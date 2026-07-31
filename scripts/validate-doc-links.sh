@@ -108,9 +108,6 @@ required_indexes=(
   "docs/context/design-system/components/components-index.json"
   "skills/uno-research/references/foundations-index.json"
   "skills/uno-research/references/patterns-index.json"
-  "skills/uno-prototype/references/tokens-index.json"
-  "skills/uno-prototype/references/examples-index.json"
-  "skills/uno-prototype/references/integrations-index.json"
 )
 
 for idx in "${required_indexes[@]}"; do

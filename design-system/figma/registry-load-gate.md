@@ -36,7 +36,7 @@ Agents **MUST** read both files below before:
 ## Supporting docs (load after registries)
 
 - `design-system/figma/component-alignment.md` — implement + write-back rules
-- `skills/uno-prototype/references/figma-mcp-guide.md` — MCP workflow
+- `design-system/figma/mcp-guide.md` — MCP workflow
 - `design-system/docs/foundations/token-mapping.md` — extended token tables (authoritative source)
 
 ## Skills that enforce this load

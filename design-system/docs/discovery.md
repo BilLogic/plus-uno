@@ -51,8 +51,8 @@ Patterns explain **how DS components compose** — not product UX, IA, or page t
 |-------|------|
 | Component registry (MANDATORY) | `design-system/figma/component-registry.json` |
 | Token registry (MANDATORY) | `design-system/figma/token-registry.json` |
-| Registry load gate | `skills/uno-prototype/references/figma-registry-mandatory-load.md` |
-| Implement-design workflow | `skills/uno-prototype/references/figma-mcp-guide.md` |
+| Registry load gate | `design-system/figma/registry-load-gate.md` |
+| Implement-design workflow | `design-system/figma/mcp-guide.md` |
 | Component Figma node links | `design-system/figma/component-figma-links.md` |
 
 ## Workflow Skills (not DS knowledge)
@@ -95,7 +95,7 @@ Patterns explain **how DS components compose** — not product UX, IA, or page t
 → `agent-views/components/Modal/Modal.md` → `docs/patterns/layout.md` (Modal skeleton)
 
 **Implement from Figma**
-→ `design-system/figma/component-registry.json` + `token-registry.json` → `figma-mcp-guide.md` → `design-system/docs/foundations/token-mapping.md` → task-specific component/pattern docs
+→ `design-system/figma/component-registry.json` + `token-registry.json` → `mcp-guide.md` → `design-system/docs/foundations/token-mapping.md` → task-specific component/pattern docs
 
 **Refresh all agent artifacts (designer)**
 → `npm run generate:agent`

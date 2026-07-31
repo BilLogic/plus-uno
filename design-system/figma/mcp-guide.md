@@ -2,26 +2,13 @@
 
 # Figma MCP Reference Guide
 
-## MANDATORY load gate (before any MCP call or JSX)
+## Before any MCP call or JSX
 
-Read in this order — **do not skip**:
-
-1. `design-system/figma/component-registry.json`
-2. `design-system/figma/token-registry.json`
-3. `references/figma-registry-mandatory-load.md` (enforcement checklist)
-
-Then load `design-system/figma/component-alignment.md` for implement + write-back rules.
-
-## Component alignment (Figma ↔ code)
-
-- `design-system/figma/component-registry.json` — code import ↔ Figma component set ↔ props
-- `design-system/figma/component-alignment.md` — implement + write-back rules
-- `design-system/figma/token-registry.json` — Figma variable ↔ `var(--*)`
-
-**Figma → code:** resolve library instances via `component-registry.json` + `search_design_system`; never hallucinate components.  
-**Code → Figma:** place component **instances** from registry; never redraw mapped components as raw frames.
-
-Pilot: `Button` tonal set (`979:20977`). See `design-system/figma/README.md`.
+The registry load gate is **`design-system/figma/registry-load-gate.md`** —
+MANDATORY, registries first, not restated here. Alignment rules (Figma → code
+resolution, code → Figma instance placement, drift prevention) are
+`design-system/figma/component-alignment.md`. This guide owns what neither
+does: the MCP tools themselves and the workflows that chain them.
 
 ## Available Tools
 
@@ -44,7 +31,7 @@ When implementing a design from a Figma link, follow all 7 steps:
 2. **Fetch design context** — `get_design_context(fileKey, nodeId)` → layout, typography, colors, component structure, spacing
 3. **Capture screenshot** — `get_screenshot(fileKey, nodeId)` → visual reference for validation throughout
 4. **Download assets** — Retrieve images, icons, SVGs from MCP assets endpoint. DO NOT install new icon packages — all assets come from Figma payload
-5. **Translate to PLUS conventions** — Map Figma output to PLUS tokens, components, and patterns. Use the Cheat Sheet as law. Resolve components via `component-registry.json`. See token mapping below
+5. **Translate to PLUS conventions** — Map Figma output to PLUS tokens, components, and patterns. The DS agent-views are law. Resolve components via `component-registry.json`. See token mapping below
 6. **Achieve visual parity** — Implement pixel-perfect matching. Use PLUS design tokens, not raw Figma values
 7. **Validate against source** — Compare implementation against the captured screenshot. Check: layout, typography, colors, states, spacing, assets, accessibility
 

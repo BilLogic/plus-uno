@@ -17,335 +17,100 @@ allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Task, mcp__figma__*, mcp__fi
 
 # Prototype
 
+PRD → design artifact. This file routes; the procedures live in the
+references below — load them at the moments the load table names.
+
 ## Agents it summons
 
 writers/blueprint (grounding reads) · researchers/explorer (prior art) ·
-reviewers/ds-lens (exit validation) · writers/figma (prototypes frames) —
-defined in `agents/` (see `agents/README.md`). Per the interaction contract,
-these are summoned by this skill, never by users.
-
-PRD → design artifact, fidelity-routed. The full procedure is
-[`references/method.md`](references/method.md) — this file is the IDE
-execution layer over it.
+reviewers/ds-lens (exit validation) · writers/figma (Figma frames) — defined
+in `agents/` (see `agents/README.md`). Summoned by this skill, never by users.
 
 ## When to use / when NOT
 
 **Use when** a **PRD is already available** (usually from uno-synthesize) and
-needs to become an artifact: a flow sketch, a data-flow map, an interactive
-draft, a working-UI proof, or a hi-fi prototypes build.
+needs to become an artifact. **PRD is mandatory at entry (method §0)** —
+Notion PRD URL, local `.md` path, or inline PRD body (user flows + acceptance
+criteria minimum). No PRD → stop and invite `skills/uno-synthesize`.
 
-**PRD is mandatory at entry (method §0).** Acceptable forms: Notion PRD URL,
-local `.md` path, or inline PRD body in the same message (user flows +
-acceptance criteria minimum). No PRD → stop and invite
-`skills/uno-synthesize` — do not prototype on an idea alone.
+**Not for:** critiquing an artifact (→ `skills/uno-review`) · sharing or
+handoff (→ `skills/uno-publish`) · drafting the PRD (→ `skills/uno-synthesize`)
+· DS-library component maintenance (→ `skills/uno-maintain`) · hand-crafted
+work — the designer's manual path carries no skill; it re-joins at review.
 
-**Not for:** critiquing an artifact (→ `skills/uno-review`) · sharing,
-replicas, or handoff (→ `skills/uno-publish`) · drafting the PRD
-(→ `skills/uno-synthesize`) · DS-library component maintenance
-(→ `skills/uno-maintain`) · hand-crafted work — the designer's manual path
-carries no skill; it re-joins at review.
+## The workflow
 
-## Fidelity routing
+1. **Gate + interview** — PRD check, then the 8-question intake ending in a
+   confirmed **brief card** (goal · artifact · fidelity dials · won't-include).
+   The card is the contract for everything after.
+2. **Understand** — ground via writers/blueprint + researchers/explorer
+   (method §1), summarize the PRD back; recommend nothing yet.
+3. **Deliver** — the confirmed artifact selects ONE deliverable doc (table
+   below); plan, produce, validate per that doc.
+4. **Exit** — ds-lens pass · one-line manifest · hand to `skills/uno-review`
+   (method §6). Iteration or a failed review re-enters at the reflection, not
+   at "fix the artifact".
 
-Method §2 in brief — the designer chooses, UNO routes, no gold-plating:
+Always optimize for **learning, not completeness**: the successful prototype is
+the smallest artifact that lets the designer confidently answer their current
+design question. Help the designer reduce scope, not grow it.
 
-| Ask | Fidelity | UNO's role |
+## Deliverables & routing
+
+The designer chooses; UNO routes — no gold-plating past the ask.
+
+| Confirmed artifact | Mode | Load |
 |---|---|---|
-| "sketch / map / work through the flow" | low | prompt engineer — diagram-shaped spec for FigJam / Stitch |
-| "validate / prove it works" | mid | prompt engineer — interactive/functional spec for Claude design / Figma Make / Stitch / v0 / Google AI Studio |
-| "build it" (approved PRD) | high | builder — DS-compliant prototypes build against uno-storybook |
-| designer draws it themselves | hand-craft | none — stay out of the way |
+| user flow · journey map · data-flow map | spec → FigJam / Stitch | `references/deliverables/flow-map.md` |
+| wireframe · static mockup | ASCII in-chat · Figma MCP · spec → Stitch / Figma Make | `references/deliverables/wireframe.md` |
+| concept image | spec → GPT / Gemini image gen | `references/deliverables/concept-image.md` |
+| storyboard | spec → sequenced image prompts + captions | `references/deliverables/storyboard.md` |
+| interactive · functional prototype | spec → Claude design / Figma Make / Stitch / v0 / AI Studio | `references/deliverables/interactive.md` |
+| hi-fi build (approved PRD, settled direction) | UNO builds on the DS in `prototypes/` | `references/deliverables/coded-build.md` |
 
-## Workflow (IDE execution of method.md)
+WIP ladder: flow map → ASCII → concept image / storyboard → Figma wireframe →
+interactive → coded build. Each rung optional; WIP artifacts exist to converge
+cheaply before the next rung.
 
-The IDE face front-loads a **reflection pass** before any routing or building:
-Understand → Prototype Reflection → Prototype Plan → Generate. The method.md
-procedures (grounding §1, prompt-spec modes §3, hard gates §5, validation loop
-§6) are unchanged — they are folded into these four steps. Always optimize for
-**learning, not completeness** (see Guiding Principle at the end).
+## Load table
 
-### Intake mode — the PRD gate AND Step 2 reflection
-
-The intake sequence is eight steps in order — `prd_check`, `prd_paste`, then
-the Step 2 reflection gates `reflect_learn`, `reflect_artifact_open`,
-`reflect_artifact`, `reflect_fidelity`, `reflect_exclude`, `reflect_confirm`.
-**The sequence is the contract; the hook is an accelerator.** Two ways to run it:
-
-- **Hook-gated** (Cursor · Claude Code · Codex — adapters in `.cursor/hooks.json`,
-  `.claude/settings.json`, `.codex/hooks.json`; one FSM backs all three):
-  `.cursor/hooks/briefings/active-intake-question.json` exists and owns the
-  state. Sanity-check it first: a `conversationId` that doesn't match the
-  current session, or an `updatedAt` older than a day, means a dead session
-  left it behind — ignore the file and take the manual path. Otherwise render
-  the **current** step (the file's `stateId` / `type` tell you which), per the
-  numbered rules below.
-- **Gate disabled?** Check `.cursor/settings.json` first: `"uno": { "prdGate": false }`
-  means the operator turned intake OFF — do not re-impose it manually; proceed
-  straight to Step 1 with the PRD gate as an ordinary skill rule.
-- **Manual** (any runtime without a wired adapter — Antigravity and Windsurf
-  until theirs land, headless runs, or a hook that failed to fire): no JSON
-  appears. Run the SAME eight steps yourself, in order, one question per
-  message, tracking your own position. Every numbered rule below still applies —
-  read "the JSON's field" as "the step you are on". Do not refuse to proceed
-  because the hook is absent; the hook automates this procedure, it does not
-  own it. Either path delivers the same intake — same steps, same order, same
-  brief-card contract.
-
-Throughout, "AskQuestion" means your runtime's ask-the-user tool —
-`AskUserQuestion` in Claude Code, `AskQuestion` in Cursor; a runtime without
-such a tool asks the same single question in plain text.
-
-1. Read `active-intake-question.json` first — the only source of truth for what
-   to ask this turn (`oneQuestionOnly` and `neverSkipStep` are always true).
-2. **One question per message — no exceptions.** If `type` is `choice`, call
-   **AskQuestion** with a `questions` array of length **1** (the prompt + its
-   options from the JSON). If `type` is `reflection`, call **AskQuestion** with a
-   single question and **compose the PRD-specific options yourself** (recommended
-   first, labeled "(Recommended)", 1–2 alternatives, then Other) following the
-   `guidance` field; honor `multiSelect`, `openEnded`, `confirm`, and the
-   `stepIndex`/`stepTotal`. Otherwise ask that one question in plain text. Plus
-   Design System is always applied; never ask which design system to use.
-3. **Set expectations, show position.** At `prd_check`, open with the one-line
-   flow map (the hook instruction carries it) so the designer sees the whole
-   road before the first question. Every step, show the JSON's `progressLabel`
-   with the question, and mention once that saying **back** revises an earlier
-   answer — this is prototyping *with* the designer; nothing locks until the
-   brief is confirmed.
-4. **Never skip a step — but never re-interview either.** When the conversation
-   already answers the current step (a pasted PRD names the goal, the ask names
-   the artifact, an earlier message sets fidelity), **render that answer as the
-   recommended option and ask to confirm** — quote where it came from ("your PRD's
-   Goals section says X — confirm?"). The step still fires, the designer still
-   rules on it, but a pre-answered step costs one tap, not a fresh question.
-   Reason from the whole context window; only ask cold when the context is
-   genuinely silent. Do not auto-advance past the confirm and do not batch steps.
-5. **Forbidden during intake:** batching steps into one AskQuestion; loading
-   `method.md`; building; or previewing later steps beyond the flow map.
-   (Grounding + the Step 1 Understand summary are expected *before* answering
-   `reflect_learn` — the step-1 instruction says so.)
-6. Intake ends only after the **brief card is confirmed** at `reflect_confirm`.
-   The hook then emits its **build handoff** message — carrying the confirmed
-   brief (goal · artifact · fidelity · exclusions) as the contract — clears
-   `active-intake-question.json`, and stops intercepting. From that point **you**
-   run Step 3 (Plan) → Step 4 (Generate) against that contract. There is **no
-   separate fidelity-picker step**: fidelity is reasoned through inside
-   `reflect_fidelity`.
-
-**PRD reuse within a conversation:** after a PRD is provided once, the hook
-caches it. A follow-up prototype request for the same project skips PRD check +
-paste and **re-enters the reflection at `reflect_learn`** (a revision may change
-the strategy). Say **upload a new PRD** to clear the cache and start fresh.
-
-If intake JSON is absent and your runtime has no hook, that is the **manual**
-path above — run the eight steps yourself. What stays forbidden either way:
-improvising a different sequence, batching steps, or skipping the PRD gate.
-
----
-
-### Step 1 — Understand (grounding folded in)
-
-**Gate: PRD required** (method §0). No PRD → stop; `skills/uno-synthesize`
-creates it (`notion_create` on approval). Return here once filed. The hook
-enforces this at entry; enforce it again on load. No exceptions.
-
-Then **ground before summarizing** (method §1 — unconditional, scoped to the
-card): summon **writers/blueprint** for this card's flows, constraints, and
-current-state context + global constraints; summon **researchers/explorer** for
-prior art in the repo (components, specs, `prototypes/` prototypes). Record the
-grounding snapshot. On re-entry: diff the PRD/blueprint against the snapshot,
-re-ground only the delta (method §1).
-
-Carefully read the PRD and, grounded against the above, **summarize**:
-
-- **Feature overview**
-- **Primary users**
-- **Core workflow**
-- **Design constraints**
-- **Remaining uncertainties or assumptions**
-
-**Do not recommend any prototype yet.** First make sure the feature is
-correctly understood — then move to reflection.
-
-### Step 2 — Prototype Reflection
-
-Reflect **with** the designer on what should be prototyped — never decide *for*
-them. Offer suggestions *with reasoning*, always grounded in the PRD, and let
-the designer reshape them; remind them they can say **back** to revise any
-earlier answer until the brief is confirmed.
-
-**Ask the four questions one by one**, under the presentation rules in § Intake
-mode above (one question per message · recommendation first, anchored in PRD
-evidence · confirm labels restate the content). Two additions specific to this
-step: Q1 (goals) may be multi-select since goals co-apply, the rest are single;
-and carry the missing-context hard gate (method §5) through — if grounding lacks
-a screen state, an interaction is ambiguous, or DS/Figma expectations are
-unclear, surface it here rather than inventing later.
-
-The lists below are your **vocabulary to pick from, not the menu to show**.
-
-1. **What are you trying to achieve?** Recommend the most likely goal(s)
-   for *this* PRD (multi-select), one line each on why — drawn from: validate
-   usability · explore concepts · compare alternatives · evaluate visual
-   direction · communicate product vision · align stakeholders · reduce
-   engineering ambiguity.
-2. **What artifact fits? — two beats.** First ask **open-ended**: *"In your own
-   words, what do you picture making?"* — no recommendation, no options menu;
-   the designer's framing comes before yours (anti-anchoring). Next turn,
-   acknowledge their words, then offer **one recommended artifact + one
-   alternative + Other** — drawn from: user flow · journey map · wireframe ·
-   static mockup · interactive prototype · functional prototype. One line of
-   tradeoff each; never imply only one correct answer.
-3. **What fidelity is actually needed?** Rather than one "hi/lo" label, render
-   each dimension as a labeled **low↔high scale line** so the dials are visible
-   at a glance (e.g. `Visual   low ──●───── high — wireframe-clean is enough`),
-   covering:
-   - **Visual** — how polished must the interface appear?
-   - **Interaction** — which interactions must behave realistically?
-   - **Scope** — which parts are in; what is intentionally out?
-   - **Complexity** — which scenarios must be supported; can edge cases simplify?
-
-   Then one AskQuestion to **confirm or adjust the dials** — the confirm label
-   restates the settings.
-4. **What should the prototype intentionally NOT include?** Give the "won't
-   include" list in prose (screens skipped · interactions left fake · flows that
-   need not exist · details that won't move the goal), then confirm with
-   **one confirm option + two alternatives + Other** — not a long checklist.
-
-**Then confirm the brief.** Assemble the four answers into **one brief card**
-(rows: Goal · Artifact · Fidelity · Won't include) and ask a single AskQuestion
-to confirm it. The confirmed card is **the contract**: Step 3 restates it, Step
-4 builds against it, and the validation loop checks the artifact against it.
-
-The reflection resolves to a fidelity route for Step 4 (the **Fidelity routing**
-table above): the artifact + fidelity dimensions map onto low/mid = prompt-spec,
-high = DS build. A revision re-enters *here* (method §2), not at "fix the
-artifact" — a failed review may legitimately change the strategy.
-
-### Step 3 — Prototype Plan
-
-Once the designer **confirms the brief**, generate the prototype plan — the
-blueprint for implementation. **Open by restating the confirmed brief card**
-(goal · artifact · fidelity · won't include), then include:
-
-- pages or frames
-- user flows
-- interactions
-- component requirements
-- variants (if useful)
-- prototype outputs
-
-**Confirm the plan + touched files** with the designer before any large or risky
-edit (method §4). Small iterations don't need the gate.
-
-### Step 4 — Generate
-
-Only **after the strategy is confirmed** do you generate. The artifact must
-faithfully follow the agreed strategy — do **not** add screens or interactions
-just because they appear in the PRD. Route by the agreed fidelity (method §2):
-
-- **Low/mid → prompt-spec, not generation.** Write the prompt-spec in the matching
-  mode (method §3) and hand it to the designer for the external tool
-  (FigJam / Stitch / Claude design / Figma Make / v0 / Google AI Studio). UNO does
-  not run the generation. **The spec ends with an embedded self-check block**
-  (method §3): the brief-card contract restated as pass/fail checks the external
-  tool must verify against its own output before returning — the loop travels
-  with the spec, so it works on any platform. Offer the designer a paste-back:
-  bring the generated result here and UNO re-checks it against the contract.
-- **High → build in `prototypes/`:**
-  a. **Ask for a Figma file first — one AskQuestion, before any build.** The
-     moment high-fi is the confirmed route and *before* you generate, ask the
-     designer: *"Do you already have a Figma file you want to build upon?"*
-     (single **AskQuestion**, `questions.length === 1`, Yes / No). This is the
-     one hook step that moved into the agent — the hook no longer asks fidelity,
-     so this question now lives here, at the threshold of high-fi generation.
-     - **Yes** → get the Figma link, then follow the full implement-design
-       workflow in [`references/figma-mcp-guide.md`](references/figma-mcp-guide.md)
-       — no skipped steps; translate variables to tokens via
-       `design-system/figma/token-registry.json` (gate:
-       [`references/figma-registry-mandatory-load.md`](references/figma-registry-mandatory-load.md)).
-     - **No** → build from the confirmed plan on the design system directly.
-  b. Scaffold from `prototypes/starter/` per `design-system/docs/setup.md`
-     (vite config: [`examples/vite-config-example.js`](examples/vite-config-example.js)).
-  c. Load the DS agent-views (Tier-2 table below) **before any component or token
-     use**; verify props against source + stories.
-  d. **Gate: DS gap** (method §5). Needed component not in
-     `design-system/agent-views/components/index.md` → name it, propose the
-     nearest existing composition, file a uno-maintain intake. Never hand-roll a
-     lookalike.
-  e. Playground frames or wip placement in Figma → summon **writers/figma**
-     (obeys `docs/conventions/figma-workspace.md`).
-
-**Validate & exit** (method §6 — the validation loop). Hi-fi: iterate until clean,
-max 3 attempts (stop conditions in method §6). **The loop's objective is the
-brief-card contract plus the machine checks**: the artifact serves the confirmed
-goal, sits at the confirmed fidelity dials, and contains nothing from the
-won't-include list — a build that passes every script but violates the brief has
-NOT converged. A runtime with a goal-loop primitive may drive this with it
-(goal = contract + checks pass; cap = 3); elsewhere run the loop as written.
-This face's check set — the interactive-IDE set; a runtime without Storybook MCP
-or a browser runs the two scripts and records the rest as unavailable, not as
-failures:
-
-- `bash skills/uno-prototype/scripts/validate-prototype.sh prototypes/{project}`
-- `bash skills/uno-review/scripts/run-review-checks.sh prototypes/{project}`
-  — a pre-flight of review's deterministic catches; fixing them here saves a
-  review round-trip (the review lenses still run on exit).
-- Stories touched → Storybook MCP `run-story-tests` (a11y included).
-- Open the running preview and verify the pages render, key interactions work,
-  and the console is clean — scripts can pass while the page is visibly broken;
-  the browser is the check of record for UI.
-
-All fidelities: summon **reviewers/ds-lens** for the conformance pass, write the
-one-line artifact manifest (fidelity · tools · PRD link · any unresolved check
-failures), then hand to `skills/uno-review` for the stage lens.
-
-## Guiding Principle
-
-**Always optimize for learning, not completeness.** A successful prototype is not
-the one with the most screens, the highest visual fidelity, or the most realistic
-interactions — it is the **smallest artifact that lets the designer confidently
-answer their current design question.** Whenever possible, help the designer
-**reduce** scope rather than increase it.
-
-## Tier-2 loads
-
-DS agent-views and layout patterns load per **AGENTS.md § Progressive loading**; estate conventions per **loading-order.md § Tier 2**. Neither is restated here — this table is only what is specific to prototyping.
-
-| Trigger | Load |
+| Moment | Load |
 |---|---|
-| Figma link / implement-design workflow | `design-system/figma/component-registry.json` + `token-registry.json` (MANDATORY — load first; gate: [`references/figma-registry-mandatory-load.md`](references/figma-registry-mandatory-load.md)), then [`references/figma-mcp-guide.md`](references/figma-mcp-guide.md) |
-| Exhaustive lookup: prior-art roots · token sources · tool wiring | [`references/examples-index.json`](references/examples-index.json) · [`references/tokens-index.json`](references/tokens-index.json) · [`references/integrations-index.json`](references/integrations-index.json) |
+| Always, on invocation | `references/method.md` (the shared core) |
+| A prototype run starts | `references/intake.md` (the interview + fidelity dials) |
+| Brief card confirmed | the ONE deliverable doc the artifact selects (table above) |
+| Figma design input | `design-system/figma/registry-load-gate.md` (MANDATORY, registries first) → `design-system/figma/mcp-guide.md` |
+| Building UI (components/tokens) | DS agent-views per **AGENTS.md § Progressive loading**; estate conventions per **loading-order.md § Tier 2** |
+
+## Constraints
+
+- **The intake owns its eight steps** (`references/intake.md`) — one question
+  per message, never skipped, never batched; ends only at the confirmed brief
+  card. The "do you have a Figma file?" question belongs to the coded-build
+  doc, asked right before generation.
+- **PRD gate is never skipped** (method §0). Exit the hook with
+  `terminate this process` / `skip PRD upload` — that releases the workflow,
+  it does not grant a PRD bypass.
+- **Grounding is never skipped** (method §1) — not even for "just a quick
+  sketch".
+- **Generate only after the brief and plan are confirmed**, and stay within
+  the agreed scope — never expand it because the PRD lists more.
+- Low/mid external-tool routes: the output is the prompt-spec, never the
+  generated artifact. In-chat and MCP-direct routes (ASCII, Figma wireframe)
+  are the named exceptions — see the deliverable docs.
+- Hi-fi: AGENTS.md forbidden patterns apply in full — tokens over literals,
+  agent-views are law, no deep imports from `design-system/src/`, PLUS
+  components first, FA Free icons only.
+- This skill builds; it does not judge (uno-review), share (uno-publish), or
+  change the DS library (uno-maintain).
+- New packages, Figma writes, and blueprint writes require explicit approval
+  or the named writer agent — never direct.
+- **Figma MCP unavailable?** The implement-design workflow halts — ask for
+  exported frames/screenshots and say why; never approximate a Figma design
+  from memory.
 
 ## Quality bar
 
 Scored against `docs/evals/rubrics/uno-prototype.md` (grounding-completeness ·
 prompt-spec-quality · ds-compliance · fidelity-appropriateness; the two hard
 gates are pass/fail). Golden scenarios: `docs/evals/scenarios/uno-prototype.md`.
-
-## Constraints
-
-- **Intake owns the eight steps; § Intake mode above owns the rules.** Not
-  restated here — the sequence, the one-question-per-message rule, the
-  hook-vs-manual paths and the runtime list all live there, once. What belongs
-  in this list: intake ends at `reflect_confirm`, and only then do **you** run
-  Step 3 (Plan) → Step 4 (Generate). There is no separate fidelity-picker step
-  (fidelity is `reflect_fidelity`); the "do you have a Figma file?" question is
-  the agent's, asked in Step 4's high-fi branch right before generation.
-- **PRD gate is never skipped** — method §0; route to `skills/uno-synthesize`
-  when PRD is absent. Exit the hook with `terminate this process` or
-  `skip PRD upload` to leave without invoking this skill.
-- Grounding is never skipped — not even for "just a quick sketch"; it is folded
-  into Step 1 (Understand), before the PRD summary.
-- **Do not recommend a prototype during Step 1**, and do not auto-decide the
-  strategy in Step 2 — suggest with reasoning and let the designer choose.
-- **Generate only after the strategy is confirmed** (Step 4), and stay within the
-  agreed scope — never expand it just because the PRD lists more.
-- Low/mid: output is the prompt-spec, never the generated artifact.
-- Hi-fi: AGENTS.md forbidden patterns apply in full — tokens over literals,
-  DS knowledge (agent-views) is law, no deep imports from
-  `design-system/src/`, PLUS components first, FA Free icons only.
-- This skill builds; it does not judge (uno-review), share (uno-publish), or
-  change the DS library (uno-maintain).
-- New packages, Figma writes, and blueprint writes all require explicit
-  approval or the named writer agent — never direct.
-- **Figma MCP unavailable?** The implement-design workflow halts — ask for exported frames/screenshots and say why; never approximate a Figma design from memory (the no-skipped-steps rule includes its inputs).

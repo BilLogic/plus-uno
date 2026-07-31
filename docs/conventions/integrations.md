@@ -2,12 +2,12 @@
 
 <!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand, ~150 tokens) · distilled 2026-07-07 · load when deciding which tool or integration path to use. -->
 
-One row per connected tool: where its conventions live, what touches it. Concrete scripts/env vars: `skills/uno-prototype/references/integrations-index.json`.
+One row per connected tool: where its conventions live, what touches it. Concrete sync scripts/env vars for the Figma pipeline: `design-system/figma/README.md` § Quick commands.
 
 | Tool | Conventions | Primary access | Written by |
 |---|---|---|---|
 | Notion | `docs/conventions/notion.md` | MCP: `notion-plus` · `notion-parsnip` · `notion-personal` | `writers/notion` only |
-| Figma | `docs/conventions/figma-workspace.md` (workspace) · `skills/uno-prototype/references/figma-mcp-guide.md` (MCP pipeline) | MCP: `figma-plus` · `figma-parsnip` (+ Cursor Figma plugin / Dev Mode) | `writers/figma` only |
+| Figma | `docs/conventions/figma-workspace.md` (workspace) · `design-system/figma/mcp-guide.md` (MCP pipeline) | MCP: `figma-plus` · `figma-parsnip` (+ Cursor Figma plugin / Dev Mode) | `writers/figma` only |
 | Slack | `docs/conventions/slack.md` | IDE MCP: `slack-plus` · `slack-parsnip` (separate OAuth each); bot: uno-bot Worker | the uno-bot embodiment |
 | Supabase (`uno-blueprint`) | `docs/conventions/supabase.md` | `blueprint_search` / PostgREST | `writers/blueprint` only |
 | Storybook (`uno-storybook`) | source of truth in `design-system/` stories; setup `.storybook/main.js` | MCP `storybook` at `http://localhost:4200/mcp` while `npm run storybook` runs | skills (component work) |
