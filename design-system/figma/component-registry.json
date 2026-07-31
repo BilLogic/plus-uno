@@ -670,11 +670,27 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/forms/DatePicker"
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/DatePicker"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
+          {
+            "id": "date-time-picker",
+            "name": "Date & Time Picker",
+            "componentSetNodeId": "13549:6703",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703",
+            "source": "manual",
+            "status": "verified"
+          },
+          {
+            "id": "month-date-picker",
+            "name": "Month (Date Picker)",
+            "componentSetNodeId": "13574:1150",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13574-1150",
+            "source": "manual",
+            "status": "verified"
+          },
           {
             "id": "date-picker-single-date",
             "name": "Date Picker (Single Date)",
@@ -692,7 +708,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9279-4480"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
       }
     },
     "Divider": {
