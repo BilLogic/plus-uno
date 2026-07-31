@@ -71,15 +71,25 @@ the Step 2 reflection gates `reflect_learn`, `reflect_artifact_open`,
 `reflect_artifact`, `reflect_fidelity`, `reflect_exclude`, `reflect_confirm`.
 **The sequence is the contract; the hook is an accelerator.** Two ways to run it:
 
-- **Hook-gated** (Cursor, Claude Code): `.cursor/hooks/briefings/active-intake-question.json`
-  exists and owns the state. Render the **current** step (the file's
-  `stateId` / `type` tell you which), per the numbered rules below.
-- **Manual** (any other runtime — Codex, Windsurf, Antigravity, headless): no
-  JSON appears. Run the SAME eight steps yourself, in order, one question per
+- **Hook-gated** (Cursor · Claude Code · Codex — adapters in `.cursor/hooks.json`,
+  `.claude/settings.json`, `.codex/hooks.json`; one FSM backs all three):
+  `.cursor/hooks/briefings/active-intake-question.json` exists and owns the
+  state. Sanity-check it first: a `conversationId` that doesn't match the
+  current session, or an `updatedAt` older than a day, means a dead session
+  left it behind — ignore the file and take the manual path. Otherwise render
+  the **current** step (the file's `stateId` / `type` tell you which), per the
+  numbered rules below.
+- **Gate disabled?** Check `.cursor/settings.json` first: `"uno": { "prdGate": false }`
+  means the operator turned intake OFF — do not re-impose it manually; proceed
+  straight to Step 1 with the PRD gate as an ordinary skill rule.
+- **Manual** (any runtime without a wired adapter — Antigravity and Windsurf
+  until theirs land, headless runs, or a hook that failed to fire): no JSON
+  appears. Run the SAME eight steps yourself, in order, one question per
   message, tracking your own position. Every numbered rule below still applies —
   read "the JSON's field" as "the step you are on". Do not refuse to proceed
   because the hook is absent; the hook automates this procedure, it does not
-  own it.
+  own it. Either path delivers the same intake — same steps, same order, same
+  brief-card contract.
 
 Throughout, "AskQuestion" means your runtime's ask-the-user tool —
 `AskUserQuestion` in Claude Code, `AskQuestion` in Cursor; a runtime without
@@ -101,9 +111,14 @@ such a tool asks the same single question in plain text.
    with the question, and mention once that saying **back** revises an earlier
    answer — this is prototyping *with* the designer; nothing locks until the
    brief is confirmed.
-4. **Never skip a step.** Even when the user's message already contains a PRD or
-   an obvious strategy, still ask the current gate step. Do not auto-advance and
-   do not batch the reflection questions.
+4. **Never skip a step — but never re-interview either.** When the conversation
+   already answers the current step (a pasted PRD names the goal, the ask names
+   the artifact, an earlier message sets fidelity), **render that answer as the
+   recommended option and ask to confirm** — quote where it came from ("your PRD's
+   Goals section says X — confirm?"). The step still fires, the designer still
+   rules on it, but a pre-answered step costs one tap, not a fresh question.
+   Reason from the whole context window; only ask cold when the context is
+   genuinely silent. Do not auto-advance past the confirm and do not batch steps.
 5. **Forbidden during intake:** batching steps into one AskQuestion; loading
    `method.md`; building; or previewing later steps beyond the flow map.
    (Grounding + the Step 1 Understand summary are expected *before* answering
@@ -158,25 +173,15 @@ them. Offer suggestions *with reasoning*, always grounded in the PRD, and let
 the designer reshape them; remind them they can say **back** to revise any
 earlier answer until the brief is confirmed.
 
-**Ask the four questions one by one** — each as its own **AskQuestion** call with
-`questions.length === 1`, never batched. Carry the missing-context hard gate
-(method §5) through this step: if grounding lacks a screen state, an interaction
-is ambiguous, or DS/Figma expectations are unclear, surface it here rather than
-inventing later.
+**Ask the four questions one by one**, under the presentation rules in § Intake
+mode above (one question per message · recommendation first, anchored in PRD
+evidence · confirm labels restate the content). Two additions specific to this
+step: Q1 (goals) may be multi-select since goals co-apply, the rest are single;
+and carry the missing-context hard gate (method §5) through — if grounding lacks
+a screen state, an interaction is ambiguous, or DS/Figma expectations are
+unclear, surface it here rather than inventing later.
 
-**Presentation rules (keep it lean — long option menus waste the designer's
-attention and tokens):**
-- **Lead with a recommendation** (except the open-ended beat of Q2). Put the
-  recommended choice first (label it "(Recommended)") — then at most one or two
-  alternatives — then **Other**. Don't enumerate every possibility from the
-  lists below; those are your vocabulary to pick from, not the menu to show.
-- **Anchor every recommendation in PRD evidence** — quote or name the section
-  that motivates it, never generic reasoning.
-- **One line per option**, and **confirm-option labels restate the content**
-  being confirmed (e.g. "Yes: mid visual, 3 screens") — never a bare "All look
-  right" a designer could click without reading.
-- Q1 (goals) may be multi-select since several goals can co-apply; the rest are
-  single-select.
+The lists below are your **vocabulary to pick from, not the menu to show**.
 
 1. **What are you trying to achieve?** Recommend the most likely goal(s)
    for *this* PRD (multi-select), one line each on why — drawn from: validate
@@ -319,26 +324,13 @@ gates are pass/fail). Golden scenarios: `docs/evals/scenarios/uno-prototype.md`.
 
 ## Constraints
 
-- **Intake = PRD gate + Step 2 reflection, then handoff** — the eight-step
-  sequence (`prd_check` → `prd_paste` → `reflect_learn` →
-  `reflect_artifact_open` → `reflect_artifact` → `reflect_fidelity` →
-  `reflect_exclude` → `reflect_confirm`), one step per message, one AskQuestion
-  with `questions.length === 1` per step — for `reflection` steps you compose
-  the PRD-specific options from the guidance (the `openEnded` beat takes free
-  text, no menu; the `confirm` beat assembles the brief card from the answers).
-  Only after the brief is confirmed do **you** run Step 3 (Plan) → Step 4
-  (Generate). There is no separate fidelity-picker step (fidelity is
-  `reflect_fidelity`); the "do you have a Figma file?" question is asked by the
-  agent in Step 4's high-fi branch, right before generation. Hook runtimes
-  automate the sequence — Cursor via `beforeSubmitPrompt` (`run.mjs`), Claude
-  Code via `UserPromptSubmit` (`claude-code-run.mjs` + `.claude/settings.json`)
-  — writing `active-intake-question.json` each turn and emitting the
-  **build-handoff** message at confirm; every other runtime runs the same
-  sequence manually (see Intake mode above).
-- **One question at a time everywhere** — the PRD-gate steps *and* the Step 2
-  reflection beats are each their own hook-gated AskQuestion
-  (`questions.length === 1`). The hook enforces this; never batch reflection
-  questions or dump the whole reflection at once even if the JSON weren't present.
+- **Intake owns the eight steps; § Intake mode above owns the rules.** Not
+  restated here — the sequence, the one-question-per-message rule, the
+  hook-vs-manual paths and the runtime list all live there, once. What belongs
+  in this list: intake ends at `reflect_confirm`, and only then do **you** run
+  Step 3 (Plan) → Step 4 (Generate). There is no separate fidelity-picker step
+  (fidelity is `reflect_fidelity`); the "do you have a Figma file?" question is
+  the agent's, asked in Step 4's high-fi branch right before generation.
 - **PRD gate is never skipped** — method §0; route to `skills/uno-synthesize`
   when PRD is absent. Exit the hook with `terminate this process` or
   `skip PRD upload` to leave without invoking this skill.

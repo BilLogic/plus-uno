@@ -1,0 +1,89 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as StudentReflectionStories from './StudentReflection.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    DocsTable,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={StudentReflectionStories} name="Toolkit Docs — Student Reflection" />
+
+<Title />
+
+Student Reflection page (Figma Pages · Student Reflection) — one student at a time.
+Shell + form match Reflection Flow. Page variants: **Unfilled · Filled · Filled-low**.
+
+For the multi-step walkthrough, use **[Reflection Flow](?path=/docs/specs-toolkit-post-session-pages-reflection-flow--toolkit-docs-reflection-flow)**.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=10662-18965"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Pages/StudentReflection"
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
+    sets={[{ name: 'Student Reflection', nodeId: '10662:18965' }]}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+Unfilled — notes empty, chip questions unanswered (Baxter Ellington active).
+
+<DocsCanvasShell attachSourceBelow description={<>Primary canvas (<code>Unfilled</code>).</>}>
+    <Canvas of={StudentReflectionStories.Unfilled} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### States
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Figma</th>
+            <th>Story</th>
+            <th>What it shows</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>state=unfilled</td>
+            <td>Unfilled</td>
+            <td>Empty chips; AI hidden until banks are complete</td>
+        </tr>
+        <tr>
+            <td>state=filled</td>
+            <td>Filled</td>
+            <td>Happy-path chips + AI follow-up answered</td>
+        </tr>
+        <tr>
+            <td>state=filled-low</td>
+            <td>Filled-low</td>
+            <td>Other everywhere, AI empty, concern + Escalate</td>
+        </tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive
+
+<DocsInteractivePlayground
+    of={StudentReflectionStories.Overview}
+    description={
+        <>
+            Use <strong className="text-foreground">Form state</strong> to switch Unfilled · Filled · Filled-low.
+        </>
+    }
+/>
+
+</div>
+
+</div>

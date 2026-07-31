@@ -69,7 +69,7 @@ Only after user opts in and supplies a Figma URL.
    - **Hit** → place **component instance** with variant props; apply `codeDefaults` (e.g. `fill`)
    - **Miss** → stop and report; do not draw a substitute shape
 3. Layout/spacing → bind Figma variables, never raw hex/px
-4. Record returned `node-id`s in `playground/<name>/<name>-manifest.json`
+4. Record returned `node-id`s in `prototypes/<name>/<name>-manifest.json`
 5. Run `npm run validate:figma-writeback` then `npm run audit:figma-writeback` (gate clears on pass)
 
 **IDE gate:** saying "write back to Figma" activates `.cursor/hooks/briefings/active-writeback-gate.json`. **`generate_figma_design` / screenshot capture is forbidden as the final frame** — reference-only at most.

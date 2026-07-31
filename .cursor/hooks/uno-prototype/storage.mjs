@@ -54,12 +54,22 @@ function briefingPath(conversationId) {
  * @param {string} conversationId
  * @returns {SessionState | null}
  */
+/** Sessions older than this are treated as abandoned, not resumed. Without it,
+ *  a conversation left mid-reflection days ago silently consumes the next
+ *  unrelated prompt as the reflection answer (ce:review 064). */
+const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
+
 export function loadSession(conversationId) {
   ensureDirs();
   const file = statePath(conversationId);
   if (!fs.existsSync(file)) return null;
   try {
-    return JSON.parse(fs.readFileSync(file, 'utf8'));
+    const session = JSON.parse(fs.readFileSync(file, 'utf8'));
+    if (session?.updatedAt && Date.now() - Date.parse(session.updatedAt) > SESSION_TTL_MS) {
+      clearSession(conversationId); // stale — release the gate rather than eat a prompt
+      return null;
+    }
+    return session;
   } catch {
     return null;
   }

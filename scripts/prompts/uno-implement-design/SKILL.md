@@ -181,5 +181,5 @@ The shared bot voice from `AGENTS.md` applies. Two constraints on top:
 
 ## Related Skills
 
-- **`uno-implement`** — updates an existing DS-library component (source + stories). The sibling of this skill; the agent picks between them per `AGENTS.md` rule 2.1.
+- **`uno-implement`** — updates an existing DS-library component (source + stories). The sibling of this skill; the agent picks between them per `AGENTS.md` § Forbidden patterns (DS-knowledge-is-law).
 - **`uno-marketplace`** — after a prototype ships, register it in the Prototype Market via `marketplace_add`.

@@ -343,7 +343,15 @@ const preview = {
                 "Tables",
                 "Modals",
                 "Sections",
-                "Pages"
+                "Pages",
+                [
+                  "Session Info",
+                  "Student Reflection",
+                  "Session Reflection",
+                  "Self Reflection",
+                  "Form Feedback",
+                  "Reflection Flow"
+                ]
               ]
             ],
             "Admin",

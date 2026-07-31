@@ -171,6 +171,23 @@ export function FigmaNodesTable({ sets, fileKey }) {
 }
 
 /**
+ * Catalog / states table for MDX inside `.not-prose` wrappers.
+ * Prefer this over Markdown pipe tables — those do not style under `not-prose` and look malformed.
+ *
+ * @param {object} props
+ * @param {React.ReactNode} props.children - `<thead>` + `<tbody>`
+ * @param {string} [props.className]
+ */
+export function DocsTable({ children, className = '' }) {
+    const wrapClass = ['sb-ds-doc-table-wrap', className].filter(Boolean).join(' ');
+    return (
+        <div className={wrapClass}>
+            <table className="sb-ds-doc-table">{children}</table>
+        </div>
+    );
+}
+
+/**
  * Design + repo links above the docs body.
  * Figma: specs and tokens. GitHub: full source tree, history, and PR context — unlike the Overview code snippet,
  * which is usually a curated web-app/JSP-style excerpt, not the whole React implementation.

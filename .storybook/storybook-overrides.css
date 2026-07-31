@@ -46,11 +46,16 @@ body,
     margin-top: var(--size-element-gap-md) !important;
 }
 
-/* Body text in docs */
-.sbdocs p,
-.sbdocs li,
-.sbdocs td,
-.sbdocs th {
+/*
+ * Body text in MDX prose only.
+ * Do NOT target bare `.sbdocs p` / `li` / `td` — that !important override
+ * smashed DS utilities (body3-txt captions, h6 titles, etc.) inside story canvases.
+ */
+.sbdocs p.sbdocs-p,
+.sbdocs li.sbdocs-li,
+.sbdocs .sbdocs-content > p:not([class]),
+.sbdocs .sbdocs-content > ul > li:not([class]),
+.sbdocs .sbdocs-content > ol > li:not([class]) {
     font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif) !important;
     font-size: var(--font-size-body1, 16px) !important;
     line-height: var(--font-line-height-body1, 150%) !important;
@@ -406,6 +411,59 @@ a.sbdocs-a {
 .sbdocs .sb-button-docs .sb-button-doc-section .sbdocs-h3 {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
+}
+
+/*
+ * Docs tables inside `.not-prose` (catalog / states).
+ * Prefer `<DocsTable>` / `<table class="sb-ds-doc-table">` over Markdown pipe tables.
+ */
+.sbdocs .sb-ds-doc-table-wrap {
+  overflow: hidden;
+  width: 100%;
+  margin: 0.5rem 0 0;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--size-card-radius-sm);
+  background: var(--color-surface, #fff);
+}
+
+.sbdocs .sb-ds-doc-table {
+  width: 100%;
+  margin: 0 !important;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-on-surface, #191c1e);
+}
+
+.sbdocs .sb-ds-doc-table thead tr {
+  background: color-mix(in srgb, var(--color-muted, #e0e3e7) 40%, transparent);
+}
+
+.sbdocs .sb-ds-doc-table th,
+.sbdocs .sb-ds-doc-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+  text-align: left;
+  vertical-align: top;
+}
+
+.sbdocs .sb-ds-doc-table th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sbdocs .sb-ds-doc-table tbody tr:last-child th,
+.sbdocs .sb-ds-doc-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.sbdocs .sb-ds-doc-table a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.sbdocs .sb-ds-doc-table a:hover {
+  text-decoration: underline;
 }
 
 /*

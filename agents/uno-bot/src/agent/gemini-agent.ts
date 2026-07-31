@@ -286,7 +286,10 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
         // rest of the turn; the next turn re-caches under the model in use.
         if (harnessCache.name) {
           console.log(`[gemini-cache] dropped for the fallback model — inlining the system prompt`);
-          if (perRequestSystem) contents.shift();
+          // Self-describing removal: only shift if index 0 IS the prepended
+          // per-request turn. A future leading-turn insertion must not cause
+          // this to silently delete the oldest history turn (ce:review 067).
+          if (perRequestSystem && contents[0]?.parts?.[0]?.text === perRequestSystem) contents.shift();
           harnessCache.name = null;
         }
         return callGemini(disableTools);

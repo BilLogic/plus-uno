@@ -4,7 +4,7 @@ import Button from '@/components/actions/Button';
 
 /**
  * Form footer navigation for reflection steps
- * (Figma: Navigation Button + Button Group).
+ * (Figma Navigation Button + spaced Button Group layout — not connected ButtonGroup chrome).
  *
  * @param {object} props
  * @param {boolean} [props.canSave=false] - Enables Save & Exit

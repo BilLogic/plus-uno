@@ -1,0 +1,30 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SessionSelectionStories from './SessionSelection.stories.jsx';
+import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SessionSelectionStories} name="Toolkit Docs — SessionSelection" />
+
+<Title />
+
+Session selection dropdown (Empty/Filled × closed/open) plus “Session did not happen” switch.
+Placeholder: **Session site + time**. Label uses Body/B3.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=20-24370"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Elements/SessionSelection"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Empty and filled side by side.</>}>
+    <Canvas of={SessionSelectionStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+</div>

@@ -1,19 +1,17 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import Rating from '@/components/forms-and-inputs/Rating';
-import Textarea from '@/components/forms-and-inputs/Textarea';
-import { PageLayout } from '@/specs/Universal/Pages';
 import SideNavBar from '@/specs/Toolkit/Post-Session/Sections/SideNavBar/SideNavBar';
-import SessionInformationForm from '@/specs/Toolkit/Post-Session/Sections/SessionInformationForm/SessionInformationForm';
-import SessionReflectionFormV2 from '@/specs/Toolkit/Post-Session/Sections/SessionReflectionForm/SessionReflectionFormV2';
-import StudentReflectionFormV2 from '@/specs/Toolkit/Post-Session/Sections/StudentReflectionForm/StudentReflectionFormV2';
-import LinearScale from '@/specs/Toolkit/Post-Session/Sections/LinearScale/LinearScale';
-import NavigationButtons from '@/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons';
+import SessionInfoForm from '@/specs/Toolkit/Post-Session/Sections/SessionInfoForm/SessionInfoForm';
+import SessionReflectionForm from '@/specs/Toolkit/Post-Session/Sections/SessionReflectionForm/SessionReflectionForm';
+import StudentReflectionForm from '@/specs/Toolkit/Post-Session/Sections/StudentReflectionForm/StudentReflectionForm';
+import SelfReflectionForm from '@/specs/Toolkit/Post-Session/Sections/SelfReflectionForm/SelfReflectionForm';
+import FormFeedbackForm from '@/specs/Toolkit/Post-Session/Sections/FormFeedbackForm/FormFeedbackForm';
 import ConfirmationPopUp from '@/specs/Toolkit/Post-Session/Modals/ConfirmationPopUp/ConfirmationPopUp';
 import {
-    FORM_RATING_COMMENTS,
-    formatLastUpdated,
-} from '@/specs/Toolkit/Post-Session/reflectionCopy';
+    ReflectionContentRow,
+    ReflectionExitModals,
+    ReflectionPageLayout,
+} from '@/specs/Toolkit/Post-Session/Pages/pageShell';
 
 const DEFAULT_STUDENTS = [
     { id: 'kiera', name: 'Kiera Wintervale', status: 'incomplete' },
@@ -22,117 +20,22 @@ const DEFAULT_STUDENTS = [
 ];
 
 /**
- * Self reflection step body.
+ * Clamps initial tab when cadence sections are hidden.
  *
- * @param {object} props
+ * @param {string} tab
+ * @param {boolean} showSelfReflection
+ * @param {boolean} showFormFeedback
+ * @returns {string}
  */
-function SelfReflectionStep({ data, onChange, onCancel, onSaveAndExit, onNext, onPrevious }) {
-    const rating = data.rating || 0;
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)', flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
-                <h4 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>Self Reflection</h4>
-                <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>{formatLastUpdated()}</p>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                <p className="body1-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
-                    How do you feel about your performance this session?
-                    <span style={{ color: 'var(--color-danger)' }}> *</span>
-                </p>
-                <LinearScale
-                    name="self-reflection-rating"
-                    value={rating}
-                    onChange={(value) => onChange({ ...data, rating: value })}
-                />
-            </div>
-            {rating > 0 && (
-                <Textarea
-                    id="self-reflection-notes"
-                    label="Anything else you’d like to note?"
-                    value={data.notes || ''}
-                    onChange={(event) => onChange({ ...data, notes: event.target.value })}
-                    rows={4}
-                />
-            )}
-            <NavigationButtons
-                showPrevious
-                canSave={rating >= 1}
-                canNext={rating >= 1}
-                onPrevious={onPrevious}
-                onCancel={onCancel}
-                onSaveAndExit={onSaveAndExit}
-                onNext={onNext}
-            />
-        </div>
-    );
+function resolveInitialTab(tab, showSelfReflection, showFormFeedback) {
+    if (tab === 'self-reflection' && !showSelfReflection) {
+        return showFormFeedback ? 'form-feedback' : 'session-reflection';
+    }
+    if (tab === 'form-feedback' && !showFormFeedback) {
+        return showSelfReflection ? 'self-reflection' : 'session-reflection';
+    }
+    return tab;
 }
-
-SelfReflectionStep.propTypes = {
-    data: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
-    onCancel: PropTypes.func,
-    onSaveAndExit: PropTypes.func,
-    onNext: PropTypes.func,
-    onPrevious: PropTypes.func,
-};
-
-/**
- * Form feedback step body.
- *
- * @param {object} props
- */
-function FormFeedbackStep({ data, onChange, onCancel, onSaveAndExit, onPrevious, onSubmit }) {
-    const rating = data.rating || 0;
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)', flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
-                <h4 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>Form Feedback</h4>
-                <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>{formatLastUpdated()}</p>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                <p className="body1-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
-                    How was this reflection form?
-                    <span style={{ color: 'var(--color-danger)' }}> *</span>
-                </p>
-                <Rating
-                    id="form-feedback-rating"
-                    value={rating}
-                    onChange={(value) => onChange({ ...data, rating: value })}
-                    icon="thumbs-up"
-                    variant="comments"
-                    showCommentsLabel={rating > 0}
-                    commentsLabel={FORM_RATING_COMMENTS[rating]}
-                />
-            </div>
-            <Textarea
-                id="form-feedback-notes"
-                label="Any feedback on the reflection experience?"
-                value={data.notes || ''}
-                onChange={(event) => onChange({ ...data, notes: event.target.value })}
-                rows={4}
-            />
-            <NavigationButtons
-                showPrevious
-                showSubmit
-                canSave={rating >= 1}
-                canNext={rating >= 1}
-                onPrevious={onPrevious}
-                onCancel={onCancel}
-                onSaveAndExit={onSaveAndExit}
-                onSubmit={onSubmit}
-            />
-        </div>
-    );
-}
-
-FormFeedbackStep.propTypes = {
-    data: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
-    onCancel: PropTypes.func,
-    onSaveAndExit: PropTypes.func,
-    onPrevious: PropTypes.func,
-    onSubmit: PropTypes.func,
-};
 
 /**
  * Full post-session reflection flow orchestrator (PageLayout + side nav + step content).
@@ -142,9 +45,17 @@ FormFeedbackStep.propTypes = {
  * @param {{ id?: string, name: string, status?: string }[]} [props.students]
  * @param {string} [props.initialTab='session-information']
  * @param {object} [props.initialSessionInfo]
- * @param {() => void} [props.onExit]
- * @param {() => void} [props.onSubmitted]
- * @param {boolean} [props.showSaveAndExitOnMount=false] - Story helper for Save & Exit modal state
+ * @param {(result?: object) => void} [props.onExit]
+ * @param {(result?: object) => void} [props.onSubmitted]
+ * @param {null|'discard'|'saved'} [props.initialExitModal=null]
+ * @param {boolean} [props.showSubmittedOnMount=false]
+ * @param {object} [props.initialCompletedSections]
+ * @param {object} [props.initialStudentReflections]
+ * @param {object} [props.initialSessionReflection]
+ * @param {object} [props.initialSelfReflection]
+ * @param {object} [props.initialFormFeedback]
+ * @param {boolean} [props.showSelfReflection=true]
+ * @param {boolean} [props.showFormFeedback=true]
  */
 const ReflectionFlow = ({
     students: studentsProp = DEFAULT_STUDENTS,
@@ -152,35 +63,61 @@ const ReflectionFlow = ({
     initialSessionInfo = {},
     onExit,
     onSubmitted,
-    showSaveAndExitOnMount = false,
+    initialExitModal = null,
+    showSubmittedOnMount = false,
+    initialCompletedSections = {},
+    initialStudentReflections = {},
+    initialSessionReflection = {},
+    initialSelfReflection = {},
+    initialFormFeedback = {},
+    showSelfReflection = true,
+    showFormFeedback = true,
 }) => {
     const [students, setStudents] = useState(studentsProp);
-    const [activeTab, setActiveTab] = useState(initialTab);
+    const [activeTab, setActiveTab] = useState(
+        () => resolveInitialTab(initialTab, showSelfReflection, showFormFeedback),
+    );
     const [sessionInfo, setSessionInfo] = useState(initialSessionInfo);
-    const [studentReflections, setStudentReflections] = useState({});
-    const [sessionReflection, setSessionReflection] = useState({});
-    const [selfReflection, setSelfReflection] = useState({});
-    const [formFeedback, setFormFeedback] = useState({});
-    const [completedSections, setCompletedSections] = useState({});
-    const [showSaveExit, setShowSaveExit] = useState(showSaveAndExitOnMount);
-    const [submitted, setSubmitted] = useState(false);
+    const [studentReflections, setStudentReflections] = useState(initialStudentReflections);
+    const [sessionReflection, setSessionReflection] = useState(initialSessionReflection);
+    const [selfReflection, setSelfReflection] = useState(initialSelfReflection);
+    const [formFeedback, setFormFeedback] = useState(initialFormFeedback);
+    const [completedSections, setCompletedSections] = useState(initialCompletedSections);
+    const [draftSnapshot, setDraftSnapshot] = useState(null);
+    /** @type {[null|'discard'|'saved', Function]} */
+    const [exitModal, setExitModal] = useState(initialExitModal);
+    const [submitted, setSubmitted] = useState(showSubmittedOnMount);
+    const [cancelled, setCancelled] = useState(Boolean(initialSessionInfo.didNotHappen));
 
     const selectedStudentIndex = activeTab.startsWith('student-')
         ? Number(activeTab.replace('student-', ''))
         : 0;
 
     const completedStudents = useMemo(
-        () => students.every((student) => student.status === 'complete'),
+        () => students.length > 0 && students.every((student) => student.status === 'complete'),
         [students],
     );
 
-    const canSubmit = Boolean(
-        completedSections['session-information']
-        && completedStudents
-        && completedSections['session-reflection']
-        && completedSections['self-reflection']
-        && completedSections['form-feedback'],
+    const sessionInfoDone = Boolean(completedSections['session-information']);
+    const studentReflectionDone = Boolean(completedSections['student-reflection']) || completedStudents;
+    const sessionReflectionDone = Boolean(completedSections['session-reflection']);
+    const selfReflectionDone = Boolean(completedSections['self-reflection']);
+
+    /**
+     * Prior steps required before Form Feedback / final Submit (excludes form-feedback itself).
+     */
+    const prerequisitesMet = Boolean(
+        sessionInfoDone
+        && studentReflectionDone
+        && sessionReflectionDone
+        && (!showSelfReflection || selfReflectionDone),
     );
+
+    /**
+     * SideNav Submit enablement — prior steps only (navigates to Form Feedback when needed).
+     * Finalization still requires a Form Feedback rating when that step is shown.
+     */
+    const canSubmit = !cancelled && !submitted && prerequisitesMet;
 
     /**
      * @param {string} section
@@ -199,16 +136,102 @@ const ReflectionFlow = ({
     };
 
     /**
-     * Opens Save & Exit confirmation.
+     * Persists a draft snapshot into the active step's in-memory state.
+     *
+     * @param {object|null|undefined} data
      */
-    const openSaveExit = () => setShowSaveExit(true);
+    const persistDraft = (data) => {
+        if (!data) return;
+        if (activeTab === 'session-information') setSessionInfo(data);
+        else if (activeTab.startsWith('student-') || activeTab === 'student-reflection') {
+            const index = activeTab === 'student-reflection' ? 0 : selectedStudentIndex;
+            const student = students[index];
+            if (student) {
+                setStudentReflections((prev) => ({
+                    ...prev,
+                    [student.id || student.name]: data,
+                }));
+            }
+        } else if (activeTab === 'session-reflection') setSessionReflection(data);
+        else if (activeTab === 'self-reflection') setSelfReflection(data);
+        else if (activeTab === 'form-feedback') setFormFeedback(data);
+    };
 
     /**
-     * Advances after Session Information.
+     * Cancel → discard modal when dirty; clean Cancel exits immediately.
+     *
+     * @param {object} [data]
+     * @param {boolean} [dirty=true]
+     */
+    const openDiscardModal = (data, dirty = true) => {
+        if (!dirty) {
+            onExit?.({ saved: false });
+            return;
+        }
+        setDraftSnapshot(data || null);
+        setExitModal('discard');
+    };
+
+    /**
+     * Save & Exit from nav → persist then Saved modal (Figma type=exit).
+     *
+     * @param {object} [data]
+     */
+    const openSavedModal = (data) => {
+        persistDraft(data);
+        setDraftSnapshot(data || null);
+        setExitModal('saved');
+    };
+
+    /**
+     * Discard modal secondary: Save & Exit — persist then show Saved.
+     */
+    const handleDiscardSaveAndExit = () => {
+        persistDraft(draftSnapshot);
+        setExitModal('saved');
+    };
+
+    /**
+     * Discard modal primary: leave without saving.
+     */
+    const handleExitWithoutSaving = () => {
+        setExitModal(null);
+        setDraftSnapshot(null);
+        onExit?.({ saved: false });
+    };
+
+    /**
+     * Saved modal primary: Exit after save.
+     */
+    const handleSavedExit = () => {
+        const draft = draftSnapshot;
+        setExitModal(null);
+        setDraftSnapshot(null);
+        onExit?.({ saved: true, draft });
+    };
+
+    /**
+     * Saved modal secondary: Continue Editing.
+     */
+    const handleContinueEditing = () => {
+        setExitModal(null);
+        setDraftSnapshot(null);
+    };
+
+    /**
      * @param {object} data
      */
     const handleSessionInfoNext = (data) => {
         setSessionInfo(data);
+        if (data.didNotHappen) {
+            setCancelled(true);
+            markComplete('cancellation');
+            markComplete('session-information');
+            setSubmitted(true);
+            onSubmitted?.({ cancelled: true, data });
+            return;
+        }
+        setCancelled(false);
         markComplete('session-information');
         setActiveTab(students.length ? 'student-0' : 'session-reflection');
     };
@@ -235,34 +258,102 @@ const ReflectionFlow = ({
     const handleSessionReflectionNext = (data) => {
         setSessionReflection(data);
         markComplete('session-reflection');
-        setActiveTab('self-reflection');
+        if (showSelfReflection) {
+            setActiveTab('self-reflection');
+        } else if (showFormFeedback) {
+            setActiveTab('form-feedback');
+        } else {
+            setSubmitted(true);
+            onSubmitted?.({ data: { sessionReflection: data } });
+        }
     };
 
     /**
-     * Completes self reflection and moves to form feedback.
+     * @param {object} data
      */
-    const handleSelfNext = () => {
+    const handleSelfNext = (data) => {
+        setSelfReflection(data);
         markComplete('self-reflection');
-        setActiveTab('form-feedback');
+        if (showFormFeedback) {
+            setActiveTab('form-feedback');
+        } else {
+            setSubmitted(true);
+            onSubmitted?.({ data: { selfReflection: data } });
+        }
     };
 
     /**
-     * Final submit of the in-memory reflection.
+     * Final submit — gated on prior steps + Form Feedback rating when shown.
+     *
+     * @param {object} [data]
      */
-    const handleSubmit = () => {
+    const handleSubmit = (data) => {
+        if (cancelled || submitted || !prerequisitesMet) return;
+
+        if (showFormFeedback && activeTab !== 'form-feedback' && !data) {
+            setActiveTab('form-feedback');
+            return;
+        }
+
+        const payload = data || formFeedback;
+        if (showFormFeedback && Number(payload?.rating) < 1) {
+            if (activeTab !== 'form-feedback') setActiveTab('form-feedback');
+            return;
+        }
+
+        if (data) setFormFeedback(data);
         markComplete('form-feedback');
         setSubmitted(true);
-        onSubmitted?.();
+        onSubmitted?.({
+            sessionInfo,
+            studentReflections,
+            sessionReflection,
+            selfReflection,
+            formFeedback: payload,
+        });
     };
 
     /**
-     * Renders the active step panel.
+     * Gate SideNav jumps to completed (or current) prerequisites.
+     *
+     * @param {string} tab
+     */
+    const handleTabClick = (tab) => {
+        if (tab === 'session-information') {
+            setActiveTab(tab);
+            return;
+        }
+        if (!sessionInfoDone) return;
+        if (tab.startsWith('student-') || tab === 'student-reflection') {
+            setActiveTab(tab);
+            return;
+        }
+        if (tab === 'session-reflection') {
+            if (studentReflectionDone || activeTab.startsWith('student-')) setActiveTab(tab);
+            return;
+        }
+        if (tab === 'self-reflection') {
+            if (showSelfReflection && sessionReflectionDone) setActiveTab(tab);
+            return;
+        }
+        if (tab === 'form-feedback') {
+            if (
+                showFormFeedback
+                && sessionReflectionDone
+                && (!showSelfReflection || selfReflectionDone)
+            ) {
+                setActiveTab(tab);
+            }
+        }
+    };
+
+    /**
      * @returns {React.ReactNode}
      */
     const renderStep = () => {
         if (activeTab === 'session-information') {
             return (
-                <SessionInformationForm
+                <SessionInfoForm
                     initialData={sessionInfo}
                     availableStudents={studentsProp}
                     selectedStudentIds={sessionInfo.selectedStudentIds || students.map((s) => s.id || s.name)}
@@ -273,33 +364,26 @@ const ReflectionFlow = ({
                         );
                     }}
                     onSave={handleSessionInfoNext}
-                    onCancel={openSaveExit}
-                    onSaveAndExit={(data) => {
-                        setSessionInfo(data);
-                        openSaveExit();
-                    }}
+                    onCancel={(data, dirty) => openDiscardModal(data, dirty)}
+                    onSaveAndExit={(data) => openSavedModal(data)}
                 />
             );
         }
 
         if (activeTab.startsWith('student-') || activeTab === 'student-reflection') {
             const index = activeTab === 'student-reflection' ? 0 : selectedStudentIndex;
-            const student = students[index] || students[0];
+            const student = students[Number.isFinite(index) ? index : 0] || students[0];
             if (!student) {
                 return <p className="body1-txt">Add students in Session Information to continue.</p>;
             }
             const studentKey = student.id || student.name;
             return (
-                <StudentReflectionFormV2
+                <StudentReflectionForm
                     key={studentKey}
                     studentName={student.name}
                     initialData={studentReflections[studentKey] || {}}
-                    aiState={studentReflections[studentKey]?.goalProgress?.length ? 'ready' : 'idle'}
-                    onCancel={openSaveExit}
-                    onSaveAndExit={(data) => {
-                        setStudentReflections((prev) => ({ ...prev, [studentKey]: data }));
-                        openSaveExit();
-                    }}
+                    onCancel={(data, dirty) => openDiscardModal(data, dirty)}
+                    onSaveAndExit={(data) => openSavedModal(data)}
                     onNext={handleStudentNext}
                 />
             );
@@ -307,39 +391,35 @@ const ReflectionFlow = ({
 
         if (activeTab === 'session-reflection') {
             return (
-                <SessionReflectionFormV2
+                <SessionReflectionForm
                     initialData={sessionReflection}
-                    onCancel={openSaveExit}
-                    onSaveAndExit={(data) => {
-                        setSessionReflection(data);
-                        openSaveExit();
-                    }}
+                    onCancel={(data, dirty) => openDiscardModal(data, dirty)}
+                    onSaveAndExit={(data) => openSavedModal(data)}
                     onNext={handleSessionReflectionNext}
                 />
             );
         }
 
-        if (activeTab === 'self-reflection') {
+        if (activeTab === 'self-reflection' && showSelfReflection) {
             return (
-                <SelfReflectionStep
-                    data={selfReflection}
-                    onChange={setSelfReflection}
+                <SelfReflectionForm
+                    initialData={selfReflection}
                     onPrevious={() => setActiveTab('session-reflection')}
-                    onCancel={openSaveExit}
-                    onSaveAndExit={openSaveExit}
+                    onCancel={(data, dirty) => openDiscardModal(data, dirty)}
+                    onSaveAndExit={(data) => openSavedModal(data)}
                     onNext={handleSelfNext}
                 />
             );
         }
 
-        if (activeTab === 'form-feedback') {
+        if (activeTab === 'form-feedback' && showFormFeedback) {
             return (
-                <FormFeedbackStep
-                    data={formFeedback}
-                    onChange={setFormFeedback}
-                    onPrevious={() => setActiveTab('self-reflection')}
-                    onCancel={openSaveExit}
-                    onSaveAndExit={openSaveExit}
+                <FormFeedbackForm
+                    initialData={formFeedback}
+                    onDraftChange={setFormFeedback}
+                    onPrevious={() => setActiveTab(showSelfReflection ? 'self-reflection' : 'session-reflection')}
+                    onCancel={(data, dirty) => openDiscardModal(data, dirty)}
+                    onSaveAndExit={(data) => openSavedModal(data)}
                     onSubmit={handleSubmit}
                 />
             );
@@ -350,61 +430,38 @@ const ReflectionFlow = ({
 
     return (
         <div style={{ width: '100%', height: '100%' }}>
-            <PageLayout
-                topBarConfig={{
-                    breadcrumbs: [
-                        { text: 'Toolkit', href: '#' },
-                        { text: 'Sessions', href: '#' },
-                        { text: 'Reflection Form' },
-                    ],
-                    user: { name: 'John Doe', role: 'Lead' },
-                }}
-                sidebarConfig={{
-                    user: 'tutor',
-                    activeTab: 'sessions',
-                }}
-                id="post-session-reflection-flow"
-                style={{ width: '100%', height: '100%' }}
-            >
-                <div
-                    style={{
-                        display: 'flex',
-                        gap: 'var(--size-surface-gap-md)',
-                        width: '100%',
-                        minHeight: '100%',
-                        alignItems: 'stretch',
-                    }}
+            <ReflectionPageLayout id="post-session-reflection-flow">
+                <ReflectionContentRow
+                    sideNav={(
+                        <SideNavBar
+                            students={students}
+                            activeTab={activeTab}
+                            completedSections={{
+                                ...completedSections,
+                                'student-reflection': studentReflectionDone,
+                            }}
+                            canSubmit={canSubmit}
+                            showSelfReflection={showSelfReflection}
+                            showFormFeedback={showFormFeedback}
+                            onTabClick={handleTabClick}
+                            onSubmit={() => handleSubmit()}
+                        />
+                    )}
                 >
-                    <SideNavBar
-                        state={activeTab === 'session-information' ? 'pre-student-add' : activeTab.startsWith('student-') ? 'students-confirmed' : 'in-progress'}
-                        students={students}
-                        activeTab={activeTab}
-                        completedSections={{
-                            ...completedSections,
-                            'student-reflection': completedStudents || completedSections['student-reflection'],
-                        }}
-                        canSubmit={canSubmit}
-                        onTabClick={setActiveTab}
-                        onSubmit={handleSubmit}
-                    />
-                    <div style={{ flex: '1 1 auto', minWidth: 0, width: '100%' }}>
-                        {renderStep()}
-                    </div>
-                </div>
-            </PageLayout>
+                    {renderStep()}
+                </ReflectionContentRow>
+            </ReflectionPageLayout>
 
-            <ConfirmationPopUp
-                show={showSaveExit}
-                type="exit-without-saving"
-                onClose={() => setShowSaveExit(false)}
-                onPrimary={() => {
-                    setShowSaveExit(false);
-                    onExit?.();
+            <ReflectionExitModals
+                exitModal={exitModal}
+                setExitModal={(next) => {
+                    setExitModal(next);
+                    if (next == null) setDraftSnapshot(null);
                 }}
-                onSecondary={() => {
-                    setShowSaveExit(false);
-                    onExit?.();
-                }}
+                onExitWithoutSaving={handleExitWithoutSaving}
+                onSavedExit={handleSavedExit}
+                onDiscardSaveAndExit={handleDiscardSaveAndExit}
+                onContinueEditing={handleContinueEditing}
             />
             <ConfirmationPopUp
                 show={submitted}
@@ -423,7 +480,15 @@ ReflectionFlow.propTypes = {
     initialSessionInfo: PropTypes.object,
     onExit: PropTypes.func,
     onSubmitted: PropTypes.func,
-    showSaveAndExitOnMount: PropTypes.bool,
+    initialExitModal: PropTypes.oneOf([null, 'discard', 'saved']),
+    showSubmittedOnMount: PropTypes.bool,
+    initialCompletedSections: PropTypes.object,
+    initialStudentReflections: PropTypes.object,
+    initialSessionReflection: PropTypes.object,
+    initialSelfReflection: PropTypes.object,
+    initialFormFeedback: PropTypes.object,
+    showSelfReflection: PropTypes.bool,
+    showFormFeedback: PropTypes.bool,
 };
 
 export default ReflectionFlow;

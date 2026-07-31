@@ -1,0 +1,31 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SideNavBarStories from './SideNavBar.stories.jsx';
+import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SideNavBarStories} name="Toolkit Docs — Side Nav Bar" />
+
+<Title />
+
+Side Nav Bar for the reflection flow
+(Figma: pre-student add · students confirmed · in progress).
+While a student is active, **Student Reflection** stays selected; student name rows are text-only.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=20-24229"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Sections/SideNavBar"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Primary canvas</>}>
+    <Canvas of={SideNavBarStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+</div>

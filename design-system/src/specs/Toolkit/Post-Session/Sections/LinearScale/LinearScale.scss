@@ -1,0 +1,58 @@
+/**
+ * Post-Session Linear Scale — Figma Sections · Linear Scale `10819:11602`.
+ * Shell: primary-state-08 · section radius-md · col-8 (445px).
+ * Row: wrapping end labels (flex) + fixed 1–5 radio columns · gap-lg between groups.
+ */
+
+.post-session-linear-scale {
+    width: var(--col-8);
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: var(--size-section-pad-y-sm) var(--size-section-pad-x-sm);
+    background-color: var(--color-primary-state-08);
+    border-radius: var(--size-section-radius-md);
+}
+
+.post-session-linear-scale__row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-section-gap-lg);
+    min-width: 0;
+}
+
+.post-session-linear-scale__label {
+    flex: 1 0 0;
+    min-width: 0;
+    color: var(--color-on-surface);
+    line-height: var(--font-line-height-body2, 1.571);
+    word-break: break-word;
+}
+
+.post-session-linear-scale__options {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: var(--size-section-gap-md);
+}
+
+.post-session-linear-scale__option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--size-element-gap-sm);
+    /* Figma Scale Radio Button column ≈ 29px */
+    width: 1.8125rem;
+}
+
+.post-session-linear-scale__option-label {
+    width: 100%;
+    text-align: center;
+    color: var(--color-on-surface);
+    line-height: var(--font-line-height-body2, 1.571);
+}
+
+/* Scale.Button already stacks its own label; we render numbers outside it */
+.post-session-linear-scale__option .plus-radio-button-wrapper {
+    width: auto;
+}

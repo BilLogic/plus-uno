@@ -30,6 +30,19 @@ jobs:
         with:
           persist-credentials: false # gh uses GH_TOKEN from env; no token in .git/config
 
+      # Deterministic registry-drift check, promoted from loose scripts (ce:review
+      # 069 item 5): before this, check:component-registry / check:token-registry
+      # ran only when an agent obeyed prose — drift was caught by luck. Node with
+      # no npm install: both generators are dependency-free.
+      - name: Registry drift check (deterministic)
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+      - name: Run registry checks
+        run: |
+          npm run check:component-registry
+          npm run check:token-registry
+
       - name: Ensure intake labels exist
         env:
           GH_TOKEN: ${{ github.token }}

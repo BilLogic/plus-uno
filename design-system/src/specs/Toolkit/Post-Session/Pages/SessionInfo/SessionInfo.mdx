@@ -1,0 +1,87 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SessionInfoStories from './SessionInfo.stories.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    DocsTable,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SessionInfoStories} name="Toolkit Docs — Session Info" />
+
+<Title />
+
+**Single-step page spec** for Session Information (Figma Pages · Session Info).
+Composes Session date, Session selection, Students Dropdown, and Upload Files.
+States (empty · filled · cancellation) are story variants — not separate docs pages.
+
+For the clickable multi-step walkthrough (nav between all steps), use **[Reflection Flow](?path=/docs/specs-toolkit-post-session-pages-reflection-flow--docs)**.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=563-300236"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Pages/SessionInfo"
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
+    sets={[{ name: 'Session Info', nodeId: '563:300236' }]}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+Filled happy path — date + session selected; students and upload visible.
+
+<DocsCanvasShell attachSourceBelow description={<>Primary canvas (<code>Default</code> / filled).</>}>
+    <Canvas of={SessionInfoStories.Default} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### States
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Story</th>
+            <th>What it shows</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Default</td>
+            <td>Date + session filled; students + recording</td>
+        </tr>
+        <tr>
+            <td>Empty</td>
+            <td>Date/session required before roster/upload</td>
+        </tr>
+        <tr>
+            <td>Cancellation</td>
+            <td>Session did not happen — reasons + description</td>
+        </tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={SessionInfoStories.Default}
+    description={
+        <>
+            Preview stays <strong className="text-foreground">inline</strong> while you scroll.
+            Switch stories in the sidebar for empty / cancellation.
+        </>
+    }
+/>
+
+</div>
+
+</div>

@@ -65,16 +65,28 @@ export const StudentDashboardPage = lazyStoryExport(
   () => import('@/specs/Toolkit/In-Session/Pages/StudentDashboard.stories'),
 );
 
-/** Post-Session — real page modules */
-export const SessionReflectionPage = React.lazy(() =>
-  import('@/specs/Toolkit/Post-Session/Pages/SessionReflection/Part1'),
+/** Post-Session — Storybook page compositions (same pattern as Pre-Session) */
+export const ReflectionFlowPage = lazyStoryExport(
+  () => import('@/specs/Toolkit/Post-Session/Pages/ReflectionFlow/ReflectionFlow.stories.jsx'),
+  'Default',
 );
-export const StudentReflectionPage = React.lazy(() =>
-  import('@/specs/Toolkit/Post-Session/Pages/StudentReflection/Part1'),
+export const SessionInfoPage = lazyStoryExport(
+  () => import('@/specs/Toolkit/Post-Session/Pages/SessionInfo/SessionInfo.stories.jsx'),
+  'Default',
 );
-export const FormFeedbackPage = React.lazy(() =>
-  import('@/specs/Toolkit/Post-Session/Pages/FormFeedback/Filled'),
+export const SessionReflectionPage = lazyStoryExport(
+  () => import('@/specs/Toolkit/Post-Session/Pages/SessionReflection/SessionReflection.stories.jsx'),
+  'Filled',
 );
-export const SelfReflectionPage = React.lazy(() =>
-  import('@/specs/Toolkit/Post-Session/Pages/SelfReflection/Filled'),
+export const StudentReflectionPage = lazyStoryExport(
+  () => import('@/specs/Toolkit/Post-Session/Pages/StudentReflection/StudentReflection.stories.jsx'),
+  'Filled',
+);
+export const FormFeedbackPage = lazyStoryExport(
+  () => import('@/specs/Toolkit/Post-Session/Pages/FormFeedback/FormFeedback.stories.jsx'),
+  'Filled',
+);
+export const SelfReflectionPage = lazyStoryExport(
+  () => import('@/specs/Toolkit/Post-Session/Pages/SelfReflection/SelfReflection.stories.jsx'),
+  'Filled',
 );

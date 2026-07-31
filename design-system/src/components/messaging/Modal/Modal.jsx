@@ -3,6 +3,46 @@ import PropTypes from 'prop-types';
 import BootstrapModal from 'react-bootstrap/Modal';
 import Button from '@/components/actions/Button';
 
+const DEFAULT_MODAL_WIDTH = { width: '340px', minWidth: '340px', maxWidth: '340px' };
+
+/** Safe CSS length / custom-property patterns for Modal width. */
+const SAFE_WIDTH_RE = /^(?:\d+(?:\.\d+)?(?:px|rem|%)|var\(--[a-zA-Z0-9-]+(?:\s*,\s*[^)]+)?\))$/;
+
+/**
+ * Resolves Modal `width` to CSS length values.
+ * Numbers (and numeric strings) become px; allowlisted lengths / CSS vars pass through.
+ *
+ * @param {number|string|undefined} width
+ * @returns {{ width: string, minWidth: string, maxWidth: string }}
+ */
+const resolveModalWidth = (width) => {
+    if (width === undefined || width === null) {
+        return { ...DEFAULT_MODAL_WIDTH };
+    }
+
+    if (typeof width === 'number' && Number.isFinite(width)) {
+        const px = `${width}px`;
+        return { width: px, minWidth: px, maxWidth: px };
+    }
+
+    if (typeof width === 'string') {
+        const trimmed = width.trim();
+        if (/^\d+(\.\d+)?$/.test(trimmed)) {
+            const px = `${trimmed}px`;
+            return { width: px, minWidth: px, maxWidth: px };
+        }
+        if (SAFE_WIDTH_RE.test(trimmed)) {
+            return { width: trimmed, minWidth: trimmed, maxWidth: trimmed };
+        }
+        if (process.env.NODE_ENV !== 'production') {
+            // eslint-disable-next-line no-console
+            console.warn(`[Modal] Rejected unsafe width "${trimmed}"; falling back to 340px.`);
+        }
+    }
+
+    return { ...DEFAULT_MODAL_WIDTH };
+};
+
 /**
  * Modal component for PLUS design system.
  * Universal modal component for creating dialog windows that overlay the main content.
@@ -36,7 +76,7 @@ const Modal = ({
     className = '',
     style,
     children,
-    ...props
+    'data-testid': dataTestId,
 }) => {
     // Set padding and gap based on type if not explicitly provided
     const effectivePaddingSize = paddingSize || ((type === 'scrollable' && showBottomButtons) ? 'md' : 'sm');
@@ -55,17 +95,16 @@ const Modal = ({
         className
     ].filter(Boolean).join(' ');
 
+    const resolvedWidth = resolveModalWidth(width);
     const modalStyle = {
-        width: `${width}px`,
-        minWidth: `${width}px`,
-        maxWidth: `${width}px`,
-        ...style,
+        ...(style || {}),
+        ...resolvedWidth,
     };
 
     const closeBtnClass = showBottomButtons ? 'plus-modal-close-btn-h5' : 'plus-modal-close-btn-h3';
 
     const modalContent = (
-        <div id={id} className={classes} style={modalStyle} {...props}>
+        <div id={id} className={classes} style={modalStyle} data-testid={dataTestId}>
             {!bodyOnly && (
                 <>
                     <div className="plus-modal-header">
@@ -76,7 +115,7 @@ const Modal = ({
                             aria-label="Close modal"
                             onClick={onClose}
                         >
-                            <i className="fas fa-xmark" aria-hidden="true" />
+                            <i className="fa-solid fa-xmark" aria-hidden="true" />
                         </button>
                     </div>
                     <div className="plus-modal-divider" />

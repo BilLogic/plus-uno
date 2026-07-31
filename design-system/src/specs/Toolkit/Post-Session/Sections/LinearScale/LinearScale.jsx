@@ -1,9 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Scale } from '@/components/forms-and-inputs';
+import './LinearScale.scss';
+
+const SCALE_VALUES = [1, 2, 3, 4, 5];
 
 /**
  * Five-point linear scale (Figma Sections · Linear Scale `10819:11602`).
- * Fixed 445px shell: equal flex label columns + non-shrinking 1–5 radio row.
+ * Post-Session shell + Foundations `Scale.Button` radios — not the Foundations Scale organism
+ * (that shell uses different padding, gap, and non-wrapping end labels).
  *
  * @param {object} props
  * @param {number} [props.value=0]
@@ -20,127 +25,38 @@ const LinearScale = ({
     highLabel = 'I nailed it!',
 }) => (
     <div
-        style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: 'var(--size-section-gap-md)',
-            padding: 'var(--size-section-pad-y-sm) var(--size-section-pad-x-sm)',
-            backgroundColor: 'var(--color-primary-state-08)',
-            borderRadius: 'var(--size-section-radius-md, 12px)',
-            width: '445px',
-            maxWidth: '100%',
-            boxSizing: 'border-box',
-        }}
+        className="post-session-linear-scale"
+        role="radiogroup"
+        aria-label={`${lowLabel} to ${highLabel}`}
     >
-        <div
-            style={{
-                display: 'flex',
-                flex: '1 0 0',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 'var(--size-section-gap-lg, 24px)',
-                minWidth: 0,
-            }}
-        >
-            <p
-                className="body2-txt m-0"
-                style={{
-                    flex: '1 0 0',
-                    minWidth: 0,
-                    color: 'var(--color-on-surface)',
-                    lineHeight: 1.571,
-                }}
-            >
+        <div className="post-session-linear-scale__row">
+            <div className="post-session-linear-scale__label body2-txt">
                 {lowLabel}
-            </p>
-
-            <div
-                style={{
-                    display: 'flex',
-                    gap: 'var(--size-section-gap-md)',
-                    alignItems: 'center',
-                    flexShrink: 0,
-                }}
-                role="radiogroup"
-                aria-label="Self reflection scale"
-            >
-                {[1, 2, 3, 4, 5].map((option) => {
-                    const checked = value === option;
+            </div>
+            <div className="post-session-linear-scale__options">
+                {SCALE_VALUES.map((optionValue) => {
+                    const optionId = `${name}-option-${optionValue}`;
+                    const labelId = `${optionId}-label`;
                     return (
-                        <label
-                            key={option}
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                gap: 'var(--size-element-gap-sm)',
-                                width: '29px',
-                                cursor: 'pointer',
-                                margin: 0,
-                            }}
-                        >
-                            <span className="body2-txt" style={{ color: 'var(--color-on-surface)', textAlign: 'center' }}>
-                                {option}
-                            </span>
-                            <span
-                                style={{
-                                    position: 'relative',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: '12px',
-                                    height: '12px',
-                                    borderRadius: '999px',
-                                    border: '1px solid var(--color-primary)',
-                                    backgroundColor: checked
-                                        ? 'var(--color-surface)'
-                                        : 'var(--color-on-primary, #fff)',
-                                    flexShrink: 0,
-                                }}
-                            >
-                                <input
-                                    type="radio"
-                                    name={name}
-                                    value={option}
-                                    checked={checked}
-                                    onChange={() => onChange?.(option)}
-                                    aria-label={String(option)}
-                                    style={{
-                                        position: 'absolute',
-                                        inset: 0,
-                                        opacity: 0,
-                                        margin: 0,
-                                        cursor: 'pointer',
-                                    }}
-                                />
-                                {checked && (
-                                    <span
-                                        aria-hidden="true"
-                                        style={{
-                                            width: '8px',
-                                            height: '8px',
-                                            borderRadius: '999px',
-                                            backgroundColor: 'var(--color-primary)',
-                                        }}
-                                    />
-                                )}
-                            </span>
-                        </label>
+                        <div key={optionValue} className="post-session-linear-scale__option">
+                            <div id={labelId} className="post-session-linear-scale__option-label body2-txt">
+                                {optionValue}
+                            </div>
+                            <Scale.Button
+                                id={optionId}
+                                name={name}
+                                value={optionValue}
+                                checked={value === optionValue}
+                                onChange={() => onChange?.(optionValue)}
+                                aria-labelledby={labelId}
+                            />
+                        </div>
                     );
                 })}
             </div>
-
-            <p
-                className="body2-txt m-0"
-                style={{
-                    flex: '1 0 0',
-                    minWidth: 0,
-                    color: 'var(--color-on-surface)',
-                    lineHeight: 1.571,
-                }}
-            >
+            <div className="post-session-linear-scale__label body2-txt">
                 {highLabel}
-            </p>
+            </div>
         </div>
     </div>
 );

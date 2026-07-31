@@ -1,7 +1,12 @@
-export * from './Pages.stories.jsx';
-export * from './StudentReflection/Part1.stories.jsx';
-export * from './SessionReflection/Part1.stories.jsx';
-export * from './FormFeedback/Unfilled.stories.jsx';
-export * from './FormFeedback/Filled.stories.jsx';
-export * from './SelfReflection/Unfilled.stories.jsx';
-export * from './SelfReflection/Filled.stories.jsx';
+/**
+ * Post-Session page story barrels.
+ * Single-step leaves share Section forms + pageShell; ReflectionFlow is the multi-step prototype.
+ * Components: import SessionInfo / ReflectionFlow directly — do not treat this barrel as a component API.
+ */
+
+export * from './ReflectionFlow/ReflectionFlow.stories.jsx';
+export * from './SessionInfo/SessionInfo.stories.jsx';
+export * from './SessionReflection/SessionReflection.stories.jsx';
+export * from './StudentReflection/StudentReflection.stories.jsx';
+export * from './SelfReflection/SelfReflection.stories.jsx';
+export * from './FormFeedback/FormFeedback.stories.jsx';

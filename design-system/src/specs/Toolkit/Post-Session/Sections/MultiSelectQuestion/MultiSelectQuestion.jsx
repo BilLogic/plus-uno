@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import PropTypes from 'prop-types';
 import { OptionChipGroup } from '@/specs/Toolkit/Post-Session/Elements/OptionChip/OptionChip';
 import OtherTextInput from '@/specs/Toolkit/Post-Session/Sections/OtherTextInput/OtherTextInput';
@@ -6,12 +6,14 @@ import OtherTextInput from '@/specs/Toolkit/Post-Session/Sections/OtherTextInput
 /**
  * Multi-select question block
  * (Figma Sections · Multi-Select Question `10791:8694`).
- * Selected chips = filled · unselected = tonal. Pair with Other Text Input when Other is selected.
+ * Selected chips = filled · unselected = tonal. Tooltips on hover ≥2s via OptionChip.
+ * Pair with Other Text Input when Other is selected.
  *
  * @param {object} props
+ * @param {string} [props.id] - Stable prefix for the Other field id
  * @param {string} [props.question='{Question}']
  * @param {string} [props.caption='Select all that apply.']
- * @param {{ id: string, label: string }[]} [props.options]
+ * @param {{ id: string, label: string, tooltip?: string }[]} [props.options]
  * @param {string[]} [props.selectedIds]
  * @param {(id: string) => void} [props.onToggle]
  * @param {string} [props.otherId='other']
@@ -20,12 +22,13 @@ import OtherTextInput from '@/specs/Toolkit/Post-Session/Sections/OtherTextInput
  * @param {boolean} [props.required=true]
  */
 const MultiSelectQuestion = ({
+    id,
     question = '{Question}',
     caption = 'Select all that apply.',
     options = [
         { id: 'option-1', label: 'Option 1' },
         { id: 'option-2', label: 'Option 2' },
-        { id: 'other', label: 'Other' },
+        { id: 'other', label: 'Other', tooltip: 'Anything not covered by the options — a short text field asks for details.' },
     ],
     selectedIds = [],
     onToggle,
@@ -34,7 +37,9 @@ const MultiSelectQuestion = ({
     onOtherChange,
     required = true,
 }) => {
-    const showOther = selectedIds.includes(otherId);
+    const autoId = useId();
+    const showOther = Boolean(otherId) && selectedIds.includes(otherId);
+    const otherFieldId = `${id || autoId}-${otherId || 'other'}`;
 
     return (
         <div
@@ -43,7 +48,7 @@ const MultiSelectQuestion = ({
                 flexDirection: 'column',
                 gap: 'var(--size-section-gap-sm)',
                 width: '100%',
-                maxWidth: '445px',
+                maxWidth: 'var(--col-8)',
             }}
         >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
@@ -61,22 +66,24 @@ const MultiSelectQuestion = ({
             <OptionChipGroup options={options} selectedIds={selectedIds} onToggle={onToggle} />
 
             {showOther && (
-                <OtherTextInput value={otherValue} onChange={onOtherChange} />
+                <OtherTextInput id={otherFieldId} value={otherValue} onChange={onOtherChange} />
             )}
         </div>
     );
 };
 
 MultiSelectQuestion.propTypes = {
+    id: PropTypes.string,
     question: PropTypes.string,
     caption: PropTypes.string,
     options: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
+        tooltip: PropTypes.string,
     })),
     selectedIds: PropTypes.arrayOf(PropTypes.string),
     onToggle: PropTypes.func,
-    otherId: PropTypes.string,
+    otherId: PropTypes.string, // empty string suppresses OtherTextInput pairing
     otherValue: PropTypes.string,
     onOtherChange: PropTypes.func,
     required: PropTypes.bool,

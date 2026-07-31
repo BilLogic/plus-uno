@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import PropTypes from 'prop-types';
 import Textarea from '@/components/forms-and-inputs/Textarea';
 
@@ -12,7 +12,7 @@ import Textarea from '@/components/forms-and-inputs/Textarea';
  * @param {string} [props.value]
  * @param {(event: React.ChangeEvent) => void} [props.onChange]
  * @param {boolean} [props.required=true]
- * @param {string} [props.id='other-text-input']
+ * @param {string} [props.id] - Unique field id (defaults to React useId)
  */
 const OtherTextInput = ({
     label = 'Other (please specify)',
@@ -20,37 +20,42 @@ const OtherTextInput = ({
     value = '',
     onChange,
     required = true,
-    id = 'other-text-input',
-}) => (
-    <div
-        style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--size-element-gap-xs)',
-            width: '100%',
-            maxWidth: '380px',
-        }}
-    >
-        <label
-            htmlFor={id}
-            className="body3-txt font-weight-semibold m-0"
-            style={{ color: 'var(--color-on-surface)' }}
+    id,
+}) => {
+    const autoId = useId();
+    const fieldId = id || autoId;
+
+    return (
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--size-element-gap-xs)',
+                width: '100%',
+                maxWidth: 'var(--col-7)',
+            }}
         >
-            {label}
-            {required && <span style={{ color: 'var(--color-danger)' }}> *</span>}
-        </label>
-        <Textarea
-            id={id}
-            name={id}
-            value={value}
-            onChange={onChange}
-            placeholder={placeholder}
-            rows={1}
-            variant="short"
-            size="medium"
-        />
-    </div>
-);
+            <label
+                htmlFor={fieldId}
+                className="body3-txt font-weight-semibold m-0"
+                style={{ color: 'var(--color-on-surface)' }}
+            >
+                {label}
+                {required && <span style={{ color: 'var(--color-danger)' }}> *</span>}
+            </label>
+            <Textarea
+                id={fieldId}
+                name={fieldId}
+                value={value}
+                onChange={onChange}
+                placeholder={placeholder}
+                rows={1}
+                variant="short"
+                size="medium"
+            />
+        </div>
+    );
+};
 
 OtherTextInput.propTypes = {
     label: PropTypes.string,

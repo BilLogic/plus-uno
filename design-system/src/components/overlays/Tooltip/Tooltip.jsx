@@ -1,8 +1,23 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { OverlayTrigger, Overlay, Tooltip as BSTooltip } from 'react-bootstrap';
 import './Tooltip.scss';
 
+/**
+ * Design-system tooltip wrapper around Bootstrap OverlayTrigger.
+ *
+ * @param {object} props
+ * @param {React.ReactNode} props.text - Tooltip body
+ * @param {'top'|'bottom'|'left'|'right'} [props.placement='top']
+ * @param {string|string[]} [props.trigger]
+ * @param {'small'|'default'|'large'} [props.size='default']
+ * @param {React.ReactElement} props.children - Single trigger element
+ * @param {string} [props.id]
+ * @param {string} [props.className]
+ * @param {boolean} [props.show] - Controlled visibility (skips hover delay)
+ * @param {number} [props.delayShow=250] - ms before show on hover/focus
+ * @param {number} [props.delayHide=400] - ms before hide
+ */
 const Tooltip = ({
     text,
     placement = 'top',
@@ -11,11 +26,17 @@ const Tooltip = ({
     children,
     id,
     className = '',
-    show
+    show,
+    delayShow = 250,
+    delayHide = 400,
 }) => {
     const uniqueId = useRef(`tooltip-${Math.random().toString(36).substring(2, 9)}`);
     const [targetElement, setTargetElement] = useState(null);
 
+    /**
+     * @param {object} props
+     * @returns {React.ReactElement}
+     */
     const renderTooltip = (props) => (
         <BSTooltip
             id={id || uniqueId.current}
@@ -41,7 +62,7 @@ const Tooltip = ({
     return (
         <OverlayTrigger
             placement={placement}
-            delay={{ show: 250, hide: 400 }}
+            delay={{ show: delayShow, hide: delayHide }}
             overlay={renderTooltip}
             trigger={trigger}
         >
@@ -55,13 +76,15 @@ Tooltip.propTypes = {
     placement: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
     trigger: PropTypes.oneOfType([
         PropTypes.string,
-        PropTypes.arrayOf(PropTypes.string)
+        PropTypes.arrayOf(PropTypes.string),
     ]),
     size: PropTypes.oneOf(['small', 'default', 'large']),
     children: PropTypes.node.isRequired,
     id: PropTypes.string,
     className: PropTypes.string,
-    show: PropTypes.bool
+    show: PropTypes.bool,
+    delayShow: PropTypes.number,
+    delayHide: PropTypes.number,
 };
 
 export default Tooltip;

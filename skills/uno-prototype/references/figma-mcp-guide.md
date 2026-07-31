@@ -75,7 +75,7 @@ For the full token reference, load `design-system/agent-views/tokens/tokens.md` 
 Use `create_new_file` only when:
 - A code-first feature needs a corresponding Figma spec
 - The user explicitly requests generating a Figma design from code
-- Always confirm with the user before writing to Figma (treat like forbidden pattern #8 — no unsanctioned writes)
+- Always confirm with the user before writing to Figma (treat like the never-install-without-approval forbidden pattern — no unsanctioned writes)
 
 ## Round-trip loop (code → Figma → code) — optional, opt-in
 

@@ -1,17 +1,31 @@
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ReflectionFlowStories from './ReflectionFlow.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    DocsTable,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
-<Meta of={ReflectionFlowStories} name="Toolkit Docs — ReflectionFlow" />
+<Meta of={ReflectionFlowStories} name="Toolkit Docs — Reflection Flow" />
 
 <Title />
 
-End-to-end Post-Session reflection orchestrator (flows 02–06). Visual specs live in **Figma**; tokens and behavior notes are in the **GitHub** source below.
+**End-to-end interactive prototype** — not a Figma page frame.
+
+Use this when you need to click through the full tutor journey in one place:
+Session Info → Student(s) → Session → Self (optional) → Form Feedback (optional) → submit / Save & Exit modals.
+
+Individual **Pages** docs (Session Info, Student, Session, Self, Form Feedback) are **single-step visual specs** for Figma page masters. Prefer those when checking layout/copy for one step. Prefer Reflection Flow when checking navigation, cadence flags, cancellation, and confirmation modals together.
+
+The hi-fi prototype app (`prototypes/post-session-reflection`) mounts this same orchestrator.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=3400-286833"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Pages/ReflectionFlow"
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
+    sets={[{ name: 'Toolkit / Post-Session', nodeId: '3400:286833' }]}
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -20,9 +34,48 @@ End-to-end Post-Session reflection orchestrator (flows 02–06). Visual specs li
 
 ### Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Primary canvas (<code>Default</code> story).</>}>
+Starts on Session Information with side nav. Walk the form with Next / side-nav jumps.
+
+<DocsCanvasShell attachSourceBelow description={<>Primary canvas (<code>Default</code>).</>}>
     <Canvas of={ReflectionFlowStories.Default} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Stories
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Story</th>
+            <th>What it shows</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Default</td>
+            <td>Full flow from Session Info</td>
+        </tr>
+        <tr>
+            <td>Start at Session Reflection</td>
+            <td>Jump into mid-flow</td>
+        </tr>
+        <tr>
+            <td>Save &amp; Exit</td>
+            <td>Confirmation modal on mount</td>
+        </tr>
+        <tr>
+            <td>Without Self + Form Feedback</td>
+            <td>Cadence flags off</td>
+        </tr>
+        <tr>
+            <td>Cancellation branch</td>
+            <td>Session did not happen path</td>
+        </tr>
+    </tbody>
+</DocsTable>
 
 </div>
 
@@ -34,8 +87,8 @@ End-to-end Post-Session reflection orchestrator (flows 02–06). Visual specs li
     of={ReflectionFlowStories.Default}
     description={
         <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+            Cadence props (<code>showSelfReflection</code>, <code>showFormFeedback</code>) and
+            starting tab live on the component — use story variants for common setups.
         </>
     }
 />

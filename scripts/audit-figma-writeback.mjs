@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Audit a Figma write-back frame against its manifest (library instances + bindings).
- * Run: npm run audit:figma-writeback -- playground/test-roundtrip/roundtrip-manifest.json
+ * Run: npm run audit:figma-writeback -- prototypes/test-roundtrip/roundtrip-manifest.json
  * Optional: --conversation-id <id> writes .cursor/hooks/briefings/writeback-audit-pass.json on success
  * Optional: --manifest-only skips live Figma API checks (validate JSON only)
  */

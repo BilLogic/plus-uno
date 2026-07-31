@@ -1,0 +1,40 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as FreeResponseQuestionStories from './FreeResponseQuestion.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={FreeResponseQuestionStories} name="Toolkit Docs — Free Response Question" />
+
+<Title />
+
+Free-text question block (Figma Sections · Free Response Question).
+Separate **caption** (neutral) and **warning** (danger) slots, optional escalate toggle.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=791-137860"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Toolkit/Post-Session/Sections/FreeResponseQuestion"
+    figmaFileKey="W0qzhXWxFsMwSJzkdV2yal"
+    sets={[{ name: 'Free Response Question', nodeId: '791:137860' }]}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Primary canvas (<code>Overview</code>).</>}>
+    <Canvas of={FreeResponseQuestionStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground of={FreeResponseQuestionStories.Overview} />
+
+</div>
+
+</div>
