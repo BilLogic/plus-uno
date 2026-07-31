@@ -1,6 +1,6 @@
 /**
  * Shared rules for DS-compliant Figma write-back manifests.
- * Canonical example: playground/test-roundtrip/roundtrip-manifest.json
+ * Canonical example: prototypes/test-roundtrip/roundtrip-manifest.json
  */
 
 export const FORBIDDEN_MANIFEST_PATTERNS = [
@@ -36,8 +36,13 @@ export function validateWritebackManifest(manifest) {
     }
   }
 
-  if (!m.playground || typeof m.playground !== 'string') {
-    errors.push('Missing required field: playground (e.g. "playground/test-roundtrip").');
+  // Field renamed playground -> prototype when playground/ became prototypes/.
+  // Legacy key still accepted so a manifest written from stale context validates.
+  const prototypePath = m.prototype ?? m.playground;
+  if (!prototypePath || typeof prototypePath !== 'string') {
+    errors.push('Missing required field: prototype (e.g. "prototypes/test-roundtrip").');
+  } else if (m.playground && !m.prototype) {
+    warnings.push('Field "playground" is deprecated — rename it to "prototype".');
   }
 
   const testFile = /** @type {Record<string, unknown>} */ (m.figmaTestFile || {});
