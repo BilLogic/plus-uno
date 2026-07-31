@@ -208,7 +208,15 @@ async function main() {
         history.push({ role: "assistant", content: `(staged a ${r.toolName} proposal awaiting confirmation)` });
         pending = { toolName: r.toolName, input: r.input ?? {} };
       } else if (r?.kind === "resolved") {
-        history.push({ role: "assistant", content: r.messageToUser ?? `(${r.decision})` });
+        // Production writes the OUTCOME MARKER to DO history, not the friendly
+        // text (agent/resolve-proposal.ts) — and slack/events.ts reads that
+        // marker to refuse re-carding a cancelled action. Mirror it here or the
+        // headless history is not the history the bot actually sees (R5).
+        const marker =
+          r.decision === "cancel"
+            ? `(Cancelled the proposed ${pending?.toolName ?? "action"} — nothing was done.)`
+            : (r.messageToUser ?? `(${r.decision})`);
+        history.push({ role: "assistant", content: marker });
         pending = null;
       }
     }
