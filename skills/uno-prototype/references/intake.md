@@ -32,8 +32,8 @@ and both forms are equally valid:
 
 The plain-text form is a first-class rendering, **not a degradation** — the
 contract is one question, options shown, recommendation marked, free-form
-answer always accepted. **Always state the number affordance** (the JSON's
-`answerHint`): a bare number has always been a valid answer, so say so.
+answer always accepted (a bare number matching an option parses too — phrase
+that affordance however fits the question you just asked, or leave it implicit).
 Never name a specific tool in your reply, and never refuse to proceed because
 a tool is missing.
 

@@ -32,13 +32,6 @@ export function buildIntakePayload(conversationId, session, state) {
 
   if (state.progressLabel) payload.progressLabel = state.progressLabel;
 
-  // `parseChoice` has always accepted a bare number (validators.mjs) — nothing
-  // ever said so, so no model offered it and no designer knew. One field, one
-  // sentence: a capability we already shipped, finally visible. Deliberately
-  // NOT a full render template — Cynthia's live Cursor run and the Grok run
-  // both show agents lay options out fine on their own.
-  payload.answerHint = 'Reply with the number, or answer in your own words.';
-
   if (effectiveType === 'choice' && options?.length) {
     payload.options = options.map((label, index) => ({
       id: String(index + 1),
@@ -113,7 +106,7 @@ export function clearIntakeQuestion(conversationId) {
  * plain-text form is a first-class rendering, not a degradation.
  */
 const ONE_QUESTION_CONTRACT =
-  'ASK EXACTLY ONE QUESTION THIS MESSAGE. If your runtime has an interactive question/choice tool (whatever it is named), use it for a SINGLE question with the options. If it does not, ask in plain text with the options as a numbered list. Both renderings are first-class — the plain-text one is NOT a degraded fallback. Either way: one question, options shown, the JSON\'s `answerHint` stated so the designer knows a bare number works, and a free-form answer always accepted.';
+  'ASK EXACTLY ONE QUESTION THIS MESSAGE. If your runtime has an interactive question/choice tool (whatever it is named), use it for a SINGLE question with the options. If it does not, ask in plain text with the options as a numbered list. Both renderings are first-class — the plain-text one is NOT a degraded fallback. Either way: one question, options shown, and a free-form answer always accepted — a bare number matching an option is accepted too, so phrase the affordance however fits the question you just asked.';
 
 export function buildAgentIntakeInstruction(state) {
   const effectiveType = state.type;
