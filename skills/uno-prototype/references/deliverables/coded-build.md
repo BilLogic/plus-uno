@@ -16,9 +16,9 @@ any large or risky edit**. Small iterations don't need the gate.
 
 ## Build (Step 4)
 
-a. **Ask for a Figma file first — one AskQuestion, before any build:** *"Do you
-   already have a Figma file you want to build upon?"* (single question,
-   Yes/No).
+a. **Ask for a Figma file first — one question, before any build:** *"Do you
+   already have a Figma file you want to build upon?"* (one question this
+   message, Yes/No).
    - **Yes** → get the link, then follow the full implement-design workflow in
      `design-system/figma/mcp-guide.md` — no skipped steps; registries load
      first per `design-system/figma/registry-load-gate.md` (MANDATORY);

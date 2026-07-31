@@ -19,18 +19,31 @@ brief → build.
 | Gate off | `.cursor/settings.json` → `"uno": { "prdGate": false }` | Skip the interview; PRD gate still applies as an ordinary rule (method §0) |
 | Manual (no adapter, headless, hook failed) | No JSON appears | Run the SAME eight steps yourself, in order, tracking your own position — the hook automates this procedure, it does not own it |
 
-"AskQuestion" below means your runtime's ask-the-user tool (`AskUserQuestion`
-in Claude Code, `AskQuestion` in Cursor); a runtime without one asks the same
-single question in plain text.
+## How to ask — the contract, not a tool name
+
+**One question per message.** How it renders depends on what your runtime has,
+and both forms are equally valid:
+
+- **Runtime has an interactive question/choice tool** (any name — Claude Code's
+  `AskUserQuestion`, Cursor's question UI, anything equivalent): use it for a
+  SINGLE question with the options.
+- **Runtime has no such tool** (some Cursor models, Codex, headless, plain
+  chat): render the question in plain text with the options as a **numbered
+  list** the designer answers by number or in their own words.
+
+The plain-text form is a first-class rendering, **not a degradation** — the
+contract is one question, options shown, recommendation marked, free-form
+answer always accepted. Never name a specific tool in your reply, and never
+refuse to proceed because a tool is missing.
 
 ## Rules — every step, both modes
 
 1. Hook-gated: read `active-intake-question.json` first — the only source of
    truth for what to ask this turn.
-2. **One question per message — no exceptions.** `choice` type → AskQuestion
-   with a `questions` array of length **1**. Reflection steps → one AskQuestion,
-   composing the PRD-specific options yourself (recommended first, labeled
-   "(Recommended)", 1–2 alternatives, then Other); honor `multiSelect`,
+2. **One question per message — no exceptions**, rendered per § How to ask.
+   `choice` steps use the options from the JSON. Reflection steps: compose the
+   PRD-specific options yourself (recommended first, labeled "(Recommended)",
+   1–2 alternatives, plus room to answer freely); honor `multiSelect`,
    `openEnded`, `confirm`, `stepIndex`/`stepTotal`. Plus Design System is always
    applied; never ask which design system to use.
 3. **Set expectations, show position.** Open `prd_check` with the one-line flow
@@ -43,8 +56,8 @@ single question in plain text.
    section says X — confirm?"). The step still fires; a pre-answered step costs
    one tap. Only ask cold when the context is genuinely silent. No auto-advance,
    no batching.
-5. **Forbidden during intake:** batching steps into one AskQuestion; building;
-   previewing later steps beyond the flow map.
+5. **Forbidden during intake:** asking more than one question in a message;
+   building; previewing later steps beyond the flow map.
 6. Intake ends only when the **brief card is confirmed** at `reflect_confirm`.
    Then load the deliverable doc (§ Handoff below) and proceed to plan →
    generate. There is no separate fidelity-picker step.
@@ -91,7 +104,7 @@ The lists below are vocabulary to pick from, not menus to show.
    Complexity    low ─●────── high — happy path only
    ```
 
-   Then ONE AskQuestion to confirm or adjust; the confirm label restates the
+   Then ONE question to confirm or adjust; the confirm option restates the
    settings ("Yes: mid visual, real interactions, 3 screens").
 4. **What should it intentionally NOT include?** State the won't-include list
    in prose (screens skipped · interactions left fake · flows that need not
@@ -100,7 +113,7 @@ The lists below are vocabulary to pick from, not menus to show.
 
 **Confirm the brief.** Assemble the answers into ONE brief card — Goal ·
 Artifact · **Fidelity (the dial settings, not a label)** · Won't include — and
-ask a single AskQuestion to confirm. The confirmed card is the contract: the
+ask a single confirmation question. The confirmed card is the contract: the
 plan restates it, generation builds against it, validation checks against it.
 
 ## Handoff — the Q2 answer selects the deliverable doc
