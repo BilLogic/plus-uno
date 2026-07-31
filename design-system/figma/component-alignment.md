@@ -106,5 +106,5 @@ Requires: `figma-use` skill before canvas writes; summon `writers/figma` for pla
 
 - `design-system/figma/token-registry.json`
 - `design-system/docs/foundations/token-mapping.md`
-- `skills/uno-prototype/references/figma-mcp-guide.md`
-- `skills/uno-prototype/references/figma-registry-mandatory-load.md`
+- `design-system/figma/mcp-guide.md`
+- `design-system/figma/registry-load-gate.md`

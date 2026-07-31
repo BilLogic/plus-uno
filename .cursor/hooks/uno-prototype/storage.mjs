@@ -106,13 +106,12 @@ export function clearBriefing(conversationId) {
 /**
  * @typedef {object} PrdCacheEntry
  * @property {string} prd
- * @property {Record<string, unknown>} prdHints
  * @property {string} updatedAt
  */
 
 /**
  * @param {string} conversationId
- * @param {{ prd: string; prdHints?: Record<string, unknown> }} entry
+ * @param {{ prd: string }} entry
  */
 export function savePrdCache(conversationId, entry) {
   ensureDirs();
@@ -120,7 +119,6 @@ export function savePrdCache(conversationId, entry) {
   /** @type {PrdCacheEntry} */
   const payload = {
     prd: entry.prd.trim(),
-    prdHints: entry.prdHints || {},
     updatedAt: new Date().toISOString(),
   };
   fs.writeFileSync(prdCachePath(conversationId), JSON.stringify(payload, null, 2));

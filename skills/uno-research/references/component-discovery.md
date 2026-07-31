@@ -4,7 +4,7 @@
 
 0. **Mandatory Existing Component Check:** You MUST always check if there is a similar or exact component that already exists within the design system FIRST before starting to implement any new custom component. Do not build from scratch if the design system already provides it.
 
-0a. **Mandatory Figma Registry Load:** When a Figma link, design-to-code mapping, or Figma audit is involved, read `design-system/figma/component-registry.json` and `design-system/figma/token-registry.json` before any other discovery. See `../uno-prototype/references/figma-registry-mandatory-load.md`.
+0a. **Mandatory Figma Registry Load:** When a Figma link, design-to-code mapping, or Figma audit is involved, read `design-system/figma/component-registry.json` and `design-system/figma/token-registry.json` before any other discovery. See `../../../design-system/figma/registry-load-gate.md`.
 
 1. Check design-to-code mapping first
 - If a design link is provided, fetch design context/screenshot first.

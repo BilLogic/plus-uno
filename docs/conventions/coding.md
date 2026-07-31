@@ -56,7 +56,7 @@ Use design tokens everywhere — never hardcode colors, spacing, typography, or 
 - Each prototype lives at `prototypes/{project-name}/` (flat, no creator grouping)
 - Each has its own `vite.config.js` with `@` alias pointing to `../../design-system/src`
 - Creator info is metadata in the prototype's README or marketplace data, not the directory name
-- `src/pages/PrototypeMarket/prototypes-data.js` is a LEGACY routing registry for the live-app shell — do not add new experiment IDs for `main` (`skills/uno-publish/SKILL.md`); new prototypes register in the Notion marketplace DB
+- `src/pages/PrototypeMarket/prototypes-data.js` is a LEGACY routing registry for the live-app shell — do not add new experiment IDs for `main` (`skills/uno-publish/references/marketplace.md`); new prototypes register in the Notion marketplace DB
 
 ## Token workflow
 

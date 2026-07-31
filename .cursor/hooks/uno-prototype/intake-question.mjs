@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FLOW_MAP } from './constants.mjs';
-import { resolveOptions, resolveQuestion, resolveType } from './states.mjs';
+import { resolveQuestion } from './states.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BRIEFING_DIR = path.join(__dirname, '..', 'briefings');
@@ -14,8 +14,8 @@ export const ACTIVE_INTAKE_FILE = path.join(BRIEFING_DIR, 'active-intake-questio
  * @param {Record<string, unknown>} ctx
  */
 export function buildIntakePayload(conversationId, session, state) {
-  const effectiveType = resolveType(state, session.context);
-  const options = resolveOptions(state, session.context);
+  const effectiveType = state.type;
+  const options = state.options;
 
   /** @type {Record<string, unknown>} */
   const payload = {
@@ -94,6 +94,20 @@ export function clearIntakeQuestion(conversationId) {
  * @param {import('./states.mjs').ConversationState} state
  * @returns {string}
  */
+/**
+ * How to render a single-select question, stated as a CONTRACT rather than as
+ * one runtime's tool signature.
+ *
+ * This used to say "AskQuestion with questions.length === 1" — Claude Code's
+ * `AskUserQuestion` API shape, sent verbatim to every model. A runtime without
+ * that exact tool (Cursor on a non-Claude model, Codex, headless) had no good
+ * option: hallucinate a failing tool call, or silently drop to prose. Naming
+ * the contract instead means every runtime can satisfy it, and the numbered
+ * plain-text form is a first-class rendering, not a degradation.
+ */
+const ONE_QUESTION_CONTRACT =
+  'ASK EXACTLY ONE QUESTION THIS MESSAGE. If your runtime has an interactive question/choice tool (whatever it is named), use it for a SINGLE question with the options. If it does not, ask in plain text with the options as a numbered list. Both renderings are first-class — the plain-text one is NOT a degraded fallback. Either way: one question, options shown, and a free-form answer always accepted — a bare number matching an option is accepted too, so phrase the affordance however fits the question you just asked.';
+
 export function buildAgentIntakeInstruction(state) {
   const effectiveType = state.type;
 
@@ -104,7 +118,7 @@ export function buildAgentIntakeInstruction(state) {
     if (state.confirm) {
       return [
         'uno-prototype Step 2 (Prototype Reflection) gate is active — final beat: confirm the brief. Read `.cursor/hooks/briefings/active-intake-question.json` before doing anything else.',
-        'Assemble the stored answers (the `reflection` field in that JSON) into ONE compact brief card per the `guidance` field, then ask EXACTLY one AskQuestion (questions.length === 1) to confirm it.',
+        `Assemble the stored answers (the \`reflection\` field in that JSON) into ONE compact brief card per the \`guidance\` field, then ask for confirmation. ${ONE_QUESTION_CONTRACT}`,
         'This card is the contract the build will be validated against — restate content in the confirm option label; never offer a content-free "looks good".',
         reviseNote,
         'Do NOT load method.md or start building until the brief is confirmed.',
@@ -114,8 +128,8 @@ export function buildAgentIntakeInstruction(state) {
     if (state.openEnded) {
       return [
         'uno-prototype Step 2 (Prototype Reflection) gate is active. Read `.cursor/hooks/briefings/active-intake-question.json` before doing anything else.',
-        `This is reflection step ${state.stepIndex} of ${state.stepTotal}, OPEN-ENDED beat: ask the one question from the JSON in plain text or as a single AskQuestion with free-form entry expected — do NOT present a recommendation or an options menu this turn; the designer speaks first, in their own words.`,
-        'Never batch reflection questions; never skip ahead to Step 3/4 or start building.',
+        `This is reflection step ${state.stepIndex} of ${state.stepTotal}, OPEN-ENDED beat: ask the one question from the JSON as a plain open question — no options list, no recommendation this turn; the designer speaks first, in their own words. Any non-empty answer advances.`,
+        'Never batch reflection questions; never skip ahead to planning or building.',
         reviseNote,
         'Follow the `guidance` field in that JSON. Do NOT load method.md.',
       ].join(' ');
@@ -123,14 +137,14 @@ export function buildAgentIntakeInstruction(state) {
 
     return [
       'uno-prototype Step 2 (Prototype Reflection) gate is active. Read `.cursor/hooks/briefings/active-intake-question.json` before doing anything else.',
-      `This is reflection step ${state.stepIndex} of ${state.stepTotal}: ask EXACTLY this one question via AskQuestion (questions.length === 1). Never batch the four reflection questions; never skip ahead to Step 3/4 or start building.`,
+      `This is reflection step ${state.stepIndex} of ${state.stepTotal}. ${ONE_QUESTION_CONTRACT} Never batch the four reflection questions; never skip ahead to planning or building.`,
       state.stepIndex === 1
         ? 'PRD received — before asking, if you have not already, do Step 1 (Understand): summarize the PRD and recommend nothing yet, then ask this question.'
         : '',
-      'Compose PRD-specific options: lead with the recommended choice labeled "(Recommended)", then 1–2 alternatives; rely on the built-in Other. One line of reasoning per option, each anchored in the PRD — this is reflecting WITH the designer, not deciding for them.',
+      'Compose PRD-specific options: lead with the recommended choice labeled "(Recommended)", then 1–2 alternatives, and always leave room for an answer of their own (an explicit "something else" option, or the runtime\'s built-in equivalent). One line of reasoning per option, each anchored in the PRD — this is reflecting WITH the designer, not deciding for them.',
       state.multiSelect
-        ? 'Set multiSelect: true — several goals may co-apply.'
-        : 'Single-select — this confirms your recommendation.',
+        ? 'Several goals may co-apply — let the designer pick more than one (multi-select where the runtime supports it; otherwise say they may name several numbers).'
+        : 'Single choice — this confirms your recommendation.',
       `Show the \`progressLabel\` from the JSON with the question so the designer knows where they are. ${reviseNote}`,
       'Follow the `guidance` field in that JSON for what to present before/with the question. Do NOT load method.md or start building.',
     ]
@@ -140,7 +154,7 @@ export function buildAgentIntakeInstruction(state) {
 
   const lines = [
     'uno-prototype PRD-gate intake is active. Read `.cursor/hooks/briefings/active-intake-question.json` before doing anything else.',
-    'ONE QUESTION PER TURN: render exactly one PRD-gate step this message — never batch steps into one AskQuestion call or one reply.',
+    `ONE QUESTION PER TURN: render exactly one PRD-gate step this message — never batch steps into one question or one reply. ${ONE_QUESTION_CONTRACT}`,
     'NEVER SKIP A STEP: even when the user message already contains a PRD, still ask the current step as verification — do not auto-advance.',
   ];
 
@@ -152,9 +166,9 @@ export function buildAgentIntakeInstruction(state) {
 
   if (effectiveType === 'choice') {
     lines.push(
-      'Use AskQuestion with a `questions` array of length 1 only — one prompt, one set of options from the JSON file.',
+      'One prompt, one set of options — take both from the JSON file.',
       'Show the `progressLabel` from the JSON with the question.',
-      'Forbidden: multiple entries in `questions`, combining steps, or previewing later steps beyond the one-line flow map.',
+      'Forbidden: asking more than one question this message, combining steps, or previewing later steps beyond the one-line flow map.',
       'Do NOT load method.md, do NOT start building.',
     );
   } else {

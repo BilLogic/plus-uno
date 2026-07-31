@@ -108,10 +108,10 @@ bash skills/uno-review/scripts/run-review-checks.sh prototypes/<name>/src
 
 1. `design-system/figma/component-registry.json`
 2. `design-system/figma/token-registry.json`
-3. `skills/uno-prototype/references/figma-registry-mandatory-load.md`
+3. `design-system/figma/registry-load-gate.md`
 
 Then:
 
 4. `design-system/figma/component-alignment.md`
-5. `skills/uno-prototype/references/figma-mcp-guide.md`
+5. `design-system/figma/mcp-guide.md`
 6. `design-system/docs/foundations/token-mapping.md`

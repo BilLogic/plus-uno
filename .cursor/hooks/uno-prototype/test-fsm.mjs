@@ -17,7 +17,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleSubmit } from './engine.mjs';
-import { ACTIVE_INTAKE_FILE } from './intake-question.mjs';
+import { ACTIVE_INTAKE_FILE, buildAgentIntakeInstruction } from './intake-question.mjs';
+import { STATES } from './states.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const STATE_DIR = path.join(__dirname, '..', 'state');
@@ -159,7 +160,11 @@ assert.equal(artifactOpen.stateId, 'reflect_artifact_open');
 assert.equal(artifactOpen.stepIndex, 2);
 assert.equal(artifactOpen.openEnded, true);
 assert.match(afterQ1.agent_message || '', /OPEN-ENDED beat/i);
-assert.match(afterQ1.agent_message || '', /do NOT present a recommendation/i);
+// Anti-anchoring: the open beat must forbid a recommendation AND an options
+// menu. Asserted on meaning, not on one phrasing — the wording changed once
+// already when the instructions were made runtime-neutral.
+assert.match(afterQ1.agent_message || '', /no (options|recommendation)|not? present a recommendation/i);
+assert.match(afterQ1.agent_message || '', /own words/i);
 
 // Q2 beat 1 answered → Q2 beat 2: the recommendation, single-select
 run('something clickable I can put in front of students', 'handoff-conv');
@@ -273,3 +278,23 @@ cleanup('terminate-proto-conv');
 cleanup('quit-conv');
 
 console.log('All uno-prototype FSM smoke tests passed.');
+
+// ---------------------------------------------------------------------------
+// Portability: no injected instruction may name a runtime-specific tool.
+// The intake used to ship "AskQuestion with questions.length === 1" — Claude
+// Code's API shape — to every model, leaving runtimes without that tool no
+// good option. The contract is one-question-per-message; the rendering is the
+// runtime's business.
+// ---------------------------------------------------------------------------
+{
+  const TOOL_NAMES = /AskQuestion|AskUserQuestion|questions\.length|questions array/i;
+  for (const [id, state] of Object.entries(STATES)) {
+    const text = buildAgentIntakeInstruction(state);
+    assert.ok(
+      !TOOL_NAMES.test(text),
+      `injected instruction for "${id}" names a runtime-specific tool — state the contract instead`,
+    );
+  }
+}
+
+console.log('Portability guard passed — no runtime tool names in injected instructions.');

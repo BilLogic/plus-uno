@@ -29,6 +29,7 @@
     "generate:knowledge-audit": "node scripts/generate-knowledge-audit.js",
     "check:knowledge-audit": "node scripts/generate-knowledge-audit.js --check",
     "check:docs": "bash scripts/validate-doc-links.sh",
+    "check:intake-fsm": "node .cursor/hooks/uno-prototype/test-fsm.mjs",
     "start": "vite",
     "dev:react": "vite",
     "build:react": "vite build",

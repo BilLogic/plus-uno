@@ -24,7 +24,7 @@ export const BYPASS_PATTERNS = [
   /stop (this )?(process|workflow)/i,
 ];
 
-/** First intake step — AskQuestion choice when prototype intent is detected. */
+/** First intake step — a single choice question when prototype intent is detected. */
 export const PRD_CHECK_QUESTION = 'Do you have a PRD?';
 
 /** Second step after Yes — paste link, body, or attach a file. */
@@ -98,7 +98,7 @@ export const REFLECTION_STEPS = {
     progressLabel: 'Reflection · Q2 of 4 (suggestion)',
     question: 'Step 2 · Q2 — Here is the artifact I would suggest — does it fit?',
     guidance:
-      'Building on what the designer just described in their own words, acknowledge their framing first, THEN offer ONE recommended artifact + ONE alternative + Other (not the full list), each tied to their description and the PRD. Vocabulary: user flow · journey map · wireframe · static mockup · interactive prototype · functional prototype. One line of tradeoff each; never imply only one correct answer — this is prototyping *with* them.',
+      'Building on what the designer just described in their own words, acknowledge their framing first, THEN offer ONE recommended artifact + ONE alternative + Other (not the full list), each tied to their description and the PRD. Vocabulary: user flow · journey map · wireframe (incl. quick ASCII sketch in-chat) · static mockup · concept image · storyboard · interactive prototype · functional prototype. One line of tradeoff each; never imply only one correct answer — this is prototyping *with* them.',
   },
   reflect_fidelity: {
     stepIndex: 3,
@@ -106,7 +106,7 @@ export const REFLECTION_STEPS = {
     progressLabel: 'Reflection · Q3 of 4',
     question: 'Step 2 · Q3 — What fidelity is actually needed?',
     guidance:
-      'FIRST render each dimension as a labeled low↔high scale line so the designer sees the dials at a glance, e.g. `Visual      low ──●───── high — wireframe-clean is enough`, for Visual, Interaction, Scope, Complexity — each placement justified by concrete PRD evidence, not generic reasoning. THEN this AskQuestion confirms or adjusts; the confirm option label must RESTATE the settings (e.g. "Yes: mid visual, real interactions, 3 screens"), never a bare "All look right".',
+      'FIRST render each dimension as a labeled low↔high scale line so the designer sees the dials at a glance, e.g. `Visual      low ──●───── high — wireframe-clean is enough`, for Visual, Interaction, Scope, Complexity — each placement justified by concrete PRD evidence, not generic reasoning. THEN ask ONE question to confirm or adjust the dials; the confirm option label must RESTATE the settings (e.g. "Yes: mid visual, real interactions, 3 screens"), never a bare "All look right".',
   },
   reflect_exclude: {
     stepIndex: 4,
@@ -123,24 +123,15 @@ export const REFLECTION_STEPS = {
     progressLabel: 'Reflection · confirm the brief',
     question: 'Step 2 · Brief — Here is the prototype brief we built together. Ship it to the build?',
     guidance:
-      'Assemble the four answers (in the `reflection` field of the intake JSON) into ONE compact brief card — a markdown table with rows: Goal · Artifact · Fidelity · Won\'t include. This card is the contract the build will be checked against, so wording matters more than brevity. Ask ONE AskQuestion: a confirm option whose label restates the brief in a phrase, plus "adjust one of the four" (they can also just say "back"), plus Other.',
+      'Assemble the four answers (in the `reflection` field of the intake JSON) into ONE compact brief card — a markdown table with rows: Goal · Artifact · Fidelity · Won\'t include. This card is the contract the build will be checked against, so wording matters more than brevity. Ask ONE question with: a confirm option whose label restates the brief in a phrase, plus "adjust one of the four" (they can also just say "back"), plus room to answer freely.',
   },
 };
 
 /**
- * Intake steps that must complete before the agent proceeds. The hook enforces
- * the PRD gate (prd_check → prd_paste) AND the Step 2 reflection (four
- * reflect_* states) — each is strict, so an empty/invalid reply re-prompts the
- * same step instead of falling through. Once the last reflection answer lands
- * the hook releases and the agent runs Step 3 (Plan) → Step 4 (Generate).
+ * Intake steps that must complete before the agent proceeds: the PRD gate
+ * (prd_check → prd_paste) and the Step 2 reflection (the reflect_* states).
+ * Every one is strict — an empty/invalid reply re-prompts the same step instead
+ * of falling through — which is why the engine has no non-strict branch. Once
+ * the last reflection answer lands the hook releases and the agent runs Step 3
+ * (Plan) → Step 4 (Generate).
  */
-export const STRICT_GATE_STATE_IDS = new Set([
-  'prd_check',
-  'prd_paste',
-  'reflect_learn',
-  'reflect_artifact_open',
-  'reflect_artifact',
-  'reflect_fidelity',
-  'reflect_exclude',
-  'reflect_confirm',
-]);

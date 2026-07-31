@@ -14,8 +14,8 @@ Use with **uno-review** when implementing approved designs for production (not d
 
 If a Figma link is provided:
 
-1. Follow `../uno-prototype/references/figma-mcp-guide.md` (7 steps)
-2. Load registries per `figma-registry-mandatory-load.md`
+1. Follow `../../../design-system/figma/mcp-guide.md` (7 steps)
+2. Load registries per `design-system/figma/registry-load-gate.md`
 3. Use `get_variable_defs` to verify tokens against latest Figma variables
 
 ## Accessibility (mandatory)
