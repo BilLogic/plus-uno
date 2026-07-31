@@ -1,44 +1,50 @@
 /**
- * Post-Session Confirmation Pop-up chrome (Figma `6327:241452`).
- * Spec-local overrides for surface-container-high + sm modal pads.
- * radiusSize="sm" on Modal supplies border-radius via --size-modal-radius-sm.
+ * Post-Session Confirmation Pop-up chrome (Figma `6327:241454`).
+ * Spec-local deltas on DS Modal: surface-container-high, inset dividers,
+ * min 64px body with vertically centered copy, 24px close (FA Solid/H3).
+ * Radius comes from Modal default radiusSize="md" → --size-modal-radius-md (6px).
  */
 
 .plus-modal.plus-modal--confirmation-popup {
-    background-color: var(--color-surface-container-high, #e7e8eb);
+    background-color: var(--color-surface-container-high);
     gap: 0;
 
     .plus-modal-header,
     .plus-modal-footer {
-        padding: var(--size-modal-pad-y-sm, 8px) var(--size-modal-pad-x-sm, 10px);
+        padding: var(--size-modal-pad-y-sm) var(--size-modal-pad-x-sm);
     }
 
     .plus-modal-header {
-        gap: var(--size-modal-gap-md, 12px);
-    }
-
-    .plus-modal-title {
-        font-size: var(--font-size-h5, 20px);
-        line-height: var(--font-line-height-h5, 1.4);
+        gap: var(--size-modal-gap-md);
     }
 
     .plus-modal-close-btn {
-        width: 24px;
-        height: 24px;
-        font-size: 24px;
+        width: auto;
+        height: auto;
+        min-width: 0;
+        min-height: 0;
+        padding: 0;
+        border-radius: 0;
+        font-size: var(--font-size-fa-h3-solid);
         line-height: 1;
+        color: var(--color-on-surface-variant);
     }
 
-    .plus-modal-close-btn-h5,
-    .plus-modal-close-btn-h3 {
-        font-size: 24px;
+    .plus-modal-close-btn:hover {
+        background-color: transparent;
+    }
+
+    .plus-modal-body {
+        flex: 0 0 auto;
     }
 
     .plus-modal-content {
-        padding: 0 var(--size-modal-pad-x-sm, 10px);
+        padding: 0 var(--size-modal-pad-x-sm);
+        /* Figma body band ~64px; min-height allows wrap/zoom without clipping */
         min-height: 64px;
         display: flex;
-        align-items: flex-start;
+        align-items: center;
+        box-sizing: border-box;
     }
 
     .plus-modal-footer {
@@ -46,13 +52,17 @@
     }
 
     .plus-modal-button-row {
-        gap: var(--size-modal-gap-sm, 8px);
+        gap: var(--size-modal-gap-sm);
         justify-content: flex-end;
+        flex-wrap: nowrap;
     }
 
     .plus-modal-divider {
+        height: 1px;
+        margin: 0 var(--size-modal-pad-x-sm);
         opacity: 0.1;
-        background-color: var(--color-outline, #6f797a);
-        margin: 0;
+        background-color: var(--color-outline);
+        align-self: stretch;
+        width: auto;
     }
 }

@@ -11,9 +11,21 @@ export default function ReflectionFormPage() {
     const navigate = useNavigate();
 
     const reflection = useMemo(
-        () => REFLECTIONS.find((row) => row.id === reflectionId) || REFLECTIONS[0],
+        () => REFLECTIONS.find((row) => row.id === reflectionId) || null,
         [reflectionId],
     );
+
+    if (!reflection) {
+        return (
+            <div style={{ padding: 'var(--size-section-gap-md)' }}>
+                <h4 className="h4">Reflection not found</h4>
+                <p className="body1-txt">No draft matches id “{reflectionId}”.</p>
+                <button type="button" className="body2-txt" onClick={() => navigate('/')}>
+                    Back to sessions
+                </button>
+            </div>
+        );
+    }
 
     return (
         <ReflectionFlow

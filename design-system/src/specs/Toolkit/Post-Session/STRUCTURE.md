@@ -55,18 +55,34 @@ Empty in Figma — no Storybook leaves.
 | Session Notes | `10808:478232` | Sections / Session Notes |
 | Side Nav Bar | `20:24229` | Sections / Side Nav Bar |
 
+### Section form composers (not Figma strip leaves)
+
+These compose the Figma section organisms into step bodies used by Pages + Reflection Flow. They are **not** separate Figma Components-strip entries:
+
+| Composer | Used by |
+|---|---|
+| `StudentReflectionForm` | Pages / Student Reflection, Reflection Flow |
+| `SessionReflectionForm` | Pages / Session Reflection, Reflection Flow |
+| `SessionInfoForm` | Pages / Session Info, Reflection Flow |
+| `SelfReflectionForm` | Pages / Self Reflection, Reflection Flow |
+| `FormFeedbackForm` | Pages / Form Feedback, Reflection Flow |
+
+(`V2` suffix retained for import stability after V1 archive deletion.)
+
 ## Pages (`1721:118451`)
 
 One Storybook docs leaf per Figma page. Empty / filled / AI states are **story variants or Controls args**, not nested Unfilled/Filled docs.
 
-| Figma | Node | Storybook |
-|---|---|---|
-| Full Page / Reflections | `1751:114672` | Pre-Session Pages / Reflection (shared entry) |
-| Session Info | `563:300236` | Pages / Session Info (`Pages/SessionInfo/`) |
-| Student Reflection | `10662:18965` | Pages / Student Reflection |
-| Session Reflection | `10662:18089` | Pages / Session Reflection |
-| Self Reflection | `5179:79703` | Pages / Self Reflection |
-| Form Feedback | `5176:24528` | Pages / Form Feedback |
+Storybook **Pages** sidebar order follows the form sequence:
+
+| # | Figma | Node | Storybook |
+|---|---|---|---|
+| 1 | Session Info | `563:300236` | Pages / Session Info |
+| 2 | Student Reflection | `10662:18965` | Pages / Student Reflection |
+| 3 | Session Reflection | `10662:18089` | Pages / Session Reflection |
+| 4 | Self Reflection | `5179:79703` | Pages / Self Reflection |
+| 5 | Form Feedback | `5176:24528` | Pages / Form Feedback |
+| — | Full Page / Reflections | `1751:114672` | Pre-Session Pages / Reflection (shared entry) |
 
 Page stories share `pageShell` + Section form organisms with **Reflection Flow** (no divergent Unfilled/Filled bodies).
 
@@ -74,7 +90,7 @@ Page stories share `pageShell` + Section form organisms with **Reflection Flow**
 
 | | Storybook |
 |---|---|
-| End-to-end clickable prototype (hi-fi app mounts this) | Pages / Reflection Flow |
+| End-to-end clickable prototype (hi-fi app mounts this) | Pages / Reflection Flow (last under Pages) |
 
 Use **page docs** for single-step visual QA against Figma masters. Use **Reflection Flow** to walk Session Info → Students → Session → Self → Form Feedback with nav, cadence, cancellation, and modals.
 
@@ -83,7 +99,7 @@ Use **page docs** for single-step visual QA against Figma masters. Use **Reflect
 - Session Info lives under `Pages/SessionInfo/` (title matches folder).
 - Free Response Question = `Sections/FreeResponseQuestion/` (legacy `FormReflection` archived).
 - `Tables/index.js` → `Reflections.stories.jsx`; Cards barrel is empty (Figma Cards strip empty).
-- Linear Scale composes Foundations `Scale` with Post-Session shell SCSS.
+- Linear Scale uses Foundations `Scale.Button` radios inside a Post-Session shell (Figma `10819:11602`).
 
 ## Obsolete (removed from Storybook catalog)
 
@@ -98,7 +114,7 @@ These are **not** in the current Figma Components strip and must not ship as liv
 | Sections / Form Feedback (success card) | Form Feedback is a **Page** (`FormFeedbackForm`) |
 | Post Session Page shell | Superseded by Reflection Flow + page states |
 | `*.archive` soft-deletes | Deleted — use git history |
-| V1 `*ReflectionForm.jsx` (non-V2) | Use `*FormV2` / `SelfReflectionForm` / `FormFeedbackForm` |
+| `*FormV2` filenames | Renamed to `StudentReflectionForm` / `SessionReflectionForm` (deprecated barrel aliases remain) |
 
 ## Docs conventions
 

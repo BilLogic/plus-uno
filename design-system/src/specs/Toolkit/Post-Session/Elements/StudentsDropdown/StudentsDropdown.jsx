@@ -37,7 +37,7 @@ const StudentsDropdown = ({
                 flexDirection: 'column',
                 gap: 'var(--size-element-gap-xs)',
                 width: '100%',
-                maxWidth: '480px',
+                maxWidth: 'var(--col-9)',
             }}
         >
             <label className="body3-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>

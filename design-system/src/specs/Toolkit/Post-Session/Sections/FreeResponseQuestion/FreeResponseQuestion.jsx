@@ -10,9 +10,9 @@ import Switch from '@/components/forms-and-inputs/Switch';
  * @param {object} props
  * @param {string} props.label - Question text
  * @param {boolean} [props.required=false]
- * @param {string} [props.caption] - Neutral helper (on-surface-variant)
- * @param {string} [props.warning] - Privacy / danger helper (danger-text)
- * @param {string} [props.example] - Optional “E.g. …” line
+ * @param {string} [props.caption] - Neutral helper — Body/B3 (on-surface-variant)
+ * @param {string} [props.warning] - Privacy / danger helper — Body/B3 (danger-text)
+ * @param {string} [props.example] - Optional “E.g. …” line — Body/B3
  * @param {string} [props.value='']
  * @param {(event: React.ChangeEvent) => void} [props.onChange]
  * @param {string} [props.placeholder='Type your answer here…']
@@ -48,7 +48,7 @@ const FreeResponseQuestion = ({
             flexDirection: 'column',
             gap: 'var(--size-section-gap-sm)',
             width: '100%',
-            maxWidth: '445px',
+            maxWidth: 'var(--col-8)',
         }}
     >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)', width: '100%' }}>

@@ -1,68 +1,121 @@
-/*
- * DatePicker Component Styles
- * Uses context-aware M3 color roles.
- * Calendar on surface bg → on-surface-variant text
- * Selected day on primary bg → on-primary text
+/**
+ * DatePicker — Figma Forms · Date & Time Picker · Month (Date Picker).
+ * Trigger matches form/Select chrome (surface + outline-variant) with calendar-day
+ * trailing icon — not the Dropdown caret used by Session Selection / Select.
  */
 
 .plus-date-picker-wrapper {
     position: relative;
     display: inline-block;
+    width: 100%;
+    --bs-dropdown-spacer: 0px;
 
-    // --- TOGGLE BUTTON ---
-    // Uses Dropdown toggle styling (inherits from pdropdown)
-    .pdropdown-default-toggle {
-        min-width: 140px;
-        text-align: left;
-    }
-
-    .plus-date-picker-content {
-        display: flex;
-        align-items: center;
-        gap: var(--size-element-gap-sm);
-        flex-grow: 1;
-    }
-
-    .plus-date-picker-input {
-        background: transparent;
-        border: none;
-        padding: 0;
-        margin: 0;
-        width: 100%;
-        outline: none;
-        font-family: inherit;
-        font-size: inherit;
-        font-weight: inherit;
-        line-height: inherit;
-        color: inherit;
-        cursor: inherit;
-
-        &::placeholder {
-            color: var(--color-on-surface-variant);
-            opacity: 0.7;
-        }
+    /* Kill Bootstrap caret if any dropdown-toggle slips in */
+    .dropdown-toggle::after {
+        display: none !important;
+        content: none !important;
     }
 }
 
-// --- CALENDAR DROPDOWN ---
-// Per Material Design: popups/modals use surface-container-high with elevation
-// Figma node 9413:1783 - uses modal tokens for popup container
+/* ===== TRIGGER (Month / no label form field) ===== */
+/* Figma Body/B2 — match Select trigger (not Dropdown B1). */
+.plus-date-picker-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-md);
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 140px;
+    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body2);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--font-line-height-body2);
+    background-color: var(--color-surface);
+    border: 0.8px solid var(--color-outline-variant);
+    border-radius: var(--size-border-radius-radius-50, 2px);
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+
+    &:hover:not(.plus-date-picker-trigger--disabled):not(.plus-date-picker-trigger--readonly) {
+        border-color: var(--color-outline);
+    }
+
+    &.plus-date-picker-trigger--open,
+    &:focus-within {
+        border-color: var(--color-primary);
+        outline: none;
+    }
+}
+
+.plus-date-picker-trigger--small {
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+}
+
+.plus-date-picker-trigger--large {
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+    /* Large stays B2 per Figma Month field — do not bump to B1 */
+    font-size: var(--font-size-body2);
+    line-height: var(--font-line-height-body2);
+}
+
+.plus-date-picker-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    outline: none;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body2);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--font-line-height-body2);
+    color: var(--color-on-surface);
+    cursor: inherit;
+
+    &::placeholder {
+        color: var(--color-on-surface-variant);
+        opacity: 1;
+        font-size: var(--font-size-body2);
+        line-height: var(--font-line-height-body2);
+    }
+}
+
+.plus-date-picker-trigger--small .plus-date-picker-input,
+.plus-date-picker-trigger--small .plus-date-picker-input::placeholder {
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+}
+
+.plus-date-picker-trigger:not(.plus-date-picker-trigger--filled) .plus-date-picker-input {
+    color: var(--color-on-surface-variant);
+}
+
+.plus-date-picker-trigger__icon {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-on-surface-variant);
+    font-size: var(--font-size-fa-body2-solid, 12px);
+    line-height: 1;
+    pointer-events: none;
+}
+
+/* ===== CALENDAR POPUP ===== */
 .plus-date-picker-calendar {
     min-width: 280px;
-    // Figma: px-[var(--modal/pad-x-sm,10px)] py-[var(--modal/pad-y-sm,8px)]
-    // Explicitly using the values 8px 10px as tokens seemed to resolve incorrectly.
     padding: 8px 10px !important;
-
-    // M3 popup background: surface-container-high
     background-color: var(--color-surface-container-high);
     border: var(--size-element-stroke-sm) solid var(--color-outline-variant);
-    // Figma: rounded-[var(--modal/radius-sm,4px)]
     border-radius: var(--size-modal-radius-sm, 4px);
-    // M3 elevation level 2 for dropdowns/popups
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
 }
 
-// --- CALENDAR HEADER ---
 .plus-date-picker-calendar-header {
     display: flex;
     align-items: center;
@@ -93,11 +146,9 @@
 }
 
 .plus-date-picker-calendar-month-year {
-    // Uses h6 class styling already
     color: var(--color-on-surface);
 }
 
-// --- WEEKDAY HEADERS ---
 .plus-date-picker-calendar-weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -111,7 +162,6 @@
     font-weight: var(--font-weight-semibold-1);
 }
 
-// --- DAY CELLS ---
 .plus-date-picker-calendar-days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -135,19 +185,16 @@
         background-color: var(--color-surface-container-high);
     }
 
-    // Other month days - muted
     &-other-month {
         color: var(--color-outline);
         pointer-events: none;
     }
 
-    // Today indicator
     &-today {
         border: var(--size-element-stroke-sm) solid var(--color-primary);
         color: var(--color-primary-text);
     }
 
-    // Selected day - primary bg → on-primary text
     &-selected {
         background-color: var(--color-primary);
         color: var(--color-on-primary);
@@ -157,7 +204,6 @@
         }
     }
 
-    // Disabled
     &-disabled {
         opacity: var(--color-disabled-opacity);
         pointer-events: none;
@@ -165,7 +211,6 @@
     }
 }
 
-// --- ALIGNMENT VARIANTS ---
 .plus-date-picker-calendar-align-left {
     left: 0;
 }
@@ -180,7 +225,6 @@
     right: 0;
 }
 
-// --- SIZE VARIANTS ---
 .plus-date-picker-wrapper.small {
     .plus-date-picker-calendar-day {
         width: 28px;
@@ -195,7 +239,6 @@
     }
 }
 
-// --- STATE VARIANTS ---
 .plus-date-picker-disabled {
     opacity: var(--color-disabled-opacity);
     pointer-events: none;

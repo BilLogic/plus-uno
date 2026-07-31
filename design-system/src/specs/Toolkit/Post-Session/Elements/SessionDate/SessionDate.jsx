@@ -20,7 +20,7 @@ const SessionDate = ({
     onChange,
     required = true,
 }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)', width: '100%', maxWidth: '205px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)', width: '100%', maxWidth: 'var(--col-4)' }}>
         <label htmlFor={id} className="body3-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
             {label}
             {required && <span style={{ color: 'var(--color-danger)' }}> *</span>}
@@ -28,7 +28,7 @@ const SessionDate = ({
         <DatePicker
             id={id}
             name="date"
-            placeholder="Select date"
+            placeholder="MM/DD/YYYY"
             value={value}
             onChange={onChange}
             style={{ width: '100%' }}

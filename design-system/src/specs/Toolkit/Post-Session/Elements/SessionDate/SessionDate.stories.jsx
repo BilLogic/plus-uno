@@ -16,7 +16,7 @@ export const Overview = {
         return (
             <div style={{ display: 'flex', gap: '48px', alignItems: 'flex-start' }}>
                 <SessionDate value={value} onChange={setValue} />
-                <SessionDate value="2026-07-15" onChange={() => {}} />
+                <SessionDate value="2026-11-09" onChange={() => {}} />
             </div>
         );
     },

@@ -214,3 +214,44 @@ export function multiSelectComplete(selectedIds, otherText = '', otherId = 'othe
     if (selectedIds.includes(otherId) && !String(otherText).trim()) return false;
     return true;
 }
+
+/**
+ * Stable JSON compare for dirty-checking reflection drafts.
+ *
+ * @param {unknown} current
+ * @param {unknown} baseline
+ * @returns {boolean}
+ */
+/**
+ * Drops AI-generated / seed-only fields so Cancel dirty checks ignore timer updates.
+ *
+ * @param {object|null|undefined} data
+ * @returns {object|null|undefined}
+ */
+export function reflectionUserFields(data) {
+    if (!data || typeof data !== 'object') return data;
+    const {
+        aiState: _aiState,
+        aiPrompt: _aiPrompt,
+        aiHelper: _aiHelper,
+        aiAnswer: _aiAnswer,
+        forceAiFail: _forceAiFail,
+        forceAiEmpty: _forceAiEmpty,
+        ...rest
+    } = data;
+    return rest;
+}
+
+/**
+ * @param {object|null|undefined} current
+ * @param {object|null|undefined} baseline
+ * @returns {boolean}
+ */
+export function isReflectionDraftDirty(current, baseline) {
+    try {
+        return JSON.stringify(reflectionUserFields(current) ?? null)
+            !== JSON.stringify(reflectionUserFields(baseline) ?? null);
+    } catch {
+        return true;
+    }
+}

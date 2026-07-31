@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/actions/Button';
+import './SideNavBar.scss';
 
 /**
  * Single side-nav tab row for the reflection flow.
@@ -9,12 +10,14 @@ import Button from '@/components/actions/Button';
  * @param {object} props
  * @param {string} props.text
  * @param {'enabled'|'selected'|'disabled'|'active-text'} [props.state='enabled']
+ * @param {'section'|'student'} [props.variant='section']
  * @param {React.ReactNode} [props.trailingIcon]
  * @param {() => void} [props.onClick]
  */
 const SideBarTab = ({
     text = 'Tab Title',
     state = 'enabled',
+    variant = 'section',
     trailingIcon = null,
     onClick,
 }) => {
@@ -22,21 +25,21 @@ const SideBarTab = ({
     const isDisabled = state === 'disabled';
     const isActiveText = state === 'active-text';
 
+    const className = [
+        'post-session-side-nav-tab',
+        variant === 'student' ? 'post-session-side-nav-tab--student' : '',
+        isSelected ? 'post-session-side-nav-tab--selected' : '',
+        isDisabled ? 'post-session-side-nav-tab--disabled' : '',
+        isActiveText ? 'post-session-side-nav-tab--active-text' : '',
+    ].filter(Boolean).join(' ');
+
     return (
         <div
             role="button"
             tabIndex={isDisabled ? -1 : 0}
             aria-disabled={isDisabled || undefined}
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '10px 16px',
-                width: '100%',
-                cursor: isDisabled ? 'default' : 'pointer',
-                borderRadius: isSelected ? 'var(--size-element-radius-md, 6px)' : undefined,
-                backgroundColor: isSelected ? 'var(--color-primary-state-16)' : undefined,
-            }}
+            aria-current={isSelected || isActiveText ? 'step' : undefined}
+            className={className}
             onClick={!isDisabled ? onClick : undefined}
             onKeyDown={(event) => {
                 if (isDisabled) return;
@@ -47,31 +50,15 @@ const SideBarTab = ({
             }}
         >
             <span
-                className={isSelected || isActiveText ? 'body2-txt font-weight-semibold' : 'body2-txt'}
-                style={{
-                    flex: '1 0 0',
-                    color: (isSelected || isActiveText)
-                        ? 'var(--color-primary-text)'
-                        : 'var(--color-on-surface)',
-                    opacity: isDisabled ? 0.38 : 1,
-                    minWidth: 0,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                }}
+                className={[
+                    'post-session-side-nav-tab__label',
+                    isSelected || isActiveText ? 'body2-txt font-weight-semibold' : 'body2-txt',
+                ].join(' ')}
             >
                 {text}
             </span>
             {trailingIcon && (
-                <span
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '12px',
-                        opacity: isDisabled ? 0.38 : 1,
-                    }}
-                >
+                <span className="post-session-side-nav-tab__icon" aria-hidden="true">
                     {trailingIcon}
                 </span>
             )}
@@ -82,6 +69,7 @@ const SideBarTab = ({
 SideBarTab.propTypes = {
     text: PropTypes.string,
     state: PropTypes.oneOf(['enabled', 'selected', 'disabled', 'active-text']),
+    variant: PropTypes.oneOf(['section', 'student']),
     trailingIcon: PropTypes.node,
     onClick: PropTypes.func,
 };
@@ -92,11 +80,7 @@ SideBarTab.propTypes = {
  */
 const completeIcon = (complete) =>
     complete ? (
-        <i
-            className="fa-solid fa-circle-check"
-            style={{ color: 'var(--color-success-text, var(--color-success))' }}
-            aria-hidden="true"
-        />
+        <i className="fa-solid fa-circle-check" aria-hidden="true" />
     ) : null;
 
 /**
@@ -120,7 +104,9 @@ const SideNavBar = ({
 }) => {
     const onStudentStep = activeTab === 'student-reflection' || Boolean(activeTab?.startsWith('student-'));
     const sessionInfoDone = Boolean(completedSections['session-information']) || state !== 'pre-student-add';
-    const studentDone = Boolean(completedSections['student-reflection']) || state === 'in-progress';
+    const studentDone = Boolean(completedSections['student-reflection']);
+    const sessionDone = Boolean(completedSections['session-reflection']);
+    const selfDone = Boolean(completedSections['self-reflection']);
 
     /**
      * @param {boolean} selected
@@ -133,29 +119,8 @@ const SideNavBar = ({
     };
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                gap: 'var(--size-section-gap-sm)',
-                padding: 'var(--size-section-pad-y-sm) var(--size-section-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container)',
-                borderRadius: 'var(--size-border-radius-4-5, 16px)',
-                width: '219px',
-                maxWidth: '219px',
-                alignSelf: 'flex-start',
-                flexShrink: 0,
-            }}
-        >
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '8px',
-                    width: '100%',
-                }}
-            >
+        <div className="post-session-side-nav">
+            <div className="post-session-side-nav__tabs">
                 <SideBarTab
                     text="Session Information"
                     state={sectionState(activeTab === 'session-information')}
@@ -163,13 +128,12 @@ const SideNavBar = ({
                     onClick={() => onTabClick?.('session-information')}
                 />
 
-                <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                <div className="post-session-side-nav__student-stack">
                     <SideBarTab
                         text="Student Reflection"
                         state={sectionState(
-                            /* Parent stays selected while any student is active */
                             onStudentStep || activeTab === 'student-reflection',
-                            !sessionInfoDone && state === 'pre-student-add',
+                            !sessionInfoDone,
                         )}
                         trailingIcon={completeIcon(studentDone && !onStudentStep)}
                         onClick={() => onTabClick?.(students.length ? 'student-0' : 'student-reflection')}
@@ -178,50 +142,54 @@ const SideNavBar = ({
                     {students.length > 0 && onStudentStep && students.map((student, index) => {
                         const isActive = activeTab === `student-${index}`;
                         return (
-                            <div
+                            <SideBarTab
                                 key={student.id || student.name || index}
-                                style={{ paddingLeft: '32px', width: '100%' }}
-                            >
-                                <SideBarTab
-                                    text={student.name}
-                                    /* Figma: active student = primary text only — never a selected pill */
-                                    state={isActive ? 'active-text' : 'enabled'}
-                                    trailingIcon={completeIcon(student.status === 'complete')}
-                                    onClick={() => onTabClick?.(`student-${index}`)}
-                                />
-                            </div>
+                                text={student.name}
+                                variant="student"
+                                state={isActive ? 'active-text' : 'enabled'}
+                                onClick={() => onTabClick?.(`student-${index}`)}
+                            />
                         );
                     })}
                 </div>
 
                 <SideBarTab
                     text="Session Reflection"
-                    state={sectionState(activeTab === 'session-reflection')}
-                    trailingIcon={completeIcon(Boolean(completedSections['session-reflection']))}
+                    state={sectionState(
+                        activeTab === 'session-reflection',
+                        !sessionInfoDone || !studentDone,
+                    )}
+                    trailingIcon={completeIcon(sessionDone)}
                     onClick={() => onTabClick?.('session-reflection')}
                 />
                 {showSelfReflection && (
                     <SideBarTab
                         text="Self Reflection"
-                        state={sectionState(activeTab === 'self-reflection')}
-                        trailingIcon={completeIcon(Boolean(completedSections['self-reflection']))}
+                        state={sectionState(
+                            activeTab === 'self-reflection',
+                            !sessionDone,
+                        )}
+                        trailingIcon={completeIcon(selfDone)}
                         onClick={() => onTabClick?.('self-reflection')}
                     />
                 )}
                 {showFormFeedback && (
                     <SideBarTab
                         text="Form Feedback"
-                        state={sectionState(activeTab === 'form-feedback')}
+                        state={sectionState(
+                            activeTab === 'form-feedback',
+                            !sessionDone || (showSelfReflection && !selfDone),
+                        )}
                         trailingIcon={completeIcon(Boolean(completedSections['form-feedback']))}
                         onClick={() => onTabClick?.('form-feedback')}
                     />
                 )}
             </div>
 
-            <div style={{ opacity: canSubmit ? 1 : 0.38, width: '100%' }}>
+            <div className="post-session-side-nav__submit">
                 <Button
                     text="Submit"
-                    style="default"
+                    style={canSubmit ? 'primary' : 'default'}
                     fill="filled"
                     size="medium"
                     disabled={!canSubmit}

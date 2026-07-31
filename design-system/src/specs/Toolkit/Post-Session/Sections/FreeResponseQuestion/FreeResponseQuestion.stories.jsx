@@ -5,20 +5,33 @@ export default {
     tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Post-Session/Sections/Free Response Question',
     parameters: { layout: 'padded' },
+    args: {
+        showEscalate: true,
+        escalate: false,
+    },
+    argTypes: {
+        showEscalate: { control: 'boolean' },
+        escalate: { control: 'boolean' },
+    },
 };
 
 /**
- * Default empty state with caption.
+ * Default empty state with caption + controllable escalate Switch.
+ *
+ * @param {object} args
  */
 export const Overview = {
-    render: function FreeResponseOverview() {
+    render: function FreeResponseOverview(args) {
         const [value, setValue] = useState('');
+        const [escalate, setEscalate] = useState(args.escalate);
         return (
             <FreeResponseQuestion
                 label="Is there anything we can do to best support your development?"
                 value={value}
                 onChange={(event) => setValue(event.target.value)}
-                showEscalate
+                showEscalate={args.showEscalate}
+                escalate={escalate}
+                onEscalateChange={setEscalate}
             />
         );
     },

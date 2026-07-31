@@ -1,15 +1,57 @@
 import React from 'react';
-import StudentReflectionFormV2 from '@/specs/Toolkit/Post-Session/Sections/StudentReflectionForm/StudentReflectionFormV2';
+import StudentReflectionForm from '@/specs/Toolkit/Post-Session/Sections/StudentReflectionForm/StudentReflectionForm';
 import {
     BreakpointPreview,
     DEFAULT_PAGE_STUDENTS,
     ReflectionPageShell,
 } from '@/specs/Toolkit/Post-Session/Pages/pageShell';
 
-const students = DEFAULT_PAGE_STUDENTS.map((student, index) => ({
+/** Roster — Baxter is the active student in Figma page masters. */
+const students = DEFAULT_PAGE_STUDENTS.map((student) => ({
     ...student,
-    status: index === 0 ? 'complete' : 'incomplete',
+    status: student.id === 'kiera' ? 'complete' : 'incomplete',
 }));
+
+/**
+ * Figma Pages · Student Reflection (`10662:18965`) states.
+ * Keys match Controls + story names: unfilled · filled · filledLow.
+ */
+const STATE_PROPS = {
+    unfilled: {
+        initialData: {},
+        simulateAi: false,
+        aiState: 'idle',
+    },
+    filled: {
+        simulateAi: false,
+        aiState: 'ready',
+        initialData: {
+            goalProgress: ['steady'],
+            effort: ['consistent'],
+            engagement: ['responsive'],
+            followUp: ['no'],
+            aiPrompt: 'What’s one moment from this session you’d want the next tutor to know?',
+            aiHelper: 'E.g. He solved the last two problems without prompts.',
+            aiAnswer: 'He solved the last two problems without prompts.',
+        },
+    },
+    filledLow: {
+        simulateAi: false,
+        aiState: 'empty',
+        initialData: {
+            goalProgress: ['other'],
+            effort: ['other'],
+            engagement: ['other'],
+            otherGoal: 'Finished early but skipped the stretch goal.',
+            otherEffort: 'Started strong, then stalled after the first break.',
+            otherEngagement: 'Camera off for half the block.',
+            followUp: ['behavioral', 'other'],
+            followUpDescription: 'Repeatedly redirected peers and refused the warm-up.',
+            escalate: true,
+            forceAiEmpty: true,
+        },
+    },
+};
 
 /**
  * @param {object} formProps
@@ -23,12 +65,12 @@ function renderShell(formProps) {
                 completedSections={{ 'session-information': true }}
                 id="student-reflection-page-story"
             >
-                {({ openSaveExit }) => (
-                    <StudentReflectionFormV2
+                {({ openDiscard, openSaved }) => (
+                    <StudentReflectionForm
                         studentName="Baxter Ellington"
                         {...formProps}
-                        onCancel={openSaveExit}
-                        onSaveAndExit={openSaveExit}
+                        onCancel={openDiscard}
+                        onSaveAndExit={openSaved}
                         onNext={() => {}}
                     />
                 )}
@@ -41,62 +83,46 @@ export default {
     title: 'Specs/Toolkit/Post-Session/Pages/Student Reflection',
     parameters: { layout: 'padded' },
     tags: ['!dev', '!autodocs'],
-};
-
-/** Empty — chip questions unanswered. */
-export const Empty = {
-    render: () => renderShell({
-        initialData: {},
-        simulateAi: false,
-        aiState: 'idle',
-    }),
-};
-
-/** AI generating after chips. */
-export const InProgressAi = {
-    name: 'In progress (AI generating)',
-    render: () => renderShell({
-        simulateAi: false,
-        aiState: 'generating',
-        initialData: {
-            goalProgress: ['steady'],
-            effort: ['consistent'],
-            engagement: ['responsive'],
+    args: { formState: 'unfilled' },
+    argTypes: {
+        formState: {
+            name: 'Form state',
+            control: 'radio',
+            options: ['unfilled', 'filled', 'filledLow'],
+            labels: {
+                unfilled: 'Unfilled',
+                filled: 'Filled',
+                filledLow: 'Filled-low',
+            },
         },
-    }),
+    },
 };
 
-/** Filled with AI ready. */
+/**
+ * Controllable Overview — switch Form state via Controls (Figma page variants).
+ *
+ * @param {object} args
+ */
+export const Overview = {
+    render: (args) => renderShell(STATE_PROPS[args.formState] || STATE_PROPS.unfilled),
+};
+
+/** Figma state=unfilled — unanswered chips for the active student. */
+export const Unfilled = {
+    name: 'Unfilled',
+    render: () => renderShell(STATE_PROPS.unfilled),
+};
+
+/** @deprecated Prefer Unfilled — kept so old Storybook URLs / HMR keep working. */
+export const Empty = Unfilled;
+
+/** Figma state=filled — happy path with AI follow-up ready. */
 export const Filled = {
-    render: () => renderShell({
-        simulateAi: false,
-        aiState: 'ready',
-        initialData: {
-            goalProgress: ['steady'],
-            effort: ['consistent'],
-            engagement: ['responsive'],
-            followUp: ['no'],
-            aiPrompt: 'What’s one moment from this session you’d want the next tutor to know?',
-            aiAnswer: 'He solved the last two problems without prompts.',
-        },
-    }),
+    render: () => renderShell(STATE_PROPS.filled),
 };
 
-/** Worst case — Other + escalation. */
-export const WorstCase = {
-    name: 'Worst case (Other everywhere)',
-    render: () => renderShell({
-        simulateAi: false,
-        aiState: 'ready',
-        initialData: {
-            goalProgress: ['other'],
-            effort: ['other'],
-            engagement: ['other'],
-            otherGoal: 'Worked ahead on a custom packet.',
-            otherEffort: 'Needed frequent nudges after break.',
-            otherEngagement: 'Camera off for most of the block.',
-            followUp: ['behavioral'],
-            followUpDescription: 'Repeatedly redirected peers off-task.',
-        },
-    }),
+/** Figma state=filled-low — Other chips, empty AI, escalate concern. */
+export const FilledLow = {
+    name: 'Filled-low',
+    render: () => renderShell(STATE_PROPS.filledLow),
 };
