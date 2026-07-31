@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 priority: p2
 issue_id: "073"
 tags: [code-review, post-session, architecture, quality]
@@ -28,9 +28,11 @@ Triage — schedule after PR merge if not blocking.
 
 ## Acceptance Criteria
 
-- [ ] Matches Figma Components strip / Notion Form Design where applicable
-- [ ] No Storybook catalog pollution from obsolete names
+- [x] Matches Figma Components strip / Notion Form Design where applicable
+- [x] No Storybook catalog pollution from obsolete names
 
 ## Work Log
 
 - 2026-07-30: Filed from ce:review synthesis (kieran-typescript, architecture-strategist, code-simplicity, security-sentinel).
+
+- 2026-07-30: Implemented — SideNav SCSS + --col-* widths; stories colocated under SideNavBar/ FormRating/ SessionRating/.

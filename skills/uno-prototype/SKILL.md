@@ -173,25 +173,15 @@ them. Offer suggestions *with reasoning*, always grounded in the PRD, and let
 the designer reshape them; remind them they can say **back** to revise any
 earlier answer until the brief is confirmed.
 
-**Ask the four questions one by one** — each as its own **AskQuestion** call with
-`questions.length === 1`, never batched. Carry the missing-context hard gate
-(method §5) through this step: if grounding lacks a screen state, an interaction
-is ambiguous, or DS/Figma expectations are unclear, surface it here rather than
-inventing later.
+**Ask the four questions one by one**, under the presentation rules in § Intake
+mode above (one question per message · recommendation first, anchored in PRD
+evidence · confirm labels restate the content). Two additions specific to this
+step: Q1 (goals) may be multi-select since goals co-apply, the rest are single;
+and carry the missing-context hard gate (method §5) through — if grounding lacks
+a screen state, an interaction is ambiguous, or DS/Figma expectations are
+unclear, surface it here rather than inventing later.
 
-**Presentation rules (keep it lean — long option menus waste the designer's
-attention and tokens):**
-- **Lead with a recommendation** (except the open-ended beat of Q2). Put the
-  recommended choice first (label it "(Recommended)") — then at most one or two
-  alternatives — then **Other**. Don't enumerate every possibility from the
-  lists below; those are your vocabulary to pick from, not the menu to show.
-- **Anchor every recommendation in PRD evidence** — quote or name the section
-  that motivates it, never generic reasoning.
-- **One line per option**, and **confirm-option labels restate the content**
-  being confirmed (e.g. "Yes: mid visual, 3 screens") — never a bare "All look
-  right" a designer could click without reading.
-- Q1 (goals) may be multi-select since several goals can co-apply; the rest are
-  single-select.
+The lists below are your **vocabulary to pick from, not the menu to show**.
 
 1. **What are you trying to achieve?** Recommend the most likely goal(s)
    for *this* PRD (multi-select), one line each on why — drawn from: validate
@@ -334,26 +324,13 @@ gates are pass/fail). Golden scenarios: `docs/evals/scenarios/uno-prototype.md`.
 
 ## Constraints
 
-- **Intake = PRD gate + Step 2 reflection, then handoff** — the eight-step
-  sequence (`prd_check` → `prd_paste` → `reflect_learn` →
-  `reflect_artifact_open` → `reflect_artifact` → `reflect_fidelity` →
-  `reflect_exclude` → `reflect_confirm`), one step per message, one AskQuestion
-  with `questions.length === 1` per step — for `reflection` steps you compose
-  the PRD-specific options from the guidance (the `openEnded` beat takes free
-  text, no menu; the `confirm` beat assembles the brief card from the answers).
-  Only after the brief is confirmed do **you** run Step 3 (Plan) → Step 4
-  (Generate). There is no separate fidelity-picker step (fidelity is
-  `reflect_fidelity`); the "do you have a Figma file?" question is asked by the
-  agent in Step 4's high-fi branch, right before generation. Hook runtimes
-  automate the sequence — Cursor via `beforeSubmitPrompt` (`run.mjs`), Claude
-  Code via `UserPromptSubmit` (`claude-code-run.mjs` + `.claude/settings.json`)
-  — writing `active-intake-question.json` each turn and emitting the
-  **build-handoff** message at confirm; every other runtime runs the same
-  sequence manually (see Intake mode above).
-- **One question at a time everywhere** — the PRD-gate steps *and* the Step 2
-  reflection beats are each their own hook-gated AskQuestion
-  (`questions.length === 1`). The hook enforces this; never batch reflection
-  questions or dump the whole reflection at once even if the JSON weren't present.
+- **Intake owns the eight steps; § Intake mode above owns the rules.** Not
+  restated here — the sequence, the one-question-per-message rule, the
+  hook-vs-manual paths and the runtime list all live there, once. What belongs
+  in this list: intake ends at `reflect_confirm`, and only then do **you** run
+  Step 3 (Plan) → Step 4 (Generate). There is no separate fidelity-picker step
+  (fidelity is `reflect_fidelity`); the "do you have a Figma file?" question is
+  the agent's, asked in Step 4's high-fi branch right before generation.
 - **PRD gate is never skipped** — method §0; route to `skills/uno-synthesize`
   when PRD is absent. Exit the hook with `terminate this process` or
   `skip PRD upload` to leave without invoking this skill.

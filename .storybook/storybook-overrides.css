@@ -46,11 +46,16 @@ body,
     margin-top: var(--size-element-gap-md) !important;
 }
 
-/* Body text in docs */
-.sbdocs p,
-.sbdocs li,
-.sbdocs td,
-.sbdocs th {
+/*
+ * Body text in MDX prose only.
+ * Do NOT target bare `.sbdocs p` / `li` / `td` — that !important override
+ * smashed DS utilities (body3-txt captions, h6 titles, etc.) inside story canvases.
+ */
+.sbdocs p.sbdocs-p,
+.sbdocs li.sbdocs-li,
+.sbdocs .sbdocs-content > p:not([class]),
+.sbdocs .sbdocs-content > ul > li:not([class]),
+.sbdocs .sbdocs-content > ol > li:not([class]) {
     font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif) !important;
     font-size: var(--font-size-body1, 16px) !important;
     line-height: var(--font-line-height-body1, 150%) !important;

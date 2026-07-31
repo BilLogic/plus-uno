@@ -65,7 +65,7 @@ function isStrictGateState(stateId) {
  * @param {string} conversationId
  */
 function releaseSession(conversationId) {
-  clearIntakeQuestion();
+  clearIntakeQuestion(conversationId);
   clearSession(conversationId);
 }
 
@@ -177,7 +177,7 @@ export function handleSubmit(input) {
   if (isBypassRequest(prompt)) {
     clearSession(conversationId);
     clearBriefing(conversationId);
-    clearIntakeQuestion();
+    clearIntakeQuestion(conversationId);
     return result(true);
   }
 
@@ -246,6 +246,27 @@ export function handleGateAnswer(input) {
  * @param {Array<{ type?: string; file_path?: string }>} attachments
  */
 function handleActiveSession(conversationId, session, prompt, attachments) {
+  // Dedup: on runtimes where an ask-the-user answer ALSO surfaces as a prompt
+  // event (Claude Code / Codex — the typed rather than tapped path), the same
+  // answer can reach the FSM twice: once via UserPromptSubmit, once via
+  // PostToolUse. Reflection steps validate any non-empty text, so the second
+  // arrival would silently advance a second step and store the answer under the
+  // wrong id. Same text, same step, within a few seconds → already consumed.
+  // Matched on text + recency only: by the time the duplicate arrives the step
+  // has already advanced, so comparing against the CURRENT step never matches.
+  // A user cannot deliberately answer twice inside the window — they have not
+  // seen the next question yet.
+  const now = Date.now();
+  if (
+    session.lastAnswer === prompt &&
+    session.lastAnswerAt &&
+    now - Date.parse(session.lastAnswerAt) < 5_000
+  ) {
+    return result(true);
+  }
+  session.lastAnswer = prompt;
+  session.lastAnswerAt = new Date(now).toISOString();
+
   if (GLOBAL_COMMANDS.restart.test(prompt)) {
     const cached = loadPrdCache(conversationId);
     const restarted = createSession(cached);
@@ -385,7 +406,7 @@ function presentState(conversationId, session) {
   const state = getState(session.stateId);
   if (!state) {
     clearSession(conversationId);
-    clearIntakeQuestion();
+    clearIntakeQuestion(conversationId);
     return result(true);
   }
 

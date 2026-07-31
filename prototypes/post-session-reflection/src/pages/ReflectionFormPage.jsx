@@ -24,7 +24,6 @@ export default function ReflectionFormPage() {
                 selectedStudentIds: (reflection.students || []).map((student) => student.id || student.name),
             }}
             onExit={() => navigate('/')}
-            onSubmitted={() => navigate('/')}
         />
     );
 }

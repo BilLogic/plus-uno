@@ -66,8 +66,28 @@ export function writeIntakeQuestion(conversationId, session, state) {
   fs.writeFileSync(ACTIVE_INTAKE_FILE, JSON.stringify(payload, null, 2));
 }
 
-export function clearIntakeQuestion() {
-  if (fs.existsSync(ACTIVE_INTAKE_FILE)) fs.unlinkSync(ACTIVE_INTAKE_FILE);
+/**
+ * Remove the active question file — but only if it belongs to this conversation.
+ *
+ * The file is a single fixed path while sessions are per-conversation, so an
+ * unguarded delete let conversation A's session-end wipe conversation B's live
+ * question mid-intake (two Cursor tabs, or Cursor + Claude Code at once). The
+ * payload already carries `conversationId`; this makes the delete respect it.
+ * Pass no id to force (the FSM's own terminal transitions).
+ *
+ * @param {string} [conversationId]
+ */
+export function clearIntakeQuestion(conversationId) {
+  if (!fs.existsSync(ACTIVE_INTAKE_FILE)) return;
+  if (conversationId) {
+    try {
+      const owner = JSON.parse(fs.readFileSync(ACTIVE_INTAKE_FILE, 'utf8'))?.conversationId;
+      if (owner && owner !== conversationId) return; // another conversation owns it
+    } catch {
+      // unreadable → fall through and clear it; a corrupt file helps nobody
+    }
+  }
+  fs.unlinkSync(ACTIVE_INTAKE_FILE);
 }
 
 /**
