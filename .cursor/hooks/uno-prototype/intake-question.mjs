@@ -32,17 +32,47 @@ export function buildIntakePayload(conversationId, session, state) {
 
   if (state.progressLabel) payload.progressLabel = state.progressLabel;
 
+  // Every runtime gets the SAME answer affordance. `parseChoice` has always
+  // accepted a bare number (validators.mjs) — nothing said so, so no model
+  // offered it and no designer knew. Saying it here makes the text rendering
+  // genuinely equal to a widget instead of a worse version of one.
+  payload.answerHint = 'Reply with the number, or answer in your own words.';
+
   if (effectiveType === 'choice' && options?.length) {
     payload.options = options.map((label, index) => ({
       id: String(index + 1),
       label,
     }));
+    // Ship the exact plain-text rendering rather than leaving each model to
+    // invent one. Runtimes with a question widget can ignore `render` and use
+    // `question` + `options`; runtimes without it paste this verbatim, so the
+    // experience is identical everywhere.
+    payload.render = [
+      state.progressLabel ? `**${state.progressLabel}** — ${payload.question}` : `**${payload.question}**`,
+      '',
+      ...options.map((label, index) => `${index + 1}. ${label}`),
+      '',
+      `_${payload.answerHint}_`,
+    ].join('\n');
   }
 
   if (effectiveType === 'reflection') {
     payload.multiSelect = Boolean(state.multiSelect);
     payload.openEnded = Boolean(state.openEnded);
     payload.confirm = Boolean(state.confirm);
+    // Reflection options are PRD-specific, so the agent composes them — but the
+    // SHAPE is fixed here so every runtime lays them out the same way.
+    if (!state.openEnded) {
+      payload.renderTemplate = [
+        `**${state.progressLabel ?? 'Reflection'}** — ${payload.question}`,
+        '',
+        '1. <recommended option> **(Recommended)** — <one line, anchored in the PRD>',
+        '2. <alternative> — <one line>',
+        '3. Something else — tell me in your own words',
+        '',
+        `_${payload.answerHint}${state.multiSelect ? ' Several may apply — name more than one number if so.' : ''}_`,
+      ].join('\n');
+    }
     payload.stepIndex = state.stepIndex;
     payload.stepTotal = state.stepTotal;
     payload.guidance = state.guidance;
@@ -106,7 +136,7 @@ export function clearIntakeQuestion(conversationId) {
  * plain-text form is a first-class rendering, not a degradation.
  */
 const ONE_QUESTION_CONTRACT =
-  'ASK EXACTLY ONE QUESTION THIS MESSAGE. If your runtime has an interactive question/choice tool (whatever it is named), use it for a SINGLE question with the options below. If it does not, render the question in plain text with the options as a numbered list the designer can answer by number or in their own words — that plain-text form is fully valid here, not a fallback. Either way: one question, the options shown, a free-form answer always accepted.';
+  'ASK EXACTLY ONE QUESTION THIS MESSAGE. If your runtime has an interactive question/choice tool (whatever it is named), use it for a SINGLE question with the options. If it does not, post the JSON\'s `render` field verbatim (choice steps) or follow its `renderTemplate` (reflection steps) — a numbered list the designer answers by number or in their own words. Both renderings are first-class; the plain-text one is NOT a degraded fallback. Either way: one question, options shown, the number affordance stated, a free-form answer always accepted.';
 
 export function buildAgentIntakeInstruction(state) {
   const effectiveType = state.type;
