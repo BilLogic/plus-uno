@@ -128,19 +128,10 @@ export const REFLECTION_STEPS = {
 };
 
 /**
- * Intake steps that must complete before the agent proceeds. The hook enforces
- * the PRD gate (prd_check → prd_paste) AND the Step 2 reflection (four
- * reflect_* states) — each is strict, so an empty/invalid reply re-prompts the
- * same step instead of falling through. Once the last reflection answer lands
- * the hook releases and the agent runs Step 3 (Plan) → Step 4 (Generate).
+ * Intake steps that must complete before the agent proceeds: the PRD gate
+ * (prd_check → prd_paste) and the Step 2 reflection (the reflect_* states).
+ * Every one is strict — an empty/invalid reply re-prompts the same step instead
+ * of falling through — which is why the engine has no non-strict branch. Once
+ * the last reflection answer lands the hook releases and the agent runs Step 3
+ * (Plan) → Step 4 (Generate).
  */
-export const STRICT_GATE_STATE_IDS = new Set([
-  'prd_check',
-  'prd_paste',
-  'reflect_learn',
-  'reflect_artifact_open',
-  'reflect_artifact',
-  'reflect_fidelity',
-  'reflect_exclude',
-  'reflect_confirm',
-]);

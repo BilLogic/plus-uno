@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FLOW_MAP } from './constants.mjs';
-import { resolveOptions, resolveQuestion, resolveType } from './states.mjs';
+import { resolveQuestion } from './states.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BRIEFING_DIR = path.join(__dirname, '..', 'briefings');
@@ -14,8 +14,8 @@ export const ACTIVE_INTAKE_FILE = path.join(BRIEFING_DIR, 'active-intake-questio
  * @param {Record<string, unknown>} ctx
  */
 export function buildIntakePayload(conversationId, session, state) {
-  const effectiveType = resolveType(state, session.context);
-  const options = resolveOptions(state, session.context);
+  const effectiveType = state.type;
+  const options = state.options;
 
   /** @type {Record<string, unknown>} */
   const payload = {

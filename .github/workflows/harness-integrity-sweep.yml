@@ -43,6 +43,13 @@ jobs:
           npm run check:component-registry
           npm run check:token-registry
 
+      # The intake FSM (.cursor/hooks/uno-prototype/) gates every prototype run,
+      # but its suite had no runner — it passed only when someone invoked node by
+      # hand. A test nobody runs protects nothing, so it rides the same monthly
+      # deterministic pass as the registries. Dependency-free; no npm install.
+      - name: Intake FSM smoke tests
+        run: npm run check:intake-fsm
+
       - name: Ensure intake labels exist
         env:
           GH_TOKEN: ${{ github.token }}

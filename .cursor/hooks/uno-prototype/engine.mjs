@@ -1,16 +1,10 @@
-import { GLOBAL_COMMANDS, STRICT_GATE_STATE_IDS } from './constants.mjs';
+import { GLOBAL_COMMANDS } from './constants.mjs';
 import {
   hasPrototypeIntent,
   hasNewPrdIntent,
   isBypassRequest,
 } from './intents.mjs';
-import { extractPrdHints } from './prd-hints.mjs';
-import {
-  getState,
-  resolveOptions,
-  resolveType,
-  STATES,
-} from './states.mjs';
+import { getState, STATES } from './states.mjs';
 import {
   buildAgentIntakeInstruction,
   clearIntakeQuestion,
@@ -54,14 +48,6 @@ function result(continueSubmit, userMessage, agentMessage) {
 }
 
 /**
- * @param {string} stateId
- * @returns {boolean}
- */
-function isStrictGateState(stateId) {
-  return STRICT_GATE_STATE_IDS.has(stateId);
-}
-
-/**
  * @param {string} conversationId
  */
 function releaseSession(conversationId) {
@@ -83,7 +69,6 @@ function createSession(cachedPrd = null) {
       history: ['reflect_learn'],
       context: {
         prd: cachedPrd.prd,
-        prdHints: cachedPrd.prdHints || extractPrdHints(/** @type {string} */ (cachedPrd.prd)),
         prdResumed: true,
       },
       status: 'active',
@@ -117,8 +102,7 @@ function transitionSession(session, nextStateId, patch = {}) {
  */
 function storePrdContext(context, prdText, conversationId) {
   context.prd = prdText;
-  context.prdHints = extractPrdHints(prdText);
-  savePrdCache(conversationId, { prd: prdText, prdHints: context.prdHints });
+  savePrdCache(conversationId, { prd: prdText });
 }
 
 /**
@@ -297,9 +281,11 @@ function handleActiveSession(conversationId, session, prompt, attachments) {
     return result(true);
   }
 
-  const strict = isStrictGateState(state.id);
-  const effectiveType = resolveType(state, session.context);
-  const options = resolveOptions(state, session.context);
+  // Every non-terminal state is a strict gate: an invalid or empty reply
+  // re-prompts the same step rather than falling through. Terminal states
+  // return above, so there is no non-strict path to handle here.
+  const effectiveType = state.type;
+  const options = state.options;
 
   let answer = prompt;
   if (effectiveType === 'choice' && options) {
@@ -326,10 +312,6 @@ function handleActiveSession(conversationId, session, prompt, attachments) {
       if (state.id === 'prd_check' && isNoPrdAnswer(prompt)) {
         answer = 'No';
       } else {
-        if (!strict) {
-          releaseSession(conversationId);
-          return result(true);
-        }
         writeIntakeQuestion(conversationId, session, state);
         saveSession(conversationId, session);
         return result(
@@ -344,10 +326,6 @@ function handleActiveSession(conversationId, session, prompt, attachments) {
   }
 
   if (state.validate && !state.validate(answer, session.context, attachments)) {
-    if (!strict) {
-      releaseSession(conversationId);
-      return result(true);
-    }
     writeIntakeQuestion(conversationId, session, state);
     saveSession(conversationId, session);
     return result(

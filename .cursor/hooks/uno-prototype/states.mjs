@@ -134,22 +134,6 @@ export function getState(stateId) {
 
 /**
  * @param {ConversationState} state
- * @returns {string[] | undefined}
- */
-export function resolveOptions(state) {
-  return state.options;
-}
-
-/**
- * @param {ConversationState} state
- * @returns {'choice' | 'text' | 'upload' | 'link' | 'terminal'}
- */
-export function resolveType(state) {
-  return state.type;
-}
-
-/**
- * @param {ConversationState} state
  * @returns {string}
  */
 export function resolveQuestion(state) {
