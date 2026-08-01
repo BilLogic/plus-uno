@@ -17,7 +17,7 @@ import {
 } from "../thread-state-client";
 import { resolveProposal, type Decision } from "../agent/resolve-proposal";
 import type { SlackReactionAddedEvent } from "./events";
-import { conversationsReplies, postMessage } from "./api";
+import { conversationsReplies, getBotIdentity, postMessage } from "./api";
 
 const CONFIRM_REACTIONS = new Set(["white_check_mark", "heavy_check_mark", "+1", "thumbsup"]);
 const CANCEL_REACTIONS = new Set(["x", "negative_squared_cross_mark", "no_entry_sign"]);
@@ -46,6 +46,13 @@ async function findThreadProposal(
 export async function handleReaction(env: Env, event: SlackReactionAddedEvent): Promise<void> {
   const decision = mapReaction(event.reaction);
   if (!decision) return; // not a gate reaction; ignore silently
+
+  // The bot must never resolve its own proposals. slack_react refuses the
+  // canonical pair, but the gate also accepts aliases (thumbsup et al) the
+  // refusal list doesn't cover — without this check a bot-posted 👍 near a
+  // card could self-confirm through the thread-fallback lookup.
+  const self = await getBotIdentity(env);
+  if (self && event.user === self.userId) return;
 
   if (event.item.type !== "message") return;
   const channel = event.item.channel;
