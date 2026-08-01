@@ -99,7 +99,6 @@ prompt; it does not write the asset spec inline, however completely it could.
 text sketch, or a write through a gated design-tool writer. Everything else is a
 spec the designer carries to the external tool.
 
-
 Every prompt-spec ends with an embedded self-check: the confirmed brief
 restated as concrete pass/fail checks (serves the goal · right artifact shape ·
 at the agreed fidelity dials · nothing from the won't-include list, plus the
