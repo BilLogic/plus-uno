@@ -93,9 +93,6 @@ function inventoryBlurb(name) {
 }
 
 function propsSourcePath(name, isForm) {
-  if (isForm && srcFormDir(name) === 'forms/') {
-    return `design-system/src/forms/${name}.jsx`;
-  }
   const dir = isForm ? srcFormDir(name) : srcComponentDir(name);
   return `design-system/src/${dir}${name}.jsx`;
 }
@@ -105,7 +102,7 @@ function writeSkeleton(name, kind) {
   const out = isForm ? formAgentAbs(name) : componentAgentAbs(name);
   const rel = isForm ? formAgentRel(name) : componentAgentRel(name);
   const purpose = inventoryBlurb(name) || 'See Storybook MDX and component source.';
-  const importPath = isForm ? '@/forms' : '@/components';
+  const importPath = '@/components'; // @/forms barrel was deleted in the 2026-07 reorg
   const srcDir = isForm ? srcFormDir(name) : srcComponentDir(name);
   const propsPath = propsSourcePath(name, isForm);
 
@@ -161,7 +158,10 @@ See \`${propsPath}\` PropTypes and nearest \`*.stories.jsx\`.
 function linkFor(name, kind) {
   const rel = kind === 'form' ? formAgentRel(name) : componentAgentRel(name);
   const abs = kind === 'form' ? formAgentAbs(name) : componentAgentAbs(name);
-  if (fs.existsSync(abs)) return `- [${name}](${rel})`;
+  // The index lives INSIDE the section folder (components/index.md), so links
+  // must be relative to it — "Name/Name.md", not "components/Name/Name.md".
+  const fromIndex = rel.replace(/^(components|forms)\//, '');
+  if (fs.existsSync(abs)) return `- [${name}](${fromIndex})`;
   return `- ${name} — see Storybook`;
 }
 

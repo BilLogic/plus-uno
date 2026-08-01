@@ -11,7 +11,7 @@ Toggle visibility of content sections.
 
 **Import:** `import { Collapse } from '@/components';`
 
-**Source:** `design-system/src/components/Collapse/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/layout-and-structure/Collapse/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Collapse/Collapse.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/layout-and-structure/Collapse/Collapse.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

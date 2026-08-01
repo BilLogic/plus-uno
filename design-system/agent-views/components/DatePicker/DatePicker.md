@@ -11,7 +11,7 @@ See Storybook MDX and component source.
 
 **Import:** `import { DatePicker } from '@/components';`
 
-**Source:** `design-system/src/components/DatePicker/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/forms-and-inputs/DatePicker/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/DatePicker/DatePicker.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

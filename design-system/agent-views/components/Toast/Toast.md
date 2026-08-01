@@ -11,7 +11,7 @@ Brief, auto-dismissing notifications.
 
 **Import:** `import { Toast } from '@/components';`
 
-**Source:** `design-system/src/components/Toast/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/messaging/Toast/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Toast/Toast.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/messaging/Toast/Toast.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

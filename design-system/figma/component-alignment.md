@@ -64,7 +64,7 @@ Before generating JSX:
 
 Only after user opts in and supplies a Figma URL.
 
-1. Extract component usage from prototype (imports from `@/components`, `@/forms`, `@/specs`)
+1. Extract component usage from prototype (imports from `@/components`, spec group indexes (e.g. `@/specs/Universal/Pages`))
 2. For each usage, lookup registry:
    - **Hit** → place **component instance** with variant props; apply `codeDefaults` (e.g. `fill`)
    - **Miss** → stop and report; do not draw a substitute shape

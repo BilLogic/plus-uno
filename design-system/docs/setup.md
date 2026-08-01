@@ -18,15 +18,13 @@ Implementation requirements only. For design rules, load `guidelines.md`. For co
 **Barrel exports — always import from index:**
 
 ```js
-import { Button, Alert, Modal } from '@/components';
-import { Input, Select, Checkbox } from '@/forms';
-import '@/styles/globals.scss';
+import { Button, Alert, Modal, Input, Select, Checkbox } from '@/components';
+import '@/styles/main.scss';
 ```
 
 **Entry points:**
 - `design-system/src/index.js`
-- `design-system/src/components/index.js`
-- `design-system/src/forms/index.js`
+- `design-system/src/components/index.js` (form elements live in `design-system/src/components/forms-and-inputs/`, re-exported via this barrel)
 
 **Prohibited:** deep imports like `design-system/src/components/Button/Button` — use barrel.
 
@@ -47,8 +45,7 @@ skills/         # Workflow skills (uno-prototype, uno-review, …)
 ## Prototype conventions
 
 - Experiments: `prototypes/{project-name}/` on a **feature branch** (flat, kebab-case)
-- **Starter template:** copy `prototypes/starter/` — includes DS aliases, SCSS config, shared React resolution
-- Update starter `package.json` name, `index.html` title, and pick an unused `server.port` (check `prototypes/*/vite.config.js`; range ~3000–3025)
+- **Starter template:** scaffold with `bash skills/uno-prototype/scripts/scaffold-prototype.sh <slug>` — copies `prototypes/starter/` (DS aliases, SCSS config, shared React resolution) and sets the `index.html` title and an unused `server.port` (check `prototypes/*/vite.config.js`; range ~3000–3025)
 - Each prototype has its own `vite.config.js` with `@` → `../../design-system/src`
 - Register in **Notion Marketplace** with the Deploy Preview / standalone URL — do **not** add numeric SPA routes on `main`
 - Optional local script: `"dev:{project-name}": "vite --config prototypes/{project-name}/vite.config.js"` (branch only)
@@ -71,17 +68,16 @@ prototypes/{project-name}/
 ├── src/App.jsx
 ├── src/main.jsx
 ├── vite.config.js
-└── package.json
 ```
 
 ## Example Selection
 
-When mirroring existing code: nearest `*.stories.jsx` → matching `specs/**` → `prototypes/**`. See `skills/uno-prototype/references/examples-index.json`.
+When mirroring existing code: nearest `*.stories.jsx` → matching `specs/**` → `prototypes/**`.
 
 ## Bootstrap & Providers
 
 - Use PLUS components (Bootstrap-based) — not raw Bootstrap markup for DS surfaces
-- Load `globals.scss` or `main.scss` for token variables
+- Load `main.scss` for token variables
 - Prototype Vite configs must set `@` alias or imports fail
 
 ## Token Workflow
@@ -100,7 +96,7 @@ Figma → npm run sync:tokens → npm run generate:tokens → commit SCSS
 ```bash
 npm run build
 npm run preview:react -- --host 127.0.0.1 --port 8080 --strictPort
-# Storybook: npm run storybook → http://127.0.0.1:6006
+# Storybook: npm run storybook → http://127.0.0.1:4200
 ```
 
 ## File Naming

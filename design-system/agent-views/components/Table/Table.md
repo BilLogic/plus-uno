@@ -11,7 +11,7 @@ Display tabular data.
 
 **Import:** `import { Table } from '@/components';`
 
-**Source:** `design-system/src/components/Table/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/_internal/Table/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Table/Table.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/_internal/Table/Table.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

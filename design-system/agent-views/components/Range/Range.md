@@ -11,7 +11,7 @@ See Storybook MDX and component source.
 
 **Import:** `import { Range } from '@/components';`
 
-**Source:** `design-system/src/components/Range/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/forms-and-inputs/Range.jsx` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Range/Range.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/forms-and-inputs/Range.jsxRange.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

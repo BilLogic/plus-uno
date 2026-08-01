@@ -11,7 +11,7 @@ See Storybook MDX and component source.
 
 **Import:** `import { DateAndTimePicker } from '@/components';`
 
-**Source:** `design-system/src/components/DateAndTimePicker/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/forms-and-inputs/DateAndTimePicker.jsx` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/DateAndTimePicker/DateAndTimePicker.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/forms-and-inputs/DateAndTimePicker.jsxDateAndTimePicker.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

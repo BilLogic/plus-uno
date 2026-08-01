@@ -11,7 +11,7 @@ Navigation with pill-style buttons.
 
 **Import:** `import { NavPills } from '@/components';`
 
-**Source:** `design-system/src/components/NavPills/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/navigation/NavPills/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/NavPills/NavPills.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/navigation/NavPills/NavPills.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

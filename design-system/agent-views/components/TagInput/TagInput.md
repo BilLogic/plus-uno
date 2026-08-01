@@ -11,7 +11,7 @@ See Storybook MDX and component source.
 
 **Import:** `import { TagInput } from '@/components';`
 
-**Source:** `design-system/src/components/TagInput/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/forms-and-inputs/TagInput.jsx` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/TagInput/TagInput.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/forms-and-inputs/TagInput.jsxTagInput.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

@@ -11,7 +11,7 @@ Loading indicator for async operations.
 
 **Import:** `import { Spinner } from '@/components';`
 
-**Source:** `design-system/src/components/Spinner/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/status-and-loading/Spinner/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Spinner/Spinner.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/status-and-loading/Spinner/Spinner.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

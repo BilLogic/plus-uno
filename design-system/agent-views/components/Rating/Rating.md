@@ -11,7 +11,7 @@ See Storybook MDX and component source.
 
 **Import:** `import { Rating } from '@/components';`
 
-**Source:** `design-system/src/components/Rating/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/_internal/training/Rating.jsx` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Rating/Rating.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/_internal/training/Rating.jsxRating.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

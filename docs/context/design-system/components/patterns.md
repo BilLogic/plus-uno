@@ -16,7 +16,7 @@ All full pages use the `<PageLayout>` wrapper. It renders the responsive Sidebar
 </PageLayout>
 ```
 
-- Import: `@plus-ds/specs/Universal/Pages/PageLayout/PageLayout`
+- Import: `@/specs/Universal/Pages` (named export `PageLayout`)
 - Sidebar has 3 nav categories: **Toolkit**, **Training**, **Admin**
 - TopBar shows breadcrumbs, user avatar, and notification badge
 - Content area fills remaining viewport width/height
@@ -31,7 +31,7 @@ Cards are the primary bounded containers for grouping related information.
 | Data Card | Metrics, KPIs, aggregate stats | Universal/Cards |
 | Info Card | Read-only detail display | Universal/Cards |
 
-Cards accept a `title` prop and an optional `actions` slot for buttons in the header.
+Cards accept a `title` prop and an optional `actionButton` prop (`{ text, onClick, ... }`) for a header action.
 
 ## Form Patterns
 
@@ -46,7 +46,9 @@ Cards accept a `title` prop and an optional `actions` slot for buttons in the he
 Use the PLUS `<Table>` component inside a `<Card>`. Never write raw `<table>` HTML.
 
 ```jsx
-<Card title="Student Roster" actions={<Button variant="primary">Add</Button>}>
+import { Card, Table } from '@/components';
+
+<Card title="Student Roster" actionButton={{ text: 'Add', onClick: handleAdd }}>
   <Table columns={columns} data={data} onRowClick={handleClick} />
 </Card>
 ```
@@ -98,6 +100,4 @@ All modals use `<Modal show={bool} onClose={fn} title="...">`. Set explicit `wid
 
 - **Desktop (>=1200px)**: Full sidebar + content area side-by-side
 - **Tablet (768–1199px)**: Sidebar collapses to icon-only rail; content fills width
-- **Mobile (<768px)**: Sidebar hidden behind hamburger menu; single-column stack layout
 - Cards stack vertically on narrow viewports
-- Tables switch to a card-list view below 768px

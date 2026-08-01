@@ -11,7 +11,7 @@ See Storybook MDX and component source.
 
 **Import:** `import { StaticBadgeSmart } from '@/components';`
 
-**Source:** `design-system/src/components/StaticBadgeSmart/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/_internal/StaticBadgeSmart/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/StaticBadgeSmart/StaticBadgeSmart.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/_internal/StaticBadgeSmart/StaticBadgeSmart.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

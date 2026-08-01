@@ -19,7 +19,6 @@ does: the MCP tools themselves and the workflows that chain them.
 | `get_metadata` | XML overview of node structure (IDs, names, positions) | Yes |
 | `get_variable_defs` | Inspect design tokens/variables with semantic context | Yes |
 | `search_design_system` | Search connected design systems for existing components | Yes |
-| `create_design_system_rules` | Encode project conventions as machine-readable rules | No |
 | `create_new_file` | Generate Figma designs from code/descriptions (canvas write-back) | No |
 | `whoami` | Verify authentication and plan tier | No |
 
@@ -54,7 +53,6 @@ For the full token reference, load `design-system/agent-views/tokens/tokens.md` 
 | Understanding file structure | `get_metadata` | — |
 | Verifying token values | `get_variable_defs` | `token-registry.json`, `design-system/src/tokens/*.scss` |
 | Finding existing DS components | `component-registry.json` | `search_design_system`, `components-index.json` for unmapped |
-| Encoding PLUS conventions | `create_design_system_rules` | Reference AGENTS.md forbidden patterns |
 | Writing designs back to Figma | `create_new_file` | Requires explicit user approval |
 
 ## Canvas Write-Back (create_new_file)

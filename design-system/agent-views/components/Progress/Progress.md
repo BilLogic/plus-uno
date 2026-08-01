@@ -11,7 +11,7 @@ Display progress toward completion.
 
 **Import:** `import { Progress } from '@/components';`
 
-**Source:** `design-system/src/components/Progress/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/status-and-loading/Progress/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Progress/Progress.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/status-and-loading/Progress/Progress.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

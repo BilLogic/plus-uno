@@ -11,7 +11,7 @@ Trigger actions and submit forms.
 
 **Import:** `import { Button } from '@/components';`
 
-**Source:** `design-system/src/components/Button/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/actions/Button/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Button/Button.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/actions/Button/Button.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

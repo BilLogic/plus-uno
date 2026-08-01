@@ -11,7 +11,7 @@ See Storybook MDX and component source.
 
 **Import:** `import { UserAvatar } from '@/components';`
 
-**Source:** `design-system/src/components/UserAvatar/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/_internal/UserAvatar/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/UserAvatar/UserAvatar.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/_internal/UserAvatar/UserAvatar.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

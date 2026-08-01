@@ -11,7 +11,7 @@ Group related buttons together.
 
 **Import:** `import { ButtonGroup } from '@/components';`
 
-**Source:** `design-system/src/components/ButtonGroup/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/actions/ButtonGroup/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/ButtonGroup/ButtonGroup.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/actions/ButtonGroup/ButtonGroup.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

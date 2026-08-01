@@ -11,7 +11,7 @@ Display a menu of actions or options.
 
 **Import:** `import { Dropdown } from '@/components';`
 
-**Source:** `design-system/src/components/Dropdown/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/forms-and-inputs/Dropdown/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Dropdown/Dropdown.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/forms-and-inputs/Dropdown/Dropdown.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

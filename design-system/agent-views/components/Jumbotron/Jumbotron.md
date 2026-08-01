@@ -11,7 +11,7 @@ See Storybook MDX and component source.
 
 **Import:** `import { Jumbotron } from '@/components';`
 
-**Source:** `design-system/src/components/Jumbotron/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/layout-and-structure/Jumbotron/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Jumbotron/Jumbotron.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

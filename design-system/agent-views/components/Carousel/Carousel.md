@@ -11,7 +11,7 @@ Display rotating content slides.
 
 **Import:** `import { Carousel } from '@/components';`
 
-**Source:** `design-system/src/components/Carousel/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/layout-and-structure/Carousel/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Carousel/Carousel.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/layout-and-structure/Carousel/Carousel.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 
