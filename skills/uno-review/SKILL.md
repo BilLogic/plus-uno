@@ -26,9 +26,9 @@ Poke holes in a design with a stage-aware lens. **Diagnose only — this skill n
 
 ## When it fires
 
-1. **Stage-lens review** — an artifact exits any `uno-prototype` path (including hand-crafted work), or the user asks for a review/critique.
+1. **Stage-lens review** — an artifact exits prototyping (including hand-crafted work, which bypasses the skill but not the review), or the user asks for a review/critique.
 2. **Handoff gate** — a handoff package is about to publish via `uno-publish`: after rails propagation, before sign-off.
-3. **Design QA** — auto-triggered when the Roadmap card hits `Dev Status: Ready for QA (RTT)`; also on request ("run design QA on X").
+3. **Design QA** — fires when a card hits `Ready for QA (RTT)` — human-spotted today; the auto-trigger is planned, not built; also on request ("run design QA on X").
 
 Suggest proactively when the user says "done", "ready to share", or is about to invoke `uno-publish` — once per work session, don't repeat if declined.
 
@@ -68,7 +68,7 @@ Scored by `docs/evals/rubrics/uno-review.md`: recall ≥80% and precision ≥80%
 
 ## Re-entry
 
-- `Issues? = Yes` → back to the fidelity decision in `uno-prototype`; each finding names its suggested re-entry point.
+- `Issues? = Yes` → re-enters `uno-prototype` at the reflection (`reflect_learn`); each finding names its suggested re-entry point.
 - Clean handoff gate → sign-off, then `uno-publish` proceeds.
 - Design QA findings → annotated issues to dev before `Ready for Prod`.
 - Lesson worth keeping surfaced by the review → `uno-maintain` knowledge capture.

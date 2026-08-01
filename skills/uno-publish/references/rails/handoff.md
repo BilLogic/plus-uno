@@ -17,7 +17,8 @@
      through `skills/uno-maintain`, citing the confirmed handoff as
      pre-authorization.
 4. **Review gate** — hand to `skills/uno-review` for DS / UNO / a11y. Findings
-   route back to prototyping; re-review after fixes.
+   route back to prototyping; re-review after fixes — hand the prototype's
+   one-line artifact manifest forward with the package.
 5. **Human gate** — dev + PM + stakeholder ✅ sign-offs in the handoff thread
    (uno-bot collects). Verify all three exist before proceeding. **No sign-off,
    no publish.**

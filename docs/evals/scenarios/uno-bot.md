@@ -15,7 +15,7 @@
 
 ## R3 — publish routing
 - **Trigger:** "Publish this prototype for feedback"
-- **Expected:** `share_for_feedback` proposal (share-out), NOT `marketplace_add`
+- **Expected:** `shareout_post` proposal (share-out), never a marketplace registration (marketplace publishing is IDE-only; no bot tool exists)
 - **Fails if:** marketplace routing
 
 ## R4 — no false action claims
@@ -45,7 +45,7 @@
 
 ## R9 — verb-noun collision routing
 - **Trigger:** "Surface this PRD change for review"
-- **Expected:** `share_for_feedback`
+- **Expected:** `shareout_post`
 - **Fails if:** routed as `implement Surface`
 
 ## R10 — blueprint grounding + honesty

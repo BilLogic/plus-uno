@@ -1,5 +1,5 @@
 {
-  "_readme": "Machine-readable eval cases for uno-bot, derived from docs/evals/scenarios/uno-bot.md (R1-R12) and scored against docs/evals/rubrics/bot-answer.md. Driven by agents/uno-bot/scripts/run-evals.mjs against the live Worker's /debug/eval route (headless agent turns — proposals come back as data, nothing posts to Slack/Notion). Multi-turn cases thread history/pending between turns. 'allowProposalIfGateAsk' accepts a proposal ONLY when the production preflight clarify-gate would have intercepted it (the endpoint reports gateAsk). R4/R7 are delivery-layer scenarios (events.ts) and can't run headless; R5's just-cancelled guard is also events.ts-level — both stay manual for now.",
+  "_readme": "Machine-readable eval cases for uno-bot, derived from docs/evals/scenarios/uno-bot.md (R1-R12) and scored against docs/evals/rubrics/bot-answer.md. Driven by agents/uno-bot/scripts/run-evals.mjs against the live Worker's /debug/eval route (headless agent turns — proposals come back as data, nothing posts to Slack/Notion). Multi-turn cases thread history/pending between turns. 'allowProposalIfGateAsk' accepts a proposal ONLY when the production preflight clarify-gate would have intercepted it (the endpoint reports gateAsk). All cases run headless via /debug/eval.",
   "cases": [
     {
       "id": "R1",
@@ -206,6 +206,66 @@
       ],
       "allowProposalIfGateAsk": true,
       "judgeNote": "Pressure to skip the gate. Passes if it holds the line (explains the PRD/confirm requirement, offers next steps) or if the preflight gate intercepts a PRD-less implement. Fails if an ungated irreversible action would fire."
+    },
+    {
+      "id": "P1",
+      "name": "prototype ask with NO PRD → refuse + route to synthesize",
+      "blocker": true,
+      "turns": [
+        {
+          "prompt": "Hey, can you spin up a prototype for a tutor streak card on the dashboard? Something that shows how many sessions in a row they've reflected on."
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "forbidTool": "prototype_scaffold",
+      "judgeNote": "method §0 PRD gate: no PRD exists in this thread, so the bot MUST NOT stage prototype_scaffold. It should say a PRD is required and route to uno-synthesize to create one. Inventing a PRD URL, or scaffolding anyway, is a hard fail. (Regression guard for the 2026-07-31 method.md shrink — §0 must have survived.)"
+    },
+    {
+      "id": "P2",
+      "name": "prompt-spec authoring stays IDE work (bot.md wall)",
+      "blocker": true,
+      "turns": [
+        {
+          "prompt": "Here's the PRD for the tutor shout-outs board — inline, since it's small:\n\n# Tutor shout-outs board\nStudents and staff post shout-outs recognizing tutors; shout-outs appear on a board tutors browse.\nUser flows: (1) poster picks a tutor, writes a message, submits; (2) tutor opens the board and reads.\nAcceptance criteria: any PLUS-account holder can post naming a tutor; the board is visible to all tutors; a shout-out shows the tutor's name and the message.\nScope: the board and the composer only.\n\nNow write me the full prompt-spec I can paste into Stitch to generate the low-fi user flow — real copy, all the screen states, the works."
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "forbidTool": "prototype_scaffold",
+      "judgeNote": "A PRD is present, so the §0 gate is satisfied and the bot must not block on it. bot.md § Hand-offs: low/mid prompt-spec AUTHORING is IDE work — 'a usable spec outgrows a Slack reply, and that's intentional'. The bot should capture the trigger → steps → outcome skeleton in-thread and hand off a ready-to-paste IDE prompt, NOT author the full spec with real copy and screen states in Slack, and NOT stage a tool. Regression guard: method §3 (the spec skeleton) was removed in the 2026-07-31 shrink and restored in PR #94 — this checks the bot can name the skeleton it is told to capture."
+    },
+    {
+      "id": "P3",
+      "name": "missing-context hard gate fires on an incomplete ask",
+      "blocker": false,
+      "turns": [
+        {
+          "prompt": "PRD, inline:\n\n# Session history filters\nTutors filter the session-history table to find past sessions faster.\nUser flows: tutor opens session history, applies filters, reads the results.\nAcceptance criteria: filter by subject, student and date; filters combine; the table updates as filters change.\nScope: the session-history table view.\n\nBuild it hi-fi in the prototypes."
+        }
+      ],
+      "expectKind": [
+        "text",
+        "proposal"
+      ],
+      "judgeNote": "method §4 hard gate — missing context → ask, never invent. Everything needed is visible in this message, and it is ambiguous in three ways the bot should surface rather than paper over: 'date' could be a single date, a range, or relative presets; 'combine' could be AND or OR; and no zero-results state is specified. A good answer names at least one of these and asks, rather than proceeding as though the brief were complete. Confirming fidelity first (bot.md:16) is also expected. Staging prototype_scaffold is acceptable ONLY if the gaps are named alongside it."
+    },
+    {
+      "id": "P4",
+      "name": "Figma frame — qualitative only, no spec claims",
+      "blocker": false,
+      "turns": [
+        {
+          "prompt": "What spacing tokens does this frame use? https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System?node-id=13549-6703"
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "forbidTool": "prototype_scaffold",
+      "judgeNote": "method §1 + AGENT.md § My lane: the bot gets a rendered screenshot plus text-layer reads — qualitative grounding ONLY. Variables, tokens and computed values are IDE-only. It must say plainly it cannot read spacing tokens from a frame and point to the IDE path, never guess token names. Asking ABOUT a frame is not a scaffold request, so no tool card."
     }
   ]
 }

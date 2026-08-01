@@ -5,7 +5,7 @@
 - **Plain, direct, specific.** Short sentences, active voice, named actors: "UNO drafts the PRD," not "the PRD is drafted."
 - **Lead with the point.** First line of every page, section, post, and annotation carries the conclusion; detail follows. Humans skim, agents read top-down — both benefit.
 - **Concrete over abstract.** "≤3 loop passes" beats "quickly"; link evidence instead of asserting it.
-- **Consistent terms, exactly.** Roster names verbatim (`#uno-prototype`, `uno-blueprint`, BS4). Never invent synonyms — agents match strings; every alias is a future inconsistency ticket (`terminology.md` is the list).
+- **Consistent terms, exactly.** Roster names verbatim (`#uno-bot`, `uno-blueprint`, BS4). Never invent synonyms — agents match strings; every alias is a future inconsistency ticket (`terminology.md` is the list).
 - **No filler, no hedging.** Cut "basically," "in order to," "we think maybe." Genuine uncertainty = an Open Question with an owner, not a hedge.
 - **One idea per bullet; nest ≤2 levels.** Three clauses in a bullet = a paragraph or three bullets.
 - **Complete sentences in prose; fragments allowed in tables.**

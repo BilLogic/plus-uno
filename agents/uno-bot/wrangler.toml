@@ -24,7 +24,7 @@ crons = ["*/15 13-23 * * 1-5"]
 #   • 50 subrequests per invocation. One agent turn spends most of it (Slack +
 #     DO hops + grounding tool calls + model API), which is why the AgentRunner
 #     processes exactly ONE job per alarm firing (fresh budget each firing) and
-#     the loop enforces a weighted subrequest budget (agent/loop-shared.ts).
+#     the loop enforces a measured subrequest budget at the fetch boundary (net.ts countedFetch).
 #     NOTE: the harness (persona + skills) is baked into the Worker BUNDLE at
 #     build time (src/generated/harness.ts, via `npm run bundle:harness`), so
 #     serving it costs ZERO subrequests — it updates on DEPLOY, not on a push to
@@ -222,11 +222,10 @@ new_sqlite_classes = ["AgentRunner"]
 binding = "SLACK_OAUTH_KV"
 id = "18b58372d9bc430489d634c2c9a0b0c4"
 
-# KV — harness resilience: last-known-good system-prompt assembly + alert
-# throttle. (The harness is baked into the bundle; this is the fallback/alert
-# path — see src/agent/skills.ts.) Also hosts the Figma poll's component
-# snapshot under "figma-poll:*" (src/figma-poll.ts) — one ~400KB value didn't
-# warrant a namespace of its own.
+# KV — delivery-alert throttle, the Gemini explicit-cache memo, and the Figma
+# poll's component snapshot under "figma-poll:*" (src/figma-poll.ts). NOT a
+# harness fallback: the harness is baked into the bundle and skills.ts serves
+# the compiled constant with zero KV access.
 [[kv_namespaces]]
 binding = "HARNESS_KV"
 id = "10e5f980215e4f7e817bf55ac69dda43"

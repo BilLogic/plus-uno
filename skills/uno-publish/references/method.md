@@ -52,7 +52,7 @@ Linear and gated; the order is load-bearing.
 
 1. **Componentize & spec.** Decompose the prototype into components with explicit tokens, states, and behaviors — design-system vocabulary becomes contractual here.
 2. **Handoff Spec (Notion).** Instantiate from the team template: Figma shows what it looks like; the spec holds how it behaves and what "done" means. Optional: a longer recorded walkthrough for the dev team (distinct from the feedback rail's short Loom).
-3. **Rails propagation.** Update both sources of truth — `uno-storybook` (design system) and `uno-blueprint` (product) — **before** review and publish, so the next project grounds on what this one shipped. Gate rules (§6 Q9, 2026-07-07):
+3. **Rails propagation.** Update both sources of truth — `uno-storybook` (design system) and `uno-blueprint` (product) — **before** review and publish, so the next project grounds on what this one shipped. Gate rules (docs/plans/2026-07-07-001-harness-six-skill-revision-plan.md § Q9):
    - The **storybook half** is a direct in-repo write by this skill, pre-authorized only inside an active, designer-confirmed handoff — the rail decision is the authorization.
    - The **blueprint half always routes through `skills/uno-maintain`** (this skill holds no blueprint write access), citing the confirmed handoff as pre-authorization — maintain's handoff-pre-authorized path applies (its method §6). Paired-write rules: `docs/conventions/supabase.md`.
    - Every propagation gets an apply-log row.
