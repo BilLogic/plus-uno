@@ -16,7 +16,7 @@ notification design.
 - **Trigger:** any PLUS-account holder taps "Give a shout-out" (entry surface
   TBD by this sketch's feedback).
 - **Steps:** pick tutor (search by name) → write message → preview → post.
-- **Outcome:** shout-out appears on the board, attributed to the poster.
+- **Outcome:** shout-out appears on the board.
 - **Actors/systems:** poster · PLUS auth (account gate) · shout-outs store ·
   board.
 
@@ -37,6 +37,9 @@ notification design.
    report/remove needed?
 2. **Empty state:** what does a tutor with zero shout-outs see?
 3. **Notification:** does the tutor find out, or discover by browsing?
+4. **Attribution:** is the poster shown on the board? The PRD names only the
+   tutor's name and the message — signed vs anonymous changes the composer and
+   the card, so it is asked, not assumed.
 
 ## What feedback this sketch should provoke
 
@@ -48,4 +51,6 @@ on the three open questions above.
 - [ ] Both flows read trigger → steps → outcome with no invented steps
 - [ ] No moderation UI or notification design appears (won't-include)
 - [ ] Boxes-and-arrows fidelity only — no visual styling
-- [ ] The three open questions are visible ON the map, not resolved silently
+- [ ] Every open question is visible ON the map, not resolved silently
+- [ ] Nothing on the map states a fact the PRD does not (e.g. who a shout-out is
+      attributed to) — an invented requirement is a defect, not a helpful default

@@ -3,7 +3,7 @@
 # Deliverable — interactive / functional prototype (external tool)
 
 **Execution mode: spec-handoff.** UNO writes an interactive/functional-shaped
-prompt-spec (normative shape: method §2); the designer runs it. UNO does not
+prompt-spec (normative shape: method §3); the designer runs it. UNO does not
 run the generation. (A functional prototype built *on the design system in
 this repo* is `coded-build.md`, not this.)
 
@@ -29,7 +29,7 @@ this repo* is `coded-build.md`, not this.)
 
 ## Handoff
 
-Golden example: `examples/interactive-spec.md`. Before handing off, run
+Golden example: `skills/uno-prototype/examples/interactive-spec.md`. Before handing off, run
 `bash skills/uno-prototype/scripts/validate-spec.sh <spec.md>`. Spec ready-to-paste, usable with at most one regeneration (the rubric's bar).
 Offer the paste-back re-check against the same block. Exit per method §5:
 DS-lens at the artifact's rigor · manifest line · uno-review.

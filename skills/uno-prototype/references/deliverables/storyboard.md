@@ -27,6 +27,6 @@ designer runs), MCP-direct optional where the harness has image gen.
 
 ## Exit
 
-Method §6: manifest line · hand to uno-review. A storyboard usually feeds
+Method §5: manifest line · hand to uno-review. A storyboard usually feeds
 alignment (communicate vision · align stakeholders goals) and often rungs down
 to wireframes for the screens it exposed.

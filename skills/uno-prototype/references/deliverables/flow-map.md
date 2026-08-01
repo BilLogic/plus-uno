@@ -3,7 +3,7 @@
 # Deliverable — flow map (user flow · journey map · data-flow)
 
 **Execution mode: spec-handoff.** UNO writes a diagram-shaped prompt-spec
-(normative shape: method §2); the designer runs it in the external tool. UNO
+(normative shape: method §3); the designer runs it in the external tool. UNO
 does not run the generation.
 
 **Target tools:** FigJam (diagram generation) · Stitch (PRD → flow visuals).
@@ -21,7 +21,7 @@ does not run the generation.
 
 ## Handoff
 
-Golden example: `examples/flow-map-spec.md`. Before handing off, run
+Golden example: `skills/uno-prototype/examples/flow-map-spec.md`. Before handing off, run
 `bash skills/uno-prototype/scripts/validate-spec.sh <spec.md>` — a [MISS] means
 fill the section, not ship anyway. Deliver the spec ready-to-paste. Offer the paste-back: designer brings the
 generated result here, UNO re-checks it against the same self-check block.

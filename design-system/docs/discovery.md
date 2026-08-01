@@ -60,9 +60,8 @@ Patterns explain **how DS components compose** — not product UX, IA, or page t
 | Topic | Path |
 |-------|------|
 | Scaffold prototype | `skills/uno-prototype/SKILL.md` |
-| Workflow reference index | `skills/uno-prototype/references/README.md` |
 | Production readiness (states, a11y) | `skills/uno-maintain/references/production-checklist.md` |
-| Example selection | `skills/uno-prototype/references/examples-index.json` |
+| Prompt-spec examples | `skills/uno-prototype/examples/` |
 | Local build and preview | `design-system/docs/setup.md` |
 
 ## Implementation Setup

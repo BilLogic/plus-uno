@@ -95,9 +95,14 @@ cheaply before the next rung.
   sketch".
 - **Generate only after the brief and plan are confirmed**, and stay within
   the agreed scope — never expand it because the PRD lists more.
-- Low/mid external-tool routes: the output is the prompt-spec, never the
-  generated artifact. In-chat and MCP-direct routes (ASCII, Figma wireframe)
-  are the named exceptions — see the deliverable docs.
+- **The deliverable doc is not optional.** Planning, spec-writing or building
+  without loading the one the confirmed artifact selects is a defect — it
+  carries rules that exist nowhere else. If you cannot name the doc you loaded,
+  stop and load it.
+- External-tool routes: the output is the prompt-spec, never the generated
+  artifact. Direct production is sanctioned only where UNO holds the medium
+  (in-chat ASCII, or a gated MCP writer — Figma, image gen); each deliverable
+  doc names its own routes.
 - Hi-fi: AGENTS.md forbidden patterns apply in full — tokens over literals,
   agent-views are law, no deep imports from `design-system/src/`, PLUS
   components first, FA Free icons only.
