@@ -89,6 +89,12 @@ error**, and the specific behavior under test. Always name what is out of scope,
 so the tool doesn't invent it. Each deliverable's reference adds its own
 specifics on top of this skeleton.
 
+**Where a spec is authored:** in an IDE face, in full. A usable spec — real
+copy, sample data, every state — outgrows a chat reply, and that is by design.
+A conversational face captures the **skeleton only** (trigger → steps →
+outcome, actors, constraints) in-thread and hands off a ready-to-paste IDE
+prompt; it does not write the asset spec inline, however completely it could.
+
 **Direct production is sanctioned only where UNO holds the medium:** an in-chat
 text sketch, or a write through a gated design-tool writer. Everything else is a
 spec the designer carries to the external tool.
@@ -108,8 +114,13 @@ most one regeneration.
 
 **Missing context → ask, never invent.** If the grounded brief lacks what the
 artifact needs — screen states (empty/error/loading), an ambiguous interaction,
-a missing Figma target or frame intent, unclear DS expectations — stop and ask
-before building. Filling a gap with invented behavior is a defect, not a draft.
+a missing Figma target or frame intent, unclear DS expectations — surface it
+before you act on the brief. "Act" means whichever move your face makes next:
+building, writing the spec, or staging a proposal. Proposing as though the
+brief were complete is the same defect as building on an invented behavior —
+a PRD existing is not the same as a PRD being complete. Name the gaps in the
+reply, and either ask instead of proceeding or carry them visibly alongside
+what you propose. Filling a gap with invented behavior is a defect, not a draft.
 
 **DS gap → protocol, never silent invention.** When the design needs a
 component the system doesn't have: (1) name the gap explicitly, (2) propose the
