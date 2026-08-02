@@ -12,7 +12,9 @@ and bot.md gained the name-the-gaps-before-staging rule — that moved it from
 0-for-2 to intermittent, not to reliable.
 
 **Why not chased further now:** each eval cycle is ~10 min + Vertex quota, and
-prompt-nudging showed diminishing returns. Candidate structural fixes, in order:
+prompt-nudging showed diminishing returns. Candidate structural fixes, in order (1 SHIPPED 2026-08-01 — proposal-render.ts adds a
+visible 'no open questions were named' notice to any scaffold card whose preview/notes
+name no gap, so a ✅ is informed; model-side reliability still tracked):
 1. Preflight assist: `prototype_scaffold` preflight surfaces a "gaps named?"
    checklist item into the proposal card (Worker-side, deterministic).
 2. Make P3 a 3-sample eval (pass = 3/3) so drift is visible, and tune against it.
