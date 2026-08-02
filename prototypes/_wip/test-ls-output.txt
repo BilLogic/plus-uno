@@ -1,6 +1,0 @@
-total 40
-drwxr-xr-x@  5 billguo  staff    160 Aug  2 11:35 .
-drwxr-xr-x@ 15 billguo  staff    480 Aug  2 11:34 ..
--rw-r--r--@  1 billguo  staff    512 Aug  2 11:35 .copy-tutor-home-feeling-concept.sh
--rw-r--r--@  1 billguo  staff      0 Aug  2 11:35 test-ls-output.txt
--rw-r--r--@  1 billguo  staff  14192 Aug  2 11:35 tutor-first-week-storyboard-spec.md

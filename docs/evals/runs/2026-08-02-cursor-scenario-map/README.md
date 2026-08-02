@@ -2,7 +2,8 @@
 
 Six deliverable routes driven through **Cursor's own agent** (`cursor-agent`
 CLI, headless, on `main` at `129f7dba`) after the skill restructure. Full
-transcripts are the sibling files in this folder.
+transcripts are in `transcripts/` — verbatim, and exempt from link checking for
+that reason; this README is not.
 
 **Read the coverage table before the results** — two of the runs test less than
 they appear to.
@@ -29,14 +30,17 @@ and what shape comes out.**
 `cursor-agent --print` there is no interactive question tool and no way to wait
 for an answer, so the agent proceeded on assumptions rather than interviewing.
 
-Per `intake.md` this is *arguably correct* — "never refuse to proceed because a
-tool is missing" — but the consequence is worth stating plainly: **in headless
-runs the intake gate does not bind.** Anything automated (CI, cron, a scripted
-agent) skips the interview by construction. The gate protects interactive
-sessions only.
+Per `intake.md` this was *arguably correct* — "never refuse to proceed because
+a tool is missing" — but the consequence is worth stating plainly: **in a
+headless run the intake gate did not bind.** Anything automated (CI, cron, a
+scripted agent) skipped the interview by construction, and skipped it silently.
 
-Not filed as a bug because no runtime currently runs uno-prototype headless.
-It becomes one the day something does.
+**Fixed.** `intake.md` now distinguishes *manual* (no hook, but a person is
+there to answer) from *non-interactive* (no turn exists in which anyone could
+answer). In the second case the eight steps are still answered — from the PRD —
+but written down as a numbered assumption list, and the brief card is labelled
+**`ASSUMED — not confirmed`**, a label that rides into the spec and the artifact
+manifest. Assuming in silence was the defect; assuming was not.
 
 ## Results — hi-fi coded build (the fully valid run)
 
@@ -84,20 +88,36 @@ is already a *deployed* capability and reframed the map as "today vs still
 losing track" rather than inventing a greenfield flow — and corrected
 "substitute" to **Fill-In** per `terminology.md`, unprompted.
 
-## Bugs found and fixed (commit `f41a0bdf`)
+## Bugs found and fixed
 
 1. **Prompt-specs had no home.** The deliverable docs said "deliver the spec
    ready-to-paste" and never said whether or where to persist it. Three runs
-   chose three different places — two into `docs/plans/` (which belongs to
-   `ce:plan`), one invented `prototypes/_wip/`. Fixed: `prototypes/_specs/`
-   with a README, named in all five spec-deliverable docs; the strays were
-   relocated there.
+   chose three different places — two into `docs/plans/`, one invented
+   `prototypes/_wip/`. Fixed: `docs/plans/` is the home, under the repo's own
+   date-prefix convention with a `-spec` suffix
+   (`2026-08-02-001-fill-in-coverage-flow-map-spec.md`), named in all five
+   spec-deliverable docs and in `docs/conventions/coding.md`. The four strays
+   were relocated there.
 
 2. **`validate-spec.sh` false-positived on flow maps.** Shape detection scanned
    the whole document, so a flow map saying *"no screens yet"* matched the
    screen shape and was then failed for having no screens section. Fixed:
-   detection reads only the spec's own declaration (title + Confirmed-brief
-   artifact clause).
+   detection reads the spec's own declaration — the top of the file, bounded by
+   `head -40`, not by a match count that a short spec's self-check block could
+   still slip past.
+
+3. **The validator was link-checking verbatim transcripts.** A record you have
+   to hand-edit to make CI green is not a record. Fixed by folder rather than by
+   path glob: raw output lives in `transcripts/` and is exempt, and the analysis
+   written alongside it — this README — is checked again.
+
+4. **Two bugs that only surfaced once (2) was tightened.** A concept image was
+   failed for having no screens section — narrative deliverables have frames,
+   not screens, so concept image and storyboard now match neither shape. And the
+   golden `interactive-spec.md` had silently *stopped* being screen-checked,
+   because real specs title themselves "interactive draft" and the pattern
+   demanded "interactive prototype". Both were regressions from (2)'s first cut;
+   scoping a check narrower is the moment to re-run it against every example.
 
 ## Known, not fixed
 
