@@ -42,6 +42,11 @@ card + dial settings as pass/fail checks). Golden example:
 `bash skills/uno-prototype/scripts/validate-spec.sh <spec.md>`. Offer the
 paste-back re-check.
 
+**Where the spec lives.** Write it to `prototypes/_specs/<slug>-<deliverable>.md`
+and give the designer the path plus the ready-to-paste text. Not `docs/plans/`
+— that belongs to `ce:plan`. The file is what `uno-review` receives with the
+manifest.
+
 ## Exit
 
 All routes: method §5 — DS-lens pass at the artifact's own rigor · one-line

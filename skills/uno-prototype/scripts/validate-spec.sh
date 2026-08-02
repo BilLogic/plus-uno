@@ -37,10 +37,17 @@ check "self-check block embedded"        'self-check|pass/fail|verify.*(output|a
 # Shape-specific checks: flow skeleton for diagram-shaped specs, screen-state
 # coverage for screen-shaped ones. A spec can be both; each check binds only
 # when its shape is present.
-if grep -qiE 'flow map|user flow|journey|data-flow' "$spec"; then
+#
+# Shape is read from the spec's OWN DECLARATION — the title line and the
+# "Confirmed brief" Artifact clause — not from anywhere in the body. Scanning
+# the whole file made a flow map that says "no screens yet" fail the screens
+# check: the disclaimer matched as a screen (live run 2026-08-02).
+declare_lines=$(grep -iE '^#|confirmed brief|\*\*artifact\*\*|artifact =' "$spec" | head -20)
+
+if grep -qiE 'flow map|user flow|journey|data-flow' <<<"$declare_lines"; then
   check "flow skeleton (trigger/steps/outcome)" 'trigger'
 fi
-if grep -qiE 'interactive prototype|functional prototype|screen|mockup|wireframe|table view' "$spec"; then
+if grep -qiE 'interactive prototype|functional prototype|mockup|wireframe|table view|screens?\b' <<<"$declare_lines"; then
   # Require an explicit states SECTION, not a stray "empty" anywhere in the file —
   # a flow map's open questions used to satisfy this on a spec with no screens.
   check "screens/states section" '^#+.*(state|screen)|^\*\*(screen|state)'

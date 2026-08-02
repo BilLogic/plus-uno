@@ -25,6 +25,11 @@ designer runs), MCP-direct optional where the harness has image gen.
 - End with the self-check block: arc serves the confirmed goal · continuity
   holds · nothing from the won't-include list appears in any frame.
 
+**Where the spec lives.** Write it to `prototypes/_specs/<slug>-<deliverable>.md`
+and give the designer the path plus the ready-to-paste text. Not `docs/plans/`
+— that belongs to `ce:plan`. The file is what `uno-review` receives with the
+manifest.
+
 ## Exit
 
 Method §5: manifest line · hand to uno-review. A storyboard usually feeds
