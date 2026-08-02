@@ -21,3 +21,8 @@ name no gap, so a ✅ is informed; model-side reliability still tracked):
 3. Few-shot: add one worked gap-naming exchange to bot.md § Execute.
 
 **Case stays `blocker: false`** until reliable, so CI signals without blocking.
+
+**RESOLVED-PENDING-CONFIRMATION 2026-08-02:** candidate 3 (few-shot worked
+exchange in bot.md) took P3 from 0/3 to **3/3 samples** (run 30732024610,
+deploy b4f3a9c7). Flip the case to `blocker: true` after the next weekly cron
+(Mon 08:00 UTC) confirms 3/3 again; then archive this todo.
