@@ -42,7 +42,11 @@ while IFS= read -r file; do
       status=1
     fi
   done < <(link_grep "$file" | sed -E 's/^.*\(([^)]+)\)$/\1/')
-done < <({ find skills agents docs/conventions docs/evals -type f -name '*.md' -not -path '*/node_modules/*'; echo AGENTS.md; echo loading-order.md; } | sort)
+# docs/evals/runs/ holds VERBATIM agent transcripts — the paths inside them are
+# a record of what an agent said, not links this repo owns. Link-checking them
+# fails on paths that were correct in that session (or that the run itself
+# created and we later moved). Excluded by path, not by hand-editing records.
+done < <({ find skills agents docs/conventions docs/evals -type f -name '*.md' -not -path '*/node_modules/*' -not -path 'docs/evals/runs/*'; echo AGENTS.md; echo loading-order.md; } | sort)
 
 echo "[check] validating backticked repo paths resolve"
 
