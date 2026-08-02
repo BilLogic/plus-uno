@@ -39,6 +39,19 @@ export function formatProposal(
     const audit = shareoutBundleNote(input);
     if (audit) lines.push(audit);
   }
+  if (toolName === "prototype_scaffold") {
+    // Missing-context gate, made visible at confirm time (todo 070): the model
+    // is told to name a brief's open questions before staging, but does so
+    // inconsistently. If neither the preview nor the notes mention any gap,
+    // say so ON the card — the ✅ then knowingly accepts a gap-free reading of
+    // the brief instead of silently inheriting one.
+    const staged = `${previewText ?? ""} ${typeof input.notes === "string" ? input.notes : ""}`.toLowerCase();
+    if (!/(open question|gap|ambiguit|unspecified|undecided|to confirm|tbd)/.test(staged)) {
+      lines.push(
+        ":mag: *No open questions were named for this brief.* If the PRD leaves anything ambiguous (states, interactions, semantics), cancel and ask — confirming builds it as-is.",
+      );
+    }
+  }
   lines.push(CONFIRM_FOOTER);
   return lines.join("\n");
 }

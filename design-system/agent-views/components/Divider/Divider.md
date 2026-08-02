@@ -11,7 +11,7 @@ Visual separator between content sections.
 
 **Import:** `import { Divider } from '@/components';`
 
-**Source:** `design-system/src/components/Divider/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/layout-and-structure/Divider/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Divider/Divider.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/layout-and-structure/Divider/Divider.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

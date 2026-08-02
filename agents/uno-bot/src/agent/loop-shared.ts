@@ -286,10 +286,16 @@ async function executeSlackReact(
 ): Promise<string> {
   const emoji = typeof input.emoji === "string" ? input.emoji.replace(/:/g, "").trim() : "";
   if (!emoji) return JSON.stringify({ ok: false, error: "missing emoji name" });
-  if (emoji === "white_check_mark" || emoji === "x") {
+  // Mirror of gate.ts CONFIRM/CANCEL sets — every emoji the gate would read as
+  // a decision is off-limits to the bot, not just the canonical pair.
+  const GATE_RESERVED = new Set([
+    "white_check_mark", "heavy_check_mark", "+1", "thumbsup",
+    "x", "negative_squared_cross_mark", "no_entry_sign",
+  ]);
+  if (GATE_RESERVED.has(emoji)) {
     return JSON.stringify({
       ok: false,
-      error: "white_check_mark and x are reserved for confirm/cancel on proposal cards",
+      error: `${emoji} is reserved for confirm/cancel on proposal cards`,
     });
   }
   const ts = typeof input.message_ts === "string" && input.message_ts ? input.message_ts : slack.userMsgTs;

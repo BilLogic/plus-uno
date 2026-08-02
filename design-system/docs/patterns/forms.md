@@ -17,13 +17,13 @@ Group labeled inputs, selection controls, and actions into a coherent data-entry
 
 | Role | Component | Import |
 |------|-----------|--------|
-| Text | `Input` | `@/forms` |
-| Multi-line | `Textarea` | `@/forms` |
-| Pick one | `Select`, `Radio` | `@/forms` |
-| Pick many | `Checkbox`, `SelectMultiple` | `@/forms` |
-| Toggle | `Switch` | `@/forms` |
-| Date/time | `DatePicker`, `DateAndTimePicker` | `@/forms` |
-| Grouped field | `InputGroup` | `@/forms` |
+| Text | `Input` | `@/components` |
+| Multi-line | `Textarea` | `@/components` |
+| Pick one | `Select`, `Radio` | `@/components` |
+| Pick many | `Checkbox`, `SelectMultiple` | `@/components` |
+| Toggle | `Switch` | `@/components` |
+| Date/time | `DatePicker`, `DateAndTimePicker` | `@/components` |
+| Grouped field | `InputGroup` | `@/components` |
 | Submit / cancel | `Button` | `@/components` |
 | Section container | `Card` | `@/components` |
 
@@ -32,8 +32,7 @@ See `design-system/agent-views/forms/index.md` for the full form element index.
 ## Standard structure
 
 ```jsx
-import { Card, Button } from '@/components';
-import { Input, Select, Checkbox } from '@/forms';
+import { Card, Button, Input, Select, Checkbox } from '@/components';
 
 function ExampleForm() {
   return (
@@ -87,7 +86,7 @@ Footer actions: either extra `Button` row in `children`, or `primaryButton` / `s
 
 - One `Input` per label; validation via `validation` + `validationMessage`
 - Cancel left, primary right in button row
-- Import form elements from `@/forms`, actions from `@/components`
+- Import form elements and actions from `@/components` (forms live in `design-system/src/components/forms-and-inputs/`, re-exported via `components/index.js`)
 - Field stack uses `flex-column` + `--size-element-gap-md`
 
 ### Incorrect
@@ -99,7 +98,7 @@ Footer actions: either extra `Button` row in `children`, or `primaryButton` / `s
 
 ## Related component docs
 
-- `design-system/agent-views/forms/Input.md`
+- `design-system/agent-views/components/Input/Input.md`
 - `design-system/agent-views/components/Button/Button.md`
 - `design-system/agent-views/components/Modal/Modal.md`
 - `design-system/agent-views/components/Card/Card.md`

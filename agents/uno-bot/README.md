@@ -11,7 +11,7 @@ The Worker code is only the *body*. The *brain* — guidance, persona, skills �
 1. `AGENTS.md` — the constitution (repo root)
 2. `agents/uno-bot/AGENT.md` — this embodiment's persona delta
 3. The six skills, each as `references/method.md` + `bot.md`
-4. The `docs/conventions/` files: terminology, notion, figma-workspace, slack, supabase, writing-style
+4. The `docs/conventions/` files: terminology, notion, figma-workspace, slack, supabase, blueprint-navigation, writing-style, automations
 
 Because the brain is bundled, **guidance changes reach the bot on `deploy`, not on a push to `main`** (`deploy` runs `bundle:harness` first — see `package.json`). Editing the persona/skills and pushing to `main` alone does **not** reprogram the running bot; you must `wrangler deploy`.
 
@@ -115,11 +115,11 @@ curl http://localhost:8787/health
 ```bash
 cd agents/uno-bot
 npx wrangler login       # if not already authenticated to the Cloudflare account
-npx wrangler deploy      # ships ALL of src/ on the current branch
+npm run deploy           # check:fetch + bundle:harness + wrangler deploy
 curl https://<worker-url>/health   # expect: uno-bot ok <BUILD>
 ```
 
-`wrangler deploy` runs `bundle:harness` first (see `package.json`), so it ships the whole `src/` of the current branch **and** re-bakes the latest harness sources into the bundle. Confirm the branch's Worker code and harness are production-ready first.
+`npm run deploy` runs `check:fetch` and `bundle:harness` first (see `package.json`), so it ships the whole `src/` of the current branch **and** re-bakes the latest harness sources into the bundle. Bare `npx wrangler deploy` does NOT re-bake — it ships whatever `src/generated/harness.ts` is on disk, which is exactly the stale-brain trap this section exists to prevent. Confirm the branch's Worker code and harness are production-ready first.
 
 ## Smoke test
 

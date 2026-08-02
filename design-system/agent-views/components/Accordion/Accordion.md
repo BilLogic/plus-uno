@@ -11,7 +11,7 @@ Organize content into collapsible sections to reduce visual clutter.
 
 **Import:** `import { Accordion } from '@/components';`
 
-**Source:** `design-system/src/components/Accordion/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/layout-and-structure/Accordion/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Accordion/Accordion.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/layout-and-structure/Accordion/Accordion.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

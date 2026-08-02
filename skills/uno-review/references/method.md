@@ -6,7 +6,7 @@ Poke holes in a design at the right depth for its stage. **Diagnose only — thi
 
 ## Intake — the artifact manifest (mandatory)
 
-Every designer-initiated review starts from a one-line manifest: **fidelity (low / mid / high / coded) · tools used · PRD link**. Every prototyping path exit produces one; for hand-crafted work the designer supplies it. No manifest → ask for it before reviewing — the manifest is what makes the review stage-appropriate. **Exemption:** the auto-triggered Design QA path (Ready-for-QA) derives its context from the Roadmap card + `[spec]` file instead of a manifest. One artifact per review; no side-by-side comparisons.
+Every designer-initiated review starts from a one-line manifest: **fidelity (low / mid / high / coded) · tools used · PRD link**. Every prototyping path exit produces one; for hand-crafted work the designer supplies it. The manifest may also carry unresolved check failures (the prototype method §5.3 sends them forward — treat them as pre-flagged findings, not surprises). Fidelity arrives from prototyping as dial settings, which collapse to the low / mid / high / coded label used here. No manifest → ask for it before reviewing — the manifest is what makes the review stage-appropriate. **Exemption:** the auto-triggered Design QA path (Ready-for-QA) derives its context from the Roadmap card + `[spec]` file instead of a manifest. One artifact per review; no side-by-side comparisons.
 
 ## Three scenarios
 
@@ -45,7 +45,7 @@ Every finding carries **severity · lens · evidence (what's in the artifact) ·
 
 ## Verdict & re-entry
 
-- **Stage-lens:** `Issues? = Yes` **only when at least one finding is major or above.** Yes → re-enter at the fidelity decision — a failed review can invalidate the approach, not just the artifact; each finding's re-entry point says which (re-choose fidelity vs. content fix). No → "Ready to share?" stays the designer's call; review passing is necessary, not sufficient.
+- **Stage-lens:** `Issues? = Yes` **only when at least one finding is major or above.** Yes → re-enter `uno-prototype` at the reflection (`reflect_learn`) — a failed review can invalidate the approach, not just the artifact; each finding's re-entry point says which (re-choose fidelity vs. content fix). No → "Ready to share?" stays the designer's call; review passing is necessary, not sufficient.
 - **Handoff gate:** any major+ finding holds the publish; clean or minors-only → proceed to dev / PM / stakeholder sign-off.
 - **Design QA:** findings go to dev as annotated issues *before* `Ready for Prod`; blockers hold it. The run is logged for the drift-catch metric.
 - Verdicts and sign-offs posted in Slack follow `docs/conventions/slack.md` (channels + the two gates — never conflate them).

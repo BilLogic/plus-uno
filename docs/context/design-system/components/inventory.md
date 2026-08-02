@@ -2,6 +2,8 @@
 
 # PLUS Design System Component Guidelines
 
+⚠️ STALE — source paths below predate the 2026-07 component reorg (category folders); regenerate before trusting. Components Chip, Form, Navigation, Section, SuperCompPill listed below do not exist in src.
+
 ## Guidelines Structure
 This document provides comprehensive guidelines for all PLUS Design System components.
 For each component: purpose, when to use, props API, and usage examples.

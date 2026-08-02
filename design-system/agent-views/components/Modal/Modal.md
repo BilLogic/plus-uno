@@ -11,7 +11,7 @@ Display content in a focused overlay.
 
 **Import:** `import { Modal } from '@/components';`
 
-**Source:** `design-system/src/components/Modal/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/messaging/Modal/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Modal/Modal.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/messaging/Modal/Modal.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

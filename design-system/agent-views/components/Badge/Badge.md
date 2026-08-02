@@ -11,7 +11,7 @@ Display status, counts, or labels.
 
 **Import:** `import { Badge } from '@/components';`
 
-**Source:** `design-system/src/components/Badge/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/status-and-loading/Badge/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Badge/Badge.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/status-and-loading/Badge/Badge.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

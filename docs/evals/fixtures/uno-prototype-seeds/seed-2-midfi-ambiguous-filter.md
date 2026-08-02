@@ -6,9 +6,3 @@ Requirements:
 - Filter by subject, student, and date
 - Filters combine
 - Table updates as filters change
-
-<!-- PLANTED GAPS (answer key):
-1. "Date" is ambiguous — single date, range, or relative presets?
-2. "Combine" is ambiguous — AND vs OR across the three filter types?
-3. No spec for the zero-results state after filtering.
--->

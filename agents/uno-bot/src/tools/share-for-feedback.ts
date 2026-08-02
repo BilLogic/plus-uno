@@ -1,4 +1,5 @@
 // share_for_feedback executor (D5 shareout — distinct from marketplace_add).
+// Wire name: the tool is registered and proposed as `shareout_post`.
 // Posts a "sharing this for feedback" message to #plus-design (or the origin
 // thread if that channel isn't configured): what's being shared, a link back,
 // a feedback prompt, and @-mentioned reviewers. This is the uno-publish

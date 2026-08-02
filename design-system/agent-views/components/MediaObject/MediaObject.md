@@ -11,7 +11,7 @@ See Storybook MDX and component source.
 
 **Import:** `import { MediaObject } from '@/components';`
 
-**Source:** `design-system/src/components/MediaObject/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/layout-and-structure/MediaObject/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/MediaObject/MediaObject.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/layout-and-structure/MediaObject/MediaObject.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

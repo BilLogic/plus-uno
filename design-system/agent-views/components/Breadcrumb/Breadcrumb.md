@@ -11,7 +11,7 @@ Show navigation hierarchy and current page location.
 
 **Import:** `import { Breadcrumb } from '@/components';`
 
-**Source:** `design-system/src/components/Breadcrumb/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/navigation/Breadcrumb/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Breadcrumb/Breadcrumb.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/navigation/Breadcrumb/Breadcrumb.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

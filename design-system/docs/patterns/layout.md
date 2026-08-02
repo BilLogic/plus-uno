@@ -8,7 +8,7 @@ If you are building a full page (like a dashboard, student list, or toolkit), yo
 
 ```jsx
 import React from 'react';
-import PageLayout from '@plus-ds/specs/Universal/Pages/PageLayout/PageLayout';
+import { PageLayout } from '@/specs/Universal/Pages';
 // Note: TopBar and Sidebar are auto-imported inside PageLayout, you just pass configs.
 
 export default function MyDashboard() {
@@ -38,14 +38,14 @@ If the user clicks a row or a button and needs to see details without leaving th
 
 ```jsx
 import React, { useState } from 'react';
-import Modal from '@plus-ds/components/Modal';
+import { Modal, Button } from '@/components';
 
 export default function MyPageWithModal() {
     const [showModal, setShowModal] = useState(false);
 
     return (
         <div>
-            <button onClick={() => setShowModal(true)}>Open Modal</button>
+            <Button text="Open Modal" style="primary" fill="filled" onClick={() => setShowModal(true)} />
 
             <Modal
                 show={showModal}
@@ -69,9 +69,7 @@ Inside the `PageLayout` or `Modal`, data is almost always presented in a `<Card>
 
 ```jsx
 import React from 'react';
-import Card from '@plus-ds/components/Card';
-import Table from '@plus-ds/components/Table';
-import Badge from '@plus-ds/components/Badge';
+import { Card, Table, Badge } from '@/components';
 
 export default function MyContentBlock() {
     // Table takes ARRAYS OF ARRAYS — `headers` / `rows`, not `columns` / `data`.
@@ -81,10 +79,12 @@ export default function MyContentBlock() {
         ['John Doe', <Badge style="success" text="Active" />]
     ];
 
+    const handleAdd = () => console.log('Add row');
+
     return (
         <Card
             title="Student Roster"
-            actions={<button className="plus-btn plus-btn-primary">Add Row</button>}
+            actionButton={{ text: 'Add Row', onClick: handleAdd }}
         >
             {/* Use the PLUS Table component, do not write raw <table> tags */}
             <Table

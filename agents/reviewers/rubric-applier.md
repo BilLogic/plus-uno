@@ -12,6 +12,7 @@ The one agent that turns "is this good?" into numbers: given an artifact + a rub
 ## Invoked by
 
 - `skills/uno-maintain` — quality audits, eval passes
+- `skills/uno-review` — summoned by name in its workflow to score the review run against `docs/evals/rubrics/uno-review.md` and log the eval entry
 - Any skill's exit quality bar (each skill names its rubric)
 - Automation: eval-run logging at flow exits (`docs/conventions/automations.md`)
 

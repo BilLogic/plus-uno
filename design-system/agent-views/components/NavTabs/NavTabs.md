@@ -11,7 +11,7 @@ Navigation with underline-style tabs.
 
 **Import:** `import { NavTabs } from '@/components';`
 
-**Source:** `design-system/src/components/NavTabs/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/navigation/NavTabs/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/NavTabs/NavTabs.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/navigation/NavTabs/NavTabs.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

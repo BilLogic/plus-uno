@@ -11,7 +11,7 @@ See Storybook MDX and component source.
 
 **Import:** `import { FileUpload } from '@/components';`
 
-**Source:** `design-system/src/components/FileUpload/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/forms-and-inputs/FileUpload.jsx` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/FileUpload/FileUpload.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/forms-and-inputs/FileUpload.jsxFileUpload.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

@@ -11,7 +11,7 @@ Display lists of related content items.
 
 **Import:** `import { ListGroup } from '@/components';`
 
-**Source:** `design-system/src/components/ListGroup/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/layout-and-structure/ListGroup/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/ListGroup/ListGroup.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/layout-and-structure/ListGroup/ListGroup.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

@@ -3,7 +3,9 @@
 Wires the uno-prototype intake FSM (`.cursor/hooks/uno-prototype/`) into Codex,
 mirroring `.claude/settings.json`. Codex's hook lifecycle shares Claude Code's
 event names and stdin JSON shape, so the same scripts back both runtimes —
-`hooks.json` here is the only Codex-specific piece.
+`hooks.json` here is the only Codex-specific piece. Caveat: the mirror is not
+complete — Codex has no SessionEnd hook wired (`.claude/settings.json` has one),
+so intake state is released by the 24h TTL instead of on session end.
 
 **One-time user opt-in** (hooks are off by default in Codex): add to
 `~/.codex/config.toml`

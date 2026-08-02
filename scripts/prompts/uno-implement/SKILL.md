@@ -43,7 +43,7 @@ You are not a generalist coding assistant. You know Plus's specific stack, conve
 - A designer triggers a component implement in Slack — **always tied to its Notion PRD** (the polling bot creates the PRD and posts it; the designer implements from that thread). A component implement is never done without a PRD; if none is in the thread, the bot asks for the link first.
 - A `repository_dispatch` event with `event_type: implement-figma-changes` arrives at `figma-implement.yml`, whether dispatched by the uno-bot Worker (downstream of Slack) or a manual GitHub-UI workflow run
 
-> **Note:** the Figma library polling cron (`figma-library-poll.yml`) does **not** invoke this skill directly. It creates the Notion PRD and posts a Slack notification; the designer initiates implementation from Slack.
+> **Note:** the Figma library polling cron (the Worker cron in `agents/uno-bot/src/figma-poll.ts` — registry row 1 of `docs/conventions/automations.md`) does **not** invoke this skill directly. It creates the Notion PRD and posts a Slack notification; the designer initiates implementation from Slack.
 
 **Do NOT use this skill for:**
 
@@ -96,7 +96,7 @@ The design token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.
 ## Workflow
 
 1. **Read the spec.** Fetch the linked Notion PRD / change description. If the spec is unfetchable, post an error to the originating Slack thread and exit. For Slack-triggered runs, post a "🔧 Working on it…" ack before proceeding; skip the ack for manual GitHub-UI dispatches.
-2. **Locate the relevant files.** Components live in `design-system/src/components/`, forms in `design-system/src/forms/`, specs in `design-system/src/specs/`. Confirm the target component exists in `design-system/agent-views/components/index.md` (or flag it as a new component if not — see [references/new-component-scaffolding.md](references/new-component-scaffolding.md), loaded automatically when `isNewComponent` is true).
+2. **Locate the relevant files.** Components live in `design-system/src/components/`, forms in `design-system/src/components/forms-and-inputs/`, specs in `design-system/src/specs/`. Confirm the target component exists in `design-system/agent-views/components/index.md` (or flag it as a new component if not — see [references/new-component-scaffolding.md](references/new-component-scaffolding.md), loaded automatically when `isNewComponent` is true).
 3. **Verify props and styles.** Read the existing `.jsx` and `.stories.jsx` for any component you'll touch. Don't hallucinate props. Don't change a prop's type without flagging it in the PR description.
 4. **Plan the change.** List the files that will be modified — **including** the corresponding stories file. If the change touches a prop or variant, the stories MUST be updated in the same pass; do not ship code-only or stories-only. If >5 files total, stop and escalate to the in-IDE agent.
 5. **Write the change.** Update the component source AND its stories together. Apply the Token Mapping Rules above. Use barrel imports (`@/components/...` not deep paths). Use Plus terminology per `docs/conventions/terminology.md`. Follow Storybook conventions from [skills/uno-review/references/storybook.md](../../skills/uno-review/references/storybook.md) (property categorization: Design / Content / Behavior / Development; curated interactive prototypes; preset selectors over raw data editing).
@@ -196,7 +196,7 @@ Per invocation, the script loads:
 - Up to 5 Figma screenshots (multimodal — costs vary)
 - The five token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.scss`, `_elevation.scss`, `_fonts.scss` — ~6-10K tokens combined)
 
-Estimated per-invocation cost on Sonnet 4.6: **~$0.15-0.35** for an update; **~$0.30-0.60** for a new component (more reference content + reference Badge files). Significantly higher than `uno-critique` ($0.02-0.05) and the bot's conversational Q&A ($0.01-0.03) because of the multimodal Figma input and the large token-file payload. Watch the §4.10 metrics; if average cost climbs past $0.50/invocation, audit which tokens files are genuinely needed per call (likely only `_colors.scss` and `_spacing_semantics.scss` are touched in most invocations).
+Estimated per-invocation cost on Sonnet 4.6: **~$0.15-0.35** for an update; **~$0.30-0.60** for a new component (more reference content + reference Badge files). Significantly higher than `uno-review` ($0.02-0.05) and the bot's conversational Q&A ($0.01-0.03) because of the multimodal Figma input and the large token-file payload. Watch the §4.10 metrics; if average cost climbs past $0.50/invocation, audit which tokens files are genuinely needed per call (likely only `_colors.scss` and `_spacing_semantics.scss` are touched in most invocations).
 
 ## Migration TODO (Week 2)
 
@@ -208,7 +208,7 @@ Estimated per-invocation cost on Sonnet 4.6: **~$0.15-0.35** for an update; **~$
 
 ## Related Skills
 
-- **`uno-critique`** — evaluates an artifact against Plus standards. After critique surfaces fixable issues, the designer can pivot to `implement <component>` to apply them via this skill.
+- **`uno-review`** — evaluates an artifact against Plus standards. After critique surfaces fixable issues, the designer can pivot to `implement <component>` to apply them via this skill.
 - **Conversational Q&A (uno-bot default mode)** — answers Plus-specific questions. If a designer asks "how would I implement X?" they probably want this skill instead; the router should route to `uno-implement` for action-oriented requests.
 
 ## Sample Invocations

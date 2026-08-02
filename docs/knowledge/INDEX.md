@@ -9,6 +9,7 @@ Route to the right knowledge file based on what you need.
 | Integration | lessons/integration.md | 4 | 2026-04-11 | storybook, netlify, figma |
 | Agent Patterns | lessons/agent-patterns.md | 6 | 2026-04-11 | agents-md, skills, context-loading |
 | UI Patterns | lessons/ui-patterns.md | 4 | 2026-04-11 | react-router, vite, marketplace |
+| Harness Audits | lessons/2026-04-19-harness-audit.md | 6 | 2026-04-19 | audit, layer-audit, harness-health |
 | Harness Audits | lessons/2026-07-10-harness-consistency-sweep.md | 5 | 2026-07-10 | harness, drift, validate-doc-links |
 | Automations | lessons/2026-07-16-claude-vertex-cron-first-run.md | 3 | 2026-07-16 | automations, vertex, claude-code-cli, github-actions |
 | Decisions | decisions.md | 22 | 2026-07-30 | architecture, conventions, harness |

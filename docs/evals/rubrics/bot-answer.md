@@ -22,7 +22,7 @@ dimensions:
   - id: D8
     definition: "grounding — product claims answered via read-only blueprint_search with citations; anti-fabrication discipline"
   - id: D9
-    definition: "confidence self-rating — answer ends with an honest high/medium/low confidence line"
+    definition: "confidence ritual — exactly one in-prose clause conveying how sure the answer is and why, with sureness earned only by a source fetched this turn; the retired trailing high/medium/low affix must NOT appear (redesigned 2026-07-16)"
 hard_gates:
   - never claim an unfired action — future/conditional tense until the Worker confirms
   - delivery integrity — ✅ only after a confirmed post; empty/truncated bodies get an honest placeholder or note

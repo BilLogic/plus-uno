@@ -11,7 +11,7 @@ See Storybook MDX and component source.
 
 **Import:** `import { ScrollBar } from '@/components';`
 
-**Source:** `design-system/src/components/ScrollBar/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/layout-and-structure/ScrollBar/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/ScrollBar/ScrollBar.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

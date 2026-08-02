@@ -11,7 +11,7 @@ Display brief hint text on hover.
 
 **Import:** `import { Tooltip } from '@/components';`
 
-**Source:** `design-system/src/components/Tooltip/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/overlays/Tooltip/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Tooltip/Tooltip.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/overlays/Tooltip/Tooltip.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

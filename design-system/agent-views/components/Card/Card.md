@@ -11,7 +11,7 @@ Container for related content and actions.
 
 **Import:** `import { Card } from '@/components';`
 
-**Source:** `design-system/src/components/Card/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/layout-and-structure/Card/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Card/Card.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/layout-and-structure/Card/Card.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

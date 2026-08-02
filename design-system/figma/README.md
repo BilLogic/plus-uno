@@ -2,8 +2,6 @@
 
 Machine-readable contracts and human runbooks so Cursor prototypes, Storybook, and the Figma design system stay aligned on **tokens** and **components**.
 
-> **Branch policy:** Work on `cynthia-main` (or a feature branch off it). **Do not push this pilot to `main`** until round-trip is validated on a pilot page.
-
 ## Canonical Figma file
 
 | Field | Value |
@@ -21,6 +19,9 @@ Machine-readable contracts and human runbooks so Cursor prototypes, Storybook, a
 | `token-registry.json` | **Generated artifact** — Figma variable name ↔ CSS custom property, validated against SCSS. DO NOT EDIT BY HAND |
 | `component-figma-links.md` | **Generated** — Figma node links per component (from MDX) |
 | `knowledge-audit.md` | **Generated** — verification status (edit `design-system/docs/knowledge-audit.json`) |
+| `mcp-guide.md` | Figma MCP tool reference + implement-design workflows |
+| `registry-load-gate.md` | **MANDATORY** — load both registries before any Figma implement / write-back / design-to-code mapping |
+| `patterns.json` | **Hand-authored** source for the `patterns` section of `component-registry.json` (layout/composition pattern sets → token families) |
 
 ## Source of truth: per-component MDX
 
@@ -71,7 +72,7 @@ npm run check:token-registry
 
 ## Code-side source of truth
 
-- Components: `design-system/src/components/`, `forms/`, `specs/`
+- Components: `design-system/src/components/` (forms live in `components/forms-and-inputs/`), `specs/`
 - Tokens: `design-system/src/tokens/` (synced from Figma via `npm run sync:tokens`)
 - Agent knowledge entry: `design-system/docs/discovery.md`
 - Agent views (generated): `design-system/agent-views/`
@@ -87,7 +88,7 @@ npm run check:token-registry
 ## Quick commands
 
 ```bash
-# Regenerate component registry from per-component MDX figmaMeta (44 components)
+# Regenerate component registry from per-component MDX figmaMeta (59 components)
 npm run generate:component-registry
 npm run check:component-registry
 

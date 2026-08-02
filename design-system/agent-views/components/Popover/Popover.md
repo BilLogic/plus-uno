@@ -11,7 +11,7 @@ Display contextual information in a floating container.
 
 **Import:** `import { Popover } from '@/components';`
 
-**Source:** `design-system/src/components/Popover/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/overlays/Popover/` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Popover/Popover.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/overlays/Popover/Popover.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

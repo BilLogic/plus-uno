@@ -11,7 +11,7 @@ See Storybook MDX and component source.
 
 **Import:** `import { Select } from '@/components';`
 
-**Source:** `design-system/src/components/Select/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/forms-and-inputs/Select.jsx` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Select/Select.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/forms-and-inputs/Select.jsxSelect.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

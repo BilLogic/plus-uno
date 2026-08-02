@@ -11,7 +11,7 @@ See Storybook MDX and component source.
 
 **Import:** `import { Checkbox } from '@/components';`
 
-**Source:** `design-system/src/components/Checkbox/` · Storybook · MDX `figmaMeta`
+**Source:** `design-system/src/components/forms-and-inputs/Checkbox.jsx` · Storybook · MDX `figmaMeta`
 
 ## When to use
 
@@ -19,7 +19,7 @@ TODO: Add `agent.whenToUse` to component MDX frontmatter.
 
 ## Props
 
-See `design-system/src/components/Checkbox/Checkbox.jsx` PropTypes and nearest `*.stories.jsx`.
+See `design-system/src/components/forms-and-inputs/Checkbox.jsxCheckbox.jsx` PropTypes and nearest `*.stories.jsx`.
 
 ## Examples
 

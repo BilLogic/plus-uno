@@ -39,12 +39,47 @@ export function formAgentAbs(name) {
   return path.join(AGENT_ROOT, formAgentRel(name));
 }
 
+// Components live in category folders since the 2026-07 IA reorg
+// (components/actions/Button/, components/forms-and-inputs/Input/, ...).
+// Resolve the real directory by search instead of assuming the old flat
+// layout — a wrong Source: line in agent-views misleads every building agent.
+const srcDirCache = new Map();
+function findSrcDir(name) {
+  if (srcDirCache.has(name)) return srcDirCache.get(name);
+  const roots = [path.join(SRC_ROOT, 'components'), path.join(SRC_ROOT, 'dataviz')];
+  let found = null;
+  const walk = (dir) => {
+    if (found) return;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name === name) { found = p; return; }
+        walk(p);
+      } else if (entry.name === `${name}.jsx`) {
+        // flat category layout (e.g. components/forms-and-inputs/Input.jsx)
+        found = p; return;
+      }
+    }
+  };
+  for (const r of roots) { if (fs.existsSync(r)) walk(r); if (found) break; }
+  let rel;
+  if (found) {
+    const isDir = fs.statSync(found).isDirectory();
+    rel = path.relative(SRC_ROOT, found) + (isDir ? '/' : '');
+  } else {
+    rel = `components/${name}/`;
+  }
+  srcDirCache.set(name, rel);
+  return rel;
+}
+
 export function srcComponentDir(name) {
-  return `components/${name}/`;
+  return findSrcDir(name);
 }
 
 export function srcFormDir(name) {
-  return isFormSubdir(name) ? `forms/${name}/` : 'forms/';
+  // forms/ was deleted in the reorg; forms live under components/forms-and-inputs.
+  return findSrcDir(name);
 }
 
 /**

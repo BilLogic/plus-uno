@@ -26,11 +26,8 @@ Then open **http://localhost:3020/** in your browser.
 All design system components are available via the `@` alias:
 
 ```jsx
-import Button from '@/components/Button';
-import Modal from '@/components/Modal';
-import Badge from '@/components/Badge';
-import Alert from '@/components/Alert';
-import PageLayout from '@/components/PageLayout';
+import { Button, Modal, Badge, Alert } from '@/components';
+import { PageLayout } from '@/specs/Universal/Pages';
 ```
 
 Design tokens are available as CSS variables (`--color-primary`, `--size-section-gap-lg`, etc.).

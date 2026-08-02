@@ -4,11 +4,11 @@
 
 Two files load always; everything else loads on demand or is retrieved live. Budgets are targets, not suggestions — a tier that bloats defeats the tier.
 
-## Tier 1 — always loaded (~19.5k chars total)
+## Tier 1 — always loaded (~21.5k chars total)
 
 | File | Role | Budget |
 |---|---|---|
-| `AGENTS.md` | constitution: identity · roster · routing · forbidden patterns | ≤18k chars |
+| `AGENTS.md` | constitution: identity · roster · routing · forbidden patterns | ≤18.5k chars |
 | `loading-order.md` | this contract | ≤4k chars |
 
 ## Tier 2 — loaded on demand (the estate-and-convention rows live ONLY here; DS agent-view triggers live in AGENTS.md § Progressive loading; a skill table carries only its own references)
@@ -34,5 +34,6 @@ Two files load always; everything else loads on demand or is retrieved live. Bud
 
 ## Runtime notes
 
-- **Worker (uno-bot):** no on-demand loading. `agents/uno-bot/scripts/bundle-harness.mjs` `SKILL_PATHS` concatenates AGENTS.md, then AGENT.md, then per skill its `references/method.md` followed by its `bot.md`, then the conventions it lists into `src/generated/harness.ts` at build time; `src/agent/skills.ts` serves that constant as one prompt-cached block. Everything in the bundle is always in context — the bot never "loads on demand", so Tier 2 is an IDE concept only. It carries 8 of the 12 conventions; `coding.md`, `tech-stack.md`, `integrations.md`, and `article-writing-style.md` are IDE-side (listed as `NOT_BUNDLED` in the bundler, which fails the build on any convention that is neither bundled nor excluded). Budgets for the bundled files, in chars because these are paragraph-length lines: `AGENT.md` ≤28k, each `bot.md` ≤6k.
+- **Worker (uno-bot):** no on-demand loading. `agents/uno-bot/scripts/bundle-harness.mjs` `SKILL_PATHS` concatenates AGENTS.md, then AGENT.md, then per skill its `references/method.md` followed by its `bot.md`, then the conventions it lists into `src/generated/harness.ts` at build time; `src/agent/skills.ts` serves that constant as one prompt-cached block. Everything in the bundle is always in context — the bot never "loads on demand", so Tier 2 is an IDE concept only. It carries 8 of the 12 conventions; `coding.md`, `tech-stack.md`, `integrations.md`, and `article-writing-style.md` are IDE-side (listed as `NOT_BUNDLED` in the bundler, which fails the build on any convention that is neither bundled nor excluded). Budgets for the bundled files, in chars because these are paragraph-length lines: `AGENT.md` ≤28k, each `bot.md` ≤7k (`uno-prototype/bot.md` currently 6.6k).
+- The Worker does not bundle this file — its bundle list lives in `agents/uno-bot/scripts/bundle-harness.mjs` (AGENTS.md + per-skill method/bot + 8 conventions).
 - **GitHub Actions:** `scripts/lib/skill-loader.js` loads `scripts/prompts/*` with meta-stripping; offline — fine, because conventions are repo-canonical (ADR-017) and load as plain files.

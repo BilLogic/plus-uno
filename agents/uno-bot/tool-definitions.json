@@ -96,7 +96,7 @@
   },
   {
     "name": "github_read",
-    "description": "READ-ONLY. Read from the plus-uno GitHub repo — fetch a file's contents by repo-relative path (DS cheat-sheets, rule docs, AGENTS.md, a component's source), or list a directory to check what EXISTS (a directory path returns its entries automatically). Use it to confirm a design-system component before proposing component_implement (read `design-system/src/components`), or to ground a review in the actual rule docs rather than memory. For an arbitrary GitHub URL a designer pasted, prefer source_read; use github_read when you know the path or need a directory listing. Safe to call freely (read-only, no gate).",
+    "description": "READ-ONLY. Read from the plus-uno GitHub repo — fetch a file's contents by repo-relative path (DS agent-views, rule docs, AGENTS.md, a component's source), or list a directory to check what EXISTS (a directory path returns its entries automatically). Use it to confirm a design-system component before proposing component_implement (read `design-system/src/components`), or to ground a review in the actual rule docs rather than memory. For an arbitrary GitHub URL a designer pasted, prefer source_read; use github_read when you know the path or need a directory listing. Safe to call freely (read-only, no gate).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

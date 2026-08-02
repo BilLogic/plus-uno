@@ -15,7 +15,7 @@ dimensions:
     definition: didn't gold-plate a low-fi ask (or under-build a hi-fi one)
 hard_gates:
   - missing-context prompts fire on deliberately incomplete requests (100% catch on the seeded set)
-  - gap protocol fires when a needed BS4 component doesn't exist — 0 silent inventions
+  - gap protocol fires when a needed component is absent from the agent-views / uno-storybook — 0 silent inventions
 benchmark: >
   Fixed PRD → one low-fi, one mid-fi, one hi-fi artifact; score each tier separately.
 targets:
