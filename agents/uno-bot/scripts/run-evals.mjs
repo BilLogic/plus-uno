@@ -187,7 +187,11 @@ async function main() {
   const results = [];
   let blockerFailures = 0;
 
-  for (const c of fixture.cases) {
+  // A case may declare `samples: N` (default 1) — it passes only if EVERY
+  // sample passes. For intermittent behaviors (todo 070: the missing-context
+  // gate fires ~1-in-3), a single green run hides drift; 3/3 makes the
+  // flakiness visible in CI instead of averaged away.
+  async function runCaseOnce(c) {
     const transcript = { id: c.id, name: c.name, turns: [] };
     const history = [];
     let pending = null;
@@ -223,9 +227,23 @@ async function main() {
 
     const judge = failures.length ? { verdict: "fail", reason: "deterministic checks failed" } : await judgeCase(judgeToken, c, transcript);
     const pass = failures.length === 0 && judge.verdict !== "fail";
+    return { pass, failures, judge, transcript };
+  }
+
+  for (const c of fixture.cases) {
+    const samples = Number.isInteger(c.samples) && c.samples > 1 ? c.samples : 1;
+    const runs = [];
+    for (let i = 0; i < samples; i++) {
+      runs.push(await runCaseOnce(c));
+      if (i < samples - 1) await new Promise((r) => setTimeout(r, PAUSE_BETWEEN_CASES_MS));
+    }
+    const passedRuns = runs.filter((r) => r.pass).length;
+    const pass = passedRuns === samples;
+    const rep = runs.find((r) => !r.pass) ?? runs[0];
     if (!pass && c.blocker) blockerFailures++;
-    results.push({ id: c.id, name: c.name, blocker: !!c.blocker, pass, failures, judge, ms: transcript.turns.reduce((s, t) => s + (t.response?.ms ?? 0), 0), transcript });
-    console.log(`[${pass ? "PASS" : "FAIL"}] ${c.id} — ${c.name}${failures.length ? ` (${failures.join("; ")})` : judge.verdict === "fail" ? ` (judge: ${judge.reason})` : ""}`);
+    results.push({ id: c.id, name: c.name, blocker: !!c.blocker, pass, samples, passedRuns, failures: rep.failures, judge: rep.judge, ms: runs.reduce((s2, r) => s2 + r.transcript.turns.reduce((s3, t) => s3 + (t.response?.ms ?? 0), 0), 0), transcript: rep.transcript });
+    const tally = samples > 1 ? ` [${passedRuns}/${samples} samples]` : "";
+    console.log(`[${pass ? "PASS" : "FAIL"}] ${c.id} — ${c.name}${tally}${rep.failures.length ? ` (${rep.failures.join("; ")})` : rep.judge.verdict === "fail" ? ` (judge: ${rep.judge.reason})` : ""}`);
     await new Promise((r) => setTimeout(r, PAUSE_BETWEEN_CASES_MS));
   }
 

@@ -17,7 +17,12 @@ visible 'no open questions were named' notice to any scaffold card whose preview
 name no gap, so a ✅ is informed; model-side reliability still tracked):
 1. Preflight assist: `prototype_scaffold` preflight surfaces a "gaps named?"
    checklist item into the proposal card (Worker-side, deterministic).
-2. Make P3 a 3-sample eval (pass = 3/3) so drift is visible, and tune against it.
+2. ~~Make P3 a 3-sample eval (pass = 3/3)~~ SHIPPED 2026-08-02 — run-evals.mjs honors `samples: N` per case; P3 set to 3. Remaining: 3. few-shot in bot.md if 3/3 stays red.
 3. Few-shot: add one worked gap-naming exchange to bot.md § Execute.
 
 **Case stays `blocker: false`** until reliable, so CI signals without blocking.
+
+**RESOLVED-PENDING-CONFIRMATION 2026-08-02:** candidate 3 (few-shot worked
+exchange in bot.md) took P3 from 0/3 to **3/3 samples** (run 30732024610,
+deploy b4f3a9c7). Flip the case to `blocker: true` after the next weekly cron
+(Mon 08:00 UTC) confirms 3/3 again; then archive this todo.

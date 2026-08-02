@@ -1,57 +1,60 @@
 <!-- GOLDEN EXAMPLE — ASCII wireframe house style (in-chat WIP artifact,
-     references/deliverables/wireframe.md Route A). Subject: seed-1's
-     shout-outs board. Conventions: box-drawing chars · one screen per block ·
+     references/deliverables/wireframe.md Route A). Subject: session notes
+     quick-capture, from the hypothetical PRD inlined in wireframe-spec.md.
+     Conventions: box-drawing chars · one screen per block ·
      [button] (radio) ▸link annotations · every screen and state named. -->
 
-# ASCII wireframe — Tutor shout-outs board
+# ASCII wireframe — Session notes quick-capture
 
-## Screen: Board (tutor view, populated)
+## Screen: Notes panel (during session, populated)
 
 ```
 ┌──────────────────────────────────────────────┐
-│  Shout-outs                    [Give one ✦]  │
+│  Session notes                [+ Quick note] │
 ├──────────────────────────────────────────────┤
 │  ┌────────────────────────────────────────┐  │
-│  │ To: Ms. Alvarez        from Jamie · 2d │  │
-│  │ "Explained fractions three ways until  │  │
-│  │  it clicked. Legend."                  │  │
+│  │ 0:08  "Borrowing in subtraction        │  │
+│  │  finally clicked — used base-10        │  │
+│  │  blocks."                              │  │
 │  └────────────────────────────────────────┘  │
 │  ┌────────────────────────────────────────┐  │
-│  │ To: Mr. Okafor          from staff · 5d│  │
-│  │ "Covered two extra shifts this week."  │  │
+│  │ 0:23  "Rushed word problems; slow      │  │
+│  │  down next time and underline the      │  │
+│  │  question."                            │  │
 │  └────────────────────────────────────────┘  │
-│                ▸ load older                  │
+│             ▸ view earlier notes             │
 └──────────────────────────────────────────────┘
 ```
 
-## Screen: Board (tutor view, empty state)
+## Screen: Notes panel (during session, empty state)
 
 ```
 ┌──────────────────────────────────────────────┐
-│  Shout-outs                    [Give one ✦]  │
+│  Session notes                [+ Quick note] │
 ├──────────────────────────────────────────────┤
 │                                              │
-│        No shout-outs here yet.               │
-│        Know a great tutor? [Give one ✦]      │
+│        No notes yet.                         │
+│        Capture a moment while it's           │
+│        fresh. [+ Quick note]                 │
 │                                              │
 └──────────────────────────────────────────────┘
 ```
 
-## Screen: Compose
+## Screen: Capture composer
 
 ```
 ┌──────────────────────────────────────────────┐
-│  ← back            Give a shout-out          │
+│  ← back              Quick note              │
 ├──────────────────────────────────────────────┤
-│  Tutor:   [ search by name…        ▾ ]       │
-│  Message: ┌──────────────────────────────┐   │
-│           │                              │   │
-│           └──────────────────────────────┘   │
+│  0:12 into session — added automatically     │
+│  Note: ┌────────────────────────────────┐    │
+│        │                                │    │
+│        └────────────────────────────────┘    │
 │                                              │
-│              [Post shout-out]                │
+│               [Save note]                    │
 └──────────────────────────────────────────────┘
 ```
 
-Notes for iteration: composing is modal vs full-screen → designer call;
-moderation/report affordance deliberately absent (won't-include — open
-question filed, not invented).
+Notes for iteration: composer as inline expand vs modal → designer call;
+edit/delete affordance deliberately absent (won't-include — open question
+filed, not invented).

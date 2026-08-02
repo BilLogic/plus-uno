@@ -1,51 +1,82 @@
-<!-- GOLDEN EXAMPLE — interactive/functional prompt-spec, authored against
-     docs/evals/fixtures/uno-prototype-seeds/seed-2-midfi-ambiguous-filter.md.
-     Note how the seed's ambiguities (date semantics, AND/OR combining) were
-     resolved WITH the designer during intake and are stated as decisions here —
-     while the zero-results state is specified, not left for the tool to invent. -->
+<!-- GOLDEN EXAMPLE — interactive/functional prompt-spec, demonstrating the
+     shape references/deliverables/interactive.md demands. The source PRD is
+     hypothetical and inlined below (no external fixture). Note how two
+     ambiguities (typeahead timing, filter combining) were resolved WITH the
+     designer during intake and are stated as decisions here — while the gaps
+     the PRD leaves open are surfaced as questions, and the zero-results state
+     is specified, not left for the tool to invent. -->
 
-# Prompt-spec — Session history filters · interactive draft (v0)
+# Prompt-spec — Resource library search · interactive draft (v0)
 
-**Confirmed brief:** Goal = validate the filter interaction · Artifact =
+**Source PRD (inline, hypothetical):**
+
+- Tutors can search a shared library of teaching resources by keyword.
+- Results can be narrowed by subject.
+- Each resource shows a title, subject, grade band, and type (worksheet,
+  slides, or activity).
+- Tutors open a resource from the results list.
+
+**Confirmed brief:** Goal = validate the search interaction · Artifact =
 interactive prototype · Fidelity = Visual mid (clean, not polished),
-Interaction high (filters must actually work), Scope one table view,
-Complexity real data shapes incl. zero-results · Won't include = saved
-filters, export, pagination beyond one page.
+Interaction high (search must actually work), Scope one search view,
+Complexity real data shapes incl. zero-results · Won't include = adding or
+uploading resources, favorites, pagination beyond one page.
 
 ## What to build
 
-A tutor-facing session-history table with three combinable filters. **Behavior
-under test: filtering feels immediate and combined filters stay legible.**
+A tutor-facing resource-library search over the sample data below. **Behavior
+under test: search feels immediate and the subject filter stays legible next
+to the query.**
 
-- **Filter by subject** — single-select dropdown: Math, Reading, Science.
-- **Filter by student** — type-ahead over the student names in the sample data.
-- **Filter by date** — *decision from intake:* relative presets (Last 7 days ·
-  Last 30 days · This semester), not a free date picker.
-- **Combining** — *decision from intake:* AND across filter types.
-- Table updates live on every filter change; active filters render as
-  dismissible chips above the table.
+- **Keyword search** — input with typeahead; *decision from intake:*
+  suggestions appear after 2 typed characters, drawn from resource titles in
+  the sample data.
+- **Filter by subject** — single-select chips: Math, Reading, Science.
+- **Combining** — *decision from intake:* keyword AND subject.
+- Results list updates live on every keystroke and filter change; each row
+  shows title, subject, grade band, and type.
+- Opening a resource is a stub — a row click highlights it, nothing more
+  (see open question 1).
 
 ## Sample data (use this, not lorem)
 
-12 rows: `{ student, subject, date, duration }` — e.g. "Maya R · Math ·
-2026-07-28 · 45 min", "Jordan P · Reading · 2026-07-25 · 30 min"; spread dates
-across 60 days so every preset changes the result set.
+10 rows: `{ title, subject, gradeBand, type }` — e.g. "Fraction Strips
+Warm-up · Math · 3–5 · worksheet", "Phonics Blends Bingo · Reading · K–2 ·
+activity", "Photosynthesis Diagram Lab · Science · 6–8 · slides", "Long
+Division Step Cards · Math · 4–6 · worksheet"; spread subjects and types so
+every chip changes the result set.
 
 ## Screen states
 
-- **Default:** all 12 rows, no filters.
-- **Filtered:** chips visible, row count line ("4 of 12 sessions").
-- **Zero results:** message "No sessions match — try removing a filter", plus
-  a one-tap "Clear all filters".
+- **Default:** search empty, all 10 resources listed, no chip active.
+- **Typing:** typeahead panel open under the input with matching titles.
+- **Filtered:** active chip highlighted, result count line ("4 of 10
+  resources").
+- **Zero results:** message "No resources match — try a different keyword or
+  subject", plus a one-tap "Clear search".
+
+## Open questions — answer before higher fidelity (do NOT invent)
+
+1. **Opening a resource:** preview in place, download, or external link? The
+   PRD says only "open" — the row click stays a stub until ruled.
+2. **Search scope:** does the keyword match titles only, or also type and
+   grade band? v0 matches titles only and flags this as unruled.
+3. **Ordering:** how are results ranked — relevance, recency, alphabetical?
+   v0 keeps sample-data order.
+4. **Contribution:** who adds resources to the library? No flow exists — out
+   of scope here and unspecified in the PRD.
 
 ## Out of scope — do not add
 
-Saved filter sets · CSV export · pagination · sorting changes · any nav beyond
-this view.
+Add/upload flows · favorites · ratings · pagination · any nav beyond this
+view.
 
 ## Self-check (verify before returning; regenerate once if any fail)
 
-- [ ] All three filters work and combine with AND semantics
-- [ ] Zero-results state reachable and shows the clear-all action
-- [ ] Real names/subjects/dates from the sample data — no lorem
+- [ ] Typeahead and subject chips work and combine with AND semantics
+- [ ] Zero-results state reachable and shows the clear action
+- [ ] Real titles/subjects/grade bands from the sample data — no lorem
 - [ ] Nothing from the out-of-scope list crept in
+- [ ] Nothing in the build states a fact the PRD does not (e.g. what opening
+      a resource does) — an invented requirement is a defect, not a helpful
+      default

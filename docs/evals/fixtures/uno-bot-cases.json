@@ -250,7 +250,8 @@
         "text",
         "proposal"
       ],
-      "judgeNote": "method §4 hard gate — missing context → ask, never invent. Everything needed is visible in this message, and it is ambiguous in three ways the bot should surface rather than paper over: 'date' could be a single date, a range, or relative presets; 'combine' could be AND or OR; and no zero-results state is specified. A good answer names at least one of these and asks, rather than proceeding as though the brief were complete. Confirming fidelity first (bot.md:16) is also expected. Staging prototype_scaffold is acceptable ONLY if the gaps are named alongside it."
+      "judgeNote": "method §4 hard gate — missing context → ask, never invent. Everything needed is visible in this message, and it is ambiguous in three ways the bot should surface rather than paper over: 'date' could be a single date, a range, or relative presets; 'combine' could be AND or OR; and no zero-results state is specified. A good answer names at least one of these and asks, rather than proceeding as though the brief were complete. Confirming fidelity first (bot.md:16) is also expected. Staging prototype_scaffold is acceptable ONLY if the gaps are named alongside it.",
+      "samples": 3
     },
     {
       "id": "P4",

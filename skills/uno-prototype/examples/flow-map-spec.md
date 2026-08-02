@@ -1,56 +1,70 @@
-<!-- GOLDEN EXAMPLE — flow-map prompt-spec, authored against
-     docs/evals/fixtures/uno-prototype-seeds/seed-1-lowfi-missing-flows.md.
-     Shows the shape references/deliverables/flow-map.md demands, including how
-     the missing-context gate surfaces the seed's planted gaps as QUESTIONS,
+<!-- GOLDEN EXAMPLE — flow-map prompt-spec, demonstrating the shape
+     references/deliverables/flow-map.md demands. The source PRD is
+     hypothetical and inlined below (no external fixture). Shows how the
+     missing-context gate surfaces the PRD's planted gaps as QUESTIONS,
      never invented behavior. -->
 
-# Prompt-spec — Tutor shout-outs board · user flow (FigJam)
+# Prompt-spec — Substitute request · user flow (FigJam)
 
-**Confirmed brief:** Goal = align stakeholders on the posting/browsing flow ·
+**Source PRD (inline, hypothetical):**
+
+- A tutor who can't make an upcoming session can request a substitute.
+- Open requests are visible to other tutors, who can claim one.
+- A claimed session moves onto the claiming tutor's schedule.
+- Requests show the session's subject, student level, date, and time.
+
+**Confirmed brief:** Goal = align stakeholders on the request/claim flow ·
 Artifact = user flow map · Fidelity = Visual low (boxes and arrows), Scope 2
-flows, Complexity happy-path-plus-gaps · Won't include = moderation UI,
-notification design.
+flows, Complexity happy-path-plus-gaps · Won't include = admin approval
+workflow, notification design.
 
-## Flow 1 — post a shout-out
+## Flow 1 — request a substitute
 
-- **Trigger:** any PLUS-account holder taps "Give a shout-out" (entry surface
-  TBD by this sketch's feedback).
-- **Steps:** pick tutor (search by name) → write message → preview → post.
-- **Outcome:** shout-out appears on the board.
-- **Actors/systems:** poster · PLUS auth (account gate) · shout-outs store ·
-  board.
+- **Trigger:** a tutor opens an upcoming session and taps "Request a
+  substitute" (entry surface TBD by this sketch's feedback).
+- **Steps:** confirm session details (subject, level, date/time) → add an
+  optional handoff note → submit.
+- **Outcome:** the request appears on the open-requests list.
+- **Actors/systems:** requesting tutor · PLUS schedule (session record) ·
+  requests store · open-requests list.
 
-## Flow 2 — browse the board
+## Flow 2 — claim a request
 
-- **Trigger:** tutor opens the board.
-- **Steps:** board lists shout-outs (newest first) → tutor scrolls/reads.
-- **Outcome:** tutor sees their recognition.
+- **Trigger:** another tutor opens the open-requests list.
+- **Steps:** browse open requests (soonest first) → open one → review details
+  and handoff note → claim.
+- **Outcome:** the session moves onto the claiming tutor's schedule and the
+  request leaves the open list.
+- **Actors/systems:** claiming tutor · requests store · both tutors'
+  schedules.
 
 ## Constraints from grounding
 
-- Any PLUS account can post; board visible to all tutors (PRD).
-- Shout-outs show tutor name + message (PRD).
+- Requests show subject, student level, date, and time (PRD).
+- Any tutor can see open requests; a claim reassigns the session (PRD).
 
 ## Open questions — answer before higher fidelity (do NOT invent)
 
-1. **Moderation:** nothing gates what can be posted about whom. Flow for
-   report/remove needed?
-2. **Empty state:** what does a tutor with zero shout-outs see?
-3. **Notification:** does the tutor find out, or discover by browsing?
-4. **Attribution:** is the poster shown on the board? The PRD names only the
-   tutor's name and the message — signed vs anonymous changes the composer and
-   the card, so it is asked, not assumed.
+1. **Unclaimed deadline:** what happens if nobody claims before the session
+   starts? Escalation, cancellation, or nothing — the PRD is silent.
+2. **Withdrawal:** can the requesting tutor cancel a request — and what if it
+   was already claimed? No flow exists for either.
+3. **Eligibility:** can any tutor claim, or only tutors matched to the
+   subject/level? The PRD says "other tutors" without qualification, so it is
+   asked, not assumed.
+4. **Requester feedback:** does the requesting tutor learn who claimed, or
+   discover it from their schedule?
 
 ## What feedback this sketch should provoke
 
-Where posting should live, whether browsing needs filters/search, and rulings
-on the three open questions above.
+Where the request action should live, whether the open-requests list needs
+filtering, and rulings on the four open questions above.
 
 ## Self-check (verify before returning; regenerate once if any fail)
 
 - [ ] Both flows read trigger → steps → outcome with no invented steps
-- [ ] No moderation UI or notification design appears (won't-include)
+- [ ] No approval workflow or notification design appears (won't-include)
 - [ ] Boxes-and-arrows fidelity only — no visual styling
 - [ ] Every open question is visible ON the map, not resolved silently
-- [ ] Nothing on the map states a fact the PRD does not (e.g. who a shout-out is
-      attributed to) — an invented requirement is a defect, not a helpful default
+- [ ] Nothing on the map states a fact the PRD does not (e.g. who may claim)
+      — an invented requirement is a defect, not a helpful default
