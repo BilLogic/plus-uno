@@ -27,6 +27,12 @@ this repo* is `coded-build.md`, not this.)
   settings as pass/fail checks; the tool verifies its own output, regenerates
   once on failure. The loop travels inside the spec — no UNO-side runtime.
 
+**Where the spec lives.** Write it to
+`docs/plans/YYYY-MM-DD-NNN-<slug>-<deliverable>-spec.md` (repo date-prefix
+convention, `docs/conventions/coding.md`) and give the designer the path plus
+the ready-to-paste text. The file is what `uno-review` receives with the
+manifest.
+
 ## Handoff
 
 Golden example: `skills/uno-prototype/examples/interactive-spec.md`. Before handing off, run

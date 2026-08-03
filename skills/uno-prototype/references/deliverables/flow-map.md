@@ -19,6 +19,12 @@ does not run the generation.
   including the fidelity dial settings — restated as pass/fail checks the
   generating tool verifies against its own output, regenerating once on failure.
 
+**Where the spec lives.** Write it to
+`docs/plans/YYYY-MM-DD-NNN-<slug>-<deliverable>-spec.md` (repo date-prefix
+convention, `docs/conventions/coding.md`) and give the designer the path plus
+the ready-to-paste text. The file is what `uno-review` receives with the
+manifest.
+
 ## Handoff
 
 Golden example: `skills/uno-prototype/examples/flow-map-spec.md`. Before handing off, run

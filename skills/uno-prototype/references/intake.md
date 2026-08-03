@@ -1,4 +1,4 @@
-<!-- ~1,300 tokens | Load when: a prototype run starts — this is the interview that produces the brief card -->
+<!-- ~2,400 tokens | Load when: a prototype run starts — this is the interview that produces the brief card -->
 
 # uno-prototype — intake (the 8-question interview)
 
@@ -17,7 +17,8 @@ brief → build.
 | Hook-gated (Cursor · Claude Code · Codex) | `.cursor/hooks/briefings/active-intake-question.json` exists, its `conversationId` matches this session | Render the file's **current** step (`stateId`/`type`), per the rules below |
 | Stale hook file | `conversationId` mismatch, or older than a day | Ignore the file; take the manual path |
 | Gate off | `.cursor/settings.json` → `"uno": { "prdGate": false }` | Skip the interview; PRD gate still applies as an ordinary rule (method §0) |
-| Manual (no adapter, headless, hook failed) | No JSON appears | Run the SAME eight steps yourself, in order, tracking your own position — the hook automates this procedure, it does not own it |
+| Manual (no adapter, hook failed) | No JSON appears, but there is a person to answer | Run the SAME eight steps yourself, in order, tracking your own position — the hook automates this procedure, it does not own it |
+| Non-interactive (headless, CI, cron, scripted driver) | No turn exists in which anyone could answer | Same eight steps, answered from the PRD, declared as assumptions on an **ASSUMED** brief card — see § When no answer can come back at all |
 
 ## How to ask — the contract, not a tool name
 
@@ -36,6 +37,24 @@ answer always accepted (a bare number matching an option parses too — phrase
 that affordance however fits the question you just asked, or leave it implicit).
 Don't narrate tool mechanics mid-intake — just ask the question — and never
 refuse to proceed because a tool is missing.
+
+**When no answer can come back at all** — a single-shot or non-interactive run
+(headless, CI, cron, a scripted driver), where there is no turn in which a
+person could reply — asking is not available in any rendering. Proceed, but
+proceed *visibly*:
+
+- Answer each of the eight steps yourself, from the PRD and the grounding
+  snapshot, and **write the answers down** as a numbered assumption list.
+- Label the brief card **`ASSUMED — not confirmed`**. Confirmation is a human
+  act; a card nobody confirmed is not a confirmed card, whatever it contains.
+- Carry that label into the spec and the artifact manifest, so `uno-review`
+  and the next human turn both see which decisions were nobody's.
+- The missing-context gate (method §4) still fires. An assumption you had to
+  make is exactly the thing it exists to surface — list it, don't smooth it.
+
+Assuming in silence is the defect, not assuming. This is a degraded run by
+construction: the interview's value is the designer's answers, and a run with
+no designer in it has none of them.
 
 ## Rules — every step, both modes
 

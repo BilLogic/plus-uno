@@ -42,7 +42,11 @@ while IFS= read -r file; do
       status=1
     fi
   done < <(link_grep "$file" | sed -E 's/^.*\(([^)]+)\)$/\1/')
-done < <({ find skills agents docs/conventions docs/evals -type f -name '*.md' -not -path '*/node_modules/*'; echo AGENTS.md; echo loading-order.md; } | sort)
+# A `transcripts/` folder holds VERBATIM agent output — the paths inside are a
+# record of what an agent said, not links this repo owns, and a record you must
+# hand-edit to make CI green is not a record. Excluded by folder so the analysis
+# written ALONGSIDE it (README.md) stays checked: only the raw record is exempt.
+done < <({ find skills agents docs/conventions docs/evals -type f -name '*.md' -not -path '*/node_modules/*' -not -path '*/transcripts/*'; echo AGENTS.md; echo loading-order.md; } | sort)
 
 echo "[check] validating backticked repo paths resolve"
 

@@ -8,6 +8,7 @@
 - **Stories**: Co-located with component (e.g., `Button.stories.jsx`)
 - **Prototypes**: kebab-case directories (e.g., `prototypes/home-redesign/`)
 - **Docs**: kebab-case with date prefix for plans/ideation (e.g., `2026-03-21-007-refactor-optimal-repo-structure-plan.md`)
+- **Prompt-specs**: same folder, same date prefix, `-spec` suffix (e.g., `docs/plans/2026-08-02-001-fill-in-coverage-flow-map-spec.md`). `uno-prototype`'s spec-handoff deliverables — text handed to an external design tool, not code, so nothing builds them.
 
 ## Imports
 
