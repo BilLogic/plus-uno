@@ -1,5 +1,9 @@
 name = "uno-bot"
 main = "src/index.ts"
+# Pinned because two Cloudflare accounts are visible to the team's wrangler
+# logins, and every non-interactive command (tail, secret put, CI deploy) fails
+# with "More than one account available" without it. uno-bot lives here.
+account_id = "747a73feeb756fad6c1164df234628e9"
 compatibility_date = "2026-05-01"
 compatibility_flags = ["nodejs_compat"]
 
