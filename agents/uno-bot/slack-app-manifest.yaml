@@ -1,0 +1,181 @@
+# Uno-bot Slack app manifest — app A0APS0L8HJR, CMU Simon Initiative workspace.
+#
+# Captured from api.slack.com on 2026-08-04, after the six /uno-* slash commands
+# were created. Hand-maintained: nothing generates or applies this file. It is
+# the repo's record of what production actually runs on, and the rollback point
+# if a manifest save goes wrong — before this, the app's configuration existed
+# only in Slack's UI, so there was nothing to restore from.
+#
+# Refresh it by hand (api.slack.com -> Uno-bot -> App Manifest -> YAML) after any
+# deliberate config change. Pasting it back REPLACES the whole manifest, so read
+# the diff first; additive changes are safer made through the feature pages.
+#
+# ── ONE INTENTIONAL DIFFERENCE FROM LIVE ─────────────────────────────────────
+# `app_context_changed` below is NOT yet subscribed in production. The app
+# declares features.agent_view — the current agent messaging experience — but
+# still subscribes only to the assistant_view events (assistant_thread_started,
+# assistant_thread_context_changed). agent_view's context event is
+# app_context_changed, which the app neither subscribes to nor handles, so the
+# panel's "what you're currently looking at" grounding that loadAssistantContext
+# depends on has no source on the new surface.
+#
+# It is listed here alongside the legacy events, not instead of them: dropping
+# assistant_thread_context_changed before src/slack/events.ts handles
+# app_context_changed would remove the grounding that still works today. Ship
+# the handler, confirm the new event arrives, then delete the legacy pair.
+#
+# ── KNOWN-WRONG, DELIBERATELY UNCHANGED ──────────────────────────────────────
+# settings.interactivity.request_url points at a Netlify function that does not
+# exist (confirmed 404). No such function is in this repo and no netlify.toml
+# redirect reaches one. Nothing consumes interaction payloads either: there is
+# no /slack/interactive route, and every Block Kit button is a plain URL button
+# with no action_id, so Slack has nothing to deliver. It is dead config rather
+# than a live break — and it stops being merely dead the first time someone
+# ships an action button. Left as-is because is_mcp_enabled is true and it is
+# not established here whether the Slack MCP surface needs interactivity
+# enabled; decide that before flipping it off or pointing it at the Worker.
+#
+# features.app_home.messages_tab_enabled is false while agent_view puts agent
+# conversations in the Messages tab. Unverified whether Slack requires it true
+# for that surface — the bot works today, so this is a question, not a finding.
+display_information:
+  name: Uno-bot
+  description: PLUS design team's Slack-native AI teammate
+  background_color: "#000000"
+features:
+  app_home:
+    home_tab_enabled: true
+    messages_tab_enabled: false
+    messages_tab_read_only_enabled: false
+  bot_user:
+    display_name: UNO Bot
+    always_online: true
+  slash_commands:
+    - command: /uno-prototype
+      url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
+      description: Turn a PRD into a design artifact at the fidelity you pick, grounded on the blueprint
+      usage_hint: "[prd-required] [fidelity]"
+      should_escape: false
+    - command: /uno-research
+      url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
+      description: Gather context that doesn't exist yet — evidence sweeps, study guides, discovery
+      usage_hint: "[question / hunch / who-knows-X]"
+      should_escape: false
+    - command: /uno-synthesize
+      url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
+      description: Distill gathered context into findings, takeaways, and — on your go — a PRD
+      usage_hint: '[sources-to-distill | "draft the PRD"]'
+      should_escape: false
+    - command: /uno-review
+      url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
+      description: "Diagnose-only design review: design-system, product-intent, and accessibility lenses"
+      usage_hint: "[artifact + manifest (fidelity / tools / PRD link)]"
+      should_escape: false
+    - command: /uno-publish
+      url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
+      description: Share finished-enough work for feedback, or hand it off to development
+      usage_hint: "[prototype-or-project]"
+      should_escape: false
+    - command: /uno-maintain
+      url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
+      description: File an intake, run a standing sweep, or capture a lesson into the harness
+      usage_hint: "[intake / sweep-name / lesson-to-capture]"
+      should_escape: false
+  agent_view:
+    agent_description: "Your 🐐 PLUS design teammate: I pull live, cited answers on roadmap cards, product flows, and design-system assets across Notion, Figma, and Slack. I flag anything outdated or unbuilt, and can draft PRDs, update cards, or start prototypes—with your approval first."
+    suggested_prompts: []
+oauth_config:
+  redirect_urls:
+    - https://uno-bot.bryanhuang628.workers.dev/oauth/slack/callback
+  scopes:
+    user:
+      - canvases:read
+      - canvases:write
+      - channels:history
+      - channels:read
+      - channels:write
+      - chat:write
+      - emoji:read
+      - files:read
+      - groups:history
+      - groups:read
+      - groups:write
+      - im:history
+      - im:write
+      - mpim:history
+      - mpim:read
+      - mpim:write
+      - reactions:read
+      - reactions:write
+      - search:read.files
+      - search:read.im
+      - search:read.mpim
+      - search:read.private
+      - search:read.public
+      - search:read.users
+      - users:read
+      - users:read.email
+    bot:
+      - app_mentions:read
+      - assistant:write
+      - bookmarks:read
+      - bookmarks:write
+      - calls:read
+      - canvases:read
+      - canvases:write
+      - channels:history
+      - channels:read
+      - channels:write.topic
+      - chat:write
+      - chat:write.customize
+      - chat:write.public
+      - commands
+      - emoji:read
+      - files:read
+      - files:write
+      - groups:history
+      - groups:read
+      - groups:write
+      - im:history
+      - im:write
+      - incoming-webhook
+      - links.embed:write
+      - mcp:connect
+      - metadata.message:read
+      - mpim:history
+      - reactions:read
+      - reactions:write
+      - search:read.files
+      - search:read.im
+      - search:read.mpim
+      - search:read.private
+      - search:read.public
+      - search:read.users
+      - team:read
+      - users.profile:read
+      - users:read
+      - users:read.email
+  pkce_enabled: true
+settings:
+  event_subscriptions:
+    request_url: https://uno-bot.bryanhuang628.workers.dev/slack/events
+    bot_events:
+      - app_context_changed
+      - app_home_opened
+      - app_mention
+      - assistant_thread_context_changed
+      - assistant_thread_started
+      - emoji_changed
+      - message.channels
+      - message.groups
+      - message.im
+      - message.mpim
+      - reaction_added
+      - reaction_removed
+  interactivity:
+    is_enabled: true
+    request_url: https://plus-uno.netlify.app/.netlify/functions/slack-interactivity
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false
+  is_mcp_enabled: true
