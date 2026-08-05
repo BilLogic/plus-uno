@@ -1,6 +1,7 @@
 import type { Env } from "./types";
 import { verifySlackSignature } from "./slack/verify";
 import { handleSlackEnvelope, type SlackEnvelope } from "./slack/events";
+import { handleSlashCommand } from "./slack/commands";
 import { startSlackOAuth, handleSlackOAuthCallback } from "./oauth/slack";
 import { geminiConfigured, geminiGenerate } from "./gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "./vertex/claude";
@@ -134,6 +135,12 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
 
   if (request.method === "POST" && url.pathname === "/slack/events") {
     return handleSlackEventsRequest(request, env, ctx);
+  }
+
+  // Slash commands (/uno-prototype, /uno-research, …). Separate route because
+  // Slack posts them form-encoded, not as an events JSON envelope.
+  if (request.method === "POST" && url.pathname === "/slack/commands") {
+    return handleSlackCommandRequest(request, env, ctx);
   }
 
   // One-time Slack OAuth — issues the user token that slack_search needs
@@ -296,6 +303,31 @@ async function handleSlackEventsRequest(
     console.error(`[slack] handler error: ${err instanceof Error ? err.message : String(err)}`);
   }));
   return new Response("ok", { status: 200 });
+}
+
+async function handleSlackCommandRequest(
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext,
+): Promise<Response> {
+  // Same raw-bytes rule as /slack/events — the signature covers the exact body,
+  // and the scheme is body-agnostic, so form-encoded verifies identically.
+  const rawBody = await request.text();
+  const verification = await verifySlackSignature(
+    rawBody,
+    request.headers.get("x-slack-request-timestamp"),
+    request.headers.get("x-slack-signature"),
+    env.SLACK_SIGNING_SECRET,
+  );
+  if (!verification.ok) {
+    console.warn(`[slash] verification failed: ${verification.reason}`);
+    return new Response("unauthorized", { status: 401 });
+  }
+
+  // Synchronous by design: Slack times the caller out at 3s and does NOT retry
+  // a slash command, so the response is built here and the run starts inside
+  // ctx.waitUntil.
+  return handleSlashCommand(env, new URLSearchParams(rawBody), ctx);
 }
 
 export { ThreadState } from "./thread-state";

@@ -11,7 +11,6 @@ description: >
   Dev Status flips to Ready for QA (RTT). Mandatory input: a one-line artifact
   manifest (fidelity / tools / PRD link). It never fixes what it finds — fixes
   route to uno-prototype (artifact) or uno-maintain (harness/docs).
-user-invocable: true
 argument-hint: [artifact + manifest (fidelity / tools / PRD link)]
 allowed-tools: Read, Grep, Glob, Bash, Task
 ---

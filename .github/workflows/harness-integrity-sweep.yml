@@ -50,6 +50,14 @@ jobs:
       - name: Intake FSM smoke tests
         run: npm run check:intake-fsm
 
+      # The six skills reach the IDEs and Slack only through generated surfaces
+      # (.claude/skills/ stubs, the Worker's command map, the app-manifest
+      # block). Edit a SKILL.md description without regenerating and the slash
+      # menu quietly describes the old skill — invisible until someone reads it.
+      # Dependency-free; no npm install.
+      - name: Skill-surface drift check
+        run: npm run check:skill-surfaces
+
       - name: Ensure intake labels exist
         env:
           GH_TOKEN: ${{ github.token }}

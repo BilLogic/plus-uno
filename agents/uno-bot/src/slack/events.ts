@@ -145,7 +145,9 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
 // ~30s after the Slack ack — any longer run died silently mid-flight
 // ("👀 then silence", live incident 2026-07-09). DO alarms have no such cutoff.
 // Keyed per thread so runs within a thread stay ordered.
-async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey: string): Promise<void> {
+// Exported for the slash-command route (commands.ts), which builds a synthetic
+// `message` job so a /uno-* run is an ordinary thread from here down.
+export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey: string): Promise<void> {
   const stub = env.AGENT_RUNNER.get(env.AGENT_RUNNER.idFromName(threadKey));
   charge(1, "agent-runner"); // DO stub call — a subrequest the meter can't see.
   const res = await stub.fetch("https://do/enqueue", {

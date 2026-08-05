@@ -12,7 +12,6 @@ description: >
   disagree", "the skill/persona is off", "fix this typo", "run the staleness
   sweep", "document this", "capture this lesson", or after a feature ships and
   the DS/harness need reconciling.
-user-invocable: true
 argument-hint: [intake / sweep-name / lesson-to-capture]
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Task, mcp__notion-plus__*
 ---
