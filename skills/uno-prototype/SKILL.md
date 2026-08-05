@@ -10,7 +10,7 @@ description: >
   or has an approved requirement and needs a reviewable artifact. Not for
   critique (uno-review), sharing/handoff (uno-publish), or writing the PRD
   itself (uno-synthesize).
-argument-hint: [prd-required] [fidelity]
+argument-hint: "[prd-required] [fidelity]"
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Task, mcp__figma__*, mcp__figma-plus__*, mcp__figma-parsnip__*, mcp__notion-plus__*
 ---
 

@@ -10,19 +10,37 @@
 # deliberate config change. Pasting it back REPLACES the whole manifest, so read
 # the diff first; additive changes are safer made through the feature pages.
 #
-# ── ONE INTENTIONAL DIFFERENCE FROM LIVE ─────────────────────────────────────
-# `app_context_changed` below is NOT yet subscribed in production. The app
-# declares features.agent_view — the current agent messaging experience — but
-# still subscribes only to the assistant_view events (assistant_thread_started,
-# assistant_thread_context_changed). agent_view's context event is
-# app_context_changed, which the app neither subscribes to nor handles, so the
-# panel's "what you're currently looking at" grounding that loadAssistantContext
-# depends on has no source on the new surface.
+# ── TWO INTENTIONAL DIFFERENCES FROM LIVE ────────────────────────────────────
+# Both complete a migration the app already half-made: it declares
+# features.agent_view — the current agent messaging experience — while its code
+# and events are still written for the retired assistant_view. New surface
+# declared, old surface implemented.
 #
-# It is listed here alongside the legacy events, not instead of them: dropping
-# assistant_thread_context_changed before src/slack/events.ts handles
-# app_context_changed would remove the grounding that still works today. Ship
-# the handler, confirm the new event arrives, then delete the legacy pair.
+# 1. `messages_tab_enabled: true` (live: false). agent_view puts agent
+#    conversations in the Messages tab, so the DM reads as an ordinary chat —
+#    no History tab, no "New Chat" button. With the tab off, the surface the
+#    manifest claims has nowhere to live.
+#
+# 2. `app_context_changed` subscribed. It is agent_view's replacement for
+#    assistant_thread_context_changed, and it is the only source for the
+#    "what you're currently looking at" grounding that loadAssistantContext
+#    reads. Nothing feeds it on the new surface today.
+#
+# The legacy pair (assistant_thread_started, assistant_thread_context_changed)
+# stays listed on purpose. Dropping it before src/slack/ handles the
+# replacements would delete grounding and the panel greeting that still work.
+# Ship the handlers, confirm the new events arrive, then delete the pair.
+#
+# ── SCOPE: THIS CHANGES DMs ONLY ─────────────────────────────────────────────
+# agent_view governs the app's own DM / Messages surface. Channels are
+# untouched: an @mention still opens a thread and the bot still answers inside
+# it, the emoji proposal gate still keys off the reacted message, and a /uno-*
+# slash command still posts a framing message and threads its run beneath.
+#
+# In the DM the conversation model changes by design — chat, not threads — so
+# the DM channel itself is the conversation rather than each thread within it.
+# That is a code decision (the runner key and history load branch on
+# channel_type), recorded here because the manifest is what commits to it.
 #
 # ── KNOWN-WRONG, DELIBERATELY UNCHANGED ──────────────────────────────────────
 # settings.interactivity.request_url points at a Netlify function that does not
@@ -35,9 +53,8 @@
 # not established here whether the Slack MCP surface needs interactivity
 # enabled; decide that before flipping it off or pointing it at the Worker.
 #
-# features.app_home.messages_tab_enabled is false while agent_view puts agent
-# conversations in the Messages tab. Unverified whether Slack requires it true
-# for that surface — the bot works today, so this is a question, not a finding.
+# (messages_tab_enabled moved above — it is now an intended change, not a
+# question, since the DM is meant to read as an ordinary chat.)
 display_information:
   name: Uno-bot
   description: PLUS design team's Slack-native AI teammate
@@ -45,7 +62,7 @@ display_information:
 features:
   app_home:
     home_tab_enabled: true
-    messages_tab_enabled: false
+    messages_tab_enabled: true
     messages_tab_read_only_enabled: false
   bot_user:
     display_name: UNO Bot

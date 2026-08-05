@@ -12,7 +12,7 @@ description: >
   summarizing prior studies, ingesting pasted context, or drafting PRDs — that
   is uno-synthesize.
 context: fork
-argument-hint: [question / hunch / who-knows-X]
+argument-hint: "[question / hunch / who-knows-X]"
 allowed-tools: Read, Grep, Glob, Task, WebSearch, mcp__notion-plus__API-post-search, mcp__notion-plus__API-retrieve-page-markdown, mcp__notion-plus__API-get-block-children, mcp__notion-plus__API-query-data-source
 ---
 <!-- context: fork runs this skill in a forked context with the DEFAULT agent — it must keep Task
