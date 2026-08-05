@@ -96,10 +96,33 @@ function parseFields(fmLines) {
       }
       out[key] = folded.join(" ");
     } else {
-      out[key] = rawValue.trim();
+      out[key] = unquote(key, rawValue.trim());
     }
   }
   return out;
+}
+
+/**
+ * Strip surrounding quotes, and refuse the shapes YAML would silently reinterpret.
+ *
+ * `argument-hint: [prd-required] [fidelity]` was invalid YAML for months — `[…]`
+ * opens a flow sequence, so two of them on one line is a parse error that takes
+ * the WHOLE frontmatter down with it. Nothing noticed, because nothing loaded
+ * these as skills until `.claude/skills/` existed; the skill then registered
+ * with its description missing. The single-bracket hints were no better, just
+ * quieter: they parsed as a one-item list where a string was meant.
+ */
+function unquote(key, raw) {
+  if ((raw.startsWith('"') && raw.endsWith('"')) || (raw.startsWith("'") && raw.endsWith("'"))) {
+    return raw.slice(1, -1);
+  }
+  if (/^[[{]/.test(raw)) {
+    throw new Error(
+      `frontmatter \`${key}: ${raw}\` starts with ${raw[0]} — YAML reads that as a ` +
+        `sequence/mapping, not text. Quote the value.`,
+    );
+  }
+  return raw;
 }
 
 function slackDescription(name) {

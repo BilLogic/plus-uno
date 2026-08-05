@@ -60,9 +60,12 @@ async function setSuggestedPrompts(
 export async function setStatus(
   env: Env,
   channel: string,
-  thread_ts: string,
+  thread_ts: string | undefined,
   status: string,
 ): Promise<void> {
+  // assistant.threads.setStatus addresses a THREAD. An agent_view DM has none,
+  // so there is nothing to decorate — skip rather than send a bad request.
+  if (!thread_ts) return;
   await slackCall(env, "assistant.threads.setStatus", {
     channel_id: channel,
     thread_ts,

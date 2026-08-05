@@ -95,7 +95,7 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
     case "message": {
       const msg = event as SlackMessageEvent;
       if (await shouldHandleMessage(env, msg)) {
-        await enqueueAgentJob(env, { kind: "message", event: msg }, `${msg.channel}:${msg.thread_ts ?? msg.ts}`);
+        await enqueueAgentJob(env, { kind: "message", event: msg }, conversationKey(msg));
       } else {
         console.log("[slack] ignoring message — no @mention and not an active bot thread");
       }
@@ -104,7 +104,7 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
     case "app_mention": {
       // Explicit @mention always engages.
       const msg = appMentionToMessage(event as SlackAppMentionEvent);
-      await enqueueAgentJob(env, { kind: "message", event: msg }, `${msg.channel}:${msg.thread_ts ?? msg.ts}`);
+      await enqueueAgentJob(env, { kind: "message", event: msg }, conversationKey(msg));
       return;
     }
     case "reaction_added": {
@@ -164,7 +164,7 @@ export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey
     console.error(`[slack] runner enqueue failed (${job.kind}): ${res.status}`);
     const target =
       job.kind === "message"
-        ? { channel: job.event.channel, thread_ts: job.event.thread_ts ?? job.event.ts }
+        ? { channel: job.event.channel, thread_ts: replyThreadTs(job.event) }
         : { channel: job.event.item.channel, thread_ts: job.event.item.ts };
     await postMessage(env, {
       ...target,
@@ -198,11 +198,48 @@ async function onMessageVisiblyFailing(env: Env, msg: SlackMessageEvent): Promis
     console.error(`[slack] onMessage failed: ${err instanceof Error ? err.message : String(err)}`);
     await postMessage(env, {
       channel: msg.channel,
-      thread_ts: msg.thread_ts ?? msg.ts,
+      thread_ts: replyThreadTs(msg),
       text: ":warning: I hit an internal error on that one — try again, and if it repeats flag it in #uno-bot.",
     }).catch(() => {});
     return "handled";
   }
+}
+
+// ── DM = chat, channel = thread ──────────────────────────────────────────────
+//
+// Under agent_view a DM with the app reads as an ordinary direct message, not a
+// list of threads. That splits one value this file used to treat as one thing:
+//
+//   replyThreadTs()   where a REPLY goes.  undefined = post at channel level.
+//   conversationTs()  what identifies the CONVERSATION, for history and for the
+//                     per-conversation AgentRunner key.
+//
+// In a channel they stay identical — an @mention opens a thread and everything
+// hangs off its root, unchanged. In a DM they diverge: replies land inline, and
+// the whole DM is one rolling conversation instead of one per message.
+//
+// A DM the user explicitly threaded still threads: agent_view keeps in-thread
+// replies, so an opened thread is a deliberate signal, not a leftover.
+type ThreadedEvent = { channel: string; ts: string; thread_ts?: string };
+
+function isDm(channel: string): boolean {
+  return channel.startsWith("D");
+}
+
+function replyThreadTs(e: ThreadedEvent): string | undefined {
+  return isDm(e.channel) ? e.thread_ts : (e.thread_ts ?? e.ts);
+}
+
+// Constant, not the message ts: every unthreaded message in a DM has to resolve
+// to the SAME conversation, or each line would start with an empty history.
+const DM_CONVERSATION = "dm";
+
+function conversationTs(e: ThreadedEvent): string {
+  return isDm(e.channel) ? (e.thread_ts ?? DM_CONVERSATION) : (e.thread_ts ?? e.ts);
+}
+
+function conversationKey(e: ThreadedEvent): string {
+  return `${e.channel}:${conversationTs(e)}`;
 }
 
 function appMentionToMessage(e: SlackAppMentionEvent): SlackMessageEvent {
@@ -340,7 +377,10 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   const channel = event.channel;
   const userId = event.user!;
   const userMsgTs = event.ts;
-  const threadTs = event.thread_ts ?? event.ts;
+  const threadTs = replyThreadTs(event);
+  // History + runner ordering key on the CONVERSATION, which in a DM is the whole
+  // channel — threadTs above may be undefined there and is only a post target.
+  const convTs = conversationTs(event);
   const userText = stripBotMentions(event.text!);
 
   await addReaction(env, channel, userMsgTs, "eyes");
@@ -358,10 +398,10 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   let prd: Awaited<ReturnType<typeof extractPrdFromThreadRoot>>;
   try {
     [history, pending, prd] = await Promise.all([
-      buildThreadHistory(env, channel, threadTs, userMsgTs),
-      loadPendingProposalByThread(env, channel, threadTs),
+      buildThreadHistory(env, channel, convTs, event.thread_ts, userMsgTs),
+      loadPendingProposalByThread(env, channel, convTs),
       isThreadReply
-        ? extractPrdFromThreadRoot(env, channel, threadTs)
+        ? extractPrdFromThreadRoot(env, channel, event.thread_ts!)
         : Promise.resolve(null),
     ]);
   } catch (err) {
@@ -384,7 +424,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       // was removed here and everywhere else that gated on requesterUserId.
       await resolveProposal(env, pending, bareDecision);
       await recordExchange(
-        env, channel, threadTs, userText,
+        env, channel, convTs, userText,
         bareDecision === "confirm" ? "(confirmed — executing the proposal)" : "Cancelled.",
       );
       return;
@@ -398,7 +438,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // messages are always threaded (plain top-level DMs skip the lookup). May be
   // one hop stale: Slack doesn't order context_changed vs the message event.
   const panelContext = isAssistantThread(channel) && event.thread_ts
-    ? formatAssistantContext(await loadAssistantContext(env, channel, threadTs))
+    ? formatAssistantContext(await loadAssistantContext(env, channel, convTs))
     : null;
 
   // Vision: pasted images + a linked Figma frame become base64 image blocks on
@@ -455,7 +495,8 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       history,
       slack: {
         channel,
-        threadTs,
+        // A real ts, not convTs: tool-side posts still thread off the user message.
+        threadTs: event.thread_ts ?? event.ts,
         userMsgTs,
         requestedBy: userId,
         notionPrdId: prd?.id,
@@ -482,10 +523,10 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     // timeout ships the original draft (fail open — see agent/draft-judge.ts).
     const reviewed = await reviewDraft(env, { userText: vision.modelText, draft: result.text });
     const delivery = await postTextVerified(env, channel, threadTs, reviewed.text);
-    await appendHistory(env, channel, threadTs, { role: "user", content: vision.historyText });
+    await appendHistory(env, channel, convTs, { role: "user", content: vision.historyText });
     if (delivery.ok) {
       // Record what was actually posted (capped/placeholder), not the raw text.
-      await appendHistory(env, channel, threadTs, { role: "assistant", content: delivery.text });
+      await appendHistory(env, channel, convTs, { role: "assistant", content: delivery.text });
       await addReaction(env, channel, userMsgTs, "white_check_mark");
     } else {
       // Never ✅ a reply that was never delivered.
@@ -500,7 +541,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     await resolveProposal(env, result.pending, result.decision, result.messageToUser);
     const finalText = result.messageToUser
       ?? (result.decision === "confirm" ? "Got it — kicking that off." : "Cancelled.");
-    await recordExchange(env, channel, threadTs, vision.historyText, finalText);
+    await recordExchange(env, channel, convTs, vision.historyText, finalText);
     return;
   }
 
@@ -521,7 +562,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   const gate = await preflight(result.toolName, result.input, { env, prd, implementPrdUrl });
   if (gate) {
     await postMessage(env, { channel, thread_ts: threadTs, text: gate.ask });
-    await recordExchange(env, channel, threadTs, vision.historyText, gate.ask);
+    await recordExchange(env, channel, convTs, vision.historyText, gate.ask);
     return;
   }
 
@@ -541,7 +582,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       `:hourglass: That exact *${proposalVerb(result.toolName)}* proposal is already waiting on you — ` +
       `react :white_check_mark: / :x: on it, or say "go ahead" / "cancel". I won't post a duplicate card.`;
     await postMessage(env, { channel, thread_ts: threadTs, text: remind });
-    await recordExchange(env, channel, threadTs, vision.historyText, remind);
+    await recordExchange(env, channel, convTs, vision.historyText, remind);
     return;
   }
 
@@ -550,7 +591,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // Don't re-card a cancelled action; require an explicit revival. The check
   // window is the last few turns, so one clarifying exchange clears it.
   try {
-    const doHistory = await loadHistory(env, channel, threadTs);
+    const doHistory = await loadHistory(env, channel, convTs);
     const justCancelled = doHistory
       .slice(-3)
       .some((t) => t.role === "assistant" && t.content.includes(`(Cancelled the proposed ${result.toolName}`));
@@ -559,7 +600,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
         `:leftwards_arrow_with_hook: You cancelled that ${proposalVerb(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
         `Changed your mind? Say so explicitly and I'll stage it again — or tell me what you'd like instead.`;
       await postMessage(env, { channel, thread_ts: threadTs, text: ask });
-      await recordExchange(env, channel, threadTs, vision.historyText, ask);
+      await recordExchange(env, channel, convTs, vision.historyText, ask);
       return;
     }
   } catch (err) {
@@ -621,7 +662,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       toolName: result.toolName,
       input: result.input,
       channel,
-      threadTs,
+      threadTs: convTs,
       userMsgTs,
       proposalTs: posted.ts,
       proposalText,
@@ -736,12 +777,20 @@ function stableStringify(v: unknown): string {
 // same-role turns this produces.
 const THREAD_HISTORY_LIMIT = 100;
 
+// Two different ts values on purpose (see replyThreadTs/conversationTs):
+//   convTs   — the conversation's identity, for the DO-history fallback.
+//   threadTs — a REAL Slack thread root, when one exists. conversations.replies
+//              needs one; an agent_view DM has none, so that read is skipped and
+//              the DO history is the only source. Passing convTs there would ask
+//              Slack for a thread called "dm".
 async function buildThreadHistory(
   env: Env,
   channel: string,
-  threadTs: string,
+  convTs: string,
+  threadTs: string | undefined,
   currentTs: string,
 ): Promise<HistoryTurn[]> {
+  if (!threadTs) return loadHistory(env, channel, convTs);
   try {
     const [identity, replies] = await Promise.all([
       getBotIdentity(env),
@@ -761,5 +810,5 @@ async function buildThreadHistory(
   } catch (err) {
     console.warn(`[history] thread read failed, using DO fallback: ${err instanceof Error ? err.message : String(err)}`);
   }
-  return loadHistory(env, channel, threadTs);
+  return loadHistory(env, channel, convTs);
 }
