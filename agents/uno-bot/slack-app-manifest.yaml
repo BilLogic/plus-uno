@@ -43,15 +43,9 @@
 # channel_type), recorded here because the manifest is what commits to it.
 #
 # ── KNOWN-WRONG, DELIBERATELY UNCHANGED ──────────────────────────────────────
-# settings.interactivity.request_url points at a Netlify function that does not
-# exist (confirmed 404). No such function is in this repo and no netlify.toml
-# redirect reaches one. Nothing consumes interaction payloads either: there is
-# no /slack/interactive route, and every Block Kit button is a plain URL button
-# with no action_id, so Slack has nothing to deliver. It is dead config rather
-# than a live break — and it stops being merely dead the first time someone
-# ships an action button. Left as-is because is_mcp_enabled is true and it is
-# not established here whether the Slack MCP surface needs interactivity
-# enabled; decide that before flipping it off or pointing it at the Worker.
+# (interactivity is FIXED, not known-wrong: the request_url pointed at a Netlify
+# function that never existed. It now points at the Worker's /slack/interactive
+# route. This is the third intentional difference from live.)
 #
 # (messages_tab_enabled moved above — it is now an intended change, not a
 # question, since the DM is meant to read as an ordinary chat.)
@@ -196,7 +190,10 @@ settings:
       - reaction_removed
   interactivity:
     is_enabled: true
-    request_url: https://plus-uno.netlify.app/.netlify/functions/slack-interactivity
+    # Repointed from a Netlify function that never existed (confirmed 404) to the
+    # Worker, which already owns every other Slack surface and already has the
+    # signature verification and the DO enqueue path an interaction needs.
+    request_url: https://uno-bot.bryanhuang628.workers.dev/slack/interactive
   org_deploy_enabled: false
   socket_mode_enabled: false
   token_rotation_enabled: false
