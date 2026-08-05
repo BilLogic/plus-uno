@@ -9,7 +9,6 @@ description: >
   user says "share this for feedback", "post a share-out", "set up a feedback
   session", "hand this off to dev", "publish", "submit to market", or
   "register this prototype".
-user-invocable: true
 argument-hint: [prototype-or-project]
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Task, mcp__notion-plus__*
 ---

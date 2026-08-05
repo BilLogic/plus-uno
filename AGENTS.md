@@ -38,6 +38,8 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 
 Routing: match intent to the Use-when column; if ambiguous, ask which capability is meant. Each skill's `SKILL.md` is the IDE face, `bot.md` the Worker face; both load `references/method.md`.
 
+**How a skill reaches a user.** `skills/` is canonical but is not a discovery path for anything — Claude Code reads `.claude/skills/`, Cursor reads that same directory (plus its own), and Slack reads the app manifest. `npm run generate:skill-surfaces` publishes all three from the canonical frontmatter: `.claude/skills/<name>/SKILL.md` stubs that put `/uno-*` in both IDEs' slash menus, `agents/uno-bot/src/generated/slack-commands.ts` for the Worker's `/slack/commands` route, and `agents/uno-bot/slack-app-manifest-commands.yaml` to paste at api.slack.com. All three are generated — edit the canonical `SKILL.md`, never a surface; `npm run check:skill-surfaces` fails the monthly sweep on drift. A Slack `/uno-*` run posts a public framing message and threads under it, so history, the emoji gate, and proposals behave exactly as they do for an @mention.
+
 ## Agents — what skills summon
 
 `agents/` holds three plain kinds plus the embodiment: **researchers/** (gather), **reviewers/** (judge), **writers/** (notion · figma · blueprint — the *only* agents that write to external estates). Roster, anatomy, and the creation rule: `agents/README.md`. Agents are internal — never taught to users, never invoked directly.

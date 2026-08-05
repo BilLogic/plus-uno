@@ -12,7 +12,6 @@ description: >
   summarizing prior studies, ingesting pasted context, or drafting PRDs — that
   is uno-synthesize.
 context: fork
-user-invocable: true
 argument-hint: [question / hunch / who-knows-X]
 allowed-tools: Read, Grep, Glob, Task, WebSearch, mcp__notion-plus__API-post-search, mcp__notion-plus__API-retrieve-page-markdown, mcp__notion-plus__API-get-block-children, mcp__notion-plus__API-query-data-source
 ---
