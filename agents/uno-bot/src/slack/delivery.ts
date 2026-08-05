@@ -50,10 +50,12 @@ async function alertCapacity(env: Env, err: unknown): Promise<void> {
 // failure path can never re-throw into silence (R2's ":eyes: then nothing").
 // Pass `err` so capacity/quota outages surface distinctly (clearer user message
 // + a throttled team alert) instead of the generic "something went wrong".
+// threadTs is optional: in an agent_view DM there is no thread, and an
+// undefined thread_ts posts at channel level.
 export async function postVisibleFailure(
   env: Env,
   channel: string,
-  threadTs: string,
+  threadTs: string | undefined,
   userMsgTs: string,
   err?: unknown,
 ): Promise<void> {
@@ -124,7 +126,7 @@ function stripTrailingConfidence(text: string): string {
 export async function postTextVerified(
   env: Env,
   channel: string,
-  threadTs: string,
+  threadTs: string | undefined,
   text: string,
 ): Promise<{ ok: boolean; text: string }> {
   const cleaned = stripTrailingConfidence(text);
