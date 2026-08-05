@@ -163,9 +163,14 @@ oauth_config:
       - reactions:read
       - reactions:write
       - search:read.files
-      - search:read.im
-      - search:read.mpim
-      - search:read.private
+      # search:read.im / .mpim / .private are DELIBERATELY ABSENT from the BOT
+      # block. A bot token's visibility is the BOT's own membership — not the
+      # requesting user's — and the bot is a participant in every user's DM with
+      # itself. Granting them would let a bot-token search surface one person's
+      # DM with uno-bot in answer to someone else's question, routing around the
+      # own-DM surface gate that ADR-020 exists to enforce. They remain on the
+      # USER block below, where a token can only ever see its own owner's
+      # conversations. Nothing in the Worker searches with a bot token today.
       - search:read.public
       - search:read.users
       - team:read
