@@ -22,11 +22,15 @@
 #     grounding under the DM conversation key.
 #
 # The legacy pair (assistant_thread_started, assistant_thread_context_changed)
-# stays listed ON PURPOSE, and stays handled. Slack has not confirmed the app is
-# off the assistant surface for every client, and dropping the pair before the
-# replacements are observed in production would delete working grounding and the
-# panel greeting. Delete them only after the new events are seen arriving —
-# check the Worker logs for `app_context_changed`, not this file.
+# is GONE as of 2026-08-06 — unsubscribed here and deleted from src/slack/. The
+# migration to agent_view is complete and irreversible by Slack's own design, so
+# there is no configuration these would serve. An arrival now would be a
+# Slack-side surprise, and shows up in the unhandled-event log.
+#
+# ⚠️ Event-subscription changes do NOT apply from this file. pkce_enabled makes
+# apps.manifest.update reject every payload, so the manifest editor is dead for
+# this app — edit subscriptions on the Event Subscriptions page instead, then
+# confirm with `npm run slack:diff`.
 #
 # ── SCOPE: THIS CHANGES DMs ONLY ─────────────────────────────────────────────
 # agent_view governs the app's own DM / Messages surface. Channels are
@@ -176,8 +180,6 @@ settings:
       - app_context_changed
       - app_home_opened
       - app_mention
-      - assistant_thread_context_changed
-      - assistant_thread_started
       - emoji_changed
       - message.channels
       - message.groups

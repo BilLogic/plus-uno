@@ -19,8 +19,6 @@ import {
 } from "../thread-state-client";
 import { addReaction, conversationsReplies, getBotIdentity, postMessage } from "./api";
 import {
-  handleAssistantThreadStarted,
-  handleAssistantThreadContextChanged,
   handleAgentDmOpened,
   handleAppContextChanged,
   setStatus,
@@ -39,8 +37,6 @@ import {
   type SlackEventCallback,
   type SlackUrlVerification,
   type SlackEnvelope,
-  type SlackAssistantThreadStartedEvent,
-  type SlackAssistantThreadContextChangedEvent,
   type SlackAppHomeOpenedEvent,
   type SlackAppContextChangedEvent,
   type RunnerJobPayload,
@@ -119,18 +115,11 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
       await enqueueAgentJob(env, { kind: "reaction", event: r }, `${r.item.channel}:${r.item.ts}`);
       return;
     }
-    case "assistant_thread_started": {
-      // Panel opened: greet + suggested prompts + title. Pure decoration, no
-      // agent run — safe to do inline (well under the 30s waitUntil budget).
-      await handleAssistantThreadStarted(env, event as SlackAssistantThreadStartedEvent);
-      return;
-    }
-    case "assistant_thread_context_changed": {
-      // User switched what they're viewing with the panel open — persist it so
-      // the next message can ground on it. No user-visible output.
-      await handleAssistantThreadContextChanged(env, event as SlackAssistantThreadContextChangedEvent);
-      return;
-    }
+    // assistant_thread_started / assistant_thread_context_changed are gone with
+    // the agent_view migration (2026-08-06). They no longer fire on this app's
+    // surface; app_home_opened(tab:"messages") and app_context_changed below
+    // are their replacements. Unsubscribed in the manifest too, so an arrival
+    // would be a Slack-side surprise worth seeing in the unhandled log.
     case "app_home_opened": {
       const e = event as SlackAppHomeOpenedEvent;
       // Two surfaces, one event. tab==="home" publishes the landing view;
