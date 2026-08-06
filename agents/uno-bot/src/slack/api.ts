@@ -120,6 +120,13 @@ export interface PostMessageInput {
   blocks?: unknown[];
 }
 
+// NOTE ON THE DISPLAY NAME. The bot presents as "Le Goat" because the bot
+// user's display_name says so (set in app settings, 2026-08-06) — NOT via a
+// per-message `username` override. An override was tried and reverted: Slack
+// ignores or mis-attributes it on the agent surface, and two sources of truth
+// for one name is how they drift. Slack derives the @handle from display_name,
+// so the mention moved to @le goat with it; the app name stays "Uno-bot", which
+// is what search matches on.
 export async function postMessage(env: Env, input: PostMessageInput) {
   // Coerce the body to valid Slack mrkdwn at the single egress point — the model
   // slips into GitHub-flavored Markdown (## / **bold** / tables) under load, and

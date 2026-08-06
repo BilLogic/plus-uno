@@ -51,16 +51,35 @@
 # (messages_tab_enabled moved above — it is now an intended change, not a
 # question, since the DM is meant to read as an ordinary chat.)
 display_information:
+  # App NAME stays "Uno-bot" — this is what App Directory search matches, so it
+  # is how people still find the bot by its old name. The bot USER's display
+  # name is "Le Goat" (features.bot_user below), which is what appears on every
+  # message. Slack has no separate handle field: the @mention follows
+  # display_name, so it is now @le goat.
   name: Uno-bot
   description: PLUS design team's Slack-native AI teammate
-  background_color: "#000000"
+  # long_description was never set on the app (confirmed absent from
+  # apps.manifest.export, 2026-08-06) — the App Directory entry has been blank
+  # since day one. Max 4000 chars; only shows once the app is submitted/listed.
+  long_description: |-
+    UNO Bot is the PLUS design team's Slack-native teammate. It answers from live sources rather than memory — Notion (Roadmap cards, PRDs, the team and app directories), GitHub, the service blueprint, the design system, and Slack itself — and every answer carries links back to what it read.
+
+    What it does:
+    • Answers, grounded. Card status, owner and pillar; how a product flow actually works; which design-system components and tokens exist and where their docs live. If something is stale, missing, or not built yet, it says so instead of guessing.
+    • Creates, with your approval. Drafts a PRD, files or updates a Roadmap card, kicks off a component build or a prototype, shares work for feedback. Anything that writes waits for your ✅ first — the friction is the feature.
+    • Hands off. Work that needs real code comes back as a ready-to-paste prompt for your IDE agent.
+
+    Reach it by DM, by @mention in a channel, in a thread it is already part of, or through the /uno-* slash commands (research, synthesize, prototype, review, publish, maintain).
+
+    Searching Slack runs on your own credentials once you link them, so results are scoped to what you can already see. Until then it searches public channels only. Nothing retrieved is stored: metadata is kept, content is re-read live each time.
+  background_color: "#1f1f1f"
 features:
   app_home:
     home_tab_enabled: true
     messages_tab_enabled: true
     messages_tab_read_only_enabled: false
   bot_user:
-    display_name: UNO Bot
+    display_name: Le Goat
     always_online: true
   slash_commands:
     - command: /uno-prototype
