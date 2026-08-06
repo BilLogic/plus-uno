@@ -130,6 +130,56 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
     return Response.json(await probeSlackSearch(env, url.searchParams.get("q") ?? "design"));
   }
 
+  // Live probe of chat.startStream, which has rejected every argument shape we
+  // have tried with `invalid_arguments` and names no field (r34–r40).
+  //
+  // A route, not a log line: the agent path runs inside a Durable Object, and a
+  // DO keeps the script version it was instantiated with until evicted — so
+  // several "streaming still fails" readings were actually stale code running.
+  // This runs in the Worker, so what deploys is what answers.
+  //
+  // ?channel= (required) ?thread_ts= ?user= ?team= — each argument independently
+  // omittable, so the failing one can be bisected. Returns Slack's raw response.
+  // Auth-gated: it posts a real (empty) stream to the channel on success.
+  if (request.method === "GET" && url.pathname === "/debug/slack-stream") {
+    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
+    const channel = url.searchParams.get("channel");
+    if (!channel) return Response.json({ ok: false, error: "channel required" }, { status: 400 });
+    // ?stop=<ts> closes a stream this probe opened. A started-and-never-stopped
+    // stream spins in the client forever, so the probe has to be able to tidy up
+    // after itself.
+    const stopTs = url.searchParams.get("stop");
+    if (stopTs) {
+      const r = await countedFetch("https://slack.com/api/chat.stopStream", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json; charset=utf-8",
+          authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
+        },
+        body: JSON.stringify({ channel, ts: stopTs }),
+      });
+      return Response.json({ stopped: stopTs, slack: await r.json() });
+    }
+    const payload: Record<string, unknown> = { channel };
+    for (const [param, field] of [
+      ["thread_ts", "thread_ts"],
+      ["user", "recipient_user_id"],
+      ["team", "recipient_team_id"],
+    ] as const) {
+      const v = url.searchParams.get(param);
+      if (v) payload[field] = v;
+    }
+    const res = await countedFetch("https://slack.com/api/chat.startStream", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    return Response.json({ sent: payload, status: res.status, slack: await res.json() });
+  }
+
   // Manual firing of the Figma library poll (same code path as the cron).
   // `?dry_run=1` diffs and reports without writing KV / Notion / Slack.
   // Auth-gated: a live run posts to Slack and files a PRD.
