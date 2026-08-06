@@ -139,6 +139,75 @@ export async function postMessage(env: Env, input: PostMessageInput) {
   });
 }
 
+// ── Streaming (chat.startStream / appendStream / stopStream) ─────────────────
+//
+// Opening a stream is what renders the native "thinking" state on the agent
+// surface. assistant.threads.setStatus cannot do it here: that addresses a
+// THREAD, and an agent_view DM has none — the channel is the conversation.
+//
+// The agent runs to completion inside a DO alarm before any text exists, so we
+// do NOT stream tokens. We open the stream when the turn starts (the indicator),
+// then append the finished answer and close. That is an honest use of the API:
+// the indicator is live, the text arrives when it arrives.
+//
+// EVERY call here is best-effort and returns null/false on failure. Streaming is
+// newer than this app's floor, so a workspace or plan that lacks it must degrade
+// to an ordinary postMessage rather than lose the answer.
+
+export async function startStream(
+  env: Env,
+  channel: string,
+  threadTs: string | undefined,
+): Promise<string | null> {
+  try {
+    const res = await slackCall<SlackResponse & { ts?: string }>(env, "chat.startStream", {
+      channel,
+      ...(threadTs ? { thread_ts: threadTs } : {}),
+    });
+    return res.ok && res.ts ? res.ts : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function appendStream(
+  env: Env,
+  channel: string,
+  ts: string,
+  markdownText: string,
+): Promise<boolean> {
+  try {
+    const res = await slackCall<SlackResponse>(env, "chat.appendStream", {
+      channel,
+      ts,
+      markdown_text: markdownText,
+    });
+    return !!res.ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Close the stream. Blocks are only accepted here — which is why the feedback
+ *  footer can ride along on the final frame. */
+export async function stopStream(
+  env: Env,
+  channel: string,
+  ts: string,
+  blocks?: Array<Record<string, unknown>>,
+): Promise<boolean> {
+  try {
+    const res = await slackCall<SlackResponse>(env, "chat.stopStream", {
+      channel,
+      ts,
+      ...(blocks?.length ? { blocks } : {}),
+    });
+    return !!res.ok;
+  } catch {
+    return false;
+  }
+}
+
 export async function addReaction(
   env: Env,
   channel: string,
