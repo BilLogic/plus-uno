@@ -120,6 +120,13 @@ export interface PostMessageInput {
   blocks?: unknown[];
 }
 
+// NOTE ON THE DISPLAY NAME. The bot presents as "Le Goat" because the bot
+// user's display_name says so (set in app settings, 2026-08-06) — NOT via a
+// per-message `username` override. An override was tried and reverted: Slack
+// ignores or mis-attributes it on the agent surface, and two sources of truth
+// for one name is how they drift. Slack derives the @handle from display_name,
+// so the mention moved to @le goat with it; the app name stays "Uno-bot", which
+// is what search matches on.
 export async function postMessage(env: Env, input: PostMessageInput) {
   // Coerce the body to valid Slack mrkdwn at the single egress point — the model
   // slips into GitHub-flavored Markdown (## / **bold** / tables) under load, and
@@ -130,6 +137,89 @@ export async function postMessage(env: Env, input: PostMessageInput) {
     ...input,
     ...(input.text ? { text: toSlackMrkdwn(input.text) } : {}),
   });
+}
+
+// ── Streaming (chat.startStream / appendStream / stopStream) ─────────────────
+//
+// Opening a stream is what renders the native "thinking" state on the agent
+// surface. assistant.threads.setStatus cannot do it here: that addresses a
+// THREAD, and an agent_view DM has none — the channel is the conversation.
+//
+// The agent runs to completion inside a DO alarm before any text exists, so we
+// do NOT stream tokens. We open the stream when the turn starts (the indicator),
+// then append the finished answer and close. That is an honest use of the API:
+// the indicator is live, the text arrives when it arrives.
+//
+// EVERY call here is best-effort and returns null/false on failure. Streaming is
+// newer than this app's floor, so a workspace or plan that lacks it must degrade
+// to an ordinary postMessage rather than lose the answer.
+
+export async function startStream(
+  env: Env,
+  channel: string,
+  threadTs: string | undefined,
+  recipientUserId?: string,
+  recipientTeamId?: string,
+): Promise<string | null> {
+  // thread_ts is REQUIRED (a stream is a threaded message), and
+  // recipient_user_id / recipient_team_id are required "when streaming to
+  // channels" — which includes a DM. Omitting the pair returns
+  // invalid_arguments, with nothing in the error naming the missing field.
+  try {
+    const res = await slackCall<SlackResponse & { ts?: string }>(env, "chat.startStream", {
+      channel,
+      ...(threadTs ? { thread_ts: threadTs } : {}),
+      ...(recipientUserId ? { recipient_user_id: recipientUserId } : {}),
+      ...(recipientTeamId ? { recipient_team_id: recipientTeamId } : {}),
+    });
+    if (res.ok && res.ts) return res.ts;
+    // Say WHY. A silent null here is indistinguishable from "streaming is off",
+    // which cost a deploy cycle to diagnose: the fallback works, so the only
+    // symptom is a missing indicator.
+    console.warn(`[slack] chat.startStream declined: ${res.error ?? "no ts in response"}`);
+    return null;
+  } catch (err) {
+    console.warn(`[slack] chat.startStream threw: ${err instanceof Error ? err.message : String(err)}`);
+    return null;
+  }
+}
+
+export async function appendStream(
+  env: Env,
+  channel: string,
+  ts: string,
+  markdownText: string,
+): Promise<boolean> {
+  try {
+    const res = await slackCall<SlackResponse>(env, "chat.appendStream", {
+      channel,
+      ts,
+      markdown_text: markdownText,
+    });
+    return !!res.ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Close the stream. Blocks are only accepted here — which is why the feedback
+ *  footer can ride along on the final frame. */
+export async function stopStream(
+  env: Env,
+  channel: string,
+  ts: string,
+  blocks?: Array<Record<string, unknown>>,
+): Promise<boolean> {
+  try {
+    const res = await slackCall<SlackResponse>(env, "chat.stopStream", {
+      channel,
+      ts,
+      ...(blocks?.length ? { blocks } : {}),
+    });
+    return !!res.ok;
+  } catch {
+    return false;
+  }
 }
 
 export async function addReaction(

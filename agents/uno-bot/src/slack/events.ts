@@ -17,10 +17,17 @@ import {
   savePendingProposal,
   type HistoryTurn,
 } from "../thread-state-client";
-import { addReaction, conversationsReplies, getBotIdentity, postMessage } from "./api";
 import {
-  handleAssistantThreadStarted,
-  handleAssistantThreadContextChanged,
+  addReaction,
+  conversationsReplies,
+  getBotIdentity,
+  postMessage,
+  startStream,
+  stopStream,
+} from "./api";
+import {
+  handleAgentDmOpened,
+  handleAppContextChanged,
   setStatus,
   isAssistantThread,
   formatAssistantContext,
@@ -37,9 +44,8 @@ import {
   type SlackEventCallback,
   type SlackUrlVerification,
   type SlackEnvelope,
-  type SlackAssistantThreadStartedEvent,
-  type SlackAssistantThreadContextChangedEvent,
   type SlackAppHomeOpenedEvent,
+  type SlackAppContextChangedEvent,
   type RunnerJobPayload,
 } from "./types";
 import { collectVisionInputs } from "./vision";
@@ -116,22 +122,28 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
       await enqueueAgentJob(env, { kind: "reaction", event: r }, `${r.item.channel}:${r.item.ts}`);
       return;
     }
-    case "assistant_thread_started": {
-      // Panel opened: greet + suggested prompts + title. Pure decoration, no
-      // agent run — safe to do inline (well under the 30s waitUntil budget).
-      await handleAssistantThreadStarted(env, event as SlackAssistantThreadStartedEvent);
-      return;
-    }
-    case "assistant_thread_context_changed": {
-      // User switched what they're viewing with the panel open — persist it so
-      // the next message can ground on it. No user-visible output.
-      await handleAssistantThreadContextChanged(env, event as SlackAssistantThreadContextChangedEvent);
-      return;
-    }
+    // assistant_thread_started / assistant_thread_context_changed are gone with
+    // the agent_view migration (2026-08-06). They no longer fire on this app's
+    // surface; app_home_opened(tab:"messages") and app_context_changed below
+    // are their replacements. Unsubscribed in the manifest too, so an arrival
+    // would be a Slack-side surprise worth seeing in the unhandled log.
     case "app_home_opened": {
-      // Home tab opened → publish the landing view. Inline (one API call, well
-      // under the waitUntil budget); the Messages-tab variant is ignored inside.
-      await handleAppHomeOpened(env, event as SlackAppHomeOpenedEvent);
+      const e = event as SlackAppHomeOpenedEvent;
+      // Two surfaces, one event. tab==="home" publishes the landing view;
+      // tab==="messages" is agent_view's DM-opened signal (the replacement for
+      // assistant_thread_started) and refreshes the suggested prompts.
+      if (e.tab === "messages") {
+        await handleAgentDmOpened(env, e.channel, e.user);
+        return;
+      }
+      await handleAppHomeOpened(env, e);
+      return;
+    }
+    case "app_context_changed": {
+      // agent_view's replacement for assistant_thread_context_changed: the user
+      // switched what they're looking at. Stored under the DM conversation key
+      // so the next message grounds on it. No user-visible output.
+      await handleAppContextChanged(env, event as SlackAppContextChangedEvent, DM_CONVERSATION);
       return;
     }
     default:
@@ -172,6 +184,14 @@ export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey
     }).catch(() => {});
   }
 }
+
+// Streams opened for an in-flight turn, keyed by the user message that started
+// it. The opener (handleUserMessage) and the cleanup (onMessage's finally) are
+// different functions, and only the DO's own isolate runs a given turn, so a
+// module-level map is the narrowest handoff between them. Delivery deletes its
+// entry on success; whatever remains at exit is orphaned and gets closed.
+const openStreams = new Map<string, string>();
+const streamKey = (channel: string, ts: string) => `${channel}:${ts}`;
 
 // Entry point the AgentRunner DO alarm calls. Runs OUTSIDE waitUntil — no 30s
 // cutoff, fresh subrequest budget per alarm invocation. Returns "deferred" when
@@ -226,8 +246,22 @@ function isDm(channel: string): boolean {
   return channel.startsWith("D");
 }
 
+// Where the reply goes. In a channel: the existing thread, else a new one under
+// the message. In a DM: the existing thread, else a NEW thread under the user's
+// message.
+//
+// That DM branch reverses 74f1b17c ("DMs are chat, not threads"), deliberately
+// and with the tradeoff understood. chat.startStream requires a thread_ts, and
+// so does assistant.threads.setStatus — with a threadless DM there is no way to
+// show a thinking indicator at all, which is the affordance agent_view is
+// supposed to bring. Slack's own agent experience is threaded for this reason:
+// their docs describe "threads shown in a timeline above the composer".
+//
+// Conversation continuity is unaffected: the user still types in the composer,
+// so their next message arrives unthreaded and conversationTs() still resolves
+// every DM line to DM_CONVERSATION.
 function replyThreadTs(e: ThreadedEvent): string | undefined {
-  return isDm(e.channel) ? e.thread_ts : (e.thread_ts ?? e.ts);
+  return e.thread_ts ?? e.ts;
 }
 
 // Constant, not the message ts: every unthreaded message in a DM has to resolve
@@ -368,12 +402,20 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
     // which counts as handled. Only a hard kill skips this — by design, so the
     // lease can rescue it.
     await markEventRunDone(env, runKey);
+    // Close a stream the turn opened but never finished — a proposal, an early
+    // return, a throw. Delivery removes its own entry on success, so anything
+    // still here is orphaned, and an open stream spins forever in the client.
+    const orphan = openStreams.get(streamKey(event.channel, event.ts));
+    if (orphan) {
+      openStreams.delete(streamKey(event.channel, event.ts));
+      await stopStream(env, event.channel, orphan).catch(() => {});
+    }
     // Clear the assistant "thinking…" loader on every exit (success, early
     // return, or throw) — a stuck status line is worse than none. No-op off
     // the panel or if one was never set. Same thread_ts gate as the set: only
     // threaded DM turns (the panel's shape) can have a status to clear.
-    if (isAssistantThread(event.channel) && event.thread_ts) {
-      await setStatus(env, event.channel, event.thread_ts, "").catch(() => {});
+    if (isAssistantThread(event.channel)) {
+      await setStatus(env, event.channel, event.thread_ts ?? event.ts, "").catch(() => {});
     }
   }
   return "handled";
@@ -443,7 +485,12 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // a bare "yes" never pays the DO read; gated on thread_ts because panel
   // messages are always threaded (plain top-level DMs skip the lookup). May be
   // one hop stale: Slack doesn't order context_changed vs the message event.
-  const panelContext = isAssistantThread(channel) && event.thread_ts
+  // Gated on being the assistant/DM surface, NOT on thread_ts: under agent_view
+  // a DM has no thread, and requiring one skipped the lookup for every message
+  // on the new surface — silently dropping the grounding that app_context_changed
+  // stores. convTs already resolves to DM_CONVERSATION for a threadless DM, the
+  // same key handleAppContextChanged writes under.
+  const panelContext = isAssistantThread(channel)
     ? formatAssistantContext(await loadAssistantContext(env, channel, convTs))
     : null;
 
@@ -456,14 +503,28 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // says "bigger think underway" before the model starts. routeRequest is the
   // same zero-cost lane check runAgent uses.
   const { tier: previewTier } = routeRequest({ userText, hasPending: pending !== null });
+  // ts of the stream opened for this turn, threaded down to delivery so the
+  // answer closes the same message the indicator lives in. Null = no stream,
+  // deliver normally.
+  let streamTs: string | null = null;
   if (previewTier !== "haiku" || vision.images.length > 0) {
     await addReaction(env, channel, userMsgTs, "hourglass_flowing_sand").catch(() => {});
-    // On the assistant panel, the native "is thinking…" status is the idiomatic
-    // loader (a reaction reads oddly in the side panel). Cleared in onMessage's
-    // finally on every exit path. thread_ts gate: panel messages are always
-    // threaded, so plain top-level DMs skip the doomed-to-fail API call.
-    if (isAssistantThread(channel) && event.thread_ts) {
-      await setStatus(env, channel, threadTs, "is thinking…").catch(() => {});
+    if (isAssistantThread(channel)) {
+      // The native thinking indicator. Two mechanisms, in order of preference:
+      // chat.startStream (flagged off — Slack rejects our arguments, see
+      // Env.SLACK_STREAMING), then assistant.threads.setStatus, which works now
+      // that DM replies are threaded. The old code gated setStatus on
+      // event.thread_ts, so on the threadless agent surface it never fired once
+      // — that gate, not the API, is why the indicator was missing.
+      if (env.SLACK_STREAMING === "on") {
+        streamTs = await startStream(env, channel, threadTs, event.user, event.team);
+      }
+      if (streamTs) openStreams.set(streamKey(channel, event.ts), streamTs);
+      // Only fall back to setStatus where a thread genuinely exists (a threaded
+      // reply inside a DM). Without one there is nothing it can address.
+      if (!streamTs && threadTs) {
+        await setStatus(env, channel, threadTs, "is thinking…").catch(() => {});
+      }
     }
   }
 
@@ -531,7 +592,8 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     // a flagged failure. Short replies skip it entirely; any judge error or
     // timeout ships the original draft (fail open — see agent/draft-judge.ts).
     const reviewed = await reviewDraft(env, { userText: vision.modelText, draft: result.text });
-    const delivery = await postTextVerified(env, channel, threadTs, reviewed.text);
+    openStreams.delete(streamKey(channel, event.ts));
+    const delivery = await postTextVerified(env, channel, threadTs, reviewed.text, streamTs);
     await appendHistory(env, channel, convTs, { role: "user", content: vision.historyText });
     if (delivery.ok) {
       // Record what was actually posted (capped/placeholder), not the raw text.

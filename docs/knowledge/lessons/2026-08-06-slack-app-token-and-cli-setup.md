@@ -141,6 +141,11 @@ Consequences for bot design:
 - **Enabling PKCE is a one-way door for config-as-code.** After it, all manifest
   changes are UI-only. Decide up front whether scripted manifest management
   matters more than PKCE on the OAuth flow.
+- **The web manifest editor still works.** Only the API path is broken: pasting
+  the identical YAML into the App Manifest page saves without complaint
+  (verified 2026-08-06). Whatever the editor posts to does not run the same
+  validation, so "manifest edits are impossible" is too strong — the correct
+  claim is that they cannot be *scripted*.
 - The CLI remains useful read-only: `slack manifest info` and `slack manifest diff`
   both work and give a precise, machine-readable drift report against the repo.
 - Keep the repo YAML as documented intent and diff against it in CI; just do not

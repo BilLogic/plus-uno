@@ -10,26 +10,29 @@
 # deliberate config change. Pasting it back REPLACES the whole manifest, so read
 # the diff first; additive changes are safer made through the feature pages.
 #
-# ── TWO INTENTIONAL DIFFERENCES FROM LIVE ────────────────────────────────────
-# Both complete a migration the app already half-made: it declares
-# features.agent_view — the current agent messaging experience — while its code
-# and events are still written for the retired assistant_view. New surface
-# declared, old surface implemented.
+# ── IN SYNC WITH LIVE (verified `npm run slack:diff`, 2026-08-06) ────────────
+# `messages_tab_enabled: true` and the `app_context_changed` subscription are
+# both applied on the app now, and the handlers for the agent surface shipped
+# with them:
 #
-# 1. `messages_tab_enabled: true` (live: false). agent_view puts agent
-#    conversations in the Messages tab, so the DM reads as an ordinary chat —
-#    no History tab, no "New Chat" button. With the tab off, the surface the
-#    manifest claims has nowhere to live.
-#
-# 2. `app_context_changed` subscribed. It is agent_view's replacement for
-#    assistant_thread_context_changed, and it is the only source for the
-#    "what you're currently looking at" grounding that loadAssistantContext
-#    reads. Nothing feeds it on the new surface today.
+#   app_home_opened (tab: "messages")  -> handleAgentDmOpened     — agent_view's
+#     replacement for assistant_thread_started; refreshes suggested prompts.
+#   app_context_changed                -> handleAppContextChanged — replacement
+#     for assistant_thread_context_changed; stores the "what you're looking at"
+#     grounding under the DM conversation key.
 #
 # The legacy pair (assistant_thread_started, assistant_thread_context_changed)
-# stays listed on purpose. Dropping it before src/slack/ handles the
-# replacements would delete grounding and the panel greeting that still work.
-# Ship the handlers, confirm the new events arrive, then delete the pair.
+# is GONE as of 2026-08-06 — unsubscribed here and deleted from src/slack/. The
+# migration to agent_view is complete and irreversible by Slack's own design, so
+# there is no configuration these would serve. An arrival now would be a
+# Slack-side surprise, and shows up in the unhandled-event log.
+#
+# ⚠️ The API cannot apply this file; the WEB EDITOR can. pkce_enabled makes
+# apps.manifest.update / .validate reject every payload — including Slack's own
+# unmodified export — so `slack manifest sync` and any scripted push fail with
+# cannot_disable_once_enabled. Pasting the same YAML into the App Manifest page
+# saves fine (verified 2026-08-06). So: paste by hand, then confirm with
+# `npm run slack:diff`.
 #
 # ── SCOPE: THIS CHANGES DMs ONLY ─────────────────────────────────────────────
 # agent_view governs the app's own DM / Messages surface. Channels are
@@ -37,10 +40,15 @@
 # it, the emoji proposal gate still keys off the reacted message, and a /uno-*
 # slash command still posts a framing message and threads its run beneath.
 #
-# In the DM the conversation model changes by design — chat, not threads — so
-# the DM channel itself is the conversation rather than each thread within it.
-# That is a code decision (the runner key and history load branch on
-# channel_type), recorded here because the manifest is what commits to it.
+# DM replies are THREADED (changed 2026-08-06, reversing 74f1b17c's "chat, not
+# threads"). Both thinking-indicator mechanisms Slack offers —
+# assistant.threads.setStatus and chat.startStream — require a thread_ts, so a
+# threadless DM could never show one. Slack's own agent experience threads for
+# the same reason: "threads shown in a timeline above the composer".
+#
+# Continuity is unchanged: the user types in the composer, so their next message
+# still arrives unthreaded and conversationTs() resolves every DM line to the
+# single DM_CONVERSATION key.
 #
 # ── KNOWN-WRONG, DELIBERATELY UNCHANGED ──────────────────────────────────────
 # (interactivity is FIXED, not known-wrong: the request_url pointed at a Netlify
@@ -50,16 +58,35 @@
 # (messages_tab_enabled moved above — it is now an intended change, not a
 # question, since the DM is meant to read as an ordinary chat.)
 display_information:
+  # App NAME stays "Uno-bot" — this is what App Directory search matches, so it
+  # is how people still find the bot by its old name. The bot USER's display
+  # name is "le goat" (features.bot_user below), which is what appears on every
+  # message. Slack has no separate handle field: the @mention follows
+  # display_name, so it is now @le goat.
   name: Uno-bot
-  description: PLUS design team's Slack-native AI teammate
-  background_color: "#000000"
+  description: PLUS team's Slack-native AI teammate 🐐
+  # long_description was never set on the app (confirmed absent from
+  # apps.manifest.export, 2026-08-06) — the App Directory entry has been blank
+  # since day one. Max 4000 chars; only shows once the app is submitted/listed.
+  long_description: |-
+    UNO Bot is the PLUS design team's Slack-native teammate. It answers from live sources rather than memory — Notion (Roadmap cards, PRDs, the team and app directories), GitHub, the service blueprint, the design system, and Slack itself — and every answer carries links back to what it read.
+
+    What it does:
+    • Answers, grounded. Card status, owner and pillar; how a product flow actually works; which design-system components and tokens exist and where their docs live. If something is stale, missing, or not built yet, it says so instead of guessing.
+    • Creates, with your approval. Drafts a PRD, files or updates a Roadmap card, kicks off a component build or a prototype, shares work for feedback. Anything that writes waits for your ✅ first — the friction is the feature.
+    • Hands off. Work that needs real code comes back as a ready-to-paste prompt for your IDE agent.
+
+    Reach it by DM, by @mention in a channel, in a thread it is already part of, or through the /uno-* slash commands (research, synthesize, prototype, review, publish, maintain).
+
+    Searching Slack runs on your own credentials once you link them, so results are scoped to what you can already see. Until then it searches public channels only. Nothing retrieved is stored: metadata is kept, content is re-read live each time.
+  background_color: "#1f1f1f"
 features:
   app_home:
     home_tab_enabled: true
     messages_tab_enabled: true
     messages_tab_read_only_enabled: false
   bot_user:
-    display_name: UNO Bot
+    display_name: le goat
     always_online: true
   slash_commands:
     - command: /uno-prototype
@@ -94,7 +121,19 @@ features:
       should_escape: false
   agent_view:
     agent_description: "Your 🐐 PLUS design teammate: I pull live, cited answers on roadmap cards, product flows, and design-system assets across Notion, Figma, and Slack. I flag anything outdated or unbuilt, and can draft PRDs, update cards, or start prototypes—with your approval first."
-    suggested_prompts: []
+    # Static fallback chips, shown before the Worker's setSuggestedPrompts call
+    # lands (handleAgentDmOpened). Empty meant a cold open showed nothing until
+    # the API round-tripped. Keep in sync with SUGGESTED_PROMPTS in
+    # src/slack/assistant.ts — same four, same wording.
+    suggested_prompts:
+      - title: "What's in progress?"
+        message: "What design cards are currently in progress on the Roadmap?"
+      - title: "Look up a component"
+        message: "Does the design system have a Badge component, and where are its docs?"
+      - title: "Who should I ask?"
+        message: "Who's the right person to talk to about goal-setting?"
+      - title: "Draft a PRD"
+        message: "Help me draft a PRD for a new feature idea."
 oauth_config:
   redirect_urls:
     - https://uno-bot.bryanhuang628.workers.dev/oauth/slack/callback
@@ -179,8 +218,6 @@ settings:
       - app_context_changed
       - app_home_opened
       - app_mention
-      - assistant_thread_context_changed
-      - assistant_thread_started
       - emoji_changed
       - message.channels
       - message.groups

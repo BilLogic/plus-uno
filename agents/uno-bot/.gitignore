@@ -5,3 +5,4 @@ dist/
 *.log
 .test-build/
 .playwright-mcp/
+.slack/apps.dev.json

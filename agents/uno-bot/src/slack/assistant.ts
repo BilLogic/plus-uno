@@ -20,8 +20,7 @@ import { saveAssistantContext } from "../thread-state-client";
 import { hasOwnSlackToken, slackConnectUrl } from "../oauth/slack";
 import type {
   AssistantContext,
-  SlackAssistantThreadStartedEvent,
-  SlackAssistantThreadContextChangedEvent,
+  SlackAppContextChangedEvent,
 } from "./types";
 
 export interface SuggestedPrompt {
@@ -44,13 +43,15 @@ export const SUGGESTED_PROMPTS: SuggestedPrompt[] = [
 async function setSuggestedPrompts(
   env: Env,
   channel: string,
-  thread_ts: string,
+  thread_ts: string | undefined,
   prompts: SuggestedPrompt[],
   title?: string,
 ): Promise<void> {
+  // thread_ts is omitted on the agent surface: prompts render at the top of the
+  // Messages tab, which belongs to the channel rather than to any one thread.
   await slackCall(env, "assistant.threads.setSuggestedPrompts", {
     channel_id: channel,
-    thread_ts,
+    ...(thread_ts ? { thread_ts } : {}),
     prompts,
     ...(title ? { title } : {}),
   });
@@ -73,18 +74,10 @@ export async function setStatus(
   });
 }
 
-async function setAssistantTitle(
-  env: Env,
-  channel: string,
-  thread_ts: string,
-  title: string,
-): Promise<void> {
-  await slackCall(env, "assistant.threads.setTitle", {
-    channel_id: channel,
-    thread_ts,
-    title,
-  });
-}
+// setAssistantTitle (assistant.threads.setTitle) was removed with the agent_view
+// migration: it names a THREAD, and the agent DM has none — the channel is the
+// conversation. If titled notifications are ever wanted, the pattern is
+// chat.postMessage then setTitle with the returned ts as thread_ts.
 
 /** Assistant threads are IM channels (id starts with "D"). Used to gate the
  *  status/loader affordances, which only apply to the assistant surface. */
@@ -126,43 +119,67 @@ function connectNudge(url: string): string {
   );
 }
 
-export async function handleAssistantThreadStarted(
+// The assistant_view handlers (handleAssistantThreadStarted /
+// ...ContextChanged) were deleted 2026-08-06 with the migration to agent_view.
+// Their replacements are handleAgentDmOpened and handleAppContextChanged below.
+// assistant_view is deprecated by Slack and the switch is irreversible, so
+// there is no path back that these would serve.
+
+/** agent_view: the user opened the Messages tab, i.e. a DM with us. Replaces
+ *  assistant_thread_started, which no longer fires on this surface.
+ *
+ *  The DM is the conversation, so there is no thread_ts anywhere — prompts
+ *  attach to the channel, and there is no thread to title.
+ *
+ *  Prompts refresh on every open (idempotent — Slack replaces the set). The
+ *  GREETING is once per user, ever: the Messages tab already holds the full DM
+ *  history, so posting it on each open would spam a live conversation. That
+ *  makes it real onboarding rather than a recurring banner.
+ */
+export async function handleAgentDmOpened(
   env: Env,
-  event: SlackAssistantThreadStartedEvent,
+  channel: string,
+  userId: string,
 ): Promise<void> {
-  const { channel_id, thread_ts, context } = event.assistant_thread;
-  const userId = event.assistant_thread.user_id;
-  // Persist the opening context so the first message can use it (message.im
-  // events carry no context of their own).
-  if (context) {
-    await saveAssistantContext(env, channel_id, thread_ts, context);
-  }
-  // Detect-and-direct: offer the consent link only when it's actionable
-  // (OAuth configured, user not yet connected). Best-effort — a failed token
-  // lookup just means a plain welcome.
-  let welcome = WELCOME;
-  try {
-    const url = slackConnectUrl(env);
-    if (url && userId && !(await hasOwnSlackToken(env, userId))) {
-      welcome += connectNudge(url);
-    }
-  } catch {
-    /* plain welcome */
-  }
-  // Fire the three decorations together — independent, all best-effort.
-  // allSettled (not all): one rejection must not cancel the in-flight siblings.
   await Promise.allSettled([
-    postMessage(env, { channel: channel_id, thread_ts, text: welcome }),
-    setSuggestedPrompts(env, channel_id, thread_ts, SUGGESTED_PROMPTS, "How can I help?"),
-    setAssistantTitle(env, channel_id, thread_ts, "Chat with UNO Bot"),
+    setSuggestedPrompts(env, channel, undefined, SUGGESTED_PROMPTS, "How can I help?"),
+    greetOnce(env, channel, userId),
   ]);
 }
 
-export async function handleAssistantThreadContextChanged(
+/** Post WELCOME the first time a user opens the DM, and never again.
+ *
+ *  Guarded by a KV flag written BEFORE the post: a double-fire (Slack retries,
+ *  two tabs) must not double-greet, and losing a greeting to a failed post is
+ *  cheaper than greeting twice. Without HARNESS_KV we cannot dedupe, so we stay
+ *  silent rather than risk greeting on every open.
+ */
+async function greetOnce(env: Env, channel: string, userId: string): Promise<void> {
+  const kv = env.HARNESS_KV;
+  if (!kv || !userId) return;
+  const key = `agent-dm-greeted:${userId}`;
+  if (await kv.get(key)) return;
+  await kv.put(key, new Date().toISOString());
+
+  let welcome = WELCOME;
+  try {
+    const url = slackConnectUrl(env);
+    if (url && !(await hasOwnSlackToken(env, userId))) welcome += connectNudge(url);
+  } catch {
+    /* plain welcome */
+  }
+  await postMessage(env, { channel, text: welcome });
+}
+
+/** agent_view's replacement for assistant_thread_context_changed. Stored under
+ *  the DM's conversation key (not a thread ts) so the next message in the chat
+ *  reads it — see conversationTs() in events.ts, which uses the same key. */
+export async function handleAppContextChanged(
   env: Env,
-  event: SlackAssistantThreadContextChangedEvent,
+  event: SlackAppContextChangedEvent,
+  dmConversationKey: string,
 ): Promise<void> {
-  const { channel_id, thread_ts, context } = event.assistant_thread;
-  // Overwrite the stored surface — the next message reads the latest.
-  await saveAssistantContext(env, channel_id, thread_ts, context ?? {});
+  const channel = event.channel ?? event.app_context?.channel_id;
+  if (!channel) return;
+  await saveAssistantContext(env, channel, dmConversationKey, event.app_context ?? {});
 }
