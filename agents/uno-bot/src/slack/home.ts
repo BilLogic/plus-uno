@@ -19,18 +19,22 @@ import { slackConnectUrl } from "../oauth/slack";
 // The Home view is a Block Kit document built per publish (cheap — no state,
 // just env-derived links) — typed loosely (Slack's block schema is large and
 // we hand-author valid blocks).
-const HOME_VIEW = {
-  type: "home",
-  blocks: [
-    { type: "header", text: { type: "plain_text", text: "UNO Bot 🐐", emoji: true } },
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text:
-          "*Your design-team teammate for PLUS.* I pull live, cited answers from Notion, GitHub, the service blueprint, and Slack — and I'll say plainly when something's stale or not built yet.",
-      },
+// Blocks above the connect prompt. Kept short on purpose: the link is the one
+// action a new user can take that changes what I can answer, so it sits high
+// rather than below three screens of capability copy (it used to be last).
+const HOME_INTRO = [
+  { type: "header", text: { type: "plain_text", text: "UNO Bot 🐐", emoji: true } },
+  {
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text:
+        "*Your design-team teammate for PLUS.* I pull live, cited answers from Notion, GitHub, the service blueprint, and Slack — and I'll say plainly when something's stale or not built yet.",
     },
+  },
+];
+
+const HOME_BODY = [
     { type: "divider" },
     { type: "section", text: { type: "mrkdwn", text: "*What I can do*" } },
     {
@@ -50,9 +54,10 @@ const HOME_VIEW = {
       text: {
         type: "mrkdwn",
         text:
-          "• *DM me* — right here in the *Messages* tab ↑\n" +
-          "• *In a channel* — `@UNO Bot` your question\n" +
-          "• *In a thread* — once I'm in, just reply; no need to re-tag",
+          "• *DM me* — right here in the *Messages* tab ↑. It's an ordinary chat: no threads to start, just keep talking\n" +
+          "• *In a channel* — `@UNO Bot` your question; I'll answer in a thread\n" +
+          "• *In a thread* — once I'm in, just reply; no need to re-tag\n" +
+          "• *Slash commands* — `/uno-research`, `/uno-synthesize`, `/uno-prototype`, `/uno-review`, `/uno-publish`, `/uno-maintain`",
       },
     },
     { type: "divider" },
@@ -97,40 +102,44 @@ const HOME_VIEW = {
         },
       ],
     },
-  ],
-};
+  ];
 
-// ADR-020 onboarding: the Home tab documents the own-visibility option with a
-// one-tap connect button. Static per env (we don't check per-user token state
-// here — the view is documentation; the panel welcome does the targeted nudge).
-function buildHomeView(env: Env) {
-  const url = slackConnectUrl(env);
-  if (!url) return HOME_VIEW;
-  return {
-    ...HOME_VIEW,
-    blocks: [
-      ...HOME_VIEW.blocks,
-      { type: "divider" },
-      { type: "section", text: { type: "mrkdwn", text: "*Let me search your side of Slack — optional*" } },
+// ADR-020 onboarding. Static per env — we don't check per-user token state
+// here; the view is documentation, and the DM welcome does the targeted nudge.
+//
+// Without a link, searches run on the workspace-filtered credential: public
+// channels plus the team-allowlisted private ones. Say what linking BUYS
+// rather than what it is, and say where the results go — the surface gate is
+// the reason it's safe to offer.
+const connectBlocks = (url: string) => [
+  { type: "divider" },
+  { type: "section", text: { type: "mrkdwn", text: "*First: link your Slack — 10 seconds, optional*" } },
+  {
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text:
+        "Until you do, I can only search *public channels* (plus a few team-approved private ones). Link, and I can also pull from *your* DMs, group chats, and private channels — the conversations only you can see.\n\nAnything I find that way stays in your DM with me; nobody else ever sees it. Unlink anytime in Slack's app settings.",
+    },
+  },
+  {
+    type: "actions",
+    elements: [
       {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text:
-            "Link your Slack and I can pull answers from your own DMs, group chats, and private channels — the conversations only you can see. Whatever I find stays in your DM with me; nobody else ever sees it. Unlink anytime in Slack's app settings.",
-        },
-      },
-      {
-        type: "actions",
-        elements: [
-          {
-            type: "button",
-            text: { type: "plain_text", text: "🔗 Link your Slack", emoji: true },
-            url,
-          },
-        ],
+        type: "button",
+        style: "primary",
+        text: { type: "plain_text", text: "🔗 Link your Slack", emoji: true },
+        url,
       },
     ],
+  },
+];
+
+function buildHomeView(env: Env) {
+  const url = slackConnectUrl(env);
+  return {
+    type: "home",
+    blocks: [...HOME_INTRO, ...(url ? connectBlocks(url) : []), ...HOME_BODY],
   };
 }
 

@@ -62,12 +62,28 @@ export interface SlackAssistantThreadContextChangedEvent extends SlackAssistantT
 }
 
 /** Fires when a user opens the app's App Home. `tab` distinguishes the Home tab
- *  (publish the landing view) from the Messages tab (ignore). */
+ *  (publish the landing view) from the Messages tab.
+ *
+ *  Under agent_view the Messages tab IS the agent conversation, so tab ===
+ *  "messages" is the replacement signal for the retired assistant_thread_started
+ *  — it is how we learn a user opened a DM with us. */
 export interface SlackAppHomeOpenedEvent {
   type: "app_home_opened";
   user: string;
   channel: string;
   tab?: "home" | "messages";
+  event_ts: string;
+}
+
+/** agent_view's replacement for assistant_thread_context_changed: fires when the
+ *  user switches what they're looking at. Unlike the retired event this is not
+ *  scoped to a thread — the DM channel is the conversation — so the payload is
+ *  flat rather than nested under `assistant_thread`. */
+export interface SlackAppContextChangedEvent {
+  type: "app_context_changed";
+  user?: string;
+  channel?: string;
+  app_context?: AssistantContext;
   event_ts: string;
 }
 
@@ -98,6 +114,7 @@ export type SlackInnerEvent =
   | SlackAssistantThreadStartedEvent
   | SlackAssistantThreadContextChangedEvent
   | SlackAppHomeOpenedEvent
+  | SlackAppContextChangedEvent
   | { type: string };
 
 export interface SlackEventCallback {

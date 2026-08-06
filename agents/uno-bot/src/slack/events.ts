@@ -21,6 +21,8 @@ import { addReaction, conversationsReplies, getBotIdentity, postMessage } from "
 import {
   handleAssistantThreadStarted,
   handleAssistantThreadContextChanged,
+  handleAgentDmOpened,
+  handleAppContextChanged,
   setStatus,
   isAssistantThread,
   formatAssistantContext,
@@ -40,6 +42,7 @@ import {
   type SlackAssistantThreadStartedEvent,
   type SlackAssistantThreadContextChangedEvent,
   type SlackAppHomeOpenedEvent,
+  type SlackAppContextChangedEvent,
   type RunnerJobPayload,
 } from "./types";
 import { collectVisionInputs } from "./vision";
@@ -129,9 +132,22 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
       return;
     }
     case "app_home_opened": {
-      // Home tab opened → publish the landing view. Inline (one API call, well
-      // under the waitUntil budget); the Messages-tab variant is ignored inside.
-      await handleAppHomeOpened(env, event as SlackAppHomeOpenedEvent);
+      const e = event as SlackAppHomeOpenedEvent;
+      // Two surfaces, one event. tab==="home" publishes the landing view;
+      // tab==="messages" is agent_view's DM-opened signal (the replacement for
+      // assistant_thread_started) and refreshes the suggested prompts.
+      if (e.tab === "messages") {
+        await handleAgentDmOpened(env, e.channel, e.user);
+        return;
+      }
+      await handleAppHomeOpened(env, e);
+      return;
+    }
+    case "app_context_changed": {
+      // agent_view's replacement for assistant_thread_context_changed: the user
+      // switched what they're looking at. Stored under the DM conversation key
+      // so the next message grounds on it. No user-visible output.
+      await handleAppContextChanged(env, event as SlackAppContextChangedEvent, DM_CONVERSATION);
       return;
     }
     default:
@@ -443,7 +459,12 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // a bare "yes" never pays the DO read; gated on thread_ts because panel
   // messages are always threaded (plain top-level DMs skip the lookup). May be
   // one hop stale: Slack doesn't order context_changed vs the message event.
-  const panelContext = isAssistantThread(channel) && event.thread_ts
+  // Gated on being the assistant/DM surface, NOT on thread_ts: under agent_view
+  // a DM has no thread, and requiring one skipped the lookup for every message
+  // on the new surface — silently dropping the grounding that app_context_changed
+  // stores. convTs already resolves to DM_CONVERSATION for a threadless DM, the
+  // same key handleAppContextChanged writes under.
+  const panelContext = isAssistantThread(channel)
     ? formatAssistantContext(await loadAssistantContext(env, channel, convTs))
     : null;
 

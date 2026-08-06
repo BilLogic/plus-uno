@@ -22,6 +22,7 @@ import type {
   AssistantContext,
   SlackAssistantThreadStartedEvent,
   SlackAssistantThreadContextChangedEvent,
+  SlackAppContextChangedEvent,
 } from "./types";
 
 export interface SuggestedPrompt {
@@ -44,13 +45,15 @@ export const SUGGESTED_PROMPTS: SuggestedPrompt[] = [
 async function setSuggestedPrompts(
   env: Env,
   channel: string,
-  thread_ts: string,
+  thread_ts: string | undefined,
   prompts: SuggestedPrompt[],
   title?: string,
 ): Promise<void> {
+  // thread_ts is omitted on the agent surface: prompts render at the top of the
+  // Messages tab, which belongs to the channel rather than to any one thread.
   await slackCall(env, "assistant.threads.setSuggestedPrompts", {
     channel_id: channel,
-    thread_ts,
+    ...(thread_ts ? { thread_ts } : {}),
     prompts,
     ...(title ? { title } : {}),
   });
@@ -165,4 +168,44 @@ export async function handleAssistantThreadContextChanged(
   const { channel_id, thread_ts, context } = event.assistant_thread;
   // Overwrite the stored surface — the next message reads the latest.
   await saveAssistantContext(env, channel_id, thread_ts, context ?? {});
+}
+
+/** agent_view: the user opened the Messages tab, i.e. a DM with us. Replaces
+ *  assistant_thread_started, which no longer fires on this surface.
+ *
+ *  Two differences from the retired handler, both from the DM being the
+ *  conversation rather than a thread inside it:
+ *    • no thread_ts anywhere — prompts attach to the channel, and there is no
+ *      thread to title (assistant.threads.setTitle needs one).
+ *    • no greeting post. assistant_thread_started opened an empty panel that
+ *      needed filling; the Messages tab already holds the full DM history, so
+ *      posting WELCOME on every tab open would spam an ongoing conversation.
+ *      The consent nudge rides the first reply instead (see events.ts).
+ */
+export async function handleAgentDmOpened(
+  env: Env,
+  channel: string,
+  userId: string,
+): Promise<void> {
+  // Prompts are the whole decoration here, and they're idempotent — Slack
+  // replaces the set each call, so re-publishing on every open is safe.
+  await setSuggestedPrompts(env, channel, undefined, SUGGESTED_PROMPTS, "How can I help?").catch(
+    () => {
+      /* decoration only — never fail a tab open */
+    },
+  );
+  void userId;
+}
+
+/** agent_view's replacement for assistant_thread_context_changed. Stored under
+ *  the DM's conversation key (not a thread ts) so the next message in the chat
+ *  reads it — see conversationTs() in events.ts, which uses the same key. */
+export async function handleAppContextChanged(
+  env: Env,
+  event: SlackAppContextChangedEvent,
+  dmConversationKey: string,
+): Promise<void> {
+  const channel = event.channel ?? event.app_context?.channel_id;
+  if (!channel) return;
+  await saveAssistantContext(env, channel, dmConversationKey, event.app_context ?? {});
 }
