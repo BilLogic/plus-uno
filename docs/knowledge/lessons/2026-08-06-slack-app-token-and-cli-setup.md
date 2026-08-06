@@ -146,6 +146,44 @@ Consequences for bot design:
 - Keep the repo YAML as documented intent and diff against it in CI; just do not
   expect to push from it.
 
+### ⚠️ Removing a scope does NOT revoke it from an existing install
+
+Verified end to end on uno-bot (2026-08-06), after three failed attempts that
+each assumed otherwise:
+
+| surface | before | after removal + reinstall |
+|---|---|---|
+| app config / manifest | 38 bot scopes | **36** — the two scopes gone |
+| live installed token | 39 | **39 — unchanged** |
+
+App config governs what is **requested at consent**. An existing installation
+keeps the grant it was already given. Reinstalling re-consents against the
+current config but does **not subtract** what was previously granted, and the
+bot token string does not change across a reinstall, so there is no reissue to
+carry a narrower set.
+
+The clincher: `search:read.mpim` is no longer offered to bots by Slack at all,
+yet the install still holds it from an older grant.
+
+Two traps inside the app-settings UI that cost time here:
+
+- Each scope row has a **Required Yes/No checkbox** *and* a **🗑 trash icon**.
+  Unchecking Required makes the scope **optional**, not absent — Slack's own
+  copy says optional-status changes "apply immediately … as long as the scopes
+  are already approved", i.e. it stays granted. Only the trash icon removes it.
+- The manifest editor writes through `apps.manifest.validate`, so for a PKCE app
+  it silently refuses. Use the scope table, not the manifest view.
+
+**The only way to actually revoke: uninstall the app from the workspace, then
+install fresh.** That is expensive and rarely worth it — uninstalling
+invalidates *every* token for the app in that workspace, including stored user
+(`xoxp-`) tokens, so every per-user OAuth consent must be redone.
+
+Design consequence, and the real lesson: **treat scope grants as one-way.** Be
+conservative at first install, because narrowing later costs a full reinstall
+cycle for every user. An over-granted scope is not something you can quietly
+clean up afterwards.
+
 Workflow that does work for a PKCE app: `slack manifest diff` to see drift →
 make the change by hand in app settings → reinstall → verify against the *live
 token*, not the manifest.
