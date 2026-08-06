@@ -3,7 +3,7 @@ import { verifySlackSignature } from "./slack/verify";
 import { handleSlackEnvelope, type SlackEnvelope } from "./slack/events";
 import { handleSlashCommand } from "./slack/commands";
 import { parseInteraction, handleInteraction } from "./slack/interactive";
-import { startSlackOAuth, handleSlackOAuthCallback } from "./oauth/slack";
+import { startSlackOAuth, handleSlackOAuthCallback, getSlackAccessTokenFor } from "./oauth/slack";
 import { geminiConfigured, geminiGenerate } from "./gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "./vertex/claude";
 import { MODELS } from "./agent/routing";
@@ -14,7 +14,7 @@ import { BUILD } from "./version";
 import { runFigmaPoll } from "./figma-poll";
 import { buildSystemBlocks } from "./agent/skills";
 import { ensureHarnessCache } from "./gemini/cache";
-import { runMetered, subrequestsUsed, meterBreakdown, subrequestBudgetTrips, internalSubrequestsUsed } from "./net";
+import { countedFetch, runMetered, subrequestsUsed, meterBreakdown, subrequestBudgetTrips, internalSubrequestsUsed } from "./net";
 
 export default {
   // Cron (wrangler.toml [triggers]) — the Figma library poll: detect DS
@@ -120,6 +120,16 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
     return handleEvalTurn(request, env);
   }
 
+  // What the LIVE INSTALL actually grants for search — the three questions the
+  // assistant.search.context plan could not answer from the manifest (a manifest
+  // lists what was requested, not what the installed tokens carry). Reports
+  // scopes and Slack's own error strings; never a token, never message content.
+  // `?q=` overrides the throwaway probe query. Auth-gated: it makes live calls.
+  if (request.method === "GET" && url.pathname === "/debug/slack-search") {
+    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
+    return Response.json(await probeSlackSearch(env, url.searchParams.get("q") ?? "design"));
+  }
+
   // Manual firing of the Figma library poll (same code path as the cron).
   // `?dry_run=1` diffs and reports without writing KV / Notion / Slack.
   // Auth-gated: a live run posts to Slack and files a PRD.
@@ -170,6 +180,12 @@ interface EvalTurnBody {
   history?: HistoryTurn[];
   /** Minimal pending-proposal shape; synthetic fields are filled in here. */
   pending?: { toolName: string; input: Record<string, unknown> } | null;
+  /** Surface the turn arrives on. Defaults to the synthetic channel C_EVAL —
+   *  which never starts with "D", so own-visibility search is unreachable and
+   *  any assertion about the ADR-020 surface gate would pass for the wrong
+   *  reason. A case that means to exercise the gate sets these explicitly. */
+  channel?: string;
+  requestedBy?: string;
 }
 
 async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
@@ -182,6 +198,13 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
   const prompt = typeof body.prompt === "string" ? body.prompt.trim() : "";
   if (!prompt) return Response.json({ ok: false, error: "missing prompt" }, { status: 400 });
 
+  // Slack ids only — the eval route must not become a way to name arbitrary
+  // surfaces. Anything malformed falls back to the synthetic defaults.
+  const channel = /^[CDG][A-Z0-9]{2,20}$/.test(body.channel ?? "") ? body.channel! : "C_EVAL";
+  const requestedBy = /^[UW][A-Z0-9]{2,20}$/.test(body.requestedBy ?? "")
+    ? body.requestedBy!
+    : "U_EVAL";
+
   const history: HistoryTurn[] = Array.isArray(body.history)
     ? body.history.filter(
         (t): t is HistoryTurn =>
@@ -192,12 +215,12 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
     ? {
         toolName: body.pending.toolName,
         input: body.pending.input ?? {},
-        channel: "C_EVAL",
+        channel,
         threadTs: "0",
         userMsgTs: "0",
         proposalTs: "0",
         proposalText: "(eval)",
-        requesterUserId: "U_EVAL",
+        requesterUserId: requestedBy,
       }
     : null;
 
@@ -208,8 +231,8 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
       env,
       userText: prompt,
       history,
-      slack: { channel: "C_EVAL", threadTs: "0", userMsgTs: "0", requestedBy: "U_EVAL" },
-      currentSender: { userId: "U_EVAL" },
+      slack: { channel, threadTs: "0", userMsgTs: "0", requestedBy },
+      currentSender: { userId: requestedBy },
       pending,
       onInterim: (t) => narration.push(t),
     });
@@ -364,6 +387,92 @@ async function handleSlackInteractiveRequest(
   }
 
   return handleInteraction(env, payload, ctx);
+}
+
+// ── Live-install search probe (/debug/slack-search) ───────────────────────────
+// Answers, against the real install rather than the manifest:
+//   • which scopes each installed token actually carries (auth.test's
+//     x-oauth-scopes response header — the manifest only records what was asked)
+//   • whether assistant.search.context is permitted for this app at all
+//     (distribution gate: prohibited for unlisted distributed apps — it answers
+//     with an error string, not a 404)
+//   • what a bot-token call without an action_token returns, which is how we
+//     recognize the action_token requirement in the wild
+// Tokens are never echoed. Message content is never echoed — only counts.
+async function probeToken(
+  token: string,
+  label: string,
+  channelTypes: string,
+): Promise<Record<string, unknown>> {
+  const out: Record<string, unknown> = { credential: label };
+  try {
+    const auth = await countedFetch("https://slack.com/api/auth.test", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${token}`,
+        "content-type": "application/x-www-form-urlencoded; charset=utf-8",
+      },
+    });
+    const authBody = (await auth.json()) as { ok?: boolean; error?: string; user_id?: string };
+    out.auth_ok = authBody.ok === true;
+    out.auth_error = authBody.error;
+    out.identity = authBody.user_id;
+    // Slack reports the token's REAL granted scopes here, comma-joined.
+    out.scopes = auth.headers.get("x-oauth-scopes")?.split(",") ?? null;
+  } catch (err) {
+    out.auth_exception = err instanceof Error ? err.message : String(err);
+  }
+  try {
+    const res = await countedFetch("https://slack.com/api/assistant.search.context", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${token}`,
+        "content-type": "application/x-www-form-urlencoded; charset=utf-8",
+      },
+      body: new URLSearchParams({
+        query: "probe",
+        limit: "1",
+        channel_types: channelTypes,
+        content_types: "messages",
+        disable_semantic_search: "true",
+      }).toString(),
+    });
+    const body = (await res.json()) as {
+      ok?: boolean;
+      error?: string;
+      needed?: string;
+      results?: { messages?: unknown[] };
+    };
+    out.search_ok = body.ok === true;
+    out.search_error = body.error;
+    out.search_needed_scope = body.needed;
+    out.search_hits = body.results?.messages?.length ?? 0;
+  } catch (err) {
+    out.search_exception = err instanceof Error ? err.message : String(err);
+  }
+  return out;
+}
+
+async function probeSlackSearch(env: Env, query: string): Promise<Record<string, unknown>> {
+  const probes: Record<string, unknown>[] = [];
+  if (env.SLACK_BOT_TOKEN) {
+    probes.push(await probeToken(env.SLACK_BOT_TOKEN, "bot (SLACK_BOT_TOKEN)", "public_channel"));
+  }
+  const legacy = await getSlackAccessTokenFor(env).catch(() => null);
+  if (legacy) {
+    probes.push(await probeToken(legacy.token, "stored user/legacy token", "public_channel"));
+    probes.push(
+      await probeToken(legacy.token, "stored user/legacy token (private)", "private_channel"),
+    );
+  }
+  return {
+    ok: true,
+    build: BUILD,
+    query,
+    note: "search_error 'not_allowed_token_type' or an app-permission error means the method is closed to this app; 'missing_scope' names what to re-consent for. A bot probe erroring on the missing action_token is the expected shape, not a failure.",
+    oauth_configured: !!legacy,
+    probes,
+  };
 }
 
 export { ThreadState } from "./thread-state";

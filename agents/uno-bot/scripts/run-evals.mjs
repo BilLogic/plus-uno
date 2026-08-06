@@ -77,14 +77,19 @@ async function googleToken() {
 }
 
 // ── One headless agent turn (with transient-error retries) ────────────────────
-async function evalTurnOnce(prompt, history, pending) {
+async function evalTurnOnce(prompt, history, pending, surface = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TURN_TIMEOUT_MS);
   try {
     const res = await fetch(`${WORKER_URL.replace(/\/+$/, "")}/debug/eval`, {
       method: "POST",
       headers: { "content-type": "application/json", "x-debug-token": DEBUG_TOKEN },
-      body: JSON.stringify({ prompt, history, pending }),
+      // channel/requestedBy default to the synthetic C_EVAL/U_EVAL server-side.
+      // A case sets them when the SURFACE is the thing under test — own-DM
+      // visibility (ADR-020) is unreachable from a channel that never starts
+      // with "D", so an assertion about it would otherwise pass for the wrong
+      // reason.
+      body: JSON.stringify({ prompt, history, pending, ...surface }),
       signal: controller.signal,
     });
     return await res.json();
@@ -96,9 +101,9 @@ async function evalTurnOnce(prompt, history, pending) {
 // Rate limits are a property of the moment, not the bot — retry 429/quota/
 // overload with a long backoff instead of failing the case (first live run
 // 2026-07-16: every case "failed" on a starved model quota).
-async function evalTurn(prompt, history, pending) {
+async function evalTurn(prompt, history, pending, surface) {
   for (let attempt = 0; ; attempt++) {
-    const resp = await evalTurnOnce(prompt, history, pending).catch((err) => ({
+    const resp = await evalTurnOnce(prompt, history, pending, surface).catch((err) => ({
       ok: false,
       error: String(err?.message ?? err),
     }));
@@ -198,7 +203,17 @@ async function main() {
     const failures = [];
 
     for (const turn of c.turns) {
-      const resp = await evalTurn(turn.prompt, history, turn.usePendingFromPreviousTurn ? pending : null);
+      const surface = {};
+      const channel = turn.channel ?? c.channel;
+      const requestedBy = turn.requestedBy ?? c.requestedBy;
+      if (channel) surface.channel = channel;
+      if (requestedBy) surface.requestedBy = requestedBy;
+      const resp = await evalTurn(
+        turn.prompt,
+        history,
+        turn.usePendingFromPreviousTurn ? pending : null,
+        surface,
+      );
       transcript.turns.push({ prompt: turn.prompt, response: resp });
       // Per-turn checks: turn-level spec if present, else the case-level spec on
       // the final turn only.

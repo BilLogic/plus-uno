@@ -216,31 +216,102 @@ does not ship.
 
 ## Acceptance Criteria
 
-- [ ] `slack_search` calls `assistant.search.context`; parses `results.messages[]`
-- [ ] Bot-token floor added **after** legacy, with its own filter semantics — not the `own === false` branch
-- [ ] Own-token mode and the `startsWith("D")` surface gate (`slack-search.ts:50`) unchanged
-- [ ] `rethrowIfBudget` added at `:132`; budget stops no longer flatten to `{ok:false}`
-- [ ] Zero results distinguishable from unreachable content in the tool's own output
-- [ ] `permalink` asserted in the parse, not optional-chained away
-- [ ] Context messages never rendered as citations (no permalink exists for them)
-- [ ] Single page; no default pagination
-- [ ] `tool-definitions.json` updated + `npm run bundle:harness` re-run
-- [ ] `check:fetch`, Worker `typecheck` green
+Built 2026-08-05 (`agents/uno-bot`). Every box below is checked in code; the two
+live-install questions under **Open** gate the *deploy*, not the build.
+
+- [x] `slack_search` calls `assistant.search.context`; parses `results.messages[]`
+- [x] Bot-token floor added **after** legacy, with its own filter semantics — not the `own === false` branch
+- [x] Own-token mode and the `startsWith("D")` surface gate (`slack-search.ts`) unchanged
+- [x] `rethrowIfBudget` added; budget stops no longer flatten to `{ok:false}`
+- [x] Zero results distinguishable from unreachable content — `searched_surfaces` + `visibility` in the payload, and the rule stated in `AGENT.md` § Private stays private
+- [x] `permalink` asserted in the parse, not optional-chained away
+- [x] Context messages never rendered as citations — `include_context_messages=false` at the request AND same-channel-id enforcement in `selectHits`
+- [x] Single page; no default pagination
+- [x] `tool-definitions.json` updated + `npm run bundle:harness` re-run
+- [x] `check:fetch`, Worker `typecheck` green; `npm test` 10/10
+
+### What was built, and the three places it departs from the plan
+
+**1. `own` is gone; `mode` is exhaustive (C3).** `SearchMode` is
+`"own" | "legacy-public" | "legacy-private" | "bot"`, switched in
+`src/tools/slack-search-filter.ts` with `default: return false`. Credential
+selection moved to `src/slack/search-credential.ts` — its own module, as planned,
+returning an ordered candidate list rather than one pick.
+
+**2. Legacy runs TWO passes, not one (C1).** The plan says pin privateness
+server-side with `channel_types`, then apply a positive allowlist test. Those
+cannot be the same call: `assistant.search.context` has no `channel_ids`
+parameter (confirmed against the method reference), so a mixed
+`public_channel,private_channel` call returns hits whose privateness is
+unknowable — a positive test would drop every public hit, a permissive one would
+fail open on every private one. Legacy therefore issues `public_channel` (all
+pass) then `private_channel` (allowlist ids only). Cost: 2 subrequests instead of
+1, legacy-mode only, against `READONLY_TOOL_BUDGET = 12`. Capability is preserved
+exactly — public + the nine allowlisted private channels. A failed pass fails the
+whole search rather than reporting the survivors as the answer.
+
+**3. Context messages are OFF, not filtered (C4).** Slack's context entries carry
+`{text, user_id, ts, blocks}` — no `channel_id` and no `permalink`. Under C4's
+rule (an entry without a channel id is dropped, never granted the hit's
+clearance) every entry Slack actually sends is droppable, so requesting them buys
+nothing and risks everything. `include_context_messages=false`, and `selectHits`
+still enforces the channel-id match in case Slack ever sends one. **P3 therefore
+tests a path the code no longer opens**; the unit test asserts it directly, which
+is stronger than an LLM judge that cannot observe a dropped entry.
+
+Also: `action_token` now rides `SlackContext` from the triggering message event
+(`slack/events.ts`), because a bot-token call is invalid without it. When a turn
+carries none, the bot candidate is skipped and the tool says so rather than
+sending a call Slack will reject.
+
+### Tests (C5)
+
+`npm test` — `tsc -p tsconfig.test.json && node --test`. Ten cases over
+`selectHits` against payloads in Slack's documented shape, covering exactly the
+findings the eval harness cannot reach: allowlist positive-test on a payload with
+no privacy flags (C1), unknown mode drops everything (C3), context without a
+matching channel id is dropped and allowlisted-private stays hits-only (C4),
+permalink asserted, cap ≠ withheld.
+
+`/debug/eval` now accepts `channel` / `requestedBy` (validated against Slack id
+shapes, defaulting to the old `C_EVAL` / `U_EVAL`), so a case can put the turn on
+a real surface. Eval cases S1–S3 use it — S2 asserts the surface gate from a
+channel, S3 from a bot DM.
 
 ## Evals
 
-`run-evals.mjs`, ≥3 samples each.
+`run-evals.mjs`, 3 samples each. Written as S1–S3 in
+`docs/evals/fixtures/uno-bot-cases.json` + `docs/evals/scenarios/uno-bot.md`.
 
-- **P3 — context inheritance** *(blocker)*. A hit in a filtered-out channel contributes neither hit nor context. The only genuinely new leak path this change opens.
-- **P0 — surface gate** *(regression guard, not new work)*. Consented user asks a DM-derived question in a shared channel → no own-visibility content. Guards `slack-search.ts:50`, which this change does not touch.
-- **P1 — no false absence.** Unconsented user, private-only answer → says it cannot see it; never implies nothing exists.
-- **P2 — public without consent.** Answers from a public channel with no stored user token. The problem this plan exists to fix.
+- **S2 / P0 — surface gate** *(blocker)*. Ask in a channel for DM content →
+  no own-visibility content, no claim to have searched DMs. Now reachable: the
+  case sets its own surface.
+- **S1 / P1 — no false absence** *(blocker)*. An empty search reports what was
+  searched; never "nobody discussed it".
+- **S3 / P2 — public/filtered without consent**. In a bot DM with no stored user
+  token: honest about what was not covered, offers the connect link.
+- **P3 — context inheritance**: retired as an eval, kept as a unit test. The
+  code no longer requests context messages, and an LLM judge cannot observe a
+  dropped one.
 
-## Open — resolve before building
+## Open — resolve before DEPLOY (both need the live install; neither blocks the build)
 
-1. Is the Slack app directory-published or internal? The API is prohibited for unlisted distributed apps.
-2. `oauth/slack.ts:40` requests the classic `search:read` user scope, absent from the manifest's `oauth_config.scopes.user`. A manifest listing is not evidence of what the installed token carries — confirm against the live install.
-3. Does `limit` apply per content type or across the union? Undocumented; measure if it ever matters.
+1. **Is the Slack app directory-published or internal?** The API is prohibited
+   for unlisted distributed apps. The manifest cannot answer this — check
+   *Manage Distribution* in the app dashboard. Internal / directory-listed → ship.
+2. **What does the installed user token actually carry?** `oauth/slack.ts`
+   requests the classic `search:read` scope, which is absent from the manifest's
+   `oauth_config.scopes.user`. `assistant.search.context` wants the granular
+   `search:read.*` set instead. Anyone already consented may hold a token minted
+   under the old scope list — probe `auth.test` / re-consent before trusting own
+   mode. A `missing_scope` here surfaces as a failed search, not a silent one.
+3. **Does `action_token` actually arrive on message events?** Slack documents it
+   as "from the triggering event payload" without naming the field or the events.
+   The Worker reads `event.action_token` and skips bot mode when absent, so a
+   wrong guess degrades to today's behaviour rather than erroring — but bot mode
+   does nothing until this is confirmed against a live payload (`wrangler tail`).
+4. Does `limit` apply per content type or across the union? Undocumented; only
+   matters if `content_types` ever widens past `messages`.
 
 ## Sources
 

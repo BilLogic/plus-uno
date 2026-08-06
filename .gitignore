@@ -75,3 +75,6 @@ docs/knowledge/research/2026-07-12-field-scan-improvements.md
 docs/knowledge/research/2026-07-12-request-corpus-expansion.md
 docs/knowledge/research/2026-07-12-uno-bot-cost-analysis.md
 docs/conventions/article-writing-style.md
+
+# uno-bot eval output — full agent transcripts, may quote Slack/Notion content
+eval-results.json

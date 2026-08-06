@@ -6,6 +6,12 @@ export interface SlackContext {
   threadTs: string;
   userMsgTs: string;
   requestedBy?: string;
+  /** Slack's per-event action token, forwarded from the triggering message.
+   *  assistant.search.context requires it for BOT-token calls, which is why a
+   *  bot-token search cannot run outside an event-driven turn (no cron, no
+   *  prefetch). Absent on events that don't carry one — slack_search then falls
+   *  through rather than sending an invalid call. */
+  actionToken?: string;
   /** Notion PRD reference resolved at proposal time, forwarded to the GitHub
    *  implement/scaffold workflows so codegen gets PRD context. */
   notionPrdId?: string;
