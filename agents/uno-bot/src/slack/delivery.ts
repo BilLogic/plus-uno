@@ -171,6 +171,8 @@ export async function postTextVerified(
    *  answer CLOSES that stream instead of posting a new message — otherwise the
    *  thinking indicator would be left hanging above a separate reply. */
   streamTs?: string | null,
+  /** Surface a threaded DM reply in the main timeline too — see events.ts. */
+  replyBroadcast?: boolean,
 ): Promise<{ ok: boolean; text: string }> {
   const cleaned = stripTrailingConfidence(text);
   const body = cleaned.trim()
@@ -189,13 +191,19 @@ export async function postTextVerified(
   }
   // `text` stays populated alongside blocks: it is what notifications and
   // screen readers use, and it is the fallback if a block ever fails to render.
-  const withBlocks = { channel, thread_ts: threadTs, text: body, blocks: [...textSections(body), ...ANSWER_FOOTER] };
+  const withBlocks = {
+    channel,
+    thread_ts: threadTs,
+    text: body,
+    blocks: [...textSections(body), ...ANSWER_FOOTER],
+    ...(replyBroadcast ? { reply_broadcast: true } : {}),
+  };
   let posted = await postMessage(env, withBlocks).catch(() => ({ ok: false as const }));
   if (!posted.ok) {
     // Degrade to plain text rather than lose the answer. A malformed block is a
     // cosmetic failure; a dropped answer is the 👀-then-silence failure.
     console.warn("[slack] blocks post failed; retrying as plain text");
-    posted = await postMessage(env, { channel, thread_ts: threadTs, text: body }).catch(() => ({ ok: false as const }));
+    posted = await postMessage(env, { channel, thread_ts: threadTs, text: body, ...(replyBroadcast ? { reply_broadcast: true } : {}) }).catch(() => ({ ok: false as const }));
   }
   return { ok: !!posted.ok, text: body };
 }

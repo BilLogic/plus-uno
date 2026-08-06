@@ -507,6 +507,11 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // answer closes the same message the indicator lives in. Null = no stream,
   // deliver normally.
   let streamTs: string | null = null;
+  // A DM thread we synthesized (the user typed in the composer, so their message
+  // had no thread) must broadcast: otherwise the answer hides behind "1 reply"
+  // and the Messages tab reads as a list of unanswered questions. A thread the
+  // USER opened, or any channel thread, stays where it was put.
+  const broadcastReply = isAssistantThread(channel) && !event.thread_ts;
   if (previewTier !== "haiku" || vision.images.length > 0) {
     await addReaction(env, channel, userMsgTs, "hourglass_flowing_sand").catch(() => {});
     if (isAssistantThread(channel)) {
@@ -517,7 +522,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       // event.thread_ts, so on the threadless agent surface it never fired once
       // — that gate, not the API, is why the indicator was missing.
       if (env.SLACK_STREAMING === "on") {
-        streamTs = await startStream(env, channel, threadTs, event.user, event.team);
+        streamTs = await startStream(env, channel, threadTs, event.user, event.team, broadcastReply);
       }
       if (streamTs) openStreams.set(streamKey(channel, event.ts), streamTs);
       // Only fall back to setStatus where a thread genuinely exists (a threaded
@@ -593,7 +598,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     // timeout ships the original draft (fail open — see agent/draft-judge.ts).
     const reviewed = await reviewDraft(env, { userText: vision.modelText, draft: result.text });
     openStreams.delete(streamKey(channel, event.ts));
-    const delivery = await postTextVerified(env, channel, threadTs, reviewed.text, streamTs);
+    const delivery = await postTextVerified(env, channel, threadTs, reviewed.text, streamTs, broadcastReply);
     await appendHistory(env, channel, convTs, { role: "user", content: vision.historyText });
     if (delivery.ok) {
       // Record what was actually posted (capped/placeholder), not the raw text.

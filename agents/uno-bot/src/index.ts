@@ -169,6 +169,10 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
       const v = url.searchParams.get(param);
       if (v) payload[field] = v;
     }
+    // ?broadcast=1 — does a stream accept reply_broadcast? A threaded reply is
+    // invisible in the Messages tab until you click "N replies"; broadcasting
+    // puts it in the main timeline too.
+    if (url.searchParams.get("broadcast")) payload.reply_broadcast = true;
     const res = await countedFetch("https://slack.com/api/chat.startStream", {
       method: "POST",
       headers: {
