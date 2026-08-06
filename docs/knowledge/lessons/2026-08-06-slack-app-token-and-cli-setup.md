@@ -184,6 +184,45 @@ conservative at first install, because narrowing later costs a full reinstall
 cycle for every user. An over-granted scope is not something you can quietly
 clean up afterwards.
 
+### The uninstall was performed — what it actually cost
+
+Done on uno-bot the same day. It works, and the price is exactly as predicted.
+
+**What worked.** The bot token dropped from 39 scopes to **36**, with
+`search:read.im`, `search:read.mpim`, and `search:read.private` all gone,
+verified against the live token. Nothing short of this moved it.
+
+**A fresh install DOES issue a new bot token.** Worth stating plainly, because a
+*reinstall* does not — the `xoxb-` string is stable across reinstalls, which is
+what makes reinstall useless for narrowing. Uninstall + install is a different
+operation and mints a new token, so `SLACK_BOT_TOKEN` must be updated wherever
+it is stored.
+
+**What broke, and did not self-heal:**
+
+- Every stored user token was revoked. `auth.test` returns `token_revoked`.
+- **Stale tokens must be deleted from storage by hand.** In `mcp-oauth.ts` the
+  shared/default key (`slack_oauth_token`) is only written when it is *empty*,
+  so re-consenting does not overwrite a dead value. It sits there, still sorting
+  ahead of the bot rung, poisoning every request.
+- **The credential chain has no fallthrough.** `slack-search.ts` picks the first
+  viable candidate and a failed pass returns `ok:false` — it does not retry the
+  next credential. So a revoked stored token means search **hard-errors** rather
+  than degrading to public-only. Deleting the dead keys restores graceful
+  degradation; that is the difference between "search is narrower" and "search
+  is down".
+
+Runbook for anyone doing this again, in order:
+
+1. Uninstall, then install fresh.
+2. Update the bot token in the secret store immediately — the bot is mute until
+   this lands.
+3. Delete every stored user-token key (both the per-user keys and the shared
+   default). Do not assume re-consent overwrites them.
+4. Have users re-consent.
+5. Re-invite the bot to channels it was a member of.
+6. Verify against the **live token**, not the manifest.
+
 Workflow that does work for a PKCE app: `slack manifest diff` to see drift →
 make the change by hand in app settings → reinstall → verify against the *live
 token*, not the manifest.
