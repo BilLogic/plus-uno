@@ -10,10 +10,12 @@
     "check:fetch": "node scripts/check-fetch.mjs",
     "deploy": "npm run check:fetch && npm run bundle:harness && wrangler deploy",
     "typecheck": "tsc --noEmit",
-    "tail": "wrangler tail"
+    "tail": "wrangler tail",
+    "test": "tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250101.0",
+    "@types/node": "^20.19.43",
     "typescript": "^5.6.0",
     "wrangler": "^4.97.0"
   }

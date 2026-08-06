@@ -23,6 +23,10 @@ export interface SlackMessageEvent {
   bot_id?: string;
   subtype?: string;
   files?: SlackEventFile[];
+  /** Per-event token Slack mints for apps that call the Real-time Search API
+   *  with a BOT token (assistant.search.context). Optional: not every event
+   *  carries one, and nothing else in the Worker needs it. */
+  action_token?: string;
 }
 
 /** The surface the user has open in the workspace while chatting in the assistant
@@ -75,6 +79,8 @@ export interface SlackAppMentionEvent {
   ts: string;
   thread_ts?: string;
   files?: SlackEventFile[];
+  /** Carried through appMentionToMessage — see SlackMessageEvent.action_token. */
+  action_token?: string;
 }
 
 export interface SlackReactionAddedEvent {

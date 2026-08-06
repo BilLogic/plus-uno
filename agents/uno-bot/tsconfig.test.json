@@ -1,0 +1,15 @@
+// Worker code is TypeScript and the runtime here is plain Node, so `npm test`
+// compiles the pure modules under test to .test-build/ and runs node:test over
+// the output. Only what the tests import gets compiled — no Workers types, no
+// fetch, no bundler.
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node"],
+    "noEmit": false,
+    "outDir": ".test-build"
+  },
+  "include": ["tests/**/*.ts", "src/tools/slack-search-filter.ts"]
+}

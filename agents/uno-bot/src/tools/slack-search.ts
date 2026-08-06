@@ -1,41 +1,81 @@
 // slack_search — workspace message search behind a VISIBILITY FIREWALL.
 //
-// Slack's search API only works with a USER token (bot tokens can't search).
-// Two credential modes (ADR-020, 2026-07-16):
+// Transport is assistant.search.context (Slack's Real-time Search API). Slack
+// says explicitly not to use the legacy search.messages: its search:read scope
+// cannot exclude DMs, which is why the granular scopes exist.
+//
+// Three credential modes (ADR-020, extended 2026-08-05). Order is by REACH,
+// not by trust — each one's firewall is stated where it is enforced:
 //
 //   OWN token (requester consented at /oauth/slack/start) + the ask arrives in
 //   the requester's own DM with the bot → results carry the requester's own
 //   Slack visibility: their DMs, group DMs, and private channels pass. This is
 //   physics, not policy — a user token can only see conversations its owner is
-//   part of, so "requester must be a participant" is enforced by Slack itself.
-//   Own-visibility NEVER activates outside the requester's bot DM: in shared
-//   channels a passer-by could read what the bot quotes.
+//   part of. Own-visibility NEVER activates outside the requester's bot DM: in
+//   shared channels a passer-by could read what the bot quotes.
 //
-//   LEGACY workspace token (single consenting admin) → the original hard
-//   filter stands, because that token's visibility is NOT the requester's:
-//   • public channels          → pass
-//   • allowlisted private ones → pass (env.SLACK_SEARCH_PRIVATE_ALLOWLIST)
-//   • every other private channel, every DM, every group DM → DROPPED here,
-//     unconditionally, no matter how the request was phrased.
-// The model cannot surface what it never receives.
+//   LEGACY workspace token (single consenting admin) → that token's visibility
+//   is NOT the requester's, so it runs TWO pinned passes: public_channel (all
+//   pass) and private_channel (only env.SLACK_SEARCH_PRIVATE_ALLOWLIST ids
+//   pass). Two passes because the API cannot express "public OR these nine"
+//   in one call, and because privateness is unknowable from the response —
+//   a single mixed call could only fail open.
+//
+//   BOT token (install-time, no consent anywhere) → public channels only, and
+//   that is a SCOPE fact, not a filter: search:read.im/.mpim/.private are
+//   deliberately absent from the bot block of slack-app-manifest.yaml. This is
+//   the floor — what answers a public-channel question when nothing is stored.
+//   It requires an action_token from the triggering event, so it cannot run
+//   outside an event-driven turn (no cron, no prefetch).
+//
+// The model cannot surface what it never receives. What passes the firewall is
+// decided by selectHits() in slack-search-filter.ts — pure, and unit-tested.
 
 import type { Env, SlackContext } from "../types";
-import { getSlackAccessTokenFor } from "../oauth/slack";
-import { countedFetch } from "../net";
+import { slackConnectUrl } from "../oauth/slack";
+import { slackSearchCredentials } from "../slack/search-credential";
+import { countedFetch, rethrowIfBudget } from "../net";
+import {
+  selectHits,
+  type EmittedHit,
+  type SearchContextPayload,
+  type SearchMode,
+} from "./slack-search-filter";
 
-interface SearchMatch {
-  channel?: {
-    id?: string;
-    name?: string;
-    is_private?: boolean;
-    is_im?: boolean;
-    is_mpim?: boolean;
-    is_group?: boolean;
-  };
-  username?: string;
-  ts?: string;
-  permalink?: string;
-  text?: string;
+const SEARCH_URL = "https://slack.com/api/assistant.search.context";
+const MAX_HITS = 12;
+
+/** One pinned pass. channel_types is the server-side half of the firewall. */
+async function searchPass(
+  token: string,
+  query: string,
+  channelTypes: string,
+  actionToken?: string,
+): Promise<SearchContextPayload> {
+  const params = new URLSearchParams({
+    query,
+    limit: "20",
+    channel_types: channelTypes,
+    content_types: "messages",
+    highlight: "false",
+    // Context messages carry no permalink and no channel id, so they can be
+    // neither cited nor cleared. Off at the request, and dropped again in
+    // selectHits if Slack ever sends them anyway.
+    include_context_messages: "false",
+    // Semantic search triggers on question-shaped queries and adds latency we
+    // cannot predict; keyword timing is the one we budget for.
+    disable_semantic_search: "true",
+    ...(actionToken ? { action_token: actionToken } : {}),
+  });
+  const res = await countedFetch(SEARCH_URL, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${token}`,
+      "content-type": "application/x-www-form-urlencoded; charset=utf-8",
+    },
+    body: params.toString(),
+  });
+  return (await res.json()) as SearchContextPayload;
 }
 
 export async function executeSlackSearch(
@@ -49,14 +89,20 @@ export async function executeSlackSearch(
   // Own-visibility is surface-gated: only in the requester's own bot DM.
   const inOwnDm = Boolean(slack?.channel?.startsWith("D"));
   const requester = inOwnDm ? slack?.requestedBy : undefined;
-  const cred = await getSlackAccessTokenFor(env, requester);
+  const credentials = await slackSearchCredentials(env, requester);
+  // A bot-token search is invalid without the triggering event's action_token,
+  // so that candidate only counts when we actually carry one.
+  const actionToken = slack?.actionToken;
+  const cred = credentials.find((c) => c.kind !== "bot" || !!actionToken);
   if (!cred) {
     return JSON.stringify({
       ok: false,
-      error: "workspace search unavailable (no search credential stored) — use thread/channel reads instead",
+      error:
+        credentials.length > 0
+          ? "workspace search unavailable (bot search needs the triggering event's action_token, which this turn did not carry) — use thread/channel reads instead"
+          : "workspace search unavailable (no search credential stored) — use thread/channel reads instead",
     });
   }
-  const { token, own } = cred;
 
   const allowlist = new Set(
     (env.SLACK_SEARCH_PRIVATE_ALLOWLIST ?? "")
@@ -65,63 +111,63 @@ export async function executeSlackSearch(
       .filter(Boolean),
   );
 
-  try {
-    const params = new URLSearchParams({ query, count: "20", highlight: "false" });
-    const res = await countedFetch(`https://slack.com/api/search.messages?${params}`, {
-      headers: { authorization: `Bearer ${token}` },
-    });
-    const data = (await res.json()) as {
-      ok: boolean;
-      error?: string;
-      messages?: { matches?: SearchMatch[]; total?: number };
-    };
-    if (!data.ok) return JSON.stringify({ ok: false, error: data.error ?? "search failed" });
+  // Which passes this credential runs, and what each pass may emit.
+  const passes: { mode: SearchMode; channelTypes: string }[] =
+    cred.kind === "own"
+      ? [{ mode: "own", channelTypes: "public_channel,private_channel,mpim,im" }]
+      : cred.kind === "legacy"
+        ? [
+            { mode: "legacy-public", channelTypes: "public_channel" },
+            ...(allowlist.size > 0
+              ? [{ mode: "legacy-private" as SearchMode, channelTypes: "private_channel" }]
+              : []),
+          ]
+        : [{ mode: "bot", channelTypes: "public_channel" }];
 
-    const matches = data.messages?.matches ?? [];
+  try {
+    const results: EmittedHit[] = [];
     let dropped = 0;
-    const results = matches
-      .filter((m) => {
-        // OWN token in the requester's own DM: everything the token returns IS
-        // the requester's own visibility (their DMs/mpims/private channels) —
-        // pass it through; there is nothing here they can't already read.
-        if (own) return true;
-        const c = m.channel ?? {};
-        if (c.is_im || c.is_mpim) {
-          dropped++;
-          return false; // DMs/group DMs: never searchable on the legacy token
-        }
-        if ((c.is_private || c.is_group) && !allowlist.has(c.id ?? "")) {
-          dropped++;
-          return false; // private channel not on the team allowlist
-        }
-        return true;
-      })
-      .slice(0, 12)
-      .map((m) => ({
-        channel: m.channel?.is_im
-          ? "(a DM you're in)"
-          : m.channel?.is_mpim
-            ? "(a group DM you're in)"
-            : m.channel?.name
-              ? `#${m.channel.name}`
-              : m.channel?.id,
-        from: m.username,
-        ts: m.ts,
-        link: m.permalink,
-        text: (m.text ?? "").slice(0, 400),
-      }));
+    for (const pass of passes) {
+      const data = await searchPass(
+        cred.token,
+        query,
+        pass.channelTypes,
+        cred.kind === "bot" ? actionToken : undefined,
+      );
+      if (!data.ok) {
+        // A failed pass is a failed search: reporting the survivors as if they
+        // were the whole answer is the false-absence failure this tool exists
+        // to avoid.
+        return JSON.stringify({ ok: false, error: data.error ?? "search failed" });
+      }
+      const selected = selectHits(pass.mode, data, allowlist, MAX_HITS - results.length);
+      results.push(...selected.results);
+      dropped += selected.dropped;
+    }
 
     // Consent nudge: in their own DM without a connected token, tell the model
     // the requester can widen coverage themselves (the link is user-facing).
+    const connectUrl = slackConnectUrl(env);
     const connectNote =
-      inOwnDm && !own && env.SLACK_OAUTH_REDIRECT_URI
-        ? `results are workspace-filtered (no DMs/private). The requester can connect their own Slack history — searches here will then cover everything they can see — at ${new URL(env.SLACK_OAUTH_REDIRECT_URI).origin}/oauth/slack/start`
+      inOwnDm && cred.kind !== "own" && connectUrl
+        ? `these results do not cover DMs or un-allowlisted private channels. The requester can connect their own Slack history — searches here will then cover everything they can see — at ${connectUrl}`
         : undefined;
+
+    const visibility =
+      cred.kind === "own"
+        ? "requester-own (their DMs/private included)"
+        : cred.kind === "legacy"
+          ? "workspace-filtered (public + team-allowlisted private)"
+          : "public-only (no user credential — public channels are the whole search)";
 
     return JSON.stringify({
       ok: true,
       query,
-      visibility: own ? "requester-own (their DMs/private included)" : "workspace-filtered",
+      visibility,
+      // Zero results must not read as "nothing exists": searched_surfaces says
+      // what was actually looked at, so an empty list can be reported honestly
+      // as "nothing in what I can see" rather than "nothing".
+      searched_surfaces: passes.map((p) => p.channelTypes).join(","),
       results,
       // The model is told results are pre-cleared; the count of withheld hits
       // lets it say "there were matches in spaces I can't surface" honestly
@@ -130,6 +176,9 @@ export async function executeSlackSearch(
       ...(connectNote ? { note: connectNote } : {}),
     });
   } catch (err) {
+    // A budget stop is not an empty result. Flattening it to {ok:false} told the
+    // model the search ran and found nothing.
+    rethrowIfBudget(err);
     return JSON.stringify({ ok: false, error: err instanceof Error ? err.message : String(err) });
   }
 }

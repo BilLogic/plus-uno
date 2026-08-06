@@ -251,6 +251,7 @@ function appMentionToMessage(e: SlackAppMentionEvent): SlackMessageEvent {
     ts: e.ts,
     thread_ts: e.thread_ts,
     files: e.files,
+    action_token: e.action_token,
   };
 }
 
@@ -342,6 +343,11 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
   // (re-runs the turn) once the lease is stale. Before this, a killed run left
   // its marker stuck "in-flight" and every retry no-opped: 👀-then-silence,
   // permanently (live incident 2026-07-10, test-1 run killed by a deploy).
+  // Does Slack actually put an action_token on message events? The method docs
+  // say "from the triggering event payload" without naming the field, and
+  // bot-token search is inert without one. PRESENCE only — the token itself
+  // never reaches a log.
+  console.log(`[slack] msg ${event.channel}/${event.ts} action_token=${!!event.action_token}`);
   const runKey = `msg:${event.channel}:${event.ts}`;
   const claim = await claimEventRun(env, runKey);
   if (claim === "done") {
@@ -499,6 +505,9 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
         threadTs: event.thread_ts ?? event.ts,
         userMsgTs,
         requestedBy: userId,
+        // Bot-token search needs the triggering event's action_token; it exists
+        // only for this turn, so it rides the context rather than any store.
+        actionToken: event.action_token,
         notionPrdId: prd?.id,
         notionPrdUrl: prd?.url,
       },
