@@ -27,10 +27,12 @@
 # there is no configuration these would serve. An arrival now would be a
 # Slack-side surprise, and shows up in the unhandled-event log.
 #
-# ⚠️ Event-subscription changes do NOT apply from this file. pkce_enabled makes
-# apps.manifest.update reject every payload, so the manifest editor is dead for
-# this app — edit subscriptions on the Event Subscriptions page instead, then
-# confirm with `npm run slack:diff`.
+# ⚠️ The API cannot apply this file; the WEB EDITOR can. pkce_enabled makes
+# apps.manifest.update / .validate reject every payload — including Slack's own
+# unmodified export — so `slack manifest sync` and any scripted push fail with
+# cannot_disable_once_enabled. Pasting the same YAML into the App Manifest page
+# saves fine (verified 2026-08-06). So: paste by hand, then confirm with
+# `npm run slack:diff`.
 #
 # ── SCOPE: THIS CHANGES DMs ONLY ─────────────────────────────────────────────
 # agent_view governs the app's own DM / Messages surface. Channels are
@@ -62,7 +64,7 @@ display_information:
   # message. Slack has no separate handle field: the @mention follows
   # display_name, so it is now @le goat.
   name: Uno-bot
-  description: PLUS design team's Slack-native AI teammate
+  description: PLUS team's Slack-native AI teammate 🐐
   # long_description was never set on the app (confirmed absent from
   # apps.manifest.export, 2026-08-06) — the App Directory entry has been blank
   # since day one. Max 4000 chars; only shows once the app is submitted/listed.
