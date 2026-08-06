@@ -22,6 +22,9 @@ export interface SlackMessageEvent {
   thread_ts?: string;
   bot_id?: string;
   subtype?: string;
+  /** Workspace the message came from. Slack includes it on message events;
+   *  chat.startStream needs it as recipient_team_id. */
+  team?: string;
   files?: SlackEventFile[];
   /** Per-event token Slack mints for apps that call the Real-time Search API
    *  with a BOT token (assistant.search.context). Optional: not every event

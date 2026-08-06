@@ -91,6 +91,13 @@ export interface Env {
   // Worker bundle at build time — src/generated/harness.ts — so serving it costs
   // zero subrequests; this KV is the fallback/alert path. See agent/skills.ts.)
   HARNESS_KV?: KVNamespace;
+  /** "on" enables chat.startStream for the agent surface. OFF by default:
+   *  Slack returns invalid_arguments for this app even with thread_ts +
+   *  recipient_user_id + recipient_team_id (r34–r37, 2026-08-06), and each
+   *  attempt burns one of the 50 subrequests an invocation gets. The thinking
+   *  indicator is served by assistant.threads.setStatus instead. Flip to "on"
+   *  to retest once the argument shape is known. */
+  SLACK_STREAMING?: string;
 
   // --- Slack login (user token for slack_search) -----------------------------
   // slack_search calls Slack's search Web API, which REJECTS bot tokens, so it

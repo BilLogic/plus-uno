@@ -158,14 +158,28 @@ export async function startStream(
   env: Env,
   channel: string,
   threadTs: string | undefined,
+  recipientUserId?: string,
+  recipientTeamId?: string,
 ): Promise<string | null> {
+  // thread_ts is REQUIRED (a stream is a threaded message), and
+  // recipient_user_id / recipient_team_id are required "when streaming to
+  // channels" — which includes a DM. Omitting the pair returns
+  // invalid_arguments, with nothing in the error naming the missing field.
   try {
     const res = await slackCall<SlackResponse & { ts?: string }>(env, "chat.startStream", {
       channel,
       ...(threadTs ? { thread_ts: threadTs } : {}),
+      ...(recipientUserId ? { recipient_user_id: recipientUserId } : {}),
+      ...(recipientTeamId ? { recipient_team_id: recipientTeamId } : {}),
     });
-    return res.ok && res.ts ? res.ts : null;
-  } catch {
+    if (res.ok && res.ts) return res.ts;
+    // Say WHY. A silent null here is indistinguishable from "streaming is off",
+    // which cost a deploy cycle to diagnose: the fallback works, so the only
+    // symptom is a missing indicator.
+    console.warn(`[slack] chat.startStream declined: ${res.error ?? "no ts in response"}`);
+    return null;
+  } catch (err) {
+    console.warn(`[slack] chat.startStream threw: ${err instanceof Error ? err.message : String(err)}`);
     return null;
   }
 }

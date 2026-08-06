@@ -246,8 +246,22 @@ function isDm(channel: string): boolean {
   return channel.startsWith("D");
 }
 
+// Where the reply goes. In a channel: the existing thread, else a new one under
+// the message. In a DM: the existing thread, else a NEW thread under the user's
+// message.
+//
+// That DM branch reverses 74f1b17c ("DMs are chat, not threads"), deliberately
+// and with the tradeoff understood. chat.startStream requires a thread_ts, and
+// so does assistant.threads.setStatus — with a threadless DM there is no way to
+// show a thinking indicator at all, which is the affordance agent_view is
+// supposed to bring. Slack's own agent experience is threaded for this reason:
+// their docs describe "threads shown in a timeline above the composer".
+//
+// Conversation continuity is unaffected: the user still types in the composer,
+// so their next message arrives unthreaded and conversationTs() still resolves
+// every DM line to DM_CONVERSATION.
 function replyThreadTs(e: ThreadedEvent): string | undefined {
-  return isDm(e.channel) ? e.thread_ts : (e.thread_ts ?? e.ts);
+  return e.thread_ts ?? e.ts;
 }
 
 // Constant, not the message ts: every unthreaded message in a DM has to resolve
@@ -400,8 +414,8 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
     // return, or throw) — a stuck status line is worse than none. No-op off
     // the panel or if one was never set. Same thread_ts gate as the set: only
     // threaded DM turns (the panel's shape) can have a status to clear.
-    if (isAssistantThread(event.channel) && event.thread_ts) {
-      await setStatus(env, event.channel, event.thread_ts, "").catch(() => {});
+    if (isAssistantThread(event.channel)) {
+      await setStatus(env, event.channel, event.thread_ts ?? event.ts, "").catch(() => {});
     }
   }
   return "handled";
@@ -496,16 +510,19 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   if (previewTier !== "haiku" || vision.images.length > 0) {
     await addReaction(env, channel, userMsgTs, "hourglass_flowing_sand").catch(() => {});
     if (isAssistantThread(channel)) {
-      // The native thinking indicator. chat.startStream renders it and, unlike
-      // assistant.threads.setStatus, needs no thread — which is the whole
-      // problem on agent_view, where the DM has none. The old code gated
-      // setStatus on event.thread_ts, so on this surface the loader never fired
-      // even once.
-      streamTs = await startStream(env, channel, threadTs);
+      // The native thinking indicator. Two mechanisms, in order of preference:
+      // chat.startStream (flagged off — Slack rejects our arguments, see
+      // Env.SLACK_STREAMING), then assistant.threads.setStatus, which works now
+      // that DM replies are threaded. The old code gated setStatus on
+      // event.thread_ts, so on the threadless agent surface it never fired once
+      // — that gate, not the API, is why the indicator was missing.
+      if (env.SLACK_STREAMING === "on") {
+        streamTs = await startStream(env, channel, threadTs, event.user, event.team);
+      }
       if (streamTs) openStreams.set(streamKey(channel, event.ts), streamTs);
       // Only fall back to setStatus where a thread genuinely exists (a threaded
       // reply inside a DM). Without one there is nothing it can address.
-      if (!streamTs && event.thread_ts) {
+      if (!streamTs && threadTs) {
         await setStatus(env, channel, threadTs, "is thinking…").catch(() => {});
       }
     }
