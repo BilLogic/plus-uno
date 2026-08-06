@@ -33,7 +33,10 @@
 
 import type { Env, SlackContext } from "../types";
 import { slackConnectUrl } from "../oauth/slack";
-import { slackSearchCredentials } from "../slack/search-credential";
+import {
+  slackSearchCredentials,
+  type SearchCredentialKind,
+} from "../slack/search-credential";
 import { countedFetch, rethrowIfBudget } from "../net";
 import {
   selectHits,
@@ -41,6 +44,19 @@ import {
   type SearchContextPayload,
   type SearchMode,
 } from "./slack-search-filter";
+
+// Slack errors that mean THIS CREDENTIAL is spent — the token is dead, not the
+// query. Anything outside this set (bad query, rate limit, server fault) is a
+// real failure and must not be retried against a narrower credential, which
+// would silently answer from less than the caller asked for.
+const AUTH_ERRORS: ReadonlySet<string> = new Set([
+  "token_revoked",
+  "invalid_auth",
+  "not_authed",
+  "account_inactive",
+  "token_expired",
+  "missing_scope",
+]);
 
 const SEARCH_URL = "https://slack.com/api/assistant.search.context";
 const MAX_HITS = 12;
@@ -93,8 +109,8 @@ export async function executeSlackSearch(
   // A bot-token search is invalid without the triggering event's action_token,
   // so that candidate only counts when we actually carry one.
   const actionToken = slack?.actionToken;
-  const cred = credentials.find((c) => c.kind !== "bot" || !!actionToken);
-  if (!cred) {
+  const viable = credentials.filter((c) => c.kind !== "bot" || !!actionToken);
+  if (viable.length === 0) {
     return JSON.stringify({
       ok: false,
       error:
@@ -111,11 +127,11 @@ export async function executeSlackSearch(
       .filter(Boolean),
   );
 
-  // Which passes this credential runs, and what each pass may emit.
-  const passes: { mode: SearchMode; channelTypes: string }[] =
-    cred.kind === "own"
+  // Which passes a credential runs, and what each pass may emit.
+  const passesFor = (kind: SearchCredentialKind): { mode: SearchMode; channelTypes: string }[] =>
+    kind === "own"
       ? [{ mode: "own", channelTypes: "public_channel,private_channel,mpim,im" }]
-      : cred.kind === "legacy"
+      : kind === "legacy"
         ? [
             { mode: "legacy-public", channelTypes: "public_channel" },
             ...(allowlist.size > 0
@@ -125,55 +141,92 @@ export async function executeSlackSearch(
         : [{ mode: "bot", channelTypes: "public_channel" }];
 
   try {
-    const results: EmittedHit[] = [];
-    let dropped = 0;
-    for (const pass of passes) {
-      const data = await searchPass(
-        cred.token,
-        query,
-        pass.channelTypes,
-        cred.kind === "bot" ? actionToken : undefined,
-      );
-      if (!data.ok) {
-        // A failed pass is a failed search: reporting the survivors as if they
-        // were the whole answer is the false-absence failure this tool exists
-        // to avoid.
-        return JSON.stringify({ ok: false, error: data.error ?? "search failed" });
+    // Walk the chain. A credential that fails AUTH is spent, not fatal: drop to
+    // the next rung. Anything else is a real search failure and stops here.
+    //
+    // Without this the ladder was upside down — the first viable credential was
+    // the only one ever tried, so a revoked token took search DOWN instead of
+    // narrowing it to public-only, and storing MORE credentials made the tool
+    // MORE fragile. That is what turned the 2026-08-06 app reinstall (which
+    // revokes every stored user token) into an outage rather than a degradation.
+    let lastAuthError: string | null = null;
+
+    for (const c of viable) {
+      const passes = passesFor(c.kind);
+      const results: EmittedHit[] = [];
+      let dropped = 0;
+      let authError: string | null = null;
+      let hardError: string | null = null;
+
+      for (const pass of passes) {
+        const data = await searchPass(
+          c.token,
+          query,
+          pass.channelTypes,
+          c.kind === "bot" ? actionToken : undefined,
+        );
+        if (!data.ok) {
+          const err = data.error ?? "search failed";
+          if (AUTH_ERRORS.has(err)) authError = err;
+          else hardError = err;
+          break;
+        }
+        const selected = selectHits(pass.mode, data, allowlist, MAX_HITS - results.length);
+        results.push(...selected.results);
+        dropped += selected.dropped;
       }
-      const selected = selectHits(pass.mode, data, allowlist, MAX_HITS - results.length);
-      results.push(...selected.results);
-      dropped += selected.dropped;
+
+      if (authError) {
+        // Note the rung by name: "which credential died" is the first question
+        // when search degrades, and it is invisible from the reply alone.
+        console.warn(`[slack-search] ${c.kind} credential rejected (${authError}) — trying next rung`);
+        lastAuthError = authError;
+        continue;
+      }
+      // A failed pass is a failed search: reporting the survivors as if they
+      // were the whole answer is the false-absence failure this tool exists
+      // to avoid. Only auth failures fall through — a bad query must not
+      // silently re-run against a narrower credential and look successful.
+      if (hardError) return JSON.stringify({ ok: false, error: hardError });
+
+      // Consent nudge: in their own DM without a connected token, tell the model
+      // the requester can widen coverage themselves (the link is user-facing).
+      const connectUrl = slackConnectUrl(env);
+      const connectNote =
+        inOwnDm && c.kind !== "own" && connectUrl
+          ? `these results do not cover DMs or un-allowlisted private channels. The requester can connect their own Slack history — searches here will then cover everything they can see — at ${connectUrl}`
+          : undefined;
+
+      const visibility =
+        c.kind === "own"
+          ? "requester-own (their DMs/private included)"
+          : c.kind === "legacy"
+            ? "workspace-filtered (public + team-allowlisted private)"
+            : "public-only (no user credential — public channels are the whole search)";
+
+      return JSON.stringify({
+        ok: true,
+        query,
+        visibility,
+        // Zero results must not read as "nothing exists": searched_surfaces says
+        // what was actually looked at, so an empty list can be reported honestly
+        // as "nothing in what I can see" rather than "nothing".
+        searched_surfaces: passes.map((p) => p.channelTypes).join(","),
+        results,
+        // The model is told results are pre-cleared; the count of withheld hits
+        // lets it say "there were matches in spaces I can't surface" honestly
+        // without knowing anything about them.
+        withheld_private_matches: dropped,
+        ...(connectNote ? { note: connectNote } : {}),
+      });
     }
 
-    // Consent nudge: in their own DM without a connected token, tell the model
-    // the requester can widen coverage themselves (the link is user-facing).
-    const connectUrl = slackConnectUrl(env);
-    const connectNote =
-      inOwnDm && cred.kind !== "own" && connectUrl
-        ? `these results do not cover DMs or un-allowlisted private channels. The requester can connect their own Slack history — searches here will then cover everything they can see — at ${connectUrl}`
-        : undefined;
-
-    const visibility =
-      cred.kind === "own"
-        ? "requester-own (their DMs/private included)"
-        : cred.kind === "legacy"
-          ? "workspace-filtered (public + team-allowlisted private)"
-          : "public-only (no user credential — public channels are the whole search)";
-
+    // Every rung rejected us. Say so plainly — this is a credential problem an
+    // admin must fix, not an empty result, and the model must not report it as
+    // "nothing found".
     return JSON.stringify({
-      ok: true,
-      query,
-      visibility,
-      // Zero results must not read as "nothing exists": searched_surfaces says
-      // what was actually looked at, so an empty list can be reported honestly
-      // as "nothing in what I can see" rather than "nothing".
-      searched_surfaces: passes.map((p) => p.channelTypes).join(","),
-      results,
-      // The model is told results are pre-cleared; the count of withheld hits
-      // lets it say "there were matches in spaces I can't surface" honestly
-      // without knowing anything about them.
-      withheld_private_matches: dropped,
-      ...(connectNote ? { note: connectNote } : {}),
+      ok: false,
+      error: `workspace search unavailable — every stored credential was rejected by Slack (${lastAuthError ?? "auth failed"}). Stored tokens are likely revoked; re-consent at /oauth/slack/start. Use thread/channel reads instead.`,
     });
   } catch (err) {
     // A budget stop is not an empty result. Flattening it to {ok:false} told the
