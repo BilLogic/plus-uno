@@ -38,10 +38,15 @@
 # it, the emoji proposal gate still keys off the reacted message, and a /uno-*
 # slash command still posts a framing message and threads its run beneath.
 #
-# In the DM the conversation model changes by design — chat, not threads — so
-# the DM channel itself is the conversation rather than each thread within it.
-# That is a code decision (the runner key and history load branch on
-# channel_type), recorded here because the manifest is what commits to it.
+# DM replies are THREADED (changed 2026-08-06, reversing 74f1b17c's "chat, not
+# threads"). Both thinking-indicator mechanisms Slack offers —
+# assistant.threads.setStatus and chat.startStream — require a thread_ts, so a
+# threadless DM could never show one. Slack's own agent experience threads for
+# the same reason: "threads shown in a timeline above the composer".
+#
+# Continuity is unchanged: the user types in the composer, so their next message
+# still arrives unthreaded and conversationTs() resolves every DM line to the
+# single DM_CONVERSATION key.
 #
 # ── KNOWN-WRONG, DELIBERATELY UNCHANGED ──────────────────────────────────────
 # (interactivity is FIXED, not known-wrong: the request_url pointed at a Netlify
@@ -53,7 +58,7 @@
 display_information:
   # App NAME stays "Uno-bot" — this is what App Directory search matches, so it
   # is how people still find the bot by its old name. The bot USER's display
-  # name is "Le Goat" (features.bot_user below), which is what appears on every
+  # name is "le goat" (features.bot_user below), which is what appears on every
   # message. Slack has no separate handle field: the @mention follows
   # display_name, so it is now @le goat.
   name: Uno-bot
@@ -79,7 +84,7 @@ features:
     messages_tab_enabled: true
     messages_tab_read_only_enabled: false
   bot_user:
-    display_name: Le Goat
+    display_name: le goat
     always_online: true
   slash_commands:
     - command: /uno-prototype
@@ -114,7 +119,19 @@ features:
       should_escape: false
   agent_view:
     agent_description: "Your 🐐 PLUS design teammate: I pull live, cited answers on roadmap cards, product flows, and design-system assets across Notion, Figma, and Slack. I flag anything outdated or unbuilt, and can draft PRDs, update cards, or start prototypes—with your approval first."
-    suggested_prompts: []
+    # Static fallback chips, shown before the Worker's setSuggestedPrompts call
+    # lands (handleAgentDmOpened). Empty meant a cold open showed nothing until
+    # the API round-tripped. Keep in sync with SUGGESTED_PROMPTS in
+    # src/slack/assistant.ts — same four, same wording.
+    suggested_prompts:
+      - title: "What's in progress?"
+        message: "What design cards are currently in progress on the Roadmap?"
+      - title: "Look up a component"
+        message: "Does the design system have a Badge component, and where are its docs?"
+      - title: "Who should I ask?"
+        message: "Who's the right person to talk to about goal-setting?"
+      - title: "Draft a PRD"
+        message: "Help me draft a PRD for a new feature idea."
 oauth_config:
   redirect_urls:
     - https://uno-bot.bryanhuang628.workers.dev/oauth/slack/callback
