@@ -74,10 +74,36 @@ export async function setStatus(
   });
 }
 
-// setAssistantTitle (assistant.threads.setTitle) was removed with the agent_view
-// migration: it names a THREAD, and the agent DM has none — the channel is the
-// conversation. If titled notifications are ever wanted, the pattern is
-// chat.postMessage then setTitle with the returned ts as thread_ts.
+/** Name an App thread. Slack asks for this explicitly — "Set the title
+ *  initially to capture the first question from the user" — because the title
+ *  is how a conversation is found again in History / Messages.
+ *
+ *  Removed during the agent_view migration on the reasoning that the agent DM
+ *  had no thread. It does now (DM replies are threaded), so it is back. */
+export async function setAssistantTitle(
+  env: Env,
+  channel: string,
+  thread_ts: string,
+  title: string,
+): Promise<void> {
+  await slackCall(env, "assistant.threads.setTitle", {
+    channel_id: channel,
+    thread_ts,
+    title,
+  });
+}
+
+/** A thread title from the opening question: one line, trimmed to something a
+ *  sidebar can show. Slack truncates anyway; doing it here keeps the ellipsis
+ *  on a word boundary. */
+export function threadTitleFrom(text: string): string {
+  const oneLine = text.replace(/\s+/g, " ").trim();
+  if (!oneLine) return "Chat with UNO Bot";
+  if (oneLine.length <= 60) return oneLine;
+  const cut = oneLine.slice(0, 60);
+  const brk = cut.lastIndexOf(" ");
+  return `${brk > 30 ? cut.slice(0, brk) : cut}…`;
+}
 
 /** Assistant threads are IM channels (id starts with "D"). Used to gate the
  *  status/loader affordances, which only apply to the assistant surface. */

@@ -3,7 +3,7 @@
 // (Extracted from events.ts, 2026-07-12.)
 
 import type { Env } from "../types";
-import { addReaction, appendStream, postMessage, stopStream } from "./api";
+import { addReaction, appendStream, postMessage, startStream, stopStream } from "./api";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
 // exactly how a model-quota outage read as a mystery for an afternoon
@@ -170,22 +170,28 @@ export async function postTextVerified(
   /** ts of a stream opened at turn start (chat.startStream). When present the
    *  answer CLOSES that stream instead of posting a new message — otherwise the
    *  thinking indicator would be left hanging above a separate reply. */
-  streamTs?: string | null,
 ): Promise<{ ok: boolean; text: string }> {
   const cleaned = stripTrailingConfidence(text);
   const body = cleaned.trim()
     ? capText(cleaned)
     : "(I came back with an empty answer — that's a bug on my side. Try rephrasing, and flag this to the team.)";
 
-  if (streamTs) {
-    // append (the text) then stop (the footer blocks — stopStream is the only
-    // frame that accepts blocks). If either half fails, fall through to a plain
-    // post: a duplicated answer is bad, a missing one is worse.
-    const appended = await appendStream(env, channel, streamTs, body);
-    const stopped = await stopStream(env, channel, streamTs, ANSWER_FOOTER);
-    if (appended && stopped) return { ok: true, text: body };
-    console.warn(`[slack] stream finish failed (append=${appended} stop=${stopped}); falling back to post`);
-    await stopStream(env, channel, streamTs).catch(() => {});
+  // Streamed delivery, opened HERE rather than at turn start. Opening it early
+  // (to double as the thinking indicator) left an empty "AGENT" bubble sitting
+  // in the thread for the whole run — a blank message impersonating a loader.
+  // The status line is the indicator; the stream carries the answer.
+  if (env.SLACK_STREAMING === "on" && threadTs) {
+    const streamTs = await startStream(env, channel, threadTs);
+    if (streamTs) {
+      // append (the text) then stop (the footer blocks — stopStream is the only
+      // frame that accepts blocks). If either half fails, fall through to a
+      // plain post: a duplicated answer is bad, a missing one is worse.
+      const appended = await appendStream(env, channel, streamTs, body);
+      const stopped = await stopStream(env, channel, streamTs, ANSWER_FOOTER);
+      if (appended && stopped) return { ok: true, text: body };
+      console.warn(`[slack] stream finish failed (append=${appended} stop=${stopped}); falling back to post`);
+      await stopStream(env, channel, streamTs).catch(() => {});
+    }
   }
   // `text` stays populated alongside blocks: it is what notifications and
   // screen readers use, and it is the fallback if a block ever fails to render.
