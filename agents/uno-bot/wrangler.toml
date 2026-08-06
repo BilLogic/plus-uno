@@ -46,6 +46,11 @@ crons = ["*/15 13-23 * * 1-5"]
 # docs/conventions/). `bundle:harness` reads those at build time; the Worker
 # dispatches repository_dispatch events against GITHUB_REPO.
 [vars]
+# Streaming replies on the agent surface (chat.startStream). "on" to enable.
+# Slack has rejected our arguments with invalid_arguments since r34 — kept as a
+# flag so the retest costs a var flip, not a code change, and so a failed
+# attempt does not burn one of the 50 subrequests per invocation while off.
+SLACK_STREAMING = "on"
 GITHUB_REPO = "BilLogic/plus-uno"
 # Notion "Roadmap" database (the Design HQ board). notion_create drops new PRD
 # cards here in the "Need PRD / Under Playground" Design Status column.

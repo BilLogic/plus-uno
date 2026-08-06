@@ -176,7 +176,15 @@ export async function startStream(
     // Say WHY. A silent null here is indistinguishable from "streaming is off",
     // which cost a deploy cycle to diagnose: the fallback works, so the only
     // symptom is a missing indicator.
-    console.warn(`[slack] chat.startStream declined: ${res.error ?? "no ts in response"}`);
+    //
+    // The bare error code is not enough: `invalid_arguments` names no field.
+    // Slack puts the specifics in response_metadata.messages, so log that and
+    // which arguments we actually sent (ids only — no token, no message text).
+    console.warn(
+      `[slack] chat.startStream declined: ${res.error ?? "no ts in response"} | detail=${JSON.stringify(
+        (res as Record<string, unknown>).response_metadata ?? null,
+      )} | sent={thread_ts:${threadTs ?? "MISSING"},recipient_user_id:${recipientUserId ?? "MISSING"},recipient_team_id:${recipientTeamId ?? "MISSING"}}`,
+    );
     return null;
   } catch (err) {
     console.warn(`[slack] chat.startStream threw: ${err instanceof Error ? err.message : String(err)}`);
