@@ -162,7 +162,6 @@ export async function startStream(
   threadTs: string | undefined,
   recipientUserId?: string,
   recipientTeamId?: string,
-  replyBroadcast?: boolean,
 ): Promise<string | null> {
   // thread_ts is REQUIRED (a stream is a threaded message), and
   // recipient_user_id / recipient_team_id are required "when streaming to
@@ -174,10 +173,6 @@ export async function startStream(
       ...(threadTs ? { thread_ts: threadTs } : {}),
       ...(recipientUserId ? { recipient_user_id: recipientUserId } : {}),
       ...(recipientTeamId ? { recipient_team_id: recipientTeamId } : {}),
-      // Broadcast puts the reply in the main Messages timeline as well as the
-      // thread. Without it a DM answer is collapsed behind "1 reply" and costs
-      // a click to read — the conversation stops reading like a conversation.
-      ...(replyBroadcast ? { reply_broadcast: true } : {}),
     });
     if (res.ok && res.ts) return res.ts;
     // Say WHY. A silent null here is indistinguishable from "streaming is off",

@@ -507,29 +507,23 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // answer closes the same message the indicator lives in. Null = no stream,
   // deliver normally.
   let streamTs: string | null = null;
-  // A DM thread we synthesized (the user typed in the composer, so their message
-  // had no thread) must broadcast: otherwise the answer hides behind "1 reply"
-  // and the Messages tab reads as a list of unanswered questions. A thread the
-  // USER opened, or any channel thread, stays where it was put.
-  const broadcastReply = isAssistantThread(channel) && !event.thread_ts;
   if (previewTier !== "haiku" || vision.images.length > 0) {
     await addReaction(env, channel, userMsgTs, "hourglass_flowing_sand").catch(() => {});
     if (isAssistantThread(channel)) {
-      // The native thinking indicator. Two mechanisms, in order of preference:
-      // chat.startStream (flagged off — Slack rejects our arguments, see
-      // Env.SLACK_STREAMING), then assistant.threads.setStatus, which works now
-      // that DM replies are threaded. The old code gated setStatus on
-      // event.thread_ts, so on the threadless agent surface it never fired once
-      // — that gate, not the API, is why the indicator was missing.
+      // ORDER MATTERS. setStatus first, ALWAYS — it is not merely a loading
+      // label. Slack: "After the user sends a new message, calling
+      // assistant.threads.setStatus on that thread automatically opens the
+      // thread." It is what puts the answer in front of the user instead of
+      // behind a "1 reply" stub.
+      //
+      // It used to run only as a streaming fallback, so on the streaming path
+      // the thread never opened and the Messages tab read as a list of
+      // unanswered questions. Streaming is additive on top, not an alternative.
+      await setStatus(env, channel, threadTs, "is working on your request…").catch(() => {});
       if (env.SLACK_STREAMING === "on") {
-        streamTs = await startStream(env, channel, threadTs, event.user, event.team, broadcastReply);
+        streamTs = await startStream(env, channel, threadTs, event.user, event.team);
       }
       if (streamTs) openStreams.set(streamKey(channel, event.ts), streamTs);
-      // Only fall back to setStatus where a thread genuinely exists (a threaded
-      // reply inside a DM). Without one there is nothing it can address.
-      if (!streamTs && threadTs) {
-        await setStatus(env, channel, threadTs, "is thinking…").catch(() => {});
-      }
     }
   }
 
@@ -598,7 +592,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     // timeout ships the original draft (fail open — see agent/draft-judge.ts).
     const reviewed = await reviewDraft(env, { userText: vision.modelText, draft: result.text });
     openStreams.delete(streamKey(channel, event.ts));
-    const delivery = await postTextVerified(env, channel, threadTs, reviewed.text, streamTs, broadcastReply);
+    const delivery = await postTextVerified(env, channel, threadTs, reviewed.text, streamTs);
     await appendHistory(env, channel, convTs, { role: "user", content: vision.historyText });
     if (delivery.ok) {
       // Record what was actually posted (capped/placeholder), not the raw text.
