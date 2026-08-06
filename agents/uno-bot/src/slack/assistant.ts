@@ -57,20 +57,39 @@ async function setSuggestedPrompts(
   });
 }
 
-/** Set (or, with an empty string, clear) the "is thinking…" status line. */
+/** What the status line cycles through while a turn runs.
+ *
+ *  A single frozen "is thinking…" reads as hung on a 20–30s grounded run — the
+ *  user cannot tell a slow answer from a dead one. Slack cycles this array
+ *  client-side, so it costs one field, not one API call per step.
+ *
+ *  Ordered to match what the loop actually does (read sources, then reason,
+ *  then write), so it stays honest rather than decorative. */
+const LOADING_MESSAGES = [
+  "reading the sources…",
+  "checking Notion and GitHub…",
+  "cross-checking what's current…",
+  "putting it together…",
+];
+
+/** Set (or, with an empty string, clear) the status line on an App thread. */
 export async function setStatus(
   env: Env,
   channel: string,
   thread_ts: string | undefined,
   status: string,
 ): Promise<void> {
-  // assistant.threads.setStatus addresses a THREAD. An agent_view DM has none,
-  // so there is nothing to decorate — skip rather than send a bad request.
+  // assistant.threads.setStatus addresses a THREAD. Without one there is
+  // nothing to decorate — skip rather than send a bad request.
   if (!thread_ts) return;
+  const clearing = status === "";
   await slackCall(env, "assistant.threads.setStatus", {
     channel_id: channel,
     thread_ts,
     status,
+    // Only while working. Sending them alongside the clear would re-arm the
+    // spinner we are trying to take down.
+    ...(clearing ? {} : { loading_messages: LOADING_MESSAGES }),
   });
 }
 
