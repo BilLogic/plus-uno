@@ -21,7 +21,7 @@ export const SHORTCUTS: Record<string, ShortcutSpec> = {
   // Default effort: the transcript is already in the prompt, so there is
   // nothing to dig for. The instruction not to restate the thread matters —
   // the person was there, they just did not read 40 messages.
-  uno_catchup: {
+  catchup: {
     title: "Catch-up",
     anchor: (l) => `Catching you up on this thread: ${l}`,
     ask: (l) =>
@@ -33,7 +33,7 @@ export const SHORTCUTS: Record<string, ShortcutSpec> = {
 
   // Exists BECAUSE /grind cannot be typed in a thread. Without it, escalating
   // from inside a conversation is impossible.
-  uno_grind: {
+  grind: {
     title: "Second look",
     anchor: (l) => `Taking another run at this: ${l}`,
     ask: (l) =>
@@ -44,7 +44,7 @@ export const SHORTCUTS: Record<string, ShortcutSpec> = {
 
   // Two sources of truth, and the conflict rule is the point: blueprint = today,
   // Roadmap = planned, disagreements surfaced and never blended.
-  uno_verify: {
+  verify: {
     title: "Still true?",
     anchor: (l) => `Checking whether this still holds: ${l}`,
     ask: (l) =>
@@ -58,7 +58,7 @@ export const SHORTCUTS: Record<string, ShortcutSpec> = {
 
   // The question the Decisions DB exists to answer. Ordered sources: recorded
   // beats remembered.
-  uno_where_decided: {
+  where_decided: {
     title: "Where decided?",
     anchor: (l) => `Looking for where this was decided: ${l}`,
     ask: (l) =>
@@ -73,7 +73,7 @@ export const SHORTCUTS: Record<string, ShortcutSpec> = {
 
   // The value is attribution, not words: an @-mention produces a correct answer
   // credited to a bot; this produces one credited to the person.
-  uno_draft: {
+  draft: {
     title: "Draft reply",
     anchor: (l) => `Drafting a reply for you: ${l}`,
     ask: (l) =>

@@ -33,7 +33,7 @@ test("every handler is declared in the manifest", () => {
 test("all five are present", () => {
   assert.deepEqual(
     Object.keys(SHORTCUTS).sort(),
-    ["uno_catchup", "uno_draft", "uno_grind", "uno_verify", "uno_where_decided"],
+    ["catchup", "draft", "grind", "verify", "where_decided"],
   );
 });
 
@@ -54,12 +54,12 @@ test("titles are short enough to read in a timeline", () => {
 test("the draft shortcut tells the agent not to post it", () => {
   // Its deliverable is deliberately NOT sent — the value is attribution, and a
   // bot posting "your" reply destroys exactly that.
-  const ask = SHORTCUTS.uno_draft!.ask("https://x/y");
+  const ask = SHORTCUTS.draft!.ask("https://x/y");
   assert.match(ask, /do not post it/i);
 });
 
 test("where-decided refuses to invent provenance", () => {
-  const ask = SHORTCUTS.uno_where_decided!.ask("https://x/y");
+  const ask = SHORTCUTS.where_decided!.ask("https://x/y");
   assert.match(ask, /never construct/i);
   assert.match(ask, /no record/i);
 });
