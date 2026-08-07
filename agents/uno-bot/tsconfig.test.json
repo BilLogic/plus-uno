@@ -11,5 +11,5 @@
     "noEmit": false,
     "outDir": ".test-build"
   },
-  "include": ["tests/**/*.ts", "src/tools/slack-search-filter.ts"]
+  "include": ["tests/**/*.ts", "src/tools/slack-search-filter.ts", "src/agent/revision-guard.ts"]
 }
