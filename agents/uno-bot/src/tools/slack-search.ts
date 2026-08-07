@@ -38,6 +38,7 @@ import {
   type SearchCredentialKind,
 } from "../slack/search-credential";
 import { countedFetch, rethrowIfBudget } from "../net";
+import { buildSearchResponse } from "./slack-search-response";
 import {
   selectHits,
   type EmittedHit,
@@ -204,21 +205,17 @@ export async function executeSlackSearch(
             ? "workspace-filtered (public + team-allowlisted private)"
             : "public-only (no user credential — public channels are the whole search)";
 
-      return JSON.stringify({
-        ok: true,
-        query,
-        visibility,
-        // Zero results must not read as "nothing exists": searched_surfaces says
-        // what was actually looked at, so an empty list can be reported honestly
-        // as "nothing in what I can see" rather than "nothing".
-        searched_surfaces: passes.map((p) => p.channelTypes).join(","),
-        results,
-        // The model is told results are pre-cleared; the count of withheld hits
-        // lets it say "there were matches in spaces I can't surface" honestly
-        // without knowing anything about them.
-        withheld_private_matches: dropped,
-        ...(connectNote ? { note: connectNote } : {}),
-      });
+      return JSON.stringify(
+        buildSearchResponse({
+          query,
+          visibility,
+          searchedSurfaces: passes.map((p) => p.channelTypes).join(","),
+          results,
+          dropped,
+          inOwnDm,
+          connectNote,
+        }),
+      );
     }
 
     // Every rung rejected us. Say so plainly — this is a credential problem an
