@@ -57,10 +57,19 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
     if (!mode) {
       return Response.json({ ok: false, error: "no Gemini credential configured (GEMINI_API_KEY or GEMINI_SA_EMAIL + GEMINI_SA_PRIVATE_KEY)" });
     }
+    // ?model= probes a SPECIFIC model — the only way to answer "is this model
+    // available to this project?" before wiring a tier to it. A preview model
+    // can be listed in the docs and absent from a given Vertex project, and the
+    // failure would otherwise surface as a 400 on someone's first /grind.
+    const probeModel = url.searchParams.get("model") ?? undefined;
     const result = await geminiGenerate(env, {
       prompt: "Reply with exactly: uno-bot gemini link ok",
       maxTokens: 100,
-      thinkingLevel: "minimal",
+      // ?level= too: gemini-3.1-pro rejects MINIMAL outright, so a probe with a
+      // hardcoded level cannot tell "model absent" from "level unsupported".
+      thinkingLevel: (url.searchParams.get("level") ?? "minimal") as
+        | "minimal" | "low" | "medium" | "high",
+      ...(probeModel ? { model: probeModel } : {}),
     });
     return Response.json({ auth: mode, ...result, text: result.text?.slice(0, 100) });
   }
