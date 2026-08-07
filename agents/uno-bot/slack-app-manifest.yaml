@@ -58,11 +58,20 @@
 # (messages_tab_enabled moved above — it is now an intended change, not a
 # question, since the DM is meant to read as an ordinary chat.)
 display_information:
-  # App NAME stays "Uno-bot" — this is what App Directory search matches, so it
-  # is how people still find the bot by its old name. The bot USER's display
-  # name is "le goat" (features.bot_user below), which is what appears on every
-  # message. Slack has no separate handle field: the @mention follows
-  # display_name, so it is now @le goat.
+  # ── TWO NAMES, AND THEY GOVERN DIFFERENT SURFACES ──────────────────────────
+  # This one (display_information.name) is what shows in the SIDEBAR, the DM
+  # header, the Messages/Home tab title, workspace search, and the App
+  # Directory. features.bot_user.display_name ("le goat") is what shows as the
+  # AUTHOR on every message the bot posts. Slack derives the @handle from
+  # display_name, so the mention is @le goat.
+  #
+  # Reinstalling propagates display_name to the bot user. It CANNOT change this
+  # field — so "I reinstalled and it still says Uno-bot" is the expected
+  # outcome, not a failed install. That confusion has now cost two rounds; this
+  # comment exists so it does not cost a third.
+  #
+  # Staying "Uno-bot" is a DECISION, re-confirmed 2026-08-07: search matches on
+  # the name, and this is the name the team already types to find the app.
   name: Uno-bot
   description: PLUS team's Slack-native AI teammate 🐐
   # long_description was never set on the app (confirmed absent from
@@ -94,18 +103,16 @@ features:
     # reviewable in a diff rather than buried in app settings. A test asserts
     # these callback_ids match the handler — a shortcut declared with no entry
     # there still appears in the menu and quietly does the generic thing.
+    #
+    # ORDER MATTERS TWICE. It is the order they appear in the context menu, and
+    # `slack manifest diff` compares the list positionally — so a set that
+    # matches in a different order still reports a difference forever. A diff
+    # that always shows one difference is a diff nobody reads. This order is
+    # the app's (verified in sync 2026-08-07); keep them equal.
     - name: Catch me up from here
       type: message
       callback_id: catchup
       description: What was decided, what's open, who owns what
-    - name: Think harder about this
-      type: message
-      callback_id: grind
-      description: Redo it properly on the deep tier
-    - name: Is this still true?
-      type: message
-      callback_id: verify
-      description: Check the claim against the blueprint and Notion
     - name: Where was this decided?
       type: message
       callback_id: where_decided
@@ -114,6 +121,14 @@ features:
       type: message
       callback_id: draft
       description: A draft in your voice, for you to send
+    - name: Think harder about this
+      type: message
+      callback_id: grind
+      description: Redo it properly on the deep tier
+    - name: Is this still true?
+      type: message
+      callback_id: verify
+      description: Check the claim against the blueprint and Notion
   slash_commands:
     - command: /uno-prototype
       url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
