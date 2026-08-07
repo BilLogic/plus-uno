@@ -107,11 +107,34 @@ our sources rather than theirs:
    because these two sources drift, so a verification shortcut is where it earns
    the most.
 
-4. **Where was this decided?** — the **Notion Decisions DB** (`NOTION_DECISIONS_DB_ID`,
-   already wired for `notion_search` scope "decision"). Must **say there is no
-   record** rather than construct a plausible one: "we agreed X" with no record
-   is indistinguishable from a misremembering, and inventing the provenance is
-   the worst possible failure for this particular shortcut.
+4. **Where was this decided?** — three sources, **in this order**:
+
+   1. **Notion Decisions DB** (`NOTION_DECISIONS_DB_ID`, already wired for
+      `notion_search` scope "decision") — the recorded answer.
+   2. **Notion project documentation** — PRDs and Roadmap cards, where a
+      decision often lives before anyone writes it down as one.
+   3. **Slack history, searched AS THE ASKER** — because most decisions are
+      made in a message and never recorded anywhere else (user decision,
+      2026-08-07).
+
+   Ordered because a recorded decision beats a remembered one: a Slack message
+   saying "let's do X" that was later reversed in the Decisions DB would be the
+   wrong answer, and searching Slack first would surface it first.
+
+   **The surface gate makes step 3 legitimate, and it is not an accident.**
+   Shortcut answers go to the asker's own DM, which is exactly where own-token
+   search is permitted under ADR-020. The same shortcut answering into a channel
+   could not run this search — the visibility would be the asker's while the
+   audience was everyone. Two design choices made separately, meeting cleanly.
+
+   **"Decided in Slack, never recorded" is a FINDING, not a failure.** Say where
+   it was said, quote it, and note that nothing records it — then offer to file
+   it. That is the gap the Decisions DB exists to close, and this shortcut is
+   the moment it becomes visible.
+
+   Must **say there is no record** rather than construct a plausible one:
+   "we agreed X" with no record is indistinguishable from a misremembering, and
+   inventing provenance is the worst failure available to this shortcut.
 5. **Help me reply** — a draft in the asker's own voice, in a fenced block so it
    pastes cleanly, sources *below* the draft. The bot never posts it. Value is
    attribution: an @-mention produces a correct answer credited to a bot; this
