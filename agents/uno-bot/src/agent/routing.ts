@@ -15,7 +15,11 @@ import { looksLikeResolution } from "./loop-shared";
 // On the Vertex-Claude lane a tier maps to the model IDs below. On the Gemini
 // lane it maps to a model too (see gemini-agent.ts) — the thinking dial is held
 // constant at medium so a tier change stays a single-variable change.
-export type ModelTier = "chill" | "default" | "grind";
+// Defined in tiers.ts (import-free) so pure modules can name a tier without
+// pulling in the Workers type graph. Re-exported here: routing is where callers
+// expect to find it.
+export type { ModelTier } from "./tiers";
+import type { ModelTier } from "./tiers";
 
 export const MODELS: Record<ModelTier, string> = {
   chill: "claude-haiku-4-5@20251001",

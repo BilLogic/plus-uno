@@ -8,6 +8,8 @@
 // The manifest carries only the menu label and callback_id; these strings are
 // the actual behaviour, kept in code so they are reviewable in a diff.
 
+import { GRIND } from "./effort";
+
 export interface ShortcutSpec {
   /** Explicit tier. Stated, not implied: the first version relied on the ask
    *  containing "think harder", which does NOT match the escalation phrase
@@ -38,14 +40,13 @@ export const SHORTCUTS: Record<string, ShortcutSpec> = {
 
   // Exists BECAUSE /grind cannot be typed in a thread. Without it, escalating
   // from inside a conversation is impossible.
+  // Same GRIND definition /grind uses — one meaning, two surfaces. See
+  // effort.ts for why they must not drift.
   grind: {
-    tier: "grind",
+    tier: GRIND.tier,
     title: "Second look",
     anchor: (l) => `Taking another run at this: ${l}`,
-    ask: (l) =>
-      `Think harder about this and redo it properly: ${l}\n\n` +
-      `Assume the previous answer was thin. Check the claims against the sources rather than restating them, ` +
-      `and say explicitly where you now disagree with what was said before.`,
+    ask: (l) => `Think harder about this and redo it properly: ${l}\n\n${GRIND.instruction}`,
   },
 
   // Two sources of truth, and the conflict rule is the point: blueprint = today,

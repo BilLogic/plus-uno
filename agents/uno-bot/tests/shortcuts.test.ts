@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { SHORTCUTS } from "../src/slack/shortcut-specs";
+import { GRIND, CHILL, EFFORT_COMMANDS } from "../src/slack/effort";
 
 // The manifest declares the menu label; shortcuts.ts declares what each one
 // actually asks. They are two files that must agree, and the failure is silent
@@ -62,4 +63,24 @@ test("where-decided refuses to invent provenance", () => {
   const ask = SHORTCUTS.where_decided!.ask("https://x/y");
   assert.match(ask, /never construct/i);
   assert.match(ask, /no record/i);
+});
+
+// ── one grind, two surfaces ──────────────────────────────────────────────────
+// /grind and the "think harder" shortcut are not duplicates — slash commands do
+// not work in threads, so neither reaches the other's surface. But they must
+// mean the SAME thing, and two copies of the wording would diverge the first
+// time one was edited.
+
+test("the grind shortcut and /grind share one definition", () => {
+  assert.equal(EFFORT_COMMANDS["/grind"], GRIND, "/grind must use the shared GRIND mode");
+  assert.equal(SHORTCUTS.grind!.tier, GRIND.tier);
+  assert.ok(
+    SHORTCUTS.grind!.ask("https://x/y").includes(GRIND.instruction),
+    "the shortcut must carry the shared instruction, not a second copy of it",
+  );
+});
+
+test("effort modes name a tier that is not the default", () => {
+  assert.equal(GRIND.tier, "grind");
+  assert.equal(CHILL.tier, "chill");
 });

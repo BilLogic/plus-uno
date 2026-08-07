@@ -24,6 +24,7 @@ import { countedFetch } from "../net";
 import { postMessage } from "./api";
 import { enqueueAgentJob } from "./events";
 import { requestCancel } from "../thread-state-client";
+import { EFFORT_COMMANDS, type EffortMode } from "./effort";
 import { SLASH_COMMANDS } from "../generated/slack-commands";
 import type { SlackMessageEvent } from "./types";
 
@@ -86,6 +87,25 @@ export function handleSlashCommand(
     );
   }
 
+  // /grind and /chill are effort modes, not skills: they take the question you
+  // were going to ask anyway and run it harder or cheaper. Same synthetic-event
+  // path as a /uno-* run, with an explicit tier attached.
+  const effort = EFFORT_COMMANDS[payload.command];
+  if (effort) {
+    if (!payload.text) {
+      return ephemeral(
+        `Usage: \`${payload.command} <your question>\` — it runs the question ` +
+          `${payload.command === "/grind" ? "on the deep model" : "cheap and short"}.`,
+      );
+    }
+    ctx.waitUntil(startEffortRun(env, payload, effort));
+    return ephemeral(
+      payload.command === "/grind"
+        ? "Taking a harder run at that — watch the thread."
+        : "Keeping it quick — watch the thread.",
+    );
+  }
+
   const target = SLASH_COMMANDS[payload.command];
   if (!target) {
     // Reachable whenever the app manifest declares a command the deployed Worker
@@ -108,6 +128,42 @@ export function handleSlashCommand(
 
   // The framing message lands a beat later; this is what the caller sees now.
   return ephemeral(`On it — starting *${target.skill}* in <#${payload.channelId}>. Watch the thread.`);
+}
+
+async function startEffortRun(
+  env: Env,
+  payload: SlashCommandPayload,
+  effort: EffortMode,
+): Promise<void> {
+  try {
+    const posted = await postMessage(env, {
+      channel: payload.channelId,
+      text: `<@${payload.userId}> ran \`${payload.command}\`\n>>> ${payload.text}`,
+    });
+    const rootTs = posted?.ts;
+    if (!rootTs) throw new Error("chat.postMessage returned no ts — cannot thread the run");
+
+    // tierOverride is what actually changes the model. The instruction changes
+    // the WORK: without it, "grind" would just be the same answer from a bigger
+    // model, which is not what anyone means by think harder.
+    const event: SlackMessageEvent = {
+      type: "message",
+      channel: payload.channelId,
+      user: payload.userId,
+      text: `${payload.text}\n\n${effort.instruction}`,
+      ts: rootTs,
+      thread_ts: rootTs,
+      tierOverride: effort.tier,
+    };
+    await enqueueAgentJob(env, { kind: "message", event }, `${payload.channelId}:${rootTs}`);
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error(`[slash] ${payload.command} failed to start: ${detail}`);
+    await replyPrivately(
+      payload.responseUrl,
+      ":warning: I couldn't start that one — try again, and flag it in #uno-bot if it repeats.",
+    ).catch(() => {});
+  }
 }
 
 async function startRun(
