@@ -184,6 +184,47 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
     return Response.json({ sent: payload, status: res.status, slack: await res.json() });
   }
 
+  // What the blueprint deployment actually supports — the question the code
+  // could not answer about itself. searchBlueprint degrades semantic -> rpc ->
+  // table fan-out silently, so "is semantic even deployed?" was unanswerable
+  // without reading production logs and hoping a search happened.
+  //
+  // Reports, per capability: reachable, and readable-by-anon. Auth-gated; all
+  // reads, no writes.
+  if (request.method === "GET" && url.pathname === "/debug/blueprint") {
+    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
+    if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) {
+      return Response.json({ ok: false, error: "SUPABASE_URL / SUPABASE_ANON_KEY not configured" });
+    }
+    const base = env.SUPABASE_URL.replace(/\/+$/, "");
+    const h = { apikey: env.SUPABASE_ANON_KEY, authorization: `Bearer ${env.SUPABASE_ANON_KEY}` };
+    const probe = async (label: string, path: string, init?: RequestInit) => {
+      try {
+        const r = await countedFetch(`${base}${path}`, { ...init, headers: { ...h, ...(init?.headers ?? {}) } });
+        const body = await r.text();
+        return { [label]: { status: r.status, ok: r.ok, sample: body.slice(0, 160) } };
+      } catch (err) {
+        return { [label]: { error: err instanceof Error ? err.message : String(err) } };
+      }
+    };
+    const out: Record<string, unknown> = { build: BUILD, semantic_flag: env.SEMANTIC_SEARCH ?? "on" };
+    Object.assign(out, await probe("rpc_search_blueprint", "/rest/v1/rpc/search_blueprint", {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ q: "tutor" }),
+    }));
+    Object.assign(out, await probe("rpc_match_corpus_chunks", "/rest/v1/rpc/match_corpus_chunks", {
+      method: "POST",
+      headers: { "content-type": "application/json", "content-profile": "semantic_search" },
+      // Deliberately malformed embedding: a 404/PGRST202 means the function is
+      // ABSENT, any other error means it exists and rejected the argument —
+      // which is the distinction being probed, with no embedding call spent.
+      body: JSON.stringify({ query_embedding: [0], match_count: 1, filter_source: "blueprint" }),
+    }));
+    for (const t of ["cells", "cell_triggers", "findings", "slices"]) {
+      Object.assign(out, await probe(`table_${t}`, `/rest/v1/${t}?select=id&limit=1`));
+    }
+    return Response.json(out);
+  }
+
   // Manual firing of the Figma library poll (same code path as the cron).
   // `?dry_run=1` diffs and reports without writing KV / Notion / Slack.
   // Auth-gated: a live run posts to Slack and files a PRD.
