@@ -29,7 +29,7 @@ The other docs keep their value as *reasoning*; this one is the *schedule*.
 | 8 | **`task_display_mode: "plan"`** | Streaming already ships; this renders steps as a checklist instead of interim prose. |
 | 9 | **Bot display name propagation** | `le goat` is in app settings and never reached the bot user. One reinstall. |
 | 10 | **Blueprint deep links** | Verify the param scheme, then link answers into the app. `include` already shipped (r51). |
-| 11 | **`/uno-stop` + Home-tab control** | A turn runs 30–90s with no way to abort it. Feasible here — see below. |
+| 11 | **`/stop` + Home-tab control** | A turn runs 30–90s with no way to abort it. Feasible here — see below. |
 
 ### Out of scope, deliberately
 
@@ -55,13 +55,13 @@ Durable Object **keyed by conversation** (`conversationKey`), and the agent loop
 is an explicit `for (let iter = 0; iter < MAX_ITERATIONS; iter++)` at
 `src/agent/gemini-agent.ts:307`. So:
 
-- `/uno-stop` arrives with a channel. The channel resolves to the SAME DO that
+- `/stop` arrives with a channel. The channel resolves to the SAME DO that
   is running the turn — no registry, no lookup, no session id.
 - The DO sets a cancel flag; the loop checks it at the top of each iteration and
   returns early. Cooperative, so it lands at a tool boundary rather than mid-write.
 - The `finally` that already clears status on every exit path handles the rest.
 
-Two places, per playbook 4.3, because they know different things: `/uno-stop`
+Two places, per playbook 4.3, because they know different things: `/stop`
 (knows the channel, not the person) and a Home-tab button (knows the person,
 not the channel). Note 4.2 — a slash command cannot be typed in a thread, which
 is exactly why the Home tab is not optional.
@@ -200,7 +200,7 @@ generation tokens for stale measures) — no analogue in a chat surface.
 - [ ] Phase 2: one shortcut working end to end within the 3s ack
 - [ ] Phase 3 merged, judged evals 19/19
 - [ ] Phase 4: bot renders as `le goat`; blueprint answers carry app links
-- [ ] `/uno-stop` aborts a running turn at the next iteration boundary, from both the command and the Home tab
+- [ ] `/stop` aborts a running turn at the next iteration boundary, from both the command and the Home tab
 - [ ] Retention decision recorded before Phase 5 begins
 - [ ] Phase 5 gated per-phase with case-by-case eval comparison
 

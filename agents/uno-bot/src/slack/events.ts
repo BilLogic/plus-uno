@@ -419,7 +419,15 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   const convTs = conversationTs(event);
   const userText = stripBotMentions(event.text!);
 
-  await addReaction(env, channel, userMsgTs, "eyes");
+  // ONE reaction, and only where nothing else says "I'm on it".
+  //
+  // The agent surface (DM) has assistant.threads.setStatus, a titled thread and
+  // a streamed reply — three signals. Adding 👀 ⏳ ✅ on top made four, on a
+  // message the person can already see is being handled. A channel has none of
+  // those, so 👀 is the only acknowledgement there is; it stays there.
+  if (!isAssistantThread(channel)) {
+    await addReaction(env, channel, userMsgTs, "eyes");
+  }
 
   // If this message is a thread reply (not the thread root itself), check the
   // parent message for a Notion PRD URL — that's how v1 carried PRD context
@@ -523,7 +531,6 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // answer closes the same message the indicator lives in. Null = no stream,
   // deliver normally.
   if (previewTier !== "chill" || vision.images.length > 0) {
-    await addReaction(env, channel, userMsgTs, "hourglass_flowing_sand").catch(() => {});
     if (isAssistantThread(channel)) {
       // setStatus IS the thinking indicator on an App thread — the documented
       // one ("await setStatus({ status: 'Thinking...' })"), and it also opens
@@ -616,7 +623,10 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     if (delivery.ok) {
       // Record what was actually posted (capped/placeholder), not the raw text.
       await appendHistory(env, channel, convTs, { role: "assistant", content: delivery.text });
-      await addReaction(env, channel, userMsgTs, "white_check_mark");
+      // No ✅ on success: the reply that just landed IS the completion signal,
+      // and a checkmark next to it is a second one saying the same thing. ✅
+      // still means something specific here — it is how a human CONFIRMS a
+      // proposal — so spending it on "I answered" also blunts the gate.
     } else {
       // Never ✅ a reply that was never delivered.
       console.error("[slack] reply delivery failed after retry");
