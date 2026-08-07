@@ -81,6 +81,44 @@ Deletes `trySemantic`, `tryRpc`, `searchViaTables`, the `SOURCES` table,
 call. The `retrieval` field added on 2026-08-07 becomes a constant, and the
 silent-degradation ladder it was built to observe stops existing.
 
+## Second ask: canonical URLs on the read
+
+**The problem, investigated 2026-08-07 rather than assumed.** uno-bot wants to
+link an answer back into the app — "here is the cell, here is the scenario" —
+and cannot, because it has no URL contract. What the deployed bundle shows:
+
+- `?slice=<id>` appears, but inside **vendored skill markdown**, not routing
+  code: *"render-checker confirms every frame renders at `?slice=<id>`"*. Real
+  convention, real consumer, but documentation rather than proof.
+- No `searchParams.get(...)` for it in the minified source, and **no
+  cell/scenario/phase parameters at all**.
+
+So the bot can either construct URLs from a guessed scheme, or link nothing.
+Constructing them is not an option: presenting an unverified URL as in-hand is
+the fabrication rule this bot is built around, and a link that 404s is worse
+than no link because it looks authoritative.
+
+**The ask: return the canonical URL with the row.** Not a documented scheme for
+consumers to assemble — the URL itself, from the side that owns routing.
+
+This is the cockpit plan's own principle applied one layer out: `get_compare_diff`
+exists so the agent learns slot keys from a read before issuing writes, *"the way
+`list_slices` grounds `open_slice_tab`"*. Same shape here — the read grounds the
+link.
+
+Why the app should own it rather than each consumer:
+
+- **Routing changes are the app's to make.** A scheme published to three
+  consumers becomes three places to update, and the two that lag ship dead links.
+- **Consumers cannot verify.** uno-bot has no way to check that a URL it built
+  resolves; the app knows by construction.
+- **It scales to cells.** Slices may already work by convention, but cell-level
+  links do not exist. If the read returns them, they exist for everyone at once.
+
+Concretely: `search_blueprint` (or the hybrid RPC) gains a `url` column per row,
+and slice reads return theirs. uno-bot links what it was given, and never
+assembles one.
+
 ## What this proposal does NOT ask for
 
 - **No write access.** uno-bot is anon, deliberately: same tier as an
@@ -100,3 +138,8 @@ silent-degradation ladder it was built to observe stops existing.
 3. Would you rather own the fusion ranking here, or have consumers fuse? Owning
    it means every consumer — app, IDE, bot — gets the same relevance, which is
    an argument for the database.
+4. Is `?slice=<id>` actually live, or only documented in the skill text? A
+   browser check settles it in seconds and we have not run one.
+5. Is there any deep-link target below a slice — a cell, a scenario, a phase?
+   If not, is adding one worth it, or should the bot link the slice and describe
+   the cell in words?
