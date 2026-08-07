@@ -30,15 +30,42 @@ export interface SuggestedPrompt {
   message: string;
 }
 
-/** Starter chips shown on panel open — each maps to a real lane in AGENT.md so
- *  the first tap lands a grounded win (roadmap read, DS lookup, SME routing,
- *  PRD drafting). Slack renders up to 4. */
-export const SUGGESTED_PROMPTS: SuggestedPrompt[] = [
+/** Starter chips — each maps to a real lane in AGENT.md so the first tap lands
+ *  a grounded win. Slack renders up to 4.
+ *
+ *  These three need no personal credential: Roadmap, design system, and roster
+ *  reads all work for anyone. */
+const BASE_PROMPTS: SuggestedPrompt[] = [
   { title: "What's in progress?", message: "What design cards are currently in progress on the Roadmap?" },
   { title: "Look up a component", message: "Does the design system have a Badge component, and where are its docs?" },
   { title: "Who should I ask?", message: "Who's the right person to talk to about goal-setting?" },
-  { title: "Draft a PRD", message: "Help me draft a PRD for a new feature idea." },
 ];
+
+/** Offered only to someone who HAS connected their Slack — it searches their
+ *  own DMs and private channels, which is precisely what an unconnected user
+ *  cannot do. */
+const CONNECTED_PROMPT: SuggestedPrompt = {
+  title: "What did we decide?",
+  message: "Search my Slack and tell me what we decided about the spacing token migration.",
+};
+
+/** Offered instead, to someone who has not. Turns a chip that would fail into
+ *  the one action that makes it work. */
+const CONNECT_PROMPT: SuggestedPrompt = {
+  title: "Search my Slack",
+  message: "How do I connect my Slack history so you can search my DMs and private channels?",
+};
+
+/** Exported for App Home, which lists the same starters as plain text. */
+export const SUGGESTED_PROMPTS: SuggestedPrompt[] = [...BASE_PROMPTS, CONNECTED_PROMPT];
+
+/** A fixed prompt set LIES when capability varies per person: it offers someone
+ *  a query the agent cannot run for them, and their first experience is a
+ *  refusal. Search reach depends on individual OAuth, so the set depends on it
+ *  too. This is a correctness fix, not personalisation. */
+export function promptsFor(connected: boolean): SuggestedPrompt[] {
+  return [...BASE_PROMPTS, connected ? CONNECTED_PROMPT : CONNECT_PROMPT];
+}
 
 async function setSuggestedPrompts(
   env: Env,
@@ -186,8 +213,17 @@ export async function handleAgentDmOpened(
   channel: string,
   userId: string,
 ): Promise<void> {
+  // Capability first, then the chips that match it. A failed lookup falls back
+  // to the unconnected set: offering the connect link to someone who already
+  // connected is a harmless redundancy, the reverse is a dead-end chip.
+  let connected = false;
+  try {
+    connected = Boolean(userId) && (await hasOwnSlackToken(env, userId));
+  } catch {
+    /* unconnected set */
+  }
   await Promise.allSettled([
-    setSuggestedPrompts(env, channel, undefined, SUGGESTED_PROMPTS, "How can I help?"),
+    setSuggestedPrompts(env, channel, undefined, promptsFor(connected), "How can I help?"),
     greetOnce(env, channel, userId),
   ]);
 }

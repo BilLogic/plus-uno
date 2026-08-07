@@ -49,6 +49,48 @@ export interface BlueprintRow {
   phase?: string;
   /** Cosine similarity, present only on semantic (vector) matches. */
   score?: number;
+  /** cells.links — URLs the blueprint AUTHORS attached to this cell. Already in
+   *  the table; never surfaced before, so the richest citation material the
+   *  blueprint has was being fetched and thrown away. */
+  links?: string[];
+  /** cells.updated_at. The tool tells the model to flag a stale blueprint; it
+   *  could not, because it was never given a date to judge. */
+  updatedAt?: string;
+}
+
+/** Which retrieval path answered, and whether the result was capped.
+ *
+ *  Three paths degrade silently into each other (semantic → RPC → table
+ *  fan-out) and nothing reported which one ran, so "are blueprint answers any
+ *  good?" was unanswerable — the same silent-degradation class as the
+ *  chat.startStream null that cost a day of wrong conclusions. */
+export type BlueprintRetrieval = "semantic" | "rpc" | "tables";
+
+export interface BlueprintSearchResult {
+  rows: BlueprintRow[];
+  retrieval: BlueprintRetrieval;
+  /** True when MAX_ROWS clipped the result — the model must be able to say
+   *  "there is more than this" instead of narrating a partial view as whole. */
+  truncated: boolean;
+}
+
+/** cells.links is jsonb — authored by humans, so it arrives as bare URL strings
+ *  OR as objects. Anything that is not a usable http(s) URL is dropped rather
+ *  than passed to the model: a half-parsed link is a fabricated citation, which
+ *  is the one thing this tool exists to prevent. */
+function normalizeLinks(raw: unknown): string[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const out: string[] = [];
+  for (const item of raw) {
+    const url =
+      typeof item === "string"
+        ? item
+        : typeof (item as { url?: unknown } | null)?.url === "string"
+          ? (item as { url: string }).url
+          : "";
+    if (/^https?:\/\//i.test(url)) out.push(url);
+  }
+  return out.length ? out : undefined;
 }
 
 export class BlueprintUnavailableError extends Error {}
@@ -61,7 +103,7 @@ export function isBlueprintConfigured(env: Env): boolean {
 // question often re-searches near-identical queries; serving repeats from cache
 // costs zero subrequests — which matters on the free plan's 50/request cap.
 const CACHE_TTL_MS = 60_000;
-const searchCache = new Map<string, { at: number; rows: BlueprintRow[] }>();
+const searchCache = new Map<string, { at: number; result: BlueprintSearchResult }>();
 
 function headers(key: string): Record<string, string> {
   return { apikey: key, authorization: `Bearer ${key}` };
@@ -78,18 +120,18 @@ function terms(query: string): string[] {
  * falls back to direct table queries if the function isn't present. Throws
  * BlueprintUnavailableError when Supabase isn't configured at all. Read-only.
  */
-export async function searchBlueprint(env: Env, query: string): Promise<BlueprintRow[]> {
+export async function searchBlueprint(env: Env, query: string): Promise<BlueprintSearchResult> {
   if (!isBlueprintConfigured(env)) {
     throw new BlueprintUnavailableError(
       "uno-blueprint not configured — missing SUPABASE_URL / SUPABASE_ANON_KEY",
     );
   }
   const q = query.trim();
-  if (!q) return [];
+  if (!q) return { rows: [], retrieval: "tables", truncated: false };
 
   const cacheKey = terms(q).sort().join(" ");
   const hit = searchCache.get(cacheKey);
-  if (hit && Date.now() - hit.at < CACHE_TTL_MS) return hit.rows;
+  if (hit && Date.now() - hit.at < CACHE_TTL_MS) return hit.result;
 
   const base = env.SUPABASE_URL!.replace(/\/+$/, "");
   const key = env.SUPABASE_ANON_KEY!;
@@ -101,19 +143,29 @@ export async function searchBlueprint(env: Env, query: string): Promise<Blueprin
       const sem = await trySemantic(env, base, key, q, controller.signal)
         .catch((e) => { rethrowIfBudget(e); return null; });
       if (sem && sem.length) {
-        console.log(`[blueprint] semantic hit (${sem.length})`);
-        searchCache.set(cacheKey, { at: Date.now(), rows: sem });
-        return sem;
+        console.log(`[blueprint] retrieval=semantic rows=${sem.length}`);
+        const result: BlueprintSearchResult = { rows: sem, retrieval: "semantic", truncated: false };
+        searchCache.set(cacheKey, { at: Date.now(), result });
+        return result;
       }
     }
 
     const rpc = await tryRpc(base, key, q, controller.signal);
-    const rows = rpc !== null
-      ? rpc.slice(0, MAX_ROWS)
-      // RPC absent → direct-query fallback.
-      : (await searchViaTables(base, key, q, controller.signal)).slice(0, MAX_ROWS);
-    searchCache.set(cacheKey, { at: Date.now(), rows });
-    return rows;
+    const found = rpc !== null ? rpc : await searchViaTables(base, key, q, controller.signal);
+    const retrieval: BlueprintRetrieval = rpc !== null ? "rpc" : "tables";
+    const result: BlueprintSearchResult = {
+      rows: found.slice(0, MAX_ROWS),
+      retrieval,
+      truncated: found.length > MAX_ROWS,
+    };
+    // One line per search saying WHICH path served it. Without this the tool
+    // degrades semantic → rpc → tables in silence, and answer quality drifts
+    // with nothing to attribute it to.
+    console.log(
+      `[blueprint] retrieval=${retrieval} rows=${result.rows.length}${result.truncated ? " (truncated)" : ""}`,
+    );
+    searchCache.set(cacheKey, { at: Date.now(), result });
+    return result;
   } finally {
     clearTimeout(timer);
   }
@@ -202,7 +254,7 @@ const SOURCES: Source[] = [
     table: "cells",
     kind: "cell",
     columns: ["content"],
-    select: "id,content,layer:layers(name),step:steps(name),path:paths(name,scenario:service_scenarios(name))",
+    select: "id,content,links,updated_at,layer:layers(name),step:steps(name),path:paths(name,scenario:service_scenarios(name))",
   },
 ];
 
@@ -259,6 +311,8 @@ function normalize(src: Source, row: Record<string, unknown>): BlueprintRow | nu
       layer: (row.layer as { name?: string } | undefined)?.name,
       step: (row.step as { name?: string } | undefined)?.name,
       scenario: path?.scenario?.name,
+      links: normalizeLinks(row.links),
+      updatedAt: typeof row.updated_at === "string" ? row.updated_at.slice(0, 10) : undefined,
     };
   }
   const name = typeof row.name === "string" ? row.name : "";
@@ -270,4 +324,114 @@ function normalize(src: Source, row: Record<string, unknown>): BlueprintRow | nu
     snippet: typeof row.description === "string" ? row.description : undefined,
     scenario: scenarioName,
   };
+}
+
+// ── Opt-in reads: edges, findings, slices ────────────────────────────────────
+//
+// These answer questions cells alone cannot — "what breaks if we drop X",
+// "what's already flagged here", "is there a view I can show someone" — and
+// every one of them is readable by the anon role (supabase/DATABASE.md:117:
+// "Blueprint tables and `services` have RLS enabled with public SELECT
+// policies").
+//
+// OPT-IN, not automatic. Each is one subrequest against a 50-per-invocation
+// cap that a blueprint fallback search can already spend 5 of. A status
+// question must not pay for the impact graph it will never look at.
+
+export interface BlueprintEdge {
+  from: string;
+  to: string;
+  direction: "downstream" | "upstream";
+}
+
+/**
+ * Cells that trigger, or are triggered by, the given cells — one hop.
+ *
+ * One subrequest: PostgREST embeds both ends of the FK, so the neighbour's
+ * content arrives with the edge instead of needing a second lookup per id.
+ *
+ * One hop only, deliberately. The plugin walks the graph with a dedicated
+ * impact-tracer agent and a visited set for cycles (loops_to_phase cycles are
+ * legal in this data). Reproducing that here would be a worse version of
+ * something that already exists — the bot's honest job is "here is what sits
+ * next to this, go trace it properly", not a half-built tracer.
+ */
+export async function fetchEdges(env: Env, cellIds: string[]): Promise<BlueprintEdge[]> {
+  const ids = cellIds.filter(Boolean).slice(0, 10);
+  if (!isBlueprintConfigured(env) || ids.length === 0) return [];
+  const base = env.SUPABASE_URL!.replace(/\/+$/, "");
+  const list = `(${ids.join(",")})`;
+  const select =
+    "source_cell_id,target_cell_id," +
+    "source:cells!cell_triggers_source_cell_id_fkey(content)," +
+    "target:cells!cell_triggers_target_cell_id_fkey(content)";
+  const url =
+    `${base}/rest/v1/cell_triggers` +
+    `?or=(source_cell_id.in.${list},target_cell_id.in.${list})` +
+    `&select=${encodeURIComponent(select)}&limit=40`;
+  const res = await countedFetch(url, { headers: headers(env.SUPABASE_ANON_KEY!) });
+  if (!res.ok) {
+    console.warn(`[blueprint] edges read failed (${res.status})`);
+    return [];
+  }
+  const data = (await res.json().catch(() => [])) as Array<Record<string, unknown>>;
+  if (!Array.isArray(data)) return [];
+  const text = (v: unknown) =>
+    typeof (v as { content?: unknown } | null)?.content === "string"
+      ? (v as { content: string }).content.slice(0, 120)
+      : "";
+  return data.flatMap((r): BlueprintEdge[] => {
+    const from = text(r.source);
+    const to = text(r.target);
+    if (!from || !to) return [];
+    const startedHere = ids.includes(String(r.source_cell_id));
+    return [{ from, to, direction: startedHere ? "downstream" : "upstream" }];
+  });
+}
+
+/** Rows from a table whose columns this Worker does not pin.
+ *
+ *  `findings` and `slices` were added after supabase/schema.reference.sql was
+ *  captured, so their columns are read with select=* and passed through as-is
+ *  rather than mapped against a shape that might be wrong. Guessing a column
+ *  name here would produce a confidently empty field, which is worse than
+ *  handing the model what the table actually returned. */
+async function fetchRows(
+  env: Env,
+  table: string,
+  qs: string,
+  limit: number,
+): Promise<Array<Record<string, unknown>>> {
+  if (!isBlueprintConfigured(env)) return [];
+  const base = env.SUPABASE_URL!.replace(/\/+$/, "");
+  const res = await countedFetch(`${base}/rest/v1/${table}?select=*&${qs}&limit=${limit}`, {
+    headers: headers(env.SUPABASE_ANON_KEY!),
+  });
+  if (!res.ok) {
+    // A missing table is a legitimate outcome (not every deployment has run
+    // every migration), so this degrades to "no rows" rather than failing the
+    // whole search.
+    console.warn(`[blueprint] ${table} read failed (${res.status})`);
+    return [];
+  }
+  const data = await res.json().catch(() => []);
+  return Array.isArray(data) ? (data as Array<Record<string, unknown>>) : [];
+}
+
+/** Audit findings already recorded against these cells. A READ — triage is a
+ *  write, so it stays in the app where a service-tier session can do it. */
+export async function fetchFindings(env: Env, cellIds: string[]): Promise<Array<Record<string, unknown>>> {
+  const ids = cellIds.filter(Boolean).slice(0, 10);
+  if (ids.length === 0) return [];
+  return fetchRows(env, "findings", `cell_id=in.(${ids.join(",")})`, 20);
+}
+
+/** Named slices someone already cut. Points at an existing view instead of
+ *  improvising a worse one in a Slack message. */
+export async function fetchSlices(env: Env, query: string): Promise<Array<Record<string, unknown>>> {
+  const words = terms(query);
+  const filter = words.length
+    ? `or=(${words.map((w) => `name.ilike.*${w}*`).join(",")})`
+    : "order=updated_at.desc";
+  return fetchRows(env, "slices", filter, 10);
 }
