@@ -4,6 +4,7 @@
 
 import type { Env } from "../types";
 import { addReaction, appendStream, postMessage, startStream, stopStream } from "./api";
+import { footerKindFor } from "./footer-kind";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
 // exactly how a model-quota outage read as a mystery for an afternoon
@@ -187,7 +188,7 @@ export async function postTextVerified(
       // frame that accepts blocks). If either half fails, fall through to a
       // plain post: a duplicated answer is bad, a missing one is worse.
       const appended = await appendStream(env, channel, streamTs, body);
-      const stopped = await stopStream(env, channel, streamTs, ANSWER_FOOTER);
+      const stopped = await stopStream(env, channel, streamTs, footerKindFor(body) === "full" ? ANSWER_FOOTER : undefined);
       if (appended && stopped) return { ok: true, text: body };
       console.warn(`[slack] stream finish failed (append=${appended} stop=${stopped}); falling back to post`);
       await stopStream(env, channel, streamTs).catch(() => {});
@@ -195,7 +196,11 @@ export async function postTextVerified(
   }
   // `text` stays populated alongside blocks: it is what notifications and
   // screen readers use, and it is the fallback if a block ever fails to render.
-  const withBlocks = { channel, thread_ts: threadTs, text: body, blocks: [...textSections(body), ...ANSWER_FOOTER] };
+  // A disclaimer on "Got it — cancelled" is how people learn to skip it on the
+  // messages that carry claims. Acknowledgements get no footer; anything
+  // unrecognised falls back to the footer rather than to silence.
+  const footer = footerKindFor(body) === "full" ? ANSWER_FOOTER : [];
+  const withBlocks = { channel, thread_ts: threadTs, text: body, blocks: [...textSections(body), ...footer] };
   let posted = await postMessage(env, withBlocks).catch(() => ({ ok: false as const }));
   if (!posted.ok) {
     // Degrade to plain text rather than lose the answer. A malformed block is a

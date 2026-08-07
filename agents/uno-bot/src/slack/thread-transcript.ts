@@ -10,6 +10,7 @@
 // Every failure degrades to `null` (dispatch proceeds without a transcript) —
 // a transcript problem must never block a confirmed build.
 
+import { windowTranscript } from "./transcript-window";
 import type { Env } from "../types";
 import { conversationsReplies, getBotIdentity, usersInfo } from "./api";
 
@@ -105,13 +106,12 @@ export async function fetchThreadTranscript(
       })
       .filter(Boolean);
 
-    // Char cap: drop OLDEST lines first until the joined text fits.
-    let dropped = 0;
-    let kept = [...lines];
-    while (kept.length > 1 && kept.join("\n").length > TRANSCRIPT_MAX_CHARS) {
-      kept.shift();
-      dropped++;
-    }
+    // Char cap: keep the PARENT plus the most recent lines that fit. Dropping
+    // oldest-first (the old rule) discarded the parent — the question every
+    // reply is answering — on exactly the long threads where a summary matters.
+    const windowed = windowTranscript(lines, TRANSCRIPT_MAX_CHARS);
+    const dropped = windowed.dropped;
+    const kept = windowed.lines;
     // Degenerate case: a single enormous message — hard-slice its tail.
     let text = kept.join("\n");
     if (text.length > TRANSCRIPT_MAX_CHARS) {
