@@ -478,19 +478,47 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // on the new surface — silently dropping the grounding that app_context_changed
   // stores. convTs already resolves to DM_CONVERSATION for a threadless DM, the
   // same key handleAppContextChanged writes under.
-  const panelContext = isAssistantThread(channel)
-    ? formatAssistantContext(await loadAssistantContext(env, channel, convTs))
-    : null;
+  // ROUTE FIRST, then gather. The reverse order — which this file used until
+  // 2026-08-07 — meant a "thanks" in a long thread paid for the assistant-context
+  // read AND the vision pass before anything knew the turn was trivial. Cheap
+  // turns now skip both. routeRequest is a pure string check: no I/O, so putting
+  // it first costs nothing.
+  const { tier: previewTier, reason: routeWhy } = routeRequest({
+    userText,
+    hasPending: pending !== null,
+  });
+  const trivialTurn = previewTier === "haiku";
+
+  // Assistant-panel surface the user currently has open (best-effort; null off
+  // the panel or when nothing is focused). Advisory grounding for deictic asks
+  // — never assumed to be the subject otherwise.
+  // Gated on being the assistant/DM surface, NOT on thread_ts: under agent_view
+  // a DM has no thread, and requiring one skipped the lookup for every message
+  // on the new surface — silently dropping the grounding that app_context_changed
+  // stores. convTs already resolves to DM_CONVERSATION for a threadless DM, the
+  // same key handleAppContextChanged writes under.
+  const panelContext =
+    !trivialTurn && isAssistantThread(channel)
+      ? formatAssistantContext(await loadAssistantContext(env, channel, convTs))
+      : null;
 
   // Vision: pasted images + a linked Figma frame become base64 image blocks on
   // the current turn. Guarded inside — a failure degrades to text-only.
-  const vision = await collectVisionInputs(env, event, userText);
-
-  // Wait signal: real requests (everything but the confirm/cancel fast-path)
-  // run on the sonnet lane with grounding and can take a while — ⏳ next to 👀
-  // says "bigger think underway" before the model starts. routeRequest is the
-  // same zero-cost lane check runAgent uses.
-  const { tier: previewTier } = routeRequest({ userText, hasPending: pending !== null });
+  //
+  // Skipped on a trivial turn UNLESS the message carries something visual: an
+  // image with "thanks" is not a trivial turn, and deciding that from the text
+  // alone would drop the attachment silently. A figma.com link counts — the
+  // vision pass screenshots frames from TEXT, not just from files, so checking
+  // files alone would have skipped it.
+  const carriesFiles =
+    (event.files?.length ?? 0) > 0 || /figma\.com/i.test(userText);
+  const vision =
+    trivialTurn && !carriesFiles
+      ? { images: [], modelText: userText, historyText: userText }
+      : await collectVisionInputs(env, event, userText);
+  console.log(
+    `[route] tier=${previewTier} why=${routeWhy} ctx=${trivialTurn && !carriesFiles ? "skipped" : "gathered"}`,
+  );
   // ts of the stream opened for this turn, threaded down to delivery so the
   // answer closes the same message the indicator lives in. Null = no stream,
   // deliver normally.
