@@ -90,6 +90,18 @@
         "query": {
           "type": "string",
           "description": "Free-text query describing what you need from the blueprint, e.g. 'Tutor Admin redesign status', 'decisions about empty states'."
+        },
+        "include": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "edges",
+              "findings",
+              "slices"
+            ]
+          },
+          "description": "Optional extra reads, ONE SUBREQUEST EACH — ask only for what the question needs. 'edges': cells one hop from the matches (what they trigger / are triggered by) for \"what breaks if we change X\". 'findings': audit issues already recorded against these cells. 'slices': named views someone already cut, to point at instead of improvising one. Omit for ordinary how-does-it-work questions."
         }
       }
     }

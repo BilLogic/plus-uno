@@ -325,3 +325,113 @@ function normalize(src: Source, row: Record<string, unknown>): BlueprintRow | nu
     scenario: scenarioName,
   };
 }
+
+// ── Opt-in reads: edges, findings, slices ────────────────────────────────────
+//
+// These answer questions cells alone cannot — "what breaks if we drop X",
+// "what's already flagged here", "is there a view I can show someone" — and
+// every one of them is readable by the anon role (supabase/DATABASE.md:117:
+// "Blueprint tables and `services` have RLS enabled with public SELECT
+// policies").
+//
+// OPT-IN, not automatic. Each is one subrequest against a 50-per-invocation
+// cap that a blueprint fallback search can already spend 5 of. A status
+// question must not pay for the impact graph it will never look at.
+
+export interface BlueprintEdge {
+  from: string;
+  to: string;
+  direction: "downstream" | "upstream";
+}
+
+/**
+ * Cells that trigger, or are triggered by, the given cells — one hop.
+ *
+ * One subrequest: PostgREST embeds both ends of the FK, so the neighbour's
+ * content arrives with the edge instead of needing a second lookup per id.
+ *
+ * One hop only, deliberately. The plugin walks the graph with a dedicated
+ * impact-tracer agent and a visited set for cycles (loops_to_phase cycles are
+ * legal in this data). Reproducing that here would be a worse version of
+ * something that already exists — the bot's honest job is "here is what sits
+ * next to this, go trace it properly", not a half-built tracer.
+ */
+export async function fetchEdges(env: Env, cellIds: string[]): Promise<BlueprintEdge[]> {
+  const ids = cellIds.filter(Boolean).slice(0, 10);
+  if (!isBlueprintConfigured(env) || ids.length === 0) return [];
+  const base = env.SUPABASE_URL!.replace(/\/+$/, "");
+  const list = `(${ids.join(",")})`;
+  const select =
+    "source_cell_id,target_cell_id," +
+    "source:cells!cell_triggers_source_cell_id_fkey(content)," +
+    "target:cells!cell_triggers_target_cell_id_fkey(content)";
+  const url =
+    `${base}/rest/v1/cell_triggers` +
+    `?or=(source_cell_id.in.${list},target_cell_id.in.${list})` +
+    `&select=${encodeURIComponent(select)}&limit=40`;
+  const res = await countedFetch(url, { headers: headers(env.SUPABASE_ANON_KEY!) });
+  if (!res.ok) {
+    console.warn(`[blueprint] edges read failed (${res.status})`);
+    return [];
+  }
+  const data = (await res.json().catch(() => [])) as Array<Record<string, unknown>>;
+  if (!Array.isArray(data)) return [];
+  const text = (v: unknown) =>
+    typeof (v as { content?: unknown } | null)?.content === "string"
+      ? (v as { content: string }).content.slice(0, 120)
+      : "";
+  return data.flatMap((r): BlueprintEdge[] => {
+    const from = text(r.source);
+    const to = text(r.target);
+    if (!from || !to) return [];
+    const startedHere = ids.includes(String(r.source_cell_id));
+    return [{ from, to, direction: startedHere ? "downstream" : "upstream" }];
+  });
+}
+
+/** Rows from a table whose columns this Worker does not pin.
+ *
+ *  `findings` and `slices` were added after supabase/schema.reference.sql was
+ *  captured, so their columns are read with select=* and passed through as-is
+ *  rather than mapped against a shape that might be wrong. Guessing a column
+ *  name here would produce a confidently empty field, which is worse than
+ *  handing the model what the table actually returned. */
+async function fetchRows(
+  env: Env,
+  table: string,
+  qs: string,
+  limit: number,
+): Promise<Array<Record<string, unknown>>> {
+  if (!isBlueprintConfigured(env)) return [];
+  const base = env.SUPABASE_URL!.replace(/\/+$/, "");
+  const res = await countedFetch(`${base}/rest/v1/${table}?select=*&${qs}&limit=${limit}`, {
+    headers: headers(env.SUPABASE_ANON_KEY!),
+  });
+  if (!res.ok) {
+    // A missing table is a legitimate outcome (not every deployment has run
+    // every migration), so this degrades to "no rows" rather than failing the
+    // whole search.
+    console.warn(`[blueprint] ${table} read failed (${res.status})`);
+    return [];
+  }
+  const data = await res.json().catch(() => []);
+  return Array.isArray(data) ? (data as Array<Record<string, unknown>>) : [];
+}
+
+/** Audit findings already recorded against these cells. A READ — triage is a
+ *  write, so it stays in the app where a service-tier session can do it. */
+export async function fetchFindings(env: Env, cellIds: string[]): Promise<Array<Record<string, unknown>>> {
+  const ids = cellIds.filter(Boolean).slice(0, 10);
+  if (ids.length === 0) return [];
+  return fetchRows(env, "findings", `cell_id=in.(${ids.join(",")})`, 20);
+}
+
+/** Named slices someone already cut. Points at an existing view instead of
+ *  improvising a worse one in a Slack message. */
+export async function fetchSlices(env: Env, query: string): Promise<Array<Record<string, unknown>>> {
+  const words = terms(query);
+  const filter = words.length
+    ? `or=(${words.map((w) => `name.ilike.*${w}*`).join(",")})`
+    : "order=updated_at.desc";
+  return fetchRows(env, "slices", filter, 10);
+}

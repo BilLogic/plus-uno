@@ -4,7 +4,18 @@
 // Runs inline in the agent loop (mirrors marketplace_search / find_experts).
 
 import type { Env } from "../types";
-import { searchBlueprint, isBlueprintConfigured } from "../integrations/blueprint";
+import {
+  searchBlueprint,
+  isBlueprintConfigured,
+  fetchEdges,
+  fetchFindings,
+  fetchSlices,
+} from "../integrations/blueprint";
+
+/** Opt-in extra reads. One subrequest each, against a 50-per-invocation cap
+ *  that a fallback search can already spend 5 of — so a status question does
+ *  not pay for the impact graph it will never look at. */
+const INCLUDABLE = new Set(["edges", "findings", "slices"]);
 
 export async function executeBlueprintSearch(
   env: Env,
@@ -26,6 +37,17 @@ export async function executeBlueprintSearch(
 
   try {
     const { rows, retrieval, truncated } = await searchBlueprint(env, query);
+
+    const include = Array.isArray(input.include)
+      ? input.include.filter((i): i is string => typeof i === "string" && INCLUDABLE.has(i))
+      : [];
+    const cellIds = rows.filter((r) => r.kind === "cell" && r.id).map((r) => r.id);
+    // Sequential, not Promise.all: each is a metered subrequest and the budget
+    // gate reads a running counter — firing them together can overshoot the cap
+    // before the counter catches up.
+    const edges = include.includes("edges") ? await fetchEdges(env, cellIds) : undefined;
+    const findings = include.includes("findings") ? await fetchFindings(env, cellIds) : undefined;
+    const slices = include.includes("slices") ? await fetchSlices(env, query) : undefined;
 
     // One obligation per field, not one paragraph carrying five. Instructions
     // in a tool payload are not additive — a fix to slack_search on 2026-08-06
@@ -53,6 +75,15 @@ export async function executeBlueprintSearch(
       retrieval === "semantic"
         ? "These came from semantic (vector) retrieval over indexed chunks, so they carry no row id, links, or date. Cite them as blueprint content by title//layer, and do not claim a specific cell unless the row shows one."
         : undefined;
+    const edgesNote = edges?.length
+      ? "`edges` are ONE HOP from the matched cells — what they trigger and what triggers them. Name the neighbours as places to check; do NOT present this as a full impact analysis, and do not follow the chain further than the data shown. A real trace is sb:whatif in the IDE."
+      : undefined;
+    const findingsNote = findings?.length
+      ? "`findings` are audit results ALREADY recorded against these cells — report them by cell and severity. Triaging or resolving one is a write: route that to the blueprint app, never claim to have done it."
+      : undefined;
+    const slicesNote = slices?.length
+      ? "`slices` are views someone already cut. Point at the existing one rather than composing a substitute in this reply."
+      : undefined;
     const truncation = truncated
       ? "This result was CAPPED — more rows matched than are shown. Say the list is partial; never present it as everything the blueprint has."
       : undefined;
@@ -67,9 +98,12 @@ export async function executeBlueprintSearch(
       retrieval,
       truncated,
       rows,
+      ...(edges ? { edges } : {}),
+      ...(findings ? { findings } : {}),
+      ...(slices ? { slices } : {}),
       notes:
         rows.length > 0
-          ? [grounding, attribution, conflict, citing, freshness, semanticCaveat, truncation].filter(Boolean)
+          ? [grounding, attribution, conflict, citing, freshness, semanticCaveat, edgesNote, findingsNote, slicesNote, truncation].filter(Boolean)
           : [
               "No matching blueprint rows. Say the blueprint has nothing on this rather than guessing. A CURRENT doc (Help Center, shipped PRD) may answer instead — cite and date it. If nothing covers it, say 'not in the source' and name who likely can fill the gap (the workflow's owner or lead from the roster).",
             ],
