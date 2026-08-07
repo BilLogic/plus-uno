@@ -11,5 +11,5 @@
     "noEmit": false,
     "outDir": ".test-build"
   },
-  "include": ["tests/**/*.ts", "src/tools/slack-search-filter.ts", "src/agent/revision-guard.ts", "src/tools/slack-search-response.ts", "src/slack/footer-kind.ts", "src/slack/transcript-window.ts"]
+  "include": ["tests/**/*.ts", "src/tools/slack-search-filter.ts", "src/agent/revision-guard.ts", "src/tools/slack-search-response.ts", "src/slack/footer-kind.ts", "src/slack/transcript-window.ts", "src/slack/shortcut-specs.ts"]
 }

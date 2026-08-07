@@ -300,6 +300,30 @@ export interface ConversationsRepliesResult extends SlackOk {
   has_more?: boolean;
 }
 
+/** Open (or find) the DM channel with a user. Shortcut answers land here rather
+ *  than in the channel the shortcut fired from: "catch me up on this thread"
+ *  posted publicly announces you were not following it, and "is this still
+ *  true?" reads as calling out whoever wrote the message. */
+export async function conversationsOpen(env: Env, userId: string): Promise<string | null> {
+  const res = await slackCall<SlackResponse & { channel?: { id?: string } }>(
+    env,
+    "conversations.open",
+    { users: userId },
+  );
+  return res.ok ? (res.channel?.id ?? null) : null;
+}
+
+/** Permalink for a message. Fetched, never constructed: the archive URL shape
+ *  depends on the workspace domain, and a link the bot built is a link nobody
+ *  verified — the failure this codebase treats as fabrication. */
+export async function getPermalink(env: Env, channel: string, ts: string): Promise<string | null> {
+  const res = await slackGet<SlackResponse & { permalink?: string }>(env, "chat.getPermalink", {
+    channel,
+    message_ts: ts,
+  });
+  return res.ok ? (res.permalink ?? null) : null;
+}
+
 export async function conversationsReplies(
   env: Env,
   channel: string,

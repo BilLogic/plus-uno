@@ -23,6 +23,7 @@
 
 import type { Env } from "../types";
 import { countedFetch } from "../net";
+import { runMessageShortcut } from "./shortcuts";
 
 /** The subset of Slack's interaction envelope this Worker acts on. */
 interface InteractionPayload {
@@ -58,6 +59,22 @@ export function handleInteraction(
   ctx: ExecutionContext,
 ): Response {
   switch (payload.type) {
+    // Message shortcut — the context-menu entry on a message. Slack wants a 200
+    // within 3000ms and does not retry a timeout, so every slow step (permalink,
+    // conversations.open, the anchor post, the enqueue) runs after the ack.
+    case "message_action": {
+      const callbackId = payload.callback_id ?? "";
+      const userId = payload.user?.id;
+      const channelId = payload.channel?.id;
+      const messageTs = payload.message?.ts;
+      if (!callbackId || !userId || !channelId || !messageTs) {
+        console.error(`[interactive] message_action missing fields (${callbackId || "no callback_id"})`);
+        return new Response("", { status: 200 });
+      }
+      console.log(`[shortcut] ${callbackId} from ${userId} on ${channelId}/${messageTs}`);
+      ctx.waitUntil(runMessageShortcut(env, { callbackId, userId, channelId, messageTs }));
+      return new Response("", { status: 200 });
+    }
     case "block_actions": {
       const actionId = payload.actions?.[0]?.action_id ?? "(none)";
       // Slack sends an interaction for URL buttons too, when they carry an

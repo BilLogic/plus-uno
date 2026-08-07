@@ -88,6 +88,32 @@ features:
   bot_user:
     display_name: le goat
     always_online: true
+  shortcuts:
+    # Message shortcuts (context menu on a message). The LABEL lives here; the
+    # question each one asks lives in src/slack/shortcuts.ts, so the wording is
+    # reviewable in a diff rather than buried in app settings. A test asserts
+    # these callback_ids match the handler — a shortcut declared with no entry
+    # there still appears in the menu and quietly does the generic thing.
+    - name: Catch me up from here
+      type: message
+      callback_id: uno_catchup
+      description: What was decided, what's open, who owns what
+    - name: Think harder about this
+      type: message
+      callback_id: uno_grind
+      description: Redo it properly on the deep tier
+    - name: Is this still true?
+      type: message
+      callback_id: uno_verify
+      description: Check the claim against the blueprint and Notion
+    - name: Where was this decided?
+      type: message
+      callback_id: uno_where_decided
+      description: Find the decision's origin, or say there is no record
+    - name: Help me reply
+      type: message
+      callback_id: uno_draft
+      description: A draft in your voice, for you to send
   slash_commands:
     - command: /uno-prototype
       url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
