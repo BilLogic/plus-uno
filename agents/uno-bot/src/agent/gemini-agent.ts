@@ -134,10 +134,16 @@ function textOf(parts: GeminiPart[]): string {
 export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   const { env, userText, history, currentSender, pending, images, slack, assistantContext } = input;
 
-  // Same three lanes as the Anthropic path; Gemini expresses the lane through
-  // thinkingLevel on ONE model rather than a model swap (the 2.5-lite tier
-  // predates thinkingLevel, so a cheaper fast-lane model would need different
-  // dials — one model keeps this simple and cache-friendly).
+  // Same three lanes as the Anthropic path. Until 2026-08-07 Gemini expressed
+  // them through thinkingLevel on ONE model — which collapsed two of the three:
+  // `default` and `grind` both resolved to "high", so the escalation tier did
+  // nothing on the lane we actually run.
+  //
+  // Now the MODEL is the tier and the dial is held constant at `medium`. Two
+  // interacting variables make a regression impossible to attribute — an answer
+  // that got worse could be the model or the level — so one of them is pinned.
+  // `medium` is also gemini-3.6-flash's own default, which is the overspend fix:
+  // every ordinary turn had been paying `high` because a Claude tier map said so.
   const { tier, reason: routeReason } = routeRequest({ userText, hasPending: pending !== null });
 
   // All model-generation-specific dials, derived together so a mid-turn model
@@ -156,12 +162,25 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   const modelDials = (m: string) => {
     const isGemini3 = /^gemini-3/.test(m);
     return {
-      thinkingLevel: (m.includes("flash-lite") || tier === "haiku" ? "minimal" : "high") as string,
+      // One dial, held constant. thinking_level tops out at "high" and there is
+      // no rung above it (ai.google.dev/gemini-api/docs/thinking), so effort
+      // beyond `default` has to come from a bigger model, not a bigger number.
+      thinkingLevel: "medium" as string,
       supportsThinkingLevel: isGemini3,
       builtinSearchTools: isGemini3 ? [{ googleSearch: {} }, { urlContext: {} }] : [],
     };
   };
-  let model = env.GEMINI_MODEL ?? "gemini-3.6-flash";
+
+  // Tier → model. Each is overridable so a model can be swapped without a
+  // deploy; GEMINI_GRIND_MODEL is deliberately NOT GEMINI_FALLBACK_MODEL, which
+  // means "what we use when the primary fails" — conflating the good model with
+  // the failure model makes an outage silently expensive.
+  const tierModel: Record<typeof tier, string> = {
+    chill: env.GEMINI_CHILL_MODEL ?? "gemini-3.5-flash-lite",
+    default: env.GEMINI_MODEL ?? "gemini-3.6-flash",
+    grind: env.GEMINI_GRIND_MODEL ?? "gemini-3.1-pro-preview",
+  };
+  let model = tierModel[tier];
   let { thinkingLevel, supportsThinkingLevel, builtinSearchTools } = modelDials(model);
 
   // Backup-model failover (2026-07-16 quota incident — flash quota exhausted,

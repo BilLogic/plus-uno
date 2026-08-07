@@ -74,7 +74,7 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
     if (!claudeVertexConfigured(env)) {
       return Response.json({ ok: false, error: "no Vertex-Claude credential (need GEMINI_SA_EMAIL + GEMINI_SA_PRIVATE_KEY + GEMINI_PROJECT_ID)" });
     }
-    const model = env.CLAUDE_MODEL ?? MODELS.sonnet;
+    const model = env.CLAUDE_MODEL ?? MODELS.default;
     const result = await claudeVertexGenerate(env, {
       model,
       prompt: "Reply with exactly: uno-bot vertex-claude link ok",

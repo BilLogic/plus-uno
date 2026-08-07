@@ -82,16 +82,16 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
   const { env, userText, history, currentSender, pending, images, slack, assistantContext } = input;
 
   const { tier, reason: routeReason } = routeRequest({ userText, hasPending: pending !== null });
-  // Tier → Vertex model ID. The sonnet default is overridable via CLAUDE_MODEL
-  // (e.g. pin an exact @-versioned id); haiku/opus stay fixed.
+  // Tier → Vertex model ID. The default lane is overridable via CLAUDE_MODEL
+  // (e.g. pin an exact @-versioned id); chill/grind stay fixed.
   const model =
-    tier === "sonnet" ? (env.CLAUDE_MODEL ?? MODELS.sonnet) : MODELS[tier];
+    tier === "default" ? (env.CLAUDE_MODEL ?? MODELS.default) : MODELS[tier];
 
   // Standard extended thinking for the reasoning lanes (Vertex-supported).
-  // haiku turns are trivial confirms and skip it. Preserved across tool rounds
+  // chill turns are trivial confirms and skip it. Preserved across tool rounds
   // automatically because we echo the assistant content verbatim below. Tunable
   // dial — drop to undefined if a model/region rejects the shape.
-  const thinking = tier === "haiku" ? undefined : { type: "enabled", budget_tokens: 6000 };
+  const thinking = tier === "chill" ? undefined : { type: "enabled", budget_tokens: 6000 };
 
   const tools = [
     ...TOOLS.filter((t) => t.name !== "delegate"), // delegate was MCP-backed; gone on Vertex

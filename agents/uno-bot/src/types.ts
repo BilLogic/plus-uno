@@ -90,6 +90,14 @@ export interface Env {
   // + the alert-throttle timestamp. (The harness itself is now baked into the
   // Worker bundle at build time — src/generated/harness.ts — so serving it costs
   // zero subrequests; this KV is the fallback/alert path. See agent/skills.ts.)
+  /** Tier models on the Gemini lane. The tier IS the model now; the thinking
+   *  dial is pinned to medium. GEMINI_MODEL remains the `default` tier so
+   *  existing config keeps working. GEMINI_GRIND_MODEL is separate from
+   *  GEMINI_FALLBACK_MODEL on purpose — one is "the capable model", the other
+   *  is "what we fall back to when the primary fails". */
+  GEMINI_CHILL_MODEL?: string;
+  GEMINI_GRIND_MODEL?: string;
+
   HARNESS_KV?: KVNamespace;
   /** "on" enables chat.startStream for the agent surface. OFF by default:
    *  Slack returns invalid_arguments for this app even with thread_ts +
@@ -138,8 +146,8 @@ export interface Env {
   GEMINI_FALLBACK_MODEL?: string;
   GEMINI_REGION?: string; // Vertex only; default "global"
   GEMINI_MODEL?: string; // default "gemini-3.6-flash"
-  // Vertex-Claude model id for the sonnet lane (haiku/opus are fixed in
-  // routing.ts). Optional — defaults to MODELS.sonnet ("claude-sonnet-5").
+  // Vertex-Claude model id for the default lane (chill/grind are fixed in
+  // routing.ts). Optional — defaults to MODELS.default ("claude-sonnet-5").
   CLAUDE_MODEL?: string;
 
   // --- Operational guards ----------------------------------------------------
