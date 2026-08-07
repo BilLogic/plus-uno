@@ -25,6 +25,10 @@ export interface SlackMessageEvent {
   /** Set only on SYNTHETIC events (a shortcut, /grind, /chill) — an explicit
    *  tier that beats routing heuristics. Never present on a real Slack event. */
   tierOverride?: "chill" | "default" | "grind";
+  /** Also synthetic-only: forces the answer's footer variant. The `draft`
+   *  shortcut is the only setter — a draft goes out under the USER'S name, so
+   *  the standard disclaimer describes the wrong risk. */
+  footerHint?: "full" | "draft" | "none";
   /** Workspace the message came from. Slack includes it on message events;
    *  chat.startStream needs it as recipient_team_id. */
   team?: string;

@@ -3,6 +3,7 @@ import { verifySlackSignature } from "./slack/verify";
 import { handleSlackEnvelope, type SlackEnvelope } from "./slack/events";
 import { handleSlashCommand } from "./slack/commands";
 import { parseInteraction, handleInteraction } from "./slack/interactive";
+import { publishHomeViewForDebug } from "./slack/home";
 import { startSlackOAuth, handleSlackOAuthCallback, getSlackAccessTokenFor } from "./oauth/slack";
 import { geminiConfigured, geminiGenerate } from "./gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "./vertex/claude";
@@ -191,6 +192,25 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
       body: JSON.stringify(payload),
     });
     return Response.json({ sent: payload, status: res.status, slack: await res.json() });
+  }
+
+  // Publish the App Home view and return Slack's raw verdict.
+  //
+  // The Home tab is the one surface with NO failure signal: views.publish is
+  // fired from an event handler, nothing reads its response, and a block Slack
+  // rejects simply leaves the previous view in place. Every Home change until
+  // now was verified by opening the app and squinting. The Stop button is the
+  // first ACTION element up there, so "did the block validate" became a
+  // question worth being able to ask.
+  //
+  // ?user= (required) — views.publish is per-user. Auth-gated: it writes a real
+  // view to that person's Home tab, which is the same thing opening the tab
+  // does, so the blast radius is a refresh.
+  if (request.method === "GET" && url.pathname === "/debug/home") {
+    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
+    const user = url.searchParams.get("user");
+    if (!user) return Response.json({ ok: false, error: "user required" }, { status: 400 });
+    return Response.json(await publishHomeViewForDebug(env, user));
   }
 
   // What the blueprint deployment actually supports — the question the code

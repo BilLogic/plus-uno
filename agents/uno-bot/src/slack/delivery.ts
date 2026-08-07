@@ -4,7 +4,8 @@
 
 import type { Env } from "../types";
 import { addReaction, appendStream, postMessage, startStream, stopStream } from "./api";
-import { footerKindFor } from "./footer-kind";
+import { footerKindFor, footerNoteFor, type FooterKind } from "./footer-kind";
+import { buildFailureMessage, type FailureStage } from "./failure-message";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
 // exactly how a model-quota outage read as a mystery for an afternoon
@@ -59,15 +60,23 @@ export async function postVisibleFailure(
   threadTs: string | undefined,
   userMsgTs: string,
   err?: unknown,
+  /** How far the turn got. Drives what the message can honestly promise —
+   *  see failure-message.ts. Defaults to the least-informed stage. */
+  stage: FailureStage = "internal",
 ): Promise<void> {
   const capacity = isCapacityError(err);
   await addReaction(env, channel, userMsgTs, "x").catch(() => {});
   await postMessage(env, {
     channel,
     thread_ts: threadTs,
-    text: capacity
-      ? ":warning: I'm temporarily over capacity and can't answer right now — I've flagged it to the team. Try again in a little bit."
-      : ":x: Something went wrong on my end. Try again in a moment?",
+    // Progress + blocker + next step, instead of the dead-end "something went
+    // wrong on my end" this used to send. The stage is the progress: the relay
+    // knows exactly how far it got, and that is the part the person cannot see.
+    text: buildFailureMessage({
+      stage,
+      capacity,
+      alertChannel: env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL,
+    }),
   }).catch(() => {});
   if (capacity) await alertCapacity(env, err);
 }
@@ -142,55 +151,103 @@ function textSections(body: string): Array<Record<string, unknown>> {
   return chunks.map((c) => ({ type: "section", text: { type: "mrkdwn", text: c } }));
 }
 
-// 👍/👎 + the generated-content disclaimer, appended to every answer.
-// action_ids match the handler already wired in interactive.ts.
-const ANSWER_FOOTER: Array<Record<string, unknown>> = [
-  {
-    type: "actions",
-    elements: [
-      { type: "button", text: { type: "plain_text", text: "👍", emoji: true }, action_id: "uno_feedback_up", value: "up" },
-      { type: "button", text: { type: "plain_text", text: "👎", emoji: true }, action_id: "uno_feedback_down", value: "down" },
-    ],
-  },
-  {
-    type: "context",
-    elements: [
+// ── The answer footer ────────────────────────────────────────────────────────
+//
+// Two renderings of the same thing, chosen by env.SLACK_NATIVE_FEEDBACK:
+//
+//   off (default) — hand-rolled `actions` buttons. What has shipped for months.
+//   on            — Slack's native `context_actions` block, with the
+//                   `feedback_buttons` element and an `icon_button` delete.
+//
+// Why a flag rather than a swap. The native block is the right answer — it is
+// the affordance Slack renders natively on the agent surface, it does not
+// occupy a full-width row, and the delete control has no hand-rolled
+// equivalent at all. But an invalid block does not fail loudly here: delivery
+// already degrades to plain text on a block error, which would silently drop
+// the footer from EVERY answer while looking fine. The two renderings are
+// behaviourally identical from `recordFeedback`'s side (same action_ids), so
+// this can be turned on, eyeballed once on a real answer, and made the default
+// in a one-line change.
+//
+// action_ids match the handlers wired in interactive.ts.
+function feedbackControls(env: Env): Array<Record<string, unknown>> {
+  if (env.SLACK_NATIVE_FEEDBACK !== "on") {
+    return [
       {
-        type: "mrkdwn",
-        // Short on purpose. A footer people actually read beats a complete one
-        // they skip; the playbook's own wording is five words.
-        text: "_LLM-written · check before acting_",
+        type: "actions",
+        elements: [
+          { type: "button", text: { type: "plain_text", text: "👍", emoji: true }, action_id: "uno_feedback_up", value: "up" },
+          { type: "button", text: { type: "plain_text", text: "👎", emoji: true }, action_id: "uno_feedback_down", value: "down" },
+        ],
       },
-    ],
-  },
-];
+    ];
+  }
+  return [
+    {
+      type: "context_actions",
+      elements: [
+        {
+          type: "feedback_buttons",
+          action_id: "uno_feedback",
+          positive_button: { text: { type: "plain_text", text: "👍" }, value: "up" },
+          negative_button: { text: { type: "plain_text", text: "👎" }, value: "down" },
+        },
+        // Delete is not a nicety on an agent surface. A wrong answer sitting in
+        // a channel is a wrong answer people quote later; letting the asker
+        // remove it is cheaper than any correction we could post.
+        {
+          type: "icon_button",
+          icon: "trash",
+          text: { type: "plain_text", text: "Delete" },
+          action_id: "uno_delete_answer",
+          value: "delete",
+        },
+      ],
+    },
+  ];
+}
+
+function footerBlocks(env: Env, kind: FooterKind): Array<Record<string, unknown>> {
+  if (kind === "none") return [];
+  const note = footerNoteFor(kind);
+  return [
+    ...feedbackControls(env),
+    ...(note ? [{ type: "context", elements: [{ type: "mrkdwn", text: note }] }] : []),
+  ];
+}
 
 export async function postTextVerified(
   env: Env,
   channel: string,
   threadTs: string | undefined,
   text: string,
-  /** ts of a stream opened at turn start (chat.startStream). When present the
-   *  answer CLOSES that stream instead of posting a new message — otherwise the
-   *  thinking indicator would be left hanging above a separate reply. */
+  /** Forces the footer variant. Set by the relay, never sniffed from the text:
+   *  the `draft` shortcut is the one caller that knows its answer goes out
+   *  under the PERSON'S name, and the standard "check before acting" line is
+   *  wrong for that. Absent = classify from the body. */
+  footerHint?: FooterKind,
+  /** ts of a stream already open for this turn (plan mode). When present the
+   *  answer CLOSES that stream instead of opening a new one. */
+  openStreamTs?: string,
 ): Promise<{ ok: boolean; text: string }> {
   const cleaned = stripTrailingConfidence(text);
   const body = cleaned.trim()
     ? capText(cleaned)
     : "(I came back with an empty answer — that's a bug on my side. Try rephrasing, and flag this to the team.)";
+  const footer = footerBlocks(env, footerKindFor(body, footerHint));
 
   // Streamed delivery, opened HERE rather than at turn start. Opening it early
   // (to double as the thinking indicator) left an empty "AGENT" bubble sitting
   // in the thread for the whole run — a blank message impersonating a loader.
   // The status line is the indicator; the stream carries the answer.
-  if (env.SLACK_STREAMING === "on" && threadTs) {
-    const streamTs = await startStream(env, channel, threadTs);
+  if ((openStreamTs || env.SLACK_STREAMING === "on") && threadTs) {
+    const streamTs = openStreamTs ?? (await startStream(env, channel, threadTs));
     if (streamTs) {
       // append (the text) then stop (the footer blocks — stopStream is the only
       // frame that accepts blocks). If either half fails, fall through to a
       // plain post: a duplicated answer is bad, a missing one is worse.
       const appended = await appendStream(env, channel, streamTs, body);
-      const stopped = await stopStream(env, channel, streamTs, footerKindFor(body) === "full" ? ANSWER_FOOTER : undefined);
+      const stopped = await stopStream(env, channel, streamTs, footer.length ? footer : undefined);
       if (appended && stopped) return { ok: true, text: body };
       console.warn(`[slack] stream finish failed (append=${appended} stop=${stopped}); falling back to post`);
       await stopStream(env, channel, streamTs).catch(() => {});
@@ -201,7 +258,6 @@ export async function postTextVerified(
   // A disclaimer on "Got it — cancelled" is how people learn to skip it on the
   // messages that carry claims. Acknowledgements get no footer; anything
   // unrecognised falls back to the footer rather than to silence.
-  const footer = footerKindFor(body) === "full" ? ANSWER_FOOTER : [];
   const withBlocks = { channel, thread_ts: threadTs, text: body, blocks: [...textSections(body), ...footer] };
   let posted = await postMessage(env, withBlocks).catch(() => ({ ok: false as const }));
   if (!posted.ok) {

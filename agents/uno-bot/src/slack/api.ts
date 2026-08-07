@@ -156,12 +156,40 @@ export async function postMessage(env: Env, input: PostMessageInput) {
 // newer than this app's floor, so a workspace or plan that lacks it must degrade
 // to an ordinary postMessage rather than lose the answer.
 
+/** How Slack renders the task cards inside a stream.
+ *  `timeline` (Slack's default) lists them as they arrive; `plan` shows them
+ *  together as a checklist that fills in. See startStream's plan-mode note. */
+export type TaskDisplayMode = "timeline" | "plan" | "dense";
+
+/** A `task_update` chunk — one step in the plan, updated in place by `id`. */
+export interface TaskChunk {
+  id: string;
+  title: string;
+  status: "pending" | "in_progress" | "complete" | "error";
+  details?: string;
+}
+
 export async function startStream(
   env: Env,
   channel: string,
   threadTs: string | undefined,
   recipientUserId?: string,
   recipientTeamId?: string,
+  // PLAN MODE — and the one condition that makes an early stream honest.
+  //
+  // The stream is normally opened at DELIVERY, not at turn start. Opening it
+  // early was tried and reverted: with nothing to put in it, the client renders
+  // an empty "AGENT" bubble for the whole 30–90s run — a blank message
+  // impersonating a loading state.
+  //
+  // `plan` is the exception, and the only one. In plan mode the stream carries
+  // TASK CARDS, so an early open renders a checklist of what the agent is
+  // doing rather than an empty bubble — the interim narration this Worker
+  // already produces, in the place it belongs, instead of as three loose
+  // :hourglass: messages in the thread. It stays flag-gated (SLACK_STREAM_PLAN)
+  // because the failure mode if Slack renders it differently than expected is
+  // an ugly artifact on every single turn.
+  taskDisplayMode?: TaskDisplayMode,
 ): Promise<string | null> {
   // thread_ts is REQUIRED (a stream is a threaded message), and
   // recipient_user_id / recipient_team_id are required "when streaming to
@@ -173,6 +201,7 @@ export async function startStream(
       ...(threadTs ? { thread_ts: threadTs } : {}),
       ...(recipientUserId ? { recipient_user_id: recipientUserId } : {}),
       ...(recipientTeamId ? { recipient_team_id: recipientTeamId } : {}),
+      ...(taskDisplayMode ? { task_display_mode: taskDisplayMode } : {}),
     });
     if (res.ok && res.ts) return res.ts;
     // Say WHY. A silent null here is indistinguishable from "streaming is off",
@@ -205,6 +234,31 @@ export async function appendStream(
       channel,
       ts,
       markdown_text: markdownText,
+    });
+    return !!res.ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Push one plan step into an open stream. `id` is the identity of the step —
+ *  sending the same id again UPDATES that card rather than adding another, so
+ *  a step goes in_progress → complete without ever duplicating. Best-effort:
+ *  a dropped progress card is not worth failing a turn over. */
+export async function appendTask(env: Env, channel: string, ts: string, task: TaskChunk): Promise<boolean> {
+  try {
+    const res = await slackCall<SlackResponse>(env, "chat.appendStream", {
+      channel,
+      ts,
+      chunks: [
+        {
+          type: "task_update",
+          id: task.id,
+          title: task.title.slice(0, 250),
+          status: task.status,
+          ...(task.details ? { details: task.details.slice(0, 250) } : {}),
+        },
+      ],
     });
     return !!res.ok;
   } catch {
@@ -322,6 +376,44 @@ export async function getPermalink(env: Env, channel: string, ts: string): Promi
     message_ts: ts,
   });
   return res.ok ? (res.permalink ?? null) : null;
+}
+
+/**
+ * The messages posted just BEFORE `beforeTs` in this channel. One page, no
+ * cursor — see antecedent.ts for why the absence of pagination is a rule and
+ * not an oversight.
+ *
+ * `latest` + `inclusive: false` is the whole mechanism: Slack returns the page
+ * ENDING at that timestamp, newest first, excluding the anchor itself. There is
+ * no way for this to reach a message posted after the question.
+ *
+ * Returns [] on any failure. A missing antecedent degrades the answer; a throw
+ * here would lose it entirely.
+ */
+export async function conversationsHistoryBefore(
+  env: Env,
+  channel: string,
+  beforeTs: string,
+  limit: number,
+): Promise<Array<{ user?: string; bot_id?: string; text?: string; ts: string; subtype?: string }>> {
+  const res = await slackGet<
+    SlackResponse & { messages?: Array<{ user?: string; bot_id?: string; text?: string; ts: string; subtype?: string }> }
+  >(env, "conversations.history", {
+    channel,
+    latest: beforeTs,
+    inclusive: "false",
+    limit: String(limit),
+  });
+  if (!res.ok || !Array.isArray(res.messages)) return [];
+  // Slack returns newest-first here (the opposite of conversations.replies).
+  return [...res.messages].reverse();
+}
+
+/** Delete one of the bot's own messages. Only ever called for a message the
+ *  bot posted — Slack rejects anything else on a bot token, which is the
+ *  authorization we want rather than one we would have to write. */
+export async function deleteMessage(env: Env, channel: string, ts: string) {
+  return slackCall<SlackResponse>(env, "chat.delete", { channel, ts });
 }
 
 export async function conversationsReplies(

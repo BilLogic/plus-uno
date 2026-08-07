@@ -23,7 +23,7 @@ import type { Env } from "../types";
 import { countedFetch } from "../net";
 import { postMessage } from "./api";
 import { enqueueAgentJob } from "./events";
-import { requestCancel } from "../thread-state-client";
+import { cancelForUser } from "../thread-state-client";
 import { EFFORT_COMMANDS, type EffortMode } from "./effort";
 import { SLASH_COMMANDS } from "../generated/slack-commands";
 import type { SlackMessageEvent } from "./types";
@@ -74,16 +74,22 @@ export function handleSlashCommand(
   // It sets a flag the running agent loop reads between iterations — the Worker
   // cannot interrupt a DO alarm, so cancellation is cooperative. The reply is
   // deliberately honest about that: the current step finishes.
+  // Resolved by PERSON, not by channel — the same path the Home-tab Stop
+  // button takes. The channel-derived key this used to compute was wrong for
+  // channel runs: a /uno-* run lives in a THREAD under the framing message, so
+  // the loop reads `cancel:<channel>:<thread_ts>` while /stop was writing
+  // `cancel:<channel>:<channel>`. The flag landed on a key nothing looks at and
+  // /stop silently did nothing there. The person's active-run pointer knows the
+  // conversation exactly, and it is the one thing both surfaces can resolve.
   if (payload.command === "/stop") {
-    const thread = payload.channelId.startsWith("D") ? "dm" : payload.channelId;
     ctx.waitUntil(
-      requestCancel(env, payload.channelId, thread).then((ok) => {
-        if (!ok) console.warn("[stop] could not set the cancel flag");
+      cancelForUser(env, payload.userId).then((r) => {
+        console.log(`[stop] command from ${payload.userId} cancelled=${r.cancelled}`);
       }),
     );
     return ephemeral(
       "Stopping — I'll finish the step I'm on and stop there. " +
-        "(Nothing already confirmed gets undone.)",
+        "(Nothing already confirmed gets undone. If nothing of mine was running, this did nothing.)",
     );
   }
 

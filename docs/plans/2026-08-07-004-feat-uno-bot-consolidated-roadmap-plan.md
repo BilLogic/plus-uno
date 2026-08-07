@@ -196,13 +196,47 @@ generation tokens for stale measures) — no analogue in a chat surface.
 
 ## Acceptance
 
-- [ ] Phase 1 merged, judged evals 19/19
-- [ ] Phase 2: one shortcut working end to end within the 3s ack
-- [ ] Phase 3 merged, judged evals 19/19
-- [ ] Phase 4: bot renders as `le goat`; blueprint answers carry app links
-- [ ] `/stop` aborts a running turn at the next iteration boundary, from both the command and the Home tab
-- [ ] Retention decision recorded before Phase 5 begins
-- [ ] Phase 5 gated per-phase with case-by-case eval comparison
+- [x] Phase 1 merged, judged evals 19/19 (r53)
+- [x] Phase 2: five shortcuts, each acking inside 3s and deferring the work
+- [x] Phase 3 built — error options, antecedent window, native feedback
+      elements, `task_display_mode: "plan"`. Judged evals still to re-run.
+- [ ] Phase 4: bot renders as `le goat` (needs a reinstall — user action)
+- [x] `/stop` aborts at the next iteration boundary, from both the command and
+      the Home tab
+- [x] Retention decision recorded — storing transcripts in the DO is approved
+      (user, 2026-08-07: *"actually we can store, it's ok for this project"*)
+- [ ] Phase 5 gated per-phase with case-by-case eval comparison — **built,
+      shipped OFF** (`CONTEXT_STATE`), not yet compared
+
+### Built after this plan was written
+
+Three things that were not on the list and turned out to be the same shape as
+things that were:
+
+| Item | Why it landed here |
+|---|---|
+| **Scope keywords** (`ds:` `notion:` `blueprint:` `slack:` `github:`) | The read-grounds-the-write idea (adopted item 2) inverted: the ASKER often knows where the answer lives, and had no way to say so. A hint, never a filter. |
+| **`react` tier** | User decision, 2026-08-07: *"in the future if helpful to minimize the cost, just let the agent respond with slack reaction"*. A closed acknowledgement set answers with an emoji and no model call. |
+| **Draft footer variant** | The `draft` shortcut shipped in Phase 2 with the standard disclaimer, which describes the wrong risk — a draft goes out under the person's name, not the bot's. |
+
+### Flags shipped off, and what turning each one on needs
+
+Three of these ship disabled. Each one has a specific reason it cannot simply
+default on, and a specific check that would let it:
+
+| Flag | Why off | To turn on |
+|---|---|---|
+| `SLACK_NATIVE_FEEDBACK` | An invalid block degrades SILENTLY — delivery falls back to plain text, dropping the footer from every answer while looking fine. | Enable, look at one real answer, then default it. |
+| `SLACK_STREAM_PLAN` | Opens the stream at turn start. That was tried with plain text and reverted (empty bubble for the whole run); plan mode should be different because the stream carries task cards, but "should" is doing work in that sentence. | Enable, watch one multi-tool turn render. |
+| `CONTEXT_STATE` | Changes what the model sees on **every** turn. Failure mode is subtly worse answers, not an error. | Judged evals compared **case by case** — a stable 19/19 hid a live BLOCKER once already (r48). |
+
+### Still not built
+
+- **Blueprint deep links** — in progress in the working tree
+  (`blueprint-link.ts`), depends on the app returning canonical URLs.
+- **Bot display name** — one reinstall, user action.
+- **Manifest paste** — shortcuts and `/grind` `/chill` are in the YAML and not
+  yet on the app.
 
 ## Sources
 

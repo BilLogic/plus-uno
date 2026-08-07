@@ -9,8 +9,15 @@
 // the actual behaviour, kept in code so they are reviewable in a diff.
 
 import { GRIND } from "./effort";
+import type { FooterKind } from "./footer-kind";
 
 export interface ShortcutSpec {
+  /** Forces the answer's footer variant. Only `draft` sets it: the standard
+   *  "LLM-written · check before acting" is wrong on a draft, which is not
+   *  something the bot is telling you but something you are about to send
+   *  under your own name. Classifying that from the body is not possible — the
+   *  shortcut is the only thing that knows. */
+  footer?: FooterKind;
   /** Explicit tier. Stated, not implied: the first version relied on the ask
    *  containing "think harder", which does NOT match the escalation phrase
    *  (`\bthink hard\b` fails on the trailing "er"), so the shortcut promised
@@ -81,6 +88,7 @@ export const SHORTCUTS: Record<string, ShortcutSpec> = {
   // The value is attribution, not words: an @-mention produces a correct answer
   // credited to a bot; this produces one credited to the person.
   draft: {
+    footer: "draft",
     title: "Draft reply",
     anchor: (l) => `Drafting a reply for you: ${l}`,
     ask: (l) =>

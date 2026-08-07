@@ -97,6 +97,7 @@ export async function runMessageShortcut(
       ts: rootTs,
       thread_ts: rootTs,
       ...(spec.tier ? { tierOverride: spec.tier } : {}),
+      ...(spec.footer ? { footerHint: spec.footer } : {}),
     };
     await enqueueAgentJob(env, { kind: "message", event }, `${dm}:${rootTs}`);
   } catch (err) {

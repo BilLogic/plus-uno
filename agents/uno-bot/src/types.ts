@@ -5,6 +5,14 @@ export interface SlackContext {
   channel: string;
   threadTs: string;
   userMsgTs: string;
+  /** The CONVERSATION's identity — `thread_ts` in a channel, the constant "dm"
+   *  in an agent_view DM. Distinct from threadTs, which is only a post target.
+   *
+   *  It exists here for one reader: the cancel check. `/stop` and the Home-tab
+   *  button both record and clear a flag keyed by conversation, and the loop
+   *  has to read the SAME key or the flag is set somewhere nothing looks. It
+   *  was derived independently in three places and two of them disagreed. */
+  conversationTs?: string;
   requestedBy?: string;
   /** Slack's per-event action token, forwarded from the triggering message.
    *  assistant.search.context requires it for BOT-token calls, which is why a
@@ -81,6 +89,11 @@ export interface Env {
   // first with keyword fallback; "off" → keyword only (instant rollback via a
   // var change + redeploy). See integrations/blueprint.ts.
   SEMANTIC_SEARCH?: string;
+  // Public base URL of the uno-blueprint app. Every cell/slice row the bot
+  // returns carries a deep link built from this, so an answer in Slack or the
+  // IDE can be opened at the exact cell it cites. Unset → rows carry no url
+  // (the answer is still grounded, just not clickable).
+  BLUEPRINT_APP_URL?: string;
   THREAD_STATE: DurableObjectNamespace;
   // Per-thread agent-run executor: DO alarms escape the waitUntil() 30s
   // wall-clock cancellation that silently killed long agent runs (👀-then-
@@ -106,6 +119,25 @@ export interface Env {
    *  indicator is served by assistant.threads.setStatus instead. Flip to "on"
    *  to retest once the argument shape is known. */
   SLACK_STREAMING?: string;
+  /** "on" opens the turn's stream UP FRONT in `task_display_mode: "plan"` and
+   *  routes the between-tool narration into it as task cards, instead of
+   *  posting them as loose :hourglass: messages. Off by default: an early
+   *  stream is only honest in plan mode (with plain text it renders an empty
+   *  bubble for the whole run — tried and reverted), so if Slack renders the
+   *  cards differently than expected the artifact is on every turn. */
+  SLACK_STREAM_PLAN?: string;
+  /** "on" swaps the hand-rolled 👍/👎 `actions` row for Slack's native
+   *  `context_actions` block (`feedback_buttons` + an `icon_button` delete).
+   *  Off by default only because an invalid block degrades SILENTLY here —
+   *  delivery falls back to plain text, which would drop the footer from every
+   *  answer while looking fine. Verify once on a real answer, then default it. */
+  SLACK_NATIVE_FEEDBACK?: string;
+  /** "on" enables Phase 5 context management: the derived {goal, constraints,
+   *  decisions, artifacts} block, progressive summarisation of long histories,
+   *  and drift detection. OFF by default and gated on case-by-case judged-eval
+   *  comparison — it changes what the model sees on EVERY turn, and its failure
+   *  mode is subtly worse answers rather than an error. See context-state.ts. */
+  CONTEXT_STATE?: string;
 
   // --- Slack login (user token for slack_search) -----------------------------
   // slack_search calls Slack's search Web API, which REJECTS bot tokens, so it

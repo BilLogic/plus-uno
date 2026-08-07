@@ -3,12 +3,14 @@
 // open is idempotent and keeps the view fresh; there's no per-user state here.
 //
 // Design constraints:
-//   • Only LINK buttons (elements with `url`) — those need no interactivity
-//     handler / Request URL. A button without `url` would post a block_actions
-//     payload the Worker doesn't handle.
 //   • Only links to surfaces known to exist (Storybook, blueprint, repo). A
 //     constructed/guessed link on a curated home page is worse than no link
 //     (AGENT.md § Grounding — never present an unverified URL as in-hand).
+//   • Every ACTION button (one without a `url`) must have a handler in
+//     interactive.ts. This was "link buttons only" until the Stop button, back
+//     when /slack/interactive pointed at a Netlify function that did not exist;
+//     the route is real now, so an action button is safe — but an unhandled
+//     action_id is still a click that does nothing, silently.
 
 import type { Env } from "../types";
 import type { SlackAppHomeOpenedEvent } from "./types";
@@ -56,9 +58,43 @@ const HOME_BODY = [
         text:
           "• *DM me* — right here in the *Messages* tab ↑. It's an ordinary chat: no threads to start, just keep talking\n" +
           "• *In a channel* — `@UNO Bot` your question; I'll answer in a thread\n" +
-          "• *In a thread* — once I'm in, just reply; no need to re-tag\n" +
-          "• *Slash commands* — `/uno-research`, `/uno-synthesize`, `/uno-prototype`, `/uno-review`, `/uno-publish`, `/uno-maintain`",
+          "• *In a thread* — once I'm in, just reply; no need to re-tag. Or right-click any message → *More actions* for the shortcuts\n" +
+          "• *Slash commands* — `/uno-research`, `/uno-synthesize`, `/uno-prototype`, `/uno-review`, `/uno-publish`, `/uno-maintain`\n" +
+          "• *Change the effort* — `/grind` runs it on the deep model, `/chill` keeps it short and cheap",
       },
+    },
+    { type: "divider" },
+    // STOP, and why it lives here as well as in `/stop`.
+    //
+    // The two surfaces know different halves of the problem. `/stop` arrives
+    // with a channel — but Slack does not deliver slash commands in threads at
+    // all, so from inside a thread it cannot be typed. This button arrives with
+    // a person and no channel, and resolves the channel from the run they most
+    // recently started. Between them there is nowhere a turn can be running
+    // that cannot be stopped.
+    { type: "section", text: { type: "mrkdwn", text: "*Working on something you didn't mean to ask for?*" } },
+    {
+      type: "actions",
+      elements: [
+        {
+          type: "button",
+          style: "danger",
+          text: { type: "plain_text", text: "✋ Stop what I'm running", emoji: true },
+          action_id: "uno_stop_run",
+          value: "stop",
+        },
+      ],
+    },
+    {
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          // Says exactly what stop means, because cooperative cancellation is
+          // not what "stop" implies and the gap is where trust goes.
+          text: "Stops my most recent run, wherever it is. I finish the step I'm on — nothing already confirmed gets undone. In a channel you can also type `/stop`.",
+        },
+      ],
     },
     { type: "divider" },
     { type: "section", text: { type: "mrkdwn", text: "*Try asking*" } },
@@ -145,6 +181,13 @@ function buildHomeView(env: Env) {
 
 async function publishHomeView(env: Env, userId: string): Promise<void> {
   await slackCall(env, "views.publish", { user_id: userId, view: buildHomeView(env) });
+}
+
+/** Same publish, but hands Slack's verdict back. Nothing in the event path
+ *  reads it — a rejected view just leaves the old one up — so /debug/home is
+ *  the only way to find out whether a block is valid. */
+export async function publishHomeViewForDebug(env: Env, userId: string): Promise<unknown> {
+  return slackCall(env, "views.publish", { user_id: userId, view: buildHomeView(env) });
 }
 
 export async function handleAppHomeOpened(env: Env, event: SlackAppHomeOpenedEvent): Promise<void> {

@@ -248,6 +248,45 @@ export async function requestCancel(env: Env, channel: string, thread: string): 
   }
 }
 
+/**
+ * Record which conversation this person's turn is running in, so the Home-tab
+ * Stop button — which knows the person and not the channel — can find it.
+ *
+ * Best-effort and deliberately un-awaited-on by the turn: the whole feature is
+ * a convenience, and a failed write costs one Stop click that reports nothing
+ * to stop. Never let it delay an answer.
+ */
+export async function markActiveRun(
+  env: Env,
+  userId: string,
+  channel: string,
+  thread: string,
+): Promise<void> {
+  try {
+    const q = `user=${encodeURIComponent(userId)}&channel=${encodeURIComponent(channel)}&thread=${encodeURIComponent(thread)}`;
+    await call(env, `/active-run?${q}`, { method: "POST" });
+  } catch {
+    // see above — never worth failing a turn over
+  }
+}
+
+/** Cancel whatever this person has running, wherever it is. Resolves the
+ *  channel and sets the flag in one DO hop (the Slack interaction that calls
+ *  this has 3 seconds). `cancelled: false` means there was nothing running. */
+export async function cancelForUser(
+  env: Env,
+  userId: string,
+): Promise<{ cancelled: boolean; channel?: string }> {
+  try {
+    const res = await call(env, `/cancel/by-user?user=${encodeURIComponent(userId)}`, { method: "POST" });
+    if (!res.ok) return { cancelled: false };
+    const body = (await res.json()) as { cancelled?: boolean; channel?: string };
+    return { cancelled: body.cancelled === true, channel: body.channel };
+  } catch {
+    return { cancelled: false };
+  }
+}
+
 /** Reads AND consumes the flag — one /stop cancels one turn. */
 export async function consumeCancel(env: Env, channel: string, thread: string): Promise<boolean> {
   try {

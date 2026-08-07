@@ -155,7 +155,14 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   // Using slack.threadTs directly would have failed silently in a DM — the turn
   // writes under the user's message ts while /stop looks under "dm", so the flag
   // would be set on a key nothing reads and /stop would appear to do nothing.
-  const cancelThread = slack?.channel?.startsWith("D") ? "dm" : (slack?.threadTs ?? "dm");
+  //
+  // It is now PASSED IN (slack.conversationTs) rather than re-derived, because
+  // re-deriving it is exactly how the two ends drifted: an explicitly threaded
+  // DM resolves to the thread, not to "dm", and the expression below cannot
+  // know that. The fallback keeps the old behaviour for any caller that has not
+  // supplied it.
+  const cancelThread =
+    slack?.conversationTs ?? (slack?.channel?.startsWith("D") ? "dm" : (slack?.threadTs ?? "dm"));
 
   // All model-generation-specific dials, derived together so a mid-turn model
   // fallback (below) recomputes them consistently:

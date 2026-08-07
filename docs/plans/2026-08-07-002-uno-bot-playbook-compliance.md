@@ -21,7 +21,7 @@ Verdicts below are the playbook's; **Status** is uno-bot as of `r52-2026-08-07`.
 | Messages tab | Take | ✅ `app_home_opened` + `tab === "messages"` |
 | App Home tab | Take | ✅ |
 | Slash commands | Take | ✅ six `/uno-*` |
-| **Message shortcuts** | **Take** | ❌ **missing** |
+| **Message shortcuts** | **Take** | ✅ five, r64 |
 | Global shortcuts | Skip | ✅ correctly absent |
 | Unfurls | Usually skip | ✅ correctly absent |
 
@@ -39,7 +39,7 @@ unreachable except by @-mention.
 | `loading_messages` | Take | ✅ r47 |
 | Clear status with `""` | Take | ✅ in `finally`, every exit path |
 | `setTitle` | Take | ✅ r46, derived from the question |
-| `setSuggestedPrompts` | **Take, dynamic** | ⚠️ **static** — see §4.4 |
+| `setSuggestedPrompts` | **Take, dynamic** | ✅ varies with the requester's search capability (r53) |
 | `app_context_changed` | Take, read passively | ⚠️ handled as a standalone event and stored; the playbook reads it off the incoming message instead |
 
 ## Streaming
@@ -47,7 +47,7 @@ unreachable except by @-mention.
 | Feature | Verdict | Status |
 |---|---|---|
 | `startStream` / `append` / `stop` | Take | ✅ r42, opened at delivery |
-| `task_display_mode: "plan"` | Take | ❌ **missing** |
+| `task_display_mode: "plan"` | Take | ✅ built, flagged off (`SLACK_STREAM_PLAN`) |
 | Blocks only in `stopStream` | Constraint | ✅ observed |
 | `chat.update` | Skip | ✅ not used |
 
@@ -55,10 +55,10 @@ unreachable except by @-mention.
 
 | Feature | Verdict | Status |
 |---|---|---|
-| `feedback_buttons` in `context_actions` | Take | ⚠️ plain `actions` buttons, not the native element |
-| `icon_button` delete | Take | ❌ missing |
+| `feedback_buttons` in `context_actions` | Take | ✅ built, flagged off (`SLACK_NATIVE_FEEDBACK`) |
+| `icon_button` delete | Take | ✅ built, same flag |
 | `reaction_added` feedback | Take | ⚠️ consumed for the ✅ gate, not as feedback signal |
-| LLM disclaimer | **Take, conditional** | ⚠️ **unconditional** — see §4.5 |
+| LLM disclaimer | **Take, conditional** | ✅ conditional, three variants (full / draft / none) |
 | Citations | Take | ✅ strong |
 | State supported media, fail gracefully | Take | ⚠️ omissions counted, limits not stated in the prompt |
 
@@ -66,21 +66,21 @@ unreachable except by @-mention.
 
 | Feature | Verdict | Status |
 |---|---|---|
-| Save progress, name the blocker, offer options | Take | ❌ generic "I hit an internal error" |
+| Save progress, name the blocker, offer options | Take | ✅ per-stage: progress + blocker + next step |
 | Never leave a thread thinking | Take | ✅ |
-| Intervention controls (pause/stop/retry) | Take | ❌ missing |
+| Intervention controls (pause/stop/retry) | Take | ✅ `/stop` + Home-tab button, both resolved per person |
 
 ## Context management
 
 | Feature | Verdict | Status |
 |---|---|---|
 | `conversations.replies` | Take | ✅ (see trap note below) |
-| `conversations.history`, narrow | Take, narrow | ❌ not used — a root @-mention has no antecedent for "this" |
-| Structured state between turns | Take | ❌ planned (queue plan, Phase 2) |
-| Progressive summarisation | Take | ❌ planned (Phase 3) |
+| `conversations.history`, narrow | Take, narrow | ✅ 12 messages, one page, only on a dangling pronoun |
+| Structured state between turns | Take | ✅ built, flagged off (`CONTEXT_STATE`) |
+| Progressive summarisation | Take | ✅ built, same flag |
 | Token budgets | Defer | ✅ correctly deferred |
-| Drift detection | Take | ❌ planned (Phase 4) |
-| **Don't store Slack data** | **Take** | ❌ **we store transcripts in the DO** |
+| Drift detection | Take | ✅ built, same flag |
+| **Don't store Slack data** | **Take** | ⚠️ **deliberately not followed** — retention approved for this project (user, 2026-08-07) |
 | Notify outside a thread, then `setTitle` | Take | ❌ the Figma poll posts untitled |
 
 ## Traps
@@ -97,6 +97,25 @@ unreachable except by @-mention.
 - **4.5 Conditional disclaimer** — ours is on every answer including
   acknowledgements, which trains people to ignore it.
 - **4.9 Manifest paste replaces** — learned the hard way, documented.
+
+## Status, 2026-08-07 (r65)
+
+Every ❌ in the tables above is now built. Three ship behind flags —
+`SLACK_NATIVE_FEEDBACK`, `SLACK_STREAM_PLAN`, `CONTEXT_STATE` — for reasons
+recorded in the roadmap (`2026-08-07-004`); "built and off" is not the same as
+compliant, and the tables say which is which.
+
+Two entries are deliberately NOT complied with, which is different from
+outstanding:
+
+- **Don't store Slack data.** Overruled with a recorded rationale: transcript
+  retention in the Durable Object is what makes multi-turn work, and the user
+  approved it for this project. The playbook's concern stands; the trade was
+  made knowingly.
+- **Global shortcuts / unfurls.** The playbook says skip, and we skip.
+
+The priority list below is kept as written, unticked, because it is the
+*reasoning* about order — not a checklist. The schedule lives in the roadmap.
 
 ## Priority
 
