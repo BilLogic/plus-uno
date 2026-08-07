@@ -5,17 +5,22 @@
 
 import { looksLikeResolution } from "./loop-shared";
 
-// The bot picks a tier from the intent of the incoming message so cheap turns
-// stay cheap (haiku) and heavy reasoning gets the capable model (opus), with
-// sonnet as the safe default. On the Gemini lane the tier maps to a
-// thinkingLevel on one model; on the Vertex-Claude lane it maps to these model
-// IDs (Vertex/Anthropic partner-model ids — @-versioned where required).
-export type ModelTier = "haiku" | "sonnet" | "opus";
+// A tier is HOW HARD TO THINK, named for effort — never for a model.
+//
+// These were "haiku" | "sonnet" | "opus" until 2026-08-07: Claude model names,
+// on a deployment that has run Gemini in production for months. Naming a tier
+// after a model means every model swap turns the name into a lie, and this one
+// already had. Renamed with no behaviour change; the model wiring is separate.
+//
+// On the Vertex-Claude lane a tier maps to the model IDs below. On the Gemini
+// lane it maps to a model too (see gemini-agent.ts) — the thinking dial is held
+// constant at medium so a tier change stays a single-variable change.
+export type ModelTier = "chill" | "default" | "grind";
 
 export const MODELS: Record<ModelTier, string> = {
-  haiku: "claude-haiku-4-5@20251001",
-  sonnet: "claude-sonnet-5",
-  opus: "claude-opus-4-8",
+  chill: "claude-haiku-4-5@20251001",
+  default: "claude-sonnet-5",
+  grind: "claude-opus-4-8",
 };
 
 export interface RouteDecision {
@@ -26,10 +31,10 @@ export interface RouteDecision {
 export function routeRequest(opts: { userText: string; hasPending: boolean }): RouteDecision {
   const text = opts.userText.toLowerCase();
   if (opts.hasPending && looksLikeResolution(text)) {
-    return { tier: "haiku", reason: "proposal-resolution" };
+    return { tier: "chill", reason: "proposal-resolution" };
   }
   if (/\bthink (hard|deeply)\b/.test(text)) {
-    return { tier: "opus", reason: "explicit-escalation" };
+    return { tier: "grind", reason: "explicit-escalation" };
   }
-  return { tier: "sonnet", reason: "default-lane" };
+  return { tier: "default", reason: "default-lane" };
 }

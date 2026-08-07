@@ -487,7 +487,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     userText,
     hasPending: pending !== null,
   });
-  const trivialTurn = previewTier === "haiku";
+  const trivialTurn = previewTier === "chill";
 
   // Assistant-panel surface the user currently has open (best-effort; null off
   // the panel or when nothing is focused). Advisory grounding for deictic asks
@@ -522,7 +522,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // ts of the stream opened for this turn, threaded down to delivery so the
   // answer closes the same message the indicator lives in. Null = no stream,
   // deliver normally.
-  if (previewTier !== "haiku" || vision.images.length > 0) {
+  if (previewTier !== "chill" || vision.images.length > 0) {
     await addReaction(env, channel, userMsgTs, "hourglass_flowing_sand").catch(() => {});
     if (isAssistantThread(channel)) {
       // setStatus IS the thinking indicator on an App thread — the documented

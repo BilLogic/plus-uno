@@ -2,7 +2,7 @@
 //
 // The /slack/events handler must ack Slack within 3 seconds, so agent runs used
 // to live in ctx.waitUntil() — and Cloudflare CANCELS waitUntil work ~30s after
-// the response is sent. Any run longer than that (sonnet/opus tiers, several MCP
+// the response is sent. Any run longer than that (default/grind tiers, several MCP
 // round-trips, vision) died mid-flight with no exception and no error post:
 // the "👀 then silence" failure (live incident 2026-07-09, two kills at exactly
 // +30s in the logs). DO alarm handlers have NO such wall-clock cutoff — they run

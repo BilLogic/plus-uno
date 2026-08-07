@@ -17,7 +17,7 @@
 //     `wrangler tail` / Workers Logs.
 //
 // Provider-aware like the agent loops: Gemini lane → one generateContent on
-// the active GEMINI_MODEL (low thinking); Vertex-Claude lane → one haiku call.
+// the active GEMINI_MODEL (low thinking); Vertex-Claude lane → one chill call.
 
 import { shouldRejectRevision } from "./revision-guard";
 import type { Env } from "../types";
@@ -100,7 +100,7 @@ async function callJudgeModel(env: Env, userText: string, draft: string): Promis
   const provider = (env.MODEL_PROVIDER ?? "gemini").toLowerCase();
   if (provider === "vertex-claude" && claudeVertexConfigured(env)) {
     const res = await claudeVertexGenerate(env, {
-      model: MODELS.haiku,
+      model: MODELS.chill,
       system: JUDGE_SYSTEM,
       prompt,
       maxTokens: 6000, // room for a full revised draft
