@@ -61,6 +61,13 @@ export async function executeBlueprintSearch(
       : undefined;
     const conflict =
       "These rows are the CURRENT journey. If a Notion doc in this conversation disagrees, surface the conflict (planned change vs obsolete doc, per the card's status) — never blend the two.";
+    // The share path. In Slack and the IDE the reader cannot see the blueprint,
+    // so a cited cell with no link is a dead end — they have to go find it by
+    // hand. `url` opens the app on that exact cell (the in-app agent ignores it;
+    // its user is already looking at the thing).
+    const linking = rows.some((r) => r.url)
+      ? "Each row's `url` opens that exact cell in the blueprint app. Link the cells you actually rely on — put the link on the cell's name at the point of mention, and never hand-build or edit one; only use `url` verbatim."
+      : undefined;
     const citing = rows.some((r) => r.links?.length)
       ? "Some rows carry `links` the blueprint authors attached. Link them at the point of mention — they are authored, not constructed, so they are safe to surface."
       : undefined;
@@ -73,7 +80,7 @@ export async function executeBlueprintSearch(
     // imply row-level provenance it was never given.
     const semanticCaveat =
       retrieval === "semantic"
-        ? "These came from semantic (vector) retrieval over indexed chunks, so they carry no row id, links, or date. Cite them as blueprint content by title//layer, and do not claim a specific cell unless the row shows one."
+        ? "These came from semantic (vector) retrieval over indexed chunks. They carry the cell's id, breadcrumb (`scenario`/`path`/`step`/`layer`) and `url`, but NOT the cell's authored `links` — cite them by breadcrumb and link them with `url`."
         : undefined;
     const edgesNote = edges?.length
       ? "`edges` are ONE HOP from the matched cells — what they trigger and what triggers them. Name the neighbours as places to check; do NOT present this as a full impact analysis, and do not follow the chain further than the data shown. A real trace is sb:whatif in the IDE."
@@ -82,7 +89,7 @@ export async function executeBlueprintSearch(
       ? "`findings` are audit results ALREADY recorded against these cells — report them by cell and severity. Triaging or resolving one is a write: route that to the blueprint app, never claim to have done it."
       : undefined;
     const slicesNote = slices?.length
-      ? "`slices` are views someone already cut. Point at the existing one rather than composing a substitute in this reply."
+      ? "`slices` are views someone already cut — `title`/`actor` say who it is for. Point at the existing one (link its `url`) rather than composing a substitute in this reply."
       : undefined;
     const truncation = truncated
       ? "This result was CAPPED — more rows matched than are shown. Say the list is partial; never present it as everything the blueprint has."
@@ -103,7 +110,7 @@ export async function executeBlueprintSearch(
       ...(slices ? { slices } : {}),
       notes:
         rows.length > 0
-          ? [grounding, attribution, conflict, citing, freshness, semanticCaveat, edgesNote, findingsNote, slicesNote, truncation].filter(Boolean)
+          ? [grounding, attribution, conflict, linking, citing, freshness, semanticCaveat, edgesNote, findingsNote, slicesNote, truncation].filter(Boolean)
           : [
               "No matching blueprint rows. Say the blueprint has nothing on this rather than guessing. A CURRENT doc (Help Center, shipped PRD) may answer instead — cite and date it. If nothing covers it, say 'not in the source' and name who likely can fill the gap (the workflow's owner or lead from the roster).",
             ],

@@ -172,10 +172,17 @@ async function main() {
       source: "blueprint",
       source_key: r.source_key,
       title: r.title,
-      ref_url: BLUEPRINT_URL,
+      // Deep link to the cell, not the app root. Every chunk used to carry the
+      // same homepage URL, which is not a citation — it is a link to "go look
+      // for it yourself". `?cell=` is the app's param (uno-blueprint
+      // src/lib/urlViewState.ts) and source_key IS the cell id.
+      ref_url: `${BLUEPRINT_URL.replace(/\/+$/, "")}/?cell=${r.source_key}`,
       chunk: r.chunk,
       embedding: embeddings[j],
-      updated_at: new Date().toISOString(),
+      // The SOURCE row's date, not now(). Stamping the embed time made every
+      // chunk look freshly authored, so the "flag a stale blueprint" rule the
+      // tool hands the model could never fire — the index always claimed today.
+      updated_at: r.updated_at ?? new Date().toISOString(),
     }));
     await upsertChunks(rows);
     done += rows.length;
