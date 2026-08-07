@@ -68,3 +68,30 @@ test("the connect nudge is passed through when present", () => {
   assert.match(String(body.note), /connect at/);
   assert.equal("note" in buildSearchResponse(base), false);
 });
+
+// ── S3 regression: absence guidance must not crowd out the connect nudge ─────
+// Adding absence_scope alone fixed S1 and broke S3 in the same run — the model
+// scoped the absence and dropped the connect link. Both obligations now travel
+// in one instruction.
+
+test("an empty result in an unconsented DM carries BOTH the scope and the link", () => {
+  const body = buildSearchResponse({
+    ...base,
+    results: [],
+    inOwnDm: true,
+    connectNote: "connect at https://uno-bot.example/oauth/slack/start",
+  });
+  const scope = String(body.absence_scope);
+  assert.match(scope, /not an absence in Slack/i);
+  assert.match(scope, /NOT searched/);
+  assert.match(scope, /oauth\/slack\/start/);
+  // and still available on its own for the non-empty case
+  assert.match(String(body.note), /oauth\/slack\/start/);
+});
+
+test("an empty result with no connect note keeps the scope instruction clean", () => {
+  const body = buildSearchResponse({ ...base, results: [], inOwnDm: true });
+  const scope = String(body.absence_scope);
+  assert.match(scope, /not an absence in Slack/i);
+  assert.doesNotMatch(scope, /connect/i);
+});

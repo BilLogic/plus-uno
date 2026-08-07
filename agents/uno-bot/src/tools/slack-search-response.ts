@@ -61,12 +61,21 @@ export function buildSearchResponse(input: SearchResponseInput): Record<string, 
   // Zero results are where absence gets overclaimed, so the instruction ships
   // WITH the empty result rather than living only in the tool description,
   // where it competes with everything else for the model's attention.
+  //
+  // The connect nudge is folded into the SAME string when both apply. Shipped
+  // as two sibling fields they compete, and the model does one: adding
+  // absence_scope alone regressed S3 (the unconsented-in-own-DM case) from pass
+  // to 2/3 in the very run where it fixed S1 — it scoped the absence and
+  // dropped the connect link. One instruction, both obligations.
   if (results.length === 0) {
     body.absence_scope =
       `No matches in: ${searchedSurfaces}. This is an absence IN WHAT WAS SEARCHED, not an absence in Slack. ` +
-      `Say what was searched in the same breath as the finding — "nothing in the public channels I can see" — never a bare "no one has mentioned this".`;
+      `Say what was searched in the same breath as the finding — "nothing in the public channels I can see" — never a bare "no one has mentioned this".` +
+      (connectNote ? ` THEN, in the same reply, say their own DMs and private channels were NOT searched and offer the connect link: ${connectNote}` : "");
   }
 
+  // Still sent separately: a non-empty result needs the nudge too, and there
+  // is no absence to scope in that case.
   if (connectNote) body.note = connectNote;
   return body;
 }
