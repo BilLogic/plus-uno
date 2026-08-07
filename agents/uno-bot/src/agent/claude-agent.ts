@@ -81,7 +81,7 @@ const WEB_SEARCH_TOOL = { type: "web_search_20250305", name: "web_search", max_u
 export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
   const { env, userText, history, currentSender, pending, images, slack, assistantContext } = input;
 
-  const { tier, reason: routeReason } = routeRequest({ userText, hasPending: pending !== null });
+  const { tier, reason: routeReason } = routeRequest({ userText, hasPending: pending !== null, override: input.tierOverride });
   // Tier → Vertex model ID. The default lane is overridable via CLAUDE_MODEL
   // (e.g. pin an exact @-versioned id); chill/grind stay fixed.
   const model =

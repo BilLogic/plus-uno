@@ -28,13 +28,28 @@ export interface RouteDecision {
   reason: string;
 }
 
-export function routeRequest(opts: { userText: string; hasPending: boolean }): RouteDecision {
+export function routeRequest(opts: {
+  userText: string;
+  hasPending: boolean;
+  /** Set by /grind, /chill and the "think harder" shortcut. */
+  override?: ModelTier;
+}): RouteDecision {
   const text = opts.userText.toLowerCase();
+
+  // PRECEDENCE: an explicit request beats every heuristic. Someone who asked for
+  // cheap on a hard question has told us what they want, and overriding it makes
+  // the command untrustworthy.
+  if (opts.override) return { tier: opts.override, reason: "explicit-command" };
+
   if (opts.hasPending && looksLikeResolution(text)) {
     return { tier: "chill", reason: "proposal-resolution" };
   }
-  if (/\bthink (hard|deeply)\b/.test(text)) {
-    return { tier: "grind", reason: "explicit-escalation" };
+  // "harder" and "more" included deliberately: the natural phrasing is "think
+  // harder", and `\bthink hard\b` does NOT match it — the word boundary fails on
+  // the trailing "er". The grind SHORTCUT asked exactly that and silently ran the
+  // default tier, promising deep thinking and delivering none.
+  if (/\bthink (hard(er)?|deeply|more)\b/.test(text)) {
+    return { tier: "grind", reason: "escalation-phrase" };
   }
   return { tier: "default", reason: "default-lane" };
 }

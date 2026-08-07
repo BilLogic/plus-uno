@@ -9,6 +9,11 @@
 // the actual behaviour, kept in code so they are reviewable in a diff.
 
 export interface ShortcutSpec {
+  /** Explicit tier. Stated, not implied: the first version relied on the ask
+   *  containing "think harder", which does NOT match the escalation phrase
+   *  (`\bthink hard\b` fails on the trailing "er"), so the shortcut promised
+   *  deep thinking and quietly ran the default tier. */
+  tier?: "chill" | "default" | "grind";
   /** Thread title in the Messages-tab timeline. */
   title: string;
   /** The line posted before the work starts. Confirms WHICH message was picked. */
@@ -34,6 +39,7 @@ export const SHORTCUTS: Record<string, ShortcutSpec> = {
   // Exists BECAUSE /grind cannot be typed in a thread. Without it, escalating
   // from inside a conversation is impossible.
   grind: {
+    tier: "grind",
     title: "Second look",
     anchor: (l) => `Taking another run at this: ${l}`,
     ask: (l) =>

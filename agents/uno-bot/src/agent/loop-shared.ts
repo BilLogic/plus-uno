@@ -37,9 +37,14 @@ export interface AgentImage {
   data: string;
 }
 
+import type { ModelTier } from "./routing";
+
 export interface AgentInput {
   env: Env;
   userText: string;
+  /** Explicit tier from /grind, /chill or a shortcut. Beats every routing
+   *  heuristic — see routeRequest. Absent on ordinary turns. */
+  tierOverride?: ModelTier;
   history: HistoryTurn[];
   slack: SlackContext;
   currentSender: { userId: string };

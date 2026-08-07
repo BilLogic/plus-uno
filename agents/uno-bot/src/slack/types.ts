@@ -22,6 +22,9 @@ export interface SlackMessageEvent {
   thread_ts?: string;
   bot_id?: string;
   subtype?: string;
+  /** Set only on SYNTHETIC events (a shortcut, /grind, /chill) — an explicit
+   *  tier that beats routing heuristics. Never present on a real Slack event. */
+  tierOverride?: "chill" | "default" | "grind";
   /** Workspace the message came from. Slack includes it on message events;
    *  chat.startStream needs it as recipient_team_id. */
   team?: string;

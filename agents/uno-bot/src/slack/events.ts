@@ -494,6 +494,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   const { tier: previewTier, reason: routeWhy } = routeRequest({
     userText,
     hasPending: pending !== null,
+    override: event.tierOverride,
   });
   const trivialTurn = previewTier === "chill";
 
@@ -584,6 +585,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     result = await runAgent({
       env,
       userText: vision.modelText,
+      tierOverride: event.tierOverride,
       images: vision.images.length > 0 ? vision.images : undefined,
       history,
       slack: {

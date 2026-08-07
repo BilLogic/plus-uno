@@ -145,7 +145,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   // that got worse could be the model or the level — so one of them is pinned.
   // `medium` is also gemini-3.6-flash's own default, which is the overspend fix:
   // every ordinary turn had been paying `high` because a Claude tier map said so.
-  const { tier, reason: routeReason } = routeRequest({ userText, hasPending: pending !== null });
+  const { tier, reason: routeReason } = routeRequest({ userText, hasPending: pending !== null, override: input.tierOverride });
 
   // Keyed like the CONVERSATION, not the thread. /stop arrives carrying only a
   // channel, so the key it can compute is the one this must read: a DM collapses
