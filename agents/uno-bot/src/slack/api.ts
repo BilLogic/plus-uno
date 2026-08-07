@@ -118,6 +118,8 @@ export interface PostMessageInput {
   thread_ts?: string;
   mrkdwn?: boolean;
   blocks?: unknown[];
+  /** Also show this threaded reply in the main conversation. */
+  reply_broadcast?: boolean;
 }
 
 // NOTE ON THE DISPLAY NAME. The bot presents as "Le Goat" because the bot

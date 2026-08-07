@@ -22,13 +22,13 @@ import {
   conversationsReplies,
   getBotIdentity,
   postMessage,
-  startStream,
-  stopStream,
 } from "./api";
 import {
   handleAgentDmOpened,
   handleAppContextChanged,
   setStatus,
+  setAssistantTitle,
+  threadTitleFrom,
   isAssistantThread,
   formatAssistantContext,
 } from "./assistant";
@@ -185,13 +185,9 @@ export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey
   }
 }
 
-// Streams opened for an in-flight turn, keyed by the user message that started
-// it. The opener (handleUserMessage) and the cleanup (onMessage's finally) are
-// different functions, and only the DO's own isolate runs a given turn, so a
-// module-level map is the narrowest handoff between them. Delivery deletes its
-// entry on success; whatever remains at exit is orphaned and gets closed.
-const openStreams = new Map<string, string>();
-const streamKey = (channel: string, ts: string) => `${channel}:${ts}`;
+// (The open-stream registry that lived here is gone: a stream is now opened and
+// closed inside delivery, within one function, so there is no window in which a
+// turn can end holding one.)
 
 // Entry point the AgentRunner DO alarm calls. Runs OUTSIDE waitUntil — no 30s
 // cutoff, fresh subrequest budget per alarm invocation. Returns "deferred" when
@@ -402,14 +398,6 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
     // which counts as handled. Only a hard kill skips this — by design, so the
     // lease can rescue it.
     await markEventRunDone(env, runKey);
-    // Close a stream the turn opened but never finished — a proposal, an early
-    // return, a throw. Delivery removes its own entry on success, so anything
-    // still here is orphaned, and an open stream spins forever in the client.
-    const orphan = openStreams.get(streamKey(event.channel, event.ts));
-    if (orphan) {
-      openStreams.delete(streamKey(event.channel, event.ts));
-      await stopStream(env, event.channel, orphan).catch(() => {});
-    }
     // Clear the assistant "thinking…" loader on every exit (success, early
     // return, or throw) — a stuck status line is worse than none. No-op off
     // the panel or if one was never set. Same thread_ts gate as the set: only
@@ -506,24 +494,27 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // ts of the stream opened for this turn, threaded down to delivery so the
   // answer closes the same message the indicator lives in. Null = no stream,
   // deliver normally.
-  let streamTs: string | null = null;
   if (previewTier !== "haiku" || vision.images.length > 0) {
     await addReaction(env, channel, userMsgTs, "hourglass_flowing_sand").catch(() => {});
     if (isAssistantThread(channel)) {
-      // The native thinking indicator. Two mechanisms, in order of preference:
-      // chat.startStream (flagged off — Slack rejects our arguments, see
-      // Env.SLACK_STREAMING), then assistant.threads.setStatus, which works now
-      // that DM replies are threaded. The old code gated setStatus on
-      // event.thread_ts, so on the threadless agent surface it never fired once
-      // — that gate, not the API, is why the indicator was missing.
-      if (env.SLACK_STREAMING === "on") {
-        streamTs = await startStream(env, channel, threadTs, event.user, event.team);
-      }
-      if (streamTs) openStreams.set(streamKey(channel, event.ts), streamTs);
-      // Only fall back to setStatus where a thread genuinely exists (a threaded
-      // reply inside a DM). Without one there is nothing it can address.
-      if (!streamTs && threadTs) {
-        await setStatus(env, channel, threadTs, "is thinking…").catch(() => {});
+      // setStatus IS the thinking indicator on an App thread — the documented
+      // one ("await setStatus({ status: 'Thinking...' })"), and it also opens
+      // the thread. Cleared on every exit path in onMessage's finally.
+      //
+      // The stream is deliberately NOT opened here. It used to be, to act as the
+      // indicator, and that was wrong: the agent needs 15–30s before any text
+      // exists, so the client rendered an EMPTY "UNO Bot AGENT" bubble for the
+      // whole run — a blank message impersonating a loading state. A stream
+      // carries content; a status says "working". Delivery opens the stream when
+      // there is something to put in it.
+      await setStatus(env, channel, threadTs, "is thinking…").catch(() => {});
+      // Title the App thread from the question that started it, so it is
+      // findable in History/Messages. Slack: "Set the title initially to capture
+      // the first question from the user." Only for threads we synthesized —
+      // re-titling a thread the user is continuing would overwrite their topic
+      // with a follow-up.
+      if (!event.thread_ts && threadTs) {
+        await setAssistantTitle(env, channel, threadTs, threadTitleFrom(userText)).catch(() => {});
       }
     }
   }
@@ -592,8 +583,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     // a flagged failure. Short replies skip it entirely; any judge error or
     // timeout ships the original draft (fail open — see agent/draft-judge.ts).
     const reviewed = await reviewDraft(env, { userText: vision.modelText, draft: result.text });
-    openStreams.delete(streamKey(channel, event.ts));
-    const delivery = await postTextVerified(env, channel, threadTs, reviewed.text, streamTs);
+    const delivery = await postTextVerified(env, channel, threadTs, reviewed.text);
     await appendHistory(env, channel, convTs, { role: "user", content: vision.historyText });
     if (delivery.ok) {
       // Record what was actually posted (capped/placeholder), not the raw text.

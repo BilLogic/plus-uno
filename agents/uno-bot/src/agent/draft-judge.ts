@@ -19,6 +19,7 @@
 // Provider-aware like the agent loops: Gemini lane → one generateContent on
 // the active GEMINI_MODEL (low thinking); Vertex-Claude lane → one haiku call.
 
+import { shouldRejectRevision } from "./revision-guard";
 import type { Env } from "../types";
 import { geminiConfigured, geminiGenerate } from "../gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "../vertex/claude";
@@ -160,11 +161,17 @@ export async function reviewDraft(
         verdict = "fail";
         failed = Array.isArray(parsed.failed) ? parsed.failed.filter((f): f is string => typeof f === "string") : [];
         const revised = typeof parsed.revised === "string" ? parsed.revised.trim() : "";
-        if (revised.length >= draft.trim().length * MIN_REVISION_RATIO) {
+        if (revised.length < draft.trim().length * MIN_REVISION_RATIO) {
+          console.warn("[draft-judge] fail verdict but truncated revision — sending the original draft");
+        } else if (shouldRejectRevision(draft, revised)) {
+          // Length was the ONLY check until 2026-08-06, and a degenerate
+          // revision is usually longer than the draft, so it passed. One
+          // shipped to a user. The judge can lower quality as easily as raise
+          // it; nothing was looking at what came back.
+          console.warn("[draft-judge] revision diverges from the draft — sending the original draft");
+        } else {
           text = revised;
           revisedUsed = true;
-        } else {
-          console.warn("[draft-judge] fail verdict but unusable revision — sending the original draft");
         }
       } else {
         verdict = "error";

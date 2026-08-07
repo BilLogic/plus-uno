@@ -57,27 +57,72 @@ async function setSuggestedPrompts(
   });
 }
 
-/** Set (or, with an empty string, clear) the "is thinking…" status line. */
+/** What the status line cycles through while a turn runs.
+ *
+ *  A single frozen "is thinking…" reads as hung on a 20–30s grounded run — the
+ *  user cannot tell a slow answer from a dead one. Slack cycles this array
+ *  client-side, so it costs one field, not one API call per step.
+ *
+ *  Ordered to match what the loop actually does (read sources, then reason,
+ *  then write), so it stays honest rather than decorative. */
+const LOADING_MESSAGES = [
+  "reading the sources…",
+  "checking Notion and GitHub…",
+  "cross-checking what's current…",
+  "putting it together…",
+];
+
+/** Set (or, with an empty string, clear) the status line on an App thread. */
 export async function setStatus(
   env: Env,
   channel: string,
   thread_ts: string | undefined,
   status: string,
 ): Promise<void> {
-  // assistant.threads.setStatus addresses a THREAD. An agent_view DM has none,
-  // so there is nothing to decorate — skip rather than send a bad request.
+  // assistant.threads.setStatus addresses a THREAD. Without one there is
+  // nothing to decorate — skip rather than send a bad request.
   if (!thread_ts) return;
+  const clearing = status === "";
   await slackCall(env, "assistant.threads.setStatus", {
     channel_id: channel,
     thread_ts,
     status,
+    // Only while working. Sending them alongside the clear would re-arm the
+    // spinner we are trying to take down.
+    ...(clearing ? {} : { loading_messages: LOADING_MESSAGES }),
   });
 }
 
-// setAssistantTitle (assistant.threads.setTitle) was removed with the agent_view
-// migration: it names a THREAD, and the agent DM has none — the channel is the
-// conversation. If titled notifications are ever wanted, the pattern is
-// chat.postMessage then setTitle with the returned ts as thread_ts.
+/** Name an App thread. Slack asks for this explicitly — "Set the title
+ *  initially to capture the first question from the user" — because the title
+ *  is how a conversation is found again in History / Messages.
+ *
+ *  Removed during the agent_view migration on the reasoning that the agent DM
+ *  had no thread. It does now (DM replies are threaded), so it is back. */
+export async function setAssistantTitle(
+  env: Env,
+  channel: string,
+  thread_ts: string,
+  title: string,
+): Promise<void> {
+  await slackCall(env, "assistant.threads.setTitle", {
+    channel_id: channel,
+    thread_ts,
+    title,
+  });
+}
+
+/** A thread title from the opening question: one line, trimmed to something a
+ *  sidebar can show. Slack truncates anyway; doing it here keeps the ellipsis
+ *  on a word boundary. */
+export function threadTitleFrom(text: string): string {
+  const oneLine = text.replace(/\s+/g, " ").trim();
+  if (!oneLine) return "Chat with UNO Bot";
+  if (oneLine.length <= 60) return oneLine;
+  const cut = oneLine.slice(0, 60);
+  const brk = cut.lastIndexOf(" ");
+  return `${brk > 30 ? cut.slice(0, brk) : cut}…`;
+}
 
 /** Assistant threads are IM channels (id starts with "D"). Used to gate the
  *  status/loader affordances, which only apply to the assistant surface. */
