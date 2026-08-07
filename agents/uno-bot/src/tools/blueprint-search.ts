@@ -25,16 +25,54 @@ export async function executeBlueprintSearch(
   }
 
   try {
-    const rows = await searchBlueprint(env, query);
+    const { rows, retrieval, truncated } = await searchBlueprint(env, query);
+
+    // One obligation per field, not one paragraph carrying five. Instructions
+    // in a tool payload are not additive — a fix to slack_search on 2026-08-06
+    // displaced an unrelated instruction and broke a different eval case — so
+    // each rule now travels with the data that triggers it, and only appears
+    // when it applies.
+    const grounding =
+      "Ground the answer ONLY in these rows. Do not add facts that aren't here.";
+    const attribution = rows.some((r) => r.kind === "cell")
+      ? "Attribute every activity to its `layer` (the actor/stage) and order by `step` — never give one actor's activity to another. If the question spans multiple actors or paths, cover all the relevant ones: a one-layer answer to a multi-actor question is incomplete."
+      : undefined;
+    const conflict =
+      "These rows are the CURRENT journey. If a Notion doc in this conversation disagrees, surface the conflict (planned change vs obsolete doc, per the card's status) — never blend the two.";
+    const citing = rows.some((r) => r.links?.length)
+      ? "Some rows carry `links` the blueprint authors attached. Link them at the point of mention — they are authored, not constructed, so they are safe to surface."
+      : undefined;
+    const freshness = rows.some((r) => r.updatedAt)
+      ? "`updatedAt` is when the row last changed. If it is old relative to what is being discussed, say so rather than presenting it as necessarily current."
+      : undefined;
+    // The semantic path returns corpus chunks, not table rows: no id, no links,
+    // no updated_at. Worth stating, because it is the PRIMARY path — so the
+    // best-recall answers are also the least citable, and the model should not
+    // imply row-level provenance it was never given.
+    const semanticCaveat =
+      retrieval === "semantic"
+        ? "These came from semantic (vector) retrieval over indexed chunks, so they carry no row id, links, or date. Cite them as blueprint content by title//layer, and do not claim a specific cell unless the row shows one."
+        : undefined;
+    const truncation = truncated
+      ? "This result was CAPPED — more rows matched than are shown. Say the list is partial; never present it as everything the blueprint has."
+      : undefined;
+
     return JSON.stringify({
       ok: true,
       query,
       count: rows.length,
+      // Which of the three paths served this. Surfaced so answer quality can be
+      // attributed to retrieval instead of guessed at: "semantic" is the good
+      // path, "tables" means both faster paths were unavailable.
+      retrieval,
+      truncated,
       rows,
-      note:
+      notes:
         rows.length > 0
-          ? "Ground your answer ONLY in these rows and cite the blueprint. For 'cell' rows, attribute each activity to its `layer` (the actor/stage — e.g. 'Regular Tutor', 'Lead Tutor', 'Partner Action: Teacher', 'Back Stage Actions') and order by `step`; do NOT attribute one actor's activities to another. If the question spans multiple actors, paths, or layers, cover ALL the relevant ones here — a one-layer answer to a multi-actor question is incomplete. These rows are the CURRENT journey; if a Notion doc in this conversation disagrees, surface the conflict (planned change vs obsolete doc, per the card's status) — never blend the two. Do not add facts that aren't here."
-          : "No matching blueprint rows. Say the blueprint has nothing on this rather than guessing. A CURRENT doc (Help Center, shipped PRD) may answer instead — cite and date it. If nothing covers it, say 'not in the source' and name who likely can fill the gap (the workflow's owner or lead from the roster).",
+          ? [grounding, attribution, conflict, citing, freshness, semanticCaveat, truncation].filter(Boolean)
+          : [
+              "No matching blueprint rows. Say the blueprint has nothing on this rather than guessing. A CURRENT doc (Help Center, shipped PRD) may answer instead — cite and date it. If nothing covers it, say 'not in the source' and name who likely can fill the gap (the workflow's owner or lead from the roster).",
+            ],
     });
   } catch (err) {
     return JSON.stringify({
