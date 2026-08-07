@@ -19,6 +19,7 @@
 import type { Env } from "../types";
 import { embedText, embeddingsConfigured } from "../vertex/embed";
 import { countedFetch, rethrowIfBudget } from "../net";
+import { cellUrl, sliceUrl, parseChunkTitle, chunkBody } from "./blueprint-link";
 
 const REQUEST_TIMEOUT_MS = 10000;
 const RPC_NAME = "search_blueprint";
@@ -56,6 +57,13 @@ export interface BlueprintRow {
   /** cells.updated_at. The tool tells the model to flag a stale blueprint; it
    *  could not, because it was never given a date to judge. */
   updatedAt?: string;
+  /** Which path variant a semantic hit came from ("Happy Path (happy)"). Only
+   *  the indexed breadcrumb carries this; the table paths do not select it. */
+  path?: string;
+  /** Deep link that opens this row in the blueprint app. Present only when
+   *  BLUEPRINT_APP_URL is set AND the row has an id to link to — a URL that
+   *  resolves to nothing is worse than no URL. */
+  url?: string;
 }
 
 /** Which retrieval path answered, and whether the result was capped.
@@ -154,7 +162,7 @@ export async function searchBlueprint(env: Env, query: string): Promise<Blueprin
     const found = rpc !== null ? rpc : await searchViaTables(base, key, q, controller.signal);
     const retrieval: BlueprintRetrieval = rpc !== null ? "rpc" : "tables";
     const result: BlueprintSearchResult = {
-      rows: found.slice(0, MAX_ROWS),
+      rows: withUrls(env, found).slice(0, MAX_ROWS),
       retrieval,
       truncated: found.length > MAX_ROWS,
     };
@@ -169,6 +177,21 @@ export async function searchBlueprint(env: Env, query: string): Promise<Blueprin
   } finally {
     clearTimeout(timer);
   }
+}
+
+/**
+ * Attach the app deep link to every row that can carry one.
+ *
+ * Cells only. A phase/scenario/step row has an id, but the app's URL vocabulary
+ * has no param for them (uno-blueprint src/lib/urlViewState.ts: `cell`, `slice`,
+ * `mode`, `frame`) — inventing `?step=` here would hand the model a link that
+ * silently opens the plain blueprint and looks like it worked.
+ */
+function withUrls(env: Env, rows: BlueprintRow[]): BlueprintRow[] {
+  if (!env.BLUEPRINT_APP_URL) return rows;
+  return rows.map((row) =>
+    row.kind === "cell" && row.id ? { ...row, url: cellUrl(env.BLUEPRINT_APP_URL, row.id) } : row,
+  );
 }
 
 // Embed the query + call semantic_search.match_corpus_chunks. Returns null on
@@ -200,21 +223,37 @@ async function trySemantic(
   });
   if (!res.ok) return null;
   const data = (await res.json().catch(() => [])) as Array<{
+    source_key?: string;
     title?: string;
     chunk?: string;
     ref_url?: string;
+    updated_at?: string;
     similarity?: number;
   }>;
   if (!Array.isArray(data)) return null;
+  // `source_key` is the cell uuid and `title` is the breadcrumb the backfill
+  // built. Both were being discarded, which is why the best-recall path was
+  // also the only uncitable, unlinkable one (migration 0002 added source_key to
+  // the match function's return; older deployments simply get no id/url here).
   const rows = data
     .filter((r) => (r.similarity ?? 0) >= SEMANTIC_MIN_SIMILARITY)
-    .map((r): BlueprintRow => ({
-      kind: "cell",
-      id: "",
-      title: r.title ?? "",
-      snippet: r.chunk ?? "",
-      score: typeof r.similarity === "number" ? Math.round(r.similarity * 1000) / 1000 : undefined,
-    }));
+    .map((r): BlueprintRow => {
+      const crumb = parseChunkTitle(r.title);
+      const id = typeof r.source_key === "string" ? r.source_key : "";
+      return {
+        kind: "cell",
+        id,
+        title: r.title ?? "",
+        snippet: chunkBody(r.chunk, r.title),
+        layer: crumb.layer,
+        step: crumb.step,
+        scenario: crumb.scenario,
+        path: crumb.path,
+        score: typeof r.similarity === "number" ? Math.round(r.similarity * 1000) / 1000 : undefined,
+        updatedAt: typeof r.updated_at === "string" ? r.updated_at.slice(0, 10) : undefined,
+        url: cellUrl(env.BLUEPRINT_APP_URL, id),
+      };
+    });
   return rows.length ? rows : null;
 }
 
@@ -419,19 +458,34 @@ async function fetchRows(
 }
 
 /** Audit findings already recorded against these cells. A READ — triage is a
- *  write, so it stays in the app where a service-tier session can do it. */
+ *  write, so it stays in the app where a service-tier session can do it.
+ *
+ *  `findings.cell_ids` is a uuid ARRAY (one finding can span cells), not a
+ *  scalar `cell_id`. The old `cell_id=in.(…)` filter asked for a column that
+ *  does not exist: PostgREST 400s, fetchRows logs a warning and returns [], and
+ *  the tool reported "no findings" for cells that had them. Array overlap
+ *  (`ov`) is the correct operator, and it needs `{}`, not `()`. */
 export async function fetchFindings(env: Env, cellIds: string[]): Promise<Array<Record<string, unknown>>> {
   const ids = cellIds.filter(Boolean).slice(0, 10);
   if (ids.length === 0) return [];
-  return fetchRows(env, "findings", `cell_id=in.(${ids.join(",")})`, 20);
+  return fetchRows(env, "findings", `cell_ids=ov.{${ids.join(",")}}`, 20);
 }
 
 /** Named slices someone already cut. Points at an existing view instead of
- *  improvising a worse one in a Slack message. */
+ *  improvising a worse one in a Slack message.
+ *
+ *  Matched on `title` + `actor`: the table has no `name` column, so the old
+ *  `name.ilike` filter 400d on every call and this read has been returning
+ *  nothing since it shipped. Each row carries its `?slice=` deep link, which is
+ *  the whole point of pointing at an existing view. */
 export async function fetchSlices(env: Env, query: string): Promise<Array<Record<string, unknown>>> {
   const words = terms(query);
   const filter = words.length
-    ? `or=(${words.map((w) => `name.ilike.*${w}*`).join(",")})`
+    ? `or=(${words.flatMap((w) => [`title.ilike.*${w}*`, `actor.ilike.*${w}*`]).join(",")})`
     : "order=updated_at.desc";
-  return fetchRows(env, "slices", filter, 10);
+  const rows = await fetchRows(env, "slices", filter, 10);
+  return rows.map((row) => {
+    const url = typeof row.id === "string" ? sliceUrl(env.BLUEPRINT_APP_URL, row.id) : undefined;
+    return url ? { ...row, url } : row;
+  });
 }
