@@ -114,6 +114,11 @@ features:
       description: Share finished-enough work for feedback, or hand it off to development
       usage_hint: "[prototype-or-project]"
       should_escape: false
+    - command: /stop
+      url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
+      description: Stop the turn I'm working on right now
+      usage_hint: "[no arguments]"
+      should_escape: false
     - command: /uno-maintain
       url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
       description: File an intake, run a standing sweep, or capture a lesson into the harness

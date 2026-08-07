@@ -134,6 +134,8 @@ export class ThreadState implements DurableObject {
       if (path === "/assistant-context" && method === "POST") return this.putAssistantContext(request);
       if (path === "/assistant-context" && method === "GET")  return this.getAssistantContext(url);
       if (path === "/events/check-and-record" && method === "POST") return this.checkAndRecordEvent(request);
+      if (path === "/cancel" && method === "POST")   return this.setCancel(url);
+      if (path === "/cancel" && method === "GET")    return this.getCancel(url);
     } catch (err) {
       console.error(`[thread-state] ${method} ${path} failed:`, err);
       return json({ ok: false, error: String(err) }, 500);
@@ -244,6 +246,31 @@ export class ThreadState implements DurableObject {
     return json({ ok: true });
   }
 
+  // ----- cancel (the /stop command) -----
+  //
+  // A flag, not a signal: the Worker cannot interrupt a running alarm, so the
+  // agent loop reads this between iterations and returns early. Cooperative, so
+  // cancellation lands at a tool boundary rather than mid-write.
+  //
+  // Short TTL on purpose. A stale flag would abort the NEXT question the person
+  // asks, which reads as the bot ignoring them — worse than a stop that missed.
+  private async setCancel(url: URL): Promise<Response> {
+    const key = cancelKey(url.searchParams.get("channel") ?? "", url.searchParams.get("thread") ?? "");
+    await this.storage.put(key, { at: Date.now() });
+    return json({ ok: true });
+  }
+
+  private async getCancel(url: URL): Promise<Response> {
+    const key = cancelKey(url.searchParams.get("channel") ?? "", url.searchParams.get("thread") ?? "");
+    const rec = await this.storage.get<{ at: number }>(key);
+    if (!rec) return json({ ok: true, cancelled: false });
+    // Consume it: one /stop cancels one turn. Leaving it set would cancel the
+    // reply to whatever they ask next.
+    await this.storage.delete(key);
+    const fresh = Date.now() - rec.at < CANCEL_TTL_MS;
+    return json({ ok: true, cancelled: fresh });
+  }
+
   private async getAssistantContext(url: URL): Promise<Response> {
     const channel = url.searchParams.get("channel");
     const thread = url.searchParams.get("thread");
@@ -316,6 +343,13 @@ function proposalKey(ts: string): string {
 
 function eventKey(eventId: string): string {
   return `event:${eventId}`;
+}
+
+// Cancel flags expire fast on purpose: a stale one would abort the NEXT
+// question, which reads as the bot ignoring you.
+const CANCEL_TTL_MS = 5 * 60_000;
+function cancelKey(channel: string, thread: string): string {
+  return `cancel:${channel}:${thread}`;
 }
 
 function assistantContextKey(channel: string, thread: string): string {

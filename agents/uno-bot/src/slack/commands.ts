@@ -23,6 +23,7 @@ import type { Env } from "../types";
 import { countedFetch } from "../net";
 import { postMessage } from "./api";
 import { enqueueAgentJob } from "./events";
+import { requestCancel } from "../thread-state-client";
 import { SLASH_COMMANDS } from "../generated/slack-commands";
 import type { SlackMessageEvent } from "./types";
 
@@ -64,6 +65,25 @@ export function handleSlashCommand(
   if (!payload) {
     console.error("[slash] malformed payload — missing command/user_id/channel_id");
     return ephemeral(":warning: Slack sent a command I couldn't read. Try again?");
+  }
+
+  // /stop is not a skill, so it does not go through SLASH_COMMANDS. It is a
+  // system control: it must be fast, take no arguments, and never start work.
+  //
+  // It sets a flag the running agent loop reads between iterations — the Worker
+  // cannot interrupt a DO alarm, so cancellation is cooperative. The reply is
+  // deliberately honest about that: the current step finishes.
+  if (payload.command === "/stop") {
+    const thread = payload.channelId.startsWith("D") ? "dm" : payload.channelId;
+    ctx.waitUntil(
+      requestCancel(env, payload.channelId, thread).then((ok) => {
+        if (!ok) console.warn("[stop] could not set the cancel flag");
+      }),
+    );
+    return ephemeral(
+      "Stopping — I'll finish the step I'm on and stop there. " +
+        "(Nothing already confirmed gets undone.)",
+    );
   }
 
   const target = SLASH_COMMANDS[payload.command];

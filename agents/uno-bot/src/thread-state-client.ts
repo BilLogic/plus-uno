@@ -228,3 +228,34 @@ export async function markEventRunDone(env: Env, event_id: string): Promise<void
     // Best-effort: a missed done-mark self-heals when the lease goes stale.
   }
 }
+
+
+// ----- cancel (/stop) -----
+//
+// The Worker cannot interrupt a running DO alarm, so /stop sets a flag and the
+// agent loop reads it between iterations. Both calls are best-effort: a failed
+// set means the turn finishes (annoying, not broken), and a failed read means
+// the turn continues (same). Neither is worth failing a turn over.
+
+export async function requestCancel(env: Env, channel: string, thread: string): Promise<boolean> {
+  try {
+    const res = await call(env, `/cancel?channel=${encodeURIComponent(channel)}&thread=${encodeURIComponent(thread)}`, {
+      method: "POST",
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Reads AND consumes the flag — one /stop cancels one turn. */
+export async function consumeCancel(env: Env, channel: string, thread: string): Promise<boolean> {
+  try {
+    const res = await call(env, `/cancel?channel=${encodeURIComponent(channel)}&thread=${encodeURIComponent(thread)}`);
+    if (!res.ok) return false;
+    const body = (await res.json()) as { cancelled?: boolean };
+    return body.cancelled === true;
+  } catch {
+    return false;
+  }
+}
