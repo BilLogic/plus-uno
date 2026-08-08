@@ -47,7 +47,9 @@ export async function executeBlueprintSearch(
     // before the counter catches up.
     const edges = include.includes("edges") ? await fetchEdges(env, cellIds) : undefined;
     const findings = include.includes("findings") ? await fetchFindings(env, cellIds) : undefined;
-    const slices = include.includes("slices") ? await fetchSlices(env, query) : undefined;
+    const sliceRead = include.includes("slices") ? await fetchSlices(env, query) : undefined;
+    const slices = sliceRead?.rows;
+    const sliceTotal = sliceRead?.total;
 
     // One obligation per field, not one paragraph carrying five. Instructions
     // in a tool payload are not additive — a fix to slack_search on 2026-08-06
@@ -91,6 +93,13 @@ export async function executeBlueprintSearch(
     const slicesNote = slices?.length
       ? "`slices` are views someone already cut — `title`/`actor` say who it is for. Point at the existing one (link its `url`) rather than composing a substitute in this reply."
       : undefined;
+    // The rows are a filtered page, and a "how many slices" answer must come
+    // from the table's total, never from counting the page — that mistake
+    // shipped as a confident wrong number (5 of 14) before this note existed.
+    const sliceCountNote =
+      slices && typeof sliceTotal === "number" && sliceTotal !== slices.length
+        ? `The blueprint has ${sliceTotal} saved slices in total; \`slices\` shows ${slices.length} matched to this question. For any count-of-slices answer, use ${sliceTotal}.`
+        : undefined;
     const truncation = truncated
       ? "This result was CAPPED — more rows matched than are shown. Say the list is partial; never present it as everything the blueprint has."
       : undefined;
@@ -108,9 +117,10 @@ export async function executeBlueprintSearch(
       ...(edges ? { edges } : {}),
       ...(findings ? { findings } : {}),
       ...(slices ? { slices } : {}),
+      ...(typeof sliceTotal === "number" ? { sliceTotal } : {}),
       notes:
         rows.length > 0
-          ? [grounding, attribution, conflict, linking, citing, freshness, semanticCaveat, edgesNote, findingsNote, slicesNote, truncation].filter(Boolean)
+          ? [grounding, attribution, conflict, linking, citing, freshness, semanticCaveat, edgesNote, findingsNote, slicesNote, sliceCountNote, truncation].filter(Boolean)
           : [
               "No matching blueprint rows. Say the blueprint has nothing on this rather than guessing. A CURRENT doc (Help Center, shipped PRD) may answer instead — cite and date it. If nothing covers it, say 'not in the source' and name who likely can fill the gap (the workflow's owner or lead from the roster).",
             ],

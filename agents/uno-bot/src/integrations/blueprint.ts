@@ -440,21 +440,35 @@ async function fetchRows(
   table: string,
   qs: string,
   limit: number,
-): Promise<Array<Record<string, unknown>>> {
-  if (!isBlueprintConfigured(env)) return [];
+): Promise<{ rows: Array<Record<string, unknown>>; total: number | undefined }> {
+  if (!isBlueprintConfigured(env)) return { rows: [], total: undefined };
   const base = env.SUPABASE_URL!.replace(/\/+$/, "");
   const res = await countedFetch(`${base}/rest/v1/${table}?select=*&${qs}&limit=${limit}`, {
-    headers: headers(env.SUPABASE_ANON_KEY!),
+    // count=exact rides the SAME request (PostgREST answers in
+    // content-range), so the table's true size arrives with the page. A
+    // capped page without its total is how "how many X" answers became the
+    // page size (the model counted what it was shown).
+    headers: { ...headers(env.SUPABASE_ANON_KEY!), prefer: "count=exact" },
   });
   if (!res.ok) {
     // A missing table is a legitimate outcome (not every deployment has run
     // every migration), so this degrades to "no rows" rather than failing the
     // whole search.
     console.warn(`[blueprint] ${table} read failed (${res.status})`);
-    return [];
+    return { rows: [], total: undefined };
   }
   const data = await res.json().catch(() => []);
-  return Array.isArray(data) ? (data as Array<Record<string, unknown>>) : [];
+  // content-range: "0-9/14" — the denominator is the unfiltered-by-limit total.
+  const range = res.headers.get("content-range");
+  const totalText = range?.split("/")[1];
+  const total =
+    totalText && totalText !== "*" && Number.isFinite(Number(totalText))
+      ? Number(totalText)
+      : undefined;
+  return {
+    rows: Array.isArray(data) ? (data as Array<Record<string, unknown>>) : [],
+    total,
+  };
 }
 
 /** Audit findings already recorded against these cells. A READ — triage is a
@@ -468,7 +482,7 @@ async function fetchRows(
 export async function fetchFindings(env: Env, cellIds: string[]): Promise<Array<Record<string, unknown>>> {
   const ids = cellIds.filter(Boolean).slice(0, 10);
   if (ids.length === 0) return [];
-  return fetchRows(env, "findings", `cell_ids=ov.{${ids.join(",")}}`, 20);
+  return (await fetchRows(env, "findings", `cell_ids=ov.{${ids.join(",")}}`, 20)).rows;
 }
 
 /** Named slices someone already cut. Points at an existing view instead of
@@ -478,14 +492,26 @@ export async function fetchFindings(env: Env, cellIds: string[]): Promise<Array<
  *  `name.ilike` filter 400d on every call and this read has been returning
  *  nothing since it shipped. Each row carries its `?slice=` deep link, which is
  *  the whole point of pointing at an existing view. */
-export async function fetchSlices(env: Env, query: string): Promise<Array<Record<string, unknown>>> {
+export async function fetchSlices(
+  env: Env,
+  query: string,
+): Promise<{ rows: Array<Record<string, unknown>>; total: number | undefined }> {
   const words = terms(query);
   const filter = words.length
     ? `or=(${words.flatMap((w) => [`title.ilike.*${w}*`, `actor.ilike.*${w}*`]).join(",")})`
     : "order=updated_at.desc";
-  const rows = await fetchRows(env, "slices", filter, 10);
-  return rows.map((row) => {
-    const url = typeof row.id === "string" ? sliceUrl(env.BLUEPRINT_APP_URL, row.id) : undefined;
-    return url ? { ...row, url } : row;
-  });
+  const { rows, total } = await fetchRows(env, "slices", filter, 10);
+  // `total` counts the FILTERED set. A worded query narrows it, and a "how
+  // many slices are there" answer must not inherit that narrowing — so when
+  // a filter was applied, fetch the table's true size with a rows-free
+  // head-count (limit=0 still carries content-range under count=exact).
+  const tableTotal =
+    words.length > 0 ? (await fetchRows(env, "slices", "limit=0", 0)).total : total;
+  return {
+    rows: rows.map((row) => {
+      const url = typeof row.id === "string" ? sliceUrl(env.BLUEPRINT_APP_URL, row.id) : undefined;
+      return url ? { ...row, url } : row;
+    }),
+    total: tableTotal ?? total,
+  };
 }
