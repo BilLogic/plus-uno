@@ -85,7 +85,7 @@ export async function executeBlueprintSearch(
         ? "These came from semantic (vector) retrieval over indexed chunks. They carry the cell's id, breadcrumb (`scenario`/`path`/`step`/`layer`) and `url`, but NOT the cell's authored `links` — cite them by breadcrumb and link them with `url`."
         : undefined;
     const edgesNote = edges?.length
-      ? "`edges` are ONE HOP from the matched cells — what they trigger and what triggers them. Name the neighbours as places to check; do NOT present this as a full impact analysis, and do not follow the chain further than the data shown. A real trace is sb:whatif in the IDE."
+      ? "`edges` are ONE HOP from the matched cells. Each edge carries `kind`: `trigger` means the source sets the target in motion (temporal); `needs` means the source depends on the target existing (functional) — do not narrate a needs edge as something being \"set off\". `note` is the designer's own why-line when present. Name the neighbours as places to check; do NOT present this as a full impact analysis, and do not follow the chain further than the data shown. A real trace is sb:whatif in the IDE."
       : undefined;
     const findingsNote = findings?.length
       ? "`findings` are audit results ALREADY recorded against these cells — report them by cell and severity. Triaging or resolving one is a write: route that to the blueprint app, never claim to have done it."

@@ -293,7 +293,11 @@ const SOURCES: Source[] = [
     table: "cells",
     kind: "cell",
     columns: ["content"],
-    select: "id,content,links,updated_at,layer:layers(name),step:steps(name),path:paths(name,scenario:service_scenarios(name))",
+    // Spec columns ride along (function/form/value_props/owner/perceived_owner
+    // are public-read): "who owns this touchpoint / what does it do" questions
+    // were answered "not in the blueprint" while the data sat one select away.
+    select:
+      "id,content,function,form,value_props,owner,perceived_owner,links,updated_at,layer:layers(name,owner_team,kpis),step:steps(name),path:paths(name,scenario:service_scenarios(name))",
   },
 ];
 
@@ -381,6 +385,12 @@ export interface BlueprintEdge {
   from: string;
   to: string;
   direction: "downstream" | "upstream";
+  /** "trigger" = source sets target in motion (temporal); "needs" = source
+   *  depends on target existing (functional). Distinct relations in the app —
+   *  narrating a needs edge as "what it sets off" misstates the blueprint. */
+  kind: "trigger" | "needs";
+  /** Authored why-line for the edge, when the designer wrote one. */
+  note?: string;
 }
 
 /**
@@ -401,7 +411,7 @@ export async function fetchEdges(env: Env, cellIds: string[]): Promise<Blueprint
   const base = env.SUPABASE_URL!.replace(/\/+$/, "");
   const list = `(${ids.join(",")})`;
   const select =
-    "source_cell_id,target_cell_id," +
+    "source_cell_id,target_cell_id,kind,label,note," +
     "source:cells!cell_triggers_source_cell_id_fkey(content)," +
     "target:cells!cell_triggers_target_cell_id_fkey(content)";
   const url =
@@ -424,7 +434,20 @@ export async function fetchEdges(env: Env, cellIds: string[]): Promise<Blueprint
     const to = text(r.target);
     if (!from || !to) return [];
     const startedHere = ids.includes(String(r.source_cell_id));
-    return [{ from, to, direction: startedHere ? "downstream" : "upstream" }];
+    const kind = r.kind === "needs" ? "needs" : "trigger";
+    const note =
+      [r.label, r.note]
+        .filter((v): v is string => typeof v === "string" && v.length > 0)
+        .join(" — ") || undefined;
+    return [
+      {
+        from,
+        to,
+        direction: startedHere ? "downstream" : "upstream",
+        kind,
+        ...(note ? { note } : {}),
+      },
+    ];
   });
 }
 
@@ -482,7 +505,10 @@ async function fetchRows(
 export async function fetchFindings(env: Env, cellIds: string[]): Promise<Array<Record<string, unknown>>> {
   const ids = cellIds.filter(Boolean).slice(0, 10);
   if (ids.length === 0) return [];
-  return (await fetchRows(env, "findings", `cell_ids=ov.{${ids.join(",")}}`, 20)).rows;
+  // Open findings only: the app's triage invariant is "dismissed stays
+  // dismissed" — re-surfacing closed findings in Slack re-litigates a call
+  // the team already made in-app, and closed rows eat the 20-row cap.
+  return (await fetchRows(env, "findings", `cell_ids=ov.{${ids.join(",")}}&status=eq.open`, 20)).rows;
 }
 
 /** Named slices someone already cut. Points at an existing view instead of
