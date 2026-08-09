@@ -6,10 +6,13 @@
 // the in-app agent doesn't (the UI is already there). Building that URL is pure
 // string work, so it lives here where it can be tested without a network.
 
-/** Query param the app reads to open a single cell. Mirrors `?slice=` — see
- *  uno-blueprint src/lib/urlViewState.ts, which owns both names. */
-const CELL_PARAM = "cell";
-const SLICE_PARAM = "slice";
+import { BLUEPRINT_CONTRACT } from "../generated/blueprint-contract";
+
+/** Query params the app reads — from the vendored cross-repo contract
+ *  (canonical home: uno-blueprint src/lib/blueprintContract.ts; re-vendor
+ *  with scripts/sync-blueprint-contract.mjs). */
+const CELL_PARAM = BLUEPRINT_CONTRACT.urlParams.cell;
+const SLICE_PARAM = BLUEPRINT_CONTRACT.urlParams.slice;
 
 function base(appUrl: string | undefined): string | undefined {
   const trimmed = (appUrl ?? "").trim().replace(/\/+$/, "");

@@ -12,6 +12,7 @@ import { runAgent } from "./agent/run-agent";
 import { preflight } from "./agent/preflight";
 import type { HistoryTurn, PendingProposal } from "./thread-state-client";
 import { BUILD } from "./version";
+import { BLUEPRINT_CONTRACT } from "./generated/blueprint-contract";
 import { runFigmaPoll } from "./figma-poll";
 import { buildSystemBlocks } from "./agent/skills";
 import { ensureHarnessCache } from "./gemini/cache";
@@ -42,11 +43,55 @@ export default {
   },
 };
 
+let contractProbeCache: { at: number; body: { ok: boolean; build: string; probes: Record<string, boolean> } } | null = null;
+
 async function handleRequest(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const url = new URL(request.url);
 
   if (request.method === "GET" && url.pathname === "/health") {
     return new Response(`uno-bot ok ${BUILD}`, { status: 200 });
+  }
+
+  // Public, boolean-only contract probe: does every blueprint read this bot
+  // depends on still work? Exists so the APP repo's CI can fail loudly when a
+  // schema change breaks a bot read — the drift class that twice shipped as
+  // silent empty reads. Unlike /debug/blueprint (auth-gated, carries response
+  // samples), this returns nothing but statuses: table names are public-read
+  // by design, and no row data leaves. Cached per isolate to keep a curl loop
+  // from amplifying into upstream reads.
+  if (request.method === "GET" && url.pathname === "/health/blueprint") {
+    if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) {
+      return Response.json({ ok: false, build: BUILD, error: "blueprint reads not configured" }, { status: 503 });
+    }
+    const now = Date.now();
+    if (contractProbeCache && now - contractProbeCache.at < 60_000) {
+      return Response.json(contractProbeCache.body, { status: contractProbeCache.body.ok ? 200 : 503 });
+    }
+    const base = env.SUPABASE_URL.replace(/\/+$/, "");
+    const h = { apikey: env.SUPABASE_ANON_KEY, authorization: `Bearer ${env.SUPABASE_ANON_KEY}` };
+    const probes: Record<string, boolean> = {};
+    const probe = async (label: string, path: string, init?: RequestInit) => {
+      try {
+        const r = await countedFetch(`${base}${path}`, { ...init, headers: { ...h, ...(init?.headers ?? {}) } });
+        probes[label] = r.ok;
+      } catch {
+        probes[label] = false;
+      }
+    };
+    await probe("rpc_search_blueprint", "/rest/v1/rpc/search_blueprint", {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ q: "tutor" }),
+    });
+    for (const t of BLUEPRINT_CONTRACT.botReadTables) {
+      await probe(`table_${t}`, `/rest/v1/${t}?select=id&limit=1`);
+    }
+    // The exact selects the bot issues, not just table reachability — a
+    // renamed column 400s here while bare selects stay green.
+    await probe("select_cells_spec", `/rest/v1/cells?select=${encodeURIComponent("id,content,function,form,value_props,owner,perceived_owner,links,updated_at,layer:layers(name,owner_team,kpis),step:steps(name),path:paths(name,scenario:service_scenarios(name))")}&limit=1`);
+    await probe("select_edges_kind", `/rest/v1/cell_triggers?select=${encodeURIComponent("source_cell_id,target_cell_id,kind,label,note")}&limit=1`);
+    await probe("select_findings_open", "/rest/v1/findings?select=id&status=eq.open&limit=1");
+    const body = { ok: Object.values(probes).every(Boolean), build: BUILD, probes };
+    contractProbeCache = { at: now, body };
+    return Response.json(body, { status: body.ok ? 200 : 503 });
   }
 
   // Gemini credential + reachability smoke test (dual-provider phase 1).
