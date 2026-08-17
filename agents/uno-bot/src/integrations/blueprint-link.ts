@@ -36,6 +36,7 @@ export function sliceUrl(appUrl: string | undefined, sliceId: string): string | 
 }
 
 export interface ChunkBreadcrumb {
+  phase?: string;
   scenario?: string;
   path?: string;
   step?: string;
@@ -45,15 +46,20 @@ export interface ChunkBreadcrumb {
 /**
  * Split the indexed title back into its parts.
  *
- * The backfill writes "Scenario: X · Path: Y (happy) · Step: Z · Layer: L"
- * (migration 0001, semantic_search.blueprint_chunks_src). The bot used to hand
- * that whole string to the model as `title` and leave `layer`/`step`/`scenario`
- * empty — so the one instruction blueprint_search cares most about, "attribute
- * every activity to its layer", had nothing to attribute with on the PRIMARY
- * retrieval path. The data was there the whole time, unparsed.
+ * The backfill writes "Phase: P · Scenario: X · Path: Y (happy) · Step: Z ·
+ * Layer: L" (migration 0004; migration 0001 wrote the same string WITHOUT the
+ * leading phase segment). The bot used to hand that whole string to the model
+ * as `title` and leave `layer` / `step` / `scenario` / `phase` empty — so the
+ * one instruction blueprint_search cares most about, "attribute every activity
+ * to its layer", had nothing to attribute with on the PRIMARY retrieval path,
+ * and the citation format the navigation guide demands
+ * (`phase › scenario › path — layer × step`) could not be produced at all. The
+ * data was there the whole time, unparsed.
  *
- * Unknown segments are ignored rather than guessed at: a mis-assigned layer is
- * exactly the fabrication this tool exists to prevent.
+ * Label-driven, not positional, so BOTH title shapes parse: chunks embedded
+ * before 0004 simply yield no `phase`, and keep working unchanged while the
+ * corpus re-embeds. Unknown segments are ignored rather than guessed at: a
+ * mis-assigned layer is exactly the fabrication this tool exists to prevent.
  */
 export function parseChunkTitle(title: string | undefined): ChunkBreadcrumb {
   const out: ChunkBreadcrumb = {};
@@ -65,7 +71,8 @@ export function parseChunkTitle(title: string | undefined): ChunkBreadcrumb {
     const label = segment.slice(0, at).trim().toLowerCase();
     const value = segment.slice(at + 1).trim();
     if (!value) continue;
-    if (label === "scenario") out.scenario = value;
+    if (label === "phase") out.phase = value;
+    else if (label === "scenario") out.scenario = value;
     else if (label === "path") out.path = value;
     else if (label === "step") out.step = value;
     else if (label === "layer") out.layer = value;

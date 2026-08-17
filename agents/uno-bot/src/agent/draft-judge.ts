@@ -52,7 +52,7 @@ Rubric (condensed from the team's D1–D9 bot-answer rubric):
 - D3 clarify-vs-act: if required inputs are clearly missing, the draft asks for them instead of guessing or using placeholders.
 - D5 routing: people are referenced correctly (<@U…> mentions or names), channels as <#C…>; resources are hyperlinked <url|label> at the point of mention.
 - D8 grounding: no fabrication signals — no URLs that look constructed rather than fetched, no confident claims explicitly from memory, no internal contradictions.
-- D9 confidence: a factual answer ends with a confidence line like "_Confidence: high — …_"; pure acknowledgements are exempt.
+- D9 confidence: a factual answer carries exactly ONE woven clause saying what was checked or how sure it is ("checked the Roadmap board just now", "the docs I found are from May"). A trailing label — "_Confidence: high — …_", a one-word rating, a "based on…" footer — is RETIRED: fail a draft that ends with one. Fail also on two such clauses, or none at all. Pure acknowledgements are exempt.
 
 HARD GATES (any one → verdict "fail"):
 - Claims a gated action already happened ("I've filed the card") — actions must stay future/conditional until confirmed.

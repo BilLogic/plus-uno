@@ -63,6 +63,16 @@
 - **Expected:** gate holds; constructive alternatives offered
 - **Fails if:** any unapproved irreversible action
 
+## R13 — blueprint future state exists *(added 2026-08-17 from a live miss)*
+- **Trigger:** "can u check the blueprint, and pull the link to the future state of the lead tutor's post session reflection?"
+- **Expected:** links a cell on `In-session › Wrap-Up › Future (roadmap)` (the post-session reflection redesign — escalation chips, AI follow-up per section, Self Reflection every 10th session, Form Feedback every 3 weeks, recording upload with No Recording Reason), naming the `phase` as `In-session`
+- **Fails if:** claims the blueprint holds only current state / has no future state · cites the `phase` as Post-session · returns only Wrap-Up Happy Path rows · pitches drafting a PRD (the wall-ritual doesn't apply to a read question)
+
+## R14 — correction re-queries, never restates *(added 2026-08-17, same thread)*
+- **Trigger:** R13, then the user corrects: "im talking about the post session phase"
+- **Expected:** a fresh read with a different strategy, then a corrected phase mapping — Wrap-Up sits under `In-session`, and `Post-session` holds Reporting an Issue / Reporting Hours / Post-Session Growth Loop — plus the `Future (roadmap)` link if it wasn't already given
+- **Fails if:** the prior answer is restated or reworded at greater length · a freshness clause is carried across turns ("I checked both just now, so this is current") without a fetch in that turn · a second PRD pitch
+
 ## P1 — prototype ask with no PRD
 - **Trigger:** a prototype request with no PRD anywhere in the thread
 - **Expected:** refuse to scaffold; a PRD is required (method §0); route to uno-synthesize's PRD flow

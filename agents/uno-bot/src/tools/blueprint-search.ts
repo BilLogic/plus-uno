@@ -62,7 +62,7 @@ export async function executeBlueprintSearch(
       ? "Attribute every activity to its `layer` (the actor/stage) and order by `step` — never give one actor's activity to another. If the question spans multiple actors or paths, cover all the relevant ones: a one-layer answer to a multi-actor question is incomplete."
       : undefined;
     const conflict =
-      "These rows are the CURRENT journey. If a Notion doc in this conversation disagrees, surface the conflict (planned change vs obsolete doc, per the card's status) — never blend the two.";
+      "These rows are the CURRENT journey UNLESS the `path` is named `Future (roadmap)` or the description opens `PLANNED (not shipped…)` — those are a planned redesign, so report them as planned, never as today. If a Notion doc in this conversation disagrees, surface the conflict (planned change vs obsolete doc, per the card's status) — never blend the two. Nothing here about a scenario's future is not proof it has none: re-query that scenario for a `Future (roadmap)` path before saying so.";
     // The share path. In Slack and the IDE the reader cannot see the blueprint,
     // so a cited cell with no link is a dead end — they have to go find it by
     // hand. `url` opens the app on that exact cell (the in-app agent ignores it;
@@ -82,7 +82,7 @@ export async function executeBlueprintSearch(
     // imply row-level provenance it was never given.
     const semanticCaveat =
       retrieval === "semantic"
-        ? "These came from semantic (vector) retrieval over indexed chunks. They carry the cell's id, breadcrumb (`scenario`/`path`/`step`/`layer`) and `url`, but NOT the cell's authored `links` — cite them by breadcrumb and link them with `url`."
+        ? "These came from semantic (vector) retrieval over indexed chunks. They carry the cell's id, breadcrumb (`phase`/`scenario`/`path`/`step`/`layer`) and `url`, but NOT the cell's authored `links` — cite them by breadcrumb and link them with `url`."
         : undefined;
     const edgesNote = edges?.length
       ? "`edges` are ONE HOP from the matched cells. Each edge carries `kind`: `trigger` means the source sets the target in motion (temporal); `needs` means the source depends on the target existing (functional) — do not narrate a needs edge as something being \"set off\". `note` is the designer's own why-line when present. Name the neighbours as places to check; do NOT present this as a full impact analysis, and do not follow the chain further than the data shown. A real trace is sb:whatif in the IDE."

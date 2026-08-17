@@ -37,3 +37,15 @@ test("every scope tells the model to look elsewhere on a miss", () => {
     assert.match(scope.instruction, /not there/i, scope.name);
   }
 });
+
+// The blueprint scope used to open "it is the record of how the service works
+// TODAY", full stop — an in-prompt axiom that the board holds no future state.
+// The bot repeated it at a user whose future path was sitting in the data.
+test("the blueprint scope names the future-state carve-out, not a today-only axiom", () => {
+  const { instruction } = SCOPES.blueprint;
+  assert.match(instruction, /Future \(roadmap\)/);
+  assert.match(instruction, /PLANNED \(not shipped/);
+  // The retired axiom, verbatim: an unqualified "it is" with nothing after
+  // TODAY but a full stop. "most of it is …, but" is the fix, not the bug.
+  assert.doesNotMatch(instruction, /blueprint — it is the record of how the service works TODAY\./);
+});

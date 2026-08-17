@@ -55,3 +55,49 @@ test("the snippet drops the breadcrumb line the chunk repeats", () => {
   // A chunk that does not start with its title is passed through untouched.
   assert.equal(chunkBody("Email", TITLE), "Email");
 });
+
+// The corpus re-embeds over time, so BOTH title shapes are live at once. The
+// old shape must keep parsing while the new one rolls in — a parser that only
+// understood the new shape would blank out every field on every not-yet-
+// re-embedded chunk, which is a worse bug than the one being fixed.
+
+test("the new title shape yields every segment, phase included", () => {
+  const crumb = parseChunkTitle(
+    "Phase: In-session · Scenario: Wrap-Up · Path: Future (roadmap) (named) · Step: Lead tutor writes the post-session reflection · Layer: Lead Tutor",
+  );
+  assert.equal(crumb.phase, "In-session");
+  assert.equal(crumb.scenario, "Wrap-Up");
+  assert.equal(crumb.path, "Future (roadmap) (named)");
+  assert.equal(crumb.step, "Lead tutor writes the post-session reflection");
+  assert.equal(crumb.layer, "Lead Tutor");
+});
+
+test("the pre-0004 title shape still parses, just without a phase", () => {
+  const crumb = parseChunkTitle(
+    "Scenario: Goal Setting · Path: Happy Path (happy) · Step: Set goals · Layer: Regular Tutor",
+  );
+  assert.equal(crumb.phase, undefined);
+  assert.equal(crumb.scenario, "Goal Setting");
+  assert.equal(crumb.path, "Happy Path (happy)");
+  assert.equal(crumb.step, "Set goals");
+  assert.equal(crumb.layer, "Regular Tutor");
+});
+
+test("a step name containing a colon keeps its whole value", () => {
+  const crumb = parseChunkTitle("Step: Reflection: what went well · Layer: Lead Tutor");
+  assert.equal(crumb.step, "Reflection: what went well");
+  assert.equal(crumb.layer, "Lead Tutor");
+});
+
+test("unknown, empty, and malformed segments are dropped, never guessed at", () => {
+  const crumb = parseChunkTitle("Mood: cheerful · Scenario:  · no colon here · Layer: Visual");
+  assert.equal(crumb.scenario, undefined);
+  assert.equal(crumb.layer, "Visual");
+  assert.deepEqual(Object.keys(crumb), ["layer"]);
+});
+
+test("missing or empty titles yield an empty breadcrumb, not a throw", () => {
+  assert.deepEqual(parseChunkTitle(undefined), {});
+  assert.deepEqual(parseChunkTitle(""), {});
+  assert.deepEqual(parseChunkTitle("   "), {});
+});
