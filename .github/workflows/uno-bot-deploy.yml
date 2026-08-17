@@ -5,9 +5,29 @@ name: uno-bot — deploy Worker
 # (bundle:harness → src/generated/harness.ts) and ships src/ via wrangler, then
 # verifies /health responds with the fresh build stamp.
 #
-# Deliberately manual-only (workflow_dispatch): deploying on every push to main
-# would ship half-reviewed Worker changes; a human (or an agent asked by one)
-# presses the button.
+# Runs on every push to `main`, and on demand (workflow_dispatch).
+#
+# This was deliberately manual-only until 2026-08-17, on the reasoning that
+# auto-deploy would ship half-reviewed Worker changes. That traded the wrong
+# risk. The harness is bundled at BUILD time (bundle:harness → the baked
+# src/generated/harness.ts, Block 0 of every request), so a merged rule change
+# only reaches the bot when someone remembers to press this button — and the
+# invalidation therefore never fired. The live consequence: rules that were
+# reviewed, merged and believed-live sat in main while the bot kept answering
+# from the previously-deployed copy.
+#
+# Review is not what was protecting main here — nothing in this repo runs on a
+# PR; every other workflow is `schedule` or `workflow_dispatch`. What protects a
+# deploy is the gating inside `npm run deploy` (typecheck · check:fetch ·
+# check:contract · bundle:harness · wrangler deploy), and that runs either way.
+# Bill's call, 2026-08-17: any push to main, NOT paths-filtered — a harness doc
+# under docs/ or skills/ changes the prompt just as much as a change under src/,
+# and a path filter is the exact mechanism that would reintroduce this bug.
+#
+# `concurrency` cancels a superseded in-flight run: two pushes landing close
+# together would otherwise race two `wrangler deploy`s at the same Worker, and
+# the health check below could then verify the build stamp of whichever finished
+# first rather than of the newest commit.
 #
 # Required repo secret:
 #   CLOUDFLARE_API_TOKEN   API token with the "Edit Cloudflare Workers" template
@@ -16,7 +36,15 @@ name: uno-bot — deploy Worker
 # The account id is non-secret and pinned below (the account that hosts uno-bot).
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch: {}
+
+# One deploy at a time. Superseded runs are cancelled rather than queued: an
+# older commit finishing last would leave the Worker behind main.
+concurrency:
+  group: uno-bot-deploy
+  cancel-in-progress: true
 
 jobs:
   deploy:

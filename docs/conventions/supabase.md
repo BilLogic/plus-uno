@@ -5,7 +5,6 @@
 ## The contract
 
 - **uno-blueprint (Supabase) is the source of truth for the CURRENT service journey.** Ground every current-state product claim in a blueprint read (`blueprint_search` / PostgREST) with layer/actor attribution; cite what you found. Notion is a mixed estate — stale docs *and* legitimate future state — so authority is routed by claim type (§ Two sources, one time axis), not by a single "blueprint always wins" rule.
-- **One carve-out: the blueprint carries a labelled future layer.** `paths` named `Future (roadmap)` (`path_type` `named`, `origin` `app`) hold planned redesigns, and every cell description on them opens `PLANNED (not shipped as of {month year}):`. They are the ONLY future-bearing rows — everything else is current state. Report them as planned, never as today, and **never say the blueprint has no future state for a scenario without querying that scenario for a `Future (roadmap)` path first** (live miss, 2026-08-17). Semantics per `blueprint-navigation.md` § Path semantics.
 - **Query at task time, never cache.** `docs/context/product/` holds foundation only (identity, pillars, archetypes); live truth — features, requirements, screens — is retrieved fresh per task.
 - **Paired writes, never one alone:** any requirement change updates the PRD (Notion) and the blueprint (Supabase) together — Flow 4's requirement/story path. A PRD edit without a blueprint write (or vice versa) is a defect. **Detection is human today** — no automation reads Supabase, so nothing verifies the pair. The weekly shipped watchdog files a *verify-blueprint* intake per shipped journey card (`skills/uno-maintain/references/method.md` §6) but cannot confirm drift itself; any human spot files a `uno-maintain` intake.
 - Write access: `writers/blueprint` only, via `skills/uno-synthesize` (new requirements) and `skills/uno-maintain` (changes). All other consumers are read-only.
@@ -32,8 +31,7 @@ Two hard rules, every row: **never merge two sources into one unattributed answe
 
 Drafting follows the same routing, not just answering: `skills/uno-synthesize` queries the blueprint for the current-state and downstream-effects sections before writing a PRD.
 
-*Evidence: UNO Blueprint Grounding Evaluation (Notion, 2026-07) — six-arm context ladder; guided blueprint arms scored 100% vs 36% docs-only, and the sharpest failures were source-conflict blends.*
-
+<!-- ide-only -->
 ## Access & keys
 
 | Path | Credential | Where it lives | Status |
@@ -44,3 +42,4 @@ Drafting follows the same routing, not just answering: `skills/uno-synthesize` q
 | Write (Worker — only if an acceptance-in-thread write tool ships, plan §6 note) | scoped key as Cloudflare secret, requested from whoever administers Supabase | `wrangler secret put SUPABASE_WRITE_KEY` | not built |
 
 If a session lacks the authorized MCP, the paired write's blueprint half is flagged `⏳ pending` in the PRD and filed as a uno-maintain intake; the synthesize rubric's schema-valid hard gate activates once the blueprint schema exists.
+<!-- /ide-only -->

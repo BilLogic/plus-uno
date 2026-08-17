@@ -18,8 +18,19 @@
 
 import type { Env } from "../types";
 import { embedText, embeddingsConfigured } from "../vertex/embed";
-import { countedFetch, rethrowIfBudget } from "../net";
+import { countedFetch, rethrowIfBudget, subrequestBudgetSpent } from "../net";
 import { cellUrl, sliceUrl, parseChunkTitle, chunkBody } from "./blueprint-link";
+import {
+  renderBlueprintIndex,
+  semanticCap,
+  mergedCap,
+  type BlueprintIndex,
+  type BlueprintCappedBy,
+} from "./blueprint-index";
+
+// Re-exported so the tool layer has ONE import for the blueprint integration.
+export { renderBlueprintIndex, FUTURE_PATH_NAME } from "./blueprint-index";
+export type { BlueprintIndex, BlueprintCappedBy } from "./blueprint-index";
 
 const REQUEST_TIMEOUT_MS = 10000;
 const RPC_NAME = "search_blueprint";
@@ -95,9 +106,29 @@ export type BlueprintRetrieval = "semantic" | "rpc" | "tables";
 export interface BlueprintSearchResult {
   rows: BlueprintRow[];
   retrieval: BlueprintRetrieval;
-  /** True when MAX_ROWS clipped the result — the model must be able to say
+  /** True when a cap clipped the result — the model must be able to say
    *  "there is more than this" instead of narrating a partial view as whole. */
   truncated: boolean;
+  /** Which cap did the clipping; null when nothing was clipped. */
+  capped_by: BlueprintCappedBy;
+  /** True when these rows came from the per-isolate cache rather than a fetch
+   *  made during THIS call.
+   *
+   *  AGENT.md requires a freshness claim ("I checked just now") to be backed by
+   *  a read this turn. Nothing distinguished a fetch from a cache hit, so the
+   *  claim was unauditable — and a user pushing back got the same rows while
+   *  being told they were re-fetched. */
+  cached: boolean;
+  /** How old the cached rows are, in ms. 0 on a fresh fetch. */
+  age_ms: number;
+  /** True when the semantic pass did NOT produce a healthy result
+   *  (fewer than SEMANTIC_THIN_RESULTS confident matches) — which includes the
+   *  case where it did not run at all. Thin means the keyword pass carried the
+   *  answer, so per-row `score` is absent or weak and confidence should follow. */
+  thin: boolean;
+  /** Best cosine similarity across the returned rows; absent when no row
+   *  carries a score (keyword-only result). */
+  top_score?: number;
 }
 
 /** cells.links is jsonb — authored by humans, so it arrives as bare URL strings
@@ -174,11 +205,30 @@ export async function searchBlueprint(
     );
   }
   const q = query.trim();
-  if (!q) return { rows: [], retrieval: "tables", truncated: false };
+  if (!q) {
+    return {
+      rows: [],
+      retrieval: "tables",
+      truncated: false,
+      capped_by: null,
+      cached: false,
+      age_ms: 0,
+      thin: false,
+    };
+  }
 
   const cacheKey = terms(q).sort().join(" ");
   const hit = options.fresh ? undefined : searchCache.get(cacheKey);
-  if (hit && Date.now() - hit.at < CACHE_TTL_MS) return hit.result;
+  if (hit && Date.now() - hit.at < CACHE_TTL_MS) {
+    const age = Date.now() - hit.at;
+    // A cache hit used to return here BEFORE any logging, so the failing thread
+    // looked like it never searched at all. One line per served result,
+    // whichever way it was served.
+    console.log(
+      `[blueprint] retrieval=${hit.result.retrieval} rows=${hit.result.rows.length} cached=1 age_ms=${age}`,
+    );
+    return { ...hit.result, cached: true, age_ms: age };
+  }
 
   const base = env.SUPABASE_URL!.replace(/\/+$/, "");
   const key = env.SUPABASE_ANON_KEY!;
@@ -197,12 +247,25 @@ export async function searchBlueprint(
         // SEMANTIC_THIN_RESULTS for why one weak hit must not silence keyword.
         // No withUrls() here: trySemantic already carries each row's `url`.
         if (semantic.length >= SEMANTIC_THIN_RESULTS) {
-          console.log(`[blueprint] retrieval=semantic rows=${semantic.length}`);
+          // The vector pass asks for at most SEMANTIC_MATCH_COUNT chunks. A full
+          // house means the cut-off, not the corpus, ended the list — this
+          // shape used to report truncated:false, i.e. the MOST COMMON result
+          // claimed completeness while clipped.
+          const cap = semanticCap(semantic.length, SEMANTIC_MATCH_COUNT);
           const result: BlueprintSearchResult = {
             rows: semantic,
             retrieval: "semantic",
-            truncated: false,
+            ...cap,
+            cached: false,
+            age_ms: 0,
+            thin: false,
+            ...topScore(semantic),
           };
+          console.log(
+            `[blueprint] retrieval=semantic rows=${semantic.length} cached=0 age_ms=0` +
+              `${cap.truncated ? " (truncated capped_by=semantic)" : ""}` +
+              `${result.top_score !== undefined ? ` top_score=${result.top_score}` : ""}`,
+          );
           searchCache.set(cacheKey, { at: Date.now(), result });
           return result;
         }
@@ -218,16 +281,28 @@ export async function searchBlueprint(
     // and the one whose caveat (chunks carry no authored `links`) still applies
     // to part of the result.
     const retrieval: BlueprintRetrieval = semantic.length ? "semantic" : rpc !== null ? "rpc" : "tables";
+    // Counted BEFORE the slice: after it, the overflow is invisible.
+    const cap = mergedCap(found.length, MAX_ROWS);
+    const rows = withUrls(env, found).slice(0, MAX_ROWS);
     const result: BlueprintSearchResult = {
-      rows: withUrls(env, found).slice(0, MAX_ROWS),
+      rows,
       retrieval,
-      truncated: found.length > MAX_ROWS,
+      ...cap,
+      cached: false,
+      age_ms: 0,
+      // Reaching here at all means the semantic pass was thin (or absent) —
+      // the healthy case short-circuited above.
+      thin: semantic.length < SEMANTIC_THIN_RESULTS,
+      ...topScore(rows),
     };
     // One line per search saying WHICH path served it. Without this the tool
     // degrades semantic → rpc → tables in silence, and answer quality drifts
     // with nothing to attribute it to.
     console.log(
-      `[blueprint] retrieval=${retrieval} rows=${result.rows.length}${result.truncated ? " (truncated)" : ""}`,
+      `[blueprint] retrieval=${retrieval} rows=${result.rows.length} cached=0 age_ms=0` +
+        `${cap.truncated ? " (truncated capped_by=max_rows)" : ""}` +
+        `${result.thin ? " thin=1" : ""}` +
+        `${result.top_score !== undefined ? ` top_score=${result.top_score}` : ""}`,
     );
     searchCache.set(cacheKey, { at: Date.now(), result });
     return result;
@@ -263,6 +338,20 @@ function withUrls(env: Env, rows: BlueprintRow[]): BlueprintRow[] {
  *  delete evidence, so it errs toward keeping both. */
 function signature(row: BlueprintRow): string {
   return (row.snippet ?? row.title ?? "").toLowerCase().replace(/\s+/g, " ").trim().slice(0, 120);
+}
+
+/** Best per-row similarity, as a spreadable partial so an absent score omits
+ *  the key rather than emitting `top_score: undefined` into the tool payload.
+ *
+ *  Every row already carried `score`; nothing ever read it, so "was this a
+ *  confident match or the best of a bad set?" was computed and thrown away on
+ *  every search. */
+function topScore(rows: BlueprintRow[]): { top_score?: number } {
+  let best: number | undefined;
+  for (const r of rows) {
+    if (typeof r.score === "number" && (best === undefined || r.score > best)) best = r.score;
+  }
+  return best === undefined ? {} : { top_score: best };
 }
 
 /** Semantic rows first, then the keyword rows that add something new. */
@@ -486,6 +575,96 @@ function normalize(src: Source, row: Record<string, unknown>): BlueprintRow | nu
     snippet: typeof row.description === "string" ? row.description : undefined,
     scenario: scenarioName,
   };
+}
+
+// ── Live table of contents ───────────────────────────────────────────────────
+//
+// Search answers "where is X". Nothing answered "what EXISTS" — so a retrieval
+// miss and a real absence were indistinguishable, and the bot reported a path
+// named "Future (roadmap)" as non-existent because its query never reached it.
+// The index is the structural skeleton (phases › scenarios › path counts) read
+// live, so an absence claim becomes a LOOKUP against a listing rather than an
+// inference from an empty result set.
+//
+// The renderer is pure and lives in ./blueprint-index (where unit tests can
+// reach it); only the read and its cache are here.
+
+/** Orientation TTL. Ten minutes, versus 60s for search results: the structure
+ *  changes when someone adds a scenario, not when someone asks a question. */
+const INDEX_TTL_MS = 600_000;
+
+/** Module-scope SINGLE slot — the index takes no arguments, so there is exactly
+ *  one value to cache per isolate. See fetchBlueprintIndex for why `fresh` does
+ *  NOT clear it. */
+let indexCache: { at: number; index: BlueprintIndex } | undefined;
+
+/**
+ * Read the live index: one PostgREST call, both FKs declared so the two-level
+ * embed resolves server-side (6 phases / 23 scenarios / 39 paths ≈ 2.3KB).
+ *
+ * Returns undefined rather than throwing on any failure — same degradation
+ * posture as fetchEdges/fetchRows. The caller distinguishes "unavailable" from
+ * "no future path exists"; an omitted key that reads as absence is the exact
+ * bug this exists to fix.
+ *
+ * @param env - Worker env (SUPABASE_URL / SUPABASE_ANON_KEY)
+ * @param opts - `fresh` is accepted for signature symmetry with
+ *   searchBlueprint and DELIBERATELY does not bust this cache. Orientation is
+ *   per-isolate STRUCTURAL data, not per-query data: a user pushing back
+ *   re-queries cells, and re-reading the same 23 scenarios each time would
+ *   multiply index fetches against LOOKUP_CEILING = 38 (loop-shared.ts) —
+ *   three searches a turn already cost 36. The TTL, not the caller, decides.
+ */
+export async function fetchBlueprintIndex(
+  env: Env,
+  opts: { fresh?: boolean } = {},
+): Promise<BlueprintIndex | undefined> {
+  void opts.fresh; // see @param — intentionally ignored, not forgotten
+  if (!isBlueprintConfigured(env)) return undefined;
+
+  const hit = indexCache;
+  if (hit && Date.now() - hit.at < INDEX_TTL_MS) return hit.index;
+
+  // Checked BEFORE the fetch, and never caught-and-swallowed after it: the
+  // index is an enrichment on a search that has ALREADY succeeded, so it must
+  // not be the call that trips the ceiling and unwinds that search. (The check
+  // itself records a budget trip, so the boundary still learns the turn
+  // returned less than it was asked for.)
+  if (subrequestBudgetSpent()) {
+    console.warn("[blueprint] index read failed (subrequest budget spent)");
+    return undefined;
+  }
+
+  const base = env.SUPABASE_URL!.replace(/\/+$/, "");
+  const select = "name,service_scenarios(name,paths(name))";
+  const url =
+    `${base}/rest/v1/phases?select=${encodeURIComponent(select)}` +
+    `&order=order_position&service_scenarios.order=order_position`;
+  try {
+    const res = await countedFetch(
+      url,
+      { headers: headers(env.SUPABASE_ANON_KEY!) },
+      REQUEST_TIMEOUT_MS,
+    );
+    if (!res.ok) {
+      console.warn(`[blueprint] index read failed (${res.status})`);
+      return undefined;
+    }
+    const data = await res.json().catch(() => null);
+    if (!Array.isArray(data)) {
+      console.warn("[blueprint] index read failed (unexpected payload)");
+      return undefined;
+    }
+    const index = renderBlueprintIndex(data, new Date().toISOString().slice(0, 10));
+    indexCache = { at: Date.now(), index };
+    return index;
+  } catch (e) {
+    // rethrowIfBudget FIRST: a swallowed budget stop would report the structure
+    // as unreadable when it was merely unaffordable — the false-absence bug.
+    rethrowIfBudget(e);
+    console.warn(`[blueprint] index read failed (${(e as Error)?.message ?? "error"})`);
+    return undefined;
+  }
 }
 
 // ── Opt-in reads: edges, findings, slices ────────────────────────────────────

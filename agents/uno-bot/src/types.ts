@@ -94,6 +94,16 @@ export interface Env {
   // IDE can be opened at the exact cell it cites. Unset → rows carry no url
   // (the answer is still grounded, just not clickable).
   BLUEPRINT_APP_URL?: string;
+  // Attach the LIVE blueprint index (phases → scenarios → paths) to every
+  // blueprint_search result, plus an `orientation` status field. "on" to enable;
+  // anything else (including unset) = off.
+  //
+  // FLAGGED OFF BY DEFAULT on purpose. Tool-payload instructions are not
+  // additive: on 2026-08-06 a slack_search fix displaced an unrelated
+  // instruction and broke a different eval case. This one is enabled in ONE DM
+  // first, and the judged evals are compared CASE BY CASE (a stable total hides
+  // one case breaking as another recovers) before it goes wide.
+  BLUEPRINT_INDEX?: string;
   THREAD_STATE: DurableObjectNamespace;
   // Per-thread agent-run executor: DO alarms escape the waitUntil() 30s
   // wall-clock cancellation that silently killed long agent runs (👀-then-

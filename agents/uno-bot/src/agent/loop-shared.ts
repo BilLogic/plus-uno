@@ -10,6 +10,7 @@
 // This module owns nothing provider-specific: no Anthropic streaming, no Gemini
 // wire types. Each loop keeps its own transport and calls into these helpers.
 
+import { AsyncLocalStorage } from "node:async_hooks";
 import type { Env } from "../types";
 import type { HistoryTurn, PendingProposal } from "../thread-state-client";
 import type { SlackContext } from "../tools/dispatcher";
@@ -232,6 +233,168 @@ const RESOLUTION_WORD_RE = new RegExp(
   `\\b(${[...CONFIRM_PHRASES, ...CANCEL_PHRASES].map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\b`,
 );
 
+// ── Correction / pushback vocabulary (Worker-side, drives control flow) ───────
+//
+// WHY THIS IS NOT A PROMPT RULE. On turn 2 the bot's own turn-1 claim sits in
+// history as authoritative prose with no counter-evidence (tool results are
+// never persisted). A prompt rule has to beat that, and it fires exactly when
+// instruction-following is weakest. So the Worker classifies instead, the same
+// way CONFIRM_PHRASES / looksLikeResolution already drive control flow above.
+//
+// Deliberately CONSERVATIVE-LEANING-BROAD: a false positive costs one extra
+// blueprint search (cheap, and the freshest possible answer); a false negative
+// costs a repeat of the 2026-08-17 incident, where the bot restated a wrong
+// denial at greater length while claiming it had just re-checked.
+const CORRECTION_PATTERNS: RegExp[] = [
+  // "no, I meant …" / "no — I'm asking about …"
+  /\bno[,.! ]+\s*(i|im|i'm|i am)\b/i,
+  /\b(i|we)\s+(meant|mean)\b/i,
+  // "I'm talking about …" / "I was asking about …"
+  /\b(i'm|im|i am|i was|we're|we are)\s+(talking|asking|referring)\s+about\b/i,
+  // "that's not …" / "that isn't …" / "this isn't what I asked"
+  /\bthat('s| is| was)?\s*n[o']t\b/i,
+  /\bthis\s+is\s*n[o']t\b/i,
+  /\bnot\s+what\s+(i|we)\s+(asked|meant|wanted)\b/i,
+  // bare "wrong" / "that's wrong" / "you're wrong" / "incorrect"
+  /\b(wrong|incorrect|mistaken)\b/i,
+  // "actually, …" as a lead-in (not mid-sentence hedging)
+  /^\s*(actually|no|nope|nah)\b[,\s—-]/i,
+  // direct pushback on a denial — the exact shape of the failing thread
+  /\b(it|there)\s+(is|does)\b.*\b(exist|there|in there)\b/i,
+  /\b(check|look)\s+again\b/i,
+  /\b(re-?check|re-?read|re-?search)\b/i,
+];
+
+/**
+ * True when this message reads as the user CORRECTING the bot's previous reply.
+ *
+ * On a hit the turn must (a) force `fresh: true` on blueprint_search so the 60s
+ * result cache cannot serve the same rows back under a "I just re-checked"
+ * claim, and (b) carry a one-turn directive naming the prior query so it is not
+ * reissued verbatim. Both are wired in slack/events.ts.
+ */
+export function looksLikeCorrection(text: string): boolean {
+  const t = text.trim();
+  if (!t) return false;
+  // A long message is usually a new question that happens to contain "not",
+  // not a correction of the last reply. The real ones are short.
+  if (t.length > 400) return false;
+  return CORRECTION_PATTERNS.some((re) => re.test(t));
+}
+
+/**
+ * The one-turn system directive injected on a correction. Names the PRIOR query
+ * so the model cannot reissue it verbatim and call that a re-check.
+ *
+ * @param priorQuery - The blueprint query the previous turn ran, if it is known
+ */
+export function correctionDirective(priorQuery?: string): string {
+  const prior = priorQuery
+    ? ` Your previous turn searched the blueprint for "${priorQuery}" — do NOT reissue that query verbatim; search with DIFFERENT words (the scenario name, the path name, the layer) before answering.`
+    : " Search the source again with DIFFERENT words from last turn before answering.";
+  return (
+    "(system: the user is CORRECTING your previous reply. Treat your own earlier claim as UNVERIFIED, not as established fact." +
+    prior +
+    " Your reply must either cite something you fetched THIS turn, or plainly concede you got it wrong. Restating the previous answer at greater length is a failure, and so is claiming you re-checked without a new lookup.)"
+  );
+}
+
+// ── Per-turn scope: tool ledger + correction flag ────────────────────────────
+//
+// Two things have to cross frames the AgentInput contract does not carry:
+//
+//  1. WHICH TOOLS RAN. The draft judge gates a correction reply on whether it
+//     cites something fetched this turn; the executions happen deep inside
+//     whichever provider loop is active, and the judge runs in slack/events.ts,
+//     several frames above.
+//  2. WHETHER THIS IS A CORRECTION TURN, so `blueprint_search` can be forced to
+//     `fresh: true` at the boundary. Left to the model, a pushback re-runs a
+//     near-identical query, `cacheKey` is a sorted term-set, and the SAME rows
+//     come back under an "I just re-checked" claim — a cache serving a lie.
+//
+// Rather than thread a context object through both loops' signatures, this
+// mirrors net.ts's per-invocation meter: an AsyncLocalStorage scope entered by
+// the caller. Outside a scope every call is a no-op, so a test or a direct
+// integration call costs nothing and leaks nothing across requests.
+const turnScope = new AsyncLocalStorage<{
+  tools: Set<string>;
+  correction: boolean;
+  receipt?: RetrievalReceipt;
+}>();
+
+/** What a turn actually retrieved. Persisted on the assistant HistoryTurn so
+ *  turn 2 has counter-evidence to the turn-1 prose, and so a correction turn
+ *  can be told which query NOT to reissue. Rows are NOT persisted — only the
+ *  shape of the lookup, which is what the next turn needs to reason about. */
+export interface RetrievalReceipt {
+  tool: string;
+  query: string;
+  /** The `path` of the first row, when the rows carry one (e.g. "Future (roadmap)"). */
+  path?: string;
+  count: number;
+  /** Distinct scenario names across the rows, capped — the "what did I look at". */
+  scenarios: string[];
+}
+
+/** Run `fn` inside a fresh turn scope; returns its result, the tools used, and
+ *  the retrieval receipt if one was recorded. */
+export async function withTurnScope<T>(
+  opts: { correction: boolean },
+  fn: () => Promise<T>,
+): Promise<{ result: T; tools: string[]; receipt?: RetrievalReceipt }> {
+  const store: { tools: Set<string>; correction: boolean; receipt?: RetrievalReceipt } = {
+    tools: new Set<string>(),
+    correction: opts.correction,
+  };
+  const result = await turnScope.run(store, fn);
+  return { result, tools: [...store.tools], receipt: store.receipt };
+}
+
+/** Record what a lookup retrieved. Last write wins — the most recent search is
+ *  the one a follow-up turn is pushing back on. No-op outside a turn scope. */
+export function recordRetrieval(receipt: RetrievalReceipt): void {
+  const store = turnScope.getStore();
+  if (store) store.receipt = receipt;
+}
+
+/** Derive a receipt from a blueprint_search result payload. Best-effort by
+ *  design: a malformed payload costs a receipt, never the turn. */
+function recordBlueprintReceipt(resultJson: string): void {
+  if (!turnScope.getStore()) return;
+  try {
+    const parsed = JSON.parse(resultJson) as {
+      ok?: unknown;
+      query?: unknown;
+      count?: unknown;
+      rows?: Array<{ path?: unknown; scenario?: unknown }>;
+    };
+    if (parsed.ok !== true || typeof parsed.query !== "string") return;
+    const rows = Array.isArray(parsed.rows) ? parsed.rows : [];
+    const path = rows.find((r) => typeof r?.path === "string")?.path;
+    const scenarios = [
+      ...new Set(
+        rows
+          .map((r) => r?.scenario)
+          .filter((s): s is string => typeof s === "string" && s.length > 0),
+      ),
+    ].slice(0, 8);
+    recordRetrieval({
+      tool: "blueprint_search",
+      query: parsed.query,
+      ...(typeof path === "string" ? { path } : {}),
+      count: typeof parsed.count === "number" ? parsed.count : rows.length,
+      scenarios,
+    });
+  } catch {
+    // A receipt is diagnostic context, never load-bearing for the reply.
+  }
+}
+
+/** True when the active turn was classified as a user correction. */
+export function isCorrectionTurn(): boolean {
+  return turnScope.getStore()?.correction === true;
+}
+
 // ── proposal_resolve validation (Worker-side authorization, both lanes) ───────
 
 export type ResolveValidation =
@@ -267,9 +430,20 @@ export async function executeReadOnlyTool(
   input: Record<string, unknown>,
   slack: SlackContext,
 ): Promise<string> {
+  // Ledger first: a tool that THREW still ran, and "did this turn fetch
+  // anything?" is a question about attempts, not successes.
+  turnScope.getStore()?.tools.add(name);
   if (name === "notion_search") return executeNotionSearch(env, input);
   if (name === "roadmap_query") return executeRoadmapQuery(env, input);
-  if (name === "blueprint_search") return executeBlueprintSearch(env, input);
+  if (name === "blueprint_search") {
+    // On a correction turn the cache MUST NOT answer — see withTurnScope.
+    const out = await executeBlueprintSearch(env, isCorrectionTurn() ? { ...input, fresh: true } : input);
+    // The receipt is derived HERE, not inside the tool, so blueprint-search.ts
+    // stays free of an import back into this module (the value-level cycle this
+    // file was extracted to break).
+    recordBlueprintReceipt(out);
+    return out;
+  }
   if (name === "source_read") return executeReadSource(env, input);
   if (name === "github_read") return executeGithubRead(env, input);
   if (name === "slack_thread_read") return executeSlackThreadRead(env, input);
