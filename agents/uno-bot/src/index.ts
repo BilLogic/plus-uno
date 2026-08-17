@@ -3,6 +3,7 @@ import { verifySlackSignature } from "./slack/verify";
 import { handleSlackEnvelope, type SlackEnvelope } from "./slack/events";
 import { handleSlashCommand } from "./slack/commands";
 import { parseInteraction, handleInteraction } from "./slack/interactive";
+import { publishHomeViewForDebug } from "./slack/home";
 import { startSlackOAuth, handleSlackOAuthCallback, getSlackAccessTokenFor } from "./oauth/slack";
 import { geminiConfigured, geminiGenerate } from "./gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "./vertex/claude";
@@ -11,6 +12,7 @@ import { runAgent } from "./agent/run-agent";
 import { preflight } from "./agent/preflight";
 import type { HistoryTurn, PendingProposal } from "./thread-state-client";
 import { BUILD } from "./version";
+import { BLUEPRINT_CONTRACT } from "./generated/blueprint-contract";
 import { runFigmaPoll } from "./figma-poll";
 import { buildSystemBlocks } from "./agent/skills";
 import { ensureHarnessCache } from "./gemini/cache";
@@ -41,11 +43,55 @@ export default {
   },
 };
 
+let contractProbeCache: { at: number; body: { ok: boolean; build: string; probes: Record<string, boolean> } } | null = null;
+
 async function handleRequest(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const url = new URL(request.url);
 
   if (request.method === "GET" && url.pathname === "/health") {
     return new Response(`uno-bot ok ${BUILD}`, { status: 200 });
+  }
+
+  // Public, boolean-only contract probe: does every blueprint read this bot
+  // depends on still work? Exists so the APP repo's CI can fail loudly when a
+  // schema change breaks a bot read — the drift class that twice shipped as
+  // silent empty reads. Unlike /debug/blueprint (auth-gated, carries response
+  // samples), this returns nothing but statuses: table names are public-read
+  // by design, and no row data leaves. Cached per isolate to keep a curl loop
+  // from amplifying into upstream reads.
+  if (request.method === "GET" && url.pathname === "/health/blueprint") {
+    if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) {
+      return Response.json({ ok: false, build: BUILD, error: "blueprint reads not configured" }, { status: 503 });
+    }
+    const now = Date.now();
+    if (contractProbeCache && now - contractProbeCache.at < 60_000) {
+      return Response.json(contractProbeCache.body, { status: contractProbeCache.body.ok ? 200 : 503 });
+    }
+    const base = env.SUPABASE_URL.replace(/\/+$/, "");
+    const h = { apikey: env.SUPABASE_ANON_KEY, authorization: `Bearer ${env.SUPABASE_ANON_KEY}` };
+    const probes: Record<string, boolean> = {};
+    const probe = async (label: string, path: string, init?: RequestInit) => {
+      try {
+        const r = await countedFetch(`${base}${path}`, { ...init, headers: { ...h, ...(init?.headers ?? {}) } });
+        probes[label] = r.ok;
+      } catch {
+        probes[label] = false;
+      }
+    };
+    await probe("rpc_search_blueprint", "/rest/v1/rpc/search_blueprint", {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ q: "tutor" }),
+    });
+    for (const t of BLUEPRINT_CONTRACT.botReadTables) {
+      await probe(`table_${t}`, `/rest/v1/${t}?select=id&limit=1`);
+    }
+    // The exact selects the bot issues, not just table reachability — a
+    // renamed column 400s here while bare selects stay green.
+    await probe("select_cells_spec", `/rest/v1/cells?select=${encodeURIComponent("id,content,function,form,value_props,owner,perceived_owner,links,updated_at,layer:layers(name,owner_team,kpis),step:steps(name),path:paths(name,scenario:service_scenarios(name))")}&limit=1`);
+    await probe("select_edges_kind", `/rest/v1/cell_triggers?select=${encodeURIComponent("source_cell_id,target_cell_id,kind,label,note")}&limit=1`);
+    await probe("select_findings_open", "/rest/v1/findings?select=id&status=eq.open&limit=1");
+    const body = { ok: Object.values(probes).every(Boolean), build: BUILD, probes };
+    contractProbeCache = { at: now, body };
+    return Response.json(body, { status: body.ok ? 200 : 503 });
   }
 
   // Gemini credential + reachability smoke test (dual-provider phase 1).
@@ -57,10 +103,19 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
     if (!mode) {
       return Response.json({ ok: false, error: "no Gemini credential configured (GEMINI_API_KEY or GEMINI_SA_EMAIL + GEMINI_SA_PRIVATE_KEY)" });
     }
+    // ?model= probes a SPECIFIC model — the only way to answer "is this model
+    // available to this project?" before wiring a tier to it. A preview model
+    // can be listed in the docs and absent from a given Vertex project, and the
+    // failure would otherwise surface as a 400 on someone's first /grind.
+    const probeModel = url.searchParams.get("model") ?? undefined;
     const result = await geminiGenerate(env, {
       prompt: "Reply with exactly: uno-bot gemini link ok",
       maxTokens: 100,
-      thinkingLevel: "minimal",
+      // ?level= too: gemini-3.1-pro rejects MINIMAL outright, so a probe with a
+      // hardcoded level cannot tell "model absent" from "level unsupported".
+      thinkingLevel: (url.searchParams.get("level") ?? "minimal") as
+        | "minimal" | "low" | "medium" | "high",
+      ...(probeModel ? { model: probeModel } : {}),
     });
     return Response.json({ auth: mode, ...result, text: result.text?.slice(0, 100) });
   }
@@ -182,6 +237,25 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
       body: JSON.stringify(payload),
     });
     return Response.json({ sent: payload, status: res.status, slack: await res.json() });
+  }
+
+  // Publish the App Home view and return Slack's raw verdict.
+  //
+  // The Home tab is the one surface with NO failure signal: views.publish is
+  // fired from an event handler, nothing reads its response, and a block Slack
+  // rejects simply leaves the previous view in place. Every Home change until
+  // now was verified by opening the app and squinting. The Stop button is the
+  // first ACTION element up there, so "did the block validate" became a
+  // question worth being able to ask.
+  //
+  // ?user= (required) — views.publish is per-user. Auth-gated: it writes a real
+  // view to that person's Home tab, which is the same thing opening the tab
+  // does, so the blast radius is a refresh.
+  if (request.method === "GET" && url.pathname === "/debug/home") {
+    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
+    const user = url.searchParams.get("user");
+    if (!user) return Response.json({ ok: false, error: "user required" }, { status: 400 });
+    return Response.json(await publishHomeViewForDebug(env, user));
   }
 
   // What the blueprint deployment actually supports — the question the code

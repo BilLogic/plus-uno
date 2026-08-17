@@ -22,7 +22,7 @@
 | Conflicting card is **WIP / under review**, change **decided** (Decisions DB or card) | Blueprint = today; card = incoming | "Today: X. This is changing — {card} moves it to Y." Both attributed, never blended. |
 | Conflicting card is **WIP / under review**, still **exploratory** | Blueprint = today; card = maybe | "Today: X. {card} is exploring Y — not decided." Match the verb to decision status. |
 | Conflicting card is **shipped** (`Dev Status: Deployed`) | Blueprint (still) | Answer from the blueprint — the paired write updates it at ship, so a shipped doc that disagrees is the likely obsolete side. Evidence the blueprint itself is stale → say so and offer a `uno-maintain` intake. Never silently prefer the doc. |
-| "What's **planned / coming / changing**?" | Roadmap cards + PRDs | Cite card + Design/Dev Status. Use the blueprint as the today-baseline to explain the delta. |
+| "What's **planned / coming / changing**?" | Roadmap cards + PRDs, **plus any `Future (roadmap)` path** | Cite card + Design/Dev Status. Check the scenario for a `Future (roadmap)` path and cite its cells too when one exists — they are the design-side plan of record. Use the current-state rows as the today-baseline to explain the delta. |
 | Blueprint silent; a **current** doc covers it (Help Center, shipped PRD) | The doc | Cite it and date it. Note the blueprint doesn't cover this yet. |
 | Only **aspirational** docs (roadmap PRD, future spec) | Neither, as fact | Report as planned per {doc}. Current behavior stays the blueprint's — or "not in the source". |
 | Neither source | Abstain | "Not in the source" + name who should fill the gap. |
@@ -31,8 +31,7 @@ Two hard rules, every row: **never merge two sources into one unattributed answe
 
 Drafting follows the same routing, not just answering: `skills/uno-synthesize` queries the blueprint for the current-state and downstream-effects sections before writing a PRD.
 
-*Evidence: UNO Blueprint Grounding Evaluation (Notion, 2026-07) — six-arm context ladder; guided blueprint arms scored 100% vs 36% docs-only, and the sharpest failures were source-conflict blends.*
-
+<!-- ide-only -->
 ## Access & keys
 
 | Path | Credential | Where it lives | Status |
@@ -43,3 +42,4 @@ Drafting follows the same routing, not just answering: `skills/uno-synthesize` q
 | Write (Worker — only if an acceptance-in-thread write tool ships, plan §6 note) | scoped key as Cloudflare secret, requested from whoever administers Supabase | `wrangler secret put SUPABASE_WRITE_KEY` | not built |
 
 If a session lacks the authorized MCP, the paired write's blueprint half is flagged `⏳ pending` in the PRD and filed as a uno-maintain intake; the synthesize rubric's schema-valid hard gate activates once the blueprint schema exists.
+<!-- /ide-only -->

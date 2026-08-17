@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { footerKindFor } from "../src/slack/footer-kind";
+import { footerKindFor, footerNoteFor } from "../src/slack/footer-kind";
 
 test("acknowledgements get no footer", () => {
   for (const ack of [
@@ -37,4 +37,17 @@ test("unknown / empty falls back to the footer, never to nothing", () => {
 
 test("a borderline short answer that cites is still substantive", () => {
   assert.equal(footerKindFor("Yes — RM-2482, see https://app.notion.com/p/x"), "full");
+});
+
+// The third variant. A draft is the one case where the standard footer is
+// wrong rather than merely noisy: it goes out under the PERSON'S name.
+test("a draft hint wins outright, however short the draft is", () => {
+  assert.equal(footerKindFor("Sounds good — Tuesday works.", "draft"), "draft");
+  assert.equal(footerKindFor("", "draft"), "draft");
+});
+
+test("the draft note names the actual risk", () => {
+  assert.match(footerNoteFor("draft"), /your name/i);
+  assert.doesNotMatch(footerNoteFor("draft"), /check before acting/i);
+  assert.equal(footerNoteFor("none"), "");
 });

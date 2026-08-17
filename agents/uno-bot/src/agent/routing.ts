@@ -15,7 +15,11 @@ import { looksLikeResolution } from "./loop-shared";
 // On the Vertex-Claude lane a tier maps to the model IDs below. On the Gemini
 // lane it maps to a model too (see gemini-agent.ts) — the thinking dial is held
 // constant at medium so a tier change stays a single-variable change.
-export type ModelTier = "chill" | "default" | "grind";
+// Defined in tiers.ts (import-free) so pure modules can name a tier without
+// pulling in the Workers type graph. Re-exported here: routing is where callers
+// expect to find it.
+export type { ModelTier } from "./tiers";
+import type { ModelTier } from "./tiers";
 
 export const MODELS: Record<ModelTier, string> = {
   chill: "claude-haiku-4-5@20251001",
@@ -28,13 +32,28 @@ export interface RouteDecision {
   reason: string;
 }
 
-export function routeRequest(opts: { userText: string; hasPending: boolean }): RouteDecision {
+export function routeRequest(opts: {
+  userText: string;
+  hasPending: boolean;
+  /** Set by /grind, /chill and the "think harder" shortcut. */
+  override?: ModelTier;
+}): RouteDecision {
   const text = opts.userText.toLowerCase();
+
+  // PRECEDENCE: an explicit request beats every heuristic. Someone who asked for
+  // cheap on a hard question has told us what they want, and overriding it makes
+  // the command untrustworthy.
+  if (opts.override) return { tier: opts.override, reason: "explicit-command" };
+
   if (opts.hasPending && looksLikeResolution(text)) {
     return { tier: "chill", reason: "proposal-resolution" };
   }
-  if (/\bthink (hard|deeply)\b/.test(text)) {
-    return { tier: "grind", reason: "explicit-escalation" };
+  // "harder" and "more" included deliberately: the natural phrasing is "think
+  // harder", and `\bthink hard\b` does NOT match it — the word boundary fails on
+  // the trailing "er". The grind SHORTCUT asked exactly that and silently ran the
+  // default tier, promising deep thinking and delivering none.
+  if (/\bthink (hard(er)?|deeply|more)\b/.test(text)) {
+    return { tier: "grind", reason: "escalation-phrase" };
   }
   return { tier: "default", reason: "default-lane" };
 }

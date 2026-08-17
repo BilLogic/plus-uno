@@ -23,6 +23,9 @@
 
 import type { Env } from "../types";
 import { countedFetch } from "../net";
+import { runMessageShortcut } from "./shortcuts";
+import { cancelForUser } from "../thread-state-client";
+import { conversationsOpen, deleteMessage, postMessage } from "./api";
 
 /** The subset of Slack's interaction envelope this Worker acts on. */
 interface InteractionPayload {
@@ -58,14 +61,30 @@ export function handleInteraction(
   ctx: ExecutionContext,
 ): Response {
   switch (payload.type) {
+    // Message shortcut — the context-menu entry on a message. Slack wants a 200
+    // within 3000ms and does not retry a timeout, so every slow step (permalink,
+    // conversations.open, the anchor post, the enqueue) runs after the ack.
+    case "message_action": {
+      const callbackId = payload.callback_id ?? "";
+      const userId = payload.user?.id;
+      const channelId = payload.channel?.id;
+      const messageTs = payload.message?.ts;
+      if (!callbackId || !userId || !channelId || !messageTs) {
+        console.error(`[interactive] message_action missing fields (${callbackId || "no callback_id"})`);
+        return new Response("", { status: 200 });
+      }
+      console.log(`[shortcut] ${callbackId} from ${userId} on ${channelId}/${messageTs}`);
+      ctx.waitUntil(runMessageShortcut(env, { callbackId, userId, channelId, messageTs }));
+      return new Response("", { status: 200 });
+    }
     case "block_actions": {
       const actionId = payload.actions?.[0]?.action_id ?? "(none)";
       // Slack sends an interaction for URL buttons too, when they carry an
       // action_id. Those are navigation, already handled by the browser — ack
       // and do nothing rather than treating them as commands.
       console.log(`[interactive] block_actions ${actionId} from ${payload.user?.id ?? "?"}`);
-      ctx.waitUntil(recordFeedback(env, payload).catch((err) => {
-        console.error(`[interactive] feedback failed: ${err instanceof Error ? err.message : String(err)}`);
+      ctx.waitUntil(dispatchAction(env, actionId, payload).catch((err) => {
+        console.error(`[interactive] ${actionId} failed: ${err instanceof Error ? err.message : String(err)}`);
       }));
       return new Response("", { status: 200 });
     }
@@ -75,18 +94,71 @@ export function handleInteraction(
   }
 }
 
+/** One place that says which action_id does what. An action rendered anywhere
+ *  — the Home tab, an answer footer, a proposal card — must appear here, or
+ *  clicking it is a no-op that logs nothing anyone will read. */
+async function dispatchAction(env: Env, actionId: string, payload: InteractionPayload): Promise<void> {
+  if (actionId === "uno_stop_run") return stopRun(env, payload);
+  if (actionId === "uno_delete_answer") return deleteAnswer(env, payload);
+  return recordFeedback(env, payload);
+}
+
+// The Home-tab Stop button. See home.ts for why it exists alongside `/stop`.
+//
+// App Home is not a conversation, so there is nowhere to reply — the answer
+// goes to the person's DM with the bot, which is where they would look anyway.
+async function stopRun(env: Env, payload: InteractionPayload): Promise<void> {
+  const userId = payload.user?.id;
+  if (!userId) return;
+  const result = await cancelForUser(env, userId);
+  console.log(`[stop] home-tab from ${userId} cancelled=${result.cancelled} channel=${result.channel ?? "-"}`);
+
+  const dm = await conversationsOpen(env, userId).catch(() => null);
+  if (!dm) return;
+  await postMessage(env, {
+    channel: dm,
+    // Both outcomes are worth saying. "Nothing running" is the more common
+    // click and the more confusing silence: without it, a button that did
+    // exactly what it should reads as a button that is broken.
+    text: result.cancelled
+      ? "Stopping — I'll finish the step I'm on and stop there. Nothing already confirmed gets undone."
+      : "Nothing of mine is running right now, so there was nothing to stop. (If you asked me something in the last few minutes and it's still going, ask again here and I'll look.)",
+  }).catch(() => {});
+}
+
+// The `icon_button` delete on an answer footer (native-feedback mode).
+//
+// Only ever deletes the bot's OWN message — chat.delete on a bot token cannot
+// do anything else, so Slack enforces the authorization rather than us. That is
+// deliberate: a delete control that relied on our own check would be one
+// refactor away from deleting someone else's message.
+async function deleteAnswer(env: Env, payload: InteractionPayload): Promise<void> {
+  const channel = payload.channel?.id;
+  const ts = payload.message?.ts;
+  if (!channel || !ts) return;
+  const res = await deleteMessage(env, channel, ts);
+  console.log(`[interactive] delete ${channel}/${ts} ok=${res.ok} by=${payload.user?.id ?? "?"}`);
+}
+
 // Feedback buttons (👍/👎) on a bot answer. The vote is logged, not stored:
 // Slack's data policy forbids retaining retrieved workspace content, and a
 // thumbs-down is only useful next to the message it judges — which lives in
 // Slack. The acknowledgement replaces the buttons so a second vote is not
 // invited, and so the voter can see it registered.
-const FEEDBACK_ACTIONS = new Set(["uno_feedback_up", "uno_feedback_down"]);
+//
+// `uno_feedback` is the NATIVE `feedback_buttons` element, which reports both
+// verdicts under one action_id and puts the choice in the action's `value`.
+// The two `uno_feedback_up`/`_down` ids are the hand-rolled buttons. Both
+// renderings ship (see delivery.ts) so both are read here.
+const FEEDBACK_ACTIONS = new Set(["uno_feedback_up", "uno_feedback_down", "uno_feedback"]);
 
 async function recordFeedback(env: Env, payload: InteractionPayload): Promise<void> {
-  const actionId = payload.actions?.[0]?.action_id;
+  const action = payload.actions?.[0];
+  const actionId = action?.action_id;
   if (!actionId || !FEEDBACK_ACTIONS.has(actionId)) return;
 
-  const verdict = actionId === "uno_feedback_up" ? "up" : "down";
+  const verdict =
+    actionId === "uno_feedback" ? (action?.value === "down" ? "down" : "up") : actionId === "uno_feedback_up" ? "up" : "down";
   console.log(
     `[feedback] ${verdict} user=${payload.user?.id ?? "?"} channel=${payload.channel?.id ?? "?"} ts=${payload.message?.ts ?? "?"}`,
   );

@@ -156,6 +156,28 @@ async function upsertChunks(rows) {
   });
   if (!res.ok) throw new Error(`upsert failed (${res.status}): ${await res.text()}`);
 }
+// Orphan pass: a cell deleted or re-keyed in the app leaves its chunk behind,
+// and an upsert-only index serves it forever — the bot then cites content
+// that no longer exists and hands out a dead ?cell= link. Diff the index
+// against the source view and delete what the view no longer contains.
+async function deleteOrphans(liveKeys) {
+  const listUrl = `${SUPABASE_URL}/rest/v1/corpus_chunks?select=source_key&source=eq.blueprint&limit=10000`;
+  const res = await fetch(listUrl, { headers: sbHeaders("read") });
+  if (!res.ok) throw new Error(`orphan scan failed (${res.status}): ${await res.text()}`);
+  const existing = await res.json();
+  const live = new Set(liveKeys);
+  const orphans = existing.map((r) => r.source_key).filter((k) => !live.has(k));
+  if (orphans.length === 0) return 0;
+  // Delete in bounded batches so the in-list stays well under URL limits.
+  for (let i = 0; i < orphans.length; i += 50) {
+    const batch = orphans.slice(i, i + 50);
+    const delUrl = `${SUPABASE_URL}/rest/v1/corpus_chunks` +
+      `?source=eq.blueprint&source_key=in.(${batch.map((k) => `"${k}"`).join(",")})`;
+    const del = await fetch(delUrl, { method: "DELETE", headers: sbHeaders("write") });
+    if (!del.ok) throw new Error(`orphan delete failed (${del.status}): ${await del.text()}`);
+  }
+  return orphans.length;
+}
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
@@ -172,15 +194,24 @@ async function main() {
       source: "blueprint",
       source_key: r.source_key,
       title: r.title,
-      ref_url: BLUEPRINT_URL,
+      // Deep link to the cell, not the app root. Every chunk used to carry the
+      // same homepage URL, which is not a citation — it is a link to "go look
+      // for it yourself". `?cell=` is the app's param (uno-blueprint
+      // src/lib/urlViewState.ts) and source_key IS the cell id.
+      ref_url: `${BLUEPRINT_URL.replace(/\/+$/, "")}/?cell=${r.source_key}`,
       chunk: r.chunk,
       embedding: embeddings[j],
-      updated_at: new Date().toISOString(),
+      // The SOURCE row's date, not now(). Stamping the embed time made every
+      // chunk look freshly authored, so the "flag a stale blueprint" rule the
+      // tool hands the model could never fire — the index always claimed today.
+      updated_at: r.updated_at ?? new Date().toISOString(),
     }));
     await upsertChunks(rows);
     done += rows.length;
     console.log(`[backfill] upserted ${done}/${src.length}`);
   }
+  const removed = await deleteOrphans(src.map((r) => r.source_key));
+  if (removed > 0) console.log(`[backfill] deleted ${removed} orphaned chunks`);
   console.log("[backfill] done");
 }
 

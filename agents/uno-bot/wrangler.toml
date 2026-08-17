@@ -51,6 +51,29 @@ crons = ["*/15 13-23 * * 1-5"]
 # flag so the retest costs a var flip, not a code change, and so a failed
 # attempt does not burn one of the 50 subrequests per invocation while off.
 SLACK_STREAMING = "on"
+# ── Three features that are BUILT and OFF ────────────────────────────────────
+# Each one is off for a different specific reason, and each has a check that
+# would let it default on. Full reasoning: docs/plans/2026-08-07-004.
+#
+# Plan-mode streaming: opens the turn's stream up front in
+# `task_display_mode: "plan"` and routes the between-tool narration into it as
+# task cards instead of loose :hourglass: messages. An early stream was tried
+# with plain text and reverted — nothing to put in it renders an empty bubble
+# for the whole run. Plan mode should differ because the stream carries cards;
+# watch one multi-tool turn before believing it.
+SLACK_STREAM_PLAN = "off"
+# Native feedback elements: Slack's `context_actions` block (`feedback_buttons`
+# + an `icon_button` delete) in place of the hand-rolled 👍/👎 row. Off because
+# an invalid block degrades SILENTLY here — delivery falls back to plain text,
+# which would drop the footer from every answer while looking fine. Enable,
+# look at one real answer, then make it the default.
+SLACK_NATIVE_FEEDBACK = "off"
+# Phase 5 context management: derived {goal, constraints, decisions, artifacts},
+# progressive summarisation, drift detection. Off because it changes what the
+# model sees on EVERY turn and its failure mode is subtly worse answers rather
+# than an error. Gated on judged evals compared CASE BY CASE — a stable 19/19
+# total hid a live BLOCKER once already (r48).
+CONTEXT_STATE = "off"
 GITHUB_REPO = "BilLogic/plus-uno"
 # Notion "Roadmap" database (the Design HQ board). notion_create drops new PRD
 # cards here in the "Need PRD / Under Playground" Design Status column.
@@ -95,6 +118,25 @@ SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"
 # "off" = keyword only. Vector needs an embedding credential (the Vertex SA, same
 # as the model lane) + the semantic_search schema exposed to the API.
 SEMANTIC_SEARCH = "on"
+# Public uno-blueprint app. blueprint_search turns every cell row into
+# "<this>/?cell=<id>" and every slice row into "<this>/?slice=<id>" so the bot
+# can hand back a link that opens the exact cell it just cited — the share path
+# for Slack and the IDE. Blank → no links, answers still grounded.
+BLUEPRINT_APP_URL = "https://uno-blueprint.netlify.app"
+# Attach the LIVE blueprint index (phases → scenarios → paths) to every
+# blueprint_search result, plus an `orientation` status field. "on" to enable.
+#
+# OFF by default, same protocol as CONTEXT_STATE above and for the same reason:
+# tool-payload instructions are NOT additive — on 2026-08-06 a slack_search fix
+# displaced an unrelated instruction and broke a different eval case. Turn this
+# on in ONE DM first, then compare the judged evals CASE BY CASE (a stable total
+# hides one case breaking as another recovers) before it goes wide.
+#
+# What it buys: "does this scenario have a future state?" becomes a lookup
+# instead of an inference. Without it the bot can only infer absence from a
+# search that returned nothing — which is how it denied the Wrap-Up
+# `Future (roadmap)` path that had been indexed since 2026-08-08.
+BLUEPRINT_INDEX = "off"
 # ── Figma library poll (the [triggers] cron above) ──────────────────────────
 # DS design-system Figma file key — non-secret (it's the path segment of every
 # shared Figma URL; see design-system/figma/component-figma-links.md). The poll

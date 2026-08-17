@@ -23,6 +23,29 @@ import type { Env } from "./types";
 export interface HistoryTurn {
   role: "user" | "assistant";
   content: string;
+  /** Slack ts of the message this turn was delivered as, when known.
+   *
+   *  The merge key for `retrieval` below. buildThreadHistory (slack/events.ts)
+   *  rebuilds history from the RAW Slack thread and returns without touching
+   *  this store on the common path, so a receipt recorded only here would be
+   *  invisible everywhere except the fallback path. Matching on ts is what
+   *  makes it reachable. */
+  ts?: string;
+  /** What this turn actually retrieved — the tool, the query, and the shape of
+   *  what came back. Rows are deliberately NOT persisted.
+   *
+   *  WHY IT EXISTS: with `{role, content}` only, turn 1's claim sits in turn 2's
+   *  context as authoritative prose with no counter-evidence. A user correcting
+   *  the bot is then arguing against the record. The receipt gives the next turn
+   *  something to check the prose against, and names the query that must not be
+   *  reissued verbatim. */
+  retrieval?: {
+    tool: string;
+    query: string;
+    path?: string;
+    count: number;
+    scenarios: string[];
+  };
 }
 
 interface HistoryRecord {
@@ -110,6 +133,15 @@ export class ThreadState implements DurableObject {
       if (now - rec.createdAt > PROPOSAL_TTL_MS) await this.storage.delete(key);
       else remaining++;
     }
+    // Active-run pointers: one key per user, overwritten each turn, so this is
+    // a bounded set rather than a leak — but a pointer older than its TTL can
+    // never do anything except be ignored, so drop it rather than keep the
+    // record of who talked to the bot last week.
+    const runs = await this.storage.list<{ at: number }>({ prefix: "run:" });
+    for (const [key, rec] of runs) {
+      if (now - rec.at > CANCEL_TTL_MS) await this.storage.delete(key);
+      else remaining++;
+    }
     const actx = await this.storage.list<AssistantContextRecord>({ prefix: "actx:" });
     for (const [key, rec] of actx) {
       if (now - rec.updatedAt > HISTORY_TTL_MS) await this.storage.delete(key);
@@ -134,6 +166,10 @@ export class ThreadState implements DurableObject {
       if (path === "/assistant-context" && method === "POST") return this.putAssistantContext(request);
       if (path === "/assistant-context" && method === "GET")  return this.getAssistantContext(url);
       if (path === "/events/check-and-record" && method === "POST") return this.checkAndRecordEvent(request);
+      if (path === "/cancel" && method === "POST")   return this.setCancel(url);
+      if (path === "/cancel" && method === "GET")    return this.getCancel(url);
+      if (path === "/active-run" && method === "POST") return this.setActiveRun(url);
+      if (path === "/cancel/by-user" && method === "POST") return this.cancelByUser(url);
     } catch (err) {
       console.error(`[thread-state] ${method} ${path} failed:`, err);
       return json({ ok: false, error: String(err) }, 500);
@@ -244,6 +280,70 @@ export class ThreadState implements DurableObject {
     return json({ ok: true });
   }
 
+  // ----- cancel (the /stop command) -----
+  //
+  // A flag, not a signal: the Worker cannot interrupt a running alarm, so the
+  // agent loop reads this between iterations and returns early. Cooperative, so
+  // cancellation lands at a tool boundary rather than mid-write.
+  //
+  // Short TTL on purpose. A stale flag would abort the NEXT question the person
+  // asks, which reads as the bot ignoring them — worse than a stop that missed.
+  private async setCancel(url: URL): Promise<Response> {
+    const key = cancelKey(url.searchParams.get("channel") ?? "", url.searchParams.get("thread") ?? "");
+    await this.storage.put(key, { at: Date.now() });
+    return json({ ok: true });
+  }
+
+  private async getCancel(url: URL): Promise<Response> {
+    const key = cancelKey(url.searchParams.get("channel") ?? "", url.searchParams.get("thread") ?? "");
+    const rec = await this.storage.get<{ at: number }>(key);
+    if (!rec) return json({ ok: true, cancelled: false });
+    // Consume it: one /stop cancels one turn. Leaving it set would cancel the
+    // reply to whatever they ask next.
+    await this.storage.delete(key);
+    const fresh = Date.now() - rec.at < CANCEL_TTL_MS;
+    return json({ ok: true, cancelled: fresh });
+  }
+
+  // ----- active run (the Home-tab Stop button) -----
+  //
+  // `/stop` and the Home-tab button each know HALF of what a cancel needs.
+  // The command arrives with a channel and no reliable person; the button
+  // arrives with a person and no channel at all — App Home is not anywhere.
+  // This is the missing half: the last conversation each user started a turn
+  // in, so the button can resolve "stop what I'm doing" without a registry
+  // service, a session id, or asking them which channel they meant.
+  //
+  // One record per user, overwritten every turn. Not a history — the question
+  // it answers is only ever about the run happening right now.
+  //
+  // TTL is CANCEL_TTL_MS, the same five minutes as a cancel flag, and for the
+  // same reason: a stale pointer would cancel a conversation the person has
+  // long since finished, which reads as the bot dropping a question.
+  private async setActiveRun(url: URL): Promise<Response> {
+    const user = url.searchParams.get("user") ?? "";
+    const channel = url.searchParams.get("channel") ?? "";
+    const thread = url.searchParams.get("thread") ?? "";
+    if (!user || !channel || !thread) return json({ ok: false, error: "missing user/channel/thread" }, 400);
+    await this.storage.put(activeRunKey(user), { channel, thread, at: Date.now() });
+    return json({ ok: true });
+  }
+
+  // Resolve the person's active run and set its cancel flag, in ONE hop. The
+  // two-call shape (look up, then cancel) would spend a second DO round trip
+  // inside a Slack interaction that has 3 seconds to ack, to no benefit — the
+  // caller has nothing to do with the lookup except cancel it.
+  private async cancelByUser(url: URL): Promise<Response> {
+    const user = url.searchParams.get("user") ?? "";
+    if (!user) return json({ ok: false, error: "missing user" }, 400);
+    const rec = await this.storage.get<{ channel: string; thread: string; at: number }>(activeRunKey(user));
+    if (!rec || Date.now() - rec.at > CANCEL_TTL_MS) {
+      return json({ ok: true, cancelled: false });
+    }
+    await this.storage.put(cancelKey(rec.channel, rec.thread), { at: Date.now() });
+    return json({ ok: true, cancelled: true, channel: rec.channel });
+  }
+
   private async getAssistantContext(url: URL): Promise<Response> {
     const channel = url.searchParams.get("channel");
     const thread = url.searchParams.get("thread");
@@ -316,6 +416,18 @@ function proposalKey(ts: string): string {
 
 function eventKey(eventId: string): string {
   return `event:${eventId}`;
+}
+
+// Cancel flags expire fast on purpose: a stale one would abort the NEXT
+// question, which reads as the bot ignoring you.
+const CANCEL_TTL_MS = 5 * 60_000;
+function cancelKey(channel: string, thread: string): string {
+  return `cancel:${channel}:${thread}`;
+}
+
+// Same TTL as a cancel flag — see setActiveRun.
+function activeRunKey(user: string): string {
+  return `run:${user}`;
 }
 
 function assistantContextKey(channel: string, thread: string): string {

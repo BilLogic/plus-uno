@@ -19,7 +19,7 @@
 // Provider-aware like the agent loops: Gemini lane → one generateContent on
 // the active GEMINI_MODEL (low thinking); Vertex-Claude lane → one chill call.
 
-import { shouldRejectRevision } from "./revision-guard";
+import { shouldRejectRevision, looksLikeStalledCorrection } from "./revision-guard";
 import type { Env } from "../types";
 import { geminiConfigured, geminiGenerate } from "../gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "../vertex/claude";
@@ -37,6 +37,7 @@ const JUDGE_TIMEOUT_MS = 25_000;
 // Inputs are capped so the judge call stays cheap and bounded.
 const MAX_USER_CHARS = 2_000;
 const MAX_DRAFT_CHARS = 8_000;
+const MAX_PRIOR_CHARS = 4_000;
 // A "revision" shorter than this fraction of the original is treated as a
 // judge malfunction (e.g. it answered instead of revising) — original ships.
 const MIN_REVISION_RATIO = 0.25;
@@ -52,7 +53,7 @@ Rubric (condensed from the team's D1–D9 bot-answer rubric):
 - D3 clarify-vs-act: if required inputs are clearly missing, the draft asks for them instead of guessing or using placeholders.
 - D5 routing: people are referenced correctly (<@U…> mentions or names), channels as <#C…>; resources are hyperlinked <url|label> at the point of mention.
 - D8 grounding: no fabrication signals — no URLs that look constructed rather than fetched, no confident claims explicitly from memory, no internal contradictions.
-- D9 confidence: a factual answer ends with a confidence line like "_Confidence: high — …_"; pure acknowledgements are exempt.
+- D9 confidence: a factual answer carries exactly ONE woven clause saying what was checked or how sure it is ("checked the Roadmap board just now", "the docs I found are from May"). A trailing label — "_Confidence: high — …_", a one-word rating, a "based on…" footer — is RETIRED: fail a draft that ends with one. Fail also on two such clauses, or none at all. Pure acknowledgements are exempt.
 
 HARD GATES (any one → verdict "fail"):
 - Claims a gated action already happened ("I've filed the card") — actions must stay future/conditional until confirmed.
@@ -66,6 +67,21 @@ Reply with STRICT JSON only, no code fences, no commentary:
   {"verdict":"pass"}
 or
   {"verdict":"fail","failed":["D9","gate:formatting"],"revised":"<the FULL corrected draft — same content and voice, minimal edits, Slack mrkdwn (*single-asterisk bold*, <url|label> links)>"}`;
+
+/** Appended to the judge system prompt ONLY on a detected correction turn — the
+ *  one-obligation-per-field rule that governs tool payloads applies here too.
+ *
+ *  The gate is deliberately narrow because the failure it catches is narrow: on
+ *  2026-08-17 the bot, told its denial was wrong, restated the same three links
+ *  at greater length and said "I checked … just now" while cached rows were
+ *  being served. Neither a new source nor a concession appeared anywhere in it. */
+const CORRECTION_GATE = `
+
+CORRECTION TURN. The user's message is CORRECTING your previous reply, which is included above as "Previous reply". One extra HARD GATE applies, and it OVERRIDES "prefer pass when in doubt":
+- The draft must EITHER cite a source that was fetched on this turn (the tools that ran this turn are listed above — a draft naming no source when tools ran, or naming only what the previous reply already named, does not count) OR plainly concede the previous reply was wrong.
+- Restating the previous reply's content at greater length is a FAIL, however well written.
+- A freshness claim ("I just checked", "re-ran that") when no lookup tool ran this turn is a FAIL.
+Failure code: "gate:correction".`;
 
 export interface JudgeOutcome {
   /** The text to send: the revised draft on a usable "fail", else the original. */
@@ -91,17 +107,33 @@ function parseJudgeJson(raw: string): JudgeJson | null {
   }
 }
 
-async function callJudgeModel(env: Env, userText: string, draft: string): Promise<string | null> {
+async function callJudgeModel(
+  env: Env,
+  userText: string,
+  draft: string,
+  ctx: { correction: boolean; priorAssistantText?: string; toolsUsedThisTurn: string[]; stalled: boolean },
+): Promise<string | null> {
   const prompt =
+    (ctx.correction && ctx.priorAssistantText
+      ? `Previous reply (the one the user is correcting):\n${ctx.priorAssistantText.slice(0, MAX_PRIOR_CHARS)}\n\n`
+      : "") +
+    // Deterministic evidence, computed before the call, so the judge is not
+    // asked to eyeball similarity across two long texts.
+    (ctx.stalled
+      ? "MEASURED: this draft retains almost all of the previous reply's vocabulary — it is a restatement. Unless it plainly concedes the previous reply was wrong, fail it with \"gate:correction\".\n\n"
+      : "") +
+    (ctx.correction ? `Tools that ran this turn: ${ctx.toolsUsedThisTurn.join(", ") || "(none)"}\n\n` : "") +
     `User message:\n${userText.slice(0, MAX_USER_CHARS)}\n\n` +
     `Draft reply:\n${draft.slice(0, MAX_DRAFT_CHARS)}`;
+
+  const system = ctx.correction ? JUDGE_SYSTEM + CORRECTION_GATE : JUDGE_SYSTEM;
 
   // Judge on the active lane, defaulting to Gemini (production).
   const provider = (env.MODEL_PROVIDER ?? "gemini").toLowerCase();
   if (provider === "vertex-claude" && claudeVertexConfigured(env)) {
     const res = await claudeVertexGenerate(env, {
       model: MODELS.chill,
-      system: JUDGE_SYSTEM,
+      system,
       prompt,
       maxTokens: 6000, // room for a full revised draft
     });
@@ -111,7 +143,7 @@ async function callJudgeModel(env: Env, userText: string, draft: string): Promis
 
   if (geminiConfigured(env)) {
     const res = await geminiGenerate(env, {
-      system: JUDGE_SYSTEM,
+      system,
       prompt,
       maxTokens: 6000, // room for a full revised draft
       thinkingLevel: "low",
@@ -129,12 +161,40 @@ async function callJudgeModel(env: Env, userText: string, draft: string): Promis
  */
 export async function reviewDraft(
   env: Env,
-  args: { userText: string; draft: string },
+  args: {
+    userText: string;
+    draft: string;
+    /** True when the Worker classified this turn as the user correcting the
+     *  previous reply (loop-shared looksLikeCorrection). Turns on the extra
+     *  gate AND bypasses the length floor. */
+    correction?: boolean;
+    /** The reply being corrected. Only sent on a correction turn — the judge
+     *  cannot see "restated the same thing" without it. */
+    priorAssistantText?: string;
+    /** Read-only tools executed this turn. "Cites a source fetched this turn"
+     *  is unjudgeable without it. */
+    toolsUsedThisTurn?: string[];
+  },
 ): Promise<JudgeOutcome> {
-  const { userText, draft } = args;
-  if (draft.trim().length < MIN_DRAFT_CHARS) {
-    return { text: draft, verdict: "skip" }; // quick lookups stay quick — no log noise
+  const { userText, draft, priorAssistantText } = args;
+  const correction = args.correction === true;
+  const toolsUsedThisTurn = args.toolsUsedThisTurn ?? [];
+  // The length floor is BYPASSED on a correction. The 2026-08-17 denial that
+  // started all this was short, so it was never judged — the one turn where the
+  // judge had something to catch is the one it sat out.
+  if (!correction && draft.trim().length < MIN_DRAFT_CHARS) {
+    // Skips used to bypass telemetry entirely, so "the judge never ran" and
+    // "the judge passed it" looked identical in the logs.
+    console.log(
+      `[uno-bot] draft-judge build=${BUILD} verdict=skip reason=short draft_chars=${draft.length} correction=no`,
+    );
+    return { text: draft, verdict: "skip" };
   }
+
+  // Deterministic mirror of shouldRejectRevision: a post-correction reply that
+  // is near-identical to the reply it was correcting. Costs no model call.
+  const stalled =
+    correction && !!priorAssistantText && looksLikeStalledCorrection(priorAssistantText, draft);
 
   const startedAt = Date.now();
   let verdict: JudgeOutcome["verdict"] = "error";
@@ -144,7 +204,7 @@ export async function reviewDraft(
 
   try {
     const raw = await Promise.race([
-      callJudgeModel(env, userText, draft),
+      callJudgeModel(env, userText, draft, { correction, priorAssistantText, toolsUsedThisTurn, stalled }),
       new Promise<"__timeout__">((resolve) => setTimeout(() => resolve("__timeout__"), JUDGE_TIMEOUT_MS)),
     ]);
 
@@ -185,7 +245,9 @@ export async function reviewDraft(
 
   console.log(
     `[uno-bot] draft-judge build=${BUILD} verdict=${verdict} failed=[${failed.join(",")}] ` +
-      `revised=${revisedUsed} ms=${Date.now() - startedAt} draft_chars=${draft.length}`,
+      `revised=${revisedUsed} ms=${Date.now() - startedAt} draft_chars=${draft.length} ` +
+      `correction=${correction ? "yes" : "no"} stalled=${stalled ? "yes" : "no"} ` +
+      `tools=[${toolsUsedThisTurn.join(",")}]`,
   );
   return { text, verdict };
 }

@@ -5,24 +5,89 @@ name: uno-bot — deploy Worker
 # (bundle:harness → src/generated/harness.ts) and ships src/ via wrangler, then
 # verifies /health responds with the fresh build stamp.
 #
-# Deliberately manual-only (workflow_dispatch): deploying on every push to main
-# would ship half-reviewed Worker changes; a human (or an agent asked by one)
-# presses the button.
+# Runs on every push to `main`, and on demand (workflow_dispatch).
 #
-# Required repo secret:
-#   CLOUDFLARE_API_TOKEN   API token with the "Edit Cloudflare Workers" template
-#                          (dash.cloudflare.com/profile/api-tokens), scoped to
-#                          the Bryanhuang628 account.
+# This was deliberately manual-only until 2026-08-17, on the reasoning that
+# auto-deploy would ship half-reviewed Worker changes. That traded the wrong
+# risk. The harness is bundled at BUILD time (bundle:harness → the baked
+# src/generated/harness.ts, Block 0 of every request), so a merged rule change
+# only reaches the bot when someone remembers to press this button — and the
+# invalidation therefore never fired. The live consequence: rules that were
+# reviewed, merged and believed-live sat in main while the bot kept answering
+# from the previously-deployed copy.
+#
+# Review is not what was protecting main here — nothing in this repo runs on a
+# PR; every other workflow is `schedule` or `workflow_dispatch`. What protects a
+# deploy is the gating inside `npm run deploy` (typecheck · check:fetch ·
+# check:contract · bundle:harness · wrangler deploy), and that runs either way.
+#
+# `check:contract` is only a real gate when the app repo is checked out beside
+# this one — it compares the vendored blueprint contract against the app's
+# canonical copy. Until 2026-08-17 it exited 0 on a missing checkout, i.e. it
+# passed on every runner without comparing anything while this header called it
+# a gate. It now FAILS on a missing source unless BLUEPRINT_CONTRACT_OPTIONAL=1,
+# which the step below sets only when BLUEPRINT_REPO_TOKEN is unconfigured, and
+# it prints a SKIPPED banner when it does. Configure that secret to turn the
+# gate on for real.
+# Bill's call, 2026-08-17: any push to main, NOT paths-filtered — a harness doc
+# under docs/ or skills/ changes the prompt just as much as a change under src/,
+# and a path filter is the exact mechanism that would reintroduce this bug.
+#
+# `concurrency` cancels a superseded in-flight run: two pushes landing close
+# together would otherwise race two `wrangler deploy`s at the same Worker, and
+# the health check below could then verify the build stamp of whichever finished
+# first rather than of the newest commit.
+#
+# Required secrets:
+#   CLOUDFLARE_API_TOKEN     API token with the "Edit Cloudflare Workers" template
+#                            (dash.cloudflare.com/profile/api-tokens), scoped to
+#                            the Bryanhuang628 account. Store it on the
+#                            `uno-bot-production` ENVIRONMENT, not as a plain repo
+#                            secret — see below.
+#   BLUEPRINT_REPO_TOKEN     (optional) read access to BilLogic/plus-uno-blueprint,
+#                            so check:contract can actually compare. Without it the
+#                            contract gate reports SKIPPED instead of passing.
 # The account id is non-secret and pinned below (the account that hosts uno-bot).
+#
+# WHY AN ENVIRONMENT. `main` is unprotected and this repo has 19 people who can
+# push to it. A plain repo secret is readable by any workflow this job runs, so
+# auto-deploy-on-push handed a Workers-edit token to a job that executes
+# whatever code the pushed commit contains. Binding the job to a GitHub
+# Environment with required reviewers keeps the automatic build and puts one
+# human approval in front of the token. Create it at
+# Settings → Environments → `uno-bot-production`: add the required reviewer(s),
+# then move CLOUDFLARE_API_TOKEN there from repo secrets. Until the environment
+# exists, runs will queue for approval rather than deploy — that is the intended
+# failure direction.
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch: {}
+
+# One deploy at a time. Superseded runs are cancelled rather than queued: an
+# older commit finishing last would leave the Worker behind main.
+concurrency:
+  group: uno-bot-deploy
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # The approval gate in front of CLOUDFLARE_API_TOKEN. See the header.
+    environment: uno-bot-production
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      # The app repo, so check:contract has something to compare against.
+      # Skipped (not failed) when the token is unconfigured — the deploy step
+      # then reports the contract gate as SKIPPED rather than as passing.
+      - name: Check out uno-blueprint (contract source)
+        if: ${{ secrets.BLUEPRINT_REPO_TOKEN != '' }}
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          repository: BilLogic/plus-uno-blueprint
+          token: ${{ secrets.BLUEPRINT_REPO_TOKEN }}
+          path: uno-blueprint-src
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "22" # wrangler v4.97+ requires Node >= 22
@@ -34,6 +99,8 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: "747a73feeb756fad6c1164df234628e9"
+          BLUEPRINT_REPO: ${{ github.workspace }}/uno-blueprint-src
+          BLUEPRINT_CONTRACT_OPTIONAL: ${{ secrets.BLUEPRINT_REPO_TOKEN != '' && '0' || '1' }}
         run: npm run deploy
       - name: Verify health
         run: |

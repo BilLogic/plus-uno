@@ -85,19 +85,56 @@ threads, and because the payload carries `channel`, `message.ts` and
 `message.thread_ts` — so the anchor comes **from Slack, not from text a message
 could manipulate**. That provenance is what makes the follow-up read legitimate.
 
-Five, uno-bot's domain:
+Five, uno-bot's domain. Three are mr-mule's unchanged; two are retargeted at
+our sources rather than theirs:
 
 1. **Catch me up from here** — what was decided, what is open, who owns each
    open item. Default tier: the transcript is already in the prompt, so there is
    nothing to dig for.
 2. **Think harder about this** — the `/grind` twin, and the reason it must exist:
    escalating from inside a thread is otherwise impossible.
-3. **Ground this in the blueprint** — check a claim in the thread against the
-   current-state source of truth. uno-bot's version of mr-mule's "is this still
-   true?", using `blueprint_search` and the conflict rule that already exists.
-4. **Where was this decided?** — we have a Decisions DB in Notion, so this maps
-   directly. Must **say there is no record** rather than construct a plausible
-   one.
+3. **Is this still true?** — check a claim in the thread against the sources of
+   truth, which for us are TWO: the **blueprint** (how the service works today)
+   and **Notion project documentation** (PRDs, Roadmap cards, Help Center).
+   Widened from "ground this in the blueprint" (user decision, 2026-08-07)
+   because a stale claim is as likely to live in a doc as in a journey step, and
+   a shortcut that only checks one of them answers half the question.
+
+   The conflict rule already in `blueprint_search` is what makes two sources
+   safe: blueprint = today, Roadmap = planned, and a disagreement gets
+   **surfaced, never blended** — a WIP card means "changing", a shipped card
+   that disagrees means the doc is likely obsolete. That rule exists precisely
+   because these two sources drift, so a verification shortcut is where it earns
+   the most.
+
+4. **Where was this decided?** — three sources, **in this order**:
+
+   1. **Notion Decisions DB** (`NOTION_DECISIONS_DB_ID`, already wired for
+      `notion_search` scope "decision") — the recorded answer.
+   2. **Notion project documentation** — PRDs and Roadmap cards, where a
+      decision often lives before anyone writes it down as one.
+   3. **Slack history, searched AS THE ASKER** — because most decisions are
+      made in a message and never recorded anywhere else (user decision,
+      2026-08-07).
+
+   Ordered because a recorded decision beats a remembered one: a Slack message
+   saying "let's do X" that was later reversed in the Decisions DB would be the
+   wrong answer, and searching Slack first would surface it first.
+
+   **The surface gate makes step 3 legitimate, and it is not an accident.**
+   Shortcut answers go to the asker's own DM, which is exactly where own-token
+   search is permitted under ADR-020. The same shortcut answering into a channel
+   could not run this search — the visibility would be the asker's while the
+   audience was everyone. Two design choices made separately, meeting cleanly.
+
+   **"Decided in Slack, never recorded" is a FINDING, not a failure.** Say where
+   it was said, quote it, and note that nothing records it — then offer to file
+   it. That is the gap the Decisions DB exists to close, and this shortcut is
+   the moment it becomes visible.
+
+   Must **say there is no record** rather than construct a plausible one:
+   "we agreed X" with no record is indistinguishable from a misremembering, and
+   inventing provenance is the worst failure available to this shortcut.
 5. **Help me reply** — a draft in the asker's own voice, in a fenced block so it
    pastes cleanly, sources *below* the draft. The bot never posts it. Value is
    attribution: an @-mention produces a correct answer credited to a bot; this

@@ -24,6 +24,7 @@ import { routeRequest } from "./routing";
 import { geminiGenerateRaw } from "../gemini/client";
 import { ensureHarnessCache } from "../gemini/cache";
 import { BUILD } from "../version";
+import { consumeCancel } from "../thread-state-client";
 import { subrequestsUsed, meterBreakdown, withSubrequestLimit, isSubrequestBudgetError, subrequestBudgetTrips } from "../net";
 import {
   MAX_ITERATIONS,
@@ -144,7 +145,24 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   // that got worse could be the model or the level — so one of them is pinned.
   // `medium` is also gemini-3.6-flash's own default, which is the overspend fix:
   // every ordinary turn had been paying `high` because a Claude tier map said so.
-  const { tier, reason: routeReason } = routeRequest({ userText, hasPending: pending !== null });
+  const { tier, reason: routeReason } = routeRequest({ userText, hasPending: pending !== null, override: input.tierOverride });
+
+  // Keyed like the CONVERSATION, not the thread. /stop arrives carrying only a
+  // channel, so the key it can compute is the one this must read: a DM collapses
+  // to the single "dm" conversation (mirroring conversationTs in events.ts),
+  // a channel uses its thread.
+  //
+  // Using slack.threadTs directly would have failed silently in a DM — the turn
+  // writes under the user's message ts while /stop looks under "dm", so the flag
+  // would be set on a key nothing reads and /stop would appear to do nothing.
+  //
+  // It is now PASSED IN (slack.conversationTs) rather than re-derived, because
+  // re-deriving it is exactly how the two ends drifted: an explicitly threaded
+  // DM resolves to the thread, not to "dm", and the expression below cannot
+  // know that. The fallback keeps the old behaviour for any caller that has not
+  // supplied it.
+  const cancelThread =
+    slack?.conversationTs ?? (slack?.channel?.startsWith("D") ? "dm" : (slack?.threadTs ?? "dm"));
 
   // All model-generation-specific dials, derived together so a mid-turn model
   // fallback (below) recomputes them consistently:
@@ -329,6 +347,23 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
     // spin, burning the delivery reserve until the post itself failed. Break to
     // the tools-disabled synthesis pass below instead.
     if (outOfIterationBudget(subrequestsUsed())) break;
+
+    // /stop, checked between iterations. The Worker cannot interrupt a running
+    // alarm, so cancellation is cooperative: it lands at a tool boundary, never
+    // mid-write, which is what keeps a half-executed proposal impossible.
+    //
+    // NOT checked on the first two iterations. The flag costs an internal DO
+    // read per check, and nobody types /stop inside the first few seconds —
+    // paying for it on every short turn to serve a case that cannot have
+    // happened yet is the wrong trade.
+    if (iter >= 2 && slack?.channel && (await consumeCancel(env, slack.channel, cancelThread))) {
+      console.log(`[stop] cancelled at iteration ${iter}`);
+      return finish({
+        kind: "text",
+        text: "Stopped there — I didn't finish that one. Nothing was created or changed.",
+      });
+    }
+
     const parts = await callGemini(false);
     const functionCalls = parts.filter((p) => p.functionCall?.name);
 

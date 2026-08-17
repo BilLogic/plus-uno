@@ -29,7 +29,7 @@ The other docs keep their value as *reasoning*; this one is the *schedule*.
 | 8 | **`task_display_mode: "plan"`** | Streaming already ships; this renders steps as a checklist instead of interim prose. |
 | 9 | **Bot display name propagation** | `le goat` is in app settings and never reached the bot user. One reinstall. |
 | 10 | **Blueprint deep links** | Verify the param scheme, then link answers into the app. `include` already shipped (r51). |
-| 11 | **`/uno-stop` + Home-tab control** | A turn runs 30–90s with no way to abort it. Feasible here — see below. |
+| 11 | **`/stop` + Home-tab control** | A turn runs 30–90s with no way to abort it. Feasible here — see below. |
 
 ### Out of scope, deliberately
 
@@ -55,13 +55,13 @@ Durable Object **keyed by conversation** (`conversationKey`), and the agent loop
 is an explicit `for (let iter = 0; iter < MAX_ITERATIONS; iter++)` at
 `src/agent/gemini-agent.ts:307`. So:
 
-- `/uno-stop` arrives with a channel. The channel resolves to the SAME DO that
+- `/stop` arrives with a channel. The channel resolves to the SAME DO that
   is running the turn — no registry, no lookup, no session id.
 - The DO sets a cancel flag; the loop checks it at the top of each iteration and
   returns early. Cooperative, so it lands at a tool boundary rather than mid-write.
 - The `finally` that already clears status on every exit path handles the rest.
 
-Two places, per playbook 4.3, because they know different things: `/uno-stop`
+Two places, per playbook 4.3, because they know different things: `/stop`
 (knows the channel, not the person) and a Home-tab button (knows the person,
 not the channel). Note 4.2 — a slash command cannot be typed in a thread, which
 is exactly why the Home tab is not optional.
@@ -196,13 +196,47 @@ generation tokens for stale measures) — no analogue in a chat surface.
 
 ## Acceptance
 
-- [ ] Phase 1 merged, judged evals 19/19
-- [ ] Phase 2: one shortcut working end to end within the 3s ack
-- [ ] Phase 3 merged, judged evals 19/19
-- [ ] Phase 4: bot renders as `le goat`; blueprint answers carry app links
-- [ ] `/uno-stop` aborts a running turn at the next iteration boundary, from both the command and the Home tab
-- [ ] Retention decision recorded before Phase 5 begins
-- [ ] Phase 5 gated per-phase with case-by-case eval comparison
+- [x] Phase 1 merged, judged evals 19/19 (r53)
+- [x] Phase 2: five shortcuts, each acking inside 3s and deferring the work
+- [x] Phase 3 built — error options, antecedent window, native feedback
+      elements, `task_display_mode: "plan"`. Judged evals still to re-run.
+- [ ] Phase 4: bot renders as `le goat` (needs a reinstall — user action)
+- [x] `/stop` aborts at the next iteration boundary, from both the command and
+      the Home tab
+- [x] Retention decision recorded — storing transcripts in the DO is approved
+      (user, 2026-08-07: *"actually we can store, it's ok for this project"*)
+- [ ] Phase 5 gated per-phase with case-by-case eval comparison — **built,
+      shipped OFF** (`CONTEXT_STATE`), not yet compared
+
+### Built after this plan was written
+
+Three things that were not on the list and turned out to be the same shape as
+things that were:
+
+| Item | Why it landed here |
+|---|---|
+| **Scope keywords** (`ds:` `notion:` `blueprint:` `slack:` `github:`) | The read-grounds-the-write idea (adopted item 2) inverted: the ASKER often knows where the answer lives, and had no way to say so. A hint, never a filter. |
+| **`react` tier** | User decision, 2026-08-07: *"in the future if helpful to minimize the cost, just let the agent respond with slack reaction"*. A closed acknowledgement set answers with an emoji and no model call. |
+| **Draft footer variant** | The `draft` shortcut shipped in Phase 2 with the standard disclaimer, which describes the wrong risk — a draft goes out under the person's name, not the bot's. |
+
+### Flags shipped off, and what turning each one on needs
+
+Three of these ship disabled. Each one has a specific reason it cannot simply
+default on, and a specific check that would let it:
+
+| Flag | Why off | To turn on |
+|---|---|---|
+| `SLACK_NATIVE_FEEDBACK` | An invalid block degrades SILENTLY — delivery falls back to plain text, dropping the footer from every answer while looking fine. | Enable, look at one real answer, then default it. |
+| `SLACK_STREAM_PLAN` | Opens the stream at turn start. That was tried with plain text and reverted (empty bubble for the whole run); plan mode should be different because the stream carries task cards, but "should" is doing work in that sentence. | Enable, watch one multi-tool turn render. |
+| `CONTEXT_STATE` | Changes what the model sees on **every** turn. Failure mode is subtly worse answers, not an error. | Judged evals compared **case by case** — a stable 19/19 hid a live BLOCKER once already (r48). |
+
+### Still not built
+
+- **Blueprint deep links** — in progress in the working tree
+  (`blueprint-link.ts`), depends on the app returning canonical URLs.
+- **Bot display name** — one reinstall, user action.
+- **Manifest paste** — shortcuts and `/grind` `/chill` are in the YAML and not
+  yet on the app.
 
 ## Sources
 
