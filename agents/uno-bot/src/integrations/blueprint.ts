@@ -844,13 +844,21 @@ async function fetchRows(
  *  does not exist: PostgREST 400s, fetchRows logs a warning and returns [], and
  *  the tool reported "no findings" for cells that had them. Array overlap
  *  (`ov`) is the correct operator, and it needs `{}`, not `()`. */
-export async function fetchFindings(env: Env, cellIds: string[]): Promise<Array<Record<string, unknown>>> {
+export async function fetchFindings(
+  env: Env,
+  cellIds: string[],
+): Promise<{ rows: Array<Record<string, unknown>>; total: number | undefined }> {
   const ids = cellIds.filter(Boolean).slice(0, 10);
-  if (ids.length === 0) return [];
+  if (ids.length === 0) return { rows: [], total: 0 };
   // Open findings only: the app's triage invariant is "dismissed stays
   // dismissed" — re-surfacing closed findings in Slack re-litigates a call
   // the team already made in-app, and closed rows eat the 20-row cap.
-  return (await fetchRows(env, "findings", `cell_ids=ov.{${ids.join(",")}}&status=eq.open`, 20)).rows;
+  //
+  // The total rides along: `fetchRows` already counted the full matched set
+  // under count=exact, and dropping it re-creates the counted-the-capped-page
+  // bug that 258cfd02 fixed for slices ("5 of 14").
+  const { rows, total } = await fetchRows(env, "findings", `cell_ids=ov.{${ids.join(",")}}&status=eq.open`, 20);
+  return { rows, total };
 }
 
 /** Named slices someone already cut. Points at an existing view instead of
@@ -873,6 +881,12 @@ export async function fetchSlices(
   // many slices are there" answer must not inherit that narrowing — so when
   // a filter was applied, fetch the table's true size with a rows-free
   // head-count (limit=0 still carries content-range under count=exact).
+  //
+  // If that head-count read fails, the total is UNDEFINED, not the filtered
+  // number: the consumer's note asserts "the blueprint has N slices in
+  // total", and a filtered count wearing that sentence is a confident wrong
+  // answer — the exact bug the note exists to prevent. Undefined drops the
+  // note instead.
   const tableTotal =
     words.length > 0 ? (await fetchRows(env, "slices", "limit=0", 0)).total : total;
   return {
@@ -880,6 +894,6 @@ export async function fetchSlices(
       const url = typeof row.id === "string" ? sliceUrl(env.BLUEPRINT_APP_URL, row.id) : undefined;
       return url ? { ...row, url } : row;
     }),
-    total: tableTotal ?? total,
+    total: tableTotal,
   };
 }

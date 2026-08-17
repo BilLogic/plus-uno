@@ -97,7 +97,9 @@ export async function executeBlueprintSearch(
       }
     };
     const edges = await optional(include.includes("edges"), () => fetchEdges(env, cellIds), "edges");
-    const findings = await optional(include.includes("findings"), () => fetchFindings(env, cellIds), "findings");
+    const findingsRead = await optional(include.includes("findings"), () => fetchFindings(env, cellIds), "findings");
+    const findings = findingsRead?.rows;
+    const findingsTotal = findingsRead?.total;
     const sliceRead = await optional(include.includes("slices"), () => fetchSlices(env, query), "slices");
     const slices = sliceRead?.rows;
     const sliceTotal = sliceRead?.total;
@@ -177,6 +179,13 @@ export async function executeBlueprintSearch(
     const findingsNote = findings?.length
       ? "`findings` are audit results ALREADY recorded against these cells — report them by cell and severity. Triaging or resolving one is a write: route that to the blueprint app, never claim to have done it."
       : undefined;
+    // Findings are read under a 20-row cap; the true matched count rides along
+    // from the same request. Same class as sliceCountNote: a count answer must
+    // come from the total, never from counting the capped page.
+    const findingsCountNote =
+      findings && typeof findingsTotal === "number" && findingsTotal !== findings.length
+        ? `${findingsTotal} open findings are recorded against these cells; \`findings\` shows only the first ${findings.length}. For any count-of-findings answer, use ${findingsTotal}.`
+        : undefined;
     const slicesNote = slices?.length
       ? "`slices` are views someone already cut — `title`/`actor` say who it is for. Point at the existing one (link its `url`) rather than composing a substitute in this reply."
       : undefined;
@@ -216,11 +225,12 @@ export async function executeBlueprintSearch(
       rows,
       ...(edges ? { edges } : {}),
       ...(findings ? { findings } : {}),
+      ...(typeof findingsTotal === "number" ? { findingsTotal } : {}),
       ...(slices ? { slices } : {}),
       ...(typeof sliceTotal === "number" ? { sliceTotal } : {}),
       notes:
         rows.length > 0
-          ? [grounding, attribution, conflict, indexNote, orientationNote, cacheNote, thinNote, linking, citing, freshness, semanticCaveat, edgesNote, findingsNote, slicesNote, sliceCountNote, truncation].filter(Boolean)
+          ? [grounding, attribution, conflict, indexNote, orientationNote, cacheNote, thinNote, linking, citing, freshness, semanticCaveat, edgesNote, findingsNote, findingsCountNote, slicesNote, sliceCountNote, truncation].filter(Boolean)
           : [
               // REWRITTEN 2026-08-17. This used to say "the blueprint has
               // nothing on this", which becomes wrong the moment the index
