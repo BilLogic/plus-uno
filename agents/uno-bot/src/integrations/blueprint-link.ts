@@ -47,8 +47,10 @@ export interface ChunkBreadcrumb {
  * Split the indexed title back into its parts.
  *
  * The backfill writes "Phase: P · Scenario: X · Path: Y (happy) · Step: Z ·
- * Layer: L" (migration 0004; migration 0001 wrote the same string WITHOUT the
- * leading phase segment). The bot used to hand that whole string to the model
+ * Layer: L" — the title emitted by `semantic_search.blueprint_chunks_src`,
+ * whose DDL lives in the app repo (see ../../migrations/README.md). Earlier
+ * revisions of that view wrote the same string WITHOUT the leading phase
+ * segment. The bot used to hand that whole string to the model
  * as `title` and leave `layer` / `step` / `scenario` / `phase` empty — so the
  * one instruction blueprint_search cares most about, "attribute every activity
  * to its layer", had nothing to attribute with on the PRIMARY retrieval path,
@@ -57,7 +59,8 @@ export interface ChunkBreadcrumb {
  * data was there the whole time, unparsed.
  *
  * Label-driven, not positional, so BOTH title shapes parse: chunks embedded
- * before 0004 simply yield no `phase`, and keep working unchanged while the
+ * before the phase segment shipped simply yield no `phase`, and keep working
+ * unchanged while the
  * corpus re-embeds. Unknown segments are ignored rather than guessed at: a
  * mis-assigned layer is exactly the fabrication this tool exists to prevent.
  */

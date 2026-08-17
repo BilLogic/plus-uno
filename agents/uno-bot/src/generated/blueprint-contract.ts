@@ -27,14 +27,16 @@ export const BLUEPRINT_CONTRACT = {
   appUrl: 'https://uno-blueprint.netlify.app',
 
   /**
-   * Breadcrumb format produced by the bot's semantic view
-   * (uno-bot migrations/0001 + 0003: `blueprint_chunks_src.title`) and parsed
-   * by its parseChunkTitle. Segments joined by `separator`, each
-   * `<label>: <value>`; parsers ignore unknown segments.
+   * Breadcrumb format produced by the semantic view
+   * (`semantic_search.blueprint_chunks_src.title`, defined in this repo —
+   * supabase/migrations/20260817000000_semantic_search_blueprint_chunks_phase.sql)
+   * and parsed by the bot's parseChunkTitle. Segments joined by `separator`,
+   * each `<label>: <value>`; parsers ignore unknown segments, so chunks
+   * embedded before the phase segment shipped still parse (minus `Phase`).
    */
   breadcrumb: {
     separator: ' · ',
-    labels: ['Scenario', 'Path', 'Step', 'Layer'],
+    labels: ['Phase', 'Scenario', 'Path', 'Step', 'Layer'],
   },
 
   /**

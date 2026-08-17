@@ -328,8 +328,8 @@ function withUrls(env: Env, rows: BlueprintRow[]): BlueprintRow[] {
 
 /** Text signature used to spot the same cell arriving from two paths.
  *
- *  Ids alone cannot dedupe across paths on older deployments (migration 0002
- *  added `source_key` to the match function's return; before it, semantic rows
+ *  Ids alone cannot dedupe across paths on older deployments (`source_key` was
+ *  added to `match_corpus_chunks`'s return late; before that, semantic rows
  *  have no id). This compares the body text instead — and it can compare it
  *  directly, because `chunkBody` has already stripped the breadcrumb line the
  *  semantic chunk repeats, so both paths present plain cell prose.
@@ -405,8 +405,8 @@ async function trySemantic(
   if (!Array.isArray(data)) return null;
   // `source_key` is the cell uuid and `title` is the breadcrumb the backfill
   // built. Both were being discarded, which is why the best-recall path was
-  // also the only uncitable, unlinkable one (migration 0002 added source_key to
-  // the match function's return; older deployments simply get no id/url here).
+  // also the only uncitable, unlinkable one (`source_key` was added to
+  // `match_corpus_chunks`'s return late; older deployments get no id/url here).
   const rows = data
     .filter((r) => (r.similarity ?? 0) >= SEMANTIC_MIN_SIMILARITY)
     .map((r): BlueprintRow => {
@@ -420,7 +420,7 @@ async function trySemantic(
         layer: crumb.layer,
         step: crumb.step,
         scenario: crumb.scenario,
-        // The breadcrumb's leading `Phase:` segment (migration 0004). Without it
+        // The breadcrumb's leading `Phase:` segment. Without it
         // the model cannot cite `phase › scenario › path — layer × step` on the
         // PRIMARY retrieval path, and guesses the phase from a scenario name
         // that sounds like one.
