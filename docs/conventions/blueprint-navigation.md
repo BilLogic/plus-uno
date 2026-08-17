@@ -44,14 +44,23 @@ Mis-attribution is the most common error (`schema-misread`). In the built-out sc
 
 ## 4 · Path semantics
 
-**Read `paths.name`, never `path_type`.** The declared enum and the values the board uses diverge, so the type column barely discriminates; names tell variants apart. `named` is the catch-all for "a variant with its own identity" — cycle steps, edge cases, and the future-state paths below. **Establish which path a question is about before answering**; never merge a happy path and an edge case into one answer.
+**Read `paths.name`, never `path_type`.** The declared enum and the values the board uses diverge, so the type column barely discriminates; names tell variants apart. `named` is the catch-all for "a variant with its own identity" — cycle steps, edge cases, and some of the future-state paths below. **Establish which path a question is about before answering**; never merge a happy path and an edge case into one answer.
 
-### 4a · Future state — the `Future (roadmap)` convention
+### 4a · Future state — the `Planned:` / `Prototype:` convention
 
-The board carries a labelled future layer, and its markers travel together: `paths.name` is exactly `Future (roadmap)`, `path_type` is `named`, `origin` is `app`, and every cell `description` opens `PLANNED (not shipped as of {month year}):`.
+The board carries a labelled future layer, and **the path NAME is the marker**. Two labels, and they do not mean the same thing:
 
-- **These are the only future-bearing rows.** Every other path is current state. A `Future (roadmap)` cell is a plan, never an answer to "how does it work today" — attribute it as planned, with the `PLANNED` prefix's own wording.
-- **Never assert the blueprint has no future state for a scenario without querying that scenario for a `Future (roadmap)` path.** Absence in a search result is not absence on the board. Which scenarios carry one changes; read it, don't recall it.
+| Prefix | Means | How to word it |
+|---|---|---|
+| `Planned: <topic>` | Decided and scheduled. Code exists on a branch, or the ship is committed — it is a matter of when, not whether. | "this **is changing**" |
+| `Prototype: <topic>` | Exploratory. A proposal, a design iteration, or an explicit TBD. It may never ship. | "this **might change**" |
+
+Rules:
+
+- **The name is the whole test.** `Planned` / `Prototype` alone, or followed by `: <topic>` — matched as a PREFIX. Do not read `path_type` for this (`named`, `alternative` and others all appear), do not read `origin`, and do not treat a path that merely *mentions* "planned" mid-name as future state. Cell descriptions on these paths also open `PLANNED (…)` / `PROTOTYPE (…)`, but that is a courtesy, not the marker: the name is authoritative and the prefix survives the semantic index, which renders names with their type appended (`Prototype: Reflection redesign (named)`).
+- **These are the only future-bearing rows.** Every other path is current state. A `Planned:` or `Prototype:` cell is never an answer to "how does it work today".
+- **Never assert the blueprint has no future state for a scenario without querying that scenario for a `Planned:` or `Prototype:` path.** Absence in a search result is not absence on the board. Which scenarios carry one changes; read it, don't recall it.
+- **Superseded 2026-08-17.** The single `Future (roadmap)` name used to carry both meanings, so everything on it had to be reported at one confidence level. Rows created before that date were renamed in place; nothing on the board still uses the old name.
 
 ## 5 · Retrieval
 
@@ -86,13 +95,14 @@ union all select 'cells.links',       count(*) from cells where links <> '[]'::j
 **Future paths** — which scenarios have a planned redesign on the board (§4a)
 ```sql
 select p.name as phase, ss.name as scenario, pa.path_type, pa.origin,
-       count(c.id) filter (where c.description ilike 'PLANNED%') as planned_cells
+       pa.name as path, count(c.id) as cells
 from paths pa
 join service_scenarios ss on pa.service_scenario_id = ss.id
 join phases p on ss.phase_id = p.id
 left join cells c on c.path_id = pa.id
-where pa.name = 'Future (roadmap)'
-group by p.name, ss.name, pa.path_type, pa.origin
+where pa.name like 'Planned:%' or pa.name like 'Prototype:%'
+   or pa.name in ('Planned', 'Prototype')
+group by p.name, ss.name, pa.name, pa.path_type, pa.origin
 order by p.name, ss.name;
 ```
 

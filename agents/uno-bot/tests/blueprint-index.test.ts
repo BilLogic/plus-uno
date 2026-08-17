@@ -9,6 +9,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   renderBlueprintIndex,
+  futureLabel,
+  INDEX_LEGEND,
   semanticCap,
   mergedCap,
 } from "../src/integrations/blueprint-index";
@@ -23,7 +25,7 @@ const LIVE = [
       { name: "Discovery", paths: [{ name: "Happy Path" }] },
       {
         name: "Interview & Offer",
-        paths: [{ name: "Happy Path" }, { name: "Future (roadmap)" }],
+        paths: [{ name: "Happy Path" }, { name: "Prototype: Clearance redesign" }],
       },
     ],
   },
@@ -32,40 +34,57 @@ const LIVE = [
     service_scenarios: [
       {
         name: "Wrap-Up",
-        paths: [{ name: "Happy Path" }, { name: "Edge case" }, { name: "Future (roadmap)" }],
+        paths: [
+          { name: "Happy Path" },
+          { name: "Edge case" },
+          { name: "Planned: Session creation" },
+          { name: "Prototype: Reflection redesign" },
+        ],
       },
     ],
   },
 ];
 
-test("renders one compact line per phase: scenario(pathCount), starred when future", () => {
+test("renders one line per phase, labelling each scenario's future paths", () => {
   const index = renderBlueprintIndex(LIVE, READ_AT);
   assert.deepEqual(index.phases, [
-    "Application: Discovery(1), Interview & Offer(2)*",
-    "In-session: Wrap-Up(3)*",
+    "Application: Discovery(1), Interview & Offer(2)[Prototype]",
+    // Both labels under one scenario render as a set: a scheduled change and a
+    // separate exploration are different facts and must not collapse into one.
+    "In-session: Wrap-Up(4)[Planned,Prototype]",
   ]);
-  assert.equal(index.scale, "2 phases / 3 scenarios / 6 paths");
-  assert.equal(index.legend, "* = has a Future (roadmap) path");
+  assert.equal(index.scale, "2 phases / 3 scenarios / 7 paths");
+  assert.equal(index.legend, INDEX_LEGEND);
   assert.equal(index.readAt, READ_AT);
 });
 
-test("the marker is an exact match on the path NAME, not a substring", () => {
-  // `path_type` values and prose like "future work" must not earn the marker:
-  // a false star is a promise of a roadmap branch that does not exist, which is
-  // the mirror image of the bug this index fixes.
+test("futureLabel matches the label as a PREFIX, never as a substring", () => {
+  // The prefix rule is what survives the semantic path, where names arrive with
+  // their type appended. A free substring match would promise a roadmap branch
+  // that does not exist — the mirror image of the bug this index fixes.
+  assert.equal(futureLabel("Planned"), "Planned");
+  assert.equal(futureLabel("Planned: Session creation"), "Planned");
+  assert.equal(futureLabel("Prototype: Reflection redesign (named)"), "Prototype");
+  assert.equal(futureLabel("  Prototype: Swap flow  "), "Prototype");
+  for (const notFuture of ["Happy Path", "future", "Unplanned absence", "Re-planned intake", "A Prototype"]) {
+    assert.equal(futureLabel(notFuture), null, notFuture);
+  }
+});
+
+test("the marker comes from the path NAME's prefix, not from prose that mentions it", () => {
   const index = renderBlueprintIndex(
     [
       {
         name: "Wrap",
         service_scenarios: [
-          { name: "Near miss", paths: [{ name: "future" }, { name: "Future (roadmap) v2" }] },
-          { name: "Exact", paths: [{ name: "Future (roadmap)" }] },
+          { name: "Near miss", paths: [{ name: "future" }, { name: "Unplanned absence" }] },
+          { name: "Labelled", paths: [{ name: "Planned: Reconfirmation" }] },
         ],
       },
     ],
     READ_AT,
   );
-  assert.deepEqual(index.phases, ["Wrap: Near miss(2), Exact(1)*"]);
+  assert.deepEqual(index.phases, ["Wrap: Near miss(2), Labelled(1)[Planned]"]);
 });
 
 test("no paths still lists the scenario, with a zero count", () => {
@@ -102,14 +121,14 @@ test("unnamed rows are skipped, and non-array input renders an empty index", () 
     assert.deepEqual(empty.phases, []);
     assert.equal(empty.scale, "0 phases / 0 scenarios / 0 paths");
     // Even empty, the legend ships: the caller renders a block either way and
-    // an unexplained `*` is worse than none.
-    assert.equal(empty.legend, "* = has a Future (roadmap) path");
+    // an unexplained marker is worse than none.
+    assert.equal(empty.legend, INDEX_LEGEND);
   }
 });
 
 test("the index names no paths — the compact form is the shipped form", () => {
-  // Inlining all 39 path names measured ~3x the payload for information the
-  // count and the star already carry. Guard it, or it grows back.
+  // Inlining every path name measured ~3x the payload for information the
+  // count and the labels already carry. Guard it, or it grows back.
   const rendered = renderBlueprintIndex(LIVE, READ_AT).phases.join("\n");
   assert.ok(!rendered.includes("Happy Path"));
   assert.ok(!rendered.includes("Edge case"));

@@ -17,9 +17,25 @@ const VENDORED = resolve("src/generated/blueprint-contract.ts");
 
 const check = process.argv.includes("--check");
 
+// An ABSENT source is not a passing check.
+//
+// This used to `exit(check ? 0 : 1)` — "an absent app checkout must not fail
+// CI". But the app checkout is absent on EVERY runner, so `--check` returned
+// success without comparing anything, while the deploy workflow's header
+// listed it as one of four gates protecting an auto-deploy to main. A gate that
+// cannot fail is worse than no gate: it is a gate everyone believes in.
+//
+// Set BLUEPRINT_CONTRACT_OPTIONAL=1 to get the old behaviour, and say so out
+// loud when you do — the deploy workflow sets it only when the checkout secret
+// is unconfigured, and prints a SKIPPED banner in the same breath.
 if (!existsSync(SOURCE)) {
+  const optional = process.env.BLUEPRINT_CONTRACT_OPTIONAL === "1";
   console.error(`blueprint contract not found at ${SOURCE} (set BLUEPRINT_REPO)`);
-  process.exit(check ? 0 : 1); // absent app checkout must not fail CI
+  if (check && optional) {
+    console.error("SKIPPED: contract drift was NOT checked on this run.");
+    process.exit(0);
+  }
+  process.exit(1);
 }
 
 const same =

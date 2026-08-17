@@ -132,7 +132,7 @@ if (/<!--\s*\/?\s*ide-only\s*-->/i.test(assembled)) {
 // wrong for as long as nobody re-read the file.
 //
 // The invariant: instance VOCABULARY is a contract (layer names, the
-// `Future (roadmap)` marker — those stay); instance INVENTORY is a bug (counts,
+// `Planned:` / `Prototype:` markers — those stay); instance INVENTORY is a bug (counts,
 // membership lists — those must be retrieved, per ADR-013 §6 "cache the
 // foundation, retrieve the rest").
 //

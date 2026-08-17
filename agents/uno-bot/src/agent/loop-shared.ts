@@ -255,12 +255,19 @@ const CORRECTION_PATTERNS: RegExp[] = [
   /\bthat('s| is| was)?\s*n[o']t\b/i,
   /\bthis\s+is\s*n[o']t\b/i,
   /\bnot\s+what\s+(i|we)\s+(asked|meant|wanted)\b/i,
-  // bare "wrong" / "that's wrong" / "you're wrong" / "incorrect"
-  /\b(wrong|incorrect|mistaken)\b/i,
+  // "that's wrong" / "you're wrong" / "this is incorrect" — but NOT a bare
+  // "wrong" anywhere in the message. The blueprint is full of ordinary
+  // questions about wrong things ("what happens if a tutor logs the wrong
+  // hours?"), and every one of them was being read as a correction of the
+  // previous reply.
+  /\b(that|this|you|you're|youre|it)('s| is| are| was| were)?\s*(is\s+)?(wrong|incorrect|mistaken)\b/i,
   // "actually, …" as a lead-in (not mid-sentence hedging)
   /^\s*(actually|no|nope|nah)\b[,\s—-]/i,
-  // direct pushback on a denial — the exact shape of the failing thread
-  /\b(it|there)\s+(is|does)\b.*\b(exist|there|in there)\b/i,
+  // Direct pushback on a denial — the exact shape of the failing thread
+  // ("it IS in there", "there is one"). Anchored on a contradiction verb next
+  // to the existence word: the earlier form let any clause containing "there"
+  // downstream of "it is" match, which caught plain descriptive sentences.
+  /\b(it|there)\s+(is|does|are)\b[^.?!]{0,40}\b(exist|in there|in the blueprint)\b/i,
   /\b(check|look)\s+again\b/i,
   /\b(re-?check|re-?read|re-?search)\b/i,
 ];
@@ -309,8 +316,8 @@ export function correctionDirective(priorQuery?: string): string {
 //     several frames above.
 //  2. WHETHER THIS IS A CORRECTION TURN, so `blueprint_search` can be forced to
 //     `fresh: true` at the boundary. Left to the model, a pushback re-runs a
-//     near-identical query, `cacheKey` is a sorted term-set, and the SAME rows
-//     come back under an "I just re-checked" claim — a cache serving a lie.
+//     near-identical query and the SAME rows come back under an "I just
+//     re-checked" claim — a cache serving a lie.
 //
 // Rather than thread a context object through both loops' signatures, this
 // mirrors net.ts's per-invocation meter: an AsyncLocalStorage scope entered by
@@ -329,7 +336,7 @@ const turnScope = new AsyncLocalStorage<{
 export interface RetrievalReceipt {
   tool: string;
   query: string;
-  /** The `path` of the first row, when the rows carry one (e.g. "Future (roadmap)"). */
+  /** The `path` of the first row, when the rows carry one (e.g. "Prototype: Reflection redesign"). */
   path?: string;
   count: number;
   /** Distinct scenario names across the rows, capped — the "what did I look at". */

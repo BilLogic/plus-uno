@@ -29,7 +29,7 @@ import {
 } from "./blueprint-index";
 
 // Re-exported so the tool layer has ONE import for the blueprint integration.
-export { renderBlueprintIndex, FUTURE_PATH_NAME } from "./blueprint-index";
+export { renderBlueprintIndex, FUTURE_LABELS, futureLabel } from "./blueprint-index";
 export type { BlueprintIndex, BlueprintCappedBy } from "./blueprint-index";
 
 const REQUEST_TIMEOUT_MS = 10000;
@@ -44,10 +44,11 @@ const MAX_ROWS = 30;
 // SEMANTIC_SEARCH var to "off".
 const SEMANTIC_RPC = "match_corpus_chunks";
 const SEMANTIC_SCHEMA = "semantic_search";
-// Was 6, out of ~839 indexed chunks. A niche-but-real path ("Future (roadmap)"
-// under Wrap-Up) never made a top-6 cut against the mass of happy-path cells,
-// so the bot reported it does not exist. 15 is still one subrequest and one
-// response; the cost is response tokens, not latency or subrequest budget.
+// Was 6, out of ~800 indexed chunks. A niche-but-real future path (the
+// Prototype branch under Wrap-Up) never made a top-6 cut against the mass of
+// happy-path cells, so the bot reported it does not exist. 15 is still one
+// subrequest and one response; the cost is response tokens, not latency or
+// subrequest budget.
 const SEMANTIC_MATCH_COUNT = 15;
 // Cosine-similarity floor: below this, treat as no confident match and fall back
 // to keyword search. Tunable from the semantic-quality of real queries.
@@ -56,8 +57,9 @@ const SEMANTIC_MIN_SIMILARITY = 0.5;
 //
 // The tradeoff: the old code short-circuited on >= 1 hit above the floor, so a
 // single weak-but-passing vector match suppressed keyword search entirely — and
-// keyword is the ONLY path that can match a path *named* "Future (roadmap)"
-// (see SOURCES below). One extra subrequest, and only when the semantic result
+// keyword is the ONLY path that can match a path by its NAME (`Planned:` /
+// `Prototype:` — see SOURCES below). One extra subrequest, and only when the
+// semantic result
 // is thin; a healthy semantic result (>= 3) still short-circuits exactly as
 // before, so the common case costs nothing.
 const SEMANTIC_THIN_RESULTS = 3;
@@ -85,7 +87,7 @@ export interface BlueprintRow {
   /** cells.updated_at. The tool tells the model to flag a stale blueprint; it
    *  could not, because it was never given a date to judge. */
   updatedAt?: string;
-  /** The path variant (e.g. "Happy Path (happy)", "Future (roadmap) (named)").
+  /** The path variant (e.g. "Happy Path (happy)", "Prototype: Reflection redesign (named)").
    *  On semantic hits it comes from the indexed breadcrumb; on keyword hits from
    *  `paths.name` — never `path_type`, per blueprint-navigation.md § 4. */
   path?: string;
@@ -166,6 +168,18 @@ function headers(key: string): Record<string, string> {
   return { apikey: key, authorization: `Bearer ${key}` };
 }
 
+/** The query, safe to put in a log line: one line, bounded, quoted.
+ *
+ *  Every `[blueprint]` line carried retrieval/rows/cache but not WHAT was
+ *  asked, so a bad answer in Slack could not be traced back to the query that
+ *  produced it — the eval rubric's retrieval question (R14) was unscoreable
+ *  from logs alone. 120 chars is past the point where two questions look alike.
+ */
+function logQuery(q: string): string {
+  const flat = q.replace(/\s+/g, " ").trim();
+  return ` q="${(flat.length > 120 ? `${flat.slice(0, 120)}…` : flat).replace(/"/g, "'")}"`;
+}
+
 function terms(query: string): string[] {
   return Array.from(
     new Set(query.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 3)),
@@ -217,7 +231,14 @@ export async function searchBlueprint(
     };
   }
 
-  const cacheKey = terms(q).sort().join(" ");
+  // Keyed on the NORMALISED QUERY, not on its term bag. `terms()` lowercases,
+  // drops words under 3 characters, dedupes and then keeps only the first six —
+  // so two genuinely different questions that happen to share those six words
+  // collided, and the second one was served the first one's rows while the
+  // payload still described them as a read of the second query. Whitespace and
+  // case are still folded, which is all the reuse this cache was ever meant to
+  // capture on a multi-step question.
+  const cacheKey = q.toLowerCase().replace(/\s+/g, " ").trim();
   const hit = options.fresh ? undefined : searchCache.get(cacheKey);
   if (hit && Date.now() - hit.at < CACHE_TTL_MS) {
     const age = Date.now() - hit.at;
@@ -225,7 +246,7 @@ export async function searchBlueprint(
     // looked like it never searched at all. One line per served result,
     // whichever way it was served.
     console.log(
-      `[blueprint] retrieval=${hit.result.retrieval} rows=${hit.result.rows.length} cached=1 age_ms=${age}`,
+      `[blueprint] retrieval=${hit.result.retrieval} rows=${hit.result.rows.length} cached=1 age_ms=${age}${logQuery(q)}`,
     );
     return { ...hit.result, cached: true, age_ms: age };
   }
@@ -264,7 +285,8 @@ export async function searchBlueprint(
           console.log(
             `[blueprint] retrieval=semantic rows=${semantic.length} cached=0 age_ms=0` +
               `${cap.truncated ? " (truncated capped_by=semantic)" : ""}` +
-              `${result.top_score !== undefined ? ` top_score=${result.top_score}` : ""}`,
+              `${result.top_score !== undefined ? ` top_score=${result.top_score}` : ""}` +
+              logQuery(q),
           );
           searchCache.set(cacheKey, { at: Date.now(), result });
           return result;
@@ -272,8 +294,26 @@ export async function searchBlueprint(
       }
     }
 
-    const rpc = await tryRpc(base, key, q, controller.signal);
-    const keyword = rpc !== null ? rpc : await searchViaTables(base, key, q, controller.signal);
+    // The keyword pass is a SUPPLEMENT once semantic rows exist. Letting it
+    // throw here discarded rows the semantic pass had already found and turned
+    // a thin-but-real result into "blueprint query failed" — a false absence
+    // manufactured by the more reliable path being taken down by the less
+    // reliable one. A budget error still propagates: that means the invocation
+    // is out of reads, which the caller has to report rather than paper over.
+    let rpc: BlueprintRow[] | null = null;
+    let keyword: BlueprintRow[] = [];
+    let keywordFailed = false;
+    try {
+      rpc = await tryRpc(base, key, q, controller.signal);
+      keyword = rpc !== null ? rpc : await searchViaTables(base, key, q, controller.signal);
+    } catch (e) {
+      rethrowIfBudget(e);
+      if (!semantic.length) throw e; // nothing else to fall back on — report honestly
+      keywordFailed = true;
+      console.log(
+        `[blueprint] keyword pass failed, serving ${semantic.length} semantic row(s): ${e instanceof Error ? e.message : String(e)}`,
+      );
+    }
     // Semantic rows lead when they exist: they are the higher-precision path,
     // and MAX_ROWS clips from the tail.
     const found = semantic.length ? mergeRows(semantic, keyword) : keyword;
@@ -302,7 +342,9 @@ export async function searchBlueprint(
       `[blueprint] retrieval=${retrieval} rows=${result.rows.length} cached=0 age_ms=0` +
         `${cap.truncated ? " (truncated capped_by=max_rows)" : ""}` +
         `${result.thin ? " thin=1" : ""}` +
-        `${result.top_score !== undefined ? ` top_score=${result.top_score}` : ""}`,
+        `${keywordFailed ? " keyword=failed" : ""}` +
+        `${result.top_score !== undefined ? ` top_score=${result.top_score}` : ""}` +
+        logQuery(q),
     );
     searchCache.set(cacheKey, { at: Date.now(), result });
     return result;
@@ -466,10 +508,10 @@ const SOURCES: Source[] = [
   { table: "phases", kind: "phase", columns: ["name", "description"], select: "id,name,description" },
   { table: "service_scenarios", kind: "scenario", columns: ["name", "description"], select: "id,name,description" },
   { table: "steps", kind: "step", columns: ["name"], select: "id,name,scenario:service_scenarios(name)" },
-  // paths was missing entirely, so a path *named* "Future (roadmap)" could not
-  // be matched by keyword at all — the one retrieval path that can match a
-  // structural name rather than cell prose. The whole future-state branch of
-  // the blueprint was unreachable by name.
+  // paths was missing entirely, so a path named `Planned: …` / `Prototype: …`
+  // could not be matched by keyword at all — the one retrieval path that can
+  // match a structural name rather than cell prose. The whole future-state
+  // branch of the blueprint was unreachable by name.
   {
     table: "paths",
     kind: "path",
@@ -581,7 +623,8 @@ function normalize(src: Source, row: Record<string, unknown>): BlueprintRow | nu
 //
 // Search answers "where is X". Nothing answered "what EXISTS" — so a retrieval
 // miss and a real absence were indistinguishable, and the bot reported a path
-// named "Future (roadmap)" as non-existent because its query never reached it.
+// named `Planned: …` / `Prototype: …` as non-existent because its query never
+// reached it.
 // The index is the structural skeleton (phases › scenarios › path counts) read
 // live, so an absence claim becomes a LOOKUP against a listing rather than an
 // inference from an empty result set.

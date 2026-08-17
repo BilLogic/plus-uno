@@ -63,11 +63,11 @@ test("the snippet drops the breadcrumb line the chunk repeats", () => {
 
 test("the new title shape yields every segment, phase included", () => {
   const crumb = parseChunkTitle(
-    "Phase: In-session · Scenario: Wrap-Up · Path: Future (roadmap) (named) · Step: Lead tutor writes the post-session reflection · Layer: Lead Tutor",
+    "Phase: In-session · Scenario: Wrap-Up · Path: Prototype: Reflection redesign (named) · Step: Lead tutor writes the post-session reflection · Layer: Lead Tutor",
   );
   assert.equal(crumb.phase, "In-session");
   assert.equal(crumb.scenario, "Wrap-Up");
-  assert.equal(crumb.path, "Future (roadmap) (named)");
+  assert.equal(crumb.path, "Prototype: Reflection redesign (named)");
   assert.equal(crumb.step, "Lead tutor writes the post-session reflection");
   assert.equal(crumb.layer, "Lead Tutor");
 });

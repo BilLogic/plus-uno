@@ -7,25 +7,51 @@
 // are the parts with real logic and no I/O, so they live where tests can reach
 // them. blueprint.ts re-exports them; callers import from either.
 
-/** The path name that marks a scenario's future/roadmap branch. Matched
- *  EXACTLY against `paths.name` — never `path_type`, and never as a substring
- *  (blueprint-navigation.md § 4). A false marker promises a roadmap branch that
- *  does not exist, which is the mirror image of the bug the index fixes. */
-export const FUTURE_PATH_NAME = "Future (roadmap)";
+/** The blueprint's two future-state path labels (blueprint-navigation.md § 4).
+ *
+ *  `Planned`   — decided and scheduled; code exists or the ship is committed.
+ *  `Prototype` — exploratory; a proposal, a design iteration, or a TBD that may
+ *                never ship.
+ *
+ *  Replaces the single `Future (roadmap)` name, which conflated the two and so
+ *  could only ever be reported with one confidence level. Both are matched as a
+ *  PREFIX of `paths.name` — `Planned`, or `Planned: <topic>` — never against
+ *  `path_type`, and never as a free substring (a path merely *mentioning*
+ *  "planned" mid-name is not a future path).
+ *
+ *  Prefix rather than exact match is also what makes this survive the semantic
+ *  path: chunk titles render the name with its type appended
+ *  ("Prototype: Reflection redesign (named)"), so an exact-match test silently
+ *  failed on every semantically retrieved row. */
+export const FUTURE_LABELS = ["Planned", "Prototype"] as const;
+export type FutureLabel = (typeof FUTURE_LABELS)[number];
 
-/** Ships with every index: an unexplained `*` is worse than no marker, and a
+/** The label a path name carries, or null for an ordinary current-state path. */
+export function futureLabel(pathName: string): FutureLabel | null {
+  const name = pathName.trim();
+  for (const label of FUTURE_LABELS) {
+    if (name === label || name.startsWith(`${label}:`)) return label;
+  }
+  return null;
+}
+
+/** Ships with every index: an unexplained marker is worse than no marker, and a
  *  legend carried in the payload cannot drift away from the data the way a
- *  prompt rule can. */
-export const INDEX_LEGEND = `* = has a ${FUTURE_PATH_NAME} path`;
+ *  prompt rule can. The labels are spelled out rather than abbreviated to a
+ *  symbol — the whole point is that the two mean different things. */
+export const INDEX_LEGEND =
+  "[Planned] = decided and scheduled, not yet shipped · [Prototype] = exploratory, may never ship · no marker = current state only";
 
 export interface BlueprintIndex {
-  /** e.g. "6 phases / 23 scenarios / 39 paths" — the denominator for any
-   *  "I looked and found nothing" claim. */
+  /** e.g. "6 phases / 22 scenarios / 38 paths", counted from THIS read — the
+   *  denominator for any "I looked and found nothing" claim. Never assert a
+   *  fixed figure anywhere in this repo: the board is edited daily, and every
+   *  hardcoded count written down so far has been wrong within the week. */
   scale: string;
-  /** Explains the `*` marker. */
+  /** Explains the `[Planned]` / `[Prototype]` markers. */
   legend: string;
   /** One compact line per phase, e.g.
-   *  `Application: Discovery(1), Interview & Offer(2)*`. */
+   *  `Application: Discovery(1), Interview & Offer(2)[Prototype]`. */
   phases: string[];
   /** ISO date the index was read. */
   readAt: string;
@@ -46,8 +72,8 @@ function nameOf(v: unknown): string {
 /**
  * Render the phases→scenarios→paths embed into the compact index.
  *
- * Deliberately names no paths. Inlining all 39 path names measured ~3x the
- * payload for information the count and the `*` already carry.
+ * Deliberately names no paths. Inlining every path name measured ~3x the
+ * payload for information the count and the labels already carry.
  *
  * @param data - Rows from the phases embed (anything else renders empty)
  * @param readAt - ISO date to stamp on the result
@@ -70,8 +96,13 @@ export function renderBlueprintIndex(data: unknown, readAt: string): BlueprintIn
       const raw = (scenario as { paths?: unknown }).paths;
       const named = (Array.isArray(raw) ? raw : []).map(nameOf);
       pathCount += named.length;
-      const future = named.includes(FUTURE_PATH_NAME) ? "*" : "";
-      parts.push(`${scenarioName}(${named.length})${future}`);
+      // Both labels can sit under one scenario (a shipped-soon change AND a
+      // separate exploration), so this is a set, not a first-match.
+      const labels = FUTURE_LABELS.filter((label) =>
+        named.some((n) => futureLabel(n) === label),
+      );
+      const marker = labels.length ? `[${labels.join(",")}]` : "";
+      parts.push(`${scenarioName}(${named.length})${marker}`);
     }
     // A phase with no scenarios still gets a line: "this phase exists and is
     // empty" is a different fact from "this phase does not exist", and only the

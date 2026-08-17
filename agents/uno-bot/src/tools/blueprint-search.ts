@@ -4,6 +4,7 @@
 // Runs inline in the agent loop (mirrors marketplace_search / find_experts).
 
 import type { Env } from "../types";
+import { rethrowIfBudget, SubrequestBudgetError } from "../net";
 import {
   searchBlueprint,
   isBlueprintConfigured,
@@ -15,8 +16,15 @@ import {
 
 /** Opt-in extra reads. One subrequest each, against a 50-per-invocation cap
  *  that a fallback search can already spend 5 of — so a status question does
- *  not pay for the impact graph it will never look at. */
-const INCLUDABLE = new Set(["edges", "findings", "slices"]);
+ *  not pay for the impact graph it will never look at.
+ *
+ *  `index` is here so the live table of contents is REACHABLE even while
+ *  BLUEPRINT_INDEX is off. Without it, turning the flag off left the bot with
+ *  less orientation than it had before this change: the static phase list was
+ *  deleted from the prompt and its live replacement was gated behind a flag
+ *  that ships off. The flag now controls only whether the index is attached
+ *  AUTOMATICALLY; asking for it always works. */
+const INCLUDABLE = new Set(["edges", "findings", "slices", "index"]);
 
 export async function executeBlueprintSearch(
   env: Env,
@@ -52,23 +60,45 @@ export async function executeBlueprintSearch(
     // additive — on 2026-08-06 a slack_search fix displaced an unrelated
     // instruction and broke a different eval case — so this is enabled in ONE DM
     // first and the judged evals are compared CASE BY CASE before it goes wide.
-    const index = env.BLUEPRINT_INDEX === "on" ? await fetchBlueprintIndex(env, { fresh }) : undefined;
-    // Mirrors how `retrieval` is surfaced: an OMITTED key is indistinguishable
-    // from "no future path exists", which regenerates the bug this fixes. The
-    // status is always stated when the feature is on.
-    const orientation: "live" | "unavailable" | undefined =
-      env.BLUEPRINT_INDEX === "on" ? (index ? "live" : "unavailable") : undefined;
-
     const include = Array.isArray(input.include)
       ? input.include.filter((i): i is string => typeof i === "string" && INCLUDABLE.has(i))
       : [];
+    const wantIndex = env.BLUEPRINT_INDEX === "on" || include.includes("index");
+    const index = wantIndex ? await fetchBlueprintIndex(env, { fresh }) : undefined;
+    // Mirrors how `retrieval` is surfaced: an OMITTED key is indistinguishable
+    // from "no future path exists", which regenerates the bug this fixes. The
+    // status is always stated when the index was asked for at all.
+    const orientation: "live" | "unavailable" | undefined = wantIndex
+      ? index
+        ? "live"
+        : "unavailable"
+      : undefined;
+
     const cellIds = rows.filter((r) => r.kind === "cell" && r.id).map((r) => r.id);
     // Sequential, not Promise.all: each is a metered subrequest and the budget
     // gate reads a running counter — firing them together can overshoot the cap
     // before the counter catches up.
-    const edges = include.includes("edges") ? await fetchEdges(env, cellIds) : undefined;
-    const findings = include.includes("findings") ? await fetchFindings(env, cellIds) : undefined;
-    const sliceRead = include.includes("slices") ? await fetchSlices(env, query) : undefined;
+    //
+    // Each one is also isolated. These are ENRICHMENTS of a search that has
+    // ALREADY succeeded: letting one of them throw sent the whole call to the
+    // catch below, which reports "couldn't reach the source of truth" — so a
+    // findings-table hiccup turned a good answer into a false absence. A budget
+    // error still propagates (rethrowIfBudget), because that one is not
+    // best-effort: it means the invocation is out of subrequests and the caller
+    // must say so rather than answer from a clipped read.
+    const optional = async <T>(want: boolean, read: () => Promise<T>, label: string) => {
+      if (!want) return undefined;
+      try {
+        return await read();
+      } catch (e) {
+        rethrowIfBudget(e);
+        console.log(`[blueprint_search] ${label} enrichment failed: ${e instanceof Error ? e.message : String(e)}`);
+        return undefined;
+      }
+    };
+    const edges = await optional(include.includes("edges"), () => fetchEdges(env, cellIds), "edges");
+    const findings = await optional(include.includes("findings"), () => fetchFindings(env, cellIds), "findings");
+    const sliceRead = await optional(include.includes("slices"), () => fetchSlices(env, query), "slices");
     const slices = sliceRead?.rows;
     const sliceTotal = sliceRead?.total;
 
@@ -89,13 +119,13 @@ export async function executeBlueprintSearch(
     // attached would be a FALSE-completeness claim, which is the original bug
     // wearing the fix's clothes.
     const conflictBase =
-      "These rows are the CURRENT journey UNLESS the `path` is named `Future (roadmap)` or the description opens `PLANNED (not shipped…)` — those are a planned redesign, so report them as planned, never as today. If a Notion doc in this conversation disagrees, surface the conflict (planned change vs obsolete doc, per the card's status) — never blend the two.";
+      "These rows are the CURRENT journey UNLESS the `path` name starts `Planned:` or `Prototype:` — `Planned` is decided and scheduled but NOT yet shipped (say \"is changing\"), `Prototype` is exploratory and may never ship (say \"might change\"). Never report either as how it works today. If a Notion doc in this conversation disagrees, surface the conflict (planned change vs obsolete doc, per the card's status) — never blend the two.";
     const conflict = index
       ? conflictBase
-      : `${conflictBase} Nothing here about a scenario's future is not proof it has none: re-query that scenario for a \`Future (roadmap)\` path before saying so.`;
+      : `${conflictBase} Nothing here about a scenario's future is not proof it has none: re-query that scenario for a \`Planned:\` or \`Prototype:\` path before saying so.`;
     // Emitted ONLY when an index is actually attached. One obligation, one field.
     const indexNote = index
-      ? "`index` is the COMPLETE live list of the blueprint's phases and scenarios, read just now. Use it to NAME the phase a scenario sits under rather than inferring one. You may assert that a scenario has no future state ONLY when its `index` entry shows no `Future (roadmap)` path; otherwise search that scenario before making any claim about its absence."
+      ? "`index` is the COMPLETE live list of the blueprint's phases and scenarios, read just now — including its own `scale` counts, which are the only counts to quote. Use it to NAME the phase a scenario sits under rather than inferring one. You may assert that a scenario has no future state ONLY when its `index` entry carries no `[Planned]` or `[Prototype]` marker; otherwise search that scenario before making any claim about its absence."
       : undefined;
     const orientationNote =
       orientation === "unavailable"
@@ -128,9 +158,18 @@ export async function executeBlueprintSearch(
     // no updated_at. Worth stating, because it is the PRIMARY path — so the
     // best-recall answers are also the least citable, and the model should not
     // imply row-level provenance it was never given.
+    //
+    // The breadcrumb list is COMPUTED, never spelled out: the phase segment is
+    // only in a chunk's title if the index was rebuilt after the phase join
+    // shipped, and for the whole life of this note before 2026-08-17 it was in
+    // zero of them. Promising a field the rows do not carry is what teaches the
+    // model to infer one — the exact failure this tool exists to prevent.
+    const crumbFields = (["phase", "scenario", "path", "step", "layer"] as const).filter((f) =>
+      rows.some((r) => typeof (r as unknown as Record<string, unknown>)[f] === "string"),
+    );
     const semanticCaveat =
       retrieval === "semantic"
-        ? "These came from semantic (vector) retrieval over indexed chunks. They carry the cell's id, breadcrumb (`phase`/`scenario`/`path`/`step`/`layer`) and `url`, but NOT the cell's authored `links` — cite them by breadcrumb and link them with `url`."
+        ? `These came from semantic (vector) retrieval over indexed chunks. They carry the cell's id, \`url\`, and these breadcrumb fields: ${crumbFields.length ? crumbFields.map((f) => `\`${f}\``).join("/") : "(none)"} — cite them by exactly those fields and link them with \`url\`. Any breadcrumb segment NOT listed is absent from this result: leave it out rather than inferring it.${crumbFields.includes("phase") ? "" : " In particular you do NOT have the phase here, so do not name one."} They do not carry the cell's authored \`links\`.`
         : undefined;
     const edgesNote = edges?.length
       ? "`edges` are ONE HOP from the matched cells. Each edge carries `kind`: `trigger` means the source sets the target in motion (temporal); `needs` means the source depends on the target existing (functional) — do not narrate a needs edge as something being \"set off\". `note` is the designer's own why-line when present. Name the neighbours as places to check; do NOT present this as a full impact analysis, and do not follow the chain further than the data shown. A real trace is sb:whatif in the IDE."
@@ -194,10 +233,25 @@ export async function executeBlueprintSearch(
             ].filter(Boolean),
     });
   } catch (err) {
+    // Two failures that read identically to the model unless separated. Running
+    // out of subrequests is NOT "the blueprint is unreachable" — the source is
+    // fine and the answer may well be in it; this invocation simply cannot
+    // spend another read. Narrating that as unreachable invites "so it's not in
+    // the blueprint", which is the false-absence bug arriving through the error
+    // path instead of the result path.
+    if (err instanceof SubrequestBudgetError) {
+      return JSON.stringify({
+        ok: false,
+        error: err.message,
+        reason: "subrequest_budget",
+        note: "This invocation ran OUT OF READ BUDGET before the query finished — the blueprint was reachable and this says NOTHING about whether the answer is in it. Do not report absence, do not fabricate. Say the lookup was cut short, and either answer from what you already have (labelled as partial) or offer to retry with a narrower question.",
+      });
+    }
     return JSON.stringify({
       ok: false,
       error: err instanceof Error ? err.message : String(err),
-      note: "Blueprint query failed — do not fabricate; tell the user you couldn't reach the source of truth.",
+      reason: "unreachable",
+      note: "Blueprint query failed — do not fabricate; tell the user you couldn't reach the source of truth. This is a failure to LOOK, not evidence of absence: never report the subject as missing from the blueprint on the strength of it.",
     });
   }
 }

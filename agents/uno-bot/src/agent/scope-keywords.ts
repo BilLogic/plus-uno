@@ -43,8 +43,8 @@ export const SCOPES: Record<ScopeName, Scope> = {
     label: "service blueprint",
     instruction:
       `Start in the service blueprint — most of it is the record of how the service works TODAY, ` +
-      `but paths named \`Future (roadmap)\` (\`path_type\` \`named\`, descriptions opening ` +
-      `\`PLANNED (not shipped…)\`) carry planned redesigns. Report those as planned, never as today, ` +
+      `but paths whose name starts \`Planned:\` (decided, scheduled, unshipped) or \`Prototype:\` ` +
+      `(exploratory, may never ship) carry future state. Report those as future, never as today, ` +
       `and never say a scenario has no future state without searching that scenario for one. ` +
       `Use blueprint_search first and answer from what it holds. ${NOT_THERE}`,
   },

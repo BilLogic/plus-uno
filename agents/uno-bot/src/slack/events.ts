@@ -455,7 +455,12 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // forces `fresh: true` on blueprint_search, injects a one-turn directive
   // naming the prior query, pulls the retrieval receipts off the DO, and turns
   // on the judge's correction gate. See loop-shared looksLikeCorrection.
-  const isCorrection = looksLikeCorrection(userText);
+  // TEXT-ONLY half of the test. The other half — "is there actually a previous
+  // reply to correct?" — needs the history, which is not loaded yet, so it is
+  // applied at `isCorrection` below. This value only decides whether to pull
+  // retrieval receipts off the DO, which is a cheap read and harmless when the
+  // guess is wrong.
+  const textReadsAsCorrection = looksLikeCorrection(userText);
 
   // Where the person's turn is running, so the Home-tab Stop button can find
   // it. Fire-and-forget: this is a convenience control and must never sit in
@@ -485,7 +490,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   let prd: Awaited<ReturnType<typeof extractPrdFromThreadRoot>>;
   try {
     [history, pending, prd] = await Promise.all([
-      buildThreadHistory(env, channel, convTs, event.thread_ts, userMsgTs, isCorrection),
+      buildThreadHistory(env, channel, convTs, event.thread_ts, userMsgTs, textReadsAsCorrection),
       loadPendingProposalByThread(env, channel, convTs),
       isThreadReply
         ? extractPrdFromThreadRoot(env, channel, event.thread_ts!)
@@ -644,6 +649,14 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // Receipts are attached to the USER turn of the exchange they describe (see
   // the append below for why), so the search is by receipt, not by role.
   const priorReceipt = [...history].reverse().find((t) => t.retrieval)?.retrieval;
+  // A correction needs something to correct. Without a previous assistant turn
+  // the directive tells the model to treat "your own earlier claim" as
+  // unverified when there is no earlier claim, and the judge gate demands the
+  // reply either cite a fetch made this turn or concede an error it never made
+  // — unsatisfiable by construction, so the first message of a conversation
+  // could only ever fail it. The text patterns lean broad on purpose; this is
+  // the guard that keeps that safe.
+  const isCorrection = textReadsAsCorrection && Boolean(priorAssistantTurn);
   if (isCorrection) {
     modelBlocks.push(correctionDirective(priorReceipt?.query));
     console.log(
