@@ -123,12 +123,155 @@ if (/<!--\s*\/?\s*ide-only\s*-->/i.test(assembled)) {
   process.exit(1);
 }
 
+// ── Blueprint instance-data drift guard ──────────────────────────────────────
+//
+// WHAT IT CATCHES: counts and membership lists about the blueprint's CONTENTS
+// baked into the harness. The blueprint changes daily; this bundle updates on
+// deploy. "There are 5 phases" was committed, bundled and shipping while there
+// were six (terminology.md, live find 2026-08-17), and the bot's answer was
+// wrong for as long as nobody re-read the file.
+//
+// The invariant: instance VOCABULARY is a contract (layer names, the
+// `Future (roadmap)` marker — those stay); instance INVENTORY is a bug (counts,
+// membership lists — those must be retrieved, per ADR-013 §6 "cache the
+// foundation, retrieve the rest").
+//
+// WHY IT RUNS ON `assembled`, NOT THE SOURCE FILES: `ide-only` regions are
+// stripped by then, which removes the SQL query recipes for free — so the
+// obvious false-positive source (`limit 5`, `union all select`) never reaches
+// the regex. That is also why this sits AFTER the surviving-marker check above:
+// if stripping didn't happen, the build has already failed.
+//
+// There is no PR CI in this repo — every workflow is `schedule` or
+// `workflow_dispatch` — so `npm run deploy` is the only real gate, which is why
+// the guard lives here rather than in a lint step nobody runs.
+
+// Nouns that make a nearby digit an inventory claim rather than a quantity.
+const BLUEPRINT_NOUNS = "phases|scenarios|paths|steps|layers|cells|path_steps|cell_triggers";
+// Explicit, per-line/block opt-out. REQUIRED rather than optional: the nav
+// guide deliberately keeps a historical rot ledger, and a guard with no escape
+// would either delete real content or be switched off wholesale.
+const INSTANCE_DATA_OK = /<!--\s*instance-data-ok:\s*.+?-->/i;
+// See the spelled-count pattern below — measured at 100% false positives.
+const SPELLED_COUNTS_ENABLED = false;
+
+const INSTANCE_DATA_PATTERNS = [
+  // "6 phases", "737 cells", "23 scenarios"
+  { name: "count-before-noun", re: new RegExp(String.raw`\b\d[\d,]*\s+(?:${BLUEPRINT_NOUNS})\b`, "i") },
+  // "phases: 6", "cells = 737", "scenarios (23)"
+  { name: "noun-before-count", re: new RegExp(String.raw`\b(?:${BLUEPRINT_NOUNS})\b\s*[:=(]\s*\d`, "i") },
+  // the markdown-table form: | `cells` | 737 |
+  { name: "table-row", re: new RegExp(String.raw`\|\s*\x60?(?:${BLUEPRINT_NOUNS})\x60?\s*\|\s*\d`, "i") },
+  // "there are 6 …" — an enumeration claim even when the noun drifts
+  { name: "there-are-n", re: /\bthere are \d+\b/i },
+  // SPELLED-OUT counts — MEASURED AND DISABLED, kept because the measurement is
+  // the useful part.
+  //
+  // It was added because the digit patterns are blind to the very find that
+  // motivated this guard: terminology.md enumerated the phases as a closed list
+  // of "five" when there were six — committed, bundled, shipping. But run
+  // against the real bundle it scored 4 hits and 4 FALSE POSITIVES ("Three
+  // paths" = retrieval paths, "two steps" = a procedure, "Three scenarios" = a
+  // heading, "three cells" = prose), while every digit pattern scored zero.
+  // English does not distinguish an inventory claim from a quantity, and at
+  // 100% FP this pattern would train people to ignore the guard.
+  //
+  // Flip to true only alongside a way to tell the two apart (e.g. requiring the
+  // word "blueprint" in the same sentence).
+  ...(SPELLED_COUNTS_ENABLED
+    ? [
+        {
+          name: "spelled-count-before-noun",
+          re: new RegExp(
+            String.raw`\b(?:two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s+(?:${BLUEPRINT_NOUNS})\b`,
+            "i",
+          ),
+        },
+      ]
+    : []),
+];
+
+function findInstanceData(text) {
+  // Dates are the dominant false positive ("2026-08-08", "verified 2026").
+  // Blanked, not deleted, so line numbers stay usable in the report.
+  const dateless = text
+    .replace(/\d{4}-\d{2}-\d{2}/g, "<date>")
+    .replace(/\b20\d\d\b/g, "<year>");
+  const lines = dateless.split("\n");
+
+  // The escape applies to the containing line AND the contiguous non-blank
+  // block it sits in — a markdown table carries one marker, not one per row.
+  const exempt = new Set();
+  lines.forEach((line, i) => {
+    if (!INSTANCE_DATA_OK.test(line)) return;
+    for (let j = i; j >= 0 && lines[j].trim(); j--) exempt.add(j);
+    for (let j = i; j < lines.length && lines[j].trim(); j++) exempt.add(j);
+    exempt.add(i);
+  });
+
+  const hits = [];
+  lines.forEach((line, i) => {
+    if (exempt.has(i)) return;
+    for (const { name, re } of INSTANCE_DATA_PATTERNS) {
+      const m = re.exec(line);
+      if (m) {
+        hits.push({ line: i + 1, pattern: name, match: m[0], text: line.trim().slice(0, 160) });
+        break; // one finding per line — the remediation is the same either way
+      }
+    }
+  });
+  return hits;
+}
+
+// ── LOG-ONLY FOR NOW ─────────────────────────────────────────────────────────
+// The false-positive rate is ESTIMATED, not measured, and this guard sits on
+// the one gate that can block a deploy. Run it in warn mode for a cycle, read
+// the findings, then flip THIS ONE LINE to true to make it blocking.
+const INSTANCE_DATA_GUARD_BLOCKING = false;
+
+const instanceDataHits = findInstanceData(assembled);
+if (instanceDataHits.length) {
+  const report =
+    `[bundle-harness] ${instanceDataHits.length} possible blueprint INSTANCE DATA hit(s) in the assembled harness:\n` +
+    instanceDataHits
+      .map((h) => `  assembled:${h.line}  (${h.pattern}: "${h.match}")\n    ${h.text}`)
+      .join("\n") +
+    "\n  -> Counts and membership lists about the blueprint's CONTENTS go stale between deploys and" +
+    "\n     ship as confident wrong answers. Delete the number and let blueprint_search retrieve it," +
+    "\n     or, if the figure is deliberate (a historical ledger, a fixed contract), mark the line/block:" +
+    "\n       <!-- instance-data-ok: why this number is allowed to be frozen -->";
+  if (INSTANCE_DATA_GUARD_BLOCKING) {
+    console.error(report);
+    process.exit(1);
+  }
+  console.warn(`${report}\n  (log-only: set INSTANCE_DATA_GUARD_BLOCKING = true in this script to make it blocking)`);
+}
+
 const outDir = path.join(here, "..", "src", "generated");
 mkdirSync(outDir, { recursive: true });
 const outFile = path.join(outDir, "harness.ts");
 const contents =
   "// GENERATED by scripts/bundle-harness.mjs — do not edit by hand. Run: npm run bundle:harness\n" +
   `export const HARNESS = ${JSON.stringify(assembled)};\n`;
+
+// `--check`: regenerate to memory and compare against the COMMITTED artifact
+// instead of writing. Every other generator in this repo has a --check
+// counterpart; this one did not, so a harness doc could be edited and the baked
+// copy left behind with nothing noticing until someone read the bot's answer.
+if (process.argv.includes("--check")) {
+  const current = existsSync(outFile) ? readFileSync(outFile, "utf8") : "";
+  if (current !== contents) {
+    console.error(
+      `[bundle-harness] ${outFile} is STALE — a bundled harness doc changed but the generated file was not regenerated.\n` +
+        `  committed: ${current.length} chars · regenerated: ${contents.length} chars\n` +
+        "  -> run `npm run bundle:harness` and commit src/generated/harness.ts.",
+    );
+    process.exit(1);
+  }
+  console.log(`[bundle-harness] --check OK (${assembled.length} chars from ${SKILL_PATHS.length} files)`);
+  process.exit(0);
+}
+
 writeFileSync(outFile, contents, "utf8");
 
 console.log(`[bundle-harness] wrote ${outFile} (${assembled.length} chars from ${SKILL_PATHS.length} files)`);

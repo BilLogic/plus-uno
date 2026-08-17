@@ -73,3 +73,42 @@ export function shouldRejectRevision(draft: string, revision: string): boolean {
   if (draftWords < 15) return false;
   return retainedVocabulary(draft, revision) < MIN_RETAINED_VOCABULARY;
 }
+
+// ── The mirror: too SIMILAR across turns is also a malfunction ────────────────
+//
+// Above, "the revision barely resembles the draft" means the judge malfunctioned.
+// The mirror case is the 2026-08-17 incident: told its answer was wrong, the bot
+// restated the same three links at greater length. Turn 2 shared nearly all of
+// turn 1's vocabulary — which is exactly what "minimal edit" looks like, except
+// here a minimal edit is the failure, not the goal.
+//
+// Same machinery, opposite threshold, and no model call: a correction is a
+// request to CHANGE the answer, so a reply that changes nothing has not
+// answered it.
+//
+// A shared preamble ("Here's what I found…") and a shared subject inflate this,
+// so the bar is set high — this fires on near-identity, not on family
+// resemblance.
+const STALLED_SIMILARITY = 0.85;
+// Below this the vocabulary test is noise (see shouldRejectRevision).
+const MIN_WORDS_FOR_STALL = 25;
+
+/**
+ * True when a post-correction reply is a restatement of the reply it was meant
+ * to correct.
+ *
+ * Only meaningful on a turn the Worker classified as a correction — on an
+ * ordinary follow-up, repeating yourself is often the right answer.
+ *
+ * @param priorReply - The assistant's previous turn (the one being corrected)
+ * @param newReply - The draft about to go out
+ */
+export function looksLikeStalledCorrection(priorReply: string, newReply: string): boolean {
+  if (wordSet(priorReply).size < MIN_WORDS_FOR_STALL) return false;
+  if (wordSet(newReply).size < MIN_WORDS_FOR_STALL) return false;
+  // Asymmetric in the same direction as retainedVocabulary: how much of the
+  // PRIOR reply survived. Adding a paragraph of new material does not rescue a
+  // reply that kept everything it was told was wrong, but it does mean the
+  // reverse ratio would look innocent — so the prior is the denominator.
+  return retainedVocabulary(priorReply, newReply) >= STALLED_SIMILARITY;
+}

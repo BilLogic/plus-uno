@@ -18,8 +18,19 @@
 
 import type { Env } from "../types";
 import { embedText, embeddingsConfigured } from "../vertex/embed";
-import { countedFetch, rethrowIfBudget } from "../net";
+import { countedFetch, rethrowIfBudget, subrequestBudgetSpent } from "../net";
 import { cellUrl, sliceUrl, parseChunkTitle, chunkBody } from "./blueprint-link";
+import {
+  renderBlueprintIndex,
+  semanticCap,
+  mergedCap,
+  type BlueprintIndex,
+  type BlueprintCappedBy,
+} from "./blueprint-index";
+
+// Re-exported so the tool layer has ONE import for the blueprint integration.
+export { renderBlueprintIndex, FUTURE_PATH_NAME } from "./blueprint-index";
+export type { BlueprintIndex, BlueprintCappedBy } from "./blueprint-index";
 
 const REQUEST_TIMEOUT_MS = 10000;
 const RPC_NAME = "search_blueprint";
@@ -33,16 +44,33 @@ const MAX_ROWS = 30;
 // SEMANTIC_SEARCH var to "off".
 const SEMANTIC_RPC = "match_corpus_chunks";
 const SEMANTIC_SCHEMA = "semantic_search";
-const SEMANTIC_MATCH_COUNT = 6;
+// Was 6, out of ~839 indexed chunks. A niche-but-real path ("Future (roadmap)"
+// under Wrap-Up) never made a top-6 cut against the mass of happy-path cells,
+// so the bot reported it does not exist. 15 is still one subrequest and one
+// response; the cost is response tokens, not latency or subrequest budget.
+const SEMANTIC_MATCH_COUNT = 15;
 // Cosine-similarity floor: below this, treat as no confident match and fall back
 // to keyword search. Tunable from the semantic-quality of real queries.
 const SEMANTIC_MIN_SIMILARITY = 0.5;
+// Below this many surviving semantic hits, ALSO run the keyword pass and merge.
+//
+// The tradeoff: the old code short-circuited on >= 1 hit above the floor, so a
+// single weak-but-passing vector match suppressed keyword search entirely — and
+// keyword is the ONLY path that can match a path *named* "Future (roadmap)"
+// (see SOURCES below). One extra subrequest, and only when the semantic result
+// is thin; a healthy semantic result (>= 3) still short-circuits exactly as
+// before, so the common case costs nothing.
+const SEMANTIC_THIN_RESULTS = 3;
 
 export interface BlueprintRow {
   kind: string;
   id: string;
   title: string;
   snippet?: string;
+  /** cells.description — the longer detail field. A cell can carry ALL of its
+   *  evidence here with an empty `content` (blueprint-navigation.md § 2), so
+   *  dropping it lost real answers. */
+  description?: string;
   /** For cells: the layer = actor/stage (e.g. "Regular Tutor", "Back Stage Actions"). */
   layer?: string;
   step?: string;
@@ -57,8 +85,9 @@ export interface BlueprintRow {
   /** cells.updated_at. The tool tells the model to flag a stale blueprint; it
    *  could not, because it was never given a date to judge. */
   updatedAt?: string;
-  /** Which path variant a semantic hit came from ("Happy Path (happy)"). Only
-   *  the indexed breadcrumb carries this; the table paths do not select it. */
+  /** The path variant (e.g. "Happy Path (happy)", "Future (roadmap) (named)").
+   *  On semantic hits it comes from the indexed breadcrumb; on keyword hits from
+   *  `paths.name` — never `path_type`, per blueprint-navigation.md § 4. */
   path?: string;
   /** Deep link that opens this row in the blueprint app. Present only when
    *  BLUEPRINT_APP_URL is set AND the row has an id to link to — a URL that
@@ -77,9 +106,29 @@ export type BlueprintRetrieval = "semantic" | "rpc" | "tables";
 export interface BlueprintSearchResult {
   rows: BlueprintRow[];
   retrieval: BlueprintRetrieval;
-  /** True when MAX_ROWS clipped the result — the model must be able to say
+  /** True when a cap clipped the result — the model must be able to say
    *  "there is more than this" instead of narrating a partial view as whole. */
   truncated: boolean;
+  /** Which cap did the clipping; null when nothing was clipped. */
+  capped_by: BlueprintCappedBy;
+  /** True when these rows came from the per-isolate cache rather than a fetch
+   *  made during THIS call.
+   *
+   *  AGENT.md requires a freshness claim ("I checked just now") to be backed by
+   *  a read this turn. Nothing distinguished a fetch from a cache hit, so the
+   *  claim was unauditable — and a user pushing back got the same rows while
+   *  being told they were re-fetched. */
+  cached: boolean;
+  /** How old the cached rows are, in ms. 0 on a fresh fetch. */
+  age_ms: number;
+  /** True when the semantic pass did NOT produce a healthy result
+   *  (fewer than SEMANTIC_THIN_RESULTS confident matches) — which includes the
+   *  case where it did not run at all. Thin means the keyword pass carried the
+   *  answer, so per-row `score` is absent or weak and confidence should follow. */
+  thin: boolean;
+  /** Best cosine similarity across the returned rows; absent when no row
+   *  carries a score (keyword-only result). */
+  top_score?: number;
 }
 
 /** cells.links is jsonb — authored by humans, so it arrives as bare URL strings
@@ -123,23 +172,63 @@ function terms(query: string): string[] {
   ).slice(0, 6);
 }
 
+export interface BlueprintSearchOptions {
+  /** Skip the 60s result cache and hit Supabase again.
+   *
+   *  WHY: the cache keys on the query's terms, so a user pushing back ("no,
+   *  check again — it IS in there") re-runs a near-identical query and gets the
+   *  SAME cached rows back, while the bot says it just re-checked. That is a
+   *  cache serving a lie, not a stale read.
+   *
+   *  INTENDED CALL SITE: the correction-detection path in
+   *  src/tools/blueprint-search.ts — when the turn is a user correction or an
+   *  explicit re-check, pass `{ fresh: true }`. Everything else keeps the
+   *  cache, which is what protects the subrequest budget on multi-step
+   *  questions. The fresh result still POPULATES the cache, so the re-check
+   *  costs one round trip, not every subsequent one. */
+  fresh?: boolean;
+}
+
 /**
  * Search the uno-blueprint. Tries the search_blueprint() RPC (1 subrequest);
  * falls back to direct table queries if the function isn't present. Throws
  * BlueprintUnavailableError when Supabase isn't configured at all. Read-only.
  */
-export async function searchBlueprint(env: Env, query: string): Promise<BlueprintSearchResult> {
+export async function searchBlueprint(
+  env: Env,
+  query: string,
+  options: BlueprintSearchOptions = {},
+): Promise<BlueprintSearchResult> {
   if (!isBlueprintConfigured(env)) {
     throw new BlueprintUnavailableError(
       "uno-blueprint not configured — missing SUPABASE_URL / SUPABASE_ANON_KEY",
     );
   }
   const q = query.trim();
-  if (!q) return { rows: [], retrieval: "tables", truncated: false };
+  if (!q) {
+    return {
+      rows: [],
+      retrieval: "tables",
+      truncated: false,
+      capped_by: null,
+      cached: false,
+      age_ms: 0,
+      thin: false,
+    };
+  }
 
   const cacheKey = terms(q).sort().join(" ");
-  const hit = searchCache.get(cacheKey);
-  if (hit && Date.now() - hit.at < CACHE_TTL_MS) return hit.result;
+  const hit = options.fresh ? undefined : searchCache.get(cacheKey);
+  if (hit && Date.now() - hit.at < CACHE_TTL_MS) {
+    const age = Date.now() - hit.at;
+    // A cache hit used to return here BEFORE any logging, so the failing thread
+    // looked like it never searched at all. One line per served result,
+    // whichever way it was served.
+    console.log(
+      `[blueprint] retrieval=${hit.result.retrieval} rows=${hit.result.rows.length} cached=1 age_ms=${age}`,
+    );
+    return { ...hit.result, cached: true, age_ms: age };
+  }
 
   const base = env.SUPABASE_URL!.replace(/\/+$/, "");
   const key = env.SUPABASE_ANON_KEY!;
@@ -147,30 +236,73 @@ export async function searchBlueprint(env: Env, query: string): Promise<Blueprin
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
     // Primary: semantic (vector) search. Any miss/failure → keyword paths below.
+    let semantic: BlueprintRow[] = [];
     if (env.SEMANTIC_SEARCH !== "off" && embeddingsConfigured(env)) {
       const sem = await trySemantic(env, base, key, q, controller.signal)
         .catch((e) => { rethrowIfBudget(e); return null; });
       if (sem && sem.length) {
-        console.log(`[blueprint] retrieval=semantic rows=${sem.length}`);
-        const result: BlueprintSearchResult = { rows: sem, retrieval: "semantic", truncated: false };
-        searchCache.set(cacheKey, { at: Date.now(), result });
-        return result;
+        semantic = sem;
+        // Short-circuit only on a HEALTHY semantic result. A thin one falls
+        // through to the keyword pass and the two get merged — see
+        // SEMANTIC_THIN_RESULTS for why one weak hit must not silence keyword.
+        // No withUrls() here: trySemantic already carries each row's `url`.
+        if (semantic.length >= SEMANTIC_THIN_RESULTS) {
+          // The vector pass asks for at most SEMANTIC_MATCH_COUNT chunks. A full
+          // house means the cut-off, not the corpus, ended the list — this
+          // shape used to report truncated:false, i.e. the MOST COMMON result
+          // claimed completeness while clipped.
+          const cap = semanticCap(semantic.length, SEMANTIC_MATCH_COUNT);
+          const result: BlueprintSearchResult = {
+            rows: semantic,
+            retrieval: "semantic",
+            ...cap,
+            cached: false,
+            age_ms: 0,
+            thin: false,
+            ...topScore(semantic),
+          };
+          console.log(
+            `[blueprint] retrieval=semantic rows=${semantic.length} cached=0 age_ms=0` +
+              `${cap.truncated ? " (truncated capped_by=semantic)" : ""}` +
+              `${result.top_score !== undefined ? ` top_score=${result.top_score}` : ""}`,
+          );
+          searchCache.set(cacheKey, { at: Date.now(), result });
+          return result;
+        }
       }
     }
 
     const rpc = await tryRpc(base, key, q, controller.signal);
-    const found = rpc !== null ? rpc : await searchViaTables(base, key, q, controller.signal);
-    const retrieval: BlueprintRetrieval = rpc !== null ? "rpc" : "tables";
+    const keyword = rpc !== null ? rpc : await searchViaTables(base, key, q, controller.signal);
+    // Semantic rows lead when they exist: they are the higher-precision path,
+    // and MAX_ROWS clips from the tail.
+    const found = semantic.length ? mergeRows(semantic, keyword) : keyword;
+    // Attribute the merged case to "semantic" — it is the path that ran first
+    // and the one whose caveat (chunks carry no authored `links`) still applies
+    // to part of the result.
+    const retrieval: BlueprintRetrieval = semantic.length ? "semantic" : rpc !== null ? "rpc" : "tables";
+    // Counted BEFORE the slice: after it, the overflow is invisible.
+    const cap = mergedCap(found.length, MAX_ROWS);
+    const rows = withUrls(env, found).slice(0, MAX_ROWS);
     const result: BlueprintSearchResult = {
-      rows: withUrls(env, found).slice(0, MAX_ROWS),
+      rows,
       retrieval,
-      truncated: found.length > MAX_ROWS,
+      ...cap,
+      cached: false,
+      age_ms: 0,
+      // Reaching here at all means the semantic pass was thin (or absent) —
+      // the healthy case short-circuited above.
+      thin: semantic.length < SEMANTIC_THIN_RESULTS,
+      ...topScore(rows),
     };
     // One line per search saying WHICH path served it. Without this the tool
     // degrades semantic → rpc → tables in silence, and answer quality drifts
     // with nothing to attribute it to.
     console.log(
-      `[blueprint] retrieval=${retrieval} rows=${result.rows.length}${result.truncated ? " (truncated)" : ""}`,
+      `[blueprint] retrieval=${retrieval} rows=${result.rows.length} cached=0 age_ms=0` +
+        `${cap.truncated ? " (truncated capped_by=max_rows)" : ""}` +
+        `${result.thin ? " thin=1" : ""}` +
+        `${result.top_score !== undefined ? ` top_score=${result.top_score}` : ""}`,
     );
     searchCache.set(cacheKey, { at: Date.now(), result });
     return result;
@@ -192,6 +324,46 @@ function withUrls(env: Env, rows: BlueprintRow[]): BlueprintRow[] {
   return rows.map((row) =>
     row.kind === "cell" && row.id ? { ...row, url: cellUrl(env.BLUEPRINT_APP_URL, row.id) } : row,
   );
+}
+
+/** Text signature used to spot the same cell arriving from two paths.
+ *
+ *  Ids alone cannot dedupe across paths on older deployments (migration 0002
+ *  added `source_key` to the match function's return; before it, semantic rows
+ *  have no id). This compares the body text instead — and it can compare it
+ *  directly, because `chunkBody` has already stripped the breadcrumb line the
+ *  semantic chunk repeats, so both paths present plain cell prose.
+ *
+ *  Deliberately loose. A missed duplicate costs tokens; a false merge would
+ *  delete evidence, so it errs toward keeping both. */
+function signature(row: BlueprintRow): string {
+  return (row.snippet ?? row.title ?? "").toLowerCase().replace(/\s+/g, " ").trim().slice(0, 120);
+}
+
+/** Best per-row similarity, as a spreadable partial so an absent score omits
+ *  the key rather than emitting `top_score: undefined` into the tool payload.
+ *
+ *  Every row already carried `score`; nothing ever read it, so "was this a
+ *  confident match or the best of a bad set?" was computed and thrown away on
+ *  every search. */
+function topScore(rows: BlueprintRow[]): { top_score?: number } {
+  let best: number | undefined;
+  for (const r of rows) {
+    if (typeof r.score === "number" && (best === undefined || r.score > best)) best = r.score;
+  }
+  return best === undefined ? {} : { top_score: best };
+}
+
+/** Semantic rows first, then the keyword rows that add something new. */
+function mergeRows(semantic: BlueprintRow[], keyword: BlueprintRow[]): BlueprintRow[] {
+  const seen = new Set(semantic.map(signature).filter(Boolean));
+  const extra = keyword.filter((r) => {
+    const sig = signature(r);
+    if (sig && seen.has(sig)) return false;
+    if (sig) seen.add(sig);
+    return true;
+  });
+  return [...semantic, ...extra];
 }
 
 // Embed the query + call semantic_search.match_corpus_chunks. Returns null on
@@ -248,6 +420,11 @@ async function trySemantic(
         layer: crumb.layer,
         step: crumb.step,
         scenario: crumb.scenario,
+        // The breadcrumb's leading `Phase:` segment (migration 0004). Without it
+        // the model cannot cite `phase › scenario › path — layer × step` on the
+        // PRIMARY retrieval path, and guesses the phase from a scenario name
+        // that sounds like one.
+        phase: crumb.phase,
         path: crumb.path,
         score: typeof r.similarity === "number" ? Math.round(r.similarity * 1000) / 1000 : undefined,
         updatedAt: typeof r.updated_at === "string" ? r.updated_at.slice(0, 10) : undefined,
@@ -289,15 +466,28 @@ const SOURCES: Source[] = [
   { table: "phases", kind: "phase", columns: ["name", "description"], select: "id,name,description" },
   { table: "service_scenarios", kind: "scenario", columns: ["name", "description"], select: "id,name,description" },
   { table: "steps", kind: "step", columns: ["name"], select: "id,name,scenario:service_scenarios(name)" },
+  // paths was missing entirely, so a path *named* "Future (roadmap)" could not
+  // be matched by keyword at all — the one retrieval path that can match a
+  // structural name rather than cell prose. The whole future-state branch of
+  // the blueprint was unreachable by name.
+  {
+    table: "paths",
+    kind: "path",
+    columns: ["name", "description"],
+    select: "id,name,description,scenario:service_scenarios(name)",
+  },
   {
     table: "cells",
     kind: "cell",
-    columns: ["content"],
+    // `description` was not searchable — which is why cells whose evidence
+    // begins "PLANNED (not shipped as of Aug 2026):" never matched a keyword
+    // query about planned/future work.
+    columns: ["content", "description"],
     // Spec columns ride along (function/form/value_props/owner/perceived_owner
     // are public-read): "who owns this touchpoint / what does it do" questions
     // were answered "not in the blueprint" while the data sat one select away.
     select:
-      "id,content,function,form,value_props,owner,perceived_owner,links,updated_at,layer:layers(name,owner_team,kpis),step:steps(name),path:paths(name,scenario:service_scenarios(name))",
+      "id,content,description,function,form,value_props,owner,perceived_owner,links,updated_at,layer:layers(name,owner_team,kpis),step:steps(name),path:paths(name,scenario:service_scenarios(name,phase:phases(name)))",
   },
 ];
 
@@ -344,17 +534,35 @@ function normalize(src: Source, row: Record<string, unknown>): BlueprintRow | nu
   const scenarioName = (row.scenario as { name?: string } | undefined)?.name;
   if (src.kind === "cell") {
     const content = typeof row.content === "string" ? row.content.trim() : "";
-    if (!content) return null;
-    const path = row.path as { scenario?: { name?: string } } | undefined;
+    const description = typeof row.description === "string" ? row.description.trim() : "";
+    const links = normalizeLinks(row.links);
+    // A cell can carry ALL of its evidence in `description` or `links` with an
+    // empty `content` (blueprint-navigation.md § 2: "A cell can carry real
+    // evidence with an empty content ... Check all four before calling a topic
+    // empty"). Dropping on empty content silently deleted exactly the rows a
+    // description-matched query had just found.
+    if (!content && !description && !links?.length) return null;
+    const path = row.path as
+      | { name?: string; scenario?: { name?: string; phase?: { name?: string } } }
+      | undefined;
+    const layer = (row.layer as { name?: string } | undefined)?.name;
+    const step = (row.step as { name?: string } | undefined)?.name;
+    // Falls back to the cell's coordinate so a links-only cell still has a
+    // human-readable handle instead of an empty title.
+    const primary =
+      content || description || [layer, step].filter(Boolean).join(" × ") || "(cell)";
     return {
       kind: "cell",
       id,
-      title: content.slice(0, 80),
-      snippet: content,
-      layer: (row.layer as { name?: string } | undefined)?.name,
-      step: (row.step as { name?: string } | undefined)?.name,
+      title: primary.slice(0, 80),
+      snippet: content || undefined,
+      description: description || undefined,
+      layer,
+      step,
+      path: path?.name,
       scenario: path?.scenario?.name,
-      links: normalizeLinks(row.links),
+      phase: path?.scenario?.phase?.name,
+      links,
       updatedAt: typeof row.updated_at === "string" ? row.updated_at.slice(0, 10) : undefined,
     };
   }
@@ -369,6 +577,96 @@ function normalize(src: Source, row: Record<string, unknown>): BlueprintRow | nu
   };
 }
 
+// ── Live table of contents ───────────────────────────────────────────────────
+//
+// Search answers "where is X". Nothing answered "what EXISTS" — so a retrieval
+// miss and a real absence were indistinguishable, and the bot reported a path
+// named "Future (roadmap)" as non-existent because its query never reached it.
+// The index is the structural skeleton (phases › scenarios › path counts) read
+// live, so an absence claim becomes a LOOKUP against a listing rather than an
+// inference from an empty result set.
+//
+// The renderer is pure and lives in ./blueprint-index (where unit tests can
+// reach it); only the read and its cache are here.
+
+/** Orientation TTL. Ten minutes, versus 60s for search results: the structure
+ *  changes when someone adds a scenario, not when someone asks a question. */
+const INDEX_TTL_MS = 600_000;
+
+/** Module-scope SINGLE slot — the index takes no arguments, so there is exactly
+ *  one value to cache per isolate. See fetchBlueprintIndex for why `fresh` does
+ *  NOT clear it. */
+let indexCache: { at: number; index: BlueprintIndex } | undefined;
+
+/**
+ * Read the live index: one PostgREST call, both FKs declared so the two-level
+ * embed resolves server-side (6 phases / 23 scenarios / 39 paths ≈ 2.3KB).
+ *
+ * Returns undefined rather than throwing on any failure — same degradation
+ * posture as fetchEdges/fetchRows. The caller distinguishes "unavailable" from
+ * "no future path exists"; an omitted key that reads as absence is the exact
+ * bug this exists to fix.
+ *
+ * @param env - Worker env (SUPABASE_URL / SUPABASE_ANON_KEY)
+ * @param opts - `fresh` is accepted for signature symmetry with
+ *   searchBlueprint and DELIBERATELY does not bust this cache. Orientation is
+ *   per-isolate STRUCTURAL data, not per-query data: a user pushing back
+ *   re-queries cells, and re-reading the same 23 scenarios each time would
+ *   multiply index fetches against LOOKUP_CEILING = 38 (loop-shared.ts) —
+ *   three searches a turn already cost 36. The TTL, not the caller, decides.
+ */
+export async function fetchBlueprintIndex(
+  env: Env,
+  opts: { fresh?: boolean } = {},
+): Promise<BlueprintIndex | undefined> {
+  void opts.fresh; // see @param — intentionally ignored, not forgotten
+  if (!isBlueprintConfigured(env)) return undefined;
+
+  const hit = indexCache;
+  if (hit && Date.now() - hit.at < INDEX_TTL_MS) return hit.index;
+
+  // Checked BEFORE the fetch, and never caught-and-swallowed after it: the
+  // index is an enrichment on a search that has ALREADY succeeded, so it must
+  // not be the call that trips the ceiling and unwinds that search. (The check
+  // itself records a budget trip, so the boundary still learns the turn
+  // returned less than it was asked for.)
+  if (subrequestBudgetSpent()) {
+    console.warn("[blueprint] index read failed (subrequest budget spent)");
+    return undefined;
+  }
+
+  const base = env.SUPABASE_URL!.replace(/\/+$/, "");
+  const select = "name,service_scenarios(name,paths(name))";
+  const url =
+    `${base}/rest/v1/phases?select=${encodeURIComponent(select)}` +
+    `&order=order_position&service_scenarios.order=order_position`;
+  try {
+    const res = await countedFetch(
+      url,
+      { headers: headers(env.SUPABASE_ANON_KEY!) },
+      REQUEST_TIMEOUT_MS,
+    );
+    if (!res.ok) {
+      console.warn(`[blueprint] index read failed (${res.status})`);
+      return undefined;
+    }
+    const data = await res.json().catch(() => null);
+    if (!Array.isArray(data)) {
+      console.warn("[blueprint] index read failed (unexpected payload)");
+      return undefined;
+    }
+    const index = renderBlueprintIndex(data, new Date().toISOString().slice(0, 10));
+    indexCache = { at: Date.now(), index };
+    return index;
+  } catch (e) {
+    // rethrowIfBudget FIRST: a swallowed budget stop would report the structure
+    // as unreadable when it was merely unaffordable — the false-absence bug.
+    rethrowIfBudget(e);
+    console.warn(`[blueprint] index read failed (${(e as Error)?.message ?? "error"})`);
+    return undefined;
+  }
+}
+
 // ── Opt-in reads: edges, findings, slices ────────────────────────────────────
 //
 // These answer questions cells alone cannot — "what breaks if we drop X",
@@ -378,7 +676,8 @@ function normalize(src: Source, row: Record<string, unknown>): BlueprintRow | nu
 // policies").
 //
 // OPT-IN, not automatic. Each is one subrequest against a 50-per-invocation
-// cap that a blueprint fallback search can already spend 5 of. A status
+// cap that a blueprint fallback search can already spend BLUEPRINT_TABLE_FANOUT
+// of (one per entry in SOURCES — 5 since `paths` was added). A status
 // question must not pay for the impact graph it will never look at.
 
 export interface BlueprintEdge {

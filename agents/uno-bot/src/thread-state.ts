@@ -23,6 +23,29 @@ import type { Env } from "./types";
 export interface HistoryTurn {
   role: "user" | "assistant";
   content: string;
+  /** Slack ts of the message this turn was delivered as, when known.
+   *
+   *  The merge key for `retrieval` below. buildThreadHistory (slack/events.ts)
+   *  rebuilds history from the RAW Slack thread and returns without touching
+   *  this store on the common path, so a receipt recorded only here would be
+   *  invisible everywhere except the fallback path. Matching on ts is what
+   *  makes it reachable. */
+  ts?: string;
+  /** What this turn actually retrieved — the tool, the query, and the shape of
+   *  what came back. Rows are deliberately NOT persisted.
+   *
+   *  WHY IT EXISTS: with `{role, content}` only, turn 1's claim sits in turn 2's
+   *  context as authoritative prose with no counter-evidence. A user correcting
+   *  the bot is then arguing against the record. The receipt gives the next turn
+   *  something to check the prose against, and names the query that must not be
+   *  reissued verbatim. */
+  retrieval?: {
+    tool: string;
+    query: string;
+    path?: string;
+    count: number;
+    scenarios: string[];
+  };
 }
 
 interface HistoryRecord {

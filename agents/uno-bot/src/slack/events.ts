@@ -1,7 +1,12 @@
 import type { Env } from "../types";
 import { charge } from "../net";
 import { runAgent, type AgentResult } from "../agent/run-agent";
-import { bareResolution } from "../agent/loop-shared";
+import {
+  bareResolution,
+  looksLikeCorrection,
+  correctionDirective,
+  withTurnScope,
+} from "../agent/loop-shared";
 import { routeRequest } from "../agent/routing";
 import { resolveProposal } from "../agent/resolve-proposal";
 import {
@@ -444,6 +449,14 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   const userText = scoped ? scoped.text : rawText;
   if (scoped) console.log(`[scope] ${scoped.scope.name}`);
 
+  // Is the person telling us the last reply was wrong? Classified in the Worker,
+  // not left to the prompt: on turn 2 the bot's own turn-1 claim is sitting in
+  // context as authoritative prose, and a prompt rule has to beat that. A hit
+  // forces `fresh: true` on blueprint_search, injects a one-turn directive
+  // naming the prior query, pulls the retrieval receipts off the DO, and turns
+  // on the judge's correction gate. See loop-shared looksLikeCorrection.
+  const isCorrection = looksLikeCorrection(userText);
+
   // Where the person's turn is running, so the Home-tab Stop button can find
   // it. Fire-and-forget: this is a convenience control and must never sit in
   // front of an answer.
@@ -472,7 +485,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   let prd: Awaited<ReturnType<typeof extractPrdFromThreadRoot>>;
   try {
     [history, pending, prd] = await Promise.all([
-      buildThreadHistory(env, channel, convTs, event.thread_ts, userMsgTs),
+      buildThreadHistory(env, channel, convTs, event.thread_ts, userMsgTs, isCorrection),
       loadPendingProposalByThread(env, channel, convTs),
       isThreadReply
         ? extractPrdFromThreadRoot(env, channel, event.thread_ts!)
@@ -624,6 +637,20 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     console.log(`[antecedent] read=${before.length} used=${usable.length} injected=${block ? "yes" : "no"}`);
   }
 
+  // The correction directive. Injected for ONE turn only (it is built from this
+  // message, never persisted), naming the query the previous turn ran so it
+  // cannot be reissued verbatim and called a re-check.
+  const priorAssistantTurn = [...history].reverse().find((t) => t.role === "assistant");
+  // Receipts are attached to the USER turn of the exchange they describe (see
+  // the append below for why), so the search is by receipt, not by role.
+  const priorReceipt = [...history].reverse().find((t) => t.retrieval)?.retrieval;
+  if (isCorrection) {
+    modelBlocks.push(correctionDirective(priorReceipt?.query));
+    console.log(
+      `[correction] detected prior_query=${priorReceipt?.query ?? "(none)"} receipt=${priorReceipt ? "yes" : "no"}`,
+    );
+  }
+
   // Phase 5 — structured state + drift detection. FLAGGED OFF by default; see
   // the header of context-state.ts for why this one does not get to ship on.
   if (env.CONTEXT_STATE === "on") {
@@ -726,8 +753,16 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   }, 75_000);
 
   let result: AgentResult;
+  // Which read-only tools ran, and what the last blueprint lookup retrieved.
+  // Collected by an AsyncLocalStorage scope rather than threaded through both
+  // provider loops' signatures (loop-shared withTurnScope). Both are needed
+  // AFTER the agent returns: the judge gates a correction on "cited something
+  // fetched this turn", and the receipt is persisted for the next turn.
+  let toolsUsedThisTurn: string[] = [];
+  let turnReceipt: HistoryTurn["retrieval"];
   try {
-    result = await runAgent({
+    const agentRun = await withTurnScope({ correction: isCorrection }, () =>
+      runAgent({
       env,
       userText: modelText,
       tierOverride: event.tierOverride,
@@ -751,7 +786,11 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       pending,
       assistantContext: panelContext ?? undefined,
       onInterim: postInterim,
-    });
+      }),
+    );
+    result = agentRun.result;
+    toolsUsedThisTurn = agentRun.tools;
+    turnReceipt = agentRun.receipt;
   } catch (err) {
     console.error(`[agent] failed: ${err instanceof Error ? err.message : String(err)}`);
     // Close the plan stream before the failure message, or the checklist sits
@@ -776,7 +815,17 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     // ONE cheap judge call against the condensed D1–D9 rubric, revised once on
     // a flagged failure. Short replies skip it entirely; any judge error or
     // timeout ships the original draft (fail open — see agent/draft-judge.ts).
-    const reviewed = await reviewDraft(env, { userText: modelText, draft: result.text });
+    // On a correction turn the judge ALSO gets the reply being corrected and the
+    // tools that ran, and the length floor is bypassed — the failing denial of
+    // 2026-08-17 was short, so the one turn the judge had something to catch is
+    // the one it sat out.
+    const reviewed = await reviewDraft(env, {
+      userText: modelText,
+      draft: result.text,
+      correction: isCorrection,
+      priorAssistantText: isCorrection ? priorAssistantTurn?.content : undefined,
+      toolsUsedThisTurn,
+    });
     const delivery = await postTextVerified(
       env,
       channel,
@@ -790,7 +839,19 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       planStreamTs ?? undefined,
     );
     planStreamTs = null;
-    await appendHistory(env, channel, convTs, { role: "user", content: vision.historyText });
+    // The receipt rides the USER turn, keyed by the user message's ts.
+    //
+    // It describes the TURN, not the message, and the user ts is the only id
+    // this path has: postTextVerified reports {ok, text} and not the ts it
+    // posted to, so the assistant message has no key to merge on. The user
+    // message's ts is in the same Slack thread buildThreadHistory rebuilds
+    // from, so the merge lands either way.
+    await appendHistory(env, channel, convTs, {
+      role: "user",
+      content: vision.historyText,
+      ts: userMsgTs,
+      ...(turnReceipt ? { retrieval: turnReceipt } : {}),
+    });
     if (delivery.ok) {
       // Record what was actually posted (capped/placeholder), not the raw text.
       await appendHistory(env, channel, convTs, { role: "assistant", content: delivery.text });
@@ -1067,13 +1128,25 @@ async function buildThreadHistory(
   convTs: string,
   threadTs: string | undefined,
   currentTs: string,
+  // Retrieval receipts live in the Durable Object, but this function rebuilds
+  // history from RAW SLACK TEXT and returns without touching the DO on the
+  // common path — so a receipt is invisible unless it is merged back in by
+  // message ts. That merge costs one extra DO hop, so it is only done on the
+  // turn that needs it: a correction, where "what did I actually look up last
+  // time" is the whole question.
+  wantReceipts = false,
 ): Promise<HistoryTurn[]> {
   if (!threadTs) return loadHistory(env, channel, convTs);
   try {
-    const [identity, replies] = await Promise.all([
+    const [identity, replies, stored] = await Promise.all([
       getBotIdentity(env),
       conversationsReplies(env, channel, threadTs, THREAD_HISTORY_LIMIT),
+      wantReceipts ? loadHistory(env, channel, convTs).catch(() => []) : Promise.resolve([]),
     ]);
+    const receiptsByTs = new Map<string, NonNullable<HistoryTurn["retrieval"]>>();
+    for (const t of stored) {
+      if (t.ts && t.retrieval) receiptsByTs.set(t.ts, t.retrieval);
+    }
     if (identity && replies.ok && replies.messages?.length) {
       const turns: HistoryTurn[] = [];
       for (const m of replies.messages) {
@@ -1081,7 +1154,13 @@ async function buildThreadHistory(
         const content = stripBotMentions(m.text ?? "").trim();
         if (!content) continue;
         const isBot = m.user === identity.userId || (!!m.bot_id && m.bot_id === identity.botId);
-        turns.push({ role: isBot ? "assistant" : "user", content });
+        const receipt = m.ts ? receiptsByTs.get(m.ts) : undefined;
+        turns.push({
+          role: isBot ? "assistant" : "user",
+          content,
+          ...(m.ts ? { ts: m.ts } : {}),
+          ...(receipt ? { retrieval: receipt } : {}),
+        });
       }
       if (turns.length) return turns;
     }
