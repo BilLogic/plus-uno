@@ -1,0 +1,1109 @@
+{
+  "summary": {
+    "ranAt": "2026-08-19T23:45:27.202Z",
+    "worker": "https://uno-bot.bryanhuang628.workers.dev",
+    "cases": 26,
+    "passed": 14,
+    "blockers": 14,
+    "blockerFailures": 5,
+    "recallOverall": 0.538,
+    "subrequestsAvg": 2.08,
+    "subrequestsMax": 3,
+    "byClass": {
+      "paraphrase": {
+        "cases": 6,
+        "passed": 6,
+        "recall": 1,
+        "mrr": 0.639
+      },
+      "exact-term": {
+        "cases": 5,
+        "passed": 5,
+        "recall": 1,
+        "mrr": 0.717
+      },
+      "structural-name": {
+        "cases": 10,
+        "passed": 0,
+        "recall": 0,
+        "mrr": 0
+      },
+      "aggregate": {
+        "cases": 3,
+        "passed": 3,
+        "recall": 1,
+        "mrr": 1
+      },
+      "absence": {
+        "cases": 2,
+        "passed": 0,
+        "recall": 0,
+        "mrr": 0
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "BR1",
+      "class": "paraphrase",
+      "blocker": true,
+      "q": "what happens if a tutor cancels less than 12 hours before the session",
+      "pass": true,
+      "rank": 3,
+      "reasons": [],
+      "retrieval": "semantic",
+      "top_score": 0.693,
+      "rows": 15,
+      "subrequests": 3,
+      "ms": 1345,
+      "top": [
+        {
+          "id": "a0000000-0000-4000-8000-000000170203",
+          "scenario": "Call-off Request",
+          "path": "Happy Path (happy)",
+          "step": "Files call-off (12h+, auto-approved)",
+          "layer": "Regular Tutor",
+          "score": 0.693
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000140204",
+          "scenario": "Standard Scheduling",
+          "path": "Happy Path (happy)",
+          "step": "Views schedule & syncs calendar",
+          "layer": "Front Stage Actions",
+          "score": 0.681
+        },
+        {
+          "id": "b0000000-0000-4000-8000-000000180303",
+          "scenario": "Call-off Request",
+          "path": "Late call-off (<12h) (exception)",
+          "step": "Files late call-off (<12h, immediate removal)",
+          "layer": "Regular Tutor",
+          "score": 0.676
+        }
+      ]
+    },
+    {
+      "id": "BR2",
+      "class": "paraphrase",
+      "blocker": true,
+      "q": "who creates the breakout rooms",
+      "pass": true,
+      "rank": 1,
+      "reasons": [],
+      "retrieval": "semantic",
+      "top_score": 0.647,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 426,
+      "top": [
+        {
+          "id": "a0000000-0000-4000-8000-000000180402",
+          "scenario": "Before Students Join",
+          "path": "Happy Path (happy)",
+          "step": "Prepare breakout rooms",
+          "layer": "Lead Tutor",
+          "score": 0.647
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000180406",
+          "scenario": "Before Students Join",
+          "path": "Happy Path (happy)",
+          "step": "Prepare breakout rooms",
+          "layer": "Front Stage Tech",
+          "score": 0.64
+        },
+        {
+          "id": "9d8bd23d-51e0-497b-9e2c-818511eb9b78",
+          "scenario": "Before Students Join",
+          "path": "Happy Path (happy)",
+          "step": "Prepare breakout rooms",
+          "layer": "Support Actions",
+          "score": 0.631
+        }
+      ]
+    },
+    {
+      "id": "BR3",
+      "class": "paraphrase",
+      "blocker": true,
+      "q": "who decides whether a call-off is excused",
+      "pass": true,
+      "rank": 1,
+      "reasons": [],
+      "retrieval": "semantic",
+      "top_score": 0.685,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 345,
+      "top": [
+        {
+          "id": "b0000000-0000-4000-8000-000000180507",
+          "scenario": "Call-off Request",
+          "path": "Late call-off (<12h) (exception)",
+          "step": "Supervisor review (pending/excuse)",
+          "layer": "Back Stage Actions",
+          "score": 0.685
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000170507",
+          "scenario": "Call-off Request",
+          "path": "Happy Path (happy)",
+          "step": "Supervisor review (pending/excuse)",
+          "layer": "Back Stage Actions",
+          "score": 0.671
+        },
+        {
+          "id": "b0000000-0000-4000-8000-000000180509",
+          "scenario": "Call-off Request",
+          "path": "Late call-off (<12h) (exception)",
+          "step": "Supervisor review (pending/excuse)",
+          "layer": "Support Actions",
+          "score": 0.663
+        }
+      ]
+    },
+    {
+      "id": "BR4",
+      "class": "paraphrase",
+      "blocker": true,
+      "q": "where do applicants first hear about PLUS",
+      "pass": true,
+      "rank": 4,
+      "reasons": [],
+      "retrieval": "semantic",
+      "top_score": 0.74,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 359,
+      "top": [
+        {
+          "id": "a0000000-0000-4000-8000-000000070206",
+          "scenario": "Discovery",
+          "path": "Happy Path (happy)",
+          "step": "Discovers PLUS",
+          "layer": "Front Stage Tech",
+          "score": 0.74
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000070503",
+          "scenario": "Discovery",
+          "path": "Happy Path (happy)",
+          "step": "Discovers PLUS",
+          "layer": "Regular Tutor",
+          "score": 0.733
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000070406",
+          "scenario": "Discovery",
+          "path": "Happy Path (happy)",
+          "step": "Discovers PLUS",
+          "layer": "Front Stage Tech",
+          "score": 0.731
+        }
+      ]
+    },
+    {
+      "id": "BR5",
+      "class": "paraphrase",
+      "blocker": true,
+      "q": "how does a tutor confirm a student actually showed up",
+      "pass": true,
+      "rank": 4,
+      "reasons": [],
+      "retrieval": "semantic",
+      "top_score": 0.659,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 271,
+      "top": [
+        {
+          "id": "a0000000-0000-4000-8000-000000180302",
+          "scenario": "Before Students Join",
+          "path": "Happy Path (happy)",
+          "step": "Share Zoom link",
+          "layer": "Lead Tutor",
+          "score": 0.659
+        },
+        {
+          "id": "b2000000-0000-4000-8000-000000000042",
+          "scenario": "Student Just Joined",
+          "path": "Happy Path (happy)",
+          "step": "Share screen and log in",
+          "layer": "Regular Tutor",
+          "score": 0.656
+        },
+        {
+          "id": "b0000000-0000-4000-8000-0000001e1207",
+          "scenario": "Reporting Hours",
+          "path": "Missed hours (unhappy)",
+          "step": "Supervisor follow-up",
+          "layer": "Back Stage Actions",
+          "score": 0.649
+        }
+      ]
+    },
+    {
+      "id": "BR6",
+      "class": "paraphrase",
+      "blocker": true,
+      "q": "how and when does a tutor get paid",
+      "pass": true,
+      "rank": 1,
+      "reasons": [],
+      "retrieval": "semantic",
+      "top_score": 0.727,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 342,
+      "top": [
+        {
+          "id": "a0000000-0000-4000-8000-0000001e0202",
+          "scenario": "Reporting Hours",
+          "path": "Happy Path (happy)",
+          "step": "Receive paycheck",
+          "layer": "Lead Tutor",
+          "score": 0.727
+        },
+        {
+          "id": "a0000000-0000-4000-8000-0000001e0203",
+          "scenario": "Reporting Hours",
+          "path": "Happy Path (happy)",
+          "step": "Receive paycheck",
+          "layer": "Regular Tutor",
+          "score": 0.726
+        },
+        {
+          "id": "b0000000-0000-4000-8000-0000001e1403",
+          "scenario": "Reporting Hours",
+          "path": "Missed hours (unhappy)",
+          "step": "Receive paycheck",
+          "layer": "Regular Tutor",
+          "score": 0.709
+        }
+      ]
+    },
+    {
+      "id": "BR7",
+      "class": "exact-term",
+      "blocker": true,
+      "q": "Handshake",
+      "pass": true,
+      "rank": 1,
+      "reasons": [],
+      "retrieval": "semantic",
+      "top_score": 0.601,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 222,
+      "top": [
+        {
+          "id": "a0000000-0000-4000-8000-000000070506",
+          "scenario": "Discovery",
+          "path": "Happy Path (happy)",
+          "step": "Discovers PLUS",
+          "layer": "Front Stage Tech",
+          "score": 0.601
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000070508",
+          "scenario": "Discovery",
+          "path": "Happy Path (happy)",
+          "step": "Discovers PLUS",
+          "layer": "Back Stage Tech",
+          "score": 0.59
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000070503",
+          "scenario": "Discovery",
+          "path": "Happy Path (happy)",
+          "step": "Discovers PLUS",
+          "layer": "Regular Tutor",
+          "score": 0.583
+        }
+      ]
+    },
+    {
+      "id": "BR8",
+      "class": "exact-term",
+      "blocker": true,
+      "q": "host key",
+      "pass": true,
+      "rank": 1,
+      "reasons": [],
+      "retrieval": "semantic",
+      "top_score": 0.565,
+      "rows": 7,
+      "subrequests": 3,
+      "ms": 460,
+      "top": [
+        {
+          "id": "802ecb88-257b-47a9-be10-dee9d320daf3",
+          "scenario": "Before Students Join",
+          "path": "Happy Path (happy)",
+          "step": "Open session",
+          "layer": "Back Stage Tech",
+          "score": 0.565
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000180303",
+          "scenario": "Before Students Join",
+          "path": "Happy Path (happy)",
+          "step": "Share Zoom link",
+          "layer": "Regular Tutor",
+          "score": 0.528
+        },
+        {
+          "id": "802ecb88-257b-47a9-be10-dee9d320daf3",
+          "scenario": "Before Students Join",
+          "step": "Open session",
+          "layer": "Back Stage Tech"
+        }
+      ]
+    },
+    {
+      "id": "BR9",
+      "class": "exact-term",
+      "blocker": true,
+      "q": "I-9",
+      "pass": true,
+      "rank": 3,
+      "reasons": [],
+      "retrieval": "semantic",
+      "top_score": 0.69,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 220,
+      "top": [
+        {
+          "id": "a0000000-0000-4000-8000-000000100509",
+          "scenario": "Tech Setup",
+          "path": "Happy Path (happy)",
+          "step": "Attend I-9 meeting",
+          "layer": "Support Actions",
+          "score": 0.69
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000100409",
+          "scenario": "Tech Setup",
+          "path": "Happy Path (happy)",
+          "step": "I-9 meeting",
+          "layer": "Support Actions",
+          "score": 0.687
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000100504",
+          "scenario": "Tech Setup",
+          "path": "Happy Path (happy)",
+          "step": "Attend I-9 meeting",
+          "layer": "Front Stage Actions",
+          "score": 0.655
+        }
+      ]
+    },
+    {
+      "id": "BR10",
+      "class": "exact-term",
+      "blocker": false,
+      "q": "Workday",
+      "pass": true,
+      "rank": 4,
+      "reasons": [],
+      "retrieval": "semantic",
+      "top_score": 0.677,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 304,
+      "top": [
+        {
+          "id": "b0000000-0000-4000-8000-0000001e1307",
+          "scenario": "Reporting Hours",
+          "path": "Missed hours (unhappy)",
+          "step": "Correct hours (late entry or next cycle)",
+          "layer": "Back Stage Actions",
+          "score": 0.677
+        },
+        {
+          "id": "a0000000-0000-4000-8000-0000001e0106",
+          "scenario": "Reporting Hours",
+          "path": "Happy Path (happy)",
+          "step": "Report hours",
+          "layer": "Front Stage Tech",
+          "score": 0.67
+        },
+        {
+          "id": "a0000000-0000-4000-8000-0000001e0308",
+          "scenario": "Reporting Hours",
+          "path": "Happy Path (happy)",
+          "step": "Approve hours",
+          "layer": "Back Stage Tech",
+          "score": 0.666
+        }
+      ]
+    },
+    {
+      "id": "BR11",
+      "class": "exact-term",
+      "blocker": false,
+      "q": "Call-Offs tab",
+      "pass": true,
+      "rank": 1,
+      "reasons": [],
+      "retrieval": "semantic",
+      "top_score": 0.702,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 192,
+      "top": [
+        {
+          "id": "b0000000-0000-4000-8000-000000180306",
+          "scenario": "Call-off Request",
+          "path": "Late call-off (<12h) (exception)",
+          "step": "Files late call-off (<12h, immediate removal)",
+          "layer": "Front Stage Tech",
+          "score": 0.702
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000170606",
+          "scenario": "Call-off Request",
+          "path": "Happy Path (happy)",
+          "step": "Final notification",
+          "layer": "Front Stage Tech",
+          "score": 0.698
+        },
+        {
+          "id": "b0000000-0000-4000-8000-000000180606",
+          "scenario": "Call-off Request",
+          "path": "Late call-off (<12h) (exception)",
+          "step": "Final notification",
+          "layer": "Front Stage Tech",
+          "score": 0.695
+        }
+      ]
+    },
+    {
+      "id": "BR12",
+      "class": "structural-name",
+      "blocker": true,
+      "q": "Prototype: Swap instead of call-off",
+      "pass": false,
+      "rank": 0,
+      "reasons": [
+        "path \"Prototype: Swap instead of call-off\": 0 row(s) in top-8, needed 2"
+      ],
+      "retrieval": "semantic",
+      "top_score": 0.723,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 278,
+      "top": [
+        {
+          "id": "f3480612-a69a-422f-abcc-a4623085d99f",
+          "scenario": "Call-off Request",
+          "path": "Prototype: Swap instead of call-off (named)",
+          "step": "Swaps into another session",
+          "layer": "Back Stage Actions",
+          "score": 0.723
+        },
+        {
+          "id": "fec27fac-dc90-4e12-a767-41667984cfb7",
+          "scenario": "Call-off Request",
+          "path": "Prototype: Swap instead of call-off (named)",
+          "step": "Swaps into another session",
+          "layer": "Front Stage Tech",
+          "score": 0.72
+        },
+        {
+          "id": "c06e243d-1987-43fa-a772-ad898f044fcd",
+          "scenario": "Call-off Request",
+          "path": "Prototype: Swap instead of call-off (named)",
+          "step": "Swaps into another session",
+          "layer": "Support Actions",
+          "score": 0.718
+        }
+      ]
+    },
+    {
+      "id": "BR13",
+      "class": "structural-name",
+      "blocker": true,
+      "q": "Planned: In-app session creation & reconfirmation",
+      "pass": false,
+      "rank": 0,
+      "reasons": [
+        "path \"Planned: In-app session creation & reconfirmation\": 0 row(s) in top-8, needed 1"
+      ],
+      "retrieval": "semantic",
+      "top_score": 0.73,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 316,
+      "top": [
+        {
+          "id": "8efe7e1d-1dd0-44df-88af-9fd4ad238ee1",
+          "scenario": "Standard Scheduling",
+          "path": "Planned: In-app session creation & reconfirmation (named)",
+          "step": "Creates & edits sessions in-app",
+          "layer": "Back Stage Tech",
+          "score": 0.73
+        },
+        {
+          "id": "1a79e45e-37f8-4224-b27f-0f5f6d56b2fe",
+          "scenario": "Standard Scheduling",
+          "path": "Planned: In-app session creation & reconfirmation (named)",
+          "step": "Creates & edits sessions in-app",
+          "layer": "Back Stage Actions",
+          "score": 0.715
+        },
+        {
+          "id": "a09c6939-bc46-40fe-9ea9-5e60208c9123",
+          "scenario": "Standard Scheduling",
+          "path": "Planned: In-app session creation & reconfirmation (named)",
+          "step": "Creates & edits sessions in-app",
+          "layer": "Front Stage Actions",
+          "score": 0.702
+        }
+      ]
+    },
+    {
+      "id": "BR14",
+      "class": "structural-name",
+      "blocker": true,
+      "q": "Prototype: Reflection redesign",
+      "pass": false,
+      "rank": 0,
+      "reasons": [
+        "path \"Prototype: Reflection redesign\": 0 row(s) in top-8, needed 1"
+      ],
+      "retrieval": "semantic",
+      "top_score": 0.668,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 310,
+      "top": [
+        {
+          "id": "e8a64bc5-4d0f-47c5-956d-e4a3521315b3",
+          "scenario": "Wrap-Up",
+          "path": "Prototype: Reflection redesign (named)",
+          "step": "Complete wrap-up",
+          "layer": "Support Actions",
+          "score": 0.668
+        },
+        {
+          "id": "3dc093bc-6c58-4071-b3e3-09b2d200f7ba",
+          "scenario": "Wrap-Up",
+          "path": "Prototype: Reflection redesign (named)",
+          "step": "Complete wrap-up",
+          "layer": "Front Stage Tech",
+          "score": 0.642
+        },
+        {
+          "id": "a29930ad-c72a-458a-a029-dc0575480007",
+          "scenario": "Wrap-Up",
+          "path": "Prototype: Reflection redesign (named)",
+          "step": "Complete wrap-up",
+          "layer": "Back Stage Tech",
+          "score": 0.64
+        }
+      ]
+    },
+    {
+      "id": "BR15",
+      "class": "structural-name",
+      "blocker": false,
+      "q": "Prototype: Soft-conflict sign-up gate",
+      "pass": false,
+      "rank": 0,
+      "reasons": [
+        "path \"Prototype: Soft-conflict sign-up gate\": 0 row(s) in top-8, needed 1"
+      ],
+      "retrieval": "semantic",
+      "top_score": 0.808,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 161,
+      "top": [
+        {
+          "id": "c75fb345-4aa6-47a1-b1ee-474d14d9b294",
+          "scenario": "Session Sign Up",
+          "path": "Prototype: Soft-conflict sign-up gate (named)",
+          "step": "Overlap check & acknowledgement",
+          "layer": "Support Actions",
+          "score": 0.808
+        },
+        {
+          "id": "646cabf1-2e09-4671-bb2a-34eee8c45eaa",
+          "scenario": "Session Sign Up",
+          "path": "Prototype: Soft-conflict sign-up gate (named)",
+          "step": "Overlap check & acknowledgement",
+          "layer": "Front Stage Tech",
+          "score": 0.79
+        },
+        {
+          "id": "27068c9b-76f0-4d2b-9988-f4f8b6dd6480",
+          "scenario": "Session Sign Up",
+          "path": "Prototype: Soft-conflict sign-up gate (named)",
+          "step": "Sign up",
+          "layer": "Regular Tutor",
+          "score": 0.768
+        }
+      ]
+    },
+    {
+      "id": "BR16",
+      "class": "structural-name",
+      "blocker": false,
+      "q": "Prototype: Supervisor-registration clearance",
+      "pass": false,
+      "rank": 0,
+      "reasons": [
+        "path \"Prototype: Supervisor-registration clearance\": 0 row(s) in top-8, needed 1"
+      ],
+      "retrieval": "semantic",
+      "top_score": 0.782,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 207,
+      "top": [
+        {
+          "id": "3351f41b-13c3-4323-8b11-536b202974a5",
+          "scenario": "Interview & Offer",
+          "path": "Prototype: Supervisor-registration clearance (named)",
+          "step": "Clearance confirmed (CPO/school)",
+          "layer": "Support Actions",
+          "score": 0.782
+        },
+        {
+          "id": "dbfb6712-7312-4737-a1a2-1cbd78adab9e",
+          "scenario": "Interview & Offer",
+          "path": "Prototype: Supervisor-registration clearance (named)",
+          "step": "Clearance confirmed (CPO/school)",
+          "layer": "Back Stage Actions",
+          "score": 0.779
+        },
+        {
+          "id": "050f9580-3811-4c9e-bed6-c385ac468c4a",
+          "scenario": "Interview & Offer",
+          "path": "Prototype: Supervisor-registration clearance (named)",
+          "step": "Submits candidate info form",
+          "layer": "Front Stage Tech",
+          "score": 0.761
+        }
+      ]
+    },
+    {
+      "id": "BR17",
+      "class": "structural-name",
+      "blocker": false,
+      "q": "Prototype: Lead Dashboard Wrap-Up",
+      "pass": false,
+      "rank": 0,
+      "reasons": [
+        "path \"Prototype: Lead Dashboard Wrap-Up\": 0 row(s) in top-8, needed 1"
+      ],
+      "retrieval": "semantic",
+      "top_score": 0.717,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 207,
+      "top": [
+        {
+          "id": "dbbde9f5-a666-4675-a24b-f5bf3b376434",
+          "scenario": "Wrap-Up",
+          "path": "Prototype: Lead Dashboard Wrap-Up (alternative)",
+          "step": "Complete wrap-up",
+          "layer": "Front Stage Tech",
+          "score": 0.717
+        },
+        {
+          "id": "7d47fc7c-071f-46be-914c-bcffbbaca729",
+          "scenario": "Wrap-Up",
+          "path": "Prototype: Lead Dashboard Wrap-Up (alternative)",
+          "step": "Close breakout sessions",
+          "layer": "Front Stage Tech",
+          "score": 0.695
+        },
+        {
+          "id": "bc172bd8-59e7-40a5-97da-bc6d94d66684",
+          "scenario": "Wrap-Up",
+          "path": "Prototype: Lead Dashboard Wrap-Up (alternative)",
+          "step": "Debrief with tutors",
+          "layer": "Front Stage Tech",
+          "score": 0.678
+        }
+      ]
+    },
+    {
+      "id": "BR18",
+      "class": "structural-name",
+      "blocker": true,
+      "q": "Set Goals Edge Case",
+      "pass": false,
+      "rank": 0,
+      "reasons": [
+        "path \"Set Goals Edge Case\": 0 row(s) in top-8, needed 1"
+      ],
+      "retrieval": "semantic",
+      "top_score": 0.744,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 212,
+      "top": [
+        {
+          "id": "a0000000-0000-4000-8000-000000c00203",
+          "scenario": "Goal Setting",
+          "path": "Set Goals Edge Case (named)",
+          "step": "Sees action color in dashboard is warning and CTA copy is 'Set Goals' within a mid-cycle goal check-in session.",
+          "layer": "Regular Tutor",
+          "score": 0.744
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000c00306",
+          "scenario": "Goal Setting",
+          "path": "Set Goals Edge Case (named)",
+          "step": "Click on 'Set Goals' CTA in the action column",
+          "layer": "Front Stage Tech",
+          "score": 0.742
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000c00206",
+          "scenario": "Goal Setting",
+          "path": "Set Goals Edge Case (named)",
+          "step": "Sees action color in dashboard is warning and CTA copy is 'Set Goals' within a mid-cycle goal check-in session.",
+          "layer": "Front Stage Tech",
+          "score": 0.741
+        }
+      ]
+    },
+    {
+      "id": "BR19",
+      "class": "structural-name",
+      "blocker": true,
+      "q": "Late call-off (<12h)",
+      "pass": false,
+      "rank": 0,
+      "reasons": [
+        "path \"Late call-off (<12h)\": 0 row(s) in top-8, needed 1"
+      ],
+      "retrieval": "semantic",
+      "top_score": 0.733,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 192,
+      "top": [
+        {
+          "id": "b0000000-0000-4000-8000-000000180306",
+          "scenario": "Call-off Request",
+          "path": "Late call-off (<12h) (exception)",
+          "step": "Files late call-off (<12h, immediate removal)",
+          "layer": "Front Stage Tech",
+          "score": 0.733
+        },
+        {
+          "id": "b0000000-0000-4000-8000-000000180606",
+          "scenario": "Call-off Request",
+          "path": "Late call-off (<12h) (exception)",
+          "step": "Final notification",
+          "layer": "Front Stage Tech",
+          "score": 0.72
+        },
+        {
+          "id": "b0000000-0000-4000-8000-000000180507",
+          "scenario": "Call-off Request",
+          "path": "Late call-off (<12h) (exception)",
+          "step": "Supervisor review (pending/excuse)",
+          "layer": "Back Stage Actions",
+          "score": 0.7
+        }
+      ]
+    },
+    {
+      "id": "BR20",
+      "class": "structural-name",
+      "blocker": false,
+      "q": "No or Few Students Join",
+      "pass": false,
+      "rank": 0,
+      "reasons": [
+        "path \"No or Few Students Join\": 0 row(s) in top-8, needed 1"
+      ],
+      "retrieval": "semantic",
+      "top_score": 0.653,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 153,
+      "top": [
+        {
+          "id": "b2000000-0000-4000-8000-000000000032",
+          "scenario": "Student Just Joined",
+          "path": "No or Few Students Join (unhappy)",
+          "step": "Post in school Slack channel",
+          "layer": "Lead Tutor",
+          "score": 0.653
+        },
+        {
+          "id": "b2000000-0000-4000-8000-000000000034",
+          "scenario": "Student Just Joined",
+          "path": "No or Few Students Join (unhappy)",
+          "step": "Post in school Slack channel",
+          "layer": "Front Stage Tech",
+          "score": 0.642
+        },
+        {
+          "id": "b2000000-0000-4000-8000-000000000035",
+          "scenario": "Student Just Joined",
+          "path": "No or Few Students Join (unhappy)",
+          "step": "Post in school Slack channel",
+          "layer": "Back Stage Actions",
+          "score": 0.622
+        }
+      ]
+    },
+    {
+      "id": "BR21",
+      "class": "structural-name",
+      "blocker": false,
+      "q": "Missed hours",
+      "pass": false,
+      "rank": 0,
+      "reasons": [
+        "path \"Missed hours\": 0 row(s) in top-8, needed 1"
+      ],
+      "retrieval": "semantic",
+      "top_score": 0.671,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 169,
+      "top": [
+        {
+          "id": "b0000000-0000-4000-8000-0000001e1105",
+          "scenario": "Reporting Hours",
+          "path": "Missed hours (unhappy)",
+          "step": "Miss reporting deadline",
+          "layer": "Back Stage Tech",
+          "score": 0.671
+        },
+        {
+          "id": "b0000000-0000-4000-8000-0000001e1302",
+          "scenario": "Reporting Hours",
+          "path": "Missed hours (unhappy)",
+          "step": "Correct hours (late entry or next cycle)",
+          "layer": "Lead Tutor",
+          "score": 0.671
+        },
+        {
+          "id": "b0000000-0000-4000-8000-0000001e1303",
+          "scenario": "Reporting Hours",
+          "path": "Missed hours (unhappy)",
+          "step": "Correct hours (late entry or next cycle)",
+          "layer": "Regular Tutor",
+          "score": 0.668
+        }
+      ]
+    },
+    {
+      "id": "BR22",
+      "class": "aggregate",
+      "blocker": false,
+      "q": "what happens during Warm-Up",
+      "pass": true,
+      "rank": 1,
+      "reasons": [],
+      "retrieval": "semantic",
+      "top_score": 0.655,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 117,
+      "top": [
+        {
+          "id": "a0000000-0000-4000-8000-000000040201",
+          "scenario": "Warm-Up",
+          "path": "Happy Path (happy)",
+          "step": "Greet Student",
+          "layer": "Partner Action: Teacher",
+          "score": 0.655
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000060102",
+          "scenario": "Warm-Up",
+          "path": "Alternate Path (alternative)",
+          "step": "Enter Breakout Room",
+          "layer": "Lead Tutor",
+          "score": 0.652
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000060101",
+          "scenario": "Warm-Up",
+          "path": "Alternate Path (alternative)",
+          "step": "Enter Breakout Room",
+          "layer": "Partner Action: Teacher",
+          "score": 0.651
+        }
+      ]
+    },
+    {
+      "id": "BR23",
+      "class": "aggregate",
+      "blocker": false,
+      "q": "walk me through goal setting",
+      "pass": true,
+      "rank": 1,
+      "reasons": [],
+      "retrieval": "semantic",
+      "top_score": 0.686,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 289,
+      "top": [
+        {
+          "id": "a0000000-0000-4000-8000-0000001f0403",
+          "scenario": "Goal Setting",
+          "path": "Set Goals (named)",
+          "step": "Explain to student what goal setting is",
+          "layer": "Regular Tutor",
+          "score": 0.686
+        },
+        {
+          "id": "a0000000-0000-4000-8000-0000001f0603",
+          "scenario": "Goal Setting",
+          "path": "Set Goals (named)",
+          "step": "Fill out goal settings and quantity with the student",
+          "layer": "Regular Tutor",
+          "score": 0.675
+        },
+        {
+          "id": "a0000000-0000-4000-8000-0000001f0701",
+          "scenario": "Goal Setting",
+          "path": "Set Goals (named)",
+          "step": "If prompted, fill out goal achievement strategy with the student",
+          "layer": "Partner Action: Teacher",
+          "score": 0.672
+        }
+      ]
+    },
+    {
+      "id": "BR24",
+      "class": "aggregate",
+      "blocker": false,
+      "q": "what are all the ways a tutor can miss a session",
+      "pass": true,
+      "rank": 1,
+      "reasons": [],
+      "retrieval": "semantic",
+      "top_score": 0.69,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 188,
+      "top": [
+        {
+          "id": "b0000000-0000-4000-8000-000000180103",
+          "scenario": "Call-off Request",
+          "path": "Late call-off (<12h) (exception)",
+          "step": "Initial need",
+          "layer": "Regular Tutor",
+          "score": 0.69
+        },
+        {
+          "id": "a0000000-0000-4000-8000-000000170203",
+          "scenario": "Call-off Request",
+          "path": "Happy Path (happy)",
+          "step": "Files call-off (12h+, auto-approved)",
+          "layer": "Regular Tutor",
+          "score": 0.688
+        },
+        {
+          "id": "b0000000-0000-4000-8000-000000180303",
+          "scenario": "Call-off Request",
+          "path": "Late call-off (<12h) (exception)",
+          "step": "Files late call-off (<12h, immediate removal)",
+          "layer": "Regular Tutor",
+          "score": 0.685
+        }
+      ]
+    },
+    {
+      "id": "BR25",
+      "class": "absence",
+      "blocker": false,
+      "q": "how do tutors submit expense reports",
+      "pass": false,
+      "rank": 0,
+      "reasons": [
+        "top_score 0.654 >= floor 0.5"
+      ],
+      "retrieval": "semantic",
+      "top_score": 0.654,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 140,
+      "top": [
+        {
+          "id": "a0000000-0000-4000-8000-0000001e0103",
+          "scenario": "Reporting Hours",
+          "path": "Happy Path (happy)",
+          "step": "Report hours",
+          "layer": "Regular Tutor",
+          "score": 0.654
+        },
+        {
+          "id": "a0000000-0000-4000-8000-0000001e0102",
+          "scenario": "Reporting Hours",
+          "path": "Happy Path (happy)",
+          "step": "Report hours",
+          "layer": "Lead Tutor",
+          "score": 0.652
+        },
+        {
+          "id": "a0000000-0000-4000-8000-0000001e0106",
+          "scenario": "Reporting Hours",
+          "path": "Happy Path (happy)",
+          "step": "Report hours",
+          "layer": "Front Stage Tech",
+          "score": 0.646
+        }
+      ]
+    },
+    {
+      "id": "BR26",
+      "class": "absence",
+      "blocker": false,
+      "q": "Acuity scheduling",
+      "pass": false,
+      "rank": 0,
+      "reasons": [
+        "top_score 0.607 >= floor 0.5"
+      ],
+      "retrieval": "semantic",
+      "top_score": 0.607,
+      "rows": 15,
+      "subrequests": 2,
+      "ms": 163,
+      "top": [
+        {
+          "id": "a0000000-0000-4000-8000-000000140204",
+          "scenario": "Standard Scheduling",
+          "path": "Happy Path (happy)",
+          "step": "Views schedule & syncs calendar",
+          "layer": "Front Stage Actions",
+          "score": 0.607
+        },
+        {
+          "id": "b0000000-0000-4000-8000-000000140306",
+          "scenario": "Standard Scheduling",
+          "path": "Happy Path (happy)",
+          "step": "Reconfirm availability",
+          "layer": "Front Stage Tech",
+          "score": 0.605
+        },
+        {
+          "id": "b0000000-0000-4000-8000-000000140303",
+          "scenario": "Standard Scheduling",
+          "path": "Happy Path (happy)",
+          "step": "Reconfirm availability",
+          "layer": "Regular Tutor",
+          "score": 0.603
+        }
+      ]
+    }
+  ]
+}
