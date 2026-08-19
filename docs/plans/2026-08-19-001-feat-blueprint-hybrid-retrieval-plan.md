@@ -257,9 +257,33 @@ A job red for two nights told nobody. Three changes, all landed:
 
 Typecheck clean, 102/102 tests pass.
 
-### Phase 1 — A retrieval-level eval
+### Phase 1 — A retrieval-level eval 🟡 BUILT 2026-08-19, NOT YET BASELINED
 
 **Repo:** plus-uno. **Effort:** medium. **Blocks:** Phases 2 and 3.
+
+**Status.** All three parts written, typechecked, committed
+(`620d2157`): `/debug/blueprint-search`, 26 cases in
+`docs/evals/fixtures/blueprint-retrieval-cases.json`, and
+`scripts/run-retrieval-evals.mjs` (+ `--self-test`, 11/11).
+
+Fixture validated against the live database: **19/19 cell ids exist and are
+embedded, 10/10 paths exist**, no dead references.
+
+**Remaining, and it gates Phase 2: the suite has never run.** The endpoint
+ships in the Worker, so it needs one `wrangler deploy`, then:
+
+```bash
+WORKER_URL=… DEBUG_TOKEN=… npm run evals:retrieval
+```
+
+Copy that run to `docs/evals/runs/2026-MM-DD-retrieval-baseline.json` and
+commit it. **Phase 2 must not start before that file exists** — without it
+there is no "before" and every later claim is unfalsifiable.
+
+**One expectation to hold onto:** the two `absence` cases should FAIL on the
+first run. That is the 0.5 floor sitting below the corpus's 0.586 minimum,
+measured rather than argued. If they pass, something about the measurement is
+wrong and it needs understanding before Phase 2 proceeds.
 
 Full agent turns are the wrong instrument for retrieval — 15 s each, model
 quota, LLM judge, and the answer's prose can be excellent while the rows behind
