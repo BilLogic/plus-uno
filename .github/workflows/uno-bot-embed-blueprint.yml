@@ -24,6 +24,10 @@ on:
   # 2026-07-16 — 588 chunks loaded — then removed. workflow_dispatch + the
   # nightly schedule are the standing triggers once this is on main.)
 
+permissions:
+  contents: read
+  issues: write # a blocked nightly is filed as an `automation-blocked` issue
+
 jobs:
   embed:
     runs-on: ubuntu-latest
@@ -31,7 +35,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "20"
+          node-version: "24"
       - name: Embed + upsert blueprint chunks
         env:
           SUPABASE_URL: "https://osybxeojvsqcwxkgnalm.supabase.co"
@@ -44,3 +48,49 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           EMBED_REGION: "us-central1"
         run: node agents/uno-bot/scripts/backfill-semantic-search.mjs
+
+      # A silent nightly is how this job rotted before: the orphan prune 403'd
+      # from 2026-08-18 (the semantic_search migration granted service_role
+      # select/insert/update but not delete) and nothing said so. Because the
+      # prune runs AFTER the upsert, the data looked healthy — embeddings
+      # current, chunks for deleted cells accumulating — so only the red run
+      # carried the signal, and nobody was watching Actions.
+      #
+      # One open `automation-blocked` issue at a time: re-comment on the
+      # existing one rather than filing a new issue every night.
+      - name: File an ops intake when the backfill is blocked
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          TITLE="uno-bot embed-blueprint: nightly backfill is blocked"
+
+          # `gh issue create --label X` errors when the label is missing —
+          # ensure it idempotently, same as harness-integrity-sweep.
+          gh label create automation-blocked --repo "$GITHUB_REPOSITORY" \
+            --description "A scheduled automation could not run — ops signal, not a design intake" \
+            --color B60205 || true
+
+          EXISTING=$(gh issue list --repo "$GITHUB_REPOSITORY" \
+            --label automation-blocked --state open \
+            --search "$TITLE in:title" --json number --jq '.[0].number // empty')
+
+          BODY="The nightly semantic_search backfill failed.
+
+          Run: $RUN_URL
+
+          The semantic index feeds \`blueprint_search\`'s primary retrieval path.
+          While this is red, embeddings stop refreshing and chunks for deleted
+          cells are never pruned — the bot can then cite a cell that no longer
+          exists and hand out a \`?cell=\` link that resolves to nothing.
+
+          Check the run log for the failing step before re-running."
+
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --repo "$GITHUB_REPOSITORY" --body "$BODY"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" \
+              --title "$TITLE" --label automation-blocked --body "$BODY"
+          fi
