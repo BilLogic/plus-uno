@@ -269,12 +269,27 @@ Typecheck clean, 102/102 tests pass.
 Fixture validated against the live database: **19/19 cell ids exist and are
 embedded, 10/10 paths exist**, no dead references.
 
-**Remaining, and it gates Phase 2: the suite has never run.** The endpoint
-ships in the Worker, so it needs one `wrangler deploy`, then:
+**Deployed 2026-08-19** — `uno-bot ok r67-2026-08-19`, endpoint live.
+
+Two things surfaced during that deploy, both now fixed: `BUILD` was still
+`r66-2026-08-08` (a stale stamp would have made the baseline unattributable —
+the exact failure the stamp exists to prevent), and `check:contract` was
+failing because the app repo's *canonical* `blueprintContract.ts` had never
+received the `Phase` breadcrumb segment the live view has emitted since
+2026-08-17. The gate was pointing the right way; nobody had followed it.
+Corrected against `pg_get_viewdef`, not against either repo's copy.
+
+Local wrangler needs Node ≥ 22 (`nvm use 22`); the repo default is v20.
+
+**Remaining, and it gates Phase 2: the suite has never run.**
 
 ```bash
-WORKER_URL=… DEBUG_TOKEN=… npm run evals:retrieval
+WORKER_URL=https://uno-bot.bryanhuang628.workers.dev DEBUG_TOKEN=… \
+  npm run evals:retrieval
 ```
+
+or dispatch `uno-bot-retrieval-evals.yml`, which reads `DEBUG_TOKEN` from
+repo secrets and now also runs automatically after every deploy.
 
 Copy that run to `docs/evals/runs/2026-MM-DD-retrieval-baseline.json` and
 commit it. **Phase 2 must not start before that file exists** — without it
