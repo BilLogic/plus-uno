@@ -17,6 +17,7 @@ import { runFigmaPoll } from "./figma-poll";
 import { buildSystemBlocks } from "./agent/skills";
 import { ensureHarnessCache } from "./gemini/cache";
 import { countedFetch, runMetered, subrequestsUsed, meterBreakdown, subrequestBudgetTrips, internalSubrequestsUsed } from "./net";
+import { searchBlueprint } from "./integrations/blueprint";
 
 export default {
   // Cron (wrangler.toml [triggers]) — the Figma library poll: detect DS
@@ -320,6 +321,53 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
       Object.assign(out, await probe(`table_${t}`, `/rest/v1/${t}?select=id&limit=1`));
     }
     return Response.json(out);
+  }
+
+  // GET /debug/blueprint-search?q=…  — the REAL searchBlueprint() result.
+  //
+  // WHY THIS EXISTS: /debug/eval scores full agent turns, which take ~15s, burn
+  // model quota, and judge the PROSE. An answer can read beautifully while the
+  // rows behind it are wrong, and the eval suite has no way to tell — it has
+  // been 19/19 green while 5% of the index pointed at deleted cells.
+  //
+  // This route returns row identity (ids, path, scenario, scores, which
+  // retrieval path answered) so a retrieval eval can assert recall@k directly:
+  // deterministic, model-free, seconds not minutes.
+  //
+  // `fresh=1` bypasses the 60s result cache — the eval must measure retrieval,
+  // not the cache. Auth-gated like every /debug route; read-only.
+  if (request.method === "GET" && url.pathname === "/debug/blueprint-search") {
+    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
+    const q = (url.searchParams.get("q") ?? "").trim();
+    if (!q) return Response.json({ ok: false, error: "missing ?q=" }, { status: 400 });
+    const started = Date.now();
+    try {
+      // Metered so the eval can report subrequest cost per query — the number
+      // Phase 3 is meant to move (worst case 8 -> 2 against a 50 cap).
+      const result = await runMetered(async () => {
+        const r = await searchBlueprint(env, q, { fresh: url.searchParams.get("fresh") !== "0" });
+        return { r, subrequests: subrequestsUsed() };
+      });
+      return Response.json({
+        ok: true,
+        build: BUILD,
+        q,
+        ms: Date.now() - started,
+        subrequests: result.subrequests,
+        ...result.r,
+      });
+    } catch (err) {
+      // Report the failure as a failure. A retrieval eval that reads an error
+      // as "no rows" would score a broken path as a recall miss and send
+      // someone tuning the ranker.
+      return Response.json({
+        ok: false,
+        build: BUILD,
+        q,
+        ms: Date.now() - started,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
   }
 
   // Manual firing of the Figma library poll (same code path as the cron).

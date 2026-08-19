@@ -1,0 +1,150 @@
+[
+  {
+    "_readme": "Retrieval-level eval cases for blueprint_search. Scored by agents/uno-bot/scripts/run-retrieval-evals.mjs against GET /debug/blueprint-search — NO model, NO judge, seconds not minutes. Every id below was read out of the live blueprint on 2026-08-19, never guessed. Assertions: expectCellIds (any-of within k), expectAllCellIds (all-of), expectPath/expectScenario (>= minMatches rows carry it), expectTopScoreBelow (absence). Classes: paraphrase | exact-term | structural-name | aggregate | absence. `blocker: true` cases must pass; the rest are diagnostics that report without failing the job."
+  },
+
+  { "id": "BR1", "class": "paraphrase", "blocker": true, "k": 5,
+    "q": "what happens if a tutor cancels less than 12 hours before the session",
+    "expectCellIds": ["b0000000-0000-4000-8000-000000180303"],
+    "note": "Cell says 'Files the late call-off in the app; removal is immediate'. The query shares almost no vocabulary with it — this is vector's job and keyword should miss." },
+
+  { "id": "BR2", "class": "paraphrase", "blocker": true, "k": 5,
+    "q": "who creates the breakout rooms",
+    "expectCellIds": ["a0000000-0000-4000-8000-000000180402"],
+    "note": "Before Students Join > Prepare breakout rooms > Lead Tutor ('Creates breakout rooms.'). Near-literal, so it should be easy — a miss here means something is badly wrong." },
+
+  { "id": "BR3", "class": "paraphrase", "blocker": true, "k": 5,
+    "q": "who decides whether a call-off is excused",
+    "expectCellIds": [
+      "a0000000-0000-4000-8000-000000170507",
+      "b0000000-0000-4000-8000-000000180507"
+    ],
+    "note": "Two cells share identical content across Happy and Late paths — either is correct. A golden set that demanded one would be scoring a coin flip." },
+
+  { "id": "BR4", "class": "paraphrase", "blocker": true, "k": 5,
+    "q": "where do applicants first hear about PLUS",
+    "expectCellIds": ["a0000000-0000-4000-8000-000000070506"],
+    "expectScenario": "Discovery", "minMatches": 1,
+    "note": "Answer is the single word 'Handshake' — a low-information cell that only the breadcrumb makes findable. Watch this one when Phase 2a changes the chunk body." },
+
+  { "id": "BR5", "class": "paraphrase", "blocker": true, "k": 8,
+    "q": "how does a tutor confirm a student actually showed up",
+    "expectCellIds": [
+      "a0000000-0000-4000-8000-000000040503",
+      "a0000000-0000-4000-8000-000000060503",
+      "f167a773-99f6-4a3e-b6d3-40776efd1eaa"
+    ],
+    "note": "'Marks the student present' — the canonical paraphrase case: no term overlap with 'confirm', 'actually showed up'." },
+
+  { "id": "BR6", "class": "paraphrase", "blocker": true, "k": 8,
+    "q": "how and when does a tutor get paid",
+    "expectCellIds": [
+      "a0000000-0000-4000-8000-0000001e0203",
+      "a0000000-0000-4000-8000-0000001e0202",
+      "b0000000-0000-4000-8000-0000001e1403"
+    ],
+    "note": "'Receives a biweekly paycheck.' Query says 'get paid' — synonym, not substring." },
+
+  { "id": "BR7", "class": "exact-term", "blocker": true, "k": 3,
+    "q": "Handshake",
+    "expectCellIds": ["a0000000-0000-4000-8000-000000070506"],
+    "note": "A proper noun that is semantically meaningless as a concept. Vector should struggle; keyword should nail it. This is the class the hybrid RPC exists for." },
+
+  { "id": "BR8", "class": "exact-term", "blocker": true, "k": 5,
+    "q": "host key",
+    "expectCellIds": ["802ecb88-257b-47a9-be10-dee9d320daf3"],
+    "note": "'Zoom/Pencil link + host key stored on session record' — appears in exactly one cell in the whole blueprint. Unambiguous ground truth." },
+
+  { "id": "BR9", "class": "exact-term", "blocker": true, "k": 8,
+    "q": "I-9",
+    "expectCellIds": [
+      "a0000000-0000-4000-8000-000000100503",
+      "a0000000-0000-4000-8000-000000100504",
+      "a0000000-0000-4000-8000-000000100403"
+    ],
+    "expectScenario": "Tech Setup", "minMatches": 2,
+    "note": "A hyphenated identifier — the shape tokenizers and ILIKE both handle badly. Also the case that would justify pg_trgm if to_tsvector alone cannot rank it." },
+
+  { "id": "BR10", "class": "exact-term", "blocker": false, "k": 8,
+    "q": "Workday",
+    "expectScenario": "Tech Setup", "minMatches": 1,
+    "note": "Tool name living on tech-layer cells. Non-blocking: those cells are near-duplicates of each other, so which one wins is not meaningful." },
+
+  { "id": "BR11", "class": "exact-term", "blocker": false, "k": 10,
+    "q": "Call-Offs tab",
+    "expectCellIds": [
+      "a0000000-0000-4000-8000-000000170206",
+      "b0000000-0000-4000-8000-000000180306",
+      "a0000000-0000-4000-8000-000000170606",
+      "b0000000-0000-4000-8000-000000180606"
+    ],
+    "note": "Four cells with byte-identical content ('PLUS App — Call-Offs tab'). Any one passing is the honest bar; ranking among identical text is noise." },
+
+  { "id": "BR12", "class": "structural-name", "blocker": true, "k": 8,
+    "q": "Prototype: Swap instead of call-off",
+    "expectPath": "Prototype: Swap instead of call-off", "minMatches": 2,
+    "note": "Path NAME, not cell prose. Semantic indexes the breadcrumb so it has a chance; the whole future-state branch was unreachable before paths joined the keyword fan-out. Regression cover for that fix." },
+
+  { "id": "BR13", "class": "structural-name", "blocker": true, "k": 8,
+    "q": "Planned: In-app session creation & reconfirmation",
+    "expectPath": "Planned: In-app session creation & reconfirmation", "minMatches": 1 },
+
+  { "id": "BR14", "class": "structural-name", "blocker": true, "k": 8,
+    "q": "Prototype: Reflection redesign",
+    "expectPath": "Prototype: Reflection redesign", "minMatches": 1 },
+
+  { "id": "BR15", "class": "structural-name", "blocker": false, "k": 8,
+    "q": "Prototype: Soft-conflict sign-up gate",
+    "expectPath": "Prototype: Soft-conflict sign-up gate", "minMatches": 1 },
+
+  { "id": "BR16", "class": "structural-name", "blocker": false, "k": 8,
+    "q": "Prototype: Supervisor-registration clearance",
+    "expectPath": "Prototype: Supervisor-registration clearance", "minMatches": 1 },
+
+  { "id": "BR17", "class": "structural-name", "blocker": false, "k": 8,
+    "q": "Prototype: Lead Dashboard Wrap-Up",
+    "expectPath": "Prototype: Lead Dashboard Wrap-Up", "minMatches": 1 },
+
+  { "id": "BR18", "class": "structural-name", "blocker": true, "k": 8,
+    "q": "Set Goals Edge Case",
+    "expectPath": "Set Goals Edge Case", "minMatches": 1,
+    "note": "A named path inside the 310-cell Goal Setting scenario — it has to beat a very large field of siblings." },
+
+  { "id": "BR19", "class": "structural-name", "blocker": true, "k": 8,
+    "q": "Late call-off (<12h)",
+    "expectPath": "Late call-off (<12h)", "minMatches": 1,
+    "note": "Punctuation-heavy name. websearch_to_tsquery and ILIKE treat '(<12h)' very differently — worth watching across Phase 3." },
+
+  { "id": "BR20", "class": "structural-name", "blocker": false, "k": 8,
+    "q": "No or Few Students Join",
+    "expectPath": "No or Few Students Join", "minMatches": 1 },
+
+  { "id": "BR21", "class": "structural-name", "blocker": false, "k": 8,
+    "q": "Missed hours",
+    "expectPath": "Missed hours", "minMatches": 1 },
+
+  { "id": "BR22", "class": "aggregate", "blocker": false, "k": 15,
+    "q": "what happens during Warm-Up",
+    "expectScenario": "Warm-Up", "minMatches": 5,
+    "note": "DIAGNOSTIC, not a gate. The corpus has no step- or scenario-level summary rows, so 59 sibling cells compete and none is 'the' answer. Bar is coverage: >=5 of 15 rows from the right scenario. Failing here argues for multi-granularity chunks, not for tuning the ranker." },
+
+  { "id": "BR23", "class": "aggregate", "blocker": false, "k": 15,
+    "q": "walk me through goal setting",
+    "expectScenario": "Goal Setting", "minMatches": 8,
+    "note": "The stress case: 310 cells, 38% of the corpus, one scenario. Should be easy on coverage and useless on precision — which is exactly the finding to record." },
+
+  { "id": "BR24", "class": "aggregate", "blocker": false, "k": 15,
+    "q": "what are all the ways a tutor can miss a session",
+    "expectScenario": "Call-off Request", "minMatches": 3,
+    "note": "Spans call-off, late call-off, swap and fill-in. No single scenario is complete — measures whether retrieval can span, which nothing today is designed to do." },
+
+  { "id": "BR25", "class": "absence", "blocker": false, "k": 5,
+    "q": "how do tutors submit expense reports",
+    "expectTopScoreBelow": 0.5,
+    "note": "DIAGNOSTIC, EXPECTED TO FAIL TODAY — and that failure is the point. Nothing about expenses exists in the blueprint, yet vector search always returns its nearest 15. Measured 2026-08-19: unrelated chunk pairs average 0.759 similarity, so the 0.5 floor sits BELOW the corpus's own minimum and can never reject anything. This case should start passing once Phase 2a de-duplicates the chunk text and Phase 2d sets the floor from a real query-side measurement. Until then it is the cleanest single number for the problem." },
+
+  { "id": "BR26", "class": "absence", "blocker": false, "k": 5,
+    "q": "Acuity scheduling",
+    "expectTopScoreBelow": 0.5,
+    "note": "Acuity is retired. Same diagnostic as BR25, plus it guards a real fabrication risk: a confident answer about a dead tool. Retrieval cannot fix this alone — the model must decline — but a top score below the floor is what gives it grounds to." }
+]

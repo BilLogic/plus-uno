@@ -78,3 +78,4 @@ docs/conventions/article-writing-style.md
 
 # uno-bot eval output — full agent transcripts, may quote Slack/Notion content
 eval-results.json
+retrieval-eval-results.json
