@@ -28,11 +28,16 @@ export const BLUEPRINT_CONTRACT = {
 
   /**
    * Breadcrumb format produced by the semantic view
-   * (`semantic_search.blueprint_chunks_src.title`, defined in this repo —
-   * supabase/migrations/20260817000000_semantic_search_blueprint_chunks_phase.sql)
-   * and parsed by the bot's parseChunkTitle. Segments joined by `separator`,
-   * each `<label>: <value>`; parsers ignore unknown segments, so chunks
-   * embedded before the phase segment shipped still parse (minus `Phase`).
+   * (`semantic_search.blueprint_chunks_src.title`, defined in THIS repo — the
+   * bot deleted its vendored DDL once the app took ownership) and parsed by
+   * the bot's parseChunkTitle. Segments joined by `separator`, each
+   * `<label>: <value>`; parsers ignore unknown segments, so chunks embedded
+   * before the phase segment shipped still parse (minus `Phase`).
+   *
+   * `Phase` was added to the view on 2026-08-17 but never reached this file,
+   * the canonical copy — so the canonical contract described a four-segment
+   * breadcrumb while the database emitted five. Confirmed against the live
+   * definition (`pg_get_viewdef`) on 2026-08-19 before correcting it here.
    */
   breadcrumb: {
     separator: ' · ',
