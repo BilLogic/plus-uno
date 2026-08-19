@@ -1,0 +1,65 @@
+name: uno-bot — retrieval evals (which rows come back)
+
+# Scores blueprint retrieval by ROW IDENTITY, not by how the answer reads.
+#
+# The sibling workflow (uno-bot-evals.yml) drives full agent turns and judges
+# the prose with a model. It cannot see a retrieval regression: it was 19/19
+# green while 5% of the semantic index pointed at cells that no longer existed,
+# because a fabricated citation reads exactly like a good one.
+#
+# This one hits GET /debug/blueprint-search directly — no model, no judge, no
+# quota — and asserts recall@k and MRR per query class against
+# docs/evals/fixtures/blueprint-retrieval-cases.json. Whole suite in seconds,
+# so it can run on every deploy rather than weekly.
+#
+# A failing `blocker: true` case fails the job. The aggregate and absence
+# classes are diagnostics and report without failing — the two absence cases
+# are EXPECTED to fail until the similarity floor is recalibrated (the 0.5 floor
+# currently sits below the corpus's own 0.586 minimum, so it can never reject
+# anything). See docs/plans/2026-08-19-001-feat-blueprint-hybrid-retrieval-plan.md.
+#
+# Required repo secret: DEBUG_TOKEN (the Worker's /debug/* gate token).
+
+on:
+  workflow_dispatch: {}
+  # After a deploy, so a retrieval regression surfaces with the build that
+  # caused it rather than at the next weekly run.
+  workflow_run:
+    workflows: ["uno-bot — deploy Worker"]
+    types: [completed]
+  schedule:
+    - cron: "30 7 * * *" # 07:30 UTC — after the 07:00 embed refresh
+
+permissions:
+  contents: read
+
+jobs:
+  retrieval:
+    runs-on: ubuntu-latest
+    # Don't score retrieval against a deploy that failed to ship.
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "24"
+
+      # The scorer is the instrument for the whole retrieval upgrade. A bug in
+      # it does not look like a bug — it looks like a confident recall number.
+      # Pin it before trusting anything it reports.
+      - name: Self-test the scorer
+        working-directory: agents/uno-bot
+        run: npm run evals:retrieval:selftest
+
+      - name: Score retrieval against the live Worker
+        env:
+          WORKER_URL: "https://uno-bot.bryanhuang628.workers.dev"
+          DEBUG_TOKEN: ${{ secrets.DEBUG_TOKEN }}
+        run: node agents/uno-bot/scripts/run-retrieval-evals.mjs
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: retrieval-eval-results
+          path: retrieval-eval-results.json
