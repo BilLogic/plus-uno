@@ -293,6 +293,29 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
       // which is the distinction being probed, with no embedding call spent.
       body: JSON.stringify({ query_embedding: [0], match_count: 1, filter_source: "blueprint" }),
     }));
+    // Index health — counts only, via semantic_search.index_health().
+    //
+    // The other probes answer "does the retrieval path respond". This answers
+    // "is what it returns still true", which is the failure that hides: the
+    // backfill's orphan prune 403'd nightly from 2026-08-18 and left 43 chunks
+    // for hard-deleted cells in the index. Embeddings stayed current, every
+    // probe above stayed green, and the only symptom was the bot occasionally
+    // citing a cell that no longer exists with a ?cell= link to nothing.
+    //
+    // orphan_chunks > 0  → the prune is failing (check the embed workflow).
+    // stale_chunks  > 0  → cells edited since the last successful run.
+    try {
+      const r = await countedFetch(`${base}/rest/v1/rpc/index_health`, {
+        method: "POST",
+        headers: { ...h, "content-type": "application/json", "content-profile": "semantic_search" },
+        body: "{}",
+      });
+      out.index_health = r.ok
+        ? (((await r.json()) as unknown[])[0] ?? null)
+        : { status: r.status, error: (await r.text()).slice(0, 160) };
+    } catch (err) {
+      out.index_health = { error: err instanceof Error ? err.message : String(err) };
+    }
     for (const t of ["cells", "cell_triggers", "findings", "slices"]) {
       Object.assign(out, await probe(`table_${t}`, `/rest/v1/${t}?select=id&limit=1`));
     }
