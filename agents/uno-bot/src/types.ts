@@ -89,6 +89,11 @@ export interface Env {
   // first with keyword fallback; "off" → keyword only (instant rollback via a
   // var change + redeploy). See integrations/blueprint.ts.
   SEMANTIC_SEARCH?: string;
+  // Kill-switch for the FUSED retrieval path. Unset/"on" → one call to
+  // public.blueprint_hybrid_search (vector + prose + structural-name, fused by
+  // reciprocal rank); "off" → the old semantic → rpc → tables ladder, kept for
+  // exactly one release as the rollback. See integrations/blueprint.ts.
+  BLUEPRINT_HYBRID?: string;
   // Public base URL of the uno-blueprint app. Every cell/slice row the bot
   // returns carries a deep link built from this, so an answer in Slack or the
   // IDE can be opened at the exact cell it cites. Unset → rows carry no url
