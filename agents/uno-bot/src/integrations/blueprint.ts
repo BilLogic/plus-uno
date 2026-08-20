@@ -22,6 +22,12 @@ import { countedFetch, rethrowIfBudget, subrequestBudgetSpent } from "../net";
 import { cellUrl, sliceUrl, parseChunkTitle, chunkBody } from "./blueprint-link";
 import { BLUEPRINT_CONTRACT } from "../generated/blueprint-contract";
 import {
+  mapIncludeEdges,
+  mapIncludeFindings,
+  isIncludeRow,
+  type BlueprintEdge,
+} from "./blueprint-include";
+import {
   renderBlueprintIndex,
   semanticCap,
   mergedCap,
@@ -32,6 +38,11 @@ import {
 // Re-exported so the tool layer has ONE import for the blueprint integration.
 export { renderBlueprintIndex, FUTURE_LABELS, futureLabel } from "./blueprint-index";
 export type { BlueprintIndex, BlueprintCappedBy } from "./blueprint-index";
+// The include mappers are a PURE module so `npm test` can compile them without
+// Workers types — same split as blueprint-link / blueprint-index. Re-exported
+// so the tool layer keeps ONE import for the blueprint integration.
+export { mapIncludeEdges, mapIncludeFindings } from "./blueprint-include";
+export type { BlueprintEdge } from "./blueprint-include";
 
 const REQUEST_TIMEOUT_MS = 10000;
 // ONE name for one function. The portal answers as public.search_blueprint;
@@ -43,7 +54,6 @@ const REQUEST_TIMEOUT_MS = 10000;
 // checks them — the contract plus `npm run check:contract` is what does.
 const RPC_NAME = BLUEPRINT_CONTRACT.rpcs.searchBlueprint;
 const PARAM = BLUEPRINT_CONTRACT.searchBlueprintParams;
-const INCLUDE_KIND = BLUEPRINT_CONTRACT.searchBlueprintInclude;
 const PER_TABLE_LIMIT = 8;
 const MAX_ROWS = 30;
 
@@ -132,6 +142,11 @@ export type BlueprintRetrieval = "hybrid" | "semantic" | "rpc" | "tables";
 
 export interface BlueprintSearchResult {
   rows: BlueprintRow[];
+  /** Present only when `options.include` asked for them AND the fused RPC path
+   *  served the query. Absent on every fallback path, which is the signal the
+   *  caller uses to decide whether it still owes a separate fetch. */
+  edges?: BlueprintEdge[];
+  findings?: { rows: Array<Record<string, unknown>>; total: number | undefined };
   retrieval: BlueprintRetrieval;
   /** True when a cap clipped the result — the model must be able to say
    *  "there is more than this" instead of narrating a partial view as whole. */
@@ -232,6 +247,17 @@ export interface BlueprintSearchOptions {
    *  questions. The fresh result still POPULATES the cache, so the re-check
    *  costs one round trip, not every subsequent one. */
   fresh?: boolean;
+  /** Ask the RPC to return edges and/or findings for the cells it matched,
+   *  inside the SAME subrequest. Each one dropped here is one fewer metered
+   *  call against Cloudflare's 50-per-invocation cap.
+   *
+   *  `slices` is deliberately NOT includable. The RPC's slices branch returns
+   *  slices whose frames reference the matched cells; fetchSlices answers a
+   *  different question — a title/actor ILIKE over the QUERY TEXT, plus an
+   *  unfiltered head-count so "how many slices are there" is not answered with
+   *  a filtered number. Swapping one for the other would be a behaviour change
+   *  wearing an optimisation's clothes. */
+  include?: readonly ("edges" | "findings")[];
 }
 
 /**
@@ -269,7 +295,15 @@ export async function searchBlueprint(
   // payload still described them as a read of the second query. Whitespace and
   // case are still folded, which is all the reuse this cache was ever meant to
   // capture on a multi-step question.
-  const cacheKey = q.toLowerCase().replace(/\s+/g, " ").trim();
+  //
+  // The include set is part of the key. Without it a plain search would seed
+  // the cache and a follow-up asking for edges would be served those rows with
+  // no edges attached — a cache serving a partial answer as a whole one, which
+  // is the same class of bug the `fresh` bypass exists to prevent.
+  const wantInclude = [...(options.include ?? [])].sort();
+  const cacheKey =
+    q.toLowerCase().replace(/\s+/g, " ").trim() +
+    (wantInclude.length ? `\u0000include:${wantInclude.join(",")}` : "");
   const hit = options.fresh ? undefined : searchCache.get(cacheKey);
   if (hit && Date.now() - hit.at < CACHE_TTL_MS) {
     const age = Date.now() - hit.at;
@@ -295,7 +329,7 @@ export async function searchBlueprint(
     // Falls through to the ladder only when the RPC is absent (not migrated) or
     // the kill switch is off. Kept for one release as the rollback path.
     if (env.BLUEPRINT_HYBRID !== "off") {
-      const fused = await tryHybrid(env, base, key, q, controller.signal);
+      const fused = await tryHybrid(env, base, key, q, controller.signal, wantInclude as readonly ("edges" | "findings")[]);
       if (fused && fused.rows.length) {
         const cap = semanticCap(fused.rows.length, HYBRID_MATCH_COUNT);
         const result: BlueprintSearchResult = {
@@ -307,6 +341,8 @@ export async function searchBlueprint(
           thin: false,
           ...topScore(fused.rows),
           ...(fused.matchedTotal !== undefined ? { matched_total: fused.matchedTotal } : {}),
+          ...(fused.edges ? { edges: fused.edges } : {}),
+          ...(fused.findings ? { findings: fused.findings } : {}),
         };
         console.log(
           `[blueprint] retrieval=hybrid rows=${fused.rows.length} cached=0 age_ms=0` +
@@ -509,7 +545,13 @@ async function tryHybrid(
   key: string,
   q: string,
   signal: AbortSignal,
-): Promise<{ rows: BlueprintRow[]; matchedTotal?: number } | null> {
+  include: readonly ("edges" | "findings")[] = [],
+): Promise<{
+  rows: BlueprintRow[];
+  matchedTotal?: number;
+  edges?: BlueprintEdge[];
+  findings?: { rows: Array<Record<string, unknown>>; total: number | undefined };
+} | null> {
   // A null embedding is legal here: the RPC runs keyword-only rather than
   // failing, so a Vertex outage costs paraphrase recall instead of the answer.
   const embedding = await embedText(env, q, "RETRIEVAL_QUERY");
@@ -525,15 +567,24 @@ async function tryHybrid(
       // service account is configured, and BOTH are 768-dim — so the vector
       // signature cannot catch it and nothing else in the stack would.
       [PARAM.embedModel]: embedding ? embedModelName(env) : null,
+      ...(include.length ? { [PARAM.include]: include } : {}),
     }),
     signal,
   });
   if (res.ok) {
     const data = (await res.json().catch(() => [])) as Array<Record<string, unknown>>;
     if (!Array.isArray(data)) return null;
+    // The RPC stamps total_matched on EVERY row, includes included (verified on
+    // production: 10 cells / 11 edges / 1 finding, all carrying 117). Reading it
+    // off a cell anyway keeps the read independent of include row ordering, and
+    // means a future change that scopes the count to cells cannot silently zero
+    // it here.
+    const cellData = data.filter((r) => !isIncludeRow(r));
     const matchedTotal =
-      typeof data[0]?.total_matched === "number" ? (data[0].total_matched as number) : undefined;
-    const rows = data.map((r): BlueprintRow => {
+      typeof cellData[0]?.total_matched === "number"
+        ? (cellData[0].total_matched as number)
+        : undefined;
+    const rows = cellData.map((r): BlueprintRow => {
       const id = typeof r.id === "string" ? r.id : "";
       const title = typeof r.title === "string" ? r.title : "";
       return {
@@ -560,7 +611,16 @@ async function tryHybrid(
         url: cellUrl(env.BLUEPRINT_APP_URL, id),
       };
     });
-    return { rows, matchedTotal };
+    const hitIds = new Set(rows.map((r) => r.id).filter(Boolean));
+    const edges = include.includes("edges") ? mapIncludeEdges(data, hitIds) : undefined;
+    const findings = include.includes("findings") ? mapIncludeFindings(data) : undefined;
+
+    return {
+      rows,
+      matchedTotal,
+      ...(edges ? { edges } : {}),
+      ...(findings ? { findings } : {}),
+    };
   }
   // Function absent (not migrated yet) → fall back to the ladder rather than
   // fail the search. Any other status is a real error and must propagate.
@@ -887,18 +947,6 @@ export async function fetchBlueprintIndex(
 // cap that a blueprint fallback search can already spend BLUEPRINT_TABLE_FANOUT
 // of (one per entry in SOURCES — 5 since `paths` was added). A status
 // question must not pay for the impact graph it will never look at.
-
-export interface BlueprintEdge {
-  from: string;
-  to: string;
-  direction: "downstream" | "upstream";
-  /** "trigger" = source sets target in motion (temporal); "needs" = source
-   *  depends on target existing (functional). Distinct relations in the app —
-   *  narrating a needs edge as "what it sets off" misstates the blueprint. */
-  kind: "trigger" | "needs";
-  /** Authored why-line for the edge, when the designer wrote one. */
-  note?: string;
-}
 
 /**
  * Cells that trigger, or are triggered by, the given cells — one hop.

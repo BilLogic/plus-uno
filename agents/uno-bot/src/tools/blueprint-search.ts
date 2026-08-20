@@ -50,8 +50,24 @@ export async function executeBlueprintSearch(
     // bypasses the 60s result cache — a re-check that re-serves the cache is a
     // cache serving a lie.
     const fresh = input.fresh === true;
-    const { rows, retrieval, truncated, capped_by, cached, age_ms, thin, top_score } =
-      await searchBlueprint(env, query, fresh ? { fresh: true } : undefined);
+    const include = Array.isArray(input.include)
+      ? input.include.filter((i): i is string => typeof i === "string" && INCLUDABLE.has(i))
+      : [];
+    // edges and findings ride INSIDE the search call — the RPC computes them
+    // from the rows it just ranked, so each one asked for here is a metered
+    // subrequest not spent. `slices` and `index` cannot: slices answers a
+    // different question (see BlueprintSearchOptions.include) and index is a
+    // separate cached read.
+    const rpcInclude = include.filter(
+      (i): i is "edges" | "findings" => i === "edges" || i === "findings",
+    );
+    const {
+      rows, retrieval, truncated, capped_by, cached, age_ms, thin, top_score,
+      edges: fusedEdges, findings: fusedFindings,
+    } = await searchBlueprint(env, query, {
+      ...(fresh ? { fresh: true } : {}),
+      ...(rpcInclude.length ? { include: rpcInclude } : {}),
+    });
 
     // The live index (phases → scenarios → paths). Fetched AFTER the search so a
     // failure here can never cost the rows, self-cached per isolate with its own
@@ -60,9 +76,6 @@ export async function executeBlueprintSearch(
     // additive — on 2026-08-06 a slack_search fix displaced an unrelated
     // instruction and broke a different eval case — so this is enabled in ONE DM
     // first and the judged evals are compared CASE BY CASE before it goes wide.
-    const include = Array.isArray(input.include)
-      ? input.include.filter((i): i is string => typeof i === "string" && INCLUDABLE.has(i))
-      : [];
     const wantIndex = env.BLUEPRINT_INDEX === "on" || include.includes("index");
     const index = wantIndex ? await fetchBlueprintIndex(env, { fresh }) : undefined;
     // Mirrors how `retrieval` is surfaced: an OMITTED key is indistinguishable
@@ -96,8 +109,17 @@ export async function executeBlueprintSearch(
         return undefined;
       }
     };
-    const edges = await optional(include.includes("edges"), () => fetchEdges(env, cellIds), "edges");
-    const findingsRead = await optional(include.includes("findings"), () => fetchFindings(env, cellIds), "findings");
+    // `fusedEdges` / `fusedFindings` are present only when the fused RPC path
+    // served this query. Every fallback path (RPC absent mid-rollout,
+    // BLUEPRINT_HYBRID off, semantic or keyword ladder) leaves them undefined —
+    // and then the separate reads still owe the answer. Keeping both is what
+    // makes the switch safe to deploy before the migration is everywhere.
+    const edges =
+      fusedEdges ??
+      (await optional(include.includes("edges"), () => fetchEdges(env, cellIds), "edges"));
+    const findingsRead =
+      fusedFindings ??
+      (await optional(include.includes("findings"), () => fetchFindings(env, cellIds), "findings"));
     const findings = findingsRead?.rows;
     const findingsTotal = findingsRead?.total;
     const sliceRead = await optional(include.includes("slices"), () => fetchSlices(env, query), "slices");
