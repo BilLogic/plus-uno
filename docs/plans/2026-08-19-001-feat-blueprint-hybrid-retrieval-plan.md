@@ -281,7 +281,89 @@ Corrected against `pg_get_viewdef`, not against either repo's copy.
 
 Local wrangler needs Node ≥ 22 (`nvm use 22`); the repo default is v20.
 
-**Remaining, and it gates Phase 2: the suite has never run.**
+**✅ BASELINE RUN 2026-08-19** — run 32314561908, saved to
+`docs/evals/runs/2026-08-19-retrieval-baseline.json`.
+
+| Class | Recall | MRR |
+|---|---|---|
+| paraphrase | **100%** (6/6) | 0.639 |
+| exact-term | **100%** (5/5) | 0.717 |
+| **structural-name** | **0%** (0/10) | 0 |
+| aggregate | 100% (3/3) | 1.00 |
+| absence | 0% (0/2) — as predicted | 0 |
+| **overall** | 14/26 | subreq avg 2.08, max 3 |
+
+The absence cases failed at 0.654 and 0.607 against the 0.5 floor, exactly as
+this plan predicted before the suite existed. The instrument is trustworthy.
+
+### 🔴 The finding that reorders everything: structural-name is 0/10, and the cause is not the ranker
+
+Every one of the ten cases returned **15 rows on 2 subrequests** — embed +
+`match_corpus_chunks`, nothing else. **The keyword pass never ran.** Not ranked
+low: never executed.
+
+Meanwhile `search_blueprint` finds those paths perfectly well when asked
+directly:
+
+```
+Prototype: Swap instead of call-off   → 5 path rows (34 total)
+Set Goals Edge Case                   → 5 path rows (40 total)
+Late call-off (<12h)                  → 4 path rows (35 total)
+Prototype: Reflection redesign        → 5 path rows (30 total)
+```
+
+The chain, now measured rather than argued:
+
+1. `SEMANTIC_MIN_SIMILARITY = 0.5` sits below the corpus's own 0.586 minimum
+2. so every semantic result "passes" the floor
+3. so `SEMANTIC_THIN_RESULTS = 3` short-circuits on every query
+4. so the keyword pass — **the only path that can match a path by NAME** — never runs
+5. so the entire future-state branch of the blueprint is unreachable by name
+
+### 🔴 And the floor cannot be tuned to fix it
+
+Measured top scores:
+
+| | Range |
+|---|---|
+| paraphrase + exact-term (must KEEP) | **0.565 – 0.740** |
+| structural-name (must fall through to keyword) | **0.653 – 0.808** |
+| absence (must reject) | 0.607, 0.654 |
+
+**The distributions overlap completely.** Rejecting structural-name needs a
+floor above 0.808; keeping the good semantic hits needs one below 0.565. No
+value satisfies both.
+
+**This kills Phase 2d as designed.** "Recalibrate the floor from a query-side
+measurement" assumed a separating threshold exists. It does not — the scores
+carry no usable signal for *is this good enough*, which is what 0.759 baseline
+similarity and a 0.056 top-15 spread already implied.
+
+### Consequent re-ordering
+
+- **Phase 3 is promoted to the fix, not the finale.** RRF never asks "is this
+  good enough" — it runs both paths always and ranks by agreement. It removes
+  the need for a threshold rather than tuning one.
+- **Phase 2d is struck.** Replace it with: *delete the floor and the
+  short-circuit entirely*, since Phase 3 makes both meaningless.
+- **Phase 2a is now a hypothesis, not a prerequisite.** De-boilerplating may
+  widen the distribution enough to make thresholds viable again — but Phase 3
+  does not need that, so 2a stops blocking anything.
+- **A cheap interim exists** but is not sufficient alone: removing the
+  short-circuit makes keyword always run (+1 subrequest, 2.08 → ~3). Careful —
+  `mergeRows` puts semantic rows first, so keyword hits would land at rank 16+
+  of 30. They would reach the model, but ranked below fifteen weaker semantic
+  rows. Real interleaving is Phase 3's job.
+
+### Cost estimate corrected
+
+Subrequests measured at **avg 2.08, max 3** — not the 8 worst case this plan
+assumed. The ladder never reaches its expensive branches *because* it always
+short-circuits. So Phase 3's subrequest saving is roughly **2.08 → 2, i.e.
+nil**, and the "worst case 8 → 2" argument should be dropped. Phase 3 is
+justified by structural-name recall (0% → expected near 100%), not by cost.
+
+**Remaining before Phase 2/3:**
 
 ```bash
 WORKER_URL=https://uno-bot.bryanhuang628.workers.dev DEBUG_TOKEN=… \
