@@ -972,10 +972,10 @@ export async function fetchEdges(env: Env, cellIds: string[]): Promise<Blueprint
   // contract makes the app's test the thing that catches a rename.
   const select =
     "source_cell_id,target_cell_id,kind,label,note," +
-    `source:cells!${BLUEPRINT_CONTRACT.fkConstraints.cellTriggerSource}(content),` +
-    `target:cells!${BLUEPRINT_CONTRACT.fkConstraints.cellTriggerTarget}(content)`;
+    `source:cells!${BLUEPRINT_CONTRACT.fkConstraints.cellDependencySource}(content),` +
+    `target:cells!${BLUEPRINT_CONTRACT.fkConstraints.cellDependencyTarget}(content)`;
   const url =
-    `${base}/rest/v1/cell_triggers` +
+    `${base}/rest/v1/cell_dependencies` +
     `?or=(source_cell_id.in.${list},target_cell_id.in.${list})` +
     `&select=${encodeURIComponent(select)}&limit=40`;
   const res = await countedFetch(url, { headers: headers(env.SUPABASE_ANON_KEY!) });

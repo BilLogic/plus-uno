@@ -147,7 +147,7 @@ if (/<!--\s*\/?\s*ide-only\s*-->/i.test(assembled)) {
 // the guard lives here rather than in a lint step nobody runs.
 
 // Nouns that make a nearby digit an inventory claim rather than a quantity.
-const BLUEPRINT_NOUNS = "phases|scenarios|paths|steps|layers|cells|path_steps|cell_triggers";
+const BLUEPRINT_NOUNS = "phases|scenarios|paths|steps|layers|cells|path_steps|cell_dependencies";
 // Explicit, per-line/block opt-out. REQUIRED rather than optional: the nav
 // guide deliberately keeps a historical rot ledger, and a guard with no escape
 // would either delete real content or be switched off wholesale.
