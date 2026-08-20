@@ -814,3 +814,52 @@ containing data anyone else reads.
 - GitHub Actions run 32229190507 (2026-08-19) — the 403 quoted verbatim
 - `eval-results.json` (2026-08-06, build r31) — 19/19, latency and subrequest baseline
 - Live SQL probes, 2026-08-19 — every figure in Verified State
+
+---
+
+## Phase 3 result — measured 2026-08-19 (run 32315527930, build r68)
+
+`docs/evals/runs/2026-08-19-retrieval-after-hybrid.json`, against the baseline
+in `2026-08-19-retrieval-baseline.json`.
+
+| Class | Recall before → after | MRR before → after |
+|---|---|---|
+| paraphrase | 100% → 100% | 0.639 → **0.556** |
+| exact-term | 100% → 100% | 0.717 → **0.900** |
+| **structural-name** | **0% → 100%** | **0 → 1.000** |
+| aggregate | 100% → 100% | 1.000 → 1.000 |
+| absence | 0% → 0% | 0 → 0 |
+| **overall** | **14/26 → 24/26** | blocker failures 5 → **0** |
+| subrequests | 2.08 → 2.04 avg | max 3 → 3 |
+
+**structural-name went 0/10 to 10/10, every one at rank 1.** That was the whole
+thesis, and it holds: those queries were never a ranking problem, they were a
+retriever that never ran.
+
+**One regression, stated plainly: paraphrase MRR fell 0.639 → 0.556.** BR3 moved
+from rank 1 to rank 2; no case dropped out of top-k, so recall held at 100%.
+The cause is inherent to RRF and not a bug — a cell that only the vector list
+found is now outranked by one that two lists agree on. Accepting a small
+paraphrase-ordering cost to take structural-name from 0 to 100% is the right
+trade, but it is a real cost and should not be reported as a clean win. Worth
+re-checking after Phase 2a, which should sharpen the vector list specifically.
+
+**exact-term MRR improved 0.717 → 0.900** — the `tsvector` half doing what
+`ilike` hit-counting could not.
+
+**Cost was flat**: 2.08 → 2.04 subrequests. As the corrected estimate predicted,
+there was no saving to be had, because the ladder never reached its expensive
+branches. Phase 3 bought recall, not cost.
+
+### What is still open
+
+**absence stays 0/2** — top scores 0.654 and 0.607 against a 0.5 floor,
+identical to baseline. Phase 3 does not touch this and was never going to:
+fusion changes ordering, not the similarity distribution. This is Phase 2a's
+target — 48.8% of every embedded chunk is a breadcrumb shared corpus-wide, and
+60% of cells share a body with another cell. Until that is fixed, the bot has
+no score-based grounds to say "not in the blueprint".
+
+**The `BLUEPRINT_HYBRID=off` ladder** is dead weight to be deleted one release
+from now, along with `SEMANTIC_MIN_SIMILARITY` and `SEMANTIC_THIN_RESULTS`,
+which the fused path does not consult.
