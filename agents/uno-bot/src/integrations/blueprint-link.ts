@@ -40,7 +40,7 @@ export interface ChunkBreadcrumb {
   scenario?: string;
   path?: string;
   step?: string;
-  layer?: string;
+  lane?: string;
 }
 
 /**
@@ -78,7 +78,12 @@ export function parseChunkTitle(title: string | undefined): ChunkBreadcrumb {
     else if (label === "scenario") out.scenario = value;
     else if (label === "path") out.path = value;
     else if (label === "step") out.step = value;
-    else if (label === "layer") out.layer = value;
+    // Both spellings: every stored corpus chunk still says "Layer:", because
+    // the title is part of the embedded text and renaming it would strand all
+    // 808 embeddings until a re-embed. The view flips to "Lane:" in the same
+    // change that re-embeds; until then a parser that accepted only one of them
+    // would silently drop the segment for half the index.
+    else if (label === "lane" || label === "layer") out.lane = value;
   }
   return out;
 }

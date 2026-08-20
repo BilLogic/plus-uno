@@ -9,7 +9,7 @@
 //
 // Fallback: if that function doesn't exist yet (not created in Supabase), we run
 // direct table queries so grounding still works — just with a few more
-// subrequests. Both paths return each cell's `layer` (actor/stage, e.g.
+// subrequests. Both paths return each cell's `lane` (actor/stage, e.g.
 // "Regular Tutor" / "Back Stage Actions") and `step`, so the bot attributes
 // activities to the right actor instead of guessing.
 //
@@ -93,8 +93,8 @@ export interface BlueprintRow {
    *  evidence here with an empty `content` (blueprint-navigation.md § 2), so
    *  dropping it lost real answers. */
   description?: string;
-  /** For cells: the layer = actor/stage (e.g. "Regular Tutor", "Back Stage Actions"). */
-  layer?: string;
+  /** For cells: the lane = actor/stage (e.g. "Regular Tutor", "Back Stage Actions"). */
+  lane?: string;
   step?: string;
   scenario?: string;
   phase?: string;
@@ -532,7 +532,7 @@ function mergeRows(semantic: BlueprintRow[], keyword: BlueprintRow[]): Blueprint
 // The portal now OWNS the name search_blueprint: the legacy ilike function is
 // dropped and the fused retriever (vector + prose + structural, RRF) answers
 // under it, with scope filters (filter_phase/filter_scenario/filter_path_type/
-// filter_layer_role — declared in the contract, not sent by this Worker), a
+// filter_lane_role — declared in the contract, not sent by this Worker), a
 // filter-only predicate mode, and total_matched — the
 // corpus-wide count behind the top-k, so "113 cells mention Zoom, here are 15"
 // is sayable. Same name the ladder's tryRpc always called, so the fallback
@@ -596,7 +596,7 @@ async function tryHybrid(
         // the same stripper applies.
         snippet: chunkBody(typeof r.snippet === "string" ? r.snippet : undefined, title),
         description: str(r.description),
-        layer: str(r.layer),
+        lane: str(r.lane),
         step: str(r.step),
         scenario: str(r.scenario),
         phase: str(r.phase),
@@ -684,11 +684,11 @@ async function trySemantic(
         id,
         title: r.title ?? "",
         snippet: chunkBody(r.chunk, r.title),
-        layer: crumb.layer,
+        lane: crumb.lane,
         step: crumb.step,
         scenario: crumb.scenario,
         // The breadcrumb's leading `Phase:` segment. Without it
-        // the model cannot cite `phase › scenario › path — layer × step` on the
+        // the model cannot cite `phase › scenario › path — lane × step` on the
         // PRIMARY retrieval path, and guesses the phase from a scenario name
         // that sounds like one.
         phase: crumb.phase,
@@ -754,7 +754,7 @@ const SOURCES: Source[] = [
     // are public-read): "who owns this touchpoint / what does it do" questions
     // were answered "not in the blueprint" while the data sat one select away.
     select:
-      "id,content,description,function,form,value_props,owner,perceived_owner,links,updated_at,layer:layers(name,owner_team,kpis),step:steps(name),path:paths(name,scenario:service_scenarios(name,phase:phases(name)))",
+      "id,content,description,function,form,value_props,owner,perceived_owner,links,updated_at,lane:lanes(name,owner_team,kpis),step:steps(name),path:paths(name,scenario:service_scenarios(name,phase:phases(name)))",
   },
 ];
 
@@ -812,19 +812,19 @@ function normalize(src: Source, row: Record<string, unknown>): BlueprintRow | nu
     const path = row.path as
       | { name?: string; scenario?: { name?: string; phase?: { name?: string } } }
       | undefined;
-    const layer = (row.layer as { name?: string } | undefined)?.name;
+    const lane = (row.lane as { name?: string } | undefined)?.name;
     const step = (row.step as { name?: string } | undefined)?.name;
     // Falls back to the cell's coordinate so a links-only cell still has a
     // human-readable handle instead of an empty title.
     const primary =
-      content || description || [layer, step].filter(Boolean).join(" × ") || "(cell)";
+      content || description || [lane, step].filter(Boolean).join(" × ") || "(cell)";
     return {
       kind: "cell",
       id,
       title: primary.slice(0, 80),
       snippet: content || undefined,
       description: description || undefined,
-      layer,
+      lane,
       step,
       path: path?.name,
       scenario: path?.scenario?.name,

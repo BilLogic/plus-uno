@@ -134,7 +134,7 @@ export async function executeBlueprintSearch(
     const grounding =
       "Ground the answer ONLY in these rows. Do not add facts that aren't here.";
     const attribution = rows.some((r) => r.kind === "cell")
-      ? "Attribute every activity to its `layer` (the actor/stage) and order by `step` — never give one actor's activity to another. If the question spans multiple actors or paths, cover all the relevant ones: a one-layer answer to a multi-actor question is incomplete."
+      ? "Attribute every activity to its `lane` (the actor/stage) and order by `step` — never give one actor's activity to another. If the question spans multiple actors or paths, cover all the relevant ones: a one-lane answer to a multi-actor question is incomplete."
       : undefined;
     // Two versions of the same field, and WHICH one ships is decided by whether
     // an index is attached. The "re-query before saying so" tail is the honest
@@ -188,7 +188,7 @@ export async function executeBlueprintSearch(
     // shipped, and for the whole life of this note before 2026-08-17 it was in
     // zero of them. Promising a field the rows do not carry is what teaches the
     // model to infer one — the exact failure this tool exists to prevent.
-    const crumbFields = (["phase", "scenario", "path", "step", "layer"] as const).filter((f) =>
+    const crumbFields = (["phase", "scenario", "path", "step", "lane"] as const).filter((f) =>
       rows.some((r) => typeof (r as unknown as Record<string, unknown>)[f] === "string"),
     );
     const semanticCaveat =
