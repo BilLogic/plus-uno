@@ -28,7 +28,7 @@ function edgeRow(over: Record<string, unknown> = {}): Record<string, unknown> {
       target_cell_id: OTHER,
       source_content: "Creates breakout rooms.",
       target_content: "Reminds tutors to go through rooms in order.",
-      kind: "trigger",
+      kind: "sets_off",
       label: null,
     },
     updated_at: "2026-08-01T00:00:00Z",
@@ -48,7 +48,7 @@ test("an edge whose source is a matched cell points downstream", () => {
   assert.equal(edge.direction, "downstream");
   assert.equal(edge.from, "Creates breakout rooms.");
   assert.equal(edge.to, "Reminds tutors to go through rooms in order.");
-  assert.equal(edge.kind, "trigger");
+  assert.equal(edge.kind, "sets_off");
 });
 
 test("an edge that only TARGETS a matched cell points upstream", () => {
@@ -59,17 +59,17 @@ test("an edge that only TARGETS a matched cell points upstream", () => {
 test("`needs` is preserved and anything else falls back to `trigger`", () => {
   // Distinct relations in the app: narrating a needs edge as "what it sets off"
   // misstates the blueprint, which is why this is not a cosmetic default.
-  const needs = oneEdge(
-    [edgeRow({ links: { ...(edgeRow().links as object), kind: "needs" } })],
+  const dependsOn = oneEdge(
+    [edgeRow({ links: { ...(edgeRow().links as object), kind: "depends_on" } })],
     new Set([HIT]),
   );
-  assert.equal(needs.kind, "needs");
+  assert.equal(dependsOn.kind, "depends_on");
 
   const unknown = oneEdge(
     [edgeRow({ links: { ...(edgeRow().links as object), kind: "wat" } })],
     new Set([HIT]),
   );
-  assert.equal(unknown.kind, "trigger");
+  assert.equal(unknown.kind, "sets_off");
 });
 
 test("an edge with a missing endpoint is dropped, not half-emitted", () => {

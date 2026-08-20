@@ -27,10 +27,11 @@ export interface BlueprintEdge {
   from: string;
   to: string;
   direction: "downstream" | "upstream";
-  /** "trigger" = source sets target in motion (temporal); "needs" = source
-   *  depends on target existing (functional). Distinct relations in the app —
-   *  narrating a needs edge as "what it sets off" misstates the blueprint. */
-  kind: "trigger" | "needs";
+  /** "sets_off" = the source makes the target happen; "depends_on" = the
+   *  target must already be true for the source to work. NOT inverses — a
+   *  precondition causes nothing, so narrating a depends_on edge as "what it
+   *  sets off" misstates the blueprint. */
+  kind: "sets_off" | "depends_on";
   /** Authored why-line for the edge, when the designer wrote one. */
   note?: string;
 }
@@ -69,7 +70,7 @@ export function mapIncludeEdges(
           from,
           to,
           direction: hitIds.has(String(l.source_cell_id)) ? "downstream" : "upstream",
-          kind: l.kind === "needs" ? "needs" : "trigger",
+          kind: l.kind === "depends_on" ? "depends_on" : "sets_off",
           ...(note ? { note } : {}),
         },
       ];
