@@ -146,6 +146,12 @@ export interface BlueprintSearchResult {
   /** Best cosine similarity across the returned rows; absent when no row
    *  carries a score (keyword-only result). */
   top_score?: number;
+  /** Corpus-wide count of cells matching the query's terms/filters (fused path
+   *  only). THE honesty number: rows.length is the top-k slice, this is how
+   *  many actually matched — "113 cells mention Zoom, here are the top 15".
+   *  Semantic similarity has no meaningful total, so a pure-vector match
+   *  reports the keyword/filter count, which may be smaller than rows. */
+  matched_total?: number;
 }
 
 /** cells.links is jsonb — authored by humans, so it arrives as bare URL strings
@@ -280,19 +286,21 @@ export async function searchBlueprint(
     // the kill switch is off. Kept for one release as the rollback path.
     if (env.BLUEPRINT_HYBRID !== "off") {
       const fused = await tryHybrid(env, base, key, q, controller.signal);
-      if (fused && fused.length) {
-        const cap = semanticCap(fused.length, HYBRID_MATCH_COUNT);
+      if (fused && fused.rows.length) {
+        const cap = semanticCap(fused.rows.length, HYBRID_MATCH_COUNT);
         const result: BlueprintSearchResult = {
-          rows: fused,
+          rows: fused.rows,
           retrieval: "hybrid",
           ...cap,
           cached: false,
           age_ms: 0,
           thin: false,
-          ...topScore(fused),
+          ...topScore(fused.rows),
+          ...(fused.matchedTotal !== undefined ? { matched_total: fused.matchedTotal } : {}),
         };
         console.log(
-          `[blueprint] retrieval=hybrid rows=${fused.length} cached=0 age_ms=0` +
+          `[blueprint] retrieval=hybrid rows=${fused.rows.length} cached=0 age_ms=0` +
+            `${fused.matchedTotal !== undefined ? ` matched_total=${fused.matchedTotal}` : ""}` +
             `${cap.truncated ? " (truncated capped_by=semantic)" : ""}` +
             `${result.top_score !== undefined ? ` top_score=${result.top_score}` : ""}` +
             logQuery(q),
@@ -475,7 +483,14 @@ function mergeRows(semantic: BlueprintRow[], keyword: BlueprintRow[]): Blueprint
 // lists — the only quantity comparable between a cosine distance and a ts_rank
 // — and a cell that several retrievers agree on rises above one that only a
 // single retriever liked.
-const HYBRID_RPC = "blueprint_hybrid_search";
+// The portal now OWNS the name search_blueprint: the legacy ilike function is
+// dropped and the fused retriever (vector + prose + structural, RRF) answers
+// under it, with scope filters (filter_phase/filter_scenario/filter_path_type/
+// filter_layer_role), a filter-only predicate mode, and total_matched — the
+// corpus-wide count behind the top-k, so "113 cells mention Zoom, here are 15"
+// is sayable. Same name the ladder's tryRpc always called, so the fallback
+// path rides the upgrade for free.
+const HYBRID_RPC = "search_blueprint";
 const HYBRID_MATCH_COUNT = 15;
 
 async function tryHybrid(
@@ -484,7 +499,7 @@ async function tryHybrid(
   key: string,
   q: string,
   signal: AbortSignal,
-): Promise<BlueprintRow[] | null> {
+): Promise<{ rows: BlueprintRow[]; matchedTotal?: number } | null> {
   // A null embedding is legal here: the RPC runs keyword-only rather than
   // failing, so a Vertex outage costs paraphrase recall instead of the answer.
   const embedding = await embedText(env, q, "RETRIEVAL_QUERY");
@@ -506,7 +521,9 @@ async function tryHybrid(
   if (res.ok) {
     const data = (await res.json().catch(() => [])) as Array<Record<string, unknown>>;
     if (!Array.isArray(data)) return null;
-    return data.map((r): BlueprintRow => {
+    const matchedTotal =
+      typeof data[0]?.total_matched === "number" ? (data[0].total_matched as number) : undefined;
+    const rows = data.map((r): BlueprintRow => {
       const id = typeof r.id === "string" ? r.id : "";
       const title = typeof r.title === "string" ? r.title : "";
       return {
@@ -533,6 +550,7 @@ async function tryHybrid(
         url: cellUrl(env.BLUEPRINT_APP_URL, id),
       };
     });
+    return { rows, matchedTotal };
   }
   // Function absent (not migrated yet) → fall back to the ladder rather than
   // fail the search. Any other status is a real error and must propagate.
