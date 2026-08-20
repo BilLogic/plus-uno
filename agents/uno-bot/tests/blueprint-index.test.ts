@@ -17,11 +17,11 @@ import {
 
 const READ_AT = "2026-08-17";
 
-/** Shaped like the PostgREST embed: phases → service_scenarios → paths. */
+/** Shaped like the PostgREST embed: phases → scenarios → paths. */
 const LIVE = [
   {
     name: "Application",
-    service_scenarios: [
+    scenarios: [
       { name: "Discovery", paths: [{ name: "Happy Path" }] },
       {
         name: "Interview & Offer",
@@ -31,7 +31,7 @@ const LIVE = [
   },
   {
     name: "In-session",
-    service_scenarios: [
+    scenarios: [
       {
         name: "Wrap-Up",
         paths: [
@@ -76,7 +76,7 @@ test("the marker comes from the path NAME's prefix, not from prose that mentions
     [
       {
         name: "Wrap",
-        service_scenarios: [
+        scenarios: [
           { name: "Near miss", paths: [{ name: "future" }, { name: "Unplanned absence" }] },
           { name: "Labelled", paths: [{ name: "Planned: Reconfirmation" }] },
         ],
@@ -91,7 +91,7 @@ test("no paths still lists the scenario, with a zero count", () => {
   // A scenario with no paths EXISTS. Dropping it would recreate the original
   // failure one level down: absence of a row read as absence of a scenario.
   const index = renderBlueprintIndex(
-    [{ name: "Application", service_scenarios: [{ name: "Discovery", paths: [] }] }],
+    [{ name: "Application", scenarios: [{ name: "Discovery", paths: [] }] }],
     READ_AT,
   );
   assert.deepEqual(index.phases, ["Application: Discovery(0)"]);
@@ -107,8 +107,8 @@ test("a phase with no scenarios is listed as empty, not omitted", () => {
 test("unnamed rows are skipped, and non-array input renders an empty index", () => {
   const index = renderBlueprintIndex(
     [
-      { name: "", service_scenarios: [{ name: "Orphan", paths: [{ name: "Happy Path" }] }] },
-      { name: "Kept", service_scenarios: [{ name: "" }, { name: "Real", paths: [{}] }] },
+      { name: "", scenarios: [{ name: "Orphan", paths: [{ name: "Happy Path" }] }] },
+      { name: "Kept", scenarios: [{ name: "" }, { name: "Real", paths: [{}] }] },
     ],
     READ_AT,
   );

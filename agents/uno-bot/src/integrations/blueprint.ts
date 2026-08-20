@@ -731,8 +731,8 @@ interface Source {
 }
 const SOURCES: Source[] = [
   { table: "phases", kind: "phase", columns: ["name", "description"], select: "id,name,description" },
-  { table: "service_scenarios", kind: "scenario", columns: ["name", "description"], select: "id,name,description" },
-  { table: "steps", kind: "step", columns: ["name"], select: "id,name,scenario:service_scenarios(name)" },
+  { table: "scenarios", kind: "scenario", columns: ["name", "description"], select: "id,name,description" },
+  { table: "steps", kind: "step", columns: ["name"], select: "id,name,scenario:scenarios(name)" },
   // paths was missing entirely, so a path named `Planned: …` / `Prototype: …`
   // could not be matched by keyword at all — the one retrieval path that can
   // match a structural name rather than cell prose. The whole future-state
@@ -741,7 +741,7 @@ const SOURCES: Source[] = [
     table: "paths",
     kind: "path",
     columns: ["name", "description"],
-    select: "id,name,description,scenario:service_scenarios(name)",
+    select: "id,name,description,scenario:scenarios(name)",
   },
   {
     table: "cells",
@@ -754,7 +754,7 @@ const SOURCES: Source[] = [
     // are public-read): "who owns this touchpoint / what does it do" questions
     // were answered "not in the blueprint" while the data sat one select away.
     select:
-      "id,content,description,function,form,value_props,owner,perceived_owner,links,updated_at,lane:lanes(name,owner_team,kpis),step:steps(name),path:paths(name,scenario:service_scenarios(name,phase:phases(name)))",
+      "id,content,description,function,form,value_props,owner,perceived_owner,links,updated_at,lane:lanes(name,owner_team,kpis),step:steps(name),path:paths(name,scenario:scenarios(name,phase:phases(name)))",
   },
 ];
 
@@ -904,10 +904,10 @@ export async function fetchBlueprintIndex(
   }
 
   const base = env.SUPABASE_URL!.replace(/\/+$/, "");
-  const select = "name,service_scenarios(name,paths(name))";
+  const select = "name,scenarios(name,paths(name))";
   const url =
     `${base}/rest/v1/phases?select=${encodeURIComponent(select)}` +
-    `&order=order_position&service_scenarios.order=order_position`;
+    `&order=order_position&scenarios.order=order_position`;
   try {
     const res = await countedFetch(
       url,
