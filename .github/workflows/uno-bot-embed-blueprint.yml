@@ -17,7 +17,12 @@ name: uno-bot — embed blueprint (semantic_search)
 # Non-secret values are set inline below.
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      full:
+        description: "Re-embed every chunk, not just changed ones. REQUIRED after any change to blueprint_chunks_src — a view change alters chunk TEXT without moving cells.updated_at, so the incremental pass would skip everything."
+        type: boolean
+        default: false
   schedule:
     - cron: "0 7 * * *" # 07:00 UTC nightly
   # (A temporary dev-branch push trigger was used for the initial backfill on
@@ -47,7 +52,7 @@ jobs:
           GEMINI_SA_PRIVATE_KEY: ${{ secrets.GEMINI_SA_PRIVATE_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           EMBED_REGION: "us-central1"
-        run: node agents/uno-bot/scripts/backfill-semantic-search.mjs
+        run: node agents/uno-bot/scripts/backfill-semantic-search.mjs ${{ inputs.full && '--full' || '' }}
 
       # A silent nightly is how this job rotted before: the orphan prune 403'd
       # from 2026-08-18 (the semantic_search migration granted service_role
