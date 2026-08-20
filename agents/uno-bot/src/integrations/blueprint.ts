@@ -20,6 +20,7 @@ import type { Env } from "../types";
 import { embedText, embeddingsConfigured, embedModelName } from "../vertex/embed";
 import { countedFetch, rethrowIfBudget, subrequestBudgetSpent } from "../net";
 import { cellUrl, sliceUrl, parseChunkTitle, chunkBody } from "./blueprint-link";
+import { BLUEPRINT_CONTRACT } from "../generated/blueprint-contract";
 import {
   renderBlueprintIndex,
   semanticCap,
@@ -37,7 +38,12 @@ const REQUEST_TIMEOUT_MS = 10000;
 // both call sites below use this constant — tryHybrid sends the full argument
 // set (embedding, model tag, filters), tryRpc sends {q} only, which the portal
 // serves from its defaults. That is the degraded mode, not a different search.
-const RPC_NAME = "search_blueprint";
+// Sourced from the vendored contract, not typed here. PostgREST binds RPC
+// arguments BY NAME and takes embed hints as STRINGS, so neither compiler
+// checks them — the contract plus `npm run check:contract` is what does.
+const RPC_NAME = BLUEPRINT_CONTRACT.rpcs.searchBlueprint;
+const PARAM = BLUEPRINT_CONTRACT.searchBlueprintParams;
+const INCLUDE_KIND = BLUEPRINT_CONTRACT.searchBlueprintInclude;
 const PER_TABLE_LIMIT = 8;
 const MAX_ROWS = 30;
 
@@ -490,7 +496,8 @@ function mergeRows(semantic: BlueprintRow[], keyword: BlueprintRow[]): Blueprint
 // The portal now OWNS the name search_blueprint: the legacy ilike function is
 // dropped and the fused retriever (vector + prose + structural, RRF) answers
 // under it, with scope filters (filter_phase/filter_scenario/filter_path_type/
-// filter_layer_role), a filter-only predicate mode, and total_matched — the
+// filter_layer_role — declared in the contract, not sent by this Worker), a
+// filter-only predicate mode, and total_matched — the
 // corpus-wide count behind the top-k, so "113 cells mention Zoom, here are 15"
 // is sayable. Same name the ladder's tryRpc always called, so the fallback
 // path rides the upgrade for free.
@@ -510,14 +517,14 @@ async function tryHybrid(
     method: "POST",
     headers: { ...headers(key), "content-type": "application/json" },
     body: JSON.stringify({
-      q,
-      query_embedding: embedding,
-      match_count: HYBRID_MATCH_COUNT,
+      [PARAM.q]: q,
+      [PARAM.queryEmbedding]: embedding,
+      [PARAM.matchCount]: HYBRID_MATCH_COUNT,
       // Declaring the model lets the index reject a caller built on a different
       // one. embedText falls back from text-embedding-005 to -004 when no
       // service account is configured, and BOTH are 768-dim — so the vector
       // signature cannot catch it and nothing else in the stack would.
-      embed_model: embedding ? embedModelName(env) : null,
+      [PARAM.embedModel]: embedding ? embedModelName(env) : null,
     }),
     signal,
   });
@@ -644,7 +651,7 @@ async function tryRpc(
   const res = await countedFetch(`${base}/rest/v1/rpc/${RPC_NAME}`, {
     method: "POST",
     headers: { ...headers(key), "content-type": "application/json" },
-    body: JSON.stringify({ q }),
+    body: JSON.stringify({ [PARAM.q]: q }),
     signal,
   });
   if (res.ok) {
@@ -910,10 +917,15 @@ export async function fetchEdges(env: Env, cellIds: string[]): Promise<Blueprint
   if (!isBlueprintConfigured(env) || ids.length === 0) return [];
   const base = env.SUPABASE_URL!.replace(/\/+$/, "");
   const list = `(${ids.join(",")})`;
+  // The two hint names are Postgres DEFAULTS (`<table>_<column>_fkey`) that no
+  // migration ever writes down, which is exactly why a table rename breaks them
+  // silently: PostgREST 400s, this function warns and returns [], and Slack
+  // reports "no dependencies" for cells that have them. Reading them from the
+  // contract makes the app's test the thing that catches a rename.
   const select =
     "source_cell_id,target_cell_id,kind,label,note," +
-    "source:cells!cell_triggers_source_cell_id_fkey(content)," +
-    "target:cells!cell_triggers_target_cell_id_fkey(content)";
+    `source:cells!${BLUEPRINT_CONTRACT.fkConstraints.cellTriggerSource}(content),` +
+    `target:cells!${BLUEPRINT_CONTRACT.fkConstraints.cellTriggerTarget}(content)`;
   const url =
     `${base}/rest/v1/cell_triggers` +
     `?or=(source_cell_id.in.${list},target_cell_id.in.${list})` +
