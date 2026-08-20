@@ -1,11 +1,21 @@
 ---
 title: "Blueprint retrieval upgrade: fix the prune, measure recall, fuse the ranks"
 type: feat
-status: active
+status: complete
 date: 2026-08-19
 supersedes: docs/plans/2026-08-07-003-blueprint-search-rpc-proposal.md
 repos: plus-uno (agents/uno-bot), uno-blueprint (supabase/migrations)
+completed: 2026-08-19
+outcome: "Retrieval recall 14/26 -> 26/26. structural-name 0% -> 100%. Phase 2a struck on evidence; the absence assertion was impossible and was re-specified, not met."
 ---
+
+> **STATUS: COMPLETE (2026-08-19).** Phases 0, 0b, 1 and 3 shipped and are
+> live. **Phase 2a was struck on measurement, not deferred** — see the section
+> at the end; de-boilerplating would have hurt the weakest genuine hits and
+> could not have produced the threshold it was aimed at. Phase 2c shipped as
+> incidental tidiness. Read the end-of-file sections before this plan's body:
+> several of its premises were disproved by its own eval, and the corrections
+> are the useful part.
 
 # Blueprint retrieval upgrade
 
