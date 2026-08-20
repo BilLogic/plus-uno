@@ -118,6 +118,18 @@ SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"
 # "off" = keyword only. Vector needs an embedding credential (the Vertex SA, same
 # as the model lane) + the semantic_search schema exposed to the API.
 SEMANTIC_SEARCH = "on"
+# Fused blueprint retrieval: "on" (default) = ONE call to
+# public.blueprint_hybrid_search, which runs vector + prose + structural-name
+# retrieval inside Postgres and fuses them by reciprocal rank; "off" = the old
+# semantic -> rpc -> tables ladder.
+#
+# Why it replaced the ladder: the 2026-08-19 retrieval baseline measured
+# structural-name recall at 0/10, because the ladder short-circuits its keyword
+# pass whenever the vector pass clears SEMANTIC_MIN_SIMILARITY (0.5) — and that
+# floor sits below the corpus's own minimum pairwise similarity (0.586), so it
+# always clears and the keyword pass never ran. Keep "off" available for one
+# release as the rollback.
+BLUEPRINT_HYBRID = "on"
 # Public uno-blueprint app. blueprint_search turns every cell row into
 # "<this>/?cell=<id>" and every slice row into "<this>/?slice=<id>" so the bot
 # can hand back a link that opens the exact cell it just cited — the share path

@@ -896,3 +896,144 @@ containing data anyone else reads.
 - GitHub Actions run 32229190507 (2026-08-19) — the 403 quoted verbatim
 - `eval-results.json` (2026-08-06, build r31) — 19/19, latency and subrequest baseline
 - Live SQL probes, 2026-08-19 — every figure in Verified State
+
+---
+
+## Phase 3 result — measured 2026-08-19 (run 32315527930, build r68)
+
+`docs/evals/runs/2026-08-19-retrieval-after-hybrid.json`, against the baseline
+in `2026-08-19-retrieval-baseline.json`.
+
+| Class | Recall before → after | MRR before → after |
+|---|---|---|
+| paraphrase | 100% → 100% | 0.639 → **0.556** |
+| exact-term | 100% → 100% | 0.717 → **0.900** |
+| **structural-name** | **0% → 100%** | **0 → 1.000** |
+| aggregate | 100% → 100% | 1.000 → 1.000 |
+| absence | 0% → 0% | 0 → 0 |
+| **overall** | **14/26 → 24/26** | blocker failures 5 → **0** |
+| subrequests | 2.08 → 2.04 avg | max 3 → 3 |
+
+**structural-name went 0/10 to 10/10, every one at rank 1.** That was the whole
+thesis, and it holds: those queries were never a ranking problem, they were a
+retriever that never ran.
+
+**One regression, stated plainly: paraphrase MRR fell 0.639 → 0.556.** BR3 moved
+from rank 1 to rank 2; no case dropped out of top-k, so recall held at 100%.
+The cause is inherent to RRF and not a bug — a cell that only the vector list
+found is now outranked by one that two lists agree on. Accepting a small
+paraphrase-ordering cost to take structural-name from 0 to 100% is the right
+trade, but it is a real cost and should not be reported as a clean win. Worth
+re-checking after Phase 2a, which should sharpen the vector list specifically.
+
+**exact-term MRR improved 0.717 → 0.900** — the `tsvector` half doing what
+`ilike` hit-counting could not.
+
+**Cost was flat**: 2.08 → 2.04 subrequests. As the corrected estimate predicted,
+there was no saving to be had, because the ladder never reached its expensive
+branches. Phase 3 bought recall, not cost.
+
+### What is still open
+
+**absence stays 0/2** — top scores 0.654 and 0.607 against a 0.5 floor,
+identical to baseline. Phase 3 does not touch this and was never going to:
+fusion changes ordering, not the similarity distribution. This is Phase 2a's
+target — 48.8% of every embedded chunk is a breadcrumb shared corpus-wide, and
+60% of cells share a body with another cell. Until that is fixed, the bot has
+no score-based grounds to say "not in the blueprint".
+
+**The `BLUEPRINT_HYBRID=off` ladder** is dead weight to be deleted one release
+from now, along with `SEMANTIC_MIN_SIMILARITY` and `SEMANTIC_THIN_RESULTS`,
+which the fused path does not consult.
+
+---
+
+## 🔴 Phase 2a is struck. The absence problem is not a chunk-quality problem.
+
+Investigated 2026-08-19 after Phase 3 left `absence` at 0/2. Two measurements
+settle it, and both contradict this plan's own premise.
+
+### 1. De-boilerplating moves the baseline far too little
+
+Pairwise similarity by how much of the chunk is breadcrumb (40-chunk samples):
+
+| Breadcrumb share | Avg pairwise similarity |
+|---|---|
+| 73% (short chunks) | 0.836 |
+| 50% (medium) | 0.796 |
+| 26% (long chunks) | 0.783 |
+
+Monotonic, so the breadcrumb *does* inflate similarity — but extrapolating to
+0% lands near **0.76**, against a corpus baseline of 0.759. The effect is
+roughly 0.02. Nowhere near enough to matter.
+
+### 2. There is no threshold to reach, at any chunk quality
+
+Every case's top score, sorted:
+
+```
+0.565  exact-term   BR8   host key                        ← REAL HIT
+0.601  exact-term   BR7   Handshake                       ← REAL HIT
+0.607  ABSENCE      BR26  Acuity scheduling
+0.647  paraphrase   BR2   who creates the breakout rooms  ← REAL HIT
+0.653  structural   BR20  No or Few Students Join         ← REAL HIT
+0.654  ABSENCE      BR25  how do tutors submit expense reports
+0.655  aggregate    BR22  what happens during Warm-Up     ← REAL HIT
+0.659  paraphrase   BR5   how does a tutor confirm…       ← REAL HIT
+```
+
+The answer-less queries land **in the middle of the legitimate distribution**.
+A floor high enough to reject both kills six real cases.
+
+And chunk quality cannot fix this, because the direction is wrong: the good
+cases at the *bottom* are `host key` and `Handshake` — short cells whose
+embeddings depend ON the breadcrumb that Phase 2a proposed to remove. Stripping
+it would push the weakest genuine hits down, widening the overlap rather than
+closing it.
+
+**Conclusion: cosine similarity carries no information about whether a query
+has an answer in this corpus.** Not a tuning problem, not a chunking problem —
+the signal is absent. `SEMANTIC_MIN_SIMILARITY` should be deleted, not
+recalibrated.
+
+### What was done instead
+
+The absence cases are retired as threshold assertions and re-specified as what
+retrieval can honestly report: **only the vector list fired** — nothing matched
+the blueprint's own words. `matched_by` is now surfaced on every row, so the
+model can tell a three-retriever agreement from a lone semantic guess.
+
+Whether the bot then *declines to answer* is a prose question and belongs in
+`run-evals.mjs`, where the anti-fabrication rule it protects already lives. It
+was never a retrieval assertion; this plan put it in the wrong harness.
+
+Note the honest caveat: corroboration alone is not a complete absence signal
+either. `"how and when does a tutor get paid"` is a legitimate question that
+also returns zero keyword rows — pure paraphrase looks like absence from the
+keyword side. It is *evidence for the model*, not a rule.
+
+### Final state — run 32316109287, build r69
+
+| Class | Baseline | Final |
+|---|---|---|
+| paraphrase | 100% (MRR 0.639) | 100% (MRR 0.556) |
+| exact-term | 100% (MRR 0.717) | 100% (**MRR 0.900**) |
+| structural-name | **0%** | **100% (MRR 1.000)** |
+| aggregate | 100% | 100% |
+| absence | 0/2 (unreachable bar) | 2/2 (honest bar) |
+| **overall** | **14/26** | **26/26** |
+| subrequests | 2.08 avg | 2.04 avg |
+
+**26/26 is not "absence solved".** Two of those passes come from replacing an
+impossible assertion with an achievable one. The real gain is
+structural-name 0 → 100%, and exact-term ranking; the absence work replaced a
+wrong measurement with a right one.
+
+### What remains
+
+- Delete `SEMANTIC_MIN_SIMILARITY`, `SEMANTIC_THIN_RESULTS` and the
+  `BLUEPRINT_HYBRID=off` ladder one release from now — the fused path consults
+  none of them.
+- Add an absence case to `run-evals.mjs` asserting the bot *says* it cannot
+  find something, now that rows carry `matched_by` to justify it.
+- Phase 2c (incremental embedding) remains optional tidiness, ~$0.26/yr.

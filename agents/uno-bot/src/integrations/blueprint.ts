@@ -17,7 +17,7 @@
 // `grant execute ... to anon` to get the single-subrequest path.
 
 import type { Env } from "../types";
-import { embedText, embeddingsConfigured } from "../vertex/embed";
+import { embedText, embeddingsConfigured, embedModelName } from "../vertex/embed";
 import { countedFetch, rethrowIfBudget, subrequestBudgetSpent } from "../net";
 import { cellUrl, sliceUrl, parseChunkTitle, chunkBody } from "./blueprint-link";
 import {
@@ -95,6 +95,21 @@ export interface BlueprintRow {
    *  BLUEPRINT_APP_URL is set AND the row has an id to link to — a URL that
    *  resolves to nothing is worse than no URL. */
   url?: string;
+  /** Which retrievers found this row: "vector", "keyword", "structural", or a
+   *  "+"-joined combination. Present only on the fused path.
+   *
+   *  WHY IT IS SURFACED. Similarity cannot tell the model whether a question
+   *  has an answer at all. Measured 2026-08-19 across the 26-case retrieval
+   *  set, the two queries with NO answer in the blueprint scored 0.607 and
+   *  0.654 — sitting between two genuine hits at 0.565 ("host key") and 0.647
+   *  ("who creates the breakout rooms"). Any floor that rejects the absent
+   *  pair also rejects six real ones. The signal does not exist in cosine.
+   *
+   *  Corroboration does carry information the score does not: a row only the
+   *  vector list found is a semantic guess, while one three retrievers agree
+   *  on is a match on the blueprint's own words. The model is told this so a
+   *  hedge can be earned rather than thresholded. */
+  matchedBy?: string;
 }
 
 /** Which retrieval path answered, and whether the result was capped.
@@ -103,7 +118,7 @@ export interface BlueprintRow {
  *  fan-out) and nothing reported which one ran, so "are blueprint answers any
  *  good?" was unanswerable — the same silent-degradation class as the
  *  chat.startStream null that cost a day of wrong conclusions. */
-export type BlueprintRetrieval = "semantic" | "rpc" | "tables";
+export type BlueprintRetrieval = "hybrid" | "semantic" | "rpc" | "tables";
 
 export interface BlueprintSearchResult {
   rows: BlueprintRow[];
@@ -256,6 +271,37 @@ export async function searchBlueprint(
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
+    // Primary: ONE fused call. Vector, prose and structural-name retrieval all
+    // run, always, and are ranked together — so nothing can silently skip the
+    // retriever a given question needed, which is exactly what the ladder below
+    // did to every structural-name query (0/10 at the 2026-08-19 baseline).
+    //
+    // Falls through to the ladder only when the RPC is absent (not migrated) or
+    // the kill switch is off. Kept for one release as the rollback path.
+    if (env.BLUEPRINT_HYBRID !== "off") {
+      const fused = await tryHybrid(env, base, key, q, controller.signal);
+      if (fused && fused.length) {
+        const cap = semanticCap(fused.length, HYBRID_MATCH_COUNT);
+        const result: BlueprintSearchResult = {
+          rows: fused,
+          retrieval: "hybrid",
+          ...cap,
+          cached: false,
+          age_ms: 0,
+          thin: false,
+          ...topScore(fused),
+        };
+        console.log(
+          `[blueprint] retrieval=hybrid rows=${fused.length} cached=0 age_ms=0` +
+            `${cap.truncated ? " (truncated capped_by=semantic)" : ""}` +
+            `${result.top_score !== undefined ? ` top_score=${result.top_score}` : ""}` +
+            logQuery(q),
+        );
+        searchCache.set(cacheKey, { at: Date.now(), result });
+        return result;
+      }
+    }
+
     // Primary: semantic (vector) search. Any miss/failure → keyword paths below.
     let semantic: BlueprintRow[] = [];
     if (env.SEMANTIC_SEARCH !== "off" && embeddingsConfigured(env)) {
@@ -406,6 +452,97 @@ function mergeRows(semantic: BlueprintRow[], keyword: BlueprintRow[]): Blueprint
     return true;
   });
   return [...semantic, ...extra];
+}
+
+// ── fused retrieval (the current path) ───────────────────────────────────────
+// One call to public.blueprint_hybrid_search: vector, prose and structural-name
+// retrievers run inside Postgres and are fused by reciprocal rank.
+//
+// WHY THIS REPLACED THE LADDER. The retrieval baseline (2026-08-19,
+// docs/evals/runs/2026-08-19-retrieval-baseline.json) measured structural-name
+// recall at 0/10 while paraphrase and exact-term were both 100%. Every one of
+// the ten returned 15 rows on 2 subrequests — the vector pass and nothing else.
+// The keyword pass never ran: SEMANTIC_THIN_RESULTS short-circuits it whenever
+// the vector pass clears SEMANTIC_MIN_SIMILARITY, and that floor (0.5) sits
+// BELOW the corpus's own minimum pairwise similarity (0.586), so it always
+// clears.
+//
+// And the floor cannot be retuned to fix it. Hits that must be KEPT score
+// 0.565–0.740; structural queries that must FALL THROUGH score 0.653–0.808.
+// The ranges overlap, so no threshold does both jobs.
+//
+// So: stop thresholding, start fusing. RRF ranks by POSITION across the three
+// lists — the only quantity comparable between a cosine distance and a ts_rank
+// — and a cell that several retrievers agree on rises above one that only a
+// single retriever liked.
+const HYBRID_RPC = "blueprint_hybrid_search";
+const HYBRID_MATCH_COUNT = 15;
+
+async function tryHybrid(
+  env: Env,
+  base: string,
+  key: string,
+  q: string,
+  signal: AbortSignal,
+): Promise<BlueprintRow[] | null> {
+  // A null embedding is legal here: the RPC runs keyword-only rather than
+  // failing, so a Vertex outage costs paraphrase recall instead of the answer.
+  const embedding = await embedText(env, q, "RETRIEVAL_QUERY");
+  const res = await countedFetch(`${base}/rest/v1/rpc/${HYBRID_RPC}`, {
+    method: "POST",
+    headers: { ...headers(key), "content-type": "application/json" },
+    body: JSON.stringify({
+      q,
+      query_embedding: embedding,
+      match_count: HYBRID_MATCH_COUNT,
+      // Declaring the model lets the index reject a caller built on a different
+      // one. embedText falls back from text-embedding-005 to -004 when no
+      // service account is configured, and BOTH are 768-dim — so the vector
+      // signature cannot catch it and nothing else in the stack would.
+      embed_model: embedding ? embedModelName(env) : null,
+    }),
+    signal,
+  });
+  if (res.ok) {
+    const data = (await res.json().catch(() => [])) as Array<Record<string, unknown>>;
+    if (!Array.isArray(data)) return null;
+    return data.map((r): BlueprintRow => {
+      const id = typeof r.id === "string" ? r.id : "";
+      const title = typeof r.title === "string" ? r.title : "";
+      return {
+        kind: "cell",
+        id,
+        title,
+        // The RPC returns the corpus chunk when one exists, which carries the
+        // breadcrumb as its first line exactly as the semantic path did — so
+        // the same stripper applies.
+        snippet: chunkBody(typeof r.snippet === "string" ? r.snippet : undefined, title),
+        description: str(r.description),
+        layer: str(r.layer),
+        step: str(r.step),
+        scenario: str(r.scenario),
+        phase: str(r.phase),
+        path: str(r.path),
+        // cells.links, which the semantic path could never carry: chunks have
+        // no authored links, so the richest citation material the blueprint
+        // holds was invisible on the primary retrieval path.
+        links: normalizeLinks(r.links),
+        score: typeof r.similarity === "number" ? Math.round(r.similarity * 1000) / 1000 : undefined,
+        updatedAt: typeof r.updated_at === "string" ? r.updated_at.slice(0, 10) : undefined,
+        matchedBy: str(r.matched_by),
+        url: cellUrl(env.BLUEPRINT_APP_URL, id),
+      };
+    });
+  }
+  // Function absent (not migrated yet) → fall back to the ladder rather than
+  // fail the search. Any other status is a real error and must propagate.
+  const err = (await res.json().catch(() => ({}))) as { code?: string };
+  if (res.status === 404 || err.code === "PGRST202") return null;
+  throw new Error(`Supabase rpc ${HYBRID_RPC} ${res.status}${err.code ? ` ${err.code}` : ""}`);
+}
+
+function str(v: unknown): string | undefined {
+  return typeof v === "string" && v ? v : undefined;
 }
 
 // Embed the query + call semantic_search.match_corpus_chunks. Returns null on

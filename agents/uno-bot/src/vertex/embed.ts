@@ -27,6 +27,21 @@ export function embeddingsConfigured(env: Env): boolean {
   );
 }
 
+/** Which model embedText WOULD use, given this env.
+ *
+ *  The hybrid RPC takes this and rejects a caller whose model does not match
+ *  the one the index was built with. That check cannot be done by dimension:
+ *  the Vertex SA path (005) and the AI Studio path (004) are BOTH 768-dim, so
+ *  a deployment missing the SA produces vectors that type-check perfectly and
+ *  score against the index as noise. Naming the model is the only way to catch
+ *  it, and it fails loudly on the first search instead of degrading forever.
+ */
+export function embedModelName(env: Env): string {
+  return env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY && env.GEMINI_PROJECT_ID
+    ? VERTEX_MODEL
+    : AISTUDIO_MODEL;
+}
+
 /** Embed one string. Returns the vector, or null on any error (caller falls back). */
 export async function embedText(
   env: Env,

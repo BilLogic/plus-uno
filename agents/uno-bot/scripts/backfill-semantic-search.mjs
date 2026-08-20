@@ -147,6 +147,13 @@ async function fetchSourceRows() {
   if (!res.ok) throw new Error(`read source view failed (${res.status}): ${await res.text()}`);
   return res.json();
 }
+// (source_key -> stored updated_at) for the incremental pass above.
+async function fetchIndexedStamps() {
+  const url = `${SUPABASE_URL}/rest/v1/corpus_chunks?select=source_key,updated_at&source=eq.blueprint&limit=10000`;
+  const res = await fetch(url, { headers: sbHeaders("read") });
+  if (!res.ok) throw new Error(`index scan failed (${res.status}): ${await res.text()}`);
+  return new Map((await res.json()).map((r) => [r.source_key, r.updated_at]));
+}
 async function upsertChunks(rows) {
   const url = `${SUPABASE_URL}/rest/v1/corpus_chunks?on_conflict=source,source_key`;
   const res = await fetch(url, {
@@ -157,38 +164,57 @@ async function upsertChunks(rows) {
   if (!res.ok) throw new Error(`upsert failed (${res.status}): ${await res.text()}`);
 }
 // Orphan pass: a cell deleted or re-keyed in the app leaves its chunk behind,
-// and an upsert-only index serves it forever — the bot then cites content
-// that no longer exists and hands out a dead ?cell= link. Diff the index
-// against the source view and delete what the view no longer contains.
-async function deleteOrphans(liveKeys) {
-  const listUrl = `${SUPABASE_URL}/rest/v1/corpus_chunks?select=source_key&source=eq.blueprint&limit=10000`;
-  const res = await fetch(listUrl, { headers: sbHeaders("read") });
-  if (!res.ok) throw new Error(`orphan scan failed (${res.status}): ${await res.text()}`);
-  const existing = await res.json();
-  const live = new Set(liveKeys);
-  const orphans = existing.map((r) => r.source_key).filter((k) => !live.has(k));
-  if (orphans.length === 0) return 0;
-  // Delete in bounded batches so the in-list stays well under URL limits.
-  for (let i = 0; i < orphans.length; i += 50) {
-    const batch = orphans.slice(i, i + 50);
-    const delUrl = `${SUPABASE_URL}/rest/v1/corpus_chunks` +
-      `?source=eq.blueprint&source_key=in.(${batch.map((k) => `"${k}"`).join(",")})`;
-    const del = await fetch(delUrl, { method: "DELETE", headers: sbHeaders("write") });
-    if (!del.ok) throw new Error(`orphan delete failed (${del.status}): ${await del.text()}`);
-  }
-  return orphans.length;
+// and an upsert-only index serves it forever — the bot then cites content that
+// no longer exists and hands out a dead ?cell= link. Measured 2026-08-19 before
+// this worked: 43 orphans, and 10% of sampled searches surfaced one in top-15.
+//
+// This calls semantic_search.prune_orphans() rather than issuing its own
+// DELETE. The function's WHERE lives inside a security definer, so the caller
+// can only ever remove the orphan set — where the table-level grant permitted
+// `delete from corpus_chunks` with any predicate, or none. Same shape the
+// schema already uses for reads, where match_corpus_chunks is the only door.
+//
+// This is step 2 of the sequence written into that migration; step 3 is
+// revoking the table grant, which is now safe to do.
+async function pruneOrphans() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/prune_orphans`, {
+    method: "POST",
+    headers: { ...sbHeaders("write"), "content-type": "application/json" },
+    body: "{}",
+  });
+  if (!res.ok) throw new Error(`orphan prune failed (${res.status}): ${await res.text()}`);
+  const removed = await res.json();
+  return typeof removed === "number" ? removed : 0;
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
+  const full = process.argv.includes("--full");
   // Only the Vertex SA path needs a Google token; the API-key path doesn't.
   const token = USE_API_KEY ? null : await getGoogleToken();
   const src = await fetchSourceRows();
-  console.log(`[backfill] ${src.length} blueprint chunks to embed`);
+
+  // Embed only what changed. The index stores the SOURCE row's updated_at (not
+  // the embed time), so a row whose stored stamp already matches is current.
+  //
+  // This is tidiness, not relief: EMBED_BATCH is 100, so a full run is ~9 API
+  // requests — negligible against any quota. It saves roughly $0.26/yr. Do not
+  // let it mask a real staleness bug; --full forces everything, and a view
+  // change (which alters chunk TEXT without touching cells.updated_at) REQUIRES
+  // it, because no stamp moves when the view is redefined.
+  let todo = src;
+  if (!full) {
+    const known = await fetchIndexedStamps();
+    todo = src.filter((r) => known.get(r.source_key) !== r.updated_at);
+  }
+  console.log(
+    `[backfill] ${src.length} eligible chunks; ${todo.length} to embed` +
+      `${full ? " (--full)" : ` (${src.length - todo.length} unchanged)`}`,
+  );
 
   let done = 0;
-  for (let i = 0; i < src.length; i += EMBED_BATCH) {
-    const batch = src.slice(i, i + EMBED_BATCH);
+  for (let i = 0; i < todo.length; i += EMBED_BATCH) {
+    const batch = todo.slice(i, i + EMBED_BATCH);
     const embeddings = await embedBatch(token, batch.map((r) => r.chunk));
     const rows = batch.map((r, j) => ({
       source: "blueprint",
@@ -208,10 +234,11 @@ async function main() {
     }));
     await upsertChunks(rows);
     done += rows.length;
-    console.log(`[backfill] upserted ${done}/${src.length}`);
+    console.log(`[backfill] upserted ${done}/${todo.length}`);
   }
-  const removed = await deleteOrphans(src.map((r) => r.source_key));
-  if (removed > 0) console.log(`[backfill] deleted ${removed} orphaned chunks`);
+
+  const removed = await pruneOrphans();
+  if (removed > 0) console.log(`[backfill] pruned ${removed} orphaned chunk(s)`);
   console.log("[backfill] done");
 }
 
