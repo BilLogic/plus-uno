@@ -82,8 +82,8 @@
 
 ## R14 — correction re-queries, never restates *(added 2026-08-17, same thread)*
 - **Trigger:** R13, then the user corrects the phase ("im talking about the post session phase")
-- **Expected — mechanism:** the turn issues a `blueprint_search` whose query string differs from turn 1's, and the reply's freshness claim (if any) is backed by that fetch, not by a cached hit. Then the corrected phase mapping, taken from a queried `phases` row
-- **Fails if:** no `blueprint_search` fires on the correction turn · the same query string is reissued · the prior answer is restated or reworded at greater length · a freshness clause is carried across turns ("I checked both just now, so this is current") without a fetch in that turn · a second PRD pitch
+- **Expected — mechanism:** the turn issues a `search_blueprint` whose query string differs from turn 1's, and the reply's freshness claim (if any) is backed by that fetch, not by a cached hit. Then the corrected phase mapping, taken from a queried `phases` row
+- **Fails if:** no `search_blueprint` fires on the correction turn · the same query string is reissued · the prior answer is restated or reworded at greater length · a freshness clause is carried across turns ("I checked both just now, so this is current") without a fetch in that turn · a second PRD pitch
 - **Unscoreable until** `searchBlueprint` reports `cached` / `age_ms` and logs the query string — a cache hit is otherwise indistinguishable from a fetch.
 
 ## P1 — prototype ask with no PRD

@@ -237,7 +237,7 @@ if (instanceDataHits.length) {
       .map((h) => `  assembled:${h.line}  (${h.pattern}: "${h.match}")\n    ${h.text}`)
       .join("\n") +
     "\n  -> Counts and membership lists about the blueprint's CONTENTS go stale between deploys and" +
-    "\n     ship as confident wrong answers. Delete the number and let blueprint_search retrieve it," +
+    "\n     ship as confident wrong answers. Delete the number and let search_blueprint retrieve it," +
     "\n     or, if the figure is deliberate (a historical ledger, a fixed contract), mark the line/block:" +
     "\n       <!-- instance-data-ok: why this number is allowed to be frozen -->";
   if (INSTANCE_DATA_GUARD_BLOCKING) {

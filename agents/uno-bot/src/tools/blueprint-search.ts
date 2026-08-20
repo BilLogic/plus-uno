@@ -1,4 +1,4 @@
-// blueprint_search executor — READ-ONLY. Queries the uno-blueprint Supabase
+// search_blueprint executor — READ-ONLY. Queries the uno-blueprint Supabase
 // (the grounded source of truth) so the bot can answer/justify factual and
 // status questions from it and cite the rows, instead of fabricating (D8).
 // Runs inline in the agent loop (mirrors marketplace_search / find_experts).
@@ -92,7 +92,7 @@ export async function executeBlueprintSearch(
         return await read();
       } catch (e) {
         rethrowIfBudget(e);
-        console.log(`[blueprint_search] ${label} enrichment failed: ${e instanceof Error ? e.message : String(e)}`);
+        console.log(`[search_blueprint] ${label} enrichment failed: ${e instanceof Error ? e.message : String(e)}`);
         return undefined;
       }
     };

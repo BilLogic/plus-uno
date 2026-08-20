@@ -20,7 +20,7 @@ dimensions:
   - id: D7
     definition: "efficiency & safety — one telemetry line per request (tier, model, iterations, tokens, latency); read-only tool budget respected; safety contract held"
   - id: D8
-    definition: "grounding — product claims answered via read-only blueprint_search with citations; anti-fabrication discipline"
+    definition: "grounding — product claims answered via read-only search_blueprint with citations; anti-fabrication discipline"
   - id: D9
     definition: "confidence ritual — exactly one in-prose clause conveying how sure the answer is and why, with sureness earned only by a source fetched this turn; the retired trailing high/medium/low affix must NOT appear (redesigned 2026-07-16)"
 hard_gates:

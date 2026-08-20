@@ -16,7 +16,7 @@ Slack delta only — tool payloads, gates, mrkdwn shapes. The shared procedure (
 - **Findings-doc wall — the Findings & Takeaways doc is not a bot surface:** it lives on the project hub's Research subpage (`docs/conventions/notion.md` § Write surfaces), which is not a `notion_create` surface — the surfaces are `prd`, `intake`, and `decision`. Post the findings inline, then either file an intake pointing at them or hand a ready-to-paste IDE prompt that writes the real doc.
 - **Long-thread wall — thread memory is the last ~100 turns; a linked thread reads ~50 messages.** Beyond that: summarize what's visible, SAY where the window starts, and offer the IDE prompt for a full-thread pass.
 - **"summarize what changed" / "write the update summary"** → the component-update notification shape below (method § Variant); no tool, posts as a normal threaded reply.
-- Ground product/status facts via `blueprint_search` (read-only, no gate) and cite the rows.
+- Ground product/status facts via `search_blueprint` (read-only, no gate) and cite the rows.
 
 ## Output — Slack mrkdwn, tight
 
@@ -45,7 +45,7 @@ Never auto-create a PRD — always offer, draft, then file on approval.
 
 ## Hand-offs
 
-- **The paired write is not a Worker capability** — the bot has no blueprint write tool (`blueprint_search` is read-only). **The handoff is automatic:** whenever a PRD the bot filed is accepted, attach the ready-to-paste IDE prompt for the blueprint write + Ready-for-Design card move (`skills/uno-synthesize`, method § 5) — every time, not only when asked.
+- **The paired write is not a Worker capability** — the bot has no blueprint write tool (`search_blueprint` is read-only). **The handoff is automatic:** whenever a PRD the bot filed is accepted, attach the ready-to-paste IDE prompt for the blueprint write + Ready-for-Design card move (`skills/uno-synthesize`, method § 5) — every time, not only when asked.
 - After the PRD is filed → **uno-prototype** (`prototype_scaffold`) to scaffold from a Figma frame; a natural sequence is notion_create → prototype_scaffold.
 - People-sourcing earlier in the flow → **uno-research** (`notion_search`, scope: "team"); deep multi-file codebase research → the in-IDE `skills/uno-research`.
 - Plus-fact / project-status questions → default conversational mode, not synthesis.

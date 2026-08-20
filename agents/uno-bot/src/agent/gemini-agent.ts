@@ -5,7 +5,7 @@
 //
 // Differences from the Anthropic loop, by design:
 //   - NO server-side MCP (Gemini plain models have none) — the bot runs on its
-//     LOCAL tools (roadmap_query, blueprint_search, notion_search, source_read,
+//     LOCAL tools (roadmap_query, search_blueprint, notion_search, source_read,
 //     github_read, slack_*). Each call costs Worker subrequests, which is why
 //     roadmap_query (1-2 subrequests, complete answers) matters here.
 //   - Client-side function-calling loop: every tool round is its own SHORT

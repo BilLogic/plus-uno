@@ -52,7 +52,7 @@ export interface ChunkBreadcrumb {
  * revisions of that view wrote the same string WITHOUT the leading phase
  * segment. The bot used to hand that whole string to the model
  * as `title` and leave `layer` / `step` / `scenario` / `phase` empty — so the
- * one instruction blueprint_search cares most about, "attribute every activity
+ * one instruction search_blueprint cares most about, "attribute every activity
  * to its layer", had nothing to attribute with on the PRIMARY retrieval path,
  * and the citation format the navigation guide demands
  * (`phase › scenario › path — layer × step`) could not be produced at all. The

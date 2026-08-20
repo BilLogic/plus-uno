@@ -65,7 +65,7 @@ Rules:
 ## 5 · Retrieval
 
 Phrase queries in journey words (actor, scenario, step), not product-management words, and re-query per actor when a question spans layers.
-<!-- ide-only -->In-IDE there is no `blueprint_search` — query Supabase directly with the recipes below.<!-- /ide-only -->
+<!-- ide-only -->In-IDE there is no `search_blueprint` — query Supabase directly with the recipes below.<!-- /ide-only -->
 
 <!-- ide-only -->
 ### Query recipes (Supabase MCP / SQL)

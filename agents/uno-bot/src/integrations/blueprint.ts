@@ -33,6 +33,10 @@ export { renderBlueprintIndex, FUTURE_LABELS, futureLabel } from "./blueprint-in
 export type { BlueprintIndex, BlueprintCappedBy } from "./blueprint-index";
 
 const REQUEST_TIMEOUT_MS = 10000;
+// ONE name for one function. The portal answers as public.search_blueprint;
+// both call sites below use this constant — tryHybrid sends the full argument
+// set (embedding, model tag, filters), tryRpc sends {q} only, which the portal
+// serves from its defaults. That is the degraded mode, not a different search.
 const RPC_NAME = "search_blueprint";
 const PER_TABLE_LIMIT = 8;
 const MAX_ROWS = 30;
@@ -490,7 +494,6 @@ function mergeRows(semantic: BlueprintRow[], keyword: BlueprintRow[]): Blueprint
 // corpus-wide count behind the top-k, so "113 cells mention Zoom, here are 15"
 // is sayable. Same name the ladder's tryRpc always called, so the fallback
 // path rides the upgrade for free.
-const HYBRID_RPC = "search_blueprint";
 const HYBRID_MATCH_COUNT = 15;
 
 async function tryHybrid(
@@ -503,7 +506,7 @@ async function tryHybrid(
   // A null embedding is legal here: the RPC runs keyword-only rather than
   // failing, so a Vertex outage costs paraphrase recall instead of the answer.
   const embedding = await embedText(env, q, "RETRIEVAL_QUERY");
-  const res = await countedFetch(`${base}/rest/v1/rpc/${HYBRID_RPC}`, {
+  const res = await countedFetch(`${base}/rest/v1/rpc/${RPC_NAME}`, {
     method: "POST",
     headers: { ...headers(key), "content-type": "application/json" },
     body: JSON.stringify({
@@ -556,7 +559,7 @@ async function tryHybrid(
   // fail the search. Any other status is a real error and must propagate.
   const err = (await res.json().catch(() => ({}))) as { code?: string };
   if (res.status === 404 || err.code === "PGRST202") return null;
-  throw new Error(`Supabase rpc ${HYBRID_RPC} ${res.status}${err.code ? ` ${err.code}` : ""}`);
+  throw new Error(`Supabase rpc ${RPC_NAME} ${res.status}${err.code ? ` ${err.code}` : ""}`);
 }
 
 function str(v: unknown): string | undefined {
@@ -690,7 +693,7 @@ const SOURCES: Source[] = [
 
 /**
  * Tables the keyword fallback fans out over — one subrequest each. Derived from
- * SOURCES, not copied, so adding a table updates blueprint_search's worst-case
+ * SOURCES, not copied, so adding a table updates search_blueprint's worst-case
  * bound in loop-shared automatically instead of silently exceeding it.
  */
 export const BLUEPRINT_TABLE_FANOUT = SOURCES.length;

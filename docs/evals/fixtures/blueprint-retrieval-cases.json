@@ -1,6 +1,6 @@
 [
   {
-    "_readme": "Retrieval-level eval cases for blueprint_search. Scored by agents/uno-bot/scripts/run-retrieval-evals.mjs against GET /debug/blueprint-search — NO model, NO judge, seconds not minutes. Every id below was read out of the live blueprint on 2026-08-19, never guessed. Assertions: expectCellIds (any-of within k), expectAllCellIds (all-of), expectPath/expectScenario (>= minMatches rows carry it), expectTopScoreBelow (absence). Classes: paraphrase | exact-term | structural-name | aggregate | absence. `blocker: true` cases must pass; the rest are diagnostics that report without failing the job."
+    "_readme": "Retrieval-level eval cases for search_blueprint. Scored by agents/uno-bot/scripts/run-retrieval-evals.mjs against GET /debug/blueprint-search — NO model, NO judge, seconds not minutes. Every id below was read out of the live blueprint on 2026-08-19, never guessed. Assertions: expectCellIds (any-of within k), expectAllCellIds (all-of), expectPath/expectScenario (>= minMatches rows carry it), expectTopScoreBelow (absence). Classes: paraphrase | exact-term | structural-name | aggregate | absence. `blocker: true` cases must pass; the rest are diagnostics that report without failing the job."
   },
 
   { "id": "BR1", "class": "paraphrase", "blocker": true, "k": 5,

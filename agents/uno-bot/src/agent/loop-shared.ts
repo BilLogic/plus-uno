@@ -275,7 +275,7 @@ const CORRECTION_PATTERNS: RegExp[] = [
 /**
  * True when this message reads as the user CORRECTING the bot's previous reply.
  *
- * On a hit the turn must (a) force `fresh: true` on blueprint_search so the 60s
+ * On a hit the turn must (a) force `fresh: true` on search_blueprint so the 60s
  * result cache cannot serve the same rows back under a "I just re-checked"
  * claim, and (b) carry a one-turn directive naming the prior query so it is not
  * reissued verbatim. Both are wired in slack/events.ts.
@@ -314,7 +314,7 @@ export function correctionDirective(priorQuery?: string): string {
 //     cites something fetched this turn; the executions happen deep inside
 //     whichever provider loop is active, and the judge runs in slack/events.ts,
 //     several frames above.
-//  2. WHETHER THIS IS A CORRECTION TURN, so `blueprint_search` can be forced to
+//  2. WHETHER THIS IS A CORRECTION TURN, so `search_blueprint` can be forced to
 //     `fresh: true` at the boundary. Left to the model, a pushback re-runs a
 //     near-identical query and the SAME rows come back under an "I just
 //     re-checked" claim — a cache serving a lie.
@@ -364,7 +364,7 @@ export function recordRetrieval(receipt: RetrievalReceipt): void {
   if (store) store.receipt = receipt;
 }
 
-/** Derive a receipt from a blueprint_search result payload. Best-effort by
+/** Derive a receipt from a search_blueprint result payload. Best-effort by
  *  design: a malformed payload costs a receipt, never the turn. */
 function recordBlueprintReceipt(resultJson: string): void {
   if (!turnScope.getStore()) return;
@@ -386,7 +386,7 @@ function recordBlueprintReceipt(resultJson: string): void {
       ),
     ].slice(0, 8);
     recordRetrieval({
-      tool: "blueprint_search",
+      tool: "search_blueprint",
       query: parsed.query,
       ...(typeof path === "string" ? { path } : {}),
       count: typeof parsed.count === "number" ? parsed.count : rows.length,
@@ -442,7 +442,7 @@ export async function executeReadOnlyTool(
   turnScope.getStore()?.tools.add(name);
   if (name === "notion_search") return executeNotionSearch(env, input);
   if (name === "roadmap_query") return executeRoadmapQuery(env, input);
-  if (name === "blueprint_search") {
+  if (name === "search_blueprint") {
     // On a correction turn the cache MUST NOT answer — see withTurnScope.
     const out = await executeBlueprintSearch(env, isCorrectionTurn() ? { ...input, fresh: true } : input);
     // The receipt is derived HERE, not inside the tool, so blueprint-search.ts

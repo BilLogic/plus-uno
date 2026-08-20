@@ -452,7 +452,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // Is the person telling us the last reply was wrong? Classified in the Worker,
   // not left to the prompt: on turn 2 the bot's own turn-1 claim is sitting in
   // context as authoritative prose, and a prompt rule has to beat that. A hit
-  // forces `fresh: true` on blueprint_search, injects a one-turn directive
+  // forces `fresh: true` on search_blueprint, injects a one-turn directive
   // naming the prior query, pulls the retrieval receipts off the DO, and turns
   // on the judge's correction gate. See loop-shared looksLikeCorrection.
   // TEXT-ONLY half of the test. The other half — "is there actually a previous
