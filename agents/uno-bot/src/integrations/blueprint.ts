@@ -95,6 +95,21 @@ export interface BlueprintRow {
    *  BLUEPRINT_APP_URL is set AND the row has an id to link to — a URL that
    *  resolves to nothing is worse than no URL. */
   url?: string;
+  /** Which retrievers found this row: "vector", "keyword", "structural", or a
+   *  "+"-joined combination. Present only on the fused path.
+   *
+   *  WHY IT IS SURFACED. Similarity cannot tell the model whether a question
+   *  has an answer at all. Measured 2026-08-19 across the 26-case retrieval
+   *  set, the two queries with NO answer in the blueprint scored 0.607 and
+   *  0.654 — sitting between two genuine hits at 0.565 ("host key") and 0.647
+   *  ("who creates the breakout rooms"). Any floor that rejects the absent
+   *  pair also rejects six real ones. The signal does not exist in cosine.
+   *
+   *  Corroboration does carry information the score does not: a row only the
+   *  vector list found is a semantic guess, while one three retrievers agree
+   *  on is a match on the blueprint's own words. The model is told this so a
+   *  hedge can be earned rather than thresholded. */
+  matchedBy?: string;
 }
 
 /** Which retrieval path answered, and whether the result was capped.
@@ -514,6 +529,7 @@ async function tryHybrid(
         links: normalizeLinks(r.links),
         score: typeof r.similarity === "number" ? Math.round(r.similarity * 1000) / 1000 : undefined,
         updatedAt: typeof r.updated_at === "string" ? r.updated_at.slice(0, 10) : undefined,
+        matchedBy: str(r.matched_by),
         url: cellUrl(env.BLUEPRINT_APP_URL, id),
       };
     });

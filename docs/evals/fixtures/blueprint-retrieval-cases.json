@@ -140,11 +140,11 @@
 
   { "id": "BR25", "class": "absence", "blocker": false, "k": 5,
     "q": "how do tutors submit expense reports",
-    "expectTopScoreBelow": 0.5,
-    "note": "DIAGNOSTIC, EXPECTED TO FAIL TODAY — and that failure is the point. Nothing about expenses exists in the blueprint, yet vector search always returns its nearest 15. Measured 2026-08-19: unrelated chunk pairs average 0.759 similarity, so the 0.5 floor sits BELOW the corpus's own minimum and can never reject anything. This case should start passing once Phase 2a de-duplicates the chunk text and Phase 2d sets the floor from a real query-side measurement. Until then it is the cleanest single number for the problem." },
+    "expectMatchedByOnly": "vector",
+    "note": "RETIRED AS A THRESHOLD TEST 2026-08-19, and the reason is the finding. This case used to assert top_score < 0.5. Measured across all 26 cases, the two queries with NO answer scored 0.607 and 0.654 — landing BETWEEN genuine hits at 0.565 ('host key') and 0.647 ('who creates the breakout rooms'). Any floor that rejects the absent pair also rejects six real ones, so no threshold exists, and chunk quality cannot create one: the good cases at the bottom are short cells whose scores depend ON the breadcrumb that de-boilerplating would remove. What retrieval CAN honestly report is corroboration — nothing here matches the blueprint's own words, so only the vector list fires. Whether the bot then declines to answer is a prose question, scored by run-evals.mjs, not here." },
 
   { "id": "BR26", "class": "absence", "blocker": false, "k": 5,
     "q": "Acuity scheduling",
-    "expectTopScoreBelow": 0.5,
-    "note": "Acuity is retired. Same diagnostic as BR25, plus it guards a real fabrication risk: a confident answer about a dead tool. Retrieval cannot fix this alone — the model must decline — but a top score below the floor is what gives it grounds to." }
+    "expectMatchedByOnly": "vector",
+    "note": "Same retirement as BR25. Acuity is retired tooling, so this also guards a real fabrication risk — but the guard belongs in the prose eval, where the rule it protects actually lives. Retrieval's contribution is the honest signal that no keyword or structural retriever corroborated anything." }
 ]

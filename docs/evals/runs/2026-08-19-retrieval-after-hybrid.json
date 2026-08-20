@@ -1,12 +1,12 @@
 {
   "summary": {
-    "ranAt": "2026-08-19T23:59:52.163Z",
+    "ranAt": "2026-08-20T00:08:24.437Z",
     "worker": "https://uno-bot.bryanhuang628.workers.dev",
     "cases": 26,
-    "passed": 24,
+    "passed": 26,
     "blockers": 14,
     "blockerFailures": 0,
-    "recallOverall": 0.923,
+    "recallOverall": 1,
     "subrequestsAvg": 2.04,
     "subrequestsMax": 3,
     "byClass": {
@@ -36,8 +36,8 @@
       },
       "absence": {
         "cases": 2,
-        "passed": 0,
-        "recall": 0,
+        "passed": 2,
+        "recall": 1,
         "mrr": 0
       }
     }
@@ -55,7 +55,7 @@
       "top_score": 0.693,
       "rows": 15,
       "subrequests": 3,
-      "ms": 1293,
+      "ms": 1166,
       "top": [
         {
           "id": "a0000000-0000-4000-8000-000000170203",
@@ -95,7 +95,7 @@
       "top_score": 0.647,
       "rows": 15,
       "subrequests": 2,
-      "ms": 656,
+      "ms": 383,
       "top": [
         {
           "id": "a0000000-0000-4000-8000-000000180402",
@@ -135,7 +135,7 @@
       "top_score": 0.685,
       "rows": 15,
       "subrequests": 2,
-      "ms": 684,
+      "ms": 602,
       "top": [
         {
           "id": "b0000000-0000-4000-8000-000000180303",
@@ -175,7 +175,7 @@
       "top_score": 0.74,
       "rows": 15,
       "subrequests": 2,
-      "ms": 573,
+      "ms": 667,
       "top": [
         {
           "id": "a0000000-0000-4000-8000-000000070206",
@@ -215,7 +215,7 @@
       "top_score": 0.659,
       "rows": 15,
       "subrequests": 2,
-      "ms": 533,
+      "ms": 432,
       "top": [
         {
           "id": "a0000000-0000-4000-8000-000000180302",
@@ -255,7 +255,7 @@
       "top_score": 0.727,
       "rows": 15,
       "subrequests": 2,
-      "ms": 338,
+      "ms": 512,
       "top": [
         {
           "id": "a0000000-0000-4000-8000-0000001e0202",
@@ -295,7 +295,7 @@
       "top_score": 0.601,
       "rows": 15,
       "subrequests": 2,
-      "ms": 463,
+      "ms": 340,
       "top": [
         {
           "id": "a0000000-0000-4000-8000-000000070506",
@@ -335,7 +335,7 @@
       "top_score": 0.565,
       "rows": 15,
       "subrequests": 2,
-      "ms": 420,
+      "ms": 281,
       "top": [
         {
           "id": "802ecb88-257b-47a9-be10-dee9d320daf3",
@@ -375,7 +375,7 @@
       "top_score": 0.69,
       "rows": 15,
       "subrequests": 2,
-      "ms": 456,
+      "ms": 348,
       "top": [
         {
           "id": "a0000000-0000-4000-8000-000000100403",
@@ -415,7 +415,7 @@
       "top_score": 0.677,
       "rows": 15,
       "subrequests": 2,
-      "ms": 377,
+      "ms": 494,
       "top": [
         {
           "id": "a0000000-0000-4000-8000-0000001e0106",
@@ -455,7 +455,7 @@
       "top_score": 0.702,
       "rows": 15,
       "subrequests": 2,
-      "ms": 464,
+      "ms": 258,
       "top": [
         {
           "id": "b0000000-0000-4000-8000-000000180306",
@@ -495,7 +495,7 @@
       "top_score": 0.723,
       "rows": 15,
       "subrequests": 2,
-      "ms": 406,
+      "ms": 267,
       "top": [
         {
           "id": "2dce6fba-53ee-416f-bc20-37f7f2295634",
@@ -535,7 +535,7 @@
       "top_score": 0.73,
       "rows": 15,
       "subrequests": 2,
-      "ms": 628,
+      "ms": 333,
       "top": [
         {
           "id": "8efe7e1d-1dd0-44df-88af-9fd4ad238ee1",
@@ -575,7 +575,7 @@
       "top_score": 0.668,
       "rows": 15,
       "subrequests": 2,
-      "ms": 261,
+      "ms": 357,
       "top": [
         {
           "id": "3dc093bc-6c58-4071-b3e3-09b2d200f7ba",
@@ -615,7 +615,7 @@
       "top_score": 0.808,
       "rows": 15,
       "subrequests": 2,
-      "ms": 607,
+      "ms": 319,
       "top": [
         {
           "id": "646cabf1-2e09-4671-bb2a-34eee8c45eaa",
@@ -655,7 +655,7 @@
       "top_score": 0.782,
       "rows": 15,
       "subrequests": 2,
-      "ms": 298,
+      "ms": 299,
       "top": [
         {
           "id": "49d5700f-5225-42cb-b368-f1a17ddc6087",
@@ -695,7 +695,7 @@
       "top_score": 0.717,
       "rows": 15,
       "subrequests": 2,
-      "ms": 284,
+      "ms": 401,
       "top": [
         {
           "id": "dbbde9f5-a666-4675-a24b-f5bf3b376434",
@@ -735,7 +735,7 @@
       "top_score": 0.744,
       "rows": 15,
       "subrequests": 2,
-      "ms": 439,
+      "ms": 1015,
       "top": [
         {
           "id": "a0000000-0000-4000-8000-000000c00306",
@@ -775,7 +775,7 @@
       "top_score": 0.733,
       "rows": 15,
       "subrequests": 2,
-      "ms": 539,
+      "ms": 278,
       "top": [
         {
           "id": "b0000000-0000-4000-8000-000000180306",
@@ -815,7 +815,7 @@
       "top_score": 0.653,
       "rows": 15,
       "subrequests": 2,
-      "ms": 262,
+      "ms": 269,
       "top": [
         {
           "id": "b2000000-0000-4000-8000-000000000031",
@@ -855,7 +855,7 @@
       "top_score": 0.671,
       "rows": 15,
       "subrequests": 2,
-      "ms": 278,
+      "ms": 208,
       "top": [
         {
           "id": "b0000000-0000-4000-8000-0000001e1105",
@@ -895,7 +895,7 @@
       "top_score": 0.655,
       "rows": 15,
       "subrequests": 2,
-      "ms": 529,
+      "ms": 264,
       "top": [
         {
           "id": "a0000000-0000-4000-8000-000000040201",
@@ -935,7 +935,7 @@
       "top_score": 0.686,
       "rows": 15,
       "subrequests": 2,
-      "ms": 220,
+      "ms": 263,
       "top": [
         {
           "id": "a0000000-0000-4000-8000-0000001f0403",
@@ -975,7 +975,7 @@
       "top_score": 0.69,
       "rows": 15,
       "subrequests": 2,
-      "ms": 281,
+      "ms": 198,
       "top": [
         {
           "id": "b0000000-0000-4000-8000-000000180103",
@@ -1008,16 +1008,14 @@
       "class": "absence",
       "blocker": false,
       "q": "how do tutors submit expense reports",
-      "pass": false,
+      "pass": true,
       "rank": 0,
-      "reasons": [
-        "top_score 0.654 >= floor 0.5"
-      ],
+      "reasons": [],
       "retrieval": "hybrid",
       "top_score": 0.654,
       "rows": 15,
       "subrequests": 2,
-      "ms": 312,
+      "ms": 240,
       "top": [
         {
           "id": "a0000000-0000-4000-8000-0000001e0103",
@@ -1050,16 +1048,14 @@
       "class": "absence",
       "blocker": false,
       "q": "Acuity scheduling",
-      "pass": false,
+      "pass": true,
       "rank": 0,
-      "reasons": [
-        "top_score 0.607 >= floor 0.5"
-      ],
+      "reasons": [],
       "retrieval": "hybrid",
       "top_score": 0.607,
       "rows": 15,
       "subrequests": 2,
-      "ms": 269,
+      "ms": 262,
       "top": [
         {
           "id": "a0000000-0000-4000-8000-000000140204",

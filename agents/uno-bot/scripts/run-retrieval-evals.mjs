@@ -137,6 +137,21 @@ function scoreCase(c, res) {
     if (!rank) rank = rankOf(rows, (r) => r.scenario === c.expectScenario);
   }
 
+  if (c.expectMatchedByOnly) {
+    // Absence cases. NOT a similarity threshold — that was tried and measured
+    // impossible: the two answer-less queries scored 0.607/0.654, between real
+    // hits at 0.565 and 0.647, so any floor rejecting them rejects six good
+    // cases too. What retrieval can honestly assert is that nothing matched
+    // the blueprint's own words — only the vector list fired.
+    const others = rows.filter((r) => r.matchedBy && r.matchedBy !== c.expectMatchedByOnly);
+    if (others.length) {
+      pass = false;
+      reasons.push(
+        `expected ${c.expectMatchedByOnly}-only corroboration, got ${[...new Set(others.map((r) => r.matchedBy))].join(", ")}`,
+      );
+    }
+  }
+
   if (c.expectTopScoreBelow !== undefined) {
     // Absence cases. `top_score` is only present on semantic results; a keyword
     // answer has no similarity to compare, so treat it as unscoreable rather
