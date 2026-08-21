@@ -171,6 +171,34 @@ export async function deletePendingProposal(env: Env, ts: string): Promise<void>
   await call(env, `/proposals?ts=${encodeURIComponent(ts)}`, { method: "DELETE" });
 }
 
+/**
+ * Take exclusive ownership of a proposal, or report that someone else has it.
+ * The delete IS the claim — the DO handles one request at a time, so of two
+ * racing resolvers exactly one gets `true`.
+ *
+ * Why this exists: a user who reacts ✅ and then, unsure it registered, also
+ * types "go ahead" runs two independent handlers. Both used to load the same
+ * pending record and both reach `executeTool` — and `notion_create` is not
+ * idempotent, so that is two cards, no error, and nothing downstream to catch
+ * it.
+ *
+ * **Fails CLOSED**, unlike `claimEventRun` and `isDuplicateEvent` below, which
+ * fail open on the stated reasoning that double-processing beats losing a
+ * turn. That trade is right for an event and wrong here: the actions behind
+ * this gate are the irreversible ones. A missed execution is visible — the
+ * user sees nothing happened and asks again — while a double execution is
+ * silent and has to be undone by hand. Callers surface the throw rather than
+ * swallowing it.
+ */
+export async function claimPendingProposal(env: Env, ts: string): Promise<boolean> {
+  const res = await call(env, `/proposals?ts=${encodeURIComponent(ts)}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error(`proposal claim failed: HTTP ${res.status}`);
+  const body = (await res.json()) as { ok?: boolean; deleted?: boolean };
+  return body.deleted === true;
+}
+
 // ----- event dedup -----
 
 // Returns true if the event was already processed within the dedup TTL.
