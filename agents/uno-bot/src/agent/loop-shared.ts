@@ -11,6 +11,7 @@
 // wire types. Each loop keeps its own transport and calls into these helpers.
 
 import { AsyncLocalStorage } from "node:async_hooks";
+import { typedResolution } from "./resolution";
 import type { Env } from "../types";
 import type { HistoryTurn, PendingProposal } from "../thread-state-client";
 import type { SlackContext } from "../tools/dispatcher";
@@ -215,13 +216,21 @@ export const CANCEL_PHRASES = [
   "never mind", "don't", "dont",
 ];
 
-/** Exact-match the whole (trimmed, de-punctuated) message → a resolution, or
- *  null. Used for the no-model fast-path; anything longer routes to the model. */
+/**
+ * The whole message read as a resolution, or null. Used for the no-model
+ * fast-path; anything carrying content routes to the model.
+ *
+ * Delegates to agent/resolution.ts, which replaced whole-message equality
+ * against the phrase lists above with an all-tokens-affirmative rule. Equality
+ * meant "sure go ahead" — the most natural thing a person types — matched
+ * nothing, because only "sure" and "go ahead" were listed, separately.
+ *
+ * The phrase lists stay: they still feed looksLikeResolution, the looser
+ * word-contains test the router uses to pick the cheap model lane. That test
+ * wants breadth; this one wants certainty.
+ */
 export function bareResolution(text: string): "confirm" | "cancel" | null {
-  const bare = text.trim().toLowerCase().replace(/[.!?\s]+$/g, "");
-  if (CONFIRM_PHRASES.includes(bare)) return "confirm";
-  if (CANCEL_PHRASES.includes(bare)) return "cancel";
-  return null;
+  return typedResolution(text);
 }
 
 /** True if the text CONTAINS any resolution phrase as a word — the looser test
