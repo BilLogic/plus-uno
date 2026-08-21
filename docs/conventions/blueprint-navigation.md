@@ -33,7 +33,7 @@ Mental model: **cell = (path × layer × step)**. Read a scenario by picking a p
 Mis-attribution is the most common error (`schema-misread`). In the built-out scenarios:
 
 - **Visual** — screenshots / UI reference, *not an actor*.
-- **Partner Action: Teacher** — the *classroom teacher* (partner, not a PLUS tutor): observes, reminds, raises "ask for help" alerts, escalates.
+- **Teacher** — the *classroom teacher* (a partner, not a PLUS tutor): observes, reminds, raises "ask for help" alerts, escalates. Named `Partner Action: Teacher` until 2026-08-20; the role now lives in `lane_role` and `stakeholders.kind`, not in the label.
 - **Lead Tutor** — supervises the room: rosters, attendance, assigning unpaired students, teacher liaison.
 - **Regular Tutor** — the front-line tutor running the per-student flow.
 - **Front Stage Tech** — tools the user touches (Zoom/Pencil, PLUS App).
