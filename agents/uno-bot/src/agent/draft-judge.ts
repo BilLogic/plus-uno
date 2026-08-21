@@ -20,6 +20,9 @@
 // the active GEMINI_MODEL (low thinking); Vertex-Claude lane → one chill call.
 
 import { shouldRejectRevision, looksLikeStalledCorrection } from "./revision-guard";
+// The rubric text lives in its own leaf module so `npm test` can compile it
+// without dragging the Workers-typed graph in — see draft-judge-rubric.ts.
+import { JUDGE_SYSTEM } from "./draft-judge-rubric";
 import type { Env } from "../types";
 import { geminiConfigured, geminiGenerate } from "../gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "../vertex/claude";
@@ -41,32 +44,6 @@ const MAX_PRIOR_CHARS = 4_000;
 // A "revision" shorter than this fraction of the original is treated as a
 // judge malfunction (e.g. it answered instead of revising) — original ships.
 const MIN_REVISION_RATIO = 0.25;
-
-// Condensed from docs/evals/rubrics/bot-answer.md (D1–D9 + hard gates),
-// limited to what is CHECKABLE from the draft text alone — the judge can't
-// see tool results, so grounding is judged on internal signals (invented-
-// looking links, claims with no source named), not on external truth.
-const JUDGE_SYSTEM = `You are a strict pre-send reviewer for uno-bot, the PLUS design team's Slack assistant. You receive the user's message and the bot's DRAFT reply. Judge ONLY what is visible in the draft.
-
-Rubric (condensed from the team's D1–D9 bot-answer rubric):
-- D1 answer quality: leads with the answer to what was asked; complete; scoped — no filler, no scaffolding ("Here is the breakdown"), no journey recap.
-- D3 clarify-vs-act: if required inputs are clearly missing, the draft asks for them instead of guessing or using placeholders.
-- D5 routing: people are referenced correctly (<@U…> mentions or names), channels as <#C…>; resources are hyperlinked <url|label> at the point of mention.
-- D8 grounding: no fabrication signals — no URLs that look constructed rather than fetched, no confident claims explicitly from memory, no internal contradictions.
-- D9 confidence: a factual answer carries exactly ONE woven clause saying what was checked or how sure it is ("checked the Roadmap board just now", "the docs I found are from May"). A trailing label — "_Confidence: high — …_", a one-word rating, a "based on…" footer — is RETIRED: fail a draft that ends with one. Fail also on two such clauses, or none at all. Pure acknowledgements are exempt.
-
-HARD GATES (any one → verdict "fail"):
-- Claims a gated action already happened ("I've filed the card") — actions must stay future/conditional until confirmed.
-- Broken Slack formatting: **double-asterisk bold**, markdown # headings, [1]-style bracket citations, or markdown [label](url) links instead of <url|label>.
-- Leaks internal mechanics: tool names in snake_case, "Worker", "KV", model/tier names, token or tool budgets.
-- Placeholder text left in ("TODO", "[insert …]", "lorem").
-
-Do NOT fail a draft for facts you cannot verify, for tone, or for length alone. Prefer "pass" when in doubt.
-
-Reply with STRICT JSON only, no code fences, no commentary:
-  {"verdict":"pass"}
-or
-  {"verdict":"fail","failed":["D9","gate:formatting"],"revised":"<the FULL corrected draft — same content and voice, minimal edits, Slack mrkdwn (*single-asterisk bold*, <url|label> links)>"}`;
 
 /** Appended to the judge system prompt ONLY on a detected correction turn — the
  *  one-obligation-per-field rule that governs tool payloads applies here too.
