@@ -27,11 +27,11 @@ export interface BlueprintEdge {
   from: string;
   to: string;
   direction: "downstream" | "upstream";
-  /** "sets_off" = the source makes the target happen; "depends_on" = the
+  /** "leads_to" = the source makes the target happen; "enables" = the
    *  target must already be true for the source to work. NOT inverses — a
-   *  precondition causes nothing, so narrating a depends_on edge as "what it
-   *  sets off" misstates the blueprint. */
-  kind: "sets_off" | "depends_on";
+   *  precondition causes nothing, so narrating an `enables` edge as one
+   *  thing leading to another misstates the blueprint. */
+  kind: "leads_to" | "enables";
   /** Authored why-line for the edge, when the designer wrote one. */
   note?: string;
 }
@@ -70,7 +70,7 @@ export function mapIncludeEdges(
           from,
           to,
           direction: hitIds.has(String(l.source_cell_id)) ? "downstream" : "upstream",
-          kind: l.kind === "depends_on" ? "depends_on" : "sets_off",
+          kind: l.kind === "enables" ? "enables" : "leads_to",
           ...(note ? { note } : {}),
         },
       ];

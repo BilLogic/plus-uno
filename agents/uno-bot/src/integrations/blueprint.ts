@@ -994,7 +994,7 @@ export async function fetchEdges(env: Env, cellIds: string[]): Promise<Blueprint
     const to = text(r.target);
     if (!from || !to) return [];
     const startedHere = ids.includes(String(r.source_cell_id));
-    const kind = r.kind === "depends_on" ? "depends_on" : "sets_off";
+    const kind = r.kind === "enables" ? "enables" : "leads_to";
     const note =
       [r.label, r.note]
         .filter((v): v is string => typeof v === "string" && v.length > 0)
