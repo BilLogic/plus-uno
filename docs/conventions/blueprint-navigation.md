@@ -17,7 +17,7 @@ Query the **database**, never the Netlify front end — that's the human viewer,
 | `service_lifecycles` | the whole journey ("PLUS Application") | — |
 | `phases` | the ordered phases — read them, never assume the list | `service_lifecycle_id` |
 | `service_scenarios` | scenarios within a phase (e.g. Goal Setting) | `phase_id` |
-| `paths` | scenario variants — read `paths.name`, not `path_type` (§4) | `service_scenario_id` |
+| `paths` | routes through a scenario — read `path_type` AND `name`, and `status` for future state (§4) | `service_scenario_id` |
 | `steps` | the columns, scoped to a scenario | `service_scenario_id` |
 | `path_steps` | which steps appear on a path + `column_position` | `path_id`, `step_id` |
 | `layers` | the rows (actors), scoped to a path, ordered by `row_position` | `path_id` |
@@ -44,23 +44,72 @@ Mis-attribution is the most common error (`schema-misread`). In the built-out sc
 
 ## 4 · Path semantics
 
-**Read `paths.name`, never `path_type`.** The declared enum and the values the board uses diverge, so the type column barely discriminates; names tell variants apart. `named` is the catch-all for "a variant with its own identity" — cycle steps, edge cases, and some of the future-state paths below. **Establish which path a question is about before answering**; never merge a happy path and an edge case into one answer.
+**Rewritten 2026-08-21.** Three things changed at once and every rule below is
+new: `path_type` is a real three-value vocabulary, path names are unique and
+say their CONDITION, and future state moved out of the name into a column.
 
-### 4a · Future state — the `Planned:` / `Prototype:` convention
+### 4a · `path_type` — three values, and now worth reading
 
-The board carries a labelled future layer, and **the path NAME is the marker**. Two labels, and they do not mean the same thing:
+```
+happy      the scenario's main route, everything works.  Exactly ONE per scenario.
+variant    equally normal, chosen by a CONDITION rather than by failure.
+exception  a rule or a failure DIVERTS the route.
+```
 
-| Prefix | Means | How to word it |
+It used to be five (`happy | unhappy | exception | alternative | named`, later
+`custom`), of which three were not distinguishable in practice and one had
+become the drawer for 11 of 39 paths — which is why the old rule here said to
+ignore the column. **That rule is dead. Read `path_type`.** It now discriminates
+cleanly, and `happy` is guaranteed unique per scenario, so "the main route for
+X" is a single query with no name-matching.
+
+### 4b · Names say the CONDITION, not the activity
+
+The scenario names the activity; the path names which way through it. So a name
+is only meaningful **beside its scenario**:
+
+| Scenario | Paths |
+|---|---|
+| Call-off Request | `12+ hours ahead` · `Under 12 hours` · `Swap offered instead` |
+| Goal Setting | `All conditions` · `No prior goals` · `New cycle, goals exist` · `Mid-cycle check` · `Missed last session, no goals` · `Missed last session, has goals` |
+| Student Just Joined | `Full room, on time` · `Few or none by 10 min` |
+
+- **Never quote a path name without its scenario.** `Standard` alone is
+  meaningless — nine different scenarios have a path called that, one each,
+  and it means "this scenario has one route and no branching condition".
+- **`Happy Path` no longer exists.** Neither does `Alternate Path`, `Sad Path`,
+  `Set Goals`, `Check Goals`, `Update Goals`, or any `Planned:` / `Prototype:`
+  name. Anything recalling those names is recalling the board before
+  2026-08-21. Query, do not recall.
+- **Establish which path a question is about before answering.** Never merge a
+  happy path and an exception into one answer.
+
+### 4c · Future state — `paths.status`, not the name
+
+The `Planned:` / `Prototype:` name-prefix convention is **gone**. Status is a
+column on both `paths` and `cells`, sharing one `entity_status` domain:
+
+| Status | Means | How to word it |
 |---|---|---|
-| `Planned: <topic>` | Decided and scheduled. Code exists on a branch, or the ship is committed — it is a matter of when, not whether. | "this **is changing**" |
-| `Prototype: <topic>` | Exploratory. A proposal, a design iteration, or an explicit TBD. It may never ship. | "this **might change**" |
+| `proposed` | Designed and discussed, no build card behind it. May never happen. | "this **might change**" |
+| `planned` | Committed and carded, no code yet. | "this **is changing**" |
+| `built` | Code exists, in build or QA. Not deployed, so nobody is using it. | "this **is changing**, and it is nearly here" |
+| `live` | In use today. **The default, and most of the board.** | current state |
+| `at_risk` | Live and failing in a way somebody has measured. | "this works and is **failing**" |
+| `deprecated` | Live and being taken away. | "this works and is **going away**" |
 
 Rules:
 
-- **The name is the whole test.** `Planned` / `Prototype` alone, or followed by `: <topic>` — matched as a PREFIX. Do not read `path_type` for this (`named`, `alternative` and others all appear), do not read `origin`, and do not treat a path that merely *mentions* "planned" mid-name as future state. Cell descriptions on these paths also open `PLANNED (…)` / `PROTOTYPE (…)`, but that is a courtesy, not the marker: the name is authoritative and the prefix survives the semantic index, which renders names with their type appended (`Prototype: Reflection redesign (named)`).
-- **These are the only future-bearing rows.** Every other path is current state. A `Planned:` or `Prototype:` cell is never an answer to "how does it work today".
-- **Never assert the blueprint has no future state for a scenario without querying that scenario for a `Planned:` or `Prototype:` path.** Absence in a search result is not absence on the board. Which scenarios carry one changes; read it, don't recall it.
-- **Superseded 2026-08-17.** The single `Future (roadmap)` name used to carry both meanings, so everything on it had to be reported at one confidence level. Rows created before that date were renamed in place; nothing on the board still uses the old name.
+- **`status <> 'live'` is the whole test.** One predicate, on a column, for both
+  paths and cells. No prefix matching, no reading `origin`, and no risk of a
+  path that merely *mentions* "planned" mid-name being mistaken for future
+  state — the failure the old name-based rule had to warn about.
+- **`live` is the default.** `cells.status` is `not null default 'live'`, so a
+  cell with nothing said about it is current state, not unknown.
+- **Never assert the blueprint has no future state for a scenario without
+  querying it.** Absence in a search result is not absence on the board.
+- Cell content on unbuilt rows may still open `PLANNED (…)` / `PROTOTYPE (…)`.
+  That is legacy prose, not the marker. **The column is authoritative.**
 
 ## 5 · Retrieval
 
@@ -92,18 +141,30 @@ union all select 'cells.picture',     count(*) from cells where picture is not n
 union all select 'cells.links',       count(*) from cells where links <> '[]'::jsonb;
 ```
 
-**Future paths** — which scenarios have a planned redesign on the board (§4a)
+**Future paths** — everything not live, on one predicate (§4c)
 ```sql
-select p.name as phase, ss.name as scenario, pa.path_type, pa.origin,
-       pa.name as path, count(c.id) as cells
+select p.name as phase, ss.name as scenario, pa.name as path,
+       pa.path_type, pa.status, count(c.id) as cells
 from paths pa
 join service_scenarios ss on pa.service_scenario_id = ss.id
 join phases p on ss.phase_id = p.id
 left join cells c on c.path_id = pa.id
-where pa.name like 'Planned:%' or pa.name like 'Prototype:%'
-   or pa.name in ('Planned', 'Prototype')
-group by p.name, ss.name, pa.name, pa.path_type, pa.origin
+where pa.status <> 'live'
+group by p.name, ss.name, pa.name, pa.path_type, pa.status
 order by p.name, ss.name;
+```
+
+**Unbuilt CELLS on an otherwise live path** — a live route with a piece of it
+still coming. Missed by any path-level query.
+```sql
+select ss.name as scenario, pa.name as path, l.name as lane,
+       c.status, c.content
+from cells c
+join paths pa on c.path_id = pa.id
+join service_scenarios ss on pa.service_scenario_id = ss.id
+join layers l on c.layer_id = l.id
+where c.status <> 'live'
+order by ss.name, pa.name;
 ```
 
 **A path's steps in order**
@@ -113,7 +174,8 @@ from service_scenarios ss
 join paths pa on pa.service_scenario_id = ss.id
 join path_steps ps on ps.path_id = pa.id
 join steps st on st.id = ps.step_id
-where ss.name = 'Goal Setting' and pa.name = 'Happy Path'
+-- The main route, without needing to know its name: exactly one per scenario.
+where ss.name = 'Goal Setting' and pa.path_type = 'happy'
 order by ps.column_position;
 ```
 
@@ -127,7 +189,7 @@ join layers l on c.layer_id = l.id
 join steps st on c.step_id = st.id
 join path_steps ps on ps.path_id = pa.id and ps.step_id = st.id
 where pa.service_scenario_id = (select id from service_scenarios where name = 'Goal Setting')
-  and pa.name = 'Happy Path'
+  and pa.path_type = 'happy'
   and (coalesce(c.content, '') <> '' or coalesce(c.description, '') <> ''
        or c.picture is not null or c.links <> '[]'::jsonb)
 order by ps.column_position, l.row_position;
