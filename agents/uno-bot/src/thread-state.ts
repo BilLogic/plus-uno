@@ -45,6 +45,10 @@ export interface HistoryTurn {
     path?: string;
     count: number;
     scenarios: string[];
+    /** Rows came from the short-lived cache, not from a read made this turn.
+     *  Mirrors RetrievalReceipt.cached (agent/loop-shared.ts) — the confidence
+     *  pre-check needs it to tell a fetch from a cache hit. */
+    cached?: boolean;
   };
 }
 

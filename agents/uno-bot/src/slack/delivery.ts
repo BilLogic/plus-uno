@@ -128,6 +128,25 @@ function stripTrailingConfidence(text: string): string {
 }
 
 /**
+ * The body that will actually be SENT, for a given draft: the trailing-label
+ * strip, the empty-answer placeholder, then the cap — in that order.
+ *
+ * Exported so the confidence pre-check judges the delivered text rather than
+ * the draft. The two used to diverge silently: capText truncates at
+ * MAX_POST_CHARS AFTER the judge has scored the draft, so a woven clause
+ * sitting in a closing paragraph could be amputated from a message the
+ * telemetry had already recorded as `verdict=pass` (2026-08-21).
+ * postTextVerified calls this rather than repeating it, so the two cannot
+ * drift apart again.
+ */
+export function renderDeliveredBody(text: string): string {
+  const cleaned = stripTrailingConfidence(text);
+  return cleaned.trim()
+    ? capText(cleaned)
+    : "(I came back with an empty answer — that's a bug on my side. Try rephrasing, and flag this to the team.)";
+}
+
+/**
  * Post a text reply and report whether Slack actually accepted it. Guards the
  * R2 "✅ + empty body" defect: empty text gets an honest placeholder, oversized
  * text is capped, a failed post is retried once, and the caller only ✅-reacts
@@ -230,10 +249,7 @@ export async function postTextVerified(
    *  answer CLOSES that stream instead of opening a new one. */
   openStreamTs?: string,
 ): Promise<{ ok: boolean; text: string }> {
-  const cleaned = stripTrailingConfidence(text);
-  const body = cleaned.trim()
-    ? capText(cleaned)
-    : "(I came back with an empty answer — that's a bug on my side. Try rephrasing, and flag this to the team.)";
+  const body = renderDeliveredBody(text);
   const footer = footerBlocks(env, footerKindFor(body, footerHint));
 
   // Streamed delivery, opened HERE rather than at turn start. Opening it early

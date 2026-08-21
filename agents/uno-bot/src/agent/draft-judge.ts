@@ -111,7 +111,13 @@ async function callJudgeModel(
   env: Env,
   userText: string,
   draft: string,
-  ctx: { correction: boolean; priorAssistantText?: string; toolsUsedThisTurn: string[]; stalled: boolean },
+  ctx: {
+    correction: boolean;
+    priorAssistantText?: string;
+    toolsUsedThisTurn: string[];
+    stalled: boolean;
+    extraInstruction?: string;
+  },
 ): Promise<string | null> {
   const prompt =
     (ctx.correction && ctx.priorAssistantText
@@ -122,9 +128,17 @@ async function callJudgeModel(
     (ctx.stalled
       ? "MEASURED: this draft retains almost all of the previous reply's vocabulary — it is a restatement. Unless it plainly concedes the previous reply was wrong, fail it with \"gate:correction\".\n\n"
       : "") +
-    (ctx.correction ? `Tools that ran this turn: ${ctx.toolsUsedThisTurn.join(", ") || "(none)"}\n\n` : "") +
+    // Sent on EVERY turn, not just corrections. D9 asks whether the draft says
+    // what it rests on, and "cites a source fetched this turn" is unjudgeable
+    // without knowing which tools ran — the judge was scoring that dimension
+    // blind on every non-correction turn.
+    `Tools that ran this turn: ${ctx.toolsUsedThisTurn.join(", ") || "(none)"}\n\n` +
     `User message:\n${userText.slice(0, MAX_USER_CHARS)}\n\n` +
-    `Draft reply:\n${draft.slice(0, MAX_DRAFT_CHARS)}`;
+    `Draft reply:\n${draft.slice(0, MAX_DRAFT_CHARS)}` +
+    // A deterministic pre-check already decided WHAT is wrong; passing its one
+    // sentence through beats asking the judge to rediscover it, and a specific
+    // instruction is what keeps the repair from producing generic filler.
+    (ctx.extraInstruction ? `\n\n${ctx.extraInstruction}` : "");
 
   const system = ctx.correction ? JUDGE_SYSTEM + CORRECTION_GATE : JUDGE_SYSTEM;
 
@@ -174,15 +188,24 @@ export async function reviewDraft(
     /** Read-only tools executed this turn. "Cites a source fetched this turn"
      *  is unjudgeable without it. */
     toolsUsedThisTurn?: string[];
+    /** Why this draft must be judged regardless of length — set by a caller
+     *  that already found something wrong (the confidence pre-check passes the
+     *  verdict kind). Bypasses the length floor exactly as `correction` does,
+     *  and is logged so a forced judgement is distinguishable from a routine
+     *  one when reading `wrangler tail`. */
+    forceReason?: string;
+    /** One extra line appended to the judge prompt. Carries the specific repair
+     *  the caller's own check already identified. */
+    extraInstruction?: string;
   },
 ): Promise<JudgeOutcome> {
-  const { userText, draft, priorAssistantText } = args;
+  const { userText, draft, priorAssistantText, forceReason, extraInstruction } = args;
   const correction = args.correction === true;
   const toolsUsedThisTurn = args.toolsUsedThisTurn ?? [];
   // The length floor is BYPASSED on a correction. The 2026-08-17 denial that
   // started all this was short, so it was never judged — the one turn where the
   // judge had something to catch is the one it sat out.
-  if (!correction && draft.trim().length < MIN_DRAFT_CHARS) {
+  if (!correction && !forceReason && draft.trim().length < MIN_DRAFT_CHARS) {
     // Skips used to bypass telemetry entirely, so "the judge never ran" and
     // "the judge passed it" looked identical in the logs.
     console.log(
@@ -204,7 +227,13 @@ export async function reviewDraft(
 
   try {
     const raw = await Promise.race([
-      callJudgeModel(env, userText, draft, { correction, priorAssistantText, toolsUsedThisTurn, stalled }),
+      callJudgeModel(env, userText, draft, {
+        correction,
+        priorAssistantText,
+        toolsUsedThisTurn,
+        stalled,
+        extraInstruction,
+      }),
       new Promise<"__timeout__">((resolve) => setTimeout(() => resolve("__timeout__"), JUDGE_TIMEOUT_MS)),
     ]);
 
@@ -247,6 +276,7 @@ export async function reviewDraft(
     `[uno-bot] draft-judge build=${BUILD} verdict=${verdict} failed=[${failed.join(",")}] ` +
       `revised=${revisedUsed} ms=${Date.now() - startedAt} draft_chars=${draft.length} ` +
       `correction=${correction ? "yes" : "no"} stalled=${stalled ? "yes" : "no"} ` +
+      `forced=${forceReason ?? "no"} ` +
       `tools=[${toolsUsedThisTurn.join(",")}]`,
   );
   return { text, verdict };

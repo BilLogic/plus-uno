@@ -64,8 +64,15 @@ import {
   type RunnerJobPayload,
 } from "./types";
 import { collectVisionInputs } from "./vision";
-import { postVisibleFailure, postTextVerified, isCapacityError } from "./delivery";
+import { postVisibleFailure, postTextVerified, renderDeliveredBody, isCapacityError } from "./delivery";
 import { reviewDraft } from "../agent/draft-judge";
+import {
+  judgeConfidence,
+  needsRepair,
+  repairInstruction,
+  retrievalRanIn,
+  type ConfidenceVerdict,
+} from "../agent/confidence";
 import {
   formatProposal,
   formatNotionUpdateProposal,
@@ -832,13 +839,57 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     // tools that ran, and the length floor is bypassed — the failing denial of
     // 2026-08-17 was short, so the one turn the judge had something to catch is
     // the one it sat out.
+    //
+    // Ahead of it, the deterministic half. D9 (one woven confidence clause) was
+    // only ever checked INSIDE the judge, which skips anything under 1500 chars
+    // — and almost every blueprint answer in Slack is a few hundred. This runs
+    // on the body that will actually SHIP (renderDeliveredBody: strip, then
+    // cap), because capText truncates after the judge has scored and can
+    // amputate a clause from a reply already logged as verdict=pass.
+    const retrievalRan = retrievalRanIn(toolsUsedThisTurn);
+    const servedFromCache = turnReceipt?.cached === true;
+    let verdict: ConfidenceVerdict = { kind: "exempt" };
+    try {
+      verdict = judgeConfidence(renderDeliveredBody(result.text), { retrievalRan, servedFromCache });
+    } catch (err) {
+      // Fail open, in the same direction as the judge itself: a missing
+      // confidence clause is a smaller harm than a dropped answer, so a throw
+      // in the pre-check degrades to "no escalation", never to silence.
+      console.warn(
+        `[confidence] pre-check failed: ${err instanceof Error ? err.message : String(err)} — no escalation`,
+      );
+    }
     const reviewed = await reviewDraft(env, {
       userText: modelText,
       draft: result.text,
       correction: isCorrection,
       priorAssistantText: isCorrection ? priorAssistantTurn?.content : undefined,
       toolsUsedThisTurn,
+      // Both bypass the length floor and tell the judge exactly what to repair.
+      forceReason: needsRepair(verdict) ? verdict.kind : undefined,
+      extraInstruction: repairInstruction(verdict) ?? undefined,
     });
+    // Re-validation, not a second repair round. A judge revision can itself end
+    // in a trailing label, which stripTrailingConfidence then DELETES without
+    // putting anything back — turning "wrong shape" into "no signal at all" in
+    // the one reply we had already noticed was wrong. Logged so that outcome is
+    // countable; looping here would cost another model call per turn and could
+    // land in the same place anyway.
+    try {
+      const finalVerdict = judgeConfidence(renderDeliveredBody(reviewed.text), {
+        retrievalRan,
+        servedFromCache,
+      });
+      console.log(
+        `[confidence] pre=${verdict.kind} post=${finalVerdict.kind} ` +
+          `retrieval=${retrievalRan ? "yes" : "no"} cached=${servedFromCache ? "yes" : "no"} ` +
+          `judge=${reviewed.verdict}`,
+      );
+    } catch (err) {
+      console.warn(
+        `[confidence] post-check failed: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
     const delivery = await postTextVerified(
       env,
       channel,

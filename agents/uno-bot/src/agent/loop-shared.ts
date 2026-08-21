@@ -341,6 +341,11 @@ export interface RetrievalReceipt {
   count: number;
   /** Distinct scenario names across the rows, capped — the "what did I look at". */
   scenarios: string[];
+  /** True when the rows were served from the short-lived cache rather than read
+   *  from the source on this turn. A cache hit is not a fetch performed now,
+   *  which is exactly what a freshness claim asserts — the 2026-08-17 shape,
+   *  where the bot said "I just checked" over cached rows. */
+  cached?: boolean;
 }
 
 /** Run `fn` inside a fresh turn scope; returns its result, the tools used, and
@@ -373,6 +378,7 @@ function recordBlueprintReceipt(resultJson: string): void {
       ok?: unknown;
       query?: unknown;
       count?: unknown;
+      cached?: unknown;
       rows?: Array<{ path?: unknown; scenario?: unknown }>;
     };
     if (parsed.ok !== true || typeof parsed.query !== "string") return;
@@ -391,6 +397,7 @@ function recordBlueprintReceipt(resultJson: string): void {
       ...(typeof path === "string" ? { path } : {}),
       count: typeof parsed.count === "number" ? parsed.count : rows.length,
       scenarios,
+      ...(parsed.cached === true ? { cached: true } : {}),
     });
   } catch {
     // A receipt is diagnostic context, never load-bearing for the reply.
