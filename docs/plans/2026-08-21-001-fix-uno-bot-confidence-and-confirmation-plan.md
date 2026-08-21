@@ -1,9 +1,11 @@
 ---
 title: "The confirmation gate, the clause that says what an answer rests on, and four things worse than both"
 type: fix
-status: draft
+status: implemented
 date: 2026-08-21
+completed: 2026-08-21
 repos: plus-uno (agents/uno-bot), uno-blueprint (docs/conventions consumer)
+outcome: "All five phases shipped across four commits. The gate now resolves only what a reaction was placed on, exactly once; a factual reply is checked for its confidence clause on the body that actually ships; compound affirmations resolve without a model call while anything carrying content falls through; PRD creations ask once. Two gaps recorded rather than faked: source_read's cache records no receipt, and the four new seams sit in Worker/DO/Slack code the pure-module test harness cannot reach."
 ---
 
 # The confirmation gate, the clause that says what an answer rests on, and four things worse than both
@@ -412,6 +414,35 @@ One specific trap: `delivery.ts:107-117` records that `TRAILING_CONFIDENCE` once
 backtracked badly enough to blow the 10 ms Worker CPU limit and post nothing.
 Any new confidence-detection regex needs an adversarial-input test **under
 workerd** — in Node it just runs slower and passes.
+
+### What shipped, and what is still uncovered (2026-08-21)
+
+Pure logic went into three testable modules — `agent/confidence.ts`,
+`agent/resolution.ts`, `slack/gate-reactions.ts` — with 40 new assertions, all
+in `tsconfig.test.json`'s include list. The refusal cases carry the weight:
+`bareResolution` rejecting `"go ahead but tag it Universal"`, `mapReaction`
+rejecting every spelling of 👍, `assertsSomething` refusing to exempt
+*"Yep — and that card moved to In Review yesterday"*.
+
+**Still uncovered, deliberately.** These live in Worker/DO/Slack code that the
+pure-module harness cannot reach, and mocking them would prove only that the
+mocks agree with each other:
+
+| Behaviour | Why a unit test cannot see it |
+| --- | --- |
+| The claim (`claimPendingProposal`) actually serialising two resolvers | Needs two handlers racing on one real DO key |
+| The reaction fallback pointing rather than executing | Needs real `conversations.replies` thread shapes |
+| `forceReason` reaching a live judge call | Needs the model lane |
+| `cached` surviving the DO round-trip | Needs real storage |
+| `renderDeliveredBody` | Pure in shape, but `delivery.ts` imports `./api` and `../types`, so it is not free to add to the test build |
+
+**A gap found during implementation, not in the plan.** `servedFromCache` is
+blueprint-only: `recordRetrieval` has one call site (`search_blueprint`), while
+`source_read` keeps its own per-isolate cache in `integrations/notion.ts` and
+records no receipt at all. So a cached document read still reads as a live
+fetch to the freshness check. Closing it means adding receipt recording to the
+Notion read path and deciding what the receipt's last-write-wins semantics
+should be when a turn reads several sources — a bigger change than this pass.
 
 ## Risks
 
