@@ -28,7 +28,7 @@ cc @reviewers — by [date]
 
 ## Two gates — never conflate
 
-1. **Proposal-confirmation gate** (uno-bot side-effect proposals): ⚠️ message → ✅/❌ reaction, anyone in the thread may confirm or cancel (the requester lock was removed 2026-07-14), 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state.ts` is the source of truth).
+1. **Proposal-confirmation gate** (uno-bot side-effect proposals): ⚠️ card with ✅ Approve / ⛔ Cancel buttons; a ✅ (or 👍) / ⛔ (or ❌) reaction on the card, or that emoji typed alone, does the same; a typed reply in words goes to the model, which reads it in context. Anyone in the thread may confirm or cancel (the requester lock was removed 2026-07-14), 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state.ts` is the source of truth).
 2. **Reviewer-verdict gate** (Flow 5 maintenance review, routed reviewers in #plus-design): ✅ approve · 🔁 request changes · ❌ reject. Never auto-merge; 🔁 loops the proposal with changes.
 
 Decisions reached in threads are written to **Decisions DB** (row with **Roadmap Card** = the project + **Evidence** = Slack permalink) **before** the thread is considered resolved. Do not append to obsolete Decision Log subpages.

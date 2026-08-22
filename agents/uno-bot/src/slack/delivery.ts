@@ -156,7 +156,7 @@ export function renderDeliveredBody(text: string): string {
 // body can still overflow one block. Split on line boundaries so a <url|label>
 // never straddles two blocks (the same failure capText guards against).
 const SECTION_CHARS = 2900;
-function textSections(body: string): Array<Record<string, unknown>> {
+export function textSections(body: string): Array<Record<string, unknown>> {
   const chunks: string[] = [];
   let rest = body;
   while (rest.length > SECTION_CHARS) {

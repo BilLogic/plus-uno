@@ -12,8 +12,24 @@ repos: plus-uno (agents/uno-bot)
 ## Overview
 
 One document for the whole confirmation surface, because it was decided across
-a dozen messages and that is not a readable form. Most of it has **already
-shipped**; the rest is two proposals and one rejection.
+a dozen messages and that is not a readable form.
+
+**Status 2026-08-22 (pm): decided and implemented.** The user's call: *"our
+reaction should be ✅ versus ⛔ … if one wants to approve, click the check mark;
+if they disapprove, click the cancellation button and then articulate what
+else to fix … if someone sends an emoji, fine, recognise the common mapped
+ones … but if it's a text response, just go straight to the model route.
+There are too many complications; I don't think it's worth it."* So: Proposal
+A (buttons) shipped, Proposal C (retire the typed classifiers) shipped, ⛔ is
+the cancel gesture, and the only deterministic text path left is a gate emoji
+typed alone. Proposal B (bounce notice) remains open. Path 1 below is rewritten
+to what runs now; the older prose is kept where it explains a decision.
+
+**One thing only a human can do:** the live Slack app's interactivity
+`request_url` still points at the dead Netlify function — the repo manifest
+(`slack-app-manifest.yaml:284-290`) has the Worker URL and says so. Until the
+manifest is applied in the Slack app settings, the buttons render but deliver
+nothing; reactions and typed emoji work regardless.
 
 The organising question: **when the bot needs a person's approval before it
 acts, what counts as approval, and what happens to it?**
@@ -28,7 +44,7 @@ confirmation gesture, and a typed reply — and they shared a 👍.
 The end state, written as what a person actually sees. Everything below is
 already true except the two sections marked *proposed*.
 
-### Asking for something that writes  ·  *buttons proposed, the rest shipped*
+### Asking for something that writes  ·  *shipped 2026-08-22*
 
 > **Bryan:** `@uno-bot` file a maintenance ticket about the confidence level thing
 >
@@ -39,7 +55,8 @@ already true except the two sections marked *proposed*.
 > • **Problem / Context:** Grounding rules require exactly one woven confidence clause…
 > • **Proposed Fix:** Audit the confidence clause enforcement…
 >
-> **`[ ✅ File it ]`  `[ ❌ Cancel ]`**
+> ✅ to approve · ⛔ to cancel (then tell me what to change).
+> **`[ ✅ Approve ]`  `[ ⛔ Cancel ]`**
 >
 > **Bryan:** sure go ahead
 >
@@ -110,7 +127,7 @@ measuring how often it happens.
 Traced through the code, because "does the LLM see this?" has a different
 answer on each path — and that is deliberate.
 
-### Path 1 — typed  ·  the only path the LLM can reach
+### Path 1 — typed  ·  the only path the LLM can reach  ·  *as shipped 2026-08-22*
 
 ```
 Slack message
@@ -121,25 +138,30 @@ Slack message
             └─ handleUserMessage
                  ├─ loadPendingProposalByThread          ← is anything staged?
                  │
-                 ├─ IF pending AND fastPathAllowed(lastBotTurn):
-                 │     bareResolution(text)
-                 │       ├─ "confirm" / "cancel"  → resolveProposal   ✅ NO MODEL CALL
-                 │       └─ null (carries content, mixed, or too long)
-                 │              ↓ falls through
+                 ├─ IF pending AND typedEmojiDecision(text):   the message IS
+                 │     "confirm" / "cancel" → resolveProposal   one gate emoji,
+                 │                              ✅ NO MODEL CALL  nothing else
                  │
-                 └─ the MODEL reads the turn, with <pending_proposal> in context
-                      └─ it may call  proposal_resolve
-                           └─ validateProposalResolve   ← Worker-side authorization,
-                           │                              enforced even though the
-                           │                              prompt already says it
-                           └─ resolveProposal
+                 └─ EVERYTHING ELSE: the MODEL reads the turn, with
+                      <pending_proposal> in context
+                      ├─ proposal_resolve(confirm|cancel)
+                      │     └─ validateProposalResolve   ← Worker-side authorization
+                      │     └─ resolveProposal
+                      ├─ the SAME tool with the SAME input   ← the 2026-07-10 failure
+                      │     └─ events.ts gate-idempotency (a):  shape. Was a bounce;
+                      │        resolveProposal(confirm)        now it is the confirm
+                      ├─ slack_react + no text   → emoji, no post (was the react tier)
+                      └─ anything else           → ordinary reply; card stays pending
 ```
 
 **This is the answer to "is it processed by the LLM?"** — on the typed path,
-yes, for everything the accelerator does not match, which is every phrasing it
-has never seen, every other language, and every reply that argues with the
-proposal. The accelerator only skips a round trip on an unambiguous bare yes;
-it can never *stop* the model from reading something.
+yes, for every message that is words. The phrase accelerator, the question-mark
+guard and the react tier were deleted on 2026-08-22 (Proposal C); the only
+thing the Worker resolves without the model is an emoji typed alone, which is
+a reaction by other means. What keeps the model path safe is no longer a
+vocabulary but the structural rule in the middle: a model that answers a yes
+by reaching for the tool again has said yes, and the Worker executes it
+through the same claim instead of bouncing.
 
 ### Path 2 — reaction  ·  deliberately never reaches the LLM
 
@@ -161,20 +183,25 @@ A reaction is a direct instruction on a specific object. There is nothing to
 interpret, so nothing interprets it — which also means it cannot be talked out
 of, mis-parsed, or lost to a model error.
 
-### Path 3 — button  ·  *proposed*, and would also bypass the LLM
+### Path 3 — button  ·  *shipped 2026-08-22*, and also bypasses the LLM
 
 ```
 Slack block_actions        (a DIFFERENT endpoint from events — interactive.ts)
   └─ dispatchAction(action_id)
-       ├─ "uno_stop_run"       → stopRun
-       ├─ "uno_delete_answer"  → deleteAnswer
-       └─ (proposed) "uno_proposal_confirm" / "uno_proposal_cancel"
-                               → resolveProposal      ✅ NO MODEL CALL
+       ├─ "uno_stop_run"         → stopRun
+       ├─ "uno_delete_answer"    → deleteAnswer
+       └─ "uno_proposal_confirm" / "uno_proposal_cancel"  → resolveFromButton
+              ├─ loadPendingProposalDetailed(message.ts)   the card the button is ON
+              │     ├─ expired / gone → ephemeral "already expired / resolved"
+              └─ resolveProposal           ✅ NO MODEL CALL
+                    └─ won the claim → re-render the card via response_url:
+                       buttons off, "✅ Approved by @who" or
+                       "⛔ Cancelled by @who — tell me what to change"
 ```
 
-Buttons arrive on Slack's interactivity endpoint, not the events one, so this
-is new wiring rather than a variation of Path 1. Today `dispatchAction` warns
-on any unrecognised id, so the buttons do nothing until it is added.
+Buttons arrive on Slack's interactivity endpoint, not the events one. The live
+app's `request_url` must point at the Worker for any of this to fire — see the
+status note in the Overview.
 
 ### Where all three converge
 
@@ -201,13 +228,14 @@ reacting cannot file two cards.
 
 | | Reaches the LLM? | Why |
 | --- | --- | --- |
-| Typed, unambiguous ("sure go ahead") | No | The accelerator resolves it; a round trip buys nothing |
-| Typed, anything else | **Yes** | The model reads it and decides — this is the general case |
+| Typed, a gate emoji alone (✅ 👍 ⛔ ❌) | No | It is the reaction, typed; nothing to interpret |
+| Typed, any words at all | **Yes** | The model reads it and decides — this is the general case, and since 2026-08-22 the only case |
 | Reaction | No | A direct instruction on a specific object; nothing to interpret |
-| Button *(proposed)* | No | Same — the control names the decision exactly |
+| Button | No | Same — the control names the decision exactly |
 
-The design principle holds: **no fixed list decides what a person meant.** The
-list only recognises the cases where there is nothing to decide.
+The design principle holds, and is now literally true: **no fixed list decides
+what a person meant.** The only list left recognises emoji, where there is
+nothing to decide.
 
 
 ## Part 1 — Shipped
@@ -299,9 +327,17 @@ pending and the model neither resolved it nor addressed it. That is Proposal B.
 
 ## Part 3 — Proposed
 
-### Proposal A — ✅ / ❌ buttons on the proposal card
+### Proposal A — ✅ / ⛔ buttons on the proposal card  ·  *shipped 2026-08-22*
 
-Today the card ends with:
+Shipped as `proposalActionBlocks()` in `proposal-render.ts`, `resolveFromButton`
+in `interactive.ts`, and the ⛔ (`no_entry`) cancel gesture in
+`gate-reactions.ts`. The card footer now reads *"✅ to approve · ⛔ to cancel
+(then tell me what to change)"* and nothing else. The block-path risk below was
+handled the way it says: a text-only retry keeps the gate working (reactions
+and typed emoji) if Slack rejects the blocks, and the first real card still
+wants one eyeball.
+
+Before 2026-08-22 the card ended with:
 
 > `React :white_check_mark: / :x: — or just say "go ahead" / "cancel".`
 
@@ -340,7 +376,7 @@ so the failure has a rate before anyone designs a response to it. A visible
 "I still have X staged — did you mean to go ahead?" is the obvious next step,
 but it should be built on a measured rate rather than a guess.
 
-### Proposal C — retire the typed classifiers  ·  *2026-08-22, reverses Part 4's second rejection; decision pending*
+### Proposal C — retire the typed classifiers  ·  *decided and shipped 2026-08-22; reverses Part 4's second rejection*
 
 The user asked: *"is the separation on fast path vs. letting the model think
 through really necessary? … most tasks still need the model to execute the rest
@@ -489,14 +525,16 @@ a requirement and not a nicety.
 
 Shipped work is verified; these cover what is proposed.
 
-- [ ] The proposal card carries ✅ / ❌ buttons
-- [ ] Reaction and typed paths still resolve the same card, through the same claim
-- [ ] A block-render failure on the card is **visible**, not a silent downgrade
-- [ ] The card has been eyeballed once on a real answer before becoming default
-- [ ] A turn that leaves a pending proposal unresolved and unaddressed is logged
-- [ ] That log carries the pending tool and the user's text, so it has a rate
-- [ ] `npm run typecheck` clean, `npm test` passing
-- [ ] Any new pure logic is in a testable module and added to `tsconfig.test.json`
+- [x] The proposal card carries ✅ Approve / ⛔ Cancel buttons
+- [x] Reaction, button and typed-emoji paths resolve the same card, through the same claim
+- [x] A block-render failure on the card degrades to a text card that reactions still resolve, and is logged
+- [ ] The card has been eyeballed once on a real answer (needs the manifest applied — human step)
+- [x] No typed words resolve a proposal without the model (`resolution.ts`, `react-only.ts`, the phrase lists: deleted)
+- [x] An identical re-stage while pending executes as a confirm instead of bouncing
+- [x] A pure acknowledgement can end as a reaction with no reply (model-chosen via `slack_react`)
+- [ ] A turn that leaves a pending proposal unresolved and unaddressed is logged (Proposal B — open)
+- [x] `npm run typecheck` clean, `npm test` passing (167)
+- [x] New pure logic (`typedEmojiDecision`, `GATE_RESERVED`) lives in `gate-reactions.ts`, already in `tsconfig.test.json`
 
 ## Risks
 

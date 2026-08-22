@@ -17,12 +17,15 @@ import { executeTool } from "../tools/dispatcher";
 
 export type Decision = "confirm" | "cancel";
 
+/** Resolves the proposal. Returns true if THIS call won the claim and acted;
+ *  false if another resolver (reaction, button, typed emoji, model) got there
+ *  first — in which case nothing was posted and the caller should stay quiet. */
 export async function resolveProposal(
   env: Env,
   pending: PendingProposal,
   decision: Decision,
   narrative?: string,
-): Promise<void> {
+): Promise<boolean> {
   // Claim first — before the narrative, before the reaction, and long before
   // executeTool. A user who reacts ✅ and then, unsure it registered, also
   // types "go ahead" runs two handlers that each loaded this same record.
@@ -33,7 +36,7 @@ export async function resolveProposal(
     console.log(
       `[gate] ${pending.toolName} at ${pending.proposalTs} was already claimed — standing down`,
     );
-    return;
+    return false;
   }
 
   const text =
@@ -95,6 +98,7 @@ export async function resolveProposal(
   }
   // No delete here any more: the claim above already removed the record, which
   // is what made it a claim.
+  return true;
 }
 
 /** True unless the executor explicitly reported ok:false. */

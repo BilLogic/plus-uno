@@ -184,7 +184,7 @@
   },
   {
     "name": "slack_react",
-    "description": "Add an emoji reaction AS UNO-BOT to a message in the current thread. Use freely to acknowledge, celebrate, or signal state — any workspace emoji name (without colons), e.g. 'tada', 'eyes', 'raised_hands', or a custom workspace emoji. Reactions are reversible and ungated. Do NOT react with white_check_mark or x on proposal cards (those are reserved for confirm/cancel). If message_ts is omitted, reacts to the user's current message.",
+    "description": "Add an emoji reaction AS UNO-BOT to a message in the current thread. Use freely to acknowledge, celebrate, or signal state — any workspace emoji name (without colons), e.g. 'tada', 'eyes', 'raised_hands', or a custom workspace emoji. Reactions are reversible and ungated. For a PURE acknowledgement from the user ('thanks', 'got it', 'nice') react and end your turn with NO text — the reaction is the whole reply. Refused for the gate emoji (white_check_mark, heavy_check_mark, +1, thumbsup, no_entry, x, negative_squared_cross_mark, no_entry_sign): those resolve proposal cards. If message_ts is omitted, reacts to the user's current message.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -482,7 +482,7 @@
   },
   {
     "name": "proposal_resolve",
-    "description": "Resolve a side-effect proposal that is awaiting user confirmation. Use ONLY when the system prompt indicates a pending proposal AND the user's current message clearly expresses a decision about it ('go ahead', 'yes do it', 'ship it', 'no, cancel', 'nevermind'). Anyone in the thread may confirm or cancel — not just the original requester. If the user asks an unrelated question or is still discussing without deciding, do NOT invoke — reply conversationally and the proposal sits until ✅, ❌, or 60-minute expiry.",
+    "description": "Resolve a side-effect proposal that is awaiting user confirmation. Use when the system prompt shows a pending proposal AND the user's current message is a decision about it, in whatever words — a yes ('go ahead', 'sure', 'ok', 'sounds good', 'yep do it') confirms; a no ('cancel', 'no', 'scrap it') cancels. Anyone in the thread may confirm or cancel — not just the original requester. If the message asks for a change, or asks something unrelated, do NOT invoke — reply conversationally and the proposal sits until someone presses ✅ / ⛔ on the card, reacts, or it expires after 60 minutes.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

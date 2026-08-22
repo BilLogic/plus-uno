@@ -47,6 +47,43 @@ to hold in its head.
 
 ---
 
+## Revision 2026-08-22 (pm) — the streamlined scope
+
+Asked: *"are we sure this is the most optimal, streamlined, non-overengineered
+solution?"* Not as first written. The first draft fixed everything the audit
+found; most of it is on paths that rarely run. The user-visible bug is on one
+path and needs no new code. The cut:
+
+**Ship now — zero new modules, one prompt change, two one-line code changes:**
+
+1. `AGENT.md:140` and `draft-judge.ts:68-77`: stop mandating mrkdwn. The model
+   writes standard Markdown. `slack.md`'s mrkdwn table goes; in its place a
+   six-line "what renders in Slack" list, which now says in bold:
+   **no tables** — Slack renders no table in any message format, `markdown_text`
+   included. Use bullets, or `label — value` lines. The draft judge keeps one
+   formatting rule: a pipe table fails the draft.
+2. `delivery.ts` stream path: run the existing `convertTables()` (already in
+   `mrkdwn.ts`) over the body before `markdown_text`, so a table the model
+   writes anyway degrades to bullets instead of pipes. One line.
+3. `delivery.ts:159` `textSections`: run `toSlackMrkdwn` on each section so
+   the blocks fallback renders the same as the stream. One line.
+4. `tsconfig.test.json` + `tests/mrkdwn.test.ts`: five fixtures — `**bold**`,
+   `- item`, `[l](u)`, a pipe table → bullets, idempotence on valid mrkdwn.
+
+That is the whole Slack fix. The model writes what it writes best, Slack's
+agent field renders it, the one thing Slack cannot render is caught twice.
+
+**Deferred, recorded so they are not forgotten** (rows 5, 6, 8–10, 14–16,
+18–19 below): the fence-aware splitter (only bites on replies > 3900 chars),
+the remaining converter gaps (fallback path only), the Notion block parser and
+email plain-text pass (real, separate plan — the literal-asterisk bug in Notion
+bodies stands and is the next thing to fix after this lands), the share-out
+template drift, and the `content-surfaces.md` consolidation. The `layer` →
+`lane` sweep (row 17) and the stale `slack.md:59` (row 13) are doc-only and
+ride along with the prompt change since those files are open anyway.
+
+---
+
 ## The ledger — every issue caught, and the fix proposed
 
 | # | Issue | Where | Proposed fix | Part |

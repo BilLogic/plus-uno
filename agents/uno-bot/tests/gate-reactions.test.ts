@@ -11,7 +11,11 @@ describe("gate reactions", () => {
     assert.equal(mapReaction("heavy_check_mark"), "confirm");
   });
 
-  it("cancels on the crosses", () => {
+  it("cancels on ⛔ — the one the card names — and the crosses", () => {
+    // `no_entry` (⛔, red circle with a white bar) is the card's cancel
+    // gesture (user decision 2026-08-22); the crosses are accepted because
+    // people reach for whichever is closest.
+    assert.equal(mapReaction("no_entry"), "cancel");
     assert.equal(mapReaction("x"), "cancel");
     assert.equal(mapReaction("negative_squared_cross_mark"), "cancel");
     assert.equal(mapReaction("no_entry_sign"), "cancel");

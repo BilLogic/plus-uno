@@ -11,7 +11,7 @@
 // wire types. Each loop keeps its own transport and calls into these helpers.
 
 import { AsyncLocalStorage } from "node:async_hooks";
-import { typedResolution } from "./resolution";
+import { GATE_RESERVED } from "../slack/gate-reactions";
 import type { Env } from "../types";
 import type { HistoryTurn, PendingProposal } from "../thread-state-client";
 import type { SlackContext } from "../tools/dispatcher";
@@ -200,47 +200,14 @@ export function makeInterimFilter(onInterim?: (text: string) => void): (raw: str
   };
 }
 
-// ── Bare confirm/cancel vocabulary (single source, two matchers) ──────────────
-
-// One vocabulary drives BOTH the deterministic fast-path (events.ts, exact match
-// on the whole message) and the model-routing shortcut (anthropic-client.ts,
-// word-contains). They used to be two hand-maintained lists that disagreed —
-// "lgtm" resolved but wouldn't route, "nope" routed but wouldn't resolve
-// (review 2026-07-12). Keep phrases lowercase; multi-word is fine.
-export const CONFIRM_PHRASES = [
-  "go ahead", "yes", "yes please", "confirm", "confirmed", "do it",
-  "ship it", "approve", "approved", "sure", "ok", "okay", "lgtm",
-];
-export const CANCEL_PHRASES = [
-  "cancel", "cancel it", "no", "nope", "stop", "abort", "nevermind",
-  "never mind", "don't", "dont",
-];
-
-/**
- * The whole message read as a resolution, or null. Used for the no-model
- * fast-path; anything carrying content routes to the model.
- *
- * Delegates to agent/resolution.ts, which replaced whole-message equality
- * against the phrase lists above with an all-tokens-affirmative rule. Equality
- * meant "sure go ahead" — the most natural thing a person types — matched
- * nothing, because only "sure" and "go ahead" were listed, separately.
- *
- * The phrase lists stay: they still feed looksLikeResolution, the looser
- * word-contains test the router uses to pick the cheap model lane. That test
- * wants breadth; this one wants certainty.
- */
-export function bareResolution(text: string): "confirm" | "cancel" | null {
-  return typedResolution(text);
-}
-
-/** True if the text CONTAINS any resolution phrase as a word — the looser test
- *  the router uses to send a likely confirm/cancel to the cheap lane. */
-export function looksLikeResolution(text: string): boolean {
-  return RESOLUTION_WORD_RE.test(text.toLowerCase());
-}
-const RESOLUTION_WORD_RE = new RegExp(
-  `\\b(${[...CONFIRM_PHRASES, ...CANCEL_PHRASES].map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\b`,
-);
+// ── Confirm/cancel vocabulary: there is none ─────────────────────────────────
+//
+// CONFIRM_PHRASES / CANCEL_PHRASES, bareResolution and looksLikeResolution
+// lived here until 2026-08-22. A typed reply to a pending proposal now goes to
+// the model, which reads it with <pending_proposal> in context and calls
+// proposal_resolve. The only deterministic resolution left is an emoji — a
+// reaction on the card, a button on the card, or a typed emoji alone — and
+// that vocabulary is slack/gate-reactions.ts.
 
 // ── Correction / pushback vocabulary (Worker-side, drives control flow) ───────
 //
@@ -248,7 +215,7 @@ const RESOLUTION_WORD_RE = new RegExp(
 // history as authoritative prose with no counter-evidence (tool results are
 // never persisted). A prompt rule has to beat that, and it fires exactly when
 // instruction-following is weakest. So the Worker classifies instead, the same
-// way CONFIRM_PHRASES / looksLikeResolution already drive control flow above.
+// way the proposal gate already drives control flow in the Worker.
 //
 // Deliberately CONSERVATIVE-LEANING-BROAD: a false positive costs one extra
 // blueprint search (cheap, and the freshest possible answer); a false negative
@@ -488,12 +455,8 @@ async function executeSlackReact(
 ): Promise<string> {
   const emoji = typeof input.emoji === "string" ? input.emoji.replace(/:/g, "").trim() : "";
   if (!emoji) return JSON.stringify({ ok: false, error: "missing emoji name" });
-  // Mirror of gate.ts CONFIRM/CANCEL sets — every emoji the gate would read as
-  // a decision is off-limits to the bot, not just the canonical pair.
-  const GATE_RESERVED = new Set([
-    "white_check_mark", "heavy_check_mark", "+1", "thumbsup",
-    "x", "negative_squared_cross_mark", "no_entry_sign",
-  ]);
+  // Every emoji the gate would read as a decision is off-limits to the bot —
+  // the same set the gate reads, imported rather than mirrored.
   if (GATE_RESERVED.has(emoji)) {
     return JSON.stringify({
       ok: false,

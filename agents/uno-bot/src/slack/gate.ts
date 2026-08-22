@@ -1,10 +1,10 @@
-// Reaction-path confirmation gate. Text confirmations are handled by the
-// agent loop via the proposal_resolve tool — they don't pass through
-// here.
+// Reaction-path confirmation gate. Typed confirmations are handled by the
+// agent loop via the proposal_resolve tool; button presses by
+// slack/interactive.ts. All three converge on resolveProposal and its claim.
 //
 // Filters:
-//   - Only ✅ / ✔️ and ❌ reactions are considered. 👍 is deliberately NOT one
-//     of them — see CONFIRM_REACTIONS.
+//   - Only the gate emoji resolve — ✅ (and ✔️, 👍) confirm, ⛔ (and ❌, ❎, 🚫)
+//     cancel. The sets and their reasons live in gate-reactions.ts.
 //   - Only reactions ON the live proposal card resolve it. A reaction anywhere
 //     else in the thread points at the card and executes nothing.
 //   - Anyone in the thread may confirm/cancel (the requester lock was removed
@@ -100,7 +100,7 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
       thread_ts: live.threadTs,
       text:
         `:eyes: <@${event.user}> I saw your :${event.reaction}:, but it is not on the proposal I am holding — ` +
-        `nothing was executed. React on ${cardPointer(live)}, or just say "go ahead" / "cancel".`,
+        `nothing was executed. Use the buttons on ${cardPointer(live)}, or react there.`,
     }).catch(() => {});
     return;
   }
@@ -118,7 +118,7 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
     await postMessage(env, {
       channel: pending.channel,
       thread_ts: pending.threadTs,
-      text: `:warning: I caught your :${event.reaction}: but hit a snag executing it — give it another go, or just say "go ahead" / "cancel".`,
+      text: `:warning: I caught your :${event.reaction}: but hit a snag executing it — give it another go, or tell me and I'll retry.`,
     }).catch(() => {});
   }
 }

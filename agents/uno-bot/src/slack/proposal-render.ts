@@ -7,13 +7,56 @@
 import type { Env } from "../types";
 import { parseFigmaUrl, fetchFigmaImagePngUrl } from "../integrations/figma";
 import { collectStrings } from "../agent/preflight";
+import { textSections } from "./delivery";
 
 // One shared confirmation footer on every card. Anyone in the thread may
-// confirm/cancel now (the requester lock was removed 2026-07-14), so it names no
-// approver — but it MUST keep the "go ahead" / "cancel" words the text parser
-// matches (bareResolution in loop-shared).
+// confirm/cancel (the requester lock was removed 2026-07-14), so it names no
+// approver. It names the two gestures and nothing else — no "or just say go
+// ahead": the buttons and reactions are the clear path, and anything typed
+// goes to the model, which reads it in context (2026-08-22).
 export const CONFIRM_FOOTER =
-  `React :white_check_mark: / :x: — or just say "go ahead" / "cancel".`;
+  `:white_check_mark: to approve · :no_entry: to cancel (then tell me what to change).`;
+
+/** The ✅ Approve / ⛔ Cancel button row. The handler in slack/interactive.ts
+ *  resolves the card the button sits on, so the buttons carry no payload — the
+ *  message ts is the identity, same as a reaction. */
+export function proposalActionBlocks(): unknown[] {
+  return [
+    {
+      type: "actions",
+      block_id: "uno_proposal_actions",
+      elements: [
+        {
+          type: "button",
+          action_id: "uno_proposal_confirm",
+          style: "primary",
+          text: { type: "plain_text", text: "✅ Approve", emoji: true },
+          value: "confirm",
+        },
+        {
+          type: "button",
+          action_id: "uno_proposal_cancel",
+          style: "danger",
+          text: { type: "plain_text", text: "⛔ Cancel", emoji: true },
+          value: "cancel",
+        },
+      ],
+    },
+  ];
+}
+
+/** A text-only card as blocks: the text in ≤3000-char sections, then the
+ *  button row. Used at post time and again by the button handler to re-render
+ *  the card once it is resolved (buttons off, outcome on). */
+export function proposalCardBlocks(text: string, resolvedNote?: string): unknown[] {
+  const blocks: unknown[] = [...textSections(text)];
+  if (resolvedNote) {
+    blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: resolvedNote }] });
+  } else {
+    blocks.push(...proposalActionBlocks());
+  }
+  return blocks;
+}
 
 export function formatProposal(
   toolName: string,
@@ -193,5 +236,6 @@ export async function buildImplementDesignProposal(
     type: "section",
     text: { type: "mrkdwn", text: CONFIRM_FOOTER },
   });
+  blocks.push(...proposalActionBlocks());
   return { text, blocks };
 }

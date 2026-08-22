@@ -24,8 +24,10 @@
 import type { Env } from "../types";
 import { countedFetch } from "../net";
 import { runMessageShortcut } from "./shortcuts";
-import { cancelForUser } from "../thread-state-client";
+import { cancelForUser, loadPendingProposalDetailed } from "../thread-state-client";
 import { conversationsOpen, deleteMessage, postMessage } from "./api";
+import { resolveProposal } from "../agent/resolve-proposal";
+import { proposalCardBlocks } from "./proposal-render";
 
 /** The subset of Slack's interaction envelope this Worker acts on. */
 interface InteractionPayload {
@@ -100,10 +102,81 @@ export function handleInteraction(
 async function dispatchAction(env: Env, actionId: string, payload: InteractionPayload): Promise<void> {
   if (actionId === "uno_stop_run") return stopRun(env, payload);
   if (actionId === "uno_delete_answer") return deleteAnswer(env, payload);
+  if (actionId === "uno_proposal_confirm") return resolveFromButton(env, payload, "confirm");
+  if (actionId === "uno_proposal_cancel") return resolveFromButton(env, payload, "cancel");
   // No silent catch-all. This used to fall through to the feedback handler,
   // which meant an action_id nobody had wired reached a function that ignored
   // it — a dead button that looked alive. Say so in the log instead.
   console.warn(`[interactive] no handler for action_id=${actionId}`);
+}
+
+// ✅ Approve / ⛔ Cancel on a proposal card (2026-08-22).
+//
+// The third way to resolve a card, beside a reaction and a typed emoji, and
+// the one the card itself points at. Like a reaction it resolves ONLY the
+// card it sits on — `payload.message.ts` is the card — through the same claim
+// every other path uses, so a button press racing a reaction is handled by
+// whichever got there first and the other stands down in silence.
+//
+// After a win the card is re-rendered without its buttons and with the
+// outcome, via `response_url` (valid 30 minutes, which is within the card's
+// 60-minute life for any press that could still succeed). A button that stays
+// clickable after it has acted reads as a button that did nothing.
+async function resolveFromButton(
+  env: Env,
+  payload: InteractionPayload,
+  decision: "confirm" | "cancel",
+): Promise<void> {
+  const channel = payload.channel?.id;
+  const ts = payload.message?.ts;
+  const userId = payload.user?.id ?? "someone";
+  if (!channel || !ts) return;
+
+  const lookup = await loadPendingProposalDetailed(env, ts);
+  if (lookup.state !== "found") {
+    // Expired, or already resolved by another path. Say so where the person
+    // is looking — an ephemeral reply via response_url — never silence.
+    const why = lookup.state === "expired"
+      ? "that proposal had already expired — nothing was executed. Ask me again and I'll set it up fresh."
+      : "that proposal was already resolved — nothing more to do.";
+    await replyEphemeral(payload, `:hourglass: <@${userId}>, ${why}`);
+    return;
+  }
+
+  const pending = lookup.payload;
+  const won = await resolveProposal(env, pending, decision);
+  console.log(`[interactive] ${decision} button on ${channel}/${ts} by=${userId} won=${won}`);
+  if (!won) return; // the other resolver is posting; stay quiet
+
+  const note = decision === "confirm"
+    ? `:white_check_mark: Approved by <@${userId}>`
+    : `:no_entry: Cancelled by <@${userId}> — tell me what to change and I'll stage it again.`;
+  await replaceCard(payload, pending.proposalText, note);
+}
+
+async function replyEphemeral(payload: InteractionPayload, text: string): Promise<void> {
+  if (!payload.response_url) return;
+  await countedFetch(payload.response_url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ response_type: "ephemeral", replace_original: false, text }),
+  }).catch(() => {});
+}
+
+async function replaceCard(payload: InteractionPayload, text: string, note: string): Promise<void> {
+  if (!payload.response_url) return;
+  await countedFetch(payload.response_url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      replace_original: true,
+      text,
+      blocks: proposalCardBlocks(text, note),
+    }),
+  }).catch((err: unknown) => {
+    // Cosmetic: the action already happened and was announced in the thread.
+    console.warn(`[interactive] card re-render failed: ${err instanceof Error ? err.message : String(err)}`);
+  });
 }
 
 // The Home-tab Stop button. See home.ts for why it exists alongside `/stop`.

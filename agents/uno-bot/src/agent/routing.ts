@@ -3,8 +3,6 @@
 // (Was anthropic-client.ts — the direct-Anthropic SDK client was removed when
 // the Claude lane moved to Vertex; only the provider-neutral routing survives.)
 
-import { looksLikeResolution } from "./loop-shared";
-
 // A tier is HOW HARD TO THINK, named for effort — never for a model.
 //
 // These were "haiku" | "sonnet" | "opus" until 2026-08-07: Claude model names,
@@ -32,6 +30,18 @@ export interface RouteDecision {
   reason: string;
 }
 
+/**
+ * A short message against a pending proposal is almost always the answer to
+ * it, and reading "sure go ahead" does not need the big model.
+ *
+ * This is a COST heuristic only. It used to be a phrase list
+ * (`looksLikeResolution`, retired 2026-08-22) — a list here is harmless but
+ * pointless, because the worst a wrong guess can do is spend a slightly more
+ * expensive model. Length is the honest signal: a decision is short, an
+ * amendment is a sentence.
+ */
+const SHORT_REPLY_TOKENS = 6;
+
 export function routeRequest(opts: {
   userText: string;
   hasPending: boolean;
@@ -45,8 +55,8 @@ export function routeRequest(opts: {
   // the command untrustworthy.
   if (opts.override) return { tier: opts.override, reason: "explicit-command" };
 
-  if (opts.hasPending && looksLikeResolution(text)) {
-    return { tier: "chill", reason: "proposal-resolution" };
+  if (opts.hasPending && text.split(/\s+/).filter(Boolean).length <= SHORT_REPLY_TOKENS) {
+    return { tier: "chill", reason: "short-reply-to-proposal" };
   }
   // "harder" and "more" included deliberately: the natural phrasing is "think
   // harder", and `\bthink hard\b` does NOT match it — the word boundary fails on
