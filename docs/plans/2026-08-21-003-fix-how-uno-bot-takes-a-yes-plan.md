@@ -340,6 +340,94 @@ so the failure has a rate before anyone designs a response to it. A visible
 "I still have X staged — did you mean to go ahead?" is the obvious next step,
 but it should be built on a measured rate rather than a guess.
 
+### Proposal C — retire the typed classifiers  ·  *2026-08-22, reverses Part 4's second rejection; decision pending*
+
+The user asked: *"is the separation on fast path vs. letting the model think
+through really necessary? … most tasks still need the model to execute the rest
+anyway, adding this tiny overhead seems like nothing, and instead we can
+streamline the system a lot."*
+
+One correction to the premise, then agreement with the conclusion.
+
+**The correction:** for a bare confirmation the fast path does skip the model
+entirely — `resolveProposal` executes the staged tool input directly, so "yes"
+costs zero model tokens today and one `chill`-tier call under C. The saving is
+a whole (cheap) call, not a tiny overhead.
+
+**The agreement:** it is still not worth what it costs. An inventory of what
+the dispatch keeps in hand-maintained vocabularies:
+
+| List | File | Job |
+| --- | --- | --- |
+| `CONFIRM_PHRASES` / `CANCEL_PHRASES` → `looksLikeResolution` | `loop-shared.ts:210-244` | route to the cheap tier |
+| `AFFIRM_STRONG` / `NEUTRAL` / `NEGATE_STRONG` + `AFFIRM_EMOJI` / `CANCEL_EMOJI` | `resolution.ts` | execute with no model |
+| `fastPathAllowed` (count `?` in the bot's last turn) | `resolution.ts:137` | suppress the above |
+| `reactOnlyEmoji` closed set + seven guards incl. `readsAsDecision` | `react-only.ts`, `events.ts:555-600` | 👍 with no model |
+| `CORRECTION_PATTERNS` | `loop-shared.ts:260` | force a re-retrieval |
+
+"ok" sits in three of them. ~350 lines, 35 tests, and **every incident in this
+area came from the lists, not the model**: 2026-07-12 the two lists disagreed
+(`lgtm` resolved but would not route; `nope` the reverse); 2026-08-21 Bryan
+(whole-message equality missed "sure go ahead", and the react tier could have
+swallowed "sounds good" with no model call and nothing filed); the same day,
+`wait`/`hold` as cancel tokens destroying proposals; and the consequence tier,
+removed for adding friction without a check. Each fix added a guard; each guard
+is another place the next phrasing can fall between.
+
+**What the fast path was actually protecting against.** Part 2 cites the
+2026-07-10 Gemini incident: "go ahead" made the model re-stage the identical
+proposal and hit the duplicate guard instead of calling `proposal_resolve`. That
+is a *model* failure, and a vocabulary is the wrong shape of fix for it — it
+covers the phrasings someone thought of. The structural fix covers all of them:
+
+> **Pending proposal + the model re-invokes the same tool with the same input
+> = confirm.** The Worker already intercepts the call (`claude-agent.ts:191`,
+> `gemini-agent.ts:385`) and already compares against the pending proposal
+> (`validateProposalResolve`). Treating an identical re-stage as the resolution
+> it obviously is removes the 07-10 failure for every phrasing at once, with no
+> list.
+
+### The shape after C
+
+```
+typed message ─────────────────────────────────────► model
+                                                       │ <pending_proposal> in context
+                                                       ├─ proposal_resolve(confirm|cancel)
+                                                       ├─ same tool, same input  ──► treated as confirm
+                                                       ├─ react({emoji})         ──► emoji, no post
+                                                       └─ anything else          ──► ordinary reply
+reaction on the card ──────────────────────────────► resolveProposal   (no model; structural input)
+button on the card   ──────────────────────────────► resolveProposal   (no model; Proposal A)
+```
+
+- **Delete:** `resolution.ts`, `fastPathAllowed`, `readsAsDecision`, the react
+  tier and `react-only.ts`, `looksLikeResolution` and the two phrase lists,
+  the `bareResolution` branch in `events.ts:516-540`, and their tests
+  (`resolution.test.ts`, `react-only.test.ts`, the accelerator rows of
+  `confirmation-paths.test.ts`). Net roughly −350 lines.
+- **Keep:** the reaction gate and the button gate — structural inputs with
+  exactly one meaning and no parsing. `CORRECTION_PATTERNS` stays for now; it
+  drives retrieval, not an irreversible write, and a false positive costs one
+  search.
+- **Keep, simplified:** `routeRequest` picks `chill` when a proposal is pending
+  and the message is ≤ 6 tokens — a cost heuristic only; a wrong answer costs a
+  slightly more expensive model, never a wrong action.
+- **Add:** a `react` tool (`{ emoji }`) so the model can answer "thanks" with
+  🙏 and no post. The judgment the react tier's seven guards approximated
+  becomes the model's, which can see the whole thread. ~15 lines.
+- **Add:** the same-tool-same-input = confirm rule in the tool-call
+  interception, both lanes. ~20 lines, one test each lane.
+
+**Cost of C:** a bare "yes" pays one `chill` call (~1–3s, cents). A "thanks"
+pays one `chill` call and may still produce only an emoji. Nothing else changes
+for the user; the look-and-feel transcript at the top of this plan is
+unchanged.
+
+**What C does not cover, stated:** the model may still call neither
+`proposal_resolve` nor the same tool on a clear yes. That is Proposal B's job
+(notice when an approval bounces), and B becomes more important, not less,
+once the accelerator is gone — ship B with C or before it.
+
 ---
 
 ## Part 4 — Rejected, with reasons
@@ -363,10 +451,14 @@ wrong place for it, for two reasons:
 Proposal A is where this instinct lands correctly: the same quick yes/no, on the
 object that actually needs approving.
 
-### Removing the phrase accelerator entirely
+### Removing the phrase accelerator entirely  ·  *rejection withdrawn 2026-08-22*
 
-Covered in Part 2. It cannot block the model, and deleting it reintroduces a
-production failure on the highest-cost interaction.
+Was: "It cannot block the model, and deleting it reintroduces a production
+failure on the highest-cost interaction." The first half is true; the second
+assumed the only fix for the 2026-07-10 failure was a vocabulary. It is not —
+see Proposal C, which replaces the accelerator with a structural rule (same
+tool, same input = confirm) that covers every phrasing. Kept here so the
+reasoning that held for a day is visible, not erased.
 
 ---
 
