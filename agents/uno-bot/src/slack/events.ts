@@ -8,7 +8,7 @@ import {
   withTurnScope,
 } from "../agent/loop-shared";
 import { routeRequest } from "../agent/routing";
-import { fastPathAllowed, requiresReaction, typedResolution } from "../agent/resolution";
+import { fastPathAllowed, typedResolution } from "../agent/resolution";
 import { resolveProposal } from "../agent/resolve-proposal";
 import {
   appendHistory,
@@ -525,25 +525,9 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     // staged proposal has every required parameter filled, with the model's
     // guesses, so executing it verbatim silently adopts them.
     //
-    // (2) Consequence. An email cannot be recalled and an archive takes a page
-    // out from under anyone still using it, so those keep the explicit ✅
-    // standard AGENT.md already names rather than accepting typed words.
     const lastBotTurn = [...history].reverse().find((t) => t.role === "assistant");
     const fastPathOpen = fastPathAllowed(lastBotTurn?.content);
     const bareDecision = fastPathOpen ? bareResolution(userText) : null;
-    if (bareDecision === "confirm" && requiresReaction(pending.toolName)) {
-      await postMessage(env, {
-        channel,
-        thread_ts: threadTs,
-        text:
-          `That one wants a :white_check_mark: on the card rather than a typed go-ahead — ` +
-          `${pending.toolName === "email_send"
-            ? "an email can't be unsent"
-            : "archiving takes the page out from under anyone still using it"}. ` +
-          `React on the card and I'll run it.`,
-      }).catch(() => {});
-      return;
-    }
     if (bareDecision) {
       // Anyone in the thread may confirm/cancel (2026-07-14) — the requester lock
       // was removed here and everywhere else that gated on requesterUserId.

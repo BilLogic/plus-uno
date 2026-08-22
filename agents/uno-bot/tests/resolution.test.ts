@@ -7,7 +7,6 @@ import {
   bareResolution,
   emojiResolution,
   fastPathAllowed,
-  requiresReaction,
   typedResolution,
 } from "../src/agent/resolution";
 
@@ -118,22 +117,6 @@ describe("typed emoji", () => {
     assert.equal(typedResolution("sure go ahead"), "confirm");
     assert.equal(typedResolution("👍"), "confirm");
     assert.equal(typedResolution("go ahead but rename it"), null);
-  });
-});
-
-describe("consequence tiering", () => {
-  it("keeps the harshest actions behind a reaction", () => {
-    // An email cannot be recalled and an archive removes something someone
-    // else may be looking for. A created card can be deleted by whoever sees
-    // it.
-    assert.equal(requiresReaction("email_send"), true);
-    assert.equal(requiresReaction("notion_archive"), true);
-  });
-
-  it("leaves the recoverable ones on the text path", () => {
-    for (const tool of ["notion_create", "notion_update", "shareout_post", "component_implement"]) {
-      assert.equal(requiresReaction(tool), false, tool);
-    }
   });
 });
 

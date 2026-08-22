@@ -18,7 +18,7 @@
 // the plan's testing section.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { typedResolution, fastPathAllowed, requiresReaction } from "../src/agent/resolution";
+import { typedResolution, fastPathAllowed } from "../src/agent/resolution";
 import { mapReaction } from "../src/slack/gate-reactions";
 
 /** The card the Worker posts once the model stages a notion_create. */
@@ -43,10 +43,6 @@ describe("Bryan's confirmation, both ways", () => {
     // question marks, the multi-question guard would have closed the text path
     // on every proposal — the guard has to coexist with the card, not fight it.
     assert.equal(fastPathAllowed(PROPOSAL_CARD), true);
-  });
-
-  it("lets a filed card be confirmed by text, since it can be deleted", () => {
-    assert.equal(requiresReaction("notion_create"), false);
   });
 
   it("accepts the other ways people say the same thing", () => {

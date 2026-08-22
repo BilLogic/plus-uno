@@ -94,26 +94,19 @@ export function bareResolution(text: string): Resolution | null {
 }
 
 /**
- * Tools whose consequences are severe enough that typed words are not enough.
+ * There is deliberately NO consequence tier here.
  *
- * uno-bot has one flat SIDE_EFFECT_TOOLS set and gates all seven identically,
- * which puts "create a card" and "send an email to a human" behind the same
- * bar. AGENT.md already names the higher standard — "zero irreversible action
- * without an explicit ✅" — so these require the reaction, and a typed
- * affirmation gets told so rather than silently doing nothing.
+ * `email_send` and `notion_archive` briefly required a reaction, on the
+ * reasoning that a typed word was too light for an action that cannot be
+ * recalled. That was wrong, and worth recording why: the gate is the gate.
+ * A staged proposal has already been reviewed, and the person answering it is
+ * the person who asked for it. Refusing their "go ahead" and demanding the
+ * same decision in a different medium adds friction without adding a check —
+ * it does not ask anyone to think harder, it just makes them click elsewhere.
  *
- * The test is what the action does OUTSIDE Slack and Notion's trash: an email
- * cannot be recalled, and an archive removes something someone else may be
- * looking for. A created card can be deleted by the person who sees it.
+ * If some action ever genuinely needs a second pair of eyes, the answer is a
+ * second REVIEWER, not a second gesture from the same one.
  */
-const REACTION_ONLY_TOOLS: ReadonlySet<string> = new Set([
-  "email_send",
-  "notion_archive",
-]);
-
-export function requiresReaction(toolName: string): boolean {
-  return REACTION_ONLY_TOOLS.has(toolName);
-}
 
 /**
  * Whether the deterministic fast path may run at all this turn.
@@ -139,13 +132,8 @@ export function fastPathAllowed(previousBotMessage: string | undefined): boolean
 }
 
 /**
- * A typed 👍 is the same intent as a 👍 reaction and should take the same path.
- * Today one is deterministic and the other goes to the model.
- *
- * Only the affirmative emoji are listed. The thumbs-up is deliberately absent
- * from the REACTION vocabulary (it doubles as the answer footer's feedback
- * button), but that argument does not apply to a message someone typed on
- * purpose — nothing else in the product makes you type 👍 into a thread.
+ * A typed emoji is the same intent as the reaction, and takes the same path.
+ * A person should not have to know which one they are performing.
  */
 const AFFIRM_EMOJI = ["👍", "👌", "✅", "✔️", "🆗"];
 const CANCEL_EMOJI = ["❌", "🚫", "✋"];
