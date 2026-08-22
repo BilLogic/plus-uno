@@ -23,6 +23,95 @@ confirmation gesture, and a typed reply — and they shared a 👍.
 
 ---
 
+## What it looks and feels like when this is done
+
+The end state, written as what a person actually sees. Everything in Part 1 is
+already true; the two starred moments are Part 3.
+
+### Asking for something that writes
+
+> **Bryan:** `@uno-bot` file a maintenance ticket about the confidence level thing
+>
+> **uno-bot:**
+> ⚠️ **About to create this card in Notion**
+> • **Title:** uno-blueprint responses omitting confidence level
+> • **Surface:** intake · **Suggested tier:** Tier 2
+> • **Problem / Context:** Grounding rules require exactly one woven confidence clause…
+> • **Proposed Fix:** Audit the confidence clause enforcement…
+>
+> ⭐ `[ ✅ File it ]` `[ ❌ Cancel ]`
+> *…or react ✅ / ❌, or just say "go ahead".*
+>
+> **Bryan:** sure go ahead
+>
+> **uno-bot:** Got it — kicking that off.
+> 📝 Created on Roadmap (maintenance intake): *uno-blueprint responses omitting confidence level*
+
+**One card. One confirmation.** The card carries the whole draft, so there is
+nothing to approve twice — that is why the prose-draft round is gone.
+
+**Three ways to say yes, one meaning.** Press the button, react ✅ or 👍, or
+type it. "sure go ahead", "yes please", "ok do it", "👍" all work. Whichever
+you use, the same claim resolves, and only one of them can win — pressing the
+button *and* reacting cannot file two cards.
+
+### Saying something that isn't quite yes
+
+> **Bryan:** go ahead but tag it Universal
+>
+> **uno-bot:** Updated — tagging it Universal. Same card otherwise:
+> ⚠️ **About to create this card in Notion** …
+
+The deterministic path deliberately does **not** fire here, because resolution
+runs the staged input verbatim and would have filed the untagged version while
+saying "Got it". Anything carrying an instruction goes to the model, which
+reads it and re-stages.
+
+Same for "no go ahead" and "ok cancel" — mixed signals are never guessed.
+
+### Changing your mind, or walking away
+
+> **Bryan:** actually cancel that
+>
+> **uno-bot:** Cancelled — nothing was filed. Want it re-staged with a different tier?
+
+A ✅ on a card that was already superseded says so instead of filing the newer
+one. A ✅ ten minutes after the card expired gets the hourglass, not silence.
+
+### The heavier actions
+
+> **Bryan:** go ahead
+>
+> **uno-bot:** That one wants a ✅ on the card rather than a typed go-ahead — an
+> email can't be unsent. React on the card and I'll run it.
+
+`email_send` and `notion_archive` only. Everything else takes your word.
+
+### Under an ordinary answer
+
+> **uno-bot:** The reconfirm step sits under Standard Scheduling — I checked the
+> blueprint just now. It's `status: proposed`, so it isn't live yet.
+>
+> *LLM-written · check before acting*
+
+No buttons. Nothing to press, nothing asking for a rating. The one line that
+remains is the honesty label, and it appears only on answers making checkable
+claims — a short "Got it" carries nothing at all.
+
+### ⭐ When an approval goes missing
+
+> **Bryan:** go ahead
+>
+> **uno-bot:** *(answers something adjacent, never files the card)*
+>
+> **uno-bot:** I still have the maintenance card staged — did you mean to go
+> ahead with it?
+
+Today this is the silence in which an approval evaporates. Proposal B starts by
+measuring how often it happens.
+
+---
+
 ## Part 1 — Shipped
 
 Seven commits, all on `refactor/one-name-search-blueprint`, none deployed.
