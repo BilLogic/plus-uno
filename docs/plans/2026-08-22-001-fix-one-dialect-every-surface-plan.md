@@ -3,8 +3,8 @@ title: "One dialect, every surface: the model writes Markdown, each egress conve
 type: fix
 status: partially-implemented
 date: 2026-08-22
-implemented: "Slack half (rows 1–3, 6-partial, 7, 11–13, 17) — 2026-08-22"
-deferred: "Notion + email (rows 8–10), splitter (5), share-out (14), content-surfaces.md (16), UI-copy decision (19)"
+implemented: "Slack (rows 1–3, 6-partial, 7, 11–13, 17) and Notion (rows 8–9, 15) — 2026-08-22"
+deferred: "Email (row 10), splitter (5), share-out (14), content-surfaces.md (16), UI-copy decision (19)"
 repos: plus-uno (agents/uno-bot, docs/conventions)
 related: docs/plans/2026-08-21-003-fix-how-uno-bot-takes-a-yes-plan.md
 ---
@@ -116,6 +116,49 @@ Close to the above, with three additions found while doing it:
 Slack's documented contract for that field, and if the parser turns out lenient
 on `*single*` then the old dialect worked too — no regression either way. Worth
 one real reply's eyeball, alongside the proposal card's.
+
+### Notion, shipped the same day (rows 8, 9, 15)
+
+`src/integrations/notion-blocks.ts` — pure, 200 test assertions — replaces
+`bodyToParagraphs`. Every construct in Part 2's table lands as a real block:
+annotations, links, both list kinds, checkboxes, quotes, fenced code with a
+mapped language, dividers. `chunkBlocks` batches at Notion's 100-block limit,
+in `notionCreate` (create with the first batch, append the rest) and in
+`notionUpdate`.
+
+Four things worth recording, because none was in the plan:
+
+- **The recursion bug.** `parseInline` recurses to compose annotations
+  (`**bold with _italic_**`), and it shared one module-level `/g` regex. An
+  inner call rewound the outer call's `lastIndex`, so the outer loop
+  re-consumed tokens and never terminated — the run array grew until the test
+  process took **SIGABRT after 47 seconds**. Fixed with a fresh matcher per
+  call. Caught only because a test fed it a 5,000-character paragraph; a
+  shorter fixture would have passed and this would have hung a live turn.
+- **snake_case must not italicise.** A naive `_..._` rule turns "notion_create
+  and source_read" into mangled emphasis, and this codebase's vocabulary is
+  full of exactly that. The underscore forms carry word-boundary lookarounds,
+  with a test naming the hazard.
+- **Unusable link schemes degrade instead of failing the write.** Notion
+  rejects a non-http(s)/mailto url and rejects the **whole request**, so one
+  relative link in one paragraph would have lost the entire page. It now
+  renders as `label (url)` text.
+- **Headings inside a body are `heading_3`, never `heading_2`.** Section
+  headings own `heading_2` and `fetchNotionPRD` walks that outline downstream
+  to find Acceptance Criteria and Implementation Notes; letting a body's `##`
+  emit `heading_2` would put it level with the section containing it and break
+  that reader.
+
+Partial-failure handling is deliberate on both write paths: a continuation
+batch that fails after the page exists logs and returns the page rather than
+throwing — reporting "create failed" for a card that is sitting there would
+send someone hunting for it.
+
+The bot-facing contract now lives in `docs/conventions/notion.md` § Writing a
+body, **outside** the `<!-- ide-only -->` fence. That fence is why this bug ran:
+all the formatting guidance was inside it, stripped from the bot's prompt, so
+the model had zero instruction on what goes in a body and defaulted to
+Markdown — correctly, into a parser that did not exist.
 
 **Deferred, recorded so they are not forgotten** (rows 5, 6, 8–10, 14–16,
 18–19 below): the fence-aware splitter (only bites on replies > 3900 chars),

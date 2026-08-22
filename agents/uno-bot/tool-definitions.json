@@ -246,11 +246,11 @@
         },
         "summary": {
           "type": "string",
-          "description": "1-3 sentence overview, rendered as the opening of the body."
+          "description": "1-3 sentence overview, rendered as the opening of the body. Markdown renders: **bold**, _italic_, `code`, - bullets, 1. numbered, [label](url) links, > quotes, ```fenced code```, --- dividers, and - [ ] checkboxes. Headings inside a body render one level below the section heading. Separate paragraphs with a blank line."
         },
         "sections": {
           "type": "array",
-          "description": "Body sections in order (Problem/Context, Goals, Users & Scenarios, Requirements, Open Questions, etc.). Each body may contain multiple paragraphs (separate with blank lines).",
+          "description": "Body sections in order (Problem/Context, Goals, Users & Scenarios, Requirements, Open Questions, etc.). Markdown renders: **bold**, _italic_, `code`, - bullets, 1. numbered, [label](url) links, > quotes, ```fenced code```, --- dividers, and - [ ] checkboxes. Headings inside a body render one level below the section heading. Separate paragraphs with a blank line.",
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -263,14 +263,15 @@
                 "type": "string"
               },
               "body": {
-                "type": "string"
+                "type": "string",
+                "description": "Section body. Markdown renders: **bold**, _italic_, `code`, - bullets, 1. numbered, [label](url) links, > quotes, ```fenced code```, --- dividers, and - [ ] checkboxes. Headings inside a body render one level below the section heading. Separate paragraphs with a blank line."
               }
             }
           }
         },
         "acceptance_criteria": {
           "type": "array",
-          "description": "For 'prd'/'prd' (component PRDs included): checklist rendered as Notion to-do checkboxes (read downstream by component_implement / prototype_scaffold).",
+          "description": "For 'prd'/'prd' (component PRDs included): checklist rendered as Notion to-do checkboxes (read downstream by component_implement / prototype_scaffold). Inline Markdown renders: **bold**, `code`, [label](url).",
           "items": {
             "type": "string"
           }
@@ -309,7 +310,7 @@
         "append": {
           "type": "object",
           "additionalProperties": false,
-          "description": "Narrative blocks to append to the end of the page body.",
+          "description": "Narrative blocks to append to the end of the page body. Markdown renders: **bold**, _italic_, `code`, - bullets, 1. numbered, [label](url) links, > quotes, ```fenced code```, --- dividers, and - [ ] checkboxes. Headings inside a body render one level below the section heading. Separate paragraphs with a blank line.",
           "properties": {
             "sections": {
               "type": "array",
@@ -328,11 +329,12 @@
                     "type": "string"
                   }
                 }
-              }
+              },
+              "description": "Headed sections to append. Markdown renders: **bold**, _italic_, `code`, - bullets, 1. numbered, [label](url) links, > quotes, ```fenced code```, --- dividers, and - [ ] checkboxes. Headings inside a body render one level below the section heading. Separate paragraphs with a blank line."
             },
             "text": {
               "type": "string",
-              "description": "A single block of text to append (use when no heading is needed, e.g. a dated progress pulse)."
+              "description": "A single block of text to append (use when no heading is needed, e.g. a dated progress pulse). Markdown renders: **bold**, _italic_, `code`, - bullets, 1. numbered, [label](url) links, > quotes, ```fenced code```, --- dividers, and - [ ] checkboxes. Headings inside a body render one level below the section heading. Separate paragraphs with a blank line."
             }
           }
         }
