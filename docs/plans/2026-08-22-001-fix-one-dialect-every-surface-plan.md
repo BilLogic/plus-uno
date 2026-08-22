@@ -1,9 +1,8 @@
 ---
 title: "One dialect, every surface: the model writes Markdown, each egress converts"
 type: fix
-status: partially-implemented
-date: 2026-08-22
 status: implemented
+date: 2026-08-22
 implemented: "All three surfaces — Slack (rows 1–3, 6-partial, 7, 11–13, 17), Notion (8–9, 15), email (10) — 2026-08-22"
 deferred: "content-surfaces.md consolidation (16), UI-copy decision (19)"
 repos: plus-uno (agents/uno-bot, docs/conventions)
@@ -61,13 +60,11 @@ path and needs no new code. The cut:
 
 1. `AGENT.md:140` and `draft-judge.ts:68-77`: stop mandating mrkdwn. The model
    writes standard Markdown. `slack.md`'s mrkdwn table goes; in its place a
-   six-line "what renders in Slack" list, which now says in bold:
-   **no tables** — Slack renders no table in any message format, `markdown_text`
-   included. Use bullets, or `label — value` lines. The draft judge keeps one
-   formatting rule: a pipe table fails the draft.
-2. `delivery.ts` stream path: run the existing `convertTables()` (already in
-   `mrkdwn.ts`) over the body before `markdown_text`, so a table the model
-   writes anyway degrades to bullets instead of pipes. One line.
+   six-line "what renders in Slack" list. *(The no-tables half of this was
+   SUPERSEDED the same day — tables render fine; see "Verified … twice" below.
+   Kept here as the record of what was decided before it was measured.)*
+2. ~~`delivery.ts` stream path: convert tables before `markdown_text`.~~
+   *(Superseded — it destroyed a construct Slack renders.)*
 3. `delivery.ts:159` `textSections`: run `toSlackMrkdwn` on each section so
    the blocks fallback renders the same as the stream. One line.
 4. `tsconfig.test.json` + `tests/mrkdwn.test.ts`: five fixtures — `**bold**`,
