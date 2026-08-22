@@ -9,40 +9,26 @@
 import type { Env } from "../types";
 import type { SlackContext } from "./dispatcher";
 import { postMessage } from "../slack/api";
-
-// A Slack user id ("U…"/"W…") gets @-mentioned; anything else is shown as-is.
-function renderReviewer(r: string): string {
-  return /^[UW][A-Z0-9]{6,}$/.test(r.trim()) ? `<@${r.trim()}>` : r.trim();
-}
-
-function asList(v: unknown): string[] {
-  if (Array.isArray(v)) return v.map((x) => (typeof x === "string" ? x.trim() : "")).filter(Boolean);
-  if (typeof v === "string") return v.split(",").map((s) => s.trim()).filter(Boolean);
-  return [];
-}
+import { fieldsFromInput, renderShareout } from "./share-out-render";
 
 export async function executeShareForFeedback(
   env: Env,
   input: Record<string, unknown>,
   slack: SlackContext,
 ): Promise<string> {
-  const summary = typeof input.summary === "string" ? input.summary.trim() : "";
-  const link = typeof input.link === "string" ? input.link.trim() : "";
-  const deadline = typeof input.deadline === "string" ? input.deadline.trim() : "";
-  const reviewers = asList(input.reviewers);
-
-  if (!summary) return JSON.stringify({ ok: false, error: "missing 'summary' of what's being shared" });
+  const fields = fieldsFromInput(input);
+  if (!fields.summary) {
+    return JSON.stringify({ ok: false, error: "missing 'summary' of what's being shared" });
+  }
 
   const target = env.PLUS_DESIGN_FEEDBACK_CHANNEL_ID?.trim();
   const channel = target || slack.channel;
   const requester = slack.requestedBy ? `<@${slack.requestedBy}>` : "A designer";
 
-  const lines = [
-    `:mega: *Sharing for feedback* — ${summary}`,
-    link ? `Take a look: ${link}` : "",
-    reviewers.length ? `Feedback wanted from: ${reviewers.map(renderReviewer).join(" ")}` : "",
-    `Shared by ${requester}. Please drop comments in-thread${deadline ? ` by *${deadline}*` : ""}.`,
-  ].filter(Boolean);
+  // The Flow 3 template, per docs/conventions/slack.md § Share-out post. The
+  // shape lives in share-out-render.ts so it can be asserted — it drifted from
+  // the doc for months precisely because nothing compared the two.
+  const body = renderShareout(fields, requester);
 
   try {
     const posted = await postMessage(env, {
@@ -50,7 +36,7 @@ export async function executeShareForFeedback(
       // In #plus-design this is a top-level post; if falling back to the origin
       // channel, keep it in the thread.
       thread_ts: target ? undefined : slack.threadTs,
-      text: lines.join("\n"),
+      text: body,
     });
     if (!posted.ok) {
       return JSON.stringify({ ok: false, status: "post_failed", detail: (posted as { error?: string }).error ?? "unknown" });

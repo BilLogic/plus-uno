@@ -5,7 +5,7 @@ status: partially-implemented
 date: 2026-08-22
 status: implemented
 implemented: "All three surfaces — Slack (rows 1–3, 6-partial, 7, 11–13, 17), Notion (8–9, 15), email (10) — 2026-08-22"
-deferred: "Share-out template (14), content-surfaces.md consolidation (16), UI-copy decision (19)"
+deferred: "content-surfaces.md consolidation (16), UI-copy decision (19)"
 repos: plus-uno (agents/uno-bot, docs/conventions)
 related: docs/plans/2026-08-21-003-fix-how-uno-bot-takes-a-yes-plan.md
 ---
@@ -233,6 +233,32 @@ with plain `let`s it narrowed `openFence` to `null` — so `openFence.length`
 failed with *"Property 'length' does not exist on type 'never'"*. Property
 narrowing resets after any function call, which is exactly the behaviour this
 needs.
+
+### The share-out template, shipped the same day (row 14)
+
+The doc won this disagreement, and the tool grew to carry it. Each field the
+Flow 3 template asks for changes what a reviewer does: **fidelity** says which
+critiques are useful yet (polish notes on a low-fi wire waste everyone's time),
+**round** says whether to repeat last round's points, **three specific
+questions** prevent "thoughts?", and **out-of-scope** stops feedback nobody can
+act on. Shrinking the doc to match an under-built tool would have deleted a
+team practice to make a mismatch go away.
+
+`shareout_post` gains `project`, `artifact`, `fidelity` (enum), `round`,
+`what_changed`, `feedback_wanted` (capped at three — the cap is enforced in
+code, not requested in prose) and `not_looking_for`. `share-out-render.ts`
+holds the shape, split out of the executor so it can be asserted at all.
+
+Every line below the header is optional and omitted when empty, so a share-out
+carrying only a summary still posts — the same stage-with-gaps policy as the
+bundle audit (2026-07-16), rather than a new way to be blocked.
+
+**The guard is the actual fix.** `tests/share-out.test.ts` reads
+`docs/conventions/slack.md` § Share-out post and fails if a `shareout_post`
+parameter is not named there. It caught a mismatch on its first run — the doc
+had written `` `feedback_wanted[]` ``, so the exact field name never appeared.
+That is the class of drift that let this sit for months: the two artefacts
+described the same thing and nothing read both.
 
 **Deferred, recorded so they are not forgotten** (rows 5, 6, 8–10, 14–16,
 18–19 below): the fence-aware splitter (only bites on replies > 3900 chars),

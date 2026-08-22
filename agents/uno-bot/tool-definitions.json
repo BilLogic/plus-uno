@@ -414,7 +414,7 @@
   },
   {
     "name": "shareout_post",
-    "description": "Share a prototype/design/PRD with the team FOR FEEDBACK (the 'publish' / 'share out' / 'post for feedback' action). Posts a shareout to #plus-design-feedback: what it is, a link back, a feedback prompt, and @-mentioned reviewers — SIDE EFFECT (it pings people), routed through the confirmation gate. This is NOT marketplace registration: use this when the designer wants eyes/critique/feedback — catalog registration runs in-IDE via writers/notion, not through any bot tool. Stage IMMEDIATELY with whatever links are in hand — do NOT interrogate for missing bundle pieces first; the confirmation card automatically flags anything missing (Loom / live preview / Decisions link) and the user's ✅ is informed consent to post without them (policy 2026-07-16).",
+    "description": "Share a prototype/design/PRD with the team FOR FEEDBACK (the 'publish' / 'share out' / 'post for feedback' action). Posts the Flow 3 share-out to #plus-design-feedback in the team's documented shape (docs/conventions/slack.md § Share-out post): project + artifact + fidelity + round, what it is, what changed, up to three specific questions, what is out of scope, the link, and @-mentioned reviewers — SIDE EFFECT (it pings people), routed through the confirmation gate. This is NOT marketplace registration: use this when the designer wants eyes/critique/feedback — catalog registration runs in-IDE via writers/notion, not through any bot tool. Stage IMMEDIATELY with whatever links are in hand — do NOT interrogate for missing bundle pieces first; the confirmation card automatically flags anything missing (Loom / live preview / Decisions link) and the user's ✅ is informed consent to post without them (policy 2026-07-16).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -422,9 +422,46 @@
         "summary"
       ],
       "properties": {
+        "project": {
+          "type": "string",
+          "description": "Project or card name, e.g. 'Session Sign Up'. Opens the post."
+        },
+        "artifact": {
+          "type": "string",
+          "description": "What is being shared, e.g. 'hi-fi prototype', 'PRD', 'Figma flow'."
+        },
+        "fidelity": {
+          "type": "string",
+          "enum": [
+            "low",
+            "mid",
+            "high"
+          ],
+          "description": "Fidelity of what you are sharing. It tells reviewers which critiques are useful yet — polish notes on a low-fi wire waste everyone's time."
+        },
+        "round": {
+          "type": "number",
+          "description": "Feedback round, 1 for the first. Round 2+ REQUIRES what_changed, so reviewers do not repeat last round's points."
+        },
+        "what_changed": {
+          "type": "string",
+          "description": "What changed since the previous round. Required when round is 2 or higher."
+        },
         "summary": {
           "type": "string",
-          "description": "One or two sentences: what is being shared and what feedback is wanted."
+          "description": "One or two sentences: what this is. What feedback you want goes in feedback_wanted, not here."
+        },
+        "feedback_wanted": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 3,
+          "description": "Up to THREE specific, stage-appropriate questions. The cap is the convention — an open-ended ask is the 'thoughts?' this ritual exists to prevent. Extra items are dropped."
+        },
+        "not_looking_for": {
+          "type": "string",
+          "description": "What is explicitly out of scope this round. Stops feedback nobody can act on yet."
         },
         "link": {
           "type": "string",

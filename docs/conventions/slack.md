@@ -15,16 +15,26 @@ Pillar → channel map (group announcements; **all private — uno-bot must be i
 
 ## Share-out post
 
-The Flow 3 feedback rail. Bundle completeness is loudly audited — on uno-bot the card flags any gap before ✅ posts. *(revised 2026-07-16)*
+The Flow 3 feedback rail. Bundle completeness is loudly audited — on uno-bot the card flags any gap before ✅ posts. *(revised 2026-07-16; tool brought into line 2026-08-22)*
 
 ```
-📣 [Project] — [artifact] · fidelity: [low/mid/high] · round N
-What this is: 1–2 sentences. · What changed since last round (round 2+).
-🎯 Feedback wanted on: 1… 2… (max 3, stage-specific — never "thoughts?")
-NOT looking for feedback on: [out of scope this round]
-🔗 Loom · Live preview · Figma replica (required for prototypes) · Decisions DB (project filter)
-cc @reviewers — by [date]
+📣 *[Project]* — [artifact] · fidelity: [low/mid/high] · round N
+*What this is:* 1–2 sentences.
+*What changed since last round:* … (round 2+)
+🎯 *Feedback wanted on:*
+  1. …
+  2. …            (max 3, stage-specific — never "thoughts?")
+*Not looking for feedback on:* [out of scope this round]
+🔗 [link]
+cc @reviewers
+Shared by @requester. Comments in-thread by *[date]*.
 ```
+
+**This is what `shareout_post` posts**, field for field — `project`, `artifact`, `fidelity`, `round`, `summary`, `what_changed`, `feedback_wanted` (a list), `not_looking_for`, `link`, `reviewers`, `deadline`. Every line below the header is optional and omitted when empty, so a thin share-out still posts rather than being blocked. `tests/share-out.test.ts` pins the doc and the renderer together — it reads this file and fails if a field named here has no home in the tool schema.
+
+Until 2026-08-22 the tool had no fields for fidelity, round, what-changed, the questions or the out-of-scope line — it posted four fixed lines from `summary`/`link`/`reviewers`/`deadline`, so this template was reachable only if the model crammed everything into `summary`, and the header could never match. The doc won the disagreement because each field changes what a reviewer does.
+
+Bundle links (Loom · live preview · Figma replica · Decisions DB) go in `link` and the surrounding thread; the confirmation card audits them and names anything missing before ✅.
 
 ## Two gates — never conflate
 
