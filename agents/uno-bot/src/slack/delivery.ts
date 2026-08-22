@@ -5,6 +5,8 @@
 import type { Env } from "../types";
 import { addReaction, appendStream, postMessage, startStream, stopStream } from "./api";
 import { footerKindFor, footerNoteFor, type FooterKind } from "./footer-kind";
+import { toSlackMrkdwn } from "./mrkdwn";
+import { splitBalanced } from "./split";
 import { buildFailureMessage, type FailureStage } from "./failure-message";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
@@ -86,15 +88,17 @@ export async function postVisibleFailure(
 // enforces it. Truncation note lets the user ask for the rest.
 const MAX_POST_CHARS = 3900;
 
+const TRUNCATION_NOTE = "_…truncated — ask me for the rest._";
+
 function capText(text: string): string {
   if (text.length <= MAX_POST_CHARS) return text;
-  // Cut at a line boundary (else a word boundary) so the cap never splits a
-  // <url|label> link in half — live 2026-07-10 a mid-URL cut shipped a broken
-  // link right above the truncation notice.
-  const window = text.slice(0, MAX_POST_CHARS);
-  const lastBreak = Math.max(window.lastIndexOf("\n"), window.lastIndexOf(" "));
-  const cut = lastBreak > MAX_POST_CHARS * 0.6 ? window.slice(0, lastBreak) : window;
-  return `${cut}\n_…truncated — ask me for the rest._`;
+  // splitBalanced cuts at a line boundary (else a word boundary, so a
+  // <url|label> is never sliced in half — live 2026-07-10 a mid-URL cut
+  // shipped a broken link right above this very notice) AND closes an open
+  // code fence before the cut. Without that last part the notice, and
+  // everything after it, rendered inside the code block.
+  const [first] = splitBalanced(text, MAX_POST_CHARS - TRUNCATION_NOTE.length - 1);
+  return `${first ?? text.slice(0, MAX_POST_CHARS)}\n${TRUNCATION_NOTE}`;
 }
 
 // The retired confidence affix, killed deterministically instead of by prompt.
@@ -128,92 +132,98 @@ function stripTrailingConfidence(text: string): string {
 }
 
 /**
+ * The body that will actually be SENT, for a given draft: the trailing-label
+ * strip, the empty-answer placeholder, then the cap — in that order.
+ *
+ * Exported so the confidence pre-check judges the delivered text rather than
+ * the draft. The two used to diverge silently: capText truncates at
+ * MAX_POST_CHARS AFTER the judge has scored the draft, so a woven clause
+ * sitting in a closing paragraph could be amputated from a message the
+ * telemetry had already recorded as `verdict=pass` (2026-08-21).
+ * postTextVerified calls this rather than repeating it, so the two cannot
+ * drift apart again.
+ */
+export function renderDeliveredBody(text: string): string {
+  // NOTHING is stripped from the Markdown here any more, and that is a
+  // correction, not an omission.
+  //
+  // From earlier on 2026-08-22 this ran `stripMarkdownTables` (tables → bullet
+  // lines) and `headingsToBold` (`## X` → `**X**`) on every path, on the
+  // strength of a probe whose STORED TEXT showed a table missing and a heading
+  // reduced to a bare line. Both readings were wrong: Slack keeps a table as a
+  // block and a heading as heading styling, and only the plain-text fallback
+  // omits them. Rendered in a real client, the table renders as a real table.
+  //
+  // So the Markdown path leaves the model's Markdown alone. The mrkdwn paths —
+  // the blocks fallback and `postMessage`'s `text` — still degrade a table to
+  // bullets inside `toSlackMrkdwn`, because a `section` block genuinely cannot
+  // hold one. The lesson kept: read the RENDER, never the stored text.
+  const cleaned = stripTrailingConfidence(text);
+  return cleaned.trim()
+    ? capText(cleaned)
+    : "(I came back with an empty answer — that's a bug on my side. Try rephrasing, and flag this to the team.)";
+}
+
+/**
  * Post a text reply and report whether Slack actually accepted it. Guards the
  * R2 "✅ + empty body" defect: empty text gets an honest placeholder, oversized
  * text is capped, a failed post is retried once, and the caller only ✅-reacts
  * when this returns true.
  */
 // A section's text field caps at 3000 chars, below MAX_POST_CHARS — so a capped
-// body can still overflow one block. Split on line boundaries so a <url|label>
-// never straddles two blocks (the same failure capText guards against).
+// body can still overflow one block.
 const SECTION_CHARS = 2900;
-function textSections(body: string): Array<Record<string, unknown>> {
-  const chunks: string[] = [];
-  let rest = body;
-  while (rest.length > SECTION_CHARS) {
-    const window = rest.slice(0, SECTION_CHARS);
-    const brk = Math.max(window.lastIndexOf("\n"), window.lastIndexOf(" "));
-    const cut = brk > SECTION_CHARS * 0.6 ? brk : SECTION_CHARS;
-    chunks.push(rest.slice(0, cut));
-    rest = rest.slice(cut).replace(/^\s+/, "");
-  }
-  if (rest) chunks.push(rest);
-  return chunks.map((c) => ({ type: "section", text: { type: "mrkdwn", text: c } }));
+export function textSections(body: string): Array<Record<string, unknown>> {
+  // Two things happen here, in this order, and both are load-bearing.
+  //
+  // 1. CONVERT. A `section` block's text is mrkdwn — NOT the Markdown the model
+  //    writes and NOT what `markdown_text` takes on the stream path. Until
+  //    2026-08-22 this path shipped the raw body: `postMessage` converted the
+  //    `text` field only, blocks render over `text`, so the sanitized copy was
+  //    seen by nothing but notifications and screen readers, and every
+  //    `**bold**` on this path reached people as literal asterisks.
+  //
+  // 2. SPLIT, fence-aware. Converting first also means the splitter sees the
+  //    fences it has to keep balanced. The old loop cut at the last newline or
+  //    space, so a code block opening in one section "closed" in the next and
+  //    mangled both.
+  return splitBalanced(toSlackMrkdwn(body), SECTION_CHARS).map((chunk) => ({
+    type: "section",
+    text: { type: "mrkdwn", text: chunk },
+  }));
 }
 
 // ── The answer footer ────────────────────────────────────────────────────────
 //
-// Two renderings of the same thing, chosen by env.SLACK_NATIVE_FEEDBACK:
+// One line of prose, and nothing to press.
 //
-//   off (default) — hand-rolled `actions` buttons. What has shipped for months.
-//   on            — Slack's native `context_actions` block, with the
-//                   `feedback_buttons` element and an `icon_button` delete.
+// It used to carry 👍/👎 buttons, and behind a flag a Slack-native variant of
+// the same pair plus a delete control. Both went on 2026-08-21; the reasoning
+// for the votes is in interactive.ts, where the handler used to be.
 //
-// Why a flag rather than a swap. The native block is the right answer — it is
-// the affordance Slack renders natively on the agent surface, it does not
-// occupy a full-width row, and the delete control has no hand-rolled
-// equivalent at all. But an invalid block does not fail loudly here: delivery
-// already degrades to plain text on a block error, which would silently drop
-// the footer from EVERY answer while looking fine. The two renderings are
-// behaviourally identical from `recordFeedback`'s side (same action_ids), so
-// this can be turned on, eyeballed once on a real answer, and made the default
-// in a one-line change.
+// DELETE went too, and that one was a real decision rather than collateral.
+// The argument for it was good — a wrong answer sitting in a channel is a
+// wrong answer someone quotes three weeks later. The argument against it is
+// better, and it is about this codebase specifically: `buildThreadHistory`
+// rebuilds every turn by re-reading the raw Slack thread. A deleted bot
+// message is gone from that read, so deleting a wrong answer also deletes:
 //
-// action_ids match the handlers wired in interactive.ts.
-function feedbackControls(env: Env): Array<Record<string, unknown>> {
-  if (env.SLACK_NATIVE_FEEDBACK !== "on") {
-    return [
-      {
-        type: "actions",
-        elements: [
-          { type: "button", text: { type: "plain_text", text: "👍", emoji: true }, action_id: "uno_feedback_up", value: "up" },
-          { type: "button", text: { type: "plain_text", text: "👎", emoji: true }, action_id: "uno_feedback_down", value: "down" },
-        ],
-      },
-    ];
-  }
-  return [
-    {
-      type: "context_actions",
-      elements: [
-        {
-          type: "feedback_buttons",
-          action_id: "uno_feedback",
-          positive_button: { text: { type: "plain_text", text: "👍" }, value: "up" },
-          negative_button: { text: { type: "plain_text", text: "👎" }, value: "down" },
-        },
-        // Delete is not a nicety on an agent surface. A wrong answer sitting in
-        // a channel is a wrong answer people quote later; letting the asker
-        // remove it is cheaper than any correction we could post.
-        {
-          type: "icon_button",
-          icon: "trash",
-          text: { type: "plain_text", text: "Delete" },
-          action_id: "uno_delete_answer",
-          value: "delete",
-        },
-      ],
-    },
-  ];
-}
-
-function footerBlocks(env: Env, kind: FooterKind): Array<Record<string, unknown>> {
+//   • the bot's own memory of having said it — `priorAssistantText`, which the
+//     correction gate compares a corrected reply against, so the one turn the
+//     judge has something to catch is the one it can no longer see;
+//   • the record the team analyses performance from, leaving a correction in
+//     the thread with nothing left to correct.
+//
+// A wrong answer with its correction underneath is a better artefact than a
+// gap. If channel hygiene becomes the real problem, the shape to reach for is
+// striking the answer through in place — which keeps the thread whole.
+//
+// `kind === "none"` still means no footer at all: a short acknowledgement is
+// not making checkable claims and does not need the label.
+function footerBlocks(_env: Env, kind: FooterKind): Array<Record<string, unknown>> {
   if (kind === "none") return [];
   const note = footerNoteFor(kind);
-  return [
-    ...feedbackControls(env),
-    ...(note ? [{ type: "context", elements: [{ type: "mrkdwn", text: note }] }] : []),
-  ];
+  return note ? [{ type: "context", elements: [{ type: "mrkdwn", text: note }] }] : [];
 }
 
 export async function postTextVerified(
@@ -230,10 +240,7 @@ export async function postTextVerified(
    *  answer CLOSES that stream instead of opening a new one. */
   openStreamTs?: string,
 ): Promise<{ ok: boolean; text: string }> {
-  const cleaned = stripTrailingConfidence(text);
-  const body = cleaned.trim()
-    ? capText(cleaned)
-    : "(I came back with an empty answer — that's a bug on my side. Try rephrasing, and flag this to the team.)";
+  const body = renderDeliveredBody(text);
   const footer = footerBlocks(env, footerKindFor(body, footerHint));
 
   // Streamed delivery, opened HERE rather than at turn start. Opening it early

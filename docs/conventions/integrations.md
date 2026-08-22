@@ -9,7 +9,7 @@ One row per connected tool: where its conventions live, what touches it. Concret
 | Notion | `docs/conventions/notion.md` | MCP: `notion-plus` · `notion-parsnip` · `notion-personal` | `writers/notion` only |
 | Figma | `docs/conventions/figma-workspace.md` (workspace) · `design-system/figma/mcp-guide.md` (MCP pipeline) | MCP: `figma-plus` · `figma-parsnip` (+ Cursor Figma plugin / Dev Mode) | `writers/figma` only |
 | Slack | `docs/conventions/slack.md` | IDE MCP: `slack-plus` · `slack-parsnip` (separate OAuth each); bot: uno-bot Worker | the uno-bot embodiment |
-| Supabase (`uno-blueprint`) | `docs/conventions/supabase.md` | `blueprint_search` / PostgREST | `writers/blueprint` only |
+| Supabase (`uno-blueprint`) | `docs/conventions/supabase.md` | `search_blueprint` / PostgREST | `writers/blueprint` only |
 | Storybook (`uno-storybook`) | source of truth in `design-system/` stories; setup `.storybook/main.js` | MCP `storybook` at `http://localhost:4200/mcp` while `npm run storybook` runs | skills (component work) |
 | Netlify | deploy notes: `docs/context/product/plus-uno.md` + `skills/uno-publish/references/deployment-guide.md` | MCP `netlify` · `netlify.toml` | uno-publish |
 | Cloudflare | — | MCP `cloudflare` (`https://mcp.cloudflare.com/mcp`, OAuth) | maintain / deploy |

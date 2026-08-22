@@ -87,8 +87,8 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
     }
     // The exact selects the bot issues, not just table reachability — a
     // renamed column 400s here while bare selects stay green.
-    await probe("select_cells_spec", `/rest/v1/cells?select=${encodeURIComponent("id,content,function,form,value_props,owner,perceived_owner,links,updated_at,layer:layers(name,owner_team,kpis),step:steps(name),path:paths(name,scenario:service_scenarios(name))")}&limit=1`);
-    await probe("select_edges_kind", `/rest/v1/cell_triggers?select=${encodeURIComponent("source_cell_id,target_cell_id,kind,label,note")}&limit=1`);
+    await probe("select_cells_spec", `/rest/v1/cells?select=${encodeURIComponent("id,content,function,form,value_props,owner,perceived_owner,links,updated_at,lane:lanes(name,owner_team,kpis),step:steps(name),path:paths(name,scenario:scenarios(name))")}&limit=1`);
+    await probe("select_edges_kind", `/rest/v1/cell_dependencies?select=${encodeURIComponent("source_cell_id,target_cell_id,kind,label,note")}&limit=1`);
     await probe("select_findings_open", "/rest/v1/findings?select=id&status=eq.open&limit=1");
     const body = { ok: Object.values(probes).every(Boolean), build: BUILD, probes };
     contractProbeCache = { at: now, body };
@@ -317,7 +317,7 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
     } catch (err) {
       out.index_health = { error: err instanceof Error ? err.message : String(err) };
     }
-    for (const t of ["cells", "cell_triggers", "findings", "slices"]) {
+    for (const t of ["cells", "cell_dependencies", "findings", "slices"]) {
       Object.assign(out, await probe(`table_${t}`, `/rest/v1/${t}?select=id&limit=1`));
     }
     return Response.json(out);

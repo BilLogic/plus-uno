@@ -15,20 +15,20 @@ Review / critique a design, prototype, spec, or frame from Slack. Method rules a
 - Manifest missing → ask once in-thread for the one-liner (fidelity / tools / PRD link). Still missing, or the target is unfetchable (no link, `source_read` fails) → say so plainly, **record the intake**, route to a human. No generic DIY instructions, no from-memory review.
 - Design QA runs arrive when someone brings the Roadmap card at RTT (no auto-trigger exists) — resolve RM-ID → `[spec]` file per method.md before walking the build.
 
-## Output — threaded Slack mrkdwn
+## Output — threaded Slack-ready Markdown
 
 Omit empty severity sections; short critiques stay short:
 
 ```
-🔍 *Critique: {artifact title or link}* — {fidelity} · *Issues? = {Yes/No}*
-*Overall:* {1-2 sentences — the single strongest signal, positive or negative}
+🔍 **Critique: {artifact title or link}** — {fidelity} · **Issues? = {Yes/No}**
+**Overall:** {1-2 sentences — the single strongest signal, positive or negative}
 
-*Blockers ({n})*
-• [{Lens}] {Finding} — Evidence: {what's in the artifact} — Reference: {doc/component path} — Re-entry: {fidelity choice / content fix}
-*Major ({n})* …
-*Minor — advisory, doesn't block ({n})* …
-*What's working ({n})*
-• {Specific strength + which doc/principle it matches}
+**Blockers ({n})**
+- [{Lens}] {Finding} — Evidence: {what's in the artifact} — Reference: {doc/component path} — Re-entry: {fidelity choice / content fix}
+**Major ({n})** …
+**Minor — advisory, doesn't block ({n})** …
+**What's working ({n})**
+- {Specific strength + which doc/principle it matches}
 ```
 
 No actionable findings → be honest: "I don't see anything that violates Plus conventions — what were you specifically worried about?" Past the summary threshold (`docs/conventions/slack.md` § Writing style) → 3-bullet summary inline + offer to append the full critique to the Notion card (`notion_update`, ✅) — the bot cannot create Gists. Confidence follows the persona's conversational rule (one woven clause max, no trailing confidence line; sureness earned only by sources fetched this turn).

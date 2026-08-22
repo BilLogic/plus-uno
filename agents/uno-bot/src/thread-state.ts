@@ -45,6 +45,10 @@ export interface HistoryTurn {
     path?: string;
     count: number;
     scenarios: string[];
+    /** Rows came from the short-lived cache, not from a read made this turn.
+     *  Mirrors RetrievalReceipt.cached (agent/loop-shared.ts) — the confidence
+     *  pre-check needs it to tell a fetch from a cache hit. */
+    cached?: boolean;
   };
 }
 
@@ -234,11 +238,17 @@ export class ThreadState implements DurableObject {
     return json({ ok: true, payload: rec.payload, createdAt: rec.createdAt });
   }
 
+  // Reports whether THIS call removed the record. A Durable Object handles one
+  // request at a time, so of two racing resolvers exactly one sees `deleted:
+  // true` — which makes the delete a claim, not merely a cleanup. That is the
+  // whole double-execution guard: `notion_create` is not idempotent, and a
+  // reaction landing beside a typed "go ahead" could otherwise have both
+  // resolvers read the same pending record and both call executeTool.
   private async deleteProposal(url: URL): Promise<Response> {
     const ts = url.searchParams.get("ts");
     if (!ts) return json({ ok: false, error: "missing ts" }, 400);
-    await this.storage.delete(proposalKey(ts));
-    return json({ ok: true });
+    const deleted = await this.storage.delete(proposalKey(ts));
+    return json({ ok: true, deleted });
   }
 
   // Find the freshest non-expired proposal for a (channel, thread) pair.

@@ -94,6 +94,18 @@ jobs:
       - name: Install deps
         working-directory: agents/uno-bot
         run: npm ci
+      # The deploy step below regenerates the harness before shipping, so
+      # production never gets a stale one. What drifts is the COMMITTED
+      # artifact — which is what local runs, `npm test` and code review read.
+      # On 2026-08-21 it sat 1.6k chars behind two convention edits and nothing
+      # said so. This keeps the file in the repo honest about what the bot is
+      # actually told.
+      - name: Harness bundle is current
+        working-directory: agents/uno-bot
+        env:
+          BLUEPRINT_REPO: ${{ github.workspace }}/uno-blueprint-src
+          BLUEPRINT_CONTRACT_OPTIONAL: ${{ secrets.BLUEPRINT_REPO_TOKEN != '' && '0' || '1' }}
+        run: npm run check:harness-bundle
       - name: Bundle harness + deploy
         working-directory: agents/uno-bot
         env:

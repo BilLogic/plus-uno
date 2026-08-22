@@ -1,8 +1,18 @@
-// CommonMark → Slack mrkdwn coercion. The model is told to emit Slack mrkdwn
-// (docs/conventions/slack.md), but under load it slips back into GitHub-flavored
-// Markdown — `## headings`, `**bold**`, and `| tables |`, none of which Slack
-// renders. Rather than trust the prompt, we sanitize at the single egress point
-// (slack/api.ts postMessage), so every outgoing message is valid mrkdwn.
+// Markdown → Slack mrkdwn coercion, for the paths that need mrkdwn.
+//
+// Since 2026-08-22 the model writes STANDARD MARKDOWN (`AGENT.md`,
+// `docs/conventions/slack.md`) — the dialect it writes best, and the dialect
+// Slack's own `markdown_text` field takes, which is how a streamed reply
+// ships. Two paths still need mrkdwn, and both run through here:
+//
+//   • the blocks fallback (`section` blocks are mrkdwn-only) — delivery.ts
+//   • `chat.postMessage`'s `text` field — api.ts postMessage
+//
+// Before that date the arrangement was inverted: the prompt mandated mrkdwn,
+// this file existed to catch the model "slipping" into Markdown, and the
+// streaming path — every real reply — sent that mrkdwn into a Markdown parser,
+// where `*bold*` is italic and `<url|label>` is nothing. The model was being
+// asked for the one dialect that rendered worst.
 //
 // Safe on already-correct mrkdwn (idempotent): Worker-authored messages use
 // `*bold*`, `•` bullets, and `<url|label>` links, none of which these rules
@@ -13,7 +23,38 @@
 export function toSlackMrkdwn(input: string): string {
   if (!input) return input;
   const parts = input.split(/(```[\s\S]*?```)/g);
-  return parts.map((seg, i) => (i % 2 === 1 ? seg : transformSegment(seg))).join("");
+  return parts
+    .map((seg, i) => (i % 2 === 1 ? stripFenceLanguage(seg) : transformSegment(seg)))
+    .join("");
+}
+
+// NOTE — tables and headings are NOT stripped before the Markdown path.
+//
+// Two exported helpers lived here earlier on 2026-08-22, `stripMarkdownTables`
+// and `headingsToBold`, both called from `renderDeliveredBody` on every path.
+// Both were built on a misread: a probe message was sent through Slack and the
+// STORED TEXT read back, which showed the table gone and the heading reduced to
+// a bare line. The rendered message showed neither — Slack keeps a table as a
+// real table and a heading as heading styling; only the plain-text fallback
+// drops them.
+//
+// So both were deleted rather than kept "just in case": each was actively
+// destroying a construct Slack renders well. Tables still degrade to bullets on
+// the mrkdwn paths via `convertTables` below, because a `section` block really
+// cannot hold one — that is a fallback, not a policy.
+//
+// The lesson, since it cost two wrong findings in one afternoon: **the stored
+// text of a Slack message is not what a reader sees.** Verify rendering by
+// looking at it.
+
+/**
+ * ```` ```js ```` → ```` ``` ````. Slack's mrkdwn code blocks take no info
+ * string, so a language tag renders as a literal first line inside the block.
+ * Only the opening fence of a multi-line block is touched — an inline
+ * ```` ```x``` ```` has no newline and is left alone.
+ */
+function stripFenceLanguage(fenced: string): string {
+  return fenced.replace(/^```[ \t]*[A-Za-z0-9_+#-]*[ \t]*(?=\n)/, "```");
 }
 
 function transformSegment(seg: string): string {

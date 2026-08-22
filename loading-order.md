@@ -28,7 +28,7 @@ Two files load always; everything else loads on demand or is retrieved live. Bud
 
 | Truth | Source | Access |
 |---|---|---|
-| product (features, requirements, screens) | `uno-blueprint` (Supabase) | `writers/blueprint` / `blueprint_search` |
+| product (features, requirements, screens) | `uno-blueprint` (Supabase) | `writers/blueprint` / `search_blueprint` |
 | design system (components, styles, docs) | `uno-storybook` (stories + MDX in `design-system/`) | read source + stories directly |
 | — | team conventions are NOT Tier 3: `docs/conventions/` is canonical in-repo (ADR-017) | loaded at Tier 2 |
 

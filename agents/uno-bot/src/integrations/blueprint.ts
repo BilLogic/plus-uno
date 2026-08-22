@@ -9,7 +9,7 @@
 //
 // Fallback: if that function doesn't exist yet (not created in Supabase), we run
 // direct table queries so grounding still works — just with a few more
-// subrequests. Both paths return each cell's `layer` (actor/stage, e.g.
+// subrequests. Both paths return each cell's `lane` (actor/stage, e.g.
 // "Regular Tutor" / "Back Stage Actions") and `step`, so the bot attributes
 // activities to the right actor instead of guessing.
 //
@@ -20,6 +20,13 @@ import type { Env } from "../types";
 import { embedText, embeddingsConfigured, embedModelName } from "../vertex/embed";
 import { countedFetch, rethrowIfBudget, subrequestBudgetSpent } from "../net";
 import { cellUrl, sliceUrl, parseChunkTitle, chunkBody } from "./blueprint-link";
+import { BLUEPRINT_CONTRACT } from "../generated/blueprint-contract";
+import {
+  mapIncludeEdges,
+  mapIncludeFindings,
+  isIncludeRow,
+  type BlueprintEdge,
+} from "./blueprint-include";
 import {
   renderBlueprintIndex,
   semanticCap,
@@ -31,9 +38,22 @@ import {
 // Re-exported so the tool layer has ONE import for the blueprint integration.
 export { renderBlueprintIndex, FUTURE_LABELS, futureLabel } from "./blueprint-index";
 export type { BlueprintIndex, BlueprintCappedBy } from "./blueprint-index";
+// The include mappers are a PURE module so `npm test` can compile them without
+// Workers types — same split as blueprint-link / blueprint-index. Re-exported
+// so the tool layer keeps ONE import for the blueprint integration.
+export { mapIncludeEdges, mapIncludeFindings } from "./blueprint-include";
+export type { BlueprintEdge } from "./blueprint-include";
 
 const REQUEST_TIMEOUT_MS = 10000;
-const RPC_NAME = "search_blueprint";
+// ONE name for one function. The portal answers as public.search_blueprint;
+// both call sites below use this constant — tryHybrid sends the full argument
+// set (embedding, model tag, filters), tryRpc sends {q} only, which the portal
+// serves from its defaults. That is the degraded mode, not a different search.
+// Sourced from the vendored contract, not typed here. PostgREST binds RPC
+// arguments BY NAME and takes embed hints as STRINGS, so neither compiler
+// checks them — the contract plus `npm run check:contract` is what does.
+const RPC_NAME = BLUEPRINT_CONTRACT.rpcs.searchBlueprint;
+const PARAM = BLUEPRINT_CONTRACT.searchBlueprintParams;
 const PER_TABLE_LIMIT = 8;
 const MAX_ROWS = 30;
 
@@ -73,8 +93,8 @@ export interface BlueprintRow {
    *  evidence here with an empty `content` (blueprint-navigation.md § 2), so
    *  dropping it lost real answers. */
   description?: string;
-  /** For cells: the layer = actor/stage (e.g. "Regular Tutor", "Back Stage Actions"). */
-  layer?: string;
+  /** For cells: the lane = actor/stage (e.g. "Regular Tutor", "Back Stage Actions"). */
+  lane?: string;
   step?: string;
   scenario?: string;
   phase?: string;
@@ -122,6 +142,11 @@ export type BlueprintRetrieval = "hybrid" | "semantic" | "rpc" | "tables";
 
 export interface BlueprintSearchResult {
   rows: BlueprintRow[];
+  /** Present only when `options.include` asked for them AND the fused RPC path
+   *  served the query. Absent on every fallback path, which is the signal the
+   *  caller uses to decide whether it still owes a separate fetch. */
+  edges?: BlueprintEdge[];
+  findings?: { rows: Array<Record<string, unknown>>; total: number | undefined };
   retrieval: BlueprintRetrieval;
   /** True when a cap clipped the result — the model must be able to say
    *  "there is more than this" instead of narrating a partial view as whole. */
@@ -222,6 +247,17 @@ export interface BlueprintSearchOptions {
    *  questions. The fresh result still POPULATES the cache, so the re-check
    *  costs one round trip, not every subsequent one. */
   fresh?: boolean;
+  /** Ask the RPC to return edges and/or findings for the cells it matched,
+   *  inside the SAME subrequest. Each one dropped here is one fewer metered
+   *  call against Cloudflare's 50-per-invocation cap.
+   *
+   *  `slices` is deliberately NOT includable. The RPC's slices branch returns
+   *  slices whose frames reference the matched cells; fetchSlices answers a
+   *  different question — a title/actor ILIKE over the QUERY TEXT, plus an
+   *  unfiltered head-count so "how many slices are there" is not answered with
+   *  a filtered number. Swapping one for the other would be a behaviour change
+   *  wearing an optimisation's clothes. */
+  include?: readonly ("edges" | "findings")[];
 }
 
 /**
@@ -259,7 +295,15 @@ export async function searchBlueprint(
   // payload still described them as a read of the second query. Whitespace and
   // case are still folded, which is all the reuse this cache was ever meant to
   // capture on a multi-step question.
-  const cacheKey = q.toLowerCase().replace(/\s+/g, " ").trim();
+  //
+  // The include set is part of the key. Without it a plain search would seed
+  // the cache and a follow-up asking for edges would be served those rows with
+  // no edges attached — a cache serving a partial answer as a whole one, which
+  // is the same class of bug the `fresh` bypass exists to prevent.
+  const wantInclude = [...(options.include ?? [])].sort();
+  const cacheKey =
+    q.toLowerCase().replace(/\s+/g, " ").trim() +
+    (wantInclude.length ? `\u0000include:${wantInclude.join(",")}` : "");
   const hit = options.fresh ? undefined : searchCache.get(cacheKey);
   if (hit && Date.now() - hit.at < CACHE_TTL_MS) {
     const age = Date.now() - hit.at;
@@ -285,7 +329,7 @@ export async function searchBlueprint(
     // Falls through to the ladder only when the RPC is absent (not migrated) or
     // the kill switch is off. Kept for one release as the rollback path.
     if (env.BLUEPRINT_HYBRID !== "off") {
-      const fused = await tryHybrid(env, base, key, q, controller.signal);
+      const fused = await tryHybrid(env, base, key, q, controller.signal, wantInclude as readonly ("edges" | "findings")[]);
       if (fused && fused.rows.length) {
         const cap = semanticCap(fused.rows.length, HYBRID_MATCH_COUNT);
         const result: BlueprintSearchResult = {
@@ -297,6 +341,8 @@ export async function searchBlueprint(
           thin: false,
           ...topScore(fused.rows),
           ...(fused.matchedTotal !== undefined ? { matched_total: fused.matchedTotal } : {}),
+          ...(fused.edges ? { edges: fused.edges } : {}),
+          ...(fused.findings ? { findings: fused.findings } : {}),
         };
         console.log(
           `[blueprint] retrieval=hybrid rows=${fused.rows.length} cached=0 age_ms=0` +
@@ -486,11 +532,11 @@ function mergeRows(semantic: BlueprintRow[], keyword: BlueprintRow[]): Blueprint
 // The portal now OWNS the name search_blueprint: the legacy ilike function is
 // dropped and the fused retriever (vector + prose + structural, RRF) answers
 // under it, with scope filters (filter_phase/filter_scenario/filter_path_type/
-// filter_layer_role), a filter-only predicate mode, and total_matched — the
+// filter_lane_role — declared in the contract, not sent by this Worker), a
+// filter-only predicate mode, and total_matched — the
 // corpus-wide count behind the top-k, so "113 cells mention Zoom, here are 15"
 // is sayable. Same name the ladder's tryRpc always called, so the fallback
 // path rides the upgrade for free.
-const HYBRID_RPC = "search_blueprint";
 const HYBRID_MATCH_COUNT = 15;
 
 async function tryHybrid(
@@ -499,31 +545,46 @@ async function tryHybrid(
   key: string,
   q: string,
   signal: AbortSignal,
-): Promise<{ rows: BlueprintRow[]; matchedTotal?: number } | null> {
+  include: readonly ("edges" | "findings")[] = [],
+): Promise<{
+  rows: BlueprintRow[];
+  matchedTotal?: number;
+  edges?: BlueprintEdge[];
+  findings?: { rows: Array<Record<string, unknown>>; total: number | undefined };
+} | null> {
   // A null embedding is legal here: the RPC runs keyword-only rather than
   // failing, so a Vertex outage costs paraphrase recall instead of the answer.
   const embedding = await embedText(env, q, "RETRIEVAL_QUERY");
-  const res = await countedFetch(`${base}/rest/v1/rpc/${HYBRID_RPC}`, {
+  const res = await countedFetch(`${base}/rest/v1/rpc/${RPC_NAME}`, {
     method: "POST",
     headers: { ...headers(key), "content-type": "application/json" },
     body: JSON.stringify({
-      q,
-      query_embedding: embedding,
-      match_count: HYBRID_MATCH_COUNT,
+      [PARAM.q]: q,
+      [PARAM.queryEmbedding]: embedding,
+      [PARAM.matchCount]: HYBRID_MATCH_COUNT,
       // Declaring the model lets the index reject a caller built on a different
       // one. embedText falls back from text-embedding-005 to -004 when no
       // service account is configured, and BOTH are 768-dim — so the vector
       // signature cannot catch it and nothing else in the stack would.
-      embed_model: embedding ? embedModelName(env) : null,
+      [PARAM.embedModel]: embedding ? embedModelName(env) : null,
+      ...(include.length ? { [PARAM.include]: include } : {}),
     }),
     signal,
   });
   if (res.ok) {
     const data = (await res.json().catch(() => [])) as Array<Record<string, unknown>>;
     if (!Array.isArray(data)) return null;
+    // The RPC stamps total_matched on EVERY row, includes included (verified on
+    // production: 10 cells / 11 edges / 1 finding, all carrying 117). Reading it
+    // off a cell anyway keeps the read independent of include row ordering, and
+    // means a future change that scopes the count to cells cannot silently zero
+    // it here.
+    const cellData = data.filter((r) => !isIncludeRow(r));
     const matchedTotal =
-      typeof data[0]?.total_matched === "number" ? (data[0].total_matched as number) : undefined;
-    const rows = data.map((r): BlueprintRow => {
+      typeof cellData[0]?.total_matched === "number"
+        ? (cellData[0].total_matched as number)
+        : undefined;
+    const rows = cellData.map((r): BlueprintRow => {
       const id = typeof r.id === "string" ? r.id : "";
       const title = typeof r.title === "string" ? r.title : "";
       return {
@@ -535,7 +596,7 @@ async function tryHybrid(
         // the same stripper applies.
         snippet: chunkBody(typeof r.snippet === "string" ? r.snippet : undefined, title),
         description: str(r.description),
-        layer: str(r.layer),
+        lane: str(r.lane),
         step: str(r.step),
         scenario: str(r.scenario),
         phase: str(r.phase),
@@ -550,13 +611,22 @@ async function tryHybrid(
         url: cellUrl(env.BLUEPRINT_APP_URL, id),
       };
     });
-    return { rows, matchedTotal };
+    const hitIds = new Set(rows.map((r) => r.id).filter(Boolean));
+    const edges = include.includes("edges") ? mapIncludeEdges(data, hitIds) : undefined;
+    const findings = include.includes("findings") ? mapIncludeFindings(data) : undefined;
+
+    return {
+      rows,
+      matchedTotal,
+      ...(edges ? { edges } : {}),
+      ...(findings ? { findings } : {}),
+    };
   }
   // Function absent (not migrated yet) → fall back to the ladder rather than
   // fail the search. Any other status is a real error and must propagate.
   const err = (await res.json().catch(() => ({}))) as { code?: string };
   if (res.status === 404 || err.code === "PGRST202") return null;
-  throw new Error(`Supabase rpc ${HYBRID_RPC} ${res.status}${err.code ? ` ${err.code}` : ""}`);
+  throw new Error(`Supabase rpc ${RPC_NAME} ${res.status}${err.code ? ` ${err.code}` : ""}`);
 }
 
 function str(v: unknown): string | undefined {
@@ -614,11 +684,11 @@ async function trySemantic(
         id,
         title: r.title ?? "",
         snippet: chunkBody(r.chunk, r.title),
-        layer: crumb.layer,
+        lane: crumb.lane,
         step: crumb.step,
         scenario: crumb.scenario,
         // The breadcrumb's leading `Phase:` segment. Without it
-        // the model cannot cite `phase › scenario › path — layer × step` on the
+        // the model cannot cite `phase › scenario › path — lane × step` on the
         // PRIMARY retrieval path, and guesses the phase from a scenario name
         // that sounds like one.
         phase: crumb.phase,
@@ -641,7 +711,7 @@ async function tryRpc(
   const res = await countedFetch(`${base}/rest/v1/rpc/${RPC_NAME}`, {
     method: "POST",
     headers: { ...headers(key), "content-type": "application/json" },
-    body: JSON.stringify({ q }),
+    body: JSON.stringify({ [PARAM.q]: q }),
     signal,
   });
   if (res.ok) {
@@ -661,8 +731,8 @@ interface Source {
 }
 const SOURCES: Source[] = [
   { table: "phases", kind: "phase", columns: ["name", "description"], select: "id,name,description" },
-  { table: "service_scenarios", kind: "scenario", columns: ["name", "description"], select: "id,name,description" },
-  { table: "steps", kind: "step", columns: ["name"], select: "id,name,scenario:service_scenarios(name)" },
+  { table: "scenarios", kind: "scenario", columns: ["name", "description"], select: "id,name,description" },
+  { table: "steps", kind: "step", columns: ["name"], select: "id,name,scenario:scenarios(name)" },
   // paths was missing entirely, so a path named `Planned: …` / `Prototype: …`
   // could not be matched by keyword at all — the one retrieval path that can
   // match a structural name rather than cell prose. The whole future-state
@@ -671,7 +741,7 @@ const SOURCES: Source[] = [
     table: "paths",
     kind: "path",
     columns: ["name", "description"],
-    select: "id,name,description,scenario:service_scenarios(name)",
+    select: "id,name,description,scenario:scenarios(name)",
   },
   {
     table: "cells",
@@ -684,13 +754,13 @@ const SOURCES: Source[] = [
     // are public-read): "who owns this touchpoint / what does it do" questions
     // were answered "not in the blueprint" while the data sat one select away.
     select:
-      "id,content,description,function,form,value_props,owner,perceived_owner,links,updated_at,layer:layers(name,owner_team,kpis),step:steps(name),path:paths(name,scenario:service_scenarios(name,phase:phases(name)))",
+      "id,content,description,function,form,value_props,owner,perceived_owner,links,updated_at,lane:lanes(name,owner_team,kpis),step:steps(name),path:paths(name,scenario:scenarios(name,phase:phases(name)))",
   },
 ];
 
 /**
  * Tables the keyword fallback fans out over — one subrequest each. Derived from
- * SOURCES, not copied, so adding a table updates blueprint_search's worst-case
+ * SOURCES, not copied, so adding a table updates search_blueprint's worst-case
  * bound in loop-shared automatically instead of silently exceeding it.
  */
 export const BLUEPRINT_TABLE_FANOUT = SOURCES.length;
@@ -742,19 +812,19 @@ function normalize(src: Source, row: Record<string, unknown>): BlueprintRow | nu
     const path = row.path as
       | { name?: string; scenario?: { name?: string; phase?: { name?: string } } }
       | undefined;
-    const layer = (row.layer as { name?: string } | undefined)?.name;
+    const lane = (row.lane as { name?: string } | undefined)?.name;
     const step = (row.step as { name?: string } | undefined)?.name;
     // Falls back to the cell's coordinate so a links-only cell still has a
     // human-readable handle instead of an empty title.
     const primary =
-      content || description || [layer, step].filter(Boolean).join(" × ") || "(cell)";
+      content || description || [lane, step].filter(Boolean).join(" × ") || "(cell)";
     return {
       kind: "cell",
       id,
       title: primary.slice(0, 80),
       snippet: content || undefined,
       description: description || undefined,
-      layer,
+      lane,
       step,
       path: path?.name,
       scenario: path?.scenario?.name,
@@ -834,10 +904,10 @@ export async function fetchBlueprintIndex(
   }
 
   const base = env.SUPABASE_URL!.replace(/\/+$/, "");
-  const select = "name,service_scenarios(name,paths(name))";
+  const select = "name,scenarios(name,paths(name))";
   const url =
     `${base}/rest/v1/phases?select=${encodeURIComponent(select)}` +
-    `&order=order_position&service_scenarios.order=order_position`;
+    `&order=order_position&scenarios.order=order_position`;
   try {
     const res = await countedFetch(
       url,
@@ -878,18 +948,6 @@ export async function fetchBlueprintIndex(
 // of (one per entry in SOURCES — 5 since `paths` was added). A status
 // question must not pay for the impact graph it will never look at.
 
-export interface BlueprintEdge {
-  from: string;
-  to: string;
-  direction: "downstream" | "upstream";
-  /** "trigger" = source sets target in motion (temporal); "needs" = source
-   *  depends on target existing (functional). Distinct relations in the app —
-   *  narrating a needs edge as "what it sets off" misstates the blueprint. */
-  kind: "trigger" | "needs";
-  /** Authored why-line for the edge, when the designer wrote one. */
-  note?: string;
-}
-
 /**
  * Cells that trigger, or are triggered by, the given cells — one hop.
  *
@@ -907,12 +965,17 @@ export async function fetchEdges(env: Env, cellIds: string[]): Promise<Blueprint
   if (!isBlueprintConfigured(env) || ids.length === 0) return [];
   const base = env.SUPABASE_URL!.replace(/\/+$/, "");
   const list = `(${ids.join(",")})`;
+  // The two hint names are Postgres DEFAULTS (`<table>_<column>_fkey`) that no
+  // migration ever writes down, which is exactly why a table rename breaks them
+  // silently: PostgREST 400s, this function warns and returns [], and Slack
+  // reports "no dependencies" for cells that have them. Reading them from the
+  // contract makes the app's test the thing that catches a rename.
   const select =
     "source_cell_id,target_cell_id,kind,label,note," +
-    "source:cells!cell_triggers_source_cell_id_fkey(content)," +
-    "target:cells!cell_triggers_target_cell_id_fkey(content)";
+    `source:cells!${BLUEPRINT_CONTRACT.fkConstraints.cellDependencySource}(content),` +
+    `target:cells!${BLUEPRINT_CONTRACT.fkConstraints.cellDependencyTarget}(content)`;
   const url =
-    `${base}/rest/v1/cell_triggers` +
+    `${base}/rest/v1/cell_dependencies` +
     `?or=(source_cell_id.in.${list},target_cell_id.in.${list})` +
     `&select=${encodeURIComponent(select)}&limit=40`;
   const res = await countedFetch(url, { headers: headers(env.SUPABASE_ANON_KEY!) });
@@ -931,7 +994,7 @@ export async function fetchEdges(env: Env, cellIds: string[]): Promise<Blueprint
     const to = text(r.target);
     if (!from || !to) return [];
     const startedHere = ids.includes(String(r.source_cell_id));
-    const kind = r.kind === "needs" ? "needs" : "trigger";
+    const kind = r.kind === "enables" ? "enables" : "leads_to";
     const note =
       [r.label, r.note]
         .filter((v): v is string => typeof v === "string" && v.length > 0)

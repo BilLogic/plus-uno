@@ -51,9 +51,15 @@
 # single DM_CONVERSATION key.
 #
 # ── KNOWN-WRONG, DELIBERATELY UNCHANGED ──────────────────────────────────────
-# (interactivity is FIXED, not known-wrong: the request_url pointed at a Netlify
-# function that never existed. It now points at the Worker's /slack/interactive
-# route. This is the third intentional difference from live.)
+# (interactivity: RESOLVED, and no longer a difference from live. The
+# request_url once pointed at a Netlify function that never existed; it now
+# points at the Worker's /slack/interactive route BOTH here and on the app.
+# Verified 2026-08-22: `slack manifest diff --app A0APS0L8HJR` reports
+# "Project manifest and app settings match", and the remote manifest's
+# settings.interactivity.request_url reads the Worker URL. The older wording
+# here — "this is the third intentional difference from live" — was stale, and
+# on 2026-08-22 it was read as "the ✅/⛔ buttons need a human to apply the
+# manifest", which was wrong. Re-run the diff before believing this header.)
 #
 # (messages_tab_enabled moved above — it is now an intended change, not a
 # question, since the DM is meant to read as an ordinary chat.)

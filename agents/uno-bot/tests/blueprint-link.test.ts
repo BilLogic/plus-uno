@@ -34,12 +34,12 @@ test("no base, no id, or a non-http base yields no link at all", () => {
   assert.equal(cellUrl(APP, ""), undefined);
 });
 
-test("the indexed breadcrumb parses into scenario / path / step / layer", () => {
+test("the indexed breadcrumb parses into scenario / path / step / lane", () => {
   assert.deepEqual(parseChunkTitle(TITLE), {
     scenario: "Reporting an Issue",
     path: "Happy Path (happy)",
     step: "Reach out",
-    layer: "Front Stage Tech",
+    lane: "Front Stage Tech",
   });
 });
 
@@ -69,7 +69,7 @@ test("the new title shape yields every segment, phase included", () => {
   assert.equal(crumb.scenario, "Wrap-Up");
   assert.equal(crumb.path, "Prototype: Reflection redesign (named)");
   assert.equal(crumb.step, "Lead tutor writes the post-session reflection");
-  assert.equal(crumb.layer, "Lead Tutor");
+  assert.equal(crumb.lane, "Lead Tutor");
 });
 
 test("the pre-0004 title shape still parses, just without a phase", () => {
@@ -80,24 +80,36 @@ test("the pre-0004 title shape still parses, just without a phase", () => {
   assert.equal(crumb.scenario, "Goal Setting");
   assert.equal(crumb.path, "Happy Path (happy)");
   assert.equal(crumb.step, "Set goals");
-  assert.equal(crumb.layer, "Regular Tutor");
+  assert.equal(crumb.lane, "Regular Tutor");
 });
 
 test("a step name containing a colon keeps its whole value", () => {
   const crumb = parseChunkTitle("Step: Reflection: what went well · Layer: Lead Tutor");
   assert.equal(crumb.step, "Reflection: what went well");
-  assert.equal(crumb.layer, "Lead Tutor");
+  assert.equal(crumb.lane, "Lead Tutor");
 });
 
 test("unknown, empty, and malformed segments are dropped, never guessed at", () => {
   const crumb = parseChunkTitle("Mood: cheerful · Scenario:  · no colon here · Layer: Visual");
   assert.equal(crumb.scenario, undefined);
-  assert.equal(crumb.layer, "Visual");
-  assert.deepEqual(Object.keys(crumb), ["layer"]);
+  assert.equal(crumb.lane, "Visual");
+  assert.deepEqual(Object.keys(crumb), ["lane"]);
 });
 
 test("missing or empty titles yield an empty breadcrumb, not a throw", () => {
   assert.deepEqual(parseChunkTitle(undefined), {});
   assert.deepEqual(parseChunkTitle(""), {});
   assert.deepEqual(parseChunkTitle("   "), {});
+});
+
+test('both "Layer:" and "Lane:" parse into the same field', () => {
+  // Every one of the 808 stored corpus chunks says "Layer:", because the title
+  // is part of the embedded text and renaming it would strand all of them until
+  // a re-embed. The view flips to "Lane:" in the same change that re-embeds, so
+  // for a while the index holds both spellings and the parser must take either.
+  const legacy = parseChunkTitle("Step: Set goals · Layer: Regular Tutor");
+  const renamed = parseChunkTitle("Step: Set goals · Lane: Regular Tutor");
+  assert.equal(legacy.lane, "Regular Tutor");
+  assert.equal(renamed.lane, "Regular Tutor");
+  assert.deepEqual(legacy, renamed);
 });

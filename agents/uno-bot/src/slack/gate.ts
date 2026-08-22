@@ -1,11 +1,12 @@
-// Reaction-path confirmation gate. Text confirmations are handled by the
-// agent loop via the proposal_resolve tool — they don't pass through
-// here.
+// Reaction-path confirmation gate. Typed confirmations are handled by the
+// agent loop via the proposal_resolve tool; button presses by
+// slack/interactive.ts. All three converge on resolveProposal and its claim.
 //
 // Filters:
-//   - Only ✅ and ❌ reactions are considered.
-//   - Only reactions on a proposal message we have pending state for (or, on a
-//     miss, the thread's active proposal — see findThreadProposal).
+//   - Only the gate emoji resolve — ✅ (and ✔️, 👍) confirm, ⛔ (and ❌, ❎, 🚫)
+//     cancel. The sets and their reasons live in gate-reactions.ts.
+//   - Only reactions ON the live proposal card resolve it. A reaction anywhere
+//     else in the thread points at the card and executes nothing.
 //   - Anyone in the thread may confirm/cancel (the requester lock was removed
 //     2026-07-14; requesterUserId is still stored for the record).
 
@@ -15,23 +16,28 @@ import {
   loadPendingProposalByThread,
   type PendingProposal,
 } from "../thread-state-client";
-import { resolveProposal, type Decision } from "../agent/resolve-proposal";
+import { resolveProposal } from "../agent/resolve-proposal";
+import { mapReaction } from "./gate-reactions";
 import type { SlackReactionAddedEvent } from "./events";
 import { conversationsReplies, getBotIdentity, postMessage } from "./api";
 
-const CONFIRM_REACTIONS = new Set(["white_check_mark", "heavy_check_mark", "+1", "thumbsup"]);
-const CANCEL_REACTIONS = new Set(["x", "negative_squared_cross_mark", "no_entry_sign"]);
+// The reaction vocabulary lives in gate-reactions.ts so it can be tested —
+// notably that 👍 does NOT confirm. See that file for why.
 
-function mapReaction(name: string): Decision | null {
-  if (CONFIRM_REACTIONS.has(name)) return "confirm";
-  if (CANCEL_REACTIONS.has(name)) return "cancel";
-  return null;
-}
 
-// Exact-message lookup missed. The ✅/❌ may sit on a SUPERSEDED proposal card
-// (the old card keeps its ⚠️ after a newer one replaces it) or a nearby reply,
-// so fall back to the thread's currently-active proposal. Needs the reacted
-// message's thread root — resolve it via one cheap conversations.replies call.
+// The thread's live proposal, for a reaction that landed somewhere ELSE — a
+// superseded card (the old one keeps its ⚠️ after a newer one replaces it) or
+// a nearby reply.
+//
+// This used to be an execution fallback: whatever the reaction sat on, resolve
+// the thread's active proposal. That silently answered a different question
+// from the one the person asked. React ✅ on the card in front of you and, if
+// it had been superseded, the NEWER proposal fired — you confirmed one thing
+// and got another. With 👍 still a confirm reaction, a thumbs-up on a
+// colleague's message anywhere in the thread did the same.
+//
+// It is now a POINTER, never an executor: find the live card so we can say
+// where to react, and resolve nothing on this path.
 async function findThreadProposal(
   env: Env,
   channel: string,
@@ -41,6 +47,11 @@ async function findThreadProposal(
   const root = replies.messages?.[0];
   const threadTs = root?.thread_ts ?? root?.ts ?? reactedTs;
   return loadPendingProposalByThread(env, channel, threadTs);
+}
+
+/** Slack permalink-ish pointer to the live card, for "react over there". */
+function cardPointer(pending: PendingProposal): string {
+  return `the :warning: card for *${pending.toolName}* just above`;
 }
 
 export async function handleReaction(env: Env, event: SlackReactionAddedEvent): Promise<void> {
@@ -72,15 +83,29 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
     return;
   }
 
-  let pending: PendingProposal | null =
-    lookup.state === "found" ? lookup.payload : null;
-  if (!pending) {
-    // Not on the exact tracked message — try the thread's active proposal before
-    // giving up (a ✅ on a stale/superseded card, live 2026-07-13). If there's
-    // still nothing, the reaction genuinely wasn't a confirmation — stay silent.
-    pending = await findThreadProposal(env, channel, event.item.ts).catch(() => null);
-    if (!pending) return;
+  if (lookup.state !== "found") {
+    // The reaction is not on a live proposal card. It may be on a superseded
+    // card, or on any other message in a thread that happens to have one
+    // pending. Either way this must NOT execute — a confirmation resolves the
+    // thing it was placed on, or it resolves nothing.
+    //
+    // Point at the live card instead of acting. Silence was the old behaviour
+    // for the "no proposal anywhere" case and is kept, because a ✅ used as
+    // ordinary punctuation in an unrelated thread should not make the bot
+    // speak.
+    const live = await findThreadProposal(env, channel, event.item.ts).catch(() => null);
+    if (!live) return;
+    await postMessage(env, {
+      channel: live.channel,
+      thread_ts: live.threadTs,
+      text:
+        `:eyes: <@${event.user}> I saw your :${event.reaction}:, but it is not on the proposal I am holding — ` +
+        `nothing was executed. Use the buttons on ${cardPointer(live)}, or react there.`,
+    }).catch(() => {});
+    return;
   }
+
+  const pending: PendingProposal = lookup.payload;
 
   // Anyone in the thread may confirm/cancel — no requester check (2026-07-14).
   try {
@@ -93,7 +118,7 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
     await postMessage(env, {
       channel: pending.channel,
       thread_ts: pending.threadTs,
-      text: `:warning: I caught your :${event.reaction}: but hit a snag executing it — give it another go, or just say "go ahead" / "cancel".`,
+      text: `:warning: I caught your :${event.reaction}: but hit a snag executing it — give it another go, or tell me and I'll retry.`,
     }).catch(() => {});
   }
 }

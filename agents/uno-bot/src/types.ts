@@ -80,7 +80,7 @@ export interface Env {
   GMAIL_CLIENT_ID?: string;
   GMAIL_CLIENT_SECRET?: string;
   GMAIL_REFRESH_TOKEN?: string;
-  // uno-blueprint Supabase (D8 grounding). Read-only. When unset, blueprint_search
+  // uno-blueprint Supabase (D8 grounding). Read-only. When unset, search_blueprint
   // reports "not configured" so the bot falls back to cited docs instead of
   // fabricating.
   SUPABASE_URL?: string;
@@ -100,7 +100,7 @@ export interface Env {
   // (the answer is still grounded, just not clickable).
   BLUEPRINT_APP_URL?: string;
   // Attach the LIVE blueprint index (phases → scenarios → paths) to every
-  // blueprint_search result, plus an `orientation` status field. "on" to enable;
+  // search_blueprint result, plus an `orientation` status field. "on" to enable;
   // anything else (including unset) = off.
   //
   // FLAGGED OFF BY DEFAULT on purpose. Tool-payload instructions are not
@@ -146,7 +146,6 @@ export interface Env {
    *  Off by default only because an invalid block degrades SILENTLY here —
    *  delivery falls back to plain text, which would drop the footer from every
    *  answer while looking fine. Verify once on a real answer, then default it. */
-  SLACK_NATIVE_FEEDBACK?: string;
   /** "on" enables Phase 5 context management: the derived {goal, constraints,
    *  decisions, artifacts} block, progressive summarisation of long histories,
    *  and drift detection. OFF by default and gated on case-by-case judged-eval

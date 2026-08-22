@@ -11,6 +11,7 @@
 // wire types. Each loop keeps its own transport and calls into these helpers.
 
 import { AsyncLocalStorage } from "node:async_hooks";
+import { GATE_RESERVED } from "../slack/gate-reactions";
 import type { Env } from "../types";
 import type { HistoryTurn, PendingProposal } from "../thread-state-client";
 import type { SlackContext } from "../tools/dispatcher";
@@ -199,39 +200,14 @@ export function makeInterimFilter(onInterim?: (text: string) => void): (raw: str
   };
 }
 
-// ── Bare confirm/cancel vocabulary (single source, two matchers) ──────────────
-
-// One vocabulary drives BOTH the deterministic fast-path (events.ts, exact match
-// on the whole message) and the model-routing shortcut (anthropic-client.ts,
-// word-contains). They used to be two hand-maintained lists that disagreed —
-// "lgtm" resolved but wouldn't route, "nope" routed but wouldn't resolve
-// (review 2026-07-12). Keep phrases lowercase; multi-word is fine.
-export const CONFIRM_PHRASES = [
-  "go ahead", "yes", "yes please", "confirm", "confirmed", "do it",
-  "ship it", "approve", "approved", "sure", "ok", "okay", "lgtm",
-];
-export const CANCEL_PHRASES = [
-  "cancel", "cancel it", "no", "nope", "stop", "abort", "nevermind",
-  "never mind", "don't", "dont",
-];
-
-/** Exact-match the whole (trimmed, de-punctuated) message → a resolution, or
- *  null. Used for the no-model fast-path; anything longer routes to the model. */
-export function bareResolution(text: string): "confirm" | "cancel" | null {
-  const bare = text.trim().toLowerCase().replace(/[.!?\s]+$/g, "");
-  if (CONFIRM_PHRASES.includes(bare)) return "confirm";
-  if (CANCEL_PHRASES.includes(bare)) return "cancel";
-  return null;
-}
-
-/** True if the text CONTAINS any resolution phrase as a word — the looser test
- *  the router uses to send a likely confirm/cancel to the cheap lane. */
-export function looksLikeResolution(text: string): boolean {
-  return RESOLUTION_WORD_RE.test(text.toLowerCase());
-}
-const RESOLUTION_WORD_RE = new RegExp(
-  `\\b(${[...CONFIRM_PHRASES, ...CANCEL_PHRASES].map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\b`,
-);
+// ── Confirm/cancel vocabulary: there is none ─────────────────────────────────
+//
+// CONFIRM_PHRASES / CANCEL_PHRASES, bareResolution and looksLikeResolution
+// lived here until 2026-08-22. A typed reply to a pending proposal now goes to
+// the model, which reads it with <pending_proposal> in context and calls
+// proposal_resolve. The only deterministic resolution left is an emoji — a
+// reaction on the card, a button on the card, or a typed emoji alone — and
+// that vocabulary is slack/gate-reactions.ts.
 
 // ── Correction / pushback vocabulary (Worker-side, drives control flow) ───────
 //
@@ -239,7 +215,7 @@ const RESOLUTION_WORD_RE = new RegExp(
 // history as authoritative prose with no counter-evidence (tool results are
 // never persisted). A prompt rule has to beat that, and it fires exactly when
 // instruction-following is weakest. So the Worker classifies instead, the same
-// way CONFIRM_PHRASES / looksLikeResolution already drive control flow above.
+// way the proposal gate already drives control flow in the Worker.
 //
 // Deliberately CONSERVATIVE-LEANING-BROAD: a false positive costs one extra
 // blueprint search (cheap, and the freshest possible answer); a false negative
@@ -275,7 +251,7 @@ const CORRECTION_PATTERNS: RegExp[] = [
 /**
  * True when this message reads as the user CORRECTING the bot's previous reply.
  *
- * On a hit the turn must (a) force `fresh: true` on blueprint_search so the 60s
+ * On a hit the turn must (a) force `fresh: true` on search_blueprint so the 60s
  * result cache cannot serve the same rows back under a "I just re-checked"
  * claim, and (b) carry a one-turn directive naming the prior query so it is not
  * reissued verbatim. Both are wired in slack/events.ts.
@@ -314,7 +290,7 @@ export function correctionDirective(priorQuery?: string): string {
 //     cites something fetched this turn; the executions happen deep inside
 //     whichever provider loop is active, and the judge runs in slack/events.ts,
 //     several frames above.
-//  2. WHETHER THIS IS A CORRECTION TURN, so `blueprint_search` can be forced to
+//  2. WHETHER THIS IS A CORRECTION TURN, so `search_blueprint` can be forced to
 //     `fresh: true` at the boundary. Left to the model, a pushback re-runs a
 //     near-identical query and the SAME rows come back under an "I just
 //     re-checked" claim — a cache serving a lie.
@@ -341,6 +317,11 @@ export interface RetrievalReceipt {
   count: number;
   /** Distinct scenario names across the rows, capped — the "what did I look at". */
   scenarios: string[];
+  /** True when the rows were served from the short-lived cache rather than read
+   *  from the source on this turn. A cache hit is not a fetch performed now,
+   *  which is exactly what a freshness claim asserts — the 2026-08-17 shape,
+   *  where the bot said "I just checked" over cached rows. */
+  cached?: boolean;
 }
 
 /** Run `fn` inside a fresh turn scope; returns its result, the tools used, and
@@ -364,7 +345,7 @@ export function recordRetrieval(receipt: RetrievalReceipt): void {
   if (store) store.receipt = receipt;
 }
 
-/** Derive a receipt from a blueprint_search result payload. Best-effort by
+/** Derive a receipt from a search_blueprint result payload. Best-effort by
  *  design: a malformed payload costs a receipt, never the turn. */
 function recordBlueprintReceipt(resultJson: string): void {
   if (!turnScope.getStore()) return;
@@ -373,6 +354,7 @@ function recordBlueprintReceipt(resultJson: string): void {
       ok?: unknown;
       query?: unknown;
       count?: unknown;
+      cached?: unknown;
       rows?: Array<{ path?: unknown; scenario?: unknown }>;
     };
     if (parsed.ok !== true || typeof parsed.query !== "string") return;
@@ -386,11 +368,12 @@ function recordBlueprintReceipt(resultJson: string): void {
       ),
     ].slice(0, 8);
     recordRetrieval({
-      tool: "blueprint_search",
+      tool: "search_blueprint",
       query: parsed.query,
       ...(typeof path === "string" ? { path } : {}),
       count: typeof parsed.count === "number" ? parsed.count : rows.length,
       scenarios,
+      ...(parsed.cached === true ? { cached: true } : {}),
     });
   } catch {
     // A receipt is diagnostic context, never load-bearing for the reply.
@@ -442,7 +425,7 @@ export async function executeReadOnlyTool(
   turnScope.getStore()?.tools.add(name);
   if (name === "notion_search") return executeNotionSearch(env, input);
   if (name === "roadmap_query") return executeRoadmapQuery(env, input);
-  if (name === "blueprint_search") {
+  if (name === "search_blueprint") {
     // On a correction turn the cache MUST NOT answer — see withTurnScope.
     const out = await executeBlueprintSearch(env, isCorrectionTurn() ? { ...input, fresh: true } : input);
     // The receipt is derived HERE, not inside the tool, so blueprint-search.ts
@@ -472,12 +455,8 @@ async function executeSlackReact(
 ): Promise<string> {
   const emoji = typeof input.emoji === "string" ? input.emoji.replace(/:/g, "").trim() : "";
   if (!emoji) return JSON.stringify({ ok: false, error: "missing emoji name" });
-  // Mirror of gate.ts CONFIRM/CANCEL sets — every emoji the gate would read as
-  // a decision is off-limits to the bot, not just the canonical pair.
-  const GATE_RESERVED = new Set([
-    "white_check_mark", "heavy_check_mark", "+1", "thumbsup",
-    "x", "negative_squared_cross_mark", "no_entry_sign",
-  ]);
+  // Every emoji the gate would read as a decision is off-limits to the bot —
+  // the same set the gate reads, imported rather than mirrored.
   if (GATE_RESERVED.has(emoji)) {
     return JSON.stringify({
       ok: false,

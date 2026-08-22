@@ -63,8 +63,8 @@ Two estates describe the product in **different languages**, and the words are N
 | | **uno-blueprint** (Supabase) | **Notion Roadmap** (Design HQ board) |
 |---|---|---|
 | What it holds | how the **service works**: who does what, when | what the **team is building**: work items + their status |
-| Its words | **phase** · **service scenario** · **path** (identified by NAME, not `path_type` — `blueprint-navigation.md` § Path semantics) · **step** · **layer** = the actor row · **cell** = one activity at layer × step | **Roadmap** · **card** (id = **RM-ID**, `RM-<n>`) · **Design Status** · **Product Pillar** · **Product Tag** · **owner** · **PRD** |
-| NOT its words | "roadmap", "card", "Design Status", "pillar", "owner", "WIP", "under review" — **the blueprint has no cards and no statuses** | "scenario", "layer", "cell", "path", "step", "phase", "actor" — **the Roadmap has no service steps or actor rows** |
+| Its words | **phase** · **service scenario** · **path** (identified by NAME, not `path_type` — `blueprint-navigation.md` § Path semantics) · **step** · **lane** = the actor row · **cell** = one activity at lane × step | **Roadmap** · **card** (id = **RM-ID**, `RM-<n>`) · **Design Status** · **Product Pillar** · **Product Tag** · **owner** · **PRD** |
+| NOT its words | "roadmap", "card", "Design Status", "pillar", "owner", "WIP", "under review" — **the blueprint has no cards and no statuses** | "scenario", "lane", "cell", "path", "step", "phase", "actor" — **the Roadmap has no service steps or actor rows** |
 
 **Topic words overlap; frame words don't.** "Goal Setting" is both a blueprint *scenario* and a Roadmap *card topic* — the topic never tells you which estate to read. The **frame words in the question** do:
 
@@ -77,7 +77,7 @@ Two estates describe the product in **different languages**, and the words are N
 
 When uno-bot (or any agent) writes to Slack or Notion, the estates' FRAME words render as `code` so designers learn to recognize them as system vocabulary, not casual English — Bill, Jul 2026:
 
-- **Blueprint frame words:** `phase` · `scenario` · `path` · `step` · `layer` · `cell`, plus the layer (actor-row) names listed in `blueprint-navigation.md` §3.
+- **Blueprint frame words:** `phase` · `scenario` · `path` · `step` · `lane` · `cell`, plus the lane (actor-row) names listed in `blueprint-navigation.md` §3.
 - **Roadmap frame words:** `card` · `RM-ID` · `Design Status` · `Dev Status` · `Product Pillar` · `Product Tag` · `Intake Status`.
 
-Scenario and project *names* (Goal Setting, Warm-Up, Session Sign Up) stay `*bold*` — they're topics, not frame words. Codify a frame word when it's used AS the system term ("the `Regular Tutor` `layer`"), not in ordinary prose ("a tutor joins the call").
+Scenario and project *names* (Goal Setting, Warm-Up, Session Sign Up) stay `*bold*` — they're topics, not frame words. Codify a frame word when it's used AS the system term ("the `Regular Tutor` `lane`"), not in ordinary prose ("a tutor joins the call").

@@ -67,7 +67,6 @@ SLACK_STREAM_PLAN = "off"
 # an invalid block degrades SILENTLY here — delivery falls back to plain text,
 # which would drop the footer from every answer while looking fine. Enable,
 # look at one real answer, then make it the default.
-SLACK_NATIVE_FEEDBACK = "off"
 # Phase 5 context management: derived {goal, constraints, decisions, artifacts},
 # progressive summarisation, drift detection. Off because it changes what the
 # model sees on EVERY turn and its failure mode is subtly worse answers rather

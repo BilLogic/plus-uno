@@ -2,12 +2,12 @@ import type { Env } from "../types";
 import { charge } from "../net";
 import { runAgent, type AgentResult } from "../agent/run-agent";
 import {
-  bareResolution,
   looksLikeCorrection,
   correctionDirective,
   withTurnScope,
 } from "../agent/loop-shared";
 import { routeRequest } from "../agent/routing";
+import { typedEmojiDecision } from "./gate-reactions";
 import { resolveProposal } from "../agent/resolve-proposal";
 import {
   appendHistory,
@@ -34,7 +34,6 @@ import {
   stopStream,
 } from "./api";
 import { parseScope } from "../agent/scope-keywords";
-import { reactOnlyEmoji } from "./react-only";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { buildContextBlock, compactHistory } from "../agent/context-state";
 import { buildFailureMessage } from "./failure-message";
@@ -64,13 +63,21 @@ import {
   type RunnerJobPayload,
 } from "./types";
 import { collectVisionInputs } from "./vision";
-import { postVisibleFailure, postTextVerified, isCapacityError } from "./delivery";
+import { postVisibleFailure, postTextVerified, renderDeliveredBody, isCapacityError } from "./delivery";
 import { reviewDraft } from "../agent/draft-judge";
+import {
+  judgeConfidence,
+  needsRepair,
+  repairInstruction,
+  retrievalRanIn,
+  type ConfidenceVerdict,
+} from "../agent/confidence";
 import {
   formatProposal,
   formatNotionUpdateProposal,
   proposalVerb,
   buildImplementDesignProposal,
+  proposalCardBlocks,
 } from "./proposal-render";
 import {
   describeNotionTarget,
@@ -452,7 +459,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // Is the person telling us the last reply was wrong? Classified in the Worker,
   // not left to the prompt: on turn 2 the bot's own turn-1 claim is sitting in
   // context as authoritative prose, and a prompt rule has to beat that. A hit
-  // forces `fresh: true` on blueprint_search, injects a one-turn directive
+  // forces `fresh: true` on search_blueprint, injects a one-turn directive
   // naming the prior query, pulls the retrieval receipts off the DO, and turns
   // on the judge's correction gate. See loop-shared looksLikeCorrection.
   // TEXT-ONLY half of the test. The other half — "is there actually a previous
@@ -502,66 +509,35 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     return;
   }
 
-  // Deterministic confirm/cancel fast-path — a BARE confirmation on a pending
-  // proposal never needs a model, on any provider. The reaction gate (✅/❌)
-  // was already deterministic; text now matches it. Live failure 2026-07-10
-  // (gemini): "go ahead" made the model re-stage an identical proposal and hit
-  // the duplicate guard instead of resolving — the user's approval bounced.
-  // Anything longer than a bare phrase still goes to the model (it may be a
-  // modification request, not a plain yes/no).
+  // ── The one deterministic text path: a typed gate emoji, alone ─────────────
+  //
+  // A message that is nothing but ✅ / 👍 / ⛔ / ❌ is the reaction, typed. It
+  // resolves the card exactly as the reaction would, through the same claim.
+  //
+  // Everything else typed goes to the model — including "yes", "go ahead",
+  // "sounds good", "thanks", "ok". Until 2026-08-22 a phrase list resolved
+  // some of those with no model call and a second list reacted 🙏 to others
+  // with no model call, and the two lists were the source of every incident
+  // on this path (2026-07-12 they disagreed; 2026-08-21 "sure go ahead"
+  // matched neither and "sounds good" would have been eaten by the wrong
+  // one). The model reads the whole thread; a list reads the phrasings
+  // someone thought of. User decision, 2026-08-22: "if it's a text response,
+  // just go straight to the model route."
+  //
+  // What keeps the model path safe is no longer a vocabulary but a structural
+  // rule further down: if the model answers an approval by re-invoking the
+  // same tool with the same input — the 2026-07-10 Gemini failure — that IS
+  // the confirmation, and the Worker executes it instead of bouncing.
   if (pending) {
-    const bareDecision = bareResolution(userText); // shared vocabulary (loop-shared)
-    if (bareDecision) {
-      // Anyone in the thread may confirm/cancel (2026-07-14) — the requester lock
-      // was removed here and everywhere else that gated on requesterUserId.
-      await resolveProposal(env, pending, bareDecision);
+    const typed = typedEmojiDecision(userText);
+    if (typed) {
+      await resolveProposal(env, pending, typed);
       await recordExchange(
         env, channel, convTs, userText,
-        bareDecision === "confirm" ? "(confirmed — executing the proposal)" : "Cancelled.",
+        typed === "confirm" ? "(confirmed — executing the proposal)" : "Cancelled.",
       );
       return;
     }
-  }
-
-  // ── The `react` tier: an emoji, and no model call at all ───────────────────
-  //
-  // "thanks" / "got it" / "perfect" are the most common messages in a working
-  // DM and the least informative. Each one costs a model round-trip, a
-  // draft-judge call and a post, to produce a sentence nobody needed. A
-  // reaction says the same thing for free (user decision, 2026-08-07).
-  //
-  // Every condition below exists to make a false positive impossible rather
-  // than rare, because a false positive here IS the 👀-then-silence failure:
-  //   • DM only — in a channel a bare "thanks" may not even be addressed to
-  //     the bot, and a silent 🙏 on someone else's conversation is noise.
-  //   • No pending proposal — "ok" is a CONFIRM_PHRASE. Reacting to an
-  //     approval would leave the card unresolved and the person waiting.
-  //   • The bot must have spoken already. An acknowledgement is a reply to
-  //     something; "thanks" as an opening line is someone being polite before
-  //     they ask, and it deserves an answer.
-  //   • The bot's last message must not have ENDED IN A QUESTION. "want me to
-  //     check Y next?" → "ok" means GO, not thank you. This is the only guard
-  //     that distinguishes them, and without it the react tier eats work.
-  //   • No attachments — an image with "nice" is not a trivial turn.
-  //   • No scope keyword — someone who typed `ds:` is asking something.
-  const lastBotTurn = [...history].reverse().find((t) => t.role === "assistant")?.content ?? "";
-  const botAskedSomething = /\?\s*$/.test(lastBotTurn.trim());
-  const reaction =
-    isDm(channel) &&
-    !pending &&
-    !scoped &&
-    history.length > 0 &&
-    !botAskedSomething &&
-    (event.files?.length ?? 0) === 0
-      ? reactOnlyEmoji(userText)
-      : null;
-  if (reaction) {
-    console.log(`[route] tier=react emoji=${reaction} (no model call)`);
-    await addReaction(env, channel, userMsgTs, reaction).catch(() => {});
-    // Still recorded. The exchange happened; a history with the user's "thanks"
-    // missing would make the next turn read as though they never replied.
-    await recordExchange(env, channel, convTs, userText, `(reacted :${reaction}:)`);
-    return;
   }
 
   // Assistant-panel surface the user currently has open (best-effort; null off
@@ -824,6 +800,20 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
 
   // ----- text-only response -----
   if (result.kind === "text") {
+    // A reaction and no words. The model answered a pure acknowledgement
+    // ("thanks", "got it") with slack_react and ended its turn without text —
+    // the behaviour the no-model react tier approximated with a closed phrase
+    // list and seven guards until 2026-08-22. Now the model decides, with the
+    // whole thread in view, and this is the only thing the Worker has to know:
+    // an empty reply after a reaction is a finished turn, not a failure.
+    const reactedOnly =
+      toolsUsedThisTurn.includes("slack_react") &&
+      (!result.text.trim() || result.text.trim() === "(empty response)");
+    if (reactedOnly) {
+      console.log("[route] reaction-only turn (model chose an emoji, no reply)");
+      await recordExchange(env, channel, convTs, vision.historyText, "(reacted — no reply)");
+      return;
+    }
     // Pre-send self-verification (approved 2026-07-12): substantive drafts get
     // ONE cheap judge call against the condensed D1–D9 rubric, revised once on
     // a flagged failure. Short replies skip it entirely; any judge error or
@@ -832,13 +822,57 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     // tools that ran, and the length floor is bypassed — the failing denial of
     // 2026-08-17 was short, so the one turn the judge had something to catch is
     // the one it sat out.
+    //
+    // Ahead of it, the deterministic half. D9 (one woven confidence clause) was
+    // only ever checked INSIDE the judge, which skips anything under 1500 chars
+    // — and almost every blueprint answer in Slack is a few hundred. This runs
+    // on the body that will actually SHIP (renderDeliveredBody: strip, then
+    // cap), because capText truncates after the judge has scored and can
+    // amputate a clause from a reply already logged as verdict=pass.
+    const retrievalRan = retrievalRanIn(toolsUsedThisTurn);
+    const servedFromCache = turnReceipt?.cached === true;
+    let verdict: ConfidenceVerdict = { kind: "exempt" };
+    try {
+      verdict = judgeConfidence(renderDeliveredBody(result.text), { retrievalRan, servedFromCache });
+    } catch (err) {
+      // Fail open, in the same direction as the judge itself: a missing
+      // confidence clause is a smaller harm than a dropped answer, so a throw
+      // in the pre-check degrades to "no escalation", never to silence.
+      console.warn(
+        `[confidence] pre-check failed: ${err instanceof Error ? err.message : String(err)} — no escalation`,
+      );
+    }
     const reviewed = await reviewDraft(env, {
       userText: modelText,
       draft: result.text,
       correction: isCorrection,
       priorAssistantText: isCorrection ? priorAssistantTurn?.content : undefined,
       toolsUsedThisTurn,
+      // Both bypass the length floor and tell the judge exactly what to repair.
+      forceReason: needsRepair(verdict) ? verdict.kind : undefined,
+      extraInstruction: repairInstruction(verdict) ?? undefined,
     });
+    // Re-validation, not a second repair round. A judge revision can itself end
+    // in a trailing label, which stripTrailingConfidence then DELETES without
+    // putting anything back — turning "wrong shape" into "no signal at all" in
+    // the one reply we had already noticed was wrong. Logged so that outcome is
+    // countable; looping here would cost another model call per turn and could
+    // land in the same place anyway.
+    try {
+      const finalVerdict = judgeConfidence(renderDeliveredBody(reviewed.text), {
+        retrievalRan,
+        servedFromCache,
+      });
+      console.log(
+        `[confidence] pre=${verdict.kind} post=${finalVerdict.kind} ` +
+          `retrieval=${retrievalRan ? "yes" : "no"} cached=${servedFromCache ? "yes" : "no"} ` +
+          `judge=${reviewed.verdict}`,
+      );
+    } catch (err) {
+      console.warn(
+        `[confidence] post-check failed: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
     const delivery = await postTextVerified(
       env,
       channel,
@@ -921,20 +955,30 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // Gate idempotency (R2 regressions): approvals must not re-gate, and cancels
   // must stick.
   //
-  // (a) The model re-issued the SAME proposal while one is pending (typically it
-  // answered an approval with a fresh tool call instead of resolve_pending_
-  // proposal). Superseding would delete + re-post the identical card — R2's
-  // PRD-CREATE re-gated 4× this way. Point back at the existing card instead.
+  // (a) The model re-issued the SAME proposal while one is pending. This is
+  // what a model does when it reads "go ahead" and reaches for the tool again
+  // instead of proposal_resolve — 2026-07-10 (Gemini) and R2's PRD-CREATE,
+  // which re-gated 4× this way. Until 2026-08-22 this branch bounced with a
+  // reminder to react on the card, so the person's approval went nowhere and
+  // a phrase-list fast path existed to catch the common phrasings before the
+  // model could fumble them.
+  //
+  // The honest reading is simpler: the proposal is pending, the person just
+  // replied, and the model wants to do the same thing with the same input.
+  // That is a confirmation. Execute it through the same claim the reaction
+  // and button paths use — no duplicate card, no bounce, and no vocabulary
+  // needed to guess what "go ahead" means.
   if (
     pending &&
     pending.toolName === result.toolName &&
     stableStringify(pending.input) === stableStringify(result.input)
   ) {
-    const remind =
-      `:hourglass: That exact *${proposalVerb(result.toolName)}* proposal is already waiting on you — ` +
-      `react :white_check_mark: / :x: on it, or say "go ahead" / "cancel". I won't post a duplicate card.`;
-    await postMessage(env, { channel, thread_ts: threadTs, text: remind });
-    await recordExchange(env, channel, convTs, vision.historyText, remind);
+    console.log(`[gate] identical re-stage of ${result.toolName} while pending — treating as confirm`);
+    await resolveProposal(env, pending, "confirm", result.previewText || undefined);
+    await recordExchange(
+      env, channel, convTs, vision.historyText,
+      result.previewText || "(confirmed — executing the proposal)",
+    );
     return;
   }
 
@@ -993,14 +1037,21 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     proposalText = formatProposal(result.toolName, result.input, userId, result.previewText);
   }
 
+  // Every card carries ✅ Approve / ⛔ Cancel buttons (2026-08-22). Cards that
+  // built their own blocks (the Figma preview) already include them; text-only
+  // cards get the text as sections plus the row. The text is kept alongside as
+  // the notification/fallback copy, and `proposalText` in the DO is what the
+  // button handler re-renders the card from.
+  if (!proposalBlocks) proposalBlocks = proposalCardBlocks(proposalText);
   let posted = await postMessage(env, {
     channel,
     thread_ts: threadTs,
     text: proposalText,
     blocks: proposalBlocks,
   });
-  // If Slack rejected the blocks (e.g. it couldn't fetch the Figma image_url),
-  // retry text-only so the confirmation gate still works.
+  // If Slack rejected the blocks (e.g. it couldn't fetch the Figma image_url,
+  // or a section overflowed), retry text-only so the confirmation gate still
+  // works — reactions and typed emoji resolve a text-only card just the same.
   if (!posted.ok && proposalBlocks) {
     console.warn("[slack] proposal with blocks failed; retrying text-only");
     posted = await postMessage(env, { channel, thread_ts: threadTs, text: proposalText });

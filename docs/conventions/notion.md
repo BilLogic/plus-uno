@@ -91,12 +91,40 @@ Useful context for grounding via `notion_search` catalog scopes (or Notion MCP i
 - `Current Team` routes the card to kanbans; PRD accepted → move to `Design Status: Ready for Design`.
 - Urgency = existing `Priority: Critical` — no separate lane. Maintenance intake = card on this DB with `Product Pillar: Universal` + `Product Tag: Maintenance`, surfaced via a filtered view — **not** a separate DB. ⚠️ Both `Universal` and `Maintenance` must already exist as options on the schema (add `Maintenance` to the `Product Tag` multi-select in the Notion UI once); the bot exact-matches them and never auto-creates.
 
+## Writing a body — bot tools (`notion_create`, `notion_update`)
+
+**Write standard Markdown**, the same dialect as everywhere else (`slack.md` § Message formatting). The Worker parses it into real Notion blocks — `agents/uno-bot/src/integrations/notion-blocks.ts`.
+
+| Write | Becomes |
+|---|---|
+| `**bold**` · `_italic_` · `` `code` `` · `~~strike~~` | rich-text annotations |
+| `[label](url)` | a real link (http/https/mailto only — anything else degrades to `label (url)`) |
+| `- item` / `* item` | `bulleted_list_item` (indent two spaces for one level of nesting) |
+| `1. item` | `numbered_list_item` |
+| `- [ ]` / `- [x]` | `to_do`, unchecked / checked |
+| `> quote` | `quote` (consecutive `>` lines merge into one) |
+| ```` ```ts ```` fenced | `code` with the language set (unknown tag → plain text) |
+| `---` | `divider` |
+| `#`, `##`, `###` | `heading_3` — one level below the section heading containing it |
+| blank line | a new paragraph block |
+| a `\|` table | **a real Notion table** — header row flagged, cells parsed for inline markup |
+
+**This was a real bug, not a nicety.** Until 2026-08-22 a body was split on blank lines into plain paragraphs with no parsing at all — so the `**Decision:** one sentence` shape prescribed above landed on the page as literal asterisks, and every bullet as a literal hyphen.
+
+Two limits the Worker now handles, worth knowing because they shape what you write: a single text run caps at ~1,900 characters (long paragraphs split across blocks), and Notion accepts 100 blocks per request (a long PRD is created in batches). Neither is a reason to write less — write the full document.
+
+**Tables land as real tables** (2026-08-22). The header row sets the column count and every data row is padded or truncated to match — Notion rejects the *entire request* if any row's cell count differs from `table_width`, and a ragged row is what an unescaped `|` inside a cell produces.
+
+**Headings inside a body are `heading_3` on purpose.** Section headings own `heading_2`, and `fetchNotionPRD` walks that outline downstream to find Acceptance Criteria and Implementation Notes. A `##` inside a section body is subordinate to its section and renders that way.
+
 <!-- ide-only -->
 <!-- Project-hub authoring + Notion-block/enhanced-markdown mechanics below are
      writers/notion (in-IDE) concerns — the bot writes only structured
      notion_create/update params, never raw hub blocks. Stripped from the bot's
      system prompt at assembly (agents/uno-bot/scripts/bundle-harness.mjs stripIdeOnly); kept here as
-     the single source for the IDE agent. -->
+     the single source for the IDE agent. The BOT-facing body contract is the
+     section immediately above this fence, deliberately outside it: leaving the
+     bot with no guidance at all is what let the literal-asterisk bug run. -->
 ## Project-hub golden sections (in order)
 
 Live template: **New Project** (Roadmap 🧩 Templates). Maintenance Intake is the thinner sibling for Universal/Maintenance cards.

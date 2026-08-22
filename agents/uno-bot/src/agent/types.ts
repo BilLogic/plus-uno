@@ -17,7 +17,7 @@ export type ToolName =
   | "notion_search"
   | "roadmap_query"
   | "source_read"
-  | "blueprint_search"
+  | "search_blueprint"
   | "github_read"
   | "slack_thread_read"
   | "slack_search"

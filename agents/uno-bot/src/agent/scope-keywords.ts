@@ -46,7 +46,7 @@ export const SCOPES: Record<ScopeName, Scope> = {
       `but paths whose name starts \`Planned:\` (decided, scheduled, unshipped) or \`Prototype:\` ` +
       `(exploratory, may never ship) carry future state. Report those as future, never as today, ` +
       `and never say a scenario has no future state without searching that scenario for one. ` +
-      `Use blueprint_search first and answer from what it holds. ${NOT_THERE}`,
+      `Use search_blueprint first and answer from what it holds. ${NOT_THERE}`,
   },
   ds: {
     name: "ds",

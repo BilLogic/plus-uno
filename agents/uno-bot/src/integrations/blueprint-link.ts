@@ -40,7 +40,7 @@ export interface ChunkBreadcrumb {
   scenario?: string;
   path?: string;
   step?: string;
-  layer?: string;
+  lane?: string;
 }
 
 /**
@@ -52,7 +52,7 @@ export interface ChunkBreadcrumb {
  * revisions of that view wrote the same string WITHOUT the leading phase
  * segment. The bot used to hand that whole string to the model
  * as `title` and leave `layer` / `step` / `scenario` / `phase` empty — so the
- * one instruction blueprint_search cares most about, "attribute every activity
+ * one instruction search_blueprint cares most about, "attribute every activity
  * to its layer", had nothing to attribute with on the PRIMARY retrieval path,
  * and the citation format the navigation guide demands
  * (`phase › scenario › path — layer × step`) could not be produced at all. The
@@ -78,7 +78,12 @@ export function parseChunkTitle(title: string | undefined): ChunkBreadcrumb {
     else if (label === "scenario") out.scenario = value;
     else if (label === "path") out.path = value;
     else if (label === "step") out.step = value;
-    else if (label === "layer") out.layer = value;
+    // Both spellings: every stored corpus chunk still says "Layer:", because
+    // the title is part of the embedded text and renaming it would strand all
+    // 808 embeddings until a re-embed. The view flips to "Lane:" in the same
+    // change that re-embeds; until then a parser that accepted only one of them
+    // would silently drop the segment for half the index.
+    else if (label === "lane" || label === "layer") out.lane = value;
   }
   return out;
 }

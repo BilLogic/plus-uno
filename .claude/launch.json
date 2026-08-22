@@ -10,6 +10,15 @@
       ],
       "port": 4200,
       "autoPort": true
+    },
+    {
+      "name": "Demo Recording",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev:demo"
+      ],
+      "port": 3011
     }
   ]
 }

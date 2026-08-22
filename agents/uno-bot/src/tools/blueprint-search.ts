@@ -1,4 +1,4 @@
-// blueprint_search executor — READ-ONLY. Queries the uno-blueprint Supabase
+// search_blueprint executor — READ-ONLY. Queries the uno-blueprint Supabase
 // (the grounded source of truth) so the bot can answer/justify factual and
 // status questions from it and cite the rows, instead of fabricating (D8).
 // Runs inline in the agent loop (mirrors marketplace_search / find_experts).
@@ -50,8 +50,24 @@ export async function executeBlueprintSearch(
     // bypasses the 60s result cache — a re-check that re-serves the cache is a
     // cache serving a lie.
     const fresh = input.fresh === true;
-    const { rows, retrieval, truncated, capped_by, cached, age_ms, thin, top_score } =
-      await searchBlueprint(env, query, fresh ? { fresh: true } : undefined);
+    const include = Array.isArray(input.include)
+      ? input.include.filter((i): i is string => typeof i === "string" && INCLUDABLE.has(i))
+      : [];
+    // edges and findings ride INSIDE the search call — the RPC computes them
+    // from the rows it just ranked, so each one asked for here is a metered
+    // subrequest not spent. `slices` and `index` cannot: slices answers a
+    // different question (see BlueprintSearchOptions.include) and index is a
+    // separate cached read.
+    const rpcInclude = include.filter(
+      (i): i is "edges" | "findings" => i === "edges" || i === "findings",
+    );
+    const {
+      rows, retrieval, truncated, capped_by, cached, age_ms, thin, top_score,
+      edges: fusedEdges, findings: fusedFindings,
+    } = await searchBlueprint(env, query, {
+      ...(fresh ? { fresh: true } : {}),
+      ...(rpcInclude.length ? { include: rpcInclude } : {}),
+    });
 
     // The live index (phases → scenarios → paths). Fetched AFTER the search so a
     // failure here can never cost the rows, self-cached per isolate with its own
@@ -60,9 +76,6 @@ export async function executeBlueprintSearch(
     // additive — on 2026-08-06 a slack_search fix displaced an unrelated
     // instruction and broke a different eval case — so this is enabled in ONE DM
     // first and the judged evals are compared CASE BY CASE before it goes wide.
-    const include = Array.isArray(input.include)
-      ? input.include.filter((i): i is string => typeof i === "string" && INCLUDABLE.has(i))
-      : [];
     const wantIndex = env.BLUEPRINT_INDEX === "on" || include.includes("index");
     const index = wantIndex ? await fetchBlueprintIndex(env, { fresh }) : undefined;
     // Mirrors how `retrieval` is surfaced: an OMITTED key is indistinguishable
@@ -92,12 +105,21 @@ export async function executeBlueprintSearch(
         return await read();
       } catch (e) {
         rethrowIfBudget(e);
-        console.log(`[blueprint_search] ${label} enrichment failed: ${e instanceof Error ? e.message : String(e)}`);
+        console.log(`[search_blueprint] ${label} enrichment failed: ${e instanceof Error ? e.message : String(e)}`);
         return undefined;
       }
     };
-    const edges = await optional(include.includes("edges"), () => fetchEdges(env, cellIds), "edges");
-    const findingsRead = await optional(include.includes("findings"), () => fetchFindings(env, cellIds), "findings");
+    // `fusedEdges` / `fusedFindings` are present only when the fused RPC path
+    // served this query. Every fallback path (RPC absent mid-rollout,
+    // BLUEPRINT_HYBRID off, semantic or keyword ladder) leaves them undefined —
+    // and then the separate reads still owe the answer. Keeping both is what
+    // makes the switch safe to deploy before the migration is everywhere.
+    const edges =
+      fusedEdges ??
+      (await optional(include.includes("edges"), () => fetchEdges(env, cellIds), "edges"));
+    const findingsRead =
+      fusedFindings ??
+      (await optional(include.includes("findings"), () => fetchFindings(env, cellIds), "findings"));
     const findings = findingsRead?.rows;
     const findingsTotal = findingsRead?.total;
     const sliceRead = await optional(include.includes("slices"), () => fetchSlices(env, query), "slices");
@@ -112,7 +134,7 @@ export async function executeBlueprintSearch(
     const grounding =
       "Ground the answer ONLY in these rows. Do not add facts that aren't here.";
     const attribution = rows.some((r) => r.kind === "cell")
-      ? "Attribute every activity to its `layer` (the actor/stage) and order by `step` — never give one actor's activity to another. If the question spans multiple actors or paths, cover all the relevant ones: a one-layer answer to a multi-actor question is incomplete."
+      ? "Attribute every activity to its `lane` (the actor/stage) and order by `step` — never give one actor's activity to another. If the question spans multiple actors or paths, cover all the relevant ones: a one-lane answer to a multi-actor question is incomplete."
       : undefined;
     // Two versions of the same field, and WHICH one ships is decided by whether
     // an index is attached. The "re-query before saying so" tail is the honest
@@ -166,7 +188,7 @@ export async function executeBlueprintSearch(
     // shipped, and for the whole life of this note before 2026-08-17 it was in
     // zero of them. Promising a field the rows do not carry is what teaches the
     // model to infer one — the exact failure this tool exists to prevent.
-    const crumbFields = (["phase", "scenario", "path", "step", "layer"] as const).filter((f) =>
+    const crumbFields = (["phase", "scenario", "path", "step", "lane"] as const).filter((f) =>
       rows.some((r) => typeof (r as unknown as Record<string, unknown>)[f] === "string"),
     );
     const semanticCaveat =
@@ -174,7 +196,7 @@ export async function executeBlueprintSearch(
         ? `These came from semantic (vector) retrieval over indexed chunks. They carry the cell's id, \`url\`, and these breadcrumb fields: ${crumbFields.length ? crumbFields.map((f) => `\`${f}\``).join("/") : "(none)"} — cite them by exactly those fields and link them with \`url\`. Any breadcrumb segment NOT listed is absent from this result: leave it out rather than inferring it.${crumbFields.includes("phase") ? "" : " In particular you do NOT have the phase here, so do not name one."} They do not carry the cell's authored \`links\`.`
         : undefined;
     const edgesNote = edges?.length
-      ? "`edges` are ONE HOP from the matched cells. Each edge carries `kind`: `trigger` means the source sets the target in motion (temporal); `needs` means the source depends on the target existing (functional) — do not narrate a needs edge as something being \"set off\". `note` is the designer's own why-line when present. Name the neighbours as places to check; do NOT present this as a full impact analysis, and do not follow the chain further than the data shown. A real trace is sb:whatif in the IDE."
+      ? "`edges` are ONE HOP from the matched cells. Each edge carries `kind`: `leads_to` means the source makes the target happen; `enables` means the target must already be true for the source to work. They are NOT inverses — a precondition causes nothing, so never narrate an `enables` edge as one thing leading to another. `note` is the designer's own why-line when present. Name the neighbours as places to check; do NOT present this as a full impact analysis, and do not follow the chain further than the data shown. A real trace is sb:whatif in the IDE."
       : undefined;
     const findingsNote = findings?.length
       ? "`findings` are audit results ALREADY recorded against these cells — report them by cell and severity. Triaging or resolving one is a write: route that to the blueprint app, never claim to have done it."

@@ -17,12 +17,12 @@ Triggers: "who should I talk to about X", "find me SMEs/collaborators for X", "w
 
 ## Output
 
-Slack mrkdwn, tight — 2–4 suggestions, scannable, no walls of text:
+Slack-ready Markdown, tight — 2–4 suggestions, scannable, no walls of text:
 
 ```
 For *{topic}*, talk to:
-• *{Name}* — {role}. {one-line why, from their bio}. <{linkedin}|LinkedIn>
-• *{Name}* — {role}. {one-line why}. <{linkedin}|LinkedIn>
+- **{Name}** — {role}. {one-line why, from their bio}. [LinkedIn]({linkedin})
+- **{Name}** — {role}. {one-line why}. [LinkedIn]({linkedin})
 
 Want me to summarize what you learn after you chat? (I can synthesize the thread.)
 ```

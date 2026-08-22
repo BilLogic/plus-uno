@@ -155,7 +155,7 @@ if (/<!--\s*\/?\s*ide-only\s*-->/i.test(assembled)) {
 // the guard lives here rather than in a lint step nobody runs.
 
 // Nouns that make a nearby digit an inventory claim rather than a quantity.
-const BLUEPRINT_NOUNS = "phases|scenarios|paths|steps|layers|cells|path_steps|cell_triggers";
+const BLUEPRINT_NOUNS = "phases|scenarios|paths|steps|layers|cells|path_steps|cell_dependencies";
 // Explicit, per-line/block opt-out. REQUIRED rather than optional: the nav
 // guide deliberately keeps a historical rot ledger, and a guard with no escape
 // would either delete real content or be switched off wholesale.
@@ -245,7 +245,7 @@ if (instanceDataHits.length) {
       .map((h) => `  assembled:${h.line}  (${h.pattern}: "${h.match}")\n    ${h.text}`)
       .join("\n") +
     "\n  -> Counts and membership lists about the blueprint's CONTENTS go stale between deploys and" +
-    "\n     ship as confident wrong answers. Delete the number and let blueprint_search retrieve it," +
+    "\n     ship as confident wrong answers. Delete the number and let search_blueprint retrieve it," +
     "\n     or, if the figure is deliberate (a historical ledger, a fixed contract), mark the line/block:" +
     "\n       <!-- instance-data-ok: why this number is allowed to be frozen -->";
   if (INSTANCE_DATA_GUARD_BLOCKING) {

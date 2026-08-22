@@ -3,25 +3,42 @@
 //   - slack/events.ts (text path)          — narrative comes from Claude's `message_to_user`
 //
 // Effects:
+//   0. CLAIM the proposal — the delete doubles as the lock, so exactly one
+//      resolver proceeds past this line
 //   1. Post a thread reply with the narrative
 //   2. React :handshake: or :wave: on the user's ORIGINAL request message
 //      (the message that prompted the proposal, stored as pending.userMsgTs)
 //   3. If confirm: fire the side-effect tool via executeTool
-//   4. Delete the pending proposal from the DO
 
 import type { Env } from "../types";
 import { addReaction, postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
-import { appendHistory, deletePendingProposal, type PendingProposal } from "../thread-state-client";
+import { appendHistory, claimPendingProposal, type PendingProposal } from "../thread-state-client";
 import { executeTool } from "../tools/dispatcher";
 
 export type Decision = "confirm" | "cancel";
 
+/** Resolves the proposal. Returns true if THIS call won the claim and acted;
+ *  false if another resolver (reaction, button, typed emoji, model) got there
+ *  first — in which case nothing was posted and the caller should stay quiet. */
 export async function resolveProposal(
   env: Env,
   pending: PendingProposal,
   decision: Decision,
   narrative?: string,
-): Promise<void> {
+): Promise<boolean> {
+  // Claim first — before the narrative, before the reaction, and long before
+  // executeTool. A user who reacts ✅ and then, unsure it registered, also
+  // types "go ahead" runs two handlers that each loaded this same record.
+  // Whoever loses here must not post, must not react, and above all must not
+  // execute. Losing is not an error — the winner is handling it — so return
+  // quietly rather than telling the user twice about one action.
+  if (!(await claimPendingProposal(env, pending.proposalTs))) {
+    console.log(
+      `[gate] ${pending.toolName} at ${pending.proposalTs} was already claimed — standing down`,
+    );
+    return false;
+  }
+
   const text =
     narrative ??
     (decision === "confirm" ? "Got it — kicking that off." : "Cancelled.");
@@ -79,8 +96,9 @@ export async function resolveProposal(
       content: `(Cancelled the proposed ${pending.toolName} — nothing was done.)`,
     });
   }
-
-  await deletePendingProposal(env, pending.proposalTs);
+  // No delete here any more: the claim above already removed the record, which
+  // is what made it a claim.
+  return true;
 }
 
 /** True unless the executor explicitly reported ok:false. */

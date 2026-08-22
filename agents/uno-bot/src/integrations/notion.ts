@@ -14,6 +14,12 @@
 
 import type { Env } from "../types";
 import { countedFetch, subrequestBudgetSpent, rethrowIfBudget } from "../net";
+import {
+  chunkBlocks,
+  markdownToNotionBlocks,
+  parseInline,
+  MAX_BLOCKS_PER_REQUEST,
+} from "./notion-blocks";
 
 const NOTION_API = "https://api.notion.com/v1";
 const NOTION_VERSION = "2022-06-28";
@@ -69,28 +75,27 @@ function richText(content: string) {
   return [{ type: "text", text: { content: content.slice(0, MAX_RICH_TEXT) } }];
 }
 
-function paragraph(content: string) {
-  return { object: "block", type: "paragraph", paragraph: { rich_text: richText(content) } };
-}
-
 function heading(content: string) {
   return { object: "block", type: "heading_2", heading_2: { rich_text: richText(content) } };
 }
 
 function todo(content: string) {
-  return { object: "block", type: "to_do", to_do: { checked: false, rich_text: richText(content) } };
+  // Inline-parsed: an acceptance criterion routinely carries a `code` term or a
+  // **bold** subject, and that is the same Markdown as everywhere else.
+  return { object: "block", type: "to_do", to_do: { checked: false, rich_text: parseInline(content) } };
 }
 
-function bodyToParagraphs(body: string): unknown[] {
-  // Split on blank lines into separate paragraph blocks; chunk anything that
-  // would exceed Notion's per-block text cap.
-  const blocks: unknown[] = [];
-  for (const para of body.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean)) {
-    for (let i = 0; i < para.length; i += MAX_RICH_TEXT) {
-      blocks.push(paragraph(para.slice(i, i + MAX_RICH_TEXT)));
-    }
-  }
-  return blocks;
+/**
+ * A body written by the model → Notion blocks.
+ *
+ * Was `bodyToParagraphs`: split on blank lines, one `paragraph` block each, no
+ * markup parsing at all. The model writes standard Markdown (`AGENT.md`, and
+ * `notion.md` § Decisions shows a body as `**Decision:** one sentence`), so
+ * bullets arrived as literal hyphens, bold as literal asterisks, and links as
+ * literal `[label](url)`. See `notion-blocks.ts` for the mapping.
+ */
+function bodyToBlocks(body: string): unknown[] {
+  return markdownToNotionBlocks(body);
 }
 
 function buildChildren(input: PrdInput): unknown[] {
@@ -98,13 +103,13 @@ function buildChildren(input: PrdInput): unknown[] {
 
   if (input.summary?.trim()) {
     children.push(heading("Summary"));
-    children.push(...bodyToParagraphs(input.summary));
+    children.push(...bodyToBlocks(input.summary));
   }
 
   for (const section of input.sections ?? []) {
     if (!section?.heading?.trim()) continue;
     children.push(heading(section.heading.trim()));
-    if (section.body?.trim()) children.push(...bodyToParagraphs(section.body));
+    if (section.body?.trim()) children.push(...bodyToBlocks(section.body));
   }
 
   // Acceptance Criteria as checkboxes (read by fetchNotionPRD downstream).
@@ -848,6 +853,12 @@ export async function notionCreate(
     sourceUrl: input.sourceUrl,
   });
 
+  // Notion accepts at most 100 blocks per request. A long PRD — summary, eight
+  // sections of several paragraphs each, acceptance criteria, plus the two
+  // fixed headings — crosses that, and before 2026-08-22 the whole create 400'd
+  // and the card was never made. Create with the first batch, append the rest.
+  const [firstBatch = [], ...restBatches] = chunkBlocks(children, MAX_BLOCKS_PER_REQUEST);
+
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
@@ -857,7 +868,7 @@ export async function notionCreate(
       body: JSON.stringify({
         parent: { database_id: plan.databaseId },
         properties: { Name: { title: richText(input.title.trim()) }, ...plan.properties },
-        children,
+        children: firstBatch,
       }),
       signal: controller.signal,
     });
@@ -865,6 +876,25 @@ export async function notionCreate(
     if (!res.ok || !data.id) {
       throw notionError(res.status, data, "create failed");
     }
+
+    // The page exists now. A failed continuation must NOT throw: the card is
+    // real and linked, and reporting "create failed" would send someone
+    // hunting for a page that is sitting there. Log the shortfall instead.
+    for (const batch of restBatches) {
+      const append = await countedFetch(`${NOTION_API}/blocks/${data.id}/children`, {
+        method: "PATCH",
+        headers: notionHeaders(env, { write: true }),
+        body: JSON.stringify({ children: batch }),
+        signal: controller.signal,
+      }).catch(() => null);
+      if (!append?.ok) {
+        console.warn(
+          `[notion] created ${data.id} but a ${batch.length}-block continuation did not append — the page is short`,
+        );
+        break;
+      }
+    }
+
     return {
       id: data.id,
       url: data.url ?? `https://www.notion.so/${data.id.replace(/-/g, "")}`,
@@ -1224,21 +1254,30 @@ export async function notionUpdate(
     for (const s of input.append?.sections ?? []) {
       if (!s?.heading?.trim()) continue;
       children.push(heading(s.heading.trim()));
-      if (s.body?.trim()) children.push(...bodyToParagraphs(s.body));
+      if (s.body?.trim()) children.push(...bodyToBlocks(s.body));
     }
-    if (input.append?.text?.trim()) children.push(...bodyToParagraphs(input.append.text));
-    if (children.length) {
+    if (input.append?.text?.trim()) children.push(...bodyToBlocks(input.append.text));
+    // Batched at Notion's 100-block-per-request limit. `appended` counts what
+    // actually landed, so a partial failure reports the truth rather than the
+    // total we hoped for.
+    for (const batch of chunkBlocks(children, MAX_BLOCKS_PER_REQUEST)) {
       const res = await countedFetch(`${NOTION_API}/blocks/${pageId}/children`, {
         method: "PATCH",
         headers,
-        body: JSON.stringify({ children }),
+        body: JSON.stringify({ children: batch }),
         signal: controller.signal,
       });
       if (!res.ok) {
         const err = (await res.json().catch(() => ({}))) as { message?: string };
+        if (appended) {
+          // Some blocks are already on the page. Throwing here would report a
+          // total failure of a partly-successful append.
+          console.error(`[notion] append stopped after ${appended} blocks: ${err.message ?? res.status}`);
+          break;
+        }
         throw notionError(res.status, err, "append failed");
       }
-      appended = children.length;
+      appended += batch.length;
     }
 
     // Drop any cached read so the next read reflects this write, not a stale copy.

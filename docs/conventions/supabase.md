@@ -4,13 +4,13 @@
 
 ## The contract
 
-- **uno-blueprint (Supabase) is the source of truth for the CURRENT service journey.** Ground every current-state product claim in a blueprint read (`blueprint_search` / PostgREST) with layer/actor attribution; cite what you found. Notion is a mixed estate — stale docs *and* legitimate future state — so authority is routed by claim type (§ Two sources, one time axis), not by a single "blueprint always wins" rule.
+- **uno-blueprint (Supabase) is the source of truth for the CURRENT service journey.** Ground every current-state product claim in a blueprint read (`search_blueprint` / PostgREST) with lane/actor attribution; cite what you found. Notion is a mixed estate — stale docs *and* legitimate future state — so authority is routed by claim type (§ Two sources, one time axis), not by a single "blueprint always wins" rule.
 - **Query at task time, never cache.** `docs/context/product/` holds foundation only (identity, pillars, archetypes); live truth — features, requirements, screens — is retrieved fresh per task.
 - **Paired writes, never one alone:** any requirement change updates the PRD (Notion) and the blueprint (Supabase) together — Flow 4's requirement/story path. A PRD edit without a blueprint write (or vice versa) is a defect. **Detection is human today** — no automation reads Supabase, so nothing verifies the pair. The weekly shipped watchdog files a *verify-blueprint* intake per shipped journey card (`skills/uno-maintain/references/method.md` §6) but cannot confirm drift itself; any human spot files a `uno-maintain` intake.
 - Write access: `writers/blueprint` only, via `skills/uno-synthesize` (new requirements) and `skills/uno-maintain` (changes). All other consumers are read-only.
 - Supabase is also the candidate dummy backend for prototypes needing persistence — separate schema, never mixed with blueprint tables.
 
-**Navigating it:** schema, layer semantics, path semantics, query recipes, and the scored answering rules live in `docs/conventions/blueprint-navigation.md` — load it before any blueprint read; this file owns access and source routing only.
+**Navigating it:** schema, lane semantics, path semantics, query recipes, and the scored answering rules live in `docs/conventions/blueprint-navigation.md` — load it before any blueprint read; this file owns access and source routing only.
 
 ## Two sources, one time axis (ADR-021)
 
@@ -18,7 +18,7 @@
 
 | Situation | Authority | Answer shape |
 |---|---|---|
-| "How does it work **today**?" | Blueprint | Cite `phase › scenario › path — layer × step`. The chain is containment; the pair after the dash is the cell's coordinate (actor row × journey column). |
+| "How does it work **today**?" | Blueprint | Cite `phase › scenario › path — lane × step`. The chain is containment; the pair after the dash is the cell's coordinate (actor row × journey column). |
 | Conflicting card is **WIP / under review**, change **decided** (Decisions DB or card) | Blueprint = today; card = incoming | "Today: X. This is changing — {card} moves it to Y." Both attributed, never blended. |
 | Conflicting card is **WIP / under review**, still **exploratory** | Blueprint = today; card = maybe | "Today: X. {card} is exploring Y — not decided." Match the verb to decision status. |
 | Conflicting card is **shipped** (`Dev Status: Deployed`) | Blueprint (still) | Answer from the blueprint — the paired write updates it at ship, so a shipped doc that disagrees is the likely obsolete side. Evidence the blueprint itself is stale → say so and offer a `uno-maintain` intake. Never silently prefer the doc. |
@@ -36,7 +36,7 @@ Drafting follows the same routing, not just answering: `skills/uno-synthesize` q
 
 | Path | Credential | Where it lives | Status |
 |---|---|---|---|
-| Read (Worker `blueprint_search`) | `SUPABASE_ANON_KEY` (read-only anon) | Cloudflare secret (`wrangler secret put`); `SUPABASE_URL` is a non-secret var | ✅ live |
+| Read (Worker `search_blueprint`) | `SUPABASE_ANON_KEY` (read-only anon) | Cloudflare secret (`wrangler secret put`); `SUPABASE_URL` is a non-secret var | ✅ live |
 | Read (in-IDE grounding) | Supabase MCP connector | user's Claude Code MCP config | per designer |
 | **Write (in-IDE, writers/blueprint)** | **Supabase MCP connector** (decision: Bill, 2026-07-08 — MCP over raw keys; the team sets it up properly). If the MCP is unavailable/unauthorized in a session, the agent **requests access** rather than improvising — never asks for or handles a raw key in chat | user's Claude Code MCP config; no key files in the repo, ever | MCP route |
 | Write (Worker — only if an acceptance-in-thread write tool ships, plan §6 note) | scoped key as Cloudflare secret, requested from whoever administers Supabase | `wrangler secret put SUPABASE_WRITE_KEY` | not built |

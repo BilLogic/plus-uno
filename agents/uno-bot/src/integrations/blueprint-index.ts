@@ -61,7 +61,7 @@ export interface BlueprintIndex {
  *  this is untrusted JSON, not a pinned schema. */
 interface IndexPhaseRow {
   name?: unknown;
-  service_scenarios?: unknown;
+  scenarios?: unknown;
 }
 
 function nameOf(v: unknown): string {
@@ -87,7 +87,7 @@ export function renderBlueprintIndex(data: unknown, readAt: string): BlueprintIn
   for (const row of rows) {
     const phaseName = nameOf(row);
     if (!phaseName) continue; // an unnamed phase is uncitable; listing it helps nobody
-    const scenarios = Array.isArray(row.service_scenarios) ? row.service_scenarios : [];
+    const scenarios = Array.isArray(row.scenarios) ? row.scenarios : [];
     const parts: string[] = [];
     for (const scenario of scenarios) {
       const scenarioName = nameOf(scenario);

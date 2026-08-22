@@ -21,7 +21,8 @@
 
 import { shouldRejectRevision, looksLikeStalledCorrection } from "./revision-guard";
 // The rubric text lives in its own leaf module so `npm test` can compile it
-// without dragging the Workers-typed graph in — see draft-judge-rubric.ts.
+// without dragging the Workers-typed graph in — see draft-judge-rubric.ts
+// (split out on main, PR #126, so tests/draft-judge-rubric.test.ts can pin it).
 import { JUDGE_SYSTEM } from "./draft-judge-rubric";
 import type { Env } from "../types";
 import { geminiConfigured, geminiGenerate } from "../gemini/client";
@@ -29,12 +30,20 @@ import { claudeVertexConfigured, claudeVertexGenerate } from "../vertex/claude";
 import { MODELS } from "./routing";
 import { BUILD } from "../version";
 
-// Drafts under this length are never judged. 1500 chars targets deliverable-
-// shaped output (PRD drafts, spec answers, recaps) and exempts ordinary
-// conversational replies — the judge's failure modes (overclaiming, invented
-// links, structure) barely occur below this, and every judged reply pays one
-// extra model round-trip of latency.
-const MIN_DRAFT_CHARS = 1500;
+// Drafts under this length are never judged, unless a caller forces it — a
+// correction turn, or the confidence pre-check. The floor targets
+// deliverable-shaped output (PRD drafts, spec answers, recaps) and exempts
+// ordinary conversational replies, because every judged reply pays one extra
+// model round-trip of latency.
+//
+// Lowered 1500 -> 1000 on 2026-08-21 (Bill). 1500 was chosen against the
+// judge's OTHER dimensions — overclaiming, invented links, structure — which
+// really do cluster in long output. But a substantive blueprint answer with a
+// couple of citations and a caveat lands around 1100-1400 characters, so it
+// sat just under the old floor and went unjudged on every dimension, not only
+// on the confidence clause. The pre-check forces D9 below this line anyway;
+// this is about the rest of the rubric.
+const MIN_DRAFT_CHARS = 1000;
 // Hard wall-clock cap; past it the original draft ships (fail open).
 const JUDGE_TIMEOUT_MS = 25_000;
 // Inputs are capped so the judge call stays cheap and bounded.
@@ -88,7 +97,13 @@ async function callJudgeModel(
   env: Env,
   userText: string,
   draft: string,
-  ctx: { correction: boolean; priorAssistantText?: string; toolsUsedThisTurn: string[]; stalled: boolean },
+  ctx: {
+    correction: boolean;
+    priorAssistantText?: string;
+    toolsUsedThisTurn: string[];
+    stalled: boolean;
+    extraInstruction?: string;
+  },
 ): Promise<string | null> {
   const prompt =
     (ctx.correction && ctx.priorAssistantText
@@ -99,9 +114,17 @@ async function callJudgeModel(
     (ctx.stalled
       ? "MEASURED: this draft retains almost all of the previous reply's vocabulary — it is a restatement. Unless it plainly concedes the previous reply was wrong, fail it with \"gate:correction\".\n\n"
       : "") +
-    (ctx.correction ? `Tools that ran this turn: ${ctx.toolsUsedThisTurn.join(", ") || "(none)"}\n\n` : "") +
+    // Sent on EVERY turn, not just corrections. D9 asks whether the draft says
+    // what it rests on, and "cites a source fetched this turn" is unjudgeable
+    // without knowing which tools ran — the judge was scoring that dimension
+    // blind on every non-correction turn.
+    `Tools that ran this turn: ${ctx.toolsUsedThisTurn.join(", ") || "(none)"}\n\n` +
     `User message:\n${userText.slice(0, MAX_USER_CHARS)}\n\n` +
-    `Draft reply:\n${draft.slice(0, MAX_DRAFT_CHARS)}`;
+    `Draft reply:\n${draft.slice(0, MAX_DRAFT_CHARS)}` +
+    // A deterministic pre-check already decided WHAT is wrong; passing its one
+    // sentence through beats asking the judge to rediscover it, and a specific
+    // instruction is what keeps the repair from producing generic filler.
+    (ctx.extraInstruction ? `\n\n${ctx.extraInstruction}` : "");
 
   const system = ctx.correction ? JUDGE_SYSTEM + CORRECTION_GATE : JUDGE_SYSTEM;
 
@@ -151,15 +174,24 @@ export async function reviewDraft(
     /** Read-only tools executed this turn. "Cites a source fetched this turn"
      *  is unjudgeable without it. */
     toolsUsedThisTurn?: string[];
+    /** Why this draft must be judged regardless of length — set by a caller
+     *  that already found something wrong (the confidence pre-check passes the
+     *  verdict kind). Bypasses the length floor exactly as `correction` does,
+     *  and is logged so a forced judgement is distinguishable from a routine
+     *  one when reading `wrangler tail`. */
+    forceReason?: string;
+    /** One extra line appended to the judge prompt. Carries the specific repair
+     *  the caller's own check already identified. */
+    extraInstruction?: string;
   },
 ): Promise<JudgeOutcome> {
-  const { userText, draft, priorAssistantText } = args;
+  const { userText, draft, priorAssistantText, forceReason, extraInstruction } = args;
   const correction = args.correction === true;
   const toolsUsedThisTurn = args.toolsUsedThisTurn ?? [];
   // The length floor is BYPASSED on a correction. The 2026-08-17 denial that
   // started all this was short, so it was never judged — the one turn where the
   // judge had something to catch is the one it sat out.
-  if (!correction && draft.trim().length < MIN_DRAFT_CHARS) {
+  if (!correction && !forceReason && draft.trim().length < MIN_DRAFT_CHARS) {
     // Skips used to bypass telemetry entirely, so "the judge never ran" and
     // "the judge passed it" looked identical in the logs.
     console.log(
@@ -181,7 +213,13 @@ export async function reviewDraft(
 
   try {
     const raw = await Promise.race([
-      callJudgeModel(env, userText, draft, { correction, priorAssistantText, toolsUsedThisTurn, stalled }),
+      callJudgeModel(env, userText, draft, {
+        correction,
+        priorAssistantText,
+        toolsUsedThisTurn,
+        stalled,
+        extraInstruction,
+      }),
       new Promise<"__timeout__">((resolve) => setTimeout(() => resolve("__timeout__"), JUDGE_TIMEOUT_MS)),
     ]);
 
@@ -224,6 +262,7 @@ export async function reviewDraft(
     `[uno-bot] draft-judge build=${BUILD} verdict=${verdict} failed=[${failed.join(",")}] ` +
       `revised=${revisedUsed} ms=${Date.now() - startedAt} draft_chars=${draft.length} ` +
       `correction=${correction ? "yes" : "no"} stalled=${stalled ? "yes" : "no"} ` +
+      `forced=${forceReason ?? "no"} ` +
       `tools=[${toolsUsedThisTurn.join(",")}]`,
   );
   return { text, verdict };

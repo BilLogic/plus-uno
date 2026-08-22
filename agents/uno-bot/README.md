@@ -30,7 +30,7 @@ Both lanes are **local tools only** (no hosted MCP), and share the same tool ros
 
 ## What it can / partially can / can't do
 
-**Can (reads are free; Slack messaging is native):** answer grounded questions — Roadmap card status (`roadmap_query`), product behavior from the blueprint (`blueprint_search`), DS/component/repo facts (`github_read`), Slack search + thread reads, any linked doc (`source_read`), access-request routing via the Third Party Applications directory (`notion_search` scope `apps` — names the Application Admin to ask + pre-fills the request; the grant stays human) — and post/react in Slack as itself.
+**Can (reads are free; Slack messaging is native):** answer grounded questions — Roadmap card status (`roadmap_query`), product behavior from the blueprint (`search_blueprint`), DS/component/repo facts (`github_read`), Slack search + thread reads, any linked doc (`source_read`), access-request routing via the Third Party Applications directory (`notion_search` scope `apps` — names the Application Admin to ask + pre-fills the request; the grant stays human) — and post/react in Slack as itself.
 
 **Can, behind the ✅ gate (proposal card, 60-min expiry, anyone in the thread may confirm):** file a PRD or intake card (`notion_create`), update/append to a card (`notion_update`), archive a card (`notion_archive`), trigger a DS component build (`component_implement` → `figma-implement.yml`), scaffold a prototype from a Figma frame (`prototype_scaffold` → `figma-implement-design.yml`), post a share-out (`shareout_post`), send outward email (`email_send`). Confirmed implement/scaffold dispatches also carry the **full triggering-thread transcript** (names resolved, last ~50 messages / ~10k chars, truncation noted) in the `client_payload` (`thread_transcript`), so the Actions runner sees the whole discussion — the bot itself still never edits repos.
 
@@ -104,7 +104,7 @@ curl http://localhost:8787/health
 | `GITHUB_TOKEN` | PAT for `repository_dispatch` + `github_read` |
 | `NOTION_API_KEY` | Notion integration token (`notion_create` / `notion_update` / `notion_archive` + catalog reads) |
 | `FIGMA_ACCESS_TOKEN` | Figma read token — the `prototype_scaffold` proposal screenshot + the library poll's reads |
-| `SUPABASE_ANON_KEY` | read-only blueprint key (`blueprint_search`) |
+| `SUPABASE_ANON_KEY` | read-only blueprint key (`search_blueprint`) |
 | `GMAIL_*` | OAuth for `email_send` (sender, client id/secret, refresh token) |
 | `DEBUG_TOKEN` | gates the `/debug/*` routes (sent as the `x-debug-token` header) |
 
