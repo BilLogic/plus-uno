@@ -99,7 +99,15 @@ const raw = SKILL_PATHS.map((p) => {
     console.error(`[bundle-harness] MISSING harness file: ${p} (expected at ${abs})`);
     process.exit(1);
   }
-  return readFileSync(abs, "utf8");
+  // Normalise endings at the read boundary. Line endings are a checkout
+  // artifact — no .gitattributes here and core.autocrlf defaults on for
+  // Windows — so bundling on Windows baked ~1,500 stray CRs into the prompt
+  // and dirtied this generated file on every run. Semantically inert to a
+  // model, but it makes the baked bytes depend on WHO deployed, and the
+  // system prompt is the cached prefix: alternating Windows and CI deploys
+  // would bust that cache every time. On a LF checkout this is a no-op, so
+  // CI output is unchanged.
+  return readFileSync(abs, "utf8").replace(/\r\n/g, "\n");
 });
 
 // Same assembly as the old assembleSystem(): index 0 raw, every other file
@@ -260,7 +268,13 @@ const contents =
 // copy left behind with nothing noticing until someone read the bot's answer.
 if (process.argv.includes("--check")) {
   const current = existsSync(outFile) ? readFileSync(outFile, "utf8") : "";
-  if (current !== contents) {
+  // Compare on normalised endings. The HARNESS string itself is JSON-escaped,
+  // so the only real newlines in this file are the two wrapper ones — and on a
+  // Windows checkout those arrive as CRLF while `contents` is built with "\n".
+  // That 2-char difference reported the harness as STALE on every Windows run,
+  // which is a guard crying wolf rather than a guard.
+  const norm = (t) => t.replace(/\r\n/g, "\n");
+  if (norm(current) !== norm(contents)) {
     console.error(
       `[bundle-harness] ${outFile} is STALE — a bundled harness doc changed but the generated file was not regenerated.\n` +
         `  committed: ${current.length} chars · regenerated: ${contents.length} chars\n` +
