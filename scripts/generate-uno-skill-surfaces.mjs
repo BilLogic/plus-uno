@@ -68,9 +68,20 @@ const SLACK_MENU_LINE = {
 // Slack rejects a slash-command description over 100 characters.
 const SLACK_DESC_MAX = 100;
 
+// Line endings are a checkout artifact, not content: this repo has no
+// .gitattributes and core.autocrlf is on by default on Windows, so every
+// SKILL.md arrives CRLF there. Splitting on "\n" alone left a trailing \r on
+// each line, so `lines[0]` was "---\r" and every run on Windows died with
+// "no frontmatter" on the first skill — meaning this drift guard could not run
+// at all for anyone on Windows, which is precisely who is most likely to cause
+// drift. Read through this everywhere endings could leak in.
+const LINES = (text) => text.split(/\r?\n/);
+/** Normalise for comparison only; what we WRITE stays "\n" as before. */
+const NORM = (text) => text.replace(/\r\n/g, "\n");
+
 /** Split a SKILL.md into [frontmatterLines, bodyStartIndex]. */
 function readFrontmatter(path) {
-  const lines = readFileSync(path, "utf8").split("\n");
+  const lines = LINES(readFileSync(path, "utf8"));
   if (lines[0] !== "---") throw new Error(`${path}: no frontmatter`);
   const end = lines.indexOf("---", 1);
   if (end === -1) throw new Error(`${path}: unterminated frontmatter`);
@@ -260,7 +271,13 @@ let drift = 0;
 for (const { path, content } of artifacts) {
   const abs = join(ROOT, path);
   const current = existsSync(abs) ? readFileSync(abs, "utf8") : null;
-  if (current === content) continue;
+  // Compare on normalised endings. The generated `content` is always "\n",
+  // while `current` comes off a working copy that may be CRLF — without this
+  // every artifact reads as drifted on Windows even when byte-identical in git.
+  // Nothing is lost: git normalises endings on commit, so a difference that
+  // survives only in the working copy is not drift anyone can act on.
+  // (A missing file leaves `current` null, which falls through to drift.)
+  if (current !== null && NORM(current) === NORM(content)) continue;
   if (CHECK) {
     console.error(`[drift] ${path} is stale — run: npm run generate:skill-surfaces`);
     drift++;
