@@ -26,12 +26,20 @@ import { claudeVertexConfigured, claudeVertexGenerate } from "../vertex/claude";
 import { MODELS } from "./routing";
 import { BUILD } from "../version";
 
-// Drafts under this length are never judged. 1500 chars targets deliverable-
-// shaped output (PRD drafts, spec answers, recaps) and exempts ordinary
-// conversational replies — the judge's failure modes (overclaiming, invented
-// links, structure) barely occur below this, and every judged reply pays one
-// extra model round-trip of latency.
-const MIN_DRAFT_CHARS = 1500;
+// Drafts under this length are never judged, unless a caller forces it — a
+// correction turn, or the confidence pre-check. The floor targets
+// deliverable-shaped output (PRD drafts, spec answers, recaps) and exempts
+// ordinary conversational replies, because every judged reply pays one extra
+// model round-trip of latency.
+//
+// Lowered 1500 -> 1000 on 2026-08-21 (Bill). 1500 was chosen against the
+// judge's OTHER dimensions — overclaiming, invented links, structure — which
+// really do cluster in long output. But a substantive blueprint answer with a
+// couple of citations and a caveat lands around 1100-1400 characters, so it
+// sat just under the old floor and went unjudged on every dimension, not only
+// on the confidence clause. The pre-check forces D9 below this line anyway;
+// this is about the rest of the rubric.
+const MIN_DRAFT_CHARS = 1000;
 // Hard wall-clock cap; past it the original draft ships (fail open).
 const JUDGE_TIMEOUT_MS = 25_000;
 // Inputs are capped so the judge call stays cheap and bounded.
