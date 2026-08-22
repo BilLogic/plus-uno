@@ -113,10 +113,39 @@ Close to the above, with three additions found while doing it:
   `AGENTS.md`; row 13's stale "Block Kit is not wired" replaced with what the
   code does.
 
-**Not verified:** the live `markdown_text` probe. Everything above follows
-Slack's documented contract for that field, and if the parser turns out lenient
-on `*single*` then the old dialect worked too — no regression either way. Worth
-one real reply's eyeball, alongside the proposal card's.
+**Verified 2026-08-22 by measurement**, not left to the docs. One message sent
+through Slack's Markdown path and read back as stored:
+
+| Sent | Stored | Verdict |
+| --- | --- | --- |
+| `**bold**` | `*bold*` | bold ✅ |
+| `*single*` | `_single_` | **italic** — the old mandate's bug, confirmed |
+| `_italic_` · `~~strike~~` · `` `code` `` | `_italic_` · `~strike~` · `` `code` `` | ✅ |
+| `- item`, two-space nest | `• item`, `◦ nested` | ✅ |
+| `[label](url)` | `<url\|label>` | ✅ |
+| `> quote` | `> quote` | ✅ |
+| `## Heading` | `Heading` | emphasis LOST — a bare line |
+| ```` ```sql ```` | ```` ``` ```` | language tag dropped |
+| a `\|` table | *(nothing)* | **DELETED** |
+
+Two findings changed the code:
+
+- **A table is not rendered badly — it is deleted.** Header, separator and every
+  row vanished, with the prose either side closed up around the hole. That is
+  strictly worse than the literal pipes assumed above: every other formatting
+  mistake is ugly and obvious, this one silently drops content and leaves a
+  fluent message behind. `stripMarkdownTables` already prevented it through the
+  bot; the rule is now stated with the real consequence.
+- **`## Heading` renders as an ordinary line** on the Markdown path, while the
+  mrkdwn path made it a bold line — the same reply rendering at two qualities
+  depending on which egress it took. Closed with `headingsToBold` in
+  `renderDeliveredBody`, so both paths give a heading weight.
+
+*Caveat, stated because it bounds the claim: this went through a Slack client's
+own Markdown send path, and the read-back returns a message's text rather than
+its blocks. `chat.appendStream`'s field is documented as the same parser and the
+mapping matches, but it was not itself exercised. Nothing is load-bearing on the
+difference — the Worker converts before sending on every path.*
 
 ### Notion, shipped the same day (rows 8, 9, 15)
 

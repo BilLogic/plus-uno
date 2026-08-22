@@ -8,7 +8,7 @@
 // rendered the blocks beside it, so nothing it did reached anyone.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { stripMarkdownTables, toSlackMrkdwn } from "../src/slack/mrkdwn";
+import { headingsToBold, stripMarkdownTables, toSlackMrkdwn } from "../src/slack/mrkdwn";
 
 const TABLE = [
   "Here are the touchpoints:",
@@ -53,6 +53,50 @@ describe("tables die on every path", () => {
     // Belt and braces: the blocks path runs toSlackMrkdwn, which converts
     // tables too, so a table cannot reach a reader through either door.
     assert.ok(!toSlackMrkdwn(TABLE).includes("|"));
+  });
+});
+
+describe("headings keep their weight on the Markdown path", () => {
+  // Measured 2026-08-22: Slack's Markdown parser drops the `#` and renders the
+  // text as an ordinary line, so a reply that used headings for structure
+  // arrived as undifferentiated prose. The mrkdwn path never had this problem,
+  // so the two egress paths rendered the same reply at different quality.
+  it("turns every ATX level into bold", () => {
+    assert.equal(headingsToBold("# One"), "**One**");
+    assert.equal(headingsToBold("### Three"), "**Three**");
+    assert.equal(headingsToBold("###### Six"), "**Six**");
+  });
+
+  it("handles a heading among other lines", () => {
+    assert.equal(
+      headingsToBold("intro\n\n## Rollback\n\nbody"),
+      "intro\n\n**Rollback**\n\nbody",
+    );
+  });
+
+  it("strips a closing hash run", () => {
+    assert.equal(headingsToBold("## Balanced ##"), "**Balanced**");
+  });
+
+  it("leaves a bare # alone — it is not a heading", () => {
+    assert.equal(headingsToBold("#hashtag"), "#hashtag");
+    assert.equal(headingsToBold("C# and F#"), "C# and F#");
+  });
+
+  it("never touches a # inside a code fence", () => {
+    // A comment, or a root shell prompt.
+    const code = "```bash\n# install first\nnpm i\n```";
+    assert.equal(headingsToBold(code), code);
+  });
+
+  it("is free when there is no hash at all", () => {
+    assert.equal(headingsToBold("plain prose"), "plain prose");
+  });
+
+  it("composes with the mrkdwn path without doubling up", () => {
+    // renderDeliveredBody runs this, then the blocks path runs toSlackMrkdwn:
+    // `## X` → `**X**` → `*X*`, which is what the mrkdwn path produced before.
+    assert.equal(toSlackMrkdwn(headingsToBold("## Rollback")), "*Rollback*");
   });
 });
 

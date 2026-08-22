@@ -47,6 +47,34 @@ export function stripMarkdownTables(input: string): string {
 }
 
 /**
+ * `## Heading` → `**Heading**`, for the Markdown path.
+ *
+ * Measured 2026-08-22: Slack's Markdown parser drops the `#` and renders the
+ * text as an ORDINARY LINE — no size, no weight, no hierarchy. A reply that
+ * used headings for structure arrives as undifferentiated prose.
+ *
+ * The mrkdwn path never had this problem (`convertLine` makes a `*Heading*`
+ * bold line), so without this the two egress paths rendered the same reply at
+ * different quality. `AGENT.md` already asks for `**Bold label**` lines rather
+ * than headings; this is the net under that rule, not a substitute for it.
+ *
+ * Fence-protected — a `#` inside a code block is a comment or a shell prompt.
+ */
+export function headingsToBold(input: string): string {
+  if (!input || !input.includes("#")) return input;
+  const parts = input.split(/(```[\s\S]*?```)/g);
+  return parts
+    .map((seg, i) =>
+      i % 2 === 1
+        ? seg
+        : seg.replace(/^[ \t]{0,3}(#{1,6})[ \t]+(.+?)[ \t]*#*[ \t]*$/gm, (_m, _hashes, text) =>
+            `**${String(text).trim()}**`,
+          ),
+    )
+    .join("");
+}
+
+/**
  * ```` ```js ```` → ```` ``` ````. Slack's mrkdwn code blocks take no info
  * string, so a language tag renders as a literal first line inside the block.
  * Only the opening fence of a multi-line block is touched — an inline

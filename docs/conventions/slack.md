@@ -60,7 +60,11 @@ Decisions reached in threads are written to **Decisions DB** (row with **Roadmap
 
 ### No tables. Ever. In any format.
 
-**Slack renders no table** — not in mrkdwn, not in Block Kit, not in `markdown_text`. A `| a | b |` table ships to the reader as literal pipes and dashes, and it is the single most visible way a reply comes out wrong.
+**Slack does not render a table — it DELETES it.** Measured 2026-08-22 by sending one through and reading back what Slack stored: the header row, the separator and every data row were gone. Not literal pipes, not a mangled block — *nothing*, with the prose either side closed up around the hole.
+
+That makes this the most dangerous construct on the list. Every other formatting mistake is ugly and obvious; this one silently drops the content and leaves a fluent-looking message behind, so nobody can tell anything is missing.
+
+The Worker converts tables to bullets before they ever reach Slack (`stripMarkdownTables`), so the loss cannot happen through the bot — but write the bullets yourself and the message reads better than the fallback.
 
 Write one of these instead:
 
@@ -100,10 +104,31 @@ One dialect, three destinations — you write Markdown, the Worker renders it pe
 
 **The no-tables rule is global, not a Slack quirk.** Notion's API takes no Markdown table and an email body renders one as literal pipes, so all three renderers degrade a table the same way: one bullet per row, `**Column:** value · **Column:** value`. Useful as a net; still worse than writing the bullets yourself.
 
+### What Slack's Markdown parser actually does — measured, not assumed
+
+Sent one message through and read back what Slack stored (2026-08-22). This is the mapping, and it is why the rules above are what they are:
+
+| You write | Slack stores | Verdict |
+|---|---|---|
+| `**bold**` | `*bold*` | bold ✅ |
+| `*single*` | `_single_` | **italic** — never use `*` for bold |
+| `_italic_` · `~~strike~~` · `` `code` `` | `_italic_` · `~strike~` · `` `code` `` | ✅ |
+| `- item`, nested by two spaces | `• item`, `◦ nested` | ✅ |
+| `1. item` | `1. item` | ✅ |
+| `[label](url)` | `<url\|label>` | ✅ — Markdown links work |
+| `> quote` | `> quote` | ✅ |
+| `## Heading` | `Heading` | **emphasis lost** — a bare line. Use a `**Bold label**` line for structure |
+| ```` ```sql ```` | ```` ``` ```` | language tag dropped |
+| a `\|` table | *(deleted entirely)* | ❌ see above |
+
+Two of these decided the house rule: `*single*` resolving to italic is exactly the bug the old mrkdwn mandate produced, and the table deletion is why that rule is absolute.
+
+*(Caveat, stated because it bounds the claim: this was measured through a Slack client's own Markdown send path, and the read-back returns a message's text, not its blocks. The `chat.appendStream` field the Worker streams through is documented as the same parser and the mapping matches its docs, but it was not itself exercised. Nothing above is load-bearing on the difference — the Worker converts before sending on every path.)*
+
 <details>
 <summary>Why this changed on 2026-08-22</summary>
 
-Until then this file mandated Slack **mrkdwn** (`*single*` bold, literal `•`, `<url|label>`), the Worker's converter assumed Markdown *in* and mrkdwn *out*, and the live streaming path sent the body to Slack's `markdown_text` field — which is standard Markdown. Three layers, three assumed formats. A model that obeyed the prompt perfectly rendered *worst* (in Markdown, `*bold*` is italic and `<url|label>` is nothing); a model that "slipped" into `**bold**` rendered correctly. The bot was fighting its own instructions. Fixed by picking the dialect the model writes best and Slack's agent field takes natively, and converting in code wherever something else is needed.
+Until then this file mandated Slack **mrkdwn** (`*single*` bold, literal `•`, `<url|label>`), the Worker's converter assumed Markdown *in* and mrkdwn *out*, and the live streaming path sent the body to Slack's `markdown_text` field — which is standard Markdown. Three layers, three assumed formats. A model that obeyed the prompt perfectly rendered *worst* (in Markdown, `*bold*` is italic — since confirmed by measurement — and `<url|label>` is nothing); a model that "slipped" into `**bold**` rendered correctly. The bot was fighting its own instructions. Fixed by picking the dialect the model writes best and Slack's agent field takes natively, and converting in code wherever something else is needed.
 </details>
 
 ## Threading & mentions

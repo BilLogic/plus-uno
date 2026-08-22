@@ -5,7 +5,7 @@
 import type { Env } from "../types";
 import { addReaction, appendStream, postMessage, startStream, stopStream } from "./api";
 import { footerKindFor, footerNoteFor, type FooterKind } from "./footer-kind";
-import { stripMarkdownTables, toSlackMrkdwn } from "./mrkdwn";
+import { headingsToBold, stripMarkdownTables, toSlackMrkdwn } from "./mrkdwn";
 import { splitBalanced } from "./split";
 import { buildFailureMessage, type FailureStage } from "./failure-message";
 
@@ -152,7 +152,7 @@ export function renderDeliveredBody(text: string): string {
   // anything under MIN_DRAFT_CHARS, and a three-row table is short. Doing it
   // in the renderer means the rule holds on the body that actually ships,
   // which is the same reason the confidence strip lives here (ADR-019).
-  const cleaned = stripMarkdownTables(stripTrailingConfidence(text));
+  const cleaned = headingsToBold(stripMarkdownTables(stripTrailingConfidence(text)));
   return cleaned.trim()
     ? capText(cleaned)
     : "(I came back with an empty answer — that's a bug on my side. Try rephrasing, and flag this to the team.)";
