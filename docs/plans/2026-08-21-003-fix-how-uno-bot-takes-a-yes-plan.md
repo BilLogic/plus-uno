@@ -25,10 +25,10 @@ confirmation gesture, and a typed reply — and they shared a 👍.
 
 ## What it looks and feels like when this is done
 
-The end state, written as what a person actually sees. Everything in Part 1 is
-already true; the two starred moments are Part 3.
+The end state, written as what a person actually sees. Everything below is
+already true except the two sections marked *proposed*.
 
-### Asking for something that writes
+### Asking for something that writes  ·  *buttons proposed, the rest shipped*
 
 > **Bryan:** `@uno-bot` file a maintenance ticket about the confidence level thing
 >
@@ -39,8 +39,7 @@ already true; the two starred moments are Part 3.
 > • **Problem / Context:** Grounding rules require exactly one woven confidence clause…
 > • **Proposed Fix:** Audit the confidence clause enforcement…
 >
-> ⭐ `[ ✅ File it ]` `[ ❌ Cancel ]`
-> *…or react ✅ / ❌, or just say "go ahead".*
+> **`[ ✅ File it ]`  `[ ❌ Cancel ]`**
 >
 > **Bryan:** sure go ahead
 >
@@ -50,10 +49,13 @@ already true; the two starred moments are Part 3.
 **One card. One confirmation.** The card carries the whole draft, so there is
 nothing to approve twice — that is why the prose-draft round is gone.
 
-**Three ways to say yes, one meaning.** Press the button, react ✅ or 👍, or
-type it. "sure go ahead", "yes please", "ok do it", "👍" all work. Whichever
-you use, the same claim resolves, and only one of them can win — pressing the
-button *and* reacting cannot file two cards.
+**The card names ONE way; three still work.** Once buttons are on the card,
+the copy stops advertising reactions — a card that lists three ways to say yes
+reads as three decisions to make. But reacting ✅ or 👍, or typing "sure go
+ahead", still resolves it, because someone who reaches for a reaction is not
+wrong, they just did not use the obvious control. All three land on the same
+claim, and only one can win: pressing the button *and* reacting cannot file two
+cards.
 
 ### Saying something that isn't quite yes
 
@@ -78,15 +80,6 @@ Same for "no go ahead" and "ok cancel" — mixed signals are never guessed.
 A ✅ on a card that was already superseded says so instead of filing the newer
 one. A ✅ ten minutes after the card expired gets the hourglass, not silence.
 
-### The heavier actions
-
-> **Bryan:** go ahead
->
-> **uno-bot:** That one wants a ✅ on the card rather than a typed go-ahead — an
-> email can't be unsent. React on the card and I'll run it.
-
-`email_send` and `notion_archive` only. Everything else takes your word.
-
 ### Under an ordinary answer
 
 > **uno-bot:** The reconfirm step sits under Standard Scheduling — I checked the
@@ -98,7 +91,7 @@ No buttons. Nothing to press, nothing asking for a rating. The one line that
 remains is the honesty label, and it appears only on answers making checkable
 claims — a short "Got it" carries nothing at all.
 
-### ⭐ When an approval goes missing
+### When an approval goes missing  ·  *proposed*
 
 > **Bryan:** go ahead
 >
@@ -112,6 +105,111 @@ measuring how often it happens.
 
 ---
 
+## How a confirmation is actually routed
+
+Traced through the code, because "does the LLM see this?" has a different
+answer on each path — and that is deliberate.
+
+### Path 1 — typed  ·  the only path the LLM can reach
+
+```
+Slack message
+  └─ handleSlackEnvelope → dispatchInnerEvent  case "message"
+       └─ enqueueAgentJob  (per-thread DO; the Worker's own invocation is
+                            cancelled ~30s after the ack, so the run moves
+                            to a DO alarm — live incident 2026-07-09)
+            └─ handleUserMessage
+                 ├─ loadPendingProposalByThread          ← is anything staged?
+                 │
+                 ├─ IF pending AND fastPathAllowed(lastBotTurn):
+                 │     bareResolution(text)
+                 │       ├─ "confirm" / "cancel"  → resolveProposal   ✅ NO MODEL CALL
+                 │       └─ null (carries content, mixed, or too long)
+                 │              ↓ falls through
+                 │
+                 └─ the MODEL reads the turn, with <pending_proposal> in context
+                      └─ it may call  proposal_resolve
+                           └─ validateProposalResolve   ← Worker-side authorization,
+                           │                              enforced even though the
+                           │                              prompt already says it
+                           └─ resolveProposal
+```
+
+**This is the answer to "is it processed by the LLM?"** — on the typed path,
+yes, for everything the accelerator does not match, which is every phrasing it
+has never seen, every other language, and every reply that argues with the
+proposal. The accelerator only skips a round trip on an unambiguous bare yes;
+it can never *stop* the model from reading something.
+
+### Path 2 — reaction  ·  deliberately never reaches the LLM
+
+```
+Slack reaction_added
+  └─ dispatchInnerEvent  case "reaction_added"
+       └─ enqueueAgentJob (keyed by the reacted message, so confirmations on
+                           one proposal stay ordered)
+            └─ handleReaction
+                 ├─ mapReaction(name)        ✅ ✔️ 👍 → confirm · ❌ 🚫 ⛔ → cancel
+                 ├─ getBotIdentity           the bot may never resolve its own
+                 ├─ loadPendingProposalDetailed(reactedTs)
+                 │     ├─ "expired" → the hourglass message, nothing runs
+                 │     └─ miss      → point at the live card, RESOLVE NOTHING
+                 └─ resolveProposal          ✅ NO MODEL CALL, EVER
+```
+
+A reaction is a direct instruction on a specific object. There is nothing to
+interpret, so nothing interprets it — which also means it cannot be talked out
+of, mis-parsed, or lost to a model error.
+
+### Path 3 — button  ·  *proposed*, and would also bypass the LLM
+
+```
+Slack block_actions        (a DIFFERENT endpoint from events — interactive.ts)
+  └─ dispatchAction(action_id)
+       ├─ "uno_stop_run"       → stopRun
+       ├─ "uno_delete_answer"  → deleteAnswer
+       └─ (proposed) "uno_proposal_confirm" / "uno_proposal_cancel"
+                               → resolveProposal      ✅ NO MODEL CALL
+```
+
+Buttons arrive on Slack's interactivity endpoint, not the events one, so this
+is new wiring rather than a variation of Path 1. Today `dispatchAction` warns
+on any unrecognised id, so the buttons do nothing until it is added.
+
+### Where all three converge
+
+```
+resolveProposal(pending, decision)
+  │
+  ├─ claimPendingProposal(proposalTs)      ← the DELETE *is* the claim.
+  │     └─ false → stand down silently        A DO handles one request at a
+  │                                            time, so of two racing resolvers
+  │                                            exactly one continues. Fails
+  │                                            CLOSED: notion_create is not
+  │                                            idempotent.
+  ├─ postMessage(narrative)
+  ├─ addReaction(:handshake:) on the ORIGINAL request
+  ├─ executeTool(toolName, input)          ← the actual Notion / email write
+  └─ appendHistory(outcome + any URL)      ← so later turns know what was done
+```
+
+**One claim, three doors.** Whichever path a person uses, the same record is
+claimed, and the loser of a race does nothing at all — pressing a button and
+reacting cannot file two cards.
+
+### The honest summary
+
+| | Reaches the LLM? | Why |
+| --- | --- | --- |
+| Typed, unambiguous ("sure go ahead") | No | The accelerator resolves it; a round trip buys nothing |
+| Typed, anything else | **Yes** | The model reads it and decides — this is the general case |
+| Reaction | No | A direct instruction on a specific object; nothing to interpret |
+| Button *(proposed)* | No | Same — the control names the decision exactly |
+
+The design principle holds: **no fixed list decides what a person meant.** The
+list only recognises the cases where there is nothing to decide.
+
+
 ## Part 1 — Shipped
 
 Seven commits, all on `refactor/one-name-search-blueprint`, none deployed.
@@ -123,7 +221,7 @@ Listed so nothing here has to be re-litigated.
 | --- | --- | --- |
 | 1 | **A reaction resolves only the card it sits on.** `findThreadProposal` became a *pointer*, not an executor: a reaction elsewhere in the thread now explains and resolves nothing, and one on a superseded card no longer fires the newer proposal. Previously a ✅ on the card in front of you could execute a different action. | `7f51dd39` |
 | 2 | **Resolution is atomic.** The Durable Object's `DELETE` reports whether it removed the record, which makes it a claim — a DO handles one request at a time, so of two racing resolvers exactly one proceeds. A reaction landing beside a typed "go ahead" could otherwise both reach `executeTool`, and `notion_create` is not idempotent. Fails **closed**, unlike `claimEventRun` next to it, because the actions here are the irreversible ones. | `7f51dd39` |
-| 3 | **`email_send` and `notion_archive` require a reaction.** A typed word is not enough for an action that cannot be recalled. A consequence tier this codebase did not previously have — `SIDE_EFFECT_TOOLS` gated all seven identically. | `80b3d357` |
+| 3 | **No consequence tier.** `email_send` and `notion_archive` briefly required a reaction; that was reverted the same day. A staged proposal has already been reviewed and the person answering is the person who asked — demanding the same decision in a different medium adds friction without adding a check, and splits the mental model. If an action ever needs a second pair of eyes, that is a second REVIEWER, not a second gesture from the same one. | `80b3d357`, `041d5fa4` |
 
 ### Taking a yes
 
