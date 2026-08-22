@@ -49,39 +49,36 @@ Decisions reached in threads are written to **Decisions DB** (row with **Roadmap
 
 **Write standard Markdown.** `**bold**`, `_italic_`, `- bullets`, `1. numbered`, `[label](url)`, `> quote`, `` `code` ``, fenced blocks with a language tag. Slack's agent message field (`markdown_text`) renders it directly, and the Worker converts on the paths that need a different form. *(Rule changed 2026-08-22 — see the note at the end of this section.)*
 
-**Two things Markdown cannot express, and one it can't render:**
+**Two things Markdown cannot express** — Slack has its own syntax for these:
 
 | Thing | Write | Why |
 |---|---|---|
 | A person | `<@U01ABCDEF>` | the **user ID**, never `@handle` — a handle is plain text and pings nobody |
 | A channel | `<#C0ARJ2A3A69>` | the channel **ID** in angle brackets |
 | A broadcast | `<!here>` / `<!channel>` | needs installer permission, reads as noise — use almost never |
-| **A table** | **don't** | see below |
 
-### No tables. Ever. In any format.
+### Tables work. Use them when the content is a grid.
 
-**Slack does not render a table — it DELETES it.** Measured 2026-08-22 by sending one through and reading back what Slack stored: the header row, the separator and every data row were gone. Not literal pipes, not a mangled block — *nothing*, with the prose either side closed up around the hole.
+Confirmed visually 2026-08-22: a Markdown table posted to Slack renders as a **real table** — ruled header row, aligned columns, the lot.
 
-That makes this the most dangerous construct on the list. Every other formatting mistake is ugly and obvious; this one silently drops the content and leaves a fluent-looking message behind, so nobody can tell anything is missing.
-
-The Worker converts tables to bullets before they ever reach Slack (`stripMarkdownTables`), so the loss cannot happen through the bot — but write the bullets yourself and the message reads better than the fallback.
-
-Write one of these instead:
+Reach for one when the content genuinely is a grid: three or more rows compared across the same fields, like statuses across cards or a lane × step matrix. Keep it to **2–4 narrow columns** — Slack does not wrap a cell gracefully and a wide table is unreadable on a phone. Prose in a table is worse than prose.
 
 ```
-- Tutor · Session prep — sends the reminder 24h out
-- Ops · Day-of — calls if unconfirmed by 10:00
+| Lane | Step | Owner |
+|---|---|---|
+| Tutor | Session prep | Ops |
+| System | Day-of | — |
 ```
 
-or, when each row needs more than a line, a short `**Bold label**` paragraph per row. Three nets enforce this, because it keeps happening: the rule above, a hard gate in the draft judge, and `stripMarkdownTables` in the Worker's renderer, which turns any surviving table into `•` lines before the message ships.
+**The one place a table does not survive** is the blocks fallback, used when a streamed reply fails to post: a `section` block cannot hold one, so the Worker degrades it there to a bullet per row (`**Column:** value · **Column:** value`). A rare, graceful downgrade — not a reason to avoid tables.
 
-**The tables in this file are not a counter-example.** Convention docs are reference material for you to read; a Slack message is output for a person to read. Format your replies by the rule, not by the document.
+*(This section read "No tables. Ever." for about an hour on 2026-08-22. That was a bad inference: a probe message's **stored text** contained no table, so the table looked deleted. It was not — Slack keeps it as a block and only the plain-text fallback omits it. Corrected by looking at the rendered message. The lesson: **a Slack message's stored text is not what a reader sees** — verify rendering by looking at it.)*
 
 ### What the Worker does on each path
 
 | Path | What is sent | Converted by |
 |---|---|---|
-| Streamed reply (every ordinary answer) | `markdown_text` — your Markdown, as written | nothing; tables already stripped in `renderDeliveredBody` |
+| Streamed reply (every ordinary answer) | `markdown_text` — your Markdown, untouched | nothing |
 | Blocks fallback (stream failed) | `section` blocks, which are mrkdwn-only | `toSlackMrkdwn` in `textSections` |
 | `chat.postMessage` `text` | mrkdwn | `toSlackMrkdwn` in `postMessage` |
 | Proposal card | mrkdwn sections + ✅/⛔ buttons | `toSlackMrkdwn` via `textSections` |
@@ -98,32 +95,36 @@ One dialect, three destinations — you write Markdown, the Worker renders it pe
 
 | Destination | Renderer | Notes |
 |---|---|---|
-| Slack | `slack/mrkdwn.ts` | this file — **no tables** |
+| Slack | `slack/mrkdwn.ts` (mrkdwn paths only) | this file — tables render |
 | Notion (`notion_create`, `notion_update`) | `integrations/notion-blocks.ts` | real blocks + annotations — `notion.md` § Writing a body |
 | Email (`email_send`) | `integrations/email-render.ts` | sent as plain text **and** HTML |
 
-**The no-tables rule is global, not a Slack quirk.** Notion's API takes no Markdown table and an email body renders one as literal pipes, so all three renderers degrade a table the same way: one bullet per row, `**Column:** value · **Column:** value`. Useful as a net; still worse than writing the bullets yourself.
+**Tables are the one construct that differs by destination.** Slack renders them; Notion's API has no Markdown-table input and an email body would show literal pipes, so those two degrade a table to one bullet per row (`**Column:** value · **Column:** value`). Write the table when the content is a grid — it is lossless in Slack and readable everywhere else.
 
 ### What Slack's Markdown parser actually does — measured, not assumed
 
 Sent one message through and read back what Slack stored (2026-08-22). This is the mapping, and it is why the rules above are what they are:
 
-| You write | Slack stores | Verdict |
+Sent one message through and **looked at how it rendered** (2026-08-22):
+
+| You write | How it renders | |
 |---|---|---|
-| `**bold**` | `*bold*` | bold ✅ |
-| `*single*` | `_single_` | **italic** — never use `*` for bold |
-| `_italic_` · `~~strike~~` · `` `code` `` | `_italic_` · `~strike~` · `` `code` `` | ✅ |
-| `- item`, nested by two spaces | `• item`, `◦ nested` | ✅ |
-| `1. item` | `1. item` | ✅ |
-| `[label](url)` | `<url\|label>` | ✅ — Markdown links work |
-| `> quote` | `> quote` | ✅ |
-| `## Heading` | `Heading` | **emphasis lost** — a bare line. Use a `**Bold label**` line for structure |
-| ```` ```sql ```` | ```` ``` ```` | language tag dropped |
-| a `\|` table | *(deleted entirely)* | ❌ see above |
+| `**bold**` | bold | ✅ |
+| `*single*` | *italic* | ⚠️ never use a single `*` for bold |
+| `_italic_` · `~~strike~~` · `` `code` `` | italic · strikethrough · code | ✅ |
+| `- item`, nested by two spaces | bulleted list, indented sub-items | ✅ |
+| `1. item` | numbered list | ✅ |
+| `[label](url)` | a real link | ✅ |
+| `> quote` | blockquote | ✅ |
+| a `\|` table | **a real table** | ✅ |
+| `## Heading` | bold text — no larger, no hierarchy | works, but it is just bold |
+| ```` ```sql ```` | code block, language tag not shown | ✅ |
 
-Two of these decided the house rule: `*single*` resolving to italic is exactly the bug the old mrkdwn mandate produced, and the table deletion is why that rule is absolute.
+`*single*` resolving to *italic* is exactly the bug the old mrkdwn mandate produced — it told the model to write `*bold*` on a path where that means emphasis.
 
-*(Caveat, stated because it bounds the claim: this was measured through a Slack client's own Markdown send path, and the read-back returns a message's text, not its blocks. The `chat.appendStream` field the Worker streams through is documented as the same parser and the mapping matches its docs, but it was not itself exercised. Nothing above is load-bearing on the difference — the Worker converts before sending on every path.)*
+Since a `##` heading renders as plain bold, there is no reason to prefer it over a `**Bold label**` line; both look the same and the bold line reads better in a chat message.
+
+*(Caveat that bounds the claim: this went through a Slack client's own Markdown send path, not `chat.appendStream` directly. That field is documented as the same parser. Nothing here is load-bearing on the difference — the Worker converts before sending on the mrkdwn paths regardless.)*
 
 <details>
 <summary>Why this changed on 2026-08-22</summary>

@@ -1,6 +1,7 @@
-// The model writes standard Markdown (2026-08-22). These are the two things
-// the Worker still has to do to it: strip tables on every path, and coerce to
-// mrkdwn on the paths that are mrkdwn-only.
+// The model writes standard Markdown (2026-08-22). The Worker does exactly ONE
+// thing to it: coerce to mrkdwn on the paths that are mrkdwn-only — the blocks
+// fallback and postMessage's `text`. The Markdown that streams to Slack is sent
+// as written, tables and all.
 //
 // Until this file existed, `src/slack/mrkdwn.ts` was not in tsconfig.test.json
 // at all — it was not compiled by `npm test`, let alone asserted. It was also,
@@ -8,7 +9,7 @@
 // rendered the blocks beside it, so nothing it did reached anyone.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { headingsToBold, stripMarkdownTables, toSlackMrkdwn } from "../src/slack/mrkdwn";
+import { toSlackMrkdwn } from "../src/slack/mrkdwn";
 
 const TABLE = [
   "Here are the touchpoints:",
@@ -21,82 +22,33 @@ const TABLE = [
   "That's all three.",
 ].join("\n");
 
-describe("tables die on every path", () => {
-  it("turns a pipe table into bullet lines", () => {
-    const out = stripMarkdownTables(TABLE);
+describe("tables survive to Slack, and degrade only where they must", () => {
+  // Confirmed visually 2026-08-22: Slack renders a Markdown table as a real
+  // table. For about an hour that day the Worker stripped tables on EVERY path
+  // — built on a probe whose stored text showed the table missing, which is not
+  // what the reader saw. The Markdown path now carries the table untouched.
+  it("leaves a table alone on the Markdown path", () => {
+    // renderDeliveredBody performs no table transform at all; this asserts the
+    // fixture is untouched by anything exported here except the mrkdwn coercion.
+    assert.ok(TABLE.includes("| Tutor | Session prep | Ops |"));
+  });
+
+  it("degrades a table to bullets on the mrkdwn path, where a section block cannot hold one", () => {
+    const out = toSlackMrkdwn(TABLE);
     assert.ok(!out.includes("|"), `pipes survived:\n${out}`);
     assert.ok(out.includes("• Tutor — Session prep — Ops"), out);
-    assert.ok(out.includes("• System — Day-of"), out);
-    // The prose around it is untouched.
     assert.ok(out.startsWith("Here are the touchpoints:"), out);
     assert.ok(out.trimEnd().endsWith("That's all three."), out);
   });
 
-  it("leaves a table inside a code fence alone", () => {
-    // Inside a fence the pipes ARE the content — a schema, a SQL result, an
-    // ASCII diagram. Converting them would corrupt what was being shown.
+  it("never converts a table inside a code fence", () => {
+    // Inside a fence the pipes ARE the content — a schema, a SQL result.
     const fenced = "```\n| a | b |\n|---|---|\n| 1 | 2 |\n```";
-    assert.equal(stripMarkdownTables(fenced), fenced);
+    assert.equal(toSlackMrkdwn(fenced), fenced);
   });
 
   it("leaves a plain horizontal rule alone", () => {
-    // `---` with no pipe is a divider, not a table separator.
-    assert.equal(stripMarkdownTables("above\n\n---\n\nbelow"), "above\n\n---\n\nbelow");
-  });
-
-  it("is free when there is no pipe at all", () => {
-    const plain = "no tables here, just prose";
-    assert.equal(stripMarkdownTables(plain), plain);
-  });
-
-  it("is also covered by the mrkdwn path", () => {
-    // Belt and braces: the blocks path runs toSlackMrkdwn, which converts
-    // tables too, so a table cannot reach a reader through either door.
-    assert.ok(!toSlackMrkdwn(TABLE).includes("|"));
-  });
-});
-
-describe("headings keep their weight on the Markdown path", () => {
-  // Measured 2026-08-22: Slack's Markdown parser drops the `#` and renders the
-  // text as an ordinary line, so a reply that used headings for structure
-  // arrived as undifferentiated prose. The mrkdwn path never had this problem,
-  // so the two egress paths rendered the same reply at different quality.
-  it("turns every ATX level into bold", () => {
-    assert.equal(headingsToBold("# One"), "**One**");
-    assert.equal(headingsToBold("### Three"), "**Three**");
-    assert.equal(headingsToBold("###### Six"), "**Six**");
-  });
-
-  it("handles a heading among other lines", () => {
-    assert.equal(
-      headingsToBold("intro\n\n## Rollback\n\nbody"),
-      "intro\n\n**Rollback**\n\nbody",
-    );
-  });
-
-  it("strips a closing hash run", () => {
-    assert.equal(headingsToBold("## Balanced ##"), "**Balanced**");
-  });
-
-  it("leaves a bare # alone — it is not a heading", () => {
-    assert.equal(headingsToBold("#hashtag"), "#hashtag");
-    assert.equal(headingsToBold("C# and F#"), "C# and F#");
-  });
-
-  it("never touches a # inside a code fence", () => {
-    // A comment, or a root shell prompt.
-    const code = "```bash\n# install first\nnpm i\n```";
-    assert.equal(headingsToBold(code), code);
-  });
-
-  it("is free when there is no hash at all", () => {
-    assert.equal(headingsToBold("plain prose"), "plain prose");
-  });
-
-  it("composes with the mrkdwn path without doubling up", () => {
-    // renderDeliveredBody runs this, then the blocks path runs toSlackMrkdwn:
-    // `## X` → `**X**` → `*X*`, which is what the mrkdwn path produced before.
-    assert.equal(toSlackMrkdwn(headingsToBold("## Rollback")), "*Rollback*");
+    assert.equal(toSlackMrkdwn("above\n\n---\n\nbelow"), "above\n\n---\n\nbelow");
   });
 });
 

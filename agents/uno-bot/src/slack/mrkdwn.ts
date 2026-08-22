@@ -28,51 +28,24 @@ export function toSlackMrkdwn(input: string): string {
     .join("");
 }
 
-/**
- * Tables, and nothing else — for the Markdown path.
- *
- * **Slack renders no table in any message format**: not mrkdwn, not Block Kit,
- * not `markdown_text`. A pipe table ships as literal pipes and is the single
- * most visible way a reply comes out wrong. The prompt says so and the draft
- * judge fails a draft carrying one; this is the third net, for the drafts too
- * short to be judged.
- *
- * Fence-protected, so a table inside a code block — where the pipes are the
- * point — is left alone.
- */
-export function stripMarkdownTables(input: string): string {
-  if (!input || !input.includes("|")) return input;
-  const parts = input.split(/(```[\s\S]*?```)/g);
-  return parts.map((seg, i) => (i % 2 === 1 ? seg : convertTables(seg))).join("");
-}
-
-/**
- * `## Heading` → `**Heading**`, for the Markdown path.
- *
- * Measured 2026-08-22: Slack's Markdown parser drops the `#` and renders the
- * text as an ORDINARY LINE — no size, no weight, no hierarchy. A reply that
- * used headings for structure arrives as undifferentiated prose.
- *
- * The mrkdwn path never had this problem (`convertLine` makes a `*Heading*`
- * bold line), so without this the two egress paths rendered the same reply at
- * different quality. `AGENT.md` already asks for `**Bold label**` lines rather
- * than headings; this is the net under that rule, not a substitute for it.
- *
- * Fence-protected — a `#` inside a code block is a comment or a shell prompt.
- */
-export function headingsToBold(input: string): string {
-  if (!input || !input.includes("#")) return input;
-  const parts = input.split(/(```[\s\S]*?```)/g);
-  return parts
-    .map((seg, i) =>
-      i % 2 === 1
-        ? seg
-        : seg.replace(/^[ \t]{0,3}(#{1,6})[ \t]+(.+?)[ \t]*#*[ \t]*$/gm, (_m, _hashes, text) =>
-            `**${String(text).trim()}**`,
-          ),
-    )
-    .join("");
-}
+// NOTE — tables and headings are NOT stripped before the Markdown path.
+//
+// Two exported helpers lived here earlier on 2026-08-22, `stripMarkdownTables`
+// and `headingsToBold`, both called from `renderDeliveredBody` on every path.
+// Both were built on a misread: a probe message was sent through Slack and the
+// STORED TEXT read back, which showed the table gone and the heading reduced to
+// a bare line. The rendered message showed neither — Slack keeps a table as a
+// real table and a heading as heading styling; only the plain-text fallback
+// drops them.
+//
+// So both were deleted rather than kept "just in case": each was actively
+// destroying a construct Slack renders well. Tables still degrade to bullets on
+// the mrkdwn paths via `convertTables` below, because a `section` block really
+// cannot hold one — that is a fallback, not a policy.
+//
+// The lesson, since it cost two wrong findings in one afternoon: **the stored
+// text of a Slack message is not what a reader sees.** Verify rendering by
+// looking at it.
 
 /**
  * ```` ```js ```` → ```` ``` ````. Slack's mrkdwn code blocks take no info

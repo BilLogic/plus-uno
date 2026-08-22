@@ -5,7 +5,7 @@
 import type { Env } from "../types";
 import { addReaction, appendStream, postMessage, startStream, stopStream } from "./api";
 import { footerKindFor, footerNoteFor, type FooterKind } from "./footer-kind";
-import { headingsToBold, stripMarkdownTables, toSlackMrkdwn } from "./mrkdwn";
+import { toSlackMrkdwn } from "./mrkdwn";
 import { splitBalanced } from "./split";
 import { buildFailureMessage, type FailureStage } from "./failure-message";
 
@@ -144,15 +144,21 @@ function stripTrailingConfidence(text: string): string {
  * drift apart again.
  */
 export function renderDeliveredBody(text: string): string {
-  // Tables die here, on every path, before the cap.
+  // NOTHING is stripped from the Markdown here any more, and that is a
+  // correction, not an omission.
   //
-  // The model writes standard Markdown (2026-08-22) and Slack renders it —
-  // except tables, which Slack renders in NO message format. The prompt says
-  // so and the draft judge fails a draft carrying one, but the judge skips
-  // anything under MIN_DRAFT_CHARS, and a three-row table is short. Doing it
-  // in the renderer means the rule holds on the body that actually ships,
-  // which is the same reason the confidence strip lives here (ADR-019).
-  const cleaned = headingsToBold(stripMarkdownTables(stripTrailingConfidence(text)));
+  // From earlier on 2026-08-22 this ran `stripMarkdownTables` (tables → bullet
+  // lines) and `headingsToBold` (`## X` → `**X**`) on every path, on the
+  // strength of a probe whose STORED TEXT showed a table missing and a heading
+  // reduced to a bare line. Both readings were wrong: Slack keeps a table as a
+  // block and a heading as heading styling, and only the plain-text fallback
+  // omits them. Rendered in a real client, the table renders as a real table.
+  //
+  // So the Markdown path leaves the model's Markdown alone. The mrkdwn paths —
+  // the blocks fallback and `postMessage`'s `text` — still degrade a table to
+  // bullets inside `toSlackMrkdwn`, because a `section` block genuinely cannot
+  // hold one. The lesson kept: read the RENDER, never the stored text.
+  const cleaned = stripTrailingConfidence(text);
   return cleaned.trim()
     ? capText(cleaned)
     : "(I came back with an empty answer — that's a bug on my side. Try rephrasing, and flag this to the team.)";

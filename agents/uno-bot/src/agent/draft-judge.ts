@@ -65,7 +65,6 @@ Rubric (condensed from the team's D1–D9 bot-answer rubric):
 
 HARD GATES (any one → verdict "fail"):
 - Claims a gated action already happened ("I've filed the card") — actions must stay future/conditional until confirmed.
-- A TABLE. Any pipe-delimited table — a |---|---| separator row, or rows of | cell | cell | — is a hard fail. Slack renders no table in ANY message format; the pipes ship literally. Rewrite the same content as "- label — value" lines or short labelled paragraphs.
 - Bracket citations: [1]-style footnotes, [RM-2292]-style ticket brackets, or a repo path in brackets used as a citation. Link at the point of mention instead.
 - Leaks internal mechanics: tool names in snake_case, "Worker", "KV", model/tier names, token or tool budgets.
 - Placeholder text left in ("TODO", "[insert …]", "lorem").
@@ -75,7 +74,7 @@ Do NOT fail a draft for facts you cannot verify, for tone, or for length alone. 
 Reply with STRICT JSON only, no code fences, no commentary:
   {"verdict":"pass"}
 or
-  {"verdict":"fail","failed":["D9","gate:formatting"],"revised":"<the FULL corrected draft — same content and voice, minimal edits, standard Markdown (**bold**, [label](url) links, - bullets) and NEVER a table>"}`;
+  {"verdict":"fail","failed":["D9","gate:formatting"],"revised":"<the FULL corrected draft — same content and voice, minimal edits, standard Markdown (**bold**, [label](url) links, - bullets, and tables where genuinely tabular)>"}`;
 
 /** Appended to the judge system prompt ONLY on a detected correction turn — the
  *  one-obligation-per-field rule that governs tool payloads applies here too.

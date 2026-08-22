@@ -113,39 +113,53 @@ Close to the above, with three additions found while doing it:
   `AGENTS.md`; row 13's stale "Block Kit is not wired" replaced with what the
   code does.
 
-**Verified 2026-08-22 by measurement**, not left to the docs. One message sent
-through Slack's Markdown path and read back as stored:
+**Verified 2026-08-22 — twice, because the first reading was wrong.**
 
-| Sent | Stored | Verdict |
+A probe message was sent through Slack's Markdown path and read back. The first
+pass judged it by the message's **stored text**, and drew two conclusions that
+were both false:
+
+| Claimed from stored text | Actually renders as |
+| --- | --- |
+| a table is **deleted** | **a real table** — ruled header, aligned columns |
+| `## Heading` loses all weight | bold text |
+
+A Slack message's stored text is not what a reader sees. Slack keeps a table as
+a block; only the plain-text fallback omits it. Corrected by looking at the
+rendered message.
+
+**What the render actually shows:**
+
+| You write | Renders as | |
 | --- | --- | --- |
-| `**bold**` | `*bold*` | bold ✅ |
-| `*single*` | `_single_` | **italic** — the old mandate's bug, confirmed |
-| `_italic_` · `~~strike~~` · `` `code` `` | `_italic_` · `~strike~` · `` `code` `` | ✅ |
-| `- item`, two-space nest | `• item`, `◦ nested` | ✅ |
-| `[label](url)` | `<url\|label>` | ✅ |
-| `> quote` | `> quote` | ✅ |
-| `## Heading` | `Heading` | emphasis LOST — a bare line |
-| ```` ```sql ```` | ```` ``` ```` | language tag dropped |
-| a `\|` table | *(nothing)* | **DELETED** |
+| `**bold**` | bold | ✅ |
+| `*single*` | *italic* | ⚠️ the old mrkdwn mandate's bug, confirmed |
+| `_italic_` · `~~strike~~` · `` `code` `` | italic · strike · code | ✅ |
+| `- item`, nested | bulleted list, indented sub-items | ✅ |
+| `1. item` | numbered list | ✅ |
+| `[label](url)` | a real link | ✅ |
+| `> quote` | blockquote | ✅ |
+| a `\|` table | **a real table** | ✅ |
+| `## Heading` | bold — no larger, no hierarchy | works, but it is only bold |
+| ```` ```sql ```` | code block | ✅ |
 
-Two findings changed the code:
+**Code changed twice, and the second change reverted the first.** For about an
+hour `renderDeliveredBody` ran `stripMarkdownTables` and `headingsToBold` on
+every path. Both were deleted: each was destroying a construct Slack renders
+well. `renderDeliveredBody` now strips only the retired confidence affix, and
+the Markdown that streams to Slack goes as written.
 
-- **A table is not rendered badly — it is deleted.** Header, separator and every
-  row vanished, with the prose either side closed up around the hole. That is
-  strictly worse than the literal pipes assumed above: every other formatting
-  mistake is ugly and obvious, this one silently drops content and leaves a
-  fluent message behind. `stripMarkdownTables` already prevented it through the
-  bot; the rule is now stated with the real consequence.
-- **`## Heading` renders as an ordinary line** on the Markdown path, while the
-  mrkdwn path made it a bold line — the same reply rendering at two qualities
-  depending on which egress it took. Closed with `headingsToBold` in
-  `renderDeliveredBody`, so both paths give a heading weight.
+Tables degrade to bullets on the **mrkdwn paths only** — the blocks fallback and
+`postMessage`'s `text` — because a `section` block genuinely cannot hold one.
+That is a rare downgrade on a fallback, not a policy.
 
-*Caveat, stated because it bounds the claim: this went through a Slack client's
-own Markdown send path, and the read-back returns a message's text rather than
-its blocks. `chat.appendStream`'s field is documented as the same parser and the
-mapping matches, but it was not itself exercised. Nothing is load-bearing on the
-difference — the Worker converts before sending on every path.*
+`AGENT.md`, the draft judge and `slack.md` moved from *"never a table"* to
+*"use one when the content is a grid, 2–4 narrow columns"*. The judge's table
+hard-gate is gone.
+
+**Follow-up worth doing, not done:** email HTML could carry a real `<table>`
+(the block model is already there), and Notion has a table block. Both currently
+degrade to bullets, which is lossless but plainer than it needs to be.
 
 ### Notion, shipped the same day (rows 8, 9, 15)
 
