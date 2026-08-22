@@ -107,6 +107,7 @@ Useful context for grounding via `notion_search` catalog scopes (or Notion MCP i
 | `---` | `divider` |
 | `#`, `##`, `###` | `heading_3` — one level below the section heading containing it |
 | blank line | a new paragraph block |
+| a `\|` table | one bullet per row — Notion's API takes no Markdown table. Write the bullets yourself; this is a net, not a feature |
 
 **This was a real bug, not a nicety.** Until 2026-08-22 a body was split on blank lines into plain paragraphs with no parsing at all — so the `**Decision:** one sentence` shape prescribed above landed on the page as literal asterisks, and every bullet as a literal hyphen.
 

@@ -477,7 +477,7 @@
         },
         "body": {
           "type": "string",
-          "description": "Plain-text email body. Write it out fully — no placeholders."
+          "description": "Email body, written in standard Markdown — the same dialect as everywhere else. The Worker sends it as both plain text and HTML, so **bold**, _italic_, `code`, - bullets, 1. numbered, [label](url) links, > quotes, ```fenced code``` and --- dividers all render. Write it out fully — no placeholders. This is outward mail to someone outside the team: greeting, the point up front, and a sign-off."
         }
       }
     }

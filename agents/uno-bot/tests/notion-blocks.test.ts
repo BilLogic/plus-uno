@@ -221,6 +221,46 @@ describe("the shape the convention doc asks for", () => {
   });
 });
 
+describe("tables degrade rather than shipping literal pipes", () => {
+  // Notion's API takes no Markdown table and an email body renders one as
+  // pipes, so the same degradation Slack does has to happen here — otherwise
+  // the no-tables rule holds on one surface out of three.
+  const TABLE = [
+    "| Lane | Step | Owner |",
+    "|---|---|---|",
+    "| Tutor | Session prep | Ops |",
+    "| System | Day-of | — |",
+  ].join("\n");
+
+  it("turns each row into a bullet, keeping the column names", () => {
+    const blocks = markdownToNotionBlocks(TABLE);
+    assert.deepEqual(types(blocks), ["bulleted_list_item", "bulleted_list_item"]);
+    assert.equal(plain(blocks[0]!), "Lane: Tutor · Step: Session prep · Owner: Ops");
+    // The column names come through as real bold, not asterisks.
+    assert.equal(runs(blocks[0]!)[0]!.annotations?.bold, true);
+    assert.ok(!blocks.map(plain).join("").includes("|"));
+  });
+
+  it("falls back to a joined row when the shapes disagree", () => {
+    const ragged = "| a | b |\n|---|---|\n| 1 | 2 | 3 |";
+    assert.equal(plain(markdownToNotionBlocks(ragged)[0]!), "1 — 2 — 3");
+  });
+
+  it("does not mistake a divider for a table separator", () => {
+    assert.deepEqual(types(markdownToNotionBlocks("above\n\n---\n\nbelow")), [
+      "paragraph",
+      "divider",
+      "paragraph",
+    ]);
+  });
+
+  it("leaves a table inside a code fence alone", () => {
+    const [b] = markdownToNotionBlocks("```\n| a | b |\n|---|---|\n| 1 | 2 |\n```");
+    assert.equal(b!.type, "code");
+    assert.ok((b!.code as { rich_text: RichTextRun[] }).rich_text[0]!.text.content.includes("|"));
+  });
+});
+
 describe("Notion's request limits", () => {
   it("batches children at 100", () => {
     const blocks = Array.from({ length: 250 }, (_, i) => i);

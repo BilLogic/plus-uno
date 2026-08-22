@@ -208,6 +208,10 @@ const CODE_LANGUAGES: Record<string, string> = {
   xml: "xml", yaml: "yaml", yml: "yaml",
 };
 
+/** A table separator row: pipes, dashes and colons only, and at least one pipe
+ *  (so a bare `---` divider is not mistaken for one). */
+const TABLE_SEPARATOR = /^[\s|:-]+$/;
+
 const BULLET = /^(\s*)[-*+]\s+(.*)$/;
 const NUMBERED = /^(\s*)\d+[.)]\s+(.*)$/;
 const TODO = /^(\s*)[-*+]\s+\[([ xX])\]\s*(.*)$/;
@@ -284,6 +288,33 @@ export function markdownToNotionBlocks(markdown: string): NotionBlock[] {
 
     if (DIVIDER.test(line)) {
       pushBlock(block("divider", {}), false);
+      continue;
+    }
+
+    // A pipe table → one bullet per row, matching what Slack does
+    // (`slack/mrkdwn.ts` convertTables). Neither Notion's API nor an email
+    // body takes a Markdown table, so without this the pipes render literally
+    // — the same defect the Slack rule exists to prevent, on another surface.
+    // The model is told not to write tables at all; this is the net under it.
+    const next = lines[i + 1] ?? "";
+    if (line.includes("|") && next.includes("|") && TABLE_SEPARATOR.test(next.trim()) && next.includes("-")) {
+      flushParagraph();
+      lastListBlock = null;
+      const header = splitTableRow(line);
+      i += 2; // consume the header and the separator
+      while (i < lines.length && lines[i]!.includes("|") && lines[i]!.trim()) {
+        const cells = splitTableRow(lines[i]!);
+        // Pair each cell with its column name when the shapes agree — a bare
+        // "a — b — c" loses which column was which, and these rows are usually
+        // read for exactly that.
+        const text =
+          header.length === cells.length && header.some(Boolean)
+            ? cells.map((c, n) => (header[n] ? `**${header[n]}:** ${c}` : c)).join(" · ")
+            : cells.join(" — ");
+        if (text.trim()) blocks.push(textBlock("bulleted_list_item", text));
+        i++;
+      }
+      i--; // the for-loop increments
       continue;
     }
 
@@ -377,6 +408,10 @@ function splitOversizedParagraphs(blocks: NotionBlock[]): NotionBlock[] {
  * paragraphs, acceptance criteria, plus the two fixed headings — crosses 100
  * and the entire create 400s, so the card is never made.
  */
+function splitTableRow(line: string): string[] {
+  return line.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+}
+
 export function chunkBlocks<T>(blocks: T[], size = MAX_BLOCKS_PER_REQUEST): T[][] {
   if (blocks.length <= size) return blocks.length ? [blocks] : [];
   const out: T[][] = [];

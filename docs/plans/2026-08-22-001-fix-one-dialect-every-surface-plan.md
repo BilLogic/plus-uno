@@ -3,8 +3,9 @@ title: "One dialect, every surface: the model writes Markdown, each egress conve
 type: fix
 status: partially-implemented
 date: 2026-08-22
-implemented: "Slack (rows 1–3, 6-partial, 7, 11–13, 17) and Notion (rows 8–9, 15) — 2026-08-22"
-deferred: "Email (row 10), splitter (5), share-out (14), content-surfaces.md (16), UI-copy decision (19)"
+status: implemented
+implemented: "All three surfaces — Slack (rows 1–3, 6-partial, 7, 11–13, 17), Notion (8–9, 15), email (10) — 2026-08-22"
+deferred: "Splitter (5), share-out template (14), content-surfaces.md consolidation (16), UI-copy decision (19)"
 repos: plus-uno (agents/uno-bot, docs/conventions)
 related: docs/plans/2026-08-21-003-fix-how-uno-bot-takes-a-yes-plan.md
 ---
@@ -159,6 +160,46 @@ body, **outside** the `<!-- ide-only -->` fence. That fence is why this bug ran:
 all the formatting guidance was inside it, stripped from the bot's prompt, so
 the model had zero instruction on what goes in a body and defaulted to
 Markdown — correctly, into a parser that did not exist.
+
+### Email, shipped the same day (row 10)
+
+`src/integrations/email-render.ts` — and the notable thing is what it does
+*not* contain: a parser. It renders the block model `notion-blocks.ts` already
+produces, into plain text and into HTML. A second Markdown parser would have
+been a second copy of the snake_case rule, the link-scheme rule and the
+code-span rule, and they would have drifted.
+
+`gmail.ts` now sends `multipart/alternative` — both parts, least-rich first as
+the RFC requires. HTML alone would lose text-only readers and most
+accessibility tooling; plain text alone loses the structure, which is the whole
+point. In plain text a link becomes `label (url)`, which mail clients auto-link,
+so the URL — the part that is useless when lost — survives either way.
+
+Three things beyond the plan:
+
+- **A latent RFC bug, unrelated to Markdown, fixed in passing.** Parts were
+  sent as `7bit` with the body inline, and RFC 5322 caps a line at 998
+  characters. One long paragraph — routine in a PRD summary — exceeds it, and
+  a strict receiving MTA may reject or mangle the message. Both parts are now
+  base64 wrapped at 76 columns, so the declared encoding is finally true of
+  the bytes and non-ASCII is exact. Verified by building a real message and
+  parsing it back: max line 94, CRLF throughout, both parts decode, `Résumé —
+  ✅` intact.
+- **Two bugs my own tests caught.** `renderPlainText` ended with `.trim()`,
+  which ate the four-space indent of a body whose first block is a code block —
+  silently turning code back into prose. And HTML annotation nesting was
+  inside-out (`<em><strong>` for `**bold _and italic_**`); it now mirrors the
+  source.
+- **The no-tables rule is now global, and true.** I nearly documented "tables
+  are fine in email" — they are not: the shared parser had no table branch, so
+  a pipe table would have rendered as literal pipes in both Notion and email,
+  the exact defect the Slack rule exists to prevent. All three renderers now
+  degrade a table to one bullet per row, keeping the column names as bold
+  labels (better than Slack's older version, which drops the header).
+
+**Not verified:** a real send. The MIME is verified structurally, but nothing
+has gone through Gmail's API — worth one message to yourself before the first
+outward one.
 
 **Deferred, recorded so they are not forgotten** (rows 5, 6, 8–10, 14–16,
 18–19 below): the fence-aware splitter (only bites on replies > 3900 chars),

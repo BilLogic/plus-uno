@@ -78,6 +78,18 @@ Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading`
 
 Block Kit **is** wired (`delivery.ts` posts `section` blocks with a `text` fallback; proposal cards carry buttons via `interactive.ts`) — the claim that it wasn't stood in this file until 2026-08-22. `reply_broadcast` exists on `PostMessageInput` but is used only by a test route.
 
+### The same Markdown goes everywhere else too
+
+One dialect, three destinations — you write Markdown, the Worker renders it per surface:
+
+| Destination | Renderer | Notes |
+|---|---|---|
+| Slack | `slack/mrkdwn.ts` | this file — **no tables** |
+| Notion (`notion_create`, `notion_update`) | `integrations/notion-blocks.ts` | real blocks + annotations — `notion.md` § Writing a body |
+| Email (`email_send`) | `integrations/email-render.ts` | sent as plain text **and** HTML |
+
+**The no-tables rule is global, not a Slack quirk.** Notion's API takes no Markdown table and an email body renders one as literal pipes, so all three renderers degrade a table the same way: one bullet per row, `**Column:** value · **Column:** value`. Useful as a net; still worse than writing the bullets yourself.
+
 <details>
 <summary>Why this changed on 2026-08-22</summary>
 
