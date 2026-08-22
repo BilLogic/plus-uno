@@ -8,7 +8,7 @@ import {
   withTurnScope,
 } from "../agent/loop-shared";
 import { routeRequest } from "../agent/routing";
-import { fastPathAllowed, requiresReaction } from "../agent/resolution";
+import { fastPathAllowed, requiresReaction, typedResolution } from "../agent/resolution";
 import { resolveProposal } from "../agent/resolve-proposal";
 import {
   appendHistory,
@@ -579,12 +579,31 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   //   • No scope keyword — someone who typed `ds:` is asking something.
   const lastBotTurn = [...history].reverse().find((t) => t.role === "assistant")?.content ?? "";
   const botAskedSomething = /\?\s*$/.test(lastBotTurn.trim());
+  // "ok" / "go ahead" / "sounds good" / "perfect" are DECISIONS, and they are
+  // in reactOnlyEmoji's closed set as pleasantries. The guard above tries to
+  // tell the two apart from the BOT's side — did its last message end in "?" —
+  // which is the wrong side to look at and misses the case that mattered:
+  //
+  //   2026-08-21, Slack devoli. The bot drafted a ticket and closed with
+  //   "Once you give the thumbs up, I'll stage the ticket creation." No
+  //   question mark, nothing staged, DM. Bryan happened to type "sure go
+  //   ahead", which is not in the closed set, so it reached the model. Three
+  //   words further down that set — "ok", "sounds good" — and the bot would
+  //   have added an emoji, made no model call, filed nothing, and left him
+  //   believing he had approved it.
+  //
+  // Reading the USER's side is direct: a message that IS a resolution is an
+  // answer to something, never a pleasantry to react to. The AGENT.md rule
+  // that keeps a proposal staged makes this window rare; this makes it
+  // closed, without depending on the model following a prompt.
+  const readsAsDecision = typedResolution(userText) !== null;
   const reaction =
     isDm(channel) &&
     !pending &&
     !scoped &&
     history.length > 0 &&
     !botAskedSomething &&
+    !readsAsDecision &&
     (event.files?.length ?? 0) === 0
       ? reactOnlyEmoji(userText)
       : null;

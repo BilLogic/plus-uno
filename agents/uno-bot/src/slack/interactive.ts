@@ -100,7 +100,10 @@ export function handleInteraction(
 async function dispatchAction(env: Env, actionId: string, payload: InteractionPayload): Promise<void> {
   if (actionId === "uno_stop_run") return stopRun(env, payload);
   if (actionId === "uno_delete_answer") return deleteAnswer(env, payload);
-  return recordFeedback(env, payload);
+  // No silent catch-all. This used to fall through to the feedback handler,
+  // which meant an action_id nobody had wired reached a function that ignored
+  // it — a dead button that looked alive. Say so in the log instead.
+  console.warn(`[interactive] no handler for action_id=${actionId}`);
 }
 
 // The Home-tab Stop button. See home.ts for why it exists alongside `/stop`.
@@ -140,40 +143,30 @@ async function deleteAnswer(env: Env, payload: InteractionPayload): Promise<void
   console.log(`[interactive] delete ${channel}/${ts} ok=${res.ok} by=${payload.user?.id ?? "?"}`);
 }
 
-// Feedback buttons (👍/👎) on a bot answer. The vote is logged, not stored:
-// Slack's data policy forbids retaining retrieved workspace content, and a
-// thumbs-down is only useful next to the message it judges — which lives in
-// Slack. The acknowledgement replaces the buttons so a second vote is not
-// invited, and so the voter can see it registered.
+// The 👍/👎 answer footer was removed on 2026-08-21 (Bill).
 //
-// `uno_feedback` is the NATIVE `feedback_buttons` element, which reports both
-// verdicts under one action_id and puts the choice in the action's `value`.
-// The two `uno_feedback_up`/`_down` ids are the hand-rolled buttons. Both
-// renderings ship (see delivery.ts) so both are read here.
-const FEEDBACK_ACTIONS = new Set(["uno_feedback_up", "uno_feedback_down", "uno_feedback"]);
-
-async function recordFeedback(env: Env, payload: InteractionPayload): Promise<void> {
-  const action = payload.actions?.[0];
-  const actionId = action?.action_id;
-  if (!actionId || !FEEDBACK_ACTIONS.has(actionId)) return;
-
-  const verdict =
-    actionId === "uno_feedback" ? (action?.value === "down" ? "down" : "up") : actionId === "uno_feedback_up" ? "up" : "down";
-  console.log(
-    `[feedback] ${verdict} user=${payload.user?.id ?? "?"} channel=${payload.channel?.id ?? "?"} ts=${payload.message?.ts ?? "?"}`,
-  );
-
-  if (!payload.response_url) return;
-  const note =
-    verdict === "up"
-      ? ":white_check_mark: Noted — thanks."
-      : ":pencil: Noted — thanks. If you have a second, say what was off and I'll use it.";
-
-  // replace_original swaps the message that carried the buttons, so the
-  // acknowledgement lands where the vote was cast rather than as a new message.
-  await countedFetch(payload.response_url, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ replace_original: false, response_type: "ephemeral", text: note }),
-  });
-}
+// It asked for something the system could not accept. Slack's data policy
+// forbids retaining retrieved workspace content, so the vote could only ever
+// be logged, never stored — one unstructured console line per press, rolling
+// away unread. Nothing counted it, nothing could query it. A 👎 was a person
+// telling us something into a void, under every substantive answer.
+//
+// The acknowledgement also claimed to replace the buttons "so a second vote is
+// not invited" while sending `replace_original: false`, so it never did: one
+// person could vote as many times as they liked. Any future aggregation would
+// have been meaningless before it started.
+//
+// And it cost more than nothing. 👍 was a confirm REACTION on staged proposals
+// until the same day, so the product spent months putting a thumbs-up under
+// every answer while one flavour of thumbs-up meant "yes, write to Notion".
+// Buttons and reactions are different Slack mechanisms and this button never
+// fired a write — but a person told to "give the thumbs up" reaches for
+// whichever is closer.
+//
+// What remains in the footer is the part that was doing the work: the honesty
+// line ("LLM-written · check before acting"). It is prose and needs no handler.
+//
+// If a feedback signal is wanted later, the honest shape is a WRITTEN one — a
+// reply in the thread, which is where the analysable signal already lives, and
+// which is what the retired 👎 acknowledgement asked for and then had nowhere
+// to put.

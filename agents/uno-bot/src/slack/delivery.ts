@@ -172,67 +172,35 @@ function textSections(body: string): Array<Record<string, unknown>> {
 
 // ── The answer footer ────────────────────────────────────────────────────────
 //
-// Two renderings of the same thing, chosen by env.SLACK_NATIVE_FEEDBACK:
+// One line of prose, and nothing to press.
 //
-//   off (default) — hand-rolled `actions` buttons. What has shipped for months.
-//   on            — Slack's native `context_actions` block, with the
-//                   `feedback_buttons` element and an `icon_button` delete.
+// It used to carry 👍/👎 buttons, and behind a flag a Slack-native variant of
+// the same pair plus a delete control. Both went on 2026-08-21; the reasoning
+// for the votes is in interactive.ts, where the handler used to be.
 //
-// Why a flag rather than a swap. The native block is the right answer — it is
-// the affordance Slack renders natively on the agent surface, it does not
-// occupy a full-width row, and the delete control has no hand-rolled
-// equivalent at all. But an invalid block does not fail loudly here: delivery
-// already degrades to plain text on a block error, which would silently drop
-// the footer from EVERY answer while looking fine. The two renderings are
-// behaviourally identical from `recordFeedback`'s side (same action_ids), so
-// this can be turned on, eyeballed once on a real answer, and made the default
-// in a one-line change.
+// DELETE went too, and that one was a real decision rather than collateral.
+// The argument for it was good — a wrong answer sitting in a channel is a
+// wrong answer someone quotes three weeks later. The argument against it is
+// better, and it is about this codebase specifically: `buildThreadHistory`
+// rebuilds every turn by re-reading the raw Slack thread. A deleted bot
+// message is gone from that read, so deleting a wrong answer also deletes:
 //
-// action_ids match the handlers wired in interactive.ts.
-function feedbackControls(env: Env): Array<Record<string, unknown>> {
-  if (env.SLACK_NATIVE_FEEDBACK !== "on") {
-    return [
-      {
-        type: "actions",
-        elements: [
-          { type: "button", text: { type: "plain_text", text: "👍", emoji: true }, action_id: "uno_feedback_up", value: "up" },
-          { type: "button", text: { type: "plain_text", text: "👎", emoji: true }, action_id: "uno_feedback_down", value: "down" },
-        ],
-      },
-    ];
-  }
-  return [
-    {
-      type: "context_actions",
-      elements: [
-        {
-          type: "feedback_buttons",
-          action_id: "uno_feedback",
-          positive_button: { text: { type: "plain_text", text: "👍" }, value: "up" },
-          negative_button: { text: { type: "plain_text", text: "👎" }, value: "down" },
-        },
-        // Delete is not a nicety on an agent surface. A wrong answer sitting in
-        // a channel is a wrong answer people quote later; letting the asker
-        // remove it is cheaper than any correction we could post.
-        {
-          type: "icon_button",
-          icon: "trash",
-          text: { type: "plain_text", text: "Delete" },
-          action_id: "uno_delete_answer",
-          value: "delete",
-        },
-      ],
-    },
-  ];
-}
-
-function footerBlocks(env: Env, kind: FooterKind): Array<Record<string, unknown>> {
+//   • the bot's own memory of having said it — `priorAssistantText`, which the
+//     correction gate compares a corrected reply against, so the one turn the
+//     judge has something to catch is the one it can no longer see;
+//   • the record the team analyses performance from, leaving a correction in
+//     the thread with nothing left to correct.
+//
+// A wrong answer with its correction underneath is a better artefact than a
+// gap. If channel hygiene becomes the real problem, the shape to reach for is
+// striking the answer through in place — which keeps the thread whole.
+//
+// `kind === "none"` still means no footer at all: a short acknowledgement is
+// not making checkable claims and does not need the label.
+function footerBlocks(_env: Env, kind: FooterKind): Array<Record<string, unknown>> {
   if (kind === "none") return [];
   const note = footerNoteFor(kind);
-  return [
-    ...feedbackControls(env),
-    ...(note ? [{ type: "context", elements: [{ type: "mrkdwn", text: note }] }] : []),
-  ];
+  return note ? [{ type: "context", elements: [{ type: "mrkdwn", text: note }] }] : [];
 }
 
 export async function postTextVerified(

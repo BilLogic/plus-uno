@@ -146,7 +146,6 @@ export interface Env {
    *  Off by default only because an invalid block degrades SILENTLY here —
    *  delivery falls back to plain text, which would drop the footer from every
    *  answer while looking fine. Verify once on a real answer, then default it. */
-  SLACK_NATIVE_FEEDBACK?: string;
   /** "on" enables Phase 5 context management: the derived {goal, constraints,
    *  decisions, artifacts} block, progressive summarisation of long histories,
    *  and drift detection. OFF by default and gated on case-by-case judged-eval

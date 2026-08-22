@@ -78,6 +78,38 @@ describe("Bryan's confirmation, both ways", () => {
   });
 });
 
+describe("a decision is never mistaken for a pleasantry", () => {
+  // The silent-swallow path, and the reason Bryan's ticket got filed only by
+  // luck. In a DM, with nothing staged, after a bot message not ending in "?",
+  // the react tier answers with an emoji and makes NO model call. Its closed
+  // set of pleasantries contains "ok", "sounds good", "perfect" — every one of
+  // which is also how a person says yes.
+  //
+  // The bot's draft ended "Once you give the thumbs up, I'll stage the ticket
+  // creation." — no question mark, so the tier was armed. Bryan happened to
+  // type "sure go ahead", which is not in that set. Three words further down
+  // it and he would have got a 👍 reaction, no card, and no idea.
+  //
+  // events.ts now checks the USER's side: anything that reads as a resolution
+  // is an answer to something and must reach the model.
+  it("treats every pleasantry that is also a yes as a decision", () => {
+    for (const text of ["ok", "okay", "sounds good", "perfect", "yep", "sure", "great"]) {
+      assert.notEqual(
+        typedResolution(text),
+        null,
+        `"${text}" must read as a decision, or the react tier can eat it`,
+      );
+    }
+  });
+
+  it("leaves genuine pleasantries alone", () => {
+    // These are not decisions and should still be free to get an emoji.
+    for (const text of ["thanks", "thank you", "nice work", "amazing", "haha"]) {
+      assert.equal(typedResolution(text), null, text);
+    }
+  });
+});
+
 describe("the two paths cannot both fire", () => {
   it("agrees on what confirm and cancel mean", () => {
     // The reaction path and the text path resolve the same proposal through
