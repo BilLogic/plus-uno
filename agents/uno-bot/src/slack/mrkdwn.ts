@@ -1,8 +1,18 @@
-// CommonMark → Slack mrkdwn coercion. The model is told to emit Slack mrkdwn
-// (docs/conventions/slack.md), but under load it slips back into GitHub-flavored
-// Markdown — `## headings`, `**bold**`, and `| tables |`, none of which Slack
-// renders. Rather than trust the prompt, we sanitize at the single egress point
-// (slack/api.ts postMessage), so every outgoing message is valid mrkdwn.
+// Markdown → Slack mrkdwn coercion, for the paths that need mrkdwn.
+//
+// Since 2026-08-22 the model writes STANDARD MARKDOWN (`AGENT.md`,
+// `docs/conventions/slack.md`) — the dialect it writes best, and the dialect
+// Slack's own `markdown_text` field takes, which is how a streamed reply
+// ships. Two paths still need mrkdwn, and both run through here:
+//
+//   • the blocks fallback (`section` blocks are mrkdwn-only) — delivery.ts
+//   • `chat.postMessage`'s `text` field — api.ts postMessage
+//
+// Before that date the arrangement was inverted: the prompt mandated mrkdwn,
+// this file existed to catch the model "slipping" into Markdown, and the
+// streaming path — every real reply — sent that mrkdwn into a Markdown parser,
+// where `*bold*` is italic and `<url|label>` is nothing. The model was being
+// asked for the one dialect that rendered worst.
 //
 // Safe on already-correct mrkdwn (idempotent): Worker-authored messages use
 // `*bold*`, `•` bullets, and `<url|label>` links, none of which these rules
@@ -13,7 +23,37 @@
 export function toSlackMrkdwn(input: string): string {
   if (!input) return input;
   const parts = input.split(/(```[\s\S]*?```)/g);
-  return parts.map((seg, i) => (i % 2 === 1 ? seg : transformSegment(seg))).join("");
+  return parts
+    .map((seg, i) => (i % 2 === 1 ? stripFenceLanguage(seg) : transformSegment(seg)))
+    .join("");
+}
+
+/**
+ * Tables, and nothing else — for the Markdown path.
+ *
+ * **Slack renders no table in any message format**: not mrkdwn, not Block Kit,
+ * not `markdown_text`. A pipe table ships as literal pipes and is the single
+ * most visible way a reply comes out wrong. The prompt says so and the draft
+ * judge fails a draft carrying one; this is the third net, for the drafts too
+ * short to be judged.
+ *
+ * Fence-protected, so a table inside a code block — where the pipes are the
+ * point — is left alone.
+ */
+export function stripMarkdownTables(input: string): string {
+  if (!input || !input.includes("|")) return input;
+  const parts = input.split(/(```[\s\S]*?```)/g);
+  return parts.map((seg, i) => (i % 2 === 1 ? seg : convertTables(seg))).join("");
+}
+
+/**
+ * ```` ```js ```` → ```` ``` ````. Slack's mrkdwn code blocks take no info
+ * string, so a language tag renders as a literal first line inside the block.
+ * Only the opening fence of a multi-line block is touched — an inline
+ * ```` ```x``` ```` has no newline and is left alone.
+ */
+function stripFenceLanguage(fenced: string): string {
+  return fenced.replace(/^```[ \t]*[A-Za-z0-9_+#-]*[ \t]*(?=\n)/, "```");
 }
 
 function transformSegment(seg: string): string {

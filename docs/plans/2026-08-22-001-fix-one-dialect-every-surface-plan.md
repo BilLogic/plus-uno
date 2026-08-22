@@ -1,8 +1,10 @@
 ---
 title: "One dialect, every surface: the model writes Markdown, each egress converts"
 type: fix
-status: active
+status: partially-implemented
 date: 2026-08-22
+implemented: "Slack half (rows 1–3, 6-partial, 7, 11–13, 17) — 2026-08-22"
+deferred: "Notion + email (rows 8–10), splitter (5), share-out (14), content-surfaces.md (16), UI-copy decision (19)"
 repos: plus-uno (agents/uno-bot, docs/conventions)
 related: docs/plans/2026-08-21-003-fix-how-uno-bot-takes-a-yes-plan.md
 ---
@@ -72,6 +74,48 @@ path and needs no new code. The cut:
 
 That is the whole Slack fix. The model writes what it writes best, Slack's
 agent field renders it, the one thing Slack cannot render is caught twice.
+
+### What actually shipped, 2026-08-22
+
+Close to the above, with three additions found while doing it:
+
+- `AGENT.md:140` now says *"Write standard Markdown"*; the `<url|label>`
+  citation rule (`:25`), the literal-`•` preview rule (`:115`) and the
+  duplicate length number (`:137`) went with it. The draft judge's formatting
+  gate became a **table** gate plus a bracket-citation gate, and its `revised`
+  instruction asks for Markdown.
+- `stripMarkdownTables` (new, fence-protected) runs inside
+  `renderDeliveredBody`, so tables die on **every** path — stream, blocks and
+  text — before the cap, and the delivered body matches what history records.
+- `textSections` now runs `toSlackMrkdwn` over the whole body before splitting.
+  This was the second real bug: the blocks path shipped the **raw** body, and
+  Slack renders blocks over `text`, so the sanitized copy was seen by nothing
+  but notifications. Every `**bold**` on that path reached people as asterisks.
+- **Addition 1 — the six skill files.** `skills/*/bot.md` carry the per-skill
+  output templates and are bundled into the same prompt. All six still
+  mandated mrkdwn (`*bold*` labels, literal `•` bullets, `<url|label>` links),
+  which would have fought the new rule on exactly the replies that use a
+  template. Converted.
+- **Addition 2 — the fence language tag.** `toSlackMrkdwn` now strips it:
+  mrkdwn code blocks take no info string, so ```` ```ts ```` rendered "ts" as a
+  literal first line inside the block on the blocks path, while `AGENT.md`
+  asks for language tags (correct for Markdown). Both can now be true.
+- **Addition 3 — two false claims in the new doc, caught on re-read.** The
+  first draft of `slack.md` said escaping `& < >` is "the Worker's job" —
+  nothing escapes them, and on the Markdown path an `&amp;` renders literally,
+  so it now says don't hand-escape and names the one real hazard (text that
+  looks like a Slack token). It also banned tables while using them for
+  reference, so it now says so explicitly.
+- `tests/mrkdwn.test.ts` (11 assertions) and `src/slack/mrkdwn.ts` added to
+  `tsconfig.test.json` — the module was not previously compiled by `npm test`.
+- Row 17's `layer` → `lane` sweep done in `terminology.md`, `supabase.md`,
+  `AGENTS.md`; row 13's stale "Block Kit is not wired" replaced with what the
+  code does.
+
+**Not verified:** the live `markdown_text` probe. Everything above follows
+Slack's documented contract for that field, and if the parser turns out lenient
+on `*single*` then the old dialect worked too — no regression either way. Worth
+one real reply's eyeball, alongside the proposal card's.
 
 **Deferred, recorded so they are not forgotten** (rows 5, 6, 8–10, 14–16,
 18–19 below): the fence-aware splitter (only bites on replies > 3900 chars),

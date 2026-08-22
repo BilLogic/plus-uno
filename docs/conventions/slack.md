@@ -33,30 +33,56 @@ cc @reviewers — by [date]
 
 Decisions reached in threads are written to **Decisions DB** (row with **Roadmap Card** = the project + **Evidence** = Slack permalink) **before** the thread is considered resolved. Do not append to obsolete Decision Log subpages.
 
-**Reactions outside the gates are free-form — and they're the bot's wit channel.** uno-bot may react with any workspace emoji — standard or custom — to acknowledge, celebrate, or signal state (e.g. 🛠 working, 🎉 shipped, or a fitting custom emoji; 👀/⏳/✅/⚠️ are the Worker's automatic signals — the bot doesn't duplicate them). Replies are word-budgeted; reactions aren't — content-matched and specific beats a reflexive 👍 (register details: `agents/uno-bot/AGENT.md § Slack etiquette`). Only the gate semantics above are reserved: ✅/❌ carry meaning on proposal cards and review verdicts, so the bot never reacts with those on a pending proposal itself.
+**Reactions outside the gates are free-form — and they're the bot's wit channel.** uno-bot may react with any workspace emoji — standard or custom — to acknowledge, celebrate, or signal state (e.g. 🛠 working, 🎉 shipped, or a fitting custom emoji; 👀/⏳/✅/⚠️ are the Worker's automatic signals — the bot doesn't duplicate them). Replies are word-budgeted; reactions aren't — content-matched and specific beats a reflexive 👍 (register details: `agents/uno-bot/AGENT.md § Slack etiquette`). Only the gate semantics above are reserved: ✅ (and 👍) and ⛔ (and ❌) carry meaning on proposal cards, and ✅/🔁/❌ on review verdicts, so the bot never reacts with those on a pending proposal itself.
 
-## Message formatting — Slack mrkdwn (NOT CommonMark)
+## Message formatting — write standard Markdown
 
-Every message renders as Slack **mrkdwn** (the Worker's `postMessage` defaults `mrkdwn: true`). It is *not* standard Markdown — these are the differences that actually bite:
+**Write standard Markdown.** `**bold**`, `_italic_`, `- bullets`, `1. numbered`, `[label](url)`, `> quote`, `` `code` ``, fenced blocks with a language tag. Slack's agent message field (`markdown_text`) renders it directly, and the Worker converts on the paths that need a different form. *(Rule changed 2026-08-22 — see the note at the end of this section.)*
 
-| Write | Renders | Gotcha vs Markdown |
+**Two things Markdown cannot express, and one it can't render:**
+
+| Thing | Write | Why |
 |---|---|---|
-| `*text*` | **bold** | single `*` — `**text**` does NOT bold |
-| `_text_` | _italic_ | underscore, not `*` |
-| `~text~` | ~~strike~~ | single `~` |
-| `` `code` `` / ```` ```block``` ```` | code | fine; blocks take no language hint |
-| `> quote` | quote | `>` at line start |
-| `<url\|label>` | link | **pipe syntax** — Markdown's square-bracket-then-parens link form renders literally |
-| `<@U…>` | @person | encode the **user ID**, never `@handle` |
-| `<#C…>` | #channel | channel **ID** in angle brackets |
-| `<!here>` / `<!channel>` | broadcast | special tokens — use almost never |
-| `:emoji:` / 🎯 | emoji | both work |
-| `•` + `\n` | bullet | **no list syntax** — literal `•` + newline (no `-` / `1.`) |
-| — | heading | **no `#` headings** — use a `*Bold label*` line |
-| — | table | **no Markdown tables** — the pipes render literally; use `•` bulleted lines |
-| `&` `<` `>` | literal | escape to `&amp;` `&lt;` `&gt;` in body text |
+| A person | `<@U01ABCDEF>` | the **user ID**, never `@handle` — a handle is plain text and pings nobody |
+| A channel | `<#C0ARJ2A3A69>` | the channel **ID** in angle brackets |
+| A broadcast | `<!here>` / `<!channel>` | needs installer permission, reads as noise — use almost never |
+| **A table** | **don't** | see below |
 
-**House rule: plain mrkdwn only.** Write mrkdwn directly — but as a backstop the Worker coerces every outgoing message (`agents/uno-bot/src/slack/mrkdwn.ts`, applied at `api.ts` `postMessage`), converting stray `##` headings, `**bold**`, `| tables |`, and markdown bracket-links to their mrkdwn equivalents. Don't rely on it; the model should emit mrkdwn, the sanitizer just guarantees it. The Worker (`api.ts`) posts plain `text` — Block Kit and `reply_broadcast` are not wired. Don't prescribe buttons, modals, or block layouts the code can't send. (If we ever adopt block-based gates, `api.ts` must first set a top-level `text` fallback — screen readers and notifications read `text`, not blocks.)
+### No tables. Ever. In any format.
+
+**Slack renders no table** — not in mrkdwn, not in Block Kit, not in `markdown_text`. A `| a | b |` table ships to the reader as literal pipes and dashes, and it is the single most visible way a reply comes out wrong.
+
+Write one of these instead:
+
+```
+- Tutor · Session prep — sends the reminder 24h out
+- Ops · Day-of — calls if unconfirmed by 10:00
+```
+
+or, when each row needs more than a line, a short `**Bold label**` paragraph per row. Three nets enforce this, because it keeps happening: the rule above, a hard gate in the draft judge, and `stripMarkdownTables` in the Worker's renderer, which turns any surviving table into `•` lines before the message ships.
+
+**The tables in this file are not a counter-example.** Convention docs are reference material for you to read; a Slack message is output for a person to read. Format your replies by the rule, not by the document.
+
+### What the Worker does on each path
+
+| Path | What is sent | Converted by |
+|---|---|---|
+| Streamed reply (every ordinary answer) | `markdown_text` — your Markdown, as written | nothing; tables already stripped in `renderDeliveredBody` |
+| Blocks fallback (stream failed) | `section` blocks, which are mrkdwn-only | `toSlackMrkdwn` in `textSections` |
+| `chat.postMessage` `text` | mrkdwn | `toSlackMrkdwn` in `postMessage` |
+| Proposal card | mrkdwn sections + ✅/⛔ buttons | `toSlackMrkdwn` via `textSections` |
+
+Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading` → `*Heading*`, `[label](url)` → `<url|label>`, tables → `•` lines, and strips the fence language tag (mrkdwn code blocks take no info string).
+
+**Don't hand-escape `&` `<` `>`.** Nothing escapes them and nothing should: on the Markdown path an `&amp;` would render as literal `&amp;`. Raw angle brackets in prose are fine. The one case to watch is text that *looks* like a Slack token — `<@`, `<#`, `<http` — which Slack will try to resolve; put that in backticks.
+
+Block Kit **is** wired (`delivery.ts` posts `section` blocks with a `text` fallback; proposal cards carry buttons via `interactive.ts`) — the claim that it wasn't stood in this file until 2026-08-22. `reply_broadcast` exists on `PostMessageInput` but is used only by a test route.
+
+<details>
+<summary>Why this changed on 2026-08-22</summary>
+
+Until then this file mandated Slack **mrkdwn** (`*single*` bold, literal `•`, `<url|label>`), the Worker's converter assumed Markdown *in* and mrkdwn *out*, and the live streaming path sent the body to Slack's `markdown_text` field — which is standard Markdown. Three layers, three assumed formats. A model that obeyed the prompt perfectly rendered *worst* (in Markdown, `*bold*` is italic and `<url|label>` is nothing); a model that "slipped" into `**bold**` rendered correctly. The bot was fighting its own instructions. Fixed by picking the dialect the model writes best and Slack's agent field takes natively, and converting in code wherever something else is needed.
+</details>
 
 ## Threading & mentions
 
@@ -69,13 +95,13 @@ Every message renders as Slack **mrkdwn** (the Worker's `postMessage` defaults `
 Applies the house voice (`writing-style.md`) to chat; the bot's specific register lives in `agents/uno-bot/AGENT.md § Identity & voice`.
 
 - **Lead with the answer / outcome** — no preamble, no restating the ask back.
-- **Glanceable, not paragraphs.** `*Bold label*` lines + `•` bullets for structure; don't over-format.
-- **Summarize, link the artifact** (`<url|label>`) — don't transcribe steps.
+- **Glanceable, not paragraphs.** `**Bold label**` lines + `-` bullets for structure; don't over-format.
+- **Summarize, link the artifact** (`[label](url)`) — don't transcribe steps.
 - **Human, contraction-y, low ceremony.** Brief and clear over formal; no jokes that don't serve the task.
 - **Errors are actionable** — name 2–3 next steps (retry / adjust / escalate), never a bare "something went wrong."
 - **Confirm before real-world side-effects** (the proposal gate) — but gate only genuinely risky ops; no confirmation fatigue.
 - **On behalf of** — acting for a person, say so, and surface what was done + a link.
-- **One length rule, and it lives here.** Past ~1,500 chars of prose (lists are exempt — they stay scannable at any length), lead with a 2–3 bullet summary and put the detail after it. Hard ceiling ~4,000 chars: past that, thread the detail or append it to the relevant Notion card and link it. There is no Gist tool.
+- **One length rule, and it lives here.** Past ~1,500 chars of prose (lists are exempt — they stay scannable at any length), lead with a 2–3 bullet summary and put the detail after it. The hard ceiling is **3,900 characters** — `MAX_POST_CHARS` in `agents/uno-bot/src/slack/delivery.ts`, which truncates with a note past it. Beyond that, thread the detail or append it to the relevant Notion card and link it. There is no Gist tool. *(Every other number that used to float around — "~4,000" here, ">3000" in `AGENT.md` — now points at this one.)*
 
 <!-- Grounded in Slack's own docs (fetched 2026-07-08): Formatting message text · Block Kit · chat.postMessage · Agent design · App design guidelines. -->
 

@@ -21,14 +21,14 @@ Slack delta only. The shared procedure (taxonomy, tiers, gates) is `references/m
 
 ## Output — the review-request post
 
-Slack mrkdwn, self-sufficient (assume the reviewer never opens the PR), only what the PR / PRD / Figma actually show:
+Slack-ready Markdown, self-sufficient (assume the reviewer never opens the PR), only what the PR / PRD / Figma actually show:
 
 ```
-*Maintenance — {target}*
-*What* • {the change, one line}
-*Why* • {the reason}  <{prd}|PRD>
-*Change* • <{pr}|PR>
-*Reviewers* • {suggested people via notion_search, scope: "team"}
+**Maintenance — {target}**
+**What** — {the change, one line}
+**Why** — {the reason}  [PRD]({prd})
+**Change** — [PR]({pr})
+**Reviewers** — {suggested people via notion_search, scope: "team"}
 ```
 
 After posting, the thread waits on the reviewer. Scannable, not a transcript.

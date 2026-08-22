@@ -63,8 +63,8 @@ Two estates describe the product in **different languages**, and the words are N
 | | **uno-blueprint** (Supabase) | **Notion Roadmap** (Design HQ board) |
 |---|---|---|
 | What it holds | how the **service works**: who does what, when | what the **team is building**: work items + their status |
-| Its words | **phase** · **service scenario** · **path** (identified by NAME, not `path_type` — `blueprint-navigation.md` § Path semantics) · **step** · **layer** = the actor row · **cell** = one activity at layer × step | **Roadmap** · **card** (id = **RM-ID**, `RM-<n>`) · **Design Status** · **Product Pillar** · **Product Tag** · **owner** · **PRD** |
-| NOT its words | "roadmap", "card", "Design Status", "pillar", "owner", "WIP", "under review" — **the blueprint has no cards and no statuses** | "scenario", "layer", "cell", "path", "step", "phase", "actor" — **the Roadmap has no service steps or actor rows** |
+| Its words | **phase** · **service scenario** · **path** (identified by NAME, not `path_type` — `blueprint-navigation.md` § Path semantics) · **step** · **lane** = the actor row · **cell** = one activity at lane × step | **Roadmap** · **card** (id = **RM-ID**, `RM-<n>`) · **Design Status** · **Product Pillar** · **Product Tag** · **owner** · **PRD** |
+| NOT its words | "roadmap", "card", "Design Status", "pillar", "owner", "WIP", "under review" — **the blueprint has no cards and no statuses** | "scenario", "lane", "cell", "path", "step", "phase", "actor" — **the Roadmap has no service steps or actor rows** |
 
 **Topic words overlap; frame words don't.** "Goal Setting" is both a blueprint *scenario* and a Roadmap *card topic* — the topic never tells you which estate to read. The **frame words in the question** do:
 

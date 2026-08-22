@@ -26,7 +26,7 @@ Get work in front of people: feedback share-outs (`shareout_post`), handoff sign
 
 ## Output
 
-Slack mrkdwn. Search results: `*{id} — {title}* ({stage}, {pillar})` + creators, `<url|view deployment>` or "not deployed", updated date; >25 → truncate with "(showing first 25 of {n})". Success messages (PR link, post link) are posted by the Worker — describe outcomes in future/conditional tense only. Errors: `❌ Couldn't {action}: {reason}.` with valid options named.
+Slack-ready Markdown. Search results: `**{id} — {title}** ({stage}, {pillar})` + creators, `[view deployment](url)` or "not deployed", updated date; >25 → truncate with "(showing first 25 of {n})". Success messages (PR link, post link) are posted by the Worker — describe outcomes in future/conditional tense only. Errors: `❌ Couldn't {action}: {reason}.` with valid options named.
 
 ## Hand-offs
 

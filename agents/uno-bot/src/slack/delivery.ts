@@ -5,6 +5,7 @@
 import type { Env } from "../types";
 import { addReaction, appendStream, postMessage, startStream, stopStream } from "./api";
 import { footerKindFor, footerNoteFor, type FooterKind } from "./footer-kind";
+import { stripMarkdownTables, toSlackMrkdwn } from "./mrkdwn";
 import { buildFailureMessage, type FailureStage } from "./failure-message";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
@@ -140,7 +141,15 @@ function stripTrailingConfidence(text: string): string {
  * drift apart again.
  */
 export function renderDeliveredBody(text: string): string {
-  const cleaned = stripTrailingConfidence(text);
+  // Tables die here, on every path, before the cap.
+  //
+  // The model writes standard Markdown (2026-08-22) and Slack renders it —
+  // except tables, which Slack renders in NO message format. The prompt says
+  // so and the draft judge fails a draft carrying one, but the judge skips
+  // anything under MIN_DRAFT_CHARS, and a three-row table is short. Doing it
+  // in the renderer means the rule holds on the body that actually ships,
+  // which is the same reason the confidence strip lives here (ADR-019).
+  const cleaned = stripMarkdownTables(stripTrailingConfidence(text));
   return cleaned.trim()
     ? capText(cleaned)
     : "(I came back with an empty answer — that's a bug on my side. Try rephrasing, and flag this to the team.)";
@@ -158,7 +167,15 @@ export function renderDeliveredBody(text: string): string {
 const SECTION_CHARS = 2900;
 export function textSections(body: string): Array<Record<string, unknown>> {
   const chunks: string[] = [];
-  let rest = body;
+  // A `section` block's text is mrkdwn — NOT the Markdown the model writes and
+  // NOT what `markdown_text` takes on the stream path. Convert once, before
+  // splitting, so the fence-protection in toSlackMrkdwn sees balanced input.
+  //
+  // Until 2026-08-22 this path shipped the raw body: `postMessage` converted
+  // the `text` field only, blocks render over `text`, so the sanitized copy was
+  // seen by nothing but notifications and screen readers. Every `**bold**` in a
+  // blocks-path reply reached people as literal asterisks.
+  let rest = toSlackMrkdwn(body);
   while (rest.length > SECTION_CHARS) {
     const window = rest.slice(0, SECTION_CHARS);
     const brk = Math.max(window.lastIndexOf("\n"), window.lastIndexOf(" "));
