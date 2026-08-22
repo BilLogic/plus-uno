@@ -13,10 +13,10 @@
 
 /** Tokens that mean yes on their own. */
 const AFFIRM_STRONG = new Set([
-  "yes", "yeah", "yep", "yup", "yup", "aye",
+  "yes", "yeah", "yep", "yup", "aye",
   "sure", "ok", "okay", "okey",
   "confirm", "confirmed", "confirming",
-  "approve", "approved", "approv",
+  "approve", "approved",
   "ahead", "proceed", "ship", "lgtm",
   "good", "great", "perfect",
 ]);
@@ -36,10 +36,19 @@ const NEUTRAL = new Set([
   "mind",
 ]);
 
-/** Tokens that mean no on their own. */
+/**
+ * Tokens that mean no on their own.
+ *
+ * NOT "wait" or "hold". Those mean PAUSE, and cancelling on them is the
+ * ungraceful reading: someone who types "wait" wants a moment, and destroying
+ * their staged proposal makes them ask for the whole thing again. They fall
+ * through to the model, which can hold the card and answer. Same for anything
+ * else that is hesitation rather than refusal — when the two readings differ,
+ * the model gets it, because only the model can ask.
+ */
 const NEGATE_STRONG = new Set([
   "no", "nope", "nah", "cancel", "cancelled", "stop", "abort",
-  "nevermind", "never", "dont", "wait", "hold", "scrap", "drop", "skip",
+  "nevermind", "never", "dont", "scrap", "drop",
 ]);
 
 /**

@@ -97,6 +97,23 @@ describe("bare resolution — refusing", () => {
   it("refuses an unrelated message that merely contains a yes-word", () => {
     assert.equal(bareResolution("the answer is yes for scenario three"), null);
   });
+
+  it("does not read hesitation as refusal", () => {
+    // "wait" and "hold" were in the cancel vocabulary until 2026-08-21.
+    // Someone typing "wait" wants a moment, not a cancellation — and
+    // cancelling destroys the staged proposal, so they have to ask for the
+    // whole thing again. When two readings differ, the model gets it, because
+    // only the model can ask which was meant.
+    for (const text of ["wait", "hold", "hold on", "one sec", "hang on"]) {
+      assert.equal(bareResolution(text), null, text);
+    }
+  });
+
+  it("still refuses on an actual withdrawal", () => {
+    for (const text of ["scrap it", "drop it", "abort"]) {
+      assert.equal(bareResolution(text), "cancel", text);
+    }
+  });
 });
 
 describe("typed emoji", () => {
