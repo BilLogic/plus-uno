@@ -76,13 +76,25 @@ jobs:
     runs-on: ubuntu-latest
     # The approval gate in front of CLOUDFLARE_API_TOKEN. See the header.
     environment: uno-bot-production
+    # Hoisted so a STEP can branch on whether the token exists.
+    #
+    # `secrets` is not one of the contexts GitHub allows in a step-level `if:`
+    # — only job-level `env`, `with` and `run` may read it. The checkout step
+    # below carried `if: ${{ secrets.BLUEPRINT_REPO_TOKEN != '' }}`, which made
+    # the whole FILE invalid: every run since then failed in 0s with "this run
+    # likely failed because of a workflow file issue", before a single step
+    # executed. Found 2026-08-22 — every run on main had failed since at least
+    # 08-19, so the auto-deploy added on 08-17 had never once shipped, which is
+    # precisely the stale-prompt failure this workflow's header describes.
+    env:
+      HAS_BLUEPRINT_TOKEN: ${{ secrets.BLUEPRINT_REPO_TOKEN != '' }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       # The app repo, so check:contract has something to compare against.
       # Skipped (not failed) when the token is unconfigured — the deploy step
       # then reports the contract gate as SKIPPED rather than as passing.
       - name: Check out uno-blueprint (contract source)
-        if: ${{ secrets.BLUEPRINT_REPO_TOKEN != '' }}
+        if: env.HAS_BLUEPRINT_TOKEN == 'true'
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           repository: BilLogic/plus-uno-blueprint
