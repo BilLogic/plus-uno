@@ -1,9 +1,10 @@
 ---
 title: "The answer footer: keep the label, drop the vote, decide about delete"
 type: fix
-status: draft
+status: superseded
 date: 2026-08-21
 repos: plus-uno (agents/uno-bot)
+superseded_by: docs/plans/2026-08-21-003-fix-how-uno-bot-takes-a-yes-plan.md
 ---
 
 # The answer footer: keep the label, drop the vote, decide about delete
