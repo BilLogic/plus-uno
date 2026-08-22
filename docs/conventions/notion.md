@@ -107,11 +107,13 @@ Useful context for grounding via `notion_search` catalog scopes (or Notion MCP i
 | `---` | `divider` |
 | `#`, `##`, `###` | `heading_3` — one level below the section heading containing it |
 | blank line | a new paragraph block |
-| a `\|` table | one bullet per row — Notion's API takes no Markdown table. Write the bullets yourself; this is a net, not a feature |
+| a `\|` table | **a real Notion table** — header row flagged, cells parsed for inline markup |
 
 **This was a real bug, not a nicety.** Until 2026-08-22 a body was split on blank lines into plain paragraphs with no parsing at all — so the `**Decision:** one sentence` shape prescribed above landed on the page as literal asterisks, and every bullet as a literal hyphen.
 
 Two limits the Worker now handles, worth knowing because they shape what you write: a single text run caps at ~1,900 characters (long paragraphs split across blocks), and Notion accepts 100 blocks per request (a long PRD is created in batches). Neither is a reason to write less — write the full document.
+
+**Tables land as real tables** (2026-08-22). The header row sets the column count and every data row is padded or truncated to match — Notion rejects the *entire request* if any row's cell count differs from `table_width`, and a ragged row is what an unescaped `|` inside a cell produces.
 
 **Headings inside a body are `heading_3` on purpose.** Section headings own `heading_2`, and `fetchNotionPRD` walks that outline downstream to find Acceptance Criteria and Implementation Notes. A `##` inside a section body is subordinate to its section and renders that way.
 

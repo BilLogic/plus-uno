@@ -134,6 +134,56 @@ describe("html", () => {
   });
 });
 
+describe("a table becomes bullets, on both parts", () => {
+  // Deliberate (user, 2026-08-22: "Email, not working, bullet point instead").
+  // Slack renders tables and Notion gets a real table block; email does not,
+  // because HTML mail tables are the classic cross-client mess. Pairing each
+  // cell with its column name is what keeps the flattening lossless.
+  const TABLE = [
+    "Statuses:",
+    "",
+    "| Card | Status | Owner |",
+    "|---|---|---|",
+    "| Sign Up | WIP | Ops |",
+    "| Reconfirm | Shipped | Tutor |",
+  ].join("\n");
+  const { text, html } = markdownToEmail(TABLE);
+
+  it("labels each cell with its column in the plain-text part", () => {
+    assert.ok(text.includes("• Card: Sign Up · Status: WIP · Owner: Ops"), text);
+    assert.ok(text.includes("• Card: Reconfirm · Status: Shipped · Owner: Tutor"), text);
+  });
+
+  it("emits no pipes and no header row of its own", () => {
+    assert.ok(!text.includes("|"), text);
+    // The header became labels, so it must not also appear as its own bullet.
+    assert.ok(!text.includes("• Card: Card"), text);
+  });
+
+  it("uses one list in the HTML part, never a <table>", () => {
+    assert.ok(!html.includes("<table"), html);
+    assert.equal(html.match(/<ul>/g)?.length, 1);
+    assert.ok(html.includes("<li>Card: Sign Up · Status: WIP · Owner: Ops</li>"), html);
+  });
+
+  it("keeps the prose around it, with no ragged gap", () => {
+    assert.ok(text.startsWith("Statuses:"), text);
+    assert.ok(text.trimEnd().endsWith("Owner: Tutor"), text);
+    // A table's `children` ARE its rows, so the generic child-walk rendered
+    // each one a second time as a blank indented line.
+    for (const line of text.split("\n")) {
+      assert.equal(line, line.trimEnd(), `trailing whitespace: ${JSON.stringify(line)}`);
+    }
+    assert.ok(!/\n{3,}/.test(text), JSON.stringify(text));
+  });
+
+  it("survives a header-only table", () => {
+    const { text: t, html: h } = markdownToEmail("| a | b |\n|---|---|");
+    assert.equal(t, "");
+    assert.ok(!h.includes("<li>"), h);
+  });
+});
+
 describe("degenerate input", () => {
   it("survives an empty body", () => {
     const { text, html } = markdownToEmail("");

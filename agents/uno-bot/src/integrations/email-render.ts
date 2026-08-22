@@ -33,6 +33,37 @@ function childrenOf(block: NotionBlock): NotionBlock[] {
   return ((block[block.type] as { children?: NotionBlock[] })?.children ?? []);
 }
 
+/**
+ * A `table` block → one line per data row, `Column: value · Column: value`.
+ *
+ * Email gets bullets, not a table — a deliberate call (user, 2026-08-22:
+ * *"Email, not working, bullet point instead"*), and the right one: HTML mail
+ * tables are the classic cross-client mess, Outlook worst of all, and a
+ * two-column grid reads fine as labelled lines. Pairing each cell with its
+ * column name is what makes that true — a bare "a — b — c" loses which column
+ * was which, and these rows are read for exactly that.
+ *
+ * Returns the row texts as Markdown-ish strings; each renderer wraps them.
+ */
+function tableRowTexts(block: NotionBlock): string[] {
+  const payload = block.table as { children?: NotionBlock[] } | undefined;
+  const rows = payload?.children ?? [];
+  if (!rows.length) return [];
+  const cellsOf = (r: NotionBlock): string[] =>
+    ((r.table_row as { cells?: RichTextRun[][] })?.cells ?? []).map((cell) =>
+      cell.map((run) => run.text.content).join(""),
+    );
+  const [headerRow, ...dataRows] = rows;
+  const header = cellsOf(headerRow!);
+  return dataRows.map((r) => {
+    const cells = cellsOf(r);
+    return cells
+      .map((c, n) => (header[n]?.trim() ? `${header[n]}: ${c}` : c))
+      .filter((s) => s.trim())
+      .join(" · ");
+  });
+}
+
 // ── Plain text ───────────────────────────────────────────────────────────────
 
 /**
@@ -81,10 +112,19 @@ function blockToText(block: NotionBlock, indent = ""): string[] {
     case "divider":
       lines.push(`${indent}${"—".repeat(40)}`);
       break;
+    case "table":
+      for (const row of tableRowTexts(block)) lines.push(`${indent}• ${row}`);
+      break;
     default:
       for (const line of text.split("\n")) lines.push(`${indent}${line}`);
   }
-  for (const child of childrenOf(block)) lines.push(...blockToText(child, `${indent}  `));
+  // NOT for a table: its `children` are the `table_row` blocks, which
+  // tableRowTexts has already rendered. Walking them again emitted one blank
+  // indented line per row — invisible in a diff, visible as a ragged gap in
+  // the delivered mail.
+  if (block.type !== "table") {
+    for (const child of childrenOf(block)) lines.push(...blockToText(child, `${indent}  `));
+  }
   return lines;
 }
 
@@ -187,6 +227,12 @@ function groupedHtml(blocks: NotionBlock[]): string {
 function singleHtml(block: NotionBlock): string {
   const inner = runsToHtml(runsOf(block));
   switch (block.type) {
+    case "table": {
+      // Bullets, not <table> — see tableRowTexts for why.
+      const rows = tableRowTexts(block);
+      if (!rows.length) return "";
+      return `<ul>${rows.map((r) => `<li>${escapeHtml(r)}</li>`).join("")}</ul>`;
+    }
     case "heading_3":
       return `<h3>${inner}</h3>`;
     case "quote":

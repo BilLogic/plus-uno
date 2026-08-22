@@ -291,30 +291,28 @@ export function markdownToNotionBlocks(markdown: string): NotionBlock[] {
       continue;
     }
 
-    // A pipe table → one bullet per row, matching what Slack does
-    // (`slack/mrkdwn.ts` convertTables). Neither Notion's API nor an email
-    // body takes a Markdown table, so without this the pipes render literally
-    // — the same defect the Slack rule exists to prevent, on another surface.
-    // The model is told not to write tables at all; this is the net under it.
+    // A pipe table → a real Notion `table` block.
+    //
+    // It emitted one bullet per row until 2026-08-22, on the assumption that
+    // nothing downstream could take a table. Notion can: `table` with
+    // `table_row` children. Parsing to the RICHEST representation and letting
+    // each renderer decide is what keeps this honest — Notion sends the table,
+    // and the email renderer flattens it to bullets (`email-render.ts`),
+    // because mail clients are where tables actually do fall apart.
     const next = lines[i + 1] ?? "";
     if (line.includes("|") && next.includes("|") && TABLE_SEPARATOR.test(next.trim()) && next.includes("-")) {
       flushParagraph();
       lastListBlock = null;
       const header = splitTableRow(line);
+      const rows: string[][] = [];
       i += 2; // consume the header and the separator
       while (i < lines.length && lines[i]!.includes("|") && lines[i]!.trim()) {
-        const cells = splitTableRow(lines[i]!);
-        // Pair each cell with its column name when the shapes agree — a bare
-        // "a — b — c" loses which column was which, and these rows are usually
-        // read for exactly that.
-        const text =
-          header.length === cells.length && header.some(Boolean)
-            ? cells.map((c, n) => (header[n] ? `**${header[n]}:** ${c}` : c)).join(" · ")
-            : cells.join(" — ");
-        if (text.trim()) blocks.push(textBlock("bulleted_list_item", text));
+        rows.push(splitTableRow(lines[i]!));
         i++;
       }
       i--; // the for-loop increments
+      const table = tableBlock(header, rows);
+      if (table) blocks.push(table);
       continue;
     }
 
@@ -410,6 +408,45 @@ function splitOversizedParagraphs(blocks: NotionBlock[]): NotionBlock[] {
  */
 function splitTableRow(line: string): string[] {
   return line.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+}
+
+/** How many columns a Notion table may have. The API's own ceiling. */
+const MAX_TABLE_COLUMNS = 100;
+
+/**
+ * A header row and its data rows → one Notion `table` block.
+ *
+ * **Every row must have exactly `table_width` cells or the API rejects the
+ * whole request** — and a ragged table is what a model writes when a cell
+ * contains an unescaped pipe. So the header sets the width and every data row
+ * is padded or truncated to match, which turns a 400 that loses the entire
+ * page into one slightly wrong row.
+ *
+ * The rows are `children` of the table block, which Notion requires to be
+ * present at creation — a table cannot be created empty and filled later.
+ */
+function tableBlock(header: string[], rows: string[][]): NotionBlock | null {
+  const width = Math.min(header.length, MAX_TABLE_COLUMNS);
+  if (!width || !header.some((h) => h.trim())) return null;
+
+  const row = (cells: string[]): NotionBlock => ({
+    object: "block",
+    type: "table_row",
+    table_row: {
+      cells: Array.from({ length: width }, (_, n) => parseInline(cells[n] ?? "")),
+    },
+  });
+
+  return {
+    object: "block",
+    type: "table",
+    table: {
+      table_width: width,
+      has_column_header: true,
+      has_row_header: false,
+      children: [row(header), ...rows.filter((r) => r.some((c) => c.trim())).map(row)],
+    },
+  };
 }
 
 export function chunkBlocks<T>(blocks: T[], size = MAX_BLOCKS_PER_REQUEST): T[][] {

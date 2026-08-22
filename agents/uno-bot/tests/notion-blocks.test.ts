@@ -221,10 +221,9 @@ describe("the shape the convention doc asks for", () => {
   });
 });
 
-describe("tables degrade rather than shipping literal pipes", () => {
-  // Notion's API takes no Markdown table and an email body renders one as
-  // pipes, so the same degradation Slack does has to happen here — otherwise
-  // the no-tables rule holds on one surface out of three.
+describe("tables become real Notion tables", () => {
+  // Emitted one bullet per row until 2026-08-22, on the assumption that nothing
+  // downstream could take a table. Notion can.
   const TABLE = [
     "| Lane | Step | Owner |",
     "|---|---|---|",
@@ -232,18 +231,56 @@ describe("tables degrade rather than shipping literal pipes", () => {
     "| System | Day-of | — |",
   ].join("\n");
 
-  it("turns each row into a bullet, keeping the column names", () => {
+  const cellsOf = (row: NotionBlock): string[] =>
+    ((row.table_row as { cells: RichTextRun[][] }).cells).map((c) =>
+      c.map((r) => r.text.content).join(""),
+    );
+  const rowsOf = (t: NotionBlock): NotionBlock[] =>
+    (t.table as { children: NotionBlock[] }).children;
+
+  it("emits one table block with the header flagged", () => {
     const blocks = markdownToNotionBlocks(TABLE);
-    assert.deepEqual(types(blocks), ["bulleted_list_item", "bulleted_list_item"]);
-    assert.equal(plain(blocks[0]!), "Lane: Tutor · Step: Session prep · Owner: Ops");
-    // The column names come through as real bold, not asterisks.
-    assert.equal(runs(blocks[0]!)[0]!.annotations?.bold, true);
-    assert.ok(!blocks.map(plain).join("").includes("|"));
+    assert.deepEqual(types(blocks), ["table"]);
+    const t = blocks[0]!.table as { table_width: number; has_column_header: boolean };
+    assert.equal(t.table_width, 3);
+    assert.equal(t.has_column_header, true);
   });
 
-  it("falls back to a joined row when the shapes disagree", () => {
-    const ragged = "| a | b |\n|---|---|\n| 1 | 2 | 3 |";
-    assert.equal(plain(markdownToNotionBlocks(ragged)[0]!), "1 — 2 — 3");
+  it("carries the header row first, then the data rows", () => {
+    const rows = rowsOf(markdownToNotionBlocks(TABLE)[0]!);
+    assert.equal(rows.length, 3);
+    assert.deepEqual(types(rows), ["table_row", "table_row", "table_row"]);
+    assert.deepEqual(cellsOf(rows[0]!), ["Lane", "Step", "Owner"]);
+    assert.deepEqual(cellsOf(rows[1]!), ["Tutor", "Session prep", "Ops"]);
+  });
+
+  it("parses inline markup inside a cell", () => {
+    const rows = rowsOf(
+      markdownToNotionBlocks("| A | B |\n|---|---|\n| **bold** | `code` |")[0]!,
+    );
+    const cells = (rows[1]!.table_row as { cells: RichTextRun[][] }).cells;
+    assert.equal(cells[0]![0]!.annotations?.bold, true);
+    assert.equal(cells[1]![0]!.annotations?.code, true);
+  });
+
+  it("forces every row to the header's width", () => {
+    // Notion rejects the WHOLE request if any row's cell count differs from
+    // table_width — and a ragged row is what an unescaped pipe in a cell
+    // produces. Padding turns a lost page into one slightly wrong row.
+    const rows = rowsOf(
+      markdownToNotionBlocks("| a | b |\n|---|---|\n| 1 | 2 | 3 |\n| 4 |")[0]!,
+    );
+    for (const r of rows) {
+      assert.equal((r.table_row as { cells: unknown[] }).cells.length, 2);
+    }
+    assert.deepEqual(cellsOf(rows[1]!), ["1", "2"]);
+    assert.deepEqual(cellsOf(rows[2]!), ["4", ""]);
+  });
+
+  it("keeps a header-only table", () => {
+    const blocks = markdownToNotionBlocks("| a | b |\n|---|---|");
+    assert.deepEqual(types(blocks), ["table"]);
+    assert.equal(rowsOf(blocks[0]!).length, 1);
   });
 
   it("does not mistake a divider for a table separator", () => {

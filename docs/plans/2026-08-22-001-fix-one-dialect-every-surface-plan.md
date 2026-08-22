@@ -154,9 +154,31 @@ That is a rare downgrade on a fallback, not a policy.
 *"use one when the content is a grid, 2–4 narrow columns"*. The judge's table
 hard-gate is gone.
 
-**Follow-up worth doing, not done:** email HTML could carry a real `<table>`
-(the block model is already there), and Notion has a table block. Both currently
-degrade to bullets, which is lossless but plainer than it needs to be.
+**Then the follow-up was done too.** Tables now land as richly as each
+destination allows, and the parse produces the RICHEST form once — a `table`
+block — with each renderer deciding from there:
+
+| Destination | A Markdown table becomes |
+| --- | --- |
+| Slack, streamed | the Markdown, untouched — Slack renders a real table |
+| Slack, blocks fallback | one bullet per row (a `section` block cannot hold a table) |
+| Notion | a real `table` block, header row flagged, cells parsed for inline markup |
+| Email (both parts) | one labelled bullet per row, `Column: value · Column: value` |
+
+Email keeps bullets by decision (*"Email, not working, bullet point instead"*),
+and it is the right call — HTML mail tables are the classic cross-client mess.
+
+Two things the Notion table needed that the API is unforgiving about: **every
+row must have exactly `table_width` cells or the entire request is rejected**
+(so the header sets the width and each row is padded or truncated — a ragged
+row is what an unescaped `|` inside a cell produces), and the rows must be
+present as `children` at creation, since a table cannot be made empty and
+filled later.
+
+One bug found by reading the rendered output rather than the diff: a table's
+`children` ARE its rows, so the email renderer's generic child-walk rendered
+each row a second time as a blank indented line — invisible in a diff, a ragged
+gap in the delivered mail.
 
 ### Notion, shipped the same day (rows 8, 9, 15)
 
