@@ -6,6 +6,7 @@ import type { Env } from "../types";
 import { addReaction, appendStream, postMessage, startStream, stopStream } from "./api";
 import { footerKindFor, footerNoteFor, type FooterKind } from "./footer-kind";
 import { stripMarkdownTables, toSlackMrkdwn } from "./mrkdwn";
+import { splitBalanced } from "./split";
 import { buildFailureMessage, type FailureStage } from "./failure-message";
 
 // Capacity/quota failures look identical to a generic error to a user, which is
@@ -87,15 +88,17 @@ export async function postVisibleFailure(
 // enforces it. Truncation note lets the user ask for the rest.
 const MAX_POST_CHARS = 3900;
 
+const TRUNCATION_NOTE = "_…truncated — ask me for the rest._";
+
 function capText(text: string): string {
   if (text.length <= MAX_POST_CHARS) return text;
-  // Cut at a line boundary (else a word boundary) so the cap never splits a
-  // <url|label> link in half — live 2026-07-10 a mid-URL cut shipped a broken
-  // link right above the truncation notice.
-  const window = text.slice(0, MAX_POST_CHARS);
-  const lastBreak = Math.max(window.lastIndexOf("\n"), window.lastIndexOf(" "));
-  const cut = lastBreak > MAX_POST_CHARS * 0.6 ? window.slice(0, lastBreak) : window;
-  return `${cut}\n_…truncated — ask me for the rest._`;
+  // splitBalanced cuts at a line boundary (else a word boundary, so a
+  // <url|label> is never sliced in half — live 2026-07-10 a mid-URL cut
+  // shipped a broken link right above this very notice) AND closes an open
+  // code fence before the cut. Without that last part the notice, and
+  // everything after it, rendered inside the code block.
+  const [first] = splitBalanced(text, MAX_POST_CHARS - TRUNCATION_NOTE.length - 1);
+  return `${first ?? text.slice(0, MAX_POST_CHARS)}\n${TRUNCATION_NOTE}`;
 }
 
 // The retired confidence affix, killed deterministically instead of by prompt.
@@ -162,29 +165,26 @@ export function renderDeliveredBody(text: string): string {
  * when this returns true.
  */
 // A section's text field caps at 3000 chars, below MAX_POST_CHARS — so a capped
-// body can still overflow one block. Split on line boundaries so a <url|label>
-// never straddles two blocks (the same failure capText guards against).
+// body can still overflow one block.
 const SECTION_CHARS = 2900;
 export function textSections(body: string): Array<Record<string, unknown>> {
-  const chunks: string[] = [];
-  // A `section` block's text is mrkdwn — NOT the Markdown the model writes and
-  // NOT what `markdown_text` takes on the stream path. Convert once, before
-  // splitting, so the fence-protection in toSlackMrkdwn sees balanced input.
+  // Two things happen here, in this order, and both are load-bearing.
   //
-  // Until 2026-08-22 this path shipped the raw body: `postMessage` converted
-  // the `text` field only, blocks render over `text`, so the sanitized copy was
-  // seen by nothing but notifications and screen readers. Every `**bold**` in a
-  // blocks-path reply reached people as literal asterisks.
-  let rest = toSlackMrkdwn(body);
-  while (rest.length > SECTION_CHARS) {
-    const window = rest.slice(0, SECTION_CHARS);
-    const brk = Math.max(window.lastIndexOf("\n"), window.lastIndexOf(" "));
-    const cut = brk > SECTION_CHARS * 0.6 ? brk : SECTION_CHARS;
-    chunks.push(rest.slice(0, cut));
-    rest = rest.slice(cut).replace(/^\s+/, "");
-  }
-  if (rest) chunks.push(rest);
-  return chunks.map((c) => ({ type: "section", text: { type: "mrkdwn", text: c } }));
+  // 1. CONVERT. A `section` block's text is mrkdwn — NOT the Markdown the model
+  //    writes and NOT what `markdown_text` takes on the stream path. Until
+  //    2026-08-22 this path shipped the raw body: `postMessage` converted the
+  //    `text` field only, blocks render over `text`, so the sanitized copy was
+  //    seen by nothing but notifications and screen readers, and every
+  //    `**bold**` on this path reached people as literal asterisks.
+  //
+  // 2. SPLIT, fence-aware. Converting first also means the splitter sees the
+  //    fences it has to keep balanced. The old loop cut at the last newline or
+  //    space, so a code block opening in one section "closed" in the next and
+  //    mangled both.
+  return splitBalanced(toSlackMrkdwn(body), SECTION_CHARS).map((chunk) => ({
+    type: "section",
+    text: { type: "mrkdwn", text: chunk },
+  }));
 }
 
 // ── The answer footer ────────────────────────────────────────────────────────

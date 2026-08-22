@@ -5,7 +5,7 @@ status: partially-implemented
 date: 2026-08-22
 status: implemented
 implemented: "All three surfaces — Slack (rows 1–3, 6-partial, 7, 11–13, 17), Notion (8–9, 15), email (10) — 2026-08-22"
-deferred: "Splitter (5), share-out template (14), content-surfaces.md consolidation (16), UI-copy decision (19)"
+deferred: "Share-out template (14), content-surfaces.md consolidation (16), UI-copy decision (19)"
 repos: plus-uno (agents/uno-bot, docs/conventions)
 related: docs/plans/2026-08-21-003-fix-how-uno-bot-takes-a-yes-plan.md
 ---
@@ -200,6 +200,39 @@ Three things beyond the plan:
 **Not verified:** a real send. The MIME is verified structurally, but nothing
 has gone through Gmail's API — worth one message to yourself before the first
 outward one.
+
+### The splitter, shipped the same day (row 5)
+
+`src/slack/split.ts` — `splitBalanced(text, limit)`, now the single cutter
+behind both `capText` (3900) and `textSections` (2900). Both used to cut at
+"the last newline or space before the limit" with no idea what they were
+cutting through.
+
+**It deliberately is not a Markdown parser.** It tracks exactly one piece of
+state — the open fence — because that is the only construct that spans lines,
+and therefore the only one a line-boundary cut can break. Emphasis never spans
+a line in either dialect (the converter's own regexes are `[^\n]`-bounded), so
+splitting only at line boundaries keeps it intact for free. The one exception
+is a line longer than the limit, which must be cut mid-line; `balancedCut`
+prefers a space that leaves backticks and `**` balanced, because an
+unterminated inline code span swallows the rest of the line visually.
+
+Verified on the composed pipeline, not just in units: a 9,943-character reply
+with a `sql` block straddling the cap now truncates to 3,853 characters with
+the fence **closed above** the truncation notice; and the full
+`stripMarkdownTables → capText → toSlackMrkdwn → splitBalanced` chain yields
+two sections of 2,866 and 987 characters, both balanced, table degraded, bold
+and links converted. A continuation chunk reopens the fence with its language
+on the Markdown path and without one on the mrkdwn path — correct on both,
+since mrkdwn code blocks take no info string.
+
+One implementation note worth keeping. The mutable state lives on a single
+object rather than four `let`s: `flush` and `append` are closures that reassign
+it, TypeScript's control-flow analysis cannot see through a closure call, and
+with plain `let`s it narrowed `openFence` to `null` — so `openFence.length`
+failed with *"Property 'length' does not exist on type 'never'"*. Property
+narrowing resets after any function call, which is exactly the behaviour this
+needs.
 
 **Deferred, recorded so they are not forgotten** (rows 5, 6, 8–10, 14–16,
 18–19 below): the fence-aware splitter (only bites on replies > 3900 chars),
