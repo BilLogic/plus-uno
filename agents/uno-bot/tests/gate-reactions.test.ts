@@ -17,20 +17,26 @@ describe("gate reactions", () => {
     assert.equal(mapReaction("no_entry_sign"), "cancel");
   });
 
-  // The one that matters. 👍 was a confirm reaction until 2026-08-21, while the
-  // answer footer shipped a 👍 button on every substantive reply and the bot's
-  // own proposal copy asked people for "the thumbs up". Three meanings, one
-  // gesture, and one of them wrote to Notion.
-  it("does not let a thumbs-up authorize anything", () => {
-    for (const name of ["+1", "thumbsup", "thumbsup_all", "+1::skin-tone-2"]) {
-      assert.equal(
-        mapReaction(name),
-        null,
-        `${name} must not resolve a proposal — the footer trains this gesture as feedback`,
-      );
+  // 👍 confirms again, and the round trip is the point. It was pulled on
+  // 2026-08-21 because the answer footer put a 👍 BUTTON under every
+  // substantive reply, so the gesture meant "that was useful" AND "write to
+  // Notion". Retiring the footer buttons — and making a reaction resolve only
+  // the proposal it is placed on — retired the collision instead of the
+  // gesture.
+  it("lets a thumbs-up confirm, now that it means nothing else", () => {
+    assert.equal(mapReaction("+1"), "confirm");
+    assert.equal(mapReaction("thumbsup"), "confirm");
+  });
+
+  // The invariant that keeps it safe. If 👍 is ever given a second job — a
+  // feedback button, a poll, a reaction shortcut — it has to leave this set
+  // the same day, because a confirmation gesture may mean exactly one thing.
+  it("keeps the confirm set free of gestures the product uses elsewhere", () => {
+    // 👎 is the one to watch: it was 👍's twin in the retired footer, and it
+    // has never been a cancel. Cancelling is ❌.
+    for (const name of ["-1", "thumbsdown", "eyes", "wave", "handshake"]) {
+      assert.equal(mapReaction(name), null, `${name} must carry no decision`);
     }
-    assert.equal(CONFIRM_REACTIONS.has("+1"), false);
-    assert.equal(CONFIRM_REACTIONS.has("thumbsup"), false);
   });
 
   it("ignores ordinary reactions", () => {

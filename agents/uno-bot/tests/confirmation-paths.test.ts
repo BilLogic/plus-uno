@@ -119,12 +119,15 @@ describe("the two paths cannot both fire", () => {
     assert.equal(mapReaction("x"), typedResolution("cancel"));
   });
 
-  it("keeps 👍 out of the reaction path but allows it typed", () => {
-    // Deliberately asymmetric. As a REACTION, 👍 doubles as the answer
-    // footer's feedback button, so it must not authorize a write. As a message
-    // someone deliberately typed into a thread with a card in it, nothing else
-    // in the product makes you do that.
-    assert.equal(mapReaction("+1"), null);
+  it("means the same thing reacted as typed", () => {
+    // These were deliberately asymmetric for about an hour on 2026-08-21,
+    // while 👍 was still the answer footer's feedback button and could not be
+    // allowed to authorize a write. With the footer buttons gone, the gesture
+    // has one meaning again and the two paths agree — which is the state worth
+    // holding: a person should not have to know whether they are reacting or
+    // typing to know what 👍 does.
+    assert.equal(mapReaction("+1"), "confirm");
     assert.equal(typedResolution("👍"), "confirm");
+    assert.equal(mapReaction("+1"), typedResolution("👍"));
   });
 });

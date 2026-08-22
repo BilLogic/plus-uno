@@ -8,22 +8,35 @@
 export type Decision = "confirm" | "cancel";
 
 /**
- * ✅ and ✔️ only.
+ * ✅, ✔️ and 👍.
  *
- * 👍 (`+1` / `thumbsup`) was in this set until 2026-08-21 and must not return.
- * The answer footer puts a 👍 BUTTON on every substantive reply, so in this
- * product the gesture already means "that was useful" — and the bot's own
- * proposal copy used to ask people for a thumbs up, teaching precisely the
- * reflex that then fired a Notion write. A confirmation must be a gesture with
- * no second meaning.
+ * 👍 was removed on 2026-08-21 and restored the same day, and the round trip
+ * is the useful part: it was never the gesture that was wrong, it was the
+ * gesture MEANING TWO THINGS. The answer footer put a 👍 button under every
+ * substantive reply, so the product taught "thumbs-up = that was useful"
+ * while one flavour of thumbs-up meant "yes, write to Notion" — and a person
+ * told to "give the thumbs up" reaches for whichever is closer.
  *
- * Buttons and reactions are different Slack mechanisms, so the footer button
- * never reached this code. That is not much comfort: a person told to "give
- * the thumbs up" reaches for whichever one is closer.
+ * Two changes retired the collision rather than the gesture:
+ *   • the footer no longer carries 👍/👎 at all, so nothing else in the
+ *     product asks for that gesture;
+ *   • a reaction now only resolves the proposal it is placed ON. A 👍 on a
+ *     colleague's message, or on the bot's earlier answer, does nothing — it
+ *     used to execute the thread's pending write.
+ *
+ * With those in place 👍 is what it should have been all along: the most
+ * natural way to say yes in Slack. Making someone hunt for ✅ instead is
+ * friction with nothing left to protect.
+ *
+ * The rule this leaves behind: a confirmation gesture must have exactly one
+ * meaning in the product. If 👍 is ever given a second job again, it comes out
+ * of this set the same day.
  */
 export const CONFIRM_REACTIONS: ReadonlySet<string> = new Set([
   "white_check_mark",
   "heavy_check_mark",
+  "+1",
+  "thumbsup",
 ]);
 
 export const CANCEL_REACTIONS: ReadonlySet<string> = new Set([
