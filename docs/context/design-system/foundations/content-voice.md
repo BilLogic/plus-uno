@@ -4,7 +4,16 @@
 
 # Content and Voice
 
-> **Status: DRAFT** — This file needs design leadership iteration before finalizing.
+> **Status: in use, descriptive.** Promoted out of DRAFT on 2026-08-22. The
+> banner had said "needs design leadership iteration before finalizing" since
+> April while `docs/knowledge/preferences.md` pointed here for "full rules" on
+> capitalization — so one doc told readers to rely on this file and this file
+> told them not to. Whichever was wrong, both could not be right.
+>
+> What it is: the *descriptive* rationale for product tone and UI copy. The
+> normative rules every writer obeys are in `docs/conventions/writing-style.md`,
+> which wins on conflict (see the comment above). Nothing here is a house rule
+> in its own right; it is the reasoning and the worked examples behind them.
 
 ## Voice
 

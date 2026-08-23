@@ -149,6 +149,7 @@ Load docs on demand — 2-3 guides (~2,000-2,500 tokens), never the full set:
 | Need a specific component's Figma node id / link to reference | `design-system/figma/component-figma-links.md` (generated from component MDX; run `npm run generate:figma-links`) |
 | Writing to Notion / Figma / Slack / blueprint | the matching `docs/conventions/*.md` |
 | Human-facing text of any kind | `docs/conventions/writing-style.md` |
+| Product / in-app UI copy (labels, errors, empty states) | `docs/context/design-system/foundations/content-voice.md` — descriptive; `writing-style.md` wins on conflict |
 | Component architecture questions | `docs/context/design-system/components/inventory.md` |
 | Product context, users, or domain terms | `docs/context/product/*.md` (foundation) + uno-blueprint (live truth) |
 | Reading or reasoning over the blueprint (schema, lane semantics, query recipes, answering rules) | `docs/conventions/blueprint-navigation.md` — load BEFORE querying; un-guided blueprint reads fail on navigation and lane attribution (the Worker already carries it) |
