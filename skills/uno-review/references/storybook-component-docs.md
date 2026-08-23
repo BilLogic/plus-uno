@@ -11,7 +11,7 @@ This is not a low-level implementation guide for Storybook internals. For prop-t
 The default expectation is:
 
 - one sidebar item per component or form control
-- `Components/<Name>` and `Forms/<Name>` stay flat, not deeply nested
+- `Components/<Group>/<Name>` — one group level, then the component; no deeper nesting
 - the visible page is usually an MDX docs page, not raw CSF story leaves
 
 That pattern is implemented with colocated `*.mdx` files, shared docs layout primitives in [`design-system/src/storybook-docs/ds-docs-layout.jsx`](../../../design-system/src/storybook-docs/ds-docs-layout.jsx), and `tags: ['!dev']` on the corresponding stories files so the docs page is the main surface. This docs-first pattern is also described in the knowledge/lessons archive (originally `docs/solutions/integration-issues/2026-03-23-storybook-mdx-autodocs-conflict-and-netlify-spa-static-coexistence.md`).
@@ -28,13 +28,13 @@ That pattern is implemented with colocated `*.mdx` files, shared docs layout pri
    A few pages are more editorially composed and do not rely only on `Canvas` sections. The clearest example is [`Button.mdx`](../../../design-system/src/components/actions/Button/Button.mdx), which uses [`button-segmented-demos.jsx`](../../../design-system/src/components/actions/Button/button-segmented-demos.jsx).
 
 4. **Stories-only outlier**
-   Some forms still rely on a single story file and have no colocated MDX page yet. Current examples: `Forms/Rating`, `Forms/Input Group`, and `Forms/Scale`.
+   Some form controls still rely on a single story file and have no colocated MDX page yet. Current examples: `Components/Forms and inputs/Rating`, `Components/Forms and inputs/Input group`, and `Components/Forms and inputs/Scale`.
 
 5. **Sidebar alias**
    A few sidebar labels are more user-facing than the implementation name. Current examples:
-   - `Components/Loading` for `Spinner`
-   - `Forms/Scale` for `RadioButtonGroup`
-   - `Forms/Time Picker` for `DateAndTimePicker`
+   - `Components/Status and loading/Loading` for `Spinner`
+   - `Components/Forms and inputs/Scale` for `RadioButtonGroup`
+   - `Components/Forms and inputs/Date & time picker` for `DateAndTimePicker`
 
 These aliases are acceptable when intentional, but they should be rare and kept in sync with [`storySort`](../../../.storybook/preview.jsx).
 
@@ -250,7 +250,7 @@ The tables below summarize how current entries are organized today. The goal is 
 ## Recommended rules moving forward
 
 1. **One sidebar item per component or form control**
-   Default to `Components/<Name>` or `Forms/<Name>`.
+   Default to `Components/<Group>/<Name>` — groups are the kebab-case folders under `design-system/src/components/` (`actions`, `forms-and-inputs`, `layout-and-structure`, `messaging`, `navigation`, `overlays`, `status-and-loading`), rendered sentence-case in the title.
 
 2. **Docs-first page when possible**
    Prefer colocated MDX as the primary browsing surface.

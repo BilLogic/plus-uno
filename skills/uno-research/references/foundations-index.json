@@ -30,7 +30,7 @@
       "token_scope": "--size-element-*",
       "typical_locations": [
         "design-system/src/components/",
-        "design-system/src/forms/"
+        "design-system/src/components/forms-and-inputs/"
       ]
     },
     {

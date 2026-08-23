@@ -26,14 +26,14 @@ For buttons, badges, inputs, and other small components:
 | `--size-element-pad-x-md` | 12px | Medium horizontal padding |
 | `--size-element-pad-x-lg` | 16px | Large horizontal padding |
 | `--size-element-pad-y-sm` | 4px | Small vertical padding |
-| `--size-element-pad-y-md` | 8px | Medium vertical padding |
+| `--size-element-pad-y-md` | 6px | Medium vertical padding |
 | `--size-element-pad-y-lg` | 12px | Large vertical padding |
 | `--size-element-gap-xs` | 4px | Extra small gap |
 | `--size-element-gap-sm` | 8px | Small gap |
-| `--size-element-gap-md` | 12px | Medium gap |
-| `--size-element-gap-lg` | 16px | Large gap |
+| `--size-element-gap-md` | 10px | Medium gap |
+| `--size-element-gap-lg` | 12px | Large gap |
 | `--size-element-radius-sm` | 4px | Small border radius |
-| `--size-element-radius-md` | 6px | Medium border radius |
+| `--size-element-radius-md` | 4px | Medium border radius |
 | `--size-element-radius-lg` | 8px | Large border radius |
 | `--size-element-radius-full` | 999px | Pill shape |
 
@@ -46,7 +46,7 @@ For card containers and card content:
 | `--size-card-pad-x-sm` | 16px | Small card padding |
 | `--size-card-pad-x-md` | 20px | Medium card padding |
 | `--size-card-pad-x-lg` | 24px | Large card padding |
-| `--size-card-gap-sm` | 12px | Gap between card items |
+| `--size-card-gap-sm` | 10px | Gap between card items |
 | `--size-card-gap-md` | 16px | Medium card gap |
 | `--size-card-radius-sm` | 12px | Card border radius |
 
@@ -56,8 +56,8 @@ For page sections and large containers:
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--size-section-pad-x-lg` | 32px | Section horizontal padding |
-| `--size-section-pad-y-lg` | 24px | Section vertical padding |
+| `--size-section-pad-x-lg` | 36px | Section horizontal padding |
+| `--size-section-pad-y-lg` | 36px | Section vertical padding |
 | `--size-section-gap-lg` | 24px | Gap between sections |
 | `--size-section-gap-md` | 16px | Medium section gap |
 

@@ -7,7 +7,7 @@ description: uno-blueprint access — grounding reads at task time, and paired P
 
 ## Role & responsibility
 
-The only agent that touches uno-blueprint (Supabase, the product source of truth). Two duties: grounding reads (query at task time — blueprint truth is never cached into repo docs) and requirement writes, which are always PAIRED — a blueprint update ships with its PRD update in the same action, never one alone. Must NOT write on a read-grounding call, and must NOT accept a write that has no PRD counterpart.
+The only agent that touches uno-blueprint (Supabase, the product source of truth). Two duties: grounding reads (query at task time — blueprint truth is never cached into repo docs) and requirement writes, which follow the paired-writes rule owned by `docs/conventions/supabase.md`. Must NOT write on a read-grounding call, and must NOT accept a write that has no PRD counterpart.
 
 ## Invoked by
 

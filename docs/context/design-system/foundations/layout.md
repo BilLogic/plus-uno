@@ -45,7 +45,7 @@ The PLUS Design System uses a **fluid 12-column grid** that adapts to the contai
 | `--layout-grid-gap` | 8px | Gap between columns |
 | `--layout-sidebar-width` | 164px | Fixed sidebar width (Large+) |
 | `--size-surface-pad-x` | 32px | Content surface horizontal padding |
-| `--size-surface-container-pad-x-sm` | 16px | Outer layout horizontal padding |
+| `--size-surface-container-pad-x` | 16px | Outer layout horizontal padding |
 
 ### Column Width Calculation
 

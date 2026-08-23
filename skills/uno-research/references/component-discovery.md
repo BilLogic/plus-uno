@@ -18,7 +18,7 @@
 
 3. Understand hierarchy before implementing
 - Primitives/tokens: `design-system/src/tokens/*`
-- Reusable components: `design-system/src/components/*`, `design-system/src/forms/*`, `design-system/src/DataViz/*`
+- Reusable components: `design-system/src/components/*`, `design-system/src/components/forms-and-inputs/*`, `design-system/src/DataViz/*`
 - Higher-level compositions/specs: `design-system/src/specs/*`
 
 4. Decide when to ask vs proceed

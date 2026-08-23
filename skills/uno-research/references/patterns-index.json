@@ -14,7 +14,7 @@
       "rule": "Prefer PLUS components/forms/specs before generic framework primitives.",
       "references": [
         "design-system/src/components",
-        "design-system/src/forms",
+        "design-system/src/components/forms-and-inputs",
         "design-system/src/specs"
       ]
     },
@@ -47,9 +47,9 @@
       "name": "card_styling_alignment",
       "rule": "Align section/chart card styling with admin spec patterns.",
       "references": [
-        "design-system/src/specs/Admin/Tutor Admin/Cards/TutorDataCard/TutorDataCard.scss",
-        "design-system/src/specs/Admin/Student Admin/Sections/StudentOverviewSection/StudentOverviewSection.scss",
-        "design-system/src/specs/Admin/Session Admin/Sections/SessionOverviewSection/SessionOverviewSection.scss"
+        "design-system/src/specs/Admin/Tutor/Cards/TutorDataCard/TutorDataCard.scss",
+        "design-system/src/specs/Admin/Student/Sections/StudentOverviewSection/StudentOverviewSection.scss",
+        "design-system/src/specs/Admin/Session/Sections/SessionOverviewSection/SessionOverviewSection.scss"
       ]
     },
     {
@@ -57,7 +57,7 @@
       "rule": "Respect global table behavior and align table SCSS with admin implementations.",
       "references": [
         "design-system/src/styles/main.scss",
-        "design-system/src/specs/Admin/Student Admin/Tables/StudentsTable/StudentsTable.scss"
+        "design-system/src/specs/Admin/Student/Tables/StudentsTable/StudentsTable.scss"
       ]
     },
     {
