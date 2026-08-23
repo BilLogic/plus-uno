@@ -1065,7 +1065,11 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       toolName: result.toolName,
       input: result.input,
       channel,
+      // The conversation KEY (history). In a DM this is the constant "dm".
       threadTs: convTs,
+      // A real ts to reply under — the same one the card was posted with.
+      // Without this, resolveProposal posted into "dm" and Slack dropped it.
+      replyTs: threadTs,
       userMsgTs,
       proposalTs: posted.ts,
       proposalText,

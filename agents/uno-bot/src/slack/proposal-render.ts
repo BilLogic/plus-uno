@@ -17,9 +17,31 @@ import { textSections } from "./delivery";
 export const CONFIRM_FOOTER =
   `:white_check_mark: to approve · :no_entry: to cancel (then tell me what to change).`;
 
-/** The ✅ Approve / ⛔ Cancel button row. The handler in slack/interactive.ts
- *  resolves the card the button sits on, so the buttons carry no payload — the
- *  message ts is the identity, same as a reaction. */
+/**
+ * The Approve / Cancel button row.
+ *
+ * STYLING, and what Slack actually allows. Block Kit gives a button exactly
+ * three looks — `style: "primary"` (filled green), `style: "danger"` (filled
+ * red), and no `style` at all (the quiet default outline). There is no tonal
+ * variant, no custom colour, no border control. Emoji in the label is the only
+ * other dial.
+ *
+ * The first cut used filled + emoji on BOTH buttons, which read as shouting:
+ * colour and glyph each carried the whole message, so the row said everything
+ * twice in two saturated blocks side by side.
+ *
+ * Now: one accent, one quiet. Approve is the filled primary because it is the
+ * action being asked for; Cancel is the default outline. Labels are words
+ * only — the fill already says which is which.
+ *
+ * Cancel is deliberately NOT `danger`. Red marks the dangerous choice, and
+ * here that is backwards: Cancel is the safe way out, and *Approve* fires the
+ * irreversible write. A red Cancel codes the safe action as the risky one.
+ *
+ * The handler in slack/interactive.ts resolves the card the button sits on, so
+ * the buttons carry no payload — the message ts is the identity, as with a
+ * reaction.
+ */
 export function proposalActionBlocks(): unknown[] {
   return [
     {
@@ -30,14 +52,13 @@ export function proposalActionBlocks(): unknown[] {
           type: "button",
           action_id: "uno_proposal_confirm",
           style: "primary",
-          text: { type: "plain_text", text: "✅ Approve", emoji: true },
+          text: { type: "plain_text", text: "Approve" },
           value: "confirm",
         },
         {
           type: "button",
           action_id: "uno_proposal_cancel",
-          style: "danger",
-          text: { type: "plain_text", text: "⛔ Cancel", emoji: true },
+          text: { type: "plain_text", text: "Cancel" },
           value: "cancel",
         },
       ],
