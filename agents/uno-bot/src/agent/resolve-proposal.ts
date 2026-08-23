@@ -43,11 +43,21 @@ export async function resolveProposal(
     narrative ??
     (decision === "confirm" ? "Got it — kicking that off." : "Cancelled.");
 
-  await postMessage(env, {
+  // replyTs, NOT threadTs — see PendingProposal. threadTs is the history key
+  // and is the literal string "dm" in a DM, which Slack rejects.
+  const posted = await postMessage(env, {
     channel: pending.channel,
-    thread_ts: pending.threadTs,
+    thread_ts: pending.replyTs ?? pending.threadTs,
     text,
   });
+  // A resolution that cannot speak is the failure this whole path guards
+  // against, so it is never silent in the logs even when it is silent in Slack.
+  if (!posted.ok) {
+    console.error(
+      `[gate] narrative post FAILED for ${pending.toolName} in ${pending.channel} ` +
+        `(thread=${pending.replyTs ?? pending.threadTs}): ${(posted as { error?: string }).error ?? "unknown"}`,
+    );
+  }
 
   await addReaction(
     env,

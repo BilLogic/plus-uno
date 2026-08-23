@@ -12,7 +12,30 @@ export interface PendingProposal {
   toolName: string;
   input: Record<string, unknown>;
   channel: string;
+  /**
+   * The CONVERSATION key — what history is stored under. In a threadless DM
+   * this is the constant `"dm"`, not a message ts, so every line of that DM
+   * resolves to one conversation.
+   *
+   * **Never pass this to `chat.postMessage` as `thread_ts`.** Use `replyTs`.
+   */
   threadTs: string;
+  /**
+   * A REAL message ts to reply under — `e.thread_ts ?? e.ts`, the same value
+   * the proposal card itself was posted with.
+   *
+   * Added 2026-08-22 after a live DM test: confirming a proposal produced the
+   * 🤝 reaction and NOTHING else. `resolveProposal` posted its narrative with
+   * `thread_ts: threadTs`, which in a DM is `"dm"` — Slack rejects that as an
+   * invalid thread_ts, the result was never checked, and the message silently
+   * vanished. So did the outcome note and every failure message on the path.
+   * On the bot's PRIMARY surface an approved write said nothing at all: the
+   * "approved, then silence" failure this gate exists to prevent.
+   *
+   * Optional so proposals staged before this shipped still resolve; they fall
+   * back to `threadTs`, which is correct everywhere except a DM.
+   */
+  replyTs?: string;
   userMsgTs: string;
   proposalTs: string;
   proposalText: string;

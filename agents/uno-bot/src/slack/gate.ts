@@ -97,7 +97,7 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
     if (!live) return;
     await postMessage(env, {
       channel: live.channel,
-      thread_ts: live.threadTs,
+      thread_ts: live.replyTs ?? live.threadTs,
       text:
         `:eyes: <@${event.user}> I saw your :${event.reaction}:, but it is not on the proposal I am holding — ` +
         `nothing was executed. Use the buttons on ${cardPointer(live)}, or react there.`,
@@ -117,7 +117,7 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
     console.error(`[gate] reaction resolve failed: ${err instanceof Error ? err.message : String(err)}`);
     await postMessage(env, {
       channel: pending.channel,
-      thread_ts: pending.threadTs,
+      thread_ts: pending.replyTs ?? pending.threadTs,
       text: `:warning: I caught your :${event.reaction}: but hit a snag executing it — give it another go, or tell me and I'll retry.`,
     }).catch(() => {});
   }
