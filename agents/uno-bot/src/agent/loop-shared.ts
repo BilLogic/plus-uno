@@ -12,6 +12,7 @@
 
 import { AsyncLocalStorage } from "node:async_hooks";
 import { GATE_RESERVED } from "../slack/gate-reactions";
+import type { AbsenceContext } from "./absence";
 import type { Env } from "../types";
 import type { HistoryTurn, PendingProposal } from "../thread-state-client";
 import type { SlackContext } from "../tools/dispatcher";
@@ -303,6 +304,10 @@ const turnScope = new AsyncLocalStorage<{
   tools: Set<string>;
   correction: boolean;
   receipt?: RetrievalReceipt;
+  /** Set when a slack_search this turn came back EMPTY — carries the mode it
+   *  ran under, so the delivery path can check the reply does not overclaim the
+   *  absence. See agent/absence.ts. */
+  absence?: AbsenceContext;
 }>();
 
 /** What a turn actually retrieved. Persisted on the assistant HistoryTurn so
@@ -329,13 +334,44 @@ export interface RetrievalReceipt {
 export async function withTurnScope<T>(
   opts: { correction: boolean },
   fn: () => Promise<T>,
-): Promise<{ result: T; tools: string[]; receipt?: RetrievalReceipt }> {
-  const store: { tools: Set<string>; correction: boolean; receipt?: RetrievalReceipt } = {
+): Promise<{ result: T; tools: string[]; receipt?: RetrievalReceipt; absence?: AbsenceContext }> {
+  const store: {
+    tools: Set<string>;
+    correction: boolean;
+    receipt?: RetrievalReceipt;
+    absence?: AbsenceContext;
+  } = {
     tools: new Set<string>(),
     correction: opts.correction,
   };
   const result = await turnScope.run(store, fn);
-  return { result, tools: [...store.tools], receipt: store.receipt };
+  return { result, tools: [...store.tools], receipt: store.receipt, absence: store.absence };
+}
+
+/**
+ * Note an EMPTY slack_search, with the visibility it ran under.
+ *
+ * Only the empty case is recorded: with results in hand the reply is talking
+ * about what it found, and there is no absence to overclaim. Best-effort by
+ * design — a malformed payload costs the check, never the turn.
+ */
+function recordAbsenceSignal(resultJson: string): void {
+  const store = turnScope.getStore();
+  if (!store) return;
+  try {
+    const p = JSON.parse(resultJson) as {
+      results?: unknown[];
+      visibility?: string;
+      searched_surfaces?: string;
+    };
+    if (!Array.isArray(p.results) || p.results.length > 0) return;
+    store.absence = {
+      visibility: p.visibility ?? "unknown",
+      searchedSurfaces: p.searched_surfaces ?? "unknown",
+    };
+  } catch {
+    // no signal, no check — never a thrown turn
+  }
 }
 
 /** Record what a lookup retrieved. Last write wins — the most recent search is
@@ -437,7 +473,14 @@ export async function executeReadOnlyTool(
   if (name === "source_read") return executeReadSource(env, input);
   if (name === "github_read") return executeGithubRead(env, input);
   if (name === "slack_thread_read") return executeSlackThreadRead(env, input);
-  if (name === "slack_search") return executeSlackSearch(env, input, slack);
+  if (name === "slack_search") {
+    const out = await executeSlackSearch(env, input, slack);
+    // Derived HERE rather than inside the tool, so slack-search.ts stays free
+    // of a value-level import back into this module — the same reason
+    // recordBlueprintReceipt lives here.
+    recordAbsenceSignal(out);
+    return out;
+  }
   if (name === "slack_react") return executeSlackReact(env, input, slack);
   if (name === "slack_user_profile") return executeSlackUserProfile(env, input);
   if (name === "slack_channel_members") return executeSlackChannelMembers(env, input);
