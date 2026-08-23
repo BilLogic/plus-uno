@@ -2,6 +2,7 @@
 title: "The confirmation gate, the clause that says what an answer rests on, and four things worse than both"
 type: fix
 status: implemented
+superseded_criteria: "Four acceptance criteria below were deliberately reversed by later decisions (plans …-003 and …-22-001) and are marked SUPERSEDED inline. Read them as history, never as a checklist — run them today and they report a working system as broken." 
 date: 2026-08-21
 completed: 2026-08-21
 repos: plus-uno (agents/uno-bot), uno-blueprint (docs/conventions consumer)
@@ -355,7 +356,7 @@ input and ignores both.
 
 ### The gate (P0)
 
-- [ ] A 👍 reaction does not execute a pending proposal (or the feedback footer
+- [~] **SUPERSEDED 2026-08-21 (plan …-003).** 👍 confirms again: it was never the gesture that was wrong, it was the gesture meaning two things, and retiring the footer's 👍/👎 buttons retired the collision instead. ~~A 👍 reaction does not execute a pending proposal~~ (or the feedback footer
       is suppressed wherever one is live — assert both cannot coexist)
 - [ ] A confirm reaction on a message that is not the live card does not execute
 - [ ] A confirm reaction on a superseded card explains, and never executes the
@@ -384,12 +385,12 @@ input and ignores both.
 
 - [ ] A PRD-shaped creation asks exactly **once**
 - [ ] An amendment either re-stages or is refused — never a silent verbatim execute
-- [ ] `"sure go ahead"` resolves a pending non-destructive proposal with no model call
-- [ ] Mixed-polarity and extra-content messages fall through
-- [ ] A typed affirmation cannot resolve `email_send` or `notion_archive`
+- [~] **SUPERSEDED 2026-08-22 (Proposal C).** It resolves — but through the MODEL, not a phrase list. The accelerator and its four sibling vocabularies were deleted; every incident in this area came from the lists. ~~`"sure go ahead"` resolves … with no model call~~
+- [x] Mixed-polarity and extra-content messages fall through — now trivially, since **everything** typed falls through to the model
+- [~] **SUPERSEDED 2026-08-21.** The consequence tier is gone (Bill: *"the heavier actions don't make any sense"*) — the gate is the gate, and demanding the same decision in a second medium added friction without adding a check. ~~A typed affirmation cannot resolve `email_send` or `notion_archive`~~
 - [ ] A typed confirmation after TTL gets the same expiry notice a reaction gets
 - [ ] A typed 👍 behaves as the reaction does
-- [ ] More than one `?` in the bot's last message suppresses the fast path
+- [~] **SUPERSEDED 2026-08-22.** `fastPathAllowed` is deleted along with the fast path it guarded. ~~More than one `?` in the bot's last message suppresses the fast path~~
 
 ### Quality gates
 
