@@ -1,7 +1,8 @@
 ---
 title: "How uno-bot takes a yes"
 type: fix
-status: active
+status: implemented
+remaining: "Proposal B (bounce notice) only"
 date: 2026-08-21
 supersedes: docs/plans/2026-08-21-002-fix-the-answer-footer-earns-its-place-plan.md
 repos: plus-uno (agents/uno-bot)
@@ -25,11 +26,12 @@ the cancel gesture, and the only deterministic text path left is a gate emoji
 typed alone. Proposal B (bounce notice) remains open. Path 1 below is rewritten
 to what runs now; the older prose is kept where it explains a decision.
 
-**One thing only a human can do:** the live Slack app's interactivity
-`request_url` still points at the dead Netlify function — the repo manifest
-(`slack-app-manifest.yaml:284-290`) has the Worker URL and says so. Until the
-manifest is applied in the Slack app settings, the buttons render but deliver
-nothing; reactions and typed emoji work regardless.
+**Correction 2026-08-22:** an earlier draft of this section said the live app's
+interactivity `request_url` still pointed at the dead Netlify function and
+needed a human to apply the manifest. That was wrong — read off a stale comment
+in `slack-app-manifest.yaml`. `slack manifest diff --app A0APS0L8HJR` reports
+*"Project manifest and app settings match"*, and the remote manifest's
+`settings.interactivity.request_url` is the Worker route. Nothing was pending.
 
 The organising question: **when the bot needs a person's approval before it
 acts, what counts as approval, and what happens to it?**
@@ -528,7 +530,7 @@ Shipped work is verified; these cover what is proposed.
 - [x] The proposal card carries ✅ Approve / ⛔ Cancel buttons
 - [x] Reaction, button and typed-emoji paths resolve the same card, through the same claim
 - [x] A block-render failure on the card degrades to a text card that reactions still resolve, and is logged
-- [ ] The card has been eyeballed once on a real answer (needs the manifest applied — human step)
+- [x] The card has been eyeballed once on a real answer — live DM test 2026-08-22. The manifest note was wrong: interactivity already pointed at the Worker (`slack manifest diff` reports a match), so nothing was pending there.
 - [x] No typed words resolve a proposal without the model (`resolution.ts`, `react-only.ts`, the phrase lists: deleted)
 - [x] An identical re-stage while pending executes as a confirm instead of bouncing
 - [x] A pure acknowledgement can end as a reaction with no reply (model-chosen via `slack_react`)
