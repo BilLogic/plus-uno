@@ -8,6 +8,7 @@ import {
 } from "../agent/loop-shared";
 import { routeRequest } from "../agent/routing";
 import { bounceLogLine, proposalWasAddressed } from "../agent/pending-notice";
+import { absenceRepairInstruction, judgeAbsence, type AbsenceContext } from "../agent/absence";
 import { typedEmojiDecision } from "./gate-reactions";
 import { resolveProposal } from "../agent/resolve-proposal";
 import {
@@ -750,6 +751,8 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // fetched this turn", and the receipt is persisted for the next turn.
   let toolsUsedThisTurn: string[] = [];
   let turnReceipt: HistoryTurn["retrieval"];
+  // Set only when a slack_search this turn came back EMPTY — see agent/absence.ts.
+  let turnAbsence: AbsenceContext | undefined;
   try {
     const agentRun = await withTurnScope({ correction: isCorrection }, () =>
       runAgent({
@@ -781,6 +784,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     result = agentRun.result;
     toolsUsedThisTurn = agentRun.tools;
     turnReceipt = agentRun.receipt;
+    turnAbsence = agentRun.absence;
   } catch (err) {
     console.error(`[agent] failed: ${err instanceof Error ? err.message : String(err)}`);
     // Close the plan stream before the failure message, or the checklist sits
@@ -843,6 +847,33 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
         `[confidence] pre-check failed: ${err instanceof Error ? err.message : String(err)} — no escalation`,
       );
     }
+    // Absence pre-check, beside the confidence one and for the same reason: a
+    // search came back empty and the draft may be claiming the WORLD is empty.
+    // Only runs when a search actually returned nothing this turn, so an
+    // absolute is not flagged on a turn where it is simply true.
+    let absenceRepair: string | undefined;
+    if (turnAbsence) {
+      try {
+        if (judgeAbsence(renderDeliveredBody(result.text)) === "unscoped") {
+          absenceRepair = absenceRepairInstruction(turnAbsence);
+          console.log(`[absence] unscoped claim over ${turnAbsence.visibility} — forcing repair`);
+        }
+      } catch (err) {
+        // Same direction as the confidence pre-check: fail open. An unscoped
+        // absence is a smaller harm than a dropped answer.
+        console.warn(
+          `[absence] pre-check failed: ${err instanceof Error ? err.message : String(err)} — no escalation`,
+        );
+      }
+    }
+
+    // One judge call carries both repairs when both fire. Sent as two sibling
+    // instructions they compete and the model does one — which is exactly how
+    // the last attempt at the absence rule dropped S3's connect link.
+    const extra = [repairInstruction(verdict) ?? undefined, absenceRepair]
+      .filter(Boolean)
+      .join("\n\n");
+
     const reviewed = await reviewDraft(env, {
       userText: modelText,
       draft: result.text,
@@ -850,8 +881,9 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       priorAssistantText: isCorrection ? priorAssistantTurn?.content : undefined,
       toolsUsedThisTurn,
       // Both bypass the length floor and tell the judge exactly what to repair.
-      forceReason: needsRepair(verdict) ? verdict.kind : undefined,
-      extraInstruction: repairInstruction(verdict) ?? undefined,
+      forceReason:
+        needsRepair(verdict) ? verdict.kind : absenceRepair ? "absence-scope" : undefined,
+      extraInstruction: extra || undefined,
     });
     // Re-validation, not a second repair round. A judge revision can itself end
     // in a trailing label, which stripTrailingConfidence then DELETES without
