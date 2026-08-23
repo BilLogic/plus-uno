@@ -7,6 +7,7 @@ import {
   withTurnScope,
 } from "../agent/loop-shared";
 import { routeRequest } from "../agent/routing";
+import { bounceLogLine, proposalWasAddressed } from "../agent/pending-notice";
 import { typedEmojiDecision } from "./gate-reactions";
 import { resolveProposal } from "../agent/resolve-proposal";
 import {
@@ -902,6 +903,14 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     if (delivery.ok) {
       // Record what was actually posted (capped/placeholder), not the raw text.
       await appendHistory(env, channel, convTs, { role: "assistant", content: delivery.text });
+      // Proposal B: a card was staged at turn start and this turn neither
+      // resolved it (that would be kind:"resolved") nor said anything about
+      // it. The approval has evaporated silently — the 2026-07-10 failure.
+      // Log-only on purpose: a visible "I still have X staged" belongs on a
+      // measured rate, not a guess (see agent/pending-notice.ts).
+      if (pending && !proposalWasAddressed(delivery.text, pending.toolName)) {
+        console.warn(bounceLogLine(pending.toolName, vision.historyText, delivery.text));
+      }
       // No ✅ on success: the reply that just landed IS the completion signal,
       // and a checkmark next to it is a second one saying the same thing. ✅
       // still means something specific here — it is how a human CONFIRMS a

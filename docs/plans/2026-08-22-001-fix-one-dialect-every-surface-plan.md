@@ -4,7 +4,7 @@ type: fix
 status: implemented
 date: 2026-08-22
 implemented: "All three surfaces — Slack (rows 1–3, 6-partial, 7, 11–13, 17), Notion (8–9, 15), email (10) — 2026-08-22"
-deferred: "content-surfaces.md consolidation (16), UI-copy decision (19)"
+deferred: "none — rows 16 and 19 decided 2026-08-22, see Closing the last two rows"
 repos: plus-uno (agents/uno-bot, docs/conventions)
 related: docs/plans/2026-08-21-003-fix-how-uno-bot-takes-a-yes-plan.md
 ---
@@ -577,3 +577,47 @@ delete the DRAFT).
   "Accepts message text formatted in markdown"), "Formatting message text"
 - `uno-blueprint/docs/design/content-voice.md:69-140` — the blueprint cell
   copy convention this repo never pointed at
+
+---
+
+## Closing the last two rows — 2026-08-22
+
+**Row 16 — `content-surfaces.md`: decided NOT to create it.**
+
+The audit proposed one canonical per-destination file. By the time the work
+landed, the matrix it would have contained already existed in
+`slack.md` § *The same Markdown goes everywhere else too* (what converts where,
+and the one construct that differs), with the per-destination contracts beside
+the surfaces they govern — `notion.md` § *Writing a body*, and the email row in
+that same matrix.
+
+Creating a fourth file would have duplicated all three and reproduced the exact
+defect this plan has spent the day removing: **two artefacts describing one
+thing, with nothing reading both.** The share-out template drifted from its tool
+for months that way; `slack.md` claimed Block Kit was unwired for two weeks that
+way; the manifest header sent me hunting a non-existent task that way.
+
+What was genuinely missing was **discoverability**, not consolidation — the
+router in `writing-style.md:14` named three surfaces and never mentioned the
+dialect rule. Fixed in place: the router now names UI copy as a fourth surface
+and states the one formatting rule, pointing at the matrix rather than
+restating it.
+
+**Row 19 — the UI-copy doc: promoted, not retired.**
+
+`docs/context/design-system/foundations/content-voice.md` carried
+*"Status: DRAFT — needs design leadership iteration before finalizing"* since
+April, while `docs/knowledge/preferences.md` pointed at it for "full rules" on
+capitalization. One doc told readers to rely on it; the file told them not to.
+Both could not be right, and the version that had been true in practice for
+four months is that people rely on it.
+
+So the banner goes and the file says what it actually is: *descriptive*
+rationale for product tone and UI copy, with `writing-style.md` normative and
+winning on conflict — which its own header already said. It is now in AGENTS.md's
+progressive-loading table, so it is reachable when someone is actually writing
+a label or an error message.
+
+This is a status correction, not a sign-off. If design leadership wants to
+re-review the content, that is a separate act; what could not stand was a
+banner that had been contradicted by usage since April.

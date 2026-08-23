@@ -30,13 +30,15 @@ export const CONFIRM_FOOTER =
  * colour and glyph each carried the whole message, so the row said everything
  * twice in two saturated blocks side by side.
  *
- * Now: one accent, one quiet. Approve is the filled primary because it is the
- * action being asked for; Cancel is the default outline. Labels are words
- * only — the fill already says which is which.
+ * Now: filled on both, no emoji. The colour carries the meaning and the label
+ * says the word; the glyph was the third copy of the same signal.
  *
- * Cancel is deliberately NOT `danger`. Red marks the dangerous choice, and
- * here that is backwards: Cancel is the safe way out, and *Approve* fires the
- * irreversible write. A red Cancel codes the safe action as the risky one.
+ * Approve is `primary`, Cancel is `danger` (Bill's call, 2026-08-22). I had
+ * argued for a quiet default on Cancel, on the reasoning that red marks the
+ * dangerous choice and here *Approve* is the one firing the irreversible
+ * write. Overruled, and the counter-argument is good: in a two-button yes/no
+ * the pair reads as a pair, and a green/red set is instantly legible at a
+ * glance in a busy thread — which is where these cards are actually read.
  *
  * The handler in slack/interactive.ts resolves the card the button sits on, so
  * the buttons carry no payload — the message ts is the identity, as with a
@@ -58,6 +60,7 @@ export function proposalActionBlocks(): unknown[] {
         {
           type: "button",
           action_id: "uno_proposal_cancel",
+          style: "danger",
           text: { type: "plain_text", text: "Cancel" },
           value: "cancel",
         },
