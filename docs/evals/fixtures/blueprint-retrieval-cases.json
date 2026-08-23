@@ -108,9 +108,9 @@
       "a0000000-0000-4000-8000-000000100504",
       "a0000000-0000-4000-8000-000000100403"
     ],
-    "expectScenario": "Tech Setup",
+    "expectScenario": "Employment & Access",
     "minMatches": 2,
-    "note": "NOT stale: 'I-9' is present in 3 cells, so this is a real retrieval gap, not fixture drift. minMatches stays at 2 — lowering it would make the eval pass by measuring less. Verified against the live blueprint 2026-08-22."
+    "note": "CORRECTION 2026-08-22: an earlier note here claimed this was a real retrieval gap rather than fixture drift. That was wrong, written before checking what the scorer compares. It matches on expectScenario, and 'Tech Setup' no longer exists — the I-9 cells moved to 'Employment & Access'. The three expectCellIds were right all along, and querying the RPC directly returns those cells at ranks 1-3. Scenario corrected; minMatches stays at 2."
   },
   {
     "id": "BR10",
@@ -118,23 +118,24 @@
     "blocker": false,
     "k": 8,
     "q": "Workday",
-    "expectScenario": "Tech Setup",
+    "expectScenario": "Reporting Hours",
     "minMatches": 1,
-    "note": "Tool name living on tech-layer cells. Non-blocking: those cells are near-duplicates of each other, so which one wins is not meaningful."
+    "note": "Tool name living on tech-lane cells. Scenario corrected 2026-08-22: 'Tech Setup' no longer exists; 'Workday' now appears in Reporting Hours (7 cells), Employment & Access (4) and Interview & Offer (1). Non-blocking: near-duplicate cells, so which one wins is not meaningful."
   },
   {
     "id": "BR11",
     "class": "exact-term",
     "blocker": false,
     "k": 10,
-    "q": "Call-Offs tab",
+    "q": "Fill-In tab",
     "expectCellIds": [
-      "a0000000-0000-4000-8000-000000170206",
-      "b0000000-0000-4000-8000-000000180306",
-      "a0000000-0000-4000-8000-000000170606",
-      "b0000000-0000-4000-8000-000000180606"
+      "a0000000-0000-4000-8000-000000150203",
+      "a0000000-0000-4000-8000-000000170403",
+      "b0000000-0000-4000-8000-000000180403",
+      "a0000000-0000-4000-8000-000000170404",
+      "b0000000-0000-4000-8000-000000180404"
     ],
-    "note": "STALE 2026-08-22: 'Call-Offs tab' appears in ZERO cells now — the copy was rewritten. Left failing ON PURPOSE rather than repointed at a term picked to make it pass; someone has to decide what this case should actually test. Non-blocker, so it does not gate the suite."
+    "note": "Re-pointed 2026-08-22. This asked for 'Call-Offs tab', which now matches ZERO cells — its four target cells were reduced to the bare touchpoint 'PLUS App', so the content that made this an exact-term case is gone. 'Fill-In tab' is the direct analogue that survives: a multi-word UI surface name, 5 cells across Call-off Request and Fill-in Request. Same question, live subject."
   },
   {
     "id": "BR12",
