@@ -163,6 +163,56 @@ describe("verdicts", () => {
     assert.equal(v.kind, "false-freshness");
   });
 
+  it("asks a from-memory answer to SAY it is from memory", () => {
+    // R1's shape: a factual design-system answer given off loaded docs with no
+    // tool call. This branch returned `exempt` until 2026-08-23 — "no retrieval
+    // means no freshness to claim" is true but incomplete, because D9 also asks
+    // a from-memory answer to admit it. With nothing forcing the clause, whether
+    // one appeared was left to the draw, and R1 failed 2 of 3 samples the first
+    // time the suite sampled it.
+    assert.equal(
+      judgeConfidence(
+        "Card is the container component; Surface is the elevation token underneath it.",
+        UNGROUNDED,
+      ).kind,
+      "unsourced",
+    );
+  });
+
+  it("still ships a from-memory answer that admits it", () => {
+    assert.equal(
+      judgeConfidence(
+        "Going from memory here, but Card is the container and Surface is the elevation token under it.",
+        UNGROUNDED,
+      ).kind,
+      "ok",
+    );
+  });
+
+  it("does not ask an OPINION to cite a source", () => {
+    // There is nothing to source in a suggestion, and demanding a clause here
+    // produces exactly the filler D9 exists to prevent.
+    for (const text of [
+      "Here's how I'd approach the redesign, roughly.",
+      "My take: split the panel before adding another tab.",
+      "I think the second option reads better on mobile.",
+    ]) {
+      assert.equal(judgeConfidence(text, UNGROUNDED).kind, "exempt", text);
+    }
+  });
+
+  it("a hedge does not excuse a false freshness claim", () => {
+    // Ordering matters: freshness is checked before the opinion guard, or
+    // "I'd say I just checked" would slip through.
+    assert.equal(
+      judgeConfidence(
+        "I'd say the board is clear as of today.",
+        UNGROUNDED,
+      ).kind,
+      "false-freshness",
+    );
+  });
+
   it("exempts an ungrounded reply that claims nothing", () => {
     assert.equal(judgeConfidence("Got it.", UNGROUNDED).kind, "exempt");
     assert.equal(

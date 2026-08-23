@@ -70,7 +70,10 @@ export type ConfidenceVerdict =
   /** The model reached for the retired trailing label instead of weaving. */
   | { kind: "trailing-label" }
   /** Factual, grounded, and says nothing about what it rests on. */
-  | { kind: "absent" };
+  | { kind: "absent" }
+  /** Factual, nothing fetched this turn, and it never says so. D9 requires a
+   *  from-memory answer to admit it; this branch used to be `exempt`. */
+  | { kind: "unsourced" };
 
 /**
  * Sureness the model EARNED by looking: first-person verification, or a named
@@ -180,6 +183,21 @@ export function assertsSomething(text: string): boolean {
 }
 
 /**
+ * Is this reply offered as the bot's own thinking rather than as fact?
+ *
+ * Only consulted on the NOTHING-WAS-FETCHED path, and only to decide whether a
+ * from-memory disclosure is owed. "Here's how I'd approach the redesign,
+ * roughly" sources nothing because there is nothing to source — it is a
+ * proposal, and asking the model to add "this is from memory" to its own
+ * suggestion produces filler, which is the thing D9 exists to prevent.
+ *
+ * A factual claim about the estate ("the card moved to In Review") carries none
+ * of these and still owes the disclosure.
+ */
+const OFFERED_AS_OPINION =
+  /\b(?:i'?d\b|i would|i'?d suggest|my take|i think|i suspect|roughly|off the top|a rough|one approach|here'?s how i|if it were me|my instinct)\b/i;
+
+/**
  * The verdict for one delivered reply.
  *
  * Call this on the body that will actually be SENT — after the trailing-label
@@ -192,11 +210,26 @@ export function judgeConfidence(
   ctx: ConfidenceContext,
 ): ConfidenceVerdict {
   if (!ctx.retrievalRan) {
-    // Nothing was fetched, so there is no freshness to claim — and claiming it
-    // anyway is the one thing still worth catching here.
-    return claimsFreshness(deliveredText) && assertsSomething(deliveredText)
-      ? { kind: "false-freshness" }
-      : { kind: "exempt" };
+    // Nothing was fetched. Two different failures live here, and until
+    // 2026-08-23 only the first was caught.
+    if (!assertsSomething(deliveredText)) return { kind: "exempt" };
+    // Opinion offered as opinion sources nothing, because there is nothing to
+    // source. Checked BEFORE the disclosure branch and after the freshness one:
+    // a hedge does not excuse "I just checked" when nothing was checked.
+    // (1) Claiming freshness over data nobody fetched — a false claim.
+    if (claimsFreshness(deliveredText)) return { kind: "false-freshness" };
+    // (2) Asserting something factual and never saying it came from memory.
+    //
+    // This returned `exempt`, on the reading that "no retrieval means no
+    // freshness to claim". True as far as it goes, but D9 asks for more than
+    // the absence of a false claim: a from-memory answer must SAY it is from
+    // memory. R1 is exactly this shape — "What's the difference between Card
+    // and Surface?" answered off loaded docs with no tool call — and it failed
+    // 2 of 3 samples once the suite started sampling it, because whether a
+    // clause appeared was left entirely to the draw.
+    if (OFFERED_AS_OPINION.test(deliveredText)) return { kind: "exempt" };
+    if (hasTrailingLabel(deliveredText)) return { kind: "trailing-label" };
+    return hasWovenConfidence(deliveredText) ? { kind: "ok" } : { kind: "unsourced" };
   }
 
   if (!assertsSomething(deliveredText)) return { kind: "exempt" };
@@ -224,6 +257,14 @@ export function needsRepair(verdict: ConfidenceVerdict): boolean {
  */
 export function repairInstruction(verdict: ConfidenceVerdict): string | null {
   switch (verdict.kind) {
+    case "unsourced":
+      return (
+        "CONFIDENCE (from memory). This turn fetched nothing, and the draft states things as fact " +
+        "without saying where they come from. Weave in — in your own words, wherever it reads " +
+        "naturally — that this is from what you already know rather than something you looked up " +
+        "just now, and say how sure you are. Do NOT invent a source, do NOT claim to have checked " +
+        "anything, and do NOT append a trailing label. Change nothing else."
+      );
     case "false-freshness":
       return (
         "This reply claims its information is current, but nothing was fetched " +
