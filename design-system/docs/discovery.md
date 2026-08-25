@@ -17,10 +17,8 @@ Do **not** bulk-load all knowledge. Load 2–3 focused documents per task (~2,00
 
 | Topic | Path |
 |-------|------|
-| All UI components (index) | `design-system/agent-views/components/index.md` |
-| Per-component agent view | `design-system/agent-views/components/{Name}/{Name}.md` |
+| All UI components (index) | `design-system/agent-views/components/index.md` — existence only; props and usage live in Storybook MDX |
 | Form elements (index) | `design-system/agent-views/forms/index.md` |
-| Per-form agent view | `design-system/agent-views/forms/{Name}.md` or `forms/{Name}/{Name}.md` |
 | Component source + Storybook | `design-system/src/components/<group>/` (groups: actions, forms-and-inputs, layout-and-structure, messaging, navigation, overlays, status-and-loading, _internal) |
 | Designer verification audit | `design-system/figma/knowledge-audit.md` |
 | Component architecture / inventory | `docs/context/design-system/components/inventory.md` |
@@ -85,13 +83,13 @@ Patterns explain **how DS components compose** — not product UX, IA, or page t
 → `agent-views/components/index.md` → `agent-views/tokens/tokens.md` (if styling)
 
 **Build a form**
-→ `docs/patterns/forms.md` → `agent-views/forms/{Name}.md` → `agent-views/tokens/tokens.md`
+→ `docs/patterns/forms.md` → `agent-views/components/index.md` → `agent-views/tokens/tokens.md`
 
 **Build a page / dashboard**
-→ `docs/patterns/layout.md` → task-specific `agent-views/components/{Name}/{Name}.md` → `agent-views/tokens/tokens.md`
+→ `docs/patterns/layout.md` → `agent-views/components/index.md` → `agent-views/tokens/tokens.md`
 
 **Dialog / Modal**
-→ `agent-views/components/Modal/Modal.md` → `docs/patterns/layout.md` (Modal skeleton)
+→ `agent-views/components/index.md` (confirm `Modal`) → `docs/patterns/layout.md` (Modal skeleton)
 
 **Implement from Figma**
 → `design-system/figma/component-registry.json` + `token-registry.json` → `mcp-guide.md` → `design-system/docs/foundations/token-mapping.md` → task-specific component/pattern docs

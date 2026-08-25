@@ -27,7 +27,7 @@ Group labeled inputs, selection controls, and actions into a coherent data-entry
 | Submit / cancel | `Button` | `@/components` |
 | Section container | `Card` | `@/components` |
 
-See `design-system/agent-views/forms/index.md` for the full form element index.
+See `design-system/agent-views/components/index.md` for the full component index — form elements moved into `components/forms-and-inputs/` in the 2026-07 reorg.
 
 ## Standard structure
 
@@ -98,13 +98,11 @@ Footer actions: either extra `Button` row in `children`, or `primaryButton` / `s
 
 ## Related component docs
 
-- `design-system/agent-views/components/Input/Input.md`
-- `design-system/agent-views/components/Button/Button.md`
-- `design-system/agent-views/components/Modal/Modal.md`
-- `design-system/agent-views/components/Card/Card.md`
+- `design-system/agent-views/components/index.md` — confirm `Input`, `Button`, `Modal`, `Card` exist
+- their Storybook MDX and `*.stories.jsx` — props, variants, usage
 
 ## Rules
 
 - Agent does not decide which fields belong on a form — implement designer-provided fields only
-- Verify each control exists in `design-system/agent-views/forms/index.md` before use
+- Verify each control exists in `design-system/agent-views/components/index.md` before use
 - Read each field's `.stories.jsx` for validation and size variants

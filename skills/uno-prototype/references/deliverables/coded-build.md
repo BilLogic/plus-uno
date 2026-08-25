@@ -29,9 +29,9 @@ b. Scaffold: `bash skills/uno-prototype/scripts/scaffold-prototype.sh <slug>`
    (details: `design-system/docs/setup.md`; config shape:
    `skills/uno-prototype/examples/vite-config-example.js`).
 c. **Load the DS agent-views before any component or token use** (AGENTS.md
-   § Progressive loading: `design-system/agent-views/components/{Name}/{Name}.md`
-   if it exists, else `components/index.md` + `tokens/tokens.md`); verify props
-   against source + stories.
+   § Progressive loading: `design-system/agent-views/components/index.md` +
+   `tokens/tokens.md`); read props, variants and usage from the component's
+   Storybook MDX and `*.stories.jsx` — they are the only source for that half.
 d. **Gate — DS gap (method §4):** needed component not in
    `design-system/agent-views/components/index.md` → name the gap, propose the
    nearest existing composition, file a uno-maintain intake. Never hand-roll a

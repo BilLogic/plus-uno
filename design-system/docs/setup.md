@@ -34,7 +34,7 @@ import '@/styles/main.scss';
 design-system/
   src/           # DS source (components, forms, specs, tokens, styles, MDX)
   docs/          # Hand-authored DS knowledge (discovery, patterns, token-mapping)
-  agent-views/   # Generated agent views — mirrors src/ layout (excludes storybook-docs, assets)
+  agent-views/   # Generated facts — component index, forms redirect, token list
   figma/         # Registries + alignment runbooks
 prototypes/{name}/     # Standalone prototypes
 .storybook/            # Storybook config

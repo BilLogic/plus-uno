@@ -11,7 +11,6 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { listAgentViewMarkdown } from './agent-views-paths.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -49,39 +48,7 @@ function pathRef(rel) {
 
 function generate() {
   const audit = readJson(AUDIT_JSON);
-  const onDisk = listAgentViewMarkdown();
   const patterns = listPatternFiles();
-
-  const componentRows = onDisk.map(({ name, file, abs }) => {
-    const entry = audit.components?.[name] || {};
-    const stat = fs.statSync(abs);
-    return [
-      name,
-      pathRef(file),
-      'yes',
-      yesNo(!!entry.verified),
-      entry.verifiedAt || '—',
-      entry.verifiedBy || '—',
-      entry.notes || '—',
-      stat.mtime.toISOString().slice(0, 10),
-    ];
-  });
-
-  for (const [name, entry] of Object.entries(audit.components || {})) {
-    if (componentRows.some((r) => r[0] === name)) continue;
-    componentRows.push([
-      name,
-      entry.knowledgeFile ? pathRef(entry.knowledgeFile) : '—',
-      'no',
-      yesNo(!!entry.verified),
-      entry.verifiedAt || '—',
-      entry.verifiedBy || '—',
-      entry.notes || '—',
-      '—',
-    ]);
-  }
-
-  componentRows.sort((a, b) => a[0].localeCompare(b[0]));
 
   const tokenRows = Object.entries(audit.tokens || {}).map(([file, entry]) => {
     const abs = path.join(REPO_ROOT, 'design-system', file);
@@ -112,6 +79,10 @@ function generate() {
 
 Tracks agent-facing docs and whether a designer has verified them.
 
+Per-component rows are gone: the 56 agent-view skeletons they audited were
+deleted in #156. Component documentation is verified in Storybook MDX, and its
+generated half returns under #165.
+
 **Edit verification status:** [\`design-system/docs/knowledge-audit.json\`](../docs/knowledge-audit.json)
 
 \`\`\`bash
@@ -119,13 +90,6 @@ npm run generate:agent
 \`\`\`
 
 Generated: ${new Date().toISOString().slice(0, 10)}
-
-## Components (agent-views)
-
-${mdTable(
-  ['Component', 'Agent view', 'On disk', 'Verified', 'Verified at', 'Verified by', 'Notes', 'File updated'],
-  componentRows
-)}
 
 ## Tokens & mapping
 
@@ -140,7 +104,7 @@ ${mdTable(['Pattern', 'Path', 'Verified', 'Notes', 'File updated'], patternRows)
 
 ## How designers verify
 
-1. Compare agent view or MDX against Storybook + Figma.
+1. Compare the doc against Storybook + Figma.
 2. Update \`design-system/docs/knowledge-audit.json\`.
 3. Run \`npm run generate:agent\`.
 `;

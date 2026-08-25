@@ -5,91 +5,34 @@
 
 Tracks agent-facing docs and whether a designer has verified them.
 
+Per-component rows are gone: the 56 agent-view skeletons they audited were
+deleted in #156. Component documentation is verified in Storybook MDX, and its
+generated half returns under #165.
+
 **Edit verification status:** [`design-system/docs/knowledge-audit.json`](../docs/knowledge-audit.json)
 
 ```bash
 npm run generate:agent
 ```
 
-Generated: 2026-08-01
-
-## Components (agent-views)
-
-| Component | Agent view | On disk | Verified | Verified at | Verified by | Notes | File updated |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Accordion | `design-system/agent-views/components/Accordion/Accordion.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Alert | `design-system/agent-views/components/Alert/Alert.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Badge | `design-system/agent-views/components/Badge/Badge.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Breadcrumb | `design-system/agent-views/components/Breadcrumb/Breadcrumb.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Button | `design-system/agent-views/components/Button/Button.md` | yes | ⏳ No | — | — | Generated from MDX/propTypes — add usage frontmatter to component MDX | 2026-08-01 |
-| ButtonGroup | `design-system/agent-views/components/ButtonGroup/ButtonGroup.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Card | `design-system/agent-views/components/Card/Card.md` | yes | ⏳ No | — | — | Generated from MDX/propTypes — add usage frontmatter to component MDX | 2026-08-01 |
-| Carousel | `design-system/agent-views/components/Carousel/Carousel.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Cascader | `design-system/agent-views/components/Cascader/Cascader.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Checkbox | `design-system/agent-views/components/Checkbox/Checkbox.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| ChoiceGrid | `design-system/agent-views/components/ChoiceGrid/ChoiceGrid.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Collapse | `design-system/agent-views/components/Collapse/Collapse.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| DateAndTimePicker | `design-system/agent-views/components/DateAndTimePicker/DateAndTimePicker.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| DatePicker | `design-system/agent-views/components/DatePicker/DatePicker.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Divider | `design-system/agent-views/components/Divider/Divider.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Dropdown | `design-system/agent-views/components/Dropdown/Dropdown.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| FileUpload | `design-system/agent-views/components/FileUpload/FileUpload.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Footer | `design-system/agent-views/components/Footer/Footer.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Input | `design-system/agent-views/components/Input/Input.md` | yes | ⏳ No | — | — | Generated from MDX/propTypes — add usage frontmatter to component MDX | 2026-08-01 |
-| InputGroup | `design-system/agent-views/components/InputGroup/InputGroup.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Jumbotron | `design-system/agent-views/components/Jumbotron/Jumbotron.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| ListGroup | `design-system/agent-views/components/ListGroup/ListGroup.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Logo | `design-system/agent-views/components/Logo/Logo.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| MediaObject | `design-system/agent-views/components/MediaObject/MediaObject.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Modal | `design-system/agent-views/components/Modal/Modal.md` | yes | ⏳ No | — | — | Generated from MDX/propTypes — add usage frontmatter to component MDX | 2026-08-01 |
-| MultipleChoice | `design-system/agent-views/components/MultipleChoice/MultipleChoice.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Navbar | `design-system/agent-views/components/Navbar/Navbar.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| NavPills | `design-system/agent-views/components/NavPills/NavPills.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| NavTabs | `design-system/agent-views/components/NavTabs/NavTabs.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| NumberInput | `design-system/agent-views/components/NumberInput/NumberInput.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| OptionList | `design-system/agent-views/components/OptionList/OptionList.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| PageLayout | `design-system/agent-views/components/PageLayout/PageLayout.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Pagination | `design-system/agent-views/components/Pagination/Pagination.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Popover | `design-system/agent-views/components/Popover/Popover.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Progress | `design-system/agent-views/components/Progress/Progress.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Radio | `design-system/agent-views/components/Radio/Radio.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Range | `design-system/agent-views/components/Range/Range.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Rating | `design-system/agent-views/components/Rating/Rating.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| RichTextEditor | `design-system/agent-views/components/RichTextEditor/RichTextEditor.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Scale | `design-system/agent-views/components/Scale/Scale.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| ScrollBar | `design-system/agent-views/components/ScrollBar/ScrollBar.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Scrollspy | `design-system/agent-views/components/Scrollspy/Scrollspy.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Select | `design-system/agent-views/components/Select/Select.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| SelectMultiple | `design-system/agent-views/components/SelectMultiple/SelectMultiple.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Sidebar | `design-system/agent-views/components/Sidebar/Sidebar.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| SidebarTab | `design-system/agent-views/components/SidebarTab/SidebarTab.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Spinner | `design-system/agent-views/components/Spinner/Spinner.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| StaticBadgeSmart | `design-system/agent-views/components/StaticBadgeSmart/StaticBadgeSmart.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Switch | `design-system/agent-views/components/Switch/Switch.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Table | `design-system/agent-views/components/Table/Table.md` | yes | ⏳ No | — | — | Generated from MDX/propTypes — add usage frontmatter to component MDX | 2026-08-01 |
-| TagInput | `design-system/agent-views/components/TagInput/TagInput.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Textarea | `design-system/agent-views/components/Textarea/Textarea.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Toast | `design-system/agent-views/components/Toast/Toast.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| Tooltip | `design-system/agent-views/components/Tooltip/Tooltip.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| TreeSelect | `design-system/agent-views/components/TreeSelect/TreeSelect.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
-| UserAvatar | `design-system/agent-views/components/UserAvatar/UserAvatar.md` | yes | ⏳ No | — | — | — | 2026-08-01 |
+Generated: 2026-08-25
 
 ## Tokens & mapping
 
 | Doc | Path | On disk | Verified | Verified at | Verified by | Notes | File updated |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| agent-views/tokens/tokens.md | `design-system/agent-views/tokens/tokens.md` | yes | ⏳ No | — | — | Generated from design-system/src/tokens/*.scss | 2026-08-01 |
-| docs/foundations/token-mapping.md | `design-system/docs/foundations/token-mapping.md` | yes | ⏳ No | — | — | Hand-authored Figma ↔ CSS mapping | 2026-07-10 |
+| agent-views/tokens/tokens.md | `design-system/agent-views/tokens/tokens.md` | yes | ⏳ No | — | — | Generated from design-system/src/tokens/*.scss | 2026-08-25 |
+| docs/foundations/token-mapping.md | `design-system/docs/foundations/token-mapping.md` | yes | ⏳ No | — | — | Hand-authored Figma ↔ CSS mapping | 2026-08-24 |
 
 ## Patterns (hand-authored)
 
 | Pattern | Path | Verified | Notes | File updated |
 | --- | --- | --- | --- | --- |
-| docs/patterns/forms.md | `design-system/docs/patterns/forms.md` | — | — | 2026-08-01 |
-| docs/patterns/layout.md | `design-system/docs/patterns/layout.md` | — | — | 2026-08-01 |
+| docs/patterns/forms.md | `design-system/docs/patterns/forms.md` | — | — | 2026-08-25 |
+| docs/patterns/layout.md | `design-system/docs/patterns/layout.md` | — | — | 2026-08-24 |
 
 ## How designers verify
 
-1. Compare agent view or MDX against Storybook + Figma.
+1. Compare the doc against Storybook + Figma.
 2. Update `design-system/docs/knowledge-audit.json`.
 3. Run `npm run generate:agent`.
