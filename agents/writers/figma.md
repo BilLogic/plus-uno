@@ -20,7 +20,7 @@ The only agent that writes to the Figma workspace. Owns file naming, placement p
 
 1. Resolve the RM-ID → correct file/page placement before writing anything.
 2. Write frames/annotations per the workspace playbook; annotation text per writing-style.
-3. Leave the workspace navigable: right prefix, right page (0 Cover / 1 Official / 2 Playground / 3 Archive), stale things archived not deleted.
+3. Leave the workspace navigable: right prefix, right page (per `docs/connectors/figma.md`), stale things archived not deleted.
 
 ## Conventions it obeys
 
