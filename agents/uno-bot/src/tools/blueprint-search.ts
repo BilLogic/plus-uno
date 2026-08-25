@@ -1,7 +1,7 @@
 // search_blueprint executor — READ-ONLY. Queries the uno-blueprint Supabase
 // (the grounded source of truth) so the bot can answer/justify factual and
 // status questions from it and cite the rows, instead of fabricating (D8).
-// Runs inline in the agent loop (mirrors marketplace_search / find_experts).
+// Runs inline in the agent loop, like the other read-only tools.
 
 import type { Env } from "../types";
 import { rethrowIfBudget, SubrequestBudgetError } from "../net";
