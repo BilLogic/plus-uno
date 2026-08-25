@@ -106,15 +106,15 @@ The design token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.
 ## References (Load on Every Invocation)
 
 - `design-system/agent-views/components/index.md` — component existence check (MANDATORY)
-- `design-system/docs/patterns/layout.md` — page layout formulas (if change touches a page)
+- `design-system/guidelines/composition/layout.md` — page layout formulas (if change touches a page)
 - `docs/conventions/coding.md` — file naming, imports, token usage, git conventions
 - `docs/conventions/terminology.md` — Plus vocabulary
 
 ## References (Load When Relevant)
 
 - **`references/new-component-scaffolding.md`** — auto-loaded by the skill-loader when `isNewComponent` is true. Contains scaffolding rules for creating a brand-new component from scratch, with the reference Badge component pattern.
-- `docs/context/design-system/foundations/tokens.md` — token semantics for visual changes
-- `design-system/figma/mcp-guide.md` — if spec includes a Figma link
+- `design-system/guidelines/foundations/tokens.md` — token semantics for visual changes
+- `design-system/guidelines/figma/mcp-guide.md` — if spec includes a Figma link
 - `skills/uno-review/references/storybook.md` — if change touches `.stories.jsx`
 - The target component's existing `.jsx` and `.stories.jsx` — always read before modifying
 

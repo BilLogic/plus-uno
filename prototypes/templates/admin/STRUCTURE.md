@@ -7,7 +7,7 @@ This template contains complete page implementations for admin-related interface
 
 For detailed component breakdowns and specifications, see:
 - **Specs Documentation**: `../../../design-system/src/specs/` (check for Admin specs if available)
-- **Component Inventory**: `../../../docs/context/design-system/components/inventory.md`
+- **Component Inventory**: `../../../design-system/guidelines/components/overview.md`
 - **Component Library**: `../../../design-system/src/components/`
 
 ## Template Structure

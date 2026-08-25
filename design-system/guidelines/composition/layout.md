@@ -1,9 +1,11 @@
-<!-- Tier: 2 | Route: design-system/docs/discovery.md → patterns/layout.md -->
-# PLUS Design System: Layout Skeleton Cheat Sheet
+<!-- Tier: 2 -->
+
+# Layout
 
 > **CRITICAL RULE**: When asked to build a new prototype, page, or feature, you MUST use one of these pre-approved structural skeletons. DO NOT invent your own raw HTML/CSS flexbox grids for the outer page structure.
 
-## 1. The Standard App Shell (Dashboard / Admin Layout)
+## The standard app shell
+
 If you are building a full page (like a dashboard, student list, or toolkit), you MUST wrap the entire page in the `<PageLayout>` component. This automatically handles the responsive Sidebar and TopBar.
 
 ```jsx
@@ -33,7 +35,8 @@ export default function MyDashboard() {
 }
 ```
 
-## 2. The Standard Overlay (Modal Layout)
+## The standard overlay
+
 If the user clicks a row or a button and needs to see details without leaving the page, use the `<Modal>` component. It manages its own overlay.
 
 ```jsx
@@ -64,41 +67,34 @@ export default function MyPageWithModal() {
 }
 ```
 
-## 3. The Standard Content Block (Card + Table Layout)
-Inside the `PageLayout` or `Modal`, data is almost always presented in a `<Card>` containing a `<Table>` or a form.
+## Applying spacing
 
-```jsx
-import React from 'react';
-import { Card, Table, Badge } from '@/components';
-
-export default function MyContentBlock() {
-    // Table takes ARRAYS OF ARRAYS — `headers` / `rows`, not `columns` / `data`.
-    const tableHeaders = ['Student Name', 'Status'];
-
-    const tableRows = [
-        ['John Doe', <Badge style="success" text="Active" />]
-    ];
-
-    const handleAdd = () => console.log('Add row');
-
-    return (
-        <Card
-            title="Student Roster"
-            actionButton={{ text: 'Add Row', onClick: handleAdd }}
-        >
-            {/* Use the PLUS Table component, do not write raw <table> tags */}
-            <Table
-                headers={tableHeaders}
-                rows={tableRows}
-                onRowClick={(row) => console.log('Clicked', row)}
-            />
-        </Card>
-    );
-}
-```
-
-## How to Apply Spacing Properly
-When filling in the content blocks, ONLY use semantic CSS variables from `design-system/agent-views/tokens/tokens.md`:
+When filling in the content blocks, use only semantic CSS variables — the names are in `design-system/agent-views/tokens/tokens.md`, the scales in `../foundations/spacing.md`:
 *   `gap: 'var(--size-section-gap-md)'` -> Spacing between major page blocks (like two diff Cards).
 *   `gap: 'var(--size-element-gap-md)'` -> Spacing between elements inside a Card (like headers and text).
 *   Never use raw string pixels like `gap: '16px'`.
+
+## Navigation
+
+The sidebar is a collapsible tree with three categories:
+
+- **Toolkit** — pre-session, in-session, post-session tools
+- **Training** — tutor onboarding, certification, practice modules
+- **Admin** — user management, billing, platform settings
+
+The active item is highlighted. The sidebar collapses to icons on narrow viewports.
+`PageLayout` renders it; do not build a second navigation surface.
+
+## Responsive behaviour
+
+- **Desktop (≥1200px)** — full sidebar and content area side by side.
+- **Tablet (768–1199px)** — sidebar collapses to an icon-only rail; content fills the width.
+- Cards stack vertically on narrow viewports.
+
+Column spans and breakpoint tokens: `../foundations/grid.md`.
+
+## Related
+
+- `surfaces.md` — cards, tables, modals, empty and loading states
+- `hierarchy.md` — the four context levels these skeletons compose
+- `../foundations/grid.md` — breakpoints and column spans

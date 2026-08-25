@@ -52,7 +52,7 @@ No path from PRD to prototyping skips grounding, at any fidelity.
   touching the same surface.
 - **Figma grounding when a frame is in play — the runtimes are NOT symmetric:**
   the **IDE** connects to Figma directly (design context, screenshots, variable
-  reads, gated write-back; see `design-system/figma/mcp-guide.md`). **uno-bot**
+  reads, gated write-back; see `design-system/guidelines/figma/mcp-guide.md`). **uno-bot**
   gets a rendered screenshot of a pasted frame link (with `node-id`) plus
   text-layer reads — qualitative grounding only; variables, tokens, and
   computed values are IDE-only (the bot's full capability statement lives in

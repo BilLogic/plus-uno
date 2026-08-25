@@ -19,7 +19,7 @@
   "key_paths": {
     "agent_system": "AGENTS.md + skills/ + agents/",
     "design_system_source": "design-system/src/",
-    "design_system_docs": "docs/context/design-system/",
+    "design_system_docs": "design-system/guidelines/",
     "storybook_config": ".storybook/",
     "token_scripts": "scripts/",
     "prototyping": "prototypes/"

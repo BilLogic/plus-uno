@@ -1,4 +1,4 @@
-<!-- Tier: 2 | Load when: composing form UIs | Route: design-system/docs/discovery.md → patterns/forms.md -->
+<!-- Tier: 2 | Load when: composing form UIs | Route: design-system/guidelines/overview.md → patterns/forms.md -->
 # Forms — Composition Pattern
 
 How PLUS **form elements compose** inside surfaces. Not product UX, IA, or field order decisions — those come from design/PRD.
@@ -96,10 +96,18 @@ Footer actions: either extra `Button` row in `children`, or `primaryButton` / `s
 - `Button variant="primary"` (Bootstrap) instead of PLUS `style` / `fill`
 - Product-specific wizard steps or IA — out of scope for this pattern doc
 
+## Field-level conventions
+
+- Single-column layout — never a multi-column form.
+- Inline validation appears below the field, on blur.
+- Required fields carry a red asterisk (`*`) next to the label.
+- The submit button is bottom-right, primary variant; cancel and other secondary actions bottom-left.
+
 ## Related component docs
 
 - `design-system/agent-views/components/index.md` — confirm `Input`, `Button`, `Modal`, `Card` exist
 - their Storybook MDX and `*.stories.jsx` — props, variants, usage
+- `surfaces.md` — the modal this form sits in when it is an overlay
 
 ## Rules
 

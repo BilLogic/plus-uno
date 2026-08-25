@@ -53,7 +53,7 @@ Routing: match intent to the Use-when column; if ambiguous, ask which capability
 <!-- ide-only -->
 ## Knowledge Architecture
 
-Design System knowledge lives in `design-system/docs/` (hand-authored) and `design-system/agent-views/` (generated from MDX / propTypes / SCSS). Start at `design-system/docs/discovery.md`; load only task-relevant docs. Workflow skills (`skills/uno-prototype`, `skills/uno-review`, etc.) own process; DS facts live under `design-system/`. Refresh agent artifacts: `npm run generate:agent`.
+Design System knowledge lives in `design-system/guidelines/` (hand-authored) and `design-system/agent-views/` (generated from MDX / propTypes / SCSS). Start at `design-system/guidelines/overview.md`; load only task-relevant docs. Workflow skills (`skills/uno-prototype`, `skills/uno-review`, etc.) own process; DS facts live under `design-system/`. Refresh agent artifacts: `npm run generate:agent`.
 
 ## Storybook MCP (agents: prefer this over grepping stories)
 
@@ -89,7 +89,7 @@ Desktop-only: MD 768 / LG 1024 / XL 1440, defined as **modes** on the Figma `siz
 
 Every embodiment, including Slack:
 
-1. **DS knowledge is law**: start at `design-system/docs/discovery.md`, then load only required docs (e.g. `design-system/agent-views/components/index.md`, `design-system/agent-views/tokens/tokens.md`). **If a component is not listed, it does not exist** — never assert one from priors.
+1. **DS knowledge is law**: start at `design-system/guidelines/overview.md`, then load only required docs (e.g. `design-system/agent-views/components/index.md`, `design-system/agent-views/tokens/tokens.md`). **If a component is not listed, it does not exist** — never assert one from priors.
 2. **Never hallucinate props**: read the component `.jsx` or `.stories.jsx` to verify exact prop names and types before naming them.
 3. Never use Font Awesome Pro icons — only FA Free: `fa-solid`, `fa-regular`, `fa-brands`. No `fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, or Pro-only names (e.g. `fa-grid-2`). Brand icons (`fa-brands fa-notion`, `fa-brands fa-figma`) are in FA Free.
 4. Notion writes follow `docs/conventions/notion.md` (convention surfaces + ✅-gated tools) — never invent select options, pillars, features, or OKRs; exact-match existing option names. Safety is the gate + schema match, not a hardcoded DB fence.
@@ -99,9 +99,9 @@ Every embodiment, including Slack:
 ### Code authoring — IDE and Actions runners only
 
 6. Never hardcode colors, spacing, typography, radius, or elevation — use design tokens. Map to compile-ready tokens (e.g. `var(--color-on-surface-state-08)`), not raw Figma literal names.
-7. **Never hallucinate layouts**: when building a new page, read `design-system/docs/patterns/layout.md` and use the official structural React formulas (e.g. `<PageLayout>`).
+7. **Never hallucinate layouts**: when building a new page, read `design-system/guidelines/composition/layout.md` and use the official structural React formulas (e.g. `<PageLayout>`).
 8. Never skip reading component source + story + styles before using an unfamiliar component.
-9. When Figma design input exists, follow the full implement-design workflow (`design-system/figma/mcp-guide.md`): **MANDATORY load** `design-system/figma/component-registry.json` + `design-system/figma/token-registry.json` first (`design-system/figma/registry-load-gate.md`) → extract node IDs → fetch design context → capture screenshot → download assets → translate to PLUS token conventions → achieve visual parity → validate against source. Do not skip steps.
+9. When Figma design input exists, follow the full implement-design workflow (`design-system/guidelines/figma/mcp-guide.md`): **MANDATORY load** `design-system/figma/component-registry.json` + `design-system/figma/token-registry.json` first (`design-system/guidelines/figma/registry-load-gate.md`) → extract node IDs → fetch design context → capture screenshot → download assets → translate to PLUS token conventions → achieve visual parity → validate against source. Do not skip steps.
 10. **Figma registries are law for design-to-code**: before mapping Figma nodes to imports or variables to tokens, read both registries above. Never hallucinate component imports or token names when Figma input is involved.
 11. Never install new packages without explicit user approval.
 12. Import public components only as named exports from `@/components` (forms and dataviz included). Spec shells come from area group indexes — e.g. `import { PageLayout } from '@/specs/Universal/Pages'`. File-level paths, category-folder paths, `_internal` paths, and the `@plus-ds` alias are forbidden in new files. Existing deep imports inside `design-system/src/specs/` are grandfathered — 'follow surrounding code' never licenses copying them into new files.
@@ -110,7 +110,7 @@ Every embodiment, including Slack:
 15. Always validate in Storybook when component behavior is touched.
 16. Confirm the implementation plan and touched files before large or risky edits.
 17. **uno-prototype intake is one step per message**: when `.cursor/hooks/briefings/active-intake-question.json` exists, read it and ask exactly one hook step — AskQuestion with `questions.length === 1`, or one plain question. Never batch intake steps into one turn; never skip a step because context already answers it.
-18. **Figma write-back uses the DS gate — never screenshot import as the final frame**: when `.cursor/hooks/briefings/active-writeback-gate.json` exists, follow it. Place library component instances per `design-system/figma/component-alignment.md` using `component-registry.json` + `token-registry.json`. **Forbidden:** `generate_figma_design` / html-to-design capture as the `[replica]` deliverable (reference-only if used at all). Complete `npm run validate:figma-writeback` + `npm run audit:figma-writeback` before `writeback:audit-passed`. In a runtime without the write-back hook (only Cursor wires it today), run both scripts manually before declaring the write-back done — the gate file's absence is not an exemption.
+18. **Figma write-back uses the DS gate — never screenshot import as the final frame**: when `.cursor/hooks/briefings/active-writeback-gate.json` exists, follow it. Place library component instances per `design-system/guidelines/figma/component-alignment.md` using `component-registry.json` + `token-registry.json`. **Forbidden:** `generate_figma_design` / html-to-design capture as the `[replica]` deliverable (reference-only if used at all). Complete `npm run validate:figma-writeback` + `npm run audit:figma-writeback` before `writeback:audit-passed`. In a runtime without the write-back hook (only Cursor wires it today), run both scripts manually before declaring the write-back done — the gate file's absence is not an exemption.
 <!-- /ide-only -->
 
 ## Knowledge
@@ -139,18 +139,18 @@ Load docs on demand — 2-3 guides (~2,000-2,500 tokens), never the full set:
 
 | Trigger | Load |
 |---------|------|
-| Any DS implementation task | `design-system/docs/discovery.md` (MANDATORY entry — route from here) |
+| Any DS implementation task | `design-system/guidelines/overview.md` (MANDATORY entry — route from here) |
 | Building UI, using components or tokens | `design-system/agent-views/components/index.md` (existence) + `tokens/tokens.md` (names), then the component's Storybook MDX and `*.stories.jsx` for props and usage |
 | Designer knowledge verification status | `design-system/figma/knowledge-audit.md` |
-| Building new pages, dashboards, layouts | `design-system/docs/patterns/layout.md` (MANDATORY) |
-| Implementation setup (aliases, prototypes, Vite) | `design-system/docs/setup.md` |
-| Design philosophy / agent role | `design-system/docs/guidelines.md` |
-| Figma link, implement-design, design-to-code mapping, or **code write-back to Figma** | `design-system/figma/component-registry.json` + `token-registry.json` (MANDATORY — load first); then `design-system/figma/component-alignment.md`. Write-back also loads `.cursor/hooks/briefings/active-writeback-gate.json` when the gate is active. |
+| Building new pages, dashboards, layouts | `design-system/guidelines/composition/layout.md` (MANDATORY) |
+| Implementation setup (aliases, prototypes, Vite) | `docs/engineering/setup.md` |
+| Design philosophy / agent role | `design-system/guidelines/principles.md` |
+| Figma link, implement-design, design-to-code mapping, or **code write-back to Figma** | `design-system/figma/component-registry.json` + `token-registry.json` (MANDATORY — load first); then `design-system/guidelines/figma/component-alignment.md`. Write-back also loads `.cursor/hooks/briefings/active-writeback-gate.json` when the gate is active. |
 | Need a specific component's Figma node id / link to reference | `design-system/figma/component-figma-links.md` (generated from component MDX; run `npm run generate:figma-links`) |
 | Writing to Notion / Figma / Slack / blueprint | the matching `docs/conventions/*.md` |
 | Human-facing text of any kind | `docs/conventions/writing-style.md` |
-| Product / in-app UI copy (labels, errors, empty states) | `docs/context/design-system/foundations/content-voice.md` — descriptive; `writing-style.md` wins on conflict |
-| Component architecture questions | `docs/context/design-system/components/inventory.md` |
+| Product / in-app UI copy (labels, errors, empty states) | `design-system/guidelines/foundations/content/voice-and-tone.md` — descriptive; `writing-style.md` wins on conflict |
+| Component architecture questions | `design-system/guidelines/components/overview.md` |
 | Product context, users, or domain terms | `docs/context/product/*.md` (foundation) + uno-blueprint (live truth) |
 | Reading or reasoning over the blueprint (schema, lane semantics, query recipes, answering rules) | `docs/conventions/blueprint-navigation.md` — load BEFORE querying; un-guided blueprint reads fail on navigation and lane attribution (the Worker already carries it) |
 | New teammate orientation | `docs/context/onboarding.md` |

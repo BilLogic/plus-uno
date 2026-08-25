@@ -126,7 +126,7 @@ export function writeGateBriefing(conversationId, triggerPrompt) {
     requiredReads: [
       'design-system/figma/component-registry.json',
       'design-system/figma/token-registry.json',
-      'design-system/figma/component-alignment.md',
+      'design-system/guidelines/figma/component-alignment.md',
     ],
     requiredSteps: [
       'Place Figma library component instances (never screenshot import as the final frame).',

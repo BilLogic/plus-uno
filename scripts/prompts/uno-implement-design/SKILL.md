@@ -94,7 +94,7 @@ Follow these in every file (full rules in the shared `AGENTS.md`):
 - Styling is **SCSS with CSS custom properties (design tokens)** — never CSS modules, never Tailwind/MUI/Ant
 - Component class prefix is **`plus-`**; BEM-like `.plus-block__element`, `.plus-block--modifier`
 - Icons are **Font Awesome Free only**: `fa-solid`, `fa-regular`, `fa-brands` — never `fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`
-- For full pages, use the official layout formulas (`<PageLayout>`, `<Card>`, `<Modal>`) — read `design-system/docs/patterns/layout.md`
+- For full pages, use the official layout formulas (`<PageLayout>`, `<Card>`, `<Modal>`) — read `design-system/guidelines/composition/layout.md`
 - Never deep-import from `design-system/src/` — use the `@` barrel aliases
 
 ## Token Mapping Rules (CRITICAL)
@@ -111,7 +111,7 @@ The token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.scss`, 
 ## Implementation Rules
 
 - **Achieve visual parity** with the Figma screenshot — layout, typography, color, spacing, states — using PLUS tokens and components.
-- **Confirm components exist** in `docs/context/design-system/components/inventory.md` (the component catalog — purpose, props API, and usage for every component) before using them. If a component isn't listed there, it does not exist — use the closest match or compose from primitives.
+- **Confirm components exist** in `design-system/guidelines/components/overview.md` (the component catalog — purpose, props API, and usage for every component) before using them. If a component isn't listed there, it does not exist — use the closest match or compose from primitives.
 - **Don't hallucinate props.** Use only props confirmed by the component inventory / context provided.
 - **Keep the prototype self-contained** under `prototypes/{slug}/`. Do not modify `design-system/src/` or any file outside the prototype directory.
 - **Return ONLY file contents in the exact `---FILE: ... ---` block format** below. Filenames are relative to `prototypes/{slug}/`.
@@ -127,9 +127,9 @@ The token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.scss`, 
 
 ## References (Load on Every Invocation)
 
-- `docs/context/design-system/components/inventory.md` — component catalog (MANDATORY)
-- `design-system/docs/patterns/layout.md` — page layout formulas (MANDATORY for page-level frames)
-- `design-system/docs/discovery.md` — route to component/token lists before coding
+- `design-system/guidelines/components/overview.md` — component catalog (MANDATORY)
+- `design-system/guidelines/composition/layout.md` — page layout formulas (MANDATORY for page-level frames)
+- `design-system/guidelines/overview.md` — route to component/token lists before coding
 - `docs/conventions/coding.md` — file naming, imports, token usage
 - `docs/conventions/terminology.md` — Plus vocabulary
 - `prototypes/home-redesign/` — the reference scaffold (structure to mirror)

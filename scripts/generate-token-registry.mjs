@@ -1,5 +1,5 @@
 /**
- * Generate token-registry.json from design-system/docs/foundations/token-mapping.md (human source of truth)
+ * Generate token-registry.json from design-system/guidelines/figma/token-mapping.md (human source of truth)
  * and VALIDATE every referenced CSS token against the actual SCSS token definitions.
  *
  * This kills drift: the Figma↔code mapping is authored once (in the .md), the JSON is
@@ -18,7 +18,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const MD_SOURCE = path.join(REPO_ROOT, 'design-system/docs/foundations/token-mapping.md');
+const MD_SOURCE = path.join(REPO_ROOT, 'design-system/guidelines/figma/token-mapping.md');
 const VARIABLES_SNAPSHOT = path.join(REPO_ROOT, 'scripts/figma-variables-snapshot.json');
 const TOKENS_DIR = path.join(REPO_ROOT, 'design-system/src/tokens');
 const OUT = path.join(REPO_ROOT, 'design-system/figma/token-registry.json');
@@ -27,7 +27,7 @@ const STATIC = {
   figmaFileKey: 'zAecJNRdvJzAUOcjV32tRX',
   syncCommand: 'npm run sync:tokens && npm run generate:tokens',
   codeTokenRoot: 'design-system/src/tokens/',
-  humanReference: 'design-system/docs/foundations/token-mapping.md',
+  humanReference: 'design-system/guidelines/figma/token-mapping.md',
 };
 
 /** All `--token` names defined across the SCSS token files (existence truth). */
@@ -258,7 +258,7 @@ function build() {
     version: '1.1.0',
     generated: true,
     generatedBy: 'scripts/generate-token-registry.mjs',
-    note: 'DO NOT EDIT BY HAND. Two inputs: design-system/docs/foundations/token-mapping.md (curated semantics, authoritative) and scripts/figma-variables-snapshot.json (bulk, derived mechanically). Every token in both is validated against design-system/src/tokens/*.scss. Run `npm run generate:token-registry`.',
+    note: 'DO NOT EDIT BY HAND. Two inputs: design-system/guidelines/figma/token-mapping.md (curated semantics, authoritative) and scripts/figma-variables-snapshot.json (bulk, derived mechanically). Every token in both is validated against design-system/src/tokens/*.scss. Run `npm run generate:token-registry`.',
     ...STATIC,
     variablesSnapshot: 'scripts/figma-variables-snapshot.json',
     mappings: { colors, typography, spacing, elevation },

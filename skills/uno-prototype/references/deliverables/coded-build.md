@@ -20,13 +20,13 @@ a. **Ask for a Figma file first — one question, before any build:** *"Do you
    already have a Figma file you want to build upon?"* (one question this
    message, Yes/No).
    - **Yes** → get the link, then follow the full implement-design workflow in
-     `design-system/figma/mcp-guide.md` — no skipped steps; registries load
-     first per `design-system/figma/registry-load-gate.md` (MANDATORY);
+     `design-system/guidelines/figma/mcp-guide.md` — no skipped steps; registries load
+     first per `design-system/guidelines/figma/registry-load-gate.md` (MANDATORY);
      variables translate to tokens via `design-system/figma/token-registry.json`.
    - **No** → build from the confirmed plan on the design system directly.
 b. Scaffold: `bash skills/uno-prototype/scripts/scaffold-prototype.sh <slug>`
    — copies `prototypes/starter/`, patches the name, picks the next free port
-   (details: `design-system/docs/setup.md`; config shape:
+   (details: `docs/engineering/setup.md`; config shape:
    `skills/uno-prototype/examples/vite-config-example.js`).
 c. **Load the DS agent-views before any component or token use** (AGENTS.md
    § Progressive loading: `design-system/agent-views/components/index.md` +

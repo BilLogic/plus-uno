@@ -28,9 +28,9 @@ tags: [conventions, taste]
 - Slug-based routing causes collisions when multiple contributors name things similarly
 
 ## DS knowledge is law (mandatory before UI code)
-- Start at `design-system/docs/discovery.md`, then load only required docs (e.g. `components/index.md`, `foundations/tokens.md`)
+- Start at `design-system/guidelines/overview.md`, then load only required docs (e.g. `components/index.md`, `foundations/tokens.md`)
 - If a component is not listed, it does not exist
-- For page layouts, load `design-system/docs/patterns/layout.md`
+- For page layouts, load `design-system/guidelines/composition/layout.md`
 
 ## Bootstrap-first (no Material UI, Ant Design, Tailwind)
 - PLUS design system is built on React-Bootstrap / Bootstrap 5.3
@@ -40,4 +40,4 @@ tags: [conventions, taste]
 ## Sentence case for UI labels, title case for page titles
 - UI labels, buttons, and menu items: sentence case ("Session details", "View all students")
 - Page titles and top-level navigation: title case ("Student Overview", "Tutor Dashboard")
-- See `docs/context/design-system/foundations/content-voice.md` for full rules
+- See `design-system/guidelines/foundations/content/voice-and-tone.md` for full rules

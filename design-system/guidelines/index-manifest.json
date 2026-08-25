@@ -3,7 +3,7 @@
   "updated_for_branch": "main",
   "indexes": {
     "foundations": "skills/uno-research/references/foundations-index.json",
-    "components": "docs/context/design-system/components/components-index.json",
+    "components": "design-system/guidelines/components/components-index.json",
     "figma_components": "design-system/figma/component-registry.json",
     "figma_tokens": "design-system/figma/token-registry.json",
     "patterns": "skills/uno-research/references/patterns-index.json"
@@ -14,8 +14,8 @@
       "foundations": "Shared baseline context: commands, key paths, context levels, terminology.",
       "patterns": "Implementation patterns, guardrails, and reference paths for consistent coding.",
       "components": "Component roots, export entrypoints, story globs, discovery docs.",
-      "figma_components": "MANDATORY for Figma implement-design: code import ↔ Figma component set ↔ props.",
-      "figma_tokens": "MANDATORY for Figma implement-design: Figma variable ↔ var(--*)."
+      "figma_components": "MANDATORY for Figma implement-design: code import \u2194 Figma component set \u2194 props.",
+      "figma_tokens": "MANDATORY for Figma implement-design: Figma variable \u2194 var(--*)."
     }
   }
 }

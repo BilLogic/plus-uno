@@ -8,7 +8,7 @@
       "verifiedBy": null,
       "notes": "Generated from design-system/src/tokens/*.scss"
     },
-    "docs/foundations/token-mapping.md": {
+    "guidelines/figma/token-mapping.md": {
       "verified": false,
       "verifiedAt": null,
       "verifiedBy": null,

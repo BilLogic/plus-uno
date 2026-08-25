@@ -108,8 +108,8 @@ done < <(grep -oE 'skills/uno-[a-z-]+' AGENTS.md | sort -u || true)
 echo "[check] validating JSON index files"
 
 required_indexes=(
-  "docs/context/design-system/index-manifest.json"
-  "docs/context/design-system/components/components-index.json"
+  "design-system/guidelines/index-manifest.json"
+  "design-system/guidelines/components/components-index.json"
   "skills/uno-research/references/foundations-index.json"
   "skills/uno-research/references/patterns-index.json"
 )
@@ -136,15 +136,17 @@ old_patterns=(
   "\.agent/"
   "bot-skills/"
   "/uno:"
+  "docs/context/design-system"
+  "design-system/docs/"
 )
 
 for pattern in "${old_patterns[@]}"; do
   # `|| true` inside the substitution: zero matches is the SUCCESS case, but under
   # pipefail a matchless grep would fail the assignment and kill the script.
-  # design-system/docs/foundations/ is a VALID current path — only the old
-  # repo-root docs/foundations/ counts as stale.
+  # design-system/docs/ retired in #170 (four homes collapsed into
+  # design-system/guidelines/), so it is now itself a stale pattern.
   count=$({ grep -r "$pattern" --include="*.md" --include="*.jsx" --include="*.json" --include="*.mdc" . 2>/dev/null || true; } \
-    | { grep -v "node_modules/\|docs/plans/\|docs/knowledge/\|todos/\|storybook-static/\|design-system/docs/foundations/\|design-system/docs/knowledge-audit.json" || true; } \
+    | { grep -v "node_modules/\|docs/plans/\|docs/knowledge/\|todos/\|storybook-static/\|design-system/docs/foundations/\|design-system/figma/knowledge-audit.json" || true; } \
     | wc -l | tr -d ' ')
   if [[ "$count" -gt 0 ]]; then
     echo "[stale] $count references to old path pattern: $pattern"

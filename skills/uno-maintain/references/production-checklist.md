@@ -14,8 +14,8 @@ Use with **uno-review** when implementing approved designs for production (not d
 
 If a Figma link is provided:
 
-1. Follow `../../../design-system/figma/mcp-guide.md` (7 steps)
-2. Load registries per `design-system/figma/registry-load-gate.md`
+1. Follow `../../../design-system/guidelines/figma/mcp-guide.md` (7 steps)
+2. Load registries per `design-system/guidelines/figma/registry-load-gate.md`
 3. Use `get_variable_defs` to verify tokens against latest Figma variables
 
 ## Accessibility (mandatory)
@@ -25,7 +25,7 @@ If a Figma link is provided:
 - Color contrast and readable state communication
 - Screen-reader-friendly labels and content order
 
-See also `docs/context/design-system/foundations/accessibility.md`.
+See also `design-system/guidelines/foundations/accessibility.md`.
 
 ## Before Finishing
 

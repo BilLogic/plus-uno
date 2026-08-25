@@ -29,7 +29,7 @@
       "name": "figma_to_code",
       "rule": "Fetch design context/screenshot first, then map to DS components/specs.",
       "references": [
-        "design-system/figma/mcp-guide.md"
+        "design-system/guidelines/figma/mcp-guide.md"
       ]
     },
     {

@@ -12,7 +12,7 @@ Agents **MUST** read both files below before:
 
 **Do not guess** component imports or token names. If a node is not in the registry, flag it as a gap — do not invent a substitute.
 
-**Write-back gate:** when the user asks to write back to Figma, `.cursor/hooks/briefings/active-writeback-gate.json` is the live checklist — follow `design-system/figma/component-alignment.md` § Cursor → Figma.
+**Write-back gate:** when the user asks to write back to Figma, `.cursor/hooks/briefings/active-writeback-gate.json` is the live checklist — follow `design-system/guidelines/figma/component-alignment.md` § Cursor → Figma.
 
 ## Mandatory files (load in this order)
 
@@ -24,7 +24,7 @@ Agents **MUST** read both files below before:
 > Both registries are **generated, read-only artifacts** — never hand-edit them.
 >
 > - **`component-registry.json`** is generated from each component's MDX `export const figmaMeta`. To change a mapping, edit the component's MDX `figmaMeta` and run `npm run generate:component-registry`.
-> - **`token-registry.json`** is generated from `design-system/docs/foundations/token-mapping.md` and every `var(--*)` is validated against `design-system/src/tokens/*.scss`. To change a mapping, edit `token-mapping.md` and run `npm run generate:agent` (or `generate:token-registry`). If a token doesn't exist in SCSS, the generator reports it (and `check:token-registry` fails) — this is the guard against drift.
+> - **`token-registry.json`** is generated from `design-system/guidelines/figma/token-mapping.md` and every `var(--*)` is validated against `design-system/src/tokens/*.scss`. To change a mapping, edit `token-mapping.md` and run `npm run generate:agent` (or `generate:token-registry`). If a token doesn't exist in SCSS, the generator reports it (and `check:token-registry` fails) — this is the guard against drift.
 
 ## Load gate (before writing JSX or SCSS)
 
@@ -35,9 +35,9 @@ Agents **MUST** read both files below before:
 
 ## Supporting docs (load after registries)
 
-- `design-system/figma/component-alignment.md` — implement + write-back rules
-- `design-system/figma/mcp-guide.md` — MCP workflow
-- `design-system/docs/foundations/token-mapping.md` — extended token tables (authoritative source)
+- `design-system/guidelines/figma/component-alignment.md` — implement + write-back rules
+- `design-system/guidelines/figma/mcp-guide.md` — MCP workflow
+- `design-system/guidelines/figma/token-mapping.md` — extended token tables (authoritative source)
 
 ## Skills that enforce this load
 

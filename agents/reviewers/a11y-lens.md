@@ -21,5 +21,5 @@ Judges an artifact's accessibility: color contrast, focus order, accessible labe
 
 ## Conventions it obeys
 
-- `docs/context/design-system/` a11y foundation docs (the rules live there)
+- `design-system/guidelines/` a11y foundation docs (the rules live there)
 - Scored by: `docs/evals/rubrics/uno-review.md`

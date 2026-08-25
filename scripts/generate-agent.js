@@ -34,5 +34,5 @@ for (const [label, cmd] of steps) {
 }
 
 console.log('\n✓ generate:agent complete');
-console.log('  Entry: design-system/docs/discovery.md');
+console.log('  Entry: design-system/guidelines/overview.md');
 console.log('  Views: design-system/agent-views/');

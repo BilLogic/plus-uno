@@ -1,4 +1,4 @@
-<!-- Load when: Figma ↔ CSS token mapping | Route: design-system/docs/discovery.md → foundations/token-mapping.md -->
+<!-- Load when: Figma ↔ CSS token mapping | Route: design-system/guidelines/overview.md → foundations/token-mapping.md -->
 
 # Figma Token Mapping Reference
 

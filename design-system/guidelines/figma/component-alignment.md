@@ -57,7 +57,7 @@ Before generating JSX:
 3. `search_design_system` for the node (secondary confirmation)
 4. If node is a **library instance**, use mapped `@/components/...` and props from registry
 5. If node is a **raw frame**, flag as design debt; do not invent a new component
-6. Tokens: `get_variable_defs` + `token-registry.json` / `design-system/docs/foundations/token-mapping.md` → only `var(--*)`
+6. Tokens: `get_variable_defs` + `token-registry.json` / `design-system/guidelines/figma/token-mapping.md` → only `var(--*)`
 7. Run `uno-review` on output
 
 ## Cursor → Figma (write-back)
@@ -105,6 +105,6 @@ Requires: `figma-use` skill before canvas writes; summon `writers/figma` for pla
 ## Related docs
 
 - `design-system/figma/token-registry.json`
-- `design-system/docs/foundations/token-mapping.md`
-- `design-system/figma/mcp-guide.md`
-- `design-system/figma/registry-load-gate.md`
+- `design-system/guidelines/figma/token-mapping.md`
+- `design-system/guidelines/figma/mcp-guide.md`
+- `design-system/guidelines/figma/registry-load-gate.md`

@@ -88,7 +88,7 @@ Figma → npm run sync:tokens → npm run generate:tokens → commit SCSS
 
 - Never edit generated token files (`_colors.scss`, `_spacing_semantics.scss`, etc.) directly
 - Token source is Figma; SCSS is generated output
-- Figma mapping tables: `design-system/docs/foundations/token-mapping.md`
+- Figma mapping tables: `design-system/guidelines/figma/token-mapping.md`
 - Refresh agent views: `npm run generate:agent`
 
 ## Local Preview

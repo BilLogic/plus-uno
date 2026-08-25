@@ -1,4 +1,6 @@
-# Figma ↔ Coding Agent Component Alignment
+<!-- Tier: 2 -->
+
+# Figma
 
 Machine-readable contracts and human runbooks so Cursor prototypes, Storybook, and the Figma design system stay aligned on **tokens** and **components**.
 
@@ -10,18 +12,24 @@ Machine-readable contracts and human runbooks so Cursor prototypes, Storybook, a
 | `fileKey` | `zAecJNRdvJzAUOcjV32tRX` |
 | URL | https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary- |
 
-## Files in this folder
+## What lives where
 
-| File | Purpose |
-|------|---------|
-| `component-registry.json` | **Generated artifact** — code import ↔ Figma component set ↔ props. DO NOT EDIT BY HAND |
-| `component-alignment.md` | Workflow for agents and contributors (implement + write-back) |
-| `token-registry.json` | **Generated artifact** — Figma variable name ↔ CSS custom property, validated against SCSS. DO NOT EDIT BY HAND |
-| `component-figma-links.md` | **Generated** — Figma node links per component (from MDX) |
-| `knowledge-audit.md` | **Generated** — verification status (edit `design-system/docs/knowledge-audit.json`) |
-| `mcp-guide.md` | Figma MCP tool reference + implement-design workflows |
-| `registry-load-gate.md` | **MANDATORY** — load both registries before any Figma implement / write-back / design-to-code mapping |
-| `patterns.json` | **Hand-authored** source for the `patterns` section of `component-registry.json` (layout/composition pattern sets → token families) |
+Protocol is authored here in `design-system/guidelines/figma/`; the registries it
+governs are generated and stay beside the source they describe in
+`design-system/figma/`.
+
+| File | Where | State |
+|------|-------|-------|
+| `registry-load-gate.md` | this folder | **MANDATORY** — load both registries before any implement, write-back, or design-to-code mapping |
+| `component-alignment.md` | this folder | Workflow for agents and contributors (implement + write-back) |
+| `mcp-guide.md` | this folder | Figma MCP tool reference + implement-design workflows |
+| `token-mapping.md` | this folder | Figma ↔ CSS token mapping (authoritative) |
+| `parity-2026-07.md` | this folder | Dated Figma ↔ Storybook parity snapshot |
+| `component-registry.json` | `design-system/figma/` | **Generated** — import ↔ Figma component set ↔ props |
+| `token-registry.json` | `design-system/figma/` | **Generated** — Figma variable ↔ CSS custom property, validated against SCSS |
+| `component-figma-links.md` | `design-system/figma/` | **Generated** — Figma node links per component |
+| `knowledge-audit.md` | `design-system/figma/` | **Generated** — verification status (edit `knowledge-audit.json` beside it) |
+| `patterns.json` | `design-system/figma/` | Hand-authored source for the `patterns` section of `component-registry.json` |
 
 ## Source of truth: per-component MDX
 
@@ -51,9 +59,9 @@ export const figmaMeta = {
 
 ### Token source of truth: `token-mapping.md`
 
-`token-registry.json` is generated from `design-system/docs/foundations/token-mapping.md`. Every `var(--*)` is validated against `design-system/src/tokens/*.scss`, so a mapping to a non-existent token fails the check.
+`token-registry.json` is generated from `design-system/guidelines/figma/token-mapping.md`. Every `var(--*)` is validated against `design-system/src/tokens/*.scss`, so a mapping to a non-existent token fails the check.
 
-- To change a token mapping, **edit `design-system/docs/foundations/token-mapping.md`**, not the registry.
+- To change a token mapping, **edit `design-system/guidelines/figma/token-mapping.md`**, not the registry.
 - Spacing is **contextual** (per layer: element / card / section / modal / surface / table) — there is no single `Spacing/N` → one token.
 
 ## Regenerating agent + Figma artifacts
@@ -74,7 +82,7 @@ npm run check:token-registry
 
 - Components: `design-system/src/components/` (forms live in `components/forms-and-inputs/`), `specs/`
 - Tokens: `design-system/src/tokens/` (synced from Figma via `npm run sync:tokens`)
-- Agent knowledge entry: `design-system/docs/discovery.md`
+- Agent knowledge entry: `design-system/guidelines/overview.md`
 - Agent views (generated): `design-system/agent-views/`
 
 ## Pilot status (Button)
@@ -109,10 +117,10 @@ bash skills/uno-review/scripts/run-review-checks.sh prototypes/<name>/src
 
 1. `design-system/figma/component-registry.json`
 2. `design-system/figma/token-registry.json`
-3. `design-system/figma/registry-load-gate.md`
+3. `design-system/guidelines/figma/registry-load-gate.md`
 
 Then:
 
-4. `design-system/figma/component-alignment.md`
-5. `design-system/figma/mcp-guide.md`
-6. `design-system/docs/foundations/token-mapping.md`
+4. `design-system/guidelines/figma/component-alignment.md`
+5. `design-system/guidelines/figma/mcp-guide.md`
+6. `design-system/guidelines/figma/token-mapping.md`

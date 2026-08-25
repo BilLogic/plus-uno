@@ -11,5 +11,5 @@
 - **Complete sentences in prose; fragments allowed in tables.**
 - **Sign and date judgment calls** ("— Bill, Jul 2026") so future readers skip the archaeology.
 - **Code formatting only for exact machine-referenced identifiers** (skill names, tokens, property names, paths, exact UI strings) — never decoratively.
-- Surface-specific shapes live with the surface: share-out post → `slack.md` · hub sections + Doc Changelog → `notion.md` · annotations → `figma-workspace.md` · product/UI copy → `docs/context/design-system/foundations/content-voice.md`.
+- Surface-specific shapes live with the surface: share-out post → `slack.md` · hub sections + Doc Changelog → `notion.md` · annotations → `figma-workspace.md` · product/UI copy → `design-system/guidelines/foundations/content/voice-and-tone.md`.
 - **Formatting is one rule for every destination: write standard Markdown.** The Worker renders it per surface — Slack, Notion blocks, email. The destination matrix (what converts where, and the one construct that differs) is `slack.md` § Message formatting.

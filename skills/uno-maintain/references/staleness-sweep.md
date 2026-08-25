@@ -21,7 +21,7 @@ One intake per finding (evidence + suggested tier), through the normal pipeline 
 
 - [ ] `AGENTS.md` roster lists exactly six skills; each `skills/*/SKILL.md` + `bot.md` exists and both load `references/method.md`.
 - [ ] Reference links inside each `SKILL.md` resolve (run `scripts/validate-doc-links.sh`).
-- [ ] Paths referenced from `docs/context/design-system/` exist; index JSONs match current paths and commands.
+- [ ] Paths referenced from `design-system/guidelines/` exist; index JSONs match current paths and commands.
 
 ## D. Token & DS integrity
 

@@ -16,6 +16,7 @@
     "../prototypes/**/*.stories.{js,jsx,ts,tsx}"
   ],
   "discovery_docs": [
-    "docs/context/design-system/components/inventory.md"
+    "design-system/guidelines/components/overview.md",
+    "design-system/agent-views/components/index.md"
   ]
 }

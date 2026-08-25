@@ -19,7 +19,7 @@
 
 ## Token References
 
-- [Color](../styles/color.md) — Color roles, SMART framework, surfaces, state layers
-- [Spacing](../styles/spacing.md) — Spacing hierarchy, element/card/section/modal/table tokens
-- [Typography](../styles/typography.md) — Font families, weights, classes, sizing
-- [Elevation](../styles/elevation.md) — Shadow depth tokens
+- [Color](color.md) — Color roles, SMART framework, surfaces, state layers
+- [Spacing](spacing.md) — Spacing hierarchy, element/card/section/modal/table tokens
+- [Typography](typography.md) — Font families, weights, classes, sizing
+- [Elevation](elevation.md) — Shadow depth tokens

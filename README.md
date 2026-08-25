@@ -113,7 +113,7 @@ The component library lives in `design-system/src/`: **56 UI components (form el
 **Key rules for agents and contributors:**
 - Use PLUS components first — only fall back to React-Bootstrap when no PLUS equivalent exists
 - Never hardcode colors, spacing, or typography — use design tokens
-- Start at `design-system/docs/discovery.md` before building UI
+- Start at `design-system/guidelines/overview.md` before building UI
 - After editing component MDX or token-mapping: `npm run generate:agent`
 - No Tailwind, Material UI, or Ant Design in components or prototypes — Bootstrap + SCSS only. (Tailwind appears in devDependencies solely for the internal Storybook docs pages under `design-system/src/storybook-docs/`; it is off-limits in DS components and prototypes.)
 

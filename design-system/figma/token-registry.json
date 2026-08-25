@@ -2,11 +2,11 @@
   "version": "1.1.0",
   "generated": true,
   "generatedBy": "scripts/generate-token-registry.mjs",
-  "note": "DO NOT EDIT BY HAND. Two inputs: design-system/docs/foundations/token-mapping.md (curated semantics, authoritative) and scripts/figma-variables-snapshot.json (bulk, derived mechanically). Every token in both is validated against design-system/src/tokens/*.scss. Run `npm run generate:token-registry`.",
+  "note": "DO NOT EDIT BY HAND. Two inputs: design-system/guidelines/figma/token-mapping.md (curated semantics, authoritative) and scripts/figma-variables-snapshot.json (bulk, derived mechanically). Every token in both is validated against design-system/src/tokens/*.scss. Run `npm run generate:token-registry`.",
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "syncCommand": "npm run sync:tokens && npm run generate:tokens",
   "codeTokenRoot": "design-system/src/tokens/",
-  "humanReference": "design-system/docs/foundations/token-mapping.md",
+  "humanReference": "design-system/guidelines/figma/token-mapping.md",
   "variablesSnapshot": "scripts/figma-variables-snapshot.json",
   "mappings": {
     "colors": {

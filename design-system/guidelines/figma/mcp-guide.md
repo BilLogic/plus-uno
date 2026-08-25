@@ -4,10 +4,10 @@
 
 ## Before any MCP call or JSX
 
-The registry load gate is **`design-system/figma/registry-load-gate.md`** —
+The registry load gate is **`design-system/guidelines/figma/registry-load-gate.md`** —
 MANDATORY, registries first, not restated here. Alignment rules (Figma → code
 resolution, code → Figma instance placement, drift prevention) are
-`design-system/figma/component-alignment.md`. This guide owns what neither
+`design-system/guidelines/figma/component-alignment.md`. This guide owns what neither
 does: the MCP tools themselves and the workflows that chain them.
 
 ## Available Tools
@@ -78,7 +78,7 @@ For iterating a prototype between the repo and Figma (build here → designer tw
 
 1. **Primary:** `design-system/figma/component-registry.json` — import path, props, Figma set node IDs (generated from each component's MDX `figmaMeta`; read-only — edit MDX to change a mapping)
 2. **Secondary:** `search_design_system` MCP — confirm library instance names
-3. **Tertiary:** `docs/context/design-system/components/components-index.json` — unmapped components only
+3. **Tertiary:** `design-system/guidelines/components/components-index.json` — unmapped components only
 
 If a node is not in the registry, flag as a gap. Do not invent imports or props.
 

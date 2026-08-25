@@ -1,8 +1,18 @@
-<!-- Tier: 2 | generated mirror — generated from design-system/src — regenerate, don't hand-edit (plan Phase 2b) -->
+<!-- Tier: 2 -->
 
-# PLUS Design System Component Guidelines
+# Components
 
-⚠️ STALE — source paths below predate the 2026-07 component reorg (category folders); regenerate before trusting. Components Chip, Form, Navigation, Section, SuperCompPill listed below do not exist in src.
+What each component is for, when to reach for it, and how it composes.
+
+> **Known stale — do not treat as the existence law.** The source paths below
+> predate the 2026-07 category-folder reorg, and Chip, Form, Navigation, Section
+> and SuperCompPill are listed here but do not exist in `design-system/src`.
+> The authority on what exists is the generated
+> `design-system/agent-views/components/index.md`. This file is authored
+> guidance awaiting the rebuild in #165 (generated half from source) and #166
+> (authored half — when to use, correct/incorrect, accessibility); it is kept
+> rather than deleted because the per-component prose here is the only such
+> prose that exists.
 
 ## Guidelines Structure
 This document provides comprehensive guidelines for all PLUS Design System components.

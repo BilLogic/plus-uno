@@ -28,7 +28,7 @@ or the coded build).
 through **writers/figma** (obeys `docs/conventions/figma-workspace.md` — file
 placement, prefixes, annotations); never write to the workspace directly.
 Building wireframes *from DS components* triggers the registry gate:
-`design-system/figma/registry-load-gate.md`.
+`design-system/guidelines/figma/registry-load-gate.md`.
 
 ## Route C — external tool spec (spec-handoff)
 

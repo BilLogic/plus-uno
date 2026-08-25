@@ -25,7 +25,7 @@ definition.
 The pipeline works in both directions:
 
 - **Figma → code**: each Figma variable maps to a `var(--*)` custom property.
-  The mapping tables live in `design-system/docs/foundations/token-mapping.md`.
+  The mapping tables live in `design-system/guidelines/figma/token-mapping.md`.
 - **Code → validation**: `design-system/figma/token-registry.json` is generated
   from those tables via `npm run generate:token-registry`, and every `var(--*)`
   is validated against `design-system/src/tokens/*.scss`. A token referenced in
@@ -60,7 +60,7 @@ Token names encode *context and role*, not raw values:
 <div className="sb-ds-doc-section">
 ### Source of truth
 
-`design-system/docs/foundations/token-mapping.md` is the **single source of
+`design-system/guidelines/figma/token-mapping.md` is the **single source of
 truth** for Figma-to-CSS token names. Its key rules:
 
 > **This file is the SOURCE OF TRUTH for token mappings.** `design-system/figma/token-registry.json`

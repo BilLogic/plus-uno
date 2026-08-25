@@ -48,8 +48,8 @@ const NOTES = process.env.NOTES || '';
 const PLAYGROUND_DIR = resolve('prototypes');
 const ROOT_PACKAGE_JSON = resolve('package.json');
 const TOKENS_DIR = resolve('design-system/src/tokens');
-const DOCS_DIR = resolve('docs/context/design-system/components');
-const KNOWLEDGE_LAYOUT = resolve('design-system/docs/patterns/layout.md');
+const DOCS_DIR = resolve('design-system/guidelines/components');
+const KNOWLEDGE_LAYOUT = resolve('design-system/guidelines/composition/layout.md');
 const REFERENCE_SLUG = 'home-redesign';
 
 const SLUG_RE = /^[a-z0-9][a-z0-9-]{1,40}$/;
@@ -432,7 +432,7 @@ async function main() {
   // Repo context.
   const referenceScaffold = readReferenceScaffold();
   const tokenContext = readTokenFiles();
-  const componentInventory = readDocCapped('inventory.md');
+  const componentInventory = readDocCapped('overview.md');
   const layoutCheatSheet = readRepoFileCapped(KNOWLEDGE_LAYOUT);
   const prdContext = await loadPrdContext();
 

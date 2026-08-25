@@ -61,7 +61,7 @@ export function handleSubmit(input) {
         false,
         [
           'Blocked: generate_figma_design / screenshot capture cannot be the final write-back deliverable.',
-          'Use registry component instances per design-system/figma/component-alignment.md.',
+          'Use registry component instances per design-system/guidelines/figma/component-alignment.md.',
           'To cancel: terminate writeback',
         ].join('\n'),
       );

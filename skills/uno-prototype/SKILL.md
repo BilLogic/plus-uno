@@ -78,7 +78,7 @@ cheaply before the next rung.
 | Always, on invocation | `references/method.md` (the shared core) |
 | A prototype run starts | `references/intake.md` (the interview + fidelity dials) |
 | Brief card confirmed | the ONE deliverable doc the artifact selects (table above) |
-| Figma design input | `design-system/figma/registry-load-gate.md` (MANDATORY, registries first) → `design-system/figma/mcp-guide.md` |
+| Figma design input | `design-system/guidelines/figma/registry-load-gate.md` (MANDATORY, registries first) → `design-system/guidelines/figma/mcp-guide.md` |
 | Building UI (components/tokens) | DS agent-views per **AGENTS.md § Progressive loading**; estate conventions per **loading-order.md § Tier 2** |
 
 ## Constraints
