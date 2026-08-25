@@ -14,7 +14,7 @@
       "rule": "Prefer PLUS components/forms/specs before generic framework primitives.",
       "references": [
         "design-system/src/components",
-        "design-system/src/forms",
+        "design-system/src/components/forms-and-inputs",
         "design-system/src/specs"
       ]
     },
