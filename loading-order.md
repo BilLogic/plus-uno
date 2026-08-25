@@ -24,7 +24,7 @@ Two files load always; everything else loads on demand or is retrieved live. Bud
 | any agent, on summon | its `agents/<kind>/<name>.md` + the conventions it names | always for that agent |
 | any estate write | the matching `docs/conventions/{notion,figma-workspace,slack,supabase}.md` | before writing |
 | any blueprint read | `docs/connectors/supabase/blueprint-navigation.md` | before querying — un-guided reads fail on navigation and layer attribution |
-| any human-facing text | `docs/conventions/writing/voice.md` | before writing |
+| long-form writing — a README, a recap, a findings page | `docs/conventions/writing.md` | before drafting |
 | UI building | DS agent-views per AGENTS.md § Progressive loading | mandatory triggers |
 | orientation / product framing | `docs/product-and-service/*` | as needed |
 
@@ -38,6 +38,6 @@ Two files load always; everything else loads on demand or is retrieved live. Bud
 
 ## Runtime notes
 
-- **Worker (uno-bot):** no on-demand loading. `agents/uno-bot/scripts/bundle-harness.mjs` assembles the prompt from **frontmatter, not a list**: every doc declares `embodiment: all | ide | uno-bot`, and the bundler globs four sections in order — constitution · persona · skills · conventions — sorting members by path, with a skill's `references/method.md` before its `bot.md` by rule. A doc under a section root with no `embodiment` fails the build. The result is baked into `src/generated/harness.ts`; `src/agent/skills.ts` serves that constant as one prompt-cached block. Everything in the bundle is always in context — the bot never "loads on demand", so Tier 2 is an IDE concept only. Of the writing folder only `writing/voice.md` is bundled; the other four are essay-craft the Worker never uses. Budgets for the bundled files, in chars because these are paragraph-length lines: `AGENT.md` ≤28k, each `bot.md` ≤7k (`uno-prototype/bot.md` currently 6.6k).
+- **Worker (uno-bot):** no on-demand loading. `agents/uno-bot/scripts/bundle-harness.mjs` assembles the prompt from **frontmatter, not a list**: every doc declares `embodiment: all | ide | uno-bot`, and the bundler globs four sections in order — constitution · persona · skills · conventions — sorting members by path, with a skill's `references/method.md` before its `bot.md` by rule. A doc under a section root with no `embodiment` fails the build. The result is baked into `src/generated/harness.ts`; `src/agent/skills.ts` serves that constant as one prompt-cached block. Everything in the bundle is always in context — the bot never "loads on demand", so Tier 2 is an IDE concept only. No writing convention is bundled at all: the house voice is the model's default, uno-bot's deliberate persona is `AGENT.md` § Identity & voice, formatting is `connectors/slack.md`, and vocabulary is `CONTEXT.md` — all already in the prompt. Budgets for the bundled files, in chars because these are paragraph-length lines: `AGENT.md` ≤28k, each `bot.md` ≤7k (`uno-prototype/bot.md` currently 6.6k).
 - The Worker does not bundle this file — it declares no `embodiment`, and nothing under a bundle section root may do that, so this file lives outside them.
 - **GitHub Actions:** `scripts/lib/skill-loader.js` loads `scripts/prompts/*` with meta-stripping; offline — fine, because conventions are repo-canonical (ADR-017) and load as plain files.

@@ -1,0 +1,26 @@
+{
+  "total": 324,
+  "counts": {
+    "AGENTS.md": 38,
+    "CONTEXT.md": 8,
+    "agents/uno-bot/AGENT.md": 91,
+    "skills/uno-maintain/references/method.md": 14,
+    "skills/uno-maintain/bot.md": 12,
+    "skills/uno-prototype/references/method.md": 14,
+    "skills/uno-prototype/bot.md": 16,
+    "skills/uno-publish/references/method.md": 8,
+    "skills/uno-publish/bot.md": 8,
+    "skills/uno-research/references/method.md": 6,
+    "skills/uno-research/bot.md": 5,
+    "skills/uno-review/references/method.md": 4,
+    "skills/uno-review/bot.md": 5,
+    "skills/uno-synthesize/references/method.md": 15,
+    "skills/uno-synthesize/bot.md": 3,
+    "docs/connectors/figma.md": 3,
+    "docs/connectors/notion.md": 23,
+    "docs/connectors/slack.md": 17,
+    "docs/connectors/supabase/blueprint-navigation.md": 21,
+    "docs/connectors/supabase/overview.md": 11,
+    "docs/engineering/operations.md": 2
+  }
+}

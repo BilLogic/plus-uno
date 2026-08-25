@@ -48,7 +48,6 @@ the designer's explicit go-ahead first; show what will be written and wait.
 | helping deploy a preview | `references/deployment-guide.md` |
 | building the marketplace entry | `references/notion-marketplace-db.md` (+ `references/marketplace-schema.md` / examples if dual-writing a routing registry) |
 | composing the share-out or checking sign-offs | `docs/connectors/slack.md` |
-| any human-facing text | `docs/conventions/writing/voice.md` |
 
 Summoned writers load their own conventions (`notion.md`,
 `figma-workspace.md`) — don't restate those here.

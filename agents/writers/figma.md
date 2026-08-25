@@ -25,4 +25,3 @@ The only agent that writes to the Figma workspace. Owns file naming, placement p
 ## Conventions it obeys
 
 - `docs/connectors/figma.md` — THE rulebook (nothing restated here)
-- `docs/conventions/writing/voice.md` — annotation and handoff-note prose

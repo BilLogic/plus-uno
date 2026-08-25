@@ -145,7 +145,7 @@ Until then this file mandated Slack **mrkdwn** (`*single*` bold, literal `•`, 
 
 ## Writing style (all Slack output)
 
-Applies the house voice (`conventions/writing/voice.md`) to chat; the bot's specific register lives in `agents/uno-bot/AGENT.md § Identity & voice`.
+Uses the model's default voice for chat; the bot's specific register lives in `agents/uno-bot/AGENT.md § Identity & voice`.
 
 - **Lead with the answer / outcome** — no preamble, no restating the ask back.
 - **Glanceable, not paragraphs.** `**Bold label**` lines + `-` bullets for structure; don't over-format.

@@ -40,3 +40,9 @@ Worker source, the guard script, the OAuth handler — and carry the same
 Anything surprising or hard to reverse. Next number, one file, and the same
 frontmatter: `summary`, `status`, `verified`. An ADR that asserts something the
 code contradicts is a bug in the ADR, not a note for later.
+
+**Sign and date a judgement call** — in an ADR, a convention doc, or anywhere a
+choice is recorded — so a future reader skips the archaeology: `— Bill, Jul 2026`.
+Sign it with **whoever actually made the call**. An agent recording its own
+routine decision signs the agent, not the person; attributing an agent's choice
+to a human manufactures an authority nobody granted.

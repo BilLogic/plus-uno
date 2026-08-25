@@ -47,6 +47,16 @@ unwatched surrogate queue silently defeats every sweep that files into it.
 
 Draft the concrete fix on every path *before* worth is judged. Drafting is cheap; it buys the human a concrete evaluation instead of a speculative one. Never reorder these steps.
 
+**When the fix edits harness prose — this constitution, a skill, a convention, an
+agent doc — load the `writing-for-agents` skill and review the draft against it
+before the gate.** Two questions carry most of the weight. *Is this a no-op?* — an
+instruction the model already obeys by default pays context to say nothing, and
+the test is whether behaviour changes versus the default, settled by running it
+rather than by debate. *Is this a ban that could be a target?* — a prohibition
+makes the forbidden behaviour more available, so state what to do and let the
+banned thing go unspoken. `npm run check:negation` counts the bans mechanically;
+the no-op test is judgement and lives here.
+
 ## 3 · The human gate — "worth incorporating?"
 
 Answered by the **spotter** (fallback: the designated maintainer) — never by the agent. Present the drafted fix with a **three-line brief: impact / effort / risk**.

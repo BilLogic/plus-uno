@@ -30,6 +30,7 @@
     "check:component-docs": "node scripts/generate-component-docs.mjs --check",
     "generate:index": "node scripts/generate-index.mjs",
     "check:index": "node scripts/generate-index.mjs --check",
+    "check:negation": "node scripts/check-negation-ratchet.mjs",
     "generate:knowledge-audit": "node scripts/generate-knowledge-audit.js",
     "check:knowledge-audit": "node scripts/generate-knowledge-audit.js --check",
     "generate:skill-surfaces": "node scripts/generate-uno-skill-surfaces.mjs",

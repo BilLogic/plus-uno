@@ -14,7 +14,7 @@ summary: Every annotation carries one category label: Interaction · Content · 
 
 ## Annotation category labels
 
-Every annotation carries one category label: `Interaction` · `Content` · `Layout` · `Token-Style` · `Behavior` · `Accessibility`. Handoff notes are annotations with the relevant category — written per `conventions/writing/voice.md`.
+Every annotation carries one category label: `Interaction` · `Content` · `Layout` · `Token-Style` · `Behavior` · `Accessibility`. Handoff notes are annotations with the relevant category — written per `docs/conventions/writing.md`.
 
 ## Placement / lifecycle prefixes (frames & sections — about WHERE work lives, not what it says)
 
