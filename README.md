@@ -31,7 +31,7 @@ Open [localhost:4200](http://localhost:4200) for Storybook, [localhost:4100/home
 | **uno-bot** | `@uno-bot` in Slack | Grounded Q&A + gated actions (file PRDs, trigger builds) — see [`agents/uno-bot/README.md`](agents/uno-bot/README.md) |
 | **Headless runs** | GitHub Actions (`Implement Design`, `Implement Figma Changes`) | Figma-to-code builds that open draft PRs |
 
-All three read the same brain: [`AGENTS.md`](AGENTS.md) (the constitution — identity, skill roster, forbidden patterns) plus [`loading-order.md`](loading-order.md) (what loads when). The in-IDE agent and headless runs read those files from the checkout, so a push to `main` reaches them immediately. The Worker does NOT: its harness is baked into the bundle at build time, so a guidance edit reaches uno-bot only on `npm run deploy` (`agents/uno-bot/scripts/bundle-harness.mjs`).
+All three read the same brain: [`AGENTS.md`](AGENTS.md) — the constitution: identity, skill roster, the loading contract, and the hard rules. The in-IDE agent and headless runs read those files from the checkout, so a push to `main` reaches them immediately. The Worker does NOT: its harness is baked into the bundle at build time, so a guidance edit reaches uno-bot only on `npm run deploy` (`agents/uno-bot/scripts/bundle-harness.mjs`).
 
 **The interaction contract: humans speak in skills · skills summon agents · agents obey conventions.**
 
@@ -63,7 +63,6 @@ After significant work, lessons land in `docs/knowledge/` via `uno-maintain` —
 ```
 plus-uno/
 ├── AGENTS.md                      # Tier 1 — the agent constitution (read this first)
-├── loading-order.md               # Tier 1 — what loads when, and token budgets
 ├── design-system/
 │   ├── src/                       # Component library source + Storybook MDX
 │   ├── docs/                      # Hand-authored DS knowledge (discovery, patterns, token-mapping)
@@ -169,7 +168,6 @@ Hosted on Netlify (free tier). Build: `npm run build:all` (Vite + Storybook). De
 |----------|------|
 | [`docs/product-and-service/onboarding.md`](docs/product-and-service/onboarding.md) | **New here? Start with this** — the six skills + where things live |
 | [`AGENTS.md`](AGENTS.md) | Agent constitution — identity, skill roster, forbidden patterns |
-| [`loading-order.md`](loading-order.md) | The loading-tier contract (what loads when) |
 | [`docs/product-and-service/plus-app.md`](docs/product-and-service/plus-app.md) | PLUS product landscape (mission, users, features, flows) |
 | [`docs/product-and-service/plus-uno.md`](docs/product-and-service/plus-uno.md) | This repo's structure and inventory |
 | [`docs/conventions/`](docs/conventions/) | Normative rules — coding, terminology, tech stack, Notion/Figma/Slack/Supabase, writing style |

@@ -17,27 +17,19 @@ This repo is the design system, prototyping workspace, and agent infrastructure 
 
 ## Tech Stack
 
-Mirrors `package.json` as of 2026-07-30; `package.json` is the normative copy — read `package.json` before asserting a version.
+React + React-Bootstrap on Bootstrap, built with Vite (Rolldown-powered),
+documented in Storybook, styled with SASS and design tokens; Highcharts for data
+visualization, Framer Motion for animation, TypeScript in the prototypes.
 
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| React | 19.2.1 | UI framework |
-| React-Bootstrap | 2.10.10 | Component primitives |
-| Bootstrap | 5.3.3 | CSS foundation |
-| Vite | ^8.0.1 | Build + dev server (Rolldown-powered) |
-| Storybook | ^10.5.0 | Component documentation |
-| SASS | 1.77.8 | CSS preprocessing |
-| Highcharts | ^12.4.0 | Data visualization |
-| TypeScript | 5.9.3 | Type support (prototypes) |
-| Framer Motion | ^12.38.0 | Animations |
-| @assistant-ui/react | 0.12.3 | AI chat interface |
+**Versions live in `package.json`.** They are not restated here: a mirrored
+table is correct only until the next bump, and nothing makes it fail when it
+stops being correct.
 
 ## Directory Layout
 
 ```
 plus-vibe-coding-starting-kit/
-├── AGENTS.md                  The constitution (Tier 1 #1)
-├── loading-order.md           The loading contract (Tier 1 #2)
+├── AGENTS.md                  The constitution (the only Tier-1 file)
 ├── design-system/             Design system source (was packages/plus-ds/)
 │   └── src/                   Components, forms, DataViz, specs, tokens, styles
 ├── prototypes/                home-redesign (live app) + branch experiment folders
@@ -73,7 +65,7 @@ plus-vibe-coding-starting-kit/
 | Tokens | 6 SCSS files + `source/` | `design-system/src/tokens/` (generated — never hand-edit) |
 | Styles | 14 files | `design-system/src/styles/` |
 
-<!-- Counts are a SNAPSHOT, not a source of truth. `design-system/agent-views/` is generated (`npm run generate:agent`) and AGENTS.md § Forbidden patterns makes it authoritative — "if a component is not listed, it does not exist". Re-read the agent-views before quoting a number to anyone; keep README.md § Design System in sync. Last checked 2026-07-30. -->
+<!-- Counts are a SNAPSHOT, not a source of truth. `design-system/agent-views/` is generated (`npm run generate:agent`) and AGENTS.md § Hard rules makes it authoritative — "if a component is not listed, it does not exist". Re-read the agent-views before quoting a number to anyone; keep README.md § Design System in sync. Last checked 2026-07-30. -->
 
 ## Deployment
 

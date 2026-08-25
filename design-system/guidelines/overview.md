@@ -33,6 +33,7 @@ Do not bulk-load. Two or three documents per task is the budget.
 | [`components/`](components/overview.md) | Per-component guidance: when to use, correct and incorrect, accessibility | `components/overview.md` |
 | [`composition/`](composition/overview.md) | How components combine — layout, hierarchy, surfaces, forms | `composition/overview.md` |
 | [`figma/`](figma/overview.md) | Design-to-code: registries, the load gate, token mapping, MCP workflows | `figma/overview.md` |
+| [`documentation-ia.md`](documentation-ia.md) | The documentation IA contract — the shared tree and the MDX page shell | read it before adding a story or renaming a folder |
 
 ## Common task routes
 
@@ -56,6 +57,9 @@ Do not bulk-load. Two or three documents per task is the budget.
 
 **Write product copy**
 → `foundations/content/overview.md`
+
+**Title a story, rename a docs folder, author an MDX page**
+→ `documentation-ia.md`
 
 ## Machine artifacts
 

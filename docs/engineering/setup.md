@@ -10,8 +10,9 @@ Implementation requirements only. For design rules, load `guidelines.md`. For co
 
 ## Stack
 
-- React 19, React-Bootstrap 2.10, Bootstrap 5.3, Vite 8, Storybook 10
-- SCSS with design tokens from `design-system/src/tokens/`
+- React + React-Bootstrap on Bootstrap, built with Vite, documented in Storybook.
+- SCSS with design tokens from `design-system/src/tokens/`.
+- Versions live in `package.json` and nowhere else — read them there rather than from a doc that goes stale on the next bump.
 
 ## Import Aliases
 
@@ -31,14 +32,16 @@ import '@/styles/main.scss';
 - `design-system/src/index.js`
 - `design-system/src/components/index.js` (form elements live in `design-system/src/components/forms-and-inputs/`, re-exported via this barrel)
 
-**Prohibited:** deep imports — `import Button from 'design-system/src/components/.../Button'`. Use the barrel.
+**New files import from the barrel.** Existing deep imports inside
+`design-system/src/specs/` are grandfathered — see `coding.md` § Imports for the
+full rule and what the code actually does.
 
 ## Package Structure
 
 ```
 design-system/
   src/           # DS source (components, forms, specs, tokens, styles, MDX)
-  docs/          # Hand-authored DS knowledge (discovery, patterns, token-mapping)
+  guidelines/    # Authored DS protocol (foundations, components, composition, figma)
   agent-views/   # Generated facts — component index, forms redirect, token list
   figma/         # Registries + alignment runbooks
 prototypes/{name}/     # Standalone prototypes
@@ -95,6 +98,22 @@ Figma → npm run sync:tokens → npm run generate:tokens → commit SCSS
 - Token source is Figma; SCSS is generated output
 - Figma mapping tables: `design-system/guidelines/figma/token-mapping.md`
 - Refresh agent views: `npm run generate:agent`
+
+## Generated skill surfaces
+
+`skills/<name>/SKILL.md` is canonical, and `skills/` is a discovery path for
+nothing: Claude Code and Cursor read `.claude/skills/`, and Slack reads the app
+manifest. `npm run generate:skill-surfaces` publishes all three from the
+canonical frontmatter:
+
+| Surface | Path | Serves |
+|---|---|---|
+| IDE stubs | `.claude/skills/<name>/SKILL.md` | `/uno-*` in the Claude Code and Cursor slash menus |
+| Worker commands | `agents/uno-bot/src/generated/slack-commands.ts` | the Worker's `/slack/commands` route |
+| Slack manifest | `agents/uno-bot/slack-app-manifest-commands.yaml` | pasted at api.slack.com |
+
+Edit the canonical `SKILL.md` and regenerate; `npm run check:skill-surfaces`
+fails the monthly sweep on drift.
 
 ## Local Preview
 

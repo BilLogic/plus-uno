@@ -51,24 +51,26 @@ Use these terms consistently across all design system work, prototypes, and docu
 |---|---|---|
 | **uno** | the design agent, all embodiments (constitution: `AGENTS.md`) | "the AI" |
 | **uno-bot** | uno's Slack embodiment — the Cloudflare Worker in `agents/uno-bot/` | "Slackbot" |
-| **uno-blueprint** | product source of truth (Supabase) — query at task time, never cache | "the database" |
+| **uno-blueprint** | product source of truth (Supabase); Tier 3 — `AGENTS.md` § The loading contract | "the database" |
 | **uno-storybook** | design-system source of truth (stories + MDX → /storybook) | "the docs site" |
 | **share-out** | a feedback-rail publish: Loom + preview + Decisions DB link (+ replica for prototypes) | "post", "update" |
 | **Decisions DB** | centralized decision log under Design HQ — Status / Owner / Sign-off / Date / Roadmap Card / Evidence | "Decision Log" (obsolete per-project subpage) |
 | **pillar** | product area (Universal · Admin · Toolkit · Training · Marketing …) — maps to a Slack channel | "category" |
 | **replica** | the Figma frame mirroring a coded prototype — required in prototype share-outs | "screenshot" |
 | **Tier 1 / Tier 2** (maintenance) | trivial auto-applied fix vs PR+PRD through a Slack verdict | — |
-| **Tier 1 / Tier 2** (loading) | always-loaded docs vs on-demand loads (`loading-order.md`) | — |
+| **Tier 1 / Tier 2** (loading) | always-loaded docs vs on-demand loads (`AGENTS.md` § The loading contract) | — |
 | **RM-ID** | Roadmap card id (`RM-<n>`) — the Figma↔Notion join key | — |
 
 ## Two vocabularies — the blueprint speaks service-blueprint, the Roadmap speaks project-management
+
+Ratified in ADR-023 (`docs/adr/023-two-vocabularies-ratified-blueprint-vs-roadmap.md`); this section is its only statement.
 
 Two estates describe the product in **different languages**, and the words are NOT interchangeable. Mixing them is a defect: never describe results from one estate in the other's vocabulary, and never search one estate for the other's concepts.
 
 | | **uno-blueprint** (Supabase) | **Notion Roadmap** (Design HQ board) |
 |---|---|---|
 | What it holds | how the **service works**: who does what, when | what the **team is building**: work items + their status |
-| Its words | **phase** · **service scenario** · **path** (identified by NAME, not `path_type` — `blueprint-navigation.md` § Path semantics) · **step** · **lane** = the actor row · **cell** = one activity at lane × step | **Roadmap** · **card** (id = **RM-ID**, `RM-<n>`) · **Design Status** · **Product Pillar** · **Product Tag** · **owner** · **PRD** |
+| Its words | **phase** · **service scenario** · **path** (read both `path_type` and `name` — `blueprint-navigation.md` §4) · **step** · **lane** = the actor row · **cell** = one activity at lane × step | **Roadmap** · **card** (id = **RM-ID**, `RM-<n>`) · **Design Status** · **Product Pillar** · **Product Tag** · **owner** · **PRD** |
 | NOT its words | "roadmap", "card", "Design Status", "pillar", "owner", "WIP", "under review" — **the blueprint has no cards and no statuses** | "scenario", "lane", "cell", "path", "step", "phase", "actor" — **the Roadmap has no service steps or actor rows** |
 
 **Topic words overlap; frame words don't.** "Goal Setting" is both a blueprint *scenario* and a Roadmap *card topic* — the topic never tells you which estate to read. The **frame words in the question** do:

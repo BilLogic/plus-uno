@@ -141,6 +141,7 @@ Until then this file mandated Slack **mrkdwn** (`*single*` bold, literal `•`, 
 
 - **Reply in-thread by default** (`thread_ts` = the *parent* message's ts). Keeps the channel clean.
 - A fresh top-level post is only for cross-channel announcements (e.g. a review fan-out to #plus-design) — a real new message, not a reply.
+- **A `/uno-*` slash command runs as a public thread.** The Worker posts a framing message in the channel and threads the run under it, so history, the emoji gate, and proposals behave exactly as they do for an @mention.
 - **Mention only who must act** (`<@U…>`). Never spray `<!here>` / `<!channel>` / `<!everyone>` — they need installer permission and read as noise. Batch related updates into one message, not five.
 
 ## Writing style (all Slack output)

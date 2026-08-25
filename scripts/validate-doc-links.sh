@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
-# link extraction with rg->grep fallback (rg is not guaranteed on every machine)
+# link extraction with rg->grep fallback (rg is not guaranteed on every machine).
+# A code span that IS a whole markdown link is blanked first: `[label](url)`
+# inside backticks is a doc teaching Markdown syntax, not a link this repo owns,
+# and eight of them kept this check permanently red — a check that always fails
+# is not a check. Only such spans are blanked, never every code span: the house
+# link style is [`path.md`](path.md), and blanking its label would leave `[]()`,
+# which the extractor skips — silently unvalidating most links in the repo.
 link_grep() {
-  if command -v rg >/dev/null 2>&1; then rg -o '\[[^]]+\]\(([^)]+)\)' "$1"; else grep -oE '\[[^]]+\]\([^)]+\)' "$1"; fi
+  sed -E 's/`\[[^`]+\]\([^`]+\)`//g' "$1" | { if command -v rg >/dev/null 2>&1; then rg -o '\[[^]]+\]\(([^)]+)\)'; else grep -oE '\[[^]]+\]\([^)]+\)'; fi; }
 }
 set -euo pipefail
 
@@ -49,7 +55,7 @@ while IFS= read -r file; do
 # docs/adr/ is scanned for markdown links but NOT for backticked paths: an ADR's
 # job includes naming a path that was retired, and rewriting those would erase
 # the decision's own record. Live claims inside ADRs were repointed by hand.
-done < <({ find skills agents docs/connectors docs/engineering docs/conventions docs/adr docs/product-and-service design-system/guidelines docs/evals -type f -name '*.md' -not -path '*/node_modules/*' -not -path '*/transcripts/*'; echo AGENTS.md; echo CONTEXT.md; echo SETUP.md; echo README.md; echo loading-order.md; } | sort)
+done < <({ find skills agents docs/connectors docs/engineering docs/conventions docs/adr docs/product-and-service design-system/guidelines docs/evals -type f -name '*.md' -not -path '*/node_modules/*' -not -path '*/transcripts/*'; echo AGENTS.md; echo CONTEXT.md; echo SETUP.md; echo README.md; } | sort)
 
 echo "[check] validating backticked repo paths resolve"
 
@@ -67,7 +73,7 @@ while IFS= read -r file; do
     [[ -z "$tok" ]] && continue
 
     # Only tokens rooted at a real top-level dir of this repo.
-    [[ "$tok" =~ ^(AGENTS\.md|loading-order\.md|docs/|skills/|agents/|scripts/|design-system/|prototypes/|\.github/) ]] || continue
+    [[ "$tok" =~ ^(AGENTS\.md|docs/|skills/|agents/|scripts/|design-system/|prototypes/|\.github/) ]] || continue
 
     # Placeholders, globs, ranges, prose fragments, command lines.
     [[ "$tok" == *"*"* || "$tok" == *"{"* || "$tok" == *"<"* || "$tok" == *" "* ]] && continue
@@ -97,7 +103,7 @@ while IFS= read -r file; do
 # its own staleness banner (pre-2026-07 component paths, five components that do
 # not exist) and #165/#166 own its rebuild. Excluding it keeps 50 known findings
 # from burying new ones; it is not a pass.
-done < <({ find skills agents docs/connectors docs/engineering docs/conventions docs/product-and-service design-system/guidelines -type f -name '*.md' -not -path '*/node_modules/*' -not -path 'design-system/guidelines/components/overview.md'; echo AGENTS.md; echo CONTEXT.md; echo SETUP.md; echo loading-order.md; } | sort)
+done < <({ find skills agents docs/connectors docs/engineering docs/conventions docs/product-and-service design-system/guidelines -type f -name '*.md' -not -path '*/node_modules/*' -not -path 'design-system/guidelines/components/overview.md'; echo AGENTS.md; echo CONTEXT.md; echo SETUP.md; } | sort)
 
 echo "[check] validating AGENTS.md skills-table rows resolve to SKILL.md files"
 
