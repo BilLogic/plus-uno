@@ -21,7 +21,7 @@ summary: How to write code in this repo — barrel imports, tokens over literals
 - `@` maps to `design-system/src` (in Storybook, DS Vite config, and prototypes configs)
 - `~` maps to `node_modules`
 
-**Barrel exports — always import from index, never deep paths:**
+**Barrel exports — the rule for every new file:**
 
 ```js
 import { Button, Alert, Modal } from '@/components';
@@ -34,9 +34,18 @@ import '@/styles/globals.scss';
 - `design-system/src/components/index.js`
 - `design-system/src/components/forms-and-inputs/index.js` (also re-exported from the components barrel)
 
-**Prohibited:**
-- Deep imports: `import Button from 'design-system/src/components/Button/Button'` — use barrel
-- Ad hoc legacy paths — prefer existing index exports over deep relative traversals
+**Out of new files:** file-level and category-folder paths
+(`@/components/actions/Button/Button`), `_internal/` paths, and the `@plus-ds`
+alias.
+
+**What the code actually does**, so the rule is read for what it is rather than
+as a description: about 400 deep imports live inside `design-system/src/specs/`
+and roughly 70 call sites use the barrel. The spec-side deep imports predate the
+rule and are **grandfathered** — they are not a licence to copy the pattern into
+a new file, and sweeping them is its own piece of work, not a side effect of
+touching a neighbouring line. Two cases are not violations at all: a component
+importing its own siblings inside `design-system/src/components/`, and a spec
+shell imported from its area group index (`@/specs/Universal/Pages`).
 
 ## Token usage
 

@@ -48,13 +48,39 @@ width: var(--col-6);
 width: calc((100% - (11 * 8px)) / 12);
 ```
 
+## Desktop only
+
+MD 768 / LG 1024 / XL 1440 are the designed breakpoints, defined as **modes** on
+the Figma `size / layout` variable collection and as `--breakpoint-*-min` in
+`design-system/src/tokens/_layout.scss`. Design and build at 768px and up.
+
+## The two grids (Figma)
+
+Both are single mode-adaptive Figma styles, with values bound to `size / layout`
+variables — switch the frame's mode rather than hand-editing or detaching.
+
+| Style | Columns | Gutter | Margin / offset | Carried by |
+|:---|:---|:---|:---|:---|
+| `Grid/Viewport (adaptive)` | 12 | 12 / 16 / 16 | 16 / 32 / 32 | full-page frames without the shell |
+| `Grid/Adaptive (12-col)` | 12 | 8px (`--layout-grid-gap`) | offset = `Surface/pad-x` 32 | `Pattern/Surface container` — the content grid |
+
+Column spans come from `Columns/col-1…12` in Figma = `--col-*` in code, and they
+assume the 8px content gutter. Main content width at breakpoint minimums is
+672 / 748 / 1164 — at XL that is `1440 − 32 outer − 164 SideNav − 16 gap − 64 surface pad`.
+
+## Ownership layering
+
+- The **page frame** owns width (bound to `Breakpoints/min width`) and the mode.
+- `Pattern/Surface container` runs on auto mode and **fills** the width it is given: `--color-surface`, Surface-tier pad 32/24, gap 24, radius 16. It carries the grid and the Content slot.
+- **SideNav** is 164px (`--layout-sidebar-width`); its visibility binds to the `Display/*` booleans and it collapses at MD.
+
 ## Grid rules
 
 1. **Container context** — column tokens are relative to their parent container's width, not the viewport.
-2. **Sidebar visibility** — at Medium the sidebar is hidden and content gets full width.
-3. **Gap handling** — use `gap: var(--layout-grid-gap)`; never a literal `8px`.
+2. **Gap handling** — use `gap: var(--layout-grid-gap)` so the gutter tracks `_layout.scss`.
 
 ## Related
 
 - `../composition/layout.md` — the page skeletons this grid carries
 - `spacing.md` — padding and gap scales inside a surface
+- `../figma/component-alignment.md` — placing library instances against these grids

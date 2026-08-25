@@ -15,7 +15,7 @@ One row per connected tool: where its conventions live, what touches it. Concret
 | Figma | `docs/connectors/figma.md` (workspace) · `design-system/guidelines/figma/mcp-guide.md` (MCP pipeline) | MCP: `figma-plus` · `figma-parsnip` (+ Cursor Figma plugin / Dev Mode) | `writers/figma` only |
 | Slack | `docs/connectors/slack.md` | IDE MCP: `slack-plus` · `slack-parsnip` (separate OAuth each); bot: uno-bot Worker | the uno-bot embodiment |
 | Supabase (`uno-blueprint`) | `docs/connectors/supabase/overview.md` | `search_blueprint` / PostgREST | `writers/blueprint` only |
-| Storybook (`uno-storybook`) | source of truth in `design-system/` stories; setup `.storybook/main.js` | MCP `storybook` at `http://localhost:4200/mcp` while `npm run storybook` runs | skills (component work) |
+| Storybook (`uno-storybook`) | `docs/connectors/storybook-mcp.md`; source of truth in `design-system/` stories, setup `.storybook/main.js` | MCP `storybook` at `http://localhost:4200/mcp` while `npm run storybook` runs | skills (component work) |
 | Netlify | deploy notes: `docs/product-and-service/plus-uno.md` + `skills/uno-publish/references/deployment-guide.md` | MCP `netlify` · `netlify.toml` | uno-publish |
 | Cloudflare | — | MCP `cloudflare` (`https://mcp.cloudflare.com/mcp`, OAuth) | maintain / deploy |
 | GitHub | — | MCP `github` | skills / maintain |
