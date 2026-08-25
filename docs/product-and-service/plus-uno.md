@@ -37,7 +37,6 @@ Mirrors `package.json` as of 2026-07-30; `package.json` is the normative copy �
 ```
 plus-vibe-coding-starting-kit/
 ├── AGENTS.md                  The constitution (Tier 1 #1)
-├── loading-order.md           The loading contract (Tier 1 #2)
 ├── design-system/             Design system source (was packages/plus-ds/)
 │   └── src/                   Components, forms, DataViz, specs, tokens, styles
 ├── prototypes/                home-redesign (live app) + branch experiment folders

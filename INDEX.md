@@ -11,7 +11,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 **Designer building UI** → [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) → [`design-system/agent-views/components/index.md`](design-system/agent-views/components/index.md) → [`design-system/guidelines/composition/layout.md`](design-system/guidelines/composition/layout.md)
 
-**Agent, any task** → [`AGENTS.md`](AGENTS.md) → [`loading-order.md`](loading-order.md) → [`INDEX.md`](INDEX.md)
+**Agent, any task** → [`AGENTS.md`](AGENTS.md) → [`INDEX.md`](INDEX.md)
 
 **Working on the harness** → [`AGENTS.md`](AGENTS.md) → [`docs/adr/overview.md`](docs/adr/overview.md) → [`skills/uno-maintain/SKILL.md`](skills/uno-maintain/SKILL.md)
 
@@ -25,9 +25,8 @@ Adding a doc changes this file; editing this file changes nothing.
 |-----|---------|
 | [`README.md`](README.md) | ![Netlify Status](https://app.netlify.com/projects/plus-uno/deploys) |
 | [`SETUP.md`](SETUP.md) | Clone, install, run, and find your way around — without reading the constitution first. |
-| [`AGENTS.md`](AGENTS.md) | The constitution — identity, routing and hard rules for every embodiment. |
+| [`AGENTS.md`](AGENTS.md) | The constitution — identity, routing, the loading contract, and hard rules for every embodiment. |
 | [`CONTEXT.md`](CONTEXT.md) | Use these terms consistently across all design system work, prototypes, and documentation |
-| [`loading-order.md`](loading-order.md) | Two files load always; everything else loads on demand or is retrieved live |
 
 ## Skills — what humans invoke
 
@@ -75,6 +74,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/connectors/notion.md`](docs/connectors/notion.md) | How agents write to Notion — the MCP-write principle, convention surfaces, the gated tools, and body shape. |
 | [`docs/connectors/overview.md`](docs/connectors/overview.md) | One row per connected tool: where its conventions live, what touches it |
 | [`docs/connectors/slack.md`](docs/connectors/slack.md) | Pillar → channel map (group announcements; all private — uno-bot must be invited before posting/@here): Universal → #plus-universal C072E8SFLKV · Admin → #plus-admin C089A3E9CCW · |
+| [`docs/connectors/storybook-mcp.md`](docs/connectors/storybook-mcp.md) | The Storybook MCP endpoint — the primary interface to the design system while Storybook runs, plus the story-authoring conventions that keep it useful. |
 | [`docs/connectors/supabase/blueprint-navigation.md`](docs/connectors/supabase/blueprint-navigation.md) | A structured service blueprint for the PLUS journey: how tutors, lead tutors, classroom teachers, researchers, and support staff move through the end-to-end experience |
 | [`docs/connectors/supabase/overview.md`](docs/connectors/supabase/overview.md) | Two hard rules, every row: never merge two sources into one unattributed answer — surface the conflict instead of blending it — and never fabricate a blueprint citation, the worst |
 
@@ -88,6 +88,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/composition/layout.md`](design-system/guidelines/composition/layout.md) | If you are building a full page (like a dashboard, student list, or toolkit), you MUST wrap the entire page in the <PageLayout> component |
 | [`design-system/guidelines/composition/overview.md`](design-system/guidelines/composition/overview.md) | How components combine |
 | [`design-system/guidelines/composition/surfaces.md`](design-system/guidelines/composition/surfaces.md) | Cards, tables, modals, and the empty and loading states they fall into |
+| [`design-system/guidelines/documentation-ia.md`](design-system/guidelines/documentation-ia.md) | The documentation IA contract — the shared tree Storybook titles, repo folders and Figma all speak, plus the MDX page shell. |
 | [`design-system/guidelines/figma/component-alignment.md`](design-system/guidelines/figma/component-alignment.md) | How to keep Figma component instances and PLUS code imports (@/components/) consistent when implementing designs in Cursor or writing prototypes back to Figma |
 | [`design-system/guidelines/figma/mcp-guide.md`](design-system/guidelines/figma/mcp-guide.md) | The registry load gate is design-system/guidelines/figma/registry-load-gate.md — MANDATORY, registries first, not restated here |
 | [`design-system/guidelines/figma/overview.md`](design-system/guidelines/figma/overview.md) | Machine-readable contracts and human runbooks so Cursor prototypes, Storybook, and the Figma design system stay aligned on tokens and components |
@@ -162,6 +163,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/020-requester-scoped-slack-visibility-per-user-tokens-own.md`](docs/adr/020-requester-scoped-slack-visibility-per-user-tokens-own.md) | Requester-scoped Slack visibility — per-user tokens, own DMs readable in own bot DM (2026-07-16) |
 | [`docs/adr/021-two-sources-one-time-axis-blueprint-vs-notion.md`](docs/adr/021-two-sources-one-time-axis-blueprint-vs-notion.md) | Two sources, one time axis — blueprint vs Notion authority routed by claim type and card status (2026-07-29) |
 | [`docs/adr/022-enforce-the-subrequest-budget-at-the-boundary-don.md`](docs/adr/022-enforce-the-subrequest-budget-at-the-boundary-don.md) | Enforce the subrequest budget at the boundary; don't estimate it (2026-07-30) |
+| [`docs/adr/023-two-vocabularies-ratified-blueprint-vs-roadmap.md`](docs/adr/023-two-vocabularies-ratified-blueprint-vs-roadmap.md) | The two-vocabularies rule is ratified — blueprint words and Roadmap words never mix, and CONTEXT.md is its only home (2026-08-25) |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -191,6 +193,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-120 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+122 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 raw eval data are deliberately not indexed — they record what happened rather
 than telling you what to do.
