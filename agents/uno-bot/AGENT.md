@@ -1,5 +1,5 @@
 ---
-embodiment: worker
+embodiment: uno-bot
 summary: The Worker persona delta — how uno-bot differs from the constitution.
 ---
 

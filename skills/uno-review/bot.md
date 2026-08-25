@@ -1,9 +1,9 @@
 ---
-embodiment: worker
+embodiment: uno-bot
 summary: uno-review — Worker delta over references/method.md.
 ---
 
-<!-- Worker face — bundled by uno-bot via `embodiment: worker` above. NOT loaded by the IDE agent. Delta only: the shared procedure lives in references/method.md. -->
+<!-- Worker face — bundled by uno-bot via `embodiment: uno-bot` above. NOT loaded by the IDE agent. Delta only: the shared procedure lives in references/method.md. -->
 # uno-review — bot face
 
 Slack delta only. The normative procedure (intake · scenarios · lens depth · severity · verdict) is `references/method.md`; channels + gates are `docs/conventions/slack.md` — both already in this prompt.

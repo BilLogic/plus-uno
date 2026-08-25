@@ -1,9 +1,9 @@
 ---
-embodiment: worker
+embodiment: uno-bot
 summary: uno-research — Worker delta over references/method.md.
 ---
 
-<!-- Worker face — bundled by uno-bot via `embodiment: worker` above. NOT loaded by the IDE agent. -->
+<!-- Worker face — bundled by uno-bot via `embodiment: uno-bot` above. NOT loaded by the IDE agent. -->
 # uno-research — bot face
 
 Slack delta only. The decision spine, research/synthesize boundary, and findings-brief shape are `references/method.md`, already in this prompt.

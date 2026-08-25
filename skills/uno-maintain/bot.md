@@ -1,9 +1,9 @@
 ---
-embodiment: worker
+embodiment: uno-bot
 summary: uno-maintain — Worker delta over references/method.md.
 ---
 
-<!-- Worker face — bundled by uno-bot via `embodiment: worker` above. NOT loaded by the IDE agent. -->
+<!-- Worker face — bundled by uno-bot via `embodiment: uno-bot` above. NOT loaded by the IDE agent. -->
 # uno-maintain — bot face
 
 Slack delta only. The shared procedure (taxonomy, tiers, gates) is `references/method.md`, already in this prompt.

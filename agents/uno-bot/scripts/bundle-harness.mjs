@@ -3,7 +3,7 @@
 // co-located in this repo, so the baked copy updates on deploy.
 //
 // MEMBERSHIP IS A PROPERTY OF THE DOCUMENT. Each doc declares
-// `embodiment: all | ide | worker` in its own frontmatter and this script globs
+// `embodiment: all | ide | uno-bot` in its own frontmatter and this script globs
 // for it; there is no list of files here to disagree with reality (#159).
 //
 // ORDER IS A BUNDLE-LEVEL FACT no single document can know, so it is declared
@@ -52,7 +52,7 @@ const repoRoot = path.resolve(here, "../../.."); // repo root (two levels above 
 /**
  * The bundle's sections, in order. This list is the ONLY place order is stated.
  * Each section names roots to scan — never an individual file — and takes every
- * doc under them whose frontmatter says `embodiment: worker` or `all`.
+ * doc under them whose frontmatter says `embodiment: uno-bot` or `all`.
  */
 const SECTIONS = [
   { name: "constitution", roots: ["AGENTS.md"] },
@@ -138,7 +138,7 @@ for (const section of SECTIONS) {
         undeclared.push(rel);
         continue;
       }
-      if (meta.embodiment === "worker" || meta.embodiment === "all") found.push(rel);
+      if (meta.embodiment === "uno-bot" || meta.embodiment === "all") found.push(rel);
     }
   }
   found.sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
@@ -149,7 +149,7 @@ if (undeclared.length) {
   console.error(
     `[bundle-harness] ${undeclared.length} doc(s) under a bundle section declare no \`embodiment\`:\n` +
       undeclared.map((p) => `  ${p}`).join("\n") +
-      "\n  -> add `embodiment: all | ide | worker` to the frontmatter. There is no default:" +
+      "\n  -> add `embodiment: all | ide | uno-bot` to the frontmatter. There is no default:" +
       "\n     a doc that does not say where it belongs is a rule nobody can find.",
   );
   process.exit(1);
