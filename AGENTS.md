@@ -144,7 +144,7 @@ Load docs on demand — 2-3 guides (~2,000-2,500 tokens), never the full set:
 | Designer knowledge verification status | `design-system/figma/knowledge-audit.md` |
 | Building new pages, dashboards, layouts | `design-system/guidelines/composition/layout.md` (MANDATORY) |
 | Implementation setup (aliases, prototypes, Vite) | `docs/engineering/setup.md` |
-| Design philosophy / agent role | `design-system/guidelines/principles.md` |
+| Design philosophy / agent role | `design-system/guidelines/overview.md` § Principles |
 | Figma link, implement-design, design-to-code mapping, or **code write-back to Figma** | `design-system/figma/component-registry.json` + `token-registry.json` (MANDATORY — load first); then `design-system/guidelines/figma/component-alignment.md`. Write-back also loads `.cursor/hooks/briefings/active-writeback-gate.json` when the gate is active. |
 | Need a specific component's Figma node id / link to reference | `design-system/figma/component-figma-links.md` (generated from component MDX; run `npm run generate:figma-links`) |
 | Writing to Notion / Figma / Slack / blueprint | the matching `docs/conventions/*.md` |
