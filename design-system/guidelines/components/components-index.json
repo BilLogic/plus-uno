@@ -12,8 +12,7 @@
     "design-system/src/components/index.js"
   ],
   "storybook_story_globs": [
-    "../design-system/src/**/*.stories.{js,jsx,ts,tsx}",
-    "../prototypes/**/*.stories.{js,jsx,ts,tsx}"
+    "../design-system/src/**/*.stories.{js,jsx,ts,tsx}"
   ],
   "discovery_docs": [
     "design-system/guidelines/components/overview.md",
