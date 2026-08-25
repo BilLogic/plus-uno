@@ -30,4 +30,4 @@ The only agent that writes to Notion. Owns hub golden sections (New Project temp
 ## Conventions it obeys
 
 - `docs/connectors/notion.md` — write surfaces, Decisions DB, hub golden sections (THE rulebook; nothing restated here)
-- `docs/conventions/writing-style.md` — voice for all human-facing text
+- `docs/conventions/writing/voice.md` — voice for all human-facing text

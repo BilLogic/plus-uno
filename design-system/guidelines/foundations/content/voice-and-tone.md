@@ -4,7 +4,7 @@ summary: Warm, direct, encouraging
 
 <!-- Tier: 2 -->
 
-<!-- Descriptive foundation (product tone rationale). The NORMATIVE voice rules every writer obeys live in docs/conventions/writing-style.md — on conflict, that file wins. -->
+<!-- Descriptive foundation (product tone rationale). The NORMATIVE voice rules every writer obeys live in docs/conventions/writing/voice.md — on conflict, that file wins. -->
 
 # Content and Voice
 
@@ -15,7 +15,7 @@ summary: Warm, direct, encouraging
 > told them not to. Whichever was wrong, both could not be right.
 >
 > What it is: the *descriptive* rationale for product tone and UI copy. The
-> normative rules every writer obeys are in `docs/conventions/writing-style.md`,
+> normative rules every writer obeys are in `docs/conventions/writing/voice.md`,
 > which wins on conflict (see the comment above). Nothing here is a house rule
 > in its own right; it is the reasoning and the worked examples behind them.
 

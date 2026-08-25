@@ -52,7 +52,7 @@ const ROLE_PATHS = [
   ['Agent, any task', ['AGENTS.md', 'loading-order.md', 'INDEX.md']],
   ['Working on the harness', ['AGENTS.md', 'docs/adr/overview.md', 'skills/uno-maintain/SKILL.md']],
   ['Working on uno-bot', ['agents/uno-bot/AGENT.md', 'docs/connectors/slack.md', 'docs/engineering/operations.md']],
-  ['Writing to an estate', ['docs/connectors/overview.md', 'docs/conventions/writing-style.md']],
+  ['Writing to an estate', ['docs/connectors/overview.md', 'docs/conventions/writing/voice.md']],
 ];
 
 const rel = (p) => path.relative(REPO_ROOT, p).replace(/\\/g, '/');

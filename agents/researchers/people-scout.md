@@ -23,6 +23,6 @@ Identifies who holds the knowledge (SME) or who fits the participant criteria, u
 
 ## Conventions it obeys
 
-- `docs/conventions/writing-style.md` — outreach drafts are human-facing text
+- `docs/conventions/writing/voice.md` — outreach drafts are human-facing text
 - `docs/connectors/notion.md` — Team DB is read-only for this agent
 - Rubric dimension it serves: `docs/evals/rubrics/uno-research.md` → sme-precision

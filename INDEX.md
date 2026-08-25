@@ -17,7 +17,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 **Working on uno-bot** → [`agents/uno-bot/AGENT.md`](agents/uno-bot/AGENT.md) → [`docs/connectors/slack.md`](docs/connectors/slack.md) → [`docs/engineering/operations.md`](docs/engineering/operations.md)
 
-**Writing to an estate** → [`docs/connectors/overview.md`](docs/connectors/overview.md) → [`docs/conventions/writing-style.md`](docs/conventions/writing-style.md)
+**Writing to an estate** → [`docs/connectors/overview.md`](docs/connectors/overview.md) → [`docs/conventions/writing/voice.md`](docs/conventions/writing/voice.md)
 
 ## Start here
 
@@ -168,7 +168,12 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
-| [`docs/conventions/writing-style.md`](docs/conventions/writing-style.md) | Writing Style — the voice, once |
+| [`docs/conventions/writing/mechanics.md`](docs/conventions/writing/mechanics.md) | Sentence and paragraph mechanics, the structural pattern, what never to do, and the pre-ship checklist. |
+| [`docs/conventions/writing/overview.md`](docs/conventions/writing/overview.md) | How agents write — which of the five files to load, and when. |
+| [`docs/conventions/writing/principles.md`](docs/conventions/writing/principles.md) | The eleven principles of long-form writing, with a before/after for each. |
+| [`docs/conventions/writing/registers.md`](docs/conventions/writing/registers.md) | The product register and the case-study register — how the voice shifts by audience. |
+| [`docs/conventions/writing/sources.md`](docs/conventions/writing/sources.md) | The corpus this style was distilled from, and what changed in the 2026 refresh. |
+| [`docs/conventions/writing/voice.md`](docs/conventions/writing/voice.md) | Writing Style — the voice, once |
 
 ## Evals
 
@@ -191,6 +196,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-120 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+125 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 raw eval data are deliberately not indexed — they record what happened rather
 than telling you what to do.
