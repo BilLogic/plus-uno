@@ -19,9 +19,6 @@ index, so it is both faster and more accurate than grepping stories.
 | `get-storybook-story-instructions` | call before authoring any new story, and follow it over generic CSF habits |
 | `run-story-tests` | run the vitest browser tests for stories you touched (addon-vitest is wired; a11y checks via addon-a11y) |
 
-When the endpoint is unreachable (Storybook not running, or a runtime with no
-MCP), say so and fall back to reading the component source and stories.
-
 ## Story-authoring conventions
 
 Written for agent-readability, per storybook.js.org/docs/ai/best-practices:

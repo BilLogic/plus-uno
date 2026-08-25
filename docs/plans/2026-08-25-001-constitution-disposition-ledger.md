@@ -23,9 +23,9 @@ surviving rule states the target and lets the banned thing go unspoken.
 
 | Measure | Before | After |
 |---|---:|---:|
-| `AGENTS.md` characters | 20,404 | 16,323 |
-| `AGENTS.md` prohibitions (`check:negation` regex) | 38 | 8 |
-| Bundled-harness prohibitions | 324 | 294 |
+| `AGENTS.md` characters | 20,404 | 16,270 |
+| `AGENTS.md` prohibitions (`check:negation` regex) | 38 | 6 |
+| Bundled-harness prohibitions | 324 | 291 |
 | Tier-1 files | 2 | 1 |
 | Numbered hard rules | 18 | 15 |
 
@@ -99,6 +99,25 @@ surviving rule states the target and lets the banned thing go unspoken.
 | L4 | Worker runtime note: no on-demand loading; bundler globs frontmatter; budgets | Yes — split: "everything is always in context" is a fact uno-bot needs and stays unfenced; the bundler mechanics are IDE-side and sit inside the `ide-only` fence | keep, split |
 | L5 | "The Worker does not bundle this file" | Self-referential; dies with the file | cut |
 | L6 | GitHub Actions loader note | Yes, for anyone editing `scripts/prompts/*` | keep, one line |
+
+## Second pass, against `writing-for-agents`
+
+The rewrite was then read back against the upstream skill the constitution's own
+trigger table names — the standard harness prose is reviewed against. Four
+findings, all applied:
+
+- **Duplication.** "query at task time, never cache" was stated in three bundled
+  places: the harness-components table, `CONTEXT.md`'s glossary, and the Tier 3
+  line. The loading contract is its single source of truth; the other two now
+  point at it.
+- **Pointer collision.** "adding a story" was the trigger word on two different
+  § Progressive loading rows, so a story task fired both. One trigger per branch:
+  `storybook-mcp.md` takes *writing a story's code / verifying an API*,
+  `documentation-ia.md` takes *titling a story / naming a folder*.
+- **No-op.** "Two or three documents per task, **never the full set**" — the
+  positive bound already says the whole thing; the ban added load and no meaning.
+- **Duplication.** The new `storybook-mcp.md` restated the no-MCP fallback that
+  `connectors/overview.md` already carries for every tool. Cut.
 
 ## Candidate considered and not adopted
 

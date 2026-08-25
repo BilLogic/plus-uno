@@ -27,7 +27,7 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 |---|---|---|
 | `uno` | the design agent, all embodiments | this repo |
 | `uno-bot` | Slack embodiment | `agents/uno-bot/` — definition (AGENT.md) + body (Worker) |
-| `uno-blueprint` | source of truth for the **current** service journey | Supabase — **query at task time, never cache** (`docs/connectors/supabase/overview.md`) |
+| `uno-blueprint` | source of truth for the **current** service journey | Supabase, Tier 3 (`docs/connectors/supabase/overview.md`) |
 | `uno-storybook` | design-system source of truth | `design-system/` stories + MDX → plus-uno.netlify.app/storybook |
 
 ## Skills — what humans invoke
@@ -64,7 +64,7 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 **uno-bot** does not load on demand: everything in its bundle is always in context, so Tier 2 is an IDE concept only.
 
 <!-- ide-only -->
-**Tier 2 — loaded on demand.** Two or three documents per task, never the full set. § Progressive loading is the trigger table; beyond it: a skill loads its own `SKILL.md` + `references/method.md` on invocation and its `references/*.md` as linked; an agent loads its `agents/<kind>/<name>.md` plus the conventions it names.
+**Tier 2 — loaded on demand.** Two or three documents per task. § Progressive loading is the trigger table; beyond it: a skill loads its own `SKILL.md` + `references/method.md` on invocation and its `references/*.md` as linked; an agent loads its `agents/<kind>/<name>.md` plus the conventions it names.
 
 **Bundle mechanics (uno-bot).** The bundler assembles the prompt from frontmatter, globbing four sections in order — constitution · persona · skills · conventions — sorting members by path, with a skill's `references/method.md` before its `bot.md` by rule. A doc under a section root with no `embodiment` fails the build. The result is baked into `src/generated/harness.ts` and served as one prompt-cached block. Budgets in chars, because these files have paragraph-length lines: `AGENT.md` ≤28k, each `bot.md` ≤7k.
 
@@ -107,10 +107,10 @@ Check `docs/knowledge/INDEX.md` before starting work — past lessons may apply.
 |---------|------|
 | Any DS implementation task | `design-system/guidelines/overview.md` (MANDATORY entry — route from here) |
 | Building UI, using components or tokens | `design-system/agent-views/components/index.md` (existence) + `tokens/tokens.md` (names), then the component's generated doc at `design-system/src/components/<group>/<Name>/index.md` for props, variants and tokens |
-| Authoring or reading stories, or verifying a component API | `docs/connectors/storybook-mcp.md` |
+| Verifying a component's API, or writing a story's code | `docs/connectors/storybook-mcp.md` |
 | Building new pages, dashboards, layouts | `design-system/guidelines/composition/layout.md` (MANDATORY) |
 | Laying out on the grid, or matching a Figma frame's breakpoint modes | `design-system/guidelines/foundations/grid.md` |
-| Adding a story, renaming a docs folder, or authoring an MDX page | `design-system/guidelines/documentation-ia.md` |
+| Titling a story, renaming a docs folder, or authoring an MDX page | `design-system/guidelines/documentation-ia.md` |
 | Designer knowledge verification status | `design-system/figma/knowledge-audit.md` |
 | Implementation setup (aliases, prototypes, Vite) | `docs/engineering/setup.md` |
 | Figma link, implement-design, design-to-code mapping, or **code write-back to Figma** | `design-system/figma/component-registry.json` + `token-registry.json` (MANDATORY — load first); then `design-system/guidelines/figma/component-alignment.md`. Write-back also loads `.cursor/hooks/briefings/active-writeback-gate.json` when the gate is active. |

@@ -58,8 +58,8 @@ Do not bulk-load. Two or three documents per task is the budget.
 **Write product copy**
 → `foundations/content/overview.md`
 
-**Add a story, rename a docs folder, author an MDX page**
-→ `documentation-ia.md` → `docs/connectors/storybook-mcp.md`
+**Title a story, rename a docs folder, author an MDX page**
+→ `documentation-ia.md`
 
 ## Machine artifacts
 

@@ -8,8 +8,7 @@ summary: The documentation IA contract — the shared tree Storybook titles, rep
 # Documentation IA contract (2026-07)
 
 One tree, spoken identically by Storybook titles, repo folders, and both Figma
-files. Load this before adding a story, renaming a folder, or authoring an MDX
-docs page. Full rationale: `docs/plans/2026-07-12-001-feat-ds-docs-ia-upgrade-plan.md`.
+files. Full rationale: `docs/plans/2026-07-12-001-feat-ds-docs-ia-upgrade-plan.md`.
 
 `storybook.taxonomy.json` is the single source of truth for the Storybook
 sidebar. After editing it, run `node scripts/sync-storybook-sort.mjs` — the sort
