@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 # link extraction with rg->grep fallback (rg is not guaranteed on every machine).
-# Inline code spans are blanked FIRST: `[label](url)` inside backticks is a doc
-# teaching Markdown syntax, not a link this repo owns, and eight of them kept
-# this check permanently red — a check that always fails is not a check.
+# A code span that IS a whole markdown link is blanked first: `[label](url)`
+# inside backticks is a doc teaching Markdown syntax, not a link this repo owns,
+# and eight of them kept this check permanently red — a check that always fails
+# is not a check. Only such spans are blanked, never every code span: the house
+# link style is [`path.md`](path.md), and blanking its label would leave `[]()`,
+# which the extractor skips — silently unvalidating most links in the repo.
 link_grep() {
-  sed -E 's/`[^`]*`//g' "$1" | { if command -v rg >/dev/null 2>&1; then rg -o '\[[^]]+\]\(([^)]+)\)'; else grep -oE '\[[^]]+\]\([^)]+\)'; fi; }
+  sed -E 's/`\[[^`]+\]\([^`]+\)`//g' "$1" | { if command -v rg >/dev/null 2>&1; then rg -o '\[[^]]+\]\(([^)]+)\)'; else grep -oE '\[[^]]+\]\([^)]+\)'; fi; }
 }
 set -euo pipefail
 
