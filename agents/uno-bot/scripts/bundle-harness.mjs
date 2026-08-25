@@ -63,6 +63,39 @@ const SECTIONS = [
   { name: "conventions", roots: ["docs/conventions"] },
 ];
 
+/**
+ * Char budgets, in chars because these files have paragraph-length lines. The
+ * contract they enforce is stated in `AGENTS.md` § The loading contract; this is
+ * the assertion of it, so an edit that blows a budget fails the build instead of
+ * being noticed months later by whoever re-measures.
+ *
+ * MEASURED ON THE BUNDLED BODY, not the file: frontmatter is stripped before
+ * assembly, so it costs the prompt nothing, and charging a doc ~100 chars for
+ * declaring where it belongs would tax the very thing #159 made mandatory.
+ * An `ide-only` region still counts against a per-file budget — no budgeted file
+ * carries one today, and a persona or face that grew one would be worth seeing.
+ *
+ * Budgets attach to a doc's ROLE — the persona, a Worker face — never to a path,
+ * so renaming a skill cannot silently drop its budget.
+ */
+const BUDGETS = {
+  // Headroom over today's ~163k, sized to absorb ordinary authoring and to fail
+  // on a whole doc arriving unnoticed. Raise it deliberately, in a PR that says
+  // what the prompt bought for the chars.
+  assembled: 170_000,
+  persona: 28_000,
+  botFace: 7_000,
+};
+
+/** The budget a member is held to, or null when its role carries none. */
+function budgetFor({ rel, section }) {
+  if (section === "persona") return { limit: BUDGETS.persona, role: "persona" };
+  if (rel.endsWith("/bot.md")) return { limit: BUDGETS.botFace, role: "Worker face" };
+  return null;
+}
+
+const n = (x) => x.toLocaleString("en-US");
+
 /** Frontmatter is metadata for this script, not content for the model. */
 function splitFrontmatter(text) {
   if (!text.startsWith("---\n")) return { meta: {}, body: text };
@@ -177,6 +210,30 @@ const raw = members.map(({ rel }) => {
   return splitFrontmatter(text).body;
 });
 
+// ── Char budgets, per file ───────────────────────────────────────────────────
+const overBudget = [];
+raw.forEach((body, i) => {
+  const budget = budgetFor(members[i]);
+  if (budget && body.length > budget.limit) {
+    overBudget.push({ rel: members[i].rel, ...budget, size: body.length });
+  }
+});
+
+if (overBudget.length) {
+  console.error(
+    `[bundle-harness] ${overBudget.length} file(s) over its char budget:\n` +
+      overBudget
+        .map(
+          ({ rel, role, size, limit }) =>
+            `  ${rel} (${role}): ${n(size)} chars against a budget of ${n(limit)} — over by ${n(size - limit)}`,
+        )
+        .join("\n") +
+      "\n  -> every char here ships in the system prompt on every request. Cut restatement first:" +
+      "\n     a rule that is stated elsewhere in the bundle should be cited, not quoted.",
+  );
+  process.exit(1);
+}
+
 // Assembly: first member raw, every other prefixed with a path comment so the
 // bundle stays traceable back to a file; empty (post-strip) members skipped.
 const parts = raw.map(stripIdeOnly);
@@ -194,6 +251,18 @@ if (/<!--\s*\/?\s*ide-only\s*-->/i.test(assembled)) {
   console.error(
     "[bundle-harness] an <!-- ide-only --> marker survived assembly — unbalanced or misspelled pair. " +
       "IDE-only content would ship in the bot prompt. Fix the markers and re-run.",
+  );
+  process.exit(1);
+}
+
+// ── Char budget, assembled ───────────────────────────────────────────────────
+if (assembled.length > BUDGETS.assembled) {
+  console.error(
+    `[bundle-harness] the assembled bundle is over its char budget: ${n(assembled.length)} chars ` +
+      `against a budget of ${n(BUDGETS.assembled)} — over by ${n(assembled.length - BUDGETS.assembled)} ` +
+      `(${members.length} files).\n` +
+      "  -> the whole bundle is the prompt's cached prefix, paid on every request. Cut, or raise the" +
+      "\n     budget deliberately in a PR that says what the prompt bought for the chars.",
   );
   process.exit(1);
 }

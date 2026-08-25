@@ -146,3 +146,55 @@ test("the bundler names no individual file", () => {
   assert.ok(!/["']skills\/uno-\w+/.test(code), "the bundler must not name a skill file");
   assert.ok(!/["']docs\/conventions\/\w+\.md/.test(code), "the bundler must not name a convention file");
 });
+
+// ── Char budgets (#161) ──────────────────────────────────────────────────────
+//
+// Budgets are asserted on the BUNDLED BODY, so these tests pad a file and check
+// the bundler refuses. They run `--check` rather than a bare bundle: the budget
+// gate sits ahead of the artifact write, so a padded run must fail before it can
+// touch `harness.ts` — which is also what these assertions prove.
+
+/** Enough filler to blow a budget, in lines that trip no other guard. */
+const padding = (chars) => `\n${"padding padding padding padding\n".repeat(Math.ceil(chars / 32))}`;
+
+test("a persona over its char budget fails the build", () => {
+  const rel = "agents/uno-bot/AGENT.md";
+  const before = readFileSync(harnessTs, "utf8");
+  const result = withFile(rel, (abs, original) => writeFileSync(abs, original + padding(28_000)), () =>
+    runBundler(["--check"]),
+  );
+  assert.equal(result.code, 1, "a persona over budget must fail the build");
+  assert.match(result.out, /over its char budget/i);
+  assert.match(result.out, /AGENT\.md/);
+  assert.match(result.out, /28,000/, "the failure must name the budget");
+  assert.match(result.out, /over by [\d,]+/, "the failure must name the overrun");
+  assert.equal(readFileSync(harnessTs, "utf8"), before, "a failing budget must not write the artifact");
+});
+
+test("a Worker face over its char budget fails the build", () => {
+  const rel = "skills/uno-research/bot.md";
+  const result = withFile(rel, (abs, original) => writeFileSync(abs, original + padding(7_000)), () =>
+    runBundler(["--check"]),
+  );
+  assert.equal(result.code, 1, "a Worker face over budget must fail the build");
+  assert.match(result.out, /uno-research\/bot\.md/);
+  assert.match(result.out, /7,000/, "the failure must name the budget");
+  assert.match(result.out, /over by [\d,]+/, "the failure must name the overrun");
+});
+
+test("an assembled bundle over its char budget fails the build", () => {
+  // Padded into a doc that carries no per-file budget of its own, so the bundle
+  // budget is what fails — not a file budget standing in for it.
+  const rel = "skills/uno-research/references/method.md";
+  const result = withFile(rel, (abs, original) => writeFileSync(abs, original + padding(200_000)), () =>
+    runBundler(["--check"]),
+  );
+  assert.equal(result.code, 1, "an oversized bundle must fail the build");
+  assert.match(result.out, /assembled bundle/i);
+  assert.match(result.out, /over by [\d,]+/, "the failure must name the overrun");
+});
+
+test("every budgeted file is under its budget today", () => {
+  const result = runBundler(["--check"]);
+  assert.equal(result.code, 0, `the committed harness must be within budget:\n${result.out}`);
+});
