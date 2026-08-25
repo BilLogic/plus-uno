@@ -4,6 +4,12 @@
 
 What each component is for, when to reach for it, and how it composes.
 
+> **The generated half now lives beside the source.** Props, variants, defaults,
+> tokens touched and related components are generated per component into
+> `design-system/src/components/<group>/<Name>/index.md`, and each group's
+> `index.md` counts how much of the authored half exists (#165). Read those for
+> facts; read this file only for the prose below.
+>
 > **Known stale — do not treat as the existence law.** The source paths below
 > predate the 2026-07 category-folder reorg, and Chip, Form, Navigation, Section
 > and SuperCompPill are listed here but do not exist in `design-system/src`.

@@ -140,7 +140,7 @@ Load docs on demand — 2-3 guides (~2,000-2,500 tokens), never the full set:
 | Trigger | Load |
 |---------|------|
 | Any DS implementation task | `design-system/guidelines/overview.md` (MANDATORY entry — route from here) |
-| Building UI, using components or tokens | `design-system/agent-views/components/index.md` (existence) + `tokens/tokens.md` (names), then the component's Storybook MDX and `*.stories.jsx` for props and usage |
+| Building UI, using components or tokens | `design-system/agent-views/components/index.md` (existence) + `tokens/tokens.md` (names), then the component's generated doc at `design-system/src/components/<group>/<Name>/index.md` for props, variants and tokens |
 | Designer knowledge verification status | `design-system/figma/knowledge-audit.md` |
 | Building new pages, dashboards, layouts | `design-system/guidelines/composition/layout.md` (MANDATORY) |
 | Implementation setup (aliases, prototypes, Vite) | `docs/engineering/setup.md` |

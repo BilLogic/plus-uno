@@ -33,7 +33,7 @@ Do not bulk-load. Two or three documents per task is the budget.
 ## Common task routes
 
 **Build UI with components**
-→ `agent-views/components/index.md` (does it exist?) → `agent-views/tokens/tokens.md` (token names) → the component's Storybook MDX (props, usage)
+→ `agent-views/components/index.md` (does it exist?) → the component's generated doc, linked from that index (props, variants, tokens touched) → `agent-views/tokens/tokens.md` if styling beyond them
 
 **Build a page or dashboard**
 → `composition/layout.md` → `composition/hierarchy.md` → `foundations/grid.md`
@@ -58,6 +58,8 @@ Do not bulk-load. Two or three documents per task is the budget.
 | Artifact | State |
 |----------|-------|
 | `design-system/agent-views/components/index.md` | Generated — the existence law. Not listed means it does not exist. |
+| `design-system/src/components/<group>/<Name>/index.md` | Generated — per-component props, variants, tokens touched, derived from source. |
+| `design-system/src/components/<group>/index.md` | Generated — group index, with authored-section coverage counted per component. |
 | `design-system/agent-views/tokens/tokens.md` | Generated — token names. |
 | `design-system/figma/component-registry.json` | Generated — import ↔ Figma component set ↔ props. |
 | `design-system/figma/token-registry.json` | Generated — Figma variable ↔ CSS custom property. |
