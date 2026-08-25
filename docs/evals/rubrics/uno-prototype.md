@@ -21,6 +21,7 @@ benchmark: >
 targets:
   first_pass_review_rate: "40-70% band — near-100% means the review lens is too lax, near-0% means prototyping is misfiring"
   iterations_to_ready: "<=3"
+summary: Scores prototypes per fidelity tier
 ---
 
 # uno-prototype rubric

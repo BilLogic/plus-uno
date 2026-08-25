@@ -1,3 +1,7 @@
+---
+summary: The PLUS Design System follows Material Design 3 color guidance
+---
+
 <!-- Tier: 2 -->
 
 # Color Tokens

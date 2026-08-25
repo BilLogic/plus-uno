@@ -19,7 +19,7 @@ Treating your text as the inline PRD. Grounding against the blueprint and prior 
 
 ### Grounding snapshot
 - **Prior art:** [prototypes/post-session-reflection](prototypes/post-session-reflection) (list + form), Pre-/Post-Session Reflections tables (`Completed`/`Incomplete` only — no overdue), Home `StudentsOverviewSection` list pattern. No existing “reached out” / outreach-mark UI.
-- **Product docs:** Reflection today = **tutor-written** post-session report *about* a student (`docs/context/product/features.md`, `flows.md`). Form “follow-up” = supervisor escalation, not tutor→student outreach. **Live uno-blueprint not queried** (Supabase MCP needs auth).
+- **Product docs:** Reflection today = **tutor-written** post-session report *about* a student (`docs/product-and-service/features.md`, `flows.md`). Form “follow-up” = supervisor escalation, not tutor→student outreach. **Live uno-blueprint not queried** (Supabase MCP needs auth).
 - **Uncertainty to carry:** your PRD says students *submit* reflections; repo language has tutors authoring them. We’ll treat your PRD wording as source of truth for this prototype unless you correct it later.
 
 ### PRD summary (no recommendations yet)

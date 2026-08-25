@@ -1,6 +1,6 @@
 // The share-out post's shape, and its agreement with the convention doc.
 //
-// `docs/conventions/slack.md` § Share-out post specified the Flow 3 template
+// `docs/connectors/slack.md` § Share-out post specified the Flow 3 template
 // from 2026-07-16; the tool posted four fixed lines and had no fields for most
 // of it, so the documented post was literally unreachable. Nothing compared
 // them, which is why it went unnoticed for months. These assertions are that

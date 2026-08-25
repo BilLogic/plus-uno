@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: A single evocative image that communicates a product concept, mood, or visual direction — upstream of wireframes, for alignment and reaction, not for spec
 ---
 
 <!-- ~300 tokens | Load when: the confirmed artifact is a concept image -->
@@ -30,7 +31,7 @@ don't assume it.
 
 **Where the spec lives.** Write it to
 `docs/plans/YYYY-MM-DD-NNN-<slug>-<deliverable>-spec.md` (repo date-prefix
-convention, `docs/conventions/coding.md`) and give the designer the path plus
+convention, `docs/engineering/coding.md`) and give the designer the path plus
 the ready-to-paste text. The file is what `uno-review` receives with the
 manifest.
 

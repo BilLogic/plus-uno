@@ -1,18 +1,19 @@
 ---
 name: reviewers/design-qa
 description: Design QA at Ready-for-QA — compares the dev build against the Figma spec, runs the H7 checklist, returns severity verdicts. Diagnose-only.
+summary: Catches spec-vs-implementation drift before ship: walks the QA site against the [spec] Figma file for the Roadmap card, using the Design QA checklist
 ---
 
 # reviewers/design-qa
 
 ## Role & responsibility
 
-Catches spec-vs-implementation drift before ship: walks the QA site against the `[spec]` Figma file for the Roadmap card, using the Design QA checklist. Diagnose-only — files findings with severity verdicts; devs fix. Spec-file resolution and the drift-catch target are owned by `docs/conventions/figma-workspace.md` (RM-ID join key) and `docs/evals/rubrics/uno-review.md`.
+Catches spec-vs-implementation drift before ship: walks the QA site against the `[spec]` Figma file for the Roadmap card, using the Design QA checklist. Diagnose-only — files findings with severity verdicts; devs fix. Spec-file resolution and the drift-catch target are owned by `docs/connectors/figma.md` (RM-ID join key) and `docs/evals/rubrics/uno-review.md`.
 
 ## Invoked by
 
 - `skills/uno-review` — Design QA path, when a Roadmap card hits `Dev Status: Ready for QA (RTT)`
-- Automation: RTT trigger (`docs/conventions/automations.md` — planned)
+- Automation: RTT trigger (`docs/engineering/operations.md` — planned)
 
 ## Workflow
 
@@ -22,6 +23,6 @@ Catches spec-vs-implementation drift before ship: walks the QA site against the 
 
 ## Conventions it obeys
 
-- `docs/conventions/figma-workspace.md` — file naming, `[spec]` prefix, RM-ID join key
-- `docs/conventions/notion.md` — Roadmap DB statuses
+- `docs/connectors/figma.md` — file naming, `[spec]` prefix, RM-ID join key
+- `docs/connectors/notion.md` — Roadmap DB statuses
 - Scored by: `docs/evals/rubrics/uno-review.md` (design_qa_drift_catch)

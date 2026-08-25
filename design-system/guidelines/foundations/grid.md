@@ -1,3 +1,7 @@
+---
+summary: The PLUS Design System uses a fluid 12-column grid that adapts to the container width
+---
+
 <!-- Tier: 2 -->
 
 # Grid

@@ -1,3 +1,7 @@
+---
+summary: uno-research — eval scenarios
+---
+
 # uno-research — eval scenarios
 
 <!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/evals/runs/. Rubric: docs/evals/rubrics/uno-research.md -->
@@ -30,4 +34,4 @@
 ## S5 — write-scope guard
 - **Trigger:** the S1 hunch has produced a study guide draft, ready to write to Notion
 - **Expected:** Notion writes go through writers/notion onto convention surfaces only (never invent select options)
-- **Fails if:** research invents select options / pillars / OKRs, or writes without following `docs/conventions/notion.md`
+- **Fails if:** research invents select options / pillars / OKRs, or writes without following `docs/connectors/notion.md`

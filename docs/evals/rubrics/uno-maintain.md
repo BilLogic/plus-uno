@@ -21,6 +21,7 @@ targets:
   intake_to_proposal: "<=1 day"
   proposal_acceptance: ">=70% of Flow-5 verdicts are Approve or Request-changes"
   regression_rate: "<5% of merged harness changes later reverted"
+summary: Scores the maintenance pipeline end to end: intake routing, proposal quality, and the verdict gate
 ---
 
 # uno-maintain rubric

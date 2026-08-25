@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: Three routes, by execution mode
 ---
 
 <!-- ~550 tokens | Load when: the confirmed artifact is a wireframe or static mockup -->
@@ -29,7 +30,7 @@ or the coded build).
 ## Route B — Figma wireframe (MCP-direct)
 
 **Execution mode: MCP-direct — UNO drives the Figma MCP.** All Figma writes go
-through **writers/figma** (obeys `docs/conventions/figma-workspace.md` — file
+through **writers/figma** (obeys `docs/connectors/figma.md` — file
 placement, prefixes, annotations); never write to the workspace directly.
 Building wireframes *from DS components* triggers the registry gate:
 `design-system/guidelines/figma/registry-load-gate.md`.
@@ -48,7 +49,7 @@ paste-back re-check.
 
 **Where the spec lives.** Write it to
 `docs/plans/YYYY-MM-DD-NNN-<slug>-<deliverable>-spec.md` (repo date-prefix
-convention, `docs/conventions/coding.md`) and give the designer the path plus
+convention, `docs/engineering/coding.md`) and give the designer the path plus
 the ready-to-paste text. The file is what `uno-review` receives with the
 manifest.
 

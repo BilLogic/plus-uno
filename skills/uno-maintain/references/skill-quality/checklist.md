@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: Source basis: Claude Agent Skills Best Practices
 ---
 
 # Skill Quality Checklist

@@ -10,7 +10,7 @@ cd "$ROOT"
 
 status=0
 
-echo "[check] validating markdown links in skills/ agents/ docs/conventions/"
+echo "[check] validating markdown links in skills/ agents/ docs/ design-system/guidelines/ + root"
 
 while IFS= read -r file; do
   while IFS= read -r link; do
@@ -46,7 +46,10 @@ while IFS= read -r file; do
 # record of what an agent said, not links this repo owns, and a record you must
 # hand-edit to make CI green is not a record. Excluded by folder so the analysis
 # written ALONGSIDE it (README.md) stays checked: only the raw record is exempt.
-done < <({ find skills agents docs/conventions docs/evals -type f -name '*.md' -not -path '*/node_modules/*' -not -path '*/transcripts/*'; echo AGENTS.md; echo loading-order.md; } | sort)
+# docs/adr/ is scanned for markdown links but NOT for backticked paths: an ADR's
+# job includes naming a path that was retired, and rewriting those would erase
+# the decision's own record. Live claims inside ADRs were repointed by hand.
+done < <({ find skills agents docs/connectors docs/engineering docs/conventions docs/adr docs/product-and-service design-system/guidelines docs/evals -type f -name '*.md' -not -path '*/node_modules/*' -not -path '*/transcripts/*'; echo AGENTS.md; echo CONTEXT.md; echo SETUP.md; echo README.md; echo loading-order.md; } | sort)
 
 echo "[check] validating backticked repo paths resolve"
 
@@ -90,7 +93,11 @@ while IFS= read -r file; do
       status=1
     fi
   done < <(path_grep "$file")
-done < <({ find skills agents docs/conventions -type f -name '*.md' -not -path '*/node_modules/*'; echo AGENTS.md; echo loading-order.md; } | sort)
+# design-system/guidelines/components/overview.md is EXCLUDED by name: it carries
+# its own staleness banner (pre-2026-07 component paths, five components that do
+# not exist) and #165/#166 own its rebuild. Excluding it keeps 50 known findings
+# from burying new ones; it is not a pass.
+done < <({ find skills agents docs/connectors docs/engineering docs/conventions docs/product-and-service design-system/guidelines -type f -name '*.md' -not -path '*/node_modules/*' -not -path 'design-system/guidelines/components/overview.md'; echo AGENTS.md; echo CONTEXT.md; echo SETUP.md; echo loading-order.md; } | sort)
 
 echo "[check] validating AGENTS.md skills-table rows resolve to SKILL.md files"
 
@@ -132,11 +139,11 @@ old_patterns=(
   "docs/project/"
   "docs/foundations/"
   "docs/design-system/"
-  "docs/context/conventions/"
+  "docs/product-and-service/conventions/"
   "\.agent/"
   "bot-skills/"
   "/uno:"
-  "docs/context/design-system"
+  "docs/product-and-service/design-system"
   "design-system/docs/"
 )
 
@@ -146,7 +153,7 @@ for pattern in "${old_patterns[@]}"; do
   # design-system/docs/ retired in #170 (four homes collapsed into
   # design-system/guidelines/), so it is now itself a stale pattern.
   count=$({ grep -r "$pattern" --include="*.md" --include="*.jsx" --include="*.json" --include="*.mdc" . 2>/dev/null || true; } \
-    | { grep -v "node_modules/\|docs/plans/\|docs/knowledge/\|todos/\|storybook-static/\|design-system/docs/foundations/\|design-system/figma/knowledge-audit.json" || true; } \
+    | { grep -v "node_modules/\|docs/plans/\|docs/knowledge/\|docs/adr/\|todos/\|storybook-static/\|design-system/figma/knowledge-audit.json" || true; } \
     | wc -l | tr -d ' ')
   if [[ "$count" -gt 0 ]]; then
     echo "[stale] $count references to old path pattern: $pattern"

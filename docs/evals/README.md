@@ -1,3 +1,7 @@
+---
+summary: Criteria, tests, fixtures, results — one folder, one loop
+---
+
 # evals/ — the quality loop (L4)
 
 Criteria, tests, fixtures, results — one folder, one loop.

@@ -1,6 +1,6 @@
 name: Shipped Watchdog
 
-# Weekly post-ship reconciliation check (registry: docs/conventions/automations.md).
+# Weekly post-ship reconciliation check (registry: docs/engineering/operations.md).
 # Loop shape: time-based cron → single-pass reconcile of recently shipped Roadmap
 # cards → issue intakes → stop. The reconciliation duty and check set live in
 # skills/uno-maintain/references/method.md §6; the prompt file is only the

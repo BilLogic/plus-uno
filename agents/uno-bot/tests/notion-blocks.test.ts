@@ -2,7 +2,7 @@
 //
 // Before 2026-08-22 a Notion body was split on blank lines into paragraph
 // blocks and nothing else — so `**Decision:** one sentence`, the exact shape
-// `docs/conventions/notion.md` § Decisions tells the model to write, landed on
+// `docs/connectors/notion.md` § Decisions tells the model to write, landed on
 // the page as literal asterisks. These assertions are that bug's fence.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";

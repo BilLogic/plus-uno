@@ -7,7 +7,7 @@ Plan is ready for your approval: finish the one-step intake, ground against blue
 Treating your brief as the inline PRD and continuing intake — grounding the brief first, then one reflection question.Supabase needs auth for blueprint grounding. Authenticating and sweeping local prior art in parallel.**PRD accepted (inline)** — mid-session quick notes for tutors.
 
 **Grounding snapshot** (blueprint blocked this session: Supabase MCP needs auth in Cursor desktop; not fabricating journey cites)
-- Foundation ([`docs/context/product/flows.md`](docs/context/product/flows.md)): tutors may capture lightweight timestamped notes in-session; they resurface as a memory aid in post-session reflection.
+- Foundation ([`docs/product-and-service/flows.md`](docs/product-and-service/flows.md)): tutors may capture lightweight timestamped notes in-session; they resurface as a memory aid in post-session reflection.
 - Prior art: Toolkit **SessionNotes** is a **post-session, read-only** display of notes already left ([`SessionNotes.jsx`](design-system/src/specs/Toolkit/Post-Session/Sections/SessionNotes/SessionNotes.jsx)) — empty/filled only, no capture. `prototypes/in-session-ux` has a session-notes textarea mapping in a Figma write-back manifest — related surface, not this layout settle.
 
 **PRD summary (no recommendations yet)**

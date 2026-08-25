@@ -1,3 +1,7 @@
+---
+summary: For quick machine lookups, agents may read token-registry.json (read-only); use this doc for the authoritative tables, extended cases, and notes
+---
+
 <!-- Load when: Figma ↔ CSS token mapping | Route: design-system/guidelines/overview.md → foundations/token-mapping.md -->
 
 # Figma Token Mapping Reference

@@ -1,3 +1,7 @@
+---
+summary: uno-review — eval scenarios
+---
+
 # uno-review — eval scenarios
 
 <!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/evals/runs/. Rubric: docs/evals/rubrics/uno-review.md -->

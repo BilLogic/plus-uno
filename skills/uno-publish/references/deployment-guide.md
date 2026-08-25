@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: PLUS Uno production (plus-uno.netlify.app) ships
 ---
 
 <!-- Load for: helping a designer deploy a prototype to Netlify -->

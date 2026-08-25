@@ -55,9 +55,11 @@ const repoRoot = path.resolve(here, "../../.."); // repo root (two levels above 
  * doc under them whose frontmatter says `embodiment: uno-bot` or `all`.
  */
 const SECTIONS = [
-  { name: "constitution", roots: ["AGENTS.md"] },
+  { name: "constitution", roots: ["AGENTS.md", "CONTEXT.md"] },
   { name: "persona", roots: ["agents/uno-bot/AGENT.md"] },
   { name: "skills", roots: ["skills"] },
+  { name: "connectors", roots: ["docs/connectors"] },
+  { name: "engineering", roots: ["docs/engineering"] },
   { name: "conventions", roots: ["docs/conventions"] },
 ];
 
@@ -114,7 +116,7 @@ function stripIdeOnly(text) {
 // Structural sentinels only — naming a member file here would make the repo
 // check die confusingly the day that file is renamed, and would put a filename
 // back in the one script that is supposed to hold none.
-for (const sentinel of ["AGENTS.md", "docs/conventions", "skills"]) {
+for (const sentinel of ["AGENTS.md", "CONTEXT.md", "skills"]) {
   if (!existsSync(path.join(repoRoot, sentinel))) {
     console.error(`[bundle-harness] repo root check failed: ${sentinel} not found under ${repoRoot}`);
     process.exit(1);

@@ -1,10 +1,11 @@
 ---
 embodiment: all
+summary: How agents write to Notion — the MCP-write principle, convention surfaces, the gated tools, and body shape.
 ---
 
 # Notion Conventions
 
-<!-- canonical per ADR-017 (docs/knowledge/decisions.md): this file IS the convention; the legacy Notion 📓 Doc-Management Playbook is superseded and loses on conflict. Distilled 2026-07-07 · Decisions DB + New Project hub aligned 2026-07-13 · read-radar catalog scopes 2026-07-13 · applied by writers/notion. -->
+<!-- canonical per ADR-017 (docs/adr/): this file IS the convention; the legacy Notion 📓 Doc-Management Playbook is superseded and loses on conflict. Distilled 2026-07-07 · Decisions DB + New Project hub aligned 2026-07-13 · read-radar catalog scopes 2026-07-13 · applied by writers/notion. -->
 
 ## Access paths — reads vs writes (uno-bot Worker)
 

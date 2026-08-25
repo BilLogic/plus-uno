@@ -16,8 +16,8 @@ Every intake is one of four **trigger types** — improvement (could be better) 
 
 | Estate | Target | Fix action |
 |---|---|---|
-| Codebase | product context / stories | fix `docs/context/product/*` + `terminology.md` |
-| Codebase | harness doc stale / wrong | fix `docs/context/*` (non-product) + `docs/conventions/*` — repo-canonical, ADR-017 |
+| Codebase | product context / stories | fix `docs/product-and-service/*` + `terminology.md` |
+| Codebase | harness doc stale / wrong | fix `docs/product-and-service/*` (non-product) + `docs/conventions/*` — repo-canonical, ADR-017 |
 | Codebase | a skill isn't useful | refine the skill (`skills/*` — both faces if shared) |
 | Codebase | UNO off-role / personality | tune persona / instructions (AGENTS.md, embodiment deltas) |
 | Codebase | Storybook inconsistent / bug | fix the design system (`design-system/src/**`) |
@@ -27,11 +27,11 @@ Every intake is one of four **trigger types** — improvement (could be better) 
 | Notion | requirement / story changed | update PRD **+ blueprint together** — paired, never one alone |
 | Notion | behavior / spec wrong | correct the doc **+ flag its owner** — fixing the artifact alone isn't enough |
 | Notion | doc stale or missing | author / refresh the doc |
-| Supabase | blueprint stale vs operational reality (journey changed, no requirement doc involved) | update the blueprint via `writers/blueprint` — pair a PRD only when a requirement doc exists for that flow (`docs/conventions/supabase.md` § Two sources) |
+| Supabase | blueprint stale vs operational reality (journey changed, no requirement doc involved) | update the blueprint via `writers/blueprint` — pair a PRD only when a requirement doc exists for that flow (`docs/connectors/supabase/overview.md` § Two sources) |
 
 The taxonomy is the harness map — when a new component joins the harness, this table must grow.
 
-**Record:** an intake lives as a **Roadmap DB card** — `Product Pillar: Universal`, lifecycle in the `Intake Status` property (card mechanics: `docs/conventions/notion.md`). Every intake names its **evidence** (file / frame / message link) in the card body and a **suggested tier**. Separate from Decisions DB **Evidence** (URL property on durable design/product decisions).
+**Record:** an intake lives as a **Roadmap DB card** — `Product Pillar: Universal`, lifecycle in the `Intake Status` property (card mechanics: `docs/connectors/notion.md`). Every intake names its **evidence** (file / frame / message link) in the card body and a **suggested tier**. Separate from Decisions DB **Evidence** (URL property on durable design/product decisions).
 
 **Headless surrogate:** scheduled sweeps run without Notion access and file
 their intakes as GitHub issues labeled `harness-intake` (transport contract:
@@ -56,35 +56,35 @@ Answered by the **spotter** (fallback: the designated maintainer) — never by t
 
 ## 4 · Tier classification
 
-- **Tier 1 — trivial. The whitelist is absolute:** typos · broken links · stale dates · pure formatting — nothing else. Tier 1 may **never** touch skill definitions, the persona, DS components, or requirements, no matter how small the diff. Apply directly — no PR/PRD, no verdict — and log one line to `docs/evals/runs/digest.jsonl` as `{"ts": "<ISO-8601>", "target": "<file-or-artifact>", "change": "<one line>"}` (the row shape is a contract: the weekly digest automation windows on `ts` and prints `target`/`change`; a row missing `ts` is silently undated and falls out of every digest). The weekly digest posts from it to the design channel (`docs/conventions/slack.md`); the monthly retro reviews the digest.
+- **Tier 1 — trivial. The whitelist is absolute:** typos · broken links · stale dates · pure formatting — nothing else. Tier 1 may **never** touch skill definitions, the persona, DS components, or requirements, no matter how small the diff. Apply directly — no PR/PRD, no verdict — and log one line to `docs/evals/runs/digest.jsonl` as `{"ts": "<ISO-8601>", "target": "<file-or-artifact>", "change": "<one line>"}` (the row shape is a contract: the weekly digest automation windows on `ts` and prints `target`/`change`; a row missing `ts` is silently undated and falls out of every digest). The weekly digest posts from it to the design channel (`docs/connectors/slack.md`); the monthly retro reviews the digest.
 - **Tier 2 — substantive:** everything else → the pipeline in §5.
 
 ## 5 · Tier 2 — PR + PRD → verdict → apply log
 
 1. **Pair, never one alone.** Open the PR *and* pair it with a PRD carrying the rationale — reviewers see *why*, not just *what*. A lone PR or lone PRD never ships.
-2. **Review post** to the design review channel (`docs/conventions/slack.md`): self-sufficient — one-line summary, PR + PRD links, suggested reviewers. Assume the reviewer never opens the PR.
-3. **Verdict** from a routed reviewer, machine-parseable per `docs/conventions/slack.md` gate 2 (approve / request-changes / reject — the emoji vocabulary lives there, not here). **Persona and DS-component changes need two approvals.** No verdict in 2 working days → re-ping the suggested reviewers once; 4 working days → escalate to the design lead. **Never auto-merge on silence.**
+2. **Review post** to the design review channel (`docs/connectors/slack.md`): self-sufficient — one-line summary, PR + PRD links, suggested reviewers. Assume the reviewer never opens the PR.
+3. **Verdict** from a routed reviewer, machine-parseable per `docs/connectors/slack.md` gate 2 (approve / request-changes / reject — the emoji vocabulary lives there, not here). **Persona and DS-component changes need two approvals.** No verdict in 2 working days → re-ping the suggested reviewers once; 4 working days → escalate to the design lead. **Never auto-merge on silence.**
 4. **Execute on approve only.** Merge the PR / apply the update, then write one **apply-log row** (target · verdict link · timestamp) to `docs/evals/runs/apply-log.jsonl` — interim store until the Notion Eval Runs DB exists. Non-code applies have no merge log — this row is what makes the audit measurable.
 5. **🔁** → revise and re-enter at drafting (§2); each round gets a fresh, complete post. **❌** → record why in the thread so the idea isn't silently re-raised.
 
 ## 6 · Standing intake paths
 
-- **Handoff rails propagation (from uno-publish):** arrives **pre-authorized** — the designer-confirmed handoff plus its three sign-offs replace the worth-incorporating gate and the verdict. Execute the paired PRD + blueprint write per `docs/conventions/supabase.md` and write the apply-log row citing the handoff thread. This is the only intake that skips §3/§5.
+- **Handoff rails propagation (from uno-publish):** arrives **pre-authorized** — the designer-confirmed handoff plus its three sign-offs replace the worth-incorporating gate and the verdict. Execute the paired PRD + blueprint write per `docs/connectors/supabase/overview.md` and write the apply-log row citing the handoff thread. This is the only intake that skips §3/§5.
 
 - **Conventions are repo-canonical** (decision 2026-07-07, ADR-017): `docs/conventions/` wins every conflict. A legacy Notion playbook page that contradicts a conventions file is the stale artifact — file an intake to banner it as superseded (the faces route the Notion write); never "re-sync" the repo to match it, never fix the drift silently.
-- **Standing sweeps:** named in `docs/conventions/automations.md` — shipped watchdog · weekly Tier-1 digest · Figma hygiene · conventions integrity (agents↔docs cross-references both ways, header canonicality, path rot) · Notion comment sweep. Each sweep files one intake per finding into this same pipeline.
+- **Standing sweeps:** named in `docs/engineering/operations.md` — shipped watchdog · weekly Tier-1 digest · Figma hygiene · conventions integrity (agents↔docs cross-references both ways, header canonicality, path rot) · Notion comment sweep. Each sweep files one intake per finding into this same pipeline.
 - **Post-ship reconciliation:** every shipped handoff triggers a reconcile of DS + harness + blueprint against built reality — routine, not exceptional. The check set, per shipped card:
   - `design-system/` stories/MDX reflect the shipped surface where they reference it;
-  - harness docs (`docs/context/*`, conventions, skill references) don't describe pre-ship behavior as current;
+  - harness docs (`docs/product-and-service/*`, conventions, skill references) don't describe pre-ship behavior as current;
   - deployment/marketplace references (per uno-publish's references) still point at live URLs;
-  - the **blueprint** reflects the shipped change (`docs/conventions/supabase.md` § Two sources — ship-time is when "blueprint wins vs shipped docs" becomes true). The headless watchdog can't read Supabase, so for any shipped card that touches the service journey it files a *verify-blueprint* intake naming the card and the likely scenario, rather than asserting drift itself; the intake's IDE session does the actual blueprint read.
+  - the **blueprint** reflects the shipped change (`docs/connectors/supabase/overview.md` § Two sources — ship-time is when "blueprint wins vs shipped docs" becomes true). The headless watchdog can't read Supabase, so for any shipped card that touches the service journey it files a *verify-blueprint* intake naming the card and the likely scenario, rather than asserting drift itself; the intake's IDE session does the actual blueprint read.
   The weekly shipped-watchdog automation runs exactly this set headlessly (`scripts/prompts/uno-shipped-watchdog/SKILL.md`); grow the set here, never in the adapter.
 
 ## 7 · Knowledge capture
 
 After significant work — a non-trivial fix, a gotcha, a decision worth preserving:
 
-1. File a lesson per `docs/conventions/coding.md` § Docs pipeline — the domain file by default, `docs/knowledge/lessons/YYYY-MM-DD-slug.md` for an event worth its own record — frontmatter (`title` · `date` · `tags` · `rule_candidate`) + problem / root cause / fix / prevention.
+1. File a lesson per `docs/engineering/coding.md` § Docs pipeline — the domain file by default, `docs/knowledge/lessons/YYYY-MM-DD-slug.md` for an event worth its own record — frontmatter (`title` · `date` · `tags` · `rule_candidate`) + problem / root cause / fix / prevention.
 2. Update `docs/knowledge/INDEX.md`.
 3. If a standing rule changes: one line in `docs/knowledge/changelog.md`. Proposing the AGENTS.md / persona edit itself is Tier 2 — the gate in §5 applies.
 

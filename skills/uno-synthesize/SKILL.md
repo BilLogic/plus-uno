@@ -12,6 +12,7 @@ description: >
 argument-hint: '[sources-to-distill | "draft the PRD"]'
 allowed-tools: Read, Grep, Glob, Write, Task, mcp__notion-plus__*
 embodiment: ide
+summary: The procedure lives in references/method.md (always load): ingest → findings toll gate → STOP at the designer's two gates → PRD → paired
 ---
 
 # uno-synthesize — IDE face
@@ -53,7 +54,7 @@ or an exported file/query result. Say so — never claim a connection that isn't
 | 1 · Ingest | `Read`/`Grep`/`Glob` local material; pull referenced Notion pages via `mcp__notion-plus__*` |
 | 2 · Findings doc | summon **writers/notion** → Findings & Takeaways on the project hub's Research subpage |
 | 3 · STOP | present findings + recommendation; ask "enough context?" then "worth pursuing?"; wait for the designer |
-| 4 · PRD | **query uno-blueprint first** (Supabase MCP read, `docs/conventions/supabase.md`) for the scenarios/paths/steps the PRD touches — the current-state section and downstream-effects reasoning cite blueprint rows, not memory; then draft inline for refinement; on approval, summon **writers/notion** → instantiate from the PRD template |
+| 4 · PRD | **query uno-blueprint first** (Supabase MCP read, `docs/connectors/supabase/overview.md`) for the scenarios/paths/steps the PRD touches — the current-state section and downstream-effects reasoning cite blueprint rows, not memory; then draft inline for refinement; on approval, summon **writers/notion** → instantiate from the PRD template |
 | 5 · Paired write | on acceptance, summon **writers/blueprint** → stories/flows/screens to uno-blueprint **in the same action** as the PRD write; Roadmap card → `Design Status: Ready for Design` |
 
 No-go and not-sure outcomes at step 3 are deliverables too — see method § 3.
@@ -70,8 +71,8 @@ enforces convention surfaces and exact-match selects.
 | When | Load |
 |---|---|
 | always | `references/method.md` |
-| any Notion write | `docs/conventions/notion.md` |
-| any blueprint read or write | `docs/conventions/supabase.md` + `docs/conventions/blueprint-navigation.md` |
+| any Notion write | `docs/connectors/notion.md` |
+| any blueprint read or write | `docs/connectors/supabase/overview.md` + `docs/connectors/supabase/blueprint-navigation.md` |
 | human-facing prose | `docs/conventions/writing-style.md` |
 
 ## Quality bar
@@ -86,7 +87,7 @@ scenarios: `docs/evals/scenarios/uno-synthesize.md`.
   implements code.
 - Stays scoped to the provided context — expanding into adjacent evidence-gathering
   is uno-research's job.
-- All external writes go through the writers; follow `docs/conventions/notion.md` (never invent select options).
+- All external writes go through the writers; follow `docs/connectors/notion.md` (never invent select options).
 
 ## Hand-offs
 

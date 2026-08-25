@@ -1,3 +1,8 @@
+---
+embodiment: ide
+summary: Aliases, package structure, prototype conventions, token workflow, local preview.
+---
+
 <!-- Tier: 2 | ~500 tokens | Load for: repo setup, imports, prototypes scaffolding, build tooling -->
 # PLUS Design System — Setup
 
@@ -26,7 +31,7 @@ import '@/styles/main.scss';
 - `design-system/src/index.js`
 - `design-system/src/components/index.js` (form elements live in `design-system/src/components/forms-and-inputs/`, re-exported via this barrel)
 
-**Prohibited:** deep imports like `design-system/src/components/Button/Button` — use barrel.
+**Prohibited:** deep imports — `import Button from 'design-system/src/components/.../Button'`. Use the barrel.
 
 ## Package Structure
 
@@ -105,4 +110,4 @@ npm run preview:react -- --host 127.0.0.1 --port 8080 --strictPort
 - Prototypes: kebab-case directories
 - Docs/plans: `YYYY-MM-DD-NNN-type-slug-plan.md`
 
-See `docs/conventions/coding.md` for full conventions.
+See `docs/engineering/coding.md` for full conventions.

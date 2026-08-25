@@ -4,7 +4,7 @@
 // reaches for Env and the Slack API, neither of which exists under `npm test`,
 // and the shape is the part that drifted.
 //
-// WHAT DRIFTED. `docs/conventions/slack.md` § Share-out post has specified the
+// WHAT DRIFTED. `docs/connectors/slack.md` § Share-out post has specified the
 // Flow 3 template since 2026-07-16: fidelity, round, what changed, up to three
 // specific questions, an explicit out-of-scope line, the bundle links, and a
 // cc + date. The tool posted four fixed lines built from `summary` / `link` /

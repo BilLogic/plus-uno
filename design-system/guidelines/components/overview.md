@@ -1,3 +1,7 @@
+---
+summary: What each component is for, when to reach for it, and how it composes
+---
+
 <!-- Tier: 2 -->
 
 # Components

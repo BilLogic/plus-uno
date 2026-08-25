@@ -1,7 +1,7 @@
 name: Weekly Tier-1 Digest
 
 # Weekly digest of auto-applied Tier-1 fixes → #plus-design (registry:
-# docs/conventions/automations.md). Loop shape: time-based cron → single pass →
+# docs/engineering/operations.md). Loop shape: time-based cron → single pass →
 # post → sentinel-verified stop. The Tier-1 rules live in
 # skills/uno-maintain/references/method.md §4; the prompt file is only the
 # headless adapter. Spot-run: `gh workflow run weekly-tier1-digest.yml`.

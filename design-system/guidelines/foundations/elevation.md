@@ -1,3 +1,7 @@
+---
+summary: Elevation creates visual hierarchy through shadows
+---
+
 <!-- Tier: 2 -->
 
 # Elevation Tokens

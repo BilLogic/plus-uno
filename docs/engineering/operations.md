@@ -1,10 +1,11 @@
 ---
 embodiment: all
+summary: THE standing-automation registry
 ---
 
 # Automations Registry
 
-<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand) · distilled 2026-07-07 from 📓 playbook §6, now superseded · applied by uno-maintain. -->
+<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand) · distilled 2026-07-07 from 📓 playbook §6, now superseded · applied by uno-maintain. -->
 
 THE standing-automation registry. An automation absent from the table below is undocumented by definition.
 

@@ -1,3 +1,7 @@
+---
+summary: Product copy rules
+---
+
 <!-- Tier: 2 -->
 
 # Content

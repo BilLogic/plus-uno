@@ -21,6 +21,7 @@ benchmark: >
 targets:
   grounding_fidelity: "0 violations of a known blueprint constraint reach review exit (Flow 2)"
   design_qa_drift_catch: ">=80% of spec-vs-implementation issues caught at Ready-for-QA rather than post-ship (baseline first)"
+summary: The core eval is the golden defect set: recall says the lenses see enough, precision says they don't cry wolf, stage-appropriateness says each lens stays in its lane
 ---
 
 # uno-review rubric

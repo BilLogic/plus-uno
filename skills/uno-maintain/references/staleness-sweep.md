@@ -1,8 +1,9 @@
 ---
 embodiment: ide
+summary: One intake per finding (evidence + suggested tier), through the normal pipeline in method.md
 ---
 
-<!-- Load for: the conventions-integrity sweep (monthly, at retro). Registry row: docs/conventions/automations.md. Run by reviewers/auditor — inspect and file intakes only, never fix in-sweep. -->
+<!-- Load for: the conventions-integrity sweep (monthly, at retro). Registry row: docs/engineering/operations.md. Run by reviewers/auditor — inspect and file intakes only, never fix in-sweep. -->
 
 # Integrity sweep checklist
 
@@ -10,7 +11,7 @@ One intake per finding (evidence + suggested tier), through the normal pipeline 
 
 ## A. Canonicality headers (conventions are repo-canonical — ADR-017)
 
-- [ ] Every `docs/conventions/*.md` opens with the ADR-017 header comment: `<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier N · <lineage> · applied by <who>. -->`. Prose headers, `<!-- Tier: N -->`-only headers, and missing lineage all fail.
+- [ ] Every `docs/conventions/*.md` opens with the ADR-017 header comment: `<!-- canonical per ADR-017 (docs/adr/) · Tier N · <lineage> · applied by <who>. -->`. Prose headers, `<!-- Tier: N -->`-only headers, and missing lineage all fail.
 - [ ] No conventions file still carries a "prefer Notion on conflict" rule line.
 - [ ] Legacy Notion playbook pages duplicating a conventions file carry a superseded banner pointing at the repo — missing banner → intake for writers/notion.
 
@@ -19,7 +20,7 @@ One intake per finding (evidence + suggested tier), through the normal pipeline 
 - [ ] Every agent's "Conventions it obeys" pointers resolve to existing docs.
 - [ ] Every "applied by `agents/<kind>/<name>`" pointer in docs names an agent file that exists.
 - [ ] No agent restates a rule a doc owns (non-duplication rule, `agents/README.md`).
-- [ ] Every row in `docs/conventions/automations.md` still names an existing agent and an existing skill method.
+- [ ] Every row in `docs/engineering/operations.md` still names an existing agent and an existing skill method.
 
 ## C. Routing & path integrity
 

@@ -1,3 +1,7 @@
+---
+summary: How dates, times, durations, and time zones are written in the product
+---
+
 <!-- Tier: 2 -->
 
 # Date and time

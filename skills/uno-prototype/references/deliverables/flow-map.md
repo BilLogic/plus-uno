@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: The flow-map deliverable — its normative shape and how the designer runs it in the external tool.
 ---
 
 <!-- ~350 tokens | Load when: the confirmed artifact is a user flow, journey map, or data-flow map -->
@@ -25,7 +26,7 @@ does not run the generation.
 
 **Where the spec lives.** Write it to
 `docs/plans/YYYY-MM-DD-NNN-<slug>-<deliverable>-spec.md` (repo date-prefix
-convention, `docs/conventions/coding.md`) and give the designer the path plus
+convention, `docs/engineering/coding.md`) and give the designer the path plus
 the ready-to-paste text. The file is what `uno-review` receives with the
 manifest.
 

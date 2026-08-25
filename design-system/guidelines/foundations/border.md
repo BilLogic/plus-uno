@@ -1,3 +1,7 @@
+---
+summary: Border widths and their semantic tokens
+---
+
 <!-- Tier: 2 -->
 
 # Border

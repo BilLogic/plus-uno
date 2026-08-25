@@ -1,20 +1,21 @@
 ---
 embodiment: all
+summary: Two hard rules, every row: never merge two sources into one unattributed answer — surface the conflict instead of blending it — and never fabricate a blueprint citation, the worst
 ---
 
 # Supabase / uno-blueprint Conventions
 
-<!-- canonical per ADR-017 (docs/knowledge/decisions.md); supersedes the Notion 📐 System Overview + Flow 4 doc for conventions. Distilled 2026-07-07 · applied by writers/blueprint. -->
+<!-- canonical per ADR-017 (docs/adr/); supersedes the Notion 📐 System Overview + Flow 4 doc for conventions. Distilled 2026-07-07 · applied by writers/blueprint. -->
 
 ## The contract
 
 - **uno-blueprint (Supabase) is the source of truth for the CURRENT service journey.** Ground every current-state product claim in a blueprint read (`search_blueprint` / PostgREST) with lane/actor attribution; cite what you found. Notion is a mixed estate — stale docs *and* legitimate future state — so authority is routed by claim type (§ Two sources, one time axis), not by a single "blueprint always wins" rule.
-- **Query at task time, never cache.** `docs/context/product/` holds foundation only (identity, pillars, archetypes); live truth — features, requirements, screens — is retrieved fresh per task.
+- **Query at task time, never cache.** `docs/product-and-service/` holds foundation only (identity, pillars, archetypes); live truth — features, requirements, screens — is retrieved fresh per task.
 - **Paired writes, never one alone:** any requirement change updates the PRD (Notion) and the blueprint (Supabase) together — Flow 4's requirement/story path. A PRD edit without a blueprint write (or vice versa) is a defect. **Detection is human today** — no automation reads Supabase, so nothing verifies the pair. The weekly shipped watchdog files a *verify-blueprint* intake per shipped journey card (`skills/uno-maintain/references/method.md` §6) but cannot confirm drift itself; any human spot files a `uno-maintain` intake.
 - Write access: `writers/blueprint` only, via `skills/uno-synthesize` (new requirements) and `skills/uno-maintain` (changes). All other consumers are read-only.
 - Supabase is also the candidate dummy backend for prototypes needing persistence — separate schema, never mixed with blueprint tables.
 
-**Navigating it:** schema, lane semantics, path semantics, query recipes, and the scored answering rules live in `docs/conventions/blueprint-navigation.md` — load it before any blueprint read; this file owns access and source routing only.
+**Navigating it:** schema, lane semantics, path semantics, query recipes, and the scored answering rules live in `docs/connectors/supabase/blueprint-navigation.md` — load it before any blueprint read; this file owns access and source routing only.
 
 ## Two sources, one time axis (ADR-021)
 

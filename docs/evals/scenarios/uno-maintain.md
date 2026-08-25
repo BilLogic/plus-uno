@@ -1,3 +1,7 @@
+---
+summary: uno-maintain — eval scenarios
+---
+
 # uno-maintain — eval scenarios
 
 <!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/evals/runs/. Rubric: docs/evals/rubrics/uno-maintain.md -->
@@ -17,7 +21,7 @@
 - **Fails if:** any change applies without a Slack verdict · a lone PR or lone PRD ships
 
 ## S3 — conflict with a legacy Notion playbook page
-- **Trigger:** a legacy Notion playbook page contradicts `docs/conventions/notion.md`
+- **Trigger:** a legacy Notion playbook page contradicts `docs/connectors/notion.md`
 - **Expected:** the repo file wins — conventions are repo-canonical (ADR-017); file an intake for writers/notion to banner the Notion page as superseded; the monthly integrity sweep catches unbannered legacy pages
 - **Fails if:** the repo is "re-synced" to match the obsoleted page · the conflict is resolved silently with no intake trail
 

@@ -1,10 +1,11 @@
 ---
 embodiment: all
+summary: Use these terms consistently across all design system work, prototypes, and documentation
 ---
 
 # PLUS Terminology
 
-<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand) · distilled 2026-07-07 · applied by every agent naming a product, org, design-system, or harness term. -->
+<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand) · distilled 2026-07-07 · applied by every agent naming a product, org, design-system, or harness term. -->
 
 Use these terms consistently across all design system work, prototypes, and documentation. Do not substitute generic web terms.
 

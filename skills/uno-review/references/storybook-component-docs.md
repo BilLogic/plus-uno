@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: This guide is primarily for designers browsing Storybook to review shared UI
 ---
 
 # Storybook Component Organization

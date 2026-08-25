@@ -1,3 +1,7 @@
+---
+summary: A Cloudflare Worker that puts uno (the PLUS design agent) in Slack as @uno-bot: it receives Slack events, runs an agentic tool-use loop, answers grounded questions across Notion /
+---
+
 # uno-bot — the Slack embodiment of uno
 
 A Cloudflare Worker that puts **uno** (the PLUS design agent) in Slack as `@uno-bot`: it receives Slack events, runs an agentic tool-use loop, answers grounded questions across Notion / the blueprint / GitHub / Slack, and stages consequential actions (file a PRD, trigger a build, send an email) behind a ✅ confirmation gate. Side-effects execute via GitHub Actions; per-thread state lives in Durable Objects.

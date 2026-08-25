@@ -1,3 +1,7 @@
+---
+summary: How PLUS form elements compose inside surfaces
+---
+
 <!-- Tier: 2 | Load when: composing form UIs | Route: design-system/guidelines/overview.md → patterns/forms.md -->
 # Forms — Composition Pattern
 

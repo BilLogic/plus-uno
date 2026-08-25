@@ -1,6 +1,7 @@
 ---
 name: reviewers/auditor
 description: Runs a named registry checklist against an estate (repo, Notion, Figma, blueprint) and files uno-maintain intakes. Inspects; never fixes.
+summary: The standing-sweep role: given a named checklist (shipped watchdog, conventions staleness, Figma hygiene, agents↔docs cross-references), walks the estate and files an intake per di
 ---
 
 # reviewers/auditor
@@ -12,7 +13,7 @@ The standing-sweep role: given a named checklist (shipped watchdog, conventions 
 ## Invoked by
 
 - `skills/uno-maintain` — sweeps and retro audits
-- Automations: shipped watchdog · weekly Tier-1 digest · Figma hygiene sweep · conventions integrity sweep (`docs/conventions/automations.md`)
+- Automations: shipped watchdog · weekly Tier-1 digest · Figma hygiene sweep · conventions integrity sweep (`docs/engineering/operations.md`)
 
 ## Workflow
 
@@ -24,5 +25,5 @@ The standing-sweep role: given a named checklist (shipped watchdog, conventions 
 
 ## Conventions it obeys
 
-- `docs/conventions/automations.md` — the registry that names its sweeps
+- `docs/engineering/operations.md` — the registry that names its sweeps
 - All four estate conventions (read-only) — it audits against them, never restates them

@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: Use with uno-review when implementing approved designs for production (not disposable prototypes)
 ---
 
 <!-- ~500 tokens | Load when: production-ready implementation with all states and accessibility -->

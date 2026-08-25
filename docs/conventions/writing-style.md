@@ -1,10 +1,11 @@
 ---
 embodiment: all
+summary: Writing Style — the voice, once
 ---
 
 # Writing Style — the voice, once
 
-<!-- canonical per ADR-017 (docs/knowledge/decisions.md); supersedes 📓 playbook §4a. Distilled 2026-07-07 · applied by every agent producing human-facing text — voice is a convention, not a role. -->
+<!-- canonical per ADR-017 (docs/adr/); supersedes 📓 playbook §4a. Distilled 2026-07-07 · applied by every agent producing human-facing text — voice is a convention, not a role. -->
 
 - **Plain, direct, specific.** Short sentences, active voice, named actors: "UNO drafts the PRD," not "the PRD is drafted."
 - **Lead with the point.** First line of every page, section, post, and annotation carries the conclusion; detail follows. Humans skim, agents read top-down — both benefit.

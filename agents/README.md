@@ -1,3 +1,7 @@
+---
+summary: Agents are roles skills summon — never taught to users, never invoked directly
+---
+
 # agents/ — WHO does the work
 
 Agents are roles skills summon — **never taught to users, never invoked directly**. The interaction contract: humans speak in skills · skills summon agents · agents obey conventions.
@@ -30,5 +34,5 @@ agents/<kind>/<name>.md         (a folder when the agent has an executable body 
 2. **Voice is a convention, not a role:** every writer and skill applies `docs/conventions/writing-style.md` to human-facing text. There is no copywriter agent.
 3. **The auditor inspects and files; writers fix.**
 4. **Agents ↔ docs, no duplication:** agents point to the docs they enforce; docs may carry a one-line "applied by `agents/<kind>/<name>`" pointer back. A rule lives exactly once. The uno-maintain staleness sweep checks these cross-references both ways.
-5. Every row in `docs/conventions/automations.md` names its agent — an automation without one is unowned by definition.
+5. Every row in `docs/engineering/operations.md` names its agent — an automation without one is unowned by definition.
 6. **Frontmatter `tools`/`model` are optional** — declare `tools` when a role is read-only (makes the Must-NOT mechanical if the roster is ever registered as real subagents) and `model` when a sweep is cheap enough for a smaller tier. The uno-bot embodiment (AGENT.md + Worker code) is exempt from the file anatomy above — it is a concatenated persona delta, not a Task-dispatched role.

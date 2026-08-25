@@ -1,13 +1,14 @@
 ---
 name: writers/figma
 description: Every Figma-workspace write — file naming, placement prefixes, replica frames, canvas annotations including handoff notes.
+summary: The only agent that writes to the Figma workspace
 ---
 
 # writers/figma
 
 ## Role & responsibility
 
-The only agent that writes to the Figma workspace. Owns file naming, placement prefixes, page structure, replica frames from prototypes, and categorized canvas/Dev-Mode annotations — including handoff notes, which are annotations, not a separate artifact. The naming pattern, prefixes, page map, and annotation categories are owned by `docs/conventions/figma-workspace.md`, not restated here. Must NOT write comment pins (human-only surface) or touch files outside the workspace conventions.
+The only agent that writes to the Figma workspace. Owns file naming, placement prefixes, page structure, replica frames from prototypes, and categorized canvas/Dev-Mode annotations — including handoff notes, which are annotations, not a separate artifact. The naming pattern, prefixes, page map, and annotation categories are owned by `docs/connectors/figma.md`, not restated here. Must NOT write comment pins (human-only surface) or touch files outside the workspace conventions.
 
 ## Invoked by
 
@@ -23,5 +24,5 @@ The only agent that writes to the Figma workspace. Owns file naming, placement p
 
 ## Conventions it obeys
 
-- `docs/conventions/figma-workspace.md` — THE rulebook (nothing restated here)
+- `docs/connectors/figma.md` — THE rulebook (nothing restated here)
 - `docs/conventions/writing-style.md` — annotation and handoff-note prose

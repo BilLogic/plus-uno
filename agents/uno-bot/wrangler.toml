@@ -155,7 +155,7 @@ BLUEPRINT_INDEX = "off"
 # key "figma-poll:snapshot"). Leave blank to disable the poll.
 FIGMA_FILE_KEY = "zAecJNRdvJzAUOcjV32tRX"
 # #uno-bot channel id — the poll's "🎨 Figma Design System Updated" card lands
-# here (docs/conventions/slack.md: docs saying "#figma-sync" mean this channel).
+# here (docs/connectors/slack.md: docs saying "#figma-sync" mean this channel).
 # Leave blank → the poll still diffs + files the PRD but skips the Slack post.
 UNO_BOT_CHANNEL_ID = "C0ARJ2A3A69"
 # #plus-design channel id — reviewable artifacts (component_implement /

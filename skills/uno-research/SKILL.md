@@ -15,6 +15,7 @@ context: fork
 argument-hint: "[question / hunch / who-knows-X]"
 allowed-tools: Read, Grep, Glob, Task, WebSearch, mcp__notion-plus__API-post-search, mcp__notion-plus__API-retrieve-page-markdown, mcp__notion-plus__API-get-block-children, mcp__notion-plus__API-query-data-source
 embodiment: ide
+summary: Gather context that doesn't exist yet
 ---
 <!-- context: fork runs this skill in a forked context with the DEFAULT agent — it must keep Task
      (it dispatches researchers/* and writers/notion). Notion tools are the READ set only; the one
@@ -57,7 +58,7 @@ writers/notion.
       Task `researchers/people-scout` directly for ranked candidates.
    2. Before any intro draft is sent or conversation planned: draft the study
       guide per method.md; `writers/notion` writes it to the Research & notes
-      DB. Read `docs/conventions/notion.md` before the write — convention
+      DB. Read `docs/connectors/notion.md` before the write — convention
       surfaces only, never create select options. **Notion unreachable?** Draft
       the guide locally, flag it `⏳ pending Notion write`, and say so — the
       gate is satisfied by the guide existing and being shown, never by
@@ -79,8 +80,8 @@ writers/notion.
 | scoping an explorer dispatch — repo layout, key paths, commands | `references/foundations-index.json` |
 | DS usage-pattern questions | `references/patterns-index.json` |
 | prior-knowledge check | `docs/knowledge/INDEX.md` → the relevant lesson file |
-| writing the study guide (via writers/notion) | `docs/conventions/notion.md` |
-| pointing source-miner at Slack | `docs/conventions/slack.md` (channel map) |
+| writing the study guide (via writers/notion) | `docs/connectors/notion.md` |
+| pointing source-miner at Slack | `docs/connectors/slack.md` (channel map) |
 
 ## Quality bar
 

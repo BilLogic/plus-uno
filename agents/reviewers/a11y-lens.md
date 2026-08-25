@@ -1,6 +1,7 @@
 ---
 name: reviewers/a11y-lens
 description: Accessibility lens — contrast, focus order, labels, target sizes, keyboard paths. Diagnose-only.
+summary: Judges an artifact's accessibility: color contrast, focus order, accessible labels, touch-target sizes, keyboard operability
 ---
 
 # reviewers/a11y-lens

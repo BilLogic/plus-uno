@@ -13,6 +13,7 @@ description: >
 argument-hint: "[prd-required] [fidelity]"
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Task, mcp__figma__*, mcp__figma-plus__*, mcp__figma-parsnip__*, mcp__notion-plus__*
 embodiment: ide
+summary: PRD → design artifact
 ---
 
 # Prototype

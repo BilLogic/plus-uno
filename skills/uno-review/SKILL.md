@@ -14,6 +14,7 @@ description: >
 argument-hint: "[artifact + manifest (fidelity / tools / PRD link)]"
 allowed-tools: Read, Grep, Glob, Bash, Task
 embodiment: ide
+summary: reviewers/ds-lens · reviewers/uno-lens · reviewers/a11y-lens · reviewers/design-qa · reviewers/rubric-applier — defined in agents/ (see agents/README.md)
 ---
 
 # Quality Review
@@ -52,7 +53,7 @@ Suggest proactively when the user says "done", "ready to share", or is about to 
 | always | `references/method.md` |
 | coded artifact | `references/catch-patterns.md` (+ the script above) · sample report shape: `examples/review-output-example.md` |
 | artifact touches Storybook stories/MDX | `references/storybook.md` · `references/storybook-component-docs.md` |
-| posting verdicts / sign-offs to Slack | `docs/conventions/slack.md` |
+| posting verdicts / sign-offs to Slack | `docs/connectors/slack.md` |
 
 Lens rule docs (DS agent-views, `foundations/accessibility.md`, `figma-workspace.md`) are loaded by the summoned agents, not here.
 

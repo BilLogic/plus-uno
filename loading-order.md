@@ -1,3 +1,7 @@
+---
+summary: Two files load always; everything else loads on demand or is retrieved live
+---
+
 # Loading Order — the tier contract
 
 <!-- Tier: 1 — doc #2 of exactly two always-loaded files. -->
@@ -19,10 +23,10 @@ Two files load always; everything else loads on demand or is retrieved live. Bud
 | skill references | `skills/<name>/references/*.md` — one level deep, linked from SKILL.md | as linked |
 | any agent, on summon | its `agents/<kind>/<name>.md` + the conventions it names | always for that agent |
 | any estate write | the matching `docs/conventions/{notion,figma-workspace,slack,supabase}.md` | before writing |
-| any blueprint read | `docs/conventions/blueprint-navigation.md` | before querying — un-guided reads fail on navigation and layer attribution |
+| any blueprint read | `docs/connectors/supabase/blueprint-navigation.md` | before querying — un-guided reads fail on navigation and layer attribution |
 | any human-facing text | `docs/conventions/writing-style.md` | before writing |
 | UI building | DS agent-views per AGENTS.md § Progressive loading | mandatory triggers |
-| orientation / product framing | `docs/context/*` | as needed |
+| orientation / product framing | `docs/product-and-service/*` | as needed |
 
 ## Tier 3 — retrieved live, never cached
 

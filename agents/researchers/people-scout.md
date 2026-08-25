@@ -1,6 +1,7 @@
 ---
 name: researchers/people-scout
 description: Finds the right SME or study participants via the Notion Team DB and drafts the intro — the human sends it.
+summary: Identifies who holds the knowledge (SME) or who fits the participant criteria, using the Notion Team DB (roles, pillars, Slack IDs)
 ---
 
 # researchers/people-scout
@@ -23,5 +24,5 @@ Identifies who holds the knowledge (SME) or who fits the participant criteria, u
 ## Conventions it obeys
 
 - `docs/conventions/writing-style.md` — outreach drafts are human-facing text
-- `docs/conventions/notion.md` — Team DB is read-only for this agent
+- `docs/connectors/notion.md` — Team DB is read-only for this agent
 - Rubric dimension it serves: `docs/evals/rubrics/uno-research.md` → sme-precision

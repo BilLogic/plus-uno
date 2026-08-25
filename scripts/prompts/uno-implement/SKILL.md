@@ -27,7 +27,7 @@ migration_notes: >
 
 # uno-implement
 
-> **Loop mechanics** (registry rule, docs/conventions/automations.md): single
+> **Loop mechanics** (registry rule, docs/engineering/operations.md): single
 > pass — one Claude Messages-API call, no tools, output regex-parsed into
 > files; stop = the one response. Machine checks run as a deterministic
 > workflow post-step (`run-review-checks.sh` on the changed dirs, results in
@@ -39,11 +39,11 @@ You are not a generalist coding assistant. You know Plus's specific stack, conve
 
 ## When to Use
 
-- A designer types `implement <component>` in `#uno-bot` after reviewing a Notion PRD (the primary live trigger — registry row in [docs/conventions/automations.md](../../../docs/conventions/automations.md))
+- A designer types `implement <component>` in `#uno-bot` after reviewing a Notion PRD (the primary live trigger — registry row in [docs/engineering/operations.md](../../../docs/engineering/operations.md))
 - A designer triggers a component implement in Slack — **always tied to its Notion PRD** (the polling bot creates the PRD and posts it; the designer implements from that thread). A component implement is never done without a PRD; if none is in the thread, the bot asks for the link first.
 - A `repository_dispatch` event with `event_type: implement-figma-changes` arrives at `figma-implement.yml`, whether dispatched by the uno-bot Worker (downstream of Slack) or a manual GitHub-UI workflow run
 
-> **Note:** the Figma library polling cron (the Worker cron in `agents/uno-bot/src/figma-poll.ts` — registry row 1 of `docs/conventions/automations.md`) does **not** invoke this skill directly. It creates the Notion PRD and posts a Slack notification; the designer initiates implementation from Slack.
+> **Note:** the Figma library polling cron (the Worker cron in `agents/uno-bot/src/figma-poll.ts` — registry row 1 of `docs/engineering/operations.md`) does **not** invoke this skill directly. It creates the Notion PRD and posts a Slack notification; the designer initiates implementation from Slack.
 
 **Do NOT use this skill for:**
 
@@ -99,7 +99,7 @@ The design token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.
 2. **Locate the relevant files.** Components live in `design-system/src/components/`, forms in `design-system/src/components/forms-and-inputs/`, specs in `design-system/src/specs/`. Confirm the target component exists in `design-system/agent-views/components/index.md` (or flag it as a new component if not — see [references/new-component-scaffolding.md](references/new-component-scaffolding.md), loaded automatically when `isNewComponent` is true).
 3. **Verify props and styles.** Read the existing `.jsx` and `.stories.jsx` for any component you'll touch. Don't hallucinate props. Don't change a prop's type without flagging it in the PR description.
 4. **Plan the change.** List the files that will be modified — **including** the corresponding stories file. If the change touches a prop or variant, the stories MUST be updated in the same pass; do not ship code-only or stories-only. If >5 files total, stop and escalate to the in-IDE agent.
-5. **Write the change.** Update the component source AND its stories together. Apply the Token Mapping Rules above. Use barrel imports (`@/components/...` not deep paths). Use Plus terminology per `docs/conventions/terminology.md`. Follow Storybook conventions from [skills/uno-review/references/storybook.md](../../skills/uno-review/references/storybook.md) (property categorization: Design / Content / Behavior / Development; curated interactive prototypes; preset selectors over raw data editing).
+5. **Write the change.** Update the component source AND its stories together. Apply the Token Mapping Rules above. Use barrel imports (`@/components/...` not deep paths). Use Plus terminology per `CONTEXT.md`. Follow Storybook conventions from [skills/uno-review/references/storybook.md](../../skills/uno-review/references/storybook.md) (property categorization: Design / Content / Behavior / Development; curated interactive prototypes; preset selectors over raw data editing).
 6. **Commit and open the draft PR.** The orchestration layer (`figma-implement.yml`) handles branch creation and PR opening — you produce the file contents in the exact output format below.
 7. **(Orchestration layer post-step)** Slack reaction emoji swaps to ✅/ℹ️/❌ based on outcome; PR link posts back to the originating thread.
 
@@ -107,8 +107,8 @@ The design token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.
 
 - `design-system/agent-views/components/index.md` — component existence check (MANDATORY)
 - `design-system/guidelines/composition/layout.md` — page layout formulas (if change touches a page)
-- `docs/conventions/coding.md` — file naming, imports, token usage, git conventions
-- `docs/conventions/terminology.md` — Plus vocabulary
+- `docs/engineering/coding.md` — file naming, imports, token usage, git conventions
+- `CONTEXT.md` — Plus vocabulary
 
 ## References (Load When Relevant)
 

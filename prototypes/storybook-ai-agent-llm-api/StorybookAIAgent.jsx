@@ -760,8 +760,8 @@ const buildResponse = (actionId, pageContext) => {
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '13px' }}>
                         <OnboardingLinkItem num="1" title={<span>🎨 <strong>DS Knowledge</strong></span>} desc="Components, tokens, patterns" path="design-system/guidelines/overview.md" bg="var(--color-primary-container)" fg="var(--color-on-primary-container)" />
                         <OnboardingLinkItem num="2" title={<span>📐 <strong>Layout Rules</strong></span>} desc="Page structure & spacing" path="design-system/guidelines/composition/layout.md" bg="var(--color-warning-container)" fg="var(--color-on-warning-container)" />
-                        <OnboardingLinkItem num="3" title={<span>🚢 <strong>Product Context</strong></span>} desc="What is PLUS? User roles" path="docs/context/product/plus-app.md" bg="var(--color-relationship-container)" fg="var(--color-on-relationship-container)" />
-                        <OnboardingLinkItem num="4" title={<span>📋 <strong>Conventions</strong></span>} desc="File naming & internal gotchas" path="docs/conventions/coding.md" bg="var(--color-technology-tools-container)" fg="var(--color-on-technology-tools-container)" />
+                        <OnboardingLinkItem num="3" title={<span>🚢 <strong>Product Context</strong></span>} desc="What is PLUS? User roles" path="docs/product-and-service/plus-app.md" bg="var(--color-relationship-container)" fg="var(--color-on-relationship-container)" />
+                        <OnboardingLinkItem num="4" title={<span>📋 <strong>Conventions</strong></span>} desc="File naming & internal gotchas" path="docs/engineering/coding.md" bg="var(--color-technology-tools-container)" fg="var(--color-on-technology-tools-container)" />
                     </ul>
                 </div>
             );

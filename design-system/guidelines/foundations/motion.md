@@ -1,3 +1,7 @@
+---
+summary: Duration, easing, and what is allowed to animate
+---
+
 <!-- Tier: 2 -->
 
 # Motion

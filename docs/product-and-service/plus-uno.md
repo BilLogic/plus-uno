@@ -1,3 +1,7 @@
+---
+summary: This repo is the design system, prototyping workspace, and agent infrastructure for the PLUS tutoring platform
+---
+
 <!-- Tier: 2 -->
 # plus-uno — Repository Overview
 
@@ -13,7 +17,7 @@ This repo is the design system, prototyping workspace, and agent infrastructure 
 
 ## Tech Stack
 
-Mirrors `package.json` as of 2026-07-30; `docs/conventions/tech-stack.md` is the normative copy — read `package.json` before asserting a version.
+Mirrors `package.json` as of 2026-07-30; `package.json` is the normative copy — read `package.json` before asserting a version.
 
 | Technology | Version | Purpose |
 |-----------|---------|---------|

@@ -1,3 +1,7 @@
+---
+summary: The in-session workspace
+---
+
 <!-- Tier: 2 -->
 # PLUS Features & Entities
 

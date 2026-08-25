@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: The feedback rail — share for comment: bundle, Decisions DB, and what a share-out must carry.
 ---
 
 <!-- ~550 tokens | Load when: the rail decision is FEEDBACK — share for reactions, not handoff -->
@@ -18,7 +19,7 @@ embodiment: ide
    further. In this IDE flow a partial bundle never posts. (uno-bot's quick
    feedback rail differs since 2026-07-16: it stages immediately and flags gaps
    on the confirmation card — ✅ there is informed consent to post partial.)
-3. **Compose the share-out** per `docs/conventions/slack.md`: ≤3 stage-specific
+3. **Compose the share-out** per `docs/connectors/slack.md`: ≤3 stage-specific
    feedback questions + a NOT-looking-for line, all bundle links.
 4. **Distribute.** Posting and reviewer-tagging is uno-bot's job — hand it the
    composed post; if the bot is unavailable, give the designer the exact text

@@ -5,7 +5,7 @@
 // Until 2026-08-22 every body the bot wrote to Notion went through
 // `bodyToParagraphs`: split on blank lines, one `paragraph` block each, no
 // markup parsing of any kind. Nothing told the model that, and the convention
-// doc it follows (`docs/conventions/notion.md`) shows a Decisions body written
+// doc it follows (`docs/connectors/notion.md`) shows a Decisions body written
 // as `**Decision:** one sentence` — so the model wrote Markdown, correctly, and
 // it landed in Notion as literal asterisks. Bullets landed as literal hyphens,
 // links as literal `[label](url)`.

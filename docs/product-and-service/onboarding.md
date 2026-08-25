@@ -1,3 +1,7 @@
+---
+summary: New designer, PM, developer, or intern: this page + the six skills are all you memorize
+---
+
 # Onboarding — humans start here
 
 New designer, PM, developer, or intern: this page + the six skills are all you memorize. (Agents entering the repo read `AGENTS.md` instead.)
@@ -34,7 +38,7 @@ You never invoke agents directly — skills summon them (that's the `agents/` fo
 
 ## Tooling
 
-MCP servers used by the agent: Figma (required for design work), Notion, Slack (via uno-bot), Supabase. Setup lives with each tool's row in `docs/conventions/integrations.md`. Compound-engineering skills (`/ce:plan`, `/ce:work`, `/ce:review`, `/ce:compound`) remain useful for repo development work.
+MCP servers used by the agent: Figma (required for design work), Notion, Slack (via uno-bot), Supabase. Setup lives with each tool's row in `docs/connectors/overview.md`. Compound-engineering skills (`/ce:plan`, `/ce:work`, `/ce:review`, `/ce:compound`) remain useful for repo development work.
 
 ## Your first week test
 

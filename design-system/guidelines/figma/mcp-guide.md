@@ -1,3 +1,7 @@
+---
+summary: The registry load gate is design-system/guidelines/figma/registry-load-gate.md — MANDATORY, registries first, not restated here
+---
+
 <!-- Load when: Figma link provided, implement-design workflow, design-tool integration -->
 
 # Figma MCP Reference Guide
@@ -64,7 +68,7 @@ Use `create_new_file` only when:
 
 ## Round-trip loop (code → Figma → code) — optional, opt-in
 
-For iterating a prototype between the repo and Figma (build here → designer tweaks on canvas → re-import). Never offer it unprompted as a mandatory step; it starts only when the user asks to push work to Figma, and every canvas write goes through **`writers/figma`** (placement, naming, and annotations per `docs/conventions/figma-workspace.md`).
+For iterating a prototype between the repo and Figma (build here → designer tweaks on canvas → re-import). Never offer it unprompted as a mandatory step; it starts only when the user asks to push work to Figma, and every canvas write goes through **`writers/figma`** (placement, naming, and annotations per `docs/connectors/figma.md`).
 
 1. **Implement in the repo** — the normal hi-fi path (implement-design 7 steps if the source was Figma).
 2. **Write-back (gated)** — user opts in and names the target file/page. The **DS write-back hook** activates (`active-writeback-gate.json`). Load `figma-use` before ANY canvas write; place registry component **instances**, never redrawn frames. **`generate_figma_design` is forbidden as the final deliverable** (reference layer only, delete after). Run `validate:figma-writeback` + `audit:figma-writeback` before `writeback:audit-passed`.

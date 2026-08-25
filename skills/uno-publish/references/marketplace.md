@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: Registering a finished prototype in the marketplace, and the Notion database it writes to.
 ---
 
 <!-- ~300 tokens | Load when: registering a prototype in the marketplace — handoff step 6, or a standalone "register this prototype" ask -->

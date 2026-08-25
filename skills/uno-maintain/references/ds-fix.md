@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: How to draft a design-system fix once the intake routes there
 ---
 
 <!-- Load for: drafting the fix (method.md §2) when the intake targets "Storybook inconsistent / bug" or "Figma components out of date". IDE face only — the Worker files and proposes, never edits repo files (bot.md). DS components are always Tier 2: this runbook produces the draft; the gates in method §3–5 still apply. -->
@@ -10,7 +11,7 @@ How to draft a design-system fix once the intake routes there. Harness maintenan
 
 ## Before drafting
 
-- **Check the registry first:** `docs/conventions/automations.md` — token drift and component sync are owned by standing automations (Figma library poll, daily token sync). If an automation owns the surface, the fix may be "let it run" or "fix the automation," not a manual edit.
+- **Check the registry first:** `docs/engineering/operations.md` — token drift and component sync are owned by standing automations (Figma library poll, daily token sync). If an automation owns the surface, the fix may be "let it run" or "fix the automation," not a manual edit.
 - **Evidence over impression:** work from the intake's evidence link. Heavy codebase reads → summon `researchers/explorer`; did-it-happen / how-often evidence → `researchers/source-miner`. Don't dump files into your own context.
 - **Cross-estate disagreement** (code vs Figma): DS precedence decides the losing side — **uno-storybook > BS4 Foundation library > Figma spec pages** (AGENTS.md). Flag the intake as cross-estate per method §1; never improvise a routing convention.
 

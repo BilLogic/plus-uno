@@ -5,7 +5,7 @@ description: >
   checklist headlessly and files intakes per the shared headless-intake
   contract. This prompt is an ADAPTER — the checklist and the intake pipeline
   live in the skill; this file only adds the headless execution contract.
-  Registry row (and lifecycle status): docs/conventions/automations.md.
+  Registry row (and lifecycle status): docs/engineering/operations.md.
 trigger_types:
   - github_cron            # harness-integrity-sweep.yml, monthly
   - github_dispatch        # manual workflow_dispatch / `gh workflow run` for a spot-run

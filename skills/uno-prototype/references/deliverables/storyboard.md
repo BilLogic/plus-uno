@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: A sequence of concept images with captions that narrates a user's journey through the product moment — several image prompts plus the connective story
 ---
 
 <!-- ~300 tokens | Load when: the confirmed artifact is a storyboard -->
@@ -31,7 +32,7 @@ designer runs), MCP-direct optional where the harness has image gen.
 
 **Where the spec lives.** Write it to
 `docs/plans/YYYY-MM-DD-NNN-<slug>-<deliverable>-spec.md` (repo date-prefix
-convention, `docs/conventions/coding.md`) and give the designer the path plus
+convention, `docs/engineering/coding.md`) and give the designer the path plus
 the ready-to-paste text. The file is what `uno-review` receives with the
 manifest.
 

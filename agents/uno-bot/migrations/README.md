@@ -1,3 +1,7 @@
+---
+summary: The bot's semantic-retrieval schema — semanticsearch (corpuschunks, blueprintchunkssrc, matchcorpuschunks) — used to be authored here as 0001..0004 and hand-applied to the hosted p
+---
+
 # There are no migrations here. The DDL lives in the app repo.
 
 The bot's semantic-retrieval schema — `semantic_search` (`corpus_chunks`,

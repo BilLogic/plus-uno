@@ -6,7 +6,7 @@ description: >
   per the shared headless-intake contract. Adapter only — the reconciliation
   duty AND its check set are owned by skills/uno-maintain/references/method.md
   §6 (post-ship reconciliation). Registry row (and lifecycle status):
-  docs/conventions/automations.md.
+  docs/engineering/operations.md.
 trigger_types:
   - github_cron            # shipped-watchdog.yml, Wednesdays
   - github_dispatch
@@ -25,7 +25,7 @@ human-gated pipeline.
 1. Read `skills/uno-maintain/references/method.md` §6 — the post-ship
    reconciliation duty and its check set (what to verify per shipped card)
    live there — and §1 for the intake shape each finding must carry.
-2. Read `docs/conventions/notion.md` and `docs/conventions/terminology.md` to
+2. Read `docs/connectors/notion.md` and `CONTEXT.md` to
    get the Roadmap database id and the exact status property names — Roadmap
    vocabulary only ("card", "Dev Status"); never blueprint words. Query the
    database id directly (`databases/{id}/query`) — workspace search is weak

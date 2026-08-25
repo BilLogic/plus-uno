@@ -1,3 +1,7 @@
+---
+summary: Words to prefer and words to retire, so copy reads as written for everyone
+---
+
 <!-- Tier: 2 -->
 
 # Inclusive language

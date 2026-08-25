@@ -10,7 +10,7 @@ dimensions:
   - id: replica-fidelity
     definition: visual diff of the Figma replica vs the prototype
   - id: shareout-clarity
-    definition: reviewer can act without asking a clarifying question (<=3 feedback questions + NOT-looking-for line, per docs/conventions/slack.md)
+    definition: reviewer can act without asking a clarifying question (<=3 feedback questions + NOT-looking-for line, per docs/connectors/slack.md)
   - id: handoff-spec-completeness
     definition: every component has tokens, states, behaviors enumerated
 hard_gates:
@@ -22,6 +22,7 @@ targets:
   handoff_first_pass: ">=70% pass DS / UNO / a11y first try"
   handoff_rework: "trend to <=2 dev clarification requests per handoff"
   design_efficacy: "each shipped handoff names a user-behavior hypothesis and checks it in Clarity/Metabase ~30 days post-ship"
+summary: Scores both rails
 ---
 
 # uno-publish rubric

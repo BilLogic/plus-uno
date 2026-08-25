@@ -1,3 +1,7 @@
+---
+summary: This design system uses FontAwesome Free icons via the string shorthand
+---
+
 <!-- Tier: 2 -->
 # Icon Usage
 

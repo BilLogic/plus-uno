@@ -1,3 +1,7 @@
+---
+summary: The core workflow — what happens before, during, and after every tutoring session
+---
+
 <!-- Tier: 2 -->
 # PLUS User Flows
 

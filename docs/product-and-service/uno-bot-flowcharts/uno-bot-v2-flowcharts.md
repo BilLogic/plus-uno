@@ -1,3 +1,7 @@
+---
+summary: The system around uno-bot: where it sits relative to GitHub Actions, Slack, Notion, Figma, and the model provider
+---
+
 # UNO Bot v2 — Flowcharts
 
 > Originally a Week-1 design deliverable. Author: Bryan • Date: 2026-05-20.
@@ -135,7 +139,7 @@ Notes:
 The default conversational mode. Designer asks a question; the agent answers, reaching for a tool only when it needs grounding.
 
 **Audit 2026-08-24 — corrected.** The original diagram showed a two-pass
-classify-then-fetch against `docs/context` and `docs/knowledge`, picking docs
+classify-then-fetch against `docs/product-and-service` and `docs/knowledge`, picking docs
 from a knowledge map. That is not what happens: there is one agentic loop, and
 grounding comes from tools the model calls — `search_blueprint` for journey
 facts, `github_read` for design-system and rule-doc facts (`AGENT.md` §Tool

@@ -58,15 +58,15 @@ const runBundler = (args = []) => {
 };
 
 test("a doc marked `all` is present in the Worker bundle", () => {
-  assert.equal(embodimentOf("docs/conventions/terminology.md"), "all");
+  assert.equal(embodimentOf("CONTEXT.md"), "all");
   assert.ok(
-    memberOrder(assembled()).includes("docs/conventions/terminology.md"),
+    memberOrder(assembled()).includes("CONTEXT.md"),
     "terminology.md declares `all` but is not in the bundle",
   );
 });
 
 test("a doc marked `ide` is absent from the Worker bundle", () => {
-  for (const rel of ["docs/conventions/coding.md", "docs/conventions/tech-stack.md", "docs/conventions/integrations.md"]) {
+  for (const rel of ["docs/engineering/coding.md", "docs/engineering/setup.md", "docs/connectors/overview.md"]) {
     assert.equal(embodimentOf(rel), "ide");
     assert.ok(!memberOrder(assembled()).includes(rel), `${rel} declares \`ide\` but reached the Worker bundle`);
   }
@@ -90,12 +90,20 @@ test("a skill's method.md precedes its bot.md", () => {
   }
 });
 
-test("sections stay in declared order: persona, then skills, then conventions", () => {
+test("sections stay in declared order: constitution, persona, skills, then docs", () => {
   const members = memberOrder(assembled());
-  assert.equal(members[0], "agents/uno-bot/AGENT.md", "the persona must follow the constitution");
+  // AGENTS.md is member 0 and carries no path comment, so CONTEXT.md — the
+  // constitution section's second member — is the first commented one.
+  assert.equal(members[0], "CONTEXT.md", "the constitution section must come first");
+  assert.equal(members[1], "agents/uno-bot/AGENT.md", "the persona must follow the constitution");
+
   const lastSkill = members.map((m, i) => (m.startsWith("skills/") ? i : -1)).filter((i) => i >= 0).pop();
-  const firstConvention = members.findIndex((m) => m.startsWith("docs/conventions/"));
-  assert.ok(lastSkill < firstConvention, "a convention was bundled before the last skill");
+  const firstDoc = members.findIndex((m) => m.startsWith("docs/"));
+  assert.ok(lastSkill < firstDoc, "a docs/ section member was bundled before the last skill");
+
+  const firstConnector = members.findIndex((m) => m.startsWith("docs/connectors/"));
+  const firstEngineering = members.findIndex((m) => m.startsWith("docs/engineering/"));
+  assert.ok(firstConnector < firstEngineering, "connectors must precede engineering");
 });
 
 test("frontmatter never reaches the prompt", () => {

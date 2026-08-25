@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: Schema for entries in src/pages/PrototypeMarket/prototypes-data.js
 ---
 
 # Marketplace Schema

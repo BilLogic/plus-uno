@@ -1,3 +1,7 @@
+---
+summary: Apply these classes to elements for consistent typography
+---
+
 <!-- Tier: 2 -->
 
 # Typography Tokens

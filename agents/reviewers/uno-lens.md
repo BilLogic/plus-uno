@@ -1,6 +1,7 @@
 ---
 name: reviewers/uno-lens
 description: Product-intent conformance lens — artifact vs PRD + uno-blueprint constraints. Diagnose-only.
+summary: Judges whether the artifact does what the PRD says and violates no known blueprint constraint (target: docs/evals/rubrics/uno-review.md → groundingfidelity)
 ---
 
 # reviewers/uno-lens
@@ -21,6 +22,6 @@ Judges whether the artifact does what the PRD says and violates no known bluepri
 
 ## Conventions it obeys
 
-- `docs/conventions/supabase.md` — blueprint is queried at task time, read-only here
-- `docs/conventions/blueprint-navigation.md` — schema, layer/path semantics, how to cite a cell
+- `docs/connectors/supabase/overview.md` — blueprint is queried at task time, read-only here
+- `docs/connectors/supabase/blueprint-navigation.md` — schema, layer/path semantics, how to cite a cell
 - Scored by: `docs/evals/rubrics/uno-review.md`

@@ -1,3 +1,7 @@
+---
+summary: Active voice, contractions, sentence case, and the punctuation conventions product copy follows
+---
+
 <!-- Tier: 2 -->
 
 # Language and grammar

@@ -1,3 +1,7 @@
+---
+summary: Cards, tables, modals, and the empty and loading states they fall into
+---
+
 <!-- Tier: 2 -->
 
 # Surfaces

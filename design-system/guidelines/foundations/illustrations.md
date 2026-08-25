@@ -1,3 +1,7 @@
+---
+summary: Illustration style, when to reach for one, and where the assets live
+---
+
 <!-- Tier: 2 -->
 
 # Illustrations

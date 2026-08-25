@@ -1,3 +1,7 @@
+---
+summary: ![Netlify Status](https://app.netlify.com/projects/plus-uno/deploys)
+---
+
 # plus-uno
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/9808dbb9-70ab-438e-b3c3-69d18441f0d4/deploy-status)](https://app.netlify.com/projects/plus-uno/deploys)
@@ -108,7 +112,7 @@ Do **not** merge one-off experiments onto `main`. Captures go on the Notion row 
 
 ## Design System
 
-The component library lives in `design-system/src/`: **56 UI components (form elements among them, grouped under `components/forms-and-inputs/`), 25 DataViz chart components across 6 categories, and page specs for 7 product areas** — generated inventory in `design-system/agent-views/`, narrative in [`docs/context/product/plus-uno.md`](docs/context/product/plus-uno.md). Browse it at [localhost:4200](http://localhost:4200) (Storybook) or [live](https://plus-uno.netlify.app/storybook/).
+The component library lives in `design-system/src/`: **56 UI components (form elements among them, grouped under `components/forms-and-inputs/`), 25 DataViz chart components across 6 categories, and page specs for 7 product areas** — generated inventory in `design-system/agent-views/`, narrative in [`docs/product-and-service/plus-uno.md`](docs/product-and-service/plus-uno.md). Browse it at [localhost:4200](http://localhost:4200) (Storybook) or [live](https://plus-uno.netlify.app/storybook/).
 
 **Key rules for agents and contributors:**
 - Use PLUS components first — only fall back to React-Bootstrap when no PLUS equivalent exists
@@ -163,11 +167,11 @@ Hosted on Netlify (free tier). Build: `npm run build:all` (Vite + Storybook). De
 
 | Document | What |
 |----------|------|
-| [`docs/context/onboarding.md`](docs/context/onboarding.md) | **New here? Start with this** — the six skills + where things live |
+| [`docs/product-and-service/onboarding.md`](docs/product-and-service/onboarding.md) | **New here? Start with this** — the six skills + where things live |
 | [`AGENTS.md`](AGENTS.md) | Agent constitution — identity, skill roster, forbidden patterns |
 | [`loading-order.md`](loading-order.md) | The loading-tier contract (what loads when) |
-| [`docs/context/product/plus-app.md`](docs/context/product/plus-app.md) | PLUS product landscape (mission, users, features, flows) |
-| [`docs/context/product/plus-uno.md`](docs/context/product/plus-uno.md) | This repo's structure and inventory |
+| [`docs/product-and-service/plus-app.md`](docs/product-and-service/plus-app.md) | PLUS product landscape (mission, users, features, flows) |
+| [`docs/product-and-service/plus-uno.md`](docs/product-and-service/plus-uno.md) | This repo's structure and inventory |
 | [`docs/conventions/`](docs/conventions/) | Normative rules — coding, terminology, tech stack, Notion/Figma/Slack/Supabase, writing style |
 | [`docs/knowledge/INDEX.md`](docs/knowledge/INDEX.md) | Knowledge base index (lessons, decisions, preferences) |
 | [`agents/README.md`](agents/README.md) | Agent roster, anatomy, creation rule |

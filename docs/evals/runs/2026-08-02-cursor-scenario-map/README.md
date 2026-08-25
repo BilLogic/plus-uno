@@ -96,7 +96,7 @@ losing track" rather than inventing a greenfield flow — and corrected
    `prototypes/_wip/`. Fixed: `docs/plans/` is the home, under the repo's own
    date-prefix convention with a `-spec` suffix
    (`2026-08-02-001-fill-in-coverage-flow-map-spec.md`), named in all five
-   spec-deliverable docs and in `docs/conventions/coding.md`. The four strays
+   spec-deliverable docs and in `docs/engineering/coding.md`. The four strays
    were relocated there.
 
 2. **`validate-spec.sh` false-positived on flow maps.** Shape detection scanned

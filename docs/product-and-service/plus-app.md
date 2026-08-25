@@ -1,3 +1,7 @@
+---
+summary: AI is rewriting our economy, but global K-12 math proficiency is at a historic low due to lack of content mastery and emotional support
+---
+
 <!-- Tier: 1 -->
 # PLUS App — Product Landscape
 
@@ -52,4 +56,4 @@ Evidence → feeds back to foundations (completing the loop)
 - [Users & Stakeholders](users.md)
 - [Features & Entities](features.md)
 - [User Flows](flows.md)
-- [Design System](../design-system/index-manifest.json) | [plus-uno](../../plus-uno.md)
+- [Design System](../../design-system/guidelines/overview.md) | [plus-uno](plus-uno.md)

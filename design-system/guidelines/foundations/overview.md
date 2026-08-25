@@ -1,3 +1,7 @@
+---
+summary: The fourteen foundations, following Atlassian's set
+---
+
 <!-- Tier: 2 -->
 
 # Foundations

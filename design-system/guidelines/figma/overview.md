@@ -1,3 +1,7 @@
+---
+summary: Machine-readable contracts and human runbooks so Cursor prototypes, Storybook, and the Figma design system stay aligned on tokens and components
+---
+
 <!-- Tier: 2 -->
 
 # Figma

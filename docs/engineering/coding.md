@@ -1,10 +1,11 @@
 ---
 embodiment: ide
+summary: How to write code in this repo — barrel imports, tokens over literals, styling conventions, and what not to reach for.
 ---
 
 # Coding Conventions
 
-<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand) · distilled 2026-07-07 · applied by every agent writing code in this repo. -->
+<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand) · distilled 2026-07-07 · applied by every agent writing code in this repo. -->
 
 ## File naming
 

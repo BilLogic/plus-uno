@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: See also: storybook-component-docs.md for the designer-facing guide to how Components/ and Forms/ entries are organized in the Storybook sidebar and within each docs page
 ---
 
 # Storybook Guidelines

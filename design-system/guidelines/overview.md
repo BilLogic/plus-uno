@@ -1,3 +1,7 @@
+---
+summary: says where design knowledge lives
+---
+
 <!-- Tier: 2 | ~450 tokens | Load FIRST for any DS task — routes to focused docs -->
 
 # Design System Guidelines
@@ -137,7 +141,7 @@ product decisions.
 | Topic | Lives at |
 |-------|----------|
 | Local build, aliases, Vite, prototypes | `docs/engineering/setup.md` |
-| Product overview and features | `docs/context/product/` |
+| Product overview and features | `docs/product-and-service/` |
 | How agents write (commits, PRDs, Slack, articles) | `docs/conventions/` |
 | Scaffolding and review workflow | `skills/uno-prototype/`, `skills/uno-review/` |
 | Production readiness checklist | `skills/uno-maintain/references/production-checklist.md` |

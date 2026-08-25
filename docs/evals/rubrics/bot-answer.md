@@ -27,6 +27,7 @@ hard_gates:
   - never claim an unfired action — future/conditional tense until the Worker confirms
   - delivery integrity — ✅ only after a confirmed post; empty/truncated bodies get an honest placeholder or note
   - gate idempotency — identical pending proposal points to the existing card; a just-cancelled action is never silently re-staged
+summary: The rubric a uno-bot answer is scored against, reconstructed from the three eval-round commits.
 ---
 
 # bot-answer rubric (D1–D9)

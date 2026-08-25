@@ -1,6 +1,7 @@
 ---
 name: researchers/explorer
 description: Codebase and repo exploration in an isolated context — returns findings with citations, never file dumps.
+summary: Sweeps this repo (components, stories, tokens, prototypes, knowledge) to answer 'what exists / where / how does it work' questions
 ---
 
 # researchers/explorer

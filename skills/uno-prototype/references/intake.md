@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: The intake sequence is eight steps in order — prdcheck, prdpaste, then the Step 2 reflection gates reflectlearn, reflectartifactopen, reflectartifact, reflectfidelity, reflectexclu
 ---
 
 <!-- ~2,400 tokens | Load when: a prototype run starts — this is the interview that produces the brief card -->

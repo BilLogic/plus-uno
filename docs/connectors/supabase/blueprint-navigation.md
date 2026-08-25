@@ -1,10 +1,11 @@
 ---
 embodiment: all
+summary: A structured service blueprint for the PLUS journey: how tutors, lead tutors, classroom teachers, researchers, and support staff move through the end-to-end experience
 ---
 
 # uno-blueprint — Navigation Guide
 
-<!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand; bundled into the uno-bot prompt) · distilled 2026-07-29 · applied by every agent answering a journey question or drafting from journey context. Companion: supabase.md (access, contract, source routing). -->
+<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand; bundled into the uno-bot prompt) · distilled 2026-07-29 · applied by every agent answering a journey question or drafting from journey context. Companion: supabase.md (access, contract, source routing). -->
 
 ## 1 · What it is
 
@@ -233,7 +234,7 @@ limit 50;
 
    **Read `matchedBy`, not `score`, to judge absence.** Retrieval runs three ways at once — `vector` (meaning), `keyword` (the cell's own prose), `structural` (its phase/scenario/path/step/lane name) — and each row reports which found it. Rows several retrievers agree on matched the blueprint's own words; a `vector`-only row is a semantic guess. **Every row `vector`-only = nothing in the blueprint mentions your terms**, which is the strongest absence signal the tool can give. Similarity cannot substitute: measured 2026-08-19 across a 26-case set, questions with NO answer scored 0.607–0.654 while genuine hits reached down to 0.565 — overlapping ranges, so no threshold separates them, and none ever will (`docs/plans/2026-08-19-001-feat-blueprint-hybrid-retrieval-plan.md`). One caveat: a pure paraphrase of a real cell can also come back `vector`-only, so treat it as evidence, not proof — say what you did and did not find.
 5. **Confidence — one woven clause, never a trailing label**, and sureness earned only by rows read this turn. Shape and cadence: `agents/uno-bot/AGENT.md` § Grounding.
-6. **Source precedence — ADR-021 claim-type routing, not "the blueprint wins."** Route per claim; full table in `docs/conventions/supabase.md` § Two sources, one time axis. Constant across every row: **surface the conflict, never blend.**
+6. **Source precedence — ADR-021 claim-type routing, not "the blueprint wins."** Route per claim; full table in `docs/connectors/supabase/overview.md` § Two sources, one time axis. Constant across every row: **surface the conflict, never blend.**
 
 ## 7 · Known-silent areas
 

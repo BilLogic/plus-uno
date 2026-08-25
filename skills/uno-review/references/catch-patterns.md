@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: Grep checks for the mechanical share of DS-compliance findings
 ---
 
 <!-- Load for: reviewing coded artifacts — the grep checks behind ds-lens findings. Automated by scripts/run-review-checks.sh; run individually to localize a hit. -->

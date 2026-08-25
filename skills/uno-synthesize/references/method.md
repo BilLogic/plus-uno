@@ -77,7 +77,7 @@ yes is a scenario failure.
 **Query `uno-blueprint` first (ADR-021).** The current-state section and every
 downstream-effects claim cite blueprint rows, not memory — a PRD that describes
 today's journey from priors is the failure ADR-021 exists to prevent. Routing
-when a card and the blueprint disagree: `docs/conventions/supabase.md` § Two
+when a card and the blueprint disagree: `docs/connectors/supabase/overview.md` § Two
 sources, one time axis.
 
 Then draft from the documented findings — reuse, don't re-derive: findings → summary /
@@ -85,7 +85,7 @@ problem / goals; user flows + screen list → requirements & scope; action items
 acceptance criteria; open questions carry over. Every key PRD claim traces to a
 documented finding (target: 100%).
 
-Instantiate from the Notion PRD template (see `docs/conventions/notion.md` —
+Instantiate from the Notion PRD template (see `docs/connectors/notion.md` —
 templates are referenced, never duplicated). Draft first and let the designer
 refine; instantiate/file only on approval.
 
@@ -94,12 +94,12 @@ refine; instantiate/file only on approval.
 On PRD acceptance, **in the same action**:
 
 1. Write the structured distillation — stories, user flows, screen list — to
-   uno-blueprint per the write schema (`docs/conventions/supabase.md`).
+   uno-blueprint per the write schema (`docs/connectors/supabase/overview.md`).
 2. **PRD and blueprint update together.** A lone write to either is a defect and a
    rubric hard-gate failure.
 3. Move the project's Roadmap card to `Design Status: Ready for Design` —
    exact-match existing select options; never create options, pillars, features, or
-   OKR relations (`docs/conventions/notion.md`).
+   OKR relations (`docs/connectors/notion.md`).
 
 Blueprint writes in an accepted-PRD context are pre-authorized; any other blueprint
 edit routes through uno-maintain.

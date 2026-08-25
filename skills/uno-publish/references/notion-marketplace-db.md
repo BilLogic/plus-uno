@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: Status: LIVE — Design HQ · Prototype Marketplace
 ---
 
 # notion-marketplace DB — schema & management

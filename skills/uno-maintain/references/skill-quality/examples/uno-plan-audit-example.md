@@ -76,7 +76,7 @@ description: >
 ```md
 | Trigger | Load |
 |---------|------|
-| Any plan | `docs/conventions/tech-stack.md` |
+| Any plan | `package.json` (the tech-stack table was deleted in #171 — versions live in one place) |
 ```
 - Improvement suggestion:
   - Add a trigger row for unclear layout/IA cases that maps to consulting reference.

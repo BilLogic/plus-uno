@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: What went wrong or surprised us — exact error message / visual symptom / wrong assumption
 ---
 
 <!-- Template for docs/knowledge/lessons/YYYY-MM-DD-slug.md (method.md §7). Fill and file; then update docs/knowledge/INDEX.md.

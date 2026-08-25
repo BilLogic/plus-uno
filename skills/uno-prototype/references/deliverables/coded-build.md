@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: uno-storybook
 ---
 
 <!-- ~1,100 tokens | Load when: the confirmed route is a hi-fi build on the design system -->
@@ -41,7 +42,7 @@ d. **Gate — DS gap (method §4):** needed component not in
    nearest existing composition, file a uno-maintain intake. Never hand-roll a
    lookalike.
 e. Playground frames or wip placement in Figma → summon **writers/figma**
-   (obeys `docs/conventions/figma-workspace.md`).
+   (obeys `docs/connectors/figma.md`).
 
 Hi-fi hard rules (AGENTS.md forbidden patterns in full): tokens over literals ·
 official layout formulas · PLUS components before generic primitives · no deep

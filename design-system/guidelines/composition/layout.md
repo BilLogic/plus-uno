@@ -1,3 +1,7 @@
+---
+summary: If you are building a full page (like a dashboard, student list, or toolkit), you MUST wrap the entire page in the <PageLayout> component
+---
+
 <!-- Tier: 2 -->
 
 # Layout

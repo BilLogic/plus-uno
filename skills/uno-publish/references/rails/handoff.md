@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: The handoff rail — componentize, Handoff Spec, review gates, and dev sign-off.
 ---
 
 <!-- ~450 tokens | Load when: the rail decision is HANDOFF — dev-ready package, sign-offs, marketplace -->
@@ -11,13 +12,13 @@ embodiment: ide
    annotations.
 2. **Handoff Spec** — summon `writers/notion` to instantiate the team's Handoff
    Spec template on the project hub (template pointers:
-   `docs/conventions/notion.md`).
+   `docs/connectors/notion.md`).
 3. **Rails propagation** — inside the designer-confirmed handoff only,
    apply-logged:
    - `uno-storybook`: update stories/MDX in `design-system/` directly (in-repo
      write; validate in Storybook).
    - `uno-blueprint`: this skill holds no blueprint write access
-     (`docs/conventions/supabase.md`) — route the paired PRD + blueprint update
+     (`docs/connectors/supabase/overview.md`) — route the paired PRD + blueprint update
      through `skills/uno-maintain`, citing the confirmed handoff as
      pre-authorization.
 4. **Review gate** — hand to `skills/uno-review` for DS / UNO / a11y. Findings

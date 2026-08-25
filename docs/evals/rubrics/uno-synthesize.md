@@ -10,7 +10,7 @@ dimensions:
   - id: coverage
     definition: all key source inputs represented in the synthesis
   - id: template-conformance
-    definition: PRD follows the Notion PRD template (Templates #, see docs/conventions/notion.md)
+    definition: PRD follows the Notion PRD template (Templates #, see docs/connectors/notion.md)
   - id: traceability
     definition: PRD claims trace to documented findings (target 100% of key claims)
 hard_gates:
@@ -22,6 +22,7 @@ benchmark: >
 targets:
   prd_acceptance_rate: ">=80% enter Flow 2 without major rework"
   evidence_traceability: "100% of key claims"
+summary: Scores synthesis outputs
 ---
 
 # uno-synthesize rubric

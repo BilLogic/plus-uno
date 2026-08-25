@@ -1,3 +1,7 @@
+---
+summary: How components combine
+---
+
 <!-- Tier: 2 -->
 
 # Composition

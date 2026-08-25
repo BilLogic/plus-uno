@@ -15,6 +15,7 @@ description: >
 argument-hint: "[intake / sweep-name / lesson-to-capture]"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Task, mcp__notion-plus__*
 embodiment: ide
+summary: Fix the harness, not project design work
 ---
 
 # uno-maintain — IDE face
@@ -30,7 +31,7 @@ Fix the harness, not project design work. The shared procedure — taxonomy, tie
 | Headless sweep queue | open GitHub issues labeled `harness-intake` (filed by the cron sweeps — method §1 headless surrogate). **Drain first on every maintain session**: `gh issue list --label harness-intake --state open`, triage each into the pipeline, close as incorporated |
 | DS gap from prototyping | `uno-prototype` hits a missing/broken component or token |
 | Legacy-source conflict | a legacy Notion/Figma page contradicts repo-canonical `docs/conventions/*` (method §6) |
-| Post-ship reconciliation | a handoff shipped; DS + harness **+ blueprint** reconcile against built reality (ship-time is when the blueprint must be updated — the paired-write contract, `docs/conventions/supabase.md`) |
+| Post-ship reconciliation | a handoff shipped; DS + harness **+ blueprint** reconcile against built reality (ship-time is when the blueprint must be updated — the paired-write contract, `docs/connectors/supabase/overview.md`) |
 
 ## Workflow (execution over method.md)
 
@@ -52,10 +53,10 @@ need it.
 
 ## Loads for Tier 2
 
-- `docs/conventions/notion.md` — intake card + PRD mechanics
-- `docs/conventions/slack.md` — the two gates; verdict convention is gate 2
+- `docs/connectors/notion.md` — intake card + PRD mechanics
+- `docs/connectors/slack.md` — the two gates; verdict convention is gate 2
 - `docs/conventions/writing-style.md` — any human-facing text
-- `docs/conventions/automations.md` — before touching anything a standing automation owns
+- `docs/engineering/operations.md` — before touching anything a standing automation owns
 
 ## Quality bar
 

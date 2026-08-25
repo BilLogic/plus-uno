@@ -5,7 +5,7 @@
 //                                 an OAuth token minted in ./auth.ts. THE
 //                                 CANONICAL PATH — always wins when configured
 //                                 (rule set 2026-07-16 after the Vertex-vs-AI-
-//                                 Studio key mixup; docs/knowledge/decisions.md
+//                                 Studio key mixup; docs/adr/
 //                                 ADR-018).
 //   • GEMINI_API_KEY            → Gemini Developer API (generativelanguage.
 //                                 googleapis.com) — plain key header. Emergency

@@ -1,3 +1,7 @@
+---
+summary: Error, warning, success, and empty-state copy — what each says and how long it runs
+---
+
 <!-- Tier: 2 -->
 
 # Message design

@@ -15,8 +15,8 @@ rule_candidate: false
 
 ## Current state
 
-- Tier 1 budget: pass. `AGENTS.md` is 95 lines; `docs/context/product/one-pager.md` is absent, so combined Tier 1 remains under budget.
-- Layer 1 context: present and populated across `docs/context/product/`, `design-system/guidelines/`, `docs/context/conventions/`, and `docs/context/agent-persona.md`.
+- Tier 1 budget: pass. `AGENTS.md` is 95 lines; `docs/product-and-service/one-pager.md` is absent, so combined Tier 1 remains under budget.
+- Layer 1 context: present and populated across `docs/product-and-service/`, `design-system/guidelines/`, `docs/product-and-service/conventions/`, and `docs/product-and-service/agent-persona.md`.
 - Layer 2 skills: 6 custom `uno-*` skills under `.agent/skills/`; all current `SKILL.md` files are under 200 lines.
 - Layer 3 orchestration: present via `.agent/SKILL.md`, `.agent/AGENT.md`, `.agent/loading-order.md`, and `.agent/handoffs/`.
 - Layer 4 rubrics: present via `docs/rubrics/INDEX.md` plus 3 starter rubrics.

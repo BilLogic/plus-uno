@@ -1,3 +1,7 @@
+---
+summary: Agents MUST read both files below before
+---
+
 <!-- MANDATORY — load before Figma implement, write-back, or design-to-code mapping -->
 
 # Figma Registry — Mandatory Load

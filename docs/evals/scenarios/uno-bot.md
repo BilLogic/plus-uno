@@ -1,3 +1,7 @@
+---
+summary: uno-bot — regression scenarios
+---
+
 # uno-bot — regression scenarios
 
 <!-- migrated 2026-07-07 from agents/uno-bot/REGRESSION.md (eval rounds 1–3). Rubric: docs/evals/rubrics/bot-answer.md -->

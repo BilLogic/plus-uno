@@ -5,7 +5,7 @@ description: >
   composes the week's digest per Slack conventions, and posts it to #plus-design.
   Adapter only — what counts as Tier 1, why the digest exists, and the
   digest.jsonl row shape are owned by skills/uno-maintain/references/method.md §4.
-  Registry row (and lifecycle status): docs/conventions/automations.md.
+  Registry row (and lifecycle status): docs/engineering/operations.md.
 trigger_types:
   - github_cron            # weekly-tier1-digest.yml, Mondays
   - github_dispatch
@@ -30,14 +30,14 @@ of auto-applies is the failure mode this automation exists to prevent.
 2. **Zero rows → post nothing.** Emit the `NO_TIER1_THIS_WEEK` sentinel (step
    5) and stop. An empty digest posted anyway trains people to ignore the
    real ones.
-3. Read `docs/conventions/slack.md` and follow its mrkdwn + writing-style
+3. Read `docs/connectors/slack.md` and follow its mrkdwn + writing-style
    rules for everything you compose.
 4. Compose the digest: a `*Tier-1 digest — <date range>*` header line, then
    one line per fix (target · what changed · timestamp). Close with a count
    line. Keep it scannable — this is a receipt, not a report. Write the JSON
    payload to a file with the Write tool / `jq`.
 5. Post to **#plus-design** (`C03FC8AS69K` — id owned by
-   `docs/conventions/slack.md`) using exactly this command shape (the
+   `docs/connectors/slack.md`) using exactly this command shape (the
    workflow's tool allowlist permits only this endpoint):
 
    ```

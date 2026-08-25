@@ -19,7 +19,7 @@ Every designer-initiated review starts from a one-line manifest: **fidelity (low
 |---|---|---|
 | **Stage-lens review** (Flow 2, step 4) | an artifact exits any prototyping path — including hand-crafted work — or the user asks for a review/critique | ds-lens + uno-lens + a11y-lens, in parallel |
 | **Handoff gate** (Flow 3, H4) | a handoff package is about to publish — after rails propagation, before sign-off | same three lenses in parallel; uno-lens additionally checks the spec against what was just propagated to uno-storybook / uno-blueprint |
-| **Design QA** (Flow 3, H7) | the Roadmap card hits `Dev Status: Ready for QA (RTT)` — spotted by a human today; the auto-trigger is not built (`docs/conventions/automations.md`) | design-qa solo: resolve RM-ID → `[spec]` Figma file, walk the QA build against it with the Design QA checklist |
+| **Design QA** (Flow 3, H7) | the Roadmap card hits `Dev Status: Ready for QA (RTT)` — spotted by a human today; the auto-trigger is not built (`docs/engineering/operations.md`) | design-qa solo: resolve RM-ID → `[spec]` Figma file, walk the QA build against it with the Design QA checklist |
 
 ## Lens dispatch — parallel, in-lane, stage-appropriate
 
@@ -36,7 +36,7 @@ What each lens applies (the rules live in the docs, not here):
 - `reviewers/ds-lens` — components / tokens / layout vs the DS agent-views and AGENTS.md forbidden patterns. Coded artifacts: also the catch-pattern greps (`references/catch-patterns.md`, automated by `skills/uno-review/scripts/run-review-checks.sh`).
 - `reviewers/uno-lens` — artifact vs PRD + uno-blueprint constraints, queried live at review time.
 - `reviewers/a11y-lens` — `design-system/guidelines/foundations/accessibility.md`: WCAG AA contrast, 44×44 targets, keyboard reach, focus order + visibility, semantic HTML / screen readers, color-not-alone, reduced motion.
-- `reviewers/design-qa` — the `[spec]` frames' Dev Mode annotations (`docs/conventions/figma-workspace.md`) + the Design QA checklist (Notion 🧩 Templates): components, tokens, spacing, typography, states, interaction behavior.
+- `reviewers/design-qa` — the `[spec]` frames' Dev Mode annotations (`docs/connectors/figma.md`) + the Design QA checklist (Notion 🧩 Templates): components, tokens, spacing, typography, states, interaction behavior.
 
 ## Findings & severity
 
@@ -53,7 +53,7 @@ Every finding carries **severity · lens · evidence (what's in the artifact) ·
 - **Stage-lens:** `Issues? = Yes` **only when at least one finding is major or above.** Yes → re-enter `uno-prototype` at the reflection (`reflect_learn`) — a failed review can invalidate the approach, not just the artifact; each finding's re-entry point says which (re-choose fidelity vs. content fix). No → "Ready to share?" stays the designer's call; review passing is necessary, not sufficient.
 - **Handoff gate:** any major+ finding holds the publish; clean or minors-only → proceed to dev / PM / stakeholder sign-off.
 - **Design QA:** findings go to dev as annotated issues *before* `Ready for Prod`; blockers hold it. The run is logged for the drift-catch metric.
-- Verdicts and sign-offs posted in Slack follow `docs/conventions/slack.md` (channels + the two gates — never conflate them).
+- Verdicts and sign-offs posted in Slack follow `docs/connectors/slack.md` (channels + the two gates — never conflate them).
 - Pushback on a finding → re-read the cited doc; concede or stand by it with reasoning. Never dig in on thin evidence.
 
 ## Quality bar

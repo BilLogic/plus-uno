@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: Report style references: audit-examples.md
 ---
 
 # Skill Quality Audit Workflow (uno-maintain audit path — moved from uno-review 2026-07-07)

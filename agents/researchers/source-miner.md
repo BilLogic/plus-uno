@@ -1,6 +1,7 @@
 ---
 name: researchers/source-miner
 description: Sweeps external evidence sources — Slack threads, analytics (Clarity/Metabase), Notion research DBs — and returns cited findings.
+summary: Gathers evidence from outside the repo: Slack history, analytics pulls, Notion research/study docs, linked sources
 ---
 
 # researchers/source-miner
@@ -22,5 +23,5 @@ Gathers evidence from outside the repo: Slack history, analytics pulls, Notion r
 
 ## Conventions it obeys
 
-- `docs/conventions/slack.md` — channel map for where evidence lives
-- `docs/conventions/notion.md` — read surfaces; this agent never writes
+- `docs/connectors/slack.md` — channel map for where evidence lives
+- `docs/connectors/notion.md` — read surfaces; this agent never writes

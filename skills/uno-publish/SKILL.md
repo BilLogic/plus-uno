@@ -12,6 +12,7 @@ description: >
 argument-hint: "[prototype-or-project]"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Task, mcp__notion-plus__*
 embodiment: ide
+summary: The method — rails, gates, contracts — is references/method.md
 ---
 
 # Publish
@@ -46,7 +47,7 @@ the designer's explicit go-ahead first; show what will be written and wait.
 | registering a prototype (handoff step 6, or standalone "register this prototype") | `references/marketplace.md` |
 | helping deploy a preview | `references/deployment-guide.md` |
 | building the marketplace entry | `references/notion-marketplace-db.md` (+ `references/marketplace-schema.md` / examples if dual-writing a routing registry) |
-| composing the share-out or checking sign-offs | `docs/conventions/slack.md` |
+| composing the share-out or checking sign-offs | `docs/connectors/slack.md` |
 | any human-facing text | `docs/conventions/writing-style.md` |
 
 Summoned writers load their own conventions (`notion.md`,

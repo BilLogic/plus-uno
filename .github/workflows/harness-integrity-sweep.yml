@@ -1,6 +1,6 @@
 name: Harness Integrity Sweep
 
-# Monthly conventions-integrity sweep (registry: docs/conventions/automations.md).
+# Monthly conventions-integrity sweep (registry: docs/engineering/operations.md).
 # Loop shape: time-based cron → single-pass checklist → issue intakes → stop.
 # The checklist lives in skills/uno-maintain/references/staleness-sweep.md; the
 # prompt file is only the headless adapter (never duplicate the logic here).

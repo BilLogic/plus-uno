@@ -1,3 +1,7 @@
+---
+summary: The PLUS Design System uses semantic spacing tokens organized by component hierarchy
+---
+
 <!-- Tier: 2 -->
 
 # Spacing Tokens

@@ -1,6 +1,7 @@
 ---
 name: reviewers/ds-lens
 description: Design-system conformance lens — real components, real tokens, no lookalikes. Diagnose-only.
+summary: Judges an artifact against the design system — components, tokens, layout, and the forbidden patterns.
 ---
 
 # reviewers/ds-lens

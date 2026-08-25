@@ -16,6 +16,7 @@ hard_gates:
 benchmark: >
   Seeded fuzzy hunch ("tutors seem to churn after month 2?") → produce a study
   guide + data-analysis plan; score against the dimensions above.
+summary: Scores the research skill's outputs
 ---
 
 # uno-research rubric

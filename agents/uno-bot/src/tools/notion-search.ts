@@ -34,7 +34,7 @@ type CatalogScopeConfig = {
 
 /**
  * Catalog scopes wired to wrangler DATABASE ids. Keep in sync with
- * docs/conventions/notion.md § Read radar and tool-definitions.json.
+ * docs/connectors/notion.md § Read radar and tool-definitions.json.
  */
 const CATALOG_SCOPES: Record<string, CatalogScopeConfig> = {
   help_tutors: {

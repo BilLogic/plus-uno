@@ -1,3 +1,7 @@
+---
+summary: Every PLUS surface sits at one of four context levels
+---
+
 <!-- Tier: 2 -->
 
 # Hierarchy

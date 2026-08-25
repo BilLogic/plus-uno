@@ -1,3 +1,7 @@
+---
+summary: How to keep Figma component instances and PLUS code imports (@/components/) consistent when implementing designs in Cursor or writing prototypes back to Figma
+---
+
 # Component Alignment — Figma ↔ Coding Agent
 
 How to keep **Figma component instances** and **PLUS code imports** (`@/components/*`) consistent when implementing designs in Cursor or writing prototypes back to Figma.

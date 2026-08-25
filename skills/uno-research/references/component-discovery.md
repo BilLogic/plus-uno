@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: How to find out whether a component already exists before proposing a new one.
 ---
 
 <!-- Load for: finding existing components before building new ones, design-to-code mapping -->

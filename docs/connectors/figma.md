@@ -1,10 +1,11 @@
 ---
 embodiment: all
+summary: Every annotation carries one category label: Interaction · Content · Layout · Token-Style · Behavior · Accessibility
 ---
 
 # Figma Workspace Conventions
 
-<!-- canonical per ADR-017 (docs/knowledge/decisions.md); supersedes the Notion 🎨 Figma Workspace Playbook (⏳ still pending reconcile with the "How we Fig" deck). Distilled 2026-07-07 · applied by writers/figma. -->
+<!-- canonical per ADR-017 (docs/adr/); supersedes the Notion 🎨 Figma Workspace Playbook (⏳ still pending reconcile with the "How we Fig" deck). Distilled 2026-07-07 · applied by writers/figma. -->
 
 ## Canvas vs comments
 

@@ -1,7 +1,7 @@
 // Markdown → Slack mrkdwn coercion, for the paths that need mrkdwn.
 //
 // Since 2026-08-22 the model writes STANDARD MARKDOWN (`AGENT.md`,
-// `docs/conventions/slack.md`) — the dialect it writes best, and the dialect
+// `docs/connectors/slack.md`) — the dialect it writes best, and the dialect
 // Slack's own `markdown_text` field takes, which is how a streamed reply
 // ships. Two paths still need mrkdwn, and both run through here:
 //
@@ -75,7 +75,7 @@ function transformSegment(seg: string): string {
     // Citation-marker noise the harness bans but models still emit (live
     // 2026-07-10, gemini stress round): numeric grounding indices like
     // " [11]" / " [1, 22]" (Gemini's internal chunk ids — meaningless to
-    // readers) and repo-path brackets like " [docs/conventions/notion.md]".
+    // readers) and repo-path brackets like " [docs/connectors/notion.md]".
     // Note: markdown [label](url) links were already converted above, so
     // these patterns can't touch real links.
     .replace(/ ?\[\d+(?:,\s*\d+)*\]/g, "")

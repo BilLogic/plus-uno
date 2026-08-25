@@ -1,3 +1,7 @@
+---
+summary: Corner radius scale and which surface takes which step
+---
+
 <!-- Tier: 2 -->
 
 # Radius

@@ -1,10 +1,11 @@
 ---
 embodiment: all
+summary: Pillar → channel map (group announcements; all private — uno-bot must be invited before posting/@here): Universal → #plus-universal C072E8SFLKV · Admin → #plus-admin C089A3E9CCW ·
 ---
 
 # Slack Conventions
 
-<!-- canonical per ADR-017 (docs/knowledge/decisions.md); supersedes the Notion 🧭 Flow 3/5 docs + 🧩 Templates #4 for conventions. Distilled 2026-07-07 · applied by agents/uno-bot. -->
+<!-- canonical per ADR-017 (docs/adr/); supersedes the Notion 🧭 Flow 3/5 docs + 🧩 Templates #4 for conventions. Distilled 2026-07-07 · applied by agents/uno-bot. -->
 
 ## Channels
 

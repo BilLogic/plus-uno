@@ -1,5 +1,6 @@
 ---
 embodiment: ide
+summary: Use this exact structure for all audits
 ---
 
 # Skill Audit Output Template
