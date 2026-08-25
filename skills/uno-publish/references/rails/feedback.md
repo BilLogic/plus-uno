@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- ~550 tokens | Load when: the rail decision is FEEDBACK — share for reactions, not handoff -->
 
 # Feedback rail — IDE execution

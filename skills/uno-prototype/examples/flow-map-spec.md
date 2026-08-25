@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- GOLDEN EXAMPLE — flow-map prompt-spec, demonstrating the shape
      references/deliverables/flow-map.md demands. The source PRD is
      hypothetical and inlined below (no external fixture). Shows how the

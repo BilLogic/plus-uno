@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- Load for: the conventions-integrity sweep (monthly, at retro). Registry row: docs/conventions/automations.md. Run by reviewers/auditor — inspect and file intakes only, never fix in-sweep. -->
 
 # Integrity sweep checklist

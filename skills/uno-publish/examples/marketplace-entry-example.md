@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 # Marketplace Entry Example
 
 A complete example entry for `src/pages/PrototypeMarket/prototypes-data.js`.

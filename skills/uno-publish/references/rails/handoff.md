@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- ~450 tokens | Load when: the rail decision is HANDOFF — dev-ready package, sign-offs, marketplace -->
 
 # Handoff rail — IDE execution

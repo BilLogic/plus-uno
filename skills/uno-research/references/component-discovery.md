@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- Load for: finding existing components before building new ones, design-to-code mapping -->
 
 # Component Discovery Process

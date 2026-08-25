@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- ~350 tokens | Load when: the confirmed artifact is an interactive or functional prototype built by an external tool -->
 
 # Deliverable — interactive / functional prototype (external tool)

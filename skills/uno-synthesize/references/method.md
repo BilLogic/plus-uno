@@ -1,3 +1,8 @@
+---
+embodiment: all
+summary: uno-synthesize — the shared procedure both faces load.
+---
+
 # uno-synthesize — method
 
 <!-- Runtime-neutral core, loaded by both faces (SKILL.md in the IDE, bot.md in the Worker).

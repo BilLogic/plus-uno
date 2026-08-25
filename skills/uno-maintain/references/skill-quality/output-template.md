@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 # Skill Audit Output Template
 
 Use this exact structure for all audits.

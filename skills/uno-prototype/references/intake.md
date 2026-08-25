@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- ~2,400 tokens | Load when: a prototype run starts — this is the interview that produces the brief card -->
 
 # uno-prototype — intake (the 8-question interview)

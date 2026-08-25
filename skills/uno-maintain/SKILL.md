@@ -14,6 +14,7 @@ description: >
   the DS/harness need reconciling.
 argument-hint: "[intake / sweep-name / lesson-to-capture]"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Task, mcp__notion-plus__*
+embodiment: ide
 ---
 
 # uno-maintain — IDE face

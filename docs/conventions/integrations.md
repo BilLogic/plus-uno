@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 # Integrations Index
 
 <!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand, ~150 tokens) · distilled 2026-07-07 · load when deciding which tool or integration path to use. -->

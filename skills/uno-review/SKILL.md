@@ -13,6 +13,7 @@ description: >
   route to uno-prototype (artifact) or uno-maintain (harness/docs).
 argument-hint: "[artifact + manifest (fidelity / tools / PRD link)]"
 allowed-tools: Read, Grep, Glob, Bash, Task
+embodiment: ide
 ---
 
 # Quality Review

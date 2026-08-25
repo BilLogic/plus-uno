@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 # Marketplace Schema
 
 Schema for entries in `src/pages/PrototypeMarket/prototypes-data.js`.

@@ -1,3 +1,7 @@
+---
+embodiment: all
+---
+
 # Slack Conventions
 
 <!-- canonical per ADR-017 (docs/knowledge/decisions.md); supersedes the Notion 🧭 Flow 3/5 docs + 🧩 Templates #4 for conventions. Distilled 2026-07-07 · applied by agents/uno-bot. -->

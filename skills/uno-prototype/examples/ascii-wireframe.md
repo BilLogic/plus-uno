@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- GOLDEN EXAMPLE — ASCII wireframe house style (in-chat WIP artifact,
      references/deliverables/wireframe.md Route A). Subject: session notes
      quick-capture, from the hypothetical PRD inlined in wireframe-spec.md.

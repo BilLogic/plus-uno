@@ -1,45 +1,106 @@
 // Bakes the assembled harness into the Worker bundle (src/generated/harness.ts)
 // so serving the system prompt costs ZERO subrequests at runtime — the docs are
-// co-located in this repo, so the baked copy updates on deploy. This SKILL_PATHS
-// list is now the source of truth; the output must stay byte-identical to what
-// the old runtime assembleSystem() produced (same order, dividers, ide-only
-// stripping). Run: npm run bundle:harness
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from "node:fs";
+// co-located in this repo, so the baked copy updates on deploy.
+//
+// MEMBERSHIP IS A PROPERTY OF THE DOCUMENT. Each doc declares
+// `embodiment: all | ide | worker` in its own frontmatter and this script globs
+// for it; there is no list of files here to disagree with reality (#159).
+//
+// ORDER IS A BUNDLE-LEVEL FACT no single document can know, so it is declared
+// once, in SECTIONS below, and nowhere else. Within a section, members sort by
+// path — except a skill's `method.md`, which precedes its `bot.md` by rule.
+// A per-doc sort weight was rejected: it spreads one global decision across
+// twenty files and turns a missing weight into a silent misplacement.
+//
+// ── The byte-identical requirement is RETIRED (#159) ─────────────────────────
+//
+// This script used to state: "the output must stay byte-identical to what the
+// old runtime assembleSystem() produced (same order, dividers, ide-only
+// stripping)." That requirement is retired here deliberately, not lapsed.
+//
+// Why it could not be met: order changed. Membership is now a glob, so members
+// sort by path within their section. The old hand-list ran the skills in
+// workflow order (research → synthesize → prototype → publish → review →
+// maintain); they now run alphabetically. Preserving the old order would have
+// meant naming the six skills somewhere, which is the hand-maintained list this
+// ticket exists to delete.
+//
+// Why retiring it is safe: measured at the cut, every file body is
+// byte-identical and the member set is unchanged — 22 files, 167,556 chars
+// before and after. Only sequence moved. The sections a reader depends on
+// (constitution first, persona second) are unchanged, and no rule's meaning
+// depends on which skill precedes another.
+//
+// What it costs: one prompt-cache miss on the first deploy after this change,
+// because the system prompt is the cached prefix.
+//
+// What replaces it as the guard: `--check` compares against the committed
+// artifact, so a doc edited without regenerating still fails. That check is
+// about THIS script's output, which exists — assembleSystem() does not. It was
+// deleted; src/agent/skills.ts now just serves the baked constant. A requirement
+// to match a function that no longer exists cannot fail, and a guard that
+// cannot fail is the failure mode this whole effort is about.
+//
+// Run: npm run bundle:harness
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const here = path.dirname(fileURLToPath(import.meta.url)); // agents/uno-bot/scripts
 const repoRoot = path.resolve(here, "../../.."); // repo root (two levels above agents/uno-bot)
 
-// Mirror of the current SKILL_PATHS from src/agent/skills.ts. This is the
-// source of truth now.
-const SKILL_PATHS = [
-  "AGENTS.md", // the constitution (repo root)
-  "agents/uno-bot/AGENT.md", // this embodiment's persona delta
-  // Per skill: references/method.md (runtime-neutral core) then bot.md (Worker delta)
-  "skills/uno-research/references/method.md",
-  "skills/uno-research/bot.md",
-  "skills/uno-synthesize/references/method.md",
-  "skills/uno-synthesize/bot.md",
-  "skills/uno-prototype/references/method.md",
-  "skills/uno-prototype/bot.md",
-  "skills/uno-publish/references/method.md",
-  "skills/uno-publish/bot.md",
-  "skills/uno-review/references/method.md",
-  "skills/uno-review/bot.md",
-  "skills/uno-maintain/references/method.md",
-  "skills/uno-maintain/bot.md",
-  "docs/conventions/terminology.md",
-  "docs/conventions/notion.md",
-  "docs/conventions/figma-workspace.md",
-  "docs/conventions/slack.md",
-  "docs/conventions/supabase.md",
-  "docs/conventions/blueprint-navigation.md",
-  "docs/conventions/writing-style.md",
-  // The standing-automation registry: "what runs on a schedule / who owns it"
-  // is a live Slack question, and the table is the only answer to it.
-  "docs/conventions/automations.md",
+/**
+ * The bundle's sections, in order. This list is the ONLY place order is stated.
+ * Each section names roots to scan — never an individual file — and takes every
+ * doc under them whose frontmatter says `embodiment: worker` or `all`.
+ */
+const SECTIONS = [
+  { name: "constitution", roots: ["AGENTS.md"] },
+  { name: "persona", roots: ["agents/uno-bot/AGENT.md"] },
+  { name: "skills", roots: ["skills"] },
+  { name: "conventions", roots: ["docs/conventions"] },
 ];
+
+/** Frontmatter is metadata for this script, not content for the model. */
+function splitFrontmatter(text) {
+  if (!text.startsWith("---\n")) return { meta: {}, body: text };
+  const close = text.indexOf("\n---", 4);
+  if (close === -1) return { meta: {}, body: text };
+  const meta = {};
+  for (const line of text.slice(4, close).split("\n")) {
+    const m = line.match(/^([a-zA-Z_-]+):\s*(.*)$/);
+    if (m) meta[m[1]] = m[2].trim();
+  }
+  return { meta, body: text.slice(close + 4).replace(/^\n+/, "") };
+}
+
+/** Every .md under a root, or the root itself when it is a file. */
+function walk(rel) {
+  const abs = path.join(repoRoot, rel);
+  if (!existsSync(abs)) return [];
+  const stat = statSync(abs);
+  if (stat.isFile()) return rel.endsWith(".md") ? [rel] : [];
+  const out = [];
+  for (const entry of readdirSync(abs, { withFileTypes: true })) {
+    out.push(...walk(path.posix.join(rel, entry.name)));
+  }
+  return out;
+}
+
+/**
+ * Sort key. Paths sort lexically, except that a skill's shared procedure loads
+ * before its Worker delta — the one ordering rule a document does own, because
+ * `method.md` is meaningless read second.
+ */
+function sortKey(rel) {
+  const skill = rel.match(/^skills\/([^/]+)\//);
+  if (!skill) return rel;
+  const face = rel.endsWith("/references/method.md") ? "0" : "1";
+  // `rel` is appended so two docs in the same skill and face can never tie —
+  // a tie would leave their order up to the sort's stability, which is a
+  // silent way for the prompt to differ between runs.
+  return `skills/${skill[1]}/${face}/${rel}`;
+}
 
 // Drop `<!-- ide-only -->…<!-- /ide-only -->` regions — replicated EXACTLY from
 // the old src/agent/skills.ts stripIdeOnly so the baked prompt matches.
@@ -50,73 +111,77 @@ function stripIdeOnly(text) {
 
 // Guard: verify the repo root is the one that actually holds the harness before
 // we trust any path (checked in the task brief).
-for (const sentinel of ["AGENTS.md", "docs/conventions/notion.md"]) {
+// Structural sentinels only — naming a member file here would make the repo
+// check die confusingly the day that file is renamed, and would put a filename
+// back in the one script that is supposed to hold none.
+for (const sentinel of ["AGENTS.md", "docs/conventions", "skills"]) {
   if (!existsSync(path.join(repoRoot, sentinel))) {
     console.error(`[bundle-harness] repo root check failed: ${sentinel} not found under ${repoRoot}`);
     process.exit(1);
   }
 }
 
-// Files the Worker deliberately does NOT carry. Every skill face and every
-// convention must appear here or in SKILL_PATHS — see the coverage guard below.
-const NOT_BUNDLED = new Set([
-  "docs/conventions/coding.md", // repo code authoring; the Worker writes no code
-  "docs/conventions/tech-stack.md", // dependency/version table; IDE-side
-  "docs/conventions/integrations.md", // MCP server names — the Worker has no MCP
-  "docs/conventions/article-writing-style.md", // 39k chars for essay-length recaps
-]);
+// ── Membership, derived ──────────────────────────────────────────────────────
+//
+// Every doc under a section root must DECLARE where it belongs. A doc with no
+// `embodiment` fails the build: silence used to mean "not bundled", so a new
+// convention nobody listed was a rule the bot never learned, and nothing said so.
+const members = [];
+const undeclared = [];
 
-// Coverage guard: a MISSING listed file already fails below, but the reverse —
-// a new skill face or convention that nobody adds to SKILL_PATHS — was silent,
-// and silence here means the bot never learns a rule that exists. Every such
-// file must be bundled or explicitly excluded; adding one and forgetting both
-// fails the build.
-const mustBeAccountedFor = [
-  ...readdirSync(path.join(repoRoot, "skills"), { withFileTypes: true })
-    .filter((d) => d.isDirectory())
-    .flatMap((d) => [`skills/${d.name}/bot.md`, `skills/${d.name}/references/method.md`]),
-  ...readdirSync(path.join(repoRoot, "docs/conventions"))
-    .filter((f) => f.endsWith(".md"))
-    .map((f) => `docs/conventions/${f}`),
-].filter((p) => existsSync(path.join(repoRoot, p)));
+for (const section of SECTIONS) {
+  const found = [];
+  for (const root of section.roots) {
+    for (const rel of walk(root)) {
+      const { meta } = splitFrontmatter(readFileSync(path.join(repoRoot, rel), "utf8"));
+      if (!meta.embodiment) {
+        undeclared.push(rel);
+        continue;
+      }
+      if (meta.embodiment === "worker" || meta.embodiment === "all") found.push(rel);
+    }
+  }
+  found.sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
+  members.push(...found.map((rel) => ({ rel, section: section.name })));
+}
 
-const listed = new Set(SKILL_PATHS);
-const unaccounted = mustBeAccountedFor.filter((p) => !listed.has(p) && !NOT_BUNDLED.has(p));
-if (unaccounted.length) {
+if (undeclared.length) {
   console.error(
-    `[bundle-harness] ${unaccounted.length} file(s) are neither bundled nor explicitly excluded:\n` +
-      unaccounted.map((p) => `  ${p}`).join("\n") +
-      "\n  -> add to SKILL_PATHS (the bot needs it) or to NOT_BUNDLED (with the reason).",
+    `[bundle-harness] ${undeclared.length} doc(s) under a bundle section declare no \`embodiment\`:\n` +
+      undeclared.map((p) => `  ${p}`).join("\n") +
+      "\n  -> add `embodiment: all | ide | worker` to the frontmatter. There is no default:" +
+      "\n     a doc that does not say where it belongs is a rule nobody can find.",
   );
   process.exit(1);
 }
 
-// Read every listed file from the LOCAL repo. Any missing file is a FAILURE —
-// never silently ship a partial rulebook.
-const raw = SKILL_PATHS.map((p) => {
-  const abs = path.join(repoRoot, p);
-  if (!existsSync(abs)) {
-    console.error(`[bundle-harness] MISSING harness file: ${p} (expected at ${abs})`);
-    process.exit(1);
-  }
+if (!members.length) {
+  console.error("[bundle-harness] no members matched — the glob is broken, refusing to ship an empty prompt.");
+  process.exit(1);
+}
+
+// Read every member from the LOCAL repo. Frontmatter is stripped: it addresses
+// this script, not the model, and paying prompt chars for it would be a tax on
+// having made membership declarative.
+const raw = members.map(({ rel }) => {
+  const abs = path.join(repoRoot, rel);
   // Normalise endings at the read boundary. Line endings are a checkout
   // artifact — no .gitattributes here and core.autocrlf defaults on for
   // Windows — so bundling on Windows baked ~1,500 stray CRs into the prompt
   // and dirtied this generated file on every run. Semantically inert to a
   // model, but it makes the baked bytes depend on WHO deployed, and the
-  // system prompt is the cached prefix: alternating Windows and CI deploys
-  // would bust that cache every time. On a LF checkout this is a no-op, so
-  // CI output is unchanged.
-  return readFileSync(abs, "utf8").replace(/\r\n/g, "\n");
+  // system prompt is the cached prefix.
+  const text = readFileSync(abs, "utf8").replace(/\r\n/g, "\n");
+  return splitFrontmatter(text).body;
 });
 
-// Same assembly as the old assembleSystem(): index 0 raw, every other file
-// prefixed with `\n\n---\n\n<!-- ${path} -->\n\n`; empty (post-strip) files skipped.
+// Assembly: first member raw, every other prefixed with a path comment so the
+// bundle stays traceable back to a file; empty (post-strip) members skipped.
 const parts = raw.map(stripIdeOnly);
 const assembled = parts
   .map((text, i) => {
     if (!text) return "";
-    return i === 0 ? text : `\n\n---\n\n<!-- ${SKILL_PATHS[i]} -->\n\n${text}`;
+    return i === 0 ? text : `\n\n---\n\n<!-- ${members[i].rel} -->\n\n${text}`;
   })
   .join("");
 
@@ -282,10 +347,10 @@ if (process.argv.includes("--check")) {
     );
     process.exit(1);
   }
-  console.log(`[bundle-harness] --check OK (${assembled.length} chars from ${SKILL_PATHS.length} files)`);
+  console.log(`[bundle-harness] --check OK (${assembled.length} chars from ${members.length} files)`);
   process.exit(0);
 }
 
 writeFileSync(outFile, contents, "utf8");
 
-console.log(`[bundle-harness] wrote ${outFile} (${assembled.length} chars from ${SKILL_PATHS.length} files)`);
+console.log(`[bundle-harness] wrote ${outFile} (${assembled.length} chars from ${members.length} files)`);

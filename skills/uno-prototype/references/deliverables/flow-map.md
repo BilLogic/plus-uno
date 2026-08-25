@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- ~350 tokens | Load when: the confirmed artifact is a user flow, journey map, or data-flow map -->
 
 # Deliverable — flow map (user flow · journey map · data-flow)

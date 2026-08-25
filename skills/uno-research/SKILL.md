@@ -14,6 +14,7 @@ description: >
 context: fork
 argument-hint: "[question / hunch / who-knows-X]"
 allowed-tools: Read, Grep, Glob, Task, WebSearch, mcp__notion-plus__API-post-search, mcp__notion-plus__API-retrieve-page-markdown, mcp__notion-plus__API-get-block-children, mcp__notion-plus__API-query-data-source
+embodiment: ide
 ---
 <!-- context: fork runs this skill in a forked context with the DEFAULT agent — it must keep Task
      (it dispatches researchers/* and writers/notion). Notion tools are the READ set only; the one

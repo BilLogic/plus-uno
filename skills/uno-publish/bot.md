@@ -1,4 +1,9 @@
-<!-- Worker face — loaded by uno-bot via SKILL_PATHS. NOT loaded by the IDE agent. Delta only; the rails, gates, and contracts live in references/method.md. -->
+---
+embodiment: worker
+summary: uno-publish — Worker delta over references/method.md.
+---
+
+<!-- Worker face — bundled by uno-bot via `embodiment: worker` above. NOT loaded by the IDE agent. Delta only; the rails, gates, and contracts live in references/method.md. -->
 # uno-publish — bot face
 
 Slack delta only. The rails + gates are `references/method.md`, already in this prompt.

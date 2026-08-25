@@ -11,6 +11,7 @@ description: >
   context only — running new queries against raw data is uno-research.
 argument-hint: '[sources-to-distill | "draft the PRD"]'
 allowed-tools: Read, Grep, Glob, Write, Task, mcp__notion-plus__*
+embodiment: ide
 ---
 
 # uno-synthesize — IDE face

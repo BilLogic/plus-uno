@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 # Audit Examples Reference
 
 Use the following repository-local examples as style references for report tone and structure:

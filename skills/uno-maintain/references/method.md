@@ -1,3 +1,8 @@
+---
+embodiment: all
+summary: uno-maintain — the shared procedure both faces load.
+---
+
 <!-- Shared core, loaded by both faces (SKILL.md + bot.md). Runtime-neutral: no IDE tool names, no Slack mechanics; where a role is named (writers/*, auditor) the faces own HOW it's dispatched. -->
 <!-- Source flows: Flow 4 (intake & proposal) + Flow 5 (review & approval), PLUS UNO Workflow board. -->
 

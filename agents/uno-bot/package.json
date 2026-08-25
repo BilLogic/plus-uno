@@ -2,7 +2,7 @@
   "name": "uno-bot",
   "version": "0.0.1",
   "private": true,
-  "description": "UNO Bot v2 — agentic Slack bot for the Plus design system (Cloudflare Workers runtime).",
+  "description": "UNO Bot v2 \u2014 agentic Slack bot for the Plus design system (Cloudflare Workers runtime).",
   "main": "src/index.ts",
   "scripts": {
     "dev": "wrangler dev",
@@ -10,14 +10,15 @@
     "check:harness-bundle": "node scripts/bundle-harness.mjs --check",
     "check:fetch": "node scripts/check-fetch.mjs",
     "check:contract": "node scripts/sync-blueprint-contract.mjs --check",
-    "deploy": "npm run typecheck && npm run check:fetch && npm run check:contract && npm run bundle:harness && wrangler deploy",
+    "deploy": "npm run typecheck && npm run check:fetch && npm run check:contract && npm run test:bundle && npm run bundle:harness && wrangler deploy",
     "typecheck": "tsc --noEmit",
     "tail": "wrangler tail",
     "test": "tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js",
     "slack:diff": "slack manifest diff --team T0C5GFUPJ --app A0APS0L8HJR",
     "slack:manifest": "slack manifest info --source remote --team T0C5GFUPJ --app A0APS0L8HJR",
     "evals:retrieval": "node scripts/run-retrieval-evals.mjs",
-    "evals:retrieval:selftest": "node scripts/run-retrieval-evals.mjs --self-test"
+    "evals:retrieval:selftest": "node scripts/run-retrieval-evals.mjs --self-test",
+    "test:bundle": "node --test scripts/*.test.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250101.0",

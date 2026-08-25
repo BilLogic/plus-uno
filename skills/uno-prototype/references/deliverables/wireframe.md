@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- ~550 tokens | Load when: the confirmed artifact is a wireframe or static mockup -->
 
 # Deliverable — wireframe / static mockup

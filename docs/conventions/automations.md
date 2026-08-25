@@ -1,3 +1,7 @@
+---
+embodiment: all
+---
+
 # Automations Registry
 
 <!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand) · distilled 2026-07-07 from 📓 playbook §6, now superseded · applied by uno-maintain. -->

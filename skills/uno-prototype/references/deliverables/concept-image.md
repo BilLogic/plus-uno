@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- ~300 tokens | Load when: the confirmed artifact is a concept image -->
 
 # Deliverable — concept image

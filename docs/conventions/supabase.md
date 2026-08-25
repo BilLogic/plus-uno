@@ -1,3 +1,7 @@
+---
+embodiment: all
+---
+
 # Supabase / uno-blueprint Conventions
 
 <!-- canonical per ADR-017 (docs/knowledge/decisions.md); supersedes the Notion 📐 System Overview + Flow 4 doc for conventions. Distilled 2026-07-07 · applied by writers/blueprint. -->

@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- GOLDEN EXAMPLE — wireframe/static-mockup prompt-spec for an external tool
      (references/deliverables/wireframe.md Route C, Stitch). The source PRD is
      hypothetical and inlined below (no external fixture); the spec is

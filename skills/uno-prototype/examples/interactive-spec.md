@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- GOLDEN EXAMPLE — interactive/functional prompt-spec, demonstrating the
      shape references/deliverables/interactive.md demands. The source PRD is
      hypothetical and inlined below (no external fixture). Note how two

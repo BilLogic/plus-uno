@@ -1,3 +1,7 @@
+---
+embodiment: all
+---
+
 # uno-blueprint — Navigation Guide
 
 <!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand; bundled into the uno-bot prompt) · distilled 2026-07-29 · applied by every agent answering a journey question or drafting from journey context. Companion: supabase.md (access, contract, source routing). -->

@@ -1,4 +1,9 @@
-<!-- Worker face — loaded by uno-bot via SKILL_PATHS. NOT loaded by the IDE agent. -->
+---
+embodiment: worker
+summary: uno-prototype — Worker delta over references/method.md.
+---
+
+<!-- Worker face — bundled by uno-bot via `embodiment: worker` above. NOT loaded by the IDE agent. -->
 # uno-prototype — bot face
 
 Slack delta only. The shared procedure (grounding ritual, fidelity routing, the two hard gates) is `references/method.md`, already in this prompt. DS specifics (agent-views) load in the Actions codegen prompts, not the Worker — the Worker only proposes.

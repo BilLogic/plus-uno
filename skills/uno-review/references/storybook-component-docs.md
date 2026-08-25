@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 # Storybook Component Organization
 
 ## Who this is for

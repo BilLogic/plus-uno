@@ -1,3 +1,8 @@
+---
+embodiment: all
+summary: The constitution — identity, routing and hard rules for every embodiment.
+---
+
 # plus-uno — Agent Constitution
 
 <!-- Tier: 1 — the single core doc. Every embodiment reads this first, loading-order.md second; everything else loads on demand. -->
@@ -46,7 +51,7 @@ Routing: match intent to the Use-when column; if ambiguous, ask which capability
 
 ## Conventions — what agents obey
 
-`docs/conventions/` is normative. In the uno-bot bundle, always in context: `notion.md` · `figma-workspace.md` · `slack.md` · `supabase.md` · `blueprint-navigation.md` · `writing-style.md` · `terminology.md` · `automations.md` (the standing-automation registry — every row names its agent). IDE-side, loaded on demand: `coding.md` · `tech-stack.md` · `integrations.md` (tool index) · `article-writing-style.md` (essay-length recaps) — the bot can reach these with `github_read` but does not carry them. Conventions are **canonical in this repo** (ADR-017; the Notion playbooks they were distilled from are superseded) — every header carries the ADR-017 canonical line + `distilled:` lineage; on conflict with a legacy page, the repo wins and the page gets a superseded banner via uno-maintain.
+`docs/conventions/` is normative. In the uno-bot bundle, always in context: `notion.md` · `figma-workspace.md` · `slack.md` · `supabase.md` · `blueprint-navigation.md` · `writing-style.md` · `terminology.md` · `automations.md` (the standing-automation registry — every row names its agent). IDE-side, loaded on demand: `coding.md` · `tech-stack.md` · `integrations.md` (tool index) · `article-writing-style.md` (essay-length recaps) — the bot can reach these with `github_read` but does not carry them. Membership is not this list: each doc declares `embodiment: all | ide | worker` in its own frontmatter and the bundler globs for it, so this sentence describes the outcome rather than deciding it. Conventions are **canonical in this repo** (ADR-017; the Notion playbooks they were distilled from are superseded) — every header carries the ADR-017 canonical line + `distilled:` lineage; on conflict with a legacy page, the repo wins and the page gets a superseded banner via uno-maintain.
 
 **Placement rule:** content lives with its consumer; many-consumer content lives in `docs/`. **Cache the foundation, retrieve the rest:** product truth ← uno-blueprint · DS truth ← uno-storybook · team conventions ← `docs/conventions/` (canonical here). **DS precedence on conflict:** uno-storybook > BS4 Foundation library > Figma spec pages — the losing artifact gets a uno-maintain intake (source: 📐 System Overview).
 

@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- Load for: helping a designer deploy a prototype to Netlify -->
 
 # Deployment Guide

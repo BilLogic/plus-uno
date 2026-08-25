@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- ~500 tokens | Load when: production-ready implementation with all states and accessibility -->
 
 # Production Readiness Checklist

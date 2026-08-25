@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 # Tech Stack
 
 <!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand) · distilled 2026-07-07 · applied by every agent adding a dependency, command, or path alias. Versions mirror `package.json` as of 2026-07-30 — read package.json, not this table, before asserting an installed version. -->

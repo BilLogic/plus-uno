@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 # notion-marketplace DB — schema & management
 
 Status: **LIVE** — Design HQ · Prototype Marketplace.

@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 # Skill Quality Checklist
 
 Source basis: [Claude Agent Skills Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)

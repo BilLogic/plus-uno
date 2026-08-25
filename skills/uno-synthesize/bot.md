@@ -1,4 +1,9 @@
-<!-- Worker face — loaded by uno-bot via SKILL_PATHS. NOT loaded by the IDE agent. -->
+---
+embodiment: worker
+summary: uno-synthesize — Worker delta over references/method.md.
+---
+
+<!-- Worker face — bundled by uno-bot via `embodiment: worker` above. NOT loaded by the IDE agent. -->
 # uno-synthesize — bot face
 
 Slack delta only — tool payloads, gates, Markdown shapes. The shared procedure (scope, findings toll gate, designer gates, PRD, paired write, faithfulness rules) is `references/method.md`, already in this prompt.

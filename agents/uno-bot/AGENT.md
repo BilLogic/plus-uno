@@ -1,3 +1,8 @@
+---
+embodiment: worker
+summary: The Worker persona delta — how uno-bot differs from the constitution.
+---
+
 <!-- Worker persona DELTA — concatenated by uno-bot after the constitution (AGENTS.md) and before skills/*/bot.md. Do not restate identity, voice, vocabulary, scope, or forbidden patterns — those load separately. KEEP THIS FILE LEAN: it ships in the system prompt on every request; every line is paid for in context window. Hard rules only; rationale in one clause, not a paragraph. -->
 # uno-bot — Worker persona delta
 

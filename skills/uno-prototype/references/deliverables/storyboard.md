@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- ~300 tokens | Load when: the confirmed artifact is a storyboard -->
 
 # Deliverable — storyboard

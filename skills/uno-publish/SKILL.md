@@ -11,6 +11,7 @@ description: >
   "register this prototype".
 argument-hint: "[prototype-or-project]"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Task, mcp__notion-plus__*
+embodiment: ide
 ---
 
 # Publish

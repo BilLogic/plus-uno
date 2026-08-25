@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- Load for: reviewing coded artifacts — the grep checks behind ds-lens findings. Automated by scripts/run-review-checks.sh; run individually to localize a hit. -->
 
 # Catch patterns — coded artifacts

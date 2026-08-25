@@ -1,3 +1,8 @@
+---
+embodiment: all
+summary: uno-research — the shared procedure both faces load.
+---
+
 <!-- Runtime-neutral core — loaded by BOTH faces (SKILL.md in the IDE, bot.md in the Worker).
      No IDE tool names, no Slack formatting here; execution specifics live in the faces. -->
 

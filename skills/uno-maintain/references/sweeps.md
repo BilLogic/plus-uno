@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- ~350 tokens | Load when: running or triaging a standing sweep or a scored audit — not needed for ordinary intakes -->
 
 # Sweeps & audits — IDE execution

@@ -1,3 +1,7 @@
+---
+embodiment: all
+---
+
 # PLUS Terminology
 
 <!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand) · distilled 2026-07-07 · applied by every agent naming a product, org, design-system, or harness term. -->

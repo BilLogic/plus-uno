@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- ~1,100 tokens | Load when: the confirmed route is a hi-fi build on the design system -->
 
 # Deliverable — coded build (hi-fi, on the design system)

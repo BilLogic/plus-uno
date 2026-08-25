@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 # Coding Conventions
 
 <!-- canonical per ADR-017 (docs/knowledge/decisions.md) · Tier 2 (on demand) · distilled 2026-07-07 · applied by every agent writing code in this repo. -->

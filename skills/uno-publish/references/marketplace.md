@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- ~300 tokens | Load when: registering a prototype in the marketplace — handoff step 6, or a standalone "register this prototype" ask -->
 
 # Marketplace registration

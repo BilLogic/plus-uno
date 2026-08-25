@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 # Example Audit: uno-plan
 
 ## Executive Summary

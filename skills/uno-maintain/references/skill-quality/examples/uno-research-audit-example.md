@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 # Example Audit: uno-research
 
 ## Executive Summary

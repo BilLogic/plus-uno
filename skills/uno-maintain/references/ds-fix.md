@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 <!-- Load for: drafting the fix (method.md §2) when the intake targets "Storybook inconsistent / bug" or "Figma components out of date". IDE face only — the Worker files and proposes, never edits repo files (bot.md). DS components are always Tier 2: this runbook produces the draft; the gates in method §3–5 still apply. -->
 
 # DS fix — execution runbook

@@ -1,3 +1,7 @@
+---
+embodiment: ide
+---
+
 # Storybook Guidelines
 
 See also: [`storybook-component-docs.md`](storybook-component-docs.md) for the designer-facing guide to how `Components/*` and `Forms/*` entries are organized in the Storybook sidebar and within each docs page.

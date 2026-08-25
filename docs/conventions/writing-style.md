@@ -1,3 +1,7 @@
+---
+embodiment: all
+---
+
 # Writing Style — the voice, once
 
 <!-- canonical per ADR-017 (docs/knowledge/decisions.md); supersedes 📓 playbook §4a. Distilled 2026-07-07 · applied by every agent producing human-facing text — voice is a convention, not a role. -->
