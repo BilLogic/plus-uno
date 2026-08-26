@@ -161,16 +161,39 @@ neither and takes ~14s, and merging them would make the fast answer slow.
 Two kinds of failure, two mechanisms:
 
 - **`play` functions and render errors block outright.** There are none failing
-  on `main`, so anything that appears was introduced by the branch. (The corpus
-  carries **no** `play` functions at all today — the "284 of 382" figure in #154
-  came from a grep that matched `display:`. What the suite asserts right now is
-  that every story renders and axe runs over it; the interaction path is wired
-  ahead of the first interaction test rather than after it.)
+  on `main`, so anything that appears was introduced by the branch. (How many
+  there are: five story files, fourteen `play` blocks, at 2026-08-26. The "284
+  of 382" figure in #154 was never real — it came from a grep that matched
+  `display:` in inline style objects, and #209 re-measured it at zero. The five
+  are `LabelAssociation` (#206), `DeclaredApi` (#207), and `ModalDismissal`,
+  `PageAndTabSelection` and `SelectCommit` (#209), which cover the four
+  highest-usage components whose behaviour is the product. Everything else in
+  the corpus is asserted to render, and to survive axe, and nothing more.)
 - **Accessibility is a ratchet**, not a threshold. `docs/evals/a11y-baseline.json`
-  records which axe rules each story already violates (148 stories, 15 rules at
+  records which axe rules each story already violates (126 stories, 14 rules at
   2026-08-26). A story violating a rule it did not carry before fails the gate; a
   count that falls does not. Re-record a genuine improvement with
   `npm run check:storybook -- --update` and commit the file in the same PR.
+
+**Which components carry `play` blocks, and why not all of them.** A `play`
+block costs runtime on every PR, so the set is chosen rather than grown: a
+component earns one when its behaviour *is* the product and its usage is high
+enough that a break is expensive. Usage is #166's measurement, recorded in
+`design-system/guidelines/components/overview.md` and re-run on today's tree:
+files under `design-system/src/specs/` and `prototypes/` that import a component
+and render it. Ranked that way, #209 took `Modal` (33 files), `Select` (24),
+`Pagination` (13) and `NavTabs` (11) — the four highest-usage components that
+are pure state machines and had no interaction cover.
+
+The absences are as deliberate as the set. `Button` (138) and `Alert` (11) are
+behavioural and already have unit tests beside their source, so a second
+assertion in a browser buys nothing. `Badge` (62) does one thing, dismiss, and
+`SelectCommit` exercises it where it actually matters. `Dropdown` (21) and
+`Switch` (7) are covered by `DeclaredApi` (#207). `Table` (19), `ButtonGroup`
+(17) and `Card` (14) render and do not act. Below that the ranking falls away
+fast — `Accordion` is 2 files and `TagInput` is 0, so behaviour alone does not
+earn a slot. Adding to the set is fine; adding without a usage number and a
+sentence saying what breaks is how a four-minute gate becomes a ten-minute one.
 
 Fixing the inherited violations is tracked separately at #153 — the ratchet
 exists so that work does not have to finish before anything else can merge. A
