@@ -1,6 +1,15 @@
+/**
+ * Generate the token agent view — design-system/agent-views/tokens/tokens.md.
+ *
+ * Usage:
+ *   node scripts/generate-cheat-sheet.js
+ *   node scripts/generate-cheat-sheet.js --check  (CI: fail if stale, write nothing)
+ */
+
 import fs from 'fs';
 import path from 'path';
 import { AGENT_ROOT } from './agent-views-paths.js';
+import { checkArtifacts, writeArtifacts } from './lib/generated-artifact.js';
 
 const ROOT_DIR = path.resolve(import.meta.dirname, '../');
 const TOKENS_DIR = path.join(ROOT_DIR, 'design-system/src/tokens');
@@ -21,11 +30,7 @@ function extractScssVariables(filePath) {
     return [...new Set(variables)].sort();
 }
 
-function generateTokensDoc() {
-    console.log('Generating agent views (tokens)...');
-
-    fs.mkdirSync(path.join(AGENT_ROOT, 'tokens'), { recursive: true });
-
+function renderTokensDoc() {
     const colorTokens = extractScssVariables(path.join(TOKENS_DIR, '_colors.scss'));
     const spacingTokens = extractScssVariables(path.join(TOKENS_DIR, '_spacing_semantics.scss'));
     const fontTokens = extractScssVariables(path.join(TOKENS_DIR, '_fonts.scss'));
@@ -56,10 +61,25 @@ function generateTokensDoc() {
     tokensDoc += `## Primitive Variables\n`;
     tokensDoc += `Base raw variables (only use if a semantic token doesn't exist).\n\n`;
     tokensDoc += "```css\n" + primitiveTokens.join('\n') + "\n```\n";
-    fs.writeFileSync(OUTPUT_TOKENS, tokensDoc);
-    console.log(`  ✓ ${OUTPUT_TOKENS}`);
+    return tokensDoc;
+}
 
+function main() {
+    const check = process.argv.includes('--check');
+    const artifacts = [{ file: OUTPUT_TOKENS, content: renderTokensDoc() }];
+
+    if (check) {
+        if (!checkArtifacts(artifacts)) {
+            console.error('  -> run `npm run generate:agent-views`');
+            process.exit(1);
+        }
+        console.log('✓ agent views (tokens) up to date');
+        return;
+    }
+
+    console.log('Generating agent views (tokens)...');
+    writeArtifacts(artifacts);
     console.log(`\nToken agent view generated. Route via design-system/guidelines/overview.md`);
 }
 
-generateTokensDoc();
+main();

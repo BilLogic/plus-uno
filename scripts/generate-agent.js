@@ -19,8 +19,8 @@ const check = process.argv.includes('--check');
 const flag = check ? ' --check' : '';
 
 const steps = [
-  ['Agent views (tokens)', 'node scripts/generate-cheat-sheet.js'],
-  ['Agent views (component + forms index)', 'node scripts/generate-knowledge-components.js'],
+  ['Agent views (tokens)', `node scripts/generate-cheat-sheet.js${flag}`],
+  ['Agent views (component + forms index)', `node scripts/generate-knowledge-components.js${flag}`],
   ['Component docs (generated half + group coverage)', `node scripts/generate-component-docs.mjs${flag}`],
   ['Root index (from frontmatter summaries)', `node scripts/generate-index.mjs${flag}`],
   ['Figma component registry', `node scripts/generate-component-registry-from-storybook.js${flag}`],
