@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Radio from './Radio';
 import Checkbox from './Checkbox';
+import useFieldId from './useFieldId';
 import './MultipleChoice.scss';
 
 /**
@@ -27,6 +28,16 @@ const MultipleChoice = ({
     const [internalValue, setInternalValue] = React.useState(
         defaultValue || (type === 'checkbox' ? [] : null)
     );
+
+    /**
+     * The base each option's id is suffixed from (#222), the way `Scale` does
+     * it in `RadioButtonGroup`. `id || name` comes first so the per-option ids
+     * shipped call sites already see are byte-for-byte what they were;
+     * `fieldId` only fills the case where the caller passed neither, which
+     * used to produce `undefined-option-0`.
+     */
+    const fieldId = useFieldId(id);
+    const optionIdBase = id || name || fieldId;
 
     const currentValue = isControlled ? value : internalValue;
 
@@ -74,7 +85,7 @@ const MultipleChoice = ({
         <div className={wrapperClasses} style={style} {...props}>
             <div className="plus-multiple-choice-options">
                 {options.map((option, index) => {
-                    const optionId = option.id || `${id || name}-option-${index}`;
+                    const optionId = option.id || `${optionIdBase}-option-${index}`;
                     const optionValue = option.value !== undefined ? option.value : (typeof option === 'string' ? option : index);
                     const optionLabel = option.label !== undefined ? option.label : (typeof option === 'string' ? option : 'Text');
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
+import useFieldId from './useFieldId';
 import './Radio.scss';
 
 /**
@@ -24,6 +25,26 @@ const Radio = ({
     ...props
 }) => {
     const isControlled = checked !== undefined;
+    /**
+     * One id for this option's input and the `for` `Form.Check` puts on its
+     * label (#222).
+     *
+     * The line here used to be `id={id || name}`, the defect #206 fixed on
+     * eight other components — `name` is a form key, not an id, and nothing on
+     * the page carries it as one. It is worse on a radio: radios in a group
+     * share a `name` by definition, so a group written without explicit ids
+     * gave *every* option the same id and every label resolved to whichever
+     * one the browser reached first.
+     *
+     * `Radio` is one option, not the group, so the id can come straight from
+     * `useFieldId` — `useId` runs per instance and each option in the group
+     * gets its own value. Components that render the whole group derive one
+     * base and suffix it per option instead; see `optionIdBase` in
+     * `RadioButtonGroup` and `MultipleChoice`.
+     *
+     * A caller who passes `id` gets exactly that id back.
+     */
+    const fieldId = useFieldId(id);
     const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
 
     const wrapperClasses = [
@@ -38,7 +59,7 @@ const Radio = ({
         <div className={wrapperClasses} style={style}>
             <Form.Check
                 type="radio"
-                id={id || name}
+                id={fieldId}
                 name={name}
                 value={value}
                 checked={isControlled ? checked : undefined}
