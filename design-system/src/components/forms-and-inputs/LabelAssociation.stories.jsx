@@ -209,6 +209,78 @@ HiddenLabels.play = async ({ canvasElement }) => {
 };
 
 /**
+ * The other half of naming a field: pointing it at text the component did not
+ * render (#230).
+ *
+ * `DateAndTimePicker` destructured `...props` and never spread it, so a caller
+ * wiring up validation wrote `aria-describedby={errorId}` and got nothing — no
+ * React warning, no `propTypes` warning, no attribute. It now forwards to the
+ * wrapper, which is the same element that carries `role="group"` and the field's
+ * name, and the `play` block below is what says so.
+ *
+ * #222 decides what this asserts. The proxy questions are all green on the
+ * broken component: the error paragraph is in the document either way, the group
+ * exists either way, and the inputs are named either way. The one fact that is
+ * false before the fix and true after is the *association* — the group carrying
+ * the caller's `aria-describedby`, resolving to the caller's element. So that is
+ * what it checks, along with the rule the MDX states about where a forwarded
+ * prop lands: on the wrapper, and not on either input.
+ */
+export const ForwardedProps = () => (
+    <div style={stack}>
+        <DateAndTimePicker
+            name="starts"
+            label="Session start"
+            validation="invalid"
+            aria-describedby="fp-starts-error"
+            data-testid="session-start-field"
+        />
+        {/* The caller's own error text. `validationMessage` renders without an
+            id, so it is not something `aria-describedby` can point at — this is
+            the escape hatch the Accessibility section documents. */}
+        <p id="fp-starts-error">Start time must be in the future.</p>
+    </div>
+);
+
+ForwardedProps.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const doc = canvasElement.ownerDocument;
+
+    const group = canvas.getByRole('group', { name: 'Session start' });
+
+    // The discriminator. `null` before #230, because the rest object was
+    // collected and dropped.
+    await expect(group.getAttribute('aria-describedby')).toBe('fp-starts-error');
+
+    // And it resolves — a `for`/`describedby` that points at nothing is #206's
+    // defect wearing a different attribute.
+    const description = doc.getElementById('fp-starts-error');
+    await expect(description).not.toBeNull();
+    await expect(description.textContent).toBe('Start time must be in the future.');
+
+    // The stated rule, both halves: forwarded props land on the wrapper, which
+    // is the group, and on nothing else. `data-testid` is the non-ARIA case and
+    // has to land on the same element, or the rule is two rules.
+    await expect(group.getAttribute('data-testid')).toBe('session-start-field');
+    await expect(doc.querySelectorAll('[data-testid="session-start-field"]')).toHaveLength(1);
+
+    // Not copied onto the two inputs — "spread onto both and hope" is the thing
+    // the rule exists to rule out.
+    const inputs = within(group).getAllByRole('textbox');
+    await expect(inputs).toHaveLength(2);
+    for (const input of inputs) {
+        await expect(input.hasAttribute('aria-describedby')).toBe(false);
+        await expect(input.hasAttribute('data-testid')).toBe(false);
+    }
+
+    // The spread goes last, but the caller passed no `aria-labelledby`, so the
+    // generated one still names the group and both inputs still resolve.
+    await expectNoDanglingLabels(canvasElement);
+    await expect(within(group).getByRole('textbox', { name: 'Session start Date' })).toBeTruthy();
+    await expect(within(group).getByRole('textbox', { name: 'Session start Time' })).toBeTruthy();
+};
+
+/**
  * The contract the fix must not disturb: a caller who passes `id` keeps the
  * exact ids they passed, on the exact elements they were on before.
  */

@@ -127,6 +127,17 @@ const COMPOSED = [
       'no component stylesheet colouring text in the same token as the surface under it. `Navbar` shipped one for the life of the component at 1.00:1 (#219); axe cannot see this class, because the text sits in a transparent box over a painted ancestor.',
   },
   {
+    script: 'check:unspread-rest',
+    pkg: 'root',
+    guards:
+      'no component in the published library collecting a `...rest` and never using it. ' +
+      '`DateAndTimePicker` dropped every prop beyond its signature for the life of the ' +
+      'component (#230) — React allows an unused rest element and propTypes never sees ' +
+      'unknown props, so the props lost are the unwatched ones: aria-describedby, ' +
+      'data-testid. Same shape as check:token-collision — a silent defect no browser run ' +
+      'can observe, decidable from the file.',
+  },
+  {
     script: 'check:intake-fsm',
     pkg: 'root',
     guards: 'the intake FSM that gates every uno-prototype run.',
