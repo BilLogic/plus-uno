@@ -292,11 +292,22 @@ a.sbdocs-a {
   margin-bottom: 0;
 }
 
-/* Space out major sections with macro spacing */
+/*
+ * Space between major sections.
+ *
+ * Was `clamp(6rem, 8vw, 8rem)` — 96px at desktop, three times the size of the
+ * heading it separates, which read as a gap rather than as rhythm. 64px keeps
+ * sections clearly apart while letting two of them share a screen.
+ *
+ * This block carries `!important` and therefore overrides the three
+ * `.sb-ds-component-docs .sb-ds-doc-section` margin rules above it, despite
+ * those being more specific. Left as one authority on purpose: the value lives
+ * here, and the blocks above only still matter for their `gap`.
+ */
 .sbdocs .sb-ds-doc-section,
 .sbdocs .sb-button-docs .sb-button-doc-section {
-  margin-top: clamp(6rem, 8vw, 8rem) !important;
-  margin-bottom: clamp(6rem, 8vw, 8rem) !important;
+  margin-top: clamp(2.5rem, 5vw, 4rem) !important;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem) !important;
 }
 
 /*
@@ -430,10 +441,28 @@ a.sbdocs-a {
   font-weight: 600 !important;
 }
 
-.sbdocs .sb-ds-component-docs .sb-ds-doc-section > h3,
+/*
+ * A section's own heading — sized and spaced by WHERE IT SITS, not by its tag.
+ *
+ * These were keyed to `h3` alone. ADR-025 promoted every section heading from
+ * `###` to `##` (an `h3` directly under `<Title />`'s `<h1>` was a level skip on
+ * all 48 pages), and the moment the tag moved, this rule stopped matching: the
+ * headings picked up `margin-top: 16px` and jumped from the 28px `h3` bucket to
+ * the 32px `h2` one. Both were silent.
+ *
+ * That is the failure §244 wrote down — a rule keyed to a heading's tag breaks
+ * when the tag changes for outline reasons — so the fix is to stop keying on the
+ * tag at all. `:is()` takes the specificity of its most specific argument, and
+ * every argument here is a bare tag, so this ranks exactly where the old
+ * four-selector list did.
+ */
+.sbdocs .sb-ds-component-docs .sb-ds-doc-section > :is(h2, h3, h4),
 .sbdocs .sb-ds-component-docs .sb-ds-doc-section .sbdocs-h3,
-.sbdocs .sb-button-docs .sb-button-doc-section > h3,
+.sbdocs .sb-button-docs .sb-button-doc-section > :is(h2, h3, h4),
 .sbdocs .sb-button-docs .sb-button-doc-section .sbdocs-h3 {
+  /* The h3 step, whatever the tag: the promotion was for the outline, and it is
+     not allowed to change what the page looks like. */
+  font-size: var(--font-size-h3, 28px) !important;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
