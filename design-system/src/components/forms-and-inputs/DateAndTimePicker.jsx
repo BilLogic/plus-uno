@@ -9,6 +9,11 @@ const DateAndTimePicker = ({
     name,
     label,
     required = false,
+    /**
+     * Hide the field label visually. It is still rendered, still carries
+     * `htmlFor`, and still names the `group` — see the accessibility section in
+     * `DateAndTimePicker.mdx` (#225) for why it cannot take the name away.
+     */
     showLabel = true,
     showSectionLabels = true,
     showDate = true,
@@ -55,9 +60,14 @@ const DateAndTimePicker = ({
      * `-date` / `-time` suffixes they have always had for callers who pass
      * `id`; what changes is that they are now always present, so the label's
      * `htmlFor` reaches one of them instead of reaching nothing.
+     *
+     * `showLabel` is no part of that (#225). It decides whether the label is
+     * *seen*, not whether there is one: a field with a `label` names its group
+     * and both inputs whether or not the text is on screen, which is the
+     * contract `Input` has carried since #213.
      */
     const fieldId = useFieldId(id);
-    const hasLabel = Boolean(showLabel && label);
+    const hasLabel = Boolean(label);
     const labelId = hasLabel ? `${fieldId}-label` : undefined;
     const dateInputId = `${fieldId}-date`;
     const timeInputId = `${fieldId}-time`;
@@ -384,7 +394,7 @@ const DateAndTimePicker = ({
                 <Form.Label
                     id={labelId}
                     htmlFor={showDate ? dateInputId : timeInputId}
-                    className="plus-datetime-label"
+                    className={`plus-datetime-label${showLabel ? '' : ' plus-datetime-label-hidden'}`}
                 >
                     {label}
                     {required && (

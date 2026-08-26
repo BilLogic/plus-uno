@@ -223,11 +223,20 @@ all — which is true of every component in the system and is not something
 `Input` makes especially easy.
 
 The half that `Input` cannot fix is the 19: a label rendered outside the
-component has to be pointed at the input by the caller. Seventeen of them now
-pass `htmlFor` — the Profile sections and the tutor profile page. The remaining
-two are `DateAndTimePicker`, which renders two controls under one label and
-whose own `showLabel` still removes rather than hides; that component was
-outside #213's scope, and it is the same decision waiting to be applied.
+component has to be pointed at the input by the caller. Seventeen of them pass
+`htmlFor` — the Profile sections and the tutor profile page — because each names
+one control.
+
+The last two were `DateAndTimePicker`s under a single shared caption, where
+`htmlFor` was never available: one `<label for>` names one control, and that
+field renders two. #225 settled them from the other end. The visual switch was
+ported — `DateAndTimePicker`'s `showLabel` now clips its label instead of
+deleting it, same clipping, same reasoning — and each picker was given its own
+`label` to clip, so the two controls are named "Start time" and "End time"
+rather than both being called "Time". The visible caption stopped competing for
+that job and names the pair as a `group`. In both components the name now
+belongs to the component; text the caller renders above the field is a caption,
+not a second claim on the name.
 
 </div>
 

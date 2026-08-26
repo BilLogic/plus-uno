@@ -60,8 +60,6 @@ From `design-system/src/components/forms-and-inputs/DateAndTimePicker.scss`. Ove
 
 Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `MultipleChoice` · `NumberInput` · `OptionList` · `Radio` · `RadioButtonGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `DateAndTimePicker` is the right call, only what it accepts.
+> Authored guidance is partial — missing: when to use, correct/incorrect (#166).
