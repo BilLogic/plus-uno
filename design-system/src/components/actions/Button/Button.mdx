@@ -377,6 +377,106 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Use `Button` for anything the user *does*: submit, confirm, open a dialog, run an
+export, dismiss a step. It is the only component in `actions` that carries a
+click handler of its own, and it is the element the rest of the system composes
+when it needs an action — `Modal`, `Card` and `Jumbotron` all render `Button`
+from their `primaryButton` / `secondaryButton` props.
+
+Use it for navigation too, but pass `href`: the component forwards `href` and
+`target` to the underlying element, which renders an anchor. That keeps
+middle-click and "open in new tab" working, which a click handler on a `button`
+does not.
+
+**When not to use**
+
+- **Not for a set of choices.** Three Buttons with `active` look selected but
+  announce nothing — `active` only adds a CSS class. Use `RadioButtonGroup` for
+  a scale, `NavTabs` or `NavPills` for switching views, `Select` for picking a
+  value.
+- **Not for a menu.** A button that opens a list of actions is `Dropdown`, which
+  already supplies `aria-haspopup` and `aria-expanded` on its own toggle.
+- **Not as a progress indicator.** `loading` disables the button, blocks pointer
+  events and makes the label transparent. It is a one-beat "this is going" cue,
+  not a wait indicator. For anything longer, render `Spinner` or `Progress`
+  beside the button so the label stays readable.
+- **Not for curriculum color as severity.** `style` accepts the five SMART
+  domains — `social-emotional`, `mastering-content`, `advocacy`, `relationship`,
+  `technology-tools`. They are subject colors. `success`, `warning` and `danger`
+  are the ones that mean something happened.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Correct and incorrect
+
+**An icon-only button needs a name and needs room.**
+
+```jsx
+// Incorrect — no text and no children means icon-only, which renders 36×36
+// at the default medium size with no accessible name at all.
+<Button leadingVisual="trash" style="danger" />
+
+// Correct — large is the only icon-only size that clears 44×44, and the
+// name has to be supplied by hand.
+<Button leadingVisual="trash" style="danger" size="large" aria-label="Delete session" />
+```
+
+**Loading is not a substitute for feedback.**
+
+```jsx
+// Incorrect — the label goes transparent, so for a ten-second export the
+// button reads as an empty box for ten seconds.
+<Button text="Export report" loading={isExporting} />
+
+// Correct — keep the label, and say what is happening next to it.
+<Button text="Export report" disabled={isExporting} />
+{isExporting && <Spinner />}
+```
+
+**A group of buttons is not a selection control.**
+
+```jsx
+// Incorrect — `active` is a class. Nothing announces which one is chosen.
+<Button text="Week" active={range === 'week'} onClick={() => setRange('week')} />
+<Button text="Month" active={range === 'month'} onClick={() => setRange('month')} />
+
+// Correct — extra props are spread onto the element, so state can be declared.
+<Button text="Week" active={range === 'week'} aria-pressed={range === 'week'}
+        onClick={() => setRange('week')} />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **Icon-only sizing.** With no `text` and no children the component adds
+  `plus-btn--icon-only`, which sets a square box: 28×28 at `small`, 36×36 at
+  `medium`, 48×48 at `large`. Only `large` meets the 44×44 minimum in
+  `design-system/guidelines/foundations/accessibility.md`.
+- **Icon-only naming.** A string `leadingVisual` / `trailingVisual` renders as
+  `<i aria-hidden="true">`, so an icon-only button has no accessible name unless
+  you pass `aria-label` or the `title` prop.
+- **Loading.** `loading` sets `disabled` and `aria-disabled`, drops the click
+  handler, and the stylesheet paints the label transparent while a CSS spinner
+  runs. Nothing is announced. If the wait matters to a screen-reader user, put
+  the status in a live region beside the button.
+- **Disabled.** `disabled` sets both the native attribute and `aria-disabled`.
+  A natively disabled button leaves the tab order, so any explanation of *why*
+  it is disabled must live outside the button, where it can still be reached.
+- **Pass-through.** Unrecognised props are spread onto the rendered element, so
+  `aria-pressed`, `aria-expanded`, `aria-controls` and `aria-describedby` all
+  work without a wrapper.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground

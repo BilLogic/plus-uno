@@ -73,6 +73,100 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Use `Pagination` when a list is split into numbered pages and the user needs to
+move between them or jump to a known one — admin tables of sessions, students,
+tutors. It is fully controlled: `currentPage` and `totalPages` are required, and
+every click calls `onPageChange` with the target page. It holds no state.
+
+The window of numbers is computed for you. `maxVisible` (default 5) centres the
+window on the current page, and first and last pages are pinned with an ellipsis
+whenever the window does not reach them.
+
+**When not to use**
+
+- **Not for a feed.** Continuous content that grows as you scroll is not paged;
+  give it a "load more" `Button`.
+- **Not for step-by-step flows.** "Next" and "Previous" through a wizard is a
+  different control with different labels — this one announces its steps as page
+  numbers and marks one `aria-current="page"`.
+- **Not without `onPageChange`.** Every click calls `preventDefault` first, so
+  with no handler the component renders a row of links that visibly do nothing.
+- **Not as the only navigation for a long table.** It moves between pages; it
+  does not say how many results there are or let the user change the page size.
+  Both of those are yours to render beside it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Correct and incorrect
+
+**It is controlled, so it needs both the page and the handler.**
+
+```jsx
+// Incorrect — nothing happens on click. The component never tracks a page of
+// its own, and without onPageChange each click is preventDefault and stop.
+<Pagination currentPage={1} totalPages={12} />
+
+// Correct.
+<Pagination currentPage={page} totalPages={12} onPageChange={setPage} />
+```
+
+**Text mode is the one that labels its arrows.**
+
+```jsx
+// Incorrect — in the default `icon` type, prevText and nextText are used only
+// as the arrows' aria-labels, so these strings are never visible.
+<Pagination currentPage={page} totalPages={9} onPageChange={setPage}
+            prevText="Back a page" nextText="On a page" />
+
+// Correct — type="text" renders the words; otherwise leave the defaults, which
+// already label the arrows "Previous" and "Next".
+<Pagination currentPage={page} totalPages={9} onPageChange={setPage} type="text" />
+```
+
+**Name the navigation when there is more than one on the page.**
+
+```jsx
+// Incorrect — two paginated tables produce two landmarks both called
+// "Page navigation", the component's default.
+<Pagination currentPage={p1} totalPages={4} onPageChange={setP1} />
+<Pagination currentPage={p2} totalPages={7} onPageChange={setP2} />
+
+// Correct.
+<Pagination ariaLabel="Sessions pages" currentPage={p1} totalPages={4} onPageChange={setP1} />
+<Pagination ariaLabel="Students pages" currentPage={p2} totalPages={7} onPageChange={setP2} />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **The structure is right.** A `nav` labelled by `ariaLabel` (default "Page
+  navigation") wraps a `ul` of `li`s, and the active page carries
+  `aria-current="page"`.
+- **Page numbers announce as bare numbers.** Only the previous and next controls
+  get an `aria-label` — the numbered links get none, so they read as "3", "4",
+  "5". Naming the `nav` is what makes those numbers mean something.
+- **Disabled arrows stay in the DOM.** At the first or last page the arrow gets
+  `aria-disabled="true"` and `tabIndex={-1}`, and the click handler is skipped.
+  It is announced as disabled rather than disappearing, which keeps the control
+  row from reflowing.
+- **The ellipsis is literal.** It renders as three full stops in a span marked
+  `aria-disabled`, so some screen readers will read it out. It is decorative;
+  the pinned first and last pages beside it carry the meaning.
+- **Every control is an anchor with `href="#"`.** They are focusable and
+  activate with Enter, but they are not real destinations — if the page numbers
+  should be linkable or shareable, render your own anchors with real URLs.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground

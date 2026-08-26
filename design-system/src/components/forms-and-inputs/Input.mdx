@@ -84,6 +84,105 @@ The labeled text input box allows users to enter textual inputs and receive vali
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Use `Input` for single-line text entry — names, emails, search boxes, anything
+where the answer is one short string. It is the field that owns its own label,
+its own validation state and its own message, which makes it the right home for
+an error rather than an `Alert` at the top of the form.
+
+`validation` takes `none`, `invalid` or `success`; pair it with
+`validationMessage` and the component renders the message beneath the field with
+a matching icon.
+
+**When not to use**
+
+- **Not for multi-line text.** `Textarea` — and note it does not have
+  `validation` / `validationMessage`, it has a `state` prop and no message slot.
+- **Not for numbers with steppers.** `NumberInput` adds increment and decrement
+  buttons plus `min` / `max` / `step`.
+- **Not for a value from a list.** `Select`, or `MultipleChoice` when every
+  option should be visible.
+- **Not for dates.** `DatePicker` for a date, `DateAndTimePicker` when time is
+  involved — both come with the calendar and the parsing.
+- **Not for an input with an attached control.** A field with a prefix, a
+  button, or a dropdown welded to it is `InputGroup`.
+- **Not as a search field inside a `Select`.** `Select` already renders one when
+  `searchable` is set.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Correct and incorrect
+
+**Always pass `id`, or the label points at nothing.**
+
+```jsx
+// Incorrect — the label's htmlFor falls back to `name`, but `name` is not used
+// as the input's id. The label ends up pointing at an element that does not
+// exist, and clicking it does nothing.
+<Input name="email" label="Email address" value={email} onChange={onEmail} />
+
+// Correct — id is what the input actually receives.
+<Input id="email" name="email" label="Email address" value={email} onChange={onEmail} />
+```
+
+**`required` draws an asterisk; it does not mark the field required.**
+
+```jsx
+// Incorrect — the star appears, but the input carries neither the `required`
+// attribute nor `aria-required`, so nothing outside the visual layer knows.
+<Input id="school" label="School" required value={school} onChange={onSchool} />
+
+// Correct — unknown props are spread onto the input, so declare it as well.
+<Input id="school" label="School" required aria-required="true"
+       value={school} onChange={onSchool} />
+```
+
+**`validation` styles the field; it does not announce the error.**
+
+```jsx
+// Incorrect — red border, red message, and a screen reader that hears none
+// of it. `validation` only adds classes.
+<Input id="email" label="Email" validation="invalid"
+       validationMessage="Enter a valid email address." />
+
+// Correct — say it in ARIA too, and give the message an id to point at.
+<Input id="email" label="Email" validation="invalid"
+       validationMessage="Enter a valid email address."
+       aria-invalid={true} aria-describedby="email-error" />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **`id` is load-bearing.** The label renders `htmlFor={id || name}` while the
+  input only receives `id`. Passing `name` alone silently breaks the
+  association — the single most common way this component goes wrong.
+- **`showLabel={false}` removes the label, it does not hide it visually.** The
+  label element is not rendered at all, so the field has only a placeholder.
+  Placeholders are not labels; pass `aria-label` when you turn the visible label
+  off.
+- **`required` is visual only.** It renders a `*` span marked
+  `aria-label="required"` and is not forwarded to the input.
+- **`validation` is visual only.** It adds `plus-input-invalid` or
+  `plus-input-success` and renders the message with an `aria-hidden` icon. It
+  sets no `aria-invalid`, and does not link `validationMessage` to the input.
+  Pass `aria-invalid` and `aria-describedby` yourself — they are spread onto the
+  input.
+- **Everything else passes through.** `type`, `autoComplete`, `maxLength`,
+  `pattern`, `inputMode` and any `aria-*` attribute all reach the input element,
+  so the native affordances are available even though the wrapper does not use
+  them.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground

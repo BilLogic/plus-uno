@@ -100,6 +100,114 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Use `Dropdown` for a menu of *actions* hanging off a control — a row's overflow
+menu, a "more" button, a set of export formats. Items are described as data
+(`items`), each with its own `onClick`, and the menu closes after a click unless
+that item opts out.
+
+It is the only component in `forms-and-inputs` that places itself: the menu
+flips up when there is no room below and right-aligns when a left-aligned menu
+would run off the edge, remeasuring on scroll and resize.
+
+**When not to use**
+
+- **Not to hold a form value.** A control whose job is to store what the user
+  picked is `Select` — it keeps the value, shows it in the trigger, and supports
+  multi-select and search. `Dropdown` fires handlers and forgets.
+- **Not for a long list.** There is no search, no virtualisation, and the menu is
+  capped at 320px wide. Past a dozen items, use `Select` with `searchable`.
+- **Not for rich content.** Items render a fixed row — check mark or checkbox,
+  optional leading icon, text, optional trailing icon, optional counter. Anything
+  else belongs in a `Popover`.
+- **Not in controlled mode unless the parent also owns closing.** Passing
+  `isOpen` disables the internal toggle *and* the click-outside close, and there
+  is no `onToggle` prop to tell you the user asked to close it. A controlled
+  `Dropdown` is a static open menu.
+- **`split` is presentation only.** The label half of a split button renders with
+  no click handler, and no prop supplies one. Use it to show the split treatment;
+  do not expect a primary action from it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Correct and incorrect
+
+**Controlled mode has no way out.**
+
+```jsx
+// Incorrect — `isOpen` freezes the component. Clicking the toggle does nothing,
+// clicking outside does nothing, and there is no callback to set state from.
+<Dropdown isOpen={open} buttonText="Actions" items={items} />
+
+// Correct — let the component own its own open state, and close from an item.
+<Dropdown buttonText="Actions" items={items} />
+```
+
+**A menu of actions is not a picker.**
+
+```jsx
+// Incorrect — the selection is not stored anywhere. `selected` is a per-item
+// display flag the caller has to keep in sync by hand, and the trigger keeps
+// showing "Sort by".
+<Dropdown
+  buttonText="Sort by"
+  items={[{ text: 'Newest', onClick: () => setSort('newest') }]}
+/>
+
+// Correct — a value the user picks belongs in Select.
+<Select
+  id="sort"
+  options={[{ value: 'newest', label: 'Newest' }]}
+  value={sort}
+  onChange={setSort}
+/>
+```
+
+**Give the split treatment a real button when the label must act.**
+
+```jsx
+// Incorrect — clicking "Save" does nothing. The label half of a split button
+// carries no handler and takes no prop for one.
+<Dropdown split buttonText="Save" items={saveOptions} />
+
+// Correct — a real Button beside a Dropdown for the extra options.
+<Button text="Save" onClick={save} />
+<Dropdown buttonText="Save options" items={saveOptions} />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **The toggle is well formed.** It is a real `button` with `aria-haspopup` and
+  a live `aria-expanded`. In `split` mode it also gets an `aria-label` built
+  from `buttonText` plus the word "options", which is why the toggle half of a
+  split button renders no visible text.
+- **The menu is not an ARIA menu.** The container is a plain div and each item is
+  a `button`; there is no `role="menu"` or `role="menuitem"`, no arrow-key
+  navigation, and no Escape-to-close. Items are reached by tabbing, which works
+  but does not match the menu pattern a screen-reader user expects.
+- **Closing is mouse-driven.** The outside-click listener is bound to
+  `mousedown` only. A keyboard user leaves the menu by tabbing past it, not by
+  dismissing it.
+- **A custom `toggle` loses keyboard access.** The node you pass is wrapped in a
+  `div` with an `onClick` and no role, tabindex or key handler — so it is
+  clickable and nothing else. Pass a `Button` as the trigger only if you are
+  willing to lose that; otherwise use the built-in toggle.
+- **Icons are decorative — mostly.** The selected check mark, the multi-select
+  checkbox and `leadingIcon` are all `aria-hidden`. `trailingIcon` and the
+  submenu caret are not, so an icon font glyph there can leak into the item's
+  announced name. Keep the item's meaning in `text` either way.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground

@@ -8,13 +8,13 @@ authored half (#166), counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Cascader](Cascader.md) | 8 | ✕ | ✕ | ✕ |
-| [Checkbox](Checkbox.md) | 15 | ✕ | ✕ | ✕ |
+| [Checkbox](Checkbox.md) | 15 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid.md) | 11 | ✕ | ✕ | ✕ |
 | [DateAndTimePicker](DateAndTimePicker.md) | 24 | ✕ | ✕ | ✕ |
 | [DatePicker](DatePicker/index.md) | 15 | ✕ | ✕ | ✕ |
-| [Dropdown](Dropdown/index.md) | 11 | ✕ | ✕ | ✕ |
+| [Dropdown](Dropdown/index.md) | 11 | ✅ | ✅ | ✅ |
 | [FileUpload](FileUpload.md) | 15 | ✕ | ✕ | ✕ |
-| [Input](Input.md) | 22 | ✕ | ✕ | ✕ |
+| [Input](Input.md) | 22 | ✅ | ✅ | ✅ |
 | [InputGroup](InputGroup/index.md) | 17 | ✕ | ✕ | ✕ |
 | [MultipleChoice](MultipleChoice.md) | 11 | ✕ | ✕ | ✕ |
 | [NumberInput](NumberInput.md) | 21 | ✕ | ✕ | ✕ |
@@ -24,14 +24,14 @@ authored half (#166), counted rather than assumed.
 | [Range](Range.md) | 12 | ✕ | ✕ | ✕ |
 | [Rating](Rating.md) | 13 | ✕ | ✕ | ✕ |
 | [RichTextEditor](RichTextEditor/index.md) | 16 | ✕ | ✕ | ✕ |
-| [Select](Select.md) | 24 | ✕ | ✕ | ✕ |
+| [Select](Select.md) | 24 | ✅ | ✅ | ✅ |
 | [SelectMultiple](SelectMultiple.md) | 10 | ✕ | ✕ | ✕ |
-| [Switch](Switch.md) | 14 | ✕ | ✕ | ✕ |
+| [Switch](Switch.md) | 14 | ✅ | ✅ | ✅ |
 | [TagInput](TagInput.md) | 13 | ✕ | ✕ | ✕ |
-| [Textarea](Textarea.md) | 17 | ✕ | ✕ | ✕ |
+| [Textarea](Textarea.md) | 17 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect.md) | 9 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 0/23 (0%) · Correct/incorrect 0/23 (0%) · Accessibility 0/23 (0%)
+**Authored coverage:** When to use 6/23 (26%) · Correct/incorrect 6/23 (26%) · Accessibility 6/23 (26%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

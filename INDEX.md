@@ -84,7 +84,14 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
+| [`design-system/guidelines/components/actions.md`](design-system/guidelines/components/actions.md) | Which action component to reach for — Button and ButtonGroup, and what neither of them is |
+| [`design-system/guidelines/components/forms-and-inputs.md`](design-system/guidelines/components/forms-and-inputs.md) | Twenty-three input components sorted by the shape of the answer, plus the id and validation rules that apply across all of them |
+| [`design-system/guidelines/components/layout-and-structure.md`](design-system/guidelines/components/layout-and-structure.md) | Nine container components sorted by what is being contained, plus the three pairs that get confused |
+| [`design-system/guidelines/components/messaging.md`](design-system/guidelines/components/messaging.md) | Alert, Toast or Modal — choosing by how long the message lives and whether it blocks |
+| [`design-system/guidelines/components/navigation.md`](design-system/guidelines/components/navigation.md) | Six navigation components sorted by what the user is moving between |
+| [`design-system/guidelines/components/overlays.md`](design-system/guidelines/components/overlays.md) | Tooltip or Popover — hover description versus click-triggered content |
 | [`design-system/guidelines/components/overview.md`](design-system/guidelines/components/overview.md) | What each component is for, when to reach for it, and how it composes |
+| [`design-system/guidelines/components/status-and-loading.md`](design-system/guidelines/components/status-and-loading.md) | Badge, Progress or Spinner — labelling state versus showing work in flight |
 | [`design-system/guidelines/composition/forms.md`](design-system/guidelines/composition/forms.md) | How PLUS form elements compose inside surfaces |
 | [`design-system/guidelines/composition/hierarchy.md`](design-system/guidelines/composition/hierarchy.md) | Every PLUS surface sits at one of four context levels |
 | [`design-system/guidelines/composition/layout.md`](design-system/guidelines/composition/layout.md) | If you are building a full page (like a dashboard, student list, or toolkit), you MUST wrap the entire page in the <PageLayout> component |
@@ -196,6 +203,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-125 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+132 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 raw eval data are deliberately not indexed — they record what happened rather
 than telling you what to do.

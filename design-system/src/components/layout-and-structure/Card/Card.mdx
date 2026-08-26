@@ -82,6 +82,104 @@ A card is a flexible and extensible content container. Cards support a wide vari
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Use `Card` for a bounded piece of content that stands on its own — a session
+summary in a list, a tutor's stats block, a dashboard tile. The props map to the
+regions in order: `image`, `header`, then a body of `title` / `subtitle` /
+`body` / `children`, an optional `items` list, and a footer built from `footer`,
+`links` and `actionButton`.
+
+Padding, gap, radius and border are token-backed size props (`paddingSize`,
+`gapSize`, `radiusSize`, `borderSize`), so a card should never need custom CSS
+for spacing.
+
+**When not to use**
+
+- **Not as a generic div.** A card draws a bordered surface. Grouping without a
+  visible boundary is layout, not a card — see
+  `design-system/guidelines/composition/layout.md`.
+- **Not for a page-level hero.** That is `Jumbotron`, which has the same padding
+  and gap system plus a `fluid` mode and a two-button footer.
+- **Not for a media-and-text row.** A thumbnail beside a paragraph is
+  `MediaObject`, which owns the alignment variants for exactly that shape.
+- **Not as a link.** `onClick` sets a pointer cursor and attaches a handler to
+  the card element — it adds no role, no tab stop and no key handler, so the
+  whole card becomes mouse-only. Put the navigation in `links` or
+  `actionButton`, both of which render real controls.
+- **Not for tabular data.** Repeating the same four fields across twenty cards
+  is a table.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Correct and incorrect
+
+**A clickable card is not a keyboard-reachable card.**
+
+```jsx
+// Incorrect — mouse-only. No role, no tabindex, no Enter or Space.
+<Card title="Algebra · Tue 4pm" onClick={() => open(session)} />
+
+// Correct — the action is a real control inside the card.
+<Card
+  title="Algebra · Tue 4pm"
+  actionButton={{ text: 'Open session', onClick: () => open(session) }}
+/>
+```
+
+**`header` and `footer` take strings, not nodes.**
+
+```jsx
+// Incorrect — both are declared as PropTypes.string, so a node here warns
+// even though it happens to render.
+<Card header={<Badge text="Live" />} footer={<Timestamp value={t} />} />
+
+// Correct — strings in the string slots, nodes in the body.
+<Card header="Live session" footer="Updated 4 minutes ago">
+  <Badge text="Live" style="success" />
+</Card>
+```
+
+**Radius has two values here, not three.**
+
+```jsx
+// Incorrect — `radiusSize` on Card accepts only `sm` and `md`. (Modal and
+// Jumbotron accept `lg`; Card does not.)
+<Card radiusSize="lg" title="Weekly summary" />
+
+// Correct.
+<Card radiusSize="md" title="Weekly summary" />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **The card title is not a heading.** `title` renders through the underlying
+  card title, which is a `div` carrying an `h5` class — visual weight without
+  document structure. If the card starts a section a screen-reader user should
+  be able to jump to, put a real heading in `children` and leave `title` unset.
+- **`onClick` on the card adds no semantics.** No `role`, no `tabIndex`, no key
+  handling — only `cursor: pointer`. Unknown props are spread onto the card
+  element, so `role`, `tabIndex` and `onKeyDown` can be added by hand, but a real
+  `Button` or link inside the card is the better answer.
+- **The action button stops propagation.** `actionButton`'s handler calls
+  `stopPropagation` before yours runs, so it will not also fire a card-level
+  `onClick`. That is deliberate, and it is the reason the two can coexist.
+- **Links need real destinations.** A `links` entry with no `href` falls back to
+  `#`; supplying `onClick` alone gives you a link that goes nowhere for anyone
+  navigating by link list. Give every link an `href`.
+- **Images carry no alt.** A string `image` renders the card image with no `alt`
+  attribute. If the image carries meaning, pass a node you control instead.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground

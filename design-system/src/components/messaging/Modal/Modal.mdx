@@ -74,6 +74,110 @@ Add dialogs to your site for lightboxes, user notifications, or completely custo
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Use `Modal` when the next step has to happen before anything else can — a
+destructive confirmation, a short form that would derail the page, a detail view
+that the user will close and return from. It is the only messaging component
+that takes focus away from the page, so use it when interrupting is the point.
+
+The footer is built in: pass `primaryButton` and `secondaryButton` as objects and
+the component renders the `Button` pair for you, with a divider above them.
+
+**When not to use**
+
+- **Not for a message the user only has to read.** A result that needs no
+  decision is `Toast` if it is transient, `Alert` if it stays on the page.
+- **Not for long content.** The default width is 340px and the whole width
+  system is fixed — `width` sets `width`, `minWidth` and `maxWidth` to the same
+  value, so the dialog never adapts to its content. `type="scrollable"` gives you
+  a scrolling body at that width; anything wider than a short form belongs on a
+  page.
+- **Not for a menu or a picker.** A list of choices anchored to a control is
+  `Dropdown`, `Select` or `Popover` — all three keep the page context that a
+  modal deliberately removes.
+- **`renderAs="inline"` is not a dialog.** It returns the modal's chrome as an
+  ordinary block in the flow, with no backdrop, no focus trap and no Escape
+  handling. It exists so the shell can be shown inside a docs page or a spec.
+  Never ship it as the real dialog.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Correct and incorrect
+
+**Do not use the inline render for a live dialog.**
+
+```jsx
+// Incorrect — no backdrop, no focus trap, no Escape. The page behind stays
+// fully interactive and keyboard users can tab straight past the dialog.
+<Modal renderAs="inline" title="Delete session" show={open} onClose={close} />
+
+// Correct — the default `renderAs="modal"` wraps the content in the real
+// dialog, which handles the backdrop, focus and Escape.
+<Modal title="Delete session" show={open} onClose={close} />
+```
+
+**Width must be a length the component recognises.**
+
+```jsx
+// Incorrect — `clamp(...)` is not in the allowlist, so this silently falls back
+// to 340px (with a console warning in development only).
+<Modal width="clamp(320px, 50vw, 640px)" title="Reschedule" show={open} onClose={close} />
+
+// Correct — a plain number, a px/rem/% length, or a CSS custom property.
+<Modal width={480} title="Reschedule" show={open} onClose={close} />
+```
+
+**The footer only appears when you give it a button.**
+
+```jsx
+// Incorrect — `showBottomButtons` defaults to true, but with neither button
+// supplied the footer and its divider are not rendered at all, so the dialog
+// ends with no way to confirm.
+<Modal title="Reschedule" show={open} onClose={close}>{form}</Modal>
+
+// Correct — describe the actions; the component renders the Button pair.
+<Modal
+  title="Reschedule"
+  show={open}
+  onClose={close}
+  secondaryButton={{ text: 'Cancel', onClick: close }}
+  primaryButton={{ text: 'Reschedule', onClick: submit }}
+>
+  {form}
+</Modal>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **Escape and backdrop click are on by default.** `keyboard` and `backdrop`
+  both default to `true`. Turning either off leaves the header close button as
+  the only exit, so keep that button — it is only rendered when the modal is not
+  in body-only mode (`title` absent *and* `showBottomButtons` false).
+- **The close button is labelled `Close modal`**, hard-coded. Its icon is
+  `aria-hidden`.
+- **The title is not the dialog's accessible name.** It renders as a styled div
+  inside the dialog, and the component does not spread unknown props, so there
+  is no way to pass `aria-labelledby` through it. Assume the dialog is announced
+  without a name and put the essential wording in the first line of the body.
+- **A scrollable body is focusable.** `type="scrollable"` sets `tabIndex={0}` on
+  the body so a keyboard user can scroll it — this is deliberate, and satisfies
+  the axe `scrollable-region-focusable` rule.
+- **Focus handling comes from the underlying dialog.** `enforceFocus`,
+  `autoFocus` and `restoreFocus` are forwarded untouched; leave them alone unless
+  you have a specific reason, because the defaults are what trap focus inside the
+  dialog and return it to the trigger on close.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground

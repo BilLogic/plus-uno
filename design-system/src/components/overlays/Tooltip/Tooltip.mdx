@@ -63,6 +63,107 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Use `Tooltip` for a short label on a control whose purpose is not obvious from
+what you can see — an icon-only `Button`, a truncated cell, an abbreviation. It
+wraps a single trigger element and shows on hover and focus by default, after
+250ms, hiding 400ms after you leave.
+
+**When not to use**
+
+- **Not for content the user needs.** A tooltip is unreachable on touch, is
+  hidden until hovered, and disappears when the pointer moves. Anything a person
+  must read to complete a task belongs on the page.
+- **Not for anything interactive.** There is nowhere to put a link or a button
+  the user can reach — the pointer has to travel over the gap and the tooltip
+  hides. Use `Popover`, which is click-triggered and holds a title and a body.
+- **Not as the only name for an icon-only control.** Give the control an
+  `aria-label` (or `Button`'s `title` prop) as well; a tooltip is a description,
+  not a name.
+- **Not on a bare string.** The trigger must be a single element that accepts a
+  ref. A raw string, a fragment, or a function component that does not forward
+  its ref will fail to position — `Popover` wraps a non-element trigger in a
+  focusable span, `Tooltip` does not.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Correct and incorrect
+
+**A tooltip describes; it does not name.**
+
+```jsx
+// Incorrect — the icon-only button has no accessible name of its own, so it is
+// announced as "button" with a description hanging off it.
+<Tooltip text="Archive session">
+  <Button leadingVisual="box-archive" size="large" />
+</Tooltip>
+
+// Correct — name the control, then describe it.
+<Tooltip text="Moves this session out of the active list">
+  <Button leadingVisual="box-archive" size="large" aria-label="Archive session" />
+</Tooltip>
+```
+
+**Controlled mode ignores the trigger and the delays.**
+
+```jsx
+// Incorrect — once `show` is defined, the component takes a different branch
+// entirely. `trigger`, `delayShow` and `delayHide` are all dead, and the
+// tooltip is exactly as visible as the boolean says.
+<Tooltip text="Saved" show={justSaved} trigger="hover" delayHide={2000}>
+  <Button text="Save" />
+</Tooltip>
+
+// Correct — let the component drive itself for hover, and use Toast for a
+// transient confirmation.
+<Tooltip text="Save this draft"><Button text="Save" /></Tooltip>
+```
+
+**Do not put anything reachable inside it.**
+
+```jsx
+// Incorrect — the link cannot be clicked. Moving the pointer toward it leaves
+// the trigger, and the tooltip hides.
+<Tooltip text={<a href="/help">Read the guide</a>}>
+  <Button leadingVisual="circle-question" size="large" aria-label="Help" />
+</Tooltip>
+
+// Correct — a Popover is the overlay that holds content you can interact with.
+<Popover title="Scheduling" trigger={<Button leadingVisual="circle-question"
+         size="large" aria-label="Help" />}>
+  <a href="/help">Read the guide</a>
+</Popover>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **Focus shows it.** The default trigger is `['hover', 'focus']`, so a keyboard
+  user tabbing to the control gets the tooltip. Overriding `trigger` to `'hover'`
+  alone removes that — do not.
+- **It is wired as a description.** The overlay renders with `role="tooltip"`,
+  and the positioning layer adds `aria-describedby` on the trigger pointing at
+  it. That is a description, which is why the trigger still needs its own name.
+- **Touch has no hover.** There is no tap-to-show behaviour, so on a touch
+  device the tooltip is simply absent. Never let it carry the only copy of
+  anything.
+- **No Escape.** There is no dismiss key and no way to move focus into the
+  tooltip, which is the other half of the reason it must stay non-interactive.
+- **The generated id is random.** With no `id`, the overlay gets one built from
+  `Math.random` and held in a ref: stable for the life of the instance, but
+  different on every mount and different between server and client. Pass `id`
+  when the value has to be predictable.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground

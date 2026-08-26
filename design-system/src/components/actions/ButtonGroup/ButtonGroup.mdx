@@ -94,6 +94,109 @@ Buttons can be grouped together as individual segments of related actions.
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Use `ButtonGroup` when two or more actions belong together and should read as one
+control — a toolbar above a table, a pair of view switches, a vertical stack of
+related commands. It applies `size`, `style` and `fill` down to its children so
+the group stays visually consistent without repeating those props on every
+button.
+
+Pass the buttons either way: an array of configs via `buttons`, or `Button`
+children. Children win when both are given.
+
+**When not to use**
+
+- **Not for a dialog or card footer.** `Modal` and `Jumbotron` render their own
+  buttons from `primaryButton` and `secondaryButton`, and `Card` from
+  `actionButton`; a `ButtonGroup` there fights those layouts.
+- **Not as a radio group.** `role="group"` is not `radiogroup`, and per-button
+  `active` is only a CSS class — nothing announces which one is chosen and there
+  is no roving tab order. A value the user picks is `RadioButtonGroup` or
+  `Select`.
+- **Not as a tab bar.** Switching between views is `NavTabs` or `NavPills`.
+- **Not for the full Button palette.** The group's `style` accepts seven values
+  and `fill` four — `default` and the five SMART domain colors are not among the
+  group's `style` values, and `text` is not among its `fill` values. Set those on
+  the individual button instead.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Correct and incorrect
+
+**A group of buttons is not a selection.**
+
+```jsx
+// Incorrect — looks like a segmented control, announces as three buttons in a
+// group with no selected state.
+<ButtonGroup ariaLabel="Date range" buttons={[
+  { text: 'Week', active: range === 'week', onClick: () => setRange('week') },
+  { text: 'Month', active: range === 'month', onClick: () => setRange('month') },
+]} />
+
+// Correct — `props` on a button config is spread onto the Button, and Button
+// spreads unknown props onto the element, so the state can be declared.
+<ButtonGroup ariaLabel="Date range" buttons={[
+  { text: 'Week', active: range === 'week', onClick: () => setRange('week'),
+    props: { 'aria-pressed': range === 'week' } },
+  { text: 'Month', active: range === 'month', onClick: () => setRange('month'),
+    props: { 'aria-pressed': range === 'month' } },
+]} />
+```
+
+**Group-level style is a narrower set than Button's.**
+
+```jsx
+// Incorrect — `social-emotional` is a valid Button style but not a valid
+// ButtonGroup style, so this trips a propTypes warning.
+<ButtonGroup style="social-emotional" buttons={actions} />
+
+// Correct — keep the group on a semantic style and override per button.
+<ButtonGroup style="secondary" buttons={[
+  { text: 'Social-emotional', style: 'social-emotional' },
+  { text: 'Advocacy', style: 'advocacy' },
+]} />
+```
+
+**Name the group.**
+
+```jsx
+// Incorrect — role="group" with no name. A screen reader announces "group"
+// and the user has to infer what the three buttons belong to.
+<ButtonGroup buttons={rowActions} />
+
+// Correct — `ariaLabel` becomes the group's aria-label.
+<ButtonGroup ariaLabel="Session actions" buttons={rowActions} />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **The group is a named container, nothing more.** It renders `role="group"` by
+  default, and `ariaLabel` is the only prop that names it. An unnamed group
+  is worse than no group, because it adds a boundary with no explanation.
+- **`role="group"` does not imply arrow keys.** Tab moves between the buttons,
+  one stop each. That is correct for a toolbar of actions and wrong for a
+  segmented picker — which is the reason a picker belongs elsewhere.
+- **`active` is presentational.** It adds the `active` class and nothing else.
+  Toggle state has to be declared with `aria-pressed`, passed through a button
+  config's `props` object.
+- **Children are cloned, not validated.** Any element child has `size`, `style`
+  and `fill` injected unless it already sets them. Non-`Button` children still
+  get those props, which React will warn about if they reach a DOM element.
+- **The buttons keep their own rules.** Sizing, icon-only naming and the
+  disabled behaviour described on the `Button` page all still apply inside a
+  group.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground

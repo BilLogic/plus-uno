@@ -84,6 +84,122 @@ Use a select input when a user needs to select one or multiple options from a lo
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Use `Select` when the user picks from a known list of values and the choice is
+part of a form's data. It covers the cases a plain list of radios cannot:
+`mode="multi"` for several values shown as dismissible badges in the trigger,
+`searchable` for lists long enough to need filtering, `creatable` for lists the
+user may extend.
+
+`Select` composes the rest of the system — `Badge` for the selected values,
+`ListGroup` for multi-select options, `Input` for the search field — so it stays
+visually consistent with the fields around it.
+
+**When not to use**
+
+- **Not for actions.** A trigger that opens a list of *things to do* is
+  `Dropdown`. `Select` holds a value; `Dropdown` fires handlers.
+- **Not for five or fewer options that all fit.** `MultipleChoice` (or `Radio` /
+  `Checkbox` directly) shows every option at once, which is faster to scan and
+  keyboard-native.
+- **Not for hierarchical values.** Parent-child options are `TreeSelect`;
+  drill-down columns are `Cascader`.
+- **Not inside a native form you intend to submit.** `Select` renders no form
+  control — the trigger is a `div` and the options are buttons — so `name` never
+  produces a submitted value. Read the value from `onChange` and hold it in
+  state.
+- **`required`, `onFocus` and `onBlur` are declared but never wired.** They are
+  in `propTypes` and destructured, and then not used anywhere in the render.
+  Do not rely on them; validate on `onChange` instead.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Correct and incorrect
+
+**Do not expect form semantics that are not there.**
+
+```jsx
+// Incorrect — none of these three do anything. There is no hidden input for
+// `name` to name, and `required` and `onBlur` are dropped on the floor.
+<form onSubmit={submit}>
+  <Select name="grade" options={grades} required onBlur={validate} />
+</form>
+
+// Correct — controlled value, validation driven from onChange.
+<Select
+  id="grade"
+  options={grades}
+  value={grade}
+  onChange={(next) => { setGrade(next); setGradeError(!next); }}
+/>
+```
+
+**`onChange` hands you the value, not an event.**
+
+```jsx
+// Incorrect — there is no event. `handleSelect` calls `onChange(newValue)`
+// with a string in single mode and an array in multi mode, so this throws.
+<Select options={grades} onChange={(e) => setGrade(e.target.value)} />
+
+// Correct — take the value straight.
+<Select options={grades} onChange={(value) => setGrade(value)} />
+```
+
+**Label it, because the component will not.**
+
+```jsx
+// Incorrect — the trigger is a div with role="button" and no name. A screen
+// reader announces "button", and nothing more.
+<Select id="subject" options={subjects} value={subject} onChange={setSubject} />
+
+// Correct — a visible label wired to the trigger by id.
+<label htmlFor="subject">Subject</label>
+<Select id="subject" options={subjects} value={subject} onChange={setSubject} />
+```
+
+**Multi-select badges are dismissible only when the field is live.**
+
+```jsx
+// Incorrect — expecting the badges to still be removable while read-only.
+// `readonly` (and `disabled`) turn the badge X off, by design.
+<Select mode="multi" readonly value={selected} options={topics} onChange={setTopics} />
+
+// Correct — read-only shows the values; the editable field lets them go.
+<Select mode="multi" value={selected} options={topics} onChange={setTopics} />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **This is not a native `select` and not an ARIA combobox.** The trigger is a
+  `div` with `role="button"` and `tabIndex={0}`; the options are `button`
+  elements in single mode and `ListGroup` options in multi mode. There is no
+  `aria-expanded` on the trigger and no `aria-activedescendant`, so the open
+  list is not announced as a list of options.
+- **Keyboard.** The trigger is reachable and can be activated, but there is no
+  arrow-key navigation between options — the options are reached by tabbing.
+  Keep the option list short, or use `MultipleChoice` where every option is a
+  native radio or checkbox.
+- **Name the trigger.** `id` is forwarded to the trigger element, so an external
+  `label htmlFor` is the reliable way to give it a name.
+- **The search field has a placeholder, not a label.** It is a real `Input`
+  rendered internally with `showLabel={false}` and the placeholder `Search`, and
+  the component exposes no prop to label it. That is a known gap, not something
+  the call site can fix.
+- **Selected values are `Badge`s.** Each carries the same hard-coded `Dismiss`
+  label, so a multi-select with several values exposes several identically named
+  buttons.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground

@@ -81,6 +81,112 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Use `NavTabs` for the underlined tab bar that switches between sibling views of
+the same subject — a student's Overview / Sessions / Progress, or the sections of
+an admin page. Compose it from `NavTabs.Item` children, and hang a
+`NavTabs.Dropdown` off the bar when one tab needs to fan out.
+
+It can be uncontrolled (`defaultActiveKey`) or controlled (`activeKey` plus
+`onSelect`). `alignment` covers left, centre, right and `justified`, which
+stretches the tabs to fill the bar.
+
+**When not to use**
+
+- **Not for navigating away.** Tabs imply the content stays in place. Moving to
+  a different page in a hierarchy is `Breadcrumb` plus real links; a sidebar
+  destination is `SidebarTab`.
+- **Not for a pill bar.** `NavPills` is the same component family with the pill
+  treatment and a `vertical` direction. Pick on appearance and orientation, not
+  behaviour — they behave identically.
+- **Not for more tabs than fit.** There is no overflow handling and no scroll.
+  Past about six, move the extras into a `NavTabs.Dropdown` or switch to a
+  sidebar.
+- **Not for a filter.** Tabs switch what you are looking at; narrowing a list is
+  `Select` or a row of dismissible `Badge`s.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Correct and incorrect
+
+**A controlled bar needs `onSelect`, or it will never move.**
+
+```jsx
+// Incorrect — activeKey pins the bar and nothing updates it.
+<NavTabs activeKey="overview">
+  <NavTabs.Item eventKey="overview">Overview</NavTabs.Item>
+  <NavTabs.Item eventKey="sessions">Sessions</NavTabs.Item>
+</NavTabs>
+
+// Correct.
+<NavTabs activeKey={tab} onSelect={setTab}>
+  <NavTabs.Item eventKey="overview">Overview</NavTabs.Item>
+  <NavTabs.Item eventKey="sessions">Sessions</NavTabs.Item>
+</NavTabs>
+```
+
+**Give each item an `eventKey` or an `href` — selection is keyed off one of them.**
+
+```jsx
+// Incorrect — with neither, there is no key to compare against activeKey, so
+// the item never shows as active and onSelect fires with nothing useful.
+<NavTabs activeKey={tab} onSelect={setTab}>
+  <NavTabs.Item>Overview</NavTabs.Item>
+</NavTabs>
+
+// Correct.
+<NavTabs activeKey={tab} onSelect={setTab}>
+  <NavTabs.Item eventKey="overview">Overview</NavTabs.Item>
+</NavTabs>
+```
+
+**If it must behave as an ARIA tab widget, it needs the tab container.**
+
+```jsx
+// Incorrect — assuming role="tab" and arrow keys come for free. They do not:
+// standalone, this renders as a row of links.
+<NavTabs activeKey={tab} onSelect={setTab}>{items}</NavTabs>
+
+// Correct — wrap it in react-bootstrap's Tab.Container, which is what supplies
+// the tablist context, aria-selected and left/right arrow navigation.
+<Tab.Container activeKey={tab} onSelect={setTab}>
+  <NavTabs>{items}</NavTabs>
+  <Tab.Content>{panes}</Tab.Content>
+</Tab.Container>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **Standalone, this is a row of links, not a tab widget.** The underlying nav
+  only applies `role="tablist"` — and therefore `role="tab"` and `aria-selected`
+  on each item — when it sits inside a tab container. `NavTabs` does not provide
+  one. An item with a real `href` renders as an ordinary link; an item with only
+  an `eventKey` renders as an anchor with `role="button"` and `href="#"`.
+- **Arrow keys are gated on the same context.** The library's key handler
+  returns immediately when there is no tab context, so left/right arrow
+  navigation does not work in a standalone `NavTabs` even if you set
+  `role="tablist"` yourself.
+- **Tab still works.** Each item is focusable and activates with Enter, so the
+  bar is operable by keyboard either way — it is the *semantics* that are
+  missing, not the operation.
+- **`disabled` is honoured.** A disabled item loses its `href`, gains
+  `aria-disabled`, and stops responding to clicks — so it drops out of the tab
+  order rather than sitting there as a dead-looking link.
+- **The bar has no name.** Extra props are spread onto the nav element, so
+  `aria-label` is the way to say what this set of tabs is for — especially when
+  a page carries more than one.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground
