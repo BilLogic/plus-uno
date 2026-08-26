@@ -88,6 +88,12 @@ const COMPOSED = [
       'every relative markdown link in skills/ agents/ docs/ design-system/guidelines/ + root, and the repo paths inside the JSON indexes.',
   },
   {
+    script: 'check:doc-identifiers',
+    pkg: 'root',
+    guards:
+      'every prop, variant, size and design token named in a docs page resolving to something in source. This is the #78 / #79 / #98 defect class — three fabricated-name fixes by hand in one day, 2026-08-25.',
+  },
+  {
     script: 'check:figma-links',
     pkg: 'root',
     guards: 'the generated Figma-links spreadsheet against the component MDX it is built from.',
