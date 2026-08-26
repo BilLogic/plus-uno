@@ -28,13 +28,31 @@ const steps = [
   ['Knowledge audit spreadsheet', `node scripts/generate-knowledge-audit.js${flag}`],
 ];
 
-console.log('generate:agent — refreshing agent artifacts from design-system SSOT\n');
+console.log(
+  check
+    ? 'check:agent — verifying committed agent artifacts against design-system SSOT (read-only)\n'
+    : 'generate:agent — refreshing agent artifacts from design-system SSOT\n',
+);
 
 for (const [label, cmd] of steps) {
   console.log(`▸ ${label}`);
-  execSync(cmd, { stdio: 'inherit', cwd: REPO_ROOT });
+  try {
+    execSync(cmd, { stdio: 'inherit', cwd: REPO_ROOT });
+  } catch (err) {
+    // execSync throws an Error carrying the child's status, and letting it
+    // escape buries the step's own diagnostic under a Node stack trace. The
+    // step already said what is wrong on stderr; all this layer owes the
+    // reader is which step failed and the same exit code.
+    console.error(`\n✗ ${check ? 'check' : 'generate'}:agent failed at: ${label}`);
+    console.error(`  ${cmd}`);
+    process.exit(typeof err.status === 'number' ? err.status : 1);
+  }
 }
 
-console.log('\n✓ generate:agent complete');
-console.log('  Entry: design-system/guidelines/overview.md');
-console.log('  Views: design-system/agent-views/');
+if (check) {
+  console.log('\n✓ check:agent complete — every generated artifact matches its source. Nothing was written.');
+} else {
+  console.log('\n✓ generate:agent complete');
+  console.log('  Entry: design-system/guidelines/overview.md');
+  console.log('  Views: design-system/agent-views/');
+}
