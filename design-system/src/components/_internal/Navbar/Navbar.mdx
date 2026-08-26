@@ -71,6 +71,41 @@ Horizontal navigation bar with a brand slot and a list of links.
 
 </DocsCanvasShell>
 
+`backgroundColor` names three background treatments, not three elevation steps.
+`dark` is a genuinely dark bar: `--color-inverse-surface` (`#2e3133`) with
+`--color-inverse-on-surface` (`#f0f1f3`) brand and link text, which is 11.59:1 —
+WCAG AA at any size.
+
+This was settled in #198, which asked whether `dark` was a dark surface or an
+elevation step wearing the wrong name. Three sources agree it is a dark surface:
+
+- **Figma.** The `background color=dark` variant (component set `72:16462`,
+  variant `72:16383`, designer-supplied and verified) binds its fill to
+  `Neutral Colors/Alternative/inverse-surface` and its text to
+  `inverse-on-surface`. It renders as a charcoal bar with light text, with no
+  bottom rule — so the SCSS matches the border to the fill, the way `primary`
+  already does.
+- **The rest of the system.** Every other `dark` in the DS means darker:
+  `Divider` `dark` is `--color-outline` against `light`'s `--color-outline-variant`,
+  and `ListGroup`'s dark item is `--color-on-surface` with `--color-surface` text.
+- **The old values were incoherent under either reading.** `dark` pointed at
+  `--color-surface-container-low` (`#f3f3f6`) while `light` pointed at
+  `--color-surface-container` (`#edeef0`) — so the "dark" bar was the *lighter*
+  of the two. No elevation scheme orders them that way, and the value was never
+  anything else: it was authored that way in the component's first commit
+  (`9f352679`) and no commit since has touched it.
+
+The bar looked correct until #153 (PR #197) because `Navbar.jsx` also passed
+react-bootstrap's `bg` prop, whose `.bg-dark` utility carries `!important`.
+Bootstrap's near-black won over the token, hiding the mismatch — and put
+`--color-on-surface` text on `#212529` at 1.11:1. Removing that prop was right;
+it exposed what the stylesheet had always declared. The fix is the token, not
+the prop: **do not reintroduce `bg`.**
+
+The text overrides in the `dark` rule are load-bearing, not decoration. The
+brand and link colours the light bars use would land at 1.31:1 and 2.48:1 on
+`#2e3133` — the same invisible-text defect #153 removed.
+
 </div>
 
 <div className="sb-ds-doc-section">
