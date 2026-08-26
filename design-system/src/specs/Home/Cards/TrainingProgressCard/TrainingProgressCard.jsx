@@ -157,9 +157,12 @@ const TrainingProgressCard = ({
                         <>
                             {/* Text content for default size */}
                             <div className="plus-training-progress-text">
-                                <h3 className="plus-training-progress-value">
+                                {/* A count is not a section. `.plus-training-progress-value`
+                                    carries the whole appearance, so the tag stays out of the
+                                    outline. */}
+                                <p className="plus-training-progress-value">
                                     {completed} / {total}
-                                </h3>
+                                </p>
                                 <p className="body3-txt plus-training-progress-label">
                                     Lessons completed
                                 </p>

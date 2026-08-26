@@ -47,7 +47,13 @@ so a shared component that lands at different depths takes the level as a prop �
 The same separation covers text that is not a heading at all. A metric drawn at
 display size is not a section: `<p className="h4">Answered Correctly</p>` in
 `LessonsDetailPage` is how that text gets heading type without taking an outline
-slot. The values still marked up as `<h1>`/`<h3>` beside it are #244.
+slot, and the score beside it is `<p className="h1">` for the same reason. The
+values in `MetricsCard` and `TrainingProgressCard` read the same way — the class
+carries the whole appearance, so the tag has no work left to do (#244).
+
+Dropping a heading is not free. It can **create** a skip where none existed:
+`h2, h3, h4` with the `h3` taken out becomes `h2` → `h4`. Read the page's
+outline before you remove one, the same as before you re-tag one.
 
 The docs view used to break this separation. `.sbdocs h1 / h2 / h3–h6 { …
 !important }` in `.storybook/storybook-overrides.css` reached into story
