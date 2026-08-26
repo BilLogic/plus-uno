@@ -42,6 +42,7 @@
     "check:skill-surfaces": "node scripts/generate-uno-skill-surfaces.mjs --check",
     "check:skill-overlap": "node scripts/check-skill-overlap.mjs",
     "test:scripts": "node --test scripts/*.test.mjs",
+    "check:deprecated-apis": "node scripts/check-deprecated-apis.mjs",
     "check:docs": "bash scripts/validate-doc-links.sh",
     "check:intake-fsm": "node .cursor/hooks/uno-prototype/test-fsm.mjs",
     "check:harness": "node scripts/check-harness.mjs",

@@ -82,6 +82,12 @@ const COMPOSED = [
       'seven generated artifacts against the design-system SSOT (cheat sheet, component + forms index, component docs, INDEX.md, Figma component registry, token registry, knowledge audit). Names its own failing step.',
   },
   {
+    script: 'check:deprecated-apis',
+    pkg: 'root',
+    guards:
+      'dependency ranges against the majors that remove an API this repo still uses. A deprecation is otherwise discovered twice — once when someone reads the warning, once when the upgrade breaks — and only the second one is loud.',
+  },
+  {
     script: 'check:docs',
     pkg: 'root',
     guards:
