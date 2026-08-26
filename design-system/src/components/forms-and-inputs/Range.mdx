@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as RangeStories from './Range.stories.jsx';
@@ -21,6 +22,10 @@ export const figmaMeta = {
 
 <Title />
 
+<DocsTabs of={RangeStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
@@ -28,12 +33,11 @@ export const figmaMeta = {
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Medium slider at a mid-range value.</>}>
     <Canvas of={RangeStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -43,7 +47,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large.</>}>
     <DsCanvasQuiet of={RangeStories.Sizes} />
@@ -53,7 +57,31 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={RangeStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
 
 - **A slider needs a `label`, and it is the only thing that names it.** The value
   is a number: "49" does not say what is being set. Pass `label`, and the
@@ -72,20 +100,8 @@ export const figmaMeta = {
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={RangeStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TooltipStories from './Tooltip.stories.jsx';
@@ -21,6 +22,10 @@ export const figmaMeta = {
 
 <Title />
 
+<DocsTabs of={TooltipStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19486"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/overlays/Tooltip"
@@ -28,12 +33,11 @@ export const figmaMeta = {
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Placement relative to the trigger: top, bottom, left, and right.</>}>
     <Canvas of={TooltipStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -43,7 +47,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Variants
+## Variants
 
 <DocsCanvasShell description={<>Placement options relative to the trigger: top, bottom, left, and right.</>}>
     <DsCanvasQuiet of={TooltipStories.Placements} />
@@ -53,7 +57,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Small, default, and large tooltip padding and type scale.</>}>
     <DsCanvasQuiet of={TooltipStories.Sizes} />
@@ -63,7 +67,31 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### When to use
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={TooltipStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
 
 Use `Tooltip` for a short label on a control whose purpose is not obvious from
 what you can see — an icon-only `Button`, a truncated cell, an abbreviation. It
@@ -90,7 +118,7 @@ wraps a single trigger element and shows on hover and focus by default, after
 
 <div className="sb-ds-doc-section">
 
-### Correct and incorrect
+## Correct and incorrect
 
 **A tooltip describes; it does not name.**
 
@@ -142,7 +170,7 @@ wraps a single trigger element and shows on hover and focus by default, after
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Accessibility
 
 - **Focus shows it.** The default trigger is `['hover', 'focus']`, so a keyboard
   user tabbing to the control gets the tooltip. Overriding `trigger` to `'hover'`
@@ -162,20 +190,8 @@ wraps a single trigger element and shows on hover and focus by default, after
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={TooltipStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

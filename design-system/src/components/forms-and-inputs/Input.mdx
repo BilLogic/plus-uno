@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as InputStories from './Input.stories.jsx';
@@ -22,6 +23,10 @@ export const figmaMeta = {
 <Title />
 The labeled text input box allows users to enter textual inputs and receive validation feedback with messages.
 
+<DocsTabs of={InputStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-14133"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
@@ -29,12 +34,11 @@ The labeled text input box allows users to enter textual inputs and receive vali
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Default labeled field with placeholder and trailing visual.</>}>
     <Canvas of={InputStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -44,7 +48,7 @@ The labeled text input box allows users to enter textual inputs and receive vali
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Placeholder vs value, label visibility, required marker, and leading/trailing visuals.</>}>
     <DsCanvasQuiet of={InputStories.Content} />
@@ -54,7 +58,7 @@ The labeled text input box allows users to enter textual inputs and receive vali
 
 <div className="sb-ds-doc-section">
 
-### Validation & feedback
+## Validation & feedback
 
 <DocsCanvasShell description={<>Validation treatments: none, invalid, and success (with optional message).</>}>
     <DsCanvasQuiet of={InputStories.Styles} />
@@ -64,7 +68,7 @@ The labeled text input box allows users to enter textual inputs and receive vali
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Available in medium (default) size.</>}>
     <DsCanvasQuiet of={InputStories.Sizes} />
@@ -74,7 +78,7 @@ The labeled text input box allows users to enter textual inputs and receive vali
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+## Interaction states
 
 <DocsCanvasShell description={<>Default, hover, focus, disabled, and read-only.</>}>
     <DsCanvasQuiet of={InputStories.InteractionStates} />
@@ -84,7 +88,31 @@ The labeled text input box allows users to enter textual inputs and receive vali
 
 <div className="sb-ds-doc-section">
 
-### When to use
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={InputStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
 
 Use `Input` for single-line text entry — names, emails, search boxes, anything
 where the answer is one short string. It is the field that owns its own label,
@@ -114,7 +142,7 @@ a matching icon.
 
 <div className="sb-ds-doc-section">
 
-### Correct and incorrect
+## Correct and incorrect
 
 **Always pass `id`, or the label points at nothing.**
 
@@ -158,7 +186,7 @@ a matching icon.
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Accessibility
 
 - **The label is associated whether you pass `id` or not.** One id is derived
   once and used for both the label's `htmlFor` and the input; when no `id` is
@@ -192,7 +220,7 @@ a matching icon.
 
 <div className="sb-ds-doc-section">
 
-### Why `showLabel` cannot take the name away
+## Why `showLabel` cannot take the name away
 
 `showLabel={false}` used to skip rendering the label entirely. #213 asked
 whether that mode should exist at all, since a component that makes "no
@@ -240,20 +268,8 @@ not a second claim on the name.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={InputStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

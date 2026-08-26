@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as JumbotronStories from './Jumbotron.stories.jsx';
@@ -21,6 +22,10 @@ export const figmaMeta = {
 
 <Title />
 
+<DocsTabs of={JumbotronStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19500"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Jumbotron"
@@ -28,12 +33,11 @@ export const figmaMeta = {
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Title and body copy for a simple hero block.</>}>
     <Canvas of={JumbotronStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -46,7 +50,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Tighter versus roomier padding tokens.</>}>
     <DsCanvasQuiet of={JumbotronStories.Sizes} />
@@ -56,7 +60,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={JumbotronStories.Interactive}
@@ -71,3 +75,7 @@ export const figmaMeta = {
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

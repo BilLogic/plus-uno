@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as DatePickerStories from './DatePicker.stories.jsx';
@@ -47,6 +48,9 @@ export const figmaMeta = {
 Use a date picker when a user needs to select a date or a date range.
 Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (not a Select caret).
 
+<DocsTabs of={DatePickerStories}>
+
+<DocsTab tab="examples">
 
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
@@ -55,12 +59,11 @@ Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (no
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Medium trigger with placeholder — opens calendar on focus.</>}>
     <Canvas of={DatePickerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -70,7 +73,7 @@ Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (no
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Single date selection with selected value summary.</>}>
     <DsCanvasQuiet of={DatePickerStories.PickDate} />
@@ -80,7 +83,7 @@ Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (no
 
 <div className="sb-ds-doc-section">
 
-### Variants
+## Variants
 
 <DocsCanvasShell description={<>Paired pickers for a start and end date range.</>}>
     <DsCanvasQuiet of={DatePickerStories.PickRange} />
@@ -90,7 +93,7 @@ Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (no
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large.</>}>
     <DsCanvasQuiet of={DatePickerStories.Sizes} />
@@ -100,7 +103,7 @@ Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (no
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+## Interaction states
 
 <DocsCanvasShell description={<>Default, filled, disabled, and read-only.</>}>
     <DsCanvasQuiet of={DatePickerStories.InteractionStates} />
@@ -110,7 +113,7 @@ Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (no
 
 <div className="sb-ds-doc-section">
 
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={DatePickerStories.Interactive}
@@ -125,3 +128,7 @@ Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (no
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

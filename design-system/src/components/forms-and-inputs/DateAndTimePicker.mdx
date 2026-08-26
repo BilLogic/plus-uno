@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TimePickerStories from './DateAndTimePicker.stories.jsx';
@@ -30,6 +31,10 @@ export const figmaMeta = {
 <Title />
 Date and time pickers let people select a date or range of dates and/or a time from a visual calendar and time list.
 
+<DocsTabs of={TimePickerStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
@@ -37,12 +42,11 @@ Date and time pickers let people select a date or range of dates and/or a time f
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Compact date and time row with field label.</>}>
     <Canvas of={TimePickerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -52,7 +56,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Field label and optional Date/Time section labels.</>}>
     <DsCanvasQuiet of={TimePickerStories.Content} />
@@ -62,7 +66,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 <div className="sb-ds-doc-section">
 
-### Validation & feedback
+## Validation & feedback
 
 <DocsCanvasShell description={<>Invalid and success validation.</>}>
     <DsCanvasQuiet of={TimePickerStories.Styles} />
@@ -72,7 +76,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large.</>}>
     <DsCanvasQuiet of={TimePickerStories.Sizes} />
@@ -82,7 +86,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+## Interaction states
 
 <DocsCanvasShell description={<>Default, disabled, and read-only.</>}>
     <DsCanvasQuiet of={TimePickerStories.InteractionStates} />
@@ -92,7 +96,31 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={TimePickerStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
 
 - **`label` names the field, not either input.** The field renders two controls,
   and one `<label for>` names one control, so `label` labels a `role="group"`
@@ -154,20 +182,8 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={TimePickerStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

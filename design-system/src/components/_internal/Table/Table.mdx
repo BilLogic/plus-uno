@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TableStories from './Table.stories.jsx';
@@ -80,6 +81,10 @@ export const figmaMeta = {
 
 Data table for tabular content. Cells accept any node, so a row can carry Badges, formatted currency, or a Button used as a sort trigger.
 
+<DocsTabs of={TableStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/_internal/Table"
     sets={figmaMeta.sets}
@@ -90,7 +95,7 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell
     attachSourceBelow
@@ -105,7 +110,7 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 <div className="sb-ds-doc-section">
 
-### Variants
+## Variants
 
 <DocsCanvasShell
     attachSourceBelow
@@ -122,7 +127,7 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 <div className="sb-ds-doc-section">
 
-### Empty state
+## Empty state
 
 <DocsCanvasShell
     attachSourceBelow
@@ -137,7 +142,23 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 <div className="sb-ds-doc-section">
 
-### Usage notes
+## Interactive playground
+
+<DocsInteractivePlayground of={TableStories.Overview} />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
 
 - **Sorting is not built in.** The consuming page owns sort state and passes already-ordered `rows`. To make a header sortable, put a text-fill `Button` in that header's `text`.
 - **Per-cell control** — pass `{ content, align, colSpan, className }` instead of a bare value when a cell needs alignment or spanning.
@@ -145,12 +166,8 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground of={TableStories.Overview} />
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

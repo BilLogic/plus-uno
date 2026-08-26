@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as NumberInputStories from './NumberInput.stories.jsx';
@@ -21,6 +22,10 @@ export const figmaMeta = {
 
 <Title />
 
+<DocsTabs of={NumberInputStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
@@ -28,12 +33,11 @@ export const figmaMeta = {
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Default numeric field with steppers.</>}>
     <Canvas of={NumberInputStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -43,7 +47,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Placeholder and editable value.</>}>
     <DsCanvasQuiet of={NumberInputStories.Content} />
@@ -53,7 +57,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Validation & feedback
+## Validation & feedback
 
 <DocsCanvasShell description={<>Validation styling: invalid and success.</>}>
     <DsCanvasQuiet of={NumberInputStories.Styles} />
@@ -63,7 +67,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+## Interaction states
 
 <DocsCanvasShell description={<>Default, focus, disabled, and read-only.</>}>
     <DsCanvasQuiet of={NumberInputStories.InteractionStates} />
@@ -73,7 +77,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={NumberInputStories.Interactive}
@@ -88,3 +92,7 @@ export const figmaMeta = {
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

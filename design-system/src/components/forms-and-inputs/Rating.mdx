@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as RatingStories from './Rating.stories.jsx';
@@ -29,6 +30,10 @@ export const figmaMeta = {
 
 <Title />
 
+<DocsTabs of={RatingStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-7763"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
@@ -36,12 +41,11 @@ export const figmaMeta = {
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Comments-style rating with label and required indicator.</>}>
     <Canvas of={RatingStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -51,7 +55,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Baseline rating field with supporting copy.</>}>
     <DsCanvasQuiet of={RatingStories.Content} />
@@ -61,7 +65,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Variants
+## Variants
 
 <DocsCanvasShell description={<>Comments and numeric rating patterns.</>}>
     <DsCanvasQuiet of={RatingStories.Variants} />
@@ -71,7 +75,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+## Interaction states
 
 <DocsCanvasShell description={<>Disabled comments and numeric ratings.</>}>
     <DsCanvasQuiet of={RatingStories.InteractionStates} />
@@ -81,7 +85,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={RatingStories.Interactive}
@@ -96,3 +100,7 @@ export const figmaMeta = {
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

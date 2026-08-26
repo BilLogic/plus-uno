@@ -145,6 +145,22 @@ const COMPOSED = [
       'can observe, decidable from the file.',
   },
   {
+    script: 'check:docs-tabs',
+    pkg: 'root',
+    guards:
+      'that the component docs pages keep the tab split ADR-025 gave them. Examples · Code · '
+      + 'Usage · Changelog stopped being Storybook `types.TAB` addons and became part of the '
+      + 'page, so tab membership now lives in 49 MDX files as `<DocsTab tab="…">` wrappers — '
+      + 'this is what stops those 49 drifting. It asserts the population is still 49 (48 '
+      + 'components plus one named exception), that every `sb-ds-doc-section` sits in a tab '
+      + 'rather than outside all of them, that a section is in the tab its heading assigns it '
+      + 'in BOTH directions, that no page outside the set sprouts a strip — the bug the old '
+      + 'mechanism actually had, since Storybook never filtered the tab list and a Colors '
+      + 'foundation page therefore offered a Usage tab — and that section divs and headings are '
+      + 'still one-to-one. It cannot see whether a tab RENDERS: only a browser knows that, and '
+      + '`check:storybook` runs story tests, not docs pages.',
+  },
+  {
     script: 'check:page-outline',
     pkg: 'root',
     guards:

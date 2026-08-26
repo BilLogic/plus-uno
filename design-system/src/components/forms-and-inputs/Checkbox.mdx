@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as CheckboxStories from './Checkbox.stories.jsx';
@@ -22,6 +23,9 @@ export const figmaMeta = {
 <Title />
 Use checkbox when a user needs to select more than one option from a list.
 
+<DocsTabs of={CheckboxStories}>
+
+<DocsTab tab="examples">
 
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19493"
@@ -30,12 +34,11 @@ Use checkbox when a user needs to select more than one option from a list.
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Single checkbox with label.</>}>
     <Canvas of={CheckboxStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -45,7 +48,7 @@ Use checkbox when a user needs to select more than one option from a list.
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Label text lengths and the required indicator.</>}>
     <DsCanvasQuiet of={CheckboxStories.Content} />
@@ -55,7 +58,7 @@ Use checkbox when a user needs to select more than one option from a list.
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Small, medium (default), and large.</>}>
     <DsCanvasQuiet of={CheckboxStories.Sizes} />
@@ -65,7 +68,7 @@ Use checkbox when a user needs to select more than one option from a list.
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+## Interaction states
 
 <DocsCanvasShell description={<>Unchecked, checked, indeterminate, disabled, and required.</>}>
     <DsCanvasQuiet of={CheckboxStories.InteractionStates} />
@@ -75,7 +78,31 @@ Use checkbox when a user needs to select more than one option from a list.
 
 <div className="sb-ds-doc-section">
 
-### When to use
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={CheckboxStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
 
 Use `Checkbox` for one independent yes/no — an opt-in, a "select this row", a
 single term to accept. Each checkbox stands alone: several of them are several
@@ -103,7 +130,7 @@ it is what a "select all" control needs when only some rows are ticked.
 
 <div className="sb-ds-doc-section">
 
-### Correct and incorrect
+## Correct and incorrect
 
 **A checkbox with no `label` has no name — give it one, visible or not.**
 
@@ -151,7 +178,7 @@ it is what a "select all" control needs when only some rows are ticked.
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Accessibility
 
 - **The label is wired for you, `id` or no `id`.** The component derives one id
   through `useFieldId` and hands it to the underlying form check, which renders
@@ -180,20 +207,8 @@ it is what a "select all" control needs when only some rows are ticked.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={CheckboxStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

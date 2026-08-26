@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TextareaStories from './Textarea.stories.jsx';
@@ -79,6 +80,10 @@ export const figmaMeta = {
 <Title />
 Use text area for multi-line text input form fields.
 
+<DocsTabs of={TextareaStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
@@ -86,12 +91,11 @@ Use text area for multi-line text input form fields.
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Long form (boxed) textarea with label and placeholder.</>}>
     <Canvas of={TextareaStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -101,7 +105,7 @@ Use text area for multi-line text input form fields.
 
 <div className="sb-ds-doc-section">
 
-### Variants
+## Variants
 
 <DocsCanvasShell description={<>Long (boxed) and short (underlined) styles.</>}>
     <DsCanvasQuiet of={TextareaStories.Styles} />
@@ -115,7 +119,7 @@ Use text area for multi-line text input form fields.
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+## Interaction states
 
 <DocsCanvasShell description={<>Long form: default, focus, filled, valid, error, disabled, read-only (plus placeholder examples).</>}>
     <DsCanvasQuiet of={TextareaStories.InteractionStatesLong} />
@@ -129,7 +133,31 @@ Use text area for multi-line text input form fields.
 
 <div className="sb-ds-doc-section">
 
-### When to use
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={TextareaStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
 
 Use `Textarea` when the answer is prose the user writes in their own words —
 session notes, a reflection, a reason for cancelling. `rows` (default 3) sets
@@ -152,7 +180,7 @@ the Figma spec for compact note fields.
 
 <div className="sb-ds-doc-section">
 
-### Correct and incorrect
+## Correct and incorrect
 
 **Pass `id`, not just `name`.**
 
@@ -193,7 +221,7 @@ the Figma spec for compact note fields.
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Accessibility
 
 - **The label is associated whether you pass `id` or not.** One id is derived
   once and used for both the label's `htmlFor` and the control; when no `id` is
@@ -215,20 +243,8 @@ the Figma spec for compact note fields.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={TextareaStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

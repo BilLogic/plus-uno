@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as AlertStories from './Alert.stories.jsx';
@@ -23,6 +24,10 @@ export const figmaMeta = {
 <Title />
 Provide contextual feedback messages for typical user actions with the handful of available and flexible alert messages.
 
+<DocsTabs of={AlertStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/messaging/Alert"
@@ -30,12 +35,11 @@ Provide contextual feedback messages for typical user actions with the handful o
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Title optional, dismissible toggle, and rich body content.</>}>
     <Canvas of={AlertStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -45,7 +49,7 @@ Provide contextual feedback messages for typical user actions with the handful o
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Title optional, body-only, non-dismissible, and rich HTML body patterns.</>}>
     <DsCanvasQuiet of={AlertStories.Content} />
@@ -55,7 +59,7 @@ Provide contextual feedback messages for typical user actions with the handful o
 
 <div className="sb-ds-doc-section">
 
-### Styles
+## Styles
 
 <DocsCanvasShell description={<>Semantic styles with title and dismissible chrome.</>}>
     <DsCanvasQuiet of={AlertStories.Styles} />
@@ -65,7 +69,7 @@ Provide contextual feedback messages for typical user actions with the handful o
 
 <div className="sb-ds-doc-section">
 
-### Anatomy
+## Anatomy
 
 <DocsCanvasShell description={<>Internal title and message layout inside the alert shell.</>}>
     <DsCanvasQuiet of={AlertSubStories.ContentStructure} />
@@ -79,7 +83,31 @@ Provide contextual feedback messages for typical user actions with the handful o
 
 <div className="sb-ds-doc-section">
 
-### When to use
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={AlertStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
 
 Use `Alert` for a message that belongs to the page and stays there until it is
 resolved or dismissed — a banner explaining why a session cannot be booked, a
@@ -111,7 +139,7 @@ domain colors, because an alert is always saying something about state.
 
 <div className="sb-ds-doc-section">
 
-### Correct and incorrect
+## Correct and incorrect
 
 **Field errors go on the field.**
 
@@ -160,7 +188,7 @@ domain colors, because an alert is always saying something about state.
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Accessibility
 
 - **It announces assertively.** The underlying alert renders `role="alert"`,
   which implies `aria-live="assertive"` — a screen reader interrupts to read it.
@@ -179,20 +207,8 @@ domain colors, because an alert is always saying something about state.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={AlertStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

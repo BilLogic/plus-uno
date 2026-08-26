@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as DropdownStories from './Dropdown.stories.jsx';
@@ -38,6 +39,10 @@ export const figmaMeta = {
 <Title />
 Toggle contextual overlays for displaying lists of links and more with the Bootstrap dropdown plugin.
 
+<DocsTabs of={DropdownStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs/Dropdown"
@@ -45,12 +50,11 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Closed and open states for single-button and split-button dropdowns, aligned to the core Figma content examples.</>}>
     <Canvas of={DropdownStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -60,7 +64,7 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Single and split triggers in closed and open states.</>}>
     <DsCanvasQuiet of={DropdownStories.Content} />
@@ -70,7 +74,7 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 
 <div className="sb-ds-doc-section">
 
-### Variants
+## Variants
 
 <DocsCanvasShell description={<>Semantic roles for the trigger, matching the Dropdown variants frame in Figma (outline default; ghost shown as the alternate treatment).</>}>
     <DsCanvasQuiet of={DropdownStories.StyleVariants} />
@@ -80,7 +84,7 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Small, default, and large triggers.</>}>
     <DsCanvasQuiet of={DropdownStories.Sizes} />
@@ -90,7 +94,7 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 
 <div className="sb-ds-doc-section">
 
-### Layout & composition
+## Layout & composition
 
 <DocsCanvasShell description={<>Split button and menu opening direction.</>}>
     <DsCanvasQuiet of={DropdownStories.Layout} />
@@ -100,7 +104,31 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 
 <div className="sb-ds-doc-section">
 
-### When to use
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={DropdownStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
 
 Use `Dropdown` for a menu of *actions* hanging off a control — a row's overflow
 menu, a "more" button, a set of export formats. Items are described as data
@@ -134,7 +162,7 @@ would run off the edge, remeasuring on scroll and resize.
 
 <div className="sb-ds-doc-section">
 
-### Correct and incorrect
+## Correct and incorrect
 
 **Controlled mode needs both halves.**
 
@@ -186,7 +214,7 @@ would run off the edge, remeasuring on scroll and resize.
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Accessibility
 
 - **The toggle is well formed.** It is a real `button` with `aria-haspopup` and
   a live `aria-expanded`. In `split` mode it also gets an `aria-label` built
@@ -210,20 +238,8 @@ would run off the edge, remeasuring on scroll and resize.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={DropdownStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

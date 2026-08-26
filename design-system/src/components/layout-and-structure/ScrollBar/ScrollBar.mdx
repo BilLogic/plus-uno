@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ScrollBarStories from './ScrollBar.stories.jsx';
@@ -22,6 +23,10 @@ export const figmaMeta = {
 
 <Title />
 
+<DocsTabs of={ScrollBarStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/ScrollBar"
@@ -29,12 +34,11 @@ export const figmaMeta = {
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Vertical scrolling with the tokenized thin scrollbar.</>}>
     <Canvas of={ScrollBarStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -44,7 +48,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Typical use: a list panel scrolling inside a bounded container.</>}>
     <DsCanvasQuiet of={ScrollBarStories.Content} />
@@ -54,7 +58,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Layout & composition
+## Layout & composition
 
 <DocsCanvasShell description={<>Vertical (bounded by maxHeight) and horizontal orientations.</>}>
     <DsCanvasQuiet of={ScrollBarStories.Layout} />
@@ -64,7 +68,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={ScrollBarStories.Interactive}
@@ -79,3 +83,7 @@ export const figmaMeta = {
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

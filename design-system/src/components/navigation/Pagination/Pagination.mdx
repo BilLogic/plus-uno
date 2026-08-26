@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as PaginationStories from './Pagination.stories.jsx';
@@ -21,6 +22,10 @@ export const figmaMeta = {
 
 <Title />
 
+<DocsTabs of={PaginationStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19505"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/Pagination"
@@ -28,12 +33,11 @@ export const figmaMeta = {
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Navigation content patterns: icon controls vs text controls.</>}>
     <Canvas of={PaginationStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -43,7 +47,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Icon versus text previous/next patterns.</>}>
     <DsCanvasQuiet of={PaginationStories.Content} />
@@ -53,7 +57,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Small, default, and large sizes across icon and text types.</>}>
     <DsCanvasQuiet of={PaginationStories.Sizes} />
@@ -63,7 +67,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### States
+## States
 
 <DocsCanvasShell description={<>Disabled controls on first/last page and enabled controls in middle pages.</>}>
     <DsCanvasQuiet of={PaginationStories.InteractionStates} />
@@ -73,7 +77,31 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### When to use
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={PaginationStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
 
 Use `Pagination` when a list is split into numbered pages and the user needs to
 move between them or jump to a known one — admin tables of sessions, students,
@@ -101,7 +129,7 @@ whenever the window does not reach them.
 
 <div className="sb-ds-doc-section">
 
-### Correct and incorrect
+## Correct and incorrect
 
 **It is controlled, so it needs both the page and the handler.**
 
@@ -144,7 +172,7 @@ whenever the window does not reach them.
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Accessibility
 
 - **The structure is right.** A `nav` labelled by `ariaLabel` (default "Page
   navigation") wraps a `ul` of `li`s, and the active page carries
@@ -165,20 +193,8 @@ whenever the window does not reach them.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={PaginationStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

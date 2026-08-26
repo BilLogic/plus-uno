@@ -1,8 +1,6 @@
 import { addons } from 'storybook/manager-api';
 import { create } from 'storybook/theming/create';
 import brandImage from './brand-image.js';
-import { PREVIEW_TABS } from './addons/component-tabs/contract.js';
-import './addons/component-tabs/register.jsx';
 
 // Storybook manager configuration (runs in the "manager" UI, not inside the preview iframe)
 
@@ -35,11 +33,12 @@ if (!globalThis.__PLUS_STORYBOOK_MANAGER_CONSOLE_PATCHED__) {
 }
 
 addons.setConfig({
-  // Examples · Code · Usage · Changelog (#168). This is the only supported way
-  // to rename Storybook's built-in canvas tab and the only place the four tabs'
-  // order is declared; the three authored ones register themselves in
-  // ./addons/component-tabs/register.jsx.
-  previewTabs: PREVIEW_TABS,
+  // No `previewTabs`. The four tabs moved INTO the docs page (ADR-025), and
+  // `previewTabs` was only ever here to rename Storybook's built-in canvas tab to
+  // "Examples" so it would sit beside the three registered ones. With those gone,
+  // Storybook draws no tab strip at all for a single view — measured: both a docs
+  // entry and a story entry report `tabStrip: false, tabs: []` — so the toolbar is
+  // left holding only its tools, which is the point.
   theme: create({
     base: 'light',
     brandTitle: 'PLUS Storybook',

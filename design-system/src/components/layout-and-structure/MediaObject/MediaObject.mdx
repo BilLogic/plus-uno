@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as MediaObjectStories from './MediaObject.stories.jsx';
@@ -29,6 +30,10 @@ export const figmaMeta = {
 
 <Title />
 
+<DocsTabs of={MediaObjectStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245484"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/MediaObject"
@@ -36,12 +41,11 @@ export const figmaMeta = {
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Nested media object inside the body.</>}>
     <Canvas of={MediaObjectStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -51,7 +55,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Nested media object inside parent body copy.</>}>
     <DsCanvasQuiet of={MediaObjectStories.Content} />
@@ -61,7 +65,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Small, default, and large media slots.</>}>
     <DsCanvasQuiet of={MediaObjectStories.Sizes} />
@@ -71,7 +75,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Layout & composition
+## Layout & composition
 
 <DocsCanvasShell description={<>Media on the left or right and vertical alignment with body copy.</>}>
     <DsCanvasQuiet of={MediaObjectStories.Layout} />
@@ -81,7 +85,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={MediaObjectStories.Interactive}
@@ -96,3 +100,7 @@ export const figmaMeta = {
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

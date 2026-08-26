@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SwitchStories from './Switch.stories.jsx';
@@ -22,6 +23,10 @@ export const figmaMeta = {
 <Title />
 Use switch when a user needs to toggle between two states: on and off, true and false, enabled and disabled, etc.
 
+<DocsTabs of={SwitchStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12006"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
@@ -29,12 +34,11 @@ Use switch when a user needs to toggle between two states: on and off, true and 
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Default switch with short label.</>}>
     <Canvas of={SwitchStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -44,7 +48,7 @@ Use switch when a user needs to toggle between two states: on and off, true and 
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Short and long label text.</>}>
     <DsCanvasQuiet of={SwitchStories.Content} />
@@ -54,7 +58,7 @@ Use switch when a user needs to toggle between two states: on and off, true and 
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large.</>}>
     <DsCanvasQuiet of={SwitchStories.Sizes} />
@@ -64,7 +68,7 @@ Use switch when a user needs to toggle between two states: on and off, true and 
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+## Interaction states
 
 <DocsCanvasShell description={<>Off, on, and disabled.</>}>
     <DsCanvasQuiet of={SwitchStories.InteractionStates} />
@@ -74,7 +78,31 @@ Use switch when a user needs to toggle between two states: on and off, true and 
 
 <div className="sb-ds-doc-section">
 
-### When to use
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={SwitchStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
 
 Use `Switch` for a setting the user turns on or off, where the change lands
 immediately and there is no Save button between the flick and the effect —
@@ -102,7 +130,7 @@ component does not name.
 
 <div className="sb-ds-doc-section">
 
-### Correct and incorrect
+## Correct and incorrect
 
 **A switch acts now; a checkbox saves later.**
 
@@ -147,7 +175,7 @@ component does not name.
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Accessibility
 
 - **It is announced as a switch.** The underlying form check turns
   `type="switch"` into `type="checkbox"` plus a `form-switch` class, which
@@ -207,20 +235,8 @@ component does not name.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={SwitchStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

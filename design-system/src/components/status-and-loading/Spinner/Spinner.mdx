@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SpinnerStories from './Spinner.stories.jsx';
@@ -46,6 +47,10 @@ export const figmaMeta = {
 
 <Title />
 
+<DocsTabs of={SpinnerStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19485"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Spinner"
@@ -53,12 +58,11 @@ export const figmaMeta = {
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Default border spinner for inline loading feedback.</>}>
     <Canvas of={SpinnerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -68,7 +72,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Variants
+## Variants
 
 <DocsCanvasShell description={<>Border, grow, and custom animated patterns.</>}>
     <DsCanvasQuiet of={SpinnerStories.StyleVariants} />
@@ -78,7 +82,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Styles
+## Styles
 
 <DocsCanvasShell description={<>Neutral token treatment across spinner variants.</>}>
     <DsCanvasQuiet of={SpinnerStories.Styles} />
@@ -88,7 +92,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Default and small border spinner.</>}>
     <DsCanvasQuiet of={SpinnerStories.Sizes} />
@@ -98,7 +102,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### States
+## States
 
 <DocsCanvasShell description={<>Standard spinner states and custom animated states in one comparison view.</>}>
     <DsCanvasQuiet of={SpinnerSubStories.SpinnerStates} />
@@ -108,7 +112,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Layout & composition
+## Layout & composition
 
 <DocsCanvasShell description={<>Spinner embedded in a loading button pattern.</>}>
     <DsCanvasQuiet of={SpinnerSubStories.LoadingButtonExample} />
@@ -118,7 +122,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={SpinnerStories.Interactive}
@@ -133,3 +137,7 @@ export const figmaMeta = {
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

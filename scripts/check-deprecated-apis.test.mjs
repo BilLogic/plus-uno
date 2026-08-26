@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { check, ceilingMajor } from './check-deprecated-apis.mjs';
+import { check, ceilingMajor, TRIPWIRES } from './check-deprecated-apis.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const TRIP = [{ dep: 'storybook', removedIn: 11, api: 'tabs', uses: 'x', ticket: '#202', note: '' }];
@@ -46,12 +46,25 @@ test('a dependency the repo does not have is not a finding', () => {
   assert.deepEqual(check({ devDependencies: {} }, TRIP), []);
 });
 
-test("the watched API is still in use — a tripwire for code that left is noise", () => {
-  const src = fs.readFileSync(
-    path.join(REPO_ROOT, '.storybook/addons/component-tabs/register.jsx'),
-    'utf8',
-  );
-  assert.match(src, /types\.TAB/, 'register.jsx no longer uses types.TAB — retire the tripwire with it');
+test('every armed tripwire still points at a file that exists and uses the API', () => {
+  // Generalised from a hard-coded read of `register.jsx`, which is exactly what
+  // this test was for: ADR-025 deleted that file when it retired `types.TAB`,
+  // and this went red rather than letting a tripwire outlive its code. Driven off
+  // TRIPWIRES now, so the next one is covered without an edit here.
+  for (const t of TRIPWIRES) {
+    const file = path.join(REPO_ROOT, t.uses);
+    assert.ok(fs.existsSync(file), `${t.uses} is gone — retire the tripwire with it`);
+  }
+});
+
+test('an empty tripwire list is a state this file knows about, not an accident', () => {
+  // TRIPWIRES is legitimately empty right now. That makes `check:deprecated-apis`
+  // pass unconditionally, which is only safe because `main()` says so out loud;
+  // this pins that wording so the vacuous pass can never quietly start reading
+  // like a verified one.
+  assert.ok(Array.isArray(TRIPWIRES));
+  const src = fs.readFileSync(path.join(REPO_ROOT, 'scripts/check-deprecated-apis.mjs'), 'utf8');
+  assert.match(src, /0 tripwires armed — this check is currently measuring NOTHING/);
 });
 
 test('the real package.json is pinned below every watched removal', () => {

@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as AccordionStories from './Accordion.stories.jsx';
@@ -22,6 +23,10 @@ export const figmaMeta = {
 <Title />
 Accordion component for organizing content into collapsible sections. Built on React Bootstrap with custom styling per the design system.
 
+<DocsTabs of={AccordionStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Accordion"
@@ -33,7 +38,7 @@ Accordion component for organizing content into collapsible sections. Built on R
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Composable children instead of the `items` array.</>}>
     <Canvas of={AccordionStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -43,7 +48,7 @@ Accordion component for organizing content into collapsible sections. Built on R
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Children-based items pattern alongside the <code>items</code> array API.</>}>
     <DsCanvasQuiet of={AccordionStories.Content} />
@@ -53,7 +58,7 @@ Accordion component for organizing content into collapsible sections. Built on R
 
 <div className="sb-ds-doc-section">
 
-### Styles
+## Styles
 
 <DocsCanvasShell description={<>Default bordered accordion and flush (borderless) treatment.</>}>
     <DsCanvasQuiet of={AccordionStories.Styles} />
@@ -63,7 +68,7 @@ Accordion component for organizing content into collapsible sections. Built on R
 
 <div className="sb-ds-doc-section">
 
-### Behavior
+## Behavior
 
 <DocsCanvasShell description={<>Disclosure <strong>model</strong>: multiple panels open at once (`alwaysOpen`) and an initial state where every panel starts collapsed (no default active key).</>}>
     <DsCanvasQuiet of={AccordionStories.Behavior} />
@@ -73,7 +78,7 @@ Accordion component for organizing content into collapsible sections. Built on R
 
 <div className="sb-ds-doc-section">
 
-### States
+## States
 
 <DocsCanvasShell description={<>Per-header affordances on the trigger (here: <code>disabled</code>). Expanded vs collapsed is <strong>disclosure state</strong> (which keys are open), separate from disabled, hover, focus, or pressed styling on the header.</>}>
     <DsCanvasQuiet of={AccordionStories.InteractionStates} />
@@ -83,7 +88,7 @@ Accordion component for organizing content into collapsible sections. Built on R
 
 <div className="sb-ds-doc-section">
 
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={AccordionStories.Interactive}
@@ -98,3 +103,7 @@ Accordion component for organizing content into collapsible sections. Built on R
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>
