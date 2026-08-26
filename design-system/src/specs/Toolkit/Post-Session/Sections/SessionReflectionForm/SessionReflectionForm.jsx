@@ -124,9 +124,9 @@ const SessionReflectionForm = ({
             }}
         >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
-                <h4 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>
+                <h2 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>
                     Session Reflection
-                </h4>
+                </h2>
                 <LastUpdated
                     text={typeof lastUpdated === 'string' ? lastUpdated : undefined}
                     value={lastUpdated instanceof Date ? lastUpdated : undefined}

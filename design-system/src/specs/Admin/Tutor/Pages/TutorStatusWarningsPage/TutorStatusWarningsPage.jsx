@@ -124,6 +124,7 @@ const TutorStatusWarningsPage = ({
 
     return (
         <PageLayout
+            title="Tutor Status and Warnings"
             topBarConfig={topBarConfig}
             sidebarConfig={sidebarConfig}
             id="tutor-status-warnings-page"

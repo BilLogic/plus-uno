@@ -40,12 +40,21 @@ export const MissingModal = ({ children }) => (
     </div>
 );
 
-/** Section heading with an info affordance. */
-export const SectionTitle = ({ title }) => (
+/**
+ * Section heading with an info affordance.
+ *
+ * The level is a prop because this component lands at two different depths.
+ * On most session pages it sits under the page's own "Your Sessions" header, so
+ * it is an `h3`; on the Reflection page there is no such header and it is the
+ * first heading under the page's `<h1>`, so it has to be an `h2` or axe reports
+ * a skipped level. Same shape as `OverviewCard`'s `titleAs` (#242) — the class
+ * carries the appearance either way, so nothing about it changes visually.
+ */
+export const SectionTitle = ({ title, titleAs: Heading = 'h3' }) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)' }}>
-        <h4 className="h4 font-weight-semibold" style={{ color: 'var(--color-on-surface)', margin: 0 }}>
+        <Heading className="h4 font-weight-semibold" style={{ color: 'var(--color-on-surface)', margin: 0 }}>
             {title}
-        </h4>
+        </Heading>
         <i
             className="fa-solid fa-circle-info"
             style={{

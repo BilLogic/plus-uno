@@ -26,7 +26,7 @@ export default function LoginPortal({
                 {showAlert && <LoginAlertBanner>You have been logged out.</LoginAlertBanner>}
 
                 <div className="login-portal-header">
-                    <p className="login-portal-header__title h1">Demo</p>
+                    <h1 className="login-portal-header__title h1">Demo</h1>
                     <p className="login-portal-header__subtitle body1-txt">
                         Are you joining as an admin, tutor or student?
                     </p>
@@ -87,7 +87,7 @@ export default function LoginPortal({
         return (
             <div className="login-portal-card">
                 <div className="login-portal-header">
-                    <p className="login-portal-header__title h1">New to PLUS?</p>
+                    <h1 className="login-portal-header__title h1">New to PLUS?</h1>
                 </div>
 
                 <LoginInstitutionField />
@@ -112,7 +112,7 @@ export default function LoginPortal({
         return (
             <div className="login-portal-card">
                 <div className="login-portal-header">
-                    <p className="login-portal-header__title h1">Add Your Details</p>
+                    <h1 className="login-portal-header__title h1">Add Your Details</h1>
                 </div>
 
                 <div style={{ display: 'flex', gap: 'var(--size-element-gap-lg)' }}>
@@ -183,7 +183,7 @@ export default function LoginPortal({
         return (
             <div className="login-portal-card">
                 <div className="login-portal-header">
-                    <p className="login-portal-header__title h1">Add Your Details</p>
+                    <h1 className="login-portal-header__title h1">Add Your Details</h1>
                 </div>
 
                 <div style={{ display: 'flex', gap: 'var(--size-element-gap-lg)' }}>
@@ -268,7 +268,7 @@ export default function LoginPortal({
             {showAlert && <LoginAlertBanner>You have been logged out.</LoginAlertBanner>}
 
             <div className="login-portal-header">
-                <p className="login-portal-header__title h1">Login</p>
+                <h1 className="login-portal-header__title h1">Login</h1>
                 <p className="login-portal-header__subtitle body1-txt">
                     Double Math Learning with PLUS.
                 </p>

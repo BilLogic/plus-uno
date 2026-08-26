@@ -59,6 +59,7 @@ export const LessonsSpec = () => {
 
     return (
         <PageLayout
+            title="Lessons"
             topBarConfig={topBarConfig}
             sidebarConfig={sidebarConfig}
             id="lessons-overview-page"

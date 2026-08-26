@@ -73,6 +73,7 @@ const GroupInfoPage = ({
 
     return (
         <PageLayout
+            title="Group Info"
             topBarConfig={topBarConfig}
             sidebarConfig={sidebarConfig}
             id="group-info-page"

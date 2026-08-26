@@ -14,6 +14,17 @@ const OnboardingAlertCard = ({
     description = "Make sure to finish the quiz on the Google Site and answer the reflection question at the bottom of this page to complete this onboarding module.",
     dismissible = true,
     onDismiss,
+    /**
+     * Heading level for the card's title.
+     *
+     * The card lands at two depths. On `OnboardingInnerPage` it sits under the
+     * module blurb's `h2`, so it has to be an `h3` or axe reports a skip. In its
+     * own stories each instance is introduced by an `<h6>` section label, and an
+     * `h3` there makes the NEXT label a three-level jump — which is how this
+     * regressed once already. Same shape as `OverviewCard`'s `titleAs` (#242);
+     * the class carries the appearance, so the level never changes how it looks.
+     */
+    titleAs: TitleTag = 'h5',
     className = '',
     ...props
 }) => {
@@ -22,9 +33,9 @@ const OnboardingAlertCard = ({
             <div className="onboarding-alert-card__alert">
                 {/* Message section */}
                 <div className="onboarding-alert-card__message">
-                    <h5 className="onboarding-alert-card__title h5">
+                    <TitleTag className="onboarding-alert-card__title h5">
                         {title}
-                    </h5>
+                    </TitleTag>
                     <div className="onboarding-alert-card__description">
                         <p className="onboarding-alert-card__description-text body1-txt">
                             {description}
@@ -55,6 +66,7 @@ OnboardingAlertCard.propTypes = {
     description: PropTypes.string,
     /** Whether the alert can be dismissed */
     dismissible: PropTypes.bool,
+    titleAs: PropTypes.string,
     /** Callback when dismiss button is clicked */
     onDismiss: PropTypes.func,
     /** Additional CSS classes */

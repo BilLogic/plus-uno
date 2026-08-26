@@ -35,7 +35,7 @@ const ContentBlurb = ({
             </div>
 
             {/* Title */}
-            <h4 className="content-blurb__title h4">{title}</h4>
+            <h2 className="content-blurb__title h4">{title}</h2>
 
             {/* Description */}
             <p className="content-blurb__description">{description}</p>

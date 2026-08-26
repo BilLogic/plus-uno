@@ -151,7 +151,7 @@ const MainContent = ({
         >
             {/* Left: Title and Status Filter */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)' }}>
-                <h4 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Students</h4>
+                <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Students</h2>
                 <StatusFilter
                     currentStatus={statusFilter}
                     onSelect={onStatusFilterChange}
@@ -210,6 +210,7 @@ const defaultStudents = [
 export const Overview = () => (
     <div style={{ maxWidth: '1440px', height: '100%', margin: '0 auto' }}>
         <PageLayout
+            title="Student Dashboard"
             topBarConfig={{
                 breadcrumbs: [
                     { text: 'Home', href: '#' },
@@ -274,6 +275,7 @@ export const Interactive = () => {
     // ResponsiveFrame decorator — the story renders the page directly.
     return (
         <PageLayout
+            title="Student Dashboard"
             topBarConfig={{
                 breadcrumbs: [
                     { text: 'Home', href: '#' },
@@ -613,7 +615,7 @@ const RegularTutorLoadedContent = ({
             }}
         >
             {/* Title */}
-            <h4 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Students</h4>
+            <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Students</h2>
 
             {/* Right: Control Buttons */}
             <div
@@ -698,7 +700,7 @@ const RegularTutorEmptyContent = ({
             }}
         >
             {/* Title */}
-            <h4 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Students</h4>
+            <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Students</h2>
 
             {/* Right: Control Buttons */}
             <div
@@ -777,7 +779,7 @@ const LeadSupervisorLoadedContent = ({
             }}
         >
             {/* Title */}
-            <h4 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Students</h4>
+            <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Students</h2>
 
             {/* Right: Control Buttons */}
             <div
@@ -862,7 +864,7 @@ const LeadSupervisorEmptyContent = ({
             }}
         >
             {/* Title */}
-            <h4 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Students</h4>
+            <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Students</h2>
 
             {/* Right: Control Buttons */}
             <div
@@ -934,6 +936,7 @@ const RegularTutorViewRender = (args) => {
         // Width + breakpoint come from the global Breakpoint toolbar (ResponsiveFrame decorator).
         <div style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
                 <PageLayout
+                    title="Student Dashboard"
                     topBarConfig={{
                         breadcrumbs: viewState === 'loaded'
                             ? [
@@ -1100,6 +1103,7 @@ const LeadSupervisorViewRender = (args) => {
         // come from the global Breakpoint toolbar (ResponsiveFrame decorator).
         <div style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
             <PageLayout
+                title="Student Dashboard"
                 topBarConfig={{
                     breadcrumbs: viewState === 'loaded'
                         ? [

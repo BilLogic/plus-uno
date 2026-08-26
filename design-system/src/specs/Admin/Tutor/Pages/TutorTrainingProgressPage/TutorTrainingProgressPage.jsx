@@ -193,6 +193,7 @@ const TutorTrainingProgressPage = ({
 
     return (
         <PageLayout
+            title="Tutor Training Progress"
             topBarConfig={topBarConfig}
             sidebarConfig={sidebarConfig}
             id="tutor-training-progress-page"

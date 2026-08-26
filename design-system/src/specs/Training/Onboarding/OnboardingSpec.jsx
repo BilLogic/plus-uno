@@ -46,6 +46,7 @@ export const OnboardingSpec = () => {
 
     return (
         <PageLayout
+            title="Onboarding"
             topBarConfig={topBarConfig}
             sidebarConfig={sidebarConfig}
             id="onboarding-overview-page"

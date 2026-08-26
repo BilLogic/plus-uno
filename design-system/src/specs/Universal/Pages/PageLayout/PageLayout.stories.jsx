@@ -62,6 +62,7 @@ export default {
 export const Overview = {
     render: () => (
         <PageLayout
+            title="Page Layout"
             style={{ height: '100%', minHeight: '100%' }}
             sidebarConfig={{
                 user: 'tutor',
@@ -108,6 +109,7 @@ export const Overview = {
 export const Interactive = {
     render: (args) => (
         <PageLayout
+            title="Page Layout"
             style={{ height: '100%', minHeight: '100%' }}
             sidebarConfig={{
                 user: args.userType,

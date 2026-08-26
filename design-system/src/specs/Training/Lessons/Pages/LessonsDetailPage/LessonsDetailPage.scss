@@ -179,7 +179,12 @@
         justify-content: center;
         width: 100%;
 
-        h4 {
+        // Matched by size class as well as by tag: these panel titles are the
+        // lesson page's top-level sections and are written `<h2 className="h4">`
+        // now that the page has an `<h1>` (#243). Keying on the tag alone would
+        // have silently dropped this colour and margin the moment the level moved.
+        h4,
+        .h4 {
             color: var(--color-on-primary-container);
             margin: 0;
         }

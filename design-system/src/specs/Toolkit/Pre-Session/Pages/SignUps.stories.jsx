@@ -45,7 +45,7 @@ const MainContent = ({
     >
         {/* Page Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h4 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Sessions</h4>
+            <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Sessions</h2>
             <Button size="default" fill="filled" style="primary" leadingIcon="calendar-plus">
                 Fill in
             </Button>
@@ -127,6 +127,7 @@ const defaultFilters = {
 export const Overview = () => (
     <div style={{ maxWidth: '1440px', height: '100%', margin: '0 auto' }}>
         <PageLayout
+            title="Sessions"
             topBarConfig={{
                 breadcrumbs: [
                     { text: 'Home', href: '#' },
@@ -178,6 +179,7 @@ const InteractiveRender = (args) => {
     return (
         <div style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
             <PageLayout
+                title="Sessions"
                 topBarConfig={{
                     breadcrumbs: [
                         { text: 'Home', href: '#' },

@@ -107,6 +107,7 @@ const TutorToolUsagePage = ({
 
     return (
         <PageLayout
+            title="Tutor Tool Usage"
             topBarConfig={topBarConfig}
             sidebarConfig={sidebarConfig}
             id="tutor-tool-usage-page"

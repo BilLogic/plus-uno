@@ -112,7 +112,7 @@ const P1Content = ({ lessonTitle, estimatedTime, onRatingChange }) => {
         <div className="lesson-content lesson-content--p1">
             {/* Title Section */}
             <div className="lesson-content__title-section">
-                <h4 className="h4">{lessonTitle}</h4>
+                <h2 className="h4">{lessonTitle}</h2>
                 <div className="lesson-content__subtitle">
                     <i className="far fa-clock" />
                     <span className="h6">Estimate Time: {estimatedTime}</span>
@@ -146,7 +146,7 @@ const P1Content = ({ lessonTitle, estimatedTime, onRatingChange }) => {
 
             {/* Question 1: Confidence Rating */}
             <div className="lesson-content__question">
-                <h4 className="h4">How confident are you in your knowledge of this topic?</h4>
+                <h3 className="h4">How confident are you in your knowledge of this topic?</h3>
                 <LikertScale
                     leftLabel="Not at all confident"
                     rightLabel="Extremely confident"
@@ -160,7 +160,7 @@ const P1Content = ({ lessonTitle, estimatedTime, onRatingChange }) => {
 
             {/* Question 2: Experience Rating */}
             <div className="lesson-content__question">
-                <h4 className="h4">How would you describe your tutoring experience and skills?</h4>
+                <h3 className="h4">How would you describe your tutoring experience and skills?</h3>
                 <LikertScale
                     leftLabel="Beginner Tutor"
                     rightLabel="Expert Tutor"
@@ -193,7 +193,7 @@ const P2Content = ({ onPrevious, onNext }) => (
     <div className="lesson-content lesson-content--p2">
         {/* Title */}
         <div className="lesson-content__title-section">
-            <h4 className="h4">Research says...</h4>
+            <h2 className="h4">Research says...</h2>
         </div>
 
         {/* Research text */}
@@ -264,7 +264,7 @@ const P3Content = ({ onPrevious, onNext }) => (
     <div className="lesson-content lesson-content--p3">
         {/* Title */}
         <div className="lesson-content__title-section">
-            <h4 className="h4">Conclusion & Feedback</h4>
+            <h2 className="h4">Conclusion & Feedback</h2>
         </div>
 
         <p className="body1-txt">Experts believe that the best approach is:</p>
@@ -284,7 +284,7 @@ const P3Content = ({ onPrevious, onNext }) => (
 
         {/* Feedback Section */}
         <div className="lesson-content__title-section">
-            <h4 className="h4">Feedback</h4>
+            <h2 className="h4">Feedback</h2>
         </div>
 
         <div className="lesson-content__feedback">
@@ -299,7 +299,7 @@ const P3Content = ({ onPrevious, onNext }) => (
 
         {/* References Section */}
         <div className="lesson-content__title-section">
-            <h4 className="h4">References</h4>
+            <h2 className="h4">References</h2>
         </div>
 
         <div className="lesson-content__references">
@@ -337,7 +337,7 @@ const P4Content = ({ onPrevious, onNext }) => {
         <div className="lesson-content lesson-content--p4">
             {/* Title */}
             <div className="lesson-content__title-section">
-                <h4 className="h4">Scenario 2</h4>
+                <h2 className="h4">Scenario 2</h2>
             </div>
 
             {/* Scenario description */}
@@ -520,6 +520,7 @@ const LessonsDetailPage = ({
 
     return (
         <PageLayout
+            title={lessonTitle}
             topBarConfig={topBarConfig}
             sidebarConfig={sidebarConfig}
             id="lessons-detail-page"

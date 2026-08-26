@@ -49,11 +49,67 @@ display size is not a section: `<p className="h4">Answered Correctly</p>` in
 `LessonsDetailPage` is how that text gets heading type without taking an outline
 slot. The values still marked up as `<h1>`/`<h3>` beside it are #244.
 
-Two caveats live in the harness rather than in components, both tracked in #244:
-the docs view forces every heading inside a story canvas to one of three sizes
-via `.sbdocs h1 / h2 / h3–h6 { … !important }`, and only 5 pages across `specs/`
-carry an `<h1>` at all (#243) — which `heading-order` cannot see, because the
-first heading on a page has no predecessor to skip from.
+One caveat lives in the harness rather than in components, tracked in #244: the
+docs view forces every heading inside a story canvas to one of three sizes via
+`.sbdocs h1 / h2 / h3–h6 { … !important }`.
+</div>
+
+<div className="sb-ds-doc-section">
+### The top of the outline
+
+**Every page's outline starts with an `<h1>`.** The rule above places a heading
+*within* an outline; this one says the outline has a top at all. They are
+separate defects with separate causes, and only one of them is something axe can
+report. (Starts with, not "has exactly one": a story that renders the same page
+twice, or a lesson's completion screen, legitimately shows more than one.)
+
+`heading-order` flags a heading that jumps more than one level below its
+predecessor. The **first** heading on a page has no predecessor, so a page whose
+whole outline reads `h4 → h4 → h4` satisfies the rule and still has no top. That
+was 111 of 114 page stories before #243.
+
+`page-has-heading-one` is the rule for exactly this, and it never runs here: axe
+evaluates its page-level rules only when the run context is the whole document,
+and `addon-a11y` scopes every run to the story root. No page-level rule appears
+anywhere in `docs/evals/a11y-baseline.json` — not because they pass, because
+they are never evaluated.
+
+So it is guarded by two things that are not the baseline:
+
+- `.storybook/page-outline.js` asserts, in the browser suite, that every page
+  story renders an `<h1>` and that no other heading precedes it. A failure is
+  blocking, not ratcheted.
+- `npm run check:page-outline` holds the half that assertion cannot: that its
+  title-based selector still picks out exactly the story files under
+  `specs/**/Pages/**` plus the three area overviews, that the population has not
+  shrunk, and that the assertion is still registered in
+  `.storybook/vitest.setup.ts`.
+
+**Where the `<h1>` comes from.** `PageLayout` takes a `title` and renders it as
+the first element inside `<main>`, visually hidden — these pages put their name
+in the TopBar breadcrumb rather than in the content, so a visible title would be
+a design change, and 41 of the 42 page stories reach their `<h1>` this way from
+one prop. It is hidden off-screen and **never** with `display: none`, which
+would take it out of the accessibility tree and leave the page with no top at
+all. A page that renders its own visible title heading — `LoginPortal`'s
+"Login", the area overviews' "Admin Organisms" — marks *that* heading up as the
+`<h1>` and leaves `title` unset, rather than carrying two.
+
+**A fragment is not a document.** An `<h1>` in a `Badge` story would be wrong.
+The population is `specs/**/Pages/**` plus the area overviews, and it is written
+down in `scripts/check-page-outline.mjs` rather than inferred.
+
+**Adding the `<h1>` moves everything under it.** An `h1` followed by an `h4` is
+a three-level skip, so a page that used to run `h4 → h4` has to become
+`h2 → h3` — tag only, class kept, nothing changes on screen. Two consequences,
+both of which bit during #243:
+
+- A component that lands at two depths takes its level as a prop.
+  `SectionTitle` is an `h3` under a page's own header and an `h2` on the
+  Reflection page, which has no such header.
+- Tag-keyed CSS has to be widened in the same edit, exactly as § Heading levels
+  says. `.lesson-content__title-section h4` silently dropped a colour and a
+  margin the moment those titles became `h2`.
 </div>
 
 <div className="sb-ds-doc-section">

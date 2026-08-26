@@ -20,6 +20,18 @@ const OnboardingModuleCard = ({
     description = 'Add description here',
     imageUrl = null,
     onClick,
+    /**
+     * Heading level for the card's title.
+     *
+     * The card lands at two depths. On `OnboardingOverviewPage` it sits under a
+     * "Featured Modules" / "All Modules" `h2`, so it has to be an `h3` or axe
+     * reports a skip. In its own stories each grid is introduced by an `<h6>`
+     * section label, and an `h3` there makes the NEXT label a three-level jump —
+     * which is how this regressed once already. Same shape as `OverviewCard`'s
+     * `titleAs` (#242); the class carries the appearance, so the level never
+     * changes how it looks.
+     */
+    titleAs: TitleTag = 'h5',
     className = '',
     ...props
 }) => {
@@ -64,9 +76,9 @@ const OnboardingModuleCard = ({
 
                         {/* Title */}
                         <div className="onboarding-module-card__title-wrapper">
-                            <h5 className="onboarding-module-card__title h5">
+                            <TitleTag className="onboarding-module-card__title h5">
                                 {title}
-                            </h5>
+                            </TitleTag>
                         </div>
                     </div>
 
@@ -84,6 +96,8 @@ const OnboardingModuleCard = ({
 OnboardingModuleCard.propTypes = {
     /** Module title */
     title: PropTypes.string,
+    /** Heading level for the title — see the note on the prop. */
+    titleAs: PropTypes.string,
     /** Duration text */
     duration: PropTypes.string,
     /** Card variant: "thumbnail" or "description" */

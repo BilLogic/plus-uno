@@ -62,6 +62,7 @@ const TutorProfilePage = ({
 
     return (
         <PageLayout
+            title="Tutor Profile"
             topBarConfig={topBarConfig}
             sidebarConfig={sidebarConfig}
             id="tutor-profile-page"
@@ -78,7 +79,7 @@ const TutorProfilePage = ({
                 }}
             >
                 {/* Page Title */}
-                <h3
+                <h2
                     className="h3"
                     style={{
                         color: 'var(--color-on-surface)',
@@ -86,7 +87,7 @@ const TutorProfilePage = ({
                     }}
                 >
                     Tutor Profile
-                </h3>
+                </h2>
 
                 {/* Upload Profile Pic */}
                 <div
