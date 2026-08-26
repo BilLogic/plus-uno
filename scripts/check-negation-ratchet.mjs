@@ -21,8 +21,11 @@
  * file ("no throat-clearing", "zero jokes, zero playful emoji", "aren't
  * confirmations", "stage nothing"). Across the bundled set the gap is 202 here
  * against 512 more — the number moves on roughly a third of the property its
- * old name implied. Since 6 is now this file's floor, saying so in the output
- * is the difference between a modest measurement and a misleading one.
+ * old name implied. (Both halves of that comparison were measured at #234 over
+ * whole files; the bundled figure is 200 on the bundled body — see § The scopes
+ * read their docs differently. The ratio is what this paragraph is for.) Since
+ * 6 is now this file's floor, saying so in the output is the difference between
+ * a modest measurement and a misleading one.
  *
  * THE OPTION NOT TAKEN was to broaden the regex and re-baseline once at the
  * honest number. It was measured before it was rejected, and the measurement is
@@ -89,16 +92,39 @@
  * against a hand-drawn list of directories rather than this rule; the rule finds
  * 46 and 107, and the gap is the estimate's, not a change in the docs.
  *
- * FRONTMATTER IS COUNTED, which is worth knowing and was not decided here — the
- * counter has read whole files since #155 and the bundled baseline of 202 was
- * recorded that way. It cuts both ways. For a `SKILL.md` it is right: the
- * `description:` is the routing text an agent reads to decide whether to load
- * the skill, so a ban there steers exactly as a ban in the body does, and 2 of
- * the IDE scope's tokens are that. For a bundled doc it is a slight over-count:
- * the bundler strips frontmatter before assembly, so the 2 tokens
- * `docs/connectors/supabase/overview.md` contributes from its own never reach
- * the model. Left alone deliberately — correcting it would move 202, and #174
- * adds a scope rather than re-baselining the one already holding.
+ * ── THE SCOPES READ THEIR DOCS DIFFERENTLY, ON PURPOSE (#238) ────────────────
+ *
+ * THE BUNDLED SCOPE COUNTS THE BUNDLED BODY — frontmatter stripped, through the
+ * bundler's own `splitFrontmatter`. THE IDE SCOPE COUNTS WHOLE FILES. That
+ * asymmetry is the finding, not an inconsistency to tidy away: the two corpora
+ * reach a model by different routes, and each scope reads the text its route
+ * actually delivers.
+ *
+ *   - A bundled doc reaches the model through `bundle-harness.mjs`, which
+ *     strips frontmatter before assembly. That is the same premise the char
+ *     budgets already stand on — they are measured on the bundled body, so that
+ *     declaring `embodiment:` costs a doc nothing. A prohibition in frontmatter
+ *     is therefore text the model is never told, and counting it measured a
+ *     different thing from the one this guard claims to: tokens the model is
+ *     told. `docs/connectors/supabase/overview.md` contributed the whole of the
+ *     gap — its own frontmatter carries 2, which is the whole of 202 -> 200.
+ *   - An IDE doc has no bundler. A `SKILL.md`'s `description:` is the routing
+ *     text the model reads when it decides whether to load the skill, so a ban
+ *     there steers exactly as a ban in the body does. 2 of the IDE scope's 107
+ *     are that, and they are real. Stripping frontmatter here would delete
+ *     them from the count while leaving them in the agent's context.
+ *
+ * ONE PARSER, NOT TWO. Where frontmatter ends is a fact the bundler decides —
+ * it is the fact that decides the prompt — so the split lives in
+ * `scripts/lib/frontmatter.mjs` and the bundler imports it from there. A second
+ * parser here that ended the block a line later would credit the prompt with
+ * prohibitions it never carries, which is one-rule-two-homes wearing the exact
+ * costume this guard was written to notice. `check-negation-ratchet.test.mjs`
+ * pins both halves — the asymmetry, and the single parser behind it — so a
+ * later edit cannot quietly unify the paths in either direction.
+ *
+ * The IDE scope's 107 is unchanged by this; only the bundled figure moved, from
+ * 202 (as #155 recorded it, whole files) to 200.
  *
  * ONE GUARD, TWO SCOPES, ONE BASELINE FILE. A second script would have restated
  * this header's reasoning, the token list and the failure message — which is
@@ -126,6 +152,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { bundlerFailureReport, harnessSets, resolveBundled, unresolvedReport } from './lib/bundled-set.mjs';
+import { splitFrontmatter } from './lib/frontmatter.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -170,17 +197,31 @@ export { bundlerFailureReport };
 
 /**
  * The two corpora, in one place, so a scope cannot exist in the code without a
- * name and a description the baseline file will carry.
+ * name, a description and a stated reading the baseline file will carry.
  *
  * `key` is how the scope is written down; `noun` is how the report says it.
  * Order is report order — bundled first, because those docs cost context on
  * every turn and an IDE doc costs it only when loaded.
+ *
+ * `read` IS THE ASYMMETRY, and it is a field rather than a branch so that the
+ * difference has to be declared beside the corpus it applies to and travels
+ * into the baseline as `measuredOn` (#238). Each scope reads the text its route
+ * to the model actually delivers — see § The scopes read their docs
+ * differently. A future edit that gives both scopes the same reader is a
+ * one-line edit HERE, in front of that reasoning, and it fails the tests.
  */
 export const SCOPES = [
   {
     key: 'bundled',
     noun: 'bundled docs',
     corpus: 'docs the bundler assembles into the Worker prompt (embodiment: all | uno-bot)',
+    // The bundler's own splitter, not a copy of it: this has to end the
+    // frontmatter block exactly where `bundle-harness.mjs` ends it, or the
+    // count and the prompt disagree about what the model was told.
+    read: (text) => splitFrontmatter(text).body,
+    measuredOn:
+      'the bundled body — frontmatter stripped, as bundle-harness.mjs strips it before ' +
+      'assembly, so the count is tokens the model is actually told',
   },
   {
     key: 'ide',
@@ -188,6 +229,10 @@ export const SCOPES = [
     corpus:
       'hand-authored docs under the bundler section roots declaring embodiment: ide — ' +
       'docs/adr/ and the generated .claude/skills/ surfaces are not section roots and so are out',
+    read: (text) => text,
+    measuredOn:
+      "whole files, frontmatter included — there is no bundler here, and a SKILL.md's " +
+      'description: is agent-facing routing text that steers exactly as the body does',
   },
 ];
 
@@ -241,6 +286,35 @@ export function corpusShrankReport({ scope, was, now }) {
 }
 
 /**
+ * What the reader is owed when a scope's READING changed under its baseline.
+ *
+ * The other two failures are about the corpus; this one is about the ruler. A
+ * scope reads either the bundled body or the whole file (#238), and switching
+ * one to the other moves its number without a single doc changing — downward,
+ * in the direction a ratchet never fails on. Unifying the two paths would land
+ * as bundled 200 -> 200 and IDE 107 -> 105, both green, and the guard would go
+ * on reporting a number whose definition it had stopped honouring. So the
+ * baseline records the reading it was taken under and this compares them.
+ *
+ * Pure, for the same reason as `roseReport`.
+ *
+ * @param {{scope: {key: string, noun: string, measuredOn: string}, was: string|undefined}} change
+ * @returns {string}
+ */
+export function readingChangedReport({ scope, was }) {
+  return (
+    `[negation] the ${scope.key} scope no longer reads what its baseline was recorded over.\n` +
+    `  baseline: ${was ?? '(the baseline records no reading for this scope)'}\n` +
+    `  now:      ${scope.measuredOn}\n` +
+    '  -> The two scopes read DIFFERENTLY on purpose: the bundled one counts the body the\n' +
+    '     bundler assembles, the IDE one counts whole files because a SKILL.md description\n' +
+    '     is routing text the model reads. Changing a reading moves the number with no doc\n' +
+    '     edited, and usually DOWNWARD — the direction a ratchet never fails on. If the new\n' +
+    '     reading is right, re-baseline with `--update` and say why in the PR.'
+  );
+}
+
+/**
  * One scope's score: resolve its files, count each, total them.
  *
  * `resolveBundled` RETURNS what did not resolve instead of filtering it out —
@@ -248,7 +322,11 @@ export function corpusShrankReport({ scope, was, now }) {
  * corpus in silence (#234). It is named for the bundled set but is just a
  * reader of repo-relative paths, so both scopes use it.
  *
- * @param {{key: string, noun: string, corpus: string}} scope
+ * The scope's own `read` decides how much of each file is counted — the bundled
+ * body, or the whole file (#238). It is applied HERE, once, so neither scope
+ * can acquire a reading that its baseline descriptor does not state.
+ *
+ * @param {{key: string, noun: string, corpus: string, read: (text: string) => string}} scope
  * @param {string[]} files
  */
 function measure(scope, files) {
@@ -260,7 +338,7 @@ function measure(scope, files) {
   const counts = {};
   let total = 0;
   for (const { label, text } of docs) {
-    const n = countProhibitions(text);
+    const n = countProhibitions(scope.read(text));
     if (n) counts[label] = n;
     total += n;
   }
@@ -288,12 +366,23 @@ function main() {
     const metric = {
       counts: METRIC,
       tokens: PROHIBITION_TOKENS,
-      measuredOn: 'whole files, frontmatter included, outside quoted speech and code spans',
+      // What is common to both scopes. HOW MUCH OF EACH FILE IS READ IS NOT
+      // common to them (#238), so it is recorded per scope below rather than
+      // asserted once here — a single line would have to be wrong about one of
+      // them, which is how the old "frontmatter included" outlived being true
+      // of the bundled half.
+      measuredOn: 'outside quoted speech and code spans; how much of each file, per scope below',
       note: 'NOT a count of negative statements — see scripts/check-negation-ratchet.mjs § What is counted.',
     };
     const scopes = {};
     for (const m of measured) {
-      scopes[m.scope.key] = { corpus: m.scope.corpus, docs: m.docs, total: m.total, counts: m.counts };
+      scopes[m.scope.key] = {
+        corpus: m.scope.corpus,
+        measuredOn: m.scope.measuredOn,
+        docs: m.docs,
+        total: m.total,
+        counts: m.counts,
+      };
     }
     fs.writeFileSync(BASELINE, `${JSON.stringify({ metric, scopes }, null, 2)}\n`);
     console.log(
@@ -323,7 +412,13 @@ function main() {
       );
       continue;
     }
-    // Corpus floor FIRST. A shrunken corpus makes the count below meaningless,
+    // The RULER before the corpus: a count taken through a different reading is
+    // not comparable to this baseline at all, whatever the corpus did.
+    if (b.measuredOn !== m.scope.measuredOn) {
+      failures.push(readingChangedReport({ scope: m.scope, was: b.measuredOn }));
+      continue;
+    }
+    // Corpus floor next. A shrunken corpus makes the count below meaningless,
     // and reporting a fall as good news is the failure this ordering prevents.
     if (m.docs < b.docs) {
       failures.push(corpusShrankReport({ scope: m.scope, was: b.docs, now: m.docs }));
