@@ -33,6 +33,7 @@
     "check:doc-identifiers": "node scripts/check-doc-identifiers.mjs",
     "report:doc-identifiers": "node scripts/check-doc-identifiers.mjs --report --stats",
     "check:negation": "node scripts/check-negation-ratchet.mjs",
+    "check:token-collision": "node scripts/check-token-collision.mjs",
     "generate:knowledge-audit": "node scripts/generate-knowledge-audit.js",
     "check:knowledge-audit": "node scripts/generate-knowledge-audit.js --check",
     "check:knowledge-disposition": "node scripts/check-knowledge-disposition.mjs",

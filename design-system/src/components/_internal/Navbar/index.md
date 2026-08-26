@@ -32,7 +32,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-inverse-on-surface` · `--color-inverse-surface` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--color-surface-container` · `--font-family-header` · `--font-size-title-s` · `--font-weight-bold` · `--font-weight-normal` · `--size-element-gap-lg` · `--size-element-pad-x-lg` · `--size-element-pad-y-md`
+`--color-inverse-on-surface` · `--color-inverse-surface` · `--color-on-primary` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--color-surface-container` · `--font-family-header` · `--font-size-title-s` · `--font-weight-bold` · `--font-weight-normal` · `--size-element-gap-lg` · `--size-element-pad-x-lg` · `--size-element-pad-y-md`
 
 From `design-system/src/components/_internal/Navbar/Navbar.scss`. Override these through the token layer, never with a literal.
 
