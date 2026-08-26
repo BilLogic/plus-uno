@@ -139,6 +139,18 @@ for idx in "${required_indexes[@]}"; do
   fi
 done
 
+echo "[check] validating repo paths INSIDE the JSON indexes resolve"
+
+# Existence + JSON.parse says the index is a file and is syntactically JSON. It
+# says nothing about the paths the index hands an agent, and those are the whole
+# point of an index. #75 (dead design-system/src/forms/ paths) and #76 (four
+# `Admin/Tutor Admin/...` segments) both lived inside these files while this
+# script printed [ok]. What is and is not covered is documented at the top of
+# scripts/validate-index-paths.mjs, next to the matcher that decides.
+if ! node scripts/validate-index-paths.mjs; then
+  status=1
+fi
+
 echo "[check] validating no old path remnants in active files"
 
 old_patterns=(
