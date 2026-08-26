@@ -1,9 +1,9 @@
 {
-  "total": 281,
+  "total": 202,
   "counts": {
     "AGENTS.md": 6,
     "CONTEXT.md": 7,
-    "agents/uno-bot/AGENT.md": 85,
+    "agents/uno-bot/AGENT.md": 6,
     "skills/uno-maintain/references/method.md": 13,
     "skills/uno-maintain/bot.md": 12,
     "skills/uno-prototype/references/method.md": 14,
