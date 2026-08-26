@@ -1,14 +1,13 @@
 {
   "measured": "2026-08-26",
   "suite": {
-    "storyFiles": 388,
-    "tests": 1133
+    "storyFiles": 385,
+    "tests": 1126
   },
-  "violatingStories": 146,
+  "violatingStories": 126,
   "rules": {
     "color-contrast": 45,
     "heading-order": 44,
-    "label": 25,
     "button-name": 23,
     "aria-prohibited-attr": 12,
     "aria-dialog-name": 8,
@@ -144,34 +143,9 @@
     "design-system/src/specs/Profile/Elements/MathLevel.stories.jsx::Variants": [
       "nested-interactive"
     ],
-    "design-system/src/specs/Profile/Modals/PreviewImage.stories.jsx::Interactive": [
-      "label"
-    ],
-    "design-system/src/specs/Profile/Modals/PreviewImage.stories.jsx::Overview": [
-      "label"
-    ],
-    "design-system/src/specs/Profile/Modals/PreviewImage.stories.jsx::Variants": [
-      "label"
-    ],
-    "design-system/src/specs/Profile/Pages/TutorProfilePage/TutorProfilePage.stories.jsx::Interactive": [
-      "label"
-    ],
-    "design-system/src/specs/Profile/Pages/TutorProfilePage/TutorProfilePage.stories.jsx::Overview": [
-      "label"
-    ],
     "design-system/src/specs/Profile/Pages/TutorProfilePage/TutorProfilePage.stories.jsx::Variants": [
-      "label",
       "landmark-no-duplicate-main",
       "landmark-unique"
-    ],
-    "design-system/src/specs/Profile/Sections/Status.stories.jsx::Interactive": [
-      "label"
-    ],
-    "design-system/src/specs/Profile/Sections/Status.stories.jsx::Overview": [
-      "label"
-    ],
-    "design-system/src/specs/Profile/Sections/Status.stories.jsx::Variants": [
-      "label"
     ],
     "design-system/src/specs/Toolkit/In-Session/Elements/EngagementDropdown.stories.jsx::All States": [
       "color-contrast"
@@ -181,12 +155,6 @@
     ],
     "design-system/src/specs/Toolkit/In-Session/Elements/EngagementListItems.stories.jsx::Interactive": [
       "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/In-Session/Elements/RequestTutor/RequestTutorOffCanvas.stories.jsx::Lead Request": [
-      "label"
-    ],
-    "design-system/src/specs/Toolkit/In-Session/Elements/RequestTutor/RequestTutorOffCanvas.stories.jsx::Playground": [
-      "label"
     ],
     "design-system/src/specs/Toolkit/In-Session/Modals/InSessionPopUpModal.stories.jsx::Assignment Loaded Lead": [
       "scrollable-region-focusable"
@@ -253,14 +221,7 @@
       "heading-order"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Cards/CallOffAlerts.stories.jsx::All Alerts": [
-      "button-name",
-      "label"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Cards/CallOffAlerts.stories.jsx::Confirmation Alert": [
-      "label"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Cards/CallOffAlerts.stories.jsx::Confirmation Alert Only": [
-      "label"
+      "button-name"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Cards/CallOffAlerts.stories.jsx::Time Warning Alert Only": [
       "button-name"
@@ -268,12 +229,8 @@
     "design-system/src/specs/Toolkit/Pre-Session/Cards/CallOffAlerts.stories.jsx::Update Alert Only": [
       "button-name"
     ],
-    "design-system/src/specs/Toolkit/Pre-Session/Elements/CallOffForm/ToggleOrganism/ToggleOrganism.stories.jsx::Interactive": [
-      "label"
-    ],
     "design-system/src/specs/Toolkit/Pre-Session/Elements/CallOffForm/ToggleOrganism/ToggleOrganism.stories.jsx::Overview": [
-      "color-contrast",
-      "label"
+      "color-contrast"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Elements/CTATutorViewButtons.stories.jsx::CTA (Tutor View) Buttons": [
       "color-contrast"
@@ -294,8 +251,7 @@
       "button-name"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Modals/Call-Offs/CallOffRequestDetails.stories.jsx::Call Off Request Details": [
-      "button-name",
-      "label"
+      "button-name"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Modals/ConfirmSessionAvailability/SessionDetailsNA.stories.jsx::Session Details NA": [
       "button-name",
@@ -324,15 +280,6 @@
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Modals/SessionDetailsAllUser/SessionDetails.stories.jsx::Session Info Post Sign Up": [
       "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Modals/SessionDetailsAllUser/SessionDetails.stories.jsx::Unregister Post Sign Up": [
-      "label"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Modals/SessionFillIns/SessionFillIns.stories.jsx::Consent Form": [
-      "label"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Modals/SessionFillIns/SessionFillIns.stories.jsx::Fill In": [
-      "label"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Modals/SessionFillIns/SessionFillIns.stories.jsx::Session Details": [
       "color-contrast"
@@ -374,22 +321,9 @@
     "design-system/src/specs/Toolkit/Pre-Session/Tables/AllSessionsTable.stories.jsx::Interactive": [
       "color-contrast"
     ],
-    "design-system/src/specs/Toolkit/Pre-Session/Tables/FillInSchedule.stories.jsx::Interactive": [
-      "label"
-    ],
     "design-system/src/specs/Toolkit/Pre-Session/Tables/FillInSchedule.stories.jsx::Overview": [
       "color-contrast",
-      "heading-order",
-      "label"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Tables/FillInSchedule.stories.jsx::Table Row": [
-      "label"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Tables/FillInTable.stories.jsx::Fill In Modal Row": [
-      "label"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Tables/FillInTable.stories.jsx::Overview": [
-      "label"
+      "heading-order"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Tables/MySessions.stories.jsx::Row States": [
       "color-contrast",

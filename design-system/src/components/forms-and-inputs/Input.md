@@ -21,7 +21,7 @@ Prefer `readOnly` (camelCase); legacy `readonly` is still accepted.
 | `name` | string | — | — |
 | `label` | node | — | Visible field label |
 | `required` | bool | `false` | Toggle the required switch to show or hide a * next to the label to show if the input is required. |
-| `showLabel` | bool | `true` | Toggle the label? switch to show or hide the label. |
+| `showLabel` | bool | `true` | Show the label, or hide it visually. Off still renders it and still names the input. |
 | `placeholder` | string | — | Placeholder text |
 | `value` | string or number | — | — |
 | `inputRef` | func or shape or any | — | — |

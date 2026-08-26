@@ -10,9 +10,29 @@
         border-bottom: 1px solid var(--color-outline-variant);
     }
 
+    // Figma `background color=dark` (node 72:16383) binds this bar to
+    // inverse-surface with inverse-on-surface text — a genuinely dark bar, not
+    // a surface-elevation step. The border matches the fill (as `primary` does)
+    // because the Figma variant has no bottom rule.
     &.plus-navbar-bg-dark {
-        background-color: var(--color-surface-container-low);
-        border-bottom: 1px solid var(--color-outline-variant);
+        background-color: var(--color-inverse-surface);
+        border-bottom: 1px solid var(--color-inverse-surface);
+
+        // Mandatory, not decorative. The brand and link colours further down
+        // are `--color-on-surface` and `--color-primary`, which land at 1.31:1
+        // and 2.48:1 on this background — the same invisible-text defect #153
+        // removed. Inverse-on-surface is 11.59:1. `.nav-link.active` is spelled
+        // out because Bootstrap's `.navbar-nav .nav-link.active` sets a
+        // near-black `--bs-navbar-active-color` at the same specificity as the
+        // bare `.nav-link` selector here, leaving it to stylesheet order.
+        .navbar-brand,
+        .plus-navbar-brand,
+        .nav-link,
+        .nav-link.active,
+        .nav-link:hover,
+        .nav-link:focus {
+            color: var(--color-inverse-on-surface);
+        }
     }
 
     &.plus-navbar-bg-primary {

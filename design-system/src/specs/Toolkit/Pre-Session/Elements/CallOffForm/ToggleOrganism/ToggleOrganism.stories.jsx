@@ -45,11 +45,18 @@ const CallOffFormOrganism = ({
                     <strong className="d-block body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>Call off entire recurring session</strong>
                     <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>This will call you off from all future sessions in this recurring session</span>
                 </div>
+                {/*
+                  * The heading to the left is the switch's visible text, but it
+                  * is a `<strong>` in its own column rather than a label, so it
+                  * names nothing. `Switch` spreads no rest props, so the name
+                  * goes through `inputProps` (#213).
+                  */}
                 <Switch
                     id={`call-off-switch-${isInteractive ? 'interactive' : (Math.random() + (isChecked ? 'c' : 'u'))}`}
                     checked={isToggled}
                     onChange={handleToggle}
                     size="small"
+                    inputProps={{ 'aria-label': 'Call off entire recurring session' }}
                     style={{ width: 'auto' }}
                 />
             </div>
