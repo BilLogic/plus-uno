@@ -49,11 +49,10 @@ function deriveImportPath(mdxAbsPath) {
   // barrel they are actually meant to import from.
   if (parts[0] === 'components' && parts[1] === '_internal') return '@/components';
   if (parts[0] === 'components' && parts.length >= 2) return `@/components/${parts[1]}`;
-  if (parts[0] === 'forms') {
-    if (parts[1] === 'DatePicker') return '@/forms/DatePicker';
-    if (parts[1] === 'InputGroup') return '@/forms/InputGroup';
-    return `@/forms/${parts[parts.length - 1]}`;
-  }
+  // No `forms` branch: the 2026-07 IA reorg folded `src/forms/` into
+  // `src/components/forms-and-inputs/`, so form components fall through the
+  // `components` branch above and import from `@/components/forms-and-inputs`
+  // like every other component. `@/forms/...` resolves to nothing.
   if (parts[0] === 'DataViz' && parts.length >= 3) {
     return `@/DataViz/${parts.slice(1, -1).join('/')}/${parts[parts.length - 1]}`;
   }
@@ -64,8 +63,6 @@ function deriveImportPath(mdxAbsPath) {
 function componentNameFromMdx(mdxAbsPath) {
   const rel = path.relative(DS_ROOT, mdxAbsPath).replace(/\\/g, '/');
   const parts = rel.replace(/\.mdx$/, '').split('/');
-  if (parts[0] === 'forms' && parts[1] === 'DatePicker') return 'DatePicker';
-  if (parts[0] === 'forms' && parts[1] === 'InputGroup') return 'InputGroup';
   return parts[parts.length - 1];
 }
 

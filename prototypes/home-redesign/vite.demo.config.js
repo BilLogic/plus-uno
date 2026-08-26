@@ -66,7 +66,6 @@ export default defineConfig(({ command }) => ({
                 loadPaths: [
                     path.resolve(repoRoot, 'design-system/src/tokens'),
                     path.resolve(repoRoot, 'design-system/src/styles'),
-                    path.resolve(repoRoot, 'design-system/src/forms'),
                 ],
                 silenceDeprecations: ['import', 'legacy-js-api'],
             },

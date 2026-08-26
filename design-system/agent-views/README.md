@@ -6,7 +6,7 @@ Nothing here is authored, and nothing here explains a component.
 | File | Generated from | Answers |
 |------|----------------|---------|
 | `components/index.md` | `src/components/index.js` exports | Does this component exist? |
-| `forms/index.md` | `src/forms/index.js` (now a redirect) | Where did the form components go? |
+| `forms/index.md` | static redirect (`src/forms/` is gone) | Where did the form components go? |
 | `tokens/tokens.md` | `src/tokens/*.scss` | What is this token called? |
 
 For a component's props, variants and usage, read its Storybook MDX and

@@ -79,8 +79,7 @@ export default defineConfig({
         api: 'modern-compiler',
         loadPaths: [
           path.resolve(dirname, 'design-system/src/tokens'),
-          path.resolve(dirname, 'design-system/src/styles'),
-          path.resolve(dirname, 'design-system/src/forms')
+          path.resolve(dirname, 'design-system/src/styles')
         ],
         silenceDeprecations: ['import', 'legacy-js-api']
       }
