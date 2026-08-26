@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
+import useFieldId from './useFieldId';
 import './Input.scss';
 
 /**
@@ -34,6 +35,8 @@ const Input = ({
     ...props
 }) => {
     const [isFocused, setIsFocused] = useState(false);
+    /** One id for the label and the input — see `useFieldId` (#206). */
+    const fieldId = useFieldId(id);
     /** Prefer `readOnly`; honor legacy `readonly` when explicitly passed */
     const isReadOnly = readOnly !== undefined ? readOnly : Boolean(readonly);
 
@@ -69,7 +72,7 @@ const Input = ({
     return (
         <div className={`plus-input-wrapper ${disabled ? 'plus-input-wrapper-disabled' : ''}`}>
             {showLabel && label && (
-                <Form.Label htmlFor={id || name} className="plus-input-label">
+                <Form.Label htmlFor={fieldId} className="plus-input-label">
                     {label}
                     {required && (
                         <span className="plus-input-required" aria-label="required">*</span>
@@ -87,7 +90,7 @@ const Input = ({
                     </div>
                 )}
                 <Form.Control
-                    id={id}
+                    id={fieldId}
                     name={name}
                     type={type}
                     placeholder={placeholder}

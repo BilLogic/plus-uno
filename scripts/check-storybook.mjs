@@ -8,15 +8,16 @@
  * set to `error` errored at nobody, and a story that stopped rendering said so
  * to nobody.
  *
- * HOW MANY `play` FUNCTIONS THERE ACTUALLY ARE: none. #169 and its parent were
- * written around "284 of 382 stories carry a `play` block", which came from
- * grepping `play:` — a pattern that matches `display:` in every inline style
- * object in the corpus. Re-measured 2026-08-26 with a word boundary, and against
- * the imports interaction tests need: zero story files match `play` as a key,
- * zero import `storybook/test`, zero use `userEvent` or `within(`. So what this
- * suite asserts today is: every story renders, and axe runs over the result.
- * The play path below is not dead code — it is the gate being in place before
- * the first interaction test is written, rather than after.
+ * HOW MANY `play` FUNCTIONS THERE ACTUALLY ARE: one file's worth. #169 and its
+ * parent were written around "284 of 382 stories carry a `play` block", which
+ * came from grepping `play:` — a pattern that matches `display:` in every inline
+ * style object in the corpus. Re-measured 2026-08-26 with a word boundary, and
+ * against the imports interaction tests need: zero story files matched `play` as
+ * a key, zero imported `storybook/test`. The first two arrived the same day, in
+ * `LabelAssociation.stories.jsx` (#206), which asserts what axe cannot see —
+ * that no `label[for]` in the story points at an id no element carries. So the
+ * play path below stopped being a gate held open for a future test and started
+ * carrying one.
  *
  * TWO FAILURE KINDS, TWO MECHANISMS. Vitest reports one status per story, but
  * the failures underneath are not one population:
@@ -24,7 +25,7 @@
  *   - A `play` failure, or a render error, is a defect introduced by a change.
  *     There are zero of them on `main` today (measured, not assumed). Anything
  *     that appears is new, so it blocks immediately.
- *   - An a11y violation is mostly inherited. 148 story tests fail on axe rules
+ *   - An a11y violation is mostly inherited. 146 story tests fail on axe rules
  *     that predate this gate, spread across 15 rules with no shared cause left
  *     after #153 — nothing to fix in one commit. Blocking on the absolute count
  *     would stop all work; deleting the rules would keep the count honest and

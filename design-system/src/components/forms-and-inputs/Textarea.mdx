@@ -195,9 +195,11 @@ the Figma spec for compact note fields.
 
 ### Accessibility
 
-- **`id` is what associates the label.** The label is rendered with
-  `htmlFor={id || name}` and the control receives only `id`; passing `name` on
-  its own leaves the label dangling.
+- **The label is associated whether you pass `id` or not.** One id is derived
+  once and used for both the label's `htmlFor` and the control; when no `id` is
+  given, React's `useId` supplies one. Pass `id` only when something outside the
+  component needs to point at the control, and you will get exactly that id back.
+  `name` is a form key, not an id, and no longer stands in for one (#206).
 - **The label is only rendered when `label` is given.** There is no
   `showLabel`-style escape hatch here, so a field with no visible label needs an
   `aria-label`, which is spread onto the control.

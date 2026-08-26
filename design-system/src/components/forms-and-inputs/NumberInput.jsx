@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { InputGroup as BootstrapInputGroup, Form } from 'react-bootstrap';
+import useFieldId from './useFieldId';
 import './NumberInput.scss';
 
 const NumberInput = ({
@@ -29,6 +30,8 @@ const NumberInput = ({
 }) => {
     const [isFocused, setIsFocused] = useState(false);
     const [internalValue, setInternalValue] = useState(value !== undefined ? value : '');
+    /** One id for the label and the input — see `useFieldId` (#206). */
+    const fieldId = useFieldId(id);
 
     // Sync internal value when external value prop changes
     useEffect(() => {
@@ -148,7 +151,7 @@ const NumberInput = ({
     return (
         <div className="plus-number-input-container">
             {showLabel && label && (
-                <Form.Label htmlFor={id || name} className="plus-number-input-label">
+                <Form.Label htmlFor={fieldId} className="plus-number-input-label">
                     {label}
                     {required && (
                         <span className="plus-number-input-required" aria-label="required">*</span>
@@ -161,7 +164,7 @@ const NumberInput = ({
                 {...props}
             >
                 <Form.Control
-                    id={id}
+                    id={fieldId}
                     name={name}
                     type="text"
                     placeholder={placeholder}

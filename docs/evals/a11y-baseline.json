@@ -1,14 +1,14 @@
 {
   "measured": "2026-08-26",
   "suite": {
-    "storyFiles": 382,
-    "tests": 1116
+    "storyFiles": 383,
+    "tests": 1118
   },
-  "violatingStories": 148,
+  "violatingStories": 146,
   "rules": {
     "color-contrast": 45,
     "heading-order": 44,
-    "label": 27,
+    "label": 25,
     "button-name": 23,
     "aria-prohibited-attr": 12,
     "aria-dialog-name": 8,
@@ -267,12 +267,6 @@
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Cards/CallOffAlerts.stories.jsx::Update Alert Only": [
       "button-name"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Elements/CallOffForm/SupervisorDecisionRationaleTextInput/SupervisorDecisionRationale.stories.jsx::Overview": [
-      "label"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Elements/CallOffForm/TextInputAdditionalDetails/AdditionalDetails.stories.jsx::Overview": [
-      "label"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Elements/CallOffForm/ToggleOrganism/ToggleOrganism.stories.jsx::Interactive": [
       "label"

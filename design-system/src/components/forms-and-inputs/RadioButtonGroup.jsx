@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
+import useFieldId from './useFieldId';
 import './RadioButtonGroup.scss';
 
 /**
@@ -95,6 +96,19 @@ const Scale = ({
     const isControlled = value !== undefined;
     const [internalValue, setInternalValue] = React.useState(defaultValue || (options.length > 0 ? options[0].value : null));
 
+    /**
+     * A scale's label names the whole set of radios, not any one of them (#206).
+     * A `<label for>` would be worse than dangling here — clicking it would
+     * select whichever radio it pointed at. So the label is a `span` with an
+     * id, and the radios sit in a `radiogroup` that is named by it.
+     */
+    const fieldId = useFieldId(id);
+    const hasLabel = Boolean(label);
+    const labelId = hasLabel ? `${fieldId}-label` : undefined;
+    // `id || name` first, so the per-option ids shipped call sites already see
+    // are byte-for-byte what they were; `fieldId` only fills the both-absent case.
+    const optionIdBase = id || name || fieldId;
+
     const currentValue = isControlled ? value : internalValue;
 
     const handleChange = (optionValue) => {
@@ -117,8 +131,8 @@ const Scale = ({
 
     return (
         <div className={wrapperClasses} style={style} {...props}>
-            {label && (
-                <Form.Label htmlFor={id || name} className="plus-scale-label">
+            {hasLabel && (
+                <Form.Label as="span" id={labelId} className="plus-scale-label">
                     {label}
                     {required && (
                         <span className="plus-scale-required" aria-label="required">*</span>
@@ -132,9 +146,9 @@ const Scale = ({
                 </div>
 
                 {/* Radio Buttons */}
-                <div className="plus-scale-options">
+                <div className="plus-scale-options" role="radiogroup" aria-labelledby={labelId}>
                     {options.map((option, index) => {
-                        const optionId = option.id || `${id || name}-option-${index}`;
+                        const optionId = option.id || `${optionIdBase}-option-${index}`;
                         const optionValue = option.value !== undefined ? option.value : option;
                         const optionLabel = option.label !== undefined ? option.label : (typeof option === 'string' ? option : 'Text');
                         const isChecked = currentValue === optionValue;

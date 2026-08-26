@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
+import useFieldId from './useFieldId';
 import './TagInput.scss';
 
 const TagInput = ({
@@ -26,6 +27,17 @@ const TagInput = ({
     const currentTags = isControlled ? tags : internalTags;
 
     const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
+
+    /**
+     * TagInput renders tags, not an input (#206). The label had nowhere to
+     * point — `htmlFor` was `id || name` while the only id in the tree was
+     * `${id}-container`, which never matched either. The container keeps that
+     * `-container` id, unchanged for callers who pass `id`, and is now the
+     * named `group` the label describes.
+     */
+    const fieldId = useFieldId(id);
+    const hasLabel = Boolean(label);
+    const labelId = hasLabel ? `${fieldId}-label` : undefined;
 
     const handleAdd = (tagValue) => {
         if (disabled) return;
@@ -64,8 +76,8 @@ const TagInput = ({
 
     return (
         <div className={`plus-form-tag-input-wrapper ${className}`} style={style} {...props}>
-            {label && (
-                <Form.Label htmlFor={id || name} className="plus-form-tag-input-label">
+            {hasLabel && (
+                <Form.Label as="span" id={labelId} className="plus-form-tag-input-label">
                     {label}
                     {required && (
                         <span className="plus-form-tag-input-required" aria-label="required">*</span>
@@ -74,7 +86,9 @@ const TagInput = ({
             )}
             <div
                 className={`plus-form-tag-input-container plus-form-tag-input-${size} ${sizeClass} ${disabled ? 'plus-form-tag-input-disabled' : ''}`}
-                id={id ? `${id}-container` : undefined}
+                id={`${fieldId}-container`}
+                role={hasLabel ? 'group' : undefined}
+                aria-labelledby={labelId}
             >
                 {currentTags.map((tag, index) => {
                     const tagValue = typeof tag === 'string' ? tag : tag.value || tag.text || '';

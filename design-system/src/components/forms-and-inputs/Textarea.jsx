@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
+import useFieldId from './useFieldId';
 import './Textarea.scss';
 
 const Textarea = ({
@@ -23,6 +24,9 @@ const Textarea = ({
     style,
     ...props
 }) => {
+    /** One id for the label and the control — see `useFieldId` (#206). */
+    const fieldId = useFieldId(id);
+
     const normalizeState = (nextState) => {
         // Back-compat aliases used in stories/docs.
         if (nextState === 'read-only' || nextState === 'readOnly') return 'readonly';
@@ -44,10 +48,10 @@ const Textarea = ({
 
     return (
         <div className={containerClass} style={style}>
-            {label && <label htmlFor={id || name} className="plus-textarea-v2__label">{label}</label>}
+            {label && <label htmlFor={fieldId} className="plus-textarea-v2__label">{label}</label>}
             <Form.Control
                 as="textarea"
-                id={id}
+                id={fieldId}
                 name={name}
                 value={value}
                 defaultValue={defaultValue}

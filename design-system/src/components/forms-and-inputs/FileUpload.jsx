@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import Button from '@/components/actions/Button';
+import useFieldId from './useFieldId';
 import './FileUpload.scss';
 
 const FileUpload = ({
@@ -24,6 +25,8 @@ const FileUpload = ({
 }) => {
     const [isFocused, setIsFocused] = useState(false);
     const fileInputRef = useRef(null);
+    /** One id for the label and the file input — see `useFieldId` (#206). */
+    const fieldId = useFieldId(id);
 
     const handleFocus = (e) => {
         setIsFocused(true);
@@ -88,7 +91,7 @@ const FileUpload = ({
                 }}
             >
                 {label && (
-                    <Form.Label htmlFor={id || name} className="plus-file-upload-label">
+                    <Form.Label htmlFor={fieldId} className="plus-file-upload-label">
                         {label}
                         {required && (
                             <span className="plus-file-upload-required" aria-label="required">*</span>
@@ -106,7 +109,7 @@ const FileUpload = ({
                     <input
                         ref={fileInputRef}
                         type="file"
-                        id={id}
+                        id={fieldId}
                         name={name}
                         accept={acceptAttribute}
                         disabled={disabled}

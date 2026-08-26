@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
+import useFieldId from './useFieldId';
 import './Rating.scss';
 
 /**
@@ -28,6 +29,16 @@ const Rating = ({
     icon = 'star',
     ...props
 }) => {
+    /**
+     * Rating renders no form control at all — five `role="button"` items (#206).
+     * There is nothing for a `<label for>` to point at, and `id` was accepted
+     * and then dropped on the floor. So the label is a `span` with an id, the
+     * row of items is the named `group`, and `id` finally lands on that group.
+     */
+    const fieldId = useFieldId(id);
+    const hasLabel = Boolean(label);
+    const labelId = hasLabel ? `${fieldId}-label` : undefined;
+
     const handleStarClick = (starValue) => {
         if (disabled) return;
         if (onChange) {
@@ -43,15 +54,20 @@ const Rating = ({
 
     return (
         <div className={wrapperClasses} style={style} {...props}>
-            {label && (
-                <Form.Label htmlFor={id || name} className="plus-rating-label">
+            {hasLabel && (
+                <Form.Label as="span" id={labelId} className="plus-rating-label">
                     {label}
                     {required && (
                         <span className="plus-rating-required" aria-label="required">*</span>
                     )}
                 </Form.Label>
             )}
-            <div className="plus-rating-container">
+            <div
+                className="plus-rating-container"
+                id={fieldId}
+                role={hasLabel ? 'group' : undefined}
+                aria-labelledby={labelId}
+            >
                 {[1, 2, 3, 4, 5].map((starValue) => {
                     const isSelected = value >= starValue;
                     return (
