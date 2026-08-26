@@ -100,6 +100,18 @@ for (const abs of files) {
     continue;
   }
 
+  // `archive` names a destination inside this folder, so it needs no target — but
+  // it does need to be true. A live note declaring `archive` while sitting outside
+  // archive/ is the cheapest way to pass this check without deciding anything,
+  // which is exactly what the folder became sediment by doing.
+  if (fm.disposition === 'archive') {
+    failures.push(
+      `${name}\n    disposition: archive, but the file is not under docs/knowledge/archive/.` +
+        '\n    Move it there — archiving is a destination, not a label.',
+    );
+    continue;
+  }
+
   if (!TARGET_REQUIRED.includes(fm.disposition)) continue;
 
   const target = fm['disposition-target'];
