@@ -24,6 +24,8 @@ const PatternModal = ({
     children,
     ...props
 }) => {
+    const reactId = React.useId();
+
     const classes = [
         'plus-pattern-modal',
         `plus-pattern-modal-pad-${padding}`,
@@ -36,10 +38,31 @@ const PatternModal = ({
         maxHeight: maxHeight ?? style?.maxHeight,
     };
 
+    // A `role="dialog"` needs an accessible name. The header title is the name
+    // whenever there is one, so point `aria-labelledby` at it; a caller that
+    // renders a title-less modal has to pass its own `aria-label`, which flows
+    // through `...props`.
+    const titleId = `${reactId}-title`;
+    const labelledBy = title ? titleId : undefined;
+
+    // The body is `overflow-y: auto`, so once a max height constrains it the
+    // content scrolls — and a scrollable region that holds no focusable content
+    // is unreachable by keyboard. Give it a tab stop exactly when it can
+    // scroll, rather than adding one to every modal.
+    const bodyScrolls = (maxHeight ?? style?.maxHeight) != null;
+
     return (
-        <div id={id} className={classes} style={modalStyle} role="dialog" aria-modal="false" {...props}>
+        <div
+            id={id}
+            className={classes}
+            style={modalStyle}
+            role="dialog"
+            aria-modal="false"
+            aria-labelledby={labelledBy}
+            {...props}
+        >
             <div className="plus-pattern-modal-header">
-                {title && <h2 className="plus-pattern-modal-title h5">{title}</h2>}
+                {title && <h2 id={titleId} className="plus-pattern-modal-title h5">{title}</h2>}
                 {onClose && (
                     <button
                         type="button"
@@ -51,7 +74,7 @@ const PatternModal = ({
                     </button>
                 )}
             </div>
-            <div className="plus-pattern-modal-body">{children}</div>
+            <div className="plus-pattern-modal-body" tabIndex={bodyScrolls ? 0 : undefined}>{children}</div>
             {footer && <div className="plus-pattern-modal-footer">{footer}</div>}
         </div>
     );

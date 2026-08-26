@@ -45,6 +45,32 @@ recoloring individual parts. Disabled elements are not focus targets.
 </div>
 
 <div className="sb-ds-doc-section">
+### Charts
+
+Every chart in Data visualizations is a Highcharts wrapper, and they all share
+`dataviz/chartTheme.js`. Two settings there carry the accessibility contract, so
+a chart built on the theme needs no per-component work:
+
+- **The accessibility module is on.** Highcharts only describes itself when
+  `accessibility.enabled` is true — it then emits a screen-reader section naming
+  the chart type and axes, labels every series and point, and makes the data
+  keyboard-navigable. With it off, Highcharts falls back to stamping the SVG
+  `role="img"` with a label read off the chart title; since these charts render
+  no title, that label was empty and every chart announced as an unlabeled
+  image.
+- **Charts are groups, not landmarks.** `landmarkVerbosity: 'disabled'` keeps
+  the chart a labelled `role="group"` instead of a `role="region"` landmark. A
+  chart here is a widget inside a page region, not a region of its own, so a
+  dashboard with six charts adds six groups rather than six entries to the
+  landmark menu.
+
+A chart that assembles its own options instead of spreading `chartTheme` has to
+carry `accessibility: chartTheme.accessibility` itself. Do not wrap a chart in
+`aria-hidden` to quiet a labelling warning — that hides the keyboard-navigation
+proxies the module creates, which is a worse defect than the one it silences.
+</div>
+
+<div className="sb-ds-doc-section">
 ### Automated checks
 
 The a11y addon (`@storybook/addon-a11y`) is enabled in `.storybook/main.js` and

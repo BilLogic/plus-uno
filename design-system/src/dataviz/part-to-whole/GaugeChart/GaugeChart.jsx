@@ -19,6 +19,10 @@ const GaugeChart = ({
     color
 }) => {
     const options = {
+        // This component builds its options from scratch rather than spreading
+        // chartTheme, so it has to carry the theme's accessibility settings
+        // itself — see the note on `accessibility` in chartTheme.js.
+        accessibility: chartTheme.accessibility,
         chart: {
             type: 'solidgauge',
             height: height,

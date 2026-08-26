@@ -22,11 +22,17 @@ const Navbar = ({
         className
     ].filter(Boolean).join(' ');
 
+    // No `bg` prop: react-bootstrap turns it into a `.bg-*` utility class whose
+    // `background-color` carries `!important`, so Bootstrap's palette overrode
+    // the `.plus-navbar-bg-*` token backgrounds below it. On the dark variant
+    // that left near-black brand text (`--color-on-surface`) on Bootstrap's own
+    // near-black `#212529` — a 1.11:1 contrast ratio, i.e. invisible. The three
+    // `.plus-navbar-bg-*` rules in Navbar.scss already define every background
+    // this component offers, so the tokens are the single source now.
     return (
         <RBNavbar
             id={id}
             className={navbarClasses}
-            bg={backgroundColor}
             expand="lg"
             style={style}
             {...props}
