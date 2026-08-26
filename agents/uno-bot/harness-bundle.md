@@ -15,31 +15,31 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **163,657 chars from 21 files**, against an assembled budget of 170,000 (6,343 to spare).
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **164,077 chars from 21 files**, against an assembled budget of 170,000 (5,923 to spare).
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,067 (−7,820 ide-only) | 9,067 | — |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 6,222 | 15,317 | — |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,755 | 43,113 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 53,369 | — |
-| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 57,688 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 8,959 | 66,706 | — |
-| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,448 | 73,199 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 79,385 | — |
-| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 84,547 | 7,000 (Worker face) |
-| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 88,758 | — |
-| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 91,919 | 7,000 (Worker face) |
-| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 97,833 | — |
-| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 102,263 | 7,000 (Worker face) |
-| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 108,208 | — |
-| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 112,829 | 7,000 (Worker face) |
-| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,928 | 114,799 | — |
-| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 127,762 | — |
-| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 140,741 | — |
-| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 11,794 (−4,363 ide-only) | 152,601 | — |
-| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,317 (−1,219 ide-only) | 156,972 | — |
-| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 6,637 (−605 ide-only) | 163,657 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,066 (−7,956 ide-only) | 9,066 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 6,222 | 15,316 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,755 | 43,112 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 53,368 | — |
+| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 57,687 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 8,959 | 66,705 | — |
+| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,448 | 73,198 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 79,384 | — |
+| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 84,546 | 7,000 (Worker face) |
+| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 88,757 | — |
+| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 91,918 | 7,000 (Worker face) |
+| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 97,832 | — |
+| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 102,262 | 7,000 (Worker face) |
+| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 108,207 | — |
+| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 112,828 | 7,000 (Worker face) |
+| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,928 | 114,798 | — |
+| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 127,761 | — |
+| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 140,740 | — |
+| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 11,794 (−4,363 ide-only) | 152,600 | — |
+| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,317 (−1,219 ide-only) | 156,971 | — |
+| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,058 (−605 ide-only) | 164,077 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -96,7 +96,7 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 
 Routing: match intent to the Use-when column; if ambiguous, ask which capability is meant. Each skill's `SKILL.md` is the IDE face, `bot.md` the Worker face; both load `references/method.md`. Which content belongs in which of the three — and the guard that holds the split — is `skills/README.md`.
 
-**A skill's discovery surfaces are generated.** Claude Code, Cursor and Slack each read their own path, and `npm run generate:skill-surfaces` publishes all three from the canonical frontmatter — so edit `skills/<name>/SKILL.md` and regenerate; `npm run check:skill-surfaces` fails the monthly sweep on drift. What is generated where: `docs/engineering/setup.md` § Generated skill surfaces.
+**A skill's discovery surfaces are generated.** Claude Code, Cursor and Slack each read their own path, and `npm run generate:skill-surfaces` publishes all three from the canonical frontmatter — so edit `skills/<name>/SKILL.md` and regenerate; `npm run check:skill-surfaces` fails the harness gate on drift. What is generated where: `docs/engineering/setup.md` § Generated skill surfaces.
 
 ## Agents — what skills summon
 
@@ -1830,6 +1830,7 @@ THE standing-automation registry. An automation absent from the table below is u
 | Figma hygiene sweep | monthly | uno-maintain (hygiene checklist in `figma-workspace.md`) | reviewers/auditor | ❌ not built — follow the integrity-sweep pattern; needs Figma API access in the runner | (planned) GHA cron → claude-vertex · GCP `hcii-plus` | — | planned |
 | Blueprint embeddings refresh | nightly cron (07:00 UTC) | uno-bot (semantic search freshness) | — | `uno-bot-embed-blueprint.yml` | GHA cron → Worker `/debug` route | Bill | ✅ live |
 | uno-bot evals (weekly drift check) | weekly cron (Mon 08:00 UTC) + on-demand `workflow_dispatch` | uno-bot (R/P regression cases vs live Worker) | LLM judge (Gemini on Vertex) | `uno-bot-evals.yml` → `agents/uno-bot/scripts/run-evals.mjs` | GHA cron → live Worker + Vertex judge · GCP `hcii-plus` | Bill | ✅ live |
+| Harness gate | **every `pull_request`** + on demand | the deterministic guards, composed | — | `check-harness.yml` → `npm run check:harness` → `scripts/check-harness.mjs` (composition and the reason for each member live there; `--list` prints them). ~20s, no `npm ci` — every member is dependency-free | GHA · no model call — deterministic scripts only | Bill | ✅ live (#155; the repo's first `pull_request` trigger) |
 | Conventions integrity sweep | monthly cron (1st, 09:00 UTC) | uno-maintain (integrity checklist: `staleness-sweep.md`) | reviewers/auditor | `harness-integrity-sweep.yml` → `scripts/prompts/uno-integrity-sweep/SKILL.md` (intake transport: shared ref above) | GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16 — filed intakes #71/#72); the pilot for the sweep pattern |
 | Notion comment sweep | each flow run touching a page + monthly | uno-maintain (unresolved threads → incorporate or intake) | writers/notion | ❌ not built — follow the integrity-sweep pattern (Notion via `NOTION_API_KEY`) | (planned) GHA cron → claude-vertex · GCP `hcii-plus` | — | planned |
 | Eval run logging | every flow exit | rubric scoring → run entry | reviewers/rubric-applier | interim: `docs/evals/runs/*.jsonl`; target: Notion Eval Runs DB | in-session (whatever harness ran the flow) | — | planned |
