@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import Highcharts from 'highcharts';
+import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 
 /**
@@ -110,15 +110,12 @@ const DonutChart = ({
     return (
         <div style={{ width: size, height: size, position: 'relative' }}>
             {/*
-              * Decorative: the segment values are already conveyed via the
-              * centered text overlay below, and Highcharts' default
-              * `role="img"` SVG has no accessible name without the
-              * accessibility module. Hide it from assistive tech rather than
-              * announcing an unlabeled image.
+              * Do not wrap this in `aria-hidden` — chartTheme enables the
+              * Highcharts accessibility module, so the chart names and
+              * describes itself, and hiding it would bury the focusable
+              * keyboard-navigation proxies the module renders inside it.
               */}
-            <div aria-hidden="true">
-                <HighchartsReact highcharts={Highcharts} options={options} />
-            </div>
+            <HighchartsReact highcharts={Highcharts} options={options} />
             <div style={{
                 position: 'absolute',
                 top: '50%',
