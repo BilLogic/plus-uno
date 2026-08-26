@@ -21,7 +21,7 @@ authored half (#166), counted rather than assumed.
 | [OptionList](OptionList.md) | 12 | ✕ | ✕ | ✕ |
 | [Radio](Radio.md) | 13 | ✕ | ✕ | ✕ |
 | [RadioButtonGroup](RadioButtonGroup.md) | 13 | ✕ | ✕ | ✕ |
-| [Range](Range.md) | 12 | ✕ | ✕ | ✕ |
+| [Range](Range.md) | 14 | ✕ | ✕ | ✅ |
 | [Rating](Rating.md) | 13 | ✕ | ✕ | ✕ |
 | [RichTextEditor](RichTextEditor/index.md) | 16 | ✕ | ✕ | ✕ |
 | [Select](Select.md) | 24 | ✅ | ✅ | ✅ |
@@ -31,7 +31,7 @@ authored half (#166), counted rather than assumed.
 | [Textarea](Textarea.md) | 17 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect.md) | 9 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 6/23 (26%) · Correct/incorrect 6/23 (26%) · Accessibility 6/23 (26%)
+**Authored coverage:** When to use 6/23 (26%) · Correct/incorrect 6/23 (26%) · Accessibility 7/23 (30%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

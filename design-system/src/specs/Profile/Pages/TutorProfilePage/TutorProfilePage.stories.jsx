@@ -5,7 +5,7 @@
  * Matches Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5615-214865&m=dev
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useId, useState } from 'react';
 import TutorProfilePage from './TutorProfilePage';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import { PageLayout } from '../../../Universal/Pages';
@@ -90,6 +90,13 @@ const InfoTooltipContent = () => (
 
 /** Fully wired tutor profile page for Storybook (hooks live in a real component). */
 function TutorProfileInteractiveDemo({ profileState }) {
+    // The visible labels here are the caller's `<Label>`, not each Input's own,
+    // so the pairing is made with `htmlFor` (#213). `useId` scopes the ids per
+    // instance — `Variants` renders two pages on one screen, and two fields
+    // sharing `id="bi-first-name"` would send both labels to the first.
+    const uid = useId();
+    const fieldId = (key) => `${uid}-${key}`;
+
     const [preferredName, setPreferredName] = useState('');
     const [additionalEmail, setAdditionalEmail] = useState('');
     const [slackEmail, setSlackEmail] = useState('');
@@ -182,9 +189,9 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                 overflow: 'hidden',
                             }}
                         >
-                            <Label text="First Name" required={false} />
+                            <Label text="First Name" required={false} htmlFor={fieldId('bi-first-name')} />
                             <Input
-                                id="bi-first-name"
+                                id={fieldId('bi-first-name')}
                                 value="Veronica"
                                 readonly={true}
                                 size="medium"
@@ -201,8 +208,8 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                 overflow: 'hidden',
                             }}
                         >
-                            <Label text="Last Name" required={false} />
-                            <Input id="bi-last-name" value="Lodge" readonly={true} size="medium" showLabel={false} />
+                            <Label text="Last Name" required={false} htmlFor={fieldId('bi-last-name')} />
+                            <Input id={fieldId('bi-last-name')} value="Lodge" readonly={true} size="medium" showLabel={false} />
                         </div>
                         <div
                             style={{
@@ -214,9 +221,9 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                 overflow: 'hidden',
                             }}
                         >
-                            <Label text="Preferred Name" required={false} />
+                            <Label text="Preferred Name" required={false} htmlFor={fieldId('bi-preferred-name')} />
                             <Input
-                                id="bi-preferred-name"
+                                id={fieldId('bi-preferred-name')}
                                 placeholder="Enter"
                                 value={preferredName}
                                 onChange={(e) => setPreferredName(e.target.value)}
@@ -240,9 +247,9 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                 overflow: 'hidden',
                             }}
                         >
-                            <Label text="PLUS Account Email" required={false} />
+                            <Label text="PLUS Account Email" required={false} htmlFor={fieldId('bi-plus-email')} />
                             <Input
-                                id="bi-plus-email"
+                                id={fieldId('bi-plus-email')}
                                 value="pl2-app-demo@gmail.com"
                                 readonly={true}
                                 size="medium"
@@ -266,7 +273,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                     alignItems: 'flex-start',
                                 }}
                             >
-                                <Label text="Additional Email" required={false} />
+                                <Label text="Additional Email" required={false} htmlFor={fieldId('bi-additional-email')} />
                                 <Tooltip
                                     text="Get notifications sent to an alternate email address"
                                     placement="right"
@@ -291,7 +298,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                 </Tooltip>
                             </div>
                             <Input
-                                id="bi-additional-email"
+                                id={fieldId('bi-additional-email')}
                                 placeholder="pl2-app-demo@gmail.com"
                                 value={additionalEmail}
                                 onChange={(e) => setAdditionalEmail(e.target.value)}
@@ -309,9 +316,9 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                 overflow: 'hidden',
                             }}
                         >
-                            <Label text="Slack Email" required={false} />
+                            <Label text="Slack Email" required={false} htmlFor={fieldId('bi-slack-email')} />
                             <Input
-                                id="bi-slack-email"
+                                id={fieldId('bi-slack-email')}
                                 placeholder="pl2-app-demo@gmail.com"
                                 value={slackEmail}
                                 onChange={(e) => setSlackEmail(e.target.value)}
@@ -387,8 +394,8 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                     overflow: 'hidden',
                                 }}
                             >
-                                <Label text={field.label} required={false} />
-                                <Input id={`status-${field.label}`} value={field.value} readonly={true} size="medium" showLabel={false} />
+                                <Label text={field.label} required={false} htmlFor={fieldId(`status-${field.label}`)} />
+                                <Input id={fieldId(`status-${field.label}`)} value={field.value} readonly={true} size="medium" showLabel={false} />
                             </div>
                         ))}
                     </div>

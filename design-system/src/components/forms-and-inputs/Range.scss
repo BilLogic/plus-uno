@@ -10,6 +10,28 @@
     width: 100%;
 }
 
+.plus-form-range-label {
+    margin-bottom: var(--size-element-gap-xs, 4px);
+    color: var(--color-on-surface);
+    font-weight: var(--font-weight-normal);
+    font-size: var(--font-size-body3);
+    line-height: var(--font-line-height-body3);
+}
+
+// `showLabel={false}` hides the label, it does not delete it (#213). Absolute
+// positioning takes it out of flow, so the slider sits where it did before.
+.plus-form-range-label-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 .plus-form-range {
     width: 100%;
     height: 4px; // Track height - medium size

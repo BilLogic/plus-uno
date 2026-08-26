@@ -105,16 +105,19 @@ it is what a "select all" control needs when only some rows are ticked.
 
 ### Correct and incorrect
 
-**Give it an `id` or a `name` — with neither, nothing links the label.**
+**A checkbox with no `label` has no name — give it one, visible or not.**
 
 ```jsx
-// Incorrect — the id passed down is `id || name`, so with neither the input has
-// no id, and its label has nothing to point at.
-<Checkbox label="Email me a summary" checked={emailMe} onChange={onEmailMe} />
+// Incorrect — a row-select checkbox in a table. Nothing names it, and the
+// column it sits in does not: a screen reader reads "checkbox", four times.
+<Checkbox checked={selected} onChange={onSelect} />
 
-// Correct.
-<Checkbox id="email-summary" label="Email me a summary"
-          checked={emailMe} onChange={onEmailMe} />
+// Correct — no room for visible text, so the name goes in `aria-label`.
+<Checkbox checked={selected} onChange={onSelect}
+          aria-label={`Select the session on ${date}`} />
+
+// Also correct — there is room, so the text is the label.
+<Checkbox label="Email me a summary" checked={emailMe} onChange={onEmailMe} />
 ```
 
 **Pick controlled or uncontrolled and stay there.**
@@ -150,11 +153,18 @@ it is what a "select all" control needs when only some rows are ticked.
 
 ### Accessibility
 
-- **The label is wired for you** — as long as `id` or `name` is set. The
-  component hands `id || name` to the underlying form check, which renders the
-  `label` with a matching `htmlFor`. `Input` and `Textarea` reach the same place
-  by a different route: since #206 they generate an id when the caller gives none,
-  so their label is associated either way.
+- **The label is wired for you, `id` or no `id`.** The component derives one id
+  through `useFieldId` and hands it to the underlying form check, which renders
+  the `label` with a matching `htmlFor`. Until #213 it handed down `id || name`,
+  so a caller who passed neither got an input with no id and a label pointing at
+  nothing — the `label` rendered and named nothing. `Input` and `Textarea` reach
+  the same place by the same route, since #206.
+- **`name` is not an id.** It is a form key, it is not unique on the page, and no
+  element carries it as one; it no longer stands in for a missing `id` (#213).
+- **A checkbox with no `label` has no accessible name.** Nothing substitutes for
+  it — not a neighbouring `<span>`, not the column it sits under. Where the
+  design has no room for visible text, pass `aria-label`; it is spread onto the
+  input.
 - **`required` is forwarded.** Unlike `Input`, the `required` prop reaches the
   input element as well as drawing the asterisk, so native validation applies.
   The asterisk itself is a span marked `aria-label="required"`.
