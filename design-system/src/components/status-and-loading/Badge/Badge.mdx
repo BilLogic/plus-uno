@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as BadgeStories from './Badge.stories.jsx';
@@ -97,6 +98,10 @@ export const figmaMeta = {
 <Title />
 Static visual identifiers used to categorize or describe elements. They are used for displaying the status, type, or other relevant information about an element.
 
+<DocsTabs of={BadgeStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19481"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Badge"
@@ -104,12 +109,11 @@ Static visual identifiers used to categorize or describe elements. They are used
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Icons, counters, and dismissible badge patterns.</>}>
     <Canvas of={BadgeStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -119,7 +123,7 @@ Static visual identifiers used to categorize or describe elements. They are used
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Recommended combinations: status, labels, counts, filters, and subcomponent wiring.</>}>
     <DsCanvasQuiet of={BadgeStories.Content} />
@@ -133,7 +137,7 @@ Static visual identifiers used to categorize or describe elements. They are used
 
 <div className="sb-ds-doc-section">
 
-### Styles
+## Styles
 
 <DocsCanvasShell description={<>Semantic and curriculum color themes.</>}>
     <DsCanvasQuiet of={BadgeStories.Styles} />
@@ -147,7 +151,7 @@ Static visual identifiers used to categorize or describe elements. They are used
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Header and body typography scales.</>}>
     <DsCanvasQuiet of={BadgeStories.Sizes} />
@@ -157,7 +161,31 @@ Static visual identifiers used to categorize or describe elements. They are used
 
 <div className="sb-ds-doc-section">
 
-### When to use
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={BadgeStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
 
 Use `Badge` to label something that is already on screen — a session's status, a
 tutor's competency domain, an unread count beside a nav item. It is a read-only
@@ -188,7 +216,7 @@ Reach for it when the label is a *property* of the row, not an action on it.
 
 <div className="sb-ds-doc-section">
 
-### Correct and incorrect
+## Correct and incorrect
 
 **Status is a badge; changing status is a button.**
 
@@ -233,7 +261,7 @@ Reach for it when the label is a *property* of the row, not an action on it.
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Accessibility
 
 - **The badge itself is not interactive, on purpose.** The source says so: a
   `role="button"` wrapper would nest one control inside another once
@@ -255,20 +283,8 @@ Reach for it when the label is a *property* of the row, not an action on it.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={BadgeStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

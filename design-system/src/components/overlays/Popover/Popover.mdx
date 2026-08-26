@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as PopoverStories from './Popover.stories.jsx';
@@ -21,6 +22,10 @@ export const figmaMeta = {
 
 <Title />
 
+<DocsTabs of={PopoverStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19506"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/overlays/Popover"
@@ -28,12 +33,11 @@ export const figmaMeta = {
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Popover with title and body in a fixed, non-interactive layout (always visible). Use Interactive for click/hover behavior.</>}>
     <Canvas of={PopoverStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -43,7 +47,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Body-only popover (no title).</>}>
     <DsCanvasQuiet of={PopoverStories.Content} />
@@ -53,7 +57,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### States
+## States
 
 <DocsCanvasShell description={<>Open on click, hover, or focus.</>}>
     <DsCanvasQuiet of={PopoverStories.InteractionStates} />
@@ -63,7 +67,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Layout & composition
+## Layout & composition
 
 <DocsCanvasShell description={<>Placement around the trigger: top, bottom, left, and right.</>}>
     <DsCanvasQuiet of={PopoverStories.Layout} />
@@ -73,7 +77,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={PopoverStories.Interactive}
@@ -88,3 +92,7 @@ export const figmaMeta = {
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

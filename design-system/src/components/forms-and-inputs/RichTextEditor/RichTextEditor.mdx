@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as RichTextEditorStories from './RichTextEditor.stories.jsx';
@@ -21,6 +22,10 @@ export const figmaMeta = {
 
 <Title />
 
+<DocsTabs of={RichTextEditorStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9662-17308"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs/RichTextEditor"
@@ -28,12 +33,11 @@ export const figmaMeta = {
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Default medium editor and placeholder.</>}>
     <Canvas of={RichTextEditorStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -43,7 +47,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={RichTextEditorStories.Interactive}
@@ -58,3 +62,7 @@ export const figmaMeta = {
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

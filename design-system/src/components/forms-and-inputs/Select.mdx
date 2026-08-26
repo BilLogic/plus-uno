@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SelectStories from './Select.stories.jsx';
@@ -22,6 +23,10 @@ export const figmaMeta = {
 <Title />
 Use a select input when a user needs to select one or multiple options from a long list.
 
+<DocsTabs of={SelectStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10266"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
@@ -29,12 +34,11 @@ Use a select input when a user needs to select one or multiple options from a lo
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Single-select with placeholder — default docs entry.</>}>
     <Canvas of={SelectStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -44,7 +48,7 @@ Use a select input when a user needs to select one or multiple options from a lo
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Placeholder and value display in single-select mode.</>}>
     <DsCanvasQuiet of={SelectStories.Content} />
@@ -54,7 +58,7 @@ Use a select input when a user needs to select one or multiple options from a lo
 
 <div className="sb-ds-doc-section">
 
-### Modes
+## Modes
 
 <DocsCanvasShell description={<>Multi-select, searchable, and creatable behaviors.</>}>
     <DsCanvasQuiet of={SelectStories.Modes} />
@@ -64,7 +68,7 @@ Use a select input when a user needs to select one or multiple options from a lo
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large.</>}>
     <DsCanvasQuiet of={SelectStories.Sizes} />
@@ -74,7 +78,7 @@ Use a select input when a user needs to select one or multiple options from a lo
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+## Interaction states
 
 <DocsCanvasShell description={<>Enabled, disabled, and read-only.</>}>
     <DsCanvasQuiet of={SelectStories.InteractionStates} />
@@ -84,7 +88,31 @@ Use a select input when a user needs to select one or multiple options from a lo
 
 <div className="sb-ds-doc-section">
 
-### When to use
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={SelectStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
 
 Use `Select` when the user picks from a known list of values and the choice is
 part of a form's data. It covers the cases a plain list of radios cannot:
@@ -119,7 +147,7 @@ visually consistent with the fields around it.
 
 <div className="sb-ds-doc-section">
 
-### Correct and incorrect
+## Correct and incorrect
 
 **Do not expect form semantics that are not there.**
 
@@ -200,7 +228,7 @@ visually consistent with the fields around it.
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Accessibility
 
 - **This is not a native `select` and not an ARIA combobox.** The trigger is a
   `div` with `role="button"` and `tabIndex={0}`; the options are `button`
@@ -228,20 +256,8 @@ visually consistent with the fields around it.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={SelectStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as RadioButtonGroupStories from './RadioButtonGroup.stories.jsx';
@@ -38,6 +39,10 @@ export const figmaMeta = {
 <Title />
 Use a scale when a user needs to communicate degree or intensity across an ordered range.
 
+<DocsTabs of={RadioButtonGroupStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
@@ -45,12 +50,11 @@ Use a scale when a user needs to communicate degree or intensity across an order
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Three-point scale with end labels and a selected value.</>}>
     <Canvas of={RadioButtonGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -60,7 +64,7 @@ Use a scale when a user needs to communicate degree or intensity across an order
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Baseline three-point scale with end labels.</>}>
     <DsCanvasQuiet of={RadioButtonGroupStories.Content} />
@@ -70,7 +74,7 @@ Use a scale when a user needs to communicate degree or intensity across an order
 
 <div className="sb-ds-doc-section">
 
-### Variants
+## Variants
 
 <DocsCanvasShell description={<>Different scale lengths using the same horizontal pattern.</>}>
     <DsCanvasQuiet of={RadioButtonGroupStories.Variants} />
@@ -80,7 +84,7 @@ Use a scale when a user needs to communicate degree or intensity across an order
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+## Interaction states
 
 <DocsCanvasShell description={<>Disabled scale example.</>}>
     <DsCanvasQuiet of={RadioButtonGroupStories.InteractionStates} />
@@ -90,7 +94,7 @@ Use a scale when a user needs to communicate degree or intensity across an order
 
 <div className="sb-ds-doc-section">
 
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={RadioButtonGroupStories.Interactive}
@@ -105,3 +109,7 @@ Use a scale when a user needs to communicate degree or intensity across an order
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

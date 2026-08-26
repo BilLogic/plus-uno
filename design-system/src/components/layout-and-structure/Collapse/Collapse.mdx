@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as CollapseStories from './Collapse.stories.jsx';
@@ -22,6 +23,10 @@ export const figmaMeta = {
 <Title />
 The collapse JavaScript plugin is used to show and hide content. Buttons or anchors are used as triggers that are mapped to specific elements you toggle.
 
+<DocsTabs of={CollapseStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19499"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Collapse"
@@ -29,12 +34,11 @@ The collapse JavaScript plugin is used to show and hide content. Buttons or anch
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Uncontrolled usage and an initially expanded panel via <code>defaultOpen</code>.</>}>
     <Canvas of={CollapseStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -44,7 +48,7 @@ The collapse JavaScript plugin is used to show and hide content. Buttons or anch
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Default collapsed panel and an initially expanded panel.</>}>
     <DsCanvasQuiet of={CollapseStories.Content} />
@@ -54,7 +58,7 @@ The collapse JavaScript plugin is used to show and hide content. Buttons or anch
 
 <div className="sb-ds-doc-section">
 
-### Icons
+## Icons
 
 <DocsCanvasShell description={<>Optional trigger icons on the left or right.</>}>
     <DsCanvasQuiet of={CollapseStories.Icons} />
@@ -64,7 +68,7 @@ The collapse JavaScript plugin is used to show and hide content. Buttons or anch
 
 <div className="sb-ds-doc-section">
 
-### Behavior
+## Behavior
 
 <DocsCanvasShell description={<>External open state and multiple independent panels.</>}>
     <DsCanvasQuiet of={CollapseStories.StatePatterns} />
@@ -77,7 +81,7 @@ The collapse JavaScript plugin is used to show and hide content. Buttons or anch
 
 <div className="sb-ds-doc-section">
 
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={CollapseStories.Interactive}
@@ -92,3 +96,7 @@ The collapse JavaScript plugin is used to show and hide content. Buttons or anch
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

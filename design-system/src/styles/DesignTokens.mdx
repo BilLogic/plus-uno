@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 import * as DesignTokensStories from './DesignTokens.stories.jsx';
@@ -12,6 +13,10 @@ mirrored one-to-one as CSS custom properties in
 reference tokens, so a change in Figma propagates to code by updating a single
 definition.
 
+<DocsTabs of={DesignTokensStories} examplesTitle="All tokens">
+
+<DocsTab tab="examples">
+
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/styles"
@@ -20,7 +25,7 @@ definition.
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
-### Figma variables ↔ CSS custom properties
+## Figma variables ↔ CSS custom properties
 
 The pipeline works in both directions:
 
@@ -33,7 +38,7 @@ The pipeline works in both directions:
 </div>
 
 <div className="sb-ds-doc-section">
-### Collections
+## Collections
 
 The Figma variables are organized into four collections, each with a CSS
 counterpart:
@@ -42,7 +47,7 @@ counterpart:
 </div>
 
 <div className="sb-ds-doc-section">
-### Naming contract
+## Naming contract
 
 Token names encode *context and role*, not raw values:
 
@@ -58,7 +63,7 @@ Token names encode *context and role*, not raw values:
 </div>
 
 <div className="sb-ds-doc-section">
-### Source of truth
+## Source of truth
 
 `design-system/guidelines/figma/token-mapping.md` is the **single source of
 truth** for Figma-to-CSS token names. Its key rules:
@@ -75,3 +80,7 @@ When you need a token, check that doc first; for quick machine lookups,
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

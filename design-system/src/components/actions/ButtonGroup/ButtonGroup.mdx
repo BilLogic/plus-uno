@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ButtonGroupStories from './ButtonGroup.stories.jsx';
@@ -22,6 +23,10 @@ export const figmaMeta = {
 <Title />
 Buttons can be grouped together as individual segments of related actions.
 
+<DocsTabs of={ButtonGroupStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19489"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/actions/ButtonGroup"
@@ -29,12 +34,11 @@ Buttons can be grouped together as individual segments of related actions.
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Compose with child <code>Button</code> elements instead of the <code>buttons</code> array when you need more custom content.</>}>
     <Canvas of={ButtonGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -44,7 +48,7 @@ Buttons can be grouped together as individual segments of related actions.
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Use child <code>Button</code> elements for custom per-segment content and visuals.</>}>
     <DsCanvasQuiet of={ButtonGroupStories.Children} />
@@ -54,7 +58,7 @@ Buttons can be grouped together as individual segments of related actions.
 
 <div className="sb-ds-doc-section">
 
-### Variants
+## Variants
 
 <DocsCanvasShell description={<>Connected groups with two through five segments.</>}>
     <DsCanvasQuiet of={ButtonGroupStories.Counts} />
@@ -64,7 +68,7 @@ Buttons can be grouped together as individual segments of related actions.
 
 <div className="sb-ds-doc-section">
 
-### Patterns
+## Patterns
 
 <DocsCanvasShell description={<>Common grouped patterns like pagination controls, toolbars, and segmented toggles.</>}>
     <DsCanvasQuiet of={ButtonGroupStories.Patterns} />
@@ -74,7 +78,7 @@ Buttons can be grouped together as individual segments of related actions.
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large grouped buttons.</>}>
     <DsCanvasQuiet of={ButtonGroupStories.Sizes} />
@@ -84,7 +88,7 @@ Buttons can be grouped together as individual segments of related actions.
 
 <div className="sb-ds-doc-section">
 
-### Layout & composition
+## Layout & composition
 
 <DocsCanvasShell description={<>Horizontal default versus vertical stacking.</>}>
     <DsCanvasQuiet of={ButtonGroupStories.Layout} />
@@ -94,7 +98,31 @@ Buttons can be grouped together as individual segments of related actions.
 
 <div className="sb-ds-doc-section">
 
-### When to use
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ButtonGroupStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
 
 Use `ButtonGroup` when two or more actions belong together and should read as one
 control — a toolbar above a table, a pair of view switches, a vertical stack of
@@ -124,7 +152,7 @@ children. Children win when both are given.
 
 <div className="sb-ds-doc-section">
 
-### Correct and incorrect
+## Correct and incorrect
 
 **A group of buttons is not a selection.**
 
@@ -175,7 +203,7 @@ children. Children win when both are given.
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Accessibility
 
 - **The group is a named container, nothing more.** It renders `role="group"` by
   default, and `ariaLabel` is the only prop that names it. An unnamed group
@@ -195,20 +223,8 @@ children. Children win when both are given.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={ButtonGroupStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

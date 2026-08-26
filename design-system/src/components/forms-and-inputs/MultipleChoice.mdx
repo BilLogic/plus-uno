@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as MultipleChoiceStories from './MultipleChoice.stories.jsx';
@@ -30,6 +31,10 @@ export const figmaMeta = {
 <Title />
 The multiple choice component can be used in forms where the user is required to select one or more options.
 
+<DocsTabs of={MultipleChoiceStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13332-2508"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
@@ -37,12 +42,11 @@ The multiple choice component can be used in forms where the user is required to
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Vertical radio list — default single-select pattern.</>}>
     <Canvas of={MultipleChoiceStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -52,7 +56,7 @@ The multiple choice component can be used in forms where the user is required to
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Pre-selected radio and checkbox examples.</>}>
     <DsCanvasQuiet of={MultipleChoiceStories.Content} />
@@ -62,7 +66,7 @@ The multiple choice component can be used in forms where the user is required to
 
 <div className="sb-ds-doc-section">
 
-### Variants
+## Variants
 
 <DocsCanvasShell description={<>Radio (single choice) and checkbox (multiple choices).</>}>
     <DsCanvasQuiet of={MultipleChoiceStories.Variants} />
@@ -72,7 +76,7 @@ The multiple choice component can be used in forms where the user is required to
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Small and large (medium is default).</>}>
     <DsCanvasQuiet of={MultipleChoiceStories.Sizes} />
@@ -82,7 +86,7 @@ The multiple choice component can be used in forms where the user is required to
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+## Interaction states
 
 <DocsCanvasShell description={<>Disabled radio and checkbox groups.</>}>
     <DsCanvasQuiet of={MultipleChoiceStories.InteractionStates} />
@@ -92,7 +96,7 @@ The multiple choice component can be used in forms where the user is required to
 
 <div className="sb-ds-doc-section">
 
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={MultipleChoiceStories.Interactive}
@@ -107,3 +111,7 @@ The multiple choice component can be used in forms where the user is required to
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

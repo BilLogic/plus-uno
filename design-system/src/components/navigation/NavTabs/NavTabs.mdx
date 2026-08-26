@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as NavTabsStories from './NavTabs.stories.jsx';
@@ -29,6 +30,10 @@ export const figmaMeta = {
 
 <Title />
 
+<DocsTabs of={NavTabsStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/NavTabs"
@@ -36,12 +41,11 @@ export const figmaMeta = {
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Standard tabs with disabled item and a tab dropdown.</>}>
     <Canvas of={NavTabsStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -51,7 +55,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Standard tabs, disabled item, and tab dropdown.</>}>
     <DsCanvasQuiet of={NavTabsStories.Content} />
@@ -61,7 +65,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### States
+## States
 
 <DocsCanvasShell description={<>Pseudo hover, focus, and pressed on inactive and active tabs.</>}>
     <DsCanvasQuiet of={NavTabsStories.InteractionStates} />
@@ -71,7 +75,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Layout & composition
+## Layout & composition
 
 <DocsCanvasShell description={<>Justified tab distribution.</>}>
     <DsCanvasQuiet of={NavTabsStories.Layout} />
@@ -81,7 +85,31 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### When to use
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={NavTabsStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
 
 Use `NavTabs` for the underlined tab bar that switches between sibling views of
 the same subject — a student's Overview / Sessions / Progress, or the sections of
@@ -110,7 +138,7 @@ stretches the tabs to fill the bar.
 
 <div className="sb-ds-doc-section">
 
-### Correct and incorrect
+## Correct and incorrect
 
 **A controlled bar needs `onSelect`, or it will never move.**
 
@@ -162,7 +190,7 @@ stretches the tabs to fill the bar.
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Accessibility
 
 - **Standalone, this is a row of links, not a tab widget.** The underlying nav
   only applies `role="tablist"` — and therefore `role="tab"` and `aria-selected`
@@ -185,20 +213,8 @@ stretches the tabs to fill the bar.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={NavTabsStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

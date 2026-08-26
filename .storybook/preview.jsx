@@ -114,6 +114,14 @@ const preview = {
       toc: {
         title: 'On this page',
         /**
+         * Storybook's default is `h3` alone. ADR-025 promoted the 49 component
+         * docs pages' sections from `###` to `##` for the outline, and that
+         * silently emptied their TOC — "On this page" listed only the `<h3>` the
+         * ResourcesBlock renders. The other 338 MDX pages still write `###`, so
+         * the selector has to span both rather than move.
+         */
+        headingSelector: 'h2, h3',
+        /**
          * Storybook’s TOC uses Tocbot, which scrolls via `window.scrollTo` + `getBoundingClientRect`.
          * That path ignores CSS `scroll-padding-top` (see storybook-overrides.css). Defaults (±40px)
          * are too small for the preview chrome, so “Layout” stops mid-viewport and scrollspy

@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as LabelAndCaptionStories from './LabelAndCaption.stories.jsx';
@@ -29,6 +30,10 @@ export const figmaMeta = {
 
 <Title />
 
+<DocsTabs of={LabelAndCaptionStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
@@ -36,12 +41,11 @@ export const figmaMeta = {
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Label row and caption row — two separate typography patterns used together on a field.</>}>
     <Canvas of={LabelAndCaptionStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -51,7 +55,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Label copy and optional required asterisk.</>}>
     <DsCanvasQuiet of={LabelAndCaptionStories.LabelContent} />
@@ -61,7 +65,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Variants
+## Variants
 
 <DocsCanvasShell description={<>Caption semantic styles: default, success, danger, warning, disabled.</>}>
     <DsCanvasQuiet of={LabelAndCaptionStories.CaptionVariants} />
@@ -71,7 +75,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Layout & composition
+## Layout & composition
 
 <DocsCanvasShell description={<>Label, native input, and caption stacked as a field.</>}>
     <DsCanvasQuiet of={LabelAndCaptionStories.Layout} />
@@ -80,3 +84,7 @@ export const figmaMeta = {
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

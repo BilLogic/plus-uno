@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as CascaderStories from './Cascader.stories.jsx';
@@ -21,6 +22,10 @@ export const figmaMeta = {
 
 <Title />
 
+<DocsTabs of={CascaderStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-5947"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
@@ -28,12 +33,11 @@ export const figmaMeta = {
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Empty field ready for hierarchical selection.</>}>
     <Canvas of={CascaderStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -43,7 +47,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Empty vs pre-filled path in the trigger.</>}>
     <DsCanvasQuiet of={CascaderStories.Content} />
@@ -53,7 +57,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Layout & composition
+## Layout & composition
 
 <DocsCanvasShell description={<>Multi-column menu: one column per hierarchy level.</>}>
     <DsCanvasQuiet of={CascaderStories.Layout} />
@@ -63,7 +67,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+## Interaction states
 
 <DocsCanvasShell description={<>Disabled: closed field with no interaction.</>}>
     <DsCanvasQuiet of={CascaderStories.InteractionStates} />
@@ -73,7 +77,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={CascaderStories.Interactive}
@@ -88,3 +92,7 @@ export const figmaMeta = {
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as RadioStories from './Radio.stories.jsx';
@@ -22,6 +23,9 @@ export const figmaMeta = {
 <Title />
 Use radio when a user needs to select one option from a list.
 
+<DocsTabs of={RadioStories}>
+
+<DocsTab tab="examples">
 
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005"
@@ -30,12 +34,11 @@ Use radio when a user needs to select one option from a list.
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Two-option group with a selected value.</>}>
     <Canvas of={RadioStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -45,7 +48,7 @@ Use radio when a user needs to select one option from a list.
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Labels and selection within one group.</>}>
     <DsCanvasQuiet of={RadioStories.Content} />
@@ -55,7 +58,7 @@ Use radio when a user needs to select one option from a list.
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<>Small, medium, and large.</>}>
     <DsCanvasQuiet of={RadioStories.Sizes} />
@@ -65,7 +68,7 @@ Use radio when a user needs to select one option from a list.
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+## Interaction states
 
 <DocsCanvasShell description={<>Selected, unselected, and disabled.</>}>
     <DsCanvasQuiet of={RadioStories.InteractionStates} />
@@ -75,7 +78,31 @@ Use radio when a user needs to select one option from a list.
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={RadioStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
 
 - **The label is wired for you, `id` or no `id`.** One id is derived through
   `useFieldId` and handed to the underlying form check, which renders the
@@ -98,20 +125,8 @@ Use radio when a user needs to select one option from a list.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={RadioStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

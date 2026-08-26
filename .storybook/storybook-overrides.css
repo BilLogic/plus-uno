@@ -292,11 +292,22 @@ a.sbdocs-a {
   margin-bottom: 0;
 }
 
-/* Space out major sections with macro spacing */
+/*
+ * Space between major sections.
+ *
+ * Was `clamp(6rem, 8vw, 8rem)` — 96px at desktop, three times the size of the
+ * heading it separates, which read as a gap rather than as rhythm. 64px keeps
+ * sections clearly apart while letting two of them share a screen.
+ *
+ * This block carries `!important` and therefore overrides the three
+ * `.sb-ds-component-docs .sb-ds-doc-section` margin rules above it, despite
+ * those being more specific. Left as one authority on purpose: the value lives
+ * here, and the blocks above only still matter for their `gap`.
+ */
 .sbdocs .sb-ds-doc-section,
 .sbdocs .sb-button-docs .sb-button-doc-section {
-  margin-top: clamp(6rem, 8vw, 8rem) !important;
-  margin-bottom: clamp(6rem, 8vw, 8rem) !important;
+  margin-top: clamp(2.5rem, 5vw, 4rem) !important;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem) !important;
 }
 
 /*
@@ -430,10 +441,28 @@ a.sbdocs-a {
   font-weight: 600 !important;
 }
 
-.sbdocs .sb-ds-component-docs .sb-ds-doc-section > h3,
+/*
+ * A section's own heading — sized and spaced by WHERE IT SITS, not by its tag.
+ *
+ * These were keyed to `h3` alone. ADR-025 promoted every section heading from
+ * `###` to `##` (an `h3` directly under `<Title />`'s `<h1>` was a level skip on
+ * all 48 pages), and the moment the tag moved, this rule stopped matching: the
+ * headings picked up `margin-top: 16px` and jumped from the 28px `h3` bucket to
+ * the 32px `h2` one. Both were silent.
+ *
+ * That is the failure §244 wrote down — a rule keyed to a heading's tag breaks
+ * when the tag changes for outline reasons — so the fix is to stop keying on the
+ * tag at all. `:is()` takes the specificity of its most specific argument, and
+ * every argument here is a bare tag, so this ranks exactly where the old
+ * four-selector list did.
+ */
+.sbdocs .sb-ds-component-docs .sb-ds-doc-section > :is(h2, h3, h4),
 .sbdocs .sb-ds-component-docs .sb-ds-doc-section .sbdocs-h3,
-.sbdocs .sb-button-docs .sb-button-doc-section > h3,
+.sbdocs .sb-button-docs .sb-button-doc-section > :is(h2, h3, h4),
 .sbdocs .sb-button-docs .sb-button-doc-section .sbdocs-h3 {
+  /* The h3 step, whatever the tag: the promotion was for the outline, and it is
+     not allowed to change what the page looks like. */
+  font-size: var(--font-size-h3, 28px) !important;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
@@ -795,4 +824,95 @@ h2.toc-title {
   border-bottom: none !important;
   border-radius: var(--size-card-radius-sm) var(--size-card-radius-sm) 0 0;
   box-sizing: border-box !important;
+}
+
+/*
+ * The component docs page's own tab strip (ADR-025).
+ *
+ * These tabs used to be Storybook's — `types.TAB` addons drawn in the manager's
+ * preview toolbar, which sits in a different document from `<Title />` and so
+ * could never render below it. They are now part of the page, and this is their
+ * only styling.
+ *
+ * Scoped entirely under `.sb-ds-docs-tabs`, so the `:not(:where(.docs-story *))`
+ * fence the heading rules above need does not apply here: nothing in this block
+ * selects a bare tag.
+ */
+.sb-ds-docs-tabs__strip {
+    display: flex;
+    gap: 1.5rem;
+    align-items: stretch;
+    border-bottom: 1px solid var(--color-outline-variant, #e4e4e7);
+    margin: 0 0 2rem;
+    overflow-x: auto;
+}
+
+.sb-ds-docs-tabs__tab {
+    appearance: none;
+    background: none;
+    border: 0;
+    /* The active underline sits ON the strip's border, so it must be the same
+       thickness and hang below the padding rather than adding height — otherwise
+       selecting a tab nudges the whole page down by a pixel. */
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    padding: 0.75rem 0;
+    color: var(--color-on-surface-variant, #43474e);
+    font-family: var(--font-family-header, 'Lato', sans-serif);
+    font-size: var(--font-size-body1, 16px);
+    font-weight: var(--font-weight-medium, 500);
+    line-height: 1.5;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.sb-ds-docs-tabs__tab:hover {
+    color: var(--color-on-surface, #191c1e);
+}
+
+.sb-ds-docs-tabs__tab--active {
+    color: var(--color-primary, #0472a8);
+    border-bottom-color: var(--color-primary, #0472a8);
+}
+
+/* The panel is focusable so keyboard users land in the content they just chose;
+   it must not draw a focus ring when that focus arrives by click. */
+.sb-ds-docs-tabs__panel:focus {
+    outline: none;
+}
+
+.sb-ds-docs-tabs__panel:focus-visible {
+    outline: 2px solid var(--color-primary, #0472a8);
+    outline-offset: 4px;
+}
+
+.sb-ds-changelog {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 0.5rem 1.5rem;
+    margin: 0 0 1.5rem;
+}
+
+.sb-ds-changelog dt {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+    white-space: nowrap;
+    color: var(--color-on-surface-variant, #43474e);
+}
+
+.sb-ds-changelog dd {
+    margin: 0;
+    min-width: 0;
+}
+
+.sb-ds-changelog__kind {
+    font-size: var(--font-size-body3, 12px);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.sb-ds-changelog__adopted {
+    color: var(--color-on-surface-variant, #43474e);
+    font-size: var(--font-size-body2, 14px);
 }

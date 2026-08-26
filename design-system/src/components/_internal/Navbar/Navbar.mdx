@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as NavbarStories from './Navbar.stories.jsx';
@@ -33,6 +34,10 @@ export const figmaMeta = {
 
 Horizontal navigation bar with a brand slot and a list of links.
 
+<DocsTabs of={NavbarStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/_internal/Navbar"
     sets={figmaMeta.sets}
@@ -43,7 +48,7 @@ Horizontal navigation bar with a brand slot and a list of links.
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell
     attachSourceBelow
@@ -58,7 +63,7 @@ Horizontal navigation bar with a brand slot and a list of links.
 
 <div className="sb-ds-doc-section">
 
-### Backgrounds
+## Backgrounds
 
 <DocsCanvasShell
     attachSourceBelow
@@ -132,18 +137,30 @@ the mechanically decidable subset of this defect.
 
 <div className="sb-ds-doc-section">
 
-### Usage notes
-
-- For the authenticated PLUS app shell, use the **Top Bar** spec (`Specs/Universal/Sections/Top Bar`) — it carries breadcrumbs, the user avatar, and the sidebar toggle. `Navbar` is the generic standalone bar.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground of={NavbarStories.Overview} />
 
 </div>
 
 </div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+- For the authenticated PLUS app shell, use the **Top Bar** spec (`Specs/Universal/Sections/Top Bar`) — it carries breadcrumbs, the user avatar, and the sidebar toggle. `Navbar` is the generic standalone bar.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

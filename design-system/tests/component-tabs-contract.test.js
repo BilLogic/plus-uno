@@ -1,9 +1,9 @@
 /**
  * The component tabs' pure half (#168).
  *
- * The tabs themselves are manager-side React and only exist inside a running
+ * The tabs themselves are React and only exist inside a running
  * Storybook. Everything that can be wrong without a browser is in
- * `.storybook/addons/component-tabs/contract.js`: which entries count as
+ * `../src/storybook-docs/lib/component-tabs-contract.js`: which entries count as
  * components, where their files sit, and what a changelog entry has to look
  * like before it is rendered. That is what this file holds to.
  *
@@ -16,11 +16,13 @@ import { describe, it, expect } from 'vitest';
 import {
   CHANGELOG_ADOPTED,
   CHANGELOG_KINDS,
-  PREVIEW_TABS,
+  TABS,
+  TABBED_EXCEPTIONS,
+  isTabbedDocsPage,
   TAB_IDS,
   componentIdentity,
   normaliseChangelog,
-} from '../../.storybook/addons/component-tabs/contract.js';
+} from '../src/storybook-docs/lib/component-tabs-contract.js';
 
 describe('componentIdentity', () => {
   it('reads a nested component out of its story path', () => {
@@ -123,20 +125,13 @@ describe('normaliseChangelog', () => {
 });
 
 describe('the tab contract', () => {
-  it('declares four tabs, in Atlassian order, with the canvas renamed', () => {
-    expect(Object.keys(PREVIEW_TABS)).toEqual([
-      'canvas',
-      TAB_IDS.code,
-      TAB_IDS.usage,
-      TAB_IDS.changelog,
-    ]);
-    expect(Object.values(PREVIEW_TABS).map((t) => t.title)).toEqual([
-      'Examples',
-      'Code',
-      'Usage',
-      'Changelog',
-    ]);
-    expect(Object.values(PREVIEW_TABS).map((t) => t.index)).toEqual([0, 1, 2, 3]);
+  it('declares four tabs, in Atlassian order, with Examples first and unparameterised', () => {
+    expect(TABS.map((t) => t.key)).toEqual(['examples', 'code', 'usage', 'changelog']);
+    expect(TABS.map((t) => t.title)).toEqual(['Examples', 'Code', 'Usage', 'Changelog']);
+    // Examples is the DEFAULT tab, so it carries no query param — the addon tabs
+    // behaved the same way, and those URLs are still in circulation.
+    expect(TABS[0].id).toBeNull();
+    expect(TABS.slice(1).map((t) => t.id)).toEqual(['plus-code', 'plus-usage', 'plus-changelog']);
   });
 
   it('states the adoption date once, as an ISO date', () => {

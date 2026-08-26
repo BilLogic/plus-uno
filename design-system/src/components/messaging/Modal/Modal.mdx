@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ModalStories from './Modal.stories.jsx';
@@ -22,6 +23,10 @@ export const figmaMeta = {
 <Title />
 Add dialogs to your site for lightboxes, user notifications, or completely custom content.
 
+<DocsTabs of={ModalStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/messaging/Modal"
@@ -29,12 +34,11 @@ Add dialogs to your site for lightboxes, user notifications, or completely custo
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Title and body are driven by props; use <code>body</code> for strings or <code>children</code> for custom markup.</>}>
     <Canvas of={ModalStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -44,7 +48,7 @@ Add dialogs to your site for lightboxes, user notifications, or completely custo
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Default, scrollable, and footer combinations in inline docs previews.</>}>
     <DsCanvasQuiet of={ModalStories.Content} />
@@ -54,7 +58,7 @@ Add dialogs to your site for lightboxes, user notifications, or completely custo
 
 <div className="sb-ds-doc-section">
 
-### Layout & composition
+## Layout & composition
 
 <DocsCanvasShell description={<>Header-only versus header with a primary and secondary action row.</>}>
     <DsCanvasQuiet of={ModalStories.Layout} />
@@ -64,7 +68,7 @@ Add dialogs to your site for lightboxes, user notifications, or completely custo
 
 <div className="sb-ds-doc-section">
 
-### Types
+## Types
 
 <DocsCanvasShell description={<>Scrollable body with decorative scrollbar affordances for long content.</>}>
     <DsCanvasQuiet of={ModalStories.Types} />
@@ -74,7 +78,31 @@ Add dialogs to your site for lightboxes, user notifications, or completely custo
 
 <div className="sb-ds-doc-section">
 
-### When to use
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ModalStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
 
 Use `Modal` when the next step has to happen before anything else can — a
 destructive confirmation, a short form that would derail the page, a detail view
@@ -105,7 +133,7 @@ the component renders the `Button` pair for you, with a divider above them.
 
 <div className="sb-ds-doc-section">
 
-### Correct and incorrect
+## Correct and incorrect
 
 **Do not use the inline render for a live dialog.**
 
@@ -154,7 +182,7 @@ the component renders the `Button` pair for you, with a divider above them.
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Accessibility
 
 - **Escape and backdrop click are on by default.** `keyboard` and `backdrop`
   both default to `true`. Turning either off leaves the header close button as
@@ -176,20 +204,8 @@ the component renders the `Button` pair for you, with a divider above them.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={ModalStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

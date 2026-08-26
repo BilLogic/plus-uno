@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as CardStories from './Card.stories.jsx';
@@ -30,6 +31,10 @@ export const figmaMeta = {
 <Title />
 A card is a flexible and extensible content container. Cards support a wide variety of content, including images, text, list groups, links, and more.
 
+<DocsTabs of={CardStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19497"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Card"
@@ -37,12 +42,11 @@ A card is a flexible and extensible content container. Cards support a wide vari
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Title, body, subtitle, and optional media.</>}>
     <Canvas of={CardStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -52,7 +56,7 @@ A card is a flexible and extensible content container. Cards support a wide vari
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Basic body, media slot, and subtitle line.</>}>
     <DsCanvasQuiet of={CardStories.Content} />
@@ -62,7 +66,7 @@ A card is a flexible and extensible content container. Cards support a wide vari
 
 <div className="sb-ds-doc-section">
 
-### Actions
+## Actions
 
 <DocsCanvasShell description={<>Primary action button, link row, and simple list items.</>}>
     <DsCanvasQuiet of={CardStories.Actions} />
@@ -72,7 +76,7 @@ A card is a flexible and extensible content container. Cards support a wide vari
 
 <div className="sb-ds-doc-section">
 
-### Layout & composition
+## Layout & composition
 
 <DocsCanvasShell description={<>Full example with header, footer, media, links, and primary action.</>}>
     <DsCanvasQuiet of={CardStories.Layout} />
@@ -82,7 +86,31 @@ A card is a flexible and extensible content container. Cards support a wide vari
 
 <div className="sb-ds-doc-section">
 
-### When to use
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={CardStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
 
 Use `Card` for a bounded piece of content that stands on its own — a session
 summary in a list, a tutor's stats block, a dashboard tile. The props map to the
@@ -114,7 +142,7 @@ for spacing.
 
 <div className="sb-ds-doc-section">
 
-### Correct and incorrect
+## Correct and incorrect
 
 **A clickable card is not a keyboard-reachable card.**
 
@@ -157,7 +185,7 @@ for spacing.
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Accessibility
 
 - **The card title is not a heading.** `title` renders through the underlying
   card title, which is a `div` carrying an `h5` class — visual weight without
@@ -178,20 +206,8 @@ for spacing.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={CardStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

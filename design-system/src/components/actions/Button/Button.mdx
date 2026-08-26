@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ButtonStories from './Button.stories.jsx';
@@ -302,6 +303,10 @@ export const figmaMeta = {
 <Title />
 Buttons are interactive elements that are used to perform actions on a page.
 
+<DocsTabs of={ButtonStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/actions/Button"
@@ -309,12 +314,11 @@ Buttons are interactive elements that are used to perform actions on a page.
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell
     attachSourceBelow
@@ -332,7 +336,7 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <ButtonContentSection />
 
@@ -340,7 +344,7 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 <div className="sb-ds-doc-section">
 
-### Variants
+## Variants
 
 <div className="space-y-10 md:space-y-12">
     <ColorStylesSection />
@@ -351,7 +355,7 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 <div className="sb-ds-doc-section">
 
-### Sizes
+## Sizes
 
 <DocsCanvasShell description={<SizesDocDescription />}>
     <Canvas of={ButtonStories.SizesFilledRow} story={{ inline: true }} sourceState="none" />
@@ -361,7 +365,7 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 <div className="sb-ds-doc-section">
 
-### States
+## States
 
 <InteractionStatesSection />
 
@@ -369,7 +373,7 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 <div className="sb-ds-doc-section">
 
-### Layout & composition
+## Layout & composition
 
 <LayoutSection />
 
@@ -377,7 +381,32 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 <div className="sb-ds-doc-section">
 
-### When to use
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ButtonStories.Interactive}
+    description={
+        <>
+            Use the table in the panel below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> so clicks and focus work while you scroll
+            the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
 
 Use `Button` for anything the user *does*: submit, confirm, open a dialog, run an
 export, dismiss a step. It is the only component in `actions` that carries a
@@ -411,7 +440,7 @@ does not.
 
 <div className="sb-ds-doc-section">
 
-### Correct and incorrect
+## Correct and incorrect
 
 **An icon-only button needs a name and needs room.**
 
@@ -453,7 +482,7 @@ does not.
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Accessibility
 
 - **Icon-only sizing.** With no `text` and no children the component adds
   `plus-btn--icon-only`, which sets a square box: 28×28 at `small`, 36×36 at
@@ -475,21 +504,8 @@ does not.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={ButtonStories.Interactive}
-    description={
-        <>
-            Use the table in the panel below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> so clicks and focus work while you scroll
-            the docs page.
-        </>
-    }
-/>
-
 </div>
 
-</div>
+</DocsTab>
+
+</DocsTabs>

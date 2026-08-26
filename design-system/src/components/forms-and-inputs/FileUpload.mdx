@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as FileUploadStories from './FileUpload.stories.jsx';
@@ -22,6 +23,10 @@ export const figmaMeta = {
 <Title />
 The file upload component is used to select and upload files from a local device.
 
+<DocsTabs of={FileUploadStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13337-2288"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/forms-and-inputs"
@@ -29,12 +34,11 @@ The file upload component is used to select and upload files from a local device
     figmaFileKey={figmaMeta.fileKey}
 />
 
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Label, accepted formats, and primary action.</>}>
     <Canvas of={FileUploadStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -44,7 +48,7 @@ The file upload component is used to select and upload files from a local device
 
 <div className="sb-ds-doc-section">
 
-### Content
+## Content
 
 <DocsCanvasShell description={<>Label, required asterisk, accepted formats, and button copy.</>}>
     <DsCanvasQuiet of={FileUploadStories.Content} />
@@ -54,7 +58,7 @@ The file upload component is used to select and upload files from a local device
 
 <div className="sb-ds-doc-section">
 
-### Validation & feedback
+## Validation & feedback
 
 <DocsCanvasShell description={<>Invalid and success validation treatment.</>}>
     <DsCanvasQuiet of={FileUploadStories.Styles} />
@@ -64,7 +68,7 @@ The file upload component is used to select and upload files from a local device
 
 <div className="sb-ds-doc-section">
 
-### Interaction states
+## Interaction states
 
 <DocsCanvasShell description={<>Default, focus, and disabled.</>}>
     <DsCanvasQuiet of={FileUploadStories.InteractionStates} />
@@ -74,7 +78,7 @@ The file upload component is used to select and upload files from a local device
 
 <div className="sb-ds-doc-section">
 
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={FileUploadStories.Interactive}
@@ -89,3 +93,7 @@ The file upload component is used to select and upload files from a local device
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

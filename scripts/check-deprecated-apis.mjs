@@ -32,33 +32,18 @@ const REPO_ROOT = path.resolve(__dirname, '..');
  * declared range can resolve at or above `removedIn`, the bet is off and the
  * work in `ticket` is due.
  */
-const TRIPWIRES = [
-  {
-    dep: 'storybook',
-    removedIn: 11,
-    api: 'addon tabs (`types.TAB`)',
-    uses: '.storybook/addons/component-tabs/register.jsx',
-    ticket: '#202 (closed — the port could not be written while Storybook 11 did not exist)',
-    // Everything the port needs, here rather than behind a link. A ticket can be
-    // closed, renumbered, or migrated to another tracker; this file is what the
-    // failure prints, so this is where the knowledge has to live.
-    note: [
-      'Storybook 10.5 already warns: "Addon tabs are deprecated and will be removed in Storybook 11."',
-      'What breaks: the Code / Usage / Changelog tabs on every component page.',
-      'What to do: re-register the three panels on 11\'s replacement mechanism.',
-      '  - Confirm that mechanism against CURRENT upstream docs. Do not trust this',
-      '    note or the addon README, both written against a 10.5 source file.',
-      '  - contract.js is pure and framework-free (tab ids, titles, order,',
-      '    componentIdentity, normaliseChangelog). The port is a re-registration,',
-      '    not a rewrite of what the panels contain.',
-      '  - .storybook/manager.js is the single place titles and order are declared,',
-      '    including the renamed built-in canvas tab ("Examples"). Keep it that way.',
-      '  - design-system/tests/component-tabs-contract.test.js (11 tests) must still',
-      '    pass, or be updated with its reasoning intact.',
-      '  - Verify in a running Storybook that all four tabs render and selection',
-      '    follows the URL. That bar was met once; meet it again.',
-    ].join('\n    '),
-  },
+export const TRIPWIRES = [
+  // Empty, and that is a real state, not an oversight: the only tripwire this
+  // file ever held was Storybook's `types.TAB`, and ADR-025 retired that API
+  // from the repo rather than waiting for Storybook 11 to remove it. A settled
+  // bet is deleted, not left armed against code that no longer exists.
+  //
+  // An empty list is why `main()` says so OUT LOUD on every run. A tripwire file
+  // with nothing in it passes unconditionally, and a green line reading "every
+  // dependency range still pinned below its removal" would be a true sentence
+  // that means nothing — exactly the shape of guard this repo keeps finding and
+  // removing. The zero case gets its own message so the output can never be
+  // mistaken for cover.
 ];
 
 /** The lowest major a range can resolve to — `^10.5.0` -> 10, `>=9` -> 9. */
@@ -118,6 +103,15 @@ function main() {
           .join('\n\n'),
     );
     return 1;
+  }
+
+  if (!TRIPWIRES.length) {
+    console.log(
+      '[deprecated-apis] 0 tripwires armed — this check is currently measuring NOTHING.\n' +
+        '  It passes because there is nothing to test, not because anything was verified.\n' +
+        '  Arm one by adding to TRIPWIRES when a dependency deprecates an API this repo uses.',
+    );
+    return 0;
   }
 
   console.log(
