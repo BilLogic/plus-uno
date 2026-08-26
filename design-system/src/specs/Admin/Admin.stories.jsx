@@ -56,7 +56,7 @@ export const Overview = () => (
                     backgroundColor: 'var(--color-surface-container)',
                     borderRadius: '8px'
                 }}>
-                    <h4 className="h4" style={{ marginBottom: '12px' }}>{section.title}</h4>
+                    <h3 className="h4" style={{ marginBottom: '12px' }}>{section.title}</h3>
                     <ul className="body2-txt" style={{ paddingLeft: '20px', margin: 0 }}>
                         {section.items.map(item => (
                             <li key={item}>{item}</li>

@@ -269,7 +269,10 @@
         width: 100%;
         box-sizing: border-box;
 
-        h4 {
+        // Matched by size class as well as by tag: the question on P5 sits at
+        // level 2 in that page's outline and is written `<h2 className="h4">`.
+        h4,
+        .h4 {
             color: var(--color-on-primary-container);
             min-width: 100%;
             margin: 0;

@@ -194,7 +194,7 @@ const TutorStatusWarningsPage = ({
                             {/* Status Distribution (Latest) */}
                             <div className="tutor-status-overview-card__section">
                                 <div className="tutor-status-overview-card__header">
-                                    <h4 className="title-h4">Status Distribution (Latest)</h4>
+                                    <h3 className="title-h4">Status Distribution (Latest)</h3>
                                     <i className="fas fa-circle-question help-icon" title="Current distribution of tutor statuses" />
                                 </div>
                                 <div className="tutor-status-overview-card__content">
@@ -212,7 +212,7 @@ const TutorStatusWarningsPage = ({
                             {/* Status Trend (Weekly) */}
                             <div className="tutor-status-overview-card__section">
                                 <div className="tutor-status-overview-card__header">
-                                    <h4 className="title-h4">Status Trend (Weekly)</h4>
+                                    <h3 className="title-h4">Status Trend (Weekly)</h3>
                                     <i className="fas fa-circle-question help-icon" title="Weekly trend of tutor statuses" />
                                 </div>
                                 <div className="tutor-status-overview-card__content">

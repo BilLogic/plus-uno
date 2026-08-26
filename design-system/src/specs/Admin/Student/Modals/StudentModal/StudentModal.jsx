@@ -82,9 +82,9 @@ const StudentModal = ({
             <div className="student-modal__container">
                 {/* Header */}
                 <div className="student-modal__header">
-                    <h4 className="h4 student-modal__title">
+                    <h3 className="h4 student-modal__title">
                         {student.name || 'Student Name'}
-                    </h4>
+                    </h3>
                     <button
                         className="student-modal__close-btn"
                         onClick={onHide}

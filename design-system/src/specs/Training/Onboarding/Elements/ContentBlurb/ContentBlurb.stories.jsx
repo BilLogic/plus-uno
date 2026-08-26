@@ -74,7 +74,7 @@ export const Overview = {
             gap: 'var(--size-section-gap-lg, 32px)'
         }}>
             <section>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Default</h6>
+                <h3 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Default</h3>
                 <ContentBlurb 
                     title="Competence-building Narratives"
                     description="Learn effective strategies for building student confidence through positive narratives and growth mindset approaches."
@@ -84,7 +84,7 @@ export const Overview = {
             </section>
 
             <section>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Video Content</h6>
+                <h3 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Video Content</h3>
                 <ContentBlurb 
                     title="Introduction to Active Learning"
                     description="Watch this video to understand the core principles of active learning techniques."
@@ -94,7 +94,7 @@ export const Overview = {
             </section>
 
             <section>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Document Content</h6>
+                <h3 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Document Content</h3>
                 <ContentBlurb 
                     title="Session Planning Guide"
                     description="Download and review this comprehensive guide for planning effective tutoring sessions."
@@ -104,7 +104,7 @@ export const Overview = {
             </section>
 
             <section>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Different Badge Types</h6>
+                <h3 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Different Badge Types</h3>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
                     {['image', 'video', 'audio', 'document', 'book', 'website'].map(type => (
                         <ContentBlurb 

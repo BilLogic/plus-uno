@@ -58,7 +58,7 @@ const DataVisualizationTrainingProgress = ({
         >
             {/* Header with title and info icon */}
             <div className="plus-data-viz-header">
-                <h4 className="h4 plus-data-viz-title">{title}</h4>
+                <h3 className="h4 plus-data-viz-title">{title}</h3>
                 {tooltip && (
                     <button
                         className="plus-data-viz-info-btn"

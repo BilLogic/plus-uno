@@ -42,7 +42,7 @@ export const Overview = () => (
                     backgroundColor: 'var(--color-surface-container)',
                 }}
             >
-                <h3 className="h4 mb-2">Elements</h3>
+                <h2 className="h4 mb-2">Elements</h2>
                 <p className="body2-txt mb-2">Reusable building blocks for universal UI patterns:</p>
                 <ul className="body2-txt mb-0 ps-4">
                     <li><strong>UserAvatar</strong> - User display with initial, name, and counter</li>
@@ -59,7 +59,7 @@ export const Overview = () => (
                     backgroundColor: 'var(--color-surface-container)',
                 }}
             >
-                <h3 className="h4 mb-2">Sections</h3>
+                <h2 className="h4 mb-2">Sections</h2>
                 <p className="body2-txt mb-2">Larger container components:</p>
                 <ul className="body2-txt mb-0 ps-4">
                     <li><strong>Sidebar</strong> - Navigation sidebar (tutor/supervisor variants)</li>
@@ -77,7 +77,7 @@ export const Overview = () => (
                     backgroundColor: 'var(--color-surface-container)',
                 }}
             >
-                <h3 className="h4 mb-2">Pages</h3>
+                <h2 className="h4 mb-2">Pages</h2>
                 <p className="body2-txt mb-2">Complete page layouts:</p>
                 <ul className="body2-txt mb-0 ps-4">
                     <li><strong>PageLayout</strong> - Standard layout with Sidebar, TopBar, Content, Footer</li>

@@ -540,12 +540,22 @@ h2.toc-title {
     border-radius: 0 !important;
 }
 
-/* 
+/*
  * Variant subheadings design within each story section.
  * Differentiates from normal headers by using a subtle body-copy typography token feel.
+ *
+ * Matched by SIZE CLASS as well as by tag. The tag is the outline position and the
+ * `hN` class is the appearance (see design-system/src/styles/Accessibility.mdx §
+ * Heading levels), so a subheading that has to sit at level 3 in its page's
+ * outline is written `<h3 className="h6">` and still has to look like the rest of
+ * them. Keying this rule to the tag alone made the docs treatment fall off the
+ * moment a story's outline was corrected. The tag selectors stay for headings
+ * that carry no size class.
  */
 .docs-story section > h5,
-.docs-story section > h6 {
+.docs-story section > h6,
+.docs-story section > .h5,
+.docs-story section > .h6 {
     font-family: var(--font-family-body, 'Merriweather Sans', sans-serif) !important;
     font-size: var(--font-size-body2, 14px) !important;
     font-weight: 600 !important;
