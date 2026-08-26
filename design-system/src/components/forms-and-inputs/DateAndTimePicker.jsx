@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Dropdown, InputGroup } from 'react-bootstrap';
+import useFieldId from './useFieldId';
 import './DateAndTimePicker.scss';
 
 const DateAndTimePicker = ({
@@ -44,6 +45,26 @@ const DateAndTimePicker = ({
     const dateInputRef = useRef(null);
     const timeInputRef = useRef(null);
     const calendarRef = useRef(null);
+
+    /**
+     * Ids for a field that renders two controls (#206).
+     *
+     * `label` names the field, not either input, so it labels a `group` and
+     * each input is named `<field> Date` / `<field> Time` off the section
+     * headings that were already on screen. The date and time ids keep the
+     * `-date` / `-time` suffixes they have always had for callers who pass
+     * `id`; what changes is that they are now always present, so the label's
+     * `htmlFor` reaches one of them instead of reaching nothing.
+     */
+    const fieldId = useFieldId(id);
+    const hasLabel = Boolean(showLabel && label);
+    const labelId = hasLabel ? `${fieldId}-label` : undefined;
+    const dateInputId = `${fieldId}-date`;
+    const timeInputId = `${fieldId}-time`;
+    const dateSectionLabelId = showSectionLabels ? `${dateInputId}-section-label` : undefined;
+    const timeSectionLabelId = showSectionLabels ? `${timeInputId}-section-label` : undefined;
+    const dateLabelledBy = [labelId, dateSectionLabelId].filter(Boolean).join(' ');
+    const timeLabelledBy = [labelId, timeSectionLabelId].filter(Boolean).join(' ');
 
     // Utility functions
     const parseDate = (dateString) => {
@@ -353,12 +374,18 @@ const DateAndTimePicker = ({
     ));
 
     return (
-        <div 
-            className={`plus-datetime-wrapper ${className}`} 
+        <div
+            className={`plus-datetime-wrapper ${className}`}
             style={style}
+            role={hasLabel ? 'group' : undefined}
+            aria-labelledby={labelId}
         >
-            {showLabel && label && (
-                <Form.Label htmlFor={id || name} className="plus-datetime-label">
+            {hasLabel && (
+                <Form.Label
+                    id={labelId}
+                    htmlFor={showDate ? dateInputId : timeInputId}
+                    className="plus-datetime-label"
+                >
                     {label}
                     {required && (
                         <span className="plus-datetime-required" aria-label="required">*</span>
@@ -368,7 +395,7 @@ const DateAndTimePicker = ({
             
             {/* Date Picker Section */}
             {showDate && <div className="plus-datetime-section">
-                {showSectionLabels && <div className="plus-datetime-section-label">Date</div>}
+                {showSectionLabels && <div id={dateSectionLabelId} className="plus-datetime-section-label">Date</div>}
                 <div className="plus-datetime-date-wrapper">
                     <Dropdown
                         show={isCalendarOpen}
@@ -380,8 +407,10 @@ const DateAndTimePicker = ({
                             <Form.Control
                                 ref={dateInputRef}
                                 type="text"
-                                id={id ? `${id}-date` : undefined}
+                                id={dateInputId}
                                 name={name ? `${name}-date` : undefined}
+                                aria-labelledby={dateLabelledBy || undefined}
+                                aria-label={dateLabelledBy ? undefined : 'Date'}
                                 placeholder={datePlaceholder}
                                 value={selectedDate ? formatDateForInput(selectedDate) : ''}
                                 disabled={disabled}
@@ -445,13 +474,15 @@ const DateAndTimePicker = ({
 
             {/* Time Picker Section */}
             <div className="plus-datetime-section">
-                {showSectionLabels && <div className="plus-datetime-section-label">Time</div>}
+                {showSectionLabels && <div id={timeSectionLabelId} className="plus-datetime-section-label">Time</div>}
                 <InputGroup className="plus-datetime-time-input-group">
                     <Form.Control
                         ref={timeInputRef}
                         type="text"
-                        id={id ? `${id}-time` : undefined}
+                        id={timeInputId}
                         name={name ? `${name}-time` : undefined}
+                        aria-labelledby={timeLabelledBy || undefined}
+                        aria-label={timeLabelledBy ? undefined : 'Time'}
                         placeholder={timePlaceholder}
                         value={timeHours && timeMinutes ? `${timeHours}:${timeMinutes}` : (timeHours ? `${timeHours}:` : '')}
                         disabled={disabled}

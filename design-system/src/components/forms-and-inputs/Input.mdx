@@ -160,9 +160,12 @@ a matching icon.
 
 ### Accessibility
 
-- **`id` is load-bearing.** The label renders `htmlFor={id || name}` while the
-  input only receives `id`. Passing `name` alone silently breaks the
-  association — the single most common way this component goes wrong.
+- **The label is associated whether you pass `id` or not.** One id is derived
+  once and used for both the label's `htmlFor` and the input; when no `id` is
+  given, React's `useId` supplies one. Pass `id` when something outside the
+  component needs to point at the input — an `aria-describedby`, a `<label>` you
+  render yourself, a test selector — and you will get exactly the id you passed.
+  `name` is a form key, not an id, and no longer stands in for one (#206).
 - **`showLabel={false}` removes the label, it does not hide it visually.** The
   label element is not rendered at all, so the field has only a placeholder.
   Placeholders are not labels; pass `aria-label` when you turn the visible label
