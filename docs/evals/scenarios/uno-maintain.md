@@ -27,8 +27,8 @@ summary: uno-maintain — eval scenarios
 
 ## S4 — knowledge capture
 - **Trigger:** a significant work session ends with a non-obvious gotcha discovered
-- **Expected:** lesson filed under `docs/knowledge/lessons/` (dated, per naming convention), INDEX updated, changelog line if a rule changed
-- **Fails if:** the learning survives only in the chat transcript
+- **Expected:** the gotcha reaches a disposition in the same change — a rule in the doc that owns the subject, an ADR when the call is hard to reverse, or a reasoned drop — with a ledger line in `docs/knowledge/changelog.md` when something was promoted (`docs/knowledge/INDEX.md` is the contract)
+- **Fails if:** the learning survives only in the chat transcript · a note is staged under `docs/knowledge/` with no `disposition:`, which `npm run check:knowledge-disposition` fails on
 
 ## S5 — routing accuracy benchmark
 - **Trigger:** seeded issue set — one per taxonomy target (11 total, across codebase/Figma/Notion estates) plus one cross-estate seed (two estates disagreeing) so the flag-don't-improvise rule is actually exercised

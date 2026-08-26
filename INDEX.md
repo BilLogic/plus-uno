@@ -165,6 +165,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/021-two-sources-one-time-axis-blueprint-vs-notion.md`](docs/adr/021-two-sources-one-time-axis-blueprint-vs-notion.md) | Two sources, one time axis — blueprint vs Notion authority routed by claim type and card status (2026-07-29) |
 | [`docs/adr/022-enforce-the-subrequest-budget-at-the-boundary-don.md`](docs/adr/022-enforce-the-subrequest-budget-at-the-boundary-don.md) | Enforce the subrequest budget at the boundary; don't estimate it (2026-07-30) |
 | [`docs/adr/023-two-vocabularies-ratified-blueprint-vs-roadmap.md`](docs/adr/023-two-vocabularies-ratified-blueprint-vs-roadmap.md) | The two-vocabularies rule is ratified — blueprint words and Roadmap words never mix, and CONTEXT.md is its only home (2026-08-25) |
+| [`docs/adr/024-slack-app-configuration-is-a-one-way-door.md`](docs/adr/024-slack-app-configuration-is-a-one-way-door.md) | Slack app config only ever widens — narrowing a scope costs a full uninstall, and PKCE forecloses scripted manifest writes (2026-08-06) |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions

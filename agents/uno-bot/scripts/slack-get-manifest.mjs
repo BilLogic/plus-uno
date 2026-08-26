@@ -11,7 +11,7 @@
 // So .slack/config.json pins manifest.source to "remote", which makes
 // `slack manifest sync` refuse outright rather than fail confusingly at the API.
 // Manifest edits are UI-only for this app. See
-// docs/knowledge/lessons/2026-08-06-slack-app-token-and-cli-setup.md.
+// docs/adr/024-slack-app-configuration-is-a-one-way-door.md.
 //
 // A clean diff means repo == app settings. It does NOT mean the installed
 // token carries those scopes — a grant is a third state no manifest tool can

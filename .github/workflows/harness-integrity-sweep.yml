@@ -58,6 +58,12 @@ jobs:
       - name: Skill-surface drift check
         run: npm run check:skill-surfaces
 
+      # docs/knowledge/ became sediment because nothing forced a note to say
+      # what it became (#172). This is the forcing function: a file there
+      # without a `disposition:` fails the sweep. Dependency-free; no npm install.
+      - name: Knowledge disposition check
+        run: npm run check:knowledge-disposition
+
       - name: Ensure intake labels exist
         env:
           GH_TOKEN: ${{ github.token }}

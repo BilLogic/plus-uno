@@ -98,7 +98,7 @@ Every embodiment, including Slack:
 
 ## Knowledge
 
-Check `docs/knowledge/INDEX.md` before starting work — past lessons may apply. After significant work, capture learnings via `skills/uno-maintain` (knowledge-capture path). `docs/knowledge/archive/` is the graveyard for superseded docs — archive rather than delete, so a decision keeps its trail.
+Finished work leaves behind one of three things: a **rule** in the doc that already owns the subject, an **ADR** under `docs/adr/` when the call is hard to reverse, or **nothing** — git keeps the trail, and a finding worth less than the context it costs is worth dropping. `docs/knowledge/INDEX.md` is the contract, `npm run check:knowledge-disposition` enforces it, and `docs/knowledge/changelog.md` is the ledger of what was promoted. Capture runs through `skills/uno-maintain`; land the note and its disposition in the same change. `docs/knowledge/archive/` is the graveyard for superseded docs — archive rather than delete when a decision's own trail matters, and what is already there stays as it is (#172).
 
 <!-- ide-only -->
 ## Progressive loading

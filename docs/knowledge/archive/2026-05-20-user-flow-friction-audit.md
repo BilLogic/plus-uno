@@ -1,3 +1,11 @@
+
+> **Archived 2026-08-26 (#172).** Moved here rather than deleted. This is an authored
+> deliverable with a named author and audience, not accumulated sediment, so it is kept
+> as a record even though its recommendations are spent.
+>
+> Its three high-leverage fixes shipped in v2. It produced no standing rule and no
+> decision needing an ADR, which is why it is archived rather than promoted.
+
 # UNO Bot v2 — User-Flow Friction Audit
 
 > Week 1 deliverable per `~/.claude/plans/piped-riding-melody.md`. Audit the existing Figma → PRD → implement chain for friction points; propose improvements; rank for v2 inclusion.

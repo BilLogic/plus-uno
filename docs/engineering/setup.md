@@ -63,10 +63,18 @@ skills/         # Workflow skills (uno-prototype, uno-review, …)
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Entry HTML with DS stylesheet |
+| `index.html` | Entry HTML with DS stylesheet + the pinned Font Awesome link |
 | `src/App.jsx` | Root component with DS import examples |
 | `src/main.jsx` | React 19 entry point |
 | `vite.config.js` | `@` alias, SCSS loadPaths, ESM-safe `__dirname` |
+
+**Font Awesome** loads from jsdelivr, pinned:
+`https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css`.
+That is the host and path that serve FA 7's `all.min.css`; the cdnjs path most
+agents reach for by habit is laid out differently for FA 7 and the icons come up
+blank. Copy the `<link>` from `prototypes/starter/index.html` rather than typing
+it. Icons themselves are FA Free — `fa-solid`, `fa-regular`, `fa-brands`
+(AGENTS.md § Hard rules 3).
 
 **Minimal structure** (if not using starter):
 

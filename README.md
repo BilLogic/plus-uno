@@ -56,7 +56,7 @@ The canonical routing table (Use-when triggers + which agents each skill summons
 
 ### Knowledge compounding
 
-After significant work, lessons land in `docs/knowledge/` via `uno-maintain` — patterns that worked, pitfalls, ADRs. Future sessions check this base before starting, so institutional memory compounds.
+After significant work, `uno-maintain` turns what was learned into a rule in the doc that owns the subject or an ADR under `docs/adr/` — and deletes the rest, because a note nobody acts on costs more to re-read than it returns. `docs/knowledge/INDEX.md` holds the rule; `npm run check:knowledge-disposition` keeps the folder from refilling.
 
 ## Repository Structure
 
@@ -171,7 +171,8 @@ Hosted on Netlify (free tier). Build: `npm run build:all` (Vite + Storybook). De
 | [`docs/product-and-service/plus-app.md`](docs/product-and-service/plus-app.md) | PLUS product landscape (mission, users, features, flows) |
 | [`docs/product-and-service/plus-uno.md`](docs/product-and-service/plus-uno.md) | This repo's structure and inventory |
 | [`docs/conventions/`](docs/conventions/) | Normative rules — coding, terminology, tech stack, Notion/Figma/Slack/Supabase, writing style |
-| [`docs/knowledge/INDEX.md`](docs/knowledge/INDEX.md) | Knowledge base index (lessons, decisions, preferences) |
+| [`docs/adr/overview.md`](docs/adr/overview.md) | Architecture decisions — one file each, checked against the code |
+| [`docs/knowledge/INDEX.md`](docs/knowledge/INDEX.md) | The disposition rule: work leaves a rule, an ADR, or nothing |
 | [`agents/README.md`](agents/README.md) | Agent roster, anatomy, creation rule |
 | [`agents/uno-bot/README.md`](agents/uno-bot/README.md) | The Slack bot — architecture, setup, capabilities |
 

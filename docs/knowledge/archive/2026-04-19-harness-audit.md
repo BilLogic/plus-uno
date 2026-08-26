@@ -5,6 +5,15 @@ tags: [audit, layer-audit, harness-health]
 rule_candidate: false
 ---
 
+> **Archived 2026-08-26 (#172).** Moved here rather than deleted. This audit's own closing
+> note says history is sacred and asks that the file not be deleted — authoring a
+> counter-lesson is the prescribed way to revise it. That instruction is honoured: nothing
+> below was edited, and the findings stand verbatim.
+>
+> It is archived because the harness it audits no longer exists. All three subjects —
+> `.agent/skills/`, `docs/rubrics/`, `hd-config.md` — are absent from the repo, so every
+> finding resolves to nothing. Read it as a record of the Layer-5 era, not as open work.
+
 # Harness audit — 2026-04-19
 
 ## Top 3 priorities
