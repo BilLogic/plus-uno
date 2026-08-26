@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
+import useFieldId from './useFieldId';
 import './Checkbox.scss';
 
 /**
@@ -28,6 +29,15 @@ const Checkbox = ({
     const wrapperRef = useRef(null);
     const inputRef = useRef(null);
     const isControlled = checked !== undefined;
+    /**
+     * `Form.Check` gives its label a `for` from the id it is handed, so an id of
+     * `undefined` produced a label that named nothing — the same defect #206
+     * fixed on the eight components that wrote `htmlFor={id || name}`, arriving
+     * here through the id instead of through the `for`. `useFieldId` supplies
+     * one when the caller gave none; a caller who passes `id` gets that id back.
+     * `name` is a form key, not an id, so it no longer stands in for one (#213).
+     */
+    const fieldId = useFieldId(id);
 
     // Callback ref to get the actual input element from Form.Check
     const setInputRef = useCallback((node) => {
@@ -69,7 +79,7 @@ const Checkbox = ({
             <div ref={setInputRef}>
                 <Form.Check
                     type="checkbox"
-                    id={id || name}
+                    id={fieldId}
                     name={name}
                     value={value}
                     checked={isControlled ? checked : undefined}

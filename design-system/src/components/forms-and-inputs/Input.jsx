@@ -13,6 +13,11 @@ const Input = ({
     name,
     label,
     required = false,
+    /**
+     * Hide the label visually. It is still rendered and still names the input —
+     * see the `showLabel` section in `Input.mdx` (#213) for why it cannot remove
+     * it.
+     */
     showLabel = true,
     placeholder,
     value,
@@ -71,8 +76,11 @@ const Input = ({
 
     return (
         <div className={`plus-input-wrapper ${disabled ? 'plus-input-wrapper-disabled' : ''}`}>
-            {showLabel && label && (
-                <Form.Label htmlFor={fieldId} className="plus-input-label">
+            {label && (
+                <Form.Label
+                    htmlFor={fieldId}
+                    className={`plus-input-label${showLabel ? '' : ' plus-input-label-hidden'}`}
+                >
                     {label}
                     {required && (
                         <span className="plus-input-required" aria-label="required">*</span>

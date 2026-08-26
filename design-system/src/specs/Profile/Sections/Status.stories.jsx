@@ -93,6 +93,12 @@ const InfoTooltipContent = () => (
  * Reusable Status & Clearance section component for use in pages
  */
 export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'March 16, 2026' } = {}) => {
+    // The visible label is the caller's `<Label>`, not the Input's own, so the
+    // pairing has to be made here with `htmlFor` (#213). `useId` scopes the ids
+    // per instance — `Variants` renders three sections on one page, and three
+    // fields sharing `id="tutor-status"` would send every label to the first.
+    const uid = React.useId();
+
     return (
         <div
             style={{
@@ -192,9 +198,9 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
                         overflow: 'hidden',
                     }}
                 >
-                    <Label text="Tutor Status" required={false} />
+                    <Label text="Tutor Status" required={false} htmlFor={`${uid}-tutor-status`} />
                     <Input
-                        id="tutor-status"
+                        id={`${uid}-tutor-status`}
                         value="Lead Tutor"
                         readonly={true}
                         size="medium"
@@ -213,9 +219,9 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
                         overflow: 'hidden',
                     }}
                 >
-                    <Label text="Onboarding Status:" required={false} />
+                    <Label text="Onboarding Status:" required={false} htmlFor={`${uid}-onboarding-status`} />
                     <Input
-                        id="onboarding-status"
+                        id={`${uid}-onboarding-status`}
                         value="Complete"
                         readonly={true}
                         size="medium"
@@ -234,9 +240,9 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
                         overflow: 'hidden',
                     }}
                 >
-                    <Label text="Tutoring with PLUS since:" required={false} />
+                    <Label text="Tutoring with PLUS since:" required={false} htmlFor={`${uid}-tutoring-since`} />
                     <Input
-                        id="tutoring-since"
+                        id={`${uid}-tutoring-since`}
                         value="01/29/2026"
                         readonly={true}
                         size="medium"
@@ -255,9 +261,9 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
                         overflow: 'hidden',
                     }}
                 >
-                    <Label text="Assigned Supervisor:" required={false} />
+                    <Label text="Assigned Supervisor:" required={false} htmlFor={`${uid}-assigned-supervisor`} />
                     <Input
-                        id="assigned-supervisor"
+                        id={`${uid}-assigned-supervisor`}
                         value="Albus Dumbledore"
                         readonly={true}
                         size="medium"

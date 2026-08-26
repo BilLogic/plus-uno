@@ -35,11 +35,18 @@ export const ConfirmationAlert = ({
         }}
     >
         <div className="d-flex align-items-start" style={{ gap: 'var(--size-element-gap-sm)' }}>
+            {/*
+              * The confirmation text is a sibling `<span>`, laid out in the row
+              * rather than inside the checkbox, so it cannot be the checkbox's
+              * `label` without changing the layout. `aria-label` carries the
+              * same string to the accessibility tree (#213).
+              */}
             <Checkbox
                 size="small"
                 required
                 checked={checked}
                 onChange={onChange}
+                aria-label={label}
                 style={{ flexShrink: 0, width: 'auto', margin: 0, padding: 0 }}
             />
             <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>

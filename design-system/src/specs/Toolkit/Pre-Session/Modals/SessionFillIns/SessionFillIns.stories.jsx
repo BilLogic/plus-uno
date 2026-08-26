@@ -294,7 +294,18 @@ export const ConsentForm = () => (
                             }}
                         >
                             <div style={{ flexShrink: 0, paddingTop: '2px' }}>
-                                <Checkbox checked={i < 2} onChange={() => {}} size="small" />
+                                {/*
+                                  * The consent title is laid out beside the
+                                  * checkbox with its own link icon, so it cannot
+                                  * be the checkbox's `label` without moving it.
+                                  * `aria-label` carries the same text (#213).
+                                  */}
+                                <Checkbox
+                                    checked={i < 2}
+                                    onChange={() => {}}
+                                    size="small"
+                                    aria-label={`I acknowledge ${item.title}`}
+                                />
                             </div>
                             <div className="d-flex flex-column" style={{ gap: 'var(--size-table-cell-gap)', flex: 1, minWidth: 0 }}>
                                 <div className="d-flex align-items-center" style={{ gap: 'var(--size-element-gap-xs)' }}>

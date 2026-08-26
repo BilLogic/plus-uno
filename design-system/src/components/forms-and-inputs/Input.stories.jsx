@@ -46,7 +46,7 @@ export default {
         },
         showLabel: {
             control: 'boolean',
-            description: 'Toggle the label? switch to show or hide the label.',
+            description: 'Show the label, or hide it visually. Off still renders it and still names the input.',
             table: { category: 'Content' }
         },
         label: {

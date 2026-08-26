@@ -53,6 +53,27 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
+### Accessibility
+
+- **A slider needs a `label`, and it is the only thing that names it.** The value
+  is a number: "49" does not say what is being set. Pass `label`, and the
+  component associates it with the input through `useFieldId`, so the pairing
+  holds whether or not you pass an `id`.
+- **`showLabel={false}` hides the label, it does not remove it.** Same contract
+  as `Input` (#213): the label still renders and still names the slider, it is
+  just clipped out of sight. Use it where the design puts the meaning elsewhere
+  — the minus/plus icons flanking a zoom slider, for instance.
+- **Everything else passes through.** `aria-valuetext`, `aria-describedby` and
+  any other `aria-*` reach the input. Reach for `aria-valuetext` when the number
+  is not what a listener needs to hear — "50 percent" rather than "50".
+- **`min`, `max` and `step` are on the input.** They become
+  `aria-valuemin` / `aria-valuemax` implicitly, so a screen reader reports the
+  range without any extra attribute.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground

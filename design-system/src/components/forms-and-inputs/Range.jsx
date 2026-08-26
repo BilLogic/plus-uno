@@ -1,11 +1,22 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
+import useFieldId from './useFieldId';
 import './Range.scss';
 
+/**
+ * Range — slider over a numeric span.
+ *
+ * A range input carries its value, never its meaning: "49" says nothing about
+ * what is being set. `label` is the only thing that names it, so it takes the
+ * same pair as `Input` — `label` for the text, `showLabel={false}` to hide that
+ * text without taking the name away (#213).
+ */
 const Range = ({
     id,
     name,
+    label,
+    showLabel = true,
     min = 0,
     max = 100,
     value,
@@ -19,6 +30,8 @@ const Range = ({
     ...props
 }) => {
     const rangeRef = useRef(null);
+    /** One id for the label and the slider — see `useFieldId` (#206). */
+    const fieldId = useFieldId(id);
 
     // Logic to update --value-percent CSS variable for track filling
     const updateValuePercent = () => {
@@ -74,9 +87,17 @@ const Range = ({
 
     return (
         <div className="plus-form-range-wrapper">
+            {label && (
+                <Form.Label
+                    htmlFor={fieldId}
+                    className={`plus-form-range-label${showLabel ? '' : ' plus-form-range-label-hidden'}`}
+                >
+                    {label}
+                </Form.Label>
+            )}
             <Form.Range
                 ref={rangeRef}
-                id={id}
+                id={fieldId}
                 name={name}
                 min={min}
                 max={max}
@@ -96,6 +117,10 @@ const Range = ({
 Range.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
+    /** Text that names the slider. Without it the slider has no accessible name. */
+    label: PropTypes.node,
+    /** Render the label visually hidden rather than visible. It still names the slider. */
+    showLabel: PropTypes.bool,
     min: PropTypes.number,
     max: PropTypes.number,
     value: PropTypes.number,
