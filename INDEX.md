@@ -32,6 +32,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
+| [`skills/README.md`](skills/README.md) | Skill anatomy — which content belongs in method.md, which in a face, and the guard that holds the split |
 | [`skills/uno-maintain/bot.md`](skills/uno-maintain/bot.md) | uno-maintain — Worker delta over references/method.md. |
 | [`skills/uno-maintain/SKILL.md`](skills/uno-maintain/SKILL.md) | Fix the harness, not project design work |
 | [`skills/uno-prototype/bot.md`](skills/uno-prototype/bot.md) | uno-prototype — Worker delta over references/method.md. |
@@ -195,6 +196,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-124 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+125 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 raw eval data are deliberately not indexed — they record what happened rather
 than telling you what to do.
