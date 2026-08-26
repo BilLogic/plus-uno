@@ -2,7 +2,7 @@
   "measured": "2026-08-26",
   "suite": {
     "storyFiles": 388,
-    "tests": 1135
+    "tests": 1136
   },
   "violatingStories": 126,
   "rules": {

@@ -123,14 +123,34 @@ Date and time pickers let people select a date or range of dates and/or a time f
   (`useFieldId`), so omitting `id` is safe and unique. Repeating one is not: both
   fields' labels and `aria-labelledby` targets then collide, and every label on
   the page lands on whichever control the browser reached first (#222).
-- **`required` and `validation` are visual only, and there is no ARIA escape
-  hatch.** `required` renders a `*` span marked `aria-label="required"`;
-  `validation` colours the field and renders the message with an `aria-hidden`
-  icon. Neither sets `aria-invalid`, and neither links `validationMessage` to an
-  input. Unlike `Input`, this component also forwards nothing: props it does not
-  name are collected into a rest object that is never spread, so passing
-  `aria-invalid` or `aria-describedby` yourself has no effect. An invalid state
-  that has to reach assistive tech needs the component changed.
+- **`required` and `validation` are visual only.** `required` renders a `*` span
+  marked `aria-label="required"`; `validation` colours the field and renders the
+  message with an `aria-hidden` icon. Neither sets `aria-invalid`, and neither
+  links `validationMessage` to an input. Until #230 there was no escape hatch
+  either — this component collected the props it does not name into a rest
+  object and never spread it, so passing `aria-describedby` yourself did
+  nothing, silently. It forwards them now; the rule for where they land is the
+  next bullet.
+- **Forwarded props go to the wrapper, which is the group — not to either
+  input.** Anything this component does not name in its own signature is spread
+  onto the outer `<div>`, the same element that carries `role="group"` and the
+  field's name (#230). One target, because this field renders two inputs plus an
+  AM/PM control and a prop split across them would land somewhere the caller did
+  not choose. The wrapper is the right one of the four: it is what `data-testid`
+  means by "this field", and it is what `aria-describedby` is about — a
+  description of the field describes the field, not its date half. The spread is
+  last, so a caller's `aria-labelledby` wins over the generated one, matching
+  `Input`. One dependency worth knowing: the wrapper is only a `group` when the
+  field has a `label`, per the third bullet above, so a description forwarded to
+  an unlabelled picker lands on a plain `<div>` and is announced by nothing.
+  Pass a `label` — with `showLabel={false}` if it should not be seen.
+- **What that rule costs you: `aria-invalid` marks the group, not the inputs.**
+  It is the honest consequence of one spread target. A description on the group
+  is the right place for one — it describes the field, and screen readers
+  generally announce it on entering the group — but `aria-invalid` is expected
+  on the control that is invalid, and a group is not a control. So wiring a
+  validation message with `aria-describedby` works today; marking the two inputs
+  invalid still needs the component changed.
 
 </div>
 

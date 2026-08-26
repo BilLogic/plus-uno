@@ -34,6 +34,12 @@ const DateAndTimePicker = ({
     onChange,
     onFocus,
     onBlur,
+    /**
+     * Everything not named above, forwarded to the wrapper — see *Forwarded
+     * props* in `DateAndTimePicker.mdx` (#230) for why that is the one target
+     * and not the two inputs. Collected but never spread until #230, so
+     * `aria-describedby` and friends were silently dropped.
+     */
     ...props
 }) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -383,12 +389,21 @@ const DateAndTimePicker = ({
         />
     ));
 
+    /*
+     * `{...props}` lands on the wrapper, which is also the `group` (#206), so
+     * one target serves both halves of what callers pass: `data-testid` wants
+     * the outermost element, and `aria-describedby` wants the thing the
+     * description is about — the field, which is this element, not either
+     * input. It goes last so a caller's `aria-labelledby` overrides the
+     * generated one, the same precedence `Input.jsx` gives its spread (#230).
+     */
     return (
         <div
             className={`plus-datetime-wrapper ${className}`}
             style={style}
             role={hasLabel ? 'group' : undefined}
             aria-labelledby={labelId}
+            {...props}
         >
             {hasLabel && (
                 <Form.Label
