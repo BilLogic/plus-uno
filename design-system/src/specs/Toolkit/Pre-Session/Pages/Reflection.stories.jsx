@@ -61,7 +61,7 @@ const MainContent = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-sm)' }}>
             {/* Table Header with Title and Filters */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <SectionTitle title="Session Reflections" />
+                <SectionTitle title="Session Reflections" titleAs="h2" />
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)' }}>
                     <CompletionFilter
                         initialSelection={completionFilter}
@@ -118,6 +118,7 @@ const defaultReflections = [
 export const Overview = () => (
     <div style={{ maxWidth: '1440px', height: '100%', margin: '0 auto' }}>
         <PageLayout
+            title="Sessions"
             topBarConfig={{
                 breadcrumbs: [
                     { text: 'Home', href: '#' },
@@ -199,6 +200,7 @@ const InteractiveRender = (args) => {
     return (
         <div style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
             <PageLayout
+                title="Sessions"
                 topBarConfig={{
                     breadcrumbs: [
                         { text: 'Home', href: '#' },

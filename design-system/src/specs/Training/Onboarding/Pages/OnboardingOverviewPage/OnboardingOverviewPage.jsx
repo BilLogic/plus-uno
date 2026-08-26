@@ -83,6 +83,7 @@ const OnboardingOverviewPage = ({
 
     return (
         <PageLayout
+            title="Onboarding"
             topBarConfig={topBarConfig}
             sidebarConfig={sidebarConfig}
             id="onboarding-overview-page"
@@ -93,7 +94,7 @@ const OnboardingOverviewPage = ({
                     {/* Title and Controls */}
                     <div className="onboarding-overview-page__section-header">
                         <div className="onboarding-overview-page__title-container">
-                            <h4 className="h4" style={{ margin: 0 }}>Featured Modules</h4>
+                            <h2 className="h4" style={{ margin: 0 }}>Featured Modules</h2>
                         </div>
                         <div className="onboarding-overview-page__controls">
                             <Button
@@ -127,6 +128,7 @@ const OnboardingOverviewPage = ({
                                 <OnboardingModuleCard
                                     key={module.id}
                                     title={module.title}
+                                    titleAs="h3"
                                     duration={module.duration}
                                     variant={module.variant || 'thumbnail'}
                                     badgeType={module.badgeType || 'other'}
@@ -143,7 +145,7 @@ const OnboardingOverviewPage = ({
                     {/* Control Bar */}
                     <div className="onboarding-overview-page__section-header">
                         <div className="onboarding-overview-page__title-container">
-                            <h4 className="h4" style={{ margin: 0 }}>All Modules</h4>
+                            <h2 className="h4" style={{ margin: 0 }}>All Modules</h2>
                         </div>
                         <SortingDropdown
                             status={false}

@@ -136,7 +136,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
     const sidebarConfig = { user: 'tutor' };
 
     return (
-        <PageLayout topBarConfig={topBarConfig} sidebarConfig={sidebarConfig} id="tutor-profile-page-interactive">
+        <PageLayout title="Tutor Profile" topBarConfig={topBarConfig} sidebarConfig={sidebarConfig} id="tutor-profile-page-interactive">
             <div
                 style={{
                     display: 'flex',
@@ -145,9 +145,9 @@ function TutorProfileInteractiveDemo({ profileState }) {
                     width: '100%',
                 }}
             >
-                <h3 className="h3" style={{ color: 'var(--color-on-surface)', margin: 0 }}>
+                <h2 className="h3" style={{ color: 'var(--color-on-surface)', margin: 0 }}>
                     Tutor Profile
-                </h3>
+                </h2>
 
                 <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                     <UploadProfilePic state={profileState} />

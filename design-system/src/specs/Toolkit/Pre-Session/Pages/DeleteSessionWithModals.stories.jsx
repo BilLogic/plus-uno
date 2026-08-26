@@ -54,7 +54,7 @@ const BackgroundContent = ({ tabs, selectedTab }) => (
     >
         {/* Page Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h4 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Sessions</h4>
+            <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Sessions</h2>
             <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
                 <Button size="default" fill="outline" style="primary" leadingVisual="plus">
                     Create New Sessions
@@ -208,6 +208,7 @@ export const WithModals = (args) => {
             }}>
                 {/* Background Page */}
                 <PageLayout
+                    title="Sessions"
                     topBarConfig={{
                         breadcrumbs: [
                             { text: 'Home', href: '#' },

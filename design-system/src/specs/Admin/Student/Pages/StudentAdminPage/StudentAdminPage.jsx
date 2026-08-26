@@ -137,6 +137,7 @@ const StudentAdminPage = ({
     return (
         <div ref={modalBoundaryRef} className={containModal ? 'plus-modal-boundary' : undefined}>
         <PageLayout
+            title="Student Admin"
             topBarConfig={topBarConfig}
             sidebarConfig={sidebarConfig}
             id="student-admin-page"

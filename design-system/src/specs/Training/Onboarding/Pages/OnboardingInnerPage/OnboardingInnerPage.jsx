@@ -72,6 +72,7 @@ const OnboardingInnerPage = ({
 
     return (
         <PageLayout
+            title={moduleTitle}
             topBarConfig={topBarConfig}
             sidebarConfig={sidebarConfig}
             id="onboarding-inner-page"
@@ -103,6 +104,7 @@ const OnboardingInnerPage = ({
                     <section className="onboarding-inner-page__alert-section">
                         <OnboardingAlertCard
                             title={alertTitle}
+                            titleAs="h3"
                             description={alertDescription}
                             dismissible={true}
                             onDismiss={() => setIsAlertVisible(false)}

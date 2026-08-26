@@ -48,9 +48,9 @@ const StrategyContentPromptModal = ({
         <div className={`strategy-content-prompt-modal ${className}`} {...props}>
             {/* Instructions section */}
             <div className="strategy-content-prompt-modal__intro">
-                <h5 className="strategy-content-prompt-modal__instructions-title h5">
+                <h3 className="strategy-content-prompt-modal__instructions-title h5">
                     {instructionsTitle}
-                </h5>
+                </h3>
                 <p className="strategy-content-prompt-modal__instructions-text body1-txt">
                     {instructionsText}
                 </p>

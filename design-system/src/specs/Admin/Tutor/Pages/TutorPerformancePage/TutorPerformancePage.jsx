@@ -151,6 +151,7 @@ const TutorPerformancePage = ({
     return (
         <div ref={modalBoundaryRef} className={containModal ? 'plus-modal-boundary' : undefined}>
         <PageLayout
+            title="Tutor Performance"
             topBarConfig={topBarConfig}
             sidebarConfig={sidebarConfig}
             id="tutor-performance-page"

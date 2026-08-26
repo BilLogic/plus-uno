@@ -116,7 +116,7 @@ const SelfReflectionForm = ({
             }}
         >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
-                <h4 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>Self Reflection</h4>
+                <h2 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>Self Reflection</h2>
                 <LastUpdated text={typeof lastUpdated === 'string' ? lastUpdated : undefined} />
             </div>
 

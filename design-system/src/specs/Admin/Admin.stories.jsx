@@ -24,9 +24,9 @@ export default {
  */
 export const Overview = () => (
     <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-        <h2 className="h2" style={{ marginBottom: 'var(--size-section-pad-y-md)' }}>
+        <h1 className="h2" style={{ marginBottom: 'var(--size-section-pad-y-md)' }}>
             Admin Organisms
-        </h2>
+        </h1>
 
         <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-lg)' }}>
             Admin organisms for management dashboards. Organized by admin type.
@@ -56,7 +56,7 @@ export const Overview = () => (
                     backgroundColor: 'var(--color-surface-container)',
                     borderRadius: '8px'
                 }}>
-                    <h3 className="h4" style={{ marginBottom: '12px' }}>{section.title}</h3>
+                    <h2 className="h4" style={{ marginBottom: '12px' }}>{section.title}</h2>
                     <ul className="body2-txt" style={{ paddingLeft: '20px', margin: 0 }}>
                         {section.items.map(item => (
                             <li key={item}>{item}</li>

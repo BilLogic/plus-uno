@@ -25,9 +25,9 @@ export default {
  */
 export const Overview = () => (
     <div style={{ padding: 'var(--size-section-pad-y-lg)', maxWidth: '800px' }}>
-        <h2 className="h2" style={{ marginBottom: 'var(--size-section-pad-y-md)' }}>
+        <h1 className="h2" style={{ marginBottom: 'var(--size-section-pad-y-md)' }}>
             Training Organisms
-        </h2>
+        </h1>
 
         <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-lg)' }}>
             Training organisms are built using PLUS Design System components. All pages use
@@ -42,7 +42,7 @@ export const Overview = () => (
                 borderRadius: 'var(--size-card-radius-sm, 12px)',
                 border: '1px solid var(--color-outline-variant)'
             }}>
-                <h3 className="h4" style={{ marginBottom: '12px' }}>
+                <h2 className="h4" style={{ marginBottom: '12px' }}>
                     Lessons
                     <a 
                         href="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=63-178289" 
@@ -52,7 +52,7 @@ export const Overview = () => (
                     >
                         View in Figma →
                     </a>
-                </h3>
+                </h2>
                 <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
                     Training lessons module with overview and detail pages.
                 </p>
@@ -62,7 +62,7 @@ export const Overview = () => (
                         backgroundColor: 'var(--color-surface)', 
                         borderRadius: 'var(--size-element-radius-md, 8px)' 
                     }}>
-                        <h4 className="h6" style={{ marginBottom: '8px' }}>LessonsOverviewPage</h4>
+                        <h3 className="h6" style={{ marginBottom: '8px' }}>LessonsOverviewPage</h3>
                         <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
                             Main lessons list with progress tracking, status filters, and navigation.
                         </p>
@@ -72,7 +72,7 @@ export const Overview = () => (
                         backgroundColor: 'var(--color-surface)', 
                         borderRadius: 'var(--size-element-radius-md, 8px)' 
                     }}>
-                        <h4 className="h6" style={{ marginBottom: '8px' }}>LessonsDetailPage (5 variants)</h4>
+                        <h3 className="h6" style={{ marginBottom: '8px' }}>LessonsDetailPage (5 variants)</h3>
                         <p className="body3-txt" style={{ marginBottom: '8px', color: 'var(--color-on-surface-variant)' }}>
                             Individual lesson content with variant-based rendering:
                         </p>
@@ -94,7 +94,7 @@ export const Overview = () => (
                 borderRadius: 'var(--size-card-radius-sm, 12px)',
                 border: '1px solid var(--color-outline-variant)'
             }}>
-                <h3 className="h4" style={{ marginBottom: '12px' }}>Onboarding</h3>
+                <h2 className="h4" style={{ marginBottom: '12px' }}>Onboarding</h2>
                 <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
                     Onboarding module (separate specification).
                 </p>
@@ -107,7 +107,7 @@ export const Overview = () => (
                 borderRadius: 'var(--size-card-radius-sm, 12px)',
                 border: '1px solid var(--color-outline-variant)'
             }}>
-                <h3 className="h4" style={{ marginBottom: '12px' }}>PLUS DS Components Used</h3>
+                <h2 className="h4" style={{ marginBottom: '12px' }}>PLUS DS Components Used</h2>
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Training pages are built using these core PLUS Design System components:
                 </p>

@@ -133,15 +133,15 @@ const StudentReflectionForm = ({
             }}
         >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
-                <h4 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>
+                <h2 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>
                     Student Reflection
-                </h4>
+                </h2>
                 <LastUpdated text={lastUpdated} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                    <h5 className="h6 m-0">{studentName}</h5>
+                    <h3 className="h6 m-0">{studentName}</h3>
                     <SessionNotes state={initialData.notes ? 'filled' : 'empty'} notes={initialData.notes} />
                 </div>
 

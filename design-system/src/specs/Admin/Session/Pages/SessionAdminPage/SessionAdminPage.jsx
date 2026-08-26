@@ -143,6 +143,7 @@ const SessionAdminPage = ({
     return (
         <div ref={modalBoundaryRef} className={containModal ? 'plus-modal-boundary' : undefined}>
         <PageLayout
+            title="Session Admin"
             topBarConfig={topBarConfig}
             sidebarConfig={sidebarConfig}
             id="session-admin-page"

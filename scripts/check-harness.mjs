@@ -145,6 +145,21 @@ const COMPOSED = [
       'can observe, decidable from the file.',
   },
   {
+    script: 'check:page-outline',
+    pkg: 'root',
+    guards:
+      'the OTHER half of the page-outline guard — the half a DOM assertion cannot hold. ' +
+      '`.storybook/page-outline.js` asserts in the browser that every page story renders an ' +
+      '`<h1>` and that it comes first; it selects pages by story TITLE, cannot count its own ' +
+      'population (each story file is its own module in browser mode), and goes silent if its ' +
+      'registration in `.storybook/vitest.setup.ts` is deleted. This checks the title selector ' +
+      'still picks out exactly the files under `specs/**/Pages/**` plus the three area ' +
+      'overviews, that the population has not collapsed below its floor, and that the assertion ' +
+      'is still wired in. #243 — the defect neither `heading-order` nor `page-has-heading-one` ' +
+      'can see, because the first heading on a page has no predecessor to skip from and axe ' +
+      'never evaluates page-level rules against a story root.',
+  },
+  {
     script: 'check:intake-fsm',
     pkg: 'root',
     guards: 'the intake FSM that gates every uno-prototype run.',

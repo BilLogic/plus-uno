@@ -89,7 +89,7 @@ const MainContent = ({
     >
         {/* Page Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h4 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Sessions</h4>
+            <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Sessions</h2>
             <Button size="default" fill="filled" style="primary" leadingVisual="calendar">
                 Fill in
             </Button>
@@ -109,7 +109,7 @@ const MainContent = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-sm)' }}>
             {/* Table Header with Title and Filters */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h4 className="h4 font-weight-semibold" style={{ color: 'var(--color-on-surface)', margin: 0 }}>My Sessions</h4>
+                <h3 className="h4 font-weight-semibold" style={{ color: 'var(--color-on-surface)', margin: 0 }}>My Sessions</h3>
                 <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
                     <SiteFilter initialSelection="All schools" />
                     <TimeframeFilter initialSelection="This week" />
@@ -159,6 +159,7 @@ const defaultSessions = [
 export const Overview = () => (
     <div style={{ maxWidth: '1440px', height: '100%', margin: '0 auto', position: 'relative' }}>
         <PageLayout
+            title="Sessions"
             topBarConfig={{
                 breadcrumbs: [
                     { text: 'Home', href: '#' },
@@ -249,6 +250,7 @@ const InteractiveRender = (args) => {
     return (
         <div style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden', borderRadius: 'var(--size-card-radius-sm)' }}>
             <PageLayout
+                title="Sessions"
                 topBarConfig={{
                     breadcrumbs: [
                         { text: 'Home', href: '#' },

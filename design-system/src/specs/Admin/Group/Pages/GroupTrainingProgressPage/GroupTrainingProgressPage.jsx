@@ -88,6 +88,7 @@ const GroupTrainingProgressPage = ({
 
     return (
         <PageLayout
+            title="Group Training Progress"
             topBarConfig={topBarConfig}
             sidebarConfig={sidebarConfig}
             id="group-training-progress-page"

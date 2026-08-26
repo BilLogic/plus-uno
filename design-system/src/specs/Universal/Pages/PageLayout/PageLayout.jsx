@@ -20,6 +20,29 @@ const SIDEBAR_WIDTH = 164;
 const TOPBAR_LEFT_COLLAPSED_WIDTH = 52;
 const TOPBAR_LEFT_EXPANDED_WIDTH = SIDEBAR_WIDTH;
 
+/**
+ * The page's `<h1>` is off-screen, not `display: none` — a hidden-by-display
+ * heading is out of the accessibility tree entirely and would give the page no
+ * outline top at all, which is the defect this exists to fix (#243).
+ *
+ * It is an inline style rather than a utility class on purpose. Bootstrap's
+ * `.visually-hidden` would do the same job, but a heading whose concealment
+ * depends on a stylesheet arriving fails LOUDLY in the wrong direction: if that
+ * sheet is missing or ordered late, an untitled-looking page suddenly grows a
+ * 56px title. An inline style cannot be un-loaded.
+ */
+const PAGE_TITLE_STYLE = {
+    position: 'absolute',
+    width: 1,
+    height: 1,
+    padding: 0,
+    margin: -1,
+    overflow: 'hidden',
+    clip: 'rect(0, 0, 0, 0)',
+    whiteSpace: 'nowrap',
+    border: 0,
+};
+
 const PageLayout = ({
     children,
     sidebarConfig = {},
@@ -30,6 +53,22 @@ const PageLayout = ({
     style,
     mainClassName = '',
     floatingContent,
+    /**
+     * The page's name — rendered as the `<h1>` that tops its heading outline.
+     *
+     * Every page laid out by this shell owns a document, and a document with no
+     * `<h1>` has no top: `heading-order` cannot see it, because the first
+     * heading on a page has no predecessor to skip from (#243). Supplying it
+     * here rather than in each page means a new page gets one by passing a prop,
+     * not by remembering a convention. `scripts/check-page-outline.mjs` and the
+     * `.storybook/page-outline.js` assertion are what make forgetting it red.
+     *
+     * It is visually hidden because these pages put their name in the TopBar
+     * breadcrumb, not in the content — see the note on PAGE_TITLE_STYLE. A page
+     * that DOES render its own visible title heading marks that heading up as
+     * the `<h1>` instead and leaves this unset.
+     */
+    title,
     /** When true, render children directly in content-wrapper without main (e.g. full-width chat). */
     contentDirect = false,
     /** When true, show TopBar skeleton + Sidebar loading (shimmer). */
@@ -159,6 +198,15 @@ useEffect(() => {
         setIsSidebarVisible(true);
     };
 
+    /**
+     * First element inside `<main>`, so the outline's top is also the top of the
+     * page's main content. Omitted entirely when no title is given — a page that
+     * marks its own visible heading up as the `<h1>` must not get a second one.
+     */
+    const pageTitle = title
+        ? <h1 className="plus-page-title" style={PAGE_TITLE_STYLE}>{title}</h1>
+        : null;
+
     return (
         <div
             id={id}
@@ -274,7 +322,10 @@ useEffect(() => {
                     transition: CONTENT_TRANSITION,
                 }}>
                     {contentDirect ? (
-                        children
+                        <>
+                            {pageTitle}
+                            {children}
+                        </>
                     ) : (
                         <main
                             className={['plus-page-main', mainClassName].filter(Boolean).join(' ')}
@@ -290,6 +341,7 @@ useEffect(() => {
                                 position: 'relative'
                             }}
                         >
+                            {pageTitle}
                             {children}
                         </main>
                     )}
@@ -324,6 +376,7 @@ PageLayout.propTypes = {
     style: PropTypes.object,
     mainClassName: PropTypes.string,
     floatingContent: PropTypes.node,
+    title: PropTypes.string,
     contentDirect: PropTypes.bool,
     shellLoading: PropTypes.bool,
     shellEntered: PropTypes.bool,

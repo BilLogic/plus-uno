@@ -42,11 +42,13 @@ BreakpointPreview.propTypes = {
  * @param {object} props
  * @param {React.ReactNode} props.children
  * @param {string} [props.id]
+ * @param {string} [props.title] - Page name; becomes the page's `<h1>` (see PageLayout).
  * @returns {React.ReactElement}
  */
-export function ReflectionPageLayout({ children, id = 'post-session-page' }) {
+export function ReflectionPageLayout({ children, id = 'post-session-page', title = 'Reflection Form' }) {
     return (
         <PageLayout
+            title={title}
             topBarConfig={{
                 breadcrumbs: [
                     { text: 'Toolkit', href: '#' },
@@ -67,6 +69,7 @@ export function ReflectionPageLayout({ children, id = 'post-session-page' }) {
 ReflectionPageLayout.propTypes = {
     children: PropTypes.node,
     id: PropTypes.string,
+    title: PropTypes.string,
 };
 
 /**

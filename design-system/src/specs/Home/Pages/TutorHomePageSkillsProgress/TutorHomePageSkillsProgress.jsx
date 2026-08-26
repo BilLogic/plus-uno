@@ -95,6 +95,7 @@ const TutorHomePageSkillsProgress = ({
 
     return (
         <PageLayout
+            title="Home"
             id={id}
             topBarConfig={topBarConfig}
             sidebarConfig={sidebarConfig}
