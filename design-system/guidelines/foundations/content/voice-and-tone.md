@@ -10,9 +10,11 @@ summary: Warm, direct, encouraging
 
 > **Status: in use, descriptive.** Promoted out of DRAFT on 2026-08-22. The
 > banner had said "needs design leadership iteration before finalizing" since
-> April while `docs/knowledge/preferences.md` pointed here for "full rules" on
-> capitalization — so one doc told readers to rely on this file and this file
-> told them not to. Whichever was wrong, both could not be right.
+> April while a preferences note in the knowledge folder pointed here for "full
+> rules" on capitalization — so one doc told readers to rely on this file and
+> this file told them not to. Whichever was wrong, both could not be right.
+> (That note was dissolved in #172; § Capitalization below is now the only
+> statement of the rule.)
 >
 > What it is: the *descriptive* rationale for product tone and UI copy. The
 > long-form craft rules are in `docs/conventions/writing.md`,

@@ -12,7 +12,7 @@ summary: How to write code in this repo — barrel imports, tokens over literals
 - **Components**: PascalCase directories and files (e.g., `Button/Button.jsx`, `Alert/Alert.scss`)
 - **Stories**: Co-located with component (e.g., `Button.stories.jsx`)
 - **Prototypes**: kebab-case directories (e.g., `prototypes/home-redesign/`)
-- **Docs**: kebab-case with date prefix for plans/ideation (e.g., `2026-03-21-007-refactor-optimal-repo-structure-plan.md`)
+- **Docs**: kebab-case with a date prefix for plans (e.g., `2026-03-21-007-refactor-optimal-repo-structure-plan.md`)
 - **Prompt-specs**: same folder, same date prefix, `-spec` suffix (e.g., `docs/plans/2026-08-02-001-fill-in-coverage-flow-map-spec.md`). `uno-prototype`'s spec-handoff deliverables — text handed to an external design tool, not code, so nothing builds them.
 
 ## Imports
@@ -92,12 +92,20 @@ Figma → npm run sync:tokens → npm run generate:tokens → commit SCSS
 ## Docs pipeline
 
 ```
-docs/knowledge/ideations.md → docs/plans/ → implementation → docs/knowledge/lessons/
+docs/plans/ → implementation → a rule, an ADR, or nothing
 ```
 
-- **Ideation**: `YYYY-MM-DD-topic-ideation.md` — exploratory docs with ranked ideas
 - **Plans**: `YYYY-MM-DD-NNN-type-slug-plan.md` — actionable implementation plans
-- **Lessons**: two shapes, both live. `docs/knowledge/lessons/{domain}.md` — the compounding files (atomic entries with YAML frontmatter), one per domain. `docs/knowledge/lessons/YYYY-MM-DD-slug.md` — a single incident or sweep worth its own file (template: `skills/uno-maintain/examples/lesson-template.md`). Default to the domain file; give an incident its own only when it will be cited as an event.
+- **What a finished piece of work leaves behind** is one of three things, and `docs/knowledge/INDEX.md` § The disposition rule is the contract: a **rule** in the doc that already owns the subject (this file, `setup.md`, a `docs/connectors/*.md`, a design-system guideline), an **ADR** under `docs/adr/` when the call is hard to reverse, or **nothing** — git keeps the trail and most findings are worth less than the context they cost. A note staged under `docs/knowledge/` carries its `disposition:` in frontmatter from the moment it is written; `npm run check:knowledge-disposition` fails the build otherwise.
+
+## Renames
+
+A rename is finished when `bash scripts/validate-doc-links.sh` passes, not when
+the first file is updated. Grep the old literal across `src/`, `*.json`,
+`AGENTS.md` and `docs/` in the same change, and count the surfaces before you
+start: the 2026-07 sweep found one renamed tool still named in the live system
+prompt, a constant whose old value survived in three doc surfaces, and a path
+rename that reached `AGENTS.md` and stopped there.
 
 ## Known gotchas
 
@@ -108,3 +116,6 @@ docs/knowledge/ideations.md → docs/plans/ → implementation → docs/knowledg
 | `design-system/src/index.js` is the barrel | New components not exported = import fails | Add to barrel export when creating new components |
 | Storybook uses autodocs | Missing JSDoc = empty docs page | Add JSDoc to component exports |
 | Raw HTML in marketplace pages | Breaks DS consistency | Use DS components: Button, Input, Badge, Card, Select |
+| Nested Router providers | `MemoryRouter` inside `BrowserRouter` renders an empty root in React 19, with a silent console | One Router provider per tree — a shell mounted under another app takes its route from props |
+| A shell mounted under `<Route path="/x/*">` | Descendant `<Routes>` sees only the remainder after the prefix, so every path collapses to `/` and the index route always wins | Declare the named shell paths (`/monthly-reports/*`, `/admin/*`) above `/:prototypeId/*` — v6 ranks static segments first — and pass the shell a `contentKey` prop so it knows what to render at `index` |
+| `Failed to import test file` naming a setup file, with a `SyntaxError` that is not a real syntax error | A dependency discovered mid-run forced a Vite re-optimise and the page reloaded through the setup import. Look for `Vite unexpectedly reloaded a test` in the same run | Add the dependency to `optimizeDeps.include` on the `storybook` test project in `vite.config.js` — that is the one field the browser server reads. `design-system/tests/storybook-vitest-project.test.js` holds the assertions |
