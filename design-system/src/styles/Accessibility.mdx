@@ -49,9 +49,14 @@ display size is not a section: `<p className="h4">Answered Correctly</p>` in
 `LessonsDetailPage` is how that text gets heading type without taking an outline
 slot. The values still marked up as `<h1>`/`<h3>` beside it are #244.
 
-One caveat lives in the harness rather than in components, tracked in #244: the
-docs view forces every heading inside a story canvas to one of three sizes via
-`.sbdocs h1 / h2 / h3–h6 { … !important }`.
+The docs view used to break this separation. `.sbdocs h1 / h2 / h3–h6 { …
+!important }` in `.storybook/storybook-overrides.css` reached into story
+canvases — `.docs-story` sits inside `.sbdocs` — and forced every heading a
+component rendered to one of three docs sizes, so `<h3 className="h6">` drew at
+28px instead of 16px and the preview was not showing the component. Those rules
+are now fenced with `:not(:where(.docs-story *))` and apply to MDX prose only
+(#244). Any new `.sbdocs hN` rule needs the same fence.
+
 </div>
 
 <div className="sb-ds-doc-section">

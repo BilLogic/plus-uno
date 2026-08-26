@@ -13,8 +13,33 @@ body,
     color: var(--color-on-surface, #191c1e) !important;
 }
 
-/* Headers in Storybook docs */
-.sbdocs h1,
+/*
+ * Headers in MDX prose only.
+ * Do NOT let these reach inside a story canvas — that is what
+ * `:not(:where(.docs-story *))` is fencing off, and it is the same lesson the
+ * body-text rules below already learned.
+ *
+ * `.docs-story` is a descendant of `.sbdocs`, so an unfenced
+ * `.sbdocs h3 { font-size: … !important }` outranks a story's own `hN` size
+ * class and flattens every heading a component renders into one of three docs
+ * sizes. Measured on the PageLayout docs page: `<h3 className="h6">Card 1</h3>`
+ * drew at 28px, not the 16px its class asks for, and `<h1 className="h2">Page
+ * Title</h1>` at 56px, not 32px. The docs preview was not showing the component.
+ * The tag is the outline position and the class is the appearance
+ * (design-system/src/styles/Accessibility.mdx § Heading levels), so a canvas
+ * heading has to be free to take its size from its class whatever tag it carries.
+ *
+ * `:where()` contributes no specificity, so the fence leaves every rule ranked
+ * exactly where it was against `.sb-doc-shadcn`, the TOC and the intro page.
+ *
+ * The `.sbdocs-h1`/`-h2`/`-h3`/`-h4`/`-h5` selectors are INERT on Storybook 10.5:
+ * `addon-docs` emits `sbdocs-title`, `-subtitle`, `-wrapper`, `-content`,
+ * `-preview`, `-toc--custom`, `-expandable` and `-argcontrol*` and nothing else,
+ * so an MDX heading carries only an emotion class. The bare tag selectors are what
+ * actually styles MDX prose here, which is why they are fenced rather than dropped.
+ * The class selectors are kept in case a future Storybook restores them.
+ */
+.sbdocs h1:not(:where(.docs-story *)),
 .sbdocs-title,
 .sbdocs-h1 {
     font-family: var(--font-family-header, 'Lato', sans-serif) !important;
@@ -23,7 +48,7 @@ body,
     color: var(--color-on-surface, #191c1e) !important;
 }
 
-.sbdocs h2,
+.sbdocs h2:not(:where(.docs-story *)),
 .sbdocs-h2 {
     font-family: var(--font-family-header, 'Lato', sans-serif) !important;
     font-size: var(--font-size-h2, 32px) !important;
@@ -32,10 +57,10 @@ body,
     margin-top: var(--size-section-gap-md) !important;
 }
 
-.sbdocs h3,
-.sbdocs h4,
-.sbdocs h5,
-.sbdocs h6,
+.sbdocs h3:not(:where(.docs-story *)),
+.sbdocs h4:not(:where(.docs-story *)),
+.sbdocs h5:not(:where(.docs-story *)),
+.sbdocs h6:not(:where(.docs-story *)),
 .sbdocs-h3,
 .sbdocs-h4,
 .sbdocs-h5 {
@@ -479,8 +504,10 @@ a.sbdocs-a {
   margin-bottom: 4rem !important;
 }
 
-/* Add margin under the main Title */
-.sbdocs h1,
+/* Add margin under the main Title. Fenced out of story canvases for the same
+   reason as the type-scale rules at the top of this file — LessonsDetailPage's
+   P5 canvas renders `<h1>`s of its own. */
+.sbdocs h1:not(:where(.docs-story *)),
 .sbdocs-title,
 .sbdocs-h1 {
   margin-bottom: 1rem !important;
