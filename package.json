@@ -41,6 +41,7 @@
     "check:docs": "bash scripts/validate-doc-links.sh",
     "check:intake-fsm": "node .cursor/hooks/uno-prototype/test-fsm.mjs",
     "check:harness": "node scripts/check-harness.mjs",
+    "check:storybook": "node scripts/check-storybook.mjs",
     "start": "vite",
     "dev:react": "vite",
     "build:react": "vite build",

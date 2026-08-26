@@ -125,9 +125,12 @@ fails the harness gate on drift.
 
 ## The harness gate
 
-`npm run check:harness` is the one command to run before opening a PR, and the
-one thing CI runs on every `pull_request` (`.github/workflows/check-harness.yml`).
-It composes the deterministic guards into a single exit code and a report that
+Two workflows run on every `pull_request`, concurrently: this one, and the
+Storybook gate below.
+
+`npm run check:harness` is the command to run before opening a PR
+(`.github/workflows/check-harness.yml`). It composes the deterministic guards
+into a single exit code and a report that
 names each sub-check that failed, with that sub-check's own diagnostic under it —
 it does not stop at the first, so one run tells you everything wrong with the
 branch. Takes about 20 seconds and installs nothing.
@@ -145,6 +148,40 @@ and commit:
 npm run generate:agent
 npm run generate:index
 npm --prefix agents/uno-bot run bundle:harness
+```
+
+## The Storybook gate
+
+`npm run check:storybook` runs the browser suite — every story rendered in
+headless chromium, any `play` block executed, axe run over the result
+(`.github/workflows/storybook-gate.yml`). It is a separate workflow because it
+needs `npm ci` and a Playwright browser and takes ~130s; `check:harness` needs
+neither and takes ~14s, and merging them would make the fast answer slow.
+
+Two kinds of failure, two mechanisms:
+
+- **`play` functions and render errors block outright.** There are none failing
+  on `main`, so anything that appears was introduced by the branch. (The corpus
+  carries **no** `play` functions at all today — the "284 of 382" figure in #154
+  came from a grep that matched `display:`. What the suite asserts right now is
+  that every story renders and axe runs over it; the interaction path is wired
+  ahead of the first interaction test rather than after it.)
+- **Accessibility is a ratchet**, not a threshold. `docs/evals/a11y-baseline.json`
+  records which axe rules each story already violates (148 stories, 15 rules at
+  2026-08-26). A story violating a rule it did not carry before fails the gate; a
+  count that falls does not. Re-record a genuine improvement with
+  `npm run check:storybook -- --update` and commit the file in the same PR.
+
+Fixing the inherited violations is tracked separately at #153 — the ratchet
+exists so that work does not have to finish before anything else can merge. A
+rule that genuinely does not apply to a story belongs in that story's own
+`parameters.a11y`, with the reason written next to it; re-baselining is not a
+substitute for that decision.
+
+```bash
+npm run check:storybook                       # gate
+npm run check:storybook -- --update           # re-record the a11y baseline
+npx vitest run --project=storybook -t "Name"  # one story, for triage
 ```
 
 ## Local Preview

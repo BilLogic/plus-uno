@@ -1,0 +1,85 @@
+name: check:storybook
+
+# The Storybook browser suite, on every PR. What it asserts and why the a11y half
+# is a ratchet rather than a threshold is written once, in
+# `scripts/check-storybook.mjs` — never restate it here.
+#
+# WHY A SECOND WORKFLOW INSTEAD OF A SUB-CHECK OF `check-harness.yml`. That gate
+# runs in ~14s with no `npm ci`, and its own header says the ~20s is what keeps it
+# switched on. This job needs `npm ci` plus a Playwright chromium download before
+# it can run a ~130s browser suite. Folding it in would turn the number people
+# wait on from seconds into minutes, and a gate people wait on is a gate people
+# route around. Two workflows on the same `pull_request` trigger run
+# concurrently, so a PR waits `max(fast, slow)` — the same wall clock as putting
+# them together, with the fast answer still arriving fast. The decision is
+# recorded where composition decisions live: `EXCLUDED` in
+# `scripts/check-harness.mjs`.
+#
+# NOT NIGHTLY, DELIBERATELY. A nightly run observes `main` after the merge, which
+# is the exact defect #155 was opened to fix. A `play` function that a PR breaks
+# should block that PR, not appear in tomorrow's cron against a tree that four
+# people have already built on.
+#
+# NOT PATHS-FILTERED. The stories render the design system, which is imported
+# through aliases, tokens, SCSS load paths and `.storybook/preview.jsx` — a filter
+# narrow enough to save time is a filter that misses the break.
+#
+# THE PLAYWRIGHT BROWSER IS CACHED BY VERSION. `playwright install --with-deps`
+# on a cold cache is ~40s of download; keyed on the resolved playwright version so
+# a dependency bump busts it rather than silently running the old browser.
+#
+# Spot-run: `gh workflow run storybook-gate.yml`.
+
+on:
+  pull_request:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: storybook-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  storybook:
+    runs-on: ubuntu-latest
+    # ~130s of suite plus install; 30 lets a cold cache and a slow runner through
+    # without letting a hang burn an hour.
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: npm ci
+        run: npm ci
+
+      # Read the resolved version from the installed package rather than from
+      # package.json's range, so the cache key names the browser actually used.
+      - name: Resolve Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+
+      - name: Install chromium
+        run: npx playwright install --with-deps chromium
+
+      # One command, one exit code. A `play` failure or a render error fails the
+      # job outright; an accessibility violation fails it only if the story did
+      # not already carry that rule in `docs/evals/a11y-baseline.json`.
+      - name: npm run check:storybook
+        run: npm run check:storybook
