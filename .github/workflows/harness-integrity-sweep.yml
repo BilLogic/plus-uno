@@ -64,6 +64,17 @@ jobs:
       - name: Knowledge disposition check
         run: npm run check:knowledge-disposition
 
+      # A skill states each rule once — in references/method.md — and each face
+      # carries only its delta (skills/README.md § Where content goes). Two
+      # copies of a rule is two rules the moment one is edited, and each file
+      # still reads correctly alone, so nothing surfaces the drift. The tests
+      # ride along because a guard nobody has watched fail is a guard nobody
+      # knows works (#191). Dependency-free; no npm install.
+      - name: Skill overlap check
+        run: |
+          npm run check:skill-overlap
+          npm run test:scripts
+
       - name: Ensure intake labels exist
         env:
           GH_TOKEN: ${{ github.token }}

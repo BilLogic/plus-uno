@@ -7,11 +7,11 @@ description: >
   tiered pipeline: Tier-1 trivial fixes (typos, links, dates only) apply
   directly with a weekly-digest line; Tier-2 changes ship as a PR + PRD pair
   through Slack review to a verdict. Also runs the standing sweeps (staleness,
-  hygiene, shipped watchdog) and captures lessons into docs/knowledge/. Use when
-  the user says "file an intake", "this doc is stale", "the spec and Storybook
-  disagree", "the skill/persona is off", "fix this typo", "run the staleness
-  sweep", "document this", "capture this lesson", or after a feature ships and
-  the DS/harness need reconciling.
+  hygiene, shipped watchdog) and settles what finished work leaves behind — a
+  rule, an ADR, or nothing. Use when the user says "file an intake", "this doc
+  is stale", "the spec and Storybook disagree", "the skill/persona is off",
+  "fix this typo", "run the staleness sweep", "document this", "capture this
+  lesson", or after a feature ships and the DS/harness need reconciling.
 argument-hint: "[intake / sweep-name / lesson-to-capture]"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Task, mcp__notion-plus__*
 embodiment: ide

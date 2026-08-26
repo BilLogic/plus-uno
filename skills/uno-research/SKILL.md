@@ -45,9 +45,12 @@ writers/notion.
 
 ## Workflow — method.md spine, IDE execution
 
-1. **Inventory first** (method.md gate 1). Read `docs/knowledge/INDEX.md`; check
-   the project hub Research subpages for prior studies via `mcp__notion-plus__*`. Context
-   already exists → route to `uno-synthesize` and stop.
+1. **Inventory first** (method.md gate 1). Read the root `INDEX.md` and
+   `docs/adr/overview.md` — prior findings live as rules in the doc that owns
+   the subject and as ADRs, with `docs/knowledge/changelog.md` as the ledger of
+   what was promoted (#172). Check the project hub Research subpages for prior
+   studies via `mcp__notion-plus__*`. Context already exists → route to
+   `uno-synthesize` and stop.
 2. **Repo/DS questions** → Task `researchers/explorer`. It owns the heavy reads
    and returns `path:line`-cited findings, never file dumps.
 3. **Org-evidence questions** (Slack history, analytics, research DBs) → Task
@@ -79,7 +82,7 @@ writers/notion.
 | component / pattern / token discovery, before dispatching explorer | `references/component-discovery.md` |
 | scoping an explorer dispatch — repo layout, key paths, commands | `references/foundations-index.json` |
 | DS usage-pattern questions | `references/patterns-index.json` |
-| prior-knowledge check | `docs/knowledge/INDEX.md` → the relevant lesson file |
+| prior-knowledge check | root `INDEX.md` + `docs/adr/overview.md`; ledger: `docs/knowledge/changelog.md` |
 | writing the study guide (via writers/notion) | `docs/connectors/notion.md` |
 | pointing source-miner at Slack | `docs/connectors/slack.md` (channel map) |
 

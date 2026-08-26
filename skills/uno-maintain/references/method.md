@@ -90,12 +90,13 @@ Answered by the **spotter** (fallback: the designated maintainer) — never by t
   - the **blueprint** reflects the shipped change (`docs/connectors/supabase/overview.md` § Two sources — ship-time is when "blueprint wins vs shipped docs" becomes true). The headless watchdog can't read Supabase, so for any shipped card that touches the service journey it files a *verify-blueprint* intake naming the card and the likely scenario, rather than asserting drift itself; the intake's IDE session does the actual blueprint read.
   The weekly shipped-watchdog automation runs exactly this set headlessly (`scripts/prompts/uno-shipped-watchdog/SKILL.md`); grow the set here, never in the adapter.
 
-## 7 · Knowledge capture
+## 7 · What the work leaves behind
 
-After significant work — a non-trivial fix, a gotcha, a decision worth preserving:
+Significant work — a non-trivial fix, a gotcha, a decision worth preserving — leaves **a rule, an ADR, or nothing**; `AGENTS.md` § Conventions is the contract and `docs/knowledge/INDEX.md` its detail. This step answers it in the same change as the fix.
 
-1. File a lesson per `docs/engineering/coding.md` § Docs pipeline — the domain file by default, `docs/knowledge/lessons/YYYY-MM-DD-slug.md` for an event worth its own record — frontmatter (`title` · `date` · `tags` · `rule_candidate`) + problem / root cause / fix / prevention.
-2. Update `docs/knowledge/INDEX.md`.
-3. If a standing rule changes: one line in `docs/knowledge/changelog.md`. Proposing the AGENTS.md / persona edit itself is Tier 2 — the gate in §5 applies.
+1. **Name the disposition.** A **rule** when an agent would behave differently knowing it — the line lands in the doc that already owns the subject, where the next agent is reading anyway. An **ADR** when the call is hard to reverse *and* surprising without its context *and* a real trade-off, all three. Otherwise **nothing**: git keeps the trail, and dropping a finding worth less than the context it costs is the ordinary outcome.
+2. **A note staged under `docs/knowledge/` declares `disposition:` and `disposition-target:` from the moment it is written** (`npm run check:knowledge-disposition`). It is a receipt for content that already landed, so the next sweep clears it.
+3. **Write the ledger line** in `docs/knowledge/changelog.md` — one per promotion, so adoption is visible rather than implied.
+4. A disposition that edits `AGENTS.md` or the persona is Tier 2 — the gate in §5 applies.
 
-Lessons live under `docs/knowledge/` — never `docs/solutions/` (reserved for other tools). A learning that survives only in the chat transcript is a capture failure.
+A learning that survives only in the chat transcript is a capture failure.

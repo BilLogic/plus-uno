@@ -7,11 +7,11 @@ description: >
   tiered pipeline: Tier-1 trivial fixes (typos, links, dates only) apply
   directly with a weekly-digest line; Tier-2 changes ship as a PR + PRD pair
   through Slack review to a verdict. Also runs the standing sweeps (staleness,
-  hygiene, shipped watchdog) and captures lessons into docs/knowledge/. Use when
-  the user says "file an intake", "this doc is stale", "the spec and Storybook
-  disagree", "the skill/persona is off", "fix this typo", "run the staleness
-  sweep", "document this", "capture this lesson", or after a feature ships and
-  the DS/harness need reconciling.
+  hygiene, shipped watchdog) and settles what finished work leaves behind — a
+  rule, an ADR, or nothing. Use when the user says "file an intake", "this doc
+  is stale", "the spec and Storybook disagree", "the skill/persona is off",
+  "fix this typo", "run the staleness sweep", "document this", "capture this
+  lesson", or after a feature ships and the DS/harness need reconciling.
 argument-hint: "[intake / sweep-name / lesson-to-capture]"
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash, Task, mcp__notion-plus__*
 embodiment: ide
@@ -43,7 +43,7 @@ Fix the harness, not project design work. The shared procedure — taxonomy, tie
 4. **Tier and apply** (method §4–5):
    - **Tier 1** (whitelist absolute): apply, then add the one-line row for the weekly digest.
    - **Tier 2**: open the PR (git), pair the PRD (`writers/notion`), post the review request, wait for the ✅/🔁/❌ verdict. On ✅: merge/apply and write the apply-log row. Never auto-merge.
-5. **Capture** (method §7): file the lesson, update `docs/knowledge/INDEX.md`, changelog line on rule adoption. Template: [`examples/lesson-template.md`](examples/lesson-template.md).
+5. **Disposition** (method §7): settle what the work left behind — a rule in the doc that already owns the subject, an ADR, or nothing — and write the `docs/knowledge/changelog.md` ledger line when something was promoted. A note staged under `docs/knowledge/` ships with its `disposition:` in the same commit; shape: [`examples/staged-note-template.md`](examples/staged-note-template.md).
 
 ## Sweeps & audits
 
@@ -70,5 +70,5 @@ Rubric: `docs/evals/rubrics/uno-maintain.md` (applied by `reviewers/rubric-appli
 - Never self-approve a substantive change; never answer the worth-incorporating gate; never auto-merge on silence.
 - The Tier-1 whitelist is absolute — skills, persona, DS components, and requirements are always Tier 2.
 - A lone PR or lone PRD never ships; every execution writes its apply-log row.
-- Lessons go under `docs/knowledge/` — never `docs/solutions/` (reserved for other tools).
+- Capture lands in the doc that already owns the subject; `docs/knowledge/` stages a note only alongside its `disposition:` and its ledger line.
 - Maintains the harness only — design-work fixes route back through `uno-prototype`; diagnosis-only reviews stay in `uno-review`.

@@ -15,31 +15,31 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **163,037 chars from 21 files**, against an assembled budget of 170,000 (6,963 to spare).
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **163,657 chars from 21 files**, against an assembled budget of 170,000 (6,343 to spare).
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 8,961 (−7,820 ide-only) | 8,961 | — |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 6,222 | 15,211 | — |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,755 | 43,007 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 9,684 | 52,749 | — |
-| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 57,068 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 8,959 | 66,086 | — |
-| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,448 | 72,579 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 78,765 | — |
-| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 83,927 | 7,000 (Worker face) |
-| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 88,138 | — |
-| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 91,299 | 7,000 (Worker face) |
-| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 97,213 | — |
-| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 101,643 | 7,000 (Worker face) |
-| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 107,588 | — |
-| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 112,209 | 7,000 (Worker face) |
-| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,928 | 114,179 | — |
-| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 127,142 | — |
-| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 140,121 | — |
-| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 11,794 (−4,363 ide-only) | 151,981 | — |
-| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,317 (−1,219 ide-only) | 156,352 | — |
-| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 6,637 (−605 ide-only) | 163,037 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,067 (−7,820 ide-only) | 9,067 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 6,222 | 15,317 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,755 | 43,113 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 53,369 | — |
+| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 57,688 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 8,959 | 66,706 | — |
+| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,448 | 73,199 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 79,385 | — |
+| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 84,547 | 7,000 (Worker face) |
+| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 88,758 | — |
+| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 91,919 | 7,000 (Worker face) |
+| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 97,833 | — |
+| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 102,263 | 7,000 (Worker face) |
+| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 108,208 | — |
+| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 112,829 | 7,000 (Worker face) |
+| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,928 | 114,799 | — |
+| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 127,762 | — |
+| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 140,741 | — |
+| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 11,794 (−4,363 ide-only) | 152,601 | — |
+| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,317 (−1,219 ide-only) | 156,972 | — |
+| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 6,637 (−605 ide-only) | 163,657 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -94,7 +94,7 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 | `skills/uno-review` | DS / UNO / a11y lens review · Design QA at Ready-for-QA | reviewers/* (except auditor — uno-maintain's) |
 | `skills/uno-maintain` | intake · Tier 1/2 fixes · cross-estate sync · knowledge capture | reviewers/auditor · researchers/source-miner · reviewers/rubric-applier · writers/* |
 
-Routing: match intent to the Use-when column; if ambiguous, ask which capability is meant. Each skill's `SKILL.md` is the IDE face, `bot.md` the Worker face; both load `references/method.md`.
+Routing: match intent to the Use-when column; if ambiguous, ask which capability is meant. Each skill's `SKILL.md` is the IDE face, `bot.md` the Worker face; both load `references/method.md`. Which content belongs in which of the three — and the guard that holds the split — is `skills/README.md`.
 
 **A skill's discovery surfaces are generated.** Claude Code, Cursor and Slack each read their own path, and `npm run generate:skill-surfaces` publishes all three from the canonical frontmatter — so edit `skills/<name>/SKILL.md` and regenerate; `npm run check:skill-surfaces` fails the monthly sweep on drift. What is generated where: `docs/engineering/setup.md` § Generated skill surfaces.
 
@@ -472,15 +472,16 @@ Answered by the **spotter** (fallback: the designated maintainer) — never by t
   - the **blueprint** reflects the shipped change (`docs/connectors/supabase/overview.md` § Two sources — ship-time is when "blueprint wins vs shipped docs" becomes true). The headless watchdog can't read Supabase, so for any shipped card that touches the service journey it files a *verify-blueprint* intake naming the card and the likely scenario, rather than asserting drift itself; the intake's IDE session does the actual blueprint read.
   The weekly shipped-watchdog automation runs exactly this set headlessly (`scripts/prompts/uno-shipped-watchdog/SKILL.md`); grow the set here, never in the adapter.
 
-## 7 · Knowledge capture
+## 7 · What the work leaves behind
 
-After significant work — a non-trivial fix, a gotcha, a decision worth preserving:
+Significant work — a non-trivial fix, a gotcha, a decision worth preserving — leaves **a rule, an ADR, or nothing**; `AGENTS.md` § Conventions is the contract and `docs/knowledge/INDEX.md` its detail. This step answers it in the same change as the fix.
 
-1. File a lesson per `docs/engineering/coding.md` § Docs pipeline — the domain file by default, `docs/knowledge/lessons/YYYY-MM-DD-slug.md` for an event worth its own record — frontmatter (`title` · `date` · `tags` · `rule_candidate`) + problem / root cause / fix / prevention.
-2. Update `docs/knowledge/INDEX.md`.
-3. If a standing rule changes: one line in `docs/knowledge/changelog.md`. Proposing the AGENTS.md / persona edit itself is Tier 2 — the gate in §5 applies.
+1. **Name the disposition.** A **rule** when an agent would behave differently knowing it — the line lands in the doc that already owns the subject, where the next agent is reading anyway. An **ADR** when the call is hard to reverse *and* surprising without its context *and* a real trade-off, all three. Otherwise **nothing**: git keeps the trail, and dropping a finding worth less than the context it costs is the ordinary outcome.
+2. **A note staged under `docs/knowledge/` declares `disposition:` and `disposition-target:` from the moment it is written** (`npm run check:knowledge-disposition`). It is a receipt for content that already landed, so the next sweep clears it.
+3. **Write the ledger line** in `docs/knowledge/changelog.md` — one per promotion, so adoption is visible rather than implied.
+4. A disposition that edits `AGENTS.md` or the persona is Tier 2 — the gate in §5 applies.
 
-Lessons live under `docs/knowledge/` — never `docs/solutions/` (reserved for other tools). A learning that survives only in the chat transcript is a capture failure.
+A learning that survives only in the chat transcript is a capture failure.
 
 
 ---
