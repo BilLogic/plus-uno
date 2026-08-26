@@ -15,23 +15,21 @@ generated half returns under #165.
 npm run generate:agent
 ```
 
-Generated: 2026-08-25
-
 ## Tokens & mapping
 
-| Doc | Path | On disk | Verified | Verified at | Verified by | Notes | File updated |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| agent-views/tokens/tokens.md | `design-system/agent-views/tokens/tokens.md` | yes | ⏳ No | — | — | Generated from design-system/src/tokens/*.scss | 2026-08-25 |
-| guidelines/figma/token-mapping.md | `design-system/guidelines/figma/token-mapping.md` | yes | ⏳ No | — | — | Hand-authored Figma ↔ CSS mapping | 2026-08-25 |
+| Doc | Path | On disk | Verified | Verified at | Verified by | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| agent-views/tokens/tokens.md | `design-system/agent-views/tokens/tokens.md` | yes | ⏳ No | — | — | Generated from design-system/src/tokens/*.scss |
+| guidelines/figma/token-mapping.md | `design-system/guidelines/figma/token-mapping.md` | yes | ⏳ No | — | — | Hand-authored Figma ↔ CSS mapping |
 
 ## Composition (hand-authored)
 
-| Composition doc | Path | Verified | Notes | File updated |
-| --- | --- | --- | --- | --- |
-| guidelines/composition/forms.md | `design-system/guidelines/composition/forms.md` | — | — | 2026-08-25 |
-| guidelines/composition/hierarchy.md | `design-system/guidelines/composition/hierarchy.md` | — | — | 2026-08-25 |
-| guidelines/composition/layout.md | `design-system/guidelines/composition/layout.md` | — | — | 2026-08-25 |
-| guidelines/composition/surfaces.md | `design-system/guidelines/composition/surfaces.md` | — | — | 2026-08-25 |
+| Composition doc | Path | Verified | Notes |
+| --- | --- | --- | --- |
+| guidelines/composition/forms.md | `design-system/guidelines/composition/forms.md` | — | — |
+| guidelines/composition/hierarchy.md | `design-system/guidelines/composition/hierarchy.md` | — | — |
+| guidelines/composition/layout.md | `design-system/guidelines/composition/layout.md` | — | — |
+| guidelines/composition/surfaces.md | `design-system/guidelines/composition/surfaces.md` | — | — |
 
 ## How designers verify
 
