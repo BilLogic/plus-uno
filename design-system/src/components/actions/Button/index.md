@@ -73,8 +73,4 @@ Implemented as `ButtonContent`.
 
 Same group: `ButtonGroup`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
-
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `Button` is the right call, only what it accepts.
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

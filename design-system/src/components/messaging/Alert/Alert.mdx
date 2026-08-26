@@ -79,6 +79,108 @@ Provide contextual feedback messages for typical user actions with the handful o
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Use `Alert` for a message that belongs to the page and stays there until it is
+resolved or dismissed — a banner explaining why a session cannot be booked, a
+notice that a report is out of date, a confirmation that survives a scroll. It
+takes children, so the message can carry a link or emphasis.
+
+Six styles: `primary`, `secondary`, `success`, `danger`, `warning`, `info`. That
+list is shorter than `Button`'s — there is no `tertiary` and there are no SMART
+domain colors, because an alert is always saying something about state.
+
+**When not to use**
+
+- **Not for field validation.** A message about one field belongs on that field.
+  `Input`, `NumberInput`, `FileUpload` and `DateAndTimePicker` all take
+  `validation="invalid"` plus `validationMessage`, which renders the message with
+  an icon directly beneath the control, where the person filling it in is
+  looking. An alert at the top of a form makes them hunt.
+- **Not for a transient confirmation.** "Saved" that should fade is `Toast`,
+  which auto-hides after 5s by default.
+- **Not for something that must be acknowledged before continuing.** That is
+  `Modal`.
+- **Not for a status label on a row.** That is `Badge`.
+- **Not for a message you plan to re-show.** Dismissal is held in the
+  component's own state, and the render returns `null` on that state before
+  anything else is read — so a dismissed alert stays dismissed until it is
+  remounted.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Correct and incorrect
+
+**Field errors go on the field.**
+
+```jsx
+// Incorrect — the error is a hundred pixels away from the input it is about,
+// and nothing connects the two.
+<Alert style="danger">Email address is not valid.</Alert>
+<Input id="email" label="Email" value={email} onChange={onEmail} />
+
+// Correct — the field owns its own error state and message.
+<Input
+  id="email"
+  label="Email"
+  value={email}
+  onChange={onEmail}
+  validation="invalid"
+  validationMessage="Enter an email address in the form name@example.com."
+  aria-invalid={true}
+/>
+```
+
+**`dismissible` is on by default.**
+
+```jsx
+// Incorrect — this renders a close button the author never asked for, and the
+// message the page depends on can be dismissed away.
+<Alert style="warning">This term's schedule is provisional.</Alert>
+
+// Correct — say so explicitly when the message must stay.
+<Alert style="warning" dismissible={false}>This term's schedule is provisional.</Alert>
+```
+
+**Dismissal is one-way.**
+
+```jsx
+// Incorrect — `show` is not a declared prop, and the component checks its own
+// dismissed state and returns null before any passed-through prop is read.
+// Once the user closes this alert, nothing you own brings it back.
+<Alert style="info" show={hasNews}>Three new sessions this week.</Alert>
+
+// Correct — remount it with a key when the message genuinely changes.
+{hasNews && <Alert key={newsId} style="info">Three new sessions this week.</Alert>}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **It announces assertively.** The underlying alert renders `role="alert"`,
+  which implies `aria-live="assertive"` — a screen reader interrupts to read it.
+  That is right for something that just went wrong and wrong for ambient
+  information; for the latter, prefer plain text on the page.
+- **An alert rendered on mount may not be announced at all.** Live regions
+  announce *changes*. If the alert is present in the first paint, treat it as
+  ordinary content and make sure the surrounding page still reads correctly.
+- **`title` is not a heading element.** It renders through the underlying alert
+  heading, which is a `div` carrying an `h4` class. Do not rely on it for
+  document structure.
+- **The dismiss button is labelled `Close alert`**, hard-coded, and its icon has
+  no `aria-hidden` — keep the alert's own text carrying the meaning.
+- **Style is colour only.** Six palettes, no icon and no text prefix, so
+  `style="danger"` on its own does not say "error". Say it in the children.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground

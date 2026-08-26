@@ -129,6 +129,92 @@ Use text area for multi-line text input form fields.
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Use `Textarea` when the answer is prose the user writes in their own words —
+session notes, a reflection, a reason for cancelling. `rows` (default 3) sets
+the visible height, and `variant="short"` gives the one-line treatment used in
+the Figma spec for compact note fields.
+
+**When not to use**
+
+- **Not for a one-line answer.** `Input` is the single-line field, and it is the
+  one with `validation` and `validationMessage`.
+- **Not for formatted text.** Bold, lists and links are `RichTextEditor`, which
+  has `toolbarPreset` and a toolbar of real buttons.
+- **Not when you need an error message under the field.** `Textarea` has
+  `state="error"`, which is styling only — there is no `validationMessage`
+  equivalent, so the message has to be rendered by the caller.
+- **Not for a fixed-height panel.** `rows` grows the control, it does not scroll
+  it; content that needs its own scroll region is `ScrollBar`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Correct and incorrect
+
+**Pass `id`, not just `name`.**
+
+```jsx
+// Incorrect — the label points at `name`, but the textarea only receives `id`.
+// Same trap as Input.
+<Textarea name="notes" label="Session notes" value={notes} onChange={onNotes} />
+
+// Correct.
+<Textarea id="notes" name="notes" label="Session notes" value={notes} onChange={onNotes} />
+```
+
+**`state="error"` carries no message.**
+
+```jsx
+// Incorrect — the field turns red and says nothing. Unlike Input, there is no
+// validationMessage prop here, so the reason never reaches the user.
+<Textarea id="notes" label="Session notes" state="error" value={notes} onChange={onNotes} />
+
+// Correct — render the message and point the field at it.
+<Textarea id="notes" label="Session notes" state="error"
+          aria-invalid={true} aria-describedby="notes-error"
+          value={notes} onChange={onNotes} />
+<p id="notes-error">Notes must be at least 20 characters.</p>
+```
+
+**`rows` is ignored in the short variant.**
+
+```jsx
+// Incorrect — `variant="short"` forces one row regardless of what rows says.
+<Textarea id="summary" variant="short" rows={6} />
+
+// Correct — the long variant is the one that honours rows.
+<Textarea id="summary" rows={6} />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **`id` is what associates the label.** The label is rendered with
+  `htmlFor={id || name}` and the control receives only `id`; passing `name` on
+  its own leaves the label dangling.
+- **The label is only rendered when `label` is given.** There is no
+  `showLabel`-style escape hatch here, so a field with no visible label needs an
+  `aria-label`, which is spread onto the control.
+- **`state` is presentation.** `error`, `success`, `readonly` and `disabled` all
+  resolve to a class; only `disabled` and `readOnly` change the control's actual
+  behaviour, and they override `state` when set.
+- **The aliases are real.** `read-only`, `readOnly` and `valid` are normalised to
+  `readonly` and `success` respectively — they exist for older call sites, and
+  new code should use `readonly` and `success`.
+- **Everything passes through.** `maxLength`, `required`, `aria-invalid`,
+  `aria-describedby` and the rest all reach the control, which is how the
+  missing message slot is worked around.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground

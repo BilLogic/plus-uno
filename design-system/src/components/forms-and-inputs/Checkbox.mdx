@@ -75,6 +75,102 @@ Use checkbox when a user needs to select more than one option from a list.
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Use `Checkbox` for one independent yes/no — an opt-in, a "select this row", a
+single term to accept. Each checkbox stands alone: several of them are several
+independent booleans, not one answer with several parts.
+
+`indeterminate` is the third visual state, applied imperatively to the input, and
+it is what a "select all" control needs when only some rows are ticked.
+
+**When not to use**
+
+- **Not for a setting that takes effect immediately.** A control that switches
+  something on or off right now reads better as `Switch`; a checkbox implies a
+  value that is saved with the rest of the form.
+- **Not for one answer from several options.** That is `Radio`, or
+  `MultipleChoice` with `type="radio"`.
+- **Not to build a list of options by hand.** `MultipleChoice` with
+  `type="checkbox"` takes an `options` array and keeps the value; `ChoiceGrid`
+  handles the rows-by-columns matrix; `OptionList` and `Select` handle the popup
+  cases.
+- **Not as a tri-state input.** `indeterminate` is display only — the underlying
+  value is still checked or unchecked, and clicking an indeterminate box resolves
+  it like any other.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Correct and incorrect
+
+**Give it an `id` or a `name` — with neither, nothing links the label.**
+
+```jsx
+// Incorrect — the id passed down is `id || name`, so with neither the input has
+// no id, and its label has nothing to point at.
+<Checkbox label="Email me a summary" checked={emailMe} onChange={onEmailMe} />
+
+// Correct.
+<Checkbox id="email-summary" label="Email me a summary"
+          checked={emailMe} onChange={onEmailMe} />
+```
+
+**Pick controlled or uncontrolled and stay there.**
+
+```jsx
+// Incorrect — `checked` being defined puts the component in controlled mode,
+// which makes `defaultChecked` dead. The two never apply together.
+<Checkbox id="terms" label="I accept" checked={accepted} defaultChecked />
+
+// Correct — controlled needs a handler; uncontrolled needs neither.
+<Checkbox id="terms" label="I accept" checked={accepted} onChange={onAccept} />
+```
+
+**A group of checkboxes is a group; say so.**
+
+```jsx
+// Incorrect — three independent checkboxes with no shared question. A screen
+// reader hears three unrelated booleans.
+<Checkbox id="mon" label="Monday" />
+<Checkbox id="tue" label="Tuesday" />
+
+// Correct — either name the group, or let MultipleChoice own the whole set.
+<fieldset>
+  <legend>Available days</legend>
+  <Checkbox id="mon" label="Monday" />
+  <Checkbox id="tue" label="Tuesday" />
+</fieldset>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **The label is wired for you** — as long as `id` or `name` is set. The
+  component hands `id || name` to the underlying form check, which renders the
+  `label` with a matching `htmlFor`. This is better than `Input` and `Textarea`,
+  where only `id` works.
+- **`required` is forwarded.** Unlike `Input`, the `required` prop reaches the
+  input element as well as drawing the asterisk, so native validation applies.
+  The asterisk itself is a span marked `aria-label="required"`.
+- **`indeterminate` is set on the DOM node.** An effect finds the input and sets
+  its `indeterminate` property, which is the only way to express that state —
+  it is a property, not an attribute. Screen readers report it as "mixed".
+- **No error state.** There is no `validation` prop and no message slot; a
+  checkbox that fails validation needs its message rendered and linked by the
+  caller with `aria-describedby`, which is spread onto the input.
+- **Group it.** Nothing in the component connects one checkbox to the next.
+  Related checkboxes need a `fieldset` and `legend`, per
+  `design-system/guidelines/foundations/accessibility.md`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground

@@ -74,6 +74,102 @@ Use switch when a user needs to toggle between two states: on and off, true and 
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Use `Switch` for a setting the user turns on or off, where the change lands
+immediately and there is no Save button between the flick and the effect —
+notification preferences, showing archived sessions, a feature toggle in an
+admin panel.
+
+It always has an id: `id`, else `name`, else a generated one, so its label is
+always associated. `inputProps` is the escape hatch for DOM attributes the
+component does not name.
+
+**When not to use**
+
+- **Not for a form value.** A boolean that gets submitted with everything else
+  is `Checkbox` — the visual difference is the whole point: a switch says "this
+  is now on", a checkbox says "this will be saved as ticked".
+- **Not for accept-the-terms.** That is a checkbox, and `Switch` has no
+  `required` prop to enforce it with.
+- **Not for one of two named options.** "Weekly" versus "Monthly" is
+  `RadioButtonGroup` or `MultipleChoice`; a switch has no label for its off
+  state.
+- **Not without a label.** There is no `showLabel` and no built-in visually
+  hidden text — an unlabelled switch is a bare toggle.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Correct and incorrect
+
+**A switch acts now; a checkbox saves later.**
+
+```jsx
+// Incorrect — a switch inside a form that is only applied on submit. The
+// affordance promises an immediate effect the form does not deliver.
+<form onSubmit={save}>
+  <Switch id="digest" label="Weekly digest" checked={digest} onChange={onDigest} />
+  <Button type="submit" text="Save" />
+</form>
+
+// Correct — either persist on change, or use a checkbox.
+<Switch id="digest" label="Weekly digest" checked={digest}
+        onChange={(e) => persist(e.target.checked)} />
+```
+
+**`type` cannot be overridden through `inputProps`.**
+
+```jsx
+// Incorrect — `type` is stripped out of inputProps before they are spread,
+// so this quietly does nothing.
+<Switch id="a" label="On" inputProps={{ type: 'checkbox' }} />
+
+// Correct — inputProps is for the attributes the component does not name.
+<Switch id="a" label="On" inputProps={{ role: 'switch', 'aria-describedby': 'a-hint' }} />
+```
+
+**Controlled means controlled.**
+
+```jsx
+// Incorrect — `checked` with no `onChange`. The input never moves, because the
+// component is controlled and nothing updates the value.
+<Switch id="archived" label="Show archived" checked={showArchived} />
+
+// Correct.
+<Switch id="archived" label="Show archived" checked={showArchived}
+        onChange={(e) => setShowArchived(e.target.checked)} />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **It is announced as a checkbox, not a switch.** The underlying form check
+  turns `type="switch"` into `type="checkbox"` plus a `form-switch` class — the
+  switch is entirely visual, and no `role="switch"` is applied. Screen readers
+  say "checked" / "not checked" rather than "on" / "off". Pass
+  `inputProps={{ role: 'switch' }}` when that distinction matters.
+- **The label is always associated.** `id`, then `name`, then a generated id, so
+  there is no way to end up with an orphaned label — the trap that `Input` and
+  `Textarea` have.
+- **`label` is required in practice.** Nothing else names the control, so
+  omitting it leaves a toggle with no accessible name.
+- **`inputProps` reaches the input.** Everything except `type` is spread onto
+  the underlying form check and lands on the input element, so
+  `aria-describedby`, `aria-labelledby` and `data-*` all work.
+- **The track is small at every size.** The default track is 25×12px, and
+  `size="large"` takes it to 36×20px — both well under the 44×44 minimum in
+  `design-system/guidelines/foundations/accessibility.md`. The associated label
+  is part of the hit area, which is the practical reason never to drop it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground

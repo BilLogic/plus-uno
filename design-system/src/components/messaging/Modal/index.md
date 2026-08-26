@@ -67,8 +67,4 @@ From `design-system/src/components/messaging/Modal/Modal.scss`. Override these t
 
 Same group: `Alert` · `Toast`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
-
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `Modal` is the right call, only what it accepts.
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

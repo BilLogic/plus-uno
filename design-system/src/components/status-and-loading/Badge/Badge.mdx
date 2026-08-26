@@ -157,6 +157,106 @@ Static visual identifiers used to categorize or describe elements. They are used
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Use `Badge` to label something that is already on screen — a session's status, a
+tutor's competency domain, an unread count beside a nav item. It is a read-only
+mark attached to other content, and it is the second most used component in the
+repo after `Button`, almost always as a status chip inside a table row or a card
+header.
+
+Reach for it when the label is a *property* of the row, not an action on it.
+
+**When not to use**
+
+- **Not as a button.** `Badge` has no `onClick` and deliberately carries no
+  button semantics — the only interactive part is the dismiss control created by
+  `dismissible`. Wrapping a badge in a click handler produces a control with no
+  name, no role and no keyboard path.
+- **Not for removable filter chips you built yourself.** `dismissible` already
+  renders the X, stops propagation and calls `onDismiss`. `TagInput` owns the
+  add-and-remove case where the user is authoring the list.
+- **Not for progress.** `counter` is a static number in a pill. Anything moving
+  toward completion is `Progress`.
+- **Not for a message.** A badge is one or two words on a row. Something the
+  user has to read and act on is `Alert`; something transient is `Toast`.
+- **`size` is not physical size.** It selects a typography scale (`h1`–`h6`,
+  `b1`–`b3`, default `b2`), so `size="h1"` produces a badge with heading-sized
+  text, not a bigger pill with the same text.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Correct and incorrect
+
+**Status is a badge; changing status is a button.**
+
+```jsx
+// Incorrect — a badge with a click handler. `onClick` is not a prop, so it is
+// silently dropped, and even spread onto the element it would have no role.
+<Badge text="Cancelled" style="danger" onClick={reopen} />
+
+// Correct — the badge states the status, a Button changes it.
+<Badge text="Cancelled" style="danger" />
+<Button text="Reopen session" fill="text" size="small" onClick={reopen} />
+```
+
+**Domain colors are not severity colors.**
+
+```jsx
+// Incorrect — `advocacy` is a SMART curriculum domain. Used here it just means
+// "some green-ish badge", and the next reader has to guess.
+<Badge text="Passed" style="advocacy" />
+
+// Correct — semantic style for semantic meaning, domain style for the domain.
+<Badge text="Passed" style="success" />
+<Badge text="Advocacy" style="advocacy" />
+```
+
+**Give a dismissible badge a context the label alone can carry.**
+
+```jsx
+// Incorrect — every dismiss button in the row announces the same word,
+// "Dismiss", because that label is hard-coded inside the component.
+<Badge text="Grade 4" dismissible onDismiss={() => remove('grade-4')} />
+<Badge text="Maths" dismissible onDismiss={() => remove('maths')} />
+
+// Correct — name the group once, so the dismiss buttons are read in context.
+<div role="group" aria-label="Active filters">
+  <Badge text="Grade 4" dismissible onDismiss={() => remove('grade-4')} />
+  <Badge text="Maths" dismissible onDismiss={() => remove('maths')} />
+</div>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **The badge itself is not interactive, on purpose.** The source says so: a
+  `role="button"` wrapper would nest one control inside another once
+  `dismissible` adds its own button, which ARIA forbids.
+- **The dismiss control is a real `button`, labelled `Dismiss`.** That string is
+  hard-coded and there is no prop to change it, so several dismissible badges in
+  a row expose several identically named buttons. Give the row a named
+  `role="group"` so each one is announced in context.
+- **`counter` is static.** It renders as a plain span inside the badge with no
+  live region, so a count that changes while the page is open is not announced.
+  If the change matters, mirror it in a live region you own.
+- **Color is never the whole message.** `style` only changes the palette. The
+  eleven values include five SMART domain colors that carry no severity meaning,
+  so the text has to say what the badge means —
+  `design-system/guidelines/foundations/accessibility.md` requires this anyway.
+- **Contrast follows the token pair, not the size.** Because `size` selects a
+  type scale, `b3` produces the smallest text in the set; keep it for badges
+  whose color pair still clears 4.5:1.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground

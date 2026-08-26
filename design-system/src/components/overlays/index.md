@@ -8,9 +8,9 @@ authored half (#166), counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Popover](Popover/index.md) | 12 | ✕ | ✕ | ✕ |
-| [Tooltip](Tooltip/index.md) | 10 | ✕ | ✕ | ✕ |
+| [Tooltip](Tooltip/index.md) | 10 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 0/2 (0%) · Correct/incorrect 0/2 (0%) · Accessibility 0/2 (0%)
+**Authored coverage:** When to use 1/2 (50%) · Correct/incorrect 1/2 (50%) · Accessibility 1/2 (50%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

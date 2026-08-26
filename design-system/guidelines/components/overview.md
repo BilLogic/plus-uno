@@ -8,21 +8,72 @@ summary: What each component is for, when to reach for it, and how it composes
 
 What each component is for, when to reach for it, and how it composes.
 
-> **The generated half now lives beside the source.** Props, variants, defaults,
-> tokens touched and related components are generated per component into
-> `design-system/src/components/<group>/<Name>/index.md`, and each group's
-> `index.md` counts how much of the authored half exists (#165). Read those for
-> facts; read this file only for the prose below.
->
-> **Known stale — do not treat as the existence law.** The source paths below
-> predate the 2026-07 category-folder reorg, and Chip, Form, Navigation, Section
-> and SuperCompPill are listed here but do not exist in `design-system/src`.
-> The authority on what exists is the generated
-> `design-system/agent-views/components/index.md`. This file is authored
-> guidance awaiting the rebuild in #165 (generated half from source) and #166
-> (authored half — when to use, correct/incorrect, accessibility); it is kept
-> rather than deleted because the per-component prose here is the only such
-> prose that exists.
+## Start here — the seven group overviews
+
+"Which component do I reach for" is answered per group, not in one list:
+
+- [Actions](actions.md) — `Button`, `ButtonGroup`
+- [Forms and inputs](forms-and-inputs.md) — 23 components, sorted by the shape of the answer
+- [Layout and structure](layout-and-structure.md) — nine containers
+- [Messaging](messaging.md) — `Alert`, `Toast`, `Modal`
+- [Navigation](navigation.md) — six, sorted by what the user moves between
+- [Overlays](overlays.md) — `Tooltip`, `Popover`
+- [Status and loading](status-and-loading.md) — `Badge`, `Progress`, `Spinner`
+
+Facts about a single component — props, variants, defaults, tokens touched,
+related components — are generated from source into each component's own
+`index.md` beside it, and each group's `index.md` counts how much authored
+guidance exists (#165). Read those for facts.
+
+The authored half — when to use, when not, correct/incorrect pairs,
+accessibility — lives in the component's Storybook MDX, which is where the
+coverage columns detect it.
+
+## How the authored half grows
+
+**The top of the list was measured, not guessed.** Ranking every public
+component by the number of files under `design-system/src/specs/` and
+`prototypes/` that import it from the design system and render it, the leaders
+are: `Button` (139 files), `Badge` (60), `Modal` (29), `Select` (24),
+`Dropdown` (17), `ButtonGroup` (17), `Card` (14), `Pagination` (14),
+`NavTabs` (11), `Alert` (11), `Input` (10), `Textarea` (9), `Checkbox` (9),
+`Tooltip` (8), `Switch` (7). Those fifteen were written first, in #166. Twenty
+of the 48 public components are rendered nowhere in either corpus.
+
+**Earned thereafter.** Every other component gets its authored half the first
+time an agent gets it wrong — not on a schedule, and not by working down the
+ranking. The trigger is a real miss: a hallucinated prop, a component reached
+for where another was meant, an accessibility defect that shipped. One miss, one
+component, one set of three sections.
+
+The capture path is `uno-maintain`, and the routing is already in its taxonomy:
+
+1. **Intake.** The miss is an *inaccuracy* (the docs say something wrong) or an
+   *improvement* (the docs say nothing where they should). Its target is the
+   codebase estate's "Storybook inconsistent / bug" row, which fixes
+   `design-system/src/**` — the component's MDX. Name the evidence: the session
+   or PR where the agent got it wrong.
+2. **Draft first.** Write the three sections before anyone judges whether they
+   are worth it. That is `uno-maintain`'s standing order, and it is cheap here
+   because reading the component source is most of the work either way.
+3. **Tier 2.** The Tier-1 whitelist is typos, broken links, stale dates and pure
+   formatting, and nothing else — so authored guidance always ships as a PR
+   paired with a PRD, through the review gate.
+
+Method: `skills/uno-maintain/references/method.md`. Nothing is ever stubbed: a
+component with no authored half simply has none, and its group's coverage column
+says so. An empty section under a real heading would count as covered and say
+nothing, which is worse than the gap.
+
+## Known stale below this line
+
+The per-component prose in the rest of this file predates the 2026-07
+category-folder reorg: its source paths are wrong, and Chip, Form, Navigation,
+Section and SuperCompPill are listed here but do not exist in
+`design-system/src`. The authority on what exists is the generated
+`design-system/agent-views/components/index.md`. It is kept rather than deleted
+because for the components with no authored half yet, it is the only prose there
+is — and it is superseded, group by group, as those pages get written.
 
 ## Guidelines Structure
 This document provides comprehensive guidelines for all PLUS Design System components.
