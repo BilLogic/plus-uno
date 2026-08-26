@@ -253,20 +253,6 @@ function main() {
       `across ${Object.keys(rules).length} rule(s)`,
   );
 
-  // A run that collects fewer files than the baseline recorded is not a pass, it is
-  // a run that did not happen. Every assertion below is over what the report
-  // contains, so a report missing half the corpus reports half the violations and
-  // exits 0. The baseline already carries the size it was measured at; use it.
-  const expectedFiles = base?.suite?.storyFiles;
-  if (!UPDATE && expectedFiles && totals.files < expectedFiles) {
-    console.error(
-      `\n[storybook] collected ${totals.files} story files, but the baseline was measured at ` +
-        `${expectedFiles}. A short run cannot clear a ratchet — it just has less to find.\n` +
-        '  -> If story files were deliberately removed, re-record with --update in the same PR.',
-    );
-    process.exit(1);
-  }
-
   if (UPDATE) {
     fs.writeFileSync(BASELINE, `${JSON.stringify(baselineRecord({ a11y, totals }), null, 2)}\n`);
     console.log(
@@ -312,6 +298,21 @@ function main() {
   }
 
   const base = JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
+
+  // A run that collects fewer files than the baseline recorded is not a pass, it is
+  // a run that did not happen. Every assertion below is over what the report
+  // contains, so a report missing half the corpus reports half the violations and
+  // still clears the ratchet. The baseline already carries the size it was
+  // measured at, so the floor is free.
+  const expectedFiles = base.suite?.storyFiles;
+  if (expectedFiles && totals.files < expectedFiles) {
+    console.error(
+      `\n[storybook] collected ${totals.files} story files, but the baseline was measured at ` +
+        `${expectedFiles}. A short run cannot clear a ratchet — it just has less to find.\n` +
+        '  -> If story files were deliberately removed, re-record with --update in the same PR.',
+    );
+    return 1;
+  }
   const { regressions, cleared } = ratchet(a11y, base.stories ?? {});
 
   if (regressions.length) {
