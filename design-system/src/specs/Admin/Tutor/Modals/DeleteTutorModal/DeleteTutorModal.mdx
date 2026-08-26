@@ -30,9 +30,13 @@ This story renders the modal in its open state, so it is not embedded inline (it
 
 ### Anatomy
 
-- **Header** — warning icon + "Delete Tutor" title.
-- **Body** — confirmation copy referencing the tutor's name.
-- **Footer** — `Cancel` (secondary) and `Delete` (destructive primary).
+- **Header** — an `h4` reading "Delete Tutor?". No icon.
+- **Body** — fixed copy: "All data related to this tutor will be removed. This
+  tutor will lose access to the PLUS system." The tutor's name is not
+  interpolated; the component takes no name.
+- **Footer** — "Delete Tutor" (`style="danger"`, `fill="text"`) then
+  "Keep Tutor" (`style="primary"`, `fill="filled"`). The destructive action is
+  the quieter of the two.
 
 </div>
 
@@ -43,9 +47,9 @@ This story renders the modal in its open state, so it is not embedded inline (it
 | Prop | Type | Notes |
 | --- | --- | --- |
 | `show` | `boolean` | Controls visibility. |
-| `onHide` | `() => void` | Fires on close. |
-| `tutorName` | `string` | Interpolated into the confirmation copy. |
-| `onConfirm` | `() => void` | Fires when the destructive action is clicked. |
+| `onHide` | `() => void` | Fires on close, and on "Keep Tutor". |
+| `onDelete` | `() => void` | Fires when "Delete Tutor" is clicked. |
+| `className` | `string` | Appended to the modal's own class. |
 
 </div>
 

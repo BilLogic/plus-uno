@@ -46,7 +46,12 @@ function ExampleForm() {
         style={{ gap: 'var(--size-element-gap-md)' }}
       >
         <Input id="name" label="Student name" required value={name} onChange={...} />
-        <Select label="Program" options={programs} value={program} onChange={...} />
+        {/* Select has no `label` prop — it forwards `id` to the trigger and
+            nothing else, so the label has to be wired from outside. */}
+        <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-sm)' }}>
+          <label htmlFor="program">Program</label>
+          <Select id="program" options={programs} value={program} onChange={...} />
+        </div>
         <Checkbox label="Send reminder" checked={remind} onChange={...} />
       </div>
       <div
