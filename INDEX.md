@@ -195,6 +195,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-123 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+124 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 raw eval data are deliberately not indexed — they record what happened rather
 than telling you what to do.
