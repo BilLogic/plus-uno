@@ -141,7 +141,17 @@ export function strip(src) {
     }
 
     // A `/` starts a regex only where a value cannot already have ended.
-    if (c === '/' && (prev === '' || '(,=:[!&|?{};+-*%~^<>'.includes(prev))) {
+    //
+    // `}` is deliberately NOT in this set. In plain JS it does precede a regex
+    // (`if (x) {} /re/.test(s)`), but this corpus is JSX, where `}` far more often
+    // closes an expression container and is followed by `/>`: two self-closing tags
+    // on one line — `<Foo {...a} /> <b {...rest} />` — then read as a regex literal
+    // spanning from the first `/>` to the second, blanking the real spread between
+    // them and reporting BOTH rest elements as dropped. That is the over-blanking
+    // this file's header promises not to do, and it fails correct code, which is how
+    // a check gets switched off. Missing a regex after `}` costs a false negative on
+    // a construct that does not appear in this corpus; the trade is deliberate.
+    if (c === '/' && (prev === '' || '(,=:[!&|?;+-*%~^<>'.includes(prev))) {
       const start = i;
       let j = i + 1;
       let ok = false;
@@ -237,6 +247,18 @@ function main() {
   const list = process.argv.slice(2).includes('--list');
   const files = sourceFiles(SCAN_ROOT).sort();
 
+  // A corpus that vanished is not a clean corpus. If SCAN_ROOT is renamed or moved,
+  // every walk below returns nothing, every assertion holds vacuously, and this exits
+  // 0 having examined no files at all. check-storybook.mjs took the same floor for the
+  // same reason. The number is a floor, not a target — raise it only when it bites.
+  if (files.length < 100) {
+    console.error(
+      `[check:unspread-rest] found ${files.length} file(s) under ${path.relative(REPO_ROOT, SCAN_ROOT)} — expected at least 100.\n` +
+        '  -> The corpus moved or the walk broke. A check over nothing passes over everything.',
+    );
+    return 1;
+  }
+
   if (list) {
     console.log(
       `[check:unspread-rest] ${files.length} file(s) under ` +
@@ -271,4 +293,10 @@ function main() {
   return 0;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) process.exit(main());
+// path.resolve + fileURLToPath, not string comparison: `file://${argv[1]}` never
+// matches once the repo path contains a space or any non-ASCII char, because the
+// URL form percent-encodes them. This check silently did nothing under such a
+// path — exit 0, main() never invoked. Same idiom as check-token-collision.mjs.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  process.exit(main());
+}
