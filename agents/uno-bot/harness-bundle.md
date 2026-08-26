@@ -15,31 +15,31 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **164,398 chars from 21 files**, against an assembled budget of 170,000 (5,602 to spare).
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **164,703 chars from 21 files**, against an assembled budget of 170,000 (5,297 to spare).
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,066 (−8,090 ide-only) | 9,066 | — |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 6,222 | 15,316 | — |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,555 | 42,912 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 53,168 | — |
-| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 57,487 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 8,959 | 66,505 | — |
-| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,448 | 72,998 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 79,184 | — |
-| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 84,346 | 7,000 (Worker face) |
-| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 88,557 | — |
-| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 91,718 | 7,000 (Worker face) |
-| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 97,632 | — |
-| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 102,062 | 7,000 (Worker face) |
-| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 108,007 | — |
-| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 112,628 | 7,000 (Worker face) |
-| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,928 | 114,598 | — |
-| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 127,561 | — |
-| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 140,540 | — |
-| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 11,794 (−4,363 ide-only) | 152,400 | — |
-| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,317 (−1,219 ide-only) | 156,771 | — |
-| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 164,398 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 6,527 | 15,621 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,555 | 43,217 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 53,473 | — |
+| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 57,792 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 8,959 | 66,810 | — |
+| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,448 | 73,303 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 79,489 | — |
+| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 84,651 | 7,000 (Worker face) |
+| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 88,862 | — |
+| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 92,023 | 7,000 (Worker face) |
+| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 97,937 | — |
+| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 102,367 | 7,000 (Worker face) |
+| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 108,312 | — |
+| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 112,933 | 7,000 (Worker face) |
+| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,928 | 114,903 | — |
+| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 127,866 | — |
+| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 140,845 | — |
+| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 11,794 (−4,363 ide-only) | 152,705 | — |
+| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,317 (−1,219 ide-only) | 157,076 | — |
+| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 164,703 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -177,6 +177,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 |------|---------|
 | **Context Level** | Atomic hierarchy: Element → Card → Section → Page |
 | **Spec** | Full page composition (e.g., `specs/Home/Pages/`) |
+| **Component docs page** | The tabbed page a human reads for one component — one `.mdx` under `design-system/src/components/`, 48 of them. Distinct from **Page** (a Context Level), from **Spec**, and from a *page story* (`specs/**/Pages/**`, the population #243 gave an `<h1>`). Avoid bare "docs page" |
 | **Token** | Design value: color, spacing, typography, elevation, radius |
 | **Foundation** | Fundamental design primitive (color palette, type scale, grid) |
 
