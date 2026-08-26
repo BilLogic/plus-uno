@@ -106,6 +106,28 @@ The text overrides in the `dark` rule are load-bearing, not decoration. The
 brand and link colours the light bars use would land at 1.31:1 and 2.48:1 on
 `#2e3133` — the same invisible-text defect #153 removed.
 
+`primary` carries the same kind of override, for the same reason (#219). The bar
+is `--color-primary` (`#0472a8`) and every label on it is `--color-on-primary`
+(`#ffffff`) — 5.28:1, WCAG AA for normal text — which is the pair the Figma
+`background color=primary` variant (`4296:25311`) binds: `_Primary/Primary`
+fill, `_Primary/On Primary` text.
+
+Before that override the bar had no foreground of its own, so the links kept the
+light bar's `--color-primary`: the same token as the background it now sat on,
+1.00:1, invisible rather than low-contrast. Measured in the browser against the
+real cascade, the brand was 3.24:1 and the active link 3.98:1 — that one is
+Bootstrap's own near-black active-link variable, which ties on specificity with
+the bare `.plus-navbar .nav-link` rule and wins on source order. So the
+override names every state — plain, `:hover`, `:focus`, `.active`, and the brand
+— and all of them measure 5.28:1.
+
+Nothing in the browser reported this. axe's contrast rule reads the
+background of the element's own box, and a nav link is transparent over the
+bar's paint, so the `primary` story passed the Storybook gate for the life of
+the component. `npm run check:token-collision` (`scripts/check-token-collision.mjs`)
+now fails on a foreground token identical to the background beneath it, which is
+the mechanically decidable subset of this defect.
+
 </div>
 
 <div className="sb-ds-doc-section">

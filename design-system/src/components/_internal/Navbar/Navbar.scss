@@ -35,9 +35,31 @@
         }
     }
 
+    // Figma `background color=primary` (node 4296:25311) fills the bar with
+    // `_Primary/Primary` and draws every label in `_Primary/On Primary` — the
+    // `--color-primary` / `--color-on-primary` pair below.
     &.plus-navbar-bg-primary {
         background-color: var(--color-primary);
         border-bottom: 1px solid var(--color-primary);
+
+        // Mandatory, not decorative. The link colour further down is
+        // `--color-primary` itself — the same token as this background — so
+        // the links rendered at 1.00:1: invisible, not merely low-contrast
+        // (#219). The brand was 3.24:1 and Bootstrap's black active link
+        // 3.98:1, both under AA; on-primary is 5.28:1 for every state.
+        // `.nav-link.active` is spelled out because Bootstrap's
+        // `.navbar-nav .nav-link.active` sets a near-black
+        // `--bs-navbar-active-color` at the same specificity as the bare
+        // `.nav-link` selector here, leaving it to stylesheet order — and
+        // `:hover` for the same reason against the bare `:hover` rule below.
+        .navbar-brand,
+        .plus-navbar-brand,
+        .nav-link,
+        .nav-link.active,
+        .nav-link:hover,
+        .nav-link:focus {
+            color: var(--color-on-primary);
+        }
     }
 }
 

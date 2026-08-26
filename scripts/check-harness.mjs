@@ -121,6 +121,12 @@ const COMPOSED = [
     guards: 'the negation ratchet — prohibition density across the harness docs not climbing.',
   },
   {
+    script: 'check:token-collision',
+    pkg: 'root',
+    guards:
+      'no component stylesheet colouring text in the same token as the surface under it. `Navbar` shipped one for the life of the component at 1.00:1 (#219); axe cannot see this class, because the text sits in a transparent box over a painted ancestor.',
+  },
+  {
     script: 'check:intake-fsm',
     pkg: 'root',
     guards: 'the intake FSM that gates every uno-prototype run.',
