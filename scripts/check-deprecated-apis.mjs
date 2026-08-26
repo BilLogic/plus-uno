@@ -38,8 +38,26 @@ const TRIPWIRES = [
     removedIn: 11,
     api: 'addon tabs (`types.TAB`)',
     uses: '.storybook/addons/component-tabs/register.jsx',
-    ticket: '#202',
-    note: 'Storybook 10.5 already warns: "Addon tabs are deprecated and will be removed in Storybook 11."',
+    ticket: '#202 (closed — the port could not be written while Storybook 11 did not exist)',
+    // Everything the port needs, here rather than behind a link. A ticket can be
+    // closed, renumbered, or migrated to another tracker; this file is what the
+    // failure prints, so this is where the knowledge has to live.
+    note: [
+      'Storybook 10.5 already warns: "Addon tabs are deprecated and will be removed in Storybook 11."',
+      'What breaks: the Code / Usage / Changelog tabs on every component page.',
+      'What to do: re-register the three panels on 11\'s replacement mechanism.',
+      '  - Confirm that mechanism against CURRENT upstream docs. Do not trust this',
+      '    note or the addon README, both written against a 10.5 source file.',
+      '  - contract.js is pure and framework-free (tab ids, titles, order,',
+      '    componentIdentity, normaliseChangelog). The port is a re-registration,',
+      '    not a rewrite of what the panels contain.',
+      '  - .storybook/manager.js is the single place titles and order are declared,',
+      '    including the renamed built-in canvas tab ("Examples"). Keep it that way.',
+      '  - design-system/tests/component-tabs-contract.test.js (11 tests) must still',
+      '    pass, or be updated with its reasoning intact.',
+      '  - Verify in a running Storybook that all four tabs render and selection',
+      '    follows the URL. That bar was met once; meet it again.',
+    ].join('\n    '),
   },
 ];
 
@@ -95,7 +113,7 @@ function main() {
               `  ${t.dep} ${t.range} can resolve to ${t.removedIn}.x, which removes ${t.api}\n` +
               `    still used by ${t.uses}\n` +
               `    ${t.note}\n` +
-              `    -> ${t.ticket} carries the port. Land it in this PR, or pin below ${t.removedIn}.`,
+              `    -> Land the port in this PR, or pin below ${t.removedIn}. History: ${t.ticket}.`,
           )
           .join('\n\n'),
     );
