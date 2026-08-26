@@ -202,6 +202,10 @@ const committed = CHECK
 // convention nobody listed was a rule the bot never learned, and nothing said so.
 const members = [];
 const undeclared = [];
+// The docs under these same roots that declare `embodiment: ide` — everything
+// the walk SAW and did not bundle. Not used to assemble anything; counted, and
+// reported below. See the census note after the guards.
+const ideOnly = [];
 
 for (const section of SECTIONS) {
   const found = [];
@@ -213,6 +217,7 @@ for (const section of SECTIONS) {
         continue;
       }
       if (meta.embodiment === "uno-bot" || meta.embodiment === "all") found.push(rel);
+      else if (meta.embodiment === "ide") ideOnly.push(rel);
     }
   }
   found.sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
@@ -233,6 +238,26 @@ if (!members.length) {
   console.error("[bundle-harness] no members matched — the glob is broken, refusing to ship an empty prompt.");
   process.exit(1);
 }
+
+// ── The embodiment census (#174) ─────────────────────────────────────────────
+//
+// One line stating what this walk saw: every doc under the section roots, split
+// into the ones bundled and the ones marked `ide`. It changes no artifact — it
+// is stdout only — and the bundle does not need it.
+//
+// IT EXISTS FOR A READER OUTSIDE THIS SCRIPT. `check:negation` now ratchets the
+// IDE-side docs as well as the bundled ones, and the IDE corpus is exactly the
+// complement measured here: same roots, same frontmatter, the other answer. A
+// guard that re-walked those roots on its own would be a second glob that can
+// disagree with this one — the failure #159 deleted — so it walks them and then
+// checks itself against this line. The `--check OK` file count already plays
+// that role for the bundled half (#234); this is the same witness for the other
+// half, and for the total, so a root silently dropped from either list fails
+// instead of narrowing a corpus in silence.
+console.log(
+  `[bundle-harness] embodiment census: ${n(members.length + ideOnly.length)} declared doc(s) under the ` +
+    `section roots — ${n(members.length)} bundled, ${n(ideOnly.length)} ide-only`,
+);
 
 // Read every member from the LOCAL repo. Frontmatter is stripped: it addresses
 // this script, not the model, and paying prompt chars for it would be a tax on
