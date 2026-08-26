@@ -14,7 +14,7 @@
  * that runs on the merge candidate can.
  *
  * WHAT IT COMPOSES, AND WHY NOT EVERYTHING. Composition is stated once, in
- * `COMPOSED` below, with the reason each member earns its seconds. Three rules
+ * `COMPOSED` below, with the reason each member earns its seconds. Four rules
  * decided the set:
  *
  *   1. No member that another member already runs. `check:agent` is itself a
@@ -30,6 +30,13 @@
  *      the vendored blueprint contract against a sibling repo that no runner
  *      has; composing it would make the gate permanently red, which is how a
  *      gate gets switched off.
+ *   4. No member that costs minutes. `check:storybook` (#169) drives a real
+ *      browser over 382 story files in ~130s, and needs an `npm ci` and a
+ *      Playwright download on top. It belongs on `pull_request` — it just does
+ *      not belong inside this exit code, where it would multiply the wait
+ *      tenfold and make the fast gate the slow one. It has its own workflow on
+ *      the same trigger, running concurrently. Exclusion here means "not in this
+ *      process", never "not on PRs".
  *
  * WHY IT REACHES INTO `agents/uno-bot`. For exactly one check, on one rule: a
  * sub-package check is composed here when its INPUTS live at the repo root.
@@ -136,6 +143,14 @@ const EXCLUDED = {
   'check:component-registry': 'step 5 of check:agent.',
   'check:token-registry': 'step 6 of check:agent.',
   'check:knowledge-audit': 'step 7 of check:agent.',
+  'check:storybook':
+    'the only sub-check that is not dependency-free: it needs `npm ci` and a Playwright ' +
+    'chromium download, and the browser suite itself is ~130s against this gate\'s ~14s ' +
+    'total (measured 2026-08-26, #169). Composing it would be a 10x rise in the number ' +
+    'people wait on, and the header above says why that is fatal. It runs on the same ' +
+    '`pull_request` trigger as its own job — `.github/workflows/storybook-gate.yml` — so ' +
+    'it is a peer of this gate, not an orphan, and the two run concurrently: a PR waits ' +
+    'one Storybook run, not a Storybook run after a harness run.',
   'check:fetch':
     'reads only agents/uno-bot/src/. A root-only PR cannot break it, and `npm run deploy` gates it at its own boundary.',
   'check:contract':

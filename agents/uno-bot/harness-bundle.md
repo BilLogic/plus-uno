@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **164,077 chars from 21 files**, against an assembled budget of 170,000 (5,923 to spare).
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **164,598 chars from 21 files**, against an assembled budget of 170,000 (5,402 to spare).
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -39,7 +39,7 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 140,740 | — |
 | 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 11,794 (−4,363 ide-only) | 152,600 | — |
 | 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,317 (−1,219 ide-only) | 156,971 | — |
-| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,058 (−605 ide-only) | 164,077 | — |
+| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 164,598 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -1831,6 +1831,7 @@ THE standing-automation registry. An automation absent from the table below is u
 | Blueprint embeddings refresh | nightly cron (07:00 UTC) | uno-bot (semantic search freshness) | — | `uno-bot-embed-blueprint.yml` | GHA cron → Worker `/debug` route | Bill | ✅ live |
 | uno-bot evals (weekly drift check) | weekly cron (Mon 08:00 UTC) + on-demand `workflow_dispatch` | uno-bot (R/P regression cases vs live Worker) | LLM judge (Gemini on Vertex) | `uno-bot-evals.yml` → `agents/uno-bot/scripts/run-evals.mjs` | GHA cron → live Worker + Vertex judge · GCP `hcii-plus` | Bill | ✅ live |
 | Harness gate | **every `pull_request`** + on demand | the deterministic guards, composed | — | `check-harness.yml` → `npm run check:harness` → `scripts/check-harness.mjs` (composition and the reason for each member live there; `--list` prints them). ~20s, no `npm ci` — every member is dependency-free | GHA · no model call — deterministic scripts only | Bill | ✅ live (#155; the repo's first `pull_request` trigger) |
+| Storybook gate | **every `pull_request`** + on demand | the Storybook browser suite — 382 stories rendered in headless chromium, axe over each | — | `storybook-gate.yml` → `npm run check:storybook` → `scripts/check-storybook.mjs` (why it is a peer workflow of the harness gate rather than a member: `EXCLUDED` there). Play/render failures block; a11y is a **ratchet** against `docs/evals/a11y-baseline.json` | GHA · no model call — Playwright + axe | Bill | ✅ live (#169; baseline 148 stories / 15 rules, 2026-08-26) |
 | Conventions integrity sweep | monthly cron (1st, 09:00 UTC) | uno-maintain (integrity checklist: `staleness-sweep.md`) | reviewers/auditor | `harness-integrity-sweep.yml` → `scripts/prompts/uno-integrity-sweep/SKILL.md` (intake transport: shared ref above) | GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16 — filed intakes #71/#72); the pilot for the sweep pattern |
 | Notion comment sweep | each flow run touching a page + monthly | uno-maintain (unresolved threads → incorporate or intake) | writers/notion | ❌ not built — follow the integrity-sweep pattern (Notion via `NOTION_API_KEY`) | (planned) GHA cron → claude-vertex · GCP `hcii-plus` | — | planned |
 | Eval run logging | every flow exit | rubric scoring → run entry | reviewers/rubric-applier | interim: `docs/evals/runs/*.jsonl`; target: Notion Eval Runs DB | in-session (whatever harness ran the flow) | — | planned |
