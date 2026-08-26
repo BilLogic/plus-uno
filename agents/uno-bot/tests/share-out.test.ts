@@ -114,7 +114,7 @@ describe("the doc and the tool cannot drift again", () => {
   // The actual fix. The template and the schema disagreed for months because
   // nothing read both — so this reads both.
   const root = join(process.cwd(), "..", "..");
-  const doc = readFileSync(join(root, "docs", "conventions", "slack.md"), "utf8");
+  const doc = readFileSync(join(root, "docs", "connectors", "slack.md"), "utf8");
   const tools = JSON.parse(
     readFileSync(join(process.cwd(), "tool-definitions.json"), "utf8"),
   ) as Array<{ name: string; input_schema: { properties: Record<string, unknown> } }>;
