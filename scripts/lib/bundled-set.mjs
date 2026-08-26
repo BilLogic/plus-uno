@@ -21,6 +21,14 @@
  * them as one is what #204 fixed — so the failure path is a report that says
  * whose problem it is, not an exception.
  *
+ * IT ALSO ANSWERS THE COMPLEMENT (#174). The same walk that decides who is
+ * bundled decides who is IDE-only — a doc under a section root declares `all`,
+ * `uno-bot` or `ide`, and the bundler refuses to build if it declares nothing.
+ * `check:negation` ratchets both halves, so `harnessSets` returns both from one
+ * bundler run and `SECTION_ROOTS` carries the walk the artifact cannot supply:
+ * an IDE-only doc is, by definition, absent from the bundle, so there is no
+ * marker to parse it back out of.
+ *
  * A SHORT SET ALSO STOPS THE CALLER (#234). Asking the bundler is not the same
  * as being told: the answer is read back by matching `<!-- path -->` markers in
  * the artifact, and a marker format that shifts breaks the match without
@@ -84,15 +92,96 @@ export function bundlerFailureReport({ status, signal, stderr }, caller = {}) {
 }
 
 /**
- * The bundled set, in load order, as repo-relative paths.
+ * The roots the bundler scans, flattened out of its `SECTIONS`.
+ *
+ * A COPY, DELIBERATELY, AND CHECKED AGAINST THE ORIGINAL. Order is a
+ * bundle-level fact and `bundle-harness.mjs` says it is declared in `SECTIONS`
+ * "and nowhere else" — so this does not move it. What this list is for is the
+ * OTHER answer the same walk produces: the docs under those roots that say
+ * `embodiment: ide`, which is the corpus `check:negation`'s IDE scope ratchets
+ * (#174). Membership there is the same frontmatter fact, read the same way.
+ *
+ * The obvious objection is #159's: a second glob is a glob that can disagree.
+ * It is answered the way #234 answered it for the marker parse rather than by
+ * pretending the copy is safe — the bundler states its own census on stdout,
+ * and `harnessSets` fails when this walk and that census differ. Drop a root
+ * here and the count falls short of the bundler's; add one and it overshoots.
+ * Either way it stops, instead of ratcheting a corpus that quietly lost a
+ * directory.
+ */
+export const SECTION_ROOTS = [
+  'AGENTS.md',
+  'CONTEXT.md',
+  'agents/uno-bot/AGENT.md',
+  'skills',
+  'docs/connectors',
+  'docs/engineering',
+  'docs/conventions',
+];
+
+/** Every `.md` under a root, or the root itself when it is a file. */
+function walkDocs(rel) {
+  const abs = path.join(REPO_ROOT, rel);
+  if (!fs.existsSync(abs)) return [];
+  if (fs.statSync(abs).isFile()) return rel.endsWith('.md') ? [rel] : [];
+  const out = [];
+  for (const entry of fs.readdirSync(abs, { withFileTypes: true })) {
+    out.push(...walkDocs(path.posix.join(rel, entry.name)));
+  }
+  return out;
+}
+
+/**
+ * A doc's declared `embodiment`, or null when it declares none.
+ *
+ * Exported so the tests can drive the classifier on strings. The bundler
+ * refuses to build while any doc under a section root is undeclared, so null
+ * here means "not reached through a section root" rather than "allowed".
+ *
+ * @param {string} text the file's whole contents, frontmatter included.
+ * @returns {string|null}
+ */
+export function embodimentOf(text) {
+  if (!text.startsWith('---\n')) return null;
+  const close = text.indexOf('\n---', 4);
+  if (close === -1) return null;
+  const m = /^embodiment:\s*(.*)$/m.exec(text.slice(4, close));
+  return m ? m[1].trim() : null;
+}
+
+/**
+ * The IDE-side set: docs under the section roots declaring `embodiment: ide`.
+ *
+ * This is the exact complement of the bundled set within the same walk — a doc
+ * under a section root is bundled (`all` / `uno-bot`) or it is this, and the
+ * bundler fails the build if it is neither. That is what makes the two scopes
+ * of `check:negation` cover the harness between them with nothing in both.
+ *
+ * It also settles two exclusions BY RULE rather than by list, which is what
+ * #216 asked for. `docs/adr/` and `.claude/skills/` are not section roots, so
+ * neither is reachable from here: ADRs (append-only, so a ratchet over them
+ * rises by construction) and the generated `SKILL.md` faces (copies of docs
+ * already counted) are out because of where they live, not because anyone
+ * wrote their names down.
+ *
+ * @returns {string[]} repo-relative paths, sorted.
+ */
+export function ideAuthoredFiles() {
+  return SECTION_ROOTS.flatMap(walkDocs)
+    .filter((rel) => embodimentOf(fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8')) === 'ide')
+    .sort();
+}
+
+/**
+ * Both halves of the harness, from ONE bundler run.
  *
  * `spawnSync` rather than `execFileSync`: the failure path is a report, not an
  * exception, and the child's stderr is the substance of it.
  *
  * @param {{tag?: string, notThis?: string}} [caller] see `bundlerFailureReport`.
- * @returns {string[]}
+ * @returns {{bundled: string[], ide: string[]}}
  */
-export function bundledFiles(caller = {}) {
+export function harnessSets(caller = {}) {
   const { tag = 'negation' } = caller;
   const child = spawnSync('node', [BUNDLER, '--check'], {
     cwd: path.join(REPO_ROOT, 'agents/uno-bot'),
@@ -149,7 +238,76 @@ export function bundledFiles(caller = {}) {
     console.error(membershipMismatchReport({ parsed: parsed.length, declared, tag }));
     process.exit(1);
   }
-  return parsed;
+
+  // THE IDE WALK IS CHECKED THE SAME WAY (#174). `SECTION_ROOTS` above is a
+  // copy of the bundler's roots, so it can fall behind them; the census line is
+  // the bundler's own statement of what the same walk found, and comparing the
+  // two is what makes the copy falsifiable. Both numbers are compared, not just
+  // the IDE one — a root that vanished from this list shows up first in the
+  // total, before it has narrowed either half enough to notice.
+  const ide = ideAuthoredFiles();
+  const census = declaredCensus(child.stdout ?? '');
+  if (!census || census.ide !== ide.length || census.underRoots !== ide.length + parsed.length) {
+    console.error(censusMismatchReport({ walkedIde: ide.length, bundled: parsed.length, census, tag }));
+    process.exit(1);
+  }
+
+  return { bundled: parsed, ide };
+}
+
+/**
+ * The bundled set, in load order, as repo-relative paths.
+ *
+ * Kept as its own export because `check:skill-overlap` asks only this question
+ * and reads better for saying so.
+ *
+ * @param {{tag?: string, notThis?: string}} [caller] see `bundlerFailureReport`.
+ * @returns {string[]}
+ */
+export function bundledFiles(caller = {}) {
+  return harnessSets(caller).bundled;
+}
+
+/**
+ * What the BUNDLER says its walk found, read off the census line it prints.
+ *
+ * `[bundle-harness] embodiment census: 67 declared doc(s) under the section roots — 21 bundled, 46 ide-only`
+ *
+ * @param {string} stdout the bundler's output.
+ * @returns {{underRoots: number, bundled: number, ide: number}|null} null when
+ *   the line is absent or has changed shape.
+ */
+export function declaredCensus(stdout) {
+  const m = /embodiment census: ([\d,]+) declared doc\(s\) under the section roots [—-] ([\d,]+) bundled, ([\d,]+) ide-only/.exec(
+    stdout ?? '',
+  );
+  if (!m) return null;
+  const num = (s) => Number(s.replace(/,/g, ''));
+  return { underRoots: num(m[1]), bundled: num(m[2]), ide: num(m[3]) };
+}
+
+/**
+ * What the reader is owed when this module's walk and the bundler's disagree.
+ *
+ * Pure, so the message can be asserted without editing `SECTION_ROOTS` to break
+ * it — same reason as `bundlerFailureReport` and `membershipMismatchReport`.
+ *
+ * @param {{walkedIde: number, bundled: number, census: {underRoots: number, ide: number}|null, tag?: string}} counts
+ * @returns {string}
+ */
+export function censusMismatchReport({ walkedIde, bundled, census, tag = 'negation' }) {
+  const said = census
+    ? `it says ${census.ide} ide-only out of ${census.underRoots} under those roots`
+    : 'its `embodiment census` line is absent or has changed shape';
+  return (
+    `[${tag}] this check's walk of the harness section roots disagrees with the bundler's:\n` +
+    `  walked ${walkedIde} ide-only doc(s) and ${bundled} bundled (${walkedIde + bundled} in all), but ${said}.\n` +
+    '  -> Membership is one frontmatter fact, but it is read TWICE: agents/uno-bot/scripts/bundle-harness.mjs\n' +
+    '     walks its `SECTIONS` roots, and scripts/lib/bundled-set.mjs walks its own `SECTION_ROOTS` copy to\n' +
+    '     find the ide-only complement. A root added to one and not the other narrows a corpus without\n' +
+    '     emptying it, and a ratchet over a corpus that quietly shrank passes every time (#234). Bring\n' +
+    "     `SECTION_ROOTS` back into line with the bundler's `SECTIONS` — the count is the symptom."
+  );
 }
 
 /**
