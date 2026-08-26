@@ -121,10 +121,11 @@ would run off the edge, remeasuring on scroll and resize.
 - **Not for rich content.** Items render a fixed row — check mark or checkbox,
   optional leading icon, text, optional trailing icon, optional counter. Anything
   else belongs in a `Popover`.
-- **Not in controlled mode unless the parent also owns closing.** Passing
-  `isOpen` disables the internal toggle *and* the click-outside close, and there
-  is no `onToggle` prop to tell you the user asked to close it. A controlled
-  `Dropdown` is a static open menu.
+- **Not in controlled mode without `onToggle`.** Passing `isOpen` hands the
+  state to the parent: the component stops writing its own, so the toggle
+  click, the item click and the click-outside close all become `onToggle`
+  calls the parent has to act on. `isOpen` on its own is still a static open
+  menu — now by omission rather than by design.
 - **`split` is presentation only.** The label half of a split button renders with
   no click handler, and no prop supplies one. Use it to show the split treatment;
   do not expect a primary action from it.
@@ -135,14 +136,17 @@ would run off the edge, remeasuring on scroll and resize.
 
 ### Correct and incorrect
 
-**Controlled mode has no way out.**
+**Controlled mode needs both halves.**
 
 ```jsx
-// Incorrect — `isOpen` freezes the component. Clicking the toggle does nothing,
-// clicking outside does nothing, and there is no callback to set state from.
+// Incorrect — `isOpen` without `onToggle` freezes the component. The user's
+// clicks are reported to nobody, so nothing ever sets `open` back to false.
 <Dropdown isOpen={open} buttonText="Actions" items={items} />
 
-// Correct — let the component own its own open state, and close from an item.
+// Correct — take the state, and take the callback that moves it.
+<Dropdown isOpen={open} onToggle={setOpen} buttonText="Actions" items={items} />
+
+// Also correct — let the component own its own open state.
 <Dropdown buttonText="Actions" items={items} />
 ```
 
