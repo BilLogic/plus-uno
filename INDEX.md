@@ -83,6 +83,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
+| [`design-system/guidelines/components/changelog.md`](design-system/guidelines/components/changelog.md) | How a component records what changed about it — starting empty on 2026-08-26, never backfilled |
 | [`design-system/guidelines/components/overview.md`](design-system/guidelines/components/overview.md) | What each component is for, when to reach for it, and how it composes |
 | [`design-system/guidelines/composition/forms.md`](design-system/guidelines/composition/forms.md) | How PLUS form elements compose inside surfaces |
 | [`design-system/guidelines/composition/hierarchy.md`](design-system/guidelines/composition/hierarchy.md) | Every PLUS surface sits at one of four context levels |
@@ -195,6 +196,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-124 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+125 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 raw eval data are deliberately not indexed — they record what happened rather
 than telling you what to do.
