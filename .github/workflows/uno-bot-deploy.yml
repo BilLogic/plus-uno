@@ -16,10 +16,13 @@ name: uno-bot — deploy Worker
 # reviewed, merged and believed-live sat in main while the bot kept answering
 # from the previously-deployed copy.
 #
-# Review is not what was protecting main here — nothing in this repo runs on a
-# PR; every other workflow is `schedule` or `workflow_dispatch`. What protects a
-# deploy is the gating inside `npm run deploy` (typecheck · check:fetch ·
-# check:contract · bundle:harness · wrangler deploy), and that runs either way.
+# Review is not what was protecting main here. Until 2026-08-26 nothing in this
+# repo ran on a PR at all; `check-harness.yml` now does, and it composes
+# `check:harness-bundle`, so a stale bundle is caught on the branch rather than
+# here. What protects the DEPLOY is still the gating inside `npm run deploy`
+# (typecheck · check:fetch · check:contract · bundle:harness · wrangler deploy),
+# and that runs either way — the PR gate deliberately leaves `check:fetch` and
+# `check:contract` to this boundary (scripts/check-harness.mjs § EXCLUDED).
 #
 # `check:contract` is only a real gate when the app repo is checked out beside
 # this one — it compares the vendored blueprint contract against the app's

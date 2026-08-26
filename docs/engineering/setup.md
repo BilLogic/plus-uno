@@ -121,7 +121,31 @@ canonical frontmatter:
 | Slack manifest | `agents/uno-bot/slack-app-manifest-commands.yaml` | pasted at api.slack.com |
 
 Edit the canonical `SKILL.md` and regenerate; `npm run check:skill-surfaces`
-fails the monthly sweep on drift.
+fails the harness gate on drift.
+
+## The harness gate
+
+`npm run check:harness` is the one command to run before opening a PR, and the
+one thing CI runs on every `pull_request` (`.github/workflows/check-harness.yml`).
+It composes the deterministic guards into a single exit code and a report that
+names each sub-check that failed, with that sub-check's own diagnostic under it —
+it does not stop at the first, so one run tells you everything wrong with the
+branch. Takes about 20 seconds and installs nothing.
+
+`npm run check:harness -- --list` prints what it composes, what it deliberately
+does not, and why. Those reasons are stated once, in `scripts/check-harness.mjs` —
+read them there rather than anywhere else, and add a new `check:*` script to that
+file's `COMPOSED` or `EXCLUDED` when you write one. The gate fails on a check
+that is in neither, because a check that runs nowhere protects nothing.
+
+When it reports a generated artifact as stale, the fix is always to regenerate
+and commit:
+
+```bash
+npm run generate:agent
+npm run generate:index
+npm --prefix agents/uno-bot run bundle:harness
+```
 
 ## Local Preview
 

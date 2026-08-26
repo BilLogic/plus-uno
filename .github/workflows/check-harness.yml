@@ -1,0 +1,63 @@
+name: check:harness
+
+# The repo's first `pull_request` gate. Everything it runs is composed in
+# `scripts/check-harness.mjs`, which is also where the reasons for the set live —
+# never restate the composition here, or the two lists drift and the workflow
+# becomes the lie.
+#
+# WHY A PR TRIGGER AND NOT ANOTHER CRON. Every other workflow here is `schedule`,
+# `repository_dispatch` or `push`, and all three observe a branch only once it is
+# `main`. Two branches each green alone and red together are undetectable until
+# the damage is merged — observed 2026-08-26, when #172 and #193 merged in
+# sequence and left `main` with a stale INDEX.md and harness-bundle.md, four
+# checks red, repaired afterwards by #196. `pull_request` runs against the merge
+# commit GitHub builds from the head and the base, so that pair would have been
+# caught on the second PR rather than on main.
+#
+# NO `npm ci`, DELIBERATELY. Every composed sub-check is dependency-free — node:
+# builtins and bash only — so the job needs a checkout and a Node, nothing more.
+# That is what keeps it at ~20s, and ~20s is what keeps it switched on. A gate
+# that costs ten minutes gets marked "not required" the first busy week. If a
+# future sub-check needs a package, install it in its own step and say what it
+# bought; do not reach for a blanket `npm ci`.
+#
+# NOT PATHS-FILTERED, for the same reason `uno-bot-deploy.yml` is not: the
+# generated artifacts are assembled from docs/, skills/, design-system/ and the
+# generators themselves, so a filter narrow enough to be worth having is a filter
+# that misses the drift. The whole run is cheaper than reasoning about the filter.
+#
+# Spot-run: `gh workflow run check-harness.yml`.
+
+on:
+  pull_request:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  # A superseded push to the same PR should cancel its in-flight run — the older
+  # answer is about a tree that no longer exists.
+  group: check-harness-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  harness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+
+      # One command, one exit code. The composite names every sub-check that
+      # failed and prints each one's own diagnostic underneath — it does not stop
+      # at the first, so one run reports everything wrong with the branch.
+      - name: npm run check:harness
+        run: npm run check:harness

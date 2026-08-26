@@ -30,6 +30,14 @@ jobs:
         with:
           persist-credentials: false # gh uses GH_TOKEN from env; no token in .git/config
 
+      # Every deterministic check below ALSO runs per-PR since 2026-08-26
+      # (`check-harness.yml` → `npm run check:harness`, #155). They stay here on
+      # purpose: `main` is unprotected, so a direct push reaches it without ever
+      # meeting the PR gate, and this monthly pass is what sees that. The steps
+      # are kept spelled out rather than collapsed into the composite because
+      # each one's rationale is written here and is worth keeping — this list is
+      # a backstop, and it is fine for it to lag the composite's membership.
+
       # Deterministic registry-drift check, promoted from loose scripts (ce:review
       # 069 item 5): before this, check:component-registry / check:token-registry
       # ran only when an agent obeyed prose — drift was caught by luck. Node with
