@@ -170,7 +170,7 @@ Two kinds of failure, two mechanisms:
   highest-usage components whose behaviour is the product. Everything else in
   the corpus is asserted to render, and to survive axe, and nothing more.)
 - **Accessibility is a ratchet**, not a threshold. `docs/evals/a11y-baseline.json`
-  records which axe rules each story already violates (146 stories, 15 rules at
+  records which axe rules each story already violates (126 stories, 14 rules at
   2026-08-26). A story violating a rule it did not carry before fails the gate; a
   count that falls does not. Re-record a genuine improvement with
   `npm run check:storybook -- --update` and commit the file in the same PR.
