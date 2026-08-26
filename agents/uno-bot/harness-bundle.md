@@ -19,7 +19,7 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,066 (−7,956 ide-only) | 9,066 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,066 (−8,089 ide-only) | 9,066 | — |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 6,222 | 15,316 | — |
 | 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,755 | 43,112 | 28,000 (persona) |
 | 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 53,368 | — |
