@@ -422,7 +422,9 @@ const P5Content = ({ lessonTitle, onPrevious, onNext }) => {
             <div className="lesson-content__congrats">
                 <h1 className="h1">Congratulations on finishing the Lesson!</h1>
                 <div className="lesson-content__score">
-                    <h1 className="h1">0/2</h1>
+                    {/* A score is not a section: it keeps display type via `h1` and stays
+                        out of the outline, like its own label below it. */}
+                    <p className="h1">0/2</p>
                     <p className="h4">Answered Correctly</p>
                 </div>
             </div>

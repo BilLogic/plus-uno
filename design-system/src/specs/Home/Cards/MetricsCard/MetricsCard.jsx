@@ -31,7 +31,8 @@ const MetricsCard = ({
         <div className="plus-metrics-card-page">
             <div className="plus-metrics-card-progress">
                 <div className="plus-metrics-card-progress-text">
-                    <h3 className="plus-metrics-card-progress-value">2/3</h3>
+                    {/* A metric value is not a section — display type, no outline slot. */}
+                    <p className="plus-metrics-card-progress-value">2/3</p>
                     <p className="body3-txt">Sessions Completed This Week</p>
                 </div>
                 <div className="plus-metrics-card-progress-chart">
@@ -196,7 +197,8 @@ const MetricItem = ({ value, label, showBadge = false, badgeState = 'increase' }
     return (
         <div className="plus-metrics-card-item">
             <div className="plus-metrics-card-item-content">
-                <h4 className="plus-metrics-card-item-value">{value}</h4>
+                {/* A metric value is not a section — display type, no outline slot. */}
+                <p className="plus-metrics-card-item-value">{value}</p>
                 <p className="body2-txt plus-metrics-card-item-label">{label}</p>
                 {renderBadge()}
             </div>
@@ -231,7 +233,8 @@ const StackedMetricCard = ({ value, label, showBadge = false, badgeState = 'incr
             showBorder={true}
         >
             <div className="plus-metrics-stacked-card-content">
-                <h3 className="plus-metrics-stacked-card-value">{value}</h3>
+                {/* A metric value is not a section — display type, no outline slot. */}
+                <p className="plus-metrics-stacked-card-value">{value}</p>
                 <p className="body2-txt plus-metrics-stacked-card-label">{label}</p>
                 {renderBadge()}
             </div>

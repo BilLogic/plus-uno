@@ -471,7 +471,10 @@
         text-align: center;
         width: 100%;
 
-        h1 {
+        // Matched by size class as well as by tag: the score below is drawn at
+        // `h1` size but is not a section, so it is a `<p className="h1">`.
+        h1,
+        .h1 {
             color: var(--color-on-primary-container);
             margin: 0;
         }
@@ -481,7 +484,8 @@
         margin-top: var(--size-section-gap-md, 16px);
         padding-bottom: var(--size-element-pad-y-lg, 16px);
 
-        h1 {
+        h1,
+        .h1 {
             margin: 0;
         }
 
