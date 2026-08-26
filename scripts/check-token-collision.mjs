@@ -220,6 +220,18 @@ function scssFiles(dir) {
 function main() {
   const files = scssFiles(SCAN_ROOT);
 
+  // A corpus that vanished is not a clean corpus. If SCAN_ROOT is renamed or moved,
+  // every walk below returns nothing, every assertion holds vacuously, and this exits
+  // 0 having examined no files at all. check-storybook.mjs took the same floor for the
+  // same reason. The number is a floor, not a target — raise it only when it bites.
+  if (files.length < 100) {
+    console.error(
+      `[check:token-collision] found ${files.length} file(s) under ${path.relative(REPO_ROOT, SCAN_ROOT)} — expected at least 100.\n` +
+        '  -> The corpus moved or the walk broke. A check over nothing passes over everything.',
+    );
+    return 1;
+  }
+
   if (process.argv.includes('--list')) {
     console.log(`check:token-collision reads ${files.length} stylesheets under design-system/src:\n`);
     for (const f of files) console.log(`  ${path.relative(REPO_ROOT, f)}`);

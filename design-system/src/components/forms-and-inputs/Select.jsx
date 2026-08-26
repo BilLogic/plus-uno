@@ -88,7 +88,11 @@ const Select = ({
      * The half that was actually missing is the half assistive technology
      * hears, and that is what this supplies.
      */
-    const requiredHintId = required ? `${id || name || generatedId}-required` : undefined;
+    // One base for every id this component mints. `${id || name}` alone yields the
+    // literal string "undefined-search" when a caller passes neither — a real id,
+    // pointing at nothing, which is the #206 defect in miniature.
+    const fieldId = id || name || generatedId;
+    const requiredHintId = required ? `${fieldId}-required` : undefined;
 
     /**
      * `onFocus` / `onBlur` (#207). A caller passing these means the *field*,
@@ -305,7 +309,7 @@ const Select = ({
                     {searchable && (
                         <div className="plus-select-search">
                             <Input
-                                id={`${id || name}-search`}
+                                id={`${fieldId}-search`}
                                 showLabel={false}
                                 placeholder="Search"
                                 value={searchTerm}

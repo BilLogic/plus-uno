@@ -1,4 +1,5 @@
-import React, { useId } from 'react';
+import React from 'react';
+import useFieldId from './useFieldId';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import './Switch.scss';
@@ -40,7 +41,10 @@ const Switch = ({
     style,
     inputProps = {},
 }) => {
-    const autoId = useId();
+    // `name` is a form key, not an id: two <Switch name="x"> siblings share it,
+    // so `id || name` collapses them onto one id and every label resolves to the
+    // first. Same fix as Checkbox (#213) and Radio (#222).
+    const fieldId = useFieldId(id);
     const isControlled = checked !== undefined;
     const sizeClass = size === 'small'
         ? 'body3-txt'
@@ -79,7 +83,7 @@ const Switch = ({
                 role="switch"
                 {...safeInputProps}
                 type="switch"
-                id={id || name || autoId}
+                id={fieldId}
                 name={name}
                 value={value}
                 checked={isControlled ? checked : undefined}
