@@ -27,12 +27,23 @@ scope and left untouched. Four promotions, two conversions, nine deletions.
 **Deleted**
 
 `ideations.md` · `lessons/ds-compliance.md` · `lessons/integration.md` ·
-`lessons/agent-patterns.md` · `lessons/2026-04-19-harness-audit.md` ·
-`lessons/2026-07-16-claude-vertex-cron-first-run.md` ·
-`research/2026-05-20-user-flow-friction-audit.md` — every entry either shipped,
-was superseded by ADR-013/016's harness rewrite, or was a postmortem whose fix
-is now permanent in code. The old `changelog.md` and `INDEX.md` contents went
-with them; both files were repurposed rather than deleted because the folder
-needs a contract and a ledger.
+`lessons/agent-patterns.md` · `lessons/2026-07-16-claude-vertex-cron-first-run.md`
+— every entry either shipped, was superseded by ADR-013/016's harness rewrite, or
+was a postmortem whose fix is now permanent in code. The old `changelog.md` and
+`INDEX.md` contents went with them; both files were repurposed rather than deleted
+because the folder needs a contract and a ledger.
+
+**Archived** — moved to `archive/`, which is itself a disposition
+
+`archive/2026-04-19-harness-audit.md` — its own closing note asks that it not be
+deleted and prescribes a counter-lesson instead; that instruction is honoured. It
+is archived rather than kept live because all three things it audits (`.agent/skills/`,
+`docs/rubrics/`, `hd-config.md`) are absent from the repo, so every finding resolves
+to nothing.
+
+`archive/2026-05-20-user-flow-friction-audit.md` — an authored deliverable with a
+named author and audience, not accumulated sediment. Its three high-leverage fixes
+shipped in v2; it produced no standing rule and no decision needing an ADR, so it is
+kept as a record rather than promoted.
 
 **Enforced by** `npm run check:knowledge-disposition` (`scripts/check-knowledge-disposition.mjs`).
