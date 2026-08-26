@@ -107,7 +107,8 @@ const COMPOSED = [
   {
     script: 'check:skill-overlap',
     pkg: 'root',
-    guards: 'one rule, one home: no substantive line living in two faces of the same skill.',
+    guards:
+      'one rule, one home — no substantive line living in two faces of the same skill, and none living in two bundled docs. Reads the bundled set from the bundler, so a stale bundle stops it.',
   },
   {
     script: 'check:knowledge-disposition',
