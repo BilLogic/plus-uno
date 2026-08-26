@@ -62,6 +62,12 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSy
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
+// Frontmatter is metadata for this script, not content for the model — and
+// where it STOPS decides both the char budgets below and `check:negation`'s
+// bundled count (#238), so the split lives in one shared module rather than
+// once here and once in each guard that has to agree with it.
+import { splitFrontmatter } from "../../../scripts/lib/frontmatter.mjs";
+
 const here = path.dirname(fileURLToPath(import.meta.url)); // agents/uno-bot/scripts
 const repoRoot = path.resolve(here, "../../.."); // repo root (two levels above agents/uno-bot)
 
@@ -111,19 +117,6 @@ function budgetFor({ rel, section }) {
 }
 
 const n = (x) => x.toLocaleString("en-US");
-
-/** Frontmatter is metadata for this script, not content for the model. */
-function splitFrontmatter(text) {
-  if (!text.startsWith("---\n")) return { meta: {}, body: text };
-  const close = text.indexOf("\n---", 4);
-  if (close === -1) return { meta: {}, body: text };
-  const meta = {};
-  for (const line of text.slice(4, close).split("\n")) {
-    const m = line.match(/^([a-zA-Z_-]+):\s*(.*)$/);
-    if (m) meta[m[1]] = m[2].trim();
-  }
-  return { meta, body: text.slice(close + 4).replace(/^\n+/, "") };
-}
 
 /** Every .md under a root, or the root itself when it is a file. */
 function walk(rel) {

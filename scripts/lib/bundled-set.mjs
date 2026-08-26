@@ -46,6 +46,8 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
+import { splitFrontmatter } from './frontmatter.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, '..', '..');
 
@@ -138,15 +140,15 @@ function walkDocs(rel) {
  * refuses to build while any doc under a section root is undeclared, so null
  * here means "not reached through a section root" rather than "allowed".
  *
+ * The fence is found by `splitFrontmatter` rather than by a regex of this
+ * module's own: where frontmatter ends is one fact, and the bundler's answer to
+ * it is the one that decides the prompt (#238).
+ *
  * @param {string} text the file's whole contents, frontmatter included.
  * @returns {string|null}
  */
 export function embodimentOf(text) {
-  if (!text.startsWith('---\n')) return null;
-  const close = text.indexOf('\n---', 4);
-  if (close === -1) return null;
-  const m = /^embodiment:\s*(.*)$/m.exec(text.slice(4, close));
-  return m ? m[1].trim() : null;
+  return splitFrontmatter(text).meta.embodiment ?? null;
 }
 
 /**

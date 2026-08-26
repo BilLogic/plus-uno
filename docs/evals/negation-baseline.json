@@ -8,14 +8,15 @@
       "cannot",
       "must not"
     ],
-    "measuredOn": "whole files, frontmatter included, outside quoted speech and code spans",
+    "measuredOn": "outside quoted speech and code spans; how much of each file, per scope below",
     "note": "NOT a count of negative statements — see scripts/check-negation-ratchet.mjs § What is counted."
   },
   "scopes": {
     "bundled": {
       "corpus": "docs the bundler assembles into the Worker prompt (embodiment: all | uno-bot)",
+      "measuredOn": "the bundled body — frontmatter stripped, as bundle-harness.mjs strips it before assembly, so the count is tokens the model is actually told",
       "docs": 21,
-      "total": 202,
+      "total": 200,
       "counts": {
         "AGENTS.md": 6,
         "CONTEXT.md": 7,
@@ -36,12 +37,13 @@
         "docs/connectors/notion.md": 23,
         "docs/connectors/slack.md": 17,
         "docs/connectors/supabase/blueprint-navigation.md": 21,
-        "docs/connectors/supabase/overview.md": 11,
+        "docs/connectors/supabase/overview.md": 9,
         "docs/engineering/operations.md": 2
       }
     },
     "ide": {
       "corpus": "hand-authored docs under the bundler section roots declaring embodiment: ide — docs/adr/ and the generated .claude/skills/ surfaces are not section roots and so are out",
+      "measuredOn": "whole files, frontmatter included — there is no bundler here, and a SKILL.md's description: is agent-facing routing text that steers exactly as the body does",
       "docs": 46,
       "total": 107,
       "counts": {

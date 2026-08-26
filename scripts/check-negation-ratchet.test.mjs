@@ -29,6 +29,7 @@ import {
   bundlerFailureReport,
   corpusShrankReport,
   countProhibitions,
+  readingChangedReport,
   roseReport,
 } from './check-negation-ratchet.mjs';
 import {
@@ -40,6 +41,9 @@ import {
   ideAuthoredFiles,
   unresolvedReport,
 } from './lib/bundled-set.mjs';
+import { splitFrontmatter } from './lib/frontmatter.mjs';
+
+const scopeBy = (key) => SCOPES.find((s) => s.key === key);
 
 /** The bundler's real `--check` failure, verbatim in shape (2026-08-26). */
 const realStderr =
@@ -110,9 +114,17 @@ test('the baseline carries the definition of the number it records', () => {
   assert.equal(base.metric.counts, METRIC, 'the file says what it counted');
   assert.deepEqual(base.metric.tokens, PROHIBITION_TOKENS, 'and with which tokens');
   assert.match(base.metric.note, /NOT a count of negative statements/);
-  // Frontmatter is inside the count — see the script header. Asserted so the
-  // descriptor cannot drift back to claiming it measures bodies.
-  assert.match(base.metric.measuredOn, /frontmatter included/);
+  // HOW MUCH of each file is read differs by scope (#238), so the shared
+  // descriptor says only what is actually shared and hands the reader on. A
+  // single global claim here is what let "frontmatter included" outlive being
+  // true of the bundled half.
+  assert.match(base.metric.measuredOn, /quoted speech and code spans/);
+  assert.match(base.metric.measuredOn, /per scope/);
+  assert.doesNotMatch(
+    base.metric.measuredOn,
+    /frontmatter included/,
+    'the shared descriptor must not claim a reading only one scope uses',
+  );
 });
 
 test('the narrow regex is narrow on purpose — these forms are out of scope', () => {
@@ -292,4 +304,153 @@ test('every doc in the IDE corpus declares itself IDE-side', () => {
     const text = fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
     assert.equal(embodimentOf(text), 'ide', `not an ide doc: ${rel}`);
   }
+});
+
+// ── The two scopes read their docs differently, on purpose (#238) ────────────
+//
+// The bundled scope counts the bundled BODY; the IDE scope counts WHOLE FILES.
+// That is not an inconsistency waiting to be tidied — it is the two routes a
+// doc takes to a model. A bundled doc arrives through `bundle-harness.mjs`,
+// which strips frontmatter, so a ban there is text the model is never told; an
+// IDE doc has no bundler, and a `SKILL.md`'s `description:` is the routing text
+// the model reads when it decides whether to load the skill.
+//
+// What follows pins BOTH halves, because a future edit could unify them in
+// either direction and both would look like a tidy-up: strip on the IDE side
+// and 2 real tokens vanish from the count while staying in the agent's context;
+// stop stripping on the bundled side and 2 phantom tokens come back.
+
+test('the bundled scope reads the bundled body; the IDE scope reads the whole file', () => {
+  // One fixture, both readers — the prohibition sits ONLY in the frontmatter,
+  // which is the only place the two can disagree.
+  const doc = '---\nsummary: never ship this unreviewed\nembodiment: all\n---\n\n# Doc\n\nShip it.\n';
+
+  assert.equal(countProhibitions(scopeBy('bundled').read(doc)), 0, 'the bundler deletes this text');
+  assert.equal(countProhibitions(scopeBy('ide').read(doc)), 1, 'nothing deletes it on the IDE side');
+});
+
+test('the readings agree wherever the prohibition is in the body', () => {
+  // The asymmetry is confined to frontmatter. If it ever reached the body the
+  // two scopes would have stopped measuring the same kind of thing entirely.
+  const doc = '---\nembodiment: all\n---\n\n# Doc\n\nYou must not ship it unreviewed.\n';
+  assert.equal(countProhibitions(scopeBy('bundled').read(doc)), 1);
+  assert.equal(countProhibitions(scopeBy('ide').read(doc)), 1);
+});
+
+test('each scope declares the reading it uses, and no two scopes share one', () => {
+  for (const scope of SCOPES) {
+    assert.equal(typeof scope.read, 'function', `${scope.key} declares no reading`);
+    assert.ok(scope.measuredOn, `${scope.key} does not say what it reads`);
+  }
+  assert.match(scopeBy('bundled').measuredOn, /frontmatter stripped/);
+  assert.match(scopeBy('ide').measuredOn, /frontmatter included/);
+  assert.notEqual(
+    scopeBy('bundled').measuredOn,
+    scopeBy('ide').measuredOn,
+    'a shared descriptor is the first sign the two paths were unified',
+  );
+});
+
+test('the baseline records each scope under the reading it was taken with', () => {
+  // Without this, a change of reading is invisible in the file the numbers are
+  // compared against, and 200 could mean either thing.
+  const base = JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
+  for (const scope of SCOPES) {
+    assert.equal(
+      base.scopes[scope.key].measuredOn,
+      scope.measuredOn,
+      `the ${scope.key} baseline was recorded under a different reading than the code now uses`,
+    );
+  }
+});
+
+test('a changed reading fails the run rather than quietly lowering the number', () => {
+  // THE DIRECTION IS THE POINT. Unifying the paths moves the bundled count
+  // 200 -> 200 and the IDE count 107 -> 105: both flat or falling, and a
+  // ratchet fails only on a RISE. So the reading is compared explicitly.
+  const msg = readingChangedReport({
+    scope: scopeBy('ide'),
+    was: 'the bundled body — frontmatter stripped',
+  });
+  assert.match(msg, /ide scope no longer reads what its baseline was recorded over/);
+  assert.match(msg, /frontmatter stripped/, 'must quote the reading the baseline used');
+  assert.match(msg, /frontmatter included/, 'and the one in force now');
+  assert.match(msg, /DOWNWARD/, 'must say why a ratchet cannot catch this on its own');
+  assert.match(msg, /--update/);
+});
+
+test('a baseline that records no reading at all is a failure, not a pass', () => {
+  const msg = readingChangedReport({ scope: scopeBy('bundled'), was: undefined });
+  assert.match(msg, /records no reading for this scope/);
+});
+
+test('the bundled numbers on record are body counts, and the IDE ones whole-file counts', () => {
+  // Driven over the REAL corpus rather than a fixture: the readings could agree
+  // on every string a test invents and still be wired to the wrong scope here.
+  const base = JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
+
+  for (const [rel, n] of Object.entries(base.scopes.bundled.counts)) {
+    const text = fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8').replace(/\r\n/g, '\n');
+    assert.equal(
+      n,
+      countProhibitions(splitFrontmatter(text).body),
+      `bundled count is not a body count: ${rel}`,
+    );
+  }
+  for (const [rel, n] of Object.entries(base.scopes.ide.counts)) {
+    const text = fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8').replace(/\r\n/g, '\n');
+    assert.equal(n, countProhibitions(text), `IDE count is not a whole-file count: ${rel}`);
+  }
+});
+
+test('at least one harness doc still separates the two readings', () => {
+  // If nothing in the harness carries a prohibition in frontmatter, the two
+  // assertions above pass with the paths unified and nobody notices. This goes
+  // red the day that is true — the day the fixtures are all that is left
+  // witnessing the asymmetry against real docs.
+  const base = JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
+  const files = [...Object.keys(base.scopes.bundled.counts), ...Object.keys(base.scopes.ide.counts)];
+  const split = files.filter((rel) => {
+    const text = fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8').replace(/\r\n/g, '\n');
+    return countProhibitions(text) !== countProhibitions(splitFrontmatter(text).body);
+  });
+  assert.ok(
+    split.length > 0,
+    'no harness doc carries a prohibition in frontmatter any more — the asymmetry is no ' +
+      'longer witnessed by the real corpus. Either re-argue it, or accept that the fixtures ' +
+      'are all that hold it.',
+  );
+});
+
+// ── One parser, not two ──────────────────────────────────────────────────────
+
+test("the frontmatter split is the bundler's own, imported rather than copied", () => {
+  // Where frontmatter ends decides the char budgets AND the bundled count. Two
+  // parsers that disagreed by one line would charge the prompt for chars it
+  // does not carry, or credit it with bans the model is never told — one rule,
+  // two homes, which is the defect this guard family exists to catch.
+  const bundler = fs.readFileSync(
+    path.join(REPO_ROOT, 'agents/uno-bot/scripts/bundle-harness.mjs'),
+    'utf8',
+  );
+  assert.match(
+    bundler,
+    /import \{ splitFrontmatter \} from "\.\.\/\.\.\/\.\.\/scripts\/lib\/frontmatter\.mjs"/,
+    'the bundler must import the shared split',
+  );
+  assert.doesNotMatch(
+    bundler,
+    /function splitFrontmatter/,
+    'a local copy in the bundler is a second parser that can disagree with the guards',
+  );
+});
+
+test('the shared split ends the block where the bundler always has', () => {
+  assert.deepEqual(splitFrontmatter('# No frontmatter\n'), { meta: {}, body: '# No frontmatter\n' });
+  // An unterminated block is content, not a guess at where it meant to close.
+  assert.deepEqual(splitFrontmatter('---\nsummary: x\n'), { meta: {}, body: '---\nsummary: x\n' });
+
+  const { meta, body } = splitFrontmatter('---\nsummary: x\nembodiment: ide\n---\n\n# Doc\n\nBody.\n');
+  assert.deepEqual(meta, { summary: 'x', embodiment: 'ide' });
+  assert.equal(body, '# Doc\n\nBody.\n', 'the blank lines after the fence belong to the fence');
 });
