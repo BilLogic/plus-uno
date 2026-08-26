@@ -304,7 +304,21 @@ function check() {
     for (const el of jsxClaims(page.text)) {
       if (el.markedIncorrect) continue;
       const target = components.get(el.tag);
-      if (!target || target.props.size === 0) continue;
+      // A component whose props we could not read accepts every claim about it,
+      // which is the shape of a check that cannot fail: the page asserting the
+      // most about the least-parseable component is the one least examined. Say
+      // so instead of skipping in silence.
+      if (target && target.props.size === 0 && el.attrs.length) {
+        record(
+          page,
+          el.line,
+          'unreadable',
+          el.tag,
+          'has claims made about it but no readable propTypes or signature, so none of them could be checked',
+        );
+        continue;
+      }
+      if (!target) continue;
       for (const attr of el.attrs) {
         if (isPassThrough(attr.name)) continue;
         if (!target.props.has(attr.name)) {

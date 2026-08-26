@@ -323,7 +323,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToP
     console.error(
       `[skill-overlap] ${skillScope.incomplete.length} skill(s) are not three-part:\n` +
         skillScope.incomplete.map((m) => `  ${m}`).join('\n') +
-        '\n  -> a skill is one method and two faces. skills/README.md § The three parts.',
+        '\n  -> a skill is one method and two faces. skills/README.md § Where content goes.',
     );
     process.exit(1);
   }
