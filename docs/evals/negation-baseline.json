@@ -1,4 +1,16 @@
 {
+  "metric": {
+    "counts": "prohibition tokens",
+    "tokens": [
+      "never",
+      "don't",
+      "do not",
+      "cannot",
+      "must not"
+    ],
+    "scope": "21 bundled docs, outside quoted speech and code spans",
+    "note": "NOT a count of negative statements — see scripts/check-negation-ratchet.mjs § What is counted."
+  },
   "total": 202,
   "counts": {
     "AGENTS.md": 6,

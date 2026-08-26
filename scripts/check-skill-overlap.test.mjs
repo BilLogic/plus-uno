@@ -21,6 +21,11 @@ import {
   auditBundle,
   findSharedAcross,
 } from './check-skill-overlap.mjs';
+import {
+  declaredMemberCount,
+  membershipMismatchReport,
+  unresolvedReport,
+} from './lib/bundled-set.mjs';
 
 const doc = (label, text) => ({ label, text });
 
@@ -170,4 +175,62 @@ test('the bundled set today has no substantive cross-document overlap', () => {
       .map((f) => `${f.a.label}:${f.a.line} == ${f.b.label}:${f.b.line}  ${f.text}`)
       .join('\n')}`,
   );
+});
+
+// ── The corpus is not allowed to narrow quietly (#234) ───────────────────────
+//
+// Every assertion above is over what `auditBundle` collected. A collection that
+// silently loses twenty of twenty-one docs makes all of them hold vacuously —
+// 0 findings across 0 pairings reads exactly like 0 findings across 210. These
+// cover both ways the set can shrink: a declared path that does not resolve,
+// and the marker parse itself coming back short.
+
+test('an unresolved doc is returned, not filtered away', () => {
+  const { declared, files, missing } = auditBundle([
+    'AGENTS.md',
+    'docs/this-doc-does-not-exist-and-never-did.md',
+  ]);
+  assert.equal(declared, 2, 'declared is what the bundler said, not what resolved');
+  assert.deepEqual(files, ['AGENTS.md'], 'only the resolvable doc is compared');
+  assert.deepEqual(missing, ['docs/this-doc-does-not-exist-and-never-did.md']);
+});
+
+test('the report for a short corpus names the shortfall and both numbers', () => {
+  const { declared, missing } = auditBundle(['AGENTS.md', 'docs/gone.md', 'docs/also-gone.md']);
+  const msg = unresolvedReport({ missing, declared, tag: 'skill-overlap' });
+  assert.match(msg, /2 of the 3 doc/, 'must state how many of how many');
+  assert.match(msg, /would have measured 1/, 'must state what it would otherwise have compared');
+  assert.match(msg, /docs\/gone\.md/, 'must name the docs that vanished');
+  assert.match(msg, /bundle:harness/, 'must point at the command that fixes it');
+});
+
+test('a marker parse that comes back short is a mismatch, not a pass', () => {
+  // The failure mode the ticket describes: `<!-- path -->` markers shift format,
+  // the parse yields only member 0, and the guard compares one doc against
+  // nothing and exits 0. The bundler's own `N files` is the second opinion.
+  const ok = '[bundle-harness] --check OK (164398 chars from 21 files; harness.ts + harness-bundle.md both current)';
+  assert.equal(declaredMemberCount(ok), 21);
+
+  const msg = membershipMismatchReport({ parsed: 1, declared: 21, tag: 'skill-overlap' });
+  assert.match(msg, /parsed\n?\s*1 doc/, 'must state what the parse found');
+  assert.match(msg, /it says it bundled 21/, 'must state what the bundler declares');
+  assert.match(msg, /bundled-set\.mjs/, 'must point at the parse, not at the corpus');
+});
+
+test('a bundler OK line with no file count is a mismatch too', () => {
+  assert.equal(declaredMemberCount('[bundle-harness] --check OK'), null);
+  assert.equal(declaredMemberCount(''), null);
+  const msg = membershipMismatchReport({ parsed: 21, declared: null, tag: 'skill-overlap' });
+  assert.match(msg, /no longer states a file count/);
+});
+
+test('a comma-grouped file count is still read as a number', () => {
+  // Cheap insurance: the bundler already comma-groups its char counts elsewhere.
+  assert.equal(declaredMemberCount('--check OK (1,234,567 chars from 1,021 files;'), 1021);
+});
+
+test('the real run compares every doc the bundler declares', () => {
+  const { declared, files, missing } = auditBundle();
+  assert.deepEqual(missing, [], 'every declared doc must resolve on disk');
+  assert.equal(files.length, declared, 'docs compared must equal docs declared');
 });

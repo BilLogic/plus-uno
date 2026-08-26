@@ -108,7 +108,7 @@ const COMPOSED = [
     script: 'check:skill-overlap',
     pkg: 'root',
     guards:
-      'one rule, one home — no substantive line living in two faces of the same skill, and none living in two bundled docs. Reads the bundled set from the bundler, so a stale bundle stops it.',
+      'one rule, one home — no substantive line living in two faces of the same skill, and none living in two bundled docs. Reads the bundled set from the bundler, so a stale bundle stops it — and since #234 a SHORT set stops it too, rather than comparing the survivors and printing the narrowed number as the corpus.',
   },
   {
     script: 'check:knowledge-disposition',
@@ -118,7 +118,8 @@ const COMPOSED = [
   {
     script: 'check:negation',
     pkg: 'root',
-    guards: 'the negation ratchet — prohibition density across the harness docs not climbing.',
+    guards:
+      'the negation ratchet — the density of five imperative-ban tokens (never / don\'t / do not / cannot / must not) across the bundled harness docs not climbing. It counts PROHIBITION TOKENS, not negation as written: the two differ by roughly 3x and #234 chose the narrow, unarguable one on the evidence. The script header carries the measurement.',
   },
   {
     script: 'check:token-collision',
