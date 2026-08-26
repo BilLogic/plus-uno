@@ -53,3 +53,13 @@ declares `parameters.changelog` in its story meta, entries start on 2026-08-26,
 nothing is backfilled, and if entries stop being written the decided next step is
 to generate them from git history scoped to the component folder rather than to
 add authoring ceremony.
+
+## The upgrade will not be silent
+
+`npm run check:deprecated-apis` (composed into `check:harness`, so it runs on every
+PR) fails the moment `package.json`'s `storybook` range can resolve to 11.x — the
+major that removes `types.TAB`. It names this file and the ticket carrying the
+port, in the PR that widens the range, before anything is installed.
+
+A note in a README is discovered twice: once when someone reads it, and once when
+the upgrade breaks. Only the second is loud. This makes the first one loud instead.
