@@ -59,8 +59,7 @@ const Pagination = ({
 
     const visiblePages = getVisiblePages();
 
-    const handlePageChange = (e, page) => {
-        e.preventDefault();
+    const handlePageChange = (page) => {
         if (onPageChange && page >= 1 && page <= totalPages) {
             onPageChange(page);
         }
@@ -74,15 +73,34 @@ const Pagination = ({
         className
     ].filter(Boolean).join(' ');
 
-    const renderPageItem = (page, isActive, isDisabled, content, isIconButton = false, accessibleLabel) => (
+    /**
+     * Every activation prevents the default, disabled included.
+     *
+     * `pointer-events: none` stops a mouse, but a keyboard Enter, a dispatched
+     * click and an assistive-technology activation all reach this handler — and
+     * one that returns without preventing the default follows `href="#"` and
+     * navigates the page. So the guard sits after `preventDefault`, not around it.
+     */
+    const handleLinkClick = (e, page, isDisabled) => {
+        e.preventDefault();
+        if (!isDisabled) {
+            handlePageChange(page);
+        }
+    };
+
+    // `key` is the item's identity; `page` is where it goes. Previous and Next
+    // target `currentPage -/+ 1`, the same number as a page item in the window,
+    // so keying by destination would give two children of the same `<ul>` the
+    // same key.
+    const renderPageItem = (key, page, isActive, isDisabled, content, isIconButton = false, accessibleLabel) => (
         <li 
             className={`page-item ${isActive ? 'active' : ''} ${isDisabled ? 'disabled' : ''} ${isIconButton ? 'page-item-icon' : ''}`} 
-            key={page}
+            key={key}
         >
             <a
                 className="page-link"
                 href="#"
-                onClick={(e) => !isDisabled && handlePageChange(e, page)}
+                onClick={(e) => handleLinkClick(e, page, isDisabled)}
                 aria-current={isActive ? 'page' : undefined}
                 aria-disabled={isDisabled ? 'true' : undefined}
                 aria-label={isIconButton ? accessibleLabel : undefined}
@@ -98,6 +116,7 @@ const Pagination = ({
             <ul className={containerClasses}>
                 {/* Previous Button */}
                 {renderPageItem(
+                    'prev',
                     currentPage - 1,
                     false,
                     currentPage === 1,
@@ -121,6 +140,7 @@ const Pagination = ({
                             )}
                             {/* Render the page */}
                             {renderPageItem(
+                                `page-${pageNum}`,
                                 pageNum,
                                 pageNum === currentPage,
                                 false,
@@ -132,6 +152,7 @@ const Pagination = ({
 
                 {/* Next Button */}
                 {renderPageItem(
+                    'next',
                     currentPage + 1,
                     false,
                     currentPage === totalPages,
