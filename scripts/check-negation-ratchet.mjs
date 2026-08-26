@@ -16,6 +16,32 @@
  * which is the load this is about. IDE-side docs load on demand and are not
  * counted.
  *
+ * WHETHER THAT SHOULD CHANGE, re-argued 2026-08-26 (#174). The original reason
+ * to stop at the bundle was cost: an IDE doc is paid for only when loaded, so a
+ * ratchet over it buys less. That reason is now weak — `check:harness` runs on
+ * every PR, so an IDE-side ratchet costs a contributor nothing at authoring
+ * time. Two BETTER reasons took its place, and both are about what a ratchet
+ * can measure rather than what it is worth measuring:
+ *
+ *   - `docs/adr/` is append-only. An ADR is what a hard-to-reverse call leaves
+ *     behind (`AGENTS.md` § Knowledge), and a new one that records "X is not
+ *     reversible" ADDS prohibitions by doing its job. A ratchet over an
+ *     append-only corpus goes up by construction, and a ratchet re-baselined on
+ *     every append is a counter with extra steps. 25 ADRs carry 26 today.
+ *   - The six `.claude/skills/<name>/SKILL.md` are generated from their sources
+ *     (`scripts/generate-uno-skill-surfaces.mjs`), so their 14 prohibitions are
+ *     copies of ones already counted. Counting both double-counts, and the fix
+ *     would land in a file whose header says not to edit it.
+ *
+ * So the recommendation is YES, but narrowed: the 48 hand-authored IDE docs —
+ * the six `SKILL.md` faces, `skills/<name>/references/`, `docs/conventions/`,
+ * `docs/engineering/` — carrying 108 prohibitions, with `docs/adr/` and every
+ * generated surface excluded by rule rather than by list. Shape it as this
+ * script with a second scope and a second total in the same baseline file, the
+ * way `check:skill-overlap` grew its bundle scope in #174 — one guard, two
+ * corpora, so the two can never disagree about the corpus they share. Not built
+ * here: #174 shipped the overlap extension and left this measured, not coded.
+ *
  * Usage:
  *   node scripts/check-negation-ratchet.mjs           report, fail if the count rose
  *   node scripts/check-negation-ratchet.mjs --update  record the current count as the new baseline
@@ -24,7 +50,8 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { spawnSync } from 'child_process';
+
+import { bundlerFailureReport, bundledFiles as readBundledFiles } from './lib/bundled-set.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -39,95 +66,16 @@ const UPDATE = process.argv.includes('--update');
 const PROHIBITION = /\b(never|don't|do not|cannot|must not)\b/gi;
 const stripQuoted = (text) => text.replace(/"[^"\n]*"/g, '""').replace(/`[^`\n]*`/g, '``');
 
-const BUNDLER = path.join(REPO_ROOT, 'agents/uno-bot/scripts/bundle-harness.mjs');
-const REBUNDLE = 'npm --prefix agents/uno-bot run bundle:harness';
-
 /**
- * What the reader is owed when the bundler exits non-zero.
+ * The bundled set, and what to say when it cannot be read, both live in
+ * `scripts/lib/bundled-set.mjs` — `check:skill-overlap` asks the same question
+ * (#174) and one copy of the answer is the whole point of that guard.
  *
- * This check cannot see the bundled set without the bundler, so a stale bundle
- * stops it before a single prohibition is counted. That is not a ratchet
- * failure, and it used to read as one: the child's non-zero exit escaped as an
- * `execFileSync` throw, so `check:harness` printed `✗ check:negation` over a
- * Node stack trace while the bundler's own diagnostic — which artifact is
- * behind, by how many chars — went to `stdio: ignore` and was never seen
- * (#204). `scripts/generate-agent.js` fixed the same shape in #191; this is
- * that pattern, with the child's stderr relayed because this check silences it
- * on the happy path.
- *
- * Pure so the message can be asserted without a stale bundle to hand — see
- * `check-negation-ratchet.test.mjs`.
- *
- * @param {{status: number|null, signal?: string|null, stderr?: string}} child
- * @returns {string} the whole report, ready for stderr.
+ * Re-exported so this module stays the import site its own tests already use.
  */
-export function bundlerFailureReport({ status, signal, stderr }) {
-  const said = (stderr ?? '').trimEnd();
-  // `--check` exits non-zero for a STALE artifact, a blown char budget, or a doc
-  // with no `embodiment:` — so the headline names the cause it usually is and
-  // then gets out of the way. The bundler's own line below says which.
-  const how = signal ? `was killed by ${signal}` : `exited ${status ?? 1}`;
-  return (
-    `[negation] the harness bundler failed, so this check could not read the bundled set\n` +
-    `  — usually a STALE bundle. Its own diagnostic:\n\n` +
-    (said || `  (the bundler ${how} without printing anything)`) +
-    `\n\n  -> Nothing is wrong with the prohibition count: the bundler ${how}, so the list of\n` +
-    `     bundled docs was never available and not one doc was counted. If the bundle is\n` +
-    `     stale, regenerate it, commit it, and re-run this check:\n` +
-    `       ${REBUNDLE}`
-  );
-}
+export { bundlerFailureReport };
 
-/**
- * The bundled set, read from the bundler rather than restated here.
- *
- * `spawnSync` rather than `execFileSync`: the failure path is a report, not an
- * exception, and the child's stderr is the substance of it.
- */
-function bundledFiles() {
-  const child = spawnSync('node', [BUNDLER, '--check'], {
-    cwd: path.join(REPO_ROOT, 'agents/uno-bot'),
-    encoding: 'utf8',
-    // the bundler's own warnings are its business on the happy path — but its
-    // stderr is captured rather than discarded, because on failure it is the
-    // only thing worth printing.
-    stdio: ['ignore', 'pipe', 'pipe'],
-  });
-
-  if (child.error) {
-    // Its own branch, because a bundler that could not START says nothing about
-    // whether the bundle is stale, and borrowing the staleness wording here
-    // would trade one misleading diagnostic for another.
-    console.error(
-      `[negation] could not run the harness bundler, so this check could not read the\n` +
-        `  bundled set: ${child.error.message}\n` +
-        `  -> ${BUNDLER}`,
-    );
-    process.exit(1);
-  }
-  if (child.status !== 0) {
-    console.error(bundlerFailureReport(child));
-    // The child's own code, as in #191 — this layer adds a diagnosis, not a
-    // verdict of its own.
-    process.exit(typeof child.status === 'number' ? child.status : 1);
-  }
-  if (!/--check OK/.test(child.stdout ?? '')) {
-    // Belt and braces, kept from the throw this replaced: a zero exit with no OK
-    // line means the bundler changed under us, and counting against a set it did
-    // not confirm is worse than stopping.
-    console.error(
-      `[negation] the harness bundler exited 0 without confirming the bundle, so this check\n` +
-        `  is counting against a set it cannot vouch for. Run it directly to see why:\n` +
-        `    ${REBUNDLE} -- --check`,
-    );
-    process.exit(1);
-  }
-
-  const ts = fs.readFileSync(path.join(REPO_ROOT, 'agents/uno-bot/src/generated/harness.ts'), 'utf8');
-  const assembled = JSON.parse(ts.slice(ts.indexOf('= ') + 2, ts.lastIndexOf(';')));
-  // AGENTS.md is member 0 and carries no path comment of its own.
-  return ['AGENTS.md', ...[...assembled.matchAll(/<!-- ([\w/.-]+\.md) -->/g)].map((m) => m[1])];
-}
+const bundledFiles = () => readBundledFiles({ tag: 'negation', notThis: 'the prohibition count' });
 
 /**
  * The check itself.

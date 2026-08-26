@@ -66,14 +66,24 @@ lives.
 
 ## What the guard measures
 
-`npm run check:skill-overlap` compares all three pairings per skill — method
-against each face, and the two faces against each other — and fails on a
-substantive line living in two of them. Structure is discounted first:
-headings, `---`, code fences, table rules, and lines under five words, which is
-every line the six skills coincide on today. What survives that filter is prose
-somebody wrote twice, and the ceiling on it is zero. The measurement, the
-threshold and the reasoning behind both are in
-`scripts/check-skill-overlap.mjs`.
+`npm run check:skill-overlap` measures two scopes and fails on a substantive
+line living in two files in either.
+
+**Within a skill** it compares all three pairings — method against each face,
+and the two faces against each other.
+
+**Across the bundle** it compares every bundled doc against every other: the
+constitution, the persona, the connector docs and the twelve bundled skill
+files, 210 pairs in all. A rule stated in two of those is paid for twice on
+every uno-bot turn. Membership comes from the bundler itself, so a stale bundle
+stops the check rather than being measured around.
+
+Structure is discounted first: headings, `---`, code fences, table rules, HTML
+comments, and lines under five words, which is every line these docs coincide
+on today. What survives that filter is prose somebody wrote twice, and the
+ceiling on it is zero. Citing another doc is not writing it twice — a pointer
+shares no line with the rule it points at. The measurement, the threshold and
+the reasoning behind both are in `scripts/check-skill-overlap.mjs`.
 
 ## Discovery surfaces are generated
 

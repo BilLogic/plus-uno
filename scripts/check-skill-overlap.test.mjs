@@ -18,6 +18,8 @@ import {
   classify,
   findSharedLines,
   auditSkills,
+  auditBundle,
+  findSharedAcross,
 } from './check-skill-overlap.mjs';
 
 const doc = (label, text) => ({ label, text });
@@ -98,5 +100,74 @@ test('all six shipped skills pass at the chosen threshold', () => {
   assert.ok(
     findings.length <= MAX_SHARED_LINES,
     `expected no substantive overlap, got:\n${findings.map((f) => `${f.a.label}:${f.a.line} == ${f.b.label}:${f.b.line}  ${f.text}`).join('\n')}`,
+  );
+});
+
+// ── The bundled set (#174) ───────────────────────────────────────────────────
+//
+// The same invariant, one scope out: a rule that lives in the persona and again
+// in the constitution is the same defect as one living in a method and again in
+// a face, and until this landed nothing compared two bundled docs to each other.
+
+test('a multi-line HTML comment is discounted whole, not just its opening line', () => {
+  // The 2026-08-26 measurement's only cross-document hit: four method.md files
+  // open with the same two-line authoring banner. Line 1 was discounted as a
+  // comment and line 2 was not, which is a classifier artefact, not drift.
+  const banner =
+    '<!-- Runtime-neutral core — loaded by BOTH faces (SKILL.md in the IDE, bot.md in the Worker).\n' +
+    '     No IDE tool names, no Slack formatting here; execution specifics live in the faces. -->';
+  const found = findSharedLines(
+    doc('skills/a/references/method.md', `---\nembodiment: all\n---\n\n${banner}\n\nA procedure step that only skill A performs.`),
+    doc('skills/b/references/method.md', `---\nembodiment: all\n---\n\n${banner}\n\nA procedure step that only skill B performs.`),
+  );
+  assert.deepEqual(found, []);
+});
+
+test('discounting a comment does not discount the prose beside it', () => {
+  const rule = 'Ground every current-state product claim in the blueprint and cite the cell.';
+  const found = findSharedLines(
+    doc('AGENTS.md', `<!-- an authoring note\n     spanning two lines -->\n${rule}`),
+    doc('agents/uno-bot/AGENT.md', `<!-- an authoring note\n     spanning two lines -->\n${rule}`),
+  );
+  assert.equal(found.length, 1, 'the comment is discounted; the rule beside it is not');
+  assert.equal(found[0].a.label, 'AGENTS.md');
+  assert.equal(found[0].b.label, 'agents/uno-bot/AGENT.md');
+  assert.equal(found[0].a.line, 3, 'blanking a comment must not shift the line numbers reported');
+});
+
+test('every document pairs with every other, and a copy is named on both sides', () => {
+  const rule = 'A rule states itself once, and every other mention of it is a citation.';
+  const { findings, pairings } = findSharedAcross([
+    doc('AGENTS.md', `# constitution\n\n${rule}\n`),
+    doc('CONTEXT.md', '# context\n\nNothing in common with either neighbouring document.\n'),
+    doc('docs/connectors/slack.md', `# slack\n\nSome delta.\n\n${rule}\n`),
+  ]);
+  assert.equal(pairings, 3, 'three documents make three pairs');
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].a.label, 'AGENTS.md');
+  assert.equal(findings[0].b.label, 'docs/connectors/slack.md');
+  assert.equal(findings[0].b.line, 5);
+});
+
+test('a citation is not a duplication', () => {
+  // Bundled docs cite each other by design. A pointer is a different sentence
+  // from the rule it points at, which is why verbatim matching can tell the two
+  // apart without a similarity number to argue about.
+  const found = findSharedLines(
+    doc('AGENTS.md', 'Every deliverable carries the evidence it was judged against, in the same message.'),
+    doc('skills/uno-review/bot.md', 'Evidence travels with the deliverable — `AGENTS.md` § The loading contract.'),
+  );
+  assert.deepEqual(found, []);
+});
+
+test('the bundled set today has no substantive cross-document overlap', () => {
+  const { files, findings, pairings } = auditBundle();
+  assert.ok(files.length >= 20, `expected the whole bundled set, got ${files.length} docs`);
+  assert.equal(pairings, (files.length * (files.length - 1)) / 2, 'every pair is compared');
+  assert.ok(
+    findings.length <= MAX_SHARED_LINES,
+    `expected no cross-document overlap, got:\n${findings
+      .map((f) => `${f.a.label}:${f.a.line} == ${f.b.label}:${f.b.line}  ${f.text}`)
+      .join('\n')}`,
   );
 });
