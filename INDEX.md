@@ -60,6 +60,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`agents/reviewers/rubric-applier.md`](agents/reviewers/rubric-applier.md) | The one agent that turns 'is this good?' into numbers: given an artifact + a rubric name, scores every dimension 1–5, checks every hard gate pass/fail, and appends the run entry |
 | [`agents/reviewers/uno-lens.md`](agents/reviewers/uno-lens.md) | Judges whether the artifact does what the PRD says and violates no known blueprint constraint (target: docs/evals/rubrics/uno-review.md → groundingfidelity) |
 | [`agents/uno-bot/AGENT.md`](agents/uno-bot/AGENT.md) | The Worker persona delta — how uno-bot differs from the constitution. |
+| [`agents/uno-bot/harness-bundle.md`](agents/uno-bot/harness-bundle.md) | Generated readable companion to the baked Worker prompt — the load-order manifest plus the assembled harness as markdown. |
 | [`agents/uno-bot/migrations/README.md`](agents/uno-bot/migrations/README.md) | The bot's semantic-retrieval schema — semanticsearch (corpuschunks, blueprintchunkssrc, matchcorpuschunks) — used to be authored here as 0001..0004 and hand-applied to the hosted p |
 | [`agents/uno-bot/README.md`](agents/uno-bot/README.md) | A Cloudflare Worker that puts uno (the PLUS design agent) in Slack as @uno-bot: it receives Slack events, runs an agentic tool-use loop, answers grounded questions across Notion / |
 | [`agents/writers/blueprint.md`](agents/writers/blueprint.md) | The only agent that touches uno-blueprint (Supabase, the product source of truth) |
@@ -193,6 +194,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-122 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+123 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 raw eval data are deliberately not indexed — they record what happened rather
 than telling you what to do.
