@@ -41,6 +41,32 @@ async function expectUnreachable(element) {
     await expect(getComputedStyle(element).pointerEvents).toBe('none');
 }
 
+/**
+ * What happens when a click reaches a disabled control anyway (#223).
+ *
+ * `expectUnreachable` says the pointer cannot get there. This says the control
+ * refuses the click that arrives by every other route — because `pointer-events`
+ * is a mouse-only shield, and a keyboard Enter, an assistive-technology
+ * activation and a dispatched event all land on the handler regardless.
+ *
+ * The assertion is `defaultPrevented` rather than "nothing visibly happened",
+ * because for `Pagination` the anchor keeps its `href="#"` while disabled: a
+ * handler that returns early without calling `preventDefault` lets the browser
+ * follow the href, and the page navigates out from under the run. That is the
+ * defect #223 fixed and the reason #221 could only assert unreachability here.
+ * The URL is checked as well, since it is the damage rather than the cause.
+ */
+async function expectRefusesDispatchedClick(element) {
+    const doc = element.ownerDocument;
+    const before = doc.location.href;
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true, view: doc.defaultView });
+
+    element.dispatchEvent(click);
+
+    await expect(click.defaultPrevented).toBe(true);
+    await expect(doc.location.href).toBe(before);
+}
+
 export default {
     title: 'Components/Navigation/Page and tab selection',
     tags: ['!dev', '!autodocs'],
@@ -156,12 +182,14 @@ PageSelection.play = async ({ canvasElement }) => {
     const log = canvas.getByTestId('page-log');
 
     // On page 1 there is nowhere back to go, so Previous is unreachable rather
-    // than merely styled grey. Unlike the disabled tab above it is not clicked
-    // past the shield: this anchor keeps its `href="#"` when disabled, so a
-    // dispatched click follows it and navigates the page out from under the run.
+    // than merely styled grey — and, since #223, it also refuses a click
+    // dispatched straight past the CSS shield instead of following its own
+    // `href="#"`. Reporting nothing is only half of it: the page has to still
+    // be here to report it.
     const previous = canvas.getByRole('link', { name: 'Previous' });
     await expectUnreachable(previous);
     await expect(previous).toHaveAttribute('tabindex', '-1');
+    await expectRefusesDispatchedClick(previous);
     await expect(log.textContent).toBe('');
 
     // A page number reports itself, and becomes the current page.
@@ -185,4 +213,25 @@ PageSelection.play = async ({ canvasElement }) => {
     const next = canvas.getByRole('link', { name: 'Next' });
     await expectUnreachable(next);
     await expect(next).toHaveAttribute('tabindex', '-1');
+    await expectRefusesDispatchedClick(next);
+    await expect(log).toHaveTextContent(/^3,4,3,20$/);
+
+    // And an enabled control still navigates nothing — `preventDefault` moved in
+    // front of the disabled guard in #223, so it now runs on every activation,
+    // and a page click that stopped preventing the default would leave the whole
+    // suite on a different URL.
+    await expectRefusesDispatchedClick(canvas.getByRole('link', { name: '19' }));
+    await expect(log).toHaveTextContent(/^3,4,3,20,19$/);
+
+    // Previous and Next are keyed by their role, not by the page they point at
+    // (#223): on page 19 of 20, `currentPage + 1` is 20 and `currentPage - 1` is
+    // 18, and both numbers are also page items in the same `<ul>`. React does not
+    // warn about that pair — it namespaces the mapped array's keys under the
+    // array's own slot, so the two never meet in one reconciliation set — which
+    // is exactly why the collision needs an assertion rather than a console. The
+    // consequence a caller would see is a current marker on the wrong node, and
+    // `aria-current` is what a screen reader reads, so exactly one link holds it.
+    const current = canvasElement.querySelectorAll('[aria-current="page"]');
+    await expect(current.length).toBe(1);
+    await expect(current[0]).toHaveTextContent('19');
 };
