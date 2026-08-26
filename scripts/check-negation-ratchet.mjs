@@ -12,6 +12,50 @@
  * that the count go down. Same pattern as the a11y baseline (#152): a corpus
  * too large to fix at once still gets a binding direction.
  *
+ * ── WHAT IS COUNTED, AND WHAT IS NOT (#234, decided 2026-08-26) ──────────────
+ *
+ * This counts PROHIBITION TOKENS — five imperative bans — and it is named that
+ * everywhere it reports, because it is not a count of negation as written and
+ * the difference is a factor of three. `AGENT.md` scores 6 here; a regex broad
+ * enough to catch negation as written finds 111 MORE constructions in the same
+ * file ("no throat-clearing", "zero jokes, zero playful emoji", "aren't
+ * confirmations", "stage nothing"). Across the bundled set the gap is 202 here
+ * against 512 more — the number moves on roughly a third of the property its
+ * old name implied. Since 6 is now this file's floor, saying so in the output
+ * is the difference between a modest measurement and a misleading one.
+ *
+ * THE OPTION NOT TAKEN was to broaden the regex and re-baseline once at the
+ * honest number. It was measured before it was rejected, and the measurement is
+ * the reason:
+ *
+ *   - 187 of the 512 additions are a bare `not`, and 113 of those sit in the
+ *     contrastive appositive — "cards live on the board, not in doc search",
+ *     "state signals are protocol, not personality". That construction STATES A
+ *     TARGET and names the near miss beside it. It is the idiom #229's rewrite
+ *     produced when it turned 51 bans into targets. Broadening counts it, so
+ *     the ratchet would penalise the writing it exists to encourage, and the
+ *     cheapest way to clear it would be to delete the disambiguation.
+ *   - 166 are `no <noun>`, mostly conditional antecedents and plain facts
+ *     rather than bans: "no clear match → offer the closest candidates", "the
+ *     blueprint holds no cards and no statuses", "no PLUS equivalent exists".
+ *     Hand-classified across AGENT.md's 111 additions: ~20 genuine bans, ~37
+ *     contrastive, ~54 descriptive or conditional. Under one in five is a
+ *     prohibition.
+ *   - the tail splits the same way — `without` 18, `rather than`/`instead of`
+ *     25, `unless`/`except`/`nothing`/`nor` 56, `forbidden`/`skip` 13,
+ *     `zero <noun>` 8, `avoid` 1.
+ *
+ * So broadening buys a larger number with a worse signal, and every bucket
+ * above is an edge case someone gets to argue about at the moment the gate
+ * blocks them — which is how a gate gets switched off. `check:skill-overlap`
+ * refused a similarity threshold on the same grounds. Five unambiguous tokens
+ * make a ratchet nobody has to litigate: every match is an imperative ban.
+ *
+ * WHAT THE NARROW METRIC DOES NOT SEE is real and stays visible — it is in the
+ * paragraph above, and it is a matter for review rather than for regex. A rule
+ * phrased "no throat-clearing" is still a prohibition; this guard just does not
+ * pretend to have counted it.
+ *
  * Scope is the bundled set only — those docs cost context on every single turn,
  * which is the load this is about. IDE-side docs load on demand and are not
  * counted.
@@ -51,20 +95,43 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { bundlerFailureReport, bundledFiles as readBundledFiles } from './lib/bundled-set.mjs';
+import {
+  bundlerFailureReport,
+  bundledFiles as readBundledFiles,
+  resolveBundled,
+  unresolvedReport,
+} from './lib/bundled-set.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const BASELINE = path.join(REPO_ROOT, 'docs/evals/negation-baseline.json');
+export const BASELINE = path.join(REPO_ROOT, 'docs/evals/negation-baseline.json');
 const UPDATE = process.argv.includes('--update');
 
 /**
- * A prohibition is an imperative ban. Quoted speech is exempt: `Say "I don't
- * know"` is an instruction TO do something, and counting it would push authors
- * toward removing the honesty rule to satisfy the guard.
+ * The five tokens, in one place, so the regex and the label the report prints
+ * cannot drift apart. Deliberately narrow — see the header.
  */
-const PROHIBITION = /\b(never|don't|do not|cannot|must not)\b/gi;
+export const PROHIBITION_TOKENS = ['never', "don't", 'do not', 'cannot', 'must not'];
+
+/** What the number is called wherever it is written down or printed. */
+export const METRIC = 'prohibition tokens';
+
+/**
+ * A prohibition token is an imperative ban. Quoted speech is exempt: `Say "I
+ * don't know"` is an instruction TO do something, and counting it would push
+ * authors toward removing the honesty rule to satisfy the guard.
+ */
+const PROHIBITION = new RegExp(`\\b(${PROHIBITION_TOKENS.join('|')})\\b`, 'gi');
 const stripQuoted = (text) => text.replace(/"[^"\n]*"/g, '""').replace(/`[^`\n]*`/g, '``');
+
+/**
+ * One doc's score. Exported so the tests assert the REAL counter rather than a
+ * re-implementation of it — including what it deliberately does not see (#234).
+ *
+ * @param {string} text
+ * @returns {number}
+ */
+export const countProhibitions = (text) => (stripQuoted(text).match(PROHIBITION) || []).length;
 
 /**
  * The bundled set, and what to say when it cannot be read, both live in
@@ -75,7 +142,7 @@ const stripQuoted = (text) => text.replace(/"[^"\n]*"/g, '""').replace(/`[^`\n]*
  */
 export { bundlerFailureReport };
 
-const bundledFiles = () => readBundledFiles({ tag: 'negation', notThis: 'the prohibition count' });
+const bundledFiles = () => readBundledFiles({ tag: 'negation', notThis: 'the prohibition-token count' });
 
 /**
  * The check itself.
@@ -86,19 +153,35 @@ const bundledFiles = () => readBundledFiles({ tag: 'negation', notThis: 'the pro
  * `check-storybook.mjs`.
  */
 function main() {
+  // `resolveBundled` RETURNS what did not resolve instead of filtering it out —
+  // the `if (!fs.existsSync(abs)) continue;` this replaces dropped a doc from
+  // the corpus in silence, and a ratchet only fails when the count RISES, so a
+  // corpus that halves clears it every time (#234).
+  const { declared, docs, missing } = resolveBundled(bundledFiles());
+  if (missing.length) {
+    console.error(unresolvedReport({ missing, declared, tag: 'negation' }));
+    process.exit(1);
+  }
+
   const counts = {};
   let total = 0;
-  for (const rel of bundledFiles()) {
-    const abs = path.join(REPO_ROOT, rel);
-    if (!fs.existsSync(abs)) continue;
-    const n = (stripQuoted(fs.readFileSync(abs, 'utf8')).match(PROHIBITION) || []).length;
-    if (n) counts[rel] = n;
+  for (const { label, text } of docs) {
+    const n = countProhibitions(text);
+    if (n) counts[label] = n;
     total += n;
   }
 
   if (UPDATE) {
-    fs.writeFileSync(BASELINE, `${JSON.stringify({ total, counts }, null, 2)}\n`);
-    console.log(`[negation] baseline recorded: ${total} prohibitions across ${Object.keys(counts).length} bundled docs`);
+    // The metric descriptor rides in the file so the number is never read
+    // without its definition beside it (#234).
+    const metric = {
+      counts: METRIC,
+      tokens: PROHIBITION_TOKENS,
+      scope: `${docs.length} bundled docs, outside quoted speech and code spans`,
+      note: 'NOT a count of negative statements — see scripts/check-negation-ratchet.mjs § What is counted.',
+    };
+    fs.writeFileSync(BASELINE, `${JSON.stringify({ metric, total, counts }, null, 2)}\n`);
+    console.log(`[negation] baseline recorded: ${total} ${METRIC} across ${Object.keys(counts).length} bundled docs`);
     process.exit(0);
   }
 
@@ -115,7 +198,7 @@ function main() {
       .filter(([f, n]) => n > (base.counts[f] ?? 0))
       .map(([f, n]) => `  ${f}: ${base.counts[f] ?? 0} -> ${n}`);
     console.error(
-      `[negation] prohibitions in the bundled harness rose ${base.total} -> ${total}.\n` +
+      `[negation] ${METRIC} in the bundled harness rose ${base.total} -> ${total}.\n` +
         risen.join('\n') +
         '\n  -> state the target behaviour instead of banning its opposite. A ban that is a real\n' +
         '     guardrail keeps its place, but pair it with the positive so attention lands on\n' +
@@ -124,10 +207,17 @@ function main() {
     process.exit(1);
   }
 
+  // Both numbers, always: `N ... across M of M docs` is the only shape in which
+  // a narrowed corpus is visible to whoever reads the pass line (#234). And the
+  // tokens are named because a bare "prohibitions" was read as a claim about
+  // negation in general, which this has never measured.
   console.log(
-    `[negation] ${total} prohibitions in the bundled harness (baseline ${base.total})` +
+    `[negation] ${total} ${METRIC} (${PROHIBITION_TOKENS.join(' / ')}) across ` +
+      `${docs.length} of ${declared} bundled docs (baseline ${base.total})` +
       (total < base.total ? ` — down ${base.total - total}, re-baseline with --update` : '') +
-      `\n  heaviest: ${worst.map(([f, n]) => `${f} (${n})`).join(' · ')}`,
+      `\n  heaviest: ${worst.map(([f, n]) => `${f} (${n})`).join(' · ')}` +
+      '\n  (imperative bans only — negation in other forms is not counted here;' +
+      ' see this script\'s header.)',
   );
 }
 

@@ -28,6 +28,17 @@
  * that a stale bundle stops this check before it counts anything; the shared
  * module says so in those words rather than reporting it as an overlap.
  *
+ * AND A SHORT SET STOPS IT TOO (#234). Asking the bundler still leaves the
+ * answer to be READ BACK, by matching `<!-- path -->` markers in the artifact,
+ * and this used to end in `.filter(fs.existsSync)` — every unresolved doc
+ * dropped with no error, no warning and no count assertion. Break the marker
+ * format and the parse yields one member; 210 pairings become 0; `0 substantive
+ * shared line(s)` prints and the check exits 0 having compared nothing. Both
+ * halves are now loud: the shared module cross-checks the parse against the
+ * bundler's own member count, and the shortfall from disk comes back as
+ * `missing` for the report below. The summary says `N of M docs the bundler
+ * declares` for the same reason — one number cannot show a narrowing, two can.
+ *
  * NOTE THE SCOPES OVERLAP BUT DO NOT NEST. `SKILL.md` is IDE-side and never
  * bundled, so scope one is the only thing that reads it; `AGENTS.md`,
  * `CONTEXT.md`, `AGENT.md` and the connector docs are bundled and belong to no
@@ -86,7 +97,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { bundledFiles } from './lib/bundled-set.mjs';
+import { bundledFiles, resolveBundled, unresolvedReport } from './lib/bundled-set.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -238,13 +249,18 @@ export function findSharedAcross(docs) {
  * `files` defaults to whatever the bundler says is bundled — passing a list is
  * for tests, never for narrowing the real run.
  *
+ * `missing` is returned, not filtered away. The line this replaced was
+ * `.filter((f) => fs.existsSync(...))`, which dropped any doc whose path stopped
+ * resolving with no error, no warning and no count assertion — and the summary
+ * then printed the survivors as though they were the corpus (#234). The
+ * narrowing is now the caller's to report, and `declared` travels beside
+ * `files` so a reader of the output can see the two numbers agree.
+ *
  * @param {string[]} [files] repo-relative paths, in load order.
  */
 export function auditBundle(files = bundledFiles({ tag: 'skill-overlap', notThis: 'the overlap count' })) {
-  const docs = files
-    .filter((f) => fs.existsSync(path.join(REPO_ROOT, f)))
-    .map((f) => ({ label: f, text: fs.readFileSync(path.join(REPO_ROOT, f), 'utf8') }));
-  return { files: docs.map((d) => d.label), ...findSharedAcross(docs) };
+  const { declared, docs, missing } = resolveBundled(files);
+  return { declared, missing, files: docs.map((d) => d.label), ...findSharedAcross(docs) };
 }
 
 const FACES = {
@@ -335,6 +351,14 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToP
   const bundleScope = auditBundle();
   const failed = [];
 
+  // A short corpus is reported BEFORE any finding, because it changes what the
+  // findings mean: zero overlaps across three docs is not the same claim as
+  // zero across twenty-one, and until #234 the summary printed the same
+  // sentence for both.
+  if (bundleScope.missing.length) {
+    failed.push(unresolvedReport({ ...bundleScope, tag: 'skill-overlap' }));
+  }
+
   if (skillScope.findings.length > MAX_SHARED_LINES) {
     failed.push(
       `[skill-overlap] ${skillScope.findings.length} substantive line(s) live in two faces of one skill:\n\n` +
@@ -370,7 +394,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToP
       `line(s) against a ceiling of ${MAX_SHARED_LINES}\n` +
       `  within skills: ${skillScope.skills.length} skills, ${skillScope.pairings} pairings ` +
       `(${skillDiscounted} structural lines discounted)\n` +
-      `  across the bundle: ${bundleScope.files.length} docs, ${bundleScope.pairings} pairings ` +
+      `  across the bundle: ${bundleScope.files.length} of ${bundleScope.declared} docs the bundler ` +
+      `declares, ${bundleScope.pairings} pairings ` +
       `(${bundleScope.discounted} structural lines discounted)`,
   );
   if (process.argv.includes('--verbose')) {
