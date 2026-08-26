@@ -39,7 +39,25 @@ Every docs page uses the same skeleton:
 Markdown pipe-tables do not parse in this MDX setup — use styled `<table>` JSX.
 The shared pattern is in `design-system/src/styles/Spacing.stories.jsx`.
 
+## The four tabs
+
+A component page has four faces above the canvas — **Examples · Code · Usage ·
+Changelog** — as real Storybook tabs, not sidebar entries. Four entries per
+component would fragment the sidebar, which is the one place the tree above is
+spoken out loud.
+
+**The tabs are a human affordance and change nothing for an agent.** The
+agent-facing file stays one flat generated `index.md` per component. An agent
+that had to open four files to answer one question would be paying for a
+navigation aid it cannot see.
+
+`Examples` is Storybook's canvas tab, renamed. The other three are registered by
+the local manager addon in `.storybook/addons/component-tabs/`, whose README
+states the mechanism, the Storybook 11 deprecation it rides on, and what
+replaces it.
+
 ## Related
 
 - `overview.md` — where design knowledge lives
+- `components/changelog.md` — what a component records about itself, and when it does not
 - `docs/connectors/storybook-mcp.md` — reading the docs tree through the MCP endpoint
