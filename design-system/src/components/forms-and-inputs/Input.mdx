@@ -166,10 +166,12 @@ a matching icon.
   component needs to point at the input — an `aria-describedby`, a `<label>` you
   render yourself, a test selector — and you will get exactly the id you passed.
   `name` is a form key, not an id, and no longer stands in for one (#206).
-- **`showLabel={false}` removes the label, it does not hide it visually.** The
-  label element is not rendered at all, so the field has only a placeholder.
-  Placeholders are not labels; pass `aria-label` when you turn the visible label
-  off.
+- **`showLabel={false}` hides the label, it does not remove it.** The label is
+  rendered either way and always carries `htmlFor`; `showLabel={false}` only
+  clips it out of sight with `.plus-input-label-hidden`. So a field that has a
+  `label` has an accessible name whether or not you show it, and turning the
+  label off costs nothing but the pixels. This was the other way round until
+  #213 — see *Why `showLabel` cannot take the name away* below.
 - **`required` is visual only.** It renders a `*` span marked
   `aria-label="required"` and is not forwarded to the input.
 - **`validation` is visual only.** It adds `plus-input-invalid` or
@@ -177,10 +179,55 @@ a matching icon.
   sets no `aria-invalid`, and does not link `validationMessage` to the input.
   Pass `aria-invalid` and `aria-describedby` yourself — they are spread onto the
   input.
+- **A field with no `label` still has no name.** `showLabel` decides whether the
+  label is *seen*, not whether there is one. If the visible label is rendered by
+  the caller instead — a `<Label>` above the field, a table column header — point
+  it at the input with `htmlFor`; if there is no text anywhere, pass `aria-label`.
 - **Everything else passes through.** `type`, `autoComplete`, `maxLength`,
   `pattern`, `inputMode` and any `aria-*` attribute all reach the input element,
   so the native affordances are available even though the wrapper does not use
   them.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Why `showLabel` cannot take the name away
+
+`showLabel={false}` used to skip rendering the label entirely. #213 asked
+whether that mode should exist at all, since a component that makes "no
+accessible name" easy keeps producing the defect. The 37 call sites answered it,
+and they were not one population:
+
+- **17 pass a real `label` string and then switch it off** — the whole Login
+  family (`LoginPortal`, `InstitutionSelection`, `InstitutionForm`,
+  `AccessCodeForm`) and the prototype-market search field. The name was already
+  written; the design just has no room to show it. These never wanted "no
+  label", only "no visible label".
+- **19 pass no `label` at all**, because the caller renders its own visible
+  label above the field — the Profile sections do this throughout, with the
+  `Label` element from Label and caption. `showLabel={false}` there prevents a
+  *second* label, which is a real and correct use. Removing the prop would put a
+  duplicate label back on every one of those fields.
+- **1 is a search box inside `Select`'s dropdown**, named by the listbox it
+  filters.
+
+So neither answer in the ticket was right on its own. Forbidding the mode breaks
+the 19; permitting it as-is leaves the 17 one careless call site away from an
+unnamed field forever. The resolution is to make the mode mean something it can
+be trusted with: **`showLabel` is a visual switch, and the accessibility tree
+does not read it.** The 17 gained a name with no visual change and no call-site
+edit; the 19 are untouched, because a `label` you never passed is still not
+rendered. What is left is the one honest way to have no name — pass no text at
+all — which is true of every component in the system and is not something
+`Input` makes especially easy.
+
+The half that `Input` cannot fix is the 19: a label rendered outside the
+component has to be pointed at the input by the caller. Seventeen of them now
+pass `htmlFor` — the Profile sections and the tutor profile page. The remaining
+two are `DateAndTimePicker`, which renders two controls under one label and
+whose own `showLabel` still removes rather than hides; that component was
+outside #213's scope, and it is the same decision waiting to be applied.
 
 </div>
 

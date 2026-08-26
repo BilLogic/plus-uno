@@ -79,6 +79,13 @@ export default {
  * Reusable Basic Information section component for use in pages
  */
 export const BasicInformationSection = ({ changed = false }) => {
+    // The visible label is the caller's `<Label>`, not the Input's own, so the
+    // pairing has to be made here with `htmlFor` (#213). A placeholder is not a
+    // label — axe's `label` rule accepts one, which is why these fields never
+    // showed up in the violation count while still having no real name. `useId`
+    // scopes the ids per instance, since `Variants` renders three sections.
+    const uid = React.useId();
+
     return (
         <div
             style={{
@@ -134,9 +141,9 @@ export const BasicInformationSection = ({ changed = false }) => {
                         overflow: 'hidden',
                     }}
                 >
-                    <Label text="First Name" required={false} />
+                    <Label text="First Name" required={false} htmlFor={`${uid}-first-name`} />
                     <Input
-                        id="first-name"
+                        id={`${uid}-first-name`}
                         placeholder="Value"
                         value="Veronica"
                         readonly={true}
@@ -156,9 +163,9 @@ export const BasicInformationSection = ({ changed = false }) => {
                         overflow: 'hidden',
                     }}
                 >
-                    <Label text="Last Name" required={false} />
+                    <Label text="Last Name" required={false} htmlFor={`${uid}-last-name`} />
                     <Input
-                        id="last-name"
+                        id={`${uid}-last-name`}
                         placeholder="Value"
                         value="Lodge"
                         readonly={true}
@@ -178,9 +185,9 @@ export const BasicInformationSection = ({ changed = false }) => {
                         overflow: 'hidden',
                     }}
                 >
-                    <Label text="Preferred Name" required={false} />
+                    <Label text="Preferred Name" required={false} htmlFor={`${uid}-preferred-name`} />
                     <Input
-                        id="preferred-name"
+                        id={`${uid}-preferred-name`}
                         placeholder="Enter"
                         size="medium"
                         showLabel={false}
@@ -218,9 +225,9 @@ export const BasicInformationSection = ({ changed = false }) => {
                         overflow: 'hidden',
                     }}
                 >
-                    <Label text="PLUS Account Email" required={false} />
+                    <Label text="PLUS Account Email" required={false} htmlFor={`${uid}-plus-account-email`} />
                     <Input
-                        id="plus-account-email"
+                        id={`${uid}-plus-account-email`}
                         placeholder="Placeholder"
                         value="pl2-app-demo@gmail.com"
                         readonly={true}
@@ -247,7 +254,7 @@ export const BasicInformationSection = ({ changed = false }) => {
                             alignItems: 'flex-start',
                         }}
                     >
-                        <Label text="Additional Email" required={false} />
+                        <Label text="Additional Email" required={false} htmlFor={`${uid}-additional-email`} />
                         <Tooltip
                             text="Get notifications sent to an alternate email address"
                             placement="right"
@@ -275,7 +282,7 @@ export const BasicInformationSection = ({ changed = false }) => {
                         </Tooltip>
                     </div>
                     <Input
-                        id="additional-email"
+                        id={`${uid}-additional-email`}
                         placeholder="pl2-app-demo@gmail.com"
                         size="medium"
                         showLabel={false}
@@ -293,9 +300,9 @@ export const BasicInformationSection = ({ changed = false }) => {
                         overflow: 'hidden',
                     }}
                 >
-                    <Label text="Slack Email" required={false} />
+                    <Label text="Slack Email" required={false} htmlFor={`${uid}-slack-email`} />
                     <Input
-                        id="slack-email"
+                        id={`${uid}-slack-email`}
                         placeholder="pl2-app-demo@gmail.com"
                         size="medium"
                         showLabel={false}

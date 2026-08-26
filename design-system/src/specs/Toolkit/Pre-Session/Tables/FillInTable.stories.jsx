@@ -354,10 +354,16 @@ export const FillInModalRow = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
+                {/*
+                  * A row-select checkbox has no visible text and the column it
+                  * sits in does not name it — the row's own date and time are
+                  * what distinguish it, so they are the name (#213).
+                  */}
                 <Checkbox
                     checked={isChecked}
                     onChange={handleCheckboxChange}
                     size="small"
+                    aria-label={`Select the fill-in on ${date}, ${timeRange}`}
                 />
             </div>
 

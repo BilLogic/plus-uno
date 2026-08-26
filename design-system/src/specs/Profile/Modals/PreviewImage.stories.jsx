@@ -275,6 +275,8 @@ const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = fa
                     {interactive ? (
                         <Range
                             id="zoom-range"
+                            label="Zoom"
+                            showLabel={false}
                             min={0}
                             max={100}
                             value={zoom}
@@ -285,6 +287,8 @@ const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = fa
                     ) : (
                         <Range
                             id="zoom-range-static"
+                            label="Zoom"
+                            showLabel={false}
                             min={0}
                             max={100}
                             defaultValue={zoomValue}

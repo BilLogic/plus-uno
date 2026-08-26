@@ -165,10 +165,16 @@ const WithdrawToggle = ({ checked, onChange }) => (
             Withdraw from all recurring sessions.
         </span>
         <div style={{ marginRight: 'var(--size-element-gap-md)' }}>
+            {/*
+              * The text to the left is a `<span>` in its own column, not a
+              * label, so it names nothing. `Switch` spreads no rest props, so
+              * the name goes through `inputProps` (#213).
+              */}
             <Switch
                 checked={checked}
                 onChange={onChange}
                 size="medium"
+                inputProps={{ 'aria-label': 'Withdraw from all recurring sessions' }}
             />
         </div>
     </div>

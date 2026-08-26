@@ -87,11 +87,18 @@ export const TableRow = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
+                {/*
+                  * A row-select checkbox has no visible text, and the column it
+                  * sits in does not name it either — a screen reader would read
+                  * one "checkbox" per row. The row's own date and time are what
+                  * distinguish it, so they are the name (#213).
+                  */}
                 <Checkbox
                     checked={isChecked}
                     onChange={handleCheckboxChange}
                     size="small"
                     disabled={effectiveState === 'disabled'}
+                    aria-label={`Select the session on ${date}, ${timeRange}`}
                 />
             </div>
 

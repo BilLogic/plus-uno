@@ -3,6 +3,8 @@
 
 # Range
 
+A range input carries its value, never its meaning: "49" says nothing about what is being set. `label` is the only thing that names it, so it takes the same pair as `Input` — `label` for the text, `showLabel={false}` to hide that text without taking the name away (#213).
+
 **Import:** `import { Range } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/Range.jsx`
@@ -17,6 +19,8 @@
 |------|------|---------|-------------|
 | `id` | string | — | — |
 | `name` | string | — | — |
+| `label` | node | — | Text that names the slider. Without it the slider has no accessible name. |
+| `showLabel` | bool | `true` | Render the label visually hidden rather than visible. It still names the slider. |
 | `min` | number | `0` | Minimum slider value |
 | `max` | number | `100` | Maximum slider value |
 | `value` | number | — | Current slider value |
@@ -36,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-inverse-primary` · `--color-outline-variant` · `--color-primary` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-primary-state-16` · `--size-element-radius-full` · `--value-percent`
+`--color-inverse-primary` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-primary-state-16` · `--font-line-height-body3` · `--font-size-body3` · `--font-weight-normal` · `--size-element-gap-xs` · `--size-element-radius-full` · `--value-percent`
 
 From `design-system/src/components/forms-and-inputs/Range.scss`. Override these through the token layer, never with a literal.
 
@@ -44,8 +48,6 @@ From `design-system/src/components/forms-and-inputs/Range.scss`. Override these 
 
 Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `MultipleChoice` · `NumberInput` · `OptionList` · `Radio` · `RadioButtonGroup` · `Rating` · `RichTextEditor` · `Select` · `SelectMultiple` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `Range` is the right call, only what it accepts.
+> Authored guidance is partial — missing: when to use, correct/incorrect (#166).
