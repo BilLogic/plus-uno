@@ -75,6 +75,31 @@ Use radio when a user needs to select one option from a list.
 
 <div className="sb-ds-doc-section">
 
+### Accessibility
+
+- **The label is wired for you, `id` or no `id`.** One id is derived through
+  `useFieldId` and handed to the underlying form check, which renders the
+  `label` with a matching `htmlFor`. Pass `id` when something outside the
+  component needs to point at the input — an `aria-describedby`, a test
+  selector — and you get exactly the id you passed.
+- **A group's shared `name` cannot double as its ids (#222).** The id used to
+  fall back to `name`, and radios in a group share a `name` — that is what makes
+  them one group. So a group written without `id`s gave every option the same
+  id, and every label in it resolved to whichever radio the browser reached
+  first. Each radio now derives its own id, so the group is wired correctly with
+  no `id`s at all.
+- **A radio with no `label` has no accessible name.** Nothing substitutes for it.
+  Where the design has no room for visible text, pass `aria-label`; it is spread
+  onto the input.
+- **Nothing here names the set.** `name` groups the radios for the form, not for
+  a screen reader. Wrap related radios in a `fieldset` with a `legend`, or hand
+  the whole set to `MultipleChoice` or `Scale` — see
+  `design-system/guidelines/foundations/accessibility.md`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground
