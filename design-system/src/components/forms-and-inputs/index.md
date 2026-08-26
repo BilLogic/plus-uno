@@ -10,7 +10,7 @@ authored half (#166), counted rather than assumed.
 | [Cascader](Cascader.md) | 8 | ✕ | ✕ | ✕ |
 | [Checkbox](Checkbox.md) | 15 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid.md) | 11 | ✕ | ✕ | ✕ |
-| [DateAndTimePicker](DateAndTimePicker.md) | 24 | ✕ | ✕ | ✕ |
+| [DateAndTimePicker](DateAndTimePicker.md) | 24 | ✕ | ✕ | ✅ |
 | [DatePicker](DatePicker/index.md) | 15 | ✕ | ✕ | ✕ |
 | [Dropdown](Dropdown/index.md) | 12 | ✅ | ✅ | ✅ |
 | [FileUpload](FileUpload.md) | 15 | ✕ | ✕ | ✕ |
@@ -31,7 +31,7 @@ authored half (#166), counted rather than assumed.
 | [Textarea](Textarea.md) | 17 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect.md) | 9 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 6/23 (26%) · Correct/incorrect 6/23 (26%) · Accessibility 8/23 (35%)
+**Authored coverage:** When to use 6/23 (26%) · Correct/incorrect 6/23 (26%) · Accessibility 9/23 (39%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

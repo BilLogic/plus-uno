@@ -1,4 +1,6 @@
 import React from 'react';
+import { expect, within } from 'storybook/test';
+
 import { Label, Caption } from '@/components/forms-and-inputs/LabelAndCaption.stories';
 import DateAndTimePicker from '@/components/forms-and-inputs/DateAndTimePicker';
 
@@ -26,6 +28,19 @@ export default {
  * - filled: Both time pickers show actual time values
  * - missing-start: Left picker has danger border + "Start Time is required" caption
  * - missing-end: Right picker has danger border + "End Time is required" caption
+ *
+ * Naming (#225). "Session time" sits above two separate pickers, and a single
+ * `<label for>` names one control, so it cannot be the name of either. Each
+ * picker owns its own name instead — `label="Start time"` / `label="End time"`
+ * with `showLabel={false}`, which the component now clips rather than deletes —
+ * and the visible caption names the pair as a `group`. So the caption stays a
+ * caption, and the two controls are told apart by assistive tech.
+ *
+ * The `id="start-time"` / `id="end-time"` these used to pass went with it: the
+ * Overview story renders four of these, so four fields claimed one pair of ids,
+ * and now that the labels are rendered they would all have pointed at the first
+ * — #222's failure exactly. `useFieldId` generates one id per instance, and
+ * nothing outside this file referenced those two.
  */
 const SessionTimeInput = ({
     state = 'unfilled',
@@ -33,9 +48,13 @@ const SessionTimeInput = ({
     const isFilled = state === 'filled';
     const isMissingStart = state === 'missing-start';
     const isMissingEnd = state === 'missing-end';
+    /** Unique per instance — the Overview story renders four of these. */
+    const captionId = `${React.useId()}-session-time`;
 
     return (
         <div
+            role="group"
+            aria-labelledby={captionId}
             style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -44,8 +63,10 @@ const SessionTimeInput = ({
                 width: '100%',
             }}
         >
-            {/* Label */}
-            <Label text="Session time" required={true} />
+            {/* Label — names the pair, not either picker */}
+            <div id={captionId}>
+                <Label text="Session time" required={true} />
+            </div>
 
             {/* Time Inputs Row */}
             <div
@@ -59,7 +80,7 @@ const SessionTimeInput = ({
                 {/* Start Time */}
                 <div style={{ flex: '1 0 0', minWidth: 0, minHeight: 1 }}>
                     <DateAndTimePicker
-                        id="start-time"
+                        label="Start time"
                         showLabel={false}
                         showSectionLabels={false}
                         showDate={false}
@@ -91,7 +112,7 @@ const SessionTimeInput = ({
                 {/* End Time */}
                 <div style={{ flex: '1 0 0', minWidth: 0, minHeight: 1 }}>
                     <DateAndTimePicker
-                        id="end-time"
+                        label="End time"
                         showLabel={false}
                         showSectionLabels={false}
                         showDate={false}
@@ -154,6 +175,38 @@ export const Overview = () => (
 export const Unfilled = () => (
     <SessionTimeInput state="unfilled" />
 );
+
+/**
+ * The naming contract at the call site (#225): one visible caption over two
+ * pickers, and two controls that are still told apart.
+ *
+ * Checking that the `for` targets resolve would not catch the failure this
+ * guards — #222's lesson. Before the fix both inputs resolved fine and were
+ * both called "Time".
+ */
+Unfilled.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // The caption names the pair, because it cannot name either control.
+    const pair = canvas.getByRole('group', { name: /Session time/ });
+    const inputs = within(pair).getAllByRole('textbox');
+    await expect(inputs).toHaveLength(2);
+
+    // `getByRole` throws on more than one match, so a distinct name each is the
+    // assertion: two controls, two names, neither of them "Time".
+    const start = within(pair).getByRole('textbox', { name: 'Start time' });
+    const end = within(pair).getByRole('textbox', { name: 'End time' });
+    await expect(start).not.toBe(end);
+
+    // `showLabel={false}` is a visual switch: the label is in the document,
+    // pointed at the control, and clipped to nothing.
+    for (const [input, text] of [[start, 'Start time'], [end, 'End time']]) {
+        const label = input.ownerDocument.querySelector(`label[for="${input.id}"]`);
+        await expect(label).not.toBeNull();
+        await expect(label.textContent).toBe(text);
+        await expect(label.getBoundingClientRect().width).toBeLessThanOrEqual(1);
+    }
+};
 
 /**
  * Filled

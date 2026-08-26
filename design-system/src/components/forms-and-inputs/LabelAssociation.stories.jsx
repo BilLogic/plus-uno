@@ -28,6 +28,12 @@ import Textarea from './Textarea';
  * `play` blocks below cover the other half — every `label[for]` in the story
  * has to resolve, and every field has to be reachable by its visible label.
  *
+ * #225 added the hidden-label case, which is the same defect one step earlier:
+ * `DateAndTimePicker`'s `showLabel={false}` used to skip rendering the label at
+ * all, so there was no `for` to dangle and no name to check — the field simply
+ * had none. Its story asserts names rather than `for` targets, which is the only
+ * form of the question that survives a label that is not there.
+ *
  * #222 added the radio case, which resolves and is still wrong: radios in a
  * group share a `name`, so `id={id || name}` gave every option in the group the
  * *same* id. Nothing dangles — N controls claim one id and every label in the
@@ -145,6 +151,60 @@ RadioGroupWithoutIds.play = async ({ canvasElement }) => {
         const radio = canvas.getByLabelText(text);
         await expect(radio.getAttribute('type')).toBe('radio');
         await expect(radio.value).toBe(value);
+    }
+};
+
+/**
+ * `showLabel={false}` on the two components that offer it. The label is clipped,
+ * not dropped: #213 settled that for `Input`, #225 for `DateAndTimePicker`,
+ * whose `showLabel` used to feed `hasLabel` and so took the name away along with
+ * the pixels — leaving two inputs called "Date" and "Time", which does not say
+ * which field.
+ *
+ * #222 is why the `play` block checks names rather than `for` targets. There,
+ * every `label[for]` resolved — to the same element. Here the equivalent failure
+ * resolves too: both inputs of a picker have a name, and before the fix it was
+ * the same generic one on every picker on the page.
+ */
+export const HiddenLabels = () => (
+    <div style={stack}>
+        <Input id="hl-email" name="email" label="Email address" showLabel={false} />
+        <DateAndTimePicker id="hl-starts" name="starts" label="Session start" showLabel={false} />
+        <DateAndTimePicker
+            id="hl-ends"
+            name="ends"
+            label="Session end"
+            showLabel={false}
+            showDate={false}
+            showSectionLabels={false}
+        />
+    </div>
+);
+
+HiddenLabels.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expectNoDanglingLabels(canvasElement);
+
+    // Every text control in the story, and the one name each must answer to.
+    // `getByRole` throws on a second match, so this fails both when a name is
+    // missing and when two controls share one.
+    const named = [
+        'Email address',
+        'Session start Date',
+        'Session start Time',
+        'Session end',
+    ].map((name) => canvas.getByRole('textbox', { name }));
+
+    await expect(new Set(named).size).toBe(named.length);
+    // No control left over with some other name — "Date", say, or nothing.
+    await expect(canvas.getAllByRole('textbox')).toHaveLength(named.length);
+
+    // And none of those names is on screen: `showLabel` moves pixels only, so
+    // all three field labels are rendered and all three are clipped to nothing.
+    const labels = Array.from(canvasElement.querySelectorAll('label'));
+    await expect(labels).toHaveLength(3);
+    for (const label of labels) {
+        await expect(label.getBoundingClientRect().width).toBeLessThanOrEqual(1);
     }
 };
 

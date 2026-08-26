@@ -92,6 +92,50 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 <div className="sb-ds-doc-section">
 
+### Accessibility
+
+- **`label` names the field, not either input.** The field renders two controls,
+  and one `<label for>` names one control, so `label` labels a `role="group"`
+  around both (#206). Each input is then named off that plus its section
+  heading — `<field> Date` and `<field> Time` — which is what tells them apart
+  once they are read out of context.
+- **`showLabel={false}` hides the label, it does not remove it.** The label is
+  rendered either way and always carries `htmlFor`; `showLabel={false}` only
+  clips it out of sight with `.plus-datetime-label-hidden`, so the group and
+  both inputs keep their names and the layout does not move. This was the other
+  way round until #225, which brought the component in line with `Input`
+  (#213) — see *Why `showLabel` cannot take the name away* in the Input docs.
+- **A field with no `label` still has no name.** `showLabel` decides whether the
+  label is *seen*; passing no `label` is what leaves the field unnamed. Then
+  there is no group either, and the two inputs are called just "Date" and
+  "Time" — off their section headings, or off a fallback `aria-label` when
+  `showSectionLabels` is off. Both are true of the control and useless as a
+  field name: two such pickers on one screen are indistinguishable.
+- **A caption you render above the field cannot be its name.** The pattern that
+  prompted #225 — one visible "Session time" over a start and an end picker —
+  has no `htmlFor` that works, because one `<label for>` reaches one control and
+  there are two fields under it. Give each picker its own `label` with
+  `showLabel={false}`, and let the caption name the pair: put it in an element
+  with an `id` and point a wrapping `role="group"` at it with
+  `aria-labelledby`. `Specs/Toolkit/Pre-Session/Elements/New Form Time Input` is
+  the worked example, and its `play` block is the regression cover.
+- **Never hand the same `id` to two pickers.** Ids are derived once per instance
+  (`useFieldId`), so omitting `id` is safe and unique. Repeating one is not: both
+  fields' labels and `aria-labelledby` targets then collide, and every label on
+  the page lands on whichever control the browser reached first (#222).
+- **`required` and `validation` are visual only, and there is no ARIA escape
+  hatch.** `required` renders a `*` span marked `aria-label="required"`;
+  `validation` colours the field and renders the message with an `aria-hidden`
+  icon. Neither sets `aria-invalid`, and neither links `validationMessage` to an
+  input. Unlike `Input`, this component also forwards nothing: props it does not
+  name are collected into a rest object that is never spread, so passing
+  `aria-invalid` or `aria-describedby` yourself has no effect. An invalid state
+  that has to reach assistive tech needs the component changed.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground
