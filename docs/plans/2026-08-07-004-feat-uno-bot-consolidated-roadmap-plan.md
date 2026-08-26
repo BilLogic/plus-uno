@@ -244,4 +244,4 @@ default on, and a specific check that would let it:
 - Compliance audit: `docs/plans/2026-08-07-002-uno-bot-playbook-compliance.md`
 - Blueprint approach: `docs/plans/2026-08-06-001-feat-blueprint-skills-in-slack-plan.md`
 - Hybrid-search proposal: `docs/plans/2026-08-07-003-blueprint-search-rpc-proposal.md`
-- Slack lessons: `docs/knowledge/lessons/2026-08-06-slack-app-token-and-cli-setup.md`
+- Slack lessons: converted to ADR-024 by #172; the file no longer exists

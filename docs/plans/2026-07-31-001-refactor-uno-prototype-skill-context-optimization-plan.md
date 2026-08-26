@@ -262,5 +262,5 @@ planted gaps ("moderation flow unspecified — asked, not invented").
 - `docs/evals/fixtures/uno-prototype-seeds/` (example-authoring inputs)
 - `docs/evals/scenarios/uno-prototype.md` S0–S7 · `docs/evals/rubrics/uno-prototype.md`
 - `skills/uno-maintain/references/skill-quality/checklist.md` §5
-- `docs/knowledge/lessons/2026-07-10-harness-consistency-sweep.md` (lessons 3–5)
+- Harness consistency sweep, lessons 3–5: promoted into `docs/engineering/coding.md` § Renames by #172; the lesson file no longer exists
 - `todos/061` (stale pattern numbers in the Figma docs — fix during Move 2)

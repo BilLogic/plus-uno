@@ -101,8 +101,20 @@ function runSuite() {
   ];
   console.log(`[storybook] npx ${args.join(' ')}\n`);
   const started = Date.now();
-  spawnSync('npx', args, { cwd: REPO_ROOT, stdio: 'inherit', env: process.env });
+  const run = spawnSync('npx', args, { cwd: REPO_ROOT, stdio: 'inherit', env: process.env });
   const seconds = (Date.now() - started) / 1000;
+
+  // A signal means the runner was killed — OOM, timeout, Ctrl-C. Vitest may still
+  // have flushed a partial report, and a partial report is indistinguishable from
+  // a clean one once it is parsed: fewer testResults simply look like fewer
+  // stories, so every downstream check finds nothing wrong and this exits 0.
+  if (run.signal) {
+    console.error(
+      `[storybook] vitest was killed by ${run.signal} — any JSON report it left is partial.\n` +
+        '  -> This is a harness failure, not a story failure. Re-run it.',
+    );
+    process.exit(1);
+  }
 
   if (!fs.existsSync(out)) {
     console.error(
@@ -240,6 +252,20 @@ function main() {
       `${violatingStories} stor${violatingStories === 1 ? 'y' : 'ies'} with a11y violations ` +
       `across ${Object.keys(rules).length} rule(s)`,
   );
+
+  // A run that collects fewer files than the baseline recorded is not a pass, it is
+  // a run that did not happen. Every assertion below is over what the report
+  // contains, so a report missing half the corpus reports half the violations and
+  // exits 0. The baseline already carries the size it was measured at; use it.
+  const expectedFiles = base?.suite?.storyFiles;
+  if (!UPDATE && expectedFiles && totals.files < expectedFiles) {
+    console.error(
+      `\n[storybook] collected ${totals.files} story files, but the baseline was measured at ` +
+        `${expectedFiles}. A short run cannot clear a ratchet — it just has less to find.\n` +
+        '  -> If story files were deliberately removed, re-record with --update in the same PR.',
+    );
+    process.exit(1);
+  }
 
   if (UPDATE) {
     fs.writeFileSync(BASELINE, `${JSON.stringify(baselineRecord({ a11y, totals }), null, 2)}\n`);
