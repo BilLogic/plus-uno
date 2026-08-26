@@ -89,9 +89,9 @@ export const Overview = {
 
                 {sections.map((section, index) => (
                     <div key={section.title} style={{ marginBottom: '32px' }}>
-                        <h6 className="h6" style={{ marginBottom: '8px', color: 'var(--color-primary)', fontWeight: '600' }}>
+                        <h4 className="h6" style={{ marginBottom: '8px', color: 'var(--color-primary)', fontWeight: '600' }}>
                             {section.title}
-                        </h6>
+                        </h4>
                         <LessonsTable
                             lessons={section.lessons}
                             headless={index > 0} // Only show header for the first section

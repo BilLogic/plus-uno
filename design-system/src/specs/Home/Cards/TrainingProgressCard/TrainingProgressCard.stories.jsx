@@ -10,7 +10,7 @@ export default {
 export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
         <div>
-            <h3 style={{ marginBottom: '16px', fontSize: '14px', fontWeight: '600' }}>Default</h3>
+            <h4 className="h3" style={{ marginBottom: '16px', fontSize: '14px', fontWeight: '600' }}>Default</h4>
             <TrainingProgressCard
                 size="default"
                 completed={6}
@@ -25,7 +25,7 @@ export const Overview = () => (
             />
         </div>
         <div>
-            <h3 style={{ marginBottom: '16px', fontSize: '14px', fontWeight: '600' }}>Small</h3>
+            <h4 className="h3" style={{ marginBottom: '16px', fontSize: '14px', fontWeight: '600' }}>Small</h4>
             <TrainingProgressCard
                 size="small"
                 completed={4}

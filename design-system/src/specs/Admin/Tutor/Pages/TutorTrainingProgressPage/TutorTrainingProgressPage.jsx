@@ -264,6 +264,7 @@ const TutorTrainingProgressPage = ({
                     <div className="tutor-training-progress-page__overview-cards">
                         {/* Tutor Need Card */}
                         <OverviewCard
+                            titleAs="h3"
                             type="advocacy"
                             title="Tutor Need"
                             subtitle="Advocacy"
@@ -279,6 +280,7 @@ const TutorTrainingProgressPage = ({
 
                         {/* Avg Completion Rate Card */}
                         <OverviewCard
+                            titleAs="h3"
                             type="avg-completion"
                             title="Avg Completion Rate"
                             chartValue={avgCompletionRate}
@@ -289,6 +291,7 @@ const TutorTrainingProgressPage = ({
 
                         {/* Tutor Badge Completions Card */}
                         <OverviewCard
+                            titleAs="h3"
                             type="completion"
                             title="Tutor Badge Completions"
                             chartValue={tutorBadgeCompletions}
@@ -299,6 +302,7 @@ const TutorTrainingProgressPage = ({
 
                         {/* Onboarding Completion Card */}
                         <OverviewCard
+                            titleAs="h3"
                             type="completion"
                             title="Onboarding Completion"
                             chartValue={onboardingCompletion}

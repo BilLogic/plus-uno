@@ -4,10 +4,9 @@
     "storyFiles": 388,
     "tests": 1136
   },
-  "violatingStories": 126,
+  "violatingStories": 93,
   "rules": {
     "color-contrast": 45,
-    "heading-order": 44,
     "button-name": 23,
     "aria-prohibited-attr": 12,
     "aria-dialog-name": 8,
@@ -22,65 +21,26 @@
     "select-name": 1
   },
   "stories": {
-    "design-system/src/specs/Admin/Admin.stories.jsx::Overview": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Admin/Group/Pages/GroupTrainingProgressPage/GroupTrainingProgressPage.stories.jsx::Interactive": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Admin/Group/Pages/GroupTrainingProgressPage/GroupTrainingProgressPage.stories.jsx::Overview": [
-      "heading-order"
-    ],
     "design-system/src/specs/Admin/Session/Pages/SessionAdminPage/SessionAdminPage.stories.jsx::With Modal Open": [
-      "aria-dialog-name",
-      "heading-order"
-    ],
-    "design-system/src/specs/Admin/Student/Pages/StudentAdminPage/StudentAdminPage.stories.jsx::Interactive": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Admin/Student/Pages/StudentAdminPage/StudentAdminPage.stories.jsx::Overview": [
-      "heading-order"
+      "aria-dialog-name"
     ],
     "design-system/src/specs/Admin/Student/Pages/StudentAdminPage/StudentAdminPage.stories.jsx::With Modal Info Variant": [
       "aria-dialog-name",
-      "color-contrast",
-      "heading-order"
+      "color-contrast"
     ],
     "design-system/src/specs/Admin/Student/Pages/StudentAdminPage/StudentAdminPage.stories.jsx::With Modal Sessions Variant": [
       "aria-dialog-name",
-      "color-contrast",
-      "heading-order"
-    ],
-    "design-system/src/specs/Admin/Tutor/Pages/TutorPerformancePage/TutorPerformancePage.stories.jsx::Interactive": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Admin/Tutor/Pages/TutorPerformancePage/TutorPerformancePage.stories.jsx::Overview": [
-      "heading-order"
+      "color-contrast"
     ],
     "design-system/src/specs/Admin/Tutor/Pages/TutorPerformancePage/TutorPerformancePage.stories.jsx::With Modal Open": [
-      "aria-dialog-name",
-      "heading-order"
-    ],
-    "design-system/src/specs/Admin/Tutor/Pages/TutorStatusWarningsPage/TutorStatusWarningsPage.stories.jsx::Interactive": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Admin/Tutor/Pages/TutorStatusWarningsPage/TutorStatusWarningsPage.stories.jsx::Overview": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Admin/Tutor/Pages/TutorToolUsagePage/TutorToolUsagePage.stories.jsx::Interactive": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Admin/Tutor/Pages/TutorToolUsagePage/TutorToolUsagePage.stories.jsx::Overview": [
-      "heading-order"
+      "aria-dialog-name"
     ],
     "design-system/src/specs/Admin/Tutor/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.stories.jsx::Interactive": [
       "aria-hidden-focus",
-      "heading-order",
       "nested-interactive"
     ],
     "design-system/src/specs/Admin/Tutor/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.stories.jsx::Overview": [
       "aria-hidden-focus",
-      "heading-order",
       "nested-interactive"
     ],
     "design-system/src/specs/Admin/Tutor/Tables/TutorsTrainingProgressTable/TutorsTrainingProgressTable.stories.jsx::Interactive": [
@@ -92,32 +52,11 @@
     "design-system/src/specs/Home/Cards/ResourceCard/ResourceCard.stories.jsx::Overview": [
       "color-contrast"
     ],
-    "design-system/src/specs/Home/Cards/TrainingProgressCard/TrainingProgressCard.stories.jsx::Overview": [
-      "heading-order"
-    ],
     "design-system/src/specs/Home/Elements/ProductAreaDropdown/ProductAreaDropdown.stories.jsx::Overview": [
       "aria-required-parent"
     ],
     "design-system/src/specs/Home/Elements/ResourceType/ResourceType.stories.jsx::Overview": [
       "aria-prohibited-attr"
-    ],
-    "design-system/src/specs/Home/Pages/TutorHomePageSkillsOverview/TutorHomePageSkillsOverview.stories.jsx::Interactive": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Home/Pages/TutorHomePageSkillsOverview/TutorHomePageSkillsOverview.stories.jsx::Overview": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Home/Pages/TutorHomePageSkillsOverviewDifferentLayout/TutorHomePageSkillsOverviewDifferentLayout.stories.jsx::Interactive": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Home/Pages/TutorHomePageSkillsOverviewDifferentLayout/TutorHomePageSkillsOverviewDifferentLayout.stories.jsx::Overview": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Home/Pages/TutorHomePageSkillsProgress/TutorHomePageSkillsProgress.stories.jsx::Interactive": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Home/Pages/TutorHomePageSkillsProgress/TutorHomePageSkillsProgress.stories.jsx::Overview": [
-      "heading-order"
     ],
     "design-system/src/specs/Home/Sections/StudentsOverviewSection/StudentsOverviewSection.stories.jsx::Default": [
       "color-contrast"
@@ -165,9 +104,6 @@
     "design-system/src/specs/Toolkit/In-Session/Modals/InSessionPopUpModal.stories.jsx::Session Info Loaded Regular": [
       "color-contrast"
     ],
-    "design-system/src/specs/Toolkit/In-Session/Tables/StudentList.stories.jsx::Row States": [
-      "heading-order"
-    ],
     "design-system/src/specs/Toolkit/In-Session/Tables/StudentListItems.stories.jsx::Interactive": [
       "color-contrast"
     ],
@@ -183,14 +119,8 @@
     "design-system/src/specs/Toolkit/Post-Session/Elements/UploadFiles/UploadFiles.stories.jsx::Overview": [
       "color-contrast"
     ],
-    "design-system/src/specs/Toolkit/Post-Session/Pages/ReflectionFlow/ReflectionFlow.stories.jsx::AI empty seed": [
-      "heading-order"
-    ],
     "design-system/src/specs/Toolkit/Post-Session/Pages/ReflectionFlow/ReflectionFlow.stories.jsx::Discard confirmation": [
       "aria-dialog-name"
-    ],
-    "design-system/src/specs/Toolkit/Post-Session/Pages/ReflectionFlow/ReflectionFlow.stories.jsx::Filled-low student": [
-      "heading-order"
     ],
     "design-system/src/specs/Toolkit/Post-Session/Pages/ReflectionFlow/ReflectionFlow.stories.jsx::Reflection submitted": [
       "aria-dialog-name"
@@ -204,21 +134,6 @@
     ],
     "design-system/src/specs/Toolkit/Post-Session/Pages/SessionReflection/SessionReflection.stories.jsx::Save & Exit confirmation": [
       "aria-dialog-name"
-    ],
-    "design-system/src/specs/Toolkit/Post-Session/Pages/StudentReflection/StudentReflection.stories.jsx::Empty": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Toolkit/Post-Session/Pages/StudentReflection/StudentReflection.stories.jsx::Filled": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Toolkit/Post-Session/Pages/StudentReflection/StudentReflection.stories.jsx::Filled-low": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Toolkit/Post-Session/Pages/StudentReflection/StudentReflection.stories.jsx::Overview": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Toolkit/Post-Session/Pages/StudentReflection/StudentReflection.stories.jsx::Unfilled": [
-      "heading-order"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Cards/CallOffAlerts.stories.jsx::All Alerts": [
       "button-name"
@@ -284,9 +199,6 @@
     "design-system/src/specs/Toolkit/Pre-Session/Modals/SessionFillIns/SessionFillIns.stories.jsx::Session Details": [
       "color-contrast"
     ],
-    "design-system/src/specs/Toolkit/Pre-Session/Modals/TutorCallOffDetailsModals.stories.jsx::Overview": [
-      "heading-order"
-    ],
     "design-system/src/specs/Toolkit/Pre-Session/Pages/AllSessions.stories.jsx::Interactive": [
       "button-name"
     ],
@@ -322,12 +234,10 @@
       "color-contrast"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Tables/FillInSchedule.stories.jsx::Overview": [
-      "color-contrast",
-      "heading-order"
+      "color-contrast"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Tables/MySessions.stories.jsx::Row States": [
-      "color-contrast",
-      "heading-order"
+      "color-contrast"
     ],
     "design-system/src/specs/Training/Lessons/Elements/Toast/Toast.stories.jsx::Interactive": [
       "color-contrast"
@@ -338,20 +248,11 @@
     "design-system/src/specs/Training/Lessons/Pages/LessonsDetailPage/LessonsDetailPage.stories.jsx::Interactive": [
       "select-name"
     ],
-    "design-system/src/specs/Training/Lessons/Pages/LessonsDetailPage/LessonsDetailPage.stories.jsx::P5": [
-      "heading-order"
-    ],
     "design-system/src/specs/Training/Lessons/Pages/LessonsOverviewPage/LessonsOverviewPage.stories.jsx::Interactive": [
       "button-name"
     ],
     "design-system/src/specs/Training/Lessons/Pages/LessonsOverviewPage/LessonsOverviewPage.stories.jsx::Overview": [
       "button-name"
-    ],
-    "design-system/src/specs/Training/Lessons/Sections/LessonOverviewSection/LessonOverviewSection.stories.jsx::Interactive": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Training/Lessons/Sections/LessonOverviewSection/LessonOverviewSection.stories.jsx::Overview": [
-      "heading-order"
     ],
     "design-system/src/specs/Training/Lessons/Sections/LessonWelcomeSection/LessonWelcomeSection.stories.jsx::Interactive": [
       "aria-allowed-attr"
@@ -364,8 +265,7 @@
     ],
     "design-system/src/specs/Training/Lessons/Tables/LessonsTable/LessonsTable.stories.jsx::Overview": [
       "button-name",
-      "color-contrast",
-      "heading-order"
+      "color-contrast"
     ],
     "design-system/src/specs/Training/Onboarding/Cards/OnboardingModuleCard/OnboardingModuleCard.stories.jsx::Interactive": [
       "aria-prohibited-attr"
@@ -377,8 +277,7 @@
       "aria-prohibited-attr"
     ],
     "design-system/src/specs/Training/Onboarding/Elements/ContentBlurb/ContentBlurb.stories.jsx::Overview": [
-      "aria-prohibited-attr",
-      "heading-order"
+      "aria-prohibited-attr"
     ],
     "design-system/src/specs/Training/Onboarding/Elements/DropdownListOptions/DropdownListOptions.stories.jsx::Interactive": [
       "color-contrast"
@@ -413,17 +312,7 @@
       "button-name"
     ],
     "design-system/src/specs/Training/Training.stories.jsx::Overview": [
-      "color-contrast",
-      "heading-order"
-    ],
-    "design-system/src/specs/Universal/Pages/PageLayout/PageLayout.stories.jsx::Interactive": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Universal/Pages/PageLayout/PageLayout.stories.jsx::Overview": [
-      "heading-order"
-    ],
-    "design-system/src/specs/Universal/Universal.stories.jsx::Overview": [
-      "heading-order"
+      "color-contrast"
     ]
   }
 }

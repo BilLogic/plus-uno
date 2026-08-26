@@ -274,7 +274,7 @@ export const Overview = () => (
         <h3 className="h5">Fill-In Schedule Row States</h3>
 
         <div>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default</h6>
+            <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default</h4>
             <TableHeaderRow />
             <TableRow
                 date="Tue, Sep 9"
@@ -289,7 +289,7 @@ export const Overview = () => (
         </div>
 
         <div>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover</h6>
+            <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover</h4>
             <TableRow
                 date="Tue, Sep 9"
                 timeRange="12:30 PM - 1:30 PM"
@@ -303,7 +303,7 @@ export const Overview = () => (
         </div>
 
         <div>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Pressed</h6>
+            <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Pressed</h4>
             <TableRow
                 date="Tue, Sep 9"
                 timeRange="12:30 PM - 1:30 PM"
@@ -317,7 +317,7 @@ export const Overview = () => (
         </div>
 
         <div>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Focus</h6>
+            <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Focus</h4>
             <TableRow
                 date="Tue, Sep 9"
                 timeRange="12:30 PM - 1:30 PM"
@@ -331,7 +331,7 @@ export const Overview = () => (
         </div>
 
         <div>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Disabled</h6>
+            <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Disabled</h4>
             <TableRow
                 date="Tue, Sep 9"
                 timeRange="12:30 PM - 1:30 PM"

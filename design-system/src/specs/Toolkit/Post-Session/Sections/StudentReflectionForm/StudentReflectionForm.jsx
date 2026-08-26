@@ -141,7 +141,7 @@ const StudentReflectionForm = ({
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                    <h6 className="h6 m-0">{studentName}</h6>
+                    <h5 className="h6 m-0">{studentName}</h5>
                     <SessionNotes state={initialData.notes ? 'filled' : 'empty'} notes={initialData.notes} />
                 </div>
 

@@ -117,9 +117,9 @@ const TutorModal = ({
             <div className="tutor-modal__container">
                 {/* Header */}
                 <div className="tutor-modal__header">
-                    <h4 className="h4 tutor-modal__title">
+                    <h3 className="h4 tutor-modal__title">
                         {mode === 'add' ? 'Add a new tutor:' : (tutor.name || 'Amelia Blue')}
-                    </h4>
+                    </h3>
                     <button
                         type="button"
                         className="tutor-modal__close"

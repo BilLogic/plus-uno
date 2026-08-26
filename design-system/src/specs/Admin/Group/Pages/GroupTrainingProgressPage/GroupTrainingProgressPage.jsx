@@ -128,6 +128,7 @@ const GroupTrainingProgressPage = ({
                     {/* Overview Cards */}
                     <div className="group-training-progress-page__cards">
                         <OverviewCard
+                            titleAs="h3"
                             type="mastering-content"
                             subtitle="Mastering Content"
                             description="3/3 students need mastering content support"
@@ -140,6 +141,7 @@ const GroupTrainingProgressPage = ({
                             }}
                         />
                         <OverviewCard
+                            titleAs="h3"
                             type="avg-completion"
                             title="Completion Rate"
                             subtitle="20%"
@@ -148,6 +150,7 @@ const GroupTrainingProgressPage = ({
                             chartColor="#FFD23F"
                         />
                         <OverviewCard
+                            titleAs="h3"
                             type="avg-accuracy"
                             subtitle="20%"
                             description="is the average accuracy on the completed training lessons."
@@ -155,6 +158,7 @@ const GroupTrainingProgressPage = ({
                             chartColor="#FFD23F"
                         />
                         <OverviewCard
+                            titleAs="h3"
                             type="time-spent"
                             subtitle="30 / 90 min"
                             description="is the average time <placeholder> spent on training. "

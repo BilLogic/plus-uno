@@ -20,7 +20,7 @@ const StackedBarChart = ({ title, tooltip, data, legend, chartType = 'needs', cl
         <div className={`stacked-bar-chart stacked-bar-chart--${chartType} ${className}`}>
             {/* Header */}
             <div className="stacked-bar-chart__header">
-                <h4 className="h4 stacked-bar-chart__title">{title}</h4>
+                <h3 className="h4 stacked-bar-chart__title">{title}</h3>
                 <button
                     className="stacked-bar-chart__info-btn"
                     aria-label="Info"

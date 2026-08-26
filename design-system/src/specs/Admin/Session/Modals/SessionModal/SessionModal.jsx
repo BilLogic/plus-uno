@@ -35,9 +35,9 @@ const SessionModal = ({
             <div className="session-modal__container">
                 {/* Header */}
                 <div className="session-modal__header">
-                    <h4 className="h4 session-modal__title">
+                    <h3 className="h4 session-modal__title">
                         {sessionDate} Session Breakdown
-                    </h4>
+                    </h3>
                     <button
                         type="button"
                         className="session-modal__close"

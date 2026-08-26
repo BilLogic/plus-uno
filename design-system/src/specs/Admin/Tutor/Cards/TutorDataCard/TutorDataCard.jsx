@@ -20,7 +20,7 @@ const TutorDataCard = ({
         <div className={`tutor-data-card ${className}`} {...props}>
             {/* Header */}
             <div className="tutor-data-card__header">
-                <h4 className="h4 tutor-data-card__title">{title}</h4>
+                <h3 className="h4 tutor-data-card__title">{title}</h3>
                 {tooltip && (
                     <button
                         className="tutor-data-card__info-btn"

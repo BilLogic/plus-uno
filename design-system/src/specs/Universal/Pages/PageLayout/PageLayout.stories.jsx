@@ -90,7 +90,7 @@ export const Overview = {
             >
                 {Array(4).fill(0).map((_, i) => (
                     <Card key={i} className="p-3">
-                        <h6 className="h6">Card {i + 1}</h6>
+                        <h3 className="h6">Card {i + 1}</h3>
                     </Card>
                 ))}
             </div>
@@ -141,7 +141,7 @@ export const Interactive = {
                 >
                     {Array(4).fill(0).map((_, i) => (
                         <Card key={i} className="p-3">
-                            <h3 className="h5">Card {i + 1}</h3>
+                            <h2 className="h5">Card {i + 1}</h2>
                             <p className="body3-txt mt-2" style={{ color: 'var(--color-on-surface-variant)' }}>
                                 Content
                             </p>

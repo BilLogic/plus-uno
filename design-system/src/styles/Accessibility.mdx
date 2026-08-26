@@ -11,6 +11,52 @@ below keeps components compliant by default.
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
+### Heading levels
+
+**The tag is the outline position. The class is the appearance.** A heading that
+has to *look* small but sit high in the page's outline is written
+`<h2 className="h4">`, not `<h4>`.
+
+This works because `design-system/src/tokens/_fonts.scss` declares every heading
+step against **both** selectors at once — `h4, .h4 { … }`, `h6, .h6 { … }`, and
+so on for all six. Font family, size, line height, weight and the nested
+FontAwesome sizing are one rule shared by the tag and the class, so moving a
+heading to a different tag and keeping its `hN` class leaves its rendered size
+byte-identical. Nothing else in the system needs to change.
+
+Two consequences worth stating outright:
+
+- **A heading with no size class takes its appearance from its tag**, and the
+  steps are not interchangeable — `h1`–`h3` are `%font-headline` (weight 700),
+  `h4`–`h6` are `%font-title` (weight 600), and every step has its own line
+  height. So re-tagging a bare `<h3 style={{ fontSize: '14px' }}>` silently
+  changes its weight and leading. Give it the class of the tag it is leaving
+  (`<h4 className="h3" style={…}>`) in the same edit.
+- **CSS that selects a heading by tag re-couples the two.** A rule like
+  `.lesson-content__question h4 { … }` stops applying the moment that heading's
+  outline position is corrected. Where such a rule exists, match the size class
+  as well: `h4, .h4 { … }`.
+
+What this rules out is choosing a level for its size. 329 `<h6>` against 5
+`<h1>` across `specs/` was `h6` being used as small bold text; a page then ran
+`h2` → `h6` and axe's `heading-order` reported the three skipped levels. The
+level a heading carries is decided by where it sits in *its own page's* outline,
+so a shared component that lands at different depths takes the level as a prop —
+`OverviewCard`'s `titleAs` is the pattern.
+
+The same separation covers text that is not a heading at all. A metric drawn at
+display size is not a section: `<p className="h4">Answered Correctly</p>` in
+`LessonsDetailPage` is how that text gets heading type without taking an outline
+slot. The values still marked up as `<h1>`/`<h3>` beside it are #244.
+
+Two caveats live in the harness rather than in components, both tracked in #244:
+the docs view forces every heading inside a story canvas to one of three sizes
+via `.sbdocs h1 / h2 / h3–h6 { … !important }`, and only 5 pages across `specs/`
+carry an `<h1>` at all (#243) — which `heading-order` cannot see, because the
+first heading on a page has no predecessor to skip from.
+</div>
+
+<div className="sb-ds-doc-section">
 ### Contrast
 
 Text and icon colors are paired with their surface tokens so contrast is

@@ -429,7 +429,7 @@ const P5Content = ({ lessonTitle, onPrevious, onNext }) => {
 
             {/* Final Question */}
             <div className="lesson-content__question lesson-content__question--centered">
-                <h4 className="h4">Now that you've completed the module, how confident are you in your knowledge of this topic?</h4>
+                <h2 className="h4">Now that you've completed the module, how confident are you in your knowledge of this topic?</h2>
                 <LikertScale
                     leftLabel="Not at all confident"
                     rightLabel="Extremely confident"

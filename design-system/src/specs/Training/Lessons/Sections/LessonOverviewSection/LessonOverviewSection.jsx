@@ -67,6 +67,8 @@ const LessonOverviewSection = ({
                         {displayMetrics.map((metric) => (
                             <OverviewCard
                                 key={metric.id || metric.title}
+                                // One level under this section's own h4 title.
+                                titleAs="h5"
                                 type={metric.type}
                                 title={metric.title}
                                 subtitle={metric.subtitle}

@@ -40,7 +40,7 @@ export const PreReview_TutorRequest = () => (
 
                 {/* Step 1: Header */}
                 <div className="d-flex justify-content-between align-items-center">
-                    <h4 className="h4 m-0">Call-off Request Details</h4>
+                    <h3 className="h4 m-0">Call-off Request Details</h3>
                     <i
                         className="fa-solid fa-xmark"
                         style={{
@@ -142,7 +142,7 @@ export const PreReview_WithdrawRequest = () => (
 
                 {/* Header */}
                 <div className="d-flex justify-content-between align-items-center">
-                    <h4 className="h4 m-0">Call-off Request Details</h4>
+                    <h3 className="h4 m-0">Call-off Request Details</h3>
                     <i
                         className="fa-solid fa-xmark"
                         style={{
@@ -168,7 +168,7 @@ export const PreReview_WithdrawRequest = () => (
                     />
 
                     {/* Confirmation Text */}
-                    <h5 className="h5 m-0">Are you sure you want to withdraw this request?</h5>
+                    <h4 className="h5 m-0">Are you sure you want to withdraw this request?</h4>
                     <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface)' }}>
                         This will cancel your call-off request and you will be expected to attend the session.
                     </p>
@@ -205,7 +205,7 @@ export const PreReview_RequestWithdrawn = () => (
 
                 {/* Header */}
                 <div className="d-flex justify-content-between align-items-center">
-                    <h4 className="h4 m-0">Call-off Request Details</h4>
+                    <h3 className="h4 m-0">Call-off Request Details</h3>
                     <i
                         className="fa-solid fa-xmark"
                         style={{
@@ -231,7 +231,7 @@ export const PreReview_RequestWithdrawn = () => (
                     />
 
                     {/* Success Text */}
-                    <h5 className="h5 m-0">Request withdrawn</h5>
+                    <h4 className="h5 m-0">Request withdrawn</h4>
                     <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface)' }}>
                         Your request has been withdrawn. The related sessions have been restored to your schedule and you are expected to attend.
                     </p>
@@ -267,7 +267,7 @@ export const PostReview_SupervisorReview = () => (
 
                 {/* Header */}
                 <div className="d-flex justify-content-between align-items-center">
-                    <h4 className="h4 m-0">Call-off Request Details</h4>
+                    <h3 className="h4 m-0">Call-off Request Details</h3>
                     <i
                         className="fa-solid fa-xmark"
                         style={{
@@ -349,7 +349,7 @@ export const PostReview_TutorRequest = () => (
 
                 {/* Header */}
                 <div className="d-flex justify-content-between align-items-center">
-                    <h4 className="h4 m-0">Call-off Request Details</h4>
+                    <h3 className="h4 m-0">Call-off Request Details</h3>
                     <i
                         className="fa-solid fa-xmark"
                         style={{
