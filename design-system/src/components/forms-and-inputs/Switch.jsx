@@ -58,7 +58,25 @@ const Switch = ({
 
     return (
         <div className={wrapperClasses} style={style}>
+            {/*
+              * `role="switch"` — decided in #207. The evidence and the two
+              * conditions it comes with are in the accessibility section of
+              * `Switch.mdx`; read that before changing this line.
+              *
+              * Short version. `Form.Check type="switch"` rewrites the type
+              * back to `"checkbox"` and adds a `form-switch` class, so the
+              * switch was entirely visual and the control announced itself as
+              * a checkbox. Bootstrap's own documented markup for `.form-switch`
+              * carries `role="switch"`; react-bootstrap simply never emitted
+              * it. The W3C APG's switch pattern ships this exact markup —
+              * `input[type=checkbox]` plus the role, with no `aria-checked`,
+              * because the platform maps the native `checked` state for us.
+              *
+              * It is a default, not a lock: set before the spread, so
+              * `inputProps={{ role: 'checkbox' }}` still wins.
+              */}
             <Form.Check
+                role="switch"
                 {...safeInputProps}
                 type="switch"
                 id={id || name || autoId}

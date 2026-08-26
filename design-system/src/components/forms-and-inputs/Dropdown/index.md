@@ -25,6 +25,7 @@
 | `direction` | enum | `"dropdown"` | Direction the menu opens |
 | `className` | string | `""` | — |
 | `isOpen` | bool | — | — |
+| `onToggle` | func | — | — |
 | `toggle` | node | — | — |
 
 ## Variants

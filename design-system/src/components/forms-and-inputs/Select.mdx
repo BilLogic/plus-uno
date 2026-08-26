@@ -109,9 +109,11 @@ visually consistent with the fields around it.
   control — the trigger is a `div` and the options are buttons — so `name` never
   produces a submitted value. Read the value from `onChange` and hold it in
   state.
-- **`required`, `onFocus` and `onBlur` are declared but never wired.** They are
-  in `propTypes` and destructured, and then not used anywhere in the render.
-  Do not rely on them; validate on `onChange` instead.
+- **Not for a `required` that has to block submission.** `required` is a
+  signal, not a constraint: it gives the trigger a hidden "Required"
+  description so assistive technology announces the field as required. Nothing
+  stops an empty value — there is no form control here to stop it with — so the
+  check still belongs in your own validation.
 
 </div>
 
@@ -122,18 +124,41 @@ visually consistent with the fields around it.
 **Do not expect form semantics that are not there.**
 
 ```jsx
-// Incorrect — none of these three do anything. There is no hidden input for
-// `name` to name, and `required` and `onBlur` are dropped on the floor.
+// Incorrect — `name` names nothing. There is no hidden input, so the form
+// submits without this field, and `required` cannot block a submit it is not
+// part of.
 <form onSubmit={submit}>
-  <Select name="grade" options={grades} required onBlur={validate} />
+  <Select name="grade" options={grades} required />
 </form>
 
-// Correct — controlled value, validation driven from onChange.
+// Correct — controlled value, `required` for the announcement, and the
+// validation you actually enforce driven from onChange and onBlur.
 <Select
   id="grade"
   options={grades}
   value={grade}
+  required
   onChange={(next) => { setGrade(next); setGradeError(!next); }}
+  onBlur={() => setGradeTouched(true)}
+/>
+```
+
+**`onFocus` and `onBlur` are the field's, not the search box's.**
+
+```jsx
+// Incorrect — expecting a blur each time focus moves inside the control. It
+// does not fire when the user goes from the trigger into the search field, so
+// a "close the menu when the search box is left" effect never runs.
+<Select searchable options={grades} onBlur={closeMenu} />
+
+// Correct — they report the boundary: once when focus enters the control from
+// outside, once when it leaves for good. That is the "touched" signal.
+<Select
+  searchable
+  options={grades}
+  value={grade}
+  onChange={setGrade}
+  onBlur={() => setTouched(true)}
 />
 ```
 
@@ -188,6 +213,11 @@ visually consistent with the fields around it.
   native radio or checkbox.
 - **Name the trigger.** `id` is forwarded to the trigger element, so an external
   `label htmlFor` is the reliable way to give it a name.
+- **`required` is announced as a description, not as `aria-required`.** ARIA
+  does not allow `aria-required` on `role="button"`, so the trigger gets an
+  `aria-describedby` pointing at a visually hidden "Required" instead — the
+  field announces as required without inventing invalid markup. The visible
+  asterisk is still the caller's, drawn in the caller's own label.
 - **The search field has a placeholder, not a label.** It is a real `Input`
   rendered internally with `showLabel={false}` and the placeholder `Search`, and
   the component exposes no prop to label it. That is a known gap, not something

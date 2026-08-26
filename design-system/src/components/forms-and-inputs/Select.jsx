@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useId } from 'react';
 import PropTypes from 'prop-types';
 import { Dropdown } from 'react-bootstrap';
 import Badge from '@/components/status-and-loading/Badge';
@@ -75,6 +75,39 @@ const Select = ({
     const [createdOptions, setCreatedOptions] = useState([]);
     const searchInputRef = useRef(null);
     const dropdownRef = useRef(null);
+    const generatedId = useId();
+
+    /**
+     * `required` (#207). The trigger is a `div` with `role="button"`, and ARIA
+     * does not allow `aria-required` on that role — axe's `aria-allowed-attr`
+     * rejects it — so the required-ness is carried by a visually hidden
+     * description instead. Every other field in this folder marks `required`
+     * with an asterisk inside the label it renders itself; `Select` renders no
+     * label, and its call sites already draw their own asterisk beside their
+     * own label, so a second visible one here would double up in 26 places.
+     * The half that was actually missing is the half assistive technology
+     * hears, and that is what this supplies.
+     */
+    const requiredHintId = required ? `${id || name || generatedId}-required` : undefined;
+
+    /**
+     * `onFocus` / `onBlur` (#207). A caller passing these means the *field*,
+     * not whichever element inside it happens to hold focus, so they fire only
+     * when focus crosses the widget boundary — moving from the trigger into
+     * the search box is not a blur. They are bound in the capture phase
+     * because the search `Input` stops propagation on focus and blur to keep
+     * the menu from toggling; capture runs before that, so the existing
+     * `stopPropagation` behaviour is composed with rather than replaced.
+     */
+    const handleFieldFocus = (event) => {
+        if (event.currentTarget.contains(event.relatedTarget)) return;
+        onFocus(event);
+    };
+
+    const handleFieldBlur = (event) => {
+        if (event.currentTarget.contains(event.relatedTarget)) return;
+        onBlur(event);
+    };
 
     // Allow controlled open state for Storybook demos
     useEffect(() => {
@@ -211,9 +244,22 @@ const Select = ({
                 onToggle={(nextShow) => !disabled && !readonly && setIsOpen(nextShow)}
                 className={wrapperClasses}
                 style={style}
+                onFocusCapture={onFocus ? handleFieldFocus : undefined}
+                onBlurCapture={onBlur ? handleFieldBlur : undefined}
             >
+                {required && (
+                    <span id={requiredHintId} className="plus-select-required-hint">
+                        Required
+                    </span>
+                )}
+
                 {/* Trigger / Input Field */}
-                <Dropdown.Toggle as={CustomSelectToggle} id={id} disabled={disabled || readonly}>
+                <Dropdown.Toggle
+                    as={CustomSelectToggle}
+                    id={id}
+                    disabled={disabled || readonly}
+                    aria-describedby={requiredHintId}
+                >
                 <div className="plus-select-value">
                     {showBadgesInTrigger && (
                         <div className="plus-select-badges">

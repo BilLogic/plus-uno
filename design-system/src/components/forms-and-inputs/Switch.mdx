@@ -127,7 +127,8 @@ component does not name.
 <Switch id="a" label="On" inputProps={{ type: 'checkbox' }} />
 
 // Correct — inputProps is for the attributes the component does not name.
-<Switch id="a" label="On" inputProps={{ role: 'switch', 'aria-describedby': 'a-hint' }} />
+// `role` is already `switch`; pass it only to override.
+<Switch id="a" label="On" inputProps={{ 'aria-describedby': 'a-hint' }} />
 ```
 
 **Controlled means controlled.**
@@ -148,11 +149,49 @@ component does not name.
 
 ### Accessibility
 
-- **It is announced as a checkbox, not a switch.** The underlying form check
-  turns `type="switch"` into `type="checkbox"` plus a `form-switch` class — the
-  switch is entirely visual, and no `role="switch"` is applied. Screen readers
-  say "checked" / "not checked" rather than "on" / "off". Pass
-  `inputProps={{ role: 'switch' }}` when that distinction matters.
+- **It is announced as a switch.** The underlying form check turns
+  `type="switch"` into `type="checkbox"` plus a `form-switch` class, which
+  makes the switch purely visual, so the component adds `role="switch"` to the
+  input itself. Screen readers say "on" / "off" rather than "checked" /
+  "not checked". The element underneath is still a real checkbox, so keyboard
+  behaviour, the checked state and `name`/`value` in a form are the browser's,
+  unchanged — and assistive technology that does not know the role falls back
+  to the checkbox it really is.
+
+  **The decision, so it does not get re-litigated (#207).** A checkbox-backed
+  toggle is a legitimate pattern and the role was missing for long enough to
+  look deliberate, so this was decided on evidence rather than reflex.
+
+  *Why the role belongs here.* This component's own "when to use" defines it as
+  state that takes effect immediately with no Save button in between, and sends
+  form values to `Checkbox`. That is ARIA's distinction between a switch and a
+  checkbox, near word for word — the semantics were already decided, only the
+  markup had not caught up. Bootstrap's own documented `.form-switch` markup
+  has carried `role="switch"` since 5.1; react-bootstrap's `Form.Check` never
+  emitted it, with no issue and no stated rationale, so the gap is an
+  oversight upstream rather than a position. The W3C APG's switch pattern
+  ships `<input type="checkbox" role="switch">` verbatim as its official
+  example.
+
+  *Why the usual objection no longer holds.* The standing published advice
+  against the role — Adrian Roselli's — rests entirely on screen-reader
+  support, and the two named holdouts have since been addressed: NVDA reported
+  switches as checkboxes until it fixed that in 2023.1, and iOS VoiceOver's
+  long-standing bug was closed against WebKit 17.4. Everywhere the role is not
+  honoured it degrades to a correctly announced checkbox with its state — in
+  the published test matrices there is no case of a native-checkbox switch
+  going unannounced or losing its state.
+
+  *The two conditions it comes with.* Never let the input reach an
+  indeterminate state: `aria-checked="mixed"` is not valid under this role,
+  browsers disagree about what to do with it, and neither axe nor the HTML
+  validator flags it — nothing in this repo's gates would catch it. And never
+  set `aria-checked` by hand; the native `checked` property carries the state,
+  which is why the APG example sets no ARIA state at all.
+
+  *If a call site really is collecting a form value*, the fix is `Checkbox`,
+  not a switch with its role turned off — but `inputProps={{ role: 'checkbox' }}`
+  still wins, because the role is set before the spread.
 - **The label is always associated.** `id`, then `name`, then a generated id, so
   there is no way to end up with an orphaned label — the trap that `Input` and
   `Textarea` have.

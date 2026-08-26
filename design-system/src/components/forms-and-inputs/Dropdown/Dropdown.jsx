@@ -13,6 +13,7 @@ const Dropdown = ({
     direction = "dropdown",
     className = "",
     isOpen: controlledIsOpen, // Optional controlled state
+    onToggle, // Called with the next open state, controlled or not
     toggle // Optional custom toggle component
 }) => {
     const [internalIsOpen, setInternalIsOpen] = useState(false);
@@ -27,16 +28,27 @@ const Dropdown = ({
     const isControlled = controlledIsOpen !== undefined;
     const show = isControlled ? controlledIsOpen : internalIsOpen;
 
-    const toggleDropdown = () => {
+    /**
+     * Every open/close goes through here (#207). Before it existed, a caller
+     * who passed `isOpen` owned the state and had no way to hear about a
+     * toggle click, an item click, or a click outside — so a controlled
+     * dropdown opened and then stayed open forever. The internal state is
+     * still only touched when uncontrolled; `onToggle` fires either way, which
+     * is what makes the controlled half usable.
+     */
+    const setOpen = (next) => {
         if (!isControlled) {
-            setInternalIsOpen(!internalIsOpen);
+            setInternalIsOpen(next);
+        }
+        if (onToggle) {
+            onToggle(next);
         }
     };
 
+    const toggleDropdown = () => setOpen(!show);
+
     const closeDropdown = () => {
-        if (!isControlled) {
-            setInternalIsOpen(false);
-        }
+        if (show) setOpen(false);
     };
 
     useEffect(() => {
@@ -48,7 +60,12 @@ const Dropdown = ({
 
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [dropdownRef]);
+        // `show` and `onToggle` are read inside the listener, so it has to be
+        // re-bound when either changes — otherwise the close fires against a
+        // stale open state and a stale callback. The old deps were
+        // `[dropdownRef]`, a ref that never changes, which is why this only
+        // started mattering once the listener had a callback to call.
+    }, [show, onToggle]);
 
     // Measure available space and choose a placement so the menu stays on-screen.
     const measurePlacement = useCallback(() => {
@@ -265,6 +282,7 @@ Dropdown.propTypes = {
     direction: PropTypes.oneOf(['dropdown', 'dropup', 'dropleft', 'dropright']),
     className: PropTypes.string,
     isOpen: PropTypes.bool,
+    onToggle: PropTypes.func,
     toggle: PropTypes.node
 };
 
