@@ -10,4 +10,4 @@
 // failure the paragraph above describes, pointing the other way — nothing was
 // stale except the label. #249 replaces this constant with something the deploy
 // writes and nobody has to remember.
-export const BUILD = "r74-2026-08-26";
+export const BUILD = "r75-2026-08-27";
