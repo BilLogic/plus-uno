@@ -816,24 +816,55 @@ h2.toc-title {
  * fence the heading rules above need does not apply here: nothing in this block
  * selects a bare tag.
  */
+/*
+ * WHY THE RAIL IS A SHADOW AND THE TABS CARRY NO NEGATIVE MARGIN.
+ *
+ * `overflow-x: auto` is here so a narrow viewport can scroll a long tab list.
+ * But CSS does not let one axis scroll while the other stays `visible`: when
+ * either axis is not `visible`, a computed `visible` on the other becomes
+ * `auto`. So `overflow-y` was silently `auto` — never authored, and visible in
+ * `getComputedStyle`.
+ *
+ * That mattered because the active underline used to be a 2px `border-bottom`
+ * on the tab pulled onto the strip's own border with `margin-bottom: -1px`.
+ * The negative margin takes the tab OUT of the strip's content box by 1px, so
+ * `scrollHeight` (50) exceeded `clientHeight` (49) and the now-`auto` y-axis
+ * drew a vertical scrollbar on every docs page — measured, 15px of the strip's
+ * width eaten by the gutter, on a control 50px tall.
+ *
+ * `overflow-y: hidden` alone is NOT the fix: overflow clips at the padding box,
+ * and the tab's border ran 1px past it, so the 2px underline would have painted
+ * as 1px. Measured that too before rejecting it.
+ *
+ * So the rail moved from `border-bottom` to an inset shadow, which paints
+ * INSIDE the padding box, and the tabs no longer need to reach outside the box
+ * to sit on it. There is now no vertical overflow to scroll or to clip: strip
+ * top/bottom/height are byte-identical to before (116/166/50), the underline is
+ * still 2px, and `scrollHeight === clientHeight`.
+ */
 .sb-ds-docs-tabs__strip {
     display: flex;
     gap: var(--size-section-gap-lg);
     align-items: stretch;
-    border-bottom: 1px solid var(--color-outline-variant, #e4e4e7);
+    box-shadow: inset 0 -1px 0 var(--color-outline-variant, #e4e4e7);
     margin: 0 0 var(--size-surface-gap-lg);
     overflow-x: auto;
+    /* Explicit, because `overflow-x: auto` would otherwise compute it to `auto`.
+       Belt and braces: nothing overflows vertically any more, but the next
+       person to add padding or a taller child should not get a scrollbar. */
+    overflow-y: hidden;
 }
 
 .sb-ds-docs-tabs__tab {
     appearance: none;
     background: none;
     border: 0;
-    /* The active underline sits ON the strip's border, so it must be the same
-       thickness and hang below the padding rather than adding height — otherwise
-       selecting a tab nudges the whole page down by a pixel. */
+    /* The active underline overlaps the strip's inset rail, so selecting a tab
+       does not nudge the page down. It needs no negative margin to get there:
+       the rail paints inside the strip's padding box, which is where this
+       border already is. See the strip rule above for what the negative margin
+       used to cost. */
     border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
     padding: var(--size-surface-container-pad-y) 0;
     color: var(--color-on-surface-variant, #43474e);
     font-family: var(--font-family-header, 'Lato', sans-serif);
