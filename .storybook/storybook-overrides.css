@@ -32,24 +32,23 @@ body,
  * `:where()` contributes no specificity, so the fence leaves every rule ranked
  * exactly where it was against `.sb-doc-shadcn`, the TOC and the intro page.
  *
- * The `.sbdocs-h1`/`-h2`/`-h3`/`-h4`/`-h5` selectors are INERT on Storybook 10.5:
- * `addon-docs` emits `sbdocs-title`, `-subtitle`, `-wrapper`, `-content`,
- * `-preview`, `-toc--custom`, `-expandable` and `-argcontrol*` and nothing else,
- * so an MDX heading carries only an emotion class. The bare tag selectors are what
- * actually styles MDX prose here, which is why they are fenced rather than dropped.
- * The class selectors are kept in case a future Storybook restores them.
+ * The bare tag selectors are the ONLY thing styling MDX prose here, which is why
+ * they are fenced rather than dropped. `addon-docs` 10.5 emits `sbdocs-title`,
+ * `-wrapper`, `-content`, `-preview`, `-toc--custom`, `-expandable` and
+ * `-argcontrol*` and nothing else — an MDX heading carries only an emotion class.
+ * The `.sbdocs-h1`…`-h5`, `.sbdocs-p`, `.sbdocs-li` and `.sbdocs-subtitle`
+ * selectors that used to sit alongside these were deleted: they were never
+ * emitted, so they had never once applied. `.sbdocs-title` IS emitted and stays.
  */
 .sbdocs h1:not(:where(.docs-story *)),
-.sbdocs-title,
-.sbdocs-h1 {
+.sbdocs-title {
     font-family: var(--font-family-header, 'Lato', sans-serif) !important;
     font-size: var(--font-size-display4, 56px) !important;
     font-weight: var(--font-weight-headline, 700) !important;
     color: var(--color-on-surface, #191c1e) !important;
 }
 
-.sbdocs h2:not(:where(.docs-story *)),
-.sbdocs-h2 {
+.sbdocs h2:not(:where(.docs-story *)) {
     font-family: var(--font-family-header, 'Lato', sans-serif) !important;
     font-size: var(--font-size-h2, 32px) !important;
     font-weight: var(--font-weight-headline, 700) !important;
@@ -60,10 +59,7 @@ body,
 .sbdocs h3:not(:where(.docs-story *)),
 .sbdocs h4:not(:where(.docs-story *)),
 .sbdocs h5:not(:where(.docs-story *)),
-.sbdocs h6:not(:where(.docs-story *)),
-.sbdocs-h3,
-.sbdocs-h4,
-.sbdocs-h5 {
+.sbdocs h6:not(:where(.docs-story *)) {
     font-family: var(--font-family-header, 'Lato', sans-serif) !important;
     font-size: var(--font-size-h3, 28px) !important;
     font-weight: var(--font-weight-headline, 700) !important;
@@ -76,8 +72,6 @@ body,
  * Do NOT target bare `.sbdocs p` / `li` / `td` — that !important override
  * smashed DS utilities (body3-txt captions, h6 titles, etc.) inside story canvases.
  */
-.sbdocs p.sbdocs-p,
-.sbdocs li.sbdocs-li,
 .sbdocs .sbdocs-content > p:not([class]),
 .sbdocs .sbdocs-content > ul > li:not([class]),
 .sbdocs .sbdocs-content > ol > li:not([class]) {
@@ -225,89 +219,73 @@ a.sbdocs-a {
     color: var(--color-primary, #0472a8) !important;
 }
 
-/* MDX pages that wrap content in .sb-doc-shadcn (shadcn-style docs): let Tailwind control type scale and color */
-.sbdocs .sb-doc-shadcn,
-.sbdocs .sb-doc-shadcn h1,
-.sbdocs .sb-doc-shadcn h2,
-.sbdocs .sb-doc-shadcn h3,
-.sbdocs .sb-doc-shadcn h4,
-.sbdocs .sb-doc-shadcn p,
-.sbdocs .sb-doc-shadcn li {
-    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif !important;
-    color: inherit !important;
-    font-size: inherit !important;
-    line-height: inherit !important;
-    font-weight: inherit !important;
-}
-
-.sbdocs .sb-doc-shadcn a {
-    color: inherit !important;
-}
-
-.sbdocs .sb-doc-shadcn a:hover {
-    color: inherit !important;
-}
-
 /*
- * Component MDX (Button + shared Components/* pages): section rhythm without relying on Tailwind
- * in MDX. `.sb-button-*` aliases match `.sb-ds-*` for backward compatibility.
+ * Component MDX: section rhythm.
+ *
+ * The `.sb-button-*` aliases that used to shadow every selector here are gone —
+ * `sb-button-docs`, `sb-button-doc-section` and `sb-button-interactive-panel`
+ * had zero occurrences anywhere in the repo, so they doubled the size of this
+ * block while matching nothing.
+ *
+ * SPACING HAS ONE AUTHORITY, and it is `gap`.
+ *
+ * A section is a flex column, and margins do NOT collapse inside a flex
+ * container. While its children kept their own margins, a paragraph pair cost
+ * `margin-bottom 16 + gap 10 + margin-top 16 = 42px` where block flow would have
+ * collapsed it to 16 — measured at 46px on the Introduction page, whose gap is
+ * wider. Zeroing the children's margins makes the sum impossible: the only
+ * number that can appear between two children is `gap`.
+ *
+ * The margins are zeroed on DIRECT children only. Prose inside a
+ * `DocsCanvasShell` is not a direct child, is still in block flow, and still
+ * collapses normally — that spacing is the shell's business, not this rule's.
+ *
+ * `--size-section-gap-md` replaces the hand-picked `0.5rem`/`0.625rem` pair. One
+ * value at every width: a heading sits the same distance from its content as two
+ * paragraphs sit from each other, which is the trade of having one authority.
  */
-.sbdocs .sb-ds-component-docs.sb-ds-component-docs--page,
-.sbdocs .sb-button-docs.sb-button-docs--page {
+.sbdocs .sb-ds-component-docs.sb-ds-component-docs--page {
   margin-top: 4rem;
 }
 
 @media (min-width: 768px) {
-  .sbdocs .sb-ds-component-docs.sb-ds-component-docs--page,
-  .sbdocs .sb-button-docs.sb-button-docs--page {
+  .sbdocs .sb-ds-component-docs.sb-ds-component-docs--page {
     margin-top: 6rem;
   }
 }
 
-.sbdocs .sb-ds-component-docs .sb-ds-doc-section,
-.sbdocs .sb-button-docs .sb-button-doc-section {
+.sbdocs .sb-ds-component-docs .sb-ds-doc-section {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: clamp(4.5rem, 12vw, 11rem);
+  gap: var(--size-section-gap-md, 16px);
 }
 
-@media (min-width: 768px) {
-  .sbdocs .sb-ds-component-docs .sb-ds-doc-section,
-  .sbdocs .sb-button-docs .sb-button-doc-section {
-    gap: 0.625rem;
-    margin-bottom: clamp(6rem, 14vw, 14rem);
-  }
-}
-
-@media (min-width: 1024px) {
-  .sbdocs .sb-ds-component-docs .sb-ds-doc-section,
-  .sbdocs .sb-button-docs .sb-button-doc-section {
-    margin-bottom: clamp(7rem, 12vw, 16rem);
-  }
-}
-
-.sbdocs .sb-ds-component-docs .sb-ds-doc-section:last-child,
-.sbdocs .sb-button-docs .sb-button-doc-section:last-child {
-  margin-bottom: 0;
+.sbdocs .sb-ds-component-docs .sb-ds-doc-section > * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 /*
  * Space between major sections.
  *
- * Was `clamp(6rem, 8vw, 8rem)` — 96px at desktop, three times the size of the
- * heading it separates, which read as a gap rather than as rhythm. 64px keeps
- * sections clearly apart while letting two of them share a screen.
- *
- * This block carries `!important` and therefore overrides the three
- * `.sb-ds-component-docs .sb-ds-doc-section` margin rules above it, despite
- * those being more specific. Left as one authority on purpose: the value lives
- * here, and the blocks above only still matter for their `gap`.
+ * `!important` because it has to beat the `> *` rule above on a section that is
+ * itself the child of another — and because four earlier authored values used to
+ * lose to a block like this one silently. There is now nothing left to fight:
+ * the three `margin-bottom` clamps and the `:last-child` reset that used to sit
+ * above were unreachable, and are deleted rather than reinstated.
  */
-.sbdocs .sb-ds-doc-section,
-.sbdocs .sb-button-docs .sb-button-doc-section {
+.sbdocs .sb-ds-doc-section {
   margin-top: clamp(2.5rem, 5vw, 4rem) !important;
   margin-bottom: clamp(2.5rem, 5vw, 4rem) !important;
+}
+
+/*
+ * The last section ends the panel. Its bottom margin was authored as 0, lost to
+ * the block above, and left 40-64px of dead space under every tab panel on all
+ * 48 component pages. Restored here, where it can actually win.
+ */
+.sbdocs .sb-ds-doc-section:last-child {
+  margin-bottom: 0 !important;
 }
 
 /*
@@ -406,38 +384,32 @@ a.sbdocs-a {
 /*
  * Preview well: flatten inner Storybook Canvas chrome; outer card only.
  */
-.sbdocs .sb-ds-docs-preview-well .sbdocs.sbdocs-preview,
-.sbdocs .sb-button-docs-preview-well .sbdocs.sbdocs-preview {
+.sbdocs .sb-ds-docs-preview-well .sbdocs.sbdocs-preview {
   margin: 0 !important;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
 }
 
-.sbdocs .sb-ds-docs-preview-well .docs-story,
-.sbdocs .sb-button-docs-preview-well .docs-story {
+.sbdocs .sb-ds-docs-preview-well .docs-story {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   margin: 0 !important;
 }
 
-.sbdocs .sb-ds-docs-preview-well .docs-story > div:first-child,
-.sbdocs .sb-button-docs-preview-well .docs-story > div:first-child {
+.sbdocs .sb-ds-docs-preview-well .docs-story > div:first-child {
   padding: 0 !important;
 }
 
-.sbdocs .sb-ds-docs-preview-well .innerZoomElementWrapper > *,
-.sbdocs .sb-button-docs-preview-well .innerZoomElementWrapper > * {
+.sbdocs .sb-ds-docs-preview-well .innerZoomElementWrapper > * {
   border-width: 0 !important;
 }
 
-.sbdocs .sb-ds-docs-interactive-panel__controls .docblock-argstable,
-.sbdocs .sb-button-interactive-panel__controls .docblock-argstable {
+.sbdocs .sb-ds-docs-interactive-panel__controls .docblock-argstable {
   margin: 0 !important;
 }
 
-.sbdocs .sb-ds-docs-interactive-panel__controls .docblock-argstable-head th,
-.sbdocs .sb-button-interactive-panel__controls .docblock-argstable-head th {
+.sbdocs .sb-ds-docs-interactive-panel__controls .docblock-argstable-head th {
   font-weight: 600 !important;
 }
 
@@ -456,10 +428,7 @@ a.sbdocs-a {
  * every argument here is a bare tag, so this ranks exactly where the old
  * four-selector list did.
  */
-.sbdocs .sb-ds-component-docs .sb-ds-doc-section > :is(h2, h3, h4),
-.sbdocs .sb-ds-component-docs .sb-ds-doc-section .sbdocs-h3,
-.sbdocs .sb-button-docs .sb-button-doc-section > :is(h2, h3, h4),
-.sbdocs .sb-button-docs .sb-button-doc-section .sbdocs-h3 {
+.sbdocs .sb-ds-component-docs .sb-ds-doc-section > :is(h2, h3, h4) {
   /* The h3 step, whatever the tag: the promotion was for the outline, and it is
      not allowed to change what the page looks like. */
   font-size: var(--font-size-h3, 28px) !important;
@@ -524,10 +493,7 @@ a.sbdocs-a {
  * Default autodocs pages (no .sb-doc-shadcn): slightly calmer lead under the title.
  * Does not affect Canvas.
  */
-.sbdocs .sbdocs-subtitle,
-.sbdocs-title + p,
-.sbdocs-h1 + p,
-.sbdocs p.sbdocs-subtitle {
+.sbdocs-title + p {
   opacity: 0.92;
   margin-top: 1.5rem !important;
   margin-bottom: 4rem !important;
@@ -537,8 +503,7 @@ a.sbdocs-a {
    reason as the type-scale rules at the top of this file — LessonsDetailPage's
    P5 canvas renders `<h1>`s of its own. */
 .sbdocs h1:not(:where(.docs-story *)),
-.sbdocs-title,
-.sbdocs-h1 {
+.sbdocs-title {
   margin-bottom: 1rem !important;
 }
 
@@ -585,13 +550,11 @@ h2.toc-title {
  * Remove outer border, shadow.
  */
 .sb-ds-docs-preview-well,
-.sb-button-docs-preview-well,
 .sbdocs.sbdocs-preview {
     box-shadow: none !important;
 }
 
-.sb-ds-docs-preview-well .sbdocs.sbdocs-preview,
-.sb-button-docs-preview-well .sbdocs.sbdocs-preview {
+.sb-ds-docs-preview-well .sbdocs.sbdocs-preview {
     background-color: transparent !important;
     border-radius: 0 !important;
 }
@@ -807,8 +770,7 @@ h2.toc-title {
 
 /* Flush / custom wells: zero Storybook’s own padding (outer card supplies it). */
 .sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .docs-story > div[scale="1"],
-.sbdocs .sb-ds-docs-preview-well .docs-story > div[scale="1"],
-.sbdocs .sb-button-docs-preview-well .docs-story > div[scale="1"] {
+.sbdocs .sb-ds-docs-preview-well .docs-story > div[scale="1"] {
   padding: 0 !important;
 }
 
