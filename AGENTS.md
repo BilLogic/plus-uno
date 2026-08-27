@@ -131,3 +131,34 @@ Finished work leaves behind one of three things: a **rule** in the doc that alre
      the IDE agent. The comment sits INSIDE the fence on purpose: a note about
      removed sections is itself meaningless to the reader they were removed for. -->
 <!-- /ide-only -->
+
+<!-- ide-only -->
+
+## Agent skills
+
+Config the `mattpocock-skills` plugin's skills read — `/tdd`, `/code-review`,
+`/triage`, `/implement` and the rest. Each sub-section summarises its file in a
+line; open the file itself only when a skill asks for it, since loading three
+config docs up front spends context no task has asked for. IDE-only: these
+skills run against a filesystem and the `gh` CLI, and the Worker has neither, so
+this region is stripped from its prompt.
+
+### Issue tracker
+
+GitHub Issues on `BilLogic/plus-uno`, inferred from `git remote`.
+See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five canonical roles, label strings unchanged (`needs-triage`, `needs-info`,
+`ready-for-agent`, `ready-for-human`, `wontfix`) — all created in GitHub.
+See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context. `docs/adr/` is the live half; there is no root `CONTEXT.md` and
+that is not a finding — `/domain-modeling` creates both lazily, and
+`docs/agents/domain.md` tells a skill to proceed silently when they are absent.
+`docs/adr/026-spacing-tokens-grouped-over-flat.md` is the one it has written so
+far. See `docs/agents/domain.md`.
+<!-- /ide-only -->
