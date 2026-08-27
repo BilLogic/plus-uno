@@ -247,6 +247,23 @@ export interface BlueprintSearchOptions {
    *  questions. The fresh result still POPULATES the cache, so the re-check
    *  costs one round trip, not every subsequent one. */
   fresh?: boolean;
+  /** Score a CANDIDATE search function instead of the live one.
+   *
+   *  WHY: retrieval changes could only be measured by editing the function the
+   *  whole product calls, because this module names it from the contract and
+   *  nothing could point elsewhere. So the loop was "apply to production, run
+   *  the eval, revert if worse" — which is how an OR-ranked keyword arm reached
+   *  production, fixed one blocker case, broke three others and had to be
+   *  rolled back (plus-uno-blueprint#154).
+   *
+   *  With this, a candidate is created ALONGSIDE `search_blueprint`, scored,
+   *  and dropped, and the live function never moves.
+   *
+   *  DEBUG ROUTES ONLY, and validated there against a prefix — see
+   *  `CANDIDATE_RPC` in src/index.ts. An arbitrary name here would let anyone
+   *  holding the debug token call any Postgres function reachable by the bot's
+   *  key, which is a larger surface than the route is meant to expose. */
+  rpcName?: string;
   /** Ask the RPC to return edges and/or findings for the cells it matched,
    *  inside the SAME subrequest. Each one dropped here is one fewer metered
    *  call against Cloudflare's 50-per-invocation cap.
@@ -301,9 +318,14 @@ export async function searchBlueprint(
   // no edges attached — a cache serving a partial answer as a whole one, which
   // is the same class of bug the `fresh` bypass exists to prevent.
   const wantInclude = [...(options.include ?? [])].sort();
+  // The candidate function is part of the key. `fresh` skips the cache READ but
+  // still WRITES, so without this a scored candidate's rows would be served to
+  // the next live question — a debug route quietly changing what the product
+  // answers.
   const cacheKey =
     q.toLowerCase().replace(/\s+/g, " ").trim() +
-    (wantInclude.length ? `\u0000include:${wantInclude.join(",")}` : "");
+    (wantInclude.length ? `\u0000include:${wantInclude.join(",")}` : "") +
+    (options.rpcName && options.rpcName !== RPC_NAME ? `\u0000rpc:${options.rpcName}` : "");
   const hit = options.fresh ? undefined : searchCache.get(cacheKey);
   if (hit && Date.now() - hit.at < CACHE_TTL_MS) {
     const age = Date.now() - hit.at;
@@ -329,7 +351,7 @@ export async function searchBlueprint(
     // Falls through to the ladder only when the RPC is absent (not migrated) or
     // the kill switch is off. Kept for one release as the rollback path.
     if (env.BLUEPRINT_HYBRID !== "off") {
-      const fused = await tryHybrid(env, base, key, q, controller.signal, wantInclude as readonly ("edges" | "findings")[]);
+      const fused = await tryHybrid(env, base, key, q, controller.signal, wantInclude as readonly ("edges" | "findings")[], options.rpcName ?? RPC_NAME);
       if (fused && fused.rows.length) {
         const cap = semanticCap(fused.rows.length, HYBRID_MATCH_COUNT);
         const result: BlueprintSearchResult = {
@@ -546,6 +568,7 @@ async function tryHybrid(
   q: string,
   signal: AbortSignal,
   include: readonly ("edges" | "findings")[] = [],
+  rpcName: string = RPC_NAME,
 ): Promise<{
   rows: BlueprintRow[];
   matchedTotal?: number;
@@ -555,7 +578,7 @@ async function tryHybrid(
   // A null embedding is legal here: the RPC runs keyword-only rather than
   // failing, so a Vertex outage costs paraphrase recall instead of the answer.
   const embedding = await embedText(env, q, "RETRIEVAL_QUERY");
-  const res = await countedFetch(`${base}/rest/v1/rpc/${RPC_NAME}`, {
+  const res = await countedFetch(`${base}/rest/v1/rpc/${rpcName}`, {
     method: "POST",
     headers: { ...headers(key), "content-type": "application/json" },
     body: JSON.stringify({
@@ -626,7 +649,7 @@ async function tryHybrid(
   // fail the search. Any other status is a real error and must propagate.
   const err = (await res.json().catch(() => ({}))) as { code?: string };
   if (res.status === 404 || err.code === "PGRST202") return null;
-  throw new Error(`Supabase rpc ${RPC_NAME} ${res.status}${err.code ? ` ${err.code}` : ""}`);
+  throw new Error(`Supabase rpc ${rpcName} ${res.status}${err.code ? ` ${err.code}` : ""}`);
 }
 
 function str(v: unknown): string | undefined {
