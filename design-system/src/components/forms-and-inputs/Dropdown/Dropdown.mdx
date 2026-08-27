@@ -139,7 +139,7 @@ It is the only component in `forms-and-inputs` that places itself: the menu
 flips up when there is no room below and right-aligns when a left-aligned menu
 would run off the edge, remeasuring on scroll and resize.
 
-**When not to use**
+### When not to use
 
 - **Not to hold a form value.** A control whose job is to store what the user
   picked is `Select` — it keeps the value, shows it in the trigger, and supports
@@ -164,7 +164,7 @@ would run off the edge, remeasuring on scroll and resize.
 
 ## Correct and incorrect
 
-**Controlled mode needs both halves.**
+### Controlled mode needs both halves.
 
 ```jsx
 // Incorrect — `isOpen` without `onToggle` freezes the component. The user's
@@ -178,7 +178,7 @@ would run off the edge, remeasuring on scroll and resize.
 <Dropdown buttonText="Actions" items={items} />
 ```
 
-**A menu of actions is not a picker.**
+### A menu of actions is not a picker.
 
 ```jsx
 // Incorrect — the selection is not stored anywhere. `selected` is a per-item
@@ -198,7 +198,7 @@ would run off the edge, remeasuring on scroll and resize.
 />
 ```
 
-**Give the split treatment a real button when the label must act.**
+### Give the split treatment a real button when the label must act.
 
 ```jsx
 // Incorrect — clicking "Save" does nothing. The label half of a split button

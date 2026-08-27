@@ -122,7 +122,7 @@ Padding, gap, radius and border are token-backed size props (`paddingSize`,
 `gapSize`, `radiusSize`, `borderSize`), so a card should never need custom CSS
 for spacing.
 
-**When not to use**
+### When not to use
 
 - **Not as a generic div.** A card draws a bordered surface. Grouping without a
   visible boundary is layout, not a card — see
@@ -144,7 +144,7 @@ for spacing.
 
 ## Correct and incorrect
 
-**A clickable card is not a keyboard-reachable card.**
+### A clickable card is not a keyboard-reachable card.
 
 ```jsx
 // Incorrect — mouse-only. No role, no tabindex, no Enter or Space.
@@ -157,7 +157,7 @@ for spacing.
 />
 ```
 
-**`header` and `footer` take strings, not nodes.**
+### `header` and `footer` take strings, not nodes.
 
 ```jsx
 // Incorrect — both are declared as PropTypes.string, so a node here warns
@@ -170,7 +170,7 @@ for spacing.
 </Card>
 ```
 
-**Radius has two values here, not three.**
+### Radius has two values here, not three.
 
 ```jsx
 // Incorrect — `radiusSize` on Card accepts only `sm` and `md`. (Modal and

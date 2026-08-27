@@ -59,7 +59,7 @@ Provide contextual feedback messages for typical user actions with the handful o
 
 <div className="sb-ds-doc-section">
 
-## Styles
+## Variants
 
 <DocsCanvasShell description={<>Semantic styles with title and dismissible chrome.</>}>
     <DsCanvasQuiet of={AlertStories.Styles} />
@@ -118,7 +118,7 @@ Six styles: `primary`, `secondary`, `success`, `danger`, `warning`, `info`. That
 list is shorter than `Button`'s — there is no `tertiary` and there are no SMART
 domain colors, because an alert is always saying something about state.
 
-**When not to use**
+### When not to use
 
 - **Not for field validation.** A message about one field belongs on that field.
   `Input`, `NumberInput`, `FileUpload` and `DateAndTimePicker` all take
@@ -141,7 +141,7 @@ domain colors, because an alert is always saying something about state.
 
 ## Correct and incorrect
 
-**Field errors go on the field.**
+### Field errors go on the field.
 
 ```jsx
 // Incorrect — the error is a hundred pixels away from the input it is about,
@@ -161,7 +161,7 @@ domain colors, because an alert is always saying something about state.
 />
 ```
 
-**`dismissible` is on by default.**
+### `dismissible` is on by default.
 
 ```jsx
 // Incorrect — this renders a close button the author never asked for, and the
@@ -172,7 +172,7 @@ domain colors, because an alert is always saying something about state.
 <Alert style="warning" dismissible={false}>This term's schedule is provisional.</Alert>
 ```
 
-**Dismissal is one-way.**
+### Dismissal is one-way.
 
 ```jsx
 // Incorrect — `show` is not a declared prop, and the component checks its own

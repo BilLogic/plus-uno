@@ -68,7 +68,7 @@ Use switch when a user needs to toggle between two states: on and off, true and 
 
 <div className="sb-ds-doc-section">
 
-## Interaction states
+## States
 
 <DocsCanvasShell description={<>Off, on, and disabled.</>}>
     <DsCanvasQuiet of={SwitchStories.InteractionStates} />
@@ -113,7 +113,7 @@ It always has an id: `id`, else `name`, else a generated one, so its label is
 always associated. `inputProps` is the escape hatch for DOM attributes the
 component does not name.
 
-**When not to use**
+### When not to use
 
 - **Not for a form value.** A boolean that gets submitted with everything else
   is `Checkbox` — the visual difference is the whole point: a switch says "this
@@ -132,7 +132,7 @@ component does not name.
 
 ## Correct and incorrect
 
-**A switch acts now; a checkbox saves later.**
+### A switch acts now; a checkbox saves later.
 
 ```jsx
 // Incorrect — a switch inside a form that is only applied on submit. The
@@ -147,7 +147,7 @@ component does not name.
         onChange={(e) => persist(e.target.checked)} />
 ```
 
-**`type` cannot be overridden through `inputProps`.**
+### `type` cannot be overridden through `inputProps`.
 
 ```jsx
 // Incorrect — `type` is stripped out of inputProps before they are spread,
@@ -159,7 +159,7 @@ component does not name.
 <Switch id="a" label="On" inputProps={{ 'aria-describedby': 'a-hint' }} />
 ```
 
-**Controlled means controlled.**
+### Controlled means controlled.
 
 ```jsx
 // Incorrect — `checked` with no `onChange`. The input never moves, because the

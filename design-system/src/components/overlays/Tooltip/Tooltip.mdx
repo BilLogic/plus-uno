@@ -98,7 +98,7 @@ what you can see — an icon-only `Button`, a truncated cell, an abbreviation. I
 wraps a single trigger element and shows on hover and focus by default, after
 250ms, hiding 400ms after you leave.
 
-**When not to use**
+### When not to use
 
 - **Not for content the user needs.** A tooltip is unreachable on touch, is
   hidden until hovered, and disappears when the pointer moves. Anything a person
@@ -120,7 +120,7 @@ wraps a single trigger element and shows on hover and focus by default, after
 
 ## Correct and incorrect
 
-**A tooltip describes; it does not name.**
+### A tooltip describes; it does not name.
 
 ```jsx
 // Incorrect — the icon-only button has no accessible name of its own, so it is
@@ -135,7 +135,7 @@ wraps a single trigger element and shows on hover and focus by default, after
 </Tooltip>
 ```
 
-**Controlled mode ignores the trigger and the delays.**
+### Controlled mode ignores the trigger and the delays.
 
 ```jsx
 // Incorrect — once `show` is defined, the component takes a different branch
@@ -150,7 +150,7 @@ wraps a single trigger element and shows on hover and focus by default, after
 <Tooltip text="Save this draft"><Button text="Save" /></Tooltip>
 ```
 
-**Do not put anything reachable inside it.**
+### Do not put anything reachable inside it.
 
 ```jsx
 // Incorrect — the link cannot be clicked. Moving the pointer toward it leaves

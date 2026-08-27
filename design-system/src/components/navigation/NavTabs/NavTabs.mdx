@@ -120,7 +120,7 @@ It can be uncontrolled (`defaultActiveKey`) or controlled (`activeKey` plus
 `onSelect`). `alignment` covers left, centre, right and `justified`, which
 stretches the tabs to fill the bar.
 
-**When not to use**
+### When not to use
 
 - **Not for navigating away.** Tabs imply the content stays in place. Moving to
   a different page in a hierarchy is `Breadcrumb` plus real links; a sidebar
@@ -140,7 +140,7 @@ stretches the tabs to fill the bar.
 
 ## Correct and incorrect
 
-**A controlled bar needs `onSelect`, or it will never move.**
+### A controlled bar needs `onSelect`, or it will never move.
 
 ```jsx
 // Incorrect — activeKey pins the bar and nothing updates it.
@@ -156,7 +156,7 @@ stretches the tabs to fill the bar.
 </NavTabs>
 ```
 
-**Give each item an `eventKey` or an `href` — selection is keyed off one of them.**
+### Give each item an `eventKey` or an `href` — selection is keyed off one of them.
 
 ```jsx
 // Incorrect — with neither, there is no key to compare against activeKey, so
@@ -171,7 +171,7 @@ stretches the tabs to fill the bar.
 </NavTabs>
 ```
 
-**If it must behave as an ARIA tab widget, it needs the tab container.**
+### If it must behave as an ARIA tab widget, it needs the tab container.
 
 ```jsx
 // Incorrect — assuming role="tab" and arrow keys come for free. They do not:

@@ -419,7 +419,7 @@ Use it for navigation too, but pass `href`: the component forwards `href` and
 middle-click and "open in new tab" working, which a click handler on a `button`
 does not.
 
-**When not to use**
+### When not to use
 
 - **Not for a set of choices.** Three Buttons with `active` look selected but
   announce nothing — `active` only adds a CSS class. Use `RadioButtonGroup` for
@@ -442,7 +442,7 @@ does not.
 
 ## Correct and incorrect
 
-**An icon-only button needs a name and needs room.**
+### An icon-only button needs a name and needs room.
 
 ```jsx
 // Incorrect — no text and no children means icon-only, which renders 36×36
@@ -454,7 +454,7 @@ does not.
 <Button leadingVisual="trash" style="danger" size="large" aria-label="Delete session" />
 ```
 
-**Loading is not a substitute for feedback.**
+### Loading is not a substitute for feedback.
 
 ```jsx
 // Incorrect — the label goes transparent, so for a ten-second export the
@@ -466,7 +466,7 @@ does not.
 {isExporting && <Spinner />}
 ```
 
-**A group of buttons is not a selection control.**
+### A group of buttons is not a selection control.
 
 ```jsx
 // Incorrect — `active` is a class. Nothing announces which one is chosen.

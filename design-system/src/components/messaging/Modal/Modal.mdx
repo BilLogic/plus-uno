@@ -112,7 +112,7 @@ that takes focus away from the page, so use it when interrupting is the point.
 The footer is built in: pass `primaryButton` and `secondaryButton` as objects and
 the component renders the `Button` pair for you, with a divider above them.
 
-**When not to use**
+### When not to use
 
 - **Not for a message the user only has to read.** A result that needs no
   decision is `Toast` if it is transient, `Alert` if it stays on the page.
@@ -135,7 +135,7 @@ the component renders the `Button` pair for you, with a divider above them.
 
 ## Correct and incorrect
 
-**Do not use the inline render for a live dialog.**
+### Do not use the inline render for a live dialog.
 
 ```jsx
 // Incorrect — no backdrop, no focus trap, no Escape. The page behind stays
@@ -147,7 +147,7 @@ the component renders the `Button` pair for you, with a divider above them.
 <Modal title="Delete session" show={open} onClose={close} />
 ```
 
-**Width must be a length the component recognises.**
+### Width must be a length the component recognises.
 
 ```jsx
 // Incorrect — `clamp(...)` is not in the allowlist, so this silently falls back
@@ -158,7 +158,7 @@ the component renders the `Button` pair for you, with a divider above them.
 <Modal width={480} title="Reschedule" show={open} onClose={close} />
 ```
 
-**The footer only appears when you give it a button.**
+### The footer only appears when you give it a button.
 
 ```jsx
 // Incorrect — `showBottomButtons` defaults to true, but with neither button

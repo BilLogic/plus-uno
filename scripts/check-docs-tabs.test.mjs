@@ -80,12 +80,28 @@ test('3b. an Examples section pulled into Usage is caught — the rule runs both
   );
 });
 
-test('3c. `When not to use` is prose, not a heading — it must not be treated as a Usage section', () => {
-  // It appears as bold prose inside `When to use` in all 15 files. If it were
-  // ever promoted to a heading it would belong to Examples by this rule, and
-  // that is the answer we want: the rule does not guess at near-miss names.
-  const ok = page({ examples: ['Overview'], usage: ['When to use'] });
-  assert.deepEqual(checkFile(COMPONENT, ok, true), []);
+test('3c. a `###` sub-heading is not a section — the `##`-only regex is load-bearing', () => {
+  // #253 promoted `When not to use` from bold prose to `### When not to use` in
+  // all 15 files, and 47 more code-pair intros beside it. `HEADING` matches `##`
+  // and only `##`, so none of the 62 opens a section, none is assigned a tab,
+  // and none is counted by assertion 5. That regex is one character away from
+  // swallowing `###`, and if it did, every one of those pages would go red for a
+  // reason no one would connect to a heading level. So it is asserted here.
+  const withSub = page({ examples: ['Overview'], usage: ['When to use'] }).replace(
+    '## When to use\n\nbody',
+    '## When to use\n\nbody\n\n### When not to use\n\nmore body',
+  );
+  const read = readTabs(withSub);
+  assert.equal(read.headings, 2, 'Overview and When to use — the `###` is not a heading here');
+  assert.equal(read.sectionDivs, 2);
+  assert.deepEqual(checkFile(COMPONENT, withSub, true), []);
+
+  // The failing twin: the same line written as `##` IS a section, and one with
+  // no div of its own, so the one-to-one invariant fires. Without this the case
+  // above would pass on a `readTabs` that had simply stopped seeing headings.
+  const asSection = withSub.replace('### When not to use', '## When not to use');
+  const found = checkFile(COMPONENT, asSection, true);
+  assert.ok(found.some((f) => /2 section div\(s\) but 3 heading\(s\)/.test(f)), found.join('\n'));
 });
 
 test('4. a foundation page that sprouts tabs is caught — the old mechanism\'s actual bug', () => {
@@ -99,6 +115,24 @@ test('5. a section div that lost its heading breaks the one-to-one invariant', (
   const broken = page().replace('## Overview\n\n', '');
   const found = checkFile(COMPONENT, broken, true);
   assert.ok(found.some((f) => /section div\(s\) but 0 heading\(s\)/.test(f)), found.join('\n'));
+});
+
+test('6. two sections sharing a name are caught — and assertion 5 cannot see them', () => {
+  // The collision #253 would have shipped blind. `Spinner.mdx` was the one page
+  // carrying both `## Variants` and `## Styles`; collapsing that pair renames
+  // the second onto the first and leaves two identically named sections, one
+  // anchor between them and two identical "On this page" entries.
+  const broken = page({ examples: ['Overview', 'Variants', 'Variants'] });
+  const found = checkFile(COMPONENT, broken, true);
+  assert.ok(found.some((f) => /2 sections named "Variants"/.test(f)), found.join('\n'));
+
+  // The reason it had to be its own assertion: a rename keeps the counts
+  // one-to-one, so assertion 5 stays silent on the very page that is broken.
+  assert.ok(!found.some((f) => /section div\(s\) but/.test(f)), found.join('\n'));
+
+  // The green twin — the same page with the two names distinct is silent.
+  const ok = page({ examples: ['Overview', 'Variants', 'States'] });
+  assert.deepEqual(checkFile(COMPONENT, ok, true), []);
 });
 
 test('an unknown tab name is caught — Code and Changelog are generated, never authored', () => {
