@@ -161,6 +161,22 @@ const COMPOSED = [
       + '`check:storybook` runs story tests, not docs pages.',
   },
   {
+    script: 'check:docs-token-literals',
+    pkg: 'root',
+    guards:
+      'that the docs stylesheet stops hand-picking values the design system already '
+      + 'tokenises. `.storybook/storybook-overrides.css` is the one stylesheet here that '
+      + 'dresses the DOCUMENTATION rather than a component, and nothing watched it: it had '
+      + 'accumulated `clamp(2.5rem, 5vw, 4rem)`, `1.5rem`, `0.625rem` and a `#e4e4e7`, each '
+      + 'a few lines from a `var(--size-…)` doing the same job, and #251 had to sweep some of '
+      + 'them by hand. Every declaration value is read against the live token table in '
+      + 'design-system/src/tokens/, matched by VALUE and filtered by family so a font-size is '
+      + 'never offered a spacing step. Zero, `100%`, `1px` hairlines, `var()` fallbacks and a '
+      + 'comment against the declaration are allowed, and each allowance has a red twin in the '
+      + 'tests. It cannot see a NEAR miss (13px is not 12px), and it cannot see a fallback that '
+      + 'disagrees with the token it backs — both are written into the script header.',
+  },
+  {
     script: 'check:page-outline',
     pkg: 'root',
     guards:

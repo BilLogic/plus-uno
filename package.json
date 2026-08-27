@@ -37,6 +37,7 @@
     "check:unspread-rest": "node scripts/check-unspread-rest.mjs",
     "check:page-outline": "node scripts/check-page-outline.mjs",
     "check:docs-tabs": "node scripts/check-docs-tabs.mjs",
+    "check:docs-token-literals": "node scripts/check-docs-token-literals.mjs",
     "generate:knowledge-audit": "node scripts/generate-knowledge-audit.js",
     "check:knowledge-audit": "node scripts/generate-knowledge-audit.js --check",
     "check:knowledge-disposition": "node scripts/check-knowledge-disposition.mjs",
