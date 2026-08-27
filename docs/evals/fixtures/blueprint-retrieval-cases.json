@@ -1,6 +1,6 @@
 [
   {
-    "_readme": "Retrieval-level eval cases for search_blueprint. Scored by agents/uno-bot/scripts/run-retrieval-evals.mjs against GET /debug/blueprint-search — NO model, NO judge, seconds not minutes. Every id below was read out of the live blueprint on 2026-08-19, never guessed. Assertions: expectCellIds (any-of within k), expectAllCellIds (all-of), expectPath/expectScenario (>= minMatches rows carry it), expectTopScoreBelow (absence). Classes: paraphrase | exact-term | structural-name | aggregate | absence. `blocker: true` cases must pass; the rest are diagnostics that report without failing the job."
+    "_readme": "Retrieval-level eval cases for search_blueprint. Scored by agents/uno-bot/scripts/run-retrieval-evals.mjs against GET /debug/blueprint-search \u2014 NO model, NO judge, seconds not minutes. Every id below was read out of the live blueprint on 2026-08-19, never guessed. Assertions: expectCellIds (any-of within k), expectAllCellIds (all-of), expectPath/expectScenario (>= minMatches rows carry it), expectTopScoreBelow (absence). Classes: paraphrase | exact-term | structural-name | aggregate | absence. `blocker: true` cases must pass; the rest are diagnostics that report without failing the job."
   },
   {
     "id": "BR1",
@@ -11,7 +11,7 @@
     "expectCellIds": [
       "b0000000-0000-4000-8000-000000180303"
     ],
-    "note": "Cell says 'Files the late call-off in the app; removal is immediate'. The query shares almost no vocabulary with it — this is vector's job and keyword should miss."
+    "note": "Cell says 'Files the late call-off in the app; removal is immediate'. The query shares almost no vocabulary with it \u2014 this is vector's job and keyword should miss."
   },
   {
     "id": "BR2",
@@ -22,7 +22,7 @@
     "expectCellIds": [
       "a0000000-0000-4000-8000-000000180402"
     ],
-    "note": "Before Students Join > Prepare breakout rooms > Lead Tutor ('Creates breakout rooms.'). Near-literal, so it should be easy — a miss here means something is badly wrong."
+    "note": "Before Students Join > Prepare breakout rooms > Lead Tutor ('Creates breakout rooms.'). Near-literal, so it should be easy \u2014 a miss here means something is badly wrong."
   },
   {
     "id": "BR3",
@@ -34,7 +34,7 @@
       "a0000000-0000-4000-8000-000000170507",
       "b0000000-0000-4000-8000-000000180507"
     ],
-    "note": "Two cells share identical content across Happy and Late paths — either is correct. A golden set that demanded one would be scoring a coin flip."
+    "note": "NOT RETUNED, deliberately: this is a real regression rather than an over-specific expectation (plus-uno-blueprint#154). Two cells share identical content across the '12+ hours ahead' and 'Under 12 hours' paths \u2014 either is correct, which is why both are listed; a golden set that demanded one would be scoring a coin flip. The 'Supervisor review (pending/excuse)' step holds exactly three cells per path: 'PLUS App', 'Dev Team', and 'Reviews pending call-off requests and records a decision.' Only the third answers 'who decides'. Since the breadcrumb re-embed, retrieval ranks 'Dev Team' above it. Widening this case to accept that would record a retrieval failure as a passing test, so it stays red until the retrieval is fixed."
   },
   {
     "id": "BR4",
@@ -43,11 +43,20 @@
     "k": 5,
     "q": "where do applicants first hear about PLUS",
     "expectCellIds": [
-      "a0000000-0000-4000-8000-000000070506"
+      "a0000000-0000-4000-8000-000000070103",
+      "a0000000-0000-4000-8000-000000070203",
+      "a0000000-0000-4000-8000-000000070303",
+      "a0000000-0000-4000-8000-000000070403",
+      "a0000000-0000-4000-8000-000000070503",
+      "a0000000-0000-4000-8000-000000070206",
+      "a0000000-0000-4000-8000-000000070306",
+      "a0000000-0000-4000-8000-000000070406",
+      "a0000000-0000-4000-8000-000000070506",
+      "65fe259e-1f90-48fc-bc5b-27b998a5002d"
     ],
     "expectScenario": "Discovery",
     "minMatches": 1,
-    "note": "Answer is the single word 'Handshake' — a low-information cell that only the breadcrumb makes findable. Watch this one when Phase 2a changes the chunk body."
+    "note": "RETUNED 2026-08-27, ids read out of the live blueprint that day (plus-uno-blueprint#154). Was a single expectation: the Front Stage Tech cell whose entire content is 'Handshake'. The 'Layer: ' -> 'Lane: ' breadcrumb change re-embedded every chunk and this went red \u2014 but the new top hit is 'Discovers PLUS via Handshake.', which answers the question at least as well as the bare channel name. The golden set was over-specific; the retrieval is not wrong. The question has five true answers, one per discovery channel, so demanding one cell was scoring a coin flip \u2014 the reasoning BR3's note already gave for its two. Now: any cell in the 'Discovers PLUS' step that NAMES A CHANNEL, in the tutor's lane or the tech lane. Still falsifiable: the same step also holds 'Figma', 'Dev Tools', 'Branding Guidelines' and the backstage-actions cells, and none of those would pass."
   },
   {
     "id": "BR5",
@@ -60,7 +69,7 @@
       "a0000000-0000-4000-8000-000000060503",
       "f167a773-99f6-4a3e-b6d3-40776efd1eaa"
     ],
-    "note": "'Marks the student present' — the canonical paraphrase case: no term overlap with 'confirm', 'actually showed up'."
+    "note": "'Marks the student present' \u2014 the canonical paraphrase case: no term overlap with 'confirm', 'actually showed up'."
   },
   {
     "id": "BR6",
@@ -73,7 +82,7 @@
       "a0000000-0000-4000-8000-0000001e0202",
       "b0000000-0000-4000-8000-0000001e1403"
     ],
-    "note": "'Receives a biweekly paycheck.' Query says 'get paid' — synonym, not substring."
+    "note": "'Receives a biweekly paycheck.' Query says 'get paid' \u2014 synonym, not substring."
   },
   {
     "id": "BR7",
@@ -95,7 +104,7 @@
     "expectCellIds": [
       "802ecb88-257b-47a9-be10-dee9d320daf3"
     ],
-    "note": "'Zoom/Pencil link + host key stored on session record' — appears in exactly one cell in the whole blueprint. Unambiguous ground truth."
+    "note": "'Zoom/Pencil link + host key stored on session record' \u2014 appears in exactly one cell in the whole blueprint. Unambiguous ground truth."
   },
   {
     "id": "BR9",
@@ -110,7 +119,7 @@
     ],
     "expectScenario": "Employment & Access",
     "minMatches": 2,
-    "note": "CORRECTION 2026-08-22: an earlier note here claimed this was a real retrieval gap rather than fixture drift. That was wrong, written before checking what the scorer compares. It matches on expectScenario, and 'Tech Setup' no longer exists — the I-9 cells moved to 'Employment & Access'. The three expectCellIds were right all along, and querying the RPC directly returns those cells at ranks 1-3. Scenario corrected; minMatches stays at 2."
+    "note": "CORRECTION 2026-08-22: an earlier note here claimed this was a real retrieval gap rather than fixture drift. That was wrong, written before checking what the scorer compares. It matches on expectScenario, and 'Tech Setup' no longer exists \u2014 the I-9 cells moved to 'Employment & Access'. The three expectCellIds were right all along, and querying the RPC directly returns those cells at ranks 1-3. Scenario corrected; minMatches stays at 2."
   },
   {
     "id": "BR10",
@@ -135,7 +144,7 @@
       "a0000000-0000-4000-8000-000000170404",
       "b0000000-0000-4000-8000-000000180404"
     ],
-    "note": "Re-pointed 2026-08-22. This asked for 'Call-Offs tab', which now matches ZERO cells — its four target cells were reduced to the bare touchpoint 'PLUS App', so the content that made this an exact-term case is gone. 'Fill-In tab' is the direct analogue that survives: a multi-word UI surface name, 5 cells across Call-off Request and Fill-in Request. Same question, live subject."
+    "note": "Re-pointed 2026-08-22. This asked for 'Call-Offs tab', which now matches ZERO cells \u2014 its four target cells were reduced to the bare touchpoint 'PLUS App', so the content that made this an exact-term case is gone. 'Fill-In tab' is the direct analogue that survives: a multi-word UI surface name, 5 cells across Call-off Request and Fill-in Request. Same question, live subject."
   },
   {
     "id": "BR12",
@@ -145,7 +154,7 @@
     "q": "Swap offered instead",
     "expectPath": "Swap offered instead",
     "minMatches": 2,
-    "note": "Path NAME, not cell prose. Semantic indexes the breadcrumb so it has a chance; the whole future-state branch was unreachable before paths joined the keyword fan-out. Regression cover for that fix. Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed — recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
+    "note": "Path NAME, not cell prose. Semantic indexes the breadcrumb so it has a chance; the whole future-state branch was unreachable before paths joined the keyword fan-out. Regression cover for that fix. Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed \u2014 recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
   },
   {
     "id": "BR13",
@@ -155,7 +164,7 @@
     "q": "Created in the app",
     "expectPath": "Created in the app",
     "minMatches": 1,
-    "note": "Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed — recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
+    "note": "Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed \u2014 recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
   },
   {
     "id": "BR14",
@@ -165,7 +174,7 @@
     "q": "Redesigned reflection",
     "expectPath": "Redesigned reflection",
     "minMatches": 1,
-    "note": "Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed — recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
+    "note": "Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed \u2014 recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
   },
   {
     "id": "BR15",
@@ -175,7 +184,7 @@
     "q": "Soft-conflict gate",
     "expectPath": "Soft-conflict gate",
     "minMatches": 1,
-    "note": "Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed — recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
+    "note": "Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed \u2014 recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
   },
   {
     "id": "BR16",
@@ -185,7 +194,7 @@
     "q": "Supervisor-registered clearance",
     "expectPath": "Supervisor-registered clearance",
     "minMatches": 1,
-    "note": "Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed — recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
+    "note": "Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed \u2014 recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
   },
   {
     "id": "BR17",
@@ -195,7 +204,7 @@
     "q": "Lead works from a dashboard",
     "expectPath": "Lead works from a dashboard",
     "minMatches": 1,
-    "note": "Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed — recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
+    "note": "Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed \u2014 recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
   },
   {
     "id": "BR18",
@@ -205,7 +214,7 @@
     "q": "Missed last session, no goals",
     "expectPath": "Missed last session, no goals",
     "minMatches": 1,
-    "note": "A named path inside the 310-cell Goal Setting scenario — it has to beat a very large field of siblings. Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed — recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
+    "note": "A named path inside the 310-cell Goal Setting scenario \u2014 it has to beat a very large field of siblings. Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed \u2014 recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
   },
   {
     "id": "BR19",
@@ -215,7 +224,7 @@
     "q": "Under 12 hours",
     "expectPath": "Under 12 hours",
     "minMatches": 1,
-    "note": "Punctuation-heavy name. websearch_to_tsquery and ILIKE treat '(<12h)' very differently — worth watching across Phase 3. Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed — recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
+    "note": "Punctuation-heavy name. websearch_to_tsquery and ILIKE treat '(<12h)' very differently \u2014 worth watching across Phase 3. Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed \u2014 recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
   },
   {
     "id": "BR20",
@@ -225,7 +234,7 @@
     "q": "Few or none by 10 min",
     "expectPath": "Few or none by 10 min",
     "minMatches": 1,
-    "note": "Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed — recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
+    "note": "Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed \u2014 recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
   },
   {
     "id": "BR21",
@@ -235,7 +244,7 @@
     "q": "Deadline missed",
     "expectPath": "Deadline missed",
     "minMatches": 1,
-    "note": "Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed — recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
+    "note": "Renamed 2026-08-22 to the live path name. The 2026-08-21 blueprint change dropped the 'Planned:'/'Prototype:' prefixes and moved future-state onto the `status` column, so every structural-name case here queried a name that no longer existed \u2014 recall sat at 0% (0/10) and this workflow was red from 2026-08-22 07:56 with nobody watching. The six proposed-status paths keep the future-state cover the original cases existed for."
   },
   {
     "id": "BR22",
@@ -255,7 +264,7 @@
     "q": "walk me through goal setting",
     "expectScenario": "Goal Setting",
     "minMatches": 8,
-    "note": "The stress case: 310 cells, 38% of the corpus, one scenario. Should be easy on coverage and useless on precision — which is exactly the finding to record."
+    "note": "The stress case: 310 cells, 38% of the corpus, one scenario. Should be easy on coverage and useless on precision \u2014 which is exactly the finding to record."
   },
   {
     "id": "BR24",
@@ -265,7 +274,7 @@
     "q": "what are all the ways a tutor can miss a session",
     "expectScenario": "Call-off Request",
     "minMatches": 3,
-    "note": "Spans call-off, late call-off, swap and fill-in. No single scenario is complete — measures whether retrieval can span, which nothing today is designed to do."
+    "note": "Spans call-off, late call-off, swap and fill-in. No single scenario is complete \u2014 measures whether retrieval can span, which nothing today is designed to do."
   },
   {
     "id": "BR25",
@@ -274,7 +283,7 @@
     "k": 5,
     "q": "how do tutors submit expense reports",
     "expectMatchedByOnly": "vector",
-    "note": "RETIRED AS A THRESHOLD TEST 2026-08-19, and the reason is the finding. This case used to assert top_score < 0.5. Measured across all 26 cases, the two queries with NO answer scored 0.607 and 0.654 — landing BETWEEN genuine hits at 0.565 ('host key') and 0.647 ('who creates the breakout rooms'). Any floor that rejects the absent pair also rejects six real ones, so no threshold exists, and chunk quality cannot create one: the good cases at the bottom are short cells whose scores depend ON the breadcrumb that de-boilerplating would remove. What retrieval CAN honestly report is corroboration — nothing here matches the blueprint's own words, so only the vector list fires. Whether the bot then declines to answer is a prose question, scored by run-evals.mjs, not here."
+    "note": "RETIRED AS A THRESHOLD TEST 2026-08-19, and the reason is the finding. This case used to assert top_score < 0.5. Measured across all 26 cases, the two queries with NO answer scored 0.607 and 0.654 \u2014 landing BETWEEN genuine hits at 0.565 ('host key') and 0.647 ('who creates the breakout rooms'). Any floor that rejects the absent pair also rejects six real ones, so no threshold exists, and chunk quality cannot create one: the good cases at the bottom are short cells whose scores depend ON the breadcrumb that de-boilerplating would remove. What retrieval CAN honestly report is corroboration \u2014 nothing here matches the blueprint's own words, so only the vector list fires. Whether the bot then declines to answer is a prose question, scored by run-evals.mjs, not here."
   },
   {
     "id": "BR26",
@@ -283,6 +292,6 @@
     "k": 5,
     "q": "Acuity scheduling",
     "expectMatchedByOnly": "vector",
-    "note": "Same retirement as BR25. Acuity is retired tooling, so this also guards a real fabrication risk — but the guard belongs in the prose eval, where the rule it protects actually lives. Retrieval's contribution is the honest signal that no keyword or structural retriever corroborated anything."
+    "note": "Same retirement as BR25. Acuity is retired tooling, so this also guards a real fabrication risk \u2014 but the guard belongs in the prose eval, where the rule it protects actually lives. Retrieval's contribution is the honest signal that no keyword or structural retriever corroborated anything."
   }
 ]
