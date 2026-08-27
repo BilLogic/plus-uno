@@ -101,6 +101,27 @@ export function DocsTab({ children }) {
 }
 
 /**
+ * The wrapper an authored tab gets from its MDX, applied to the generated ones.
+ *
+ * Code and Changelog build their own markup, and they used to emit a bare
+ * `.sb-ds-doc-section` with no `.sb-ds-component-docs` ancestor. The section
+ * rules are scoped to that ancestor, so those two tabs fell outside them: their
+ * `<h2>` rendered at 32px with a 16px top margin against 28px and zero for the
+ * 289 authored ones. Same class, same tag, two appearances — which is precisely
+ * what ADR-025 says must not happen.
+ *
+ * `not-prose` is deliberately absent: it appears on all 387 MDX pages and is
+ * inert, because `@tailwindcss/typography` is not a dependency.
+ */
+function GeneratedTabBody({ children }) {
+  return (
+    <div className="sb-ds-component-docs sb-ds-component-docs--page">
+      <div className="sb-ds-doc-section">{children}</div>
+    </div>
+  );
+}
+
+/**
  * The Code tab. Generated, never authored.
  *
  * `ArgTypes` derives the props table from the story meta, so it cannot drift
@@ -110,17 +131,17 @@ export function DocsTab({ children }) {
  */
 function CodeTabPanel({ of }) {
   return (
-    <div className="sb-ds-doc-section">
+    <GeneratedTabBody>
       <h2>Props</h2>
       <ArgTypes of={of} />
-    </div>
+    </GeneratedTabBody>
   );
 }
 
 /** The Changelog tab. Entries come from the story meta, newest first. */
 function ChangelogTabPanel({ entries }) {
   return (
-    <div className="sb-ds-doc-section">
+    <GeneratedTabBody>
       <h2>Changelog</h2>
       <dl className="sb-ds-changelog">
         {entries.map((entry) => (
@@ -137,7 +158,7 @@ function ChangelogTabPanel({ entries }) {
         Component changelogs start {CHANGELOG_ADOPTED}. Nothing before it is recorded, because
         nothing produced a component changelog before it.
       </p>
-    </div>
+    </GeneratedTabBody>
   );
 }
 
