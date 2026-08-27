@@ -925,3 +925,83 @@ h2.toc-title {
     color: var(--color-on-surface-variant, #43474e);
     font-size: var(--font-size-body2, 14px);
 }
+
+/* ---------------------------------------------------------------------------
+ * #263 — three defects found by looking at the rendered pages, not by a check.
+ *
+ * Said once for all three: NOTHING IN CI CAN SEE THESE. `check:storybook`'s
+ * 1136 tests are story tests and docs pages are not in that suite, so each of
+ * these shipped and survived a stylesheet teardown without one line going red.
+ * ------------------------------------------------------------------------ */
+
+/*
+ * D2 — a canvas must not draw an open bottom edge with nothing beneath it.
+ *
+ * `DocsCanvasShell` defaults `attachSourceBelow = true`, so it always applies
+ * the "canvas + extension" treatment: bottom border removed, bottom corners
+ * squared, because the code panel is meant to attach below and close the card.
+ * A canvas rendered with `sourceState="none"` has no panel and no toggle, so
+ * the card opens onto whitespace — measured on Button's Sizes section, sitting
+ * directly above a States card that IS closed, which is what made it read as a
+ * rendering fault rather than a style.
+ *
+ * Only one canvas of 536 does this today. The rule is written against the
+ * CONDITION rather than that one page, because the default is what sets the
+ * trap: any future `sourceState="none"` walks into it silently.
+ */
+.sbdocs
+  .sb-ds-docs-canvas-shell--source-attached
+  .sb-ds-docs-canvas-attached-root:not(:has(.sbdocs-preview-actions))
+  .docs-story:not(:has(.responsive-frame-root))
+  > div[scale="1"] {
+    /* This selector is shaped to out-rank the rule that opens the card, which is
+       `… .docs-story:not(:has(.responsive-frame-root)) > div[scale="1"]` at
+       (0,6,1) — the `div` type selector is what carries it. A tidier
+       `.docs-story > *:first-child` here is (0,6,0) and loses: measured, it
+       applied the radius and silently dropped the border. */
+    /* Close the card. Same element, same token and same border as the rule that
+       opens it above — picking a different radius here would leave the top
+       corners at one value and the bottom at another, which is what the first
+       attempt at this did. */
+    border-bottom: 1px solid var(--color-outline-variant, #bec8ca) !important;
+    border-radius: var(--size-card-radius-sm) var(--size-card-radius-sm)
+        var(--size-card-radius-sm) var(--size-card-radius-sm) !important;
+}
+
+/*
+ * D3 — the demo must not touch the "Show code" row.
+ *
+ * Storybook's story wrapper is `padding: 40px 0` and `.sbdocs-preview-actions`
+ * carries `margin-top: -40px`, so the actions bar is DESIGNED to occupy that
+ * bottom 40px. The padding is the buttons' band, not breathing room: measured
+ * 41px above the demo and exactly 0 between the demo's bottom edge and the
+ * actions row's top edge.
+ *
+ * So the space has to be added, not redistributed. Scoped to the attached-source
+ * case via the existing hook — a canvas with no actions bar already has its 40px
+ * and does not need more.
+ */
+.sbdocs
+  .sb-ds-docs-canvas-shell--source-attached
+  .sb-ds-docs-canvas-attached-root:has(.sbdocs-preview-actions)
+  .docs-story {
+    padding-bottom: var(--size-section-gap-md) !important;
+}
+
+/*
+ * D1 — the props table must scroll inside its own box, not bleed out of it.
+ *
+ * `.docblock-argstable` rendered 590px wide inside a 437px wrapper whose
+ * `overflow-x` is `visible`, so it spilled across the "On this page" rail
+ * instead of scrolling. Affects every Code tab and every Interactive playground.
+ *
+ * `overflow-y` is pinned explicitly for the reason documented on the tab strip
+ * above: `overflow-x: auto` alone makes a computed `visible` on the other axis
+ * become `auto`, which is precisely how the strip grew a scrollbar nobody wrote.
+ * `hidden` is safe here only because the control popups are portalled out of
+ * this subtree — verified in the browser, not assumed.
+ */
+.sbdocs *:has(> table.docblock-argstable) {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
