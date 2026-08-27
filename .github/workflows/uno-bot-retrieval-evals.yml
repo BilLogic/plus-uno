@@ -21,7 +21,15 @@ name: uno-bot — retrieval evals (which rows come back)
 # Required repo secret: DEBUG_TOKEN (the Worker's /debug/* gate token).
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      rpc:
+        description: >-
+          Score a CANDIDATE search function instead of the live one. Leave blank
+          for a normal run. A candidate is created alongside search_blueprint as
+          search_blueprint_<suffix>; the route allowlists that prefix.
+        required: false
+        default: ""
   # After a deploy, so a retrieval regression surfaces with the build that
   # caused it rather than at the next weekly run.
   workflow_run:
@@ -55,11 +63,16 @@ jobs:
         env:
           WORKER_URL: "https://uno-bot.bryanhuang628.workers.dev"
           DEBUG_TOKEN: ${{ secrets.DEBUG_TOKEN }}
+          # Empty on every trigger but a deliberate dispatch, so a scheduled or
+          # post-deploy run always measures what the product actually does.
+          RPC_NAME: ${{ inputs.rpc }}
         run: node agents/uno-bot/scripts/run-retrieval-evals.mjs
 
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: retrieval-eval-results
+          # A candidate's numbers are not the product's numbers. Name them
+          # apart so a downloaded artifact cannot be mistaken for the baseline.
+          name: retrieval-eval-results${{ inputs.rpc && format('-{0}', inputs.rpc) || '' }}
           path: retrieval-eval-results.json
