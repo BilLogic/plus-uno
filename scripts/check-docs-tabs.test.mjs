@@ -119,9 +119,11 @@ test('5. a section div that lost its heading breaks the one-to-one invariant', (
 
 test('6. two sections sharing a name are caught — and assertion 5 cannot see them', () => {
   // The collision #253 would have shipped blind. `Spinner.mdx` was the one page
-  // carrying both `## Variants` and `## Styles`; collapsing that pair renames
-  // the second onto the first and leaves two identically named sections, one
-  // anchor between them and two identical "On this page" entries.
+  // carrying both `## Variants` and `## Styles`; any rename mapping that pair
+  // onto a single word leaves two identically named sections, one anchor between
+  // them and two identical "On this page" entries. (Spinner ended up split into
+  // `Animation` and `Appearance` instead — but the trap is the rename, not that
+  // one page, so this stays.)
   const broken = page({ examples: ['Overview', 'Variants', 'Variants'] });
   const found = checkFile(COMPONENT, broken, true);
   assert.ok(found.some((f) => /2 sections named "Variants"/.test(f)), found.join('\n'));

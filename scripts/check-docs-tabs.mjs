@@ -56,9 +56,16 @@ const MDX_ROOT = 'design-system/src';
  * sub-headings land without moving a single count. It still travels with its
  * parent; it is now nested under it rather than loose inside it.
  *
- * #253 also collapsed `Styles` into `Variants` and `Interaction states` into
- * `States`. Neither pair is in this set and neither name is near one, so the
- * set did not move: all four live on the Examples side, before and after.
+ * #253 also renamed every `Variants` / `Styles` section. It did NOT collapse
+ * them onto one word: a benchmark of 328 Atlassian doc files found `## Variants`
+ * 0 times and `## Styles` 0 times, and `## Appearance` 29 times — used only where
+ * the component has an appearance prop taking semantic values, with every other
+ * such section named for its actual subject (`Positioning`, `Animation`,
+ * `Colors`, `Segments`). So each of our 24 took the name of what it shows.
+ * `Interaction states` folded into `States`, which Atlassian does use.
+ *
+ * None of those names is in this set or near one, so the set did not move: they
+ * all live on the Examples side, before and after.
  */
 const USAGE_HEADINGS = new Set([
   'When to use',
@@ -178,11 +185,16 @@ export function checkFile(file, source, tabbed = isTabbedDocsPage(file)) {
     );
   }
 
-  // 6. Two sections on one page cannot carry the same name. #253 collapsed two
-  //    pairs of near-duplicate section names, and `Spinner.mdx` was the single
-  //    page holding both halves of one pair — a blind rename would have left it
-  //    with two `## Variants`: one duplicated anchor, two identical entries in
-  //    "On this page", and no way to link to the second.
+  // 6. Two sections on one page cannot carry the same name. #253 renamed every
+  //    `Variants` / `Styles` section, and `Spinner.mdx` was the single page
+  //    holding both — a rename that mapped the pair onto one word would have
+  //    left it with two identical headings: one duplicated anchor, two identical
+  //    entries in "On this page", and no way to link to the second.
+  //
+  //    Spinner is now `Animation` and `Appearance`, which is the answer the
+  //    benchmark gave rather than a workaround for the collision — Atlassian's
+  //    own spinner page splits at exactly that seam. The assertion stays because
+  //    the NEXT rename will not have someone reading all 24 section bodies.
   //
   //    Assertion 5 is silent through exactly that edit — rename a heading and
   //    the counts stay one-to-one — so the invariant that made the tab codemod
