@@ -48,6 +48,17 @@ const {
   CASES_PATH = "docs/evals/fixtures/blueprint-retrieval-cases.json",
   OUT_PATH = "retrieval-eval-results.json",
   BASELINE,
+  // Score a CANDIDATE search function instead of the live one.
+  //
+  // Unset in CI and for every normal run: the point of this suite is what the
+  // product actually does. Set it to `search_blueprint_<suffix>` to measure a
+  // ranking change BEFORE it becomes the function everything calls — which is
+  // the loop that was missing when an OR-ranked keyword arm was applied to
+  // production, fixed BR3, broke BR1/BR5/BR25/BR26 and had to be reverted
+  // (plus-uno-blueprint#154).
+  //
+  //   RPC_NAME=search_blueprint_min_overlap npm run evals:retrieval
+  RPC_NAME,
 } = process.env;
 
 const REQUEST_TIMEOUT_MS = 30_000;
@@ -65,7 +76,8 @@ function required(name, v) {
 async function search(q) {
   const url =
     `${WORKER_URL.replace(/\/+$/, "")}/debug/blueprint-search` +
-    `?q=${encodeURIComponent(q)}&fresh=1`;
+    `?q=${encodeURIComponent(q)}&fresh=1` +
+    (RPC_NAME ? `&rpc=${encodeURIComponent(RPC_NAME)}` : "");
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
@@ -297,6 +309,10 @@ async function main() {
   const summary = {
     ranAt: new Date().toISOString(),
     worker: WORKER_URL,
+    // Which function produced these numbers. Recorded ALWAYS, not only when
+    // overridden: a results file that does not say is one someone compares
+    // against the live baseline a week later without noticing it is not one.
+    rpc: RPC_NAME ?? "search_blueprint",
     cases: results.length,
     passed: results.filter((r) => r.pass).length,
     blockers: blockers.length,

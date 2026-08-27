@@ -18,6 +18,7 @@ import { buildSystemBlocks } from "./agent/skills";
 import { ensureHarnessCache } from "./gemini/cache";
 import { countedFetch, runMetered, subrequestsUsed, meterBreakdown, subrequestBudgetTrips, internalSubrequestsUsed } from "./net";
 import { searchBlueprint } from "./integrations/blueprint";
+import { CANDIDATE_RPC, isCallableCandidate } from "./integrations/candidate-rpc";
 
 export default {
   // Cron (wrangler.toml [triggers]) — the Figma library poll: detect DS
@@ -340,18 +341,54 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
     if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
     const q = (url.searchParams.get("q") ?? "").trim();
     if (!q) return Response.json({ ok: false, error: "missing ?q=" }, { status: 400 });
+
+    // `?rpc=` scores a CANDIDATE search function without moving the live one.
+    //
+    // Retrieval changes used to be measurable only by editing the function the
+    // whole product calls, so the loop was "apply to production, run the eval,
+    // revert if worse". That is how an OR-ranked keyword arm reached
+    // production, fixed one blocker case, broke three others and was rolled
+    // back (plus-uno-blueprint#154). A candidate created alongside
+    // `search_blueprint` can now be scored while the live one is untouched.
+    //
+    // ALLOWLISTED BY PREFIX, not merely auth-gated. This route already requires
+    // the debug token, but the name is interpolated into a PostgREST `/rpc/`
+    // path — an arbitrary one would let a token holder invoke any function
+    // reachable by the bot's key, which is a much larger surface than "look at
+    // search results". The pattern admits the live name and
+    // `search_blueprint_<something>` candidates, and nothing else.
+    const rpcParam = url.searchParams.get("rpc");
+    if (rpcParam !== null && !isCallableCandidate(rpcParam)) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            `rpc must match ${CANDIDATE_RPC.source} — a candidate is named ` +
+            `search_blueprint_<suffix>, and only the search family is callable here`,
+        },
+        { status: 400 },
+      );
+    }
+
     const started = Date.now();
     try {
       // Metered so the eval can report subrequest cost per query — the number
       // Phase 3 is meant to move (worst case 8 -> 2 against a 50 cap).
       const result = await runMetered(async () => {
-        const r = await searchBlueprint(env, q, { fresh: url.searchParams.get("fresh") !== "0" });
+        const r = await searchBlueprint(env, q, {
+          fresh: url.searchParams.get("fresh") !== "0",
+          ...(rpcParam ? { rpcName: rpcParam } : {}),
+        });
         return { r, subrequests: subrequestsUsed() };
       });
       return Response.json({
         ok: true,
         build: BUILD,
         q,
+        // Echoed ALWAYS, not only when overridden: an eval artifact that does
+        // not say which function produced it can be read as the live result a
+        // week later, which is the mistake this parameter exists to prevent.
+        rpc: rpcParam ?? BLUEPRINT_CONTRACT.rpcs.searchBlueprint,
         ms: Date.now() - started,
         subrequests: result.subrequests,
         ...result.r,
