@@ -252,9 +252,18 @@ async function main() {
       rows: res.rows?.length ?? 0,
       subrequests: res.subrequests ?? null,
       ms: res.ms ?? null,
-      // Keep the top few for eyeballing a miss without re-running by hand.
-      top: (res.rows ?? []).slice(0, 3).map((r) => ({
-        id: r.id, scenario: r.scenario, path: r.path, step: r.step, layer: r.layer, score: r.score,
+      // Keep the judged window for eyeballing a miss without re-running by
+      // hand. `k`, not 3: a case is scored on top-k, and recording fewer rows
+      // than were judged means a miss cannot be diagnosed from the artifact —
+      // which is exactly what happened when the `Lane:` breadcrumb re-embed
+      // moved BR3 and BR4 (plus-uno-blueprint#154).
+      //
+      // `r.lane`, not `r.layer`: the RPC's output column was renamed by
+      // 20260820120100 and this line was not, so every artifact since has
+      // recorded `undefined` — dropped silently by JSON.stringify, so the
+      // field simply vanished rather than reading as wrong.
+      top: (res.rows ?? []).slice(0, c.k ?? 10).map((r) => ({
+        id: r.id, scenario: r.scenario, path: r.path, step: r.step, lane: r.lane, score: r.score,
       })),
     });
     const tag = pass ? "PASS" : c.blocker ? "FAIL" : "diag";
