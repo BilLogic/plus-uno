@@ -31,7 +31,35 @@ export function buildId({ runNumber, sha } = {}) {
   return `r${runNumber}-${sha.slice(0, SHORT_SHA)}`;
 }
 
-/** The stamp for the current process, from the standard GitHub Actions vars. */
+/**
+ * The stamp for the current process.
+ *
+ * TWO CI SYSTEMS DEPLOY THIS WORKER. The GitHub Actions workflow is the gated
+ * one — it runs typecheck, check:fetch, check:contract, test:bundle and
+ * bundle:harness before deploying. Cloudflare Workers Builds also builds this
+ * repo and deploys on its own, and on 2026-08-28 it was found to be winning:
+ * production served `dev` on every sample while the Actions run had just
+ * deployed r128 (#278).
+ *
+ * Recognising Cloudflare's own variables does not fix that — the decision about
+ * which deployer owns production is in #278 — but it makes the answer visible.
+ * After this, /health says which path produced what is serving:
+ *
+ *   r<n>-<sha>    the gated GitHub Actions deploy
+ *   cf<id>-<sha>  Cloudflare Workers Builds, going through scripts/deploy.mjs
+ *   dev           something deployed WITHOUT this script at all
+ *
+ * That third case is the one worth alarming on, and until now it was
+ * indistinguishable from the second.
+ */
 export function buildIdFromEnv(env = process.env) {
-  return buildId({ runNumber: env.GITHUB_RUN_NUMBER, sha: env.GITHUB_SHA });
+  if (env.GITHUB_RUN_NUMBER && env.GITHUB_SHA) {
+    return buildId({ runNumber: env.GITHUB_RUN_NUMBER, sha: env.GITHUB_SHA });
+  }
+  // Workers Builds has no monotonic run counter, so the build UUID stands in:
+  // it distinguishes two builds of one commit, which is what run_number buys.
+  if (env.WORKERS_CI_BUILD_UUID && env.WORKERS_CI_COMMIT_SHA) {
+    return `cf${env.WORKERS_CI_BUILD_UUID.replace(/-/g, "").slice(0, 8)}-${env.WORKERS_CI_COMMIT_SHA.slice(0, SHORT_SHA)}`;
+  }
+  return "dev";
 }
