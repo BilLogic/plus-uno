@@ -240,7 +240,10 @@ const EXCLUDED = {
     'people wait on, and the header above says why that is fatal. It runs on the same ' +
     '`pull_request` trigger as its own job — `.github/workflows/storybook-gate.yml` — so ' +
     'it is a peer of this gate, not an orphan, and the two run concurrently: a PR waits ' +
-    'one Storybook run, not a Storybook run after a harness run.',
+    'one Storybook run, not a Storybook run after a harness run. Reconsidered in #282, ' +
+    'which made it runnable from a worktree at last (it had aborted all 388 story files ' +
+    'there). The answer did not change: measured 166s in a worktree, and being able to ' +
+    'run it by hand is what that ticket was for.',
   'check:fetch':
     'reads only agents/uno-bot/src/. A root-only PR cannot break it, and `npm run deploy` gates it at its own boundary.',
   'check:contract':

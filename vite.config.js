@@ -4,8 +4,12 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'module';
+import { nodeModulesDirFrom } from './scripts/node-modules-dir.mjs';
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
+
+/** #282 — see scripts/node-modules-dir.mjs, where this is explained and tested. */
+const nodeModulesDir = () => nodeModulesDirFrom((id) => require.resolve(id));
 
 // Conditionally load Tailwind CSS vite plugin (used by Storybook docs, not required for prototype app)
 let tailwindcss;
@@ -43,7 +47,32 @@ export default defineConfig({
   server: {
     port: 4100,
     open: true,
-    strictPort: false
+    strictPort: false,
+    fs: {
+      // #282. This repo does its work in git worktrees under `.claude/worktrees/`,
+      // which carry no `node_modules` of their own — Node resolves every
+      // dependency UPWARD to the primary checkout's, which is OUTSIDE the Vite
+      // root. Vite will not serve a file outside the allow list, and Vitest's
+      // browser tester asks for its setup file by ABSOLUTE PATH: it prefixes
+      // `/@fs/` only for a Windows drive letter (`/^\w:/.test(filepath)` in
+      // @vitest/browser's tester), so on macOS the request is
+      // `http://localhost:PORT/Users/…/node_modules/…/setup-file.js` and 404s.
+      //
+      // The cost was the whole gate: all 388 story files aborted before a single
+      // test ran, so `check:storybook` — 1137 tests and the a11y ratchet — could
+      // only ever be exercised in CI or by hand in the primary checkout.
+      //
+      // This one entry covers the browser test server too. @vitest/browser
+      // rebuilds `server` for a browser project, but it SPREADS what is already
+      // there before appending its own paths, so the entry survives. Measured
+      // with the caches cleared each time: with it, 10 tests pass; without it,
+      // `no tests` and a 404 for the setup file.
+      //
+      // `nodeModulesDir()` and not its parent: `npm run storybook` binds
+      // `--host 0.0.0.0`, and allowing the checkout above would put every
+      // untracked file in the primary checkout on the LAN.
+      allow: [dirname, nodeModulesDir()].filter(Boolean)
+    }
   },
   build: {
     outDir: 'dist',
