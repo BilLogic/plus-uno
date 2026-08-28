@@ -5,9 +5,14 @@
 // is tested there, so what remains here is wiring.
 import { buildIdFromEnv } from "./build-id.mjs";
 import { holdSamples, verifyDeployed } from "./verify-deployed.mjs";
+import { workerUrl } from "./worker-url.mjs";
 import { appendFileSync } from "node:fs";
 
-const URL_ = process.env.UNO_BOT_HEALTH_URL ?? "https://uno-bot.bryanhuang628.workers.dev/health";
+// UNO_BOT_HEALTH_URL used to be a second override here. It was set nowhere, and
+// with `??` an unset GitHub repo variable — which interpolates to the empty
+// string, not to undefined — would have made this request `""`. One knob:
+// UNO_BOT_WORKER_URL, read by the module next door, where blank is tested.
+const URL_ = workerUrl("/health");
 
 /**
  * Samples to keep watching after our build appears, at 5s each.

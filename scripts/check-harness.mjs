@@ -203,6 +203,12 @@ const COMPOSED = [
       'the unit tests of the guards themselves. A guard nobody has watched fail is a guard nobody knows works (#191).',
   },
   {
+    script: 'check:worker-host',
+    pkg: 'bot',
+    guards:
+      'the single definition of the Worker\'s hostname. Its inputs are repo-root files — the eval workflows and docs/ — so a PR that never touches agents/uno-bot/ can still break it. A second hardcoded host is silent until a cutover (#288) misses one, and an eval pointed at the OLD deployment reports a clean pass, which is the shape of failure #249 already cost this repo.',
+  },
+  {
     script: 'check:harness-bundle',
     pkg: 'bot',
     guards:

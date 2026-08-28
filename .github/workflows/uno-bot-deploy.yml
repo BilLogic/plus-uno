@@ -205,4 +205,9 @@ jobs:
           # thing standing between a fix and production; it restores the old
           # first-answer-wins behaviour, loudly, in the log.
           UNO_BOT_HOLD_SAMPLES: ${{ vars.UNO_BOT_HOLD_SAMPLES }}
+          # Which Worker to check. Unset — the normal case — interpolates to the
+          # empty string and falls back to the default in scripts/worker-url.mjs.
+          # Setting it is how the #288 account move becomes a repo setting rather
+          # than a commit made while the bot is down.
+          UNO_BOT_WORKER_URL: ${{ vars.UNO_BOT_WORKER_URL }}
         run: node scripts/verify-deployed-cli.mjs

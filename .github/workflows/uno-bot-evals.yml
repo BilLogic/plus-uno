@@ -27,7 +27,10 @@ jobs:
           node-version: "20"
       - name: Run eval cases against the live Worker
         env:
-          WORKER_URL: "https://uno-bot.bryanhuang628.workers.dev"
+          # Set vars.UNO_BOT_WORKER_URL to point evals at another deployment;
+          # the literal is the fallback and the single other copy of it lives in
+          # agents/uno-bot/scripts/worker-url.mjs (#288).
+          WORKER_URL: ${{ vars.UNO_BOT_WORKER_URL || 'https://uno-bot.bryanhuang628.workers.dev' }}
           DEBUG_TOKEN: ${{ secrets.DEBUG_TOKEN }}
           GEMINI_SA_EMAIL: ${{ secrets.GEMINI_SA_EMAIL }}
           GEMINI_SA_PRIVATE_KEY: ${{ secrets.GEMINI_SA_PRIVATE_KEY }}
