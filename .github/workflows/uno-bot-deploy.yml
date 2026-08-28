@@ -138,16 +138,34 @@ jobs:
         # compared, so it is.
         working-directory: agents/uno-bot
         run: |
-          sleep 5
           # Derived by the SAME module the bundle was built with, so the two can
           # never drift apart. Re-deriving the format here in shell would be a
           # second definition of the stamp, and the second one would be wrong
           # eventually.
           EXPECTED=$(node -e 'import("./scripts/build-id.mjs").then(m => process.stdout.write(m.buildIdFromEnv()))')
-          HEALTH=$(curl -s --max-time 15 https://uno-bot.bryanhuang628.workers.dev/health)
-          echo "health:   $HEALTH"
           echo "expected: uno-bot ok $EXPECTED"
-          if [ "$HEALTH" != "uno-bot ok $EXPECTED" ]; then
-            echo "the worker is not serving the build this run deployed" && exit 1
-          fi
-          echo "worker is serving $EXPECTED"
+
+          # POLLED, NOT SAMPLED ONCE. A single read five seconds after upload is
+          # a coin flip against edge propagation, and this Worker has a SECOND
+          # deployer: Cloudflare Workers Builds also builds from this repo on
+          # push and deploys its own bundle seconds after this job's. That one
+          # runs without GITHUB_RUN_NUMBER/GITHUB_SHA, so it stamps `dev`, and
+          # for a window `dev` is what /health answers. First observed on
+          # 0308f999, where /health said `dev` while /health/blueprint on the
+          # same Worker still said r126-0308f99 — two versions live at once.
+          #
+          # So: poll for up to 90s and pass on the first correct answer. A
+          # deploy that never converges is a real failure and still fails.
+          for i in $(seq 1 18); do
+            sleep 5
+            HEALTH=$(curl -s --max-time 15 https://uno-bot.bryanhuang628.workers.dev/health || true)
+            echo "  [$i] $HEALTH"
+            if [ "$HEALTH" = "uno-bot ok $EXPECTED" ]; then
+              echo "worker is serving $EXPECTED"
+              exit 0
+            fi
+          done
+          echo "the worker never served the build this run deployed ($EXPECTED)"
+          echo "last seen: $HEALTH"
+          echo "if that reads 'dev', Cloudflare Workers Builds deployed over this run — see #278"
+          exit 1
