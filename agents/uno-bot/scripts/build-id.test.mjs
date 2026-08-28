@@ -12,7 +12,7 @@
 // two deploys of two different commits can never produce the same string.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildId } from "./build-id.mjs";
+import { buildId, buildIdFromEnv } from "./build-id.mjs";
 
 test("a CI deploy is identified by its run number and commit", () => {
   assert.equal(
@@ -73,5 +73,61 @@ test("the result is safe to embed in a shell argument and a JSON body", () => {
     {},
   ]) {
     assert.match(buildId(env), /^[a-z0-9-]+$/);
+  }
+});
+
+/* ------------------------------------------- which CI actually deployed this */
+
+test("GitHub Actions wins when both environments are somehow present", () => {
+  // Order matters: the Actions path is the gated one, so if a build ever sees
+  // both it should claim the gated identity rather than the other.
+  assert.equal(
+    buildIdFromEnv({
+      GITHUB_RUN_NUMBER: "412",
+      GITHUB_SHA: "80035c2f1a9b4c7d8e6f0a1b2c3d4e5f6a7b8c9d",
+      WORKERS_CI_BUILD_UUID: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+      WORKERS_CI_COMMIT_SHA: "1111111111111111111111111111111111111111",
+    }),
+    "r412-80035c2",
+  );
+});
+
+test("a Cloudflare Workers Build is named as one", () => {
+  // #278: production was serving a bundle from this path while reporting `dev`,
+  // which read as "nobody deployed this properly" rather than "the OTHER CI
+  // deployed it". Those need different responses.
+  assert.equal(
+    buildIdFromEnv({
+      WORKERS_CI_BUILD_UUID: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+      WORKERS_CI_COMMIT_SHA: "1111111111111111111111111111111111111111",
+    }),
+    "cfaaaaaaaa-1111111",
+  );
+});
+
+test("two Workers Builds of one commit are distinguishable", () => {
+  // The build UUID stands in for a run number, which Workers Builds does not
+  // provide. Without it, a rebuild of the same commit is invisible.
+  const sha = "1111111111111111111111111111111111111111";
+  const a = buildIdFromEnv({ WORKERS_CI_BUILD_UUID: "aaaaaaaa-0000-0000-0000-000000000000", WORKERS_CI_COMMIT_SHA: sha });
+  const b = buildIdFromEnv({ WORKERS_CI_BUILD_UUID: "bbbbbbbb-0000-0000-0000-000000000000", WORKERS_CI_COMMIT_SHA: sha });
+  assert.notEqual(a, b);
+});
+
+test("`dev` now means something specific: no deploy script ran", () => {
+  // It used to also cover "Workers Builds deployed this", which is why the
+  // signal was useless. Now it means the bundle was produced outside
+  // scripts/deploy.mjs entirely.
+  assert.equal(buildIdFromEnv({}), "dev");
+  assert.equal(buildIdFromEnv({ WORKERS_CI_BUILD_UUID: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee" }), "dev");
+});
+
+test("every stamp stays shell- and JSON-safe, whichever CI made it", () => {
+  for (const env of [
+    { GITHUB_RUN_NUMBER: "412", GITHUB_SHA: "80035c2f1a9b4c7d8e6f0a1b2c3d4e5f6a7b8c9d" },
+    { WORKERS_CI_BUILD_UUID: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", WORKERS_CI_COMMIT_SHA: "1111111111111111111111111111111111111111" },
+    {},
+  ]) {
+    assert.match(buildIdFromEnv(env), /^[a-z0-9-]+$/);
   }
 });
