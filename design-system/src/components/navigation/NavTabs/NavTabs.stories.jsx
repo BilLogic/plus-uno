@@ -23,6 +23,13 @@ export default {
             description: 'Preset navigation structure for the interactive demo',
             table: { category: 'Content' }
         },
+        mode: {
+            control: 'inline-radio',
+            options: ['navigation', 'tabs'],
+            description:
+                '`navigation` renders anchors and no tab semantics — the default, and what existing callers get. `tabs` renders a `role="tablist"` of buttons with `aria-selected`, roving tabindex and arrow keys. A dropdown is not a tab, so the dropdown preset only applies in navigation mode.',
+            table: { category: 'Behavior' }
+        },
         alignment: {
             control: 'select',
             options: ['left', 'center', 'right', 'justified'],
@@ -156,11 +163,60 @@ Overview.parameters = {
     }
 };
 
+/**
+ * Semantics: the same three tabs in each mode, side by side.
+ *
+ * The difference is not visual, which is the point — inspect the two, or reach
+ * them with a keyboard. Navigation gives three anchors and three stops in the
+ * tab sequence, with the selected one carried by colour alone. Tabs gives one
+ * stop, arrow keys within the strip, `aria-selected`, and a panel each tab is
+ * wired to.
+ */
+export const Semantics = () => {
+    const [nav, setNav] = useState('1');
+    const [tabs, setTabs] = useState('1');
+
+    return (
+        <div style={col}>
+            <section>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">
+                    NAVIGATION (DEFAULT) — ANCHORS, NO TAB SEMANTICS
+                </span>
+                <NavTabs activeKey={nav} onSelect={(k) => setNav(k)}>
+                    <NavTabs.Item eventKey="1">Overview</NavTabs.Item>
+                    <NavTabs.Item eventKey="2">Sessions</NavTabs.Item>
+                    <NavTabs.Item eventKey="3">Reports</NavTabs.Item>
+                </NavTabs>
+            </section>
+
+            <section>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">
+                    TABS — ROLE=TABLIST, ROVING TABINDEX, ARROW KEYS
+                </span>
+                <NavTabs mode="tabs" activeKey={tabs} onSelect={(k) => setTabs(k)}>
+                    <NavTabs.Item eventKey="1">Overview</NavTabs.Item>
+                    <NavTabs.Item eventKey="2">Sessions</NavTabs.Item>
+                    <NavTabs.Item eventKey="3" disabled>
+                        Reports
+                    </NavTabs.Item>
+                    <NavTabs.Panel eventKey="1">Everything at a glance.</NavTabs.Panel>
+                    <NavTabs.Panel eventKey="2">The sessions on the books.</NavTabs.Panel>
+                    <NavTabs.Panel eventKey="3">Nothing to report.</NavTabs.Panel>
+                </NavTabs>
+            </section>
+        </div>
+    );
+};
+
 export const Interactive = (args) => {
     const [activeKey, setActiveKey] = useState('1');
+    // A dropdown is not a tab, and there is no valid ARIA for one inside a
+    // tablist, so the preset only applies to navigation mode.
+    const withDropdown = args.contentPreset === 'with-dropdown' && args.mode !== 'tabs';
 
     return (
         <NavTabs
+            mode={args.mode}
             activeKey={activeKey}
             onSelect={(k) => setActiveKey(k)}
             alignment={args.alignment}
@@ -168,7 +224,7 @@ export const Interactive = (args) => {
             <NavTabs.Item eventKey="1">Tab 1</NavTabs.Item>
             <NavTabs.Item eventKey="2">Tab 2</NavTabs.Item>
             <NavTabs.Item eventKey="3">Tab 3</NavTabs.Item>
-            {args.contentPreset === 'with-dropdown' ? (
+            {withDropdown ? (
                 <NavTabs.Dropdown title="More" id="interactive-nav-tabs-dropdown">
                     <NavTabs.Dropdown.Item eventKey="action">Action</NavTabs.Dropdown.Item>
                     <NavTabs.Dropdown.Item eventKey="another">Another action</NavTabs.Dropdown.Item>
@@ -180,5 +236,6 @@ export const Interactive = (args) => {
 
 Interactive.args = {
     contentPreset: 'tabs-only',
+    mode: 'navigation',
     alignment: 'left'
 };
