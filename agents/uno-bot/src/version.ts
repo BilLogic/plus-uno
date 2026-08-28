@@ -22,7 +22,25 @@ declare const __BUILD_ID__: string;
  * `typeof` rather than a plain reference, because an UNSUBSTITUTED identifier
  * is a ReferenceError at runtime and this constant is read on the health path.
  * `typeof` on an undeclared name is the one form JavaScript defines as safe, so
- * a bundle built without the define degrades to "dev" instead of 500ing every
- * route that reports a build.
+ * a bundle built without the define degrades instead of 500ing every route that
+ * reports a build.
+ *
+ * The fallback is "unstamped", NOT "dev", and the difference is the whole point
+ * of #278. `deploy.mjs` stamps "dev" when it runs outside CI — so while both
+ * said "dev", a Worker reporting it could equally mean "someone deployed from a
+ * laptop" or "something deployed WITHOUT deploy.mjs, and therefore without
+ * typecheck, check:fetch, check:contract, test:bundle or bundle:harness". Those
+ * need completely different responses and were indistinguishable.
+ *
+ * Now they are not, and the distinction costs nothing and depends on nothing:
+ *
+ *   unstamped     no --define reached the bundle. deploy.mjs did NOT run.
+ *   dev           deploy.mjs ran, outside any CI it recognises.
+ *   r<n>-<sha>    the gated GitHub Actions deploy.
+ *   cf<id>-<sha>  Cloudflare Workers Builds, through deploy.mjs (#280).
+ *
+ * That last pair is why this is worth a word: #280 taught the stamp Cloudflare's
+ * WORKERS_CI_* variables, and identifying a Workers Build depends on those names
+ * being right. "unstamped" does not depend on knowing any variable name.
  */
-export const BUILD = typeof __BUILD_ID__ === "string" ? __BUILD_ID__ : "dev";
+export const BUILD = typeof __BUILD_ID__ === "string" ? __BUILD_ID__ : "unstamped";
