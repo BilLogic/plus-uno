@@ -113,24 +113,11 @@ It always has an id: `id`, else `name`, else a generated one, so its label is
 always associated. `inputProps` is the escape hatch for DOM attributes the
 component does not name.
 
-### When not to use
-
-- **Not for a form value.** A boolean that gets submitted with everything else
-  is `Checkbox` — the visual difference is the whole point: a switch says "this
-  is now on", a checkbox says "this will be saved as ticked".
-- **Not for accept-the-terms.** That is a checkbox, and `Switch` has no
-  `required` prop to enforce it with.
-- **Not for one of two named options.** "Weekly" versus "Monthly" is
-  `RadioButtonGroup` or `MultipleChoice`; a switch has no label for its off
-  state.
-- **Not without a label.** There is no `showLabel` and no built-in visually
-  hidden text — an unlabelled switch is a bare toggle.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Correct and incorrect
+## Usage notes
 
 ### A switch acts now; a checkbox saves later.
 
@@ -170,6 +157,11 @@ component does not name.
 <Switch id="archived" label="Show archived" checked={showArchived}
         onChange={(e) => setShowArchived(e.target.checked)} />
 ```
+
+### A switch always needs a label.
+
+Nothing in the control says what it governs. Without a label the accessible
+name is empty, and a screen reader announces only "switch, on".
 
 </div>
 
@@ -232,6 +224,16 @@ component does not name.
   `size="large"` takes it to 36×20px — both well under the 44×44 minimum in
   `design-system/guidelines/foundations/accessibility.md`. The associated label
   is part of the hit area, which is the practical reason never to drop it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a value saved with the rest of a form, use `Checkbox`.
+- For accepting terms, use `Checkbox` — the decision is submitted, not applied on the spot.
+- For one of two named options, use `RadioButtonGroup`.
 
 </div>
 

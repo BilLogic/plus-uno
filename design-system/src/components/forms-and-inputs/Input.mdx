@@ -123,26 +123,39 @@ an error rather than an `Alert` at the top of the form.
 `validationMessage` and the component renders the message beneath the field with
 a matching icon.
 
-### When not to use
-
-- **Not for multi-line text.** `Textarea` — and note it does not have
-  `validation` / `validationMessage`, it has a `state` prop and no message slot.
-- **Not for numbers with steppers.** `NumberInput` adds increment and decrement
-  buttons plus `min` / `max` / `step`.
-- **Not for a value from a list.** `Select`, or `MultipleChoice` when every
-  option should be visible.
-- **Not for dates.** `DatePicker` for a date, `DateAndTimePicker` when time is
-  involved — both come with the calendar and the parsing.
-- **Not for an input with an attached control.** A field with a prefix, a
-  button, or a dropdown welded to it is `InputGroup`.
-- **Not as a search field inside a `Select`.** `Select` already renders one when
-  `searchable` is set.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Correct and incorrect
+## Accessibility
+
+- **The label is associated whether you pass `id` or not.** One id is derived
+  once and used for both the label's `htmlFor` and the input; when no `id` is
+  given, React's `useId` supplies one. Pass `id` when something outside the
+  component needs to point at the input — an `aria-describedby`, a `<label>` you
+  render yourself, a test selector — and you will get exactly the id you passed.
+  `name` is a form key, not an id, and no longer stands in for one (#206).
+- **`showLabel={false}` hides the label, it does not remove it.** The label is
+  rendered either way and always carries `htmlFor`; `showLabel={false}` only
+  clips it out of sight with `.plus-input-label-hidden`. So a field that has a
+  `label` has an accessible name whether or not you show it, and turning the
+  label off costs nothing but the pixels. This was the other way round until
+  #213 — see *Why `showLabel` cannot take the name away* below.
+- **`required` is visual only.** It renders a `*` span marked
+  `aria-label="required"` and is not forwarded to the input.
+- **`validation` is visual only.** It adds `plus-input-invalid` or
+  `plus-input-success` and renders the message with an `aria-hidden` icon. It
+  sets no `aria-invalid`, and does not link `validationMessage` to the input.
+  Pass `aria-invalid` and `aria-describedby` yourself — they are spread onto the
+  input.
+- **A field with no `label` still has no name.** `showLabel` decides whether the
+  label is *seen*, not whether there is one. If the visible label is rendered by
+  the caller instead — a `<Label>` above the field, a table column header — point
+  it at the input with `htmlFor`; if there is no text anywhere, pass `aria-label`.
+- **Everything else passes through.** `type`, `autoComplete`, `maxLength`,
+  `pattern`, `inputMode` and any `aria-*` attribute all reach the input element,
+  so the native affordances are available even though the wrapper does not use
+  them.
 
 ### Always pass `id`, or the label points at nothing.
 
@@ -181,40 +194,6 @@ a matching icon.
        validationMessage="Enter a valid email address."
        aria-invalid={true} aria-describedby="email-error" />
 ```
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Accessibility
-
-- **The label is associated whether you pass `id` or not.** One id is derived
-  once and used for both the label's `htmlFor` and the input; when no `id` is
-  given, React's `useId` supplies one. Pass `id` when something outside the
-  component needs to point at the input — an `aria-describedby`, a `<label>` you
-  render yourself, a test selector — and you will get exactly the id you passed.
-  `name` is a form key, not an id, and no longer stands in for one (#206).
-- **`showLabel={false}` hides the label, it does not remove it.** The label is
-  rendered either way and always carries `htmlFor`; `showLabel={false}` only
-  clips it out of sight with `.plus-input-label-hidden`. So a field that has a
-  `label` has an accessible name whether or not you show it, and turning the
-  label off costs nothing but the pixels. This was the other way round until
-  #213 — see *Why `showLabel` cannot take the name away* below.
-- **`required` is visual only.** It renders a `*` span marked
-  `aria-label="required"` and is not forwarded to the input.
-- **`validation` is visual only.** It adds `plus-input-invalid` or
-  `plus-input-success` and renders the message with an `aria-hidden` icon. It
-  sets no `aria-invalid`, and does not link `validationMessage` to the input.
-  Pass `aria-invalid` and `aria-describedby` yourself — they are spread onto the
-  input.
-- **A field with no `label` still has no name.** `showLabel` decides whether the
-  label is *seen*, not whether there is one. If the visible label is rendered by
-  the caller instead — a `<Label>` above the field, a table column header — point
-  it at the input with `htmlFor`; if there is no text anywhere, pass `aria-label`.
-- **Everything else passes through.** `type`, `autoComplete`, `maxLength`,
-  `pattern`, `inputMode` and any `aria-*` attribute all reach the input element,
-  so the native affordances are available even though the wrapper does not use
-  them.
 
 </div>
 
@@ -265,6 +244,18 @@ rather than both being called "Time". The visible caption stopped competing for
 that job and names the pair as a `group`. In both components the name now
 belongs to the component; text the caller renders above the field is a caption,
 not a second claim on the name.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For multi-line text, use `Textarea`.
+- For numbers with steppers, use `NumberInput`.
+- For a value chosen from a list, use `Select`.
+- For dates, use `DatePicker` or `DateAndTimePicker`.
+- For an input with an attached button or addon, use `InputGroup`.
 
 </div>
 

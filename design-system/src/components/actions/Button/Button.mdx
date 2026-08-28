@@ -349,6 +349,7 @@ Buttons are interactive elements that are used to perform actions on a page.
 <div className="space-y-10 md:space-y-12">
     <ColorStylesSection />
     <FillTreatmentsSection />
+
 </div>
 
 </div>
@@ -419,40 +420,11 @@ Use it for navigation too, but pass `href`: the component forwards `href` and
 middle-click and "open in new tab" working, which a click handler on a `button`
 does not.
 
-### When not to use
-
-- **Not for a set of choices.** Three Buttons with `active` look selected but
-  announce nothing — `active` only adds a CSS class. Use `RadioButtonGroup` for
-  a scale, `NavTabs` or `NavPills` for switching views, `Select` for picking a
-  value.
-- **Not for a menu.** A button that opens a list of actions is `Dropdown`, which
-  already supplies `aria-haspopup` and `aria-expanded` on its own toggle.
-- **Not as a progress indicator.** `loading` disables the button, blocks pointer
-  events and makes the label transparent. It is a one-beat "this is going" cue,
-  not a wait indicator. For anything longer, render `Spinner` or `Progress`
-  beside the button so the label stays readable.
-- **Not for curriculum color as severity.** `style` accepts the five SMART
-  domains — `social-emotional`, `mastering-content`, `advocacy`, `relationship`,
-  `technology-tools`. They are subject colors. `success`, `warning` and `danger`
-  are the ones that mean something happened.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Correct and incorrect
-
-### An icon-only button needs a name and needs room.
-
-```jsx
-// Incorrect — no text and no children means icon-only, which renders 36×36
-// at the default medium size with no accessible name at all.
-<Button leadingVisual="trash" style="danger" />
-
-// Correct — large is the only icon-only size that clears 44×44, and the
-// name has to be supplied by hand.
-<Button leadingVisual="trash" style="danger" size="large" aria-label="Delete session" />
-```
+## Usage notes
 
 ### Loading is not a substitute for feedback.
 
@@ -466,16 +438,23 @@ does not.
 {isExporting && <Spinner />}
 ```
 
-### A group of buttons is not a selection control.
+### `style` carries two vocabularies; only one of them means severity.
+
+`success`, `warning` and `danger` say something happened. The five SMART
+domains — `social-emotional`, `mastering-content`, `advocacy`, `relationship`,
+`technology-tools` — are subject colours, and a button wearing one is about
+that domain, not about an outcome. The props table lists all thirteen values
+side by side; the enum does not tell you which half you are in.
 
 ```jsx
-// Incorrect — `active` is a class. Nothing announces which one is chosen.
-<Button text="Week" active={range === 'week'} onClick={() => setRange('week')} />
-<Button text="Month" active={range === 'month'} onClick={() => setRange('month')} />
+// Incorrect — advocacy is the colour of a curriculum domain. Nothing about it
+// says "this deletes something".
+<Button text="Delete session" style="advocacy" />
 
-// Correct — extra props are spread onto the element, so state can be declared.
-<Button text="Week" active={range === 'week'} aria-pressed={range === 'week'}
-        onClick={() => setRange('week')} />
+// Correct — severity from the semantic set, domain colour where the button is
+// genuinely about that domain.
+<Button text="Delete session" style="danger" />
+<Button text="Open advocacy plan" style="advocacy" />
 ```
 
 </div>
@@ -501,6 +480,41 @@ does not.
 - **Pass-through.** Unrecognised props are spread onto the rendered element, so
   `aria-pressed`, `aria-expanded`, `aria-controls` and `aria-describedby` all
   work without a wrapper.
+
+### An icon-only button needs a name and needs room.
+
+```jsx
+// Incorrect — no text and no children means icon-only, which renders 36×36
+// at the default medium size with no accessible name at all.
+<Button leadingVisual="trash" style="danger" />
+
+// Correct — large is the only icon-only size that clears 44×44, and the
+// name has to be supplied by hand.
+<Button leadingVisual="trash" style="danger" size="large" aria-label="Delete session" />
+```
+
+### A group of buttons is not a selection control.
+
+```jsx
+// Incorrect — `active` is a class. Nothing announces which one is chosen.
+<Button text="Week" active={range === 'week'} onClick={() => setRange('week')} />
+<Button text="Month" active={range === 'month'} onClick={() => setRange('month')} />
+
+// Correct — extra props are spread onto the element, so state can be declared.
+<Button text="Week" active={range === 'week'} aria-pressed={range === 'week'}
+        onClick={() => setRange('week')} />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a set of choices the user picks between, use `RadioButtonGroup` or `MultipleChoice`.
+- For a menu of actions behind one trigger, use `Dropdown`.
+- To show that work is under way on the page rather than in the control, use `Progress`.
+- To label a state rather than act on it, use `Badge`.
 
 </div>
 

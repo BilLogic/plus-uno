@@ -133,26 +133,11 @@ button.
 Pass the buttons either way: an array of configs via `buttons`, or `Button`
 children. Children win when both are given.
 
-### When not to use
-
-- **Not for a dialog or card footer.** `Modal` and `Jumbotron` render their own
-  buttons from `primaryButton` and `secondaryButton`, and `Card` from
-  `actionButton`; a `ButtonGroup` there fights those layouts.
-- **Not as a radio group.** `role="group"` is not `radiogroup`, and per-button
-  `active` is only a CSS class — nothing announces which one is chosen and there
-  is no roving tab order. A value the user picks is `RadioButtonGroup` or
-  `Select`.
-- **Not as a tab bar.** Switching between views is `NavTabs` or `NavPills`.
-- **Not for the full Button palette.** The group's `style` accepts seven values
-  and `fill` four — `default` and the five SMART domain colors are not among the
-  group's `style` values, and `text` is not among its `fill` values. Set those on
-  the individual button instead.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Correct and incorrect
+## Usage notes
 
 ### A group of buttons is not a selection.
 
@@ -188,17 +173,6 @@ children. Children win when both are given.
 ]} />
 ```
 
-### Name the group.
-
-```jsx
-// Incorrect — role="group" with no name. A screen reader announces "group"
-// and the user has to infer what the three buttons belong to.
-<ButtonGroup buttons={rowActions} />
-
-// Correct — `ariaLabel` becomes the group's aria-label.
-<ButtonGroup ariaLabel="Session actions" buttons={rowActions} />
-```
-
 </div>
 
 <div className="sb-ds-doc-section">
@@ -220,6 +194,28 @@ children. Children win when both are given.
 - **The buttons keep their own rules.** Sizing, icon-only naming and the
   disabled behaviour described on the `Button` page all still apply inside a
   group.
+
+### Name the group.
+
+```jsx
+// Incorrect — role="group" with no name. A screen reader announces "group"
+// and the user has to infer what the three buttons belong to.
+<ButtonGroup buttons={rowActions} />
+
+// Correct — `ariaLabel` becomes the group's aria-label.
+<ButtonGroup ariaLabel="Session actions" buttons={rowActions} />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a dialog or card footer, place buttons directly — the group's connected treatment implies the actions are alternatives.
+- For one answer from several, use `RadioButtonGroup`.
+- For switching between panels of content, use `NavTabs`.
+- For the full colour palette, use individual `Button`s; the group deliberately offers a narrower set.
 
 </div>
 

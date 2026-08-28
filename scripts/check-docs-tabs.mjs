@@ -69,10 +69,29 @@ const MDX_ROOT = 'design-system/src';
  */
 const USAGE_HEADINGS = new Set([
   'When to use',
-  'Correct and incorrect',
   'Accessibility',
   'Usage notes',
+  'Related',
   'Why `showLabel` cannot take the name away',
+]);
+
+/**
+ * Headings #254 retired, and which must never come back.
+ *
+ * `Correct and incorrect` was a category, not a rule. It collected every
+ * do/don't pair on a page into one block, so a reader had to re-derive which
+ * rule each pair illustrated. The benchmark has no equivalent: all 33 do/don't
+ * grids across ~28 Atlassian packages sit under the specific `###` rule they
+ * illustrate, immediately after the paragraph explaining why.
+ *
+ * `When not to use` was bold prose, then a `###` after #253, and in both forms
+ * it answered a question that belongs somewhere else — if the answer is "use a
+ * different component", it is a `Related` bullet; if the failure is visual, it
+ * is a don't card under the rule it breaks.
+ */
+const RETIRED_HEADINGS = new Map([
+  ['Correct and incorrect', 'dissolve it: move each pair under the rule it illustrates (#254)'],
+  ['When not to use', 'move each case to a `Related` bullet or a don\'t card (#254)'],
 ]);
 
 const SECTION_OPEN = '<div className="sb-ds-doc-section">';
@@ -125,6 +144,13 @@ export function readTabs(source) {
   return {
     tabs,
     sections,
+    // `###` sub-headings, which are NOT sections — assertion 5 counts `##` only.
+    // Needed because #254's retired `When not to use` became a `###` in #253,
+    // so a check that looked at sections alone would have gone quietly green.
+    subHeadings: lines
+      .map((l) => /^###\s+(.*?)\s*$/.exec(l))
+      .filter(Boolean)
+      .map((m) => m[1]),
     sectionDivs: lines.filter((l) => l.trim() === SECTION_OPEN).length,
     headings: lines.filter((l) => HEADING.test(l)).length,
     hasWrapper: source.includes('<DocsTabs'),
@@ -166,7 +192,12 @@ export function checkFile(file, source, tabbed = isTabbedDocsPage(file)) {
       found.push(`${file}: section ${JSON.stringify(section.heading)} sits outside every tab.`);
       continue;
     }
-    // 3. Membership follows the rule, not the author's memory.
+    // 3. Membership follows the rule, not the author's memory. A retired
+    //    heading is skipped here: it has no correct tab, and assertion 7 below
+    //    already says what to do with it. Without this, `Correct and incorrect`
+    //    coming back would draw both "move it to the examples tab" and
+    //    "dissolve it" — and following the first leaves the page still red.
+    if (RETIRED_HEADINGS.has(section.heading)) continue;
     const belongs = USAGE_HEADINGS.has(section.heading) ? 'usage' : 'examples';
     if (section.tab !== belongs) {
       found.push(
@@ -210,6 +241,42 @@ export function checkFile(file, source, tabbed = isTabbedDocsPage(file)) {
       found.push(
         `${file}: ${count} sections named ${JSON.stringify(heading)} — one anchor and one ` +
           `TOC entry between them. Merge them, or give each its own name.`,
+      );
+    }
+  }
+
+  // 7. A retired heading must not come back, at either level. #254 dissolved
+  //    two of them, and the reason each was wrong is recorded on the map above
+  //    so this check tells the author what to do instead rather than only that
+  //    they are wrong.
+  for (const [heading, remedy] of RETIRED_HEADINGS) {
+    const inSections = read.sections.some((sec) => sec.heading === heading);
+    const inSubs = read.subHeadings.includes(heading);
+    if (inSections || inSubs) {
+      found.push(`${file}: ${JSON.stringify(heading)} was retired — ${remedy}.`);
+    }
+  }
+
+  // 8. Guidance ends by pointing somewhere else. Across the 204 `usage.mdx`
+  //    pages in the Atlassian constellation corpus, 74 carry a `Related`
+  //    heading and it is the last section in 73 of them — the one exception is
+  //    `button-legacy`, a deprecated page. It goes last because "use a
+  //    different component" is the most common answer to "should I use this
+  //    one", and a reader who has reached the end of the page is who needs it.
+  //
+  //    Gated on the tab existing, not on it holding sections: a Usage tab whose
+  //    guidance is loose prose, or only `###` rules under no `##`, has no
+  //    sections to count, and assertion 5 is silent through it too because it
+  //    compares whole-file totals that stay one-to-one. Keyed on `usage.length`
+  //    that page would ship guidance with no way out of it, green.
+  const usage = read.sections.filter((sec) => sec.tab === 'usage');
+  if (read.tabs.includes('usage')) {
+    const last = usage[usage.length - 1];
+    if (!usage.some((sec) => sec.heading === 'Related')) {
+      found.push(`${file}: has a Usage tab but no "Related" section.`);
+    } else if (last && last.heading !== 'Related') {
+      found.push(
+        `${file}: "Related" must be the last Usage section, not ${JSON.stringify(last.heading)}.`,
       );
     }
   }

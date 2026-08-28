@@ -120,25 +120,11 @@ It can be uncontrolled (`defaultActiveKey`) or controlled (`activeKey` plus
 `onSelect`). `alignment` covers left, centre, right and `justified`, which
 stretches the tabs to fill the bar.
 
-### When not to use
-
-- **Not for navigating away.** Tabs imply the content stays in place. Moving to
-  a different page in a hierarchy is `Breadcrumb` plus real links; a sidebar
-  destination is `SidebarTab`.
-- **Not for a pill bar.** `NavPills` is the same component family with the pill
-  treatment and a `vertical` direction. Pick on appearance and orientation, not
-  behaviour — they behave identically.
-- **Not for more tabs than fit.** There is no overflow handling and no scroll.
-  Past about six, move the extras into a `NavTabs.Dropdown` or switch to a
-  sidebar.
-- **Not for a filter.** Tabs switch what you are looking at; narrowing a list is
-  `Select` or a row of dismissible `Badge`s.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Correct and incorrect
+## Usage notes
 
 ### A controlled bar needs `onSelect`, or it will never move.
 
@@ -171,6 +157,56 @@ stretches the tabs to fill the bar.
 </NavTabs>
 ```
 
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **In the default mode this is a row of links, not a tab widget.** The
+  underlying nav only applies `role="tablist"` — and therefore `role="tab"` and
+  `aria-selected` on each item — when it sits inside a tab container, and
+  `NavTabs` does not provide one. An item with a real `href` renders as an
+  ordinary link; an item with only an `eventKey` renders as an anchor with
+  `role="button"` and `href="#"`. Which is correct for navigation, and is why
+  `mode="tabs"` exists rather than a fix being applied to everyone.
+- **Arrow keys are gated on the same context.** The library's key handler
+  returns immediately when there is no tab context, so left/right arrow
+  navigation does not work in the default mode even if you set `role="tablist"`
+  yourself.
+- **Tab still works in either mode.** In navigation mode every item is focusable
+  and activates with Enter, so the bar is operable by keyboard — it is the
+  *semantics* that are missing, not the operation.
+- **`mode="tabs"` is the WAI-ARIA tabs pattern (#256).** `role="tablist"` on the
+  container, `role="tab"` and `aria-selected` on each item, `aria-controls`
+  pointing at the panel when one is declared, and roving tabindex: one stop for
+  the whole strip, with Left, Right, Home and End moving selection and focus
+  together. Items are real `<button>` elements, so activating one no longer
+  pushes a history entry or moves the scroll position the way `href="#"` did.
+- **Arrow keys skip a disabled tab.** A disabled `<button>` cannot take focus,
+  so landing selection on one would move the selection and strand the focus
+  behind it. If every other tab is disabled, the keys do nothing.
+- **The strip's single tab stop is never lost.** It sits on the selected tab,
+  unless that tab is disabled or `activeKey` names no tab at all — then it falls
+  back to the first enabled one. Each of those cases would otherwise take the
+  whole tablist out of the tab sequence with nothing to see on screen. The stop
+  is decided by `activeKey` alone: `active` on an item is an appearance prop, so
+  marking several items active makes several look selected without giving the
+  strip several places in the tab sequence.
+- **`aria-controls` is omitted rather than dangled.** A tab with no
+  `NavTabs.Panel` gets no pointer at all — an id that is not in the document
+  sends assistive technology to nothing, which is worse than pointing nowhere.
+- **A dropdown is not a tab.** `NavTabs.Dropdown` has no valid ARIA inside a
+  tablist. In `mode="tabs"` it is wrapped presentational so the markup stays
+  valid, and it is left out of the tab set, so the arrow keys walk past it — but
+  a strip that needs an overflow menu wants the default mode, or a `Select`.
+- **`disabled` is honoured.** A disabled item loses its `href`, gains
+  `aria-disabled`, and stops responding to clicks — so it drops out of the tab
+  order rather than sitting there as a dead-looking link.
+- **The bar has no name.** Extra props are spread onto the nav element, so
+  `aria-label` is the way to say what this set of tabs is for — especially when
+  a page carries more than one.
+
 ### If it must behave as an ARIA tab widget, ask for `mode="tabs"`.
 
 ```jsx
@@ -199,52 +235,14 @@ navigation markup byte for byte against what shipped before #256.
 
 <div className="sb-ds-doc-section">
 
-## Accessibility
+## Related
 
-- **In the default mode this is a row of links, not a tab widget.** The
-  underlying nav only applies `role="tablist"` — and therefore `role="tab"` and
-  `aria-selected` on each item — when it sits inside a tab container, and
-  `NavTabs` does not provide one. An item with a real `href` renders as an
-  ordinary link; an item with only an `eventKey` renders as an anchor with
-  `role="button"` and `href="#"`. Which is correct for navigation, and is why
-  the mode exists rather than a fix being applied to everyone.
-- **Arrow keys are gated on the same context.** The library's key handler
-  returns immediately when there is no tab context, so left/right arrow
-  navigation does not work in the default mode even if you set `role="tablist"`
-  yourself.
-- **Tab still works in either mode.** In navigation mode every item is focusable
-  and activates with Enter, so the bar is operable by keyboard — it is the
-  *semantics* that are missing, not the operation.
-- **`mode="tabs"` is the WAI-ARIA tabs pattern (#256).** `role="tablist"` on the
-  container, `role="tab"` and `aria-selected` on each item, `aria-controls`
-  pointing at the panel when one is declared, and roving tabindex: the selected
-  tab is the strip's single stop in the tab sequence, and Left, Right, Home and
-  End move selection and focus together. Items are real `<button>` elements, so
-  activating one no longer pushes a history entry or moves the scroll position
-  the way `href="#"` did.
-- **Arrow keys skip a disabled tab.** A disabled `<button>` cannot take focus,
-  so landing selection on one would move the selection and strand the focus
-  behind it. If every other tab is disabled, the keys do nothing.
-- **The strip's single tab stop is never lost.** It sits on the selected tab,
-  unless that tab is disabled or `activeKey` names no tab at all — then it falls
-  back to the first enabled one. Each of those cases would otherwise take the
-  whole tablist out of the tab sequence with nothing to see on screen. The stop
-  is decided by `activeKey` alone: `active` on an item is an appearance prop, so
-  marking several items active makes several look selected without giving the
-  strip several places in the tab sequence.
-- **`aria-controls` is omitted rather than dangled.** A tab with no
-  `NavTabs.Panel` gets no pointer at all — an id that is not in the document
-  sends assistive technology to nothing, which is worse than pointing nowhere.
-- **A dropdown is not a tab.** `NavTabs.Dropdown` has no valid ARIA inside a
-  tablist. It renders in the strip in `mode="tabs"` and is left out of the tab
-  set, so the arrow keys walk past it — but a strip that needs an overflow menu
-  wants the default mode, or a `Select`.
-- **`disabled` is honoured.** A disabled item loses its `href`, gains
-  `aria-disabled`, and stops responding to clicks — so it drops out of the tab
-  order rather than sitting there as a dead-looking link.
-- **The bar has no name.** Extra props are spread onto the nav element, so
-  `aria-label` is the way to say what this set of tabs is for — especially when
-  a page carries more than one.
+- For navigating to a different page, use `Navbar` or `Breadcrumb` — tabs imply the content stays in place.
+- For a pill-shaped bar, use `NavPills`.
+- For more tabs than fit the width, use `Select` — the strip is `flex-wrap:
+  wrap`, so the overflow becomes a second row of tabs rather than a scroll or
+  an overflow menu, and the row the reader is on stops being obvious.
+- For filtering a list rather than switching between views, use `Select` or `MultipleChoice` — filters combine, tabs do not.
 
 </div>
 

@@ -45,4 +45,6 @@ From `design-system/src/components/navigation/Pagination/Pagination.scss`. Overr
 
 Same group: `Breadcrumb` · `NavPills` · `NavTabs` · `Scrollspy` · `SidebarTab`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
+
+> Authored guidance is partial — missing: correct/incorrect (#166).

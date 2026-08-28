@@ -55,4 +55,6 @@ Anything not listed is not a valid value.
 
 Same group: `Accordion` · `Carousel` · `Collapse` · `Divider` · `Jumbotron` · `ListGroup` · `MediaObject` · `ScrollBar`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
+
+> Authored guidance is partial — missing: correct/incorrect (#166).
