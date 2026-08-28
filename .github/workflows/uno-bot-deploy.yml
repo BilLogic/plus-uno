@@ -179,11 +179,22 @@ jobs:
         # `unstamped` is unreachable from scripts/deploy.mjs, so that bundle had
         # run none of the gates above.
         #
-        # Bill disconnected the Workers Builds integration on 2026-08-28 and
-        # this job has owned production since. The hold STAYS: it is what made a
-        # silent overwrite visible, and it is what would notice a third deployer
-        # or the integration being reconnected. It costs 150s per deploy, which
-        # is the cheapest alarm in this file.
+        # The integration was disconnected on 2026-08-28. A first attempt did
+        # not take, and the deploy that "verified" it was a workflow_dispatch —
+        # which Workers Builds does not trigger on, so it could not have caught
+        # anything. The next real push proved it was still live.
+        #
+        # What it was, read off the dashboard: repository BilLogic/plus-uno,
+        # production branch main, non-production branch builds enabled, root
+        # directory agents/uno-bot, and a deploy command of `npx wrangler
+        # deploy` — NOT `npm run deploy`. That one line is the whole incident.
+        # It never invoked scripts/deploy.mjs, so no --define reached the bundle
+        # (hence `unstamped`) and none of the gates above ran. In place since
+        # 2026-07-08.
+        #
+        # The hold STAYS. It is what made a silent overwrite visible, and it is
+        # what would notice a third deployer or this being reconnected. 150s per
+        # deploy is the cheapest alarm in this file.
         #
         # The logic is a module, not a bash loop in a YAML string, because it
         # now has edge cases worth testing — an unreachable Worker must not read
