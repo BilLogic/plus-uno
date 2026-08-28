@@ -4,8 +4,10 @@
 // The old inline check exited 0 on the first correct answer. That is a claim
 // about a moment, not about the deploy: this Worker HAD a second deployer, and
 // whatever it shipped afterwards replaced ours silently while the run reported
-// success. It was disconnected on 2026-08-28 (#278); the hold stays, because it
-// is what would notice a third one, or that one coming back.
+// success. Its deploy command was `npx wrangler deploy`, which never invoked
+// scripts/deploy.mjs — so no --define reached the bundle and none of the gates
+// ran. Disconnected 2026-08-28 (#278); the hold stays, because it is what would
+// notice a third one, or that one coming back.
 //
 // Measured 2026-08-28 on 50782f79 (#278): the Actions run deployed
 // r131-50782f7 and confirmed it at 17:20:45. Thirty-six seconds later /health
