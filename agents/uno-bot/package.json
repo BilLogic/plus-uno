@@ -10,7 +10,7 @@
     "check:harness-bundle": "node scripts/bundle-harness.mjs --check",
     "check:fetch": "node scripts/check-fetch.mjs",
     "check:contract": "node scripts/sync-blueprint-contract.mjs --check",
-    "deploy": "npm run typecheck && npm run check:fetch && npm run check:contract && npm run test:bundle && npm run bundle:harness && wrangler deploy",
+    "deploy": "npm run typecheck && npm run check:fetch && npm run check:contract && npm run test:bundle && npm run bundle:harness && node scripts/deploy.mjs",
     "typecheck": "tsc --noEmit",
     "tail": "wrangler tail",
     "test": "tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js",

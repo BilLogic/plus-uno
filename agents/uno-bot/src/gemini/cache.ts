@@ -14,8 +14,9 @@
 //   2. Retry a hopeless call every turn. A failure is remembered (negative
 //      cache) for the same hour, so an unsupported configuration costs ONE
 //      wasted subrequest per hour, not one per message.
-//   3. Serve a stale prompt. The cache key includes BUILD, so a deploy that
-//      changes the harness can never hit a cache built from the old text.
+//   3. Serve a stale prompt. The key is a hash of the harness text plus the
+//      build stamp, so a deploy that changes the harness can never hit a cache
+//      built from the old text.
 import type { Env } from "../types";
 import { countedFetch, charge } from "../net";
 import { vertexBase } from "./client";
@@ -49,11 +50,18 @@ export interface HarnessCacheResult {
 
 /**
  * FNV-1a over the harness text. The key must change whenever the CONTENT
- * changes, and BUILD is a hand-bumped convention — a prompt-only hotfix that
- * forgets the bump would serve the old harness from cache for up to 50 minutes.
- * Hashing the text makes the staleness guarantee structural (the same lesson
+ * changes, and hashing the text is what makes that structural (the same lesson
  * the subrequest meter already encodes: conventions drift, boundaries hold).
- * BUILD stays in the key too, purely as a human-readable label.
+ *
+ * BUILD is in the key too. That used to be described here as "purely a
+ * human-readable label", because it was a hand-bumped convention and a
+ * prompt-only hotfix that forgot the bump would have served the old harness for
+ * up to 50 minutes. Since #249 it is derived from the deploy, so it now changes
+ * on every deploy without exception — which makes it a second, independent
+ * staleness guarantee rather than an apology. It costs nothing: TTL_SECONDS is
+ * an hour and the entry refreshes at 50 minutes, so the cached content is
+ * recreated ~24 times a day anyway and a deploy adding one is not a cost worth
+ * reasoning about.
  */
 function fnv1a(text: string): string {
   let h = 0x811c9dc5;
