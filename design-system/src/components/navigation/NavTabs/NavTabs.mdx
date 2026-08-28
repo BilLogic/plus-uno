@@ -163,18 +163,43 @@ stretches the tabs to fill the bar.
 
 ## Accessibility
 
-- **Standalone, this is a row of links, not a tab widget.** The underlying nav
-  only applies `role="tablist"` — and therefore `role="tab"` and `aria-selected`
-  on each item — when it sits inside a tab container. `NavTabs` does not provide
-  one. An item with a real `href` renders as an ordinary link; an item with only
-  an `eventKey` renders as an anchor with `role="button"` and `href="#"`.
+- **In the default mode this is a row of links, not a tab widget.** The
+  underlying nav only applies `role="tablist"` — and therefore `role="tab"` and
+  `aria-selected` on each item — when it sits inside a tab container, and
+  `NavTabs` does not provide one. An item with a real `href` renders as an
+  ordinary link; an item with only an `eventKey` renders as an anchor with
+  `role="button"` and `href="#"`. Which is correct for navigation, and is why
+  `mode="tabs"` exists rather than a fix being applied to everyone.
 - **Arrow keys are gated on the same context.** The library's key handler
   returns immediately when there is no tab context, so left/right arrow
-  navigation does not work in a standalone `NavTabs` even if you set
-  `role="tablist"` yourself.
-- **Tab still works.** Each item is focusable and activates with Enter, so the
-  bar is operable by keyboard either way — it is the *semantics* that are
-  missing, not the operation.
+  navigation does not work in the default mode even if you set `role="tablist"`
+  yourself.
+- **Tab still works in either mode.** In navigation mode every item is focusable
+  and activates with Enter, so the bar is operable by keyboard — it is the
+  *semantics* that are missing, not the operation.
+- **`mode="tabs"` is the WAI-ARIA tabs pattern (#256).** `role="tablist"` on the
+  container, `role="tab"` and `aria-selected` on each item, `aria-controls`
+  pointing at the panel when one is declared, and roving tabindex: one stop for
+  the whole strip, with Left, Right, Home and End moving selection and focus
+  together. Items are real `<button>` elements, so activating one no longer
+  pushes a history entry or moves the scroll position the way `href="#"` did.
+- **Arrow keys skip a disabled tab.** A disabled `<button>` cannot take focus,
+  so landing selection on one would move the selection and strand the focus
+  behind it. If every other tab is disabled, the keys do nothing.
+- **The strip's single tab stop is never lost.** It sits on the selected tab,
+  unless that tab is disabled or `activeKey` names no tab at all — then it falls
+  back to the first enabled one. Each of those cases would otherwise take the
+  whole tablist out of the tab sequence with nothing to see on screen. The stop
+  is decided by `activeKey` alone: `active` on an item is an appearance prop, so
+  marking several items active makes several look selected without giving the
+  strip several places in the tab sequence.
+- **`aria-controls` is omitted rather than dangled.** A tab with no
+  `NavTabs.Panel` gets no pointer at all — an id that is not in the document
+  sends assistive technology to nothing, which is worse than pointing nowhere.
+- **A dropdown is not a tab.** `NavTabs.Dropdown` has no valid ARIA inside a
+  tablist. In `mode="tabs"` it is wrapped presentational so the markup stays
+  valid, and it is left out of the tab set, so the arrow keys walk past it — but
+  a strip that needs an overflow menu wants the default mode, or a `Select`.
 - **`disabled` is honoured.** A disabled item loses its `href`, gains
   `aria-disabled`, and stops responding to clicks — so it drops out of the tab
   order rather than sitting there as a dead-looking link.
@@ -182,20 +207,29 @@ stretches the tabs to fill the bar.
   `aria-label` is the way to say what this set of tabs is for — especially when
   a page carries more than one.
 
-### If it must behave as an ARIA tab widget, it needs the tab container.
+### If it must behave as an ARIA tab widget, ask for `mode="tabs"`.
 
 ```jsx
 // Incorrect — assuming role="tab" and arrow keys come for free. They do not:
-// standalone, this renders as a row of links.
+// by default this renders as a row of links.
 <NavTabs activeKey={tab} onSelect={setTab}>{items}</NavTabs>
 
-// Correct — wrap it in react-bootstrap's Tab.Container, which is what supplies
-// the tablist context, aria-selected and left/right arrow navigation.
-<Tab.Container activeKey={tab} onSelect={setTab}>
-  <NavTabs>{items}</NavTabs>
-  <Tab.Content>{panes}</Tab.Content>
-</Tab.Container>
+// Correct — mode="tabs" supplies role="tablist", aria-selected, roving
+// tabindex and left/right/Home/End. Panels are declared alongside the items so
+// the component owns both halves of the aria-controls pair; only the active
+// one is rendered.
+<NavTabs mode="tabs" activeKey={tab} onSelect={setTab}>
+  <NavTabs.Item eventKey="overview">Overview</NavTabs.Item>
+  <NavTabs.Item eventKey="sessions">Sessions</NavTabs.Item>
+  <NavTabs.Panel eventKey="overview">{overview}</NavTabs.Panel>
+  <NavTabs.Panel eventKey="sessions">{sessions}</NavTabs.Panel>
+</NavTabs>
 ```
+
+The mode is opt-in rather than the default because three specs under
+`src/specs/Home` render this component as navigation, where anchors are the
+right element and a tablist would be a lie. `NavTabs.test.jsx` asserts the
+navigation markup byte for byte against what shipped before #256.
 
 </div>
 

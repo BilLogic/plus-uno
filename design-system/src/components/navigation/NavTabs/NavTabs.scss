@@ -221,3 +221,19 @@
     border-left: none !important;
     border-right: none !important;
 }
+/*
+ * The panel a tab controls — `mode="tabs"` only.
+ *
+ * It carries `tabindex="0"` so a keyboard user can reach panel content that
+ * holds nothing focusable of its own, which means it takes focus and needs a
+ * visible ring. `:focus-visible` rather than `:focus`, so clicking into the
+ * panel does not draw one.
+ */
+.plus-nav-tabs-panel {
+    padding-top: var(--size-section-gap-sm, 16px);
+
+    &:focus-visible {
+        outline: var(--size-element-stroke-md, 2px) solid var(--color-primary);
+        outline-offset: var(--size-element-stroke-sm, 1px);
+    }
+}
