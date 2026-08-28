@@ -29,9 +29,23 @@ name: uno-bot — deploy Worker
 # canonical copy. Until 2026-08-17 it exited 0 on a missing checkout, i.e. it
 # passed on every runner without comparing anything while this header called it
 # a gate. It now FAILS on a missing source unless BLUEPRINT_CONTRACT_OPTIONAL=1,
-# which the step below sets only when BLUEPRINT_REPO_TOKEN is unconfigured, and
-# it prints a SKIPPED banner when it does. Configure that secret to turn the
-# gate on for real.
+# which the step below sets only when BLUEPRINT_REPO_TOKEN is unconfigured.
+#
+# That is still not a gate, and #258 is the record of what it cost: the skip
+# banner printed on every deploy, nobody read it — a SKIPPED line inside a job
+# that finishes green is invisible — and the vendored contract drifted for real
+# while the gate said nothing. Two changes since:
+#
+#   - The script now writes a ::warning:: annotation and a job-summary line when
+#     it skips, and a summary line when it actually compares. A reader can tell
+#     "compared and matched" from "never compared" without opening the log.
+#   - `vars.BLUEPRINT_CONTRACT_REQUIRED` closes the escape hatch from repo
+#     settings, no PR needed. Set it to 1 once BLUEPRINT_REPO_TOKEN exists and
+#     an absent checkout stops deploying instead of quietly not checking.
+#
+# The order matters: configure the secret, watch one deploy log say `vendored
+# contract matches the app`, and only then set the variable. Setting it first
+# stops every deploy.
 # Bill's call, 2026-08-17: any push to main, NOT paths-filtered — a harness doc
 # under docs/ or skills/ changes the prompt just as much as a change under src/,
 # and a path filter is the exact mechanism that would reintroduce this bug.
@@ -47,9 +61,17 @@ name: uno-bot — deploy Worker
 #                            the Bryanhuang628 account. Store it on the
 #                            `uno-bot-production` ENVIRONMENT, not as a plain repo
 #                            secret — see below.
-#   BLUEPRINT_REPO_TOKEN     (optional) read access to BilLogic/plus-uno-blueprint,
-#                            so check:contract can actually compare. Without it the
-#                            contract gate reports SKIPPED instead of passing.
+#   BLUEPRINT_REPO_TOKEN     read access to BilLogic/plus-uno-blueprint, so
+#                            check:contract can actually compare. UNCONFIGURED as of
+#                            #258 — without it the contract gate reports SKIPPED on
+#                            every run and has never compared anything.
+#
+# Optional variables — LEAVE UNSET until the sequencing above is done:
+#   BLUEPRINT_CONTRACT_REQUIRED  set to 1 to make an absent app checkout FAIL the
+#                            deploy rather than skip the contract gate. Setting this
+#                            before BLUEPRINT_REPO_TOKEN exists stops EVERY deploy,
+#                            so: configure the secret, watch one deploy say
+#                            `vendored contract matches the app`, then set this.
 # The account id is non-secret and pinned below (the account that hosts uno-bot).
 #
 # WHY AN ENVIRONMENT. `main` is unprotected and this repo has 19 people who can
@@ -118,8 +140,11 @@ jobs:
       - name: Harness bundle is current
         working-directory: agents/uno-bot
         env:
+          # No BLUEPRINT_CONTRACT_* here: `bundle-harness.mjs` never reads them
+          # and never invokes the contract script, so setting them on this step
+          # only suggested to a reader that the gate runs twice. Measured —
+          # `BLUEPRINT_CONTRACT_REQUIRED=1` with no checkout still exits 0 here.
           BLUEPRINT_REPO: ${{ github.workspace }}/uno-blueprint-src
-          BLUEPRINT_CONTRACT_OPTIONAL: ${{ secrets.BLUEPRINT_REPO_TOKEN != '' && '0' || '1' }}
         run: npm run check:harness-bundle
       - name: Bundle harness + deploy
         working-directory: agents/uno-bot
@@ -128,6 +153,11 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: "747a73feeb756fad6c1164df234628e9"
           BLUEPRINT_REPO: ${{ github.workspace }}/uno-blueprint-src
           BLUEPRINT_CONTRACT_OPTIONAL: ${{ secrets.BLUEPRINT_REPO_TOKEN != '' && '0' || '1' }}
+          # The switch that closes the skip, set from repo VARIABLES rather than
+          # this file so turning the gate on for real needs no PR (#258). Unset
+          # today, because the secret below does not exist yet and a hard
+          # requirement would stop every deploy before it could ever pass once.
+          BLUEPRINT_CONTRACT_REQUIRED: ${{ vars.BLUEPRINT_CONTRACT_REQUIRED }}
         run: npm run deploy
       - name: Verify health
         # Asserts the build it just deployed is the build now serving, not
