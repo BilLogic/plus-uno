@@ -169,13 +169,21 @@ jobs:
         # the stamp is derived from this run it can be compared, so it is.
         #
         # Second (#278): comparing once is a claim about a MOMENT, not about the
-        # deploy. This Worker has a second deployer — Cloudflare Workers Builds,
-        # whose command lives in the Cloudflare dashboard and cannot be read
-        # from here — and it lands seconds after this job. Measured on
-        # 50782f79: this job deployed r131-50782f7 and confirmed it at 17:20:45;
-        # 36 seconds later /health turned over to `dev` and stayed there for six
-        # minutes, 24 samples, with this run green throughout. So the check
-        # converges and then HOLDS, and a stamp that leaves ours fails the run.
+        # deploy. This Worker HAD a second deployer — Cloudflare Workers Builds,
+        # whose command lived in the Cloudflare dashboard and could not be read
+        # from here. Measured on 50782f79: this job deployed r131-50782f7 and
+        # confirmed it at 17:20:45; 36 seconds later /health turned over and
+        # stayed there for six minutes, 24 samples, with this run green
+        # throughout. On 9f6030c it was worse — /health read `unstamped` on the
+        # FIRST sample and this job's build never appeared at all, and
+        # `unstamped` is unreachable from scripts/deploy.mjs, so that bundle had
+        # run none of the gates above.
+        #
+        # Bill disconnected the Workers Builds integration on 2026-08-28 and
+        # this job has owned production since. The hold STAYS: it is what made a
+        # silent overwrite visible, and it is what would notice a third deployer
+        # or the integration being reconnected. It costs 150s per deploy, which
+        # is the cheapest alarm in this file.
         #
         # The logic is a module, not a bash loop in a YAML string, because it
         # now has edge cases worth testing — an unreachable Worker must not read
