@@ -203,6 +203,12 @@ const COMPOSED = [
       'the unit tests of the guards themselves. A guard nobody has watched fail is a guard nobody knows works (#191).',
   },
   {
+    script: 'check:secrets',
+    pkg: 'bot',
+    guards:
+      "the secret declaration against `interface Env` and against [vars]. The [vars] half is the one with teeth: that table is COMMITTED, so a secret assigned there is a secret published to GitHub. The rest keeps wrangler.toml's expected-names list honest — hand-maintained, it drifted in both directions at once (four names not set, two set names missing) and #288's account move works from exactly that list.",
+  },
+  {
     script: 'check:worker-host',
     pkg: 'bot',
     guards:
