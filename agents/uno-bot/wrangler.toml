@@ -232,29 +232,63 @@ GEMINI_FALLBACK_MODEL = "gemini-2.5-pro"
 # "claude-sonnet-5".
 CLAUDE_MODEL = "claude-sonnet-5"
 
-# Secrets are set via `wrangler secret put`. Expected names:
-#   SLACK_SIGNING_SECRET     (verify incoming Slack request signatures)
-#   SLACK_BOT_TOKEN          (xoxb-… — chat.postMessage / reactions.add / replies)
-#   SLACK_MCP_CLIENT_SECRET  (secret for the static Slack OAuth client whose
-#                             id is SLACK_MCP_CLIENT_ID above; powers slack_search)
-#   GITHUB_TOKEN             (PAT with repo:dispatch scope + Contents:Read)
-#   FIGMA_ACCESS_TOKEN       (Figma read PAT — the prototype_scaffold proposal
-#                             screenshot fetch in events.ts + the library poll's
-#                             component/version reads in figma-poll.ts)
-#   NOTION_API_KEY           (Notion internal integration token — notion_create/
-#                             update/archive + the notion_search catalog reads)
-#   GMAIL_SENDER             (authorized "From" mailbox for email_send)
-#   GMAIL_CLIENT_ID / GMAIL_CLIENT_SECRET / GMAIL_REFRESH_TOKEN  (Gmail OAuth)
-#   SUPABASE_ANON_KEY        (publishable/anon read key; blueprint_search read-only)
-#   GEMINI_SA_EMAIL          (Vertex service-account client_email — powers BOTH
-#                             the Gemini-Vertex and Vertex-Claude lanes)
-#   GEMINI_SA_PRIVATE_KEY    (Vertex service-account private_key — full PEM)
-#   GEMINI_API_KEY           (AI Studio key — DO NOT SET on the Worker. Rule
-#                             2026-07-16 / ADR-018: the Vertex SA is canonical and
-#                             takes precedence whenever fully set; the AI Studio
-#                             key is a local-dev emergency fallback for the Gemini
-#                             lane only and CANNOT reach Claude.)
-#   DEBUG_TOKEN              (gates the /debug/* routes; sent as x-debug-token)
+# Secrets are set via `npm run secrets:set` (or `wrangler secret put`).
+# GENERATED from scripts/secrets.mjs — edit there, then `npm run check:secrets -- --fix`.
+#
+#   SLACK_SIGNING_SECRET
+#       verifies the signature on every incoming Slack request. Unset, the
+#       Worker cannot tell Slack from anyone else and rejects the lot.
+#   SLACK_BOT_TOKEN
+#       xoxb- token for chat.postMessage, reactions.add and threaded
+#       replies. Unset, the bot reads and never answers.
+#   GITHUB_TOKEN
+#       PAT with repo:dispatch + Contents:Read. Powers component_implement
+#       / prototype_scaffold, which dispatch workflows in
+#       BilLogic/plus-uno.
+#   FIGMA_ACCESS_TOKEN
+#       Figma read PAT. Two consumers: the proposal screenshot fetch in
+#       events.ts, and the library poll's component/version reads on the
+#       cron.
+#   NOTION_API_KEY
+#       Notion internal integration token — notion_create/update/archive
+#       plus every notion_search catalog read. Each database must also be
+#       shared with the integration.
+#   GEMINI_SA_EMAIL
+#       Vertex service-account client_email. Canonical model credential
+#       per ADR-018, and shared by BOTH the Gemini-Vertex and
+#       Vertex-Claude lanes — unset, the bot cannot think.
+#   GEMINI_SA_PRIVATE_KEY
+#       the matching private_key, full PEM including the BEGIN/END lines
+#       and its newlines. The half of the pair that is easiest to paste
+#       wrong.
+#   DEBUG_TOKEN
+#       gates /debug/*, sent as x-debug-token. Unset those routes 404 —
+#       which is safe, but both eval workflows drive the Worker through
+#       them and would score nothing.
+#   SLACK_MCP_CLIENT_SECRET [optional]
+#       client secret for the static Slack OAuth client whose id is
+#       SLACK_MCP_CLIENT_ID in [vars]. Unset, slack_search reports "not
+#       configured" and the rest of the bot is unaffected.
+#   SUPABASE_ANON_KEY [optional]
+#       read-only anon key for the uno-blueprint project. Unset,
+#       search_blueprint reports "not configured" and the bot falls back
+#       to cited docs rather than fabricating.
+#   GMAIL_SENDER [optional]
+#       authorized From mailbox for email_send. The whole Gmail lane is
+#       off unless all four GMAIL_* are set; send_email then fails
+#       gracefully.
+#   GMAIL_CLIENT_ID [optional]
+#       Gmail OAuth client id. See GMAIL_SENDER — all four or none.
+#   GMAIL_CLIENT_SECRET [optional]
+#       Gmail OAuth client secret. See GMAIL_SENDER — all four or none.
+#   GMAIL_REFRESH_TOKEN [optional]
+#       Gmail OAuth refresh token. See GMAIL_SENDER — all four or none.
+#   GEMINI_API_KEY [DO NOT SET]
+#       AI Studio key — must NOT be set on the Worker (ADR-018,
+#       2026-07-16). The Vertex SA above is canonical and takes precedence
+#       whenever fully set; this key is a local-dev fallback for the
+#       Gemini lane only and cannot reach Claude at all.
+# END GENERATED SECRETS
 
 # Durable Object — per-thread conversation state + pending tool-call proposals.
 [[durable_objects.bindings]]
