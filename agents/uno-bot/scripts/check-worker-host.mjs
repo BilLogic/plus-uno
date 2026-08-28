@@ -51,9 +51,12 @@ export const ALLOWED = new Map([
   [
     "agents/uno-bot/slack-app-manifest.yaml",
     "the Slack app's own declared config — 9 command URLs, the OAuth redirect, and " +
-      "the events and interactivity request URLs. Pushed with `npm run slack:manifest` " +
-      "and diffed with `npm run slack:diff`, so it is edited as one file and must match " +
-      "the live app exactly (#288)",
+      "the events and interactivity request URLs. NOT scripted: `pkce_enabled` " +
+      "permanently disables apps.manifest.update for this app, so every push path " +
+      "fails with cannot_disable_once_enabled (ADR-024). The file is the repo's record " +
+      "and the rollback point; applying it means pasting into the App Manifest web " +
+      "editor, then confirming with `npm run slack:diff`, which reads the live app. " +
+      "That makes it the slowest step of the #288 cutover, not the easiest",
   ],
   [
     "agents/uno-bot/slack-app-manifest-commands.yaml",
@@ -182,8 +185,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       console.error("     scripts/check-worker-host.mjs with the reason (#288).");
     } else {
       console.error(`  -> These still point at ${host}. The move is not complete until each one`);
-      console.error("     names the new host — including the Slack manifests, which are pushed");
-      console.error("     with `npm run slack:manifest` and must match the live app exactly.");
+      console.error("     names the new host. The Slack manifests cannot be pushed — paste them");
+      console.error("     into the App Manifest web editor by hand, then `npm run slack:diff`");
+      console.error("     to confirm the live app matches (ADR-024).");
     }
     process.exit(1);
   }
