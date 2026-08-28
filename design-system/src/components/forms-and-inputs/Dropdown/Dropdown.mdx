@@ -139,30 +139,11 @@ It is the only component in `forms-and-inputs` that places itself: the menu
 flips up when there is no room below and right-aligns when a left-aligned menu
 would run off the edge, remeasuring on scroll and resize.
 
-### When not to use
-
-- **Not to hold a form value.** A control whose job is to store what the user
-  picked is `Select` — it keeps the value, shows it in the trigger, and supports
-  multi-select and search. `Dropdown` fires handlers and forgets.
-- **Not for a long list.** There is no search, no virtualisation, and the menu is
-  capped at 320px wide. Past a dozen items, use `Select` with `searchable`.
-- **Not for rich content.** Items render a fixed row — check mark or checkbox,
-  optional leading icon, text, optional trailing icon, optional counter. Anything
-  else belongs in a `Popover`.
-- **Not in controlled mode without `onToggle`.** Passing `isOpen` hands the
-  state to the parent: the component stops writing its own, so the toggle
-  click, the item click and the click-outside close all become `onToggle`
-  calls the parent has to act on. `isOpen` on its own is still a static open
-  menu — now by omission rather than by design.
-- **`split` is presentation only.** The label half of a split button renders with
-  no click handler, and no prop supplies one. Use it to show the split treatment;
-  do not expect a primary action from it.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Correct and incorrect
+## Usage notes
 
 ### Controlled mode needs both halves.
 
@@ -198,18 +179,6 @@ would run off the edge, remeasuring on scroll and resize.
 />
 ```
 
-### Give the split treatment a real button when the label must act.
-
-```jsx
-// Incorrect — clicking "Save" does nothing. The label half of a split button
-// carries no handler and takes no prop for one.
-<Dropdown split buttonText="Save" items={saveOptions} />
-
-// Correct — a real Button beside a Dropdown for the extra options.
-<Button text="Save" onClick={save} />
-<Dropdown buttonText="Save options" items={saveOptions} />
-```
-
 </div>
 
 <div className="sb-ds-doc-section">
@@ -235,6 +204,28 @@ would run off the edge, remeasuring on scroll and resize.
   checkbox and `leadingIcon` are all `aria-hidden`. `trailingIcon` and the
   submenu caret are not, so an icon font glyph there can leak into the item's
   announced name. Keep the item's meaning in `text` either way.
+
+### Give the split treatment a real button when the label must act.
+
+```jsx
+// Incorrect — clicking "Save" does nothing. The label half of a split button
+// carries no handler and takes no prop for one.
+<Dropdown split buttonText="Save" items={saveOptions} />
+
+// Correct — a real Button beside a Dropdown for the extra options.
+<Button text="Save" onClick={save} />
+<Dropdown buttonText="Save options" items={saveOptions} />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- To hold a form value, use `Select` — a dropdown menu is a set of actions, not a field.
+- For a long list the user needs to search, use `Select` with filtering.
+- For rich content anchored to a trigger, use `Popover`.
 
 </div>
 

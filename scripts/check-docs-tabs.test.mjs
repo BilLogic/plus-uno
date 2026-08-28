@@ -38,7 +38,10 @@ const page = ({ tabs = true, examples = ['Overview'], usage = [], extra = '' } =
 };
 
 test('a well-formed page is silent — the green twin every case below needs', () => {
-  const ok = page({ examples: ['Overview', 'Variants'], usage: ['When to use', 'Accessibility'] });
+  const ok = page({
+    examples: ['Overview', 'Variants'],
+    usage: ['When to use', 'Accessibility', 'Related'],
+  });
   assert.deepEqual(checkFile(COMPONENT, ok, true), []);
 });
 
@@ -81,27 +84,30 @@ test('3b. an Examples section pulled into Usage is caught — the rule runs both
 });
 
 test('3c. a `###` sub-heading is not a section — the `##`-only regex is load-bearing', () => {
-  // #253 promoted `When not to use` from bold prose to `### When not to use` in
-  // all 15 files, and 47 more code-pair intros beside it. `HEADING` matches `##`
-  // and only `##`, so none of the 62 opens a section, none is assigned a tab,
-  // and none is counted by assertion 5. That regex is one character away from
-  // swallowing `###`, and if it did, every one of those pages would go red for a
-  // reason no one would connect to a heading level. So it is asserted here.
-  const withSub = page({ examples: ['Overview'], usage: ['When to use'] }).replace(
+  // #253 promoted 62 rule intros from bold prose to `###`, and #254 moved them
+  // under the rules they illustrate. `HEADING` matches `##` and only `##`, so
+  // none of the 62 opens a section, none is assigned a tab, and none is counted
+  // by assertion 5. That regex is one character away from swallowing `###`, and
+  // if it did, every one of those pages would go red for a reason no one would
+  // connect to a heading level. So it is asserted here.
+  const withSub = page({ examples: ['Overview'], usage: ['When to use', 'Related'] }).replace(
     '## When to use\n\nbody',
-    '## When to use\n\nbody\n\n### When not to use\n\nmore body',
+    '## When to use\n\nbody\n\n### Loading is not a substitute for feedback.\n\nmore body',
   );
   const read = readTabs(withSub);
-  assert.equal(read.headings, 2, 'Overview and When to use — the `###` is not a heading here');
-  assert.equal(read.sectionDivs, 2);
+  assert.equal(read.headings, 3, 'Overview, When to use, Related — the `###` is not a heading here');
+  assert.equal(read.sectionDivs, 3);
   assert.deepEqual(checkFile(COMPONENT, withSub, true), []);
 
   // The failing twin: the same line written as `##` IS a section, and one with
   // no div of its own, so the one-to-one invariant fires. Without this the case
   // above would pass on a `readTabs` that had simply stopped seeing headings.
-  const asSection = withSub.replace('### When not to use', '## When not to use');
+  const asSection = withSub.replace(
+    '### Loading is not a substitute for feedback.',
+    '## Loading is not a substitute for feedback.',
+  );
   const found = checkFile(COMPONENT, asSection, true);
-  assert.ok(found.some((f) => /2 section div\(s\) but 3 heading\(s\)/.test(f)), found.join('\n'));
+  assert.ok(found.some((f) => /3 section div\(s\) but 4 heading\(s\)/.test(f)), found.join('\n'));
 });
 
 test('4. a foundation page that sprouts tabs is caught — the old mechanism\'s actual bug', () => {
@@ -135,6 +141,111 @@ test('6. two sections sharing a name are caught — and assertion 5 cannot see t
   // The green twin — the same page with the two names distinct is silent.
   const ok = page({ examples: ['Overview', 'Variants', 'States'] });
   assert.deepEqual(checkFile(COMPONENT, ok, true), []);
+});
+
+test('7. a retired heading is caught at `##` — with the remedy, not just a verdict', () => {
+  const broken = page({ examples: ['Overview'], usage: ['When to use', 'When not to use', 'Related'] });
+  const found = checkFile(COMPONENT, broken, true);
+  assert.ok(
+    found.some((f) => /"When not to use" was retired — move each case to a `Related` bullet/.test(f)),
+    found.join('\n'),
+  );
+
+  // The other one #254 dissolved, so the map is not asserted through a single key.
+  const broken2 = page({
+    examples: ['Overview'],
+    usage: ['When to use', 'Correct and incorrect', 'Related'],
+  });
+  assert.ok(
+    checkFile(COMPONENT, broken2, true).some((f) => /"Correct and incorrect" was retired/.test(f)),
+  );
+
+  // The green twin — the headings that replaced them are silent.
+  const ok = page({ examples: ['Overview'], usage: ['When to use', 'Usage notes', 'Related'] });
+  assert.deepEqual(checkFile(COMPONENT, ok, true), []);
+});
+
+test('7b. a retired heading demoted to `###` is still caught — where #253 left them', () => {
+  // The failure this exists for: #253 wrote these as `###`, and `HEADING` only
+  // matches `##` (3c), so assertion 7 reading `sections` alone would see none of
+  // the 15 pages it was written for. It reads `subHeadings` too.
+  const broken = page({ examples: ['Overview'], usage: ['When to use', 'Related'] }).replace(
+    '## When to use\n\nbody',
+    '## When to use\n\nbody\n\n### When not to use\n\nmore body',
+  );
+  const found = checkFile(COMPONENT, broken, true);
+  assert.ok(found.some((f) => /"When not to use" was retired/.test(f)), found.join('\n'));
+
+  // ...and it is still not a section, so nothing else fires about it.
+  assert.ok(!found.some((f) => /sits outside every tab|belongs in/.test(f)), found.join('\n'));
+});
+
+test('8. a Usage tab with no `Related` is caught', () => {
+  const broken = page({ examples: ['Overview'], usage: ['When to use', 'Accessibility'] });
+  const found = checkFile(COMPONENT, broken, true);
+  assert.ok(found.some((f) => /has a Usage tab but no "Related" section/.test(f)), found.join('\n'));
+
+  // A page with no Usage tab at all is not asked for one — the requirement is
+  // "guidance ends by pointing somewhere else", not "every page has Related".
+  assert.deepEqual(checkFile(COMPONENT, page({ examples: ['Overview'] }), true), []);
+});
+
+test('8b. `Related` that is not last is caught — position is the point', () => {
+  const broken = page({ examples: ['Overview'], usage: ['Related', 'When to use'] });
+  const found = checkFile(COMPONENT, broken, true);
+  assert.ok(
+    found.some((f) => /"Related" must be the last Usage section, not "When to use"/.test(f)),
+    found.join('\n'),
+  );
+
+  // The green twin — the same two sections the other way round.
+  const ok = page({ examples: ['Overview'], usage: ['When to use', 'Related'] });
+  assert.deepEqual(checkFile(COMPONENT, ok, true), []);
+});
+
+test('7c. a retired heading draws one message, not a contradictory pair', () => {
+  // `Correct and incorrect` left USAGE_HEADINGS when #254 retired it, and
+  // assertion 3 sorts anything not in that set into the Examples tab. So the
+  // page that brings it back would have been told both "move it to examples"
+  // and "dissolve it" — and an author who did the first is still red, having
+  // moved a guidance block into the examples tab for nothing.
+  const broken = page({
+    examples: ['Overview'],
+    usage: ['When to use', 'Correct and incorrect', 'Related'],
+  });
+  const found = checkFile(COMPONENT, broken, true);
+  assert.ok(found.some((f) => /"Correct and incorrect" was retired/.test(f)), found.join('\n'));
+  assert.ok(!found.some((f) => /belongs in "examples"/.test(f)), found.join('\n'));
+
+  // The skip is scoped to retired headings — an ordinary misfiled section is
+  // still caught, so this did not just switch assertion 3 off.
+  const misfiled = page({ examples: ['Overview'], usage: ['When to use', 'Variants', 'Related'] });
+  assert.ok(
+    checkFile(COMPONENT, misfiled, true).some((f) => /"Variants".*belongs in "examples"/.test(f)),
+  );
+});
+
+test('8c. a Usage tab with no `##` section is still asked for `Related`', () => {
+  // Assertion 8 used to key on the sections inside the usage tab. A tab holding
+  // loose prose — or only `###` rules under no `##` — has none, and assertion 5
+  // is silent through it as well, because it compares whole-file totals that
+  // stay one-to-one. That page shipped guidance with no way out of it, green.
+  const proseOnly = [
+    "import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';",
+    '<DocsTabs of={S}>',
+    '<DocsTab tab="examples">',
+    section('Overview'),
+    '</DocsTab>',
+    '<DocsTab tab="usage">',
+    'Guidance written as prose, under no heading at all.',
+    '</DocsTab>',
+    '</DocsTabs>',
+  ].join('\n\n');
+  const found = checkFile(COMPONENT, proseOnly, true);
+  assert.ok(found.some((f) => /has a Usage tab but no "Related" section/.test(f)), found.join('\n'));
+
+  // ...and nothing else fires, so the complaint is the one the author can act on.
+  assert.equal(found.length, 1, found.join('\n'));
 });
 
 test('an unknown tab name is caught — Code and Changelog are generated, never authored', () => {

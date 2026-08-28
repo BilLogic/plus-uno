@@ -111,41 +111,11 @@ independent booleans, not one answer with several parts.
 `indeterminate` is the third visual state, applied imperatively to the input, and
 it is what a "select all" control needs when only some rows are ticked.
 
-### When not to use
-
-- **Not for a setting that takes effect immediately.** A control that switches
-  something on or off right now reads better as `Switch`; a checkbox implies a
-  value that is saved with the rest of the form.
-- **Not for one answer from several options.** That is `Radio`, or
-  `MultipleChoice` with `type="radio"`.
-- **Not to build a list of options by hand.** `MultipleChoice` with
-  `type="checkbox"` takes an `options` array and keeps the value; `ChoiceGrid`
-  handles the rows-by-columns matrix; `OptionList` and `Select` handle the popup
-  cases.
-- **Not as a tri-state input.** `indeterminate` is display only — the underlying
-  value is still checked or unchecked, and clicking an indeterminate box resolves
-  it like any other.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Correct and incorrect
-
-### A checkbox with no `label` has no name — give it one, visible or not.
-
-```jsx
-// Incorrect — a row-select checkbox in a table. Nothing names it, and the
-// column it sits in does not: a screen reader reads "checkbox", four times.
-<Checkbox checked={selected} onChange={onSelect} />
-
-// Correct — no room for visible text, so the name goes in `aria-label`.
-<Checkbox checked={selected} onChange={onSelect}
-          aria-label={`Select the session on ${date}`} />
-
-// Also correct — there is room, so the text is the label.
-<Checkbox label="Email me a summary" checked={emailMe} onChange={onEmailMe} />
-```
+## Usage notes
 
 ### Pick controlled or uncontrolled and stay there.
 
@@ -158,21 +128,10 @@ it is what a "select all" control needs when only some rows are ticked.
 <Checkbox id="terms" label="I accept" checked={accepted} onChange={onAccept} />
 ```
 
-### A group of checkboxes is a group; say so.
+### `indeterminate` is display only.
 
-```jsx
-// Incorrect — three independent checkboxes with no shared question. A screen
-// reader hears three unrelated booleans.
-<Checkbox id="mon" label="Monday" />
-<Checkbox id="tue" label="Tuesday" />
-
-// Correct — either name the group, or let MultipleChoice own the whole set.
-<fieldset>
-  <legend>Available days</legend>
-  <Checkbox id="mon" label="Monday" />
-  <Checkbox id="tue" label="Tuesday" />
-</fieldset>
-```
+The underlying value is still checked or unchecked. Clicking an indeterminate
+box resolves it like any other, so it cannot be used as a third stored value.
 
 </div>
 
@@ -204,6 +163,49 @@ it is what a "select all" control needs when only some rows are ticked.
 - **Group it.** Nothing in the component connects one checkbox to the next.
   Related checkboxes need a `fieldset` and `legend`, per
   `design-system/guidelines/foundations/accessibility.md`.
+
+### A checkbox with no `label` has no name — give it one, visible or not.
+
+```jsx
+// Incorrect — a row-select checkbox in a table. Nothing names it, and the
+// column it sits in does not: a screen reader reads "checkbox", four times.
+<Checkbox checked={selected} onChange={onSelect} />
+
+// Correct — no room for visible text, so the name goes in `aria-label`.
+<Checkbox checked={selected} onChange={onSelect}
+          aria-label={`Select the session on ${date}`} />
+
+// Also correct — there is room, so the text is the label.
+<Checkbox label="Email me a summary" checked={emailMe} onChange={onEmailMe} />
+```
+
+### A group of checkboxes is a group; say so.
+
+```jsx
+// Incorrect — three independent checkboxes with no shared question. A screen
+// reader hears three unrelated booleans.
+<Checkbox id="mon" label="Monday" />
+<Checkbox id="tue" label="Tuesday" />
+
+// Correct — either name the group, or let MultipleChoice own the whole set.
+<fieldset>
+  <legend>Available days</legend>
+  <Checkbox id="mon" label="Monday" />
+  <Checkbox id="tue" label="Tuesday" />
+</fieldset>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a setting that takes effect immediately, use `Switch`.
+- For one answer from several options, use `Radio` or `MultipleChoice` with `type="radio"`.
+- For a list of options from an array, use `MultipleChoice` with `type="checkbox"`.
+- For a rows-by-columns matrix of choices, use `ChoiceGrid`.
+- For choices in a popup, use `Select`.
 
 </div>
 

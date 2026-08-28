@@ -46,4 +46,6 @@ From `design-system/src/components/overlays/Tooltip/Tooltip.scss`. Override thes
 
 Same group: `Popover`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
+
+> Authored guidance is partial — missing: correct/incorrect (#166).

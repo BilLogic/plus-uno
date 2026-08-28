@@ -124,30 +124,11 @@ user may extend.
 `ListGroup` for multi-select options, `Input` for the search field — so it stays
 visually consistent with the fields around it.
 
-### When not to use
-
-- **Not for actions.** A trigger that opens a list of *things to do* is
-  `Dropdown`. `Select` holds a value; `Dropdown` fires handlers.
-- **Not for five or fewer options that all fit.** `MultipleChoice` (or `Radio` /
-  `Checkbox` directly) shows every option at once, which is faster to scan and
-  keyboard-native.
-- **Not for hierarchical values.** Parent-child options are `TreeSelect`;
-  drill-down columns are `Cascader`.
-- **Not inside a native form you intend to submit.** `Select` renders no form
-  control — the trigger is a `div` and the options are buttons — so `name` never
-  produces a submitted value. Read the value from `onChange` and hold it in
-  state.
-- **Not for a `required` that has to block submission.** `required` is a
-  signal, not a constraint: it gives the trigger a hidden "Required"
-  description so assistive technology announces the field as required. Nothing
-  stops an empty value — there is no form control here to stop it with — so the
-  check still belongs in your own validation.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Correct and incorrect
+## Usage notes
 
 ### Do not expect form semantics that are not there.
 
@@ -201,18 +182,6 @@ visually consistent with the fields around it.
 <Select options={grades} onChange={(value) => setGrade(value)} />
 ```
 
-### Label it, because the component will not.
-
-```jsx
-// Incorrect — the trigger is a div with role="button" and no name. A screen
-// reader announces "button", and nothing more.
-<Select id="subject" options={subjects} value={subject} onChange={setSubject} />
-
-// Correct — a visible label wired to the trigger by id.
-<label htmlFor="subject">Subject</label>
-<Select id="subject" options={subjects} value={subject} onChange={setSubject} />
-```
-
 ### Multi-select badges are dismissible only when the field is live.
 
 ```jsx
@@ -253,6 +222,29 @@ visually consistent with the fields around it.
 - **Selected values are `Badge`s.** Each carries the same hard-coded `Dismiss`
   label, so a multi-select with several values exposes several identically named
   buttons.
+
+### Label it, because the component will not.
+
+```jsx
+// Incorrect — the trigger is a div with role="button" and no name. A screen
+// reader announces "button", and nothing more.
+<Select id="subject" options={subjects} value={subject} onChange={setSubject} />
+
+// Correct — a visible label wired to the trigger by id.
+<label htmlFor="subject">Subject</label>
+<Select id="subject" options={subjects} value={subject} onChange={setSubject} />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For actions rather than a value, use `Dropdown`.
+- For five or fewer options that all fit on screen, use `Radio` or `RadioButtonGroup`.
+- For hierarchical values, use `TreeSelect` or `Cascader`.
+- For a native form you intend to submit without JavaScript, use a plain `<select>`; this component does not participate in form submission.
 
 </div>
 

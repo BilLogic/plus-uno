@@ -122,40 +122,11 @@ Padding, gap, radius and border are token-backed size props (`paddingSize`,
 `gapSize`, `radiusSize`, `borderSize`), so a card should never need custom CSS
 for spacing.
 
-### When not to use
-
-- **Not as a generic div.** A card draws a bordered surface. Grouping without a
-  visible boundary is layout, not a card — see
-  `design-system/guidelines/composition/layout.md`.
-- **Not for a page-level hero.** That is `Jumbotron`, which has the same padding
-  and gap system plus a `fluid` mode and a two-button footer.
-- **Not for a media-and-text row.** A thumbnail beside a paragraph is
-  `MediaObject`, which owns the alignment variants for exactly that shape.
-- **Not as a link.** `onClick` sets a pointer cursor and attaches a handler to
-  the card element — it adds no role, no tab stop and no key handler, so the
-  whole card becomes mouse-only. Put the navigation in `links` or
-  `actionButton`, both of which render real controls.
-- **Not for tabular data.** Repeating the same four fields across twenty cards
-  is a table.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Correct and incorrect
-
-### A clickable card is not a keyboard-reachable card.
-
-```jsx
-// Incorrect — mouse-only. No role, no tabindex, no Enter or Space.
-<Card title="Algebra · Tue 4pm" onClick={() => open(session)} />
-
-// Correct — the action is a real control inside the card.
-<Card
-  title="Algebra · Tue 4pm"
-  actionButton={{ text: 'Open session', onClick: () => open(session) }}
-/>
-```
+## Usage notes
 
 ### `header` and `footer` take strings, not nodes.
 
@@ -181,6 +152,12 @@ for spacing.
 <Card radiusSize="md" title="Weekly summary" />
 ```
 
+### A card is not a link.
+
+Wrapping a card in an anchor makes every element inside it part of one link
+target, including any button it contains. Give the card an explicit action
+instead.
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -203,6 +180,30 @@ for spacing.
   navigating by link list. Give every link an `href`.
 - **Images carry no alt.** A string `image` renders the card image with no `alt`
   attribute. If the image carries meaning, pass a node you control instead.
+
+### A clickable card is not a keyboard-reachable card.
+
+```jsx
+// Incorrect — mouse-only. No role, no tabindex, no Enter or Space.
+<Card title="Algebra · Tue 4pm" onClick={() => open(session)} />
+
+// Correct — the action is a real control inside the card.
+<Card
+  title="Algebra · Tue 4pm"
+  actionButton={{ text: 'Open session', onClick: () => open(session) }}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a plain container with no surface treatment, use a `div` — a card implies a grouped, self-contained unit.
+- For a page-level hero, use `Jumbotron`.
+- For a media-and-text row, use `MediaObject`.
+- For tabular data, use `Table`.
 
 </div>
 

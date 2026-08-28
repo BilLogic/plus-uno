@@ -7,10 +7,10 @@ authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [Button](Button/index.md) | 20 | ✅ | ✅ | ✅ |
-| [ButtonGroup](ButtonGroup/index.md) | 10 | ✅ | ✅ | ✅ |
+| [Button](Button/index.md) | 20 | ✅ | ✕ | ✅ |
+| [ButtonGroup](ButtonGroup/index.md) | 10 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 2/2 (100%) · Correct/incorrect 2/2 (100%) · Accessibility 2/2 (100%)
+**Authored coverage:** When to use 2/2 (100%) · Correct/incorrect 0/2 (0%) · Accessibility 2/2 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

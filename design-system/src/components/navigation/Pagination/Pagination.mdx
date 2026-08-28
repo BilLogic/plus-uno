@@ -112,24 +112,11 @@ The window of numbers is computed for you. `maxVisible` (default 5) centres the
 window on the current page, and first and last pages are pinned with an ellipsis
 whenever the window does not reach them.
 
-### When not to use
-
-- **Not for a feed.** Continuous content that grows as you scroll is not paged;
-  give it a "load more" `Button`.
-- **Not for step-by-step flows.** "Next" and "Previous" through a wizard is a
-  different control with different labels — this one announces its steps as page
-  numbers and marks one `aria-current="page"`.
-- **Not without `onPageChange`.** Every click calls `preventDefault` first, so
-  with no handler the component renders a row of links that visibly do nothing.
-- **Not as the only navigation for a long table.** It moves between pages; it
-  does not say how many results there are or let the user change the page size.
-  Both of those are yours to render beside it.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Correct and incorrect
+## Usage notes
 
 ### It is controlled, so it needs both the page and the handler.
 
@@ -141,6 +128,29 @@ whenever the window does not reach them.
 // Correct.
 <Pagination currentPage={page} totalPages={12} onPageChange={setPage} />
 ```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The structure is right.** A `nav` labelled by `ariaLabel` (default "Page
+  navigation") wraps a `ul` of `li`s, and the active page carries
+  `aria-current="page"`.
+- **Page numbers announce as bare numbers.** Only the previous and next controls
+  get an `aria-label` — the numbered links get none, so they read as "3", "4",
+  "5". Naming the `nav` is what makes those numbers mean something.
+- **Disabled arrows stay in the DOM.** At the first or last page the arrow gets
+  `aria-disabled="true"` and `tabIndex={-1}`, and the click handler is skipped.
+  It is announced as disabled rather than disappearing, which keeps the control
+  row from reflowing.
+- **The ellipsis is literal.** It renders as three full stops in a span marked
+  `aria-disabled`, so some screen readers will read it out. It is decorative;
+  the pinned first and last pages beside it carry the meaning.
+- **Every control is an anchor with `href="#"`.** They are focusable and
+  activate with Enter, but they are not real destinations — if the page numbers
+  should be linkable or shareable, render your own anchors with real URLs.
 
 ### Text mode is the one that labels its arrows.
 
@@ -172,24 +182,11 @@ whenever the window does not reach them.
 
 <div className="sb-ds-doc-section">
 
-## Accessibility
+## Related
 
-- **The structure is right.** A `nav` labelled by `ariaLabel` (default "Page
-  navigation") wraps a `ul` of `li`s, and the active page carries
-  `aria-current="page"`.
-- **Page numbers announce as bare numbers.** Only the previous and next controls
-  get an `aria-label` — the numbered links get none, so they read as "3", "4",
-  "5". Naming the `nav` is what makes those numbers mean something.
-- **Disabled arrows stay in the DOM.** At the first or last page the arrow gets
-  `aria-disabled="true"` and `tabIndex={-1}`, and the click handler is skipped.
-  It is announced as disabled rather than disappearing, which keeps the control
-  row from reflowing.
-- **The ellipsis is literal.** It renders as three full stops in a span marked
-  `aria-disabled`, so some screen readers will read it out. It is decorative;
-  the pinned first and last pages beside it carry the meaning.
-- **Every control is an anchor with `href="#"`.** They are focusable and
-  activate with Enter, but they are not real destinations — if the page numbers
-  should be linkable or shareable, render your own anchors with real URLs.
+- For a continuously loading feed, use infinite scroll rather than pages.
+- For a step-by-step flow, use `Progress` with your own step control.
+- For a long table, pair pagination with sorting and filtering; on its own it makes a specific row hard to find.
 
 </div>
 

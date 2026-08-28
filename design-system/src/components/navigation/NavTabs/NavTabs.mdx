@@ -120,25 +120,11 @@ It can be uncontrolled (`defaultActiveKey`) or controlled (`activeKey` plus
 `onSelect`). `alignment` covers left, centre, right and `justified`, which
 stretches the tabs to fill the bar.
 
-### When not to use
-
-- **Not for navigating away.** Tabs imply the content stays in place. Moving to
-  a different page in a hierarchy is `Breadcrumb` plus real links; a sidebar
-  destination is `SidebarTab`.
-- **Not for a pill bar.** `NavPills` is the same component family with the pill
-  treatment and a `vertical` direction. Pick on appearance and orientation, not
-  behaviour — they behave identically.
-- **Not for more tabs than fit.** There is no overflow handling and no scroll.
-  Past about six, move the extras into a `NavTabs.Dropdown` or switch to a
-  sidebar.
-- **Not for a filter.** Tabs switch what you are looking at; narrowing a list is
-  `Select` or a row of dismissible `Badge`s.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Correct and incorrect
+## Usage notes
 
 ### A controlled bar needs `onSelect`, or it will never move.
 
@@ -171,21 +157,6 @@ stretches the tabs to fill the bar.
 </NavTabs>
 ```
 
-### If it must behave as an ARIA tab widget, it needs the tab container.
-
-```jsx
-// Incorrect — assuming role="tab" and arrow keys come for free. They do not:
-// standalone, this renders as a row of links.
-<NavTabs activeKey={tab} onSelect={setTab}>{items}</NavTabs>
-
-// Correct — wrap it in react-bootstrap's Tab.Container, which is what supplies
-// the tablist context, aria-selected and left/right arrow navigation.
-<Tab.Container activeKey={tab} onSelect={setTab}>
-  <NavTabs>{items}</NavTabs>
-  <Tab.Content>{panes}</Tab.Content>
-</Tab.Container>
-```
-
 </div>
 
 <div className="sb-ds-doc-section">
@@ -210,6 +181,34 @@ stretches the tabs to fill the bar.
 - **The bar has no name.** Extra props are spread onto the nav element, so
   `aria-label` is the way to say what this set of tabs is for — especially when
   a page carries more than one.
+
+### If it must behave as an ARIA tab widget, it needs the tab container.
+
+```jsx
+// Incorrect — assuming role="tab" and arrow keys come for free. They do not:
+// standalone, this renders as a row of links.
+<NavTabs activeKey={tab} onSelect={setTab}>{items}</NavTabs>
+
+// Correct — wrap it in react-bootstrap's Tab.Container, which is what supplies
+// the tablist context, aria-selected and left/right arrow navigation.
+<Tab.Container activeKey={tab} onSelect={setTab}>
+  <NavTabs>{items}</NavTabs>
+  <Tab.Content>{panes}</Tab.Content>
+</Tab.Container>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For navigating to a different page, use `Navbar` or `Breadcrumb` — tabs imply the content stays in place.
+- For a pill-shaped bar, use `NavPills`.
+- For more tabs than fit the width, use `Select` — the strip is `flex-wrap:
+  wrap`, so the overflow becomes a second row of tabs rather than a scroll or
+  an overflow menu, and the row the reader is on stops being obvious.
+- For filtering a list rather than switching between views, use `Select` or `MultipleChoice` — filters combine, tabs do not.
 
 </div>
 
