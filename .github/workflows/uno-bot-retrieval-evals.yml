@@ -61,7 +61,10 @@ jobs:
 
       - name: Score retrieval against the live Worker
         env:
-          WORKER_URL: "https://uno-bot.bryanhuang628.workers.dev"
+          # Set vars.UNO_BOT_WORKER_URL to point evals at another deployment;
+          # the literal is the fallback and the single other copy of it lives in
+          # agents/uno-bot/scripts/worker-url.mjs (#288).
+          WORKER_URL: ${{ vars.UNO_BOT_WORKER_URL || 'https://uno-bot.bryanhuang628.workers.dev' }}
           DEBUG_TOKEN: ${{ secrets.DEBUG_TOKEN }}
           # Empty on every trigger but a deliberate dispatch, so a scheduled or
           # post-deploy run always measures what the product actually does.

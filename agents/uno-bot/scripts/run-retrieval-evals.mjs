@@ -25,7 +25,7 @@
 // expected to fail before Phase 2 (see the fixture's notes on BR25).
 //
 // Env:
-//   WORKER_URL   e.g. https://uno-bot.bryanhuang628.workers.dev
+//   WORKER_URL   e.g. the Worker origin (scripts/worker-url.mjs, or UNO_BOT_WORKER_URL)
 //   DEBUG_TOKEN  the Worker's /debug/* gate token
 // Optional:
 //   CASES_PATH   default docs/evals/fixtures/blueprint-retrieval-cases.json

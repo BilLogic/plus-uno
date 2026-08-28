@@ -11,7 +11,7 @@
 // eval-results.json for reasoning investigation.
 //
 // Env required:
-//   WORKER_URL      e.g. https://uno-bot.bryanhuang628.workers.dev
+//   WORKER_URL      e.g. the Worker origin (scripts/worker-url.mjs, or UNO_BOT_WORKER_URL)
 //   DEBUG_TOKEN     the Worker's /debug/* gate token
 // Judge (optional — judge is skipped without it; deterministic checks still run):
 //   GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY, GEMINI_PROJECT_ID (default hcii-plus)
