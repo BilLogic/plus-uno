@@ -67,4 +67,6 @@ From `design-system/src/components/messaging/Modal/Modal.scss`. Override these t
 
 Same group: `Alert` · `Toast`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
+
+> Authored guidance is partial — missing: correct/incorrect (#166).

@@ -118,28 +118,11 @@ Six styles: `primary`, `secondary`, `success`, `danger`, `warning`, `info`. That
 list is shorter than `Button`'s — there is no `tertiary` and there are no SMART
 domain colors, because an alert is always saying something about state.
 
-### When not to use
-
-- **Not for field validation.** A message about one field belongs on that field.
-  `Input`, `NumberInput`, `FileUpload` and `DateAndTimePicker` all take
-  `validation="invalid"` plus `validationMessage`, which renders the message with
-  an icon directly beneath the control, where the person filling it in is
-  looking. An alert at the top of a form makes them hunt.
-- **Not for a transient confirmation.** "Saved" that should fade is `Toast`,
-  which auto-hides after 5s by default.
-- **Not for something that must be acknowledged before continuing.** That is
-  `Modal`.
-- **Not for a status label on a row.** That is `Badge`.
-- **Not for a message you plan to re-show.** Dismissal is held in the
-  component's own state, and the render returns `null` on that state before
-  anything else is read — so a dismissed alert stays dismissed until it is
-  remounted.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Correct and incorrect
+## Usage notes
 
 ### Field errors go on the field.
 
@@ -204,6 +187,17 @@ domain colors, because an alert is always saying something about state.
   no `aria-hidden` — keep the alert's own text carrying the meaning.
 - **Style is colour only.** Six palettes, no icon and no text prefix, so
   `style="danger"` on its own does not say "error". Say it in the children.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For validation on a single field, put the message on the field — see *Label & caption*.
+- For a transient confirmation, use `Toast`.
+- For something that must be acknowledged before continuing, use `Modal`.
+- For a status label on a row, use `Badge`.
 
 </div>
 

@@ -164,48 +164,11 @@ session notes, a reflection, a reason for cancelling. `rows` (default 3) sets
 the visible height, and `variant="short"` gives the one-line treatment used in
 the Figma spec for compact note fields.
 
-### When not to use
-
-- **Not for a one-line answer.** `Input` is the single-line field, and it is the
-  one with `validation` and `validationMessage`.
-- **Not for formatted text.** Bold, lists and links are `RichTextEditor`, which
-  has `toolbarPreset` and a toolbar of real buttons.
-- **Not when you need an error message under the field.** `Textarea` has
-  `state="error"`, which is styling only — there is no `validationMessage`
-  equivalent, so the message has to be rendered by the caller.
-- **Not for a fixed-height panel.** `rows` grows the control, it does not scroll
-  it; content that needs its own scroll region is `ScrollBar`.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Correct and incorrect
-
-### Pass `id`, not just `name`.
-
-```jsx
-// Incorrect — the label points at `name`, but the textarea only receives `id`.
-// Same trap as Input.
-<Textarea name="notes" label="Session notes" value={notes} onChange={onNotes} />
-
-// Correct.
-<Textarea id="notes" name="notes" label="Session notes" value={notes} onChange={onNotes} />
-```
-
-### `state="error"` carries no message.
-
-```jsx
-// Incorrect — the field turns red and says nothing. Unlike Input, there is no
-// validationMessage prop here, so the reason never reaches the user.
-<Textarea id="notes" label="Session notes" state="error" value={notes} onChange={onNotes} />
-
-// Correct — render the message and point the field at it.
-<Textarea id="notes" label="Session notes" state="error"
-          aria-invalid={true} aria-describedby="notes-error"
-          value={notes} onChange={onNotes} />
-<p id="notes-error">Notes must be at least 20 characters.</p>
-```
+## Usage notes
 
 ### `rows` is ignored in the short variant.
 
@@ -240,6 +203,41 @@ the Figma spec for compact note fields.
 - **Everything passes through.** `maxLength`, `required`, `aria-invalid`,
   `aria-describedby` and the rest all reach the control, which is how the
   missing message slot is worked around.
+
+### Pass `id`, not just `name`.
+
+```jsx
+// Incorrect — the label points at `name`, but the textarea only receives `id`.
+// Same trap as Input.
+<Textarea name="notes" label="Session notes" value={notes} onChange={onNotes} />
+
+// Correct.
+<Textarea id="notes" name="notes" label="Session notes" value={notes} onChange={onNotes} />
+```
+
+### `state="error"` carries no message.
+
+```jsx
+// Incorrect — the field turns red and says nothing. Unlike Input, there is no
+// validationMessage prop here, so the reason never reaches the user.
+<Textarea id="notes" label="Session notes" state="error" value={notes} onChange={onNotes} />
+
+// Correct — render the message and point the field at it.
+<Textarea id="notes" label="Session notes" state="error"
+          aria-invalid={true} aria-describedby="notes-error"
+          value={notes} onChange={onNotes} />
+<p id="notes-error">Notes must be at least 20 characters.</p>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a one-line answer, use `Input`.
+- For formatted text, use `RichTextEditor`.
+- For an error message under the field, render it yourself and link it with `aria-describedby` — `state` colours the control but there is no message slot. See *Label & caption*.
 
 </div>
 

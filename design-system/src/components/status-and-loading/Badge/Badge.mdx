@@ -195,28 +195,11 @@ header.
 
 Reach for it when the label is a *property* of the row, not an action on it.
 
-### When not to use
-
-- **Not as a button.** `Badge` has no `onClick` and deliberately carries no
-  button semantics — the only interactive part is the dismiss control created by
-  `dismissible`. Wrapping a badge in a click handler produces a control with no
-  name, no role and no keyboard path.
-- **Not for removable filter chips you built yourself.** `dismissible` already
-  renders the X, stops propagation and calls `onDismiss`. `TagInput` owns the
-  add-and-remove case where the user is authoring the list.
-- **Not for progress.** `counter` is a static number in a pill. Anything moving
-  toward completion is `Progress`.
-- **Not for a message.** A badge is one or two words on a row. Something the
-  user has to read and act on is `Alert`; something transient is `Toast`.
-- **`size` is not physical size.** It selects a typography scale (`h1`–`h6`,
-  `b1`–`b3`, default `b2`), so `size="h1"` produces a badge with heading-sized
-  text, not a bigger pill with the same text.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Correct and incorrect
+## Usage notes
 
 ### Status is a badge; changing status is a button.
 
@@ -242,20 +225,11 @@ Reach for it when the label is a *property* of the row, not an action on it.
 <Badge text="Advocacy" style="advocacy" />
 ```
 
-### Give a dismissible badge a context the label alone can carry.
+### `size` selects a type step, not a physical size.
 
-```jsx
-// Incorrect — every dismiss button in the row announces the same word,
-// "Dismiss", because that label is hard-coded inside the component.
-<Badge text="Grade 4" dismissible onDismiss={() => remove('grade-4')} />
-<Badge text="Maths" dismissible onDismiss={() => remove('maths')} />
-
-// Correct — name the group once, so the dismiss buttons are read in context.
-<div role="group" aria-label="Active filters">
-  <Badge text="Grade 4" dismissible onDismiss={() => remove('grade-4')} />
-  <Badge text="Maths" dismissible onDismiss={() => remove('maths')} />
-</div>
-```
+The prop maps to the typography scale, so it changes the text and the padding
+that follows it. It is not a width or a height, and two badges at the same
+`size` can be different widths.
 
 </div>
 
@@ -280,6 +254,33 @@ Reach for it when the label is a *property* of the row, not an action on it.
 - **Contrast follows the token pair, not the size.** Because `size` selects a
   type scale, `b3` produces the smallest text in the set; keep it for badges
   whose color pair still clears 4.5:1.
+
+### Give a dismissible badge a context the label alone can carry.
+
+```jsx
+// Incorrect — every dismiss button in the row announces the same word,
+// "Dismiss", because that label is hard-coded inside the component.
+<Badge text="Grade 4" dismissible onDismiss={() => remove('grade-4')} />
+<Badge text="Maths" dismissible onDismiss={() => remove('maths')} />
+
+// Correct — name the group once, so the dismiss buttons are read in context.
+<div role="group" aria-label="Active filters">
+  <Badge text="Grade 4" dismissible onDismiss={() => remove('grade-4')} />
+  <Badge text="Maths" dismissible onDismiss={() => remove('maths')} />
+
+</div>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- To act on a status rather than show it, use `Button`.
+- For a list the user builds by adding and removing entries, use `TagInput`; `dismissible` covers removal on a badge that is already there.
+- For completion or progress, use `Progress`.
+- For a message rather than a label, use `Alert` or `Toast`.
 
 </div>
 
