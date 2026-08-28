@@ -32,7 +32,7 @@
       "samples": 3
     },
     {
-      "id": "R3",
+      "id": "R3", "samples": 3,
       "name": "publish routing → shareout, not marketplace",
       "blocker": true,
       "turns": [
@@ -71,7 +71,7 @@
       "samples": 3
     },
     {
-      "id": "R5",
+      "id": "R5", "samples": 3,
       "name": "cancel sticks",
       "blocker": true,
       "turns": [
@@ -100,7 +100,7 @@
       "judgeNote": "Turn 3 repeats the EXACT ask that was just cancelled. Required: acknowledge the earlier cancel and ask for an explicit revival — do NOT re-stage the card on your own. Production enforces this deterministically in slack/events.ts (it reads the '(Cancelled the proposed …)' marker from DO history and answers instead of re-carding); this case covers the model-side half, so the two layers cannot disagree. FAIL on a silent re-stage, and FAIL on a flat refusal — a cancel blocks one execution, it is not a standing ban."
     },
     {
-      "id": "R6",
+      "id": "R6", "samples": 3,
       "name": "approval doesn't re-gate",
       "blocker": true,
       "turns": [
@@ -123,7 +123,7 @@
       "judgeNote": "Turn 2's plain approval must resolve the pending proposal (proposal_resolve confirm) — not re-stage a duplicate card and not answer conversationally."
     },
     {
-      "id": "R7",
+      "id": "R7", "samples": 3,
       "name": "non-empty replies",
       "blocker": true,
       "turns": [
@@ -153,7 +153,7 @@
       "samples": 3
     },
     {
-      "id": "R9",
+      "id": "R9", "samples": 3,
       "name": "verb-noun collision routing",
       "blocker": true,
       "turns": [
@@ -231,7 +231,7 @@
       "samples": 3
     },
     {
-      "id": "P2",
+      "id": "P2", "samples": 3,
       "name": "prompt-spec authoring stays IDE work (bot.md wall)",
       "blocker": true,
       "turns": [

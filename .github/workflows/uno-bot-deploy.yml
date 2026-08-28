@@ -130,11 +130,24 @@ jobs:
           BLUEPRINT_CONTRACT_OPTIONAL: ${{ secrets.BLUEPRINT_REPO_TOKEN != '' && '0' || '1' }}
         run: npm run deploy
       - name: Verify health
+        # Asserts the build it just deployed is the build now serving, not
+        # merely that SOMETHING is serving. The old check matched
+        # "uno-bot ok "* and so passed against a Worker still running last
+        # week's bundle — which is the failure /health exists to catch (#249).
+        # Now that the stamp is derived from this run it can actually be
+        # compared, so it is.
+        working-directory: agents/uno-bot
         run: |
           sleep 5
-          BUILD=$(curl -s --max-time 15 https://uno-bot.bryanhuang628.workers.dev/health)
-          echo "health: $BUILD"
-          case "$BUILD" in
-            "uno-bot ok "*) echo "worker is serving" ;;
-            *) echo "unexpected health response" && exit 1 ;;
-          esac
+          # Derived by the SAME module the bundle was built with, so the two can
+          # never drift apart. Re-deriving the format here in shell would be a
+          # second definition of the stamp, and the second one would be wrong
+          # eventually.
+          EXPECTED=$(node -e 'import("./scripts/build-id.mjs").then(m => process.stdout.write(m.buildIdFromEnv()))')
+          HEALTH=$(curl -s --max-time 15 https://uno-bot.bryanhuang628.workers.dev/health)
+          echo "health:   $HEALTH"
+          echo "expected: uno-bot ok $EXPECTED"
+          if [ "$HEALTH" != "uno-bot ok $EXPECTED" ]; then
+            echo "the worker is not serving the build this run deployed" && exit 1
+          fi
+          echo "worker is serving $EXPECTED"
