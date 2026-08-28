@@ -68,7 +68,7 @@ Use checkbox when a user needs to select more than one option from a list.
 
 <div className="sb-ds-doc-section">
 
-## Interaction states
+## States
 
 <DocsCanvasShell description={<>Unchecked, checked, indeterminate, disabled, and required.</>}>
     <DsCanvasQuiet of={CheckboxStories.InteractionStates} />
@@ -111,7 +111,7 @@ independent booleans, not one answer with several parts.
 `indeterminate` is the third visual state, applied imperatively to the input, and
 it is what a "select all" control needs when only some rows are ticked.
 
-**When not to use**
+### When not to use
 
 - **Not for a setting that takes effect immediately.** A control that switches
   something on or off right now reads better as `Switch`; a checkbox implies a
@@ -132,7 +132,7 @@ it is what a "select all" control needs when only some rows are ticked.
 
 ## Correct and incorrect
 
-**A checkbox with no `label` has no name — give it one, visible or not.**
+### A checkbox with no `label` has no name — give it one, visible or not.
 
 ```jsx
 // Incorrect — a row-select checkbox in a table. Nothing names it, and the
@@ -147,7 +147,7 @@ it is what a "select all" control needs when only some rows are ticked.
 <Checkbox label="Email me a summary" checked={emailMe} onChange={onEmailMe} />
 ```
 
-**Pick controlled or uncontrolled and stay there.**
+### Pick controlled or uncontrolled and stay there.
 
 ```jsx
 // Incorrect — `checked` being defined puts the component in controlled mode,
@@ -158,7 +158,7 @@ it is what a "select all" control needs when only some rows are ticked.
 <Checkbox id="terms" label="I accept" checked={accepted} onChange={onAccept} />
 ```
 
-**A group of checkboxes is a group; say so.**
+### A group of checkboxes is a group; say so.
 
 ```jsx
 // Incorrect — three independent checkboxes with no shared question. A screen

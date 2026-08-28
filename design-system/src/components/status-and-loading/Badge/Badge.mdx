@@ -137,7 +137,7 @@ Static visual identifiers used to categorize or describe elements. They are used
 
 <div className="sb-ds-doc-section">
 
-## Styles
+## Appearance
 
 <DocsCanvasShell description={<>Semantic and curriculum color themes.</>}>
     <DsCanvasQuiet of={BadgeStories.Styles} />
@@ -195,7 +195,7 @@ header.
 
 Reach for it when the label is a *property* of the row, not an action on it.
 
-**When not to use**
+### When not to use
 
 - **Not as a button.** `Badge` has no `onClick` and deliberately carries no
   button semantics — the only interactive part is the dismiss control created by
@@ -218,7 +218,7 @@ Reach for it when the label is a *property* of the row, not an action on it.
 
 ## Correct and incorrect
 
-**Status is a badge; changing status is a button.**
+### Status is a badge; changing status is a button.
 
 ```jsx
 // Incorrect — a badge with a click handler. `onClick` is not a prop, so it is
@@ -230,7 +230,7 @@ Reach for it when the label is a *property* of the row, not an action on it.
 <Button text="Reopen session" fill="text" size="small" onClick={reopen} />
 ```
 
-**Domain colors are not severity colors.**
+### Domain colors are not severity colors.
 
 ```jsx
 // Incorrect — `advocacy` is a SMART curriculum domain. Used here it just means
@@ -242,7 +242,7 @@ Reach for it when the label is a *property* of the row, not an action on it.
 <Badge text="Advocacy" style="advocacy" />
 ```
 
-**Give a dismissible badge a context the label alone can carry.**
+### Give a dismissible badge a context the label alone can carry.
 
 ```jsx
 // Incorrect — every dismiss button in the row announces the same word,

@@ -78,7 +78,7 @@ The labeled text input box allows users to enter textual inputs and receive vali
 
 <div className="sb-ds-doc-section">
 
-## Interaction states
+## States
 
 <DocsCanvasShell description={<>Default, hover, focus, disabled, and read-only.</>}>
     <DsCanvasQuiet of={InputStories.InteractionStates} />
@@ -123,7 +123,7 @@ an error rather than an `Alert` at the top of the form.
 `validationMessage` and the component renders the message beneath the field with
 a matching icon.
 
-**When not to use**
+### When not to use
 
 - **Not for multi-line text.** `Textarea` — and note it does not have
   `validation` / `validationMessage`, it has a `state` prop and no message slot.
@@ -144,7 +144,7 @@ a matching icon.
 
 ## Correct and incorrect
 
-**Always pass `id`, or the label points at nothing.**
+### Always pass `id`, or the label points at nothing.
 
 ```jsx
 // Incorrect — the label's htmlFor falls back to `name`, but `name` is not used
@@ -156,7 +156,7 @@ a matching icon.
 <Input id="email" name="email" label="Email address" value={email} onChange={onEmail} />
 ```
 
-**`required` draws an asterisk; it does not mark the field required.**
+### `required` draws an asterisk; it does not mark the field required.
 
 ```jsx
 // Incorrect — the star appears, but the input carries neither the `required`
@@ -168,7 +168,7 @@ a matching icon.
        value={school} onChange={onSchool} />
 ```
 
-**`validation` styles the field; it does not announce the error.**
+### `validation` styles the field; it does not announce the error.
 
 ```jsx
 // Incorrect — red border, red message, and a screen reader that hears none

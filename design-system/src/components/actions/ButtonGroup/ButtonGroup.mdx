@@ -58,7 +58,7 @@ Buttons can be grouped together as individual segments of related actions.
 
 <div className="sb-ds-doc-section">
 
-## Variants
+## Behavior
 
 <DocsCanvasShell description={<>Connected groups with two through five segments.</>}>
     <DsCanvasQuiet of={ButtonGroupStories.Counts} />
@@ -133,7 +133,7 @@ button.
 Pass the buttons either way: an array of configs via `buttons`, or `Button`
 children. Children win when both are given.
 
-**When not to use**
+### When not to use
 
 - **Not for a dialog or card footer.** `Modal` and `Jumbotron` render their own
   buttons from `primaryButton` and `secondaryButton`, and `Card` from
@@ -154,7 +154,7 @@ children. Children win when both are given.
 
 ## Correct and incorrect
 
-**A group of buttons is not a selection.**
+### A group of buttons is not a selection.
 
 ```jsx
 // Incorrect — looks like a segmented control, announces as three buttons in a
@@ -174,7 +174,7 @@ children. Children win when both are given.
 ]} />
 ```
 
-**Group-level style is a narrower set than Button's.**
+### Group-level style is a narrower set than Button's.
 
 ```jsx
 // Incorrect — `social-emotional` is a valid Button style but not a valid
@@ -188,7 +188,7 @@ children. Children win when both are given.
 ]} />
 ```
 
-**Name the group.**
+### Name the group.
 
 ```jsx
 // Incorrect — role="group" with no name. A screen reader announces "group"

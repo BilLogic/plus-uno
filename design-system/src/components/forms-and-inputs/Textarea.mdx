@@ -105,7 +105,7 @@ Use text area for multi-line text input form fields.
 
 <div className="sb-ds-doc-section">
 
-## Variants
+## Appearance
 
 <DocsCanvasShell description={<>Long (boxed) and short (underlined) styles.</>}>
     <DsCanvasQuiet of={TextareaStories.Styles} />
@@ -119,7 +119,7 @@ Use text area for multi-line text input form fields.
 
 <div className="sb-ds-doc-section">
 
-## Interaction states
+## States
 
 <DocsCanvasShell description={<>Long form: default, focus, filled, valid, error, disabled, read-only (plus placeholder examples).</>}>
     <DsCanvasQuiet of={TextareaStories.InteractionStatesLong} />
@@ -164,7 +164,7 @@ session notes, a reflection, a reason for cancelling. `rows` (default 3) sets
 the visible height, and `variant="short"` gives the one-line treatment used in
 the Figma spec for compact note fields.
 
-**When not to use**
+### When not to use
 
 - **Not for a one-line answer.** `Input` is the single-line field, and it is the
   one with `validation` and `validationMessage`.
@@ -182,7 +182,7 @@ the Figma spec for compact note fields.
 
 ## Correct and incorrect
 
-**Pass `id`, not just `name`.**
+### Pass `id`, not just `name`.
 
 ```jsx
 // Incorrect — the label points at `name`, but the textarea only receives `id`.
@@ -193,7 +193,7 @@ the Figma spec for compact note fields.
 <Textarea id="notes" name="notes" label="Session notes" value={notes} onChange={onNotes} />
 ```
 
-**`state="error"` carries no message.**
+### `state="error"` carries no message.
 
 ```jsx
 // Incorrect — the field turns red and says nothing. Unlike Input, there is no
@@ -207,7 +207,7 @@ the Figma spec for compact note fields.
 <p id="notes-error">Notes must be at least 20 characters.</p>
 ```
 
-**`rows` is ignored in the short variant.**
+### `rows` is ignored in the short variant.
 
 ```jsx
 // Incorrect — `variant="short"` forces one row regardless of what rows says.

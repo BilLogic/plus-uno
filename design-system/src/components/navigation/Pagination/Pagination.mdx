@@ -112,7 +112,7 @@ The window of numbers is computed for you. `maxVisible` (default 5) centres the
 window on the current page, and first and last pages are pinned with an ellipsis
 whenever the window does not reach them.
 
-**When not to use**
+### When not to use
 
 - **Not for a feed.** Continuous content that grows as you scroll is not paged;
   give it a "load more" `Button`.
@@ -131,7 +131,7 @@ whenever the window does not reach them.
 
 ## Correct and incorrect
 
-**It is controlled, so it needs both the page and the handler.**
+### It is controlled, so it needs both the page and the handler.
 
 ```jsx
 // Incorrect — nothing happens on click. The component never tracks a page of
@@ -142,7 +142,7 @@ whenever the window does not reach them.
 <Pagination currentPage={page} totalPages={12} onPageChange={setPage} />
 ```
 
-**Text mode is the one that labels its arrows.**
+### Text mode is the one that labels its arrows.
 
 ```jsx
 // Incorrect — in the default `icon` type, prevText and nextText are used only
@@ -155,7 +155,7 @@ whenever the window does not reach them.
 <Pagination currentPage={page} totalPages={9} onPageChange={setPage} type="text" />
 ```
 
-**Name the navigation when there is more than one on the page.**
+### Name the navigation when there is more than one on the page.
 
 ```jsx
 // Incorrect — two paginated tables produce two landmarks both called

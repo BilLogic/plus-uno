@@ -78,7 +78,7 @@ Use a select input when a user needs to select one or multiple options from a lo
 
 <div className="sb-ds-doc-section">
 
-## Interaction states
+## States
 
 <DocsCanvasShell description={<>Enabled, disabled, and read-only.</>}>
     <DsCanvasQuiet of={SelectStories.InteractionStates} />
@@ -124,7 +124,7 @@ user may extend.
 `ListGroup` for multi-select options, `Input` for the search field — so it stays
 visually consistent with the fields around it.
 
-**When not to use**
+### When not to use
 
 - **Not for actions.** A trigger that opens a list of *things to do* is
   `Dropdown`. `Select` holds a value; `Dropdown` fires handlers.
@@ -149,7 +149,7 @@ visually consistent with the fields around it.
 
 ## Correct and incorrect
 
-**Do not expect form semantics that are not there.**
+### Do not expect form semantics that are not there.
 
 ```jsx
 // Incorrect — `name` names nothing. There is no hidden input, so the form
@@ -171,7 +171,7 @@ visually consistent with the fields around it.
 />
 ```
 
-**`onFocus` and `onBlur` are the field's, not the search box's.**
+### `onFocus` and `onBlur` are the field's, not the search box's.
 
 ```jsx
 // Incorrect — expecting a blur each time focus moves inside the control. It
@@ -190,7 +190,7 @@ visually consistent with the fields around it.
 />
 ```
 
-**`onChange` hands you the value, not an event.**
+### `onChange` hands you the value, not an event.
 
 ```jsx
 // Incorrect — there is no event. `handleSelect` calls `onChange(newValue)`
@@ -201,7 +201,7 @@ visually consistent with the fields around it.
 <Select options={grades} onChange={(value) => setGrade(value)} />
 ```
 
-**Label it, because the component will not.**
+### Label it, because the component will not.
 
 ```jsx
 // Incorrect — the trigger is a div with role="button" and no name. A screen
@@ -213,7 +213,7 @@ visually consistent with the fields around it.
 <Select id="subject" options={subjects} value={subject} onChange={setSubject} />
 ```
 
-**Multi-select badges are dismissible only when the field is live.**
+### Multi-select badges are dismissible only when the field is live.
 
 ```jsx
 // Incorrect — expecting the badges to still be removable while read-only.

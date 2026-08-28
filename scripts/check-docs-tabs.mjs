@@ -41,12 +41,31 @@ const MDX_ROOT = 'design-system/src';
  * `When to use` and `Correct and incorrect` co-occur in exactly the same 15
  * files and `Accessibility` adds 3 more; `Usage notes` is what Navbar and Table
  * call the same thing. The `showLabel` entry is Input's, and it is here on the
- * merits — it argues why a label cannot be removed — which also keeps the one
- * cross-reference in the whole corpus (Input.mdx, inside Accessibility) pointing
- * at something in the same tab.
+ * merits — it argues why a label cannot be removed — which also keeps the only
+ * WITHIN-page cross-reference in the corpus (Input.mdx, inside Accessibility)
+ * pointing at something in the same tab. It is not the only cross-reference:
+ * #253 measured a second, missed by the audit before it, where
+ * DateAndTimePicker.mdx names that same heading "in the Input docs". That one
+ * is across pages, so no tab split can strand it.
  *
- * `When not to use` is deliberately absent: it is bold prose INSIDE `When to
- * use` in all 15 files, never a heading, so it travels with its parent.
+ * `When not to use` is deliberately absent, and the reason changed in #253
+ * without the answer changing. It used to be bold prose inside `When to use`;
+ * it is now `### When not to use`, a real heading in all 15 files. `HEADING`
+ * below matches `##` and only `##`, so a `###` is not a section, does not open
+ * one, and is not counted by assertion 5 — which is what lets 62 promoted
+ * sub-headings land without moving a single count. It still travels with its
+ * parent; it is now nested under it rather than loose inside it.
+ *
+ * #253 also renamed every `Variants` / `Styles` section. It did NOT collapse
+ * them onto one word: a benchmark of 328 Atlassian doc files found `## Variants`
+ * 0 times and `## Styles` 0 times, and `## Appearance` 29 times — used only where
+ * the component has an appearance prop taking semantic values, with every other
+ * such section named for its actual subject (`Positioning`, `Animation`,
+ * `Colors`, `Segments`). So each of our 24 took the name of what it shows.
+ * `Interaction states` folded into `States`, which Atlassian does use.
+ *
+ * None of those names is in this set or near one, so the set did not move: they
+ * all live on the Examples side, before and after.
  */
 const USAGE_HEADINGS = new Set([
   'When to use',
@@ -164,6 +183,35 @@ export function checkFile(file, source, tabbed = isTabbedDocsPage(file)) {
       `${file}: ${read.sectionDivs} section div(s) but ${read.headings} heading(s) — ` +
         `they were one-to-one before the split.`,
     );
+  }
+
+  // 6. Two sections on one page cannot carry the same name. #253 renamed every
+  //    `Variants` / `Styles` section, and `Spinner.mdx` was the single page
+  //    holding both — a rename that mapped the pair onto one word would have
+  //    left it with two identical headings: one duplicated anchor, two identical
+  //    entries in "On this page", and no way to link to the second.
+  //
+  //    Spinner is now `Animation` and `Appearance`, which is the answer the
+  //    benchmark gave rather than a workaround for the collision — Atlassian's
+  //    own spinner page splits at exactly that seam. The assertion stays because
+  //    the NEXT rename will not have someone reading all 24 section bodies.
+  //
+  //    Assertion 5 is silent through exactly that edit — rename a heading and
+  //    the counts stay one-to-one — so the invariant that made the tab codemod
+  //    safe is not the invariant that makes a RENAME safe. This is the second
+  //    one, written down before the next collapse needs it.
+  const byName = new Map();
+  for (const section of read.sections) {
+    if (section.heading === null) continue;
+    byName.set(section.heading, (byName.get(section.heading) ?? 0) + 1);
+  }
+  for (const [heading, count] of byName) {
+    if (count > 1) {
+      found.push(
+        `${file}: ${count} sections named ${JSON.stringify(heading)} — one anchor and one ` +
+          `TOC entry between them. Merge them, or give each its own name.`,
+      );
+    }
   }
 
   return found;
