@@ -1,0 +1,111 @@
+/*
+ * AiLabel — the agent's mark (#269).
+ *
+ * ACHROMATIC BY DESIGN, AND THAT IS THE DECISION RATHER THAN A PLACEHOLDER.
+ * Atlassian's `color.rovo.background.brand.bold` is #000000: AI is a different
+ * REGISTER, not another semantic colour competing with success and danger. So
+ * the ground here is the neutral surface ramp this system already has, and the
+ * only accent is the glyph and the edge.
+ *
+ * #269 says the brand hue is Bill's call. When it is made, it lands on ONE
+ * declaration — `--plus-ai-accent` below — and nothing else in this file moves.
+ * That is why it is a local custom property with a token fallback rather than a
+ * new design token: a token nothing has decided is a token nobody can read, and
+ * this repo has spent two passes deleting exactly that.
+ */
+.plus-ai-label {
+    /* The one line the brand decision changes. */
+    --plus-ai-accent: var(--color-on-surface-variant);
+
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--size-element-gap-sm);
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+
+    /*
+     * The edge, not a fill. Decision 2: the identity marks an edge and a glyph
+     * and never floods a surface, which is also what keeps the mark legible on
+     * whatever it is attached to.
+     */
+    background-color: var(--color-surface-container-lowest);
+    border: var(--size-element-border) solid var(--color-outline-variant);
+    border-inline-start: var(--size-element-stroke-lg) solid var(--plus-ai-accent);
+    border-radius: var(--size-element-radius-md);
+
+    color: var(--color-on-surface);
+}
+
+.plus-ai-label__mark {
+    flex: none;
+    color: var(--plus-ai-accent);
+    /* Sized from the type register beside it, so the glyph and the words scale
+       together rather than drifting apart at a different step. */
+    font-size: var(--font-size-fa-body3-solid);
+}
+
+.plus-ai-label__text {
+    min-width: 0;
+}
+
+/*
+ * `reviewed` is the one origin a person has signed off, so it is the one that
+ * loses the caution edge and takes the system's own success colour. `generated`
+ * and `assisted` keep the neutral edge: neither has been checked, and telling
+ * them apart is the caller's words, not a colour.
+ */
+.plus-ai-label--reviewed {
+    --plus-ai-accent: var(--color-success);
+}
+
+/*
+ * Low confidence uses the WARNING container pair, not the warning ground.
+ *
+ * Deliberate, and measured: `--color-warning` with a white label is 3.70:1 and
+ * fails AA (#312), while `--color-warning-container` with
+ * `--color-on-warning-container` is 13.27:1. A new component must not be built
+ * on the one pair in the system that is known to fail.
+ */
+.plus-ai-label--low {
+    --plus-ai-accent: var(--color-warning-text);
+    background-color: var(--color-warning-container);
+    color: var(--color-on-warning-container);
+    border-color: var(--color-warning-text);
+}
+
+.plus-ai-label__note {
+    color: inherit;
+    opacity: 0.85;
+}
+
+/*
+ * The one control the mark may contain. It is a real button because the label
+ * is not one — a button inside a button is invalid per ARIA, the same rule
+ * `Tag` and `Badge` both record.
+ */
+.plus-ai-label__explain {
+    appearance: none;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+    /*
+     * WCAG 2.5.8 asks for a 24px target and inline text is the shape that most
+     * often misses it. The height is built from padding on the existing
+     * spacing tokens rather than from a `min-block-size` on a target token,
+     * because this system has no target-size token — `--size-element-target-sm`
+     * is used twice with a 24px fallback and defined nowhere, and a third use
+     * would grow a debt two passes have just spent shrinking.
+     */
+    padding-block: var(--size-element-pad-y-sm);
+}
+
+.plus-ai-label__explain:focus-visible {
+    outline: var(--size-element-stroke-lg) solid var(--color-primary);
+    outline-offset: var(--size-element-gap-xs);
+}

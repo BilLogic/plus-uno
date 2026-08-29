@@ -1,0 +1,214 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as AiLabelStories from './AiLabel.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "origin": { "type": "enum", "values": ["generated", "assisted", "reviewed"] },
+    "confidence": { "type": "enum", "values": ["high", "low"] }
+  },
+  "sets": [
+    {
+      "id": "ai-label",
+      "name": "AI label",
+      "componentSetNodeId": "17560:1166",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17560-1166",
+      "source": "manual",
+      "status": "unpublished",
+      "isComponentSet": true,
+      "notes": "Created 2026-08-29 on the Badge page, BESIDE the four AI surfaces the product invented locally (#269) rather than instead of them. No brand hue is picked: the ground is achromatic and the accent is a border and a glyph, so the branding decision lands on one value. Not yet published to the library."
+    }
+  ]
+};
+
+<Meta of={AiLabelStories} />
+
+<Title />
+Marks content the agent produced, and says how much to trust it. The axis is who
+authored the value — generated, assisted, reviewed — not whether a model was
+involved somewhere.
+
+<DocsTabs of={AiLabelStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17560-1166"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/AiLabel"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>The three origins. Each carries its own default words, so a mark with no text still says something true.</>}>
+    <Canvas of={AiLabelStories.Origins} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<><code>confidence="low"</code> carries an instruction, not just a colour. The default is itself an instruction.</>}>
+    <DsCanvasQuiet of={AiLabelStories.LowConfidenceCarriesItsAdvice} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The confidence is in the accessible name too, so it reaches somebody who cannot see the treatment.</>}>
+    <DsCanvasQuiet of={AiLabelStories.ConfidenceIsInTheName} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<><code>onExplain</code> renders one real button inside the mark. The mark itself is never a control.</>}>
+    <DsCanvasQuiet of={AiLabelStories.ExplainIsARealButton} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Colors
+
+<DocsCanvasShell description={<>No brand hue is picked. The accent is one local custom property behind a neutral token, so the branding decision lands on a single declaration.</>}>
+    <DsCanvasQuiet of={AiLabelStories.NoBrandHueIsAssumed} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={AiLabelStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `AiLabel` wherever a person is looking at something the agent had a hand in:
+a suggested question, a drafted summary, a recommended lesson. It answers two
+questions at once — where did this come from, and how much should I trust it —
+and both belong on the content rather than in a paragraph elsewhere on the page.
+
+It is a **first stab at #269, not a settled component.** The colour is
+deliberately unresolved: `--plus-ai-accent` is one local custom property behind a
+neutral token, so when the brand decision is made it lands on a single
+declaration.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### The axis is authorship, not technology.
+
+`origin` separates the agent's own output from a person's work it helped with,
+and both from output a person has since checked. A reader needs those three
+apart far more than they need to know a model was involved somewhere.
+
+```jsx
+// Incorrect — "AI was here" is not information a reader can act on.
+<AiLabel text="AI-powered" />
+
+// Correct — say who authored it, and the default words follow.
+<AiLabel origin="generated" />
+<AiLabel origin="reviewed" text="AI draft, checked by Ms Okafor" />
+```
+
+### A low-confidence mark has to say what to do.
+
+`confidence="low"` changes the treatment and the accessible name. It also
+carries a note, and the default note is an instruction rather than a label —
+a caution with no instruction is the thing this is meant to prevent.
+
+```jsx
+// Incorrect — the reader is told to worry and not told what about.
+<AiLabel origin="generated" confidence="low" note="Low confidence" />
+
+// Correct — the note says what is wrong and what to do.
+<AiLabel origin="generated" confidence="low" note="Two citations could not be verified" />
+```
+
+### The mark is not a control.
+
+`onExplain` renders one real button inside it. Nesting one interactive element
+inside another is invalid per ARIA — the same rule `Tag` and `Badge` both
+record. To make a whole row pressable, put a `Button` around the content and
+this inside it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The name says what the mark means, not what it is.** The surface this
+  replaces is labelled `AI-powered feature`, which tells a screen-reader user
+  the category of the thing and nothing about the content it is attached to.
+- **The confidence is in the accessible name.** Somebody who cannot see the
+  caution treatment is otherwise told the same thing whether or not the system
+  trusts its own output.
+- **`role="note"`** makes the mark one thing rather than a loose icon beside
+  loose words, so it is announced as a phrase.
+- **The glyph is decorative and hidden.** It repeats what the words already say;
+  announcing it would give "wand, Generated by PLUS AI" and no extra
+  information — the same rule `Tag`'s `swatchBefore` follows.
+- **The explain button says what it does.** `How was this made?` is an action,
+  not a category. Compare `title="AI recommended"`, which is not a reliable
+  accessible name in any screen reader.
+- **Low confidence uses the warning *container* pair, never the warning
+  ground.** Measured: `--color-warning` with a white label is 3.70:1 — the only
+  one of the 65 button combinations below AA (#312) — while
+  `--color-warning-container` with `--color-on-warning-container` is 13.27:1. A
+  new component must not be built on the one pair known to fail.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a value a person chose rather than one the agent produced, use `Tag`.
+- For system-generated data with no trust question attached, use `Badge`.
+- For a message about the whole page rather than a mark on one thing, use `Alert`.
+- For work still in progress, use `Spinner` or `Progress`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

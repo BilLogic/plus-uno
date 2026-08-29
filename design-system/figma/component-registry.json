@@ -31,6 +31,47 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
       }
     },
+    "AiLabel": {
+      "code": {
+        "import": "@/components/status-and-loading",
+        "export": "default",
+        "mdxPath": "design-system/src/components/status-and-loading/AiLabel/AiLabel.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/AiLabel",
+        "props": {
+          "origin": {
+            "type": "enum",
+            "values": [
+              "generated",
+              "assisted",
+              "reviewed"
+            ]
+          },
+          "confidence": {
+            "type": "enum",
+            "values": [
+              "high",
+              "low"
+            ]
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "ai-label",
+            "name": "AI label",
+            "componentSetNodeId": "17560:1166",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17560-1166",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "Created 2026-08-29 on the Badge page, BESIDE the four AI surfaces the product invented locally (#269) rather than instead of them. No brand hue is picked: the ground is achromatic and the accent is a border and a glyph, so the branding decision lands on one value. Not yet published to the library."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17560-1166"
+      }
+    },
     "Alert": {
       "code": {
         "import": "@/components/messaging",

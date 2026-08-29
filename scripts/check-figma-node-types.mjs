@@ -29,12 +29,13 @@ const REGISTRY = 'design-system/figma/component-registry.json';
 const RECORDING = 'design-system/figma/node-types.json';
 
 /**
- * The floor. 96 distinct ids across 98 mappings — two ids are mapped twice, by
- * two components that share a Figma set, and `Tag` added one on 2026-08-29. A comparison over an empty recording
+ * The floor. 97 distinct ids across 99 mappings — two ids are mapped twice, by
+ * two components that share a Figma set; `Tag` and `AI label` each added one on
+ * 2026-08-29. A comparison over an empty recording
  * agrees with everything, so the size is asserted rather than assumed. Lower it
  * only when a mapping is genuinely deleted, and say which one in the commit.
  */
-const MIN_RECORDED = 96;
+const MIN_RECORDED = 97;
 
 const registry = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, REGISTRY), 'utf8'));
 const recording = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, RECORDING), 'utf8'));

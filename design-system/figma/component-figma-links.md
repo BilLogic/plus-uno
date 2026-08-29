@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-57 docs-page links + 91 style/variant entries across 60 components.
+58 docs-page links + 92 style/variant entries across 61 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -15,6 +15,7 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Group | Component | Node ID | Figma link |
 | --- | --- | --- | --- |
 | Components | Accordion | `13265:5813` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813) |
+| Components | AiLabel | `17560:1166` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17560-1166) |
 | Components | Alert | `3496:1444` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444) |
 | Components | Badge | `3497:19481` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19481) |
 | Components | Breadcrumb | `3497:19484` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19484) |
@@ -79,6 +80,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Group | Component | Style / variant | Node ID | Figma link | Status |
 | --- | --- | --- | --- | --- | --- |
 | Components | Accordion | accordion | `13667:6004` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13667-6004) | verified |
+| Components | AiLabel | AI label | `17560:1166` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17560-1166) | unpublished |
 | Components | Alert | alert | `11:324` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=11-324) | verified |
 | Components | Badge | Counter | `3998:68735` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3998-68735) | verified |
 | Components | Badge | Dismissible Badges | `1056:32356` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=1056-32356) | verified |
