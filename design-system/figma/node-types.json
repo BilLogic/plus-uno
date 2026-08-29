@@ -1,0 +1,391 @@
+{
+  "note": "What each mapped Figma node ACTUALLY is, read from Figma. Not derived from anything in this repo — it is a measurement, and check:figma-node-types holds the registry to it. Re-measure with npm run audit:figma-registry and record the date.",
+  "measuredAt": "2026-08-29",
+  "method": "figma.getNodeByIdAsync(id).type, one call per file, via the Figma Plugin API.",
+  "files": {
+    "zAecJNRdvJzAUOcjV32tRX": "Design System - BS4 Foundation (Component Library)",
+    "W0qzhXWxFsMwSJzkdV2yal": "Design System - Web App Specs"
+  },
+  "nodes": {
+    "10010:37927": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT"
+    },
+    "1056:32356": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "10661:10292": {
+      "file": "W0qzhXWxFsMwSJzkdV2yal",
+      "type": "COMPONENT_SET"
+    },
+    "10:174": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "10:473": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "10:502": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "10:507": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "10:721": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "10:722": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "111:227859": {
+      "file": "W0qzhXWxFsMwSJzkdV2yal",
+      "type": "COMPONENT_SET"
+    },
+    "111:227876": {
+      "file": "W0qzhXWxFsMwSJzkdV2yal",
+      "type": "COMPONENT_SET"
+    },
+    "111:227891": {
+      "file": "W0qzhXWxFsMwSJzkdV2yal",
+      "type": "COMPONENT_SET"
+    },
+    "111:227940": {
+      "file": "W0qzhXWxFsMwSJzkdV2yal",
+      "type": "COMPONENT"
+    },
+    "111:241933": {
+      "file": "W0qzhXWxFsMwSJzkdV2yal",
+      "type": "COMPONENT"
+    },
+    "1133:12915": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "11:324": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "12785:189314": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "13526:17774": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "13536:195": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT"
+    },
+    "13536:6785": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "13536:9083": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT"
+    },
+    "13536:9208": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT"
+    },
+    "13540:9207": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "13540:9717": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "13541:10731": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "13541:9229": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "13541:9240": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "13543:5904": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "13549:6703": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "PAGE"
+    },
+    "13574:1150": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "13584:55731": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "13644:11268": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "13667:6004": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "13671:3218": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "13696:8299": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "13726:9599": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "14851:17069": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "16560:4508": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "17118:127": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "17160:127": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT"
+    },
+    "17161:132": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT"
+    },
+    "17169:137": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "17169:43279": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "17169:43292": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "2370:191400": {
+      "file": "W0qzhXWxFsMwSJzkdV2yal",
+      "type": "COMPONENT_SET"
+    },
+    "2370:194322": {
+      "file": "W0qzhXWxFsMwSJzkdV2yal",
+      "type": "COMPONENT"
+    },
+    "25:568": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "27:618": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "33:2470": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "3497:19481": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "PAGE"
+    },
+    "3497:19482": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "PAGE"
+    },
+    "34:5212": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "34:8261": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "37:4513": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "3998:68735": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "39:4802": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "39:5070": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT"
+    },
+    "4209:29375": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "4209:29770": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "4241:27817": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT"
+    },
+    "42:5756": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "42:5857": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "42:5858": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "42:5949": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "42:6020": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "4457:25458": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "44:4803": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "44:4872": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "49:19534": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "49:6872": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "5173:6149": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "53:19822": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "53:20229": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "53:20312": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "53:20424": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "59:16038": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "69:16193": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "69:16745": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "69:16779": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "7204:9586": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "72:16462": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "72:16776": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "82:16570": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "83:125838": {
+      "file": "W0qzhXWxFsMwSJzkdV2yal",
+      "type": "COMPONENT_SET"
+    },
+    "8583:12093": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "9109:14766": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT"
+    },
+    "9296:3061": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "9297:3104": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "9297:3156": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "9413:1764": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "9538:17087": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "956:256793": {
+      "file": "W0qzhXWxFsMwSJzkdV2yal",
+      "type": "COMPONENT_SET"
+    },
+    "968:18597": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "979:19814": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "979:20977": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    }
+  }
+}

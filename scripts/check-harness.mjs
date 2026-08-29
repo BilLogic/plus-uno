@@ -121,6 +121,12 @@ const COMPOSED = [
     guards: 'the generated Figma-links spreadsheet against the component MDX it is built from.',
   },
   {
+    script: 'check:figma-node-types',
+    pkg: 'root',
+    guards:
+      "each registry mapping claiming what its Figma node actually IS, against a dated measurement in design-system/figma/node-types.json. The field is called componentSetNodeId and 15 of the 95 mapped nodes are not sets — 3 PAGEs and 12 plain COMPONENTs. `isComponentSet: false` is how an entry says so, and until this check nothing in the repo READ that field, so six entries carried it and seven that needed it did not. Also catches a mapping nobody has measured, a recording for a mapping that no longer exists, an id recorded against the wrong one of the two Figma files, and a link that opens on nothing.",
+  },
+  {
     script: 'check:skill-surfaces',
     pkg: 'root',
     guards:

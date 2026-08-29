@@ -106,6 +106,7 @@
             "id": "storybook-resources",
             "name": "Badge docs page (MDX link)",
             "componentSetNodeId": "3497:19481",
+            "isComponentSet": false,
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19481",
             "source": "storybook-mdx",
             "status": "docs-page",
@@ -229,6 +230,7 @@
             "id": "storybook-resources",
             "name": "Buttons docs page (MDX link)",
             "componentSetNodeId": "3497:19482",
+            "isComponentSet": false,
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482",
             "source": "storybook-mdx",
             "status": "docs-page",
@@ -501,6 +503,7 @@
             "id": "card",
             "name": "Card",
             "componentSetNodeId": "4241:27817",
+            "isComponentSet": false,
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4241-27817",
             "source": "node-chart",
             "status": "verified"
@@ -679,6 +682,7 @@
             "id": "date-time-picker",
             "name": "Date & Time Picker",
             "componentSetNodeId": "13549:6703",
+            "isComponentSet": false,
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703",
             "source": "manual",
             "status": "verified"
@@ -755,6 +759,7 @@
             "id": "dropdown-list",
             "name": "Dropdown List",
             "componentSetNodeId": "9109:14766",
+            "isComponentSet": false,
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9109-14766",
             "source": "node-chart",
             "status": "verified"
@@ -1514,6 +1519,7 @@
             "id": "rich-text-editor",
             "name": "Rich Text Editor",
             "componentSetNodeId": "10010:37927",
+            "isComponentSet": false,
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10010-37927",
             "source": "node-chart",
             "status": "verified"
@@ -1536,6 +1542,7 @@
             "id": "scrollbar",
             "name": "Scrollbar",
             "componentSetNodeId": "39:5070",
+            "isComponentSet": false,
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=39-5070",
             "source": "designer-supplied",
             "status": "verified",

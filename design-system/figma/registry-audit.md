@@ -54,6 +54,13 @@ it. The request was for work that had already been done.
 
 ### Not a component set — 12, unfixed and recorded
 
+> **Superseded by the re-measurement below.** The counts in this section were
+> read off a summary; the second pass read every id and recorded each type, and
+> the real numbers are **15 of 95** — 3 PAGEs and 12 COMPONENTs. Kept as written
+> because it is what the first pass concluded, and because the difference is the
+> point: a summary is not a measurement.
+
+
 The field is called `componentSetNodeId`. Twelve nodes are not sets:
 
 | kind | n | which |
@@ -191,3 +198,67 @@ recorded whole rather than filtered down to a number.
 Issue #339 carries "29 unreferenced / 17 unmapped". Those were measured against
 `scripts/figma-component-snapshot.json`, which was seven weeks old at the time.
 **The numbers above replace them**, and they were read live.
+
+## The re-measurement — 2026-08-29, and what now holds it
+
+The first pass above recorded its conclusions in prose. Prose cannot be
+checked, and the field it was about — `isComponentSet` — **had no reader
+anywhere in the repository**, so six entries carried it, seven that needed it
+did not, and nothing said a word.
+
+So the 95 distinct ids were read again, live, one `getNodeByIdAsync` per id per
+file, and each type was written down as data:
+
+| | |
+|---|---|
+| recording | [node-types.json](node-types.json) — id, file, type, with the date and the method |
+| check | `npm run check:figma-node-types`, composed into `check:harness` |
+| comparison | `scripts/figma-node-types.mjs`, with `scripts/figma-node-types.test.mjs` |
+
+```
+95 nodes · 80 COMPONENT_SET · 12 COMPONENT · 3 PAGE · 0 MISSING
+```
+
+**0 MISSING** is the first result worth stating: the four broken ids fixed
+above all resolve now, re-read rather than assumed.
+
+**15 are not sets**, not 12 — the earlier number came from a summary that
+counted the BS4 file's nine COMPONENTs and described the Web App Specs file's
+separately. The seven that were silent are now explicit:
+
+| component | set | node | is |
+|---|---|---|---|
+| Badge | Badge docs page (MDX link) | `3497:19481` | PAGE |
+| Button | Buttons docs page (MDX link) | `3497:19482` | PAGE |
+| DatePicker | Date & Time Picker | `13549:6703` | PAGE |
+| Card | Card | `4241:27817` | COMPONENT |
+| Dropdown | Dropdown List | `9109:14766` | COMPONENT |
+| RichTextEditor | Rich Text Editor | `10010:37927` | COMPONENT |
+| ScrollBar | Scrollbar | `39:5070` | COMPONENT |
+
+The four PAGE/COMPONENT distinctions that were already flagged are unchanged,
+and the three `Pattern/*` sets that ARE sets are flagged `true` and checked in
+that direction too — a flag claiming "not a set" over a set is as wrong as the
+reverse, and the check says both.
+
+`DatePicker → 13549:6703` is still the one that is arguably wrong rather than
+merely mislabelled, for the reason given above: it is a page holding four sets,
+two of which are mapped separately and two of which are mapped nowhere. The
+flag makes the entry honest about what it points at. It does not answer which
+set the component corresponds to, and that is still a design question.
+
+### What the check does and does not do
+
+It compares two files. The Figma half already happened, on the date the
+recording carries — no CI job can ask Figma anything, which is the same
+constraint `audit:figma-registry` prints work for rather than pretending to
+gate. What the comparison catches:
+
+- a mapping nobody has measured — a new entry cannot pass by defaulting to true
+- a recording for a mapping that no longer exists
+- an id recorded against the wrong one of the two Figma files, which is exactly
+  the mistake the first pass made
+- a link that opens on nothing
+- the flag, in both directions
+
+It still cannot tell you whether the mapped node is the **right** one.

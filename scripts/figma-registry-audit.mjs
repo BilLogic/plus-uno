@@ -25,6 +25,13 @@
  * the work instead of doing it, and the result is written down by hand in
  * `design-system/figma/registry-audit.md`.
  *
+ * WHERE THE RESULT GOES NOW. Into `design-system/figma/node-types.json`, as
+ * data rather than prose, and `npm run check:figma-node-types` holds the
+ * registry to it on every run — a mapping nobody has measured, a stale
+ * recording, an id recorded against the wrong file and a mislabelled
+ * `componentSetNodeId` are all findings there. That check is why re-running
+ * this one is worth the trouble: the measurement it produces is read.
+ *
  * WHAT IT PRINTS. The node ids grouped by FILE — the registry spans two, and
  * the first version of this audit checked all 92 against one of them and
  * reported thirteen false misses — plus a ready-to-run Plugin API script per
