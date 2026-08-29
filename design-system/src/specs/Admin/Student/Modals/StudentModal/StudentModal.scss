@@ -147,7 +147,7 @@
         color: var(--color-on-surface-variant);
 
         &:focus {
-            border-color: var(--color-primary);
+            border-color: var(--color-primary-border);
             box-shadow: none;
         }
     }

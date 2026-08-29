@@ -79,7 +79,7 @@
     
     &:focus {
         outline: none;
-        border-color: var(--color-primary);
+        border-color: var(--color-primary-border);
         box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
         z-index: 1;
     }
@@ -143,7 +143,7 @@
     
     // Dropdown addons should have primary border color
     &.plus-input-group-dropdown {
-        border-color: var(--color-primary);
+        border-color: var(--color-primary-border);
     }
     
     // Remove right border when next to input or another addon
@@ -208,7 +208,7 @@
             min-height: 18px;
             padding: 0;
             margin: 0;
-            border: var(--size-element-stroke-md, 2px) solid var(--color-primary);
+            border: var(--size-element-stroke-md, 2px) solid var(--color-primary-border);
             border-radius: var(--size-element-radius-sm, 2px);
             background-color: var(--color-surface-container-lowest);
             cursor: pointer;
@@ -238,7 +238,7 @@
             // Checked state
             &:checked {
                 background-color: var(--color-primary);
-                border-color: var(--color-primary);
+                border-color: var(--color-primary-border);
                 
                 &::before {
                     transform: translate(-50%, -50%) scale(1);
@@ -246,7 +246,7 @@
             }
             
             &:hover:not(:disabled) {
-                border-color: var(--color-primary);
+                border-color: var(--color-primary-border);
                 background-color: var(--color-primary-state-08);
             }
             
@@ -342,7 +342,7 @@
             // Checked state - use primary color
             &:checked {
                 background-color: var(--color-primary) !important;
-                border-color: var(--color-primary) !important;
+                border-color: var(--color-primary-border) !important;
                 accent-color: var(--color-primary) !important;
             }
             
@@ -371,7 +371,7 @@
             }
             
             &:hover:not(:disabled) {
-                border-color: var(--color-primary);
+                border-color: var(--color-primary-border);
             }
             
             &:disabled {
@@ -485,12 +485,12 @@
 
 // Input border turns primary on the side adjacent to a button wrapper
 .plus-input-group-button-wrapper + .plus-input-group-input {
-    border-left-color: var(--color-primary) !important;
+    border-left-color: var(--color-primary-border) !important;
 }
 
 // Use :has() to target the input's right border when followed by a button
 .plus-input-group-wrapper .plus-input-group-input:has(+ .plus-input-group-button-wrapper) {
-    border-right-color: var(--color-primary) !important;
+    border-right-color: var(--color-primary-border) !important;
 }
 
 // Dropdown addon
@@ -639,7 +639,7 @@
 // Focused state
 .plus-input-group-focused {
     .plus-input-group-input {
-        border-color: var(--color-primary);
+        border-color: var(--color-primary-border);
         box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
     }
 }

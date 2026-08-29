@@ -43,7 +43,7 @@
 
     &.plus-date-picker-trigger--open,
     &:focus-within {
-        border-color: var(--color-primary);
+        border-color: var(--color-primary-border);
         outline: none;
     }
 }
@@ -196,7 +196,7 @@
     }
 
     &-today {
-        border: var(--size-element-stroke-sm) solid var(--color-primary);
+        border: var(--size-element-stroke-sm) solid var(--color-primary-border);
         color: var(--color-primary-text);
     }
 

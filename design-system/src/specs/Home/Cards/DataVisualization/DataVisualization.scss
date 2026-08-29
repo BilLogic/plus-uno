@@ -96,7 +96,7 @@
     // Active tab styling - use secondary colors (per Figma spec)
     .plus-nav-link.active {
         color: var(--color-secondary-text) !important;
-        border-bottom-color: var(--color-secondary) !important;
+        border-bottom-color: var(--color-secondary-border) !important;
         font-weight: var(--font-weight-semibold-1, 400) !important;
         
         .plus-data-viz-tab-content i {

@@ -33,7 +33,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface` · `--color-on-surface-state-08` · `--color-on-surface-state-12` · `--color-on-surface-state-16` · `--color-primary` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-primary-state-16` · `--color-primary-text` · `--font-family-body` · `--font-line-height-body1` · `--font-size-body1` · `--font-weight-body1-regular` · `--font-weight-normal` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-y-md` · `--size-element-radius-md` · `--size-element-stroke-sm`
+`--color-on-surface` · `--color-on-surface-state-08` · `--color-on-surface-state-12` · `--color-on-surface-state-16` · `--color-primary` · `--color-primary-border` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-primary-state-16` · `--color-primary-text` · `--font-family-body` · `--font-line-height-body1` · `--font-size-body1` · `--font-weight-body1-regular` · `--font-weight-normal` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-y-md` · `--size-element-radius-md` · `--size-element-stroke-sm`
 
 From `design-system/src/components/navigation/NavPills/NavPills.scss`. Override these through the token layer, never with a literal.
 

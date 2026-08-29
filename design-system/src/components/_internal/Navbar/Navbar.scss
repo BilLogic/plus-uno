@@ -40,7 +40,7 @@
     // `--color-primary` / `--color-on-primary` pair below.
     &.plus-navbar-bg-primary {
         background-color: var(--color-primary);
-        border-bottom: 1px solid var(--color-primary);
+        border-bottom: 1px solid var(--color-primary-border);
 
         // Mandatory, not decorative. The link colour further down is
         // `--color-primary` itself — the same token as this background — so

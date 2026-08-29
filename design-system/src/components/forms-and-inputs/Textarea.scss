@@ -148,52 +148,52 @@
 
     &--error {
         textarea.plus-textarea-v2__control.form-control {
-            border: var(--size-element-stroke-lg, 2px) solid var(--color-danger) !important;
+            border: var(--size-element-stroke-lg, 2px) solid var(--color-danger-border) !important;
 
             &:focus {
-                border: var(--size-element-stroke-lg, 2px) solid var(--color-danger) !important;
+                border: var(--size-element-stroke-lg, 2px) solid var(--color-danger-border) !important;
             }
 
             &:not(:placeholder-shown):not(:focus) {
-                border: var(--size-element-stroke-lg, 2px) solid var(--color-danger) !important;
+                border: var(--size-element-stroke-lg, 2px) solid var(--color-danger-border) !important;
             }
         }
 
         &.plus-textarea-v2--short textarea.plus-textarea-v2__control.form-control {
-            border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-danger) !important;
+            border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-danger-border) !important;
 
             &:focus {
-                border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-danger) !important;
+                border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-danger-border) !important;
             }
 
             &:not(:placeholder-shown):not(:focus) {
-                border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-danger) !important;
+                border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-danger-border) !important;
             }
         }
     }
 
     &--success {
         textarea.plus-textarea-v2__control.form-control {
-            border: var(--size-element-stroke-lg, 2px) solid var(--color-success) !important;
+            border: var(--size-element-stroke-lg, 2px) solid var(--color-success-border) !important;
 
             &:focus {
-                border: var(--size-element-stroke-lg, 2px) solid var(--color-success) !important;
+                border: var(--size-element-stroke-lg, 2px) solid var(--color-success-border) !important;
             }
 
             &:not(:placeholder-shown):not(:focus) {
-                border: var(--size-element-stroke-lg, 2px) solid var(--color-success) !important;
+                border: var(--size-element-stroke-lg, 2px) solid var(--color-success-border) !important;
             }
         }
 
         &.plus-textarea-v2--short textarea.plus-textarea-v2__control.form-control {
-            border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-success) !important;
+            border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-success-border) !important;
 
             &:focus {
-                border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-success) !important;
+                border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-success-border) !important;
             }
 
             &:not(:placeholder-shown):not(:focus) {
-                border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-success) !important;
+                border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-success-border) !important;
             }
         }
     }

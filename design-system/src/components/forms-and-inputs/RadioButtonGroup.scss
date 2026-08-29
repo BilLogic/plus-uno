@@ -134,13 +134,13 @@
         accent-color: var(--color-primary) !important;
 
         // Unchecked state - white background with primary border (matching Figma)
-        border-color: var(--color-primary) !important;
+        border-color: var(--color-primary-border) !important;
         background-color: var(--color-on-primary, white) !important;
 
         // Checked state - use primary color
         &:checked {
             background-color: var(--color-primary) !important;
-            border-color: var(--color-primary) !important;
+            border-color: var(--color-primary-border) !important;
             accent-color: var(--color-primary) !important;
         }
 
@@ -162,7 +162,7 @@
         // Focus state - show circular ring only for keyboard navigation
         &:focus-visible {
             outline: none !important;
-            border-color: var(--color-primary) !important;
+            border-color: var(--color-primary-border) !important;
             accent-color: var(--color-primary) !important;
             box-shadow: none !important;
 
@@ -174,7 +174,7 @@
         // Regular :focus state - update colors but don't show focus ring
         &:focus:not(:focus-visible) {
             outline: none !important;
-            border-color: var(--color-primary) !important;
+            border-color: var(--color-primary-border) !important;
             accent-color: var(--color-primary) !important;
             box-shadow: none !important;
 
@@ -185,13 +185,13 @@
 
         // Hover state
         &:hover:not(:disabled):not(:checked) {
-            border-color: var(--color-primary) !important;
+            border-color: var(--color-primary-border) !important;
             accent-color: var(--color-primary) !important;
             background-color: var(--color-primary-state-08) !important;
         }
 
         &:hover:not(:disabled):checked {
-            border-color: var(--color-primary) !important;
+            border-color: var(--color-primary-border) !important;
             accent-color: var(--color-primary) !important;
             background-color: var(--color-primary-state-12) !important;
         }

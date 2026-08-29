@@ -41,7 +41,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-danger` · `--color-inverse-primary` · `--color-on-primary` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-surface-container-lowest` · `--color-surface-variant` · `--font-family-body` · `--font-weight-normal` · `--size-element-gap-sm` · `--size-element-radius-sm` · `--size-element-stroke-md`
+`--color-danger` · `--color-inverse-primary` · `--color-on-primary` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-surface-container-lowest` · `--color-surface-variant` · `--font-family-body` · `--font-weight-normal` · `--size-element-gap-sm` · `--size-element-radius-sm` · `--size-element-stroke-md`
 
 From `design-system/src/components/forms-and-inputs/Checkbox.scss`. Override these through the token layer, never with a literal.
 

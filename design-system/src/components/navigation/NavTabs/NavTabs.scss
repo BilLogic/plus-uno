@@ -55,7 +55,7 @@
         &.pseudo-hover > .nav-link[aria-current="true"],
         &.pseudo-hover > .plus-nav-link[aria-current="true"] {
             background-color: var(--color-primary-state-08) !important;
-            border-bottom-color: var(--color-primary) !important;
+            border-bottom-color: var(--color-primary-border) !important;
         }
 
         &.pseudo-pressed > .nav-link.active,
@@ -67,7 +67,7 @@
         &.pseudo-pressed > .nav-link[aria-current="true"],
         &.pseudo-pressed > .plus-nav-link[aria-current="true"] {
             background-color: var(--color-primary-state-16) !important;
-            border-bottom-color: var(--color-primary) !important;
+            border-bottom-color: var(--color-primary-border) !important;
         }
 
         &.pseudo-focus > .nav-link.active,
@@ -79,7 +79,7 @@
         &.pseudo-focus > .nav-link[aria-current="true"],
         &.pseudo-focus > .plus-nav-link[aria-current="true"] {
             background-color: var(--color-primary-state-12) !important;
-            border-bottom-color: var(--color-primary) !important;
+            border-bottom-color: var(--color-primary-border) !important;
             outline: none;
         }
     }
@@ -144,7 +144,7 @@
             font-weight: var(--font-weight-body1-semibold);
             background-color: transparent !important;
             color: var(--color-secondary-text) !important;
-            border-color: transparent transparent var(--color-primary) transparent !important;
+            border-color: transparent transparent var(--color-primary-border) transparent !important;
             // The active state overrides the 1px outline with a 2px secondary line
             border-bottom-width: var(--size-element-stroke-md, 2px) !important;
             // Negative margin to prevent layout shift from 1px -> 2px border change
@@ -208,7 +208,7 @@
             &.show,
             &[aria-expanded="true"] {
                 color: var(--color-secondary-text);
-                border-bottom-color: var(--color-secondary);
+                border-bottom-color: var(--color-secondary-border);
                 background-color: var(--color-secondary-state-08);
             }
         }

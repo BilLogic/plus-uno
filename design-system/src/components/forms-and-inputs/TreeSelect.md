@@ -27,7 +27,7 @@
 
 ## Tokens touched
 
-`--color-on-surface` · `--color-on-surface-variant` · `--color-outline` · `--color-outline-variant` · `--color-primary` · `--color-primary-state-08` · `--color-secondary-state-16` · `--color-secondary-text` · `--color-surface-container` · `--color-surface-container-high` · `--color-surface-container-low` · `--color-surface-container-lowest` · `--elevation-light-2` · `--font-family-body` · `--font-line-height-body2` · `--font-size-body2` · `--font-weight-normal` · `--size-element-gap-sm` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-md` · `--size-element-radius-sm` · `--size-element-stroke-md`
+`--color-on-surface` · `--color-on-surface-variant` · `--color-outline` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-state-08` · `--color-secondary-state-16` · `--color-secondary-text` · `--color-surface-container` · `--color-surface-container-high` · `--color-surface-container-low` · `--color-surface-container-lowest` · `--elevation-light-2` · `--font-family-body` · `--font-line-height-body2` · `--font-size-body2` · `--font-weight-normal` · `--size-element-gap-sm` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-md` · `--size-element-radius-sm` · `--size-element-stroke-md`
 
 From `design-system/src/components/forms-and-inputs/TreeSelect.scss`. Override these through the token layer, never with a literal.
 

@@ -93,7 +93,7 @@
             /* Figma — 1px primary border, primary-text label, transparent interior */
             &.active {
                 background-color: transparent;
-                border-color: var(--color-primary);
+                border-color: var(--color-primary-border);
 
                 .plus-nav-text {
                     color: var(--color-primary-text);
@@ -108,7 +108,7 @@
 
         &.plus-nav-item-selected .plus-nav-link {
             background-color: transparent;
-            border-color: var(--color-primary);
+            border-color: var(--color-primary-border);
 
             .plus-nav-text {
                 color: var(--color-primary-text);
@@ -145,7 +145,7 @@
         .plus-nav-link.active,
         .plus-nav-item-selected .plus-nav-link {
             background-color: var(--color-primary);
-            border-color: var(--color-primary);
+            border-color: var(--color-primary-border);
 
             .plus-nav-text {
                 color: var(--color-on-primary);

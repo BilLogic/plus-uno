@@ -34,7 +34,7 @@
         padding: 0;
         margin: 0;
         margin-right: var(--size-element-gap-sm, 8px); // Spacing between checkbox and label
-        border: var(--size-element-stroke-md, 2px) solid var(--color-primary);
+        border: var(--size-element-stroke-md, 2px) solid var(--color-primary-border);
         border-radius: var(--size-element-radius-sm, 2px);
         background-color: var(--color-surface-container-lowest);
         cursor: pointer;
@@ -79,7 +79,7 @@
         // Checked state
         &:checked:not(:indeterminate) {
             background-color: var(--color-primary);
-            border-color: var(--color-primary);
+            border-color: var(--color-primary-border);
         }
 
         &:checked:not(:indeterminate)::before {
@@ -89,7 +89,7 @@
         // Indeterminate state (dash/minus)
         &:indeterminate {
             background-color: var(--color-primary);
-            border-color: var(--color-primary);
+            border-color: var(--color-primary-border);
         }
 
         &:indeterminate::after {
@@ -102,7 +102,7 @@
 
         // Hover state
         &:hover:not(:disabled):not(:indeterminate) {
-            border-color: var(--color-primary);
+            border-color: var(--color-primary-border);
             background-color: var(--color-primary-state-08);
         }
 
