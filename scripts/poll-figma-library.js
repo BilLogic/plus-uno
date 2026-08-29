@@ -13,7 +13,9 @@
  * Usage:
  *   node scripts/poll-figma-library.js                    # Check for changes
  *   node scripts/poll-figma-library.js --init             # Create initial snapshot
- *   node scripts/poll-figma-library.js --dry-run          # Check without updating snapshot
+ *   node scripts/poll-figma-library.js --dry-run          # Read and print; write nothing,
+ *                                                         # local or remote (no Notion PRD,
+ *                                                         # no Slack, no snapshot)
  *
  * Environment Variables:
  *   FIGMA_ACCESS_TOKEN - Figma API access token
@@ -616,18 +618,40 @@ async function main() {
     fs.appendFileSync(githubOutput, outputLines.join('\n') + '\n');
   }
 
-  // Also write issue body for GitHub Actions to use
+  // Also write issue body for GitHub Actions to use. Local, but still a write,
+  // and `--dry-run` now means none of them.
   const issueBody = buildIssueBody(componentDiff, newVersions);
-  fs.mkdirSync(path.join(process.cwd(), '.figma-sync-context'), { recursive: true });
-  fs.writeFileSync(path.join(process.cwd(), '.figma-sync-context', 'issue-body.md'), issueBody);
+  if (args.dryRun) {
+    console.log('\n📄 issue-body.md: skipped (--dry-run)');
+  } else {
+    fs.mkdirSync(path.join(process.cwd(), '.figma-sync-context'), { recursive: true });
+    fs.writeFileSync(path.join(process.cwd(), '.figma-sync-context', 'issue-body.md'), issueBody);
+  }
 
-  // Create Notion PRD
+  /*
+   * PUBLISHING IS GATED ON `--dry-run`, and it was not.
+   *
+   * The flag is documented as "Check without updating snapshot", and that is
+   * exactly what it did: the snapshot write below was guarded and the two
+   * OUTWARD-FACING side effects were not. A dry run created a Notion PRD and
+   * posted to Slack — the parts a person cannot undo — while carefully leaving
+   * the local file alone.
+   *
+   * Anyone reaching for `--dry-run` is asking "what would this do?", and the
+   * honest answer cannot involve telling a channel of people that the library
+   * changed. So the rule is now the stronger one: a dry run reads Figma and
+   * prints; it writes nothing anywhere, local or remote.
+   */
   let prdResult = null;
-  try {
-    console.log('\n📋 Creating Notion PRD...');
-    prdResult = await createNotionPRD(componentDiff, newVersions, components);
-  } catch (error) {
-    console.error(`\n⚠ Notion PRD creation failed: ${error.message}`);
+  if (args.dryRun) {
+    console.log('\n📋 Notion PRD: skipped (--dry-run)');
+  } else {
+    try {
+      console.log('\n📋 Creating Notion PRD...');
+      prdResult = await createNotionPRD(componentDiff, newVersions, components);
+    } catch (error) {
+      console.error(`\n⚠ Notion PRD creation failed: ${error.message}`);
+    }
   }
 
   // Write PRD info for GitHub Actions
@@ -636,8 +660,13 @@ async function main() {
     fs.appendFileSync(githubOutput, `notion_prd_id=${prdResult.pageId}\n`);
   }
 
-  // Post to Slack
-  if (SLACK_WEBHOOK_URL) {
+  // Post to Slack — see the note above `prdResult`; a dry run tells nobody.
+  // The dry-run term comes FIRST and is repeated rather than hoisted into an
+  // `else`, so the guard is visible on the same line as the effect it guards.
+  if (args.dryRun) {
+    console.log('\n💬 Slack notification: skipped (--dry-run)');
+  }
+  if (!args.dryRun && SLACK_WEBHOOK_URL) {
     try {
       const { blocks, text } = buildSlackMessage(componentDiff, newVersions, prdResult, components);
       await postToSlack(blocks, text);
