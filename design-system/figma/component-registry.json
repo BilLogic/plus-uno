@@ -2158,7 +2158,28 @@
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [],
+        "sets": [
+          {
+            "id": "tree-dropdown-layers",
+            "name": "tree_dropdown layers",
+            "componentSetNodeId": "13529:1075",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13529-1075",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "note": "The indent layers a tree select is drawn from — 8 variants over open? and # of indents (0-3). Page-level and documented. The two sets under the page's Legacy section (tree_dropdown component ver 1, Indented Tree Select Item List) and the private _tree dropdown Indent are deliberately unmapped."
+          },
+          {
+            "id": "tree-select-ver2",
+            "name": "tree_select_ver2",
+            "componentSetNodeId": "13529:2016",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13529-2016",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": false,
+            "note": "The v2 tree select itself — a plain COMPONENT and not a set, which is what isComponentSet: false records. Resolved and typed against Figma on 2026-08-29."
+          }
+        ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-"
       }
     },

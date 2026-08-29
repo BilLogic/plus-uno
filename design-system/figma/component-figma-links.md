@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-58 docs-page links + 92 style/variant entries across 61 components.
+58 docs-page links + 94 style/variant entries across 61 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -160,6 +160,8 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Textarea | Form Textarea | `13541:10731` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731) | verified |
 | Components | Toast | Toast | `44:4803` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4803) | verified |
 | Components | Tooltip | Tooltip | `42:6020` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-6020) | verified |
+| Components | TreeSelect | tree_dropdown layers | `13529:1075` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13529-1075) | verified |
+| Components | TreeSelect | tree_select_ver2 | `13529:2016` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13529-2016) | verified |
 | Other | Footer | Footnote | `111:227940` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227940) | verified |
 | Other | Logo | Logo | `1133:12915` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=1133-12915) | verified |
 | Other | MaintenanceAlert | Maintenance Alert | `2370:194322` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=2370-194322) | verified |
