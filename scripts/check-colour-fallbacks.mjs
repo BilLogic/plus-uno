@@ -3,7 +3,7 @@
  * `npm run check:colour-fallbacks` — #268.
  *
  * What each defect is, and why one is ratcheted and the other is not, is written
- * once in `scripts/colour-fallbacks.mjs`. This file is the filesystem.
+ * once in `scripts/token-fallbacks.mjs`. This file is the filesystem.
  *
  * WHY IT COMPOSES INTO `check:harness` when `check:storybook` and
  * `check:docs-chrome` do not: it is static. No browser, no server, no `npm ci` —
@@ -20,7 +20,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { fallbackAudit, fallbackFailures, fallbackUsages, staleEntries, tokenDefinitions } from './colour-fallbacks.mjs';
+import {
+  fallbackAudit,
+  fallbackFailures,
+  fallbackUsages,
+  resolveAliases,
+  staleEntries,
+  tokenDefinitions,
+} from './token-fallbacks.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BASELINE = path.join(REPO_ROOT, 'docs', 'evals', 'colour-fallback-baseline.json');
@@ -42,7 +49,14 @@ function main() {
   const args = process.argv.slice(2);
 
   const tokenFiles = tracked([TOKEN_DIR]).filter((f) => /\.(scss|css)$/.test(f)).map(read);
-  const tokens = tokenDefinitions(tokenFiles);
+  // Aliases resolved so `--color-x: var(--color-y)` compares as `--color-y`'s
+  // value rather than as an incomparable `var()`. Only 11 of 195 colour tokens
+  // are aliases, and adding this found two more disagreements immediately —
+  // both in the `--color-info-*` family, which is one alias hop from
+  // `--color-tertiary-*` and was therefore invisible to the check that shipped
+  // in #313. Both are fixed in this change rather than recorded; the recorded
+  // set is still 191.
+  const tokens = resolveAliases(tokenDefinitions(tokenFiles));
   // An empty token map makes every `var()` look like an undefined token and
   // every comparison vacuous — the shape a moved directory produces.
   if (tokens.size === 0) {
