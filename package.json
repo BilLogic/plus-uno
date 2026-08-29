@@ -39,6 +39,7 @@
     "check:size-fallbacks": "node scripts/check-size-fallbacks.mjs",
     "check:typography-classes": "node scripts/check-typography-classes.mjs",
     "check:text-contrast": "node scripts/check-text-contrast.mjs",
+    "audit:figma-registry": "node scripts/figma-registry-audit.mjs",
     "check:unspread-rest": "node scripts/check-unspread-rest.mjs",
     "check:page-outline": "node scripts/check-page-outline.mjs",
     "check:docs-tabs": "node scripts/check-docs-tabs.mjs",
