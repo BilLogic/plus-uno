@@ -1,0 +1,14 @@
+{
+  "measured": "2026-08-29",
+  "why": "Two colour-token decisions (#312) that Button cannot make for itself. The set may shrink and must never grow: an entry that stops failing is itself reported, so a fix cannot be made and then quietly forgotten here.",
+  "contrast": [
+    "warning/filled"
+  ],
+  "duplicates": [
+    "info+tertiary"
+  ],
+  "notes": {
+    "warning/filled": "--color-on-warning (#ffffff) on --color-warning (#9f8205) measures 3.70:1, the only one of the 40 generated combinations under 4.5:1. Needs a darker filled warning ground, or filled warning disallowed. #268.",
+    "info+tertiary": "--color-info is literally `var(--color-tertiary)` in _colors.scss, and so is every other info slot. Two names, one appearance. Needs info re-pointed, merged into tertiary, or tertiary moved. #268."
+  }
+}
