@@ -103,4 +103,93 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `ChoiceGrid` when the same question is asked of several things at once — rate
+each of these six statements, tick which of these tools each tutor uses. It is a
+matrix: one question in the column headers, one subject per row.
+
+It is fully controlled. `values` is `{ rowId: columnId }` in `radio` mode and
+`{ rowId: { columnId: boolean } }` in `checkbox` mode, and the component holds no
+state of its own.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### `onChange` has two shapes, and only one of them is the new state.
+
+```jsx
+// radio — the two ids that changed. Merge them yourself.
+<ChoiceGrid type="radio" values={v} rows={rows} columns={cols}
+            onChange={(rowId, columnId) => setV({ ...v, [rowId]: columnId })} />
+
+// checkbox — the whole new values object, already merged.
+<ChoiceGrid type="checkbox" values={v} rows={rows} columns={cols}
+            onChange={(next) => setV(next)} />
+```
+
+### In checkbox mode, treat the object you passed in as spent.
+
+The merge copies the top level and writes into the row objects it finds, so the
+row you passed in is modified in place. Do not keep the previous `values` around
+to compare against — take the object `onChange` hands you as the new truth.
+
+### A radio row cannot be unanswered again.
+
+Selecting a column always sets it; there is no path back to "not answered". If
+that state is meaningful, add a column for it — "Not applicable" as a real
+option is better than a row the user cannot clear.
+
+### Keep the grid small.
+
+Every cell is a control, so a six-by-five grid is thirty tab stops. Past that,
+ask the questions one at a time with `MultipleChoice`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Every cell is named by its row and its column.** Each input carries
+  `aria-labelledby` pointing at both the row label and the column header, so it
+  is announced as "Punctuality, Agree" rather than as an unnamed radio in a
+  table.
+- **Radio rows are grouped per row.** Each row's inputs share a `name` built from
+  the row's id, which is what makes one answer per row and arrow-key movement
+  along it.
+- **The grid itself has no name.** There is no caption and no `aria-label` on the
+  table. Put the question above it as a heading, and describe the scale in the
+  column headers.
+- **The row-header column is empty on purpose.** It carries a visually hidden
+  "Row" so the header row is not a blank cell.
+- **On a narrow screen this is a wide table.** Put it in a horizontal
+  `ScrollBar` rather than letting the columns crush — a header the user cannot
+  read is a question they cannot answer.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For one question with several answers, use `MultipleChoice`.
+- For a rated answer with end labels, use `Scale`.
+- For data being displayed rather than answered, use `Table`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>
