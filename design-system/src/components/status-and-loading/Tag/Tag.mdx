@@ -4,6 +4,38 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 import * as TagStories from './Tag.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "variant": {
+      "type": "enum",
+      "values": ["read-only", "dismissible", "selectable", "operational"]
+    },
+    "color": {
+      "type": "enum",
+      "values": ["grey", "blue", "green", "purple", "magenta", "orange", "teal"]
+    },
+    "isSelected": { "type": "boolean" },
+    "isLoading": { "type": "boolean" }
+  },
+  "sets": [
+    {
+      "id": "tag",
+      "name": "Tag",
+      "componentSetNodeId": "17558:1218",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17558-1218",
+      "source": "manual",
+      "status": "unpublished",
+      "isComponentSet": true,
+      "variantProps": {
+        "variant": "trailing + selected",
+        "isSelected": "selected"
+      },
+      "notes": "Created 2026-08-29 on the Badge page, BESIDE Dismissible Badges rather than instead of it (#276, #339 finding 2). The code's `variant` axis does not map one-to-one: read-only and operational are both trailing=none/selected=false, dismissible is trailing=dismiss, selectable is the selected axis \u2014 three of the four look identical at rest. Not yet published to the library."
+    }
+  ]
+};
+
 <Meta of={TagStories} />
 
 <Title />
@@ -15,7 +47,10 @@ system-generated data that people can't change, use a badge instead.
 <DocsTab tab="examples">
 
 <ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17558-1218"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Tag"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">

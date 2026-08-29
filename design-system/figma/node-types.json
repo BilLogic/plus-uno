@@ -1,5 +1,5 @@
 {
-  "note": "What each mapped Figma node ACTUALLY is, read from Figma. Not derived from anything in this repo — it is a measurement, and check:figma-node-types holds the registry to it. Re-measure with npm run audit:figma-registry and record the date.",
+  "note": "What each mapped Figma node ACTUALLY is, read from Figma. Not derived from anything in this repo \u2014 it is a measurement, and check:figma-node-types holds the registry to it. Re-measure with npm run audit:figma-registry and record the date.",
   "measuredAt": "2026-08-29",
   "method": "figma.getNodeByIdAsync(id).type, one call per file, via the Figma Plugin API.",
   "files": {
@@ -180,6 +180,10 @@
       "type": "COMPONENT_SET"
     },
     "17169:43292": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "17558:1218": {
       "file": "zAecJNRdvJzAUOcjV32tRX",
       "type": "COMPONENT_SET"
     },
