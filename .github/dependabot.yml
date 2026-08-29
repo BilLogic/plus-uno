@@ -1,0 +1,74 @@
+# Automated upgrade checking (#266).
+#
+# WHY DEPENDABOT AND NOT RENOVATE. Renovate is the more configurable of the two
+# and would group better. It also needs a GitHub App installed on the account,
+# which is a permission grant and one more third party with write access to a
+# repo whose deploy job holds a Cloudflare token — the thing #289 exists to
+# narrow. Dependabot is already present, needs no install, and its grouping is
+# sufficient for a repo this size. If the grouping ever stops being sufficient,
+# that is the moment to revisit, not before.
+#
+# WHAT IT CANNOT SEE, and what covers that instead:
+#   - a declared dependency nothing imports  -> `npm run check:deps`
+#   - a library loaded from a CDN <link>     -> `npm run check:deps`
+# Both are in check:harness. See scripts/check-deps.mjs for what each one found.
+
+version: 2
+
+updates:
+  # ── The app, Storybook and the whole design-system toolchain ───────────────
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # Patch and minor together: individually they are noise, and a batch of
+      # them is one review against one CI run. The Storybook gate and
+      # check:harness both run on the PR, so a bad batch is caught before merge.
+      patch-and-minor:
+        update-types: [minor, patch]
+      # Storybook moves as a fleet — the core and every addon share a version,
+      # and upgrading one without the others is how the vitest addon's setup
+      # graph broke before (#157). Keep them in one PR so they land together.
+      storybook:
+        patterns: ["storybook", "@storybook/*"]
+    ignore:
+      # Majors still open a PR each; these two are decisions, not upgrades.
+      #
+      # react-bootstrap 3 is a React-19-native rewrite and is explicitly out of
+      # scope on #266: it wants its own issue once the component build-out
+      # direction is settled. 75+ files import it.
+      - dependency-name: react-bootstrap
+        update-types: [version-update:semver-major]
+      # Bootstrap 6 would move the CSS the whole design system sits on, and the
+      # prototypes load their own copy from a CDN (see CDN_BASELINE in
+      # scripts/check-deps.mjs). Two Bootstraps have to become one first.
+      - dependency-name: bootstrap
+        update-types: [version-update:semver-major]
+
+  # ── The Cloudflare Worker, which has its own manifest and its own runtime ──
+  - package-ecosystem: npm
+    directory: /agents/uno-bot
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+    groups:
+      patch-and-minor:
+        update-types: [minor, patch]
+
+  # ── Actions themselves. A pinned action drifts silently: nothing in the repo
+  # imports it, nothing installs it, and a deprecated runtime is announced in a
+  # deprecation warning inside a green run — which is exactly the failure shape
+  # #258 was about.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+    groups:
+      actions:
+        patterns: ["*"]
