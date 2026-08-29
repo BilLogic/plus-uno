@@ -143,11 +143,11 @@ a matching icon.
   #213 — see *Why `showLabel` cannot take the name away* below.
 - **`required` is visual only.** It renders a `*` span marked
   `aria-label="required"` and is not forwarded to the input.
-- **`validation` is visual only.** It adds `plus-input-invalid` or
-  `plus-input-success` and renders the message with an `aria-hidden` icon. It
-  sets no `aria-invalid`, and does not link `validationMessage` to the input.
-  Pass `aria-invalid` and `aria-describedby` yourself — they are spread onto the
-  input.
+- **`validation` is announced, not only drawn.** The message gets an id, the
+  input points at it with `aria-describedby`, and `validation="invalid"` sets
+  `aria-invalid` (#327). A `success` message describes without claiming an
+  error. Your own `aria-describedby` is kept and the message id is appended, so
+  standing help and a new error are both read, in that order.
 - **A field with no `label` still has no name.** `showLabel` decides whether the
   label is *seen*, not whether there is one. If the visible label is rendered by
   the caller instead — a `<Label>` above the field, a table column header — point

@@ -75,6 +75,11 @@ const DateAndTimePicker = ({
     const fieldId = useFieldId(id);
     const hasLabel = Boolean(label);
     const labelId = hasLabel ? `${fieldId}-label` : undefined;
+    /* #327 — see `Input.jsx`. Here the description belongs to the GROUP, which
+     * is the wrapper, not to either of the two inputs inside it. */
+    const validationId = validation !== 'none' && validationMessage
+        ? `${fieldId}-validation`
+        : undefined;
     const dateInputId = `${fieldId}-date`;
     const timeInputId = `${fieldId}-time`;
     const dateSectionLabelId = showSectionLabels ? `${dateInputId}-section-label` : undefined;
@@ -404,6 +409,13 @@ const DateAndTimePicker = ({
             role={hasLabel ? 'group' : undefined}
             aria-labelledby={labelId}
             {...props}
+            /* #327. After the spread, and composed with what the caller passed,
+             * so pointing at your own help text does not drop the error and the
+             * error does not drop your help text. #230 left the caller's value
+             * to win outright, which was right when there was nothing of ours to
+             * lose. */
+            aria-describedby={[props['aria-describedby'], validationId]
+                .filter(Boolean).join(' ') || undefined}
         >
             {hasLabel && (
                 <Form.Label
@@ -574,7 +586,10 @@ const DateAndTimePicker = ({
             </div>
 
             {validation !== 'none' && validationMessage && (
-                <div className={`plus-datetime-validation plus-datetime-validation-${validation}`}>
+                <div
+                    id={validationId}
+                    className={`plus-datetime-validation plus-datetime-validation-${validation}`}
+                >
                     {validationIcon}
                     <span className="plus-datetime-validation-message">{validationMessage}</span>
                 </div>
