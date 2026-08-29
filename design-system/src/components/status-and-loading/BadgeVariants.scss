@@ -1,0 +1,127 @@
+/*
+ * Badge — system-generated values (#276).
+ *
+ * THE APPEARANCE SET IS CLOSED, and that is the feature. With `style="primary"`
+ * as the old default, a badge's colour carried no consistent signal: a reader
+ * could not tell whether blue meant "information", "the brand colour", or
+ * nothing in particular. Five names, five token pairs, no new tokens.
+ *
+ * `discovery` borrows the curriculum palette's purple — the one non-semantic set
+ * in the system, and the same borrowing #276 sanctions for it by name.
+ */
+$badge-appearances: (
+    'positive': (--color-success-container, --color-on-success-container),
+    'negative': (--color-danger-container, --color-on-danger-container),
+    'neutral': (--color-surface-container, --color-on-surface-variant),
+    'information': (--color-info-container, --color-on-info-container),
+    'discovery': (--color-mastering-content-container, --color-on-mastering-content-container),
+);
+
+.plus-badge-v {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-element-gap-sm);
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+    vertical-align: middle;
+    white-space: nowrap;
+
+    /*
+     * TYPE IS NOT SET HERE, and must not be. It comes from `.body2-txt` in the
+     * JSX — the design system's own body class — because #276's rule is that
+     * density changes padding and NEVER type size. A badge that set its own type
+     * could disagree with the text beside it, which is the defect the removed
+     * `size` prop caused on 84 call sites.
+     */
+}
+
+@each $name, $tokens in $badge-appearances {
+    .plus-badge-v--#{$name} {
+        background-color: var(#{nth($tokens, 1)});
+        color: var(#{nth($tokens, 2)});
+    }
+}
+
+/*
+ * Density. Measured on Atlassian's live lozenge:
+ *
+ *   default   20px tall,  4px inline padding, 4px radius
+ *   spacious  32px tall, 12px inline padding, 6px radius
+ *
+ * with font-size and line-height identical at 14px/20px in both. The radius
+ * steps so the corner stays optically consistent on the taller box.
+ *
+ * The rule for authors: SPACIOUS WHEN THE BADGE IS A SUBJECT OF THE PAGE —
+ * beside a heading, in a detail header, in an empty state. DEFAULT WHEN IT IS
+ * METADATA ABOUT A ROW — table cells, list items, inline in prose.
+ */
+.plus-badge-v--default {
+    min-height: 20px;
+    padding: 0 var(--size-element-pad-x-sm, 4px);
+    border-radius: var(--size-element-radius-md, 4px);
+}
+
+.plus-badge-v--spacious {
+    min-height: 32px;
+    padding: 0 var(--size-element-pad-x-lg, 12px);
+    border-radius: var(--size-border-radius-radius-150, 6px);
+}
+
+.plus-badge-v--bold {
+    font-weight: var(--font-weight-semibold, 600);
+}
+
+/*
+ * A counter is a pill, not a rounded rectangle: it holds a number of varying
+ * width and the full radius is what keeps 9 and 1204 looking like one control.
+ */
+.plus-badge-v--counter {
+    border-radius: 999px;
+    padding: 0 var(--size-element-pad-x-sm, 4px);
+    min-width: 20px;
+}
+
+/*
+ * The dot. A counter with nothing to say — "there is something here, and the
+ * number does not matter". Sized from the same token as the counter's own
+ * minimum so the two anchor identically against whatever they sit beside.
+ */
+.plus-badge-v--dot {
+    inline-size: var(--size-element-gap-md, 10px);
+    block-size: var(--size-element-gap-md, 10px);
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    border-radius: 50%;
+}
+
+/*
+ * The trailing metric. It is a counter badge INSIDE a status badge, so it needs
+ * to read against a ground that is already tinted — hence bold, and a ground
+ * derived from the outer one rather than inherited flat, which would leave the
+ * two indistinguishable.
+ */
+.plus-badge-v__metric {
+    margin-right: calc(var(--size-element-pad-x-sm, 4px) * -1);
+    background-color: color-mix(in srgb, currentColor 16%, transparent);
+    color: inherit;
+}
+
+.plus-badge-v--truncated .plus-badge-v__text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.plus-badge-v__text {
+    min-width: 0;
+}
+
+.plus-badge-v__icon {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+}

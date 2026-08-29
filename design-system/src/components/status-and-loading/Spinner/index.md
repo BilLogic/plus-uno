@@ -36,7 +36,7 @@ From `design-system/src/components/status-and-loading/Spinner/Spinner.scss`. Ove
 
 ## Related
 
-Same group: `Badge` · `Progress`
+Same group: `Badge` · `BadgeVariants` · `Progress`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 
