@@ -233,6 +233,24 @@ set_env_secret() {
   warn "skipped $name: gh not ready. Set it by hand before merging."
 }
 
+# ask_required KEY "Prompt" — `ask`, but an empty answer is not an answer.
+#
+# WHY. The library's `ask` accepts "" and hands it straight to `write_env`, so a
+# run with no one at the keyboard (a pipe, a closed stdin, an impatient Enter)
+# walks the whole eleven stages writing blanks and only fails at the end, in
+# apply-cutover, having already opened six browser tabs. Three tries, then stop:
+# a bounded loop, so a non-interactive run terminates instead of spinning.
+ask_required() {
+  local key="$1" prompt="$2" attempt
+  for attempt in 1 2 3; do
+    ask "$key" "$prompt"
+    [[ -n "${!key}" ]] && return 0
+    warn "That is empty, and an empty value would be written to the repo."
+  done
+  warn "No value after three tries. Stopping rather than recording a blank."
+  exit 1
+}
+
 banner "uno-bot → your Cloudflare account (#288)"
 
 # ── 1 ─────────────────────────────────────────────────────────────────────
@@ -248,6 +266,43 @@ for tool in node wrangler gh git; do
 done
 WRANGLER="$BOT_DIR/node_modules/.bin/wrangler"
 [[ -x "$WRANGLER" ]] || WRANGLER="wrangler"
+
+# `command -v node` proves nothing: wrangler declares a Node floor and refuses
+# to run below it, with an error that reads like advice rather than a stop.
+# The floor is READ from the installed wrangler's engines field, so this cannot
+# drift from the wrangler this repo actually pins.
+NODE_FLOOR="$(node -e "
+  try {
+    const e = require('$BOT_DIR/node_modules/wrangler/package.json').engines || {};
+    const m = /(\\d+)/.exec(e.node || '');
+    if (m) console.log(m[1]);
+  } catch {}
+" 2>/dev/null)"
+NODE_MAJOR="$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null)"
+if [[ -n "$NODE_FLOOR" && -n "$NODE_MAJOR" && "$NODE_MAJOR" -lt "$NODE_FLOOR" ]]; then
+  warn "node $(node -v) is below wrangler's floor of v${NODE_FLOOR}."
+  note "  Every wrangler call in this wizard would fail, several of them quietly."
+  # Naming the version that is already installed beats naming a manager: it is
+  # one line to paste rather than a search.
+  READY=""
+  for candidate in "$HOME"/.nvm/versions/node/v*/bin/node; do
+    [[ -x "$candidate" ]] || continue
+    major="$("$candidate" -p 'process.versions.node.split(".")[0]' 2>/dev/null)"
+    # The LOWEST satisfying version, not the newest: the smallest step away
+    # from the Node this repo is otherwise run on.
+    [[ -n "$major" && "$major" -ge "$NODE_FLOOR" && -z "$READY" ]] && READY="$("$candidate" -v)"
+  done
+  if [[ -n "$READY" ]]; then
+    note "  You already have $READY installed. In this shell:"
+    note "    nvm use ${READY#v}"
+  else
+    note "  Install one: nvm install $NODE_FLOOR   (or volta install node@$NODE_FLOOR)"
+  fi
+  note "  Then re-run this wizard. It resumes from what is already in .cutover.env."
+  exit 1
+fi
+note "✓ node $(node -v) (wrangler needs v${NODE_FLOOR:-?}+)"
+
 BRANCH="$(git -C "$REPO_ROOT" rev-parse --abbrev-ref HEAD)"
 note "branch: $BRANCH"
 if [[ "$BRANCH" == "main" ]]; then
@@ -264,11 +319,17 @@ note "This opens a browser. Pick YOUR account, not the current one."
 confirm "Run 'wrangler login' now? (skip if already logged in as yourself)" && "$WRANGLER" login || true
 say ""
 say "Reading the accounts this login can see:"
-"$WRANGLER" whoami || warn "wrangler whoami failed — log in and re-run."
+if ! "$WRANGLER" whoami; then
+  warn "wrangler whoami failed, so the account list above is not there."
+  note "  The next question asks you to copy an Account ID out of that list."
+  note "  Answering it from memory is how the wrong id gets written into seven"
+  note "  files, so this stops here instead. Fix the login and re-run."
+  exit 1
+fi
 say ""
 step "Copy the Account ID of the account you are moving INTO."
 warn "It must NOT be $OLD_ACCOUNT — that is the account you are leaving."
-ask NEW_ACCOUNT_ID "Paste the new Account ID:"
+ask_required NEW_ACCOUNT_ID "Paste the new Account ID:"
 if [[ "$NEW_ACCOUNT_ID" == "$OLD_ACCOUNT" ]]; then
   warn "That is the old account. Nothing to move. Stopping."
   exit 1
@@ -307,8 +368,8 @@ step "Creating them in $NEW_ACCOUNT_ID:"
 "$WRANGLER" kv namespace create HARNESS_KV 2>&1 | sed 's/^/    /' || warn "create failed — make it in the dashboard instead."
 say ""
 step "Copy each new namespace id from the output above."
-ask NEW_SLACK_OAUTH_KV_ID "SLACK_OAUTH_KV id:"
-ask NEW_HARNESS_KV_ID "HARNESS_KV id:"
+ask_required NEW_SLACK_OAUTH_KV_ID "SLACK_OAUTH_KV id:"
+ask_required NEW_HARNESS_KV_ID "HARNESS_KV id:"
 write_env NEW_SLACK_OAUTH_KV_ID "$NEW_SLACK_OAUTH_KV_ID"
 write_env NEW_HARNESS_KV_ID "$NEW_HARNESS_KV_ID"
 pause
@@ -340,7 +401,7 @@ say ""
 open_url "https://dash.cloudflare.com/$NEW_ACCOUNT_ID/workers/subdomain"
 step "That page shows your workers.dev subdomain. The Worker will be at"
 step "  uno-bot.<subdomain>.workers.dev"
-ask NEW_WORKER_HOST "New hostname (no https://):"
+ask_required NEW_WORKER_HOST "New hostname (no https://):"
 write_env NEW_WORKER_HOST "$NEW_WORKER_HOST"
 say ""
 node "$BOT_DIR/scripts/apply-cutover.mjs" --check || { warn "apply-cutover refused. Read it above; nothing was written."; exit 1; }
