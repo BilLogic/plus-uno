@@ -106,4 +106,101 @@ Easily extend form controls by adding text, check box, radio, or button on eithe
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `InputGroup` for a text field joined edge-to-edge with something else — a
+unit after the box, a currency symbol before it, a button that acts on what was
+typed. The joining is the whole point: the addons share the field's border, so
+they read as one control.
+
+Up to two addons sit on each side. `leadingVisual`, `leadingVisual2`,
+`trailingVisual` and `trailingVisual2` each take an element, a string shorthand,
+or an object like `{ type: 'button', text: 'Go', onClick }`. The subcomponents —
+`InputGroup.Text`, `.Icon`, `.Button`, `.Dropdown`, `.Checkbox`, `.Radio` — are
+what those shorthands build, and can be passed directly.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### The field cannot be labelled. Use `Input` when it needs a label.
+
+```jsx
+// Incorrect — `id` is applied to the group, not to the input, and forwarded
+// props go to the group too. There is no way to name the field through this
+// component's API, so it is an unnamed text box.
+<label htmlFor="amount">Amount</label>
+<InputGroup id="amount" leadingVisual="£" />
+
+// Correct — Input takes a label, does the association, and has its own
+// leading and trailing visuals.
+<Input label="Amount" leadingVisual="fa-solid fa-sterling-sign" value={v} onChange={setV} />
+```
+
+Reach for `InputGroup` when the addon is a real control — a button or a dropdown
+that `Input` cannot hold — and give the field its name another way.
+
+### An unrecognised string addon becomes text.
+
+```jsx
+// Incorrect — "buttons" is not one of the shorthands, so it renders as the
+// literal text "buttons" in an addon.
+<InputGroup trailingVisual="buttons" />
+
+// Correct — the shorthands are checkbox, radio, icon, plus, button, dropdown.
+// Anything else is text, which is what makes the typo silent.
+<InputGroup trailingVisual={{ type: 'button', text: 'Search', onClick: run }} />
+```
+
+### The string shorthands come with defaults you probably do not want.
+
+`"checkbox"` and `"radio"` render already checked, with no handler and the
+generic names "Toggle option" and "Select option". `"button"` is labelled
+"Button". Use the object form as soon as the addon does anything.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The input has no accessible name and no way to be given one.** It carries no
+  `id`, no `label` and no forwarded ARIA — `id` and extra props land on the
+  wrapping group. Where a name is required, and it usually is, use `Input`.
+- **Addon controls are named generically.** The checkbox and radio addons
+  default to "Toggle option" and "Select option"; pass `aria-label` in the object
+  form to say what they actually do.
+- **An addon that acts on the field must be a control.** `InputGroup.Button` and
+  `InputGroup.Dropdown` are real ones. `InputGroup.Text` and `InputGroup.Icon`
+  are decoration — the icon is `aria-hidden`, so an icon that means something
+  needs text beside it.
+- **Two addons a side is the limit, and it is a limit for a reason.** Four things
+  bolted to a field are four things a screen-reader user meets before the field
+  itself.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a labelled text field — the usual case — use `Input`, which has its own
+  leading and trailing visuals.
+- For a number with a stepper, use `NumberInput`.
+- For a button that is not attached to a field, use `Button` beside it.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

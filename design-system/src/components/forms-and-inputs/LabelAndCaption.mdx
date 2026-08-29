@@ -87,4 +87,114 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+These are the two lines that bracket a field: the label above it, and the caption
+below. Every field component in this group draws them for you — this page is the
+typography they all share, and the rules for what goes in them.
+
+A **label** names the field. It is always present, it is short, and it does not
+change. A **caption** is the line under the control that helps, warns or
+explains, and it carries a state: `default`, `success`, `danger`, `warning`,
+`disabled`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Say what the field is, not what to do with it.
+
+```jsx
+// Incorrect — an instruction where the name should be. It reads badly in a
+// screen reader's list of form fields, where the labels appear without context.
+<Input label="Enter your email address" />
+
+// Correct — the instruction is a caption if it is needed at all.
+<Input label="Email address" />
+```
+
+### A caption is help; a placeholder is not.
+
+A hint written into `placeholder` disappears the moment the user types, which is
+when they need it, and it is low contrast by design. Put help in a caption.
+
+### The neutral caption has no prop on most fields.
+
+```jsx
+// Incorrect — there is no caption or helper prop. Input, NumberInput and
+// FileUpload render a message only in a validation state.
+<Input label="Phone" caption="Include the area code" />
+
+// What exists — a message tied to success or failure.
+<Input label="Phone" validation="invalid"
+       validationMessage="Include the area code." />
+
+// For standing help with no state, render the line yourself under the field,
+// give it an id, and point the control at it.
+<Input label="Phone" aria-describedby="phone-help" />
+<p id="phone-help" className="body3-txt">Include the area code.</p>
+```
+
+### Write the error, not the fact that there is one.
+
+A `danger` caption should say what to do: "Choose a date after today", not
+"Invalid date". The state colours the line; the words do the work.
+
+### The asterisk is decoration.
+
+Across these components the required marker is a `span` beside the label with
+`aria-label="required"`. None of them sets the `required` attribute or
+`aria-required` on the control, so the asterisk is a convention for sighted
+users and your own validation is what enforces it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The label must be associated, not merely adjacent.** The field components do
+  this with `htmlFor` and a shared id. Where you build a field yourself, a label
+  that sits above an input and points at nothing names nothing.
+- **A label for a set of controls is not a `label`.** For radios or a scale, a
+  `label` element would point at one control and clicking it would select that
+  one. `Scale` and `Rating` use a `span` with an id and name the group with
+  `aria-labelledby` instead — that is the pattern to copy.
+- **Captions are not attached to their fields.** Across these components the
+  caption and validation message render as text with no id, and the control
+  carries no `aria-describedby` and no `aria-invalid`. A screen-reader user hears
+  the field's name and not its help. Where the caption must be announced, render
+  it yourself with an id and point at it — the field components that forward
+  props let you.
+- **Do not hide the label.** `showLabel={false}` is meant to move pixels, not to
+  remove the name; on `Input` it clips the label and keeps it, which is the
+  behaviour to expect.
+- **State is never colour alone.** The caption states carry an icon as well as a
+  colour, and the words should stand without either.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For the fullest treatment of naming a field, including why the label cannot be
+  taken away, see `Input`.
+- For a group of controls under one question, see `Scale` or `MultipleChoice`.
+- For a message about the whole form rather than one field, use `Alert`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

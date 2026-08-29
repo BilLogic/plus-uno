@@ -86,4 +86,95 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `TreeSelect` to choose from a nested set where the nesting matters and the
+list is too long to show at once — a subject tree, a folder, an organisation.
+`multiple` turns it from one choice into many, with a checkbox on every node and
+a tri-state parent that reflects its descendants.
+
+`value` is a single value in single mode and an array in `multiple` mode;
+`onChange` matches. `options` takes strings or `{ label | text, value, children,
+disabled }`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Selecting a parent selects its subtree.
+
+```jsx
+// In multiple mode, toggling a node toggles every descendant with it, and a
+// parent shows indeterminate when only some of its children are selected. The
+// value you receive is the flat list of every selected node, parents included.
+<TreeSelect multiple options={subjects} value={selected} onChange={setSelected} />
+```
+
+If you only want leaves, filter the array you are handed.
+
+### Expanding is not selecting.
+
+The caret expands and collapses without changing the selection — its click
+handler stops there. Clicking anywhere else on the row selects it, including on a
+parent.
+
+### Name it through the forwarded props.
+
+`id` is applied to the wrapper, not to the input, so a `label` pointing at it
+names nothing. Pass `aria-label` or `aria-labelledby`, which are forwarded to the
+input that takes focus.
+
+### Values must be unique across the whole tree.
+
+Lookup is a depth-first search by value and selection is a flat set, so the same
+value appearing under two parents is one node as far as this component is
+concerned.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The roles are right.** The input is a `combobox` with `aria-haspopup="tree"`
+  and `aria-expanded`; the panel is a `tree`; every node is a `treeitem` with
+  `aria-expanded`, `aria-selected` and `aria-disabled` where each applies.
+- **The tree is not keyboard-navigable.** No node is a tab stop and there are no
+  key handlers, so the arrow-key movement a `tree` implies is not there. In
+  `multiple` mode the per-node checkboxes are real inputs and can be reached and
+  toggled; in single mode there is no keyboard path to a selection at all.
+- **Nothing connects the combobox to the tree.** There is no `aria-controls` and
+  no `aria-activedescendant`, so the relationship exists visually and not
+  programmatically.
+- **Indeterminate is set on the input, not implied.** A partly selected parent
+  gets the real `indeterminate` property, so it announces as mixed rather than as
+  unchecked.
+- **Where a keyboard path is required, prefer `Select`** — or use `multiple` mode
+  here, whose checkboxes are at least operable.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a path down a hierarchy shown as columns, use `Cascader`.
+- For a flat list, use `Select`.
+- For a handful of nested options that all fit on screen, use `MultipleChoice`
+  under headings.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

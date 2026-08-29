@@ -95,4 +95,102 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Cascader` to pick one path down a shallow hierarchy where each level narrows
+the next — region then city, subject then topic. The columns are the point: the
+user sees where they are in the tree while they choose.
+
+`value` is the path as an array of values, root first, and `onChange` gives you
+the same. `options` takes strings or `{ text | label, value, children, disabled }`
+objects, nested by `children`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### `onChange` fires only on a leaf.
+
+```jsx
+// Choosing a branch opens the next column and reports nothing. Only an option
+// with no children commits the path and calls onChange — so a partial path is
+// not a value this component can return.
+<Cascader options={regions} value={path} onChange={setPath} />
+```
+
+If a branch is a legitimate answer, give it a child that says so ("All of
+Scotland"), rather than expecting the intermediate click to commit.
+
+### The field is unnamed unless you name it.
+
+```jsx
+// Incorrect — `id` is put on the wrapper div, not on the input, so a label
+// pointing at it points at a div and names nothing.
+<label htmlFor="region">Region</label>
+<Cascader id="region" options={regions} />
+
+// Correct — extra props are forwarded to the input, so name it there.
+<Cascader aria-label="Region" options={regions} value={path} onChange={setPath} />
+```
+
+### A falsy option `value` falls through to the text.
+
+The value of an option is read as `option.value || option.text || option.label`,
+so `{ value: 0 }` and `{ value: '' }` resolve to the label instead. Use non-empty
+string values.
+
+### It is a mouse-driven control.
+
+The menu opens on click, the columns preview on hover, the options are `div`s
+with no role and no tab stop, and nothing closes it but a click elsewhere. Where
+the audience is not guaranteed to be using a mouse, use `TreeSelect` or `Select`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The options are not reachable by keyboard.** Each is a `div` with an
+  `onClick` and no `role`, no `tabIndex` and no key handler. Tab reaches the
+  input and then leaves; there is no way to open the menu, move through it or
+  choose from it without a pointer.
+- **The state of the control is not announced.** The input is a read-only text
+  field with no `role="combobox"`, no `aria-expanded` and no `aria-controls`, so
+  nothing says a menu opened or what it holds.
+- **Escape does not close it.** The only dismissal is a `mousedown` outside the
+  wrapper.
+- **Name it through the forwarded props.** `aria-label` or `aria-labelledby`
+  passed to the component reaches the input, which is the element that gets
+  focus. `id` does not — it lands on the wrapper.
+- **Do not use it for a required or sole path through a task.** Everything above
+  means some users cannot complete it. `TreeSelect` covers the same shape with
+  real roles, and `Select` covers a flat list properly.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For the same hierarchy with tree roles and a multi-select mode, use
+  `TreeSelect`.
+- For a flat list of options, use `Select`.
+- For a hierarchy the user browses rather than selects from, use `Accordion` or
+  `SidebarTab`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>
