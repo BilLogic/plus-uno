@@ -265,6 +265,19 @@ const DatePicker = ({
                     key={`curr-${i}`}
                     type="button"
                     disabled={isDisabled}
+                    /*
+                     * #331. A day used to announce as a bare number — "17,
+                     * button" — with the month and year only in a header that is
+                     * not read with it, and with nothing saying which day was
+                     * chosen or which is today. The full date as the accessible
+                     * name is what makes a day legible on its own; `aria-pressed`
+                     * carries the selection, and `aria-current="date"` today.
+                     */
+                    aria-label={date.toLocaleDateString(undefined, {
+                        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+                    })}
+                    aria-pressed={isSelected}
+                    aria-current={isToday ? 'date' : undefined}
                     onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
