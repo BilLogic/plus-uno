@@ -95,7 +95,7 @@ $tag-colors: (
 
 .plus-tag:focus-visible {
     outline: var(--size-element-stroke-lg, 2px) solid var(--color-primary);
-    outline-offset: var(--size-element-gap-xs, 2px);
+    outline-offset: var(--size-element-gap-xs, 4px);
 }
 
 /* Truncation. The full text stays reachable through `title` — set in the JSX,
