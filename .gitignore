@@ -78,3 +78,4 @@ docs/knowledge/research/2026-07-12-uno-bot-cost-analysis.md
 # uno-bot eval output — full agent transcripts, may quote Slack/Notion content
 eval-results.json
 retrieval-eval-results.json
+.cutover.env
