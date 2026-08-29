@@ -1,3 +1,40 @@
+// #333. The play/pause control for an autoplaying carousel. It sits outside the
+// slides so it cannot scroll away from the person reaching for it, and it is
+// positioned over the bottom-left corner where it does not collide with the
+// prev/next controls or the indicators.
+.plus-carousel-shell {
+    position: relative;
+}
+
+.plus-carousel-playpause {
+    position: absolute;
+    /*
+     * A 10px inset, and it has to come from a token that IS 10px. The element
+     * pad ramp is 12px on x and 6px on y, so `-md` on both axes was writing
+     * `10px` as a fallback beside two tokens that are neither — the control sat
+     * 12px in and 6px up, asymmetrically, and the literal made it read square.
+     * Caught by check:size-fallbacks (#336).
+     */
+    left: var(--size-spacing-small-space-150, 10px);
+    bottom: var(--size-spacing-small-space-150, 10px);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 50%;
+    color: var(--color-on-surface);
+    background-color: var(--color-surface-container-lowest);
+    cursor: pointer;
+
+    &:focus-visible {
+        outline: var(--size-element-stroke-lg) solid var(--color-primary);
+        outline-offset: 2px;
+    }
+}
+
 /*
  * Carousel Component Styles
  * Implements Design System tokens for carousel navigation and indicators.

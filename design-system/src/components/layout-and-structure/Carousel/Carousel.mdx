@@ -125,14 +125,15 @@ on. `fade` is accepted and ignored — the transition is always a slide.
 <Carousel slides={[{ content: '/hero/autumn.png', alt: 'Students in a workshop' }]} />
 ```
 
-### Autoplay is off, and turning it on is a decision.
+### Autoplay is off, and turning it on adds a control.
 
 ```jsx
-// Incorrect — content that moves for more than five seconds needs a way to stop
-// it, and hover is not one for a keyboard or touch user.
+// Setting an interval starts the rotation AND renders a play/pause button, so
+// the movement can be stopped without a mouse (#333). Leaving it off is still
+// the better default — a carousel nobody asked to move is a carousel people
+// read half of.
 <Carousel interval={4000} slides={slides} />
 
-// Correct — leave it off, and let the controls do the moving.
 <Carousel slides={slides} />
 ```
 
@@ -151,9 +152,11 @@ on. `fade` is accepted and ignored — the transition is always a slide.
 - **`keyboard` is on by default.** Left and right arrows move between slides when
   the carousel has focus. Leaving it on is what makes the component operable
   without a mouse.
-- **Autoplay is a WCAG question, not a preference.** Anything that moves for
-  more than five seconds must be pausable. `pause="hover"` covers a mouse and
-  nothing else — if you set an `interval`, add a real pause control.
+- **Autoplay comes with its pause control.** Anything that moves for more than
+  five seconds must be pausable, and `pause="hover"` covers a mouse and nothing
+  else. Setting an `interval` renders a play/pause button, named for what
+  pressing it will do and reachable by keyboard (#333). It appears only when
+  there is autoplay to pause.
 - **Captions are an `h5` and a `p`.** The title is a heading at a fixed level,
   so a page of carousels contributes a flat run of `h5`s to the outline.
 
