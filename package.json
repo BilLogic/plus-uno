@@ -111,7 +111,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^13.1.1",
-    "highcharts": "^12.4.0",
+    "highcharts": "^13.0.1",
     "highcharts-react-official": "^3.2.3",
     "radix-ui": "^1.4.3",
     "react": "^19.2.8",
