@@ -262,3 +262,34 @@ gate. What the comparison catches:
 - the flag, in both directions
 
 It still cannot tell you whether the mapped node is the **right** one.
+
+## One set added — 2026-08-29
+
+`Tag` `17558:1218`, on the Badge page, **beside** `Dismissible Badges` rather
+than instead of it. That takes the reverse sweep's public-set count from 157 to
+158 and the mapped count from 75 to 76; `Tag` and `TagGroup` were two of finding
+3's "23 code components with no Figma set" in #339, and one of them now has one.
+
+`TagGroup` still has none, deliberately: it owns gaps and wrapping, which a
+component set cannot show without inventing content for it.
+
+**Why it is a new set and not a mapping.** #339 finding 2 proposed mapping
+`Dismissible Badges` → `Tag`, on the grounds that static-versus-dismissible is
+exactly #276's badge/tag split. Read live, the set's variant props are
+`style = default | primary | secondary | tertiary | danger | success | warning | info`
+and `state`. That colour axis is precisely what a tag must not offer — #276's
+argument is that a tag's colour is a category and never a status, and a green
+tag beside a red one reads as "this went well" when it only means "Science". So
+the shape was right and the vocabulary was wrong, and mapping the two would have
+told a designer that `<Tag color="danger">` exists while `check:doc-identifiers`
+rejects exactly that string on the docs page.
+
+The new set's axes are the VISUAL ones — `color` × `trailing` × `selected`, 28
+variants — because three of the code's four `variant` values look identical at
+rest. That divergence is recorded in `figmaMeta.variantProps` and written out in
+full in the set's description and in the `DOC — Tag vs Dismissible Badges (#276)`
+frame beneath it, rather than papered over by inventing a visual difference the
+code does not have.
+
+**Unpublished.** Every Figma edit in this pass is local to the file until
+somebody publishes the library.

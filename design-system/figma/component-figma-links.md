@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-56 docs-page links + 90 style/variant entries across 59 components.
+57 docs-page links + 91 style/variant entries across 60 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -56,6 +56,7 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | SidebarTab | `17118:120` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17118-120) |
 | Components | Spinner | `3497:19485` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19485) |
 | Components | Switch | `14876:12006` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12006) |
+| Components | Tag | `17558:1218` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17558-1218) |
 | Components | Textarea | `13543:5904` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904) |
 | Components | Toast | `3548:245993` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245993) |
 | Components | Tooltip | `3497:19486` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19486) |
@@ -151,6 +152,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Table | Table/Normal Border | `10:502` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-502) | verified |
 | Components | Table | Table/Normal Borderless | `10:473` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-473) | verified |
 | Components | Table | Table/Small Borderless | `10:507` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-507) | verified |
+| Components | Tag | Tag | `17558:1218` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17558-1218) | unpublished |
 | Components | Textarea | Form Short Textarea | `13543:5904` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904) | verified |
 | Components | Textarea | Form Short Textarea (MDX link) | `13543:5904` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904) | verified |
 | Components | Textarea | Form Textarea | `13541:10731` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731) | verified |

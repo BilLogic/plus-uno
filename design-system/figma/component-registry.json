@@ -1890,6 +1890,63 @@
         ]
       }
     },
+    "Tag": {
+      "code": {
+        "import": "@/components/status-and-loading",
+        "export": "default",
+        "mdxPath": "design-system/src/components/status-and-loading/Tag/Tag.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Tag",
+        "props": {
+          "variant": {
+            "type": "enum",
+            "values": [
+              "read-only",
+              "dismissible",
+              "selectable",
+              "operational"
+            ]
+          },
+          "color": {
+            "type": "enum",
+            "values": [
+              "grey",
+              "blue",
+              "green",
+              "purple",
+              "magenta",
+              "orange",
+              "teal"
+            ]
+          },
+          "isSelected": {
+            "type": "boolean"
+          },
+          "isLoading": {
+            "type": "boolean"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "tag",
+            "name": "Tag",
+            "componentSetNodeId": "17558:1218",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17558-1218",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "variantProps": {
+              "variant": "trailing + selected",
+              "isSelected": "selected"
+            },
+            "notes": "Created 2026-08-29 on the Badge page, BESIDE Dismissible Badges rather than instead of it (#276, #339 finding 2). The code's `variant` axis does not map one-to-one: read-only and operational are both trailing=none/selected=false, dismissible is trailing=dismiss, selectable is the selected axis — three of the four look identical at rest. Not yet published to the library."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17558-1218"
+      }
+    },
     "Textarea": {
       "code": {
         "import": "@/components/forms-and-inputs",
