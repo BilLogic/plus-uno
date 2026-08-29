@@ -146,6 +146,18 @@ const COMPOSED = [
       'no component stylesheet colouring text in the same token as the surface under it. `Navbar` shipped one for the life of the component at 1.00:1 (#219); axe cannot see this class, because the text sits in a transparent box over a painted ancestor.',
   },
   {
+    script: 'check:colour-fallbacks',
+    pkg: 'root',
+    guards:
+      'the literal beside a colour token agreeing with that token (#268). `var(--color-on-surface-variant, #5c5c5c)` reads as one decision and is two — that token is `#3f484a`, and it carries TEN different fallbacks across its uses, none of them the token. 191 of 473 comparable fallbacks disagree, so the recorded set is ratcheted and only a NEW one fails. It also holds 27 `--color-*` names that are referenced and defined nowhere, where the fallback IS the colour. Static and sub-second, which is why it composes here while the browser checks do not.',
+  },
+  {
+    script: 'check:size-fallbacks',
+    pkg: 'root',
+    guards:
+      "the same rule as check:colour-fallbacks, over the tokens that decide layout rather than colour — and it is the bigger half. 454 of 1075 comparable fallbacks disagree with their token: `var(--size-section-gap-sm, 16px)` is written 61 times for a token that is `8px`, and `var(--size-element-pad-y-lg, 12px)` 52 times for one that is `8px`. Colour's version of this defect paints a wrong shade when the token sheet is late; this one lays out a different page. Ratcheted at 68 distinct pairs. Two entry points rather than one because the families genuinely differ: dimensions have no shared name prefix and are selected by value, and an undefined dimension name is usually a component-local custom property rather than a defect.",
+  },
+  {
     script: 'check:unspread-rest',
     pkg: 'root',
     guards:
@@ -256,6 +268,12 @@ const EXCLUDED = {
     'which made it runnable from a worktree at last (it had aborted all 388 story files ' +
     'there). The answer did not change: measured 166s in a worktree, and being able to ' +
     'run it by hand is what that ticket was for.',
+  'check:docs-chrome':
+    'the same reason as check:storybook, and it runs in the same job: it needs `npm ci`, a ' +
+    'Playwright chromium and a Storybook server before it can measure anything. It exists ' +
+    'because `check:storybook` does NOT cover docs pages — that suite tests stories, and #263 ' +
+    'found four chrome defects on docs pages that no check could ever have caught. It is a ' +
+    'step in `.github/workflows/storybook-gate.yml`, which already pays for the browser.',
   'check:fetch':
     'reads only agents/uno-bot/src/. A root-only PR cannot break it, and `npm run deploy` gates it at its own boundary.',
   'check:contract':
