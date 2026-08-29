@@ -61,9 +61,15 @@ const NumberInput = ({
     const handleIncrement = () => {
         if (disabled || readonly) return;
         
+        /*
+         * #318. An empty field reads as 0, so `min={5}` used to step to 1 —
+         * below its own floor. Clamping to BOTH bounds is what makes the
+         * stepper unable to leave the range it was given, from any start.
+         */
         const currentValue = parseFloat(value || internalValue) || 0;
-        const newValue = currentValue + step;
-        const finalValue = max !== undefined ? Math.min(newValue, max) : newValue;
+        let finalValue = currentValue + step;
+        if (max !== undefined) finalValue = Math.min(finalValue, max);
+        if (min !== undefined) finalValue = Math.max(finalValue, min);
         
         const syntheticEvent = {
             target: {
@@ -82,8 +88,9 @@ const NumberInput = ({
         if (disabled || readonly) return;
         
         const currentValue = parseFloat(value || internalValue) || 0;
-        const newValue = currentValue - step;
-        const finalValue = min !== undefined ? Math.max(newValue, min) : newValue;
+        let finalValue = currentValue - step;
+        if (min !== undefined) finalValue = Math.max(finalValue, min);
+        if (max !== undefined) finalValue = Math.min(finalValue, max);
         
         const syntheticEvent = {
             target: {
@@ -150,18 +157,34 @@ const NumberInput = ({
 
     return (
         <div className="plus-number-input-container">
-            {showLabel && label && (
-                <Form.Label htmlFor={fieldId} className="plus-number-input-label">
+            {/*
+              * #318. `showLabel={false}` HIDES the label; it does not delete it.
+              * Deleting it left the input with no accessible name at all, which
+              * is the defect `Input` was fixed for in #213 and which
+              * `LabelAssociation.stories.jsx` states as a rule for the whole
+              * group: showLabel moves pixels only.
+              */}
+            {label && (
+                <Form.Label
+                    htmlFor={fieldId}
+                    className={`plus-number-input-label${showLabel ? '' : ' plus-number-input-label-hidden'}`}
+                >
                     {label}
                     {required && (
                         <span className="plus-number-input-required" aria-label="required">*</span>
                     )}
                 </Form.Label>
             )}
+            {/*
+              * #318. Extra props go to the FIELD, not to the group. The group is
+              * a `div` with no role and no name, so a caller's `aria-describedby`
+              * landed somewhere it could not help. `DateAndTimePicker` forwards
+              * to a wrapper that IS the named group (#230); this component has no
+              * such wrapper, so the input is the only correct destination.
+              */}
             <BootstrapInputGroup
                 className={wrapperClasses}
                 style={inputGroupStyle}
-                {...props}
             >
                 <Form.Control
                     id={fieldId}
@@ -175,6 +198,7 @@ const NumberInput = ({
                     onFocus={handleFocus}
                     onBlur={handleBlur}
                     className="plus-number-input-field"
+                    {...props}
                 />
                 <BootstrapInputGroup.Text className="plus-number-input-buttons">
                     <button

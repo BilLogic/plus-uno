@@ -25,6 +25,7 @@
 | `onToggle` | func | — | — |
 | `container` | any | — | — |
 | `offset` | array | `[0` | — |
+| `rootClose` | bool | — | Dismiss on a click outside. Defaults to true for every trigger but `manual`. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |
 
