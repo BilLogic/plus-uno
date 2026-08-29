@@ -51,6 +51,16 @@
  * added without a decision fails this one — which is the failure mode the whole
  * epic exists to kill: a guard that exists and runs nowhere.
  *
+ * THAT ASSERTION HAS A BLIND SPOT, AND IT COST SOMETHING. It matches on the
+ * `check:` prefix, so a guard that does not carry the prefix is invisible to it.
+ * `agents/uno-bot`'s `typecheck` and `test` are both guards by any reading —
+ * 268 unit tests across 39 suites, and the Worker's whole type surface — and
+ * neither ran in any workflow. `test` was not even in `npm run deploy`. They are
+ * composed above BY NAME because the assertion cannot find them for us; the
+ * prefix is not widened to catch them, because the rest of that package's
+ * scripts (`dev`, `tail`, `deploy`, `secrets:set`) are commands rather than
+ * guards, and a rule that demanded a decision on each of those would be noise.
+ *
  * IT DOES NOT STOP AT THE FIRST FAILURE. One CI run should report everything
  * that is wrong, not the first thing; a gate that costs a fix-push-wait cycle
  * per fact is a gate people route around.
@@ -243,6 +253,18 @@ const COMPOSED = [
     pkg: 'bot',
     guards:
       'the Worker prompt bundle against the root docs it is assembled from, and the char budgets in AGENTS.md § The loading contract. This is the artifact #196 had to repair.',
+  },
+  {
+    script: 'typecheck',
+    pkg: 'bot',
+    guards:
+      "the Worker's TypeScript, which no pull request ran until now. `npm run deploy` chains it, so it was gated at the deploy boundary and nowhere earlier — a type error reached the one command whose failure is most expensive to discover. 1.2s, measured 2026-08-29.",
+  },
+  {
+    script: 'test',
+    pkg: 'bot',
+    guards:
+      "the Worker's 268 unit tests across 39 suites, which ran in NO workflow and are not in `npm run deploy` either — that chain chose `test:bundle` and stopped. So the largest test suite in this repository was gated by nothing at all, and had been since it was written. 1.2s, measured 2026-08-29. Found while verifying the TypeScript 7 bump (#298), which is exactly the change that needed them.",
   },
 ];
 
