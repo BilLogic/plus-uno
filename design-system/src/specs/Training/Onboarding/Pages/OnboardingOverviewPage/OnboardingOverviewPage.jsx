@@ -102,6 +102,7 @@ const OnboardingOverviewPage = ({
                                 fill="outline"
                                 size="small"
                                 leadingVisual="arrow-left"
+                                aria-label="Scroll to previous modules"
                                 onClick={() => scrollCarousel('left')}
                                 disabled={!canScrollLeft}
                                 className={!canScrollLeft ? 'onboarding-overview-page__btn-disabled' : ''}
@@ -111,6 +112,7 @@ const OnboardingOverviewPage = ({
                                 fill="outline"
                                 size="small"
                                 leadingVisual="arrow-right"
+                                aria-label="Scroll to next modules"
                                 onClick={() => scrollCarousel('right')}
                                 disabled={!canScrollRight}
                             />

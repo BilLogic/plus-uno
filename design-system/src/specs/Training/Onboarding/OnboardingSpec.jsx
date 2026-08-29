@@ -41,7 +41,7 @@ export const OnboardingSpec = () => {
         { key: 'title', label: 'Module Title' },
         { key: 'duration', label: 'Duration' },
         { key: 'stage', label: 'Stage', render: (row) => <Badge label={row.stage} type="neutral" /> },
-        { key: 'action', label: 'Action', render: () => <Button btnStyle="primary" btnFill="tonal" label="Start" btnSize="small" /> }
+        { key: 'action', label: 'Action', render: () => <Button style="primary" fill="tonal" text="Start" size="small" /> }
     ];
 
     return (
@@ -57,8 +57,8 @@ export const OnboardingSpec = () => {
                 <PatternSection title="Featured Modules">
                     <div className="d-flex justify-content-end mb-2">
                         <div className="d-flex gap-2">
-                            <Button btnStyle="default" btnFill="outline" icon="arrow-left" btnSize="small" disabled />
-                            <Button btnStyle="primary" btnFill="outline" icon="arrow-right" btnSize="small" />
+                            <Button style="default" fill="outline" leadingVisual="arrow-left" size="small" aria-label="Previous modules" disabled />
+                            <Button style="primary" fill="outline" leadingVisual="arrow-right" size="small" aria-label="Next modules" />
                         </div>
                     </div>
                     <div className="d-flex gap-3 overflow-auto pb-3" style={{ scrollBehavior: 'smooth' }}>
@@ -69,7 +69,7 @@ export const OnboardingSpec = () => {
                                 style={{ minWidth: '300px', backgroundColor: 'var(--color-surface-container-low)' }}
                             >
                                 <div className="body2-txt text-muted mb-2">{mod.duration}</div>
-                                <Button btnStyle="primary" btnFill="tonal" label="Start Module" className="w-100" />
+                                <Button style="primary" fill="tonal" text="Start Module" className="w-100" />
                             </Card>
                         ))}
                     </div>

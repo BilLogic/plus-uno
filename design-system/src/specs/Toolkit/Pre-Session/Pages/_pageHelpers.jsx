@@ -95,6 +95,8 @@ export const UpdateAlert = ({ title, description, onClose }) => (
             </span>
         </div>
         <button
+            type="button"
+            aria-label="Close"
             onClick={onClose}
             style={{
                 background: 'none',

@@ -1,0 +1,10 @@
+{
+  "note": "Buttons whose only content is an icon and which carry no accessible name. Read by check:icon-button-name. The list is EMPTY on purpose: all 20 findings of the 2026-08-29 sweep were named rather than recorded. An entry here would have to argue that a screen reader announcing 'button' and nothing else is enough for that control.",
+  "recordedAt": "2026-08-29",
+  "measured": {
+    "sources": 708,
+    "wereNameless": 20,
+    "axeFoundOfThose": 23
+  },
+  "exceptions": {}
+}

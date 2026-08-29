@@ -1,13 +1,12 @@
 {
-  "measured": "2026-08-26",
+  "measured": "2026-08-29",
   "suite": {
-    "storyFiles": 388,
-    "tests": 1136
+    "storyFiles": 417,
+    "tests": 1225
   },
-  "violatingStories": 93,
+  "violatingStories": 78,
   "rules": {
     "color-contrast": 45,
-    "button-name": 23,
     "aria-prohibited-attr": 12,
     "aria-dialog-name": 8,
     "nested-interactive": 6,
@@ -135,15 +134,6 @@
     "design-system/src/specs/Toolkit/Post-Session/Pages/SessionReflection/SessionReflection.stories.jsx::Save & Exit confirmation": [
       "aria-dialog-name"
     ],
-    "design-system/src/specs/Toolkit/Pre-Session/Cards/CallOffAlerts.stories.jsx::All Alerts": [
-      "button-name"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Cards/CallOffAlerts.stories.jsx::Time Warning Alert Only": [
-      "button-name"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Cards/CallOffAlerts.stories.jsx::Update Alert Only": [
-      "button-name"
-    ],
     "design-system/src/specs/Toolkit/Pre-Session/Elements/CallOffForm/ToggleOrganism/ToggleOrganism.stories.jsx::Overview": [
       "color-contrast"
     ],
@@ -156,20 +146,7 @@
     "design-system/src/specs/Toolkit/Pre-Session/Elements/SessionManagementSnackbar.stories.jsx::All Variations": [
       "color-contrast"
     ],
-    "design-system/src/specs/Toolkit/Pre-Session/Elements/SupervisorControls/SupervisorControls.stories.jsx::Interactive": [
-      "button-name"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Elements/SupervisorControls/SupervisorControls.stories.jsx::Overview": [
-      "button-name"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Elements/SupervisorControls/SupervisorControls.stories.jsx::Supervisor Controls Dropdown": [
-      "button-name"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Modals/Call-Offs/CallOffRequestDetails.stories.jsx::Call Off Request Details": [
-      "button-name"
-    ],
     "design-system/src/specs/Toolkit/Pre-Session/Modals/ConfirmSessionAvailability/SessionDetailsNA.stories.jsx::Session Details NA": [
-      "button-name",
       "color-contrast"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Modals/ConfirmSessionAvailability/SessionDetailsOneTimeSession.stories.jsx::Session Details One Time Session": [
@@ -199,36 +176,17 @@
     "design-system/src/specs/Toolkit/Pre-Session/Modals/SessionFillIns/SessionFillIns.stories.jsx::Session Details": [
       "color-contrast"
     ],
-    "design-system/src/specs/Toolkit/Pre-Session/Pages/AllSessions.stories.jsx::Interactive": [
-      "button-name"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Pages/AllSessions.stories.jsx::Overview": [
-      "button-name"
-    ],
     "design-system/src/specs/Toolkit/Pre-Session/Pages/DeleteSession.stories.jsx::Interactive": [
-      "button-name",
       "color-contrast"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Pages/DeleteSession.stories.jsx::Overview": [
-      "button-name",
       "color-contrast"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Pages/EditSession.stories.jsx::Interactive": [
-      "button-name",
       "color-contrast"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Pages/EditSession.stories.jsx::Overview": [
-      "button-name",
       "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Pages/MySessions.stories.jsx::Interactive": [
-      "button-name"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Pages/MySessions.stories.jsx::Overview": [
-      "button-name"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Pages/MySessions.stories.jsx::With Modals": [
-      "button-name"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Tables/AllSessionsTable.stories.jsx::Interactive": [
       "color-contrast"
@@ -248,23 +206,13 @@
     "design-system/src/specs/Training/Lessons/Pages/LessonsDetailPage/LessonsDetailPage.stories.jsx::Interactive": [
       "select-name"
     ],
-    "design-system/src/specs/Training/Lessons/Pages/LessonsOverviewPage/LessonsOverviewPage.stories.jsx::Interactive": [
-      "button-name"
-    ],
-    "design-system/src/specs/Training/Lessons/Pages/LessonsOverviewPage/LessonsOverviewPage.stories.jsx::Overview": [
-      "button-name"
-    ],
     "design-system/src/specs/Training/Lessons/Sections/LessonWelcomeSection/LessonWelcomeSection.stories.jsx::Interactive": [
       "aria-allowed-attr"
     ],
     "design-system/src/specs/Training/Lessons/Sections/LessonWelcomeSection/LessonWelcomeSection.stories.jsx::Overview": [
       "aria-allowed-attr"
     ],
-    "design-system/src/specs/Training/Lessons/Tables/LessonsTable/LessonsTable.stories.jsx::Interactive": [
-      "button-name"
-    ],
     "design-system/src/specs/Training/Lessons/Tables/LessonsTable/LessonsTable.stories.jsx::Overview": [
-      "button-name",
       "color-contrast"
     ],
     "design-system/src/specs/Training/Onboarding/Cards/OnboardingModuleCard/OnboardingModuleCard.stories.jsx::Interactive": [
@@ -304,12 +252,10 @@
       "aria-prohibited-attr"
     ],
     "design-system/src/specs/Training/Onboarding/Pages/OnboardingOverviewPage/OnboardingOverviewPage.stories.jsx::Interactive": [
-      "aria-prohibited-attr",
-      "button-name"
+      "aria-prohibited-attr"
     ],
     "design-system/src/specs/Training/Onboarding/Pages/OnboardingOverviewPage/OnboardingOverviewPage.stories.jsx::Overview": [
-      "aria-prohibited-attr",
-      "button-name"
+      "aria-prohibited-attr"
     ],
     "design-system/src/specs/Training/Training.stories.jsx::Overview": [
       "color-contrast"

@@ -68,6 +68,8 @@ const CallOffAlert = ({ onClose }) => (
             </span>
         </div>
         <button
+            type="button"
+            aria-label="Close"
             onClick={onClose}
             style={{
                 background: 'none',
