@@ -50,6 +50,7 @@ Implemented as `ListGroupItem`.
 | `onClick` | func | — | — |
 | `className` | string | — | — |
 | `as` | elementType | — | — |
+| `tabbable` | bool | — | Holds the listbox's single tab stop. Managed by `ListGroup`. |
 
 ### `ListGroup.Option`
 

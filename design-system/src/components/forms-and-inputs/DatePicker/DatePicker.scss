@@ -185,8 +185,13 @@
         background-color: var(--color-surface-container-high);
     }
 
+    // #331. `--color-outline` measured 3.65:1 against the calendar's surface —
+    // under AA for 14px text, and these cells are text, whatever their job.
+    // `--color-on-surface-variant` measures 7.66:1 and is still visibly lighter
+    // than the current month's `--color-on-surface` (13.98:1), so the cells stay
+    // de-emphasised without being unreadable. Measured, not eyeballed.
     &-other-month {
-        color: var(--color-outline);
+        color: var(--color-on-surface-variant);
         pointer-events: none;
     }
 

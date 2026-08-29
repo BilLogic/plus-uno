@@ -237,12 +237,13 @@ the prop; if the state does not change, nothing on screen does.
 - **The listbox is conditional, and that is deliberate.** `role="listbox"` and
   `aria-multiselectable` appear only when every child is an option, because
   `role="option"` without a listbox parent is worse than no role at all.
-- **There is no arrow-key navigation.** Each option is its own tab stop
-  (`tabIndex={0}`). The ARIA listbox pattern expects one tab stop and arrow keys
-  between options; this is a list of focusable rows instead. It is usable, and it
-  is not the pattern a screen-reader user will be expecting — for a long set of
-  options, prefer `Select` or a group of `Radio`s, which have the keyboard
-  behaviour built in.
+- **Arrow keys walk the options.** When the list is a listbox it holds one tab
+  stop, and Up/Down, Left/Right, Home and End move between the options (#331) —
+  the pattern the role promises. A list of links and buttons is not a listbox and
+  is still walked with Tab.
+- **Name the listbox.** It is an input field as far as ARIA is concerned, so it
+  needs an accessible name — pass `aria-label`, which reaches the list element.
+  "Listbox, 3 options" of what, otherwise.
 - **Selection state is announced.** `aria-selected` tracks `selected`, and
   `aria-disabled` tracks `disabled`, on every option.
 - **Disabled rows stay reachable in one case.** A disabled `button` item gets the

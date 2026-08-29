@@ -182,11 +182,11 @@ it leaves the accordion with no edge to hold it.
 - **Write `header` as a heading.** It becomes the text of an `h2`, so it is
   read both in place and in the heading list. A short noun phrase, not a
   sentence.
-- **`disabled` stops the mouse only.** The prop adds a class whose rule sets
-  `pointer-events: none`; it never becomes a `disabled` attribute. The header
-  stays in the tab order and Enter still opens it. Do not use it to withhold
-  content — leave the item out, or render the body as an explanation of why it
-  is unavailable.
+- **`disabled` stops the keyboard too.** The prop reaches the header button as
+  a real `disabled` attribute (#331), so the section is out of the tab order and
+  announced as unavailable rather than merely greyed. It still is not a way to
+  withhold content: the body stays in the DOM, so leave the item out if what is
+  inside it is not for this reader.
 - **Focus stays on the header after a toggle.** Opening an item does not move
   focus into the body and does not scroll it into view. That is the right
   behaviour — the user keeps their place — but it means a tall body opened low
