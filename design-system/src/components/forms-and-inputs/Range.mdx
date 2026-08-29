@@ -81,6 +81,47 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
+## When to use
+
+- **When the position matters more than the number.** A slider shows where a
+  value sits in its span, which is what makes it good for volume, opacity or a
+  rough weighting and bad for anything the reader has an exact figure for.
+- **When the span is bounded and known.** `min` and `max` default to 0 and 100;
+  a value with no natural ceiling has nowhere to put the right-hand end.
+- **Not for precise entry.** Landing on a specific number by dragging is slow
+  and, on a touch screen, unreliable. Use `NumberInput`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+- **There is no value readout.** This renders the label and the slider, and
+  nothing else — a reader dragging it sees the track fill and no number. If the
+  figure matters, render it yourself beside the slider and keep it in step with
+  `onChange`.
+- **`onChange` fires throughout the drag, not on release.** The `input` event is
+  forwarded to `onChange` as well as to `onInput`, so a controlled `Range` stays
+  in step with the thumb rather than jumping when the pointer lifts. Anything
+  expensive — a network call, a chart redraw — belongs behind a debounce or in
+  `onBlur`, not in `onChange`.
+- **`showLabel={false}` hides the label; it does not remove it (#213).** A range
+  input carries its value and never its meaning: "49" says nothing about what is
+  being set, so `label` is the only thing that names the control.
+- **The filled part of the track is drawn from a custom property set in
+  JavaScript.** The component writes --value-percent onto the input element as
+  the value changes, and the stylesheet reads it with a 0% fallback. It is
+  deliberately not declared in any stylesheet — nothing static could give it a
+  correct value — so styling the track means reading that property rather than
+  recomputing the position.
+- **Extra props land on the input**, so `aria-describedby`, `disabled`,
+  `data-*` and the rest reach the control that has the role.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Accessibility
 
 - **A slider needs a `label`, and it is the only thing that names it.** The value
