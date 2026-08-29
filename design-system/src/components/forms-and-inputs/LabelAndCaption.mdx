@@ -168,12 +168,13 @@ users and your own validation is what enforces it.
   `label` element would point at one control and clicking it would select that
   one. `Scale` and `Rating` use a `span` with an id and name the group with
   `aria-labelledby` instead — that is the pattern to copy.
-- **Captions are not attached to their fields.** Across these components the
-  caption and validation message render as text with no id, and the control
-  carries no `aria-describedby` and no `aria-invalid`. A screen-reader user hears
-  the field's name and not its help. Where the caption must be announced, render
-  it yourself with an id and point at it — the field components that forward
-  props let you.
+- **Validation messages are attached to their fields.** `Input`, `NumberInput`,
+  `FileUpload` and `DateAndTimePicker` give the message an id and point the
+  control at it, and mark an invalid field `aria-invalid` (#327). Your own
+  `aria-describedby` is composed with theirs, not replaced by it.
+- **Standing help is still yours to attach.** There is no `caption` prop, so a
+  neutral line under the field is text you render — give it an id and pass
+  `aria-describedby`, and it will be read before any validation message.
 - **Do not hide the label.** `showLabel={false}` is meant to move pixels, not to
   remove the name; on `Input` it clips the label and keeps it, which is the
   behaviour to expect.

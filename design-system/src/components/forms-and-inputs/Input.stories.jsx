@@ -172,15 +172,15 @@ export const Styles = () => (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, justifyContent: 'center', alignItems: 'flex-start' }}>
         <div>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">NONE</span>
-            <Input id="doc-style-none" placeholder="Placeholder" value="" trailingVisual="fa-solid fa-icons" />
+            <Input id="doc-style-none" label="No validation" showLabel={false} placeholder="Placeholder" value="" trailingVisual="fa-solid fa-icons" />
         </div>
         <div>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INVALID</span>
-            <Input id="doc-style-invalid" placeholder="Placeholder" value="" validation="invalid" validationMessage="Validation message" trailingVisual="fa-solid fa-icons" />
+            <Input id="doc-style-invalid" label="Invalid example" showLabel={false} placeholder="Placeholder" value="" validation="invalid" validationMessage="Validation message" trailingVisual="fa-solid fa-icons" />
         </div>
         <div>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SUCCESS</span>
-            <Input id="doc-style-success" placeholder="Placeholder" value="" validation="success" validationMessage="Validation message" trailingVisual="fa-solid fa-icons" />
+            <Input id="doc-style-success" label="Success example" showLabel={false} placeholder="Placeholder" value="" validation="success" validationMessage="Validation message" trailingVisual="fa-solid fa-icons" />
         </div>
     </div>
 );

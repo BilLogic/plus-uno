@@ -65,6 +65,7 @@ ScrollspyContent.propTypes = {
     className: PropTypes.string,
     style: PropTypes.object,
     height: PropTypes.string,
+    /** Name for the scrollable region. */
     'aria-label': PropTypes.string
 };
 
@@ -78,6 +79,12 @@ const Scrollspy = ({
     offset = 10,
     activeId: controlledActiveId,
     onActivate,
+    /**
+     * #325. The landmark's name. It used to be the fixed string "Scrollspy
+     * navigation", so two on a page were two landmarks called the same thing
+     * and neither said which document it navigated.
+     */
+    'aria-label': ariaLabel = 'Scrollspy navigation',
     className = '',
     style,
     ...props
@@ -163,7 +170,7 @@ const Scrollspy = ({
             id={id}
             className={`plus-scrollspy-navbar ${className}`}
             role="navigation"
-            aria-label="Scrollspy navigation"
+            aria-label={ariaLabel}
             style={style}
             {...props}
         >
@@ -210,6 +217,13 @@ const Scrollspy = ({
                             <a
                                 href={item.href}
                                 className={`plus-nav-link ${isActive ? 'active' : ''}`}
+                                /*
+                                 * #325. Which section you are in was a class and
+                                 * nothing else. `aria-current="location"` — not
+                                 * "page", since every item points inside the
+                                 * page you are already on — is what says it.
+                                 */
+                                aria-current={isActive ? 'location' : undefined}
                                 onClick={(e) => handleLinkClick(e, item.href)}
                             >
                                 <span className="plus-nav-text">{item.text}</span>
@@ -238,6 +252,8 @@ Scrollspy.propTypes = {
     offset: PropTypes.number,
     activeId: PropTypes.string,
     onActivate: PropTypes.func,
+    /** Name for the navigation landmark. One per page needs no more than the default. */
+    'aria-label': PropTypes.string,
     className: PropTypes.string,
     style: PropTypes.object
 };

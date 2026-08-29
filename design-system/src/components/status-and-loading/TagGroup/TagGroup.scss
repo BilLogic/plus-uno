@@ -1,0 +1,38 @@
+/*
+ * TagGroup — the gaps and the wrapping (#276).
+ *
+ * There is deliberately very little here. Everything about how a tag LOOKS is
+ * `Tag.scss`'s; everything about how a SET of them is arranged is this file's,
+ * and the split is what keeps a tag from carrying margin it would then need an
+ * escape hatch to remove.
+ */
+.plus-tag-group {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-sm);
+    /* The list markers a `role="list"` container would otherwise inherit from a
+       `ul` reset are not wanted; this is a div, so only the box matters. */
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+}
+
+.plus-tag-group--wrap {
+    flex-wrap: wrap;
+    row-gap: var(--size-element-gap-sm);
+}
+
+/*
+ * `collapse` keeps one line. It does NOT scroll: a row that scrolls sideways
+ * hides its tail behind a gesture, which is the failure the `+n` tag exists to
+ * avoid — so the row is allowed to shrink and its members to truncate instead.
+ */
+.plus-tag-group--collapse {
+    flex-wrap: nowrap;
+    overflow: hidden;
+}
+
+.plus-tag-group__item {
+    display: inline-flex;
+    min-width: 0;
+}

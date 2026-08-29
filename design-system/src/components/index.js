@@ -39,6 +39,8 @@ export { default as SidebarTab } from '@/components/navigation/SidebarTab';
 export { default as Spinner } from '@/components/status-and-loading/Spinner';
 export { default as StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart';
 
+export { default as Tag } from '@/components/status-and-loading/Tag';
+export { default as TagGroup } from '@/components/status-and-loading/TagGroup';
 export { default as Table } from '@/components/_internal/Table';
 export { default as Toast } from '@/components/messaging/Toast';
 export { default as Tooltip } from '@/components/overlays/Tooltip';

@@ -94,7 +94,17 @@ const Scale = ({
     ...props
 }) => {
     const isControlled = value !== undefined;
-    const [internalValue, setInternalValue] = React.useState(defaultValue || (options.length > 0 ? options[0].value : null));
+    /*
+     * #325. Unanswered, until someone answers. This used to fall back to
+     * `options[0].value`, so an uncontrolled scale arrived already showing "1"
+     * and a response of 1 could not be told apart from no response at all —
+     * which is a data problem, not only an interface one. `!== undefined` and
+     * not `||`, so `defaultValue={0}` is a starting value rather than a falsy
+     * miss.
+     */
+    const [internalValue, setInternalValue] = React.useState(
+        defaultValue !== undefined ? defaultValue : null,
+    );
 
     /**
      * A scale's label names the whole set of radios, not any one of them (#206).

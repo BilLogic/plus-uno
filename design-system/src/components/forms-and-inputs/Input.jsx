@@ -42,6 +42,25 @@ const Input = ({
     const [isFocused, setIsFocused] = useState(false);
     /** One id for the label and the input — see `useFieldId` (#206). */
     const fieldId = useFieldId(id);
+
+    /*
+     * #327. The validation message is now something the field POINTS AT.
+     *
+     * It used to render as text after the input with no id, so nothing could
+     * refer to it: a screen-reader user heard the field's name and none of the
+     * reason it was rejected. Giving it an id and pointing `aria-describedby` at
+     * it is the whole fix, and `aria-invalid` is the other half — the state, as
+     * opposed to the explanation.
+     *
+     * A caller's own `aria-describedby` is kept and ours is appended, so
+     * pointing at your own help text does not silently lose the error, and the
+     * error does not silently lose your help text.
+     */
+    const validationId = validation !== 'none' && validationMessage
+        ? `${fieldId}-validation`
+        : undefined;
+    const describedBy = [props['aria-describedby'], validationId]
+        .filter(Boolean).join(' ') || undefined;
     /** Prefer `readOnly`; honor legacy `readonly` when explicitly passed */
     const isReadOnly = readOnly !== undefined ? readOnly : Boolean(readonly);
 
@@ -112,6 +131,10 @@ const Input = ({
                     onFocus={handleFocus}
                     onBlur={handleBlur}
                     {...props}
+                    /* After the spread: this value already contains the
+                     * caller's, so letting the spread win would drop ours. */
+                    aria-describedby={describedBy}
+                    aria-invalid={validation === 'invalid' || undefined}
                 />
                 {trailingVisual && (
                     <div className="plus-input-trailing-visual">
@@ -128,7 +151,10 @@ const Input = ({
                 )}
             </div>
             {validation !== 'none' && validationMessage && (
-                <div className={`plus-input-validation plus-input-validation-${validation}`}>
+                <div
+                    id={validationId}
+                    className={`plus-input-validation plus-input-validation-${validation}`}
+                >
                     {validationIcon}
                     <span className="plus-input-validation-message">{validationMessage}</span>
                 </div>

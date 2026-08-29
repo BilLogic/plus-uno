@@ -89,9 +89,30 @@ const AccordionItem = ({
             className={itemClasses}
             {...props}
         >
-            <RBAccordion.Header className="plus-accordion-header">
-                {header}
-            </RBAccordion.Header>
+            {/*
+              * #331. `disabled` reaches the BUTTON, not only a class.
+              *
+              * It used to add `plus-accordion-item--disabled`, whose rule is
+              * `pointer-events: none`. That stops the mouse and nothing else:
+              * measured in chromium, a button under `pointer-events: none` is
+              * still in the tab order and Enter still fires its click handler,
+              * so a disabled section opened for anyone using a keyboard.
+              *
+              * The header is composed by hand rather than using
+              * `Accordion.Header`, and that is not a preference. `AccordionHeader`
+              * spreads its props onto the `h2` WRAPPER and passes its
+              * `AccordionButton` only `onClick`, `aria-controls` and children —
+              * so `disabled` handed to it lands on a heading, where it means
+              * nothing. `AccordionButton` does spread onto the `button`, so
+              * addressing it directly is the only route to the attribute. The
+              * `accordion-header` class is what `AccordionHeader` would have
+              * added, kept so the stylesheet does not know the difference.
+              */}
+            <h2 className="accordion-header plus-accordion-header">
+                <RBAccordion.Button disabled={disabled}>
+                    {header}
+                </RBAccordion.Button>
+            </h2>
             <RBAccordion.Body className="plus-accordion-body">
                 {children}
             </RBAccordion.Body>

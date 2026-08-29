@@ -32,7 +32,7 @@ From `design-system/src/components/status-and-loading/BadgeVariants.scss`. Overr
 
 ## Related
 
-Same group: `Badge` · `Progress` · `Spinner`
+Same group: `Badge` · `Progress` · `Spinner` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

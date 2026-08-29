@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ListOption as ListOptionComponent } from './ListOption';
 import SelectionIndicator from './SelectionIndicator';
@@ -30,6 +30,12 @@ export const ListGroupItem = ({
     onClick,
     className = '',
     as = 'div',
+    /**
+     * #331. Whether this option holds the list's single tab stop. Defaults to
+     * true so a selectable item used on its own stays reachable; `ListGroup`
+     * passes false to all but one when it is managing a listbox.
+     */
+    tabbable = true,
     ...props
 }) => {
     // Determine if this is a selectable item
@@ -99,7 +105,7 @@ export const ListGroupItem = ({
                 role="option"
                 aria-selected={selected}
                 aria-disabled={disabled}
-                tabIndex={disabled ? -1 : 0}
+                tabIndex={disabled || !tabbable ? -1 : 0}
                 {...props}
             >
                 <SelectionIndicator mode={selectable} selected={selected} disabled={disabled} />
@@ -144,7 +150,9 @@ ListGroupItem.propTypes = {
     name: PropTypes.string,
     onClick: PropTypes.func,
     className: PropTypes.string,
-    as: PropTypes.elementType
+    as: PropTypes.elementType,
+    /** Holds the listbox's single tab stop. Managed by `ListGroup`. */
+    tabbable: PropTypes.bool
 };
 
 /**
@@ -188,7 +196,16 @@ const ListGroup = ({
     ...props
 }) => {
     const Tag = as;
-    const classes = [
+    /*
+     * #331. A listbox is ONE tab stop with arrow keys inside it, and this list
+     * gave every option its own — usable, and not the pattern a screen-reader
+     * user is told to expect when they hear "listbox". The cursor is held here
+     * rather than in each item because only the container knows the order.
+     */
+    const listRef = useRef(null);
+    const [activeIndex, setActiveIndex] = useState(0);
+
+    const listClasses = [
         'list-group',
         'plus-list-group',
         flush ? 'list-group-flush' : '',
@@ -203,9 +220,81 @@ const ListGroup = ({
         ? { role: 'listbox', 'aria-multiselectable': isMultiSelect || undefined }
         : {};
 
+    /** The options as the DOM has them — the only order that matters. */
+    const optionNodes = () => (listRef.current
+        ? Array.from(listRef.current.querySelectorAll('[role="option"]'))
+        : []);
+
+    const moveTo = (index) => {
+        const nodes = optionNodes();
+        if (!nodes.length) return;
+        const next = Math.min(Math.max(index, 0), nodes.length - 1);
+        setActiveIndex(next);
+        nodes[next].focus();
+    };
+
+    /**
+     * The listbox keyboard contract, and only when the list is actually one.
+     * A list of links and buttons is walked with Tab, and taking that away
+     * would be a regression dressed as a fix.
+     *
+     * @param {React.KeyboardEvent} event
+     */
+    const handleKeyDown = (event) => {
+        if (!isOptionList) return;
+        const nodes = optionNodes();
+        const current = nodes.indexOf(document.activeElement);
+        const from = current >= 0 ? current : activeIndex;
+
+        switch (event.key) {
+            case 'ArrowDown':
+            case 'ArrowRight':
+                event.preventDefault();
+                moveTo(from + 1);
+                return;
+            case 'ArrowUp':
+            case 'ArrowLeft':
+                event.preventDefault();
+                moveTo(from - 1);
+                return;
+            case 'Home':
+                event.preventDefault();
+                moveTo(0);
+                return;
+            case 'End':
+                event.preventDefault();
+                moveTo(nodes.length - 1);
+                return;
+            default:
+        }
+    };
+
+    /*
+     * The single tab stop, handed to the option at the cursor. Cloning is what
+     * lets `ListGroup.Item` and `ListGroup.Option` both take it without either
+     * of them knowing where they sit.
+     */
+    const renderedChildren = isOptionList
+        ? React.Children.map(children, (child, index) => (
+            React.isValidElement(child)
+                ? React.cloneElement(child, { tabbable: index === activeIndex })
+                : child
+        ))
+        : children;
+
     return (
-        <Tag className={classes} {...listboxProps} {...props}>
-            {children}
+        <Tag
+            ref={listRef}
+            className={listClasses}
+            onKeyDown={handleKeyDown}
+            onFocus={(event) => {
+                const index = optionNodes().indexOf(event.target);
+                if (index >= 0) setActiveIndex(index);
+            }}
+            {...listboxProps}
+            {...props}
+        >
+            {renderedChildren}
         </Tag>
     );
 };

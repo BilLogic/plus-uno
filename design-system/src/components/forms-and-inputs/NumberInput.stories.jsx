@@ -133,6 +133,8 @@ export const Styles = () => {
                 <h6 className="h6 mb-2">Invalid</h6>
                 <NumberInput
                     id="number-input-error"
+                    label="Invalid example"
+                    showLabel={false}
                     placeholder="Number"
                     value={v1}
                     onChange={(e) => setV1(e.target.value)}
@@ -144,6 +146,8 @@ export const Styles = () => {
                 <h6 className="h6 mb-2">Success</h6>
                 <NumberInput
                     id="number-input-success"
+                    label="Success example"
+                    showLabel={false}
                     placeholder="Number"
                     value={v2}
                     onChange={(e) => setV2(e.target.value)}

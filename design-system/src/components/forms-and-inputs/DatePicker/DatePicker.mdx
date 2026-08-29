@@ -197,11 +197,13 @@ value yourself.
 - **The days are real buttons.** Each is a `button` with a genuine `disabled`
   attribute outside the bounds, so they are reachable by Tab and announced as
   unavailable rather than doing nothing.
-- **A day announces as a bare number.** The buttons carry only their date
-  number, and there is no `aria-selected`, no `aria-current` for today and no
-  grid role. A screen-reader user hears "17, button" without the month, and
-  cannot hear which day is selected — the month and year in the header are the
-  only context, and they are not read with each day.
+- **A day announces its whole date.** Each button is named with the weekday,
+  day, month and year in the reader's locale, carries `aria-pressed` when it is
+  the chosen day, and `aria-current="date"` when it is today (#331). The header's
+  month and year are no longer the only context.
+- **Adjacent-month days are dimmed, not unreadable.** They measure 7.66:1
+  against the calendar surface — still lighter than the current month's 13.98:1,
+  and above the 4.5:1 that 14px text needs.
 - **There is no arrow-key movement inside the calendar.** Tab steps through the
   days one at a time; up to 31 tab stops to reach the end of a month.
 - **`readOnly` and `disabled` both stop the calendar opening.** `disabled` takes

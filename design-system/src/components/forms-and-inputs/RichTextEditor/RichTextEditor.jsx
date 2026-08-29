@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import useFieldId from '@/components/forms-and-inputs/useFieldId';
 import { Dropdown } from 'react-bootstrap';
 import Button from '@/components/actions/Button/Button';
 import ButtonGroup from '@/components/actions/ButtonGroup/ButtonGroup';
@@ -67,6 +68,13 @@ RichTextBlockToggle.displayName = 'RichTextBlockToggle';
 const RichTextEditor = ({
     id,
     name,
+    /**
+     * #329. The editor's name. The editable region was a bare
+     * `contentEditable` div: no role, no name, and `id` applied to the outer
+     * container, so a `label` pointing at it named a `div`. Someone hearing the
+     * page reached an editable area that did not say what it was for.
+     */
+    label,
     placeholder,
     value,
     defaultValue = '',
@@ -83,6 +91,9 @@ const RichTextEditor = ({
     onBlur,
     ...props
 }) => {
+    const fieldId = useFieldId(id);
+    const editorId = `${fieldId}-editor`;
+    const labelId = label ? `${fieldId}-label` : undefined;
     const editorRef = useRef(null);
     const containerRef = useRef(null);
     const [toolbarState, setToolbarState] = useState({});
@@ -241,7 +252,18 @@ const RichTextEditor = ({
     );
 
     return (
-        <div id={id} ref={containerRef} className={containerClasses} style={style} {...props}>
+        <div id={fieldId} ref={containerRef} className={containerClasses} style={style} {...props}>
+            {/*
+              * #329. A `span`, not a `label`. `contentEditable` is not a form
+              * control, so `htmlFor` has nothing to bind to — the same reason
+              * `Rating` and `Scale` name their groups with `aria-labelledby`
+              * (#206). The editor points back at this id.
+              */}
+            {label && (
+                <span id={labelId} className="plus-rich-text-editor-label body2-txt">
+                    {label}
+                </span>
+            )}
             <div className="plus-rich-text-editor-toolbar">
                 {useFullToolbar ? (
                     renderFullToolbar()
@@ -255,7 +277,7 @@ const RichTextEditor = ({
                         >
                             <Dropdown.Toggle
                                 as={RichTextBlockToggle}
-                                id={`${id || 'rte'}-block-format`}
+                                id={`${fieldId}-block-format`}
                                 disabled={disabled || readOnly}
                             >
                                 <span className="plus-rich-text-editor-block-toggle-label">{blockLabel}</span>
@@ -298,8 +320,20 @@ const RichTextEditor = ({
 
             <div
                 ref={editorRef}
+                id={editorId}
                 className="plus-rich-text-editor-content body3-txt"
                 contentEditable={!readOnly && !disabled}
+                /*
+                 * #329. `textbox` with `aria-multiline` is what a contentEditable
+                 * region has to say about itself; without it, it is announced as
+                 * a group of whatever happens to be inside. `aria-readonly`
+                 * tracks the same flag that turns editing off, so the two cannot
+                 * drift.
+                 */
+                role="textbox"
+                aria-multiline="true"
+                aria-labelledby={labelId}
+                aria-readonly={readOnly || disabled || undefined}
                 data-placeholder={placeholder}
                 style={{ minHeight: minHeight ? `${minHeight}px` : undefined }}
                 onInput={handleInput}
@@ -321,6 +355,8 @@ const RichTextEditor = ({
 RichTextEditor.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
+    /** The editor's name, rendered above it and pointed at by the region. */
+    label: PropTypes.node,
     placeholder: PropTypes.string,
     value: PropTypes.string,
     defaultValue: PropTypes.string,

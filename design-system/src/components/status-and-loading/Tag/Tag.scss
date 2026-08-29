@@ -1,0 +1,192 @@
+@use "sass:map";
+
+/*
+ * Tag — a value someone picked (#276).
+ *
+ * THE COLOUR MAP IS THE POINT. `Tag`'s API offers plain colour names because a
+ * tag's colour is a category, not a status: offering `success` would invite a
+ * green tag that reads as "went well" on a screen where it only means "Science".
+ * The repo has no plain-name colour tokens, so each name borrows a container
+ * pair that already exists. The curriculum palette is the only non-semantic set
+ * in the system, which is why five of the seven come from it — the same reason
+ * #276 gives for letting Badge's `discovery` borrow its purple.
+ *
+ * Measured hues, so the names are not a guess:
+ *   blue     relationship        rgb(0, 92, 189)
+ *   green    mastering-content   rgb(22, 119, 69)
+ *   purple   social-emotional    rgb(127, 63, 177)
+ *   magenta  advocacy            rgb(199, 11, 119)
+ *   orange   technology-tools    rgb(125, 87, 0)
+ *   teal     tertiary            rgb(14, 129, 117)
+ *   grey     surface-container   — the default, and the only one that is not a hue
+ *
+ * `grey` is the default deliberately: a tag with no colour chosen must not claim
+ * a category it was not given.
+ */
+$tag-colors: (
+    'grey': (--color-surface-container, --color-on-surface-variant, --color-outline-variant),
+    'blue': (--color-relationship-container, --color-on-relationship-container, --color-relationship),
+    'green': (--color-mastering-content-container, --color-on-mastering-content-container, --color-mastering-content),
+    'purple': (--color-social-emotional-container, --color-on-social-emotional-container, --color-social-emotional),
+    'magenta': (--color-advocacy-container, --color-on-advocacy-container, --color-advocacy),
+    'orange': (--color-technology-tools-container, --color-on-technology-tools-container, --color-technology-tools),
+    'teal': (--color-tertiary-container, --color-on-tertiary-container, --color-tertiary),
+);
+
+.plus-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--size-element-gap-sm);
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+
+    /*
+     * NO DENSITY PROP, and no vertical padding tier either. #276 puts spacing at
+     * the group level: a tag that carried its own margin would force
+     * `TagGroup` to switch it off whenever it used `gap`, which is exactly the
+     * escape hatch Atlassian's `hasMargin` exists to undo. So this sets padding
+     * and nothing outside its own box.
+     */
+    margin: 0;
+    padding: 0 var(--size-element-pad-x-sm);
+    border: var(--size-element-border) solid transparent;
+    border-radius: var(--size-element-radius-md);
+
+    /*
+     * Type comes from `.body2-txt` in the JSX — the design system's own class —
+     * and is NOT restated here. #276's rule is that density changes padding and
+     * never type size, so a tag can never disagree with the text beside it.
+     */
+    text-align: left;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+@each $name, $tokens in $tag-colors {
+    .plus-tag--#{$name} {
+        background-color: var(#{nth($tokens, 1)});
+        color: var(#{nth($tokens, 2)});
+    }
+}
+
+/* The tag itself is the control. */
+.plus-tag--selectable,
+.plus-tag--operational {
+    cursor: pointer;
+    appearance: none;
+}
+
+/*
+ * A selected tag needs a signal that is not only its background, because the
+ * unselected and selected grounds of one colour differ by lightness alone and
+ * that is the axis that collapses under low vision and low-quality displays.
+ * The outline is the second channel.
+ */
+.plus-tag--selected {
+    border-color: currentColor;
+    font-weight: var(--font-weight-semibold, 600);
+}
+
+.plus-tag--selectable:hover,
+.plus-tag--operational:hover {
+    filter: brightness(0.96);
+}
+
+.plus-tag:focus-visible {
+    outline: var(--size-element-stroke-lg, 2px) solid var(--color-primary);
+    outline-offset: var(--size-element-gap-xs, 4px);
+}
+
+/* Truncation. The full text stays reachable through `title` — set in the JSX,
+   because CSS cannot put the label anywhere a screen reader will find it. */
+.plus-tag--truncated .plus-tag__text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.plus-tag__text {
+    min-width: 0;
+}
+
+.plus-tag__swatch {
+    flex: none;
+    width: var(--size-element-gap-md, 10px);
+    height: var(--size-element-gap-md, 10px);
+    border-radius: var(--size-element-radius-sm, 2px);
+    /* The swatch carries an arbitrary series colour, which may be near the tag's
+       own ground. An outline keeps it a shape rather than a smudge. */
+    box-shadow: inset 0 0 0 1px var(--color-outline-variant);
+}
+
+.plus-tag__elem-before {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+}
+
+/*
+ * The remove button. It is a real button inside a non-interactive tag — which is
+ * why `dismissible` is NOT rendered as a control itself: nesting one interactive
+ * element inside another is invalid per ARIA, the same rule Badge records for
+ * its own dismiss button.
+ */
+.plus-tag__remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    appearance: none;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    /*
+     * 24px, not the icon's own size. WCAG 2.5.8 asks for a 24×24 target, and an
+     * X glyph at body2 is about half that — the most common way a dismissible
+     * chip fails to be usable with a finger or an unsteady hand.
+     */
+    inline-size: var(--size-element-target-sm, 24px);
+    block-size: var(--size-element-target-sm, 24px);
+    margin-right: calc(var(--size-element-pad-x-sm) * -1);
+    border-radius: var(--size-element-radius-sm, 2px);
+}
+
+.plus-tag__remove:hover {
+    background-color: var(--color-on-surface-state-08);
+}
+
+.plus-tag__remove:focus-visible {
+    outline: var(--size-element-stroke-lg, 2px) solid var(--color-primary);
+    outline-offset: -2px;
+}
+
+/* Loading. The tag stands down as a control while it spins, so a second click
+   cannot queue a second action against a value that is already changing. */
+.plus-tag--loading {
+    cursor: default;
+}
+
+.plus-tag__spinner {
+    flex: none;
+    inline-size: var(--size-element-gap-md, 10px);
+    block-size: var(--size-element-gap-md, 10px);
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: plus-tag-spin 0.7s linear infinite;
+}
+
+@keyframes plus-tag-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Honour a stated preference; a spinning ring is exactly the motion this is for. */
+@media (prefers-reduced-motion: reduce) {
+    .plus-tag__spinner {
+        animation-duration: 2.4s;
+    }
+}

@@ -131,22 +131,20 @@ what those shorthands build, and can be passed directly.
 
 ## Usage notes
 
-### The field cannot be labelled. Use `Input` when it needs a label.
+### Label it, and reach for `Input` when the addon is decoration.
 
 ```jsx
-// Incorrect — `id` is applied to the group, not to the input, and forwarded
-// props go to the group too. There is no way to name the field through this
-// component's API, so it is an unnamed text box.
-<label htmlFor="amount">Amount</label>
-<InputGroup id="amount" leadingVisual="£" />
+// The label is associated with the input, and `id` names the input rather than
+// the group (#329). `showLabel={false}` clips it without removing the name.
+<InputGroup id="amount" label="Amount" leadingVisual="£" />
 
-// Correct — Input takes a label, does the association, and has its own
-// leading and trailing visuals.
+// For a field whose addon is only an icon or a unit, `Input` is the smaller
+// component and has its own leading and trailing visuals.
 <Input label="Amount" leadingVisual="fa-solid fa-sterling-sign" value={v} onChange={setV} />
 ```
 
 Reach for `InputGroup` when the addon is a real control — a button or a dropdown
-that `Input` cannot hold — and give the field its name another way.
+that `Input` cannot hold.
 
 ### An unrecognised string addon becomes text.
 
@@ -172,9 +170,9 @@ generic names "Toggle option" and "Select option". `"button"` is labelled
 
 ## Accessibility
 
-- **The input has no accessible name and no way to be given one.** It carries no
-  `id`, no `label` and no forwarded ARIA — `id` and extra props land on the
-  wrapping group. Where a name is required, and it usually is, use `Input`.
+- **The input takes the name.** `label` associates through `htmlFor`, `id`
+  lands on the input, and extra props are forwarded there too (#329) — so
+  `aria-describedby` reaches the element it describes.
 - **Addon controls are named generically.** The checkbox and radio addons
   default to "Toggle option" and "Select option"; pass `aria-label` in the object
   form to say what they actually do.

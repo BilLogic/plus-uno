@@ -33,6 +33,13 @@ const NumberInput = ({
     /** One id for the label and the input — see `useFieldId` (#206). */
     const fieldId = useFieldId(id);
 
+    /* #327 — see `Input.jsx`, where this pattern is explained once. */
+    const validationId = validation !== 'none' && validationMessage
+        ? `${fieldId}-validation`
+        : undefined;
+    const describedBy = [props['aria-describedby'], validationId]
+        .filter(Boolean).join(' ') || undefined;
+
     // Sync internal value when external value prop changes
     useEffect(() => {
         if (value !== undefined) {
@@ -199,6 +206,8 @@ const NumberInput = ({
                     onBlur={handleBlur}
                     className="plus-number-input-field"
                     {...props}
+                    aria-describedby={describedBy}
+                    aria-invalid={validation === 'invalid' || undefined}
                 />
                 <BootstrapInputGroup.Text className="plus-number-input-buttons">
                     <button
@@ -222,7 +231,10 @@ const NumberInput = ({
                 </BootstrapInputGroup.Text>
             </BootstrapInputGroup>
             {validation !== 'none' && validationMessage && (
-                <div className={`plus-number-input-validation plus-number-input-validation-${validation}`}>
+                <div
+                    id={validationId}
+                    className={`plus-number-input-validation plus-number-input-validation-${validation}`}
+                >
                     {validationIcon}
                     <span className="plus-number-input-validation-message">{validationMessage}</span>
                 </div>
