@@ -78,4 +78,95 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Jumbotron` for the one block at the top of a page that states what the page
+is and what to do first — a landing hero, an empty state that has something to
+say, the opening panel of a programme. One per page, at most.
+
+`title` renders as the page's `h1` and `subtitle` as a paragraph styled like an
+`h4`. `children` is the body. `primaryButton` and `secondaryButton` are prop
+objects spread into `Button`, so anything `Button` takes goes in them.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### The title is an `h1`, so there can only be one.
+
+```jsx
+// Incorrect — two jumbotrons on a page, or one on a page that already has its
+// own h1, produce two level-one headings and a broken outline.
+<h1>Programme</h1>
+<Jumbotron title="Autumn 2026" subtitle="12 weeks, 48 sessions" />
+
+// Correct — the jumbotron IS the page heading, or it does not carry a title.
+<Jumbotron title="Autumn 2026" subtitle="12 weeks, 48 sessions" />
+```
+
+### Always label the buttons.
+
+```jsx
+// Incorrect — an empty object still renders a button, and its default text is
+// the placeholder "Primary Action".
+<Jumbotron title="Autumn 2026" primaryButton={{ onClick: enrol }} />
+
+// Correct.
+<Jumbotron title="Autumn 2026" primaryButton={{ text: 'Enrol', onClick: enrol }} />
+```
+
+### The buttons are `medium` unless you say otherwise.
+
+That default is applied before your button object is spread, so `size: 'small'`
+or `size: 'large'` in the object wins. (It was `"default"` until #317 — a value
+`Button` does not accept, which produced a size class no stylesheet defines.)
+
+### `fluid` drops the corner radius.
+
+Radius is applied only when `fluid` is false, so a full-bleed jumbotron is square
+by design. Passing `radiusSize` alongside `fluid` does nothing.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The heading level is fixed.** `title` is always an `h1`. If this block is not
+  the page's main heading, leave `title` out and put your own heading in
+  `children` at the level the outline needs.
+- **The subtitle is a paragraph.** It looks like a heading and is not one, which
+  is right — a subtitle that read as a heading would put a second entry in the
+  outline for the same idea.
+- **Two actions, ranked.** The primary is filled and the secondary is outlined.
+  That ranking is visual; the reading order is the DOM order, so put the action
+  you expect first, first.
+- **The block is a plain `div`.** It is not a landmark and does not need to be —
+  it sits inside whatever `main` or `section` the page already has.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a bordered container that is not the page's opening statement, use `Card`.
+- For a message about state rather than an invitation to act, use `Alert`.
+- For the actions themselves, see `Button` — every prop it takes can be passed
+  through the button objects.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

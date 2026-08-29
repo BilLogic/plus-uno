@@ -86,4 +86,94 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `ScrollBar` when a region has to scroll inside a page that does not — a long
+list in a fixed panel, a wide table in a narrow column. It is a wrapper: it caps
+the height, turns on overflow, and applies the design system's thin scrollbar so
+the region does not draw the platform's default one.
+
+`maxHeight` (default `320px`) caps a vertical region. `horizontal` switches the
+axis, and in that mode `maxHeight` is ignored — the width comes from the
+container.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Name each region.
+
+```jsx
+// Incorrect — two scroll regions on a page, both announced as the default
+// "Scrollable content".
+<ScrollBar><SessionList /></ScrollBar>
+<ScrollBar><NoteList /></ScrollBar>
+
+// Correct.
+<ScrollBar aria-label="Sessions"><SessionList /></ScrollBar>
+<ScrollBar aria-label="Notes"><NoteList /></ScrollBar>
+```
+
+### It caps the height; it does not fill one.
+
+```jsx
+// Incorrect — maxHeight caps, so in a taller panel the region stops at 320px
+// and leaves the space below it empty.
+<Panel style={{ height: 600 }}><ScrollBar>{rows}</ScrollBar></Panel>
+
+// Correct — give it the height you want it to take.
+<Panel style={{ height: 600 }}><ScrollBar maxHeight="100%">{rows}</ScrollBar></Panel>
+```
+
+### One axis, not both.
+
+`horizontal` chooses which axis is styled and which cap applies. A region that
+scrolls both ways is usually a sign the content should be laid out differently —
+a table that needs horizontal scroll inside a page that scrolls vertically is
+the case this handles, and that is one axis each.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The region is focusable on purpose.** `tabIndex={0}` is what lets a keyboard
+  user scroll it with the arrow keys, and it is what satisfies the
+  scrollable-region-focusable rule. It is a tab stop, which is the cost of being
+  reachable.
+- **It has a name, and the default is generic.** `aria-label` defaults to
+  "Scrollable content". One per page is tolerable; two are indistinguishable.
+- **It is deliberately not a landmark.** No `role="region"` — a role would make
+  every scroll area a landmark, and several on one page would collide under the
+  unique-landmark rule. The label names the tab stop instead.
+- **Do not hide the last row.** A scroll region whose content ends exactly at the
+  cap looks finished. Leave the cut visible, or the user will not know to scroll.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a long list that should page rather than scroll, use `Pagination`.
+- For content the user opens rather than scrolls past, use `Collapse` or
+  `Accordion`.
+- For a wide data table, put the table in a horizontal `ScrollBar` rather than
+  shrinking its columns — see `Table`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

@@ -131,4 +131,99 @@ Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (no
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `DatePicker` for a single calendar date the user picks rather than types — a
+session date, a deadline, a birthday within a bounded range. The trigger is a
+read-only field; the calendar opens beneath it.
+
+`value` and `onChange` speak ISO `YYYY-MM-DD`. The closed field displays
+`MM/DD/YYYY`, and the two formats are not the same string — do not read what is
+on screen as the value. `minDate` and `maxDate` accept either an ISO string or a
+`Date`, and disable everything outside them.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### The value is ISO. Anything else parses to empty.
+
+```jsx
+// Incorrect — parsing splits on "-" and requires three parts, so a slashed
+// date returns null and the field silently shows the placeholder.
+<DatePicker value="08/29/2026" onChange={setDate} />
+
+// Correct.
+<DatePicker value="2026-08-29" onChange={setDate} />
+```
+
+### It gives you a date, not a time.
+
+`onChange` hands back the ISO day and nothing else. For a moment in time, use
+`DateAndTimePicker`, which pairs the two fields and names them as one group.
+
+### Label it the ordinary way.
+
+```jsx
+// The id lands on the input, so a label pointing at it works — unlike the other
+// menu-backed fields in this group.
+<label htmlFor="starts">Session date</label>
+<DatePicker id="starts" value={date} onChange={setDate} />
+```
+
+### Bounds disable days; they do not clamp a value.
+
+A `value` outside `minDate`/`maxDate` is still displayed and still returned. The
+bounds only stop the user from choosing another one, so validate the incoming
+value yourself.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The trigger is wired correctly.** `role="combobox"` with
+  `aria-haspopup="dialog"`, `aria-expanded`, and `aria-controls` pointing at the
+  calendar. Enter, Space and Down all open it from the keyboard.
+- **The days are real buttons.** Each is a `button` with a genuine `disabled`
+  attribute outside the bounds, so they are reachable by Tab and announced as
+  unavailable rather than doing nothing.
+- **A day announces as a bare number.** The buttons carry only their date
+  number, and there is no `aria-selected`, no `aria-current` for today and no
+  grid role. A screen-reader user hears "17, button" without the month, and
+  cannot hear which day is selected — the month and year in the header are the
+  only context, and they are not read with each day.
+- **There is no arrow-key movement inside the calendar.** Tab steps through the
+  days one at a time; up to 31 tab stops to reach the end of a month.
+- **`readOnly` and `disabled` both stop the calendar opening.** `disabled` takes
+  the input out of the tab order; `readOnly` leaves it focusable and inert,
+  which is the right difference between "not for you" and "not now".
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a date and a time together, use `DateAndTimePicker`.
+- For a date typed rather than picked, use `Input` with your own validation —
+  a typed date is faster for anyone who knows it.
+- For a range, use two pickers and bound the second with the first's value
+  through `minDate`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

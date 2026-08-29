@@ -86,7 +86,7 @@ const weekdayData = {
     data: [
         { letter: 'M', height: '40', color: 'var(--color-tertiary-container, #e8deff)' },
         { letter: 'T', height: '80', color: 'var(--color-secondary-container, #cfe4ff)' },
-        { letter: 'W', height: '60', color: 'var(--color-info-container, #dde3ea)' },
+        { letter: 'W', height: '60', color: 'var(--color-info-container, #85ecd5)' },
         { letter: 'T', height: '90', color: 'var(--color-primary-container, #c3e8ff)' },
         { letter: 'F', height: '20', color: 'var(--color-success-container, #ceeaaf)' }
     ]

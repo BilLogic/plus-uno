@@ -74,4 +74,92 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Scrollspy` for a long page inside a scrolling panel where the reader needs
+to see where they are and jump between sections — a settings page, a policy, a
+long report. It is two components: the `nav`, and `ScrollspyContent`, the
+scrolling region it watches.
+
+`contentId` names the region; each item's `href` names a section by id. The nav
+tracks the topmost section past the `offset` and reports it through `onActivate`,
+or holds it itself when `activeId` is not given.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Three ids have to line up, and nothing warns you when they do not.
+
+```jsx
+// The nav's contentId must be the content's id, and every item href must be a
+// section id inside it. If the content element is not found the spy silently
+// does nothing — no error, no console warning, a nav that never highlights.
+<Scrollspy contentId="policy" items={[
+    { text: 'Scope', href: '#scope' },
+    { text: 'Retention', href: '#retention' },
+]} />
+
+<ScrollspyContent id="policy" height="60vh">
+    <section id="scope">…</section>
+    <section id="retention">…</section>
+</ScrollspyContent>
+```
+
+### Memoise `items` and `onActivate`.
+
+The scroll listener is re-attached whenever either changes, and an array literal
+or an inline arrow is a new value on every render. Define them outside the
+component or wrap them in `useMemo`/`useCallback`.
+
+### Jumping scrolls smoothly, always.
+
+Clicking an item calls `scrollTo` with `behavior: 'smooth'` unconditionally —
+there is no reduced-motion path. For an audience where that matters, handle the
+click yourself and scroll instantly.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The nav is a landmark with a fixed name.** It renders `nav` with
+  `aria-label="Scrollspy navigation"`, and there is no prop to change it — two on
+  one page are two landmarks with the same name.
+- **The current section is not announced.** The active item gets a class and
+  nothing else: no `aria-current`. Everyone hearing the page gets a list of
+  links with no indication of where they are.
+- **The content region is focusable.** `ScrollspyContent` sets `tabIndex={0}`
+  and an `aria-label` so the scrollable region can be reached and scrolled with
+  the arrow keys. Give each one a real name — the default is "Scrollable
+  content".
+- **Give each section a heading.** The nav is a convenience; the headings are
+  what let a screen-reader user move through the document at all.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a scrolling region without the navigation, use `ScrollBar`.
+- For sections the reader opens rather than scrolls past, use `Accordion`.
+- For navigation between pages rather than within one, use `SidebarTab` or
+  `NavPills`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

@@ -39,6 +39,12 @@ import Textarea from './Textarea';
  * *same* id. Nothing dangles — N controls claim one id and every label in the
  * group lands on whichever the browser reached first — so a story here has to
  * check that the ids are distinct as well as that they exist.
+ *
+ * #318 added `NumberInput` to the hidden-label story, which had made #225's
+ * mistake in its own file: `{showLabel && label && …}` skipped the element
+ * entirely rather than clipping it, and nothing replaced the name. The rule
+ * this file exists to hold is one rule for the whole group — showLabel moves
+ * pixels — so the assertion that states it is the one that has to grow.
  */
 
 /** Fails with the list of dangling `for` values, which is the useful message. */
@@ -109,7 +115,11 @@ NameWithoutId.play = async ({ canvasElement }) => {
     const dateTime = canvas.getByRole('group', { name: /Session start/ });
     await expect(within(dateTime).getAllByLabelText(/Session start/)).toHaveLength(2);
     canvas.getByRole('radiogroup', { name: /Confidence/ });
-    canvas.getByRole('group', { name: /Overall rating/ });
+    // #319 moved `Rating` from `group` to `radiogroup` — a rating is one value
+    // out of five, and the weaker role could not carry `aria-checked`. The name
+    // is what this file is about and it did not change; the role did, and this
+    // line is where that is recorded.
+    canvas.getByRole('radiogroup', { name: /Overall rating/ });
     canvas.getByRole('group', { name: /Topics/ });
 };
 
@@ -178,6 +188,8 @@ export const HiddenLabels = () => (
             showDate={false}
             showSectionLabels={false}
         />
+        {/* #318. The third component to make this mistake, and the last. */}
+        <NumberInput id="hl-sessions" name="sessions" label="Sessions" showLabel={false} />
     </div>
 );
 
@@ -193,6 +205,7 @@ HiddenLabels.play = async ({ canvasElement }) => {
         'Session start Date',
         'Session start Time',
         'Session end',
+        'Sessions',
     ].map((name) => canvas.getByRole('textbox', { name }));
 
     await expect(new Set(named).size).toBe(named.length);
@@ -202,7 +215,7 @@ HiddenLabels.play = async ({ canvasElement }) => {
     // And none of those names is on screen: `showLabel` moves pixels only, so
     // all three field labels are rendered and all three are clipped to nothing.
     const labels = Array.from(canvasElement.querySelectorAll('label'));
-    await expect(labels).toHaveLength(3);
+    await expect(labels).toHaveLength(4);
     for (const label of labels) {
         await expect(label.getBoundingClientRect().width).toBeLessThanOrEqual(1);
     }

@@ -106,4 +106,111 @@ Accordion component for organizing content into collapsible sections. Built on R
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Accordion` when a page carries several long, independent sections and only
+one of them matters at a time — a settings page, a FAQ, the optional detail
+under a form. Each item is collapsed until asked for, so the page keeps its
+shape and the headers stay a readable index of what is there.
+
+It is uncontrolled by default: give it `defaultActiveKey` and it tracks the open
+item itself. Pass `activeKey` and `onSelect` together to control it. `alwaysOpen`
+lets more than one item stay open at once.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### There are two ways to author items, and `children` wins.
+
+```jsx
+// Incorrect — the items array is dropped without warning. The component
+// returns children whenever children exist, and never looks at items.
+<Accordion items={sections}>
+    <Accordion.Item eventKey="0" header="One">…</Accordion.Item>
+</Accordion>
+
+// Correct — pick one. The array for uniform, data-driven sections:
+<Accordion items={sections} />
+
+// or children when a body needs its own markup:
+<Accordion>
+    <Accordion.Item eventKey="0" header="One">…</Accordion.Item>
+</Accordion>
+```
+
+### `alwaysOpen` needs an array key, even for one item.
+
+```jsx
+// Incorrect — the open item snaps shut on the first click elsewhere. With
+// alwaysOpen set and a non-array key, opening any item replaces the whole
+// selection with just that item.
+<Accordion alwaysOpen defaultActiveKey="0" items={sections} />
+
+// Correct.
+<Accordion alwaysOpen defaultActiveKey={['0']} items={sections} />
+```
+
+### `flush` is for accordions inside another bordered surface.
+
+It removes the outer border and the corner radius so the item rows sit flat
+against their container. Inside a `Card` that is what you want; on the bare page
+it leaves the accordion with no edge to hold it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Each header is a real button.** React Bootstrap renders the header as a
+  `button` carrying `aria-expanded`, wrapped in an `h2`. Tab reaches every
+  header; Enter and Space toggle; the heading list shows the whole index.
+- **The body is not associated with its header.** There is no `aria-controls` on
+  the button and no `role="region"` or `aria-labelledby` on the body — it is a
+  plain `div` that follows. In practice a screen reader lands on the body
+  immediately after the header it just expanded, so the order carries the
+  meaning. It does not survive being jumped to out of order.
+- **Write `header` as a heading.** It becomes the text of an `h2`, so it is
+  read both in place and in the heading list. A short noun phrase, not a
+  sentence.
+- **`disabled` stops the mouse only.** The prop adds a class whose rule sets
+  `pointer-events: none`; it never becomes a `disabled` attribute. The header
+  stays in the tab order and Enter still opens it. Do not use it to withhold
+  content — leave the item out, or render the body as an explanation of why it
+  is unavailable.
+- **Focus stays on the header after a toggle.** Opening an item does not move
+  focus into the body and does not scroll it into view. That is the right
+  behaviour — the user keeps their place — but it means a tall body opened low
+  in the viewport is off-screen until they scroll.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For one section that opens and closes, use `Collapse` — an accordion of one
+  item is furniture around a toggle.
+- For switching between alternative views of the same content, use `NavTabs`.
+  Tabs say "one of these"; an accordion says "these, some of which are open".
+- For a list of items that navigate rather than expand, use `ListGroup`.
+- When every section has to be readable at once, use none of them and lay the
+  sections out. Comparing two collapsed items means opening, reading, closing,
+  opening.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

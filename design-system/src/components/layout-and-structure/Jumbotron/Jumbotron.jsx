@@ -37,12 +37,20 @@ const Jumbotron = ({
 
                 {(primaryButton || secondaryButton) && (
                     <div className="plus-jumbotron-actions">
+                        {/*
+                          * #317. `size="medium"` and not `"default"`: Button's
+                          * `size` is `oneOf(['small','medium','large'])` and the
+                          * value is interpolated straight into a class name, so
+                          * `"default"` failed the prop type AND produced a class
+                          * `Button.scss` has no rule for. `medium` is Button's own
+                          * default, so this is now the value it would pick anyway.
+                          */}
                         {primaryButton && (
                             <Button
                                 text="Primary Action"
                                 style="primary"
                                 fill="filled"
-                                size="default"
+                                size="medium"
                                 {...primaryButton}
                             />
                         )}
@@ -51,7 +59,7 @@ const Jumbotron = ({
                                 text="Secondary Action"
                                 style="secondary"
                                 fill="outline"
-                                size="default"
+                                size="medium"
                                 {...secondaryButton}
                             />
                         )}

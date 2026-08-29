@@ -134,6 +134,23 @@ export default defineConfig({
         // so no static scan can see it. The rest are the setup file's own imports,
         // pinned so the first optimise pass is the only one.
         //
+        // `framer-motion` and `react-router-dom` were added after the flake came
+        // back on 2026-08-29 and took three PRs red at once, each naming a
+        // DIFFERENT innocent story file. The log says what the comment above
+        // predicted it would:
+        //
+        //     [vite] (client) ✨ new dependencies optimized: framer-motion, react-router-dom
+        //     [vitest] Vite unexpectedly reloaded a test.
+        //     [vite] (client) ✨ optimized dependencies changed. reloading
+        //
+        // NEITHER IS IMPORTED BY ANYTHING UNDER THE STORY GLOBS — searched across
+        // `design-system/src` and `.storybook`, statically, and there is no hit.
+        // That is not a contradiction, it is the mechanism: a dependency no static
+        // scan can reach is precisely the one that arrives mid-run. `include`
+        // forces it into the first pass anyway, which is the whole point of the
+        // field, and pre-bundling a package the suite may never execute costs one
+        // optimise pass and nothing else.
+        //
         // To check: delete node_modules/.cache/storybook, run the suite, and read
         // `optimized` in .cache/storybook/*/sb-vitest/deps/_metadata.json. Every
         // name below must be there. If a new dependency starts arriving at runtime,
@@ -145,9 +162,11 @@ export default defineConfig({
             '@storybook/addon-vitest/internal/test-utils',
             '@storybook/react-vite',
             'axe-core',
+            'framer-motion',
             'prop-types',
             'react-dom/client',
             'react-dom/test-utils',
+            'react-router-dom',
             'storybook/internal/preview/runtime',
             'storybook/preview-api',
             'storybook/test'

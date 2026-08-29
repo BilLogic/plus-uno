@@ -65,4 +65,95 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `RichTextEditor` where the formatting is part of the meaning — session notes
+with a list, feedback with emphasis, a description that needs a link. Where it is
+not, a `Textarea` is the smaller, sturdier control.
+
+`toolbarPreset` is `compact` or `full`; passing `toolbarButtons` selects the
+buttons by name and implies the full toolbar. `value` and `onChange` are HTML
+strings. Giving it a `name` also renders a hidden input, so the HTML posts with a
+plain form.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### `value` is written to the DOM as HTML.
+
+```jsx
+// Incorrect — the value is assigned to the editable region's innerHTML, so
+// anything a user can influence is executed as markup.
+<RichTextEditor value={note.bodyFromApi} onChange={setBody} />
+
+// Correct — sanitise on the way in, and again on the way out before storing.
+<RichTextEditor value={sanitize(note.bodyFromApi)} onChange={(html) => setBody(sanitize(html))} />
+```
+
+The same applies to what you receive: `onChange` hands you whatever the browser
+produced, which is markup from a paste as much as from the toolbar.
+
+### It is built on a deprecated browser API.
+
+Formatting runs through `document.execCommand`, which every engine now documents
+as deprecated. It works today and its exact output differs between browsers —
+one may wrap a line in `<div>`, another in `<p>`. Do not depend on the shape of
+the HTML; store it and render it, or convert it once on save.
+
+### Link and image ask with a browser prompt.
+
+Pressing those buttons opens the platform `prompt()` dialog for a URL. It is
+unstyled, it is not translatable, and some environments suppress it. Where that
+matters, leave those two buttons out of `toolbarButtons`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The editable region is not announced as a text field.** It is a
+  `contentEditable` `div` with no `role="textbox"`, no `aria-multiline` and no
+  name. A screen-reader user reaches an editable area that does not say what it
+  is or what it is for.
+- **`id` does not label it.** The prop is applied to the outer container, so a
+  `label` pointing at it points at a `div`. There is no `label` prop either — put
+  a heading above the editor and accept that the association is visual.
+- **The toolbar buttons are named.** Each carries an `aria-label` from its
+  definition, and the bold/italic/underline set is a `role="group"` labelled
+  "Bold, italic, and underline". Their pressed state is tracked internally and is
+  not exposed as `aria-pressed`.
+- **The placeholder is CSS.** It is drawn from a `data-placeholder` attribute, so
+  it is not part of the accessible name and may not be announced at all.
+- **Keep the formatting optional.** Anything that only exists as bold text or a
+  colour in the body is invisible to someone hearing the page. Structure it with
+  lists and headings instead.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For plain multi-line text, use `Textarea` — smaller, labelled, and with none
+  of the above.
+- For one line, use `Input`.
+- For displaying formatted content the user cannot edit, render the HTML
+  yourself after sanitising it.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

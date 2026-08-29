@@ -68,26 +68,69 @@ body,
 }
 
 /*
- * Body text in MDX prose only.
- * Do NOT target bare `.sbdocs p` / `li` / `td` — that !important override
- * smashed DS utilities (body3-txt captions, h6 titles, etc.) inside story canvases.
+ * Docs prose (#252).
+ *
+ * THE DEFECT was not specificity, it was inheritance. `.sbdocs { font-family: …
+ * !important }` is inherited, and an inherited value loses to any declaration
+ * applied directly to the element whatever its weight. Storybook applies one:
+ *
+ *   .css-1cymxic :where(p:not(.sb-anchor, .sb-unstyled, .sb-unstyled p))
+ *       font-family: "Nunito Sans", …;  font-size: 14px;  color: rgb(46, 51, 56)
+ *
+ * So prose rendered in Storybook's font, at 14px, in Storybook's grey, on every
+ * docs page. The rules meant to prevent it targeted `.sbdocs-content > p`, a
+ * DIRECT child — which is why a page whose prose sat one div deep rendered at
+ * 14px while a sibling page rendered correctly.
+ *
+ * NO `!important`. That selector looks like `(0,0,0)` because of the `:where()`,
+ * but the emotion class in front of it counts: it is `(0,1,0)`. Two classes and
+ * an attribute selector is `(0,3,0)` and outranks it outright, in any source
+ * order. The four `!important`s the old rules carried were doing nothing that
+ * specificity was not already doing, and are gone.
+ *
+ * `:not([class])` IS THE POLICY, not a trick. Prose that carries no class of its
+ * own is ours to type; prose that carries one — the Tailwind captions authored
+ * in Getting started/Introduction — is that page's own decision, and this must
+ * not overrule it. The fence keeps the rule out of story canvases, where it
+ * would smash DS utilities (body3-txt captions, h6 titles); `:where()` costs the
+ * rule no specificity.
+ *
+ * WHAT WAS TRIED AND DROPPED: `parameters.docs.components`, mapping `p`/`li` to
+ * components carrying `.body1-txt`. It is the approach the ticket decided on,
+ * and measured against a running Storybook it changed nothing — the same 34
+ * prose elements rendered identically with and without it, because an element
+ * the map does not class is an element this rule already catches. A second
+ * mechanism that alters no pixel is a second authority for one job.
  */
-.sbdocs .sbdocs-content > p:not([class]),
-.sbdocs .sbdocs-content > ul > li:not([class]),
-.sbdocs .sbdocs-content > ol > li:not([class]) {
-    font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif) !important;
-    font-size: var(--font-size-body1, 16px) !important;
-    line-height: var(--font-line-height-body1, 150%) !important;
-    font-weight: var(--font-weight-normal, 300) !important;
+.sbdocs .sbdocs-content p:not([class]):not(:where(.docs-story *)),
+.sbdocs .sbdocs-content li:not([class]):not(:where(.docs-story *)) {
+    font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif);
+    font-size: var(--font-size-body1, 16px);
+    line-height: var(--font-line-height-body1, 150%);
+    font-weight: var(--font-weight-normal, 300);
+    color: var(--color-on-surface, #191c1e);
+    max-width: 55ch;
 }
 
-/* Canvas Descriptions text */
-.sb-ds-canvas-description {
-    font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif) !important;
-    font-size: var(--font-size-body2, 14px) !important;
-    line-height: var(--font-line-height-body2, 157.1%) !important;
-    font-weight: var(--font-weight-normal, 300) !important;
-    color: var(--color-on-surface-variant, #5c5c5c) !important;
+/*
+ * Measure. The longest paragraph on Foundations/Accessibility ran 134 characters
+ * per line at a 1140px docs column, against a comfortable 45–75. The cap is on
+ * the text, not on the column: canvases stay full-bleed at 864px while prose
+ * narrows, and splitting the two is what lets both be right.
+ *
+ * 55ch, not the 72ch the ticket suggested. `ch` is the advance width of "0",
+ * which in Merriweather Sans is 10.8px at 16px type while the average prose
+ * glyph is about 7.9px — so `ch` runs a third wide for this face, and 72ch
+ * measured 98 characters per line rather than 72. Walked down against the
+ * longest paragraph in the sample: 72ch gave 98, 58ch gave 83, 55ch gives 78.
+ * The number is chosen against the measured line, not against the unit.
+ *
+ * The cap goes on the LIST rather than on each item, so a wrapped item and its
+ * marker stay in one column.
+ */
+.sbdocs .sbdocs-content ul:not([class]):not(:where(.docs-story *)),
+.sbdocs .sbdocs-content ol:not([class]):not(:where(.docs-story *)) {
+    max-width: 55ch;
 }
 
 /* Code blocks */
@@ -427,6 +470,38 @@ a.sbdocs-a {
 
 .sbdocs .sb-ds-docs-interactive-panel__controls .docblock-argstable-head th {
   font-weight: 600 !important;
+}
+
+/*
+ * D1 of #263 — the props table is wider than its column, and Storybook's wrapper
+ * does not scroll.
+ *
+ * Measured on Components/Actions/Button, the same page at four widths:
+ *
+ *   viewport   table   wrapper   docs body (scroll/client)
+ *   1440px     749     750       1140 / 1140
+ *   1024px     594     594        724 /  724
+ *    900px     591     470        656 /  600   <- overflows
+ *    768px     591     338        656 /  468   <- overflows
+ *
+ * The table's width is intrinsic — `min-width` is `0` and `table-layout` is
+ * `auto`, so it stops shrinking at its content and 591px is the floor. Storybook's
+ * wrapper computes `overflow-x: visible`, so below about 1024px the table does not
+ * scroll, it spills: the `Control` column is what visibly collides with the "On
+ * this page" rail, and the docs body itself scrolls sideways.
+ *
+ * The wrapper is Storybook's own emotion div with a hashed class name, so it is
+ * selected by what it directly contains rather than by a name that changes on
+ * every release. `:has()` support is noted where it is first used, above.
+ *
+ * `overflow-y` is stated because it would not otherwise stay `visible`: CSS does
+ * not let one axis scroll while the other does not, so `overflow-x: auto` alone
+ * computes it to `auto`. That is the whole of D4 in this ticket — the docs tab
+ * strip grew a vertical scrollbar nobody authored, and ate 15px of its own width.
+ */
+.sbdocs *:has(> .docblock-argstable) {
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 /*
@@ -802,6 +877,78 @@ h2.toc-title {
   border-bottom: none !important;
   border-radius: var(--size-card-radius-sm) var(--size-card-radius-sm) 0 0;
   box-sizing: border-box !important;
+}
+
+/*
+ * D2 and D3 of #263 — the two halves of the attached card's bottom edge.
+ *
+ * The rule above deliberately leaves that edge OPEN: square bottom corners and
+ * no bottom border, because the code strip is meant to attach there and complete
+ * the card ("canvas + extension"). It keys on the canvas alone, which is true
+ * whether or not a strip actually exists, and Storybook gives the story wrapper
+ * symmetric `padding: 40px 0` while pulling `.sbdocs-preview-actions` up by
+ * `margin-top: -40px` — so the card's bottom 40px is the buttons' band, not
+ * breathing room.
+ *
+ * Measured on Components/Actions/Button, both attached roots:
+ *
+ *              actions row?   border T/R/B/L   radius        above/below demo
+ *   Overview   yes            1/1/0/1          12/12/0/0     41px / 0px
+ *   Sizes      no             1/1/0/1          12/12/0/0     41px / 0px
+ *
+ * Sizes renders an open card onto whitespace, directly above a `States` section
+ * whose plain well is a closed rounded rectangle; the difference between the two
+ * reads as a rendering fault. Overview puts the demo's bottom edge exactly on
+ * the actions row's top edge.
+ *
+ * The actions row is a SIBLING of the preview inside the attached root, so the
+ * root is the node where its presence can be tested. `:has()` support is noted
+ * where it is first used, near the top of this file.
+ *
+ * WHY THESE REPEAT THE SELECTOR ABOVE RATHER THAN SITTING ON `> *:first-child`.
+ * That rule is `(0,6,1)` — six classes and the `div` type. A selector qualified
+ * only by the attached root reaches `(0,6,0)` and LOSES to it, so `border-bottom:
+ * none !important` would have survived and the card would still hang open. These
+ * mirror it and add the one `:has()`, which is `(0,7,1)`.
+ *
+ * The closing border has to name its COLOUR as well as its width and style.
+ * `border-bottom: none` in the rule above is a shorthand, so it reset that edge's
+ * colour to the initial `currentColor` along with its width — restoring width and
+ * style alone drew the bottom edge in the text colour, a near-black line under
+ * three grey ones. Measured before it shipped.
+ */
+.sbdocs
+  .sb-ds-docs-canvas-shell--source-attached
+  .sb-ds-docs-canvas-attached-root:not(:has(.sbdocs-preview-actions))
+  .docs-story:not(:has(.responsive-frame-root))
+  > div[scale="1"] {
+  border-bottom-width: 1px !important;
+  border-bottom-style: solid !important;
+  border-bottom-color: var(--color-outline-variant, #bec8ca) !important;
+  border-radius: var(--size-card-radius-sm);
+}
+
+/* Dark carries only the fallback, exactly as the sibling rules above do: the
+   token itself is theme-aware, and this is what applies if it is ever unset. */
+.sbdocs.dark
+  .sb-ds-docs-canvas-shell--source-attached
+  .sb-ds-docs-canvas-attached-root:not(:has(.sbdocs-preview-actions))
+  .docs-story:not(:has(.responsive-frame-root))
+  > div[scale="1"] {
+  border-bottom-color: var(--color-outline-variant, #3f4847) !important;
+}
+
+/*
+ * D3: a second 40px below the demo — one band for the buttons that the negative
+ * margin pulls into, one to match the 40px above. Scoped to roots that actually
+ * carry an actions row, so no canvas is padded for a band it does not have.
+ */
+.sbdocs
+  .sb-ds-docs-canvas-shell--source-attached
+  .sb-ds-docs-canvas-attached-root:has(.sbdocs-preview-actions)
+  .docs-story:not(:has(.responsive-frame-root))
+  > div[scale="1"] {
+  padding-bottom: calc(var(--size-spacing-large-space-700) * 2) !important;
 }
 
 /*
