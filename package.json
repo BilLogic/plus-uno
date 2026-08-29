@@ -24,6 +24,8 @@
     "generate:figma-links": "node scripts/generate-figma-links-spreadsheet.js",
     "check:figma-links": "node scripts/generate-figma-links-spreadsheet.js --check",
     "check:figma-node-types": "node scripts/check-figma-node-types.mjs",
+    "check:figma-snapshots": "node scripts/check-figma-snapshots.mjs",
+    "audit:figma-variables": "node scripts/audit-figma-variables.mjs",
     "generate:token-registry": "node scripts/generate-token-registry.mjs",
     "check:token-registry": "node scripts/generate-token-registry.mjs --check",
     "generate:knowledge-components": "node scripts/generate-knowledge-components.js",
