@@ -4,7 +4,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { ROWS, ourTokens, compare, ageInDays, failures } from './atlassian-benchmark.mjs';
+import { INTENT, ROWS, ourTokens, compare, ageInDays, failures } from './atlassian-benchmark.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BENCHMARK = JSON.parse(
@@ -35,8 +35,8 @@ test('the token count is a real read of the token files', () => {
 });
 
 test('an `up` row that FALLS is a finding, and one that rises is not', () => {
-  const rows = [{ key: 'colour.role.icon', ours: 0, direction: 'up', why: 'x' }];
-  const base = { ours: { 'colour.role.icon': 3 } };
+  const rows = [{ key: 'intent.iconTokens', ours: 0, direction: 'up', why: 'x' }];
+  const base = { ours: { 'intent.iconTokens': 3 } };
   const found = failures(rows, base, opts);
   assert.equal(found.length, 1);
   assert.match(found[0], /may only RISE/);
@@ -83,6 +83,31 @@ test('ageInDays counts whole days and rejects nonsense', () => {
   assert.equal(ageInDays('2026-08-29', NOW), 0);
   assert.equal(ageInDays('2026-08-19', NOW), 10);
   assert.equal(ageInDays('not a date', NOW), null);
+});
+
+test('the seven intents all still carry the same shape the finding rests on', () => {
+  // The finding is "every intent names two roles and uses three". It stops being
+  // true the moment one intent grows a -border or -icon, which is the point: the
+  // ratchet above notices. This asserts the SHAPE the claim was measured on.
+  const tokens = ourTokens(REPO_ROOT);
+  const intents = ['primary', 'secondary', 'tertiary', 'danger', 'success', 'warning', 'info'];
+  for (const name of intents) {
+    const own = tokens.filter((t) => t.startsWith(`--color-${name}-`) || t === `--color-${name}`);
+    assert.equal(own.length, 9, `${name} has ${own.length} tokens, not the shared 9`);
+    assert.ok(own.includes(`--color-${name}-text`), `${name} has no -text`);
+    assert.ok(own.includes(`--color-${name}-container`), `${name} has no -container`);
+  }
+  assert.ok(INTENT.test('--color-warning-text'));
+  assert.ok(!INTENT.test('--color-advocacy-text'), 'a subject colour is not an intent');
+});
+
+test('the roles we DO have are counted under our own names, not Atlassian spelling', () => {
+  // The first draft of this file recorded "0 background tokens" by grepping for
+  // the literal string. --color-surface* IS the background role; measuring our
+  // vocabulary instead of our system produced a finding that was not true.
+  const tokens = ourTokens(REPO_ROOT);
+  assert.ok(tokens.filter((t) => t.startsWith('--color-surface')).length > 20);
+  assert.ok(tokens.filter((t) => t.startsWith('--color-outline')).length > 5);
 });
 
 test('the recorded Atlassian side is the measurement, not a guess', () => {

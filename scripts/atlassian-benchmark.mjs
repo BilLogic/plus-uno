@@ -14,25 +14,43 @@
  * on distance, and only on the rows where a direction has actually been argued
  * for.
  *
- * THE TWO STRUCTURAL FINDINGS, measured 2026-08-29:
+ * THE FINDINGS, measured 2026-08-29. The first draft of this file recorded
+ * that we have "no role namespace in colour at all", which is false and worth
+ * saying plainly: `--color-surface*` (36) is the background role and
+ * `--color-outline*` (8) is the border role, under Material's names rather than
+ * Atlassian's. Counting only the literal strings `background` and `border` in
+ * token names measured our vocabulary, not our system. What survives the
+ * correction is sharper than what it replaced:
  *
- * 1. WE HAVE NO ROLE NAMESPACE IN COLOUR. Atlassian's largest namespace is
- *    `color.background` at 208 tokens, beside `color.text` 49, `color.border`
- *    39 and `color.icon` 23 — four separate answers to "what is this colour
- *    FOR". We have zero tokens whose name says background, border or icon.
- *    `--color-primary` is used as a fill, as a label and as a border, and no
- *    token can say which is meant. That is why #312's warning defect could
- *    exist at all: nothing in the system distinguished "warning as a ground"
- *    from "warning as text", so the one pair that fails as a ground was never
- *    separable from the one that passes as text.
+ * 1. OUR FOREGROUND ROLE IS UNDIVIDED. Atlassian split it in two — `color.text`
+ *    49 and `color.icon` 23 — because the bars differ: text must reach 4.5:1
+ *    and an icon 3:1. We have one `--color-on-*` family (32) serving both, so
+ *    no token records which bar its value was chosen against. Nothing in the
+ *    system can tell you whether a colour passing as an icon was ever checked
+ *    as text.
  *
- * 2. OUR TYPE IS STORED APART FROM ITSELF. Atlassian ships 14 type steps and
- *    each one is a single token carrying size, line-height and weight together;
- *    there is no `font.lineHeight.*` namespace on their page at all. We ship 44
+ * 2. EVERY INTENT NAMES TWO ROLES AND USES THREE. All seven intents — primary,
+ *    secondary, tertiary, danger, success, warning, info — have the identical
+ *    9-token shape: a base, a container, a `-text`, and six state overlays.
+ *    There is no `--color-warning-border` and no `--color-warning-icon`, so an
+ *    intent-coloured border or icon reaches for the BASE, which is also the
+ *    ground. That is exactly the gap #312's warning defect lived in:
+ *    `--color-warning` measures 3.70:1 against white — failing both as a ground
+ *    under white text and as text on white — while `--color-warning-text`
+ *    measures 13.27:1 and passes. The two are one prefix apart and the name
+ *    says nothing about which is safe where.
+ *
+ * 3. OUR TYPE IS STORED APART FROM ITSELF. Atlassian ship 14 type steps, each
+ *    ONE token carrying size, line-height and weight together; there is no
+ *    `font.lineHeight.*` namespace on their page at all. We ship 44
  *    `--font-size-*` and 46 `--font-line-height-*` as separate tokens that must
- *    agree and are stored where they can disagree. That is the same defect
- *    shape as #346, where `--type-h4` carried a weight the class it named did
- *    not use.
+ *    agree and are stored where they can disagree — the same defect shape as
+ *    #346, where `--type-h4` carried a weight the class it named did not use.
+ *
+ * Only findings 1-3 are enforced, and only in the direction argued at each row.
+ * The role COUNTS are recorded and left alone: 36 surface tokens against their
+ * 208 backgrounds is a difference, not a defect, and a gate that demanded the
+ * number rise would be demanding growth for its own sake.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -50,6 +68,13 @@ export function ourTokens(repoRoot) {
 }
 
 /**
+ * The seven intents, each of which today carries the identical 9-token shape.
+ * Written as one regex so `intent.borderTokens` and `intent.iconTokens` cannot
+ * drift apart from the list they are counting over.
+ */
+export const INTENT = /^--color-(primary|secondary|tertiary|danger|success|warning|info)-/;
+
+/**
  * The rows worth comparing, and the direction each one may move.
  *
  * `direction` is the only thing the check enforces:
@@ -62,37 +87,26 @@ export function ourTokens(repoRoot) {
  */
 export const ROWS = [
   {
-    key: 'colour.role.background',
-    ours: (t) => t.filter((n) => n.startsWith('--color-') && n.includes('background')).length,
-    theirs: (b) => b.colourByRole['color.background'],
-    direction: 'up',
-    why:
-      'Atlassian’s largest namespace, 208 tokens, and we have none. A component ' +
-      'reaching for --color-primary cannot say whether it wants the fill or the label, ' +
-      'which is the gap #312’s warning defect lived in.',
-  },
-  {
-    key: 'colour.role.text',
-    ours: (t) => t.filter((n) => n.startsWith('--color-') && n.includes('text')).length,
-    theirs: (b) => b.colourByRole['color.text'],
-    direction: 'up',
-    why: 'The one role we have started naming — 12 `-text` tokens against their 49.',
-  },
-  {
-    key: 'colour.role.border',
-    ours: (t) => t.filter((n) => n.startsWith('--color-') && n.includes('border')).length,
+    key: 'intent.borderTokens',
+    ours: (t) => t.filter((n) => INTENT.test(n) && n.endsWith('-border')).length,
     theirs: (b) => b.colourByRole['color.border'],
     direction: 'up',
-    why: 'Zero. Every border colour in this system is a fill token used as a stroke.',
+    why:
+      'Zero. All seven intents have the same 9 tokens — base, container, -text and ' +
+      'six state overlays — so an intent-coloured BORDER reaches for the base, which ' +
+      'is also the ground. Atlassian name 39 border colours precisely so a stroke ' +
+      'never has to borrow a fill.',
   },
   {
-    key: 'colour.role.icon',
-    ours: (t) => t.filter((n) => n.startsWith('--color-') && n.includes('icon')).length,
+    key: 'intent.iconTokens',
+    ours: (t) => t.filter((n) => INTENT.test(n) && n.endsWith('-icon')).length,
     theirs: (b) => b.colourByRole['color.icon'],
     direction: 'up',
     why:
-      'Zero. An icon is the case where 3:1 is the bar rather than 4.5:1, and no token ' +
-      'records which colours were chosen against which bar.',
+      'Zero, and the bar is different: an icon must reach 3:1 where text must reach ' +
+      '4.5:1. Atlassian keep 23 icon colours apart from their 49 text colours for ' +
+      'that reason. --color-warning is 3.70:1 on white — legal as an icon, illegal ' +
+      'as text — and nothing in its name says so, which is where #312 came from.',
   },
   {
     key: 'type.sizeSteps',
@@ -100,9 +114,9 @@ export const ROWS = [
     theirs: (b) => b.typeSteps.count,
     direction: 'down',
     why:
-      '44 against their 14. #267 measured that our scale has no ratio at all — the steps ' +
-      'wander between 1.111 and 1.400 — and that 26 of the tokens are dead. The direction ' +
-      'is settled even though the destination is not.',
+      '44 against their 14. #267 measured that our scale has no ratio at all — the ' +
+      'steps wander between 1.111 and 1.400 — and that 26 of the tokens are dead. ' +
+      'The direction is settled even though the destination is not.',
   },
   {
     key: 'type.lineHeights',
@@ -110,10 +124,22 @@ export const ROWS = [
     theirs: () => 0,
     direction: 'down',
     why:
-      'They ship ZERO: line-height travels inside the 14 steps. We ship 46 tokens that ' +
-      'must agree with 44 size tokens and are stored where they can disagree — the same ' +
-      'shape as #346.',
+      'They ship ZERO: line-height travels inside the 14 steps. We ship 46 tokens ' +
+      'that must agree with 44 size tokens and are stored where they can disagree — ' +
+      'the same shape as #346.',
   },
+
+  /*
+   * Recorded and not enforced. These are the role counts under OUR names, which
+   * is what the first draft of this file got wrong by counting Atlassian's
+   * spelling and finding zero. They are printed so the comparison is visible;
+   * no direction is claimed, because 36 surface tokens against 208 backgrounds
+   * is a difference and not a defect.
+   */
+  { key: 'role.background(surface)', ours: (t) => t.filter((n) => n.startsWith('--color-surface')).length, theirs: (b) => b.colourByRole['color.background'], direction: null },
+  { key: 'role.foreground(on-*)', ours: (t) => t.filter((n) => n.startsWith('--color-on-')).length, theirs: (b) => b.colourByRole['color.text'] + b.colourByRole['color.icon'], direction: null },
+  { key: 'role.border(outline)', ours: (t) => t.filter((n) => n.startsWith('--color-outline')).length, theirs: (b) => b.colourByRole['color.border'], direction: null },
+  { key: 'intent.textTokens', ours: (t) => t.filter((n) => INTENT.test(n) && n.endsWith('-text')).length, theirs: (b) => b.colourByRole['color.text'], direction: null },
   { key: 'colour.total', ours: (t) => t.filter((n) => n.startsWith('--color-')).length, theirs: (b) => b.totals.color, direction: null },
   { key: 'font.total', ours: (t) => t.filter((n) => n.startsWith('--font-')).length, theirs: (b) => b.totals.font, direction: null },
   { key: 'space', ours: (t) => t.filter((n) => n.startsWith('--size-spacing-')).length, theirs: (b) => b.totals.space, direction: null },
