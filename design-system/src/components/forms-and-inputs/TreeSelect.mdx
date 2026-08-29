@@ -123,14 +123,14 @@ If you only want leaves, filter the array you are handed.
 ### Expanding is not selecting.
 
 The caret expands and collapses without changing the selection — its click
-handler stops there. Clicking anywhere else on the row selects it, including on a
-parent.
+handler stops there, and Right and Left do the same from the keyboard. Clicking
+or pressing Enter anywhere else on the row selects it, including on a parent.
 
-### Name it through the forwarded props.
+### Label it the ordinary way.
 
-`id` is applied to the wrapper, not to the input, so a `label` pointing at it
-names nothing. Pass `aria-label` or `aria-labelledby`, which are forwarded to the
-input that takes focus.
+`id` lands on the input (#323), so a `label` pointing at it names the field.
+`aria-label` and `aria-labelledby` are forwarded to the same element if you
+would rather not render a label.
 
 ### Values must be unique across the whole tree.
 
@@ -144,21 +144,23 @@ concerned.
 
 ## Accessibility
 
-- **The roles are right.** The input is a `combobox` with `aria-haspopup="tree"`
-  and `aria-expanded`; the panel is a `tree`; every node is a `treeitem` with
-  `aria-expanded`, `aria-selected` and `aria-disabled` where each applies.
-- **The tree is not keyboard-navigable.** No node is a tab stop and there are no
-  key handlers, so the arrow-key movement a `tree` implies is not there. In
-  `multiple` mode the per-node checkboxes are real inputs and can be reached and
-  toggled; in single mode there is no keyboard path to a selection at all.
-- **Nothing connects the combobox to the tree.** There is no `aria-controls` and
-  no `aria-activedescendant`, so the relationship exists visually and not
-  programmatically.
+- **The roles are right, and now they are honoured.** The input is a `combobox`
+  with `aria-haspopup="tree"`, `aria-expanded` and `aria-controls`; the panel is
+  a `tree`; every node is a `treeitem` with `aria-expanded`, `aria-selected`,
+  `aria-level` and `aria-disabled` where each applies.
+- **The tree walks with the arrow keys.** Down opens it from the field. Up and
+  Down move through the rows that are actually showing; Right opens a branch and
+  then steps into it; Left closes one and then steps out to its parent; Home and
+  End jump; Enter and Space choose (#323).
+- **One tab stop, on the cursor.** Tab leaves the tree rather than walking it,
+  which is what a `tree` promises. Opening starts on the selected node — the
+  reason its ancestors are expanded for you — or on the first row.
+- **Escape closes it and returns focus to the field.** So does choosing, in
+  single mode. In `multiple` mode choosing leaves the panel open, because you are
+  usually about to choose again.
 - **Indeterminate is set on the input, not implied.** A partly selected parent
   gets the real `indeterminate` property, so it announces as mixed rather than as
   unchecked.
-- **Where a keyboard path is required, prefer `Select`** — or use `multiple` mode
-  here, whose checkboxes are at least operable.
 
 </div>
 

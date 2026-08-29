@@ -129,15 +129,14 @@ objects, nested by `children`.
 If a branch is a legitimate answer, give it a child that says so ("All of
 Scotland"), rather than expecting the intermediate click to commit.
 
-### The field is unnamed unless you name it.
+### Label it the ordinary way.
 
 ```jsx
-// Incorrect — `id` is put on the wrapper div, not on the input, so a label
-// pointing at it points at a div and names nothing.
+// `id` lands on the input (#323), so a label pointing at it names the field.
 <label htmlFor="region">Region</label>
-<Cascader id="region" options={regions} />
+<Cascader id="region" options={regions} value={path} onChange={setPath} />
 
-// Correct — extra props are forwarded to the input, so name it there.
+// `aria-label` works too — extra props are forwarded to the same input.
 <Cascader aria-label="Region" options={regions} value={path} onChange={setPath} />
 ```
 
@@ -147,11 +146,13 @@ The value of an option is read as `option.value || option.text || option.label`,
 so `{ value: 0 }` and `{ value: '' }` resolve to the label instead. Use non-empty
 string values.
 
-### It is a mouse-driven control.
+### Hover previews; the keyboard walks.
 
-The menu opens on click, the columns preview on hover, the options are `div`s
-with no role and no tab stop, and nothing closes it but a click elsewhere. Where
-the audience is not guaranteed to be using a mouse, use `TreeSelect` or `Select`.
+The columns preview on hover, which is a pointer convenience and not the only
+route: Down opens the menu, Up and Down walk a column, Right opens the child
+column and steps into it, Left goes back to the row that opened it, Enter
+commits a leaf, and Escape closes and returns focus to the field (#323).
+Disabled options are stepped over rather than landed on.
 
 </div>
 
@@ -159,21 +160,19 @@ the audience is not guaranteed to be using a mouse, use `TreeSelect` or `Select`
 
 ## Accessibility
 
-- **The options are not reachable by keyboard.** Each is a `div` with an
-  `onClick` and no `role`, no `tabIndex` and no key handler. Tab reaches the
-  input and then leaves; there is no way to open the menu, move through it or
-  choose from it without a pointer.
-- **The state of the control is not announced.** The input is a read-only text
-  field with no `role="combobox"`, no `aria-expanded` and no `aria-controls`, so
-  nothing says a menu opened or what it holds.
-- **Escape does not close it.** The only dismissal is a `mousedown` outside the
-  wrapper.
-- **Name it through the forwarded props.** `aria-label` or `aria-labelledby`
-  passed to the component reaches the input, which is the element that gets
-  focus. `id` does not — it lands on the wrapper.
-- **Do not use it for a required or sole path through a task.** Everything above
-  means some users cannot complete it. `TreeSelect` covers the same shape with
-  real roles, and `Select` covers a flat list properly.
+- **The trigger says what it opens.** `role="combobox"` with
+  `aria-haspopup="listbox"`, `aria-expanded`, and `aria-controls` naming the menu
+  while it is open.
+- **Each column is a named listbox.** The first is "Options"; the rest are named
+  for the row that opened them, so a screen-reader user hears which branch they
+  are inside rather than a second unnamed list.
+- **One tab stop, and it moves with you.** The open menu holds a single tab stop
+  on the cursor, so Tab leaves the menu rather than walking it — the arrow keys
+  are what walk it, which is the listbox contract.
+- **Escape closes it and gives focus back to the field.** So does choosing a
+  leaf. Nothing strands focus in a menu that is no longer there.
+- **Disabled options are skipped, not refused.** Arrow keys step over them, so a
+  keyboard user never lands somewhere that will not respond.
 
 </div>
 
@@ -181,8 +180,8 @@ the audience is not guaranteed to be using a mouse, use `TreeSelect` or `Select`
 
 ## Related
 
-- For the same hierarchy with tree roles and a multi-select mode, use
-  `TreeSelect`.
+- For the same hierarchy shown as one expanding tree, or for choosing more than
+  one branch, use `TreeSelect`.
 - For a flat list of options, use `Select`.
 - For a hierarchy the user browses rather than selects from, use `Accordion` or
   `SidebarTab`.
