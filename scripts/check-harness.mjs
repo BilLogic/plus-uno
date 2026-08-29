@@ -192,6 +192,12 @@ const COMPOSED = [
       "every font stack ending in a CSS generic, and every inline fallback naming the face its token names. A fallback only paints when the token fails to load, so a wrong one is wrong everywhere at once and invisible until then — the reasoning check:colour-fallbacks applies to colour, which nothing applied to type. Seven findings when it was written and all seven fixed: --font-family-display4 named one face and no generic; three files fell back from --font-family-body to Lato, which is the HEADER face, so body text would have rendered in the heading font; two fell back to a bare `Lato`. It also keeps #267's monospace rule, where --font-family-code fell back to sans-serif and the stack measured 171.13px against monospace's 480.08px.",
   },
   {
+    script: 'check:atlassian-benchmark',
+    pkg: 'root',
+    guards:
+      "the comparison against Atlassian staying a MEASUREMENT rather than a memory, and the two structural gaps it found staying closed once they close. Atlassian's published surface was read live on 2026-08-29 — 515 tokens, of which 441 are colour split by ROLE into `background` 208, `text` 49, `border` 39 and `icon` 23. We have 195 colour tokens and no role split at all: zero named background, border or icon, so `--color-primary` is used as a fill, a label and a stroke and no token can say which is meant. That is the gap #312's warning defect lived in — nothing separated warning-as-a-ground (3.70:1, fails) from warning-as-text (13.27:1, passes). Their 14 type steps each carry size, line-height and weight in ONE token and there is no lineHeight namespace on their page; we ship 44 sizes and 46 line-heights apart, where they can disagree, which is #346's defect shape. Six rows are ratcheted by DIRECTION and not by distance — role coverage may only rise, the type surface may only fall — because differing from Atlassian is usually correct: they ship 100 chart colours for a product surface we do not have. It also fails when the recording goes a year unread, since a benchmark nobody re-measures is a sentence and not a comparison.",
+  },
+  {
     script: 'check:unspread-rest',
     pkg: 'root',
     guards:

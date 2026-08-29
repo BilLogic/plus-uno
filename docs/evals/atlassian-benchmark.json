@@ -1,0 +1,58 @@
+{
+  "note": "Atlassian's published token surface, MEASURED rather than remembered. Not derived from anything in this repository. Re-measure with `npm run benchmark:atlassian -- --how` and record the date; check:atlassian-benchmark holds our own numbers to the directions below.",
+  "source": "https://atlassian.design/components/tokens/all-tokens",
+  "measuredAt": "2026-08-29",
+  "method": "Read the rendered page and matched every line of the form `<group>.<path>` against /^(color|elevation|space|font|border|opacity|shadow|utility|layer)\\.[a-zA-Z0-9.-]+$/m, de-duplicated, then grouped by the first and second segments. Counts are of DISTINCT token names on that page.",
+  "totals": {
+    "all": 515,
+    "color": 441,
+    "elevation": 21,
+    "font": 23,
+    "space": 23,
+    "border": 3,
+    "opacity": 2,
+    "utility": 2
+  },
+  "colourByRole": {
+    "color.background": 208,
+    "color.chart": 100,
+    "color.text": 49,
+    "color.border": 39,
+    "color.icon": 23,
+    "color.rovo": 11,
+    "color.link": 4,
+    "color.blanket": 3,
+    "color.interaction": 2,
+    "color.skeleton": 2
+  },
+  "typeSteps": {
+    "count": 14,
+    "names": [
+      "font.heading.xxlarge",
+      "font.heading.xlarge",
+      "font.heading.large",
+      "font.heading.medium",
+      "font.heading.small",
+      "font.heading.xsmall",
+      "font.heading.xxsmall",
+      "font.body.large",
+      "font.body",
+      "font.body.small",
+      "font.metric.large",
+      "font.metric.medium",
+      "font.metric.small",
+      "font.code"
+    ],
+    "note": "Each of these is ONE token carrying size, line-height and weight together. There is no separate `font.lineHeight.*` namespace on the page at all — the 23 `font.*` tokens are these 14 steps plus 4 weights and 5 families."
+  },
+  "ours": {
+    "note": "OUR side of the comparison, recorded 2026-08-29 so the enforced rows have a starting point. Each row moves in one direction only — see ROWS in scripts/atlassian-benchmark.mjs, where the direction is argued. Re-record with `npm run benchmark:atlassian -- --update` AFTER the move, never to get past a red run.",
+    "recordedAt": "2026-08-29",
+    "colour.role.background": 0,
+    "colour.role.text": 12,
+    "colour.role.border": 0,
+    "colour.role.icon": 0,
+    "type.sizeSteps": 44,
+    "type.lineHeights": 46
+  }
+}
