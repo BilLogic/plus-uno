@@ -25,6 +25,26 @@ const PopoverContent = forwardRef(({
 ));
 PopoverContent.displayName = 'PopoverContent';
 
+/**
+ * Can this element carry `aria-expanded` without lying?
+ *
+ * The attribute is only meaningful on something with an interactive role. Put
+ * on a bare `span` it is invalid ARIA — a state on a thing that has none — so
+ * it is applied to a `button`, an `a`, anything the caller has already given a
+ * `role`, and to the button this component generates for a text trigger. A
+ * caller who passes a plain `div` gets no `aria-expanded`, which is correct:
+ * the fix there is to pass a control, not to decorate a `div`.
+ */
+export function acceptsExpandedState(element) {
+    if (!React.isValidElement(element)) return false;
+    if (element.props && element.props.role) return true;
+    if (element.type === 'button' || element.type === 'a') return true;
+    // A component, not a host element — its rendered tag is unknowable here.
+    // `Button` is the overwhelmingly common case and renders a `button`, but
+    // guessing for every component would be guessing.
+    return Boolean(element.type && element.type.displayName === 'Button');
+}
+
 const Popover = ({
     trigger, // The element that triggers the popover
     children, // Content of the popover
@@ -45,6 +65,9 @@ const Popover = ({
     // Map our trigger types to react-bootstrap trigger types
     // RB uses 'click', 'hover', 'focus' or arrays.
     // Legacy mapping: 'manual' -> controlled mode (user handles 'show')
+
+    const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultShow);
+    const isOpen = show !== undefined ? show : uncontrolledOpen;
 
     const overlayTriggerProps = {
         placement,
@@ -84,19 +107,58 @@ const Popover = ({
         overlayTriggerProps.show = show;
     }
 
-    if (onToggle) {
-        overlayTriggerProps.onToggle = onToggle;
-    }
+    /*
+     * The open state is tracked here so the trigger can report it. Controlled
+     * callers still own it — `show` wins whenever it is passed, and `onToggle`
+     * is always called — this only fills in the uncontrolled case, which is the
+     * default and the one that previously announced nothing at all.
+     */
+    overlayTriggerProps.onToggle = (next) => {
+        if (show === undefined) setUncontrolledOpen(next);
+        if (onToggle) onToggle(next);
+    };
 
-    // Wrap the trigger element
-    // OverlayTrigger requires a single child capable of accepting a ref
-    // If trigger is a string, wrap it in a button or span? Legacy uses Button if using createPopoverButton
+    /*
+     * #321. A TEXT TRIGGER IS A BUTTON, not a focusable span.
+     *
+     * `OverlayTrigger` needs one child that can take a ref, so a string had to
+     * be wrapped in something. It used to be wrapped in
+     * `<span className="d-inline-block" tabIndex="0">` — a tab stop with no
+     * role and no accessible name. A keyboard user reached it, heard nothing,
+     * and pressing Enter did nothing either, because implicit activation
+     * belongs to the `button` ELEMENT and not to a tabindex.
+     *
+     * A real `button` carries the role, the name (its own text) and Enter/Space
+     * for free. `.plus-popover-trigger` strips the browser chrome so it still
+     * looks like the text it replaced.
+     */
+    const isTextTrigger = !React.isValidElement(trigger);
+    const triggerElement = isTextTrigger
+        ? <button type="button" className="plus-popover-trigger">{trigger}</button>
+        : trigger;
 
-    const triggerElement = React.isValidElement(trigger) ? trigger : <span className="d-inline-block" tabIndex="0">{trigger}</span>;
+    /*
+     * #321. The trigger says a panel exists, and whether it is open.
+     *
+     * Nothing announced either before this: no `aria-haspopup`, no
+     * `aria-expanded`. react-bootstrap adds `aria-describedby` while the
+     * popover is shown, which points AT the content once it is open and says
+     * nothing beforehand.
+     *
+     * `aria-controls` is deliberately absent. It needs the rendered popover's
+     * id, `id` is optional on this component, and an `aria-controls` pointing
+     * at an element that does not exist yet is worse than none.
+     */
+    const expandable = acceptsExpandedState(triggerElement);
 
     return (
         <OverlayTrigger {...overlayTriggerProps}>
-            {triggerElement}
+            {expandable
+                ? React.cloneElement(triggerElement, {
+                    'aria-haspopup': 'dialog',
+                    'aria-expanded': isOpen,
+                })
+                : triggerElement}
         </OverlayTrigger>
     );
 };
