@@ -19,6 +19,7 @@ A vertical list of radio buttons or checkboxes for multiple choice selections. S
 |------|------|---------|-------------|
 | `id` | string | — | — |
 | `name` | string (required) | — | — |
+| `legend` | node | — | The question. Renders a `fieldset`/`legend` around the options. |
 | `type` | enum | `'radio'` | Selection type: radio for single selection, checkbox for multiple selection |
 | `options` | arrayOf or string or shape or number or node | `[]` | — |
 | `value` | string or number or arrayOf | — | — |
@@ -39,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface-variant` · `--color-outline-variant` · `--font-size-body2` · `--size-element-gap-md` · `--size-element-gap-sm`
+`--color-on-surface` · `--color-on-surface-variant` · `--color-outline-variant` · `--font-size-body2` · `--size-element-gap-md` · `--size-element-gap-sm`
 
 From `design-system/src/components/forms-and-inputs/MultipleChoice.scss`. Override these through the token layer, never with a literal.
 

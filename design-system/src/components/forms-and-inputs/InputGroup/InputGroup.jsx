@@ -3,11 +3,22 @@ import PropTypes from 'prop-types';
 import { InputGroup as BootstrapInputGroup, Form } from 'react-bootstrap';
 import Button from '@/components/actions/Button/Button';
 import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
+import useFieldId from '@/components/forms-and-inputs/useFieldId';
 import './InputGroup.scss';
 
 const InputGroup = ({
     id,
     name,
+    /**
+     * #329. The field's name. This component had none, and no way to acquire
+     * one: `id` was applied to the GROUP and extra props were spread there too,
+     * so nothing a caller could pass reached the input. It was the only field in
+     * this directory that could not be labelled at all.
+     */
+    label,
+    /** Hides the label; it does not remove it. Same rule as `Input` (#213). */
+    showLabel = true,
+    required = false,
     placeholder,
     value,
     size = 'medium',
@@ -26,6 +37,8 @@ const InputGroup = ({
     ...props
 }) => {
     const [isFocused, setIsFocused] = useState(false);
+    /** One id for the label and the input — see `useFieldId` (#206). */
+    const fieldId = useFieldId(id);
 
     const sizeClass = size === 'small' ? 'body3-txt' : (size === 'large' ? 'body1-txt' : 'body2-txt');
     const bsSize = size === 'small' ? 'sm' : (size === 'large' ? 'lg' : undefined);
@@ -107,36 +120,55 @@ const InputGroup = ({
     ].filter(Boolean).join(' ');
 
     return (
-        <BootstrapInputGroup
-            id={id}
-            size={bsSize}
-            className={wrapperClasses}
-            style={style}
-            {...props}
-        >
-            {/* Leading visuals */}
-            {leadingVisual && renderAddon(leadingVisual, 'leading')}
-            {leadingVisual2 && renderAddon(leadingVisual2, 'leading2')}
+        <div className="plus-input-group-container">
+            {label && (
+                <Form.Label
+                    htmlFor={fieldId}
+                    className={`plus-input-group-label${showLabel ? '' : ' plus-input-group-label-hidden'}`}
+                >
+                    {label}
+                    {required && (
+                        <span className="plus-input-group-required" aria-label="required">*</span>
+                    )}
+                </Form.Label>
+            )}
+            <BootstrapInputGroup
+                size={bsSize}
+                className={wrapperClasses}
+                style={style}
+            >
+                {/* Leading visuals */}
+                {leadingVisual && renderAddon(leadingVisual, 'leading')}
+                {leadingVisual2 && renderAddon(leadingVisual2, 'leading2')}
 
-            {/* Main input */}
-            <Form.Control
-                ref={inputRef}
-                name={name}
-                type="text"
-                placeholder={placeholder}
-                value={value}
-                disabled={disabled}
-                readOnly={readonly}
-                onChange={onChange}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                className="plus-input-group-input"
-            />
+                {/*
+                  * #329. Extra props go to the FIELD, not to the group — the
+                  * same move `NumberInput` made in #318, and for the same
+                  * reason: the group is a `div` with no role and no name, so a
+                  * caller's `aria-label` or `aria-describedby` landed somewhere
+                  * it could not help.
+                  */}
+                <Form.Control
+                    ref={inputRef}
+                    id={fieldId}
+                    name={name}
+                    type="text"
+                    placeholder={placeholder}
+                    value={value}
+                    disabled={disabled}
+                    readOnly={readonly}
+                    onChange={onChange}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
+                    className="plus-input-group-input"
+                    {...props}
+                />
 
-            {/* Trailing visuals */}
-            {trailingVisual && renderAddon(trailingVisual, 'trailing')}
-            {trailingVisual2 && renderAddon(trailingVisual2, 'trailing2')}
-        </BootstrapInputGroup>
+                {/* Trailing visuals */}
+                {trailingVisual && renderAddon(trailingVisual, 'trailing')}
+                {trailingVisual2 && renderAddon(trailingVisual2, 'trailing2')}
+            </BootstrapInputGroup>
+        </div>
     );
 };
 
@@ -342,6 +374,11 @@ InputGroup.Dropdown = InputGroupDropdown;
 InputGroup.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
+    /** The field's name. Render one unless something else on the page names it. */
+    label: PropTypes.node,
+    /** Hides the label without removing it. */
+    showLabel: PropTypes.bool,
+    required: PropTypes.bool,
     placeholder: PropTypes.string,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     size: PropTypes.oneOf(['small', 'medium', 'large']),

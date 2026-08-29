@@ -77,7 +77,7 @@ export default {
 
 export const Overview = () => (
     <div style={{ width: '100%' }}>
-        <RichTextEditor placeholder="Type something..." minHeight={150} />
+        <RichTextEditor label="Session notes" placeholder="Type something..." minHeight={150} />
     </div>
 );
 Overview.parameters = {
@@ -96,6 +96,7 @@ export const Interactive = (args) => {
     return (
         <div style={{ maxWidth: '880px' }}>
             <RichTextEditor
+                label="Session notes"
                 size={args.size}
                 readOnly={args.readOnly}
                 disabled={args.disabled}

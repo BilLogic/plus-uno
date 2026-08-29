@@ -121,13 +121,14 @@ matters, leave those two buttons out of `toolbarButtons`.
 
 ## Accessibility
 
-- **The editable region is not announced as a text field.** It is a
-  `contentEditable` `div` with no `role="textbox"`, no `aria-multiline` and no
-  name. A screen-reader user reaches an editable area that does not say what it
-  is or what it is for.
-- **`id` does not label it.** The prop is applied to the outer container, so a
-  `label` pointing at it points at a `div`. There is no `label` prop either — put
-  a heading above the editor and accept that the association is visual.
+- **The editable region announces itself as a multi-line textbox.**
+  `role="textbox"` with `aria-multiline` and `aria-readonly` tracking the flag
+  that turns editing off (#329).
+- **`label` names it, and is effectively required.** The prop renders a `span`
+  above the editor and the region points at it with `aria-labelledby` — a
+  `label` element cannot be used, because `contentEditable` is not a form
+  control for `htmlFor` to bind to. Without a `label` the region is a named role
+  with no name, which axe reports and a screen-reader user hears as nothing.
 - **The toolbar buttons are named.** Each carries an `aria-label` from its
   definition, and the bold/italic/underline set is a `role="group"` labelled
   "Bold, italic, and underline". Their pressed state is tracked internally and is

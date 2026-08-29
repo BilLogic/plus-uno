@@ -13,6 +13,13 @@ import './MultipleChoice.scss';
 const MultipleChoice = ({
     id,
     name,
+    /**
+     * #329. The question the options answer. This component rendered the
+     * options and nothing around them — no `fieldset`, no legend, no group name
+     * — so the question was on the page and not attached to the answers, and a
+     * screen-reader user heard four options with no idea what they were for.
+     */
+    legend,
     type = 'radio', // 'radio' or 'checkbox'
     options = [],
     value, // For radio: single value; For checkbox: array of values
@@ -81,8 +88,19 @@ const MultipleChoice = ({
         className
     ].filter(Boolean).join(' ');
 
+    /*
+     * A real `fieldset`/`legend` rather than `role="group"` with a label id.
+     * For radios and checkboxes that is the element the platform already knows
+     * about: it groups them for the browser as well as for the accessibility
+     * tree, and it needs no id to do it. Without a legend the fieldset would be
+     * an unnamed group, which is worse than none — so the wrapper only becomes
+     * one when there is something to call it.
+     */
+    const Wrapper = legend ? 'fieldset' : 'div';
+
     return (
-        <div className={wrapperClasses} style={style} {...props}>
+        <Wrapper className={wrapperClasses} style={style} {...props}>
+            {legend && <legend className="plus-multiple-choice-legend body2-txt">{legend}</legend>}
             <div className="plus-multiple-choice-options">
                 {options.map((option, index) => {
                     const optionId = option.id || `${optionIdBase}-option-${index}`;
@@ -122,13 +140,15 @@ const MultipleChoice = ({
                     }
                 })}
             </div>
-        </div>
+        </Wrapper>
     );
 };
 
 MultipleChoice.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string.isRequired,
+    /** The question. Renders a `fieldset`/`legend` around the options. */
+    legend: PropTypes.node,
     type: PropTypes.oneOf(['radio', 'checkbox']),
     options: PropTypes.arrayOf(
         PropTypes.oneOfType([
