@@ -59,8 +59,8 @@ test('the repository is in the state the check records', () => {
   assert.equal(result.unreadable.length, 0);
   assert.deepEqual(
     result.divergences.map((d) => d.token).sort(),
-    ['--color-scrim', '--color-success-container'],
-    'the two divergences measured on 2026-08-29, and no others',
+    ['--color-success-container'],
+    'scrim was resolved to the M3 0.32; success-container is the one Bill still owns',
   );
 });
 
