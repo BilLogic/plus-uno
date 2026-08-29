@@ -28,6 +28,17 @@ const FileUpload = ({
     /** One id for the label and the file input — see `useFieldId` (#206). */
     const fieldId = useFieldId(id);
 
+    /*
+     * #327 — see `Input.jsx`. This component has TWO things worth pointing at:
+     * the format rules, which are standing help, and the validation message,
+     * which is a result. Both, in reading order, so "PDF, up to 10 MB" is heard
+     * before "that file was too large" rather than instead of it.
+     */
+    const descriptionId = `${fieldId}-description`;
+    const validationId = validation !== 'none' && validationMessage
+        ? `${fieldId}-validation`
+        : undefined;
+
     const handleFocus = (e) => {
         setIsFocused(true);
         if (onFocus) onFocus(e);
@@ -100,7 +111,7 @@ const FileUpload = ({
                 )}
 
                 {descriptionText && (
-                    <p className="plus-file-upload-description">
+                    <p id={descriptionId} className="plus-file-upload-description">
                         {descriptionText}
                     </p>
                 )}
@@ -119,6 +130,12 @@ const FileUpload = ({
                         className="plus-file-upload-input"
                         aria-label={label || 'File upload'}
                         {...props}
+                        aria-describedby={[
+                            props['aria-describedby'],
+                            descriptionText ? descriptionId : undefined,
+                            validationId,
+                        ].filter(Boolean).join(' ') || undefined}
+                        aria-invalid={validation === 'invalid' || undefined}
                     />
                     <Button
                         text={buttonText}
@@ -133,7 +150,10 @@ const FileUpload = ({
                 </div>
 
                 {validation !== 'none' && validationMessage && (
-                    <div className={`plus-file-upload-validation plus-file-upload-validation-${validation}`}>
+                    <div
+                        id={validationId}
+                        className={`plus-file-upload-validation plus-file-upload-validation-${validation}`}
+                    >
                         {validationIcon}
                         <span className="plus-file-upload-validation-message">{validationMessage}</span>
                     </div>

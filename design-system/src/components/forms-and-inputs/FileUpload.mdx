@@ -162,12 +162,10 @@ report it through `validation` and `validationMessage`.
   invisible input first and the visible button second. Focusing either draws the
   container's focus border, so the stop is at least visible — but it is two
   stops, and Enter on the first opens the picker just as the second does.
-- **The description is not attached to the field.** It renders as a paragraph
-  with no id, so nothing points at it. Where the format rules must be announced
-  with the field, render them yourself with an id and pass `aria-describedby` —
-  extra props are forwarded to the input, so it lands on the right element.
-- **The validation message is not attached either.** Same shape: text after the
-  field, with no `aria-invalid` on the input.
+- **The description and the message are both attached.** The format rules and
+  the validation message each carry an id and the input points at both, in that
+  order (#327) — "PDF, up to 10 MB" is heard before "that file was too large"
+  rather than instead of it. An invalid field also carries `aria-invalid`.
 - **`required` marks the label only.** The asterisk is decorative — the input
   carries no `required` attribute.
 

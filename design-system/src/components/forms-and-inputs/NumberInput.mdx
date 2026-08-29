@@ -164,15 +164,13 @@ validation and set `validation="invalid"` with a message.
 - **The stepper buttons are named.** "Increment" and "Decrement", with the icons
   `aria-hidden`. They also take the real `disabled` attribute at the bounds, so
   they announce as disabled rather than doing nothing.
-- **The validation message is not attached to the input.** It renders as
-  unidentified text after the field: no id, so nothing can point at it, and the
-  input carries no `aria-invalid`. A screen-reader user hears the field's name
-  and no error. Where that matters, render your own message with an id and put
-  `aria-describedby` on an element you control.
+- **The validation message is attached to the input.** It carries an id, the
+  field points at it with `aria-describedby`, and an invalid field carries
+  `aria-invalid` (#327) — so the error is heard with the name rather than seen
+  beside it.
 - **Forwarded props reach the input.** `aria-describedby`, `aria-invalid` and
-  anything else you pass lands on the field itself (#318), so pointing the
-  control at your own message works — which is the way round the validation gap
-  above.
+  anything else you pass lands on the field itself (#318), and your
+  `aria-describedby` is composed with the message's rather than replaced by it.
 - **The value is text to assistive technology.** With `type="text"` there is no
   `aria-valuenow`, no spinbutton role and no numeric keypad on a phone. The label
   and the unit carry the meaning.
