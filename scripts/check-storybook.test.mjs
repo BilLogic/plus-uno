@@ -23,6 +23,7 @@ import {
   baselineRecord,
   classify,
   ratchet,
+  reoptimisationFailures,
   ruleCounts,
 } from './check-storybook.mjs';
 
@@ -204,4 +205,38 @@ test('the recorded baseline round-trips through the ratchet it feeds', () => {
 test('rule counts are ordered heaviest first', () => {
   const counts = ruleCounts({ a: ['label'], b: ['label'], c: ['button-name'] });
   assert.deepEqual(Object.keys(counts), ['label', 'button-name']);
+});
+
+/* ------------------------------------------ the re-optimisation flake shape */
+
+test('a blocking failure that names the setup file is identified as the flake', () => {
+  // The real message, from run 33239327882: the file blamed is a story, the
+  // file named in the message is the setup file every test imports.
+  const blocking = [
+    {
+      where: 'design-system/src/components/_internal/Table/Table.stories.jsx',
+      message: 'Error: Failed to import test file /home/runner/work/plus-uno/plus-uno/.storybook/vitest.setup.ts',
+    },
+  ];
+  assert.equal(reoptimisationFailures(blocking).length, 1);
+});
+
+test('a genuine play-function failure is not mistaken for the flake', () => {
+  // Otherwise the guidance would tell someone to ignore a real break.
+  const blocking = [
+    { where: 'a.stories.jsx::Story', message: 'AssertionError: expected 1 to equal 2' },
+    { where: 'b.stories.jsx', message: 'Failed to import test file /repo/b.stories.jsx' },
+  ];
+  assert.deepEqual(reoptimisationFailures(blocking), []);
+});
+
+test('the flake is reported alongside the real failures, never instead of them', () => {
+  // It must stay blocking: a setup file that genuinely cannot import is a real
+  // break, and nothing in the report can tell the two apart.
+  const blocking = [
+    { where: 'a.stories.jsx::Story', message: 'AssertionError: nope' },
+    { where: 'b.stories.jsx', message: 'Failed to import test file /repo/.storybook/vitest.setup.ts' },
+  ];
+  assert.equal(reoptimisationFailures(blocking).length, 1);
+  assert.equal(blocking.length, 2);
 });
