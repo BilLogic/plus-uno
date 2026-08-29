@@ -2,12 +2,18 @@
  * #268 — the literal beside a token, and whether it agrees with it.
  *
  * The fixtures are the real shapes, measured across `design-system/src`,
- * `.storybook` and `prototypes`: 471 comparable literal fallbacks, 280 agreeing,
- * 191 disagreeing across 90 distinct token/literal pairs, and 27 `--color-*`
- * names referenced and never defined.
+ * `.storybook` and `prototypes`.
  *
- * The worst single case is `--color-on-surface-variant`, which resolves to
- * `#3f484a` and carries ten different fallbacks, none of them the token.
+ * COLOUR: 473 comparable literal fallbacks, 282 agreeing, 191 disagreeing
+ * across 90 distinct token/literal pairs, and 27 `--color-*` names referenced
+ * and never defined. The worst single case is `--color-on-surface-variant`,
+ * which resolves to `#3f484a` and carries ten different fallbacks, none of them
+ * the token.
+ *
+ * DIMENSION: 1075 comparable, 621 agreeing, 454 disagreeing across 68 distinct
+ * pairs. The worst single case is `var(--size-section-gap-sm, 16px)`, written 61
+ * times for a token that is `8px` — a fallback that doubles a gap rather than
+ * shifting a shade.
  */
 
 import { test } from 'node:test';
@@ -18,9 +24,11 @@ import {
   fallbackFailures,
   fallbackUsages,
   normaliseColour,
+  normaliseDimension,
+  resolveAliases,
   staleEntries,
   tokenDefinitions,
-} from './colour-fallbacks.mjs';
+} from './token-fallbacks.mjs';
 
 /* --------------------------------------------------------------- normalise */
 
@@ -85,7 +93,7 @@ test('a fallback that disagrees with its token is reported', () => {
 });
 
 test('a fallback that agrees is counted and not reported', () => {
-  // The check has to be able to pass: 280 of the 471 are already correct.
+  // The check has to be able to pass: 282 of the 473 are already correct.
   const audit = fallbackAudit({
     tokens: new Map([['--color-primary', '#0472a8']]),
     usages: [{ path: 'a.scss', line: 1, token: '--color-primary', literal: 'rgb(4, 114, 168)' }],
@@ -185,4 +193,110 @@ test('nothing is stale while every entry is still true', () => {
     ],
   });
   assert.deepEqual(staleEntries(audit, baseline), []);
+});
+
+/* ------------------------------------------------- the dimension family */
+
+test('the spellings of one length normalise together', () => {
+  assert.equal(normaliseDimension('16px'), '16px');
+  assert.equal(normaliseDimension('1rem'), '16px');
+  assert.equal(normaliseDimension(' 0.5REM '), '8px');
+});
+
+test('a percentage stays a percentage', () => {
+  // `--size-element-radius-full` is 999px and falls back to 50% eleven times.
+  // On a non-square box those are different shapes, so they must not compare
+  // equal — converting the percentage to px would report agreement.
+  assert.equal(normaliseDimension('50%'), '50%');
+  assert.notEqual(normaliseDimension('50%'), normaliseDimension('999px'));
+});
+
+test('a bare number is a length only when it is zero', () => {
+  // `line-height: 1.5` is a ratio. Reading it as `1.5px` would invent a
+  // disagreement with every line-height token in the system.
+  assert.equal(normaliseDimension('0'), '0px');
+  assert.equal(normaliseDimension('0rem'), '0px');
+  assert.equal(normaliseDimension('1.5'), null);
+});
+
+test('em is not comparable, because this cannot know the element font size', () => {
+  assert.equal(normaliseDimension('1.5em'), null);
+});
+
+test('anything that is not a length is not comparable', () => {
+  for (const v of ['var(--size-x)', 'auto', 'calc(100% - 8px)', '#fff', '', null, undefined]) {
+    assert.equal(normaliseDimension(v), null, String(v));
+  }
+});
+
+test('aliases resolve to the value at the end of the chain', () => {
+  // 124 of 207 dimension tokens are `var()` aliases. Without this the check
+  // sees a fraction of its corpus and reports green on the rest.
+  const resolved = resolveAliases(
+    new Map([
+      ['--size-card-gap-md', 'var(--size-spacing-medium-space-300)'],
+      ['--size-spacing-medium-space-300', 'var(--size-primitive-16)'],
+      ['--size-primitive-16', '16px'],
+    ]),
+  );
+  assert.equal(resolved.get('--size-card-gap-md'), '16px');
+});
+
+test('a cyclic alias keeps its raw value rather than hanging', () => {
+  // A cycle has no value, so incomparable is the honest answer.
+  const resolved = resolveAliases(
+    new Map([
+      ['--a', 'var(--b)'],
+      ['--b', 'var(--a)'],
+    ]),
+  );
+  assert.equal(resolved.get('--a'), 'var(--b)');
+  assert.equal(normaliseDimension(resolved.get('--a')), null);
+});
+
+test('the name pattern selects which family is read', () => {
+  // The dimension check passes any custom-property name and then filters by
+  // VALUE, because lengths are spread across --size-*, --spacing-*,
+  // --font-size-* and --font-line-height-* with no shared prefix.
+  const text = '  --size-element-gap-md: 10px;\n  --color-primary: #0472a8;';
+  assert.equal(tokenDefinitions([{ path: 'a.scss', text }]).size, 1);
+  assert.equal(tokenDefinitions([{ path: 'a.scss', text }], { names: /--[a-z0-9-]+/ }).size, 2);
+
+  const use = 'gap: var(--size-element-gap-md, 16px);';
+  assert.deepEqual(fallbackUsages([{ path: 'a.scss', text: use }]), []);
+  assert.equal(fallbackUsages([{ path: 'a.scss', text: use }], { names: /--[a-z0-9-]+/ }).length, 1);
+});
+
+test('a disagreeing length is reported the same way a disagreeing colour is', () => {
+  const audit = fallbackAudit({
+    tokens: new Map([['--size-section-gap-sm', '8px']]),
+    usages: [{ path: 'a.scss', line: 2, token: '--size-section-gap-sm', literal: '1rem' }],
+    normalise: normaliseDimension,
+    reportUndefined: false,
+  });
+  assert.equal(audit.disagreements.length, 1);
+  assert.equal(audit.disagreements[0].expected, '8px');
+  assert.equal(audit.disagreements[0].found, '16px');
+});
+
+test('an undefined name is ignored for dimensions and reported for colours', () => {
+  // `var(--table-cell-x, 10px)` is a component-local custom property with a
+  // documented default — correct code, and 324 of them would bury the colour
+  // finding that is a real defect.
+  const usages = [{ path: 'a.scss', line: 1, token: '--table-cell-x', literal: '10px' }];
+  const quiet = fallbackAudit({ tokens: new Map(), usages, normalise: normaliseDimension, reportUndefined: false });
+  assert.deepEqual(quiet.undefinedTokens, []);
+
+  const loud = fallbackAudit({ tokens: new Map(), usages, normalise: normaliseDimension });
+  assert.equal(loud.undefinedTokens.length, 1);
+});
+
+test('the failure text names the family it is talking about', () => {
+  const audit = fallbackAudit({
+    tokens: new Map(),
+    usages: [{ path: 'a.scss', line: 1, token: '--size-invented', literal: '4px' }],
+    normalise: normaliseDimension,
+  });
+  const failures = fallbackFailures(audit, { disagreements: [], undefinedTokens: [] }, { noun: 'dimension' });
+  assert.match(failures[0], /dimension token/);
 });

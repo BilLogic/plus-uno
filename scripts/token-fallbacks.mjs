@@ -2,7 +2,7 @@
  * What a colour token says, and what the literal beside it says (#268).
  *
  * `var(--color-on-surface-variant, #5c5c5c)` reads as one decision. It is two,
- * and in this repository they disagree 191 times out of 472 comparable uses —
+ * and in this repository they disagree 191 times out of 473 comparable uses —
  * that token resolves to `#3f484a` and carries TEN different fallbacks across
  * its uses, not one of which is the token. `--color-primary` is `#0472a8` and
  * falls back in one place to `#6750a4`, which is Material's default purple and
@@ -35,6 +35,42 @@
  * disagreements, because they are a different defect with a different endpoint:
  * the disagreements shrink as files are touched, and this list should be driven
  * to zero deliberately.
+ *
+ * ─── WHY THIS FILE IS NOT CALLED `colour-fallbacks` ─────────────────────────
+ * Because the defect is not about colour. #268 asks for "a fallback that
+ * disagrees with its token", unqualified, and the colour half turned out to be
+ * the SMALLER half. The same measurement over dimension tokens finds 546
+ * disagreements inside `design-system/src` alone, against 191 for colour, and
+ * they are worse: `var(--size-section-gap-sm, 16px)` appears 61 times and that
+ * token is `8px`. A wrong emergency colour is wrong; a gap that doubles when
+ * the token sheet is late is a different layout.
+ *
+ * So the machinery below is parameterised by FAMILY — which tokens it looks at,
+ * and how two values of that kind are compared — and the two families differ in
+ * exactly three ways, each of which is a fact about the corpus rather than a
+ * preference:
+ *
+ *   which tokens      colour matches `--color-*` by name. Dimensions have no
+ *                     single prefix (`--size-*`, `--spacing-*`, `--font-size-*`,
+ *                     `--font-line-height-*` and more), so that family is
+ *                     defined by VALUE: a token counts if its resolved value is
+ *                     a length. Nothing has to be added here when a new
+ *                     dimension family is minted.
+ *
+ *   undefined names   reported for colour, ignored for dimensions. `--color-border`
+ *                     with no definition is a real defect: the fallback IS the
+ *                     colour. `var(--table-cell-x, 10px)` is not — it is a
+ *                     component-local custom property, defined in the component's
+ *                     own stylesheet, and the fallback is its documented default.
+ *                     Reporting those would bury the finding in 324 non-findings.
+ *
+ *   aliases           resolved for both, and it is only load-bearing for
+ *                     dimensions: 11 of 195 colour tokens are `var()` aliases
+ *                     against 124 of 207 dimension tokens. Without resolution
+ *                     most of the semantic size names are simply incomparable
+ *                     and the check silently sees a fraction of its corpus.
+ *                     Colour's recorded set is unchanged by it — measured, not
+ *                     assumed; the test below pins that.
  */
 
 /** `#abc`, `#aabbcc` and `rgb(a, b, c)` all normalise to `#aabbcc`. */
@@ -59,6 +95,39 @@ export function normaliseColour(value) {
 }
 
 /**
+ * `12px`, `0.75rem` and `120%` normalise to a comparable string.
+ *
+ * `rem` is 16px and only 16px, the same assumption `check:docs-token-literals`
+ * makes and for the same reason: nothing here renders anything, and a repo that
+ * changed its root font size would have to revisit both.
+ *
+ * A PERCENTAGE IS NOT CONVERTED TO PX, and that is the point rather than a
+ * shortcut. `--size-element-radius-full` is `999px` and falls back to `50%`
+ * eleven times; on a non-square box those are visibly different shapes, so they
+ * must compare unequal. Keeping the unit in the key is what makes them so.
+ *
+ * `0` is accepted in any unit and normalises to `0px`, because zero is zero.
+ */
+export function normaliseDimension(value) {
+  if (typeof value !== 'string') return null;
+  const v = value.trim().toLowerCase();
+  const m = /^(-?\d*\.?\d+)(px|rem|em|%)?$/.exec(v);
+  if (!m) return null;
+  const n = Number(m[1]);
+  if (!Number.isFinite(n)) return null;
+  // A bare number is only a length when it is zero: `line-height: 1.5` is a
+  // ratio, and calling it `1.5px` would invent a disagreement with every
+  // line-height token in the system.
+  if (!m[2]) return n === 0 ? '0px' : null;
+  if (m[2] === '%') return `${n}%`;
+  // `em` is relative to the element's own font size, which this cannot know.
+  // It is not comparable, and guessing 16px would report agreement with a
+  // number nobody wrote.
+  if (m[2] === 'em') return null;
+  return `${m[2] === 'rem' ? n * 16 : n}px`;
+}
+
+/**
  * Token definitions from the token sources.
  *
  * Later definitions win, which is how the cascade reads them, and is why the
@@ -67,14 +136,42 @@ export function normaliseColour(value) {
  * @param {{path: string, text: string}[]} files
  * @returns {Map<string, string>} name -> raw value
  */
-export function tokenDefinitions(files) {
+export function tokenDefinitions(files, { names = /--color-[a-z0-9-]+/ } = {}) {
   const tokens = new Map();
+  const declaration = new RegExp(`^\\s*(${names.source})\\s*:\\s*([^;]+);`, 'gm');
   for (const { text } of files) {
-    for (const m of text.matchAll(/^\s*(--color-[a-z0-9-]+)\s*:\s*([^;]+);/gm)) {
+    for (const m of text.matchAll(declaration)) {
       tokens.set(m[1], m[2].trim());
     }
   }
   return tokens;
+}
+
+/**
+ * Follow `var(--other)` aliases to the value at the end of the chain.
+ *
+ * Returns a NEW map rather than mutating, so a caller can still see what each
+ * token literally says. Cycle-safe: a token that eventually refers to itself
+ * keeps its raw value and is therefore incomparable, which is the honest answer
+ * — a cycle has no value.
+ *
+ * @param {Map<string,string>} tokens
+ */
+export function resolveAliases(tokens) {
+  const resolved = new Map();
+  const terminal = (name, seen) => {
+    if (seen.has(name)) return null;
+    seen.add(name);
+    const value = tokens.get(name);
+    if (value === undefined) return null;
+    const alias = /^var\(\s*(--[\w-]+)\s*\)$/.exec(value.trim());
+    if (!alias) return value;
+    return terminal(alias[1], seen);
+  };
+  for (const [name, raw] of tokens) {
+    resolved.set(name, terminal(name, new Set()) ?? raw);
+  }
+  return resolved;
 }
 
 /**
@@ -86,11 +183,12 @@ export function tokenDefinitions(files) {
  *
  * @param {{path: string, text: string}[]} files
  */
-export function fallbackUsages(files) {
+export function fallbackUsages(files, { names = /--color-[a-z0-9-]+/ } = {}) {
   const uses = [];
+  const call = new RegExp(`var\\(\\s*(${names.source})\\s*(?:,\\s*([^),]+))?\\)`, 'g');
   for (const { path, text } of files) {
     text.split('\n').forEach((line, i) => {
-      for (const m of line.matchAll(/var\(\s*(--color-[a-z0-9-]+)\s*(?:,\s*([^),]+))?\)/g)) {
+      for (const m of line.matchAll(call)) {
         uses.push({ path, line: i + 1, token: m[1], literal: m[2] ? m[2].trim() : null });
       }
     });
@@ -103,7 +201,7 @@ export function fallbackUsages(files) {
  *
  * @param {{tokens: Map<string,string>, usages: Usage[]}} o
  */
-export function fallbackAudit({ tokens, usages }) {
+export function fallbackAudit({ tokens, usages, normalise = normaliseColour, reportUndefined = true }) {
   const disagreements = [];
   const undefinedTokens = new Map();
   let comparable = 0;
@@ -112,12 +210,15 @@ export function fallbackAudit({ tokens, usages }) {
 
   for (const use of usages) {
     if (!tokens.has(use.token)) {
-      undefinedTokens.set(use.token, (undefinedTokens.get(use.token) ?? 0) + 1);
+      // For the dimension family this is the overwhelmingly common case and it
+      // is not a defect: a component-local custom property with a documented
+      // default. See the family note at the top of the file.
+      if (reportUndefined) undefinedTokens.set(use.token, (undefinedTokens.get(use.token) ?? 0) + 1);
       continue;
     }
     if (use.literal === null) continue;
-    const tokenValue = normaliseColour(tokens.get(use.token));
-    const literal = normaliseColour(use.literal);
+    const tokenValue = normalise(tokens.get(use.token));
+    const literal = normalise(use.literal);
     // Either side may be a nested `var()` or a keyword. Counted, so the check
     // can say what share of the corpus it was actually able to compare.
     if (tokenValue === null || literal === null) {
@@ -165,7 +266,7 @@ export function fallbackAudit({ tokens, usages }) {
  * @param {ReturnType<typeof fallbackAudit>} audit
  * @param {{disagreements: string[], undefinedTokens: string[]}|null} baseline
  */
-export function fallbackFailures(audit, baseline) {
+export function fallbackFailures(audit, baseline, { noun = 'colour' } = {}) {
   const failures = [];
 
   if (!baseline) {
@@ -180,9 +281,9 @@ export function fallbackFailures(audit, baseline) {
   const newUndefined = audit.undefinedTokens.filter((u) => !knownUndefined.has(u.token));
   if (newUndefined.length) {
     failures.push(
-      `${newUndefined.length} new colour token(s) referenced and never defined:\n` +
+      `${newUndefined.length} new ${noun} token(s) referenced and never defined:\n` +
         newUndefined.map((u) => `       ${u.token}  (${u.count} use(s))`).join('\n') +
-        '\n     For these the fallback IS the colour and the token is fiction — changing the\n' +
+        `\n     For these the fallback IS the ${noun} and the token is fiction — changing the\n` +
         '     token changes nothing. Define it, or fix the name.',
     );
   }
