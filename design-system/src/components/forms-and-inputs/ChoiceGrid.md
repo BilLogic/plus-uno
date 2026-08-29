@@ -39,7 +39,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-inverse-primary` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-surface-container-low` · `--color-surface-container-lowest` · `--color-surface-variant` · `--font-family-body` · `--font-weight-normal` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-radius-full` · `--size-element-radius-md` · `--size-element-radius-sm` · `--size-element-stroke-lg` · `--size-element-stroke-md`
+`--color-focus-ring` · `--color-inverse-primary` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-surface-container-low` · `--color-surface-container-lowest` · `--color-surface-variant` · `--font-family-body` · `--font-weight-normal` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-radius-full` · `--size-element-radius-md` · `--size-element-radius-sm` · `--size-element-stroke-lg` · `--size-element-stroke-md`
 
 From `design-system/src/components/forms-and-inputs/ChoiceGrid.scss`. Override these through the token layer, never with a literal.
 

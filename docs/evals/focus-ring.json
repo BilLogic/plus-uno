@@ -1,0 +1,10 @@
+{
+  "note": "Focus rules whose strongest visible affordance is under 3:1 (WCAG 1.4.11). Read by check:focus-ring. The list is EMPTY on purpose: all 29 findings of the 2026-08-29 sweep were fixed rather than recorded, because an invisible focus ring is a defect and not a preference. An entry here would need a reason a keyboard user cannot see where they are.",
+  "recordedAt": "2026-08-29",
+  "measured": {
+    "focusRules": 84,
+    "wereUnder3to1": 29,
+    "fixedBy": "--color-focus-ring, 5.02:1 on the page"
+  },
+  "exceptions": {}
+}

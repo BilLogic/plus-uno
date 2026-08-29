@@ -186,7 +186,7 @@
     &:focus {
         outline: none;
         border-width: 2px;
-        border-color: var(--color-inverse-primary);
+        border-color: var(--color-focus-ring);
         box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
         z-index: 1;
     }
@@ -220,7 +220,7 @@
     // Focus state - update border (when input is focused)
     .plus-datetime-time-input-group:has(.plus-datetime-time-input:focus) & {
         border-width: 2px;
-        border-color: var(--color-inverse-primary);
+        border-color: var(--color-focus-ring);
         margin-left: -2px; // Adjust for 2px border
     }
     
@@ -328,7 +328,7 @@
     
     &:focus {
         outline: none;
-        box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
+        box-shadow: 0 0 0 2px var(--color-focus-ring);
         z-index: 1;
     }
     
@@ -360,7 +360,7 @@
         }
         
         &:focus {
-            box-shadow: 0 0 0 0.2rem var(--color-danger-state-08);
+            box-shadow: 0 0 0 2px var(--color-danger-border);
         }
         
         &[aria-expanded="true"],
@@ -387,7 +387,7 @@
         }
         
         &:focus {
-            box-shadow: 0 0 0 0.2rem var(--color-success-state-08);
+            box-shadow: 0 0 0 2px var(--color-success-border);
         }
         
         &[aria-expanded="true"],

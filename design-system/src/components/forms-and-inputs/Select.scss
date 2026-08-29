@@ -292,7 +292,7 @@
 
         &:focus,
         &:focus-visible {
-            border-color: var(--color-outline-variant) !important;
+            border-color: var(--color-focus-ring) !important;
         }
     }
 }

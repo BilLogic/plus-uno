@@ -81,7 +81,7 @@
         white-space: nowrap;
 
         &:focus-visible {
-            outline: 2px solid var(--color-on-surface-state-12);
+            outline: 2px solid var(--color-focus-ring);
             border-radius: var(--size-element-radius-sm);
         }
     }

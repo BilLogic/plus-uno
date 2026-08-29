@@ -132,7 +132,7 @@
         // FOCUS state
         &:focus-visible:not(.disabled):not(:disabled):not(.active) {
             background-color: var(--color-on-surface-state-12);
-            border-color: transparent transparent var(--color-outline-variant) transparent !important;
+            border-color: transparent transparent var(--color-focus-ring) transparent !important;
             outline: none;
         }
 

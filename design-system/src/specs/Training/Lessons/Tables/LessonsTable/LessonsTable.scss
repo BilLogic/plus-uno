@@ -73,7 +73,7 @@
 
         &.lessons-table__group--focus {
             background-color: var(--color-on-surface-state-12);
-            outline: 2px solid var(--color-inverse-primary) !important;
+            outline: 2px solid var(--color-focus-ring) !important;
             outline-offset: -2px;
             position: relative;
             z-index: 10;

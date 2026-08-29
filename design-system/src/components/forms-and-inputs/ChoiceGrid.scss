@@ -173,7 +173,7 @@
         // Focus state
         &:focus {
             outline: none;
-            box-shadow: 0 0 0 2px var(--color-inverse-primary);
+            box-shadow: 0 0 0 2px var(--color-focus-ring);
         }
 
         // Disabled state

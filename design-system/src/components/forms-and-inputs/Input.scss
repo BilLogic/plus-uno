@@ -82,7 +82,7 @@
     
     &:focus {
         outline: none;
-        border-color: var(--color-inverse-primary);
+        border-color: var(--color-focus-ring);
         box-shadow: none;
     }
     
@@ -106,7 +106,7 @@
         cursor: default;
         
         &:focus {
-            border-color: var(--color-outline-variant);
+            border-color: var(--color-focus-ring);
             box-shadow: none;
         }
     }

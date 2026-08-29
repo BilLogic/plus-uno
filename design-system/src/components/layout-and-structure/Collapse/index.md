@@ -36,7 +36,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-inverse-primary` · `--color-on-primary` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary` · `--color-primary-text` · `--color-surface` · `--font-family-body` · `--font-line-height-body1` · `--font-size-body1` · `--font-size-fa-body1-solid` · `--font-weight-normal` · `--font-weight-semibold-1` · `--size-element-gap-lg` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-element-stroke-sm`
+`--color-focus-ring` · `--color-on-primary` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary` · `--color-primary-text` · `--color-surface` · `--font-family-body` · `--font-line-height-body1` · `--font-size-body1` · `--font-size-fa-body1-solid` · `--font-weight-normal` · `--font-weight-semibold-1` · `--size-element-gap-lg` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-element-stroke-sm`
 
 From `design-system/src/components/layout-and-structure/Collapse/Collapse.scss`. Override these through the token layer, never with a literal.
 
