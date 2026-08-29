@@ -292,10 +292,12 @@ function main() {
   );
 
   // The population itself, so a selector that quietly stops matching is loud
-  // rather than green. 48 components + the one named exception.
-  if (tabbed.length !== 49) {
+  // rather than green. 50 components + the one named exception — Tag and
+  // TagGroup took it from 48 in #276, which is the deliberate edit this number
+  // is here to force.
+  if (tabbed.length !== 51) {
     found.push(
-      `expected 49 tabbed docs pages (48 components + ${TABBED_EXCEPTIONS.length} named ` +
+      `expected 51 tabbed docs pages (50 components + ${TABBED_EXCEPTIONS.length} named ` +
         `exception), found ${tabbed.length}. If a component was added or removed, ` +
         `update this number deliberately.`,
     );

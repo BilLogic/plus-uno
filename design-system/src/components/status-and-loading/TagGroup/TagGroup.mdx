@@ -1,0 +1,192 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TagGroupStories from './TagGroup.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={TagGroupStories} />
+
+<Title />
+A tag is a representation of a value that someone has picked; a tag group is
+the set of them. It owns what no single tag can decide — the gaps between them,
+and whether a long set wraps or collapses.
+
+<DocsTabs of={TagGroupStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/TagGroup"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>The default. Tags flow onto as many lines as they need, and the set announces itself as a list.</>}>
+    <Canvas of={TagGroupStories.Wrapping} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Overflow
+
+<DocsCanvasShell description={<>One line, with a <code>+n</code> that counts what is hidden. Pressing it reveals them — a count with no way to reach the values is worse than no count.</>}>
+    <DsCanvasQuiet of={TagGroupStories.Overflow} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A set short enough to fit shows no overflow tag at all.</>}>
+    <DsCanvasQuiet of={TagGroupStories.NoOverflowWhenItFits} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>Conditional children are skipped rather than counted, so <code>+n</code> stays right about the screen and not just about the array.</>}>
+    <DsCanvasQuiet of={TagGroupStories.ConditionalChildrenAreNotCounted} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A dismissible set: the group holds the gaps, the tags hold the values.</>}>
+    <DsCanvasQuiet of={TagGroupStories.DismissibleSet} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={TagGroupStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `TagGroup` wherever more than one `Tag` appears together: the subjects on a
+profile, the filters above a table, the recipients on a message. It is the
+right wrapper even when the set is short, because the two decisions it owns —
+the spacing and the wrapping — are properties of the set rather than of any tag
+in it.
+
+A single tag standing alone does not need it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### The gap lives here, not on the tag.
+
+Atlassian's tag carries its own margin, which then has to be switched off with
+a `hasMargin` escape hatch whenever a parent uses `gap` — an API that exists
+only to undo a decision made in the wrong place. `Tag` sets `margin: 0` and
+this sets `gap`, so there is nothing to undo and nothing to double up.
+
+```jsx
+// Incorrect — the row's spacing is now defined in two places, and the next
+// change to the rhythm has to find both.
+<div style={{ display: 'flex', gap: '4px' }}>
+  <Tag color="blue">Science</Tag>
+  <Tag color="blue">Mathematics</Tag>
+</div>
+
+// Correct — one owner for the gap.
+<TagGroup label="Subjects">
+  <Tag color="blue">Science</Tag>
+  <Tag color="blue">Mathematics</Tag>
+</TagGroup>
+```
+
+### `collapse` needs somewhere for the hidden tags to go.
+
+The default reveal expands the group in place. Replace it with
+`onOverflowClick` when the values belong somewhere else — a popover, a filter
+panel — but replacing it with a handler that only counts leaves the person
+told that values exist and unable to see them.
+
+```jsx
+// Incorrect — the overflow tag is now a dead end. It counts, it logs, and it
+// shows nobody the values it is counting.
+<TagGroup overflow="collapse" maxVisible={3} onOverflowClick={() => logEvent('overflow')}>
+  {subjects.map((s) => <Tag key={s} color="blue">{s}</Tag>)}
+</TagGroup>
+
+// Correct — either drop the handler and let it reveal in place, or send the
+// person somewhere they can look.
+<TagGroup overflow="collapse" maxVisible={3} onOverflowClick={openFilterPanel}>
+  {subjects.map((s) => <Tag key={s} color="blue">{s}</Tag>)}
+</TagGroup>
+```
+
+### `maxVisible` counts tags, not pixels.
+
+It slices the children, so a set of long labels can still overflow its line at
+`maxVisible={5}`. Pick the number against the labels the surface actually
+shows, not against the width of the container.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The set is a list, and says so.** Without `role="list"` a screen reader
+  reads seven unrelated words in a row; with it the person is told there are
+  seven and can move through them as a group.
+- **`label` is the group's accessible name.** It is what says these seven tags
+  are subjects rather than filters. There is no default, so a group without it
+  is an unnamed list.
+- **The items are wrapped, not rendered as `li`.** That is what keeps `Tag`
+  usable on its own, outside any group, without it carrying list semantics it
+  has no right to.
+- **The overflow tag is a real control.** It renders as an `operational` tag,
+  which is a `button`, so it is reachable by keyboard and activated by Enter
+  and Space without any handler of its own.
+- **`+n` is not a live region.** Revealing the hidden tags changes the list
+  silently. If the reveal is the point of the interaction, move focus into what
+  it revealed.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For one value rather than a set, use `Tag`.
+- For a field where the person types values in and takes them out, use `TagInput`.
+- For system-generated data nobody can change, use `Badge`.
+- For a long set that needs paging rather than an overflow count, use `Pagination`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>
