@@ -117,20 +117,18 @@ those, or `manual` for a popover you drive with `show`.
 
 ## Usage notes
 
-### A click popover does not close when you click away.
+### Dismissal is on by default, except when you own the state.
 
 ```jsx
-// The underlying overlay's rootClose is off and this component does not expose
-// it, so the only way to dismiss a click-triggered popover is to click the
-// trigger again. Say so in the content, or add your own close control.
-<Popover trigger={<Button text="Details" />} title="Session 12">
-    …
-    <Button text="Close" fill="text" onClick={close} />
-</Popover>
-```
+// A click away and Escape both close it — `rootClose` defaults to true for
+// every trigger but `manual` (#321).
+<Popover trigger={<Button text="Details" />} title="Session 12">…</Popover>
 
-For a popover the user can dismiss the usual way, drive it yourself with
-`triggerType="manual"` and `show`, and close it on your own outside-click.
+// With `manual` the caller owns `show`, so nothing dismisses it but the caller.
+// Pass rootClose explicitly if you want the outside click to reach onToggle.
+<Popover trigger={<Button text="Pinned" />} triggerType="manual" show={open}
+         onToggle={setOpen}>…</Popover>
+```
 
 ### Pass a real element as the trigger.
 
@@ -162,8 +160,8 @@ must be read is content that has to stay put while it is read.
 - **Focus does not move into it, and does not have to.** A popover is not a
   dialog. But that means anything focusable inside it is reached by continuing to
   Tab, which for a bottom-placed popover comes after the rest of the row.
-- **Escape does not close it.** Neither does clicking away, for a click trigger.
-  A visible close control is the only reliable dismissal.
+- **Escape and a click away both close it.** Both come from the same
+  `rootClose` binding, which is on for every trigger but `manual` (#321).
 - **Do not put required content in one.** Anything the user must read to finish
   the task belongs on the page. A popover is an aside.
 

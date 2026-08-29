@@ -152,11 +152,12 @@ under the row, `numeric` puts 1–5 above each item. `icon` is `star` or
 </form>
 ```
 
-### `label` is what makes the row a group.
+### Give it a `label`.
 
-Without it there is no `role="group"` and no name — five buttons appear in the
-tab order with nothing saying what they rate. `commentsLabel` is a caption under
-the row, not a substitute.
+The row is a `radiogroup` either way, but the label is what names it. Without
+one it falls back to the generic name "Rating", which says nothing when a page
+carries two of them. `commentsLabel` is a caption under the row, not a
+substitute.
 
 </div>
 
@@ -164,18 +165,20 @@ the row, not a substitute.
 
 ## Accessibility
 
-- **Five buttons, five tab stops.** Each item is a `div` with `role="button"`,
-  `tabIndex={0}` and an `aria-label` of "Rate 1" … "Rate 5". Enter and Space
-  activate. There is no arrow-key movement between them, and no radio-group
-  semantics.
-- **The current value is not announced.** Selection is drawn by filling the
-  icons; no item carries `aria-pressed` or `aria-checked`. A screen-reader user
-  can set a rating and cannot hear what it is. Where the value must be readable,
-  render it in text beside the row.
-- **Disabled removes the items from the tree.** With `disabled`, the role,
-  `tabIndex` and `aria-label` are all dropped — the items become unlabelled
-  `div`s rather than disabled buttons, so nothing is announced at all. Prefer
-  rendering the score as text when it cannot be changed.
+- **It is one value out of five, and says so.** The row is a `radiogroup` and
+  each item is a `radio` carrying `aria-checked` and an `aria-label` of "Rate 1"
+  … "Rate 5" (#319). The chosen value is in the accessibility tree, not only in
+  the fill colour.
+- **One tab stop, arrow keys within it.** Tab reaches the group once — landing
+  on the checked item, or the first when nothing is checked — and Left/Right,
+  Up/Down, Home and End move the value. Enter and Space still activate an item
+  directly.
+- **Moving the selection is changing it.** There is no "focused but not chosen"
+  state: an arrow key calls `onChange`. That is the usual radio-group behaviour
+  and it means a keyboard user cannot browse the scale without setting it.
+- **Disabled stays announced.** The items keep their role, label and
+  `aria-checked` and take `aria-disabled` — an unavailable rating rather than an
+  invisible one — and drop out of the tab order.
 - **The label is a `span`, deliberately.** There is no form control for a
   `label` element to point at, so the label is a `span` with an id and the row
   is named by `aria-labelledby`. That is why the `id` lands on the row rather

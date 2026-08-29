@@ -135,11 +135,13 @@ and `onDecrement` with the new number.
 />
 ```
 
-### An empty field steps from zero, not from `min`.
+### An empty field steps to its floor.
 
-Increment and decrement read the current value as `parseFloat(value) || 0`, so an
-empty field with `min={5}` steps to `1`, not to `5`. Give the field a starting
-value when it has a floor.
+Increment and decrement read the current value as `parseFloat(value) || 0` and
+then clamp to both bounds, so an empty field with `min={5}` steps to `5` rather
+than to `1` (#318). Give the field a starting value anyway when it has a floor —
+a field that shows nothing and means five is a field the user has to press to
+understand.
 
 ### `required` marks the label, not the field.
 
@@ -154,11 +156,11 @@ validation and set `validation="invalid"` with a message.
 
 ## Accessibility
 
-- **`showLabel={false}` leaves the field unnamed.** Unlike `Input`, which keeps
-  the label in the DOM and clips it to nothing, this component omits the label
-  element entirely and adds no `aria-label` in its place — see the `showLabel`
-  section in the `Input` docs for why a name cannot be removed. Keep the label
-  visible.
+- **`showLabel={false}` hides the label; it does not remove the name.** The
+  label is rendered and clipped to nothing, the same treatment `Input` gives it
+  — see the `showLabel` section in the `Input` docs for why a name cannot be
+  taken away. Prefer a visible label regardless: a field whose name only exists
+  in the accessibility tree is a field sighted users have to guess at.
 - **The stepper buttons are named.** "Increment" and "Decrement", with the icons
   `aria-hidden`. They also take the real `disabled` attribute at the bounds, so
   they announce as disabled rather than doing nothing.
@@ -167,10 +169,10 @@ validation and set `validation="invalid"` with a message.
   input carries no `aria-invalid`. A screen-reader user hears the field's name
   and no error. Where that matters, render your own message with an id and put
   `aria-describedby` on an element you control.
-- **A forwarded `aria-describedby` does not reach the input.** Extra props are
-  spread onto the wrapping input group — a plain `div` with no role and no name —
-  not onto the field. Unlike `DateAndTimePicker`, whose wrapper is the named
-  group, there is nothing here for the attribute to be useful on.
+- **Forwarded props reach the input.** `aria-describedby`, `aria-invalid` and
+  anything else you pass lands on the field itself (#318), so pointing the
+  control at your own message works — which is the way round the validation gap
+  above.
 - **The value is text to assistive technology.** With `type="text"` there is no
   `aria-valuenow`, no spinbutton role and no numeric keypad on a phone. The label
   and the unit carry the meaning.

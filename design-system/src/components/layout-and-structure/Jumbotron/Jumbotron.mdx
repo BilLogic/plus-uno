@@ -123,13 +123,11 @@ objects spread into `Button`, so anything `Button` takes goes in them.
 <Jumbotron title="Autumn 2026" primaryButton={{ text: 'Enrol', onClick: enrol }} />
 ```
 
-### Pass a `size` to the buttons.
+### The buttons are `medium` unless you say otherwise.
 
-The default handed to `Button` is `"default"`, which is not one of the three
-sizes `Button` accepts — it fails the prop type and produces a size class no
-stylesheet defines, so the button falls back to base metrics. Set
-`size: 'medium'` (or `small`, or `large`) in the button object until that default
-is corrected.
+That default is applied before your button object is spread, so `size: 'small'`
+or `size: 'large'` in the object wins. (It was `"default"` until #317 — a value
+`Button` does not accept, which produced a size class no stylesheet defines.)
 
 ### `fluid` drops the corner radius.
 

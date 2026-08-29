@@ -99,16 +99,20 @@ on. `fade` is accepted and ignored — the transition is always a slide.
 
 ## Usage notes
 
-### A non-image string slide is injected as raw HTML.
+### A string slide is text, and only text.
 
 ```jsx
-// Incorrect — content that is a string and does not end in an image extension
-// is written into the slide with dangerouslySetInnerHTML. With anything a user
-// can influence, that is an injection.
-<Carousel slides={[{ content: review.bodyHtml }]} />
+// A string that is not an image path renders escaped. Markup in it appears as
+// characters on the slide rather than as elements, which is what makes it safe
+// to pass content you did not write (#316).
+<Carousel slides={[{ content: review.body }]} />
 
-// Correct — pass an element. Elements are rendered as elements.
+// Prefer an element anyway — it is the only way to style a slide.
 <Carousel slides={[{ content: <Review body={review.body} /> }]} />
+
+// And if you genuinely hold trusted HTML, say so explicitly. The component will
+// render the element you pass; the decision is yours and it is visible.
+<Carousel slides={[{ content: <div dangerouslySetInnerHTML={{ __html: trusted }} /> }]} />
 ```
 
 ### Give every image slide an `alt`.
