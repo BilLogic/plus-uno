@@ -186,6 +186,12 @@ const COMPOSED = [
       "design tokens that are USED and defined nowhere. A bare `var(--x)` on a token that does not exist DROPS the whole declaration: `var(--font-weight-light)` was in six shipped components against a system that defines `--font-weight-normal: 300`, so text designed at 300 rendered at its inherited weight, and Tooltip's small variant reached for `--font-size-body4`, which does not exist, so its text had no size of its own. Nothing saw either — check:colour-fallbacks and check:size-fallbacks only read tokens written WITH a fallback and only in two namespaces, and check:doc-identifiers resolves names in docs pages, not in stylesheets. A ratchet: 145 names over 508 uses when it was written, and the count may fall and never rise, with the BARE count held down separately so converting a fallback into a bare use cannot pass by keeping the total flat.",
   },
   {
+    script: 'check:font-families',
+    pkg: 'root',
+    guards:
+      "every font stack ending in a CSS generic, and every inline fallback naming the face its token names. A fallback only paints when the token fails to load, so a wrong one is wrong everywhere at once and invisible until then — the reasoning check:colour-fallbacks applies to colour, which nothing applied to type. Seven findings when it was written and all seven fixed: --font-family-display4 named one face and no generic; three files fell back from --font-family-body to Lato, which is the HEADER face, so body text would have rendered in the heading font; two fell back to a bare `Lato`. It also keeps #267's monospace rule, where --font-family-code fell back to sans-serif and the stack measured 171.13px against monospace's 480.08px.",
+  },
+  {
     script: 'check:unspread-rest',
     pkg: 'root',
     guards:

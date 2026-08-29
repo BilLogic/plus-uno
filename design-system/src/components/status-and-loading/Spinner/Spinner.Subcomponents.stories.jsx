@@ -102,7 +102,7 @@ export const LoadingButtonExample = () => {
                     border: '1px solid var(--color-outline-variant)',
                     borderRadius: 'var(--size-element-radius-md, 8px)',
                     cursor: loading ? 'not-allowed' : 'pointer',
-                    fontFamily: 'var(--font-family-body, inherit)',
+                    fontFamily: 'var(--font-family-body, Merriweather Sans, sans-serif)',
                 }}
             >
                 {loading && <Spinner variant="border" size="sm" />}
