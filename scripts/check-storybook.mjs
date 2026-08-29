@@ -88,6 +88,12 @@ export const UNIDENTIFIED_RULE = '(unidentified-rule)';
  */
 const RULE_FROM_HELP_URL = /dequeuniversity\.com\/rules\/axe\/[^/]+\/([a-z0-9-]+)/g;
 
+/**
+ * The setup file every browser test imports. Named here rather than inline so
+ * `reoptimisationFailures` and its test agree on one string.
+ */
+const SETUP_FILE = '.storybook/vitest.setup.ts';
+
 /** Runs the browser suite and returns the parsed vitest JSON report. */
 function runSuite() {
   const out = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'sb-gate-')), 'report.json');
@@ -190,6 +196,30 @@ export function classify(report, root = REPO_ROOT) {
   };
 }
 
+/**
+ * The blocking failures that are the Vite re-optimisation flake, not a broken
+ * story (#157, and again on 2026-08-29).
+ *
+ * When Vite discovers a dependency mid-run it re-optimises and reloads the page.
+ * Any test file whose setup import is in flight when that lands aborts with
+ * `Failed to import test file <the setup file>` — so the report blames a file
+ * chosen by timing. Three PRs went red on one morning naming three different
+ * innocent stories, and re-running picked a fourth.
+ *
+ * SEPARATED, NOT EXCUSED. These still block: a setup file that genuinely cannot
+ * import is a real break and must not be swallowed, and the check has no way to
+ * tell the two apart from the report alone. What changes is what the reader is
+ * told — "this story is broken" sends someone to read a story that is fine.
+ *
+ * @param {{where: string, message: string}[]} blocking
+ * @param {string} setupFile the setup file's path, matched as a suffix
+ */
+export function reoptimisationFailures(blocking, setupFile = SETUP_FILE) {
+  return blocking.filter(
+    (b) => b.message?.includes('Failed to import test file') && b.message.includes(setupFile),
+  );
+}
+
 /** Rule -> number of stories violating it, heaviest first. */
 export function ruleCounts(a11y) {
   const counts = {};
@@ -286,6 +316,19 @@ function main() {
       '  -> These have no baseline. Reproduce one story on its own with:\n' +
         '       npx vitest run --project=storybook -t "<story name>"',
     );
+
+    const reopt = reoptimisationFailures(blocking);
+    if (reopt.length) {
+      console.error(
+        `\n  !! ${reopt.length} of those name ${SETUP_FILE} rather than a story.\n` +
+          '     That is the Vite re-optimisation flake, and the story above is a bystander\n' +
+          '     picked by timing — do not go and read it. Search this log for:\n' +
+          '         new dependencies optimized:\n' +
+          '     and add every name it lists to `optimizeDeps.include` in vite.config.js,\n' +
+          '     where the mechanism is written down. Re-running WITHOUT that change will\n' +
+          '     usually fail again, naming a different file.',
+      );
+    }
   }
 
   // 2. Accessibility. Ratchet against the committed baseline.
