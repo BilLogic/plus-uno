@@ -102,6 +102,44 @@ Use radio when a user needs to select one option from a list.
 
 <div className="sb-ds-doc-section">
 
+## When to use
+
+- **Exactly one answer, from a set that is short enough to show.** Every option
+  is on the page at once, so the reader compares them without opening anything.
+  Past roughly seven options the set stops being scannable and belongs in
+  `Select`.
+- **When the options are worth reading.** A radio group spends vertical space to
+  make the alternatives visible; if the reader already knows what they want and
+  the list is long, that space is wasted.
+- **Not for on/off.** One radio on its own cannot be unchecked once chosen, so a
+  single yes/no is a `Switch` or a `Checkbox`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+- **`Radio` is one option, not the group.** The group is whatever shares a
+  `name`. Nothing here renders the set, names it or manages which member is
+  chosen — `MultipleChoice`, `RadioButtonGroup` and `ChoiceGrid` do that.
+- **`checked` makes it controlled and `defaultChecked` is then ignored.** Pass
+  `checked` with an `onChange` that sets it, or pass `defaultChecked` and let
+  the browser hold the state. Passing both is the mistake that renders a radio
+  which cannot be selected.
+- **`size` changes the control as well as the label.** The dot is 10px on
+  `small`, 12px on `medium` and 14px on `large`, and the label takes
+  `body3-txt`, `body2-txt` and `body1-txt` to match. All three dots are well
+  under a 24px target, so the hit area comes from the label — which is why a
+  radio without a `label` is a hard thing to point at as well as an unnamed one.
+- **Extra props land on the input.** `aria-label`, `required`, `data-*` and the
+  rest are spread onto the control rather than the wrapper, so they reach the
+  thing that has the role.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Accessibility
 
 - **The label is wired for you, `id` or no `id`.** One id is derived through

@@ -120,6 +120,49 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 <div className="sb-ds-doc-section">
 
+## When to use
+
+- **When a moment needs both halves.** A session start is a date *and* a time,
+  and splitting it across two fields makes the reader hold the pair together
+  themselves. Where only one half matters, use `DatePicker`.
+- **`showDate={false}` gives a time-only control** without reaching for a
+  different component, which keeps the time half's parsing and its AM/PM
+  behaviour rather than reimplementing them beside it.
+- **Not for a duration.** This picks a point, not a length. Two of these, or a
+  `NumberInput` of minutes, says what a single one cannot.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+- **`onChange` does not hand you an event.** It is called with
+  `{ date, time }` — plain strings, or `null` for a half that is not yet
+  complete. Every other field in this group forwards a DOM event, so this is
+  the one place `event.target.value` will be undefined.
+- **`time` stays `null` until both hours and minutes are present.** A reader
+  part-way through typing produces `{ date: '03/14/26', time: null }`, which is
+  the honest report: `09:` is not a time.
+- **The hour shown is a 12-hour hour.** `timeValue` accepts either form —
+  `"02:30 PM"` is used as given, and `"14:30"` is split into `02:30` and `PM`.
+  Midnight and noon are the two that do not follow the modulo and both read as
+  `12`, with only the period telling them apart.
+- **The hour field refuses what the control cannot show.** It takes 0 to 12, not
+  0 to 23, because an AM/PM control sits beside it. Zero is inside the bound so
+  a leading zero can be typed on the way to `05`.
+- **Changing AM/PM reports, with or without a date.** The event carries
+  `date: null` when no date has been picked yet, rather than staying silent
+  about a change the reader can see.
+- **Extra props go to the wrapper, not to the two inputs (#230).** The wrapper
+  is the element that carries the group's role and name, so a caller's
+  `aria-describedby` lands where it can help. They go on last, so a caller's
+  `aria-labelledby` overrides the generated one.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Accessibility
 
 - **`label` names the field, not either input.** The field renders two controls,

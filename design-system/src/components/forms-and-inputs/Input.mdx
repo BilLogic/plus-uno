@@ -127,6 +127,30 @@ a matching icon.
 
 <div className="sb-ds-doc-section">
 
+## Usage notes
+
+- **A visual is decoration; it never carries the meaning.** `leadingVisual` and
+  `trailingVisual` accept a Font Awesome class name or a node, and a string is
+  rendered `aria-hidden`. Anything the reader must know — that this is a search
+  field, that the value is a currency — belongs in the `label` or the
+  `validationMessage`, not in the glyph.
+- **`validationMessage` only renders when `validation` is not `none`.** Setting
+  the message alone shows nothing, which is the shape to reach for when a field
+  should carry its message only once it has failed.
+- **The field points AT its message (#327).** When both are set, the message
+  gets an id and the input an `aria-describedby` naming it, alongside
+  `aria-invalid` for `invalid`. A caller's own `aria-describedby` is kept and
+  the generated id appended, so passing one does not silence the error.
+- **Extra props land on the input**, so `maxLength`, `autoComplete`, `readOnly`,
+  `pattern` and the rest reach the control rather than its wrapper.
+- **`type` is passed straight through.** `type="email"` and `type="tel"` change
+  the mobile keyboard as well as the validation, which is worth setting even
+  where the form validates server-side.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Accessibility
 
 - **The label is associated whether you pass `id` or not.** One id is derived

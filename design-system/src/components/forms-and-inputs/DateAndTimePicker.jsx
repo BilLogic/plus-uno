@@ -140,12 +140,28 @@ const DateAndTimePicker = ({
                 let hours = parseInt(timeMatch[1]);
                 const minutes = timeMatch[2];
                 const period = timeMatch[3]?.toUpperCase() || '';
-                
+
+                /*
+                 * THE HOUR SHOWN IS A 12-HOUR HOUR, because an AM/PM control
+                 * sits beside it. This used to convert a 12-hour value UP to
+                 * 24-hour — `if (period === 'PM' && hours !== 12) hours += 12`
+                 * — and then render the result next to the period it came from,
+                 * so `timeValue="02:30 PM"` displayed as `14:30` with `PM`
+                 * beside it and `onChange` reported `"14:30 PM"`. A value could
+                 * not survive a round trip through its own component.
+                 *
+                 * With a period, the hour is already in the form the control
+                 * shows and needs no conversion. Without one the value is
+                 * 24-hour, so it is split into the hour this control can show
+                 * and the period that says which half of the day it is —
+                 * midnight and noon are the two that do not follow the modulo,
+                 * and both read as 12.
+                 */
                 if (period) {
-                    // 12-hour format
                     setAmPm(period);
-                    if (period === 'PM' && hours !== 12) hours += 12;
-                    if (period === 'AM' && hours === 12) hours = 0;
+                } else {
+                    setAmPm(hours >= 12 ? 'PM' : 'AM');
+                    hours = hours % 12 === 0 ? 12 : hours % 12;
                 }
                 setTimeHours(String(hours).padStart(2, '0'));
                 setTimeMinutes(minutes);
@@ -230,7 +246,14 @@ const DateAndTimePicker = ({
         // Validate and format
         if (type === 'hours') {
             const num = parseInt(value) || 0;
-            if (num >= 0 && num <= 23) {
+            /*
+             * Twelve, not twenty-three. The field is displayed beside an AM/PM
+             * control, so 23 was a bound from a clock this component does not
+             * show: typing 20 was accepted and rendered as `20:00 PM`. Zero
+             * stays inside the bound so a leading zero can be typed on the way
+             * to `05`.
+             */
+            if (num >= 0 && num <= 12) {
                 setTimeHours(String(num).padStart(2, '0'));
             } else if (value === '') {
                 setTimeHours('');
@@ -261,9 +284,18 @@ const DateAndTimePicker = ({
         setAmPm(newAmPm);
         setIsAmPmOpen(false);
         
-        if (onChange && selectedDate) {
+        /*
+         * Reported whether or not a date has been chosen. This used to be
+         * `if (onChange && selectedDate)`, so switching AM to PM on a form
+         * where the time is filled and the date is not told the caller
+         * nothing — and the two sibling handlers, `handleTimeChange` and the
+         * date handler, both report with whatever half they have. A control
+         * that is silent about a change the reader can see is worse than one
+         * that reports a half-complete value.
+         */
+        if (onChange) {
             onChange({
-                date: formatDateForInput(selectedDate),
+                date: selectedDate ? formatDateForInput(selectedDate) : null,
                 time: timeHours && timeMinutes ? `${timeHours}:${timeMinutes} ${newAmPm}` : null
             });
         }
