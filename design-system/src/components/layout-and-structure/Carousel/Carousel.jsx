@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Carousel as BootstrapCarousel } from 'react-bootstrap';
 import './Carousel.scss';
@@ -25,6 +25,23 @@ const Carousel = ({
     ...props
 }) => {
     const slide = slideProp !== undefined ? slideProp : true;
+
+    /*
+     * #333. Autoplay needs a way to stop it.
+     *
+     * WCAG 2.2.2 is not a preference: anything that moves, blinks or scrolls
+     * automatically for more than five seconds has to be pausable. `pause`
+     * covers a mouse hovering, which is not a mechanism for a keyboard or a
+     * touch user, and there was no other one — an `interval` was a carousel
+     * nobody could stop.
+     *
+     * The control appears ONLY when there is autoplay to pause. A play/pause
+     * button on a carousel that never advances is a control that lies about
+     * what the component does.
+     */
+    const autoplays = typeof interval === 'number' && interval > 0;
+    const [paused, setPaused] = useState(false);
+    const effectiveInterval = autoplays && !paused ? interval : null;
     // Custom icons matching legacy
     const defaultPrevIcon = <span aria-hidden="true" className="carousel-control-prev-icon plus-carousel-control-icon"><i className="fas fa-chevron-left"></i></span>;
     const defaultNextIcon = <span aria-hidden="true" className="carousel-control-next-icon plus-carousel-control-icon"><i className="fas fa-chevron-right"></i></span>;
@@ -62,14 +79,14 @@ const Carousel = ({
         </BootstrapCarousel.Item>
     ));
 
-    return (
+    const carousel = (
         <BootstrapCarousel
             id={id}
             activeIndex={activeIndex}
             onSelect={onSelect}
             controls={controls}
             indicators={indicators}
-            interval={interval}
+            interval={effectiveInterval}
             pause={pause}
             wrap={wrap}
             keyboard={keyboard}
@@ -88,6 +105,28 @@ const Carousel = ({
         >
             {content}
         </BootstrapCarousel>
+    );
+
+    if (!autoplays) return carousel;
+
+    return (
+        <div className="plus-carousel-shell">
+            {carousel}
+            {/*
+              * Outside the carousel, not inside a slide: a control that lives in
+              * a slide is a control that scrolls away from the person trying to
+              * press it. Its name says what the press will DO, which is the
+              * convention for a toggle rendered as one button rather than two.
+              */}
+            <button
+                type="button"
+                className="plus-carousel-playpause"
+                aria-label={paused ? 'Play slideshow' : 'Pause slideshow'}
+                onClick={() => setPaused((wasPaused) => !wasPaused)}
+            >
+                <i className={`fas ${paused ? 'fa-play' : 'fa-pause'}`} aria-hidden="true" />
+            </button>
+        </div>
     );
 };
 
