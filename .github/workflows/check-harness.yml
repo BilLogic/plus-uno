@@ -56,6 +56,21 @@ jobs:
         with:
           node-version: "22"
 
+      # BEFORE `check:harness`, not after, and the order is load-bearing:
+      # that composite now runs the Worker's `typecheck` and its 268 tests, and
+      # both need this package's devDependencies. With the install below the
+      # check, CI failed on `Cannot find type definition file for
+      # '@cloudflare/workers-types'` while the same command passed on any
+      # machine that had ever installed them — a guard that is green only where
+      # it is not needed.
+      #
+      # `npm ci` is scoped to agents/uno-bot and these tests touch no network,
+      # no credential and no Worker; they are pure functions plus two files read
+      # off disk.
+      - name: Install uno-bot deps
+        working-directory: agents/uno-bot
+        run: npm ci
+
       # One command, one exit code. The composite names every sub-check that
       # failed and prints each one's own diagnostic underneath — it does not stop
       # at the first, so one run reports everything wrong with the branch.
@@ -68,13 +83,6 @@ jobs:
       # while reviewing, and a docs edit could block a production deploy on a
       # sentence nobody had run the check against (#249).
       #
-      # `npm ci` is scoped to agents/uno-bot and these tests touch no network,
-      # no credential and no Worker; they are pure functions plus two files read
-      # off disk.
-      - name: Install uno-bot deps
-        working-directory: agents/uno-bot
-        run: npm ci
-
       - name: uno-bot script tests
         working-directory: agents/uno-bot
         run: npm run test:bundle
