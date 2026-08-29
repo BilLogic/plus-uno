@@ -204,6 +204,12 @@ const COMPOSED = [
       "the vocabulary of every intent-coloured EDGE in the design system. `_color_roles.scss` minted `--color-X-icon` and `--color-X-border` on 2026-08-29 and closed with the sentence that these tokens had no users yet \u2014 111 of the 137 border declarations now name the role, and this is the ratchet that keeps them there. The rename changes no pixel for six of the seven intents, which is the point: `border-color: var(--color-danger)` is a use of the bold FILL colour that happens to land on an edge, and `var(--color-danger-border)` is a declaration that an edge was intended and 3:1 was the bar. Only the second can move on its own, and warning must \u2014 #9f8205 is 2.87:1 on the darkest surface step, under even WCAG 1.4.11's non-text bar. It ratchets in BOTH directions: a count below its record is a finding too, because a baseline that describes code that no longer exists has stopped being readable. It also asserts the seven role tokens still EXIST, since a regeneration that removed `_color_roles.scss` would leave 111 call sites resolving to nothing while this check, which counts BASE uses, reported green. Mutation-tested four ways: a reverted call site, a deleted role, a baselined file with its reason removed, and a recorded remainder fixed without lowering the record. 0.1s, measured 2026-08-29.",
   },
   {
+    script: 'check:focus-ring',
+    pkg: 'root',
+    guards:
+      "the one thing that tells a keyboard user where they are. Of the 84 focus rules in the design system, 29 had NO affordance reaching WCAG 1.4.11's 3:1 \u2014 `.plus-input:focus` announced itself with a #84cfff border at 1.62:1, the AM/PM toggle and the file drop zone with an 8% primary tint at 1.13:1, four textarea states at 2.22:1, and six readonly fields with the same grey they wear at rest. axe cannot catch this: it has no focus-appearance rule, so `check:storybook` swept all 416 story files and reported none of it. A rule is scored on its STRONGEST affordance, which is the correction that made the check right \u2014 eleven rules pair a 1.13:1 glow with a 5.02:1 border, and there the border is the indicator. No ratchet and no exceptions: a ring nobody can see is a defect, not a vocabulary to migrate at leisure. Mutation-tested three ways: one ring reverted, the `--color-focus-ring` role deleted, and a stale exception left behind. 0.2s, measured 2026-08-29.",
+  },
+  {
     script: 'check:figma-colour-drift',
     pkg: 'root',
     guards:

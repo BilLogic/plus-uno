@@ -106,7 +106,7 @@
         cursor: default;
 
         &:focus {
-            border-color: var(--color-outline-variant);
+            border-color: var(--color-focus-ring);
             box-shadow: none;
         }
     }

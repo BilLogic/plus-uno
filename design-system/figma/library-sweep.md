@@ -280,3 +280,43 @@ look the same.
 
 Nothing was replaced and no variable was minted. The five `_Proposal/`
 candidates already in `colors / accent` are unchanged.
+
+## The focus ring, in Figma — 2026-08-29
+
+The code sweep behind `npm run check:focus-ring` found 29 of this system's 84
+focus rules with no affordance reaching 3:1. The library had the matching gap:
+fourteen role variables were minted for `Icon` and `Border` on the same day, and
+none for the focus ring, because the code did not have that role either.
+
+**`_Focus/Focus Ring`** now exists in `colors / accent`
+(`VariableID:17595:28`), aliasing `_Primary/Primary` and scoped to
+`STROKE_COLOR` alone. It is a variable rather than a reuse of `_Primary/Primary`
+for the same reason `--color-focus-ring` is a token rather than a literal: WCAG
+2.4.11 gives the focus indicator a success criterion of its own, Atlassian keep
+`color.border.focused` apart from `color.border`, and the alias is the part that
+can change — a different hue, a lighter one on dark grounds — without touching
+anything that points at it.
+
+`DOC — Focus ring (#368): 29 rings nobody could see` sits on the **Color** page
+at (1180, 32100), id `17596:5105`, beside the intent-roles frame. It draws all
+seven of the old ring colours as real 2px rings on real fields, so the failure
+is visible rather than argued:
+
+| drawn with | on the page | rules |
+| --- | ---: | ---: |
+| Inverse Primary | 1.62:1 | 14 |
+| Outline Variant | 1.62:1 | 6 |
+| Primary Container | 2.22:1 | 4 |
+| Primary at 8% | 1.13:1 | 2 |
+| Danger at 8% | 1.15:1 | 1 |
+| Success at 8% | 1.12:1 | 1 |
+| On Surface at 12% | 1.28:1 | 1 |
+
+beside `_Focus/Focus Ring` at 5.02:1 and the two intent borders the invalid and
+valid states keep. Reading the frame is the argument: on the first seven fields
+the ring and the field edge are the same thing to the eye.
+
+Nothing was replaced and nothing was rebound. The 29 call sites moved in the
+code; no component set in this file has been repointed at the new variable, and
+the ring's WIDTH — spelled six ways across the 53 declarations — is recorded as
+open rather than decided.

@@ -67,7 +67,7 @@
 
             &:focus {
                 border-width: var(--size-element-stroke-lg, 2px) !important;
-                border-color: var(--color-primary-container) !important;
+                border-color: var(--color-focus-ring) !important;
             }
 
             // Value (filled) state: darker border when not showing placeholder
@@ -90,7 +90,7 @@
 
             &:focus {
                 border-bottom-width: var(--size-element-stroke-lg, 2px) !important;
-                border-bottom-color: var(--color-primary-container) !important;
+                border-bottom-color: var(--color-focus-ring) !important;
             }
 
             // Value (filled) state: darker underline when not showing placeholder
@@ -127,7 +127,7 @@
             cursor: default;
 
             &:focus {
-                border-color: var(--color-outline-variant) !important;
+                border-color: var(--color-focus-ring) !important;
             }
 
             &:not(:placeholder-shown):not(:focus) {
@@ -200,11 +200,11 @@
 
     &--focus {
         textarea.plus-textarea-v2__control.form-control {
-            border: var(--size-element-stroke-lg, 2px) solid var(--color-primary-container) !important;
+            border: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring) !important;
         }
 
         &.plus-textarea-v2--short textarea.plus-textarea-v2__control.form-control {
-            border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-primary-container) !important;
+            border-bottom: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring) !important;
         }
     }
 }

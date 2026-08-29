@@ -50,7 +50,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-danger` · `--color-danger-border` · `--color-inverse-primary` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline` · `--color-outline-variant` · `--color-success` · `--color-success-border` · `--color-surface` · `--color-surface-variant` · `--font-family-body` · `--font-line-height-body1` · `--font-line-height-body3` · `--font-size-body1` · `--font-size-body3` · `--font-weight-normal` · `--size-element-gap-lg` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-sm`
+`--color-danger` · `--color-danger-border` · `--color-focus-ring` · `--color-inverse-primary` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline` · `--color-outline-variant` · `--color-success` · `--color-success-border` · `--color-surface` · `--color-surface-variant` · `--font-family-body` · `--font-line-height-body1` · `--font-line-height-body3` · `--font-size-body1` · `--font-size-body3` · `--font-weight-normal` · `--size-element-gap-lg` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-sm`
 
 From `design-system/src/components/forms-and-inputs/Input.scss`. Override these through the token layer, never with a literal.
 

@@ -100,7 +100,7 @@
         cursor: default;
         
         &:focus {
-            border-color: var(--color-outline-variant);
+            border-color: var(--color-focus-ring);
             box-shadow: none;
         }
     }
@@ -256,7 +256,7 @@
             
             &:focus {
                 outline: none;
-                box-shadow: 0 0 0 2px var(--color-inverse-primary);
+                box-shadow: 0 0 0 2px var(--color-focus-ring);
             }
             
             &:disabled {

@@ -29,7 +29,7 @@ Collapsible content sections built on React Bootstrap Accordion. Supports flush 
 
 ## Tokens touched
 
-`--color-inverse-primary` · `--color-on-surface-state-08` · `--color-on-surface-state-12` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary-state-16` · `--color-surface` · `--font-family-body` · `--font-family-header` · `--font-line-height-body1` · `--font-line-height-h6` · `--font-size-body1` · `--font-size-fa-h6-solid` · `--font-size-h6` · `--font-weight-normal` · `--font-weight-title` · `--size-card-border-lg` · `--size-card-border-sm` · `--size-card-pad-x-md` · `--size-card-pad-y-md` · `--size-card-radius-sm`
+`--color-focus-ring` · `--color-on-surface-state-08` · `--color-on-surface-state-12` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary-state-16` · `--color-surface` · `--font-family-body` · `--font-family-header` · `--font-line-height-body1` · `--font-line-height-h6` · `--font-size-body1` · `--font-size-fa-h6-solid` · `--font-size-h6` · `--font-weight-normal` · `--font-weight-title` · `--size-card-border-lg` · `--size-card-border-sm` · `--size-card-pad-x-md` · `--size-card-pad-y-md` · `--size-card-radius-sm`
 
 From `design-system/src/components/layout-and-structure/Accordion/Accordion.scss`. Override these through the token layer, never with a literal.
 

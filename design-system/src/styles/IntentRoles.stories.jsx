@@ -41,8 +41,19 @@ import { expect } from 'storybook/test';
  * `-border` keeps the base, where 3:1 is the right bar: a border as dark as its
  * own label reads as a heavier component than it is.
  *
- * NOTHING IS REPOINTED. The role tokens have no users yet. This page is the
- * argument for moving the 108 onto them, one at a time.
+ * THE BORDERS ARE REPOINTED NOW. 111 of the 137 border declarations moved onto
+ * `-border` on 2026-08-29, and `npm run check:intent-roles` keeps them there;
+ * the remaining 26 are recorded with a reason in
+ * `docs/evals/intent-role-adoption.json`. Six of the seven roles alias their
+ * base, so those 111 changed no pixel — what changed is that an edge now says
+ * it is an edge, and the value can move for edges alone. The `-icon` roles
+ * still have no users: an icon colour is usually set by `color:` on a glyph,
+ * which `check:text-contrast` already measures against the 4.5:1 bar.
+ *
+ * The sweep also found the role that was missing rather than unused. 25 focus
+ * rings were left behind because a focus indicator is not a border, and
+ * measuring them found 29 rules whose ring could not be seen at all — see
+ * Foundations/Focus ring, and `--color-focus-ring` beside these tokens.
  */
 export default {
     title: 'Foundations/Intent colour roles',

@@ -114,7 +114,7 @@
         &:focus,
         &:focus-visible {
             box-shadow: none !important;
-            outline: var(--size-card-border-lg) solid var(--color-inverse-primary) !important;
+            outline: var(--size-card-border-lg) solid var(--color-focus-ring) !important;
             outline-offset: calc(-1 * var(--size-card-border-lg));
         }
 
@@ -214,7 +214,7 @@
                 z-index: 3; // Ensure above adjacent items
                 box-shadow: none !important;
                 outline: none !important;
-                border-bottom: var(--size-card-border-lg) solid var(--color-inverse-primary) !important;
+                border-bottom: var(--size-card-border-lg) solid var(--color-focus-ring) !important;
                 margin-bottom: -1px; // prevent layout shift if border width changes from 1px to 2px? 
                 // actually, border-width change might cause shift. 
                 // Better to use box-shadow inset or just let it be 2px.

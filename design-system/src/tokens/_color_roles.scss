@@ -118,4 +118,29 @@
     /* Info — aliases tertiary, as every other info token does. */
     --color-info-icon: var(--color-info-text);
     --color-info-border: var(--color-info);
+
+    /*
+     * THE FOCUS RING — the role the border sweep found missing.
+     *
+     * Moving 111 edges onto `-border` left 25 focus rings behind, because a
+     * focus indicator is not a border: Atlassian names `color.border.focused`
+     * beside `color.border`, and the two answer to different criteria. A
+     * border is decoration a designer chooses; a focus ring is the only thing
+     * telling a keyboard user where they are, and WCAG 2.4.11 gives it its own
+     * success criterion on top of 1.4.11's 3:1.
+     *
+     * Measuring them was worse than counting them. Of the 84 focus rules in
+     * this system, 29 had no affordance that could be seen — a #84cfff border
+     * on `.plus-input:focus` at 1.62:1, an 8% primary glow at 1.13:1 on the
+     * AM/PM toggle and the file drop zone, a #d1e4ff textarea edge at 2.22:1,
+     * and six readonly fields whose focus was `--color-outline-variant`, the
+     * same grey they wear at rest. `--color-primary` is 5.02:1 on the page and
+     * was already the majority spelling.
+     *
+     * It aliases primary today. It is a token so that the ring can stop
+     * aliasing primary — a different hue, a lighter one on dark grounds —
+     * without hunting 29 call sites, and so `check:focus-ring` has one name to
+     * hold them to.
+     */
+    --color-focus-ring: var(--color-primary);
 }

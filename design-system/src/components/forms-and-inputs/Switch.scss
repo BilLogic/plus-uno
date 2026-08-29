@@ -114,12 +114,12 @@
 
         &:focus {
             outline: none;
-            box-shadow: 0 0 0 2px var(--color-inverse-primary);
+            box-shadow: 0 0 0 2px var(--color-focus-ring);
         }
 
         &:focus-visible {
             outline: none;
-            box-shadow: 0 0 0 2px var(--color-inverse-primary);
+            box-shadow: 0 0 0 2px var(--color-focus-ring);
         }
 
         &:focus:not(:focus-visible) {
