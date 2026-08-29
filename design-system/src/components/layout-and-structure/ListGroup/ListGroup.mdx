@@ -154,4 +154,122 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `ListGroup` for a flat, bordered list of like things — a set of links, a set
+of actions, or a set of options the user picks from. It is one component covering
+three shapes, and `selectable` on the item is what decides which:
+
+- `none` (the default) is a plain row. It renders as an `a` if given `href`, a
+  `button` if given `onClick` or `action`, and a `div` otherwise.
+- `single` and `multi` render an option with a radio or checkbox indicator, and
+  the container becomes a `listbox`.
+
+`flush` removes the outer border for a list inside another surface; `horizontal`
+lays the rows in a row.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Do not mix selectable and plain items in one list.
+
+```jsx
+// Incorrect — the container only takes role="listbox" when EVERY child is
+// option-shaped. One plain item silently drops it, leaving the others as
+// role="option" with no listbox ancestor, which is invalid ARIA.
+<ListGroup>
+    <ListGroup.Item selectable="single" selected={a} value="a">A</ListGroup.Item>
+    <ListGroup.Item selectable="single" value="b">B</ListGroup.Item>
+    <ListGroup.Item onClick={addNew}>Add another…</ListGroup.Item>
+</ListGroup>
+
+// Correct — the list is options; the action sits outside it.
+<ListGroup>
+    <ListGroup.Item selectable="single" selected={a} value="a">A</ListGroup.Item>
+    <ListGroup.Item selectable="single" value="b">B</ListGroup.Item>
+</ListGroup>
+<Button fill="text" onClick={addNew}>Add another…</Button>
+```
+
+### `onClick` is handed different arguments in the two modes.
+
+```jsx
+// Incorrect — a selectable item's handler receives its `value`, not an event.
+<ListGroup.Item selectable="multi" value="maths" onClick={(e) => e.preventDefault()}>
+    Maths
+</ListGroup.Item>
+
+// Correct.
+<ListGroup.Item selectable="multi" value="maths" onClick={(value) => toggle(value)}>
+    Maths
+</ListGroup.Item>
+
+// A plain item's handler receives the event, as usual.
+<ListGroup.Item onClick={(e) => open(e)}>Session notes</ListGroup.Item>
+```
+
+### `style` on an item is a colour variant, not inline CSS.
+
+It takes `primary`, `success`, `danger` and the rest, and is turned into a class
+name. An object passed there produces a class name built from `[object Object]`,
+and there is no inline-style prop on the item — put the CSS in a `className`.
+
+### Selection is yours to hold.
+
+`selected` is read, never written. The item reports the click and re-renders from
+the prop; if the state does not change, nothing on screen does.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The listbox is conditional, and that is deliberate.** `role="listbox"` and
+  `aria-multiselectable` appear only when every child is an option, because
+  `role="option"` without a listbox parent is worse than no role at all.
+- **There is no arrow-key navigation.** Each option is its own tab stop
+  (`tabIndex={0}`). The ARIA listbox pattern expects one tab stop and arrow keys
+  between options; this is a list of focusable rows instead. It is usable, and it
+  is not the pattern a screen-reader user will be expecting — for a long set of
+  options, prefer `Select` or a group of `Radio`s, which have the keyboard
+  behaviour built in.
+- **Selection state is announced.** `aria-selected` tracks `selected`, and
+  `aria-disabled` tracks `disabled`, on every option.
+- **Disabled rows stay reachable in one case.** A disabled `button` item gets the
+  real `disabled` attribute; a disabled link loses its `href` and takes
+  `tabIndex={-1}`; a disabled option keeps `role="option"` with
+  `aria-disabled="true"` and drops out of the tab order.
+- **A row that only looks clickable is not.** Without `href`, `onClick` or
+  `action` the item renders as a `div` — no focus, no Enter. If it does
+  something, give it one of the three.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For picking one option from many in a form, use `Select` or `Radio` — both
+  carry the keyboard pattern this list does not.
+- For several checkboxes, use `Checkbox` in a fieldset rather than
+  `selectable="multi"`, unless the bordered list is the point.
+- For rows that navigate a section of the app, use `SidebarTab` or `NavPills`.
+- For tabular data with more than one column per row, use `Table`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

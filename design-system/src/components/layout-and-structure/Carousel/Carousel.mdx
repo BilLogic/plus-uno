@@ -76,4 +76,99 @@ A slideshow component for cycling through elements—images or slides of text—
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Carousel` for a small set of equal, browsable panels the user is invited to
+look through — onboarding screens, a few featured items, a gallery. Everything in
+it is one slide away from being unseen, so nothing essential belongs here.
+
+`slides` takes an array of `{ content, alt, title, caption, interval }`, or you
+can compose the items yourself as `children`. `interval` is `null` by default,
+which means it does not advance on its own; `controls` and `indicators` are both
+on. `fade` is accepted and ignored — the transition is always a slide.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### A non-image string slide is injected as raw HTML.
+
+```jsx
+// Incorrect — content that is a string and does not end in an image extension
+// is written into the slide with dangerouslySetInnerHTML. With anything a user
+// can influence, that is an injection.
+<Carousel slides={[{ content: review.bodyHtml }]} />
+
+// Correct — pass an element. Elements are rendered as elements.
+<Carousel slides={[{ content: <Review body={review.body} /> }]} />
+```
+
+### Give every image slide an `alt`.
+
+```jsx
+// Incorrect — the fallback is "Slide 0", "Slide 1", zero-based and meaningless.
+<Carousel slides={[{ content: '/hero/autumn.png' }]} />
+
+// Correct.
+<Carousel slides={[{ content: '/hero/autumn.png', alt: 'Students in a workshop' }]} />
+```
+
+### Autoplay is off, and turning it on is a decision.
+
+```jsx
+// Incorrect — content that moves for more than five seconds needs a way to stop
+// it, and hover is not one for a keyboard or touch user.
+<Carousel interval={4000} slides={slides} />
+
+// Correct — leave it off, and let the controls do the moving.
+<Carousel slides={slides} />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The controls are named.** The previous and next buttons carry visually
+  hidden "Previous slide" and "Next slide" text; the arrows themselves are
+  `aria-hidden`. That is what keeps them from being unnamed links.
+- **Slides off screen are still in the DOM.** A link or button inside a hidden
+  slide can still be reached. Keep controls out of the slides, or accept that
+  they are focusable before they are visible.
+- **`keyboard` is on by default.** Left and right arrows move between slides when
+  the carousel has focus. Leaving it on is what makes the component operable
+  without a mouse.
+- **Autoplay is a WCAG question, not a preference.** Anything that moves for
+  more than five seconds must be pausable. `pause="hover"` covers a mouse and
+  nothing else — if you set an `interval`, add a real pause control.
+- **Captions are an `h5` and a `p`.** The title is a heading at a fixed level,
+  so a page of carousels contributes a flat run of `h5`s to the outline.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For content the user must see, take it out of the carousel and lay it out —
+  a slide that is not on screen is a slide most people never read.
+- For stepping through a sequence with a known end, use `Progress` alongside
+  your own controls.
+- For alternative views of the same thing, use `NavTabs`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>
