@@ -45,6 +45,8 @@
     "audit:figma-registry": "node scripts/figma-registry-audit.mjs",
     "check:undefined-tokens": "node scripts/check-undefined-tokens.mjs",
     "check:font-families": "node scripts/check-font-families.mjs",
+    "check:atlassian-benchmark": "node scripts/check-atlassian-benchmark.mjs",
+    "benchmark:atlassian": "node scripts/check-atlassian-benchmark.mjs --table",
     "check:unspread-rest": "node scripts/check-unspread-rest.mjs",
     "check:page-outline": "node scripts/check-page-outline.mjs",
     "check:docs-tabs": "node scripts/check-docs-tabs.mjs",
