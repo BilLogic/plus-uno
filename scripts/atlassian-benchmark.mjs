@@ -68,6 +68,65 @@ export function ourTokens(repoRoot) {
 }
 
 /**
+ * The TEXT type scale: distinct rendered sizes, in px, ascending, with the
+ * ratio between each adjacent pair.
+ *
+ * Counting `--font-size-*` declarations measures the wrong thing, which the
+ * first version of this file did. There are 44, and 27 of them are FontAwesome
+ * icon sizes while five more are aliases (`--font-size-code` is
+ * `--font-size-body2`, `--font-size-h5` and `--font-size-lead` and
+ * `--font-size-blockquote` are all `--font-size-125`). Twelve distinct text
+ * sizes remain, against Atlassian's fourteen steps — near parity, and not the
+ * bloat the raw count implied.
+ *
+ * The defect is the SPACING, not the count. The twelve run
+ * 12·14·16·20·24·28·32·40·56·64·72·80, and the ratios between them are 1.167,
+ * 1.143, 1.250, 1.200, 1.167, 1.143, 1.250, 1.400, 1.143, 1.125, 1.111.
+ *
+ * IRREGULARITY, NOT A COUNT OF RATIOS. The obvious metric — how many distinct
+ * ratios are there — is wrong, and wrong in a way that would have shipped: font
+ * sizes round to whole pixels, so a PERFECT geometric run scores badly on it.
+ * A clean 1.2 scale from 16 renders as 16·19·23·28·33·40·48·57·69·83, whose
+ * rounded ratios are nine different numbers between 1.143 and 1.217 — worse, by
+ * that count, than the ad-hoc scale it replaces. What actually separates a scale
+ * from a list survives rounding: the SPREAD, max ratio over min ratio. A perfect
+ * scale scores 1.000 however it rounds. Today's twelve score 1.400 / 1.111 =
+ * 1.260; that clean 1.2 run scores 1.065.
+ */
+export function textScale(repoRoot) {
+  const file = path.join(repoRoot, 'design-system/src/tokens/_fonts.scss');
+  const text = fs.readFileSync(file, 'utf8');
+  const declared = new Map(
+    [...text.matchAll(/(--font-size-[a-z0-9-]+)\s*:\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()]),
+  );
+
+  /** Follow `var(--x)` chains. Depth-capped rather than cycle-tracked: a cycle
+   *  in a token file is its own bug and this is not the check for it. */
+  const resolve = (value, depth = 0) => {
+    const alias = /^var\(\s*(--[a-z0-9-]+)\s*\)$/.exec(value);
+    if (!alias || depth > 8) return value;
+    const next = declared.get(alias[1]);
+    return next === undefined ? value : resolve(next.trim(), depth + 1);
+  };
+
+  const px = new Set();
+  for (const [name, value] of declared) {
+    // Icon sizing is a separate scale with a separate job; `--font-size-125` is
+    // a primitive that three semantic tokens alias.
+    if (name.startsWith('--font-size-fa-') || name === '--font-size-125') continue;
+    const rem = /^([\d.]+)rem$/.exec(resolve(value));
+    if (rem) px.add(Number(rem[1]) * 16);
+  }
+
+  const sizes = [...px].sort((a, b) => a - b);
+  const ratios = sizes.slice(1).map((size, i) => Number((size / sizes[i]).toFixed(3)));
+  const spread = ratios.length
+    ? Number((Math.max(...ratios) / Math.min(...ratios)).toFixed(3))
+    : 1;
+  return { sizes, ratios, distinctRatios: [...new Set(ratios)].sort((a, b) => a - b), spread };
+}
+
+/**
  * The seven intents, each of which today carries the identical 9-token shape.
  * Written as one regex so `intent.borderTokens` and `intent.iconTokens` cannot
  * drift apart from the list they are counting over.
@@ -109,14 +168,21 @@ export const ROWS = [
       'as text — and nothing in its name says so, which is where #312 came from.',
   },
   {
-    key: 'type.sizeSteps',
-    ours: (t) => t.filter((n) => n.startsWith('--font-size-')).length,
-    theirs: (b) => b.typeSteps.count,
+    key: 'type.scaleSpread',
+    ours: (t, repoRoot) => textScale(repoRoot).spread,
+    // NOT compared to a number. The recording holds their fourteen step NAMES,
+    // not their px values, so any ratio count for Atlassian would be invented.
+    // The argument stands on its own terms.
+    theirs: () => null,
     direction: 'down',
     why:
-      '44 against their 14. #267 measured that our scale has no ratio at all — the ' +
-      'steps wander between 1.111 and 1.400 — and that 26 of the tokens are dead. ' +
-      'The direction is settled even though the destination is not.',
+      'The widest step ratio over the narrowest: 1.400 / 1.111 = 1.260 across eleven ' +
+      'steps, where a scale scores 1.000. The largest gap in the system (40 -> 56) sits ' +
+      'directly beside the smallest (72 -> 80). This is what the type work has to ' +
+      'converge, NOT the token count: twelve distinct text sizes against their fourteen ' +
+      'steps is already parity, and 27 of the 44 --font-size-* tokens are icon sizes. ' +
+      'Counted as DISTINCT RATIOS instead, a perfect 1.2 run would score worse than the ' +
+      'list it replaces, because whole-pixel rounding gives every step its own number.',
   },
   {
     key: 'type.lineHeights',
@@ -136,6 +202,8 @@ export const ROWS = [
    * no direction is claimed, because 36 surface tokens against 208 backgrounds
    * is a difference and not a defect.
    */
+  { key: 'type.textSizes', ours: (t, repoRoot) => textScale(repoRoot).sizes.length, theirs: (b) => b.typeSteps.count, direction: null },
+  { key: 'type.fontSizeTokens', ours: (t) => t.filter((n) => n.startsWith('--font-size-')).length, theirs: (b) => b.typeSteps.count, direction: null },
   { key: 'role.background(surface)', ours: (t) => t.filter((n) => n.startsWith('--color-surface')).length, theirs: (b) => b.colourByRole['color.background'], direction: null },
   { key: 'role.foreground(on-*)', ours: (t) => t.filter((n) => n.startsWith('--color-on-')).length, theirs: (b) => b.colourByRole['color.text'] + b.colourByRole['color.icon'], direction: null },
   { key: 'role.border(outline)', ours: (t) => t.filter((n) => n.startsWith('--color-outline')).length, theirs: (b) => b.colourByRole['color.border'], direction: null },
@@ -147,11 +215,15 @@ export const ROWS = [
   { key: 'tokens.total', ours: (t) => t.length, theirs: (b) => b.totals.all, direction: null },
 ];
 
-/** `{key, ours, theirs, direction, why}` for every row. */
-export function compare(tokens, benchmark) {
+/**
+ * `{key, ours, theirs, direction, why}` for every row. `repoRoot` is passed to
+ * each row's reader because two of them measure the type scale, which needs the
+ * file rather than the name list.
+ */
+export function compare(tokens, benchmark, repoRoot) {
   return ROWS.map((row) => ({
     key: row.key,
-    ours: row.ours(tokens),
+    ours: row.ours(tokens, repoRoot),
     theirs: row.theirs(benchmark),
     direction: row.direction,
     why: row.why,

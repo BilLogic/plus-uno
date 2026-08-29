@@ -50,7 +50,7 @@
     "recordedAt": "2026-08-29",
     "intent.borderTokens": 7,
     "intent.iconTokens": 7,
-    "type.sizeSteps": 44,
+    "type.scaleSpread": 1.26,
     "type.lineHeights": 46
   }
 }

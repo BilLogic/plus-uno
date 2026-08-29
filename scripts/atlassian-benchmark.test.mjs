@@ -4,7 +4,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { INTENT, ROWS, ourTokens, compare, ageInDays, failures } from './atlassian-benchmark.mjs';
+import { INTENT, ROWS, ourTokens, textScale, compare, ageInDays, failures } from './atlassian-benchmark.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BENCHMARK = JSON.parse(
@@ -14,7 +14,7 @@ const NOW = new Date('2026-08-29T00:00:00Z');
 const opts = { now: NOW, measuredAt: BENCHMARK.measuredAt, maxAgeDays: 365 };
 
 test('the repository passes its own benchmark', () => {
-  const rows = compare(ourTokens(REPO_ROOT), BENCHMARK);
+  const rows = compare(ourTokens(REPO_ROOT), BENCHMARK, REPO_ROOT);
   assert.deepEqual(failures(rows, BENCHMARK, opts), []);
 });
 
@@ -46,13 +46,13 @@ test('an `up` row that FALLS is a finding, and one that rises is not', () => {
 });
 
 test('a `down` row that GROWS is a finding, and one that shrinks is not', () => {
-  const rows = [{ key: 'type.sizeSteps', ours: 50, direction: 'down', why: 'x' }];
-  const base = { ours: { 'type.sizeSteps': 44 } };
+  const rows = [{ key: 'type.scaleSpread', ours: 1.4, direction: 'down', why: 'x' }];
+  const base = { ours: { 'type.scaleSpread': 1.26 } };
   const found = failures(rows, base, opts);
   assert.equal(found.length, 1);
   assert.match(found[0], /may only FALL/);
 
-  assert.deepEqual(failures([{ ...rows[0], ours: 40 }], base, opts), []);
+  assert.deepEqual(failures([{ ...rows[0], ours: 1.05 }], base, opts), []);
 });
 
 test('a row with no direction is never a finding, however far apart', () => {
@@ -112,6 +112,28 @@ test('the roles we DO have are counted under our own names, not Atlassian spelli
   const tokens = ourTokens(REPO_ROOT);
   assert.ok(tokens.filter((t) => t.startsWith('--color-surface')).length > 20);
   assert.ok(tokens.filter((t) => t.startsWith('--color-outline')).length > 5);
+});
+
+test('the type scale is measured from rendered sizes, not from token names', () => {
+  // Counting --font-size-* declarations measures the wrong thing: 27 of the 44
+  // are FontAwesome icon sizes and five more are aliases. What is left is the
+  // scale, and its defect is the SPACING rather than the count.
+  const { sizes, ratios, distinctRatios, spread } = textScale(REPO_ROOT);
+  assert.deepEqual(sizes, [12, 14, 16, 20, 24, 28, 32, 40, 56, 64, 72, 80]);
+  assert.equal(ratios.length, sizes.length - 1);
+  assert.ok(sizes.every((s, i) => i === 0 || s > sizes[i - 1]), 'sizes must ascend and be distinct');
+  // 20px is only reachable by following --font-size-h5 -> --font-size-125,
+  // so its presence proves the alias chain is resolved rather than skipped.
+  assert.ok(sizes.includes(20), 'the alias chain to --font-size-125 was not followed');
+  assert.deepEqual(distinctRatios, [1.111, 1.125, 1.143, 1.167, 1.2, 1.25, 1.4]);
+  // Spread, not the count of ratios: whole-pixel rounding gives a perfect
+  // geometric run a different ratio at every step, so counting them would score
+  // a real scale worse than this list.
+  assert.equal(spread, 1.26);
+  assert.equal(textScale(REPO_ROOT).spread, Number((1.4 / 1.111).toFixed(3)));
+  // Twelve distinct text sizes against Atlassian's fourteen steps: parity. The
+  // raw token count of 44 is what made this look like bloat.
+  assert.equal(sizes.length, 12);
 });
 
 test('the recorded Atlassian side is the measurement, not a guess', () => {
