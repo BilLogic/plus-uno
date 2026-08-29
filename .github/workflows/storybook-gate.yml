@@ -83,3 +83,11 @@ jobs:
       # not already carry that rule in `docs/evals/a11y-baseline.json`.
       - name: npm run check:storybook
         run: npm run check:storybook
+
+      # Docs pages, which the suite above does not reach: it tests stories, and a
+      # docs page is not one. #263 found four chrome defects there by eye because
+      # nothing else could. This starts its own Storybook, so it goes after the
+      # suite rather than beside it — the browser and the install are already paid
+      # for by this point, and a failure here should not hide a story failure.
+      - name: npm run check:docs-chrome
+        run: npm run check:docs-chrome
