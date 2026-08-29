@@ -133,10 +133,30 @@ body,
     max-width: 55ch;
 }
 
-/* Code blocks */
+/*
+ * Code blocks.
+ *
+ * The COLOUR is not cosmetic. Bootstrap's default `code` colour is `#d63384`,
+ * which measures 4.28:1 against this docs ground (`--color-surface`, #f9f9fc) —
+ * under AA's 4.5:1 for body text, on every inline `<code>` in every docs page.
+ * It surfaced when a new Foundations story put ten `<code>` labels on one page
+ * and `check:storybook`'s a11y pass failed it; the defect was on all 48 pages
+ * before that, unmeasured, because no story had rendered enough of them to be
+ * noticed.
+ *
+ * `--color-secondary` measures 6.70:1 and carries no meaning that code should
+ * not have. The near-hue alternative, `--color-relationship` (5.34:1), was
+ * rejected on purpose: it is a curriculum-domain colour, and painting literals
+ * in it would say a code span IS that domain — the same borrowed-meaning
+ * mistake #269 argues against for the AI palette.
+ */
 .sbdocs code,
 .sbdocs pre {
     font-family: var(--font-family-code, 'Source Code Pro', monospace) !important;
+}
+
+.sbdocs code {
+    color: var(--color-secondary);
 }
 
 /*
