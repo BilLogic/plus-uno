@@ -22,3 +22,77 @@
     --elevation-light-5: 0px 4px 4px 0px rgba(0, 0, 0, 0.3), 0px 8px 12px 6px rgba(0, 0, 0, 0.15);
 }
 
+
+/**
+ * ─── THE ROLE LAYER (#268) ──────────────────────────────────────────────────
+ *
+ * Everything above this line names a LEVEL. Nothing above this line says what a
+ * level is FOR, and nothing joins a level to a shadow. That is the gap #268
+ * opened, measured against `@atlaskit/tokens` 16.9.0:
+ *
+ *   Atlassian ships five surface ROLES — default, raised, overlay, sunken,
+ *   container — and `default`, `raised` and `overlay` are all `#FFFFFF`.
+ *   Elevation is carried by box-shadow, and the token descriptions say so in
+ *   words: "combine with elevation.shadow.raised". Only `sunken` differs in
+ *   fill, and it goes down.
+ *
+ *   We ship nine surfaces graded by lightness (Material 3's model) AND a
+ *   five-step shadow ramp (Atlassian's), with no rule joining them. The docs
+ *   canvases pick a surface by eye because there is nothing else to pick by.
+ *
+ * WHAT THIS IS AND IS NOT. It is a naming layer over values that already exist:
+ * every token below is an alias, no new colour and no new shadow is introduced,
+ * and NOTHING ABOVE IS REMOVED. Both models are usable side by side, which is
+ * the point — the decision in #268 ("shadow or lightness?") is Bill's, and this
+ * makes it comparable in a browser instead of in a document.
+ *
+ * THE PAIRING IS THE WHOLE IDEA. `--surface-raised` is a fill; on its own it is
+ * indistinguishable from `--surface-default`, because in this model that is
+ * TRUE — a raised card is the same colour as the page and is lifted by its
+ * shadow. So each raised role ships with the shadow it must be used with, named
+ * so the two cannot drift apart:
+ *
+ *   background: var(--surface-raised);
+ *   box-shadow: var(--surface-raised-shadow);
+ *
+ * A rule that sets one without the other is visible in review as a missing
+ * line, which is the cheapest form of enforcement available here. It is not
+ * enforced by a check: no static gate can tell a deliberately flat card from a
+ * forgotten shadow, and a gate that guessed would be wrong on the first
+ * legitimate case.
+ */
+:root {
+    /** The page itself. Atlassian's `elevation.surface`. */
+    --surface-default: var(--color-surface-container-lowest);
+
+    /**
+     * The ground BEHIND grouped things — the column a set of cards sits in.
+     * Atlassian's `sunken`, and the only role whose fill differs from the page
+     * in their model too.
+     */
+    --surface-sunken: var(--color-surface);
+
+    /**
+     * A card that lifts. Same fill as the page, by design; the shadow is what
+     * raises it.
+     */
+    --surface-raised: var(--color-surface-container-lowest);
+    --surface-raised-shadow: var(--elevation-light-1);
+
+    /**
+     * Modals, popovers, dropdowns — anything that sits ON TOP of the UI rather
+     * than in it. A heavier shadow than `raised` because it is further away,
+     * which is the one place the five-step ramp earns its steps.
+     */
+    --surface-overlay: var(--color-surface-container-lowest);
+    --surface-overlay-shadow: var(--elevation-light-3);
+
+    /**
+     * A neutral well INSIDE a card — a code block, a quiet panel, a summary
+     * strip. Atlassian makes this one translucent so it works over any ground;
+     * ours is opaque, because our containers sit on known surfaces and a
+     * translucent token would need a second decision about what it composites
+     * over. Recorded as a difference rather than smoothed over.
+     */
+    --surface-container: var(--color-surface-container);
+}
