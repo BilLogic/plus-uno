@@ -44,10 +44,12 @@ test('normalise reads every form both sides write', () => {
 test('the CSS side follows alias chains', () => {
   const colours = cssColours(REPO_ROOT);
   // --color-info is `var(--color-tertiary)`, and --color-info-icon is
-  // `var(--color-info)` — two hops. A scanner that stopped at the first would
-  // report `var(...)` and be unreadable rather than wrong, which is worse.
+  // `var(--color-info-text)` -> `var(--color-tertiary-text)` — two hops, and
+  // across two files, since the role layer lives in its own stylesheet. A
+  // scanner that stopped at the first hop would report `var(...)` and be
+  // unreadable rather than wrong, which is worse.
   assert.equal(colours.get('--color-info'), colours.get('--color-tertiary'));
-  assert.equal(colours.get('--color-info-icon'), colours.get('--color-tertiary'));
+  assert.equal(colours.get('--color-info-icon'), colours.get('--color-tertiary-text'));
   assert.match(colours.get('--color-info-icon'), /^#[0-9a-f]{6}$/);
 });
 

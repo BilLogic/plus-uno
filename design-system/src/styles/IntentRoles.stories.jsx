@@ -30,6 +30,17 @@ import { expect } from 'storybook/test';
  * border are held to 3:1 under WCAG 1.4.11 where text is held to 4.5:1. Naming
  * the role is what lets a value be chosen against the right bar.
  *
+ * AND 3:1 IS A FLOOR, NOT A VALUE. The first version of the role layer gave
+ * every `-icon` the base, since the base already clears 3:1. Binding the tokens
+ * to the real Alert component set in Figma showed what that would do: four of
+ * its six variants already draw their icon from the `-text` colour, and the
+ * base-valued token would have LIGHTENED them — danger 6.7:1 down to 5.0:1,
+ * warning 8.7:1 down to 5.0:1. Clearing the icon bar is not a reason to stop
+ * clearing the text one, so `-icon` resolves to `-text` and exists as its own
+ * name so an icon can be lightened DELIBERATELY later, against a written bar.
+ * `-border` keeps the base, where 3:1 is the right bar: a border as dark as its
+ * own label reads as a heavier component than it is.
+ *
  * NOTHING IS REPOINTED. The role tokens have no users yet. This page is the
  * argument for moving the 108 onto them, one at a time.
  */
@@ -204,13 +215,16 @@ export const RolesAndBars = () => {
 
             <h3 className="h5">The new `-icon` and `-border` roles</h3>
             <p className="body2-txt" style={{ maxWidth: '62ch' }}>
-                Held to 3:1 rather than 4.5:1 — WCAG 1.4.11, non-text contrast. Six of the seven
-                resolve to the base, which already clears 3:1 everywhere; naming the role is what
-                records which bar the value was chosen against.
+                Held to 3:1 rather than 4.5:1 — WCAG 1.4.11, non-text contrast — but 3:1 is the
+                floor an icon must reach, not the value it should take. Every <code>-icon</code>
+                resolves to its <code>-text</code> colour, which clears both bars on all five
+                grounds; it exists as its own name so an icon can be lightened deliberately later,
+                against a bar that is written down. Every <code>-border</code> keeps the base, where
+                3:1 is the right bar.
                 <strong> Warning is the exception</strong>: its base falls to 2.87:1 on the darkest
-                ground, under even the non-text bar, so its icon and border take
+                ground, under even the border bar, so its <em>border</em> takes
                 <code> #715c00</code> — the Figma warning value already used by the warning state
-                layers.
+                layers. Its icon needs no exception.
             </p>
             <Matrix rows={icon} bar={AA_NON_TEXT} caption="`-icon`" />
             <Matrix rows={border} bar={AA_NON_TEXT} caption="`-border`" />

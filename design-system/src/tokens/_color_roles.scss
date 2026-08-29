@@ -63,35 +63,41 @@
  */
 
 :root {
-    /* Primary — base clears 3:1 on all five grounds (min 4.08). */
-    --color-primary-icon: var(--color-primary);
+    /* Every -icon resolves to its -text colour: 6.70:1 at worst, clearing the
+       4.5:1 text bar as well as the 3:1 icon one. Every -border keeps the base,
+       whose worst ratio is noted beside it. */
+
+    /* Primary — border base 4.08 at worst. */
+    --color-primary-icon: var(--color-primary-text);
     --color-primary-border: var(--color-primary);
 
-    /* Secondary — min 5.44. */
-    --color-secondary-icon: var(--color-secondary);
+    /* Secondary — border base 5.44. */
+    --color-secondary-icon: var(--color-secondary-text);
     --color-secondary-border: var(--color-secondary);
 
-    /* Tertiary — min 3.68. Clears 3:1 everywhere; fails 4.5:1 on four of five,
-       which is why it is a role token and not a licence to use it as text. */
-    --color-tertiary-icon: var(--color-tertiary);
+    /* Tertiary — border base 3.68. Clears 3:1 everywhere; fails 4.5:1 on four
+       of the five, which is why the border is a role token and not a licence to
+       use the base as text. */
+    --color-tertiary-icon: var(--color-tertiary-text);
     --color-tertiary-border: var(--color-tertiary);
 
-    /* Danger — min 5.00. */
-    --color-danger-icon: var(--color-danger);
+    /* Danger — border base 5.00. */
+    --color-danger-icon: var(--color-danger-text);
     --color-danger-border: var(--color-danger);
 
-    /* Success — min 5.01. */
-    --color-success-icon: var(--color-success);
+    /* Success — border base 5.01. */
+    --color-success-icon: var(--color-success-text);
     --color-success-border: var(--color-success);
 
     /* Warning — the one exception. The base (#9f8205) measures 2.87:1 on
-       --color-surface-container-highest, under the 3:1 non-text bar. #715c00 is
-       the Figma warning value already used by the warning state layers and
-       measures 5.02:1 at its worst. */
-    --color-warning-icon: #715c00;
+       --color-surface-container-highest, under even the 3:1 border bar, so the
+       BORDER takes #715c00: the Figma warning value already used by the warning
+       state layers, 5.02:1 at its worst. The icon needs no exception, since
+       --color-warning-text is 6.70:1 at its worst like every other. */
+    --color-warning-icon: var(--color-warning-text);
     --color-warning-border: #715c00;
 
     /* Info — aliases tertiary, as every other info token does. */
-    --color-info-icon: var(--color-info);
+    --color-info-icon: var(--color-info-text);
     --color-info-border: var(--color-info);
 }
