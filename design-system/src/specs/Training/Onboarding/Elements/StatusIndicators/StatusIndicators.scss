@@ -54,7 +54,7 @@
 
     &--in-progress {
         i {
-            color: var(--color-warning, #ed6c02);
+            color: var(--color-warning-text, #5b4a00);
             animation: spin 3s linear infinite; // Slow spin for in-progress
         }
     }

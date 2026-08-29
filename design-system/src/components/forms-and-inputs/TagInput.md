@@ -37,7 +37,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-danger` · `--color-info` · `--color-on-surface` · `--color-primary` · `--color-success` · `--color-surface-container-low` · `--color-warning` · `--font-weight-normal` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-x-xs` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-pad-y-xs` · `--size-element-radius-md`
+`--color-danger` · `--color-info` · `--color-on-surface` · `--color-primary` · `--color-success` · `--color-surface-container-low` · `--color-warning-text` · `--font-weight-normal` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-x-xs` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-pad-y-xs` · `--size-element-radius-md`
 
 From `design-system/src/components/forms-and-inputs/TagInput.scss`. Override these through the token layer, never with a literal.
 
