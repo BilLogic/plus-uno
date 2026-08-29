@@ -192,6 +192,12 @@ const COMPOSED = [
       "every font stack ending in a CSS generic, and every inline fallback naming the face its token names. A fallback only paints when the token fails to load, so a wrong one is wrong everywhere at once and invisible until then — the reasoning check:colour-fallbacks applies to colour, which nothing applied to type. Seven findings when it was written and all seven fixed: --font-family-display4 named one face and no generic; three files fell back from --font-family-body to Lato, which is the HEADER face, so body text would have rendered in the heading font; two fell back to a bare `Lato`. It also keeps #267's monospace rule, where --font-family-code fell back to sans-serif and the stack measured 171.13px against monospace's 480.08px.",
   },
   {
+    script: 'check:figma-scopes',
+    pkg: 'root',
+    guards:
+      "no Figma colour variable offering itself for a role its contrast cannot carry. A variable's SCOPES are what the picker offers it FOR, and nothing recorded them — not the name snapshot, not the token registry. The sweep of 2026-08-29 found five variables outside the convention their peers follow, and every one of the five was offerable as a TEXT_FILL: `_Primary/Primary` on ALL_SCOPES, which measures 4.31:1 and 4.08:1 on the two darkest surface steps; `_Relationship/Relationship` likewise; `_Warning/Warning Container` and `_Advocacy/Advocacy Container` on ALL_FILLS, which includes text, where #ffe17a is 1.5:1 on white; and `_Warning/Warning (Text)` on ALL_SCOPES — the inverse error, the one warning value that PASSES as text also offered as a ground. That is #368's finding reached from the designer's end: picking `_Primary/Primary` for a label in Figma is what the 108 CSS declarations do, and the file was inviting it. The convention is DERIVED from the majority across the twelve accent groups rather than declared, so a finding reads 'this one disagrees with its peers' and not 'this one disagrees with me', and a new group that follows the pattern needs no edit. It also asserts that a convention was FOUND for each of the seven roles, since a naming change under classify() would otherwise let the check pass by having nothing to say. Mutation-tested by restoring each of the two worst violations and by emptying the recording.",
+  },
+  {
     script: 'check:figma-colour-drift',
     pkg: 'root',
     guards:
