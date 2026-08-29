@@ -9,9 +9,9 @@ authored half (#166), counted rather than assumed.
 |-----------|------:|:---:|:---:|:---:|
 | [Alert](Alert/index.md) | 8 | ✅ | ✕ | ✅ |
 | [Modal](Modal/index.md) | 25 | ✅ | ✕ | ✅ |
-| [Toast](Toast/index.md) | 13 | ✕ | ✕ | ✕ |
+| [Toast](Toast/index.md) | 13 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 2/3 (67%) · Correct/incorrect 0/3 (0%) · Accessibility 2/3 (67%)
+**Authored coverage:** When to use 3/3 (100%) · Correct/incorrect 0/3 (0%) · Accessibility 3/3 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

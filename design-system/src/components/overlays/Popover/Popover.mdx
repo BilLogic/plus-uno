@@ -95,4 +95,92 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Popover` for a small panel of secondary content anchored to a control — a
+definition, a preview, a short form with one or two fields. It holds more than a
+`Tooltip` and less than a `Modal`, and unlike a modal it does not take the page.
+
+`trigger` is the element it hangs off, `children` the body, `title` the optional
+header. `triggerType` is `click` (the default), `hover`, `focus`, an array of
+those, or `manual` for a popover you drive with `show`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### A click popover does not close when you click away.
+
+```jsx
+// The underlying overlay's rootClose is off and this component does not expose
+// it, so the only way to dismiss a click-triggered popover is to click the
+// trigger again. Say so in the content, or add your own close control.
+<Popover trigger={<Button text="Details" />} title="Session 12">
+    …
+    <Button text="Close" fill="text" onClick={close} />
+</Popover>
+```
+
+For a popover the user can dismiss the usual way, drive it yourself with
+`triggerType="manual"` and `show`, and close it on your own outside-click.
+
+### Pass a real element as the trigger.
+
+```jsx
+// Incorrect — a string trigger is wrapped in a focusable span. It takes Tab
+// and has no role and no name, so it is a focus stop that announces nothing.
+<Popover trigger="What is this?">…</Popover>
+
+// Correct.
+<Popover trigger={<Button fill="text" text="What is this?" />}>…</Popover>
+```
+
+### Hover alone leaves out the keyboard.
+
+`triggerType="hover"` has no keyboard equivalent. Use `['hover', 'focus']` at
+least, and `click` when the content is more than a sentence — hover content that
+must be read is content that has to stay put while it is read.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The trigger does not announce the popover.** There is no `aria-expanded`,
+  no `aria-haspopup` and no `aria-controls`, so nothing says a panel opened or
+  that one exists. Where the content matters, put it on the page instead, or add
+  the attributes to your own trigger element.
+- **Focus does not move into it, and does not have to.** A popover is not a
+  dialog. But that means anything focusable inside it is reached by continuing to
+  Tab, which for a bottom-placed popover comes after the rest of the row.
+- **Escape does not close it.** Neither does clicking away, for a click trigger.
+  A visible close control is the only reliable dismissal.
+- **Do not put required content in one.** Anything the user must read to finish
+  the task belongs on the page. A popover is an aside.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For one line of help on a control, use `Tooltip`.
+- For a decision that must be made before continuing, use `Modal`.
+- For detail that belongs with the content rather than over it, use `Collapse`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

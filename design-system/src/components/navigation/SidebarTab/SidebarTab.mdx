@@ -96,4 +96,86 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `SidebarTab` for one row of a persistent side navigation — the list down the
+left of an admin screen, a section switcher that stays put while the content
+changes. One component, one row; the list around it is yours.
+
+`text` is the label and `icon` the Font Awesome name beside it. `leadingVisual`
+is on by default and `trailingVisual` off. The row is capped at 164px wide.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### `state` is a prop, not a behaviour.
+
+```jsx
+// Incorrect — hover and focus are drawn from the prop, so wiring them to mouse
+// and focus events means re-rendering the row on every pointer move, and it
+// still will not follow the keyboard.
+<SidebarTab text="Sessions" state={isHovered ? 'hover' : 'enabled'}
+            onMouseEnter={() => setHovered(true)} />
+
+// Correct — pass only the state you own. `hover` and `focus` exist so the
+// design's states can be shown side by side, not to be driven at runtime.
+<SidebarTab text="Sessions" state={section === 'sessions' ? 'selected' : 'enabled'}
+            onClick={() => go('sessions')} />
+```
+
+### It is a row, not a list.
+
+The component renders one `div`. Wrap the set in a `nav` with an `aria-label`,
+and put each row in a list item, so the group has a name and a count.
+
+### It does not navigate.
+
+There is no `href` — activation is `onClick` only. If these rows change the URL,
+render an anchor inside, or use `NavPills` with real links.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **It is focusable but not operable by keyboard.** The row is a `div` with
+  `role="button"` and `tabIndex={0}` and no key handler, so Tab reaches it and
+  Enter and Space do nothing. Until that is fixed, put a real `Button` or anchor
+  inside the row and let it take the activation.
+- **The selected row is a colour.** `state="selected"` changes the background and
+  the text colour; nothing carries `aria-current` or `aria-selected`, so which
+  section you are in is not announced.
+- **Disabled is announced.** `state="disabled"` sets `aria-disabled`, drops the
+  click handler and takes the row out of the tab order.
+- **The disabled colour is deliberate.** It uses a solid muted colour rather than
+  an opacity, so the text still meets AA — an opacity would have taken it below.
+- **The icon is decoration.** It carries the state's colour and no text. The
+  label is what names the row, so never ship an icon-only row.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a horizontal row of the same idea, use `NavPills`.
+- For switching between panels rather than sections, use `NavTabs`.
+- For where the user is in a hierarchy, use `Breadcrumb`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

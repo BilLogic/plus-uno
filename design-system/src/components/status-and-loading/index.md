@@ -8,10 +8,10 @@ authored half (#166), counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Badge](Badge/index.md) | 11 | ✅ | ✕ | ✅ |
-| [Progress](Progress/index.md) | 11 | ✕ | ✕ | ✕ |
+| [Progress](Progress/index.md) | 11 | ✅ | ✕ | ✅ |
 | [Spinner](Spinner/index.md) | 4 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 2/3 (67%) · Correct/incorrect 0/3 (0%) · Accessibility 2/3 (67%)
+**Authored coverage:** When to use 3/3 (100%) · Correct/incorrect 0/3 (0%) · Accessibility 3/3 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says
