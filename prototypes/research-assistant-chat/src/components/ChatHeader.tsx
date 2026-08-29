@@ -23,7 +23,7 @@ export function ChatHeader({
         width: '100%',
         height: 'fit-content',
         borderBottom: '1px solid var(--chat-outline, #d1d5db)',
-        fontFamily: 'var(--font-family-header, Lato)',
+        fontFamily: 'var(--font-family-header, Lato, sans-serif)',
         background: 'var(--chat-bg, #f9fafb)',
       }}
     >

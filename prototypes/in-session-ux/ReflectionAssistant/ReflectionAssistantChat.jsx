@@ -73,7 +73,7 @@ const ChatHeader = ({ onBack }) => (
             fontSize: 'var(--font-size-h4, 18px)',
             fontWeight: 600,
             color: 'var(--chat-on-surface, #111827)',
-            fontFamily: 'var(--font-family-header, Lato)'
+            fontFamily: 'var(--font-family-header, Lato, sans-serif)'
         }}>
             Tutor Reflection Assistant
         </h1>
