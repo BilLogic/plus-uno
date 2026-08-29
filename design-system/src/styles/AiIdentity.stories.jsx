@@ -165,7 +165,7 @@ const AgentChip = ({ hex }) => (
 
 export const Candidates = () => (
     <div style={{ maxWidth: '1000px', padding: '24px' }}>
-        <h2 className="h4-txt">Four candidates, measured</h2>
+        <h2 className="h4">Four candidates, measured</h2>
         <p className="body2-txt" style={{ maxWidth: '62ch' }}>
             Each row shows the candidate as a bold ground, as the border-and-icon accent it would
             mostly appear as, and the two numbers that decide whether it is usable at all.
@@ -233,7 +233,7 @@ export const Candidates = () => (
             );
         })}
 
-        <h3 className="h5-txt" style={{ marginTop: '32px' }}>
+        <h3 className="h5" style={{ marginTop: '32px' }}>
             Still yours to decide
         </h3>
         <ol className="body2-txt" style={{ maxWidth: '62ch' }}>

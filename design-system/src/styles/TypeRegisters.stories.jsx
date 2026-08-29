@@ -76,7 +76,7 @@ const Row = ({ children, label, note }) => (
 /** One token, one declaration. */
 export const Composite = () => (
     <div style={{ maxWidth: '900px', padding: '24px' }}>
-        <h2 className="h4-txt">One token per register</h2>
+        <h2 className="h4">One token per register</h2>
         <p className="body2-txt" style={{ maxWidth: '62ch' }}>
             Each line below sets <code style={{ color: 'var(--color-secondary)' }}>font</code> and
             nothing else. Size, line-height, weight and family arrive together or not at all.
@@ -120,7 +120,7 @@ Composite.play = async () => {
 /** The four axes, set separately, the way every rule in the system does today. */
 export const Axes = () => (
     <div style={{ maxWidth: '900px', padding: '24px' }}>
-        <h2 className="h4-txt">Four tokens per register</h2>
+        <h2 className="h4">Four tokens per register</h2>
         <p className="body2-txt" style={{ maxWidth: '62ch' }}>
             The same nine registers, built the way the system builds them now. Three of the four
             token names below do not contain the register they belong to, which is why the

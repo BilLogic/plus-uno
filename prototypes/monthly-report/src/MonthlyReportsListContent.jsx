@@ -130,7 +130,7 @@ export default function MonthlyReportsListContent() {
             `}</style>
             <div className="reports-header-row reveal-section" style={{ animationDelay: '0ms' }}>
                 <div className="header-text">
-                    <h1 className="h2-txt">Monthly Reviews</h1>
+                    <h1 className="h2">Monthly Reviews</h1>
                     <p className="body2-txt text-muted" style={{ marginTop: '8px' }}>
                         Overview of your performance and session feedback.
                     </p>

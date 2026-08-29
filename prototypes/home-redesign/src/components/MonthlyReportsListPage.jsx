@@ -61,7 +61,7 @@ export default function MonthlyReportsListPage() {
         <>
             <div className="reports-header-row page-content-reveal" style={{ animationDelay: '0ms' }}>
                 <div className="header-text">
-                    <h1 className="h2-txt">Monthly Reports</h1>
+                    <h1 className="h2">Monthly Reports</h1>
                     <p className="body2-txt text-muted" style={{ marginTop: '8px' }}>
                         Overview of your performance and session feedback.
                     </p>

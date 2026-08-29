@@ -31,7 +31,7 @@ export default function MyDashboard() {
             {/* ⬇️ YOUR PAGE CONTENT GOES HERE ⬇️ */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
                 {/* Example Content */}
-                <h1 className="h3-txt">Dashboard Overview</h1>
+                <h1 className="h3">Dashboard Overview</h1>
             </div>
             {/* ⬆️ YOUR PAGE CONTENT ENDS HERE ⬆️ */}
         </PageLayout>

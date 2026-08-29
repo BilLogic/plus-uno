@@ -249,6 +249,12 @@ const COMPOSED = [
       'the single definition of the Worker\'s hostname. Its inputs are repo-root files — the eval workflows and docs/ — so a PR that never touches agents/uno-bot/ can still break it. A second hardcoded host is silent until a cutover (#288) misses one, and an eval pointed at the OLD deployment reports a clean pass, which is the shape of failure #249 already cost this repo.',
   },
   {
+    script: 'check:typography-classes',
+    pkg: 'root',
+    guards:
+      "every `*-txt` class a page asks for against a rule that actually sets type. `.h1-txt`\u2013`.h6-txt` have never existed \u2014 headings are `.h1`\u2013`.h6` \u2014 and eleven places asked for them anyway, including two prototype pages and a guidelines example teaching it onward. A missing utility class fails silently by definition: the element keeps its own type, one step off the scale, with nothing to notice it. 0.1s, measured 2026-08-29.",
+  },
+  {
     script: 'check:harness-bundle',
     pkg: 'bot',
     guards:
