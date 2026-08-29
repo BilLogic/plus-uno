@@ -35,7 +35,7 @@ const RECORDING = 'design-system/figma/node-types.json';
  * agrees with everything, so the size is asserted rather than assumed. Lower it
  * only when a mapping is genuinely deleted, and say which one in the commit.
  */
-const MIN_RECORDED = 97;
+const MIN_RECORDED = 99;
 
 const registry = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, REGISTRY), 'utf8'));
 const recording = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, RECORDING), 'utf8'));
