@@ -95,4 +95,101 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `NumberInput` for a quantity the user adjusts as much as types — a session
+count, a duration, a score out of a known total. The stepper is the point: if
+nobody will ever press it, a plain `Input` is the simpler field.
+
+It works controlled or uncontrolled. Pass `value` and `onChange` to control it;
+leave `value` off and it keeps its own. The stepper buttons call `onChange` with
+a synthetic event carrying `{ name, value, type: 'number' }`, and `onIncrement`
+and `onDecrement` with the new number.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### The field is a text input, so `min` and `max` bind the buttons only.
+
+```jsx
+// Incorrect — the stepper stops at 10, and typing 400 does not. The control
+// renders type="text", so nothing constrains what is typed.
+<NumberInput label="Sessions" min={1} max={10} value={v} onChange={setV} />
+
+// Correct — clamp on change, or validate before submit and say so.
+<NumberInput
+    label="Sessions" min={1} max={10}
+    value={v}
+    onChange={(e) => setV(clamp(e.target.value, 1, 10))}
+    validation={v > 10 ? 'invalid' : 'none'}
+    validationMessage="Ten sessions is the maximum."
+/>
+```
+
+### An empty field steps from zero, not from `min`.
+
+Increment and decrement read the current value as `parseFloat(value) || 0`, so an
+empty field with `min={5}` steps to `1`, not to `5`. Give the field a starting
+value when it has a floor.
+
+### `required` marks the label, not the field.
+
+The asterisk beside the label is decorative. The input carries no `required`
+attribute and no `aria-required`, so the browser will not block a submit and a
+screen reader will not announce the field as required. Enforce it in your own
+validation and set `validation="invalid"` with a message.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **`showLabel={false}` leaves the field unnamed.** Unlike `Input`, which keeps
+  the label in the DOM and clips it to nothing, this component omits the label
+  element entirely and adds no `aria-label` in its place — see the `showLabel`
+  section in the `Input` docs for why a name cannot be removed. Keep the label
+  visible.
+- **The stepper buttons are named.** "Increment" and "Decrement", with the icons
+  `aria-hidden`. They also take the real `disabled` attribute at the bounds, so
+  they announce as disabled rather than doing nothing.
+- **The validation message is not attached to the input.** It renders as
+  unidentified text after the field: no id, so nothing can point at it, and the
+  input carries no `aria-invalid`. A screen-reader user hears the field's name
+  and no error. Where that matters, render your own message with an id and put
+  `aria-describedby` on an element you control.
+- **A forwarded `aria-describedby` does not reach the input.** Extra props are
+  spread onto the wrapping input group — a plain `div` with no role and no name —
+  not onto the field. Unlike `DateAndTimePicker`, whose wrapper is the named
+  group, there is nothing here for the attribute to be useful on.
+- **The value is text to assistive technology.** With `type="text"` there is no
+  `aria-valuenow`, no spinbutton role and no numeric keypad on a phone. The label
+  and the unit carry the meaning.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a number nobody steps through, use `Input`.
+- For a value chosen along a scale, use `Range`.
+- For a rating out of five, use `Rating`.
+- For the label and message conventions these fields share, see `Input`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

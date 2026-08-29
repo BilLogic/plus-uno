@@ -103,4 +103,101 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Rating` for a single satisfaction score out of five — the end of a session,
+a piece of feedback, a quick judgement the user makes in one gesture. Five items
+is the whole scale; there is no other length.
+
+`variant` chooses what the row says about itself: `comments` puts one caption
+under the row, `numeric` puts 1–5 above each item. `icon` is `star` or
+`thumbs-up`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### It is always controlled.
+
+```jsx
+// Incorrect — the component holds no state. Without an onChange the items are
+// clickable and nothing ever changes.
+<Rating label="How was the session?" />
+
+// Correct — onChange receives the number, not an event.
+<Rating label="How was the session?" value={score} onChange={setScore} />
+```
+
+### It is not a form field.
+
+```jsx
+// Incorrect — `name` is accepted and never used. There is no input, so nothing
+// is submitted and nothing is restored on a back navigation.
+<form action="/feedback" method="post">
+    <Rating name="score" value={score} onChange={setScore} />
+</form>
+
+// Correct — carry the value yourself.
+<form onSubmit={submit}>
+    <Rating label="Rating" value={score} onChange={setScore} />
+    <input type="hidden" name="score" value={score} />
+</form>
+```
+
+### `label` is what makes the row a group.
+
+Without it there is no `role="group"` and no name — five buttons appear in the
+tab order with nothing saying what they rate. `commentsLabel` is a caption under
+the row, not a substitute.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Five buttons, five tab stops.** Each item is a `div` with `role="button"`,
+  `tabIndex={0}` and an `aria-label` of "Rate 1" … "Rate 5". Enter and Space
+  activate. There is no arrow-key movement between them, and no radio-group
+  semantics.
+- **The current value is not announced.** Selection is drawn by filling the
+  icons; no item carries `aria-pressed` or `aria-checked`. A screen-reader user
+  can set a rating and cannot hear what it is. Where the value must be readable,
+  render it in text beside the row.
+- **Disabled removes the items from the tree.** With `disabled`, the role,
+  `tabIndex` and `aria-label` are all dropped — the items become unlabelled
+  `div`s rather than disabled buttons, so nothing is announced at all. Prefer
+  rendering the score as text when it cannot be changed.
+- **The label is a `span`, deliberately.** There is no form control for a
+  `label` element to point at, so the label is a `span` with an id and the row
+  is named by `aria-labelledby`. That is why the `id` lands on the row rather
+  than on a field.
+- **`required` marks the label only.** The asterisk is decorative; nothing
+  carries `aria-required` and nothing blocks a submit.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a value on a longer scale, use `Range`.
+- For a choice among labelled options rather than a score, use `RadioButtonGroup`
+  or `Radio`.
+- For the comment that usually accompanies a rating, use `Textarea`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>
