@@ -200,7 +200,7 @@ export const Overview = () => (
                 backgroundColor: 'var(--color-surface-container-high)',
                 borderRadius: 'var(--size-modal-radius-sm)',
                 maxWidth: 'var(--size-modal-width-sm)',
-                boxShadow: 'var(--elevation-2)'
+                boxShadow: 'var(--elevation-light-2)'
             }}>
                 {/* Join session */}
                 <div style={{

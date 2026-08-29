@@ -56,7 +56,7 @@ const ReconfirmTutorAvailabilityModalBody = () => (
             <div
                 className="d-flex flex-column align-items-center"
                 style={{
-                    padding: '0 var(--size-spacing-space-600)',
+                    padding: '0 var(--size-spacing-large-space-600)',
                     gap: 'var(--size-modal-gap-md)',
                 }}
             >

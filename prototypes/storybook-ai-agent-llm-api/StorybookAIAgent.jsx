@@ -1185,7 +1185,7 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
             setIsTyping(false);
 
             if (responseData.error) {
-                setMessages(p => [...p, { role: 'bot', content: <p style={{ color: 'var(--color-error)' }}>{responseData.error.message || 'API Error'}</p> }]);
+                setMessages(p => [...p, { role: 'bot', content: <p style={{ color: 'var(--color-danger)' }}>{responseData.error.message || 'API Error'}</p> }]);
                 return;
             }
 
@@ -1297,14 +1297,14 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                 } else {
                     setMessages(p => [...p, {
                         role: 'bot', content: (
-                            <p style={{ color: 'var(--color-error)' }}>
+                            <p style={{ color: 'var(--color-danger)' }}>
                                 ⚠️ Could not reach the AI API. Add a key in Mode 1, set <code>VITE_OPENAI_API_KEY</code> or <code>VITE_CHATGPT_API_KEY</code> in <code>.env</code>, and check your network.
                             </p>
                         )
                     }]);
                 }
             } else {
-                setMessages(p => [...p, { role: 'bot', content: <p style={{ color: 'var(--color-error)' }}>⚠️ Could not reach the AI API. Check your key, `.env` (<code>VITE_OPENAI_API_KEY</code> / <code>VITE_CHATGPT_API_KEY</code>), and network.</p> }]);
+                setMessages(p => [...p, { role: 'bot', content: <p style={{ color: 'var(--color-danger)' }}>⚠️ Could not reach the AI API. Check your key, `.env` (<code>VITE_OPENAI_API_KEY</code> / <code>VITE_CHATGPT_API_KEY</code>), and network.</p> }]);
             }
         }
     };

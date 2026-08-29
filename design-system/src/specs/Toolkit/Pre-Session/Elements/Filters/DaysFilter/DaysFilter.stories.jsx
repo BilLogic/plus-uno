@@ -90,7 +90,7 @@ export const Overview = () => (
             />
         </section>
 
-        <section style={{ marginTop: 'var(--size-section-gap-xl)' }}>
+        <section style={{ marginTop: 'var(--size-section-gap-lg)' }}>
             <h6 className="h6 mb-3">Specific Day Selected</h6>
             <p className="body3-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
                 The filter dropdown with "Mondays" selected.
@@ -143,7 +143,7 @@ export const Interactive = () => {
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-ele-gap-md)'
+                    gap: 'var(--size-element-gap-md)'
                 }}
             >
                 <Dropdown

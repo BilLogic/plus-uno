@@ -78,7 +78,7 @@ export const TableHeaderRow = () => (
             <i
                 className="fa-solid fa-arrow-up"
                 style={{
-                    fontSize: 'var(--font-size-fa-b2-solid)',
+                    fontSize: 'var(--font-size-fa-body2-solid)',
                     color: 'var(--color-outline-variant)'
                 }}
             />
@@ -100,7 +100,7 @@ export const TableHeaderRow = () => (
             <i
                 className="fa-solid fa-arrow-up"
                 style={{
-                    fontSize: 'var(--font-size-fa-b2-solid)',
+                    fontSize: 'var(--font-size-fa-body2-solid)',
                     color: 'var(--color-outline-variant)'
                 }}
             />
@@ -335,8 +335,8 @@ export const RowStates = () => (
     <div style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: 'var(--size-spacing-space-400)',
-        padding: 'var(--size-spacing-space-400)'
+        gap: 'var(--size-spacing-medium-space-400)',
+        padding: 'var(--size-spacing-medium-space-400)'
     }}>
         <h3 className="h5">Table Row States</h3>
 

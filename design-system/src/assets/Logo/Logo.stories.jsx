@@ -51,7 +51,7 @@ export const Overview = () => (
                             textTransform: 'capitalize',
                             fontSize: '14px',
                             fontWeight: '600',
-                            color: 'var(--color-neutral-text-secondary)'
+                            color: 'var(--color-on-surface-variant)'
                         }}>
                             {style} Style
                         </div>
@@ -61,9 +61,9 @@ export const Overview = () => (
                             flexWrap: 'wrap',
                             alignItems: 'end',
                             padding: '32px',
-                            backgroundColor: style === 'colored' ? 'var(--color-neutral-background-pure)' : 'var(--color-neutral-text-primary)',
+                            backgroundColor: style === 'colored' ? 'var(--color-surface-container-lowest)' : 'var(--color-on-surface)',
                             borderRadius: '12px',
-                            border: '1px solid var(--color-neutral-border-weak)'
+                            border: '1px solid var(--color-outline-variant)'
                         }}>
                             {['XS', 'S', 'M', 'L', 'XL'].map(size => (
                                 <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
@@ -71,7 +71,7 @@ export const Overview = () => (
                                     <span style={{
                                         fontFamily: 'monospace',
                                         fontSize: '12px',
-                                        color: style === 'colored' ? 'var(--color-neutral-text-tertiary)' : 'rgba(255,255,255,0.7)'
+                                        color: style === 'colored' ? 'var(--color-on-surface-variant)' : 'rgba(255,255,255,0.7)'
                                     }}>
                                         {size}
                                     </span>
@@ -86,7 +86,7 @@ export const Overview = () => (
         {/* 2. With Text Wordmark */}
         <section>
             <h6 className="h6" style={{ marginBottom: '24px' }}>With Wordmark</h6>
-            <p className="body-2" style={{ marginBottom: '24px', color: 'var(--color-neutral-text-secondary)' }}>
+            <p className="body-2" style={{ marginBottom: '24px', color: 'var(--color-on-surface-variant)' }}>
                 The text prop adds the "PLUS" wordmark. Available in all sizes.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -97,7 +97,7 @@ export const Overview = () => (
                             textTransform: 'capitalize',
                             fontSize: '14px',
                             fontWeight: '600',
-                            color: 'var(--color-neutral-text-secondary)'
+                            color: 'var(--color-on-surface-variant)'
                         }}>
                             {style} Style
                         </div>
@@ -107,9 +107,9 @@ export const Overview = () => (
                             flexWrap: 'wrap',
                             alignItems: 'end',
                             padding: '32px',
-                            backgroundColor: style === 'colored' ? 'var(--color-neutral-background-pure)' : 'var(--color-neutral-text-primary)',
+                            backgroundColor: style === 'colored' ? 'var(--color-surface-container-lowest)' : 'var(--color-on-surface)',
                             borderRadius: '12px',
-                            border: '1px solid var(--color-neutral-border-weak)'
+                            border: '1px solid var(--color-outline-variant)'
                         }}>
                             {['XS', 'S', 'M'].map(size => (
                                 <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'start', gap: '12px' }}>
@@ -117,7 +117,7 @@ export const Overview = () => (
                                     <span style={{
                                         fontFamily: 'monospace',
                                         fontSize: '12px',
-                                        color: style === 'colored' ? 'var(--color-neutral-text-tertiary)' : 'rgba(255,255,255,0.7)'
+                                        color: style === 'colored' ? 'var(--color-on-surface-variant)' : 'rgba(255,255,255,0.7)'
                                     }}>
                                         {size}
                                     </span>

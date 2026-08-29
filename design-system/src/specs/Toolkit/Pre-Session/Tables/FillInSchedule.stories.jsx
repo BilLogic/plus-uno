@@ -207,7 +207,7 @@ export const TableHeaderRow = () => (
             <i
                 className="fa-solid fa-arrow-up"
                 style={{
-                    fontSize: 'var(--font-size-fa-b1-solid)',
+                    fontSize: 'var(--font-size-fa-body1-solid)',
                     color: 'var(--color-on-surface)'
                 }}
             />
@@ -228,7 +228,7 @@ export const TableHeaderRow = () => (
             <i
                 className="fa-solid fa-arrow-up"
                 style={{
-                    fontSize: 'var(--font-size-fa-b1-solid)',
+                    fontSize: 'var(--font-size-fa-body1-solid)',
                     color: 'var(--color-outline-variant)'
                 }}
             />
@@ -268,8 +268,8 @@ export const Overview = () => (
     <div style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: 'var(--size-spacing-space-400)',
-        padding: 'var(--size-spacing-space-400)'
+        gap: 'var(--size-spacing-medium-space-400)',
+        padding: 'var(--size-spacing-medium-space-400)'
     }}>
         <h3 className="h5">Fill-In Schedule Row States</h3>
 
@@ -385,7 +385,7 @@ export const Interactive = () => {
                     onCheckChange={(checked) => handleRowCheck(index, checked)}
                 />
             ))}
-            <div style={{ marginTop: 'var(--size-spacing-space-400)', padding: 'var(--size-spacing-space-200)' }}>
+            <div style={{ marginTop: 'var(--size-spacing-medium-space-400)', padding: 'var(--size-spacing-medium-space-200)' }}>
                 <span className="body2-txt" style={{ color: 'var(--color-secondary-text)' }}>
                     Selected: {selectedRows.length} session(s)
                 </span>

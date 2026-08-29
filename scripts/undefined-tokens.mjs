@@ -114,6 +114,21 @@ export function usages(files) {
 export const isInterpolated = (name) => name.endsWith('-');
 
 /**
+ * Properties something OUTSIDE this repository defines.
+ *
+ * `--spacing` is Tailwind v4's own theme variable, set by Tailwind's generated
+ * stylesheet, and `design-system/src/storybook-docs/ui/alert.tsx` is a vendored
+ * shadcn component that reads it. Undefined here and defined at runtime — so
+ * reporting it would be reporting a fact about this repo's boundary rather than
+ * a defect, and the fix a reader would attempt (point it at a design token)
+ * would break the component.
+ *
+ * Keep this list short and give every entry its owner. An allowlist is where a
+ * check goes to stop being true.
+ */
+export const EXTERNAL = new Set(['--spacing']);
+
+/**
  * `{name: {uses, bare, files}}` for every used-and-undefined token, plus the
  * interpolated names, which are reported and never counted.
  */
@@ -128,6 +143,7 @@ export function audit(files) {
       interpolated.add(use.name);
       continue;
     }
+    if (EXTERNAL.has(use.name)) continue;
     if (!counts.has(use.name)) counts.set(use.name, { uses: 0, bare: 0, files: new Set() });
     const entry = counts.get(use.name);
     entry.uses += 1;

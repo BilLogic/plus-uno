@@ -20,7 +20,7 @@
     // --- SHARED: LEGEND ---
     &__legend {
         display: flex;
-        gap: 24px; // var(--space-500) Gap between legend items
+        gap: 24px; // var(--size-spacing-medium-space-500) Gap between legend items
         justify-content: center; // Center alignment for ABC XYZ
         width: 100%;
         // removed margin-top: auto and padding-top to rely on parent gap
@@ -29,7 +29,7 @@
     &__legend-item {
         display: flex;
         align-items: center;
-        gap: 4px; // var(--space-050)
+        gap: 4px; // var(--size-spacing-small-space-050)
     }
 
     &__legend-color {

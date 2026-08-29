@@ -91,7 +91,7 @@ export const ConfirmWithdrawalButton = (props) => (
 
 export const CtaTutorViewButtons = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-card-gap-lg)' }}>
-        <p className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>
+        <p className="plus-body-2" style={{ color: 'var(--color-on-surface)' }}>
             Overview of CTA (Tutor View) buttons.
         </p>
 

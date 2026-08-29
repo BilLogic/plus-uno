@@ -316,7 +316,7 @@ export const ConsentForm = () => (
                                     <i
                                         className="fa-solid fa-arrow-up-right-from-square"
                                         style={{
-                                            fontSize: 'var(--font-size-fa-b1-solid)',
+                                            fontSize: 'var(--font-size-fa-body1-solid)',
                                             color: 'var(--color-primary)',
                                             cursor: 'pointer',
                                         }}

@@ -18,7 +18,7 @@ const Label = ({ text = 'Label', required = true, htmlFor }) => (
         htmlFor={htmlFor}
         style={{
             display: 'flex',
-            gap: 'var(--size-spacing-space-050)',
+            gap: 'var(--size-spacing-small-space-050)',
             alignItems: 'flex-start',
             lineHeight: 0,
         }}

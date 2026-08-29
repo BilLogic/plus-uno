@@ -31,7 +31,7 @@ export const ConfirmationAlert = ({
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--size-card-gap-sm)',
-            width: 'var(--size-columns-col-12)'
+            width: 'var(--col-12)'
         }}
     >
         <div className="d-flex align-items-start" style={{ gap: 'var(--size-element-gap-sm)' }}>
@@ -82,7 +82,7 @@ const UpdateAlert = ({ title, description, onClose }) => (
             padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
             display: 'flex',
             gap: 'var(--size-card-gap-sm)',
-            width: 'var(--size-columns-col-12)'
+            width: 'var(--col-12)'
         }}
     >
         <div
@@ -135,7 +135,7 @@ const TimeWarningAlert = ({ onClose }) => (
             padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
             display: 'flex',
             gap: 'var(--size-card-gap-sm)',
-            width: 'var(--size-columns-col-12)'
+            width: 'var(--col-12)'
         }}
     >
         <span className="body2-txt" style={{ color: 'var(--color-on-surface)', flex: 1 }}>

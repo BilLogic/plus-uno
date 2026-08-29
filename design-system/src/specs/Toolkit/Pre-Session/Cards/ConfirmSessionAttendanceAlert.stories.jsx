@@ -20,7 +20,7 @@ export default {
  * Standard container for the alert to ensure it takes full width in the story
  */
 const AlertContainer = ({ children }) => (
-    <div style={{ width: 'var(--size-columns-col-12)' }}>
+    <div style={{ width: 'var(--col-12)' }}>
         {children}
     </div>
 );

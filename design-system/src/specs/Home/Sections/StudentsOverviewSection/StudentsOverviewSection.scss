@@ -189,7 +189,7 @@
     width: 6px;
     height: 80px;
     background-color: var(--color-surface-container-lowest);
-    border-radius: var(--size-border-radius-radius-4-5);
+    border-radius: var(--size-border-radius-radius-400);
     position: relative;
     transform: rotate(270deg);
 }
@@ -199,7 +199,7 @@
     bottom: 0;
     left: 0;
     height: 6px;
-    border-radius: var(--size-border-radius-radius-4-5);
+    border-radius: var(--size-border-radius-radius-400);
     transition: width 0.3s ease;
 }
 

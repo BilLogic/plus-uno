@@ -503,7 +503,7 @@ export const SignInTableHeaderRowModal = ({ showTeacher = false }) => (
 );
 
 export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-xl)', padding: 'var(--size-spacing-space-400)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg)', padding: 'var(--size-spacing-medium-space-400)' }}>
         <section>
             <h5 className="h5 mb-4">Regular Tutors Table</h5>
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
@@ -578,7 +578,7 @@ export const InteractiveRegularTutors = () => {
             {sampleSessions.map((session, index) => (
                 <SignInTableRow key={index} day={session.day} timeRange={session.timeRange} school={session.school} tutorCount={session.tutorCount} onSignUp={() => handleSignUp(index)} />
             ))}
-            <div style={{ marginTop: 'var(--size-spacing-space-400)', padding: 'var(--size-spacing-space-200)' }}>
+            <div style={{ marginTop: 'var(--size-spacing-medium-space-400)', padding: 'var(--size-spacing-medium-space-200)' }}>
                 <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>Signed up for: {signedUpSessions.length} session(s)</span>
             </div>
         </div>
@@ -605,7 +605,7 @@ export const InteractiveSupervisors = () => {
             {sampleSessions.map((session, index) => (
                 <SignInTableRowSupervisor key={index} day={session.day} timeRange={session.timeRange} school={session.school} teacher={session.teacher} tutorCount={session.tutorCount} studentCount={session.studentCount} onSignUp={() => handleSignUp(index)} />
             ))}
-            <div style={{ marginTop: 'var(--size-spacing-space-400)', padding: 'var(--size-spacing-space-200)' }}>
+            <div style={{ marginTop: 'var(--size-spacing-medium-space-400)', padding: 'var(--size-spacing-medium-space-200)' }}>
                 <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>Signed up for: {signedUpSessions.length} session(s)</span>
             </div>
         </div>

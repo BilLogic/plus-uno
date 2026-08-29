@@ -17,6 +17,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
+  EXTERNAL,
   audit,
   corpus,
   definitions,
@@ -154,4 +155,35 @@ test('the tokens this pass repointed are gone from the corpus', () => {
     [],
     'no shipped component stylesheet may drop a declaration on a token that does not exist',
   );
+});
+
+test('an externally-defined property is not a finding', () => {
+  // `--spacing` is Tailwind v4's own theme variable, read by a vendored shadcn
+  // component. Reporting it would send a reader to "fix" it into a design
+  // token, which would break the component.
+  const { undefinedTokens } = audit([file('alert.tsx', 'const c = "calc(var(--spacing)*4)";')]);
+  assert.deepEqual(undefinedTokens, {});
+  assert.ok(EXTERNAL.has('--spacing'));
+});
+
+test('only five bare uses remain, and each is a token the system does not have', () => {
+  const files = corpus(REPO_ROOT, ['design-system/src', '.storybook', 'prototypes']).map((rel) => ({
+    path: rel,
+    text: fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8'),
+  }));
+  const defined = definitions(files);
+  const bare = usages(files)
+    .filter((u) => u.bare && !defined.has(u.name) && !isInterpolated(u.name) && !EXTERNAL.has(u.name))
+    .map((u) => u.name)
+    .sort();
+  // The design system has no min-size and no width tokens at all. Pointing
+  // these anywhere would be inventing a value, so they are recorded rather
+  // than guessed — and this asserts the list has not quietly grown.
+  assert.deepEqual([...new Set(bare)], [
+    '--size-button-min-height-md',
+    '--size-button-min-width-md',
+    '--size-modal-min-height-md',
+    '--size-modal-min-height-sm',
+    '--size-modal-width-sm',
+  ]);
 });

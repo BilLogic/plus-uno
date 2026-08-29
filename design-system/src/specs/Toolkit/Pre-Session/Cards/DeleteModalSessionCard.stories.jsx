@@ -34,8 +34,8 @@ const ColumnHeader = ({ label, showSort = true }) => (
             <i
                 className="fa-solid fa-arrow-up"
                 style={{
-                    fontSize: 'var(--font-size-fa-b1-solid)',
-                    lineHeight: 'var(--font-line-height-fa-b1-solid)',
+                    fontSize: 'var(--font-size-fa-body1-solid)',
+                    lineHeight: 'var(--font-line-height-fa-body1-solid)',
                     color: 'var(--color-on-surface-variant)',
                 }}
             />

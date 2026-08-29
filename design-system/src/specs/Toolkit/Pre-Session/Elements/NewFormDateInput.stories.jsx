@@ -40,7 +40,7 @@ const DateInput = ({
         style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--size-small-gap-xs)',
+            gap: 'var(--size-element-gap-xs)',
             alignItems: 'flex-start',
             overflow: 'hidden',
             width: '100%',
@@ -74,7 +74,7 @@ const DateInput = ({
             <i
                 className="fa-solid fa-calendar"
                 style={{
-                    fontSize: 'var(--font-size-fa-b2-solid)',
+                    fontSize: 'var(--font-size-fa-body2-solid)',
                     lineHeight: 1.833,
                     color: 'var(--color-on-surface-variant)',
                 }}
@@ -114,7 +114,7 @@ const SessionDateInput = ({
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-spacing-space-050)',
+                gap: 'var(--size-spacing-small-space-050)',
                 alignItems: 'flex-start',
                 width: '100%',
             }}

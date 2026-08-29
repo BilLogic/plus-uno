@@ -60,7 +60,7 @@ export default function SignInPortal() {
                         style={{
                             color: 'var(--color-primary)',
                             textDecoration: 'underline',
-                            fontWeight: 'var(--font-weight-semibold)',
+                            fontWeight: 'var(--font-weight-semibold-2)',
                         }}
                     >
                         Contact us
