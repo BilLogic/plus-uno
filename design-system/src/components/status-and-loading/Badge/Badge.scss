@@ -33,13 +33,17 @@
 
     // --- SIZES ---
     // Override padding + radius based on size class (mirrors the Figma variant tiers)
-    // Match both size classes (b2) and typography classes (body2-txt) for compatibility
+    // Match both size classes (b2) and typography classes (body2-txt) for compatibility.
+    //
+    // The heading tier lists `.h4`-`.h6` only. It used to list `.h4-txt`-`.h6-txt`
+    // beside them "for compatibility", but there is nothing to be compatible with:
+    // this system has never defined a `-txt` form of a heading class, so those three
+    // selectors could only ever match a caller who had asked for a class that does
+    // not exist — and that caller's badge was already rendering at the wrong type.
+    // `check:typography-classes` now makes that string impossible to write here.
     &.h4,
     &.h5,
-    &.h6,
-    &.h4-txt,
-    &.h5-txt,
-    &.h6-txt {
+    &.h6 {
         padding-left: var(--size-element-pad-x-md);
         padding-right: var(--size-element-pad-x-md);
         border-radius: var(--size-border-radius-radius-150, 6px);

@@ -85,7 +85,7 @@ const Grid = ({ children }) => (
  */
 export const RoleModel = () => (
     <div style={{ maxWidth: '1100px', padding: '24px', background: 'var(--surface-sunken)' }}>
-        <h2 className="h4-txt">By role — what a surface is for</h2>
+        <h2 className="h4">By role — what a surface is for</h2>
         <p className="body2-txt" style={{ maxWidth: '62ch' }}>
             Three of these five are the same colour. That is the model, not a mistake: a raised
             card and an overlay are the page&rsquo;s own colour, lifted by shadow. Only{' '}
@@ -143,7 +143,7 @@ RoleModel.play = async ({ canvasElement }) => {
  */
 export const LevelModel = () => (
     <div style={{ maxWidth: '1100px', padding: '24px' }}>
-        <h2 className="h4-txt">By level — what a surface is</h2>
+        <h2 className="h4">By level — what a surface is</h2>
         <p className="body2-txt" style={{ maxWidth: '62ch' }}>
             The nine that exist today, in lightness order. Each is a real, distinct value and
             none of them says what it is for, so a modal and a table header can legitimately
@@ -164,7 +164,7 @@ export const LevelModel = () => (
                 <Swatch key={token} label={token} fill={`var(${token})`} note={note} />
             ))}
         </Grid>
-        <h3 className="h5-txt">and the five shadows, unattached to any of them</h3>
+        <h3 className="h5">and the five shadows, unattached to any of them</h3>
         <Grid>
             {[1, 2, 3, 4, 5].map((n) => (
                 <Swatch
