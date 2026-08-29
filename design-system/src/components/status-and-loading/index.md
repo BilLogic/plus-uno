@@ -8,7 +8,7 @@ authored half (#166), counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Badge](Badge/index.md) | 11 | ✅ | ✕ | ✅ |
-| [BadgeVariants](BadgeVariants.md) | 9 | ✕ | ✕ | ✕ |
+| [BadgeVariants](BadgeVariants.md) | 10 | ✕ | ✕ | ✕ |
 | [Progress](Progress/index.md) | 11 | ✕ | ✕ | ✕ |
 | [Spinner](Spinner/index.md) | 4 | ✕ | ✕ | ✕ |
 

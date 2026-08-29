@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/BadgeVariants.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/BadgeVariants.stories.jsx` — Appearances, Density, Counters, CounterFormatting, TrailingMetric, TrailingMetricIsGatedToStatus, DateAndCustom, Truncation, WithIcon
+**Stories:** `design-system/src/components/status-and-loading/BadgeVariants.stories.jsx` — Appearances, Density, Counters, CounterFormatting, TrailingMetric, TrailingMetricIsGatedToStatus, DateAndCustom, Truncation, WithIcon, CustomStaysReadable
 
 ## Props
 
@@ -17,6 +17,7 @@
 | `appearance` | oneOf | `'neutral'` | `status` only: one of the closed set of five. Ignored on `custom`. |
 | `children` | node | — | — |
 | `text` | string or number | — | — |
+| `textColor` | string | — | `custom` only: overrides the foreground derived from `color`. |
 | `trailingMetric` | string or number | — | `status` only: a count attached to the state — "In progress · 12". |
 | `max` | number | — | `counter` only: the cap. 1204 with max 99 reads `99+`. |
 | `isBold` | bool | `false` | — |
