@@ -119,3 +119,56 @@ ManualIgnoresRootClose.play = async ({ canvasElement }) => {
     // Still there. `show` is the caller's, and nothing here may overrule it.
     await expect(doc.getByText('Stays until the caller says otherwise.')).toBeTruthy();
 };
+
+/**
+ * What the TRIGGER says — the other half of #321.
+ *
+ * The issue listed two more gaps beside the dismissal one, and both are about
+ * the trigger rather than the panel:
+ *
+ *   · nothing announced that a panel existed, or that it had opened. No
+ *     `aria-haspopup`, no `aria-expanded`. react-bootstrap adds
+ *     `aria-describedby` while the popover is shown, which points AT the
+ *     content once it is open and says nothing before that.
+ *   · a STRING trigger became `<span className="d-inline-block" tabIndex="0">`
+ *     — a tab stop with no role and no accessible name. Reachable by keyboard,
+ *     inert on Enter, and silent to a screen reader.
+ *
+ * Both are invisible to a render assertion and to a screenshot: the span looked
+ * exactly like the text it wrapped, and a trigger with no `aria-expanded` looks
+ * exactly like one that has it.
+ */
+export const TriggerSemantics = () => (
+    <div style={stack}>
+        <Popover trigger="Learn more" title="Scoring">
+            Sessions are scored on the rubric agreed at intake.
+        </Popover>
+    </div>
+);
+
+TriggerSemantics.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const doc = documentOf(canvasElement);
+
+    // A string trigger is a real button, found BY ROLE and BY ITS OWN TEXT.
+    // Neither query can succeed against a `span` with a tabindex: it has no
+    // role to match and no accessible name to match on.
+    const trigger = canvas.getByRole('button', { name: 'Learn more' });
+
+    await expect(trigger.tagName).toBe('BUTTON');
+    await expect(trigger.getAttribute('aria-haspopup')).toBe('dialog');
+    await expect(trigger.getAttribute('aria-expanded')).toBe('false');
+
+    // Enter, not a click — implicit activation is a property of the `button`
+    // element, and it is exactly what the old `tabIndex` span did not have.
+    trigger.focus();
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => expect(doc.getByText('Sessions are scored on the rubric agreed at intake.')).toBeTruthy());
+
+    // …and the state the trigger reports moves with it.
+    await waitFor(() => expect(trigger.getAttribute('aria-expanded')).toBe('true'));
+
+    await userEvent.keyboard('{Escape}');
+    await expectPopoverGone(canvasElement, 'Sessions are scored on the rubric agreed at intake.');
+    await waitFor(() => expect(trigger.getAttribute('aria-expanded')).toBe('false'));
+};

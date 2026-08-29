@@ -130,15 +130,21 @@ those, or `manual` for a popover you drive with `show`.
          onToggle={setOpen}>…</Popover>
 ```
 
-### Pass a real element as the trigger.
+### A string trigger is a button.
 
 ```jsx
-// Incorrect — a string trigger is wrapped in a focusable span. It takes Tab
-// and has no role and no name, so it is a focus stop that announces nothing.
+// Fine — a string trigger renders a real <button className="plus-popover-trigger">,
+// which carries the role, its own text as the accessible name, and Enter/Space.
+// It used to be a `span` with a tabindex: a focus stop that announced nothing (#321).
 <Popover trigger="What is this?">…</Popover>
 
-// Correct.
+// Also fine, and what you want when the trigger needs a Button's own styling.
 <Popover trigger={<Button fill="text" text="What is this?" />}>…</Popover>
+
+// Incorrect — a `div` is not a control. `aria-expanded` is NOT added to it,
+// deliberately: a state on something with no role is invalid ARIA. Pass a
+// control instead of decorating a div.
+<Popover trigger={<div>What is this?</div>}>…</Popover>
 ```
 
 ### Hover alone leaves out the keyboard.
@@ -153,10 +159,15 @@ must be read is content that has to stay put while it is read.
 
 ## Accessibility
 
-- **The trigger does not announce the popover.** There is no `aria-expanded`,
-  no `aria-haspopup` and no `aria-controls`, so nothing says a panel opened or
-  that one exists. Where the content matters, put it on the page instead, or add
-  the attributes to your own trigger element.
+- **The trigger announces the popover** (#321). It carries
+  `aria-haspopup="dialog"` and an `aria-expanded` that tracks the open state —
+  including while the caller drives `show` themselves. Both are applied only to
+  a trigger that can hold them: a `button`, an `a`, a `Button`, anything you
+  have already given a `role`, and the button a string trigger becomes. A plain
+  `div` gets neither, because a state on something with no role is invalid ARIA.
+- **`aria-controls` is deliberately absent.** It needs the rendered panel's id,
+  `id` is optional here, and an `aria-controls` pointing at an element that does
+  not exist yet is worse than none.
 - **Focus does not move into it, and does not have to.** A popover is not a
   dialog. But that means anything focusable inside it is reached by continuing to
   Tab, which for a bottom-placed popover comes after the rest of the row.
