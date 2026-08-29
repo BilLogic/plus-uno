@@ -192,6 +192,12 @@ const COMPOSED = [
       "every font stack ending in a CSS generic, and every inline fallback naming the face its token names. A fallback only paints when the token fails to load, so a wrong one is wrong everywhere at once and invisible until then — the reasoning check:colour-fallbacks applies to colour, which nothing applied to type. Seven findings when it was written and all seven fixed: --font-family-display4 named one face and no generic; three files fell back from --font-family-body to Lato, which is the HEADER face, so body text would have rendered in the heading font; two fell back to a bare `Lato`. It also keeps #267's monospace rule, where --font-family-code fell back to sans-serif and the stack measured 171.13px against monospace's 480.08px.",
   },
   {
+    script: 'check:token-generation',
+    pkg: 'root',
+    guards:
+      "`npm run generate:tokens` being unable to silently delete tokens. It opened with `console.warn('WARNING: Source JSON files are incomplete. Token generation is DISABLED to protect existing tokens.')` and then wrote all four token files four lines later — the warning had no return and no exit, so the protection it announced did not exist. One run of that documented one-word command on 2026-08-29 took `_colors.scss` from 195 colour tokens to 5, keeping only the five bare intents; `_layout.scss` lost every breakpoint token, `_primitives.scss` 9 and `_spacing_semantics.scss` 3. It reported `✅ All token files generated successfully!` while doing it, and printed `✅ Validation passed` beside a validation that had been commented out. `skills/uno-maintain/references/ds-fix.md` lists the command as the way to regenerate SCSS from source, so an agent following the maintenance skill would have run it. The generator now builds every file in memory, refuses by NAME when any file would lose a token, and writes nothing on that path. This check asserts the conditional rather than the refusal — non-zero exit if and only if it says a file would shrink, and a `--dry-run` that leaves every token file byte-identical — because a gate that goes red on the day the Figma exports are fixed is a gate somebody deletes. Mutation-tested three ways: dropping the exit, letting `--dry-run` write, and reinstating the false validation claim. The first draft of the check MISSED the dropped exit, because the refusal is on stderr and `execFileSync` returns only stdout on a zero exit; it uses `spawnSync` now.",
+  },
+  {
     script: 'check:atlassian-benchmark',
     pkg: 'root',
     guards:
