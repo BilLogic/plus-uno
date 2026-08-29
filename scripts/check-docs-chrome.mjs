@@ -55,6 +55,10 @@ const PAGES = [
   'components-actions-button--docs',
   'components-forms-and-inputs-checkbox--docs',
   'foundations-design-tokens--docs',
+  // The prose page. A component page is almost all canvas — one paragraph each —
+  // so without this the typography assertions would run over a sample of three
+  // and report green having barely looked. This one carries 33.
+  'foundations-accessibility--docs',
 ];
 
 /**
@@ -185,12 +189,23 @@ try {
     for (const f of failures) console.error(`  -> ${f}`);
     exitCode = 1;
   } else {
-    const canvases = measurements.reduce((n, m) => n + m.canvases.length, 0);
-    const tables = measurements.reduce((n, m) => n + m.tables.length, 0);
+    const total = (k) => measurements.reduce((n, m) => n + (m[k]?.length ?? 0), 0);
     console.log(
       `[docs-chrome] ${measurements.length} page render(s) across ${WIDTHS.length} width(s): ` +
-        `no horizontal bleed, ${canvases} canvas(es) closed or attached, ${tables} table(s) contained.`,
+        `no horizontal bleed, ${total('canvases')} canvas(es) closed or attached, ` +
+        `${total('tables')} table(s) contained, ${total('prose')} prose element(s) in the ` +
+        `design system's own type.`,
     );
+    if (total('prose') === 0) {
+      // A typography gate that measured no typography is a gate that reports
+      // green for the wrong reason — the exact failure #263 is about.
+      console.error(
+        '[docs-chrome] no prose was measured on any page. The MDX component map or the ' +
+          'selectors in scripts/docs-chrome.mjs stopped matching; this run asserted nothing ' +
+          'about type.',
+      );
+      exitCode = 1;
+    }
   }
 } finally {
   await browser.close();

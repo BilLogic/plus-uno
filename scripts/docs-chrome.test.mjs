@@ -118,6 +118,65 @@ test('a table that fits does not need a scrolling wrapper', () => {
   );
 });
 
+/* ------------------------------------------------------- prose is the DS's own */
+
+const prose = (over = {}) => ({
+  label: 'p 0: Buttons are interactive',
+  fontFamily: '"Merriweather Sans", "Open Sans", sans-serif',
+  fontSize: '16px',
+  color: 'rgb(25, 28, 30)',
+  measure: 74,
+  ...over,
+});
+
+test("Storybook's own font is reported", () => {
+  // What every docs page rendered before #252: Storybook styles prose with
+  // `.css-… :where(p:not(…))`, a class in front of a zero-specificity `:where()`,
+  // which beats an inherited `!important` outright.
+  const f = chromeFailures([
+    page({ prose: [prose({ fontFamily: '"Nunito Sans", -apple-system, sans-serif' })] }),
+  ]);
+  assert.equal(f.length, 1);
+  assert.match(f[0], /renders in Nunito Sans/);
+});
+
+test('14px prose is reported', () => {
+  const f = chromeFailures([page({ prose: [prose({ fontSize: '14px' })] })]);
+  assert.equal(f.length, 1);
+  assert.match(f[0], /14px, not 16px/);
+});
+
+test("Storybook's grey is reported", () => {
+  // The one property the old rules never set, which is why prose read #2E3338
+  // even on pages where the family was already right.
+  const f = chromeFailures([page({ prose: [prose({ color: 'rgb(46, 51, 56)' })] })]);
+  assert.equal(f.length, 1);
+  assert.match(f[0], /rgb\(46, 51, 56\)/);
+});
+
+test('a line longer than 80 characters is reported', () => {
+  // 134 was the longest in the corpus sample before the cap.
+  const f = chromeFailures([page({ prose: [prose({ measure: 134 })] })]);
+  assert.equal(f.length, 1);
+  assert.match(f[0], /134 characters per line/);
+});
+
+test('80 characters exactly is not a failure', () => {
+  // The bar is "at most 80", and an off-by-one here would fail correct pages.
+  assert.deepEqual(chromeFailures([page({ prose: [prose({ measure: 80 })] })]), []);
+  assert.equal(chromeFailures([page({ prose: [prose({ measure: 81 })] })]).length, 1);
+});
+
+test('correct prose reports nothing', () => {
+  assert.deepEqual(chromeFailures([page({ prose: [prose(), prose(), prose()] })]), []);
+});
+
+test('a page measured before prose was collected does not throw', () => {
+  // `prose` is absent from any measurement taken by an older driver, and a gate
+  // that crashes on its own history reports nothing at all.
+  assert.deepEqual(chromeFailures([{ ...page(), prose: undefined }]), []);
+});
+
 /* ------------------------------------------------------------------ reporting */
 
 test('every failure is reported, not just the first', () => {

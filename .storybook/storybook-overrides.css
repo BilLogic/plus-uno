@@ -68,26 +68,69 @@ body,
 }
 
 /*
- * Body text in MDX prose only.
- * Do NOT target bare `.sbdocs p` / `li` / `td` — that !important override
- * smashed DS utilities (body3-txt captions, h6 titles, etc.) inside story canvases.
+ * Docs prose (#252).
+ *
+ * THE DEFECT was not specificity, it was inheritance. `.sbdocs { font-family: …
+ * !important }` is inherited, and an inherited value loses to any declaration
+ * applied directly to the element whatever its weight. Storybook applies one:
+ *
+ *   .css-1cymxic :where(p:not(.sb-anchor, .sb-unstyled, .sb-unstyled p))
+ *       font-family: "Nunito Sans", …;  font-size: 14px;  color: rgb(46, 51, 56)
+ *
+ * So prose rendered in Storybook's font, at 14px, in Storybook's grey, on every
+ * docs page. The rules meant to prevent it targeted `.sbdocs-content > p`, a
+ * DIRECT child — which is why a page whose prose sat one div deep rendered at
+ * 14px while a sibling page rendered correctly.
+ *
+ * NO `!important`. That selector looks like `(0,0,0)` because of the `:where()`,
+ * but the emotion class in front of it counts: it is `(0,1,0)`. Two classes and
+ * an attribute selector is `(0,3,0)` and outranks it outright, in any source
+ * order. The four `!important`s the old rules carried were doing nothing that
+ * specificity was not already doing, and are gone.
+ *
+ * `:not([class])` IS THE POLICY, not a trick. Prose that carries no class of its
+ * own is ours to type; prose that carries one — the Tailwind captions authored
+ * in Getting started/Introduction — is that page's own decision, and this must
+ * not overrule it. The fence keeps the rule out of story canvases, where it
+ * would smash DS utilities (body3-txt captions, h6 titles); `:where()` costs the
+ * rule no specificity.
+ *
+ * WHAT WAS TRIED AND DROPPED: `parameters.docs.components`, mapping `p`/`li` to
+ * components carrying `.body1-txt`. It is the approach the ticket decided on,
+ * and measured against a running Storybook it changed nothing — the same 34
+ * prose elements rendered identically with and without it, because an element
+ * the map does not class is an element this rule already catches. A second
+ * mechanism that alters no pixel is a second authority for one job.
  */
-.sbdocs .sbdocs-content > p:not([class]),
-.sbdocs .sbdocs-content > ul > li:not([class]),
-.sbdocs .sbdocs-content > ol > li:not([class]) {
-    font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif) !important;
-    font-size: var(--font-size-body1, 16px) !important;
-    line-height: var(--font-line-height-body1, 150%) !important;
-    font-weight: var(--font-weight-normal, 300) !important;
+.sbdocs .sbdocs-content p:not([class]):not(:where(.docs-story *)),
+.sbdocs .sbdocs-content li:not([class]):not(:where(.docs-story *)) {
+    font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif);
+    font-size: var(--font-size-body1, 16px);
+    line-height: var(--font-line-height-body1, 150%);
+    font-weight: var(--font-weight-normal, 300);
+    color: var(--color-on-surface, #191c1e);
+    max-width: 55ch;
 }
 
-/* Canvas Descriptions text */
-.sb-ds-canvas-description {
-    font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif) !important;
-    font-size: var(--font-size-body2, 14px) !important;
-    line-height: var(--font-line-height-body2, 157.1%) !important;
-    font-weight: var(--font-weight-normal, 300) !important;
-    color: var(--color-on-surface-variant, #5c5c5c) !important;
+/*
+ * Measure. The longest paragraph on Foundations/Accessibility ran 134 characters
+ * per line at a 1140px docs column, against a comfortable 45–75. The cap is on
+ * the text, not on the column: canvases stay full-bleed at 864px while prose
+ * narrows, and splitting the two is what lets both be right.
+ *
+ * 55ch, not the 72ch the ticket suggested. `ch` is the advance width of "0",
+ * which in Merriweather Sans is 10.8px at 16px type while the average prose
+ * glyph is about 7.9px — so `ch` runs a third wide for this face, and 72ch
+ * measured 98 characters per line rather than 72. Walked down against the
+ * longest paragraph in the sample: 72ch gave 98, 58ch gave 83, 55ch gives 78.
+ * The number is chosen against the measured line, not against the unit.
+ *
+ * The cap goes on the LIST rather than on each item, so a wrapped item and its
+ * marker stay in one column.
+ */
+.sbdocs .sbdocs-content ul:not([class]):not(:where(.docs-story *)),
+.sbdocs .sbdocs-content ol:not([class]):not(:where(.docs-story *)) {
+    max-width: 55ch;
 }
 
 /* Code blocks */
