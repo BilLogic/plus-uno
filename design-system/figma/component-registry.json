@@ -806,15 +806,15 @@
           {
             "id": "footnote",
             "name": "Footnote",
-            "componentSetNodeId": "111:227939",
-            "url": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227939",
+            "componentSetNodeId": "111:227940",
+            "url": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227940",
             "source": "designer-supplied",
             "status": "verified",
             "isComponentSet": false,
-            "notes": "Figma node is an INSTANCE, not a component or component set — no variants to map. Ask design to promote it to a component before relying on it for write-back."
+            "notes": "Points at the COMPONENT (111:227940), not the instance. It used to name 111:227939, which is an instance of it — the note here asked design to “promote it to a component”, but the component already existed and the registry was simply linking a copy of it. No variants: not a component set."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227939"
+        "docsPageUrl": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227940"
       }
     },
     "Input": {
@@ -1425,18 +1425,22 @@
           {
             "id": "scale-options",
             "name": "Scale Options",
-            "componentSetNodeId": "13536:9084",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-9084",
+            "componentSetNodeId": "13536:9083",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-9083",
             "source": "node-chart",
-            "status": "verified"
+            "status": "verified",
+            "isComponentSet": false,
+            "notes": "Was 13536:9084, which resolves to nothing in the file. A plain COMPONENT, not a set. Re-read from the Scale page 2026-08-29."
           },
           {
             "id": "linear-scale",
             "name": "Linear Scale",
-            "componentSetNodeId": "13611:16853",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-16853",
+            "componentSetNodeId": "13536:9208",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-9208",
             "source": "node-chart",
-            "status": "verified"
+            "status": "verified",
+            "isComponentSet": false,
+            "notes": "Was 13611:16853, which resolves to nothing in the file — not an off-by-one, a different node entirely. A plain COMPONENT, not a set. Re-read from the Scale page 2026-08-29."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005"
@@ -1485,10 +1489,12 @@
           {
             "id": "rating-system-with-text",
             "name": "Rating System (with text)",
-            "componentSetNodeId": "13536:196",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-196",
+            "componentSetNodeId": "13536:195",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-195",
             "source": "node-chart",
-            "status": "verified"
+            "status": "verified",
+            "isComponentSet": false,
+            "notes": "Was 13536:196, which resolves to nothing in the file. A plain COMPONENT, not a set. Re-read from the Rating page 2026-08-29."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-7763"
