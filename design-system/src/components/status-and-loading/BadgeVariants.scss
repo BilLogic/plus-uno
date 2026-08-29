@@ -57,15 +57,27 @@ $badge-appearances: (
  * beside a heading, in a detail header, in an empty state. DEFAULT WHEN IT IS
  * METADATA ABOUT A ROW — table cells, list items, inline in prose.
  */
+/*
+ * #276 measured Atlassian's live lozenge: `default` is 20px tall with 4px
+ * inline padding, `spacious` 32px with 12px. These used
+ * `--size-element-pad-x-sm` and `-lg`, whose fallbacks said 4px and 12px — so
+ * the numbers READ correct while the tokens beside them resolve to 8px and
+ * 16px, and the tokens are what paint. Both variants shipped wider than the
+ * spec they cite, and the literal beside each one hid it.
+ *
+ * `check:size-fallbacks` (#336) is what caught it, on the merge. The named
+ * primitives below are what actually carry 4px and 12px; the `-sm`/`-lg` step
+ * of the element ramp does not.
+ */
 .plus-badge-v--default {
     min-height: 20px;
-    padding: 0 var(--size-element-pad-x-sm, 4px);
+    padding: 0 var(--size-spacing-small-space-050, 4px);
     border-radius: var(--size-element-radius-md, 4px);
 }
 
 .plus-badge-v--spacious {
     min-height: 32px;
-    padding: 0 var(--size-element-pad-x-lg, 12px);
+    padding: 0 var(--size-element-pad-x-md, 12px);
     border-radius: var(--size-border-radius-radius-150, 6px);
 }
 

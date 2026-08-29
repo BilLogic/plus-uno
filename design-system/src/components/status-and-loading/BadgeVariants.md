@@ -26,7 +26,7 @@
 
 ## Tokens touched
 
-`--font-weight-semibold` · `--size-border-radius-radius-150` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-pad-x-sm` · `--size-element-radius-md`
+`--font-weight-semibold` · `--size-border-radius-radius-150` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-radius-md` · `--size-spacing-small-space-050`
 
 From `design-system/src/components/status-and-loading/BadgeVariants.scss`. Override these through the token layer, never with a literal.
 
