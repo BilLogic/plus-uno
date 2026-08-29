@@ -523,18 +523,34 @@ h6,
  * is 32px.
  */
 :root {
-    /* Headings — `--font-weight-headline` (700) on `--font-family-header`. */
-    --type-h1: 700 var(--font-size-h1) / var(--font-line-height-h1) var(--font-family-header);
-    --type-h2: 700 var(--font-size-h2) / var(--font-line-height-h2) var(--font-family-header);
-    --type-h3: 700 var(--font-size-h3) / var(--font-line-height-h3) var(--font-family-header);
-    --type-h4: 700 var(--font-size-h4) / var(--font-line-height-h4) var(--font-family-header);
-    --type-h5: 700 var(--font-size-h5) / var(--font-line-height-h5) var(--font-family-header);
-    --type-h6: 700 var(--font-size-h6) / var(--font-line-height-h6) var(--font-family-header);
+    /*
+     * h1–h3 are HEADLINES and h4–h6 are TITLES, and the two carry different
+     * weights: `%font-headline` sets `--font-weight-headline` (700), `%font-title`
+     * sets `--font-weight-title` (600). Figma agrees — Headline/H1–H3 are Lato
+     * Bold, Title/H4–H6 are Lato SemiBold.
+     *
+     * These six shipped with a literal `700` on all six, so `--type-h4` rendered
+     * an h4 one weight heavier than `h4` itself did. The layer that exists to
+     * stop a register being half-picked had half-picked one. Referencing the
+     * weight token rather than restating its value is the actual fix: a literal
+     * is a second place for the number to live, which is the whole failure mode.
+     */
+    --type-h1: var(--font-weight-headline) var(--font-size-h1) / var(--font-line-height-h1) var(--font-family-header);
+    --type-h2: var(--font-weight-headline) var(--font-size-h2) / var(--font-line-height-h2) var(--font-family-header);
+    --type-h3: var(--font-weight-headline) var(--font-size-h3) / var(--font-line-height-h3) var(--font-family-header);
+    --type-h4: var(--font-weight-title) var(--font-size-h4) / var(--font-line-height-h4) var(--font-family-header);
+    --type-h5: var(--font-weight-title) var(--font-size-h5) / var(--font-line-height-h5) var(--font-family-header);
+    --type-h6: var(--font-weight-title) var(--font-size-h6) / var(--font-line-height-h6) var(--font-family-header);
 
-    /* Body — `--font-weight-normal` (300) on `--font-family-body`. */
-    --type-body1: 300 var(--font-size-body1) / var(--font-line-height-body1) var(--font-family-body);
-    --type-body2: 300 var(--font-size-body2) / var(--font-line-height-body2) var(--font-family-body);
-    --type-body3: 300 var(--font-size-body3) / var(--font-line-height-body3) var(--font-family-body);
+    /*
+     * Body — `%font-body` sets `--font-weight-normal` (300), so that is the token
+     * named here. `--font-weight-body1-regular` aliases the same value and would
+     * read better, but it is not what the classes resolve; mirroring the rule is
+     * the point, not picking the nicest-looking name.
+     */
+    --type-body1: var(--font-weight-normal) var(--font-size-body1) / var(--font-line-height-body1) var(--font-family-body);
+    --type-body2: var(--font-weight-normal) var(--font-size-body2) / var(--font-line-height-body2) var(--font-family-body);
+    --type-body3: var(--font-weight-normal) var(--font-size-body3) / var(--font-line-height-body3) var(--font-family-body);
 
     /*
      * `lead` and `blockquote` are both 20px, and so is `h5`. Three registers,
