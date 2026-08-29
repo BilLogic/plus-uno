@@ -36,7 +36,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-neutral-state-08` · `--color-neutral-state-12` · `--color-primary` · `--color-primary-08` · `--color-primary-text` · `--size-element-gap-md`
+`--color-on-surface-state-08` · `--color-on-surface-state-12` · `--color-primary` · `--color-primary-state-08` · `--color-primary-text` · `--size-element-gap-md`
 
 From `design-system/src/components/forms-and-inputs/OptionList.scss`. Override these through the token layer, never with a literal.
 

@@ -48,7 +48,7 @@
 
     // Selected state
     &.active {
-        background-color: var(--color-primary-08) !important;
+        background-color: var(--color-primary-state-08) !important;
 
         .form-check-label {
             color: var(--color-primary-text);
@@ -57,12 +57,12 @@
 
     // Hover state
     &:hover:not(.disabled) {
-        background-color: var(--color-neutral-state-08);
+        background-color: var(--color-on-surface-state-08);
     }
 
     // Active/pressed
     &:active:not(.disabled) {
-        background-color: var(--color-neutral-state-12);
+        background-color: var(--color-on-surface-state-12);
     }
 
     // Focus state

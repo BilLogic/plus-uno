@@ -35,7 +35,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface` · `--color-outline-variant` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body2` · `--font-size-body3` · `--font-weight-normal` · `--font-weight-semibold-2` · `--size-spacing-medium-space-200` · `--size-spacing-medium-space-250` · `--size-spacing-small-space-050` · `--size-spacing-small-space-100` · `--size-table-cell-x` · `--size-table-cell-y`
+`--color-on-surface` · `--color-outline-variant` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body2` · `--font-size-body3` · `--font-weight-normal` · `--font-weight-semibold-2` · `--size-spacing-medium-space-200` · `--size-spacing-medium-space-300` · `--size-spacing-small-space-050` · `--size-spacing-small-space-100` · `--size-table-cell-x` · `--size-table-cell-y`
 
 From `design-system/src/components/_internal/Table/Table.scss`. Override these through the token layer, never with a literal.
 

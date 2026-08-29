@@ -71,7 +71,7 @@
                 font-family: var(--font-family-body);
                 font-size: var(--font-size-body1);
                 line-height: var(--font-line-height-body1);
-                font-weight: var(--font-weight-light);
+                font-weight: var(--font-weight-normal);
                 color: var(--color-on-surface);
             }
 
@@ -82,7 +82,7 @@
             }
 
             &:hover {
-                background-color: var(--color-neutral-state-12);
+                background-color: var(--color-on-surface-state-12);
             }
 
             &:focus-visible {
@@ -131,7 +131,7 @@
 
         .plus-nav-link {
             /* ghost theme uses semibold on toggle; match nav weight */
-            font-weight: var(--font-weight-light);
+            font-weight: var(--font-weight-normal);
         }
 
         .dropdown-menu {

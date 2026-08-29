@@ -45,7 +45,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-danger` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline` · `--color-outline-variant` · `--color-primary-container` · `--color-success` · `--color-surface` · `--color-surface-variant` · `--font-family-body` · `--font-line-height-body1` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body-small` · `--font-size-body1` · `--font-size-body2` · `--font-size-body3` · `--font-weight-light` · `--font-weight-medium` · `--size-ele-gap-xs` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-stroke-lg`
+`--color-danger` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline` · `--color-outline-variant` · `--color-primary-container` · `--color-success` · `--color-surface` · `--color-surface-variant` · `--font-family-body` · `--font-line-height-body1` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body-small` · `--font-size-body1` · `--font-size-body2` · `--font-size-body3` · `--font-weight-light` · `--font-weight-medium` · `--size-element-gap-xs` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-stroke-lg`
 
 From `design-system/src/components/forms-and-inputs/Textarea.scss`. Override these through the token layer, never with a literal.
 

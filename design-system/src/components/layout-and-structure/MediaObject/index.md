@@ -34,7 +34,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface` · `--color-on-surface-variant` · `--color-tertiary-state-08` · `--color-tertiary-text` · `--font-family-body` · `--font-family-header` · `--font-line-height-body1` · `--font-line-height-h5` · `--font-size-body1` · `--font-size-fa-h3-solid` · `--font-size-h5` · `--font-weight-light` · `--font-weight-title` · `--size-border-radius-100` · `--size-element-gap-lg` · `--size-spacing-md` · `--size-spacing-sm`
+`--color-on-surface` · `--color-on-surface-variant` · `--color-tertiary-state-08` · `--color-tertiary-text` · `--font-family-body` · `--font-family-header` · `--font-line-height-body1` · `--font-line-height-h5` · `--font-size-body1` · `--font-size-fa-h3-solid` · `--font-size-h5` · `--font-weight-normal` · `--font-weight-title` · `--size-border-radius-radius-100` · `--size-element-gap-lg` · `--size-spacing-medium-space-200` · `--size-spacing-small-space-100`
 
 From `design-system/src/components/layout-and-structure/MediaObject/MediaObject.scss`. Override these through the token layer, never with a literal.
 

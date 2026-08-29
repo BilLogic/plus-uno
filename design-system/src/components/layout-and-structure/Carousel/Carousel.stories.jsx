@@ -140,7 +140,7 @@ const createLabeledSlideContent = (text, bgColor, label, description) => (
             <span style={{
                 fontSize: 'var(--font-size-b1)',
                 lineHeight: 'var(--font-line-height-b1)',
-                fontWeight: 'var(--font-weight-light)',
+                fontWeight: 'var(--font-weight-normal)',
                 fontFamily: 'var(--font-family-merriweather-sans)',
                 color: 'var(--color-on-surface-variant)'
             }}>
