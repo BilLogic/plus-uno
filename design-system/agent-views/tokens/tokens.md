@@ -427,6 +427,13 @@ Use semantic colors (never hex codes).
 --elevation-light-3
 --elevation-light-4
 --elevation-light-5
+--surface-container
+--surface-default
+--surface-overlay
+--surface-overlay-shadow
+--surface-raised
+--surface-raised-shadow
+--surface-sunken
 ```
 
 ## Primitive Variables
