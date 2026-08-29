@@ -35,7 +35,7 @@ Horizontal radio button group with end labels (e.g., "Lowest" and "Highest") and
 
 ## Tokens touched
 
-`--color-danger` · `--color-inverse-primary` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-surface-container-low` · `--color-surface-variant` · `--font-weight-normal` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-radius-full` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-section-gap-md`
+`--color-danger` · `--color-inverse-primary` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-surface-container-low` · `--color-surface-variant` · `--font-weight-normal` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-radius-full` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-section-gap-md`
 
 From `design-system/src/components/forms-and-inputs/RadioButtonGroup.scss`. Override these through the token layer, never with a literal.
 

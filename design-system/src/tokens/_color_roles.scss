@@ -54,12 +54,30 @@
  * warning color from Figma" and uses for the warning state layers. It measures
  * 6.50:1 on white and 5.02:1 at its worst, clearing both bars everywhere.
  *
- * NOT DONE HERE. Nothing is repointed. These tokens have no users yet, so this
- * file changes no pixel — it is the vocabulary that the 108 foreground uses can
- * then be moved onto, one at a time, against a ratchet. The five SMART subject
- * colours (advocacy, mastering-content, relationship, social-emotional,
- * technology-tools) are deliberately out of scope: they are category colours
- * rather than intents, and their bar is a separate question.
+ * THE BORDERS HAVE USERS NOW; THE ICONS DO NOT. On 2026-08-29 the scan behind
+ * `npm run check:intent-roles` found 137 declarations painting a border or an
+ * outline from an intent BASE, and 111 of them were moved onto `-border` in one
+ * pass. Six of the seven roles alias their base, so those 111 changed no pixel —
+ * what changed is that an edge now SAYS it is an edge, and the value can move
+ * for edges alone. Twenty-six remain, each recorded with a reason in
+ * `docs/evals/intent-role-adoption.json`:
+ *
+ *   25  focus rings, all `--color-primary`. A focus indicator is its own role —
+ *       Atlassian names `color.border.focused` beside `color.border` — and no
+ *       `--color-X-focus-ring` exists here. Renaming them to `-border` would
+ *       assert an equivalence nobody has decided.
+ *    1  the warning border on the supervisor alert, the ONE site whose
+ *       migration would change a pixel. The base measures 3.70:1 on that
+ *       ground, clearing the 3:1 non-text bar, so there is no defect there to
+ *       fix — only the choice #312 has not made.
+ *
+ * The `-icon` roles still have no users: an icon colour is usually set by
+ * `color:` on a glyph, which `check:text-contrast` already measures against the
+ * 4.5:1 bar, and moving those is that check's ratchet rather than this one's.
+ *
+ * The five SMART subject colours (advocacy, mastering-content, relationship,
+ * social-emotional, technology-tools) are deliberately out of scope: they are
+ * category colours rather than intents, and their bar is a separate question.
  */
 
 :root {

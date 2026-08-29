@@ -50,7 +50,7 @@
         // Active state - secondary color tokens
         &.active {
             color: var(--color-secondary-text) !important;
-            border-bottom-color: var(--color-secondary) !important;
+            border-bottom-color: var(--color-secondary-border) !important;
             font-weight: var(--font-weight-semibold-1, 500);
         }
         

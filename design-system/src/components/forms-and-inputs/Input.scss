@@ -113,27 +113,27 @@
     
     // Validation states
     &.plus-input-invalid {
-        border-color: var(--color-danger);
+        border-color: var(--color-danger-border);
         
         &:hover:not(:disabled) {
-            border-color: var(--color-danger);
+            border-color: var(--color-danger-border);
         }
         
         &:focus {
-            border-color: var(--color-danger);
+            border-color: var(--color-danger-border);
             box-shadow: none;
         }
     }
     
     &.plus-input-success {
-        border-color: var(--color-success);
+        border-color: var(--color-success-border);
         
         &:hover:not(:disabled) {
-            border-color: var(--color-success);
+            border-color: var(--color-success-border);
         }
         
         &:focus {
-            border-color: var(--color-success);
+            border-color: var(--color-success-border);
             box-shadow: none;
         }
     }

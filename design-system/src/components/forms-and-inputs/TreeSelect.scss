@@ -40,7 +40,7 @@
     &.plus-tree-select-input-open,
     &:focus {
         outline: none;
-        border-color: var(--color-primary);
+        border-color: var(--color-primary-border);
         box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
     }
 
@@ -160,11 +160,11 @@
         &:checked,
         &:indeterminate {
             background-color: var(--color-primary);
-            border-color: var(--color-primary);
+            border-color: var(--color-primary-border);
         }
 
         &:focus {
-            border-color: var(--color-primary);
+            border-color: var(--color-primary-border);
             box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
         }
 

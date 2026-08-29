@@ -100,7 +100,7 @@
     
     &:focus {
         outline: none;
-        border-color: var(--color-primary);
+        border-color: var(--color-primary-border);
         box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
     }
     
@@ -207,7 +207,7 @@
     flex: 0 0 auto;
     display: flex;
     align-items: stretch;
-    border: 1px solid var(--color-primary);
+    border: 1px solid var(--color-primary-border);
     border-radius: 0 var(--size-element-radius-sm) var(--size-element-radius-sm) 0;
     overflow: hidden;
     margin-left: -1px; // Overlap with input border to connect seamlessly
@@ -233,38 +233,38 @@
     
     // Invalid state
     &.plus-datetime-validation-invalid {
-        border-color: var(--color-danger);
+        border-color: var(--color-danger-border);
         
         // Focus state in invalid
         .plus-datetime-time-input-group:has(.plus-datetime-time-input:focus) & {
             border-width: 2px;
-            border-color: var(--color-danger);
+            border-color: var(--color-danger-border);
             margin-left: -2px;
         }
         
         // Active/expanded state in invalid
         .plus-datetime-am-pm-dropdown.show & {
             border-width: 2px;
-            border-color: var(--color-danger);
+            border-color: var(--color-danger-border);
             margin-left: -2px;
         }
     }
     
     // Success state
     &.plus-datetime-validation-success {
-        border-color: var(--color-success);
+        border-color: var(--color-success-border);
         
         // Focus state in success
         .plus-datetime-time-input-group:has(.plus-datetime-time-input:focus) & {
             border-width: 2px;
-            border-color: var(--color-success);
+            border-color: var(--color-success-border);
             margin-left: -2px;
         }
         
         // Active/expanded state in success
         .plus-datetime-am-pm-dropdown.show & {
             border-width: 2px;
-            border-color: var(--color-success);
+            border-color: var(--color-success-border);
             margin-left: -2px;
         }
     }
@@ -323,7 +323,7 @@
     }
     
     &:hover:not(:disabled) {
-        border-color: var(--color-primary);
+        border-color: var(--color-primary-border);
     }
     
     &:focus {
@@ -356,7 +356,7 @@
         }
         
         &:hover:not(:disabled) {
-            border-color: var(--color-danger);
+            border-color: var(--color-danger-border);
         }
         
         &:focus {
@@ -383,7 +383,7 @@
         }
         
         &:hover:not(:disabled) {
-            border-color: var(--color-success);
+            border-color: var(--color-success-border);
         }
         
         &:focus {

@@ -211,16 +211,16 @@
 // Validation states - stroke style (colored borders, white background)
 .plus-number-input-invalid {
     .plus-number-input-field {
-        border-color: var(--color-danger);
+        border-color: var(--color-danger-border);
 
         &:focus {
-            border-color: var(--color-danger);
+            border-color: var(--color-danger-border);
             box-shadow: 0 0 0 0.2rem var(--color-danger-state-08);
         }
     }
 
     .plus-number-input-buttons {
-        border-color: var(--color-danger);
+        border-color: var(--color-danger-border);
         background-color: var(--color-surface-container-lowest);
 
         &::before {
@@ -230,12 +230,12 @@
 
     .plus-number-input-button {
         background-color: var(--color-surface-container-lowest);
-        border-left-color: var(--color-danger);
+        border-left-color: var(--color-danger-border);
         color: var(--color-danger) !important;
 
         // First button has no left border, but second button has danger-colored separator
         &:not(:first-child) {
-            border-left-color: var(--color-danger);
+            border-left-color: var(--color-danger-border);
         }
 
         i {
@@ -254,16 +254,16 @@
 
 .plus-number-input-success {
     .plus-number-input-field {
-        border-color: var(--color-success);
+        border-color: var(--color-success-border);
 
         &:focus {
-            border-color: var(--color-success);
+            border-color: var(--color-success-border);
             box-shadow: 0 0 0 0.2rem var(--color-success-state-08);
         }
     }
 
     .plus-number-input-buttons {
-        border-color: var(--color-success);
+        border-color: var(--color-success-border);
         background-color: var(--color-surface-container-lowest);
 
         &::before {
@@ -273,12 +273,12 @@
 
     .plus-number-input-button {
         background-color: var(--color-surface-container-lowest);
-        border-left-color: var(--color-success);
+        border-left-color: var(--color-success-border);
         color: var(--color-success) !important;
 
         // First button has no left border, but second button has success-colored separator
         &:not(:first-child) {
-            border-left-color: var(--color-success);
+            border-left-color: var(--color-success-border);
         }
 
         i {
@@ -298,16 +298,16 @@
 // Focused state
 .plus-number-input-focused {
     .plus-number-input-field {
-        border-color: var(--color-primary);
+        border-color: var(--color-primary-border);
         box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
     }
 
     .plus-number-input-buttons {
-        border-color: var(--color-primary);
+        border-color: var(--color-primary-border);
     }
 
     .plus-number-input-button {
-        border-left-color: var(--color-primary);
+        border-left-color: var(--color-primary-border);
     }
 }
 

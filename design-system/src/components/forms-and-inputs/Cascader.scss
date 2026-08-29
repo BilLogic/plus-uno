@@ -39,7 +39,7 @@
     &.plus-cascader-input-open,
     &:focus {
         outline: none;
-        border-color: var(--color-primary);
+        border-color: var(--color-primary-border);
         box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);
     }
     
