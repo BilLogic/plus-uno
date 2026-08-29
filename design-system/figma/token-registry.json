@@ -108,7 +108,9 @@
       "_Advocacy/on-surface": "var(--color-on-surface)",
       "_Danger/Danger": "var(--color-danger)",
       "_Danger/Danger (Text)": "var(--color-danger-text)",
+      "_Danger/Danger Border": "var(--color-danger-border)",
       "_Danger/Danger Container": "var(--color-danger-container)",
+      "_Danger/Danger Icon": "var(--color-danger-icon)",
       "_Danger/On Danger": "var(--color-on-danger)",
       "_Danger/On Danger Container": "var(--color-on-danger-container)",
       "_Danger/State-layers/Danger 08": "var(--color-danger-state-08)",
@@ -119,7 +121,9 @@
       "_Danger/State-layers/Danger Container 16": "var(--color-danger-container-state-16)",
       "_Info/Info": "var(--color-info)",
       "_Info/Info (Text)": "var(--color-info-text)",
+      "_Info/Info Border": "var(--color-info-border)",
       "_Info/Info Container": "var(--color-info-container)",
+      "_Info/Info Icon": "var(--color-info-icon)",
       "_Info/On Info": "var(--color-on-info)",
       "_Info/On Info Container": "var(--color-on-info-container)",
       "_Info/State-layers/Info 08": "var(--color-info-state-08)",
@@ -144,7 +148,9 @@
       "_Primary/On Primary Container": "var(--color-on-primary-container)",
       "_Primary/Primary": "var(--color-primary)",
       "_Primary/Primary (Text)": "var(--color-primary-text)",
+      "_Primary/Primary Border": "var(--color-primary-border)",
       "_Primary/Primary Container": "var(--color-primary-container)",
+      "_Primary/Primary Icon": "var(--color-primary-icon)",
       "_Primary/State-layers/Primary 08": "var(--color-primary-state-08)",
       "_Primary/State-layers/Primary 12": "var(--color-primary-state-12)",
       "_Primary/State-layers/Primary 16": "var(--color-primary-state-16)",
@@ -166,7 +172,9 @@
       "_Secondary/On Secondary Container": "var(--color-on-secondary-container)",
       "_Secondary/Secondary": "var(--color-secondary)",
       "_Secondary/Secondary (Text)": "var(--color-secondary-text)",
+      "_Secondary/Secondary Border": "var(--color-secondary-border)",
       "_Secondary/Secondary Container": "var(--color-secondary-container)",
+      "_Secondary/Secondary Icon": "var(--color-secondary-icon)",
       "_Secondary/State-layers/Secondary 08": "var(--color-secondary-state-08)",
       "_Secondary/State-layers/Secondary 12": "var(--color-secondary-state-12)",
       "_Secondary/State-layers/Secondary 16": "var(--color-secondary-state-16)",
@@ -194,7 +202,9 @@
       "_Success/State-layers/Success Container 16": "var(--color-success-container-state-16)",
       "_Success/Success": "var(--color-success)",
       "_Success/Success (Text)": "var(--color-success-text)",
+      "_Success/Success Border": "var(--color-success-border)",
       "_Success/Success Container": "var(--color-success-container)",
+      "_Success/Success Icon": "var(--color-success-icon)",
       "_Technology-Tools/On Technology-Tools": "var(--color-on-technology-tools)",
       "_Technology-Tools/On Technology-Tools Container": "var(--color-on-technology-tools-container)",
       "_Technology-Tools/State-layers/Technology-Tools 08": "var(--color-technology-tools-state-08)",
@@ -216,7 +226,9 @@
       "_Tertiary/State-layers/Tertiary Container 16": "var(--color-tertiary-container-state-16)",
       "_Tertiary/Tertiary": "var(--color-tertiary)",
       "_Tertiary/Tertiary (Text)": "var(--color-tertiary-text)",
+      "_Tertiary/Tertiary Border": "var(--color-tertiary-border)",
       "_Tertiary/Tertiary Container": "var(--color-tertiary-container)",
+      "_Tertiary/Tertiary Icon": "var(--color-tertiary-icon)",
       "_Warning/On Warning": "var(--color-on-warning)",
       "_Warning/On Warning Container": "var(--color-on-warning-container)",
       "_Warning/State-layers/Warning 08": "var(--color-warning-state-08)",
@@ -227,7 +239,9 @@
       "_Warning/State-layers/Warning Container 16": "var(--color-warning-container-state-16)",
       "_Warning/Warning": "var(--color-warning)",
       "_Warning/Warning (Text)": "var(--color-warning-text)",
-      "_Warning/Warning Container": "var(--color-warning-container)"
+      "_Warning/Warning Border": "var(--color-warning-border)",
+      "_Warning/Warning Container": "var(--color-warning-container)",
+      "_Warning/Warning Icon": "var(--color-warning-icon)"
     },
     "colors / neutral": {
       "Neutral Colors/Alternative/inverse-on-surface": "var(--color-inverse-on-surface)",
@@ -425,9 +439,9 @@
     "scssTokenCount": 493,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 341,
-      "resolved": 317,
-      "percent": 93,
+      "total": 360,
+      "resolved": 331,
+      "percent": 92,
       "unresolved": [
         {
           "collection": "colors / accent",
@@ -435,6 +449,47 @@
           "tried": [
             "--color-content",
             "--color-content-content"
+          ]
+        },
+        {
+          "collection": "colors / accent",
+          "figmaVariable": "_Proposal/Info (Text) (candidate)",
+          "tried": [
+            "--color-info-candidate-text",
+            "--color-info-text-candidate",
+            "--color-proposal-info-text-candidate"
+          ]
+        },
+        {
+          "collection": "colors / accent",
+          "figmaVariable": "_Proposal/Info Bold (candidate)",
+          "tried": [
+            "--color-info-bold-candidate",
+            "--color-proposal-info-bold-candidate"
+          ]
+        },
+        {
+          "collection": "colors / accent",
+          "figmaVariable": "_Proposal/Info Container (candidate)",
+          "tried": [
+            "--color-info-container-candidate",
+            "--color-proposal-info-container-candidate"
+          ]
+        },
+        {
+          "collection": "colors / accent",
+          "figmaVariable": "_Proposal/On Info Container (candidate)",
+          "tried": [
+            "--color-on-info-container-candidate",
+            "--color-proposal-on-info-container-candidate"
+          ]
+        },
+        {
+          "collection": "colors / accent",
+          "figmaVariable": "_Proposal/Warning Bold (candidate B)",
+          "tried": [
+            "--color-warning-bold-candidate-b",
+            "--color-proposal-warning-bold-candidate-b"
           ]
         },
         {
