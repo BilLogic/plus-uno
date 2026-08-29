@@ -34,6 +34,7 @@
     "report:doc-identifiers": "node scripts/check-doc-identifiers.mjs --report --stats",
     "check:negation": "node scripts/check-negation-ratchet.mjs",
     "check:token-collision": "node scripts/check-token-collision.mjs",
+    "check:colour-fallbacks": "node scripts/check-colour-fallbacks.mjs",
     "check:unspread-rest": "node scripts/check-unspread-rest.mjs",
     "check:page-outline": "node scripts/check-page-outline.mjs",
     "check:docs-tabs": "node scripts/check-docs-tabs.mjs",
