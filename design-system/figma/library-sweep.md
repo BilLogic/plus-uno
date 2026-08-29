@@ -119,3 +119,53 @@ Recorded because a sweep that reports everything reports nothing:
   Nothing re-reads them, and this sweep did not.
 - **Publishing.** Every description written here is **unpublished** until the
   library is published from Figma. Consumers see nothing until then.
+
+## Role-token blast radius — measured 2026-08-29
+
+The role variables added in #368 (`_<Intent>/<Intent> Icon`,
+`_<Intent>/<Intent> Border`) only matter where a component draws a stroke or an
+icon from an intent BASE today. That was measured rather than guessed: sixty
+public component sets were scanned for nodes whose stroke is one of the six
+intent base colours, and for Font Awesome glyphs whose fill is one.
+
+**23 of the 60 sets, 391 nodes.**
+
+| set | stroke or glyph nodes on an intent base |
+| --- | --- |
+| Dropdown button | 216 — 36 in each of the six intents |
+| Outlined buttons | 63 |
+| Dismissible Badges | 28 |
+| Vertical Outlined buttons | 9 |
+| Alert | 7 (6 strokes, 1 glyph) |
+| Number Input Group Button, Form Textarea, Nav Pills | 6 each |
+| Choice Grid Radios, Form Radio Button, Scale Radio Button | 5 each |
+| Input, Form Switch Button, Tab Item, Pill Item | 4 each |
+| Form Checkbox, Dropdown list Item, Scrollspy | 3 each |
+| Tonal buttons, Text buttons, File Upload, Tag | 2 each |
+| Navbar | 1 |
+
+**The warning strokes are the ones that fail.** `_Warning/Warning` is 2.87:1
+against `surface-container-highest`, under the 3:1 bar WCAG 1.4.11 sets for a
+border. Fifty of the 391 are warning strokes: 36 in `Dropdown button`, 9 in
+`Outlined buttons`, 4 in `Dismissible Badges`, 1 in `Alert`. Each is an outline
+that can fail against the surface it sits on, and none of them says in its name
+that it is a border.
+
+Nothing here has been rebound. `Alert · role-bound (proposal)` on the Alert page
+is the worked example — a clone of `11:324` with its six strokes bound to
+`_<Intent>/<Intent> Border` and its leading icon to `_<Intent>/<Intent> Icon`,
+placed below the original so the two can be compared. The original set is
+untouched, per the standing rule that an obsoleted component is kept beside its
+replacement rather than deleted.
+
+**What the proposal set taught, and changed.** The Alert set paints its leading
+icon from three different roles depending on variant — the base for `primary`,
+the neutral `on-surface-variant` for `secondary`, and the `-text` token for the
+other four. Binding all six to a base-valued `-icon` would have LIGHTENED four of
+them (danger 6.7:1 to 5.0:1, warning 8.7:1 to 5.0:1). That is why every `-icon`
+now resolves to its `-text` value instead: 3:1 is the floor an icon must clear,
+not the value it should take. See PR #373.
+
+**Not scanned.** Fills. A fill on an intent base is usually correct — the base
+IS the ground — and the role tokens do not cover it. The 46 sets with no hits
+are mostly typographic, layout or animation sets with no intent colour at all.
