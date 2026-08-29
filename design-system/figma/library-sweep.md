@@ -120,52 +120,88 @@ Recorded because a sweep that reports everything reports nothing:
 - **Publishing.** Every description written here is **unpublished** until the
   library is published from Figma. Consumers see nothing until then.
 
-## Role-token blast radius — measured 2026-08-29
+## Role-token blast radius — measured 2026-08-29, corrected the same day
 
 The role variables added in #368 (`_<Intent>/<Intent> Icon`,
 `_<Intent>/<Intent> Border`) only matter where a component draws a stroke or an
-icon from an intent BASE today. That was measured rather than guessed: sixty
-public component sets were scanned for nodes whose stroke is one of the six
-intent base colours, and for Font Awesome glyphs whose fill is one.
+icon from an intent BASE. That was measured rather than guessed.
 
-**23 of the 60 sets, 391 nodes.**
+**The first measurement over-counted, and the correction is the finding.** It
+reported 391 nodes across 23 sets, counting every node that resolved to an
+intent base colour. Most of those are not decisions. A stroke inside an INSTANCE
+belongs to the set that instance came from: change the owner and every instance
+follows. Splitting the same scan by ownership:
 
-| set | stroke or glyph nodes on an intent base |
-| --- | --- |
-| Dropdown button | 216 — 36 in each of the six intents |
-| Outlined buttons | 63 |
-| Dismissible Badges | 28 |
-| Vertical Outlined buttons | 9 |
-| Alert | 7 (6 strokes, 1 glyph) |
-| Number Input Group Button, Form Textarea, Nav Pills | 6 each |
-| Choice Grid Radios, Form Radio Button, Scale Radio Button | 5 each |
-| Input, Form Switch Button, Tab Item, Pill Item | 4 each |
-| Form Checkbox, Dropdown list Item, Scrollspy | 3 each |
-| Tonal buttons, Text buttons, File Upload, Tag | 2 each |
-| Navbar | 1 |
+| | nodes | sets |
+| --- | --- | --- |
+| **owned** — the set's own strokes | **122** | **8** |
+| inherited through an instance | 293 | 15 |
+
+`Dropdown button` was the largest number in the first table, at 216. It owns
+**none** of them: every one is an `Outlined buttons` instance, and all 216 are
+inherited rather than overridden — checked field by field through
+`instance.overrides`, which lists radii, sizing and stroke WEIGHTS and never
+`strokes`. It is a dependant, not an offender. The same is true of `Tonal
+buttons` and `Text buttons` (from a private `_Button`), of `Nav Pills` (from
+`Pill Item`), of the three radio sets (from `_Form Radio Button`), and of
+`Scrollspy`, `Navbar`, `Input`, `File Upload`, `Form Checkbox`, `Dropdown list
+Item`, `Form Switch Button` and `Number Input Group Button`.
+
+### The eight sets that own an intent stroke
+
+| set | owned strokes | of which warning |
+| --- | --- | --- |
+| Outlined buttons | 63 | 9 |
+| Dismissible Badges | 28 | 4 |
+| Vertical Outlined buttons | 9 | 0 |
+| Alert | 6 | 1 |
+| Form Textarea | 6 | 0 |
+| Tab Item | 4 | 0 |
+| Pill Item | 4 | 0 |
+| Tag | 2 | 0 |
 
 **The warning strokes are the ones that fail.** `_Warning/Warning` is 2.87:1
 against `surface-container-highest`, under the 3:1 bar WCAG 1.4.11 sets for a
-border. Fifty of the 391 are warning strokes: 36 in `Dropdown button`, 9 in
-`Outlined buttons`, 4 in `Dismissible Badges`, 1 in `Alert`. Each is an outline
-that can fail against the surface it sits on, and none of them says in its name
-that it is a border.
+border. Fourteen of the 122 are warning strokes, and each is an outline that can
+fail against the surface it sits on while its token name says nothing about
+being a border.
 
-Nothing here has been rebound. `Alert · role-bound (proposal)` on the Alert page
-is the worked example — a clone of `11:324` with its six strokes bound to
-`_<Intent>/<Intent> Border` and its leading icon to `_<Intent>/<Intent> Icon`,
-placed below the original so the two can be compared. The original set is
-untouched, per the standing rule that an obsoleted component is kept beside its
-replacement rather than deleted.
+### Eight role-bound proposals, one per owning set
 
-**What the proposal set taught, and changed.** The Alert set paints its leading
-icon from three different roles depending on variant — the base for `primary`,
-the neutral `on-surface-variant` for `secondary`, and the `-text` token for the
-other four. Binding all six to a base-valued `-icon` would have LIGHTENED four of
-them (danger 6.7:1 to 5.0:1, warning 8.7:1 to 5.0:1). That is why every `-icon`
-now resolves to its `-text` value instead: 3:1 is the floor an icon must clear,
-not the value it should take. See PR #373.
+Each is a clone placed BELOW its original with every intent stroke the set owns
+rebound from `_<Intent>/<Intent>` to `_<Intent>/<Intent> Border`. The originals
+are untouched, per the standing rule that an obsoleted component is kept beside
+its replacement rather than deleted. Together they cover all 122.
 
-**Not scanned.** Fills. A fill on an intent base is usually correct — the base
-IS the ground — and the role tokens do not cover it. The 46 sets with no hits
-are mostly typographic, layout or animation sets with no intent colour at all.
+Two things the verification pass established. The originals were already bound
+to intent **variables** rather than to raw hexes, so each proposal is a
+variable-to-variable move and not a re-colouring. And every non-intent stroke
+was correctly left alone: `Neutral Colors/outline` and `outline-variant`,
+`_Primary/Inverse Primary` — which is the focus ring, not an intent — and
+`_Primary/Primary Container`.
+
+### One gap the proposals surfaced
+
+`Tag` binds five SMART **subject** colours as strokes — Advocacy,
+Mastering-Content, Relationship, Social-Emotional, Technology-Tools — and none
+of them has a `Border` role, because #368 scoped the role layer to the seven
+intents. Measured against the five surface steps, all five clear 3:1 as a
+border (worst 4.05:1, Mastering-Content and Social-Emotional on
+`surface-container-highest`), so this is a **naming gap and not a contrast
+defect**. Four of the five fail 4.5:1 as text on the darker grounds, which is
+the same shape the intents have.
+
+### What the proposal set taught, and changed
+
+The Alert set paints its leading icon from three different roles depending on
+variant — the base for `primary`, the neutral `on-surface-variant` for
+`secondary`, and the `-text` token for the other four. Binding all six to a
+base-valued `-icon` would have LIGHTENED four of them (danger 6.7:1 to 5.0:1,
+warning 8.7:1 to 5.0:1). That is why every `-icon` now resolves to its `-text`
+value instead: 3:1 is the floor an icon must clear, not the value it should
+take. See PR #373.
+
+### Not scanned
+
+Fills. A fill on an intent base is usually correct — the base IS the ground —
+and the role tokens do not cover it.
