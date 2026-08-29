@@ -210,6 +210,12 @@ const COMPOSED = [
       "the one thing that tells a keyboard user where they are. Of the 84 focus rules in the design system, 29 had NO affordance reaching WCAG 1.4.11's 3:1 \u2014 `.plus-input:focus` announced itself with a #84cfff border at 1.62:1, the AM/PM toggle and the file drop zone with an 8% primary tint at 1.13:1, four textarea states at 2.22:1, and six readonly fields with the same grey they wear at rest. axe cannot catch this: it has no focus-appearance rule, so `check:storybook` swept all 416 story files and reported none of it. A rule is scored on its STRONGEST affordance, which is the correction that made the check right \u2014 eleven rules pair a 1.13:1 glow with a 5.02:1 border, and there the border is the indicator. No ratchet and no exceptions: a ring nobody can see is a defect, not a vocabulary to migrate at leisure. Mutation-tested three ways: one ring reverted, the `--color-focus-ring` role deleted, and a stale exception left behind. 0.2s, measured 2026-08-29.",
   },
   {
+    script: 'check:icon-button-name',
+    pkg: 'root',
+    guards:
+      "a button that is only an icon still telling you what it does. 20 of them across the design system had no `aria-label`, no `title` and no text \u2014 a screen reader announces \"button\" and nothing else for a control that dismisses an alert, expands a lesson row or opens the session menu. axe reports 23 of these across the story suite, and the two populations overlap without either containing the other: axe counts RENDERED instances, so one component in a loop is many findings and a component nobody storied is none, where this counts SOURCE sites and sees the page nobody wrote a story for. Two of the 20 were not about names at all \u2014 `LessonsSpec` and `OnboardingSpec` call Button with `btnStyle`, `btnFill`, `label` and `icon`, none of which Button has, so those buttons were rendering EMPTY and the missing name was the symptom that surfaced it. No ratchet: the bar is zero and the exception map is empty. Mutation-tested three ways \u2014 a name removed, a stale exception, and `text=\"\"`, which an attribute-presence test reads as a name and which four real call sites are written with. 0.2s, measured 2026-08-29.",
+  },
+  {
     script: 'check:figma-colour-drift',
     pkg: 'root',
     guards:

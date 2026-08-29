@@ -170,6 +170,8 @@ const LessonsOverviewPage = ({
                                 fill={currentView === 'list' ? 'tonal' : 'ghost'}
                                 size="small"
                                 leadingVisual="list-ul"
+                                aria-label="List view"
+                                aria-pressed={currentView === 'list'}
                                 onClick={() => onViewToggle && onViewToggle('list')}
                             />
                             <Button
@@ -178,6 +180,8 @@ const LessonsOverviewPage = ({
                                 fill={currentView === 'grid' ? 'tonal' : 'ghost'}
                                 size="small"
                                 leadingVisual="table-cells-large"
+                                aria-label="Grid view"
+                                aria-pressed={currentView === 'grid'}
                                 onClick={() => onViewToggle && onViewToggle('grid')}
                             />
                         </div>

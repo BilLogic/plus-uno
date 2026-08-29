@@ -101,6 +101,8 @@ const UpdateAlert = ({ title, description, onClose }) => (
             </span>
         </div>
         <button
+            type="button"
+            aria-label="Dismiss alert"
             onClick={onClose}
             style={{
                 background: 'none',
@@ -142,6 +144,8 @@ const TimeWarningAlert = ({ onClose }) => (
             This session begins in <strong>less than 12 hours</strong>. Dropping now may leave students without enough tutors. Please think carefully before submitting your call-off request, as it <strong>may not be excused</strong> and could count toward your absences.
         </span>
         <button
+            type="button"
+            aria-label="Dismiss alert"
             onClick={onClose}
             style={{
                 background: 'none',

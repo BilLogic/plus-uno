@@ -138,9 +138,11 @@ const LessonsTable = ({
                                             <button
                                                 type="button"
                                                 className="lessons-table__toggle"
+                                                aria-label={`${isExpanded ? 'Hide' : 'Show'} details for ${lesson.title}`}
+                                                aria-expanded={isExpanded}
                                                 onClick={(e) => toggleRow(lessonId, e)}
                                             >
-                                                <i className={`fas fa-chevron-${isExpanded ? 'down' : 'right'}`} />
+                                                <i className={`fas fa-chevron-${isExpanded ? 'down' : 'right'}`} aria-hidden="true" />
                                             </button>
                                         )}
                                         <span className="body3-txt font-weight-semibold lesson-title">

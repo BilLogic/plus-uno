@@ -16,7 +16,7 @@
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | — |
-| `buttonText` | string | `"Dropdown"` | Text displayed on the dropdown toggle button |
+| `ariaLabel` | string | — | The toggle's accessible name. Needed whenever `buttonText` is an icon. |
 | `items` | arrayOf or shape or string or bool or number or func | `[]` | — |
 | `size` | enum | `"default"` | Button size |
 | `style` | enum | `"default"` | Trigger color style |

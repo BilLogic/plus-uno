@@ -12,6 +12,7 @@ const Dropdown = ({
     split = false,
     direction = "dropdown",
     className = "",
+    ariaLabel, // The toggle's accessible name, for a toggle whose `buttonText` is an icon
     isOpen: controlledIsOpen, // Optional controlled state
     onToggle, // Called with the next open state, controlled or not
     toggle // Optional custom toggle component
@@ -144,13 +145,22 @@ const Dropdown = ({
         ].filter(Boolean).join(' ');
 
         return (
+            /*
+             * The name. `buttonText` is a node, not a string, and four call
+             * sites pass an icon: `buttonText={<i className="fa-solid fa-gear" />}`.
+             * That renders a button a screen reader announces as "button" and
+             * nothing else — four of the 23 `button-name` violations axe found
+             * across the story suite. `ariaLabel` is how a caller names an
+             * icon-only toggle; the split case keeps its derived name, which
+             * only reads as anything when `buttonText` is a string.
+             */
             <button
                 type="button"
                 className={toggleClasses}
                 onClick={toggleDropdown}
                 aria-haspopup="true"
                 aria-expanded={show}
-                aria-label={split ? `${buttonText || 'Toggle'} options` : undefined}
+                aria-label={ariaLabel || (split ? `${typeof buttonText === 'string' ? buttonText : 'Toggle'} options` : undefined)}
             >
                 {!split && <span>{buttonText}</span>}
             </button>
@@ -259,7 +269,11 @@ const Dropdown = ({
 
 Dropdown.propTypes = {
     id: PropTypes.string,
-    buttonText: PropTypes.string,
+    /* A node, not just a string: four call sites pass an icon. That is what
+       makes `ariaLabel` necessary rather than decorative. */
+    buttonText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    /** The toggle's accessible name. Needed whenever `buttonText` is an icon. */
+    ariaLabel: PropTypes.string,
     items: PropTypes.arrayOf(PropTypes.shape({
         text: PropTypes.string,
         label: PropTypes.string,

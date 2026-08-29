@@ -49,6 +49,7 @@ const SupervisorControlsComponent = ({ isOpen = false, onToggle }) => {
     return (
         <div style={{ position: 'relative', display: 'inline-block' }}>
             <Dropdown
+                ariaLabel="Session actions"
                 buttonText={<i className="fa-solid fa-gear" style={{ fontSize: 'var(--font-size-fa-h6-solid)', color: 'var(--color-on-surface-variant)' }} />}
                 items={supervisorControlItems.map((item, index) => ({
                     ...item,
@@ -162,6 +163,7 @@ export const Overview = () => (
                 minHeight: 'var(--size-modal-min-height-sm)'
             }}>
                 <Dropdown
+                    ariaLabel="Session actions"
                     buttonText={<i className="fa-solid fa-gear" style={{ fontSize: 'var(--font-size-fa-h6-solid)', color: 'var(--color-primary)' }} />}
                     items={[
                         {
@@ -289,6 +291,7 @@ export const Interactive = () => {
                     minHeight: 'var(--size-modal-min-height-md)'
                 }}>
                     <Dropdown
+                        ariaLabel="Session actions"
                         buttonText={<i className="fa-solid fa-gear" style={{ fontSize: 'var(--font-size-fa-h6-solid)', color: 'var(--color-primary)' }} />}
                         items={[
                             {
@@ -327,6 +330,7 @@ export const Interactive = () => {
  */
 export const SupervisorControlsDropdown = ({ onJoinSession, onEditSession, onRecruitTutors, onCancelSession, ...props }) => (
     <Dropdown
+        ariaLabel="Session actions"
         buttonText={<i className="fa-solid fa-gear" style={{ fontSize: 'var(--font-size-fa-h6-solid)', color: 'var(--color-primary)' }} />}
         items={[
             {

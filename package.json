@@ -51,6 +51,7 @@
     "check:figma-scopes": "node scripts/check-figma-scopes.mjs",
     "check:intent-roles": "node scripts/check-intent-roles.mjs",
     "check:focus-ring": "node scripts/check-focus-ring.mjs",
+    "check:icon-button-name": "node scripts/check-icon-button-name.mjs",
     "benchmark:atlassian": "node scripts/check-atlassian-benchmark.mjs --table",
     "check:unspread-rest": "node scripts/check-unspread-rest.mjs",
     "check:page-outline": "node scripts/check-page-outline.mjs",
