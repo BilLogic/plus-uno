@@ -41,7 +41,7 @@ From `design-system/src/components/status-and-loading/Progress/Progress.scss`. O
 
 ## Related
 
-Same group: `Badge` · `Spinner` · `Tag` · `TagGroup`
+Same group: `Badge` · `BadgeVariants` · `Spinner` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

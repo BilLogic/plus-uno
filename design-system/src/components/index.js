@@ -3,6 +3,9 @@ import '../styles/main.scss';
 export { default as Accordion } from '@/components/layout-and-structure/Accordion';
 export { default as Alert } from '@/components/messaging/Alert';
 export { default as Badge } from '@/components/status-and-loading/Badge';
+// #276's Badge. A separate export through the deprecation period: 84 call sites
+// pass `size`, which that API removes. See BadgeVariants.jsx for why.
+export { default as BadgeVariants } from '@/components/status-and-loading/BadgeVariants';
 export { default as Breadcrumb } from '@/components/navigation/Breadcrumb';
 
 export { default as Button } from '@/components/actions/Button';

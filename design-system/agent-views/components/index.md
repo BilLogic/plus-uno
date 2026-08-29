@@ -8,11 +8,12 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
-## UI components (58)
+## UI components (59)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [Alert](../../src/components/messaging/Alert/index.md)
 - [Badge](../../src/components/status-and-loading/Badge/index.md)
+- [BadgeVariants](../../src/components/status-and-loading/BadgeVariants.md)
 - [Breadcrumb](../../src/components/navigation/Breadcrumb/index.md)
 - [Button](../../src/components/actions/Button/index.md)
 - [ButtonGroup](../../src/components/actions/ButtonGroup/index.md)
