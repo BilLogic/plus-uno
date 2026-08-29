@@ -85,17 +85,21 @@ test('ageInDays counts whole days and rejects nonsense', () => {
   assert.equal(ageInDays('not a date', NOW), null);
 });
 
-test('the seven intents all still carry the same shape the finding rests on', () => {
-  // The finding is "every intent names two roles and uses three". It stops being
-  // true the moment one intent grows a -border or -icon, which is the point: the
-  // ratchet above notices. This asserts the SHAPE the claim was measured on.
+test('the seven intents all still carry the same shape', () => {
+  // The finding this benchmark was written on was "every intent names two roles
+  // and uses three": nine tokens each — base, container, -text, six state
+  // overlays — and no -border or -icon. The role layer added those two, so the
+  // shape is eleven now and the ratchet rows sit at 7. What the assertion is
+  // for is unchanged: all seven must move TOGETHER. An intent that grows a role
+  // the others lack is a vocabulary that only some of the system can use.
   const tokens = ourTokens(REPO_ROOT);
   const intents = ['primary', 'secondary', 'tertiary', 'danger', 'success', 'warning', 'info'];
   for (const name of intents) {
     const own = tokens.filter((t) => t.startsWith(`--color-${name}-`) || t === `--color-${name}`);
-    assert.equal(own.length, 9, `${name} has ${own.length} tokens, not the shared 9`);
-    assert.ok(own.includes(`--color-${name}-text`), `${name} has no -text`);
-    assert.ok(own.includes(`--color-${name}-container`), `${name} has no -container`);
+    assert.equal(own.length, 11, `${name} has ${own.length} tokens, not the shared 11`);
+    for (const role of ['text', 'container', 'icon', 'border']) {
+      assert.ok(own.includes(`--color-${name}-${role}`), `${name} has no -${role}`);
+    }
   }
   assert.ok(INTENT.test('--color-warning-text'));
   assert.ok(!INTENT.test('--color-advocacy-text'), 'a subject colour is not an intent');

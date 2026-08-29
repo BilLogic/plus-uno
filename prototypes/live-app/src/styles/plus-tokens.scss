@@ -2,6 +2,8 @@
  * PLUS design tokens for the live-app replica.
  */
 @use '../../../../design-system/src/tokens/colors' as *;
+// Role layer — must follow colors; see design-system/src/tokens/_color_roles.scss.
+@use '../../../../design-system/src/tokens/color_roles' as *;
 @use '../../../../design-system/src/tokens/primitives' as *;
 @use '../../../../design-system/src/tokens/spacing_semantics' as *;
 @use '../../../../design-system/src/tokens/layout' as *;

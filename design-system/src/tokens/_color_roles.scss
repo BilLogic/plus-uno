@@ -1,0 +1,97 @@
+/**
+ * Intent colour ROLES — what each intent colour is FOR.
+ *
+ * HAND-MAINTAINED, ON PURPOSE. Every other file in this directory is written by
+ * `scripts/generate-all-tokens.js` from a Figma export. These are not exports:
+ * they are role names derived from values that already exist, and they carry a
+ * contrast argument that no Figma variable records. Keeping them in their own
+ * file means a future regeneration cannot delete them, and means nobody has to
+ * wonder which lines in `_colors.scss` were added by hand.
+ *
+ * WHAT WAS MISSING. All seven intents — primary, secondary, tertiary, danger,
+ * success, warning, info — carry the identical nine tokens: a base, a
+ * container, a `-text`, and six state overlays. That names two roles and uses
+ * three. There is no `--color-warning-border` and no `--color-warning-icon`, so
+ * an intent-coloured stroke or glyph reaches for the BASE, which is also the
+ * ground. `_colors.scss` even says so in a comment beside the value —
+ * "for borders/backgrounds" — which is a rule nothing can enforce.
+ *
+ * WHAT THE BASE ACTUALLY MEASURES. Contrast of each base against the five
+ * surface steps this system ships, `--color-surface-container-lowest` (#ffffff)
+ * through `-highest` (#e2e2e5):
+ *
+ *              lowest    low  container   high  highest
+ *   primary      5.28   4.77       4.55   4.31✗    4.08✗
+ *   secondary    7.04   6.35       6.06   5.74     5.44
+ *   tertiary     4.76   4.29✗      4.10✗  3.88✗    3.68✗
+ *   danger       6.46   5.83       5.56   5.27     5.00
+ *   success      6.48   5.85       5.58   5.29     5.01
+ *   warning      3.70✗  3.34✗      3.19✗  3.02✗    2.87✗
+ *   info         4.76   4.29✗      4.10✗  3.88✗    3.68✗   (aliases tertiary)
+ *
+ *   ✗ = below 4.5:1, the bar for text.
+ *
+ * So `--color-warning` fails as text on EVERY ground including white — that is
+ * #312 — `--color-tertiary` and `--color-info` fail on four of the five, and
+ * `--color-primary` fails on the two darkest. Every `--color-*-text` token, by
+ * contrast, clears 4.5:1 on all five (lowest ratio 6.70). And 108 declarations
+ * across this repository set a foreground from an intent base today.
+ *
+ * THE ROLES. An icon and a border are held to 3:1, not 4.5:1 — WCAG 1.4.11,
+ * non-text contrast — which is why Atlassian keep `color.icon` (23 tokens) and
+ * `color.border` (39) apart from `color.text` (49). Naming the role is what
+ * lets a value be chosen against the right bar and checked against it later.
+ *
+ * Six of the seven roles resolve to the base, because the base already clears
+ * 3:1 on all five grounds. They are still worth naming: `--color-danger-icon`
+ * says an icon was intended and 3:1 was the bar, where `--color-danger` says
+ * only "danger", and the two can diverge later without hunting call sites.
+ *
+ * WARNING IS THE EXCEPTION and the reason this file has values in it at all.
+ * The base falls to 2.87:1 on `--color-surface-container-highest`, under even
+ * the 3:1 bar, so warning's icon and border take #715c00 — which is not an
+ * invented colour: it is the value `_colors.scss` already names as "the actual
+ * warning color from Figma" and uses for the warning state layers. It measures
+ * 6.50:1 on white and 5.02:1 at its worst, clearing both bars everywhere.
+ *
+ * NOT DONE HERE. Nothing is repointed. These tokens have no users yet, so this
+ * file changes no pixel — it is the vocabulary that the 108 foreground uses can
+ * then be moved onto, one at a time, against a ratchet. The five SMART subject
+ * colours (advocacy, mastering-content, relationship, social-emotional,
+ * technology-tools) are deliberately out of scope: they are category colours
+ * rather than intents, and their bar is a separate question.
+ */
+
+:root {
+    /* Primary — base clears 3:1 on all five grounds (min 4.08). */
+    --color-primary-icon: var(--color-primary);
+    --color-primary-border: var(--color-primary);
+
+    /* Secondary — min 5.44. */
+    --color-secondary-icon: var(--color-secondary);
+    --color-secondary-border: var(--color-secondary);
+
+    /* Tertiary — min 3.68. Clears 3:1 everywhere; fails 4.5:1 on four of five,
+       which is why it is a role token and not a licence to use it as text. */
+    --color-tertiary-icon: var(--color-tertiary);
+    --color-tertiary-border: var(--color-tertiary);
+
+    /* Danger — min 5.00. */
+    --color-danger-icon: var(--color-danger);
+    --color-danger-border: var(--color-danger);
+
+    /* Success — min 5.01. */
+    --color-success-icon: var(--color-success);
+    --color-success-border: var(--color-success);
+
+    /* Warning — the one exception. The base (#9f8205) measures 2.87:1 on
+       --color-surface-container-highest, under the 3:1 non-text bar. #715c00 is
+       the Figma warning value already used by the warning state layers and
+       measures 5.02:1 at its worst. */
+    --color-warning-icon: #715c00;
+    --color-warning-border: #715c00;
+
+    /* Info — aliases tertiary, as every other info token does. */
+    --color-info-icon: var(--color-info);
+    --color-info-border: var(--color-info);
+}
