@@ -127,6 +127,12 @@ const COMPOSED = [
       "each registry mapping claiming what its Figma node actually IS, against a dated measurement in design-system/figma/node-types.json. The field is called componentSetNodeId and 15 of the 95 mapped nodes are not sets — 3 PAGEs and 12 plain COMPONENTs. `isComponentSet: false` is how an entry says so, and until this check nothing in the repo READ that field, so six entries carried it and seven that needed it did not. Also catches a mapping nobody has measured, a recording for a mapping that no longer exists, an id recorded against the wrong one of the two Figma files, and a link that opens on nothing.",
   },
   {
+    script: 'check:figma-snapshots',
+    pkg: 'root',
+    guards:
+      "the two Figma snapshots in scripts/ still describing the library: their capture dates against a 180-day ceiling, their declared totals against their own contents, their file key, and a floor under each so a snapshot that shrank silently is loud. #339's finding was that NOTHING watched these — the variables snapshot was five weeks behind a library that had gained seven variables it had never seen, and check:token-registry was green over every one of them, because it validates the snapshot against the SCSS and nothing validated the snapshot against Figma. The age is printed on every run, green or not.",
+  },
+  {
     script: 'check:skill-surfaces',
     pkg: 'root',
     guards:

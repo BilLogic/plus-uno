@@ -1,12 +1,12 @@
 {
-  "note": "Snapshot of every published variable in the PLUS Figma library, captured via the Figma MCP (figma.variables.getLocalVariablesAsync). Consumed by scripts/generate-token-registry.mjs to validate the Figma-variable -> CSS-token mapping. Refresh manually via the Figma MCP when the library's variables change (no npm task; the old snapshot:figma-variables script was never created).",
+  "note": "Snapshot of every variable in the PLUS Figma library, captured with figma.variables.getLocalVariableCollectionsAsync + getLocalVariablesAsync. Consumed by scripts/generate-token-registry.mjs to validate the Figma-variable -> CSS-token mapping, and held to a capture date by check:figma-snapshots. Refresh with `npm run audit:figma-variables`, which prints the script to run in Figma and says where the result goes.",
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "figmaFileName": "Design System - BS4 Foundation (Component LIbrary)",
-  "capturedAt": "2026-07-26",
-  "totalVariables": 334,
+  "capturedAt": "2026-08-29",
+  "totalVariables": 341,
   "byType": {
-    "COLOR": 196,
-    "FLOAT": 129,
+    "COLOR": 201,
+    "FLOAT": 131,
     "BOOLEAN": 8,
     "STRING": 1
   },
@@ -219,7 +219,12 @@
         "State-layers/surface-variant/opacity-0_16",
         "State-layers/surface/opacity-0_08",
         "State-layers/surface/opacity-0_12",
-        "State-layers/surface/opacity-0_16"
+        "State-layers/surface/opacity-0_16",
+        "Surface roles/surface-container",
+        "Surface roles/surface-default",
+        "Surface roles/surface-overlay",
+        "Surface roles/surface-raised",
+        "Surface roles/surface-sunken"
       ]
     },
     "size / layout": {
@@ -228,11 +233,14 @@
         "Large (1024px)",
         "X-Large (1440px)"
       ],
-      "note": "Responsive: three breakpoint modes. Code has no breakpoint-mode equivalent — see gaps in the generated registry.",
+      "note": "Responsive: three breakpoint modes. Code has no breakpoint-mode equivalent \u2014 see gaps in the generated registry.",
       "variables": [
         "Breakpoints/max width",
         "Breakpoints/min width",
         "Columns/col-1",
+        "Columns/col-10",
+        "Columns/col-11",
+        "Columns/col-12",
         "Columns/col-2",
         "Columns/col-3",
         "Columns/col-4",
@@ -241,9 +249,6 @@
         "Columns/col-7",
         "Columns/col-8",
         "Columns/col-9",
-        "Columns/col-10",
-        "Columns/col-11",
-        "Columns/col-12",
         "Display/hidden <= lg",
         "Display/hidden <= md",
         "Display/hidden <= xl",
@@ -255,7 +260,9 @@
         "Grid/columns",
         "Grid/content-gutter",
         "Grid/viewport-gutter",
-        "Grid/viewport-margin"
+        "Grid/viewport-margin",
+        "Min Heights/card-body",
+        "Min Heights/modal-body"
       ]
     },
     "size / primitive": {
@@ -264,34 +271,34 @@
       ],
       "variables": [
         "Border/Radius/radius-0",
-        "Border/Radius/radius-50",
         "Border/Radius/radius-100",
+        "Border/Radius/radius-1000",
         "Border/Radius/radius-150",
         "Border/Radius/radius-200",
         "Border/Radius/radius-300",
         "Border/Radius/radius-400",
-        "Border/Radius/radius-1000",
+        "Border/Radius/radius-50",
         "Border/Stroke/stroke-100",
         "Border/Stroke/stroke-150",
         "Border/Stroke/stroke-200",
         "Border/Stroke/stroke-250",
         "Border/Stroke/stroke-300",
-        "Spacing/Small/space-000",
-        "Spacing/Small/space-025",
-        "Spacing/Small/space-050",
-        "Spacing/Small/space-075",
-        "Spacing/Small/space-100",
-        "Spacing/Small/space-150",
-        "Spacing/Medium/space-200",
-        "Spacing/Medium/space-300",
-        "Spacing/Medium/space-400",
-        "Spacing/Medium/space-500",
+        "Spacing/Large/space-1000",
         "Spacing/Large/space-600",
         "Spacing/Large/space-650",
         "Spacing/Large/space-700",
         "Spacing/Large/space-800",
         "Spacing/Large/space-900",
-        "Spacing/Large/space-1000"
+        "Spacing/Medium/space-200",
+        "Spacing/Medium/space-300",
+        "Spacing/Medium/space-400",
+        "Spacing/Medium/space-500",
+        "Spacing/Small/space-000",
+        "Spacing/Small/space-025",
+        "Spacing/Small/space-050",
+        "Spacing/Small/space-075",
+        "Spacing/Small/space-100",
+        "Spacing/Small/space-150"
       ]
     },
     "size / semantics": {
