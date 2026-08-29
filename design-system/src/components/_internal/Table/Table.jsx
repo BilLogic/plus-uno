@@ -55,11 +55,29 @@ const Table = ({
                 {rows && rows.length > 0 && (
                     <tbody>
                         {rows.map((row, rowIndex) => (
+                            /*
+                             * NO `role="button"` ON A ROW. It used to be added
+                             * whenever `onRowClick` was passed, and it was
+                             * wrong twice over: it replaced the row's own
+                             * `row` semantics inside the table, and it made
+                             * every focusable cell a nested control — axe's
+                             * `nested-interactive`, 20 nodes on the tutor
+                             * training page alone.
+                             *
+                             * It also promised something it never delivered:
+                             * there was no `tabIndex` and no key handler, so
+                             * the row announced itself as a button that no
+                             * keyboard could press. Dropping the role loses
+                             * nothing that worked and restores the table
+                             * structure a screen reader navigates by. A row
+                             * that needs a keyboard action needs a real
+                             * control INSIDE a cell, which is where the ARIA
+                             * grid pattern puts it.
+                             */
                             <tr
                                 key={rowIndex}
                                 onClick={() => onRowClick && onRowClick(rowIndex)}
                                 style={onRowClick ? { cursor: 'pointer' } : undefined}
-                                role={onRowClick ? 'button' : undefined}
                             >
                                 {row.map((cell, cellIndex) => {
                                     const isObject = typeof cell === 'object' && cell !== null && !React.isValidElement(cell) && cell.content !== undefined;

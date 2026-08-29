@@ -49,10 +49,22 @@ const StrategyBadge = ({
 
     const config = typeConfig[type] || typeConfig['other'];
 
+    /*
+     * ARIA PROHIBITS NAMING A GENERIC ELEMENT. `aria-label` on a bare `div` is
+     * dropped by the accessibility tree, so the badge announced nothing at all
+     * — twelve stories reported `aria-prohibited-attr` for exactly this. The
+     * icon is the whole content when `showLabel` is false, which is what
+     * `role="img"` describes: a graphic with a text alternative.
+     *
+     * With the label VISIBLE there is nothing to add. The text says what the
+     * icon says, the icon is already `aria-hidden`, and a second name on the
+     * wrapper would have a screen reader read the type twice.
+     */
     return (
-        <div 
+        <div
             className={`strategy-badge ${className}`}
-            aria-label={`Content type: ${config.label}`}
+            role={showLabel ? undefined : 'img'}
+            aria-label={showLabel ? undefined : `Content type: ${config.label}`}
             {...props}
         >
             <i className={`fas ${config.icon}`} aria-hidden="true" />

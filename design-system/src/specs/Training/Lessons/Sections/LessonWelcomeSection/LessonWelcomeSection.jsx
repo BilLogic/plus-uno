@@ -5,7 +5,7 @@
  * Matches Figma design: 63-178182 ("Welcome Row")
  */
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/actions/Button';
 import Badge from '@/components/status-and-loading/Badge';
@@ -31,6 +31,8 @@ const LessonWelcomeSection = ({
 }) => {
     const [selectedTab, setSelectedTab] = useState(activeTab);
 
+    const tabRefs = useRef({});
+
     const handleTabClick = (tabId) => {
         setSelectedTab(tabId);
         if (onTabChange) {
@@ -38,18 +40,61 @@ const LessonWelcomeSection = ({
         }
     };
 
+    /*
+     * A ROVING TABINDEX NEEDS ARROW KEYS, or it is a cage.
+     *
+     * `role="tab"` with `tabIndex={-1}` on the unselected tabs is what the ARIA
+     * practices describe — one tab stop for the whole set — but only because
+     * the arrows do the moving inside it. Without this handler the roving
+     * tabindex would make two of the three tabs unreachable by keyboard, which
+     * is worse than the `aria-selected` on a plain button it replaced.
+     */
+    const handleTabKeyDown = (event) => {
+        const order = tabs.map((tab) => tab.id);
+        const current = order.indexOf(selectedTab);
+        const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+        let next = null;
+        if (step !== undefined) next = (current + step + order.length) % order.length;
+        else if (event.key === 'Home') next = 0;
+        else if (event.key === 'End') next = order.length - 1;
+        if (next === null) return;
+        event.preventDefault();
+        handleTabClick(order[next]);
+        // Selection follows focus, so the newly selected tab is where focus goes.
+        const node = tabRefs.current[order[next]];
+        if (node) node.focus();
+    };
+
     return (
         <section className={`lesson-welcome-section ${className}`} style={style}>
             <div className="lesson-welcome-section__container">
                 <div className="lesson-welcome-section__tabs-container">
-                    <div className="lesson-welcome-section__tabs">
+                    {/*
+                      * `aria-selected` IS NOT ALLOWED ON A BUTTON. It belongs to
+                      * roles that have a selected state — `tab`, `option`,
+                      * `row` — and axe reported `aria-allowed-attr` on all six
+                      * of these. The attribute was doing nothing: which tab was
+                      * current was a colour and an underline, and nothing else.
+                      *
+                      * The fix is the role the markup already means. A `tablist`
+                      * around `tab`s makes `aria-selected` legal AND meaningful,
+                      * and `aria-controls` points each tab at the panel it
+                      * shows, which is what a screen reader follows.
+                      */}
+                    <div className="lesson-welcome-section__tabs" role="tablist" aria-label="Lesson groups">
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
                                 type="button"
+                                role="tab"
+                                id={`lesson-welcome-tab-${tab.id}`}
+                                aria-controls="lesson-welcome-panel"
+                                ref={(node) => { tabRefs.current[tab.id] = node; }}
+                                onKeyDown={handleTabKeyDown}
                                 className={`lesson-welcome-section__tab ${selectedTab === tab.id ? 'lesson-welcome-section__tab--selected' : ''}`}
                                 onClick={() => handleTabClick(tab.id)}
                                 aria-selected={selectedTab === tab.id}
+                                tabIndex={selectedTab === tab.id ? 0 : -1}
                             >
                                 <span className="lesson-welcome-section__tab-text">
                                     {tab.label}
@@ -72,7 +117,12 @@ const LessonWelcomeSection = ({
                     <div className="lesson-welcome-section__divider" />
                 </div>
 
-                <div className="lesson-welcome-section__content">
+                <div
+                    className="lesson-welcome-section__content"
+                    id="lesson-welcome-panel"
+                    role="tabpanel"
+                    aria-labelledby={`lesson-welcome-tab-${selectedTab}`}
+                >
                     <div className="lesson-welcome-section__text">
                         <h2 className="lesson-welcome-section__title h2">
                             {title}
