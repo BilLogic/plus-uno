@@ -56,7 +56,7 @@ function DividerSizesDemos() {
     return (
         <section>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SIZES</span>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                 Dividers come in four thicknesses: sm (1px), md (1.5px), lg (2px), and xl (2.5px).
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -86,7 +86,7 @@ function DividerVariantsDemos() {
         <>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">STYLES</span>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                     Light style for standard backgrounds, dark style for light backgrounds.
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -102,7 +102,7 @@ function DividerVariantsDemos() {
             </section>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">OPACITY VARIANT</span>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                     Apply 10% opacity for subtle, less prominent separation.
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -125,7 +125,7 @@ function DividerLayoutDemos() {
         <>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CUSTOM WIDTH</span>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                     Set custom widths for specific layout needs.
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center' }}>
@@ -137,7 +137,7 @@ function DividerLayoutDemos() {
             </section>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">USE CASE EXAMPLE</span>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                     Dividers are commonly used to separate content sections.
                 </p>
                 <div style={{ padding: '16px', border: '1px solid var(--color-outline-variant)', borderRadius: '8px' }}>

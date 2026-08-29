@@ -91,7 +91,7 @@ export const Layout = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', width: '100%', maxWidth: '600px' }}>
         <section>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VERTICAL (DEFAULT)</span>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                 Content scrolls vertically once it exceeds maxHeight.
             </p>
             <div style={demoBox}>
@@ -102,7 +102,7 @@ export const Layout = () => (
         </section>
         <section>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">HORIZONTAL</span>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                 Wide content scrolls sideways with the same thin, tokenized scrollbar.
             </p>
             <div style={demoBox}>
@@ -117,7 +117,7 @@ export const Layout = () => (
 export const Content = () => (
     <div style={{ width: '100%', maxWidth: '600px' }}>
         <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">USE CASE EXAMPLE</span>
-        <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+        <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
             A list panel with the Design System scrollbar instead of the browser default.
         </p>
         <div style={{ ...demoBox, padding: 0 }}>

@@ -91,7 +91,7 @@ const createSlideContent = (text, bgColor) => (
         alignItems: 'center',
         justifyContent: 'center',
         fontSize: '2rem',
-        fontFamily: 'var(--font-family-lato)',
+        fontFamily: 'var(--font-family-header)',
         color: 'var(--color-on-surface)'
     }}>
         {text}
@@ -116,7 +116,7 @@ const createLabeledSlideContent = (text, bgColor, label, description) => (
             display: 'flex',
             alignItems: 'center',
             fontSize: '2rem',
-            fontFamily: 'var(--font-family-lato)',
+            fontFamily: 'var(--font-family-header)',
             textAlign: 'center'
         }}>
             {text}
@@ -132,16 +132,16 @@ const createLabeledSlideContent = (text, bgColor, label, description) => (
             <span style={{
                 fontSize: 'var(--font-size-h5)',
                 lineHeight: 'var(--font-line-height-h5)',
-                fontWeight: 'var(--font-weight-semibold)',
-                fontFamily: 'var(--font-family-lato)'
+                fontWeight: 'var(--font-weight-semibold-2)',
+                fontFamily: 'var(--font-family-header)'
             }}>
                 {label}
             </span>
             <span style={{
-                fontSize: 'var(--font-size-b1)',
-                lineHeight: 'var(--font-line-height-b1)',
+                fontSize: 'var(--font-size-body1)',
+                lineHeight: 'var(--font-line-height-body1)',
                 fontWeight: 'var(--font-weight-normal)',
-                fontFamily: 'var(--font-family-merriweather-sans)',
+                fontFamily: 'var(--font-family-body)',
                 color: 'var(--color-on-surface-variant)'
             }}>
                 {description}

@@ -42,11 +42,11 @@ export const Overview = () => (
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-ele-gap-xs)',
+                    gap: 'var(--size-element-gap-xs)',
                     maxWidth: '589px'
                 }}
             >
-                <div style={{ display: 'flex', gap: 'var(--size-spacing-space-050)' }}>
+                <div style={{ display: 'flex', gap: 'var(--size-spacing-small-space-050)' }}>
                     <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
                         Which supervisor did you speak with?
                     </span>
@@ -67,11 +67,11 @@ export const Overview = () => (
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-ele-gap-xs)',
+                    gap: 'var(--size-element-gap-xs)',
                     maxWidth: '589px'
                 }}
             >
-                <div style={{ display: 'flex', gap: 'var(--size-spacing-space-050)' }}>
+                <div style={{ display: 'flex', gap: 'var(--size-spacing-small-space-050)' }}>
                     <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
                         Which supervisor did you speak with?
                     </span>
@@ -106,11 +106,11 @@ export const Interactive = () => {
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-ele-gap-xs)',
+                    gap: 'var(--size-element-gap-xs)',
                     maxWidth: '589px'
                 }}
             >
-                <div style={{ display: 'flex', gap: 'var(--size-spacing-space-050)' }}>
+                <div style={{ display: 'flex', gap: 'var(--size-spacing-small-space-050)' }}>
                     <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
                         Which supervisor did you speak with?
                     </span>

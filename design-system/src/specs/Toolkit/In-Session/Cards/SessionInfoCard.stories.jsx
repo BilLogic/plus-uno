@@ -104,7 +104,7 @@ export const SessionInfoCard = ({
                         <i
                             className="fa-regular fa-copy"
                             style={{
-                                fontSize: 'var(--font-size-fa-b3-regular)',
+                                fontSize: 'var(--font-size-fa-body3-regular)',
                                 color: 'var(--color-primary)',
                                 cursor: 'pointer',
                             }}

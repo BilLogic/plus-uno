@@ -105,7 +105,7 @@ export const Interactive = {
                     padding: '24px',
                     backgroundColor: 'white',
                     borderRadius: '16px',
-                    boxShadow: 'var(--elevation-1)'
+                    boxShadow: 'var(--elevation-light-1)'
                 }}>
                     <h4 className="h4" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                         Filter Controls

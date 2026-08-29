@@ -30,7 +30,7 @@ const FilterWrapper = ({ label = "Call-Off Type", initialSelection = "This week"
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs, 4px)', width: '240px' }}>
             {label && (
-                <label className="body2-txt" style={{ color: 'var(--color-neutral-text-medium)' }}>
+                <label className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
                     {label}
                 </label>
             )}

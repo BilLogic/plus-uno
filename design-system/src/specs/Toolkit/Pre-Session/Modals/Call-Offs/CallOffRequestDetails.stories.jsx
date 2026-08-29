@@ -103,7 +103,7 @@ const ReasonDropdown = ({ value, onChange }) => (
             width: '100%'
         }}
     >
-        <div style={{ display: 'flex', gap: 'var(--size-spacing-space-050)' }}>
+        <div style={{ display: 'flex', gap: 'var(--size-spacing-small-space-050)' }}>
             <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
                 Reason for call-Off
             </span>
@@ -135,7 +135,7 @@ const AdditionalDetailsTextarea = ({ value, onChange }) => (
             width: '100%'
         }}
     >
-        <div style={{ display: 'flex', gap: 'var(--size-spacing-space-050)' }}>
+        <div style={{ display: 'flex', gap: 'var(--size-spacing-small-space-050)' }}>
             <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
                 Additional details
             </span>

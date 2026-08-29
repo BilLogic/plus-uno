@@ -47,7 +47,7 @@ export const EngagementListItems = ({
             >
                 {/* Opens the "reasons" submenu — the only item with a caret. */}
                 <span className="pdropdown-item-text">Partially engaged</span>
-                <i className="fa-solid fa-caret-right ms-2" style={{ fontSize: 'var(--font-size-fa-b2-solid)', color: 'var(--color-on-surface-variant)' }} />
+                <i className="fa-solid fa-caret-right ms-2" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--color-on-surface-variant)' }} />
             </button>
             <button
                 type="button"
@@ -85,7 +85,7 @@ export const EngagementSubmenuItems = ({
                             width: '12px', 
                             height: '12px', 
                             border: '1px solid var(--color-primary)', 
-                            borderRadius: 'var(--size-element-radius-xs)',
+                            borderRadius: 'var(--size-element-radius-sm)',
                             backgroundColor: selectedReason === reason.id ? 'var(--color-primary)' : 'var(--color-on-primary)',
                             display: 'inline-block',
                             position: 'relative'
@@ -109,7 +109,7 @@ export const EngagementSubmenuItems = ({
                     {reason.icon && (
                         <i 
                             className={`${reason.icon} ms-2`} 
-                            style={{ fontSize: 'var(--font-size-fa-b2-solid)', color: 'var(--color-on-surface-variant)' }}
+                            style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--color-on-surface-variant)' }}
                             title={reason.tooltip}
                         />
                     )}

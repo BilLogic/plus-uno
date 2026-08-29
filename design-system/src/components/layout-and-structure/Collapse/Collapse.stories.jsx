@@ -81,7 +81,7 @@ function CollapseBasicsDemos() {
         <>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT (UNCONTROLLED)</span>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                     Basic collapse that manages its own open/closed state internally.
                 </p>
                 <Collapse
@@ -100,7 +100,7 @@ function CollapseBasicsDemos() {
 
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INITIALLY OPEN</span>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                     Collapse that starts in the expanded state using <code>defaultOpen</code>.
                 </p>
                 <Collapse
@@ -124,7 +124,7 @@ function CollapseIconsDemos() {
     return (
         <section>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH ICONS</span>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                 Collapse triggers can include icons positioned left or right.
             </p>
             <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
@@ -159,7 +159,7 @@ function CollapseStateDemos() {
         <>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CONTROLLED MODE</span>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                     External state management using <code>isOpen</code> prop.
                 </p>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
@@ -174,7 +174,7 @@ function CollapseStateDemos() {
 
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MULTIPLE TARGETS</span>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                     Control multiple collapse sections independently or simultaneously.
                 </p>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
@@ -199,7 +199,7 @@ function CollapseLinkDemos() {
     return (
         <section>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LINK TRIGGER</span>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                 Use an anchor tag as the trigger instead of a button.
             </p>
             <Collapse

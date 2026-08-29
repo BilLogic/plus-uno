@@ -87,14 +87,14 @@ function AccordionVariantsDemos() {
         <>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT ACCORDION</span>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                     Standard accordion with borders and one item open at a time.
                 </p>
                 <Accordion items={sampleItems} defaultActiveKey="0" />
             </section>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FLUSH ACCORDION</span>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                     Borderless accordion for seamless integration with surrounding content.
                 </p>
                 <div style={{ border: '1px dashed var(--color-outline-variant)', padding: '0' }}>
@@ -110,14 +110,14 @@ function AccordionBehaviorDemos() {
         <>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ALWAYS OPEN (MULTIPLE EXPANDED)</span>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                     Multiple accordion items can be open simultaneously.
                 </p>
                 <Accordion items={sampleItems} defaultActiveKey={['0', '1']} alwaysOpen />
             </section>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ALL COLLAPSED</span>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                     Accordion with no default expanded item.
                 </p>
                 <Accordion items={sampleItems} />
@@ -130,7 +130,7 @@ function AccordionInteractionDemos() {
     return (
         <section>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH DISABLED ITEM</span>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                 Individual items can be disabled to prevent interaction.
             </p>
             <Accordion
@@ -149,7 +149,7 @@ function AccordionContentDemos() {
     return (
         <section>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">USING CHILDREN (ALTERNATIVE PATTERN)</span>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-neutral-text)' }}>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
                 Accordion supports both the <code>items</code> array prop and direct child components.
             </p>
             <Accordion defaultActiveKey="custom-1">

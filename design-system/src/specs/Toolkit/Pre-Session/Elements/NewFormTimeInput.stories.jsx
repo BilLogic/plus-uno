@@ -58,7 +58,7 @@ const SessionTimeInput = ({
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-spacing-space-050)',
+                gap: 'var(--size-spacing-small-space-050)',
                 alignItems: 'flex-start',
                 width: '100%',
             }}

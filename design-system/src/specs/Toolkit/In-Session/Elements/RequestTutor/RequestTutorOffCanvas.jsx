@@ -50,7 +50,7 @@ const NumberStepper = ({ value, min = 1, max = 5, onChange }) => {
                 cursor: disabled ? 'not-allowed' : 'pointer',
             }}
         >
-            <i className={`fa-solid fa-${icon}`} style={{ fontSize: 'var(--font-size-fa-b2-solid)' }} />
+            <i className={`fa-solid fa-${icon}`} style={{ fontSize: 'var(--font-size-fa-body2-solid)' }} />
         </button>
     );
     return (

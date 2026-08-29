@@ -439,7 +439,7 @@ export const FillInModalRow = ({
  * Shows all table states: default, hover, pressed
  */
 export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-xl)', padding: 'var(--size-spacing-space-400)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg)', padding: 'var(--size-spacing-medium-space-400)' }}>
         <section>
             <h5 className="h5 mb-4">Fill-In Table</h5>
             <p className="body2-txt mb-4" style={{ color: 'var(--color-on-surface-variant)' }}>
@@ -673,7 +673,7 @@ export const Interactive = () => {
                     onFillIn={() => handleFillIn(index)}
                 />
             ))}
-            <div style={{ marginTop: 'var(--size-spacing-space-400)', padding: 'var(--size-spacing-space-200)' }}>
+            <div style={{ marginTop: 'var(--size-spacing-medium-space-400)', padding: 'var(--size-spacing-medium-space-200)' }}>
                 <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
                     Filled in for: {filledInSessions.length} session(s)
                 </span>

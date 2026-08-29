@@ -12,7 +12,7 @@ export default {
 
 const LatenessBadge = ({ isLate = true }) => {
     if (!isLate) {
-        return <p className="body2-txt" style={{ color: 'var(--color-neutral-text-medium)', margin: 0 }}>-</p>;
+        return <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', margin: 0 }}>-</p>;
     }
 
     return (

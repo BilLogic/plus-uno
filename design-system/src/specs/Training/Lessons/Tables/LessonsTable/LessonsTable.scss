@@ -1,6 +1,6 @@
 .lessons-table-wrapper {
     width: 100%;
-    margin-bottom: var(--size-space-4);
+    margin-bottom: var(--size-spacing-medium-space-400);
 }
 
 .lessons-table {
@@ -94,7 +94,7 @@
 
             // Expanded state styling (Title row default highlight)
             &--expanded {
-                background-color: var(--color-on-surface-state-04);
+                background-color: var(--color-on-surface-state-08);
             }
 
             td {
@@ -129,7 +129,7 @@
                         transition: background-color 0.2s ease;
 
                         &:hover {
-                            background-color: var(--color-state-layer-hover);
+                            background-color: var(--color-on-surface-state-08);
                         }
                     }
 
@@ -201,6 +201,6 @@
     text-decoration: underline;
 
     &:hover {
-        color: var(--color-primary-variant);
+        color: var(--color-primary-text);
     }
 }

@@ -131,7 +131,7 @@ export const Overview = () => (
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--size-spacing-small-space-025)',
-            width: 'var(--size-columns-col-4)'
+            width: 'var(--col-4)'
         }}
     >
         <StatCard title="Card title" value="{#}" />
@@ -147,7 +147,7 @@ export const Overview = () => (
  * Isolated stat card component
  */
 export const StatsCardOnly = () => (
-    <div style={{ width: 'var(--size-columns-col-4)' }}>
+    <div style={{ width: 'var(--col-4)' }}>
         <StatCard title="Total Sessions" value="42" />
     </div>
 );
@@ -157,7 +157,7 @@ export const StatsCardOnly = () => (
  * Isolated session details component
  */
 export const SessionDetailsOnly = () => (
-    <div style={{ width: 'var(--size-columns-col-4)' }}>
+    <div style={{ width: 'var(--col-4)' }}>
         <SessionDetailsCard
             session="Hogwarts"
             dateTime="Mon, Sep 15 at 3:30 PM - 4:20 PM"

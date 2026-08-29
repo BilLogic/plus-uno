@@ -21,7 +21,7 @@ export default {
 const ModalHeader = () => (
     <div
         className="d-flex flex-column"
-        style={{ gap: 'var(--size-spacing-space-050)' }}
+        style={{ gap: 'var(--size-spacing-small-space-050)' }}
     >
         <div className="d-flex justify-content-between align-items-center">
             <span className="h4" style={{ margin: 0, color: 'var(--color-on-surface)' }}>
@@ -122,7 +122,7 @@ export const AttendanceLoadingLead = () => (
                         style={{
                             flex: '1 0 0',
                             minHeight: 0,
-                            gap: 'var(--size-spacing-spacer-1)',
+                            gap: 'var(--size-spacing-medium-space-200)',
                             position: 'relative',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -135,11 +135,11 @@ export const AttendanceLoadingLead = () => (
                                 flex: '1 0 0', height: '100%', opacity: 0,
                                 border: 'var(--size-element-border) solid var(--color-outline-variant)',
                                 borderRadius: 'var(--size-element-radius-lg)',
-                                padding: 'var(--size-spacing-space-200) var(--size-spacing-space-300)',
-                                gap: 'var(--size-spacing-space-200)',
+                                padding: 'var(--size-spacing-medium-space-200) var(--size-spacing-medium-space-300)',
+                                gap: 'var(--size-spacing-medium-space-200)',
                             }}
                         >
-                            <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-space-150)' }}>
+                            <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-small-space-150)' }}>
                                 <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>Tutor Roster</span>
                                 <Button text="Add tutor" style="primary" fill="outline" size="small" leadingVisual="user-plus" />
                             </div>
@@ -152,11 +152,11 @@ export const AttendanceLoadingLead = () => (
                                 flex: '1 0 0', height: '100%', opacity: 0,
                                 border: 'var(--size-element-border) solid var(--color-outline-variant)',
                                 borderRadius: 'var(--size-element-radius-lg)',
-                                padding: 'var(--size-spacing-space-200) var(--size-spacing-space-300)',
-                                gap: 'var(--size-spacing-space-200)',
+                                padding: 'var(--size-spacing-medium-space-200) var(--size-spacing-medium-space-300)',
+                                gap: 'var(--size-spacing-medium-space-200)',
                             }}
                         >
-                            <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-space-150)' }}>
+                            <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-small-space-150)' }}>
                                 <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>Student Roster</span>
                                 <Button text="Add Student" style="primary" fill="outline" size="small" leadingVisual="user-plus" />
                             </div>
@@ -237,7 +237,7 @@ export const AttendanceInitialLead = () => (
                                 gap: 'var(--size-card-gap-sm)',
                             }}
                         >
-                            <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-space-150)' }}>
+                            <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-small-space-150)' }}>
                                 <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>
                                     Tutor Roster
                                 </span>
@@ -264,7 +264,7 @@ export const AttendanceInitialLead = () => (
                                 overflow: 'auto',
                             }}
                         >
-                            <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-space-150)' }}>
+                            <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-small-space-150)' }}>
                                 <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>
                                     Student Roster
                                 </span>
@@ -348,7 +348,7 @@ export const AttendanceLoadedLead = () => (
                                 gap: 'var(--size-card-gap-sm)',
                             }}
                         >
-                            <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-space-150)' }}>
+                            <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-small-space-150)' }}>
                                 <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>
                                     Tutor Roster
                                 </span>
@@ -375,7 +375,7 @@ export const AttendanceLoadedLead = () => (
                                 overflow: 'auto',
                             }}
                         >
-                            <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-space-150)' }}>
+                            <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-small-space-150)' }}>
                                 <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>
                                     Student Roster
                                 </span>
@@ -508,13 +508,13 @@ export const AssignmentLoadingLead = () => (
                             }}
                         >
                             <div className="d-flex align-items-center justify-content-center" style={{ flexShrink: 0 }}>
-                                <i className="fa-solid fa-caret-up" style={{ fontSize: 'var(--font-size-fa-b3-solid)', color: 'var(--color-outline)' }} />
+                                <i className="fa-solid fa-caret-up" style={{ fontSize: 'var(--font-size-fa-body3-solid)', color: 'var(--color-outline)' }} />
                             </div>
                             <div className="d-flex" style={{ flex: '1 0 0', minHeight: 0, justifyContent: 'center', padding: '0 1px', width: '100%' }}>
                                 <div style={{ flex: '1 0 0', height: '30px', backgroundColor: 'var(--color-outline-variant)', borderRadius: '1px' }} />
                             </div>
                             <div className="d-flex align-items-center justify-content-center" style={{ flexShrink: 0 }}>
-                                <i className="fa-solid fa-caret-down" style={{ fontSize: 'var(--font-size-fa-b3-solid)', color: 'var(--color-outline)' }} />
+                                <i className="fa-solid fa-caret-down" style={{ fontSize: 'var(--font-size-fa-body3-solid)', color: 'var(--color-outline)' }} />
                             </div>
                         </div>
                     </div>
@@ -545,7 +545,7 @@ const AssignmentStudentRow = ({ name }) => (
         >
             {name}
         </span>
-        <Badge text="Joined" style="success" size="b3" trailingVisual={<i className="fa-solid fa-caret-down" style={{ fontSize: 'var(--font-size-fa-b3-solid)', color: 'var(--color-success-text)' }} />} />
+        <Badge text="Joined" style="success" size="b3" trailingVisual={<i className="fa-solid fa-caret-down" style={{ fontSize: 'var(--font-size-fa-body3-solid)', color: 'var(--color-success-text)' }} />} />
     </div>
 );
 
@@ -578,7 +578,7 @@ const AssignmentCard = ({ tutorName, studentCount, students }) => (
             <Badge
                 style="info"
                 size="b3"
-                leadingVisual={<i className="fa-solid fa-user-group" style={{ fontSize: 'var(--font-size-fa-b3-solid)', color: 'var(--color-secondary-text)' }} />}
+                leadingVisual={<i className="fa-solid fa-user-group" style={{ fontSize: 'var(--font-size-fa-body3-solid)', color: 'var(--color-secondary-text)' }} />}
                 text={String(studentCount)}
             />
         </div>
@@ -984,8 +984,8 @@ const RosterHeader = ({ title, count, showInfo = false }) => (
             <i
                 className="fa-solid fa-circle-info"
                 style={{
-                    fontSize: 'var(--font-size-fa-b3-solid)',
-                    lineHeight: 'var(--font-line-height-fa-b3-solid)',
+                    fontSize: 'var(--font-size-fa-body3-solid)',
+                    lineHeight: 'var(--font-line-height-fa-body3-solid)',
                     color: 'var(--color-on-surface-variant)',
                 }}
             />

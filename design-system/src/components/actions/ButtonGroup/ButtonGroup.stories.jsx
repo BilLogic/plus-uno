@@ -68,21 +68,21 @@ function ButtonGroupSizesDemos() {
         <section>
             <div style={{ display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-neutral-text)' }}>Small</span>
+                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)' }}>Small</span>
                     <ButtonGroup
                         size="small"
                         buttons={[{ text: 'Left' }, { text: 'Right' }]}
                     />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-neutral-text)' }}>Medium (Default)</span>
+                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)' }}>Medium (Default)</span>
                     <ButtonGroup
                         size="medium"
                         buttons={[{ text: 'Left' }, { text: 'Right' }]}
                     />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-neutral-text)' }}>Large</span>
+                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)' }}>Large</span>
                     <ButtonGroup
                         size="large"
                         buttons={[{ text: 'Left' }, { text: 'Right' }]}
@@ -98,13 +98,13 @@ function ButtonGroupLayoutDemos() {
         <section>
             <div style={{ display: 'flex', gap: '48px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-neutral-text)' }}>Horizontal</span>
+                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)' }}>Horizontal</span>
                     <ButtonGroup
                         buttons={[{ text: 'Left' }, { text: 'Center' }, { text: 'Right' }]}
                     />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-neutral-text)' }}>Vertical</span>
+                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)' }}>Vertical</span>
                     <ButtonGroup
                         vertical
                         buttons={[{ text: 'Top' }, { text: 'Middle' }, { text: 'Bottom' }]}
@@ -120,19 +120,19 @@ function ButtonGroupCountsDemos() {
         <section>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-neutral-text)', minWidth: '80px' }}>2 Buttons</span>
+                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)', minWidth: '80px' }}>2 Buttons</span>
                     <ButtonGroup buttons={[{ text: 'Left' }, { text: 'Right' }]} />
                 </div>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-neutral-text)', minWidth: '80px' }}>3 Buttons</span>
+                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)', minWidth: '80px' }}>3 Buttons</span>
                     <ButtonGroup buttons={[{ text: 'Left' }, { text: 'Center' }, { text: 'Right' }]} />
                 </div>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-neutral-text)', minWidth: '80px' }}>4 Buttons</span>
+                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)', minWidth: '80px' }}>4 Buttons</span>
                     <ButtonGroup buttons={[{ text: 'One' }, { text: 'Two' }, { text: 'Three' }, { text: 'Four' }]} />
                 </div>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-neutral-text)', minWidth: '80px' }}>5 Buttons</span>
+                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)', minWidth: '80px' }}>5 Buttons</span>
                     <ButtonGroup buttons={[{ text: 'One' }, { text: 'Two' }, { text: 'Three' }, { text: 'Four' }, { text: 'Five' }]} />
                 </div>
             </div>
@@ -157,7 +157,7 @@ function ButtonGroupUseCasesDemos() {
                             { trailingVisual: 'chevron-right', props: { 'aria-label': 'Next page' } }
                         ]}
                     />
-                    <span className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Pagination Controls</span>
+                    <span className="plus-body-2" style={{ color: 'var(--color-on-surface)' }}>Pagination Controls</span>
                 </div>
 
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
@@ -170,7 +170,7 @@ function ButtonGroupUseCasesDemos() {
                             { leadingVisual: 'underline', props: { 'aria-label': 'Underline' } }
                         ]}
                     />
-                    <span className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Text Formatting Toolbar</span>
+                    <span className="plus-body-2" style={{ color: 'var(--color-on-surface)' }}>Text Formatting Toolbar</span>
                 </div>
 
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
@@ -182,7 +182,7 @@ function ButtonGroupUseCasesDemos() {
                             { text: 'Month' }
                         ]}
                     />
-                    <span className="plus-body-2" style={{ color: 'var(--color-neutral-text)' }}>Toggle Selection</span>
+                    <span className="plus-body-2" style={{ color: 'var(--color-on-surface)' }}>Toggle Selection</span>
                 </div>
             </div>
         </section>

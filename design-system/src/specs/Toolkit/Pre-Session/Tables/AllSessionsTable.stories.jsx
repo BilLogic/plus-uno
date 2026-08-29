@@ -22,7 +22,7 @@ const ColumnHeader = ({ label, sortable = true, span = 1 }) => (
             alignItems: 'center',
             gap: 'var(--size-element-gap-sm)',
             padding: 'var(--size-table-cell-y) var(--size-table-cell-x)',
-            borderRadius: 'var(--size-border-radius-100)'
+            borderRadius: 'var(--size-border-radius-radius-100)'
         }}
     >
         <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)', textTransform: 'capitalize' }}>
@@ -32,7 +32,7 @@ const ColumnHeader = ({ label, sortable = true, span = 1 }) => (
             <i
                 className="fa-solid fa-arrow-up"
                 style={{
-                    fontSize: 'var(--font-size-fa-b1-solid)',
+                    fontSize: 'var(--font-size-fa-body1-solid)',
                     color: 'var(--color-on-surface-variant)'
                 }}
             />

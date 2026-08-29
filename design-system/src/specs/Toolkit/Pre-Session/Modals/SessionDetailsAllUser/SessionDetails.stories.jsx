@@ -537,7 +537,7 @@ export const FillIn_ReviewChoices = () => {
                 <i
                     className="fa-solid fa-arrow-up"
                     style={{
-                        fontSize: 'var(--font-size-fa-b1-solid)',
+                        fontSize: 'var(--font-size-fa-body1-solid)',
                         color: 'var(--color-on-surface)',
                     }}
                 />
@@ -556,7 +556,7 @@ export const FillIn_ReviewChoices = () => {
                 <i
                     className="fa-solid fa-arrow-up"
                     style={{
-                        fontSize: 'var(--font-size-fa-b1-solid)',
+                        fontSize: 'var(--font-size-fa-body1-solid)',
                         color: 'var(--color-outline-variant)',
                     }}
                 />

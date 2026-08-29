@@ -389,7 +389,7 @@ export const Interactive = () => {
                 <span className="body2-txt" style={{ color: 'var(--color-success)' }}>
                     Completed: <strong>{completedCount}</strong>
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--color-error)' }}>
+                <span className="body2-txt" style={{ color: 'var(--color-danger)' }}>
                     Incomplete: <strong>{incompleteCount}</strong>
                 </span>
             </div>
