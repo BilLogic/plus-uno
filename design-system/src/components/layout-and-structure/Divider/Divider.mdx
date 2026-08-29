@@ -95,4 +95,90 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Divider` to separate groups that space alone does not separate clearly
+enough — sections of a settings panel, the footer of a card from its body, a
+list of unlike things. It is a rule and a rule only: no text, no label, no
+padding of its own beyond its own height.
+
+`size` sets the thickness and accepts either the `sm`–`xl` names or the pixel
+strings that alias them, so `"1.5px"` and `"md"` are the same divider. `style`
+is `light` (`--color-outline-variant`) or `dark` (`--color-outline`); `width`
+takes any CSS length for a rule that does not span its container.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### `style` is a variant name, not inline CSS.
+
+```jsx
+// Incorrect — `style` is this component's light/dark prop. An object lands in
+// a class name and produces plus-divider-[object Object].
+<Divider style={{ marginBlock: 24 }} />
+
+// Correct — inline CSS goes through customStyles.
+<Divider style="dark" customStyles={{ marginBlock: 24 }} />
+```
+
+### Space is the first separator; a rule is the second.
+
+```jsx
+// Incorrect — a divider between every row turns a list into a grid and adds
+// nothing the spacing did not already say.
+{rows.map((r) => <><Row {...r} /><Divider /></>)}
+
+// Correct — separate the groups, not the members.
+<section>{rows.map((r) => <Row key={r.id} {...r} />)}</section>
+<Divider />
+<section>{others.map((r) => <Row key={r.id} {...r} />)}</section>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **It is decorative, and it is typed that way.** It renders as a `div`, not an
+  `hr`, so it is not announced as a separator and does not appear in any
+  landmark or heading list. Nothing is lost — the grouping should already be
+  carried by headings, lists or landmarks.
+- **If the split is meaningful, say so in the markup.** Two `section`s with
+  headings state the boundary to a screen reader; the rule states it to the eye.
+  Use both rather than either.
+- **It is never the only thing distinguishing two states.** A rule that appears
+  or thickens to mark a selection is invisible to anyone not looking at it.
+- **`opacity10` is a low-contrast mode by design.** At 10% opacity the rule is
+  under any contrast threshold. That is acceptable for a decorative divider and
+  not acceptable for anything carrying meaning.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a titled boundary between regions, give each region a heading; a divider
+  cannot label itself.
+- For separating the parts of a single surface, use `Card` — its own edges may
+  be all the separation the layout needs.
+- For a divider between navigation items, use `ListGroup` or `NavPills`, which
+  space and group their own items.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

@@ -62,7 +62,10 @@
  *     `var(--color-surface, #fff)` where it is `#f9f9fc`. Those fallbacks only
  *     ever paint when the token sheet failed to load, so they are a different
  *     defect — a wrong emergency colour, not a hand-picked one — and they need
- *     their own check, not a widening of this one.
+ *     their own check, not a widening of this one. They now have two:
+ *     `check:colour-fallbacks` and `check:size-fallbacks` (#268), which read
+ *     the same token sources this does. This limitation stays written down
+ *     because it is still true OF THIS CHECK; it is no longer unguarded.
  *  3. ANYTHING OUTSIDE A DECLARATION. Media-query preludes especially:
  *     `@media (min-width: 768px)` matches `--breakpoint-md-min` exactly, and is
  *     NOT a finding, because custom properties are invalid in a media prelude —

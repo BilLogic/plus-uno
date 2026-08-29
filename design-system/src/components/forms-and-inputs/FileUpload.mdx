@@ -96,4 +96,97 @@ The file upload component is used to select and upload files from a local device
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `FileUpload` where a form needs a document from the user — a report, an
+avatar, a signed form. It is a real `input type="file"` with the platform picker
+behind a styled button; it does not drag-and-drop and it does not upload.
+
+`acceptedFormats` does two jobs from one array: it becomes the input's `accept`
+filter and, unless you pass your own `description`, the line of help text under
+the label. `onChange` is the file input's own change event, so the files are at
+`event.target.files`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Nothing shows the chosen file. That is yours to render.
+
+```jsx
+// Incorrect — the button text never changes and the component shows no file
+// name, so after picking a file the form looks exactly as it did before.
+<FileUpload label="Report" onChange={handleFile} />
+
+// Correct.
+<FileUpload label="Report" onChange={(e) => setFile(e.target.files[0])} />
+{file && <p>{file.name}</p>}
+```
+
+### `label` should be a string here.
+
+```jsx
+// Incorrect — the label is also written to the input's aria-label, and a node
+// stringifies. The field ends up named "[object Object]".
+<FileUpload label={<span>Report <em>(PDF)</em></span>} />
+
+// Correct — put the qualification in the description, which is prose.
+<FileUpload label="Report" description="PDF, up to 10 MB." />
+```
+
+### `accept` is a filter, not a check.
+
+The picker offers the listed types first and every platform lets the user
+override it. Validate the file after it arrives — type, size, and count — and
+report it through `validation` and `validationMessage`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The control is a real file input.** The label points at it with `htmlFor`,
+  it takes the `accept` and `disabled` attributes, and it fires a genuine change
+  event. All the platform behaviour is intact.
+- **It is one control with two tab stops.** The input is hidden at zero size
+  rather than removed, so it stays in the tab order: the keyboard reaches the
+  invisible input first and the visible button second. Focusing either draws the
+  container's focus border, so the stop is at least visible — but it is two
+  stops, and Enter on the first opens the picker just as the second does.
+- **The description is not attached to the field.** It renders as a paragraph
+  with no id, so nothing points at it. Where the format rules must be announced
+  with the field, render them yourself with an id and pass `aria-describedby` —
+  extra props are forwarded to the input, so it lands on the right element.
+- **The validation message is not attached either.** Same shape: text after the
+  field, with no `aria-invalid` on the input.
+- **`required` marks the label only.** The asterisk is decorative — the input
+  carries no `required` attribute.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For text the user types rather than a file they hold, use `Input` or
+  `Textarea`.
+- For the outcome of an upload, use `Alert` for something the user must act on
+  and `Toast` for something they only need to know.
+- For progress while the file is going up, use `Progress`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

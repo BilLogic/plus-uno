@@ -2,7 +2,6 @@ import React, { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import './Popover.scss';
 import { Popover as BootstrapPopover, OverlayTrigger } from 'react-bootstrap';
-import Button from '@/components/actions/Button/Button';
 
 // Wrapper for the Popover content
 const PopoverContent = forwardRef(({
@@ -37,6 +36,7 @@ const Popover = ({
     onToggle, // Callback for controlled state
     container,
     offset = [0, 8],
+    rootClose,
     className = '',
     id,
     ...props
@@ -64,6 +64,21 @@ const Popover = ({
     } else {
         overlayTriggerProps.trigger = triggerType;
     }
+
+    /*
+     * #321. react-bootstrap's Overlay defaults `rootClose` to false, and this
+     * component used to pass no value and expose no way to set one — extra props
+     * are spread onto the overlay's CONTENT, not onto OverlayTrigger. So a click
+     * popover stayed open until the trigger was clicked a second time: no
+     * click-away, no Escape. Clicking away to dismiss is what a click popover is
+     * expected to do, and it is what Modal and Dropdown already do.
+     *
+     * Not defaulted on for `manual`: there the caller owns `show`, and a root
+     * close it did not ask for would fight its own state.
+     */
+    overlayTriggerProps.rootClose = rootClose !== undefined
+        ? rootClose
+        : triggerType !== 'manual';
 
     if (show !== undefined && triggerType !== 'manual') {
         overlayTriggerProps.show = show;
@@ -100,6 +115,8 @@ Popover.propTypes = {
     onToggle: PropTypes.func,
     container: PropTypes.any,
     offset: PropTypes.array,
+    /** Dismiss on a click outside. Defaults to true for every trigger but `manual`. */
+    rootClose: PropTypes.bool,
     className: PropTypes.string,
     id: PropTypes.string
 };

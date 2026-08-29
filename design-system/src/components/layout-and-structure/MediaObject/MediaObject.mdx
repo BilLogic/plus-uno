@@ -103,4 +103,106 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `MediaObject` for the repeating "picture beside text" row — a tutor with a
+photo and a bio, a resource with an icon and a description, a comment with an
+avatar. It is a layout, not a card: no border, no background, no padding of its
+own.
+
+`media` takes either a URL string, which is rendered as an `img`, or any node,
+which is rendered as given. `alignment` picks the side and the vertical
+alignment in one value: `left`, `left-center`, `left-bottom`, and the three
+`right` equivalents.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### A string `media` borrows its alt text from `heading`.
+
+```jsx
+// Incorrect — with a non-string heading there is no alt text to borrow, and
+// every such image is announced as "Media".
+<MediaObject media="/avatars/li.png" heading={<span>Li Wei</span>}>
+    Tutor, Mathematics
+</MediaObject>
+
+// Correct — a string heading becomes the alt text.
+<MediaObject media="/avatars/li.png" heading="Li Wei">
+    Tutor, Mathematics
+</MediaObject>
+
+// Also correct — pass the element yourself when the image needs its own alt,
+// or an empty one because the heading already says it.
+<MediaObject media={<img src="/avatars/li.png" alt="" />} heading={<span>Li Wei</span>}>
+    Tutor, Mathematics
+</MediaObject>
+```
+
+### `onClick` does not make it a control.
+
+```jsx
+// Incorrect — the handler is put on a div. It gets a pointer cursor and
+// nothing else: no focus, no Enter, no role.
+<MediaObject media={icon} heading="Session notes" onClick={open}>
+    Last edited yesterday
+</MediaObject>
+
+// Correct — put the control inside, where it can be one.
+<MediaObject media={icon} heading={<a href="/notes/12">Session notes</a>}>
+    Last edited yesterday
+</MediaObject>
+```
+
+### An inline `style` replaces the pointer cursor.
+
+The computed style is merged first and then overwritten by the one you pass, so
+a `MediaObject` with both `onClick` and `style` loses `cursor: pointer`. Set the
+cursor yourself in that case, or use the correct fix above and drop `onClick`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The heading is an `h6`.** Every media object emits the smallest heading
+  level regardless of where it sits. In a list of them that is consistent; in a
+  page outline it is a flat run at the bottom level. Pass a node if the outline
+  needs a different level.
+- **Reading order follows the DOM, not the side.** With a `right` alignment the
+  media renders after the text, so a screen reader hears the text first either
+  way. That is usually right — say so in the alt text if the image comes first
+  in meaning.
+- **Decorative media should say it is decorative.** Pass an `img` node with
+  `alt=""` rather than a URL string; a string always produces alt text, and alt
+  text on a decoration is noise.
+- **It is not a list.** Several media objects in a row are several divs. If they
+  are a set, wrap them in a `ul` and put each in an `li`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For the same row with a border, background and actions, use `Card`.
+- For a bordered, selectable or navigable set of rows, use `ListGroup`.
+- For a person's picture on its own, use `UserAvatar`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

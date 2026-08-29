@@ -140,4 +140,100 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Spinner` when the wait is short, indeterminate, and the user has nothing to
+do but wait — a submit in flight, a panel fetching on open. It says "working",
+and that is all it says.
+
+`variant` picks the animation: `border` and `grow` are the Bootstrap two,
+`growing`, `rotating` and `stacking` are drawn from blocks in CSS. `size` takes
+`sm` and nothing else. The colour is fixed at `--color-on-surface-variant` for
+every variant, deliberately — a spinner is not a status colour.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### The colour prop is swallowed on purpose.
+
+```jsx
+// Incorrect — color is destructured away and never reaches the DOM. Every
+// variant is --color-on-surface-variant, by design.
+<Spinner variant="border" color="primary" />
+
+// Correct — if a surface needs a different spinner colour, set it on the
+// element, not through a prop that does not exist.
+<Spinner variant="border" className="on-inverse-surface" />
+```
+
+### A spinner replaces the thing it is waiting on, or sits beside it.
+
+```jsx
+// Incorrect — the button resizes as the label is swapped for a spinner, and
+// the row jumps.
+<Button>{saving ? <Spinner size="sm" /> : 'Save'}</Button>
+
+// Correct — keep the label, put the spinner beside it, and disable.
+<Button disabled={saving}>
+    {saving && <Spinner size="sm" variant="border" />} Save
+</Button>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **It announces itself as a status.** `role="status"` is the default. The
+  `border` and `grow` variants carry a visually hidden "Loading…"; the three
+  custom variants carry `aria-label="Loading"`. Either way it has a name.
+- **A status region is only announced when it changes.** A spinner rendered into
+  a region that was already on the page is announced; one that arrives with a
+  whole new screen usually is not. If the wait matters, put the live region where
+  it will still be there afterwards and swap its contents.
+- **Say what is loading, if it is not obvious.** "Loading" beside a form is
+  fine. "Loading" as the only thing on a page is not — override the name with
+  the surrounding text or an `aria-label`.
+- **Reduced motion is only half handled.** Bootstrap slows `border` and `grow`
+  to a 1.5s cycle under `prefers-reduced-motion: reduce`. The `growing`,
+  `rotating` and `stacking` variants have no reduced-motion rule and animate at
+  full speed regardless. Prefer `border` where a user's motion preference should
+  be respected.
+- **Never make it the only feedback for a long wait.** After a few seconds a
+  spinner stops reading as "working" and starts reading as "stuck". Pair it with
+  text.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a wait whose length is known, use `Progress`. A determinate bar answers
+  "how much longer", which a spinner never can.
+- For content loading into a layout that already has a shape, use a skeleton —
+  it holds the shape and does not flash. A spinner is for when there is no shape
+  yet.
+- For a result once the wait ends, use `Alert` or `Toast`.
+- For a control that is busy rather than a region, disable the `Button` and put
+  the spinner inside it.
+- For a wait under about 300ms, show nothing. The spinner appears and vanishes
+  as a flicker, which reads as a glitch rather than as work.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

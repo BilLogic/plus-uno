@@ -95,4 +95,101 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Cascader` to pick one path down a shallow hierarchy where each level narrows
+the next — region then city, subject then topic. The columns are the point: the
+user sees where they are in the tree while they choose.
+
+`value` is the path as an array of values, root first, and `onChange` gives you
+the same. `options` takes strings or `{ text | label, value, children, disabled }`
+objects, nested by `children`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### `onChange` fires only on a leaf.
+
+```jsx
+// Choosing a branch opens the next column and reports nothing. Only an option
+// with no children commits the path and calls onChange — so a partial path is
+// not a value this component can return.
+<Cascader options={regions} value={path} onChange={setPath} />
+```
+
+If a branch is a legitimate answer, give it a child that says so ("All of
+Scotland"), rather than expecting the intermediate click to commit.
+
+### Label it the ordinary way.
+
+```jsx
+// `id` lands on the input (#323), so a label pointing at it names the field.
+<label htmlFor="region">Region</label>
+<Cascader id="region" options={regions} value={path} onChange={setPath} />
+
+// `aria-label` works too — extra props are forwarded to the same input.
+<Cascader aria-label="Region" options={regions} value={path} onChange={setPath} />
+```
+
+### A falsy option `value` falls through to the text.
+
+The value of an option is read as `option.value || option.text || option.label`,
+so `{ value: 0 }` and `{ value: '' }` resolve to the label instead. Use non-empty
+string values.
+
+### Hover previews; the keyboard walks.
+
+The columns preview on hover, which is a pointer convenience and not the only
+route: Down opens the menu, Up and Down walk a column, Right opens the child
+column and steps into it, Left goes back to the row that opened it, Enter
+commits a leaf, and Escape closes and returns focus to the field (#323).
+Disabled options are stepped over rather than landed on.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The trigger says what it opens.** `role="combobox"` with
+  `aria-haspopup="listbox"`, `aria-expanded`, and `aria-controls` naming the menu
+  while it is open.
+- **Each column is a named listbox.** The first is "Options"; the rest are named
+  for the row that opened them, so a screen-reader user hears which branch they
+  are inside rather than a second unnamed list.
+- **One tab stop, and it moves with you.** The open menu holds a single tab stop
+  on the cursor, so Tab leaves the menu rather than walking it — the arrow keys
+  are what walk it, which is the listbox contract.
+- **Escape closes it and gives focus back to the field.** So does choosing a
+  leaf. Nothing strands focus in a menu that is no longer there.
+- **Disabled options are skipped, not refused.** Arrow keys step over them, so a
+  keyboard user never lands somewhere that will not respond.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For the same hierarchy shown as one expanding tree, or for choosing more than
+  one branch, use `TreeSelect`.
+- For a flat list of options, use `Select`.
+- For a hierarchy the user browses rather than selects from, use `Accordion` or
+  `SidebarTab`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

@@ -101,4 +101,110 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Breadcrumb` when a page sits inside a hierarchy the user needs to see and
+climb — a student inside a cohort inside a programme, a lesson inside a unit. It
+answers two questions at once: where am I, and what is one level up.
+
+It takes a single `items` array, ordered root first. Each item is `{ text, href,
+onClick }`. The last item is the current page and is rendered as plain text; every
+item before it is a link.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### The last item is always the current page, whatever you pass it.
+
+```jsx
+// Incorrect — the href is dropped. The last item is rendered active
+// unconditionally, and an active item is plain text with aria-current="page",
+// never an anchor.
+<Breadcrumb items={[
+    { text: 'Cohorts', href: '/cohorts' },
+    { text: 'Autumn 2026', href: '/cohorts/a26' },
+]} />
+
+// Correct — the trail ends at where you are.
+<Breadcrumb items={[
+    { text: 'Cohorts', href: '/cohorts' },
+    { text: 'Autumn 2026' },
+]} />
+```
+
+### An item with `onClick` still needs an `href`.
+
+```jsx
+// Incorrect — with no href the item is rendered active, which means it is an
+// li rather than a link. The click handler still fires for a mouse, and is
+// unreachable by keyboard.
+<Breadcrumb items={[
+    { text: 'Cohorts', onClick: goToCohorts },
+    { text: 'Autumn 2026' },
+]} />
+
+// Correct — the href makes it a real, focusable link; onClick intercepts it
+// for the router. The component calls preventDefault for you.
+<Breadcrumb items={[
+    { text: 'Cohorts', href: '/cohorts', onClick: goToCohorts },
+    { text: 'Autumn 2026' },
+]} />
+```
+
+### `separator` takes a string, not a node.
+
+Despite the `node` prop type, the value is written into Bootstrap's breadcrumb
+divider custom property, and a custom property holds text. A string is quoted
+for you and works; a React element is stringified by CSS and disappears. Pass
+`'/'`, `'›'`, `'—'`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The landmark and the current page are handled.** It renders a `nav` around
+  an `ol`, and the last item carries `aria-current="page"`.
+- **Every breadcrumb on the page is named "breadcrumb".** That is React
+  Bootstrap's default label, and this component does not expose a way to change
+  it. One breadcrumb per page is the shape that works; two produce two landmarks
+  with the same name.
+- **Keep `text` short and literal.** It is the whole accessible name of the
+  link. "Autumn 2026" navigates; "here" does not.
+- **The separator is generated content.** It is a `::before` on each item after
+  the first, not text in the list. Browsers differ on whether they expose
+  generated content to assistive technology, so do not let the character carry
+  meaning — the `ol` structure is what states the nesting.
+- **`id` lands on the last item.** Not on the `nav`. If you need to point a
+  `aria-describedby` or a test at the trail as a whole, use `className`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For progress through a sequence of steps, use `Progress`. A breadcrumb is a
+  position in a tree, not a position in a flow.
+- For moving between sibling views, use `NavTabs` or `NavPills`.
+- For a persistent hierarchy the user browses rather than retraces, use `SidebarTab`.
+- When the hierarchy is one level deep, a single "Back to X" link says the same
+  thing with less furniture.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>
