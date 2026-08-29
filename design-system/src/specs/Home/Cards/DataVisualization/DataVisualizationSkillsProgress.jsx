@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Highcharts from 'highcharts';
+// The instance WITH the modules registered (#300). Importing `highcharts`
+// directly gives a second, bare instance, so anything this file drew that
+// needed a module series type was drawing on the wrong object.
+import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import Card from '@/components/layout-and-structure/Card';
 import NavTabs from '@/components/navigation/NavTabs';
