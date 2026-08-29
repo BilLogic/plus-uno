@@ -292,12 +292,12 @@ function main() {
   );
 
   // The population itself, so a selector that quietly stops matching is loud
-  // rather than green. 50 components + the one named exception — Tag and
-  // TagGroup took it from 48 in #276, which is the deliberate edit this number
+  // rather than green. 51 components + the one named exception — Tag and
+  // TagGroup took it from 48 in #276 and AiLabel added one in #269 — the deliberate edit this number
   // is here to force.
-  if (tabbed.length !== 51) {
+  if (tabbed.length !== 52) {
     found.push(
-      `expected 51 tabbed docs pages (50 components + ${TABBED_EXCEPTIONS.length} named ` +
+      `expected 52 tabbed docs pages (51 components + ${TABBED_EXCEPTIONS.length} named ` +
         `exception), found ${tabbed.length}. If a component was added or removed, ` +
         `update this number deliberately.`,
     );
