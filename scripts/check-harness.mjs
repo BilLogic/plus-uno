@@ -82,6 +82,12 @@ const COMPOSED = [
       'seven generated artifacts against the design-system SSOT (cheat sheet, component + forms index, component docs, INDEX.md, Figma component registry, token registry, knowledge audit). Names its own failing step.',
   },
   {
+    script: 'check:deps',
+    pkg: 'root',
+    guards:
+      "the two dependency questions a version bumper cannot ask. Dependabot (.github/dependabot.yml) says what is out of date; this says what is DEAD — declared, upgraded forever, imported nowhere — and what is real but UNDECLARED, because a CDN <link> is invisible to every dependency tool there is. Both were live: two packages with zero references anywhere, and FontAwesome loaded from two CDNs at two different MAJOR versions in one codebase.",
+  },
+  {
     script: 'check:deprecated-apis',
     pkg: 'root',
     guards:
