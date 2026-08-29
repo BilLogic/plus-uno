@@ -50,7 +50,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-primary` · `--color-on-surface` · `--color-on-surface-state-12` · `--color-on-surface-variant` · `--color-outline` · `--color-secondary-text` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-radius-md`
+`--color-on-surface` · `--color-on-surface-state-12` · `--color-on-surface-variant` · `--color-outline` · `--color-secondary-text` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-radius-md`
 
 From `design-system/src/components/actions/Button/Button.scss`. Override these through the token layer, never with a literal.
 

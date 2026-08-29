@@ -39,8 +39,20 @@
 
     // --- STATES ---
 
-    &:disabled,
-    &.disabled {
+    // `loading` is excluded from the DISABLED APPEARANCE on purpose (#264).
+    //
+    // Button.jsx sets `disabled={disabled || loading}` so a loading button is
+    // genuinely :disabled — it cannot be clicked and it announces as disabled,
+    // which is right. But inheriting the disabled LOOK repainted the ground to
+    // --color-on-surface-state-12 (near-white) and dimmed everything to 0.38,
+    // while the spinner below kept the variant's on-main colour: white on
+    // near-white at 38%, i.e. an empty grey box. Measured on the docs States
+    // demo before this change.
+    //
+    // A loading button therefore keeps its own ground, and the spinner is drawn
+    // on the colour it was designed against.
+    &:disabled:not(.plus-btn--loading),
+    &.disabled:not(.plus-btn--loading) {
         opacity: 0.38;
         pointer-events: none;
         cursor: not-allowed;
@@ -82,7 +94,20 @@
             border-right-color: transparent;
             border-radius: 50%;
             animation: spin 0.75s linear infinite;
-            color: var(--color-on-primary); // Fallback
+
+            // The fallback for a style with no entry in $btn-themes, which is
+            // NOT hypothetical: Button.jsx advertises 13 `style` values and the
+            // map below implements 8. The five category styles
+            // (social-emotional, mastering-content, advocacy, relationship,
+            // technology-tools) therefore render on the unthemed near-white
+            // ground, and the old fallback of --color-on-primary put a WHITE
+            // spinner on it — 1.04:1, measured across all 25 of their
+            // style x fill combinations.
+            //
+            // A themed style overrides this from its own block below, so this
+            // value only ever applies where the ground is the light default.
+            // The missing themes are a separate defect (#304).
+            color: var(--color-on-surface);
         }
     }
 
@@ -194,8 +219,8 @@ $btn-themes: (
             }
 
             // Disabled: neutral bg at 12%, secondary text color, NO border
-            &:disabled,
-            &.disabled {
+            &:disabled:not(.plus-btn--loading),
+            &.disabled:not(.plus-btn--loading) {
                 background-color: var(--color-on-surface-state-12);
                 border-color: transparent;
                 color: var(--color-secondary-text);
@@ -220,8 +245,8 @@ $btn-themes: (
             }
 
             // Disabled: neutral bg at 12%, on-surface-variant text
-            &:disabled,
-            &.disabled {
+            &:disabled:not(.plus-btn--loading),
+            &.disabled:not(.plus-btn--loading) {
                 background-color: var(--color-on-surface-state-12);
                 color: var(--color-on-surface-variant);
             }
@@ -244,8 +269,8 @@ $btn-themes: (
             }
 
             // Disabled: neutral outline border, on-surface text
-            &:disabled,
-            &.disabled {
+            &:disabled:not(.plus-btn--loading),
+            &.disabled:not(.plus-btn--loading) {
                 background-color: transparent;
                 border-color: var(--color-outline);
                 color: var(--color-on-surface);
@@ -270,8 +295,8 @@ $btn-themes: (
             }
 
             // Disabled: no bg/border, secondary text
-            &:disabled,
-            &.disabled {
+            &:disabled:not(.plus-btn--loading),
+            &.disabled:not(.plus-btn--loading) {
                 background-color: transparent;
                 border-color: transparent;
                 color: var(--color-secondary-text);
