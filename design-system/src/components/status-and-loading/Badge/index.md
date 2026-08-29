@@ -43,7 +43,7 @@ From `design-system/src/components/status-and-loading/Badge/Badge.scss`. Overrid
 
 ## Related
 
-Same group: `Progress` · `Spinner` · `Tag` · `TagGroup`
+Same group: `BadgeVariants` · `Progress` · `Spinner` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

@@ -32,7 +32,7 @@ From `design-system/src/components/status-and-loading/Tag/Tag.scss`. Override th
 
 ## Related
 
-Same group: `Badge` · `Progress` · `Spinner` · `TagGroup`
+Same group: `Badge` · `BadgeVariants` · `Progress` · `Spinner` · `TagGroup`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

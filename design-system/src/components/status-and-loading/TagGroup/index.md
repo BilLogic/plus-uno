@@ -38,7 +38,7 @@ From `design-system/src/components/status-and-loading/TagGroup/TagGroup.scss`. O
 
 ## Related
 
-Same group: `Badge` · `Progress` · `Spinner` · `Tag`
+Same group: `Badge` · `BadgeVariants` · `Progress` · `Spinner` · `Tag`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 
