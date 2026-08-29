@@ -36,10 +36,16 @@ const MediaObject = ({
         );
     };
 
+    /*
+     * #325. The spread goes BEFORE `style`, not after. With `{...props}` last,
+     * `props.style` replaced the merged object wholesale, so a MediaObject given
+     * both `onClick` and `style` lost its pointer cursor — the one visual cue
+     * that the row does anything.
+     */
     const styles = onClick ? { cursor: 'pointer' } : {};
 
     return (
-        <div className={containerClasses} onClick={onClick} style={{ ...styles, ...props.style }} {...props}>
+        <div className={containerClasses} onClick={onClick} {...props} style={{ ...styles, ...props.style }}>
             {!isRight && renderMedia()}
 
             <div className="media-body plus-media-body">

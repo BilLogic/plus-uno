@@ -16,6 +16,13 @@ const Progress = ({
     className = ''
 }) => {
     const percentage = Math.min(Math.max(((value - min) / (max - min)) * 100, 0), 100);
+    /*
+     * #325. The bar's width was clamped and the announced value was not, so a
+     * `value` above `max` drew a full bar while reporting a number greater than
+     * its own `aria-valuemax` — a state no assistive technology can make sense
+     * of. One clamp, both readings.
+     */
+    const boundedValue = Math.min(Math.max(value, min), max);
 
     const containerClasses = [
         'progress',
@@ -38,7 +45,7 @@ const Progress = ({
                 className={barClasses}
                 role="progressbar"
                 aria-label={label || 'Progress'}
-                aria-valuenow={value}
+                aria-valuenow={boundedValue}
                 aria-valuemin={min}
                 aria-valuemax={max}
                 style={{ width: `${percentage}%` }}

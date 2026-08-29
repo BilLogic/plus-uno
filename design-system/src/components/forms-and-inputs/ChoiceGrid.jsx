@@ -30,12 +30,18 @@ const ChoiceGrid = ({
                 // For radio, only one column can be selected per row
                 onChange(rowId, columnId);
             } else {
-                // For checkbox, multiple columns can be selected per row
-                const newValues = { ...values };
-                if (!newValues[rowId]) {
-                    newValues[rowId] = {};
-                }
-                newValues[rowId][columnId] = checked;
+                /*
+                 * #325. Copy the ROW as well as the top level. A spread of
+                 * `values` shares its row objects, so writing into
+                 * `newValues[rowId]` wrote into the object the caller passed in
+                 * — the previous state and the next one were the same object
+                 * one level down, which defeats an identity comparison and
+                 * silently rewrites history for anything holding the old value.
+                 */
+                const newValues = {
+                    ...values,
+                    [rowId]: { ...(values[rowId] || {}), [columnId]: checked },
+                };
                 onChange(newValues);
             }
         }
