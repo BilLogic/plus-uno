@@ -75,14 +75,33 @@
     /**
      * A card that lifts. Same fill as the page, by design; the shadow is what
      * raises it.
+     *
+     * LIGHT/2, NOT LIGHT/1. This shipped pointing at `--elevation-light-1` and
+     * that was wrong against a convention this repo already had written down:
+     * `design-system/guidelines/figma/token-mapping.md` assigns Light/1 to
+     * "subtle" and Light/2 to "cards, dropdowns", and the code agrees — the
+     * card pattern itself uses `--elevation-light-2`, with the mapping cited in
+     * the rule. A role layer whose whole job is to say which level a card gets
+     * cannot answer that differently from the document that already answered
+     * it. `scripts/check-elevation-roles.test.mjs` now reads both.
      */
     --surface-raised: var(--color-surface-container-lowest);
-    --surface-raised-shadow: var(--elevation-light-1);
+    --surface-raised-shadow: var(--elevation-light-2);
 
     /**
-     * Modals, popovers, dropdowns — anything that sits ON TOP of the UI rather
-     * than in it. A heavier shadow than `raised` because it is further away,
-     * which is the one place the five-step ramp earns its steps.
+     * Popovers and toasts — things that sit ON TOP of the UI rather than in it.
+     * Light/3, per the same mapping table.
+     *
+     * WHAT THIS ROLE DOES NOT COVER, said plainly because the first draft of it
+     * did and was wrong: MODALS. The mapping separates "popovers, toasts"
+     * (Light/3) from "modals" (Light/4) from "dialogs" (Light/5), and the modal
+     * pattern uses `--elevation-light-4` today. Atlassian collapses all of that
+     * into one `elevation.shadow.overlay`, and copying the collapse would throw
+     * away a distinction this system has already made and shipped. So the role
+     * layer stops here and modals keep naming their level directly; if the
+     * three-way split turns out not to earn itself, that is a #268 decision and
+     * deleting a distinction is the kind of change that should be decided
+     * rather than absorbed.
      */
     --surface-overlay: var(--color-surface-container-lowest);
     --surface-overlay-shadow: var(--elevation-light-3);

@@ -104,7 +104,7 @@ export const RoleModel = () => (
                 label="--surface-overlay"
                 fill="var(--surface-overlay)"
                 shadow="var(--surface-overlay-shadow)"
-                note="modals, popovers — paired with --surface-overlay-shadow"
+                note="popovers, toasts — paired with --surface-overlay-shadow. Modals name --elevation-light-4 directly."
             />
             <Swatch label="--surface-container" fill="var(--surface-container)" note="a neutral well inside a card" />
         </Grid>
@@ -129,6 +129,18 @@ RoleModel.play = async ({ canvasElement }) => {
     for (const shadow of ['--surface-raised-shadow', '--surface-overlay-shadow']) {
         await expect(resolve(shadow).length).toBeGreaterThan(0);
     }
+
+    // …and it ships with the RIGHT one. `raised` pointed at Light/1 when it
+    // shipped, against a mapping table this repo already had that assigns
+    // Light/2 to cards; a non-empty shadow was indistinguishable from a correct
+    // one, which is how that got through. The token-name agreement is checked
+    // in scripts/check-elevation-roles.test.mjs; here it is checked as VALUES,
+    // in a browser, which is the only place a `var()` chain actually resolves.
+    await expect(resolve('--surface-raised-shadow')).toBe(resolve('--elevation-light-2'));
+    await expect(resolve('--surface-overlay-shadow')).toBe(resolve('--elevation-light-3'));
+
+    // The overlay role stops short of modals on purpose — see _elevation.scss.
+    await expect(resolve('--surface-overlay-shadow')).not.toBe(resolve('--elevation-light-4'));
 
     // Every role is an ALIAS. Nothing here introduced a colour, so each one has
     // to equal the level token it points at — that is what "nothing deleted,
