@@ -205,3 +205,50 @@ take. See PR #373.
 
 Fills. A fill on an intent base is usually correct — the base IS the ground —
 and the role tokens do not cover it.
+
+## Type scale, incorporated — 2026-08-29
+
+The colour work put role variables into the library and eight proposal sets
+beside their originals. The type work had produced candidates and no component
+had been drawn at them. Four now are.
+
+**`DOC — Type scale candidates (#267)`** sits on the Typography page at
+(960, 1450) — the twelve current sizes, their eleven ratios, and the three
+options with spread measured on each: today 1.260, candidate A 1.065,
+candidate B 1.044, where a scale scores 1.000. Candidate A is drawn at every
+step from 28px to 83px so the run can be read rather than imagined.
+
+**Four `· candidate A (proposal)` sets** sit beside the four `Typography/*`
+sets, each a clone with every text node resized to candidate A's index-matched
+size. Line heights are percentages, so they follow the size and need no separate
+decision.
+
+| set | moves | holds |
+| --- | --- | --- |
+| Typography/Display | 80→83, 72→69, 64→57, 56→48 | — |
+| Typography/Headline | 32→33 | 40, 28 |
+| Typography/Title | 24→23, 20→19 | 16 |
+| Typography/Body | lead and blockquote 20→19 | seven at 16, one at 12 |
+
+**Nine of the nineteen variants move, and ten do not.** Every one that moves is
+a heading or a display size; nothing at 12, 14 or 16 is touched, which is the
+whole of candidate A's argument — those three sizes carry 76% of the type in the
+product (body2 54 direct `var()` uses, body3 52, body1 40, against 33 for every
+heading and display size combined).
+
+The largest single change is Display 4, 56px to 48px. That is candidate A's
+1.2 ratio meeting a display run that currently steps 1.143, 1.125 and 1.111 —
+the three tightest ratios in the system, sitting immediately above its widest.
+
+### One face that does not match its register
+
+`Typography/Display` `size=x-small` is set in **Open Sans Regular**. Every other
+Display, Headline and Title variant is Lato; every Body variant is Merriweather
+Sans. It is the only place in the type system where the face changes WITHIN a
+register.
+
+The code agrees with it rather than contradicting it —
+`--font-family-display4: "Open Sans", sans-serif` while display1, display2 and
+display3 all alias `--font-family-header`. So this is not a drift to reconcile;
+it is a design question nothing has asked out loud. Recorded, not changed: a
+face is Bill's call.
