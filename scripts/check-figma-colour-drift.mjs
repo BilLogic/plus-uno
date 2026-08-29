@@ -45,15 +45,6 @@ const KNOWN = [
       'alone and only the comparison shows the split. Success containers ship in ' +
       'Badge, Alert and the lesson tables; whichever side moves, they move.',
   },
-  {
-    token: '--color-scrim',
-    figma: '#000000@0.32',
-    css: '#000000@0.38',
-    why:
-      'The CSS scrim is 19% more opaque than the designed one. It sits behind every ' +
-      'Modal and Drawer, so the difference is visible on every overlay in the product ' +
-      'and changing it is a look decision rather than a token repair.',
-  },
 ];
 
 const recording = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, RECORDING), 'utf8'));
