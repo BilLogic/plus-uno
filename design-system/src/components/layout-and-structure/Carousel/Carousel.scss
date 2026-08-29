@@ -8,8 +8,15 @@
 
 .plus-carousel-playpause {
     position: absolute;
-    left: var(--size-element-pad-x-md, 10px);
-    bottom: var(--size-element-pad-y-md, 10px);
+    /*
+     * A 10px inset, and it has to come from a token that IS 10px. The element
+     * pad ramp is 12px on x and 6px on y, so `-md` on both axes was writing
+     * `10px` as a fallback beside two tokens that are neither — the control sat
+     * 12px in and 6px up, asymmetrically, and the literal made it read square.
+     * Caught by check:size-fallbacks (#336).
+     */
+    left: var(--size-spacing-small-space-150, 10px);
+    bottom: var(--size-spacing-small-space-150, 10px);
     z-index: 2;
     display: inline-flex;
     align-items: center;
