@@ -9,6 +9,9 @@
 // Use @use to include :root blocks and CSS rules (modern Sass syntax)
 // Import token files directly to ensure :root blocks are included
 @use "../tokens/colors" as *;
+// Hand-maintained role layer; see the header of _color_roles.scss. Must follow
+// colors, since most of it aliases values defined there.
+@use "../tokens/color_roles" as *;
 @use "../tokens/primitives" as *;
 @use "../tokens/spacing_semantics" as *;
 @use "../tokens/layout" as *;

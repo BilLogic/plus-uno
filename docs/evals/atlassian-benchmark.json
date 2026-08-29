@@ -48,8 +48,8 @@
   "ours": {
     "note": "OUR side of the comparison, recorded 2026-08-29 so the enforced rows have a starting point. Only the four ARGUED rows are recorded \u2014 see ROWS in scripts/atlassian-benchmark.mjs, where each direction carries its reason. Re-record with `npm run benchmark:atlassian -- --update` AFTER a move in the argued direction; it refuses a backwards one.",
     "recordedAt": "2026-08-29",
-    "intent.borderTokens": 0,
-    "intent.iconTokens": 0,
+    "intent.borderTokens": 7,
+    "intent.iconTokens": 7,
     "type.sizeSteps": 44,
     "type.lineHeights": 46
   }
