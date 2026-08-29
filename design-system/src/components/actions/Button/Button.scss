@@ -187,7 +187,26 @@ $btn-themes: (
     'warning': ('--color-warning', '--color-on-warning', '--color-warning-state-08', '--color-warning-text', '--color-warning-container', '--color-on-warning-container'),
     'danger': ('--color-danger', '--color-on-danger', '--color-danger-state-08', '--color-danger-text', '--color-danger-container', '--color-on-danger-container'),
     'info': ('--color-info', '--color-on-info', '--color-info-state-08', '--color-info-text', '--color-info-container', '--color-on-info-container'),
-    'default': ('--color-surface-container-high', '--color-on-surface', '--color-surface-container-state-08', '--color-on-surface', '--color-surface-container', '--color-on-surface')
+    'default': ('--color-surface-container-high', '--color-on-surface', '--color-surface-container-state-08', '--color-on-surface', '--color-surface-container', '--color-on-surface'),
+
+    // The five category styles (#304). `Button.jsx` has advertised all thirteen
+    // in its `oneOf` since it was written, while this map implemented eight — so
+    // `style="advocacy"` rendered the unthemed near-white ground in every state,
+    // measured at 1.04:1 across all 25 of its style x fill combinations.
+    //
+    // WHY ADDING THEM RATHER THAN NARROWING THE PROP, which #304's acceptance
+    // allows equally: `Badge` already ships all twelve of the same vocabulary,
+    // each with its own colour, measured. Narrowing here would leave two
+    // components in one design system disagreeing about what the vocabulary IS —
+    // `<Badge style="advocacy">` pink and `<Button style="advocacy">` not a
+    // thing. Badge is also the working precedent that these tokens render.
+    //
+    // No new tokens: every one of the thirty slots below already existed.
+    'social-emotional': ('--color-social-emotional', '--color-on-social-emotional', '--color-social-emotional-state-08', '--color-social-emotional-text', '--color-social-emotional-container', '--color-on-social-emotional-container'),
+    'mastering-content': ('--color-mastering-content', '--color-on-mastering-content', '--color-mastering-content-state-08', '--color-mastering-content-text', '--color-mastering-content-container', '--color-on-mastering-content-container'),
+    'advocacy': ('--color-advocacy', '--color-on-advocacy', '--color-advocacy-state-08', '--color-advocacy-text', '--color-advocacy-container', '--color-on-advocacy-container'),
+    'relationship': ('--color-relationship', '--color-on-relationship', '--color-relationship-state-08', '--color-relationship-text', '--color-relationship-container', '--color-on-relationship-container'),
+    'technology-tools': ('--color-technology-tools', '--color-on-technology-tools', '--color-technology-tools-state-08', '--color-technology-tools-text', '--color-technology-tools-container', '--color-on-technology-tools-container')
 );
 
 // --- VARIANTS (Fill Types) ---

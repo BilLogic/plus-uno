@@ -10,7 +10,12 @@
 
     /* common font families*/
     --font-family-header: "Lato";
-    --font-family-body: "Merriweather Sans", "Open Sans", "sans-serif";
+    /* `sans-serif` UNQUOTED. A quoted generic is not the generic keyword — it is a
+       family name, and nothing is called that, so the chain simply ended. Measured
+       in the docs iframe at 40px: `"sans-serif"` renders 222.27px wide against
+       `sans-serif`'s 171.13px, and identically to `serif`. If both faces failed to
+       load, body text fell through to the browser default, which is a serif. */
+    --font-family-body: "Merriweather Sans", "Open Sans", sans-serif;
 
     /*font weights*/
     --font-weight-normal: 300;
@@ -151,7 +156,12 @@
     /* 142.9% = 20px / 14px */
     --font-weight-code: var(--font-weight-normal);
     /* 300 */
-    --font-family-code: "Source Code Pro", sans-serif;
+    /* `monospace`, not `sans-serif`. A monospace token whose fallback is
+       proportional loses every code block's alignment the moment the face fails
+       to load. Measured: this stack resolved 171.13px where `monospace` is
+       480.08px, so the fallback was not merely a different mono face — it was
+       not monospaced at all. */
+    --font-family-code: "Source Code Pro", monospace;
 
     /*Fontawesome (icons)*/
     /* Font Awesome Solid */
