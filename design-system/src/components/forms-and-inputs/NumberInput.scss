@@ -11,6 +11,22 @@
     gap: var(--size-element-gap-sm, 8px);
 }
 
+// `showLabel={false}` hides the label, it does not delete it (#318) — the same
+// rule and the same treatment as `.plus-input-label-hidden`. Absolute
+// positioning takes it out of flow, so the field lays out exactly as it did
+// when the label was absent.
+.plus-number-input-label-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 .plus-number-input-label {
     margin-bottom: 0;
     color: var(--color-on-surface);

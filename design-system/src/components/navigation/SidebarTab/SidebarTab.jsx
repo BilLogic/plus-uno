@@ -72,8 +72,27 @@ const SidebarTab = ({
             id={id}
             className={`plus-sidebar-tab plus-sidebar-tab--${state} ${className}`}
             onClick={!disabled ? onClick : undefined}
+            /*
+             * #320. Enter and Space activate a `button` ELEMENT; they do not
+             * activate `role="button"`. Without this handler the row was
+             * announced as a button, took a tab stop, and did nothing when
+             * pressed — every row of a sidebar reachable and none openable.
+             * Space is prevented so the page does not scroll under the press.
+             */
+            onKeyDown={!disabled && onClick ? (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    onClick(event);
+                }
+            } : undefined}
             role="button"
             aria-disabled={disabled || undefined}
+            /*
+             * #320. Which section you are in was a background colour and
+             * nothing else. `aria-current="page"` is what says it to anyone
+             * not looking at the colour.
+             */
+            aria-current={isSelected ? 'page' : undefined}
             tabIndex={disabled ? -1 : 0}
             style={{
                 display: 'flex',

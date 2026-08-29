@@ -40,8 +40,16 @@ const Carousel = ({
                 />
             ) : (
                 <div className="plus-carousel-content">
-                    {/* if content is HTML string, we might need dangerouslySetInnerHTML or just render if it's node */}
-                    {React.isValidElement(slide.content) ? slide.content : <div dangerouslySetInnerHTML={{ __html: slide.content }} />}
+                    {/*
+                      * #316. A non-element `content` renders as TEXT, never as markup.
+                      * `slides` is a public prop, so anything a caller pipes through it —
+                      * a review body, an API description — used to be written into the DOM
+                      * with `dangerouslySetInnerHTML`, which is an injection. React escapes
+                      * a string child; a caller who genuinely holds trusted HTML can pass
+                      * their own `dangerouslySetInnerHTML` element as `content` and own
+                      * that decision explicitly.
+                      */}
+                    {slide.content}
                 </div>
             )}
 
