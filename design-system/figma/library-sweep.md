@@ -252,3 +252,31 @@ The code agrees with it rather than contradicting it —
 display3 all alias `--font-family-header`. So this is not a drift to reconcile;
 it is a design question nothing has asked out loud. Recorded, not changed: a
 face is Bill's call.
+
+## Colour candidates, rendered — 2026-08-29
+
+`DOC — Colour candidates (#312 / #268)` on the Color page was **text only**. It
+described three warning candidates and an info candidate in prose, gave their
+ratios as numbers, and pointed at Storybook for the visuals — so in the tool
+where the decision is actually made, the candidates could not be SEEN.
+
+Both defects are now drawn from the same values the prose names, appended to the
+frame rather than replacing anything:
+
+| | ground | label | measured |
+| --- | --- | --- | --- |
+| A — keep the yellow, use the ink | #9f8205 | #231b00 | 4.62:1 |
+| B — darken the yellow, keep white | #876f04 | #ffffff | 4.88:1 |
+| C — what ships today | #9f8205 | #ffffff | **3.70:1, fails AA** |
+
+And the info defect as three chips: `--color-info` and `--color-tertiary` side
+by side, which measure **1.00:1 against each other** because one is an alias of
+the other, beside the Info Bold candidate at #203eb6 (8.66:1 on white, and
+1.64:1 against primary where primary against tertiary today is 1.11:1).
+
+The two identical chips are the point. A reader can argue with a sentence
+saying two tokens hold the same value; they cannot argue with two swatches that
+look the same.
+
+Nothing was replaced and no variable was minted. The five `_Proposal/`
+candidates already in `colors / accent` are unchanged.
