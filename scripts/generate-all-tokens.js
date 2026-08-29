@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
+import { compare, refusals } from './token-generation.mjs';
+
 /**
  * Convert RGB to hex/rgba
  */
@@ -583,36 +585,76 @@ function validateSemanticTokens(scssContent, filename) {
 
 
 // Generate all files
+//
+// EVERY FILE IS BUILT IN MEMORY FIRST. This used to write each one as it was
+// produced, immediately below a warning that said generation was "DISABLED to
+// protect existing tokens" — a `console.warn` with no return and no exit, so
+// the protection it announced did not exist. One run on 2026-08-29 took
+// `_colors.scss` from 195 colour tokens to 5 and reported success. See
+// `scripts/token-generation.mjs` for the rule and the measurement.
 console.log('Generating token SCSS files...');
 
-console.warn('⚠️  WARNING: Source JSON files are incomplete. Token generation is DISABLED to protect existing tokens.');
-console.warn('⚠️  Please export full token JSONs from Figma (with all variables resolved) before re-enabling.');
+const OUT_DIR = 'design-system/src/tokens';
+const built = [
+    { file: '_colors.scss', generated: generateColorsSCSS() },
+    { file: '_primitives.scss', generated: generatePrimitivesSCSS() },
+    { file: '_spacing_semantics.scss', generated: generateSemanticsSCSS() },
+    { file: '_layout.scss', generated: generateLayoutSCSS() },
+].map((entry) => ({
+    ...entry,
+    committed: fs.existsSync(path.join(OUT_DIR, entry.file))
+        ? fs.readFileSync(path.join(OUT_DIR, entry.file), 'utf8')
+        : '',
+}));
 
-const colorsSCSS = generateColorsSCSS();
-fs.writeFileSync('design-system/src/tokens/_colors.scss', colorsSCSS);
-console.log('✅ Generated design-system/src/tokens/_colors.scss');
+const comparisons = compare(built);
+const refused = refusals(comparisons);
+const force = process.argv.includes('--force');
+const dryRun = process.argv.includes('--dry-run');
 
-const primitivesSCSS = generatePrimitivesSCSS();
-fs.writeFileSync('design-system/src/tokens/_primitives.scss', primitivesSCSS);
-console.log('✅ Generated design-system/src/tokens/_primitives.scss');
+for (const c of comparisons) {
+    const delta = c.after - c.before;
+    const sign = delta > 0 ? `+${delta}` : `${delta}`;
+    console.log(`   ${c.file.padEnd(24)} ${String(c.before).padStart(4)} -> ${String(c.after).padStart(4)} (${sign})`);
+}
 
-const semanticsSCSS = generateSemanticsSCSS();
-fs.writeFileSync('design-system/src/tokens/_spacing_semantics.scss', semanticsSCSS);
-console.log('✅ Generated design-system/src/tokens/_spacing_semantics.scss');
+if (refused.length && !force) {
+    console.error('\n❌ Refusing to write. A generator may not shrink the thing it generates.\n');
+    for (const line of refused) console.error(`   ${line}`);
+    console.error(
+        '\n   The source JSONs under design-system/src/tokens/source/ no longer\n' +
+        '   resolve to the full library — export them from Figma with every\n' +
+        '   variable resolved, then run this again. Nothing was written.\n' +
+        '\n   `--force` writes anyway, and is for a deliberate REMOVAL of tokens.\n' +
+        '   It is not the way past an incomplete export.\n',
+    );
+    process.exit(1);
+}
 
-// Validate semantic tokens
-// const validationErrors = validateSemanticTokens(semanticsSCSS, '_spacing_semantics.scss');
-// if (validationErrors.length > 0) {
-//     console.error('\n❌ Validation errors:');
-//     validationErrors.forEach(error => console.error(`  - ${error}`));
-//     console.error('\nError: Primitive tokens should not be used in semantic token files!');
-//     process.exit(1);
-// }
+if (dryRun) {
+    console.log('\n--dry-run: nothing written. No file would lose a token.');
+    process.exit(0);
+}
 
-const layoutSCSS = generateLayoutSCSS();
-fs.writeFileSync('design-system/src/tokens/_layout.scss', layoutSCSS);
-console.log('✅ Generated design-system/src/tokens/_layout.scss');
+for (const { file, generated } of built) {
+    fs.writeFileSync(path.join(OUT_DIR, file), generated);
+    console.log(`✅ Generated ${OUT_DIR}/${file}`);
+}
+
+if (refused.length && force) {
+    console.warn(`\n⚠️  --force: wrote anyway, deleting ${refused.length} file(s) worth of tokens.`);
+}
 
 console.log('\n✅ All token files generated successfully!');
-console.log('✅ Validation passed: No primitive tokens found in semantic files');
+/*
+ * `validateSemanticTokens` is still not run — see the commented-out block above.
+ * This line used to read "✅ Validation passed: No primitive tokens found in
+ * semantic files", printed unconditionally beside a validation that had been
+ * commented out, which is a claim rather than a result. The validation would
+ * report 48 findings today: `_spacing_semantics.scss` uses `--size-spacing-*`
+ * throughout, which is the pattern it forbids. Turning it on means deciding
+ * whether that pattern is wrong or the rule is; neither is decided here, and
+ * neither is served by printing that it passed.
+ */
+console.log('ℹ️  Semantic-token validation is DISABLED (48 known findings). Not run, not passed.');
 
