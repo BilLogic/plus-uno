@@ -217,6 +217,18 @@ Use for font sizes, weights, and line heights.
 --font-weight-semibold-1
 --font-weight-semibold-2
 --font-weight-title
+--type-blockquote
+--type-body1
+--type-body2
+--type-body3
+--type-code
+--type-h1
+--type-h2
+--type-h3
+--type-h4
+--type-h5
+--type-h6
+--type-lead
 ```
 
 ## Color Tokens

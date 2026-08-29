@@ -9,7 +9,11 @@
     --font-line-height-160: 160%;
 
     /* common font families*/
-    --font-family-header: "Lato";
+    /* `sans-serif` on the end, for the same reason as the body stack (#314).
+       A single quoted family name is not a fallback chain: if Lato fails to
+       load, every heading in the system falls through to the browser default,
+       which is a serif. Body and code were fixed; this one was missed. */
+    --font-family-header: "Lato", sans-serif;
     /* `sans-serif` UNQUOTED. A quoted generic is not the generic keyword — it is a
        family name, and nothing is called that, so the chain simply ended. Measured
        in the docs iframe at 40px: `"sans-serif"` renders 222.27px wide against
@@ -474,4 +478,73 @@ h6,
     font-size: var(--font-size-blockquote);
     font-weight: var(--font-weight-blockquote);
     line-height: var(--font-line-height-blockquote);
+}
+/**
+ * ─── THE COMPOSITE LAYER (#267) ─────────────────────────────────────────────
+ *
+ * Everything above names ONE AXIS of a type style. A register is currently four
+ * independent picks — `--font-size-h5`, `--font-line-height-h5`,
+ * `--font-weight-headline`, `--font-family-header` — and nothing binds them.
+ * Three of the four have no `h5` in the name at all, so "what is h5?" is
+ * answered by reading the rule that happens to use them together.
+ *
+ * Measured against `@atlaskit/tokens` 16.9.0, read from the published package:
+ * Atlassian's entire active type surface is FOURTEEN tokens, and each one is a
+ * complete `font` shorthand — `normal 653 32px/36px "Atlassian Sans", …`. You
+ * cannot take their size without their line-height, because there is nothing
+ * there to take. We ship 122 font tokens and 44 size names for 14 distinct
+ * pixel values.
+ *
+ * WHAT THE GAP IS NOT. #267 recorded that our steps wander (×1.111 to ×1.400)
+ * and framed that as the difference. Measuring Atlassian corrected it: theirs
+ * wander too — 32→28 is ×1.143, 20→16 is ×1.250 — and theirs works anyway.
+ * The difference is COUNT and COUPLING. So this layer couples; it does not
+ * re-scale anything, and no value below is new.
+ *
+ * WHY COUPLING IS THE PART THAT MATTERS. When a value can be picked
+ * independently, it gets picked wrongly and nothing notices: #336 measured 454
+ * dimension fallbacks in this repository that disagree with their own token.
+ * A register you cannot half-use is a register that cannot half-drift.
+ *
+ * NOTHING IS REMOVED. Every `--font-size-*`, `--font-weight-*` and
+ * `--font-line-height-*` above still exists and still works. These sit beside
+ * them so the two can be compared before either is preferred — see
+ * `Foundations/Type registers`.
+ *
+ * THE `font` SHORTHAND RESETS what it does not name — `font-style`,
+ * `font-variant`, `font-stretch` return to their initial values. That is
+ * standard CSS and it is the point: a composite is the WHOLE register, so a
+ * style leaking in from a parent is a bug rather than a feature.
+ *
+ * DISPLAY IS DELIBERATELY ABSENT. `display1`–`display4` are 80/72/64/56px, and
+ * three of their four family tokens (`--font-family-display1/2/3`) are dead —
+ * referenced nowhere. Minting composites for them would make four sizes look
+ * supported that #267 is still deciding the fate of. Atlassian's largest text
+ * is 32px.
+ */
+:root {
+    /* Headings — `--font-weight-headline` (700) on `--font-family-header`. */
+    --type-h1: 700 var(--font-size-h1) / var(--font-line-height-h1) var(--font-family-header);
+    --type-h2: 700 var(--font-size-h2) / var(--font-line-height-h2) var(--font-family-header);
+    --type-h3: 700 var(--font-size-h3) / var(--font-line-height-h3) var(--font-family-header);
+    --type-h4: 700 var(--font-size-h4) / var(--font-line-height-h4) var(--font-family-header);
+    --type-h5: 700 var(--font-size-h5) / var(--font-line-height-h5) var(--font-family-header);
+    --type-h6: 700 var(--font-size-h6) / var(--font-line-height-h6) var(--font-family-header);
+
+    /* Body — `--font-weight-normal` (300) on `--font-family-body`. */
+    --type-body1: 300 var(--font-size-body1) / var(--font-line-height-body1) var(--font-family-body);
+    --type-body2: 300 var(--font-size-body2) / var(--font-line-height-body2) var(--font-family-body);
+    --type-body3: 300 var(--font-size-body3) / var(--font-line-height-body3) var(--font-family-body);
+
+    /*
+     * `lead` and `blockquote` are both 20px, and so is `h5`. Three registers,
+     * one size — the same shape as `info`/`tertiary` in #312. They are kept
+     * distinct here because their WEIGHTS differ (300 / 400 / 700), which is
+     * the argument for keeping all three; #267 is where the decision lives, and
+     * the composite makes the overlap visible rather than deciding it.
+     */
+    --type-lead: var(--font-weight-lead) var(--font-size-lead) / var(--font-line-height-lead) var(--font-family-body);
+    --type-blockquote: var(--font-weight-blockquote) var(--font-size-blockquote) / var(--font-line-height-blockquote) var(--font-family-body);
+
+    --type-code: var(--font-weight-code) var(--font-size-code) / var(--font-line-height-code) var(--font-family-code);
 }
