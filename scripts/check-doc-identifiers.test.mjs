@@ -303,6 +303,14 @@ test('a constant declared in another module stays unresolved rather than empty',
   assert.equal(namedEnumValues(source, 'SIZES'), null);
 });
 
+test('an array this cannot read comes back null, never an empty list', () => {
+  // `[]` would mean "no legal value" and fail every correct page on the five
+  // props that name their enum. Both ways of failing to read one end at `null`.
+  assert.equal(namedEnumValues("const X = ['a]b'];", 'X'), null, 'a value holding a `]`');
+  assert.equal(namedEnumValues('const X = [];', 'X'), null, 'an array with nothing in it');
+  assert.deepEqual(namedEnumValues("const $X = ['a'];", '$X'), ['a'], '`$` is escaped, not an anchor');
+});
+
 test('a sub-component assignment is read with the symbol it points at', () => {
   const subs = parseSubComponents('ListGroup.Item = ListGroupItem;\n', 'ListGroup');
   assert.deepEqual(subs, [{ name: 'Item', impl: 'ListGroupItem' }]);

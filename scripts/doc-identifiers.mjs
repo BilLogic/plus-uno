@@ -423,19 +423,27 @@ function dedupe(list, key) {
  * those pages: `<Tag variant="removable">` and `<Tag color="chartreuse">` both
  * passed a full green run in #276.
  *
- * SAME FILE ONLY. A constant imported from another module is not followed —
- * that needs module resolution, and a value half-resolved to an empty list
- * would fail every correct page rather than no page. Unresolved stays `null`,
- * which is the behaviour that was already there.
+ * SAME FILE ONLY, AND NEVER AN EMPTY LIST. A constant imported from another
+ * module is not followed — that needs module resolution. Anything this cannot
+ * read returns `null`, meaning "not checked", which is the behaviour that was
+ * already there. It must never return `[]`: that reads as "no legal value" and
+ * would fail every correct page on the five props below rather than no page.
+ * The two ways to get there are an import, and an array whose contents this
+ * regex mis-slices — a value containing a `]`, say — so both end at `null`.
  *
  * @param {string} source The component's source text.
  * @param {string} name The constant's identifier.
- * @returns {string[] | null} The string values, or `null` if it is not declared here.
+ * @returns {string[] | null} The string values, or `null` when it cannot be read here.
  */
 export function namedEnumValues(source, name) {
-  const decl = new RegExp(`(?:export\\s+)?const\\s+${name}\\s*=\\s*\\[([^\\]]*)\\]`).exec(source);
+  // `name` reaches here from a `[A-Za-z_$][\w$]*` match, so `$` is the one
+  // regex metacharacter it can carry — and an unescaped `$` is an anchor, which
+  // silently matches nothing.
+  const escaped = name.replace(/\$/g, '\\$');
+  const decl = new RegExp(`(?:export\\s+)?const\\s+${escaped}\\s*=\\s*\\[([^\\]]*)\\]`).exec(source);
   if (!decl) return null;
-  return [...decl[1].matchAll(/'([^']*)'|"([^"]*)"/g)].map((v) => v[1] ?? v[2]);
+  const values = [...decl[1].matchAll(/'([^']*)'|"([^"]*)"/g)].map((v) => v[1] ?? v[2]);
+  return values.length ? values : null;
 }
 
 /** `<Name>.propTypes = { ... }` → [{ name, enumValues }]. */
