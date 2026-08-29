@@ -134,6 +134,12 @@ const COMPOSED = [
       "the negation ratchet — the density of five imperative-ban tokens (never / don't / do not / cannot / must not) not climbing, over TWO scopes ratcheted separately from one baseline file: the bundled harness docs and, since #174, the hand-authored IDE-side docs (the `embodiment: ide` complement of the bundled set within the bundler's own section roots, so docs/adr/ and the generated .claude/skills/ surfaces are out by structure). It counts PROHIBITION TOKENS, not negation as written: the two differ by roughly 3x and #234 chose the narrow, unarguable one on the evidence. Each scope also refuses to run against fewer docs than its baseline was recorded over — a ratchet only fails on a RISE, so a corpus that vanished otherwise passes with a smaller number. The script header carries the measurement.",
   },
   {
+    script: 'check:button-contrast',
+    pkg: 'root',
+    guards:
+      "every combination Button's `$btn-themes` map GENERATES — 8 styles x 5 fills — rather than the ones a story happens to render. `check:storybook`'s a11y ratchet measures the DOM, and nothing renders a filled `warning` button, so a 3.70:1 label sat in the map unseen for the life of it (#312). It also asserts no two styles resolve to the same filled ground: `--color-info` is `var(--color-tertiary)`, so two names render one appearance, and no accessibility tool compares token values for equality because none knows they were meant to differ. Both current findings are colour-token decisions (#268) rather than Button's, so they are ratcheted in `docs/evals/button-contrast-baseline.json` — which may shrink and never grow, and reports an entry that has stopped failing.",
+  },
+  {
     script: 'check:token-collision',
     pkg: 'root',
     guards:
