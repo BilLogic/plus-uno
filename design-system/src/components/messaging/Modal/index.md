@@ -19,6 +19,7 @@ Universal modal component for creating dialog windows that overlay the main cont
 |------|------|---------|-------------|
 | `id` | string | — | — |
 | `title` | string | — | — |
+| `ariaLabel` | string | — | The dialog's accessible name when it has no visible `title`. |
 | `body` | string or node | — | — |
 | `type` | enum | `'default'` | Modal type |
 | `showBottomButtons` | bool | `true` | Show bottom buttons |

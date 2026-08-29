@@ -112,12 +112,13 @@ const TutorModal = ({
             centered
             size="lg"
             className={`tutor-modal tutor-modal--${mode} ${className}`}
+            aria-labelledby="tutor-modal-title"
             {...props}
         >
             <div className="tutor-modal__container">
                 {/* Header */}
                 <div className="tutor-modal__header">
-                    <h3 className="h4 tutor-modal__title">
+                    <h3 className="h4 tutor-modal__title" id="tutor-modal-title">
                         {mode === 'add' ? 'Add a new tutor:' : (tutor.name || 'Amelia Blue')}
                     </h3>
                     <button

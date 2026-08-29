@@ -22,9 +22,16 @@ export const ResourceType = ({
     const iconName = iconMap[type] || iconMap['pdf'];
 
     return (
-        <div 
+        /*
+         * `role="img"` because the content is an icon and nothing else, and
+         * because `aria-label` on a role-less `div` is PROHIBITED by ARIA —
+         * dropped from the accessibility tree, leaving the type visible to
+         * sighted users only.
+         */
+        <div
             id={id}
             className={`plus-resource-type plus-resource-type--${type} ${className}`}
+            role="img"
             aria-label={`Resource type: ${type}`}
         >
             <div className="plus-resource-type-icon">

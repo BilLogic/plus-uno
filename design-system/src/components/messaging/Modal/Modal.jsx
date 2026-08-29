@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import PropTypes from 'prop-types';
 import BootstrapModal from 'react-bootstrap/Modal';
 import Button from '@/components/actions/Button';
@@ -76,8 +76,20 @@ const Modal = ({
     className = '',
     style,
     children,
+    ariaLabel,
     'data-testid': dataTestId,
 }) => {
+    /*
+     * A DIALOG WITHOUT A NAME. react-bootstrap renders `role="dialog"
+     * aria-modal="true"` and nothing else, so a screen reader announced
+     * "dialog" and stopped — six stories reported `aria-dialog-name`. The
+     * title was right there in the markup, unreferenced.
+     *
+     * `useId` rather than a counter or the caller's `id`: the id has to be
+     * unique per instance and stable across renders, and `id` is optional on
+     * this component.
+     */
+    const titleId = useId();
     // Set padding and gap based on type if not explicitly provided
     const effectivePaddingSize = paddingSize || ((type === 'scrollable' && showBottomButtons) ? 'md' : 'sm');
     const effectiveGapSize = gapSize || ((type === 'scrollable' && showBottomButtons) ? 'md' : 'sm');
@@ -108,7 +120,7 @@ const Modal = ({
             {!bodyOnly && (
                 <>
                     <div className="plus-modal-header">
-                        {title && <div className="plus-modal-title h5">{title}</div>}
+                        {title && <div className="plus-modal-title h5" id={titleId}>{title}</div>}
                         <button
                             type="button"
                             className={`plus-modal-close-btn ${closeBtnClass}`}
@@ -200,6 +212,8 @@ const Modal = ({
             restoreFocus={restoreFocus}
             contentClassName="plus-bootstrap-modal-content-reset"
             dialogClassName="plus-bootstrap-modal-dialog-reset"
+            aria-labelledby={title ? titleId : undefined}
+            aria-label={title ? undefined : ariaLabel}
         >
             {modalContent}
         </BootstrapModal>
@@ -209,6 +223,8 @@ const Modal = ({
 Modal.propTypes = {
     id: PropTypes.string,
     title: PropTypes.string,
+    /** The dialog's accessible name when it has no visible `title`. */
+    ariaLabel: PropTypes.string,
     body: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     type: PropTypes.oneOf(['default', 'scrollable']),
     showBottomButtons: PropTypes.bool,

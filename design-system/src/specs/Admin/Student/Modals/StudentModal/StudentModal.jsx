@@ -72,17 +72,24 @@ const StudentModal = ({
     };
 
     return (
+        /*
+         * The dialog's name. react-bootstrap renders `role="dialog"` and
+         * nothing to name it, so this modal announced itself as "dialog" —
+         * two of the eight `aria-dialog-name` findings. The student's name is
+         * already the heading; this points the dialog at it.
+         */
         <Modal
             show={show}
             onHide={onHide}
             centered
             className={`student-modal ${className}`}
+            aria-labelledby="student-modal-title"
             {...props}
         >
             <div className="student-modal__container">
                 {/* Header */}
                 <div className="student-modal__header">
-                    <h3 className="h4 student-modal__title">
+                    <h3 className="h4 student-modal__title" id="student-modal-title">
                         {student.name || 'Student Name'}
                     </h3>
                     <button

@@ -221,8 +221,16 @@ const ProgressRing = ({ value, label, size = 48, height = 48, color, animated = 
               * visible text below, and Highcharts' default `role="img"` SVG
               * has no accessible name without the accessibility module. Hide
               * it from assistive tech rather than announcing an unlabeled image.
+              *
+              * `inert` AS WELL AS `aria-hidden`, because Highcharts renders a
+              * focusable container inside: a hidden element that still takes a
+              * tab stop drops a keyboard user somewhere a screen reader says
+              * nothing about, which is what axe's `aria-hidden-focus` reports —
+              * 52 nodes across the tutor progress tables, one per ring. `inert`
+              * removes the subtree from the tab order and from hit testing,
+              * which is what "decorative" was supposed to mean.
               */}
-            <div aria-hidden="true">
+            <div aria-hidden="true" inert>
                 <HighchartsReact highcharts={Highcharts} options={options} immutable />
             </div>
             <div className="plus-progress-ring__label">

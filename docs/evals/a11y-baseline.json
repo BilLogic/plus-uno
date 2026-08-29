@@ -1,17 +1,13 @@
 {
   "measured": "2026-08-29",
   "suite": {
-    "storyFiles": 417,
-    "tests": 1225
+    "storyFiles": 418,
+    "tests": 1226
   },
-  "violatingStories": 78,
+  "violatingStories": 54,
   "rules": {
     "color-contrast": 45,
-    "aria-prohibited-attr": 12,
-    "aria-dialog-name": 8,
-    "nested-interactive": 6,
-    "aria-hidden-focus": 4,
-    "aria-allowed-attr": 2,
+    "nested-interactive": 4,
     "scrollable-region-focusable": 2,
     "aria-input-field-name": 1,
     "aria-required-parent": 1,
@@ -20,42 +16,17 @@
     "select-name": 1
   },
   "stories": {
-    "design-system/src/specs/Admin/Session/Pages/SessionAdminPage/SessionAdminPage.stories.jsx::With Modal Open": [
-      "aria-dialog-name"
-    ],
     "design-system/src/specs/Admin/Student/Pages/StudentAdminPage/StudentAdminPage.stories.jsx::With Modal Info Variant": [
-      "aria-dialog-name",
       "color-contrast"
     ],
     "design-system/src/specs/Admin/Student/Pages/StudentAdminPage/StudentAdminPage.stories.jsx::With Modal Sessions Variant": [
-      "aria-dialog-name",
       "color-contrast"
-    ],
-    "design-system/src/specs/Admin/Tutor/Pages/TutorPerformancePage/TutorPerformancePage.stories.jsx::With Modal Open": [
-      "aria-dialog-name"
-    ],
-    "design-system/src/specs/Admin/Tutor/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.stories.jsx::Interactive": [
-      "aria-hidden-focus",
-      "nested-interactive"
-    ],
-    "design-system/src/specs/Admin/Tutor/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.stories.jsx::Overview": [
-      "aria-hidden-focus",
-      "nested-interactive"
-    ],
-    "design-system/src/specs/Admin/Tutor/Tables/TutorsTrainingProgressTable/TutorsTrainingProgressTable.stories.jsx::Interactive": [
-      "aria-hidden-focus"
-    ],
-    "design-system/src/specs/Admin/Tutor/Tables/TutorsTrainingProgressTable/TutorsTrainingProgressTable.stories.jsx::Overview": [
-      "aria-hidden-focus"
     ],
     "design-system/src/specs/Home/Cards/ResourceCard/ResourceCard.stories.jsx::Overview": [
       "color-contrast"
     ],
     "design-system/src/specs/Home/Elements/ProductAreaDropdown/ProductAreaDropdown.stories.jsx::Overview": [
       "aria-required-parent"
-    ],
-    "design-system/src/specs/Home/Elements/ResourceType/ResourceType.stories.jsx::Overview": [
-      "aria-prohibited-attr"
     ],
     "design-system/src/specs/Home/Sections/StudentsOverviewSection/StudentsOverviewSection.stories.jsx::Default": [
       "color-contrast"
@@ -118,21 +89,9 @@
     "design-system/src/specs/Toolkit/Post-Session/Elements/UploadFiles/UploadFiles.stories.jsx::Overview": [
       "color-contrast"
     ],
-    "design-system/src/specs/Toolkit/Post-Session/Pages/ReflectionFlow/ReflectionFlow.stories.jsx::Discard confirmation": [
-      "aria-dialog-name"
-    ],
-    "design-system/src/specs/Toolkit/Post-Session/Pages/ReflectionFlow/ReflectionFlow.stories.jsx::Reflection submitted": [
-      "aria-dialog-name"
-    ],
-    "design-system/src/specs/Toolkit/Post-Session/Pages/ReflectionFlow/ReflectionFlow.stories.jsx::Save & Exit": [
-      "aria-dialog-name"
-    ],
     "design-system/src/specs/Toolkit/Post-Session/Pages/SessionInfo/SessionInfo.stories.jsx::Default": [
       "color-contrast",
       "nested-interactive"
-    ],
-    "design-system/src/specs/Toolkit/Post-Session/Pages/SessionReflection/SessionReflection.stories.jsx::Save & Exit confirmation": [
-      "aria-dialog-name"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Elements/CallOffForm/ToggleOrganism/ToggleOrganism.stories.jsx::Overview": [
       "color-contrast"
@@ -206,26 +165,8 @@
     "design-system/src/specs/Training/Lessons/Pages/LessonsDetailPage/LessonsDetailPage.stories.jsx::Interactive": [
       "select-name"
     ],
-    "design-system/src/specs/Training/Lessons/Sections/LessonWelcomeSection/LessonWelcomeSection.stories.jsx::Interactive": [
-      "aria-allowed-attr"
-    ],
-    "design-system/src/specs/Training/Lessons/Sections/LessonWelcomeSection/LessonWelcomeSection.stories.jsx::Overview": [
-      "aria-allowed-attr"
-    ],
     "design-system/src/specs/Training/Lessons/Tables/LessonsTable/LessonsTable.stories.jsx::Overview": [
       "color-contrast"
-    ],
-    "design-system/src/specs/Training/Onboarding/Cards/OnboardingModuleCard/OnboardingModuleCard.stories.jsx::Interactive": [
-      "aria-prohibited-attr"
-    ],
-    "design-system/src/specs/Training/Onboarding/Cards/OnboardingModuleCard/OnboardingModuleCard.stories.jsx::Overview": [
-      "aria-prohibited-attr"
-    ],
-    "design-system/src/specs/Training/Onboarding/Elements/ContentBlurb/ContentBlurb.stories.jsx::Interactive": [
-      "aria-prohibited-attr"
-    ],
-    "design-system/src/specs/Training/Onboarding/Elements/ContentBlurb/ContentBlurb.stories.jsx::Overview": [
-      "aria-prohibited-attr"
     ],
     "design-system/src/specs/Training/Onboarding/Elements/DropdownListOptions/DropdownListOptions.stories.jsx::Interactive": [
       "color-contrast"
@@ -235,27 +176,6 @@
     ],
     "design-system/src/specs/Training/Onboarding/Elements/SortingDropdown/SortingDropdown.stories.jsx::Overview": [
       "color-contrast"
-    ],
-    "design-system/src/specs/Training/Onboarding/Elements/StrategyBadge/StrategyBadge.stories.jsx::Interactive": [
-      "aria-prohibited-attr"
-    ],
-    "design-system/src/specs/Training/Onboarding/Elements/StrategyBadge/StrategyBadge.stories.jsx::Overview": [
-      "aria-prohibited-attr"
-    ],
-    "design-system/src/specs/Training/Onboarding/Pages/OnboardingInnerPage/OnboardingInnerPage.stories.jsx::Interactive": [
-      "aria-prohibited-attr"
-    ],
-    "design-system/src/specs/Training/Onboarding/Pages/OnboardingInnerPage/OnboardingInnerPage.stories.jsx::Overview": [
-      "aria-prohibited-attr"
-    ],
-    "design-system/src/specs/Training/Onboarding/Pages/OnboardingInnerPage/OnboardingInnerPage.stories.jsx::With Completion Modal": [
-      "aria-prohibited-attr"
-    ],
-    "design-system/src/specs/Training/Onboarding/Pages/OnboardingOverviewPage/OnboardingOverviewPage.stories.jsx::Interactive": [
-      "aria-prohibited-attr"
-    ],
-    "design-system/src/specs/Training/Onboarding/Pages/OnboardingOverviewPage/OnboardingOverviewPage.stories.jsx::Overview": [
-      "aria-prohibited-attr"
     ],
     "design-system/src/specs/Training/Training.stories.jsx::Overview": [
       "color-contrast"

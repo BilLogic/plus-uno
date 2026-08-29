@@ -30,12 +30,13 @@ const SessionModal = ({
             centered
             size="lg"
             className={`session-modal ${className}`}
+            aria-labelledby="session-modal-title"
             {...props}
         >
             <div className="session-modal__container">
                 {/* Header */}
                 <div className="session-modal__header">
-                    <h3 className="h4 session-modal__title">
+                    <h3 className="h4 session-modal__title" id="session-modal-title">
                         {sessionDate} Session Breakdown
                     </h3>
                     <button

@@ -24,10 +24,11 @@ const DeleteTutorModal = ({
             onHide={onHide}
             centered
             className={`delete-tutor-modal ${className}`}
+            aria-labelledby="delete-tutor-modal-title"
             {...props}
         >
             <div className="delete-tutor-modal__container">
-                <h4 className="h4 delete-tutor-modal__title">Delete Tutor?</h4>
+                <h4 className="h4 delete-tutor-modal__title" id="delete-tutor-modal-title">Delete Tutor?</h4>
                 <p className="body1-txt delete-tutor-modal__message">
                     All data related to this tutor will be removed. This tutor will lose access to the PLUS system.
                 </p>
