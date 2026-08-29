@@ -17,6 +17,22 @@
 const EPSILON = 1;
 
 /**
+ * What docs prose must be, from the design system's own tokens: `body1-txt`
+ * reads `--font-size-body1` (16px) and `--font-family-body`, and
+ * `--color-on-surface` is `#191c1e`. They are literals here because this file is
+ * asserting the rendered result, and reading the token to compare against the
+ * token would assert nothing.
+ */
+const PROSE_FAMILY = 'Merriweather Sans';
+const PROSE_SIZE = '16px';
+const PROSE_COLOR = 'rgb(25, 28, 30)';
+/**
+ * 45–75 characters is the comfortable range; the ticket asks for at most 80.
+ * The corpus sample's longest paragraph ran 134 before the cap.
+ */
+const MAX_MEASURE = 80;
+
+/**
  * @typedef {object} Canvas
  * @property {string} label which section it is, for the failure message
  * @property {boolean} hasActions whether a source/actions panel attaches beneath
@@ -88,6 +104,33 @@ export function chromeFailures(pages) {
         );
       }
     }
+    // #252. Docs prose had never rendered in the design system's font: Storybook
+    // styles it with `.css-… :where(p:not(…))`, which is a class in front of a
+    // zero-specificity `:where()` and so beats an inherited value outright.
+    for (const t of p.prose ?? []) {
+      const family = t.fontFamily.split(',')[0].replace(/["']/g, '').trim();
+      if (family !== PROSE_FAMILY) {
+        failures.push(
+          `${where}: prose "${t.label}" renders in ${family}, not ${PROSE_FAMILY}. ` +
+            `Storybook's own rule out-ranked the docs prose rule.`,
+        );
+      }
+      if (t.fontSize !== PROSE_SIZE) {
+        failures.push(`${where}: prose "${t.label}" is ${t.fontSize}, not ${PROSE_SIZE}.`);
+      }
+      if (t.color !== PROSE_COLOR) {
+        failures.push(
+          `${where}: prose "${t.label}" is ${t.color}, not ${PROSE_COLOR} — that is ` +
+            `Storybook's own text colour, not the design system's.`,
+        );
+      }
+      if (t.measure > MAX_MEASURE) {
+        failures.push(
+          `${where}: prose "${t.label}" runs ${t.measure} characters per line, over ${MAX_MEASURE}. ` +
+            `The measure cap is not reaching it.`,
+        );
+      }
+    }
   }
 
   return failures;
@@ -119,6 +162,26 @@ export function measureScript(page) {
         borderBottomWidth: card ? parseFloat(g(card).borderBottomWidth) : 0,
       };
     });
+    // Prose the fix in #252 owns, and only that: elements carrying no class of
+    // their own. A paragraph with an authored class — the Tailwind captions on
+    // Getting started/Introduction — is that page's decision, not this one's,
+    // and asserting over it would turn a typography gate into a content gate.
+    // The selector here is deliberately the same population the CSS rule claims.
+    const prose = [...document.querySelectorAll('.sbdocs-content p, .sbdocs-content li')]
+      .filter((e) => !e.closest('.docs-story'))
+      .filter((e) => e.textContent.trim().length > 40)
+      .filter((e) => e.className === '')
+      .map((e, i) => {
+        const c = g(e);
+        const lines = Math.max(1, Math.round(e.getBoundingClientRect().height / parseFloat(c.lineHeight)));
+        return {
+          label: e.tagName.toLowerCase() + ' ' + i + ': ' + e.textContent.trim().slice(0, 32),
+          fontFamily: c.fontFamily,
+          fontSize: c.fontSize,
+          color: c.color,
+          measure: Math.round(e.textContent.trim().length / lines),
+        };
+      });
     const tables = [...document.querySelectorAll('.docblock-argstable')].map((t, i) => {
       const w = t.parentElement;
       return {
@@ -134,6 +197,11 @@ export function measureScript(page) {
       bodyClient: document.documentElement.clientWidth,
       canvases,
       tables,
+      prose,
+      tokens: {
+        fontFamily: getComputedStyle(document.documentElement).getPropertyValue('--font-family-body').trim(),
+        color: getComputedStyle(document.body).getPropertyValue('color'),
+      },
     };
   })()`;
 }
