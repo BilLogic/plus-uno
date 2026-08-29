@@ -14,6 +14,17 @@ import './SidebarTab.scss';
  * - selected: primary-16 bg, primary-text color (#00547e), primary icon (#0472a8)
  * - disabled: transparent bg, on-surface text, 0.38 opacity
  * - focus: primary-12 bg, primary-text color, 2px outline
+ *
+ * `hover` AND `focus` ARE DOCUMENTATION VALUES, NOT BEHAVIOUR (#320). They
+ * exist so the design's five states can be laid out side by side in a docs
+ * canvas — the real hover and focus appearances come from CSS on the rendered
+ * element and need no prop at all.
+ *
+ * Wiring them to real events is the mistake this note exists to prevent:
+ * `onMouseEnter={() => setState('hover')}` re-renders the row on every pointer
+ * move, and it still does not follow the keyboard, because a focus that arrives
+ * by Tab never touches the pointer handler. Leave `state` on `enabled` or
+ * `selected` in an application and let the stylesheet do the rest.
  */
 const SidebarTab = ({
     text,
