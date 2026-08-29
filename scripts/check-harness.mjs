@@ -250,6 +250,12 @@ const EXCLUDED = {
     'which made it runnable from a worktree at last (it had aborted all 388 story files ' +
     'there). The answer did not change: measured 166s in a worktree, and being able to ' +
     'run it by hand is what that ticket was for.',
+  'check:docs-chrome':
+    'the same reason as check:storybook, and it runs in the same job: it needs `npm ci`, a ' +
+    'Playwright chromium and a Storybook server before it can measure anything. It exists ' +
+    'because `check:storybook` does NOT cover docs pages — that suite tests stories, and #263 ' +
+    'found four chrome defects on docs pages that no check could ever have caught. It is a ' +
+    'step in `.github/workflows/storybook-gate.yml`, which already pays for the browser.',
   'check:fetch':
     'reads only agents/uno-bot/src/. A root-only PR cannot break it, and `npm run deploy` gates it at its own boundary.',
   'check:contract':
