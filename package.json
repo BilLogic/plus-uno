@@ -47,6 +47,7 @@
     "check:font-families": "node scripts/check-font-families.mjs",
     "check:atlassian-benchmark": "node scripts/check-atlassian-benchmark.mjs",
     "check:token-generation": "node scripts/check-token-generation.mjs",
+    "check:figma-colour-drift": "node scripts/check-figma-colour-drift.mjs",
     "benchmark:atlassian": "node scripts/check-atlassian-benchmark.mjs --table",
     "check:unspread-rest": "node scripts/check-unspread-rest.mjs",
     "check:page-outline": "node scripts/check-page-outline.mjs",
