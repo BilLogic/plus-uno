@@ -99,4 +99,95 @@ The collapse JavaScript plugin is used to show and hide content. Buttons or anch
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Collapse` for one piece of secondary content that the user asks to see —
+optional detail under a field, a long explanation beside a short summary, the
+raw data behind a chart. It is a trigger and a body, and nothing else.
+
+It works uncontrolled from `defaultOpen`, or controlled by passing `isOpen`;
+either way `onToggle` receives the new boolean. Closed content is `display: none`
+rather than animated to zero height, so it opens and shuts at once — only the
+`icon` rotates.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Give it an `id`, or it has no accessibility wiring at all.
+
+```jsx
+// Incorrect — the trigger and content ids are derived from `id`. Without one
+// they are undefined, so aria-controls and aria-labelledby are dropped and
+// nothing connects the button to what it opens.
+<Collapse trigger="Show detail">…</Collapse>
+
+// Correct.
+<Collapse id="session-detail" trigger="Show detail">…</Collapse>
+```
+
+### Keep the trigger a button.
+
+```jsx
+// Incorrect — triggerTag="a" renders href="#", which is a link that goes
+// nowhere. It is announced as a link, offers to open in a new tab, and does
+// not respond to Space.
+<Collapse id="detail" triggerTag="a" trigger="Show detail">…</Collapse>
+
+// Correct — the default. Style it as a link if it should look like one.
+<Collapse id="detail" trigger="Show detail">…</Collapse>
+```
+
+### `icon` is a Font Awesome name, not a node.
+
+The string is interpolated into `fas fa-${icon}`, so pass `"chevron-down"`, not
+an element and not the `fa-` prefix. `iconPosition` puts it before or after the
+trigger text.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **With an `id`, the pattern is complete.** The trigger carries `aria-expanded`
+  and `aria-controls`; the body carries `aria-labelledby` pointing back. That is
+  the whole disclosure pattern, and it is why the `id` is not optional in
+  practice.
+- **Closed content is out of the tree.** `display: none` means a screen reader
+  does not reach it and a link inside it is not tabbable, which is what you want
+  — nothing is hidden in plain sight.
+- **The trigger's name is its text.** `trigger` takes a node, so it can be
+  markup; keep the words in it. A trigger whose only content is the icon has no
+  accessible name.
+- **Do not put the answer only inside.** Content a user must read to complete a
+  task should not be behind a disclosure. Collapse the elaboration, not the
+  instruction.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For several sections where the same trigger pattern repeats, use `Accordion` —
+  it manages which ones are open.
+- For content that appears over the page rather than in it, use `Popover` or
+  `Modal`.
+- For switching between alternatives rather than revealing more, use `NavTabs`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

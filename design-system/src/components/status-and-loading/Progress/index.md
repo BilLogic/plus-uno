@@ -43,8 +43,6 @@ From `design-system/src/components/status-and-loading/Progress/Progress.scss`. O
 
 Same group: `Badge` · `Spinner`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `Progress` is the right call, only what it accepts.
+> Authored guidance is partial — missing: correct/incorrect (#166).

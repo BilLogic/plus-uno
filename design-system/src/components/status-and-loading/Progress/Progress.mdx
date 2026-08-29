@@ -95,4 +95,93 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Progress` when the proportion done is known and worth showing — an upload, a
+course, a multi-step form. If you cannot say how far along it is, a `Spinner` is
+the honest control.
+
+`value` is read against `min` and `max` (0 and 100 by default). `size` is
+`small`, `medium` or `large`; `striped` adds the diagonal pattern and `animated`
+moves it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### `animated` does nothing without `striped`.
+
+```jsx
+// Incorrect — the animation is on the stripes, so this renders a plain bar.
+<Progress value={40} animated />
+
+// Correct.
+<Progress value={40} striped animated />
+```
+
+### `label` and `showLabel` are not two settings.
+
+```jsx
+// `label` wins: when it is set, showLabel is never consulted, and the text
+// renders INSIDE the bar — so a long label is clipped by a short bar.
+<Progress value={12} label="12 of 100 sessions complete" />   // clipped at 12%
+
+// For the percentage, leave label off.
+<Progress value={12} showLabel />                              // renders "12%"
+
+// For a long description, put it beside the bar and name the bar with label.
+<Progress value={12} label="Course progress" />
+<p className="body3-txt">12 of 100 sessions complete</p>
+```
+
+### Keep `value` inside its bounds.
+
+The width is clamped to 0–100%, but the announced value is not: a `value` above
+`max` renders a full bar while reporting a number greater than its own maximum.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The bar is a real progressbar.** `role="progressbar"` with `aria-valuenow`,
+  `aria-valuemin` and `aria-valuemax`, and an `aria-label` that defaults to
+  "Progress".
+- **Name it for what it measures.** "Progress" on its own says nothing when
+  there are two bars on a page. `label` sets the name — and also renders as
+  visible text in the bar, so keep it to a few words.
+- **Reduced motion is handled.** Bootstrap stops the stripe animation under
+  `prefers-reduced-motion: reduce`, so `animated` is safe to use.
+- **The value is not announced as it changes.** The bar is not a live region;
+  a screen-reader user hears the value when they reach it. For a long operation,
+  put the state in a live region of your own.
+- **Colour is not the message.** `style` colours the bar; the number is what
+  says how far along it is. Show it, with `showLabel` or beside the bar.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For an indeterminate wait, use `Spinner`.
+- For the outcome when it finishes, use `Toast` or `Alert`.
+- For position in a hierarchy rather than progress through a task, use
+  `Breadcrumb`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

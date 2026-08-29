@@ -48,8 +48,6 @@ From `design-system/src/components/layout-and-structure/Carousel/Carousel.scss`.
 
 Same group: `Accordion` · `Card` · `Collapse` · `Divider` · `Jumbotron` · `ListGroup` · `MediaObject` · `ScrollBar`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `Carousel` is the right call, only what it accepts.
+> Authored guidance is partial — missing: correct/incorrect (#166).

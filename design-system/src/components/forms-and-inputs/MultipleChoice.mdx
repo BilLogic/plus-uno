@@ -114,4 +114,102 @@ The multiple choice component can be used in forms where the user is required to
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `MultipleChoice` for a vertical list of options a user answers in one place —
+a question with four answers, a set of preferences, a filter. `type` chooses the
+control: `radio` for one answer, `checkbox` for any number.
+
+It works controlled or uncontrolled. `name` is required, and for `radio` it is
+what makes the browser treat the options as one group — arrow keys move between
+them because they share it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### `onChange` gives you a value in one mode and an array in the other.
+
+```jsx
+// radio — the selected option's value.
+<MultipleChoice name="level" type="radio" options={levels} onChange={(v) => setLevel(v)} />
+
+// checkbox — the whole new array, already added to or filtered.
+<MultipleChoice name="days" type="checkbox" options={days} onChange={(vs) => setDays(vs)} />
+```
+
+Neither hands you an event. There is no `event.target` to read.
+
+### An option object without a `label` is labelled "Text".
+
+```jsx
+// Incorrect — the fallback is a literal placeholder, and it renders.
+<MultipleChoice name="level" options={[{ value: 'a' }, { value: 'b' }]} />
+
+// Correct — either give every object a label,
+<MultipleChoice name="level" options={[
+    { value: 'a', label: 'Beginner' },
+    { value: 'b', label: 'Advanced' },
+]} />
+
+// or use the string shorthand, where the string is both value and label.
+<MultipleChoice name="level" options={['Beginner', 'Advanced']} />
+```
+
+### A falsy `defaultValue` is discarded.
+
+The initial state is `defaultValue || (type === 'checkbox' ? [] : null)`, so
+`defaultValue={0}` and `defaultValue=""` both start empty. Use a controlled
+`value` when zero or the empty string is a real answer.
+
+### Give the group a heading of its own.
+
+The component renders the options and nothing around them — no `fieldset`, no
+legend, no group name. Put the question above it as your own element.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The radios are a group; the checkboxes are not.** Radios sharing a `name`
+  are one group to the browser, so arrow keys move between them and only one can
+  be checked. Checkboxes have no such relationship — they are separate controls
+  that happen to be next to each other.
+- **Nothing names the set.** There is no `fieldset`/`legend` and no
+  `role="group"`, so the question is not announced with the answers. Wrap it
+  yourself in a `fieldset` with a `legend` when the options only make sense
+  under a question.
+- **Each option is a real control.** `Radio` and `Checkbox` do the label
+  association, so every option has a name and a state that is announced.
+- **`disabled` disables all of them.** It is a property of the set, not of an
+  option — there is no way to disable one answer. Leave it out of `options`
+  instead.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For one control rather than a set, use `Radio` or `Checkbox`.
+- For a rated answer along a scale with end labels, use `Scale`.
+- For many options where the list would be too long to show, use `Select`.
+- For options laid out as a grid of cards rather than a list, use `ChoiceGrid`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

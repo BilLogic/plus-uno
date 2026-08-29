@@ -112,4 +112,97 @@ Use a scale when a user needs to communicate degree or intensity across an order
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Scale` for one rated answer along a run of options with an end label at each
+side — agreement, confidence, difficulty. It is the horizontal counterpart to a
+vertical list: the ordering is the point, so the options read as a range rather
+than as alternatives.
+
+`options` takes `{ value, label }` objects or plain strings. `lowestLabel` and
+`highestLabel` sit at the ends and default to "Lowest" and "Highest".
+`Scale.Button` is the single radio, exported for a row you lay out yourself.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Uncontrolled, it starts on the first option.
+
+```jsx
+// Incorrect — with no defaultValue the initial state falls back to
+// options[0].value, so the question arrives already answered and a response of
+// "1" cannot be told apart from no response.
+<Scale name="confidence" label="How confident are you?" options={scale} />
+
+// Correct — control it, and start at null.
+<Scale name="confidence" label="How confident are you?" options={scale}
+       value={confidence} onChange={setConfidence} />
+```
+
+### Give it a `label`, or the group has no name.
+
+```jsx
+// Incorrect — the radiogroup's aria-labelledby is derived from the label. With
+// no label it points at nothing, and the end labels are decorative text that
+// names nothing either.
+<Scale name="confidence" options={scale} value={v} onChange={setV} />
+
+// Correct.
+<Scale name="confidence" label="How confident are you?" options={scale}
+       value={v} onChange={setV} />
+```
+
+### The end labels are decoration, not answers.
+
+`lowestLabel` and `highestLabel` render as text beside the row and are not read
+with any option. If "Not at all" and "Completely" are what the ends mean, put
+that in the option labels too, or in the question.
+
+### `onChange` receives the value, not an event.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The row is a real radiogroup.** `role="radiogroup"` named by the label, with
+  a genuine radio input per option — so arrow keys move through it, one is
+  checked at a time, and the state is announced.
+- **The label is a `span`, deliberately.** A `label` element would point at one
+  radio, and clicking it would select that radio. Naming the group instead is
+  what makes the question apply to all of them.
+- **Each option is named by the number above it.** The per-option label div gets
+  an id and the radio points at it with `aria-labelledby`, so a screen-reader
+  user hears "3" rather than an unnamed radio.
+- **`required` marks the label only.** No `aria-required`, no submit blocking.
+- **The end labels are outside the group.** They are read as text on the way
+  past, not as part of any option's name.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a vertical list of alternatives rather than a range, use `MultipleChoice`.
+- For a single yes/no, use `Radio` or `Switch`.
+- For a satisfaction score drawn as icons, use `Rating`.
+- For a continuous value rather than a handful of steps, use `Range`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

@@ -75,4 +75,91 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Toast` to confirm something that has already happened and needs no reply —
+saved, sent, copied. It appears over the page, times out, and takes nothing with
+it when it goes.
+
+`show` and `onClose` are yours; the component holds no state. `delay` is the
+timeout in milliseconds and `autohide` turns it off. `ToastContainer` positions a
+stack of them.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Nothing important goes only in a toast.
+
+```jsx
+// Incorrect — five seconds, then gone, and it took the only copy of the error
+// with it. An error the user must act on is not a toast.
+<Toast style="danger" title="Upload failed" show={failed} onClose={dismiss}>
+    The file was larger than 10 MB.
+</Toast>
+
+// Correct — a failure that needs a decision stays on the page.
+<Alert style="danger" title="Upload failed">The file was larger than 10 MB.</Alert>
+```
+
+### Turn off `autohide` for anything the user might need to re-read.
+
+```jsx
+// delay is ignored when autohide is false, and setting delay={0} also disables
+// the timer — the toast then waits for its close button.
+<Toast title="Report ready" show={ready} onClose={dismiss} autohide={false}>
+    Your export is on the downloads page.
+</Toast>
+```
+
+### Keep `dismissible` on.
+
+It is on by default and is the only way to close a toast that is not timing out.
+Turning it off with `autohide={false}` leaves a toast that never goes away.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **It always interrupts.** `role="alert"` with `aria-live="assertive"` and
+  `aria-atomic` is set for every style, so a success toast cuts across whatever
+  a screen reader was saying. Reserve toasts for moments where that is
+  proportionate, and prefer inline confirmation where it is not.
+- **A five-second timeout is a timing limit.** Content that disappears on its own
+  has to be dismissible or extendable to satisfy WCAG's timing rule. The close
+  button is what does that here, which is why it is on by default.
+- **Announcement needs the region to already exist.** A toast mounted at the same
+  moment as its container may not be announced at all. Render `ToastContainer`
+  with the page and put toasts into it.
+- **The close button is named.** "Close", with the icon inside it.
+- **The style icon is not hidden.** It is a decorative glyph without
+  `aria-hidden`, so some screen readers will read it. The title beside it carries
+  the meaning; the colour and icon should never carry it alone.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For something the user must read or act on, use `Alert`.
+- For a decision that blocks the task, use `Modal`.
+- For help attached to a specific control, use `Tooltip` or `Popover`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>

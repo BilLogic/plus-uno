@@ -3,7 +3,7 @@
 
 # Breadcrumb
 
-Universal element component for navigation breadcrumbs. Uses React Bootstrap Breadcrumb as base.
+Universal element component for navigation breadcrumbs. Uses React Bootstrap Breadcrumb as base. / /* `items` defaults to `[]` even though its prop type is `isRequired`. A required prop is a lint, not a guarantee: React renders anyway, and `items.map` on `undefined` took the whole page down rather than the one breadcrumb. Found by `DocumentedContract.stories.jsx`, and only once this component's page gained a Usage tab: the guard renders each DOCUMENTED prop against fabricated required props, and it cannot fabricate an `arrayOf(shape)`. So documenting `separator` is what first rendered a Breadcrumb with no items, and the crash had been reachable by any caller all along.
 
 **Import:** `import { Breadcrumb } from '@/components';`
 
@@ -17,7 +17,7 @@ Universal element component for navigation breadcrumbs. Uses React Bootstrap Bre
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `items` | arrayOf (required) | — | — |
+| `items` | arrayOf (required) | `[]` | — |
 | `id` | string | — | — |
 | `separator` | node | `'/'` | — |
 | `className` | string | `''` | — |
@@ -33,8 +33,6 @@ From `design-system/src/components/navigation/Breadcrumb/Breadcrumb.scss`. Overr
 
 Same group: `NavPills` · `NavTabs` · `Pagination` · `Scrollspy` · `SidebarTab`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `Breadcrumb` is the right call, only what it accepts.
+> Authored guidance is partial — missing: correct/incorrect (#166).

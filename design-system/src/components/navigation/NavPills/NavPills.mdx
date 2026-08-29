@@ -127,4 +127,92 @@ export const figmaMeta = {
 
 </DocsTab>
 
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `NavPills` for a row of filters or sibling views where the selected one is
+shown as a filled pill — a segmented list, a set of report views, a sub-navigation
+under a page title. `direction="vertical"` turns the same set into a column.
+
+Items are `NavPills.Item` and `NavPills.Dropdown`. Selection is either yours —
+`active` on the item — or the group's, through `activeKey`/`defaultActiveKey`
+with an `eventKey` on each item and an `onSelect` handler.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Pick one selection model and stay in it.
+
+```jsx
+// Incorrect — `active` on the item overrides the group, so the two disagree and
+// onSelect still fires for a pill that never lights up.
+<NavPills activeKey="week" onSelect={setRange}>
+    <NavPills.Item eventKey="week" active={false}>Week</NavPills.Item>
+</NavPills>
+
+// Correct — the group holds it.
+<NavPills activeKey={range} onSelect={setRange}>
+    <NavPills.Item eventKey="week">Week</NavPills.Item>
+    <NavPills.Item eventKey="month">Month</NavPills.Item>
+</NavPills>
+
+// Or you hold it, per item.
+<NavPills>
+    <NavPills.Item active={range === 'week'} onClick={() => setRange('week')}>Week</NavPills.Item>
+</NavPills>
+```
+
+### An item with no `href` is still a link.
+
+React Bootstrap renders each item as an anchor. Without an `href` it is an anchor
+with no destination — focusable, but not activated by Enter in every browser. Give
+navigating pills a real `href`, and give acting pills `as={Button}`.
+
+### `alignment` moves the row; it does not stretch it.
+
+`left`, `center` and `right` position the pills within the container. For pills
+that fill the width, set the flex behaviour in `className`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **These are not tabs.** The group is a plain container of links with no
+  `tablist`, `tab` or `tabpanel` roles, and no arrow-key movement. If the pills
+  switch between panels of content, use `NavTabs`, which is that pattern.
+- **The selected pill is announced only if you say so.** Selection is a class.
+  For pills that navigate, put `aria-current="page"` on the active item; for
+  pills that filter, `aria-pressed` on buttons says more than colour does.
+- **Disabled items stay in the DOM.** React Bootstrap marks them
+  `aria-disabled` and removes them from the tab order rather than hiding them, so
+  the row does not reflow.
+- **Name the group when there is more than one.** Wrap the pills in a `nav` with
+  an `aria-label` — the component renders no landmark of its own.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For switching between panels of content, use `NavTabs`.
+- For a persistent section navigation down the side, use `SidebarTab`.
+- For where the user is in a hierarchy, use `Breadcrumb`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
 </DocsTabs>
