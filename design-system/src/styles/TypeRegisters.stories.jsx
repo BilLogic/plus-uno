@@ -15,11 +15,22 @@ import { expect } from 'storybook/test';
  * tokens. Both are live, which is what makes this page a comparison rather than
  * an announcement.
  *
- * WHAT THE `play` FUNCTION ASSERTS. That the two produce the SAME computed type
+ * WHAT THE `play` FUNCTIONS ASSERT. That the two produce the SAME computed type
  * — same family, size, weight, line-height. That is the whole claim of an
  * additive layer, and it is the claim that quietly stops being true the first
  * time someone edits one side. A screenshot cannot hold it; `getComputedStyle`
  * can.
+ *
+ * AND WHY THAT WAS NOT ENOUGH ON ITS OWN. `Axes` compares the composite against
+ * a span this file builds out of the four tokens — which means it compares my
+ * reading of the register against my reading of the register. It shipped green
+ * while `--type-h4` was a whole weight heavier than `h4`: h4–h6 are TITLES
+ * (`--font-weight-title`, 600) and the composites had all six at a literal 700.
+ * Both sides of that comparison were wrong in the same direction, so it passed.
+ *
+ * `AgainstTheRules` closes that hole by comparing against the ELEMENTS — a real
+ * `<h4>`, a real `.body1-txt` — which is the only side of this that users see
+ * and the only one no token file can restate incorrectly.
  */
 export default {
     title: 'Foundations/Type registers',
@@ -117,18 +128,25 @@ export const Axes = () => (
         </p>
         {REGISTERS.map(({ name }) => {
             const isBody = name.startsWith('body');
+            // h1-h3 are headlines (700), h4-h6 are titles (600). Reading that off
+            // the name is exactly the step this page argues should not be needed.
+            const weight = isBody
+                ? '--font-weight-normal'
+                : Number(name[1]) <= 3
+                    ? '--font-weight-headline'
+                    : '--font-weight-title';
             return (
                 <Row
                     key={name}
                     label={`--font-size-${name}`}
-                    note={`+ --font-line-height-${name}, --font-weight-${isBody ? 'normal' : 'headline'}, --font-family-${isBody ? 'body' : 'header'}`}
+                    note={`+ --font-line-height-${name}, ${weight}, --font-family-${isBody ? 'body' : 'header'}`}
                 >
                     <span
                         data-axes={name}
                         style={{
                             fontSize: `var(--font-size-${name})`,
                             lineHeight: `var(--font-line-height-${name})`,
-                            fontWeight: isBody ? 'var(--font-weight-normal)' : 'var(--font-weight-headline)',
+                            fontWeight: `var(${weight})`,
                             fontFamily: isBody ? 'var(--font-family-body)' : 'var(--font-family-header)',
                         }}
                     >
@@ -167,6 +185,67 @@ Axes.play = async () => {
             await expect(comp.weight, `${composite} weight`).toBe(axes.weight);
             await expect(comp.lineHeight, `${composite} line-height`).toBe(axes.lineHeight);
             await expect(comp.family, `${composite} family`).toBe(axes.family);
+        }
+    } finally {
+        probe.remove();
+    }
+};
+
+/**
+ * The composites, checked against the rules they claim to name.
+ *
+ * Each row renders the REAL element on the left of the comparison — `h4` picks
+ * up `%font-title`, `.body1-txt` picks up `%font-body` — and the assertion
+ * probes a composite against it. Nothing here restates a token value, which is
+ * the property that makes this catch what `Axes` could not.
+ */
+export const AgainstTheRules = () => (
+    <div style={{ maxWidth: '900px', padding: '24px' }}>
+        <h2 className="h4">The elements themselves</h2>
+        <p className="body2-txt" style={{ maxWidth: '62ch' }}>
+            Every line below is the plain element or class the system already ships. The{' '}
+            <code style={{ color: 'var(--color-secondary)' }}>play</code> function builds a
+            composite beside each one and asserts the two computed styles match — so a composite
+            that drifts from its own rule fails here rather than in a design review.
+        </p>
+        {REGISTERS.map(({ name }) => {
+            const isBody = name.startsWith('body');
+            const Tag = isBody ? 'p' : name;
+            return (
+                <Row key={name} label={isBody ? `.${name}-txt` : `<${name}>`}>
+                    <Tag data-rule={name} className={isBody ? `${name}-txt` : undefined}>
+                        The quick brown fox jumps
+                    </Tag>
+                </Row>
+            );
+        })}
+    </div>
+);
+
+AgainstTheRules.play = async () => {
+    const probe = document.createElement('div');
+    probe.setAttribute('data-probe', '');
+    document.body.appendChild(probe);
+    try {
+        for (const { name, composite } of REGISTERS) {
+            const span = document.createElement('span');
+            span.style.font = `var(${composite})`;
+            span.dataset.composite = `rule-${name}`;
+            probe.appendChild(span);
+        }
+
+        for (const { name, composite } of REGISTERS) {
+            const rule = computed(`[data-rule="${name}"]`);
+            const comp = computed(`[data-composite="rule-${name}"]`);
+            await expect(rule, `${name} element missing`).not.toBe(null);
+            await expect(comp, `${composite} probe missing`).not.toBe(null);
+
+            // Weight first, because that is the axis that was wrong: h4-h6 are
+            // titles at 600 and the composites claimed 700.
+            await expect(comp.weight, `${composite} weight vs ${name}`).toBe(rule.weight);
+            await expect(comp.size, `${composite} size vs ${name}`).toBe(rule.size);
+            await expect(comp.lineHeight, `${composite} line-height vs ${name}`).toBe(rule.lineHeight);
+            await expect(comp.family, `${composite} family vs ${name}`).toBe(rule.family);
         }
     } finally {
         probe.remove();
