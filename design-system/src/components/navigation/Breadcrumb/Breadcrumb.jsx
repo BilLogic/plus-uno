@@ -8,7 +8,18 @@ import './Breadcrumb.scss';
  * Universal element component for navigation breadcrumbs.
  * Uses React Bootstrap Breadcrumb as base.
  */
-const Breadcrumb = ({ items, id, separator = '/', className = '', style }) => {
+/*
+ * `items` defaults to `[]` even though its prop type is `isRequired`. A required
+ * prop is a lint, not a guarantee: React renders anyway, and `items.map` on
+ * `undefined` took the whole page down rather than the one breadcrumb.
+ *
+ * Found by `DocumentedContract.stories.jsx`, and only once this component's page
+ * gained a Usage tab: the guard renders each DOCUMENTED prop against fabricated
+ * required props, and it cannot fabricate an `arrayOf(shape)`. So documenting
+ * `separator` is what first rendered a Breadcrumb with no items, and the crash
+ * had been reachable by any caller all along.
+ */
+const Breadcrumb = ({ items = [], id, separator = '/', className = '', style }) => {
     // React Bootstrap uses --bs-breadcrumb-divider CSS variable for separator
     // We set it inline if a custom separator is provided
     const breadcrumbStyle = {
