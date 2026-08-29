@@ -41,13 +41,17 @@ const MAX_AGE_DAYS = 365;
 
 const benchmark = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, BENCHMARK), 'utf8'));
 const tokens = ourTokens(REPO_ROOT);
-const rows = compare(tokens, benchmark);
+const rows = compare(tokens, benchmark, REPO_ROOT);
 const now = new Date();
 
 const table = rows
   .map((r) => {
     const arrow = r.direction === 'up' ? '↑' : r.direction === 'down' ? '↓' : ' ';
-    return `  ${arrow} ${r.key.padEnd(24)} ours ${String(r.ours).padStart(4)}   atlassian ${String(r.theirs).padStart(4)}`;
+    // A row with no counterpart prints as one. The recording holds Atlassian's
+    // fourteen step NAMES and not their px values, so `type.stepRatios` has
+    // nothing on their side that is not invented.
+    const theirs = r.theirs === null ? '—' : String(r.theirs);
+    return `  ${arrow} ${r.key.padEnd(24)} ours ${String(r.ours).padStart(4)}   atlassian ${theirs.padStart(4)}`;
   })
   .join('\n');
 
