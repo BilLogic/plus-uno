@@ -4,6 +4,26 @@
  * using Design System tokens to match Figma specifications exactly.
  */
 
+// #329. A `fieldset` carries browser default border, margin and padding that a
+// `div` does not, so the two wrappers have to look identical or the legend
+// changes the layout it was only meant to name.
+.plus-multiple-choice-wrapper {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-inline-size: 0;
+}
+
+.plus-multiple-choice-legend {
+    float: none;
+    width: auto;
+    margin-bottom: 0;
+    padding: 0;
+    font-size: inherit;
+    line-height: inherit;
+    color: var(--color-on-surface);
+}
+
 .plus-multiple-choice-wrapper {
     display: flex;
     flex-direction: column;

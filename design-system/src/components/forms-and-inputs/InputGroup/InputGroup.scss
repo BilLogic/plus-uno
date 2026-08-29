@@ -1,3 +1,35 @@
+// #329. The container exists so a label can sit above the joined row. The label
+// hides the way `Input`'s does — clipped, never deleted — so `showLabel={false}`
+// moves pixels and not the accessible name.
+.plus-input-group-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-sm, 8px);
+    position: relative;
+}
+
+.plus-input-group-label {
+    margin-bottom: 0;
+    color: var(--color-on-surface);
+}
+
+.plus-input-group-label-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.plus-input-group-required {
+    color: var(--color-danger);
+    margin-left: 2px;
+}
+
 /**
  * InputGroup Component Styles
  * Implements input group component with addons (prepend/append)

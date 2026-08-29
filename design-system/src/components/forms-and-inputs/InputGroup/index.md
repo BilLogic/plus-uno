@@ -17,6 +17,9 @@
 |------|------|---------|-------------|
 | `id` | string | — | — |
 | `name` | string | — | — |
+| `label` | node | — | The field's name. Render one unless something else on the page names it. |
+| `showLabel` | bool | `true` | Hides the label without removing it. |
+| `required` | bool | `false` | — |
 | `placeholder` | string | — | Placeholder text for the input |
 | `value` | string or number | — | — |
 | `size` | enum | `'medium'` | Size variant of the input group |
@@ -41,7 +44,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-inverse-primary` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-surface-container` · `--color-surface-container-low` · `--color-surface-container-lowest` · `--color-surface-variant` · `--font-family-body` · `--font-line-height-body1` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body1` · `--font-size-body2` · `--font-size-body3` · `--font-weight-normal` · `--size-element-gap-xs` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-full` · `--size-element-radius-md` · `--size-element-radius-sm` · `--size-element-stroke-md`
+`--color-danger` · `--color-inverse-primary` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-surface-container` · `--color-surface-container-low` · `--color-surface-container-lowest` · `--color-surface-variant` · `--font-family-body` · `--font-line-height-body1` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body1` · `--font-size-body2` · `--font-size-body3` · `--font-weight-normal` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-lg` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-full` · `--size-element-radius-md` · `--size-element-radius-sm` · `--size-element-stroke-md`
 
 From `design-system/src/components/forms-and-inputs/InputGroup/InputGroup.scss`. Override these through the token layer, never with a literal.
 
