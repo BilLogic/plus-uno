@@ -161,7 +161,7 @@
 
         &:hover,
         &:focus {
-            background-color: var(--color-neutral-state-08);
+            background-color: var(--color-on-surface-state-08);
         }
 
         &.active {
@@ -209,7 +209,7 @@
     background-color: var(--color-surface);
     box-sizing: border-box;
     border: var(--size-border-stroke-stroke-150) solid var(--color-outline-variant);
-    font-weight: var(--font-weight-light);
+    font-weight: var(--font-weight-normal);
 
     &:focus {
         outline: none;
@@ -223,7 +223,7 @@
     text-align: center;
     color: var(--color-on-surface-variant);
     pointer-events: none;
-    font-weight: var(--font-weight-light);
+    font-weight: var(--font-weight-normal);
 }
 
 .plus-rich-text-editor-readonly .plus-rich-text-editor-content,

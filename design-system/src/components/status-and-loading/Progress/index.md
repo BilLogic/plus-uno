@@ -35,7 +35,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-danger` · `--color-info` · `--color-on-danger` · `--color-on-info` · `--color-on-primary` · `--color-on-secondary` · `--color-on-success` · `--color-on-warning` · `--color-primary` · `--color-secondary` · `--color-success` · `--color-surface-container-high` · `--color-warning` · `--font-family-body` · `--font-line-height-body3` · `--font-size-body2` · `--font-size-body3` · `--font-size-body4` · `--font-weight-semibold-1` · `--size-element-gap-lg` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-radius-full`
+`--color-danger` · `--color-info` · `--color-on-danger` · `--color-on-info` · `--color-on-primary` · `--color-on-secondary` · `--color-on-success` · `--color-on-warning` · `--color-primary` · `--color-secondary` · `--color-success` · `--color-surface-container-high` · `--color-warning` · `--font-family-body` · `--font-line-height-body3` · `--font-size-body2` · `--font-size-body3` · `--font-weight-semibold-1` · `--size-element-gap-lg` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-radius-full`
 
 From `design-system/src/components/status-and-loading/Progress/Progress.scss`. Override these through the token layer, never with a literal.
 

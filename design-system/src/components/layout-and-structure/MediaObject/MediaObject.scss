@@ -18,9 +18,9 @@
         justify-content: center;
         width: 64px; // Per Figma default
         height: 64px;
-        padding: var(--size-spacing-md); // 12px
+        padding: var(--size-spacing-medium-space-200); // 12px
         background-color: var(--color-tertiary-state-08);
-        border-radius: var(--size-border-radius-100); // 4px
+        border-radius: var(--size-border-radius-radius-100); // 4px
         overflow: hidden;
 
         img {
@@ -43,7 +43,7 @@
         min-width: 0; // Prevent overflow
         display: flex;
         flex-direction: column;
-        gap: var(--size-spacing-sm); // 8px
+        gap: var(--size-spacing-small-space-100); // 8px
 
         // Heading - H5 typography per Figma
         .plus-media-heading {
@@ -59,7 +59,7 @@
         .plus-media-content {
             font-family: var(--font-family-body);
             font-size: var(--font-size-body1);
-            font-weight: var(--font-weight-light);
+            font-weight: var(--font-weight-normal);
             line-height: var(--font-line-height-body1);
             color: var(--color-on-surface-variant);
         }

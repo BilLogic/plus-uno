@@ -1,0 +1,544 @@
+{
+  "note": "Token names used in the corpus and defined nowhere in it. A ratchet: counts may FALL and must never RISE, and an entry that stops matching is itself a finding. Regenerate with `npm run check:undefined-tokens -- --update`, and only when the numbers went DOWN.",
+  "measuredAt": "2026-08-29",
+  "roots": [
+    "design-system/src",
+    ".storybook",
+    "prototypes"
+  ],
+  "totals": {
+    "names": 132,
+    "uses": 459,
+    "bare": 193
+  },
+  "tokens": {
+    "--body2-line-height": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--body2-size": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--body3-size": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--card-gap-md": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--card-pad-x-lg": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--card-pad-y-lg": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--card-radius-sm": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--color-error": {
+      "uses": 5,
+      "bare": 4
+    },
+    "--color-error-container": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--color-mastering-content-state-28": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--color-neutral-background-pure": {
+      "uses": 2,
+      "bare": 2
+    },
+    "--color-neutral-border-weak": {
+      "uses": 2,
+      "bare": 2
+    },
+    "--color-neutral-container": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--color-neutral-text": {
+      "uses": 41,
+      "bare": 40
+    },
+    "--color-neutral-text-medium": {
+      "uses": 2,
+      "bare": 2
+    },
+    "--color-neutral-text-primary": {
+      "uses": 2,
+      "bare": 2
+    },
+    "--color-neutral-text-secondary": {
+      "uses": 3,
+      "bare": 3
+    },
+    "--color-neutral-text-tertiary": {
+      "uses": 2,
+      "bare": 2
+    },
+    "--color-on-background": {
+      "uses": 2,
+      "bare": 1
+    },
+    "--color-on-error-container": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--color-on-surface-state-04": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--color-on-surface-variant-2": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--color-on-surface-variant-3": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--color-on-surface-variant-light": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--color-primary-state-04": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--color-primary-variant": {
+      "uses": 2,
+      "bare": 2
+    },
+    "--color-progress-ring-fill": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--color-state-layer-focus": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--color-state-layer-hover": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--color-surface-container-active": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--color-surface-container-hover": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--columns-col-5": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--columns-col-8": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--element-gap-lg": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--element-gap-md": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--element-gap-sm": {
+      "uses": 4,
+      "bare": 0
+    },
+    "--element-radius-sm": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--elevation-1": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--elevation-2": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--font-family-base": {
+      "uses": 2,
+      "bare": 1
+    },
+    "--font-family-lato": {
+      "uses": 3,
+      "bare": 3
+    },
+    "--font-family-merriweather-sans": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--font-line-height-b1": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--font-line-height-fa-b1-solid": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--font-line-height-fa-b3-solid": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--font-line-height-title": {
+      "uses": 5,
+      "bare": 0
+    },
+    "--font-size-b1": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--font-size-body-small": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--font-size-caption": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--font-size-fa-b1-solid": {
+      "uses": 9,
+      "bare": 9
+    },
+    "--font-size-fa-b2-solid": {
+      "uses": 6,
+      "bare": 6
+    },
+    "--font-size-fa-b3-regular": {
+      "uses": 2,
+      "bare": 2
+    },
+    "--font-size-fa-b3-solid": {
+      "uses": 7,
+      "bare": 5
+    },
+    "--font-size-fa-huge-solid": {
+      "uses": 8,
+      "bare": 0
+    },
+    "--font-size-title-l": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--font-size-title-m1": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--font-size-title-m2": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--font-size-title-m4": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--font-size-title-s": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--font-weight-light": {
+      "uses": 9,
+      "bare": 6
+    },
+    "--font-weight-medium": {
+      "uses": 4,
+      "bare": 0
+    },
+    "--font-weight-regular": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--font-weight-semibold": {
+      "uses": 4,
+      "bare": 2
+    },
+    "--line-height-h4": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--primary-primary-text": {
+      "uses": 3,
+      "bare": 0
+    },
+    "--secondary-secondary-text": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--shadow-modal": {
+      "uses": 3,
+      "bare": 0
+    },
+    "--shadow-small": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--size-border-radius-100": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--size-border-radius-4-5": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--size-border-radius-large": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--size-border-radius-radius-4-5": {
+      "uses": 3,
+      "bare": 2
+    },
+    "--size-button-min-height-md": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--size-button-min-width-md": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--size-card-gap": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--size-columns-col-12": {
+      "uses": 4,
+      "bare": 4
+    },
+    "--size-columns-col-4": {
+      "uses": 3,
+      "bare": 3
+    },
+    "--size-ele-gap-md": {
+      "uses": 3,
+      "bare": 3
+    },
+    "--size-ele-gap-xs": {
+      "uses": 15,
+      "bare": 6
+    },
+    "--size-element-pad-x-xs": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--size-element-pad-y-xs": {
+      "uses": 2,
+      "bare": 1
+    },
+    "--size-element-radius-pill": {
+      "uses": 2,
+      "bare": 1
+    },
+    "--size-element-radius-xs": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--size-element-target-sm": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--size-modal-min-height-md": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--size-modal-min-height-sm": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--size-modal-pad": {
+      "uses": 3,
+      "bare": 0
+    },
+    "--size-modal-radius": {
+      "uses": 3,
+      "bare": 0
+    },
+    "--size-modal-width-sm": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--size-section-gap-xl": {
+      "uses": 22,
+      "bare": 5
+    },
+    "--size-small-gap-xs": {
+      "uses": 32,
+      "bare": 1
+    },
+    "--size-space-4": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--size-space-medium": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--size-spacing-between-components-spacer-2": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--size-spacing-medium-space-600": {
+      "uses": 5,
+      "bare": 0
+    },
+    "--size-spacing-medium-space-800": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--size-spacing-small-space-200": {
+      "uses": 3,
+      "bare": 0
+    },
+    "--size-spacing-small-space-400": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--size-spacing-space-050": {
+      "uses": 15,
+      "bare": 12
+    },
+    "--size-spacing-space-150": {
+      "uses": 6,
+      "bare": 6
+    },
+    "--size-spacing-space-200": {
+      "uses": 8,
+      "bare": 8
+    },
+    "--size-spacing-space-300": {
+      "uses": 2,
+      "bare": 2
+    },
+    "--size-spacing-space-400": {
+      "uses": 12,
+      "bare": 12
+    },
+    "--size-spacing-space-600": {
+      "uses": 3,
+      "bare": 3
+    },
+    "--size-spacing-spacer-1": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--size-spacing-within-component-spacer-2": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--size-spacing-within-component-spacer-3": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--size-spacing-within-component-spacer-4": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--size-spacing-within-component-spacer-4-5": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--size-spacing-within-component-spacer-5": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--size-surface-container-border": {
+      "uses": 2,
+      "bare": 2
+    },
+    "--size-surface-container-gap-sm": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--size-surface-container-pad-x-md": {
+      "uses": 2,
+      "bare": 2
+    },
+    "--size-surface-container-pad-y-md": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--size-surface-container-pad-y-sm": {
+      "uses": 2,
+      "bare": 2
+    },
+    "--size-table-row-radius": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--space-050": {
+      "uses": 1,
+      "bare": 0
+    },
+    "--space-100": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--space-200": {
+      "uses": 5,
+      "bare": 0
+    },
+    "--space-300": {
+      "uses": 3,
+      "bare": 0
+    },
+    "--space-500": {
+      "uses": 3,
+      "bare": 0
+    },
+    "--spacing": {
+      "uses": 1,
+      "bare": 1
+    },
+    "--spacing-large-space-300": {
+      "uses": 15,
+      "bare": 0
+    },
+    "--spacing-large-space-400": {
+      "uses": 4,
+      "bare": 0
+    },
+    "--spacing-medium-space-200": {
+      "uses": 7,
+      "bare": 0
+    },
+    "--spacing-small-space-100": {
+      "uses": 3,
+      "bare": 0
+    },
+    "--spacing-xxlarge-space-500": {
+      "uses": 2,
+      "bare": 0
+    },
+    "--table-cell-gap": {
+      "uses": 7,
+      "bare": 0
+    },
+    "--table-cell-x": {
+      "uses": 14,
+      "bare": 0
+    },
+    "--table-cell-y": {
+      "uses": 14,
+      "bare": 0
+    },
+    "--table-row-radius": {
+      "uses": 5,
+      "bare": 0
+    },
+    "--value-percent": {
+      "uses": 4,
+      "bare": 0
+    }
+  }
+}

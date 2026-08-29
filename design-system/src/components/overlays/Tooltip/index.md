@@ -38,7 +38,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-inverse-on-surface` · `--color-inverse-surface` · `--elevation-light-2` · `--font-family-body` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-line-height-body4` · `--font-size-body2` · `--font-size-body3` · `--font-size-body4` · `--font-weight-normal` · `--size-border-stroke-stroke-100` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-radius-md` · `--size-spacing-small-space-050` · `--size-spacing-small-space-150`
+`--color-inverse-on-surface` · `--color-inverse-surface` · `--elevation-light-2` · `--font-family-body` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body2` · `--font-size-body3` · `--font-weight-normal` · `--size-border-stroke-stroke-100` · `--size-element-pad-x-sm` · `--size-element-pad-y-lg` · `--size-element-radius-md` · `--size-spacing-small-space-050` · `--size-spacing-small-space-150`
 
 From `design-system/src/components/overlays/Tooltip/Tooltip.scss`. Override these through the token layer, never with a literal.
 

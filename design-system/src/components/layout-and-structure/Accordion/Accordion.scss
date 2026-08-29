@@ -93,7 +93,7 @@
         // --- HOVER STATE (must come after collapsed/expanded base states) ---
         // Hover on COLLAPSED items (not yet opened)
         &.collapsed:hover:not(:disabled) {
-            background-color: var(--color-neutral-state-08) !important;
+            background-color: var(--color-on-surface-state-08) !important;
             cursor: pointer;
         }
 
@@ -106,7 +106,7 @@
         // --- PRESSED STATE ---
         &:active,
         &.pressed {
-            background-color: var(--color-neutral-state-12) !important;
+            background-color: var(--color-on-surface-state-12) !important;
         }
 
         // --- FOCUS STATE ---
@@ -179,7 +179,7 @@
             // It's nested to ensure specificity within the flush context
             border: none;
             background: transparent;
-            border-bottom: var(--size-card-border-xs) solid var(--color-outline-variant); // Default divider-radius: 0;
+            border-bottom: var(--size-card-border-sm) solid var(--color-outline-variant); // Default divider-radius: 0;
             background-color: var(--color-surface);
 
             // Last item still has bottom border for consistency
@@ -195,7 +195,7 @@
 
             // Hover state
             &:hover {
-                background-color: var(--color-neutral-state-08) !important;
+                background-color: var(--color-on-surface-state-08) !important;
             }
 
             // Per Figma: Expanded state uses primary-state-16 bg

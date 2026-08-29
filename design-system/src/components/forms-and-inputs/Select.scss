@@ -204,7 +204,7 @@
     flex: 1 1 auto;
     font-family: var(--font-family-body);
     font-size: inherit;
-    font-weight: var(--font-weight-light);
+    font-weight: var(--font-weight-normal);
     color: var(--color-on-surface);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -279,7 +279,7 @@
         background-color: var(--color-surface);
         transition: none !important;
         color: var(--color-on-surface-variant);
-        font-weight: var(--font-weight-light);
+        font-weight: var(--font-weight-normal);
 
         &::placeholder {
             color: var(--color-on-surface-variant);
@@ -363,7 +363,7 @@
         color: var(--color-on-surface);
         font-family: var(--font-family-body);
         font-size: var(--font-size-body2);
-        font-weight: var(--font-weight-light);
+        font-weight: var(--font-weight-normal);
         line-height: var(--font-line-height-body2);
         text-align: left;
         text-decoration: none;
@@ -389,7 +389,7 @@
             position: relative;
             background-color: var(--_Primary-State-layers-Primary-08, rgba(0, 101, 142, 0.08));
             color: var(--color-on-surface);
-            font-weight: var(--font-weight-light) !important;
+            font-weight: var(--font-weight-normal) !important;
             border: none !important;
             box-shadow: none !important;
 
@@ -427,7 +427,7 @@
         background-color: var(--color-surface);
         font-family: var(--font-family-body);
         font-size: var(--font-size-body2);
-        font-weight: var(--font-weight-light);
+        font-weight: var(--font-weight-normal);
         line-height: var(--font-line-height-body2);
         gap: var(--size-element-gap-md, 10px);
         align-items: center;
@@ -448,7 +448,7 @@
             position: relative;
             /* Override OptionList active background to match single-select selected */
             background-color: var(--_Primary-State-layers-Primary-08, rgba(0, 101, 142, 0.08)) !important;
-            font-weight: var(--font-weight-light) !important;
+            font-weight: var(--font-weight-normal) !important;
             padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px) !important;
             margin: 0 !important;
             gap: var(--size-element-gap-md, 10px) !important;

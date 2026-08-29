@@ -52,7 +52,7 @@
         &.plus-list-group-item--active {
             z-index: 2;
             color: var(--color-primary-text); // Primary Text
-            background-color: var(--color-primary-08); // Primary 08 Opacity
+            background-color: var(--color-primary-state-08); // Primary 08 Opacity
             border-color: var(--color-outline-variant); // Keep border or change? Usually active has border change?
             // User requested active colors. Default BS removes border or colors it.
             // We keep it simple to match design system "Selected/Active" state.
@@ -76,7 +76,7 @@
             align-items: center;
             justify-content: center;
             min-width: 20px;
-            padding: 0 var(--size-spacing-md); // 12px
+            padding: 0 var(--size-spacing-medium-space-200); // 12px
             background-color: var(--color-on-surface);
             color: var(--color-surface);
             border-radius: var(--size-element-radius-full);
