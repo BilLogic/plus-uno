@@ -182,3 +182,24 @@ CustomOverflowAction.play = async ({ canvasElement }) => {
     await expect(canvas.getByRole('button', { name: '5 more' })).toBeInTheDocument();
     await expect(canvas.queryByText('Music')).toBeNull();
 };
+
+/* -------------------------------------------------------------- playground */
+
+/**
+ * Interactive playground.
+ *
+ * The tags are fixed so the controls change the SET: whether it wraps or
+ * collapses, how many show before the `+n`, and what the group is called.
+ */
+export const Interactive = (args) => (
+    <div style={{ maxWidth: '360px' }}>
+        <TagGroup {...args}>
+            {SUBJECTS.map((s) => <Tag key={s} color="blue">{s}</Tag>)}
+        </TagGroup>
+    </div>
+);
+Interactive.args = {
+    label: 'Subjects',
+    overflow: 'wrap',
+    maxVisible: 3,
+};

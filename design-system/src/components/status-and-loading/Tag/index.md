@@ -7,7 +7,9 @@
 
 **Source:** `design-system/src/components/status-and-loading/Tag/Tag.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/Tag/Tag.stories.jsx` — Colors, Variants, Dismissing, RemoveIsGatedToDismissible, DismissibleIsNotNestedInteractive, Selecting, OperationalHasNoPressedState, ReadOnlyExposesNoControl, Truncation, WithLeadingContent, Loading
+**Stories:** `design-system/src/components/status-and-loading/Tag/Tag.stories.jsx` — Colors, Variants, Dismissing, RemoveIsGatedToDismissible, DismissibleIsNotNestedInteractive, Selecting, OperationalHasNoPressedState, ReadOnlyExposesNoControl, Truncation, WithLeadingContent, Loading, Interactive
+
+**Storybook page:** `design-system/src/components/status-and-loading/Tag/Tag.mdx`
 
 ## Props
 
@@ -34,8 +36,6 @@ From `design-system/src/components/status-and-loading/Tag/Tag.scss`. Override th
 
 Same group: `Badge` · `BadgeVariants` · `Progress` · `Spinner` · `TagGroup`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `Tag` is the right call, only what it accepts.
+> Authored guidance is partial — missing: correct/incorrect (#166).

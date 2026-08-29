@@ -1,0 +1,218 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TagStories from './Tag.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={TagStories} />
+
+<Title />
+A tag is a representation of a value that someone has picked. To show
+system-generated data that people can't change, use a badge instead.
+
+<DocsTabs of={TagStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Tag"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>The four variants. What separates them is what the person can do to the value once it is on screen.</>}>
+    <Canvas of={TagStories.Variants} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Colors
+
+<DocsCanvasShell description={<>Every colour the API offers. A tag's colour is a category, never a status — there is deliberately no <code>success</code> or <code>danger</code>.</>}>
+    <DsCanvasQuiet of={TagStories.Colors} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>A swatch for a legend entry, an avatar or icon for a person or an app.</>}>
+    <DsCanvasQuiet of={TagStories.WithLeadingContent} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Selection
+
+<DocsCanvasShell description={<>A selectable tag is a toggle, and publishes <code>aria-pressed</code>. An operational tag acts once and has no pressed state to report.</>}>
+    <DsCanvasQuiet of={TagStories.Selecting} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Dismissal
+
+<DocsCanvasShell description={<>The remove button is named from the label, so a row of tags does not expose a row of identically named controls.</>}>
+    <DsCanvasQuiet of={TagStories.Dismissing} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Truncation
+
+<DocsCanvasShell description={<>A capped tag keeps its full text in <code>title</code>, which is the one place a pointer and a screen reader both reach.</>}>
+    <DsCanvasQuiet of={TagStories.Truncation} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>A loading tag stands down as a control while the value it represents is still changing.</>}>
+    <DsCanvasQuiet of={TagStories.Loading} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={TagStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Tag` for a value a person chose: the subjects on a tutor's profile, the
+filters someone applied to a table, the recipients they added to a message. The
+test is authorship — who put the value there — and not whether the control can
+be clicked.
+
+That test is what survives the edge case. A `read-only` tag is still a tag,
+because the pattern tells the reader the selection becomes editable again once
+the surface does. `Badge` is what to reach for when the system produced the
+value and nobody can change it: a session's status, an unread count.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Colour is a category, not a status.
+
+`color` takes plain names, and that is deliberate. There is no `success` and no
+`danger`, because a green tag would be read as "this went well" the moment one
+appears next to a red one.
+
+```jsx
+// Incorrect — the colour is doing the work the label should do, and it is
+// doing it wrongly: `green` here means "Biology", not "passed".
+<Tag color="green">Biology</Tag>
+<Tag color="orange">Chemistry</Tag>
+
+// Correct — pick a colour per category and keep it stable across the app, or
+// leave every tag `grey` and let the words carry the meaning.
+<Tag color="blue">Biology</Tag>
+<Tag color="blue">Chemistry</Tag>
+```
+
+### `onRemove` belongs to `dismissible`, and nothing else.
+
+The gate is behaviour, not a type. `propTypes` will accept the function on any
+variant; the component renders the remove button on one.
+
+```jsx
+// Incorrect — no X renders, and the value stays put. The tag is read-only
+// because that is what `variant` says, whatever handler is attached.
+<Tag variant="read-only" onRemove={drop}>Grade 4</Tag>
+
+// Correct — the variant is the API.
+<Tag variant="dismissible" onRemove={drop}>Grade 4</Tag>
+```
+
+### Let the group own the gaps.
+
+`Tag` sets no margin of its own. A row of tags is a `TagGroup`, which sets
+`gap` once for the set; spacing a row by hand means every future change to the
+rhythm has to find each place it was done.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A dismissible tag is not itself a control.** Its remove button is, and a
+  button inside a button is invalid per ARIA. So the tag renders as a `span`
+  and exactly one control exists inside it.
+- **The remove button is named from the label.** It announces `Remove Science`,
+  not `Remove` — `removeLabel` overrides that string when the label is not
+  text. This is the defect `Badge` still carries: its dismiss control is
+  hard-coded to one word, so a row of them exposes identical names.
+- **`selectable` publishes `aria-pressed`; `operational` does not.** A toggle
+  reports its state, and a control that acts once has no state to report.
+  Saying `aria-pressed="false"` on the latter tells a screen-reader user to
+  track something that never changes.
+- **A truncated label keeps its full text.** `maxWidth` puts the label in
+  `title`, because a CSS ellipsis alone deletes the value for anyone not
+  looking at the pixels.
+- **`swatchBefore` is decoration and is hidden.** It repeats what the tag
+  already says in words; announcing it would produce "square, Series A".
+- **A loading tag exposes no control.** `isLoading` stands the tag down so a
+  second press cannot queue a second action against a value that is already
+  changing.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a set of tags, use `TagGroup` — it owns the gaps and the overflow.
+- For a field where the person types values in and takes them out, use `TagInput`.
+- For system-generated data nobody can change, use `Badge`.
+- For choosing from a fixed list rather than showing what was chosen, use `Select` or `Checkbox`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

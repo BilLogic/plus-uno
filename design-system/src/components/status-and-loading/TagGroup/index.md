@@ -9,7 +9,9 @@ The container for a set of tags (#276). IT EXISTS TO OWN WHAT A SINGLE TAG CANNO
 
 **Source:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.stories.jsx` — Wrapping, Overflow, NoOverflowWhenItFits, ConditionalChildrenAreNotCounted, DismissibleSet, CustomOverflowAction
+**Stories:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.stories.jsx` — Wrapping, Overflow, NoOverflowWhenItFits, ConditionalChildrenAreNotCounted, DismissibleSet, CustomOverflowAction, Interactive
+
+**Storybook page:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.mdx`
 
 ## Props
 
@@ -40,8 +42,6 @@ From `design-system/src/components/status-and-loading/TagGroup/TagGroup.scss`. O
 
 Same group: `Badge` · `BadgeVariants` · `Progress` · `Spinner` · `Tag`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `TagGroup` is the right call, only what it accepts.
+> Authored guidance is partial — missing: correct/incorrect (#166).

@@ -410,6 +410,42 @@ function dedupe(list, key) {
 
 /* -------------------------------------------------------- source reading */
 
+/**
+ * `PropTypes.oneOf(TAG_VARIANTS)` — an enum whose values are named by a
+ * constant rather than written inline.
+ *
+ * WHY THIS EXISTS. `parsePropTypes` matched only `oneOf([...])`. Five props
+ * across three components declare their values as a module constant instead —
+ * `Tag.variant`, `Tag.color`, `BadgeVariants.variant`,
+ * `BadgeVariants.appearance`, `Surface.level` — and for all five `enumValues`
+ * came back `null`, which this check reads as "no enum to compare against".
+ * So the `variant` claim shape, which the header advertises, was never made on
+ * those pages: `<Tag variant="removable">` and `<Tag color="chartreuse">` both
+ * passed a full green run in #276.
+ *
+ * SAME FILE ONLY, AND NEVER AN EMPTY LIST. A constant imported from another
+ * module is not followed — that needs module resolution. Anything this cannot
+ * read returns `null`, meaning "not checked", which is the behaviour that was
+ * already there. It must never return `[]`: that reads as "no legal value" and
+ * would fail every correct page on the five props below rather than no page.
+ * The two ways to get there are an import, and an array whose contents this
+ * regex mis-slices — a value containing a `]`, say — so both end at `null`.
+ *
+ * @param {string} source The component's source text.
+ * @param {string} name The constant's identifier.
+ * @returns {string[] | null} The string values, or `null` when it cannot be read here.
+ */
+export function namedEnumValues(source, name) {
+  // `name` reaches here from a `[A-Za-z_$][\w$]*` match, so `$` is the one
+  // regex metacharacter it can carry — and an unescaped `$` is an anchor, which
+  // silently matches nothing.
+  const escaped = name.replace(/\$/g, '\\$');
+  const decl = new RegExp(`(?:export\\s+)?const\\s+${escaped}\\s*=\\s*\\[([^\\]]*)\\]`).exec(source);
+  if (!decl) return null;
+  const values = [...decl[1].matchAll(/'([^']*)'|"([^"]*)"/g)].map((v) => v[1] ?? v[2]);
+  return values.length ? values : null;
+}
+
 /** `<Name>.propTypes = { ... }` → [{ name, enumValues }]. */
 export function parsePropTypes(source, symbol) {
   const at = source.indexOf(`${symbol}.propTypes`);
@@ -429,6 +465,7 @@ export function parsePropTypes(source, symbol) {
     const m = cleaned.match(/^([A-Za-z_$][\w$]*)\s*:\s*([\s\S]+)$/);
     if (!m) return;
     const oneOf = m[2].match(/PropTypes\.oneOf\(\[([\s\S]*?)\]\)/);
+    const oneOfNamed = oneOf ? null : m[2].match(/PropTypes\.oneOf\(\s*([A-Za-z_$][\w$]*)\s*\)/);
     props.push({
       name: m[1],
       type: m[2].replace(/\s+/g, ' ').trim(),
@@ -436,7 +473,11 @@ export function parsePropTypes(source, symbol) {
       // marks the shape's field, not the prop — reading it as the prop's made
       // `options` look required, and the render test then passed Select a string.
       required: /\.isRequired\s*$/.test(m[2].trim()),
-      enumValues: oneOf ? [...oneOf[1].matchAll(/'([^']*)'|"([^"]*)"/g)].map((v) => v[1] ?? v[2]) : null,
+      enumValues: oneOf
+        ? [...oneOf[1].matchAll(/'([^']*)'|"([^"]*)"/g)].map((v) => v[1] ?? v[2])
+        : oneOfNamed
+          ? namedEnumValues(source, oneOfNamed[1])
+          : null,
     });
   };
   for (const ch of body) {

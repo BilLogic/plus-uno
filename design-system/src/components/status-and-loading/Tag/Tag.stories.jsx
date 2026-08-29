@@ -270,3 +270,24 @@ Loading.play = async ({ canvasElement }) => {
     await expect(canvas.queryAllByRole('button')).toHaveLength(0);
     await expect(canvas.getByRole('status', { name: 'Loading' })).toBeInTheDocument();
 };
+
+/* -------------------------------------------------------------- playground */
+
+/**
+ * Interactive playground.
+ *
+ * `onClick` and `onRemove` are supplied here rather than exposed as controls: a
+ * docs control cannot author a function, and `dismissible` renders no remove
+ * button without one — which reads as the variant being broken rather than as a
+ * missing handler.
+ */
+export const Interactive = (args) => (
+    <Tag {...args} onClick={() => {}} onRemove={() => {}} />
+);
+Interactive.args = {
+    text: 'Mathematics',
+    variant: 'read-only',
+    color: 'blue',
+    isSelected: false,
+    isLoading: false,
+};

@@ -26,6 +26,7 @@ import {
   DOM_EVENTS,
   definedTokens,
   jsxElements,
+  namedEnumValues,
   parsePropTypes,
   parseSubComponents,
   proseAttrClaims,
@@ -278,6 +279,36 @@ test('propTypes enums are read off the real Button', () => {
   assert.deepEqual(props.get('size'), ['small', 'medium', 'large']);
   assert.ok(props.get('style').includes('social-emotional'));
   assert.equal(props.get('text'), null, 'a non-enum prop has no legal-value list');
+});
+
+test('an enum named by a constant is read, not skipped — the #276 blind spot', () => {
+  const source = fs.readFileSync(
+    path.join(REPO_ROOT, 'design-system/src/components/status-and-loading/Tag/Tag.jsx'),
+    'utf8',
+  );
+  const props = new Map(parsePropTypes(source, 'Tag').map((p) => [p.name, p.enumValues]));
+  // Before this was taught to resolve `PropTypes.oneOf(TAG_VARIANTS)`, both of
+  // these were null, which the check reads as "no enum" — so every
+  // `variant="…"` on the Tag page resolved to nothing at all, silently.
+  assert.deepEqual(props.get('variant'), ['read-only', 'dismissible', 'selectable', 'operational']);
+  assert.ok(props.get('color').includes('magenta'));
+});
+
+test('a constant declared in another module stays unresolved rather than empty', () => {
+  // `null` means "not checked", which is what it was before. An empty array
+  // would mean "no legal value", and would fail every correct page on the four
+  // other components that declare their enums this way.
+  const source = 'import { SIZES } from "./sizes";\nX.propTypes = { size: PropTypes.oneOf(SIZES) };\n';
+  assert.equal(parsePropTypes(source, 'X')[0].enumValues, null);
+  assert.equal(namedEnumValues(source, 'SIZES'), null);
+});
+
+test('an array this cannot read comes back null, never an empty list', () => {
+  // `[]` would mean "no legal value" and fail every correct page on the five
+  // props that name their enum. Both ways of failing to read one end at `null`.
+  assert.equal(namedEnumValues("const X = ['a]b'];", 'X'), null, 'a value holding a `]`');
+  assert.equal(namedEnumValues('const X = [];', 'X'), null, 'an array with nothing in it');
+  assert.deepEqual(namedEnumValues("const $X = ['a'];", '$X'), ['a'], '`$` is escaped, not an anchor');
 });
 
 test('a sub-component assignment is read with the symbol it points at', () => {
