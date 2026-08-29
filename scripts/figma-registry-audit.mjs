@@ -30,6 +30,15 @@
  * reported thirteen false misses — plus a ready-to-run Plugin API script per
  * file. Paste each into `use_figma` against that file's key.
  *
+ * ONE DIRECTION ONLY. This walks the registry outward and asks Figma about
+ * each id. It never walks Figma and asks the registry, so a component set that
+ * exists in the library and is mapped nowhere is invisible here. That sweep was
+ * run by hand on 2026-08-29 — 157 sets, 75 mapped, 28 public sets unmapped —
+ * and is recorded in registry-audit.md § The reverse direction. It is a
+ * whole-file enumeration rather than a lookup, which is why it is not printed
+ * here as a paste-ready script alongside the others: it needs reading, not
+ * running.
+ *
  * Run: `npm run audit:figma-registry`
  */
 import fs from 'node:fs';

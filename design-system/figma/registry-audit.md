@@ -91,6 +91,94 @@ above.
 - **Whether the variant props still line up.** `figmaMeta.variantProps` records
   name divergences (TopBar's Figma `expand?` vs code's `mode`). Nothing
   re-reads them.
-- **Whether anything is missing.** This walks the registry and asks Figma. It
-  never walks Figma and asks the registry, so a component that exists in the
-  library and is mapped nowhere is invisible here.
+- **Whether anything is missing** — this was the third blind spot, and it is
+  now closed once, by hand, in the section below. The npm script still only
+  walks the registry outward; the reverse direction is a whole-file enumeration
+  and has to be re-run the same way.
+
+## The reverse direction — 2026-08-29
+
+Walked the file instead of the registry: every `COMPONENT_SET` on every page
+except the dividers and the Cover.
+
+```js
+// use_figma, fileKey zAecJNRdvJzAUOcjV32tRX
+for (const page of figma.root.children) {
+  if (page.name.startsWith('───') || page.name === 'Cover') continue;
+  for (const node of page.findAllWithCriteria({ types: ['COMPONENT_SET'] })) { /* … */ }
+}
+```
+
+**157 component sets. 75 are mapped. 82 are not** — and the 82 are not one
+problem:
+
+| kind | n | mapped? |
+|---|---|---|
+| internal parts, `_`-prefixed | 38 | correctly not mapped — the file's own convention marks these as pieces, not products |
+| on the `🗄 Archive` page | 6 | correctly not mapped |
+| Foundations documentation sets (Color swatch sets, `Typography/*`, `Icon`, `Image`, `Figure`) | 10 | correctly not mapped — these document tokens, they are not code components |
+| **public component sets with no mapping** | **28** | **the finding** |
+
+### The 28
+
+| page | set | node | variants |
+|---|---|---|---|
+| Choice Grid | Choice Grid Radios | `13541:7040` | 6 |
+| Choice Grid | Choice Grid Checkboxes | `13541:10470` | 8 |
+| Date & Time Picker | Time (no label) | `13662:9119` | 6 |
+| Date & Time Picker | Month (no label) | `13686:6222` | 5 |
+| Dropdown | Dropdown list Item | `37:6472` | 5 |
+| Input | Form | `14841:25919` | 1 |
+| Input Group | Input Group Text | `13125:6054` | 18 |
+| Input Group | Input Group Checkbox | `13125:6127` | 12 |
+| Input Group | Input Group Radio | `13125:6164` | 9 |
+| Input Group | Input Group Button | `13125:6192` | 18 |
+| Input Group | Input Group Text | `53:20700` | 6 |
+| Input Group | Input Group Checkbox | `53:20962` | 4 |
+| Input Group | Input Group Radio | `53:20972` | 3 |
+| Input Group | Input Group Text | `13659:1414` | 1 |
+| Input Group | Multiple Inputs | `13612:78094` | 4 |
+| Input Group | Multiple Dropdown | `13612:78859` | 2 |
+| Rating | Rating Icons | `13527:17892` | 2 |
+| Select | Multi-Select Option | `15685:6233` | 3 |
+| Tree Select | tree_dropdown layers | `13529:1075` | 8 |
+| Tree Select | tree_dropdown component ver 1 | `13520:62188` | 3 |
+| Tree Select | Indented Tree Select Item List | `13520:70443` | 9 |
+| Accordion | accordion-item | `13667:4944` | 10 |
+| [wip] Card | Card Components | `59:15771` | 8 |
+| Nav Tabs & Nav Pills | Navbar Components | `72:16339` | 7 |
+| Nav Tabs & Nav Pills | NavBar Item | `4209:30087` | 9 |
+| Nav Tabs & Nav Pills | NavBar Item Dropdown | `4209:30187` | 9 |
+| Nav Tabs & Nav Pills | Tab Item | `4209:20411` | 9 |
+| Nav Tabs & Nav Pills | Pill Item | `4209:29515` | 9 |
+
+### What the 28 are NOT
+
+**They are not 28 missing components.** Reading them:
+
+- **Nine are sub-parts of a mapped component** — `accordion-item`, `Tab Item`,
+  `Pill Item`, `NavBar Item`, `NavBar Item Dropdown`, `Dropdown list Item`,
+  `Multi-Select Option`, `Rating Icons`, `Card Components`. Their parent set is
+  mapped; the code renders them from the parent's props rather than as
+  separate exports. Mapping each would add rows nobody could act on.
+- **Three are the same name three times** — `Input Group Text` at `13125:6054`
+  (18 variants), `53:20700` (6) and `13659:1414` (1). That is the ver1 / ver2 /
+  legacy layering the library keeps on purpose. Which is current is a question
+  for design; a registry entry has to pick one and would be picking silently.
+  `Tree Select` has the same shape: `tree_dropdown component ver 1` beside the
+  mapped `tree_select_ver2`.
+- **Two are legitimately unmapped variants of a mapped component** —
+  `Time (no label)` and `Month (no label)` on the Date & Time Picker page, the
+  labelless twins of `Time (Date Picker)` and `Month (Date Picker)`. Whether
+  the code's `DatePicker` covers the labelless case is a design question, and
+  it is the same question the `13549:6703` entry above raises.
+
+So the number worth acting on is smaller than 28, and every reduction above is
+a judgement rather than a measurement — which is exactly why the list is
+recorded whole rather than filtered down to a number.
+
+### Correcting an earlier claim
+
+Issue #339 carries "29 unreferenced / 17 unmapped". Those were measured against
+`scripts/figma-component-snapshot.json`, which was seven weeks old at the time.
+**The numbers above replace them**, and they were read live.
