@@ -96,6 +96,15 @@ above.
   walks the registry outward; the reverse direction is a whole-file enumeration
   and has to be re-run the same way.
 
+## Descriptions
+
+A third sweep, recorded separately in [library-sweep.md](library-sweep.md):
+66 of the 112 public component sets carried NO description, which is what a
+designer reads in the assets panel. All 112 have one now, and writing them
+surfaced a naming layer this audit could not see — four unnamed variant
+properties, five sets still on Figma's default `Property 1` / `Variant2`
+names, a `preppend`, and `error` where the rest of the system says `danger`.
+
 ## The reverse direction — 2026-08-29
 
 Walked the file instead of the registry: every `COMPONENT_SET` on every page
