@@ -87,8 +87,6 @@
     "--color-surface-variant #dee3e5",
     "--color-tertiary #c96a6a",
     "--color-tertiary-container #e8deff",
-    "--color-warning #715c00",
-    "--color-warning #ed6c02",
     "--color-warning-container #f8efc1",
     "--color-warning-container #fcdf8e"
   ],

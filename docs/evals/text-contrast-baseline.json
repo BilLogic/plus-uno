@@ -1,0 +1,85 @@
+{
+  "measured": "AA 4.5:1, ground from each rule, page fallback --color-surface",
+  "findings": {
+    "design-system/src/components/_internal/SessionManagementSnackbar/SessionManagementSnackbar.scss|--color-surface|--color-surface": {
+      "count": 1,
+      "ratio": 1,
+      "why": "NOT A DEFECT \u2014 the check's blind spot 1. The header's ground is set by child modifiers (&--created is --color-success, &--updated --color-info, &--cancelled --color-warning), which this reads as the page. White on those three is 6.17 / 4.53 / 3.52:1; the last is the same --color-warning question recorded below, in a place that is genuinely white-on-gold."
+    },
+    "design-system/src/components/forms-and-inputs/DateAndTimePicker.scss|--color-primary|--color-primary-state-08": {
+      "count": 3,
+      "ratio": 4.46,
+      "why": "LIVE, MARGINAL \u2014 4.46:1 against primary's own 8% wash, a hair under 4.5. Not a mistake in this file: --color-primary is 5.02:1 on the page and passes there, and it fails here only because the wash lightens the ground. The fix is a token decision (#268 \u2014 does --color-primary need a darker text sibling, which is what --color-primary-text at 7.78:1 already is), not a per-call-site edit."
+    },
+    "design-system/src/components/forms-and-inputs/DateAndTimePicker.scss|--color-primary|--color-primary-state-12": {
+      "count": 1,
+      "ratio": 4.2,
+      "why": "LIVE, MARGINAL \u2014 4.20:1. Same as the state-08 entry above and slightly worse, because a 12% wash lightens the ground further. Same #268 decision."
+    },
+    "design-system/src/components/forms-and-inputs/Rating.scss|--color-outline-variant|--color-surface": {
+      "count": 1,
+      "ratio": 1.62,
+      "why": "EXEMPT, BUT WORTH A LOOK \u2014 the UNSELECTED star. It is the track of the rating rather than the value, and WCAG 1.4.11 exempts inactive components; the selected stars carry the meaning. Recorded rather than dismissed because 1.62:1 is faint enough that the empty half of a 2-of-5 rating is nearly invisible, and whether that reads is a design call."
+    },
+    "design-system/src/components/layout-and-structure/Carousel/Carousel.scss|--color-on-primary|--color-scrim": {
+      "count": 1,
+      "ratio": 2.81,
+      "why": "NOT MEASURABLE HERE \u2014 the ground is `linear-gradient(transparent, var(--color-scrim))` over a photograph. The check composites the scrim over the page and gets 2.81:1, which is neither the top of the gradient nor the real image beneath. A caption over an arbitrary photo needs a scrim strong enough for the worst image, and only rendering can answer that."
+    },
+    "design-system/src/components/status-and-loading/Progress/Progress.scss|--color-on-warning|--color-warning": {
+      "count": 1,
+      "ratio": 3.7,
+      "why": "OPEN DECISION, ALREADY RECORDED \u2014 3.7:1, the same pair in docs/evals/button-contrast-baseline.json. Does --color-warning need a darker filled variant, or --color-on-warning a darker on-colour? That is #268 and Bill's. Two checks reaching the same fact from different directions is the system working; it is one decision, not two."
+    },
+    "design-system/src/specs/Admin/Session/Tables/SessionBreakdownTable/SessionBreakdownTable.scss|--color-outline-variant|--color-surface": {
+      "count": 1,
+      "ratio": 1.62,
+      "why": "EXEMPT \u2014 INACTIVE table sort arrow. WCAG 1.4.11 exempts inactive components outright, and the active state is --color-secondary (6.70:1). One of eight identical sort indicators across the admin tables."
+    },
+    "design-system/src/specs/Admin/Session/Tables/SessionsTable/SessionsTable.scss|--color-outline-variant|--color-surface": {
+      "count": 1,
+      "ratio": 1.62,
+      "why": "EXEMPT \u2014 INACTIVE table sort arrow, &--active is --color-secondary (6.70:1). See the SessionBreakdownTable entry."
+    },
+    "design-system/src/specs/Admin/Tutor/Modals/TutorModal/TutorModal.scss|--color-outline-variant|--color-surface": {
+      "count": 1,
+      "ratio": 1.62,
+      "why": "EXEMPT \u2014 a 10px trailing chevron beside a label that carries the text itself. Decorative; the label is --color-on-surface."
+    },
+    "design-system/src/specs/Admin/Tutor/Tables/TutorSessionsTable/TutorSessionsTable.scss|--color-outline-variant|--color-surface": {
+      "count": 1,
+      "ratio": 1.62,
+      "why": "EXEMPT \u2014 INACTIVE table sort arrow. See the SessionBreakdownTable entry."
+    },
+    "design-system/src/specs/Admin/Tutor/Tables/TutorsPerformanceTable/TutorsPerformanceTable.scss|--color-outline-variant|--color-surface": {
+      "count": 1,
+      "ratio": 1.62,
+      "why": "EXEMPT \u2014 INACTIVE table sort arrow. See the SessionBreakdownTable entry."
+    },
+    "design-system/src/specs/Admin/Tutor/Tables/TutorsToolUsageTable/TutorsToolUsageTable.scss|--color-outline-variant|--color-surface": {
+      "count": 1,
+      "ratio": 1.62,
+      "why": "EXEMPT \u2014 INACTIVE table sort arrow. See the SessionBreakdownTable entry."
+    },
+    "design-system/src/specs/Admin/Tutor/Tables/TutorsTrainingProgressTable/TutorsTrainingProgressTable.scss|--color-outline-variant|--color-surface": {
+      "count": 1,
+      "ratio": 1.62,
+      "why": "EXEMPT \u2014 INACTIVE table sort arrow. See the SessionBreakdownTable entry."
+    },
+    "design-system/src/specs/Home/Cards/ResourceCard/ResourceCard.scss|--color-outline|--color-surface": {
+      "count": 1,
+      "ratio": 4.26,
+      "why": "LIVE \u2014 4.26:1 on a `span` of real text, the closest miss in the corpus. --color-outline is a BORDER token being used as a text colour; --color-on-surface-variant (8.93:1) is what the rest of the system uses for subtle text. Not fixed here only because it is a visible change to a shipped card and belongs with the wider `-text` sweep, not with the seven warning fixes."
+    },
+    "design-system/src/specs/Home/Sections/StudentsOverviewSection/StudentsOverviewSection.scss|--color-outline-variant|--color-surface": {
+      "count": 1,
+      "ratio": 1.62,
+      "why": "EXEMPT \u2014 a 14px table-header icon beside a text label. Decorative; the label carries the meaning."
+    },
+    "design-system/src/specs/Universal/Sections/TopBar/TopBar.scss|--color-primary|--color-primary-state-08": {
+      "count": 1,
+      "ratio": 4.46,
+      "why": "LIVE, MARGINAL \u2014 4.46:1. The sidebar toggle's icon on primary's 8% wash, the same pair as the DateAndTimePicker entries and the same #268 token decision. The rule cites a Figma node, so changing it here would put the code and the design out of step for a 0.04 difference."
+    }
+  }
+}
