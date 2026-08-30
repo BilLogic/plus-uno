@@ -376,8 +376,15 @@ say ""
 # only thing left to answer the question. The real wrangler.toml is not touched
 # here: rewriting it early would make apply-cutover read the NEW account as its
 # OLD one and refuse the whole pass.
-MINI_TOML="$(mktemp -t cutover-wrangler).toml"
-trap 'rm -f "$MINI_TOML"' EXIT
+# `mktemp` creates its own extensionless file and wrangler needs the .toml
+# suffix to parse it, so both names exist and both have to go.
+# `mktemp` creates its own extensionless file and wrangler needs the .toml
+# suffix to parse it, so both names exist and both have to go. Two variables,
+# because the trap body expands at EXIT: one that also held the base name would
+# by then have been reassigned, and the base would survive.
+MINI_BASE="$(mktemp -t cutover-wrangler)"
+MINI_TOML="$MINI_BASE.toml"
+trap 'rm -f "$MINI_BASE" "$MINI_TOML"' EXIT
 {
   printf 'name = "uno-bot"\n'
   # Carried across rather than pinned, so this cannot drift from the real config.
