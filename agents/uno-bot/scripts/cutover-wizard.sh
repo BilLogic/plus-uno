@@ -363,13 +363,76 @@ say "SLACK_OAUTH_KV holds the issued Slack user token and the PKCE verifiers."
 say "HARNESS_KV holds the figma-poll snapshot, the delivery-alert throttle and"
 say "the Gemini cache memo. Both are small."
 say ""
+# WRANGLER.TOML'S account_id BEATS $CLOUDFLARE_ACCOUNT_ID, and stage 2 only
+# exported the variable. So every wrangler call made from this directory was
+# still talking to the account we are LEAVING — its account_id line is not
+# rewritten until stage 6, which needs these ids and therefore runs after.
+#
+# Proven, read-only, both ways:
+#   wrangler kv namespace list                    -> the old account's namespaces
+#   wrangler kv namespace list -c <no account_id> -> []
+#
+# The fix is a throwaway config carrying no account_id, so the env var is the
+# only thing left to answer the question. The real wrangler.toml is not touched
+# here: rewriting it early would make apply-cutover read the NEW account as its
+# OLD one and refuse the whole pass.
+MINI_TOML="$(mktemp -t cutover-wrangler).toml"
+trap 'rm -f "$MINI_TOML"' EXIT
+{
+  printf 'name = "uno-bot"\n'
+  # Carried across rather than pinned, so this cannot drift from the real config.
+  sed -n 's/^compatibility_date *= *\(".*"\)/compatibility_date = \1/p' "$BOT_DIR/wrangler.toml" | head -n1
+} > "$MINI_TOML"
+
+# kv_namespace_id TITLE — create it in the new account and return its id, or
+# find the id if it is already there from an earlier run. Never asks a human to
+# read an id out of scrollback: that is how an id from the wrong account gets
+# typed in, which is the exact failure this whole cutover exists to undo.
+kv_namespace_id() {
+  local title="$1" out id
+  out="$(CLOUDFLARE_ACCOUNT_ID="$NEW_ACCOUNT_ID" "$WRANGLER" kv namespace create "$title" -c "$MINI_TOML" 2>&1)" || true
+  id="$(printf '%s' "$out" | sed -n 's/.*id *= *"\([0-9a-f]\{32\}\)".*/\1/p' | head -n1)"
+  if [[ -z "$id" ]]; then
+    # Already exists is the normal case on a re-run, not an error.
+    id="$(CLOUDFLARE_ACCOUNT_ID="$NEW_ACCOUNT_ID" "$WRANGLER" kv namespace list -c "$MINI_TOML" 2>/dev/null \
+      | node -e "
+        let s = ''; process.stdin.on('data', c => s += c).on('end', () => {
+          try {
+            const hit = JSON.parse(s.slice(s.indexOf('['))).find(n => n.title === '$title');
+            if (hit) console.log(hit.id);
+          } catch {}
+        });
+      " 2>/dev/null)"
+  fi
+  printf '%s' "$id"
+}
+
 step "Creating them in $NEW_ACCOUNT_ID:"
-"$WRANGLER" kv namespace create SLACK_OAUTH_KV 2>&1 | sed 's/^/    /' || warn "create failed — make it in the dashboard instead."
-"$WRANGLER" kv namespace create HARNESS_KV 2>&1 | sed 's/^/    /' || warn "create failed — make it in the dashboard instead."
-say ""
-step "Copy each new namespace id from the output above."
-ask_required NEW_SLACK_OAUTH_KV_ID "SLACK_OAUTH_KV id:"
-ask_required NEW_HARNESS_KV_ID "HARNESS_KV id:"
+NEW_SLACK_OAUTH_KV_ID="$(kv_namespace_id SLACK_OAUTH_KV)"
+NEW_HARNESS_KV_ID="$(kv_namespace_id HARNESS_KV)"
+
+# The old ids come from apply-cutover, which already parses them BY BINDING —
+# one parser, so the two cannot disagree about which namespace is which.
+OLD_SLACK_KV="$(node -e "import('$BOT_DIR/scripts/apply-cutover.mjs').then(m => console.log(m.OLD.slackKv))" 2>/dev/null)"
+OLD_HARNESS_KV="$(node -e "import('$BOT_DIR/scripts/apply-cutover.mjs').then(m => console.log(m.OLD.harnessKv))" 2>/dev/null)"
+
+for pair in "SLACK_OAUTH_KV:$NEW_SLACK_OAUTH_KV_ID:$OLD_SLACK_KV" "HARNESS_KV:$NEW_HARNESS_KV_ID:$OLD_HARNESS_KV"; do
+  kv_title="${pair%%:*}"; kv_rest="${pair#*:}"; kv_new="${kv_rest%%:*}"; kv_old="${kv_rest#*:}"
+  if [[ -z "$kv_new" ]]; then
+    warn "Could not create or find $kv_title in $NEW_ACCOUNT_ID."
+    note "  Make it in the dashboard (Storage & Databases -> KV) and re-run;"
+    note "  this stage will then find it instead of creating it."
+    exit 1
+  fi
+  if [[ "$kv_new" == "$kv_old" ]]; then
+    warn "$kv_title came back as $kv_new — the id already in wrangler.toml."
+    note "  That means wrangler answered from the OLD account. Stopping: writing"
+    note "  this id would leave the Worker reading the account you are leaving."
+    exit 1
+  fi
+  note "✓ $kv_title = $kv_new"
+done
+
 write_env NEW_SLACK_OAUTH_KV_ID "$NEW_SLACK_OAUTH_KV_ID"
 write_env NEW_HARNESS_KV_ID "$NEW_HARNESS_KV_ID"
 pause
