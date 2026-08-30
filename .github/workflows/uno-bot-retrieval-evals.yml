@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "24"
+          node-version-file: ".nvmrc"
 
       # The scorer is the instrument for the whole retrieval upgrade. A bug in
       # it does not look like a bug — it looks like a confident recall number.
@@ -64,7 +64,7 @@ jobs:
           # Set vars.UNO_BOT_WORKER_URL to point evals at another deployment;
           # the literal is the fallback and the single other copy of it lives in
           # agents/uno-bot/scripts/worker-url.mjs (#288).
-          WORKER_URL: ${{ vars.UNO_BOT_WORKER_URL || 'https://uno-bot.bryanhuang628.workers.dev' }}
+          WORKER_URL: ${{ vars.UNO_BOT_WORKER_URL || 'https://plus-uno' }}
           DEBUG_TOKEN: ${{ secrets.DEBUG_TOKEN }}
           # Empty on every trigger but a deliberate dispatch, so a scheduled or
           # post-deploy run always measures what the product actually does.

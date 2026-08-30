@@ -1,6 +1,9 @@
 {
   "name": "uno-bot",
   "version": "0.0.1",
+  "engines": {
+    "node": ">=22"
+  },
   "private": true,
   "description": "UNO Bot v2 \u2014 agentic Slack bot for the Plus design system (Cloudflare Workers runtime).",
   "main": "src/index.ts",
