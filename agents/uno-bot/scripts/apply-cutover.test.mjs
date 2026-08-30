@@ -95,3 +95,24 @@ test('four edits to one file all survive, rather than the last one winning', () 
   assert.ok(clobbered.includes(VALUES.host));
   assert.ok(clobbered.includes(OLD.account), "the old bug is what this asserts");
 });
+
+test('a project name is not a hostname', () => {
+  // What actually happened at stage 6: "plus-uno" matched the first version of
+  // this rule, and ten places across seven files were rewritten to
+  // "https://plus-uno", a URL that resolves to nothing.
+  const host = (h, extra) => validate({ ...VALUES, host: h, ...extra }).find((p) => p.includes('--host')) ?? '';
+  assert.match(host('plus-uno'), /not a hostname/);
+  assert.match(host('localhost'), /not a hostname/);
+  assert.equal(host('uno-bot.someone.workers.dev'), '');
+});
+
+test('a custom domain is flagged, not forbidden', () => {
+  // Legitimate, but a different procedure: the zone has to be in this
+  // Cloudflare account. Saying so beats discovering it after the Slack
+  // manifests are pasted.
+  const host = (h, extra) => validate({ ...VALUES, host: h, ...extra }).find((p) => p.includes('--host')) ?? '';
+  assert.match(host('bot.plus.school'), /custom domain/);
+  assert.equal(host('bot.plus.school', { allowCustomDomain: true }), '');
+  // The escape hatch must not re-open the shape hole it sits behind.
+  assert.match(host('plus-uno', { allowCustomDomain: true }), /not a hostname/);
+});
