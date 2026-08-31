@@ -339,6 +339,12 @@ const COMPOSED = [
       "the Worker's TypeScript, which no pull request ran until now. `npm run deploy` chains it, so it was gated at the deploy boundary and nowhere earlier — a type error reached the one command whose failure is most expensive to discover. 1.2s, measured 2026-08-29.",
   },
   {
+    script: 'test:bundle',
+    pkg: 'bot',
+    guards:
+      "the bot's own script tests \u2014 apply-cutover, secrets, deploy, the harness bundler \u2014 which check-harness.yml has run since #266 but check:harness did not, so the local gate was a strict SUBSET of the remote one. That gap cost a red CI on #388: a message reworded in apply-cutover.mjs broke an assertion in apply-cutover.test.mjs, `npm run check:harness` went green locally on all 38 sub-checks, and the failure appeared only after the push. The completeness assertion could not have caught it either, because it scans `check:*` names and this is not one. 0.3s, measured 2026-08-30.",
+  },
+  {
     script: 'test',
     pkg: 'bot',
     guards:

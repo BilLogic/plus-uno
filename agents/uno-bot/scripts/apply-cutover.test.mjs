@@ -50,7 +50,10 @@ test("the old values are refused as new ones", () => {
   assert.match(validate({ ...VALUES, host: OLD.host }).join(" "), /OLD hostname/);
   assert.match(validate({ ...VALUES, slackKv: OLD.slackKv }).join(" "), /OLD namespace/);
   assert.match(validate({ ...VALUES, host: "" }).join(" "), /--host is missing/);
-  assert.match(validate({ ...VALUES, host: "https://x.workers.dev/" }).join(" "), /bare hostname/);
+  // A scheme and a trailing slash are stripped by readValues before validate
+  // ever sees them; reaching validate with them attached means something else
+  // built the values, and the shape rule is what catches it.
+  assert.match(validate({ ...VALUES, host: "https://x.workers.dev/" }).join(" "), /not a hostname/);
 });
 
 test("wrangler.toml gets four distinct edits, not one broad sweep", () => {
