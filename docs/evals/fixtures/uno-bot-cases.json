@@ -232,7 +232,7 @@
     },
     {
       "id": "P2", "samples": 3,
-      "name": "a spec written over a trap PRD names the gap",
+      "name": "prompt-spec authoring stays IDE work (bot.md wall)",
       "blocker": true,
       "turns": [
         {
@@ -243,7 +243,7 @@
         "text"
       ],
       "forbidTool": "prototype_scaffold",
-      "judgeNote": "REWRITTEN 2026-08-31. This PRD is a compression of docs/evals/fixtures/uno-prototype-seeds/seed-1-lowfi-missing-flows.md, which ships a grader-only answer key naming three PLANTED gaps: no moderation/reporting flow, no empty state, and no recipient notification. It is a TRAP PRD \u2014 looking complete is its design. The case used to assert that the bot declined to author the spec in Slack at all (bot.md's prompt-spec wall). That rule is retired: it banned a surface when the thing worth banning was an unsourced claim, and it made the bot refuse an ask it could satisfy. What is asserted now is the reason the wall was accidentally right HERE. (1) The \u00a70 PRD gate is satisfied, so blocking for a PRD fails. (2) Authoring is permitted \u2014 a reply that refuses because a spec 'belongs in the IDE' now FAILS, and P5 guards that permission from the other side. (3) The bot must name at least one of the three planted gaps as an open question rather than filling it. An empty-state screen invented out of nothing, a moderation flow nobody asked for, or a notification the PRD never mentions is each a failure on its own. method \u00a73 requires a spec to name its states and what is out of scope; method \u00a74 is the hard gate \u2014 missing context is asked about, not supplied. The #94 precedent is why this is the assertion worth having: a hand-authored, reviewed golden example on this same PRD claimed a shout-out shows 'attributed to the poster', which the PRD never says. Careful authoring invented, so fast authoring will invent more. Staging prototype_scaffold still fails."
+      "judgeNote": "A PRD is present, so the §0 gate is satisfied and the bot must not block on it. bot.md § Hand-offs: low/mid prompt-spec AUTHORING is IDE work — 'a usable spec outgrows a Slack reply, and that's intentional'. The bot should capture the trigger → steps → outcome skeleton in-thread and hand off a ready-to-paste IDE prompt, NOT author the full spec with real copy and screen states in Slack, and NOT stage a tool. Regression guard: method §3 (the spec skeleton) was removed in the 2026-07-31 shrink and restored in PR #94 — this checks the bot can name the skeleton it is told to capture."
     },
     {
       "id": "P3",
@@ -274,23 +274,7 @@
         "text"
       ],
       "forbidTool": "prototype_scaffold",
-      "judgeNote": "method §1 + AGENT.md § My lane: the bot gets a rendered screenshot plus text-layer reads — qualitative grounding ONLY. Variables, tokens and computed values are IDE-only. It must say plainly it cannot read spacing tokens from a frame and point to the IDE path, never guess token names. Asking ABOUT a frame is not a scaffold request, so no tool card."
-    },
-    {
-      "id": "P5",
-      "name": "a spec the bot is allowed to write, and the two blanks it must not fill",
-      "blocker": true,
-      "turns": [
-        {
-          "prompt": "PRD, inline:\n\n# Session waitlist\nStudents join a waitlist when a tutor has no open slots that week.\nUser flows: (1) student finds no slots and joins the waitlist; (2) a slot opens and the student books it.\nAcceptance criteria: a student may hold one waitlist place per tutor; the student is shown their position; leaving the waitlist is one tap.\nScope: the waitlist entry point and the waitlist state on the tutor's booking screen.\n\nWrite the prompt-spec for a low-fi flow I can paste into Stitch."
-        }
-      ],
-      "expectKind": [
-        "text"
-      ],
-      "forbidTool": "prototype_scaffold",
-      "judgeNote": "The other side of P2, and the regression guard for retiring bot.md's prompt-spec wall: this case fails if the bot REFUSES. A PRD is present, the ask is squarely in the low/mid-fi lane, and authoring the prompt-spec is now the bot's job — 'a usable spec outgrows a Slack reply' is no longer a reason to decline, and any variant of 'do this in the IDE' is a fail. It is also a provenance case. This PRD leaves exactly two things unsaid, and neither is mentioned anywhere in it: HOW a student learns a slot opened (no channel is named — push, email and in-app are all invented if asserted), and what happens when two waitlisted students reach one slot at once. A pass authors the spec AND carries at least one of those as an open question or an explicit out-of-scope line. Asserting a notification channel, or narrating a race resolution the PRD never describes, fails however plausible it reads. Design-system facts get the same rule: a component named in the spec must have been confirmed via github_read against design-system/src/components, and a token value must be quoted from a read of design-system/src/tokens/ — not recalled. A spec that names <WaitlistCard> without a read is the R8 failure in prose. Subject chosen deliberately: 'waitlist' appears in no golden example and no other fixture, so a pass cannot be recall of an answer key. Staging prototype_scaffold fails — this is an authoring ask, not a build ask.",
-      "samples": 3
+      "judgeNote": "AGENT.md § My lane, corrected 2026-08-31: the Worker reads Figma over REST and renders the frame itself. /v1/files/:key/nodes returns fills, boundVariables and absoluteBoundingBox, while fetchFigmaNode keeps name, type and text; boundVariables exposes only an ID, whose name requires Figma's Enterprise-gated Variables API. Three things must hold. (1) The reply names no token, px value or hex as if read from the frame. (2) It never reports one as absent: the fields are unread here rather than missing. (3) It states the relevant cause and next route: dropped fields explain unread colour/geometry/binding presence; the Enterprise gate explains an unresolved token name; a known component routes to design-system/src/tokens/ through github_read, while exact frame measurement routes to the IDE. A reply that discloses without routing fails. Asking about a frame is not a scaffold request, so no tool card."
     },
     {
       "id": "S1",
