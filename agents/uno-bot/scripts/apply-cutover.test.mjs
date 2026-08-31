@@ -61,3 +61,37 @@ test("wrangler.toml gets four distinct edits, not one broad sweep", () => {
   assert.equal(toml.length, 4);
   assert.equal(new Set(toml.map((e) => e.from)).size, 4);
 });
+
+test('four edits to one file all survive, rather than the last one winning', () => {
+  // The regression this exists for. wrangler.toml carries four of the ten
+  // edits; the write loop rewrote the PLANNING-time source once per edit, so
+  // three were discarded and the file came out with a new redirect URI beside
+  // the OLD account id and the OLD KV ids — a Worker pointed at the account
+  // being left, which is the exact silent half-migration the header promises
+  // this script cannot produce.
+  const original = [
+    `account_id = "${OLD.account}"`,
+    `id = "${OLD.slackKv}"`,
+    `id = "${OLD.harnessKv}"`,
+    `SLACK_OAUTH_REDIRECT_URI = "https://${OLD.host}/oauth/slack/callback"`,
+  ].join("\n");
+
+  const toml = edits(VALUES).filter((e) => e.file === "agents/uno-bot/wrangler.toml");
+  assert.equal(toml.length, 4);
+
+  // Fold, the way main() now does: each edit sees the previous edit's output.
+  const folded = toml.reduce((acc, edit) => rewrite(acc, edit), original);
+  assert.ok(folded.includes(VALUES.account), "account id was dropped");
+  assert.ok(folded.includes(VALUES.slackKv), "SLACK_OAUTH_KV id was dropped");
+  assert.ok(folded.includes(VALUES.harnessKv), "HARNESS_KV id was dropped");
+  assert.ok(folded.includes(VALUES.host), "redirect URI was dropped");
+  for (const stale of [OLD.account, OLD.slackKv, OLD.harnessKv, OLD.host]) {
+    assert.ok(!folded.includes(stale), `${stale} survived the rewrite`);
+  }
+
+  // And the shape of the old bug, so this test fails if the fold is reverted:
+  // rewriting the ORIGINAL once per edit keeps only the last.
+  const clobbered = toml.map((edit) => rewrite(original, edit)).at(-1);
+  assert.ok(clobbered.includes(VALUES.host));
+  assert.ok(clobbered.includes(OLD.account), "the old bug is what this asserts");
+});

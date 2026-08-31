@@ -216,10 +216,26 @@ function main() {
     return;
   }
 
+  /*
+   * FOLD PER FILE, THEN WRITE ONCE.
+   *
+   * Every entry in `work` carries the source as it was read during PLANNING.
+   * Writing inside the loop therefore rewrites the original four times for
+   * wrangler.toml — which has four edits, the account id, both KV ids and the
+   * redirect URI — and the last write wins. Three of the four vanish.
+   *
+   * That is not theoretical. Running this against the real repo produced a
+   * wrangler.toml with the new redirect URI (the last edit) and the OLD account
+   * and OLD KV ids, which is the half-migrated state this script's header
+   * claims it cannot produce: a Worker pointed at the account being left, with
+   * a redirect URI Slack would accept. Silent, and exactly the shape of #249.
+   */
+  const byFile = new Map();
   for (const { edit, full, source, already } of work) {
     if (already) continue;
-    fs.writeFileSync(full, rewrite(source, edit));
+    byFile.set(full, rewrite(byFile.get(full) ?? source, edit));
   }
+  for (const [full, contents] of byFile) fs.writeFileSync(full, contents);
 
   console.log(
     "\n  Written. Now:\n" +
