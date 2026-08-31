@@ -8,6 +8,20 @@ Fixed inputs the benchmarks run against — same inputs, comparable outputs acro
 | uno-prototype | `uno-prototype-seeds/` — 3 deliberately incomplete PRDs spanning fidelities | each seed lists its planted gaps in a footer comment; 100% of gaps must fire the missing-context prompt |
 | uno-review | `prototypes/home-redesign/src` (pre-existing defects as planted flaws) | the 2026-07-08 run: `docs/evals/runs/2026-07-08-golden-uno-review.jsonl` (9 defects vs AGENTS.md FP-1/2/6; full-procedure recall 100%, script-only 44%) |
 | uno-maintain | seeded issue set defined inline in `docs/evals/scenarios/uno-maintain.md` S5 (11 targets + 1 cross-estate) | the taxonomy table in `skills/uno-maintain/references/method.md` |
-| uno-bot | `docs/evals/scenarios/uno-bot.md` (12 seed prompts, binary outcomes) | expected column per scenario |
+| uno-bot | `uno-bot-cases.json` — public prompts and deterministic checks | `uno-bot-answer-key.enc.json` — AES-256-GCM ciphertext; the eval runner decrypts it with the `UNO_BOT_EVAL_KEY` Actions secret |
 
 Fixtures are frozen: revise only when the thing they test changes, and note it in the fixture header — a moving fixture measures nothing.
+
+## uno-bot answer-key lifecycle
+
+The public fixture contains no `judgeNote` fields. This matters because uno-bot can read this repository: a plaintext judge instruction would let the system under test retrieve the expected answer during the test.
+
+To rotate the key, prepare a private JSON object whose keys exactly match every public case id. Generate a 32-byte key, seal the file, and store the same key as the repository's `UNO_BOT_EVAL_KEY` Actions secret:
+
+```sh
+UNO_BOT_EVAL_KEY=<64 hex characters> npm --prefix agents/uno-bot run evals:seal-answer-key -- \
+  /private/path/uno-bot-answer-key.json \
+  docs/evals/fixtures/uno-bot-answer-key.enc.json
+```
+
+Do not place the plaintext file or key inside the repository. The loader rejects unauthenticated ciphertext, missing cases, extra cases, and any public case that regains a `judgeNote`.

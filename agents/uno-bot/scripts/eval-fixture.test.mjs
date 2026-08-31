@@ -26,6 +26,11 @@ test("every case id is unique", () => {
   assert.equal(new Set(ids).size, ids.length, "duplicate case id");
 });
 
+test("the public fixture contains no grader answer key", () => {
+  const exposed = cases.filter((c) => Object.hasOwn(c, "judgeNote")).map((c) => c.id);
+  assert.deepEqual(exposed, [], `public judgeNote(s): ${exposed.join(", ")}`);
+});
+
 test("no blocker is decided by a single judge call", () => {
   // THE DECISION THIS FILE EXISTS TO HOLD. R3, R5, R6, R7, R9 and P2 were
   // blockers at 1 sample, so their red/green turned on one model verdict

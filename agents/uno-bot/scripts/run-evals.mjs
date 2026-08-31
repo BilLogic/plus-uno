@@ -5,7 +5,7 @@
 //   1. deterministic checks from the fixture (expectKind / expectTool /
 //      textRegex / forbidTool / gateAsk escape hatch), and
 //   2. an LLM judge (Gemini on Vertex, same SA as everything else) against the
-//      condensed D1–D9 bot-answer rubric + the case's judgeNote.
+//      condensed D1–D9 bot-answer rubric + the runner-only answer key.
 // A failing BLOCKER case fails the job (exit 1) — mirroring the scenario doc's
 // "a failing row is a release blocker". Full transcripts land in
 // eval-results.json for reasoning investigation.
@@ -15,13 +15,15 @@
 //   DEBUG_TOKEN     the Worker's /debug/* gate token
 // Judge (optional — judge is skipped without it; deterministic checks still run):
 //   GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY, GEMINI_PROJECT_ID (default hcii-plus)
-// Optional: JUDGE_MODEL (default gemini-3.6-flash), CASES_PATH
+// Judge key: UNO_BOT_EVAL_KEY (64 hex characters; required when judge credentials work)
+// Optional: JUDGE_MODEL (default gemini-3.6-flash), CASES_PATH, ANSWER_KEY_PATH
 //
 // Run:  node agents/uno-bot/scripts/run-evals.mjs
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { createSign } from "node:crypto";
 import { passesCase } from "./eval-scoring.mjs";
+import { attachJudgeNotes, loadAnswerKey } from "./eval-answer-key.mjs";
 
 const {
   WORKER_URL,
@@ -31,6 +33,8 @@ const {
   GEMINI_PROJECT_ID = "hcii-plus",
   JUDGE_MODEL = "gemini-3.6-flash",
   CASES_PATH = "docs/evals/fixtures/uno-bot-cases.json",
+  ANSWER_KEY_PATH = "docs/evals/fixtures/uno-bot-answer-key.enc.json",
+  UNO_BOT_EVAL_KEY,
 } = process.env;
 
 const TURN_TIMEOUT_MS = 8 * 60_000; // agent turns can legally run for minutes
@@ -185,10 +189,16 @@ function checkTurn(spec, resp) {
 async function main() {
   required("WORKER_URL", WORKER_URL);
   required("DEBUG_TOKEN", DEBUG_TOKEN);
-  const fixture = JSON.parse(readFileSync(CASES_PATH, "utf8"));
+  const publicFixture = JSON.parse(readFileSync(CASES_PATH, "utf8"));
   const judgeToken =
     GEMINI_SA_EMAIL && GEMINI_SA_PRIVATE_KEY ? await googleToken().catch(() => null) : null;
   if (!judgeToken) console.log("[evals] no judge credential — deterministic checks only");
+  const fixture = judgeToken
+    ? attachJudgeNotes(
+        publicFixture,
+        loadAnswerKey(ANSWER_KEY_PATH, required("UNO_BOT_EVAL_KEY", UNO_BOT_EVAL_KEY)),
+      )
+    : publicFixture;
 
   const results = [];
   let blockerFailures = 0;
