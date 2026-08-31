@@ -606,6 +606,57 @@ step "Create Token -> 'Edit Cloudflare Workers' template."
 step "Account Resources: THIS account only ($ACCOUNT). Zone Resources: none."
 step "Create, then copy — Cloudflare shows it once."
 ask_secret CF_TOKEN "Paste the API token (hidden):"
+
+# VERIFY IT BEFORE STORING IT. The first version of this stage wrote whatever
+# was typed straight to the GitHub environment and moved on. The token Bill
+# pasted was rejected by Cloudflare — `Invalid access token [code: 9109]` on
+# /accounts, which is the token string itself being wrong rather than a scope
+# problem — and nothing found out until the post-merge deploy, which is the
+# most expensive place to learn it: gates green, harness bundled, build stamped
+# r220-c46adb3, and then wrangler could not authenticate.
+#
+# One unauthenticated-cost API call answers it. The token is used here and
+# never printed; only the verdict and the account list are shown.
+if [[ -n "$CF_TOKEN" ]]; then
+  say ""
+  say "Checking the token against Cloudflare before storing it:"
+  CF_PROBE="$(curl -s --max-time 25 -H "Authorization: Bearer $CF_TOKEN" \
+    https://api.cloudflare.com/client/v4/accounts 2>/dev/null)"
+  CF_VERDICT="$(printf '%s' "$CF_PROBE" | node -e "
+    let s=''; process.stdin.on('data',c=>s+=c).on('end',()=>{
+      let d; try { d = JSON.parse(s); } catch { console.log('UNPARSEABLE'); return; }
+      if (!d.success) {
+        console.log('BAD|' + (d.errors||[]).map(e => e.code + ' ' + e.message).join('; '));
+        return;
+      }
+      const ids = (d.result||[]).map(a => a.id);
+      console.log((ids.includes(process.argv[1]) ? 'OK|' : 'WRONG_ACCOUNT|') +
+        (d.result||[]).map(a => a.name + ' (' + a.id + ')').join(', '));
+    });
+  " "$ACCOUNT")"
+  case "$CF_VERDICT" in
+    OK\|*)
+      note "  ✓ token is valid and can see $ACCOUNT"
+      note "    ${CF_VERDICT#OK|}" ;;
+    WRONG_ACCOUNT\|*)
+      warn "  Token is valid but does NOT include $ACCOUNT."
+      note "    it sees: ${CF_VERDICT#WRONG_ACCOUNT|}"
+      warn "  Account Resources on the token must include the account you are"
+      warn "  moving INTO. Nothing was stored."
+      CF_TOKEN="" ;;
+    BAD\|*)
+      warn "  Cloudflare rejected it: ${CF_VERDICT#BAD|}"
+      note "    9109 / 6003 mean the token STRING is wrong — usually truncated on"
+      note "    paste, or rolled since it was created. 10000 with a valid string"
+      note "    means the permissions are too narrow."
+      warn "  Nothing was stored."
+      CF_TOKEN="" ;;
+    *)
+      warn "  Could not reach the Cloudflare API to check. Nothing was stored."
+      CF_TOKEN="" ;;
+  esac
+fi
+
 if [[ -n "$CF_TOKEN" ]]; then
   if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
     if printf '%s' "$CF_TOKEN" | gh secret set CLOUDFLARE_API_TOKEN --env uno-bot-production >/dev/null 2>&1; then
