@@ -389,7 +389,57 @@ say ""
 note "Any multi-line secret that needs redoing (the Vertex PEM, say) can go in"
 note "through an editor instead of a prompt: re-run with --fix-pem."
 if [[ "${1:-}" == "--fix-pem" ]]; then
-  ask_multiline GEMINI_SA_PRIVATE_KEY && WRITTEN_SECRET+=("GEMINI_SA_PRIVATE_KEY")
+  say ""
+  say "Redoing GEMINI_SA_PRIVATE_KEY. Two routes:"
+  step "a downloaded service-account JSON — give the path, and .private_key is"
+  step "  extracted with its \\n escapes turned into real newlines"
+  step "or blank, and an editor opens for you to paste the key block"
+  ask SA_JSON_PATH "Path to the service-account JSON (blank for the editor):"
+  # Drag-and-drop leaves a trailing space and escapes; a quoted paste leaves
+  # the quotes. Both are how this actually gets typed.
+  SA_JSON_PATH="${SA_JSON_PATH%\"}"; SA_JSON_PATH="${SA_JSON_PATH#\"}"
+  SA_JSON_PATH="${SA_JSON_PATH%\'}"; SA_JSON_PATH="${SA_JSON_PATH#\'}"
+  SA_JSON_PATH="$(printf '%s' "$SA_JSON_PATH" | sed 's/[[:space:]]*$//; s/\\ / /g')"
+  SA_JSON_PATH="${SA_JSON_PATH/#\~/$HOME}"
+
+  if [[ -z "$SA_JSON_PATH" ]]; then
+    ask_multiline GEMINI_SA_PRIVATE_KEY && WRITTEN_SECRET+=("GEMINI_SA_PRIVATE_KEY")
+  elif [[ ! -f "$SA_JSON_PATH" ]]; then
+    warn "No file at: $SA_JSON_PATH. Nothing sent."
+  else
+    # Read once, and report only what is safe to show: never the key.
+    SA_SUMMARY="$(node -e "
+      const fs = require('fs');
+      let d;
+      try { d = JSON.parse(fs.readFileSync(process.argv[1], 'utf8')); }
+      catch { console.log('BAD_JSON'); process.exit(0); }
+      if (d.type !== 'service_account') { console.log('NOT_SA:' + (d.type || 'no type field')); process.exit(0); }
+      if (!d.private_key || !d.private_key.includes('BEGIN')) { console.log('NO_KEY'); process.exit(0); }
+      console.log(['OK', d.client_email || '?', d.project_id || '?', d.private_key_id || '?'].join('|'));
+    " "$SA_JSON_PATH")"
+    case "$SA_SUMMARY" in
+      BAD_JSON) warn "Not valid JSON. Nothing sent." ;;
+      NOT_SA:*) warn "Not a service account (type: ${SA_SUMMARY#NOT_SA:}). Nothing sent."
+                note "  You want the key file from IAM & Admin -> Service Accounts -> Keys." ;;
+      NO_KEY)   warn "No private_key in that JSON. Nothing sent." ;;
+      *)
+        note "  service account: $(printf '%s' "$SA_SUMMARY" | cut -d'|' -f2)"
+        note "  project:         $(printf '%s' "$SA_SUMMARY" | cut -d'|' -f3)"
+        note "  key id:          $(printf '%s' "$SA_SUMMARY" | cut -d'|' -f4)"
+        warn "If that key id is one that has ever been pasted into a chat, an"
+        warn "issue, or a document, delete it in Google Cloud and use a new one."
+        if confirm "Set GEMINI_SA_PRIVATE_KEY from this file?"; then
+          if node -e "
+            const fs = require('fs');
+            process.stdout.write(JSON.parse(fs.readFileSync(process.argv[1], 'utf8')).private_key);
+          " "$SA_JSON_PATH" | put_secret GEMINI_SA_PRIVATE_KEY; then
+            WRITTEN_SECRET+=("GEMINI_SA_PRIVATE_KEY")
+          else
+            SKIPPED+=("GEMINI_SA_PRIVATE_KEY")
+          fi
+        fi ;;
+    esac
+  fi
 fi
 say ""
 say "Secrets only take effect on the next deploy."
