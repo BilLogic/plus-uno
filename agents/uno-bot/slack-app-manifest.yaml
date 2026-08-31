@@ -137,47 +137,47 @@ features:
       description: Check the claim against the blueprint and Notion
   slash_commands:
     - command: /uno-prototype
-      url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
+      url: https://uno-bot.plus-uno.workers.dev/slack/commands
       description: Turn a PRD into a design artifact at the fidelity you pick, grounded on the blueprint
       usage_hint: "[prd-required] [fidelity]"
       should_escape: false
     - command: /uno-research
-      url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
+      url: https://uno-bot.plus-uno.workers.dev/slack/commands
       description: Gather context that doesn't exist yet — evidence sweeps, study guides, discovery
       usage_hint: "[question / hunch / who-knows-X]"
       should_escape: false
     - command: /uno-synthesize
-      url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
+      url: https://uno-bot.plus-uno.workers.dev/slack/commands
       description: Distill gathered context into findings, takeaways, and — on your go — a PRD
       usage_hint: '[sources-to-distill | "draft the PRD"]'
       should_escape: false
     - command: /uno-review
-      url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
+      url: https://uno-bot.plus-uno.workers.dev/slack/commands
       description: "Diagnose-only design review: design-system, product-intent, and accessibility lenses"
       usage_hint: "[artifact + manifest (fidelity / tools / PRD link)]"
       should_escape: false
     - command: /uno-publish
-      url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
+      url: https://uno-bot.plus-uno.workers.dev/slack/commands
       description: Share finished-enough work for feedback, or hand it off to development
       usage_hint: "[prototype-or-project]"
       should_escape: false
     - command: /grind
-      url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
+      url: https://uno-bot.plus-uno.workers.dev/slack/commands
       description: Run this question harder — deep model, checks the claims
       usage_hint: "[your question]"
       should_escape: false
     - command: /chill
-      url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
+      url: https://uno-bot.plus-uno.workers.dev/slack/commands
       description: Run this question cheap and short
       usage_hint: "[your question]"
       should_escape: false
     - command: /stop
-      url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
+      url: https://uno-bot.plus-uno.workers.dev/slack/commands
       description: Stop the turn I'm working on right now
       usage_hint: "[no arguments]"
       should_escape: false
     - command: /uno-maintain
-      url: https://uno-bot.bryanhuang628.workers.dev/slack/commands
+      url: https://uno-bot.plus-uno.workers.dev/slack/commands
       description: File an intake, run a standing sweep, or capture a lesson into the harness
       usage_hint: "[intake / sweep-name / lesson-to-capture]"
       should_escape: false
@@ -198,7 +198,7 @@ features:
         message: "Help me draft a PRD for a new feature idea."
 oauth_config:
   redirect_urls:
-    - https://uno-bot.bryanhuang628.workers.dev/oauth/slack/callback
+    - https://uno-bot.plus-uno.workers.dev/oauth/slack/callback
   scopes:
     user:
       - canvases:read
@@ -275,7 +275,7 @@ oauth_config:
   pkce_enabled: true
 settings:
   event_subscriptions:
-    request_url: https://uno-bot.bryanhuang628.workers.dev/slack/events
+    request_url: https://uno-bot.plus-uno.workers.dev/slack/events
     bot_events:
       - app_context_changed
       - app_home_opened
@@ -292,7 +292,7 @@ settings:
     # Repointed from a Netlify function that never existed (confirmed 404) to the
     # Worker, which already owns every other Slack surface and already has the
     # signature verification and the DO enqueue path an interaction needs.
-    request_url: https://uno-bot.bryanhuang628.workers.dev/slack/interactive
+    request_url: https://uno-bot.plus-uno.workers.dev/slack/interactive
   org_deploy_enabled: false
   socket_mode_enabled: false
   token_rotation_enabled: false

@@ -15,7 +15,7 @@
 // change in lockstep with Slack's own config and cannot be derived here.
 
 /** The production Worker's origin. No trailing slash. */
-export const DEFAULT_WORKER_ORIGIN = "https://uno-bot.bryanhuang628.workers.dev";
+export const DEFAULT_WORKER_ORIGIN = "https://uno-bot.plus-uno.workers.dev";
 
 /**
  * The Worker origin for this process.
