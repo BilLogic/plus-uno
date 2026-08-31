@@ -137,8 +137,8 @@ export function rewrite(source, edit) {
 function readValues(argv) {
   const flags = {};
   for (const arg of argv) {
-    const match = /^--([a-z-]+)=(.+)$/.exec(arg);
-    if (match) flags[match[1]] = match[2];
+    const match = /^--([a-z-]+)(?:=(.+))?$/.exec(arg);
+    if (match) flags[match[1]] = match[2] ?? true;
   }
   const envFile = path.join(REPO_ROOT, ".cutover.env");
   const fromFile = {};
@@ -149,6 +149,7 @@ function readValues(argv) {
     }
   }
   const values = {
+    allowCustomDomain: "allow-custom-domain" in flags,
     account: flags.account ?? fromFile.NEW_ACCOUNT_ID,
     slackKv: flags["slack-kv"] ?? fromFile.NEW_SLACK_OAUTH_KV_ID,
     harnessKv: flags["harness-kv"] ?? fromFile.NEW_HARNESS_KV_ID,
@@ -167,7 +168,31 @@ export function validate(values) {
   if (values.host === OLD.host) problems.push("--host is the OLD hostname.");
   if (values.slackKv === OLD.slackKv) problems.push("--slack-kv is the OLD namespace id.");
   if (values.harnessKv === OLD.harnessKv) problems.push("--harness-kv is the OLD namespace id.");
-  if (values.host && !/^[a-z0-9.-]+$/i.test(values.host)) problems.push(`--host should be a bare hostname, not "${values.host}".`);
+  // A HOSTNAME, not a project name. The first version of this accepted
+  // /^[a-z0-9.-]+$/, which matches "plus-uno" — and that is exactly what got
+  // typed at stage 6, rewriting ten places across seven files to
+  // "https://plus-uno", a URL that resolves to nothing. Requiring a dot is what
+  // separates a host from a label, and it is the whole difference between a
+  // cutover and an outage.
+  if (values.host) {
+    if (!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(values.host)) {
+      problems.push(
+        `--host is "${values.host}", which is not a hostname. It needs at least one dot — ` +
+          'the Worker lives at uno-bot.<your-subdomain>.workers.dev unless you have ' +
+          'attached a custom domain.',
+      );
+    } else if (!values.allowCustomDomain && !/\.workers\.dev$/i.test(values.host)) {
+      // Not refused: a custom domain is legitimate. But it is a different
+      // procedure (the zone has to be in this Cloudflare account), so saying so
+      // beats discovering it after the Slack manifests are pasted.
+      problems.push(
+        `--host is "${values.host}", which is not a *.workers.dev address. A custom domain ` +
+          'needs its DNS zone in this Cloudflare account and a Workers route; if that is ' +
+          'not done yet, cut over to workers.dev first and move the domain afterwards. ' +
+          'Pass --allow-custom-domain once it is set up.',
+      );
+    }
+  }
   return problems;
 }
 

@@ -50,7 +50,10 @@ test("the old values are refused as new ones", () => {
   assert.match(validate({ ...VALUES, host: OLD.host }).join(" "), /OLD hostname/);
   assert.match(validate({ ...VALUES, slackKv: OLD.slackKv }).join(" "), /OLD namespace/);
   assert.match(validate({ ...VALUES, host: "" }).join(" "), /--host is missing/);
-  assert.match(validate({ ...VALUES, host: "https://x.workers.dev/" }).join(" "), /bare hostname/);
+  // A scheme and a trailing slash are stripped by readValues before validate
+  // ever sees them; reaching validate with them attached means something else
+  // built the values, and the shape rule is what catches it.
+  assert.match(validate({ ...VALUES, host: "https://x.workers.dev/" }).join(" "), /not a hostname/);
 });
 
 test("wrangler.toml gets four distinct edits, not one broad sweep", () => {
@@ -94,4 +97,25 @@ test('four edits to one file all survive, rather than the last one winning', () 
   const clobbered = toml.map((edit) => rewrite(original, edit)).at(-1);
   assert.ok(clobbered.includes(VALUES.host));
   assert.ok(clobbered.includes(OLD.account), "the old bug is what this asserts");
+});
+
+test('a project name is not a hostname', () => {
+  // What actually happened at stage 6: "plus-uno" matched the first version of
+  // this rule, and ten places across seven files were rewritten to
+  // "https://plus-uno", a URL that resolves to nothing.
+  const host = (h, extra) => validate({ ...VALUES, host: h, ...extra }).find((p) => p.includes('--host')) ?? '';
+  assert.match(host('plus-uno'), /not a hostname/);
+  assert.match(host('localhost'), /not a hostname/);
+  assert.equal(host('uno-bot.someone.workers.dev'), '');
+});
+
+test('a custom domain is flagged, not forbidden', () => {
+  // Legitimate, but a different procedure: the zone has to be in this
+  // Cloudflare account. Saying so beats discovering it after the Slack
+  // manifests are pasted.
+  const host = (h, extra) => validate({ ...VALUES, host: h, ...extra }).find((p) => p.includes('--host')) ?? '';
+  assert.match(host('bot.plus.school'), /custom domain/);
+  assert.equal(host('bot.plus.school', { allowCustomDomain: true }), '');
+  // The escape hatch must not re-open the shape hole it sits behind.
+  assert.match(host('plus-uno', { allowCustomDomain: true }), /not a hostname/);
 });

@@ -472,9 +472,17 @@ open_url "https://dash.cloudflare.com/$NEW_ACCOUNT_ID/workers/subdomain"
 step "That page shows your workers.dev subdomain. The Worker will be at"
 step "  uno-bot.<subdomain>.workers.dev"
 ask_required NEW_WORKER_HOST "New hostname (no https://):"
-write_env NEW_WORKER_HOST "$NEW_WORKER_HOST"
 say ""
-node "$BOT_DIR/scripts/apply-cutover.mjs" --check || { warn "apply-cutover refused. Read it above; nothing was written."; exit 1; }
+# CHECKED BEFORE IT IS WRITTEN. Persisting first means a rejected value comes
+# back as the "[Enter keeps current]" default on the next run, so one typo
+# becomes the answer for every re-run after it.
+NEW_WORKER_HOST="${NEW_WORKER_HOST#http://}"
+NEW_WORKER_HOST="${NEW_WORKER_HOST#https://}"
+NEW_WORKER_HOST="${NEW_WORKER_HOST%/}"
+node "$BOT_DIR/scripts/apply-cutover.mjs" --check --host="$NEW_WORKER_HOST" \
+  || { warn "apply-cutover refused. Read it above; nothing was written, and the"; \
+       note "  hostname was NOT saved, so re-running asks again."; exit 1; }
+write_env NEW_WORKER_HOST "$NEW_WORKER_HOST"
 say ""
 if confirm "Apply those rewrites now?"; then
   node "$BOT_DIR/scripts/apply-cutover.mjs"
