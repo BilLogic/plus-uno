@@ -229,6 +229,57 @@ put_secret() {
 
 already_set() { "$WRANGLER" secret list 2>/dev/null | grep -q "\"$1\""; }
 
+# find_blueprint — `npm run deploy` runs check:contract, which compares the
+# vendored blueprint contract against the CANONICAL copy in the uno-blueprint
+# app repo. Its default path is relative to the script, which does not resolve
+# from a git worktree, so the deploy dies at the third gate with
+# "blueprint contract not found ... (set BLUEPRINT_REPO)" AFTER the secrets are
+# already in — a stop with nothing wrong and no obvious next move.
+#
+# So: honour an existing BLUEPRINT_REPO, else look where the checkout actually
+# tends to live, else ask. A checkout is identified by the contract file itself
+# rather than by its directory name, because the name has been both
+# uno-blueprint and plus-uno-blueprint.
+find_blueprint() {
+  local candidate
+  for candidate in \
+    "${BLUEPRINT_REPO:-}" \
+    "$REPO_ROOT/../plus-uno-blueprint" \
+    "$REPO_ROOT/../uno-blueprint" \
+    "$REPO_ROOT/uno-blueprint" \
+    "$HOME/Desktop/PLUS/plus-uno-blueprint"
+  do
+    [[ -n "$candidate" && -f "$candidate/src/lib/blueprintContract.ts" ]] || continue
+    printf '%s' "$(cd "$candidate" && pwd)"
+    return 0
+  done
+  return 1
+}
+
+# deploy_bot — one place that knows how to run the deploy, so every stage that
+# offers it offers the same one.
+deploy_bot() {
+  local found
+  if found="$(find_blueprint)"; then
+    export BLUEPRINT_REPO="$found"
+    note "blueprint contract: $BLUEPRINT_REPO"
+  else
+    warn "No uno-blueprint checkout found, so check:contract cannot compare."
+    note "  The contract gate is what stops the Worker shipping against a"
+    note "  blueprint schema it no longer matches (#258)."
+    ask BLUEPRINT_REPO_INPUT "Path to a uno-blueprint checkout (blank to skip the gate):"
+    if [[ -n "$BLUEPRINT_REPO_INPUT" && -f "$BLUEPRINT_REPO_INPUT/src/lib/blueprintContract.ts" ]]; then
+      export BLUEPRINT_REPO="$BLUEPRINT_REPO_INPUT"
+    else
+      [[ -n "$BLUEPRINT_REPO_INPUT" ]] && warn "No blueprintContract.ts under that path."
+      warn "Deploying with the contract gate DISARMED."
+      SKIPPED+=("check:contract ran disarmed — no blueprint checkout to compare against")
+      export BLUEPRINT_CONTRACT_OPTIONAL=1
+    fi
+  fi
+  ( cd "$BOT_DIR" && npm run deploy )
+}
+
 # ask_multiline NAME — for a secret that spans lines and is NOT in a file:
 # a PEM copied out of a Notion page, say. A no-echo prompt cannot take a paste
 # with newlines in it, so this opens an editor on a 0600 temp file instead,
@@ -336,7 +387,7 @@ if [[ "${1:-}" == "--fix-pem" ]]; then
 fi
 say ""
 say "Secrets only take effect on the next deploy."
-confirm "Deploy now?" && { ( cd "$BOT_DIR" && npm run deploy ) || warn "Deploy failed. Read it above; the secrets are still set."; }
+confirm "Deploy now?" && { deploy_bot || warn "Deploy failed. Read it above; the secrets are still set — re-run this wizard and it will skip straight past them."; }
 pause
 
 # ── 3 ─────────────────────────────────────────────────────────────────────
@@ -345,14 +396,35 @@ say "GEMINI_SA_PRIVATE_KEY is the one secret that can be SET and still wrong:"
 say "a PEM pasted with its \\n escapes intact stores fine and fails at runtime"
 say "with a signing error. /debug/gemini is what tells the difference."
 say ""
+say ""
+say "First, the probe that needs no token — table reachability only, no rows:"
+BP_CODE="$(curl -s --max-time 30 -o /tmp/uno-bp.$$ -w '%{http_code}' "$ORIGIN/health/blueprint" || echo 000)"
+note "  /health/blueprint -> $BP_CODE"
+head -c 400 "/tmp/uno-bp.$$" 2>/dev/null | sed 's/^/      /'; printf '\n'
+rm -f "/tmp/uno-bp.$$"
+if [[ "$BP_CODE" == "503" ]]; then
+  note "  503 means SUPABASE_ANON_KEY is not set, or the deploy that would have"
+  note "  picked it up has not run yet."
+fi
+say ""
 say "DEBUG_TOKEN is the value you chose. It is used here and not stored."
 ask_secret DEBUG_VALUE "DEBUG_TOKEN (hidden):"
 if [[ -n "$DEBUG_VALUE" ]]; then
   for route in gemini vertex-claude blueprint; do
+    # x-debug-token, NOT Authorization: Bearer. debugAuthorized() reads that
+    # header and nothing else, and a failed compare returns 404 rather than 401
+    # by design — an unauthenticated caller must not be able to confirm the
+    # route exists. So a 404 here means the TOKEN is wrong far more often than
+    # the route is missing, and the first draft of this stage sent the wrong
+    # header and read its own three 404s as a broken deploy.
     code="$(curl -s --max-time 45 -o /tmp/uno-debug.$$ -w '%{http_code}' \
-      -H "Authorization: Bearer $DEBUG_VALUE" "$ORIGIN/debug/$route" || echo 000)"
+      -H "x-debug-token: $DEBUG_VALUE" "$ORIGIN/debug/$route" || echo 000)"
     if [[ "$code" == "200" ]]; then
       note "  ✓ /debug/$route -> 200"
+    elif [[ "$code" == "404" ]]; then
+      warn "  /debug/$route -> 404"
+      note "      404 is what a WRONG DEBUG_TOKEN looks like: the gate closes the"
+      note "      route rather than admitting it is there. Check the value you set."
     else
       warn "  /debug/$route -> $code"
       head -c 300 "/tmp/uno-debug.$$" 2>/dev/null | sed 's/^/      /'
