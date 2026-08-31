@@ -44,18 +44,22 @@ export const MAX_TEXT_LAYERS = 200;
 export function collectTextLayers(node: FigmaNode): { texts: string[]; truncated: boolean } {
   const texts: string[] = [];
   let seen = 0;
-  const walk = (n: FigmaNode): void => {
+  const walk = (n: FigmaNode): boolean => {
     if (n.type === "TEXT" && typeof n.characters === "string") {
       const t = n.characters.trim();
       if (t) {
         seen++;
-        if (texts.length < MAX_TEXT_LAYERS) texts.push(t);
+        if (seen > MAX_TEXT_LAYERS) return true;
+        texts.push(t);
       }
     }
-    for (const child of n.children ?? []) walk(child);
+    for (const child of n.children ?? []) {
+      if (walk(child)) return true;
+    }
+    return false;
   };
-  walk(node);
-  return { texts, truncated: seen > MAX_TEXT_LAYERS };
+  const truncated = walk(node);
+  return { texts, truncated };
 }
 
 /** What `source_read` returns for a figma.com URL, said accurately. */

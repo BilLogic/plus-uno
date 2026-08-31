@@ -65,6 +65,24 @@ describe("figma text-layer reading", () => {
     assert.equal(truncated, true);
   });
 
+  it("stops walking once one layer past the cap proves truncation", () => {
+    const unreadTail: FigmaNode = { name: "unread-tail", type: "FRAME" };
+    Object.defineProperty(unreadTail, "children", {
+      get: () => {
+        throw new Error("walk continued after truncation was known");
+      },
+    });
+    const frame: FigmaNode = {
+      name: "Board",
+      type: "FRAME",
+      children: [...(frameWith(MAX_TEXT_LAYERS + 1).children ?? []), unreadTail],
+    };
+
+    const { texts, truncated } = collectTextLayers(frame);
+    assert.equal(texts.length, MAX_TEXT_LAYERS);
+    assert.equal(truncated, true);
+  });
+
   it("a much larger frame still returns the cap, and still says so", () => {
     const { texts, truncated } = collectTextLayers(frameWith(400));
     assert.equal(texts.length, MAX_TEXT_LAYERS);
