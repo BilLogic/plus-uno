@@ -3,7 +3,7 @@ main = "src/index.ts"
 # Pinned because two Cloudflare accounts are visible to the team's wrangler
 # logins, and every non-interactive command (tail, secret put, CI deploy) fails
 # with "More than one account available" without it. uno-bot lives here.
-account_id = "747a73feeb756fad6c1164df234628e9"
+account_id = "4f87edd8bcef026788a442fedcaa550d"
 compatibility_date = "2026-05-01"
 compatibility_flags = ["nodejs_compat"]
 
@@ -173,7 +173,7 @@ PLUS_DESIGN_FEEDBACK_CHANNEL_ID = "C074QG2V7DJ"
 # client_secret is a wrangler secret (SLACK_MCP_CLIENT_SECRET). The redirect URI
 # must match the one registered on the Slack app.
 SLACK_MCP_CLIENT_ID = "12186538800.10808020289637"
-SLACK_OAUTH_REDIRECT_URI = "https://uno-bot.bryanhuang628.workers.dev/oauth/slack/callback"
+SLACK_OAUTH_REDIRECT_URI = "https://uno-bot.plus-uno.workers.dev/oauth/slack/callback"
 # Visibility firewall for workspace search (src/tools/slack-search.ts). The
 # search credential sees the consenting admin's FULL Slack (DMs, private
 # channels) — the Worker hard-filters results before the model sees them:
@@ -316,7 +316,7 @@ new_sqlite_classes = ["AgentRunner"]
 # (and PKCE verifiers during the one-time OAuth consent).
 [[kv_namespaces]]
 binding = "SLACK_OAUTH_KV"
-id = "18b58372d9bc430489d634c2c9a0b0c4"
+id = "aa0ba01735c545d1abe887bd81fc98aa"
 
 # KV — delivery-alert throttle, the Gemini explicit-cache memo, and the Figma
 # poll's component snapshot under "figma-poll:*" (src/figma-poll.ts). NOT a
@@ -324,4 +324,4 @@ id = "18b58372d9bc430489d634c2c9a0b0c4"
 # the compiled constant with zero KV access.
 [[kv_namespaces]]
 binding = "HARNESS_KV"
-id = "10e5f980215e4f7e817bf55ac69dda43"
+id = "060347fa19cb41398dd516a8f7b8b21a"
