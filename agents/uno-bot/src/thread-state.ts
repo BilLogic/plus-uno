@@ -19,6 +19,7 @@
 // `actx:{channel}:{thread}`.
 
 import type { Env } from "./types";
+import type { VisionReference } from "./slack/vision-reference";
 
 export interface HistoryTurn {
   role: "user" | "assistant";
@@ -50,6 +51,9 @@ export interface HistoryTurn {
      *  pre-check needs it to tell a fetch from a cache hit. */
     cached?: boolean;
   };
+  /** Re-fetchable pointers for one follow-up turn. Image bytes never enter DO
+   *  storage; the next turn rehydrates these through Slack or Figma. */
+  vision?: VisionReference;
 }
 
 interface HistoryRecord {

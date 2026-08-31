@@ -4,6 +4,7 @@
 import type { Env } from "../types";
 import { toSlackMrkdwn } from "./mrkdwn";
 import { countedFetch, rethrowIfBudget } from "../net";
+import type { SlackEventFile } from "./types";
 
 interface SlackOk {
   ok: true;
@@ -350,6 +351,7 @@ export interface ConversationsRepliesResult extends SlackOk {
     text: string;
     ts: string;
     thread_ts?: string;
+    files?: SlackEventFile[];
   }>;
   has_more?: boolean;
 }

@@ -1,6 +1,7 @@
 import type { Env } from "../types";
 import { charge } from "../net";
 import { runAgent, type AgentResult } from "../agent/run-agent";
+import { buildProviderConversation } from "../agent/provider-conversation";
 import {
   looksLikeCorrection,
   correctionDirective,
@@ -65,6 +66,7 @@ import {
   type RunnerJobPayload,
 } from "./types";
 import { collectVisionInputs } from "./vision";
+import { historyVisionTurn, selectPreviousVisionReference } from "./vision-reference";
 import { postVisibleFailure, postTextVerified, renderDeliveredBody, isCapacityError } from "./delivery";
 import { reviewDraft } from "../agent/draft-judge";
 import {
@@ -587,11 +589,17 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // vision pass screenshots frames from TEXT, not just from files, so checking
   // files alone would have skipped it.
   const carriesFiles =
-    (event.files?.length ?? 0) > 0 || /figma\.com/i.test(userText);
+    (event.files?.length ?? 0) > 0 ||
+    /figma\.com/i.test(userText) ||
+    Boolean(selectPreviousVisionReference(history, false));
   const vision =
     trivialTurn && !carriesFiles
       ? { images: [], modelText: userText, historyText: userText }
-      : await collectVisionInputs(env, event, userText);
+      : await collectVisionInputs(env, event, userText, history);
+  const visionTurn = {
+    ts: userMsgTs,
+    ...("reference" in vision && vision.reference ? { vision: vision.reference } : {}),
+  };
   console.log(
     `[route] tier=${previewTier} why=${routeWhy} ctx=${trivialTurn && !carriesFiles ? "skipped" : "gathered"}`,
   );
@@ -761,6 +769,12 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       tierOverride: event.tierOverride,
       images: vision.images.length > 0 ? vision.images : undefined,
       history: historyForModel,
+      conversation: buildProviderConversation(
+        historyForModel,
+        modelText,
+        vision.images,
+        vision.historicalImages,
+      ),
       slack: {
         channel,
         // A real ts, not convTs: tool-side posts still thread off the user message.
@@ -816,7 +830,14 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       (!result.text.trim() || result.text.trim() === "(empty response)");
     if (reactedOnly) {
       console.log("[route] reaction-only turn (model chose an emoji, no reply)");
-      await recordExchange(env, channel, convTs, vision.historyText, "(reacted — no reply)");
+      await recordExchange(
+        env,
+        channel,
+        convTs,
+        vision.historyText,
+        "(reacted — no reply)",
+        visionTurn,
+      );
       return;
     }
     // Pre-send self-verification (approved 2026-07-12): substantive drafts get
@@ -931,6 +952,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       content: vision.historyText,
       ts: userMsgTs,
       ...(turnReceipt ? { retrieval: turnReceipt } : {}),
+      ...("reference" in vision && vision.reference ? { vision: vision.reference } : {}),
     });
     if (delivery.ok) {
       // Record what was actually posted (capped/placeholder), not the raw text.
@@ -968,7 +990,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     await resolveProposal(env, result.pending, result.decision, result.messageToUser);
     const finalText = result.messageToUser
       ?? (result.decision === "confirm" ? "Got it — kicking that off." : "Cancelled.");
-    await recordExchange(env, channel, convTs, vision.historyText, finalText);
+    await recordExchange(env, channel, convTs, vision.historyText, finalText, visionTurn);
     return;
   }
 
@@ -989,7 +1011,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   const gate = await preflight(result.toolName, result.input, { env, prd, implementPrdUrl });
   if (gate) {
     await postMessage(env, { channel, thread_ts: threadTs, text: gate.ask });
-    await recordExchange(env, channel, convTs, vision.historyText, gate.ask);
+    await recordExchange(env, channel, convTs, vision.historyText, gate.ask, visionTurn);
     return;
   }
 
@@ -1019,6 +1041,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     await recordExchange(
       env, channel, convTs, vision.historyText,
       result.previewText || "(confirmed — executing the proposal)",
+      visionTurn,
     );
     return;
   }
@@ -1037,7 +1060,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
         `:leftwards_arrow_with_hook: You cancelled that ${proposalVerb(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
         `Changed your mind? Say so explicitly and I'll stage it again — or tell me what you'd like instead.`;
       await postMessage(env, { channel, thread_ts: threadTs, text: ask });
-      await recordExchange(env, channel, convTs, vision.historyText, ask);
+      await recordExchange(env, channel, convTs, vision.historyText, ask, visionTurn);
       return;
     }
   } catch (err) {
@@ -1118,6 +1141,10 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       notionPrdId: prd?.id,
       notionPrdUrl: prd?.url,
     });
+    // A proposal is still a completed conversational turn. Agent-view DMs have
+    // no Slack thread to rebuild, so preserving this exchange in the DO is the
+    // only way its image pointer can reach the immediate follow-up.
+    await recordExchange(env, channel, convTs, vision.historyText, proposalText, visionTurn);
   }
 }
 
@@ -1260,15 +1287,19 @@ async function buildThreadHistory(
       const turns: HistoryTurn[] = [];
       for (const m of replies.messages) {
         if (m.ts === currentTs) continue;
-        const content = stripBotMentions(m.text ?? "").trim();
-        if (!content) continue;
         const isBot = m.user === identity.userId || (!!m.bot_id && m.bot_id === identity.botId);
+        const rawContent = stripBotMentions(m.text ?? "").trim();
+        const visionTurn = isBot
+          ? (rawContent ? { content: rawContent } : null)
+          : historyVisionTurn(rawContent, m.files);
+        if (!visionTurn) continue;
         const receipt = m.ts ? receiptsByTs.get(m.ts) : undefined;
         turns.push({
           role: isBot ? "assistant" : "user",
-          content,
+          content: visionTurn.content,
           ...(m.ts ? { ts: m.ts } : {}),
           ...(receipt ? { retrieval: receipt } : {}),
+          ...(visionTurn.vision ? { vision: visionTurn.vision } : {}),
         });
       }
       if (turns.length) return turns;

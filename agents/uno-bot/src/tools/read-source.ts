@@ -11,6 +11,7 @@ import type { Env } from "../types";
 import { parseNotionPageId, readNotionPage } from "../integrations/notion";
 import { parseFigmaUrl, fetchFigmaNode } from "../integrations/figma";
 import { countedFetch } from "../net";
+import { parseSlackCanvasId, readSlackCanvas } from "../integrations/slack-canvas";
 
 const GENERIC_TIMEOUT_MS = 8000;
 const GENERIC_TEXT_CAP = 8000;
@@ -58,6 +59,30 @@ export async function executeReadSource(env: Env, input: Record<string, unknown>
   const host = parsed.hostname.toLowerCase();
 
   try {
+    // ---- Slack Canvas ----
+    if (/(^|\.)slack\.com$/.test(host) && parseSlackCanvasId(url)) {
+      const canvas = await readSlackCanvas(
+        url,
+        env.SLACK_BOT_TOKEN,
+        (target, init) => countedFetch(target, init, GENERIC_TIMEOUT_MS),
+      );
+      if (!canvas.ok) {
+        return JSON.stringify({
+          ok: false,
+          error: canvas.error,
+          note: "Couldn't read the Canvas with the bot's current access. Tell the user which Canvas failed; don't answer from memory.",
+        });
+      }
+      return JSON.stringify({
+        ok: true,
+        source_type: "slack_canvas",
+        url,
+        title: canvas.title,
+        content: canvas.content,
+        note: "Answer from this Canvas content and cite the URL. If it doesn't contain the answer, say so.",
+      });
+    }
+
     // ---- Notion ----
     if (/(^|\.)notion\.so$/.test(host) || /(^|\.)notion\.site$/.test(host)) {
       const pageId = parseNotionPageId(url);
