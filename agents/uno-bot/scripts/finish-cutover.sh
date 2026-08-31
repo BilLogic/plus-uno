@@ -200,7 +200,7 @@ finish() {
 # the account, so the branch decides which Worker everything lands on.
 # ──────────────────────────────────────────────────────────────────────────
 
-TOTAL_STAGES=6
+TOTAL_STAGES=7
 
 BOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REPO_ROOT="$(cd "$BOT_DIR/../.." && pwd)"
@@ -212,6 +212,12 @@ WRANGLER="$BOT_DIR/node_modules/.bin/wrangler"
 ACCOUNT="$(sed -n 's/^account_id *= *"\(.*\)"/\1/p' "$BOT_DIR/wrangler.toml" | head -n1)"
 ORIGIN="$(node -e "import('$BOT_DIR/scripts/worker-url.mjs').then(m => console.log(m.DEFAULT_WORKER_ORIGIN))" 2>/dev/null)"
 BRANCH="$(git -C "$REPO_ROOT" rev-parse --abbrev-ref HEAD)"
+
+# The team and app ids are already written down once, in the slack:diff script.
+# Parsed from there rather than repeated here, for the same reason the hostname
+# is read from worker-url.mjs.
+SLACK_TEAM="$(node -p "(/--team (\S+)/.exec(require('$BOT_DIR/package.json').scripts['slack:diff'])||[])[1]||''" 2>/dev/null)"
+SLACK_APP="$(node -p "(/--app (\S+)/.exec(require('$BOT_DIR/package.json').scripts['slack:diff'])||[])[1]||''" 2>/dev/null)"
 
 # put_secret NAME — reads the value on stdin, hands it to wrangler there.
 # Never an argv entry: argv is readable by `ps` for every user on the machine.
@@ -367,7 +373,7 @@ if already_set SLACK_MCP_CLIENT_SECRET; then
   note "✓ SLACK_MCP_CLIENT_SECRET already set."
 else
   say "The client half of the Slack MCP OAuth flow — workspace search."
-  open_url "https://api.slack.com/apps/A0APS0L8HJR/general"
+  open_url "https://app.slack.com/app-settings/$SLACK_TEAM/$SLACK_APP/general"
   step "Basic Information -> App Credentials -> Client Secret -> Show."
   warn "Show, not Regenerate: the old Worker is still the live bot on this app."
   ask_secret MCP_VALUE "Paste the client secret (hidden):"
@@ -439,12 +445,74 @@ unset DEBUG_VALUE
 pause
 
 # ── 4 ─────────────────────────────────────────────────────────────────────
+stage "The Gmail lane — all four, or none"
+say "send_email is off unless ALL FOUR are set. Three of four is worse than"
+say "zero: the lane stays off and there are dangling secrets to explain later,"
+say "so this sets four or it sets nothing."
+say ""
+GMAIL_KEYS=(GMAIL_SENDER GMAIL_CLIENT_ID GMAIL_CLIENT_SECRET GMAIL_REFRESH_TOKEN)
+GMAIL_HAVE=0
+for k in "${GMAIL_KEYS[@]}"; do already_set "$k" && GMAIL_HAVE=$((GMAIL_HAVE + 1)); done
+if [[ "$GMAIL_HAVE" -eq 4 ]]; then
+  note "✓ All four already set."
+elif ! confirm "Set up the Gmail lane now? (n leaves it off, which is the current state)"; then
+  note "Skipped. send_email stays off and fails gracefully, as it does today."
+  SKIPPED+=("Gmail lane — send_email stays off")
+else
+  [[ "$GMAIL_HAVE" -gt 0 ]] && warn "$GMAIL_HAVE of 4 are already set; you will be asked for all four."
+  say ""
+  say "Two of these come from a Google Cloud OAuth CLIENT, and the third from a"
+  say "consent round done once by hand. The Gmail API must be enabled on the"
+  say "project first or the token exchange returns a 403 that reads like a"
+  say "credential problem and is not one."
+  say ""
+  step "1. Enable the Gmail API on the project:"
+  open_url "https://console.cloud.google.com/apis/library/gmail.googleapis.com"
+  pause "Enabled? Enter to continue"
+  step "2. Credentials -> Create credentials -> OAuth client ID -> Web application."
+  step "   Add https://developers.google.com/oauthplayground as an authorized"
+  step "   redirect URI: the playground is how the refresh token gets minted."
+  open_url "https://console.cloud.google.com/apis/credentials"
+  ask GMAIL_SENDER_V "The From address (the mailbox this sends AS):"
+  ask GMAIL_CLIENT_ID_V "OAuth client ID:"
+  ask_secret GMAIL_CLIENT_SECRET_V "OAuth client secret (hidden):"
+  say ""
+  step "3. In the playground: the gear -> Use your own OAuth credentials, paste"
+  step "   the same id and secret. Scope:"
+  note "     https://www.googleapis.com/auth/gmail.send"
+  step "   Authorize, then Exchange authorization code for tokens."
+  warn "You want the REFRESH token, not the access token. The access token"
+  warn "expires in an hour; the refresh token is the one worth storing."
+  open_url "https://developers.google.com/oauthplayground/"
+  ask_secret GMAIL_REFRESH_TOKEN_V "Refresh token (hidden):"
+
+  if [[ -z "$GMAIL_SENDER_V" || -z "$GMAIL_CLIENT_ID_V" || -z "$GMAIL_CLIENT_SECRET_V" || -z "$GMAIL_REFRESH_TOKEN_V" ]]; then
+    warn "One or more was blank. Setting NONE of them — three of four is the"
+    warn "state this stage exists to avoid."
+    SKIPPED+=("Gmail lane — incomplete, nothing written")
+  else
+    for pair in "GMAIL_SENDER:$GMAIL_SENDER_V" "GMAIL_CLIENT_ID:$GMAIL_CLIENT_ID_V" \
+                "GMAIL_CLIENT_SECRET:$GMAIL_CLIENT_SECRET_V" "GMAIL_REFRESH_TOKEN:$GMAIL_REFRESH_TOKEN_V"; do
+      if printf '%s' "${pair#*:}" | put_secret "${pair%%:*}"; then
+        WRITTEN_SECRET+=("${pair%%:*}")
+      else
+        SKIPPED+=("${pair%%:*}")
+      fi
+    done
+    say ""
+    confirm "Redeploy so the lane comes up?" && { deploy_bot || warn "Deploy failed; the secrets are still set."; }
+  fi
+  unset GMAIL_SENDER_V GMAIL_CLIENT_ID_V GMAIL_CLIENT_SECRET_V GMAIL_REFRESH_TOKEN_V
+fi
+pause
+
+# ── 5 ─────────────────────────────────────────────────────────────────────
 stage "Repoint the Slack app — the slowest step, and the only unscriptable one"
 say "pkce_enabled permanently disables apps.manifest.update for this app"
 say "(ADR-024), so the manifests in the repo are the paste source and the"
 say "rollback point. Nothing here can make Slack agree."
 say ""
-open_url "https://api.slack.com/apps/A0APS0L8HJR/app-manifest"
+open_url "https://app.slack.com/app-settings/$SLACK_TEAM/$SLACK_APP/app-manifest"
 step "Paste agents/uno-bot/slack-app-manifest.yaml, save."
 step "Then agents/uno-bot/slack-app-manifest-commands.yaml, save."
 step "Check Event Subscriptions and Interactivity both show the new host."
@@ -455,7 +523,7 @@ pause "Pasted and saved? Enter to verify"
 confirm "Run 'npm run slack:diff'?" && { ( cd "$BOT_DIR" && npm run slack:diff ) || warn "Differences above. The LIVE app is what matters — fix it there."; }
 pause
 
-# ── 5 ─────────────────────────────────────────────────────────────────────
+# ── 6 ─────────────────────────────────────────────────────────────────────
 stage "The deploy token, on the environment and not the repo"
 say "CI deploys with this. It goes on the uno-bot-production ENVIRONMENT:"
 say "a repo-level token is readable by any workflow that omits 'environment:',"
@@ -488,7 +556,7 @@ step "Also point CI's health checks at the new host — a variable, not a commit
 confirm "Set vars.UNO_BOT_WORKER_URL to $ORIGIN?" && set_var UNO_BOT_WORKER_URL "$ORIGIN"
 pause
 
-# ── 6 ─────────────────────────────────────────────────────────────────────
+# ── 7 ─────────────────────────────────────────────────────────────────────
 stage "Verify, then merge"
 say "The old host must appear nowhere it should not. This scan ignores the"
 say "ALLOWED list, so it is proof the move is COMPLETE and not merely permitted."
