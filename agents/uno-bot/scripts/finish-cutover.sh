@@ -418,7 +418,23 @@ if [[ "${1:-}" == "--fix-pem" ]]; then
       console.log(['OK', d.client_email || '?', d.project_id || '?', d.private_key_id || '?'].join('|'));
     " "$SA_JSON_PATH")"
     case "$SA_SUMMARY" in
-      BAD_JSON) warn "Not valid JSON. Nothing sent." ;;
+      BAD_JSON)
+        warn "Not valid JSON. Nothing sent."
+        # Almost always truncation, not a malformed file. A terminal in
+        # canonical mode drops any single line over 1024 bytes, and the
+        # private_key line in a service-account JSON is around 1700 — so
+        # `cat > file` and pasting silently loses exactly that line and keeps
+        # the short ones around it. The result is a small, plausible-looking
+        # file that fails to parse near where the key should have been.
+        BYTES="$(wc -c < "$SA_JSON_PATH" | tr -d ' ')"
+        if [[ "$BYTES" -lt 1500 ]]; then
+          note "  That file is only $BYTES bytes; a service-account JSON is ~2400."
+          note "  A pasted line over 1024 bytes is dropped by the terminal, and the"
+          note "  private_key line is about 1700 — so it never arrived. Copy the"
+          note "  JSON again and write it WITHOUT a terminal in the middle:"
+          note "      pbpaste > $SA_JSON_PATH"
+          note "  or open an editor on the file and paste there."
+        fi ;;
       NOT_SA:*) warn "Not a service account (type: ${SA_SUMMARY#NOT_SA:}). Nothing sent."
                 note "  You want the key file from IAM & Admin -> Service Accounts -> Keys." ;;
       NO_KEY)   warn "No private_key in that JSON. Nothing sent." ;;
