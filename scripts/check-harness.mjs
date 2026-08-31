@@ -216,6 +216,12 @@ const COMPOSED = [
       "a button that is only an icon still telling you what it does. 20 of them across the design system had no `aria-label`, no `title` and no text \u2014 a screen reader announces \"button\" and nothing else for a control that dismisses an alert, expands a lesson row or opens the session menu. axe reports 23 of these across the story suite, and the two populations overlap without either containing the other: axe counts RENDERED instances, so one component in a loop is many findings and a component nobody storied is none, where this counts SOURCE sites and sees the page nobody wrote a story for. Two of the 20 were not about names at all \u2014 `LessonsSpec` and `OnboardingSpec` call Button with `btnStyle`, `btnFill`, `label` and `icon`, none of which Button has, so those buttons were rendering EMPTY and the missing name was the symptom that surfaced it. No ratchet: the bar is zero and the exception map is empty. Mutation-tested three ways \u2014 a name removed, a stale exception, and `text=\"\"`, which an attribute-presence test reads as a name and which four real call sites are written with. 0.2s, measured 2026-08-29.",
   },
   {
+    script: 'check:node-floor',
+    pkg: 'root',
+    guards:
+      "one Node major for the whole repo, with the floor READ from wrangler rather than written down twice. The uno-bot cutover wizard died at stage 2 on \"Wrangler requires at least Node.js v22.0.0. You are using v20.19.3\", and nothing in the repo could have said so first: no .nvmrc, no `engines` in either package.json, and nine workflows pinning three different majors as literals \u2014 20 in uno-bot-evals, 22 in the harness gates, 24 in the figma and blueprint jobs. uno-bot-deploy.yml even carried the comment `# wrangler v4.97+ requires Node >= 22`, so the fact was known, written once, and enforced nowhere. The floor now comes from the installed wrangler's own engines.node, which is the only ordering that helps: bumping wrangler past a Node major fails this check instead of failing a deploy. A workflow literal is a finding even when it AGREES with .nvmrc, because the second copy is the defect and not the number it happens to hold. Mutation-tested five ways: an .nvmrc below the floor, a missing .nvmrc, a literal that disagrees, a literal that agrees, and a manifest whose engines drifted.",
+  },
+  {
     script: 'check:figma-colour-drift',
     pkg: 'root',
     guards:

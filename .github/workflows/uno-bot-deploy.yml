@@ -127,7 +127,7 @@ jobs:
           path: uno-blueprint-src
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "22" # wrangler v4.97+ requires Node >= 22
+          node-version-file: ".nvmrc" # wrangler v4.97+ requires Node >= 22
       - name: Install deps
         working-directory: agents/uno-bot
         run: npm ci
