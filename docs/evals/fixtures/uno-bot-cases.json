@@ -274,7 +274,7 @@
         "text"
       ],
       "forbidTool": "prototype_scaffold",
-      "judgeNote": "method §1 + AGENT.md § My lane: the bot gets a rendered screenshot plus text-layer reads — qualitative grounding ONLY. Variables, tokens and computed values are IDE-only. It must say plainly it cannot read spacing tokens from a frame and point to the IDE path, never guess token names. Asking ABOUT a frame is not a scaffold request, so no tool card."
+      "judgeNote": "AGENT.md § My lane, corrected 2026-08-31: the Worker reads Figma over REST and renders the frame itself, and /v1/files/:key/nodes DOES return fills, boundVariables and absoluteBoundingBox — fetchFigmaNode keeps name, type and text and drops the rest. So a spacing token here is UNREAD, not absent, and the old note on this case ('variables, tokens and computed values are IDE-only') stated our reader's limit as if it were Figma's. Three things must hold. (1) It never names a token, px value or hex from the frame. (2) It never reports one as ABSENT — 'this frame uses no spacing token' is a claim about our reader wearing the costume of a claim about the design, and fails. (3) It states the limit WITH its cause and a next route, per AGENT.md § My lane: not a bare 'I can\u2019t', but why (the Worker drops Figma's binding data) and what to do instead (name the component and it reads the value out of design-system/src/tokens/ via github_read, or open the frame in the IDE). A reply that discloses without routing fails this case. Asking ABOUT a frame is not a scaffold request, so no tool card."
     },
     {
       "id": "S1",

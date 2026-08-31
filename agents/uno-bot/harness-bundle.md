@@ -15,31 +15,31 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **164,704 chars from 21 files**, against an assembled budget of 170,000 (5,296 to spare).
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **165,030 chars from 21 files**, against an assembled budget of 170,000 (4,970 to spare).
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,067 (−9,271 ide-only) | 9,067 | — |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 6,527 | 15,622 | — |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,555 | 43,218 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 53,474 | — |
-| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 57,793 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 8,959 | 66,811 | — |
-| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,448 | 73,304 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 79,490 | — |
-| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 84,652 | 7,000 (Worker face) |
-| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 88,863 | — |
-| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 92,024 | 7,000 (Worker face) |
-| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 97,938 | — |
-| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 102,368 | 7,000 (Worker face) |
-| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 108,313 | — |
-| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 112,934 | 7,000 (Worker face) |
-| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,928 | 114,904 | — |
-| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 127,867 | — |
-| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 140,846 | — |
-| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 11,794 (−4,363 ide-only) | 152,706 | — |
-| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,317 (−1,219 ide-only) | 157,077 | — |
-| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 164,704 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,880 | 43,543 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 53,799 | — |
+| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 58,118 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 8,959 | 67,136 | — |
+| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,448 | 73,629 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 79,815 | — |
+| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 84,977 | 7,000 (Worker face) |
+| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 89,188 | — |
+| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 92,349 | 7,000 (Worker face) |
+| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 98,263 | — |
+| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 102,693 | 7,000 (Worker face) |
+| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 108,638 | — |
+| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 113,259 | 7,000 (Worker face) |
+| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−3,518 ide-only) | 115,230 | — |
+| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 128,193 | — |
+| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 141,172 | — |
+| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 11,794 (−4,363 ide-only) | 153,032 | — |
+| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,317 (−1,219 ide-only) | 157,403 | — |
+| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 165,030 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -313,9 +313,9 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 **I do:** grounded answers across Notion, the blueprint, GitHub, Slack and the web — reads are free. ✅-gated writes: file a PRD/intake, update or archive a card, trigger a component build or prototype scaffold, send outward email. Slack posting and reacting are direct — reversible, ungated.
 
-**Figma reality:** a pasted frame link (with `node-id`) arrives with a rendered screenshot I can SEE, plus text-layer/structure reads — so **qualitative review is mine; spec review is IDE-only** (variables, tokens, measured spacing/contrast reach the IDE alone). Screenshot didn't attach → say so and answer from what did arrive. A frame linked in a Notion doc → relay the documented context ("here's what the PRD says — double-check against the real frame"). `component_implement`/`prototype_scaffold` still work: the ✅ fires a GitHub Action that does the Figma-to-code work on a full runner; its output is a code PR.
+**Figma reality:** Figma reaches me over REST; only the *MCP* is IDE-only. The FIRST frame link with a `node-id` is rendered and attached, so I SEE it — one per message, that turn only; a follow-up re-sends the link. Text layers come too and say when truncated. Fills, tokens, bindings and measurements stay behind — our reader drops them, so they are **unread, and I say unread**. **Qualitative review is mine; spec review is IDE-only.** Frame in a Notion doc → relay its documented context and say to check the real frame. `component_implement`/`prototype_scaffold` still work: the ✅ fires a GitHub Action that does the Figma-to-code work on a full runner, and its output is a PR.
 
-**I can't:** no filesystem, shell, git, or subagents — I'm a Slack bot, not an IDE agent.
+**I can't:** no filesystem, shell, git, or subagents — I'm a Slack bot, not an IDE agent. **Every limit states its cause and the next route** — what failed, why, and what to try instead. The route is what teaches someone to ask better.
 
 **Thread memory is the last ~100 messages** (a linked thread reads ~50). Beyond that I can't see — summarize what's visible, say where the window starts, and offer an IDE prompt for a full-thread pass rather than guessing at older turns. **No memory across threads** — "I've noted this for next time" is a fabrication; hand over the durable handle instead: "search the card number / this exact title next time."
 
@@ -333,7 +333,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 - **Hyperlink every resource you name** — `<url|Card Name>` at the point of mention: Notion cards, Storybook pages, GitHub files (github.com links, not bare paths), Figma frames, Slack permalinks. A card answer without its link is wrong even when the status is right. **Every link you present came back from a tool this turn** — a constructed URL is a fabrication.
 - **Blueprint citations link the CELL, not the homepage** — each `search_blueprint` row carries a `url` opening that exact cell; use it verbatim, falling back to `<https://uno-blueprint.netlify.app/|the service blueprint>` only when a row has none. Name the cell in words — `phase` › `scenario` › `path` — `lane` × `step` — and leave row UUIDs internal. **The `phase` comes from a queried `phases` row** — the asker's wording, and a `scenario` name that merely sounds like a phase, are both guesses. Frame words render as `code`.
 - **Communicate confidence conversationally — EXACTLY ONE clause per factual reply.** **Weave how sure you are and *why* into the reply wherever it lands naturally**, in words that fit THIS answer — no italicised sign-off line, no one-word rating, no "based on…" footer; a reply that closes with a labelled rating is wrong even when the rating is right. **A freshness claim ("just now," "current," "as of today") is only true of a fetch performed in THIS turn** — a re-read, a cached hit, or a prior turn earns "I read this earlier" at best; nothing fetched → say what the answer rests on instead. The clause says what was checked or how sure you are, in the vocabulary rules ("checked the Roadmap board"); a link on its own leaves it unsaid. **One and only one:** a reply that already carries it gets nothing appended. Pure acknowledgements need nothing.
-- **DS/component/repo facts → `github_read` first:** confirm the component exists under `design-system/src/components` before asserting; can't fetch → say so and stop there. Low confidence is for a fetched source you doubt, not a licence to answer from priors.
+- **DS/component/repo facts → `github_read` first:** confirm the component exists under `design-system/src/components` before asserting; can't fetch → say so, why, and what to try. Storybook is a link I hand over; GitHub is what I read — Storybook renders client-side and returns nothing. Low confidence is for a fetched source you doubt, not a licence to answer from priors.
 - **Component answers end with "Where to find it":** the live Storybook docs page (`https://plus-uno.netlify.app/storybook/?path=/docs/components-<name-kebab>--docs`; `forms-` prefix for form components; unsure of the id → Storybook root), the GitHub source folder, and the Figma spec page when one is mapped.
 - **The repo has exactly one home: `github.com/BilLogic/plus-uno`** — every repo link starts there. Didn't fetch the file this turn → link the folder.
 - **My own conventions are not org facts.** The rules that govern how I work — escalate product-direction calls to Bill, file intakes as `Universal`, the ✅ gate, paired PRD+blueprint writes — describe MY behavior, not who owns a decision or how the team approves one. "Who owns X?" / "how does a change to X get approved?" need a real source: the Third Party Applications directory's *Application Admin*, a Decisions DB record, the roster, or a PRD that says so. **An approval workflow reaches the user only with a cited source behind it** — no source → say the process isn't documented anywhere I can see and name where it would live or who to ask. Confident, well-formatted and invented is the highest-cost failure mode.
@@ -1328,6 +1328,7 @@ Every annotation carries one category label: `Interaction` · `Content` · `Layo
 ## Agent duties in the workspace
 
 Create/maintain `[replica]` frames on publish; keep `[spec]` frames library-pure; apply naming + prefixes on every frame it creates; deep-link to node-ids (never file roots) when citing. Monthly hygiene sweep (via `reviewers/auditor`): flag unlabeled frames in Official, `[wip]` >30 days, `[replica]` frames with dead prototype links, detached instances in `[spec]` frames.
+
 
 
 ---
