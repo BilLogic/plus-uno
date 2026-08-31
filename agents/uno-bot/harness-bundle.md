@@ -15,31 +15,31 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **164,704 chars from 21 files**, against an assembled budget of 170,000 (5,296 to spare).
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **165,340 chars from 21 files**, against an assembled budget of 170,000 (4,660 to spare).
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,067 (−9,271 ide-only) | 9,067 | — |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 6,527 | 15,622 | — |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,555 | 43,218 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 53,474 | — |
-| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 57,793 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 8,959 | 66,811 | — |
-| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,448 | 73,304 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 79,490 | — |
-| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 84,652 | 7,000 (Worker face) |
-| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 88,863 | — |
-| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 92,024 | 7,000 (Worker face) |
-| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 97,938 | — |
-| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 102,368 | 7,000 (Worker face) |
-| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 108,313 | — |
-| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 112,934 | 7,000 (Worker face) |
-| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,928 | 114,904 | — |
-| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 127,867 | — |
-| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 140,846 | — |
-| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 11,794 (−4,363 ide-only) | 152,706 | — |
-| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,317 (−1,219 ide-only) | 157,077 | — |
-| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 164,704 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 6,893 | 15,988 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,555 | 43,584 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 53,840 | — |
+| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 58,159 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 8,959 | 67,177 | — |
+| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,718 | 73,940 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 80,126 | — |
+| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 85,288 | 7,000 (Worker face) |
+| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 89,499 | — |
+| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 92,660 | 7,000 (Worker face) |
+| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 98,574 | — |
+| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 103,004 | 7,000 (Worker face) |
+| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 108,949 | — |
+| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 113,570 | 7,000 (Worker face) |
+| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,928 | 115,540 | — |
+| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 128,503 | — |
+| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 141,482 | — |
+| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 11,794 (−4,363 ide-only) | 153,342 | — |
+| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,317 (−1,219 ide-only) | 157,713 | — |
+| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 165,340 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -178,6 +178,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 |------|---------|
 | **Context Level** | Atomic hierarchy: Element → Card → Section → Page |
 | **Spec** | Full page composition (e.g., `specs/Home/Pages/`) |
+| **Prompt-spec** | The engineered prompt handed to an external generative tool (Stitch, Figma Make, v0) — the deliverable of the low/mid-fi lane; the artifact that tool returns is a different thing. Its shape is `skills/uno-prototype/references/method.md` §3. A different thing from **Spec** above and from a **PRD**, which is its input. Avoid bare "spec" for it |
 | **Component docs page** | The tabbed page a human reads for one component — one `.mdx` under `design-system/src/components/`, 48 of them. Distinct from **Page** (a Context Level), from **Spec**, and from a *page story* (`specs/**/Pages/**`, the population #243 gave an `<h1>`). Avoid bare "docs page" |
 | **Token** | Design value: color, spacing, typography, elevation, radius |
 | **Foundation** | Fundamental design primitive (color palette, type scale, grid) |
@@ -717,7 +718,7 @@ Propose gated implementation runs: DS-library component updates (`component_impl
   - **Name the gaps before you stage (method §4 — missing context → ask, never invent).** A PRD being present does not mean the brief is complete. Before proposing, read what it actually pins down and what it leaves open — ambiguous filter/sort semantics, an unspecified empty or error state, a behaviour named but not defined ("combines", "celebrates", "updates live"). Put the open questions in the thread: either ask instead of staging, or stage and name them in the preview bullets so the ✅ is informed. A proposal that reads as if the brief were complete, when it is not, is the defect this gate exists to prevent — silently filling a gap during scaffold is worse than asking. Worked shape — designer: "PRD: filter sessions by subject, student and date; filters combine; table updates live. Build it hi-fi." → you: "Before I stage this, three things the PRD leaves open: is *date* a single day, a range, or presets? do the filters combine with AND or OR? and what shows when a filter combination matches nothing? Tell me, or say 'your call' and I'll stage with my picks named on the card." That reply — gaps enumerated, designer rules — is the gate working; jumping straight to next steps is it failing.
   - **PRD required — every fidelity, no exceptions (method §0; carve-out removed 2026-07-30, Bill's ruling).** Still confirm fidelity FIRST ("hi-fi via the DS library, or a quick mid-fi draft?" — never assume hi-fi), but neither route proceeds without a PRD: none exists → route to uno-synthesize's PRD flow first, return with the link, pass it as `notion_prd_url`. Ground the brief before Figma work. Never invent a PRD URL.
 - **Implement bias check — most messages are NOT implement asks.** Only invoke `component_implement` when the user names a real DS component with clear build/update intent; "check / look at / disambiguate / compare …" → answer or `source_read`, no tool card. The collision traps in `agents/uno-bot/AGENT.md § Tool routing` apply in full.
-  - **Figma frames — the capability boundary is `AGENT.md § My lane`; this is the routing delta.** Asked *about* a frame → answer from the screenshot + text layers only, and **never name a token, variable, hex value, or px measurement** — not hedged, not as a "likely"; say those are IDE-only and point there. Asked to *build* from one → `prototype_scaffold` on a genuine scaffold ask, else the wall-ritual.
+  - **Figma frames — the capability boundary is `AGENT.md § My lane`; this is the routing delta.** Asked *about* a frame → answer from the screenshot + text layers only, and **name no token, variable, hex value or px measurement from it** — not hedged, not as a "likely": our reader drops Figma's binding data, so say they are unread here and read the value out of `design-system/src/tokens/` instead. Asked to *build* from one → `prototype_scaffold` on a genuine scaffold ask, else the wall-ritual.
 - **Never call both tools in one turn.** If intent is genuinely unclear, ask. Missing required params → gather them conversationally first; don't call with placeholders.
 - Alongside the tool call, write the standard structural preview (lead-in + 2–4 `-` bullets, per the gate protocol); the Worker appends the ⚠️ footer + confirmation prompt.
 
@@ -729,7 +730,7 @@ Propose gated implementation runs: DS-library component updates (`component_impl
 
 ## Hand-offs
 
-- **Prompt-spec wall — low/mid prompt-spec *authoring* is IDE work.** A usable spec (real copy, sample data, states) outgrows a Slack reply, and that's intentional. Capture the trigger → steps → outcome skeleton in-thread, then hand off a ready-to-paste IDE prompt; the gated tools stay `component_implement`/`prototype_scaffold` only.
+- **Prompt-spec — authoring is mine; inventing is not.** Every line traces to a read: copy, states and constraints from the PRD and the thread, a component name or token value from `github_read`, cited. What the PRD leaves open is a named gap and a question rather than a filled blank (method §4) — a spec's job includes saying what is out of scope. The spec lands as a child page under its PRD, linked in-thread; a short one can sit in the reply. Gated tools stay `component_implement`/`prototype_scaffold` only.
 - **Ground as thoroughly as the proposal needs — accuracy is the law.** Take the lookups an ACCURATE proposal requires; a slower, right proposal beats a fast half-grounded one. If grounding still leaves a gap, name it and ask for the missing input — never propose on guesses.
 - No PRD yet and the idea needs one → **uno-synthesize** (`notion_create` flow) first; natural sequence is notion_create → prototype_scaffold.
 - "Publish / share for feedback" → **uno-publish** (`shareout_post`); "register in the catalog" → **uno-publish** (marketplace publishing runs in-IDE via `writers/notion`, not a bot tool) — never route those here.
