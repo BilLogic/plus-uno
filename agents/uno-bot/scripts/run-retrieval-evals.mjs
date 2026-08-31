@@ -349,8 +349,66 @@ async function main() {
 
   if (blockerFails.length) {
     console.error(`\n[retrieval] ${blockerFails.length} BLOCKER case(s) failed: ${blockerFails.map((r) => r.id).join(", ")}`);
+    diagnoseWholesaleFailure(results);
     process.exit(1);
   }
+}
+
+/**
+ * When EVERY case failed the same way, say what that pattern means.
+ *
+ * A retrieval regression looks like some cases passing and some not. All 26
+ * failing with an identical transport error is not retrieval at all — it is the
+ * eval never reaching the Worker, and the per-case output says so 26 times
+ * without ever saying it once.
+ *
+ * The 404 is the expensive one to read. `/debug/*` closes on a token mismatch
+ * rather than returning 401, deliberately, so that an unauthenticated caller
+ * cannot confirm the route exists. So a wrong DEBUG_TOKEN and a Worker without
+ * the route are indistinguishable from the outside — and after the #288 account
+ * move they were the same morning: the repo secret still held the OLD Worker's
+ * token while the new Worker had a different one, and all 26 cases returned
+ * "HTTP 404: not found" with 0% recall in every class.
+ */
+function diagnoseWholesaleFailure(results) {
+  const failures = results.filter((r) => !r.pass);
+  if (failures.length !== results.length || results.length === 0) return;
+
+  const errors = failures.map((r) => (r.reasons ?? []).join(" ")).filter((e) => e.includes("request failed"));
+  if (errors.length !== results.length) return;
+
+  const say = (...lines) => {
+    console.error("");
+    for (const l of lines) console.error(l);
+  };
+
+  if (errors.every((e) => e.includes("HTTP 404"))) {
+    say(
+      `[retrieval] every one of the ${results.length} cases returned 404, which is not a retrieval result.`,
+      "  /debug/* closes the route on a token mismatch instead of returning 401, so a WRONG",
+      "  DEBUG_TOKEN and a missing route look identical from here. The token is the usual cause:",
+      "",
+      "    the Worker's DEBUG_TOKEN is set with `wrangler secret put DEBUG_TOKEN`",
+      "    this eval reads GitHub's repo secret of the same name",
+      "",
+      "  Two copies of one value, so they drift — most recently when the Worker moved accounts",
+      "  (#288) and only one side was updated. Check they match before reading these scores as",
+      "  a retrieval problem.",
+    );
+    return;
+  }
+  if (errors.every((e) => e.includes("HTTP 5"))) {
+    say(`[retrieval] all ${results.length} cases got a 5xx. The Worker is up but erroring — check its logs, not these scores.`);
+    return;
+  }
+  if (errors.every((e) => /abort|timeout|fetch failed|ENOTFOUND|ECONNREFUSED/i.test(e))) {
+    say(
+      `[retrieval] all ${results.length} cases failed to connect to ${WORKER_URL}.`,
+      "  Nothing was measured. Check the host is right and the Worker is deployed.",
+    );
+    return;
+  }
+  say(`[retrieval] all ${results.length} cases failed at the transport, so nothing about retrieval was measured.`);
 }
 
 main().catch((err) => {
