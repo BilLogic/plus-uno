@@ -73,3 +73,53 @@ export const FIGMA_NOTE =
 export const FIGMA_TRUNCATION_NOTE =
   "The frame has more text than was read, so treat this as a partial reading: what is here is " +
   "quotable, what is missing is unknown rather than nonexistent.";
+
+// ── URL parsing ─────────────────────────────────────────────────────────────
+//
+// Lives here rather than in figma.ts because two Slack-side modules need to
+// agree on what counts as a frame link, and figma.ts imports the Workers fetch
+// wrapper — which the test build cannot compile. A recognizer nothing can
+// unit-test is how vision.ts and vision-reference.ts came to hold two
+// different answers to the same question.
+
+export interface FigmaUrlParts {
+  fileKey: string;
+  /** Canonical colon form the Figma REST API expects, e.g. "158:21725". */
+  nodeId: string;
+}
+
+/**
+ * Parse a Figma share URL into its fileKey + nodeId.
+ *
+ * Handles the `/design/`, `/file/`, and `/proto/` path shapes and both node-id
+ * encodings Figma emits: dash form (`node-id=158-21725`) and colon form
+ * (`node-id=158%3A21725` → decoded to `158:21725` by `searchParams`). Returns
+ * null for anything that isn't a figma.com URL carrying a node-id.
+ */
+export function parseFigmaUrl(url: string): FigmaUrlParts | null {
+  if (typeof url !== "string" || !url.trim()) return null;
+
+  let parsed: URL;
+  try {
+    parsed = new URL(url.trim());
+  } catch {
+    return null;
+  }
+
+  if (!/(?:^|\.)figma\.com$/i.test(parsed.hostname)) return null;
+
+  const pathMatch = parsed.pathname.match(/^\/(?:design|file|proto)\/([A-Za-z0-9]+)/);
+  if (!pathMatch) return null;
+  const fileKey = pathMatch[1]!;
+
+  // searchParams.get already percent-decodes, so `%3A` arrives as `:`.
+  const rawNode = parsed.searchParams.get("node-id");
+  if (!rawNode) return null;
+
+  // Dash form uses a single `-` between the two ids; colon form is already
+  // API-ready. Replace only the first `-` so compound ids stay intact.
+  const nodeId = rawNode.includes(":") ? rawNode : rawNode.replace("-", ":");
+  if (!/^[A-Za-z0-9]+:[A-Za-z0-9]+/.test(nodeId)) return null;
+
+  return { fileKey, nodeId };
+}
