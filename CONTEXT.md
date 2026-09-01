@@ -42,6 +42,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 |------|---------|
 | **Context Level** | Atomic hierarchy: Element → Card → Section → Page |
 | **Spec** | Full page composition (e.g., `specs/Home/Pages/`) |
+| **Prompt-spec** | The engineered prompt handed to an external generative tool (Stitch, Figma Make, v0) — the deliverable of the low/mid-fi lane; the artifact that tool returns is a different thing. Its shape is `skills/uno-prototype/references/method.md` §3. A different thing from **Spec** above and from a **PRD**, which is its input. Avoid bare "spec" for it |
 | **Component docs page** | The tabbed page a human reads for one component — one `.mdx` under `design-system/src/components/`, 48 of them. Distinct from **Page** (a Context Level), from **Spec**, and from a *page story* (`specs/**/Pages/**`, the population #243 gave an `<h1>`). Avoid bare "docs page" |
 | **Token** | Design value: color, spacing, typography, elevation, radius |
 | **Foundation** | Fundamental design primitive (color palette, type scale, grid) |

@@ -95,11 +95,14 @@ error**, and the specific behavior under test. Always name what is out of scope,
 so the tool doesn't invent it. Each deliverable's reference adds its own
 specifics on top of this skeleton.
 
-**Where a spec is authored:** in an IDE face, in full. A usable spec — real
-copy, sample data, every state — outgrows a chat reply, and that is by design.
-A conversational face captures the **skeleton only** (trigger → steps →
-outcome, actors, constraints) in-thread and hands off a ready-to-paste IDE
-prompt; it does not write the asset spec inline, however completely it could.
+**Provenance is the authoring gate, not the surface.** Any face that can read
+the PRD and return text may author the complete spec. Every line traces to an
+input the face actually read: copy, states and constraints from the PRD or
+conversation; design-system names and values from the design-system source.
+Cite those inputs. What the inputs leave open stays visible as a named question
+or an explicit out-of-scope line (the hard gate in §4); open inputs remain open.
+The current surface carries the complete spec; durable storage uses only a
+writer that surface actually has, behind its normal confirmation gate.
 
 **Direct production is sanctioned only where UNO holds the medium:** an in-chat
 text sketch, or a write through a gated design-tool writer. Everything else is a

@@ -15,31 +15,31 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **165,318 chars from 21 files**, against an assembled budget of 170,000 (4,682 to spare).
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **165,932 chars from 21 files**, against an assembled budget of 170,000 (4,068 to spare).
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,067 (−9,271 ide-only) | 9,067 | — |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 6,527 | 15,622 | — |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,926 | 43,589 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 53,845 | — |
-| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 58,164 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,079 | 67,302 | — |
-| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,570 | 73,917 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 80,103 | — |
-| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 85,265 | 7,000 (Worker face) |
-| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 89,476 | — |
-| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 92,637 | 7,000 (Worker face) |
-| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 98,551 | — |
-| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 102,981 | 7,000 (Worker face) |
-| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 108,926 | — |
-| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 113,547 | 7,000 (Worker face) |
-| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,599 ide-only) | 115,518 | — |
-| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 128,481 | — |
-| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 141,460 | — |
-| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 11,794 (−4,363 ide-only) | 153,320 | — |
-| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,317 (−1,219 ide-only) | 157,691 | — |
-| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 165,318 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 6,893 | 15,988 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,926 | 43,955 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 54,211 | — |
+| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 58,530 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 67,902 | — |
+| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,584 | 74,531 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 80,717 | — |
+| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 85,879 | 7,000 (Worker face) |
+| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 90,090 | — |
+| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 93,251 | 7,000 (Worker face) |
+| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 99,165 | — |
+| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 103,595 | 7,000 (Worker face) |
+| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 109,540 | — |
+| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 114,161 | 7,000 (Worker face) |
+| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,599 ide-only) | 116,132 | — |
+| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 129,095 | — |
+| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 142,074 | — |
+| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 11,794 (−4,363 ide-only) | 153,934 | — |
+| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,317 (−1,219 ide-only) | 158,305 | — |
+| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 165,932 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -178,6 +178,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 |------|---------|
 | **Context Level** | Atomic hierarchy: Element → Card → Section → Page |
 | **Spec** | Full page composition (e.g., `specs/Home/Pages/`) |
+| **Prompt-spec** | The engineered prompt handed to an external generative tool (Stitch, Figma Make, v0) — the deliverable of the low/mid-fi lane; the artifact that tool returns is a different thing. Its shape is `skills/uno-prototype/references/method.md` §3. A different thing from **Spec** above and from a **PRD**, which is its input. Avoid bare "spec" for it |
 | **Component docs page** | The tabbed page a human reads for one component — one `.mdx` under `design-system/src/components/`, 48 of them. Distinct from **Page** (a Context Level), from **Spec**, and from a *page story* (`specs/**/Pages/**`, the population #243 gave an `<h1>`). Avoid bare "docs page" |
 | **Token** | Design value: color, spacing, typography, elevation, radius |
 | **Foundation** | Fundamental design primitive (color palette, type scale, grid) |
@@ -628,11 +629,14 @@ error**, and the specific behavior under test. Always name what is out of scope,
 so the tool doesn't invent it. Each deliverable's reference adds its own
 specifics on top of this skeleton.
 
-**Where a spec is authored:** in an IDE face, in full. A usable spec — real
-copy, sample data, every state — outgrows a chat reply, and that is by design.
-A conversational face captures the **skeleton only** (trigger → steps →
-outcome, actors, constraints) in-thread and hands off a ready-to-paste IDE
-prompt; it does not write the asset spec inline, however completely it could.
+**Provenance is the authoring gate, not the surface.** Any face that can read
+the PRD and return text may author the complete spec. Every line traces to an
+input the face actually read: copy, states and constraints from the PRD or
+conversation; design-system names and values from the design-system source.
+Cite those inputs. What the inputs leave open stays visible as a named question
+or an explicit out-of-scope line (the hard gate in §4); open inputs remain open.
+The current surface carries the complete spec; durable storage uses only a
+writer that surface actually has, behind its normal confirmation gate.
 
 **Direct production is sanctioned only where UNO holds the medium:** an in-chat
 text sketch, or a write through a gated design-tool writer. Everything else is a
@@ -730,7 +734,7 @@ Propose gated implementation runs: DS-library component updates (`component_impl
 
 ## Hand-offs
 
-- **Prompt-spec wall — low/mid prompt-spec *authoring* is IDE work.** A usable spec (real copy, sample data, states) outgrows a Slack reply, and that's intentional. Capture the trigger → steps → outcome skeleton in-thread, then hand off a ready-to-paste IDE prompt; the gated tools stay `component_implement`/`prototype_scaffold` only.
+- **Prompt-spec — authoring is mine; provenance is method §3.** Return the complete spec in-thread. If the requester wants durable storage and supplied a PRD URL, offer a ✅-gated `notion_update` that appends it to that PRD; the Worker has no child-page create surface. Gated implementation tools stay `component_implement`/`prototype_scaffold` only.
 - **Ground as thoroughly as the proposal needs — accuracy is the law.** Take the lookups an ACCURATE proposal requires; a slower, right proposal beats a fast half-grounded one. If grounding still leaves a gap, name it and ask for the missing input — never propose on guesses.
 - No PRD yet and the idea needs one → **uno-synthesize** (`notion_create` flow) first; natural sequence is notion_create → prototype_scaffold.
 - "Publish / share for feedback" → **uno-publish** (`shareout_post`); "register in the catalog" → **uno-publish** (marketplace publishing runs in-IDE via `writers/notion`, not a bot tool) — never route those here.

@@ -33,7 +33,7 @@ Propose gated implementation runs: DS-library component updates (`component_impl
 
 ## Hand-offs
 
-- **Prompt-spec wall — low/mid prompt-spec *authoring* is IDE work.** A usable spec (real copy, sample data, states) outgrows a Slack reply, and that's intentional. Capture the trigger → steps → outcome skeleton in-thread, then hand off a ready-to-paste IDE prompt; the gated tools stay `component_implement`/`prototype_scaffold` only.
+- **Prompt-spec — authoring is mine; provenance is method §3.** Return the complete spec in-thread. If the requester wants durable storage and supplied a PRD URL, offer a ✅-gated `notion_update` that appends it to that PRD; the Worker has no child-page create surface. Gated implementation tools stay `component_implement`/`prototype_scaffold` only.
 - **Ground as thoroughly as the proposal needs — accuracy is the law.** Take the lookups an ACCURATE proposal requires; a slower, right proposal beats a fast half-grounded one. If grounding still leaves a gap, name it and ask for the missing input — never propose on guesses.
 - No PRD yet and the idea needs one → **uno-synthesize** (`notion_create` flow) first; natural sequence is notion_create → prototype_scaffold.
 - "Publish / share for feedback" → **uno-publish** (`shareout_post`); "register in the catalog" → **uno-publish** (marketplace publishing runs in-IDE via `writers/notion`, not a bot tool) — never route those here.
