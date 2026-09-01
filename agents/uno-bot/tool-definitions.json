@@ -62,7 +62,7 @@
   },
   {
     "name": "source_read",
-    "description": "READ-ONLY. Fetch the actual CONTENT of a link before answering — a Notion page (returns title + properties incl. Owner/people + block text), a Figma frame (returns node name/type + text layers), a GitHub/raw file, or any web URL (returns text). Use this WHENEVER the request contains or references a URL, a linked PRD/doc/guide, or a Figma frame: read it and ground your answer in the returned content, then cite it. Never answer a question about a linked source from memory/priors. For 'who owns/should review this' questions, read the page and use its Owner/people property rather than guessing. Safe to call freely (read-only, no gate).",
+    "description": "READ-ONLY. Fetch the actual CONTENT of a link before answering — a Notion page (returns title + properties incl. Owner/people + block text), a Figma frame (returns node name/type + text layers), a Slack Canvas shared by a user in this conversation, a GitHub/raw file, or any web URL (returns text). A Canvas attachment appears in the user turn as a source URL; read that URL when the request refers to the attachment. Canvas access is conversation-scoped and the Worker rejects URLs not user-shared here. Use this WHENEVER the request contains or references a URL, a linked PRD/doc/guide, or a Figma frame: read it and ground your answer in the returned content, then cite it. Never answer a question about a linked source from memory/priors. For 'who owns/should review this' questions, read the page and use its Owner/people property rather than guessing. Safe to call freely (read-only, no gate).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
