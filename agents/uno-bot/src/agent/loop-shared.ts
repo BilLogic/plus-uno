@@ -466,7 +466,7 @@ export async function executeReadOnlyTool(
     recordBlueprintReceipt(out);
     return out;
   }
-  if (name === "source_read") return executeReadSource(env, input);
+  if (name === "source_read") return executeReadSource(env, input, slack);
   if (name === "github_read") return executeGithubRead(env, input);
   if (name === "slack_thread_read") return executeSlackThreadRead(env, input);
   if (name === "slack_search") {

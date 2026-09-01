@@ -7,8 +7,11 @@
 /** Slack file attachment metadata as delivered on message/app_mention events.
  *  Only the fields the vision path reads — everything else is ignored. */
 export interface SlackEventFile {
+  id?: string;
   name?: string;
+  filetype?: string;
   mimetype?: string;
+  permalink?: string;
   url_private?: string;
   size?: number;
 }
@@ -104,6 +107,8 @@ export interface SlackAppMentionEvent {
   text: string;
   ts: string;
   thread_ts?: string;
+  bot_id?: string;
+  subtype?: string;
   files?: SlackEventFile[];
   /** Carried through appMentionToMessage — see SlackMessageEvent.action_token. */
   action_token?: string;

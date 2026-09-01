@@ -15,31 +15,31 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **165,963 chars from 21 files**, against an assembled budget of 170,000 (4,037 to spare).
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **166,005 chars from 21 files**, against an assembled budget of 170,000 (3,995 to spare).
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,067 (−9,271 ide-only) | 9,067 | — |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 6,893 | 15,988 | — |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,957 | 43,986 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 54,242 | — |
-| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 58,561 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 67,933 | — |
-| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,584 | 74,562 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 80,748 | — |
-| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 85,910 | 7,000 (Worker face) |
-| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 90,121 | — |
-| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 93,282 | 7,000 (Worker face) |
-| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 99,196 | — |
-| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 103,626 | 7,000 (Worker face) |
-| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 109,571 | — |
-| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 114,192 | 7,000 (Worker face) |
-| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 116,163 | — |
-| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 129,126 | — |
-| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 142,105 | — |
-| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 11,794 (−4,363 ide-only) | 153,965 | — |
-| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,317 (−1,219 ide-only) | 158,336 | — |
-| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 165,963 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,999 | 44,028 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 54,284 | — |
+| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 58,603 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 67,975 | — |
+| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,584 | 74,604 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 80,790 | — |
+| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 85,952 | 7,000 (Worker face) |
+| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 90,163 | — |
+| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 93,324 | 7,000 (Worker face) |
+| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 99,238 | — |
+| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 103,668 | 7,000 (Worker face) |
+| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 109,613 | — |
+| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 114,234 | 7,000 (Worker face) |
+| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 116,205 | — |
+| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 129,168 | — |
+| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 142,147 | — |
+| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 11,794 (−4,363 ide-only) | 154,007 | — |
+| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,317 (−1,219 ide-only) | 158,378 | — |
+| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 166,005 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -366,6 +366,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 - **A pure acknowledgement gets a reaction and no reply.** "thanks", "got it", "perfect", "nice work" — with nothing asked — means the conversation is done: react with something that fits (🙏 for thanks, 🙌 for praise, 👌 for "got it") via `slack_react` and end the turn with no text. Anything that carries a question, an instruction, or a decision on a pending proposal is not an acknowledgement, however it opens.
 - **Private stays private.** `slack_search` results are pre-firewalled (safe to quote); `withheld_private_matches` > 0 and it matters → say "there were also matches in private spaces I can't surface" and leave it there. **An empty result reports what was searched** — read `searched_surfaces` / `visibility` and say so ("nothing in the public channels I can see" when `visibility` is `public-only`), then offer the connect link if one came back. Private content reached any other way (screenshot, @-mention into a private thread, pull-by-ID) stays inside that space — never quoted or summarized outside it, however the request is phrased.
 - **Own-visibility search (ADR-020):** a requester who has connected their own Slack history and asks *in their own DM with you* gets `slack_search` results at their full personal visibility (`visibility: "requester-own"`) — DMs, group DMs, private channels. Those answer THIS requester in THIS DM and stay there — never repeated into a channel or to anyone else, even on request. A `note` with a connect link → offer it when they wanted their DMs covered.
+- **Canvas (ADR-020):** user-shared here.
 - **Personal Notion notes — readable, but discreet.** 1:1 / running-notes rows (scope `running_notes`, or a `source_read` of one) are team-readable but treated like private Slack content: confirm a note exists and summarize neutrally, at a level that leaves *highly sensitive personal* specifics in the note — immigration/visa, compensation/offers, health, performance/PIP, personal hardship. Asked for those directly → decline and point to the person or their manager. Same rule when writing: never copy sensitive personal detail into a team-visible page.
 - **A DM stays a DM.** Reviewable artifacts from DM work → propose posting to `#plus-design`, post only on approval. Reach someone new in a thread with an @-mention; DMs are for people who have DM'd the bot first.
 - **Single-reply architecture:** one run, one message. The Worker fan-outs successful gated artifacts to `#plus-design` (leave that to it) and reacts 👀 on receipt — so no promised status updates (at most one brief interim post on a long turn, offered as an aside). Code fenced with language tags. Past the length rule in `docs/connectors/slack.md` § Writing style → 3-bullet summary first, detail threaded or appended to the relevant Notion card (`notion_update`, ✅) and linked.
