@@ -101,8 +101,9 @@ export async function recordExchange(
   thread_ts: string,
   userText: string,
   assistantText: string,
+  userTurn?: Pick<HistoryTurn, "ts" | "vision">,
 ): Promise<void> {
-  await appendHistory(env, channel, thread_ts, { role: "user", content: userText });
+  await appendHistory(env, channel, thread_ts, { role: "user", content: userText, ...userTurn });
   await appendHistory(env, channel, thread_ts, { role: "assistant", content: assistantText });
 }
 

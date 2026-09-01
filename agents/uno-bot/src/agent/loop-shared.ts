@@ -16,6 +16,7 @@ import type { AbsenceContext } from "./absence";
 import type { Env } from "../types";
 import type { HistoryTurn, PendingProposal } from "../thread-state-client";
 import type { SlackContext } from "../tools/dispatcher";
+import type { AgentImage, ProviderConversationTurn } from "./provider-conversation";
 import { addReaction } from "../slack/api";
 import { executeNotionSearch } from "../tools/notion-search";
 import { executeRoadmapQuery } from "../tools/roadmap-query";
@@ -30,15 +31,7 @@ export type { HistoryTurn };
 
 // ── The provider-neutral contract (input/output of one agent turn) ───────────
 
-/** A base64-encoded image attached to the CURRENT user turn (Slack paste or a
- *  rendered Figma frame). Never persisted to history — the Durable Object
- *  stores a text marker instead (see events.ts). */
-export interface AgentImage {
-  /** One of the Anthropic-supported image media types (jpeg/png/gif/webp). */
-  media_type: string;
-  /** Raw base64 (no data: prefix). */
-  data: string;
-}
+export type { AgentImage } from "./provider-conversation";
 
 import type { ModelTier } from "./routing";
 
@@ -52,8 +45,11 @@ export interface AgentInput {
   slack: SlackContext;
   currentSender: { userId: string };
   pending: PendingProposal | null;
-  /** Vision input for the current turn only. History turns stay plain text. */
+  /** Legacy current-turn vision input; provider-ready callers use conversation. */
   images?: AgentImage[];
+  /** Provider-ready multimodal turns. When present, image blocks remain on the
+   *  user turn that introduced them instead of being moved to the latest ask. */
+  conversation?: ProviderConversationTurn[];
   /** Pre-rendered one-line description of what the user has open in the
    *  assistant panel (e.g. "channel <#C123>"), when chatting from the panel.
    *  Injected as an advisory system block. Absent for channel/@mention turns. */

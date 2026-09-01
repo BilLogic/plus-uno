@@ -1,15 +1,23 @@
 // Vision input (2026-07-09): Slack-pasted images + Figma frame screenshots are
-// attached to the CURRENT user turn as base64 image blocks so the model can
-// actually see them. Everything here is best-effort — any failure degrades to
-// text-only and must never break the reply. Base64 is NEVER persisted to the
-// Durable Object history; `historyText` carries text markers instead.
+// attached as base64 image blocks so the model can actually see them. The
+// immediately previous user image is re-fetched for one follow-up and remains
+// anchored to its original turn. Everything here is best-effort — any failure
+// degrades to text-only and must never break the reply. Base64 is NEVER
+// persisted to Durable Object history; only re-fetchable pointers are stored.
 // (Extracted from events.ts, 2026-07-12.)
 
 import type { Env } from "../types";
 import type { AgentImage } from "../agent/loop-shared";
-import type { SlackMessageEvent } from "./types";
+import type { SlackEventFile, SlackMessageEvent } from "./types";
+import type { HistoryTurn } from "../thread-state-client";
+import type { HistoricalImages } from "../agent/provider-conversation";
 import { parseFigmaUrl, fetchFigmaImagePngUrl } from "../integrations/figma";
 import { countedFetch } from "../net";
+import {
+  selectPreviousVisionReference,
+  visionReferenceFor,
+  type VisionReference,
+} from "./vision-reference";
 
 const MAX_IMAGE_ATTACHMENTS = 3;
 const MAX_IMAGE_BYTES = Math.floor(3.5 * 1024 * 1024); // Anthropic per-image limit is ~5MB; stay well under
@@ -25,43 +33,32 @@ export interface VisionInputs {
   modelText: string;
   /** userText + plain-text markers for the stored history (no base64 ever). */
   historyText: string;
+  /** Rehydrated image blocks anchored to the immediately previous user turn. */
+  historicalImages?: HistoricalImages;
+  /** Small pointers persisted for the next turn; never base64. */
+  reference?: VisionReference;
 }
 
 export async function collectVisionInputs(
   env: Env,
   event: SlackMessageEvent,
   userText: string,
+  history: HistoryTurn[] = [],
 ): Promise<VisionInputs> {
   const images: AgentImage[] = [];
   const modelNotes: string[] = [];
   const historyMarkers: string[] = [];
+  const reference = visionReferenceFor(userText, event.files);
+  let historicalImages: HistoricalImages | undefined;
 
   try {
     // 1) Slack-pasted images: up to MAX_IMAGE_ATTACHMENTS supported image files.
-    const files = Array.isArray(event.files) ? event.files : [];
-    const imageFiles = files.filter(
-      (f) => typeof f?.mimetype === "string" && f.mimetype.startsWith("image/") && !!f.url_private,
+    const currentSlack = await loadSlackImages(env, event.files);
+    images.push(...currentSlack.loaded.map(({ image }) => image));
+    historyMarkers.push(
+      ...currentSlack.loaded.map(({ file }) => `[user attached image: ${file.name ?? "unnamed"}]`),
     );
-    let omitted = 0;
-    for (const f of imageFiles) {
-      if (
-        images.length >= MAX_IMAGE_ATTACHMENTS ||
-        !SUPPORTED_IMAGE_TYPES.has(f.mimetype!) ||
-        (typeof f.size === "number" && f.size > MAX_IMAGE_BYTES)
-      ) {
-        omitted++;
-        continue;
-      }
-      const bytes = await fetchBytes(f.url_private!, {
-        Authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
-      });
-      if (!bytes || bytes.byteLength === 0 || bytes.byteLength > MAX_IMAGE_BYTES) {
-        omitted++;
-        continue;
-      }
-      images.push({ media_type: f.mimetype!, data: bytesToBase64(bytes) });
-      historyMarkers.push(`[user attached image: ${f.name ?? "unnamed"}]`);
-    }
+    const omitted = currentSlack.omitted;
     if (omitted > 0) {
       modelNotes.push(`[${omitted} more image(s) omitted — too large or unsupported format]`);
     }
@@ -71,17 +68,29 @@ export async function collectVisionInputs(
     // proposal cards use, then downloads the short-lived signed PNG.
     const figmaParts = findFigmaFrameUrl(userText);
     if (figmaParts) {
-      let attached = false;
-      const pngUrl = await fetchFigmaImagePngUrl(env, figmaParts.fileKey, figmaParts.nodeId, 1);
-      if (pngUrl) {
-        const png = await fetchBytes(pngUrl);
-        if (png && png.byteLength > 0 && png.byteLength <= MAX_IMAGE_BYTES) {
-          images.push({ media_type: "image/png", data: bytesToBase64(png) });
-          historyMarkers.push("[figma frame screenshot attached]");
-          attached = true;
+      const figmaImage = await loadFigmaImage(env, figmaParts);
+      if (figmaImage) {
+        images.push(figmaImage);
+        historyMarkers.push("[figma frame screenshot attached]");
+      } else modelNotes.push("[figma screenshot unavailable]");
+    }
+
+    // One-follow-up lifetime. Only rehydrate the immediately previous user
+    // turn, and only when this turn did not introduce a new image of its own.
+    const previous = selectPreviousVisionReference(history, Boolean(reference));
+    if (previous) {
+      const priorSlack = await loadSlackImages(env, previous.reference.files);
+      const priorImages = priorSlack.loaded.map(({ image }) => image);
+      if (previous.reference.figmaUrl) {
+        const parts = parseFigmaUrl(previous.reference.figmaUrl);
+        if (parts) {
+          const figmaImage = await loadFigmaImage(env, parts);
+          if (figmaImage) priorImages.push(figmaImage);
         }
       }
-      if (!attached) modelNotes.push("[figma screenshot unavailable]");
+      if (priorImages.length) {
+        historicalImages = { turnTs: previous.turnTs, images: priorImages };
+      }
     }
   } catch (err) {
     // Vision is additive — never let it break the reply. Keep whatever was
@@ -95,7 +104,52 @@ export async function collectVisionInputs(
     images,
     modelText: [userText, ...modelNotes].join("\n"),
     historyText: [userText, ...historyMarkers].join("\n"),
+    ...(historicalImages ? { historicalImages } : {}),
+    ...(reference ? { reference } : {}),
   };
+}
+
+async function loadSlackImages(
+  env: Env,
+  files: SlackEventFile[] | undefined,
+): Promise<{ loaded: Array<{ file: SlackEventFile; image: AgentImage }>; omitted: number }> {
+  const loaded: Array<{ file: SlackEventFile; image: AgentImage }> = [];
+  let omitted = 0;
+  const imageFiles = (files ?? []).filter(
+    (file) => file.mimetype?.startsWith("image/") && Boolean(file.url_private),
+  );
+  for (const file of imageFiles) {
+    if (
+      loaded.length >= MAX_IMAGE_ATTACHMENTS ||
+      !file.mimetype ||
+      !SUPPORTED_IMAGE_TYPES.has(file.mimetype) ||
+      !file.url_private ||
+      (typeof file.size === "number" && file.size > MAX_IMAGE_BYTES)
+    ) {
+      omitted++;
+      continue;
+    }
+    const bytes = await fetchBytes(file.url_private, {
+      Authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
+    });
+    if (!bytes || bytes.byteLength === 0 || bytes.byteLength > MAX_IMAGE_BYTES) {
+      omitted++;
+      continue;
+    }
+    loaded.push({ file, image: { media_type: file.mimetype, data: bytesToBase64(bytes) } });
+  }
+  return { loaded, omitted };
+}
+
+async function loadFigmaImage(
+  env: Env,
+  parts: NonNullable<ReturnType<typeof parseFigmaUrl>>,
+): Promise<AgentImage | null> {
+  const pngUrl = await fetchFigmaImagePngUrl(env, parts.fileKey, parts.nodeId, 1);
+  if (!pngUrl) return null;
+  const png = await fetchBytes(pngUrl);
+  if (!png || png.byteLength === 0 || png.byteLength > MAX_IMAGE_BYTES) return null;
+  return { media_type: "image/png", data: bytesToBase64(png) };
 }
 
 /** First figma.com URL in the message that carries a node-id (Slack wraps links

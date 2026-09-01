@@ -42,6 +42,7 @@ import {
 } from "./loop-shared";
 import { subrequestsUsed, meterBreakdown, withSubrequestLimit, isSubrequestBudgetError, subrequestBudgetTrips } from "../net";
 import type { HistoryTurn } from "../thread-state-client";
+import { buildProviderConversation, type ProviderConversationTurn } from "./provider-conversation";
 
 // ── Anthropic Messages wire types (the subset we touch) ──────────────────────
 
@@ -80,6 +81,7 @@ const WEB_SEARCH_TOOL = { type: "web_search_20250305", name: "web_search", max_u
 
 export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
   const { env, userText, history, currentSender, pending, images, slack, assistantContext } = input;
+  const conversation = input.conversation ?? buildProviderConversation(history, userText, images);
 
   const { tier, reason: routeReason } = routeRequest({ userText, hasPending: pending !== null, override: input.tierOverride });
   // Tier → Vertex model ID. The default lane is overridable via CLAUDE_MODEL
@@ -142,7 +144,7 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
     : null;
   const systemBlocks = await buildSystemBlocks(env, pendingForSystem, currentSender, assistantContext);
 
-  const messages = buildMessages(history, userText, images);
+  const messages = buildMessages(conversation);
 
   const callClaude = async (disableTools: boolean): Promise<ClaudeMessage> => {
     const body: Record<string, unknown> = {
@@ -319,31 +321,17 @@ function extractFinalText(content: ContentBlock[]): string {
  * assistant turns (first message must be user). Current-turn images become
  * image blocks ahead of the text block; history stays plain text.
  */
-function buildMessages(history: HistoryTurn[], userText: string, images?: AgentImage[]): MessageParam[] {
-  const raw: { role: "user" | "assistant"; content: string }[] = [
-    ...history.map((h) => ({ role: h.role, content: h.content })),
-    { role: "user", content: userText },
-  ];
-  const merged: { role: "user" | "assistant"; content: string }[] = [];
-  for (const turn of raw) {
-    const last = merged[merged.length - 1];
-    if (last && last.role === turn.role) last.content = `${last.content}\n\n${turn.content}`;
-    else merged.push({ role: turn.role, content: turn.content });
-  }
-  while (merged.length > 0 && merged[0]!.role !== "user") merged.shift();
-  const result: MessageParam[] = merged.map((m) => ({ role: m.role, content: m.content }));
-
-  if (images && images.length > 0 && result.length > 0) {
-    const lastTurn = result[result.length - 1]!;
-    if (lastTurn.role === "user" && typeof lastTurn.content === "string") {
-      lastTurn.content = [
-        ...images.map((img): ImageBlockParam => ({
+function buildMessages(conversation: ProviderConversationTurn[]): MessageParam[] {
+  return conversation.map((turn): MessageParam => ({
+    role: turn.role,
+    content: turn.images?.length
+      ? [
+        ...turn.images.map((img): ImageBlockParam => ({
           type: "image",
           source: { type: "base64", media_type: img.media_type, data: img.data },
         })),
-        { type: "text", text: lastTurn.content },
-      ];
-    }
-  }
-  return result;
+        { type: "text", text: turn.text },
+      ]
+      : turn.text,
+  }));
 }

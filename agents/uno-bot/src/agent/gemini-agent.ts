@@ -45,6 +45,7 @@ import {
   type AgentImage,
 } from "./loop-shared";
 import type { HistoryTurn } from "../thread-state-client";
+import { buildProviderConversation, type ProviderConversationTurn } from "./provider-conversation";
 
 // ── Gemini wire types (the subset we touch) ─────────────────────────────────
 
@@ -104,22 +105,17 @@ function geminiFunctionDeclarations(): Array<Record<string, unknown>> {
 // ── Content building ─────────────────────────────────────────────────────────
 
 function buildContents(
-  history: HistoryTurn[],
-  userText: string,
-  images?: AgentImage[],
+  conversation: ProviderConversationTurn[],
 ): GeminiContent[] {
-  const contents: GeminiContent[] = history.map((t) => ({
-    role: t.role === "assistant" ? "model" : "user",
-    parts: [{ text: t.content }],
-  }));
-  const currentParts: GeminiPart[] = [
-    ...(images ?? []).map((img) => ({
+  return conversation.map((turn) => ({
+    role: turn.role === "assistant" ? "model" : "user",
+    parts: [
+      ...(turn.images ?? []).map((img) => ({
       inlineData: { mimeType: img.media_type, data: img.data },
-    })),
-    { text: userText },
-  ];
-  contents.push({ role: "user", parts: currentParts });
-  return contents;
+      })),
+      { text: turn.text },
+    ],
+  }));
 }
 
 function textOf(parts: GeminiPart[]): string {
@@ -134,6 +130,7 @@ function textOf(parts: GeminiPart[]): string {
 
 export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   const { env, userText, history, currentSender, pending, images, slack, assistantContext } = input;
+  const conversation = input.conversation ?? buildProviderConversation(history, userText, images);
 
   // Same three lanes as the Anthropic path. Until 2026-08-07 Gemini expressed
   // them through thinkingLevel on ONE model — which collapsed two of the three:
@@ -276,7 +273,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   }
 
   const functionDeclarations = geminiFunctionDeclarations();
-  const contents = buildContents(history, userText, images);
+  const contents = buildContents(conversation);
   // A request that references cachedContent may NOT also set systemInstruction —
   // Vertex rejects the pair. The per-request context therefore rides as a
   // leading user turn instead; it is the same text, one role over.
