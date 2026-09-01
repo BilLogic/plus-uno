@@ -7,11 +7,12 @@
 // checks them, so this file checks them.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { passesCase } from "./eval-scoring.mjs";
 
 const FIXTURE = new URL("../../../docs/evals/fixtures/uno-bot-cases.json", import.meta.url);
 const README = new URL("../../../docs/evals/README.md", import.meta.url);
+const PROTOTYPE_SEEDS = new URL("../../../docs/evals/fixtures/uno-prototype-seeds/", import.meta.url);
 
 const raw = JSON.parse(readFileSync(FIXTURE, "utf8"));
 const cases = Array.isArray(raw) ? raw : raw.cases;
@@ -29,6 +30,31 @@ test("every case id is unique", () => {
 test("the public fixture contains no grader answer key", () => {
   const exposed = cases.filter((c) => Object.hasOwn(c, "judgeNote")).map((c) => c.id);
   assert.deepEqual(exposed, [], `public judgeNote(s): ${exposed.join(", ")}`);
+});
+
+test("prototype seeds expose no plaintext grader answers", () => {
+  const filenames = readdirSync(PROTOTYPE_SEEDS).sort();
+  const plaintext = filenames.filter((name) => name.endsWith(".answers.md"));
+  assert.deepEqual(plaintext, [], `public seed answer key(s): ${plaintext.join(", ")}`);
+
+  const seedPrds = filenames.filter((name) => /^seed-[^.]+\.md$/.test(name));
+  const categoryBearingNames = seedPrds.filter(
+    (name) => !/^seed-\d+-(?:lowfi|midfi|hifi)\.md$/.test(name),
+  );
+  assert.deepEqual(categoryBearingNames, [], `seed filename(s) expose gap categories: ${categoryBearingNames.join(", ")}`);
+
+  const encrypted = filenames.filter((name) => name.endsWith(".answers.enc.json"));
+  assert.equal(encrypted.length, seedPrds.length, "every prototype seed needs one encrypted answer key");
+  const missingEncrypted = seedPrds
+    .map((name) => name.replace(/\.md$/, ".answers.enc.json"))
+    .filter((name) => !encrypted.includes(name));
+  assert.deepEqual(missingEncrypted, [], `seed PRD(s) missing encrypted answers: ${missingEncrypted.join(", ")}`);
+  for (const filename of encrypted) {
+    const envelope = JSON.parse(readFileSync(new URL(filename, PROTOTYPE_SEEDS), "utf8"));
+    assert.deepEqual(Object.keys(envelope).sort(), ["algorithm", "ciphertext", "iv", "tag", "version"]);
+    assert.equal(envelope.algorithm, "aes-256-gcm", filename);
+    assert.equal(typeof envelope.ciphertext, "string", filename);
+  }
 });
 
 test("no blocker is decided by a single judge call", () => {
