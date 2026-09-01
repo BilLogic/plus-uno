@@ -7,7 +7,14 @@
 // Slack as the blueprint having changed, not as a bug.
 //
 // Rows below are shaped exactly as public.search_blueprint returns them
-// (verified against production on 2026-08-20).
+// (verified against production 2026-08-20, RE-verified 2026-09-01).
+//
+// The re-verification is the point. Between those two dates 20260830190000
+// renamed two payload keys — the edge why-line `label` became `name`, and
+// `check_name` became `check_key` — and these fixtures kept the old spelling,
+// so the mappers kept reading keys the RPC no longer sends and the tests kept
+// passing. A fixture written to match the code tests nothing; it has to be
+// written from the wire, and its authority is the date it was last read.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -29,7 +36,7 @@ function edgeRow(over: Record<string, unknown> = {}): Record<string, unknown> {
       source_content: "Creates breakout rooms.",
       target_content: "Reminds tutors to go through rooms in order.",
       kind: "sets_off",
-      label: null,
+      name: null,
     },
     updated_at: "2026-08-01T00:00:00Z",
     ...over,
@@ -81,12 +88,12 @@ test("an edge with a missing endpoint is dropped, not half-emitted", () => {
   assert.equal(rows.length, 0);
 });
 
-test("label and note are joined into one why-line", () => {
+test("the edge's name and the row description join into one why-line", () => {
   const edge = oneEdge(
     [
       edgeRow({
         description: "confirmed with ops",
-        links: { ...(edgeRow().links as object), label: "after roll call" },
+        links: { ...(edgeRow().links as object), name: "after roll call" },
       }),
     ],
     new Set([HIT]),
@@ -112,7 +119,7 @@ test("a finding keeps every field the model reads as its own key", () => {
     snippet: "Front Stage Actions lane is completely unpopulated",
     links: {
       cell_ids: [HIT, OTHER],
-      check_name: "gap-sweep",
+      check_key: "gap-sweep",
       severity: "critical",
       status: "open",
       source: "audit",
@@ -123,7 +130,7 @@ test("a finding keeps every field the model reads as its own key", () => {
   assert.equal(total, 1);
   assert.deepEqual(rows[0]!, {
     id: "f1",
-    check_name: "gap-sweep",
+    check_key: "gap-sweep",
     severity: "critical",
     status: "open",
     source: "audit",

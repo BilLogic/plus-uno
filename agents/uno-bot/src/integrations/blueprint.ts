@@ -45,7 +45,7 @@ import {
 } from "./blueprint-index";
 
 // Re-exported so the tool layer has ONE import for the blueprint integration.
-export { renderBlueprintIndex, FUTURE_LABELS, futureLabel } from "./blueprint-index";
+export { renderBlueprintIndex, FUTURE_STATUSES, futureStatus } from "./blueprint-index";
 export type { BlueprintIndex, BlueprintCappedBy } from "./blueprint-index";
 // The include mappers are a PURE module so `npm test` can compile them without
 // Workers types — same split as blueprint-link / blueprint-index. Re-exported
@@ -936,7 +936,11 @@ export async function fetchBlueprintIndex(
   }
 
   const base = env.SUPABASE_URL!.replace(/\/+$/, "");
-  const select = "name,scenarios(name,paths(name))";
+  // `status` rides along because the index is where an absence-of-future-state
+  // claim gets settled (see the tool description). Without it every scenario
+  // renders unmarked and the legend says so — a confident falsehood in the one
+  // place the harness points for this question.
+  const select = "name,scenarios(name,paths(name,status))";
   const url =
     `${base}/rest/v1/phases?select=${encodeURIComponent(select)}` +
     // `order_position` became `position` in 20260820130000 (one name for every

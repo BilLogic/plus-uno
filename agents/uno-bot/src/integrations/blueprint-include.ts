@@ -61,8 +61,13 @@ export function mapIncludeEdges(
       // An edge with an empty endpoint cannot be narrated; fetchEdges dropped
       // these too rather than emitting half an edge.
       if (!from || !to) return [];
+      // `name`, not `label`: 20260830190000 renamed the column and the RPC's
+      // payload key moved with it. This read kept asking for `label` and got
+      // undefined — no error, no 400, just every edge arriving without the
+      // designer's why-line, on the ONE path (include:edges) that the tool
+      // result tells the model to narrate from.
       const note =
-        [l.label, r.description]
+        [l.name, r.description]
           .filter((v): v is string => typeof v === "string" && v.length > 0)
           .join(" — ") || undefined;
       return [
@@ -96,7 +101,11 @@ export function mapIncludeFindings(data: Array<Record<string, unknown>>): {
       const l = linkOf(r);
       return {
         id: r.id,
-        check_name: l.check_name,
+        // `check_key`, not `check_name` — renamed by 20260830190000. The tool
+        // result says "report them by cell and severity"; without the check
+        // identity the model could report that a finding exists and never
+        // which check raised it.
+        check_key: l.check_key,
         severity: l.severity,
         status: l.status,
         source: l.source,

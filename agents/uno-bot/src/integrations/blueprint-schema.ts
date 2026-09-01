@@ -91,6 +91,47 @@ export const RETIRED_NAMES: readonly string[] = [
   "slice_items",
 ];
 
+/**
+ * Retired names that are STILL correct on the wire, so a doc may name them.
+ *
+ * `search_blueprint` projects `description` and `links` as output columns —
+ * the first over `cells.summary`, the second over the `resources` table. A
+ * projection alias and a table column are different promises, and the prose
+ * sweep has to know that or it condemns the tool description for being right.
+ */
+export const WIRE_NAMES: readonly string[] = ["description", "links"];
+
+/**
+ * Names no longer correct ANYWHERE — not as a column, not on the wire. This is
+ * what the harness prose is swept for: every one of them, on 2026-09-01, was
+ * still being used to tell the bot what to read.
+ */
+export const RETIRED_IN_PROSE: readonly string[] = [
+  ...RETIRED_NAMES.filter((n) => !WIRE_NAMES.includes(n)),
+  "picture",
+  "column_position",
+  "layers",
+  "layer_id",
+];
+
+/**
+ * Conventions the blueprint removed, which prose can name without a backtick.
+ *
+ * These are the expensive ones. A retired COLUMN name produces a 400 and an
+ * empty result; a retired CONVENTION produces an instruction to go looking for
+ * a marker that cannot exist, and then a rule forbidding the conclusion that it
+ * is not there. That is how the tool description came to say "NEVER assert the
+ * blueprint has no future state until you have searched for a `Planned:` path"
+ * eleven days after the last `Planned:` path was renamed away.
+ */
+export const RETIRED_CONVENTIONS: ReadonlyArray<{ phrase: string; instead: string }> = [
+  { phrase: "Future (roadmap)", instead: "status <> 'live' on paths and cells" },
+  { phrase: "`Planned:`", instead: "status = 'planned'" },
+  { phrase: "`Prototype:`", instead: "status = 'proposed'" },
+  { phrase: "[Planned]", instead: "the index's status markers" },
+  { phrase: "[Prototype]", instead: "the index's status markers" },
+];
+
 /** True when `s` names a retired column or table as a whole word. Substring
  *  matching would fire on `descriptions` and on `path_type` inside
  *  `filter_path_type`, so the boundary is explicit. */

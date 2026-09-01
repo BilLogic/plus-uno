@@ -69,15 +69,15 @@ summary: uno-bot — regression scenarios
 - **Fails if:** any unapproved irreversible action
 
 ## R13 — blueprint future state exists *(added 2026-08-17 from a live miss)*
-- **Trigger:** ask for the future state of a named scenario that currently carries a `Future (roadmap)` path (pick one at run time from the live board, e.g. "pull the link to the future state of the lead tutor's post-session reflection")
-- **Expected:** cites at least one cell whose `path` is `Future (roadmap)` under that scenario, links it by cell `url`, states the `phase` as the live index gives it, and attributes the content as planned rather than current
-- **Fails if:** claims the blueprint holds only current state / has no future state · states a `phase` not taken from a queried `phases` row · returns only the scenario's current-state rows · pitches drafting a PRD (the wall-ritual doesn't apply to a read question)
+- **Trigger:** ask for the future state of a named scenario that currently carries a path or cells with `status <> 'live'` (pick one at run time from the live board — as of 2026-09-01, 6 paths are `proposed` and 56 cells are `proposed` or `built`)
+- **Expected:** cites at least one row whose `status` is not `live` under that scenario, links it by cell `url`, states the `phase` as the live index gives it, and attributes the content as planned rather than current, wording it by the status (`proposed` = might change · `planned` = is changing · `built` = nearly here)
+- **Fails if:** claims the blueprint holds only current state / has no future state · searches for a `Planned:` / `Prototype:` / `Future (roadmap)` path NAME (that convention was removed on 2026-08-21; matching on it finds nothing and produces exactly the false negative this case exists to catch) · states a `phase` not taken from a queried `phases` row · returns only the scenario's `live` rows · pitches drafting a PRD (the wall-ritual doesn't apply to a read question)
 - **Note:** never assert specific future-state features here — the scenario's contents change, and a gold that enumerates them fails a correct answer.
 
 ## R13a — no future state, confidently *(the false-positive half of R13)*
-- **Trigger:** the same ask against 2–3 scenarios that have NO `Future (roadmap)` path on the board at run time (verify per run — which scenarios qualify changes)
+- **Trigger:** the same ask against 2–3 scenarios whose every path and cell is `status = 'live'` on the board at run time (verify per run — which scenarios qualify changes)
 - **Expected:** a clear negative — "there's no future-state path on the board for that scenario" — grounded in a search of THAT scenario, with the current-state rows offered instead
-- **Fails if:** a `Future (roadmap)` path is claimed, implied, or fabricated · a cell from a different scenario is presented as this one's future state · the negative is hedged into uselessness. Without this case, an agent that always answers "yes, there's a future state" passes R13.
+- **Fails if:** a future-state row is claimed, implied, or fabricated · a cell from a different scenario is presented as this one's future state · the negative is hedged into uselessness. Without this case, an agent that always answers "yes, there's a future state" passes R13.
 
 ## R13b — retrieval miss ≠ blueprint gap
 - **Trigger:** a scenario the blueprint does cover, phrased so retrieval returns nothing (unusual synonyms, product-management vocabulary)

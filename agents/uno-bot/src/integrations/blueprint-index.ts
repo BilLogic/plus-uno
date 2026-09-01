@@ -7,40 +7,41 @@
 // are the parts with real logic and no I/O, so they live where tests can reach
 // them. blueprint.ts re-exports them; callers import from either.
 
-/** The blueprint's two future-state path labels (blueprint-navigation.md § 4).
+/** The non-`live` values of the blueprint's `entity_status` domain, in the
+ *  order the board thinks about them: least committed first.
  *
- *  `Planned`   — decided and scheduled; code exists or the ship is committed.
- *  `Prototype` — exploratory; a proposal, a design iteration, or a TBD that may
- *                never ship.
+ *  This replaces a prefix match on `paths.name`. Until 2026-08-21 a future path
+ *  was named `Planned: <topic>` or `Prototype: <topic>`, and this module tested
+ *  for those prefixes; on that date the convention was removed and status
+ *  became a column on both `paths` and `cells`. Nothing here followed, so from
+ *  2026-08-21 to 2026-09-01 EVERY scenario rendered with no marker and the
+ *  legend said "no marker = current state only" — while 6 paths were
+ *  `proposed`. The index is the instrument the tool description points at for
+ *  settling "does this scenario have future state", and it was answering no,
+ *  always, in the voice of a complete read.
  *
- *  Replaces the single `Future (roadmap)` name, which conflated the two and so
- *  could only ever be reported with one confidence level. Both are matched as a
- *  PREFIX of `paths.name` — `Planned`, or `Planned: <topic>` — never against
- *  `path_type`, and never as a free substring (a path merely *mentioning*
- *  "planned" mid-name is not a future path).
- *
- *  Prefix rather than exact match is also what makes this survive the semantic
- *  path: chunk titles render the name with its type appended
- *  ("Prototype: Reflection redesign (named)"), so an exact-match test silently
- *  failed on every semantically retrieved row. */
-export const FUTURE_LABELS = ["Planned", "Prototype"] as const;
-export type FutureLabel = (typeof FUTURE_LABELS)[number];
+ *  A prefix on a name could go stale silently. A status value cannot: it is
+ *  constrained by the `entity_status` domain, and a value the domain drops
+ *  stops appearing in the data. */
+export const FUTURE_STATUSES = ["proposed", "planned", "built", "at_risk", "deprecated"] as const;
+export type FutureStatus = (typeof FUTURE_STATUSES)[number];
 
-/** The label a path name carries, or null for an ordinary current-state path. */
-export function futureLabel(pathName: string): FutureLabel | null {
-  const name = pathName.trim();
-  for (const label of FUTURE_LABELS) {
-    if (name === label || name.startsWith(`${label}:`)) return label;
-  }
-  return null;
+/** The status a path carries when it is not current state, or null when it is.
+ *  A missing status is `live` — the column is `not null default 'live'`, so an
+ *  absent value means the read did not ask for it, and treating that as future
+ *  would mark the whole board. */
+export function futureStatus(status: unknown): FutureStatus | null {
+  if (typeof status !== "string") return null;
+  const s = status.trim();
+  return (FUTURE_STATUSES as readonly string[]).includes(s) ? (s as FutureStatus) : null;
 }
 
-/** Ships with every index: an unexplained marker is worse than no marker, and a
- *  legend carried in the payload cannot drift away from the data the way a
- *  prompt rule can. The labels are spelled out rather than abbreviated to a
- *  symbol — the whole point is that the two mean different things. */
 export const INDEX_LEGEND =
-  "[Planned] = decided and scheduled, not yet shipped · [Prototype] = exploratory, may never ship · no marker = current state only";
+  "Markers are each path's `status`: [proposed] = exploratory, may never happen · " +
+  "[planned] = decided and scheduled · [built] = code exists, not the live route yet · " +
+  "[at_risk] = live and measurably failing · [deprecated] = live and going away · " +
+  "no marker = every path in that scenario is live. Cells carry their own status, " +
+  "so a scenario with no marker can still hold a non-live cell.";
 
 export interface BlueprintIndex {
   /** e.g. "6 phases / 22 scenarios / 38 paths", counted from THIS read — the
@@ -94,13 +95,17 @@ export function renderBlueprintIndex(data: unknown, readAt: string): BlueprintIn
       if (!scenarioName) continue;
       scenarioCount += 1;
       const raw = (scenario as { paths?: unknown }).paths;
-      const named = (Array.isArray(raw) ? raw : []).map(nameOf);
+      const paths = Array.isArray(raw) ? raw : [];
+      const named = paths.map(nameOf);
       pathCount += named.length;
-      // Both labels can sit under one scenario (a shipped-soon change AND a
-      // separate exploration), so this is a set, not a first-match.
-      const labels = FUTURE_LABELS.filter((label) =>
-        named.some((n) => futureLabel(n) === label),
+      // Several statuses can sit under one scenario (a decided change AND a
+      // separate exploration), so this is a set, not a first-match, and it is
+      // ordered by FUTURE_STATUSES rather than by encounter — the marker reads
+      // the same for the same scenario however the rows arrive.
+      const seen = new Set(
+        paths.map((p) => futureStatus((p as { status?: unknown })?.status)).filter(Boolean),
       );
+      const labels = FUTURE_STATUSES.filter((s) => seen.has(s));
       const marker = labels.length ? `[${labels.join(",")}]` : "";
       parts.push(`${scenarioName}(${named.length})${marker}`);
     }

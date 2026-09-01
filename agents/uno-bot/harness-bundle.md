@@ -15,31 +15,31 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **166,005 chars from 21 files**, against an assembled budget of 170,000 (3,995 to spare).
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **166,961 chars from 21 files**, against an assembled budget of 170,000 (3,039 to spare).
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,067 (−9,271 ide-only) | 9,067 | — |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 6,893 | 15,988 | — |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,999 | 44,028 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 54,284 | — |
-| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 58,603 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 67,975 | — |
-| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,584 | 74,604 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 80,790 | — |
-| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 85,952 | 7,000 (Worker face) |
-| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 90,163 | — |
-| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 93,324 | 7,000 (Worker face) |
-| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 99,238 | — |
-| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 103,668 | 7,000 (Worker face) |
-| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 109,613 | — |
-| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 114,234 | 7,000 (Worker face) |
-| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 116,205 | — |
-| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 129,168 | — |
-| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 142,147 | — |
-| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 11,794 (−4,363 ide-only) | 154,007 | — |
-| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,317 (−1,219 ide-only) | 158,378 | — |
-| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 166,005 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 7,111 | 16,206 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,999 | 44,246 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 54,502 | — |
+| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 58,821 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 68,193 | — |
+| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,584 | 74,822 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 81,008 | — |
+| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 86,170 | 7,000 (Worker face) |
+| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 90,381 | — |
+| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 93,542 | 7,000 (Worker face) |
+| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 99,456 | — |
+| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 103,886 | 7,000 (Worker face) |
+| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 109,831 | — |
+| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 114,452 | 7,000 (Worker face) |
+| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 116,423 | — |
+| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 129,386 | — |
+| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 142,365 | — |
+| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 12,537 (−4,500 ide-only) | 154,968 | — |
+| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,312 (−1,219 ide-only) | 159,334 | — |
+| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 166,961 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -208,8 +208,8 @@ Two estates describe the product in **different languages**, and the words are N
 | | **uno-blueprint** (Supabase) | **Notion Roadmap** (Design HQ board) |
 |---|---|---|
 | What it holds | how the **service works**: who does what, when | what the **team is building**: work items + their status |
-| Its words | **phase** · **service scenario** · **path** (read both `path_type` and `name` — `blueprint-navigation.md` §4) · **step** · **lane** = the actor row · **cell** = one activity at lane × step | **Roadmap** · **card** (id = **RM-ID**, `RM-<n>`) · **Design Status** · **Product Pillar** · **Product Tag** · **owner** · **PRD** |
-| NOT its words | "roadmap", "card", "Design Status", "pillar", "owner", "WIP", "under review" — **the blueprint has no cards and no statuses** | "scenario", "lane", "cell", "path", "step", "phase", "actor" — **the Roadmap has no service steps or actor rows** |
+| Its words | **phase** · **service scenario** · **path** (read both `kind` and `name` — `blueprint-navigation.md` §4) · **step** · **lane** = the actor row · **cell** = one activity at lane × step | **Roadmap** · **card** (id = **RM-ID**, `RM-<n>`) · **Design Status** · **Product Pillar** · **Product Tag** · **owner** · **PRD** |
+| NOT its words | "roadmap", "card", "Design Status", "pillar", "owner", "WIP", "under review" — **the blueprint has no cards, and no workflow status.** It does have `status` on `paths` and `cells`, which says whether a row is `live` today or still coming (`AGENT.md` § Two sources) — a different axis from a card's Design Status, and it answers a different question | "scenario", "lane", "cell", "path", "step", "phase", "actor" — **the Roadmap has no service steps or actor rows** |
 
 **Topic words overlap; frame words don't.** "Goal Setting" is both a blueprint *scenario* and a Roadmap *card topic* — the topic never tells you which estate to read. The **frame words in the question** do:
 
@@ -1647,17 +1647,19 @@ Query the **database**, never the Netlify front end — that's the human viewer,
 | `services` | the whole journey ("PLUS Application") | — |
 | `phases` | the ordered phases — read them, never assume the list | `service_id` |
 | `scenarios` | scenarios within a phase (e.g. Goal Setting) | `phase_id` |
-| `paths` | routes through a scenario — read `path_type` AND `name`, and `status` for future state (§4) | `scenario_id` |
+| `paths` | routes through a scenario — read `kind` AND `name`, and `status` for future state (§4) | `scenario_id` |
 | `steps` | the columns, scoped to a scenario | `scenario_id` |
-| `path_steps` | which steps appear on a path + `column_position` | `path_id`, `step_id` |
+| `path_steps` | which steps appear on a path + `position` | `path_id`, `step_id` |
 | `lanes` | the rows (actors), scoped to a path, ordered by `position`. Also carries `owner_team` (closed vocabulary), `kpis`, `tools`, `stakeholder_id` | `path_id` |
 | `stakeholders` | the actor/org a lane can point to — `kind`: recipient/staff/partner/provider/team; `parent_id` rolls a sub-team up to its parent | `service_id`; referenced by `lanes.stakeholder_id` |
 | `cells` | **the evidence** at a path × lane × step slot. A slot is `(lane_id, step_id)` and can hold an ordered list of cells (`position`) — never assume one cell per slot | `path_id`, `lane_id`, `step_id` |
 | `cell_dependencies` | dependencies: one cell leads to or enables another (`kind`: `leads_to` \| `enables`) | `source_cell_id` → `target_cell_id` |
 
-Mental model: **cell = (path × lane × step) slot**, and a slot can hold more than one cell, ordered by `position`. Read a scenario by picking a path, then reading its cells across lanes (rows) and steps (columns). (`slices` / `slice_items` are saved 1-D cuts for the viewer; `findings` / `evidence` / `business_model` are audit and provenance surfaces — not journey facts. Don't answer journey questions from them.)
+Mental model: **cell = (path × lane × step) slot**, and a slot can hold more than one cell, ordered by `position`. Read a scenario by picking a path, then reading its cells across lanes (rows) and steps (columns). (`slices` / `slides` are saved 1-D cuts for the viewer; `audit_findings` / `evidence` / `business_models` are audit and provenance surfaces — not journey facts. Don't answer journey questions from them.)
 
-**Cell evidence lives in four fields:** `content` (primary grid text) · `summary` (longer detail) · `picture` (image ref) · `links` (JSON array). A cell can carry real evidence with an empty `content`, and many do. **Check all four before calling a topic empty.** Never infer a fact from an image filename or a link label without opening the resource.
+**Cell evidence lives in four places:** `content` (primary grid text) · `summary` (longer detail) · `frame` (image ref) · the `resources` table (authored links, joined on `cell_id`). A cell can carry real evidence with an empty `content`, and many do. **Check all four before calling a topic empty.** Never infer a fact from an image filename or a link label without opening the resource.
+
+Three of the four moved and this file did not follow, which is why the rule is spelled out again: `picture` became `frame` (20260830270000) and `links` — one jsonb column that held resources, touchpoint detail and provenance at once — was split into `resources`, `cell_touchpoints` and `evidence` (20260830280000). A search result still reports the authored links under `links`: that is the RPC's projection over `resources`, and a projection alias is not a column.
 
 ## 3 · Lane semantics — read before attributing any action
 
@@ -1676,10 +1678,10 @@ Mis-attribution is the most common error (`schema-misread`). In the built-out sc
 ## 4 · Path semantics
 
 **Rewritten 2026-08-21.** Three things changed at once and every rule below is
-new: `path_type` is a real three-value vocabulary, path names are unique and
+new: `kind` is a real three-value vocabulary, path names are unique and
 say their CONDITION, and future state moved out of the name into a column.
 
-### 4a · `path_type` — three values, and now worth reading
+### 4a · `paths.kind` — three values, and now worth reading
 
 ```
 happy      the scenario's main route, everything works.  Exactly ONE per scenario.
@@ -1690,7 +1692,7 @@ exception  a rule or a failure DIVERTS the route.
 It used to be five (`happy | unhappy | exception | alternative | named`, later
 `custom`), of which three were not distinguishable in practice and one had
 become the drawer for 11 of 39 paths — which is why the old rule here said to
-ignore the column. **That rule is dead. Read `path_type`.** It now discriminates
+ignore the column. **That rule is dead. Read `kind`.** It now discriminates
 cleanly, and `happy` is guaranteed unique per scenario, so "the main route for
 X" is a single query with no name-matching.
 
@@ -1749,18 +1751,18 @@ Phrase queries in journey words (actor, scenario, step), not product-management 
 
 ## 6 · Answering rules
 
-1. **Cite location.** Every factual claim names where it sits: `phase › scenario › path — lane × step`. The `›` chain is containment; the pair after the dash is the cell's coordinate — actor row × journey column, actor first because mis-attribution is the most common failure (§3). Step names are full sentences on this board, so quote them. **The phase comes from a queried `phases` row — never from the asker's wording, and never inferred from a scenario name that sounds like a phase.** No phase in hand → name only the levels you actually retrieved. Say which evidence field a claim came from when it matters (a `picture`-only fact is weaker than a `content` one). Never expose row UUIDs to a reader.
+1. **Cite location.** Every factual claim names where it sits: `phase › scenario › path — lane × step`. The `›` chain is containment; the pair after the dash is the cell's coordinate — actor row × journey column, actor first because mis-attribution is the most common failure (§3). Step names are full sentences on this board, so quote them. **The phase comes from a queried `phases` row — never from the asker's wording, and never inferred from a scenario name that sounds like a phase.** No phase in hand → name only the levels you actually retrieved. Say which evidence field a claim came from when it matters (a `frame`-only fact is weaker than a `content` one). Never expose row UUIDs to a reader.
 2. **Cover the right lanes.** A multi-actor question spans the relevant rows, not just the tutor. One-lane answers to multi-actor questions score as incomplete, not merely brief.
 3. **Respect structure.** Right path variant, right lane. Don't merge happy + edge; don't move a back-stage action to a front-stage actor.
-4. **Silent → say so, and name who to ask.** Search all four evidence fields first. Still absent → "this isn't in the blueprint," plus the person or role who should fill the gap when the blueprint supports that ownership. Fabricating here is the worst failure mode (`overconfident-silence`).
+4. **Silent → say so, and name who to ask.** Search all four evidence places first (§2). Still absent → "this isn't in the blueprint," plus the person or role who should fill the gap when the blueprint supports that ownership. Fabricating here is the worst failure mode (`overconfident-silence`).
 
-   **Read `matchedBy`, not `score`, to judge absence.** Retrieval runs three ways at once — `vector` (meaning), `keyword` (the cell's own prose), `structural` (its phase/scenario/path/step/lane name) — and each row reports which found it. Rows several retrievers agree on matched the blueprint's own words; a `vector`-only row is a semantic guess. **Every row `vector`-only = nothing in the blueprint mentions your terms**, which is the strongest absence signal the tool can give. Similarity cannot substitute: measured 2026-08-19 across a 26-case set, questions with NO answer scored 0.607–0.654 while genuine hits reached down to 0.565 — overlapping ranges, so no threshold separates them, and none ever will (`docs/plans/2026-08-19-001-feat-blueprint-hybrid-retrieval-plan.md`). One caveat: a pure paraphrase of a real cell can also come back `vector`-only, so treat it as evidence, not proof — say what you did and did not find.
+   **Read `matchedBy`, not `score`, to judge absence.** Retrieval runs three ways at once — `vector` (meaning), `keyword` (the cell's own prose), `structural` (its phase/scenario/path/step/lane name) — and each row reports which found it, `+`-joined when more than one did: `keyword+structural` and `vector+keyword+structural` are ordinary values, not three atomic ones. So the test is EQUALITY with `vector`, not containment — `vector+keyword` is a row the blueprint's own words matched. Rows several retrievers agree on matched the blueprint's own words; a `vector`-only row is a semantic guess. **Every row `vector`-only = nothing in the blueprint mentions your terms**, which is the strongest absence signal the tool can give. Similarity cannot substitute: measured 2026-08-19 across a 26-case set, questions with NO answer scored 0.607–0.654 while genuine hits reached down to 0.565 — overlapping ranges, so no threshold separates them, and none ever will (`docs/plans/2026-08-19-001-feat-blueprint-hybrid-retrieval-plan.md`). One caveat: a pure paraphrase of a real cell can also come back `vector`-only, so treat it as evidence, not proof — say what you did and did not find.
 5. **Confidence — one woven clause, never a trailing label**, and sureness earned only by rows read this turn. Shape and cadence: `agents/uno-bot/AGENT.md` § Grounding.
 6. **Source precedence — ADR-021 claim-type routing, not "the blueprint wins."** Route per claim; full table in `docs/connectors/supabase/overview.md` § Two sources, one time axis. Constant across every row: **surface the conflict, never blend.**
 
 ## 7 · Known-silent areas
 
-No structured fields for verbatim scripts, durations, counts, targets, or dates — such details appear only inside general cell evidence, and only sometimes. Use them where they appear explicitly; absent after checking all four fields → abstain and escalate per rule 4.
+No structured fields for verbatim scripts, durations, counts, targets, or dates — such details appear only inside general cell evidence, and only sometimes. Use them where they appear explicitly; absent after checking all four places (§2) → abstain and escalate per rule 4.
 
 ## 8 · Content depth (what's answerable today)
 
@@ -1796,7 +1798,7 @@ Coverage is uneven, and judged from the rows you just read — never from a reme
 | Conflicting card is **WIP / under review**, change **decided** (Decisions DB or card) | Blueprint = today; card = incoming | "Today: X. This is changing — {card} moves it to Y." Both attributed, never blended. |
 | Conflicting card is **WIP / under review**, still **exploratory** | Blueprint = today; card = maybe | "Today: X. {card} is exploring Y — not decided." Match the verb to decision status. |
 | Conflicting card is **shipped** (`Dev Status: Deployed`) | Blueprint (still) | Answer from the blueprint — the paired write updates it at ship, so a shipped doc that disagrees is the likely obsolete side. Evidence the blueprint itself is stale → say so and offer a `uno-maintain` intake. Never silently prefer the doc. |
-| "What's **planned / coming / changing**?" | Roadmap cards + PRDs, **plus any `Future (roadmap)` path** | Cite card + Design/Dev Status. Check the scenario for a `Future (roadmap)` path and cite its cells too when one exists — they are the design-side plan of record. Use the current-state rows as the today-baseline to explain the delta. |
+| "What's **planned / coming / changing**?" | Roadmap cards + PRDs, **plus any row with `status <> 'live'`** | Cite card + Design/Dev Status. Check the scenario for paths and cells whose `status` is not `live` and cite them too — they are the design-side plan of record. Use the `live` rows as the today-baseline to explain the delta. |
 | Blueprint silent; a **current** doc covers it (Help Center, shipped PRD) | The doc | Cite it and date it. Note the blueprint doesn't cover this yet. |
 | Only **aspirational** docs (roadmap PRD, future spec) | Neither, as fact | Report as planned per {doc}. Current behavior stays the blueprint's — or "not in the source". |
 | Neither source | Abstain | "Not in the source" + name who should fill the gap. |
