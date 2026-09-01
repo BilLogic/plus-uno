@@ -4,6 +4,7 @@
 
 import type { Env } from "../types";
 import { githubReadPath, githubSearchCode } from "../integrations/github";
+import { isWithheldRepoPath, WITHHELD_NOTE } from "../integrations/repo-read-guard";
 
 export async function executeGithubRead(env: Env, input: Record<string, unknown>): Promise<string> {
   const path = typeof input.path === "string" ? input.path.trim() : "";
@@ -14,12 +15,17 @@ export async function executeGithubRead(env: Env, input: Record<string, unknown>
   // by path. Replaces the hosted GitHub MCP's code search in gemini mode.
   if (search) {
     try {
-      const hits = await githubSearchCode(env, search);
+      const allHits = await githubSearchCode(env, search);
+      // The eval corpus is filtered out of results too, not just out of
+      // direct reads: a search that returns the path is half the answer.
+      const hits = allHits.filter((hit) => !isWithheldRepoPath(hit?.path ?? ""));
+      const withheld = allHits.length - hits.length;
       return JSON.stringify({
         ok: true,
         search,
         count: hits.length,
         hits,
+        ...(withheld > 0 ? { withheld, withheld_note: WITHHELD_NOTE } : {}),
         note: hits.length
           ? "Code-search hits (path + github.com link). Read the promising ones by path; link files as github.com URLs in replies."
           : "No code-search hits — the term may not appear in the repo; say so rather than guessing.",
@@ -34,6 +40,9 @@ export async function executeGithubRead(env: Env, input: Record<string, unknown>
   }
 
   if (!path) return JSON.stringify({ ok: false, error: "missing 'path' (or use 'search')" });
+  if (isWithheldRepoPath(path)) {
+    return JSON.stringify({ ok: false, error: `${path} is withheld`, note: WITHHELD_NOTE });
+  }
 
   try {
     const r = await githubReadPath(env, path, ref);

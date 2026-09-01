@@ -15,6 +15,7 @@ import { parseNotionPageId, readNotionPage } from "../integrations/notion";
 import { parseFigmaUrl, fetchFigmaNode } from "../integrations/figma";
 import { FIGMA_NOTE, FIGMA_TRUNCATION_NOTE } from "../integrations/figma-reading";
 import { countedFetch } from "../net";
+import { isWithheldRepoPath, WITHHELD_NOTE } from "../integrations/repo-read-guard";
 
 const GENERIC_TIMEOUT_MS = 8000;
 const GENERIC_TEXT_CAP = 8000;
@@ -116,6 +117,12 @@ export async function executeReadSource(env: Env, input: Record<string, unknown>
     }
 
     // ---- GitHub / raw / other http(s) ----
+    // Same guard as github_read: source_read reaches the repo by URL, and a
+    // withheld path is withheld by whichever door it is asked through.
+    if (isWithheldRepoPath(url)) {
+      return JSON.stringify({ ok: false, error: `${url} is withheld`, note: WITHHELD_NOTE });
+    }
+
     const raw = toGithubRaw(parsed);
     const fetchUrl = raw ?? url;
     {
