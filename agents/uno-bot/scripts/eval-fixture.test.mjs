@@ -7,11 +7,19 @@
 // checks them, so this file checks them.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { passesCase } from "./eval-scoring.mjs";
 
 const FIXTURE = new URL("../../../docs/evals/fixtures/uno-bot-cases.json", import.meta.url);
 const README = new URL("../../../docs/evals/README.md", import.meta.url);
+const SEED_ONE_PLAINTEXT = new URL(
+  "../../../docs/evals/fixtures/uno-prototype-seeds/seed-1-lowfi-missing-flows.answers.md",
+  import.meta.url,
+);
+const SEED_ONE_ENCRYPTED = new URL(
+  "../../../docs/evals/fixtures/uno-prototype-seeds/seed-1-lowfi-missing-flows.answers.enc.json",
+  import.meta.url,
+);
 
 const raw = JSON.parse(readFileSync(FIXTURE, "utf8"));
 const cases = Array.isArray(raw) ? raw : raw.cases;
@@ -29,6 +37,15 @@ test("every case id is unique", () => {
 test("the public fixture contains no grader answer key", () => {
   const exposed = cases.filter((c) => Object.hasOwn(c, "judgeNote")).map((c) => c.id);
   assert.deepEqual(exposed, [], `public judgeNote(s): ${exposed.join(", ")}`);
+});
+
+test("seed 1 exposes no plaintext grader answer", () => {
+  assert.equal(existsSync(SEED_ONE_PLAINTEXT), false, "seed 1 plaintext answer key is public");
+  const envelopeText = readFileSync(SEED_ONE_ENCRYPTED, "utf8");
+  const envelope = JSON.parse(envelopeText);
+  assert.deepEqual(Object.keys(envelope).sort(), ["algorithm", "ciphertext", "iv", "tag", "version"]);
+  assert.equal(envelope.algorithm, "aes-256-gcm");
+  assert.equal(typeof envelope.ciphertext, "string");
 });
 
 test("no blocker is decided by a single judge call", () => {
