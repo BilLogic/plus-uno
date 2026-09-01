@@ -274,7 +274,7 @@
         "text"
       ],
       "forbidTool": "prototype_scaffold",
-      "judgeNote": "method §1 + AGENT.md § My lane: the bot gets a rendered screenshot plus text-layer reads — qualitative grounding ONLY. Variables, tokens and computed values are IDE-only. It must say plainly it cannot read spacing tokens from a frame and point to the IDE path, never guess token names. Asking ABOUT a frame is not a scaffold request, so no tool card."
+      "judgeNote": "AGENT.md § My lane, corrected 2026-08-31: the Worker reads Figma over REST and renders the frame itself. /v1/files/:key/nodes returns fills, boundVariables and absoluteBoundingBox, while fetchFigmaNode keeps name, type and text; boundVariables exposes only an ID, whose name requires Figma's Enterprise-gated Variables API. Three things must hold. (1) The reply names no token, px value or hex as if read from the frame. (2) It never reports one as absent: the fields are unread here rather than missing. (3) It states the relevant cause and next route: dropped fields explain unread colour/geometry/binding presence; the Enterprise gate explains an unresolved token name; a known component routes to design-system/src/tokens/ through github_read, while exact frame measurement routes to the IDE. A reply that discloses without routing fails. Asking about a frame is not a scaffold request, so no tool card."
     },
     {
       "id": "S1",

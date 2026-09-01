@@ -59,11 +59,12 @@ No path from PRD to prototyping skips grounding, at any fidelity.
   the **IDE** connects to Figma directly (design context, screenshots, variable
   reads, gated write-back; see `design-system/guidelines/figma/mcp-guide.md`). **uno-bot**
   gets a rendered screenshot of a pasted frame link (with `node-id`) plus
-  text-layer reads — qualitative grounding only; variables, tokens, and
-  computed values are IDE-only (the bot's full capability statement lives in
-  `agents/uno-bot/AGENT.md § My lane`). The bot grounds the rest from the
-  Notion doc/PRD that references the frame and runs its wall-ritual for
-  spec-level work.
+  text-layer reads. Fills, geometry and variable-binding IDs arrive but its
+  reader drops them; resolving an ID to a token name is separately
+  Enterprise-gated. Those fields are unread rather than absent. Given a known
+  component, the bot grounds token values through `github_read` on
+  `design-system/src/tokens/`; exact frame measurements and visual math route
+  to the IDE (full statement: `agents/uno-bot/AGENT.md § My lane`).
 - Keep a grounding snapshot (what was read, when). Re-entry depends on it.
 
 **Re-grounding rule:** on every re-entry — review returned issues, or the
