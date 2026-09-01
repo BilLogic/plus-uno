@@ -27,34 +27,47 @@ test("every case id is unique", () => {
   assert.equal(new Set(ids).size, ids.length, "duplicate case id");
 });
 
-test("the public fixture contains no grader answer key", () => {
-  const exposed = cases.filter((c) => Object.hasOwn(c, "judgeNote")).map((c) => c.id);
-  assert.deepEqual(exposed, [], `public judgeNote(s): ${exposed.join(", ")}`);
+test("every case carries its rubric, in plain text", () => {
+  // The inverse of what this asserted for one day. Hiding the judgeNote from
+  // the bot by encrypting it hid it from every reviewer too, and the key went
+  // to a write-only Actions secret — within a day nobody could read what a
+  // case asserted. The bot is kept out by src/integrations/repo-read-guard.ts
+  // instead, which holds at every ref and needs no secret.
+  //
+  // A case with no judgeNote is a case the judge grades on the rubric alone,
+  // which is how P2 asserted a retired rule for eight days while reading green.
+  const missing = cases.filter((c) => !String(c.judgeNote ?? "").trim()).map((c) => c.id);
+  assert.deepEqual(missing, [], `case(s) with no rubric: ${missing.join(", ")}`);
 });
 
-test("prototype seeds expose no plaintext grader answers", () => {
+test("every prototype seed has an answer key, and the guard withholds it", () => {
+  // Plain text, deliberately. The earlier design sealed these with AES-256-GCM
+  // and failed twice: the plaintext stayed in public git history, which
+  // `githubReadPath`'s `ref` parameter reaches, so nothing was prevented; and
+  // the key went to a write-only Actions secret, so within a day no human could
+  // read the rubric to review it. `src/integrations/repo-read-guard.ts`
+  // replaces both properties — it holds at every ref and needs no secret.
   const filenames = readdirSync(PROTOTYPE_SEEDS).sort();
-  const plaintext = filenames.filter((name) => name.endsWith(".answers.md"));
-  assert.deepEqual(plaintext, [], `public seed answer key(s): ${plaintext.join(", ")}`);
-
   const seedPrds = filenames.filter((name) => /^seed-[^.]+\.md$/.test(name));
+  assert.ok(seedPrds.length > 0, "no seed PRDs found");
+
   const categoryBearingNames = seedPrds.filter(
     (name) => !/^seed-\d+-(?:lowfi|midfi|hifi)\.md$/.test(name),
   );
-  assert.deepEqual(categoryBearingNames, [], `seed filename(s) expose gap categories: ${categoryBearingNames.join(", ")}`);
+  assert.deepEqual(
+    categoryBearingNames,
+    [],
+    `seed filename(s) expose gap categories: ${categoryBearingNames.join(", ")}`,
+  );
 
-  const encrypted = filenames.filter((name) => name.endsWith(".answers.enc.json"));
-  assert.equal(encrypted.length, seedPrds.length, "every prototype seed needs one encrypted answer key");
-  const missingEncrypted = seedPrds
-    .map((name) => name.replace(/\.md$/, ".answers.enc.json"))
-    .filter((name) => !encrypted.includes(name));
-  assert.deepEqual(missingEncrypted, [], `seed PRD(s) missing encrypted answers: ${missingEncrypted.join(", ")}`);
-  for (const filename of encrypted) {
-    const envelope = JSON.parse(readFileSync(new URL(filename, PROTOTYPE_SEEDS), "utf8"));
-    assert.deepEqual(Object.keys(envelope).sort(), ["algorithm", "ciphertext", "iv", "tag", "version"]);
-    assert.equal(envelope.algorithm, "aes-256-gcm", filename);
-    assert.equal(typeof envelope.ciphertext, "string", filename);
-  }
+  const missing = seedPrds
+    .map((name) => name.replace(/\.md$/, ".answers.md"))
+    .filter((expected) => !filenames.includes(expected));
+  assert.deepEqual(missing, [], `seed(s) with no answer key: ${missing.join(", ")}`);
+
+  // That these paths are REFUSED to the bot is asserted in
+  // tests/repo-read-guard.test.ts, which can import the guard: this file is
+  // plain .mjs and node --test cannot load a .ts module from it.
 });
 
 test("no blocker is decided by a single judge call", () => {

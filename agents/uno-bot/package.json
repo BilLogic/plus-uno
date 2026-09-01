@@ -25,7 +25,6 @@
     "slack:manifest": "slack manifest info --source remote --team T0C5GFUPJ --app A0APS0L8HJR",
     "evals:retrieval": "node scripts/run-retrieval-evals.mjs",
     "evals:retrieval:selftest": "node scripts/run-retrieval-evals.mjs --self-test",
-    "evals:seal-answer-key": "node scripts/seal-eval-answer-key.mjs",
     "test:bundle": "node --test scripts/*.test.mjs"
   },
   "devDependencies": {
