@@ -3,6 +3,9 @@
 // (fixes the "doesn't read what it's linked" cluster). Dispatches by domain:
 //   notion.so  → page title + properties (incl. Owner/people) + block text
 //   figma.com  → node name/type + text layers (for review/inspection)
+//                (the frame IMAGE arrives separately — slack/vision.ts renders
+//                 the first frame link in the message and attaches it to the
+//                 turn, so this branch is not the model's only view of it)
 //   github.com / raw / *.md → raw file text
 //   other http(s) → fetched text with tags stripped
 // Runs inline in the agent loop (no side effect, no gate).
@@ -10,13 +13,16 @@
 import type { Env, SlackContext } from "../types";
 import { parseNotionPageId, readNotionPage } from "../integrations/notion";
 import { parseFigmaUrl, fetchFigmaNode } from "../integrations/figma";
+import { FIGMA_NOTE, FIGMA_TRUNCATION_NOTE } from "../integrations/figma-reading";
 import { countedFetch } from "../net";
 import { parseSlackCanvasId } from "../slack/canvas-reference";
 import { readSlackCanvasSource } from "./slack-canvas-source";
 import { htmlToPlainText } from "./html-to-text";
+import { isWithheldRepoPath, WITHHELD_NOTE } from "../integrations/repo-read-guard";
 
 const GENERIC_TIMEOUT_MS = 8000;
 const GENERIC_TEXT_CAP = 8000;
+
 
 function firstUrl(input: unknown): string | null {
   if (typeof input !== "string") return null;
@@ -121,11 +127,19 @@ export async function executeReadSource(
         title: node.name,
         node_type: node.type,
         content: node.texts.join("\n"),
-        note: "This is the frame's structure + text layers. Ground any critique/answer in it and cite the frame. It's text only — you cannot judge pixel-level visuals.",
+        text_layers: node.texts.length,
+        text_layers_truncated: node.truncated,
+        note: node.truncated ? `${FIGMA_NOTE} ${FIGMA_TRUNCATION_NOTE}` : FIGMA_NOTE,
       });
     }
 
     // ---- GitHub / raw / other http(s) ----
+    // Same guard as github_read: source_read reaches the repo by URL, and a
+    // withheld path is withheld by whichever door it is asked through.
+    if (isWithheldRepoPath(url)) {
+      return JSON.stringify({ ok: false, error: `${url} is withheld`, note: WITHHELD_NOTE });
+    }
+
     const raw = toGithubRaw(parsed);
     const fetchUrl = raw ?? url;
     {

@@ -1,7 +1,0 @@
-{
-  "version": 1,
-  "algorithm": "aes-256-gcm",
-  "iv": "kVo8JadBp/Df/L/u",
-  "tag": "dEWmbYBl/jXfbQPALMpoVA==",
-  "ciphertext": "sCow0oleYXjQiF1I5raEvihTIyRPlquGR95K2tNceA/vRoPWBhWILu4z0793rvwkGpPK0FJP5S3aPlwvUQGB0eqxJU26S18IzkrhZp2YZqo1s3lXiO/tTWFUQ/V7TPTEMV39uzBxyiyR4d0UcHhjvvUfRVHYK0afsduoaBYG/6Piz9WNIPXpLwXR78AQs8LhPxL/jhNHexU0Rvk53g+Ko6THCnxs6emwQ9u3qJtePf889HaJqzejeYZjtS6ILqonkZYRQYYOKdutsmvg0V4+JWy8ChLKjQEMv9jYl709iY+o80EYTTMDPyLsqt86MNms2K2t7u1oJABoSUSTd2LFZgM8hLY2i4zO7toOSeXGLqeomKuDyyg="
-}
