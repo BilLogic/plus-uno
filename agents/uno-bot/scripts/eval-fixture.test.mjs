@@ -37,8 +37,18 @@ test("prototype seeds expose no plaintext grader answers", () => {
   const plaintext = filenames.filter((name) => name.endsWith(".answers.md"));
   assert.deepEqual(plaintext, [], `public seed answer key(s): ${plaintext.join(", ")}`);
 
+  const seedPrds = filenames.filter((name) => /^seed-[^.]+\.md$/.test(name));
+  const categoryBearingNames = seedPrds.filter(
+    (name) => !/^seed-\d+-(?:lowfi|midfi|hifi)\.md$/.test(name),
+  );
+  assert.deepEqual(categoryBearingNames, [], `seed filename(s) expose gap categories: ${categoryBearingNames.join(", ")}`);
+
   const encrypted = filenames.filter((name) => name.endsWith(".answers.enc.json"));
-  assert.equal(encrypted.length, 3, "every prototype seed needs an encrypted answer key");
+  assert.equal(encrypted.length, seedPrds.length, "every prototype seed needs one encrypted answer key");
+  const missingEncrypted = seedPrds
+    .map((name) => name.replace(/\.md$/, ".answers.enc.json"))
+    .filter((name) => !encrypted.includes(name));
+  assert.deepEqual(missingEncrypted, [], `seed PRD(s) missing encrypted answers: ${missingEncrypted.join(", ")}`);
   for (const filename of encrypted) {
     const envelope = JSON.parse(readFileSync(new URL(filename, PROTOTYPE_SEEDS), "utf8"));
     assert.deepEqual(Object.keys(envelope).sort(), ["algorithm", "ciphertext", "iv", "tag", "version"]);

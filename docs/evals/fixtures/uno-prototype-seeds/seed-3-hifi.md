@@ -1,4 +1,4 @@
-<!-- Reseeded 2026-08-31 after public answer-key exposure; the prior subject is retired. -->
+<!-- Reseeded and renamed 2026-08-31 after public answer-key exposure. -->
 
 # Seed PRD 3 (hi-fi ask) — "Session countdown banner"
 
