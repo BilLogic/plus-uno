@@ -22,6 +22,15 @@ import { countedFetch, rethrowIfBudget, subrequestBudgetSpent } from "../net";
 import { cellUrl, sliceUrl, parseChunkTitle, chunkBody } from "./blueprint-link";
 import { BLUEPRINT_CONTRACT } from "../generated/blueprint-contract";
 import {
+  PROSE_COLUMN,
+  POSITION_COLUMN,
+  FINDINGS_TABLE,
+  EDGE_SELECT_COLUMNS,
+  CELL_FALLBACK_SELECT,
+} from "./blueprint-schema";
+
+export { FINDINGS_TABLE, EDGE_SELECT_COLUMNS, CELL_FALLBACK_SELECT };
+import {
   mapIncludeEdges,
   mapIncludeFindings,
   isIncludeRow,
@@ -753,8 +762,8 @@ interface Source {
   select: string;
 }
 const SOURCES: Source[] = [
-  { table: "phases", kind: "phase", columns: ["name", "description"], select: "id,name,description" },
-  { table: "scenarios", kind: "scenario", columns: ["name", "description"], select: "id,name,description" },
+  { table: "phases", kind: "phase", columns: ["name", PROSE_COLUMN], select: `id,name,${PROSE_COLUMN}` },
+  { table: "scenarios", kind: "scenario", columns: ["name", PROSE_COLUMN], select: `id,name,${PROSE_COLUMN}` },
   { table: "steps", kind: "step", columns: ["name"], select: "id,name,scenario:scenarios(name)" },
   // paths was missing entirely, so a path named `Planned: …` / `Prototype: …`
   // could not be matched by keyword at all — the one retrieval path that can
@@ -763,21 +772,20 @@ const SOURCES: Source[] = [
   {
     table: "paths",
     kind: "path",
-    columns: ["name", "description"],
-    select: "id,name,description,scenario:scenarios(name)",
+    columns: ["name", PROSE_COLUMN],
+    select: `id,name,${PROSE_COLUMN},scenario:scenarios(name)`,
   },
   {
     table: "cells",
     kind: "cell",
-    // `description` was not searchable — which is why cells whose evidence
+    // The prose column was not searchable — which is why cells whose evidence
     // begins "PLANNED (not shipped as of Aug 2026):" never matched a keyword
     // query about planned/future work.
-    columns: ["content", "description"],
+    columns: ["content", PROSE_COLUMN],
     // Spec columns ride along (function/form/value_props/owner/perceived_owner
     // are public-read): "who owns this touchpoint / what does it do" questions
     // were answered "not in the blueprint" while the data sat one select away.
-    select:
-      "id,content,description,function,form,value_props,owner,perceived_owner,links,updated_at,lane:lanes(name,owner_team,kpis),step:steps(name),path:paths(name,scenario:scenarios(name,phase:phases(name)))",
+    select: CELL_FALLBACK_SELECT,
   },
 ];
 
@@ -824,8 +832,9 @@ function normalize(src: Source, row: Record<string, unknown>): BlueprintRow | nu
   const scenarioName = (row.scenario as { name?: string } | undefined)?.name;
   if (src.kind === "cell") {
     const content = typeof row.content === "string" ? row.content.trim() : "";
-    const description = typeof row.description === "string" ? row.description.trim() : "";
-    const links = normalizeLinks(row.links);
+    const description =
+      typeof row[PROSE_COLUMN] === "string" ? (row[PROSE_COLUMN] as string).trim() : "";
+    const links = normalizeLinks(row.resources);
     // A cell can carry ALL of its evidence in `description` or `links` with an
     // empty `content` (blueprint-navigation.md § 2: "A cell can carry real
     // evidence with an empty content ... Check all four before calling a topic
@@ -862,7 +871,7 @@ function normalize(src: Source, row: Record<string, unknown>): BlueprintRow | nu
     kind: src.kind,
     id,
     title: name,
-    snippet: typeof row.description === "string" ? row.description : undefined,
+    snippet: typeof row[PROSE_COLUMN] === "string" ? (row[PROSE_COLUMN] as string) : undefined,
     scenario: scenarioName,
   };
 }
@@ -930,7 +939,10 @@ export async function fetchBlueprintIndex(
   const select = "name,scenarios(name,paths(name))";
   const url =
     `${base}/rest/v1/phases?select=${encodeURIComponent(select)}` +
-    `&order=order_position&scenarios.order=order_position`;
+    // `order_position` became `position` in 20260820130000 (one name for every
+    // position column). Ordering by a column that does not exist is a 400, not
+    // a fallback to insertion order, so the index has been undefined since.
+    `&order=${POSITION_COLUMN}&scenarios.order=${POSITION_COLUMN}`;
   try {
     const res = await countedFetch(
       url,
@@ -994,7 +1006,11 @@ export async function fetchEdges(env: Env, cellIds: string[]): Promise<Blueprint
   // reports "no dependencies" for cells that have them. Reading them from the
   // contract makes the app's test the thing that catches a rename.
   const select =
-    "source_cell_id,target_cell_id,kind,label,note," +
+    // `label` became `name` and `note` was dropped by 20260830190000. The
+    // comment above describes exactly this failure and it still happened,
+    // because the FK hints were read from the contract and the COLUMNS were
+    // not — so the rename landed in the half of the select nothing watched.
+    `${EDGE_SELECT_COLUMNS},` +
     `source:cells!${BLUEPRINT_CONTRACT.fkConstraints.cellDependencySource}(content),` +
     `target:cells!${BLUEPRINT_CONTRACT.fkConstraints.cellDependencyTarget}(content)`;
   const url =
@@ -1018,10 +1034,9 @@ export async function fetchEdges(env: Env, cellIds: string[]): Promise<Blueprint
     if (!from || !to) return [];
     const startedHere = ids.includes(String(r.source_cell_id));
     const kind = r.kind === "enables" ? "enables" : "leads_to";
-    const note =
-      [r.label, r.note]
-        .filter((v): v is string => typeof v === "string" && v.length > 0)
-        .join(" — ") || undefined;
+    // Emitted as `note`, not `name`: the tool result's own instructions call it
+    // "the designer's own why-line", and that is the word the model is taught.
+    const note = typeof r.name === "string" && r.name.length > 0 ? r.name : undefined;
     return [
       {
         from,
@@ -1098,7 +1113,12 @@ export async function fetchFindings(
   // The total rides along: `fetchRows` already counted the full matched set
   // under count=exact, and dropping it re-creates the counted-the-capped-page
   // bug that 258cfd02 fixed for slices ("5 of 14").
-  const { rows, total } = await fetchRows(env, "findings", `cell_ids=ov.{${ids.join(",")}}&status=eq.open`, 20);
+  const { rows, total } = await fetchRows(
+    env,
+    FINDINGS_TABLE,
+    `cell_ids=ov.{${ids.join(",")}}&status=eq.open`,
+    20,
+  );
   return { rows, total };
 }
 

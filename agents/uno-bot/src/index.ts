@@ -17,7 +17,12 @@ import { runFigmaPoll } from "./figma-poll";
 import { buildSystemBlocks } from "./agent/skills";
 import { ensureHarnessCache } from "./gemini/cache";
 import { countedFetch, runMetered, subrequestsUsed, meterBreakdown, subrequestBudgetTrips, internalSubrequestsUsed } from "./net";
-import { searchBlueprint } from "./integrations/blueprint";
+import {
+  searchBlueprint,
+  CELL_FALLBACK_SELECT,
+  EDGE_SELECT_COLUMNS,
+  FINDINGS_TABLE,
+} from "./integrations/blueprint";
 import { CANDIDATE_RPC, isCallableCandidate } from "./integrations/candidate-rpc";
 
 export default {
@@ -88,9 +93,15 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
     }
     // The exact selects the bot issues, not just table reachability — a
     // renamed column 400s here while bare selects stay green.
-    await probe("select_cells_spec", `/rest/v1/cells?select=${encodeURIComponent("id,content,function,form,value_props,owner,perceived_owner,links,updated_at,lane:lanes(name,owner_team,kpis),step:steps(name),path:paths(name,scenario:scenarios(name))")}&limit=1`);
-    await probe("select_edges_kind", `/rest/v1/cell_dependencies?select=${encodeURIComponent("source_cell_id,target_cell_id,kind,label,note")}&limit=1`);
-    await probe("select_findings_open", "/rest/v1/findings?select=id&status=eq.open&limit=1");
+    //
+    // IMPORTED, not restated. These three probes were written as copies of the
+    // selects and then stayed still while 20260820130000, 20260830190000 and
+    // 20260830280000 renamed the columns underneath them, so the probe agreed
+    // with a read that had stopped working. A copy of a select is a second
+    // thing to keep correct; an import is the same thing.
+    await probe("select_cells_spec", `/rest/v1/cells?select=${encodeURIComponent(CELL_FALLBACK_SELECT)}&limit=1`);
+    await probe("select_edges_kind", `/rest/v1/cell_dependencies?select=${encodeURIComponent(EDGE_SELECT_COLUMNS)}&limit=1`);
+    await probe("select_findings_open", `/rest/v1/${FINDINGS_TABLE}?select=id&status=eq.open&limit=1`);
     const body = { ok: Object.values(probes).every(Boolean), build: BUILD, probes };
     contractProbeCache = { at: now, body };
     return Response.json(body, { status: body.ok ? 200 : 503 });
@@ -318,7 +329,10 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
     } catch (err) {
       out.index_health = { error: err instanceof Error ? err.message : String(err) };
     }
-    for (const t of ["cells", "cell_dependencies", "findings", "slices"]) {
+    // Same list as /health/blueprint, from the same source: a hardcoded copy
+    // here kept probing `findings` for a day after the table became
+    // `audit_findings`.
+    for (const t of BLUEPRINT_CONTRACT.botReadTables) {
       Object.assign(out, await probe(`table_${t}`, `/rest/v1/${t}?select=id&limit=1`));
     }
     return Response.json(out);
