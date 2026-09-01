@@ -54,6 +54,9 @@ export interface HistoryTurn {
   /** Re-fetchable pointers for one follow-up turn. Image bytes never enter DO
    *  storage; the next turn rehydrates these through Slack or Figma. */
   vision?: VisionReference;
+  /** Canvas ids explicitly shared on this user turn. Content stays in Slack;
+   *  this pointer only preserves the conversation-scoped authorization fact. */
+  sharedCanvasIds?: string[];
 }
 
 interface HistoryRecord {
