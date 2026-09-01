@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   historyVisionTurn,
   selectPreviousVisionReference,
+  visionReferenceFor,
 } from "../src/slack/vision-reference";
 
 const reference = {
@@ -44,5 +45,32 @@ test("an image-only Slack message survives thread-history reconstruction", () =>
   assert.deepEqual(
     historyVisionTurn("", reference.files),
     { content: "[image attached: dashboard.png]", vision: reference },
+  );
+});
+
+test("a stored figma reference is one the renderer can actually honour", () => {
+  // These four were accepted by the old substring pattern and refused by
+  // parseFigmaUrl, so each stored a reference the next turn could never
+  // render — and made the turn look like it carried files, which costs it the
+  // trivial-turn shortcut.
+  const unrenderable = [
+    "https://www.figma.com/board/ABC123/Jam?node-id=1-2",
+    "https://www.figma.com/design/ABC123/Spec#node-id=1-2",
+    "https://www.figma.com/design/ABC123/Spec?Node-Id=1-2",
+    "https://www.figma.com/design/ABC123/Spec",
+  ];
+  for (const url of unrenderable) {
+    assert.equal(visionReferenceFor(url, undefined), undefined, url);
+  }
+
+  const renderable = "https://www.figma.com/design/ABC123/Spec?node-id=158-21725";
+  assert.equal(visionReferenceFor(renderable, undefined)?.figmaUrl, renderable);
+});
+
+test("the recognizer stops at Slack's link delimiters", () => {
+  const wrapped = "<https://www.figma.com/design/ABC123/Spec?node-id=158-21725|the frame>";
+  assert.equal(
+    visionReferenceFor(wrapped, undefined)?.figmaUrl,
+    "https://www.figma.com/design/ABC123/Spec?node-id=158-21725",
   );
 });

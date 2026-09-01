@@ -14,6 +14,7 @@ import type { HistoricalImages } from "../agent/provider-conversation";
 import { parseFigmaUrl, fetchFigmaImagePngUrl } from "../integrations/figma";
 import { countedFetch } from "../net";
 import {
+  firstFigmaFrameUrl,
   selectPreviousVisionReference,
   visionReferenceFor,
   type VisionReference,
@@ -66,7 +67,8 @@ export async function collectVisionInputs(
     // 2) Figma frame screenshot: first figma.com URL with a node-id in the text
     // (cap: 1 frame per message). Reuses the same image-render endpoint the
     // proposal cards use, then downloads the short-lived signed PNG.
-    const figmaParts = findFigmaFrameUrl(userText);
+    const figmaFrameUrl = firstFigmaFrameUrl(userText);
+    const figmaParts = figmaFrameUrl ? parseFigmaUrl(figmaFrameUrl) : null;
     if (figmaParts) {
       const figmaImage = await loadFigmaImage(env, figmaParts);
       if (figmaImage) {
@@ -150,17 +152,6 @@ async function loadFigmaImage(
   const png = await fetchBytes(pngUrl);
   if (!png || png.byteLength === 0 || png.byteLength > MAX_IMAGE_BYTES) return null;
   return { media_type: "image/png", data: bytesToBase64(png) };
-}
-
-/** First figma.com URL in the message that carries a node-id (Slack wraps links
- *  as `<url>` or `<url|label>` — strip that before parsing). */
-function findFigmaFrameUrl(text: string): ReturnType<typeof parseFigmaUrl> {
-  const matches = text.match(/https?:\/\/[^\s<>|]+/g) ?? [];
-  for (const candidate of matches) {
-    const parts = parseFigmaUrl(candidate);
-    if (parts) return parts;
-  }
-  return null;
 }
 
 /** Timeout-guarded byte fetch; null on any failure. Slack serves an HTML login
