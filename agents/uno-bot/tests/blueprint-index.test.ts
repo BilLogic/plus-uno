@@ -9,7 +9,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   renderBlueprintIndex,
-  futureLabel,
+  futureStatus,
+  FUTURE_STATUSES,
   INDEX_LEGEND,
   semanticCap,
   mergedCap,
@@ -22,10 +23,13 @@ const LIVE = [
   {
     name: "Application",
     scenarios: [
-      { name: "Discovery", paths: [{ name: "Happy Path" }] },
+      { name: "Discovery", paths: [{ name: "All conditions", status: "live" }] },
       {
         name: "Interview & Offer",
-        paths: [{ name: "Happy Path" }, { name: "Prototype: Clearance redesign" }],
+        paths: [
+          { name: "All conditions", status: "live" },
+          { name: "Clearance redesign", status: "proposed" },
+        ],
       },
     ],
   },
@@ -35,10 +39,10 @@ const LIVE = [
       {
         name: "Wrap-Up",
         paths: [
-          { name: "Happy Path" },
-          { name: "Edge case" },
-          { name: "Planned: Session creation" },
-          { name: "Prototype: Reflection redesign" },
+          { name: "All conditions", status: "live" },
+          { name: "Missed last session", status: "live" },
+          { name: "Session creation", status: "planned" },
+          { name: "Reflection redesign", status: "proposed" },
         ],
       },
     ],
@@ -48,43 +52,77 @@ const LIVE = [
 test("renders one line per phase, labelling each scenario's future paths", () => {
   const index = renderBlueprintIndex(LIVE, READ_AT);
   assert.deepEqual(index.phases, [
-    "Application: Discovery(1), Interview & Offer(2)[Prototype]",
-    // Both labels under one scenario render as a set: a scheduled change and a
-    // separate exploration are different facts and must not collapse into one.
-    "In-session: Wrap-Up(4)[Planned,Prototype]",
+    "Application: Discovery(1), Interview & Offer(2)[proposed]",
+    // Both statuses under one scenario render as a set: a scheduled change and
+    // a separate exploration are different facts and must not collapse.
+    "In-session: Wrap-Up(4)[proposed,planned]",
   ]);
   assert.equal(index.scale, "2 phases / 3 scenarios / 7 paths");
   assert.equal(index.legend, INDEX_LEGEND);
   assert.equal(index.readAt, READ_AT);
 });
 
-test("futureLabel matches the label as a PREFIX, never as a substring", () => {
-  // The prefix rule is what survives the semantic path, where names arrive with
-  // their type appended. A free substring match would promise a roadmap branch
-  // that does not exist — the mirror image of the bug this index fixes.
-  assert.equal(futureLabel("Planned"), "Planned");
-  assert.equal(futureLabel("Planned: Session creation"), "Planned");
-  assert.equal(futureLabel("Prototype: Reflection redesign (named)"), "Prototype");
-  assert.equal(futureLabel("  Prototype: Swap flow  "), "Prototype");
-  for (const notFuture of ["Happy Path", "future", "Unplanned absence", "Re-planned intake", "A Prototype"]) {
-    assert.equal(futureLabel(notFuture), null, notFuture);
+test("futureStatus accepts the domain's non-live values and nothing else", () => {
+  for (const s of FUTURE_STATUSES) assert.equal(futureStatus(s), s);
+  assert.equal(futureStatus("  proposed  "), "proposed");
+  // `live` is current state, so it is not a marker. A missing status is `live`
+  // too: the column is `not null default 'live'`, so an absent value means the
+  // READ did not ask for it — and marking the whole board on that would be the
+  // same false claim as marking none of it.
+  for (const notFuture of ["live", "", "   ", "LIVE", "planned!", "future"]) {
+    assert.equal(futureStatus(notFuture), null, JSON.stringify(notFuture));
+  }
+  for (const notString of [undefined, null, 0, {}, ["planned"]]) {
+    assert.equal(futureStatus(notString), null, JSON.stringify(notString));
   }
 });
 
-test("the marker comes from the path NAME's prefix, not from prose that mentions it", () => {
+test("the marker comes from the path's STATUS, never from its name", () => {
+  // Until 2026-08-21 the marker came from a `Planned:` / `Prototype:` name
+  // prefix. The convention was removed that day and this module kept matching
+  // on it, so every scenario rendered clean while 6 paths were `proposed` —
+  // the index answering "no future state" in the voice of a complete read.
+  // A name that still looks like the old convention proves nothing now.
   const index = renderBlueprintIndex(
     [
       {
         name: "Wrap",
         scenarios: [
-          { name: "Near miss", paths: [{ name: "future" }, { name: "Unplanned absence" }] },
-          { name: "Labelled", paths: [{ name: "Planned: Reconfirmation" }] },
+          {
+            name: "Named like the old way",
+            paths: [{ name: "Planned: Reconfirmation", status: "live" }],
+          },
+          {
+            name: "Ordinary name, not live",
+            paths: [{ name: "Under 12 hours", status: "proposed" }],
+          },
         ],
       },
     ],
     READ_AT,
   );
-  assert.deepEqual(index.phases, ["Wrap: Near miss(2), Labelled(1)[Planned]"]);
+  assert.deepEqual(index.phases, [
+    "Wrap: Named like the old way(1), Ordinary name, not live(1)[proposed]",
+  ]);
+});
+
+test("a path with no status reads as live, not as future", () => {
+  const index = renderBlueprintIndex(
+    [{ name: "Wrap", scenarios: [{ name: "Silent", paths: [{ name: "Standard" }] }] }],
+    READ_AT,
+  );
+  assert.deepEqual(index.phases, ["Wrap: Silent(1)"]);
+});
+
+test("markers order by the domain, not by the order rows arrive", () => {
+  const scenario = (paths: Array<Record<string, unknown>>) => renderBlueprintIndex(
+    [{ name: "P", scenarios: [{ name: "S", paths }] }],
+    READ_AT,
+  ).phases[0];
+  const forward = scenario([{ name: "a", status: "proposed" }, { name: "b", status: "built" }]);
+  const reverse = scenario([{ name: "b", status: "built" }, { name: "a", status: "proposed" }]);
+  assert.equal(forward, reverse);
+  assert.equal(forward, "P: S(2)[proposed,built]");
 });
 
 test("no paths still lists the scenario, with a zero count", () => {

@@ -22,17 +22,19 @@ Query the **database**, never the Netlify front end — that's the human viewer,
 | `services` | the whole journey ("PLUS Application") | — |
 | `phases` | the ordered phases — read them, never assume the list | `service_id` |
 | `scenarios` | scenarios within a phase (e.g. Goal Setting) | `phase_id` |
-| `paths` | routes through a scenario — read `path_type` AND `name`, and `status` for future state (§4) | `scenario_id` |
+| `paths` | routes through a scenario — read `kind` AND `name`, and `status` for future state (§4) | `scenario_id` |
 | `steps` | the columns, scoped to a scenario | `scenario_id` |
-| `path_steps` | which steps appear on a path + `column_position` | `path_id`, `step_id` |
+| `path_steps` | which steps appear on a path + `position` | `path_id`, `step_id` |
 | `lanes` | the rows (actors), scoped to a path, ordered by `position`. Also carries `owner_team` (closed vocabulary), `kpis`, `tools`, `stakeholder_id` | `path_id` |
 | `stakeholders` | the actor/org a lane can point to — `kind`: recipient/staff/partner/provider/team; `parent_id` rolls a sub-team up to its parent | `service_id`; referenced by `lanes.stakeholder_id` |
 | `cells` | **the evidence** at a path × lane × step slot. A slot is `(lane_id, step_id)` and can hold an ordered list of cells (`position`) — never assume one cell per slot | `path_id`, `lane_id`, `step_id` |
 | `cell_dependencies` | dependencies: one cell leads to or enables another (`kind`: `leads_to` \| `enables`) | `source_cell_id` → `target_cell_id` |
 
-Mental model: **cell = (path × lane × step) slot**, and a slot can hold more than one cell, ordered by `position`. Read a scenario by picking a path, then reading its cells across lanes (rows) and steps (columns). (`slices` / `slice_items` are saved 1-D cuts for the viewer; `findings` / `evidence` / `business_model` are audit and provenance surfaces — not journey facts. Don't answer journey questions from them.)
+Mental model: **cell = (path × lane × step) slot**, and a slot can hold more than one cell, ordered by `position`. Read a scenario by picking a path, then reading its cells across lanes (rows) and steps (columns). (`slices` / `slides` are saved 1-D cuts for the viewer; `audit_findings` / `evidence` / `business_models` are audit and provenance surfaces — not journey facts. Don't answer journey questions from them.)
 
-**Cell evidence lives in four fields:** `content` (primary grid text) · `summary` (longer detail) · `picture` (image ref) · `links` (JSON array). A cell can carry real evidence with an empty `content`, and many do. **Check all four before calling a topic empty.** Never infer a fact from an image filename or a link label without opening the resource.
+**Cell evidence lives in four places:** `content` (primary grid text) · `summary` (longer detail) · `frame` (image ref) · the `resources` table (authored links, joined on `cell_id`). A cell can carry real evidence with an empty `content`, and many do. **Check all four before calling a topic empty.** Never infer a fact from an image filename or a link label without opening the resource.
+
+Three of the four moved and this file did not follow, which is why the rule is spelled out again: `picture` became `frame` (20260830270000) and `links` — one jsonb column that held resources, touchpoint detail and provenance at once — was split into `resources`, `cell_touchpoints` and `evidence` (20260830280000). A search result still reports the authored links under `links`: that is the RPC's projection over `resources`, and a projection alias is not a column.
 
 ## 3 · Lane semantics — read before attributing any action
 
@@ -51,10 +53,10 @@ Mis-attribution is the most common error (`schema-misread`). In the built-out sc
 ## 4 · Path semantics
 
 **Rewritten 2026-08-21.** Three things changed at once and every rule below is
-new: `path_type` is a real three-value vocabulary, path names are unique and
+new: `kind` is a real three-value vocabulary, path names are unique and
 say their CONDITION, and future state moved out of the name into a column.
 
-### 4a · `path_type` — three values, and now worth reading
+### 4a · `paths.kind` — three values, and now worth reading
 
 ```
 happy      the scenario's main route, everything works.  Exactly ONE per scenario.
@@ -65,7 +67,7 @@ exception  a rule or a failure DIVERTS the route.
 It used to be five (`happy | unhappy | exception | alternative | named`, later
 `custom`), of which three were not distinguishable in practice and one had
 become the drawer for 11 of 39 paths — which is why the old rule here said to
-ignore the column. **That rule is dead. Read `path_type`.** It now discriminates
+ignore the column. **That rule is dead. Read `kind`.** It now discriminates
 cleanly, and `happy` is guaranteed unique per scenario, so "the main route for
 X" is a single query with no name-matching.
 
@@ -127,9 +129,9 @@ Phrase queries in journey words (actor, scenario, step), not product-management 
 
 **Phase → scenario map** — run this before naming a phase in any citation
 ```sql
-select p.order_position, p.name as phase, ss.order_position, ss.name as scenario
+select p.position, p.name as phase, ss.position, ss.name as scenario
 from phases p join scenarios ss on ss.phase_id = p.id
-order by p.order_position, ss.order_position;
+order by p.position, ss.position;
 ```
 
 **Live scale** — the replacement for every count this file used to hardcode
@@ -143,20 +145,20 @@ union all select 'cells',     count(*) from cells
 union all select 'dependencies', count(*) from cell_dependencies
 union all select 'cells.content', count(*) from cells where coalesce(content, '') <> ''
 union all select 'cells.summary', count(*) from cells where coalesce(summary, '') <> ''
-union all select 'cells.picture', count(*) from cells where picture is not null
-union all select 'cells.links',   count(*) from cells where links <> '[]'::jsonb;
+union all select 'cells.frame',   count(*) from cells where frame is not null
+union all select 'cells.resources', count(*) from resources;
 ```
 
 **Future paths** — everything not live, on one predicate (§4c)
 ```sql
 select p.name as phase, ss.name as scenario, pa.name as path,
-       pa.path_type, pa.status, count(c.id) as cells
+       pa.kind, pa.status, count(c.id) as cells
 from paths pa
 join scenarios ss on pa.scenario_id = ss.id
 join phases p on ss.phase_id = p.id
 left join cells c on c.path_id = pa.id
 where pa.status <> 'live'
-group by p.name, ss.name, pa.name, pa.path_type, pa.status
+group by p.name, ss.name, pa.name, pa.kind, pa.status
 order by p.name, ss.name;
 ```
 
@@ -175,38 +177,40 @@ order by ss.name, pa.name;
 
 **A path's steps in order**
 ```sql
-select st.name, ps.column_position
+select st.name, ps.position
 from scenarios ss
 join paths pa on pa.scenario_id = ss.id
 join path_steps ps on ps.path_id = pa.id
 join steps st on st.id = ps.step_id
 -- The main route, without needing to know its name: exactly one per scenario.
-where ss.name = 'Goal Setting' and pa.path_type = 'happy'
-order by ps.column_position;
+where ss.name = 'Goal Setting' and pa.kind = 'happy'
+order by ps.position;
 ```
 
 **The full grid for one path, all evidence fields** — a `(lane, step)` slot can
 hold more than one cell, so this orders within the slot by `c.position` rather
 than assuming a single cell per intersection.
 ```sql
-select l.name as lane, st.name as step, ps.column_position, c.position,
-       c.content, c.summary, c.picture, c.links
+select l.name as lane, st.name as step, ps.position as step_position, c.position,
+       c.content, c.summary, c.frame,
+       (select jsonb_agg(jsonb_build_object('name', r.name, 'url', r.url))
+          from resources r where r.cell_id = c.id) as resources
 from cells c
 join paths pa on c.path_id = pa.id
 join lanes l on c.lane_id = l.id
 join steps st on c.step_id = st.id
 join path_steps ps on ps.path_id = pa.id and ps.step_id = st.id
 where pa.scenario_id = (select id from scenarios where name = 'Goal Setting')
-  and pa.path_type = 'happy'
+  and pa.kind = 'happy'
   and (coalesce(c.content, '') <> '' or coalesce(c.summary, '') <> ''
-       or c.picture is not null or c.links <> '[]'::jsonb)
-order by ps.column_position, l.position, c.position;
+       or c.frame is not null or exists (select 1 from resources r where r.cell_id = c.id))
+order by ps.position, l.position, c.position;
 ```
 
 **Which actor performs an action (keyword)**
 ```sql
 select ss.name as scenario, pa.name as path, l.name as lane, st.name as step,
-       c.content, c.summary, c.picture, c.links
+       c.content, c.summary, c.frame
 from cells c
 join paths pa on c.path_id = pa.id
 join scenarios ss on pa.scenario_id = ss.id
@@ -227,18 +231,18 @@ limit 50;
 
 ## 6 · Answering rules
 
-1. **Cite location.** Every factual claim names where it sits: `phase › scenario › path — lane × step`. The `›` chain is containment; the pair after the dash is the cell's coordinate — actor row × journey column, actor first because mis-attribution is the most common failure (§3). Step names are full sentences on this board, so quote them. **The phase comes from a queried `phases` row — never from the asker's wording, and never inferred from a scenario name that sounds like a phase.** No phase in hand → name only the levels you actually retrieved. Say which evidence field a claim came from when it matters (a `picture`-only fact is weaker than a `content` one). Never expose row UUIDs to a reader.
+1. **Cite location.** Every factual claim names where it sits: `phase › scenario › path — lane × step`. The `›` chain is containment; the pair after the dash is the cell's coordinate — actor row × journey column, actor first because mis-attribution is the most common failure (§3). Step names are full sentences on this board, so quote them. **The phase comes from a queried `phases` row — never from the asker's wording, and never inferred from a scenario name that sounds like a phase.** No phase in hand → name only the levels you actually retrieved. Say which evidence field a claim came from when it matters (a `frame`-only fact is weaker than a `content` one). Never expose row UUIDs to a reader.
 2. **Cover the right lanes.** A multi-actor question spans the relevant rows, not just the tutor. One-lane answers to multi-actor questions score as incomplete, not merely brief.
 3. **Respect structure.** Right path variant, right lane. Don't merge happy + edge; don't move a back-stage action to a front-stage actor.
-4. **Silent → say so, and name who to ask.** Search all four evidence fields first. Still absent → "this isn't in the blueprint," plus the person or role who should fill the gap when the blueprint supports that ownership. Fabricating here is the worst failure mode (`overconfident-silence`).
+4. **Silent → say so, and name who to ask.** Search all four evidence places first (§2). Still absent → "this isn't in the blueprint," plus the person or role who should fill the gap when the blueprint supports that ownership. Fabricating here is the worst failure mode (`overconfident-silence`).
 
-   **Read `matchedBy`, not `score`, to judge absence.** Retrieval runs three ways at once — `vector` (meaning), `keyword` (the cell's own prose), `structural` (its phase/scenario/path/step/lane name) — and each row reports which found it. Rows several retrievers agree on matched the blueprint's own words; a `vector`-only row is a semantic guess. **Every row `vector`-only = nothing in the blueprint mentions your terms**, which is the strongest absence signal the tool can give. Similarity cannot substitute: measured 2026-08-19 across a 26-case set, questions with NO answer scored 0.607–0.654 while genuine hits reached down to 0.565 — overlapping ranges, so no threshold separates them, and none ever will (`docs/plans/2026-08-19-001-feat-blueprint-hybrid-retrieval-plan.md`). One caveat: a pure paraphrase of a real cell can also come back `vector`-only, so treat it as evidence, not proof — say what you did and did not find.
+   **Read `matchedBy`, not `score`, to judge absence.** Retrieval runs three ways at once — `vector` (meaning), `keyword` (the cell's own prose), `structural` (its phase/scenario/path/step/lane name) — and each row reports which found it, `+`-joined when more than one did: `keyword+structural` and `vector+keyword+structural` are ordinary values, not three atomic ones. So the test is EQUALITY with `vector`, not containment — `vector+keyword` is a row the blueprint's own words matched. Rows several retrievers agree on matched the blueprint's own words; a `vector`-only row is a semantic guess. **Every row `vector`-only = nothing in the blueprint mentions your terms**, which is the strongest absence signal the tool can give. Similarity cannot substitute: measured 2026-08-19 across a 26-case set, questions with NO answer scored 0.607–0.654 while genuine hits reached down to 0.565 — overlapping ranges, so no threshold separates them, and none ever will (`docs/plans/2026-08-19-001-feat-blueprint-hybrid-retrieval-plan.md`). One caveat: a pure paraphrase of a real cell can also come back `vector`-only, so treat it as evidence, not proof — say what you did and did not find.
 5. **Confidence — one woven clause, never a trailing label**, and sureness earned only by rows read this turn. Shape and cadence: `agents/uno-bot/AGENT.md` § Grounding.
 6. **Source precedence — ADR-021 claim-type routing, not "the blueprint wins."** Route per claim; full table in `docs/connectors/supabase/overview.md` § Two sources, one time axis. Constant across every row: **surface the conflict, never blend.**
 
 ## 7 · Known-silent areas
 
-No structured fields for verbatim scripts, durations, counts, targets, or dates — such details appear only inside general cell evidence, and only sometimes. Use them where they appear explicitly; absent after checking all four fields → abstain and escalate per rule 4.
+No structured fields for verbatim scripts, durations, counts, targets, or dates — such details appear only inside general cell evidence, and only sometimes. Use them where they appear explicitly; absent after checking all four places (§2) → abstain and escalate per rule 4.
 
 ## 8 · Content depth (what's answerable today)
 
@@ -248,7 +252,8 @@ Coverage is uneven, and judged from the rows you just read — never from a reme
 ```sql
 select ss.name as scenario, count(distinct pa.id) as paths,
        count(c.id) filter (where coalesce(c.content,'') <> '' or coalesce(c.summary,'') <> ''
-                              or c.picture is not null or c.links::text <> '[]') as cells_with_evidence
+                              or c.frame is not null
+                              or exists (select 1 from resources r where r.cell_id = c.id)) as cells_with_evidence
 from scenarios ss
 left join paths pa on pa.scenario_id = ss.id
 left join cells c on c.path_id = pa.id
