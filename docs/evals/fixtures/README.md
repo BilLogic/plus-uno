@@ -5,7 +5,7 @@ Fixed inputs the benchmarks run against — same inputs, comparable outputs acro
 | Skill | Fixture | Answer key |
 |---|---|---|
 | uno-synthesize | `uno-synthesize-bundle/` — 3 sources (Slack thread · transcript · analytics) | `uno-synthesize-bundle/answer-key/reference-findings.md` — diff coverage against it |
-| uno-prototype | `uno-prototype-seeds/` — 3 deliberately incomplete PRDs spanning fidelities | seed-specific adjacent answer keys; seed 1 uses authenticated ciphertext |
+| uno-prototype | `uno-prototype-seeds/` — 3 deliberately incomplete PRDs spanning fidelities | adjacent `*.answers.enc.json` files — AES-256-GCM ciphertext under one grader key |
 | uno-review | `prototypes/home-redesign/src` (pre-existing defects as planted flaws) | the 2026-07-08 run: `docs/evals/runs/2026-07-08-golden-uno-review.jsonl` (9 defects vs AGENTS.md FP-1/2/6; full-procedure recall 100%, script-only 44%) |
 | uno-maintain | seeded issue set defined inline in `docs/evals/scenarios/uno-maintain.md` S5 (11 targets + 1 cross-estate) | the taxonomy table in `skills/uno-maintain/references/method.md` |
 | uno-bot | `uno-bot-cases.json` — public prompts and deterministic checks | `uno-bot-answer-key.enc.json` — AES-256-GCM ciphertext; the eval runner decrypts it with the `UNO_BOT_EVAL_KEY` Actions secret |
@@ -26,6 +26,6 @@ UNO_BOT_EVAL_KEY=<64 hex characters> npm --prefix agents/uno-bot run evals:seal-
 
 Do not place the plaintext file or key inside the repository. The loader rejects unauthenticated ciphertext, missing cases, extra cases, and any public case that regains a `judgeNote`.
 
-## uno-prototype seed 1 answer key
+## uno-prototype answer-key lifecycle
 
-`seed-1-lowfi-missing-flows.answers.enc.json` uses the same authenticated envelope and loader as the uno-bot answer key. Its key lives in the repository Actions secret `UNO_PROTOTYPE_EVAL_KEY`; pass that value to `loadAnswerKey` when grading or to `evals:seal-answer-key` as `UNO_BOT_EVAL_KEY` when rotating the fixture. The public seed remains the benchmark input; the decrypted object is the grader input.
+Each adjacent `*.answers.enc.json` uses the same authenticated envelope and loader as the uno-bot answer key. Their shared key lives in the repository Actions secret `UNO_PROTOTYPE_EVAL_KEY`; pass that value to `loadAnswerKey` when grading or to `evals:seal-answer-key` as `UNO_BOT_EVAL_KEY` when rotating a fixture. Public seed Markdown is the benchmark input; the decrypted object is the grader input. Rotate all three ciphertext files and the shared secret together.

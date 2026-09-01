@@ -1,8 +1,10 @@
-# Seed PRD 3 (hi-fi ask) — "Reflection streak card"
+<!-- Reseeded 2026-08-31 after public answer-key exposure; the prior subject is retired. -->
 
-Build the approved reflection-streak card for the tutor dashboard in the prototypes, production-quality against the design system.
+# Seed PRD 3 (hi-fi ask) — "Session countdown banner"
+
+Build the approved Session countdown banner for the tutor dashboard in the prototypes, production-quality against the design system.
 
 Requirements:
-- Shows current streak (consecutive sessions with a submitted reflection)
-- Tapping opens the reflection composer
-- Celebrates milestone streaks (5, 10, 25)
+- Shows time until the scheduled Session and then time remaining
+- Changes emphasis at key time thresholds
+- Its primary action opens the Session in Pencil or Zoom

@@ -1,8 +1,10 @@
-# Seed PRD 1 (low-fi ask) — "Tutor shout-outs board"
+<!-- Reseeded 2026-08-31 after public answer-key exposure; the prior subject is retired. -->
 
-Students and staff can post shout-outs recognizing tutors. Shout-outs appear on a board tutors can browse. Keep it lightweight and fun. We want a quick flow sketch to react to.
+# Seed PRD 1 (low-fi ask) — "Live-session question queue"
+
+Students can add questions to a shared queue during a Session so tutors can pull up what needs attention next. Keep it lightweight. We want a quick flow sketch to react to.
 
 Requirements:
-- Anyone with a PLUS account can post a shout-out naming a tutor
-- Board is visible to all tutors
-- Shout-outs show the tutor's name and the message
+- A student can add a short question during an active Session
+- The queue is visible to tutors assigned to that Session
+- A tutor can open the next question from the queue

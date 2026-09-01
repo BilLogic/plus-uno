@@ -7,19 +7,12 @@
 // checks them, so this file checks them.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { passesCase } from "./eval-scoring.mjs";
 
 const FIXTURE = new URL("../../../docs/evals/fixtures/uno-bot-cases.json", import.meta.url);
 const README = new URL("../../../docs/evals/README.md", import.meta.url);
-const SEED_ONE_PLAINTEXT = new URL(
-  "../../../docs/evals/fixtures/uno-prototype-seeds/seed-1-lowfi-missing-flows.answers.md",
-  import.meta.url,
-);
-const SEED_ONE_ENCRYPTED = new URL(
-  "../../../docs/evals/fixtures/uno-prototype-seeds/seed-1-lowfi-missing-flows.answers.enc.json",
-  import.meta.url,
-);
+const PROTOTYPE_SEEDS = new URL("../../../docs/evals/fixtures/uno-prototype-seeds/", import.meta.url);
 
 const raw = JSON.parse(readFileSync(FIXTURE, "utf8"));
 const cases = Array.isArray(raw) ? raw : raw.cases;
@@ -39,13 +32,19 @@ test("the public fixture contains no grader answer key", () => {
   assert.deepEqual(exposed, [], `public judgeNote(s): ${exposed.join(", ")}`);
 });
 
-test("seed 1 exposes no plaintext grader answer", () => {
-  assert.equal(existsSync(SEED_ONE_PLAINTEXT), false, "seed 1 plaintext answer key is public");
-  const envelopeText = readFileSync(SEED_ONE_ENCRYPTED, "utf8");
-  const envelope = JSON.parse(envelopeText);
-  assert.deepEqual(Object.keys(envelope).sort(), ["algorithm", "ciphertext", "iv", "tag", "version"]);
-  assert.equal(envelope.algorithm, "aes-256-gcm");
-  assert.equal(typeof envelope.ciphertext, "string");
+test("prototype seeds expose no plaintext grader answers", () => {
+  const filenames = readdirSync(PROTOTYPE_SEEDS).sort();
+  const plaintext = filenames.filter((name) => name.endsWith(".answers.md"));
+  assert.deepEqual(plaintext, [], `public seed answer key(s): ${plaintext.join(", ")}`);
+
+  const encrypted = filenames.filter((name) => name.endsWith(".answers.enc.json"));
+  assert.equal(encrypted.length, 3, "every prototype seed needs an encrypted answer key");
+  for (const filename of encrypted) {
+    const envelope = JSON.parse(readFileSync(new URL(filename, PROTOTYPE_SEEDS), "utf8"));
+    assert.deepEqual(Object.keys(envelope).sort(), ["algorithm", "ciphertext", "iv", "tag", "version"]);
+    assert.equal(envelope.algorithm, "aes-256-gcm", filename);
+    assert.equal(typeof envelope.ciphertext, "string", filename);
+  }
 });
 
 test("no blocker is decided by a single judge call", () => {
