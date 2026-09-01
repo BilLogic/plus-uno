@@ -67,6 +67,13 @@ import {
 } from "./types";
 import { collectVisionInputs } from "./vision";
 import { historyVisionTurn, selectPreviousVisionReference } from "./vision-reference";
+import { appMentionToMessage } from "./event-provenance";
+import {
+  canvasIdsSharedByMessage,
+  canvasIdsSharedBySlackHistoryMessage,
+  canvasIdsSharedIntoConversation,
+  messageTextWithCanvasAttachments,
+} from "./canvas-reference";
 import { postVisibleFailure, postTextVerified, renderDeliveredBody, isCapacityError } from "./delivery";
 import { reviewDraft } from "../agent/draft-judge";
 import {
@@ -305,19 +312,6 @@ function conversationKey(e: ThreadedEvent): string {
   return `${e.channel}:${conversationTs(e)}`;
 }
 
-function appMentionToMessage(e: SlackAppMentionEvent): SlackMessageEvent {
-  return {
-    type: "message",
-    channel: e.channel,
-    user: e.user,
-    text: e.text,
-    ts: e.ts,
-    thread_ts: e.thread_ts,
-    files: e.files,
-    action_token: e.action_token,
-  };
-}
-
 function isUserTurn(event: SlackMessageEvent): boolean {
   if (event.bot_id) return false;
   if (event.subtype) return false;
@@ -512,6 +506,9 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     await postVisibleFailure(env, channel, threadTs, userMsgTs, err, "context");
     return;
   }
+  const currentCanvasIds = canvasIdsSharedByMessage(userText, event.files);
+  const sharedCanvasIds = canvasIdsSharedIntoConversation(userText, event.files, history);
+  const canvasMessageText = messageTextWithCanvasAttachments(userText, event.files);
 
   // ── The one deterministic text path: a typed gate emoji, alone ─────────────
   //
@@ -595,10 +592,11 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   const vision =
     trivialTurn && !carriesFiles
       ? { images: [], modelText: userText, historyText: userText }
-      : await collectVisionInputs(env, event, userText, history);
+      : await collectVisionInputs(env, event, canvasMessageText, history);
   const visionTurn = {
     ts: userMsgTs,
     ...("reference" in vision && vision.reference ? { vision: vision.reference } : {}),
+    ...(currentCanvasIds.length ? { sharedCanvasIds: currentCanvasIds } : {}),
   };
   console.log(
     `[route] tier=${previewTier} why=${routeWhy} ctx=${trivialTurn && !carriesFiles ? "skipped" : "gathered"}`,
@@ -786,6 +784,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
         // Bot-token search needs the triggering event's action_token; it exists
         // only for this turn, so it rides the context rather than any store.
         actionToken: event.action_token,
+        sharedCanvasIds,
         notionPrdId: prd?.id,
         notionPrdUrl: prd?.url,
       },
@@ -950,9 +949,8 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     await appendHistory(env, channel, convTs, {
       role: "user",
       content: vision.historyText,
-      ts: userMsgTs,
+      ...visionTurn,
       ...(turnReceipt ? { retrieval: turnReceipt } : {}),
-      ...("reference" in vision && vision.reference ? { vision: vision.reference } : {}),
     });
     if (delivery.ok) {
       // Record what was actually posted (capped/placeholder), not the raw text.
@@ -1289,17 +1287,25 @@ async function buildThreadHistory(
         if (m.ts === currentTs) continue;
         const isBot = m.user === identity.userId || (!!m.bot_id && m.bot_id === identity.botId);
         const rawContent = stripBotMentions(m.text ?? "").trim();
+        const canvasContent = messageTextWithCanvasAttachments(rawContent, m.files);
+        const sharedCanvasIds = canvasIdsSharedBySlackHistoryMessage({
+          user: m.user,
+          bot_id: m.bot_id,
+          text: rawContent,
+          files: m.files,
+        });
         const visionTurn = isBot
           ? (rawContent ? { content: rawContent } : null)
-          : historyVisionTurn(rawContent, m.files);
-        if (!visionTurn) continue;
+          : historyVisionTurn(canvasContent, m.files);
+        if (!visionTurn && !sharedCanvasIds.length) continue;
         const receipt = m.ts ? receiptsByTs.get(m.ts) : undefined;
         turns.push({
           role: isBot ? "assistant" : "user",
-          content: visionTurn.content,
+          content: visionTurn?.content ?? "[Canvas shared]",
           ...(m.ts ? { ts: m.ts } : {}),
           ...(receipt ? { retrieval: receipt } : {}),
-          ...(visionTurn.vision ? { vision: visionTurn.vision } : {}),
+          ...(visionTurn?.vision ? { vision: visionTurn.vision } : {}),
+          ...(sharedCanvasIds.length ? { sharedCanvasIds } : {}),
         });
       }
       if (turns.length) return turns;

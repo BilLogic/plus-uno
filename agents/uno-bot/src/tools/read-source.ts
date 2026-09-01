@@ -10,11 +10,14 @@
 //   other http(s) → fetched text with tags stripped
 // Runs inline in the agent loop (no side effect, no gate).
 
-import type { Env } from "../types";
+import type { Env, SlackContext } from "../types";
 import { parseNotionPageId, readNotionPage } from "../integrations/notion";
 import { parseFigmaUrl, fetchFigmaNode } from "../integrations/figma";
 import { FIGMA_NOTE, FIGMA_TRUNCATION_NOTE } from "../integrations/figma-reading";
 import { countedFetch } from "../net";
+import { parseSlackCanvasId } from "../slack/canvas-reference";
+import { readSlackCanvasSource } from "./slack-canvas-source";
+import { htmlToPlainText } from "./html-to-text";
 import { isWithheldRepoPath, WITHHELD_NOTE } from "../integrations/repo-read-guard";
 
 const GENERIC_TIMEOUT_MS = 8000;
@@ -37,19 +40,11 @@ function toGithubRaw(u: URL): string | null {
   return null;
 }
 
-function stripHtml(html: string): string {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/\s+\n/g, "\n")
-    .replace(/[ \t]{2,}/g, " ")
-    .trim();
-}
-
-export async function executeReadSource(env: Env, input: Record<string, unknown>): Promise<string> {
+export async function executeReadSource(
+  env: Env,
+  input: Record<string, unknown>,
+  slack?: Pick<SlackContext, "sharedCanvasIds">,
+): Promise<string> {
   const url = firstUrl(input.url) ?? firstUrl(input.text);
   if (!url) {
     return JSON.stringify({ ok: false, error: "no http(s) URL found in the input" });
@@ -64,6 +59,28 @@ export async function executeReadSource(env: Env, input: Record<string, unknown>
   const host = parsed.hostname.toLowerCase();
 
   try {
+    // ---- Slack Canvas ----
+    if (/(^|\.)slack\.com$/.test(host) && parseSlackCanvasId(url)) {
+      const canvas = await readSlackCanvasSource(
+        url,
+        env.SLACK_BOT_TOKEN,
+        slack?.sharedCanvasIds ?? [],
+        (target, init) => countedFetch(target, init, GENERIC_TIMEOUT_MS),
+      );
+      if (!canvas.ok) {
+        return JSON.stringify({
+          ok: false,
+          error: canvas.error,
+          note: "Ask the user to share the Canvas into this conversation, then try again.",
+        });
+      }
+      return JSON.stringify({
+        ...canvas,
+        source_type: "slack_canvas",
+        note: "Answer from this Canvas content and cite the URL. If it doesn't contain the answer, say so.",
+      });
+    }
+
     // ---- Notion ----
     if (/(^|\.)notion\.so$/.test(host) || /(^|\.)notion\.site$/.test(host)) {
       const pageId = parseNotionPageId(url);
@@ -132,7 +149,7 @@ export async function executeReadSource(env: Env, input: Record<string, unknown>
       }
       const ctype = res.headers.get("content-type") ?? "";
       let body = await res.text();
-      if (/html/i.test(ctype) && !raw) body = stripHtml(body);
+      if (/html/i.test(ctype) && !raw) body = htmlToPlainText(body);
       return JSON.stringify({
         ok: true,
         source_type: raw ? "github" : "web",

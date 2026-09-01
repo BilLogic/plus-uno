@@ -20,6 +20,9 @@ export interface SlackContext {
    *  prefetch). Absent on events that don't carry one — slack_search then falls
    *  through rather than sending an invalid call. */
   actionToken?: string;
+  /** Canvas file ids explicitly shared in this conversation. `source_read`
+   *  treats this as an allowlist; model-supplied URLs never widen it. */
+  sharedCanvasIds?: string[];
   /** Notion PRD reference resolved at proposal time, forwarded to the GitHub
    *  implement/scaffold workflows so codegen gets PRD context. */
   notionPrdId?: string;
