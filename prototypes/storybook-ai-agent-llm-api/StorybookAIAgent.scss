@@ -830,6 +830,14 @@
   }
 }
 
+/* Screen-explain tags: PLUS Badge (primary tint + primary-text), not a filled container */
+.sb-ai-agent__component-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--size-element-gap-sm);
+}
+
 .sb-ai-agent__user-avatar {
   width: 32px;
   height: 32px;

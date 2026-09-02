@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { linkTo } from '@storybook/addon-links';
+import { Badge } from '@/components';
 import './StorybookAIAgent.scss';
 import { extractStoryIndex, findBestMatch } from './SmartNavigation';
 
@@ -1255,11 +1256,9 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                                 {Array.isArray(data.structure) && data.structure.map((item, i) => <li key={i}>{item}</li>)}
                             </ul>
                             <p style={{ fontWeight: 600, marginTop: 8, marginBottom: 4 }}>Components Used:</p>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                                {Array.isArray(data.components_used) && data.components_used.map((comp, i) => (
-                                    <span key={i} style={{ background: 'var(--color-secondary-container)', color: 'var(--color-on-secondary-container)', padding: '2px 8px', borderRadius: 4, fontSize: 11 }}>
-                                        {comp}
-                                    </span>
+                            <div className="sb-ai-agent__component-chips">
+                                {Array.isArray(data.components_used) && data.components_used.map((comp) => (
+                                    <Badge key={comp} text={comp} style="primary" size="b3" />
                                 ))}
                             </div>
                         </div>
