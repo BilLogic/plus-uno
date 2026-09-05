@@ -21,6 +21,7 @@ import { embedText, embeddingsConfigured, embedModelName } from "../vertex/embed
 import { countedFetch, rethrowIfBudget, subrequestBudgetSpent } from "../net";
 import { cellUrl, sliceUrl, parseChunkTitle, chunkBody } from "./blueprint-link";
 import { BLUEPRINT_CONTRACT } from "../generated/blueprint-contract";
+import { type BlueprintScope, hasFilter, hasScope, scopeBody, scopeKey } from "./blueprint-scope";
 import {
   PROSE_COLUMN,
   POSITION_COLUMN,
@@ -63,6 +64,7 @@ const REQUEST_TIMEOUT_MS = 10000;
 // checks them — the contract plus `npm run check:contract` is what does.
 const RPC_NAME = BLUEPRINT_CONTRACT.rpcs.searchBlueprint;
 const PARAM = BLUEPRINT_CONTRACT.searchBlueprintParams;
+const COL = BLUEPRINT_CONTRACT.searchBlueprintColumns;
 const PER_TABLE_LIMIT = 8;
 const MAX_ROWS = 30;
 
@@ -284,6 +286,12 @@ export interface BlueprintSearchOptions {
    *  a filtered number. Swapping one for the other would be a behaviour change
    *  wearing an optimisation's clothes. */
   include?: readonly ("edges" | "findings")[];
+  /** Scope filters and the granularity rung, chosen by the model (#413). Sent
+   *  on the fused path only — the ladder below cannot honour them, so a scoped
+   *  search never falls through to it: an unfiltered answer to a filtered
+   *  question is wrong, not degraded. With at least one filter set, `query`
+   *  may be empty (filter-only predicate mode). */
+  scope?: BlueprintScope;
 }
 
 /**
@@ -302,7 +310,11 @@ export async function searchBlueprint(
     );
   }
   const q = query.trim();
-  if (!q) {
+  const scope = options.scope ?? {};
+  const scoped = hasScope(scope);
+  // Filter-only predicate mode: no terms, but a scope to list. Anything else
+  // with no terms is still the empty result it always was.
+  if (!q && !hasFilter(scope)) {
     return {
       rows: [],
       retrieval: "tables",
@@ -334,6 +346,9 @@ export async function searchBlueprint(
   const cacheKey =
     q.toLowerCase().replace(/\s+/g, " ").trim() +
     (wantInclude.length ? `\u0000include:${wantInclude.join(",")}` : "") +
+    // The scope is part of the key for the same reason include is: the same
+    // words under a different filter are a different search.
+    scopeKey(scope) +
     (options.rpcName && options.rpcName !== RPC_NAME ? `\u0000rpc:${options.rpcName}` : "");
   const hit = options.fresh ? undefined : searchCache.get(cacheKey);
   if (hit && Date.now() - hit.at < CACHE_TTL_MS) {
@@ -360,8 +375,11 @@ export async function searchBlueprint(
     // Falls through to the ladder only when the RPC is absent (not migrated) or
     // the kill switch is off. Kept for one release as the rollback path.
     if (env.BLUEPRINT_HYBRID !== "off") {
-      const fused = await tryHybrid(env, base, key, q, controller.signal, wantInclude as readonly ("edges" | "findings")[], options.rpcName ?? RPC_NAME);
-      if (fused && fused.rows.length) {
+      const fused = await tryHybrid(env, base, key, q, controller.signal, wantInclude as readonly ("edges" | "findings")[], options.rpcName ?? RPC_NAME, scope);
+      // A SCOPED search returns whatever the RPC said, empty included: zero
+      // rows inside a filter is an answer ("no exception paths in Discovery"),
+      // and the ladder below would replace it with an unscoped one.
+      if (fused && (fused.rows.length || scoped)) {
         const cap = semanticCap(fused.rows.length, HYBRID_MATCH_COUNT);
         const result: BlueprintSearchResult = {
           rows: fused.rows,
@@ -562,9 +580,10 @@ function mergeRows(semantic: BlueprintRow[], keyword: BlueprintRow[]): Blueprint
 // single retriever liked.
 // The portal now OWNS the name search_blueprint: the legacy ilike function is
 // dropped and the fused retriever (vector + prose + structural, RRF) answers
-// under it, with scope filters (filter_phase/filter_scenario/filter_path_type/
-// filter_lane_role — declared in the contract, not sent by this Worker), a
-// filter-only predicate mode, and total_matched — the
+// under it, with scope filters (filter_phase/filter_scenario/filter_path_kind/
+// filter_lane_role — declared in the contract, chosen by the model since #413
+// and rendered by blueprint-scope.ts), a filter-only predicate mode, and
+// total_matched — the
 // corpus-wide count behind the top-k, so "113 cells mention Zoom, here are 15"
 // is sayable. Same name the ladder's tryRpc always called, so the fallback
 // path rides the upgrade for free.
@@ -578,6 +597,7 @@ async function tryHybrid(
   signal: AbortSignal,
   include: readonly ("edges" | "findings")[] = [],
   rpcName: string = RPC_NAME,
+  scope: BlueprintScope = {},
 ): Promise<{
   rows: BlueprintRow[];
   matchedTotal?: number;
@@ -600,6 +620,9 @@ async function tryHybrid(
       // signature cannot catch it and nothing else in the stack would.
       [PARAM.embedModel]: embedding ? embedModelName(env) : null,
       ...(include.length ? { [PARAM.include]: include } : {}),
+      // Filters and granularity, keyed by the contract's wire names. Omitted
+      // when unset, so an unscoped body is byte-identical to what it was.
+      ...scopeBody(scope),
     }),
     signal,
   });
@@ -619,8 +642,12 @@ async function tryHybrid(
     const rows = cellData.map((r): BlueprintRow => {
       const id = typeof r.id === "string" ? r.id : "";
       const title = typeof r.title === "string" ? r.title : "";
+      // The RPC tags each row with the rung it answered at (`kind` is one of
+      // searchBlueprintKinds). Default `cell` keeps every pre-#413 caller
+      // reading exactly what it did.
+      const kind = str(r[COL.kind]) ?? "cell";
       return {
-        kind: "cell",
+        kind,
         id,
         title,
         // The RPC returns the corpus chunk when one exists, which carries the
@@ -640,7 +667,9 @@ async function tryHybrid(
         score: typeof r.similarity === "number" ? Math.round(r.similarity * 1000) / 1000 : undefined,
         updatedAt: typeof r.updated_at === "string" ? r.updated_at.slice(0, 10) : undefined,
         matchedBy: str(r.matched_by),
-        url: cellUrl(env.BLUEPRINT_APP_URL, id),
+        // A cell deep link opens a CELL; a phase or lane id in that slot would
+        // open nothing, so coarser rungs carry no url.
+        url: kind === "cell" ? cellUrl(env.BLUEPRINT_APP_URL, id) : undefined,
       };
     });
     const hitIds = new Set(rows.map((r) => r.id).filter(Boolean));

@@ -79,17 +79,57 @@
   },
   {
     "name": "search_blueprint",
-    "description": "Read-only, ungated. Hybrid search over the uno-blueprint (Supabase), the source of truth for the current service journey: who does what, at which phase › scenario › path › step, per lane actor. Use it first for any ask in blueprint frame words — how a flow works, who does what, scenario, step, 'what happens when' — and cite the rows. Every path and cell carries `status`: `live` is how it works today and the default; `proposed`, `planned` and `built` are coming; `at_risk` and `deprecated` are fading. Word each row by its status. No rows is a fact about the QUERY: check `index` or re-search under the scenario's own name before saying the blueprint has nothing; a current doc (Help Center, shipped PRD) may then answer, cited and dated. Rows carry `url` (a deep link opening THAT cell — link the cells you rely on, verbatim), may carry `links` (URLs the authors attached, safe to surface) and `updatedAt` (judge staleness from it). `matchedBy` names the retrievers that found a row: `vector` (semantic similarity), `keyword` (the cell's prose), `structural` (its phase/scenario/path/step/lane name), or a `+`-joined set. Use it for confidence: a row several retrievers agree on matched the blueprint's own words; a `vector`-only row is a semantic guess and gets a hedge; when EVERY row is `vector`-only, nothing in the blueprint mentions your terms — treat the topic as probably absent and present such rows as near-misses at most. `score` cannot tell you this: answer-less questions score in the range of real hits. The result also reports `retrieval` (`hybrid` = all retrievers ran; `semantic`/`rpc`/`tables` = legacy fallbacks), `truncated` + `capped_by` (say the list is partial), `cached` + `age_ms` (true = rows read on an earlier turn, so claim no freshness) and `thin` (legacy fallback only). When `orientation` is `live`, `index` is the complete list of phases → scenarios → paths read this turn: name the phase from it, quote counts only from its `scale`, and read future state from its `[proposed]`/`[planned]`/`[built]`/`[at_risk]`/`[deprecated]` markers; `unavailable` means you could not check, so claim no absence. Ask for it any time with `include: [\"index\"]`. Follow the `notes` array — each entry is one obligation for THIS result.",
+    "description": "Read-only, ungated. Hybrid search over the uno-blueprint (Supabase), the source of truth for the current service journey. Use it first for any ask in blueprint frame words — how a flow works, who does what, scenario, step, 'what happens when' — and cite the rows. Choose the scope yourself: a question inside one phase, scenario, path kind or lane role gets the matching `filter_*`; a shape question ('what does onboarding look like') gets a `granularity` coarser than `cell`; a completeness question ('how many cells mention Zoom') answers from `matched`, the corpus-wide count behind the rows shown. Filters with no `query` list the whole scope. Word each row by its `status` (the blueprint account says what each one licenses). No rows is a fact about the QUERY: check `index` or re-search under the scenario's own name before saying the blueprint has nothing; a current doc (Help Center, shipped PRD) may then answer, cited and dated. Rows carry `url` (a deep link opening THAT cell — link the cells you rely on, verbatim), may carry `links` (URLs the authors attached, safe to surface) and `updatedAt` (judge staleness from it). `matchedBy` names the retrievers that found a row: `vector` (semantic similarity), `keyword` (the cell's prose), `structural` (its breadcrumb name), or a `+`-joined set. Use it for confidence: a row several retrievers agree on matched the blueprint's own words; a `vector`-only row is a semantic guess and gets a hedge; when EVERY row is `vector`-only, nothing in the blueprint mentions your terms — treat the topic as probably absent and present such rows as near-misses at most. `score` cannot tell you this. The result also reports `retrieval`, `truncated` + `capped_by` (say the list is partial), `cached` + `age_ms` (true = rows read on an earlier turn, so claim no freshness) and `thin`. When `orientation` is `live`, `index` is the complete list of phases → scenarios → paths read this turn: name the phase from it, quote counts only from its `scale`, and read future state from its status markers; `unavailable` means you could not check, so claim no absence. Ask for it any time with `include: [\"index\"]`. Follow the `notes` array — each entry is one obligation for THIS result.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "query"
-      ],
       "properties": {
         "query": {
           "type": "string",
-          "description": "Free-text query describing what you need from the blueprint, e.g. 'Tutor Admin redesign status', 'decisions about empty states'."
+          "description": "Free-text query describing what you need from the blueprint, e.g. 'Tutor Admin redesign status', 'decisions about empty states'. Optional ONLY when at least one filter_* is set — then omit it to list the whole scope in structural order."
+        },
+        "filter_phase": {
+          "type": "string",
+          "description": "Narrow every retriever to one phase, by its name (case-insensitive) — use when the question is about what happens inside a named phase rather than across the journey."
+        },
+        "filter_scenario": {
+          "type": "string",
+          "description": "Narrow to one scenario, by its name (case-insensitive) — use when the user names the situation ('the no-show scenario') and an answer from another scenario would be wrong."
+        },
+        "filter_path_kind": {
+          "type": "string",
+          "enum": [
+            "happy",
+            "variant",
+            "exception"
+          ],
+          "description": "Keep only paths of one kind (exact value) — use for 'every exception path' or 'the main route' (happy) style questions."
+        },
+        "filter_lane_role": {
+          "type": "string",
+          "enum": [
+            "customer_actions",
+            "frontstage_actions",
+            "backstage_actions",
+            "partner_actions",
+            "frontstage_touchpoints",
+            "backstage_touchpoints",
+            "support_actions",
+            "storyboard"
+          ],
+          "description": "Keep only cells in lanes with one semantic role (exact value) — use when the question is about one kind of participant's work, e.g. what the customer does versus what happens backstage."
+        },
+        "granularity": {
+          "type": "string",
+          "enum": [
+            "phase",
+            "scenario",
+            "path",
+            "step",
+            "lane",
+            "cell"
+          ],
+          "description": "The level rows answer at; default cell. Go coarser for a shape or overview question — `phase`/`scenario` for 'what does X look like', `path` for route listings, `step`/`lane` for who-does-what-when — and stay at `cell` for facts to cite."
         },
         "include": {
           "type": "array",

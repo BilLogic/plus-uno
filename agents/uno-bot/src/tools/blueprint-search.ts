@@ -15,6 +15,7 @@ import {
 } from "../integrations/blueprint";
 import { inventoryNotes } from "./blueprint-inventory-notes";
 import { conflictNote, INDEX_NOTE } from "./blueprint-search-notes";
+import { hasFilter, matchedNote, scopeFromInput } from "../integrations/blueprint-scope";
 
 /** Opt-in extra reads. One subrequest each, against a 50-per-invocation cap
  *  that a fallback search can already spend 5 of — so a status question does
@@ -33,8 +34,17 @@ export async function executeBlueprintSearch(
   input: Record<string, unknown>,
 ): Promise<string> {
   const query = typeof input.query === "string" ? input.query.trim() : "";
-  if (!query) {
-    return JSON.stringify({ ok: false, error: "missing 'query'" });
+  // The four filters and the granularity rung (#413). A bad rung is an error,
+  // not a silent default: answering at `cell` to a `phase` question would read
+  // as the blueprint having no phase-level view.
+  const { scope, error: scopeError } = scopeFromInput(input);
+  if (scopeError) {
+    return JSON.stringify({ ok: false, error: scopeError });
+  }
+  // Filter-only predicate mode: with a filter set, no `query` means "list the
+  // scope". Without one there is nothing to search.
+  if (!query && !hasFilter(scope)) {
+    return JSON.stringify({ ok: false, error: "missing 'query' (optional only when a filter_* is set)" });
   }
   if (!isBlueprintConfigured(env)) {
     // Degrade honestly: tell the model the blueprint is unavailable so it says
@@ -64,12 +74,19 @@ export async function executeBlueprintSearch(
       (i): i is "edges" | "findings" => i === "edges" || i === "findings",
     );
     const {
-      rows, retrieval, truncated, capped_by, cached, age_ms, thin, top_score,
+      rows, retrieval, truncated, capped_by, cached, age_ms, thin, top_score, matched_total,
       edges: fusedEdges, findings: fusedFindings,
     } = await searchBlueprint(env, query, {
       ...(fresh ? { fresh: true } : {}),
       ...(rpcInclude.length ? { include: rpcInclude } : {}),
+      scope,
     });
+    // The corpus-wide count behind the top-k (fused path only). Surfaced as
+    // `matched` with its own note, so "113 cells mention Zoom; here are 15" is
+    // sayable and a count answer never comes from counting the page.
+    const matched = typeof matched_total === "number" ? matched_total : undefined;
+    const matchedCountNote =
+      matched !== undefined ? matchedNote(matched, rows.length, scope.granularity ?? "cell") : undefined;
 
     // The live index (phases → scenarios → paths). Fetched AFTER the search so a
     // failure here can never cost the rows, self-cached per isolate with its own
@@ -229,7 +246,9 @@ export async function executeBlueprintSearch(
     return JSON.stringify({
       ok: true,
       query,
+      ...(hasFilter(scope) || scope.granularity ? { scope } : {}),
       count: rows.length,
+      ...(matched !== undefined ? { matched } : {}),
       // Which of the three paths served this. Surfaced so answer quality can be
       // attributed to retrieval instead of guessed at: "semantic" is the good
       // path, "tables" means both faster paths were unavailable.
@@ -253,7 +272,7 @@ export async function executeBlueprintSearch(
       ...(typeof sliceTotal === "number" ? { sliceTotal } : {}),
       notes:
         rows.length > 0
-          ? [grounding, attribution, conflict, indexNote, orientationNote, cacheNote, thinNote, linking, citing, freshness, semanticCaveat, edgesNote, findingsNote, findingsCountNote, slicesNote, sliceCountNote, truncation, ...inventory].filter(Boolean)
+          ? [grounding, attribution, conflict, indexNote, orientationNote, cacheNote, thinNote, matchedCountNote, linking, citing, freshness, semanticCaveat, edgesNote, findingsNote, findingsCountNote, slicesNote, sliceCountNote, truncation, ...inventory].filter(Boolean)
           : [
               // REWRITTEN 2026-08-17. This used to say "the blueprint has
               // nothing on this", which becomes wrong the moment the index
