@@ -13,6 +13,7 @@ import {
   fetchFindings,
   fetchSlices,
 } from "../integrations/blueprint";
+import { inventoryNotes } from "./blueprint-inventory-notes";
 
 /** Opt-in extra reads. One subrequest each, against a 50-per-invocation cap
  *  that a fallback search can already spend 5 of — so a status question does
@@ -218,6 +219,10 @@ export async function executeBlueprintSearch(
       slices && typeof sliceTotal === "number" && sliceTotal !== slices.length
         ? `The blueprint has ${sliceTotal} saved slices in total; \`slices\` shows ${slices.length} matched to this question. For any count-of-slices answer, use ${sliceTotal}.`
         : undefined;
+    // The blueprint's instance inventory — the detail classes it has no field
+    // for, and how thin its coverage runs — told only beside a result it
+    // explains (#412). It used to ride the always-loaded guide.
+    const inventory = inventoryNotes({ query, rows: rows.length, capped: Boolean(truncated) });
     // Same flag, opposite advice — so the note has to say WHICH cap fired.
     const truncation = truncated
       ? capped_by === "semantic"
@@ -252,7 +257,7 @@ export async function executeBlueprintSearch(
       ...(typeof sliceTotal === "number" ? { sliceTotal } : {}),
       notes:
         rows.length > 0
-          ? [grounding, attribution, conflict, indexNote, orientationNote, cacheNote, thinNote, linking, citing, freshness, semanticCaveat, edgesNote, findingsNote, findingsCountNote, slicesNote, sliceCountNote, truncation].filter(Boolean)
+          ? [grounding, attribution, conflict, indexNote, orientationNote, cacheNote, thinNote, linking, citing, freshness, semanticCaveat, edgesNote, findingsNote, findingsCountNote, slicesNote, sliceCountNote, truncation, ...inventory].filter(Boolean)
           : [
               // REWRITTEN 2026-08-17. This used to say "the blueprint has
               // nothing on this", which becomes wrong the moment the index

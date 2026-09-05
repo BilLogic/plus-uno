@@ -55,7 +55,11 @@ while IFS= read -r file; do
 # docs/adr/ is scanned for markdown links but NOT for backticked paths: an ADR's
 # job includes naming a path that was retired, and rewriting those would erase
 # the decision's own record. Live claims inside ADRs were repointed by hand.
-done < <({ find skills agents docs/connectors docs/engineering docs/conventions docs/adr docs/product-and-service design-system/guidelines docs/evals -type f -name '*.md' -not -path '*/node_modules/*' -not -path '*/transcripts/*'; echo AGENTS.md; echo CONTEXT.md; echo SETUP.md; echo README.md; } | sort)
+# agents/uno-bot/harness-bundle.md is GENERATED from the swept sources (the
+# bundler's readable companion); its links are theirs, already checked at their
+# own paths, and re-resolving them from the bundle's directory only invents
+# misses. check:retired-spelling skips it for the same reason.
+done < <({ find skills agents docs/connectors docs/engineering docs/conventions docs/adr docs/product-and-service design-system/guidelines docs/evals -type f -name '*.md' -not -path '*/node_modules/*' -not -path '*/transcripts/*' -not -path 'agents/uno-bot/harness-bundle.md'; echo AGENTS.md; echo CONTEXT.md; echo SETUP.md; echo README.md; } | sort)
 
 echo "[check] validating backticked repo paths resolve"
 
@@ -103,7 +107,12 @@ while IFS= read -r file; do
 # its own staleness banner (pre-2026-07 component paths, five components that do
 # not exist) and #165/#166 own its rebuild. Excluding it keeps 50 known findings
 # from burying new ones; it is not a pass.
-done < <({ find skills agents docs/connectors docs/engineering docs/conventions docs/product-and-service design-system/guidelines -type f -name '*.md' -not -path '*/node_modules/*' -not -path 'design-system/guidelines/components/overview.md'; echo AGENTS.md; echo CONTEXT.md; echo SETUP.md; } | sort)
+# docs/connectors/supabase/blueprint.md and blueprint-direct-access.md are VENDORED
+# from BilLogic/plus-uno-blueprint by agents/uno-bot/scripts/sync-blueprint-contract.mjs
+# and their backticked paths are that repo's (`docs/reference/...`, `scripts/...`).
+# Excluded from this pass only; their markdown links are rewritten to GitHub
+# URLs at sync time and stay checked above.
+done < <({ find skills agents docs/connectors docs/engineering docs/conventions docs/product-and-service design-system/guidelines -type f -name '*.md' -not -path '*/node_modules/*' -not -path 'design-system/guidelines/components/overview.md' -not -path 'docs/connectors/supabase/blueprint.md' -not -path 'docs/connectors/supabase/blueprint-direct-access.md' -not -path 'agents/uno-bot/harness-bundle.md'; echo AGENTS.md; echo CONTEXT.md; echo SETUP.md; } | sort)
 
 echo "[check] validating AGENTS.md skills-table rows resolve to SKILL.md files"
 

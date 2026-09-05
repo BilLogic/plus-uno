@@ -34,6 +34,15 @@ const script = path.join(here, "sync-blueprint-contract.mjs");
 const CANONICAL = "export const BLUEPRINT_CONTRACT = { breadcrumb: 'Lane' };\n";
 const DRIFTED = "export const BLUEPRINT_CONTRACT = { breadcrumb: 'Layer' };\n";
 
+// The account (#412): two docs beside the contract in the app, vendored into
+// docs/connectors/supabase/ here. The core carries a relative link to its
+// sibling and one that leaves docs/agents/; the rendering has to keep the
+// first and repoint the second.
+const CORE =
+  "---\naudience: agents\nsummary: The core.\n---\n\n# The blueprint, for agents\n\n" +
+  "See [the supplement](blueprint-direct-access.md) and [security](../engineering/access-and-security.md).\n";
+const SUPPLEMENT = "---\naudience: agents\nsummary: The supplement.\n---\n\n# Direct access\n\nGET /rest/v1/cells\n";
+
 /**
  * A throwaway pair of repos.
  *
@@ -41,30 +50,59 @@ const DRIFTED = "export const BLUEPRINT_CONTRACT = { breadcrumb: 'Layer' };\n";
  * copy relative to the working directory. `app` is null to model the checkout
  * being absent, which is the case the escape hatch is about.
  */
-function withRepos({ app, vendored }, run) {
+function withRepos({ app, vendored, account = { core: CORE, supplement: SUPPLEMENT }, vendoredAccount = "synced" }, run) {
   const root = mkdtempSync(path.join(tmpdir(), "contract-gate-"));
   const cwd = path.join(root, "uno-bot");
   mkdirSync(path.join(cwd, "src", "generated"), { recursive: true });
   const vendoredPath = path.join(cwd, "src", "generated", "blueprint-contract.ts");
   if (vendored !== null) writeFileSync(vendoredPath, vendored);
+  // The vendored account lands under the repo root, which the script reads
+  // from PLUS_UNO_ROOT; `root` plays that part here.
+  const docs = path.join(root, "docs", "connectors", "supabase");
+  mkdirSync(docs, { recursive: true });
+  const corePath = path.join(docs, "blueprint.md");
+  const supplementPath = path.join(docs, "blueprint-direct-access.md");
 
   let appRoot = path.join(root, "absent");
   if (app !== null) {
     appRoot = path.join(root, "uno-blueprint");
     mkdirSync(path.join(appRoot, "src", "lib"), { recursive: true });
     writeFileSync(path.join(appRoot, "src", "lib", "blueprintContract.ts"), app);
+    if (account) {
+      mkdirSync(path.join(appRoot, "docs", "agents"), { recursive: true });
+      writeFileSync(path.join(appRoot, "docs", "agents", "blueprint.md"), account.core);
+      writeFileSync(path.join(appRoot, "docs", "agents", "blueprint-direct-access.md"), account.supplement);
+    }
+  }
+  // "synced" writes what a prior sync would have — by running one — so a case
+  // about the CONTRACT is not also a case about an unsynced account. A string
+  // is a hand-planted vendored core (a drifted one, typically); null leaves
+  // the docs dir empty.
+  if (vendoredAccount === "synced" && app !== null && account) {
+    spawnSync(process.execPath, [script], {
+      cwd,
+      env: { ...process.env, BLUEPRINT_REPO: appRoot, PLUS_UNO_ROOT: root, BLUEPRINT_REVISION: "abc1234" },
+    });
+    // The sync above also repaired the contract; put the case's own back.
+    if (vendored !== null) writeFileSync(vendoredPath, vendored);
+    else rmSync(vendoredPath, { force: true });
+  } else if (typeof vendoredAccount === "string" && vendoredAccount !== "synced") {
+    writeFileSync(corePath, vendoredAccount);
   }
 
   const summary = path.join(root, "summary.md");
   writeFileSync(summary, "");
 
-  const invoke = (args, env = {}) => {
+  const invoke = (args, env = {}, rewriteAccount = null) => {
+    if (rewriteAccount?.core) writeFileSync(path.join(appRoot, "docs", "agents", "blueprint.md"), rewriteAccount.core);
     const result = spawnSync(process.execPath, [script, ...args], {
       cwd,
       encoding: "utf8",
       env: {
         ...process.env,
         BLUEPRINT_REPO: appRoot,
+        PLUS_UNO_ROOT: root,
+        BLUEPRINT_REVISION: "abc1234",
         // Annotations are CI-only, so the default here is a CI-shaped
         // environment. The last case below drops it to check the other side.
         GITHUB_ACTIONS: "true",
@@ -79,6 +117,8 @@ function withRepos({ app, vendored }, run) {
       out: `${result.stdout}${result.stderr}`,
       summary: readFileSync(summary, "utf8"),
       vendored: () => readFileSync(vendoredPath, "utf8"),
+      core: () => readFileSync(corePath, "utf8"),
+      supplement: () => readFileSync(supplementPath, "utf8"),
     };
   };
 
@@ -206,5 +246,69 @@ test("off CI it prints no workflow syntax, and exits the same way", () => {
       GITHUB_STEP_SUMMARY: path.join(tmpdir(), "no-such-dir-258", "summary.md"),
     });
     assert.equal(status, 0);
+  });
+});
+
+// ── The account (#412) ───────────────────────────────────────────────────────
+
+test("a sync renders the account with this repo's frontmatter and a vendored header", () => {
+  withRepos({ app: CANONICAL, vendored: CANONICAL, vendoredAccount: null }, (invoke) => {
+    const { status, out, core, supplement } = invoke([]);
+    assert.equal(status, 0);
+    assert.match(out, /synced: blueprint\.md/);
+    assert.match(out, /synced: blueprint-direct-access\.md/);
+    const c = core();
+    assert.match(
+      c,
+      /^---\nembodiment: all\nsummary: The core\.\nvendored_from: BilLogic\/plus-uno-blueprint docs\/agents\/blueprint\.md\nvendored_revision: abc1234\n---\n/,
+    );
+    assert.match(c, /<!-- VENDORED from BilLogic\/plus-uno-blueprint docs\/agents\/blueprint\.md by agents\/uno-bot\/scripts\/sync-blueprint-contract\.mjs\./);
+    assert.ok(
+      c.endsWith(
+        "# The blueprint, for agents\n\nSee [the supplement](blueprint-direct-access.md) and [security](https://github.com/BilLogic/plus-uno-blueprint/blob/main/docs/engineering/access-and-security.md).\n",
+      ),
+      c,
+    );
+    assert.doesNotMatch(c, /audience: agents/, "the source's frontmatter is replaced, not carried");
+    // The supplement is for a session with a key: IDE only, so the bundler's
+    // glob never carries it to the Worker.
+    assert.match(supplement(), /^---\nembodiment: ide\n/);
+  });
+});
+
+test("a drifted account fails the check, and names the vendored file", () => {
+  // A vendored core that is the source's OLD bytes, rendered — the shape a
+  // rename in the blueprint leaves behind.
+  withRepos({ app: CANONICAL, vendored: CANONICAL, vendoredAccount: null }, (invoke) => {
+    invoke([]);
+    // Now move the app's copy on, and check.
+    const moved = CORE.replace("The core.", "The core, renamed.");
+    const { status, out } = invoke(["--check"], {}, { core: moved });
+    assert.equal(status, 1);
+    assert.match(out, /drift: docs\/connectors\/supabase\/blueprint\.md differs from the app's blueprint\.md/);
+  });
+});
+
+test("the check ignores the recorded revision — a shallow CI checkout is not drift", () => {
+  withRepos({ app: CANONICAL, vendored: CANONICAL }, (invoke) => {
+    const { status } = invoke(["--check"], { BLUEPRINT_REVISION: "fedcba9" });
+    assert.equal(status, 0, "the same bytes under a different HEAD must pass");
+  });
+});
+
+test("an app checkout that has the contract but not the account fails, hatch or no hatch", () => {
+  withRepos({ app: CANONICAL, vendored: CANONICAL, account: null, vendoredAccount: null }, (invoke) => {
+    const { status, out } = invoke(["--check"], { BLUEPRINT_CONTRACT_OPTIONAL: "1" });
+    assert.equal(status, 1);
+    assert.match(out, /blueprint account not found/);
+    assert.match(out, /has not published it/);
+  });
+});
+
+test("the absent-checkout handling covers the account too — nothing is copied, nothing passes", () => {
+  withRepos({ app: null, vendored: CANONICAL, vendoredAccount: null }, (invoke) => {
+    assert.equal(invoke(["--check"]).status, 1);
+    assert.equal(invoke([]).status, 1);
+    assert.equal(invoke(["--check"], { BLUEPRINT_CONTRACT_OPTIONAL: "1" }).status, 0, "the hatch still excuses a missing CHECKOUT");
   });
 });

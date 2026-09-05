@@ -34,6 +34,21 @@
 // scope, and imported here by file URL because this test's compiled twin runs
 // from `.test-build/` where a relative import cannot reach the repo root. The
 // same two sweeps run over them, sentence-scoped with the same exemption.
+//
+// THE SCHEMA IS IN THE PROMPT NOW (#412). docs/connectors/supabase/blueprint.md
+// is the blueprint's own account, vendored from plus-uno-blueprint, and its
+// `generated:schema` region is the live catalog rendered table by table. Two
+// consequences for this sweep. First, that region is the ALLOWLIST: every
+// backticked `table.column` in the swept prose has to resolve against it, which
+// catches a name that was never right as well as one that was retired — the
+// blocklist below cannot, and needs a hand edit per rename. Second, the region
+// is itself exempt from the blocklist: it is a rendering of what exists, so a
+// live column that happens to share a retired name (`authoring_changes.label`,
+// `trash.label` — the retired one was `cell_dependencies.label`) is correct
+// there and would be condemned by a bare-word match. What guards the region's
+// own truth is the chain it arrives by: plus-uno-blueprint's
+// `check:agent-account` fails when the catalog and the render disagree, and
+// `sync-blueprint-contract.mjs --check` fails when the vendored bytes differ.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
@@ -48,7 +63,10 @@ import {
 
 const REPO = resolve(process.cwd(), "..", "..");
 const BOT = resolve(REPO, "agents", "uno-bot");
+const ACCOUNT = resolve(REPO, "docs", "connectors", "supabase", "blueprint.md");
 const PROMPT_MARKER = "## The assembled prompt";
+const SCHEMA_OPEN = /<!-- generated:schema[^>]*-->/;
+const SCHEMA_CLOSE = "<!-- /generated:schema -->";
 
 /** The Actions-prompt walk, from the one module that owns it. */
 type ActionsPrompts = {
@@ -66,6 +84,56 @@ function assembledPrompt(): string {
   const at = bundle.indexOf(PROMPT_MARKER);
   assert.notEqual(at, -1, "harness-bundle.md has no assembled-prompt section");
   return bundle.slice(at);
+}
+
+/** The rendered catalog, cut out of a text; the text with it blanked to the
+ *  same line count, so reported line numbers stay right. */
+function splitSchema(text: string): { schema: string; rest: string } {
+  const open = text.search(SCHEMA_OPEN);
+  const close = text.indexOf(SCHEMA_CLOSE);
+  if (open === -1 || close === -1) return { schema: "", rest: text };
+  const schema = text.slice(open, close);
+  const blank = schema.replace(/[^\n]/g, "");
+  return { schema, rest: text.slice(0, open) + blank + text.slice(close) };
+}
+
+/** table → its columns, read off the account's `### \`table\`` sections and the
+ *  `| \`column\` |` rows beneath each. A table listed as unreadable with the
+ *  anon key has no rows and is recorded with no columns. */
+export function schemaTables(text: string): Map<string, Set<string>> {
+  const out = new Map<string, Set<string>>();
+  let current: Set<string> | undefined;
+  for (const line of splitSchema(text).schema.split("\n")) {
+    const table = line.match(/^### `([a-z_]+)`/);
+    if (table) {
+      current = new Set();
+      out.set(table[1]!, current);
+      continue;
+    }
+    const unreadable = line.match(/^- `([a-z_]+)` — /);
+    if (unreadable && !out.has(unreadable[1]!)) out.set(unreadable[1]!, new Set());
+    const column = current && line.match(/^\| `([a-z_]+)` \|/);
+    if (column) current!.add(column[1]!);
+  }
+  return out;
+}
+
+/** Every backticked `table.column` whose table the schema knows and whose
+ *  column it does not. A table the schema lacks is left to the blocklist — the
+ *  prompt is full of `file.ext` spans that look the same. */
+export function unresolved(text: string, schema: Map<string, Set<string>>, source: string): string[] {
+  const found: string[] = [];
+  const { rest } = splitSchema(text);
+  let line = 1;
+  for (const raw of rest.split("\n")) {
+    for (const m of raw.matchAll(/`([a-z_]+)\.([a-z_]+)`/g)) {
+      const columns = schema.get(m[1]!);
+      if (!columns || columns.has(m[2]!)) continue;
+      found.push(`${source}:${line} names \`${m[1]}.${m[2]}\`, which the schema lacks`);
+    }
+    line++;
+  }
+  return found;
 }
 
 function toolDefinitions(): string {
@@ -120,10 +188,11 @@ function sentences(body: string): string[] {
   return body.split(/(?<=[.!?])\s+/).filter((x) => x.trim());
 }
 
-/** Paragraphs naming a retired identifier, minus passages ABOUT the rename. */
+/** Paragraphs naming a retired identifier, minus passages ABOUT the rename,
+ *  and minus the rendered catalog (see the header). */
 function offenders(text: string, source: string): string[] {
   const found: string[] = [];
-  for (const { line, body } of paragraphs(text)) {
+  for (const { line, body } of paragraphs(splitSchema(text).rest)) {
     for (const sentence of sentences(body)) {
       if (CORRECTION.test(sentence)) continue;
       for (const name of RETIRED_IN_PROSE) {
@@ -235,4 +304,56 @@ test("a wire name is not condemned as a retired column", () => {
 test("the sweep bites — a retired name in prose is caught", () => {
   const planted = "read `path_type` AND `name` before answering.";
   assert.deepEqual(offenders(planted, "planted"), ["planted:1 names `path_type`"]);
+});
+
+// ── The allowlist (#412) ─────────────────────────────────────────────────────
+
+test("the vendored account is in the prompt, and its catalog parses", () => {
+  const prompt = assembledPrompt();
+  assert.ok(prompt.includes("<!-- docs/connectors/supabase/blueprint.md -->"), "the account must be bundled");
+  const schema = schemaTables(prompt);
+  assert.ok(schema.size >= 10, `expected the rendered catalog, got ${schema.size} table(s)`);
+  for (const [table, columns] of [
+    ["cells", ["content", "summary", "frame", "status", "lane_id", "step_id", "path_id"]],
+    ["paths", ["kind", "status", "scenario_id"]],
+    ["resources", ["cell_id", "url", "kind"]],
+  ] as const) {
+    for (const column of columns) assert.ok(schema.get(table)?.has(column), `${table}.${column}`);
+  }
+  assert.ok(schema.has("business_models"), "an unreadable table is still a table the schema has");
+});
+
+test("every qualified identifier in the assembled prompt resolves against the account", () => {
+  const schema = schemaTables(assembledPrompt());
+  assert.deepEqual(unresolved(assembledPrompt(), schema, "harness-bundle.md"), []);
+});
+
+test("every qualified identifier in the tool schemas resolves against the account", () => {
+  const schema = schemaTables(assembledPrompt());
+  assert.deepEqual(unresolved(toolDefinitions(), schema, "tool-definitions.json"), []);
+});
+
+test("the allowlist bites — a column the schema lacks is caught, on a table it has", () => {
+  const schema = schemaTables(readFileSync(ACCOUNT, "utf8"));
+  assert.deepEqual(unresolved("read `cells.picture` first, then `cells.colour`.", schema, "planted"), [
+    "planted:1 names `cells.picture`, which the schema lacks",
+    "planted:1 names `cells.colour`, which the schema lacks",
+  ]);
+  // A live column passes; a `file.ext` span is not an identifier claim.
+  assert.deepEqual(unresolved("read `cells.frame`; see `AGENT.md` and `bot.md`.", schema, "planted"), []);
+});
+
+test("the blocklist bites in the account's hand-written part, and is silent inside its catalog", () => {
+  const account = readFileSync(ACCOUNT, "utf8");
+  // The catalog names live columns that share a retired spelling. Correct
+  // there — and this is what exempting the region buys.
+  assert.deepEqual(offenders(account, "account"), []);
+  // A retired name planted in the hand-written part: caught.
+  const planted = account.replace("## What it is", "## What it is\n\nRead `path_type` first.");
+  assert.equal(offenders(planted, "account").length, 1);
+  assert.match(offenders(planted, "account")[0]!, /names `path_type`/);
+  // Planted inside the catalog: not this sweep's finding — the catalog's truth
+  // is the blueprint's check:agent-account and the sync's drift gate.
+  const inCatalog = account.replace("### `cells`", "### `cells`\nRead `path_type` first.");
+  assert.deepEqual(offenders(inCatalog, "account"), []);
 });

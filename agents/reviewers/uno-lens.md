@@ -23,5 +23,6 @@ Judges whether the artifact does what the PRD says and violates no known bluepri
 ## Conventions it obeys
 
 - `docs/connectors/supabase/overview.md` — blueprint is queried at task time, read-only here
-- `docs/connectors/supabase/blueprint-navigation.md` — schema, layer/path semantics, how to cite a cell
+- `docs/connectors/supabase/blueprint.md` — the blueprint's own account: shape, path semantics, schema
+- `docs/connectors/supabase/blueprint-navigation.md` — how to cite a cell
 - Scored by: `docs/evals/rubrics/uno-review.md`
