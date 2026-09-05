@@ -381,7 +381,7 @@
     },
     {
       "id": "T1",
-      "name": "a short reply to a proposal runs chill at low (ADR-027)",
+      "name": "a short reply to a proposal runs chill at low (ADR-028)",
       "blocker": true,
       "turns": [
         {
@@ -407,7 +407,7 @@
     },
     {
       "id": "T2",
-      "name": "\"think harder\" runs grind at high (ADR-027)",
+      "name": "\"think harder\" runs grind at high (ADR-028)",
       "blocker": true,
       "turns": [
         {
