@@ -9,7 +9,7 @@ import { geminiConfigured, geminiGenerate } from "./gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "./vertex/claude";
 import { MODELS } from "./agent/routing";
 import { runAgent } from "./agent/run-agent";
-import type { ToolCall, TurnDials } from "./agent/loop-shared";
+import { withTurnScope, type ToolCall, type TurnDials } from "./agent/loop-shared";
 import { preflight } from "./agent/preflight";
 import type { HistoryTurn, PendingProposal } from "./thread-state-client";
 import { BUILD } from "./version";
@@ -527,19 +527,30 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
   // maintain turn read `uno-maintain/method` before proposing), where the
   // result alone shows only the final proposal or text.
   const tools: ToolCall[] = [];
+  // Names read_reference SERVED this turn (hits only) — the receipt production
+  // persists on the user HistoryTurn in place of the text (slack/events.ts
+  // turnReferences, #423). Collected the way production collects it, inside
+  // withTurnScope, so the eval runner can thread the same receipt into the
+  // next turn's history and a case can assert the text did not travel with it
+  // (#426). Deriving it from `tools` would count misses too.
+  let references: string[] = [];
   const startedAt = Date.now();
   try {
-    const result = await runAgent({
-      env,
-      userText: prompt,
-      history,
-      slack: { channel, threadTs: "0", userMsgTs: "0", requestedBy },
-      currentSender: { userId: requestedBy },
-      pending,
-      onInterim: (t) => narration.push(t),
-      onDials: (d) => { dials = d; },
-      onToolCall: (c) => tools.push(c),
-    });
+    const agentRun = await withTurnScope({ correction: false }, () =>
+      runAgent({
+        env,
+        userText: prompt,
+        history,
+        slack: { channel, threadTs: "0", userMsgTs: "0", requestedBy },
+        currentSender: { userId: requestedBy },
+        pending,
+        onInterim: (t) => narration.push(t),
+        onDials: (d) => { dials = d; },
+        onToolCall: (c) => tools.push(c),
+      }),
+    );
+    const result = agentRun.result;
+    references = agentRun.references;
     // Mirror production's clarify gate: when a proposal comes back, report what
     // preflight would have asked (events.ts applies this before staging).
     let gateAsk: string | null = null;
@@ -559,7 +570,7 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
       subrequests: subrequestsUsed(), subrequest_hosts: meterBreakdown(),
       internal_subrequests: internalSubrequestsUsed(),
       budget_trips: subrequestBudgetTrips(),
-      narration, dials, tools, gateAsk, result,
+      narration, dials, tools, references, gateAsk, result,
     });
   } catch (err) {
     return Response.json({

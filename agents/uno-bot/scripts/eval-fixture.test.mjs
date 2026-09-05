@@ -98,6 +98,18 @@ test("every blocker survives one dissenting judge", () => {
   }
 });
 
+test("a history assertion sits on a later turn of a multi-turn case", () => {
+  // `expectHistory` asserts on what the runner SENT to a turn — the thread so
+  // far. On a first turn that is always empty, so the assertion would pass
+  // with nothing under test (C1, #426).
+  for (const c of cases) {
+    c.turns.forEach((turn, i) => {
+      if ("expectHistory" in turn) assert.ok(i > 0, `${c.id} asserts history on its first turn`);
+    });
+    assert.equal("expectHistory" in c, false, `${c.id}: expectHistory is a turn key, not a case key`);
+  }
+});
+
 test("the README's case count matches the fixture", () => {
   // It said 16 while the file held 20 — R20 and S1–S3 were added without it.
   // A number in prose that nothing compares is a number that will be wrong.

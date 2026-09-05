@@ -1,5 +1,5 @@
 {
-  "_readme": "Machine-readable eval cases for uno-bot, derived from docs/evals/scenarios/uno-bot.md (R1-R12) and scored against docs/evals/rubrics/bot-answer.md. Driven by agents/uno-bot/scripts/run-evals.mjs against the live Worker's /debug/eval route (headless agent turns — proposals come back as data, nothing posts to Slack/Notion). Multi-turn cases thread history/pending between turns. 'allowProposalIfGateAsk' accepts a proposal ONLY when the production preflight clarify-gate would have intercepted it (the endpoint reports gateAsk). All cases run headless via /debug/eval. Cases may set `channel` / `requestedBy` (case- or turn-level) when the SURFACE is under test — own-visibility Slack search only activates in the requester's own bot DM (a channel id starting with D), so a case asserting the ADR-020 gate must say which surface it is on or it passes for the wrong reason. `expectToolCalled: { tool, args? }` asserts against the route's `tools` list — every call the model made, in order, with its arguments — so a case can prove a read happened on the way to the result (M1: `read_reference` for `uno-maintain/method`).",
+  "_readme": "Machine-readable eval cases for uno-bot, derived from docs/evals/scenarios/uno-bot.md (R1-R12) and scored against docs/evals/rubrics/bot-answer.md. Driven by agents/uno-bot/scripts/run-evals.mjs against the live Worker's /debug/eval route (headless agent turns — proposals come back as data, nothing posts to Slack/Notion). Multi-turn cases thread history/pending between turns. 'allowProposalIfGateAsk' accepts a proposal ONLY when the production preflight clarify-gate would have intercepted it (the endpoint reports gateAsk). All cases run headless via /debug/eval. Cases may set `channel` / `requestedBy` (case- or turn-level) when the SURFACE is under test — own-visibility Slack search only activates in the requester's own bot DM (a channel id starting with D), so a case asserting the ADR-020 gate must say which surface it is on or it passes for the wrong reason. `expectToolCalled: { tool, args? }` asserts against the route's `tools` list — every call the model made, in order, with its arguments — so a case can prove a read happened on the way to the result (M1: `read_reference` for `uno-maintain/method`). `expectHistory: { references?, maxChars? }` on a LATER turn asserts against the history the runner SENT to that turn — the receipt names must sit on a history turn's `references` (where production carries them, slack/events.ts) and the serialized history must stay within `maxChars` — so a case can prove a reference fetched in turn 1 reached turn 2 as its receipt and not as its text (C1).",
   "cases": [
     {
       "id": "R1",
@@ -465,6 +465,60 @@
         }
       },
       "judgeNote": "AUTHORED 2026-09-05 (#424). uno-publish's method left the always-loaded prompt for the reference map, and its Worker face ends in a pointer naming `uno-publish/method`; this case proves a publish turn still runs the method by reaching it through that pointer. Deterministic: the route's tool list holds a read_reference call whose name is exactly `uno-publish/method`, and the staged tool is shareout_post (R3's routing, kept) — a turn that stages from the face alone, or reads a different name, fails here regardless of how good the card is. For the judge, the proposal follows the method's feedback rail: the rail decided once (feedback — the ask says so), the share-out staged immediately with the link in hand rather than held for the Loom / preview / Decisions pieces (the card audits those), fidelity and round carried from the ask, at most three stage-specific questions drawn from what the designer asked about, and a not-looking-for line carrying the layout-polish exclusion. A reply that interrogates for missing bundle pieces before staging, routes to the marketplace, or names reviewers without a notion_search fails."
+    },
+    {
+      "id": "V1",
+      "name": "a review turn reads uno-review/method by pointer before critiquing (#424)",
+      "blocker": true,
+      "samples": 3,
+      "turns": [
+        {
+          "prompt": "Can you poke holes in this before I share it out? Tutor session sign-up sheet, mid-fi, built in Figma and Storybook, PRD is the Roadmap card of the same name: https://plus-uno.netlify.app/prototypes/session-sign-up/"
+        }
+      ],
+      "expectKind": [
+        "text",
+        "proposal"
+      ],
+      "expectToolCalled": {
+        "tool": "read_reference",
+        "args": {
+          "name": "uno-review/method"
+        }
+      },
+      "judgeNote": "AUTHORED 2026-09-05 (#424 disclosed the method; case added with #426). uno-review's Worker face is complete in-file and ends in a pointer naming `uno-review/method`; this case proves a review turn reaches the method through that pointer before it judges. Deterministic: the route's tool list holds a read_reference call whose name is exactly `uno-review/method` — a critique written from the face alone fails here regardless of how sharp it is. For the judge: the reply is the 🔍 critique in-thread, every finding resting on content fetched this turn (a source_read of the link, the PRD found by notion_search or asked for once), each carrying severity · lens · evidence · reference · re-entry, with a what's-working section; computed values (exact WCAG ratios, 44×44 targets, focus order) are named as IDE-only and marked partial, not asserted. If the link cannot be fetched, the turn says so and ends at a gated notion_create intake (kind proposal) rather than inventing findings. A reply that critiques from the URL alone without fetching, states a measured ratio, or fixes the artifact itself fails."
+    },
+    {
+      "id": "C1",
+      "name": "a fetched method does not ride the thread — turn 2 receives the receipt, not the text (#426)",
+      "blocker": true,
+      "samples": 3,
+      "turns": [
+        {
+          "prompt": "The bot keeps telling people that a small wording tweak to a skill counts as Tier 1 and can just be applied — that's wrong, Tier 1 is typos, links, dates and formatting only, and anything touching a skill is Tier 2. Take this as an intake.",
+          "expectKind": [
+            "text",
+            "proposal"
+          ],
+          "expectToolCalled": {
+            "tool": "read_reference",
+            "args": {
+              "name": "uno-maintain/method"
+            }
+          }
+        },
+        {
+          "prompt": "Before you file it — which tier did you land on for this one, and what in the method decided it?",
+          "usePendingFromPreviousTurn": true,
+          "expectHistory": {
+            "references": [
+              "uno-maintain/method"
+            ],
+            "maxChars": 8000
+          }
+        }
+      ],
+      "judgeNote": "AUTHORED 2026-09-05 (#426). The clearing half of the reference design (#423): a method read in turn 1 is that turn's tool result and ends with it; turn 2 sees one stub line naming it (provider-conversation.ts), carried as the `references` receipt on the user turn that read it (slack/events.ts). Deterministic, two turns: turn 1's tool list holds read_reference `uno-maintain/method` (M1's ask, reused so the fetch is not in doubt); the history the runner SENT to turn 2 carries `references: [\"uno-maintain/method\"]` on a history turn and serializes under 8000 chars — the method alone is ~10k, so a history that carried its text cannot pass, while a thread of prompt + reply + receipt sits well under. The receipt comes from the same turn scope production persists it from (/debug/eval runs inside withTurnScope) and the runner threads it as events.ts does, so what is measured is the bot's history and not the runner's. For the judge: turn 2 answers the tier question from turn 1's own reply — Tier 2, because the whitelist for direct fixes is typos, links, dates and formatting and this touches a skill — without claiming the card was filed or the fix applied; re-reading the method in turn 2 is allowed (the face says so), never required. A turn-2 reply that says the method is unavailable, or that it never read it, fails."
     }
   ]
 }
