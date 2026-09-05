@@ -21,6 +21,7 @@ import { TOOLS } from "./tool-definitions";
 import { SIDE_EFFECT_TOOLS } from "./types";
 import { buildSystemBlocks } from "./skills";
 import { routeRequest } from "./routing";
+import { geminiDials, resolveGeminiModel } from "./gemini-tiers";
 import { geminiGenerateRaw } from "../gemini/client";
 import { ensureHarnessCache } from "../gemini/cache";
 import { BUILD } from "../version";
@@ -135,13 +136,14 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   // Same three lanes as the Anthropic path. Until 2026-08-07 Gemini expressed
   // them through thinkingLevel on ONE model — which collapsed two of the three:
   // `default` and `grind` both resolved to "high", so the escalation tier did
-  // nothing on the lane we actually run.
+  // nothing on the lane we actually run. From 2026-08-07 the MODEL was the tier
+  // and the dial was pinned at `medium` so a regression had one variable — which
+  // ran the pro model below its own default on "think harder" and the lite
+  // model above its own on a six-word reply.
   //
-  // Now the MODEL is the tier and the dial is held constant at `medium`. Two
-  // interacting variables make a regression impossible to attribute — an answer
-  // that got worse could be the model or the level — so one of them is pinned.
-  // `medium` is also gemini-3.6-flash's own default, which is the overspend fix:
-  // every ordinary turn had been paying `high` because a Claude tier map said so.
+  // Now a tier is model PLUS level, moving together (ADR-027): chill low,
+  // default medium, grind high. The resolution lives in gemini-tiers.ts so the
+  // unit suite can assert the level a turn is sent with.
   const { tier, reason: routeReason } = routeRequest({ userText, hasPending: pending !== null, override: input.tierOverride });
 
   // Keyed like the CONVERSATION, not the thread. /stop arrives carrying only a
@@ -161,42 +163,13 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   const cancelThread =
     slack?.conversationTs ?? (slack?.channel?.startsWith("D") ? "dm" : (slack?.threadTs ?? "dm"));
 
-  // All model-generation-specific dials, derived together so a mid-turn model
-  // fallback (below) recomputes them consistently:
-  //   • thinkingLevel — flash-lite is the minimal-thinking tier; it doesn't
-  //     take the higher thinking_level dials the full flash/pro models do.
-  //   • supportsThinkingLevel — thinking_level is a Gemini 3.x dial; 2.5-gen
-  //     models 400 on it ("not supported by this model", probed live 2026-07-16
-  //     during the quota incident on the gemini-2.5-pro bridge).
-  //   • builtinSearchTools — Gemini 2.x REJECTS mixing local function
-  //     declarations with built-in search tools ("Multiple tools are supported
-  //     only when they are all search tools", 400, probed live 2026-07-16).
-  //     The bot's LOCAL tools are load-bearing (all grounding runs through
-  //     them); googleSearch/urlContext are a nice-to-have, so on 2.x we keep
-  //     the function tools and drop the built-ins.
-  const modelDials = (m: string) => {
-    const isGemini3 = /^gemini-3/.test(m);
-    return {
-      // One dial, held constant. thinking_level tops out at "high" and there is
-      // no rung above it (ai.google.dev/gemini-api/docs/thinking), so effort
-      // beyond `default` has to come from a bigger model, not a bigger number.
-      thinkingLevel: "medium" as string,
-      supportsThinkingLevel: isGemini3,
-      builtinSearchTools: isGemini3 ? [{ googleSearch: {} }, { urlContext: {} }] : [],
-    };
-  };
-
-  // Tier → model. Each is overridable so a model can be swapped without a
-  // deploy; GEMINI_GRIND_MODEL is deliberately NOT GEMINI_FALLBACK_MODEL, which
-  // means "what we use when the primary fails" — conflating the good model with
-  // the failure model makes an outage silently expensive.
-  const tierModel: Record<typeof tier, string> = {
-    chill: env.GEMINI_CHILL_MODEL ?? "gemini-3.5-flash-lite",
-    default: env.GEMINI_MODEL ?? "gemini-3.6-flash",
-    grind: env.GEMINI_GRIND_MODEL ?? "gemini-3.1-pro-preview",
-  };
-  let model = tierModel[tier];
-  let { thinkingLevel, supportsThinkingLevel, builtinSearchTools } = modelDials(model);
+  // Tier → model (env-overridable per tier) → every model-generation dial,
+  // derived together so the mid-turn model fallback (below) recomputes them
+  // consistently: the tier stays, the model changes underneath it, and the
+  // level is re-derived against the new model. See gemini-tiers.ts for what
+  // each dial means and the live probes behind the 2.x/3.x split.
+  let model = resolveGeminiModel(tier, env);
+  let { thinkingLevel, builtinSearchTools } = geminiDials(tier, model);
 
   // Backup-model failover (2026-07-16 quota incident — flash quota exhausted,
   // every turn 429'd, bot down in Slack for an afternoon). When the active
@@ -230,9 +203,14 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
       `[budget] ${subrequestsUsed()}/${SUBREQUEST_CAP} subrequests spent (lookup ceiling ${LOOKUP_CEILING}), ` +
         `${toolCallsUsed} tools, ${subrequestBudgetTrips()} budget stops | ${meterBreakdown()}`,
     );
+    // level= is what the LAST model call was sent with: the tier's level, or
+    // "none" when the model in use (a 2.x fallback) takes no dial. Beside
+    // tier= and model= so a regression reads as one named configuration.
+    const dials = { tier, route: routeReason, model, level: thinkingLevel };
+    input.onDials?.(dials);
     console.log(
       `[uno-bot] request done build=${BUILD} provider=gemini tier=${tier} route=${routeReason} model=${model} ` +
-        `fallback=${fellBack ? "yes" : "no"} ` +
+        `level=${thinkingLevel ?? "none"} fallback=${fellBack ? "yes" : "no"} ` +
         `iterations=${iterations} tokens_in=${inputTokens} tokens_out=${outputTokens} thinking=${thinkingTokens} ` +
         `cached_in=${cachedTokens} ` +
         `ms=${Date.now() - startedAt} tools=[${toolNamesUsed.join(",")}] mcp=off outcome=${result.kind}`,
@@ -297,7 +275,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
         : {}),
       generationConfig: {
         maxOutputTokens: MAX_TOKENS,
-        ...(supportsThinkingLevel ? { thinkingConfig: { thinkingLevel } } : {}),
+        ...(thinkingLevel ? { thinkingConfig: { thinkingLevel } } : {}),
       },
     };
     const { status, data } = await geminiGenerateRaw(env, model, body);
@@ -305,7 +283,8 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
     if (status !== 200) {
       // One-shot failover to the backup model on capacity/availability
       // failures — mid-turn is fine, the conversation contents are
-      // model-agnostic. Dials recompute for the new model's generation.
+      // model-agnostic. Dials recompute for the new model: the tier (and so
+      // its level) stays, the model under it changes.
       if (!fellBack && FALLBACK_STATUSES.has(status) && fallbackModel && fallbackModel !== model) {
         fellBack = true;
         console.warn(
@@ -313,7 +292,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
             `falling back to ${fallbackModel} for the rest of this turn`,
         );
         model = fallbackModel;
-        ({ thinkingLevel, supportsThinkingLevel, builtinSearchTools } = modelDials(model));
+        ({ thinkingLevel, builtinSearchTools } = geminiDials(tier, model));
         // A cachedContents resource is bound to the model that created it, so
         // the backup model cannot reference it — carrying the name over would
         // turn a recoverable capacity failure into a hard 400. Inline for the

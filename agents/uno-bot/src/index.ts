@@ -9,6 +9,7 @@ import { geminiConfigured, geminiGenerate } from "./gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "./vertex/claude";
 import { MODELS } from "./agent/routing";
 import { runAgent } from "./agent/run-agent";
+import type { TurnDials } from "./agent/loop-shared";
 import { preflight } from "./agent/preflight";
 import type { HistoryTurn, PendingProposal } from "./thread-state-client";
 import { BUILD } from "./version";
@@ -516,6 +517,11 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
     : null;
 
   const narration: string[] = [];
+  // The tier the turn routed to and the model + thinking level the last model
+  // call was sent with — what the `request done` log line carries, surfaced
+  // here so an eval case can assert the LEVEL and not just the model (#421,
+  // ADR-028). Null if the loop never reached its finish.
+  let dials = null as TurnDials | null;
   const startedAt = Date.now();
   try {
     const result = await runAgent({
@@ -526,6 +532,7 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
       currentSender: { userId: requestedBy },
       pending,
       onInterim: (t) => narration.push(t),
+      onDials: (d) => { dials = d; },
     });
     // Mirror production's clarify gate: when a proposal comes back, report what
     // preflight would have asked (events.ts applies this before staging).
@@ -546,7 +553,7 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
       subrequests: subrequestsUsed(), subrequest_hosts: meterBreakdown(),
       internal_subrequests: internalSubrequestsUsed(),
       budget_trips: subrequestBudgetTrips(),
-      narration, gateAsk, result,
+      narration, dials, gateAsk, result,
     });
   } catch (err) {
     return Response.json({
