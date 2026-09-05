@@ -17,6 +17,14 @@
 // "a failing row is a release blocker". Full transcripts land in
 // eval-results.json for reasoning investigation.
 //
+// A case may also declare `subject: { need }` — a CONDITION the live blueprint
+// answers with a row, fetched once before turn 1 from the Worker's
+// /debug/blueprint-subject route and substituted into every `{{subject.…}}` the
+// case spells (#415, scripts/eval-subjects.mjs). A condition nothing on the
+// board satisfies makes the case SKIPPED: neither a pass nor a failure, counted
+// apart in the summary. A case that named its subject instead would encode a
+// fact about a board that is edited daily.
+//
 // Env required:
 //   WORKER_URL      e.g. the Worker origin (scripts/worker-url.mjs, or UNO_BOT_WORKER_URL)
 //   DEBUG_TOKEN     the Worker's /debug/* gate token
