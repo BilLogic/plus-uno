@@ -41,6 +41,7 @@
     "check:negation": "node scripts/check-negation-ratchet.mjs",
     "check:pointers": "node scripts/check-pointers.mjs",
     "check:glossary": "node scripts/check-glossary.mjs",
+    "check:retired-spelling": "node scripts/check-retired-spelling.mjs",
     "check:button-contrast": "node scripts/check-button-contrast.mjs",
     "check:token-collision": "node scripts/check-token-collision.mjs",
     "check:colour-fallbacks": "node scripts/check-colour-fallbacks.mjs",

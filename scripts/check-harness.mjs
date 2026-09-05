@@ -168,6 +168,12 @@ const COMPOSED = [
       'CONTEXT.md staying a glossary: no fenced code, no third-level headings, every section holding term rows, and prose lines ratcheted against docs/evals/glossary-baseline.json — the count may fall, never rise. The two sibling repos grew their CONTEXT.md to 40k and 18k chars one "just one more section" at a time (#420); this is what stops it here.',
   },
   {
+    script: 'check:retired-spelling',
+    pkg: 'root',
+    guards:
+      'the contract of the maintenance-severity rename (#429): "Tier 1 / Tier 2" for a FIX stays retired across every hand-authored doc an agent reads — the constitution, glossary, agents/, skills/, docs/, the DS guidelines, the headless prompts and the workflows — because *Tier* now means the loading tiers and a maintenance "Tier 1" reads as always-loaded. Each shape is anchored on a severity noun (fix, digest, whitelist, pipeline, "suggested tier", the old file names), so the loading uses match nothing. History (docs/plans/, todos/), ADRs, the archive and generated artifacts are left as written by rule; the glossary row that names the old spelling in its Do NOT use cell is the one exemption.',
+  },
+  {
     script: 'check:button-contrast',
     pkg: 'root',
     guards:
