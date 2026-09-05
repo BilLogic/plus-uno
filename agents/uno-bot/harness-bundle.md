@@ -15,11 +15,11 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **166,961 chars from 21 files**, against an assembled budget of 170,000 (3,039 to spare).
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **166,961 chars from 21 files**, against an assembled budget of 170,000 (3,039 to spare), and a floor of 131,072 plus a 4,000 margin (31,889 above it). The floor is the Gemini lane's explicit-cache minimum; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,067 (−9,271 ide-only) | 9,067 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,067 (−9,515 ide-only) | 9,067 | — |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 7,111 | 16,206 | — |
 | 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,999 | 44,246 | 28,000 (persona) |
 | 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 54,502 | — |
