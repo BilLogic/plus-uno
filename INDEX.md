@@ -177,6 +177,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/024-slack-app-configuration-is-a-one-way-door.md`](docs/adr/024-slack-app-configuration-is-a-one-way-door.md) | Slack app config only ever widens — narrowing a scope costs a full uninstall, and PKCE forecloses scripted manifest writes (2026-08-06) |
 | [`docs/adr/025-component-docs-page-owns-its-tabs-not-the-storybook-toolbar.md`](docs/adr/025-component-docs-page-owns-its-tabs-not-the-storybook-toolbar.md) | Tabs move from Storybook's manager toolbar into the component docs page, below the title — the toolbar sits in a different document and can never render under in-page content (2026-08-26) |
 | [`docs/adr/026-spacing-tokens-grouped-over-flat.md`](docs/adr/026-spacing-tokens-grouped-over-flat.md) | Semantic spacing tokens are grouped (namespaced), not flat |
+| [`docs/adr/027-own-the-worker-rather-than-rent-a-managed-slack-agent.md`](docs/adr/027-own-the-worker-rather-than-rent-a-managed-slack-agent.md) | uno-bot stays a self-hosted Worker rather than a managed Slack agent, until a managed agent can hold the proposal gate and reach the blueprint and Notion, or the plumbing costs more than a stated bound (2026-09-04) |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -206,6 +207,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-135 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+136 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 raw eval data are deliberately not indexed — they record what happened rather
 than telling you what to do.
