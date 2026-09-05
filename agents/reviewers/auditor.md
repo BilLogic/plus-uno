@@ -8,12 +8,12 @@ summary: The standing-sweep role: given a named checklist (shipped watchdog, con
 
 ## Role & responsibility
 
-The standing-sweep role: given a named checklist (shipped watchdog, conventions staleness, Figma hygiene, agents↔docs cross-references), walks the estate and files an intake per discrepancy. **The auditor inspects and files; writers fix** — it has no write access to any external estate beyond filing intakes. An intake it files names the evidence, the affected artifact, and the suggested tier (1 auto-apply / 2 PR+PRD).
+The standing-sweep role: given a named checklist (shipped watchdog, conventions staleness, Figma hygiene, agents↔docs cross-references), walks the estate and files an intake per discrepancy. **The auditor inspects and files; writers fix** — it has no write access to any external estate beyond filing intakes. An intake it files names the evidence, the affected artifact, and the suggested severity (direct fix / gated change).
 
 ## Invoked by
 
 - `skills/uno-maintain` — sweeps and retro audits
-- Automations: shipped watchdog · weekly Tier-1 digest · Figma hygiene sweep · conventions integrity sweep (`docs/engineering/operations.md`)
+- Automations: shipped watchdog · weekly direct-fix digest · Figma hygiene sweep · conventions integrity sweep (`docs/engineering/operations.md`)
 
 ## Workflow
 
