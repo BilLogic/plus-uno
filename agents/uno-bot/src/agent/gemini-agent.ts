@@ -141,7 +141,7 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
   // ran the pro model below its own default on "think harder" and the lite
   // model above its own on a six-word reply.
   //
-  // Now a tier is model PLUS level, moving together (ADR-027): chill low,
+  // Now a tier is model PLUS level, moving together (ADR-028): chill low,
   // default medium, grind high. The resolution lives in gemini-tiers.ts so the
   // unit suite can assert the level a turn is sent with.
   const { tier, reason: routeReason } = routeRequest({ userText, hasPending: pending !== null, override: input.tierOverride });
