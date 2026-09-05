@@ -443,6 +443,28 @@
         }
       },
       "judgeNote": "AUTHORED 2026-09-05 (#423). uno-maintain's method left the always-loaded prompt for the reference map, and its Worker face ends in a pointer naming `uno-maintain/method`; this case proves a maintain turn still runs the method by reaching it through that pointer. Deterministic: the route's tool list holds a read_reference call whose name is exactly `uno-maintain/method` — a turn that classifies and drafts from the face alone, or reads a different name, fails here regardless of how good the prose is. For the judge, the reply must show the method's steps in order: (1) the flag classified as one of the four trigger types (this one is an inaccuracy) with an estate and target (codebase — the uno-bot faces or the maintain skill), (2) a concrete drafted fix stated before any judgement of worth, (3) the three-line brief — impact, effort, risk — put to the spotter with the worth-incorporating question, and (4) a suggested tier consistent with the whitelist (Tier 2, since it touches a skill). Either shape passes: an in-thread intake ending at the human gate (kind text), or a staged notion_create for the Roadmap intake card (kind proposal) that carries the same classification, draft and brief. A reply that applies the fix itself, opens a PR, invents evidence beyond what the designer said, or names reviewers without a notion_search fails."
+    },
+    {
+      "id": "D1",
+      "name": "a publish turn reads uno-publish/method by pointer before staging the share-out (#424)",
+      "blocker": true,
+      "samples": 3,
+      "turns": [
+        {
+          "prompt": "Publish this prototype for feedback — it's the tutor session sign-up sheet, mid-fi, first round: https://plus-uno.netlify.app/prototypes/session-sign-up/ . Ask people about the day grouping and the claim flow; layout polish is out of scope this round."
+        }
+      ],
+      "expectKind": [
+        "proposal"
+      ],
+      "expectTool": "shareout_post",
+      "expectToolCalled": {
+        "tool": "read_reference",
+        "args": {
+          "name": "uno-publish/method"
+        }
+      },
+      "judgeNote": "AUTHORED 2026-09-05 (#424). uno-publish's method left the always-loaded prompt for the reference map, and its Worker face ends in a pointer naming `uno-publish/method`; this case proves a publish turn still runs the method by reaching it through that pointer. Deterministic: the route's tool list holds a read_reference call whose name is exactly `uno-publish/method`, and the staged tool is shareout_post (R3's routing, kept) — a turn that stages from the face alone, or reads a different name, fails here regardless of how good the card is. For the judge, the proposal follows the method's feedback rail: the rail decided once (feedback — the ask says so), the share-out staged immediately with the link in hand rather than held for the Loom / preview / Decisions pieces (the card audits those), fidelity and round carried from the ask, at most three stage-specific questions drawn from what the designer asked about, and a not-looking-for line carrying the layout-polish exclusion. A reply that interrogates for missing bundle pieces before staging, routes to the marketplace, or names reviewers without a notion_search fails."
     }
   ]
 }

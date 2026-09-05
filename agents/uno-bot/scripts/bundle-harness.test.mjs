@@ -10,7 +10,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFileSync, writeFileSync, mkdtempSync, rmSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync, rmSync, existsSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -202,8 +202,11 @@ test("a Worker face over its char budget fails the build", () => {
 
 test("an assembled bundle over its char budget fails the build", () => {
   // Padded into a doc that carries no per-file budget of its own, so the bundle
-  // budget is what fails — not a file budget standing in for it.
-  const rel = "skills/uno-research/references/method.md";
+  // budget is what fails — not a file budget standing in for it. A connector,
+  // because it is always in the prompt: a method padded here would land in the
+  // reference map instead once it is disclosed (#424), and the ceiling would
+  // never see it.
+  const rel = "docs/connectors/figma.md";
   const result = withFile(rel, (abs, original) => writeFileSync(abs, original + padding(200_000)), () =>
     runBundler(["--check"]),
   );
@@ -369,10 +372,21 @@ test("the companion carries each disclosed reference verbatim, after the prompt"
 });
 
 test("the census names the disclosed count beside the bundled and ide-only ones", () => {
+  // The expected count is read off the docs themselves, so a method moving in
+  // or out of the map (#423 moved one, #424 four more) changes this test's
+  // expectation and the bundler's answer together.
+  const disclosedOnDisk = readdirSync(path.join(repoRoot, "skills"), { withFileTypes: true })
+    .filter((d) => d.isDirectory() && d.name.startsWith("uno-"))
+    .map((d) => path.join(repoRoot, "skills", d.name, "references", "method.md"))
+    .filter((abs) => existsSync(abs) && /^disclosure:\s*reference$/m.test(readFileSync(abs, "utf8"))).length;
+  assert.ok(disclosedOnDisk >= 1, "expected at least one disclosed method on disk");
   const result = runBundler(["--check"]);
   assert.equal(result.code, 0, result.out);
-  assert.match(result.out, /embodiment census: [\d,]+ declared doc\(s\) under the section roots — [\d,]+ bundled, 1 disclosed, [\d,]+ ide-only/);
-  assert.match(result.out, /--check OK \([\d,]+ chars from [\d,]+ files; 1 reference\(s\)/);
+  assert.match(
+    result.out,
+    new RegExp(`embodiment census: [\\d,]+ declared doc\\(s\\) under the section roots — [\\d,]+ bundled, ${disclosedOnDisk} disclosed, [\\d,]+ ide-only`),
+  );
+  assert.match(result.out, new RegExp(`--check OK \\([\\d,]+ chars from [\\d,]+ files; ${disclosedOnDisk} reference\\(s\\)`));
 });
 
 test("--check fails on a stale reference map, names it, and writes nothing", () => {
