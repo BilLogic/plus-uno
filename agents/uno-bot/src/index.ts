@@ -9,7 +9,7 @@ import { geminiConfigured, geminiGenerate } from "./gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "./vertex/claude";
 import { MODELS } from "./agent/routing";
 import { runAgent } from "./agent/run-agent";
-import { withTurnScope, type ToolCall, type TurnDials } from "./agent/loop-shared";
+import { withTurnScope, attachToolResult, type ToolCall, type TurnDials } from "./agent/loop-shared";
 import { preflight } from "./agent/preflight";
 import type { HistoryTurn, PendingProposal } from "./thread-state-client";
 import { BUILD } from "./version";
@@ -22,6 +22,7 @@ import {
   searchBlueprint,
   fetchPhaseOutline,
   fetchTouchpoints,
+  TOUCHPOINT_SUBJECT_PAGE,
   isBlueprintConfigured,
   CELL_FALLBACK_SELECT,
   EDGE_SELECT_COLUMNS,
@@ -474,7 +475,12 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
     }
     const reads: SubjectReads = {
       outline: () => fetchPhaseOutline(env),
-      touchpoints: async () => (await fetchTouchpoints(env, "")).rows,
+      // A WIDER page than the bot's own tool reads. Rows come back `name.asc`,
+      // and `corpus-term` picks its search term out of these names — so the
+      // product's 15-row page quietly turned the condition into "…among the
+      // alphabetically-first fifteen tools" and skipped B4 on a board that
+      // satisfies it (#452). Still one request.
+      touchpoints: async () => (await fetchTouchpoints(env, "", TOUCHPOINT_SUBJECT_PAGE)).rows,
       search: async (query, scope) => {
         const r = await searchBlueprint(env, query, {
           fresh: true,
@@ -627,7 +633,16 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
   // so a case can assert a call happened and what it named (#423: that a
   // maintain turn read `uno-maintain/method` before proposing), where the
   // result alone shows only the final proposal or text.
+  //
+  // Each entry also carries what its RESULT said about itself: `note`,
+  // `visibility`, `error` — never rows, never message or blueprint content
+  // (#452). The arguments alone could not explain S3: three samples replied
+  // that workspace search "isn't available on this turn" and the transcript
+  // could not say whether the own-DM gate, the connect URL or the credential
+  // was the leg that failed. `filled` is which entries already have their
+  // result, so a turn that searches twice keeps the two apart.
   const tools: ToolCall[] = [];
+  const filled = new Set<number>();
   // Names read_reference SERVED this turn (hits only) — the receipt production
   // persists on the user HistoryTurn in place of the text (slack/events.ts
   // turnReferences, #423). Collected the way production collects it, inside
@@ -648,6 +663,7 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
         onInterim: (t) => narration.push(t),
         onDials: (d) => { dials = d; },
         onToolCall: (c) => tools.push(c),
+        onToolResult: (r) => { attachToolResult(tools, r, filled); },
       }),
     );
     const result = agentRun.result;

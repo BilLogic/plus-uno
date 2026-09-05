@@ -1,6 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildSearchResponse } from "../src/tools/slack-search-response";
+import {
+  buildSearchResponse,
+  buildUnavailableResponse,
+  connectOffer,
+  connectNoteForResults,
+  connectNoteForUnavailable,
+} from "../src/tools/slack-search-response";
 
 const base = {
   query: "migration deadline",
@@ -94,4 +100,47 @@ test("an empty result with no connect note keeps the scope instruction clean", (
   const scope = String(body.absence_scope);
   assert.match(scope, /not an absence in Slack/i);
   assert.doesNotMatch(scope, /connect/i);
+});
+
+// ── S3, second half: the nudge must exist on the paths where NOTHING ran ─────
+// S3 read 0/3 against r254, every reply saying workspace search "isn't
+// available on this turn" — the tool's own words, from the branch ABOVE the
+// credential loop. The connect link was built inside that loop, so the one turn
+// where the requester most needs it (their own DM, nothing stored, no
+// action_token) was the one turn it could not exist. The model was not
+// withholding the offer; it was never handed one.
+
+test("an unavailable search still carries the connect offer", () => {
+  const body = buildUnavailableResponse({
+    error: "workspace search unavailable (no search credential stored) — use thread/channel reads instead",
+    connectNote: connectNoteForUnavailable("https://uno-bot.example/oauth/slack/start"),
+  });
+  assert.equal(body.ok, false);
+  assert.match(String(body.error), /no search credential stored/);
+  assert.match(String(body.note), /oauth\/slack\/start/);
+});
+
+test("an unavailable search says plainly that it is not an empty result", () => {
+  // Otherwise the S1 failure rides in on the S3 fix: "these results do not
+  // cover DMs" beside an error invites the model to report a search that never
+  // ran as a search that found nothing.
+  const note = connectNoteForUnavailable("https://x/oauth/slack/start");
+  assert.match(note, /NOT an empty result/);
+  assert.doesNotMatch(note, /these results/);
+});
+
+test("with no connect URL the unavailable result carries no note at all", () => {
+  // The leg that stays diagnosable: a transcript showing this error and NO note
+  // says the Worker has no SLACK_OAUTH_REDIRECT_URI — not that the model
+  // dropped a link it was given.
+  const body = buildUnavailableResponse({ error: "workspace search unavailable" });
+  assert.equal("note" in body, false);
+});
+
+test("the offer sentence is the same wherever it is made", () => {
+  const url = "https://uno-bot.example/oauth/slack/start";
+  const offer = connectOffer(url);
+  assert.ok(connectNoteForResults(url).includes(offer));
+  assert.ok(connectNoteForUnavailable(url).includes(offer));
+  assert.match(connectNoteForResults(url), /do not cover DMs/);
 });
