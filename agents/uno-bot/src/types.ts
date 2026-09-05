@@ -196,7 +196,7 @@ export interface Env {
   // the flash models, probed healthy during the 2026-07-16 quota incident).
   GEMINI_FALLBACK_MODEL?: string;
   GEMINI_REGION?: string; // Vertex only; default "global"
-  GEMINI_MODEL?: string; // default "gemini-3.6-flash"
+  GEMINI_MODEL?: string; // default "gemini-3.8-flash"
   // Vertex-Claude model id for the default lane (chill/grind are fixed in
   // routing.ts). Optional — defaults to MODELS.default ("claude-sonnet-5").
   CLAUDE_MODEL?: string;

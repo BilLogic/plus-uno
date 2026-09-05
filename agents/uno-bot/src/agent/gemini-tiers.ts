@@ -10,8 +10,6 @@
 //   gemini-3.5-flash-lite   accepts minimal|low|medium|high, defaults to minimal
 //   gemini-3.8-flash        accepts         low|medium|high, defaults to medium
 //   gemini-3.1-pro-preview  accepts         low|medium|high, defaults to high
-// (The default map below still names gemini-3.6-flash until the model-id
-// change in #416 lands; it takes the same three levels used here.)
 //
 // chill runs ONE RUNG ABOVE flash-lite's own default. A chill turn is the one
 // that resolves a gated proposal ("yes please" against a staged notion_create),
@@ -39,7 +37,7 @@ export interface GeminiTierConfig {
 
 export const GEMINI_TIERS: Record<ModelTier, GeminiTierConfig> = {
   chill: { model: "gemini-3.5-flash-lite", level: "low" },
-  default: { model: "gemini-3.6-flash", level: "medium" },
+  default: { model: "gemini-3.8-flash", level: "medium" },
   grind: { model: "gemini-3.1-pro-preview", level: "high" },
 };
 

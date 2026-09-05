@@ -158,7 +158,7 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
   // memoised for the hour either way. Auth-gated like every /debug route.
   if (request.method === "GET" && url.pathname === "/debug/gemini-cache") {
     if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-    const model = env.GEMINI_MODEL ?? "gemini-3.6-flash";
+    const model = env.GEMINI_MODEL ?? "gemini-3.8-flash";
     const blocks = await buildSystemBlocks(env, null, null);
     const stable = (blocks as Array<{ text?: string }>)[0]?.text ?? "";
     const result = await ensureHarnessCache(env, model, stable);
