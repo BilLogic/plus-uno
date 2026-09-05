@@ -1,5 +1,5 @@
 {
-  "_readme": "Machine-readable eval cases for uno-bot, derived from docs/evals/scenarios/uno-bot.md (R1-R12) and scored against docs/evals/rubrics/bot-answer.md. Driven by agents/uno-bot/scripts/run-evals.mjs against the live Worker's /debug/eval route (headless agent turns — proposals come back as data, nothing posts to Slack/Notion). Multi-turn cases thread history/pending between turns. 'allowProposalIfGateAsk' accepts a proposal ONLY when the production preflight clarify-gate would have intercepted it (the endpoint reports gateAsk). All cases run headless via /debug/eval. Cases may set `channel` / `requestedBy` (case- or turn-level) when the SURFACE is under test — own-visibility Slack search only activates in the requester's own bot DM (a channel id starting with D), so a case asserting the ADR-020 gate must say which surface it is on or it passes for the wrong reason. `expectToolCalled: { tool, args? }` asserts against the route's `tools` list — every call the model made, in order, with its arguments — so a case can prove a read happened on the way to the result (M1: `read_reference` for `uno-maintain/method`). `expectHistory: { references?, maxChars? }` on a LATER turn asserts against the history the runner SENT to that turn — the receipt names must sit on a history turn's `references` (where production carries them, slack/events.ts) and the serialized history must stay within `maxChars` — so a case can prove a reference fetched in turn 1 reached turn 2 as its receipt and not as its text (C1).",
+  "_readme": "Machine-readable eval cases for uno-bot, derived from docs/evals/scenarios/uno-bot.md (R1-R12) and scored against docs/evals/rubrics/bot-answer.md. Driven by agents/uno-bot/scripts/run-evals.mjs against the live Worker's /debug/eval route (headless agent turns — proposals come back as data, nothing posts to Slack/Notion). Multi-turn cases thread history/pending between turns. 'allowProposalIfGateAsk' accepts a proposal ONLY when the production preflight clarify-gate would have intercepted it (the endpoint reports gateAsk). All cases run headless via /debug/eval. Cases may set `channel` / `requestedBy` (case- or turn-level) when the SURFACE is under test — own-visibility Slack search only activates in the requester's own bot DM (a channel id starting with D), so a case asserting the ADR-020 gate must say which surface it is on or it passes for the wrong reason. `expectToolCalled: { tool, args? }` asserts against the route's `tools` list — every call the model made, in order, with its arguments — so a case can prove a read happened on the way to the result (M1: `read_reference` for `uno-maintain/method`). `expectHistory: { references?, maxChars? }` on a LATER turn asserts against the history the runner SENT to that turn — the receipt names must sit on a history turn's `references` (where production carries them, slack/events.ts) and the serialized history must stay within `maxChars` — so a case can prove a reference fetched in turn 1 reached turn 2 as its receipt and not as its text (C1). `subject: { need }` names a CONDITION — `scenario-with-future-paths`, `touchpoint-any`, `absent-detail` — and the runner asks the Worker's token-gated /debug/blueprint-subject route for a row from the LIVE board that satisfies it, once per case, before turn 1; every `{{subject.<field>}}` in the case is then filled in (scripts/eval-subjects.mjs). A case whose condition nothing satisfies is reported SKIPPED — neither a pass nor a failure — and counted separately in the summary. This is why no case names a scenario, a lane, a tool or a count: those are facts about the board on the day a case was written, and the board is edited daily (#415). `expectToolCalled.argsOneOf: { arg: [values] }` passes when the sent value is one of several right answers, for a choice that is genuinely open (B3's granularity rung); `args` is the other direction, where a LIST wanted value matches by membership in what was sent.",
   "cases": [
     {
       "id": "R1",
@@ -132,13 +132,16 @@
       "blocker": true,
       "turns": [
         {
-          "prompt": "What does the Escalation section of the post-session reflection do, and which layer owns it in the blueprint?",
+          "prompt": "What does the {{subject.scenario}} scenario cover in the blueprint, and which lane does most of the work in it?",
           "expectKind": [
             "text"
           ]
         }
       ],
-      "judgeNote": "A reply body must always be present and non-trivial — the failure this guards is the live 'reacted eyes then silence' mode where the turn dies and nothing is posted. The answer may legitimately be 'I could not reach the blueprint' or 'that is not in the source' — an honest miss passes. FAIL on: empty or whitespace-only text, a bare acknowledgement with no content ('sure!', 'looking into it'), or text that is only a tool-mechanics apology. Grounding honesty still applies: no invented layer names."
+      "judgeNote": "A reply body must always be present and non-trivial — the failure this guards is the live 'reacted eyes then silence' mode where the turn dies and nothing is posted. The subject is chosen from the live board at run time (#415), so the answer may legitimately be 'I could not reach the blueprint' or 'that is not in the source' — an honest miss passes. FAIL on: empty or whitespace-only text, a bare acknowledgement with no content ('sure!', 'looking into it'), or text that is only a tool-mechanics apology. Grounding honesty still applies: no invented lane names, and no lane presented as owning the scenario without a row behind it. [re-grounded 2026-09-05 with #415 — it used to name a section and a 'layer', which is a row title and a retired word.]",
+      "subject": {
+        "need": "scenario-any"
+      }
     },
     {
       "id": "R8",
@@ -179,14 +182,17 @@
       "blocker": true,
       "turns": [
         {
-          "prompt": "Walk me through what the Regular Tutor does at each Goal Setting step."
+          "prompt": "Walk me through what happens at each step of {{subject.scenario}}, and who does what."
         }
       ],
       "expectKind": [
         "text"
       ],
       "samples": 3,
-      "judgeNote": "Per-step answer grounded in the service blueprint, attributing activities to the correct layer/actor (Regular Tutor vs Lead Tutor vs backstage). Fails on misattributed actors or claims with no blueprint grounding. Confidence must be communicated conversationally in the prose (not the retired '_Confidence:' affix), and be earned by sources fetched this turn. [samples:3 since 2026-08-23 — does it attribute to the right lane in prose — phrasing. The runner requires EVERY sample to pass, so three draws is a stricter bar than one, not a weaker one.]"
+      "judgeNote": "Per-step answer grounded in the service blueprint, attributing each activity to the LANE that holds it (the actor/stage the row sits in) rather than to whoever seems likely. The scenario is picked from the live board at run time (#415), so the correct lane names are whatever came back this turn — a lane named without a row behind it is a fail, as is an activity moved to the wrong lane. Fails on misattributed actors or claims with no blueprint grounding. Confidence must be communicated conversationally in the prose (not the retired '_Confidence:' affix), and be earned by sources fetched this turn. [samples:3 since 2026-08-23 — does it attribute to the right lane in prose — phrasing. Re-grounded 2026-09-05 with #415: it used to name the scenario and the lane outright, which is a fact about the board on the day it was written.]",
+      "subject": {
+        "need": "scenario-any"
+      }
     },
     {
       "id": "R11",
@@ -528,12 +534,12 @@
     },
     {
       "id": "B1",
-      "name": "a tooling question reaches the touchpoint registry (#414)",
+      "name": "a tooling question reaches the touchpoint registry (#414, re-grounded #415)",
       "blocker": true,
       "samples": 3,
       "turns": [
         {
-          "prompt": "where do we use Zoom?"
+          "prompt": "where do we use {{subject.touchpoint}}?"
         }
       ],
       "expectKind": [
@@ -547,7 +553,120 @@
           ]
         }
       },
-      "judgeNote": "AUTHORED 2026-09-05 (#414). 'Where do we use Zoom' is a tooling question, and the table that holds the answer is the blueprint's touchpoint registry, read through search_blueprint with include: [\"touchpoints\"]. The deterministic half: the runner requires a search_blueprint call whose include list holds \"touchpoints\" (the model may ask for more; a list arg matches by membership). For the judge: the reply is grounded in what came back — registry rows (name, kind, summary; a row's own url surfaced verbatim when given) for WHAT the tool is, and the search rows that mention Zoom for WHERE it is used — and it does not claim the registry places a tool at a cell, because placements are outside this read. If the registry had no entry, the reply says the REGISTRY has no entry for Zoom, names what was searched, and answers where-used from the search rows rather than declaring the service has no Zoom. A hand-built per-touchpoint deep link fails (the app has no such page; the root is the only link). An answer from memory, or one that says the blueprint has nothing on Zoom, fails. [samples:3 — the include choice is a routing decision made from the tool description alone; three draws is the stricter bar.]"
+      "judgeNote": "AUTHORED 2026-09-05 (#414), re-grounded the same day (#415): the tool is now whichever row the registry hands back at run time, not the literal 'Zoom'. 'Where do we use {{subject.touchpoint}}' is a tooling question, and the table that holds the answer is the blueprint's touchpoint registry, read through search_blueprint with include: [\"touchpoints\"]. The deterministic half: the runner requires a search_blueprint call whose include list holds \"touchpoints\" (the model may ask for more; a list arg matches by membership). For the judge: the reply is grounded in what came back — registry rows (name, kind, summary; a row's own url surfaced verbatim when given) for WHAT the tool is, and the search rows that mention it for WHERE it is used — and it does not claim the registry places a tool at a cell, because placements are outside this read. If the registry had no entry, the reply says the REGISTRY has no entry for it, names what was searched, and answers where-used from the search rows rather than declaring the service does not use it. A hand-built per-touchpoint deep link fails (the app has no such page; the root is the only link). An answer from memory, or one that says the blueprint has nothing on the tool, fails. [samples:3 — the include choice is a routing decision made from the tool description alone; three draws is the stricter bar.]",
+      "subject": {
+        "need": "touchpoint-any"
+      }
+    },
+    {
+      "id": "B2",
+      "name": "a scoped question is scoped at the tool, not in the prose (#415)",
+      "blocker": true,
+      "samples": 3,
+      "subject": {
+        "need": "scenario-any"
+      },
+      "turns": [
+        {
+          "prompt": "what happens in {{subject.scenario}}?"
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "expectToolCalled": {
+        "tool": "search_blueprint",
+        "args": {
+          "filter_scenario": "{{subject.scenario}}"
+        }
+      },
+      "judgeNote": "AUTHORED 2026-09-05 (#415). A question about ONE scenario should be scoped at the tool: filter_scenario narrows the corpus before ranking, so the answer is not fifteen slots of the whole board competing with the scenario that was asked about. The portal accepted this filter for weeks while the Worker sent none, and the choice the model should make was made for it by omission (#413). The deterministic half: a search_blueprint call carrying filter_scenario set to the scenario named in the question. For the judge: the reply describes THAT scenario from the rows that came back — its steps, its paths, the lanes doing the work — and does not wander into neighbouring scenarios as though they were part of it. Saying the scenario is thin or the rows are few is fine; inventing steps to fill it out is a hard fail. [samples:3 — scoping is a routing decision read off the tool description alone.]"
+    },
+    {
+      "id": "B3",
+      "name": "a question about shape is asked at a rung above cell (#415)",
+      "blocker": true,
+      "samples": 3,
+      "subject": {
+        "need": "phase-any"
+      },
+      "turns": [
+        {
+          "prompt": "what shape does the {{subject.phase}} phase have?"
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "expectToolCalled": {
+        "tool": "search_blueprint",
+        "argsOneOf": {
+          "granularity": [
+            "scenario",
+            "path",
+            "step"
+          ]
+        }
+      },
+      "judgeNote": "AUTHORED 2026-09-05 (#415). 'What shape does this phase have' is a question about structure, and the tool retrieves at six rungs. Answering it at `cell` returns six excerpts of prose — the right corpus at the wrong altitude. The deterministic half: a search_blueprint call whose granularity is one of scenario, path or step. All three are defensible readings of 'shape'; `cell` is the default, and the default is what this case exists to catch. For the judge: the reply describes the phase's structure — how many scenarios, how they divide, which carry variants or exceptions — from the rows that came back, at the rung it asked for. A count stated without a read behind it, or a phase described from memory, is a fail. [samples:3 — the rung is chosen from the tool description alone.]"
+    },
+    {
+      "id": "B4",
+      "name": "a completeness question answers with the corpus-wide count (#415)",
+      "blocker": true,
+      "samples": 3,
+      "subject": {
+        "need": "corpus-term"
+      },
+      "turns": [
+        {
+          "prompt": "how many cells mention {{subject.term}}?"
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "textRegex": "\\d",
+      "judgeNote": "AUTHORED 2026-09-05 (#415). The subject is chosen at run time as a term the corpus matches MORE times than one page of rows can show, so the two candidate answers are different numbers and only one of them is right. search_blueprint already returns total_matched (surfaced as `matched`) beside the top-k rows: that is the answer. The number of rows shown is not. The deterministic half is only that a number appears at all — which number it is cannot be pattern-matched, because the count moves with the board. For the judge: the reply must state the corpus-wide match count, and must not present the number of rows it was shown as the total. '113 cells mention it, here are the top 15' passes; '15 cells mention it' when 113 matched is a hard fail, and so is a count with no read behind it. Hedging that the count is what the search matched rather than a hand audit is fine and welcome. [samples:3 — reading `matched` instead of counting rows is a habit, and a habit is what sampling measures.]"
+    },
+    {
+      "id": "B5",
+      "name": "future state is read off status, not off a naming convention (#415)",
+      "blocker": true,
+      "samples": 3,
+      "subject": {
+        "need": "scenario-with-future-paths"
+      },
+      "turns": [
+        {
+          "prompt": "Is there any future state on the board for {{subject.scenario}}, or is all of it live today?"
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "textRegex": "^(?![\\s\\S]*(?:Planned:|Prototype:))[\\s\\S]*$",
+      "judgeNote": "AUTHORED 2026-09-05 (#415). The scenario is chosen at run time BECAUSE it carries a path whose status is not `live` — so the honest answer is yes, and the failure mode is a confident no. Until 2026-08-21 a future path was named `Planned: <topic>` or `Prototype: <topic>`; the convention was deleted and replaced by `status` on paths and cells, and for eleven days the harness went on telling the bot to search for the dead prefix and then forbade it from concluding there was no future state. The deterministic half rejects any reply containing `Planned:` or `Prototype:` — reaching for the retired convention is the specific regression this case guards. For the judge: the reply must say the scenario has future state and name the non-live status IN WORDS as the board spells it — proposed, planned, built, at risk or deprecated — and say what that status means (exploratory / decided and scheduled / code exists but is not the live route / live and failing / live and going away). Naming the path is welcome; misreporting a proposed path as shipped, or reporting the scenario as entirely live, is a hard fail. [samples:3 — this is the exact claim that read false for eleven days in the voice of a complete read.]"
+    },
+    {
+      "id": "B6",
+      "name": "a detail the blueprint has no field for is reported as absent (#415)",
+      "blocker": true,
+      "samples": 3,
+      "subject": {
+        "need": "absent-detail"
+      },
+      "turns": [
+        {
+          "prompt": "how long does \"{{subject.cell}}\" take?"
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "forbidTool": "notion_create",
+      "textRegex": "^(?![\\s\\S]*(?:\\d+(?:[.,]\\d+)?|[Aa] few|[Oo]ne|[Tt]wo|[Tt]hree|[Ff]our|[Ff]ive|[Tt]en|[Ff]ifteen|[Tt]wenty|[Tt]hirty|[Ff]orty|[Ff]ifty|[Ss]ixty)[\\s-]*(?:[Mm]in|[Hh]our|[Hh]r|[Ss]ec))[\\s\\S]*$",
+      "judgeNote": "AUTHORED 2026-09-05 (#415). The cell is real and chosen from the live board; the QUESTION is not answerable, because `cells` has no duration field — the route checks that against the contract's column list before offering this subject, so the premise is verified rather than remembered. The reply must say the blueprint does not record how long things take, name what it DOES record for that cell (what happens, the lane, the owner, its resources), and offer the next-best source if there is one. The deterministic half rejects any stated duration — a number or a spelled-out number followed by minutes/hours/seconds — because the failure this case exists to catch is a plausible figure improvised to fill the gap. NOTE FOR A REVIEWER READING THIS RED: the check cannot tell an invented figure from one quoted out of a cell's own prose. If it fires, read the transcript — a duration the blueprint genuinely wrote down in a cell's summary is a finding about that cell, not about the bot. Absence must be stated, not staged: proposing a Notion write to 'capture' the missing duration is a fail, and so is any invented number. [samples:3 — absence behaviour is phrasing, and phrasing is what sampling measures.]"
     }
   ]
 }

@@ -968,6 +968,28 @@ export async function fetchBlueprintIndex(
     return undefined;
   }
 
+  const data = await fetchPhaseOutline(env);
+  if (!data) return undefined;
+  const index = renderBlueprintIndex(data, new Date().toISOString().slice(0, 10));
+  indexCache = { at: Date.now(), index };
+  return index;
+}
+
+/**
+ * The raw phases→scenarios→paths embed the index is rendered from.
+ *
+ * Split out of fetchBlueprintIndex so a second caller can have the STRUCTURE
+ * without the prose. The eval subject route (#415) needs to know which scenario
+ * carries a non-live path, and the rendered index answers that only as a
+ * `[proposed]` marker glued to a scenario name — parsing it back out would be a
+ * second, worse copy of a shape this function already has. One select, one
+ * order clause, one place a rename lands.
+ *
+ * Returns undefined on any failure, exactly as the index did, with the same
+ * budget-first rethrow: an unaffordable read must not be reported as an empty
+ * board.
+ */
+export async function fetchPhaseOutline(env: Env): Promise<unknown[] | undefined> {
   const base = env.SUPABASE_URL!.replace(/\/+$/, "");
   // `status` rides along because the index is where an absence-of-future-state
   // claim gets settled (see the tool description). Without it every scenario
@@ -995,9 +1017,7 @@ export async function fetchBlueprintIndex(
       console.warn("[blueprint] index read failed (unexpected payload)");
       return undefined;
     }
-    const index = renderBlueprintIndex(data, new Date().toISOString().slice(0, 10));
-    indexCache = { at: Date.now(), index };
-    return index;
+    return data;
   } catch (e) {
     // rethrowIfBudget FIRST: a swallowed budget stop would report the structure
     // as unreadable when it was merely unaffordable — the false-absence bug.

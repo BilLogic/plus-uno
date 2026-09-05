@@ -11,7 +11,7 @@
 // It is now a majority. These tests pin both the rule and the reason.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { passesCase } from "./eval-scoring.mjs";
+import { passesCase, argMatches, toolCallMatches, describeCalls } from "./eval-scoring.mjs";
 
 test("a single sample still passes on its own run", () => {
   assert.equal(passesCase(1, 1), true);
@@ -60,6 +60,83 @@ test("a genuinely broken case still goes red", () => {
   const p = 0.9;
   const goesRed = 3 * p ** 2 * (1 - p) + p ** 3;
   assert.ok(goesRed > 0.97, `a 90%-failing case should be red ~always, got ${goesRed}`);
+});
+
+// ── The tool-call matcher (#415) ─────────────────────────────────────────────
+//
+// `expectToolCalled` is how a case asserts that a read happened MID-turn and
+// what it named — the result alone shows only the final text or proposal. The
+// matcher lived untested inside run-evals.mjs until the blueprint cases needed
+// a third matching mode.
+
+const CALLS = [
+  { name: "search_blueprint", args: { query: "zoom", include: ["touchpoints", "findings"], granularity: "path" } },
+  { name: "notion_search", args: { query: "zoom" } },
+];
+
+test("a list argument matches by membership, not by equality", () => {
+  // The model may ask for more than the case names, and `===` on two arrays is
+  // never true, so an equality matcher would fail every list assertion.
+  assert.equal(argMatches(["touchpoints", "findings"], ["touchpoints"]), true);
+  assert.equal(argMatches(["findings"], ["touchpoints"]), false);
+  assert.equal(argMatches("touchpoints", ["touchpoints"]), false, "a scalar is not a one-element list");
+  assert.equal(argMatches("path", "path"), true);
+  assert.equal(argMatches(undefined, "path"), false, "an unsent argument matches nothing");
+});
+
+test("a call matches when the tool and every named argument match", () => {
+  assert.equal(toolCallMatches(CALLS, { tool: "search_blueprint", args: { include: ["touchpoints"] } }), true);
+  assert.equal(toolCallMatches(CALLS, { tool: "search_blueprint", args: { include: ["slices"] } }), false);
+  assert.equal(toolCallMatches(CALLS, { tool: "figma_read" }), false);
+  assert.equal(toolCallMatches(CALLS, { tool: "notion_search" }), true, "no args means the tool alone");
+  assert.equal(toolCallMatches(undefined, { tool: "notion_search" }), false, "an unreported list is not a pass");
+});
+
+test("argsOneOf accepts any of several right answers and refuses the default", () => {
+  // Asked what shape a phase has, `scenario`, `path` and `step` are all
+  // correct and `cell` is the wrong one. Pinning one rung would grade a
+  // preference nobody holds; asserting nothing would let the default through,
+  // which is the behaviour the case was written to catch.
+  const rungs = { tool: "search_blueprint", argsOneOf: { granularity: ["scenario", "path", "step"] } };
+  assert.equal(toolCallMatches(CALLS, rungs), true);
+  assert.equal(
+    toolCallMatches([{ name: "search_blueprint", args: { granularity: "cell" } }], rungs),
+    false,
+    "the default rung is exactly what this assertion exists to fail",
+  );
+  assert.equal(
+    toolCallMatches([{ name: "search_blueprint", args: {} }], rungs),
+    false,
+    "an unsent granularity is the default, not an open choice",
+  );
+});
+
+test("args and argsOneOf both apply to the SAME call", () => {
+  // Two calls, each satisfying one half, must not add up to a pass: the case
+  // asserts one scoped search, not two unscoped ones.
+  const split = [
+    { name: "search_blueprint", args: { filter_scenario: "Quiet Harbour", granularity: "cell" } },
+    { name: "search_blueprint", args: { granularity: "path" } },
+  ];
+  const want = {
+    tool: "search_blueprint",
+    args: { filter_scenario: "Quiet Harbour" },
+    argsOneOf: { granularity: ["scenario", "path", "step"] },
+  };
+  assert.equal(toolCallMatches(split, want), false);
+  assert.equal(
+    toolCallMatches([{ name: "search_blueprint", args: { filter_scenario: "Quiet Harbour", granularity: "path" } }], want),
+    true,
+  );
+});
+
+test("the failure line shows the wanted tool's arguments and the rest by name", () => {
+  // "no search_blueprint call with granularity" beside a bare `search_blueprint`
+  // tells a reader nothing about which rung it asked for.
+  const seen = describeCalls(CALLS, "search_blueprint");
+  assert.match(seen, /search_blueprint\(\{"query":"zoom"/);
+  assert.match(seen, /, notion_search$/);
+  assert.equal(describeCalls([], "search_blueprint"), "none");
 });
 
 test("more passes than samples is a caller bug, not a pass", () => {
