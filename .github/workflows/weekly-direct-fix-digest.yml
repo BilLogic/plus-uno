@@ -6,9 +6,8 @@ name: Weekly Direct-Fix Digest
 # skills/uno-maintain/references/method.md §4; the prompt file is only the
 # headless adapter. Spot-run: `gh workflow run weekly-direct-fix-digest.yml`.
 #
-# Renamed from weekly-tier1-digest.yml on 2026-09-05 (#429 batch 2). This file
-# owns the Monday schedule from its first run; the old file keeps only
-# workflow_dispatch until the #429 contract step deletes it.
+# Renamed 2026-09-05 (#429): the workflow carried the retired maintenance
+# spelling in its name. This file owns the Monday schedule; the old file is gone.
 #
 # Executor: Claude Code CLI on Vertex, billed to hcii-plus (ADR-018).
 # Model: action default (sonnet). Required secrets: GEMINI_SA_EMAIL,

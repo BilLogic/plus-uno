@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **144,056 chars from 16 files**, against an assembled budget of 170,000 (25,944 to spare), and a floor of 131,072 plus a 4,000 margin (8,984 above it). The floor is the Gemini lane's explicit-cache minimum; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **143,986 chars from 16 files**, against an assembled budget of 170,000 (26,014 to spare), and a floor of 131,072 plus a 4,000 margin (8,914 above it). The floor is the Gemini lane's explicit-cache minimum; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,603 (−6,727 ide-only) | 9,603 | — |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 8,288 | 17,919 | — |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 25,763 | 43,723 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 5,980 | 49,747 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 59,119 | — |
-| 6 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,947 | 66,111 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 72,824 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 78,111 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,213 | 84,366 | 7,000 (Worker face) |
-| 10 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 90,768 | 7,000 (Worker face) |
-| 11 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 92,739 | — |
-| 12 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 105,702 | — |
-| 13 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,708 | 119,452 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 12,537 (−4,500 ide-only) | 132,055 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,312 (−1,219 ide-only) | 136,421 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,587 (−605 ide-only) | 144,056 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 8,208 | 17,839 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 25,763 | 43,643 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 5,980 | 49,667 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 59,039 | — |
+| 6 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,947 | 66,031 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 72,744 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 78,031 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,213 | 84,286 | 7,000 (Worker face) |
+| 10 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 90,688 | 7,000 (Worker face) |
+| 11 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 92,659 | — |
+| 12 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 105,622 | — |
+| 13 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,708 | 119,372 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 12,537 (−4,500 ide-only) | 131,975 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,312 (−1,219 ide-only) | 136,341 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,597 (−605 ide-only) | 143,986 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -206,7 +206,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **Decisions DB** | centralized decision log under Design HQ — Status / Owner / Sign-off / Date / Roadmap Card / Evidence | "Decision Log" (obsolete per-project subpage) |
 | **pillar** | product area (Universal · Admin · Toolkit · Training · Marketing …) — maps to a Slack channel | "category" |
 | **replica** | the Figma frame mirroring a coded prototype — required in prototype share-outs | "screenshot" |
-| **direct fix / gated change** | the two maintenance severities: a trivial fix applied straight to main with a digest line, vs a PR + PRD through a Slack verdict. Was "Tier 1 / Tier 2 (maintenance)"; the old spelling retires in batches (#429) | "Tier 1", "Tier 2" |
+| **direct fix / gated change** | the two maintenance severities: a trivial fix applied straight to main with a digest line, vs a PR + PRD through a Slack verdict. | "Tier 1", "Tier 2" |
 | **Tier 1 / Tier 2 / Tier 3** | the loading tiers: always-loaded · on demand · retrieved live (`AGENTS.md` § The loading contract). *Tier* means loading and nothing else | "Tier" for a maintenance severity |
 | **RM-ID** | Roadmap card id (`RM-<n>`) — the Figma↔Notion join key | — |
 | **embodiment** | a runtime uno runs in — the IDE, the uno-bot Worker, headless GitHub Actions — each with its own powers and its own slice of the harness; `embodiment:` frontmatter says which docs a runtime bundles | "mode", "environment" |
@@ -1400,7 +1400,7 @@ THE standing-automation registry. An automation absent from the table below is u
 | Marketplace add/edit | — | uno-publish (registration) | — | ❌ **not built.** The two stub workflows (`marketplace-add.yml` / `marketplace-edit.yml`) were deleted in #158 — they logged a payload and posted a construction notice, and nothing dispatched them. No Worker tool exists. The open product question — repo data file (`src/pages/PrototypeMarket/prototypes-data.js`) versus the Notion database when they disagree — is tracked in #173 and must be answered before this is built | (planned) | — | planned |
 | Design QA trigger | Roadmap card → `Dev Status: Ready for QA (RTT)` | uno-review (Design QA checklist) | reviewers/design-qa | ❌ not built — no Notion webhook exists, so this becomes a daily status-poll cron on the sweep pattern below; still needs the `Design QA` status column (manual Notion setup) first | (planned) GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | — | planned |
 | Shipped watchdog | weekly cron (Wed 09:00 UTC) | uno-maintain (post-ship reconciliation, method §6) | reviewers/auditor | `shipped-watchdog.yml` → `scripts/prompts/uno-shipped-watchdog/SKILL.md` (intake transport: shared ref above) | GHA cron → claude-vertex (**opus** — judgment-heavy) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16) |
-| Weekly direct-fix digest | weekly cron (Mon 09:00 UTC) | uno-maintain (direct-fix digest, method §4) | reviewers/auditor composes → posted via the uno-bot Slack token to #plus-design | `weekly-tier1-digest.yml` → `scripts/prompts/uno-tier1-digest/SKILL.md` — reads `docs/evals/runs/digest.jsonl` (row shape: method §4), empty week posts nothing, sentinel-verified | GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16; posts sentinel-verified) |
+| Weekly direct-fix digest | weekly cron (Mon 09:00 UTC) | uno-maintain (direct-fix digest, method §4) | reviewers/auditor composes → posted via the uno-bot Slack token to #plus-design | `weekly-direct-fix-digest.yml` → `scripts/prompts/uno-direct-fix-digest/SKILL.md` — reads `docs/evals/runs/digest.jsonl` (row shape: method §4), empty week posts nothing, sentinel-verified | GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16; posts sentinel-verified) |
 | Figma hygiene sweep | monthly | uno-maintain (hygiene checklist in `figma-workspace.md`) | reviewers/auditor | ❌ not built — follow the integrity-sweep pattern; needs Figma API access in the runner | (planned) GHA cron → claude-vertex · GCP `hcii-plus` | — | planned |
 | Blueprint embeddings refresh | nightly cron (07:00 UTC) | uno-bot (semantic search freshness) | — | `uno-bot-embed-blueprint.yml` | GHA cron → Worker `/debug` route | Bill | ✅ live |
 | uno-bot evals (weekly drift check) | weekly cron (Mon 08:00 UTC) + on-demand `workflow_dispatch` | uno-bot (R/P regression cases vs live Worker) | LLM judge (Gemini on Vertex) | `uno-bot-evals.yml` → `agents/uno-bot/scripts/run-evals.mjs` | GHA cron → live Worker + Vertex judge · GCP `hcii-plus` | Bill | ✅ live |
