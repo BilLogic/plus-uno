@@ -27,8 +27,14 @@ import { executeSlackThreadRead } from "../tools/slack-thread-read";
 import { executeSlackSearch } from "../tools/slack-search";
 import { executeSlackUserProfile, executeSlackChannelMembers } from "../tools/slack-people";
 import { readReference } from "../tools/read-reference";
+import { toolResultDigest, type ToolCall, type ToolResultNote } from "./tool-transcript";
 
 export type { HistoryTurn };
+// The transcript shape lives in its own pure module (tool-transcript.ts) so the
+// fields an eval artifact promises can be unit-tested; re-exported here because
+// every caller reaches the agent contract through this file.
+export type { ToolCall, ToolResultNote } from "./tool-transcript";
+export { toolResultDigest, attachToolResult } from "./tool-transcript";
 
 // ── The provider-neutral contract (input/output of one agent turn) ───────────
 
@@ -72,12 +78,12 @@ export interface AgentInput {
    *  skill's method, say (#423). Absent on production turns, which read the
    *  `tools=[…]` log. */
   onToolCall?: (call: ToolCall) => void;
-}
-
-/** One tool call as the model issued it. */
-export interface ToolCall {
-  name: string;
-  args: Record<string, unknown>;
+  /** Called after a tool RESULT comes back, with the small honesty fields it
+   *  carries — `note`, `visibility`, `error`, never rows and never content.
+   *  The eval route attaches these to the call they answer, so a search-shaped
+   *  failure is diagnosable from the artifact instead of only from a live
+   *  re-run (#452). Absent on production turns. */
+  onToolResult?: (result: ToolResultNote) => void;
 }
 
 /** What one turn actually ran on. `level` is null when the model in use takes

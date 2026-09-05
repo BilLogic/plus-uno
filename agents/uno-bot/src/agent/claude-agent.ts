@@ -36,6 +36,7 @@ import {
   makeInterimFilter,
   validateProposalResolve,
   executeReadOnlyTool,
+  toolResultDigest,
   type AgentInput,
   type AgentResult,
   type AgentImage,
@@ -252,11 +253,9 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
           toolCallsUsed >= READONLY_TOOL_BUDGET ||
           subrequestsUsed() >= LOOKUP_CEILING
         ) {
-          toolResults.push({
-            type: "tool_result",
-            tool_use_id: tu.id,
-            content: JSON.stringify({ ok: false, error: "no more lookups available this turn", note: BUDGET_EXHAUSTED_LOOKUP_NOTE }),
-          });
+          const refused = JSON.stringify({ ok: false, error: "no more lookups available this turn", note: BUDGET_EXHAUSTED_LOOKUP_NOTE });
+          input.onToolResult?.(toolResultDigest(tu.name, refused));
+          toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: refused });
           continue;
         }
         toolCallsUsed++;
@@ -278,6 +277,10 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
           if (!isSubrequestBudgetError(err)) throw err;
           resultText = JSON.stringify({ ok: false, error: "no more lookups available this turn", note: BUDGET_EXHAUSTED_LOOKUP_NOTE });
         }
+        // The result's own honesty fields, for the eval transcript. Reported
+        // for every outcome including the refusals above — "the lookup never
+        // ran" is the answer to a whole class of failure (#452).
+        input.onToolResult?.(toolResultDigest(tu.name, resultText));
         toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: resultText });
       }
       messages.push({ role: "user", content: toolResults });

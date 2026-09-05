@@ -79,3 +79,57 @@ export function buildSearchResponse(input: SearchResponseInput): Record<string, 
   if (connectNote) body.note = connectNote;
   return body;
 }
+
+/**
+ * The consent nudge, as one sentence the model can hand the requester.
+ *
+ * Shared by every path that can carry it, because the paths that could NOT
+ * carry it were the bug (#452): the nudge was built inside the per-credential
+ * loop, so it only ever existed on a search that RAN. In the requester's own
+ * bot DM with no user token and no action_token — which is exactly the eval
+ * surface, and exactly a fresh install — the tool returned "workspace search
+ * unavailable" from above the loop and the link the reply was supposed to offer
+ * had not been computed yet. S3 read 0/3 for that reason: not a judgement call
+ * the model got wrong, an offer it was never handed.
+ */
+export function connectOffer(connectUrl: string): string {
+  return (
+    `The requester can connect their own Slack history — searches here will then cover ` +
+    `everything they can see — at ${connectUrl}`
+  );
+}
+
+/** The nudge as it reads beside RESULTS: what came back is real, but partial. */
+export function connectNoteForResults(connectUrl: string): string {
+  return `these results do not cover DMs or un-allowlisted private channels. ${connectOffer(connectUrl)}`;
+}
+
+/**
+ * The nudge as it reads when NOTHING was searched. A different sentence on
+ * purpose: "these results do not cover DMs" beside an error invites the model
+ * to report an empty search as an empty Slack, which is the S1 failure wearing
+ * the S3 fix's clothes.
+ */
+export function connectNoteForUnavailable(connectUrl: string): string {
+  return (
+    `no search ran, so this is NOT an empty result and must not be reported as one. ` +
+    `${connectOffer(connectUrl)}`
+  );
+}
+
+/**
+ * A search that could not run. `note` rides along when the ask arrived in the
+ * requester's own DM and a connect URL exists — the one place the offer is both
+ * useful and safe (ADR-020: outside their own DM the link would be addressed to
+ * whoever happens to be in the room).
+ */
+export function buildUnavailableResponse(input: {
+  error: string;
+  connectNote?: string;
+}): Record<string, unknown> {
+  return {
+    ok: false,
+    error: input.error,
+    ...(input.connectNote ? { note: input.connectNote } : {}),
+  };
+}

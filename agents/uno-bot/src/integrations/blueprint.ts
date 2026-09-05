@@ -34,6 +34,15 @@ import {
 } from "./blueprint-schema";
 
 export { FINDINGS_TABLE, EDGE_SELECT_COLUMNS, CELL_FALLBACK_SELECT, TOUCHPOINTS_TABLE, TOUCHPOINT_SELECT };
+
+/** One page of the touchpoint registry, as the bot's own tool reads it. */
+export const TOUCHPOINT_PAGE = 15;
+
+/** The registry page the eval subject route reads (#452). Bigger than the
+ *  product page on purpose and still one request: `corpus-term` picks a search
+ *  term out of these names, and a page that stops at the fifteenth name
+ *  alphabetically decides the answer before any probe runs. */
+export const TOUCHPOINT_SUBJECT_PAGE = 100;
 import {
   mapIncludeEdges,
   mapIncludeFindings,
@@ -1241,6 +1250,13 @@ export async function fetchSlices(
 export async function fetchTouchpoints(
   env: Env,
   query: string,
+  /** How many rows one page holds. 15 is the product read — a Slack reply
+   *  quoting more registry rows than that is not a reply anyone reads. The eval
+   *  subject route (#452) asks for more: it reads the registry to find a term
+   *  with a wide footprint in the prose, and rows come back `name.asc`, so a
+   *  15-row page silently made the condition "…among the alphabetically-first
+   *  fifteen tools" and skipped B4 on a board that satisfies it. */
+  limit = TOUCHPOINT_PAGE,
 ): Promise<{
   rows: Array<Record<string, unknown>>;
   total: number | undefined;
@@ -1249,7 +1265,7 @@ export async function fetchTouchpoints(
 }> {
   const words = terms(query);
   const filter = words.length ? touchpointFilter(words) : "order=name.asc";
-  const { rows, total } = await fetchRows(env, TOUCHPOINTS_TABLE, filter, 15, TOUCHPOINT_SELECT);
+  const { rows, total } = await fetchRows(env, TOUCHPOINTS_TABLE, filter, limit, TOUCHPOINT_SELECT);
   // Same two-count shape as fetchSlices, for the same reason: `total` is the
   // FILTERED set, and a "how many tools do we use" answer must not inherit a
   // query's narrowing. An unfiltered read already IS the registry's size; a

@@ -41,6 +41,7 @@ import {
   makeInterimFilter,
   validateProposalResolve,
   executeReadOnlyTool,
+  toolResultDigest,
   type AgentInput,
   type AgentResult,
   type AgentImage,
@@ -439,6 +440,10 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
           resultText = JSON.stringify({ ok: false, error: "no more lookups available this turn", note: BUDGET_EXHAUSTED_LOOKUP_NOTE });
         }
       }
+      // The result's own honesty fields, for the eval transcript. Reported for
+      // every outcome including the budget refusal above — "the lookup never
+      // ran" is the answer to a whole class of failure (#452).
+      input.onToolResult?.(toolResultDigest(name, resultText));
       responseParts.push({ functionResponse: { name, response: { result: resultText } } });
     }
     contents.push({ role: "user", parts: responseParts });
