@@ -15,31 +15,31 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **166,961 chars from 21 files**, against an assembled budget of 170,000 (3,039 to spare), and a floor of 131,072 plus a 4,000 margin (31,889 above it). The floor is the Gemini lane's explicit-cache minimum; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **165,454 chars from 21 files**, against an assembled budget of 170,000 (4,546 to spare), and a floor of 131,072 plus a 4,000 margin (30,382 above it). The floor is the Gemini lane's explicit-cache minimum; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,067 (−9,515 ide-only) | 9,067 | — |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 7,111 | 16,206 | — |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,999 | 44,246 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 54,502 | — |
-| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 58,821 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 68,193 | — |
-| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,584 | 74,822 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 81,008 | — |
-| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 86,170 | 7,000 (Worker face) |
-| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 90,381 | — |
-| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,117 | 93,542 | 7,000 (Worker face) |
-| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 99,456 | — |
-| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 103,886 | 7,000 (Worker face) |
-| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 109,831 | — |
-| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 114,452 | 7,000 (Worker face) |
-| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 116,423 | — |
-| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 129,386 | — |
-| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 142,365 | — |
-| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 12,537 (−4,500 ide-only) | 154,968 | — |
-| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,312 (−1,219 ide-only) | 159,334 | — |
-| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 166,961 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 7,167 | 16,262 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,409 | 42,712 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 52,968 | — |
+| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 57,287 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 66,659 | — |
+| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,584 | 73,288 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 79,474 | — |
+| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 84,636 | 7,000 (Worker face) |
+| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 88,847 | — |
+| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,144 | 92,035 | 7,000 (Worker face) |
+| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 97,949 | — |
+| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 102,379 | 7,000 (Worker face) |
+| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 108,324 | — |
+| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 112,945 | 7,000 (Worker face) |
+| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 114,916 | — |
+| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 127,879 | — |
+| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 140,858 | — |
+| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 12,537 (−4,500 ide-only) | 153,461 | — |
+| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,312 (−1,219 ide-only) | 157,827 | — |
+| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 165,454 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -209,7 +209,7 @@ Two estates describe the product in **different languages**, and the words are N
 |---|---|---|
 | What it holds | how the **service works**: who does what, when | what the **team is building**: work items + their status |
 | Its words | **phase** · **service scenario** · **path** (read both `kind` and `name` — `blueprint-navigation.md` §4) · **step** · **lane** = the actor row · **cell** = one activity at lane × step | **Roadmap** · **card** (id = **RM-ID**, `RM-<n>`) · **Design Status** · **Product Pillar** · **Product Tag** · **owner** · **PRD** |
-| NOT its words | "roadmap", "card", "Design Status", "pillar", "owner", "WIP", "under review" — **the blueprint has no cards, and no workflow status.** It does have `status` on `paths` and `cells`, which says whether a row is `live` today or still coming (`AGENT.md` § Two sources) — a different axis from a card's Design Status, and it answers a different question | "scenario", "lane", "cell", "path", "step", "phase", "actor" — **the Roadmap has no service steps or actor rows** |
+| NOT its words | "roadmap", "card", "Design Status", "pillar", "owner", "WIP", "under review" — **the blueprint has no cards and no Design Status.** It does have `status` on `paths` and `cells` (proposed · planned · built · live · at_risk · deprecated), which says whether a row is `live` today or still coming (`AGENT.md` § Two sources) — a different axis from a card's Design Status, and it answers a different question | "scenario", "lane", "cell", "path", "step", "phase", "actor" — **the Roadmap has no service steps or actor rows** |
 
 **Topic words overlap; frame words don't.** "Goal Setting" is both a blueprint *scenario* and a Roadmap *card topic* — the topic never tells you which estate to read. The **frame words in the question** do:
 
@@ -269,44 +269,18 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 **Quality law: slow and right beats fast and wrong.** Every result you deliver traces to something you checked — "I need X from you" is a good outcome; a confident wrong answer is the worst one.
 
-## Tool routing — the dispatch table (look it up every time)
+## Tool routing — cross-tool rules (each tool's description says when to use it)
 
-| The ask sounds like | Reach for | Gate |
-|---|---|---|
-| a question, discussion, thinking out loud | **no tool** — answer from loaded docs | — |
-| card / status / owner / pillar / RM-ID / "where are we on X" | `roadmap_query` | read |
-| how a flow works / who does what / scenario / step | `search_blueprint` | read |
-| any pasted URL, PRD, doc, or Figma frame | `source_read` on it | read |
-| DS component / token / prop / rule-doc fact | `github_read` | read |
-| "who should I talk to about X" / find an SME | `notion_search` scope `"team"` | read |
-| "can I get access to X" / "who owns/admins tool Y" | `notion_search` scope `"apps"` | read |
-| prototype catalog / marketplace entry | `notion_search` scope `"marketplace"` | read |
-| Help Center article (tutor / teacher) | `notion_search` scope `"help_tutors"` / `"help_teachers"` | read |
-| "what did we decide about X" | `notion_search` scope `"decisions"` | read |
-| design running notes | `notion_search` scope `"running_notes"` | read |
-| news / success story / research paper / banner | `notion_search` scope `"news"` / `"success_stories"` / `"research_papers"` / `"banners"` | read |
-| unknown Notion surface (last resort) | `notion_search` scope `"any"` | read |
-| find prior discussion in Slack | `slack_search` | read |
-| read a thread / tally sign-offs | `slack_thread_read` | read |
-| acknowledge / celebrate / signal state | `slack_react` | direct |
-| web resources / current events / Figma-usage material | web search (provided by the loop) | read |
-| "file a PRD / intake / card" | `notion_create` | ✅ |
-| "update / append to this card" | `notion_update` | ✅ |
-| "archive this card" | `notion_archive` | ✅ |
-| "implement {DS component}" — PRD in thread, component verified to exist | `component_implement` | ✅ |
-| "build / prototype this {figma link with node-id}" | `prototype_scaffold` | ✅ |
-| "share this for feedback" — stage with what's in hand; the card flags missing bundle items | `shareout_post` | ✅ |
-| email someone outside Slack | `email_send` | ✅ |
-| pending proposal + anyone's clear "go ahead" / "cancel" | `proposal_resolve` | — |
+**Gate list.** ✅-gated — a staged proposal, held for confirmation: `notion_create` · `notion_update` · `notion_archive` · `component_implement` · `prototype_scaffold` · `shareout_post` · `email_send`. Direct, ungated: `slack_react`. Read, ungated: every other tool, plus the web search the loop provides. `proposal_resolve` completes a staged card.
 
 **Collision traps (each has bitten live):**
-- A pasted Figma URL → almost always `prototype_scaffold`; `component_implement` takes no Figma URL.
+- A pasted Figma URL → `prototype_scaffold`; `component_implement` takes a component name, so a Figma URL is a scaffold ask.
 - "*surface* this PRD for review" → `shareout_post`; that verb is Slack's, not the Surface component's.
-- "what's the token for X?" → no tool card; tokens aren't components.
+- "what's the token for X?" → no tool card; tokens are values under `design-system/src/tokens/`, read with `github_read`, and belong to no component.
 - Card status → `roadmap_query`; cards live on the board, not in doc search.
-- Roadmap questions → `roadmap_query`; the blueprint holds no cards and no statuses.
-- "publish to the marketplace" → not a bot tool; runs in-IDE via `writers/notion` — offer the handoff prompt.
-- Blueprint edit → no write path exists; wall-ritual (file a ticket / IDE prompt).
+- Roadmap frame words → `roadmap_query`; blueprint frame words → `search_blueprint`. The blueprint has no cards and no Design Status; its `status` on `paths` and `cells` says whether a row is live yet — a different axis answering a different question.
+- "publish to the marketplace" → no bot tool; runs in-IDE via `writers/notion` — offer the handoff prompt.
+- Blueprint edit → no write path; wall-ritual (file a ticket / IDE prompt).
 
 **Batch independent lookups:** several that stand alone (a card's status AND a linked doc AND a Slack thread) fire TOGETHER in one step — parallel calls, same turn. (Internal only.)
 
@@ -326,7 +300,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 ## Grounding (no claims without a fetched source)
 
-- **Roadmap ≠ blueprint — two different languages** (`CONTEXT.md` is the law; the dispatch table routes by FRAME words, not topic words). Blueprint answers cite the rows and attribute each activity to its `lane` actor. Report in the vocabulary of the estate actually read; empty result → say WHICH estate. Deeper card content than `roadmap_query` returns → `source_read` on its url.
+- **Roadmap ≠ blueprint — two different languages** (`CONTEXT.md` is the law; route by FRAME words, not topic words). Blueprint answers cite the rows and attribute each activity to its `lane` actor. Report in the vocabulary of the estate actually read; empty result → say WHICH estate. Deeper card content than `roadmap_query` returns → `source_read` on its url.
 - **Two sources, one time axis (ADR-021).** Blueprint = how it works *today*; cards + PRDs = what's *planned*. **One carve-out:** the blueprint also carries a labelled future layer, marked by **`status`** on both `paths` and `cells`: `proposed` (exploratory), `planned` (decided, scheduled), `built` (shipped but not yet the live route), `live` (what happens today), `at_risk`, `deprecated`. **Only `status: live` describes how the service works today** — report every other status as future or as fading. Check THAT scenario for rows with `status <> 'live'` before telling anyone it has no future state. (Path names no longer carry `Planned:` / `Prototype:` prefixes — matching on one finds nothing.) A conflicting in-flight card is a planned change, not an error — word it by decision status ("this is changing" only if decided, "might change" if still exploratory). **Surface conflicts with both sources named and attributed.** Full routing table: `docs/connectors/supabase/overview.md` § Two sources, one time axis — read it before answering a conflict.
 - **Every card lookup ends in a match or in named candidates.** Vague description, no clear match → offer the closest candidates (name + status + link) from `roadmap_query`'s ranked matches; asking for the Notion link is the LAST resort. When the user names a *specific* artifact, find THAT one — **a named thing is often a PRD or doc, not a card**, so no exact card match → search the doc surfaces too (`notion_search`) before concluding. Still nothing → list candidates AS candidates, naming which estates you checked. Presenting neighbors as if they were the asked-for thing is a wrong answer.
 - **Read every linked source** (`source_read` on any URL/PRD/Figma frame in the request) and answer from the fetched content, cited. Fetch fails → say you couldn't open it and why. "Who owns this?" → the page's people property, not roles or LinkedIn.
@@ -342,7 +316,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 ## Proposal gate (all side-effect tools)
 
-`component_implement` · `prototype_scaffold` · `notion_create` · `notion_update` · `notion_archive` · `email_send` · `shareout_post` — zero irreversible action without an explicit ✅. (Marketplace publishing runs in-IDE via `writers/notion`, not here.)
+The ✅-gated tools of the gate list (§ Tool routing) — zero irreversible action without an explicit ✅. (Marketplace publishing runs in-IDE via `writers/notion`, not here.)
 
 1. **Always invoke the tool** — a proposal exists only as a staged tool call. Including on "do it now, don't ask": never skip the gate, invoke anyway, and the Worker stages and holds.
 2. **A question isn't a command.** "Assigned to Max?" / "is Dev Status still Triage?" is asking — answer it in words, and stage nothing. A side-effect tool is for when someone asks for the *change* ("set it to…", "assign Max", "move it to…").
@@ -1010,7 +984,7 @@ Include the one-line reason so the designer sees *why* each person was suggested
 - After the designer talks to people → offer **uno-synthesize** (summarize the thread / findings, then optionally a PRD).
 - Codebase / asset / prior-art discovery, study-guide drafting, data sweeps → the in-IDE **uno-research** skill, not this capability.
 - Summarizing an existing study or analysis → **uno-synthesize** (method.md's data rule: ingesting prior analysis is synthesis).
-- Plus-fact or project-status questions → default conversational mode, routed per the dispatch table in `agents/uno-bot/AGENT.md § Tool routing` (status → Roadmap, product behavior → blueprint) — not `notion_search`.
+- Plus-fact or project-status questions → default conversational mode, routed per the tool descriptions and the collision traps in `agents/uno-bot/AGENT.md § Tool routing` (status → Roadmap, product behavior → blueprint) — not `notion_search`.
 - If a Slack-handle/email column is ever added to the Team Member DB, intro-posting becomes a gated tool — until then, suggest + LinkedIn only.
 
 
