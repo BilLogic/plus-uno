@@ -50,11 +50,11 @@ the marker is what a relaxed or raised budget would have to explain.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **1 reference(s), 10,198 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **1 reference(s), 10,258 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 |
+| `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,258 |
 
 ## The assembled prompt
 
@@ -1756,7 +1756,7 @@ THE standing-automation registry. An automation absent from the table below is u
 
 # uno-maintain — method
 
-Keep the harness itself current. One pass per issue: **capture → route → draft → human gate → tier → apply or propose.** Separation of powers is the design: humans observe and *decide*, the agent drafts and *executes*, the bot packages and *routes*. No step self-approves.
+Keep the harness itself current. One pass per issue: **capture → route → draft → human gate → classify → apply or propose.** Separation of powers is the design: humans observe and *decide*, the agent drafts and *executes*, the bot packages and *routes*. No step self-approves.
 
 ## 1 · Intake — normalize the observation
 
@@ -1779,7 +1779,7 @@ Every intake is one of four **trigger types** — improvement (could be better) 
 
 The taxonomy is the harness map — when a new component joins the harness, this table must grow.
 
-**Record:** an intake lives as a **Roadmap DB card** — `Product Pillar: Universal`, lifecycle in the `Intake Status` property (card mechanics: `docs/connectors/notion.md`). Every intake names its **evidence** (file / frame / message link) in the card body and a **suggested tier**. Separate from Decisions DB **Evidence** (URL property on durable design/product decisions).
+**Record:** an intake lives as a **Roadmap DB card** — `Product Pillar: Universal`, lifecycle in the `Intake Status` property (card mechanics: `docs/connectors/notion.md`). Every intake names its **evidence** (file / frame / message link) in the card body and a **suggested severity**. Separate from Decisions DB **Evidence** (URL property on durable design/product decisions).
 
 **Headless surrogate:** scheduled sweeps run without Notion access and file
 their intakes as GitHub issues labeled `harness-intake` (transport contract:
@@ -1810,14 +1810,14 @@ the no-op test is judgement and lives here.
 Answered by the **spotter** (fallback: the designated maintainer) — never by the agent. Present the drafted fix with a **three-line brief: impact / effort / risk**.
 
 - **No** → end: no change needed. Discard the draft; keep the intake card trail.
-- **Yes** → tier it (§4).
+- **Yes** → classify its severity (§4).
 
-## 4 · Tier classification
+## 4 · Severity classification
 
-- **Tier 1 — trivial. The whitelist is absolute:** typos · broken links · stale dates · pure formatting — nothing else. Tier 1 may **never** touch skill definitions, the persona, DS components, or requirements, no matter how small the diff. Apply directly — no PR/PRD, no verdict — and log one line to `docs/evals/runs/digest.jsonl` as `{"ts": "<ISO-8601>", "target": "<file-or-artifact>", "change": "<one line>"}` (the row shape is a contract: the weekly digest automation windows on `ts` and prints `target`/`change`; a row missing `ts` is silently undated and falls out of every digest). The weekly digest posts from it to the design channel (`docs/connectors/slack.md`); the monthly retro reviews the digest.
-- **Tier 2 — substantive:** everything else → the pipeline in §5.
+- **Direct fix — trivial. The whitelist is absolute:** typos · broken links · stale dates · pure formatting — nothing else. A direct fix may **never** touch skill definitions, the persona, DS components, or requirements, no matter how small the diff. Apply directly — no PR/PRD, no verdict — and log one line to `docs/evals/runs/digest.jsonl` as `{"ts": "<ISO-8601>", "target": "<file-or-artifact>", "change": "<one line>"}` (the row shape is a contract: the weekly digest automation windows on `ts` and prints `target`/`change`; a row missing `ts` is silently undated and falls out of every digest). The weekly digest posts from it to the design channel (`docs/connectors/slack.md`); the monthly retro reviews the digest.
+- **Gated change — substantive:** everything else → the pipeline in §5.
 
-## 5 · Tier 2 — PR + PRD → verdict → apply log
+## 5 · Gated change — PR + PRD → verdict → apply log
 
 1. **Pair, never one alone.** Open the PR *and* pair it with a PRD carrying the rationale — reviewers see *why*, not just *what*. A lone PR or lone PRD never ships.
 2. **Review post** to the design review channel (`docs/connectors/slack.md`): self-sufficient — one-line summary, PR + PRD links, suggested reviewers. Assume the reviewer never opens the PR.
@@ -1830,7 +1830,7 @@ Answered by the **spotter** (fallback: the designated maintainer) — never by t
 - **Handoff rails propagation (from uno-publish):** arrives **pre-authorized** — the designer-confirmed handoff plus its three sign-offs replace the worth-incorporating gate and the verdict. Execute the paired PRD + blueprint write per `docs/connectors/supabase/overview.md` and write the apply-log row citing the handoff thread. This is the only intake that skips §3/§5.
 
 - **Conventions are repo-canonical** (decision 2026-07-07, ADR-017): `docs/conventions/` wins every conflict. A legacy Notion playbook page that contradicts a conventions file is the stale artifact — file an intake to banner it as superseded (the faces route the Notion write); never "re-sync" the repo to match it, never fix the drift silently.
-- **Standing sweeps:** named in `docs/engineering/operations.md` — shipped watchdog · weekly Tier-1 digest · Figma hygiene · conventions integrity (agents↔docs cross-references both ways, header canonicality, path rot) · Notion comment sweep. Each sweep files one intake per finding into this same pipeline.
+- **Standing sweeps:** named in `docs/engineering/operations.md` — shipped watchdog · weekly direct-fix digest · Figma hygiene · conventions integrity (agents↔docs cross-references both ways, header canonicality, path rot) · Notion comment sweep. Each sweep files one intake per finding into this same pipeline.
 - **Post-ship reconciliation:** every shipped handoff triggers a reconcile of DS + harness + blueprint against built reality — routine, not exceptional. The check set, per shipped card:
   - `design-system/` stories/MDX reflect the shipped surface where they reference it;
   - harness docs (`docs/product-and-service/*`, conventions, skill references) don't describe pre-ship behavior as current;
@@ -1845,7 +1845,7 @@ Significant work — a non-trivial fix, a gotcha, a decision worth preserving �
 1. **Name the disposition.** A **rule** when an agent would behave differently knowing it — the line lands in the doc that already owns the subject, where the next agent is reading anyway. An **ADR** when the call is hard to reverse *and* surprising without its context *and* a real trade-off, all three. Otherwise **nothing**: git keeps the trail, and dropping a finding worth less than the context it costs is the ordinary outcome.
 2. **A note staged under `docs/knowledge/` declares `disposition:` and `disposition-target:` from the moment it is written** (`npm run check:knowledge-disposition`). It is a receipt for content that already landed, so the next sweep clears it.
 3. **Write the ledger line** in `docs/knowledge/changelog.md` — one per promotion, so adoption is visible rather than implied.
-4. A disposition that edits `AGENTS.md` or the persona is Tier 2 — the gate in §5 applies.
+4. A disposition that edits `AGENTS.md` or the persona is a gated change — the gate in §5 applies.
 
 A learning that survives only in the chat transcript is a capture failure.
 

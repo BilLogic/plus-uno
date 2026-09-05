@@ -4,8 +4,8 @@ description: >
   Keeps the harness itself current. Captures a flagged issue — improvement,
   inaccuracy, inconsistency, or bug — routes it across the four estates
   (codebase, Figma, Notion, Supabase/blueprint) to one of twelve targets, drafts the fix, and runs the
-  tiered pipeline: Tier-1 trivial fixes (typos, links, dates only) apply
-  directly with a weekly-digest line; Tier-2 changes ship as a PR + PRD pair
+  severity pipeline: direct fixes (typos, links, dates only) land straight
+  on main with a weekly-digest line; gated changes ship as a PR + PRD pair
   through Slack review to a verdict. Also runs the standing sweeps (staleness,
   hygiene, shipped watchdog) and settles what finished work leaves behind — a
   rule, an ADR, or nothing. Use when the user says "file an intake", "this doc
@@ -20,7 +20,7 @@ summary: Fix the harness, not project design work
 
 # uno-maintain — IDE face
 
-Fix the harness, not project design work. The shared procedure — taxonomy, tiers, gates — lives in **[`references/method.md`](references/method.md)**; load it first. This file adds in-IDE execution.
+Fix the harness, not project design work. The shared procedure — taxonomy, severities, gates — lives in **[`references/method.md`](references/method.md)**; load it first. This file adds in-IDE execution.
 
 ## Intake sources
 
@@ -35,14 +35,14 @@ Fix the harness, not project design work. The shared procedure — taxonomy, tie
 
 ## Workflow (execution over method.md)
 
-1. **Normalize** (method §1): classify trigger type → estate → target; record the Roadmap intake card via `writers/notion`; name evidence + suggested tier. Cross-estate disagreement → flag it, don't improvise.
+1. **Normalize** (method §1): classify trigger type → estate → target; record the Roadmap intake card via `writers/notion`; name evidence + suggested severity. Cross-estate disagreement → flag it, don't improvise.
 2. **Draft the fix** (method §2), fix-first judge-second:
    - Repo targets (context docs, skills, persona, DS source, bot) — edit files directly in a branch. DS-source and Figma↔DS reconcile targets: execution runbook [`references/ds-fix.md`](references/ds-fix.md) (who executes what · workflows · script inventory).
    - Notion writes → `writers/notion` · Figma writes → `writers/figma` · requirement changes → `writers/blueprint` (paired PRD+blueprint, never one alone) · blueprint-stale-vs-reality (no requirement doc) → `writers/blueprint` solo, PRD only when one exists for the flow.
 3. **Human gate** (method §3): present the 3-line impact / effort / risk brief; the spotter answers. Never answer it yourself.
-4. **Tier and apply** (method §4–5):
-   - **Tier 1** (whitelist absolute): apply, then add the one-line row for the weekly digest.
-   - **Tier 2**: open the PR (git), pair the PRD (`writers/notion`), post the review request, wait for the ✅/🔁/❌ verdict. On ✅: merge/apply and write the apply-log row. Never auto-merge.
+4. **Classify severity and apply** (method §4–5):
+   - **Direct fix** (whitelist absolute): apply, then add the one-line row for the weekly digest.
+   - **Gated change**: open the PR (git), pair the PRD (`writers/notion`), post the review request, wait for the ✅/🔁/❌ verdict. On ✅: merge/apply and write the apply-log row. Never auto-merge.
 5. **Disposition** (method §7): settle what the work left behind — a rule in the doc that already owns the subject, an ADR, or nothing — and write the `docs/knowledge/changelog.md` ledger line when something was promoted. A note staged under `docs/knowledge/` ships with its `disposition:` in the same commit; shape: [`examples/staged-note-template.md`](examples/staged-note-template.md).
 
 ## Sweeps & audits
@@ -51,7 +51,7 @@ Running or triaging a standing sweep, a scored audit, or a skill-quality audit
 → load [`references/sweeps.md`](references/sweeps.md). Ordinary intakes never
 need it.
 
-## Loads for Tier 2
+## Tier-2 loads
 
 - `docs/connectors/notion.md` — intake card + PRD mechanics
 - `docs/connectors/slack.md` — the two gates; verdict convention is gate 2
@@ -68,7 +68,7 @@ Rubric: `docs/evals/rubrics/uno-maintain.md` (applied by `reviewers/rubric-appli
 ## Constraints
 
 - Never self-approve a substantive change; never answer the worth-incorporating gate; never auto-merge on silence.
-- The Tier-1 whitelist is absolute — skills, persona, DS components, and requirements are always Tier 2.
+- The direct-fix whitelist is absolute — skills, persona, DS components, and requirements are always gated changes.
 - A lone PR or lone PRD never ships; every execution writes its apply-log row.
 - Capture lands in the doc that already owns the subject; `docs/knowledge/` stages a note only alongside its `disposition:` and its ledger line.
 - Maintains the harness only — design-work fixes route back through `uno-prototype`; diagnosis-only reviews stay in `uno-review`.

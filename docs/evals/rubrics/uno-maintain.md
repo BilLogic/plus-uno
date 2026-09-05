@@ -1,5 +1,5 @@
 ---
-artifact: intake record · Tier-2 PR+PRD proposal · review post
+artifact: intake record · gated-change PR+PRD proposal · review post
 status: canonical
 distilled: 2026-07-07 — from the Notion 📊 Evals doc (https://app.notion.com/p/396b7cca498281ff8a4ad0e63c621a4c), superseded per ADR-017
 applied_by: agents/reviewers/rubric-applier
@@ -12,7 +12,7 @@ dimensions:
   - id: self-sufficiency
     definition: reviewer follow-up questions before verdict — target median 0
 hard_gates:
-  - 0 Tier-2 changes applied without a Slack verdict (audit merge log vs #plus-design; the Tier-1 whitelist applies verdict-free by design, logged to the digest)
+  - 0 gated changes applied without a Slack verdict (audit merge log vs #plus-design; the direct-fix whitelist applies verdict-free by design, logged to the digest)
   - accepted changes ship as a PR+PRD PAIR, never one alone (100%)
 benchmark: >
   Seeded issue set (one per taxonomy target, 11 total) → measure routing
@@ -26,6 +26,6 @@ summary: Scores the maintenance pipeline end to end: intake routing, proposal qu
 
 # uno-maintain rubric
 
-Scores the maintenance pipeline end to end: intake routing, proposal quality, and the verdict gate. The Slack-verdict gate is absolute — an auto-applied Tier-2 change is a rubric fail and a forbidden-pattern violation. Golden scenarios: `docs/evals/scenarios/uno-maintain.md`.
+Scores the maintenance pipeline end to end: intake routing, proposal quality, and the verdict gate. The Slack-verdict gate is absolute — an auto-applied gated change is a rubric fail and a forbidden-pattern violation. Golden scenarios: `docs/evals/scenarios/uno-maintain.md`.
 
 Canonical here (ADR-017): the Notion source is lineage, not law — a conflicting legacy page gets a superseded banner via uno-maintain, never a repo re-sync.

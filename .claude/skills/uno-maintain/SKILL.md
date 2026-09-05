@@ -4,8 +4,8 @@ description: >
   Keeps the harness itself current. Captures a flagged issue — improvement,
   inaccuracy, inconsistency, or bug — routes it across the four estates
   (codebase, Figma, Notion, Supabase/blueprint) to one of twelve targets, drafts the fix, and runs the
-  tiered pipeline: Tier-1 trivial fixes (typos, links, dates only) apply
-  directly with a weekly-digest line; Tier-2 changes ship as a PR + PRD pair
+  severity pipeline: direct fixes (typos, links, dates only) land straight
+  on main with a weekly-digest line; gated changes ship as a PR + PRD pair
   through Slack review to a verdict. Also runs the standing sweeps (staleness,
   hygiene, shipped watchdog) and settles what finished work leaves behind — a
   rule, an ADR, or nothing. Use when the user says "file an intake", "this doc

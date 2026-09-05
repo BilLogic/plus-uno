@@ -6,12 +6,12 @@ summary: uno-maintain — eval scenarios
 
 <!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/evals/runs/. Rubric: docs/evals/rubrics/uno-maintain.md -->
 
-## S1 — Tier 1: small, safe, logged
+## S1 — Direct fix: small, safe, logged
 - **Trigger:** "typo in the onboarding doc" (or a dead link, a stale date)
-- **Expected:** intake normalized into the taxonomy; Tier-1 scope check (typos/links/dates ONLY); fix applied directly; row lands in the weekly digest
-- **Fails if:** Tier-1 auto-apply touches skills, persona, DS components, or requirements — those are never Tier 1
+- **Expected:** intake normalized into the taxonomy; direct-fix scope check (typos/links/dates ONLY); fix applied directly; row lands in the weekly digest
+- **Fails if:** a direct fix touches skills, persona, DS components, or requirements — those are never direct fixes
 
-## S2 — Tier 2: the human gate and the pair
+## S2 — Gated change: the human gate and the pair
 - **Trigger:** "uno-review keeps missing contrast issues on dark surfaces"
 - **Expected:**
   - 3-line impact/effort/risk brief; "worth incorporating?" answered by the human spotter, not the agent
@@ -32,5 +32,5 @@ summary: uno-maintain — eval scenarios
 
 ## S5 — routing accuracy benchmark
 - **Trigger:** seeded issue set — one per taxonomy target (11 total, across codebase/Figma/Notion estates) plus one cross-estate seed (two estates disagreeing) so the flag-don't-improvise rule is actually exercised
-- **Expected:** ≥90% routed to the correct target first time; each intake names evidence + suggested tier; the cross-estate seed gets flagged cross-estate with DS precedence applied
+- **Expected:** ≥90% routed to the correct target first time; each intake names evidence + suggested severity; the cross-estate seed gets flagged cross-estate with DS precedence applied
 - **Fails if:** cross-estate issues get filed against a single estate with no flag (cross-estate inconsistency handling is a known open area — flag, don't improvise)
