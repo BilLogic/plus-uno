@@ -47,17 +47,16 @@ test("MUTATION: a column the read uses but the contract stops declaring fails lo
   assert.doesNotThrow(() => touchpointSelectFrom(BLUEPRINT_CONTRACT.botDirectReadColumns.touchpoints));
 });
 
-test("the registry is anon-readable by the contract, and not yet a probed table", () => {
-  // publicReadTables is the grant the read stands on. botReadTables is the
-  // probe list the blueprint's CI checks against the DEPLOYED Worker, so the
-  // table joins it one deploy after this read ships; until then index.ts
-  // carries the `table_touchpoints` probe by hand. When the second assertion
-  // fails, the blueprint has added the table and the hand-written probe line
-  // in index.ts is a duplicate to delete.
+test("the registry is anon-readable by the contract, and a probed bot read", () => {
+  // publicReadTables is the grant the read stands on; botReadTables is the
+  // probe list /health/blueprint derives `table_*` keys from. The blueprint
+  // added the table to both (plus-uno-blueprint#370, #374), so the loop keys
+  // `table_touchpoints` and index.ts probes the fuller select as
+  // `select_touchpoints` — the same split as cells / edges / findings.
   assert.ok(touchpointsTableIsPublic(), `${TOUCHPOINTS_TABLE} not in publicReadTables`);
   assert.ok(
-    !(BLUEPRINT_CONTRACT.botReadTables as readonly string[]).includes(TOUCHPOINTS_TABLE),
-    "touchpoints is in botReadTables now — drop the hand-written probe line in index.ts",
+    (BLUEPRINT_CONTRACT.botReadTables as readonly string[]).includes(TOUCHPOINTS_TABLE),
+    "touchpoints left botReadTables — /health/blueprint would stop probing the table",
   );
 });
 

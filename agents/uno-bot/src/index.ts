@@ -105,14 +105,10 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
     await probe("select_cells_spec", `/rest/v1/cells?select=${encodeURIComponent(CELL_FALLBACK_SELECT)}&limit=1`);
     await probe("select_edges_kind", `/rest/v1/cell_dependencies?select=${encodeURIComponent(EDGE_SELECT_COLUMNS)}&limit=1`);
     await probe("select_findings_open", `/rest/v1/${FINDINGS_TABLE}?select=id&status=eq.open&limit=1`);
-    // The touchpoint registry (#414), keyed the way the botReadTables loop
-    // would key it. The table is not in that list yet — the blueprint's CI
-    // checks `table_*` keys against the DEPLOYED Worker, so it adds the table
-    // only after this read ships — and this line is what makes the key exist
-    // on the day it does. It probes the select the read issues, imported, so
-    // when the loop later writes the same key with a bare `select=id`, this
-    // fuller check is the one that stands.
-    await probe(`table_${TOUCHPOINTS_TABLE}`, `/rest/v1/${TOUCHPOINTS_TABLE}?select=${encodeURIComponent(TOUCHPOINT_SELECT)}&limit=1`);
+    // The touchpoint registry's select (#414), imported like the three above.
+    // `table_touchpoints` comes from the botReadTables loop now that the
+    // contract lists it; this is the fuller check — the columns the read names.
+    await probe("select_touchpoints", `/rest/v1/${TOUCHPOINTS_TABLE}?select=${encodeURIComponent(TOUCHPOINT_SELECT)}&limit=1`);
     const body = { ok: Object.values(probes).every(Boolean), build: BUILD, probes };
     contractProbeCache = { at: now, body };
     return Response.json(body, { status: body.ok ? 200 : 503 });

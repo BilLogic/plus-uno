@@ -49,6 +49,13 @@ test("the cells fallback still reads the resources embed", () => {
   // drop it and the "check all four before calling a topic empty" guard in
   // normalize() loses a third of what it checks.
   assert.match(CELL_FALLBACK_SELECT, /resources\(name,url,kind\)/);
+  // Two FKs cells → lanes since 20260830180000; an unhinted embed is PGRST201.
+  assert.match(
+    CELL_FALLBACK_SELECT,
+    new RegExp(`lane:lanes!${BLUEPRINT_CONTRACT.fkConstraints.cellLane}\\(`),
+    "the lanes embed carries the contract's hint",
+  );
+  assert.equal(BLUEPRINT_CONTRACT.fkConstraints.cellLane, "cells_lane_id_fkey");
   assert.match(CELL_FALLBACK_SELECT, new RegExp(`(^|,)${PROSE_COLUMN}(,|$)`));
 });
 
