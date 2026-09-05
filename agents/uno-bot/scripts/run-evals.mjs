@@ -7,7 +7,10 @@
 //      expectLevel against the dials the route reports — the tier the turn
 //      ran on and the thinking level it was SENT with, #421 — and
 //      expectToolCalled against the tool calls the route lists, so a case can
-//      assert a read happened mid-turn and what it named, #423), and
+//      assert a read happened mid-turn and what it named, #423 — and
+//      expectHistory against the history this runner SENT to a later turn,
+//      so a case can assert a fetched reference reached the next turn as its
+//      receipt and not as its text, #426), and
 //   2. an LLM judge (Gemini on Vertex, same SA as everything else) against the
 //      condensed D1–D9 bot-answer rubric + the case's judgeNote.
 // A failing BLOCKER case fails the job (exit 1) — mirroring the scenario doc's
@@ -26,6 +29,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { createSign } from "node:crypto";
 import { passesCase } from "./eval-scoring.mjs";
+import { threadTurn, checkHistory, sentSummary } from "./eval-history.mjs";
 
 const {
   WORKER_URL,
@@ -158,8 +162,11 @@ async function judgeCase(token, c, transcript) {
 }
 
 // ── Deterministic checks ──────────────────────────────────────────────────────
-function checkTurn(spec, resp) {
-  const failures = [];
+// `historySent` is the history this runner handed the route for the turn —
+// checked before the response is, because what was sent is a fact of the run
+// even when the turn errored (eval-history.mjs checkHistory, #426).
+function checkTurn(spec, resp, historySent = []) {
+  const failures = checkHistory(spec, historySent);
   if (!resp?.ok) {
     failures.push(`turn errored: ${resp?.error ?? "no response"}`);
     return failures;
@@ -215,7 +222,7 @@ function checkTurn(spec, resp) {
 
 // Which fixture keys make a turn carry its own assertions (else the case-level
 // spec applies to the final turn only).
-const TURN_SPEC_KEYS = ["expectKind", "expectTool", "expectDecision", "expectTier", "expectLevel", "expectToolCalled", "forbidTool", "textRegex"];
+const TURN_SPEC_KEYS = ["expectKind", "expectTool", "expectDecision", "expectTier", "expectLevel", "expectToolCalled", "expectHistory", "forbidTool", "textRegex"];
 const hasOwnSpec = (turn) => TURN_SPEC_KEYS.some((k) => k in turn);
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -261,30 +268,18 @@ async function main() {
         turn.usePendingFromPreviousTurn ? pending : null,
         surface,
       );
-      transcript.turns.push({ prompt: turn.prompt, response: resp });
+      // `sent` is the compact record of what this turn was handed — size and
+      // reference receipts — so a reviewer can read the clearing case's
+      // evidence off the transcript without the judge paying for the history.
+      transcript.turns.push({ prompt: turn.prompt, sent: sentSummary(history), response: resp });
       // Per-turn checks: turn-level spec if present, else the case-level spec on
-      // the final turn only.
+      // the final turn only. `history` here is still what the route received.
       const spec = hasOwnSpec(turn) ? turn : (turn === c.turns[c.turns.length - 1] ? c : {});
-      failures.push(...checkTurn(spec, resp).map((f) => `${c.id}${c.turns.length > 1 ? ` t${transcript.turns.length}` : ""}: ${f}`));
-      // Thread state forward for multi-turn cases.
-      const r = resp?.result;
-      history.push({ role: "user", content: turn.prompt });
-      if (r?.kind === "text") history.push({ role: "assistant", content: r.text ?? "" });
-      else if (r?.kind === "proposal") {
-        history.push({ role: "assistant", content: `(staged a ${r.toolName} proposal awaiting confirmation)` });
-        pending = { toolName: r.toolName, input: r.input ?? {} };
-      } else if (r?.kind === "resolved") {
-        // Production writes the OUTCOME MARKER to DO history, not the friendly
-        // text (agent/resolve-proposal.ts) — and slack/events.ts reads that
-        // marker to refuse re-carding a cancelled action. Mirror it here or the
-        // headless history is not the history the bot actually sees (R5).
-        const marker =
-          r.decision === "cancel"
-            ? `(Cancelled the proposed ${pending?.toolName ?? "action"} — nothing was done.)`
-            : (r.messageToUser ?? `(${r.decision})`);
-        history.push({ role: "assistant", content: marker });
-        pending = null;
-      }
+      failures.push(...checkTurn(spec, resp, history).map((f) => `${c.id}${c.turns.length > 1 ? ` t${transcript.turns.length}` : ""}: ${f}`));
+      // Thread state forward for multi-turn cases, the way production records
+      // a turn: reply text or outcome marker, and the reference RECEIPT on the
+      // user turn — never the reference text (eval-history.mjs).
+      pending = threadTurn(history, turn.prompt, resp, pending);
     }
 
     const judge = failures.length ? { verdict: "fail", reason: "deterministic checks failed" } : await judgeCase(judgeToken, c, transcript);
