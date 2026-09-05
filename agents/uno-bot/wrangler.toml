@@ -227,9 +227,13 @@ GEMINI_REGION = "global"
 GEMINI_MODEL = "gemini-3.8-flash"
 # Backup model — a turn that hits a capacity/availability error (404/429/500/
 # 503) on GEMINI_MODEL retries once on this model and finishes there, instead
-# of dying like the 2026-07-16 outage. Pick one with a SEPARATE quota pool from
-# the active model (pro vs flash); degraded-but-answering beats down.
-GEMINI_FALLBACK_MODEL = "gemini-2.5-pro"
+# of dying like the 2026-07-16 outage; degraded-but-answering beats down.
+# gemini-3.7-flash since 2026-09-04 (was gemini-2.5-pro, two generations back and
+# behind the /^gemini-3/ gate, so a failover turn silently lost thinking_level and
+# the built-in search tools). The previous flash keeps every dial. Vertex quotas
+# are keyed per base model, so 3.7 and 3.8 draw on separate pools — if a live
+# incident ever shows both exhausted together, move this to a pro.
+GEMINI_FALLBACK_MODEL = "gemini-3.7-flash"
 # Vertex-Claude sonnet-lane model id (only read when MODEL_PROVIDER=vertex-claude;
 # haiku/opus tiers are fixed in src/agent/routing.ts). Optional — defaults to
 # "claude-sonnet-5".
