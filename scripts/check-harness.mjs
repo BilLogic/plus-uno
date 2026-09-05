@@ -156,6 +156,18 @@ const COMPOSED = [
       "the negation ratchet — the density of five imperative-ban tokens (never / don't / do not / cannot / must not) not climbing, over TWO scopes ratcheted separately from one baseline file: the bundled harness docs and, since #174, the hand-authored IDE-side docs (the `embodiment: ide` complement of the bundled set within the bundler's own section roots, so docs/adr/ and the generated .claude/skills/ surfaces are out by structure). It counts PROHIBITION TOKENS, not negation as written: the two differ by roughly 3x and #234 chose the narrow, unarguable one on the evidence. Each scope also refuses to run against fewer docs than its baseline was recorded over — a ratchet only fails on a RISE, so a corpus that vanished otherwise passes with a smaller number. The script header carries the measurement.",
   },
   {
+    script: 'check:pointers',
+    pkg: 'root',
+    guards:
+      "the pointer sweep over the always-loaded router (AGENTS.md): every backticked repo path resolves, every `path § Heading` names a heading that exists, and every § Progressive loading trigger leads with the word that carries its branch rather than filler. A pointer that does not resolve, or buries its trigger, is a document the agent will not reach — the same rot as a stale schema name in prose (#409), one layer up. Conditional pointers (\"when `path` exists\") and bare shape names (`SKILL.md`) are skipped by rule, and the rules are mutation-tested in check-pointers.test.mjs (#420).",
+  },
+  {
+    script: 'check:glossary',
+    pkg: 'root',
+    guards:
+      'CONTEXT.md staying a glossary: no fenced code, no third-level headings, every section holding term rows, and prose lines ratcheted against docs/evals/glossary-baseline.json — the count may fall, never rise. The two sibling repos grew their CONTEXT.md to 40k and 18k chars one "just one more section" at a time (#420); this is what stops it here.',
+  },
+  {
     script: 'check:button-contrast',
     pkg: 'root',
     guards:

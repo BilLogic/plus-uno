@@ -16,9 +16,9 @@
       "corpus": "docs the bundler assembles into the Worker prompt (embodiment: all | uno-bot)",
       "measuredOn": "the bundled body — frontmatter stripped, as bundle-harness.mjs strips it before assembly, so the count is tokens the model is actually told",
       "docs": 21,
-      "total": 199,
+      "total": 198,
       "counts": {
-        "AGENTS.md": 6,
+        "AGENTS.md": 5,
         "CONTEXT.md": 7,
         "agents/uno-bot/AGENT.md": 6,
         "skills/uno-maintain/references/method.md": 13,

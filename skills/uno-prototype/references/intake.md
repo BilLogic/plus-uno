@@ -161,3 +161,7 @@ plan restates it, generation builds against it, validation checks against it.
 
 A failed review or an iteration by choice re-enters at the reflection
 (`reflect_learn`), not at "fix the artifact" — the strategy itself may change.
+
+## One step per turn
+
+When `.cursor/hooks/briefings/active-intake-question.json` exists, read it and ask exactly that one hook step — AskQuestion with `questions.length === 1`, or one plain question. One step per turn, even when context already answers a later one: the interview's value is the order, and each step is weighed in its own turn.

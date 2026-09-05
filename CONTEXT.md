@@ -59,9 +59,16 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **Decisions DB** | centralized decision log under Design HQ — Status / Owner / Sign-off / Date / Roadmap Card / Evidence | "Decision Log" (obsolete per-project subpage) |
 | **pillar** | product area (Universal · Admin · Toolkit · Training · Marketing …) — maps to a Slack channel | "category" |
 | **replica** | the Figma frame mirroring a coded prototype — required in prototype share-outs | "screenshot" |
-| **Tier 1 / Tier 2** (maintenance) | trivial auto-applied fix vs PR+PRD through a Slack verdict | — |
-| **Tier 1 / Tier 2** (loading) | always-loaded docs vs on-demand loads (`AGENTS.md` § The loading contract) | — |
+| **direct fix / gated change** | the two maintenance severities: a trivial fix applied straight to main with a digest line, vs a PR + PRD through a Slack verdict. Was "Tier 1 / Tier 2 (maintenance)"; the old spelling retires in batches (#429, in batches) | "Tier 1", "Tier 2" |
+| **Tier 1 / Tier 2 / Tier 3** | the loading tiers: always-loaded · on demand · retrieved live (`AGENTS.md` § The loading contract). *Tier* means loading and nothing else | "Tier" for a maintenance severity |
 | **RM-ID** | Roadmap card id (`RM-<n>`) — the Figma↔Notion join key | — |
+| **embodiment** | a runtime uno runs in — the IDE, the uno-bot Worker, headless GitHub Actions — each with its own powers and its own slice of the harness; `embodiment:` frontmatter says which docs a runtime bundles | "mode", "environment" |
+| **persona** | uno-bot's own always-loaded document (`agents/uno-bot/AGENT.md`): voice, audience, gate, etiquette — what the Worker is, beside what every embodiment obeys | "system prompt", "soul" |
+| **pointer** | a line held in context that names material outside it and the branch that should reach it — a skill description, a row in § Progressive loading. Its wording, not its target, decides whether the agent gets there | "link", "reference" (a reference is what a pointer points AT) |
+| **ladder** | where a piece of writing sits by how immediately the agent needs it: in-file step · in-file reference · **disclosed** reference behind a pointer | — |
+| **disclosed** | reference pushed out of the always-loaded tier behind a pointer, loaded only when the pointer fires; the Worker's `read_reference` tool is its Tier 2 | "hidden", "optional" |
+| **leading word** | a compact pretrained concept an agent thinks with (*tracer bullet*, *red*, *ratchet*): repeated as a token, kept out of sentence form; front-loaded in a pointer so it triggers | — |
+| **sprawl** | a document too long even when every line is live — attention thins across it; the cure is the ladder, not a shorter sentence | "bloat" (bloat is dead weight; sprawl is live weight) |
 
 ## Two vocabularies — the blueprint speaks service-blueprint, the Roadmap speaks project-management
 
@@ -82,11 +89,4 @@ Two estates describe the product in **different languages**, and the words are N
 
 **Attribution rule:** when reporting findings, name the estate you actually read, in its own words — "on the Roadmap board" ONLY for Notion Roadmap cards; "in the service blueprint" ONLY for blueprint rows.
 
-## Codify the frame words in chat
-
-When uno-bot (or any agent) writes to Slack or Notion, the estates' FRAME words render as `code` so designers learn to recognize them as system vocabulary, not casual English — Bill, Jul 2026:
-
-- **Blueprint frame words:** `phase` · `scenario` · `path` · `step` · `lane` · `cell`, plus the lane (actor-row) names listed in `blueprint-navigation.md` §3.
-- **Roadmap frame words:** `card` · `RM-ID` · `Design Status` · `Dev Status` · `Product Pillar` · `Product Tag` · `Intake Status`.
-
-Scenario and project *names* (Goal Setting, Warm-Up, Session Sign Up) stay `*bold*` — they're topics, not frame words. Codify a frame word when it's used AS the system term ("the `Regular Tutor` `lane`"), not in ordinary prose ("a tutor joins the call").
+How frame words render in chat (as `code`) is a Slack and Notion writing convention: `docs/connectors/slack.md` § Frame words render as code.
