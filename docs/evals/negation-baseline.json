@@ -72,6 +72,21 @@
         "skills/uno-review/references/storybook.md": 1,
         "skills/uno-synthesize/SKILL.md": 5
       }
+    },
+    "actions": {
+      "corpus": "the headless GitHub Actions prompts under scripts/prompts/ — every .md the skill-loader root holds: the adapter SKILL.mds, their references/, and the shared headless-intake contract. Listed by where they live, since they carry no embodiment: and are never bundled (#425)",
+      "measuredOn": "whole files, frontmatter included — the sweep workflows hand a SKILL.md to the model as a prompt-file: with nothing stripped, and the loader route the implement adapters take is narrower",
+      "docs": 7,
+      "total": 68,
+      "counts": {
+        "scripts/prompts/references/headless-intake.md": 4,
+        "scripts/prompts/uno-direct-fix-digest/SKILL.md": 3,
+        "scripts/prompts/uno-implement-design/SKILL.md": 20,
+        "scripts/prompts/uno-implement/SKILL.md": 22,
+        "scripts/prompts/uno-implement/references/new-component-scaffolding.md": 7,
+        "scripts/prompts/uno-integrity-sweep/SKILL.md": 7,
+        "scripts/prompts/uno-shipped-watchdog/SKILL.md": 5
+      }
     }
   }
 }

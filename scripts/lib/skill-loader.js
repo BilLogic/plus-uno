@@ -33,6 +33,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const BOT_SKILLS_ROOT = resolve(__dirname, '../prompts');
 
 /**
+ * The prompts' root, exported so the sweeps that cover the Actions embodiment
+ * (`scripts/lib/actions-prompts.mjs`) walk the directory THIS loader reads
+ * rather than a copy of its name (#425).
+ */
+export const PROMPTS_ROOT = BOT_SKILLS_ROOT;
+
+/**
  * Section headings that are metadata for humans and should not appear in the
  * runtime system prompt. The loader strips each section from its `## Heading`
  * line through (but not including) the next `##` heading of the same level.
