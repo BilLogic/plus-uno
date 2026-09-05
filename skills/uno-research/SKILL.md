@@ -98,8 +98,9 @@ change to this skill must keep all five passing.
 - **Read-only, one exception:** the study guide (and research notes), written
   via writers/notion to convention Notion surfaces only.
 - **Cite everything** — a finding without a citation doesn't ship.
-- **Never contact people** — people-scout sources and drafts; humans send.
-- **Never conclude** — no takeaways, no go/no-go, no PRD. Hand the brief to
-  `uno-synthesize`.
+- **People are the human's to contact** (method.md § 2, the people path) —
+  people-scout sources and drafts the intro; the human sends it.
+- **Stop at evidence** (method.md § 4) — the brief goes to `uno-synthesize`;
+  takeaways, go/no-go and PRDs are its.
 - **Stay scoped** to the question asked; expand into adjacent topics only when
   they change the answer.

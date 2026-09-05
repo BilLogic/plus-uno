@@ -1,5 +1,6 @@
 ---
 embodiment: all
+disclosure: reference
 summary: uno-review — the shared procedure both faces load.
 ---
 

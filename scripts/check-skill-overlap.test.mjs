@@ -11,6 +11,9 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import {
   MAX_SHARED_LINES,
@@ -28,6 +31,9 @@ import {
 } from './lib/bundled-set.mjs';
 
 const doc = (label, text) => ({ label, text });
+
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const SKILLS_ROOT = path.join(REPO_ROOT, 'skills');
 
 test('structural lines are discounted, not counted as drift', () => {
   for (const line of [
@@ -163,6 +169,53 @@ test('a citation is not a duplication', () => {
     doc('skills/uno-review/bot.md', 'Evidence travels with the deliverable — `AGENTS.md` § The loading contract.'),
   );
   assert.deepEqual(found, []);
+});
+
+// ── A disclosed method is still compared (#424) ──────────────────────────────
+//
+// `disclosure: reference` moves a method out of the prompt and into the
+// reference map. It does not move it out of the Worker's reading, so it must
+// not move it out of this guard: a face that restates its own disclosed method
+// is still one rule in two homes the bot reads, on the turn that fetches it.
+
+test('a face that restates its disclosed method is found, in both scopes', () => {
+  const rule = 'The study guide exists in Notion before any SME or participant conversation.';
+  const method = doc(
+    'skills/x/references/method.md',
+    `---\nembodiment: all\ndisclosure: reference\n---\n\n# x — method\n\n${rule}\n`,
+  );
+  const face = doc('skills/x/bot.md', `---\nembodiment: uno-bot\n---\n\n# x — bot face\n\nSlack steps.\n\n- **${rule}**\n`);
+  // Scope one reads the skill's three files off disk, disclosure or not.
+  assert.equal(findSharedLines(method, face).length, 1, 'the within-skill pairing sees through disclosure');
+  // Scope two compares the whole Worker corpus — prompt plus map — so the same
+  // pair is found there too, and the frontmatter that moved the method is
+  // discounted as structure rather than read as a rule.
+  const { findings, pairings } = findSharedAcross([method, face, doc('AGENTS.md', '# constitution\n\nUnrelated.\n')]);
+  assert.equal(pairings, 3);
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].a.label, 'skills/x/references/method.md');
+  assert.equal(findings[0].b.label, 'skills/x/bot.md');
+});
+
+test('every disclosed method is inside the corpus the bundle scope compares', () => {
+  // The real run: each method that declares `disclosure: reference` on disk is
+  // one of the docs `auditBundle` collected. A method that left the prompt and
+  // fell out of the comparison would let its face restate it unseen.
+  const { files } = auditBundle();
+  const disclosed = fs
+    .readdirSync(SKILLS_ROOT, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && d.name.startsWith('uno-'))
+    .map((d) => `skills/${d.name}/references/method.md`)
+    .filter((rel) => /^disclosure:\s*reference$/m.test(fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8')));
+  assert.ok(disclosed.length >= 1, 'expected at least one disclosed method on disk');
+  for (const rel of disclosed) {
+    assert.ok(files.includes(rel), `${rel} is disclosed but absent from the bundle scope's corpus`);
+  }
+  // And every face is compared against every method, whichever delivery the method has.
+  for (const rel of disclosed) {
+    const face = rel.replace('/references/method.md', '/bot.md');
+    assert.ok(files.includes(face), `${face} must be in the same corpus as its method`);
+  }
 });
 
 test('the bundled set today has no substantive cross-document overlap', () => {
