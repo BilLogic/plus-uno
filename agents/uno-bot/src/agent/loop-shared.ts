@@ -58,6 +58,21 @@ export interface AgentInput {
    *  narration, capped + capped-count) so the Worker can post them as separate
    *  interim messages. Never receives the full working monologue. */
   onInterim?: (text: string) => void;
+  /** Called once, as the turn finishes, with the tier it was routed to and the
+   *  model + thinking level the last model call was sent with — the same facts
+   *  the `[uno-bot] request done` log line carries. The headless eval route
+   *  reports these so a scenario can assert the level, not just the model
+   *  (#421). Absent on production turns, which read the log. */
+  onDials?: (dials: TurnDials) => void;
+}
+
+/** What one turn actually ran on. `level` is null when the model in use takes
+ *  no thinking dial (a 2.x fallback on the Gemini lane; every Claude call). */
+export interface TurnDials {
+  tier: ModelTier;
+  route: string;
+  model: string;
+  level: string | null;
 }
 
 export type AgentResult =

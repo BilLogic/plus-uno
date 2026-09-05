@@ -121,11 +121,13 @@ export interface Env {
   // + the alert-throttle timestamp. (The harness itself is now baked into the
   // Worker bundle at build time — src/generated/harness.ts — so serving it costs
   // zero subrequests; this KV is the fallback/alert path. See agent/skills.ts.)
-  /** Tier models on the Gemini lane. The tier IS the model now; the thinking
-   *  dial is pinned to medium. GEMINI_MODEL remains the `default` tier so
-   *  existing config keeps working. GEMINI_GRIND_MODEL is separate from
-   *  GEMINI_FALLBACK_MODEL on purpose — one is "the capable model", the other
-   *  is "what we fall back to when the primary fails". */
+  /** Tier models on the Gemini lane. A tier is model PLUS thinking level
+   *  (chill low, default medium, grind high — src/agent/gemini-tiers.ts,
+   *  ADR-028); only the model is overridable here, the level moves with the
+   *  tier. GEMINI_MODEL remains the `default` tier so existing config keeps
+   *  working. GEMINI_GRIND_MODEL is separate from GEMINI_FALLBACK_MODEL on
+   *  purpose — one is "the capable model", the other is "what we fall back to
+   *  when the primary fails". */
   GEMINI_CHILL_MODEL?: string;
   GEMINI_GRIND_MODEL?: string;
 

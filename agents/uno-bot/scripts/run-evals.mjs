@@ -3,7 +3,9 @@
 // come back as data, nothing posts to Slack/Notion), then scores each case two
 // ways:
 //   1. deterministic checks from the fixture (expectKind / expectTool /
-//      textRegex / forbidTool / gateAsk escape hatch), and
+//      textRegex / forbidTool / gateAsk escape hatch, and expectTier /
+//      expectLevel against the dials the route reports — the tier the turn
+//      ran on and the thinking level it was SENT with, #421), and
 //   2. an LLM judge (Gemini on Vertex, same SA as everything else) against the
 //      condensed D1–D9 bot-answer rubric + the case's judgeNote.
 // A failing BLOCKER case fails the job (exit 1) — mirroring the scenario doc's
@@ -178,8 +180,24 @@ function checkTurn(spec, resp) {
   if (spec.textRegex && r.kind === "text" && !new RegExp(spec.textRegex).test(r.text ?? "")) {
     failures.push(`text missing /${spec.textRegex}/`);
   }
+  // Dials are reported by the agent loop as the turn finishes (loop-shared.ts
+  // TurnDials): the tier it routed to, and the model + level the LAST model
+  // call went out with. A missing block is a failure, not a pass — a turn that
+  // reports nothing cannot prove it ran at the level the case asserts.
+  const dials = resp.dials ?? null;
+  if (spec.expectTier && dials?.tier !== spec.expectTier) {
+    failures.push(`tier=${dials?.tier ?? "unreported"} (expected ${spec.expectTier})`);
+  }
+  if (spec.expectLevel && dials?.level !== spec.expectLevel) {
+    failures.push(`level=${dials?.level ?? "unreported"} (expected ${spec.expectLevel}; model=${dials?.model ?? "?"})`);
+  }
   return failures;
 }
+
+// Which fixture keys make a turn carry its own assertions (else the case-level
+// spec applies to the final turn only).
+const TURN_SPEC_KEYS = ["expectKind", "expectTool", "expectDecision", "expectTier", "expectLevel", "forbidTool", "textRegex"];
+const hasOwnSpec = (turn) => TURN_SPEC_KEYS.some((k) => k in turn);
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
@@ -227,7 +245,7 @@ async function main() {
       transcript.turns.push({ prompt: turn.prompt, response: resp });
       // Per-turn checks: turn-level spec if present, else the case-level spec on
       // the final turn only.
-      const spec = turn.expectKind || turn.expectTool || turn.expectDecision ? turn : (turn === c.turns[c.turns.length - 1] ? c : {});
+      const spec = hasOwnSpec(turn) ? turn : (turn === c.turns[c.turns.length - 1] ? c : {});
       failures.push(...checkTurn(spec, resp).map((f) => `${c.id}${c.turns.length > 1 ? ` t${transcript.turns.length}` : ""}: ${f}`));
       // Thread state forward for multi-turn cases.
       const r = resp?.result;

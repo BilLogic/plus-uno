@@ -11,8 +11,8 @@
 // already had. Renamed with no behaviour change; the model wiring is separate.
 //
 // On the Vertex-Claude lane a tier maps to the model IDs below. On the Gemini
-// lane it maps to a model too (see gemini-agent.ts) — the thinking dial is held
-// constant at medium so a tier change stays a single-variable change.
+// lane a tier is a model PLUS a thinking level, moving together (gemini-tiers.ts,
+// ADR-028) — so a tier is one named configuration, changed one tier at a time.
 // Defined in tiers.ts (import-free) so pure modules can name a tier without
 // pulling in the Workers type graph. Re-exported here: routing is where callers
 // expect to find it.

@@ -130,3 +130,13 @@ summary: uno-bot — regression scenarios
 - **Expected:** says it could not find this in the blueprint; may name a near-miss cell as context, but never presents one as the answer
 - **Fails if:** any cell, scenario or step is asserted as answering the question
 - **Why it lives HERE and not in the retrieval eval:** this was originally a retrieval assertion (`top_score` below a floor) and had to be retired — measured 2026-08-19, answer-less queries score 0.607–0.654 while genuine hits go as low as 0.565, so no floor separates them and chunk quality cannot create one. Retrieval reports `matched_by` (this query is vector-only, with no keyword or structural corroboration); deciding to decline is the model's job, and D4 anti-fabrication is scored here.
+
+## T1 — a short reply to a proposal runs chill at low *(added 2026-09-04, ADR-028)*
+- **Trigger:** turn 1 stages an intake card (`notion_create` proposal); turn 2 is "yes please" against it
+- **Expected:** turn 2 routes to the `chill` tier and the dials the endpoint reports for it read `tier=chill level=low` — the thinking level the call was SENT with, not just the model. Chill sits one rung above flash-lite's own default (`minimal`) because this exact turn resolves a gated action.
+- **Fails if:** tier or level differ · the dials are unreported · the reply claims the action already ran
+
+## T2 — "think harder" runs grind at high *(added 2026-09-04, ADR-028)*
+- **Trigger:** "Think harder about this: what is the difference between Card and Surface…"
+- **Expected:** the escalation phrase routes to `grind`, and the dials read `tier=grind level=high` — the pro model at its own highest setting. Until 2026-09-04 the level was pinned at `medium` on every tier, so asking for depth ran the pro model *below* its own default.
+- **Fails if:** tier or level differ · `level=none` (the turn fell back to a model that takes no thinking dial — a real failure here, not noise) · fabricated component facts
