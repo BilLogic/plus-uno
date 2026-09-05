@@ -28,11 +28,9 @@ skills/<name>/
 ```
 
 `disclosure: reference` is the frontmatter line that moves a method out of the
-Worker's always-loaded prompt into the reference map beside it. Five of the six
-carry it today; `uno-prototype`'s method stays loaded, because the always-loaded
-core keeps a floor (`agents/uno-bot/scripts/bundle-harness.mjs` § BUDGETS) and
-it is the method most skill turns reach. #418's measurement decides whether it
-follows the others.
+Worker's always-loaded prompt into the reference map beside it. All six carry
+it: every Worker face opens by reading its method through `read_reference` and
+closes on the pointer that names it.
 
 ## Where content goes
 

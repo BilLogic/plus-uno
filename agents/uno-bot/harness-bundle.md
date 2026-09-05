@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **159,565 chars from 17 files**, against an assembled budget of 170,000 (10,435 to spare), and a floor of 131,072 plus a 4,000 margin (24,493 above it). The floor is the Gemini lane's explicit-cache minimum; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **150,243 chars from 16 files**, against an assembled budget of 170,000 (19,757 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 129,859 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -23,19 +23,18 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 8,246 | 17,877 | — |
 | 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 25,763 | 43,681 | 28,000 (persona) |
 | 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,036 | 49,761 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 59,133 | — |
-| 6 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,947 | 66,125 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 72,838 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 78,125 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,213 | 84,380 | 7,000 (Worker face) |
-| 10 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 90,782 | 7,000 (Worker face) |
-| 11 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 92,753 | — |
-| 12 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 105,716 | — |
-| 13 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,694 | 119,452 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 122,700 | — |
-| 15 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 24,576 | 147,331 | — |
-| 16 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 151,920 | — |
-| 17 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,597 (−605 ide-only) | 159,565 | — |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,997 | 56,803 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 63,516 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 68,803 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,213 | 75,058 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 81,460 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 83,431 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 96,394 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,694 | 110,130 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 113,378 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 24,576 | 138,009 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 142,598 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,597 (−605 ide-only) | 150,243 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -47,11 +46,12 @@ the marker is what a relaxed or raised budget would have to explain.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **5 reference(s), 32,283 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **6 reference(s), 41,596 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
 | `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,258 |
+| `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
 | `uno-research/method` | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 |
 | `uno-review/method` | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 |
@@ -430,173 +430,6 @@ After posting, the thread waits on the reviewer. Scannable, not a transcript.
 
 ---
 
-<!-- skills/uno-prototype/references/method.md -->
-
-<!-- Runtime-neutral core — loaded by BOTH faces (SKILL.md in the IDE, bot.md in the Worker).
-     No IDE tool names, no Slack formatting here; execution specifics live in the faces. -->
-
-# uno-prototype — method
-
-Turn a written requirement into a design artifact. UNO's role depends on the
-deliverable's execution mode: for external-tool routes UNO is the **prompt
-engineer, not the generator** — the spec is the output, the external tool
-generates. Where UNO itself holds the medium (an in-chat text sketch, a
-connected design tool driven through its gated writer), producing directly is
-legitimate — the rule's target is hand-faking what a tool must render, never
-delegated production through sanctioned channels. Hi-fi builds UNO makes
-directly, against `uno-storybook`. Critique belongs to uno-review; sharing and
-handoff to uno-publish. The hand-craft path bypasses this skill by design —
-but nothing bypasses the stage-lens review.
-
-## 0. PRD required — entry gate, all fidelities
-
-No PRD → do not enter this skill. Applies to every route including hand-craft;
-there are no exceptions and no "idea-only" bypass.
-
-**Acceptable PRD forms (any one):**
-
-1. **Notion PRD URL** — the document of record from `skills/uno-synthesize`
-2. **Local PRD file** — a `.md` path in the repo (e.g. eval fixtures)
-3. **Inline PRD body** — pasted in the same turn, with structured sections
-   (user flows, acceptance criteria, scope, or equivalent)
-
-**When PRD is missing:** stop immediately. Do not ground, scaffold, write a
-prompt-spec, or touch `prototypes/`. Invite the designer to run
-`skills/uno-synthesize` first (`notion_create` flow) and return with the PRD
-link or approved inline draft. Never invent requirements to fill the gap.
-
-**The intake contract.** Before any routing or building, an interview settles —
-one question per message, no step skipped, a step the conversation already
-answered rendered as a one-tap confirm (cite the source), never re-asked cold —
-and ends in a confirmed **brief card**: goal · artifact · fidelity (as explicit
-per-dimension dial settings) · won't-include. The card is the **contract**
-carried into planning, generation, and validation. Plus Design System is always
-applied and is never asked. Any runtime that can ask a question can run the
-interview; runtimes with an intake hook automate it, others run it manually —
-same steps, same order, same card.
-
-## 1. Ground the brief — unconditional, scoped
-
-No path from PRD to prototyping skips grounding, at any fidelity.
-
-- Pull user flows, constraints, and current-state context from `uno-blueprint`,
-  **scoped to this project's Roadmap card** plus globally-flagged constraints.
-  Summarize long records — grounding is scoped retrieval, never a blueprint dump.
-- Sweep for prior art: existing components, specs, and prototypes
-  touching the same surface.
-- **Figma grounding when a frame is in play — the runtimes are NOT symmetric:**
-  the **IDE** connects to Figma directly (design context, screenshots, variable
-  reads, gated write-back; see `design-system/guidelines/figma/mcp-guide.md`). **uno-bot**
-  gets a rendered screenshot of a pasted frame link (with `node-id`) plus
-  text-layer reads. Fills, geometry and variable-binding IDs arrive but its
-  reader drops them; resolving an ID to a token name is separately
-  Enterprise-gated. Those fields are unread rather than absent. Given a known
-  component, the bot grounds token values through `github_read` on
-  `design-system/src/tokens/`; exact frame measurements and visual math route
-  to the IDE (full statement: `agents/uno-bot/AGENT.md § My lane`).
-- Keep a grounding snapshot (what was read, when). Re-entry depends on it.
-
-**Re-grounding rule:** on every re-entry — review returned issues, or the
-designer iterates by choice — diff the PRD/blueprint against the grounding
-snapshot. Changed → re-ground the delta. Unchanged → fix against the existing
-grounding; never re-run the full ritual out of habit.
-
-## 2. Choose the route
-
-The designer chooses; UNO routes — and never gold-plates past the ask. The
-confirmed artifact selects the deliverable: a **flow map**, **wireframe or
-static mockup**, **concept image**, **storyboard**, or **interactive proof**
-exits as a prompt-spec (or, where sanctioned, a directly-produced WIP
-artifact); a **hi-fi build** is executed directly on the design system. Each
-deliverable's procedure lives in its own reference; every deliverable honors
-the same contract and exit ritual below.
-
-A revision re-enters *here*, not at "fix the artifact" — a failed review may
-legitimately change the deliverable or tool, not just content.
-
-## 3. The prompt-spec — shape, then the self-check block
-
-**Every prompt-spec names the same skeleton:** the flow's **trigger → steps →
-outcome**, the actors and systems touched, and the constraints from grounding.
-Specs for something interactive add the asset spec the generating tool needs —
-real copy (never lorem), sample data, screen states **including empty and
-error**, and the specific behavior under test. Always name what is out of scope,
-so the tool doesn't invent it. Each deliverable's reference adds its own
-specifics on top of this skeleton.
-
-**Provenance is the authoring gate, not the surface.** Any face that can read
-the PRD and return text may author the complete spec. Every line traces to an
-input the face actually read: copy, states and constraints from the PRD or
-conversation; design-system names and values from the design-system source.
-Cite those inputs. What the inputs leave open stays visible as a named question
-or an explicit out-of-scope line (the hard gate in §4); open inputs remain open.
-The current surface carries the complete spec; durable storage uses only a
-writer that surface actually has, behind its normal confirmation gate.
-
-**Direct production is sanctioned only where UNO holds the medium:** an in-chat
-text sketch, or a write through a gated design-tool writer. Everything else is a
-spec the designer carries to the external tool.
-
-Every prompt-spec ends with an embedded self-check: the confirmed brief
-restated as concrete pass/fail checks (serves the goal · right artifact shape ·
-at the agreed fidelity dials · nothing from the won't-include list, plus the
-spec's own named states/constraints). The block instructs the generating tool
-to verify its output against these checks and regenerate once if any fail. The
-loop travels inside the spec, so it runs on any platform — no UNO-side runtime
-needed. Where UNO can see the result (the designer pastes it back), UNO
-re-checks against the same block. A spec is done when it is usable with at
-most one regeneration.
-
-## 4. Hard gates — at any fidelity
-
-**Missing context → ask, never invent.** If the grounded brief lacks what the
-artifact needs — screen states (empty/error/loading), an ambiguous interaction,
-a missing Figma target or frame intent, unclear DS expectations — surface it
-before you act on the brief. "Act" means whichever move your face makes next:
-building, writing the spec, or staging a proposal. Proposing as though the
-brief were complete is the same defect as building on an invented behavior —
-a PRD existing is not the same as a PRD being complete. Name the gaps in the
-reply, and either ask instead of proceeding or carry them visibly alongside
-what you propose. Filling a gap with invented behavior is a defect, not a draft.
-
-**DS gap → protocol, never silent invention.** When the design needs a
-component the system doesn't have: (1) name the gap explicitly, (2) propose the
-nearest existing composition as the interim, (3) file a uno-maintain intake for
-the missing component. Zero hand-rolled lookalikes — a gap is a finding, not a
-license to invent. Filing is an external-estate write, so it needs the usual
-approval: if no approver is present, record the intake in the artifact manifest
-as pending and say so — never drop the gap silently, and never write unasked.
-
-## 5. Exit — validation, manifest, hand off
-
-Before any artifact leaves the skill:
-
-1. **Validation.** Coded artifacts run the validation loop their deliverable
-   reference defines (objective: every available machine check passes AND the
-   brief card is honored; capped attempts). Headless codegen faces run the
-   check set as a deterministic post-step whose results land in the draft PR
-   under "Machine checks" — the PR review is their fix loop, and a ❌ there
-   blocks review sign-off, not PR creation. Spec deliverables carry their
-   validation inside the spec (§3).
-2. **DS-lens validation pass** — a conformance check at the artifact's own
-   fidelity (no token nits on a flow sketch; full rigor on a hi-fi build).
-   Major findings loop back to the route decision (§2).
-3. **Artifact manifest** — one line: fidelity · tools used · PRD link, plus
-   any unresolved check failures. Review's mandatory input; **every path exit
-   produces it**.
-4. Hand to **uno-review** for the stage-lens review. Passing review and being
-   ready to share are separate gates — iteration by choice re-enters at §2.
-
-## Quality bar
-
-Scored against `docs/evals/rubrics/uno-prototype.md` — grounding-completeness ·
-prompt-spec-quality · ds-compliance · fidelity-appropriateness, plus the two
-hard gates above (pass/fail, they override the score). Golden scenarios:
-`docs/evals/scenarios/uno-prototype.md`.
-
-
----
-
 <!-- skills/uno-prototype/bot.md -->
 
 <!-- Worker face — bundled by uno-bot via `embodiment: uno-bot` above. NOT loaded by the IDE agent. -->
@@ -606,7 +439,7 @@ Turn a written requirement into a build from Slack. A designer names a design-sy
 
 ## Execute — one prototype turn
 
-1. **Hold the method in view.** It is loaded just above this face; the PRD gate, the grounding ritual and the two hard gates are its sections, and every step here is their Slack rendering. Done when you have located the section each step below cites.
+1. **Read the method.** The pointer at the foot of this file names it; make that `read_reference` call before anything below — the PRD gate, the grounding ritual, the prompt-spec skeleton and the two hard gates are its sections, and every step here is their Slack rendering. Done when the method is in this turn's context.
 2. **Sort the ask.** A build or update verb on a named DS component, or a pasted Figma frame with a build verb, is an implement ask. "Check / look at / compare / what does X do" is a question — answer it or `source_read` the link, and stage nothing. Asked *about* a frame → answer from the screenshot and text layers, within `agents/uno-bot/AGENT.md § My lane`. Done when you know whether this turn answers, asks, or stages.
 3. **Hold the PRD gate** (method §0) — every fidelity, every route. A PRD is one of: a Notion PRD URL, the polling bot's PRD notification already in the thread, or a PRD pasted inline this turn with its sections. None in hand → say a PRD is required, route to **uno-synthesize**, and stage nothing; every PRD link you cite is one you fetched. Done when the PRD is read this turn, or the turn has ended at the route.
 4. **Confirm fidelity first.** "Hi-fi via the DS library, or a quick mid-fi draft?" — the designer chooses; a brief that states it, or delegates it ("your call"), counts as answered. Done when fidelity is stated in the thread.
@@ -644,7 +477,7 @@ Bullets are discrete actions in future tense.
 - Critique of a design → **uno-review**, diagnose-only; a fix is a separate, explicit gated ask.
 - Multi-file refactors (>5 files) or visual iteration → the in-IDE agent.
 
-**uno-prototype/method** — the procedure behind these steps: the PRD entry gate and intake contract, unconditional scoped grounding with its re-grounding rule, route choice by deliverable, the prompt-spec skeleton and self-check block, the two hard gates, and the exit ritual (validation · DS-lens pass · artifact manifest · hand to review). It is the one method still loaded in this prompt — the section just above this face — because most skill turns reach it and the always-loaded core keeps a floor; the other five sit behind `read_reference`.
+**uno-prototype/method** — the procedure behind these steps: the PRD entry gate and intake contract, unconditional scoped grounding with its re-grounding rule, route choice by deliverable, the prompt-spec skeleton and self-check block, the two hard gates, and the exit ritual (validation · DS-lens pass · artifact manifest · hand to review). It is disclosed: `read_reference` with name `uno-prototype/method` as the turn's first move (step 1), and again in a later turn of the same thread if its text is no longer in context.
 
 
 ---
@@ -1904,6 +1737,174 @@ Significant work — a non-trivial fix, a gotcha, a decision worth preserving �
 4. A disposition that edits `AGENTS.md` or the persona is a gated change — the gate in §5 applies.
 
 A learning that survives only in the chat transcript is a capture failure.
+
+
+
+---
+
+<!-- reference: uno-prototype/method -->
+
+<!-- Runtime-neutral core — loaded by BOTH faces (SKILL.md in the IDE, bot.md in the Worker).
+     No IDE tool names, no Slack formatting here; execution specifics live in the faces. -->
+
+# uno-prototype — method
+
+Turn a written requirement into a design artifact. UNO's role depends on the
+deliverable's execution mode: for external-tool routes UNO is the **prompt
+engineer, not the generator** — the spec is the output, the external tool
+generates. Where UNO itself holds the medium (an in-chat text sketch, a
+connected design tool driven through its gated writer), producing directly is
+legitimate — the rule's target is hand-faking what a tool must render, never
+delegated production through sanctioned channels. Hi-fi builds UNO makes
+directly, against `uno-storybook`. Critique belongs to uno-review; sharing and
+handoff to uno-publish. The hand-craft path bypasses this skill by design —
+but nothing bypasses the stage-lens review.
+
+## 0. PRD required — entry gate, all fidelities
+
+No PRD → do not enter this skill. Applies to every route including hand-craft;
+there are no exceptions and no "idea-only" bypass.
+
+**Acceptable PRD forms (any one):**
+
+1. **Notion PRD URL** — the document of record from `skills/uno-synthesize`
+2. **Local PRD file** — a `.md` path in the repo (e.g. eval fixtures)
+3. **Inline PRD body** — pasted in the same turn, with structured sections
+   (user flows, acceptance criteria, scope, or equivalent)
+
+**When PRD is missing:** stop immediately. Do not ground, scaffold, write a
+prompt-spec, or touch `prototypes/`. Invite the designer to run
+`skills/uno-synthesize` first (`notion_create` flow) and return with the PRD
+link or approved inline draft. Never invent requirements to fill the gap.
+
+**The intake contract.** Before any routing or building, an interview settles —
+one question per message, no step skipped, a step the conversation already
+answered rendered as a one-tap confirm (cite the source), never re-asked cold —
+and ends in a confirmed **brief card**: goal · artifact · fidelity (as explicit
+per-dimension dial settings) · won't-include. The card is the **contract**
+carried into planning, generation, and validation. Plus Design System is always
+applied and is never asked. Any runtime that can ask a question can run the
+interview; runtimes with an intake hook automate it, others run it manually —
+same steps, same order, same card.
+
+## 1. Ground the brief — unconditional, scoped
+
+No path from PRD to prototyping skips grounding, at any fidelity.
+
+- Pull user flows, constraints, and current-state context from `uno-blueprint`,
+  **scoped to this project's Roadmap card** plus globally-flagged constraints.
+  Summarize long records — grounding is scoped retrieval, never a blueprint dump.
+- Sweep for prior art: existing components, specs, and prototypes
+  touching the same surface.
+- **Figma grounding when a frame is in play — the runtimes are NOT symmetric:**
+  the **IDE** connects to Figma directly (design context, screenshots, variable
+  reads, gated write-back; see `design-system/guidelines/figma/mcp-guide.md`). **uno-bot**
+  gets a rendered screenshot of a pasted frame link (with `node-id`) plus
+  text-layer reads. Fills, geometry and variable-binding IDs arrive but its
+  reader drops them; resolving an ID to a token name is separately
+  Enterprise-gated. Those fields are unread rather than absent. Given a known
+  component, the bot grounds token values through `github_read` on
+  `design-system/src/tokens/`; exact frame measurements and visual math route
+  to the IDE (full statement: `agents/uno-bot/AGENT.md § My lane`).
+- Keep a grounding snapshot (what was read, when). Re-entry depends on it.
+
+**Re-grounding rule:** on every re-entry — review returned issues, or the
+designer iterates by choice — diff the PRD/blueprint against the grounding
+snapshot. Changed → re-ground the delta. Unchanged → fix against the existing
+grounding; never re-run the full ritual out of habit.
+
+## 2. Choose the route
+
+The designer chooses; UNO routes — and never gold-plates past the ask. The
+confirmed artifact selects the deliverable: a **flow map**, **wireframe or
+static mockup**, **concept image**, **storyboard**, or **interactive proof**
+exits as a prompt-spec (or, where sanctioned, a directly-produced WIP
+artifact); a **hi-fi build** is executed directly on the design system. Each
+deliverable's procedure lives in its own reference; every deliverable honors
+the same contract and exit ritual below.
+
+A revision re-enters *here*, not at "fix the artifact" — a failed review may
+legitimately change the deliverable or tool, not just content.
+
+## 3. The prompt-spec — shape, then the self-check block
+
+**Every prompt-spec names the same skeleton:** the flow's **trigger → steps →
+outcome**, the actors and systems touched, and the constraints from grounding.
+Specs for something interactive add the asset spec the generating tool needs —
+real copy (never lorem), sample data, screen states **including empty and
+error**, and the specific behavior under test. Always name what is out of scope,
+so the tool doesn't invent it. Each deliverable's reference adds its own
+specifics on top of this skeleton.
+
+**Provenance is the authoring gate, not the surface.** Any face that can read
+the PRD and return text may author the complete spec. Every line traces to an
+input the face actually read: copy, states and constraints from the PRD or
+conversation; design-system names and values from the design-system source.
+Cite those inputs. What the inputs leave open stays visible as a named question
+or an explicit out-of-scope line (the hard gate in §4); open inputs remain open.
+The current surface carries the complete spec; durable storage uses only a
+writer that surface actually has, behind its normal confirmation gate.
+
+**Direct production is sanctioned only where UNO holds the medium:** an in-chat
+text sketch, or a write through a gated design-tool writer. Everything else is a
+spec the designer carries to the external tool.
+
+Every prompt-spec ends with an embedded self-check: the confirmed brief
+restated as concrete pass/fail checks (serves the goal · right artifact shape ·
+at the agreed fidelity dials · nothing from the won't-include list, plus the
+spec's own named states/constraints). The block instructs the generating tool
+to verify its output against these checks and regenerate once if any fail. The
+loop travels inside the spec, so it runs on any platform — no UNO-side runtime
+needed. Where UNO can see the result (the designer pastes it back), UNO
+re-checks against the same block. A spec is done when it is usable with at
+most one regeneration.
+
+## 4. Hard gates — at any fidelity
+
+**Missing context → ask, never invent.** If the grounded brief lacks what the
+artifact needs — screen states (empty/error/loading), an ambiguous interaction,
+a missing Figma target or frame intent, unclear DS expectations — surface it
+before you act on the brief. "Act" means whichever move your face makes next:
+building, writing the spec, or staging a proposal. Proposing as though the
+brief were complete is the same defect as building on an invented behavior —
+a PRD existing is not the same as a PRD being complete. Name the gaps in the
+reply, and either ask instead of proceeding or carry them visibly alongside
+what you propose. Filling a gap with invented behavior is a defect, not a draft.
+
+**DS gap → protocol, never silent invention.** When the design needs a
+component the system doesn't have: (1) name the gap explicitly, (2) propose the
+nearest existing composition as the interim, (3) file a uno-maintain intake for
+the missing component. Zero hand-rolled lookalikes — a gap is a finding, not a
+license to invent. Filing is an external-estate write, so it needs the usual
+approval: if no approver is present, record the intake in the artifact manifest
+as pending and say so — never drop the gap silently, and never write unasked.
+
+## 5. Exit — validation, manifest, hand off
+
+Before any artifact leaves the skill:
+
+1. **Validation.** Coded artifacts run the validation loop their deliverable
+   reference defines (objective: every available machine check passes AND the
+   brief card is honored; capped attempts). Headless codegen faces run the
+   check set as a deterministic post-step whose results land in the draft PR
+   under "Machine checks" — the PR review is their fix loop, and a ❌ there
+   blocks review sign-off, not PR creation. Spec deliverables carry their
+   validation inside the spec (§3).
+2. **DS-lens validation pass** — a conformance check at the artifact's own
+   fidelity (no token nits on a flow sketch; full rigor on a hi-fi build).
+   Major findings loop back to the route decision (§2).
+3. **Artifact manifest** — one line: fidelity · tools used · PRD link, plus
+   any unresolved check failures. Review's mandatory input; **every path exit
+   produces it**.
+4. Hand to **uno-review** for the stage-lens review. Passing review and being
+   ready to share are separate gates — iteration by choice re-enters at §2.
+
+## Quality bar
+
+Scored against `docs/evals/rubrics/uno-prototype.md` — grounding-completeness ·
+prompt-spec-quality · ds-compliance · fidelity-appropriateness, plus the two
+hard gates above (pass/fail, they override the score). Golden scenarios:
+`docs/evals/scenarios/uno-prototype.md`.
 
 
 

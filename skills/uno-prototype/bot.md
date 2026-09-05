@@ -1,6 +1,6 @@
 ---
 embodiment: uno-bot
-summary: uno-prototype — the Worker's prototype turn, complete in-file; its method is the one still loaded beside it.
+summary: uno-prototype — the Worker's prototype turn, complete in-file; the method is disclosed behind read_reference.
 ---
 
 <!-- Worker face — bundled by uno-bot via `embodiment: uno-bot` above. NOT loaded by the IDE agent. -->
@@ -10,7 +10,7 @@ Turn a written requirement into a build from Slack. A designer names a design-sy
 
 ## Execute — one prototype turn
 
-1. **Hold the method in view.** It is loaded just above this face; the PRD gate, the grounding ritual and the two hard gates are its sections, and every step here is their Slack rendering. Done when you have located the section each step below cites.
+1. **Read the method.** The pointer at the foot of this file names it; make that `read_reference` call before anything below — the PRD gate, the grounding ritual, the prompt-spec skeleton and the two hard gates are its sections, and every step here is their Slack rendering. Done when the method is in this turn's context.
 2. **Sort the ask.** A build or update verb on a named DS component, or a pasted Figma frame with a build verb, is an implement ask. "Check / look at / compare / what does X do" is a question — answer it or `source_read` the link, and stage nothing. Asked *about* a frame → answer from the screenshot and text layers, within `agents/uno-bot/AGENT.md § My lane`. Done when you know whether this turn answers, asks, or stages.
 3. **Hold the PRD gate** (method §0) — every fidelity, every route. A PRD is one of: a Notion PRD URL, the polling bot's PRD notification already in the thread, or a PRD pasted inline this turn with its sections. None in hand → say a PRD is required, route to **uno-synthesize**, and stage nothing; every PRD link you cite is one you fetched. Done when the PRD is read this turn, or the turn has ended at the route.
 4. **Confirm fidelity first.** "Hi-fi via the DS library, or a quick mid-fi draft?" — the designer chooses; a brief that states it, or delegates it ("your call"), counts as answered. Done when fidelity is stated in the thread.
@@ -48,4 +48,4 @@ Bullets are discrete actions in future tense.
 - Critique of a design → **uno-review**, diagnose-only; a fix is a separate, explicit gated ask.
 - Multi-file refactors (>5 files) or visual iteration → the in-IDE agent.
 
-**uno-prototype/method** — the procedure behind these steps: the PRD entry gate and intake contract, unconditional scoped grounding with its re-grounding rule, route choice by deliverable, the prompt-spec skeleton and self-check block, the two hard gates, and the exit ritual (validation · DS-lens pass · artifact manifest · hand to review). It is the one method still loaded in this prompt — the section just above this face — because most skill turns reach it and the always-loaded core keeps a floor; the other five sit behind `read_reference`.
+**uno-prototype/method** — the procedure behind these steps: the PRD entry gate and intake contract, unconditional scoped grounding with its re-grounding rule, route choice by deliverable, the prompt-spec skeleton and self-check block, the two hard gates, and the exit ritual (validation · DS-lens pass · artifact manifest · hand to review). It is disclosed: `read_reference` with name `uno-prototype/method` as the turn's first move (step 1), and again in a later turn of the same thread if its text is no longer in context.

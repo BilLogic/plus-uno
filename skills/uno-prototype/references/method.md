@@ -1,5 +1,6 @@
 ---
 embodiment: all
+disclosure: reference
 summary: uno-prototype — the shared procedure both faces load.
 ---
 

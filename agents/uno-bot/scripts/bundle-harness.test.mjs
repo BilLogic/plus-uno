@@ -218,12 +218,28 @@ test("an assembled bundle over its char budget fails the build", () => {
 // ── The floor (#418) ─────────────────────────────────────────────────────────
 //
 // The ceiling stops a bundle from growing past what the model can attend to.
-// The floor stops it from SHRINKING past what the Gemini lane can cache: under
-// Vertex's explicit-cache minimum the prompt silently ships inline at full
-// price. Three connector docs emptied to their frontmatter take the committed
-// bundle from ~167k to under the provisional 131k floor — three, not one,
-// because no single member is large enough, and because a floor that one
-// missing doc could trip would be a ceiling in disguise.
+// The floor stops it from SHRINKING past what the Gemini cache in force will
+// hold: under the minimum the prompt silently ships at full price. Which
+// minimum is in force follows `GEMINI_REGION` in wrangler.toml — `global` runs
+// on Google's implicit cache (4,096 tokens, 16,384 chars), a region creates the
+// explicit cache (provisional 131,072 chars) — so the tests below name each
+// branch by fixing the region, and one runs against the committed region so the
+// active floor is proven to trip, whichever it is.
+
+const wranglerToml = "agents/uno-bot/wrangler.toml";
+
+/** The floor the committed wrangler.toml selects. Stated here independently of the bundler
+ *  so a bundler that picked the wrong branch could not agree with the test. */
+const activeFloor = () => {
+  const region = readFileSync(path.join(repoRoot, wranglerToml), "utf8").match(/^GEMINI_REGION\s*=\s*"([^"]+)"/m)[1];
+  return region === "global"
+    ? { value: 16_384, margin: 4_000, label: "16,384 + 4,000 (implicit cache, GEMINI_REGION global)" }
+    : { value: 131_072, margin: 4_000, label: `131,072 + 4,000 (explicit cache, GEMINI_REGION ${region})` };
+};
+
+/** wrangler.toml with its GEMINI_REGION line rewritten to `region`. */
+const withRegion = (region) => (abs, original) =>
+  writeFileSync(abs, original.replace(/^GEMINI_REGION\s*=\s*"[^"]+"/m, `GEMINI_REGION = "${region}"`));
 
 /** A doc reduced to its frontmatter: still a member (embodiment intact), zero body. */
 const frontmatterOnly = (abs, original) => {
@@ -231,29 +247,73 @@ const frontmatterOnly = (abs, original) => {
   writeFileSync(abs, original.slice(0, end + 4) + "\n");
 };
 
-test("an assembled bundle under its char floor fails the build", () => {
+/** `withFile` over a list, innermost last; every file is restored whatever `fn` does. */
+const withFiles = (rels, mutate, fn) =>
+  rels.length === 0 ? fn() : withFile(rels[0], mutate, () => withFiles(rels.slice(1), mutate, fn));
+
+/** Every member but the first (AGENTS.md, which carries no path comment): emptied together they
+ *  leave ~10k chars, under either floor. The implicit floor is low enough that no three docs
+ *  can trip it — so the trip has to cut nearly the whole bundle, which is the honest shape of
+ *  the cliff it guards. */
+const allButFirstMember = () => memberOrder(assembled());
+
+test("an assembled bundle under the ACTIVE char floor fails the build", () => {
   const before = readFileSync(harnessTs, "utf8");
-  const result = withFile("docs/connectors/notion.md", frontmatterOnly, () =>
-    withFile("docs/connectors/slack.md", frontmatterOnly, () =>
-      withFile("docs/connectors/supabase/blueprint-navigation.md", frontmatterOnly, () => runBundler(["--check"])),
-    ),
-  );
+  const floor = activeFloor();
+  const result = withFiles(allButFirstMember(), frontmatterOnly, () => runBundler(["--check"]));
   assert.equal(result.code, 1, "a bundle under the floor must fail the build");
   assert.match(result.out, /under its char floor/i);
-  assert.match(result.out, /floor of 131,072/, "the failure must name the floor");
-  assert.match(result.out, /margin of 4,000/, "the failure must name the margin");
+  assert.ok(result.out.includes(`floor of ${floor.label}`), `the failure must name the active floor:\n${result.out}`);
   assert.match(result.out, /short by [\d,]+/, "the failure must name the shortfall");
   assert.equal(readFileSync(harnessTs, "utf8"), before, "a failing floor must not write the artifact");
 });
 
-test("the committed bundle is above its floor today", () => {
-  const len = assembled().length;
-  assert.ok(len >= 131_072 + 4_000, `the committed harness (${len} chars) must clear the floor plus margin`);
+test("GEMINI_REGION `global` selects the implicit-cache floor", () => {
+  const result = withFile(wranglerToml, withRegion("global"), () =>
+    withFiles(allButFirstMember(), frontmatterOnly, () => runBundler(["--check"])),
+  );
+  assert.equal(result.code, 1);
+  assert.match(result.out, /floor of 16,384 \+ 4,000 \(implicit cache, GEMINI_REGION global\)/);
+  assert.match(result.out, /implicit cache holds none of the prompt/, "the consequence must be the implicit cache's");
 });
 
-test("the manifest states the floor beside the budget", () => {
+test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
+  // Three connector docs emptied take the committed bundle under 131k — three, not
+  // one, because no single member is large enough, and because a floor that one
+  // missing doc could trip would be a ceiling in disguise.
+  const result = withFile(wranglerToml, withRegion("us-central1"), () =>
+    withFiles(
+      ["docs/connectors/notion.md", "docs/connectors/slack.md", "docs/connectors/supabase/blueprint-navigation.md"],
+      frontmatterOnly,
+      () => runBundler(["--check"]),
+    ),
+  );
+  assert.equal(result.code, 1);
+  assert.match(result.out, /floor of 131,072 \+ 4,000 \(explicit cache, GEMINI_REGION us-central1\)/);
+  assert.match(result.out, /cannot create its explicit context cache/, "the consequence must be the explicit cache's");
+});
+
+test("a wrangler.toml with no GEMINI_REGION fails the build, naming the line", () => {
+  const result = withFile(
+    wranglerToml,
+    (abs, original) => writeFileSync(abs, original.replace(/^GEMINI_REGION\s*=\s*"[^"]+"\n/m, "")),
+    () => runBundler(["--check"]),
+  );
+  assert.equal(result.code, 1);
+  assert.match(result.out, /GEMINI_REGION/);
+  assert.match(result.out, /floor cannot be chosen/);
+});
+
+test("the committed bundle is above its active floor today", () => {
+  const len = assembled().length;
+  const floor = activeFloor();
+  assert.ok(len >= floor.value + floor.margin, `the committed harness (${len} chars) must clear ${floor.label}`);
+});
+
+test("the manifest states the active floor, its cache and its region beside the budget", () => {
   const md = readFileSync(companionMd, "utf8");
-  assert.match(md, /a floor of 131,072 plus a 4,000 margin \([\d,]+ above it\)/);
+  assert.ok(md.includes(`a floor of ${activeFloor().label}, `), "the manifest must carry the floor line");
+  assert.match(md, /a floor of [\d,]+ \+ [\d,]+ \((?:implicit|explicit) cache, GEMINI_REGION [\w-]+\), [\d,]+ above it\./);
 });
 
 test("every budgeted file is under its budget today", () => {
@@ -448,5 +508,6 @@ test("a disclosed doc does not count toward the assembled prompt, and the prompt
   const disclosedChars = Object.values(map).reduce((n, t) => n + t.length, 0);
   assert.ok(disclosedChars > 0);
   assert.ok(!assembled().includes(map["uno-maintain/method"]));
-  assert.ok(len >= 131_072 + 4_000, `the prompt (${len}) must stay above the floor after the cut`);
+  const floor = activeFloor();
+  assert.ok(len >= floor.value + floor.margin, `the prompt (${len}) must stay above the floor after the cut`);
 });

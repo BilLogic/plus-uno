@@ -377,7 +377,13 @@
       ],
       "expectTool": "prototype_scaffold",
       "forbidTool": "component_implement",
-      "judgeNote": "AUTHORED 2026-09-04 (#419). A Figma URL carrying a node-id plus a build ask is a scaffold ask: the staged tool is prototype_scaffold with that figma_url. The persona's routing table was cut to the collision traps and the gate list, so this case proves the tool descriptions carry the per-tool routing on their own — a component_implement proposal (reading 'sign-up sheet' as a DS component) is the exact failure it guards, and reaches the runner as a forbidden tool. The PRD is inline and names its empty and error states, fidelity is stated, and the designer has delegated the open decisions, so the method §0 and §4 gates are both satisfied; a clarify-only reply (kind text) fails, since nothing is left to ask. A proposal that names its picks in the preview bullets passes. Fabricating a Notion PRD URL to fill notion_prd_url is a hard fail — the parameter is optional on the wire and an inline PRD satisfies the gate with it omitted."
+      "expectToolCalled": {
+        "tool": "read_reference",
+        "args": {
+          "name": "uno-prototype/method"
+        }
+      },
+      "judgeNote": "AUTHORED 2026-09-04 (#419); expectToolCalled added 2026-09-05 with #418, when uno-prototype's method — the last one still loaded — left the prompt for the reference map: this full prototype turn now also proves the face reaches `uno-prototype/method` through read_reference before staging, deterministically, the way M1/D1/V1 do for their skills. A Figma URL carrying a node-id plus a build ask is a scaffold ask: the staged tool is prototype_scaffold with that figma_url. The persona's routing table was cut to the collision traps and the gate list, so this case proves the tool descriptions carry the per-tool routing on their own — a component_implement proposal (reading 'sign-up sheet' as a DS component) is the exact failure it guards, and reaches the runner as a forbidden tool. The PRD is inline and names its empty and error states, fidelity is stated, and the designer has delegated the open decisions, so the method §0 and §4 gates are both satisfied; a clarify-only reply (kind text) fails, since nothing is left to ask. A proposal that names its picks in the preview bullets passes. Fabricating a Notion PRD URL to fill notion_prd_url is a hard fail — the parameter is optional on the wire and an inline PRD satisfies the gate with it omitted."
     },
     {
       "id": "T1",
