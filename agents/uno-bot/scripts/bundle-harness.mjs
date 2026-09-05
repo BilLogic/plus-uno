@@ -6,6 +6,26 @@
 // `embodiment: all | ide | uno-bot` in its own frontmatter and this script globs
 // for it; there is no list of files here to disagree with reality (#159).
 //
+// SO IS DELIVERY (#423). A Worker-read doc may add `disclosure: reference` to
+// its frontmatter. It then leaves the prompt and enters a second artifact from
+// the SAME assembly — `src/generated/references.ts`, a name → text map the
+// `read_reference` tool serves at zero subrequests — so the Worker reaches it
+// only on the turns whose pointer fires. The key is `disclosure` because that
+// is the glossary word (CONTEXT.md: *disclosed* — reference pushed out of the
+// always-loaded tier behind a pointer), and its one value is `reference`, the
+// ladder rung it names. Absent means loaded: the default is the prompt, and a
+// doc has to say so to leave it. `embodiment` still decides WHO reads a doc;
+// `disclosure` decides HOW the Worker gets it, so it is only legal on a doc the
+// Worker reads (`all` or `uno-bot`) — on an `ide` doc it names a delivery for
+// a reader that does not exist, and the build fails rather than bake a map
+// entry nobody can reach.
+//
+// A reference is NAMED by its path with the shape words removed — `skills/` and
+// `references/` carry no meaning to the model — so `skills/uno-maintain/
+// references/method.md` is `uno-maintain/method`: the skill's own name leads,
+// which is the word the face's pointer fires on. A doc outside `skills/` keeps
+// its path sans `.md`.
+//
 // ORDER IS A BUNDLE-LEVEL FACT no single document can know, so it is declared
 // once, in SECTIONS below, and nowhere else. Within a section, members sort by
 // path — except a skill's `method.md`, which precedes its `bot.md` by rule.
@@ -153,8 +173,9 @@ function walk(rel) {
 
 /**
  * Sort key. Paths sort lexically, except that a skill's shared procedure loads
- * before its Worker delta — the one ordering rule a document does own, because
- * `method.md` is meaningless read second.
+ * before its Worker face — the one ordering rule a document does own, because
+ * `method.md` is meaningless read second. A disclosed method never reaches this
+ * sort: it is in the map, not the prompt, and the face points at it.
  */
 function sortKey(rel) {
   const skill = rel.match(/^skills\/([^/]+)\//);
@@ -164,6 +185,11 @@ function sortKey(rel) {
   // a tie would leave their order up to the sort's stability, which is a
   // silent way for the prompt to differ between runs.
   return `skills/${skill[1]}/${face}/${rel}`;
+}
+
+/** The name read_reference knows a disclosed doc by. Stated once; see the header. */
+function referenceName(rel) {
+  return rel.replace(/\.md$/, "").replace(/^skills\//, "").replace(/\/references\//, "/");
 }
 
 // Drop `<!-- ide-only -->…<!-- /ide-only -->` regions — replicated EXACTLY from
@@ -193,6 +219,8 @@ for (const sentinel of ["AGENTS.md", "CONTEXT.md", "skills"]) {
 const outDir = path.join(here, "..", "src", "generated");
 const outFile = path.join(outDir, "harness.ts");
 const companionFile = path.join(here, "..", "harness-bundle.md");
+// The reference map (#423): the disclosed docs, keyed by name, for read_reference.
+const referencesFile = path.join(outDir, "references.ts");
 
 const CHECK = process.argv.includes("--check");
 
@@ -205,6 +233,7 @@ const committed = CHECK
   ? {
       [outFile]: existsSync(outFile) ? readFileSync(outFile, "utf8") : "",
       [companionFile]: existsSync(companionFile) ? readFileSync(companionFile, "utf8") : "",
+      [referencesFile]: existsSync(referencesFile) ? readFileSync(referencesFile, "utf8") : "",
     }
   : null;
 
@@ -219,6 +248,12 @@ const undeclared = [];
 // the walk SAW and did not bundle. Not used to assemble anything; counted, and
 // reported below. See the census note after the guards.
 const ideOnly = [];
+// Worker-read docs that declare `disclosure: reference` — the third answer the
+// walk can give. They ship in the reference map, never in the prompt.
+const disclosed = [];
+// `disclosure` on a doc that cannot carry it: an `ide` doc, or a value that is
+// not the one word this script knows. Both fail the build below.
+const misdisclosed = [];
 
 for (const section of SECTIONS) {
   const found = [];
@@ -229,12 +264,34 @@ for (const section of SECTIONS) {
         undeclared.push(rel);
         continue;
       }
-      if (meta.embodiment === "uno-bot" || meta.embodiment === "all") found.push(rel);
+      const workerReads = meta.embodiment === "uno-bot" || meta.embodiment === "all";
+      if (meta.disclosure !== undefined) {
+        if (meta.disclosure !== "reference") {
+          misdisclosed.push({ rel, why: `\`disclosure: ${meta.disclosure}\` is not a delivery this script knows` });
+        } else if (!workerReads) {
+          misdisclosed.push({ rel, why: `\`disclosure: reference\` on an \`embodiment: ${meta.embodiment}\` doc names a Worker delivery for a doc the Worker never reads` });
+        } else {
+          disclosed.push({ rel, section: section.name, name: referenceName(rel) });
+        }
+        continue;
+      }
+      if (workerReads) found.push(rel);
       else if (meta.embodiment === "ide") ideOnly.push(rel);
     }
   }
   found.sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
   members.push(...found.map((rel) => ({ rel, section: section.name })));
+}
+disclosed.sort((a, b) => a.name.localeCompare(b.name));
+
+if (misdisclosed.length) {
+  console.error(
+    `[bundle-harness] ${misdisclosed.length} doc(s) carry a \`disclosure\` this script cannot honour:\n` +
+      misdisclosed.map(({ rel, why }) => `  ${rel}: ${why}`).join("\n") +
+      "\n  -> the one value is `disclosure: reference`, and only a doc the Worker reads (`embodiment: all`" +
+      "\n     or `uno-bot`) can carry it. Absent means loaded into the prompt.",
+  );
+  process.exit(1);
 }
 
 if (undeclared.length) {
@@ -268,8 +325,8 @@ if (!members.length) {
 // half, and for the total, so a root silently dropped from either list fails
 // instead of narrowing a corpus in silence.
 console.log(
-  `[bundle-harness] embodiment census: ${n(members.length + ideOnly.length)} declared doc(s) under the ` +
-    `section roots — ${n(members.length)} bundled, ${n(ideOnly.length)} ide-only`,
+  `[bundle-harness] embodiment census: ${n(members.length + disclosed.length + ideOnly.length)} declared doc(s) under the ` +
+    `section roots — ${n(members.length)} bundled, ${n(disclosed.length)} disclosed, ${n(ideOnly.length)} ide-only`,
 );
 
 // Read every member from the LOCAL repo. Frontmatter is stripped: it addresses
@@ -286,6 +343,16 @@ const raw = members.map(({ rel }) => {
   const text = readFileSync(abs, "utf8").replace(/\r\n/g, "\n");
   return splitFrontmatter(text).body;
 });
+
+// The disclosed docs, read the same way: frontmatter off, endings normalised,
+// `ide-only` regions dropped — the Worker is the reader, so the IDE's regions
+// are as foreign here as in the prompt. Keyed by name for the map.
+const referenceMap = Object.fromEntries(
+  disclosed.map(({ rel, name }) => {
+    const text = readFileSync(path.join(repoRoot, rel), "utf8").replace(/\r\n/g, "\n");
+    return [name, stripIdeOnly(splitFrontmatter(text).body)];
+  }),
+);
 
 // ── Char budgets, per file ───────────────────────────────────────────────────
 const overBudget = [];
@@ -324,10 +391,10 @@ const assembled = parts
 // stripIdeOnly needs a MATCHED pair — an unbalanced or misspelled marker simply
 // doesn't match, and the IDE-only block ships into the system prompt silently.
 // Fail the build instead: a surviving marker proves something didn't strip.
-if (/<!--\s*\/?\s*ide-only\s*-->/i.test(assembled)) {
+if (/<!--\s*\/?\s*ide-only\s*-->/i.test(assembled + Object.values(referenceMap).join(""))) {
   console.error(
     "[bundle-harness] an <!-- ide-only --> marker survived assembly — unbalanced or misspelled pair. " +
-      "IDE-only content would ship in the bot prompt. Fix the markers and re-run.",
+      "IDE-only content would ship to the bot (in the prompt or the reference map). Fix the markers and re-run.",
   );
   process.exit(1);
 }
@@ -491,6 +558,14 @@ const contents =
   "// GENERATED by scripts/bundle-harness.mjs — do not edit by hand. Run: npm run bundle:harness\n" +
   `export const HARNESS = ${JSON.stringify(assembled)};\n`;
 
+// The reference map, from the same walk (#423). Baked, so a read_reference call
+// is a property lookup: zero subrequests, nothing to fail on a cold start.
+const referencesContents =
+  "// GENERATED by scripts/bundle-harness.mjs — do not edit by hand. Run: npm run bundle:harness\n" +
+  "// The disclosed docs (`disclosure: reference` in their frontmatter), keyed by the name\n" +
+  "// the read_reference tool takes. Same assembly as harness.ts; held to the same --check.\n" +
+  `export const REFERENCES: Record<string, string> = ${JSON.stringify(referenceMap)};\n`;
+
 // ── The companion, rendered from the same assembly ───────────────────────────
 //
 // Two halves, in this order because a reviewer asks "what moved?" before "what
@@ -563,12 +638,33 @@ function renderCompanion() {
     "which is why the last running total exceeds the sum of the chars column. A row marked over budget\n" +
     "cannot normally appear: the bundler refuses to write either artifact once a budget is blown, so\n" +
     "the marker is what a relaxed or raised budget would have to explain.\n\n" +
+    "## Disclosed references\n\n" +
+    (disclosed.length
+      ? `These docs declare \`disclosure: reference\` and ship in \`agents/uno-bot/src/generated/references.ts\` ` +
+        "— the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing " +
+        `and load only on the turns whose pointer fires. **${n(disclosed.length)} reference(s), ` +
+        `${n(Object.values(referenceMap).reduce((t, x) => t + x.length, 0))} chars.**\n\n` +
+        "| Name | Doc | Chars |\n" +
+        "|------|-----|------:|\n" +
+        disclosed
+          .map(({ rel, name }) => `| \`${name}\` | [\`${rel}\`](../../${rel}) | ${n(referenceMap[name].length)} |`)
+          .join("\n") +
+        "\n\n"
+      : "None. A Worker-read doc joins this table by declaring `disclosure: reference`.\n\n") +
     "## The assembled prompt\n\n" +
-    "Verbatim from here to the end of the file — this is the string baked into\n" +
-    "`agents/uno-bot/src/generated/harness.ts` and handed to the model as Block 0 of every request.\n\n" +
+    "Verbatim from here to the end of the prompt — this is the string baked into\n" +
+    "`agents/uno-bot/src/generated/harness.ts` and handed to the model as Block 0 of every request.\n" +
+    (disclosed.length
+      ? "The disclosed references follow it, each under its `<!-- reference: name -->` marker, verbatim\n" +
+        "as baked into `references.ts`, so a sweep over this file from the prompt marker down reads\n" +
+        "everything the bot can be told.\n\n"
+      : "\n") +
     "---\n\n" +
     assembled +
-    "\n"
+    "\n" +
+    disclosed
+      .map(({ name }) => `\n\n---\n\n<!-- reference: ${name} -->\n\n${referenceMap[name]}\n`)
+      .join("")
   );
 }
 
@@ -595,6 +691,7 @@ if (CHECK) {
   const stale = [
     { file: outFile, expected: contents, hint: "src/generated/harness.ts" },
     { file: companionFile, expected: companion, hint: "harness-bundle.md" },
+    { file: referencesFile, expected: referencesContents, hint: "src/generated/references.ts" },
   ].filter(({ file, expected }) => norm(committed[file]) !== norm(expected));
 
   if (stale.length) {
@@ -614,7 +711,7 @@ if (CHECK) {
   }
   console.log(
     `[bundle-harness] --check OK (${assembled.length} chars from ${members.length} files; ` +
-      `harness.ts + harness-bundle.md both current)`,
+      `${disclosed.length} reference(s) disclosed; harness.ts + harness-bundle.md + references.ts all current)`,
   );
   process.exit(0);
 }
@@ -622,6 +719,11 @@ if (CHECK) {
 mkdirSync(outDir, { recursive: true });
 writeFileSync(outFile, contents, "utf8");
 writeFileSync(companionFile, companion, "utf8");
+writeFileSync(referencesFile, referencesContents, "utf8");
 
 console.log(`[bundle-harness] wrote ${outFile} (${assembled.length} chars from ${members.length} files)`);
 console.log(`[bundle-harness] wrote ${companionFile} (manifest + assembled prompt, ${n(companion.length)} chars)`);
+console.log(
+  `[bundle-harness] wrote ${referencesFile} (${disclosed.length} reference(s): ` +
+    `${disclosed.map(({ name }) => `${name} ${n(referenceMap[name].length)} chars`).join(", ") || "none"})`,
+);

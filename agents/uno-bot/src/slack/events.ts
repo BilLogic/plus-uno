@@ -757,6 +757,9 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // fetched this turn", and the receipt is persisted for the next turn.
   let toolsUsedThisTurn: string[] = [];
   let turnReceipt: HistoryTurn["retrieval"];
+  // Names read_reference served this turn — persisted as the receipt that
+  // stands in for the text once the turn ends (#423).
+  let turnReferences: string[] = [];
   // Set only when a slack_search this turn came back EMPTY — see agent/absence.ts.
   let turnAbsence: AbsenceContext | undefined;
   try {
@@ -797,6 +800,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     result = agentRun.result;
     toolsUsedThisTurn = agentRun.tools;
     turnReceipt = agentRun.receipt;
+    turnReferences = agentRun.references;
     turnAbsence = agentRun.absence;
   } catch (err) {
     console.error(`[agent] failed: ${err instanceof Error ? err.message : String(err)}`);
@@ -951,6 +955,9 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       content: vision.historyText,
       ...visionTurn,
       ...(turnReceipt ? { retrieval: turnReceipt } : {}),
+      // The names only. The text was this turn's tool result and ends with it;
+      // the next turn sees a one-line stub per name (provider-conversation.ts).
+      ...(turnReferences.length ? { references: turnReferences } : {}),
     });
     if (delivery.ok) {
       // Record what was actually posted (capped/placeholder), not the raw text.
@@ -1278,8 +1285,13 @@ async function buildThreadHistory(
       wantReceipts ? loadHistory(env, channel, convTs).catch(() => []) : Promise.resolve([]),
     ]);
     const receiptsByTs = new Map<string, NonNullable<HistoryTurn["retrieval"]>>();
+    // Reference receipts merge on the same key, on the same turns: the names
+    // a turn read are the counter-evidence a correction turn checks the prior
+    // prose against, and cost one line each (#423).
+    const referencesByTs = new Map<string, string[]>();
     for (const t of stored) {
       if (t.ts && t.retrieval) receiptsByTs.set(t.ts, t.retrieval);
+      if (t.ts && t.references?.length) referencesByTs.set(t.ts, t.references);
     }
     if (identity && replies.ok && replies.messages?.length) {
       const turns: HistoryTurn[] = [];
@@ -1299,11 +1311,13 @@ async function buildThreadHistory(
           : historyVisionTurn(canvasContent, m.files);
         if (!visionTurn && !sharedCanvasIds.length) continue;
         const receipt = m.ts ? receiptsByTs.get(m.ts) : undefined;
+        const references = m.ts ? referencesByTs.get(m.ts) : undefined;
         turns.push({
           role: isBot ? "assistant" : "user",
           content: visionTurn?.content ?? "[Canvas shared]",
           ...(m.ts ? { ts: m.ts } : {}),
           ...(receipt ? { retrieval: receipt } : {}),
+          ...(references ? { references } : {}),
           ...(visionTurn?.vision ? { vision: visionTurn.vision } : {}),
           ...(sharedCanvasIds.length ? { sharedCanvasIds } : {}),
         });

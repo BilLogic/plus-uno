@@ -222,6 +222,23 @@
     }
   },
   {
+    "name": "read_reference",
+    "description": "Read-only, ungated, zero network cost. Returns one harness document by name from a map baked into the Worker at build time — the skill methods and references that are disclosed behind this tool instead of loaded into every turn. Reach for it when a skill's Worker face names its method (for example `uno-maintain/method`) at the point the turn needs the full procedure, or when a question the loaded documents leave open names a reference. The answer is already in context when the loaded skill face, the persona or the connector docs settle it; a document read this turn stays available for the rest of the turn and is dropped when the turn ends, so a later turn reads it again with one call. An unknown name returns the list of names the map knows.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The reference's name: the skill and document, e.g. `uno-maintain/method`. A name the map lacks returns the known names."
+        }
+      }
+    }
+  },
+  {
     "name": "notion_create",
     "description": "SIDE EFFECT, routed through the confirmation gate. Create a page or card. Use it for 'file a PRD / intake / card' and for recording a decision. `surface` selects where and what: 'prd' (design or DS-component PRD on the Roadmap board), 'intake' (maintenance intake on the Roadmap board — Product Pillar: Universal + Product Tag: Maintenance), or 'decision' (Decisions DB row under Design HQ, which requires properties.roadmap_card). Put the full drafted document INTO the call — the staged card renders every parameter and is the draft review. Required properties and body shape follow docs/connectors/notion.md; option names (pillars, OKRs, selects) are exact matches of existing values — the tool reports a mismatch rather than creating one. Keep content grounded in the conversation, with genuine unknowns under an 'Open Questions' section.",
     "input_schema": {

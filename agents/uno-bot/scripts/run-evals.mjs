@@ -3,9 +3,11 @@
 // come back as data, nothing posts to Slack/Notion), then scores each case two
 // ways:
 //   1. deterministic checks from the fixture (expectKind / expectTool /
-//      textRegex / forbidTool / gateAsk escape hatch, and expectTier /
+//      textRegex / forbidTool / gateAsk escape hatch, expectTier /
 //      expectLevel against the dials the route reports — the tier the turn
-//      ran on and the thinking level it was SENT with, #421), and
+//      ran on and the thinking level it was SENT with, #421 — and
+//      expectToolCalled against the tool calls the route lists, so a case can
+//      assert a read happened mid-turn and what it named, #423), and
 //   2. an LLM judge (Gemini on Vertex, same SA as everything else) against the
 //      condensed D1–D9 bot-answer rubric + the case's judgeNote.
 // A failing BLOCKER case fails the job (exit 1) — mirroring the scenario doc's
@@ -191,12 +193,29 @@ function checkTurn(spec, resp) {
   if (spec.expectLevel && dials?.level !== spec.expectLevel) {
     failures.push(`level=${dials?.level ?? "unreported"} (expected ${spec.expectLevel}; model=${dials?.model ?? "?"})`);
   }
+  // Tool calls are listed by the route in the order the model made them, with
+  // the arguments it sent (loop-shared.ts ToolCall) — the result alone shows
+  // only the final text or proposal, so a read made on the way to it is
+  // invisible there. `expectToolCalled: { tool, args? }` passes when some call
+  // matches the tool and every named arg exactly; a missing list is a failure.
+  if (spec.expectToolCalled) {
+    const want = spec.expectToolCalled;
+    const calls = Array.isArray(resp.tools) ? resp.tools : [];
+    const wanted = Object.entries(want.args ?? {});
+    const hit = calls.some((c) => c?.name === want.tool && wanted.every(([k, v]) => c.args?.[k] === v));
+    if (!hit) {
+      const seen = calls.map((c) => (c?.name === want.tool ? `${c.name}(${JSON.stringify(c.args ?? {})})` : c?.name)).join(", ");
+      failures.push(
+        `no ${want.tool} call${wanted.length ? ` with ${JSON.stringify(want.args)}` : ""} (calls: ${seen || "none"})`,
+      );
+    }
+  }
   return failures;
 }
 
 // Which fixture keys make a turn carry its own assertions (else the case-level
 // spec applies to the final turn only).
-const TURN_SPEC_KEYS = ["expectKind", "expectTool", "expectDecision", "expectTier", "expectLevel", "forbidTool", "textRegex"];
+const TURN_SPEC_KEYS = ["expectKind", "expectTool", "expectDecision", "expectTier", "expectLevel", "expectToolCalled", "forbidTool", "textRegex"];
 const hasOwnSpec = (turn) => TURN_SPEC_KEYS.some((k) => k in turn);
 
 // ── Main ──────────────────────────────────────────────────────────────────────

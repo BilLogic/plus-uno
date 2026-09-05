@@ -214,7 +214,13 @@ export const SCOPES = [
   {
     key: 'bundled',
     noun: 'bundled docs',
-    corpus: 'docs the bundler assembles into the Worker prompt (embodiment: all | uno-bot)',
+    corpus:
+      'docs the bundler assembles for the Worker (embodiment: all | uno-bot) — the prompt, plus the ' +
+      'disclosed references behind read_reference (disclosure: reference), told on the turns that fetch them',
+    // Both deliveries: a ban that left the prompt for the reference map is
+    // still a ban the bot reads, so it stays in this count rather than
+    // vanishing from it on the day its doc is disclosed (#423).
+    files: (sets) => [...sets.bundled, ...sets.disclosed],
     // The bundler's own splitter, not a copy of it: this has to end the
     // frontmatter block exactly where `bundle-harness.mjs` ends it, or the
     // count and the prompt disagree about what the model was told.
@@ -229,6 +235,7 @@ export const SCOPES = [
     corpus:
       'hand-authored docs under the bundler section roots declaring embodiment: ide — ' +
       'docs/adr/ and the generated .claude/skills/ surfaces are not section roots and so are out',
+    files: (sets) => sets.ide,
     read: (text) => text,
     measuredOn:
       "whole files, frontmatter included — there is no bundler here, and a SKILL.md's " +
@@ -357,7 +364,7 @@ function main() {
   // ONE bundler run answers both scopes. Two runs would be two chances for the
   // harness to change underneath a check that is comparing the halves.
   const sets = harnessSets({ tag: 'negation', notThis: 'the prohibition-token count' });
-  const measured = SCOPES.map((scope) => measure(scope, sets[scope.key]));
+  const measured = SCOPES.map((scope) => measure(scope, scope.files(sets)));
 
   if (UPDATE) {
     // The metric descriptor rides in the file so the number is never read

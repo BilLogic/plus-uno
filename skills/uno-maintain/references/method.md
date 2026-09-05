@@ -1,5 +1,6 @@
 ---
 embodiment: all
+disclosure: reference
 summary: uno-maintain — the shared procedure both faces load.
 ---
 

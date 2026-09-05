@@ -95,3 +95,54 @@ test("images from both sides of a merge survive, in turn order", () => {
   assert.equal(conversation.length, 1);
   assert.deepEqual(conversation[0]!.images, [PRIOR_IMAGE, CURRENT_IMAGE]);
 });
+
+// ── Fetched references clear at turn end (#423) ──────────────────────────────
+//
+// A read_reference result rides the turn's provider contents while the turn
+// runs. What a LATER turn is built from is HistoryTurn[] — user and assistant
+// text plus receipts — and the receipt for a reference is the NAME, never the
+// text: ~50 chars stand in for ~10k, and a re-read is one baked-map lookup.
+// This is the boundary those receipts cross into the model's context, so it
+// is where the rule is held.
+
+test("a reference read in a prior turn reaches the next turn as a one-line stub, never as its text", () => {
+  const conversation = buildProviderConversation(
+    [
+      { role: "user", content: "this doc is stale — file an intake", ts: "1", references: ["uno-maintain/method"] },
+      { role: "assistant", content: "Classified as an inaccuracy; here is the drafted fix." },
+    ],
+    "go ahead",
+  );
+
+  assert.deepEqual(
+    conversation.map((t) => t.role),
+    ["user", "assistant", "user"],
+  );
+  assert.equal(
+    conversation[0]!.text,
+    "this doc is stale — file an intake\n\n[reference uno-maintain/method was read this turn]",
+  );
+  assert.equal(conversation[1]!.text, "Classified as an inaccuracy; here is the drafted fix.");
+  for (const turn of conversation) {
+    assert.ok(!/## 4 · Tier classification/.test(turn.text), "the method's text must not be carried");
+  }
+});
+
+test("several references read in one turn stub one line each, in read order", () => {
+  const conversation = buildProviderConversation(
+    [{ role: "user", content: "ask", ts: "1", references: ["uno-maintain/method", "docs/connectors/notion"] }],
+    "follow-up",
+  );
+  assert.equal(
+    conversation[0]!.text,
+    "ask\n\n[reference uno-maintain/method was read this turn]\n[reference docs/connectors/notion was read this turn]\n\nfollow-up",
+  );
+});
+
+test("a turn that read nothing carries no stub", () => {
+  const conversation = buildProviderConversation(
+    [{ role: "user", content: "ask", ts: "1", references: [] }, { role: "assistant", content: "answer" }],
+    "follow-up",
+  );
+  assert.equal(conversation[0]!.text, "ask");
+});

@@ -347,7 +347,10 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
       return finish({ kind: "text", text: textOf(parts) || "(empty response)" });
     }
 
-    for (const fc of functionCalls) toolNamesUsed.push(fc.functionCall!.name!);
+    for (const fc of functionCalls) {
+      toolNamesUsed.push(fc.functionCall!.name!);
+      input.onToolCall?.({ name: fc.functionCall!.name!, args: (fc.functionCall!.args ?? {}) as Record<string, unknown> });
+    }
     const narration = textOf(parts);
     // Only narrate ahead of read-only work — proposal previews are delivered
     // via the proposal card, and narrating them would duplicate it.

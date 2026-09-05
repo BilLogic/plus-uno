@@ -54,6 +54,11 @@ export const REPO_ROOT = path.resolve(__dirname, '..', '..');
 const BUNDLER = path.join(REPO_ROOT, 'agents/uno-bot/scripts/bundle-harness.mjs');
 const REBUNDLE = 'npm --prefix agents/uno-bot run bundle:harness';
 const HARNESS_TS = path.join(REPO_ROOT, 'agents/uno-bot/src/generated/harness.ts');
+// The readable companion carries the disclosed-references table — name, path,
+// chars — which is where a disclosed doc's PATH is stated (references.ts keys
+// by name). Read here for the same reason harness.ts is: it is the bundler's
+// own statement, held current by the same --check.
+const COMPANION_MD = path.join(REPO_ROOT, 'agents/uno-bot/harness-bundle.md');
 
 /**
  * What the reader is owed when the bundler exits non-zero.
@@ -180,8 +185,13 @@ export function ideAuthoredFiles() {
  * `spawnSync` rather than `execFileSync`: the failure path is a report, not an
  * exception, and the child's stderr is the substance of it.
  *
+ * Three answers, not two, since #423: a Worker-read doc may declare
+ * `disclosure: reference` and ship in the reference map behind `read_reference`
+ * instead of the prompt. `bundled` is the prompt; `disclosed` is the map; the
+ * Worker reads both, on different turns. `ide` is the complement.
+ *
  * @param {{tag?: string, notThis?: string}} [caller] see `bundlerFailureReport`.
- * @returns {{bundled: string[], ide: string[]}}
+ * @returns {{bundled: string[], disclosed: string[], ide: string[]}}
  */
 export function harnessSets(caller = {}) {
   const { tag = 'negation' } = caller;
@@ -249,12 +259,63 @@ export function harnessSets(caller = {}) {
   // total, before it has narrowed either half enough to notice.
   const ide = ideAuthoredFiles();
   const census = declaredCensus(child.stdout ?? '');
-  if (!census || census.ide !== ide.length || census.underRoots !== ide.length + parsed.length) {
-    console.error(censusMismatchReport({ walkedIde: ide.length, bundled: parsed.length, census, tag }));
+  // THE DISCLOSED SET IS CHECKED THE SAME WAY (#423): read off the companion's
+  // table, counted against the census. A table the parse cannot read would
+  // otherwise narrow the Worker corpus by exactly the docs that just left the
+  // prompt — the quiet shrink #234 exists to refuse.
+  const disclosed = disclosedFiles();
+  if (
+    !census ||
+    census.ide !== ide.length ||
+    census.disclosed !== disclosed.length ||
+    census.underRoots !== ide.length + disclosed.length + parsed.length
+  ) {
+    console.error(
+      censusMismatchReport({ walkedIde: ide.length, bundled: parsed.length, disclosed: disclosed.length, census, tag }),
+    );
     process.exit(1);
   }
 
-  return { bundled: parsed, ide };
+  return { bundled: parsed, disclosed, ide };
+}
+
+/**
+ * The disclosed docs' paths, from the companion's `## Disclosed references`
+ * table. Empty when the section says "None." or the companion is absent — the
+ * census comparison above is what turns an unreadable table into a failure.
+ *
+ * @returns {string[]}
+ */
+export function disclosedFiles() {
+  if (!fs.existsSync(COMPANION_MD)) return [];
+  return disclosedRows(fs.readFileSync(COMPANION_MD, 'utf8'));
+}
+
+/**
+ * Pure parse of the companion's disclosed table: `| \`name\` | [\`path\`](…) | chars |`.
+ *
+ * @param {string} companion the companion markdown.
+ * @returns {string[]} the paths, in table order.
+ */
+export function disclosedRows(companion) {
+  const start = companion.indexOf('## Disclosed references');
+  if (start === -1) return [];
+  const end = companion.indexOf('## The assembled prompt', start);
+  const section = companion.slice(start, end === -1 ? undefined : end);
+  return [...section.matchAll(/^\| `[^`]+` \| \[`([\w/.-]+\.md)`\]\([^)]+\) \| [\d,]+ \|$/gm)].map((m) => m[1]);
+}
+
+/**
+ * Every doc the WORKER reads — the prompt plus the reference map. The corpus a
+ * guard over "what the bot can be told" walks; `bundled` alone would let a doc
+ * escape the guard by leaving the prompt for the map.
+ *
+ * @param {{tag?: string, notThis?: string}} [caller] see `bundlerFailureReport`.
+ * @returns {string[]}
+ */
+export function workerFiles(caller = {}) {
+  const { bundled, disclosed } = harnessSets(caller);
+  return [...bundled, ...disclosed];
 }
 
 /**
@@ -280,12 +341,15 @@ export function bundledFiles(caller = {}) {
  *   the line is absent or has changed shape.
  */
 export function declaredCensus(stdout) {
-  const m = /embodiment census: ([\d,]+) declared doc\(s\) under the section roots [—-] ([\d,]+) bundled, ([\d,]+) ide-only/.exec(
-    stdout ?? '',
-  );
+  // `, N disclosed` is optional in the parse so a census printed before #423
+  // still reads; it is not optional in the bundler, which always prints it.
+  const m =
+    /embodiment census: ([\d,]+) declared doc\(s\) under the section roots [—-] ([\d,]+) bundled, (?:([\d,]+) disclosed, )?([\d,]+) ide-only/.exec(
+      stdout ?? '',
+    );
   if (!m) return null;
   const num = (s) => Number(s.replace(/,/g, ''));
-  return { underRoots: num(m[1]), bundled: num(m[2]), ide: num(m[3]) };
+  return { underRoots: num(m[1]), bundled: num(m[2]), disclosed: m[3] === undefined ? 0 : num(m[3]), ide: num(m[4]) };
 }
 
 /**
@@ -297,13 +361,13 @@ export function declaredCensus(stdout) {
  * @param {{walkedIde: number, bundled: number, census: {underRoots: number, ide: number}|null, tag?: string}} counts
  * @returns {string}
  */
-export function censusMismatchReport({ walkedIde, bundled, census, tag = 'negation' }) {
+export function censusMismatchReport({ walkedIde, bundled, disclosed = 0, census, tag = 'negation' }) {
   const said = census
-    ? `it says ${census.ide} ide-only out of ${census.underRoots} under those roots`
+    ? `it says ${census.ide} ide-only and ${census.disclosed ?? 0} disclosed out of ${census.underRoots} under those roots`
     : 'its `embodiment census` line is absent or has changed shape';
   return (
     `[${tag}] this check's walk of the harness section roots disagrees with the bundler's:\n` +
-    `  walked ${walkedIde} ide-only doc(s) and ${bundled} bundled (${walkedIde + bundled} in all), but ${said}.\n` +
+    `  walked ${walkedIde} ide-only doc(s), ${disclosed} disclosed and ${bundled} bundled (${walkedIde + disclosed + bundled} in all), but ${said}.\n` +
     '  -> Membership is one frontmatter fact, but it is read TWICE: agents/uno-bot/scripts/bundle-harness.mjs\n' +
     '     walks its `SECTIONS` roots, and scripts/lib/bundled-set.mjs walks its own `SECTION_ROOTS` copy to\n' +
     '     find the ide-only complement. A root added to one and not the other narrows a corpus without\n' +

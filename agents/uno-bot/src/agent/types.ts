@@ -24,6 +24,7 @@ export type ToolName =
   | "slack_react"
   | "slack_user_profile"
   | "slack_channel_members"
+  | "read_reference"
   // writes (gated)
   | "notion_create"
   | "notion_update"

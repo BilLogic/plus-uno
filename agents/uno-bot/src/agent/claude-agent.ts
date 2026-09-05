@@ -120,6 +120,10 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
     for (const b of content) {
       if (b.type === "tool_use" || b.type === "server_tool_use") {
         toolNamesUsed.push((b as ToolUseBlock).name ?? "(server)");
+        if (b.type === "tool_use") {
+          const tu = b as ToolUseBlock;
+          input.onToolCall?.({ name: tu.name, args: tu.input ?? {} });
+        }
       }
     }
   };

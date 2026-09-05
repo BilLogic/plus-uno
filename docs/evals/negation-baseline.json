@@ -13,16 +13,15 @@
   },
   "scopes": {
     "bundled": {
-      "corpus": "docs the bundler assembles into the Worker prompt (embodiment: all | uno-bot)",
+      "corpus": "docs the bundler assembles for the Worker (embodiment: all | uno-bot) — the prompt, plus the disclosed references behind read_reference (disclosure: reference), told on the turns that fetch them",
       "measuredOn": "the bundled body — frontmatter stripped, as bundle-harness.mjs strips it before assembly, so the count is tokens the model is actually told",
       "docs": 21,
-      "total": 198,
+      "total": 188,
       "counts": {
         "AGENTS.md": 5,
         "CONTEXT.md": 7,
         "agents/uno-bot/AGENT.md": 6,
-        "skills/uno-maintain/references/method.md": 13,
-        "skills/uno-maintain/bot.md": 12,
+        "skills/uno-maintain/bot.md": 2,
         "skills/uno-prototype/references/method.md": 14,
         "skills/uno-prototype/bot.md": 12,
         "skills/uno-publish/references/method.md": 8,
@@ -38,7 +37,8 @@
         "docs/connectors/slack.md": 17,
         "docs/connectors/supabase/blueprint-navigation.md": 21,
         "docs/connectors/supabase/overview.md": 9,
-        "docs/engineering/operations.md": 2
+        "docs/engineering/operations.md": 2,
+        "skills/uno-maintain/references/method.md": 13
       }
     },
     "ide": {
