@@ -35,6 +35,20 @@ export function sliceUrl(appUrl: string | undefined, sliceId: string): string | 
   return link(appUrl, SLICE_PARAM, sliceId);
 }
 
+/** The app itself, for a row that has no page of its own.
+ *
+ *  The touchpoint registry (#414) is the case: the app's URL layer has no
+ *  per-touchpoint param — `urlParams` carries cell, slice, mode and slide, and
+ *  nothing else — so a registry row can only be linked to the blueprint's
+ *  root. Inventing a `?touchpoint=` here would be a link that opens the app
+ *  and ignores the query, which reads as a broken deep link. When the app
+ *  grows such a route it lands in the contract's `urlParams`, and this becomes
+ *  a `link(...)` like the two above. */
+export function appRootUrl(appUrl: string | undefined): string | undefined {
+  const root = base(appUrl);
+  return root ? `${root}/` : undefined;
+}
+
 export interface ChunkBreadcrumb {
   phase?: string;
   scenario?: string;

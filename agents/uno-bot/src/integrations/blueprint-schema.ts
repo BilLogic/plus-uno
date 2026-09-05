@@ -65,6 +65,61 @@ export const CELL_FALLBACK_SELECT =
   "lane:lanes(name,owner_team,kpis),step:steps(name)," +
   "path:paths(name,scenario:scenarios(name,phase:phases(name)))";
 
+/**
+ * The touchpoint registry (#414): the deployment-level catalog of the tools,
+ * documents, channels and artifacts the service runs through — an app screen,
+ * an email, a Zoom room. Anon-readable since 20260830140000, in the contract's
+ * `publicReadTables` since plus-uno-blueprint#370, and read by the bot from
+ * here on. NOT yet in `botReadTables`: that list drives the `table_*` probe
+ * keys, and the blueprint's own CI checks those keys against the DEPLOYED
+ * Worker, so the table joins the list after this read ships — which is why
+ * /health/blueprint carries its probe line by hand until then (index.ts).
+ */
+export const TOUCHPOINTS_TABLE = "touchpoints";
+
+/** The columns the touchpoint read USES by key — the link and the notes read
+ *  `id`, `name`, `kind`, `summary` and `url` off each row. Kept apart from the
+ *  contract's list on purpose: the contract says what the app promises is
+ *  there; this says what the code will go looking for. When the two disagree,
+ *  `touchpointSelectFrom` throws at module load — the Worker fails to start
+ *  rather than issuing a select PostgREST answers with 400 and the call site
+ *  reports as "no touchpoint matched". */
+export const TOUCHPOINT_READ_KEYS: readonly string[] = ["id", "name", "kind", "summary", "url"];
+
+/**
+ * The touchpoint select, BUILT FROM the contract's column list rather than
+ * restated beside it. The three selects above were copies; each rotted on
+ * its own schedule, and the probe that was meant to catch them was a fourth
+ * copy that rotted in step. A select derived from the vendored contract moves
+ * the day `sync-blueprint-contract.mjs` moves it, and the throw below is what
+ * makes a column the contract stops promising a loud failure instead of a
+ * quiet empty result.
+ */
+export function touchpointSelectFrom(columns: readonly string[]): string {
+  for (const key of TOUCHPOINT_READ_KEYS) {
+    if (!columns.includes(key)) {
+      throw new Error(
+        `touchpoints select reads \`${key}\`, which the contract's botDirectReadColumns.touchpoints does not declare`,
+      );
+    }
+  }
+  return columns.join(",");
+}
+
+export const TOUCHPOINT_SELECT = touchpointSelectFrom(BLUEPRINT_CONTRACT.botDirectReadColumns.touchpoints);
+
+/** The registry filter for a worded query: any word, in the name, the kind
+ *  or the summary. Case-insensitive substring on all three — `kind` is a free
+ *  text column ("email", "screen", "zoom room"), so an exact match on a
+ *  plural or a compound would miss the row it was asked for. Words are the
+ *  caller's `terms()` output: lower-case, alphanumeric, so nothing here needs
+ *  escaping against PostgREST's `or=(...)` syntax. */
+export function touchpointFilter(words: readonly string[]): string {
+  return `or=(${words
+    .flatMap((w) => [`name.ilike.*${w}*`, `kind.ilike.*${w}*`, `summary.ilike.*${w}*`])
+    .join(",")})`;
+}
+
 /** Every direct-read string in one place, for the test that sweeps them for
  *  names the schema no longer has. */
 export const DIRECT_READ_STRINGS: readonly string[] = [
@@ -73,6 +128,9 @@ export const DIRECT_READ_STRINGS: readonly string[] = [
   FINDINGS_TABLE,
   `id,name,${PROSE_COLUMN}`,
   `order=${POSITION_COLUMN}`,
+  TOUCHPOINTS_TABLE,
+  TOUCHPOINT_SELECT,
+  touchpointFilter(["zoom"]),
 ];
 
 /** Names the blueprint schema no longer has. A direct read naming one of these
@@ -142,4 +200,11 @@ export function namesRetiredColumn(s: string): string | undefined {
 /** The findings table the bot reads must be one the contract says it reads. */
 export function findingsTableIsInContract(): boolean {
   return (BLUEPRINT_CONTRACT.botReadTables as readonly string[]).includes(FINDINGS_TABLE);
+}
+
+/** The touchpoint registry must be one the contract says is anon-readable.
+ *  `publicReadTables`, not `botReadTables` — see TOUCHPOINTS_TABLE for why the
+ *  second list lags this read by one deploy. */
+export function touchpointsTableIsPublic(): boolean {
+  return (BLUEPRINT_CONTRACT.publicReadTables as readonly string[]).includes(TOUCHPOINTS_TABLE);
 }

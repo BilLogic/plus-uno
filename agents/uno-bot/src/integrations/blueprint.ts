@@ -28,9 +28,12 @@ import {
   FINDINGS_TABLE,
   EDGE_SELECT_COLUMNS,
   CELL_FALLBACK_SELECT,
+  TOUCHPOINTS_TABLE,
+  TOUCHPOINT_SELECT,
+  touchpointFilter,
 } from "./blueprint-schema";
 
-export { FINDINGS_TABLE, EDGE_SELECT_COLUMNS, CELL_FALLBACK_SELECT };
+export { FINDINGS_TABLE, EDGE_SELECT_COLUMNS, CELL_FALLBACK_SELECT, TOUCHPOINTS_TABLE, TOUCHPOINT_SELECT };
 import {
   mapIncludeEdges,
   mapIncludeFindings,
@@ -1095,10 +1098,14 @@ async function fetchRows(
   table: string,
   qs: string,
   limit: number,
+  // `*` for the two tables above. The touchpoint read (#414) names its
+  // columns instead — a select built from the contract is what lets a
+  // rename fail the sync and the probe rather than this call's 400 branch.
+  select = "*",
 ): Promise<{ rows: Array<Record<string, unknown>>; total: number | undefined }> {
   if (!isBlueprintConfigured(env)) return { rows: [], total: undefined };
   const base = env.SUPABASE_URL!.replace(/\/+$/, "");
-  const res = await countedFetch(`${base}/rest/v1/${table}?select=*&${qs}&limit=${limit}`, {
+  const res = await countedFetch(`${base}/rest/v1/${table}?select=${encodeURIComponent(select)}&${qs}&limit=${limit}`, {
     // count=exact rides the SAME request (PostgREST answers in
     // content-range), so the table's true size arrives with the page. A
     // capped page without its total is how "how many X" answers became the
@@ -1191,4 +1198,46 @@ export async function fetchSlices(
     }),
     total: tableTotal,
   };
+}
+
+/** The touchpoint REGISTRY (#414): the catalog of the tools, documents,
+ *  channels and artifacts the service runs through — an app screen, an email,
+ *  a Zoom room. "Where do we use Zoom" is answered from the table that holds
+ *  the answer, instead of from whatever the prose search happens to surface.
+ *
+ *  Matched on `name` + `kind` + `summary`, the same way fetchSlices matches
+ *  on title + actor. The select is the contract's column list
+ *  (blueprint-schema.ts TOUCHPOINT_SELECT), and /health/blueprint probes THAT
+ *  string, imported — so a renamed column fails the sync, the probe and this
+ *  read together rather than reaching Slack as "no touchpoint matched".
+ *
+ *  Rows are returned as the columns the contract names, unmapped: `url` is
+ *  the tool's own authored address (a registry column), not a deep link.
+ *  There is no per-touchpoint page in the app, so no deep link is minted
+ *  here — the notes point at the app root instead (blueprint-link.ts
+ *  appRootUrl). Placements — which cell uses which touchpoint — are a
+ *  different table, deliberately out of scope; the registry plus the search
+ *  rows answer the question being asked. */
+export async function fetchTouchpoints(
+  env: Env,
+  query: string,
+): Promise<{
+  rows: Array<Record<string, unknown>>;
+  total: number | undefined;
+  registryTotal: number | undefined;
+  words: string[];
+}> {
+  const words = terms(query);
+  const filter = words.length ? touchpointFilter(words) : "order=name.asc";
+  const { rows, total } = await fetchRows(env, TOUCHPOINTS_TABLE, filter, 15, TOUCHPOINT_SELECT);
+  // Same two-count shape as fetchSlices, for the same reason: `total` is the
+  // FILTERED set, and a "how many tools do we use" answer must not inherit a
+  // query's narrowing. An unfiltered read already IS the registry's size; a
+  // filtered one pays a rows-free head-count for it, and reports undefined
+  // rather than the filtered number when that head-count fails.
+  const registryTotal =
+    words.length > 0
+      ? (await fetchRows(env, TOUCHPOINTS_TABLE, "limit=0", 0, TOUCHPOINT_SELECT)).total
+      : total;
+  return { rows, total, registryTotal, words };
 }

@@ -205,11 +205,16 @@ function checkTurn(spec, resp, historySent = []) {
   // only the final text or proposal, so a read made on the way to it is
   // invisible there. `expectToolCalled: { tool, args? }` passes when some call
   // matches the tool and every named arg exactly; a missing list is a failure.
+  // A LIST arg (B1: `include: ["touchpoints"]`) passes when the call's list
+  // holds every wanted member — the model may ask for more than the case
+  // names, and `===` on two arrays is never true.
+  const argMatches = (sent, want) =>
+    Array.isArray(want) ? Array.isArray(sent) && want.every((v) => sent.includes(v)) : sent === want;
   if (spec.expectToolCalled) {
     const want = spec.expectToolCalled;
     const calls = Array.isArray(resp.tools) ? resp.tools : [];
     const wanted = Object.entries(want.args ?? {});
-    const hit = calls.some((c) => c?.name === want.tool && wanted.every(([k, v]) => c.args?.[k] === v));
+    const hit = calls.some((c) => c?.name === want.tool && wanted.every(([k, v]) => argMatches(c.args?.[k], v)));
     if (!hit) {
       const seen = calls.map((c) => (c?.name === want.tool ? `${c.name}(${JSON.stringify(c.args ?? {})})` : c?.name)).join(", ");
       failures.push(
