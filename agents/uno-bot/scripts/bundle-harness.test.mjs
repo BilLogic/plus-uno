@@ -195,6 +195,47 @@ test("an assembled bundle over its char budget fails the build", () => {
   assert.match(result.out, /over by [\d,]+/, "the failure must name the overrun");
 });
 
+// ── The floor (#418) ─────────────────────────────────────────────────────────
+//
+// The ceiling stops a bundle from growing past what the model can attend to.
+// The floor stops it from SHRINKING past what the Gemini lane can cache: under
+// Vertex's explicit-cache minimum the prompt silently ships inline at full
+// price. Three connector docs emptied to their frontmatter take the committed
+// bundle from ~167k to under the provisional 131k floor — three, not one,
+// because no single member is large enough, and because a floor that one
+// missing doc could trip would be a ceiling in disguise.
+
+/** A doc reduced to its frontmatter: still a member (embodiment intact), zero body. */
+const frontmatterOnly = (abs, original) => {
+  const end = original.indexOf("\n---", 4);
+  writeFileSync(abs, original.slice(0, end + 4) + "\n");
+};
+
+test("an assembled bundle under its char floor fails the build", () => {
+  const before = readFileSync(harnessTs, "utf8");
+  const result = withFile("docs/connectors/notion.md", frontmatterOnly, () =>
+    withFile("docs/connectors/slack.md", frontmatterOnly, () =>
+      withFile("docs/connectors/supabase/blueprint-navigation.md", frontmatterOnly, () => runBundler(["--check"])),
+    ),
+  );
+  assert.equal(result.code, 1, "a bundle under the floor must fail the build");
+  assert.match(result.out, /under its char floor/i);
+  assert.match(result.out, /floor of 131,072/, "the failure must name the floor");
+  assert.match(result.out, /margin of 4,000/, "the failure must name the margin");
+  assert.match(result.out, /short by [\d,]+/, "the failure must name the shortfall");
+  assert.equal(readFileSync(harnessTs, "utf8"), before, "a failing floor must not write the artifact");
+});
+
+test("the committed bundle is above its floor today", () => {
+  const len = assembled().length;
+  assert.ok(len >= 131_072 + 4_000, `the committed harness (${len} chars) must clear the floor plus margin`);
+});
+
+test("the manifest states the floor beside the budget", () => {
+  const md = readFileSync(companionMd, "utf8");
+  assert.match(md, /a floor of 131,072 plus a 4,000 margin \([\d,]+ above it\)/);
+});
+
 test("every budgeted file is under its budget today", () => {
   const result = runBundler(["--check"]);
   assert.equal(result.code, 0, `the committed harness must be within budget:\n${result.out}`);

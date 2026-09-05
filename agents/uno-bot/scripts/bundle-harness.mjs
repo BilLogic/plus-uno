@@ -107,6 +107,26 @@ const BUDGETS = {
   assembled: 170_000,
   persona: 28_000,
   botFace: 7_000,
+  // A FLOOR beside the ceiling (#418). The assembled bundle is the Gemini lane's
+  // explicit context cache — one cachedContents object, one-hour TTL — and Vertex
+  // refuses to create a cache under a minimum size. A bundle cut below that
+  // minimum does not fail: src/gemini/cache.ts falls back to sending the prompt
+  // inline, at full price, on every iteration of every turn, and the only trace
+  // is a warning line nobody reads. So a cut that is too deep is a cost
+  // regression that ships green, which is the failure mode this file exists to
+  // stop.
+  //
+  // PROVISIONAL VALUE. The Vertex docs reached on 2026-09-04 did not state the
+  // 3.x minimum; one aggregator says 32,768 tokens, and this harness measures
+  // ~4.0 chars per token, so 131,072 chars. Replace it with the number from
+  // `GET /debug/gemini-cache` (auth-gated; it reports cache_tokens and whether
+  // the create succeeded) and record the date beside it. Until then the floor
+  // is deliberately conservative: it blocks a cut past an unmeasured cliff,
+  // which is the point — #424 sizes its cut to this number plus the margin.
+  assembledFloor: 131_072,
+  // Room kept above the floor so ordinary editing cannot brush it. Also
+  // provisional; re-derive from the measured floor.
+  assembledFloorMargin: 4_000,
 };
 
 /** The budget a member is held to, or null when its role carries none. */
@@ -324,6 +344,25 @@ if (assembled.length > BUDGETS.assembled) {
   process.exit(1);
 }
 
+// ── Char floor, assembled (#418) ─────────────────────────────────────────────
+//
+// Asserted on the SAME quantity as the ceiling — the assembled prompt, which is
+// the cached block in its entirety — so the two bounds cannot disagree about
+// what they measure. Fails the build the same way the ceiling does: no artifact
+// is written, and the message names the floor, the margin and the shortfall.
+const floorLine = BUDGETS.assembledFloor + BUDGETS.assembledFloorMargin;
+if (assembled.length < floorLine) {
+  console.error(
+    `[bundle-harness] the assembled bundle is under its char floor: ${n(assembled.length)} chars ` +
+      `against a floor of ${n(BUDGETS.assembledFloor)} plus a margin of ${n(BUDGETS.assembledFloorMargin)} ` +
+      `— short by ${n(floorLine - assembled.length)} (${members.length} files).\n` +
+      "  -> below the floor the Gemini lane cannot create its explicit context cache and the prompt" +
+      "\n     ships inline at full price every iteration. Put a document back, or lower the floor" +
+      "\n     deliberately in a PR that cites the /debug/gemini-cache measurement it rests on.",
+  );
+  process.exit(1);
+}
+
 // ── Blueprint instance-data drift guard ──────────────────────────────────────
 //
 // WHAT IT CATCHES: counts and membership lists about the blueprint's CONTENTS
@@ -486,6 +525,7 @@ function renderCompanion() {
   });
 
   const totalOver = assembled.length - BUDGETS.assembled;
+  const aboveFloor = assembled.length - (BUDGETS.assembledFloor + BUDGETS.assembledFloorMargin);
   return (
     "---\n" +
     "summary: Generated readable companion to the baked Worker prompt — the load-order manifest plus the assembled harness as markdown.\n" +
@@ -502,7 +542,10 @@ function renderCompanion() {
     `Load order is a bundle-level fact, declared once in the bundler's \`SECTIONS\` list. ` +
     `**${n(assembled.length)} chars from ${n(members.length)} files**, against an assembled budget of ` +
     `${n(BUDGETS.assembled)}` +
-    (totalOver > 0 ? ` — ⚠️ **over by ${n(totalOver)}**.` : ` (${n(-totalOver)} to spare).`) +
+    (totalOver > 0 ? ` — ⚠️ **over by ${n(totalOver)}**` : ` (${n(-totalOver)} to spare)`) +
+    `, and a floor of ${n(BUDGETS.assembledFloor)} plus a ${n(BUDGETS.assembledFloorMargin)} margin` +
+    (aboveFloor < 0 ? ` — ⚠️ **short by ${n(-aboveFloor)}**.` : ` (${n(aboveFloor)} above it).`) +
+    " The floor is the Gemini lane's explicit-cache minimum; a bundle cut under it ships uncached." +
     "\n\n" +
     "| # | Section | Doc | Chars | Running total | Budget |\n" +
     "|--:|---------|-----|------:|--------------:|--------|\n" +
