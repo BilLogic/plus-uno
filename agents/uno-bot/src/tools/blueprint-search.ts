@@ -14,6 +14,7 @@ import {
   fetchSlices,
 } from "../integrations/blueprint";
 import { inventoryNotes } from "./blueprint-inventory-notes";
+import { conflictNote, INDEX_NOTE } from "./blueprint-search-notes";
 
 /** Opt-in extra reads. One subrequest each, against a 50-per-invocation cap
  *  that a fallback search can already spend 5 of — so a status question does
@@ -142,16 +143,11 @@ export async function executeBlueprintSearch(
     // instruction when nothing enumerates the blueprint; with the index present
     // the lookup replaces the re-query. A completeness claim with no index
     // attached would be a FALSE-completeness claim, which is the original bug
-    // wearing the fix's clothes.
-    const conflictBase =
-      "These rows are the CURRENT journey UNLESS the `path` name starts `Planned:` or `Prototype:` — `Planned` is decided and scheduled but NOT yet shipped (say \"is changing\"), `Prototype` is exploratory and may never ship (say \"might change\"). Never report either as how it works today. If a Notion doc in this conversation disagrees, surface the conflict (planned change vs obsolete doc, per the card's status) — never blend the two.";
-    const conflict = index
-      ? conflictBase
-      : `${conflictBase} Nothing here about a scenario's future is not proof it has none: re-query that scenario for a \`Planned:\` or \`Prototype:\` path before saying so.`;
+    // wearing the fix's clothes. The strings live in blueprint-search-notes.ts
+    // so the harness name sweep can read them (#443).
+    const conflict = conflictNote(Boolean(index));
     // Emitted ONLY when an index is actually attached. One obligation, one field.
-    const indexNote = index
-      ? "`index` is the COMPLETE live list of the blueprint's phases and scenarios, read just now — including its own `scale` counts, which are the only counts to quote. Use it to NAME the phase a scenario sits under rather than inferring one. You may assert that a scenario has no future state ONLY when its `index` entry carries no `[Planned]` or `[Prototype]` marker; otherwise search that scenario before making any claim about its absence."
-      : undefined;
+    const indexNote = index ? INDEX_NOTE : undefined;
     const orientationNote =
       orientation === "unavailable"
         ? "The blueprint index could not be read this turn, so you have NO list of what exists. Do not state that a scenario, phase or future path is absent — say you could not check."
