@@ -402,7 +402,8 @@
           "expectLevel": "low"
         }
       ],
-      "judgeNote": "Turn 2 is the case: a two-word reply against a pending proposal routes to the chill tier, and the dials reported for that turn must be tier=chill level=low — the level the call was SENT with, asserted deterministically. Chill sits one rung above flash-lite's own default because this exact turn resolves a gated action and a misread costs more than a rung. For the judge: the reply is a plain confirmation that does not claim the action already ran (the Worker posts the outcome after execution)."
+      "judgeNote": "Turn 2 is the case: a two-word reply against a pending proposal routes to the chill tier, and the dials reported for that turn must be tier=chill level=low — the level the call was SENT with, asserted deterministically. Chill sits one rung above flash-lite's own default because this exact turn resolves a gated action and a misread costs more than a rung. For the judge: the reply is a plain confirmation that does not claim the action already ran (the Worker posts the outcome after execution).",
+      "samples": 3
     },
     {
       "id": "T2",
@@ -418,7 +419,8 @@
       ],
       "expectTier": "grind",
       "expectLevel": "high",
-      "judgeNote": "The escalation phrase routes to the grind tier, and the dials reported must be tier=grind level=high — the pro model at its own highest setting, asserted deterministically (until 2026-09-04 the level was pinned at medium, so asking for depth ran the pro model below its own default). A level of `none` here means the turn fell back to a model that takes no thinking dial, which is a real failure of this case, not noise. For the judge: a grounded answer about the two components with no fabricated component facts, and sureness earned from a source fetched this turn."
+      "judgeNote": "The escalation phrase routes to the grind tier, and the dials reported must be tier=grind level=high — the pro model at its own highest setting, asserted deterministically (until 2026-09-04 the level was pinned at medium, so asking for depth ran the pro model below its own default). A level of `none` here means the turn fell back to a model that takes no thinking dial, which is a real failure of this case, not noise. For the judge: a grounded answer about the two components with no fabricated component facts, and sureness earned from a source fetched this turn.",
+      "samples": 3
     }
   ]
 }
