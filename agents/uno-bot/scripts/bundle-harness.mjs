@@ -127,25 +127,43 @@ const BUDGETS = {
   assembled: 170_000,
   persona: 28_000,
   botFace: 7_000,
-  // A FLOOR beside the ceiling (#418). The assembled bundle is the Gemini lane's
-  // explicit context cache — one cachedContents object, one-hour TTL — and Vertex
-  // refuses to create a cache under a minimum size. A bundle cut below that
-  // minimum does not fail: src/gemini/cache.ts falls back to sending the prompt
-  // inline, at full price, on every iteration of every turn, and the only trace
-  // is a warning line nobody reads. So a cut that is too deep is a cost
-  // regression that ships green, which is the failure mode this file exists to
-  // stop.
+  // A FLOOR beside the ceiling (#418). The assembled bundle is the cached prefix
+  // of every Gemini request, and each cache Google offers has a minimum size
+  // under which it caches nothing. A bundle cut below that minimum does not
+  // fail: the prompt ships at full price on every iteration of every turn, and
+  // the only trace is a log field nobody reads. So a cut that is too deep is a
+  // cost regression that ships green, which is the failure mode this file
+  // exists to stop.
   //
-  // PROVISIONAL VALUE. The Vertex docs reached on 2026-09-04 did not state the
-  // 3.x minimum; one aggregator says 32,768 tokens, and this harness measures
-  // ~4.0 chars per token, so 131,072 chars. Replace it with the number from
-  // `GET /debug/gemini-cache` (auth-gated; it reports cache_tokens and whether
-  // the create succeeded) and record the date beside it. Until then the floor
-  // is deliberately conservative: it blocks a cut past an unmeasured cliff,
-  // which is the point — #424 sizes its cut to this number plus the margin.
-  assembledFloor: 131_072,
-  // Room kept above the floor so ordinary editing cannot brush it. Also
-  // provisional; re-derive from the measured floor.
+  // WHICH MINIMUM APPLIES FOLLOWS THE CACHE THE DEPLOYMENT USES, and that is
+  // decided by `GEMINI_REGION` in wrangler.toml — read by activeFloor() below,
+  // never restated here, so the bundler cannot disagree with the Worker about
+  // which cache is in effect. Two cases, both real:
+  //
+  //   `global` (production, 2026-09-05): `cachedContents` is a regional
+  //   resource, so src/gemini/cache.ts declines to create the explicit cache on
+  //   every turn (`GET /debug/gemini-cache` reports the reason verbatim); the
+  //   explicit cache this floor once guarded had never been created. The only
+  //   caching in effect is Google's IMPLICIT cache, measured per request from
+  //   `usageMetadata.cachedContentTokenCount` (`cached_in=` on the [uno-bot]
+  //   log line). Its documented minimum for the Gemini 3.x Flash models is
+  //   4,096 tokens (ai.google.dev/gemini-api/docs/caching, read 2026-09-05);
+  //   this harness measures ~4.0 chars per token, so 16,384 chars.
+  //
+  //   a region (e.g. `us-central1`): the EXPLICIT cache is created — one
+  //   cachedContents object, one-hour TTL — and Vertex refuses to create it
+  //   under a larger minimum. PROVISIONAL VALUE: the Vertex docs reached on
+  //   2026-09-04 did not state the 3.x minimum; one aggregator says 32,768
+  //   tokens, so 131,072 chars. Measure it on the first deploy after the region
+  //   changes: `GET /debug/gemini-cache` (auth-gated) reports cache_tokens and
+  //   whether the create succeeded; replace the number and record the date.
+  //
+  // The manifest line names the active floor with the cache and region it
+  // follows from, so a reader of harness-bundle.md sees which case is live.
+  assembledFloorImplicit: 16_384,
+  assembledFloorExplicit: 131_072,
+  // Room kept above the floor so ordinary editing cannot brush it. Re-derive
+  // beside the explicit floor once that one is measured.
   assembledFloorMargin: 4_000,
 };
 
@@ -157,6 +175,39 @@ function budgetFor({ rel, section }) {
 }
 
 const n = (x) => x.toLocaleString("en-US");
+
+/**
+ * The floor in force, chosen by the cache the deployment uses. `GEMINI_REGION`
+ * is read from wrangler.toml — the line the Worker deploys with — because the
+ * floor is a property of that deployment, and a region stated here would be a
+ * second copy of a decision the toml already holds. A toml without the line
+ * fails the build: with no region there is no cache, and no floor to assert.
+ */
+function activeFloor() {
+  const tomlRel = "agents/uno-bot/wrangler.toml";
+  const toml = readFileSync(path.join(repoRoot, tomlRel), "utf8");
+  const m = toml.match(/^GEMINI_REGION\s*=\s*"([^"]+)"/m);
+  if (!m) {
+    console.error(
+      `[bundle-harness] ${tomlRel} has no \`GEMINI_REGION = "…"\` line, so the floor cannot be chosen: ` +
+        "the floor follows the cache the deployment uses, and the region decides which cache that is.",
+    );
+    process.exit(1);
+  }
+  const region = m[1];
+  const implicit = region === "global";
+  const value = implicit ? BUDGETS.assembledFloorImplicit : BUDGETS.assembledFloorExplicit;
+  const cache = implicit ? "implicit" : "explicit";
+  return {
+    region,
+    cache,
+    value,
+    margin: BUDGETS.assembledFloorMargin,
+    // One wording for the manifest and the failure message:
+    // "16,384 + 4,000 (implicit cache, GEMINI_REGION global)".
+    label: `${n(value)} + ${n(BUDGETS.assembledFloorMargin)} (${cache} cache, GEMINI_REGION ${region})`,
+  };
+}
 
 /** Every .md under a root, or the root itself when it is a file. */
 function walk(rel) {
@@ -416,15 +467,20 @@ if (assembled.length > BUDGETS.assembled) {
 // Asserted on the SAME quantity as the ceiling — the assembled prompt, which is
 // the cached block in its entirety — so the two bounds cannot disagree about
 // what they measure. Fails the build the same way the ceiling does: no artifact
-// is written, and the message names the floor, the margin and the shortfall.
-const floorLine = BUDGETS.assembledFloor + BUDGETS.assembledFloorMargin;
+// is written, and the message names the floor, the cache it follows, the
+// margin and the shortfall.
+const floor = activeFloor();
+const floorLine = floor.value + floor.margin;
 if (assembled.length < floorLine) {
+  const consequence =
+    floor.cache === "implicit"
+      ? "below the floor Google's implicit cache holds none of the prompt, and it ships"
+      : "below the floor the Gemini lane cannot create its explicit context cache, and the prompt ships inline";
   console.error(
     `[bundle-harness] the assembled bundle is under its char floor: ${n(assembled.length)} chars ` +
-      `against a floor of ${n(BUDGETS.assembledFloor)} plus a margin of ${n(BUDGETS.assembledFloorMargin)} ` +
-      `— short by ${n(floorLine - assembled.length)} (${members.length} files).\n` +
-      "  -> below the floor the Gemini lane cannot create its explicit context cache and the prompt" +
-      "\n     ships inline at full price every iteration. Put a document back, or lower the floor" +
+      `against a floor of ${floor.label} — short by ${n(floorLine - assembled.length)} (${members.length} files).\n` +
+      `  -> ${consequence}` +
+      "\n     at full price every iteration. Put a document back, or lower the floor" +
       "\n     deliberately in a PR that cites the /debug/gemini-cache measurement it rests on.",
   );
   process.exit(1);
@@ -600,7 +656,7 @@ function renderCompanion() {
   });
 
   const totalOver = assembled.length - BUDGETS.assembled;
-  const aboveFloor = assembled.length - (BUDGETS.assembledFloor + BUDGETS.assembledFloorMargin);
+  const aboveFloor = assembled.length - floorLine;
   return (
     "---\n" +
     "summary: Generated readable companion to the baked Worker prompt — the load-order manifest plus the assembled harness as markdown.\n" +
@@ -618,9 +674,11 @@ function renderCompanion() {
     `**${n(assembled.length)} chars from ${n(members.length)} files**, against an assembled budget of ` +
     `${n(BUDGETS.assembled)}` +
     (totalOver > 0 ? ` — ⚠️ **over by ${n(totalOver)}**` : ` (${n(-totalOver)} to spare)`) +
-    `, and a floor of ${n(BUDGETS.assembledFloor)} plus a ${n(BUDGETS.assembledFloorMargin)} margin` +
-    (aboveFloor < 0 ? ` — ⚠️ **short by ${n(-aboveFloor)}**.` : ` (${n(aboveFloor)} above it).`) +
-    " The floor is the Gemini lane's explicit-cache minimum; a bundle cut under it ships uncached." +
+    `, and a floor of ${floor.label}` +
+    (aboveFloor < 0 ? ` — ⚠️ **short by ${n(-aboveFloor)}**.` : `, ${n(aboveFloor)} above it.`) +
+    " The floor is the minimum the cache in force will hold — Google's implicit cache on the `global`" +
+    " endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in" +
+    " `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached." +
     "\n\n" +
     "| # | Section | Doc | Chars | Running total | Budget |\n" +
     "|--:|---------|-----|------:|--------------:|--------|\n" +
