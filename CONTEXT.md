@@ -59,7 +59,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **Decisions DB** | centralized decision log under Design HQ — Status / Owner / Sign-off / Date / Roadmap Card / Evidence | "Decision Log" (obsolete per-project subpage) |
 | **pillar** | product area (Universal · Admin · Toolkit · Training · Marketing …) — maps to a Slack channel | "category" |
 | **replica** | the Figma frame mirroring a coded prototype — required in prototype share-outs | "screenshot" |
-| **direct fix / gated change** | the two maintenance severities: a trivial fix applied straight to main with a digest line, vs a PR + PRD through a Slack verdict. Was "Tier 1 / Tier 2 (maintenance)"; the old spelling retires in batches (#429, in batches) | "Tier 1", "Tier 2" |
+| **direct fix / gated change** | the two maintenance severities: a trivial fix applied straight to main with a digest line, vs a PR + PRD through a Slack verdict. Was "Tier 1 / Tier 2 (maintenance)"; the old spelling retires in batches (#429) | "Tier 1", "Tier 2" |
 | **Tier 1 / Tier 2 / Tier 3** | the loading tiers: always-loaded · on demand · retrieved live (`AGENTS.md` § The loading contract). *Tier* means loading and nothing else | "Tier" for a maintenance severity |
 | **RM-ID** | Roadmap card id (`RM-<n>`) — the Figma↔Notion join key | — |
 | **embodiment** | a runtime uno runs in — the IDE, the uno-bot Worker, headless GitHub Actions — each with its own powers and its own slice of the harness; `embodiment:` frontmatter says which docs a runtime bundles | "mode", "environment" |

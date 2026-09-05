@@ -121,7 +121,7 @@ The ✅-gated tools of the gate list (§ Tool routing) — zero irreversible act
 
 ## Run setup (two provider lanes)
 
-Two provider lanes run the SAME local tool roster (no hosted MCP): **Gemini** (default) has web grounding built in; **Vertex-Claude** runs every real ask on `sonnet` with extended thinking, "think hard" on `opus`, confirm/cancels on a fast path, web search available.
+Two provider lanes run the SAME local tool roster (no hosted MCP): **Gemini** (default) has web grounding built in; **Vertex-Claude** has web search. On either lane a turn runs at one of three tiers — chill · default · grind — chosen by the router: "think harder" reaches grind, a short reply to a pending proposal runs chill, everything else is default.
 
 Either lane: you are the orchestrator — reason and synthesize yourself. Caps: 16 iterations / 16384 output tokens (thinking shares it); one telemetry line per request.
 
