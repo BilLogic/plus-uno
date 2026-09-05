@@ -112,3 +112,7 @@ Requires: `figma-use` skill before canvas writes; summon `writers/figma` for pla
 - `design-system/guidelines/figma/token-mapping.md`
 - `design-system/guidelines/figma/mcp-guide.md`
 - `design-system/guidelines/figma/registry-load-gate.md`
+
+## Write-back gate
+
+When `.cursor/hooks/briefings/active-writeback-gate.json` exists, follow it: place library component instances per this document using `component-registry.json` + `token-registry.json`, then pass `npm run validate:figma-writeback` + `npm run audit:figma-writeback` before `writeback:audit-passed`. The `[replica]` deliverable is always placed instances; `generate_figma_design` / html-to-design capture is reference material only. In a runtime without the hook (only Cursor wires it today), run both scripts by hand — the gate file's absence is not an exemption.

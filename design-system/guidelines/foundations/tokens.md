@@ -7,6 +7,7 @@ summary: Tokens — Overview & Decision Tree
 
 ## Non-Negotiable Rules
 
+- Colour, spacing, typography, radius and elevation come from compile-ready tokens (e.g. `var(--color-on-surface-state-08)`) — not raw values, and not Figma literal names.
 - Never hardcode colors, spacing, typography, radius, or elevation when a token exists.
 - Choose semantic layer first (element/card/section/modal/table), then pick token.
 - Use primitives only for token-definition work, not feature implementation.

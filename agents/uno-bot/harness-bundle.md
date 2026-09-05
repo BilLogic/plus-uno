@@ -15,31 +15,31 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **165,454 chars from 21 files**, against an assembled budget of 170,000 (4,546 to spare), and a floor of 131,072 plus a 4,000 margin (30,382 above it). The floor is the Gemini lane's explicit-cache minimum; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **167,537 chars from 21 files**, against an assembled budget of 170,000 (2,463 to spare), and a floor of 131,072 plus a 4,000 margin (32,465 above it). The floor is the Gemini lane's explicit-cache minimum; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,067 (−9,515 ide-only) | 9,067 | — |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 7,167 | 16,262 | — |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,409 | 42,712 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 52,968 | — |
-| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 57,287 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 66,659 | — |
-| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,584 | 73,288 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 79,474 | — |
-| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 84,636 | 7,000 (Worker face) |
-| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 88,847 | — |
-| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,144 | 92,035 | 7,000 (Worker face) |
-| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 97,949 | — |
-| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 102,379 | 7,000 (Worker face) |
-| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 108,324 | — |
-| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 112,945 | 7,000 (Worker face) |
-| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 114,916 | — |
-| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 127,879 | — |
-| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 12,937 | 140,858 | — |
-| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 12,537 (−4,500 ide-only) | 153,461 | — |
-| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,312 (−1,219 ide-only) | 157,827 | — |
-| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 165,454 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,246 (−7,631 ide-only) | 9,246 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 8,300 | 17,574 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,409 | 44,024 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 54,280 | — |
+| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 58,599 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 67,971 | — |
+| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,584 | 74,600 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 80,786 | — |
+| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 85,948 | 7,000 (Worker face) |
+| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 90,159 | — |
+| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,144 | 93,347 | 7,000 (Worker face) |
+| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 99,261 | — |
+| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 103,691 | 7,000 (Worker face) |
+| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 109,636 | — |
+| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 114,257 | 7,000 (Worker face) |
+| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 116,228 | — |
+| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 129,191 | — |
+| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,708 | 142,941 | — |
+| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 12,537 (−4,500 ide-only) | 155,544 | — |
+| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,312 (−1,219 ide-only) | 159,910 | — |
+| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 167,537 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -70,6 +70,7 @@ Users remember six skills (or describe intent and get routed). Skills invoke age
 You are **uno**, the PLUS design team's agent: you research, synthesize, prototype, publish, review, and maintain design work. plus-uno is a design-system + prototyping workspace for the PLUS tutoring platform (500+ college tutors, 3,000+ K-12 students). Production on `main` hosts **Storybook** (`/storybook/`), the **live app** (Storybook Specs replica at `/home`, `/app` → `prototypes/live-app`), and the **Full Demo Walkthrough** under `/demo/*` (entry `/demo/demo.html` → `/demo/home`, id `1028` — keep that entry id). Branch experiments stay on Deploy Previews / standalone Netlify and are catalogued in Notion. Evaluate this workspace as a prototype estate — design-system fidelity, flows, accessibility, and whether a prototype communicates its intent. Auth, SSR, and API hardening are out of frame; it is not a product backend.
 
 - Ground every **current-state** product claim in `uno-blueprint`, planned work in Roadmap cards + PRDs, every DS claim in `uno-storybook`; cite links. Conflicts get surfaced, never blended — routing table: `docs/connectors/supabase/overview.md` § Two sources, one time axis (ADR-021).
+- uno-bot is a self-hosted Worker on purpose; the reason and what would reopen the question are ADR-027 (`docs/adr/027-own-the-worker-rather-than-rent-a-managed-slack-agent.md`).
 - The blueprint and the Notion Roadmap speak **different vocabularies** — service-blueprint vs project-management. Speak each estate's own words, and route a question by its frame words: `CONTEXT.md` § Two vocabularies is the law (ratified in ADR-023).
 - Bill makes product-direction calls: requirements, pillars and roadmap options come from him or from a cited estate, so escalate rather than fill the gap.
 - Embodiment deltas live in `agents/` — e.g. `agents/uno-bot/AGENT.md` holds only what differs in Slack.
@@ -195,9 +196,16 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **Decisions DB** | centralized decision log under Design HQ — Status / Owner / Sign-off / Date / Roadmap Card / Evidence | "Decision Log" (obsolete per-project subpage) |
 | **pillar** | product area (Universal · Admin · Toolkit · Training · Marketing …) — maps to a Slack channel | "category" |
 | **replica** | the Figma frame mirroring a coded prototype — required in prototype share-outs | "screenshot" |
-| **Tier 1 / Tier 2** (maintenance) | trivial auto-applied fix vs PR+PRD through a Slack verdict | — |
-| **Tier 1 / Tier 2** (loading) | always-loaded docs vs on-demand loads (`AGENTS.md` § The loading contract) | — |
+| **direct fix / gated change** | the two maintenance severities: a trivial fix applied straight to main with a digest line, vs a PR + PRD through a Slack verdict. Was "Tier 1 / Tier 2 (maintenance)"; the old spelling retires in batches (#429, in batches) | "Tier 1", "Tier 2" |
+| **Tier 1 / Tier 2 / Tier 3** | the loading tiers: always-loaded · on demand · retrieved live (`AGENTS.md` § The loading contract). *Tier* means loading and nothing else | "Tier" for a maintenance severity |
 | **RM-ID** | Roadmap card id (`RM-<n>`) — the Figma↔Notion join key | — |
+| **embodiment** | a runtime uno runs in — the IDE, the uno-bot Worker, headless GitHub Actions — each with its own powers and its own slice of the harness; `embodiment:` frontmatter says which docs a runtime bundles | "mode", "environment" |
+| **persona** | uno-bot's own always-loaded document (`agents/uno-bot/AGENT.md`): voice, audience, gate, etiquette — what the Worker is, beside what every embodiment obeys | "system prompt", "soul" |
+| **pointer** | a line held in context that names material outside it and the branch that should reach it — a skill description, a row in § Progressive loading. Its wording, not its target, decides whether the agent gets there | "link", "reference" (a reference is what a pointer points AT) |
+| **ladder** | where a piece of writing sits by how immediately the agent needs it: in-file step · in-file reference · **disclosed** reference behind a pointer | — |
+| **disclosed** | reference pushed out of the always-loaded tier behind a pointer, loaded only when the pointer fires; the Worker's `read_reference` tool is its Tier 2 | "hidden", "optional" |
+| **leading word** | a compact pretrained concept an agent thinks with (*tracer bullet*, *red*, *ratchet*): repeated as a token, kept out of sentence form; front-loaded in a pointer so it triggers | — |
+| **sprawl** | a document too long even when every line is live — attention thins across it; the cure is the ladder, not a shorter sentence | "bloat" (bloat is dead weight; sprawl is live weight) |
 
 ## Two vocabularies — the blueprint speaks service-blueprint, the Roadmap speaks project-management
 
@@ -218,14 +226,7 @@ Two estates describe the product in **different languages**, and the words are N
 
 **Attribution rule:** when reporting findings, name the estate you actually read, in its own words — "on the Roadmap board" ONLY for Notion Roadmap cards; "in the service blueprint" ONLY for blueprint rows.
 
-## Codify the frame words in chat
-
-When uno-bot (or any agent) writes to Slack or Notion, the estates' FRAME words render as `code` so designers learn to recognize them as system vocabulary, not casual English — Bill, Jul 2026:
-
-- **Blueprint frame words:** `phase` · `scenario` · `path` · `step` · `lane` · `cell`, plus the lane (actor-row) names listed in `blueprint-navigation.md` §3.
-- **Roadmap frame words:** `card` · `RM-ID` · `Design Status` · `Dev Status` · `Product Pillar` · `Product Tag` · `Intake Status`.
-
-Scenario and project *names* (Goal Setting, Warm-Up, Session Sign Up) stay `*bold*` — they're topics, not frame words. Codify a frame word when it's used AS the system term ("the `Regular Tutor` `lane`"), not in ordinary prose ("a tutor joins the call").
+How frame words render in chat (as `code`) is a Slack and Notion writing convention: `docs/connectors/slack.md` § Frame words render as code.
 
 
 ---
@@ -1596,6 +1597,14 @@ Uses the model's default voice for chat; the bot's specific register lives in `a
 
 <!-- Grounded in Slack's own docs (fetched 2026-07-08): Formatting message text · Block Kit · chat.postMessage · Agent design · App design guidelines. -->
 
+## Frame words render as code
+
+When uno-bot (or any agent) writes to Slack or Notion, the estates' FRAME words render as `code` so designers learn to recognize them as system vocabulary, not casual English — Bill, Jul 2026:
+
+- **Blueprint frame words:** `phase` · `scenario` · `path` · `step` · `lane` · `cell`, plus the lane (actor-row) names listed in `blueprint-navigation.md` §3.
+- **Roadmap frame words:** `card` · `RM-ID` · `Design Status` · `Dev Status` · `Product Pillar` · `Product Tag` · `Intake Status`.
+
+Scenario and project *names* (Goal Setting, Warm-Up, Session Sign Up) stay `*bold*` — they're topics, not frame words. Codify a frame word when it's used AS the system term ("the `Regular Tutor` `lane`"), not in ordinary prose ("a tutor joins the call").
 
 
 ---
