@@ -525,6 +525,29 @@
         }
       ],
       "judgeNote": "AUTHORED 2026-09-05 (#426). The clearing half of the reference design (#423): a method read in turn 1 is that turn's tool result and ends with it; turn 2 sees one stub line naming it (provider-conversation.ts), carried as the `references` receipt on the user turn that read it (slack/events.ts). Deterministic, two turns: turn 1's tool list holds read_reference `uno-maintain/method` (M1's ask, reused so the fetch is not in doubt); the history the runner SENT to turn 2 carries `references: [\"uno-maintain/method\"]` on a history turn and serializes under 8000 chars — the method alone is ~10k, so a history that carried its text cannot pass, while a thread of prompt + reply + receipt sits well under. The receipt comes from the same turn scope production persists it from (/debug/eval runs inside withTurnScope) and the runner threads it as events.ts does, so what is measured is the bot's history and not the runner's. For the judge: turn 2 answers the tier question from turn 1's own reply — Tier 2, because the whitelist for direct fixes is typos, links, dates and formatting and this touches a skill — without claiming the card was filed or the fix applied; re-reading the method in turn 2 is allowed (the face says so), never required. A turn-2 reply that says the method is unavailable, or that it never read it, fails."
+    },
+    {
+      "id": "B1",
+      "name": "a tooling question reaches the touchpoint registry (#414)",
+      "blocker": true,
+      "samples": 3,
+      "turns": [
+        {
+          "prompt": "where do we use Zoom?"
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "expectToolCalled": {
+        "tool": "search_blueprint",
+        "args": {
+          "include": [
+            "touchpoints"
+          ]
+        }
+      },
+      "judgeNote": "AUTHORED 2026-09-05 (#414). 'Where do we use Zoom' is a tooling question, and the table that holds the answer is the blueprint's touchpoint registry, read through search_blueprint with include: [\"touchpoints\"]. The deterministic half: the runner requires a search_blueprint call whose include list holds \"touchpoints\" (the model may ask for more; a list arg matches by membership). For the judge: the reply is grounded in what came back — registry rows (name, kind, summary; a row's own url surfaced verbatim when given) for WHAT the tool is, and the search rows that mention Zoom for WHERE it is used — and it does not claim the registry places a tool at a cell, because placements are outside this read. If the registry had no entry, the reply says the REGISTRY has no entry for Zoom, names what was searched, and answers where-used from the search rows rather than declaring the service has no Zoom. A hand-built per-touchpoint deep link fails (the app has no such page; the root is the only link). An answer from memory, or one that says the blueprint has nothing on Zoom, fails. [samples:3 — the include choice is a routing decision made from the tool description alone; three draws is the stricter bar.]"
     }
   ]
 }

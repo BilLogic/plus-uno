@@ -12,8 +12,11 @@ import {
   fetchEdges,
   fetchFindings,
   fetchSlices,
+  fetchTouchpoints,
 } from "../integrations/blueprint";
+import { appRootUrl } from "../integrations/blueprint-link";
 import { inventoryNotes } from "./blueprint-inventory-notes";
+import { touchpointNotes } from "./blueprint-touchpoint-notes";
 import { conflictNote, INDEX_NOTE } from "./blueprint-search-notes";
 import { hasFilter, matchedNote, scopeFromInput } from "../integrations/blueprint-scope";
 
@@ -26,8 +29,14 @@ import { hasFilter, matchedNote, scopeFromInput } from "../integrations/blueprin
  *  less orientation than it had before this change: the static phase list was
  *  deleted from the prompt and its live replacement was gated behind a flag
  *  that ships off. The flag now controls only whether the index is attached
- *  AUTOMATICALLY; asking for it always works. */
-const INCLUDABLE = new Set(["edges", "findings", "slices", "index"]);
+ *  AUTOMATICALLY; asking for it always works.
+ *
+ *  `touchpoints` (#414) is the registry of tools and surfaces the service runs
+ *  through. Bot-owned like `slices` and `index`, not one of the RPC's
+ *  `searchBlueprintInclude` values: it is a direct read of a public table,
+ *  matched on the query text, and what a touchpoint IS is explained in the
+ *  result's notes — never in the always-loaded prompt. */
+const INCLUDABLE = new Set(["edges", "findings", "slices", "index", "touchpoints"]);
 
 export async function executeBlueprintSearch(
   env: Env,
@@ -144,6 +153,24 @@ export async function executeBlueprintSearch(
     const sliceRead = await optional(include.includes("slices"), () => fetchSlices(env, query), "slices");
     const slices = sliceRead?.rows;
     const sliceTotal = sliceRead?.total;
+    // The touchpoint registry (#414). Read on request only, like slices; its
+    // notes — what a touchpoint is, what the registry does not cover, and an
+    // absence that names what was searched — travel with it, so a turn that
+    // never asks pays nothing for the explanation.
+    const touchpointRead = await optional(
+      include.includes("touchpoints"),
+      () => fetchTouchpoints(env, query),
+      "touchpoints",
+    );
+    const touchpoints = touchpointRead?.rows;
+    const touchpointNoteList = touchpointRead
+      ? touchpointNotes({
+          words: touchpointRead.words,
+          rows: touchpointRead.rows.length,
+          registryTotal: touchpointRead.registryTotal,
+          appUrl: appRootUrl(env.BLUEPRINT_APP_URL),
+        })
+      : [];
 
     // One obligation per field, not one paragraph carrying five. Instructions
     // in a tool payload are not additive — a fix to slack_search on 2026-08-06
@@ -270,9 +297,11 @@ export async function executeBlueprintSearch(
       ...(typeof findingsTotal === "number" ? { findingsTotal } : {}),
       ...(slices ? { slices } : {}),
       ...(typeof sliceTotal === "number" ? { sliceTotal } : {}),
+      ...(touchpoints ? { touchpoints } : {}),
+      ...(typeof touchpointRead?.registryTotal === "number" ? { touchpointsTotal: touchpointRead.registryTotal } : {}),
       notes:
         rows.length > 0
-          ? [grounding, attribution, conflict, indexNote, orientationNote, cacheNote, thinNote, matchedCountNote, linking, citing, freshness, semanticCaveat, edgesNote, findingsNote, findingsCountNote, slicesNote, sliceCountNote, truncation, ...inventory].filter(Boolean)
+          ? [grounding, attribution, conflict, indexNote, orientationNote, cacheNote, thinNote, matchedCountNote, linking, citing, freshness, semanticCaveat, edgesNote, findingsNote, findingsCountNote, slicesNote, sliceCountNote, ...touchpointNoteList, truncation, ...inventory].filter(Boolean)
           : [
               // REWRITTEN 2026-08-17. This used to say "the blueprint has
               // nothing on this", which becomes wrong the moment the index
@@ -282,6 +311,10 @@ export async function executeBlueprintSearch(
               indexNote,
               orientationNote,
               cacheNote,
+              // Registry rows can exist when the search found nothing — "is
+              // there a Zoom room" is a registry question first. Their notes
+              // ride both branches for that reason.
+              ...touchpointNoteList,
             ].filter(Boolean),
     });
   } catch (err) {

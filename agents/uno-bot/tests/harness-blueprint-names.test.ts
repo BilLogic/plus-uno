@@ -70,6 +70,7 @@ import {
   WIRE_NAMES,
 } from "../src/integrations/blueprint-schema";
 import { SEARCH_NOTES } from "../src/tools/blueprint-search-notes";
+import { TOUCHPOINT_NOTES } from "../src/tools/blueprint-touchpoint-notes";
 import { SCOPES } from "../src/agent/scope-keywords";
 import { INDEX_LEGEND } from "../src/integrations/blueprint-index";
 
@@ -236,6 +237,9 @@ function conventionOffenders(text: string, source: string): string[] {
 function runtimeNotes(): Array<[string, string]> {
   return [
     ...SEARCH_NOTES.map(([name, text]): [string, string] => [`blueprint-search-notes.ts#${name}`, text]),
+    // The touchpoint notes (#414): the explanation of what a touchpoint is
+    // lives ONLY here, so this is the only place it can be swept.
+    ...TOUCHPOINT_NOTES.map(([name, text]): [string, string] => [`blueprint-touchpoint-notes.ts#${name}`, text]),
     ["scope-keywords.ts#SCOPES.blueprint", SCOPES.blueprint.instruction],
     ["blueprint-index.ts#INDEX_LEGEND", INDEX_LEGEND],
   ];
