@@ -216,10 +216,25 @@ export function pickCellTitle(rows: readonly SubjectSearchRow[]): string | undef
 
 // ── corpus-term ──────────────────────────────────────────────────────────────
 
-/** How many registry names to probe before giving up. Each probe is one
- *  `search_blueprint` call, and this route runs under the same 50-subrequest
- *  cap as everything else in the Worker. */
-export const CORPUS_TERM_PROBES = 4;
+/** How many registry names to probe before giving up.
+ *
+ *  Was 4, and 4 was too few: the registry read hands its rows back in
+ *  `name.asc` order, so the probes were the alphabetically-first four tools the
+ *  service uses — and the tools with the widest footprint in the prose (the
+ *  video room, the mail client) are wherever the alphabet happens to put them.
+ *  The 2026-09-04 run skipped this case for that reason and not because the
+ *  corpus is narrow (`zoom` matches 135 cells against a page of 15).
+ *
+ *  Ranking the candidates by footprint first would be better than probing more
+ *  of them, but the registry read carries no usage count — `touchpoints` is
+ *  (id, name, kind, summary, url) — so "how often does this name appear in cell
+ *  prose" IS the probe. There is nothing cheaper to sort by.
+ *
+ *  The ceiling is the Worker's 50-subrequest cap: a probe costs the RPC call
+ *  plus, when embeddings are configured, its query embedding — two at worst, so
+ *  eight probes is ~16 against 50, with the registry read and the route's own
+ *  overhead alongside. */
+export const CORPUS_TERM_PROBES = 8;
 
 /** Registry names usable as a single search term: one word, three characters
  *  or more, letters and digits only. "Zoom" qualifies; "Google Meet" does not,
@@ -266,21 +281,44 @@ export async function selectSubject(need: SubjectNeed, reads: SubjectReads): Pro
     if (!candidates.length) {
       return none(need, "no registry name is a single searchable word");
     }
-    for (const term of candidates.slice(0, CORPUS_TERM_PROBES)) {
-      const result = await reads.search(term, { granularity: "cell" });
+    const probes = candidates.slice(0, CORPUS_TERM_PROBES);
+    // How many probes came back with NO corpus-wide total. Counted so the two
+    // ways this condition fails cannot be reported as one: a narrow corpus is a
+    // fact about the board, and a read path that does not carry `total_matched`
+    // is a broken instrument. The 2026-09-04 skip said only the first, and the
+    // second was the open question it left behind.
+    let withoutTotal = 0;
+    for (const term of probes) {
+      // UNSCOPED, deliberately. The RPC already answers at `cell` by default
+      // (`granularity text[] = '{cell}'`), so naming the rung buys nothing and
+      // costs the one thing that matters here: this is then byte-for-byte the
+      // call shape the bot makes on every ordinary search — the shape known to
+      // carry `total_matched` — rather than a shape only this route exercises.
+      const result = await reads.search(term, {});
       const shown = result.rows.length;
       const matched = result.matched;
+      if (typeof matched !== "number") {
+        withoutTotal++;
+        continue;
+      }
       // The condition is not "a term with hits" but "a term whose corpus-wide
       // count exceeds the page of rows" — without that gap the completeness
       // question has no wrong answer to catch, because counting the rows shown
       // would give the right number by accident.
-      if (typeof matched === "number" && matched > shown && matched > 1) {
+      if (matched > shown && matched > 1) {
         return { need, subject: { name: term, term, matched, shown } };
       }
     }
+    if (probes.length > 0 && withoutTotal === probes.length) {
+      return none(
+        need,
+        `no probe returned a corpus-wide total — 'total_matched' is absent on this read path ` +
+          `(${probes.length} term${probes.length === 1 ? "" : "s"} tried)`,
+      );
+    }
     return none(
       need,
-      `no registry term among the first ${CORPUS_TERM_PROBES} matches more cells than one page shows`,
+      `no registry term among the first ${probes.length} matches more cells than one page shows`,
     );
   }
 

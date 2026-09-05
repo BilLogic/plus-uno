@@ -38,7 +38,12 @@ import {
   type SearchCredentialKind,
 } from "../slack/search-credential";
 import { countedFetch, rethrowIfBudget } from "../net";
-import { buildSearchResponse } from "./slack-search-response";
+import {
+  buildSearchResponse,
+  buildUnavailableResponse,
+  connectNoteForResults,
+  connectNoteForUnavailable,
+} from "./slack-search-response";
 import {
   selectHits,
   type EmittedHit,
@@ -107,18 +112,32 @@ export async function executeSlackSearch(
   const inOwnDm = Boolean(slack?.channel?.startsWith("D"));
   const requester = inOwnDm ? slack?.requestedBy : undefined;
   const credentials = await slackSearchCredentials(env, requester);
+  // The connect link, resolved ONCE and above the credential loop.
+  //
+  // It used to be built inside the loop, which meant it existed only on a
+  // search that RAN — and the turn that most needs it is the one where no
+  // search can run at all. Null when SLACK_OAUTH_REDIRECT_URI is unset, and
+  // withheld outside the requester's own DM (ADR-020): a connect link offered
+  // in a channel is addressed to whoever is in the room, not to the asker.
+  const connectUrl = inOwnDm ? slackConnectUrl(env) : null;
   // A bot-token search is invalid without the triggering event's action_token,
   // so that candidate only counts when we actually carry one.
   const actionToken = slack?.actionToken;
   const viable = credentials.filter((c) => c.kind !== "bot" || !!actionToken);
   if (viable.length === 0) {
-    return JSON.stringify({
-      ok: false,
-      error:
-        credentials.length > 0
-          ? "workspace search unavailable (bot search needs the triggering event's action_token, which this turn did not carry) — use thread/channel reads instead"
-          : "workspace search unavailable (no search credential stored) — use thread/channel reads instead",
-    });
+    // Unavailable, and STILL the moment to offer the link: in their own DM with
+    // nothing stored, "I can't search that" and "you can let me" are one answer.
+    // Withholding the second half is what made S3 unpassable — the reply had
+    // nothing to offer because the tool had computed nothing to offer.
+    return JSON.stringify(
+      buildUnavailableResponse({
+        error:
+          credentials.length > 0
+            ? "workspace search unavailable (bot search needs the triggering event's action_token, which this turn did not carry) — use thread/channel reads instead"
+            : "workspace search unavailable (no search credential stored) — use thread/channel reads instead",
+        ...(connectUrl ? { connectNote: connectNoteForUnavailable(connectUrl) } : {}),
+      }),
+    );
   }
 
   const allowlist = new Set(
@@ -192,11 +211,8 @@ export async function executeSlackSearch(
 
       // Consent nudge: in their own DM without a connected token, tell the model
       // the requester can widen coverage themselves (the link is user-facing).
-      const connectUrl = slackConnectUrl(env);
       const connectNote =
-        inOwnDm && c.kind !== "own" && connectUrl
-          ? `these results do not cover DMs or un-allowlisted private channels. The requester can connect their own Slack history — searches here will then cover everything they can see — at ${connectUrl}`
-          : undefined;
+        c.kind !== "own" && connectUrl ? connectNoteForResults(connectUrl) : undefined;
 
       const visibility =
         c.kind === "own"
@@ -220,11 +236,14 @@ export async function executeSlackSearch(
 
     // Every rung rejected us. Say so plainly — this is a credential problem an
     // admin must fix, not an empty result, and the model must not report it as
-    // "nothing found".
-    return JSON.stringify({
-      ok: false,
-      error: `workspace search unavailable — every stored credential was rejected by Slack (${lastAuthError ?? "auth failed"}). Stored tokens are likely revoked; re-consent at /oauth/slack/start. Use thread/channel reads instead.`,
-    });
+    // "nothing found". The link rides along in their own DM for the same reason
+    // as above: a revoked token is exactly a thing the requester can re-grant.
+    return JSON.stringify(
+      buildUnavailableResponse({
+        error: `workspace search unavailable — every stored credential was rejected by Slack (${lastAuthError ?? "auth failed"}). Stored tokens are likely revoked; re-consent at /oauth/slack/start. Use thread/channel reads instead.`,
+        ...(connectUrl ? { connectNote: connectNoteForUnavailable(connectUrl) } : {}),
+      }),
+    );
   } catch (err) {
     // A budget stop is not an empty result. Flattening it to {ok:false} told the
     // model the search ran and found nothing.

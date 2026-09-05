@@ -192,7 +192,7 @@ test("corpus-term needs a term the corpus matches MORE than one page shows", asy
 });
 
 test("a corpus with no such term skips, and the probe budget is honoured", async () => {
-  const names = Array.from({ length: 12 }, (_, i) => ({ name: `Term${i}` }));
+  const names = Array.from({ length: CORPUS_TERM_PROBES + 4 }, (_, i) => ({ name: `Term${i}` }));
   const reads = readsWith({
     touchpoints: async () => names,
     search: async () => ({ rows: [{ kind: "cell", title: "only one" }], matched: 1 }),
@@ -207,12 +207,67 @@ test("a corpus with no such term skips, and the probe budget is honoured", async
   );
 });
 
+test("the probe reaches past the alphabetically-first few registry names (#452)", async () => {
+  // WHY THIS EXISTS. The registry read returns rows `name.asc`, and the probe
+  // budget was four — so the condition was really "…among the alphabetically
+  // first four tools the service uses", and the 2026-09-04 run skipped B4 on a
+  // board where `zoom` matches 135 cells against a page of 15. The wide term
+  // here sits sixth on purpose: a budget that cannot reach it is the bug.
+  const names = [
+    { name: "Airtable" }, { name: "Basecamp" }, { name: "Confluence" },
+    { name: "Dovetail" }, { name: "Figjam" }, { name: "Zoom" },
+  ];
+  const reads = readsWith({
+    touchpoints: async () => names,
+    search: async (q) =>
+      q === "Zoom"
+        ? { rows: Array.from({ length: 15 }, () => ({ kind: "cell", title: "a cell" })), matched: 135 }
+        : { rows: [{ kind: "cell", title: "a cell" }], matched: 1 },
+  });
+  const pick = await selectSubject("corpus-term", reads);
+  assert.deepEqual(pick.subject, { name: "Zoom", term: "Zoom", matched: 135, shown: 15 });
+});
+
+test("the probe is the ordinary unscoped search, not a rung only this route asks for", async () => {
+  // The RPC already answers at `cell` by default, so naming the rung bought
+  // nothing and made this the one call shape nothing else in the bot exercises
+  // — the other candidate explanation for B4's skip (#452).
+  const reads = readsWith({
+    search: async () => ({ rows: [{ kind: "cell", title: "a" }], matched: 9 }),
+  });
+  await selectSubject("corpus-term", reads);
+  assert.ok(
+    reads.calls.some((c) => c === "search(Kazoo|{})"),
+    `the probe must carry no scope (calls: ${reads.calls.join(", ")})`,
+  );
+});
+
 test("a search that reports no total is not treated as a count", async () => {
   // `matched_total` is absent on every fallback path. Reading a missing total
   // as zero — or as the row count — would hand the completeness case a subject
   // whose premise the tool cannot support.
   const reads = readsWith({ search: async () => ({ rows: [{ kind: "cell", title: "a" }] }) });
   assert.equal((await selectSubject("corpus-term", reads)).subject, null);
+});
+
+test("a read path that carries no total skips with its OWN reason (#452)", async () => {
+  // The two ways this condition fails must not share a sentence. "No term is
+  // wide enough" is a fact about the board and the case is right to skip; "no
+  // probe came back with a total" is a broken instrument, and the 2026-09-04
+  // artifact could not tell them apart because only the first was ever said.
+  const noTotal = readsWith({
+    search: async () => ({ rows: [{ kind: "cell", title: "a" }, { kind: "cell", title: "b" }] }),
+  });
+  const blind = await selectSubject("corpus-term", noTotal);
+  assert.equal(blind.subject, null);
+  assert.match(blind.reason ?? "", /'total_matched' is absent on this read path/);
+
+  // …and a corpus that DOES answer, narrowly, keeps the other reason.
+  const narrow = readsWith({ search: async () => ({ rows: [{ kind: "cell", title: "a" }], matched: 1 }) });
+  const thin = await selectSubject("corpus-term", narrow);
+  assert.equal(thin.subject, null);
+  assert.match(thin.reason ?? "", /matches more cells than one page shows/);
+  assert.doesNotMatch(thin.reason ?? "", /total_matched/);
 });
 
 test("absent-detail names a class the cells table has no column for", () => {
