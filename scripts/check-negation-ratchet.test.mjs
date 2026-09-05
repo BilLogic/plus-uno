@@ -21,17 +21,22 @@ import path from 'node:path';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
+import os from 'node:os';
+
 import {
   BASELINE,
   METRIC,
   PROHIBITION_TOKENS,
   SCOPES,
   bundlerFailureReport,
+  compare,
   corpusShrankReport,
   countProhibitions,
+  measureDocs,
   readingChangedReport,
   roseReport,
 } from './check-negation-ratchet.mjs';
+import { ACTIONS_PROMPTS_DIR, actionsPromptFiles, walkPromptDocs } from './lib/actions-prompts.mjs';
 import {
   REPO_ROOT,
   SECTION_ROOTS,
@@ -175,10 +180,10 @@ test('a doc that vanished from disk stops the ratchet instead of shrinking it', 
 // of the bundled one, and — the property the whole guard turns on — a corpus
 // that shrank FAILS rather than reporting a smaller, greener number.
 
-test('both scopes are declared, and the baseline records each one', () => {
+test('all three scopes are declared, and the baseline records each one', () => {
   assert.deepEqual(
     SCOPES.map((s) => s.key),
-    ['bundled', 'ide'],
+    ['bundled', 'ide', 'actions'],
   );
 
   const base = JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
@@ -195,13 +200,14 @@ test('both scopes are declared, and the baseline records each one', () => {
   }
 });
 
-test('the two scopes ratchet separately, so a fall on one cannot pay for a rise on the other', () => {
+test('the scopes ratchet separately, so a fall on one cannot pay for a rise on another', () => {
   const base = JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
   // A single summed total would let 202 + 107 stay flat while the IDE side
   // climbed and the bundle fell. The file has no such number to compare.
   assert.equal(base.total, undefined, 'a summed total would make one scope pay for the other');
   assert.notEqual(base.scopes.bundled.total, undefined);
   assert.notEqual(base.scopes.ide.total, undefined);
+  assert.notEqual(base.scopes.actions.total, undefined);
 });
 
 test('a corpus that shrank is a failure, not a lower score', () => {
@@ -443,6 +449,116 @@ test('at least one harness doc still separates the two readings', () => {
     'no harness doc carries a prohibition in frontmatter any more — the asymmetry is no ' +
       'longer witnessed by the real corpus. Either re-argue it, or accept that the fixtures ' +
       'are all that hold it.',
+  );
+});
+
+// ── The third scope: the Actions prompts (#425) ──────────────────────────────
+//
+// The third embodiment is not the bundler's to name — its prompts declare no
+// `embodiment:` and are never bundled — so the corpus is listed by where it
+// lives, and what is asserted here is that the list is the loader's own root,
+// that the real counter and the real comparison bite on a planted ban, and
+// that a shrunken corpus refuses to run rather than reporting a greener number.
+
+const scratch = () => fs.mkdtempSync(path.join(os.tmpdir(), 'negation-actions-'));
+
+test('the actions corpus is the loader root, walked for every .md', () => {
+  assert.equal(ACTIONS_PROMPTS_DIR, 'scripts/prompts');
+  const files = actionsPromptFiles();
+  assert.ok(files.length > 0, 'an empty Actions corpus is a broken walk, not a clean repo');
+  for (const rel of files) {
+    assert.match(rel, /^scripts\/prompts\/.+\.md$/, `outside the loader root: ${rel}`);
+    assert.ok(fs.existsSync(path.join(REPO_ROOT, rel)), `walked a path that is not there: ${rel}`);
+  }
+  // Every adapter the loader can load is in the corpus — the loader reads
+  // `<skill>/SKILL.md`, so each of those is the minimum the walk owes.
+  for (const entry of fs.readdirSync(path.join(REPO_ROOT, 'scripts/prompts'), { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.name === 'references') continue;
+    assert.ok(files.includes(`scripts/prompts/${entry.name}/SKILL.md`), `adapter missing: ${entry.name}`);
+  }
+});
+
+test('the walk finds nested references and skips everything that is not markdown', () => {
+  const dir = scratch();
+  fs.mkdirSync(path.join(dir, 'x/references'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'x/SKILL.md'), '# x\n');
+  fs.writeFileSync(path.join(dir, 'x/references/deep.md'), '# deep\n');
+  fs.writeFileSync(path.join(dir, 'x/notes.txt'), 'not a prompt\n');
+  assert.deepEqual(walkPromptDocs(dir), ['x/SKILL.md', 'x/references/deep.md']);
+  assert.deepEqual(walkPromptDocs(path.join(dir, 'missing')), [], 'a missing root is empty, not a throw');
+});
+
+test('the actions scope reads whole files, the way the sweep workflows hand them over', () => {
+  // Three adapters reach the model as a `prompt-file:` with nothing stripped,
+  // so a ban in `description:` is a ban the model reads.
+  const doc = '---\nname: x\ndescription: never run this by hand\n---\n\n# x\n\nState the target.\n';
+  assert.equal(countProhibitions(scopeBy('actions').read(doc)), 1);
+  assert.match(scopeBy('actions').measuredOn, /frontmatter included/);
+  assert.match(scopeBy('actions').measuredOn, /prompt-file/);
+});
+
+test('MUTATION: a ban planted in a prompt fixture raises the actions scope and fails', () => {
+  // The real counter, the real reading, the real comparison — over a fixture
+  // baseline, so the gate's own path is what bites and nothing is re-implemented.
+  const scope = scopeBy('actions');
+  const clean = [{ label: 'scripts/prompts/x/SKILL.md', text: '---\nname: x\n---\n\n# x\n\nState the target.\n' }];
+  const base = { scopes: { actions: { measuredOn: scope.measuredOn, docs: 1, total: 0, counts: {} } } };
+  assert.deepEqual(compare([measureDocs(scope, clean)], base), [], 'the clean fixture holds');
+
+  const planted = [
+    { label: 'scripts/prompts/x/SKILL.md', text: `${clean[0].text}\nYou must not skip the machine check.\n` },
+  ];
+  const failures = compare([measureDocs(scope, planted)], base);
+  assert.equal(failures.length, 1, 'one scope rose, one report');
+  assert.match(failures[0], /Actions prompts rose 0 -> 1/, 'must name WHICH corpus rose');
+  assert.match(failures[0], /scripts\/prompts\/x\/SKILL\.md: 0 -> 1/, 'and the doc that caused it');
+});
+
+test('MUTATION: the actions scope shrinking refuses to run rather than passing smaller', () => {
+  const scope = scopeBy('actions');
+  const base = { scopes: { actions: { measuredOn: scope.measuredOn, docs: 2, total: 5, counts: {} } } };
+  // One doc where two were recorded — and fewer bans than the baseline, which
+  // is exactly the shape a ratchet passes on its own.
+  const shrunk = [{ label: 'scripts/prompts/x/SKILL.md', text: 'You never ship it unreviewed.\n' }];
+  const failures = compare([measureDocs(scope, shrunk)], base);
+  assert.equal(failures.length, 1);
+  assert.match(failures[0], /the actions corpus shrank: 1 Actions prompts measured, against the 2/);
+});
+
+test('a scope in the code with no baseline is a failure, not a pass', () => {
+  // The state this scope was in for one run between being added and being
+  // recorded — asserted so the next scope cannot ship without its number.
+  const scope = scopeBy('actions');
+  const failures = compare([measureDocs(scope, [])], { scopes: {} });
+  assert.equal(failures.length, 1);
+  assert.match(failures[0], /records no `actions` scope/);
+  assert.match(failures[0], /--update/);
+});
+
+test('the actions numbers on record are whole-file counts over the real corpus', () => {
+  const base = JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
+  assert.equal(base.scopes.actions.measuredOn, scopeBy('actions').measuredOn);
+  for (const [rel, n] of Object.entries(base.scopes.actions.counts)) {
+    assert.match(rel, /^scripts\/prompts\//, `a non-Actions doc in the actions baseline: ${rel}`);
+    const text = fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8').replace(/\r\n/g, '\n');
+    assert.equal(n, countProhibitions(text), `actions count is not a whole-file count: ${rel}`);
+  }
+});
+
+test('the three corpora partition — no doc is counted twice', () => {
+  const base = JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
+  const seen = new Map();
+  for (const [key, scope] of Object.entries(base.scopes)) {
+    for (const rel of Object.keys(scope.counts)) {
+      assert.ok(!seen.has(rel), `${rel} is counted in both ${seen.get(rel)} and ${key}`);
+      seen.set(rel, key);
+    }
+  }
+  // And by rule, not just by record: the bundler's roots never reach the
+  // loader's, so the Actions walk cannot overlap the other two.
+  assert.ok(
+    SECTION_ROOTS.every((r) => !r.startsWith(ACTIONS_PROMPTS_DIR)),
+    'scripts/prompts must not become a bundler section root without this decision being revisited',
   );
 });
 

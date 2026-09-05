@@ -126,7 +126,7 @@
  * The IDE scope's 107 is unchanged by this; only the bundled figure moved, from
  * 202 (as #155 recorded it, whole files) to 200.
  *
- * ONE GUARD, TWO SCOPES, ONE BASELINE FILE. A second script would have restated
+ * ONE GUARD, TWO SCOPES (THREE SINCE #425), ONE BASELINE FILE. A second script would have restated
  * this header's reasoning, the token list and the failure message — which is
  * the defect `check:skill-overlap` exists to catch, one level down in the
  * tooling. The two scopes share the regex, the metric name and the report, and
@@ -142,8 +142,43 @@
  * fewer — the case neither witness sees, because a doc genuinely deleted or
  * re-declared shrinks the corpus without either walk being wrong.
  *
+ * ── THE THIRD SCOPE: THE ACTIONS PROMPTS (#425, built 2026-09-05) ────────────
+ *
+ * uno has three embodiments, and the two scopes above cover two of them. The
+ * third — headless GitHub Actions — runs on `scripts/prompts/**\/*.md`: five
+ * adapter `SKILL.md`s, their `references/`, and the shared headless-intake
+ * contract. They were outside every sweep for a structural reason, not an
+ * oversight: both scopes above take their corpus from the bundler's walk, and
+ * the Actions prompts are never bundled. They also carry no `embodiment:`
+ * frontmatter, on purpose (#417 § Embodiment stays a document property): the
+ * constitution already names the runtime, and the prompts reach a model by
+ * their own loader. Faking the key onto them to ride the bundler's walk would
+ * have been a second membership rule dressed as the first, so instead the
+ * corpus is listed by where it lives — `scripts/lib/actions-prompts.mjs` walks
+ * the loader's own root, and the harness name sweep reads the same list.
+ *
+ * IT READS WHOLE FILES, like the IDE scope, and for the same kind of reason:
+ * three of the five adapters reach the model as a `prompt-file:` handed over
+ * whole by the sweep workflows, frontmatter included, so a ban in a
+ * `description:` there is text the model is told. The two implement adapters go
+ * through `skill-loader.js`, which strips frontmatter and meta sections — a
+ * narrower route. The scope reads the widest route, because a count that
+ * missed a ban the model reads on three workflows to be exact about two is
+ * the wrong trade. Measured at #425: 7 docs carrying 68 prohibition tokens —
+ * 42 of them in the two implement adapters, which predate the operations rule
+ * that adapters carry loop mechanics only and are due a rewrite when next
+ * touched (`docs/engineering/operations.md`). The other two scopes were
+ * unchanged by the addition: 152 across 21 and 105 across 46. (First recorded
+ * as 69 across 8, then re-baselined the same day when #439's contract step
+ * deleted the `uno-tier1-digest` stub — the corpus floor refused the run, which
+ * is the shrink case doing its job.)
+ *
+ * The retired-SPELLING sweep (`check:retired-spelling`, #429) already reaches
+ * these prompts by root; this scope and the harness name sweep are the two
+ * that did not, and now do.
+ *
  * Usage:
- *   node scripts/check-negation-ratchet.mjs           report, fail if either count rose
+ *   node scripts/check-negation-ratchet.mjs           report, fail if any scope's count rose
  *   node scripts/check-negation-ratchet.mjs --update  record the current counts as the new baseline
  */
 
@@ -151,6 +186,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { actionsPromptFiles } from './lib/actions-prompts.mjs';
 import { bundlerFailureReport, harnessSets, resolveBundled, unresolvedReport } from './lib/bundled-set.mjs';
 import { splitFrontmatter } from './lib/frontmatter.mjs';
 
@@ -240,6 +276,21 @@ export const SCOPES = [
     measuredOn:
       "whole files, frontmatter included — there is no bundler here, and a SKILL.md's " +
       'description: is agent-facing routing text that steers exactly as the body does',
+  },
+  {
+    key: 'actions',
+    noun: 'Actions prompts',
+    corpus:
+      'the headless GitHub Actions prompts under scripts/prompts/ — every .md the skill-loader ' +
+      'root holds: the adapter SKILL.mds, their references/, and the shared headless-intake contract. ' +
+      'Listed by where they live, since they carry no embodiment: and are never bundled (#425)',
+    // Not from the bundler's sets at all — the third embodiment has its own
+    // loader, and this is its own walk (scripts/lib/actions-prompts.mjs).
+    files: () => actionsPromptFiles(),
+    read: (text) => text,
+    measuredOn:
+      'whole files, frontmatter included — the sweep workflows hand a SKILL.md to the model as a ' +
+      'prompt-file: with nothing stripped, and the loader route the implement adapters take is narrower',
   },
 ];
 
@@ -342,6 +393,21 @@ function measure(scope, files) {
     console.error(unresolvedReport({ missing, declared, tag: 'negation' }));
     process.exit(1);
   }
+  return measureDocs(scope, docs, declared);
+}
+
+/**
+ * The counting half of `measure`, over docs already read.
+ *
+ * Split out so a test can hand a scope a FIXTURE — a planted ban, an emptied
+ * corpus — and watch the real counter and the real reading score it, rather
+ * than a re-implementation of either (#425). `measure` above is the disk half.
+ *
+ * @param {{key: string, noun: string, read: (text: string) => string}} scope
+ * @param {{label: string, text: string}[]} docs
+ * @param {number} [declared] how many the corpus listed; defaults to what was read.
+ */
+export function measureDocs(scope, docs, declared = docs.length) {
   const counts = {};
   let total = 0;
   for (const { label, text } of docs) {
@@ -350,6 +416,52 @@ function measure(scope, files) {
     total += n;
   }
   return { scope, declared, docs: docs.length, counts, total };
+}
+
+/**
+ * Every measured scope against the baseline: the failures, in report order.
+ *
+ * Pure — the comparison the gate turns on, separated from the disk and the
+ * bundler so it can be asserted over a fixture baseline (#425). Order inside a
+ * scope is load-bearing and stated at each step: the RULER first, then the
+ * corpus floor, then the count.
+ *
+ * @param {ReturnType<typeof measureDocs>[]} measured
+ * @param {{scopes?: Record<string, {measuredOn?: string, docs: number, total: number, counts: Record<string, number>}>}} base
+ * @returns {string[]} one report per failing scope; empty when every scope holds.
+ */
+export function compare(measured, base) {
+  const failures = [];
+  for (const m of measured) {
+    const b = base.scopes?.[m.scope.key];
+    if (!b) {
+      failures.push(
+        `[negation] the baseline records no \`${m.scope.key}\` scope, so this run has nothing to ratchet\n` +
+          `  against for ${m.scope.corpus}.\n` +
+          '  -> A scope added to SCOPES without a recorded baseline is a scope that cannot fail.\n' +
+          '     Record it from a real run: `npm run check:negation -- --update`.',
+      );
+      continue;
+    }
+    // The RULER before the corpus: a count taken through a different reading is
+    // not comparable to this baseline at all, whatever the corpus did.
+    if (b.measuredOn !== m.scope.measuredOn) {
+      failures.push(readingChangedReport({ scope: m.scope, was: b.measuredOn }));
+      continue;
+    }
+    // Corpus floor next. A shrunken corpus makes the count below meaningless,
+    // and reporting a fall as good news is the failure this ordering prevents.
+    if (m.docs < b.docs) {
+      failures.push(corpusShrankReport({ scope: m.scope, was: b.docs, now: m.docs }));
+      continue;
+    }
+    if (m.total > b.total) {
+      failures.push(
+        roseReport({ scope: m.scope, was: b.total, now: m.total, counts: m.counts, baseCounts: b.counts }),
+      );
+    }
+  }
+  return failures;
 }
 
 /**
@@ -406,40 +518,10 @@ function main() {
   }
 
   const base = JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
-  const failures = [];
-
-  for (const m of measured) {
-    const b = base.scopes?.[m.scope.key];
-    if (!b) {
-      failures.push(
-        `[negation] the baseline records no \`${m.scope.key}\` scope, so this run has nothing to ratchet\n` +
-          `  against for ${m.scope.corpus}.\n` +
-          '  -> A scope added to SCOPES without a recorded baseline is a scope that cannot fail.\n' +
-          '     Record it from a real run: `npm run check:negation -- --update`.',
-      );
-      continue;
-    }
-    // The RULER before the corpus: a count taken through a different reading is
-    // not comparable to this baseline at all, whatever the corpus did.
-    if (b.measuredOn !== m.scope.measuredOn) {
-      failures.push(readingChangedReport({ scope: m.scope, was: b.measuredOn }));
-      continue;
-    }
-    // Corpus floor next. A shrunken corpus makes the count below meaningless,
-    // and reporting a fall as good news is the failure this ordering prevents.
-    if (m.docs < b.docs) {
-      failures.push(corpusShrankReport({ scope: m.scope, was: b.docs, now: m.docs }));
-      continue;
-    }
-    if (m.total > b.total) {
-      failures.push(
-        roseReport({ scope: m.scope, was: b.total, now: m.total, counts: m.counts, baseCounts: b.counts }),
-      );
-    }
-  }
+  const failures = compare(measured, base);
 
   if (failures.length) {
-    // Both scopes are reported, never just the first: one PR can raise both, and
+    // Every scope is reported, never just the first: one PR can raise all three, and
     // a gate that costs a fix-push-wait cycle per fact is a gate people route
     // around (`check-harness.mjs` § It does not stop at the first failure).
     console.error(failures.join('\n\n'));
@@ -463,7 +545,7 @@ function main() {
     );
   });
   console.log(
-    `[negation] ${METRIC} (${PROHIBITION_TOKENS.join(' / ')}), two scopes, one baseline:\n` +
+    `[negation] ${METRIC} (${PROHIBITION_TOKENS.join(' / ')}), ${SCOPES.length} scopes, one baseline:\n` +
       lines.join('\n') +
       '\n  (imperative bans only — negation in other forms is not counted here;' +
       " see this script's header.)",

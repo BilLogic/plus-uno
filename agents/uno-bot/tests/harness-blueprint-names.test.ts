@@ -24,18 +24,42 @@
 // tool-definitions.json, because tool schemas ship outside the bundle. Sweeping
 // the assembly rather than a list of paths means a doc added to the prompt is
 // swept the day it is added, with nothing to remember.
+//
+// THE THIRD SUBJECT IS THE ACTIONS PROMPTS (#425). uno has three embodiments
+// and the two subjects above are the Worker's. The headless GitHub Actions
+// prompts under `scripts/prompts/` reach a model by their own loader, never
+// the bundler, and carry no `embodiment:` on purpose — so until #425 no sweep
+// could name them and none did. They are listed by where they live: the walk
+// is `scripts/lib/actions-prompts.mjs`, shared with `check:negation`'s third
+// scope, and imported here by file URL because this test's compiled twin runs
+// from `.test-build/` where a relative import cannot reach the repo root. The
+// same two sweeps run over them, sentence-scoped with the same exemption.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import {
   RETIRED_IN_PROSE,
   RETIRED_CONVENTIONS,
   WIRE_NAMES,
 } from "../src/integrations/blueprint-schema";
 
-const BOT = resolve(process.cwd(), "..", "..", "agents", "uno-bot");
+const REPO = resolve(process.cwd(), "..", "..");
+const BOT = resolve(REPO, "agents", "uno-bot");
 const PROMPT_MARKER = "## The assembled prompt";
+
+/** The Actions-prompt walk, from the one module that owns it. */
+type ActionsPrompts = {
+  ACTIONS_PROMPTS_DIR: string;
+  walkPromptDocs: (root: string) => string[];
+  actionsPromptFiles: () => string[];
+};
+async function actionsPrompts(): Promise<ActionsPrompts> {
+  const url = pathToFileURL(resolve(REPO, "scripts", "lib", "actions-prompts.mjs")).href;
+  return (await import(url)) as ActionsPrompts;
+}
 
 function assembledPrompt(): string {
   const bundle = readFileSync(resolve(BOT, "harness-bundle.md"), "utf8");
@@ -111,6 +135,31 @@ function offenders(text: string, source: string): string[] {
   return found;
 }
 
+/** Sentences that still INSTRUCT on a convention the blueprint removed. */
+function conventionOffenders(text: string, source: string): string[] {
+  const found: string[] = [];
+  for (const { line, body } of paragraphs(text)) {
+    for (const sentence of sentences(body)) {
+      if (CORRECTION.test(sentence)) continue;
+      for (const { phrase, instead } of RETIRED_CONVENTIONS) {
+        if (!sentence.includes(phrase)) continue;
+        found.push(`${source}:${line} still instructs on "${phrase}" — use ${instead}`);
+      }
+    }
+  }
+  return found;
+}
+
+/** Both sweeps over every prompt doc under `root` — the Actions subject. */
+function sweepPromptDocs(root: string, rels: string[]): string[] {
+  const found: string[] = [];
+  for (const rel of rels) {
+    const text = readFileSync(join(root, rel), "utf8");
+    found.push(...offenders(text, rel), ...conventionOffenders(text, rel));
+  }
+  return found;
+}
+
 test("the assembled prompt names no retired blueprint identifier", () => {
   assert.deepEqual(offenders(assembledPrompt(), "harness-bundle.md"), []);
 });
@@ -125,18 +174,52 @@ test("no removed convention survives as an instruction", () => {
     ["tool-definitions.json", toolDefinitions()],
   ];
   const found: string[] = [];
-  for (const [source, text] of surfaces) {
-    for (const { line, body } of paragraphs(text)) {
-      for (const sentence of sentences(body)) {
-        if (CORRECTION.test(sentence)) continue;
-        for (const { phrase, instead } of RETIRED_CONVENTIONS) {
-          if (!sentence.includes(phrase)) continue;
-          found.push(`${source}:${line} still instructs on "${phrase}" — use ${instead}`);
-        }
-      }
-    }
-  }
+  for (const [source, text] of surfaces) found.push(...conventionOffenders(text, source));
   assert.deepEqual(found, []);
+});
+
+test("the Actions prompts name no retired identifier and keep no removed convention", async () => {
+  const { ACTIONS_PROMPTS_DIR, actionsPromptFiles } = await actionsPrompts();
+  const files = actionsPromptFiles();
+  assert.ok(files.length > 0, "an empty Actions corpus is a broken walk, not a clean repo");
+  // Repo-relative paths in, so a finding reads `scripts/prompts/x/SKILL.md:12`
+  // and the walk is the same one check:negation's third scope ratchets.
+  assert.deepEqual(sweepPromptDocs(REPO, files), []);
+  assert.equal(ACTIONS_PROMPTS_DIR, "scripts/prompts");
+});
+
+test("MUTATION: an Actions prompt fixture carrying a retired identifier fails the sweep", async () => {
+  // Through the real walk over a scratch root, not a string handed to the
+  // regex: the point is that a prompt on disk is REACHED, which is the half
+  // the two subjects above never had to prove.
+  const { walkPromptDocs } = await actionsPrompts();
+  const root = mkdtempSync(join(tmpdir(), "actions-names-"));
+  mkdirSync(join(root, "uno-planted", "references"), { recursive: true });
+  writeFileSync(
+    join(root, "uno-planted", "SKILL.md"),
+    "---\nname: uno-planted\n---\n\n# Planted\n\nRead `path_type` before you answer.\n",
+  );
+  writeFileSync(
+    join(root, "uno-planted", "references", "deep.md"),
+    "NEVER assert there is no future state until you have searched for a `Planned:` path.\n",
+  );
+  writeFileSync(join(root, "clean.md"), "Rows may carry `links` and `description`.\n");
+
+  const rels = walkPromptDocs(root);
+  assert.deepEqual(rels, ["clean.md", "uno-planted/SKILL.md", "uno-planted/references/deep.md"]);
+  assert.deepEqual(sweepPromptDocs(root, rels), [
+    "uno-planted/SKILL.md:7 names `path_type`",
+    'uno-planted/references/deep.md:1 still instructs on "`Planned:`" — use status = \'planned\'',
+  ]);
+});
+
+test("a correction in an Actions prompt is not an offender", async () => {
+  // Same exemption as the other two subjects — a passage saying the old
+  // spelling is dead is the one place it belongs.
+  const { walkPromptDocs } = await actionsPrompts();
+  const root = mkdtempSync(join(tmpdir(), "actions-names-"));
+  writeFileSync(join(root, "SKILL.md"), "`path_type` was removed on 2026-08-20; read `status`.\n");
+  assert.deepEqual(sweepPromptDocs(root, walkPromptDocs(root)), []);
 });
 
 test("a wire name is not condemned as a retired column", () => {

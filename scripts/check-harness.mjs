@@ -153,7 +153,7 @@ const COMPOSED = [
     script: 'check:negation',
     pkg: 'root',
     guards:
-      "the negation ratchet — the density of five imperative-ban tokens (never / don't / do not / cannot / must not) not climbing, over TWO scopes ratcheted separately from one baseline file: the bundled harness docs and, since #174, the hand-authored IDE-side docs (the `embodiment: ide` complement of the bundled set within the bundler's own section roots, so docs/adr/ and the generated .claude/skills/ surfaces are out by structure). It counts PROHIBITION TOKENS, not negation as written: the two differ by roughly 3x and #234 chose the narrow, unarguable one on the evidence. Each scope also refuses to run against fewer docs than its baseline was recorded over — a ratchet only fails on a RISE, so a corpus that vanished otherwise passes with a smaller number. The script header carries the measurement.",
+      "the negation ratchet — the density of five imperative-ban tokens (never / don't / do not / cannot / must not) not climbing, over THREE scopes ratcheted separately from one baseline file: the bundled harness docs; since #174, the hand-authored IDE-side docs (the `embodiment: ide` complement of the bundled set within the bundler's own section roots, so docs/adr/ and the generated .claude/skills/ surfaces are out by structure); and since #425 the headless GitHub Actions prompts under scripts/prompts/, the third embodiment, which declare no embodiment: and are never bundled, so they are listed by where they live rather than found through the bundler. It counts PROHIBITION TOKENS, not negation as written: the two differ by roughly 3x and #234 chose the narrow, unarguable one on the evidence. Each scope also refuses to run against fewer docs than its baseline was recorded over — a ratchet only fails on a RISE, so a corpus that vanished otherwise passes with a smaller number. The script header carries the measurement.",
   },
   {
     script: 'check:pointers',
@@ -372,7 +372,7 @@ const COMPOSED = [
     script: 'test',
     pkg: 'bot',
     guards:
-      "the Worker's 268 unit tests across 39 suites, which ran in NO workflow and are not in `npm run deploy` either — that chain chose `test:bundle` and stopped. So the largest test suite in this repository was gated by nothing at all, and had been since it was written. 1.2s, measured 2026-08-29. Found while verifying the TypeScript 7 bump (#298), which is exactly the change that needed them.",
+      "the Worker's 268 unit tests across 39 suites, which ran in NO workflow and are not in `npm run deploy` either — that chain chose `test:bundle` and stopped. So the largest test suite in this repository was gated by nothing at all, and had been since it was written. 1.2s, measured 2026-08-29. Found while verifying the TypeScript 7 bump (#298), which is exactly the change that needed them. Among them is the harness name sweep (tests/harness-blueprint-names.test.ts), which reads the assembled prompt, the tool schemas and — since #425 — the Actions prompts under scripts/prompts/ for blueprint identifiers and conventions the schema no longer has; its inputs are repo-root files, which is the rule that composes a sub-package check here.",
   },
 ];
 
