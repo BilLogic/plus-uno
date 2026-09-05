@@ -264,7 +264,7 @@
   },
   {
     "name": "read_reference",
-    "description": "Read-only, ungated, zero network cost. Returns one harness document by name from a map baked into the Worker at build time — the skill methods and references that are disclosed behind this tool instead of loaded into every turn. Reach for it when a skill's Worker face names its method (for example `uno-maintain/method`) at the point the turn needs the full procedure, or when a question the loaded documents leave open names a reference. The answer is already in context when the loaded skill face, the persona or the connector docs settle it; a document read this turn stays available for the rest of the turn and is dropped when the turn ends, so a later turn reads it again with one call. An unknown name returns the list of names the map knows.",
+    "description": "Read-only, ungated, zero network cost. Returns one harness document by name from a map baked into the Worker at build time — the skill methods and references that are disclosed behind this tool instead of loaded into every turn. Reach for it when a skill's Worker face names its method (for example `uno-maintain/method`) at the point the turn needs the full procedure, or when a question the loaded documents leave open names a reference. The answer is already in context when the loaded skill face, the persona or the connector docs settle it; a document read this turn stays available for the rest of the turn and is dropped when the turn ends, so a later turn reads it again with one call. A miss returns the map's names, so a second call with one of them is one lookup.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
