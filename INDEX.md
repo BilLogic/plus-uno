@@ -33,7 +33,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | Doc | Summary |
 |-----|---------|
 | [`skills/README.md`](skills/README.md) | Skill anatomy — which content belongs in method.md, which in a face, and the guard that holds the split |
-| [`skills/uno-maintain/bot.md`](skills/uno-maintain/bot.md) | uno-maintain — Worker delta over references/method.md. |
+| [`skills/uno-maintain/bot.md`](skills/uno-maintain/bot.md) | uno-maintain — the Worker's maintain turn, complete in-file; the method is disclosed behind read_reference. |
 | [`skills/uno-maintain/SKILL.md`](skills/uno-maintain/SKILL.md) | Fix the harness, not project design work |
 | [`skills/uno-prototype/bot.md`](skills/uno-prototype/bot.md) | uno-prototype — Worker delta over references/method.md. |
 | [`skills/uno-prototype/SKILL.md`](skills/uno-prototype/SKILL.md) | PRD → design artifact |

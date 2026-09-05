@@ -15,31 +15,30 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **167,634 chars from 21 files**, against an assembled budget of 170,000 (2,366 to spare), and a floor of 131,072 plus a 4,000 margin (32,562 above it). The floor is the Gemini lane's explicit-cache minimum; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **159,320 chars from 20 files**, against an assembled budget of 170,000 (10,680 to spare), and a floor of 131,072 plus a 4,000 margin (24,248 above it). The floor is the Gemini lane's explicit-cache minimum; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,260 (−6,727 ide-only) | 9,260 | — |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 8,288 | 17,576 | — |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,496 | 44,113 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 54,369 | — |
-| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 58,688 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 68,060 | — |
-| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,584 | 74,689 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 80,875 | — |
-| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 86,037 | 7,000 (Worker face) |
-| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 90,248 | — |
-| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,144 | 93,436 | 7,000 (Worker face) |
-| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 99,350 | — |
-| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 103,780 | 7,000 (Worker face) |
-| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 109,725 | — |
-| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 114,346 | 7,000 (Worker face) |
-| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 116,317 | — |
-| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 129,280 | — |
-| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,708 | 143,030 | — |
-| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 12,537 (−4,500 ide-only) | 155,633 | — |
-| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,312 (−1,219 ide-only) | 159,999 | — |
-| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,587 (−605 ide-only) | 167,634 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,497 (−6,727 ide-only) | 9,497 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 8,288 | 17,813 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,496 | 44,350 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 5,980 | 50,374 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 59,746 | — |
+| 6 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,584 | 66,375 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 72,561 | — |
+| 8 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 77,723 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 81,934 | — |
+| 10 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,144 | 85,122 | 7,000 (Worker face) |
+| 11 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 91,036 | — |
+| 12 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 95,466 | 7,000 (Worker face) |
+| 13 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 101,411 | — |
+| 14 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 106,032 | 7,000 (Worker face) |
+| 15 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 108,003 | — |
+| 16 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 120,966 | — |
+| 17 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,708 | 134,716 | — |
+| 18 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 12,537 (−4,500 ide-only) | 147,319 | — |
+| 19 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,312 (−1,219 ide-only) | 151,685 | — |
+| 20 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,587 (−605 ide-only) | 159,320 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -49,10 +48,21 @@ which is why the last running total exceeds the sum of the chars column. A row m
 cannot normally appear: the bundler refuses to write either artifact once a budget is blown, so
 the marker is what a relaxed or raised budget would have to explain.
 
+## Disclosed references
+
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **1 reference(s), 10,198 chars.**
+
+| Name | Doc | Chars |
+|------|-----|------:|
+| `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 |
+
 ## The assembled prompt
 
-Verbatim from here to the end of the file — this is the string baked into
+Verbatim from here to the end of the prompt — this is the string baked into
 `agents/uno-bot/src/generated/harness.ts` and handed to the model as Block 0 of every request.
+The disclosed references follow it, each under its `<!-- reference: name -->` marker, verbatim
+as baked into `references.ts`, so a sweep over this file from the prompt marker down reads
+everything the bot can be told.
 
 ---
 
@@ -115,7 +125,7 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 
 **Tier 3 — retrieved live, never cached.** Product truth from `uno-blueprint` (`writers/blueprint` / `search_blueprint`); design-system truth from `uno-storybook` (read the source and stories). Team conventions are *not* Tier 3 — they are canonical in-repo (ADR-017) and load as plain files.
 
-**uno-bot** does not load on demand: everything in its bundle is always in context, so Tier 2 is an IDE concept only.
+**uno-bot's Tier 2 is `read_reference`.** A doc that declares `disclosure: reference` leaves the always-loaded bundle for a map baked beside it, and the Worker reads it by name — `uno-maintain/method` — on the turns whose pointer fires; the text lasts the turn and a later turn re-reads it in one call. Everything else in the bundle is always in context.
 
 
 ## Hard rules
@@ -362,131 +372,34 @@ At most ONE plain sentence before a tool call, written for the requester and abo
 
 ---
 
-<!-- skills/uno-maintain/references/method.md -->
-
-<!-- Shared core, loaded by both faces (SKILL.md + bot.md). Runtime-neutral: no IDE tool names, no Slack mechanics; where a role is named (writers/*, auditor) the faces own HOW it's dispatched. -->
-<!-- Source flows: Flow 4 (intake & proposal) + Flow 5 (review & approval), PLUS UNO Workflow board. -->
-
-# uno-maintain — method
-
-Keep the harness itself current. One pass per issue: **capture → route → draft → human gate → tier → apply or propose.** Separation of powers is the design: humans observe and *decide*, the agent drafts and *executes*, the bot packages and *routes*. No step self-approves.
-
-## 1 · Intake — normalize the observation
-
-Every intake is one of four **trigger types** — improvement (could be better) · inaccuracy (says something wrong) · inconsistency (two sources disagree) · bug (behaves wrongly) — routed to one of **12 targets across 4 estates**:
-
-| Estate | Target | Fix action |
-|---|---|---|
-| Codebase | product context / stories | fix `docs/product-and-service/*` + `terminology.md` |
-| Codebase | harness doc stale / wrong | fix `docs/product-and-service/*` (non-product) + `docs/conventions/*` — repo-canonical, ADR-017 |
-| Codebase | a skill isn't useful | refine the skill (`skills/*` — both faces if shared) |
-| Codebase | UNO off-role / personality | tune persona / instructions (AGENTS.md, embodiment deltas) |
-| Codebase | Storybook inconsistent / bug | fix the design system (`design-system/src/**`) |
-| Codebase | uno-bot misbehaving | fix uno-bot (`agents/uno-bot/**`, bot faces) |
-| Figma | spec out of date | update the Figma spec pages |
-| Figma | components out of date | update the Figma component library |
-| Notion | requirement / story changed | update PRD **+ blueprint together** — paired, never one alone |
-| Notion | behavior / spec wrong | correct the doc **+ flag its owner** — fixing the artifact alone isn't enough |
-| Notion | doc stale or missing | author / refresh the doc |
-| Supabase | blueprint stale vs operational reality (journey changed, no requirement doc involved) | update the blueprint via `writers/blueprint` — pair a PRD only when a requirement doc exists for that flow (`docs/connectors/supabase/overview.md` § Two sources) |
-
-The taxonomy is the harness map — when a new component joins the harness, this table must grow.
-
-**Record:** an intake lives as a **Roadmap DB card** — `Product Pillar: Universal`, lifecycle in the `Intake Status` property (card mechanics: `docs/connectors/notion.md`). Every intake names its **evidence** (file / frame / message link) in the card body and a **suggested tier**. Separate from Decisions DB **Evidence** (URL property on durable design/product decisions).
-
-**Headless surrogate:** scheduled sweeps run without Notion access and file
-their intakes as GitHub issues labeled `harness-intake` (transport contract:
-`scripts/prompts/references/headless-intake.md`). That queue feeds THIS
-pipeline: every maintain session's intake step starts by draining it — triage
-each open `harness-intake` issue into a Roadmap card (or straight into §2–§4
-when acted on immediately), then close the issue as incorporated. An
-unwatched surrogate queue silently defeats every sweep that files into it.
-
-**Cross-estate inconsistencies are a known open area.** When two estates disagree, decide which side is believed wrong (DS precedence: uno-storybook > BS4 Foundation library > Figma spec pages), route there, and **flag the intake as cross-estate** — don't improvise a routing convention.
-
-## 2 · Draft first, judge second
-
-Draft the concrete fix on every path *before* worth is judged. Drafting is cheap; it buys the human a concrete evaluation instead of a speculative one. Never reorder these steps.
-
-**When the fix edits harness prose — this constitution, a skill, a convention, an
-agent doc — load the `writing-for-agents` skill and review the draft against it
-before the gate.** Two questions carry most of the weight. *Is this a no-op?* — an
-instruction the model already obeys by default pays context to say nothing, and
-the test is whether behaviour changes versus the default, settled by running it
-rather than by debate. *Is this a ban that could be a target?* — a prohibition
-makes the forbidden behaviour more available, so state what to do and let the
-banned thing go unspoken. `npm run check:negation` counts the bans mechanically;
-the no-op test is judgement and lives here.
-
-## 3 · The human gate — "worth incorporating?"
-
-Answered by the **spotter** (fallback: the designated maintainer) — never by the agent. Present the drafted fix with a **three-line brief: impact / effort / risk**.
-
-- **No** → end: no change needed. Discard the draft; keep the intake card trail.
-- **Yes** → tier it (§4).
-
-## 4 · Tier classification
-
-- **Tier 1 — trivial. The whitelist is absolute:** typos · broken links · stale dates · pure formatting — nothing else. Tier 1 may **never** touch skill definitions, the persona, DS components, or requirements, no matter how small the diff. Apply directly — no PR/PRD, no verdict — and log one line to `docs/evals/runs/digest.jsonl` as `{"ts": "<ISO-8601>", "target": "<file-or-artifact>", "change": "<one line>"}` (the row shape is a contract: the weekly digest automation windows on `ts` and prints `target`/`change`; a row missing `ts` is silently undated and falls out of every digest). The weekly digest posts from it to the design channel (`docs/connectors/slack.md`); the monthly retro reviews the digest.
-- **Tier 2 — substantive:** everything else → the pipeline in §5.
-
-## 5 · Tier 2 — PR + PRD → verdict → apply log
-
-1. **Pair, never one alone.** Open the PR *and* pair it with a PRD carrying the rationale — reviewers see *why*, not just *what*. A lone PR or lone PRD never ships.
-2. **Review post** to the design review channel (`docs/connectors/slack.md`): self-sufficient — one-line summary, PR + PRD links, suggested reviewers. Assume the reviewer never opens the PR.
-3. **Verdict** from a routed reviewer, machine-parseable per `docs/connectors/slack.md` gate 2 (approve / request-changes / reject — the emoji vocabulary lives there, not here). **Persona and DS-component changes need two approvals.** No verdict in 2 working days → re-ping the suggested reviewers once; 4 working days → escalate to the design lead. **Never auto-merge on silence.**
-4. **Execute on approve only.** Merge the PR / apply the update, then write one **apply-log row** (target · verdict link · timestamp) to `docs/evals/runs/apply-log.jsonl` — interim store until the Notion Eval Runs DB exists. Non-code applies have no merge log — this row is what makes the audit measurable.
-5. **🔁** → revise and re-enter at drafting (§2); each round gets a fresh, complete post. **❌** → record why in the thread so the idea isn't silently re-raised.
-
-## 6 · Standing intake paths
-
-- **Handoff rails propagation (from uno-publish):** arrives **pre-authorized** — the designer-confirmed handoff plus its three sign-offs replace the worth-incorporating gate and the verdict. Execute the paired PRD + blueprint write per `docs/connectors/supabase/overview.md` and write the apply-log row citing the handoff thread. This is the only intake that skips §3/§5.
-
-- **Conventions are repo-canonical** (decision 2026-07-07, ADR-017): `docs/conventions/` wins every conflict. A legacy Notion playbook page that contradicts a conventions file is the stale artifact — file an intake to banner it as superseded (the faces route the Notion write); never "re-sync" the repo to match it, never fix the drift silently.
-- **Standing sweeps:** named in `docs/engineering/operations.md` — shipped watchdog · weekly Tier-1 digest · Figma hygiene · conventions integrity (agents↔docs cross-references both ways, header canonicality, path rot) · Notion comment sweep. Each sweep files one intake per finding into this same pipeline.
-- **Post-ship reconciliation:** every shipped handoff triggers a reconcile of DS + harness + blueprint against built reality — routine, not exceptional. The check set, per shipped card:
-  - `design-system/` stories/MDX reflect the shipped surface where they reference it;
-  - harness docs (`docs/product-and-service/*`, conventions, skill references) don't describe pre-ship behavior as current;
-  - deployment/marketplace references (per uno-publish's references) still point at live URLs;
-  - the **blueprint** reflects the shipped change (`docs/connectors/supabase/overview.md` § Two sources — ship-time is when "blueprint wins vs shipped docs" becomes true). The headless watchdog can't read Supabase, so for any shipped card that touches the service journey it files a *verify-blueprint* intake naming the card and the likely scenario, rather than asserting drift itself; the intake's IDE session does the actual blueprint read.
-  The weekly shipped-watchdog automation runs exactly this set headlessly (`scripts/prompts/uno-shipped-watchdog/SKILL.md`); grow the set here, never in the adapter.
-
-## 7 · What the work leaves behind
-
-Significant work — a non-trivial fix, a gotcha, a decision worth preserving — leaves **a rule, an ADR, or nothing**; `AGENTS.md` § Conventions is the contract and `docs/knowledge/INDEX.md` its detail. This step answers it in the same change as the fix.
-
-1. **Name the disposition.** A **rule** when an agent would behave differently knowing it — the line lands in the doc that already owns the subject, where the next agent is reading anyway. An **ADR** when the call is hard to reverse *and* surprising without its context *and* a real trade-off, all three. Otherwise **nothing**: git keeps the trail, and dropping a finding worth less than the context it costs is the ordinary outcome.
-2. **A note staged under `docs/knowledge/` declares `disposition:` and `disposition-target:` from the moment it is written** (`npm run check:knowledge-disposition`). It is a receipt for content that already landed, so the next sweep clears it.
-3. **Write the ledger line** in `docs/knowledge/changelog.md` — one per promotion, so adoption is visible rather than implied.
-4. A disposition that edits `AGENTS.md` or the persona is Tier 2 — the gate in §5 applies.
-
-A learning that survives only in the chat transcript is a capture failure.
-
-
----
-
 <!-- skills/uno-maintain/bot.md -->
 
 <!-- Worker face — bundled by uno-bot via `embodiment: uno-bot` above. NOT loaded by the IDE agent. -->
 # uno-maintain — bot face
 
-Slack delta only. The shared procedure (taxonomy, tiers, gates) is `references/method.md`, already in this prompt.
+Keep the harness current from Slack. A designer flags that the agent system is wrong — a doc, a skill, the persona, a story, the bot itself, a Figma spec, a Notion page, the blueprint — or hands off a shipped change to reconcile. The turn captures the flag, drafts the fix, brings a human a decision, and packages what they approve. You file, draft and route; the in-IDE agent edits repo files, merges and applies.
 
-## Execute (what differs in Slack)
+## Execute — one maintain turn
 
-- **Trigger:** a designer flags that the agent system is wrong, or hands off a shipped change for reconciliation. Classify per method §1; split flags that span targets; cross-estate → flag, don't improvise.
-- **Investigate before punting.** If the flag links a Figma frame, doc, or PRD, `source_read` it and inspect the issue yourself. If you truly can't inspect, record the intake and route to a human — don't hand back DIY instructions as the whole answer.
-- **You file and propose; you never fix repo files.** Tier-1 repo fixes and all multi-file/visual work are the in-IDE agent's — your job is the intake, the packaging, and the routing.
-- **Cadence wall — the bot has no clock.** It can't re-ping at day 2 or escalate at day 4 on its own; it acts only when messaged. It tallies verdict status on request; the escalation timer belongs to the maintainer or a standing sweep.
-- **Tier-2 packaging** (after the human gate says yes, method §3–5):
-  1. Draft the PRD as text in-thread first (Title · Summary · Problem/Context · Goals & Non-goals · Users & Scenarios · Requirements/Scope · Acceptance Criteria · Open Questions); let them refine. Do NOT call `notion_create` yet. The compact-PRD size wall from `skills/uno-synthesize/bot.md` applies here too — keep the in-thread card compact; expansion is IDE work.
-  2. On approval → `notion_create` (gated; post the Notion link).
-  3. Open the PR via `component_implement(component, notion_prd_url, …)` for a DS-component fix; a catalog entry publishes in-IDE via `writers/notion` (not a bot tool) — one gated side-effect tool per message.
-  4. Post the review request to `#plus-design` (format below), suggesting reviewers via `notion_search` (scope: "team"). The post itself is a normal threaded reply, no tool.
-- **After the verdict** (method §5): on ✅ the *in-IDE* agent merges/applies and writes the apply-log row — hand off, then confirm the harness is current. On 🔁 fold feedback in and re-propose (heavy revisions escalate). On ❌ record why in the thread.
-- **Gate instruction edits.** Persona / AGENTS.md / bot-face files steer every session — never propose those silently; two approvals apply (method §5.3).
-- **`notion_update` governance.** Works on **any page/DB the bot is shared on** (Roadmap cards, Decisions DB rows, running notes, etc.) — safety is the ✅ gate + exact-match selects, not a parent-DB fence. Allowed: property changes that **exact-match an existing select/status option**, appending progress notes, updating decision Status/Evidence. Never invent options, pillars, or OKRs. New durable decisions → ✅-gated `notion_create` surface `decision` (Roadmap Card + Evidence), not a Decision Log subpage. A **`Design Status` move to `Ready for Design`** is part of the accepted-PRD paired write (uno-synthesize / the IDE), not a standalone Slack action; other status moves ("move my card to WIP") are fine as a gated `notion_update` when the target option already exists. Missing/renamed option → say so and stop, don't approximate.
-- Faithful to what's flagged: cite the file/frame; never invent an inconsistency, reviewers, or change items. Never auto-file a PRD or auto-open a PR.
+1. **Read the method.** The pointer at the foot of this file names it; make that `read_reference` call before anything below, since every step here is a Slack rendering of one of its sections. Done when the method is in this turn's context.
+2. **Inspect the evidence yourself.** A linked frame, doc, PRD or thread → `source_read` / `slack_thread_read` it and confirm what is actually wrong. Done when you can quote the offending line, frame or behaviour — or have said plainly that you could not reach it and are recording the intake on the designer's report.
+3. **Classify** (method §1): trigger type, estate, target, suggested tier. A flag spanning two targets is two intakes; two estates that disagree is one intake marked cross-estate, routed to the side believed wrong by the method's precedence. Done when each intake has a type, a target and a tier.
+4. **Draft the fix before judging it** (method §2): the concrete change, quoted — the corrected sentence, the property to move, the token to swap. Harness prose gets the writing-for-agents pass the method names: cut what the model does by default, state the target behaviour. Done when whoever reads the draft could apply it.
+5. **Bring the human the gate** (method §3): the draft plus a three-line brief — impact · effort · risk — and the question *worth incorporating?* The spotter answers (fallback: the maintainer); the bot waits. Done when the brief is posted and the thread is theirs.
+6. **On yes, tier it** (method §4). Tier 1 — typos, links, dates, pure formatting, and only those — is repo work: hand it to the in-IDE agent with the digest line it will log. Everything else, including any edit to a skill, the persona, a DS component or a requirement, is Tier 2 → step 7.
+7. **Package Tier 2** (method §5), one gated tool per message:
+   - Draft the PRD as text in-thread first — Title · Summary · Problem/Context · Goals & Non-goals · Users & Scenarios · Requirements/Scope · Acceptance Criteria · Open Questions — and let them refine it. The compact-PRD size wall from `skills/uno-synthesize/bot.md` holds here too; expansion is IDE work.
+   - On approval → `notion_create` (gated); post the Notion link.
+   - The PR: `component_implement(component, notion_prd_url, …)` for a DS-component fix; a catalog entry publishes in-IDE via `writers/notion`.
+   - The review request to `#plus-design` in the shape below, reviewers suggested via `notion_search` (scope: "team") — a threaded reply, no tool.
+   Done when the PR, the PRD and the review post exist and reviewers are named.
+8. **Carry the verdict** (method §5). ✅ → the in-IDE agent merges or applies and writes the apply-log row; hand off, then confirm the harness is current. 🔁 → fold the feedback in and re-propose; a heavy revision escalates. ❌ → record why in the thread. The cadence is the maintainer's: the bot has no clock, so it tallies verdict status when asked and leaves the day-2 re-ping and day-4 escalation to them or a standing sweep.
+
+Across every step: persona, `AGENTS.md` and bot-face edits steer every session, so they are proposed in the open and take two approvals (method §5.3). A PRD is filed and a PR opened on an explicit go-ahead, one gated tool at a time. Cite the file, frame or message you inspected; an inconsistency, a reviewer or a change item comes from the evidence or stays out.
+
+## `notion_update` governance
+
+Works on any page or DB the bot is shared on — Roadmap cards, Decisions DB rows, running notes — with safety in the ✅ gate and exact-match selects rather than a parent-DB fence. Allowed: property changes that exact-match an existing select or status option, appended progress notes, updated decision Status/Evidence. Options, pillars and OKRs come from the page as it is; a missing or renamed option is reported and the write stops. A new durable decision is a ✅-gated `notion_create` with surface `decision` (Roadmap Card + Evidence). A `Design Status` move to `Ready for Design` belongs to the accepted-PRD paired write (uno-synthesize / the IDE); other status moves ("move my card to WIP") are a gated `notion_update` when the option already exists.
 
 ## Output — the review-request post
 
@@ -504,9 +417,11 @@ After posting, the thread waits on the reviewer. Scannable, not a transcript.
 
 ## Hand-offs
 
-- Heavy multi-file or visual fixes → escalate to the in-IDE agent (your scope cap); it works from the same `references/method.md`.
-- Merging and applying are never yours — **you propose, you don't merge.**
+- Heavy multi-file or visual fixes → the in-IDE agent (your scope cap); it works from the same method.
+- Merging and applying are the in-IDE agent's — **you propose, you don't merge.**
 - Ordinary Plus-fact questions → default conversational mode. New prototype builds → **uno-prototype**. Thread summaries / PRD content from a thread → **uno-synthesize**.
+
+**uno-maintain/method** — the procedure behind these steps: the four trigger types and twelve targets across four estates, the Tier-1 whitelist, the Tier-2 pipeline with its two-approval rule and cadence, the standing intake paths, and what finished work leaves behind. It is disclosed, not loaded: `read_reference` with name `uno-maintain/method` as the turn's first move (step 1), and again in a later turn of the same thread if its text is no longer in context.
 
 
 ---
@@ -1829,4 +1744,108 @@ THE standing-automation registry. An automation absent from the table below is u
 | Conventions integrity sweep | monthly cron (1st, 09:00 UTC) | uno-maintain (integrity checklist: `staleness-sweep.md`) | reviewers/auditor | `harness-integrity-sweep.yml` → `scripts/prompts/uno-integrity-sweep/SKILL.md` (intake transport: shared ref above) | GHA cron → claude-vertex (sonnet) · GCP `hcii-plus` | Bill | ✅ live (first dispatch run green 2026-07-16 — filed intakes #71/#72); the pilot for the sweep pattern |
 | Notion comment sweep | each flow run touching a page + monthly | uno-maintain (unresolved threads → incorporate or intake) | writers/notion | ❌ not built — follow the integrity-sweep pattern (Notion via `NOTION_API_KEY`) | (planned) GHA cron → claude-vertex · GCP `hcii-plus` | — | planned |
 | Eval run logging | every flow exit | rubric scoring → run entry | reviewers/rubric-applier | interim: `docs/evals/runs/*.jsonl`; target: Notion Eval Runs DB | in-session (whatever harness ran the flow) | — | planned |
+
+
+
+---
+
+<!-- reference: uno-maintain/method -->
+
+<!-- Shared core, loaded by both faces (SKILL.md + bot.md). Runtime-neutral: no IDE tool names, no Slack mechanics; where a role is named (writers/*, auditor) the faces own HOW it's dispatched. -->
+<!-- Source flows: Flow 4 (intake & proposal) + Flow 5 (review & approval), PLUS UNO Workflow board. -->
+
+# uno-maintain — method
+
+Keep the harness itself current. One pass per issue: **capture → route → draft → human gate → tier → apply or propose.** Separation of powers is the design: humans observe and *decide*, the agent drafts and *executes*, the bot packages and *routes*. No step self-approves.
+
+## 1 · Intake — normalize the observation
+
+Every intake is one of four **trigger types** — improvement (could be better) · inaccuracy (says something wrong) · inconsistency (two sources disagree) · bug (behaves wrongly) — routed to one of **12 targets across 4 estates**:
+
+| Estate | Target | Fix action |
+|---|---|---|
+| Codebase | product context / stories | fix `docs/product-and-service/*` + `terminology.md` |
+| Codebase | harness doc stale / wrong | fix `docs/product-and-service/*` (non-product) + `docs/conventions/*` — repo-canonical, ADR-017 |
+| Codebase | a skill isn't useful | refine the skill (`skills/*` — both faces if shared) |
+| Codebase | UNO off-role / personality | tune persona / instructions (AGENTS.md, embodiment deltas) |
+| Codebase | Storybook inconsistent / bug | fix the design system (`design-system/src/**`) |
+| Codebase | uno-bot misbehaving | fix uno-bot (`agents/uno-bot/**`, bot faces) |
+| Figma | spec out of date | update the Figma spec pages |
+| Figma | components out of date | update the Figma component library |
+| Notion | requirement / story changed | update PRD **+ blueprint together** — paired, never one alone |
+| Notion | behavior / spec wrong | correct the doc **+ flag its owner** — fixing the artifact alone isn't enough |
+| Notion | doc stale or missing | author / refresh the doc |
+| Supabase | blueprint stale vs operational reality (journey changed, no requirement doc involved) | update the blueprint via `writers/blueprint` — pair a PRD only when a requirement doc exists for that flow (`docs/connectors/supabase/overview.md` § Two sources) |
+
+The taxonomy is the harness map — when a new component joins the harness, this table must grow.
+
+**Record:** an intake lives as a **Roadmap DB card** — `Product Pillar: Universal`, lifecycle in the `Intake Status` property (card mechanics: `docs/connectors/notion.md`). Every intake names its **evidence** (file / frame / message link) in the card body and a **suggested tier**. Separate from Decisions DB **Evidence** (URL property on durable design/product decisions).
+
+**Headless surrogate:** scheduled sweeps run without Notion access and file
+their intakes as GitHub issues labeled `harness-intake` (transport contract:
+`scripts/prompts/references/headless-intake.md`). That queue feeds THIS
+pipeline: every maintain session's intake step starts by draining it — triage
+each open `harness-intake` issue into a Roadmap card (or straight into §2–§4
+when acted on immediately), then close the issue as incorporated. An
+unwatched surrogate queue silently defeats every sweep that files into it.
+
+**Cross-estate inconsistencies are a known open area.** When two estates disagree, decide which side is believed wrong (DS precedence: uno-storybook > BS4 Foundation library > Figma spec pages), route there, and **flag the intake as cross-estate** — don't improvise a routing convention.
+
+## 2 · Draft first, judge second
+
+Draft the concrete fix on every path *before* worth is judged. Drafting is cheap; it buys the human a concrete evaluation instead of a speculative one. Never reorder these steps.
+
+**When the fix edits harness prose — this constitution, a skill, a convention, an
+agent doc — load the `writing-for-agents` skill and review the draft against it
+before the gate.** Two questions carry most of the weight. *Is this a no-op?* — an
+instruction the model already obeys by default pays context to say nothing, and
+the test is whether behaviour changes versus the default, settled by running it
+rather than by debate. *Is this a ban that could be a target?* — a prohibition
+makes the forbidden behaviour more available, so state what to do and let the
+banned thing go unspoken. `npm run check:negation` counts the bans mechanically;
+the no-op test is judgement and lives here.
+
+## 3 · The human gate — "worth incorporating?"
+
+Answered by the **spotter** (fallback: the designated maintainer) — never by the agent. Present the drafted fix with a **three-line brief: impact / effort / risk**.
+
+- **No** → end: no change needed. Discard the draft; keep the intake card trail.
+- **Yes** → tier it (§4).
+
+## 4 · Tier classification
+
+- **Tier 1 — trivial. The whitelist is absolute:** typos · broken links · stale dates · pure formatting — nothing else. Tier 1 may **never** touch skill definitions, the persona, DS components, or requirements, no matter how small the diff. Apply directly — no PR/PRD, no verdict — and log one line to `docs/evals/runs/digest.jsonl` as `{"ts": "<ISO-8601>", "target": "<file-or-artifact>", "change": "<one line>"}` (the row shape is a contract: the weekly digest automation windows on `ts` and prints `target`/`change`; a row missing `ts` is silently undated and falls out of every digest). The weekly digest posts from it to the design channel (`docs/connectors/slack.md`); the monthly retro reviews the digest.
+- **Tier 2 — substantive:** everything else → the pipeline in §5.
+
+## 5 · Tier 2 — PR + PRD → verdict → apply log
+
+1. **Pair, never one alone.** Open the PR *and* pair it with a PRD carrying the rationale — reviewers see *why*, not just *what*. A lone PR or lone PRD never ships.
+2. **Review post** to the design review channel (`docs/connectors/slack.md`): self-sufficient — one-line summary, PR + PRD links, suggested reviewers. Assume the reviewer never opens the PR.
+3. **Verdict** from a routed reviewer, machine-parseable per `docs/connectors/slack.md` gate 2 (approve / request-changes / reject — the emoji vocabulary lives there, not here). **Persona and DS-component changes need two approvals.** No verdict in 2 working days → re-ping the suggested reviewers once; 4 working days → escalate to the design lead. **Never auto-merge on silence.**
+4. **Execute on approve only.** Merge the PR / apply the update, then write one **apply-log row** (target · verdict link · timestamp) to `docs/evals/runs/apply-log.jsonl` — interim store until the Notion Eval Runs DB exists. Non-code applies have no merge log — this row is what makes the audit measurable.
+5. **🔁** → revise and re-enter at drafting (§2); each round gets a fresh, complete post. **❌** → record why in the thread so the idea isn't silently re-raised.
+
+## 6 · Standing intake paths
+
+- **Handoff rails propagation (from uno-publish):** arrives **pre-authorized** — the designer-confirmed handoff plus its three sign-offs replace the worth-incorporating gate and the verdict. Execute the paired PRD + blueprint write per `docs/connectors/supabase/overview.md` and write the apply-log row citing the handoff thread. This is the only intake that skips §3/§5.
+
+- **Conventions are repo-canonical** (decision 2026-07-07, ADR-017): `docs/conventions/` wins every conflict. A legacy Notion playbook page that contradicts a conventions file is the stale artifact — file an intake to banner it as superseded (the faces route the Notion write); never "re-sync" the repo to match it, never fix the drift silently.
+- **Standing sweeps:** named in `docs/engineering/operations.md` — shipped watchdog · weekly Tier-1 digest · Figma hygiene · conventions integrity (agents↔docs cross-references both ways, header canonicality, path rot) · Notion comment sweep. Each sweep files one intake per finding into this same pipeline.
+- **Post-ship reconciliation:** every shipped handoff triggers a reconcile of DS + harness + blueprint against built reality — routine, not exceptional. The check set, per shipped card:
+  - `design-system/` stories/MDX reflect the shipped surface where they reference it;
+  - harness docs (`docs/product-and-service/*`, conventions, skill references) don't describe pre-ship behavior as current;
+  - deployment/marketplace references (per uno-publish's references) still point at live URLs;
+  - the **blueprint** reflects the shipped change (`docs/connectors/supabase/overview.md` § Two sources — ship-time is when "blueprint wins vs shipped docs" becomes true). The headless watchdog can't read Supabase, so for any shipped card that touches the service journey it files a *verify-blueprint* intake naming the card and the likely scenario, rather than asserting drift itself; the intake's IDE session does the actual blueprint read.
+  The weekly shipped-watchdog automation runs exactly this set headlessly (`scripts/prompts/uno-shipped-watchdog/SKILL.md`); grow the set here, never in the adapter.
+
+## 7 · What the work leaves behind
+
+Significant work — a non-trivial fix, a gotcha, a decision worth preserving — leaves **a rule, an ADR, or nothing**; `AGENTS.md` § Conventions is the contract and `docs/knowledge/INDEX.md` its detail. This step answers it in the same change as the fix.
+
+1. **Name the disposition.** A **rule** when an agent would behave differently knowing it — the line lands in the doc that already owns the subject, where the next agent is reading anyway. An **ADR** when the call is hard to reverse *and* surprising without its context *and* a real trade-off, all three. Otherwise **nothing**: git keeps the trail, and dropping a finding worth less than the context it costs is the ordinary outcome.
+2. **A note staged under `docs/knowledge/` declares `disposition:` and `disposition-target:` from the moment it is written** (`npm run check:knowledge-disposition`). It is a receipt for content that already landed, so the next sweep clears it.
+3. **Write the ledger line** in `docs/knowledge/changelog.md` — one per promotion, so adoption is visible rather than implied.
+4. A disposition that edits `AGENTS.md` or the persona is Tier 2 — the gate in §5 applies.
+
+A learning that survives only in the chat transcript is a capture failure.
 

@@ -1,5 +1,5 @@
 {
-  "_readme": "Machine-readable eval cases for uno-bot, derived from docs/evals/scenarios/uno-bot.md (R1-R12) and scored against docs/evals/rubrics/bot-answer.md. Driven by agents/uno-bot/scripts/run-evals.mjs against the live Worker's /debug/eval route (headless agent turns — proposals come back as data, nothing posts to Slack/Notion). Multi-turn cases thread history/pending between turns. 'allowProposalIfGateAsk' accepts a proposal ONLY when the production preflight clarify-gate would have intercepted it (the endpoint reports gateAsk). All cases run headless via /debug/eval. Cases may set `channel` / `requestedBy` (case- or turn-level) when the SURFACE is under test — own-visibility Slack search only activates in the requester's own bot DM (a channel id starting with D), so a case asserting the ADR-020 gate must say which surface it is on or it passes for the wrong reason.",
+  "_readme": "Machine-readable eval cases for uno-bot, derived from docs/evals/scenarios/uno-bot.md (R1-R12) and scored against docs/evals/rubrics/bot-answer.md. Driven by agents/uno-bot/scripts/run-evals.mjs against the live Worker's /debug/eval route (headless agent turns — proposals come back as data, nothing posts to Slack/Notion). Multi-turn cases thread history/pending between turns. 'allowProposalIfGateAsk' accepts a proposal ONLY when the production preflight clarify-gate would have intercepted it (the endpoint reports gateAsk). All cases run headless via /debug/eval. Cases may set `channel` / `requestedBy` (case- or turn-level) when the SURFACE is under test — own-visibility Slack search only activates in the requester's own bot DM (a channel id starting with D), so a case asserting the ADR-020 gate must say which surface it is on or it passes for the wrong reason. `expectToolCalled: { tool, args? }` asserts against the route's `tools` list — every call the model made, in order, with its arguments — so a case can prove a read happened on the way to the result (M1: `read_reference` for `uno-maintain/method`).",
   "cases": [
     {
       "id": "R1",
@@ -421,6 +421,28 @@
       "expectLevel": "high",
       "judgeNote": "The escalation phrase routes to the grind tier, and the dials reported must be tier=grind level=high — the pro model at its own highest setting, asserted deterministically (until 2026-09-04 the level was pinned at medium, so asking for depth ran the pro model below its own default). A level of `none` here means the turn fell back to a model that takes no thinking dial, which is a real failure of this case, not noise. For the judge: a grounded answer about the two components with no fabricated component facts, and sureness earned from a source fetched this turn.",
       "samples": 3
+    },
+    {
+      "id": "M1",
+      "name": "a maintain turn reads uno-maintain/method by pointer before proposing (#423)",
+      "blocker": true,
+      "samples": 3,
+      "turns": [
+        {
+          "prompt": "The bot keeps telling people that a small wording tweak to a skill counts as Tier 1 and can just be applied — that's wrong, Tier 1 is typos, links, dates and formatting only, and anything touching a skill is Tier 2. Take this as an intake."
+        }
+      ],
+      "expectKind": [
+        "text",
+        "proposal"
+      ],
+      "expectToolCalled": {
+        "tool": "read_reference",
+        "args": {
+          "name": "uno-maintain/method"
+        }
+      },
+      "judgeNote": "AUTHORED 2026-09-05 (#423). uno-maintain's method left the always-loaded prompt for the reference map, and its Worker face ends in a pointer naming `uno-maintain/method`; this case proves a maintain turn still runs the method by reaching it through that pointer. Deterministic: the route's tool list holds a read_reference call whose name is exactly `uno-maintain/method` — a turn that classifies and drafts from the face alone, or reads a different name, fails here regardless of how good the prose is. For the judge, the reply must show the method's steps in order: (1) the flag classified as one of the four trigger types (this one is an inaccuracy) with an estate and target (codebase — the uno-bot faces or the maintain skill), (2) a concrete drafted fix stated before any judgement of worth, (3) the three-line brief — impact, effort, risk — put to the spotter with the worth-incorporating question, and (4) a suggested tier consistent with the whitelist (Tier 2, since it touches a skill). Either shape passes: an in-thread intake ending at the human gate (kind text), or a staged notion_create for the Roadmap intake card (kind proposal) that carries the same classification, draft and brief. A reply that applies the fix itself, opens a PR, invents evidence beyond what the designer said, or names reviewers without a notion_search fails."
     }
   ]
 }

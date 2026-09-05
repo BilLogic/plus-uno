@@ -62,7 +62,7 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 
 **Tier 3 — retrieved live, never cached.** Product truth from `uno-blueprint` (`writers/blueprint` / `search_blueprint`); design-system truth from `uno-storybook` (read the source and stories). Team conventions are *not* Tier 3 — they are canonical in-repo (ADR-017) and load as plain files.
 
-**uno-bot** does not load on demand: everything in its bundle is always in context, so Tier 2 is an IDE concept only.
+**uno-bot's Tier 2 is `read_reference`.** A doc that declares `disclosure: reference` leaves the always-loaded bundle for a map baked beside it, and the Worker reads it by name — `uno-maintain/method` — on the turns whose pointer fires; the text lasts the turn and a later turn re-reads it in one call. Everything else in the bundle is always in context.
 
 <!-- ide-only -->
 **Tier 2 — loaded on demand.** Two or three documents per task. § Progressive loading is the trigger table; beyond it: a skill loads its own `SKILL.md` + `references/method.md` on invocation and its `references/*.md` as linked; an agent loads its `agents/<kind>/<name>.md` plus the conventions it names.

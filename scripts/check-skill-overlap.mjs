@@ -97,7 +97,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { bundledFiles, resolveBundled, unresolvedReport } from './lib/bundled-set.mjs';
+import { workerFiles, resolveBundled, unresolvedReport } from './lib/bundled-set.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -258,7 +258,10 @@ export function findSharedAcross(docs) {
  *
  * @param {string[]} [files] repo-relative paths, in load order.
  */
-export function auditBundle(files = bundledFiles({ tag: 'skill-overlap', notThis: 'the overlap count' })) {
+// The WORKER corpus — prompt plus the disclosed references (#423): a line
+// living in a bundled doc and in a disclosed one is still one rule in two
+// homes the bot reads.
+export function auditBundle(files = workerFiles({ tag: 'skill-overlap', notThis: 'the overlap count' })) {
   const { declared, docs, missing } = resolveBundled(files);
   return { declared, missing, files: docs.map((d) => d.label), ...findSharedAcross(docs) };
 }

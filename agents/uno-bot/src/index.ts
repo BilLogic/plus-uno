@@ -9,7 +9,7 @@ import { geminiConfigured, geminiGenerate } from "./gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "./vertex/claude";
 import { MODELS } from "./agent/routing";
 import { runAgent } from "./agent/run-agent";
-import type { TurnDials } from "./agent/loop-shared";
+import type { ToolCall, TurnDials } from "./agent/loop-shared";
 import { preflight } from "./agent/preflight";
 import type { HistoryTurn, PendingProposal } from "./thread-state-client";
 import { BUILD } from "./version";
@@ -522,6 +522,11 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
   // here so an eval case can assert the LEVEL and not just the model (#421,
   // ADR-028). Null if the loop never reached its finish.
   let dials = null as TurnDials | null;
+  // Every tool call the model made this turn, with its arguments, in order —
+  // so a case can assert a call happened and what it named (#423: that a
+  // maintain turn read `uno-maintain/method` before proposing), where the
+  // result alone shows only the final proposal or text.
+  const tools: ToolCall[] = [];
   const startedAt = Date.now();
   try {
     const result = await runAgent({
@@ -533,6 +538,7 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
       pending,
       onInterim: (t) => narration.push(t),
       onDials: (d) => { dials = d; },
+      onToolCall: (c) => tools.push(c),
     });
     // Mirror production's clarify gate: when a proposal comes back, report what
     // preflight would have asked (events.ts applies this before staging).
@@ -553,7 +559,7 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
       subrequests: subrequestsUsed(), subrequest_hosts: meterBreakdown(),
       internal_subrequests: internalSubrequestsUsed(),
       budget_trips: subrequestBudgetTrips(),
-      narration, dials, gateAsk, result,
+      narration, dials, tools, gateAsk, result,
     });
   } catch (err) {
     return Response.json({
@@ -561,6 +567,7 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
       build: BUILD,
       ms: Date.now() - startedAt,
       narration,
+      tools,
       subrequests: subrequestsUsed(), subrequest_hosts: meterBreakdown(),
       internal_subrequests: internalSubrequestsUsed(),
       budget_trips: subrequestBudgetTrips(),

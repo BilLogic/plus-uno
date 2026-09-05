@@ -1,3 +1,5 @@
+import { referenceStub } from "../tools/read-reference";
+
 export interface AgentImage {
   media_type: string;
   data: string;
@@ -7,6 +9,9 @@ interface ConversationHistoryTurn {
   role: "user" | "assistant";
   content: string;
   ts?: string;
+  /** Names of the references `read_reference` served during the turn this
+   *  message opened — the receipt, never the text (thread-state.ts HistoryTurn). */
+  references?: string[];
 }
 
 export interface ProviderConversationTurn {
@@ -26,9 +31,20 @@ export function buildProviderConversation(
   currentImages: AgentImage[] = [],
   historicalImages?: HistoricalImages,
 ): ProviderConversationTurn[] {
+  // THE HISTORY BOUNDARY (#423). A reference fetched in an earlier turn arrives
+  // here as its name, and leaves as one stub line per name appended to the
+  // turn that read it. The text itself was dropped when that turn ended: it
+  // was a tool result in that turn's provider contents, and those are not
+  // history — HistoryTurn carries text and receipts, and this is the receipt.
+  // Stub over silence because the next turn then knows the method was
+  // consulted (a correction turn can judge the prior reply as grounded) and
+  // that a re-read is one cheap call; stub over text because ~50 chars beats
+  // ~10k on every iteration of every later turn, outside the explicit cache.
   const turns: ProviderConversationTurn[] = history.map((turn) => ({
     role: turn.role,
-    text: turn.content,
+    text: turn.references?.length
+      ? `${turn.content}\n\n${turn.references.map(referenceStub).join("\n")}`
+      : turn.content,
     ...(historicalImages?.images.length && turn.ts === historicalImages.turnTs
       ? { images: historicalImages.images }
       : {}),

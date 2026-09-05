@@ -26,6 +26,7 @@ import { executeGithubRead } from "../tools/github-read";
 import { executeSlackThreadRead } from "../tools/slack-thread-read";
 import { executeSlackSearch } from "../tools/slack-search";
 import { executeSlackUserProfile, executeSlackChannelMembers } from "../tools/slack-people";
+import { readReference } from "../tools/read-reference";
 
 export type { HistoryTurn };
 
@@ -64,6 +65,19 @@ export interface AgentInput {
    *  reports these so a scenario can assert the level, not just the model
    *  (#421). Absent on production turns, which read the log. */
   onDials?: (dials: TurnDials) => void;
+  /** Called for every tool call the model makes, in order, with the arguments
+   *  it sent — before dispatch, so gated proposals and budget-refused lookups
+   *  are reported too. The headless eval route lists these so a scenario can
+   *  assert a call was made and what it named — a `read_reference` for the
+   *  skill's method, say (#423). Absent on production turns, which read the
+   *  `tools=[…]` log. */
+  onToolCall?: (call: ToolCall) => void;
+}
+
+/** One tool call as the model issued it. */
+export interface ToolCall {
+  name: string;
+  args: Record<string, unknown>;
 }
 
 /** What one turn actually ran on. `level` is null when the model in use takes
@@ -314,6 +328,9 @@ export function correctionDirective(priorQuery?: string): string {
 const turnScope = new AsyncLocalStorage<{
   tools: Set<string>;
   correction: boolean;
+  /** Names read_reference served this turn, in call order — the receipt that
+   *  outlives the turn in place of the text (#423). */
+  references: string[];
   receipt?: RetrievalReceipt;
   /** Set when a slack_search this turn came back EMPTY — carries the mode it
    *  ran under, so the delivery path can check the reply does not overclaim the
@@ -345,18 +362,32 @@ export interface RetrievalReceipt {
 export async function withTurnScope<T>(
   opts: { correction: boolean },
   fn: () => Promise<T>,
-): Promise<{ result: T; tools: string[]; receipt?: RetrievalReceipt; absence?: AbsenceContext }> {
+): Promise<{
+  result: T;
+  tools: string[];
+  references: string[];
+  receipt?: RetrievalReceipt;
+  absence?: AbsenceContext;
+}> {
   const store: {
     tools: Set<string>;
     correction: boolean;
+    references: string[];
     receipt?: RetrievalReceipt;
     absence?: AbsenceContext;
   } = {
     tools: new Set<string>(),
     correction: opts.correction,
+    references: [],
   };
   const result = await turnScope.run(store, fn);
-  return { result, tools: [...store.tools], receipt: store.receipt, absence: store.absence };
+  return {
+    result,
+    tools: [...store.tools],
+    references: [...new Set(store.references)],
+    receipt: store.receipt,
+    absence: store.absence,
+  };
 }
 
 /**
@@ -495,6 +526,21 @@ export async function executeReadOnlyTool(
   if (name === "slack_react") return executeSlackReact(env, input, slack);
   if (name === "slack_user_profile") return executeSlackUserProfile(env, input);
   if (name === "slack_channel_members") return executeSlackChannelMembers(env, input);
+  if (name === "read_reference") {
+    // A property lookup, no fetch. Recorded on a HIT only: the receipt says
+    // what the turn read, and a miss read nothing.
+    const out = readReference(input);
+    const store = turnScope.getStore();
+    if (store) {
+      try {
+        const parsed = JSON.parse(out) as { ok?: unknown; name?: unknown };
+        if (parsed.ok === true && typeof parsed.name === "string") store.references.push(parsed.name);
+      } catch {
+        // the receipt is a courtesy to the next turn, never load-bearing
+      }
+    }
+    return out;
+  }
   return JSON.stringify({ ok: false, error: `tool '${name}' is not read-only or not implemented` });
 }
 

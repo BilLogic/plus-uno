@@ -32,6 +32,12 @@ export interface HistoryTurn {
    *  invisible everywhere except the fallback path. Matching on ts is what
    *  makes it reachable. */
   ts?: string;
+  /** Names of the references `read_reference` served during this turn, on the
+   *  user turn that opened it (same key as `retrieval`, for the same reason).
+   *  The TEXT is deliberately not persisted (#423): it rode the turn's provider
+   *  contents while the turn ran, and a later turn sees only a one-line stub per
+   *  name (provider-conversation.ts) — a re-read is one baked-map lookup. */
+  references?: string[];
   /** What this turn actually retrieved — the tool, the query, and the shape of
    *  what came back. Rows are deliberately NOT persisted.
    *

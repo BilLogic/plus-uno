@@ -37,6 +37,7 @@ import {
   SECTION_ROOTS,
   censusMismatchReport,
   declaredCensus,
+  disclosedRows,
   embodimentOf,
   ideAuthoredFiles,
   unresolvedReport,
@@ -233,7 +234,30 @@ test('a rise names the scope it happened in, and the docs that caused it', () =>
 test("the census line is read back off the bundler's own output", () => {
   const line =
     '[bundle-harness] embodiment census: 67 declared doc(s) under the section roots — 21 bundled, 46 ide-only';
-  assert.deepEqual(declaredCensus(line), { underRoots: 67, bundled: 21, ide: 46 });
+  assert.deepEqual(declaredCensus(line), { underRoots: 67, bundled: 21, disclosed: 0, ide: 46 });
+});
+
+test('the census line carries the disclosed count since #423', () => {
+  const line =
+    '[bundle-harness] embodiment census: 67 declared doc(s) under the section roots — 20 bundled, 1 disclosed, 46 ide-only';
+  assert.deepEqual(declaredCensus(line), { underRoots: 67, bundled: 20, disclosed: 1, ide: 46 });
+});
+
+test('the disclosed table is read back off the companion by path', () => {
+  const md = [
+    '## Disclosed references',
+    '',
+    '| Name | Doc | Chars |',
+    '|------|-----|------:|',
+    '| `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 |',
+    '',
+    '## The assembled prompt',
+    '',
+    '| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 1 | 1 | — |',
+  ].join('\n');
+  assert.deepEqual(disclosedRows(md), ['skills/uno-maintain/references/method.md']);
+  assert.deepEqual(disclosedRows('## Disclosed references\n\nNone.\n\n## The assembled prompt\n'), []);
+  assert.deepEqual(disclosedRows(''), []);
 });
 
 test('a census line that is absent or reshaped reads as null rather than as zero', () => {
@@ -247,18 +271,18 @@ test('a census line that is absent or reshaped reads as null rather than as zero
 test('the census parse survives thousands separators', () => {
   const line =
     'embodiment census: 1,067 declared doc(s) under the section roots — 1,021 bundled, 46 ide-only';
-  assert.deepEqual(declaredCensus(line), { underRoots: 1067, bundled: 1021, ide: 46 });
+  assert.deepEqual(declaredCensus(line), { underRoots: 1067, bundled: 1021, disclosed: 0, ide: 46 });
 });
 
 test('a walk that disagrees with the bundler points at the roots, not at the corpus', () => {
   const msg = censusMismatchReport({
     walkedIde: 45,
     bundled: 21,
-    census: { underRoots: 67, bundled: 21, ide: 46 },
+    census: { underRoots: 67, bundled: 21, disclosed: 0, ide: 46 },
     tag: 'negation',
   });
-  assert.match(msg, /walked 45 ide-only doc\(s\) and 21 bundled \(66 in all\)/);
-  assert.match(msg, /it says 46 ide-only out of 67/);
+  assert.match(msg, /walked 45 ide-only doc\(s\), 0 disclosed and 21 bundled \(66 in all\)/);
+  assert.match(msg, /it says 46 ide-only and 0 disclosed out of 67/);
   assert.match(msg, /SECTION_ROOTS/, 'must name the list that fell behind');
   assert.match(msg, /bundle-harness\.mjs/, 'and the list it must match');
 });
