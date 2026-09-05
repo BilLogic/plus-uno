@@ -20,12 +20,21 @@ import { ensureHarnessCache } from "./gemini/cache";
 import { countedFetch, runMetered, subrequestsUsed, meterBreakdown, subrequestBudgetTrips, internalSubrequestsUsed } from "./net";
 import {
   searchBlueprint,
+  fetchPhaseOutline,
+  fetchTouchpoints,
+  isBlueprintConfigured,
   CELL_FALLBACK_SELECT,
   EDGE_SELECT_COLUMNS,
   FINDINGS_TABLE,
   TOUCHPOINTS_TABLE,
   TOUCHPOINT_SELECT,
 } from "./integrations/blueprint";
+import {
+  SUBJECT_NEEDS,
+  isSubjectNeed,
+  selectSubject,
+  type SubjectReads,
+} from "./integrations/blueprint-subject";
 import { CANDIDATE_RPC, isCallableCandidate } from "./integrations/candidate-rpc";
 
 export default {
@@ -422,6 +431,92 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
         ok: false,
         build: BUILD,
         q,
+        ms: Date.now() - started,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
+
+  // GET /debug/blueprint-subject?need=…  — a row from the LIVE board that
+  // satisfies a named condition (#415).
+  //
+  // WHY THIS EXISTS: an eval scenario that names its subject — "walk me through
+  // Goal Setting", "where do we use Zoom" — encodes a fact about the board on
+  // the day it was written, and the board is edited daily. A rename turns the
+  // case red with nothing wrong, which is the same defect #411 exists to fix,
+  // one layer up. So the fixture names a CONDITION, and this route answers it
+  // from the database at run time.
+  //
+  // The runner holds no Supabase credential and must not gain one — the Worker
+  // is the only thing here that reads the blueprint, and this route keeps it
+  // that way. Selection is a pure module (integrations/blueprint-subject.ts);
+  // everything below binds it to the reads the bot already makes.
+  //
+  // Auth-gated like every /debug route; read-only. An unknown `need` gets the
+  // known list back, because "no row satisfies your condition" and "that is not
+  // a condition" are different answers and only one of them is a finding.
+  if (request.method === "GET" && url.pathname === "/debug/blueprint-subject") {
+    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
+    const need = (url.searchParams.get("need") ?? "").trim();
+    if (!isSubjectNeed(need)) {
+      return Response.json(
+        { ok: false, build: BUILD, need, error: "unknown need", needs: SUBJECT_NEEDS },
+        { status: 400 },
+      );
+    }
+    if (!isBlueprintConfigured(env)) {
+      return Response.json({
+        ok: false,
+        build: BUILD,
+        need,
+        error: "uno-blueprint not configured — missing SUPABASE_URL / SUPABASE_ANON_KEY",
+      });
+    }
+    const reads: SubjectReads = {
+      outline: () => fetchPhaseOutline(env),
+      touchpoints: async () => (await fetchTouchpoints(env, "")).rows,
+      search: async (query, scope) => {
+        const r = await searchBlueprint(env, query, {
+          fresh: true,
+          scope: {
+            ...(scope.filterScenario ? { filterScenario: scope.filterScenario } : {}),
+            ...(scope.granularity === "cell" ? { granularity: "cell" as const } : {}),
+          },
+        });
+        return { rows: r.rows, ...(r.matched_total === undefined ? {} : { matched: r.matched_total }) };
+      },
+      // Read off the vendored contract, not remembered: `absent-detail` claims
+      // the blueprint has no field for a duration, and the day it grows one the
+      // condition must stop being satisfiable rather than keep asserting that
+      // the bot should refuse an answerable question.
+      cellColumns: BLUEPRINT_CONTRACT.botDirectReadColumns.cells,
+    };
+    const started = Date.now();
+    try {
+      // Metered like the search route: a `corpus-term` pick probes several
+      // terms, and a subject read that quietly ate the turn's budget would be
+      // indistinguishable from a board with no qualifying row.
+      const pick = await runMetered(async () => {
+        const p = await selectSubject(need, reads);
+        return { p, subrequests: subrequestsUsed() };
+      });
+      return Response.json({
+        ok: true,
+        build: BUILD,
+        need,
+        ms: Date.now() - started,
+        subrequests: pick.subrequests,
+        subject: pick.p.subject,
+        ...(pick.p.reason ? { reason: pick.p.reason } : {}),
+      });
+    } catch (err) {
+      // A failed READ is not an unsatisfiable condition. Reporting it as
+      // `subject: null` would skip the case for the wrong reason and hide a
+      // broken blueprint behind a tidy log line.
+      return Response.json({
+        ok: false,
+        build: BUILD,
+        need,
         ms: Date.now() - started,
         error: err instanceof Error ? err.message : String(err),
       });

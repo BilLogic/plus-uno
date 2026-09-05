@@ -9,6 +9,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { passesCase } from "./eval-scoring.mjs";
+import { NEED_FIELDS, SUBJECT_NEEDS, placeholdersIn } from "./eval-subjects.mjs";
 
 const FIXTURE = new URL("../../../docs/evals/fixtures/uno-bot-cases.json", import.meta.url);
 const README = new URL("../../../docs/evals/README.md", import.meta.url);
@@ -107,6 +108,73 @@ test("a history assertion sits on a later turn of a multi-turn case", () => {
       if ("expectHistory" in turn) assert.ok(i > 0, `${c.id} asserts history on its first turn`);
     });
     assert.equal("expectHistory" in c, false, `${c.id}: expectHistory is a turn key, not a case key`);
+  }
+});
+
+test("a case's subject condition is one the route knows", () => {
+  // A typo in `need` reaches the route as an unknown condition, which fails the
+  // case rather than skipping it — but only during a live run, minutes and a
+  // model quota later. This is the same fact, free.
+  for (const c of cases) {
+    if (!c.subject) continue;
+    assert.ok(
+      SUBJECT_NEEDS.includes(c.subject.need),
+      `${c.id} asks for '${c.subject.need}'; known: ${SUBJECT_NEEDS.join(", ")}`,
+    );
+  }
+});
+
+test("every placeholder a case uses is a field its condition promises", () => {
+  // The failure this prevents: a case reading `{{subject.status}}` off a
+  // condition that only ever sets a name. The placeholder survives
+  // substitution (deliberately — see eval-subjects.mjs), so the prompt goes out
+  // with a literal `{{subject.status}}` in it and the assertion grades the
+  // model on a question nobody asked.
+  for (const c of cases) {
+    const used = placeholdersIn(c);
+    if (!used.length) continue;
+    assert.ok(c.subject?.need, `${c.id} uses ${used.join(", ")} but declares no subject`);
+    const promised = NEED_FIELDS[c.subject.need] ?? [];
+    const unpromised = used.filter((f) => !promised.includes(f));
+    assert.deepEqual(
+      unpromised,
+      [],
+      `${c.id}: '${c.subject.need}' promises ${promised.join(", ")} — not ${unpromised.join(", ")}`,
+    );
+  }
+});
+
+test("a case that declares a subject actually uses it", () => {
+  // A subject nobody substitutes buys nothing and costs something: the case can
+  // now be SKIPPED by a condition its question does not depend on, which is a
+  // blocker retired by accident.
+  for (const c of cases) {
+    if (!c.subject) continue;
+    assert.ok(placeholdersIn(c).length > 0, `${c.id} declares a subject and substitutes nothing`);
+  }
+});
+
+test("no case hard-codes a blueprint row, status value or count", () => {
+  // THE DECISION #415 EXISTS TO HOLD. A scenario names a condition, not a row.
+  // The retired vocabulary is checked too: `Planned:` and `Prototype:` were a
+  // path-NAME convention deleted on 2026-08-21, and `layer` was renamed to
+  // `lane`. A case may still QUOTE them where the point is that they are dead —
+  // B5's textRegex rejects them and its note explains why — so the check reads
+  // the prompts, which is where a stale fact would actually reach the model.
+  const stale = [
+    { pattern: /\blayers?\b/i, why: "`layer` became `lane` on 2026-08-21" },
+    { pattern: /Planned:|Prototype:/, why: "the path-name convention was deleted on 2026-08-21" },
+  ];
+  for (const c of cases) {
+    for (const turn of c.turns) {
+      for (const { pattern, why } of stale) {
+        assert.equal(
+          pattern.test(turn.prompt),
+          false,
+          `${c.id} asks the bot about ${pattern} — ${why}`,
+        );
+      }
+    }
   }
 });
 

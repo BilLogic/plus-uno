@@ -27,9 +27,11 @@
 // Run:  node agents/uno-bot/scripts/run-evals.mjs
 
 import { readFileSync, writeFileSync } from "node:fs";
-import { createSign } from "node:crypto";
-import { passesCase } from "./eval-scoring.mjs";
+import { execFileSync } from "node:child_process";
+import { createHash, createSign } from "node:crypto";
+import { passesCase, toolCallMatches, describeCalls } from "./eval-scoring.mjs";
 import { threadTurn, checkHistory, sentSummary } from "./eval-history.mjs";
+import { applySubject, fetchSubject, skipReason } from "./eval-subjects.mjs";
 
 const {
   WORKER_URL,
@@ -207,18 +209,19 @@ function checkTurn(spec, resp, historySent = []) {
   // matches the tool and every named arg exactly; a missing list is a failure.
   // A LIST arg (B1: `include: ["touchpoints"]`) passes when the call's list
   // holds every wanted member — the model may ask for more than the case
-  // names, and `===` on two arrays is never true.
-  const argMatches = (sent, want) =>
-    Array.isArray(want) ? Array.isArray(sent) && want.every((v) => sent.includes(v)) : sent === want;
+  // names, and `===` on two arrays is never true. `argsOneOf` is the other
+  // direction: the SENT value must be one of several acceptable ones, for a
+  // choice that is genuinely open (B3's granularity rung). Both live in
+  // eval-scoring.mjs, where they are tested.
   if (spec.expectToolCalled) {
     const want = spec.expectToolCalled;
-    const calls = Array.isArray(resp.tools) ? resp.tools : [];
-    const wanted = Object.entries(want.args ?? {});
-    const hit = calls.some((c) => c?.name === want.tool && wanted.every(([k, v]) => argMatches(c.args?.[k], v)));
-    if (!hit) {
-      const seen = calls.map((c) => (c?.name === want.tool ? `${c.name}(${JSON.stringify(c.args ?? {})})` : c?.name)).join(", ");
+    if (!toolCallMatches(resp.tools, want)) {
+      const wanted = [
+        ...(want.args ? [`with ${JSON.stringify(want.args)}`] : []),
+        ...(want.argsOneOf ? [`one of ${JSON.stringify(want.argsOneOf)}`] : []),
+      ].join(" and ");
       failures.push(
-        `no ${want.tool} call${wanted.length ? ` with ${JSON.stringify(want.args)}` : ""} (calls: ${seen || "none"})`,
+        `no ${want.tool} call${wanted ? ` ${wanted}` : ""} (calls: ${describeCalls(resp.tools, want.tool)})`,
       );
     }
   }
@@ -230,6 +233,57 @@ function checkTurn(spec, resp, historySent = []) {
 const TURN_SPEC_KEYS = ["expectKind", "expectTool", "expectDecision", "expectTier", "expectLevel", "expectToolCalled", "expectHistory", "forbidTool", "textRegex"];
 const hasOwnSpec = (turn) => TURN_SPEC_KEYS.some((k) => k in turn);
 
+// ── What this run measured, and what it measured it with ─────────────────────
+
+/** The Worker build that answered. Scanned across results rather than read off
+ *  the first one: a first case that skipped, or failed before its turn ran, has
+ *  no response to carry a build, and "unknown" in a results file is a fact
+ *  nobody can recover later. */
+function firstBuild(results) {
+  for (const r of results) {
+    if (r.workerBuild) return r.workerBuild;
+    for (const t of r.transcript?.turns ?? []) {
+      if (t.response?.build) return t.response.build;
+    }
+  }
+  return "unknown";
+}
+
+/**
+ * The fixture's identity: the repo revision it was read at, and a hash of the
+ * bytes actually loaded.
+ *
+ * BOTH, deliberately. `rev` places the run in history; `sha256` says what was
+ * measured even when `rev` cannot — Actions checks out at depth 1, so a
+ * per-file `git log` returns nothing unless that commit happened to touch the
+ * fixture, and a locally-edited fixture is not the committed one at all. The
+ * hash is the fact; the revision is the context.
+ */
+function fixtureStamp(path) {
+  const bytes = readFileSync(path);
+  const sha256 = createHash("sha256").update(bytes).digest("hex").slice(0, 12);
+  // stderr ignored on both: git is being ASKED a question it may not be able to
+  // answer (no checkout, a fixture outside the work tree via CASES_PATH), and a
+  // `fatal:` printed into the middle of the eval log reads like the run broke.
+  const git = (args) =>
+    execFileSync("git", args, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+  let rev = process.env.GITHUB_SHA ?? "";
+  if (!rev) {
+    try {
+      rev = git(["rev-parse", "HEAD"]);
+    } catch {
+      rev = "unknown";
+    }
+  }
+  let dirty = false;
+  try {
+    dirty = git(["status", "--porcelain", "--", path]) !== "";
+  } catch {
+    /* not a checkout — the hash still identifies the bytes */
+  }
+  return { path, rev: `${rev.slice(0, 12)}${dirty ? "+dirty" : ""}`, sha256 };
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
   required("WORKER_URL", WORKER_URL);
@@ -240,6 +294,10 @@ async function main() {
   if (!judgeToken) console.log("[evals] no judge credential — deterministic checks only");
 
   const results = [];
+  /** case id → the condition it asked for and the row the board answered with,
+   *  so a transcript read a week later says WHICH scenario "what happens in X"
+   *  was actually about. */
+  const subjectsUsed = {};
   let blockerFailures = 0;
 
   // A case may declare `samples: N` (default 1) and passes on a MAJORITY of
@@ -292,7 +350,52 @@ async function main() {
     return { pass, failures, judge, transcript };
   }
 
-  for (const c of fixture.cases) {
+  for (const rawCase of fixture.cases) {
+    let c = rawCase;
+    // ── Run-time subject (#415) ───────────────────────────────────────────────
+    // A case declaring `subject: { need }` names a CONDITION; the Worker picks a
+    // row from the live board that satisfies it and the placeholders are filled
+    // in before turn 1. Once per case, not once per sample: three samples of one
+    // case must ask the same question, or the [n/3] tally stops meaning
+    // intermittency and starts meaning three different questions.
+    if (rawCase.subject?.need) {
+      const need = rawCase.subject.need;
+      const got = await fetchSubject(need, { workerUrl: WORKER_URL, token: DEBUG_TOKEN });
+      if (got.error) {
+        // A broken route or a failed read is a FAILURE. Reporting it as a skip
+        // would retire a blocker by breaking the thing that feeds it.
+        const failure = `subject route for '${need}': ${got.error}`;
+        results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, pass: false, samples: 0, passedRuns: 0, need, failures: [failure], judge: { verdict: "skipped" }, ms: 0 });
+        if (rawCase.blocker) blockerFailures++;
+        console.log(`[FAIL] ${rawCase.id} — ${rawCase.name} (${failure})`);
+        continue;
+      }
+      if (!got.subject) {
+        // SKIPPED: neither a pass nor a failure. Nothing on the board satisfies
+        // the condition, so the case had nothing to measure — and a blocker
+        // recorded green for that would be the silent-empty-read lie all over
+        // again, one layer up.
+        const reason = skipReason(need, got.reason);
+        results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, skipped: true, need, reason, samples: 0, workerBuild: got.build });
+        console.log(`[SKIP] ${rawCase.id} — ${rawCase.name} (${reason})`);
+        continue;
+      }
+      const { spec, missing } = applySubject(rawCase, got.subject);
+      if (missing.length) {
+        // The condition was satisfiable and the route answered — so an unfilled
+        // placeholder means the fixture and the route disagree about what this
+        // condition promises. That is a bug in one of them, not a property of
+        // the board, and it must not be swallowed as a skip.
+        const failure = `subject for '${need}' carries no ${missing.map((f) => `'${f}'`).join(", ")} (got ${JSON.stringify(got.subject)})`;
+        results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, pass: false, samples: 0, passedRuns: 0, need, subject: got.subject, failures: [failure], judge: { verdict: "skipped" }, ms: 0 });
+        if (rawCase.blocker) blockerFailures++;
+        console.log(`[FAIL] ${rawCase.id} — ${rawCase.name} (${failure})`);
+        continue;
+      }
+      c = spec;
+      console.log(`[subject] ${c.id} — ${need} → ${JSON.stringify(got.subject)}`);
+      subjectsUsed[c.id] = { need, subject: got.subject };
+    }
     const samples = Number.isInteger(c.samples) && c.samples > 1 ? c.samples : 1;
     const runs = [];
     for (let i = 0; i < samples; i++) {
@@ -303,22 +406,37 @@ async function main() {
     const pass = passesCase(passedRuns, samples);
     const rep = runs.find((r) => !r.pass) ?? runs[0];
     if (!pass && c.blocker) blockerFailures++;
-    results.push({ id: c.id, name: c.name, blocker: !!c.blocker, pass, samples, passedRuns, failures: rep.failures, judge: rep.judge, ms: runs.reduce((s2, r) => s2 + r.transcript.turns.reduce((s3, t) => s3 + (t.response?.ms ?? 0), 0), 0), transcript: rep.transcript });
+    results.push({ id: c.id, name: c.name, blocker: !!c.blocker, pass, samples, passedRuns, ...(subjectsUsed[c.id] ?? {}), failures: rep.failures, judge: rep.judge, ms: runs.reduce((s2, r) => s2 + r.transcript.turns.reduce((s3, t) => s3 + (t.response?.ms ?? 0), 0), 0), transcript: rep.transcript });
     const tally = samples > 1 ? ` [${passedRuns}/${samples} samples]` : "";
     console.log(`[${pass ? "PASS" : "FAIL"}] ${c.id} — ${c.name}${tally}${rep.failures.length ? ` (${rep.failures.join("; ")})` : rep.judge.verdict === "fail" ? ` (judge: ${rep.judge.reason})` : ""}`);
     await new Promise((r) => setTimeout(r, PAUSE_BETWEEN_CASES_MS));
   }
 
+  // Skipped cases are neither passed nor failed, so they come out of the
+  // denominator too. A suite that reported 33/34 while one case never ran would
+  // be describing a run that did not happen.
+  const scored = results.filter((r) => !r.skipped);
   const summary = {
     ranAt: new Date().toISOString(),
-    workerBuild: results[0]?.transcript?.turns?.[0]?.response?.build ?? "unknown",
-    passed: results.filter((r) => r.pass).length,
-    failed: results.filter((r) => !r.pass).length,
+    // WHAT WAS MEASURED, AGAINST WHAT. The acceptance criterion is that results
+    // are recorded with the revision they were measured against (#415), and
+    // that is two facts, not one: which Worker answered, and which fixture
+    // asked. Neither is inferable from the other, and a results file carrying
+    // only a date is unreadable a week later.
+    workerBuild: firstBuild(results),
+    fixture: fixtureStamp(CASES_PATH),
+    passed: scored.filter((r) => r.pass).length,
+    failed: scored.filter((r) => !r.pass).length,
+    skipped: results.length - scored.length,
     blockerFailures,
     results,
   };
   writeFileSync("eval-results.json", JSON.stringify(summary, null, 2));
-  console.log(`\n[evals] ${summary.passed}/${results.length} passed (build ${summary.workerBuild}) — details in eval-results.json`);
+  const skipNote = summary.skipped ? `, ${summary.skipped} skipped` : "";
+  console.log(
+    `\n[evals] ${summary.passed}/${scored.length} passed${skipNote} ` +
+      `(build ${summary.workerBuild}, fixture ${summary.fixture.rev}/${summary.fixture.sha256}) — details in eval-results.json`,
+  );
   if (blockerFailures > 0) {
     console.error(`[evals] ${blockerFailures} BLOCKER case(s) failed`);
     process.exit(1);
