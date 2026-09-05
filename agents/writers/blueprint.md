@@ -26,5 +26,7 @@ The only agent that touches uno-blueprint (Supabase, the product source of truth
 ## Conventions it obeys
 
 - `docs/connectors/supabase/overview.md` — the paired-writes contract + read/write scope per skill (THE rulebook)
-- `docs/connectors/supabase/blueprint-navigation.md` — schema, layer/path semantics, query recipes, citation format (load before any read or write)
+- `docs/connectors/supabase/blueprint.md` — the blueprint's own account: shape, status vocabulary, retrieval, schema (vendored from plus-uno-blueprint; load before any read or write)
+- `docs/connectors/supabase/blueprint-navigation.md` — citation format, confidence, absence behaviour
+- `docs/connectors/supabase/blueprint-direct-access.md` — SQL and PostgREST recipes
 - Schema-valid writes are a hard gate in `docs/evals/rubrics/uno-synthesize.md`

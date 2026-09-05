@@ -99,7 +99,7 @@ export interface BlueprintRow {
   title: string;
   snippet?: string;
   /** cells.description — the longer detail field. A cell can carry ALL of its
-   *  evidence here with an empty `content` (blueprint-navigation.md § 2), so
+   *  evidence here with an empty `content` (docs/connectors/supabase/blueprint.md § How to read it), so
    *  dropping it lost real answers. */
   description?: string;
   /** For cells: the lane = actor/stage (e.g. "Regular Tutor", "Back Stage Actions"). */
@@ -118,7 +118,7 @@ export interface BlueprintRow {
   updatedAt?: string;
   /** The path variant (e.g. "Happy Path (happy)", "Prototype: Reflection redesign (named)").
    *  On semantic hits it comes from the indexed breadcrumb; on keyword hits from
-   *  `paths.name` — never `path_type`, per blueprint-navigation.md § 4. */
+   *  `paths.name` — never `path_type`, per docs/connectors/supabase/blueprint.md § Paths and the main route. */
   path?: string;
   /** Deep link that opens this row in the blueprint app. Present only when
    *  BLUEPRINT_APP_URL is set AND the row has an id to link to — a URL that
@@ -836,9 +836,10 @@ function normalize(src: Source, row: Record<string, unknown>): BlueprintRow | nu
       typeof row[PROSE_COLUMN] === "string" ? (row[PROSE_COLUMN] as string).trim() : "";
     const links = normalizeLinks(row.resources);
     // A cell can carry ALL of its evidence in `description` or `links` with an
-    // empty `content` (blueprint-navigation.md § 2: "A cell can carry real
-    // evidence with an empty content ... Check all four before calling a topic
-    // empty"). Dropping on empty content silently deleted exactly the rows a
+    // empty `content` — the account (docs/connectors/supabase/blueprint.md
+    // § How to read it) puts evidence in the sentence of record, the longer
+    // summary, the frame and the resources, and any one may be the only one
+    // filled. Dropping on empty content silently deleted exactly the rows a
     // description-matched query had just found.
     if (!content && !description && !links?.length) return null;
     const path = row.path as

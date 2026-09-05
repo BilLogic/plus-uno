@@ -15,26 +15,27 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **144,042 chars from 16 files**, against an assembled budget of 170,000 (25,958 to spare), and a floor of 131,072 plus a 4,000 margin (8,970 above it). The floor is the Gemini lane's explicit-cache minimum; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **159,565 chars from 17 files**, against an assembled budget of 170,000 (10,435 to spare), and a floor of 131,072 plus a 4,000 margin (24,493 above it). The floor is the Gemini lane's explicit-cache minimum; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,603 (−6,727 ide-only) | 9,603 | — |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 8,208 | 17,839 | — |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 25,763 | 43,643 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,036 | 49,723 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 59,095 | — |
-| 6 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,947 | 66,087 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 72,800 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 78,087 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,213 | 84,342 | 7,000 (Worker face) |
-| 10 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 90,744 | 7,000 (Worker face) |
-| 11 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 92,715 | — |
-| 12 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 105,678 | — |
-| 13 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,708 | 119,428 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 12,537 (−4,500 ide-only) | 132,031 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,312 (−1,219 ide-only) | 136,397 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,597 (−605 ide-only) | 144,042 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,603 (−7,000 ide-only) | 9,603 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 8,246 | 17,877 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 25,763 | 43,681 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,036 | 49,761 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 59,133 | — |
+| 6 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,947 | 66,125 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 72,838 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 78,125 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,213 | 84,380 | 7,000 (Worker face) |
+| 10 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 90,782 | 7,000 (Worker face) |
+| 11 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 92,753 | — |
+| 12 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 105,716 | — |
+| 13 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,694 | 119,452 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 122,700 | — |
+| 15 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 24,576 | 147,331 | — |
+| 16 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 151,920 | — |
+| 17 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,597 (−605 ide-only) | 159,565 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -226,7 +227,7 @@ Two estates describe the product in **different languages**, and the words are N
 | | **uno-blueprint** (Supabase) | **Notion Roadmap** (Design HQ board) |
 |---|---|---|
 | What it holds | how the **service works**: who does what, when | what the **team is building**: work items + their status |
-| Its words | **phase** · **service scenario** · **path** (read both `kind` and `name` — `blueprint-navigation.md` §4) · **step** · **lane** = the actor row · **cell** = one activity at lane × step | **Roadmap** · **card** (id = **RM-ID**, `RM-<n>`) · **Design Status** · **Product Pillar** · **Product Tag** · **owner** · **PRD** |
+| Its words | **phase** · **service scenario** · **path** (read both `kind` and `name` — `docs/connectors/supabase/blueprint.md` § Paths and the main route) · **step** · **lane** = the actor row · **cell** = one activity at lane × step | **Roadmap** · **card** (id = **RM-ID**, `RM-<n>`) · **Design Status** · **Product Pillar** · **Product Tag** · **owner** · **PRD** |
 | NOT its words | "roadmap", "card", "Design Status", "pillar", "owner", "WIP", "under review" — **the blueprint has no cards and no Design Status.** It does have `status` on `paths` and `cells` (proposed · planned · built · live · at_risk · deprecated), which says whether a row is `live` today or still coming (`AGENT.md` § Two sources) — a different axis from a card's Design Status, and it answers a different question | "scenario", "lane", "cell", "path", "step", "phase", "actor" — **the Roadmap has no service steps or actor rows** |
 
 **Topic words overlap; frame words don't.** "Goal Setting" is both a blueprint *scenario* and a Roadmap *card topic* — the topic never tells you which estate to read. The **frame words in the question** do:
@@ -1181,7 +1182,7 @@ Uses the model's default voice for chat; the bot's specific register lives in `a
 
 When uno-bot (or any agent) writes to Slack or Notion, the estates' FRAME words render as `code` so designers learn to recognize them as system vocabulary, not casual English — Bill, Jul 2026:
 
-- **Blueprint frame words:** `phase` · `scenario` · `path` · `step` · `lane` · `cell`, plus the lane (actor-row) names listed in `blueprint-navigation.md` §3.
+- **Blueprint frame words:** `phase` · `scenario` · `path` · `step` · `lane` · `cell`, plus the lane (actor-row) names as the board spells them.
 - **Roadmap frame words:** `card` · `RM-ID` · `Design Status` · `Dev Status` · `Product Pillar` · `Product Tag` · `Intake Status`.
 
 Scenario and project *names* (Goal Setting, Warm-Up, Session Sign Up) stay `*bold*` — they're topics, not frame words. Codify a frame word when it's used AS the system term ("the `Regular Tutor` `lane`"), not in ordinary prose ("a tutor joins the call").
@@ -1191,146 +1192,536 @@ Scenario and project *names* (Goal Setting, Warm-Up, Session Sign Up) stay `*bol
 
 <!-- docs/connectors/supabase/blueprint-navigation.md -->
 
-# uno-blueprint — Navigation Guide
+# uno-blueprint — Answering Guide
 
-<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand; bundled into the uno-bot prompt) · distilled 2026-07-29 · applied by every agent answering a journey question or drafting from journey context. Companion: supabase.md (access, contract, source routing). -->
+<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (bundled) · cut to voice 2026-09-05 (#412). Shape, status vocabulary, retrieval modes and schema: `blueprint.md` beside this file, vendored from plus-uno-blueprint, which owns every such claim. SQL and PostgREST recipes: `blueprint-direct-access.md`. This file is uno-bot's voice. -->
 
-## 1 · What it is
+Query the **database**; the Netlify front end is the human viewer. Cite its URL to readers (`https://uno-blueprint.netlify.app/`) while grounding in rows.
 
-A structured **service blueprint** for the PLUS journey: how tutors, lead tutors, classroom teachers, researchers, and support staff move through the end-to-end experience. A grid — **rows are actors (`lane`s), columns are journey `step`s, and each `cell` holds the evidence at that intersection.** Postgres on Supabase, read-only for every consumer except `writers/blueprint`.
+## Answering rules
 
-Query the **database**, never the Netlify front end — that's the human viewer, and the database is richer. Cite the live app URL to readers (`https://uno-blueprint.netlify.app/`) while grounding in the rows.
+1. **Cite location.** Every factual claim names where it sits: `phase › scenario › path — lane × step`. The `›` chain is containment; the pair after the dash is the cell's coordinate — actor row × journey column, actor first, because mis-attribution is the most common failure. Step names are full sentences here, so quote them. **The phase is one you read this turn** — from a retrieved row or the index, not from the asker's wording and not inferred from a scenario name that sounds like a phase; with no phase in hand, name only the levels you retrieved. Say which evidence field a claim came from when it matters: an image-only fact is weaker than the sentence of record. Row UUIDs stay out of replies.
+2. **Cover the right lanes.** A multi-actor question spans every relevant row, not just the tutor's. A one-lane answer to a multi-actor question scores as incomplete, not merely brief.
+3. **Respect structure.** Right path, right lane. A main route and an exception are two answers, kept apart; a back-stage action stays with its back-stage row. Name a path beside its scenario — a path name alone repeats across scenarios — and establish which path a question is about before answering.
+4. **Silent → say so, and name who to ask.** Check every place the account says a cell's evidence can live before calling a topic empty. Still absent → "this isn't in the blueprint," plus the person or role who should fill the gap when the blueprint supports that ownership. Fabricating here is the worst failure mode (`overconfident-silence`).
 
-## 2 · The data model
-
-**This file carries no counts and no membership lists, by design** — the shape is durable, the contents change weekly. Any "how many," "which ones," or "is this thin" is a query; quote only what you counted this task.
-
-| Table | What it is | Joins on |
-|---|---|---|
-| `services` | the whole journey ("PLUS Application") | — |
-| `phases` | the ordered phases — read them, never assume the list | `service_id` |
-| `scenarios` | scenarios within a phase (e.g. Goal Setting) | `phase_id` |
-| `paths` | routes through a scenario — read `kind` AND `name`, and `status` for future state (§4) | `scenario_id` |
-| `steps` | the columns, scoped to a scenario | `scenario_id` |
-| `path_steps` | which steps appear on a path + `position` | `path_id`, `step_id` |
-| `lanes` | the rows (actors), scoped to a path, ordered by `position`. Also carries `owner_team` (closed vocabulary), `kpis`, `tools`, `stakeholder_id` | `path_id` |
-| `stakeholders` | the actor/org a lane can point to — `kind`: recipient/staff/partner/provider/team; `parent_id` rolls a sub-team up to its parent | `service_id`; referenced by `lanes.stakeholder_id` |
-| `cells` | **the evidence** at a path × lane × step slot. A slot is `(lane_id, step_id)` and can hold an ordered list of cells (`position`) — never assume one cell per slot | `path_id`, `lane_id`, `step_id` |
-| `cell_dependencies` | dependencies: one cell leads to or enables another (`kind`: `leads_to` \| `enables`) | `source_cell_id` → `target_cell_id` |
-
-Mental model: **cell = (path × lane × step) slot**, and a slot can hold more than one cell, ordered by `position`. Read a scenario by picking a path, then reading its cells across lanes (rows) and steps (columns). (`slices` / `slides` are saved 1-D cuts for the viewer; `audit_findings` / `evidence` / `business_models` are audit and provenance surfaces — not journey facts. Don't answer journey questions from them.)
-
-**Cell evidence lives in four places:** `content` (primary grid text) · `summary` (longer detail) · `frame` (image ref) · the `resources` table (authored links, joined on `cell_id`). A cell can carry real evidence with an empty `content`, and many do. **Check all four before calling a topic empty.** Never infer a fact from an image filename or a link label without opening the resource.
-
-Three of the four moved and this file did not follow, which is why the rule is spelled out again: `picture` became `frame` (20260830270000) and `links` — one jsonb column that held resources, touchpoint detail and provenance at once — was split into `resources`, `cell_touchpoints` and `evidence` (20260830280000). A search result still reports the authored links under `links`: that is the RPC's projection over `resources`, and a projection alias is not a column.
-
-## 3 · Lane semantics — read before attributing any action
-
-Mis-attribution is the most common error (`schema-misread`). In the built-out scenarios:
-
-- **Visual** — screenshots / UI reference, *not an actor*.
-- **Teacher** — the *classroom teacher* (a partner, not a PLUS tutor): observes, reminds, raises "ask for help" alerts, escalates. Named `Partner Action: Teacher` until 2026-08-20; the role now lives in `lane_role` and `stakeholders.kind`, not in the label.
-- **Lead Tutor** — supervises the room: rosters, attendance, assigning unpaired students, teacher liaison.
-- **Regular Tutor** — the front-line tutor running the per-student flow.
-- **Front Stage Tech** — tools the user touches (Zoom, PLUS App).
-- **Front Stage Actions** — visible actions supporting the user.
-- **Back Stage Actions** — behind-the-scenes work, typically **researchers / ops** ("Researcher sets student order"). **Never attribute a back-stage action to a tutor.**
-- **Back Stage Tech** — systems working behind the scenes.
-- **Support Actions** — Dev team, Design team.
-
-## 4 · Path semantics
-
-**Rewritten 2026-08-21.** Three things changed at once and every rule below is
-new: `kind` is a real three-value vocabulary, path names are unique and
-say their CONDITION, and future state moved out of the name into a column.
-
-### 4a · `paths.kind` — three values, and now worth reading
-
-```
-happy      the scenario's main route, everything works.  Exactly ONE per scenario.
-variant    equally normal, chosen by a CONDITION rather than by failure.
-exception  a rule or a failure DIVERTS the route.
-```
-
-It used to be five (`happy | unhappy | exception | alternative | named`, later
-`custom`), of which three were not distinguishable in practice and one had
-become the drawer for 11 of 39 paths — which is why the old rule here said to
-ignore the column. **That rule is dead. Read `kind`.** It now discriminates
-cleanly, and `happy` is guaranteed unique per scenario, so "the main route for
-X" is a single query with no name-matching.
-
-### 4b · Names say the CONDITION, not the activity
-
-The scenario names the activity; the path names which way through it. So a name
-is only meaningful **beside its scenario**:
-
-| Scenario | Paths |
-|---|---|
-| Call-off Request | `12+ hours ahead` · `Under 12 hours` · `Swap offered instead` |
-| Goal Setting | `All conditions` · `No prior goals` · `New cycle, goals exist` · `Mid-cycle check` · `Missed last session, no goals` · `Missed last session, has goals` |
-| Student Just Joined | `Full room, on time` · `Few or none by 10 min` |
-
-- **Never quote a path name without its scenario.** `Standard` alone is
-  meaningless — nine different scenarios have a path called that, one each,
-  and it means "this scenario has one route and no branching condition".
-- **`Happy Path` no longer exists.** Neither does `Alternate Path`, `Sad Path`,
-  `Set Goals`, `Check Goals`, `Update Goals`, or any `Planned:` / `Prototype:`
-  name. Anything recalling those names is recalling the board before
-  2026-08-21. Query, do not recall.
-- **Establish which path a question is about before answering.** Never merge a
-  happy path and an exception into one answer.
-
-### 4c · Future state — `paths.status`, not the name
-
-The `Planned:` / `Prototype:` name-prefix convention is **gone**. Status is a
-column on both `paths` and `cells`, sharing one `entity_status` domain:
-
-| Status | Means | How to word it |
-|---|---|---|
-| `proposed` | Designed and discussed, no build card behind it. May never happen. | "this **might change**" |
-| `planned` | Committed and carded, no code yet. | "this **is changing**" |
-| `built` | Code exists, in build or QA. Not deployed, so nobody is using it. | "this **is changing**, and it is nearly here" |
-| `live` | In use today. **The default, and most of the board.** | current state |
-| `at_risk` | Live and failing in a way somebody has measured. | "this works and is **failing**" |
-| `deprecated` | Live and being taken away. | "this works and is **going away**" |
-
-Rules:
-
-- **`status <> 'live'` is the whole test.** One predicate, on a column, for both
-  paths and cells. No prefix matching, no reading `origin`, and no risk of a
-  path that merely *mentions* "planned" mid-name being mistaken for future
-  state — the failure the old name-based rule had to warn about.
-- **`live` is the default.** `cells.status` is `not null default 'live'`, so a
-  cell with nothing said about it is current state, not unknown.
-- **Never assert the blueprint has no future state for a scenario without
-  querying it.** Absence in a search result is not absence on the board.
-- Cell content on unbuilt rows may still open `PLANNED (…)` / `PROTOTYPE (…)`.
-  That is legacy prose, not the marker. **The column is authoritative.**
-
-## 5 · Retrieval
-
-Phrase queries in journey words (actor, scenario, step), not product-management words, and re-query per actor when a question spans lanes.
-
-
-## 6 · Answering rules
-
-1. **Cite location.** Every factual claim names where it sits: `phase › scenario › path — lane × step`. The `›` chain is containment; the pair after the dash is the cell's coordinate — actor row × journey column, actor first because mis-attribution is the most common failure (§3). Step names are full sentences on this board, so quote them. **The phase comes from a queried `phases` row — never from the asker's wording, and never inferred from a scenario name that sounds like a phase.** No phase in hand → name only the levels you actually retrieved. Say which evidence field a claim came from when it matters (a `frame`-only fact is weaker than a `content` one). Never expose row UUIDs to a reader.
-2. **Cover the right lanes.** A multi-actor question spans the relevant rows, not just the tutor. One-lane answers to multi-actor questions score as incomplete, not merely brief.
-3. **Respect structure.** Right path variant, right lane. Don't merge happy + edge; don't move a back-stage action to a front-stage actor.
-4. **Silent → say so, and name who to ask.** Search all four evidence places first (§2). Still absent → "this isn't in the blueprint," plus the person or role who should fill the gap when the blueprint supports that ownership. Fabricating here is the worst failure mode (`overconfident-silence`).
-
-   **Read `matchedBy`, not `score`, to judge absence.** Retrieval runs three ways at once — `vector` (meaning), `keyword` (the cell's own prose), `structural` (its phase/scenario/path/step/lane name) — and each row reports which found it, `+`-joined when more than one did: `keyword+structural` and `vector+keyword+structural` are ordinary values, not three atomic ones. So the test is EQUALITY with `vector`, not containment — `vector+keyword` is a row the blueprint's own words matched. Rows several retrievers agree on matched the blueprint's own words; a `vector`-only row is a semantic guess. **Every row `vector`-only = nothing in the blueprint mentions your terms**, which is the strongest absence signal the tool can give. Similarity cannot substitute: measured 2026-08-19 across a 26-case set, questions with NO answer scored 0.607–0.654 while genuine hits reached down to 0.565 — overlapping ranges, so no threshold separates them, and none ever will (`docs/plans/2026-08-19-001-feat-blueprint-hybrid-retrieval-plan.md`). One caveat: a pure paraphrase of a real cell can also come back `vector`-only, so treat it as evidence, not proof — say what you did and did not find.
+   **Judge absence from `matchedBy`, not `score`.** A row several retrievers agree on matched the blueprint's own words; a row only `vector` found is a semantic guess — hedge it. Every row `vector`-only is the strongest absence signal the tool gives: nothing in the blueprint mentions your terms. Similarity cannot substitute — measured 2026-08-19, answer-less questions score inside the range of genuine hits. A pure paraphrase of a real cell can also come back `vector`-only, so treat it as evidence, not proof — say what you did and did not find.
 5. **Confidence — one woven clause, never a trailing label**, and sureness earned only by rows read this turn. Shape and cadence: `agents/uno-bot/AGENT.md` § Grounding.
-6. **Source precedence — ADR-021 claim-type routing, not "the blueprint wins."** Route per claim; full table in `docs/connectors/supabase/overview.md` § Two sources, one time axis. Constant across every row: **surface the conflict, never blend.**
+6. **Source precedence — ADR-021 claim-type routing, not "the blueprint wins."** Route per claim; full table in `docs/connectors/supabase/overview.md` § Two sources, one time axis. Constant across every row: **surface the conflict, never blend.** Word future state the way the account's status table says; a doc that disagrees with a current-state row is a conflict to surface.
 
-## 7 · Known-silent areas
 
-No structured fields for verbatim scripts, durations, counts, targets, or dates — such details appear only inside general cell evidence, and only sometimes. Use them where they appear explicitly; absent after checking all four places (§2) → abstain and escalate per rule 4.
+---
 
-## 8 · Content depth (what's answerable today)
+<!-- docs/connectors/supabase/blueprint.md -->
 
-Coverage is uneven, and judged from the rows you just read — never from a remembered ranking. **A thin result is more often a content gap than a retrieval failure** — and since 2026-08-19 that is a stronger claim than it used to be: all three retrievers now run on every search, so a short result is no longer the ladder having skipped a path. It used to be: structural-name queries scored 0/10 because the keyword pass never ran at all. a query returning two or three cells in a shallow scenario means the blueprint doesn't cover it yet — say so and route a `uno-maintain` intake, rather than synthesizing an answer out of adjacent scenarios.
+<!-- VENDORED from BilLogic/plus-uno-blueprint docs/agents/blueprint.md by agents/uno-bot/scripts/sync-blueprint-contract.mjs. Edit it there: this copy is overwritten by the sync, and `npm run check:contract` fails on drift. -->
 
+# The blueprint, for agents
+
+This document is the blueprint's own account of itself, for any agent that
+reads it: the Slack bot, an IDE session in this repository or in the kit's,
+the canvas agent through `get_reference("blueprint")`. One source, four
+readers. The first part is written by hand and says what the catalog cannot.
+The two parts after it are rendered — from the entity definitions the board
+shows a reader, and from the table and column comments in the database — and
+`npm run check:agent-account` fails when either source changes and this file
+does not.
+
+## What it is
+
+A service blueprint is a grid of one service, end to end. Phases run left to
+right in time. Each phase holds scenarios: situations the service has to
+handle. A scenario is drawn as one or more paths, and each path is a grid of
+steps (columns, in that path's order) by lanes (rows: the customer, the staff
+they see, the staff they do not, the tools each uses). A cell is what happens
+at one lane in one step on one path. Everything else hangs off cells:
+resources a cell points at, touchpoint placements, evidence, dependencies
+between cells, and slices that cite cells.
+
+## How to read it
+
+Orient at phase and scenario level first, then open one scenario's grid. Read
+a cell's `content` as the sentence of record — the thing that happens — and
+its `summary` as the longer account. The spec fields (`function`, `form`,
+`value_props`, `owner`, `perceived_owner`) say what the moment must do, how it
+must feel, who gains, who owns it and who the customer believes owns it. A
+step's `summary` is the one sentence that makes the whole column legible; a
+lane's `owner_team`, `kpis` and `tools` say who staffs the row and what they
+are measured on.
+
+## Retrieval
+
+`search_blueprint` is the one door. With `q` it ranks by meaning, prose and
+structural name fused together. With filters (`filter_phase`,
+`filter_scenario`, `filter_path_kind`, `filter_lane_role`) it narrows every
+retriever to a scope. With filters and no `q` it returns the complete matching
+set in structural order — the honest way to say "every exception path" or
+"all of Discovery". `granularity` picks the level: phase, scenario, path,
+step, lane or cell. Every row carries `matched_by` and `total_matched`, so
+answer with the count behind the top-k: "113 cells mention Zoom; here are 15."
+Direct selects, embed hints and service-key routes are in
+[`blueprint-direct-access.md`](blueprint-direct-access.md).
+
+## What absence means
+
+- A cell with no evidence rows is an assumption. Say so when you cite it.
+- A cell with no dependency rows has none recorded — report "none recorded",
+  which is different from "independent".
+- Every cell and path carries a `status`, defaulting to `live`: this is a
+  current-state blueprint, and it documents what is in use. Future state is
+  read off `status`, and only there — path names carry no convention.
+- A placement with a `name` and no `touchpoint_id` is a real tool the
+  registry lacks. Treat it as a touchpoint; the registry is the part that is
+  behind.
+- A cell with no resources points at nothing yet. Report the gap rather than
+  guessing at a tool.
+- A `null` placement `role` means nobody has judged it — neither core nor
+  peripheral.
+
+## What a status licenses you to say
+
+`status` is one vocabulary on cells and paths, the `entity_status` domain:
+`proposed`, `planned`, `built`, `live`, `at_risk`, `deprecated`.
+
+- `proposed` — designed and discussed, with no build card behind it. Say "may
+  never happen".
+- `planned` — committed and carded, no code yet. Say "committed, not started".
+- `built` — code exists, in build or QA, nobody uses it. Say "built, not
+  deployed".
+- `live` — in use today. This is what the service does. The default.
+- `at_risk` — live and failing in a way somebody has measured. Say both
+  halves.
+- `deprecated` — on the way out. Say so, and point at what replaces it if a
+  dependency says.
+
+When the question is about today, answer from `live` and `at_risk`. When it is
+about the roadmap, answer from `proposed`, `planned` and `built`.
+
+## Paths and the main route
+
+A path's `kind` is `happy`, `variant` or `exception`. The happy path IS the
+scenario's main route. A variant is equally normal, chosen by a condition. An
+exception is a rule or a failure diverting the route. Nothing connects across
+paths: each path owns its lanes and cells, and shares the scenario's steps
+through `path_steps` in its own order. A scenario's `layout` is `stacked` or
+`merged` — how the board is drawn, a display setting and not a kind.
+Dependencies between cells are `leads_to` (this cell makes the other happen,
+drawn as an arrow) or `enables` (the other must already be in place).
+
+## The vocabulary
+
+Rendered from `ENTITY_KIND_DEFINITIONS` in `src/lib/panelTerms.ts` — the six
+kinds the board defines for a reader who has never seen one.
+
+<!-- generated:vocabulary from src/lib/panelTerms.ts — edit the source, then npm run agent-account -->
+
+**Service** — The whole service this blueprint maps, end to end. Everything else on the board is part of it.
+
+**Phase** — A chapter of the service, in time order. Each phase holds the scenarios that can happen during it.
+
+**Scenario** — A specific situation inside a phase, mapped on its own board.
+
+**Path** — One route through a scenario: the main way, plus variants and exceptions. Paths are alternatives, not stages — nothing carries across them.
+
+**Step** — A column of the board: one moment in time, read down every lane at once. Steps run left to right.
+
+**Lane** — A row of the board, for one kind of participant — the customer, frontstage staff, backstage work, the tools. A row reads across every step.
+
+<!-- /generated:vocabulary -->
+
+## The schema, as the catalog describes it
+
+Rendered from `pg_description` through `public.schema_comments()`, laid over
+the column inventory in `src/types/database.ts`. A dash is a column nobody has
+described yet; the coverage ratchets upward in
+`docs/reference/agent-account-baseline.json`. Renaming a column and rewriting
+its description are the same migration.
+
+<!-- generated:schema from public.schema_comments() and src/types/database.ts — edit the migration, then npm run agent-account -->
+
+### `agent_messages`
+Transcript events of an agent session, ordered by seq. Payload mirrors the app's TranscriptEvent.
+
+0 of 6 columns described.
+
+| Column | Meaning |
+|---|---|
+| `created_at` | — |
+| `id` | — |
+| `kind` | — |
+| `payload` | — |
+| `seq` | — |
+| `session_id` | — |
+
+### `agent_sessions`
+One canvas-agent conversation. Ledger entries reference it via agentSessionId (client-side).
+
+1 of 5 columns described.
+
+| Column | Meaning |
+|---|---|
+| `created_at` | — |
+| `id` | — |
+| `title` | — |
+| `updated_at` | — |
+| `user_id` | Who owns this conversation. NULL means the row predates ownership (2026-08-28); those are readable by service accounts only and no new row may be NULL. |
+
+### `audit_findings`
+Audit / whatif / import-sweep outputs. Written by skills (IDE service key or canvas authenticated agent); humans triage by status. Prefixed on 2026-08-30 because the bare word `findings` gave a reader no clue which process produces the rows; the CONCEPT is still a finding everywhere else.
+
+4 of 13 columns described.
+
+| Column | Meaning |
+|---|---|
+| `cell_ids` | — |
+| `cell_keys` | — |
+| `check_key` | Roster check identifier, e.g. "gap-sweep". A key rather than a name because nobody reads it as prose — it is what a fingerprint is built from and what a run is grouped by. |
+| `created_at` | — |
+| `fingerprint` | check_key + sorted cell_keys hash. Dedupe/reopen identity across runs. |
+| `id` | — |
+| `summary` | The finding itself, in one line. It was `note`, which read as an aside about a finding rather than as the finding. |
+| `run_id` | Audit-run identity. Intentionally FK-less — no runs table by design. |
+| `service_id` | — |
+| `severity` | — |
+| `source` | — |
+| `status` | — |
+| `updated_at` | — |
+
+### `authoring_changes`
+Append-only record of every authoring write. Audit-only: the in-memory stack in src/lib/authoringSession.ts is still the undo affordance, and nothing replays `revert` from here. A row with `deleted_kind` set is a deletion and carries the rows it destroyed; `public.trash` is the view over exactly those.
+
+4 of 12 columns described.
+
+| Column | Meaning |
+|---|---|
+| `affected_slices` | — |
+| `agent_session_id` | The agent conversation this write belongs to. No foreign key on purpose: the record has to outlive the session it names. |
+| `args` | Exactly what was sent. Ids, not names — a name is resolved at render because a name is a thing that changes. |
+| `at` | — |
+| `author` | — |
+| `author_id` | — |
+| `deleted_kind` | — |
+| `fn` | The operation: an authoring RPC name, or one of the direct-table mutation names the client logs under. Matches the WriteFn union in src/lib/authoringSession.ts. |
+| `id` | — |
+| `label` | — |
+| `payload` | — |
+| `revert` | The captured inverse, {fn, args}, where one exists. Recorded so a row can say what would undo it. Nothing replays it — see the header. |
+
+### `cell_dependencies`
+Dependency from one cell to another
+
+2 of 7 columns described.
+
+| Column | Meaning |
+|---|---|
+| `created_at` | — |
+| `id` | — |
+| `kind` | leads_to = temporal (this cell makes the other happen; drawn as an arrow); enables = functional (the other must already be in place). enables renders in the panel only. |
+| `name` | The word on the arrow, e.g. a channel tag like "Email". A name because it is what a reader navigates the dependency by; it was `label`, which said how it renders rather than what it is. |
+| `source_cell_id` | — |
+| `target_cell_id` | — |
+| `updated_at` | — |
+
+### `cell_touchpoints`
+One touchpoint used at one cell: its own summary and role at this moment. Named by touchpoint_id into the registry, or by name alone when the registry lacks it. What it points at is in resources.
+
+2 of 10 columns described.
+
+| Column | Meaning |
+|---|---|
+| `cell_id` | — |
+| `created_at` | — |
+| `id` | — |
+| `name` | The touchpoint's name when the registry lacks it. Exactly one of name and touchpoint_id is set; linking to the registry clears it. |
+| `origin` | — |
+| `position` | — |
+| `role` | What this touchpoint is to this moment: core (the step happens through it) or peripheral (present, but not what the step turns on), or null for the unmarked majority. Null is a state of its own and not a quiet "peripheral": it means nobody has judged this placement, so the panel renders nothing for it rather than a badge saying so. On the placement and not the catalog because the same artifact is central at one step and incidental at another. |
+| `summary` | — |
+| `touchpoint_id` | — |
+| `updated_at` | — |
+
+### `cells`
+Content at lane × step intersection, within one path.
+
+10 of 17 columns described.
+
+| Column | Meaning |
+|---|---|
+| `content` | THE ONE DELIBERATE EXCEPTION to the name/title/summary vocabulary (#177): a cell's text is a sentence somebody wrote about a moment, not a name for the cell and not a one-line summary of something longer. It is the cell's own words, as typed into the grid. Renaming it to any of the three would have described the column less well than the word it already had. |
+| `created_at` | — |
+| `summary` | Optional longer cell description (detail panel, not grid label) |
+| `form` | Spec: communication/look/feel/sound (what it must convey). |
+| `function` | Spec: role/responsibility/requirements of this cell (what it must do). |
+| `id` | — |
+| `lane_id` | — |
+| `status` | How far along the thing this cell describes is. Defaults to live — a current-state blueprint documents what is in use. |
+| `owner` | Actual owning team/party for this cell. |
+| `path_id` | — |
+| `perceived_owner` | Who the customer believes owns this moment (mismatch = deception risk). |
+| `frame` | One image for one cell — the frame. A step's frames across the lanes are its STRIP, and the storyboard cell in that step draws the strip rather than an image of its own. A cell outside the storyboard holds at most one frame. Holds a URL or a storage reference. The retired name is not repeated here on purpose: a comment is a swept prose surface, so naming the old word would leave the residue this file removes. |
+| `search_tsv` | Generated FTS vector over the cell's own prose + spec columns, with a slash-stripped copy appended so "Zoom/Pencil"-style compounds match their parts (the parser treats a/b as a filename and indexes it whole). Consumed by public.search_blueprint. |
+| `position` | — |
+| `step_id` | — |
+| `updated_at` | — |
+| `value_props` | Array of {for, value} — value generated per beneficiary (user, business, actor). |
+
+### `evidence`
+Provenance rows for cells and proposition questions. A cell with zero rows is an ASSUMPTION (derived, never stored). Restricted SELECT: excerpts may hold interview content.
+
+2 of 14 columns described.
+
+| Column | Meaning |
+|---|---|
+| `added_by` | Agent name or participant-coded author. Never the interviewee. |
+| `cell_id` | — |
+| `cell_key` | — |
+| `created_at` | — |
+| `created_by` | — |
+| `excerpt` | — |
+| `id` | — |
+| `kind` | — |
+| `observed_at` | Date-only by design (timestamps could re-identify participants). |
+| `proposition_question_key` | — |
+| `ref` | — |
+| `service_id` | — |
+| `title` | — |
+| `updated_at` | — |
+
+### `evidence_counts`
+cell_id -> evidence row count. Public: powers the assumption lens without exposing evidence content.
+
+0 of 2 columns described.
+
+| Column | Meaning |
+|---|---|
+| `cell_id` | — |
+| `n` | — |
+
+### `lanes`
+Blueprint row (e.g. Users, Front Stage Employees)
+
+4 of 11 columns described.
+
+| Column | Meaning |
+|---|---|
+| `created_at` | — |
+| `id` | — |
+| `kpis` | String array: metrics this lane's team is measured on. |
+| `lane_role` | Semantic role key that drives rendering (pill cells, storyboard rows, divider anchoring), deliberately separate from the free-form display name. Canonical values: customer_actions, frontstage_actions, backstage_actions, partner_actions, frontstage_touchpoints, backstage_touchpoints, support_actions, storyboard. Null = generic swimlane (e.g. actor lanes), and is permitted on purpose. Constrained by lanes_lane_role_check — a custom role is no longer allowed, because an unconstrained column is how 36 support lanes went unclassified. |
+| `name` | — |
+| `owner_team` | Team that staffs/owns this lane (feeds KPI-alignment audit). |
+| `path_id` | — |
+| `position` | — |
+| `tools` | String array: systems/tools this lane's actors use. |
+| `stakeholder_id` | — |
+| `updated_at` | — |
+
+### `path_steps`
+Steps included on a path and their column order
+
+1 of 5 columns described.
+
+| Column | Meaning |
+|---|---|
+| `position` | Blueprint column index for this step on this path |
+| `created_at` | — |
+| `path_id` | — |
+| `step_id` | — |
+| `updated_at` | — |
+
+### `paths`
+One route through a scenario: happy, variant or exception (kind), and how far along it is (status). Nothing connects across paths; a path is a detour, not a stage.
+
+4 of 9 columns described.
+
+| Column | Meaning |
+|---|---|
+| `created_at` | — |
+| `summary` | Optional summary of what this path variant represents |
+| `id` | — |
+| `name` | — |
+| `note` | Optional path note shown alongside path metadata (e.g. parallel scenario context) |
+| `kind` | How this route relates to the scenario's main one: happy (it IS the main route), variant (equally normal, chosen by condition), exception (a rule or a failure diverts it). How far along the route is does not belong here: paths.status carries that, on the entity_status domain — proposed, planned, built, live, at_risk, deprecated. |
+| `status` | How far along this route is. Defaults to live. Replaces the "Prototype: " / "Planned: " name prefixes, which said the same thing where nothing could query it. |
+| `scenario_id` | — |
+| `updated_at` | — |
+
+### `phases`
+Ordered phase of the service, in time order.
+
+3 of 10 columns described.
+
+| Column | Meaning |
+|---|---|
+| `business_impact` | Commercial impact notes: opex, NPS, brand, retention, growth. |
+| `created_at` | — |
+| `id` | — |
+| `loops_to_phase_id` | When set, UI shows a return transition from this phase to the target phase |
+| `name` | — |
+| `operational_requirements` | Process / system / people / legal requirements for this phase. |
+| `position` | — |
+| `service_id` | — |
+| `summary` | — |
+| `updated_at` | — |
+
+### `resources`
+Things a cell, or one touchpoint placement, points at. A link is one kind of resource and `kind` carries the subtype. cell_id is always set; cell_touchpoint_id is set as well when the resource is a placement's, so a design link can belong to the tool it documents while staying the cell's.
+
+4 of 11 columns described.
+
+| Column | Meaning |
+|---|---|
+| `cell_id` | The cell this resource belongs to — always. A placement-owned resource carries its placement in cell_touchpoint_id as well, and the composite key holds the two to one row. |
+| `cell_touchpoint_id` | — |
+| `created_at` | — |
+| `featured` | The resource its owner leads with. One featured attachment per placement or per cell (the image it shows); any number of featured links. |
+| `id` | — |
+| `kind` | link = a place on the web; attachment = a file the cell points at, an object in the cell-attachments bucket reached by its public URL (#274). Both carry a url. Host and file type are read at render, never stored. |
+| `name` | What the thing on the other end is called. `name`, not `label`: a reader navigates to it. |
+| `origin` | — |
+| `position` | — |
+| `updated_at` | — |
+| `url` | — |
+
+### `scenarios`
+Scenario within a phase
+
+1 of 8 columns described.
+
+| Column | Meaning |
+|---|---|
+| `created_at` | — |
+| `id` | — |
+| `name` | — |
+| `position` | — |
+| `phase_id` | — |
+| `summary` | — |
+| `updated_at` | — |
+| `layout` | How the board is drawn: the paths stacked as bands on a shared step axis, or merged into one grid where the paths agree and split where they diverge. A display setting rather than a kind, which is why it is `layout` and not `kind`. Written by the header toggle through update_scenario_layout, so a scenario left merged opens merged. A one-path scenario is stacked with one band. |
+
+### `services`
+The service this board describes. One row. Renamed from service_lifecycles on 2026-08-21 — a service cannot contain several lifecycles, so the word named a level that does not exist.
+
+4 of 8 columns described.
+
+| Column | Meaning |
+|---|---|
+| `created_at` | — |
+| `summary` | What this service is, in the words a newcomer needs. The one field above the business model in the service panel. |
+| `id` | — |
+| `name` | — |
+| `slug` | A service's stable route slug: `/<slug>` opens it (#303/#341). Its own identity, not derived from the name — a rename does not move the URL, and the unique constraint stops two services colliding. Backfilled from the name-derived slug (public.key_slug) when re-added; nullable so a cleared slug falls back to the name-derived route in the app. Editable by the deployer through a later panel write, which adds the UPDATE grant then. |
+| `origin` | Where this service came from: import (the pipeline) or app (created in the canvas). The same two values its six sibling tables carry. |
+| `entity_examples` | Per-service authored examples, one free-text value per core kind (service, phase, scenario, path, step, lane), shown under each kind's definition to ground it in this deployment. Blueprint data, not app config: it rides the service block so a re-map round-trips it. A jsonb object with no CHECK — the six-key shape is the app's, and an unwritten key simply does not render. |
+| `updated_at` | — |
+
+### `slices`
+Saved 1D cuts through the blueprint grid. Reference cells only — never copy or create them.
+
+2 of 13 columns described.
+
+| Column | Meaning |
+|---|---|
+| `actor` | — |
+| `created_at` | — |
+| `created_by` | — |
+| `summary` | — |
+| `id` | — |
+| `locale` | — |
+| `authorship` | Who wrote this slice, and whether a regeneration may overwrite it: generated = safe to regenerate; customized = human-edited, regeneration must confirm; human = authored outright. Deliberately NOT called origin: every origin column in this schema answers "import or app", which is a different question with a different vocabulary. |
+| `position` | — |
+| `service_id` | — |
+| `kind` | How the cut was made: journey (experience closure for an actor) \| step (one column) \| lane (one lane across the whole service) \| cell (single-cell spec) \| custom. |
+| `title` | — |
+| `stakeholder_id` | — |
+| `updated_at` | — |
+
+### `slides`
+One slide of a slice. It shows the FRAMES of the cells it references — that strip is what the slide shows, so the two cannot disagree — and carries the words written over them. Empty cell_ids = a title-only divider slide. The retired table name is not repeated here: a comment is a swept prose surface, and CONTEXT.md's rename map is where the old name is recorded.
+
+4 of 10 columns described.
+
+| Column | Meaning |
+|---|---|
+| `title` | The words at the top of the slide, as somebody wrote them. A title rather than a name because a slide is authored content a reader reads, which is the rule #177 settled; it was `caption`. |
+| `cell_ids` | SOFT refs to cells (no FK — must survive scenario re-import). Same order as cell_keys. Their frames are this slide's strip. |
+| `cell_keys` | IR key-paths paired with cell_ids for orphan recovery after key renames. |
+| `created_at` | — |
+| `created_by` | auth.uid() at insert; null for service-key writes. |
+| `id` | — |
+| `narrative` | — |
+| `position` | — |
+| `slice_id` | — |
+| `updated_at` | — |
+
+### `stakeholders`
+Deployment-level cast list: one pool of actors a lane picks from, unique by name across the deployment. A lane references a stakeholder; no service owns one (ADR 0014). The unscoped read this registry always did is now correct.
+
+3 of 7 columns described.
+
+| Column | Meaning |
+|---|---|
+| `aliases` | — |
+| `created_at` | — |
+| `id` | — |
+| `kind` | What sort of party this is. staff/recipient/partner/provider are ACTORS — they can be a lane's stakeholder. team is an accountable group — it can be a lane's owner_team and never its stakeholder. |
+| `name` | The identity: unique across the deployment, so the same actor recurs across services by name rather than as one row per service. |
+| `summary` | What this party IS, in one line — a definition, not an aside. The lane panel and the owner badge read it; a lane never copies it, because one stakeholder owns many lanes and 37 copies is 37 chances to disagree. |
+| `updated_at` | — |
+
+### `steps`
+Blueprint column (journey step) scoped to a service scenario
+
+2 of 6 columns described.
+
+| Column | Meaning |
+|---|---|
+| `created_at` | — |
+| `id` | — |
+| `name` | — |
+| `scenario_id` | Scenario that owns this canonical step |
+| `summary` | What this moment is, across every lane — the one sentence that makes the column legible without reading five cells. Shown as the caption under the step's strip, which is the frames of its cells read across the lanes. |
+| `updated_at` | — |
+
+### `touchpoints`
+Deployment-level catalog of the tools, documents, channels and artifacts the services use. One row per real thing, unique by name across the deployment; a service references it, no service owns it (ADR 0014).
+
+1 of 9 columns described.
+
+| Column | Meaning |
+|---|---|
+| `created_at` | — |
+| `id` | — |
+| `kind` | — |
+| `name` | The identity: unique across the deployment, so a second service reuses an entry by naming the same tool the same way rather than minting its own. |
+| `origin` | — |
+| `stakeholder_id` | — |
+| `summary` | — |
+| `updated_at` | — |
+| `url` | — |
+
+### `trash`
+The deletions in public.authoring_changes, in the shape the retired deleted_structure table had. A filter over the one log, so the recovery list cannot drift from the record of what happened.
+
+0 of 7 columns described.
+
+| Column | Meaning |
+|---|---|
+| `affected_slices` | — |
+| `deleted_at` | — |
+| `deleted_by` | — |
+| `id` | — |
+| `kind` | — |
+| `label` | — |
+| `payload` | — |
+
+### Not readable with the anon key
+
+These exist and a service key reads them. What each is for:
+
+- `business_models` — How the service is funded, priced and delivered. One row per service. Renamed from `propositions` on 2026-08-21 — that word already meant a cell's value proposition, which is a different thing at a different level.
+
+<!-- /generated:schema -->
 
 
 ---
@@ -1349,7 +1740,7 @@ Coverage is uneven, and judged from the rows you just read — never from a reme
 - Write access: `writers/blueprint` only, via `skills/uno-synthesize` (new requirements) and `skills/uno-maintain` (changes). All other consumers are read-only.
 - Supabase is also the candidate dummy backend for prototypes needing persistence — separate schema, never mixed with blueprint tables.
 
-**Navigating it:** schema, lane semantics, path semantics, query recipes, and the scored answering rules live in `docs/connectors/supabase/blueprint-navigation.md` — load it before any blueprint read; this file owns access and source routing only.
+**Navigating it:** the blueprint's own account — shape, status vocabulary, retrieval modes, schema — is `docs/connectors/supabase/blueprint.md`, vendored from plus-uno-blueprint; the answering rules (citation shape, confidence, absence) are `docs/connectors/supabase/blueprint-navigation.md`; SQL and PostgREST recipes are `docs/connectors/supabase/blueprint-direct-access.md`. Load the first two before any blueprint read; this file owns access and source routing only.
 
 ## Two sources, one time axis (ADR-021)
 

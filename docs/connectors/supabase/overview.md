@@ -15,7 +15,7 @@ summary: Two hard rules, every row: never merge two sources into one unattribute
 - Write access: `writers/blueprint` only, via `skills/uno-synthesize` (new requirements) and `skills/uno-maintain` (changes). All other consumers are read-only.
 - Supabase is also the candidate dummy backend for prototypes needing persistence — separate schema, never mixed with blueprint tables.
 
-**Navigating it:** schema, lane semantics, path semantics, query recipes, and the scored answering rules live in `docs/connectors/supabase/blueprint-navigation.md` — load it before any blueprint read; this file owns access and source routing only.
+**Navigating it:** the blueprint's own account — shape, status vocabulary, retrieval modes, schema — is `docs/connectors/supabase/blueprint.md`, vendored from plus-uno-blueprint; the answering rules (citation shape, confidence, absence) are `docs/connectors/supabase/blueprint-navigation.md`; SQL and PostgREST recipes are `docs/connectors/supabase/blueprint-direct-access.md`. Load the first two before any blueprint read; this file owns access and source routing only.
 
 ## Two sources, one time axis (ADR-021)
 

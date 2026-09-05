@@ -72,7 +72,7 @@ enforces convention surfaces and exact-match selects.
 |---|---|
 | always | `references/method.md` |
 | any Notion write | `docs/connectors/notion.md` |
-| any blueprint read or write | `docs/connectors/supabase/overview.md` + `docs/connectors/supabase/blueprint-navigation.md` |
+| any blueprint read or write | `docs/connectors/supabase/overview.md` + `docs/connectors/supabase/blueprint.md` + `docs/connectors/supabase/blueprint-navigation.md` |
 | a findings page | `docs/conventions/writing.md` § Findings pages |
 
 ## Quality bar
