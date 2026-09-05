@@ -58,11 +58,20 @@ export const EDGE_SELECT_COLUMNS = "source_cell_id,target_cell_id,kind,name";
  * `resources(...)` replaces `cells.links`, which 20260830280000 dropped when it
  * split that one jsonb column into resources, cell_touchpoints and evidence.
  * Without the embed a links-only cell is invisible to the fallback.
+ *
+ * `lanes` is embedded WITH A HINT. 20260830180000 added the composite
+ * `cells_path_matches_lane_fkey` beside `cells_lane_id_fkey`, so `cells` has
+ * two foreign keys to `lanes` and PostgREST refuses the unhinted embed as
+ * ambiguous (PGRST201). From that day this select 400'd, the fallback answered
+ * "no cells matched", and the probe that imports this string read false on
+ * every deploy — noticed on 2026-09-05 when the touchpoint probe went green
+ * beside it. The hint's name is the contract's, so a renamed constraint moves
+ * this string when the sync moves the contract.
  */
 export const CELL_FALLBACK_SELECT =
   `id,content,${PROSE_COLUMN},function,form,value_props,owner,perceived_owner,updated_at,` +
   "resources(name,url,kind)," +
-  "lane:lanes(name,owner_team,kpis),step:steps(name)," +
+  `lane:lanes!${BLUEPRINT_CONTRACT.fkConstraints.cellLane}(name,owner_team,kpis),step:steps(name),` +
   "path:paths(name,scenario:scenarios(name,phase:phases(name)))";
 
 /**
