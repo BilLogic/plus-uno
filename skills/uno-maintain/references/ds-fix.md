@@ -3,7 +3,7 @@ embodiment: ide
 summary: How to draft a design-system fix once the intake routes there
 ---
 
-<!-- Load for: drafting the fix (method.md §2) when the intake targets "Storybook inconsistent / bug" or "Figma components out of date". IDE face only — the Worker files and proposes, never edits repo files (bot.md). DS components are always Tier 2: this runbook produces the draft; the gates in method §3–5 still apply. -->
+<!-- Load for: drafting the fix (method.md §2) when the intake targets "Storybook inconsistent / bug" or "Figma components out of date". IDE face only — the Worker files and proposes, never edits repo files (bot.md). DS components are always gated changes: this runbook produces the draft; the gates in method §3–5 still apply. -->
 
 # DS fix — execution runbook
 
@@ -72,4 +72,4 @@ Investigative one-offs (`inspect_nodes.js`, `debug_token_values.js`, `compare_*_
 
 ## Verify
 
-Storybook renders the touched stories, story paths still resolve under `.storybook/main.js`, `npm run test` passes. Then the draft enters the gate (method §3) and, on yes, the Tier-2 pipeline (§5) — DS components always need the PR + PRD pair and two approvals.
+Storybook renders the touched stories, story paths still resolve under `.storybook/main.js`, `npm run test` passes. Then the draft enters the gate (method §3) and, on yes, the gated-change pipeline (§5) — DS components always need the PR + PRD pair and two approvals.

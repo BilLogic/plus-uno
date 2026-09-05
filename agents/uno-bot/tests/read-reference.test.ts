@@ -46,7 +46,7 @@ test("the baked map serves uno-maintain's method under the skill's name", () => 
   const out = JSON.parse(readReference({ name: "uno-maintain/method" }, REFERENCES));
   assert.equal(out.ok, true);
   assert.match(out.text, /^<!-- Shared core/, "the body ships frontmatter-stripped");
-  assert.match(out.text, /## 4 · Tier classification/);
+  assert.match(out.text, /## 4 · Severity classification/);
   assert.ok(out.text.length > 9_000, `the whole method, not a stub (${out.text.length} chars)`);
 });
 

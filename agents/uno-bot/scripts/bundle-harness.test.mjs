@@ -346,7 +346,7 @@ test("uno-maintain's method is disclosed: absent from the prompt, present in the
   const map = references();
   assert.ok("uno-maintain/method" in map, `map holds ${Object.keys(map).join(", ")}`);
   assert.ok(map["uno-maintain/method"].startsWith("<!-- Shared core"), "the map carries the body, frontmatter stripped");
-  assert.ok(map["uno-maintain/method"].includes("## 4 · Tier classification"), "the map carries the whole method");
+  assert.ok(map["uno-maintain/method"].includes("## 4 · Severity classification"), "the map carries the whole method");
 });
 
 test("the manifest lists disclosed references in their own table with chars", () => {

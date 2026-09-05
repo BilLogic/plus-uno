@@ -1,13 +1,13 @@
 ---
 embodiment: ide
-summary: One intake per finding (evidence + suggested tier), through the normal pipeline in method.md
+summary: One intake per finding (evidence + suggested severity), through the normal pipeline in method.md
 ---
 
 <!-- Load for: the conventions-integrity sweep (monthly, at retro). Registry row: docs/engineering/operations.md. Run by reviewers/auditor — inspect and file intakes only, never fix in-sweep. -->
 
 # Integrity sweep checklist
 
-One intake per finding (evidence + suggested tier), through the normal pipeline in `method.md`. Tier 1 only for pure path/date/link rot; anything touching skills, persona, DS, or requirements is Tier 2.
+One intake per finding (evidence + suggested severity), through the normal pipeline in `method.md`. A direct fix only for pure path/date/link rot; anything touching skills, persona, DS, or requirements is a gated change.
 
 ## A. Canonicality headers (conventions are repo-canonical — ADR-017)
 

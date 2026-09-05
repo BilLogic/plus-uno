@@ -124,7 +124,7 @@ test("a reference read in a prior turn reaches the next turn as a one-line stub,
   );
   assert.equal(conversation[1]!.text, "Classified as an inaccuracy; here is the drafted fix.");
   for (const turn of conversation) {
-    assert.ok(!/## 4 · Tier classification/.test(turn.text), "the method's text must not be carried");
+    assert.ok(!/## 4 · Severity classification/.test(turn.text), "the method's text must not be carried");
   }
 });
 

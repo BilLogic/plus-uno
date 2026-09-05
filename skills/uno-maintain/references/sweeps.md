@@ -1,6 +1,6 @@
 ---
 embodiment: ide
-summary: docs/engineering/operations.md owns the sweep names (shipped watchdog · weekly Tier-1 digest · Figma hygiene · conventions integrity · comment sweep)
+summary: docs/engineering/operations.md owns the sweep names (shipped watchdog · weekly direct-fix digest · Figma hygiene · conventions integrity · comment sweep)
 ---
 
 <!-- ~350 tokens | Load when: running or triaging a standing sweep or a scored audit — not needed for ordinary intakes -->
@@ -9,9 +9,9 @@ summary: docs/engineering/operations.md owns the sweep names (shipped watchdog �
 
 - Summon `reviewers/auditor` with a named checklist from the registry —
   `docs/engineering/operations.md` owns the sweep names (shipped watchdog ·
-  weekly Tier-1 digest · Figma hygiene · conventions integrity · comment
+  weekly direct-fix digest · Figma hygiene · conventions integrity · comment
   sweep). The auditor inspects and files intakes; writers fix.
-- The integrity sweep, Tier-1 digest, and shipped watchdog also run
+- The integrity sweep, direct-fix digest, and shipped watchdog also run
   **headlessly on cron** — adapters in `scripts/prompts/uno-*/`, registry rows
   in `docs/engineering/operations.md`. Spot-run one with
   `gh workflow run <workflow-file>`; outcomes land in the Actions job summary
