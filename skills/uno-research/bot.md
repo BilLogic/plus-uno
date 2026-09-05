@@ -39,5 +39,5 @@ Include the one-line reason so the designer sees *why* each person was suggested
 - After the designer talks to people → offer **uno-synthesize** (summarize the thread / findings, then optionally a PRD).
 - Codebase / asset / prior-art discovery, study-guide drafting, data sweeps → the in-IDE **uno-research** skill, not this capability.
 - Summarizing an existing study or analysis → **uno-synthesize** (method.md's data rule: ingesting prior analysis is synthesis).
-- Plus-fact or project-status questions → default conversational mode, routed per the dispatch table in `agents/uno-bot/AGENT.md § Tool routing` (status → Roadmap, product behavior → blueprint) — not `notion_search`.
+- Plus-fact or project-status questions → default conversational mode, routed per the tool descriptions and the collision traps in `agents/uno-bot/AGENT.md § Tool routing` (status → Roadmap, product behavior → blueprint) — not `notion_search`.
 - If a Slack-handle/email column is ever added to the Team Member DB, intro-posting becomes a gated tool — until then, suggest + LinkedIn only.
