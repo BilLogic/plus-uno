@@ -137,13 +137,25 @@ async function evalTurn(prompt, history, pending, surface) {
 // ── LLM judge (fail-open: any judge error → "skipped") ────────────────────────
 const JUDGE_SYSTEM = `You are a strict evaluator for uno-bot, the PLUS design team's Slack agent. You receive one eval case (its expectation and failure condition) and the bot's actual transcript (prompts, narration, final result JSON). Judge ONLY what the transcript shows against the case's expectation, informed by the team's D1-D9 rubric: grounded answer quality; clarify-vs-act; proposal-gate discipline; grounding/anti-fabrication; honestly-communicated confidence (woven conversationally into the prose with its rationale — the retired trailing "_Confidence: …_" affix must NOT appear). A "proposal" result means the action was STAGED behind a human confirmation — it did not execute. Reply with STRICT JSON only: {"verdict":"pass"} or {"verdict":"fail","reason":"<one sentence>"}.`;
 
+// How much of the transcript the judge reads. Was 8,000 chars, and a full
+// prompt-spec is longer than that: on 2026-09-05 (run 33972756077) P2's Open
+// Questions block began at char 8,190, so the judge failed the reply for
+// "documenting none of the open decisions" it had documented — a verdict about
+// the cut, not the reply. The judge runs on the grind tier with a long context;
+// 60,000 chars covers every transcript the fixture produces today with room to
+// grow, and the marker tells the judge when it still is not the whole thing.
+const JUDGE_TRANSCRIPT_CHARS = 60_000;
+
 async function judgeCase(token, c, transcript) {
   if (!token) return { verdict: "skipped" };
   try {
     const url = `https://aiplatform.googleapis.com/v1/projects/${GEMINI_PROJECT_ID}/locations/global/publishers/google/models/${JUDGE_MODEL}:generateContent`;
-    const prompt =
-      `Case ${c.id} — ${c.name}\nExpectation: ${c.judgeNote}\n\nTranscript (JSON):\n` +
-      JSON.stringify(transcript).slice(0, 8000);
+    const full = JSON.stringify(transcript);
+    const shown =
+      full.length > JUDGE_TRANSCRIPT_CHARS
+        ? `${full.slice(0, JUDGE_TRANSCRIPT_CHARS)} …[transcript truncated at ${JUDGE_TRANSCRIPT_CHARS} chars — judge only what is shown]`
+        : full;
+    const prompt = `Case ${c.id} — ${c.name}\nExpectation: ${c.judgeNote}\n\nTranscript (JSON):\n` + shown;
     const res = await fetch(url, {
       method: "POST",
       headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
