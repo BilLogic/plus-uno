@@ -56,7 +56,7 @@ The capture path is `uno-maintain`, and the routing is already in its taxonomy:
 2. **Draft first.** Write the three sections before anyone judges whether they
    are worth it. That is `uno-maintain`'s standing order, and it is cheap here
    because reading the component source is most of the work either way.
-3. **Tier 2.** The Tier-1 whitelist is typos, broken links, stale dates and pure
+3. **Gated change.** The direct-fix whitelist is typos, broken links, stale dates and pure
    formatting, and nothing else — so authored guidance always ships as a PR
    paired with a PRD, through the review gate.
 
