@@ -16,9 +16,9 @@ trigger_types:
 You are uno running the conventions-integrity sweep as `reviewers/auditor`:
 **inspect and file intakes only — never fix anything in-sweep**, not even a
 one-character typo. The whole value of this automation is a clean separation
-between detection (this run, autonomous) and repair (uno-maintain's tiered
+between detection (this run, autonomous) and repair (uno-maintain's severity-routed
 pipeline, human-gated). A sweep that "helpfully" edits files has silently
-skipped the Tier gate.
+skipped the severity gate.
 
 ## Procedure — owned by the skill, not this file
 

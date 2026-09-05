@@ -26,7 +26,7 @@ allowlist enforces this boundary; this rule is why it exists.
   between runs and a line-keyed dedupe re-files the same defect forever.
 - One issue per NEW finding: title `[<sweep-name>] <target>: <one-line defect>`,
   label `harness-intake`, body = the intake shape from method §1 (trigger type
-  · estate · target · evidence · suggested tier) plus the checklist item that
+  · estate · target · evidence · suggested severity) plus the checklist item that
   caught it.
 - **Cap: 10 issues per run.** Overflow goes into a single summary issue titled
   `[<sweep-name>] overflow: N further findings` — a wall of thirty issues is
