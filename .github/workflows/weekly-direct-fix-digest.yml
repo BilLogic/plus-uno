@@ -1,17 +1,14 @@
-name: Weekly Direct-Fix Digest (retired path)
+name: Weekly Direct-Fix Digest
 
-# RETIRED 2026-09-05 (#429 batch 2). The weekly direct-fix digest now lives in
-# weekly-direct-fix-digest.yml, which owns the Monday 09:00 UTC schedule from
-# its first run. This file's schedule is disabled below so the digest cannot
-# post twice; workflow_dispatch is kept so an in-flight reference to the old
-# name still spot-runs (against the renamed prompt). It is deleted in the #429
-# contract step, not before — the old name must resolve until then.
-#
 # Weekly digest of auto-applied direct fixes → #plus-design (registry:
 # docs/engineering/operations.md). Loop shape: time-based cron → single pass →
 # post → sentinel-verified stop. The direct-fix rules live in
 # skills/uno-maintain/references/method.md §4; the prompt file is only the
 # headless adapter. Spot-run: `gh workflow run weekly-direct-fix-digest.yml`.
+#
+# Renamed from weekly-tier1-digest.yml on 2026-09-05 (#429 batch 2). This file
+# owns the Monday schedule from its first run; the old file keeps only
+# workflow_dispatch until the #429 contract step deletes it.
 #
 # Executor: Claude Code CLI on Vertex, billed to hcii-plus (ADR-018).
 # Model: action default (sonnet). Required secrets: GEMINI_SA_EMAIL,
@@ -19,9 +16,8 @@ name: Weekly Direct-Fix Digest (retired path)
 
 on:
   workflow_dispatch: {}
-  # schedule disabled 2026-09-05 — weekly-direct-fix-digest.yml owns the cron.
-  # schedule:
-  #   - cron: "0 9 * * 1" # Mondays 09:00 UTC — lands after the Monday evals run (08:00)
+  schedule:
+    - cron: "0 9 * * 1" # Mondays 09:00 UTC — lands after the Monday evals run (08:00)
 
 permissions:
   contents: read
