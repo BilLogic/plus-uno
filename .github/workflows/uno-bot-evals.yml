@@ -14,8 +14,11 @@ name: uno-bot — evals (R-scenarios vs live Worker)
 
 on:
   workflow_dispatch: {}
-  schedule:
-    - cron: "0 8 * * 1" # Mondays 08:00 UTC — weekly drift check
+  # Weekly drift check — PAUSED 2026-09-04 (Bill). The harness it would measure
+  # is known-stale until BilLogic/plus-uno#412 lands, so a Monday run scores the
+  # staleness, not the bot. Restore the two lines below when #412 merges:
+  #   schedule:
+  #     - cron: "0 8 * * 1" # Mondays 08:00 UTC
 
 jobs:
   evals:
@@ -35,10 +38,10 @@ jobs:
           GEMINI_SA_EMAIL: ${{ secrets.GEMINI_SA_EMAIL }}
           GEMINI_SA_PRIVATE_KEY: ${{ secrets.GEMINI_SA_PRIVATE_KEY }}
           GEMINI_PROJECT_ID: "hcii-plus"
-          # Judge on the same model the bot runs (gemini-3.6-flash) so evals
-          # test what actually serves. Was bridged to gemini-2.5-pro during the
-          # 2026-07-16 flash-quota incident; restored 2026-07-17 with the bot.
-          JUDGE_MODEL: "gemini-3.6-flash"
+                    # Judge on the grind model, one tier above the bot. Same-model judging shares
+          # the bot's blind spots (self-preference); a judge should be at least as
+          # strong as what it grades. Decided 2026-09-04.
+          JUDGE_MODEL: "gemini-3.1-pro-preview"
         run: node agents/uno-bot/scripts/run-evals.mjs
       - name: Upload transcripts
         if: always()

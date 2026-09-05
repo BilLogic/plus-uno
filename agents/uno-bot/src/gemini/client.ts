@@ -146,7 +146,7 @@ export async function geminiGenerate(
   },
 ): Promise<GeminiResult> {
   const started = Date.now();
-  const model = opts.model ?? env.GEMINI_MODEL ?? "gemini-3.6-flash";
+  const model = opts.model ?? env.GEMINI_MODEL ?? "gemini-3.8-flash";
   if (!geminiConfigured(env)) {
     return { ok: false, model, error: "no Gemini credential configured", ms: 0 };
   }
