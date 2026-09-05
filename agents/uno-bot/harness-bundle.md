@@ -15,31 +15,31 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **167,537 chars from 21 files**, against an assembled budget of 170,000 (2,463 to spare), and a floor of 131,072 plus a 4,000 margin (32,465 above it). The floor is the Gemini lane's explicit-cache minimum; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **167,626 chars from 21 files**, against an assembled budget of 170,000 (2,374 to spare), and a floor of 131,072 plus a 4,000 margin (32,554 above it). The floor is the Gemini lane's explicit-cache minimum; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,246 (−7,631 ide-only) | 9,246 | — |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 8,300 | 17,574 | — |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,409 | 44,024 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 54,280 | — |
-| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 58,599 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 67,971 | — |
-| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,584 | 74,600 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 80,786 | — |
-| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 85,948 | 7,000 (Worker face) |
-| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 90,159 | — |
-| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,144 | 93,347 | 7,000 (Worker face) |
-| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 99,261 | — |
-| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 103,691 | 7,000 (Worker face) |
-| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 109,636 | — |
-| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 114,257 | 7,000 (Worker face) |
-| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 116,228 | — |
-| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 129,191 | — |
-| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,708 | 142,941 | — |
-| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 12,537 (−4,500 ide-only) | 155,544 | — |
-| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,312 (−1,219 ide-only) | 159,910 | — |
-| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 167,537 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,260 (−6,727 ide-only) | 9,260 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 8,288 | 17,576 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,496 | 44,113 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 | 54,369 | — |
+| 5 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 4,275 | 58,688 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 9,313 | 68,060 | — |
+| 7 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,584 | 74,689 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 | 80,875 | — |
+| 9 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 5,119 | 86,037 | 7,000 (Worker face) |
+| 10 | skills | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 | 90,248 | — |
+| 11 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 3,144 | 93,436 | 7,000 (Worker face) |
+| 12 | skills | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 | 99,350 | — |
+| 13 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 4,388 | 103,780 | 7,000 (Worker face) |
+| 14 | skills | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 | 109,725 | — |
+| 15 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 4,575 | 114,346 | 7,000 (Worker face) |
+| 16 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 116,317 | — |
+| 17 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 129,280 | — |
+| 18 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,708 | 143,030 | — |
+| 19 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 12,537 (−4,500 ide-only) | 155,633 | — |
+| 20 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,312 (−1,219 ide-only) | 159,999 | — |
+| 21 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,579 (−605 ide-only) | 167,626 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -93,7 +93,7 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 | `skills/uno-prototype` | PRD → prototype, fidelity-routed (low / mid / high / coded); hand-craft bypasses the skill and re-joins at review; **PRD required at entry** — no PRD → `skills/uno-synthesize` first (hook-enforced where a hook runtime exists; the sequence itself binds every runtime) | researchers/explorer · writers/blueprint · reviewers/ds-lens · writers/figma |
 | `skills/uno-publish` | share-out bundle · handoff rail + Handoff Spec · marketplace entry | writers/notion · writers/figma |
 | `skills/uno-review` | DS / UNO / a11y lens review · Design QA at Ready-for-QA | reviewers/* (except auditor — uno-maintain's) |
-| `skills/uno-maintain` | intake · Tier 1/2 fixes · cross-estate sync · knowledge capture | reviewers/auditor · researchers/source-miner · reviewers/rubric-applier · writers/* |
+| `skills/uno-maintain` | intake · direct fixes · gated changes · cross-estate sync · knowledge capture | reviewers/auditor · researchers/source-miner · reviewers/rubric-applier · writers/* |
 
 Routing: match intent to the Use-when column; if ambiguous, ask which capability is meant. Each skill's `SKILL.md` is the IDE face, `bot.md` the Worker face; both load `references/method.md`. Which content belongs in which of the three — and the guard that holds the split — is `skills/README.md`.
 
@@ -196,7 +196,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **Decisions DB** | centralized decision log under Design HQ — Status / Owner / Sign-off / Date / Roadmap Card / Evidence | "Decision Log" (obsolete per-project subpage) |
 | **pillar** | product area (Universal · Admin · Toolkit · Training · Marketing …) — maps to a Slack channel | "category" |
 | **replica** | the Figma frame mirroring a coded prototype — required in prototype share-outs | "screenshot" |
-| **direct fix / gated change** | the two maintenance severities: a trivial fix applied straight to main with a digest line, vs a PR + PRD through a Slack verdict. Was "Tier 1 / Tier 2 (maintenance)"; the old spelling retires in batches (#429, in batches) | "Tier 1", "Tier 2" |
+| **direct fix / gated change** | the two maintenance severities: a trivial fix applied straight to main with a digest line, vs a PR + PRD through a Slack verdict. Was "Tier 1 / Tier 2 (maintenance)"; the old spelling retires in batches (#429) | "Tier 1", "Tier 2" |
 | **Tier 1 / Tier 2 / Tier 3** | the loading tiers: always-loaded · on demand · retrieved live (`AGENTS.md` § The loading contract). *Tier* means loading and nothing else | "Tier" for a maintenance severity |
 | **RM-ID** | Roadmap card id (`RM-<n>`) — the Figma↔Notion join key | — |
 | **embodiment** | a runtime uno runs in — the IDE, the uno-bot Worker, headless GitHub Actions — each with its own powers and its own slice of the harness; `embodiment:` frontmatter says which docs a runtime bundles | "mode", "environment" |
@@ -351,7 +351,7 @@ The ✅-gated tools of the gate list (§ Tool routing) — zero irreversible act
 
 ## Run setup (two provider lanes)
 
-Two provider lanes run the SAME local tool roster (no hosted MCP): **Gemini** (default) has web grounding built in; **Vertex-Claude** runs every real ask on `sonnet` with extended thinking, "think hard" on `opus`, confirm/cancels on a fast path, web search available.
+Two provider lanes run the SAME local tool roster (no hosted MCP): **Gemini** (default) has web grounding built in; **Vertex-Claude** has web search. On either lane a turn runs at one of three tiers — chill · default · grind — chosen by the router: "think harder" reaches grind, a short reply to a pending proposal runs chill, everything else is default.
 
 Either lane: you are the orchestrator — reason and synthesize yourself. Caps: 16 iterations / 16384 output tokens (thinking shares it); one telemetry line per request.
 

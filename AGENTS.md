@@ -40,7 +40,7 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 | `skills/uno-prototype` | PRD → prototype, fidelity-routed (low / mid / high / coded); hand-craft bypasses the skill and re-joins at review; **PRD required at entry** — no PRD → `skills/uno-synthesize` first (hook-enforced where a hook runtime exists; the sequence itself binds every runtime) | researchers/explorer · writers/blueprint · reviewers/ds-lens · writers/figma |
 | `skills/uno-publish` | share-out bundle · handoff rail + Handoff Spec · marketplace entry | writers/notion · writers/figma |
 | `skills/uno-review` | DS / UNO / a11y lens review · Design QA at Ready-for-QA | reviewers/* (except auditor — uno-maintain's) |
-| `skills/uno-maintain` | intake · Tier 1/2 fixes · cross-estate sync · knowledge capture | reviewers/auditor · researchers/source-miner · reviewers/rubric-applier · writers/* |
+| `skills/uno-maintain` | intake · direct fixes · gated changes · cross-estate sync · knowledge capture | reviewers/auditor · researchers/source-miner · reviewers/rubric-applier · writers/* |
 
 Routing: match intent to the Use-when column; if ambiguous, ask which capability is meant. Each skill's `SKILL.md` is the IDE face, `bot.md` the Worker face; both load `references/method.md`. Which content belongs in which of the three — and the guard that holds the split — is `skills/README.md`.
 
@@ -67,7 +67,7 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 <!-- ide-only -->
 **Tier 2 — loaded on demand.** Two or three documents per task. § Progressive loading is the trigger table; beyond it: a skill loads its own `SKILL.md` + `references/method.md` on invocation and its `references/*.md` as linked; an agent loads its `agents/<kind>/<name>.md` plus the conventions it names.
 
-**Bundle mechanics (uno-bot).** The bundler assembles the prompt from frontmatter, globbing four sections in order — constitution · persona · skills · conventions — sorting members by path, with a skill's `references/method.md` before its `bot.md` by rule. A doc under a section root with no `embodiment` fails the build. The result is baked into `agents/uno-bot/src/generated/harness.ts` and served as one prompt-cached block. Budgets in chars, because these files have paragraph-length lines: `AGENT.md` ≤28k, each `bot.md` ≤7k, the assembled bundle ≤170k. The assembled bundle also keeps a **floor** (131,072 chars, provisional until measured against the Gemini lane's explicit-cache minimum — #418), because a bundle cut under that minimum ships uncached at full price with no error. The bundler asserts all four on the bundled body (frontmatter stripped, so it costs nothing), so `npm --prefix agents/uno-bot run check:harness-bundle` fails the build on an overrun or a shortfall and names the file, the bound and the distance. (It is also composed into `npm run check:harness`, which is the one to reach for from the repo root.)
+**Bundle mechanics (uno-bot).** Sections, order, `ide-only` stripping and the four char budgets — persona, each `bot.md`, the assembled ceiling and its floor — are decided in one place, the header of `agents/uno-bot/scripts/bundle-harness.mjs`. `npm run check:harness` fails the build on a stale bundle, an overrun or a shortfall, and names the file and the distance.
 
 **GitHub Actions.** `scripts/lib/skill-loader.js` loads `scripts/prompts/*` with meta-stripping; offline, which is fine because conventions are repo-canonical.
 <!-- /ide-only -->
@@ -159,9 +159,7 @@ See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
-Single-context. `docs/adr/` is the live half; there is no root `CONTEXT.md` and
-that is not a finding — `/domain-modeling` creates both lazily, and
-`docs/agents/domain.md` tells a skill to proceed silently when they are absent.
-`docs/adr/026-spacing-tokens-grouped-over-flat.md` is the one it has written so
-far. See `docs/agents/domain.md`.
+Single-context. `CONTEXT.md` at the root is the glossary (`npm run check:glossary`
+keeps it glossary-only); `docs/adr/` holds the decisions, indexed by
+`docs/adr/overview.md`. See `docs/agents/domain.md`.
 <!-- /ide-only -->
