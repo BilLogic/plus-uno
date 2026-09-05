@@ -43,12 +43,16 @@ test("every scope tells the model to look elsewhere on a miss", () => {
 // The bot repeated it at a user whose future path was sitting in the data.
 test("the blueprint scope names the future-state carve-out, not a today-only axiom", () => {
   const { instruction } = SCOPES.blueprint;
-  // Both labels, and both readings of them: `Planned` and `Prototype` differ in
-  // confidence, so naming only one would leave the other reported at the wrong
-  // one. (Superseded the single `Future (roadmap)` name on 2026-08-17.)
-  assert.match(instruction, /`Planned:`/);
-  assert.match(instruction, /`Prototype:`/);
-  assert.match(instruction, /may never ship/);
+  // The carve-out is spelled in `status`, not in a path-name prefix: the
+  // `Planned:` / `Prototype:` convention was removed on 2026-08-21, and the
+  // hint named it until #443. Both decided readings, and their confidence:
+  // `planned` and `proposed` differ in it, so naming only one would leave the
+  // other reported at the wrong one.
+  assert.match(instruction, /`status`/);
+  assert.match(instruction, /only `live` describes/);
+  assert.match(instruction, /`planned` is decided and scheduled/);
+  assert.match(instruction, /`proposed` is exploratory/);
+  assert.doesNotMatch(instruction, /Planned:|Prototype:/);
   // The retired axiom, verbatim: an unqualified "it is" with nothing after
   // TODAY but a full stop. "most of it is …, but" is the fix, not the bug.
   assert.doesNotMatch(instruction, /blueprint — it is the record of how the service works TODAY\./);

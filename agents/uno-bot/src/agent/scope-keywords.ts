@@ -42,10 +42,11 @@ export const SCOPES: Record<ScopeName, Scope> = {
     name: "blueprint",
     label: "service blueprint",
     instruction:
-      `Start in the service blueprint — most of it is the record of how the service works TODAY, ` +
-      `but paths whose name starts \`Planned:\` (decided, scheduled, unshipped) or \`Prototype:\` ` +
-      `(exploratory, may never ship) carry future state. Report those as future, never as today, ` +
-      `and never say a scenario has no future state without searching that scenario for one. ` +
+      `Start in the service blueprint — every path and cell there carries a \`status\`, and only ` +
+      `\`live\` describes how the service works TODAY: \`planned\` is decided and scheduled (say ` +
+      `"is changing"), \`proposed\` is exploratory (say "might change"), and the rest are not the ` +
+      `live route or are fading. Report every non-live row as future or as fading, and check a ` +
+      `scenario for paths and cells whose \`status\` is not \`live\` before saying it has no future state. ` +
       `Use search_blueprint first and answer from what it holds. ${NOT_THERE}`,
   },
   ds: {

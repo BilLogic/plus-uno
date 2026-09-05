@@ -49,10 +49,11 @@ export interface BlueprintIndex {
    *  fixed figure anywhere in this repo: the board is edited daily, and every
    *  hardcoded count written down so far has been wrong within the week. */
   scale: string;
-  /** Explains the `[Planned]` / `[Prototype]` markers. */
+  /** Explains the status markers — `[proposed]`, `[planned]`, … — each
+   *  scenario carries; INDEX_LEGEND, verbatim. */
   legend: string;
   /** One compact line per phase, e.g.
-   *  `Application: Discovery(1), Interview & Offer(2)[Prototype]`. */
+   *  `Application: Discovery(1), Interview & Offer(2)[proposed]`. */
   phases: string[];
   /** ISO date the index was read. */
   readAt: string;

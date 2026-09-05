@@ -35,6 +35,15 @@
 // from `.test-build/` where a relative import cannot reach the repo root. The
 // same two sweeps run over them, sentence-scoped with the same exemption.
 //
+// THE FOURTH SUBJECT IS THE RUNTIME NOTES (#443). A tool RESULT carries prose
+// too — the conflict note and index note `search_blueprint` attaches, the
+// scope hint `blueprint:` prepends, the index legend — and none of it is in
+// the bundle or the tool schemas. So the prompt was swept clean of the
+// `Planned:` convention on 2026-09-01 while every result still taught it.
+// Those strings are exported from pure modules (blueprint-search-notes.ts,
+// scope-keywords.ts, blueprint-index.ts) and swept here by name, with the
+// same two sweeps and the same exemption.
+//
 // THE SCHEMA IS IN THE PROMPT NOW (#412). docs/connectors/supabase/blueprint.md
 // is the blueprint's own account, vendored from plus-uno-blueprint, and its
 // `generated:schema` region is the live catalog rendered table by table. Two
@@ -60,6 +69,9 @@ import {
   RETIRED_CONVENTIONS,
   WIRE_NAMES,
 } from "../src/integrations/blueprint-schema";
+import { SEARCH_NOTES } from "../src/tools/blueprint-search-notes";
+import { SCOPES } from "../src/agent/scope-keywords";
+import { INDEX_LEGEND } from "../src/integrations/blueprint-index";
 
 const REPO = resolve(process.cwd(), "..", "..");
 const BOT = resolve(REPO, "agents", "uno-bot");
@@ -219,6 +231,23 @@ function conventionOffenders(text: string, source: string): string[] {
   return found;
 }
 
+/** The runtime note strings, by where they are exported from — the fourth
+ *  subject. Listed by module so a finding names the constant to fix. */
+function runtimeNotes(): Array<[string, string]> {
+  return [
+    ...SEARCH_NOTES.map(([name, text]): [string, string] => [`blueprint-search-notes.ts#${name}`, text]),
+    ["scope-keywords.ts#SCOPES.blueprint", SCOPES.blueprint.instruction],
+    ["blueprint-index.ts#INDEX_LEGEND", INDEX_LEGEND],
+  ];
+}
+
+/** Both sweeps over a set of named strings — the runtime-note subject. */
+function sweepNotes(notes: Array<[string, string]>): string[] {
+  const found: string[] = [];
+  for (const [source, text] of notes) found.push(...offenders(text, source), ...conventionOffenders(text, source));
+  return found;
+}
+
 /** Both sweeps over every prompt doc under `root` — the Actions subject. */
 function sweepPromptDocs(root: string, rels: string[]): string[] {
   const found: string[] = [];
@@ -289,6 +318,30 @@ test("a correction in an Actions prompt is not an offender", async () => {
   const root = mkdtempSync(join(tmpdir(), "actions-names-"));
   writeFileSync(join(root, "SKILL.md"), "`path_type` was removed on 2026-08-20; read `status`.\n");
   assert.deepEqual(sweepPromptDocs(root, walkPromptDocs(root)), []);
+});
+
+test("the runtime notes name no retired identifier and keep no removed convention", () => {
+  const notes = runtimeNotes();
+  assert.ok(notes.length >= 5, "the note roster is the subject; an empty one sweeps nothing");
+  for (const [, text] of notes) assert.ok(text.trim(), "an empty note is a broken export, not a clean one");
+  assert.deepEqual(sweepNotes(notes), []);
+});
+
+test("MUTATION: a runtime note carrying a retired convention fails the sweep", () => {
+  // Through the same sweep the real roster goes through, with the real
+  // conflict note beside the plant: the point is that the sweep reaches a
+  // note-shaped string — one line, no paragraphs — not only a markdown doc.
+  const planted: Array<[string, string]> = [
+    ...runtimeNotes(),
+    [
+      "planted#CONFLICT_NOTE",
+      "These rows are the CURRENT journey unless the `path` name starts `Planned:` — report those as future. Read `path_type` to tell.",
+    ],
+  ];
+  assert.deepEqual(sweepNotes(planted), [
+    "planted#CONFLICT_NOTE:1 names `path_type`",
+    'planted#CONFLICT_NOTE:1 still instructs on "`Planned:`" — use status = \'planned\'',
+  ]);
 });
 
 test("a wire name is not condemned as a retired column", () => {
