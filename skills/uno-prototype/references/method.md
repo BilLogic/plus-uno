@@ -134,7 +134,18 @@ most one regeneration.
 **Missing context → ask, never invent.** If the grounded brief lacks what the
 artifact needs — screen states (empty/error/loading), an ambiguous interaction,
 a missing Figma target or frame intent, unclear DS expectations — surface it
-before you act on the brief. "Act" means whichever move your face makes next:
+before you act on the brief.
+
+That list is one pass, and it reads a screen at a time. **Run a second pass over
+the edges between actors, which is the one that gets skipped:** wherever one
+actor's action has to become visible to another, the brief names what carries it
+— a queue somebody watches, a session somebody cancels, a shelf somebody shares;
+how does the other side learn? And wherever two actors can act on the same thing
+at the same moment, the brief names which one wins. A brief can look complete
+screen by screen and settle neither, because both live between the screens
+rather than in one. The mechanism that suggests itself — a badge, a toast, an
+email, a confirmation step — is the invention, so each silence is an open
+decision. "Act" means whichever move your face makes next:
 building, writing the spec, or staging a proposal. Proposing as though the
 brief were complete is the same defect as building on an invented behavior —
 a PRD existing is not the same as a PRD being complete. Name the gaps in the
