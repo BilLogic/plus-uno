@@ -174,6 +174,12 @@ const COMPOSED = [
       'the contract of the maintenance-severity rename (#429): "Tier 1 / Tier 2" for a FIX stays retired across every hand-authored doc an agent reads — the constitution, glossary, agents/, skills/, docs/, the DS guidelines, the headless prompts and the workflows — because *Tier* now means the loading tiers and a maintenance "Tier 1" reads as always-loaded. Each shape is anchored on a severity noun (fix, digest, whitelist, pipeline, "suggested tier", the old file names), so the loading uses match nothing. History (docs/plans/, todos/), ADRs, the archive and generated artifacts are left as written by rule; the glossary row that names the old spelling in its Do NOT use cell is the one exemption.',
   },
   {
+    script: 'check:cross-repo',
+    pkg: 'root',
+    guards:
+      "one meaning stated in TWO REPOSITORIES. The same rename map, in the same shape, sat in plus-uno-blueprint's glossary and in agentic-service-blueprinting's; nothing compared them and they drifted until each was deleted by its own ticket. This sweep compares the three repos' harness documents by SHINGLE — 12 consecutive normalised words, findings merged into runs of 30+ — because paragraph equality is defeated by one edited table cell and would have found ONE shared block across both of those glossaries, which shared 771 words. It reaches the blueprint the way sync-blueprint-contract.mjs does ($BLUEPRINT_REPO or a sibling checkout) and sb through the pinned development dependency this repo now holds the way the blueprint holds it. A vendored document is exempt by the marker its sync writes; three docs/agents/ files a shared plugin installs are exempt by name; two document pairs already duplicated are RECORDED with a ceiling their shared words may fall below and never rise above, and every exemption fails when it goes stale. WITH A SIBLING MISSING IT SKIPS LOUDLY rather than silently — it names the pairings it did not compare, on stdout and, on CI, as a ::warning:: and a job-summary line, because check:contract spent months exiting 0 on a missing checkout while a header called it a gate (#258).",
+  },
+  {
     script: 'check:button-contrast',
     pkg: 'root',
     guards:
