@@ -38,6 +38,10 @@ const ALLOWED = new Map([
   ["@cloudflare/workers-types", "the Worker runtime's ambient types. Loaded through tsconfig's `types`, which names it there rather than importing it."],
   ["@types/node", "ambient Node types for the Worker's build scripts. Same shape: a tsconfig entry, never an import."],
   ["@vitest/coverage-v8", "vitest loads it by convention when --coverage is passed; there is no import site."],
+  [
+    "agentic-service-blueprinting",
+    "the sb method repo, pinned as a development dependency the way plus-uno-blueprint pins it (#425). `check:cross-repo` reads its harness DOCUMENTS off disk in node_modules rather than importing a module, so there is no specifier to find — the package IS the corpus. Removing it does not break a build; it silently narrows a sweep to two repos, which is why it is declared here rather than left to a checkout somebody may or may not have.",
+  ],
   ["@popperjs/core", "Bootstrap's positioning engine. A peer dependency of the dropdown/tooltip JS, pulled in at runtime rather than imported here."],
   [
     "@storybook/builder-vite",

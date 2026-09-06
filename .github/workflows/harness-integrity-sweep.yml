@@ -83,6 +83,53 @@ jobs:
           npm run check:skill-overlap
           npm run test:scripts
 
+      # THE ONE PLACE THE CROSS-REPO SWEEP ACTUALLY COMPARES ANYTHING (#425).
+      #
+      # `check:cross-repo` is composed into `check:harness`, so it runs on every
+      # PR — but that job installs no root dependencies by design, and clones no
+      # siblings, so on a PR runner it reaches only this repo and says so loudly
+      # (`::warning::` + a job-summary line) rather than reporting a pass it did
+      # not earn. That is the right trade there: a gate that can go red because
+      # another repository's `main` moved is a gate somebody marks not-required
+      # the first busy week, which is the failure `check-harness.yml`'s header is
+      # entirely about. It would be the wrong trade as the LAST word, though: a
+      # check that never compares anywhere is `check:contract` before #258 —
+      # believed, and empty.
+      #
+      # So the comparison lives here, on the monthly backstop, where a finding
+      # becomes a `harness-intake` issue instead of a blocked pull request. Both
+      # siblings are public, so a plain checkout needs no token.
+      #
+      # `.sibling-repos/` is dot-prefixed on purpose: every sweep's walk skips
+      # dot-directories, so the clones cannot be read as part of this repo.
+      #
+      # `continue-on-error` because a clone that fails must degrade to the loud
+      # skip the script already knows how to print, never take the month's sweep
+      # down with it.
+      - name: The sb pin, read from package.json so it has one home
+        id: sb-pin
+        run: node -p "'ref=' + require('./package.json').devDependencies['agentic-service-blueprinting'].split('#')[1]" >> "$GITHUB_OUTPUT"
+      - name: Check out plus-uno-blueprint beside this repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+        continue-on-error: true
+        with:
+          repository: BilLogic/plus-uno-blueprint
+          path: .sibling-repos/plus-uno-blueprint
+          persist-credentials: false
+      - name: Check out agentic-service-blueprinting at the pinned tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+        continue-on-error: true
+        with:
+          repository: BilLogic/agentic-service-blueprinting
+          ref: ${{ steps.sb-pin.outputs.ref }}
+          path: .sibling-repos/agentic-service-blueprinting
+          persist-credentials: false
+      - name: Cross-repo duplicate sweep (the comparison, for real)
+        env:
+          BLUEPRINT_REPO: .sibling-repos/plus-uno-blueprint
+          SB_REPO: .sibling-repos/agentic-service-blueprinting
+        run: npm run check:cross-repo
+
       - name: Ensure intake labels exist
         env:
           GH_TOKEN: ${{ github.token }}
