@@ -7,15 +7,15 @@ authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [AiLabel](AiLabel/index.md) | 7 | ✅ | ✕ | ✅ |
+| [AiLabel](AiLabel/index.md) | 9 | ✅ | ✕ | ✅ |
 | [Badge](Badge/index.md) | 11 | ✅ | ✕ | ✅ |
-| [BadgeVariants](BadgeVariants.md) | 10 | ✕ | ✕ | ✕ |
+| [BadgeVariants](BadgeVariants.md) | 15 | ✅ | ✕ | ✅ |
 | [Progress](Progress/index.md) | 11 | ✅ | ✕ | ✅ |
 | [Spinner](Spinner/index.md) | 4 | ✅ | ✕ | ✅ |
-| [Tag](Tag/index.md) | 10 | ✅ | ✕ | ✅ |
+| [Tag](Tag/index.md) | 16 | ✅ | ✕ | ✅ |
 | [TagGroup](TagGroup/index.md) | 8 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 6/7 (86%) · Correct/incorrect 0/7 (0%) · Accessibility 6/7 (86%)
+**Authored coverage:** When to use 7/7 (100%) · Correct/incorrect 0/7 (0%) · Accessibility 7/7 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

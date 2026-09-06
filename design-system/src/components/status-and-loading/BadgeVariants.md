@@ -7,7 +7,9 @@
 
 **Source:** `design-system/src/components/status-and-loading/BadgeVariants.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/BadgeVariants.stories.jsx` — Appearances, Density, Counters, CounterFormatting, TrailingMetric, TrailingMetricIsGatedToStatus, DateAndCustom, Truncation, WithIcon, CustomStaysReadable
+**Stories:** `design-system/src/components/status-and-loading/BadgeVariants.stories.jsx` — Appearances, Density, Counters, CounterFormatting, TrailingMetric, TrailingMetricIsGatedToStatus, DateAndCustom, Truncation, WithIcon, CustomStaysReadable, Interactive
+
+**Storybook page:** `design-system/src/components/status-and-loading/BadgeVariants.mdx`
 
 ## Props
 
@@ -15,14 +17,25 @@
 |------|------|---------|-------------|
 | `variant` | oneOf | `'status'` | What kind of system-generated value this is. |
 | `appearance` | oneOf | `'neutral'` | `status` only: one of the closed set of five. Ignored on `custom`. |
+| `spacing` | enum | `'default'` | `status` and `date` only. Padding, never type. |
 | `children` | node | — | — |
 | `text` | string or number | — | — |
+| `color` | string | — | `custom` only: the escape hatch, a non-semantic colour. |
 | `textColor` | string | — | `custom` only: overrides the foreground derived from `color`. |
+| `iconBefore` | node | — | A glyph, for where colour alone cannot carry the state. |
 | `trailingMetric` | string or number | — | `status` only: a count attached to the state — "In progress · 12". |
 | `max` | number | — | `counter` only: the cap. 1204 with max 99 reads `99+`. |
+| `maxWidth` | number or string | — | Caps the badge and truncates, keeping the full text in `title`. |
 | `isBold` | bool | `false` | — |
+| `label` | string | — | An accessible name. Required in practice for a dot, which has no text. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |
+
+## Variants
+
+**`spacing`** — `default` · `spacious`
+
+Anything not listed is not a valid value.
 
 ## Tokens touched
 
@@ -34,8 +47,6 @@ From `design-system/src/components/status-and-loading/BadgeVariants.scss`. Overr
 
 Same group: `AiLabel` · `Badge` · `Progress` · `Spinner` · `Tag` · `TagGroup`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `BadgeVariants` is the right call, only what it accepts.
+> Authored guidance is partial — missing: correct/incorrect (#166).

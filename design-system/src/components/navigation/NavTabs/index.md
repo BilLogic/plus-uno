@@ -18,6 +18,7 @@
 | `children` | node | — | — |
 | `alignment` | enum | `'left'` | Horizontal alignment of nav items |
 | `className` | string | `''` | — |
+| `mode` | enum | `'navigation'` | `navigation` renders anchors and no tab semantics — the default, and what existing callers get. `tabs` renders a `role="tablist"` of buttons with `aria-selected`, roving tabindex and arrow keys. A dropdown is not a tab, so the dropdown preset only applies in navigation mode. |
 | `defaultActiveKey` | any | — | — |
 | `activeKey` | any | — | — |
 | `onSelect` | func | — | — |
@@ -25,6 +26,8 @@
 ## Variants
 
 **`alignment`** — `left` · `center` · `right` · `justified`
+
+**`mode`** — `navigation` · `tabs`
 
 Anything not listed is not a valid value.
 

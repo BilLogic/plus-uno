@@ -294,6 +294,51 @@ test('an enum named by a constant is read, not skipped — the #276 blind spot',
   assert.ok(props.get('color').includes('magenta'));
 });
 
+test('a comma inside a prop\'s JSDoc does not delete the prop', () => {
+  // THE DEFECT, in its smallest form. The entry scan splits at depth-0 commas,
+  // and a comment opens no bracket — so the comma in this prose was read as an
+  // entry separator. Neither half survived: the first has an unterminated
+  // `/**` and no `name:`, the second starts mid-sentence, so both failed the
+  // `^propName:` match and were dropped. `swatchBefore` then did not exist as
+  // far as this gate was concerned, and a docs page naming it in backticks was
+  // being checked against a list it had been silently removed from.
+  const source = [
+    'Tag.propTypes = {',
+    "  /** The label (alternative to children). */",
+    '  text: PropTypes.string,',
+    "  /** A colour square, for a tag acting as a chart legend entry. */",
+    '  swatchBefore: PropTypes.string,',
+    "  /** `selectable` only: the toggle's state, published as `aria-pressed`. */",
+    '  isSelected: PropTypes.bool,',
+    '};',
+  ].join('\n');
+
+  const names = parsePropTypes(source, 'Tag').map((p) => p.name);
+  assert.deepEqual(names, ['text', 'swatchBefore', 'isSelected']);
+});
+
+test('the commented props of the real Tag and BadgeVariants all survive', () => {
+  // The same defect measured on the corpus rather than a fixture: 11 of the 17
+  // props it dropped repo-wide were on #276's own two components, because they
+  // are the most heavily commented in the tree. A fixture proves the scan; this
+  // proves the files people actually read.
+  const read = (p) => fs.readFileSync(path.join(REPO_ROOT, p), 'utf8');
+
+  const tag = parsePropTypes(
+    read('design-system/src/components/status-and-loading/Tag/Tag.jsx'), 'Tag',
+  ).map((p) => p.name);
+  for (const name of ['elemBefore', 'swatchBefore', 'maxWidth', 'href', 'isSelected', 'onClick']) {
+    assert.ok(tag.includes(name), `Tag.${name} was dropped`);
+  }
+
+  const badge = parsePropTypes(
+    read('design-system/src/components/status-and-loading/BadgeVariants.jsx'), 'BadgeVariants',
+  ).map((p) => p.name);
+  for (const name of ['spacing', 'color', 'iconBefore', 'maxWidth', 'label']) {
+    assert.ok(badge.includes(name), `BadgeVariants.${name} was dropped`);
+  }
+});
+
 test('a constant declared in another module stays unresolved rather than empty', () => {
   // `null` means "not checked", which is what it was before. An empty array
   // would mean "no legal value", and would fail every correct page on the four

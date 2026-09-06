@@ -1,0 +1,248 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as BadgeVariantsStories from './BadgeVariants.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={BadgeVariantsStories} />
+
+<Title />
+A tag is a representation of a value that someone has picked; to show
+system-generated data that people can't change, use a badge instead. This is
+the badge — the system-generated half, where the value arrived without anyone
+choosing it and nobody on the screen can change it.
+
+<DocsTabs of={BadgeVariantsStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/BadgeVariants.jsx"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>The five appearances of the <code>status</code> variant. The set is closed, which is what makes the same state look the same on every screen.</>}>
+    <Canvas of={BadgeVariantsStories.Appearances} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Density
+
+<DocsCanvasShell description={<>Padding moves; type never does. <code>spacious</code> when the badge is a subject of the page, <code>default</code> when it is metadata about a row.</>}>
+    <DsCanvasQuiet of={BadgeVariantsStories.Density} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Counters
+
+<DocsCanvasShell description={<>A number, capped by <code>max</code> so four digits cannot push a table column open. A counter with nothing to say is the dot.</>}>
+    <DsCanvasQuiet of={BadgeVariantsStories.Counters} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A value that is not a number is left alone rather than printed as <code>NaN</code>.</>}>
+    <DsCanvasQuiet of={BadgeVariantsStories.CounterFormatting} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Trailing metric
+
+<DocsCanvasShell description={<>"In progress · 12" is one call. The badge composes itself — a counter badge inside a status badge, bold so the count reads against a ground that is already tinted.</>}>
+    <DsCanvasQuiet of={BadgeVariantsStories.TrailingMetric} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>It is gated to <code>status</code>. A count inside a counter is a counter inside a counter, so nothing renders.</>}>
+    <DsCanvasQuiet of={BadgeVariantsStories.TrailingMetricIsGatedToStatus} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>A date, and the <code>custom</code> escape hatch — the one place a colour that means nothing is allowed in.</>}>
+    <DsCanvasQuiet of={BadgeVariantsStories.DateAndCustom} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A glyph, for the case colour alone cannot carry. It is decoration; the word carries the meaning.</>}>
+    <DsCanvasQuiet of={BadgeVariantsStories.WithIcon} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Truncation
+
+<DocsCanvasShell description={<>A capped badge keeps its full text in <code>title</code>, because a CSS ellipsis on its own deletes the status for anyone not looking at the pixels.</>}>
+    <DsCanvasQuiet of={BadgeVariantsStories.Truncation} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<DocsCanvasShell description={<>The escape hatch cannot be made unreadable: the foreground is derived from the colour it is given rather than inherited.</>}>
+    <DsCanvasQuiet of={BadgeVariantsStories.CustomStaysReadable} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={BadgeVariantsStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Ask who put the value there. If the system produced it and nobody on the screen
+can change it, it is a badge: a session's status, an unread count, a due date,
+a "New" mark on something just published. If a person picked it, it is a `Tag`.
+
+That test is the whole of the decision, and it is deliberately not "is it
+clickable". A read-only tag is still a tag, because the pattern tells the reader
+the selection becomes editable again once the surface does. A badge that a
+person cannot change is a badge whether or not anything can be pressed.
+
+`BadgeVariants` is the API #276 specifies. The older `Badge` still ships and
+still works — see `Badge` for what it keeps and what it is being replaced by.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Colour is a fixed set, and the set is the point.
+
+`appearance` takes five names and no others. The defect this replaces is a badge
+whose colour signalled nothing: with `style="primary"` as the old default a
+reader could not tell whether blue meant "information", "the brand colour", or
+nothing in particular.
+
+```jsx
+// Incorrect — `primary` and `secondary` are brand roles, not states. A reader
+// cannot learn anything from the colour, which is the whole job of a status.
+<Badge style="primary">Complete</Badge>
+<Badge style="secondary">Draft</Badge>
+
+// Correct — a state word on the closed set, so the same state looks the same
+// on every screen.
+<BadgeVariants variant="status" appearance="positive">Complete</BadgeVariants>
+<BadgeVariants variant="status" appearance="neutral">Draft</BadgeVariants>
+```
+
+### There is no `size`, and that is deliberate.
+
+Density changes padding and never type. A `size` prop bound to the type scale —
+which is what `Badge` still has — lets a badge introduce a size nothing else on
+the page shares, so the same status renders differently on different screens and
+can disagree with the text beside it.
+
+```jsx
+// Incorrect — this is not an API this component has, and the reason it does not
+// is that the badge would then be free to disagree with its own row.
+<BadgeVariants variant="status" appearance="positive" size="b3">Complete</BadgeVariants>
+
+// Correct — reach for density when the badge needs more presence, not for type.
+<BadgeVariants variant="status" appearance="positive" spacing="spacious">Complete</BadgeVariants>
+```
+
+### Spacious when the badge is the subject; default when it is metadata.
+
+`spacious` is for a badge beside a heading, in a detail header, in an empty
+state — where the badge is what the region is about. `default` is for table
+cells, list items and inline prose, where the badge describes a row. The prop
+exists on `status` and `date` only; on `counter` it is ignored, because a
+prominent count is not a case that arises.
+
+### `custom` is an escape hatch, not a sixth appearance.
+
+It is the only place a non-semantic colour gets in, and a badge that uses it is
+saying "this colour means nothing". Reach for it for a curriculum domain or a
+brand mark — never to invent a status the closed set does not have.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The dot carries a name.** A counter with nothing to say renders as a
+  circle with no text, which is a coloured shape assistive technology cannot
+  describe. It publishes `role="status"` and takes `label`; a badge *with* text
+  needs no label, because its text is its meaning and a label would override it.
+- **Colour is never the only signal.** Every status badge says its state in
+  words. `positive` and `information` sit 74° apart in hue but within four
+  points on lightness and saturation, so hue carries all the differentiation —
+  and green-versus-teal is the axis that collapses under deuteranopia and
+  protanopia. `iconBefore` is there for where that is not enough.
+- **A leading glyph is decoration and is hidden.** It repeats what the badge
+  already says; announcing it would produce "check, Passed".
+- **A truncated status keeps its full text.** `maxWidth` puts the label in
+  `title`, because an ellipsis alone deletes the value for anyone not looking at
+  the pixels.
+- **`custom` derives its foreground.** An escape-hatch colour with inherited
+  text failed `color-contrast` on its first run — the same "colour signals
+  nothing" defect, arriving through the one door left open — so the foreground
+  is computed from the background rather than inherited.
+- **Contrast is measured, not asserted here.** The a11y ratchet tracks
+  `color-contrast` over every story on this page and may fall but never rise.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a value a person picked rather than one the system produced, use `Tag`.
+- For a set of tags, use `TagGroup` — it owns the gaps and the overflow.
+- For the older API, still shipping and still supported, use `Badge`.
+- For completion or progress rather than a state word, use `Progress`.
+- For a message rather than a label, use `Alert` or `Toast`.
+- For marking what an agent produced, use `AiLabel`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

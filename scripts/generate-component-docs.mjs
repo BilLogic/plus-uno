@@ -124,11 +124,57 @@ function parsePropTypes(source, name) {
   // Split at depth-0 commas, keeping each entry's leading /** ... */ as its
   // description. Splitting on a regex instead dropped 3 of StaticBadgeSmart's
   // 4 props, because a JSDoc comment sits between every pair.
+  //
+  // A COMMENT IS ATOMIC, and that is what `inBlockComment` is for. Without it
+  // this scanner reads the PROSE inside a JSDoc as source: depth is 0 while
+  // scanning a comment, so the comma in "A colour square, for a tag acting as a
+  // chart legend entry" split the entry in two. Neither half survived — the
+  // first has an unterminated `/**` and no `name:`, the second has a stray `*/`
+  // and starts mid-sentence, so both failed the `^propName:` match below and
+  // were dropped by `continue`. The prop then vanished from the generated page
+  // with no error anywhere.
+  //
+  // It was silent because it deleted the DOCUMENTATION rather than the prop:
+  // the component kept working, the table just stopped mentioning a prop it
+  // had. Measured across the repo when this was found: 17 props on 7
+  // components, 11 of them on `Tag` and `BadgeVariants` — the two components
+  // #276 exists to document, whose props are the most heavily commented in the
+  // corpus and so the most exposed to it.
+  //
+  // `//` line comments have the same latent flaw and no component source
+  // exercises it today. Left alone deliberately rather than fixed blind: a fix
+  // for a case with no example is a guess.
+  //
+  // WHERE THIS IS TESTED, since it is not here. This module runs its work in
+  // its body with no `main()` guard, so importing it to unit-test the parser
+  // would run the generator — nothing can import `parsePropTypes` from it. Two
+  // things cover it instead, and both are real:
+  //   1. `scripts/doc-identifiers.mjs` had this defect independently, in its
+  //      own copy of the same scan. That copy IS exported, and
+  //      `check-doc-identifiers.test.mjs` now asserts the comma case directly.
+  //   2. The generated `.md` files are committed and `check:component-docs`
+  //      compares them to a fresh run, so reintroducing this here turns that
+  //      check red on the 7 files whose props would vanish again.
   const entries = [];
   let depth = 0;
   let buf = '';
+  let inBlockComment = false;
   for (let i = 0; i < body.length; i += 1) {
     const ch = body[i];
+    if (inBlockComment) {
+      buf += ch;
+      if (ch === '*' && body[i + 1] === '/') {
+        buf += '/';
+        i += 1;
+        inBlockComment = false;
+      }
+      continue;
+    }
+    if (ch === '/' && body[i + 1] === '*') {
+      inBlockComment = true;
+      buf += ch;
+      continue;
+    }
     if ('([{'.includes(ch)) depth += 1;
     else if (')]}'.includes(ch)) depth -= 1;
     if (ch === ',' && depth === 0) {

@@ -17,6 +17,7 @@
 |------|------|---------|-------------|
 | `id` | string | — | — |
 | `name` | string | — | — |
+| `label` | node | — | The editor's name, rendered above it and pointed at by the region. |
 | `placeholder` | string | — | Placeholder text |
 | `value` | string | — | — |
 | `defaultValue` | string | `''` | — |

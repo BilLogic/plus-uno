@@ -21,6 +21,7 @@ Uses the standard React children pattern for content (matching React Bootstrap c
 | `style` | enum | `'primary'` | Color style variant |
 | `variant` | string | — | React Bootstrap variant (for accessibility attributes) |
 | `title` | string | — | Optional alert title/heading |
+| `children` | node (required) | — | Alert content - supports text, JSX, or React components |
 | `dismissible` | bool | `true` | Whether the alert can be dismissed |
 | `dismissable` | bool | — | Whether the alert can be dismissed |
 | `onDismiss` | func | — | Callback when alert is dismissed |

@@ -12,24 +12,41 @@
  * #276 gives for letting Badge's `discovery` borrow its purple.
  *
  * Measured hues, so the names are not a guess:
- *   blue     relationship        rgb(0, 92, 189)
- *   green    mastering-content   rgb(22, 119, 69)
- *   purple   social-emotional    rgb(127, 63, 177)
- *   magenta  advocacy            rgb(199, 11, 119)
- *   orange   technology-tools    rgb(125, 87, 0)
- *   teal     tertiary            rgb(14, 129, 117)
+ *   blue     technology-tools    #005cbd  rgb(0, 92, 189)
+ *   green    advocacy            #167745  rgb(22, 119, 69)
+ *   purple   mastering-content   #8659a9  rgb(134, 89, 169)
+ *   magenta  relationship        #c70b77  rgb(199, 11, 119)
+ *   orange   social-emotional    #8c6600  rgb(140, 102, 0)
+ *   teal     tertiary            #0e8175  rgb(14, 129, 117)
  *   grey     surface-container   — the default, and the only one that is not a hue
+ *
+ * WHY THIS TABLE MOVED. The hues above were right from the start and the token
+ * names beside them were not: the two columns were transcribed one row out of
+ * step, and the map below followed the token column. So every name but `grey`
+ * and `teal` painted a colour it is not — `blue` rendered `#ffd9e4` (pink),
+ * `green` rendered `#f2daff` (purple), `purple` rendered amber, `magenta`
+ * rendered green, `orange` rendered blue.
+ *
+ * That is #276's own defect, in the component the ticket added to fix it: the
+ * whole argument for plain names over semantic ones is that the reader can
+ * trust what the name says, and a `blue` that paints pink is a colour signalling
+ * nothing. The spec catches it in its own text too — it calls
+ * `mastering-content` "the curriculum palette's purple" when it maps Badge's
+ * `discovery`, while this file was calling the same token `green`.
+ *
+ * Each name now points at the container whose hue matches it, which is exactly
+ * the hue column above and so changes no decision — only which token carries it.
  *
  * `grey` is the default deliberately: a tag with no colour chosen must not claim
  * a category it was not given.
  */
 $tag-colors: (
     'grey': (--color-surface-container, --color-on-surface-variant, --color-outline-variant),
-    'blue': (--color-relationship-container, --color-on-relationship-container, --color-relationship),
-    'green': (--color-mastering-content-container, --color-on-mastering-content-container, --color-mastering-content),
-    'purple': (--color-social-emotional-container, --color-on-social-emotional-container, --color-social-emotional),
-    'magenta': (--color-advocacy-container, --color-on-advocacy-container, --color-advocacy),
-    'orange': (--color-technology-tools-container, --color-on-technology-tools-container, --color-technology-tools),
+    'blue': (--color-technology-tools-container, --color-on-technology-tools-container, --color-technology-tools),
+    'green': (--color-advocacy-container, --color-on-advocacy-container, --color-advocacy),
+    'purple': (--color-mastering-content-container, --color-on-mastering-content-container, --color-mastering-content),
+    'magenta': (--color-relationship-container, --color-on-relationship-container, --color-relationship),
+    'orange': (--color-social-emotional-container, --color-on-social-emotional-container, --color-social-emotional),
     'teal': (--color-tertiary-container, --color-on-tertiary-container, --color-tertiary),
 );
 
