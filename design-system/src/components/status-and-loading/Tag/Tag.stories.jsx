@@ -42,6 +42,72 @@ export const Colors = () => (
     </div>
 );
 
+/**
+ * A colour name paints the colour it names.
+ *
+ * WHY THIS ASSERTS SOMETHING SO OBVIOUS. It did not. `Tag` shipped with its
+ * names and its borrowed tokens transcribed one row out of step, so `blue`
+ * painted `#ffd9e4` and `green` painted `#f2daff` — pink and purple. Nothing
+ * caught it: the a11y ratchet only asks whether the text can be read on the
+ * ground, and every one of these pairs is a real token pair with real contrast,
+ * so all seven passed while five of them lied about what they were.
+ *
+ * That is the defect #276 exists to remove, in the component it added to remove
+ * it. The whole case for plain names over `success`/`danger` is that a reader
+ * can trust the name, so a name that paints something else is worse than a
+ * semantic one — it is wrong AND it looks deliberate.
+ *
+ * The assertion is hue, not an exact value, because the exact value is #268's
+ * to change and this must not break when it does. Which channel dominates is
+ * what the NAME claims, and that survives a re-point of the palette.
+ */
+Colors.play = async ({ canvasElement }) => {
+    const tags = [...canvasElement.querySelectorAll('.plus-tag')];
+    await expect(tags).toHaveLength(TAG_COLORS.length);
+
+    const rgb = (el) => getComputedStyle(el).backgroundColor.match(/\d+/g).map(Number);
+
+    // Read the FOREGROUND (`--color-on-<x>-container`) rather than the ground.
+    // Both come from the same token family, so both move together — but every
+    // container is a pale tint sitting near white, which compresses the channel
+    // differences to a few points, while the `on-` pair is a deep version of the
+    // same hue and states it plainly. The border is not an option: it is
+    // `transparent` until the tag is selected.
+    const ink = (el) => getComputedStyle(el).color.match(/\d+/g).map(Number);
+
+    const found = Object.fromEntries(tags.map((t) => [t.textContent.trim(), ink(t)]));
+
+    const [br, bg, bb] = found.blue;
+    await expect(bb).toBeGreaterThan(br);
+    await expect(bb, 'blue must be bluer than it is green').toBeGreaterThan(bg);
+
+    const [gr, gg, gb] = found.green;
+    await expect(gg, 'green must be greener than it is red').toBeGreaterThan(gr);
+    await expect(gg, 'green must be greener than it is blue').toBeGreaterThan(gb);
+
+    const [pr, pg, pb] = found.purple;
+    await expect(pr, 'purple carries red and blue over green').toBeGreaterThan(pg);
+    await expect(pb).toBeGreaterThan(pg);
+
+    const [mr, mg, mb] = found.magenta;
+    await expect(mr, 'magenta is red-dominant').toBeGreaterThan(mg);
+    await expect(mb).toBeGreaterThan(mg);
+
+    const [or_, og, ob] = found.orange;
+    await expect(or_, 'orange runs red > green > blue').toBeGreaterThan(og);
+    await expect(og).toBeGreaterThan(ob);
+
+    const [tr, tg, tb] = found.teal;
+    await expect(tg, 'teal carries green and blue over red').toBeGreaterThan(tr);
+    await expect(tb).toBeGreaterThan(tr);
+
+    // Grey is the one name that is not a hue, and must stay that way: a default
+    // that drifted into a colour would have every uncoloured tag claiming a
+    // category nobody gave it.
+    const [yr, yg, yb] = rgb(canvasElement.querySelector('.plus-tag'));
+    await expect(Math.max(yr, yg, yb) - Math.min(yr, yg, yb)).toBeLessThan(12);
+};
+
 export const Variants = () => (
     <div style={row}>
         <Tag variant="read-only" color="blue">Read only</Tag>

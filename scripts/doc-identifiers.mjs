@@ -480,7 +480,26 @@ export function parsePropTypes(source, symbol) {
           : null,
     });
   };
-  for (const ch of body) {
+  // A COMMENT IS ATOMIC. Depth is 0 while scanning a JSDoc, so without
+  // `inBlockComment` the comma in a prop's PROSE — "`selectable` only: the
+  // toggle's state, published as `aria-pressed`" — splits the entry in two and
+  // `flush` drops both halves, neither having a `name:` to match. The prop then
+  // does not exist as far as this gate is concerned, so a docs page naming it
+  // in backticks is checked against a list it was silently removed from.
+  //
+  // The same defect was in `scripts/generate-component-docs.mjs`, found first
+  // and fixed there; the two parsers were written independently and had it
+  // independently. 17 props on 7 components across the repo, 11 of them on
+  // `Tag` and `BadgeVariants` (#276).
+  let inBlockComment = false;
+  for (let i = 0; i < body.length; i += 1) {
+    const ch = body[i];
+    if (inBlockComment) {
+      buf += ch;
+      if (ch === '*' && body[i + 1] === '/') { buf += '/'; i += 1; inBlockComment = false; }
+      continue;
+    }
+    if (ch === '/' && body[i + 1] === '*') { inBlockComment = true; buf += ch; continue; }
     if ('([{'.includes(ch)) depth += 1;
     else if (')]}'.includes(ch)) depth -= 1;
     if (ch === ',' && depth === 0) { flush(); continue; }

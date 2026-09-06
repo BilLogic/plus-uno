@@ -19,8 +19,14 @@
 | `children` | node | — | The label (takes precedence over `text`). |
 | `variant` | oneOf | `'read-only'` | What kind of tag this is. `read-only` is still a tag — see the note above. |
 | `color` | oneOf | `'grey'` | A category colour. Plain names only: a tag's colour is never a status. |
+| `elemBefore` | node | — | Leading content — an avatar for a person, a logo for an app. |
+| `swatchBefore` | string | — | A colour square, for a tag acting as a chart legend entry. Any CSS colour. |
+| `maxWidth` | number or string | — | Caps the tag and truncates the label, which then carries its full text in `title`. |
+| `href` | string | — | Navigates. Ignored on `selectable` and `operational`, which are already controls. |
 | `linkComponent` | elementType | — | Router link to render instead of `<a>` when `href` is set. |
+| `isSelected` | bool | `false` | `selectable` only: the toggle's state, published as `aria-pressed`. |
 | `isLoading` | bool | `false` | Shows a spinner and stands the tag down as a control. |
+| `onClick` | func | — | Fires on `selectable`, `operational`, and a link. |
 | `onRemove` | func | — | `dismissible` only. On any other variant no remove button renders. |
 | `removeLabel` | string | — | Overrides the remove button's accessible name. Defaults to `Remove <label>`. |
 | `className` | string | `''` | — |

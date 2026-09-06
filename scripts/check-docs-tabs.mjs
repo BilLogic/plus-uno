@@ -292,12 +292,19 @@ function main() {
   );
 
   // The population itself, so a selector that quietly stops matching is loud
-  // rather than green. 51 components + the one named exception — Tag and
-  // TagGroup took it from 48 in #276 and AiLabel added one in #269 — the deliberate edit this number
-  // is here to force.
-  if (tabbed.length !== 52) {
+  // rather than green. 52 components + the one named exception — Tag and
+  // TagGroup took it from 48 in #276, AiLabel added one in #269, and
+  // BadgeVariants added the last of #276's three in this change — the
+  // deliberate edit this number is here to force.
+  //
+  // BadgeVariants is the one component here documented from a FLAT source
+  // (`status-and-loading/BadgeVariants.jsx`, not a directory of its own), which
+  // is the shape `componentIdentity` already recognises and the shape #276
+  // wanted: the new Badge sits BESIDE the old one rather than replacing it, so
+  // both are visible in one group while the deprecation runs.
+  if (tabbed.length !== 53) {
     found.push(
-      `expected 52 tabbed docs pages (51 components + ${TABBED_EXCEPTIONS.length} named ` +
+      `expected 53 tabbed docs pages (52 components + ${TABBED_EXCEPTIONS.length} named ` +
         `exception), found ${tabbed.length}. If a component was added or removed, ` +
         `update this number deliberately.`,
     );

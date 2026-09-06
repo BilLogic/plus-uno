@@ -188,11 +188,34 @@ Static visual identifiers used to categorize or describe elements. They are used
 
 ## When to use
 
-Use `Badge` to label something that is already on screen — a session's status, a
-tutor's competency domain, an unread count beside a nav item. It is a read-only
-mark attached to other content, and it is the second most used component in the
-repo after `Button`, almost always as a status chip inside a table row or a card
-header.
+**In new code, prefer `BadgeVariants` or `Tag`.** #276 split this component in
+two along one rule: *a tag is a representation of a value that someone has
+picked; to show system-generated data that people can't change, use a badge
+instead.* `Badge` does both jobs at once — `counter` is system-generated,
+`dismissible` and `onDismiss` are a value a person picked and can remove — and
+that is what the split undoes.
+
+`Badge` is **deprecated, not removed**, and nothing here has stopped working.
+Every prop it ships still behaves exactly as documented on this page, and the
+182 call sites across 79 files need no change to keep rendering. The deprecation
+is a direction for new code, not a deadline on existing code: the migration
+sweep is explicitly out of scope for #276, and no ticket removes anything from
+this API yet.
+
+Where to go instead:
+
+| This badge | Becomes |
+|---|---|
+| `dismissible` / `onDismiss` | `Tag variant="dismissible"` — a person picked the value |
+| `counter` | `BadgeVariants variant="counter"` |
+| `style` | `BadgeVariants` `appearance`, on the closed set of five |
+| `size` | nothing — `BadgeVariants` has no `size`, by design. Use `spacing` for presence |
+
+Until then, use `Badge` to label something that is already on screen — a
+session's status, a tutor's competency domain, an unread count beside a nav
+item. It is a read-only mark attached to other content, and it is the second
+most used component in the repo after `Button`, almost always as a status chip
+inside a table row or a card header.
 
 Reach for it when the label is a *property* of the row, not an action on it.
 
@@ -278,8 +301,11 @@ that follows it. It is not a width or a height, and two badges at the same
 
 ## Related
 
+- For system-generated data in new code, use `BadgeVariants` — the #276 API this page is deprecated in favour of.
+- For a value a person picked and can remove, use `Tag`; that is what `dismissible` here becomes.
+- For a set of tags, use `TagGroup` — it owns the gaps and the overflow.
 - To act on a status rather than show it, use `Button`.
-- For a list the user builds by adding and removing entries, use `TagInput`; `dismissible` covers removal on a badge that is already there.
+- For a list the user builds by adding and removing entries, use `TagInput`.
 - For completion or progress, use `Progress`.
 - For a message rather than a label, use `Alert` or `Toast`.
 

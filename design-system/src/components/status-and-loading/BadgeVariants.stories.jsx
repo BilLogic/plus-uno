@@ -287,3 +287,24 @@ CustomStaysReadable.play = async ({ canvasElement }) => {
     await expect(readableOn('not-a-colour')).toBeNull();
     await expect(readableOn(undefined)).toBeNull();
 };
+
+/* -------------------------------------------------------------- playground */
+
+/**
+ * Interactive playground.
+ *
+ * `variant` and `appearance` are what gate every other prop, so they are what
+ * the controls open on. `trailingMetric` is deliberately left unset rather than
+ * seeded: it renders on `status` and nowhere else, so a control that silently
+ * stops having an effect the moment you change the variant beside it reads as
+ * the prop being broken rather than as the gate working.
+ */
+export const Interactive = (args) => <BadgeVariants {...args} />;
+
+Interactive.args = {
+    variant: 'status',
+    appearance: 'positive',
+    spacing: 'default',
+    text: 'In progress',
+    isBold: false,
+};
