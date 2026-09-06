@@ -220,12 +220,15 @@ html {
     max-width: none !important;
 }
 
-/* The breakpoint switcher pins itself to `top: 0` of the scroll container. In docs each Story
-   becomes a separate ResponsiveFrame and the docs body scrolls — multiple sticky toolbars would
-   pile on top of each other. Pin them to the start of their frame instead. */
-.sbdocs .responsive-frame-toolbar {
-    position: static !important;
-}
+/*
+ * A `.responsive-frame-toolbar` rule sat here, unpinning a sticky breakpoint switcher so
+ * that several ResponsiveFrames on one docs page would not pile their toolbars on top of
+ * each other. `ResponsiveFrame.jsx` emits `responsive-frame-root`, `-wrapper`, `-inner`
+ * and `-open-btn`, and has no toolbar element at all — so the rule had never once applied
+ * and the pile-up it describes cannot happen. Deleted rather than rewritten: there is no
+ * element to aim a rewrite at. `check:docs-dead-selectors` is what found it, after #251's
+ * hand sweep of this file did not.
+ */
 
 /* ResponsiveFrame: Fullscreen API — fill the physical display */
 .responsive-frame-root:fullscreen,
@@ -239,11 +242,14 @@ html {
     background: var(--color-surface-container, #edeef0);
 }
 
-.responsive-frame-root--browser-fullscreen .responsive-frame-wrapper {
-    flex: 1;
-    min-height: 0;
-    overflow: auto;
-}
+/*
+ * A `.responsive-frame-root--browser-fullscreen` rule sat here, letting the wrapper grow
+ * inside a browser-fullscreen frame. `ResponsiveFrame.jsx` builds its class list from
+ * exactly two modifiers — `--native` and `--standalone` — so `--browser-fullscreen` names
+ * a state the component has never had. The `:fullscreen` rule directly above is the one
+ * that does this job, and it works because it reads the browser's own state rather than a
+ * class nobody writes.
+ */
 
 /* Page layouts in docs: keep the ResponsiveFrame height definite so PageLayout's
    height:100% fills the well (instead of hugging / clipping mid-content). */
@@ -397,7 +403,13 @@ a.sbdocs-a {
   margin-bottom: 0 !important;
 }
 
-.sbdocs .sb-plus-intro-page .sb-plus-intro-mini-grid,
+/*
+ * `.sb-plus-intro-mini-grid` was the other half of both of these selector lists.
+ * #250 named it as 0 uses and #251 swept this file by hand and left it — which is the
+ * whole argument for `check:docs-dead-selectors` existing. `Introduction.mdx` emits
+ * `-mini-canvas`, `-mini-card`, `-mini-copy` and `-mini-title`, but never a `-mini-grid`
+ * to hold them; the cards are laid out by `-sections-stack` below.
+ */
 .sbdocs .sb-plus-intro-page .sb-plus-intro-token-grid {
   display: grid;
   gap: var(--size-section-gap-md);
@@ -412,10 +424,6 @@ a.sbdocs-a {
 }
 
 @media (min-width: 900px) {
-  .sbdocs .sb-plus-intro-page .sb-plus-intro-mini-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .sbdocs .sb-plus-intro-page .sb-plus-intro-token-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -619,14 +627,18 @@ a.sbdocs-a {
 }
 
 /*
- * TOC "ON THIS PAGE" Heading
- * Targeting aggressively as Storybook 8 TOC might lack .sbdocs-toc
+ * TOC "ON THIS PAGE" heading.
+ *
+ * This list used to carry `.toc-container h2` and `h2.toc-title` as well, written
+ * against "Storybook 8 TOC might lack .sbdocs-toc" — a guess about a version this repo
+ * has never run. Neither string occurs anywhere in the installed packages at Storybook
+ * 10.6, nor in this repo, so both were styling nothing and had been since they were
+ * typed. `.sbdocs-toc` and `.toc-wrapper` are what addon-docs actually emits; the
+ * `aside h2` fallback stays because it is a shape rather than a guessed class name.
  */
 .sbdocs .sbdocs-toc h2,
 .toc-wrapper h2,
-.toc-container h2,
-.sbdocs-wrapper aside h2,
-h2.toc-title {
+.sbdocs-wrapper aside h2 {
   font-size: var(--font-size-body2, 14px) !important;
   font-weight: 700 !important;
   letter-spacing: 0.05em !important;

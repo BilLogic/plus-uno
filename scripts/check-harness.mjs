@@ -307,6 +307,24 @@ const COMPOSED = [
       + 'disagrees with the token it backs — both are written into the script header.',
   },
   {
+    script: 'check:docs-dead-selectors',
+    pkg: 'root',
+    guards:
+      "that no rule in the docs stylesheet aims at a class nothing puts in the DOM. #250's "
+      + 'R1 asked for exactly this and was satisfied by a hand sweep, which leaked five: '
+      + '`.sb-plus-intro-mini-grid` (named IN the ticket as 0 uses, and still there after '
+      + 'the sweep that named it), `.responsive-frame-toolbar` and '
+      + '`.responsive-frame-root--browser-fullscreen` (ResponsiveFrame emits neither — its '
+      + 'only modifiers are `--native` and `--standalone`), and `.toc-container` / '
+      + '`.toc-title`, written against a guess about "Storybook 8" and absent from both this '
+      + 'repo and the installed packages. Every class in selector position is matched against '
+      + "the repo's own sources; the classes Storybook and its addons emit are listed in "
+      + 'VENDOR with the package file each was verified in. It cannot see a class assembled '
+      + 'from fragments in a template literal, and it reads selectors rather than the cascade '
+      + '— a live class whose declaration is out-`!important`-ed is the other half of R1, and '
+      + 'that half is `check:docs-chrome`, in a browser.',
+  },
+  {
     script: 'check:page-outline',
     pkg: 'root',
     guards:
