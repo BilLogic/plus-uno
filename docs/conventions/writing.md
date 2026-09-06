@@ -5,7 +5,7 @@ summary: How agents and humans write long-form prose and findings pages here.
 
 # Writing
 
-<!-- canonical per ADR-017 (docs/adr/) · Load when drafting something long — a README, a recap, a findings page. Ordinary replies and commits need nothing from this file. -->
+<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand) · distilled 2026-07-07 as writing-style.md, split into a folder and collapsed back to one file 2026-08-24 when voice.md was deleted · applied by every agent drafting long-form — a README, a recap, a findings page. Ordinary replies and commits need nothing from this file. -->
 
 The house voice is not written down, deliberately: the model's default is the
 house voice, and a rule that restates a default spends context to say nothing.

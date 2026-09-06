@@ -114,6 +114,40 @@ while IFS= read -r file; do
 # URLs at sync time and stay checked above.
 done < <({ find skills agents docs/connectors docs/engineering docs/conventions docs/product-and-service design-system/guidelines -type f -name '*.md' -not -path '*/node_modules/*' -not -path 'design-system/guidelines/components/overview.md' -not -path 'docs/connectors/supabase/blueprint.md' -not -path 'docs/connectors/supabase/blueprint-direct-access.md' -not -path 'agents/uno-bot/harness-bundle.md'; echo AGENTS.md; echo CONTEXT.md; echo SETUP.md; } | sort)
 
+echo "[check] validating backticked bare filenames name a file that exists"
+
+# The pass above only checks tokens ROOTED at a top-level directory, so a bare
+# `figma-workspace.md` was skipped by design — and that is exactly how it rotted:
+# the file moved to docs/connectors/figma.md on 2026-08-24 and four documents went
+# on naming the old one for twelve days, until the integrity sweep read the row by
+# hand (#408). A bare filename is the easiest path to write and the only one
+# nothing checked.
+#
+# The rule is deliberately weak: the name must exist SOMEWHERE in the repo. It
+# cannot be "resolves to one file", because `method.md`, `bot.md` and `SKILL.md`
+# each name many real files and are written bare on purpose. Weak still catches
+# the whole class here, because a retired file resolves to nothing at all.
+#
+# docs/adr/ is absent from the sweep set below for the reason the rooted pass
+# gives: an ADR's job includes naming a path that was retired. A LINEAGE line
+# does the same job — `docs/conventions/writing.md` records that it was distilled
+# as writing-style.md — so lineage names a former path without backticks, which
+# is what keeps it out of this check.
+KNOWN_MD_NAMES="$(find . -name '*.md' -not -path './node_modules/*' -not -path './.git/*' -exec basename {} \; | sort -u)"
+
+while IFS= read -r file; do
+  while IFS= read -r tok; do
+    tok="${tok//\`/}"
+    [[ -z "$tok" ]] && continue
+    # Template placeholders, the same ones the rooted pass skips.
+    [[ "$tok" == *"*"* || "$tok" == *"<"* || "$tok" == *"YYYY"* || "$tok" == *"…"* ]] && continue
+    if ! grep -qxF "$tok" <<< "$KNOWN_MD_NAMES"; then
+      echo "[missing] $file -> \`$tok\` (no file of that name exists)"
+      status=1
+    fi
+  done < <(if command -v rg >/dev/null 2>&1; then rg -o '`[^`/ ]+\.md`' "$file"; else grep -oE '`[^`/ ]+\.md`' "$file"; fi || true)
+done < <({ find skills agents docs/connectors docs/engineering docs/conventions docs/product-and-service design-system/guidelines -type f -name '*.md' -not -path '*/node_modules/*' -not -path 'agents/uno-bot/harness-bundle.md'; echo AGENTS.md; echo CONTEXT.md; echo SETUP.md; } | sort)
+
 echo "[check] validating AGENTS.md skills-table rows resolve to SKILL.md files"
 
 # NB: process substitution, not a pipeline — status=1 must survive (a `| while`

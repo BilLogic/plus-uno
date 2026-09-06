@@ -50,7 +50,7 @@ the designer's explicit go-ahead first; show what will be written and wait.
 | composing the share-out or checking sign-offs | `docs/connectors/slack.md` |
 
 Summoned writers load their own conventions (`notion.md`,
-`figma-workspace.md`) — don't restate those here.
+`docs/connectors/figma.md`) — don't restate those here.
 
 ## Quality bar
 

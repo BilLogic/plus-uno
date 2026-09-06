@@ -6,7 +6,7 @@ summary: Aliases, package structure, prototype conventions, token workflow, loca
 <!-- Tier: 2 | ~500 tokens | Load for: repo setup, imports, prototypes scaffolding, build tooling -->
 # PLUS Design System — Setup
 
-Implementation requirements only. For design rules, load `guidelines.md`. For component/token lists, use `discovery.md`.
+Implementation requirements only. For design rules, load `design-system/guidelines/overview.md`. For component/token lists, use `design-system/agent-views/`.
 
 ## Stack
 

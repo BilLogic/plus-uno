@@ -17,7 +17,7 @@ Every intake is one of four **trigger types** — improvement (could be better) 
 
 | Estate | Target | Fix action |
 |---|---|---|
-| Codebase | product context / stories | fix `docs/product-and-service/*` + `terminology.md` |
+| Codebase | product context / stories | fix `docs/product-and-service/*` + `CONTEXT.md` |
 | Codebase | harness doc stale / wrong | fix `docs/product-and-service/*` (non-product) + `docs/conventions/*` — repo-canonical, ADR-017 |
 | Codebase | a skill isn't useful | refine the skill (`skills/*` — both faces if shared) |
 | Codebase | UNO off-role / personality | tune persona / instructions (AGENTS.md, embodiment deltas) |
