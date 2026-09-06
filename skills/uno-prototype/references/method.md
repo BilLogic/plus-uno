@@ -101,9 +101,9 @@ the content.** A state is accounted for by being named; the words it shows come
 from the inputs or from the open questions. An empty state whose copy the PRD
 left unwritten, a button and its flow for a hand-off the PRD called only
 "shares it", a confirmation dialog nobody asked for — each reads to the
-generating tool as the settled thing, however plausible it is. So the section
-that would have held that copy holds the open question instead, and the
-decision appears exactly once in the spec. A spec that asks in its open
+generating tool as the settled thing, however plausible it is. So the slot that would have held
+that copy is left to the open question, and the decision appears exactly once
+in the spec. A spec that asks in its open
 questions what it already answered in its screens has answered it (§4).
 
 **Provenance is the authoring gate, not the surface.** Any face that can read
