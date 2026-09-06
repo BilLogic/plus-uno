@@ -14,11 +14,9 @@ name: uno-bot — evals (R-scenarios vs live Worker)
 
 on:
   workflow_dispatch: {}
-  # Weekly drift check — PAUSED 2026-09-04 (Bill). The harness it would measure
-  # is known-stale until BilLogic/plus-uno#412 lands, so a Monday run scores the
-  # staleness, not the bot. Restore the two lines below when #412 merges:
-  #   schedule:
-  #     - cron: "0 8 * * 1" # Mondays 08:00 UTC
+  schedule:
+    - cron: "0 8 * * 1" # Mondays 08:00 UTC — weekly drift check (paused 2026-09-04 while the
+                        # harness was known-stale; restored 2026-09-05 after #412 and #415 landed)
 
 jobs:
   evals:
