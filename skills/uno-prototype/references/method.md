@@ -96,6 +96,16 @@ error**, and the specific behavior under test. Always name what is out of scope,
 so the tool doesn't invent it. Each deliverable's reference adds its own
 specifics on top of this skeleton.
 
+**Where the inputs settled nothing, the spec carries the question in place of
+the content.** A state is accounted for by being named; the words it shows come
+from the inputs or from the open questions. An empty state whose copy the PRD
+left unwritten, a button and its flow for a hand-off the PRD called only
+"shares it", a confirmation dialog nobody asked for — each reads to the
+generating tool as the settled thing, however plausible it is. So the section
+that would have held that copy holds the open question instead, and the
+decision appears exactly once in the spec. A spec that asks in its open
+questions what it already answered in its screens has answered it (§4).
+
 **Provenance is the authoring gate, not the surface.** Any face that can read
 the PRD and return text may author the complete spec. Every line traces to an
 input the face actually read: copy, states and constraints from the PRD or
