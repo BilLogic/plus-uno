@@ -82,6 +82,14 @@ function walk(abs, out) {
   }
   for (const name of readdirSync(abs)) {
     if (name === 'node_modules' || name.startsWith('.')) continue;
+    // `__`-prefixed: a test fixture another test is writing into the live tree
+    // RIGHT NOW. scripts/check-doc-identifiers.test.mjs plants
+    // `design-system/guidelines/__regression-*.md`, runs the checker against the
+    // real repo root and deletes it in a `finally`; node's runner runs test files
+    // in parallel, so this sweep could list the file and then find it gone. It
+    // took CI down twice on changes that had nothing to do with either test.
+    // Fixtures are not repo content, so skipping them is right on its own terms.
+    if (name.startsWith('__')) continue;
     walk(path.join(abs, name), out);
   }
   return out;
@@ -112,7 +120,12 @@ export function sweep(root = REPO_ROOT) {
   for (const abs of files) {
     const rel = path.relative(root, abs).split(path.sep).join('/');
     if (SKIP.some((p) => rel.startsWith(p))) continue;
-    for (const f of findingsIn(readFileSync(abs, 'utf8'), rel)) findings.push({ file: rel, ...f });
+    // A file can vanish between the walk and the read — the belt to the braces
+    // above, because the next fixture somebody plants may not be `__`-prefixed.
+    // A file that is gone carries no retired spelling.
+    let text;
+    try { text = readFileSync(abs, 'utf8'); } catch (err) { if (err.code === 'ENOENT') continue; throw err; }
+    for (const f of findingsIn(text, rel)) findings.push({ file: rel, ...f });
   }
   return { files: files.length, findings };
 }
