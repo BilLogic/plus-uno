@@ -10,7 +10,7 @@ Every component has a **Changelog** tab in Storybook. On 2026-08-26 every one of
 them is empty, and that is the intended state.
 
 Nothing in this repo produced a per-component history before that date. There is
-no `CHANGELOG.md` outside `node_modules`, no `.changeset/`, and no convention any
+no CHANGELOG.md outside node_modules, no `.changeset/`, and no convention any
 component followed. A changelog written today about last quarter would be
 reconstructed from commit messages by whoever happened to be looking — which is
 a guess wearing a date. The tab starts empty and accrues forward.

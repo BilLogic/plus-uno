@@ -129,11 +129,22 @@ echo "[check] validating backticked bare filenames name a file that exists"
 # the whole class here, because a retired file resolves to nothing at all.
 #
 # docs/adr/ is absent from the sweep set below for the reason the rooted pass
-# gives: an ADR's job includes naming a path that was retired. A LINEAGE line
-# does the same job — `docs/conventions/writing.md` records that it was distilled
-# as writing-style.md — so lineage names a former path without backticks, which
-# is what keeps it out of this check.
-KNOWN_MD_NAMES="$(find . -name '*.md' -not -path './node_modules/*' -not -path './.git/*' -exec basename {} \; | sort -u)"
+# gives: an ADR's job includes naming a path that was retired. Two other jobs
+# name a file in order to say it is NOT there, and they take the same exemption
+# the same way — by dropping the backticks, since a bare name in prose is not a
+# reference. A LINEAGE line records what a document used to be called
+# (docs/conventions/writing.md was distilled as writing-style.md). An ABSENCE
+# claim is the whole point of the sentence it sits in
+# (design-system/guidelines/components/changelog.md opens by saying there is no
+# CHANGELOG.md outside node_modules, which is why its changelog tab starts
+# empty). Backticking either one asserts a file that is supposed to be missing.
+# `*/node_modules/*`, not `./node_modules/*`: the first spelling excluded only the
+# ROOT install, so a nested one (agents/uno-bot/node_modules/argparse/CHANGELOG.md)
+# was silently answering for the repo. That made the known-name list depend on what
+# happened to be installed — the check passed here and failed in a fresh worktree —
+# and it would have let a genuinely dead reference resolve against any package that
+# ships a file of that name. Git-tracked sources only.
+KNOWN_MD_NAMES="$(git ls-files '*.md' | xargs -n1 basename | sort -u)"
 
 while IFS= read -r file; do
   while IFS= read -r tok; do
