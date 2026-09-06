@@ -39,11 +39,17 @@ export interface ToolCall {
   error?: string;
 }
 
-/** What an entry says when the turn ended without a result for it. Written by
- *  {@link markUnanswered} so the artifact distinguishes "this tool answered and
- *  said nothing worth recording" from "nothing ever came back for this call" —
- *  they read identically otherwise, and one of them means a lane announced a
- *  call it never answered, which is what corrupts the pairing below. */
+/** What an entry says when a call never ran, because the turn ENDED on it — the
+ *  side-effect tool that was staged for a ✅ instead of executed, and the
+ *  `proposal_resolve` that closed the turn. Not a defect: there is no result
+ *  because there was no execution, and nothing can follow it in the same turn. */
+export const NOT_RUN_TURN_ENDED = "not run — the turn ended here";
+
+/** What an entry says when a call went unanswered and the turn CARRIED ON. This
+ *  one is a defect: a lane announced a call and answered it without reporting,
+ *  which leaves a slot the next same-named call fills by mistake. Both known
+ *  paths report today, so this string appearing in an artifact means a new one
+ *  has grown. */
 export const NO_RESULT_RECORDED = "no result was recorded for this call";
 
 /** The digest of one tool RESULT: never rows, never content. */
@@ -139,12 +145,22 @@ export function attachToolResult(
  * next lane to grow an unreported path shows up in the artifact as a call with
  * no result rather than as a plausible wrong answer.
  */
-export function markUnanswered(tools: ToolCall[], filled: Set<number>): number {
+export function markUnanswered(
+  tools: ToolCall[],
+  filled: Set<number>,
+  /** How the turn ended. `proposal` and `resolved` are terminal: the model's
+   *  call was staged or the proposal was closed, the turn returned, and no tool
+   *  ran — so an unfilled entry is expected rather than a symptom. Any other
+   *  outcome means the loop continued past the call, and an unfilled entry
+   *  there is the defect this exists to surface. */
+  outcome?: string,
+): number {
+  const terminal = outcome === "proposal" || outcome === "resolved";
   let marked = 0;
   tools.forEach((call, i) => {
     if (filled.has(i)) return;
     if (call.note === undefined && call.visibility === undefined && call.error === undefined) {
-      call.error = NO_RESULT_RECORDED;
+      call.error = terminal ? NOT_RUN_TURN_ENDED : NO_RESULT_RECORDED;
       marked++;
     }
   });
