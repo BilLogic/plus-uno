@@ -17,7 +17,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { ageInDays, ages, failures } from './figma-snapshots.mjs';
+import { REFRESHERS, ageInDays, ages, failures } from './figma-snapshots.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -36,6 +36,10 @@ const sound = () => ({
   components: { lastChecked: '2026-08-01T00:00:00.000Z', components: [{ key: '1' }, { key: '2' }] },
 });
 
+/** package.json's script map, as the check passes it. */
+const withRefreshers = () =>
+  Object.fromEntries(Object.values(REFRESHERS).map((r) => [r.script, 'node scripts/whatever.mjs']));
+
 test('a sound pair produces nothing', () => {
   assert.deepEqual(failures(sound(), OPTS), []);
 });
@@ -46,15 +50,16 @@ test('the #339 defect: a snapshot past the ceiling is a finding, and names the r
   const found = failures(files, OPTS);
   assert.equal(found.length, 1);
   assert.match(found[0], /captured 2025-01-01, \d+ days ago \(ceiling 180\)/);
-  assert.match(found[0], /audit:figma-variables/);
+  assert.match(found[0], /snapshot:figma-variables/);
 });
 
-test('the component snapshot names the poller, because the poller writes it', () => {
+test('the component finding names its refresher AND the credential that refresher needs', () => {
   const files = sound();
   files.components.lastChecked = '2025-01-01T00:00:00.000Z';
   const found = failures(files, OPTS);
   assert.equal(found.length, 1);
-  assert.match(found[0], /poll-figma-library\.js/);
+  assert.match(found[0], /snapshot:figma-components/);
+  assert.match(found[0], /FIGMA_ACCESS_TOKEN/);
 });
 
 test('a date in the future is a finding, not a very fresh snapshot', () => {
@@ -92,6 +97,26 @@ test('a snapshot of a different Figma file is a finding', () => {
   assert.match(failures(files, OPTS)[0], /not this library's/);
 });
 
+test('the component snapshot is held to the same file key — when it carries one', () => {
+  const withKey = sound();
+  withKey.components.figmaFileKey = 'W0qzhXWxFsMwSJzkdV2yal';
+  assert.match(failures(withKey, OPTS)[0], /figma-component-snapshot\.json: figmaFileKey/);
+
+  // The legacy poller writes no key at all, and that must stay green rather
+  // than demand a field the writer on disk has never produced.
+  assert.deepEqual(failures(sound(), OPTS), []);
+});
+
+test('a remedy naming a task nobody has is itself a finding', () => {
+  const scripts = withRefreshers();
+  assert.deepEqual(failures(sound(), { ...OPTS, scripts }), []);
+
+  delete scripts[REFRESHERS.components.script];
+  const found = failures(sound(), { ...OPTS, scripts });
+  assert.equal(found.length, 1);
+  assert.match(found[0], /snapshot:figma-components` is not in package\.json/);
+});
+
 test('ageInDays reads both stamp shapes, and refuses anything else', () => {
   assert.equal(ageInDays('2026-08-28', NOW), 1);
   assert.equal(ageInDays('2026-08-28T12:00:00.000Z', NOW), 1);
@@ -117,5 +142,12 @@ test('the real snapshots are internally consistent', () => {
       [...collection.variables].sort(),
       'names are stored sorted, so a refresh diffs as a change and not a reordering',
     );
+  }
+});
+
+test('every refresher this repo prints as a remedy is a script this repo has', () => {
+  const { scripts } = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
+  for (const { file, script } of Object.values(REFRESHERS)) {
+    assert.ok(script in scripts, `${file} names \`npm run ${script}\`, which package.json lacks`);
   }
 });
