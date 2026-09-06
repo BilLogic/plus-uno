@@ -136,7 +136,11 @@ jobs:
             const prdUrl = process.env.PRD_URL;
             const filesWritten = process.env.FILES_WRITTEN;
 
-            const fs = require('fs');
+            // Dynamic import, not require: github-script v9 is ESM-only, and a
+            // CommonJS require() in the inline script is the documented breakage.
+            // `await import` resolves in both, and the action already wraps this
+            // body in an async function, so the top-level await is fine.
+            const fs = await import('node:fs');
             const checksRaw = fs.existsSync('checks-output.txt')
               ? fs.readFileSync('checks-output.txt', 'utf8').slice(0, 3000)
               : '(checks step produced no output)';
