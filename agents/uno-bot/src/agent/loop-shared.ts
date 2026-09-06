@@ -35,6 +35,7 @@ export type { HistoryTurn };
 // every caller reaches the agent contract through this file.
 export type { ToolCall, ToolResultNote } from "./tool-transcript";
 export { toolResultDigest, attachToolResult, markUnanswered } from "./tool-transcript";
+export { NOT_RUN_TURN_ENDED, NO_RESULT_RECORDED } from "./tool-transcript";
 
 // ── The provider-neutral contract (input/output of one agent turn) ───────────
 

@@ -674,7 +674,7 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
     // call fills by mistake; both lanes report on every path today, so this
     // should mark nothing — and if it ever marks something, the artifact says
     // which call rather than quietly filing the wrong outcome against it.
-    markUnanswered(tools, filled);
+    markUnanswered(tools, filled, result.kind);
     // Mirror production's clarify gate: when a proposal comes back, report what
     // preflight would have asked (events.ts applies this before staging).
     let gateAsk: string | null = null;

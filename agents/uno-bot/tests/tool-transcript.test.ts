@@ -19,6 +19,7 @@ import {
   MAX_TRANSCRIPT_FIELD_CHARS,
   markUnanswered,
   NO_RESULT_RECORDED,
+  NOT_RUN_TURN_ENDED,
   type ToolCall,
 } from "../src/agent/tool-transcript";
 
@@ -153,7 +154,7 @@ test("a call that never reported a result says so, instead of looking answered",
   const filled = new Set<number>();
   attachToolResult(tools, { name: "slack_search", visibility: "public-only" }, filled);
 
-  assert.equal(markUnanswered(tools, filled), 1, "exactly the unanswered call is marked");
+  assert.equal(markUnanswered(tools, filled, "text"), 1, "exactly the unanswered call is marked");
   assert.equal(tools[0]!.visibility, "public-only");
   assert.equal(tools[0]!.error, undefined, "a call that DID report is left alone");
   assert.equal(tools[1]!.error, NO_RESULT_RECORDED);
@@ -162,11 +163,29 @@ test("a call that never reported a result says so, instead of looking answered",
 test("marking is idempotent and never overwrites a real result", () => {
   const tools: ToolCall[] = [{ name: "github_read", args: { path: "x" }, error: "fetch 404" }];
   const filled = new Set<number>([0]);
-  assert.equal(markUnanswered(tools, filled), 0);
+  assert.equal(markUnanswered(tools, filled, "text"), 0);
   assert.equal(tools[0]!.error, "fetch 404");
 
   // …and a call whose result carried only a note is not re-marked either.
   const noted: ToolCall[] = [{ name: "github_read", args: {}, note: "Cite the path." }];
-  assert.equal(markUnanswered(noted, new Set()), 0, "a recorded note is a result");
+  assert.equal(markUnanswered(noted, new Set(), "text"), 0, "a recorded note is a result");
   assert.equal(noted[0]!.error, undefined);
+});
+
+test("a call the turn ENDED on is not run, not unanswered", () => {
+  // 14 entries on the first artifact that carried this marker were staged
+  // side-effect tools and closed proposal_resolves — the turn returned and the
+  // tool never executed, so "no result was recorded" was accusing the lane of a
+  // defect it had not committed. Nothing can follow a terminal turn either, so
+  // there is no slot for a later call to fill wrongly.
+  for (const kind of ["proposal", "resolved"]) {
+    const tools: ToolCall[] = [{ name: "shareout_post", args: { text: "hi" } }];
+    assert.equal(markUnanswered(tools, new Set(), kind), 1);
+    assert.equal(tools[0]!.error, NOT_RUN_TURN_ENDED, `on kind=${kind}`);
+  }
+
+  // …and on a turn that carried on, the same shape IS the defect.
+  const ran: ToolCall[] = [{ name: "slack_search", args: { query: "x" } }];
+  assert.equal(markUnanswered(ran, new Set(), "text"), 1);
+  assert.equal(ran[0]!.error, NO_RESULT_RECORDED);
 });
