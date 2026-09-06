@@ -84,9 +84,12 @@
  * repos, and a `RECORDED` pair whose documents are gone or which no longer
  * shares anything, both FAIL: an allowlist nobody prunes is a backlog, and an
  * entry that outlives its reason is the thing it was written to prevent. The
- * assertion is suspended for any exemption whose repos were not all reachable —
- * an absent checkout makes every exemption look stale, and reporting that is
- * reporting the missing checkout twice under a worse name.
+ * assertion is suspended PER ENTRY, for any exemption whose OWN repos were not
+ * all reachable — an absent checkout makes every exemption look stale, and
+ * reporting that is reporting the missing checkout twice under a worse name.
+ * Per entry and not per run: one missing sibling used to suspend every entry,
+ * so a plus-uno↔blueprint pair went unchecked because sb was absent, and the
+ * monthly sweep clones with continue-on-error, which makes that a normal month.
  *
  * ── WHEN A SIBLING IS NOT CHECKED OUT ───────────────────────────────────────
  *
@@ -490,17 +493,33 @@ export function sweep(overrides = {}) {
     if (now > rec.words) rises.push({ rec, now });
   }
 
-  // Exemptions are only asserted when every repo they name was reachable.
-  const reachedAll = reached.length === REPOS.length;
-  if (reachedAll) {
-    for (const rec of RECORDED) {
-      if (shared.get(`${rec.a}|${rec.b}`) === 0) {
-        stale.push(
-          `RECORDED ${rec.a} ↔ ${rec.b} shares nothing any more, so the entry is describing a\n` +
-            '  duplication that no longer exists. Delete it — a baseline nobody prunes is a backlog.',
-        );
-      }
+  // Each exemption is asserted when ITS OWN repos were reachable — not when all
+  // three were.
+  //
+  // This used to gate on `reached.length === REPOS.length`, which reads as the
+  // same rule and is not: harness-integrity-sweep.yml clones both siblings with
+  // continue-on-error, so one clone failing is a normal month rather than an
+  // exceptional one, and a single absent repo then suspended the staleness
+  // assertion for EVERY entry — including a plus-uno↔blueprint pair whose own
+  // two repos had both been read and whose shared-word count had just been
+  // computed. A recorded pair that has since been deduplicated could therefore
+  // survive indefinitely, which is the backlog the assertion exists to prevent.
+  const wasReached = (key) => reached.includes(key);
+  const repoOf = (side) => String(side).split(':')[0];
+
+  for (const rec of RECORDED) {
+    if (!wasReached(repoOf(rec.a)) || !wasReached(repoOf(rec.b))) continue;
+    if (shared.get(`${rec.a}|${rec.b}`) === 0) {
+      stale.push(
+        `RECORDED ${rec.a} ↔ ${rec.b} shares nothing any more, so the entry is describing a\n` +
+          '  duplication that no longer exists. Delete it — a baseline nobody prunes is a backlog.',
+      );
     }
+  }
+  // A COPIES entry names a path rather than its repos, so it is asserted only
+  // when every repo was reached: "in fewer than two repos" cannot be told apart
+  // from "in fewer than two repos I could look at".
+  if (reached.length === REPOS.length) {
     for (const [rel, why] of COPIES) {
       const holders = REPOS.filter((s) => existsSync(path.join(located[s.key].root, rel)));
       if (holders.length < 2) {

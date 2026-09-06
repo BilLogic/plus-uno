@@ -39,6 +39,13 @@ export interface ToolCall {
   error?: string;
 }
 
+/** What an entry says when the turn ended without a result for it. Written by
+ *  {@link markUnanswered} so the artifact distinguishes "this tool answered and
+ *  said nothing worth recording" from "nothing ever came back for this call" —
+ *  they read identically otherwise, and one of them means a lane announced a
+ *  call it never answered, which is what corrupts the pairing below. */
+export const NO_RESULT_RECORDED = "no result was recorded for this call";
+
 /** The digest of one tool RESULT: never rows, never content. */
 export interface ToolResultNote {
   name: string;
@@ -117,4 +124,29 @@ export function attachToolResult(
   if (result.visibility !== undefined) call.visibility = result.visibility;
   if (result.error !== undefined) call.error = result.error;
   return i;
+}
+
+/**
+ * Stamp every call still waiting for a result, once the turn is over.
+ *
+ * The pairing in {@link attachToolResult} is FIFO by name, which is exact only
+ * while every announced call also reports a result. A lane that announces a
+ * call and answers it without reporting — a deferral behind a pending proposal
+ * used to do exactly this in both lanes — leaves a slot that the NEXT turn's
+ * call of the same name fills instead, recording that turn's outcome against
+ * this one and leaving the call that really ran blank. Both lanes now report on
+ * that path, so the case is closed at the source; this is the tell-tale, so the
+ * next lane to grow an unreported path shows up in the artifact as a call with
+ * no result rather than as a plausible wrong answer.
+ */
+export function markUnanswered(tools: ToolCall[], filled: Set<number>): number {
+  let marked = 0;
+  tools.forEach((call, i) => {
+    if (filled.has(i)) return;
+    if (call.note === undefined && call.visibility === undefined && call.error === undefined) {
+      call.error = NO_RESULT_RECORDED;
+      marked++;
+    }
+  });
+  return marked;
 }

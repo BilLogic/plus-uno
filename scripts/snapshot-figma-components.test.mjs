@@ -27,8 +27,7 @@ import {
   rowsFrom,
   setsIn,
   snapshotFrom,
-  versionsFrom,
-} from './snapshot-figma-components.mjs';
+  versionsFrom, fetchNodeHashes } from './snapshot-figma-components.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -165,4 +164,46 @@ test('with no credential it refuses by name and writes nothing', () => {
 
 test('the refusal names the variable, so the reader does not have to read the source', () => {
   assert.match(MISSING_TOKEN, /FIGMA_ACCESS_TOKEN/);
+});
+
+// ── a partial hash map never becomes the baseline ──────────────────────────
+
+test('a chunk that fails twice is REPORTED, not quietly dropped', async () => {
+  // The regression: a failed chunk was a console.warn and nothing else, and the
+  // caller wrote the partial map straight to disk. One rate-limited request
+  // produced a snapshot that looks current and is missing up to 50 hashes,
+  // which then becomes the baseline every later drift comparison reads.
+  const rows = Array.from({ length: 120 }, (_, i) => ({ nodeId: `1:${i}`, name: `C${i}` }));
+  const seen = [];
+  const get = async (url) => {
+    seen.push(url);
+    // The second chunk is down, permanently — both the call and its retry.
+    if (url.includes('1:50')) throw new Error('429 rate limited');
+    const ids = new URL(`https://x${url}`).searchParams.get('ids').split(',');
+    return { nodes: Object.fromEntries(ids.map((id) => [id, { document: { id } }])) };
+  };
+
+  const { hashes, failed } = await fetchNodeHashes(rows, 'KEY', 'token', get, 0);
+  assert.equal(failed.length, 1, 'the failing chunk is reported');
+  assert.equal(failed[0].count, 50);
+  assert.match(failed[0].message, /429/);
+  assert.equal(Object.keys(hashes).length, 70, 'the chunks that worked are still hashed');
+  assert.equal(seen.filter((u) => u.includes('1:50')).length, 2, 'it retried once before giving up');
+});
+
+test('a chunk that fails once and then succeeds is not a failure', async () => {
+  const rows = Array.from({ length: 60 }, (_, i) => ({ nodeId: `1:${i}`, name: `C${i}` }));
+  let attempts = 0;
+  const get = async (url) => {
+    const ids = new URL(`https://x${url}`).searchParams.get('ids').split(',');
+    if (ids[0] === '1:50') {
+      attempts += 1;
+      if (attempts === 1) throw new Error('ETIMEDOUT');
+    }
+    return { nodes: Object.fromEntries(ids.map((id) => [id, { document: { id } }])) };
+  };
+
+  const { hashes, failed } = await fetchNodeHashes(rows, 'KEY', 'token', get, 0);
+  assert.deepEqual(failed, [], 'the retry is what the retry is for');
+  assert.equal(Object.keys(hashes).length, 60);
 });

@@ -155,22 +155,51 @@ async function figmaGet(endpoint, token) {
   return res.json();
 }
 
-async function fetchNodeHashes(rows, fileKey, token) {
+/**
+ * Hash every component's node, in chunks.
+ *
+ * Returns the hashes AND the chunks that failed. A failed chunk used to be a
+ * warning and nothing else, and the caller wrote the partial map as the
+ * snapshot — so one rate-limited request produced a file that is structurally
+ * valid, dated today, and missing up to 50 hashes, which then BECOMES the
+ * baseline every later drift comparison reads. The components in it afterwards
+ * compare as having no recorded hash, from a run whose only symptom was one
+ * line in scrollback.
+ *
+ * A retry first, because the failure this guards is usually transient; then the
+ * caller decides, and it refuses to write.
+ */
+export async function fetchNodeHashes(rows, fileKey, token, get = figmaGet, pauseMs = 2000) {
   const hashes = {};
+  const failed = [];
   for (let i = 0; i < rows.length; i += 50) {
-    const ids = rows.slice(i, i + 50).map((c) => c.nodeId).filter(Boolean).join(',');
+    const chunk = rows.slice(i, i + 50);
+    const ids = chunk.map((c) => c.nodeId).filter(Boolean).join(',');
     if (!ids) continue;
-    try {
-      const result = await figmaGet(`/files/${fileKey}/nodes?ids=${ids}&geometry=paths`, token);
-      for (const [nodeId, node] of Object.entries(result.nodes ?? {})) {
-        if (!node?.document) continue;
-        hashes[nodeId] = crypto.createHash('md5').update(JSON.stringify(node.document)).digest('hex');
+    let lastError;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        const result = await get(`/files/${fileKey}/nodes?ids=${ids}&geometry=paths`, token);
+        for (const [nodeId, node] of Object.entries(result.nodes ?? {})) {
+          if (!node?.document) continue;
+          hashes[nodeId] = crypto.createHash('md5').update(JSON.stringify(node.document)).digest('hex');
+        }
+        lastError = undefined;
+        break;
+      } catch (e) {
+        lastError = e;
+        if (attempt === 0) {
+          console.warn(`  ! node hashes for one chunk failed (${e.message}) — retrying once`);
+          if (pauseMs > 0) await new Promise((r) => setTimeout(r, pauseMs));
+        }
       }
-    } catch (e) {
-      console.warn(`  ! node hashes for one chunk failed: ${e.message}`);
+    }
+    if (lastError) {
+      failed.push({ from: i, count: chunk.length, message: lastError.message });
+      console.warn(`  ! node hashes for components ${i}-${i + chunk.length - 1} failed: ${lastError.message}`);
     }
   }
-  return hashes;
+  return { hashes, failed };
 }
 
 /* -------------------------------------------------------------------- cli */
@@ -214,7 +243,24 @@ async function main() {
     return;
   }
 
-  const nodeHashes = await fetchNodeHashes(rows, fileKey, token);
+  const { hashes: nodeHashes, failed } = await fetchNodeHashes(rows, fileKey, token);
+  if (failed.length) {
+    // NOTHING IS WRITTEN. A snapshot is the baseline, so a partial one is worse
+    // than an old one: the old file is visibly out of date and says so, while a
+    // partial file looks current and silently drops the components it lost.
+    const missing = failed.reduce((n, f) => n + f.count, 0);
+    console.error(
+      `\n[snapshot:figma-components] ${failed.length} chunk(s) covering up to ${missing} ` +
+        'component(s) could not be hashed, after a retry each:',
+    );
+    for (const f of failed) console.error(`  components ${f.from}-${f.from + f.count - 1}: ${f.message}`);
+    console.error(
+      'Nothing was written. A snapshot missing hashes becomes a baseline that reads those\n' +
+        'components as having none, so it is refused rather than recorded. Re-run when the\n' +
+        'API is answering; the file on disk is unchanged and still says when it was captured.',
+    );
+    process.exit(1);
+  }
   const snapshot = snapshotFrom({ rows, versions, nodeHashes, fileKey, now: new Date() });
   fs.writeFileSync(snapshotPath, JSON.stringify(snapshot, null, 2) + '\n');
   console.log(`\nWrote ${SNAPSHOT}. Next: npm run check:figma-snapshots`);

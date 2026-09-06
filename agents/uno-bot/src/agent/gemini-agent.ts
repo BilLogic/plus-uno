@@ -378,9 +378,15 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
           role: "user",
           parts: functionCalls.map((fc): GeminiPart => {
             const name = fc.functionCall!.name!;
-            return name === "proposal_resolve"
-              ? { functionResponse: { name, response: { ok: false, error: verdict.error } } }
-              : { functionResponse: { name, response: { ok: false, error: "deferred — resolve the pending proposal first" } } };
+            const response =
+              name === "proposal_resolve"
+                ? { ok: false, error: verdict.error }
+                : { ok: false, error: "deferred — resolve the pending proposal first" };
+            // EVERY reported call reports a result — see the same block in
+            // claude-agent.ts. An announced call with no result leaves a slot
+            // the next turn's call of the same name fills by mistake.
+            input.onToolResult?.(toolResultDigest(name, JSON.stringify(response)));
+            return { functionResponse: { name, response } };
           }),
         });
         continue;

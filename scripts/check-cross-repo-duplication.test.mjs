@@ -274,6 +274,40 @@ test('an absent sibling suspends the exemption assertions rather than reporting 
   }
 });
 
+test('an exemption whose OWN repos were both read is still asserted', () => {
+  // The regression: suspension was gated on ALL THREE repos being reachable, so
+  // one missing sibling silenced every entry — including a pair whose own two
+  // repos had both been read and whose shared-word count had just been
+  // computed. harness-integrity-sweep.yml clones with continue-on-error, which
+  // makes a single absent repo a normal month rather than an exceptional one,
+  // so a deduplicated pair could survive as a stale entry indefinitely.
+  //
+  // Both RECORDED entries are blueprint↔sb, so dropping plus-uno leaves them
+  // fully reachable while the run as a whole is not.
+  const e = estate({});
+  try {
+    const r = sweep({ ...e.roots, 'plus-uno': null });
+    assert.deepEqual(r.reached, ['blueprint', 'sb']);
+    assert.equal(r.stale.length, 2, `both entries are asserted:\n${r.stale.join('\n')}`);
+    for (const s of r.stale) assert.match(s, /shares nothing any more/);
+  } finally {
+    e.done();
+  }
+});
+
+test('a COPIES entry stays suspended until every repo was read', () => {
+  // COPIES names a path rather than its repos, so "in fewer than two repos"
+  // cannot be told apart from "in fewer than two repos I could look at". It
+  // keeps the whole-run gate the RECORDED entries no longer need.
+  const e = estate({});
+  try {
+    const r = sweep({ ...e.roots, 'plus-uno': null });
+    for (const s of r.stale) assert.doesNotMatch(s, /^COPIES/);
+  } finally {
+    e.done();
+  }
+});
+
 test('blocks stop at a blank line, so a passage never spans a paragraph break', () => {
   assert.deepEqual(blocksOf('a\n\nb\n'), ['a', 'b']);
   assert.deepEqual(blocksOf('---\nembodiment: all\n---\n\nbody\n'), ['body']);

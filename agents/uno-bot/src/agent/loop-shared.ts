@@ -34,7 +34,7 @@ export type { HistoryTurn };
 // fields an eval artifact promises can be unit-tested; re-exported here because
 // every caller reaches the agent contract through this file.
 export type { ToolCall, ToolResultNote } from "./tool-transcript";
-export { toolResultDigest, attachToolResult } from "./tool-transcript";
+export { toolResultDigest, attachToolResult, markUnanswered } from "./tool-transcript";
 
 // ── The provider-neutral contract (input/output of one agent turn) ───────────
 

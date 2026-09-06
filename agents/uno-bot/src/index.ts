@@ -9,7 +9,7 @@ import { geminiConfigured, geminiGenerate } from "./gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "./vertex/claude";
 import { MODELS } from "./agent/routing";
 import { runAgent } from "./agent/run-agent";
-import { withTurnScope, attachToolResult, type ToolCall, type TurnDials } from "./agent/loop-shared";
+import { withTurnScope, attachToolResult, markUnanswered, type ToolCall, type TurnDials } from "./agent/loop-shared";
 import { preflight } from "./agent/preflight";
 import type { HistoryTurn, PendingProposal } from "./thread-state-client";
 import { BUILD } from "./version";
@@ -668,6 +668,13 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
     );
     const result = agentRun.result;
     references = agentRun.references;
+    // Every call that never reported a result says so, rather than reading like
+    // a tool that answered with nothing (#452 review). A lane that announces a
+    // call and answers it without reporting leaves a slot the next same-named
+    // call fills by mistake; both lanes report on every path today, so this
+    // should mark nothing — and if it ever marks something, the artifact says
+    // which call rather than quietly filing the wrong outcome against it.
+    markUnanswered(tools, filled);
     // Mirror production's clarify gate: when a proposal comes back, report what
     // preflight would have asked (events.ts applies this before staging).
     let gateAsk: string | null = null;

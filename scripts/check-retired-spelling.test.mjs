@@ -2,6 +2,9 @@
 // and the loading-tier uses proven to pass.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { findingsIn, sweep, RETIRED, SKIP } from './check-retired-spelling.mjs';
 
 test('the loading tiers pass untouched', () => {
@@ -58,4 +61,59 @@ test('the live repo carries no retired spelling', () => {
   const { files, findings } = sweep();
   assert.ok(files > 100, `swept ${files} files`);
   assert.deepEqual(findings.map((f) => `${f.file}:${f.line} ${f.text}`), []);
+});
+
+// ── the walk sees the whole tree, or says so ────────────────────────────────
+
+test('an unstattable entry costs only itself, not the rest of the root', () => {
+  // The regression: statSync ran per entry INSIDE the recursion, and sweep's
+  // catch took every error, so one broken symlink or one file deleted by a
+  // parallel test unwound the walk mid-root and the check reported success over
+  // whatever it had collected so far. Measured at the time: 324 files swept
+  // where the same tree without the bad entry swept 325.
+  //
+  // Fixtures go in a temp root, never the live tree — planting them in
+  // design-system/ is the very race this guards against.
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'retired-walk-'));
+  const dir = path.join(root, 'docs');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'a-first.md'), '# a\n');
+  fs.symlinkSync(path.join(root, 'nothing-here'), path.join(dir, 'b-broken.md'));
+  fs.writeFileSync(path.join(dir, 'c-last.md'), '# c\n');
+
+  try {
+    const withBroken = sweep(root).files;
+    fs.rmSync(path.join(dir, 'b-broken.md'));
+    const without = sweep(root).files;
+    assert.equal(
+      withBroken,
+      without,
+      `a broken entry cost ${without - withBroken} other file(s) — the walk stopped early`,
+    );
+    assert.equal(without, 2, 'both real files are swept');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('an error that is NOT a missing file still stops the sweep', () => {
+  // The other half. Swallowing everything is what made the truncation silent;
+  // a root the sweep cannot read is a sweep that cannot vouch for the repo, and
+  // it must fail rather than report a smaller number.
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'retired-eacces-'));
+  const dir = path.join(root, 'docs');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'a.md'), '# a\n');
+  fs.chmodSync(dir, 0o000);
+  try {
+    // Running as root defeats the permission bit; skip rather than assert a
+    // guarantee the environment is not providing.
+    let readable = true;
+    try { fs.readdirSync(dir); } catch { readable = false; }
+    if (readable) return;
+    assert.throws(() => sweep(root), (err) => err.code === 'EACCES');
+  } finally {
+    fs.chmodSync(dir, 0o755);
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });
