@@ -101,7 +101,8 @@ Requires: `figma-use` skill before canvas writes; summon `writers/figma` for pla
 
 | Check | Command / tool |
 |-------|----------------|
-| Figma library changed | `npm run figma:poll` |
+| Figma library changed | `npm run figma:poll` (also opens a PRD and posts to Slack) |
+| Snapshots gone stale | `npm run check:figma-snapshots` reports the age; `npm run snapshot:figma-components` and `npm run snapshot:figma-variables` re-record them |
 | Token drift | `npm run sync:tokens` + compare |
 | Code compliance | `bash skills/uno-review/scripts/run-review-checks.sh <prototype>/src` |
 | Registry stale node | Re-copy link after Figma restructure |

@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { ages, failures } from './figma-snapshots.mjs';
+import { REFRESHERS, ages, failures } from './figma-snapshots.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -31,11 +31,13 @@ const COMPONENTS = 'scripts/figma-component-snapshot.json';
 const MAX_AGE_DAYS = 180;
 
 /**
- * Floors, measured 2026-08-29. A snapshot that shrank without anyone deciding
- * to shrink it is the failure this pairs with the date: an old snapshot agrees
- * with everything, and so does an empty one.
+ * Floors — the count each snapshot held at its last real capture (variables
+ * 2026-09-06, components 2026-07-09). A snapshot that shrank without anyone
+ * deciding to shrink it is the failure this pairs with the date: an old
+ * snapshot agrees with everything, and so does an empty one. Each floor moves
+ * up only when a refresh has been run and its delta written down.
  */
-const MIN_VARIABLES = 341;
+const MIN_VARIABLES = 361;
 const MIN_COMPONENTS = 1311;
 
 /** The library both snapshots are of. */
@@ -43,6 +45,7 @@ const FILE_KEY = 'zAecJNRdvJzAUOcjV32tRX';
 
 const read = (p) => JSON.parse(fs.readFileSync(path.join(REPO_ROOT, p), 'utf8'));
 const files = { variables: read(VARIABLES), components: read(COMPONENTS) };
+const { scripts } = read('package.json');
 const now = new Date();
 
 const found = failures(files, {
@@ -51,6 +54,7 @@ const found = failures(files, {
   maxAgeDays: MAX_AGE_DAYS,
   minVariables: MIN_VARIABLES,
   minComponents: MIN_COMPONENTS,
+  scripts,
 });
 
 const clock = ages(files, now)
@@ -62,11 +66,10 @@ if (found.length) {
   for (const f of found) console.error(`  ${f}`);
   console.error(`\n${'─'.repeat(72)}`);
   console.error(`✗ check:figma-snapshots — ${clock}\n`);
-  console.error(
-    '  -> Neither file can be refreshed from CI; both need Figma. `npm run\n' +
-      '     audit:figma-variables` prints the script for one, and\n' +
-      '     `node scripts/poll-figma-library.js` refreshes the other as it polls.',
-  );
+  console.error('  -> Neither file can be refreshed from CI; both need Figma:');
+  for (const { file, script, needs } of Object.values(REFRESHERS)) {
+    console.error(`       ${file}\n         npm run ${script} — needs ${needs}`);
+  }
   process.exit(1);
 }
 
