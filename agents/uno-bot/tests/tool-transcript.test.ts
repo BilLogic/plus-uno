@@ -17,6 +17,8 @@ import {
   toolResultDigest,
   attachToolResult,
   MAX_TRANSCRIPT_FIELD_CHARS,
+  markUnanswered,
+  NO_RESULT_RECORDED,
   type ToolCall,
 } from "../src/agent/tool-transcript";
 
@@ -134,4 +136,37 @@ test("a result with no call waiting is dropped, not filed against something else
   attachToolResult(tools, { name: "slack_search", note: "first" }, filled);
   assert.equal(attachToolResult(tools, { name: "slack_search", note: "orphan" }, filled), -1);
   assert.equal(tools[0]?.note, "first");
+});
+
+// ── the pairing is exact only while every call reports ──────────────────────
+
+test("a call that never reported a result says so, instead of looking answered", () => {
+  // The corruption this guards: FIFO-by-name is exact while every announced
+  // call also reports. A lane that announces one and answers it without
+  // reporting leaves a slot the NEXT turn's call of the same name fills, so
+  // turn two's outcome lands on turn one and the call that ran shows nothing.
+  // Both lanes report on every path now; this is the tell-tale for the next one.
+  const tools: ToolCall[] = [
+    { name: "slack_search", args: { query: "deadline" } },
+    { name: "slack_search", args: { query: "deadline" } },
+  ];
+  const filled = new Set<number>();
+  attachToolResult(tools, { name: "slack_search", visibility: "public-only" }, filled);
+
+  assert.equal(markUnanswered(tools, filled), 1, "exactly the unanswered call is marked");
+  assert.equal(tools[0]!.visibility, "public-only");
+  assert.equal(tools[0]!.error, undefined, "a call that DID report is left alone");
+  assert.equal(tools[1]!.error, NO_RESULT_RECORDED);
+});
+
+test("marking is idempotent and never overwrites a real result", () => {
+  const tools: ToolCall[] = [{ name: "github_read", args: { path: "x" }, error: "fetch 404" }];
+  const filled = new Set<number>([0]);
+  assert.equal(markUnanswered(tools, filled), 0);
+  assert.equal(tools[0]!.error, "fetch 404");
+
+  // …and a call whose result carried only a note is not re-marked either.
+  const noted: ToolCall[] = [{ name: "github_read", args: {}, note: "Cite the path." }];
+  assert.equal(markUnanswered(noted, new Set()), 0, "a recorded note is a result");
+  assert.equal(noted[0]!.error, undefined);
 });

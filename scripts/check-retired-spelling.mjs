@@ -75,7 +75,25 @@ export const RETIRED = [
 const GLOSSARY_ROW = /^\| \*\*direct fix \/ gated change\*\* \|/;
 
 function walk(abs, out) {
-  const st = statSync(abs);
+  // Per-entry, and ENOENT ONLY. `readdirSync` gives names; by the time we stat
+  // one it can be gone (a fixture another test is deleting) or unresolvable (a
+  // broken symlink). Statting inside the recursion without this let ONE such
+  // entry throw all the way out to sweep's catch, which discarded it — so the
+  // walk stopped mid-root, `files` kept whatever it had already pushed, and the
+  // check reported success over a truncated list. Measured before the fix: a
+  // broken symlink in a guidelines subfolder swept 324 files where the same
+  // tree without it swept 325, losing exactly the entry after it, silently.
+  //
+  // A vanished entry carries no retired spelling, so skipping it is right. Any
+  // OTHER error still throws: EACCES on a directory means the sweep cannot see
+  // what it claims to have seen, and that must be loud.
+  let st;
+  try {
+    st = statSync(abs);
+  } catch (err) {
+    if (err.code === 'ENOENT') return out;
+    throw err;
+  }
   if (st.isFile()) {
     if (/\.(md|mdx|yml|yaml|json)$/.test(abs)) out.push(abs);
     return out;
@@ -114,7 +132,16 @@ export function sweep(root = REPO_ROOT) {
   const files = [];
   for (const r of ROOTS) {
     const abs = path.join(root, r);
-    try { walk(abs, files); } catch { /* a root may not exist in a fixture */ }
+    // A root that is absent is normal — the fixture roots in tests do not all
+    // exist. Anything else is the sweep failing to read what it is about to
+    // vouch for, and it must not be swallowed: this catch used to take every
+    // error, which is what turned a mid-walk stat failure into a quiet
+    // under-sweep instead of a crash.
+    try {
+      walk(abs, files);
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err;
+    }
   }
   const findings = [];
   for (const abs of files) {

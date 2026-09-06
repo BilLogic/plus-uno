@@ -211,11 +211,23 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
           messages.push({ role: "assistant", content: response.content });
           messages.push({
             role: "user",
-            content: toolUses.map((tu): ToolResultBlockParam =>
-              tu.id === resolveCall.id
-                ? { type: "tool_result", tool_use_id: tu.id, content: JSON.stringify({ ok: false, error: verdict.error }), is_error: true }
-                : { type: "tool_result", tool_use_id: tu.id, content: JSON.stringify({ ok: false, error: "deferred — resolve the pending proposal first" }) },
-            ),
+            content: toolUses.map((tu): ToolResultBlockParam => {
+              const body =
+                tu.id === resolveCall.id
+                  ? JSON.stringify({ ok: false, error: verdict.error })
+                  : JSON.stringify({ ok: false, error: "deferred — resolve the pending proposal first" });
+              // EVERY reported call reports a result, including this one. The
+              // transcript pairs results to calls first-in-first-out by tool
+              // name, so a call that is announced and then never answered leaves
+              // an unfilled slot that the NEXT turn's call of the same name
+              // silently fills — recording turn two's outcome against turn one
+              // and leaving the call that actually ran blank. A deferral is a
+              // real outcome and now reads as one.
+              input.onToolResult?.(toolResultDigest(tu.name, body));
+              return tu.id === resolveCall.id
+                ? { type: "tool_result", tool_use_id: tu.id, content: body, is_error: true }
+                : { type: "tool_result", tool_use_id: tu.id, content: body };
+            }),
           });
           continue;
         }

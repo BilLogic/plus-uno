@@ -138,13 +138,22 @@ echo "[check] validating backticked bare filenames name a file that exists"
 # (design-system/guidelines/components/changelog.md opens by saying there is no
 # CHANGELOG.md outside node_modules, which is why its changelog tab starts
 # empty). Backticking either one asserts a file that is supposed to be missing.
-# `*/node_modules/*`, not `./node_modules/*`: the first spelling excluded only the
-# ROOT install, so a nested one (agents/uno-bot/node_modules/argparse/CHANGELOG.md)
-# was silently answering for the repo. That made the known-name list depend on what
-# happened to be installed — the check passed here and failed in a fresh worktree —
-# and it would have let a genuinely dead reference resolve against any package that
-# ships a file of that name. Git-tracked sources only.
-KNOWN_MD_NAMES="$(git ls-files '*.md' | xargs -n1 basename | sort -u)"
+# Tracked files PLUS untracked ones git can see, and nothing from any install.
+#
+# The first spelling of this used `find . -not -path './node_modules/*'`, which
+# excludes only the ROOT install, so a nested one
+# (agents/uno-bot/node_modules/argparse/CHANGELOG.md) silently answered for the
+# repo: the check passed where dependencies were installed and failed in a fresh
+# worktree, and it would have accepted any dead reference whose name some package
+# happens to ship.
+#
+# Tracked-only was the fix and went one step too far the other way. An author who
+# writes a new page and links it from an existing one, then runs this before
+# `git add`, was told the file does not exist while looking straight at it.
+# `--others --exclude-standard` adds exactly the untracked files git would offer
+# to add — so a new page counts, and anything ignored (every node_modules among
+# them) still does not.
+KNOWN_MD_NAMES="$(git ls-files --cached --others --exclude-standard '*.md' | xargs -n1 basename | sort -u)"
 
 while IFS= read -r file; do
   while IFS= read -r tok; do
