@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **151,155 chars from 16 files**, against an assembled budget of 170,000 (18,845 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 130,771 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **153,504 chars from 16 files**, against an assembled budget of 170,000 (16,496 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 133,120 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -32,9 +32,9 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 97,268 | — |
 | 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,694 | 111,004 | — |
 | 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 114,252 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 24,576 | 138,883 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 143,472 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,635 (−605 ide-only) | 151,155 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 26,925 | 141,232 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 145,821 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,635 (−605 ide-only) | 153,504 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -1417,13 +1417,14 @@ Things a cell, or one touchpoint placement, points at. A link is one kind of res
 ### `scenarios`
 Scenario within a phase
 
-1 of 8 columns described.
+2 of 9 columns described.
 
 | Column | Meaning |
 |---|---|
 | `created_at` | — |
 | `id` | — |
 | `name` | — |
+| `note` | An aside about the scenario, beside the summary that says what it is: most often what else may be running at the same time ("this scenario can run in parallel with Goal Setting and Help Request"). Blueprint data, not app configuration — it replaces a Record keyed on hardcoded scenario ids in src/lib/scenarioParallelInfo.ts (#326 S2, Decision D4). A scenario's fact, held once, rather than the same sentence copied onto each of its paths through paths.note. Free prose in the author's own language rather than a structured flag the renderer would have to compose a sentence from. |
 | `position` | — |
 | `phase_id` | — |
 | `summary` | — |
@@ -1517,17 +1518,20 @@ Blueprint column (journey step) scoped to a service scenario
 ### `touchpoints`
 Deployment-level catalog of the tools, documents, channels and artifacts the services use. One row per real thing, unique by name across the deployment; a service references it, no service owns it (ADR 0014).
 
-1 of 9 columns described.
+4 of 12 columns described.
 
 | Column | Meaning |
 |---|---|
+| `aliases` | The other spellings that mean this touchpoint — an older name the service has stopped using, a label that carried its own specification, a lower-case one a person typed into a cell. The name is the identity (ADR 0014); these resolve to it. This deployment's own history, which is why it is a column and not the TECH_LABEL_ALIASES literal in touchpointColors.ts (#326 S2, #396 Q48). Nullable rather than NOT NULL DEFAULT '{}' like stakeholders.aliases: null means no aliases have been considered, which is what every row means today. Uniqueness against other names and aliases is not constrained here — that rule belongs with the resolver, in S6. |
 | `created_at` | — |
+| `icon_url` | A stable URL for the touchpoint's stock icon or logo — the mark a well-known tool shows in the detail panel. A property of the thing the deployment owns, authored once per name, never per placement. Blueprint data rather than app configuration: null draws nothing, and the renderer reads this row instead of matching a tool name against a table baked into code (#326 S2, Decision D4). Matches the template's column of the same name (asb 21000124000000) so a re-map round-trips. |
 | `id` | — |
 | `kind` | — |
 | `name` | The identity: unique across the deployment, so a second service reuses an entry by naming the same tool the same way rather than minting its own. |
 | `origin` | — |
 | `stakeholder_id` | — |
 | `summary` | — |
+| `tone` | The palette family this touchpoint's face is drawn in — the deployment's own choice, one of the renderer's tone names (crimson, gold, indigo, purple, red, tomato, yellow). A product fact ("Zoom is blue"), not a styling one, which is why it is a row and not a literal in touchpointColors.ts (#326 S2, #396 Q48). Deliberately unconstrained: the tone vocabulary belongs to the token model (ADR 0001) and a CHECK here would be a second copy of it, free to drift. Null means no preference — the renderer falls back deterministically, exactly as it does for a tool the old map never named. |
 | `updated_at` | — |
 | `url` | — |
 
