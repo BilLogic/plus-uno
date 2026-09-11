@@ -6,3 +6,4 @@ dist/
 .test-build/
 .playwright-mcp/
 .slack/apps.dev.json
+embed-model-ab.json
