@@ -32,3 +32,32 @@ export const CANDIDATE_RPC = /^search_blueprint(_[a-z0-9]+)*$/;
 export function isCallableCandidate(name: string): boolean {
   return CANDIDATE_RPC.test(name);
 }
+
+/**
+ * Which embedding model `/debug/blueprint-search?embed_model=` may use.
+ *
+ * WHY THIS PARAMETER EXISTS, and why `?rpc=` alone is not enough: a candidate
+ * function reads a candidate COLUMN, and a column is only as good as the model
+ * that filled it. Pointing the route at `search_blueprint_cand001` while the
+ * Worker keeps embedding the question with the live model produces a call the
+ * function refuses outright (`embedding model mismatch`) — so a candidate
+ * INDEX, as opposed to a candidate ranking, could not be scored at all. This
+ * is the missing half of the same idea: score a candidate model against a
+ * candidate index, with the live pair untouched.
+ *
+ * ALLOWLISTED BY VALUE, not by shape. A model name is not interpolated into a
+ * URL path the way an RPC name is, so the argument here is different and
+ * narrower: this is a debug route that tells the DATABASE which vector space a
+ * query belongs to, and a name the index has never heard of gets scored as
+ * noise rather than refused. Two entries, because two models are in play — the
+ * one the index holds today and the one being measured. A third goes here when
+ * there is a third, deliberately.
+ */
+export const SCOREABLE_EMBED_MODELS = ["text-embedding-005", "gemini-embedding-001"] as const;
+
+export type ScoreableEmbedModel = (typeof SCOREABLE_EMBED_MODELS)[number];
+
+/** True when `model` may be sent as the query's embedding model. */
+export function isScoreableEmbedModel(model: string): model is ScoreableEmbedModel {
+  return (SCOREABLE_EMBED_MODELS as readonly string[]).includes(model);
+}
