@@ -2,7 +2,7 @@
 embodiment: ide
 summary: Query recipes and service-key notes for agents that read the blueprint's database directly rather than through the portal — the supplement to blueprint.md, which it adds to
 vendored_from: BilLogic/plus-uno-blueprint docs/agents/blueprint-direct-access.md
-vendored_revision: c554a7a90b81
+vendored_revision: 8aaa4dda848f
 ---
 
 <!-- VENDORED from BilLogic/plus-uno-blueprint docs/agents/blueprint-direct-access.md by agents/uno-bot/scripts/sync-blueprint-contract.mjs. Edit it there: this copy is overwritten by the sync, and `npm run check:contract` fails on drift. -->
@@ -44,7 +44,7 @@ domain as deparsed, `rpc/schema_comments` every table and column comment.
 
 ## With a service key
 
-`evidence` is restricted — excerpts may hold interview content — and the
+`evidence` is restricted — a note may hold interview content — and the
 `semantic_search` schema (`blueprint_chunks_src`, `match_corpus_chunks`) is
 `service_role` only. A service key reads both; it belongs on a developer
 machine or a runner, and stays out of this repository and its workflows.
