@@ -11,11 +11,13 @@
 import type { Env } from "../types";
 import { getGoogleAccessToken } from "../gemini/auth";
 import { countedFetch } from "../net";
+import { embedModelName } from "./embed-model";
+
+export { embedModelName } from "./embed-model";
+export type { EmbedCredentials } from "./embed-model";
 
 const EMBED_DIM = 768;
 const EMBED_REGION = "us-central1";
-const VERTEX_MODEL = "text-embedding-005";
-const AISTUDIO_MODEL = "text-embedding-004";
 const TIMEOUT_MS = 8000;
 
 export type EmbedTaskType = "RETRIEVAL_QUERY" | "RETRIEVAL_DOCUMENT";
@@ -27,42 +29,39 @@ export function embeddingsConfigured(env: Env): boolean {
   );
 }
 
-/** Which model embedText WOULD use, given this env.
- *
- *  The hybrid RPC takes this and rejects a caller whose model does not match
- *  the one the index was built with. That check cannot be done by dimension:
- *  the Vertex SA path (005) and the AI Studio path (004) are BOTH 768-dim, so
- *  a deployment missing the SA produces vectors that type-check perfectly and
- *  score against the index as noise. Naming the model is the only way to catch
- *  it, and it fails loudly on the first search instead of degrading forever.
- */
-export function embedModelName(env: Env): string {
-  return env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY && env.GEMINI_PROJECT_ID
-    ? VERTEX_MODEL
-    : AISTUDIO_MODEL;
-}
-
 /** Embed one string. Returns the vector, or null on any error (caller falls back). */
 export async function embedText(
   env: Env,
   text: string,
   taskType: EmbedTaskType = "RETRIEVAL_QUERY",
+  /**
+   * Embed with a model OTHER than the one this env would choose.
+   *
+   * One caller: the debug retrieval route, scoring a candidate index. It has
+   * to be a parameter rather than an env var because the whole point is to
+   * send one model on one request while the deployed Worker goes on answering
+   * real questions with the model the live index holds. The route allow-lists
+   * the value; nothing else passes it.
+   */
+  modelOverride?: string,
 ): Promise<number[] | null> {
   const t = text.trim();
   if (!t) return null;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  const model = embedModelName(env, modelOverride);
   try {
-    // ORDER MATTERS: prefer the Vertex SA path (text-embedding-005) — the
-    // semantic_search index is built with 005, and vectors from different
-    // models are NOT comparable. The AI-Studio key (004) is a fallback for
-    // deployments without an SA; mixing it against an 005 index would silently
-    // degrade every similarity score below the floor.
+    // ORDER MATTERS: prefer the Vertex SA path, because the model it reaches
+    // is the one the live index was built with, and vectors from different
+    // models are NOT comparable. The AI-Studio key is a fallback for
+    // deployments without an SA, and it reaches a different model — which is
+    // why `embedModelName` declares whichever one this request actually used
+    // rather than the one the index is assumed to hold.
     if (env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY && env.GEMINI_PROJECT_ID) {
       const token = await getGoogleAccessToken(env);
       const url =
         `https://${EMBED_REGION}-aiplatform.googleapis.com/v1/projects/${env.GEMINI_PROJECT_ID}` +
-        `/locations/${EMBED_REGION}/publishers/google/models/${VERTEX_MODEL}:predict`;
+        `/locations/${EMBED_REGION}/publishers/google/models/${model}:predict`;
       const res = await countedFetch(url, {
         method: "POST",
         headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
@@ -79,12 +78,15 @@ export async function embedText(
       return data.predictions?.[0]?.embeddings?.values ?? null;
     }
     if (env.GEMINI_API_KEY) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${AISTUDIO_MODEL}:embedContent?key=${env.GEMINI_API_KEY}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:embedContent`;
       const res = await countedFetch(url, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        // The key rides in a HEADER, not `?key=`: a query string is kept in
+        // proxy logs and error reports, and this path is the one a local dev
+        // run uses with a personal key.
+        headers: { "content-type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
         body: JSON.stringify({
-          model: `models/${AISTUDIO_MODEL}`,
+          model: `models/${model}`,
           content: { parts: [{ text: t }] },
           taskType,
           outputDimensionality: EMBED_DIM,

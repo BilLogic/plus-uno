@@ -287,6 +287,15 @@ export interface BlueprintSearchOptions {
    *  holding the debug token call any Postgres function reachable by the bot's
    *  key, which is a larger surface than the route is meant to expose. */
   rpcName?: string;
+  /**
+   * Embed the question with a model other than this env's. Set only by the
+   * debug retrieval route, and only to an allow-listed value: a candidate
+   * FUNCTION reads a candidate COLUMN, and a column is only as good as the
+   * model that filled it, so scoring a candidate index needs the query to
+   * arrive in that index's vector space. Unset everywhere else, which is what
+   * keeps the deployed Worker answering real questions with the live model.
+   */
+  embedModel?: string;
   /** Ask the RPC to return edges and/or findings for the cells it matched,
    *  inside the SAME subrequest. Each one dropped here is one fewer metered
    *  call against Cloudflare's 50-per-invocation cap.
@@ -387,7 +396,7 @@ export async function searchBlueprint(
     // Falls through to the ladder only when the RPC is absent (not migrated) or
     // the kill switch is off. Kept for one release as the rollback path.
     if (env.BLUEPRINT_HYBRID !== "off") {
-      const fused = await tryHybrid(env, base, key, q, controller.signal, wantInclude as readonly ("edges" | "findings")[], options.rpcName ?? RPC_NAME, scope);
+      const fused = await tryHybrid(env, base, key, q, controller.signal, wantInclude as readonly ("edges" | "findings")[], options.rpcName ?? RPC_NAME, scope, options.embedModel);
       // A SCOPED search returns whatever the RPC said, empty included: zero
       // rows inside a filter is an answer ("no exception paths in Discovery"),
       // and the ladder below would replace it with an unscoped one.
@@ -610,6 +619,7 @@ async function tryHybrid(
   include: readonly ("edges" | "findings")[] = [],
   rpcName: string = RPC_NAME,
   scope: BlueprintScope = {},
+  embedModel?: string,
 ): Promise<{
   rows: BlueprintRow[];
   matchedTotal?: number;
@@ -618,7 +628,7 @@ async function tryHybrid(
 } | null> {
   // A null embedding is legal here: the RPC runs keyword-only rather than
   // failing, so a Vertex outage costs paraphrase recall instead of the answer.
-  const embedding = await embedText(env, q, "RETRIEVAL_QUERY");
+  const embedding = await embedText(env, q, "RETRIEVAL_QUERY", embedModel);
   const res = await countedFetch(`${base}/rest/v1/rpc/${rpcName}`, {
     method: "POST",
     headers: { ...headers(key), "content-type": "application/json" },
@@ -626,11 +636,17 @@ async function tryHybrid(
       [PARAM.q]: q,
       [PARAM.queryEmbedding]: embedding,
       [PARAM.matchCount]: HYBRID_MATCH_COUNT,
-      // Declaring the model lets the index reject a caller built on a different
-      // one. embedText falls back from text-embedding-005 to -004 when no
-      // service account is configured, and BOTH are 768-dim — so the vector
-      // signature cannot catch it and nothing else in the stack would.
-      [PARAM.embedModel]: embedding ? embedModelName(env) : null,
+      // Declaring the model lets the index reject a caller built on a
+      // different one, and that declaration names the model this request
+      // ACTUALLY used rather than the one the index is assumed to hold — so a
+      // misconfigured credential fails loudly on the first search instead of
+      // scoring as noise. Nothing else in the stack can catch it: every model
+      // on either credential path is 768-dim, so the vector's own signature
+      // looks perfect while ranking like nothing at all.
+      //
+      // Null when there is no vector, which asks the RPC for a keyword-only
+      // ranking instead of comparing against a space the query is not in.
+      [PARAM.embedModel]: embedding ? embedModelName(env, embedModel) : null,
       ...(include.length ? { [PARAM.include]: include } : {}),
       // Filters and granularity, keyed by the contract's wire names. Omitted
       // when unset, so an unscoped body is byte-identical to what it was.

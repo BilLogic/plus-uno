@@ -36,7 +36,13 @@ import {
   selectSubject,
   type SubjectReads,
 } from "./integrations/blueprint-subject";
-import { CANDIDATE_RPC, isCallableCandidate } from "./integrations/candidate-rpc";
+import {
+  CANDIDATE_RPC,
+  isCallableCandidate,
+  isScoreableEmbedModel,
+  SCOREABLE_EMBED_MODELS,
+} from "./integrations/candidate-rpc";
+import { embedModelName } from "./vertex/embed";
 
 export default {
   // Cron (wrangler.toml [triggers]) — the Figma library poll: detect DS
@@ -401,6 +407,28 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
       );
     }
 
+    // `?embed_model=` scores a candidate INDEX, which `?rpc=` alone cannot.
+    //
+    // A candidate function reads a candidate column, and the function refuses
+    // a caller whose model does not match the index it is reading — so
+    // pointing this route at a candidate while the Worker embedded with the
+    // live model produced `embedding model mismatch` and no measurement at
+    // all. Allow-listed by VALUE rather than by shape: the database scores an
+    // unknown model's vector as noise instead of refusing it, so a typo here
+    // would come back as plausible rubbish rather than an error.
+    const embedParam = url.searchParams.get("embed_model");
+    if (embedParam !== null && !isScoreableEmbedModel(embedParam)) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            `embed_model must be one of ${SCOREABLE_EMBED_MODELS.join(", ")} — ` +
+            `a model the index is built with, or one being scored against it`,
+        },
+        { status: 400 },
+      );
+    }
+
     const started = Date.now();
     try {
       // Metered so the eval can report subrequest cost per query — the number
@@ -409,6 +437,7 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
         const r = await searchBlueprint(env, q, {
           fresh: url.searchParams.get("fresh") !== "0",
           ...(rpcParam ? { rpcName: rpcParam } : {}),
+          ...(embedParam ? { embedModel: embedParam } : {}),
         });
         return { r, subrequests: subrequestsUsed() };
       });
@@ -420,6 +449,11 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
         // not say which function produced it can be read as the live result a
         // week later, which is the mistake this parameter exists to prevent.
         rpc: rpcParam ?? BLUEPRINT_CONTRACT.rpcs.searchBlueprint,
+        // The MODEL is echoed for the same reason as the function, and it is
+        // the half that cannot be inferred: two runs against the same
+        // candidate function, one on each model, differ in nothing else a
+        // reader of the artifact can see.
+        embed_model: embedParam ?? embedModelName(env),
         ms: Date.now() - started,
         subrequests: result.subrequests,
         ...result.r,
