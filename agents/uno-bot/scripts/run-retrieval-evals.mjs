@@ -59,6 +59,19 @@ const {
   //
   //   RPC_NAME=search_blueprint_min_overlap npm run evals:retrieval
   RPC_NAME,
+  // Score a CANDIDATE embedding model instead of the one this deployment's
+  // index holds.
+  //
+  // `RPC_NAME` alone cannot do it. A candidate function reads a candidate
+  // COLUMN, and the function refuses a query whose declared model does not
+  // match the index it is reading — so a candidate-index run pointed only by
+  // `RPC_NAME` came back as `embedding model mismatch` on every case. This
+  // names the model the Worker should embed the question with, so the query
+  // arrives in the space that column was built in.
+  //
+  //   RPC_NAME=search_blueprint_cand001 EMBED_MODEL=gemini-embedding-001 \
+  //     npm run evals:retrieval
+  EMBED_MODEL,
 } = process.env;
 
 const REQUEST_TIMEOUT_MS = 30_000;
@@ -77,7 +90,8 @@ async function search(q) {
   const url =
     `${WORKER_URL.replace(/\/+$/, "")}/debug/blueprint-search` +
     `?q=${encodeURIComponent(q)}&fresh=1` +
-    (RPC_NAME ? `&rpc=${encodeURIComponent(RPC_NAME)}` : "");
+    (RPC_NAME ? `&rpc=${encodeURIComponent(RPC_NAME)}` : "") +
+    (EMBED_MODEL ? `&embed_model=${encodeURIComponent(EMBED_MODEL)}` : "");
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
@@ -264,6 +278,12 @@ async function main() {
       rows: res.rows?.length ?? 0,
       subrequests: res.subrequests ?? null,
       ms: res.ms ?? null,
+      // What the WORKER says it embedded with, not what was asked for. A
+      // deployment that predates the parameter ignores it silently, and this
+      // is the field that shows that: the live model comes back where the
+      // candidate was requested, instead of a run that looks like a candidate
+      // measurement and is not one.
+      embedModel: res.embed_model ?? null,
       // Keep the judged window for eyeballing a miss without re-running by
       // hand. `k`, not 3: a case is scored on top-k, and recording fewer rows
       // than were judged means a miss cannot be diagnosed from the artifact —
@@ -313,6 +333,13 @@ async function main() {
     // overridden: a results file that does not say is one someone compares
     // against the live baseline a week later without noticing it is not one.
     rpc: RPC_NAME ?? "search_blueprint",
+    // The MODEL, for the same reason and with one difference: the function's
+    // name is knowable from the override, the model is not. Two runs against
+    // one candidate function, one per model, differ in nothing else a reader
+    // of this file can see. Recorded as what the WORKER said it used rather
+    // than what was asked for, so a silently ignored parameter shows up here
+    // as the live model instead of the candidate.
+    embedModel: results.find((r) => r.embedModel)?.embedModel ?? EMBED_MODEL ?? null,
     cases: results.length,
     passed: results.filter((r) => r.pass).length,
     blockers: blockers.length,
