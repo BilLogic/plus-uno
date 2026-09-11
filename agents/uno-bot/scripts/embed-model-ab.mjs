@@ -68,7 +68,17 @@ const {
 // scored at its own native width would be measured on an index uno cannot
 // build without a schema change.
 const EMBED_DIM = 768;
-const EMBED_BATCH = 100;
+/**
+ * Instances per `:predict` call, by model.
+ *
+ * Not one number: the `text-embedding-00x` family takes up to 250 instances a
+ * request, and `gemini-embedding-001` takes ONE. A shared batch size of 100
+ * means the candidate model 400s on its first call — after the baseline model
+ * has already been paid for — which is the run this script exists to produce.
+ */
+function batchSizeFor(model) {
+  return /^gemini-embedding/.test(model) ? 1 : 100;
+}
 /** Well above the live corpus; the read throws rather than truncate at it. */
 const SOURCE_ROW_CAP = 20000;
 
@@ -116,9 +126,10 @@ async function embedVertex(token, model, texts, taskType) {
   const url =
     `https://${EMBED_REGION}-aiplatform.googleapis.com/v1/projects/${required("GEMINI_PROJECT_ID", GEMINI_PROJECT_ID)}` +
     `/locations/${EMBED_REGION}/publishers/google/models/${model}:predict`;
+  const batch = batchSizeFor(model);
   const out = [];
-  for (let i = 0; i < texts.length; i += EMBED_BATCH) {
-    const slice = texts.slice(i, i + EMBED_BATCH);
+  for (let i = 0; i < texts.length; i += batch) {
+    const slice = texts.slice(i, i + batch);
     const res = await fetch(url, {
       method: "POST",
       headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
@@ -176,29 +187,39 @@ async function embedGeminiApi(model, text, taskType) {
 async function fetchChunks() {
   const url =
     `${required("SUPABASE_URL", SUPABASE_URL)}/rest/v1/blueprint_chunks_src` +
-    // Named limit rather than PostgREST's default: the default is 1000 rows
-    // and it truncates SILENTLY, which would score both models on part of the
-    // corpus and report it as the whole one.
-    `?select=source_key,title,chunk&limit=${SOURCE_ROW_CAP}`;
+    `?select=source_key,chunk&limit=${SOURCE_ROW_CAP}`;
   const res = await fetch(url, {
     headers: {
       apikey: required("SUPABASE_SERVICE_ROLE_KEY", SUPABASE_SERVICE_ROLE_KEY),
       authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
       accept: "application/json",
       "accept-profile": "semantic_search",
+      // The TOTAL, not just this page. A named `limit` does not defeat the
+      // server's own max-rows setting, so the only way to know a read was
+      // complete is to compare it against the count the server reports.
+      // Scoring a truncated corpus and calling it the whole one is the
+      // failure this guards.
+      prefer: "count=exact",
     },
   });
   if (!res.ok) throw new Error(`read source view failed (${res.status}): ${await res.text()}`);
   const rows = await res.json();
-  if (rows.length >= SOURCE_ROW_CAP)
+  const range = res.headers.get("content-range") ?? "";
+  const total = Number(range.split("/")[1]);
+  if (Number.isFinite(total) && total !== rows.length)
     throw new Error(
-      `the source view returned ${rows.length} rows, at the ${SOURCE_ROW_CAP} cap — raise SOURCE_ROW_CAP rather than scoring a partial corpus`,
+      `the source view holds ${total} rows and the read returned ${rows.length} — the server capped it. Page the read, or raise the project's max-rows, rather than scoring a partial corpus`,
     );
   return rows;
 }
 
 // ── Scoring ─────────────────────────────────────────────────────────────────
 function cosine(a, b) {
+  // Two widths have no cosine. Silently iterating the shorter one prints a
+  // confident number for a comparison that never happened — which in the
+  // transport check is the whole verdict.
+  if (a.length !== b.length)
+    throw new Error(`cosine of ${a.length} and ${b.length} dimensions`);
   let dot = 0;
   let na = 0;
   let nb = 0;
@@ -237,23 +258,46 @@ function rankOfFirstHit(questionVector, chunks, chunkVectors, expected, k) {
 async function main() {
   const models = MODELS.split(",").map((m) => m.trim()).filter(Boolean);
   const casesPath = CASES_PATH.startsWith("/") ? CASES_PATH : join(REPO_ROOT, CASES_PATH)
-  const cases = JSON.parse(readFileSync(casesPath, "utf8")).filter(
-    (c) => c.id && c.q && Array.isArray(c.expectCellIds) && c.expectCellIds.length > 0,
-  );
+  const all = JSON.parse(readFileSync(casesPath, "utf8")).filter((c) => c.id && c.q);
+  const scorable = (c) => Array.isArray(c.expectCellIds) && c.expectCellIds.length > 0;
+  const cases = all.filter(scorable);
+  // A cell-id expectation is the only thing a vector ranking can be scored
+  // against. The structural, aggregate and absence classes expect a path name,
+  // a scenario name or a score BELOW a bar — all of which the keyword and
+  // structural arms decide, and none of which this script runs. They are
+  // NAMED rather than counted, because "blocker misses: none" over a set that
+  // silently dropped a third of the blockers reads as a clean verdict.
+  const excluded = all.filter((c) => !scorable(c));
   if (cases.length === 0) throw new Error(`no scorable cases in ${casesPath}`);
 
   const chunks = await fetchChunks();
-  console.log(`${chunks.length} chunks, ${cases.length} scorable cases, models: ${models.join(", ")}`);
+  console.log(`${chunks.length} chunks, models: ${models.join(", ")}`);
+  console.log(
+    `scoring ${cases.length} of ${all.length} cases (${cases.filter((c) => c.blocker).length} blockers)`,
+  );
+  if (excluded.length > 0)
+    console.log(
+      `NOT scored — no cell-id expectation, so the vector arm cannot be judged on them: ${excluded
+        .map((c) => `${c.id}${c.blocker ? "*" : ""} (${c.class ?? "unclassed"})`)
+        .join(", ")}\n  * = a blocker case in the retrieval harness. This run says nothing about it.`,
+    );
 
   const token = await getGoogleToken();
   const results = {};
   for (const model of models) {
     // The asymmetry the index depends on: cells as documents, questions as
     // queries. Scoring both sides as one kind would flatter every model.
+    // `row.chunk` ALONE, because that is what the live backfill embeds — and
+    // `chunk` already opens with the identical breadcrumb `title` holds (see
+    // the source view: the same concat_ws is `title` and `chunk`'s first
+    // line). Prepending `title` would double a breadcrumb that is already
+    // about half the embedded text, and score both models on a document no
+    // index holds, biased toward the breadcrumb matching a past regression
+    // was blamed on.
     const chunkVectors = await embedVertex(
       token,
       model,
-      chunks.map((row) => `${row.title}\n${row.chunk}`),
+      chunks.map((row) => row.chunk),
       "RETRIEVAL_DOCUMENT",
     );
     const questionVectors = await embedVertex(
@@ -278,7 +322,7 @@ async function main() {
     };
     const { recall, mrr } = results[model];
     console.log(
-      `${model}: recall ${(recall * 100).toFixed(1)}% · MRR ${mrr.toFixed(3)} · blocker misses ${results[model].blockerMisses.join(", ") || "none"}`,
+      `${model}: recall ${(recall * 100).toFixed(1)}% · MRR ${mrr.toFixed(3)} · blocker misses among the scored ${results[model].blockerMisses.join(", ") || "none"}`,
     );
   }
 
@@ -304,11 +348,27 @@ async function main() {
     );
   }
 
+  const outPath = OUT_PATH.startsWith("/") ? OUT_PATH : join(REPO_ROOT, OUT_PATH);
   writeFileSync(
-    OUT_PATH,
-    `${JSON.stringify({ chunks: chunks.length, cases: cases.length, results, transport }, null, 2)}\n`,
+    outPath,
+    `${JSON.stringify(
+      {
+        chunks: chunks.length,
+        cases: cases.length,
+        casesInFixture: all.length,
+        excluded: excluded.map((c) => ({
+          id: c.id,
+          class: c.class ?? null,
+          blocker: Boolean(c.blocker),
+        })),
+        results,
+        transport,
+      },
+      null,
+      2,
+    )}\n`,
   );
-  console.log(`wrote ${OUT_PATH}`);
+  console.log(`wrote ${outPath}`);
 
   // A per-case table, so a model that wins on average while losing the cases
   // the index exists for is visible rather than averaged away.

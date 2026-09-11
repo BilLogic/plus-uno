@@ -79,3 +79,7 @@ docs/knowledge/research/2026-07-12-uno-bot-cost-analysis.md
 eval-results.json
 retrieval-eval-results.json
 .cutover.env
+
+# Working output of agents/uno-bot/scripts/embed-model-ab.mjs, which writes
+# beside the fixture it reads rather than wherever the shell happens to be.
+embed-model-ab.json
