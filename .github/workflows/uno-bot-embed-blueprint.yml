@@ -1,12 +1,22 @@
 name: uno-bot — embed blueprint (semantic_search)
 
-# Backfills / refreshes semantic_search.corpus_chunks from the blueprint:
-# reads the read-only source view, embeds each chunk with Vertex
-# text-embedding-005, upserts into the index. Additive + read-only w.r.t. the
-# blueprint (never writes to public.*).
+# Backfills / refreshes the blueprint's semantic index: reads the read-only
+# source view, embeds each chunk, writes the vectors. Additive + read-only
+# w.r.t. the blueprint (never writes to public.*).
 #
 # Run it by hand (Actions → this workflow → Run workflow) or let the nightly
 # schedule refresh changed cells.
+#
+# TWO PASSES, ONE INDEX. The first embeds with the model `index_meta` names for
+# the blueprint index — the set every reader shares. The second is for people
+# who search with their OWN key from the in-app agent: a question embedded by
+# OpenAI cannot be scored against cells embedded by Google, so serving them
+# needs a second set built with their model, beside the first.
+#
+# The second pass is here with no key behind it, on purpose. It SKIPS with a
+# message and exits 0 every night, so turning the capability on is setting one
+# secret rather than editing a workflow — and so that the day somebody does set
+# it, the job that builds the index is one that has been running all along.
 #
 # Required repo secrets (Settings → Secrets and variables → Actions):
 #   SUPABASE_SERVICE_ROLE_KEY   service-role key for the UNO Blueprint project
@@ -14,6 +24,9 @@ name: uno-bot — embed blueprint (semantic_search)
 #                               the bot uses — the one that also enables Claude-on-Vertex)
 #   GEMINI_SA_PRIVATE_KEY       Vertex service-account private_key (full PEM block)
 # (Alternatively a single GEMINI_API_KEY works too; the script auto-detects.)
+# Optional:
+#   OPENAI_API_KEY              turns the second pass on. UNSET in this
+#                               deployment, and the pass skips without it.
 # Non-secret values are set inline below.
 
 on:
@@ -53,6 +66,25 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           EMBED_REGION: "us-central1"
         run: node agents/uno-bot/scripts/backfill-semantic-search.mjs ${{ inputs.full && '--full' || '' }}
+
+      # The second set, for people searching from the in-app agent on an OpenAI
+      # key. With no OPENAI_API_KEY this prints a skip and exits 0; it is not
+      # `continue-on-error`, because a key that IS set and rejected must still
+      # turn the run red — that one is somebody waiting for an index.
+      #
+      # AND THEN THE INDEX MUST BE LISTED. Building the set is not the last
+      # step: uno's `agent.search.indexes` has to name it before anybody is
+      # offered the tool, and naming it BEFORE the set exists makes every
+      # meaning search raise. See the app repo's
+      # docs/engineering/access-and-security.md.
+      - name: Embed the OpenAI set, when there is a key for it
+        env:
+          SUPABASE_URL: "https://osybxeojvsqcwxkgnalm.supabase.co"
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: >-
+          node agents/uno-bot/scripts/backfill-semantic-search.mjs
+          --model=text-embedding-3-small ${{ inputs.full && '--full' || '' }}
 
       # A silent nightly is how this job rotted before: the orphan prune 403'd
       # from 2026-08-18 (the semantic_search migration granted service_role
