@@ -33,8 +33,8 @@ emits; it does not define either.
    under `supabase/migrations/`. Never rewrite an already-applied one.
 2. Apply it to the hosted project.
 3. If the change alters the breadcrumb labels or the RPC surface, update the
-   canonical contract at `uno-blueprint/src/lib/blueprintContract.ts`, then
-   re-run this repo's `node scripts/sync-blueprint-contract.mjs` (with
+   canonical contract at `uno-blueprint/deployment/lib/blueprintContract.ts`,
+   then re-run this repo's `node scripts/sync-blueprint-contract.mjs` (with
    `BLUEPRINT_REPO` pointed at the app checkout) and commit the regenerated
    `agents/uno-bot/src/generated/blueprint-contract.ts` — `npm run
    check:contract` fails the build on drift.

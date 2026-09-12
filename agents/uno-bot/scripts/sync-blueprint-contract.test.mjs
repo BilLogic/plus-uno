@@ -66,8 +66,12 @@ function withRepos({ app, vendored, account = { core: CORE, supplement: SUPPLEME
   let appRoot = path.join(root, "absent");
   if (app !== null) {
     appRoot = path.join(root, "uno-blueprint");
-    mkdirSync(path.join(appRoot, "src", "lib"), { recursive: true });
-    writeFileSync(path.join(appRoot, "src", "lib", "blueprintContract.ts"), app);
+    // The literal path is repeated here on purpose. This is the assertion
+    // that the script looks where the app repo actually keeps the contract
+    // (`deployment/lib/` since plus-uno-blueprint#332); a fixture that asked
+    // the script where to write would agree with it no matter what it said.
+    mkdirSync(path.join(appRoot, "deployment", "lib"), { recursive: true });
+    writeFileSync(path.join(appRoot, "deployment", "lib", "blueprintContract.ts"), app);
     if (account) {
       mkdirSync(path.join(appRoot, "docs", "agents"), { recursive: true });
       writeFileSync(path.join(appRoot, "docs", "agents", "blueprint.md"), account.core);
