@@ -246,8 +246,19 @@ already_set() { "$WRANGLER" secret list 2>/dev/null | grep -q "\"$1\""; }
 # tends to live, else ask. A checkout is identified by the contract file itself
 # rather than by its directory name, because the name has been both
 # uno-blueprint and plus-uno-blueprint.
+#
+# WHERE that file sits inside the checkout is not spelled out here: this asked
+# the sync script instead after the app repo moved it (src/lib → deployment/lib,
+# plus-uno-blueprint#332) and only the sync script's copy of the path was
+# updated, leaving this probe silently unable to recognise any checkout at all.
+contract_rel_path() {
+  node "$BOT_DIR/scripts/sync-blueprint-contract.mjs" --source-path 2>/dev/null
+}
+
 find_blueprint() {
-  local candidate
+  local candidate rel
+  rel="$(contract_rel_path)" || rel=""
+  [[ -n "$rel" ]] || return 1
   for candidate in \
     "${BLUEPRINT_REPO:-}" \
     "$REPO_ROOT/../plus-uno-blueprint" \
@@ -255,7 +266,7 @@ find_blueprint() {
     "$REPO_ROOT/uno-blueprint" \
     "$HOME/Desktop/PLUS/plus-uno-blueprint"
   do
-    [[ -n "$candidate" && -f "$candidate/src/lib/blueprintContract.ts" ]] || continue
+    [[ -n "$candidate" && -f "$candidate/$rel" ]] || continue
     printf '%s' "$(cd "$candidate" && pwd)"
     return 0
   done
@@ -274,7 +285,9 @@ deploy_bot() {
     note "  The contract gate is what stops the Worker shipping against a"
     note "  blueprint schema it no longer matches (#258)."
     ask BLUEPRINT_REPO_INPUT "Path to a uno-blueprint checkout (blank to skip the gate):"
-    if [[ -n "$BLUEPRINT_REPO_INPUT" && -f "$BLUEPRINT_REPO_INPUT/src/lib/blueprintContract.ts" ]]; then
+    local rel
+    rel="$(contract_rel_path)" || rel=""
+    if [[ -n "$BLUEPRINT_REPO_INPUT" && -n "$rel" && -f "$BLUEPRINT_REPO_INPUT/$rel" ]]; then
       export BLUEPRINT_REPO="$BLUEPRINT_REPO_INPUT"
     else
       [[ -n "$BLUEPRINT_REPO_INPUT" ]] && warn "No blueprintContract.ts under that path."

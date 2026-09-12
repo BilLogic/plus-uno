@@ -467,8 +467,11 @@ async function main() {
           title: r.title,
           // Deep link to the cell, not the app root. Every chunk used to carry
           // the same homepage URL, which is not a citation — it is a link to
-          // "go look for it yourself". `?cell=` is the app's param
-          // (uno-blueprint src/lib/urlViewState.ts) and source_key IS the cell id.
+          // "go look for it yourself". `?cell=` is the app's param — declared
+          // by the vendored contract as `urlParams.cell` — and source_key IS
+          // the cell id. (The app module that reads it is no longer in the
+          // uno-blueprint repo at all: that deployment imports the application
+          // from the agentic-service-blueprinting package.)
           ref_url: `${BLUEPRINT_URL.replace(/\/+$/, "")}/?cell=${r.source_key}`,
           chunk: r.chunk,
           embedding: embeddings[j],
