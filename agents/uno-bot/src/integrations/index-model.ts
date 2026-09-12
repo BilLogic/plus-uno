@@ -27,6 +27,7 @@
  * existed: a search that still answers is worth more than one that refuses
  * because a metadata read timed out.
  */
+import { countedFetch } from "../net";
 import { embedModelName, type EmbedCredentials } from "../vertex/embed-model";
 
 /** How long a resolved model is trusted. */
@@ -77,7 +78,7 @@ export async function resolveIndexModel(
 
   try {
     const url = `${base}/rest/v1/index_meta?select=model&source=eq.${encodeURIComponent(source)}`;
-    const res = await fetch(url, {
+    const res = await countedFetch(url, {
       headers: { apikey: key, authorization: `Bearer ${key}`, "accept-profile": SCHEMA },
       signal,
     });
