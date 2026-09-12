@@ -649,7 +649,9 @@ async function tryHybrid(
   // The model comes from the index unless the caller named one. A candidate
   // measurement names one on purpose; a real search must not, or it would be
   // declaring a space it cannot know the index is in.
-  const model = embedModel ?? (await resolveIndexModel(env, base, key, indexSource(rpcName), signal));
+  const model =
+    embedModel ??
+    (await resolveIndexModel(env, base, key, countedFetch, indexSource(rpcName), signal));
   // A null embedding is legal here: the RPC runs keyword-only rather than
   // failing, so a Vertex outage costs paraphrase recall instead of the answer.
   const embedding = await embedText(env, q, "RETRIEVAL_QUERY", model);
