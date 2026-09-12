@@ -2,7 +2,7 @@
 embodiment: ide
 summary: Query recipes and service-key notes for agents that read the blueprint's database directly rather than through the portal — the supplement to blueprint.md, which it adds to
 vendored_from: BilLogic/plus-uno-blueprint docs/agents/blueprint-direct-access.md
-vendored_revision: 8aaa4dda848f
+vendored_revision: de5c6af11d6e
 ---
 
 <!-- VENDORED from BilLogic/plus-uno-blueprint docs/agents/blueprint-direct-access.md by agents/uno-bot/scripts/sync-blueprint-contract.mjs. Edit it there: this copy is overwritten by the sync, and `npm run check:contract` fails on drift. -->
@@ -24,7 +24,7 @@ GET /rest/v1/resources?select=id,cell_id,cell_touchpoint_id,kind,name,url,featur
 ```
 
 Edges embed through their constraint names — the strings PostgREST resolves,
-which `src/lib/blueprintContract.ts` declares and `check:contract:live` probes:
+which `deployment/lib/blueprintContract.ts` declares and `check:contract:live` probes:
 
 ```
 GET /rest/v1/cell_dependencies?select=kind,name,source:cells!cell_dependencies_source_cell_id_fkey(id,content),target:cells!cell_dependencies_target_cell_id_fkey(id,content)

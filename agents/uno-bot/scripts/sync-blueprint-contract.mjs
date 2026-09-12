@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // One-way sync of the cross-repo blueprint contract from the uno-blueprint
-// app repo (its src/lib/blueprintContract.ts is the CANONICAL home) into this
-// Worker's vendored copy, with a drift check for CI: `--check` exits 1 when
+// app repo (its deployment/lib/blueprintContract.ts is the CANONICAL home) into
+// this Worker's vendored copy, with a drift check for CI: `--check` exits 1 when
 // the vendored bytes differ instead of copying.
 //
 // Same pattern as the app's own scripts/sync-agent-skill.mjs (plugin → app).
@@ -42,6 +42,24 @@ const ACCOUNT_DIR = "docs/agents";
 
 const check = process.argv.includes("--check");
 
+// The contract's path INSIDE the app repo, stated once here and read from here.
+//
+// It moved on 2026-09-12: the app repo flipped to importing the application
+// from the template package (plus-uno-blueprint#332), which deleted `src/` and
+// moved what that deployment still owns to `deployment/`. The path was written
+// down in two places that run — this constant and finish-cutover.sh's checkout
+// probe — and the second was not found when the first was fixed, so the cutover
+// helper would have gone on failing to recognise a perfectly good checkout.
+// `--source-path` prints this string so the shell can ask rather than repeat.
+// The test keeps its own literal on purpose: a fixture that derived the path
+// from the script under test would assert nothing.
+const CONTRACT_SOURCE = "deployment/lib/blueprintContract.ts";
+
+if (process.argv.includes("--source-path")) {
+  console.log(CONTRACT_SOURCE);
+  process.exit(0);
+}
+
 /**
  * The map. `source` is the path in the app repo; `target` the vendored path;
  * `render` turns source bytes into vendored bytes (identity for the contract).
@@ -50,7 +68,7 @@ const check = process.argv.includes("--check");
 const TARGETS = [
   {
     label: "blueprint-contract.ts",
-    source: resolve(APP, "src/lib/blueprintContract.ts"),
+    source: resolve(APP, CONTRACT_SOURCE),
     target: resolve("src/generated/blueprint-contract.ts"),
     shown: "src/generated/blueprint-contract.ts",
     render: (text) => text,
