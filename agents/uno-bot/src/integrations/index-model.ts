@@ -22,13 +22,25 @@
  * and retry once, which turns the window into one retried search rather than
  * a few minutes of failures.
  *
+ * THE READ IS HANDED IN. This module is one of the pure ones the unit suite
+ * compiles with Node types and no Workers types, so it cannot import the
+ * Worker's metered fetch without pulling `net.ts` — and its global patch —
+ * into the test build. The caller passes the metered read instead, which is
+ * also what ADR-022 wants: the one subrequest a search spends here is counted
+ * by whoever owns the budget.
+ *
  * A read that fails does NOT fail the search. It falls back to the model the
  * credentials imply, which is what this Worker did before this module
  * existed: a search that still answers is worth more than one that refuses
  * because a metadata read timed out.
  */
-import { countedFetch } from "../net";
 import { embedModelName, type EmbedCredentials } from "../vertex/embed-model";
+
+/** The metered read a caller hands in: `countedFetch`, or a stub in tests. */
+export type IndexMetaRead = (
+  url: string,
+  init: { headers: Record<string, string>; signal?: AbortSignal },
+) => Promise<Response>;
 
 /** How long a resolved model is trusted. */
 const TTL_MS = 5 * 60 * 1000;
@@ -63,6 +75,7 @@ export function forgetIndexModel(source = "blueprint"): void {
  * @param env - credentials, used only for the fallback
  * @param base - the Supabase URL
  * @param key - the REST key to read with
+ * @param read - the metered fetch to read with
  * @param source - the `index_meta` source, e.g. `blueprint`
  * @param signal - abort signal for the read
  */
@@ -70,6 +83,7 @@ export async function resolveIndexModel(
   env: EmbedCredentials,
   base: string,
   key: string,
+  read: IndexMetaRead,
   source = "blueprint",
   signal?: AbortSignal,
 ): Promise<string> {
@@ -78,7 +92,7 @@ export async function resolveIndexModel(
 
   try {
     const url = `${base}/rest/v1/index_meta?select=model&source=eq.${encodeURIComponent(source)}`;
-    const res = await countedFetch(url, {
+    const res = await read(url, {
       headers: { apikey: key, authorization: `Bearer ${key}`, "accept-profile": SCHEMA },
       signal,
     });

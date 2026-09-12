@@ -17,6 +17,7 @@ import {
   indexSource,
   isModelMismatch,
   resolveIndexModel,
+  type IndexMetaRead,
 } from "../src/integrations/index-model";
 
 const WITH_SA = {
@@ -25,101 +26,81 @@ const WITH_SA = {
   GEMINI_PROJECT_ID: "a-project",
 };
 
-type Fetch = typeof globalThis.fetch;
-
-/** Answer every read with `model`, and count the reads. */
-function stubIndexMeta(model: string | null): { calls: () => number; restore: () => void } {
-  const original = globalThis.fetch;
+/** Answer every read with `model`, and count the reads.
+ *
+ *  The read is a parameter, not the global: this module is handed the metered
+ *  fetch by its caller, so a test hands it one too and nothing patches
+ *  `globalThis`. */
+function stubIndexMeta(model: string | null): { read: IndexMetaRead; calls: () => number } {
   let calls = 0;
-  globalThis.fetch = (async () => {
+  const read: IndexMetaRead = async () => {
     calls += 1;
     return new Response(JSON.stringify(model === null ? [] : [{ model }]), {
       status: 200,
       headers: { "content-type": "application/json" },
     });
-  }) as Fetch;
-  return { calls: () => calls, restore: () => { globalThis.fetch = original; } };
+  };
+  return { read, calls: () => calls };
 }
+
+/** A read that never answers. */
+const readThatFails: IndexMetaRead = async () => {
+  throw new Error("network");
+};
 
 test("the model is read from the index, not from the credentials", async () => {
   forgetIndexModel("blueprint");
   const stub = stubIndexMeta("gemini-embedding-001");
-  try {
-    // The service account implies `text-embedding-005`. The index says
-    // otherwise, and the index is the one that has to be satisfied.
-    assert.equal(
-      await resolveIndexModel(WITH_SA, "https://db.example", "anon-key"),
-      "gemini-embedding-001",
-    );
-  } finally {
-    stub.restore();
-  }
+  // The service account implies `text-embedding-005`. The index says
+  // otherwise, and the index is the one that has to be satisfied.
+  assert.equal(
+    await resolveIndexModel(WITH_SA, "https://db.example", "anon-key", stub.read),
+    "gemini-embedding-001",
+  );
 });
 
 test("the answer is held, so a search is not a metadata read", async () => {
   forgetIndexModel("blueprint");
   const stub = stubIndexMeta("gemini-embedding-001");
-  try {
-    await resolveIndexModel(WITH_SA, "https://db.example", "anon-key");
-    await resolveIndexModel(WITH_SA, "https://db.example", "anon-key");
-    await resolveIndexModel(WITH_SA, "https://db.example", "anon-key");
-    assert.equal(stub.calls(), 1);
-  } finally {
-    stub.restore();
-  }
+  await resolveIndexModel(WITH_SA, "https://db.example", "anon-key", stub.read);
+  await resolveIndexModel(WITH_SA, "https://db.example", "anon-key", stub.read);
+  await resolveIndexModel(WITH_SA, "https://db.example", "anon-key", stub.read);
+  assert.equal(stub.calls(), 1);
 });
 
 test("forgetting makes the next resolve read the row again", async () => {
   forgetIndexModel("blueprint");
   let stub = stubIndexMeta("text-embedding-005");
-  try {
-    assert.equal(
-      await resolveIndexModel(WITH_SA, "https://db.example", "anon-key"),
-      "text-embedding-005",
-    );
-  } finally {
-    stub.restore();
-  }
+  assert.equal(
+    await resolveIndexModel(WITH_SA, "https://db.example", "anon-key", stub.read),
+    "text-embedding-005",
+  );
   // The swap lands. Without forgetting, this Worker would go on declaring the
   // old model for the rest of the cache window — which is the window the
   // mismatch retry exists to close.
   forgetIndexModel("blueprint");
   stub = stubIndexMeta("gemini-embedding-001");
-  try {
-    assert.equal(
-      await resolveIndexModel(WITH_SA, "https://db.example", "anon-key"),
-      "gemini-embedding-001",
-    );
-  } finally {
-    stub.restore();
-  }
+  assert.equal(
+    await resolveIndexModel(WITH_SA, "https://db.example", "anon-key", stub.read),
+    "gemini-embedding-001",
+  );
 });
 
 test("a failed read falls back to the credential-implied model", async () => {
   forgetIndexModel("blueprint");
-  const original = globalThis.fetch;
-  globalThis.fetch = (async () => { throw new Error("network"); }) as Fetch;
-  try {
-    assert.equal(
-      await resolveIndexModel(WITH_SA, "https://db.example", "anon-key"),
-      "text-embedding-005",
-    );
-  } finally {
-    globalThis.fetch = original;
-  }
+  assert.equal(
+    await resolveIndexModel(WITH_SA, "https://db.example", "anon-key", readThatFails),
+    "text-embedding-005",
+  );
 });
 
 test("a row that names no model is not an answer", async () => {
   forgetIndexModel("blueprint");
   const stub = stubIndexMeta(null);
-  try {
-    assert.equal(
-      await resolveIndexModel(WITH_SA, "https://db.example", "anon-key"),
-      "text-embedding-005",
-    );
-  } finally {
-    stub.restore();
-  }
+  assert.equal(
+    await resolveIndexModel(WITH_SA, "https://db.example", "anon-key", stub.read),
+    "text-embedding-005",
+  );
 });
 
 test("each function reads the index it searches", () => {

@@ -461,6 +461,7 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
                 env,
                 env.SUPABASE_URL.replace(/\/+$/, ""),
                 env.SUPABASE_ANON_KEY,
+                countedFetch,
                 indexSource(rpcParam ?? BLUEPRINT_CONTRACT.rpcs.searchBlueprint),
               )
             : embedModelName(env)),
