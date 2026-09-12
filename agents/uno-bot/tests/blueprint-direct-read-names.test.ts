@@ -84,6 +84,22 @@ const CONSTRAINTS: ReadonlySet<string> = new Set(Object.values(BLUEPRINT_CONTRAC
  *  pinned by `BLUEPRINT_CONTRACT.rpcs` and checked by `check:contract`. */
 const NOT_A_RELATION: ReadonlySet<string> = new Set(["rpc"]);
 
+/**
+ * The vocabulary this sweep checks against is the APP's public schema, which
+ * is what the vendored contract describes. `semantic_search` is not that: it
+ * is the index's own schema, owned by this bot's backfill rather than by the
+ * app, and PostgREST only serves it when a read says so with an
+ * `accept-profile` header. A read that names that schema is out of subject
+ * here, and pretending otherwise would mean either failing every such read or
+ * carrying app-contract entries for tables the app does not have.
+ *
+ * The exemption is narrow on purpose: it applies to a source file only where
+ * that file names the schema in a profile header, so a public-schema read
+ * cannot hide behind a neighbour's exemption — and the whole file is reported
+ * as before if the header ever goes away.
+ */
+const NON_PUBLIC_PROFILE = /"(?:accept|content)-profile"\s*\]?\s*[:=]\s*[^,\n]*semantic_search|SCHEMA\s*=\s*"semantic_search"/;
+
 /* ------------------------------------------------------------- extraction */
 
 export interface Literal {
@@ -232,6 +248,9 @@ export function namesInSelect(clause: string): Finding[] {
 
 /** Every database name a source file sends to PostgREST. */
 export function namesInSource(code: string): Array<Finding & { line: number }> {
+  // A file that speaks to the index's own schema is asking PostgREST for a
+  // vocabulary the app's contract has never described. See NON_PUBLIC_PROFILE.
+  if (NON_PUBLIC_PROFILE.test(code)) return [];
   const found: Array<Finding & { line: number }> = [];
   for (const { value, line, at } of mergedLiterals(code)) {
     const preceding = code.slice(Math.max(0, at - 80), at);
@@ -349,4 +368,26 @@ test("the include VALUE `findings` is not swept as a relation", () => {
   // pressure to break a working call.
   assert.equal(BLUEPRINT_CONTRACT.searchBlueprintInclude.findings, "finding");
   assert.deepEqual(namesInSource('const include = ["findings"]'), []);
+});
+
+test("a read of the index's own schema is out of subject, and only that read", () => {
+  // `semantic_search.index_meta` is the index's metadata, not the app's. It
+  // is served only to a read that names the schema, and the vendored contract
+  // — which describes the app's public schema — has never carried it. A sweep
+  // that condemned it would be pressure to add app-contract entries for
+  // tables the app does not have.
+  const profiled = [
+    'const SCHEMA = "semantic_search";',
+    'const url = `${base}/rest/v1/index_meta?select=model&source=eq.blueprint`',
+  ].join("\n");
+  assert.deepEqual(namesInSource(profiled), []);
+
+  // The exemption is a property of the FILE that speaks that schema. The same
+  // read with no profile anywhere in it is reported exactly as before, so a
+  // public-schema read cannot acquire the exemption by moving next door.
+  assert.deepEqual(
+    namesInSource('const url = `${base}/rest/v1/index_meta?select=model`')
+      .map((f) => `${f.what} ${f.name}`),
+    ["relation index_meta", "column model"],
+  );
 });

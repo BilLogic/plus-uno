@@ -18,6 +18,12 @@
 
 import type { Env } from "../types";
 import { embedText, embeddingsConfigured, embedModelName } from "../vertex/embed";
+import {
+  forgetIndexModel,
+  indexSource,
+  isModelMismatch,
+  resolveIndexModel,
+} from "./index-model";
 import { countedFetch, rethrowIfBudget, subrequestBudgetSpent } from "../net";
 import { cellUrl, sliceUrl, parseChunkTitle, chunkBody } from "./blueprint-link";
 import { BLUEPRINT_CONTRACT } from "../generated/blueprint-contract";
@@ -396,7 +402,21 @@ export async function searchBlueprint(
     // Falls through to the ladder only when the RPC is absent (not migrated) or
     // the kill switch is off. Kept for one release as the rollback path.
     if (env.BLUEPRINT_HYBRID !== "off") {
-      const fused = await tryHybrid(env, base, key, q, controller.signal, wantInclude as readonly ("edges" | "findings")[], options.rpcName ?? RPC_NAME, scope, options.embedModel);
+      const rpcName = options.rpcName ?? RPC_NAME;
+      const searchOnce = () =>
+        tryHybrid(env, base, key, q, controller.signal, wantInclude as readonly ("edges" | "findings")[], rpcName, scope, options.embedModel);
+      // One retry, and only for one error. The model is read from the index
+      // and held for a few minutes, so the seconds after the index is swapped
+      // are the one time this Worker can be confidently wrong about it. The
+      // database says so precisely, in those words, and forgetting the cached
+      // answer makes the second attempt read the row again. Anything else
+      // propagates — a retry loop around a real fault is how an outage
+      // becomes a bill.
+      const fused = await searchOnce().catch(async (error: unknown) => {
+        if (!isModelMismatch(error)) throw error;
+        forgetIndexModel(indexSource(rpcName));
+        return searchOnce();
+      });
       // A SCOPED search returns whatever the RPC said, empty included: zero
       // rows inside a filter is an answer ("no exception paths in Discovery"),
       // and the ladder below would replace it with an unscoped one.
@@ -626,9 +646,13 @@ async function tryHybrid(
   edges?: BlueprintEdge[];
   findings?: { rows: Array<Record<string, unknown>>; total: number | undefined };
 } | null> {
+  // The model comes from the index unless the caller named one. A candidate
+  // measurement names one on purpose; a real search must not, or it would be
+  // declaring a space it cannot know the index is in.
+  const model = embedModel ?? (await resolveIndexModel(env, base, key, indexSource(rpcName), signal));
   // A null embedding is legal here: the RPC runs keyword-only rather than
   // failing, so a Vertex outage costs paraphrase recall instead of the answer.
-  const embedding = await embedText(env, q, "RETRIEVAL_QUERY", embedModel);
+  const embedding = await embedText(env, q, "RETRIEVAL_QUERY", model);
   const res = await countedFetch(`${base}/rest/v1/rpc/${rpcName}`, {
     method: "POST",
     headers: { ...headers(key), "content-type": "application/json" },
@@ -646,7 +670,7 @@ async function tryHybrid(
       //
       // Null when there is no vector, which asks the RPC for a keyword-only
       // ranking instead of comparing against a space the query is not in.
-      [PARAM.embedModel]: embedding ? embedModelName(env, embedModel) : null,
+      [PARAM.embedModel]: embedding ? embedModelName(env, model) : null,
       ...(include.length ? { [PARAM.include]: include } : {}),
       // Filters and granularity, keyed by the contract's wire names. Omitted
       // when unset, so an unscoped body is byte-identical to what it was.
@@ -713,9 +737,13 @@ async function tryHybrid(
   }
   // Function absent (not migrated yet) → fall back to the ladder rather than
   // fail the search. Any other status is a real error and must propagate.
-  const err = (await res.json().catch(() => ({}))) as { code?: string };
+  const err = (await res.json().catch(() => ({}))) as { code?: string; message?: string };
   if (res.status === 404 || err.code === "PGRST202") return null;
-  throw new Error(`Supabase rpc ${rpcName} ${res.status}${err.code ? ` ${err.code}` : ""}`);
+  // The message rides along because one of them is actionable: the index
+  // refusing the caller's declared model is what the retry above reads, and a
+  // status code alone cannot say which failure this was.
+  const detail = typeof err.message === "string" && err.message ? `: ${err.message}` : "";
+  throw new Error(`Supabase rpc ${rpcName} ${res.status}${err.code ? ` ${err.code}` : ""}${detail}`);
 }
 
 function str(v: unknown): string | undefined {
