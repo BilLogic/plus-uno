@@ -43,6 +43,7 @@ import {
   SCOREABLE_EMBED_MODELS,
 } from "./integrations/candidate-rpc";
 import { embedModelName } from "./vertex/embed";
+import { indexSource, resolveIndexModel } from "./integrations/index-model";
 
 export default {
   // Cron (wrangler.toml [triggers]) — the Figma library poll: detect DS
@@ -453,7 +454,16 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
         // the half that cannot be inferred: two runs against the same
         // candidate function, one on each model, differ in nothing else a
         // reader of the artifact can see.
-        embed_model: embedParam ?? embedModelName(env),
+        embed_model:
+          embedParam ??
+          (env.SUPABASE_URL && env.SUPABASE_ANON_KEY
+            ? await resolveIndexModel(
+                env,
+                env.SUPABASE_URL.replace(/\/+$/, ""),
+                env.SUPABASE_ANON_KEY,
+                indexSource(rpcParam ?? BLUEPRINT_CONTRACT.rpcs.searchBlueprint),
+              )
+            : embedModelName(env)),
         ms: Date.now() - started,
         subrequests: result.subrequests,
         ...result.r,
