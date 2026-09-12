@@ -2,7 +2,7 @@
 embodiment: all
 summary: What this blueprint is, how to retrieve from it, what absence and status mean, and how paths relate to a scenario's main route — the hand-written core — followed by the vocabulary and the schema, rendered from the code and the catalog.
 vendored_from: BilLogic/plus-uno-blueprint docs/agents/blueprint.md
-vendored_revision: de5c6af11d6e
+vendored_revision: 5204240ff7c5
 ---
 
 <!-- VENDORED from BilLogic/plus-uno-blueprint docs/agents/blueprint.md by agents/uno-bot/scripts/sync-blueprint-contract.mjs. Edit it there: this copy is overwritten by the sync, and `npm run check:contract` fails on drift. -->
@@ -152,10 +152,10 @@ One canvas-agent conversation. Ledger entries reference it via agentSessionId (c
 | Column | Meaning |
 |---|---|
 | `created_at` | — |
+| `created_by` | Who owns this conversation. NULL means the row predates ownership (2026-08-28); those are readable by service accounts only and no new row may be NULL. |
 | `id` | — |
 | `title` | — |
 | `updated_at` | — |
-| `user_id` | Who owns this conversation. NULL means the row predates ownership (2026-08-28); those are readable by service accounts only and no new row may be NULL. |
 
 ### `audit_findings`
 Audit / whatif / import-sweep outputs. Written by skills (IDE service key or canvas authenticated agent); humans triage by status. Prefixed on 2026-08-30 because the bare word `findings` gave a reader no clue which process produces the rows; the CONCEPT is still a finding everywhere else.
@@ -480,7 +480,7 @@ Deployment-level cast list: one pool of actors a lane picks from, unique by name
 | `aliases` | — |
 | `created_at` | — |
 | `updated_at` | — |
-| `parent_id` | The party this one is part of. Design's four sub-teams point at Design, so "what does Design own?" rolls them up while a lane can still name the specific one. |
+| `part_of_id` | The actor this one is part of, or null when it is not part of another. Exactly one level: an actor that is part of something is part of nothing further. A lane still names the specific actor; this is what lets a reader roll those up. |
 
 ### `steps`
 Blueprint column (journey step) scoped to a service scenario
