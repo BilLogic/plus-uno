@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "bundle:harness": "node scripts/bundle-harness.mjs",
-    "check:harness-bundle": "node scripts/bundle-harness.mjs --check",
+    "check:harness-bundle": "node scripts/check-harness-bundle.mjs",
     "check:fetch": "node scripts/check-fetch.mjs",
     "check:contract": "node scripts/sync-blueprint-contract.mjs --check",
     "check:worker-host": "node scripts/check-worker-host.mjs",
