@@ -70,7 +70,12 @@ const CDN_BASELINE = new Map([
   ],
 ]);
 
-const SOURCE = /\.(m?js|cjs|jsx|ts|tsx|css|scss|mdx|html|json|ya?ml)$/;
+// `mts`/`cts` are here because a TypeScript ESM module was invisible to this
+// sweep: agents/uno-bot/vitest.workerd.config.mts imports
+// @cloudflare/vitest-pool-workers and has to be .mts (that package is ESM-only
+// and the manifest is not `type: module`), so the one file that uses the
+// dependency did not count as using it and the dependency read as dead (#493).
+const SOURCE = /\.(m?js|cjs|jsx|ts|tsx|mts|cts|css|scss|mdx|html|json|ya?ml)$/;
 // Markdown included deliberately: design-system/README.md carried a THIRD
 // FontAwesome (6.5.1) while the check reported "0 new", and a README is the
 // file people copy a <link> out of, so it is how a fourth would spread.

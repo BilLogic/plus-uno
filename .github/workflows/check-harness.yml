@@ -86,3 +86,17 @@ jobs:
       - name: uno-bot script tests
         working-directory: agents/uno-bot
         run: npm run test:bundle
+
+      # The ThreadState conformance suite against the DURABLE OBJECT adapter,
+      # under the real workerd via @cloudflare/vitest-pool-workers (#493). It
+      # sits here, beside `test:bundle` and beside the `test` that `check:harness`
+      # already runs, because it is the same kind of gate — but it is NOT
+      # composed into `check:harness`: that gate's whole argument is that it
+      # stays seconds long, and this one starts a runtime (~2s locally, plus
+      # miniflare's own startup). `npm test` stays on `node --test`; exactly one
+      # file pays for workerd, and it is the file whose subject IS the runtime —
+      # Durable Object RPC, SQLite storage, and the input gate that makes "the
+      # delete is the claim" true.
+      - name: uno-bot ThreadState conformance under workerd
+        working-directory: agents/uno-bot
+        run: npm run test:workerd

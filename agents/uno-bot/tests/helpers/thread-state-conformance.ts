@@ -10,8 +10,15 @@
 // injected `now()`, so a suite that needs to be twenty minutes later advances a
 // counter. A real sleep would put a 20-minute lease out of reach and make
 // everything around it flaky.
+//
+// RUNNER-AGNOSTIC. The suite is handed its `it` (#493) instead of importing
+// one, because it now runs under two runners: `node --test` for the in-memory
+// adapter and vitest under workerd for the Durable Object adapter. Importing
+// `node:test` here would have made the workerd run impossible — that module is
+// not in the Workers runtime — and duplicating the cases is the one thing this
+// file exists to prevent. `node:assert/strict` stays: workerd provides it
+// under `nodejs_compat`, which wrangler.toml already sets.
 import assert from "node:assert/strict";
-import test from "node:test";
 
 import {
   CANCEL_TTL_MS,
@@ -59,6 +66,12 @@ function proposal(overrides: Partial<PendingProposal> = {}): PendingProposal {
   };
 }
 
+/** The one thing the suite needs from its runner: register a named async test.
+ *  `node --test`'s `test` and vitest's `it` both satisfy it. */
+export interface ConformanceRunner {
+  it(name: string, fn: () => Promise<void>): void;
+}
+
 /**
  * Run the suite against one adapter.
  *
@@ -66,17 +79,20 @@ function proposal(overrides: Partial<PendingProposal> = {}): PendingProposal {
  *               of the two stores disagreed.
  * @param makeStore  builds a FRESH, empty store on the clock it is handed.
  *               Called once per test; never shared between them.
+ * @param runner  the caller's test function — see `ConformanceRunner`.
  */
 export function runThreadStateConformance(
   label: string,
   makeStore: (deps: ThreadStateDeps) => ThreadState,
+  runner: ConformanceRunner,
 ): void {
   function setup(): { store: ThreadState; clock: TestClock } {
     const clock = makeTestClock();
     return { store: makeStore({ now: () => clock.now() }), clock };
   }
 
-  const it = (name: string, fn: () => Promise<void>) => test(`[${label}] ${name}`, fn);
+  const it = (name: string, fn: () => Promise<void>): void =>
+    runner.it(`[${label}] ${name}`, fn);
 
   // ----- history -----
 
