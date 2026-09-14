@@ -81,7 +81,11 @@ export type AgentResult =
       input: Record<string, unknown>;
       /** Brief structural preview the model wrote alongside the tool call, if
        *  any. The Worker combines this with its standardized proposal footer.
-       *  TODO(#496/#498): this is delivery's business, not the loop's — it
+       *  Carried by BOTH adapters now (#496): it is the neutral
+       *  `ModelReply.text` from a turn that also announced a side-effect call,
+       *  which is the same field Gemini's narration arrives in — there is no
+       *  Claude-specific preview any more.
+       *  TODO(#498): this is delivery's business, not the loop's — it
        *  leaves the contract when mid-turn effects move behind the Delivery
        *  port and `slack/events.ts` stops reading the result's fields directly. */
       previewText?: string;

@@ -1,360 +1,107 @@
-// Claude-on-Vertex agent loop — the provider adapter's Claude execution path,
-// activated by MODEL_PROVIDER="vertex-claude". Same AgentInput/AgentResult
-// contract as the Gemini loop (gemini-agent.ts), so events.ts and the proposal
-// gate stay provider-blind.
+// Claude's turn: the wiring between the Worker's `AgentInput` contract and the
+// one agent loop (loop.ts) behind the Claude adapter (providers/claude.ts).
 //
-// Structurally this is the Gemini loop in Anthropic Messages format: a
-// CLIENT-SIDE tool loop where every round is one short rawPredict call
-// (vertex/claude.ts). It deliberately drops the direct-Anthropic-only features
-// that Vertex does not host — hosted MCP connector, the `advisor` tool, and
-// `delegate` (which fanned out THROUGH MCP). Web search IS kept: Vertex hosts
-// Claude's server-side web_search tool (needs the GCP org policy
-// `constraints/vertexai.allowedPartnerModelFeatures` enabled; Gemini's
-// googleSearch is the equivalent on the other lane).
+// There is no loop in this file any more. This file WAS the second loop — 359
+// lines of iteration budget, `proposal_resolve` validation, side-effect staging,
+// lookup ceiling, synthesis pass and narration, all written a second time — and
+// the cost of that was exactly what #496 exists to fix: `/stop` was implemented
+// on the Gemini path and simply absent here, so a Claude turn could not be
+// cancelled. Deleting the copy is what makes it work, not a third implementation.
 //
-// Prompt caching: the system blocks carry cache_control (skills.ts) and Vertex
-// honours it for Claude, so the cached prefix pays off on this lane.
+// What is left is the job the file is actually for, and it is deliberately the
+// same shape as `gemini-agent.ts`: turn `Env` into the loop's named ports, route
+// the tier, compose the system prompt and the tool roster, hand them over. The
+// only line that differs is which adapter is constructed.
+//
+// `Env` stops here. The adapter takes a transport port rather than an `Env`, so
+// it compiles in the Node test build and `tests/claude-provider.test.ts` drives
+// a whole Claude-shaped turn with a stubbed rawPredict and no network.
 
-import type { Env } from "../types";
 import { TOOLS } from "./tool-definitions";
-import { SIDE_EFFECT_TOOLS } from "./types";
 import { buildSystemBlocks } from "./skills";
-import { routeRequest, MODELS } from "./routing";
-import { claudeVertexRaw } from "../vertex/claude";
-import { BUILD } from "../version";
+import { routeRequest } from "./routing";
+import { threadStateFor } from "../thread-state/production";
 import {
-  MAX_ITERATIONS,
-  MAX_TOKENS,
-  READONLY_TOOL_BUDGET,
-  LOOKUP_CEILING,
-  SUBREQUEST_CAP,
-  outOfIterationBudget,
-  BUDGET_EXHAUSTED_LOOKUP_NOTE,
-  markPartialLookup,
-  BUDGET_EXHAUSTED_SYNTHESIS,
-  CLARIFY_FALLBACK,
-  makeInterimFilter,
-  validateProposalResolve,
-  executeReadOnlyTool,
-  toolResultDigest,
-  type AgentInput,
-  type AgentResult,
-  type AgentImage,
-} from "./loop-shared";
-import { subrequestsUsed, meterBreakdown, withSubrequestLimit, isSubrequestBudgetError, subrequestBudgetTrips } from "../net";
-import type { HistoryTurn } from "../thread-state/index";
-import { buildProviderConversation, type ProviderConversationTurn } from "./provider-conversation";
+  isSubrequestBudgetError,
+  meterBreakdown,
+  subrequestBudgetTrips,
+  subrequestsUsed,
+  withSubrequestLimit,
+} from "../net";
+import { claudeVertexRaw } from "../vertex/claude";
+import { runLoop, type LoopBudget } from "./loop";
+import { claudeProvider } from "./providers/claude";
+import { executeReadOnlyTool, type AgentInput, type AgentResult } from "./loop-shared";
+import { buildProviderConversation } from "./provider-conversation";
+import type { SystemBlock, ToolSpec } from "./model-provider";
 
-// ── Anthropic Messages wire types (the subset we touch) ──────────────────────
-
-interface TextBlock { type: "text"; text: string; }
-interface ToolUseBlock { type: "tool_use"; id: string; name: string; input: Record<string, unknown>; }
-type ContentBlock = TextBlock | ToolUseBlock | { type: string; [k: string]: unknown };
-
-interface ImageBlockParam {
-  type: "image";
-  source: { type: "base64"; media_type: string; data: string };
-}
-interface ToolResultBlockParam {
-  type: "tool_result";
-  tool_use_id: string;
-  content: string;
-  is_error?: boolean;
-}
-interface MessageParam {
-  role: "user" | "assistant";
-  content: string | Array<ContentBlock | ImageBlockParam | ToolResultBlockParam>;
-}
-interface ClaudeMessage {
-  content: ContentBlock[];
-  stop_reason: string | null;
-  usage?: {
-    input_tokens?: number;
-    output_tokens?: number;
-    cache_read_input_tokens?: number;
-    cache_creation_input_tokens?: number;
-  };
-}
-
-// Web search is a server-side tool executed on Google/Anthropic infra during
-// the single rawPredict call (zero Worker subrequests). Kept per user decision.
-const WEB_SEARCH_TOOL = { type: "web_search_20250305", name: "web_search", max_uses: 3 };
+/** The loop's budget port over the real per-invocation meter (net.ts, ADR-022). */
+const liveBudget: LoopBudget = {
+  used: subrequestsUsed,
+  trips: subrequestBudgetTrips,
+  withLookupLimit: withSubrequestLimit,
+  isBudgetError: isSubrequestBudgetError,
+  breakdown: meterBreakdown,
+};
 
 export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
   const { env, userText, history, currentSender, pending, images, slack, assistantContext } = input;
   const conversation = input.conversation ?? buildProviderConversation(history, userText, images);
 
-  const { tier, reason: routeReason } = routeRequest({ userText, hasPending: pending !== null, override: input.tierOverride });
-  // Tier → Vertex model ID. The default lane is overridable via CLAUDE_MODEL
-  // (e.g. pin an exact @-versioned id); chill/grind stay fixed.
-  const model =
-    tier === "default" ? (env.CLAUDE_MODEL ?? MODELS.default) : MODELS[tier];
-
-  // Standard extended thinking for the reasoning lanes (Vertex-supported).
-  // chill turns are trivial confirms and skip it. Preserved across tool rounds
-  // automatically because we echo the assistant content verbatim below. Tunable
-  // dial — drop to undefined if a model/region rejects the shape.
-  const thinking = tier === "chill" ? undefined : { type: "enabled", budget_tokens: 6000 };
-
-  const tools = [
-    ...TOOLS.filter((t) => t.name !== "delegate"), // delegate was MCP-backed; gone on Vertex
-    WEB_SEARCH_TOOL,
-  ];
-
-  // ── telemetry (mirror the Gemini lane's single [uno-bot] line) ─────────────
-  const startedAt = Date.now();
-  let inputTokens = 0;
-  let outputTokens = 0;
-  let cacheReadTokens = 0;
-  let cacheWriteTokens = 0;
-  let iterations = 0;
-  let toolCallsUsed = 0;
-  const toolNamesUsed: string[] = [];
-
-  const addUsage = (u: ClaudeMessage["usage"]): void => {
-    inputTokens += u?.input_tokens ?? 0;
-    outputTokens += u?.output_tokens ?? 0;
-    cacheReadTokens += u?.cache_read_input_tokens ?? 0;
-    cacheWriteTokens += u?.cache_creation_input_tokens ?? 0;
-  };
-  const recordToolUses = (content: ContentBlock[]): void => {
-    for (const b of content) {
-      if (b.type === "tool_use" || b.type === "server_tool_use") {
-        toolNamesUsed.push((b as ToolUseBlock).name ?? "(server)");
-        if (b.type === "tool_use") {
-          const tu = b as ToolUseBlock;
-          input.onToolCall?.({ name: tu.name, args: tu.input ?? {} });
-        }
-      }
-    }
-  };
-  const finish = (result: AgentResult): AgentResult => {
-    console.log(
-      `[budget] ${subrequestsUsed()}/${SUBREQUEST_CAP} subrequests spent (lookup ceiling ${LOOKUP_CEILING}), ` +
-        `${toolCallsUsed} tools, ${subrequestBudgetTrips()} budget stops | ${meterBreakdown()}`,
-    );
-    // This path has a thinking BUDGET (tokens), not a level — so it reports no
-    // level at all rather than a null one. TODO(#496): this moves into the
-    // Claude adapter's own `dials()` when it lands behind the seam.
-    input.onDials?.({ tier, route: routeReason, model, detail: {} });
-    console.log(
-      `[uno-bot] request done build=${BUILD} provider=vertex-claude tier=${tier} route=${routeReason} model=${model} ` +
-        `iterations=${iterations} tokens_in=${inputTokens} tokens_out=${outputTokens} ` +
-        `cache_read=${cacheReadTokens} cache_write=${cacheWriteTokens} ms=${Date.now() - startedAt} ` +
-        `tools=[${toolNamesUsed.join(",")}] mcp=off outcome=${result.kind}`,
-    );
-    return result;
-  };
-
-  const emitInterim = makeInterimFilter(input.onInterim);
+  // Routing reads turn knowledge (the words, whether a proposal is pending) and
+  // produces an opaque tier NAME. The adapter maps that name to a Claude model
+  // and its thinking budget; nothing between the two knows either.
+  const { tier, reason: routeReason } = routeRequest({
+    userText,
+    hasPending: pending !== null,
+    override: input.tierOverride,
+  });
 
   const pendingForSystem = pending
     ? { toolName: pending.toolName, input: pending.input, requesterUserId: pending.requesterUserId }
     : null;
-  const systemBlocks = await buildSystemBlocks(env, pendingForSystem, currentSender, assistantContext);
+  const blocks = await buildSystemBlocks(env, pendingForSystem, currentSender, assistantContext);
+  // Block 0 is the harness: identical for every request on this build, and so
+  // the only block a provider cache can hold. Everything after it is
+  // per-request — who sent this, what proposal is pending.
+  const system: SystemBlock[] = blocks.map((b, i) => ({ text: b.text, stable: i === 0 }));
 
-  const messages = buildMessages(conversation);
-
-  const callClaude = async (disableTools: boolean): Promise<ClaudeMessage> => {
-    const body: Record<string, unknown> = {
-      max_tokens: MAX_TOKENS,
-      system: systemBlocks,
-      messages,
-      tools,
-      ...(thinking ? { thinking } : {}),
-      ...(disableTools ? { tool_choice: { type: "none" } } : {}),
-    };
-    const { status, data } = await claudeVertexRaw(env, model, body);
-    if (status !== 200) {
-      const err = data as { error?: { message?: string } };
-      throw new Error(`Vertex-Claude ${status}: ${err?.error?.message ?? "rawPredict failed"}`.slice(0, 400));
-    }
-    return data as ClaudeMessage;
-  };
-
-  for (let iter = 0; iter < MAX_ITERATIONS; iter++) {
-    // The model round-trip is the one subrequest EVERY iteration spends, and it
-    // used to be the only one nothing gated: refusing lookups still let the loop
-    // spin, burning the delivery reserve until the post itself failed. Break to
-    // the tools-disabled synthesis pass below instead.
-    if (outOfIterationBudget(subrequestsUsed())) break;
-    const response = await callClaude(false);
-    iterations++;
-    addUsage(response.usage);
-    recordToolUses(response.content);
-
-    if (response.stop_reason === "end_turn" || response.stop_reason === "stop_sequence") {
-      return finish({ kind: "text", text: extractFinalText(response.content) || "(empty response)" });
-    }
-
-    // Server-side tool work (web_search) can pause a long turn: resume by
-    // echoing the paused assistant content and calling again. Without this the
-    // loop would surface "(internal: unexpected stop_reason: pause_turn)".
-    if (response.stop_reason === "pause_turn") {
-      messages.push({ role: "assistant", content: response.content });
-      continue;
-    }
-
-    if (response.stop_reason === "tool_use") {
-      const toolUses = response.content.filter((b): b is ToolUseBlock => b.type === "tool_use");
-
-      // (a) Resolve a pending proposal — Worker-side authorization, defense in depth.
-      const resolveCall = toolUses.find((tu) => tu.name === "proposal_resolve");
-      if (resolveCall) {
-        const verdict = validateProposalResolve(
-          resolveCall.input as { decision?: unknown; message_to_user?: unknown },
-          pending,
-          currentSender.userId,
-        );
-        if (!verdict.ok) {
-          // Satisfy EVERY tool_use in the turn or the next call 400s on an
-          // orphaned tool_use (same discipline as the Gemini lane).
-          messages.push({ role: "assistant", content: response.content });
-          messages.push({
-            role: "user",
-            content: toolUses.map((tu): ToolResultBlockParam => {
-              const body =
-                tu.id === resolveCall.id
-                  ? JSON.stringify({ ok: false, error: verdict.error })
-                  : JSON.stringify({ ok: false, error: "deferred — resolve the pending proposal first" });
-              // EVERY reported call reports a result, including this one. The
-              // transcript pairs results to calls first-in-first-out by tool
-              // name, so a call that is announced and then never answered leaves
-              // an unfilled slot that the NEXT turn's call of the same name
-              // silently fills — recording turn two's outcome against turn one
-              // and leaving the call that actually ran blank. A deferral is a
-              // real outcome and now reads as one.
-              input.onToolResult?.(toolResultDigest(tu.name, body));
-              return tu.id === resolveCall.id
-                ? { type: "tool_result", tool_use_id: tu.id, content: body, is_error: true }
-                : { type: "tool_result", tool_use_id: tu.id, content: body };
-            }),
-          });
-          continue;
-        }
-        return finish({ kind: "resolved", decision: verdict.decision, pending: pending!, messageToUser: verdict.messageToUser });
-      }
-
-      // (b) Side-effect tool → stage as a ✅-gated proposal.
-      const sideEffect = toolUses.find((tu) => SIDE_EFFECT_TOOLS.has(tu.name as never));
-      if (sideEffect) {
-        const previewText = response.content
-          .filter((b): b is TextBlock => b.type === "text")
-          .map((b) => b.text)
-          .join("\n")
-          .trim();
-        return finish({
-          kind: "proposal",
-          toolName: sideEffect.name,
-          input: sideEffect.input ?? {},
-          previewText: previewText || undefined,
-        });
-      }
-
-      // (c) Read-only tools: execute within budget, feed results back, loop.
-      const narration = response.content
-        .filter((b): b is TextBlock => b.type === "text")
-        .map((b) => b.text)
-        .join("\n")
-        .trim();
-      if (narration) emitInterim(narration);
-
-      messages.push({ role: "assistant", content: response.content });
-      const toolResults: ToolResultBlockParam[] = [];
-      for (const tu of toolUses) {
-        if (
-          toolCallsUsed >= READONLY_TOOL_BUDGET ||
-          subrequestsUsed() >= LOOKUP_CEILING
-        ) {
-          const refused = JSON.stringify({ ok: false, error: "no more lookups available this turn", note: BUDGET_EXHAUSTED_LOOKUP_NOTE });
-          input.onToolResult?.(toolResultDigest(tu.name, refused));
-          toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: refused });
-          continue;
-        }
-        toolCallsUsed++;
-        // Enforced, not forecast: countedFetch refuses the call that would cross
-        // the ceiling, so a tool can start with any amount of headroom left and
-        // simply return less. Paging loops turn the stop into truncated:true; a
-        // tool that can't do anything useful with what's left surfaces as the
-        // budget note, same as a pre-emptive refusal used to.
-        let resultText: string;
-        const tripsBefore = subrequestBudgetTrips();
-        try {
-          resultText = await withSubrequestLimit(LOOKUP_CEILING, () =>
-            executeReadOnlyTool(env, tu.name, tu.input, slack));
-          // A tool that returned normally may still have been cut short — by a
-          // paging loop stopping cleanly, or by a catch that ate the throw.
-          // The counter sees both, so a short read can't pass as a whole one.
-          if (subrequestBudgetTrips() > tripsBefore) resultText = markPartialLookup(resultText);
-        } catch (err) {
-          if (!isSubrequestBudgetError(err)) throw err;
-          resultText = JSON.stringify({ ok: false, error: "no more lookups available this turn", note: BUDGET_EXHAUSTED_LOOKUP_NOTE });
-        }
-        // The result's own honesty fields, for the eval transcript. Reported
-        // for every outcome including the refusals above — "the lookup never
-        // ran" is the answer to a whole class of failure (#452).
-        input.onToolResult?.(toolResultDigest(tu.name, resultText));
-        toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: resultText });
-      }
-      messages.push({ role: "user", content: toolResults });
-      continue;
-    }
-
-    return finish({ kind: "text", text: `(internal: unexpected stop_reason: ${response.stop_reason})` });
-  }
-
-  // Iteration budget exhausted — force a tools-disabled synthesis pass so the
-  // model answers from what it already gathered. `tools` stays passed (the API
-  // rejects tool_result-bearing histories with no tools defined).
-  messages.push({ role: "user", content: BUDGET_EXHAUSTED_SYNTHESIS });
-  const finalResponse = await callClaude(true);
-  iterations++;
-  addUsage(finalResponse.usage);
-  recordToolUses(finalResponse.content);
-  return finish({ kind: "text", text: extractFinalText(finalResponse.content) || CLARIFY_FALLBACK });
-}
-
-/**
- * The user-facing reply is the text AFTER the last non-text block (tool /
- * server-tool / thinking). Joining every text block would leak the working
- * monologue; falls back to all-text when there are no non-text blocks.
- */
-function extractFinalText(content: ContentBlock[]): string {
-  let lastNonText = -1;
-  content.forEach((b, i) => {
-    if (b.type !== "text") lastNonText = i;
-  });
-  const after = content
-    .slice(lastNonText + 1)
-    .filter((b): b is TextBlock => b.type === "text")
-    .map((b) => b.text)
-    .join("\n")
-    .trim();
-  if (after) return after;
-  return content
-    .filter((b): b is TextBlock => b.type === "text")
-    .map((b) => b.text)
-    .join("\n")
-    .trim();
-}
-
-/**
- * Build the Claude messages array from stored history + the current turn.
- * Merges consecutive same-role turns (the API rejects them) and drops leading
- * assistant turns (first message must be user). Current-turn images become
- * image blocks ahead of the text block; history stays plain text.
- */
-function buildMessages(conversation: ProviderConversationTurn[]): MessageParam[] {
-  return conversation.map((turn): MessageParam => ({
-    role: turn.role,
-    content: turn.images?.length
-      ? [
-        ...turn.images.map((img): ImageBlockParam => ({
-          type: "image",
-          source: { type: "base64", media_type: img.media_type, data: img.data },
-        })),
-        { type: "text", text: turn.text },
-      ]
-      : turn.text,
+  const tools: ToolSpec[] = TOOLS.map((t) => ({
+    name: t.name,
+    description: t.description,
+    input_schema: t.input_schema,
   }));
+
+  // Keyed like the CONVERSATION, not the thread — and PASSED IN
+  // (slack.conversationTs) rather than re-derived, because re-deriving it is
+  // how the two ends drifted: an explicitly threaded DM resolves to the thread,
+  // not to "dm". The fallback keeps the old behaviour for any caller that has
+  // not supplied it. Identical to the Gemini side on purpose: `/stop` is now
+  // one mechanism, read in one place.
+  const cancelThread =
+    slack?.conversationTs ?? (slack?.channel?.startsWith("D") ? "dm" : (slack?.threadTs ?? "dm"));
+
+  return runLoop({
+    provider: claudeProvider({
+      transport: (model, body) => claudeVertexRaw(env, model, body),
+      defaultModel: env.CLAUDE_MODEL,
+    }),
+    deps: {
+      executeReadOnlyTool: (name, args) => executeReadOnlyTool(env, name, args, slack),
+      threadState: threadStateFor(env),
+      budget: liveBudget,
+    },
+    tier,
+    routeReason,
+    conversation,
+    system,
+    tools,
+    pending,
+    currentSenderId: currentSender.userId,
+    cancelKey: slack?.channel ? { channel: slack.channel, thread: cancelThread } : null,
+    onInterim: input.onInterim,
+    onDials: input.onDials,
+    onToolCall: input.onToolCall,
+    onToolResult: input.onToolResult,
+  });
 }

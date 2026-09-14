@@ -28,18 +28,20 @@ Because the brain is bundled, **guidance changes reach the bot on `deploy`, not 
 
 | | `gemini` (**default / active**) | `vertex-claude` |
 |---|---|---|
-| Loop | `src/agent/gemini-agent.ts` — `GEMINI_MODEL` (`gemini-3.8-flash`) | `src/agent/claude-agent.ts` — tiered `claude-*` on Vertex (`sonnet` default; "think hard" → `opus`; confirm/cancel → `haiku`) |
+| Adapter (+ its wiring) | `src/agent/providers/gemini.ts` via `gemini-agent.ts` — `GEMINI_MODEL` (`gemini-3.8-flash`) | `src/agent/providers/claude.ts` via `claude-agent.ts` — tiered `claude-*` on Vertex (`sonnet` default; "think hard" → `opus`; confirm/cancel → `haiku`) |
 | Web grounding | `googleSearch` + `urlContext` (Google built-ins) | Claude `web_search` (needs the GCP org policy `constraints/vertexai.allowedPartnerModelFeatures`) |
 | Prompt caching | Gemini implicit caching | Anthropic prompt caching on the cached system prefix |
 | Auth / billing | Vertex service account (canonical — ADR-018; AI-Studio `GEMINI_API_KEY` is a local-dev fallback only) → GCP | **Same** Vertex service account → GCP (Claude via Model Garden) |
 
-Both lanes are **local tools only** (no hosted MCP), and share the same tool roster, gate protocol, iteration cap (16) and output-token cap (16384). Auth for both is the Vertex service account (`GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY`, project `GEMINI_PROJECT_ID`), so Claude usage bills to the same GCP project as Gemini. Smoke-test the lanes with `GET /debug/gemini` and `GET /debug/vertex-claude` (both auth-gated by `DEBUG_TOKEN`).
+Both lanes are **local tools only** (no hosted MCP), and run the same agent loop — so the tool roster, the gate protocol, `/stop`, the iteration cap (16) and the output-token cap (16384) are one implementation rather than two matching ones. Auth for both is the Vertex service account (`GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY`, project `GEMINI_PROJECT_ID`), so Claude usage bills to the same GCP project as Gemini. Smoke-test the lanes with `GET /debug/gemini` and `GET /debug/vertex-claude` (both auth-gated by `DEBUG_TOKEN`).
 
 ### One loop, behind the ModelProvider seam
 
 Everything a turn *decides* lives once, in `src/agent/loop.ts`: the iteration budget gate, the `/stop` check, authorization of the model's own `proposal_resolve` call, a side-effect call becoming a ✅-gated proposal, read-only calls under the subrequest ceiling with a budget trip stamping the result partial, the tools-disabled synthesis pass, the retry on a backup model, and the one rule that narration is emitted only ahead of read-only work. Behind it sits `ModelProvider` (`src/agent/model-provider.ts`): an adapter is handed a neutral conversation, a tool roster, an opaque tier name and a `toolsEnabled` flag, and answers with text, tool calls, usage and a stop kind. No model's wire format — a `functionCall` part, a `tool_use` block, a `pause_turn`, a thought signature — appears above an adapter, and no provider's dial sits in the shared contract.
 
-`src/agent/providers/gemini.ts` is production's adapter: it owns tier → model → thinking level (ADR-028), the `contents` array it appends to verbatim, the Vertex `cachedContents` harness cache (warmed on the turn's first use, so no route has to warm it), the `GEMINI_FALLBACK_MODEL` backup, and token accounting. `src/agent/providers/fake.ts` replays scripted turns, which is what lets `tests/agent-loop.test.ts` drive the whole loop with no network, no credential and no Cloudflare runtime. `src/agent/claude-agent.ts` still runs its own copy of the loop until #496 moves it behind the seam.
+`src/agent/providers/gemini.ts` is production's adapter: it owns tier → model → thinking level (ADR-028), the `contents` array it appends to verbatim, the Vertex `cachedContents` harness cache (warmed on the turn's first use, so no route has to warm it), the `GEMINI_FALLBACK_MODEL` backup, and token accounting. `src/agent/providers/claude.ts` is the Claude-on-Vertex adapter: the `messages` array it appends to verbatim (so a thinking block survives a tool round), tool_use ⇄ neutral tool call, the tool_result echo that keeps every announced call answered, `pause_turn` resumed inside the adapter so the loop never sees it, the tier → model id and thinking budget, server-side `web_search`, the `cache_control` prefix, and usage accounting. It reports **no backup model** — `fallback` always returns false, so a 429 surfaces through the same no-backup path a Gemini turn takes with `GEMINI_FALLBACK_MODEL` unset. Its transport is a port, so `tests/claude-provider.test.ts` drives a whole Claude-shaped turn against a stubbed rawPredict. `src/agent/providers/fake.ts` replays scripted turns, which is what lets `tests/agent-loop.test.ts` drive the whole loop with no network, no credential and no Cloudflare runtime.
+
+Deleting the second loop is what made `/stop` work on Claude (#496): `claude-agent.ts` was 359 lines that re-implemented everything above, and the cancel check was simply missing from its copy.
 
 ## What it can / partially can / can't do
 
@@ -70,9 +72,9 @@ uno-bot/
     │                     /debug/vertex-claude · /debug/figma-poll · /slack/events ·
     │                     /oauth/slack/{start,callback} — plus the cron scheduled() handler
     ├── agent/            loop.ts (THE agent loop) · model-provider.ts (the ModelProvider
-    │                     seam) · providers/ (gemini · fake) · loop-policy.ts (the loop's
-    │                     dials and strings) · run-agent.ts (provider dispatcher) ·
-    │                     gemini-agent.ts (Env → the loop's ports) · claude-agent.ts ·
+    │                     seam) · providers/ (gemini · claude · fake) · loop-policy.ts (the
+    │                     loop's dials and strings) · run-agent.ts (provider dispatcher) ·
+    │                     gemini-agent.ts · claude-agent.ts (Env → the loop's ports) ·
     │                     routing.ts (tiers/model ids) · skills.ts (bundled-harness assembly) ·
     │                     preflight · draft-judge · tool schemas
     ├── gemini/           Google auth (Vertex SA / API key) + Gemini REST client
