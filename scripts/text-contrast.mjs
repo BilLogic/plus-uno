@@ -54,6 +54,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { ratchet } from '../design-system/src/lib/tokens.mjs';
 import {
   AA_TEXT,
   PAGE_TOKEN,
@@ -287,23 +288,31 @@ export function census(found) {
  * Recorded may shrink and must never grow. An entry that no longer fails is
  * itself reported: a fix must not quietly leave its exemption behind, or the
  * baseline slowly becomes a list of things nobody has looked at.
+ *
+ * The CLASSIFICATION is `ratchet` in `design-system/src/lib/tokens.mjs` (#506) —
+ * one function for the nine baselines that each had their own rule. What stays
+ * here is the wording, and the order: NEW and ROSE are emitted in the order the
+ * run found them, not grouped by kind, so the list reads like the run.
  */
 export function ratchetFailures(counts, baseline) {
+  const { new: unrecorded, known, fixed } = ratchet(counts, baseline);
+  const isNew = new Set(unrecorded.map((entry) => entry.key));
+  const byKey = new Map(known.map((entry) => [entry.key, entry]));
+
   const failures = [];
-  for (const [key, count] of Object.entries(counts)) {
-    const recorded = baseline[key];
-    if (!recorded) {
+  for (const key of Object.keys(counts)) {
+    if (isNew.has(key)) {
       failures.push(`  NEW      ${key.split('|').join('  ')}\n           not in the baseline. Fix it, or record it with a reason.`);
       continue;
     }
-    if (count > recorded.count) {
-      failures.push(`  ROSE     ${key.split('|').join('  ')}\n           ${recorded.count} recorded, ${count} found.`);
+    const entry = byKey.get(key);
+    if (entry?.rose) {
+      failures.push(`  ROSE     ${key.split('|').join('  ')}\n           ${entry.recorded} recorded, ${entry.count} found.`);
     }
   }
-  for (const [key, recorded] of Object.entries(baseline)) {
-    if (counts[key]) continue;
+  for (const { key, recorded } of fixed) {
     failures.push(
-      `  STALE    ${key.split('|').join('  ')}\n           recorded ${recorded.count}, found 0 — it was fixed. ` +
+      `  STALE    ${key.split('|').join('  ')}\n           recorded ${recorded}, found 0 — it was fixed. ` +
         'Remove the entry so the baseline stays a list of live findings.',
     );
   }
