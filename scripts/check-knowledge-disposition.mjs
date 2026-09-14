@@ -31,7 +31,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { documents } from './lib/corpus.mjs';
+import { documents, frontmatter } from './lib/corpus.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -56,19 +56,20 @@ function inScope(root = REPO_ROOT) {
     .map((rel) => path.join(root, rel));
 }
 
-/** Frontmatter as a flat key→value map. Values are single-line scalars here. */
-function frontmatter(abs) {
-  const text = fs.readFileSync(abs, 'utf8');
-  // A leading HTML comment (the `<!-- Tier: 2 -->` house marker) precedes the
-  // fence in most of these files, so the fence is found rather than assumed.
-  const fence = text.match(/^---\r?\n([\s\S]*?)\r?\n---/m);
-  if (!fence) return null;
-  const map = {};
-  for (const line of fence[1].split(/\r?\n/)) {
-    const kv = line.match(/^([A-Za-z][\w-]*):\s*(.*)$/);
-    if (kv) map[kv[1]] = kv[2].trim().replace(/^["']|["']$/g, '').replace(/\s+#.*$/, '');
-  }
-  return map;
+/**
+ * Frontmatter as a flat key→value map, read through the corpus (#503).
+ *
+ * `allowLeadingComment` is why this could not simply call the shared reader
+ * before: the house marker `<!-- Tier: 2 (on demand) -->` precedes the fence in
+ * most of these files, and the corpus anchored at byte 0. The option moves that
+ * one difference into the shared reader, where it is tested, rather than keeping
+ * a whole second parser to hold it.
+ *
+ * @returns {Record<string, string>|null} null when there is no closed block.
+ */
+function dispositionMeta(abs) {
+  const { meta, raw } = frontmatter(abs, { allowLeadingComment: true });
+  return raw === null ? null : meta;
 }
 
 const rel = (abs) => path.relative(REPO_ROOT, abs).replace(/\\/g, '/');
@@ -83,7 +84,7 @@ const files = inScope();
 
 for (const abs of files) {
   const name = rel(abs);
-  const fm = frontmatter(abs);
+  const fm = dispositionMeta(abs);
 
   if (!fm || !fm.disposition) {
     failures.push(

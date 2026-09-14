@@ -127,7 +127,7 @@ import { appendFileSync, existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { documents } from './lib/corpus.mjs';
+import { documents, frontmatter, stripLinks } from './lib/corpus.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(here, '..');
@@ -220,13 +220,16 @@ export const RECORDED = [
   },
 ];
 
-/** Frontmatter off, HTML comments out, then blank-line-separated blocks. */
+/**
+ * Frontmatter off, HTML comments out, then blank-line-separated blocks.
+ *
+ * Where the frontmatter ends is the corpus's answer, not a sixth fence search
+ * of this file's own (#503): it is the same fact the bundler measures its char
+ * budgets against, and the shingle counts recorded in RECORDED above were
+ * taken over the body it names.
+ */
 export function blocksOf(text) {
-  let body = text;
-  if (body.startsWith('---\n')) {
-    const close = body.indexOf('\n---', 4);
-    if (close !== -1) body = body.slice(close + 4);
-  }
+  let body = frontmatter(text).body;
   body = body.replace(/<!--[\s\S]*?-->/g, '\n\n');
   return body
     .split(/\n\s*\n/)
@@ -244,8 +247,11 @@ export function blocksOf(text) {
  * numbers, and that is one meaning, not two.
  */
 export function wordsOf(block) {
-  return block
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+  // `stripLinks` is the corpus's, and it is the STRIP — not `links()` inside
+  // out. The recorded shingle counts in the baseline were measured with this
+  // exact reduction, so the helper had to match it character for character
+  // rather than improve on it (#503).
+  return stripLinks(block)
     .replace(/[`*_~>#|]/g, ' ')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ')

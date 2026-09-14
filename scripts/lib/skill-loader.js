@@ -16,7 +16,7 @@
  *   });
  *
  * This loader does three things:
- *   1. Parse the SKILL.md YAML frontmatter (minimal hand-rolled subset)
+ *   1. Read the SKILL.md YAML frontmatter through the corpus reader
  *   2. Strip "meta" sections from the body that are for human readers, not
  *      Claude (Cost Profile, Migration TODO, Related Skills, etc.)
  *   3. Conditionally append `references_when` files based on the context flags
@@ -28,6 +28,8 @@
 import { readFile } from 'fs/promises';
 import { dirname, resolve, join } from 'path';
 import { fileURLToPath } from 'url';
+
+import { frontmatter } from './corpus.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BOT_SKILLS_ROOT = resolve(__dirname, '../prompts');
@@ -56,103 +58,27 @@ const META_SECTION_HEADINGS = [
 ];
 
 /**
- * Parse YAML frontmatter. Supports only the subset this repo actually uses:
- *   - Scalars:        `key: value`
- *   - Quoted scalars: `key: "value"` or `key: 'value'`
- *   - Multi-line >:   `key: >\n  line one\n  line two`
- *   - Sequences:      `key:\n  - item\n  - item`
- *   - Nested objects: `key:\n  subkey: value`
- *   - Comments after value: `key: value  # comment` (comment stripped)
+ * Split a SKILL.md into frontmatter and body, through the corpus reader.
  *
- * Not supported (intentionally — keep it small): anchors, references, flow
- * sequences/mappings, complex multi-line literals, type tags.
- */
-export function parseFrontmatter(yamlText) {
-  const lines = yamlText.split('\n');
-  const result = {};
-  let i = 0;
-
-  while (i < lines.length) {
-    const line = lines[i];
-    if (!line.trim() || line.trim().startsWith('#')) { i++; continue; }
-
-    // Top-level key (no leading whitespace beyond optional empty leading)
-    const m = line.match(/^([A-Za-z_][\w-]*)\s*:\s*(.*?)\s*(?:#.*)?$/);
-    if (!m) { i++; continue; }
-
-    const [, key, rawValue] = m;
-    const value = rawValue.trim();
-
-    if (value === '>' || value === '|') {
-      // Multi-line scalar — collect indented lines that follow
-      const collected = [];
-      i++;
-      while (i < lines.length && (lines[i].startsWith('  ') || lines[i].trim() === '')) {
-        if (lines[i].trim()) collected.push(lines[i].replace(/^\s+/, ''));
-        i++;
-      }
-      result[key] = collected.join(' ').trim();
-      continue;
-    }
-
-    if (value === '') {
-      // Could be a sequence or a nested object — peek at next indented line
-      i++;
-      const items = [];
-      const nested = {};
-      while (i < lines.length && (lines[i].startsWith('  ') || lines[i].trim() === '')) {
-        const sub = lines[i];
-        if (!sub.trim() || sub.trim().startsWith('#')) { i++; continue; }
-        const seq = sub.match(/^\s+-\s+(.+?)\s*(?:#.*)?$/);
-        if (seq) {
-          items.push(stripQuotes(seq[1]));
-        } else {
-          const kv = sub.match(/^\s+([A-Za-z_][\w-]*)\s*:\s*(.+?)\s*(?:#.*)?$/);
-          if (kv) nested[kv[1]] = stripQuotes(kv[2]);
-        }
-        i++;
-      }
-      result[key] = items.length > 0 ? items : nested;
-      continue;
-    }
-
-    result[key] = stripQuotes(value);
-    i++;
-  }
-
-  return result;
-}
-
-function stripQuotes(s) {
-  if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
-    return s.slice(1, -1);
-  }
-  return s;
-}
-
-/**
- * Split a SKILL.md file into frontmatter and body. Frontmatter is between two
- * `---` lines at the very start of the file. Body is everything after the
- * closing `---`. If no frontmatter, the whole file is body and frontmatter
- * is an empty object.
+ * There is ONE frontmatter parser in this repo (`scripts/lib/corpus.mjs`), and
+ * this used to be the fifth: a hand-rolled YAML subset with its own fence
+ * search, its own quote stripping and its own bracket handling. Where a fence
+ * closes is one fact — the bundler measures the Worker's char budgets on the
+ * body side of it — and a second answer to it is a second answer that can
+ * disagree (#503). The two shapes this loader alone needed, a block sequence
+ * (`trigger_types:`) and a nested mapping (`references_when:`), are what
+ * `structured: true` asks for; every other caller keeps the scalar reading.
+ *
+ * Deliberately NOT kept from the parser this replaces: the throw on an
+ * unterminated block. Corpus treats it as content, which is what the bundler
+ * has always done, and a prompt file is no place for a different rule.
+ *
+ * @param {string} rawText the file's whole contents.
+ * @returns {{frontmatter: Record<string, unknown>, body: string}}
  */
 export function splitFrontmatter(rawText) {
-  const trimmed = rawText.replace(/^﻿/, ''); // strip BOM
-  if (!trimmed.startsWith('---\n') && !trimmed.startsWith('---\r\n')) {
-    return { frontmatter: {}, body: trimmed };
-  }
-  const endIdx = trimmed.indexOf('\n---\n', 4);
-  const endIdxCrlf = trimmed.indexOf('\r\n---\r\n', 5);
-  const closingIdx = endIdx !== -1 ? endIdx : endIdxCrlf;
-  if (closingIdx === -1) {
-    throw new Error('Malformed SKILL.md: opening `---` without closing `---`');
-  }
-  const fmText = trimmed.slice(4, closingIdx);
-  const bodyStart = closingIdx + (endIdx !== -1 ? 5 : 7);
-  return {
-    frontmatter: parseFrontmatter(fmText),
-    body: trimmed.slice(bodyStart).replace(/^\s+/, ''),
-  };
+  const { meta, body } = frontmatter(rawText, { structured: true });
+  return { frontmatter: meta, body };
 }
 
 /**
@@ -197,12 +123,12 @@ export async function loadSkill(skillName, context = {}) {
     throw new Error(`Skill not found: ${skillPath} (${err.message})`);
   }
 
-  const { frontmatter, body } = splitFrontmatter(raw);
+  const { frontmatter: meta, body } = splitFrontmatter(raw);
   const cleanBody = stripMetaSections(body);
 
   const parts = [cleanBody];
 
-  const refsWhen = frontmatter.references_when;
+  const refsWhen = meta.references_when;
   if (refsWhen && typeof refsWhen === 'object' && !Array.isArray(refsWhen)) {
     for (const [flag, refPath] of Object.entries(refsWhen)) {
       if (context[flag]) {
@@ -229,6 +155,6 @@ export async function loadSkill(skillName, context = {}) {
 export async function loadSkillMetadata(skillName) {
   const skillPath = join(BOT_SKILLS_ROOT, skillName, 'SKILL.md');
   const raw = await readFile(skillPath, 'utf8');
-  const { frontmatter } = splitFrontmatter(raw);
-  return frontmatter;
+  const { frontmatter: meta } = splitFrontmatter(raw);
+  return meta;
 }

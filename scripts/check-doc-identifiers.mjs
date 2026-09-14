@@ -62,7 +62,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { documents } from './lib/corpus.mjs';
+import { directories, documents } from './lib/corpus.mjs';
 
 import {
   DOM_EVENTS,
@@ -255,16 +255,9 @@ function check() {
   // `forms-and-inputs`, `layout-and-structure` — the group a page belongs to is
   // a real name in this repo, spelled exactly like a kebab-case enum value.
   const folderNames = new Set();
-  const collectDirs = (dir) => {
-    if (!fs.existsSync(dir)) return;
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (!entry.isDirectory() || entry.name.startsWith('.')) continue;
-      folderNames.add(entry.name);
-      collectDirs(path.join(dir, entry.name));
-    }
-  };
-  collectDirs(DS_SRC);
-  collectDirs(GUIDELINES);
+  for (const root of [DS_SRC, GUIDELINES]) {
+    for (const dir of directories('.', { root })) folderNames.add(path.basename(dir));
+  }
 
   /**
    * Runs of segments inside real token names. The colour roles are referred to

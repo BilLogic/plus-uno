@@ -28,9 +28,11 @@
  *
  * Run: npm run check:retired-spelling
  */
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { documents } from './lib/corpus.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(here, '..');
@@ -74,44 +76,22 @@ export const RETIRED = [
 /** The glossary row that owns the old spelling: its "Do NOT use" cell is exempt. */
 const GLOSSARY_ROW = /^\| \*\*direct fix \/ gated change\*\* \|/;
 
-function walk(abs, out) {
-  // Per-entry, and ENOENT ONLY. `readdirSync` gives names; by the time we stat
-  // one it can be gone (a fixture another test is deleting) or unresolvable (a
-  // broken symlink). Statting inside the recursion without this let ONE such
-  // entry throw all the way out to sweep's catch, which discarded it — so the
-  // walk stopped mid-root, `files` kept whatever it had already pushed, and the
-  // check reported success over a truncated list. Measured before the fix: a
-  // broken symlink in a guidelines subfolder swept 324 files where the same
-  // tree without it swept 325, losing exactly the entry after it, silently.
-  //
-  // A vanished entry carries no retired spelling, so skipping it is right. Any
-  // OTHER error still throws: EACCES on a directory means the sweep cannot see
-  // what it claims to have seen, and that must be loud.
-  let st;
-  try {
-    st = statSync(abs);
-  } catch (err) {
-    if (err.code === 'ENOENT') return out;
-    throw err;
-  }
-  if (st.isFile()) {
-    if (/\.(md|mdx|yml|yaml|json)$/.test(abs)) out.push(abs);
-    return out;
-  }
-  for (const name of readdirSync(abs)) {
-    if (name === 'node_modules' || name.startsWith('.')) continue;
-    // `__`-prefixed: a test fixture another test is writing into the live tree
-    // RIGHT NOW. scripts/check-doc-identifiers.test.mjs plants
-    // `design-system/guidelines/__regression-*.md`, runs the checker against the
-    // real repo root and deletes it in a `finally`; node's runner runs test files
-    // in parallel, so this sweep could list the file and then find it gone. It
-    // took CI down twice on changes that had nothing to do with either test.
-    // Fixtures are not repo content, so skipping them is right on its own terms.
-    if (name.startsWith('__')) continue;
-    walk(path.join(abs, name), out);
-  }
-  return out;
-}
+/** The file types an agent reads. Tested against the name, as the walk hands it. */
+const SWEPT = ['.md', '.mdx', '.yml', '.yaml', '.json'];
+
+/**
+ * Entries this sweep does not descend into or read.
+ *
+ * `node_modules` and the dot-directories are the usual exclusions. `__`-prefixed
+ * is not: it is a test fixture another test is writing into the live tree RIGHT
+ * NOW. `scripts/check-doc-identifiers.test.mjs` plants
+ * `design-system/guidelines/__regression-*.md`, runs its checker against the real
+ * repo root and deletes it in a `finally`; node's runner runs test files in
+ * parallel, so this sweep could list the file and then find it gone. It took CI
+ * down twice on changes that had nothing to do with either test. Fixtures are not
+ * repo content, so skipping them is right on its own terms.
+ */
+const skipEntry = (name) => name === 'node_modules' || name.startsWith('.') || name.startsWith('__');
 
 /** Sweep one file's text. Returns findings: { line, text, why }. */
 export function findingsIn(text, rel = '') {
@@ -129,20 +109,18 @@ export function findingsIn(text, rel = '') {
 }
 
 export function sweep(root = REPO_ROOT) {
-  const files = [];
-  for (const r of ROOTS) {
-    const abs = path.join(root, r);
-    // A root that is absent is normal — the fixture roots in tests do not all
-    // exist. Anything else is the sweep failing to read what it is about to
-    // vouch for, and it must not be swallowed: this catch used to take every
-    // error, which is what turned a mid-walk stat failure into a quiet
-    // under-sweep instead of a crash.
-    try {
-      walk(abs, files);
-    } catch (err) {
-      if (err.code !== 'ENOENT') throw err;
-    }
-  }
+  // STRICT, because this check reports a number. The corpus's default walk
+  // swallows an unreadable directory and the sweep then vouches for a corpus
+  // one directory short; `strict` makes an unreadable directory throw and lets
+  // an unresolvable ENTRY — a broken symlink, a file a parallel test just
+  // deleted — cost only itself. Both halves were pinned by this file's own
+  // tests before the walk moved, and they still are: measured at the time, one
+  // broken symlink in a guidelines subfolder swept 324 files where the same
+  // tree without it swept 325, losing exactly the entry after it, silently.
+  // An ABSENT root stays normal — the fixture roots in the tests do not all exist.
+  const files = ROOTS.flatMap((r) =>
+    documents(r, { root, ext: SWEPT, skipEntry, strict: true }).map((rel) => path.join(root, rel)),
+  );
   const findings = [];
   for (const abs of files) {
     const rel = path.relative(root, abs).split(path.sep).join('/');

@@ -11,6 +11,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { documents } from './lib/corpus.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const TOOLKIT = path.join(REPO_ROOT, 'design-system/src/specs/Toolkit');
@@ -43,14 +45,13 @@ const DELETE_REL = [
     'Post-Session/Modals/Modals.stories.jsx',
 ];
 
-function walkStories(dir, acc = []) {
-    for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
-        const p = path.join(dir, ent.name);
-        if (ent.name.startsWith('.') || ent.name === 'node_modules') continue;
-        if (ent.isDirectory()) walkStories(p, acc);
-        else if (ent.name.endsWith('.stories.jsx')) acc.push(p);
-    }
-    return acc;
+/** Every CSF file under `dir`, absolute. The walk is the corpus's (#503). */
+function walkStories(dir) {
+    return documents('.', {
+        root: dir,
+        ext: ['.stories.jsx'],
+        skipEntry: (name) => name.startsWith('.'),
+    }).map((rel) => path.join(dir, rel));
 }
 
 function patchTags(content) {

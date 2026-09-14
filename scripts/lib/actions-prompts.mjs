@@ -33,10 +33,10 @@
  * this walk with it.
  */
 
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { documents } from './corpus.mjs';
 import { PROMPTS_ROOT } from './skill-loader.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -56,17 +56,7 @@ export const ACTIONS_PROMPTS_DIR = path.relative(REPO_ROOT, PROMPTS_ROOT).split(
  * @returns {string[]} posix-style paths relative to `root`, sorted.
  */
 export function walkPromptDocs(root) {
-  if (!fs.existsSync(root)) return [];
-  const out = [];
-  const walk = (dir, rel) => {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const next = rel ? `${rel}/${entry.name}` : entry.name;
-      if (entry.isDirectory()) walk(path.join(dir, entry.name), next);
-      else if (entry.isFile() && entry.name.endsWith('.md')) out.push(next);
-    }
-  };
-  walk(root, '');
-  return out.sort();
+  return documents('.', { root });
 }
 
 /**

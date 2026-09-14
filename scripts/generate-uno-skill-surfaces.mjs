@@ -31,9 +31,11 @@
 //   node scripts/generate-uno-skill-surfaces.mjs           # write
 //   node scripts/generate-uno-skill-surfaces.mjs --check    # CI: fail on drift
 
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { directories, frontmatter } from "./lib/corpus.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CHECK = process.argv.includes("--check");
@@ -79,61 +81,23 @@ const LINES = (text) => text.split(/\r?\n/);
 /** Normalise for comparison only; what we WRITE stays "\n" as before. */
 const NORM = (text) => text.replace(/\r\n/g, "\n");
 
-/** Split a SKILL.md into [frontmatterLines, bodyStartIndex]. */
-function readFrontmatter(path) {
-  const lines = LINES(readFileSync(path, "utf8"));
-  if (lines[0] !== "---") throw new Error(`${path}: no frontmatter`);
-  const end = lines.indexOf("---", 1);
-  if (end === -1) throw new Error(`${path}: unterminated frontmatter`);
-  return lines.slice(1, end);
-}
-
 /**
- * Minimal YAML read for the shapes this repo actually uses: `key: value` and
- * `key: >` folded blocks. Not a general parser — a real one would be a
- * dependency for four fields, and an unsupported shape throws rather than
- * silently returning undefined.
- */
-function parseFields(fmLines) {
-  const out = {};
-  for (let i = 0; i < fmLines.length; i++) {
-    const m = /^([a-zA-Z][\w-]*):\s*(.*)$/.exec(fmLines[i]);
-    if (!m) continue;
-    const [, key, rawValue] = m;
-    if (rawValue === ">" || rawValue === "|") {
-      const folded = [];
-      while (i + 1 < fmLines.length && /^\s+\S/.test(fmLines[i + 1])) {
-        folded.push(fmLines[++i].trim());
-      }
-      out[key] = folded.join(" ");
-    } else {
-      out[key] = unquote(key, rawValue.trim());
-    }
-  }
-  return out;
-}
-
-/**
- * Strip surrounding quotes, and refuse the shapes YAML would silently reinterpret.
+ * A SKILL.md's frontmatter, both ways this generator needs it: the parsed
+ * fields, and the block's own LINES — because artifact 1 re-emits the
+ * frontmatter verbatim, and `argument-hint`, `allowed-tools` and `context:
+ * fork` are load-bearing there.
  *
- * `argument-hint: [prd-required] [fidelity]` was invalid YAML for months — `[…]`
- * opens a flow sequence, so two of them on one line is a parse error that takes
- * the WHOLE frontmatter down with it. Nothing noticed, because nothing loaded
- * these as skills until `.claude/skills/` existed; the skill then registered
- * with its description missing. The single-bracket hints were no better, just
- * quieter: they parsed as a one-item list where a string was meant.
+ * Both come from `scripts/lib/corpus.mjs`, which is the repo's one frontmatter
+ * reader. The parser deleted from here was its own fence search plus its own
+ * minimal YAML — including the bracket refusal that `argument-hint: [a] [b]`
+ * earned, now a corpus test. Where a fence closes decides the Worker's char
+ * budgets (#238) and now also decides what these three surfaces say, so it is
+ * answered once.
  */
-function unquote(key, raw) {
-  if ((raw.startsWith('"') && raw.endsWith('"')) || (raw.startsWith("'") && raw.endsWith("'"))) {
-    return raw.slice(1, -1);
-  }
-  if (/^[[{]/.test(raw)) {
-    throw new Error(
-      `frontmatter \`${key}: ${raw}\` starts with ${raw[0]} — YAML reads that as a ` +
-        `sequence/mapping, not text. Quote the value.`,
-    );
-  }
-  return raw;
+function readSkillFrontmatter(path) {
+  const { meta, raw } = frontmatter(readFileSync(path, "utf8"));
+  if (raw === null) throw new Error(`${path}: no frontmatter, or a block that never closes`);
+  return { fields: meta, fmLines: LINES(raw) };
 }
 
 function slackDescription(name) {
@@ -150,14 +114,13 @@ function slackDescription(name) {
   return line;
 }
 
-const skills = readdirSync(join(ROOT, "skills"))
+const skills = directories("skills", { root: ROOT, recursive: false })
+  .map((dir) => dir.slice("skills/".length))
   .filter((name) => name.startsWith("uno-"))
   .filter((name) => existsSync(join(ROOT, "skills", name, "SKILL.md")))
-  .sort()
   .map((name) => {
     const canonical = `skills/${name}/SKILL.md`;
-    const fmLines = readFrontmatter(join(ROOT, canonical));
-    const fields = parseFields(fmLines);
+    const { fields, fmLines } = readSkillFrontmatter(join(ROOT, canonical));
     if (fields.name !== name) {
       throw new Error(`${canonical}: frontmatter name "${fields.name}" != directory "${name}"`);
     }
