@@ -12,14 +12,16 @@
 //   {
 //     name,                                  // for the log and the results file
 //     runTurn({ prompt, history, pending, surface }) -> Promise<response>,
-//     fetchSubject?(need) -> Promise<{ subject | null, reason?, error?, build? }>,
+//     fetchSubject?(need, case) -> Promise<{ subject | null, reason?, error?, build? }>,
 //   }
 //
 // `response` is the /debug/eval response shape the scoring reads — `ok`,
 // `result`, `dials`, `tools`, `references`, `gateAsk`, `build`, `ms`. A
 // transport that cannot answer a run-time subject omits `fetchSubject`, and the
 // runner fails the cases that declare one by name rather than pretending the
-// board answered.
+// board answered. The case travels beside the condition for a transport that
+// answers per case — this one asks the live board, so the row it gets back is
+// about the condition and the case adds nothing.
 //
 // `workerTransport` below is the adapter for the deployed Worker — the POST
 // that used to be inline, unchanged in what it sends. The in-process adapter

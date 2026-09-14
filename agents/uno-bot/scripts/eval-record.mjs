@@ -39,9 +39,14 @@
 // Run:  node agents/uno-bot/scripts/eval-record.mjs [--case=R3] [--case=R5] [--all] [--out=<dir>]
 //
 // Every call is a live billable model run, so the default is NOTHING: name the
-// cases you mean, or pass `--all` and mean it. A case that declares a run-time
-// subject is refused — its prompt is filled in from a board that is edited
-// daily, so the recording would be a fact about one afternoon.
+// cases you mean, or pass `--all` and mean it.
+//
+// A case that declares a run-time subject (#415) is recorded WITH ITS SUBJECT:
+// the Worker's subject read answers first, the row fills the case's
+// `{{subject.…}}` placeholders the way the runner fills them, and the row is
+// written into the recording beside the replies. The recording is therefore a
+// fact about one afternoon's board — and it says which row that was, which is
+// what lets the local transport replay the case against the same one.
 
 import { mkdirSync, writeFileSync } from "node:fs";
 import { readFileSync } from "node:fs";
@@ -51,6 +56,7 @@ import { fileURLToPath } from "node:url";
 
 import { workerTransport } from "./eval-transport.mjs";
 import { threadTurn } from "./eval-history.mjs";
+import { applySubject, skipReason } from "./eval-subjects.mjs";
 import { RECORDINGS_DIR } from "./eval-transport-local.mjs";
 import { workerOrigin } from "./worker-url.mjs";
 
@@ -124,8 +130,49 @@ function isSideEffectResult(result, call) {
   return result?.kind === "proposal" && call.name === result.toolName;
 }
 
-/** One case, recorded. */
-export async function recordCase(spec, transport) {
+/**
+ * The row a case's run-time condition was answered with, from the transport's
+ * subject read — and the case with that row substituted in.
+ *
+ * The three outcomes the read keeps apart stay apart here, because they are
+ * different things to do about a recording: a row is recorded, nothing
+ * satisfying the condition is a case to record another day, and a broken route
+ * is a thing to fix before recording anything.
+ *
+ * @returns `{ subject, spec }` when a row answered, `{ skipped }` when none
+ *   does. Throws when the route or the read failed, or when the row does not
+ *   carry a field the case asks for — the same division `run-evals.mjs` makes.
+ */
+export async function resolveSubject(spec, transport) {
+  const need = spec.subject?.need;
+  if (!need) return { subject: null, spec };
+  const got = transport.fetchSubject
+    ? await transport.fetchSubject(need, spec)
+    : { error: `transport '${transport.name}' resolves no run-time subjects` };
+  if (got.error) throw new Error(`subject route for '${need}': ${got.error}`);
+  if (!got.subject) return { skipped: skipReason(need, got.reason) };
+  const { spec: filled, missing } = applySubject(spec, got.subject);
+  if (missing.length) {
+    throw new Error(
+      `subject for '${need}' carries no ${missing.map((f) => `'${f}'`).join(", ")} (got ${JSON.stringify(got.subject)})`,
+    );
+  }
+  return { subject: got.subject, spec: filled };
+}
+
+/**
+ * One case, recorded.
+ *
+ * @returns `{ recording }`, or `{ skipped }` when the case declares a condition
+ *   the board does not satisfy today — there is nothing to record, and an
+ *   empty recording would skip later for a reason nobody could read.
+ */
+export async function recordCase(rawSpec, transport) {
+  const resolved = await resolveSubject(rawSpec, transport);
+  if (resolved.skipped) return { skipped: resolved.skipped };
+  // The FILLED-IN case from here on: the prompts recorded are the prompts that
+  // were sent, which is what the local transport keys a turn on.
+  const { subject, spec } = resolved;
   const history = [];
   let pending = null;
   const turns = [];
@@ -152,15 +199,21 @@ export async function recordCase(spec, transport) {
     pending = threadTurn(history, turn.prompt, resp, pending);
   }
   return {
-    case: spec.id,
-    source: "captured",
-    recordedAt: new Date().toISOString().slice(0, 10),
-    note:
-      `CAPTURED from ${transport.name}. Round-trip boundaries are reconstructed, not reported — ` +
-      `the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). ` +
-      `Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport ` +
-      `answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.`,
-    turns,
+    recording: {
+      case: spec.id,
+      source: "captured",
+      recordedAt: new Date().toISOString().slice(0, 10),
+      note:
+        `CAPTURED from ${transport.name}. Round-trip boundaries are reconstructed, not reported — ` +
+        `the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). ` +
+        `Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport ` +
+        `answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.` +
+        (subject
+          ? ` The prompts carry the subject row below, as the condition '${rawSpec.subject.need}' answered on ${new Date().toISOString().slice(0, 10)}; a replay is against that row.`
+          : ""),
+      ...(subject ? { subject } : {}),
+      turns,
+    },
   };
 }
 
@@ -186,19 +239,17 @@ async function main() {
   mkdirSync(opts.out, { recursive: true });
   let written = 0;
   for (const spec of wanted) {
-    if (spec.subject?.need) {
-      // A run-time subject is resolved from the live board before turn 1, so the
-      // prompt this recording would carry is one afternoon's row. The local
-      // transport skips subject cases by name for the same reason.
-      console.log(`[record] SKIP ${spec.id} — declares subject '${spec.subject.need}' (run-time, not recordable)`);
-      continue;
-    }
     try {
-      const recording = await recordCase(spec, transport);
+      const { recording, skipped } = await recordCase(spec, transport);
+      if (skipped) {
+        console.log(`[record] SKIP ${spec.id} — ${skipped}`);
+        continue;
+      }
       const path = resolve(opts.out, `${spec.id}.json`);
       writeFileSync(path, `${JSON.stringify(recording, null, 2)}\n`);
       written++;
-      console.log(`[record] ${spec.id} → ${path} (${recording.turns.length} turn(s))`);
+      const row = recording.subject ? `, subject ${JSON.stringify(recording.subject)}` : "";
+      console.log(`[record] ${spec.id} → ${path} (${recording.turns.length} turn(s)${row})`);
     } catch (err) {
       console.error(`[record] FAILED ${spec.id}: ${err instanceof Error ? err.message : String(err)}`);
     }

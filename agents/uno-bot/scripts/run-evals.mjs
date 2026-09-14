@@ -469,8 +469,11 @@ export async function runEvals({
       // case with its `{{subject.…}}` placeholders unfilled, or skipping it,
       // would both report something about the board — and the board was never
       // asked.
+      // The CASE travels with the condition: a transport that answers from a
+      // recording (#541) holds one row per case, and three cases declare
+      // `scenario-any`. The worker transport asks the live board and ignores it.
       const got = transport.fetchSubject
-        ? await transport.fetchSubject(need)
+        ? await transport.fetchSubject(need, rawCase)
         : { error: `transport '${transport.name}' resolves no run-time subjects` };
       if (got.error) {
         // A broken route or a failed read is a FAILURE. Reporting it as a skip

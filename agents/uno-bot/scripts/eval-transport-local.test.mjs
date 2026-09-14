@@ -14,6 +14,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
+import { applySubject } from "./eval-subjects.mjs";
 import {
   RECORDINGS_DIR,
   UNRECORDED_TOOL_RESULT,
@@ -87,7 +88,11 @@ test("every recorded prompt is the fixture's prompt, verbatim", () => {
       spec.turns.length,
       `${id}: recording covers ${rec.turns.length} turns, the case has ${spec.turns.length}`,
     );
-    spec.turns.forEach((turn, i) => {
+    // A `need` case's recorded prompt is the FILLED-IN one — the runner
+    // substitutes the subject before turn 1 — so the comparison is against the
+    // case as the recording's own row fills it.
+    const filled = rec.subject ? applySubject(spec, rec.subject).spec : spec;
+    filled.turns.forEach((turn, i) => {
       assert.equal(
         rec.turns[i].prompt,
         turn.prompt,
@@ -116,13 +121,70 @@ test("an unrecorded case is unsupported — a reason, not a failure", () => {
   assert.match(t.unsupported(caseById("R1")), /no recording for R1/);
 });
 
-test("a subject case gets an honest skip, never a fabricated row", () => {
+test("a subject case with no recording gets an honest skip, never a fabricated row", () => {
   const t = localTransport({ recordings, build: false, env: {} });
   return t.fetchSubject("scenario-any").then((got) => {
     assert.equal(got.subject, null);
     assert.match(got.reason, /reaches no blueprint/);
     assert.match(got.reason, /--transport=worker/);
   });
+});
+
+// ── (4) a run-time subject, from the recording (#541) ───────────────────────
+
+/** B2 — `what happens in {{subject.scenario}}?`, one turn, one row. */
+const B2_SUBJECT = { name: "Goal Setting", scenario: "Goal Setting", phase: "Onboarding" };
+const b2Recording = () => {
+  const spec = applySubject(caseById("B2"), B2_SUBJECT).spec;
+  return parseRecording({
+    case: "B2",
+    source: "authored",
+    note: "AUTHORED — a blueprint answer for the recorded row, for this test.",
+    subject: B2_SUBJECT,
+    turns: [
+      {
+        prompt: spec.turns[0].prompt,
+        replies: [
+          { text: `In the service blueprint, the ${B2_SUBJECT.scenario} scenario runs across the ${B2_SUBJECT.phase} phase.` },
+        ],
+      },
+    ],
+  });
+};
+
+test("a need case answers its condition from the recording's own row", async () => {
+  const t = localTransport({ recordings: new Map([["B2", b2Recording()]]), log: () => {}, env: {} });
+  const got = await t.fetchSubject("scenario-any", caseById("B2"));
+  // The worker transport's success shape — `{ subject, build }` — so the runner
+  // threads `{ need, subject }` into the result and the judge prompt with no
+  // branching on which transport answered.
+  assert.deepEqual(got.subject, B2_SUBJECT);
+  assert.match(String(got.build), /authored recording/);
+  assert.equal(got.reason, undefined);
+  assert.equal(got.error, undefined);
+
+  // And the filled-in prompt replays: the row the condition answered with is the
+  // row the recorded turn was recorded against.
+  const spec = applySubject(caseById("B2"), got.subject).spec;
+  const resp = await t.runTurn({ prompt: spec.turns[0].prompt, history: [], pending: null });
+  assert.equal(resp.ok, true, resp.error);
+  assert.match(resp.result.text, new RegExp(B2_SUBJECT.scenario));
+});
+
+test("a need case whose recording carries no subject skips, by name", async () => {
+  const { subject: _drop, ...noSubject } = b2Recording();
+  const t = localTransport({ recordings: new Map([["B2", noSubject]]), build: false, env: {} });
+  const got = await t.fetchSubject("scenario-any", caseById("B2"));
+  assert.equal(got.subject, null);
+  assert.match(got.reason, /recording for B2 carries no 'subject'/);
+  assert.match(got.reason, /eval-record\.mjs/);
+});
+
+test("a 'subject' that is not a row is refused where it can still be named", () => {
+  assert.throws(
+    () => parseRecording({ ...structuredClone(MINIMAL), subject: ["Goal Setting"] }, { file: "X1.json" }),
+    /X1\.json: 'subject' is not a row object/,
+  );
 });
 
 test("R3 runs through Turn in-process and stages the recorded tool", async () => {
