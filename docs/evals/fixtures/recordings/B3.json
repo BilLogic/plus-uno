@@ -1,0 +1,63 @@
+{
+  "case": "B3",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED from worker https://uno-bot.plus-uno.workers.dev. Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here. The prompts carry the subject row below, as the condition 'phase-any' answered on 2026-09-14; a replay is against that row.",
+  "subject": {
+    "name": "Application",
+    "phase": "Application"
+  },
+  "turns": [
+    {
+      "prompt": "what shape does the Application phase have?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_phase": "Application",
+                "granularity": "scenario",
+                "include": [
+                  "index"
+                ]
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_phase": "Application",
+                "granularity": "path"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "granularity": "phase",
+                "filter_phase": "Application"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "granularity": "step",
+                "filter_phase": "Application"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_phase": "Application",
+                "granularity": "lane"
+              }
+            }
+          ]
+        },
+        {
+          "text": "The `Application` `phase` in <https://uno-blueprint.netlify.app/|the service blueprint> is the entry chapter of the journey (out of 6 phases / 23 scenarios / 40 paths total), covering how potential tutors discover PLUS, interview, and receive an offer.\n\nStructurally, it divides into 2 `scenarios` across 3 `paths`:\n\n---\n\n### 1. **Discovery**\n*“Potential tutors discover and want to join PLUS.”*\n- **Paths (1):**\n  - **Standard** (`happy` `path`, `status: live`): The main route where prospective tutors learn about PLUS, express interest, and attend an information session.\n- **Key steps:** Includes `\"Discovers PLUS\"`, `\"Interested in joining PLUS\"`, and `\"Attends info session\"`.\n- **Primary lanes:** Spans `Regular Tutor` (`customer_actions`), `Front Stage Actions`, `Front Stage Touchpoints`, `Back Stage Actions`, `Back Stage Touchpoints`, `Support Actions`, and `Storyboard`.\n\n---\n\n### 2. **Interview & Offer**\n*“Potential tutors interview for role and receive an offer.”*\n- **Paths (2):**\n  - **Standard** (`happy` `path`, `status: live`): The live operational route.\n    - **Key steps:** `\"Applies\"`, `\"Receives email invitation for group interview\"`, `\"Group interviews\"`, `\"Waits for offer decision\"`, and `\"Receives offer decision\"`.\n  - **Supervisor-registered clearance** (`variant` `path`, `status: proposed` — exploratory design work that might change or may never happen):\n    - Diverges post-offer to redesign clearance handling. It introduces `\"Submits candidate info form\"` and `\"Clearance confirmed (CPO/school)\"`, shifting verification to supervisors and the school/CPO rather than relying on tutor self-reporting.\n- **Primary lanes:** Covers `Regular Tutor`, `CPO` (`partner_actions`), `Front Stage Actions`, `Front Stage Touchpoints`, `Back Stage Actions`, `Back Stage Touchpoints`, `Support Actions`, and `Storyboard`.\n\n---\n\nI queried the blueprint index, phase, scenario, and path rows just now, so this breakdown reflects the live journey structure as recorded today."
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

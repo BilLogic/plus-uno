@@ -1,0 +1,106 @@
+{
+  "case": "M1",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED from worker https://uno-bot.plus-uno.workers.dev. Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "The bot keeps telling people that a small wording tweak to a skill counts as Tier 1 and can just be applied — that's wrong, Tier 1 is typos, links, dates and formatting only, and anything touching a skill is Tier 2. Take this as an intake.",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "read_reference",
+              "args": {
+                "name": "uno-maintain/method"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "search": "direct fix",
+                "path": "agents/uno-bot/AGENT.md"
+              }
+            },
+            {
+              "name": "roadmap_query",
+              "args": {
+                "title": "intake"
+              }
+            },
+            {
+              "name": "source_read",
+              "args": {
+                "url": "https://app.notion.com/p/Intake-Centralized-Decisions-DB-External-Links-Section-39cb7cca49828178adc2f69dd0c4fb4f"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "agents/uno-bot/src/integrations/notion.ts",
+                "search": "intake"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "search": "notion_create",
+                "path": "agents/uno-bot/src"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "todos/064-complete-p2-intake-state-lifecycle.md"
+              }
+            },
+            {
+              "name": "roadmap_query",
+              "args": {
+                "card_number": 2518
+              }
+            }
+          ]
+        },
+        {
+          "toolCalls": [
+            {
+              "name": "notion_create",
+              "args": {
+                "surface": "intake",
+                "sections": [
+                  {
+                    "heading": "Observation & Evidence",
+                    "body": "Reported in-thread: uno-bot has been telling users that small wording tweaks to a skill count as 'Tier 1' and can just be applied directly. Recorded from the designer's report."
+                  },
+                  {
+                    "heading": "Classification",
+                    "body": "- **Trigger type:** bug / inaccuracy\n- **Estate:** Codebase\n- **Target:** uno-bot misbehaving / tune persona (`agents/uno-bot/**`, `skills/uno-maintain/bot.md`)\n- **Suggested severity:** gated change"
+                  },
+                  {
+                    "heading": "Draft Fix",
+                    "body": "1. Enforce in `agents/uno-bot/AGENT.md` and `skills/uno-maintain/bot.md` that edits to skill definitions, personas, DS components, or requirements are strictly excluded from direct fixes, no matter how small the diff.\n2. Reinforce `CONTEXT.md` vocabulary: use `direct fix` and `gated change`; never use 'Tier 1' or 'Tier 2' for maintenance severity (tiers refer exclusively to loading tiers 1, 2, and 3)."
+                  },
+                  {
+                    "body": "- **Impact:** Prevents unreviewed skill modifications and restores canonical severity vocabulary.\n- **Effort:** Low — prompt/instruction reinforcement in bot instructions.\n- **Risk:** Very low — brings bot behavior in line with existing `AGENTS.md` and `uno-maintain/method` rules.",
+                    "heading": "Three-Line Brief"
+                  },
+                  {
+                    "heading": "Open Questions",
+                    "body": "None."
+                  }
+                ],
+                "title": "Intake: Enforce gated change classification for skill edits & retire Tier naming",
+                "summary": "Uno-bot has been incorrectly treating small skill wording tweaks as direct fixes and using retired 'Tier 1' / 'Tier 2' severity terminology. Skill changes are strictly gated changes requiring a PR and PRD, and maintenance severities must be called direct fixes or gated changes."
+              }
+            }
+          ]
+        }
+      ],
+      "toolResults": [],
+      "references": [
+        "uno-maintain/method"
+      ]
+    }
+  ]
+}

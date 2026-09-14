@@ -1,0 +1,110 @@
+{
+  "case": "V1",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED from worker https://uno-bot.plus-uno.workers.dev. Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "Can you poke holes in this before I share it out? Tutor session sign-up sheet, mid-fi, built in Figma and Storybook, PRD is the Roadmap card of the same name: https://plus-uno.netlify.app/prototypes/session-sign-up/",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "read_reference",
+              "args": {
+                "name": "uno-review/method"
+              }
+            },
+            {
+              "name": "source_read",
+              "args": {
+                "url": "https://plus-uno.netlify.app/prototypes/session-sign-up/"
+              }
+            },
+            {
+              "name": "roadmap_query",
+              "args": {
+                "title": "session sign-up"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "prototypes/session-sign-up"
+              }
+            },
+            {
+              "name": "source_read",
+              "args": {
+                "url": "https://app.notion.com/p/Session-Sign-Up-Fill-in-Redesign-21eb7cca4982806b9820fa3c6c7fd1ab"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "prototypes"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "scope": "any",
+                "query": "session sign up"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "session sign up"
+              }
+            },
+            {
+              "name": "read_reference",
+              "args": {
+                "name": "uno-maintain/method"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "scope": "team",
+                "query": "design"
+              }
+            }
+          ]
+        },
+        {
+          "toolCalls": [
+            {
+              "name": "notion_create",
+              "args": {
+                "title": "Intake: Session Sign-Up prototype artifact not in hand",
+                "properties": {
+                  "evidence_link": "https://plus-uno.netlify.app/prototypes/session-sign-up/"
+                },
+                "surface": "intake",
+                "sections": [
+                  {
+                    "heading": "Problem & Evidence",
+                    "body": "A stage-lens review was requested for `Tutor session sign-up sheet` (mid-fi). Reading the prototype link (https://plus-uno.netlify.app/prototypes/session-sign-up/) returned only the application shell title (`PLUS Prototypes`) with none of the artifact's rendered markup or content. In addition, checking the repository for `prototypes/session-sign-up` returned a 404, so no source code or Storybook spec is available to inspect."
+                  },
+                  {
+                    "body": "Route to human review with Bill Guo (Design Lead) or the product design team to review the Figma frames directly, or update the prototype deployment before sharing out for feedback.",
+                    "heading": "Routing & Next Steps"
+                  }
+                ],
+                "summary": "The prototype URL (https://plus-uno.netlify.app/prototypes/session-sign-up/) returned an empty application shell without rendered content or markup, and no matching repository directory exists under `prototypes/session-sign-up/`. Automated critique cannot inspect the artifact.",
+                "source_url": "https://plus-uno.netlify.app/prototypes/session-sign-up/"
+              }
+            }
+          ]
+        }
+      ],
+      "toolResults": [],
+      "references": [
+        "uno-review/method",
+        "uno-maintain/method"
+      ]
+    }
+  ]
+}

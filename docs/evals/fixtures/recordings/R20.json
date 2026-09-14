@@ -1,0 +1,53 @@
+{
+  "case": "R20",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED from worker https://uno-bot.plus-uno.workers.dev. Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "What does the blueprint say about how tutors submit expense reports?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "tutor expense report reimbursement"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "expense"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "scope": "help_tutors",
+                "query": "expense"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "query": "expense",
+                "scope": "any"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "reimbursement travel supplies"
+              }
+            }
+          ]
+        },
+        {
+          "text": "The service blueprint does not mention tutor expense reports or reimbursements at all. Across the blueprint corpus, 0 cells matched those terms (all returned candidate rows were semantic vector guesses rather than textual matches).\n\nI searched the service blueprint just now, and with zero keyword matches and every candidate row coming back vector-only, I am confident expense reporting is completely absent from the blueprint.\n\n### What the blueprint does cover for compensation\n\nThe blueprint only documents **hour logging and payroll** under `Post-session › Reporting Hours`:\n\n- **Reporting hours:** On the `Reported on time` `path`, the `Regular Tutor` logs tutoring hours weekly into CMU's Workday instance via the [<https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-0000001e0103>|`Regular Tutor × Report hours`] `cell`. Workday is the frontstage touchpoint ([<https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-0000001e0106>|`Front Stage Touchpoints × Report hours`]), and hours are self-reported because the PLUS App attendance records do not connect automatically to payroll.\n- **Approval & payout:** The supervisor team approves student employment hours in Workday backstage, and pay arrives via CMU's biweekly payroll cycle through direct deposit ([<https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-0000001e0203>|`Regular Tutor × Receive paycheck`]).\n\n### Who to ask\n\nBecause out-of-pocket expense reimbursement is outside the mapped journey, check directly with **Tutor Supervisors** (who oversee day-to-day tutor administration and timesheets) or **CMU HR / departmental payroll** to find out if an institutional reimbursement process exists in Workday."
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

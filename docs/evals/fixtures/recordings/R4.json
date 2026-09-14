@@ -1,0 +1,93 @@
+{
+  "case": "R4",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED from worker https://uno-bot.plus-uno.workers.dev. Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "File an intake card: the Card component has no content slot, so a Table cannot nest inside a Card instance in Figma.",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "read_reference",
+              "args": {
+                "name": "uno-maintain/method"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components",
+                "search": "Card"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components/layout-and-structure/Card/index.md"
+              }
+            }
+          ]
+        },
+        {
+          "toolCalls": [
+            {
+              "name": "notion_create",
+              "args": {
+                "surface": "intake",
+                "sections": [
+                  {
+                    "heading": "Problem & Context",
+                    "body": "In the Figma component library, the Card component does not expose a content slot or instance-swap property for nested children. While the React implementation in [`design-system/src/components/layout-and-structure/Card/Card.jsx`](https://github.com/BilLogic/plus-uno/blob/fa924d5e17128e910c4f6b24edbb5572eccdaa74/design-system/src/components/layout-and-structure/Card/Card.jsx) accepts arbitrary `children` (and `body: node`), Figma designers cannot nest a Table or other complex components inside a Card instance without detaching it."
+                  },
+                  {
+                    "body": "Update the Figma Card component definition to include a component property for slot/instance swap (or a default empty nested slot container) that supports inserting structured child components like Table without breaking instance inheritance.",
+                    "heading": "Proposed Solution"
+                  },
+                  {
+                    "heading": "Classification",
+                    "body": "- **Estate:** Figma\n- **Target:** components out of date (update the Figma component library)\n- **Trigger type:** Bug / Improvement\n- **Suggested severity:** Gated change (touches design-system library components; requires two approvals per maintain method §5.3)"
+                  },
+                  {
+                    "heading": "Brief (Impact · Effort · Risk)",
+                    "body": "- **Impact:** High for dashboard and data-dense views; stops designers from detaching instances to place tables in cards.\n- **Effort:** Low; add an instance swap / slot property to the Card component in Figma.\n- **Risk:** Low; additive change to existing Card variants in the Figma component library."
+                  }
+                ],
+                "title": "Card: add content slot property for nesting components (e.g. Table) in Figma",
+                "summary": "The Card component in the Figma library lacks a content/instance-swap slot property, preventing designers from nesting components like Table inside a Card instance without detaching."
+              }
+            }
+          ]
+        }
+      ],
+      "toolResults": [],
+      "references": [
+        "uno-maintain/method"
+      ]
+    },
+    {
+      "prompt": "yes please",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "proposal_resolve",
+              "args": {
+                "decision": "confirm",
+                "message_to_user": "Got it — filing the maintenance intake card now."
+              }
+            }
+          ]
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

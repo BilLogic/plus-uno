@@ -1,0 +1,66 @@
+{
+  "case": "P3",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED from worker https://uno-bot.plus-uno.workers.dev. Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "PRD, inline:\n\n# Session history filters\nTutors filter the session-history table to find past sessions faster.\nUser flows: tutor opens session history, applies filters, reads the results.\nAcceptance criteria: filter by subject, student and date; filters combine; the table updates as filters change.\nScope: the session-history table view.\n\nBuild it hi-fi in the prototypes.",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "read_reference",
+              "args": {
+                "name": "uno-prototype/method"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "session history"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "prototypes"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components/forms-and-inputs"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components/layout-and-structure"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components/index.js"
+              }
+            }
+          ]
+        },
+        {
+          "text": "To get this into a hi-fi prototype, I need a Figma frame link with a `node-id` to trigger the build workflow, plus clarity on a few open screen states before staging.\n\nI checked `uno-blueprint`, the repo components (`design-system/src/components/index.js`), and `prototypes/` just now, so this is current. The blueprint has no `live` cells for a tutor session-history view, though the design system provides [`Table`](https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/_internal/Table), [`SelectMultiple`](https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs), and [`DateAndTimePicker`](https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs).\n\n### Open gaps to settle\n\n1. **Figma frame URL (required for bot scaffold):** Bot-staged builds run through GitHub Actions via `prototype_scaffold`, which needs a Figma frame URL containing a `node-id`. If you don't have a Figma frame and want to build directly in code, that routes to the in-IDE agent instead.\n2. **Filter controls & logic:**\n   - Are subject and student single-select or multi-select dropdowns?\n   - Is date a single date picker, a date-range picker, or pre-set pills (e.g., *Last 7 days*, *This month*)?\n   - Confirming logic: do the filters combine with `AND` (matching all selected criteria)?\n3. **States & edge cases:**\n   - **Empty state:** What copy and visual should render when no sessions match the active filters?\n   - **Reset:** Is there an explicit \"Clear filters\" action, or do tutors uncheck each one?\n4. **Target destination:** Should this scaffold a fresh prototype under `prototypes/session-history/`, or live within an existing prototype like `prototypes/live-app/`?\n\n---\n\n### Next steps\n\n- **If you have a Figma frame:** Drop the URL here along with your picks for the filter controls and empty state, and I will stage the proposal card for your ✅ to open the draft PR.\n- **If you want to build directly in code without Figma:** Copy-paste this into Claude Code or Cursor to build it via `skills/uno-prototype`:\n\n```markdown\nRun `skills/uno-prototype` to build a hi-fi prototype for Session History Filters.\n- PRD: Session history table view with filters for subject, student, and date.\n- Target: prototypes/session-history/ (or update prototypes/live-app/)\n- Use PLUS Design System Table, Select/SelectMultiple, and DateAndTimePicker components.\n```"
+        }
+      ],
+      "toolResults": [],
+      "references": [
+        "uno-prototype/method"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "case": "R10",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED from worker https://uno-bot.plus-uno.workers.dev. Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here. The prompts carry the subject row below, as the condition 'scenario-any' answered on 2026-09-14; a replay is against that row.",
+  "subject": {
+    "name": "Discovery",
+    "scenario": "Discovery",
+    "phase": "Application"
+  },
+  "turns": [
+    {
+      "prompt": "Walk me through what happens at each step of Discovery, and who does what.",
+      "replies": [
+        {
+          "text": "Checking the service blueprint for the Discovery phase...",
+          "toolCalls": [
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_phase": "Discovery",
+                "include": [
+                  "index"
+                ]
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_phase": "Application",
+                "filter_scenario": "Discovery"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_phase": "Application",
+                "granularity": "step",
+                "filter_scenario": "Discovery"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "granularity": "lane",
+                "filter_phase": "Application",
+                "filter_scenario": "Discovery"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_lane_role": "frontstage_actions",
+                "filter_phase": "Application",
+                "filter_scenario": "Discovery"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_scenario": "Discovery",
+                "filter_lane_role": "backstage_actions",
+                "filter_phase": "Application"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_lane_role": "support_actions",
+                "filter_scenario": "Discovery",
+                "filter_phase": "Application"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_phase": "Application",
+                "filter_lane_role": "backstage_touchpoints",
+                "filter_scenario": "Discovery"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_lane_role": "frontstage_touchpoints",
+                "filter_scenario": "Discovery",
+                "filter_phase": "Application"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_scenario": "Discovery",
+                "filter_lane_role": "customer_actions",
+                "filter_phase": "Application"
+              }
+            }
+          ]
+        },
+        {
+          "text": "In the service blueprint, **Discovery** is a `scenario` within the `Application` `phase`, mapped on the `Standard` (`happy`) `path`. All 34 matching `cell` rows are `live`, documenting how prospective tutors discover and enter the PLUS funnel today. \n\nHere is what happens across each `step`, broken down by actor and `lane`:\n\n---\n\n### Step 1: “Discovers PLUS”\nThe candidate encounters PLUS through one of five parallel discovery channels that all converge into the same interest funnel.\n\n* **Prospective Tutor** (`Regular Tutor` `lane`):\n  * Discovers PLUS via [word of mouth](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070103), [social media](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070203), the [marketing website](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070303), [on-campus activities](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070403), or [Handshake](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070503).\n* **Frontstage Staff & Peers** (`Front Stage Actions` `lane`):\n  * **Current & former tutors**: Tell prospective tutors about PLUS through personal referrals ([`cell`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070104)).\n  * **Tutor supervisor team**: Staffs a physical [on-campus booth](https://uno-blueprint.netlify.app/?cell=65fe259e-1f90-48fc-bc5b-27b998a5002d) at career fairs to answer questions face-to-face ([`cell`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070404)).\n* **Backstage Teams** (`Back Stage Actions` `lane`):\n  * **Marketing team**: Creates and schedules social media recruiting campaigns ([`cell`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070207)) using Figma ([`cell`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070208)).\n  * **Design & Dev teams**: Design sets messaging/layouts in Figma while Dev implements and ships changes to the [marketing website](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070306) via dev tools ([`cell`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070307), [`cell`](https://uno-blueprint.netlify.app/?cell=b4f80b26-e2bb-454e-aa0f-e80d5c7b7a40)).\n  * **Tutor supervisor team**: Posts job openings on Handshake based on partner school calendars and tutor-to-student ratio models ([`cell`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070507)).\n* **Key Touchpoints & Systems**:\n  * [Campus posters](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070406), [Social media platforms](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070206), [Handshake employer profile](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070506), and the [Marketing website](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070306) (`tutors.plus`).\n\n---\n\n### Step 2: “Interested in joining PLUS”\nThe prospective tutor signals interest. Crucially, this submission is an interest capture—not a formal job application.\n\n* **Prospective Tutor** (`Regular Tutor` `lane`):\n  * Submits the [interest form](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070603) reached via Handshake or the website.\n* **Touchpoints** (`Front Stage Touchpoints` `lane`):\n  * [Google Form](https://uno-blueprint.netlify.app/?cell=e0000000-0000-4000-8000-000000000616): Captures basic candidate details. Submitting this form unlocks the invitation to the required info session.\n\n---\n\n### Step 3: “Attends info session”\nThis is the primary screening gate of the scenario. Candidates must attend live before receiving the real application form.\n\n* **Prospective Tutor** (`Regular Tutor` `lane`):\n  * Attends the required [live info session](https://uno-blueprint.netlify.app/?cell=e0000000-0000-4000-8000-000000000611).\n* **Tutor Supervisor Team** (`Front Stage Actions` & `Back Stage Actions` `lanes`):\n  * **Frontstage**: Hosts the session live on [Zoom](https://uno-blueprint.netlify.app/?cell=e0000000-0000-4000-8000-000000000612) and shares the post-session form link directly with attendees ([`cell`](https://uno-blueprint.netlify.app/?cell=e0000000-0000-4000-8000-000000000613)).\n  * **Backstage**: Maintains presentation slide decks and logs live attendance ([`cell`](https://uno-blueprint.netlify.app/?cell=e0000000-0000-4000-8000-000000000614)). Because the post-info-session form doubles as the candidate's first interview, attendance logging acts as the hard filter—unlogged or absent candidates cannot advance to the subsequent **Interview & Offer** `scenario`.\n\n---\n\n*I queried the live service blueprint database for `Application › Discovery` just now, so this breakdown reflects the current-state journey.*"
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

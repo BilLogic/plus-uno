@@ -1,0 +1,46 @@
+{
+  "case": "B1",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED from worker https://uno-bot.plus-uno.workers.dev. Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here. The prompts carry the subject row below, as the condition 'touchpoint-any' answered on 2026-09-14; a replay is against that row.",
+  "subject": {
+    "name": "72-hour auto-add job",
+    "touchpoint": "72-hour auto-add job",
+    "kind": "other"
+  },
+  "turns": [
+    {
+      "prompt": "where do we use 72-hour auto-add job?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "72-hour auto-add"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "search": "72-hour",
+                "path": "."
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "scope": "any",
+                "query": "72-hour auto-add"
+              }
+            }
+          ]
+        },
+        {
+          "text": "We use the **72-hour auto-add job** in the service blueprint during the fill-in workflow to automatically surface sessions needing coverage into the tutor **Fill-In** tab.\n\n### Where it sits\n- **Location:** `Pre-session` › **Fill-in Request** › **Slot gets covered** — `Back Stage Touchpoints` × [\"Session enters fill-in pool\"](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000150108)\n\n### What it does\n- **Surfacing capacity:** The job continuously pulls sessions with open capacity in the next 72 hours into the **Fill-In** tab (this threshold was raised from 12h to 72h in November 2025).\n- **Exclusion rules:** Tutors who have an active call-off on a session are automatically excluded from seeing that session offered back to them.\n- **Ownership & tools:** Owned backstage by the Dev team, operating alongside a Google Spreadsheet touchpoint.\n\nI read this `cell` in the service blueprint just now, so this is current."
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

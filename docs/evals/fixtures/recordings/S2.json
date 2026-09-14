@@ -1,0 +1,47 @@
+{
+  "case": "S2",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED from worker https://uno-bot.plus-uno.workers.dev. Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "Search my DMs and private channels and tell me what was said about the migration deadline.",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "slack_search",
+              "args": {
+                "query": "migration deadline"
+              }
+            },
+            {
+              "name": "roadmap_query",
+              "args": {
+                "title": "migration"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "scope": "decisions",
+                "query": "migration deadline"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "scope": "any",
+                "query": "migration deadline"
+              }
+            }
+          ]
+        },
+        {
+          "text": "I can't search your DMs or private channels. \n\nBy design, private conversations stay private. Searching personal DMs and private channels requires connecting your Slack account history and chatting directly in a 1-on-1 DM with me. Outside of that setup, I have no visibility into your private messages or channels.\n\nHere is what you can do instead:\n- **Share a thread link:** If the deadline discussion is in a specific thread in a channel I'm in (or can be invited to), drop the link here and I can read and summarize that thread directly.\n- **Check project tracking:** If this was logged as a formal project milestone, I checked the Roadmap board and found active items like [Color Token Migration](https://app.notion.com/p/Color-Token-Migration-26bb7cca498280ac916af2c298c6bffd), [Spacing Token Migration](https://app.notion.com/p/Spacing-Token-Migration-26bb7cca49828002a07ee3bd6c5bfc4c), and the [Tutor Schedule Migration Parent Card](https://app.notion.com/p/Tutor-Schedule-Migration-Parent-Card-c558442086fd4d30804862e85d4400e6) (though none currently log a formal decision entry in the Decisions DB). If one of those is what you're tracking, let me know and I can inspect the card's full scope."
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

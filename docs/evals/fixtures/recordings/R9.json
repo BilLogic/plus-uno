@@ -1,0 +1,63 @@
+{
+  "case": "R9",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED from worker https://uno-bot.plus-uno.workers.dev. Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "Can you surface this PRD change for review with the team? https://plus-uno.netlify.app/home",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "source_read",
+              "args": {
+                "url": "https://plus-uno.netlify.app/home"
+              }
+            },
+            {
+              "name": "read_reference",
+              "args": {
+                "name": "uno-publish/method"
+              }
+            },
+            {
+              "name": "roadmap_query",
+              "args": {
+                "design_status": "Under Review"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "query": "PRD",
+                "scope": "any"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "scope": "any",
+                "query": "Home"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "query": "design",
+                "scope": "team"
+              }
+            }
+          ]
+        },
+        {
+          "text": "I can stage the share-out post for <#C074QG2V7DJ>, but I need the actual PRD link and a few details first.\n\nI read <https://plus-uno.netlify.app/home|plus-uno.netlify.app/home> just now, so I'm certain it lands on the live prototype portal (`PLUS Prototypes`) rather than a specific Notion PRD or change summary.\n\nTo stage the `shareout_post` card cleanly without sending an empty ping to the team, send over:\n\n1. **The PRD link** — The Notion PRD URL for the change (or let me know if you meant to share a specific prototype flow from the portal).\n2. **Project name & 1–2 sentence summary** — What this is and what changed.\n3. **Feedback wanted** — Up to 3 specific questions for reviewers (the feedback rail avoids open-ended \"thoughts?\").\n4. **Reviewers to tag** — Who from the team should be looped in.\n\nOnce you drop those in, I'll stage the proposal immediately. The card will audit the bundle (Loom walkthrough, preview, Decisions DB entry) so you can review everything and confirm with a ✅ before anything posts."
+        }
+      ],
+      "toolResults": [],
+      "references": [
+        "uno-publish/method"
+      ]
+    }
+  ]
+}

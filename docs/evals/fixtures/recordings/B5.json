@@ -1,0 +1,59 @@
+{
+  "case": "B5",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED from worker https://uno-bot.plus-uno.workers.dev. Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here. The prompts carry the subject row below, as the condition 'scenario-with-future-paths' answered on 2026-09-14; a replay is against that row.",
+  "subject": {
+    "name": "Interview & Offer",
+    "scenario": "Interview & Offer",
+    "phase": "Application",
+    "path": "Supervisor-registered clearance",
+    "status": "proposed"
+  },
+  "turns": [
+    {
+      "prompt": "Is there any future state on the board for Interview & Offer, or is all of it live today?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "search_blueprint",
+              "args": {
+                "include": [
+                  "index"
+                ],
+                "query": "Interview & Offer"
+              }
+            },
+            {
+              "name": "roadmap_query",
+              "args": {
+                "title": "Interview & Offer"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_scenario": "Interview & Offer",
+                "granularity": "path",
+                "filter_phase": "Application"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "Supervisor-registered clearance",
+                "filter_phase": "Application",
+                "filter_scenario": "Interview & Offer"
+              }
+            }
+          ]
+        },
+        {
+          "text": "Yes, there is future state mapped in the service blueprint — not all of it is `live` today. \n\nIn the service blueprint, the **Interview & Offer** `scenario` (under the `Application` `phase`) contains two `paths`:\n\n1. **Standard** (`happy` `path` · `status: live`) — How the process runs today: candidates complete a group interview, receive an offer, and accept it. The supervisor team forwards accepted candidates to the CPO via email/roster, and app access and onboarding are held until the CPO clears them.\n2. **Supervisor-registered clearance** (`variant` `path` · `status: proposed`) — Future exploratory state that might change (capturing Alex Houk’s June 2026 trust redesign proposal). It redesigns the post-acceptance clearance flow to eliminate legally unusable tutor self-reports:\n   - [Regular Tutor × Accepts offer](https://uno-blueprint.netlify.app/?cell=49d5700f-5225-42cb-b368-f1a17ddc6087): Candidate accepts and initiates clearance through a structured candidate info form instead of ad-hoc email relay.\n   - [Back Stage Actions × Clearance confirmed (CPO/school)](https://uno-blueprint.netlify.app/?cell=dbfb6712-7312-4737-a1a2-1cbd78adab9e): The CPO or school confirms clearance directly to supervisors.\n   - [Back Stage Actions × Imported & invited to the app](https://uno-blueprint.netlify.app/?cell=6afc27c3-e692-42d6-b868-f4bd2c453b07): Supervisors import cleared tutors into the app, which issues account invites (replacing weekly email handoffs and ETL jobs).\n   - [Regular Tutor × Creates account & completes profile](https://uno-blueprint.netlify.app/?cell=11184a22-242c-4e80-808f-c5cb7b67b792): The tutor accepts the invite, creates an account, and completes their profile prior to onboarding.\n\nI checked the live blueprint index and path rows alongside the Notion Roadmap board just now, so this status breakdown is current. Note that on the Roadmap board itself, there are no active `cards` titled \"Interview & Offer,\" meaning this route remains an exploratory design proposal in the blueprint rather than a scheduled engineering ticket."
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

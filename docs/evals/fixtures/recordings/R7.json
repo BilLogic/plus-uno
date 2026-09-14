@@ -1,0 +1,84 @@
+{
+  "case": "R7",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED from worker https://uno-bot.plus-uno.workers.dev. Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here. The prompts carry the subject row below, as the condition 'scenario-any' answered on 2026-09-14; a replay is against that row.",
+  "subject": {
+    "name": "Discovery",
+    "scenario": "Discovery",
+    "phase": "Application"
+  },
+  "turns": [
+    {
+      "prompt": "What does the Discovery scenario cover in the blueprint, and which lane does most of the work in it?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_scenario": "Discovery",
+                "include": [
+                  "index"
+                ]
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_scenario": "Discovery",
+                "granularity": "step"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "granularity": "lane",
+                "filter_scenario": "Discovery"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_lane_role": "frontstage_actions",
+                "filter_scenario": "Discovery"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_scenario": "Discovery",
+                "filter_lane_role": "backstage_actions"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_scenario": "Discovery",
+                "filter_lane_role": "support_actions"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_lane_role": "customer_actions",
+                "filter_scenario": "Discovery"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_scenario": "Discovery",
+                "filter_lane_role": "backstage_touchpoints"
+              }
+            }
+          ]
+        },
+        {
+          "text": "In the service blueprint, the **Discovery** `scenario` sits in the `Application` `phase` on the `Standard` `path` (the live happy path). \n\nI read the scenario's rows in the blueprint just now, so this is current.\n\n---\n\n### What Discovery Covers\n\nThe **Discovery** `scenario` maps the recruitment and initial intake funnel for prospective tutors, moving through three primary `step` moments:\n\n1. **Discovers PLUS** — Prospective candidates encounter PLUS through five parallel entry channels:\n   - **Word of mouth:** Referred by previous or current tutors ([`Application › Discovery › Standard — Regular Tutor × Discovers PLUS`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070103) / [`Front Stage Actions`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070104)).\n   - **Social media:** Channels managed by the marketing team ([`Application › Discovery › Standard — Regular Tutor × Discovers PLUS`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070203) / [`Back Stage Actions`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070207)).\n   - **Marketing website:** Content maintained by design and dev ([`Application › Discovery › Standard — Regular Tutor × Discovers PLUS`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070303) / [`Back Stage Actions`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070307)).\n   - **On-campus activities:** Campus job fair booths and printed posters ([`Application › Discovery › Standard — Regular Tutor × Discovers PLUS`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070403) / [`Front Stage Touchpoints`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070406)).\n   - **Handshake:** Postings managed by the tutor supervisor team ([`Application › Discovery › Standard — Regular Tutor × Discovers PLUS`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070503) / [`Back Stage Actions`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070507)).\n\n2. **Interested in joining PLUS** — Candidates submit an initial interest form via Handshake or the website ([`Application › Discovery › Standard — Regular Tutor × Interested in joining PLUS`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070603)). Submitting this form is not yet an application—it registers interest and funnels candidates to the next mandatory gate.\n\n3. **Attends info session** — Candidates attend a required PLUS info session hosted by the tutor supervisor team ([`Application › Discovery › Standard — Regular Tutor × Attends info session`](https://uno-blueprint.netlify.app/?cell=e0000000-0000-4000-8000-000000000611) / [`Front Stage Actions`](https://uno-blueprint.netlify.app/?cell=e0000000-0000-4000-8000-000000000613)). Attendance is tracked backstage ([`Application › Discovery › Standard — Back Stage Actions × Attends info session`](https://uno-blueprint.netlify.app/?cell=e0000000-0000-4000-8000-000000000614)); only attendees receive the post-info-session application form, which acts as the real screening gate and first interview.\n\n---\n\n### Which Lane Does Most of the Work?\n\n- **Candidate side (`customer_actions`):** The **`Regular Tutor`** `lane` has the highest cell count and action volume (7 `cell` rows). It anchors the entire scenario, covering each of the 5 discovery touchpoints, form submission, and info session attendance.\n- **Operational / Staff side:** Behind the candidate, the **tutor supervisor team** carries the operational weight across:\n  - **`Front Stage Actions`** (3 `cell` rows): Staffing job fair booths and running the required info sessions.\n  - **`Back Stage Actions`** (4 `cell` rows): Managing Handshake job postings, maintaining info-session slides, and tracking attendance to gate who receives an application form."
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

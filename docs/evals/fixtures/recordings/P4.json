@@ -1,0 +1,69 @@
+{
+  "case": "P4",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED from worker https://uno-bot.plus-uno.workers.dev. Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "What spacing tokens does this frame use? https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System?node-id=13549-6703",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "source_read",
+              "args": {
+                "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System?node-id=13549-6703"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/tokens"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/tokens/_spacing_semantics.scss"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/tokens/_primitives.scss"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components/forms-and-inputs"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components/forms-and-inputs/DateAndTimePicker.scss"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components/forms-and-inputs/DateAndTimePicker.stories.jsx"
+              }
+            }
+          ]
+        },
+        {
+          "text": "I can't read the exact token bindings directly off that Figma frame from Slack.\n\nThink of a design token as the paint can label and the Figma component as the painted wall: over Slack's REST connection, Figma hands over the text layers and layout tree, but drops the geometry, measurements, and variable binding IDs (resolving those IDs directly is also Enterprise-gated). Those tokens are unread here, not missing from your file. For live variable inspection and pixel-exact node measurements, route that spec check to Claude Code, Cursor, or Antigravity in-IDE using the Figma MCP.\n\nHowever, that frame is the **Date & Time Picker** component (`DateAndTimePicker`). In our design system, its layout and spacing are built from these semantic tokens:\n\n| Element / Area | Semantic Spacing Token | Resolves to | Value |\n|---|---|---|---|\n| Main container & section gap | `--size-element-gap-sm` | `--size-spacing-small-space-100` | 8px |\n| Section spacing (`margin-bottom`) | `--size-element-gap-md` | `--size-spacing-small-space-150` | 10px |\n| Section label margin & popup offset | `--size-element-gap-xs` | `--size-spacing-small-space-050` | 4px |\n| Date/time input padding (X) | `--size-element-pad-x-md` | `--size-spacing-medium-space-200` | 12px |\n| Date/time input padding (Y) | `--size-element-pad-y-md` | `--size-spacing-small-space-075` | 6px |\n| AM/PM dropdown toggle gap | `--size-element-gap-md` | `--size-spacing-small-space-150` | 10px |\n| Dropdown item padding | `--size-element-pad-y-sm` × `--size-element-pad-x-md` | 4px × 12px | 4px × 12px |\n| Calendar popup padding | `--size-modal-pad-y-md` × `--size-modal-pad-x-md` | 12px × 16px | 12px × 16px |\n\nI read `DateAndTimePicker.scss` and `_spacing_semantics.scss` in the repo just now, so this code-level token mapping is current, though the live Figma canvas variable bindings remain unread in this lane.\n\n### Where to find it\n- **Storybook:** [Date & Time Picker Docs](https://plus-uno.netlify.app/storybook/?path=/docs/components-forms-and-inputs-date-time-picker--docs)\n- **GitHub:** [`design-system/src/components/forms-and-inputs/DateAndTimePicker.scss`](https://github.com/BilLogic/plus-uno/blob/main/design-system/src/components/forms-and-inputs/DateAndTimePicker.scss)\n- **Figma:** [Date & Time Picker Spec Frame](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System?node-id=13549-6703)"
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "case": "B2",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED from worker https://uno-bot.plus-uno.workers.dev. Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here. The prompts carry the subject row below, as the condition 'scenario-any' answered on 2026-09-14; a replay is against that row.",
+  "subject": {
+    "name": "Discovery",
+    "scenario": "Discovery",
+    "phase": "Application"
+  },
+  "turns": [
+    {
+      "prompt": "what happens in Discovery?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "search_blueprint",
+              "args": {
+                "include": [
+                  "index"
+                ],
+                "query": "Discovery",
+                "granularity": "phase"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_scenario": "Discovery",
+                "filter_phase": "Application"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "granularity": "step",
+                "filter_phase": "Application",
+                "filter_scenario": "Discovery"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_phase": "Application",
+                "filter_scenario": "Discovery",
+                "filter_lane_role": "backstage_actions"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_lane_role": "frontstage_actions",
+                "filter_phase": "Application",
+                "filter_scenario": "Discovery"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "Interested in joining PLUS",
+                "filter_scenario": "Discovery",
+                "filter_phase": "Application"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "Attends info session",
+                "filter_scenario": "Discovery",
+                "filter_phase": "Application"
+              }
+            }
+          ]
+        },
+        {
+          "text": "In the service blueprint, **Discovery** is a `scenario` under the `Application` `phase` on the `Standard` `path` (the live `happy` path). It maps how prospective college tutors discover the program, submit an interest form, and attend a required screening info session.\n\nI checked the live service blueprint rows for Discovery just now, so this accurately reflects how the recruitment journey operates today.\n\n---\n\n### Step 1: `Discovers PLUS`\nCandidates discover PLUS across five parallel recruitment channels, all of which funnel into the same interest form:\n\n* **`Regular Tutor` (Candidate):**\n  * Discovers PLUS through one of five entry points: [word of mouth](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070103), [social media](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070203), the [PLUS marketing website](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070303), [on-campus activities](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070403), or [Handshake job postings](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070503).\n* **`Front Stage Actions`:**\n  * [Current or former PLUS tutors](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070104) share word-of-mouth recommendations with prospective tutors.\n  * The [tutor supervisor team](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070404) staffs on-campus job fairs to answer questions in person.\n* **`Front Stage Touchpoints`:**\n  * [Posters & job fair booths](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070406) on university campuses.\n  * [Social Media](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070206) posts on Instagram and LinkedIn.\n  * The [Marketing Website](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070306) (`tutors.plus`), routing candidates via \"Become a Tutor\" or \"Try Demo\".\n  * [Handshake](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070506) employer job listings.\n* **`Back Stage Actions` & `Back Stage Touchpoints`:**\n  * Tutor supervisors post and manage openings via the [Handshake employer profile](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070507) using semester student-ratio forecasts.\n  * Design and Dev collaborate on marketing copy and implementation via [Figma and web tooling](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070308).\n  * Marketing manages [social media campaigns](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070207).\n\n---\n\n### Step 2: `Interested in joining PLUS`\nThis step captures inbound candidate interest without granting full applicant status:\n\n* **`Regular Tutor`:**\n  * [Submits the interest form](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070603) via the website or Handshake. Crucially, submitting this form is **not** yet an application—candidates must attend an info session before receiving the official application form.\n* **`Front Stage Touchpoints`:**\n  * [Google Form](https://uno-blueprint.netlify.app/?cell=e0000000-0000-4000-8000-000000000616) used to gather candidate contact information and availability.\n\n---\n\n### Step 3: `Attends info session`\nThe info session acts as the actual screening gate for the entire application funnel:\n\n* **`Regular Tutor`:**\n  * [Attends the required PLUS info session](https://uno-blueprint.netlify.app/?cell=e0000000-0000-4000-8000-000000000611). Only verified attendees receive the post-info-session application form, which doubles as the first interview round.\n* **`Front Stage Actions`:**\n  * The [tutor supervisor team hosts the info session](https://uno-blueprint.netlify.app/?cell=e0000000-0000-4000-8000-000000000613) and distributes the post-session application form directly to attendees.\n* **`Front Stage Touchpoints`:**\n  * [Zoom](https://uno-blueprint.netlify.app/?cell=e0000000-0000-4000-8000-000000000612) video conference room.\n* **`Back Stage Actions`:**\n  * The [tutor supervisor team maintains slides and tracks attendance](https://uno-blueprint.netlify.app/?cell=e0000000-0000-4000-8000-000000000614). Attendance tracking is strictly enforced—unverified attendance terminates the funnel before any interview takes place."
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}
