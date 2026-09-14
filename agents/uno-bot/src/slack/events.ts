@@ -76,9 +76,9 @@ import {
   formatProposal,
   formatNotionUpdateProposal,
   proposalVerb,
-  buildImplementDesignProposal,
   proposalCardBlocks,
 } from "./proposal-render";
+import { buildImplementDesignProposal } from "./proposal-figma";
 import {
   describeNotionTarget,
   normalizeName,
