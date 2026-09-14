@@ -234,10 +234,11 @@ test('strict THROWS on a directory it cannot read, rather than sweeping fewer fi
   }
 });
 
-test('strict lets a broken symlink cost only itself', () => {
-  // The other half. `withFileTypes` describes the LINK, so the forgiving walk
-  // returns a dangling one as a document with no file behind it; strict stats
-  // it, and an ENOENT skips that entry and nothing else.
+test('a broken symlink costs only itself, in both modes', () => {
+  // The other half. `withFileTypes` describes the LINK, so a walk that trusted
+  // the dirent would return a dangling one as a document with no file behind
+  // it; the walk stats it instead, and an ENOENT skips that entry and nothing
+  // else.
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'corpus-symlink-'));
   const dir = path.join(root, 'docs');
   fs.mkdirSync(dir, { recursive: true });
@@ -245,12 +246,34 @@ test('strict lets a broken symlink cost only itself', () => {
   fs.symlinkSync(path.join(root, 'nothing-here'), path.join(dir, 'b-broken.md'));
   fs.writeFileSync(path.join(dir, 'c-last.md'), '# c\n');
   try {
-    assert.deepEqual(documents('docs', { root, strict: true }), [
-      'docs/a-first.md',
-      'docs/c-last.md',
-    ]);
+    const expected = ['docs/a-first.md', 'docs/c-last.md'];
+    assert.deepEqual(documents('docs', { root, strict: true }), expected);
+    assert.deepEqual(documents('docs', { root }), expected);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('a symlinked directory is walked like a real one, by documents and directories', () => {
+  // What lets a test build its root under mkdtemp and LINK the trees it only
+  // reads: a fixture root for check:doc-identifiers links design-system/src
+  // rather than copying 1,500 files, and the walk must see through the link.
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'corpus-linkdir-'));
+  const real = fs.mkdtempSync(path.join(os.tmpdir(), 'corpus-linkdir-target-'));
+  fs.mkdirSync(path.join(real, 'nested'), { recursive: true });
+  fs.writeFileSync(path.join(real, 'top.md'), '# top\n');
+  fs.writeFileSync(path.join(real, 'nested/deep.md'), '# deep\n');
+  fs.mkdirSync(path.join(root, 'docs'));
+  fs.writeFileSync(path.join(root, 'docs/own.md'), '# own\n');
+  fs.symlinkSync(real, path.join(root, 'docs/linked'));
+  try {
+    const expected = ['docs/linked/nested/deep.md', 'docs/linked/top.md', 'docs/own.md'];
+    assert.deepEqual(documents('docs', { root }), expected);
+    assert.deepEqual(documents('docs', { root, strict: true }), expected);
+    assert.deepEqual(directories('docs', { root }), ['docs/linked', 'docs/linked/nested']);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+    fs.rmSync(real, { recursive: true, force: true });
   }
 });
 

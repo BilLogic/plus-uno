@@ -168,7 +168,7 @@ export function directories(target, opts = {}) {
       return;
     }
     for (const entry of entries) {
-      if (!entry.isDirectory()) continue;
+      if (!resolveIsDirectory(entry, path.join(abs, entry.name), strict)) continue;
       if (skipEntry && skipEntry(entry.name)) continue;
       if (ignore.has(entry.name)) continue;
       if (skipDotDirs && entry.name.startsWith('.')) continue;
@@ -225,9 +225,18 @@ function globToRegExp(glob) {
  *   - an unresolvable ENTRY — a broken symlink, or a file a parallel test
  *     deleted between the listing and the stat — costs only itself.
  *
- * The second is why strict stats a symlink rather than trusting the dirent:
- * `withFileTypes` describes the LINK, so a dangling one would otherwise be
- * pushed as a document with no file behind it.
+ * ── Symlinks ──
+ * Both modes stat a symlink rather than trusting the dirent: `withFileTypes`
+ * describes the LINK, so a linked directory would otherwise be pushed as a
+ * document and a dangling link as a file with nothing behind it. A linked
+ * directory is walked like any other — which is what lets a test build its
+ * fixture root under `mkdtemp` and link the source trees it only reads, instead
+ * of copying them or planting fixtures in the live tree. A dangling link costs
+ * only itself in both modes; any other stat error (EACCES, ELOOP) is strict's
+ * to throw and the forgiving walk's to skip, the same split as an unreadable
+ * directory. Neither walk keeps a visited set, so a link to itself or to an
+ * ancestor recurses until the stack gives out: no tree this repo reads holds
+ * one, and a fixture root should link a real tree, not a cycle.
  */
 function walk(root, rel, how, out = []) {
   const { ignore, skipDotDirs, skipEntry, strict } = how;
@@ -242,17 +251,8 @@ function walk(root, rel, how, out = []) {
   for (const entry of entries) {
     if (skipEntry && skipEntry(entry.name)) continue;
     const child = rel === '' ? entry.name : `${rel}/${entry.name}`;
-    let isDirectory = entry.isDirectory();
-    if (strict && entry.isSymbolicLink()) {
-      let st;
-      try {
-        st = fs.statSync(path.join(root, child));
-      } catch (err) {
-        if (err.code === 'ENOENT') continue;
-        throw err;
-      }
-      isDirectory = st.isDirectory();
-    }
+    const isDirectory = resolveIsDirectory(entry, path.join(root, child), strict);
+    if (isDirectory === null) continue;
     if (isDirectory) {
       if (ignore.has(entry.name)) continue;
       if (skipDotDirs && entry.name.startsWith('.')) continue;
@@ -262,6 +262,22 @@ function walk(root, rel, how, out = []) {
     }
   }
   return out;
+}
+
+/**
+ * Whether a dirent is a directory once a symlink is followed: true, false, or
+ * null for a dangling link (skip it). Only a symlink is stat'd; a plain entry
+ * answers from the dirent. See § Symlinks on `walk`.
+ */
+function resolveIsDirectory(entry, abs, strict) {
+  if (!entry.isSymbolicLink()) return entry.isDirectory();
+  try {
+    return fs.statSync(abs).isDirectory();
+  } catch (err) {
+    if (err.code === 'ENOENT') return null;
+    if (strict) throw err;
+    return null;
+  }
 }
 
 /**
