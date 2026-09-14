@@ -27,7 +27,7 @@
  *
  * What this module deliberately does NOT read: a backticked path. The house
  * pointer style — `` `docs/conventions/writing.md` `` — is not a link, and
- * `scripts/validate-doc-links.sh` owns the pointer passes. `links()` is
+ * `scripts/check-doc-links.mjs` owns the pointer passes. `links()` is
  * markdown links only, and blanks a code span that IS a whole link, since that
  * is a doc teaching Markdown rather than a link this repo owns.
  */
@@ -265,7 +265,7 @@ function unquote(key, raw) {
  * [`path.md`](path.md), and blanking its label would leave `[]()`.
  *
  * A backticked path on its own is NOT a link and is not returned here; it is a
- * pointer, and `scripts/validate-doc-links.sh` owns that pass.
+ * pointer, and `scripts/check-doc-links.mjs` owns that pass.
  *
  * @param {string} input a file path or the document text.
  * @param {{root?: string}} [opts] root for a relative path.

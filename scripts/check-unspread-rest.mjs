@@ -60,6 +60,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { documents } from './lib/corpus.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const SCAN_ROOT = path.join(REPO_ROOT, 'design-system', 'src', 'components');
@@ -233,15 +235,10 @@ export function unspread(src) {
   return findings;
 }
 
-const sourceFiles = (dir) => {
-  const out = [];
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const p = path.join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...sourceFiles(p));
-    else if (/\.jsx?$/.test(entry.name)) out.push(p);
-  }
-  return out;
-};
+const sourceFiles = (dir) =>
+  documents(path.relative(REPO_ROOT, dir), { root: REPO_ROOT, ext: ['.js', '.jsx'] }).map((rel) =>
+    path.join(REPO_ROOT, rel),
+  );
 
 function main() {
   const list = process.argv.slice(2).includes('--list');

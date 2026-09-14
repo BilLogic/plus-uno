@@ -30,7 +30,7 @@ skipped the severity gate.
    skipped and never guessed.
 2. Read `skills/uno-maintain/references/method.md` §1 for the intake shape
    each finding must carry.
-3. Where the checklist names a script (e.g. `scripts/validate-doc-links.sh`),
+3. Where the checklist names a script (e.g. `scripts/check-doc-links.mjs`),
    run it and treat its output as evidence — don't re-derive by eye what a
    script already checks deterministically.
 

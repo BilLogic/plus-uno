@@ -26,6 +26,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { documents } from './lib/corpus.mjs';
+
 import {
   TABBED_EXCEPTIONS,
   isTabbedDocsPage,
@@ -99,14 +101,7 @@ const HEADING = /^##\s+(.*?)\s*$/;
 const TAB_OPEN = /^<DocsTab tab="([a-z]+)">$/;
 
 /** Every `.mdx` under `design-system/src`, repo-relative. */
-function allMdx(dir = path.join(REPO_ROOT, MDX_ROOT), found = []) {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) allMdx(full, found);
-    else if (entry.name.endsWith('.mdx')) found.push(path.relative(REPO_ROOT, full));
-  }
-  return found;
-}
+const allMdx = (root = REPO_ROOT) => documents(MDX_ROOT, { root, ext: ['.mdx'] });
 
 /**
  * Which tab each section heading sits in, plus the counts that catch a partial

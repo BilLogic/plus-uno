@@ -52,6 +52,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { documents } from './lib/corpus.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const SPECS = path.join(REPO_ROOT, 'design-system', 'src', 'specs');
@@ -76,16 +78,11 @@ const AREA_OVERVIEWS = 3;
 export const isPageTitle = (title) =>
   typeof title === 'string' && (title.includes('/Pages/') || /^Specs\/[^/]+\/Overview$/.test(title));
 
-/** Every `*.stories.jsx` under `specs/`. */
-function storyFiles(dir) {
-  const out = [];
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const p = path.join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...storyFiles(p));
-    else if (entry.name.endsWith('.stories.jsx')) out.push(p);
-  }
-  return out;
-}
+/** Every `*.stories.jsx` under `specs/`, absolute. */
+const storyFiles = (dir) =>
+  documents(path.relative(REPO_ROOT, dir), { root: REPO_ROOT, ext: ['.stories.jsx'] }).map((rel) =>
+    path.join(REPO_ROOT, rel),
+  );
 
 /**
  * The `title:` of a story file's default export.

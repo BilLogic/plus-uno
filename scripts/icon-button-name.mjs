@@ -38,6 +38,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { documents } from './lib/corpus.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, '..');
 
@@ -73,20 +75,8 @@ export function hasName(attributes) {
   return false;
 }
 
-export function sources(root = REPO_ROOT, dir = CORPUS, out = []) {
-  let entries;
-  try {
-    entries = fs.readdirSync(path.join(root, dir), { withFileTypes: true });
-  } catch {
-    return out;
-  }
-  for (const entry of entries) {
-    if (entry.name === 'node_modules') continue;
-    const rel = path.join(dir, entry.name);
-    if (entry.isDirectory()) sources(root, rel, out);
-    else if (/\.(jsx|tsx)$/.test(entry.name)) out.push(rel);
-  }
-  return out;
+export function sources(root = REPO_ROOT, dir = CORPUS) {
+  return documents(dir, { root, ext: ['.jsx', '.tsx'] });
 }
 
 /**

@@ -28,16 +28,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { documents } from './lib/corpus.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const TOKENS = path.join(REPO_ROOT, 'design-system/src/tokens');
 
 const digest = () =>
   Object.fromEntries(
-    fs
-      .readdirSync(TOKENS)
-      .filter((f) => f.endsWith('.scss'))
-      .map((f) => [f, crypto.createHash('sha256').update(fs.readFileSync(path.join(TOKENS, f))).digest('hex')]),
+    documents('design-system/src/tokens/*.scss', { root: REPO_ROOT, ext: ['.scss'] }).map((rel) => [
+      path.basename(rel),
+      crypto.createHash('sha256').update(fs.readFileSync(path.join(REPO_ROOT, rel))).digest('hex'),
+    ]),
   );
 
 const before = digest();

@@ -100,7 +100,7 @@ docs/plans/ → implementation → a rule, an ADR, or nothing
 
 ## Renames
 
-A rename is finished when `bash scripts/validate-doc-links.sh` passes, not when
+A rename is finished when `npm run check:docs` passes, not when
 the first file is updated. Grep the old literal across `src/`, `*.json`,
 `AGENTS.md` and `docs/` in the same change, and count the surfaces before you
 start: the 2026-07 sweep found one renamed tool still named in the live system

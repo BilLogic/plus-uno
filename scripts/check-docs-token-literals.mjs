@@ -134,6 +134,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { documents } from './lib/corpus.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 
@@ -160,9 +162,9 @@ const PRIMITIVES_FILE = '_primitives.scss';
 function readTokenDefinitions(dir = TOKENS_DIR) {
   const defs = new Map();
   if (!fs.existsSync(dir)) return defs;
-  for (const file of fs.readdirSync(dir).sort()) {
-    if (!file.endsWith('.scss')) continue;
-    const source = fs.readFileSync(path.join(dir, file), 'utf8');
+  for (const rel of documents(`${path.relative(REPO_ROOT, dir)}/*.scss`, { root: REPO_ROOT, ext: ['.scss'] })) {
+    const file = path.basename(rel);
+    const source = fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
     for (const m of source.matchAll(/(--[\w-]+)\s*:\s*([^;{}]+);/g)) {
       if (!defs.has(m[1])) defs.set(m[1], { value: m[2].trim(), file });
     }
@@ -417,13 +419,9 @@ export function findings(source, index) {
 // ── the runner ──────────────────────────────────────────────────────────────
 
 const cssFiles = (dir) =>
-  fs.existsSync(dir)
-    ? fs
-        .readdirSync(dir)
-        .filter((f) => f.endsWith('.css'))
-        .sort()
-        .map((f) => path.join(dir, f))
-    : [];
+  documents(`${path.relative(REPO_ROOT, dir)}/*.css`, { root: REPO_ROOT, ext: ['.css'] }).map((rel) =>
+    path.join(REPO_ROOT, rel),
+  );
 
 function main() {
   const files = cssFiles(DOCS_STYLE_DIR);

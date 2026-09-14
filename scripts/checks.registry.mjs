@@ -90,7 +90,7 @@ export const CHECKS = [
   },
   {
     name: 'check:docs',
-    script: 'bash scripts/validate-doc-links.sh',
+    script: 'node scripts/check-doc-links.mjs',
     pkg: 'root',
     trigger: 'pull_request',
     guards:

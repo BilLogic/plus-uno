@@ -14,6 +14,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { documents } from './lib/corpus.mjs';
+
 const __filename = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(__filename), '..');
 
@@ -24,15 +26,10 @@ const roots = [
     'design-system/src/specs/Home',
 ];
 
-function walk(dir, out = []) {
-    if (!fs.existsSync(dir)) return out;
-    for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
-        const p = path.join(dir, ent.name);
-        if (ent.isDirectory()) walk(p, out);
-        else out.push(p);
-    }
-    return out;
-}
+const walk = (dir) =>
+    documents(path.relative(repoRoot, dir), { root: repoRoot, ext: null }).map((rel) =>
+        path.join(repoRoot, rel),
+    );
 
 const figmaIdRe = /(?:node-id|Figma Node|Node ID|node id|Figma Specs?)[=:\s"*-]+([0-9]+[-:][0-9]+)/gi;
 const norm = id => id.replace(':', '-');

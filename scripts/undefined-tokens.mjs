@@ -35,27 +35,14 @@
  * cannot be resolved statically at all; they are reported apart from the
  * findings rather than counted as either.
  */
-import fs from 'node:fs';
-import path from 'node:path';
+import { documents } from './lib/corpus.mjs';
 
-const SEARCHED = /\.(scss|css|jsx|tsx|mdx|html)$/;
+/** The extensions a token name can be written in. */
+const SEARCHED = ['.scss', '.css', '.jsx', '.tsx', '.mdx', '.html'];
 
 /** Every searched file under the roots, repo-relative. */
 export function corpus(repoRoot, roots) {
-  const found = [];
-  const walk = (dir) => {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        if (entry.name === 'node_modules' || entry.name === '.git') continue;
-        walk(full);
-      } else if (SEARCHED.test(entry.name)) {
-        found.push(path.relative(repoRoot, full));
-      }
-    }
-  };
-  for (const root of roots) walk(path.join(repoRoot, root));
-  return found.sort();
+  return roots.flatMap((root) => documents(root, { root: repoRoot, ext: SEARCHED })).sort();
 }
 
 /**

@@ -123,9 +123,11 @@
  * Run: npm run check:cross-repo
  *      SB_REPO=… BLUEPRINT_REPO=… npm run check:cross-repo
  */
-import { appendFileSync, existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { appendFileSync, existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { documents } from './lib/corpus.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(here, '..');
@@ -218,28 +220,6 @@ export const RECORDED = [
   },
 ];
 
-/** Walk a root for markdown, skipping node_modules and dot-directories. */
-function walk(abs, out) {
-  let st;
-  try {
-    st = statSync(abs);
-  } catch {
-    return out;
-  }
-  if (st.isFile()) {
-    if (abs.endsWith('.md')) out.push(abs);
-    return out;
-  }
-  for (const name of readdirSync(abs)) {
-    // Dot-directories are skipped here as in every other sweep — which is also
-    // what keeps a CI sibling checkout under `.sibling-repos/` from being read
-    // as a part of this repo.
-    if (name === 'node_modules' || name.startsWith('.')) continue;
-    walk(path.join(abs, name), out);
-  }
-  return out;
-}
-
 /** Frontmatter off, HTML comments out, then blank-line-separated blocks. */
 export function blocksOf(text) {
   let body = text;
@@ -276,14 +256,15 @@ export function wordsOf(block) {
 
 /** Every harness document under a repo's roots, as `{rel, blocks}` of word arrays. */
 export function documentsIn(root, spec) {
-  const files = [];
-  for (const r of spec.roots) walk(path.join(root, r), files);
+  // The corpus walk skips dot-directories, which is also what keeps a CI
+  // sibling checkout under `.sibling-repos/` from being read as part of the
+  // repo above it.
+  const files = spec.roots.flatMap((r) => documents(r, { root }));
   const docs = [];
-  for (const abs of files) {
-    const rel = path.relative(root, abs).split(path.sep).join('/');
+  for (const rel of files) {
     if (SKIP.some((p) => rel.startsWith(p))) continue;
     if (COPIES.has(rel)) continue;
-    const text = readFileSync(abs, 'utf8');
+    const text = readFileSync(path.join(root, rel), 'utf8');
     if (VENDORED.test(text)) continue;
     docs.push({ rel, blocks: blocksOf(text).map(wordsOf).filter((w) => w.length >= SHINGLE) });
   }

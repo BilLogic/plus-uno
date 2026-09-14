@@ -62,6 +62,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { documents } from './lib/corpus.mjs';
+
 import {
   DOM_EVENTS,
   HTML_ELEMENTS,
@@ -91,16 +93,11 @@ const rel = (p) => path.relative(REPO_ROOT, p).replace(/\\/g, '/');
 const read = (p) => fs.readFileSync(p, 'utf8');
 const readIf = (p) => (fs.existsSync(p) ? read(p) : '');
 
-function walk(dir, test, out = []) {
-  if (!fs.existsSync(dir)) return out;
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) walk(full, test, out);
-    else if (test(entry.name)) out.push(full);
-  }
-  return out;
-}
+/** Files under `dir` whose basename passes `test`, absolute. */
+const walk = (dir, test) =>
+  documents(path.relative(REPO_ROOT, dir), { root: REPO_ROOT, ext: null })
+    .filter((rel) => test(path.basename(rel)))
+    .map((rel) => path.join(REPO_ROOT, rel));
 
 /* ---------------------------------------------------------- source truth */
 

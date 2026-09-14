@@ -55,6 +55,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { ratchet } from '../design-system/src/lib/tokens.mjs';
+import { documents } from './lib/corpus.mjs';
+
 import {
   AA_TEXT,
   PAGE_TOKEN,
@@ -76,22 +78,11 @@ export const CORPUS = 'design-system/src';
 /** Roles that are meant to sit on a colour, not on the page. See blind spot 3. */
 export const OFF_PAGE = /^--color-(on|inverse)-/;
 
-export function stylesheets(root = REPO_ROOT, dir = CORPUS, out = []) {
-  const full = path.join(root, dir);
-  let entries;
-  try {
-    entries = fs.readdirSync(full, { withFileTypes: true });
-  } catch {
-    return out;
-  }
-  for (const entry of entries) {
-    if (entry.name === 'node_modules') continue;
-    const rel = path.join(dir, entry.name);
-    if (entry.isDirectory()) stylesheets(root, rel, out);
-    // `tokens/` DEFINES the colours; a definition is not a use of one.
-    else if (/\.(scss|css)$/.test(entry.name) && !rel.includes(`${path.sep}tokens${path.sep}`)) out.push(rel);
-  }
-  return out;
+export function stylesheets(root = REPO_ROOT, dir = CORPUS) {
+  // `tokens/` DEFINES the colours; a definition is not a use of one.
+  return documents(dir, { root, ext: ['.scss', '.css'] }).filter(
+    (file) => !file.includes('/tokens/'),
+  );
 }
 
 /**

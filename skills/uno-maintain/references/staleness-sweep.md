@@ -25,7 +25,7 @@ One intake per finding (evidence + suggested severity), through the normal pipel
 ## C. Routing & path integrity
 
 - [ ] `AGENTS.md` roster lists exactly six skills; each `skills/*/SKILL.md` + `bot.md` exists and both load `references/method.md`.
-- [ ] Reference links inside each `SKILL.md` resolve (run `scripts/validate-doc-links.sh`).
+- [ ] Reference links inside each `SKILL.md` resolve (run `scripts/check-doc-links.mjs`).
 - [ ] Paths referenced from `design-system/guidelines/` exist; index JSONs match current paths and commands.
 
 ## D. Token & DS integrity
