@@ -30,6 +30,17 @@ const CHARGED_STUB_CALLS = new Set([
   "slack/events.ts", // enqueueAgentJob charges 1 for the AgentRunner hop
 ]);
 
+// A Durable Object RPC hop — `stub.readHistory(ref, at)` (#493) — is the same
+// kind of uncounted internal subrequest, but it is INVISIBLE to the regex
+// below: there is no `.fetch(` to match, and a method call on a stub looks like
+// any other method call. So this guard cannot be the thing that keeps RPC hops
+// charged. What keeps them charged is that they are confined to one function:
+// `hop()` in src/thread-state/durable-object.ts charges 1 and is the only place
+// in the module that touches a stub, and tests/workerd asserts the internal
+// counter rises by exactly one per hop. If a second module ever calls a Durable
+// Object by RPC, it needs its own single charged call site and its own test —
+// this file will not catch it.
+
 // Skip whole-line comments only — this file's own history explains "fetch()" in
 // prose several times. Trailing comments are NOT stripped: naive `//`-splitting
 // eats the `//` inside a URL literal and takes the real call with it, and a
