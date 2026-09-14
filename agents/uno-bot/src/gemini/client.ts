@@ -14,7 +14,7 @@
 //
 // Phase 1 scope: non-streaming generateContent with a system prompt and plain
 // text — enough for the /debug/gemini smoke test and the delegate-subagent
-// lane. The full run-agent rewire (tool loop, streaming, thought signatures)
+// path. The full run-agent rewire (tool loop, streaming, thought signatures)
 // is the phase-2 adapter PR, gated on PR #47 verification.
 
 import type { Env } from "../types";
@@ -46,7 +46,7 @@ interface GenerateContentResponse {
 export function geminiConfigured(env: Env): "api-key" | "service-account" | null {
   // SA FIRST (flipped 2026-07-16, live incident; ADR-018): the service account
   // carries the GCP project's real Vertex quota and matches the credential used
-  // everywhere else (Claude lane, embeddings, backfill). An AI-Studio
+  // everywhere else (the Claude adapter, embeddings, backfill). An AI-Studio
   // GEMINI_API_KEY used to take precedence — free-tier keys have small daily
   // caps, and when one is set on the Worker it starved EVERY turn with 429s
   // (bot down in Slack + the whole eval run). API key remains the fallback for
@@ -122,7 +122,7 @@ async function geminiEndpoint(
 /**
  * Low-level generateContent: caller owns the full request body (contents,
  * systemInstruction, tools, generationConfig, …) and gets the raw parsed
- * response back. The agent loop in agent/gemini-agent.ts builds on this.
+ * response back. The Gemini adapter (agent/providers/gemini.ts) builds on this.
  */
 export async function geminiGenerateRaw(
   env: Env,

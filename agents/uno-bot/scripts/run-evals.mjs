@@ -209,7 +209,7 @@ function checkTurn(spec, resp, historySent = []) {
   if (spec.textRegex && r.kind === "text" && !new RegExp(spec.textRegex).test(r.text ?? "")) {
     failures.push(`text missing /${spec.textRegex}/`);
   }
-  // Dials are reported by the agent loop as the turn finishes (loop-shared.ts
+  // Dials are reported by the agent loop as the turn finishes (agent/run-agent.ts
   // TurnDials): the tier it routed to, and the model + level the LAST model
   // call went out with. A missing block is a failure, not a pass — a turn that
   // reports nothing cannot prove it ran at the level the case asserts.
@@ -221,7 +221,7 @@ function checkTurn(spec, resp, historySent = []) {
     failures.push(`level=${dials?.level ?? "unreported"} (expected ${spec.expectLevel}; model=${dials?.model ?? "?"})`);
   }
   // Tool calls are listed by the route in the order the model made them, with
-  // the arguments it sent (loop-shared.ts ToolCall) — the result alone shows
+  // the arguments it sent (agent/run-agent.ts ToolCall) — the result alone shows
   // only the final text or proposal, so a read made on the way to it is
   // invisible there. `expectToolCalled: { tool, args? }` passes when some call
   // matches the tool and every named arg exactly; a missing list is a failure.

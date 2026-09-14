@@ -1,12 +1,13 @@
 import type { Env } from "../types";
 import { charge } from "../net";
-import { runAgent, type AgentResult } from "../agent/run-agent";
-import { buildProviderConversation } from "../agent/provider-conversation";
 import {
+  runAgent,
   looksLikeCorrection,
   correctionDirective,
   withTurnScope,
-} from "../agent/loop-shared";
+  type AgentResult,
+} from "../agent/run-agent";
+import { buildProviderConversation } from "../agent/provider-conversation";
 import { routeRequest } from "../agent/routing";
 import { bounceLogLine, proposalWasAddressed } from "../agent/pending-notice";
 import { absenceRepairInstruction, judgeAbsence, type AbsenceContext } from "../agent/absence";
@@ -459,7 +460,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // context as authoritative prose, and a prompt rule has to beat that. A hit
   // forces `fresh: true` on search_blueprint, injects a one-turn directive
   // naming the prior query, pulls the retrieval receipts off the DO, and turns
-  // on the judge's correction gate. See loop-shared looksLikeCorrection.
+  // on the judge's correction gate. See run-agent looksLikeCorrection.
   // TEXT-ONLY half of the test. The other half — "is there actually a previous
   // reply to correct?" — needs the history, which is not loaded yet, so it is
   // applied at `isCorrection` below. This value only decides whether to pull
@@ -759,7 +760,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   let result: AgentResult;
   // Which read-only tools ran, and what the last blueprint lookup retrieved.
   // Collected by an AsyncLocalStorage scope rather than threaded through both
-  // provider loops' signatures (loop-shared withTurnScope). Both are needed
+  // the loop's signature (run-agent withTurnScope). Both are needed
   // AFTER the agent returns: the judge gates a correction on "cited something
   // fetched this turn", and the receipt is persisted for the next turn.
   let toolsUsedThisTurn: string[] = [];

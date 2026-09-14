@@ -1,7 +1,7 @@
-// Model tiers + request routing, shared by both provider lanes.
+// Model tiers + request routing, shared by both model providers.
 //
 // (Was anthropic-client.ts — the direct-Anthropic SDK client was removed when
-// the Claude lane moved to Vertex; only the provider-neutral routing survives.)
+// Claude moved to Vertex; only the provider-neutral routing survives.)
 
 // A tier is HOW HARD TO THINK, named for effort — never for a model.
 //
@@ -10,8 +10,8 @@
 // after a model means every model swap turns the name into a lie, and this one
 // already had. Renamed with no behaviour change; the model wiring is separate.
 //
-// On the Vertex-Claude lane a tier maps to the model IDs below. On the Gemini
-// lane a tier is a model PLUS a thinking level, moving together (gemini-tiers.ts,
+// On the Vertex-Claude adapter a tier maps to the model IDs below. On the Gemini
+// adapter a tier is a model PLUS a thinking level, moving together (gemini-tiers.ts,
 // ADR-028) — so a tier is one named configuration, changed one tier at a time.
 // Defined in tiers.ts (import-free) so pure modules can name a tier without
 // pulling in the Workers type graph. Re-exported here: routing is where callers
@@ -65,5 +65,5 @@ export function routeRequest(opts: {
   if (/\bthink (hard(er)?|deeply|more)\b/.test(text)) {
     return { tier: "grind", reason: "escalation-phrase" };
   }
-  return { tier: "default", reason: "default-lane" };
+  return { tier: "default", reason: "default-tier" };
 }

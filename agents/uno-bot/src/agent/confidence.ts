@@ -27,7 +27,7 @@
  * prototype_scaffold, shareout_post, email_send, proposal_resolve) are absent
  * for the same reason: none of them is a source the answer can rest on.
  *
- * Kept here rather than imported from loop-shared.ts so this module stays pure
+ * Kept here rather than imported from agent/run-agent.ts so this module stays pure
  * — it is compiled and tested outside the Worker runtime.
  */
 export const RETRIEVAL_TOOLS: ReadonlySet<string> = new Set([

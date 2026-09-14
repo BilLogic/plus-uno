@@ -1,8 +1,8 @@
-// Explicit context caching for the Gemini lane's system prompt.
+// Explicit context caching for the Gemini adapter's system prompt.
 //
 // Why this exists: skills.ts marks the stable harness block with a 1h
-// `cache_control`, and ONLY the Anthropic lane honours it. The Gemini API has
-// no such field, so on the production lane (`MODEL_PROVIDER = "gemini"`) the
+// `cache_control`, and ONLY the Claude adapter honours it. The Gemini API has
+// no such field, so on the production provider (`MODEL_PROVIDER = "gemini"`) the
 // ~40k-token harness was billed as fresh input on every iteration of every
 // turn — up to MAX_ITERATIONS per user message. Vertex's `cachedContents`
 // resource is the equivalent: create it once, reference it by name, and the

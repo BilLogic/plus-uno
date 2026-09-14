@@ -46,7 +46,7 @@ export interface ToolCall {
 export const NOT_RUN_TURN_ENDED = "not run — the turn ended here";
 
 /** What an entry says when a call went unanswered and the turn CARRIED ON. This
- *  one is a defect: a lane announced a call and answered it without reporting,
+ *  one is a defect: an adapter announced a call and answered it without reporting,
  *  which leaves a slot the next same-named call fills by mistake. Both known
  *  paths report today, so this string appearing in an artifact means a new one
  *  has grown. */
@@ -136,14 +136,14 @@ export function attachToolResult(
  * Stamp every call still waiting for a result, once the turn is over.
  *
  * The pairing in {@link attachToolResult} is FIFO by name, which is exact only
- * while every announced call also reports a result. A lane that announces a
+ * while every announced call also reports a result. An adapter that announces a
  * call and answers it without reporting — a deferral behind a pending proposal
- * used to do exactly this in both lanes — leaves a slot that the NEXT turn's
+ * used to do exactly this on both providers — leaves a slot that the NEXT turn's
  * call of the same name fills instead, recording that turn's outcome against
- * this one and leaving the call that really ran blank. Both lanes now report on
- * that path, so the case is closed at the source; this is the tell-tale, so the
- * next lane to grow an unreported path shows up in the artifact as a call with
- * no result rather than as a plausible wrong answer.
+ * this one and leaving the call that really ran blank. Both adapters now report
+ * on that path, so the case is closed at the source; this is the tell-tale, so
+ * the next unreported path to grow shows up in the artifact as a call with no
+ * result rather than as a plausible wrong answer.
  */
 export function markUnanswered(
   tools: ToolCall[],

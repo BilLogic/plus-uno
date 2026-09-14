@@ -7,7 +7,7 @@
 // (Extracted from events.ts, 2026-07-12.)
 
 import type { Env } from "../types";
-import type { AgentImage } from "../agent/loop-shared";
+import type { AgentImage } from "../agent/provider-conversation";
 import type { SlackEventFile, SlackMessageEvent } from "./types";
 import type { HistoryTurn } from "../thread-state/index";
 import type { HistoricalImages } from "../agent/provider-conversation";

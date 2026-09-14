@@ -1,10 +1,10 @@
-// The Gemini lane's tiers: one named configuration each, model PLUS thinking
+// The Gemini adapter's tiers: one named configuration each, model PLUS thinking
 // level, moving together (ADR-028, #421).
 //
 // Import-free apart from the tier union, for the same reason tiers.ts is: the
 // unit suite compiles only what it imports, and this resolution is exactly what
 // the tier tests need to assert — the LEVEL a turn is sent with, not just which
-// model answered. gemini-agent.ts is the only production caller.
+// model answered. providers/gemini.ts is the only production caller.
 //
 // Levels, verified 2026-09-04 at ai.google.dev/gemini-api/docs/thinking:
 //   gemini-3.5-flash-lite   accepts minimal|low|medium|high, defaults to minimal

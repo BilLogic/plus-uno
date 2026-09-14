@@ -879,7 +879,7 @@ const SOURCES: Source[] = [
 /**
  * Tables the keyword fallback fans out over — one subrequest each. Derived from
  * SOURCES, not copied, so adding a table updates search_blueprint's worst-case
- * bound in loop-shared automatically instead of silently exceeding it.
+ * bound in agent/loop-policy.ts automatically instead of silently exceeding it.
  */
 export const BLUEPRINT_TABLE_FANOUT = SOURCES.length;
 
@@ -1000,7 +1000,7 @@ let indexCache: { at: number; index: BlueprintIndex } | undefined;
  *   searchBlueprint and DELIBERATELY does not bust this cache. Orientation is
  *   per-isolate STRUCTURAL data, not per-query data: a user pushing back
  *   re-queries cells, and re-reading the same 23 scenarios each time would
- *   multiply index fetches against LOOKUP_CEILING = 38 (loop-shared.ts) —
+ *   multiply index fetches against LOOKUP_CEILING = 38 (agent/loop-policy.ts) —
  *   three searches a turn already cost 36. The TTL, not the caller, decides.
  */
 export async function fetchBlueprintIndex(

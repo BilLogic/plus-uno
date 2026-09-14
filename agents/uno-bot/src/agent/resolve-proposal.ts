@@ -8,13 +8,26 @@
 //   1. Post a thread reply with the narrative
 //   2. React :handshake: or :wave: on the user's ORIGINAL request message
 //      (the message that prompted the proposal, stored as pending.userMsgTs)
-//   3. If confirm: fire the side-effect tool via executeTool
+//   3. If confirm: fire the side-effect tool (executeTool, below)
+//
+// The side-effect tool table lives HERE, folded in from tools/dispatcher.ts
+// (#497), because this gate is its only caller: a confirmed proposal is the one
+// way a write tool ever runs. Read-only tools dispatch separately, inside the
+// turn, from agent/run-agent.ts. tools/dispatcher.ts also re-exported
+// `SlackContext` "so existing imports keep working" long after the type moved to
+// types.ts; those importers now name types.ts and the file is gone.
 
-import type { Env } from "../types";
+import type { Env, SlackContext } from "../types";
 import { addReaction, postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
 import type { PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
-import { executeTool } from "../tools/dispatcher";
+import { executeImplement } from "../tools/implement";
+import { executeImplementDesign } from "../tools/implement-design";
+import { executeNotionCreate } from "../tools/notion-create";
+import { executeNotionUpdate } from "../tools/notion-update";
+import { executeNotionArchive } from "../tools/notion-archive";
+import { executeSendEmail } from "../tools/send-email";
+import { executeShareForFeedback } from "../tools/share-for-feedback";
 
 export type Decision = "confirm" | "cancel";
 
@@ -149,5 +162,38 @@ function outcomeNote(toolName: string, resultJson: string): string {
     return r.url ? `${msg} Notion link: ${r.url}` : msg;
   } catch {
     return `${toolName} completed.`;
+  }
+}
+
+/**
+ * The side-effect tool table. Each body returns a JSON string that goes
+ * straight into a tool_result content block.
+ *
+ * Reached only past the gate — an unknown name is a caller bug, not a user
+ * error, so it answers ok:false rather than throwing into the resolution path.
+ */
+async function executeTool(
+  env: Env,
+  name: string,
+  input: Record<string, unknown>,
+  slack: SlackContext,
+): Promise<string> {
+  switch (name) {
+    case "notion_create":
+      return executeNotionCreate(env, input, slack);
+    case "notion_update":
+      return executeNotionUpdate(env, input, slack);
+    case "notion_archive":
+      return executeNotionArchive(env, input, slack);
+    case "component_implement":
+      return executeImplement(env, input, slack);
+    case "prototype_scaffold":
+      return executeImplementDesign(env, input, slack);
+    case "shareout_post":
+      return executeShareForFeedback(env, input, slack);
+    case "email_send":
+      return executeSendEmail(env, input, slack);
+    default:
+      return JSON.stringify({ ok: false, error: `unknown tool: ${name}` });
   }
 }

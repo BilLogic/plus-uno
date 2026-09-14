@@ -5,11 +5,11 @@
 // WHY IT IS ITS OWN FILE. `loop.ts` is provider-free AND runtime-free: it names
 // no `Env`, no Workers type, no `fetch`, so `tsconfig.test.json` compiles it and
 // the loop's own behaviour is testable against a fake adapter without a network
-// or a Durable Object. These values used to live in `loop-shared.ts`, which
-// reaches every tool body and so drags the whole Workers type graph behind it —
-// importing them from there would have put the loop back out of reach of its own
-// tests. `loop-shared.ts` re-exports everything here, so its callers are
-// unchanged; #497 retires that re-export surface along with the rest of the bag.
+// or a Durable Object. These values used to live in the shared-constants bag
+// (`loop-shared.ts`), which reached every tool body and so dragged the whole
+// Workers type graph behind it — importing them from there would have put the
+// loop back out of reach of its own tests. The bag is gone (#497) and every
+// caller names this file.
 //
 // Nothing provider-specific belongs here. A model id, a thinking level and a
 // wire shape are the adapter's business (see `model-provider.ts`).

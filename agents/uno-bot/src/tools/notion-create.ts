@@ -7,7 +7,7 @@
 // project hub's Research page.
 
 import type { Env } from "../types";
-import type { SlackContext } from "./dispatcher";
+import type { SlackContext } from "../types";
 import { postMessage } from "../slack/api";
 import { notionCreate, type NotionCreateSurface, type PrdSection } from "../integrations/notion";
 
