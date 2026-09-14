@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **158,865 chars from 16 files**, against an assembled budget of 170,000 (11,135 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 138,481 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **159,155 chars from 16 files**, against an assembled budget of 170,000 (10,845 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 138,771 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,603 (−7,277 ide-only) | 9,603 | 20,000 (constitution) |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 9,994 | 19,625 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,196 | 45,862 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,036 | 51,942 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,990 | 58,977 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 65,690 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 70,977 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 77,680 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 84,082 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 86,053 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,920 (−4,814 ide-only) | 99,016 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,700 | 112,758 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 116,006 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 146,593 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 151,182 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,635 (−605 ide-only) | 158,865 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 10,276 | 19,907 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,201 | 46,149 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,036 | 52,229 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,990 | 59,264 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 65,977 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 71,264 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 77,967 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 84,369 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 86,340 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,923 (−4,814 ide-only) | 99,306 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,700 | 113,048 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 116,296 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 146,883 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 151,472 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,635 (−605 ide-only) | 159,155 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -218,7 +218,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **disclosed** | reference pushed out of the always-loaded tier behind a pointer, loaded only when the pointer fires; the Worker's `read_reference` tool is its Tier 2 | "hidden", "optional" |
 | **leading word** | a compact pretrained concept an agent thinks with (*tracer bullet*, *red*, *ratchet*): repeated as a token, kept out of sentence form; front-loaded in a pointer so it triggers | — |
 | **ThreadState** | uno-bot's per-thread memory behind one typed interface (`agents/uno-bot/src/thread-state/`): history, the pending proposal, assistant context, the `/stop` flag, event dedup and the run lease. Two adapters — the Durable Object in production, in-memory in tests — held equal by one conformance suite. A caller hands in channel and thread; the Durable Object id and the routes stay inside the module | "the DO", "thread-state client" (deleted 2026-09) |
-| **ModelProvider** | uno-bot's seam between its one agent loop (`agents/uno-bot/src/agent/loop.ts`) and a model. An adapter takes a neutral conversation, a tool roster and an opaque tier name and returns text, tool calls, usage and a stop kind; the wire format, the tier's model and dials, the prompt cache and the backup model stay inside it. Gemini is production's adapter, the fake one is what the loop's tests run on | "the provider loop", "provider lane" (there is one loop, and **lane** is the blueprint's actor row) |
+| **ModelProvider** | uno-bot's seam between its one agent loop (`agents/uno-bot/src/agent/loop.ts`) and a model. An adapter takes a neutral conversation, a tool roster and an opaque tier name and returns text, tool calls, usage and a stop kind; the wire format, the tier's model and dials, the prompt cache and the backup model stay inside it. Gemini is production's adapter, Claude-on-Vertex the opt-in second, the fake one is what the loop's tests run on. Above the seam the loop's whole public surface is one function, `runAgent(input)` in `agent/run-agent.ts`, which is also the one place `MODEL_PROVIDER` is read | "the provider loop", "provider lane", "Gemini lane", "Claude lane", "model lane", "both lanes" (there is one loop, adapters behind one seam — and **lane** is the blueprint's actor row) |
 | **corpus** | the harness's one reader of repo files (`scripts/lib/corpus.mjs`): which documents exist under a path, where a doc's frontmatter stops, its markdown links, its heading outline. A check asks it rather than the filesystem, and it takes a root so its test reads a fixture tree | "the walker", "the parser" (there is one of each) |
 | **sprawl** | a document too long even when every line is live — attention thins across it; the cure is the ladder, not a shorter sentence | "bloat" (bloat is dead weight; sprawl is live weight) |
 
@@ -367,11 +367,11 @@ The ✅-gated tools of the gate list (§ Tool routing) — zero irreversible act
 
 **Write standard Markdown** — `**bold**`, `_italic_`, `- bullets`, `[label](url)`, `> quotes`, fenced code, and **tables**. Slack renders all of it; the Worker converts wherever a different form is needed. A table is right when the content really is a grid (3+ rows comparing the same fields); keep it to 2–4 narrow columns so it survives a phone. Prose in a table is worse than prose. One hard rule: people and channels are always Slack IDs (`<@U…>`, `<#C…>`) — a plain `@handle` pings nobody. Details in `docs/connectors/slack.md` § Message formatting.
 
-## Run setup (two provider lanes)
+## Run setup (two model providers)
 
-Two provider lanes run the SAME local tool roster (no hosted MCP): **Gemini** (default) has web grounding built in; **Vertex-Claude** has web search. On either lane a turn runs at one of three tiers — chill · default · grind — chosen by the router: "think harder" reaches grind, a short reply to a pending proposal runs chill, everything else is default.
+Two model providers run the SAME local tool roster (no hosted MCP): **Gemini** (default) has web grounding built in; **Vertex-Claude** has web search. On either one a turn runs at one of three tiers — chill · default · grind — chosen by the router: "think harder" reaches grind, a short reply to a pending proposal runs chill, everything else is default.
 
-Either lane: you are the orchestrator — reason and synthesize yourself, and budget lookups: the loop has sixteen steps, so the batching rule in § Tool routing is how a multi-source answer fits in one run. One telemetry line per request.
+Either provider: you are the orchestrator — reason and synthesize yourself, and budget lookups: the loop has sixteen steps, so the batching rule in § Tool routing is how a multi-source answer fits in one run. One telemetry line per request.
 
 ## Between-tool narration (user-visible)
 
@@ -743,7 +743,7 @@ Create/maintain `[replica]` frames on publish; keep `[spec]` frames library-pure
 - **Reads** (grounding: `notion_search`, `roadmap_query`, source lookups) → the bot's REST read code. No gate needed — reads never mutate state.
 - **Writes** (`notion_create`, `notion_update`, `notion_archive`) → the bot's **own gated tools**, intercepted by the proposal gate — nothing writes without the requester's ✅.
 
-**No hosted MCP on the Worker.** A hosted-Notion-MCP read path was adopted 2026-07-09 and has since been removed — both agent lanes log `mcp=off` and neither passes an `mcp_toolset`. Every Notion read and write the bot makes goes through the REST paths above. In-IDE, the Notion MCP connectors (`notion-plus` · `notion-parsnip` · `notion-personal`) are the read surface; that is an IDE capability, not a bot one.
+**No hosted MCP on the Worker.** A hosted-Notion-MCP read path was adopted 2026-07-09 and has since been removed — both model adapters log `mcp=off` and neither passes an `mcp_toolset`. Every Notion read and write the bot makes goes through the REST paths above. In-IDE, the Notion MCP connectors (`notion-plus` · `notion-parsnip` · `notion-personal`) are the read surface; that is an IDE capability, not a bot one.
 
 ⚠️ **The MCP-write principle (cross-service, not just Notion).** Inline MCP tools execute server-side during the turn, so any tool exposed via MCP bypasses the ✅ proposal gate. Therefore a write goes **direct via MCP only if it wouldn't need the gate anyway** — i.e. reversible + low-blast-radius, like Slack messaging (the bot's native medium, already ungated for replies). **Consequential / outward / irreversible writes stay hard-gated bot tools, never MCP:** Notion artifacts (`notion_create`/`update`/`archive`) and email. The rule stands for any future MCP attachment, in either runtime: **Slack** = reads + messaging writes may go direct; **Notion** = reads may go direct, writes stay gated; **Supabase** = reads only (the MCP URL pins server-enforced `read_only=true`) — **the bot has NO blueprint write path at all**: a blueprint-change ask becomes a maintenance intake ticket (`notion_create` intake, ✅-gated) or an IDE handoff (`uno-maintain`, where migrations/diff/review live); **Figma** = *no MCP at all* — its hosted MCP is a closed catalog (only Figma-approved clients like Claude Code/Cursor/VS Code connect; a custom Worker 403s) and the local MCP needs a desktop app, so the bot grounds Figma from the Notion docs that reference it and routes real Figma work to the IDE. The `ntn_` REST key remains Notion's write path + the read fallback when the MCP token isn't set.
 

@@ -22,18 +22,18 @@ and did.
 
 Because the brain is bundled, **guidance changes reach the bot on `deploy`, not on a push to `main`** (`deploy` runs `bundle:harness` first — see `package.json`). Editing the persona/skills and pushing to `main` alone does **not** reprogram the running bot; you must `wrangler deploy`.
 
-## Model providers — two lanes, one switch
+## Model providers — two adapters, one switch
 
-`MODEL_PROVIDER` in `wrangler.toml` selects the loop that runs every turn (`src/agent/run-agent.ts` dispatches):
+`MODEL_PROVIDER` in `wrangler.toml` selects which adapter answers every turn (`src/agent/run-agent.ts` reads it — the one place it is read):
 
 | | `gemini` (**default / active**) | `vertex-claude` |
 |---|---|---|
-| Adapter (+ its wiring) | `src/agent/providers/gemini.ts` via `gemini-agent.ts` — `GEMINI_MODEL` (`gemini-3.8-flash`) | `src/agent/providers/claude.ts` via `claude-agent.ts` — tiered `claude-*` on Vertex (`sonnet` default; "think hard" → `opus`; confirm/cancel → `haiku`) |
+| Adapter | `src/agent/providers/gemini.ts` — `GEMINI_MODEL` (`gemini-3.8-flash`) | `src/agent/providers/claude.ts` — tiered `claude-*` on Vertex (`sonnet` default; "think hard" → `opus`; confirm/cancel → `haiku`) |
 | Web grounding | `googleSearch` + `urlContext` (Google built-ins) | Claude `web_search` (needs the GCP org policy `constraints/vertexai.allowedPartnerModelFeatures`) |
 | Prompt caching | Gemini implicit caching | Anthropic prompt caching on the cached system prefix |
 | Auth / billing | Vertex service account (canonical — ADR-018; AI-Studio `GEMINI_API_KEY` is a local-dev fallback only) → GCP | **Same** Vertex service account → GCP (Claude via Model Garden) |
 
-Both lanes are **local tools only** (no hosted MCP), and run the same agent loop — so the tool roster, the gate protocol, `/stop`, the iteration cap (16) and the output-token cap (16384) are one implementation rather than two matching ones. Auth for both is the Vertex service account (`GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY`, project `GEMINI_PROJECT_ID`), so Claude usage bills to the same GCP project as Gemini. Smoke-test the lanes with `GET /debug/gemini` and `GET /debug/vertex-claude` (both auth-gated by `DEBUG_TOKEN`).
+Both adapters are **local tools only** (no hosted MCP), and run the same agent loop — so the tool roster, the gate protocol, `/stop`, the iteration cap (16) and the output-token cap (16384) are one implementation rather than two matching ones. Auth for both is the Vertex service account (`GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY`, project `GEMINI_PROJECT_ID`), so Claude usage bills to the same GCP project as Gemini. Smoke-test both with `GET /debug/gemini` and `GET /debug/vertex-claude` (both auth-gated by `DEBUG_TOKEN`).
 
 ### One loop, behind the ModelProvider seam
 
@@ -41,7 +41,7 @@ Everything a turn *decides* lives once, in `src/agent/loop.ts`: the iteration bu
 
 `src/agent/providers/gemini.ts` is production's adapter: it owns tier → model → thinking level (ADR-028), the `contents` array it appends to verbatim, the Vertex `cachedContents` harness cache (warmed on the turn's first use, so no route has to warm it), the `GEMINI_FALLBACK_MODEL` backup, and token accounting. `src/agent/providers/claude.ts` is the Claude-on-Vertex adapter: the `messages` array it appends to verbatim (so a thinking block survives a tool round), tool_use ⇄ neutral tool call, the tool_result echo that keeps every announced call answered, `pause_turn` resumed inside the adapter so the loop never sees it, the tier → model id and thinking budget, server-side `web_search`, the `cache_control` prefix, and usage accounting. It reports **no backup model** — `fallback` always returns false, so a 429 surfaces through the same no-backup path a Gemini turn takes with `GEMINI_FALLBACK_MODEL` unset. Its transport is a port, so `tests/claude-provider.test.ts` drives a whole Claude-shaped turn against a stubbed rawPredict. `src/agent/providers/fake.ts` replays scripted turns, which is what lets `tests/agent-loop.test.ts` drive the whole loop with no network, no credential and no Cloudflare runtime.
 
-Deleting the second loop is what made `/stop` work on Claude (#496): `claude-agent.ts` was 359 lines that re-implemented everything above, and the cancel check was simply missing from its copy.
+Deleting the second loop is what made `/stop` work on Claude (#496): `claude-agent.ts` was 359 lines that re-implemented everything above, and the cancel check was simply missing from its copy. The two wiring files that survived it, and the shared-constants module they both re-exported, are folded into `run-agent.ts` (#497) — the loop's public surface is now one function, `runAgent(input)`, plus the `ModelProvider` seam.
 
 ## What it can / partially can / can't do
 
@@ -64,7 +64,7 @@ The full behavioral contract (voice, grounding rules, gate protocol, Slack etiqu
 ```
 uno-bot/
 ├── AGENT.md              Persona delta (constitution is repo-root AGENTS.md)
-├── tool-definitions.json Local tool schemas (source of truth; re-exported by src/agent/tool-definitions.ts)
+├── tool-definitions.json Local tool schemas (source of truth; read by src/agent/run-agent.ts)
 ├── wrangler.toml         Worker + Durable Objects + KV + vars/secrets config (+ free-tier constraints)
 ├── package.json / tsconfig.json / .dev.vars.example
 └── src/
@@ -73,8 +73,8 @@ uno-bot/
     │                     /oauth/slack/{start,callback} — plus the cron scheduled() handler
     ├── agent/            loop.ts (THE agent loop) · model-provider.ts (the ModelProvider
     │                     seam) · providers/ (gemini · claude · fake) · loop-policy.ts (the
-    │                     loop's dials and strings) · run-agent.ts (provider dispatcher) ·
-    │                     gemini-agent.ts · claude-agent.ts (Env → the loop's ports) ·
+    │                     loop's dials and strings) · run-agent.ts (the one public entry:
+    │                     Env → the loop's ports, adapter choice, read-only tool dispatch) ·
     │                     routing.ts (tiers/model ids) · skills.ts (bundled-harness assembly) ·
     │                     preflight · draft-judge · tool schemas
     ├── gemini/           Google auth (Vertex SA / API key) + Gemini REST client
@@ -124,7 +124,7 @@ curl http://localhost:8787/health
 | `SLACK_SIGNING_SECRET` | Verify incoming Slack request signatures |
 | `SLACK_BOT_TOKEN` | `xoxb-…` for `chat.postMessage`, `reactions.add`, `conversations.replies` |
 | `SLACK_MCP_CLIENT_SECRET` | Secret for the static Slack OAuth client (the `slack_search` user token) |
-| `GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY` | Vertex service account — powers BOTH the Gemini and Vertex-Claude lanes (billed to the GCP project). Canonical credential, wins whenever fully set (ADR-018); `GEMINI_API_KEY` (AI Studio) is a local-dev fallback for the Gemini lane only — never set it on the Worker |
+| `GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY` | Vertex service account — powers BOTH the Gemini and Vertex-Claude adapters (billed to the GCP project). Canonical credential, wins whenever fully set (ADR-018); `GEMINI_API_KEY` (AI Studio) is a local-dev fallback for Gemini only — never set it on the Worker |
 | `GITHUB_TOKEN` | PAT for `repository_dispatch` + `github_read` |
 | `NOTION_API_KEY` | Notion integration token (`notion_create` / `notion_update` / `notion_archive` + catalog reads) |
 | `FIGMA_ACCESS_TOKEN` | Figma read token — the `prototype_scaffold` proposal screenshot + the library poll's reads |
@@ -148,14 +148,14 @@ curl https://<worker-url>/health   # expect: uno-bot ok <BUILD>
 ## Smoke test
 
 - **Bot behavior:** run the Test Plan's smoke trio in `#uno-bot-sandbox` — the injection case (gate + safety), the Goal-Setting retrieval case (grounding + citations), and the bare hi-fi ask (clarify-before-build). Cancel any staged proposals afterward; one case per thread.
-- **Provider health (all auth-gated by `DEBUG_TOKEN`):** `GET /debug/gemini` (live Gemini round-trip) · `GET /debug/vertex-claude` (live Claude-on-Vertex round-trip — run before flipping `MODEL_PROVIDER="vertex-claude"`) · `GET /debug/gemini-cache` (no model call: reports whether the Gemini lane's system prompt is served from a Vertex `cachedContents` resource, and the exact reason when it isn't — on `GEMINI_REGION = "global"` it never can be, see wrangler.toml).
+- **Provider health (all auth-gated by `DEBUG_TOKEN`):** `GET /debug/gemini` (live Gemini round-trip) · `GET /debug/vertex-claude` (live Claude-on-Vertex round-trip — run before flipping `MODEL_PROVIDER="vertex-claude"`) · `GET /debug/gemini-cache` (no model call: reports whether the Gemini adapter's system prompt is served from a Vertex `cachedContents` resource, and the exact reason when it isn't — on `GEMINI_REGION = "global"` it never can be, see wrangler.toml).
 - **Figma poll (auth-gated by `DEBUG_TOKEN`):** `GET /debug/figma-poll?dry_run=1` — diffs the DS file against the KV snapshot and reports, without writing KV/Notion/Slack. Drop `dry_run` to fire the real thing (posts to `#uno-bot`, files a PRD). First-ever run (empty KV) seeds the snapshot and notifies nothing.
 - **`prototype_scaffold` (manual, no Slack):** GitHub Actions → "Implement Design (Prototype)" → Run workflow from `main`, `figma_url` = a single **screen frame** (renders < 8000px), `slug` = `test-prototype`. Expect a draft PR with `prototypes/<slug>/` + a root `dev:<slug>` script; `npm install && npm run dev:test-prototype` boots it.
 
 ## Gotchas
 
 - **`repository_dispatch` + default branch:** the implement workflows (`figma-implement.yml`, `figma-implement-design.yml`) only fire when they exist on `main`, or a confirmed proposal silently no-ops.
-- **Provider drift:** capabilities differ by lane (see the table above) — check `MODEL_PROVIDER` before debugging behavior changes. The Vertex-Claude lane needs the Claude models enabled in the project's Model Garden and the `aiplatform.user` role on the service account; `web_search` on that lane also needs the GCP org policy `constraints/vertexai.allowedPartnerModelFeatures` enabled.
+- **Provider drift:** capabilities differ by provider (see the table above) — check `MODEL_PROVIDER` before debugging behavior changes. Vertex-Claude needs the Claude models enabled in the project's Model Garden and the `aiplatform.user` role on the service account; its `web_search` also needs the GCP org policy `constraints/vertexai.allowedPartnerModelFeatures` enabled.
 - **Oversized Figma frames:** whole-board nodes blow past Figma's render limit + the 8000px image cap; the script falls back (smaller scale → design-properties only). Point at a single screen frame for visual parity.
 - **Notion PRD access:** the PRD page must be shared with the Notion integration, else codegen proceeds without PRD context (graceful, lower fidelity).
 - **Slug collisions:** the scaffold refuses to overwrite an existing `prototypes/{slug}/` (Action fails, Slack gets ❌). Pick a fresh slug.
