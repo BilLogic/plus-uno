@@ -739,7 +739,7 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
       subrequests: subrequestsUsed(), subrequest_hosts: meterBreakdown(),
       internal_subrequests: internalSubrequestsUsed(),
       budget_trips: subrequestBudgetTrips(),
-      narration, dials, tools, references, gateAsk, result,
+      narration, dials: reportDials(dials), tools, references, gateAsk, result,
     });
   } catch (err) {
     return Response.json({
@@ -754,6 +754,21 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
       error: err instanceof Error ? err.message : String(err),
     });
   }
+}
+
+/**
+ * Flatten the turn's dials for the eval artifact.
+ *
+ * The shared shape names only `tier`, `route` and `model`; a provider's own
+ * dials ride in `detail`, so no provider has to report null into a field named
+ * for another provider's dial. On the wire they flatten back out, which is what
+ * keeps `dials.level` meaning "the level this turn was sent with" for a Gemini
+ * run and simply ABSENT — rather than null — for a provider that has no level.
+ */
+function reportDials(dials: TurnDials | null): Record<string, string> | null {
+  if (!dials) return null;
+  const { detail, ...named } = dials;
+  return { ...named, ...detail };
 }
 
 // Gate for /debug/* routes. Requires DEBUG_TOKEN to be configured AND matched
