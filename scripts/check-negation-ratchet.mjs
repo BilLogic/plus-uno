@@ -95,7 +95,7 @@
  * ── THE SCOPES READ THEIR DOCS DIFFERENTLY, ON PURPOSE (#238) ────────────────
  *
  * THE BUNDLED SCOPE COUNTS THE BUNDLED BODY — frontmatter stripped, through the
- * bundler's own `splitFrontmatter`. THE IDE SCOPE COUNTS WHOLE FILES. That
+ * bundler's own `frontmatter` reader. THE IDE SCOPE COUNTS WHOLE FILES. That
  * asymmetry is the finding, not an inconsistency to tidy away: the two corpora
  * reach a model by different routes, and each scope reads the text its route
  * actually delivers.
@@ -116,7 +116,7 @@
  *
  * ONE PARSER, NOT TWO. Where frontmatter ends is a fact the bundler decides —
  * it is the fact that decides the prompt — so the split lives in
- * `scripts/lib/frontmatter.mjs` and the bundler imports it from there. A second
+ * `scripts/lib/corpus.mjs` and the bundler imports it from there. A second
  * parser here that ended the block a line later would credit the prompt with
  * prohibitions it never carries, which is one-rule-two-homes wearing the exact
  * costume this guard was written to notice. `check-negation-ratchet.test.mjs`
@@ -188,7 +188,7 @@ import { fileURLToPath } from 'url';
 
 import { actionsPromptFiles } from './lib/actions-prompts.mjs';
 import { bundlerFailureReport, harnessSets, resolveBundled, unresolvedReport } from './lib/bundled-set.mjs';
-import { splitFrontmatter } from './lib/frontmatter.mjs';
+import { frontmatter } from './lib/corpus.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -260,7 +260,7 @@ export const SCOPES = [
     // The bundler's own splitter, not a copy of it: this has to end the
     // frontmatter block exactly where `bundle-harness.mjs` ends it, or the
     // count and the prompt disagree about what the model was told.
-    read: (text) => splitFrontmatter(text).body,
+    read: (text) => frontmatter(text).body,
     measuredOn:
       'the bundled body — frontmatter stripped, as bundle-harness.mjs strips it before ' +
       'assembly, so the count is tokens the model is actually told',

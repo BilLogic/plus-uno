@@ -86,7 +86,7 @@ import path from "node:path";
 // where it STOPS decides both the char budgets below and `check:negation`'s
 // bundled count (#238), so the split lives in one shared module rather than
 // once here and once in each guard that has to agree with it.
-import { splitFrontmatter } from "../../../scripts/lib/frontmatter.mjs";
+import { frontmatter } from "../../../scripts/lib/corpus.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url)); // agents/uno-bot/scripts
 const repoRoot = path.resolve(here, "../../.."); // repo root (two levels above agents/uno-bot)
@@ -310,7 +310,7 @@ for (const section of SECTIONS) {
   const found = [];
   for (const root of section.roots) {
     for (const rel of walk(root)) {
-      const { meta } = splitFrontmatter(readFileSync(path.join(repoRoot, rel), "utf8"));
+      const { meta } = frontmatter(readFileSync(path.join(repoRoot, rel), "utf8"));
       if (!meta.embodiment) {
         undeclared.push(rel);
         continue;
@@ -392,7 +392,7 @@ const raw = members.map(({ rel }) => {
   // model, but it makes the baked bytes depend on WHO deployed, and the
   // system prompt is the cached prefix.
   const text = readFileSync(abs, "utf8").replace(/\r\n/g, "\n");
-  return splitFrontmatter(text).body;
+  return frontmatter(text).body;
 });
 
 // The disclosed docs, read the same way: frontmatter off, endings normalised,
@@ -401,7 +401,7 @@ const raw = members.map(({ rel }) => {
 const referenceMap = Object.fromEntries(
   disclosed.map(({ rel, name }) => {
     const text = readFileSync(path.join(repoRoot, rel), "utf8").replace(/\r\n/g, "\n");
-    return [name, stripIdeOnly(splitFrontmatter(text).body)];
+    return [name, stripIdeOnly(frontmatter(text).body)];
   }),
 );
 
