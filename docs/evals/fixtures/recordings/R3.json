@@ -1,0 +1,25 @@
+{
+  "case": "R3",
+  "source": "authored",
+  "recordedAt": "2026-09-14",
+  "note": "AUTHORED, NOT CAPTURED — no Vertex credential was available when this was written, so the reply is what R3's expectation describes rather than a draw Gemini actually produced. It exercises the ROUTING the turn performs on a side-effect call: the loop stages `shareout_post` as a gated proposal instead of executing it, and the deterministic check reads the tool name off that staging. It proves nothing about whether the model would reach for `marketplace_register` today — that is the worker transport's measurement, on the cron. Replace with a captured recording (scripts/eval-record.mjs) when someone runs the suite with credentials.",
+  "turns": [
+    {
+      "prompt": "Publish this prototype for feedback: https://plus-uno.netlify.app/home — I'd love a quick pass on the empty states.",
+      "replies": [
+        {
+          "text": "Sharing the Home prototype out for feedback, pointing reviewers at the empty states.",
+          "toolCalls": [
+            {
+              "name": "shareout_post",
+              "args": {
+                "url": "https://plus-uno.netlify.app/home",
+                "summary": "Quick pass wanted on the Home empty states."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

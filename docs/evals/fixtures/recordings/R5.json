@@ -1,0 +1,58 @@
+{
+  "case": "R5",
+  "source": "authored",
+  "recordedAt": "2026-09-14",
+  "note": "AUTHORED, NOT CAPTURED. Three turns, and the one a local run measures best: turn 1 stages a share-out, turn 2's typed 'cancel' becomes the model's `proposal_resolve` call which the loop authorizes against the pending card, and turn 3 repeats the EXACT ask — where Turn's gate idempotency reads the '(Cancelled the proposed shareout_post …)' marker out of the seeded store and bounces rather than re-carding. Turn 3's recorded reply is a re-proposal ON PURPOSE: the deterministic check expects `text`, so it passes only if the turn refuses to stage what the model asked for. That is Turn's rule, not the model's, and it is exactly the kind of thing a recording can measure honestly.",
+  "turns": [
+    {
+      "prompt": "Share this for feedback in the feedback channel: https://plus-uno.netlify.app/home — summary: quick pass on Home empty states.",
+      "replies": [
+        {
+          "text": "Staging the share-out for the feedback channel.",
+          "toolCalls": [
+            {
+              "name": "shareout_post",
+              "args": {
+                "url": "https://plus-uno.netlify.app/home",
+                "summary": "Quick pass on Home empty states."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prompt": "cancel",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "proposal_resolve",
+              "args": {
+                "decision": "cancel",
+                "message_to_user": "Cancelled — nothing was posted."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "prompt": "Share this for feedback in the feedback channel: https://plus-uno.netlify.app/home — summary: quick pass on Home empty states.",
+      "replies": [
+        {
+          "text": "Staging the share-out again.",
+          "toolCalls": [
+            {
+              "name": "shareout_post",
+              "args": {
+                "url": "https://plus-uno.netlify.app/home",
+                "summary": "Quick pass on Home empty states."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
