@@ -1,7 +1,7 @@
 // uno-bot automated evals (P2·1) — drives docs/evals/fixtures/uno-bot-cases.json
-// through the live Worker's /debug/eval route (headless agent turns: proposals
-// come back as data, nothing posts to Slack/Notion), then scores each case two
-// ways:
+// through a TURN TRANSPORT (by default the live Worker's /debug/eval route:
+// headless agent turns, proposals come back as data, nothing posts to
+// Slack/Notion), then scores each case two ways:
 //   1. deterministic checks from the fixture (expectKind / expectTool /
 //      textRegex / forbidTool / gateAsk escape hatch, expectTier /
 //      expectLevel against the dials the route reports — the tier the turn
@@ -12,34 +12,49 @@
 //      so a case can assert a fetched reference reached the next turn as its
 //      receipt and not as its text, #426), and
 //   2. an LLM judge (Gemini on Vertex, same SA as everything else) against the
-//      condensed D1–D9 bot-answer rubric + the case's judgeNote.
+//      D1–D9 bot-answer rubric — loaded from docs/evals/rubrics/bot-answer.md
+//      and quoted verbatim, scripts/eval-rubric.mjs — + the case's judgeNote.
 // A failing BLOCKER case fails the job (exit 1) — mirroring the scenario doc's
 // "a failing row is a release blocker". Full transcripts land in
 // eval-results.json for reasoning investigation.
 //
 // A case may also declare `subject: { need }` — a CONDITION the live blueprint
-// answers with a row, fetched once before turn 1 from the Worker's
-// /debug/blueprint-subject route and substituted into every `{{subject.…}}` the
+// answers with a row, fetched once before turn 1 through the transport (the
+// Worker's /debug/blueprint-subject route) and substituted into every `{{subject.…}}` the
 // case spells (#415, scripts/eval-subjects.mjs). A condition nothing on the
 // board satisfies makes the case SKIPPED: neither a pass nor a failure, counted
 // apart in the summary. A case that named its subject instead would encode a
 // fact about a board that is edited daily.
 //
-// Env required:
+// HOW A TURN IS RUN is a dependency (#511). `--transport=worker` (the default,
+// so the cron and every documented invocation are unchanged) POSTs to the
+// deployed Worker's /debug/eval route — scripts/eval-transport.mjs, where that
+// adapter now lives. Everything else here — the fixture walk, the subject
+// substitution, the deterministic checks, the history threading, the sampling
+// arithmetic — is transport-agnostic, and `runEvals` below takes the transport
+// (and its judge, log, clock and writer) as arguments, so the composition is
+// itself testable: scripts/run-evals.test.mjs drives it with a fake transport.
+//
+// Env required (by the WORKER transport — another transport needs neither):
 //   WORKER_URL      e.g. the Worker origin (scripts/worker-url.mjs, or UNO_BOT_WORKER_URL)
 //   DEBUG_TOKEN     the Worker's /debug/* gate token
 // Judge (optional — judge is skipped without it; deterministic checks still run):
 //   GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY, GEMINI_PROJECT_ID (default hcii-plus)
 // Optional: JUDGE_MODEL (default gemini-3.1-pro-preview — the grind model; a judge should be at least as strong as what it grades, and the bot's own model shares its blind spots), CASES_PATH
 //
-// Run:  node agents/uno-bot/scripts/run-evals.mjs
+// Run:  node agents/uno-bot/scripts/run-evals.mjs [--transport=worker]
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import { argv } from "node:process";
 import { createHash, createSign } from "node:crypto";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { passesCase, toolCallMatches, describeCalls } from "./eval-scoring.mjs";
 import { threadTurn, checkHistory, sentSummary } from "./eval-history.mjs";
-import { applySubject, fetchSubject, skipReason } from "./eval-subjects.mjs";
+import { applySubject, skipReason } from "./eval-subjects.mjs";
+import { workerTransport } from "./eval-transport.mjs";
+import { describeRubric, judgeSystem, loadRubric } from "./eval-rubric.mjs";
 
 const {
   WORKER_URL,
@@ -51,7 +66,6 @@ const {
   CASES_PATH = "docs/evals/fixtures/uno-bot-cases.json",
 } = process.env;
 
-const TURN_TIMEOUT_MS = 8 * 60_000; // agent turns can legally run for minutes
 const PAUSE_BETWEEN_CASES_MS = 10_000; // stay clear of per-minute model quotas
 const TRANSIENT_RETRIES = 2; // extra attempts per turn on 429/quota/overload
 const TRANSIENT_BACKOFF_MS = 65_000; // sit out the per-minute quota window
@@ -96,46 +110,30 @@ async function googleToken() {
 }
 
 // ── One headless agent turn (with transient-error retries) ────────────────────
-async function evalTurnOnce(prompt, history, pending, surface = {}) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TURN_TIMEOUT_MS);
-  try {
-    const res = await fetch(`${WORKER_URL.replace(/\/+$/, "")}/debug/eval`, {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-debug-token": DEBUG_TOKEN },
-      // channel/requestedBy default to the synthetic C_EVAL/U_EVAL server-side.
-      // A case sets them when the SURFACE is the thing under test — own-DM
-      // visibility (ADR-020) is unreachable from a channel that never starts
-      // with "D", so an assertion about it would otherwise pass for the wrong
-      // reason.
-      body: JSON.stringify({ prompt, history, pending, ...surface }),
-      signal: controller.signal,
-    });
-    return await res.json();
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-// Rate limits are a property of the moment, not the bot — retry 429/quota/
-// overload with a long backoff instead of failing the case (first live run
-// 2026-07-16: every case "failed" on a starved model quota).
-async function evalTurn(prompt, history, pending, surface) {
+// The turn itself belongs to the transport (scripts/eval-transport.mjs); the
+// retry does not. Rate limits are a property of the moment, not the bot — retry
+// 429/quota/overload with a long backoff instead of failing the case (first
+// live run 2026-07-16: every case "failed" on a starved model quota), and that
+// is true of any transport that reaches a model.
+async function evalTurn(transport, req, { log, sleep }) {
   for (let attempt = 0; ; attempt++) {
-    const resp = await evalTurnOnce(prompt, history, pending, surface).catch((err) => ({
+    const resp = await transport.runTurn(req).catch((err) => ({
       ok: false,
       error: String(err?.message ?? err),
     }));
     const msg = String(resp?.error ?? "");
     const transient = /429|quota|exhaust|rate.?limit|overload|503|529/i.test(msg);
     if (resp?.ok || !transient || attempt >= TRANSIENT_RETRIES) return resp;
-    console.log(`  … transient model error (${msg.slice(0, 80)}) — retrying in ${TRANSIENT_BACKOFF_MS / 1000}s`);
-    await new Promise((r) => setTimeout(r, TRANSIENT_BACKOFF_MS));
+    log(`  … transient model error (${msg.slice(0, 80)}) — retrying in ${TRANSIENT_BACKOFF_MS / 1000}s`);
+    await sleep(TRANSIENT_BACKOFF_MS);
   }
 }
 
 // ── LLM judge (fail-open: any judge error → "skipped") ────────────────────────
-const JUDGE_SYSTEM = `You are a strict evaluator for uno-bot, the PLUS design team's Slack agent. You receive one eval case (its expectation and failure condition) and the bot's actual transcript (prompts, narration, final result JSON). Judge ONLY what the transcript shows against the case's expectation, informed by the team's D1-D9 rubric: grounded answer quality; clarify-vs-act; proposal-gate discipline; grounding/anti-fabrication; honestly-communicated confidence (woven conversationally into the prose with its rationale — the retired trailing "_Confidence: …_" affix must NOT appear). A "proposal" result means the action was STAGED behind a human confirmation — it did not execute. Reply with STRICT JSON only: {"verdict":"pass"} or {"verdict":"fail","reason":"<one sentence>"}.`;
+// The rubric the judge grades against is NOT written here. It is loaded from
+// docs/evals/rubrics/bot-answer.md and quoted verbatim — scripts/eval-rubric.mjs
+// (#511). The condensed paraphrase this constant used to hold was a second copy
+// of what "good" means, updated by hand or not at all.
 
 // How much of the transcript the judge reads. Was 8,000 chars, and a full
 // prompt-spec is longer than that: on 2026-09-05 (run 33972756077) P2's Open
@@ -146,7 +144,7 @@ const JUDGE_SYSTEM = `You are a strict evaluator for uno-bot, the PLUS design te
 // grow, and the marker tells the judge when it still is not the whole thing.
 const JUDGE_TRANSCRIPT_CHARS = 60_000;
 
-async function judgeCase(token, c, transcript) {
+async function judgeCase(token, system, c, transcript) {
   if (!token) return { verdict: "skipped" };
   try {
     const url = `https://aiplatform.googleapis.com/v1/projects/${GEMINI_PROJECT_ID}/locations/global/publishers/google/models/${JUDGE_MODEL}:generateContent`;
@@ -161,7 +159,7 @@ async function judgeCase(token, c, transcript) {
       headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
-        systemInstruction: { parts: [{ text: JUDGE_SYSTEM }] },
+        systemInstruction: { parts: [{ text: system }] },
         generationConfig: {
           maxOutputTokens: 2000,
           // thinking_level is Gemini 3.x-only; 2.5-gen models 400 on it.
@@ -304,14 +302,65 @@ function fixtureStamp(path) {
   return { path, rev: `${rev.slice(0, 12)}${dirty ? "+dirty" : ""}`, sha256 };
 }
 
-// ── Main ──────────────────────────────────────────────────────────────────────
-async function main() {
-  required("WORKER_URL", WORKER_URL);
-  required("DEBUG_TOKEN", DEBUG_TOKEN);
-  const fixture = JSON.parse(readFileSync(CASES_PATH, "utf8"));
-  const judgeToken =
-    GEMINI_SA_EMAIL && GEMINI_SA_PRIVATE_KEY ? await googleToken().catch(() => null) : null;
-  if (!judgeToken) console.log("[evals] no judge credential — deterministic checks only");
+// ── Which transport a run uses ────────────────────────────────────────────────
+// The CLI default is the WORKER, so the cron's plain `node …/run-evals.mjs`, and
+// every invocation docs/evals/README.md describes, mean exactly what they meant
+// before. `WORKER_URL` and `DEBUG_TOKEN` are required HERE — by the transport
+// that needs them — and not by the runner, which no longer knows what a URL is.
+const TRANSPORTS = {
+  worker: () => workerTransport(required("WORKER_URL", WORKER_URL), required("DEBUG_TOKEN", DEBUG_TOKEN)),
+};
+
+/** @returns {{transport: string}} */
+export function parseArgs(args) {
+  const names = Object.keys(TRANSPORTS).join("|");
+  const opts = { transport: "worker" };
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    const inline = /^--transport=(.*)$/.exec(arg);
+    if (inline) {
+      opts.transport = inline[1];
+      continue;
+    }
+    if (arg === "--transport") {
+      opts.transport = args[++i] ?? "";
+      continue;
+    }
+    throw new Error(`unknown argument ${arg} (usage: run-evals.mjs [--transport=${names}])`);
+  }
+  if (!TRANSPORTS[opts.transport]) {
+    throw new Error(`unknown transport '${opts.transport}' (have: ${names})`);
+  }
+  return opts;
+}
+
+// ── The run ───────────────────────────────────────────────────────────────────
+/**
+ * Walk the fixture through one transport and return the summary.
+ *
+ * Everything the run reaches outside itself is an argument: the transport (how
+ * a turn happens, and how a run-time subject is answered), the judge, the log,
+ * the clock. Nothing here writes a file or exits a process — `main` below does
+ * both — so scripts/run-evals.test.mjs can replay a fixture case in
+ * milliseconds and read the summary it produced (#511).
+ *
+ * @param {object} deps
+ * @param {{name: string, runTurn: Function, fetchSubject?: Function}} deps.transport
+ * @param {string} [deps.casesPath]
+ * @param {(c: object, transcript: object) => Promise<{verdict: string, reason?: string}>} [deps.judge]
+ * @param {(line: string) => void} [deps.log]
+ * @param {(ms: number) => Promise<void>} [deps.sleep]
+ * @param {number} [deps.pauseMs] - the wait between cases and between samples
+ */
+export async function runEvals({
+  transport,
+  casesPath = CASES_PATH,
+  judge = async () => ({ verdict: "skipped" }),
+  log = console.log,
+  sleep = (ms) => new Promise((r) => setTimeout(r, ms)),
+  pauseMs = PAUSE_BETWEEN_CASES_MS,
+}) {
+  const fixture = JSON.parse(readFileSync(casesPath, "utf8"));
 
   const results = [];
   /** case id → the condition it asked for and the row the board answered with,
@@ -346,10 +395,14 @@ async function main() {
       if (channel) surface.channel = channel;
       if (requestedBy) surface.requestedBy = requestedBy;
       const resp = await evalTurn(
-        turn.prompt,
-        history,
-        turn.usePendingFromPreviousTurn ? pending : null,
-        surface,
+        transport,
+        {
+          prompt: turn.prompt,
+          history,
+          pending: turn.usePendingFromPreviousTurn ? pending : null,
+          surface,
+        },
+        { log, sleep },
       );
       // `sent` is the compact record of what this turn was handed — size and
       // reference receipts — so a reviewer can read the clearing case's
@@ -365,29 +418,37 @@ async function main() {
       pending = threadTurn(history, turn.prompt, resp, pending);
     }
 
-    const judge = failures.length ? { verdict: "fail", reason: "deterministic checks failed" } : await judgeCase(judgeToken, c, transcript);
-    const pass = failures.length === 0 && judge.verdict !== "fail";
-    return { pass, failures, judge, transcript };
+    const verdict = failures.length
+      ? { verdict: "fail", reason: "deterministic checks failed" }
+      : await judge(c, transcript);
+    const pass = failures.length === 0 && verdict.verdict !== "fail";
+    return { pass, failures, judge: verdict, transcript };
   }
 
   for (const rawCase of fixture.cases) {
     let c = rawCase;
     // ── Run-time subject (#415) ───────────────────────────────────────────────
-    // A case declaring `subject: { need }` names a CONDITION; the Worker picks a
-    // row from the live board that satisfies it and the placeholders are filled
-    // in before turn 1. Once per case, not once per sample: three samples of one
+    // A case declaring `subject: { need }` names a CONDITION; the transport asks
+    // for a row from the live board that satisfies it and the placeholders are
+    // filled in before turn 1. Once per case, not once per sample: three samples of one
     // case must ask the same question, or the [n/3] tally stops meaning
     // intermittency and starts meaning three different questions.
     if (rawCase.subject?.need) {
       const need = rawCase.subject.need;
-      const got = await fetchSubject(need, { workerUrl: WORKER_URL, token: DEBUG_TOKEN });
+      // A transport that cannot answer a condition says so by name. Running the
+      // case with its `{{subject.…}}` placeholders unfilled, or skipping it,
+      // would both report something about the board — and the board was never
+      // asked.
+      const got = transport.fetchSubject
+        ? await transport.fetchSubject(need)
+        : { error: `transport '${transport.name}' resolves no run-time subjects` };
       if (got.error) {
         // A broken route or a failed read is a FAILURE. Reporting it as a skip
         // would retire a blocker by breaking the thing that feeds it.
         const failure = `subject route for '${need}': ${got.error}`;
         results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, pass: false, samples: 0, passedRuns: 0, need, failures: [failure], judge: { verdict: "skipped" }, ms: 0 });
         if (rawCase.blocker) blockerFailures++;
-        console.log(`[FAIL] ${rawCase.id} — ${rawCase.name} (${failure})`);
+        log(`[FAIL] ${rawCase.id} — ${rawCase.name} (${failure})`);
         continue;
       }
       if (!got.subject) {
@@ -397,7 +458,7 @@ async function main() {
         // again, one layer up.
         const reason = skipReason(need, got.reason);
         results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, skipped: true, need, reason, samples: 0, workerBuild: got.build });
-        console.log(`[SKIP] ${rawCase.id} — ${rawCase.name} (${reason})`);
+        log(`[SKIP] ${rawCase.id} — ${rawCase.name} (${reason})`);
         continue;
       }
       const { spec, missing } = applySubject(rawCase, got.subject);
@@ -409,18 +470,18 @@ async function main() {
         const failure = `subject for '${need}' carries no ${missing.map((f) => `'${f}'`).join(", ")} (got ${JSON.stringify(got.subject)})`;
         results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, pass: false, samples: 0, passedRuns: 0, need, subject: got.subject, failures: [failure], judge: { verdict: "skipped" }, ms: 0 });
         if (rawCase.blocker) blockerFailures++;
-        console.log(`[FAIL] ${rawCase.id} — ${rawCase.name} (${failure})`);
+        log(`[FAIL] ${rawCase.id} — ${rawCase.name} (${failure})`);
         continue;
       }
       c = spec;
-      console.log(`[subject] ${c.id} — ${need} → ${JSON.stringify(got.subject)}`);
+      log(`[subject] ${c.id} — ${need} → ${JSON.stringify(got.subject)}`);
       subjectsUsed[c.id] = { need, subject: got.subject };
     }
     const samples = Number.isInteger(c.samples) && c.samples > 1 ? c.samples : 1;
     const runs = [];
     for (let i = 0; i < samples; i++) {
       runs.push(await runCaseOnce(c));
-      if (i < samples - 1) await new Promise((r) => setTimeout(r, PAUSE_BETWEEN_CASES_MS));
+      if (i < samples - 1) await sleep(pauseMs);
     }
     const passedRuns = runs.filter((r) => r.pass).length;
     const pass = passesCase(passedRuns, samples);
@@ -428,42 +489,69 @@ async function main() {
     if (!pass && c.blocker) blockerFailures++;
     results.push({ id: c.id, name: c.name, blocker: !!c.blocker, pass, samples, passedRuns, ...(subjectsUsed[c.id] ?? {}), failures: rep.failures, judge: rep.judge, ms: runs.reduce((s2, r) => s2 + r.transcript.turns.reduce((s3, t) => s3 + (t.response?.ms ?? 0), 0), 0), transcript: rep.transcript });
     const tally = samples > 1 ? ` [${passedRuns}/${samples} samples]` : "";
-    console.log(`[${pass ? "PASS" : "FAIL"}] ${c.id} — ${c.name}${tally}${rep.failures.length ? ` (${rep.failures.join("; ")})` : rep.judge.verdict === "fail" ? ` (judge: ${rep.judge.reason})` : ""}`);
-    await new Promise((r) => setTimeout(r, PAUSE_BETWEEN_CASES_MS));
+    log(`[${pass ? "PASS" : "FAIL"}] ${c.id} — ${c.name}${tally}${rep.failures.length ? ` (${rep.failures.join("; ")})` : rep.judge.verdict === "fail" ? ` (judge: ${rep.judge.reason})` : ""}`);
+    await sleep(pauseMs);
   }
 
   // Skipped cases are neither passed nor failed, so they come out of the
   // denominator too. A suite that reported 33/34 while one case never ran would
   // be describing a run that did not happen.
   const scored = results.filter((r) => !r.skipped);
-  const summary = {
+  return {
     ranAt: new Date().toISOString(),
+    // HOW the turns were run. A results file whose scores were produced
+    // in-process and one produced against a deployment are different
+    // measurements, and nothing else in here tells them apart.
+    transport: transport.name,
     // WHAT WAS MEASURED, AGAINST WHAT. The acceptance criterion is that results
     // are recorded with the revision they were measured against (#415), and
     // that is two facts, not one: which Worker answered, and which fixture
     // asked. Neither is inferable from the other, and a results file carrying
     // only a date is unreadable a week later.
     workerBuild: firstBuild(results),
-    fixture: fixtureStamp(CASES_PATH),
+    fixture: fixtureStamp(casesPath),
     passed: scored.filter((r) => r.pass).length,
     failed: scored.filter((r) => !r.pass).length,
     skipped: results.length - scored.length,
     blockerFailures,
     results,
   };
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+async function main() {
+  const opts = parseArgs(argv.slice(2));
+  const transport = TRANSPORTS[opts.transport]();
+  const rubric = loadRubric();
+  const judgeToken =
+    GEMINI_SA_EMAIL && GEMINI_SA_PRIVATE_KEY ? await googleToken().catch(() => null) : null;
+  if (!judgeToken) console.log("[evals] no judge credential — deterministic checks only");
+  else console.log(`[evals] judge ${JUDGE_MODEL} against ${describeRubric(rubric)} from docs/evals/rubrics/bot-answer.md`);
+  const system = judgeSystem(rubric);
+
+  const summary = await runEvals({
+    transport,
+    judge: (c, transcript) => judgeCase(judgeToken, system, c, transcript),
+  });
+
+  const scored = summary.results.filter((r) => !r.skipped);
   writeFileSync("eval-results.json", JSON.stringify(summary, null, 2));
   const skipNote = summary.skipped ? `, ${summary.skipped} skipped` : "";
   console.log(
     `\n[evals] ${summary.passed}/${scored.length} passed${skipNote} ` +
       `(build ${summary.workerBuild}, fixture ${summary.fixture.rev}/${summary.fixture.sha256}) — details in eval-results.json`,
   );
-  if (blockerFailures > 0) {
-    console.error(`[evals] ${blockerFailures} BLOCKER case(s) failed`);
+  if (summary.blockerFailures > 0) {
+    console.error(`[evals] ${summary.blockerFailures} BLOCKER case(s) failed`);
     process.exit(1);
   }
 }
 
-main().catch((err) => {
-  console.error(`[evals] FAILED: ${err.message}`);
-  process.exit(1);
-});
+// Imported by the test, executed by the Action — so the walk only starts when
+// this file IS the entry point.
+if (argv[1] && resolve(argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    console.error(`[evals] FAILED: ${err.message}`);
+    process.exit(1);
+  });
+}
