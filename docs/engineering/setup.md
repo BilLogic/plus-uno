@@ -136,10 +136,20 @@ it does not stop at the first, so one run tells you everything wrong with the
 branch. Takes about 20 seconds and installs nothing.
 
 `npm run check:harness -- --list` prints what it composes, what it deliberately
-does not, and why. Those reasons are stated once, in `scripts/check-harness.mjs` —
-read them there rather than anywhere else, and add a new `check:*` script to that
-file's `COMPOSED` or `EXCLUDED` when you write one. The gate fails on a check
-that is in neither, because a check that runs nowhere protects nothing.
+does not, and why. Those reasons are stated once, in `scripts/checks.registry.mjs` —
+the check registry — and add a new `check:*` script to that file's `CHECKS` or
+`EXCLUDED` when you write one. The gate fails on a check that is in neither,
+because a check that runs nowhere protects nothing.
+
+That registry is also the author of the three places that used to state the same
+set by hand: the `check:*` block of `package.json`, the check steps of
+`.github/workflows/harness-integrity-sweep.yml` and those of
+`.github/workflows/storybook-gate.yml`. Each carries a generated region between
+markers; run `npm run generate:check-registry` after editing a row, and
+`npm run check:check-registry` fails on drift. A check may also return findings
+instead of exiting — `scripts/lib/findings.mjs` is that interface and
+`scripts/check-node-floor.mjs` the worked example; the runner renders the banner
+and picks the exit code.
 
 All three embodiments are swept, not two: the headless Actions prompts under
 `scripts/prompts/` are a subject of the negation ratchet (`check:negation`, its

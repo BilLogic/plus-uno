@@ -78,6 +78,7 @@ jobs:
       - name: Install chromium
         run: npx playwright install --with-deps chromium
 
+      # >>> GENERATED (storybook-checks) by scripts/generate-check-scripts.mjs from scripts/checks.registry.mjs — do not edit between the markers; run `npm run generate:check-registry`.
       # One command, one exit code. A `play` failure or a render error fails the
       # job outright; an accessibility violation fails it only if the story did
       # not already carry that rule in `docs/evals/a11y-baseline.json`.
@@ -91,3 +92,4 @@ jobs:
       # for by this point, and a failure here should not hide a story failure.
       - name: npm run check:docs-chrome
         run: npm run check:docs-chrome
+      # <<< END GENERATED (storybook-checks)
