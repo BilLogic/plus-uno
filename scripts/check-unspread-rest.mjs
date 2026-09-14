@@ -61,10 +61,26 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { documents } from './lib/corpus.mjs';
+import { byRoot, main, report } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const SCAN_ROOT = path.join(REPO_ROOT, 'design-system', 'src', 'components');
+const SCAN_ROOT = 'design-system/src/components';
+
+// A corpus that vanished is not a clean corpus. If SCAN_ROOT is renamed or moved,
+// every walk below returns nothing, every assertion holds vacuously, and this exits
+// 0 having examined no files at all. check-storybook.mjs took the same floor for the
+// same reason. The number is a floor, not a target — raise it only when it bites.
+const MIN_FILES = 100;
+
+export const REMEDY =
+  '  -> The component takes everything the caller passed beyond its declared\n' +
+  '     signature and drops it. Nothing warns: React allows an unused rest\n' +
+  '     element and propTypes never sees unknown props, so the props lost are the\n' +
+  '     ones nobody checks — aria-describedby, aria-errormessage, data-testid.\n' +
+  '     Spread it onto the element the caller means (see DateAndTimePicker.mdx\n' +
+  '     § Accessibility for how to choose when there is more than one), or drop\n' +
+  '     the rest element from the signature so the contract is honest.';
 
 /**
  * Keywords that can follow `...` in a spread expression. Without these,
@@ -235,65 +251,61 @@ export function unspread(src) {
   return findings;
 }
 
-const sourceFiles = (dir) =>
-  documents(path.relative(REPO_ROOT, dir), { root: REPO_ROOT, ext: ['.js', '.jsx'] }).map((rel) =>
-    path.join(REPO_ROOT, rel),
-  );
+/**
+ * The corpus, read once. `run`, `summary` and `--list` all ask the same question
+ * of the same tree, and before the migration all three were answered by one
+ * pass because the script was the process.
+ */
+const inputs = byRoot((repoRoot) =>
+  documents(SCAN_ROOT, { root: repoRoot, ext: ['.js', '.jsx'] }).sort(),
+);
 
-function main() {
-  const list = process.argv.slice(2).includes('--list');
-  const files = sourceFiles(SCAN_ROOT).sort();
+/** The floor, as a finding, so `--list` and the check itself refuse alike. */
+const shortCorpus = (files) =>
+  files.length < MIN_FILES
+    ? [
+        {
+          message:
+            `found ${files.length} file(s) under ${SCAN_ROOT} — expected at least ${MIN_FILES}.\n` +
+            '  -> The corpus moved or the walk broke. A check over nothing passes over everything.',
+        },
+      ]
+    : [];
 
-  // A corpus that vanished is not a clean corpus. If SCAN_ROOT is renamed or moved,
-  // every walk below returns nothing, every assertion holds vacuously, and this exits
-  // 0 having examined no files at all. check-storybook.mjs took the same floor for the
-  // same reason. The number is a floor, not a target — raise it only when it bites.
-  if (files.length < 100) {
-    console.error(
-      `[check:unspread-rest] found ${files.length} file(s) under ${path.relative(REPO_ROOT, SCAN_ROOT)} — expected at least 100.\n` +
-        '  -> The corpus moved or the walk broke. A check over nothing passes over everything.',
-    );
-    return 1;
-  }
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const files = inputs(repoRoot);
+  const found = shortCorpus(files);
+  if (found.length) return found;
 
-  if (list) {
-    console.log(
-      `[check:unspread-rest] ${files.length} file(s) under ` +
-        `${path.relative(REPO_ROOT, SCAN_ROOT)}`,
-    );
-    return 0;
-  }
-
-  const findings = [];
   for (const file of files) {
-    for (const f of unspread(fs.readFileSync(file, 'utf8'))) {
-      findings.push(`${path.relative(REPO_ROOT, file)}:${f.line}  ...${f.name}`);
+    for (const f of unspread(fs.readFileSync(path.join(repoRoot, file), 'utf8'))) {
+      found.push({ file, line: f.line, message: `...${f.name}` });
     }
   }
+  return found;
+}
 
-  if (findings.length) {
-    console.error(
-      `[check:unspread-rest] ${findings.length} rest element(s) collected and never used:\n` +
-        findings.map((f) => `  ${f}`).join('\n') +
-        '\n\n  -> The component takes everything the caller passed beyond its declared' +
-        '\n     signature and drops it. Nothing warns: React allows an unused rest' +
-        '\n     element and propTypes never sees unknown props, so the props lost are the' +
-        '\n     ones nobody checks — aria-describedby, aria-errormessage, data-testid.' +
-        '\n     Spread it onto the element the caller means (see DateAndTimePicker.mdx' +
-        '\n     § Accessibility for how to choose when there is more than one), or drop' +
-        '\n     the rest element from the signature so the contract is honest.',
-    );
-    return 1;
-  }
-
-  console.log(`[check:unspread-rest] ${files.length} component file(s), no dropped rest elements.`);
-  return 0;
+/** The green line, which carries the size of the population that was searched. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  return `${inputs(repoRoot).length} component file(s), no dropped rest elements.`;
 }
 
 // path.resolve + fileURLToPath, not string comparison: `file://${argv[1]}` never
 // matches once the repo path contains a space or any non-ASCII char, because the
 // URL form percent-encodes them. This check silently did nothing under such a
 // path — exit 0, main() never invoked. Same idiom as check-token-collision.mjs.
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  process.exit(main());
+const ENTRY = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+// `--list` answers "what did you scan?", which is an inventory and not a
+// verdict, so it replaces the green line rather than adding to it. The floor
+// still applies: a list of nothing is the same corpus failure as a scan of
+// nothing, and it was checked first here before the migration too.
+if (ENTRY && process.argv.includes('--list')) {
+  const files = inputs(REPO_ROOT);
+  const short = shortCorpus(files);
+  if (short.length) report('check:unspread-rest', short);
+  console.log(`[check:unspread-rest] ${files.length} file(s) under ${SCAN_ROOT}`);
+} else {
+  main(import.meta.url, 'check:unspread-rest', { run, summary, remedy: REMEDY });
 }

@@ -33,24 +33,23 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { directories, frontmatter } from "./lib/corpus.mjs";
+import { byRoot, main } from "./lib/findings.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const CHECK = process.argv.includes("--check");
 
 // The slash-command Request URL Slack posts to. Derived from the OAuth redirect
 // already in wrangler.toml rather than written twice: the Worker has exactly one
 // public origin, and a manifest pointing at the wrong one fails as
 // dispatch_failed with nothing in the Worker logs to explain it.
-function workerOrigin() {
-  const toml = readFileSync(join(ROOT, "agents/uno-bot/wrangler.toml"), "utf8");
+function workerOrigin(root) {
+  const toml = readFileSync(join(root, "agents/uno-bot/wrangler.toml"), "utf8");
   const m = /SLACK_OAUTH_REDIRECT_URI\s*=\s*"(https:\/\/[^/"]+)/.exec(toml);
   if (!m) throw new Error("wrangler.toml: no SLACK_OAUTH_REDIRECT_URI to read the Worker origin from");
   return m[1];
 }
-const REQUEST_URL = `${workerOrigin()}/slack/commands`;
 
 // Slack shows one short line in the / menu. The canonical `description` is
 // written for a MODEL deciding whether to load the skill — it opens with
@@ -114,21 +113,30 @@ function slackDescription(name) {
   return line;
 }
 
-const skills = directories("skills", { root: ROOT, recursive: false })
-  .map((dir) => dir.slice("skills/".length))
-  .filter((name) => name.startsWith("uno-"))
-  .filter((name) => existsSync(join(ROOT, "skills", name, "SKILL.md")))
-  .map((name) => {
-    const canonical = `skills/${name}/SKILL.md`;
-    const { fields, fmLines } = readSkillFrontmatter(join(ROOT, canonical));
-    if (fields.name !== name) {
-      throw new Error(`${canonical}: frontmatter name "${fields.name}" != directory "${name}"`);
-    }
-    if (!fields.description) throw new Error(`${canonical}: no description`);
-    return { name, canonical, fmLines, fields };
-  });
+// The canonical skills, and the origin the manifest points at. Read through
+// `byRoot` rather than at module scope: the harness runner IMPORTS this module
+// to call `run` below, and a scan that ran on import would read wrangler.toml
+// and six SKILL.mds inside the runner's own process — and throw there, not
+// here, when one of them is malformed (#509).
+const inputs = byRoot((root) => {
+  const skills = directories("skills", { root, recursive: false })
+    .map((dir) => dir.slice("skills/".length))
+    .filter((name) => name.startsWith("uno-"))
+    .filter((name) => existsSync(join(root, "skills", name, "SKILL.md")))
+    .map((name) => {
+      const canonical = `skills/${name}/SKILL.md`;
+      const { fields, fmLines } = readSkillFrontmatter(join(root, canonical));
+      if (fields.name !== name) {
+        throw new Error(`${canonical}: frontmatter name "${fields.name}" != directory "${name}"`);
+      }
+      if (!fields.description) throw new Error(`${canonical}: no description`);
+      return { name, canonical, fmLines, fields };
+    });
 
-if (skills.length === 0) throw new Error("no skills/uno-* found — refusing to emit empty surfaces");
+  if (skills.length === 0) throw new Error("no skills/uno-* found — refusing to emit empty surfaces");
+
+  return { skills, requestUrl: `${workerOrigin(root)}/slack/commands` };
+});
 
 // ── artifact 1: IDE stubs ────────────────────────────────────────────────────
 //
@@ -159,7 +167,7 @@ function stubFor(skill) {
 }
 
 // ── artifact 2: the Worker's command map ─────────────────────────────────────
-function commandsModule() {
+function commandsModule(skills) {
   const rows = skills
     .map(
       (s) =>
@@ -194,13 +202,13 @@ function commandsModule() {
 }
 
 // ── artifact 3: the manifest paste block ─────────────────────────────────────
-function manifestYaml() {
+function manifestYaml(skills, requestUrl) {
   const rows = skills
     .map((s) => {
       const hint = s.fields["argument-hint"] ?? "";
       return [
         `  - command: /${s.name}`,
-        `    url: ${REQUEST_URL}`,
+        `    url: ${requestUrl}`,
         `    description: ${JSON.stringify(slackDescription(s.name))}`,
         ...(hint ? [`    usage_hint: ${JSON.stringify(hint)}`] : []),
         `    should_escape: false`,
@@ -231,39 +239,81 @@ function manifestYaml() {
   ].join("\n");
 }
 
-const artifacts = [
-  ...skills.map((s) => ({ path: `.claude/skills/${s.name}/SKILL.md`, content: stubFor(s) })),
-  { path: "agents/uno-bot/src/generated/slack-commands.ts", content: commandsModule() },
-  { path: "agents/uno-bot/slack-app-manifest-commands.yaml", content: manifestYaml() },
-];
-
-let drift = 0;
-for (const { path, content } of artifacts) {
-  const abs = join(ROOT, path);
-  const current = existsSync(abs) ? readFileSync(abs, "utf8") : null;
-  // Compare on normalised endings. The generated `content` is always "\n",
-  // while `current` comes off a working copy that may be CRLF — without this
-  // every artifact reads as drifted on Windows even when byte-identical in git.
-  // Nothing is lost: git normalises endings on commit, so a difference that
-  // survives only in the working copy is not drift anyone can act on.
-  // (A missing file leaves `current` null, which falls through to drift.)
-  if (current !== null && NORM(current) === NORM(content)) continue;
-  if (CHECK) {
-    console.error(`[drift] ${path} is stale — run: npm run generate:skill-surfaces`);
-    drift++;
-    continue;
-  }
-  mkdirSync(dirname(abs), { recursive: true });
-  writeFileSync(abs, content);
-  console.log(`[write] ${path}`);
+/**
+ * The would-be bytes of all three surfaces, rendered and not written.
+ *
+ * Same split as `scripts/generate-check-scripts.mjs`: this renders, `run`
+ * compares, and only the CLI entry writes. A `--check` that regenerated its own
+ * targets would answer "are the committed files stale?" with the bytes it had
+ * just written.
+ *
+ * @returns {{path: string, content: string}[]}
+ */
+export function artifacts({ repoRoot = ROOT } = {}) {
+  const { skills, requestUrl } = inputs(repoRoot);
+  return [
+    ...skills.map((s) => ({ path: `.claude/skills/${s.name}/SKILL.md`, content: stubFor(s) })),
+    { path: "agents/uno-bot/src/generated/slack-commands.ts", content: commandsModule(skills) },
+    { path: "agents/uno-bot/slack-app-manifest-commands.yaml", content: manifestYaml(skills, requestUrl) },
+  ];
 }
 
-if (CHECK) {
-  if (drift > 0) {
-    console.error(`[fail] ${drift} generated skill surface(s) out of date`);
-    process.exit(1);
+/**
+ * One artifact against what is committed.
+ *
+ * Compare on normalised endings. The generated `content` is always "\n",
+ * while `current` comes off a working copy that may be CRLF — without this
+ * every artifact reads as drifted on Windows even when byte-identical in the
+ * repository. Nothing is lost: endings are normalised on commit, so a
+ * difference that survives only in the working copy is not drift anyone can
+ * act on. (A missing file leaves `current` null, which falls through to drift.)
+ */
+function matches(abs, content) {
+  const current = existsSync(abs) ? readFileSync(abs, "utf8") : null;
+  return current !== null && NORM(current) === NORM(content);
+}
+
+/**
+ * The drift check. Reports and never writes.
+ *
+ * A malformed source — a name that disagrees with its directory, a missing
+ * description, a wrangler.toml with no redirect URI — comes back as a finding
+ * rather than a thrown stack, because the runner calls this in its own process
+ * and a throw there says nothing about which surface is wrong.
+ *
+ * @returns {import('./lib/findings.mjs').Finding[]}
+ */
+export function run({ repoRoot = ROOT } = {}) {
+  let rendered;
+  try {
+    rendered = artifacts({ repoRoot });
+  } catch (error) {
+    return [{ message: error.message }];
   }
-  console.log(`[ok] ${artifacts.length} skill surfaces match their sources`);
-} else {
-  console.log(`[ok] ${skills.length} skills → ${artifacts.length} artifacts`);
+  return rendered
+    .filter(({ path, content }) => !matches(join(repoRoot, path), content))
+    .map(({ path }) => ({ file: path, message: "is stale — run: npm run generate:skill-surfaces" }));
+}
+
+/** The green line, which carries how many surfaces were compared. */
+export function summary({ repoRoot = ROOT } = {}) {
+  return `${artifacts({ repoRoot }).length} skill surfaces match their sources`;
+}
+
+if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
+  if (process.argv.includes("--check")) {
+    main(import.meta.url, "check:skill-surfaces", { run, summary });
+  } else {
+    // The write path, unchanged: every surface whose bytes already match is
+    // left alone, so a run that changed nothing says so.
+    const rendered = artifacts();
+    for (const { path, content } of rendered) {
+      const abs = join(ROOT, path);
+      if (matches(abs, content)) continue;
+      mkdirSync(dirname(abs), { recursive: true });
+      writeFileSync(abs, content);
+      console.log(`[write] ${path}`);
+    }
+    console.log(`[ok] ${inputs(ROOT).skills.length} skills → ${rendered.length} artifacts`);
+  }
 }
