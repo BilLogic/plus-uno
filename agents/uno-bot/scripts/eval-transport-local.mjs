@@ -398,13 +398,12 @@ export function localTransport({
           // Recorded, never executed — the Worker adapter's rule, for the same
           // reason: a suite that files a Notion card per sample is a suite
           // nobody runs twice.
-          async resolveProposal(p, decision, narrative) {
+          async applyVerdict(verdict) {
+            if (!verdict.execute) return;
             report.resolutions.push({
-              toolName: p.toolName,
-              decision,
-              ...(narrative === undefined ? {} : { narrative }),
+              toolName: verdict.execute.toolName,
+              decision: verdict.decision ?? "confirm",
             });
-            return true;
           },
 
           cards: {
