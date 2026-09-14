@@ -46,7 +46,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import { splitFrontmatter } from './frontmatter.mjs';
+import { frontmatter } from './corpus.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, '..', '..');
@@ -145,7 +145,7 @@ function walkDocs(rel) {
  * refuses to build while any doc under a section root is undeclared, so null
  * here means "not reached through a section root" rather than "allowed".
  *
- * The fence is found by `splitFrontmatter` rather than by a regex of this
+ * The fence is found by the corpus's `frontmatter` reader rather than by a regex of this
  * module's own: where frontmatter ends is one fact, and the bundler's answer to
  * it is the one that decides the prompt (#238).
  *
@@ -153,7 +153,7 @@ function walkDocs(rel) {
  * @returns {string|null}
  */
 export function embodimentOf(text) {
-  return splitFrontmatter(text).meta.embodiment ?? null;
+  return frontmatter(text).meta.embodiment ?? null;
 }
 
 /**

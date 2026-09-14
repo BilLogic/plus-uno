@@ -47,7 +47,7 @@ import {
   ideAuthoredFiles,
   unresolvedReport,
 } from './lib/bundled-set.mjs';
-import { splitFrontmatter } from './lib/frontmatter.mjs';
+import { frontmatter } from './lib/corpus.mjs';
 
 const scopeBy = (key) => SCOPES.find((s) => s.key === key);
 
@@ -423,7 +423,7 @@ test('the bundled numbers on record are body counts, and the IDE ones whole-file
     const text = fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8').replace(/\r\n/g, '\n');
     assert.equal(
       n,
-      countProhibitions(splitFrontmatter(text).body),
+      countProhibitions(frontmatter(text).body),
       `bundled count is not a body count: ${rel}`,
     );
   }
@@ -442,7 +442,7 @@ test('at least one harness doc still separates the two readings', () => {
   const files = [...Object.keys(base.scopes.bundled.counts), ...Object.keys(base.scopes.ide.counts)];
   const split = files.filter((rel) => {
     const text = fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8').replace(/\r\n/g, '\n');
-    return countProhibitions(text) !== countProhibitions(splitFrontmatter(text).body);
+    return countProhibitions(text) !== countProhibitions(frontmatter(text).body);
   });
   assert.ok(
     split.length > 0,
@@ -575,22 +575,22 @@ test("the frontmatter split is the bundler's own, imported rather than copied", 
   );
   assert.match(
     bundler,
-    /import \{ splitFrontmatter \} from "\.\.\/\.\.\/\.\.\/scripts\/lib\/frontmatter\.mjs"/,
-    'the bundler must import the shared split',
+    /import \{ frontmatter \} from "\.\.\/\.\.\/\.\.\/scripts\/lib\/corpus\.mjs"/,
+    'the bundler must import the corpus reader',
   );
   assert.doesNotMatch(
     bundler,
-    /function splitFrontmatter/,
+    /function (splitFrontmatter|frontmatter)\s*\(/,
     'a local copy in the bundler is a second parser that can disagree with the guards',
   );
 });
 
 test('the shared split ends the block where the bundler always has', () => {
-  assert.deepEqual(splitFrontmatter('# No frontmatter\n'), { meta: {}, body: '# No frontmatter\n' });
+  assert.deepEqual(frontmatter('# No frontmatter\n'), { meta: {}, body: '# No frontmatter\n' });
   // An unterminated block is content, not a guess at where it meant to close.
-  assert.deepEqual(splitFrontmatter('---\nsummary: x\n'), { meta: {}, body: '---\nsummary: x\n' });
+  assert.deepEqual(frontmatter('---\nsummary: x\n'), { meta: {}, body: '---\nsummary: x\n' });
 
-  const { meta, body } = splitFrontmatter('---\nsummary: x\nembodiment: ide\n---\n\n# Doc\n\nBody.\n');
+  const { meta, body } = frontmatter('---\nsummary: x\nembodiment: ide\n---\n\n# Doc\n\nBody.\n');
   assert.deepEqual(meta, { summary: 'x', embodiment: 'ide' });
   assert.equal(body, '# Doc\n\nBody.\n', 'the blank lines after the fence belong to the fence');
 });

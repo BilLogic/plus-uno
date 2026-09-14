@@ -128,7 +128,7 @@ function renderAccount(text, rev, { file, embodiment, summary }) {
   return front + header + rewriteLinks(body, file);
 }
 
-/** Frontmatter off, the way scripts/lib/frontmatter.mjs does it — inlined so
+/** Frontmatter off, the way scripts/lib/corpus.mjs does it — inlined so
  *  this script stays runnable from a bare `agents/uno-bot` in the test. */
 function splitFrontmatter(text) {
   if (!text.startsWith("---\n")) return { meta: {}, body: text };
