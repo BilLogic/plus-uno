@@ -11,11 +11,8 @@
 //     2026-07-14; requesterUserId is still stored for the record).
 
 import type { Env } from "../types";
-import {
-  loadPendingProposalDetailed,
-  loadPendingProposalByThread,
-  type PendingProposal,
-} from "../thread-state-client";
+import type { PendingProposal } from "../thread-state/index";
+import { threadStateFor } from "../thread-state/production";
 import { resolveProposal } from "../agent/resolve-proposal";
 import { mapReaction } from "./gate-reactions";
 import type { SlackReactionAddedEvent } from "./events";
@@ -46,7 +43,7 @@ async function findThreadProposal(
   const replies = await conversationsReplies(env, channel, reactedTs, 1);
   const root = replies.messages?.[0];
   const threadTs = root?.thread_ts ?? root?.ts ?? reactedTs;
-  return loadPendingProposalByThread(env, channel, threadTs);
+  return threadStateFor(env).getProposalByThread({ channel, thread: threadTs });
 }
 
 /** Slack permalink-ish pointer to the live card, for "react over there". */
@@ -68,7 +65,15 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
   if (event.item.type !== "message") return;
   const channel = event.item.channel;
 
-  const lookup = await loadPendingProposalDetailed(env, event.item.ts);
+  // The by-ts lookup, then — when it finds nothing — the by-thread one below,
+  // both kept here at the call site. #500 moves the pair inside Gate.
+  //
+  // Reads as "not a proposal" on a failed lookup, as the client did: the
+  // by-thread pointer path below then handles it, and a reaction used as
+  // ordinary punctuation stays silent.
+  const lookup = await threadStateFor(env)
+    .getProposalByTs(event.item.ts)
+    .catch(() => ({ state: "none" }) as const);
   if (lookup.state === "expired") {
     // A delayed ✅/❌ on a proposal that timed out. Never swallow this — the
     // person believes they just confirmed something (live 2026-07-10: a
@@ -105,7 +110,7 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
     return;
   }
 
-  const pending: PendingProposal = lookup.payload;
+  const pending: PendingProposal = lookup.proposal;
 
   // Anyone in the thread may confirm/cancel — no requester check (2026-07-14).
   try {

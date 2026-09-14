@@ -12,20 +12,8 @@ import { bounceLogLine, proposalWasAddressed } from "../agent/pending-notice";
 import { absenceRepairInstruction, judgeAbsence, type AbsenceContext } from "../agent/absence";
 import { typedEmojiDecision } from "./gate-reactions";
 import { resolveProposal } from "../agent/resolve-proposal";
-import {
-  appendHistory,
-  recordExchange,
-  claimEventRun,
-  deletePendingProposal,
-  isDuplicateEvent,
-  loadAssistantContext,
-  loadHistory,
-  loadPendingProposalByThread,
-  markEventRunDone,
-  markActiveRun,
-  savePendingProposal,
-  type HistoryTurn,
-} from "../thread-state-client";
+import type { HistoryTurn, PendingProposal } from "../thread-state/index";
+import { threadStateFor } from "../thread-state/production";
 import {
   addReaction,
   appendTask,
@@ -119,7 +107,12 @@ export async function handleSlackEnvelope(env: Env, body: SlackEnvelope): Promis
 
   if (body.type === "event_callback") {
     const cb = body as SlackEventCallback;
-    if (await isDuplicateEvent(env, cb.event_id)) {
+    // Fails OPEN on a store error, as the client did: double-processing is a
+    // worse-case we accept, and missing a real event is not.
+    const dedup = await threadStateFor(env)
+      .checkAndRecordEvent(cb.event_id)
+      .catch(() => ({ seen: false }));
+    if (dedup.seen) {
       console.log(`[slack] dedup: skipping ${cb.event_id}`);
       return new Response("ok", { status: 200 });
     }
@@ -353,10 +346,12 @@ async function shouldHandleMessage(env: Env, event: SlackMessageEvent): Promise<
   // On any lookup error, FAIL OPEN for a thread reply: silently dropping a
   // follow-up (a "frozen" bot) is worse than an occasional extra reply.
   try {
-    const pending = await loadPendingProposalByThread(env, event.channel, event.thread_ts);
+    const store = threadStateFor(env);
+    const ref = { channel: event.channel, thread: event.thread_ts };
+    const pending = await store.getProposalByThread(ref);
     if (pending) return true;
 
-    const history = await loadHistory(env, event.channel, event.thread_ts);
+    const history = await store.readHistory(ref);
     if (history.length > 0) return true;
 
     if (identity) {
@@ -406,7 +401,10 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
   // never reaches a log.
   console.log(`[slack] msg ${event.channel}/${event.ts} action_token=${!!event.action_token}`);
   const runKey = `msg:${event.channel}:${event.ts}`;
-  const claim = await claimEventRun(env, runKey);
+  const store = threadStateFor(env);
+  // Fails OPEN like the envelope dedup above: an unreachable store re-runs the
+  // turn rather than dropping it.
+  const claim = await store.claimRun(runKey).catch(() => "claimed" as const);
   if (claim === "done") {
     console.log(`[slack] dedup: msg ${event.channel}/${event.ts} already handled`);
     return "handled";
@@ -424,7 +422,9 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
     // Also marks done on a throw: the thrown path posts a visible ❌ upstream,
     // which counts as handled. Only a hard kill skips this — by design, so the
     // lease can rescue it.
-    await markEventRunDone(env, runKey);
+    // Best-effort by contract: a missed mark self-heals when the lease goes
+    // stale, at the cost of one re-run.
+    await store.markRunDone(runKey).catch(() => {});
     // Clear the assistant "thinking…" loader on every exit (success, early
     // return, or throw) — a stuck status line is worse than none. No-op off
     // the panel or if one was never set. Same thread_ts gate as the set: only
@@ -470,7 +470,9 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // Where the person's turn is running, so the Home-tab Stop button can find
   // it. Fire-and-forget: this is a convenience control and must never sit in
   // front of an answer.
-  void markActiveRun(env, userId, channel, convTs);
+  void threadStateFor(env)
+    .setActiveRun(userId, { channel, thread: convTs })
+    .catch(() => {});
 
   // ONE reaction, and only where nothing else says "I'm on it".
   //
@@ -491,12 +493,12 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // history read, DO lookup, Notion PRD extraction) must not be silent — post a
   // visible error instead of letting the async handler die quietly.
   let history: Awaited<ReturnType<typeof buildThreadHistory>>;
-  let pending: Awaited<ReturnType<typeof loadPendingProposalByThread>>;
+  let pending: PendingProposal | null;
   let prd: Awaited<ReturnType<typeof extractPrdFromThreadRoot>>;
   try {
     [history, pending, prd] = await Promise.all([
       buildThreadHistory(env, channel, convTs, event.thread_ts, userMsgTs, textReadsAsCorrection),
-      loadPendingProposalByThread(env, channel, convTs),
+      threadStateFor(env).getProposalByThread({ channel, thread: convTs }),
       isThreadReply
         ? extractPrdFromThreadRoot(env, channel, event.thread_ts!)
         : Promise.resolve(null),
@@ -574,7 +576,12 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // same key handleAppContextChanged writes under.
   const panelContext =
     !trivialTurn && isAssistantThread(channel)
-      ? formatAssistantContext(await loadAssistantContext(env, channel, convTs))
+      ? formatAssistantContext(
+          // Best-effort: advisory grounding, so a failed read degrades to none.
+          await threadStateFor(env)
+            .getAssistantContext({ channel, thread: convTs })
+            .catch(() => null),
+        )
       : null;
 
   // Vision: pasted images + a linked Figma frame become base64 image blocks on
@@ -950,7 +957,8 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     // posted to, so the assistant message has no key to merge on. The user
     // message's ts is in the same Slack thread buildThreadHistory rebuilds
     // from, so the merge lands either way.
-    await appendHistory(env, channel, convTs, {
+    const store = threadStateFor(env);
+    await store.appendHistory({ channel, thread: convTs }, {
       role: "user",
       content: vision.historyText,
       ...visionTurn,
@@ -961,7 +969,10 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     });
     if (delivery.ok) {
       // Record what was actually posted (capped/placeholder), not the raw text.
-      await appendHistory(env, channel, convTs, { role: "assistant", content: delivery.text });
+      await store.appendHistory(
+        { channel, thread: convTs },
+        { role: "assistant", content: delivery.text },
+      );
       // Proposal B: a card was staged at turn start and this turn neither
       // resolved it (that would be kind:"resolved") nor said anything about
       // it. The approval has evaporated silently — the 2026-07-10 failure.
@@ -1056,7 +1067,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // Don't re-card a cancelled action; require an explicit revival. The check
   // window is the last few turns, so one clarifying exchange clears it.
   try {
-    const doHistory = await loadHistory(env, channel, convTs);
+    const doHistory = await threadStateFor(env).readHistory({ channel, thread: convTs });
     const justCancelled = doHistory
       .slice(-3)
       .some((t) => t.role === "assistant" && t.content.includes(`(Cancelled the proposed ${result.toolName}`));
@@ -1075,7 +1086,9 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
 
   // If there's already a (different) pending proposal in this thread, supersede it.
   if (pending) {
-    await deletePendingProposal(env, pending.proposalTs);
+    // Only the record's removal is wanted here; the claim boolean belongs to
+    // resolveProposal, which is the path that must not double-execute.
+    await threadStateFor(env).claimProposal(pending.proposalTs);
   }
 
   let proposalText: string;
@@ -1130,7 +1143,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     // that lands before the proposal is saved would look up nothing and be
     // silently lost (the reaction gate keys off saved state). Save first so the
     // confirmation always finds it.
-    await savePendingProposal(env, {
+    await threadStateFor(env).putProposal({
       toolName: result.toolName,
       input: result.input,
       channel,
@@ -1151,6 +1164,30 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     // only way its image pointer can reach the immediate follow-up.
     await recordExchange(env, channel, convTs, vision.historyText, proposalText, visionTurn);
   }
+}
+
+// Record a full user→assistant exchange in one call — the invariant is that the
+// user turn is always stored WITH the assistant turn (every handleUserMessage
+// exit path recorded the pair by hand, six times; a missed half is a corrupted
+// memory). Sequential, not parallel, so the two turns land in order.
+//
+// It lived on the deleted thread-state client because that was the one module
+// both halves could sit in. It is not a store operation — the store's contract
+// is one turn at a time, and pairing them is a decision about what a Slack turn
+// remembers — so it stays here at the call site until the Turn module owns
+// history append for every path.
+async function recordExchange(
+  env: Env,
+  channel: string,
+  convTs: string,
+  userText: string,
+  assistantText: string,
+  userTurn?: Pick<HistoryTurn, "ts" | "vision" | "sharedCanvasIds">,
+): Promise<void> {
+  const store = threadStateFor(env);
+  const ref = { channel, thread: convTs };
+  await store.appendHistory(ref, { role: "user", content: userText, ...userTurn });
+  await store.appendHistory(ref, { role: "assistant", content: assistantText });
 }
 
 function stripBotMentions(text: string): string {
@@ -1277,12 +1314,14 @@ async function buildThreadHistory(
   // time" is the whole question.
   wantReceipts = false,
 ): Promise<HistoryTurn[]> {
-  if (!threadTs) return loadHistory(env, channel, convTs);
+  const store = threadStateFor(env);
+  const ref = { channel, thread: convTs };
+  if (!threadTs) return store.readHistory(ref);
   try {
     const [identity, replies, stored] = await Promise.all([
       getBotIdentity(env),
       conversationsReplies(env, channel, threadTs, THREAD_HISTORY_LIMIT),
-      wantReceipts ? loadHistory(env, channel, convTs).catch(() => []) : Promise.resolve([]),
+      wantReceipts ? store.readHistory(ref).catch(() => []) : Promise.resolve([]),
     ]);
     const receiptsByTs = new Map<string, NonNullable<HistoryTurn["retrieval"]>>();
     // Reference receipts merge on the same key, on the same turns: the names
@@ -1327,5 +1366,5 @@ async function buildThreadHistory(
   } catch (err) {
     console.warn(`[history] thread read failed, using DO fallback: ${err instanceof Error ? err.message : String(err)}`);
   }
-  return loadHistory(env, channel, convTs);
+  return store.readHistory(ref);
 }

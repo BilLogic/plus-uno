@@ -14,7 +14,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import { GATE_RESERVED } from "../slack/gate-reactions";
 import type { AbsenceContext } from "./absence";
 import type { Env } from "../types";
-import type { HistoryTurn, PendingProposal } from "../thread-state-client";
+import type { HistoryTurn, PendingProposal } from "../thread-state/index";
 import type { SlackContext } from "../tools/dispatcher";
 import type { AgentImage, ProviderConversationTurn } from "./provider-conversation";
 import { addReaction } from "../slack/api";

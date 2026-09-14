@@ -42,7 +42,7 @@ import {
   type AgentImage,
 } from "./loop-shared";
 import { subrequestsUsed, meterBreakdown, withSubrequestLimit, isSubrequestBudgetError, subrequestBudgetTrips } from "../net";
-import type { HistoryTurn } from "../thread-state-client";
+import type { HistoryTurn } from "../thread-state/index";
 import { buildProviderConversation, type ProviderConversationTurn } from "./provider-conversation";
 
 // ── Anthropic Messages wire types (the subset we touch) ──────────────────────

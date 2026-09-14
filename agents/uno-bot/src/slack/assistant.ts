@@ -16,7 +16,7 @@
 
 import type { Env } from "../types";
 import { postMessage, slackCall } from "./api";
-import { saveAssistantContext } from "../thread-state-client";
+import { threadStateFor } from "../thread-state/production";
 import { hasOwnSlackToken, slackConnectUrl } from "../oauth/slack";
 import type {
   AssistantContext,
@@ -262,5 +262,9 @@ export async function handleAppContextChanged(
 ): Promise<void> {
   const channel = event.channel ?? event.app_context?.channel_id;
   if (!channel) return;
-  await saveAssistantContext(env, channel, dmConversationKey, event.app_context ?? {});
+  // Best-effort, as the client always was: this is advisory grounding, and
+  // losing one context write never blocks the turn that follows it.
+  await threadStateFor(env)
+    .putAssistantContext({ channel, thread: dmConversationKey }, event.app_context ?? {})
+    .catch(() => {});
 }
