@@ -50,7 +50,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { PAGE_TOKEN, composite, contrast, parseColour, resolveToken, tokenValues } from './button-contrast.mjs';
+import {
+  composite,
+  contrast,
+  parseColour,
+  resolveToken,
+  varReferencePattern,
+} from '../design-system/src/lib/tokens.mjs';
+import { PAGE_TOKEN, tokenValues } from './button-contrast.mjs';
 import { REPO_ROOT, groundFor, stylesheets } from './text-contrast.mjs';
 
 export { REPO_ROOT, stylesheets };
@@ -108,7 +115,7 @@ export function focusRules(files, root = REPO_ROOT) {
         selector: chain,
         property: declaration[2],
         value: declaration[3].split(/\s+/).join(' ').trim(),
-        tokens: [...declaration[3].matchAll(/var\(\s*(--color-[a-z0-9-]+)/g)].map((m) => m[1]),
+        tokens: [...declaration[3].matchAll(varReferencePattern('--color-'))].map((m) => m[1]),
         ground: groundFor(source, declaration.index),
         block: blockStart(source, declaration.index),
       });

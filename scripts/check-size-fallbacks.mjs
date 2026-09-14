@@ -58,8 +58,12 @@ const TOKEN_DIR = 'design-system/src/tokens';
 const SEARCHED = /\.(scss|css|jsx|tsx|mdx|html)$/;
 const SEARCH_ROOTS = ['design-system/src', '.storybook', 'prototypes'];
 
-/** Every custom-property name. The dimension family is then picked by VALUE. */
-const ANY_TOKEN = /--[a-z0-9-]+/;
+/**
+ * Every custom-property name — the `--` prefix and nothing narrower, since the
+ * dimension family is picked by VALUE and not by name. The grammar after the
+ * prefix is the tokens module's (#507); this file used to spell it.
+ */
+const ANY_TOKEN = '--';
 
 // `git ls-files`, not a filesystem walk: this repository keeps agent worktrees
 // under `.claude/worktrees/`, and a walk finds a whole second copy of the tree.
@@ -74,7 +78,7 @@ function main() {
   const args = process.argv.slice(2);
 
   const tokenFiles = tracked([TOKEN_DIR]).filter((f) => /\.(scss|css)$/.test(f)).map(read);
-  const all = resolveAliases(tokenDefinitions(tokenFiles, { names: ANY_TOKEN }));
+  const all = resolveAliases(tokenDefinitions(tokenFiles, { prefix: ANY_TOKEN }));
   const tokens = new Map([...all].filter(([, value]) => normaliseDimension(value) !== null));
 
   // An empty token map makes every comparison vacuous — the shape a moved
@@ -90,7 +94,7 @@ function main() {
   const sources = tracked(SEARCH_ROOTS).filter((f) => SEARCHED.test(f)).map(read);
   const audit = fallbackAudit({
     tokens,
-    usages: fallbackUsages(sources, { names: ANY_TOKEN }),
+    usages: fallbackUsages(sources, { prefix: ANY_TOKEN }),
     normalise: normaliseDimension,
     reportUndefined: false,
   });

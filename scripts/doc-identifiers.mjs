@@ -27,7 +27,14 @@
  * Everything else — English words, quoted UI strings, paths, expressions with
  * spaces or parentheses — is left alone deliberately. A gate that argues with
  * prose gets switched off.
+ *
+ * The token grammar is `design-system/src/lib/tokens.mjs`'s (#507) — which is
+ * also the one module this file may safely import, for the same reason it
+ * exists: it is plain ESM with no Node built-in in it, so the browser story
+ * above and the Node check below still read a page the same way.
  */
+
+import { TOKEN_NAME, varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 
 /* ------------------------------------------------------------ vocabularies */
 
@@ -151,9 +158,26 @@ export function splitFences(text) {
  * `check:token-registry`. Neither is a claim that a token by that literal name
  * exists.
  */
-const WHOLE_TOKEN = /^--[a-zA-Z][a-zA-Z0-9_]*(?:-[a-zA-Z0-9_]+)*$/;
-const VAR_REF = /(?<![\w-])var\(\s*(--[a-zA-Z][a-zA-Z0-9_-]*)\s*[),]/g;
-const DECLARATION = /^\s*(--[a-zA-Z][a-zA-Z0-9_-]*)\s*:\s*\S/;
+const NAME = new RegExp(`^${TOKEN_NAME}$`);
+
+/**
+ * A whole name, not a FAMILY. The token grammar is the module's (#507), and the
+ * two rejections this check needs on top of it are now stated instead of hidden
+ * inside a segment pattern: a trailing hyphen and an internal `--` are both how
+ * these docs write a prefix rather than a name.
+ */
+const isWholeToken = (name) =>
+  NAME.test(name) && !name.endsWith('-') && !name.slice(2).includes('--');
+
+/**
+ * `var(--name)` or `var(--name,`. The `var(--name` half is the module's; the
+ * lookbehind and the required `)` or `,` are this check's, because it reads
+ * PROSE, where a `--` in a command line must not become a token claim.
+ */
+const VAR_REF = () => new RegExp(`(?<![\\w-])${varReferencePattern().source}\\s*[),]`, 'g');
+
+/** `--name: something`, with no `;` required: a docs fence often omits it. */
+const DECLARATION = new RegExp(`^\\s*(${TOKEN_NAME})\\s*:\\s*\\S`);
 
 /**
  * Every CSS custom property the page claims exists. Three positions count, and
@@ -169,7 +193,7 @@ export function tokenClaims(text) {
   const { fences, prose } = splitFences(stripFrontmatter(text));
   const out = [];
   const push = (name, line) => {
-    if (WHOLE_TOKEN.test(name)) out.push({ name, line });
+    if (isWholeToken(name)) out.push({ name, line });
   };
 
   for (const span of codeSpans(prose)) {
@@ -178,14 +202,14 @@ export function tokenClaims(text) {
       const decl = s.match(DECLARATION);
       push(decl ? decl[1] : s, span.line);
     }
-    for (const m of s.matchAll(VAR_REF)) push(m[1], span.line);
+    for (const m of s.matchAll(VAR_REF())) push(m[1], span.line);
   }
 
   for (const f of fences) {
     const isStyle = ['css', 'scss', 'sass', 'less'].includes(f.lang);
     for (const [i, raw] of f.code.split('\n').entries()) {
       const at = f.startLine + i;
-      for (const m of raw.matchAll(VAR_REF)) push(m[1], at);
+      for (const m of raw.matchAll(VAR_REF())) push(m[1], at);
       const decl = isStyle && raw.match(DECLARATION);
       if (decl) push(decl[1], at);
     }
@@ -538,9 +562,17 @@ export function parseSubComponents(source, symbol) {
     .map((m) => ({ name: m[1], impl: m[2] }));
 }
 
-/** Every CSS custom property *defined* in a stylesheet. */
+/**
+ * Every CSS custom property *defined* in a stylesheet.
+ *
+ * Not the module's `tokenDeclarationPattern`: that one wants the value and its
+ * `;`, and this only needs the name, wherever in the rule it is written. The
+ * grammar is the module's (#507).
+ */
+const DEFINED = () => new RegExp(`(^|[;{\\s])(${TOKEN_NAME})\\s*:`, 'g');
+
 export function definedTokens(css) {
-  return [...css.matchAll(/(^|[;{\s])(--[a-zA-Z][a-zA-Z0-9_-]*)\s*:/g)].map((m) => m[2]);
+  return [...css.matchAll(DEFINED())].map((m) => m[2]);
 }
 
 /**

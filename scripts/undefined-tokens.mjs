@@ -37,6 +37,8 @@
  */
 import { documents } from './lib/corpus.mjs';
 
+import { TOKEN_NAME, ratchet, varReferencePattern } from '../design-system/src/lib/tokens.mjs';
+
 /** The extensions a token name can be written in. */
 const SEARCHED = ['.scss', '.css', '.jsx', '.tsx', '.mdx', '.html'];
 
@@ -51,12 +53,17 @@ export function corpus(repoRoot, roots) {
  * The optional quote is what makes a JS inline-style object count:
  * `{ '--bg-color': getBackgroundColor() }` defines the property on the element,
  * and a check that only read `--x:` from stylesheets would call every one of
- * those undefined.
+ * those undefined. That is also why this is not the module's
+ * `tokenDeclarationPattern`: that one wants a value and a `;`, and a JS object
+ * key has neither. The token GRAMMAR is the module's (#507); the position is
+ * this check's.
  */
+const DEFINITION = () => new RegExp(`(${TOKEN_NAME})['"]?\\s*:`, 'g');
+
 export function definitions(files) {
   const defined = new Set();
   for (const { text } of files) {
-    for (const m of stripComments(text).matchAll(/(--[a-z][a-z0-9-]*)['"]?\s*:/g)) defined.add(m[1]);
+    for (const m of stripComments(text).matchAll(DEFINITION())) defined.add(m[1]);
   }
   return defined;
 }
@@ -85,12 +92,15 @@ export function usages(files) {
   const out = [];
   for (const { path: file, text: raw } of files) {
     const text = stripComments(raw);
-    for (const m of text.matchAll(/var\(\s*(--[a-z][a-z0-9-]*)\s*(,?)/g)) {
+    for (const m of text.matchAll(varReferencePattern())) {
       out.push({
         name: m[1],
         file,
         line: text.slice(0, m.index).split('\n').length,
-        bare: m[2] !== ',',
+        // The module's pattern stops at the name, so whether a fallback follows
+        // is read off the text after it rather than captured: `var(--x)` is bare,
+        // `var(--x, 14px)` is not, and the two are different defects.
+        bare: !/^\s*,/.test(text.slice(m.index + m[0].length)),
       });
     }
   }
@@ -150,16 +160,28 @@ export function audit(files) {
  * longer used at all is itself reported — a baseline entry nothing matches is
  * a claim about code that has gone.
  *
+ * NEW and STALE are the module's `ratchet` (#507). The ROSE test is not, and
+ * cannot be: this baseline records TWO numbers per name — total uses and bare
+ * uses — and a bare use is a dropped declaration where a fallen-back one is
+ * only a fiction, so they are checked separately. The module classifies; the
+ * comparison and the wording stay here.
+ *
+ * The walk is over the found names rather than over the module's three lists,
+ * which is what keeps NEW and ROSE interleaved in name order the way this
+ * report has always printed them.
+ *
  * @returns {string[]} One line per problem; empty when the tree is at or under
  *   its baseline.
  */
 export function ratchetFailures(undefinedTokens, baseline) {
   const found = [];
   const recorded = baseline.tokens ?? {};
+  const classified = ratchet(undefinedTokens, recorded);
+  const unrecorded = new Set(classified.new.map((entry) => entry.key));
 
   for (const [name, entry] of Object.entries(undefinedTokens)) {
     const before = recorded[name];
-    if (!before) {
+    if (unrecorded.has(name)) {
       found.push(
         `NEW  ${name} — used ${entry.uses}x (${entry.bare} bare) and defined nowhere. ` +
           `First: ${entry.files[0]}`,
@@ -179,13 +201,11 @@ export function ratchetFailures(undefinedTokens, baseline) {
     }
   }
 
-  for (const name of Object.keys(recorded)) {
-    if (!undefinedTokens[name]) {
-      found.push(
-        `STALE ${name} — recorded, and no longer used-and-undefined. Remove the entry; a ` +
-          `baseline nobody prunes stops being a measurement.`,
-      );
-    }
+  for (const { key } of classified.fixed) {
+    found.push(
+      `STALE ${key} — recorded, and no longer used-and-undefined. Remove the entry; a ` +
+        `baseline nobody prunes stops being a measurement.`,
+    );
   }
 
   return found;

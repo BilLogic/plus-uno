@@ -5,9 +5,10 @@
  * WHY IT LIVES HERE AND NOT IN `scripts/`. The WCAG core this file now holds
  * was correct and well tested inside `scripts/button-contrast.mjs` — and
  * unreachable from a story, because that file imports `node:fs` on its first
- * line. So five story files carry their own copy of luminance and contrast, and
- * the numbers a designer reads in Storybook are computed by different code from
- * the numbers the checks fail the build on. This module is the one both can
+ * line. So five story files carried their own copy of luminance and contrast,
+ * and the numbers a designer read in Storybook were computed by different code
+ * from the numbers the checks fail the build on — until #507 deleted all five
+ * and pointed them here. This module is the one both can
  * import: it is PLAIN ESM with no Node-only import and no Node global anywhere
  * in it, so Vite bundles it for the browser and `node --test` loads it
  * unchanged. Anything that needs the filesystem — reading the token stylesheet
@@ -29,11 +30,16 @@
  *   tokenDeclarationPattern(prefix)  `--name: value;`  — a DEFINITION
  *   varReferencePattern(prefix)      `var(--name…`     — a USE
  *
- * NOTE FOR #507: twenty-odd other regexes across `scripts/` spell this grammar
- * for themselves, and they do not all agree — some allow uppercase, some stop
- * at the first `)`, some miss a `var()` fallback. #507 reconciles them to this
- * one; it is deliberately not done here, so that this change can be proved to
- * leave `check:button-contrast` and `check:text-contrast` findings identical.
+ * RECONCILED IN #507. Twenty-odd other regexes across `scripts/` used to spell
+ * this grammar for themselves, and they did not all agree — some allowed
+ * uppercase, some stopped at the first `)`, some missed a `var()` fallback.
+ * They now compose these two patterns or `TOKEN_NAME` instead, and every check
+ * was proved to produce byte-identical findings across the tree first. Two
+ * differences were real and are recorded where they were handled: a name is no
+ * longer read case-insensitively (no custom property in the tree has an
+ * uppercase letter), and `scripts/doc-identifiers.mjs` still rejects a trailing
+ * hyphen on top of this grammar, because `--color-` in a docs page means a
+ * FAMILY rather than a token.
  */
 
 /**

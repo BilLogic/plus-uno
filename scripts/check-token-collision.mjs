@@ -56,6 +56,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { documents } from './lib/corpus.mjs';
+import { TOKEN_NAME } from '../design-system/src/lib/tokens.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -236,8 +237,17 @@ function resolve(parents, head) {
   return out;
 }
 
-/** `var(--x)` and nothing else — a token used raw, which is what a pair needs. */
-export const tokenOf = (value) => value.match(/^var\(\s*(--[a-z0-9-]+)\s*\)\s*$/i)?.[1] ?? null;
+/**
+ * `var(--x)` and nothing else — a token used raw, which is what a pair needs.
+ *
+ * The name grammar is the tokens module's (#507). It is case-sensitive where the
+ * pattern here carried `/i`; no custom property in the tree has an uppercase
+ * letter in it, so nothing is in the gap, and folding case would have described
+ * tokens this design system does not define.
+ */
+const RAW_TOKEN = new RegExp(`^var\\(\\s*(${TOKEN_NAME})\\s*\\)\\s*$`);
+
+export const tokenOf = (value) => value.match(RAW_TOKEN)?.[1] ?? null;
 
 const chain = (selector) => selector.split(/\s*[>+~]\s*|\s+/).filter(Boolean);
 const classesOf = (part) => new Set((part.match(/\.[-a-z0-9_]+/gi) ?? []).map((c) => c.toLowerCase()));

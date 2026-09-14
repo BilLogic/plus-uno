@@ -1,5 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
+import { luminance, parseColour } from '../../lib/tokens.mjs';
+
 import './BadgeVariants.scss';
 
 /**
@@ -64,29 +67,18 @@ export function formatCount(value, max) {
  *
  * An unparsable colour returns null, and the caller then sets no foreground at
  * all rather than guessing — inheriting is wrong, but inventing is worse.
+ *
+ * THE PARSING AND THE LUMINANCE ARE THE MODULE'S (#507) — the same functions
+ * `check:button-contrast` scores a filled button with, so a badge and a button
+ * cannot disagree about what a colour weighs. The pair this file used to spell
+ * was very slightly looser: it took a hex with no `#` on it, and it ignored an
+ * out-of-range channel. Neither is a spelling anything in this repository or
+ * its tests uses, and `0.179` is the one decision that stays here.
  */
 export function readableOn(background) {
-  if (typeof background !== 'string') return null;
-  let r;
-  let g;
-  let b;
-  const hex = background.trim().replace(/^#/, '');
-  if (/^[0-9a-f]{3}$/i.test(hex)) {
-    [r, g, b] = [...hex].map((c) => parseInt(c + c, 16));
-  } else if (/^[0-9a-f]{6}$/i.test(hex)) {
-    [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16));
-  } else {
-    const m = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i.exec(background.trim());
-    if (!m) return null;
-    [r, g, b] = m.slice(1, 4).map(Number);
-  }
-  if ([r, g, b].some((c) => !Number.isFinite(c))) return null;
-  const channel = (c) => {
-    const v = c / 255;
-    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
-  };
-  const luminance = 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
-  return luminance > 0.179 ? 'var(--color-on-surface, #191c1e)' : '#ffffff';
+  const colour = parseColour(background);
+  if (!colour) return null;
+  return luminance(colour) > 0.179 ? 'var(--color-on-surface, #191c1e)' : '#ffffff';
 }
 
 /**

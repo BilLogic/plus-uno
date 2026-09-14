@@ -8,6 +8,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { AGENT_ROOT } from './agent-views-paths.js';
 import { checkArtifacts, writeArtifacts } from './lib/generated-artifact.js';
 
@@ -20,7 +21,11 @@ function extractScssVariables(filePath) {
 
     const content = fs.readFileSync(filePath, 'utf8');
     const variables = [];
-    const regex = /(--[a-zA-Z0-9-]+):/g;
+    // The token grammar is the design system's own (#507), not a fifth spelling
+    // of it here. It is narrower than the pattern it replaces — lowercase only,
+    // and the value and its `;` have to be there — and over these five token
+    // files both find exactly the same names.
+    const regex = tokenDeclarationPattern();
     let match;
 
     while ((match = regex.exec(content)) !== null) {

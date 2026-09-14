@@ -56,13 +56,21 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { documents } from './lib/corpus.mjs';
+import { resolveToken, tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 
-/** Every `--token:` declared under `design-system/src/tokens`. */
+/**
+ * Every `--token:` declared under `design-system/src/tokens`.
+ *
+ * The grammar is the tokens module's (#507). The pattern it replaced matched a
+ * name followed by a colon and stopped there, where the module's wants the value
+ * and its `;` as well; over these files the two find the same 518 declarations,
+ * because every token in them is written as one complete line.
+ */
 export function ourTokens(repoRoot) {
   const names = new Set();
   for (const file of documents('design-system/src/tokens/*.scss', { root: repoRoot, ext: ['.scss'] })) {
     const text = fs.readFileSync(path.join(repoRoot, file), 'utf8');
-    for (const m of text.matchAll(/^\s*(--[a-z][a-z0-9-]*)\s*:/gm)) names.add(m[1]);
+    for (const m of text.matchAll(tokenDeclarationPattern())) names.add(m[1]);
   }
   return [...names].sort();
 }
@@ -97,24 +105,18 @@ export function textScale(repoRoot) {
   const file = path.join(repoRoot, 'design-system/src/tokens/_fonts.scss');
   const text = fs.readFileSync(file, 'utf8');
   const declared = new Map(
-    [...text.matchAll(/(--font-size-[a-z0-9-]+)\s*:\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()]),
+    [...text.matchAll(tokenDeclarationPattern('--font-size-'))].map((m) => [m[1], m[2].trim()]),
   );
-
-  /** Follow `var(--x)` chains. Depth-capped rather than cycle-tracked: a cycle
-   *  in a token file is its own bug and this is not the check for it. */
-  const resolve = (value, depth = 0) => {
-    const alias = /^var\(\s*(--[a-z0-9-]+)\s*\)$/.exec(value);
-    if (!alias || depth > 8) return value;
-    const next = declared.get(alias[1]);
-    return next === undefined ? value : resolve(next.trim(), depth + 1);
-  };
 
   const px = new Set();
   for (const [name, value] of declared) {
     // Icon sizing is a separate scale with a separate job; `--font-size-125` is
     // a primitive that three semantic tokens alias.
     if (name.startsWith('--font-size-fa-') || name === '--font-size-125') continue;
-    const rem = /^([\d.]+)rem$/.exec(resolve(value));
+    // `resolveToken` follows the `var(--x)` chain, cycle-guarded rather than
+    // depth-capped (#507). A name that resolves to nothing keeps its own value,
+    // which is what the depth cap used to return.
+    const rem = /^([\d.]+)rem$/.exec(resolveToken(name, declared) ?? value);
     if (rem) px.add(Number(rem[1]) * 16);
   }
 

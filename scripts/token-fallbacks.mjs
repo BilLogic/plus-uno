@@ -71,27 +71,42 @@
  *                     and the check silently sees a fraction of its corpus.
  *                     Colour's recorded set is unchanged by it — measured, not
  *                     assumed; the test below pins that.
+ *
+ * ─── WHERE THE GRAMMAR AND THE MATHS COME FROM ──────────────────────────────
+ * `design-system/src/lib/tokens.mjs` (#506), not from this file (#507). The
+ * token grammar, colour parsing, alias resolution and the new/known/fixed
+ * classification are all the module's; what is left here is what is about
+ * FALLBACKS — capturing the literal beside a token, comparing two values of a
+ * FAMILY, and the wording of the two reports.
  */
 
-/** `#abc`, `#aabbcc` and `rgb(a, b, c)` all normalise to `#aabbcc`. */
+import {
+  parseColour,
+  ratchet,
+  resolveToken,
+  toHex,
+  tokenDeclarationPattern,
+  varReferencePattern,
+} from '../design-system/src/lib/tokens.mjs';
+
+/**
+ * `#abc`, `#aabbcc` and `rgb(a, b, c)` all normalise to `#aabbcc`.
+ *
+ * The parsing and the hex are the module's (#507) — this file used to spell
+ * both. Out of range is still not a colour: `parseColour` returns null for
+ * `rgb(300, 0, 0)` rather than clamping, which is what keeps a typo from
+ * reporting agreement with something nobody wrote.
+ *
+ * The module's parser is slightly STRICTER than the one it replaces: it wants
+ * the whole value to be the colour, where this matched an `rgb(` prefix and
+ * ignored the tail. Measured over the token sources and every captured
+ * fallback literal, nothing in the tree is in the gap — a fallback literal is
+ * captured up to the first comma, so an `rgba()` fallback never reaches here at
+ * all, and no token value carries trailing content after its `rgb()`.
+ */
 export function normaliseColour(value) {
-  if (typeof value !== 'string') return null;
-  const v = value.trim().toLowerCase();
-  const hex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/.exec(v);
-  if (hex) {
-    const h = hex[1];
-    return `#${h.length === 3 ? [...h].map((c) => c + c).join('') : h}`;
-  }
-  const rgb = /^rgba?\(\s*(\d{1,3})[\s,]+(\d{1,3})[\s,]+(\d{1,3})/.exec(v);
-  if (rgb) {
-    const channels = [1, 2, 3].map((i) => Number(rgb[i]));
-    // Out of range is not a colour. Clamping or truncating would turn a typo
-    // into a plausible value and report agreement with something nobody wrote —
-    // this returned `#0000` for `rgb(300, 0, 0)` until a test asked.
-    if (channels.some((n) => !Number.isInteger(n) || n < 0 || n > 255)) return null;
-    return `#${channels.map((n) => n.toString(16).padStart(2, '0')).join('')}`;
-  }
-  return null;
+  const colour = parseColour(value);
+  return colour ? toHex(colour) : null;
 }
 
 /**
@@ -131,16 +146,24 @@ export function normaliseDimension(value) {
  * Token definitions from the token sources.
  *
  * Later definitions win, which is how the cascade reads them, and is why the
- * light-mode value is what a bare `:root` definition means here.
+ * light-mode value is what a bare `:root` definition means here. That is the
+ * one reason this is not the module's `readTokens`, which takes the FIRST
+ * definition because it reads a single stylesheet; the grammar is the module's
+ * either way (#507).
+ *
+ * The pattern this replaced was anchored to the start of a line. Dropping the
+ * anchor is measured rather than assumed: over `design-system/src/tokens`, both
+ * spellings find the same 518 declarations, because every token in those files
+ * is written one per line.
  *
  * @param {{path: string, text: string}[]} files
+ * @param {{prefix?: string}} [options] e.g. `--color-`; defaults to every token
  * @returns {Map<string, string>} name -> raw value
  */
-export function tokenDefinitions(files, { names = /--color-[a-z0-9-]+/ } = {}) {
+export function tokenDefinitions(files, { prefix = '--color-' } = {}) {
   const tokens = new Map();
-  const declaration = new RegExp(`^\\s*(${names.source})\\s*:\\s*([^;]+);`, 'gm');
   for (const { text } of files) {
-    for (const m of text.matchAll(declaration)) {
+    for (const m of text.matchAll(tokenDeclarationPattern(prefix))) {
       tokens.set(m[1], m[2].trim());
     }
   }
@@ -155,21 +178,22 @@ export function tokenDefinitions(files, { names = /--color-[a-z0-9-]+/ } = {}) {
  * keeps its raw value and is therefore incomparable, which is the honest answer
  * — a cycle has no value.
  *
+ * The walk itself is the module's `resolveToken` (#507), including its cycle
+ * guard; what stays here is the `?? raw` — the module answers `undefined` for a
+ * cycle or a dead end, and this map's contract is that every token keeps a
+ * value.
+ *
+ * One behaviour the module adds: it follows `var(--b, fallback)` through to
+ * `--b`, where the pattern here followed only a bare `var(--b)`. No token in
+ * `design-system/src/tokens` is declared as an aliased `var()` WITH a fallback,
+ * so nothing in the tree is in the gap.
+ *
  * @param {Map<string,string>} tokens
  */
 export function resolveAliases(tokens) {
   const resolved = new Map();
-  const terminal = (name, seen) => {
-    if (seen.has(name)) return null;
-    seen.add(name);
-    const value = tokens.get(name);
-    if (value === undefined) return null;
-    const alias = /^var\(\s*(--[\w-]+)\s*\)$/.exec(value.trim());
-    if (!alias) return value;
-    return terminal(alias[1], seen);
-  };
   for (const [name, raw] of tokens) {
-    resolved.set(name, terminal(name, new Set()) ?? raw);
+    resolved.set(name, resolveToken(name, tokens) ?? raw);
   }
   return resolved;
 }
@@ -181,11 +205,16 @@ export function resolveAliases(tokens) {
  * skipped: it is not comparable, but a check that silently dropped it would be
  * unable to say how much of the corpus it actually looked at.
  *
+ * The `var(--name` half is the module's `varReferencePattern` (#507); the tail
+ * that captures the fallback literal is this check's, because the module
+ * deliberately stops at the name.
+ *
  * @param {{path: string, text: string}[]} files
+ * @param {{prefix?: string}} [options]
  */
-export function fallbackUsages(files, { names = /--color-[a-z0-9-]+/ } = {}) {
+export function fallbackUsages(files, { prefix = '--color-' } = {}) {
   const uses = [];
-  const call = new RegExp(`var\\(\\s*(${names.source})\\s*(?:,\\s*([^),]+))?\\)`, 'g');
+  const call = new RegExp(`${varReferencePattern(prefix).source}\\s*(?:,\\s*([^),]+))?\\)`, 'g');
   for (const { path, text } of files) {
     text.split('\n').forEach((line, i) => {
       for (const m of line.matchAll(call)) {
@@ -251,7 +280,31 @@ export function fallbackAudit({ tokens, usages, normalise = normaliseColour, rep
 }
 
 /**
+ * The two sides of the audit as the module's `ratchet` wants them: `Map<key,
+ * count>`, in the order the audit found them, because both reports render in
+ * that order.
+ *
+ * `disagreements` is keyed on `token + literal`, so several uses of the same
+ * wrong pair collapse to one entry — which is what the old `seen` set did while
+ * it walked the list, and what makes the count a count of DECISIONS.
+ */
+function sides(audit) {
+  const disagreements = new Map();
+  const detail = new Map();
+  for (const d of audit.disagreements) {
+    disagreements.set(d.key, (disagreements.get(d.key) ?? 0) + 1);
+    if (!detail.has(d.key)) detail.set(d.key, d);
+  }
+  const undefinedTokens = new Map(audit.undefinedTokens.map((u) => [u.token, u.count]));
+  return { disagreements, detail, undefinedTokens };
+}
+
+/**
  * The ratchet.
+ *
+ * The new/known/fixed classification is the module's `ratchet` (#507); the
+ * WORDING of both failures, and which of the three directions is fatal for this
+ * check, stay here — which is what keeps the two reports byte-identical.
  *
  * 191 disagreements across 30 tokens cannot be fixed in one commit and reviewed
  * honestly — several are load-bearing in prototypes no story renders. So the
@@ -277,29 +330,26 @@ export function fallbackFailures(audit, baseline, { noun = 'colour' } = {}) {
     return failures;
   }
 
-  const knownUndefined = new Set(baseline.undefinedTokens ?? []);
-  const newUndefined = audit.undefinedTokens.filter((u) => !knownUndefined.has(u.token));
+  const found = sides(audit);
+
+  const newUndefined = ratchet(found.undefinedTokens, baseline.undefinedTokens ?? []).new;
   if (newUndefined.length) {
     failures.push(
       `${newUndefined.length} new ${noun} token(s) referenced and never defined:\n` +
-        newUndefined.map((u) => `       ${u.token}  (${u.count} use(s))`).join('\n') +
+        newUndefined.map((u) => `       ${u.key}  (${u.count} use(s))`).join('\n') +
         `\n     For these the fallback IS the ${noun} and the token is fiction — changing the\n` +
         '     token changes nothing. Define it, or fix the name.',
     );
   }
 
-  const recorded = new Set(baseline.disagreements ?? []);
-  const added = audit.disagreements.filter((d) => !recorded.has(d.key));
+  const added = ratchet(found.disagreements, baseline.disagreements ?? []).new;
   if (added.length) {
-    const seen = new Set();
-    const lines = [];
-    for (const d of added) {
-      if (seen.has(d.key)) continue;
-      seen.add(d.key);
-      lines.push(`       ${d.token}  is ${d.expected}, fallback says ${d.found}  (${d.where})`);
-    }
+    const lines = added.map(({ key }) => {
+      const d = found.detail.get(key);
+      return `       ${d.token}  is ${d.expected}, fallback says ${d.found}  (${d.where})`;
+    });
     failures.push(
-      `${seen.size} new fallback(s) that disagree with their token:\n${lines.join('\n')}\n` +
+      `${added.length} new fallback(s) that disagree with their token:\n${lines.join('\n')}\n` +
         '     A fallback only paints when the token fails to load, so a wrong one is wrong\n' +
         '     everywhere at once and invisible until then. Make it equal the token.',
     );
@@ -308,13 +358,19 @@ export function fallbackFailures(audit, baseline, { noun = 'colour' } = {}) {
   return failures;
 }
 
-/** Recorded entries that are no longer true — a baseline must be able to shrink. */
+/**
+ * Recorded entries that are no longer true — a baseline must be able to shrink.
+ *
+ * `fixed` is the module's word for it, and the direction most baselines forget.
+ * The two lists are reported together and in baseline order, with the undefined
+ * half labelled, because "no longer disagrees" and "now defined" are different
+ * news about the same file.
+ */
 export function staleEntries(audit, baseline) {
   if (!baseline) return [];
-  const live = new Set(audit.disagreements.map((d) => d.key));
-  const liveUndefined = new Set(audit.undefinedTokens.map((u) => u.token));
+  const found = sides(audit);
   return [
-    ...(baseline.disagreements ?? []).filter((key) => !live.has(key)),
-    ...(baseline.undefinedTokens ?? []).filter((t) => !liveUndefined.has(t)).map((t) => `${t} (now defined)`),
+    ...ratchet(found.disagreements, baseline.disagreements ?? []).fixed.map((f) => f.key),
+    ...ratchet(found.undefinedTokens, baseline.undefinedTokens ?? []).fixed.map((f) => `${f.key} (now defined)`),
   ];
 }

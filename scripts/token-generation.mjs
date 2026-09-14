@@ -26,9 +26,14 @@
  * only about direction, and the escape hatch is explicit rather than absent.
  */
 
-/** Every `--token:` declared in a stylesheet. */
+import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
+
+/**
+ * Every `--token:` declared in a stylesheet, with the grammar the tokens module
+ * defines (#507) rather than a fourth spelling of it here.
+ */
 export function tokenNames(scss) {
-  return [...scss.matchAll(/^\s*(--[a-z][a-z0-9-]*)\s*:/gm)].map((m) => m[1]);
+  return [...scss.matchAll(tokenDeclarationPattern())].map((m) => m[1]);
 }
 
 /**
