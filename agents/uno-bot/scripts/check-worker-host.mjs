@@ -23,8 +23,9 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { DEFAULT_WORKER_ORIGIN } from "./worker-url.mjs";
+import { main } from "../../../scripts/lib/findings.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(here, "../../..");
@@ -167,33 +168,65 @@ export function findStrays(root = REPO_ROOT, host = HOST) {
   return strays.sort();
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+/**
+ * `--host=` is a question a human asks, so it is read only when a human ran
+ * this script. The harness runner imports this module into its own process and
+ * asks about the invariant; a stray `--host=` on somebody else's command line
+ * must not silently turn that into a cutover audit.
+ */
+const entered = () =>
+  Boolean(process.argv[1]) && pathToFileURL(process.argv[1]).href === import.meta.url;
+
+function hostArgument() {
+  if (!entered()) return HOST;
   const flag = process.argv.slice(2).find((a) => a.startsWith("--host="));
-  const host = flag ? flag.slice("--host=".length) : HOST;
-  if (!host) {
-    console.error("--host= needs a hostname, e.g. --host=uno-bot.old.workers.dev");
-    process.exit(1);
-  }
-  const strays = findStrays(REPO_ROOT, host);
-  if (strays.length) {
-    console.error(`[worker-host] ${strays.length} file(s) hardcode ${host}:`);
-    for (const rel of strays) console.error(`  ${rel}`);
-    console.error("");
-    if (host === HOST) {
-      console.error("  -> Import workerOrigin()/workerUrl() from scripts/worker-url.mjs, or read");
-      console.error("     UNO_BOT_WORKER_URL. If the mention is deliberate, add it to ALLOWED in");
-      console.error("     scripts/check-worker-host.mjs with the reason (#288).");
-    } else {
-      console.error(`  -> These still point at ${host}. The move is not complete until each one`);
-      console.error("     names the new host. The Slack manifests cannot be pushed — paste them");
-      console.error("     into the App Manifest web editor by hand, then `npm run slack:diff`");
-      console.error("     to confirm the live app matches (ADR-024).");
-    }
-    process.exit(1);
-  }
-  console.log(
-    host === HOST
-      ? `[worker-host] ${HOST} is defined once; ${ALLOWED.size} documented exception(s).`
-      : `[worker-host] no file mentions ${host}.`,
-  );
+  return flag ? flag.slice("--host=".length) : HOST;
 }
+
+export const REMEDY =
+  "  -> Import workerOrigin()/workerUrl() from scripts/worker-url.mjs, or read\n" +
+  "     UNO_BOT_WORKER_URL. If the mention is deliberate, add it to ALLOWED in\n" +
+  "     scripts/check-worker-host.mjs with the reason (#288).";
+
+/**
+ * The cutover audit has its own remedy, because a foreign host is not a stray
+ * to be replaced with an import — it is a file the move has not reached yet.
+ */
+export const cutoverRemedy = (host) =>
+  `  -> These still point at ${host}. The move is not complete until each one\n` +
+  "     names the new host. The Slack manifests cannot be pushed — paste them\n" +
+  "     into the App Manifest web editor by hand, then `npm run slack:diff`\n" +
+  "     to confirm the live app matches (ADR-024).";
+
+const remedyFor = (host) => (host === HOST ? REMEDY : cutoverRemedy(host));
+
+/**
+ * @param {{repoRoot?: string, host?: string}} [ctx]
+ * @returns {import('../../../scripts/lib/findings.mjs').Finding[]}
+ */
+export function run({ repoRoot = REPO_ROOT, host = hostArgument() } = {}) {
+  if (!host) {
+    return [{ message: "--host= needs a hostname, e.g. --host=uno-bot.old.workers.dev" }];
+  }
+  return findStrays(repoRoot, host).map((rel) => ({
+    file: rel,
+    message: `hardcodes ${host}.`,
+  }));
+}
+
+/**
+ * The green line. The invariant pass reports the size of the exception list,
+ * because that list growing quietly is how the single definition dies; the
+ * cutover audit has nothing to count, only a host nothing mentions any more.
+ */
+export function summary({ host = hostArgument() } = {}) {
+  return host === HOST
+    ? `${HOST} is defined once; ${ALLOWED.size} documented exception(s).`
+    : `no file mentions ${host}.`;
+}
+
+main(import.meta.url, "check:worker-host", {
+  run,
+  summary,
+  remedy: remedyFor(hostArgument()),
+});
