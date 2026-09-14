@@ -26,7 +26,6 @@ const ALLOWED_BARE_FETCH = new Set(["net.ts"]);
 // the build instead of silently going uncounted — the one surface the meter
 // cannot instrument itself.
 const CHARGED_STUB_CALLS = new Set([
-  "thread-state-client.ts", // call() charges 1 for every ThreadState hop
   "slack/events.ts", // enqueueAgentJob charges 1 for the AgentRunner hop
 ]);
 

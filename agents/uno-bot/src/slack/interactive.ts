@@ -24,7 +24,7 @@
 import type { Env } from "../types";
 import { countedFetch } from "../net";
 import { runMessageShortcut } from "./shortcuts";
-import { cancelForUser, loadPendingProposalDetailed } from "../thread-state-client";
+import { threadStateFor } from "../thread-state/production";
 import { conversationsOpen, deleteMessage, postMessage } from "./api";
 import { resolveProposal } from "../agent/resolve-proposal";
 import { proposalCardBlocks } from "./proposal-render";
@@ -132,7 +132,12 @@ async function resolveFromButton(
   const userId = payload.user?.id ?? "someone";
   if (!channel || !ts) return;
 
-  const lookup = await loadPendingProposalDetailed(env, ts);
+  // Reads as "not a proposal" on a failed lookup, exactly as the client did:
+  // the reply below then says the card was already resolved, which is never
+  // silence.
+  const lookup = await threadStateFor(env)
+    .getProposalByTs(ts)
+    .catch(() => ({ state: "none" }) as const);
   if (lookup.state !== "found") {
     // Expired, or already resolved by another path. Say so where the person
     // is looking — an ephemeral reply via response_url — never silence.
@@ -143,7 +148,7 @@ async function resolveFromButton(
     return;
   }
 
-  const pending = lookup.payload;
+  const pending = lookup.proposal;
   const won = await resolveProposal(env, pending, decision);
   console.log(`[interactive] ${decision} button on ${channel}/${ts} by=${userId} won=${won}`);
   if (!won) return; // the other resolver is posting; stay quiet
@@ -186,7 +191,11 @@ async function replaceCard(payload: InteractionPayload, text: string, note: stri
 async function stopRun(env: Env, payload: InteractionPayload): Promise<void> {
   const userId = payload.user?.id;
   if (!userId) return;
-  const result = await cancelForUser(env, userId);
+  // Best-effort: a failed lookup reports "nothing running", which is the
+  // message this button already has to be able to send.
+  const result = await threadStateFor(env)
+    .cancelForUser(userId)
+    .catch(() => ({ cancelled: false, channel: undefined }));
   console.log(`[stop] home-tab from ${userId} cancelled=${result.cancelled} channel=${result.channel ?? "-"}`);
 
   const dm = await conversationsOpen(env, userId).catch(() => null);

@@ -11,7 +11,7 @@ import { MODELS } from "./agent/routing";
 import { runAgent } from "./agent/run-agent";
 import { withTurnScope, attachToolResult, markUnanswered, type ToolCall, type TurnDials } from "./agent/loop-shared";
 import { preflight } from "./agent/preflight";
-import type { HistoryTurn, PendingProposal } from "./thread-state-client";
+import type { HistoryTurn, PendingProposal } from "./thread-state/index";
 import { BUILD } from "./version";
 import { BLUEPRINT_CONTRACT } from "./generated/blueprint-contract";
 import { runFigmaPoll } from "./figma-poll";

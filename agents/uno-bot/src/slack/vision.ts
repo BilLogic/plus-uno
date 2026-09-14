@@ -9,7 +9,7 @@
 import type { Env } from "../types";
 import type { AgentImage } from "../agent/loop-shared";
 import type { SlackEventFile, SlackMessageEvent } from "./types";
-import type { HistoryTurn } from "../thread-state-client";
+import type { HistoryTurn } from "../thread-state/index";
 import type { HistoricalImages } from "../agent/provider-conversation";
 import { parseFigmaUrl, fetchFigmaImagePngUrl } from "../integrations/figma";
 import { countedFetch } from "../net";

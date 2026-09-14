@@ -25,7 +25,7 @@ import { geminiDials, resolveGeminiModel } from "./gemini-tiers";
 import { geminiGenerateRaw } from "../gemini/client";
 import { ensureHarnessCache } from "../gemini/cache";
 import { BUILD } from "../version";
-import { consumeCancel } from "../thread-state-client";
+import { threadStateFor } from "../thread-state/production";
 import { subrequestsUsed, meterBreakdown, withSubrequestLimit, isSubrequestBudgetError, subrequestBudgetTrips } from "../net";
 import {
   MAX_ITERATIONS,
@@ -46,7 +46,7 @@ import {
   type AgentResult,
   type AgentImage,
 } from "./loop-shared";
-import type { HistoryTurn } from "../thread-state-client";
+import type { HistoryTurn } from "../thread-state/index";
 import { buildProviderConversation, type ProviderConversationTurn } from "./provider-conversation";
 
 // ── Gemini wire types (the subset we touch) ─────────────────────────────────
@@ -333,7 +333,16 @@ export async function runGeminiAgent(input: AgentInput): Promise<AgentResult> {
     // read per check, and nobody types /stop inside the first few seconds —
     // paying for it on every short turn to serve a case that cannot have
     // happened yet is the wrong trade.
-    if (iter >= 2 && slack?.channel && (await consumeCancel(env, slack.channel, cancelThread))) {
+    // Best-effort, as it has always been: a failed read lets the turn continue,
+    // which is the same annoyance as a /stop that missed and never worth failing
+    // a turn over.
+    if (
+      iter >= 2 &&
+      slack?.channel &&
+      (await threadStateFor(env)
+        .consumeCancel({ channel: slack.channel, thread: cancelThread })
+        .catch(() => false))
+    ) {
       console.log(`[stop] cancelled at iteration ${iter}`);
       return finish({
         kind: "text",

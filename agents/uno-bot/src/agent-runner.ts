@@ -21,6 +21,13 @@
 
 import type { Env } from "./types";
 import { runMetered } from "./net";
+// The retry cadence for a deferred job is one HALF of a single rule — how long
+// a lease is trusted (`RUN_LEASE_MS`) and how often a deferred job comes back
+// to test it — and the other half has always lived with the store. It was
+// declared here, in the file that could not answer "why did a killed run come
+// back two minutes later?" on its own. The whole rule now lives in ThreadState
+// and this scheduler reads it (#494).
+import { DEFER_RETRY_MS } from "./thread-state/index";
 import {
   onRunnerJob,
   type RunnerJobPayload,
@@ -32,13 +39,6 @@ interface RunnerJob {
 }
 
 const JOB_PREFIX = "job:";
-
-// Retry cadence for a DEFERRED job — one whose run-lease is held by another
-// invocation (a live run, or one hard-killed by a deploy). The job is kept and
-// re-checked on this cadence; once the lease is marked done it's dropped, and
-// once the lease goes stale (~20 min, thread-state.ts RUN_LEASE_MS) the retry
-// reclaims it and re-runs the turn. Cost: one cheap alarm firing per interval.
-const DEFER_RETRY_MS = 2 * 60 * 1000;
 
 export class AgentRunner {
   private state: DurableObjectState;

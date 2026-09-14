@@ -12,7 +12,8 @@
 
 import type { Env } from "../types";
 import { addReaction, postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
-import { appendHistory, claimPendingProposal, type PendingProposal } from "../thread-state-client";
+import type { PendingProposal } from "../thread-state/index";
+import { threadStateFor } from "../thread-state/production";
 import { executeTool } from "../tools/dispatcher";
 
 export type Decision = "confirm" | "cancel";
@@ -32,7 +33,8 @@ export async function resolveProposal(
   // Whoever loses here must not post, must not react, and above all must not
   // execute. Losing is not an error — the winner is handling it — so return
   // quietly rather than telling the user twice about one action.
-  if (!(await claimPendingProposal(env, pending.proposalTs))) {
+  const store = threadStateFor(env);
+  if (!(await store.claimProposal(pending.proposalTs))) {
     console.log(
       `[gate] ${pending.toolName} at ${pending.proposalTs} was already claimed — standing down`,
     );
@@ -81,10 +83,10 @@ export async function resolveProposal(
     // link, so "delete that PRD" works and the bot never claims it created
     // nothing when it did. Neither caller (gate.ts reaction path, events.ts text
     // path) records the executed result otherwise.
-    await appendHistory(env, pending.channel, pending.threadTs, {
-      role: "assistant",
-      content: outcomeNote(pending.toolName, result),
-    });
+    await store.appendHistory(
+      { channel: pending.channel, thread: pending.threadTs },
+      { role: "assistant", content: outcomeNote(pending.toolName, result) },
+    );
 
     // D5: announce a successful reviewable artifact to #plus-design (right place
     // + person + time). Best-effort — never let a fan-out failure break the flow.
@@ -101,10 +103,13 @@ export async function resolveProposal(
       }
     }
   } else {
-    await appendHistory(env, pending.channel, pending.threadTs, {
-      role: "assistant",
-      content: `(Cancelled the proposed ${pending.toolName} — nothing was done.)`,
-    });
+    await store.appendHistory(
+      { channel: pending.channel, thread: pending.threadTs },
+      {
+        role: "assistant",
+        content: `(Cancelled the proposed ${pending.toolName} — nothing was done.)`,
+      },
+    );
   }
   // No delete here any more: the claim above already removed the record, which
   // is what made it a claim.

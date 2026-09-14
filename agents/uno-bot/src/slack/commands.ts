@@ -23,7 +23,7 @@ import type { Env } from "../types";
 import { countedFetch } from "../net";
 import { postMessage } from "./api";
 import { enqueueAgentJob } from "./events";
-import { cancelForUser } from "../thread-state-client";
+import { threadStateFor } from "../thread-state/production";
 import { EFFORT_COMMANDS, type EffortMode } from "./effort";
 import { SLASH_COMMANDS } from "../generated/slack-commands";
 import type { SlackMessageEvent } from "./types";
@@ -83,9 +83,14 @@ export function handleSlashCommand(
   // conversation exactly, and it is the one thing both surfaces can resolve.
   if (payload.command === "/stop") {
     ctx.waitUntil(
-      cancelForUser(env, payload.userId).then((r) => {
-        console.log(`[stop] command from ${payload.userId} cancelled=${r.cancelled}`);
-      }),
+      threadStateFor(env)
+        // Best-effort: a failed cancel means the turn finishes, which is
+        // annoying and not broken — never worth failing the ack over.
+        .cancelForUser(payload.userId)
+        .catch(() => ({ cancelled: false }))
+        .then((r) => {
+          console.log(`[stop] command from ${payload.userId} cancelled=${r.cancelled}`);
+        }),
     );
     return ephemeral(
       "Stopping — I'll finish the step I'm on and stop there. " +

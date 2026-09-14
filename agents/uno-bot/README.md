@@ -74,7 +74,13 @@ uno-bot/
     ├── oauth/            Slack OAuth (static client) — the user token slack_search needs
     ├── figma-poll.ts     Cron: DS-publish detection → Roadmap PRD → #uno-bot card
     │                     (KV snapshot diffing; v1's poll-figma-library.js, Worker-native)
-    ├── thread-state.ts   Durable Object: per-thread history + pending proposals (60-min TTL)
+    ├── thread-state/     ThreadState: ONE typed interface for everything a turn
+    │                     remembers (history · proposals · assistant context · cancel ·
+    │                     the run lease), its timings, and three adapters — Durable
+    │                     Object (production, via `threadStateFor(env)`), in-memory
+    │                     (tests), and one conformance suite over both
+    ├── thread-state.ts   The Durable Object class itself: storage behind the RPC
+    │                     methods that ARE the interface above. No HTTP routes
     ├── agent-runner.ts   Durable Object: runs the agent turn in an alarm — outlives the ~30s
     │                     waitUntil() cancellation window that killed long runs
     └── version.ts        BUILD string returned by /health
