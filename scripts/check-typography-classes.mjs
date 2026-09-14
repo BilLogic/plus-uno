@@ -55,6 +55,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { documents } from './lib/corpus.mjs';
+
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 /** Where pages and stylesheets live. Both directions read the same roots. */
@@ -79,21 +81,22 @@ const TYPE_PROPERTY = /(^|[\s;{])(font-size|font-family|font-weight|line-height|
 /** Every `something-txt` identifier, wherever it appears. */
 const TXT_CLASS = /\b([a-z][a-z0-9]*(?:-[a-z0-9]+)*-txt)\b/g;
 
-export function walk(dir, out = []) {
-  let entries;
-  try {
-    entries = fs.readdirSync(dir, { withFileTypes: true });
-  } catch {
-    return out;
-  }
-  for (const entry of entries) {
-    if (entry.name === 'node_modules' || entry.name.startsWith('.git')) continue;
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) walk(full, out);
-    else out.push(full);
-  }
-  return out;
-}
+/**
+ * Every file under the roots, repo-relative.
+ *
+ * `.storybook/` is a root, so dot-directories are walked rather than skipped;
+ * what is skipped is git's own — `.git/`, `.github/`, a `.gitkeep` placeholder —
+ * which is what this walk excluded when it carried its own `.git` prefix test.
+ */
+export const corpusFiles = (root = REPO_ROOT) =>
+  ROOTS.flatMap((dir) =>
+    documents(dir, {
+      root,
+      ext: null,
+      ignore: new Set(['node_modules']),
+      skipDotDirs: false,
+    }),
+  ).filter((rel) => !rel.split('/').some((segment) => segment.startsWith('.git')));
 
 /**
  * The block a selector opens, as source text.
@@ -192,9 +195,7 @@ export function report(missing) {
 }
 
 function main() {
-  const files = ROOTS.flatMap((root) => walk(path.join(REPO_ROOT, root))).map((f) =>
-    path.relative(REPO_ROOT, f),
-  );
+  const files = corpusFiles();
 
   const defined = definedClasses(files);
   const uses = usedClasses(files);

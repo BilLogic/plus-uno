@@ -31,9 +31,12 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { documents } from './lib/corpus.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const ROOT = path.join(REPO_ROOT, 'docs/knowledge');
+const RELATIVE_ROOT = 'docs/knowledge';
+const ROOT = path.join(REPO_ROOT, RELATIVE_ROOT);
 
 const EXCLUDED_DIRS = ['archive'];
 const GOVERNING_FILES = ['INDEX.md', 'changelog.md'];
@@ -42,18 +45,15 @@ const DISPOSITIONS = ['rule', 'adr', 'archive'];
 const TARGET_REQUIRED = ['rule', 'adr'];
 
 /** Files in scope: everything below docs/knowledge/ that is not excluded. */
-function inScope(dir = ROOT, out = []) {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const abs = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (dir === ROOT && EXCLUDED_DIRS.includes(entry.name)) continue;
-      inScope(abs, out);
-      continue;
-    }
-    if (dir === ROOT && GOVERNING_FILES.includes(entry.name)) continue;
-    out.push(abs);
-  }
-  return out;
+function inScope(root = REPO_ROOT) {
+  return documents(RELATIVE_ROOT, { root, ext: null })
+    .filter((rel) => {
+      const within = rel.slice(RELATIVE_ROOT.length + 1);
+      return within.includes('/')
+        ? !EXCLUDED_DIRS.includes(within.slice(0, within.indexOf('/')))
+        : !GOVERNING_FILES.includes(within);
+    })
+    .map((rel) => path.join(root, rel));
 }
 
 /** Frontmatter as a flat key→value map. Values are single-line scalars here. */

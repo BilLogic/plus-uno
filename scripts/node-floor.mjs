@@ -15,6 +15,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { documents } from './lib/corpus.mjs';
+
 export const WORKFLOWS = '.github/workflows';
 export const NVMRC = '.nvmrc';
 export const MANIFESTS = ['package.json', 'agents/uno-bot/package.json'];
@@ -42,14 +44,12 @@ export function nvmrcMajor(root) {
  * floor, and second copies are how 20, 22 and 24 came to coexist in one repo.
  */
 export function hardcoded(root) {
-  const dir = path.join(root, WORKFLOWS);
-  if (!fs.existsSync(dir)) return [];
   const found = [];
-  for (const name of fs.readdirSync(dir).filter((f) => /\.ya?ml$/.test(f)).sort()) {
-    const lines = fs.readFileSync(path.join(dir, name), 'utf8').split('\n');
+  for (const rel of documents(WORKFLOWS, { root, ext: ['.yml', '.yaml'] })) {
+    const lines = fs.readFileSync(path.join(root, rel), 'utf8').split('\n');
     lines.forEach((line, i) => {
       const match = /^\s*node-version:\s*["']?(\d+)/.exec(line);
-      if (match) found.push({ file: `${WORKFLOWS}/${name}`, line: i + 1, version: match[1] });
+      if (match) found.push({ file: rel, line: i + 1, version: match[1] });
     });
   }
   return found;

@@ -28,24 +28,29 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { frontmatter } from './lib/corpus.mjs';
+
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(here, '..');
 export const SUBJECT = 'CONTEXT.md';
 export const BASELINE = path.join(REPO_ROOT, 'docs/evals/glossary-baseline.json');
 
 export function measure(text) {
-  const lines = text.split('\n');
+  // The frontmatter is read off by the corpus, not by a second fence-finder
+  // here (#504); `offset` puts the line numbers back on the whole file, which
+  // is what a failure has to name.
+  const { body } = frontmatter(text);
+  const lines = body.split('\n');
+  const offset = text.split('\n').length - lines.length;
   const failures = [];
-  let inFront = false;
   let inFence = false;
   let inComment = false;
   let prose = 0;
   let section = null;
   const sections = new Map(); // heading -> table rows
-  lines.forEach((raw, i) => {
+  lines.forEach((raw, index) => {
+    const i = index + offset;
     const l = raw.trimEnd();
-    if (i === 0 && l === '---') { inFront = true; return; }
-    if (inFront) { if (l === '---') inFront = false; return; }
     if (l.startsWith('```')) { inFence = !inFence; if (inFence) failures.push(`line ${i + 1}: fenced code in the glossary`); return; }
     if (inFence) return;
     if (l.startsWith('<!--')) inComment = true;

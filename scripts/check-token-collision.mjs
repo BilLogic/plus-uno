@@ -55,6 +55,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { documents } from './lib/corpus.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const SCAN_ROOT = path.join(REPO_ROOT, 'design-system', 'src');
@@ -354,15 +356,10 @@ function overridden({ bg, fg, foregrounds }) {
   });
 }
 
-function scssFiles(dir) {
-  const out = [];
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const p = path.join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...scssFiles(p));
-    else if (entry.name.endsWith('.scss')) out.push(p);
-  }
-  return out.sort();
-}
+const scssFiles = (dir) =>
+  documents(path.relative(REPO_ROOT, dir), { root: REPO_ROOT, ext: ['.scss'] }).map((rel) =>
+    path.join(REPO_ROOT, rel),
+  );
 
 function main() {
   const files = scssFiles(SCAN_ROOT);

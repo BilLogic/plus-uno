@@ -55,13 +55,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { documents } from './lib/corpus.mjs';
+
 /** Every `--token:` declared under `design-system/src/tokens`. */
 export function ourTokens(repoRoot) {
-  const dir = path.join(repoRoot, 'design-system/src/tokens');
   const names = new Set();
-  for (const file of fs.readdirSync(dir)) {
-    if (!file.endsWith('.scss')) continue;
-    const text = fs.readFileSync(path.join(dir, file), 'utf8');
+  for (const file of documents('design-system/src/tokens/*.scss', { root: repoRoot, ext: ['.scss'] })) {
+    const text = fs.readFileSync(path.join(repoRoot, file), 'utf8');
     for (const m of text.matchAll(/^\s*(--[a-z][a-z0-9-]*)\s*:/gm)) names.add(m[1]);
   }
   return [...names].sort();

@@ -69,6 +69,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { IGNORED_DIRS, documents } from './lib/corpus.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 
@@ -80,18 +82,14 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const DOCS_STYLE_DIR = path.join(REPO_ROOT, '.storybook');
 
 /** Where a class may be emitted from. Anything else is not a source of DOM. */
-const SOURCE_EXTENSIONS = /\.(mdx|jsx?|tsx?|html|json|scss|css)$/;
+const SOURCE_EXTENSIONS = ['.mdx', '.js', '.jsx', '.ts', '.tsx', '.html', '.json', '.scss', '.css'];
 
-/** Directories that hold no authored source. `.claude/` is worktrees, not code. */
-const SKIP_DIRS = new Set([
-  'node_modules',
-  '.git',
-  '.claude',
-  'dist',
-  'storybook-static',
-  'coverage',
-  '.test-build',
-]);
+/**
+ * Directories that hold no authored source. The list this check used to carry
+ * privately — `.claude/` is worktrees, not code — is now `IGNORED_DIRS` in the
+ * corpus, which absorbed it whole (#503).
+ */
+const SKIP_DIRS = IGNORED_DIRS;
 
 /**
  * Classes Storybook and its addons put in the DOM. This repo is not their source, so
@@ -189,23 +187,11 @@ export function selectorClasses(css) {
 
 /** Every authored source file that could put a class in the DOM. */
 export function sourceFiles(root, { skip = SKIP_DIRS, exclude = new Set() } = {}) {
-  const out = [];
-  const walk = (dir) => {
-    let entries;
-    try {
-      entries = fs.readdirSync(dir, { withFileTypes: true });
-    } catch {
-      return;
-    }
-    for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
-      if (skip.has(entry.name)) continue;
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) walk(full);
-      else if (SOURCE_EXTENSIONS.test(entry.name) && !exclude.has(full)) out.push(full);
-    }
-  };
-  walk(root);
-  return out;
+  // `skipDotDirs: false` because `.storybook/` and `.github/` are authored here;
+  // the dot-directories that are not are named in `skip`.
+  return documents('.', { root, ext: SOURCE_EXTENSIONS, ignore: skip, skipDotDirs: false })
+    .map((rel) => path.join(root, rel))
+    .filter((abs) => !exclude.has(abs));
 }
 
 /**
@@ -233,13 +219,9 @@ export function emitterIndex(texts) {
 // ── the CLI ─────────────────────────────────────────────────────────────────────────
 
 const cssFiles = (dir) =>
-  fs.existsSync(dir)
-    ? fs
-        .readdirSync(dir)
-        .filter((f) => f.endsWith('.css'))
-        .sort()
-        .map((f) => path.join(dir, f))
-    : [];
+  documents(`${path.relative(REPO_ROOT, dir)}/*.css`, { root: REPO_ROOT, ext: ['.css'] }).map((rel) =>
+    path.join(REPO_ROOT, rel),
+  );
 
 function main() {
   const files = cssFiles(DOCS_STYLE_DIR);

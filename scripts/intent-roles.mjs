@@ -48,6 +48,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { documents } from './lib/corpus.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, '..');
 
@@ -73,23 +75,12 @@ export const EDGE = new RegExp(
 
 const BASE = new RegExp(`var\\(\\s*(--color-(?:${INTENTS.join('|')}))\\s*[,)]`, 'g');
 
-export function stylesheets(root = REPO_ROOT, dir = CORPUS, out = []) {
-  const full = path.join(root, dir);
-  let entries;
-  try {
-    entries = fs.readdirSync(full, { withFileTypes: true });
-  } catch {
-    return out;
-  }
-  for (const entry of entries) {
-    if (entry.name === 'node_modules') continue;
-    const rel = path.join(dir, entry.name);
-    if (entry.isDirectory()) stylesheets(root, rel, out);
-    // `tokens/` DEFINES the roles; `--color-danger-border: var(--color-danger)`
-    // is the definition of the role, not a call site that skipped it.
-    else if (/\.(scss|css)$/.test(entry.name) && !rel.includes(`${path.sep}tokens${path.sep}`)) out.push(rel);
-  }
-  return out;
+export function stylesheets(root = REPO_ROOT, dir = CORPUS) {
+  // `tokens/` DEFINES the roles; `--color-danger-border: var(--color-danger)`
+  // is the definition of the role, not a call site that skipped it.
+  return documents(dir, { root, ext: ['.scss', '.css'] }).filter(
+    (file) => !file.includes('/tokens/'),
+  );
 }
 
 /** `border`/`outline` uses of an intent BASE, one entry per token occurrence. */

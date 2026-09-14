@@ -156,6 +156,6 @@ jobs:
           max-turns: "60"
           # Injection boundary: repo reads + issue filing + the checklist's
           # named script. No arbitrary shell, no network beyond gh.
-          allowed-tools: "Read,Grep,Glob,Bash(gh issue list:*),Bash(gh issue create:*),Bash(bash scripts/validate-doc-links.sh:*)"
+          allowed-tools: "Read,Grep,Glob,Bash(gh issue list:*),Bash(gh issue create:*),Bash(node scripts/check-doc-links.mjs:*)"
           sa-email: ${{ secrets.GEMINI_SA_EMAIL }}
           sa-private-key: ${{ secrets.GEMINI_SA_PRIVATE_KEY }}
