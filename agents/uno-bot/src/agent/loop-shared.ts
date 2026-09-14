@@ -1,7 +1,8 @@
-// Provider-neutral contract + per-turn scope shared by the loop and the Claude
-// path that has not moved onto it yet (claude-agent.ts, #496).
+// Provider-neutral contract + per-turn scope, shared by both wiring functions
+// (gemini-agent.ts, claude-agent.ts) and the tool bodies the loop calls into.
 //
-// WHAT IS LEFT HERE, after the loop landed (#495):
+// WHAT IS LEFT HERE, after the loop landed (#495) and Claude moved behind the
+// seam with it (#496):
 //   - `AgentInput`: the turn contract the Worker calls an agent with. `Env`
 //     enters here and stops here; the loop itself takes named ports.
 //   - The per-turn AsyncLocalStorage scope (tool ledger, correction flag,

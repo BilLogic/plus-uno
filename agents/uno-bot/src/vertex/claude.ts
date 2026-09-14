@@ -11,9 +11,9 @@
 // (Confirmed against platform.claude.com/docs .../claude-on-vertex-ai.)
 //
 // rawPredict is non-streaming — fine here because this lane attaches NO
-// server-side MCP (every tool round is its own short HTTP call in the client
-// loop, agent/claude-agent.ts), so the long-single-request 524 that forced
-// streaming on the old direct-Anthropic path can't occur.
+// server-side MCP (every tool round is its own short HTTP call, driven by the
+// one agent loop through agent/providers/claude.ts), so the long-single-request
+// 524 that forced streaming on the old direct-Anthropic path can't occur.
 
 import type { Env } from "../types";
 import { getGoogleAccessToken } from "../gemini/auth";
