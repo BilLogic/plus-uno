@@ -1,8 +1,14 @@
 name: uno-bot — evals (R-scenarios vs live Worker)
 
 # Runs docs/evals/fixtures/uno-bot-cases.json through the DEPLOYED Worker's
-# /debug/eval route (headless agent turns — nothing posts to Slack/Notion;
-# proposals come back as data) and scores each case with deterministic checks
+# /debug/eval route — which since #499 is an ADAPTER over the Turn module, so a
+# case takes the same turn a Slack message does (preflight, the confidence
+# pre-check, the absence check, the draft judge, the history write) with Delivery
+# recording instead of posting and a resolution recorded instead of executed:
+# still nothing reaches Slack or Notion, and proposals still come back as data.
+# THE FIRST RUN ON A BUILD CARRYING #499 IS THE RE-BASELINE — record its
+# per-case before/after against the last pre-#499 run in docs/evals/runs/
+# (docs/evals/README.md § RE-BASELINE PENDING). Scores each case with deterministic checks
 # + a Gemini judge against the D1-D9 rubric. A failing BLOCKER case fails the
 # job. Full transcripts upload as the eval-results artifact for reasoning
 # investigation.
