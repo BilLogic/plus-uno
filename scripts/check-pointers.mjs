@@ -29,8 +29,13 @@ import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { byRoot, main } from './lib/findings.mjs';
+
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(here, '..');
+
+export const REMEDY =
+  '  -> a pointer that does not resolve, or buries its trigger, is a document the agent will not reach.';
 
 /** The always-loaded routers. */
 export const SUBJECTS = ['AGENTS.md'];
@@ -128,13 +133,18 @@ export function sweep(root = REPO_ROOT, subjects = SUBJECTS) {
   return { failures, pointers, triggers };
 }
 
-const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isMain) {
-  const { failures, pointers, triggers } = sweep();
-  if (failures.length) {
-    console.error(`[check-pointers] ${failures.length} pointer(s) failed:\n` + failures.map((f) => `  ${f}`).join('\n'));
-    console.error('  -> a pointer that does not resolve, or buries its trigger, is a document the agent will not reach.');
-    process.exit(1);
-  }
-  console.log(`[check-pointers] OK — ${pointers} pointers resolve, ${triggers} triggers lead with their word (${SUBJECTS.join(', ')})`);
+/** One sweep of the routers, shared by the findings and the green line. */
+const swept = byRoot((repoRoot) => sweep(repoRoot));
+
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  return swept(repoRoot).failures.map((message) => ({ message }));
 }
+
+/** The green line, which carries how much of the router was actually swept. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { pointers, triggers } = swept(repoRoot);
+  return `${pointers} pointers resolve, ${triggers} triggers lead with their word (${SUBJECTS.join(', ')})`;
+}
+
+main(import.meta.url, 'check:pointers', { run, summary, remedy: REMEDY });

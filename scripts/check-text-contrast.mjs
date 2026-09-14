@@ -40,16 +40,16 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { AA_TEXT, PAGE_TOKEN } from './button-contrast.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 import {
   census,
   findings,
   keyOf,
   ratchetFailures,
   readValues,
-  report,
   stylesheets,
   textDeclarations,
 } from './text-contrast.mjs';
@@ -58,15 +58,71 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const BASELINE = 'docs/evals/text-contrast-baseline.json';
 
-const values = readValues(REPO_ROOT);
-const files = stylesheets(REPO_ROOT);
-const uses = textDeclarations(files, REPO_ROOT);
-const found = findings(uses, values);
-const counts = census(found);
+/**
+ * The paragraph `scripts/text-contrast.mjs` closed its own report with, kept
+ * here because it is the remedy and the renderer prints remedies. The mistake it
+ * heads off is the tempting one: moving a declaration until the check stops
+ * seeing the ground, which changes nothing a reader can see.
+ */
+export const REMEDY =
+  `  A ground is read from the declaration's OWN rule. One set by an ancestor is\n` +
+  `  invisible here — if that is what happened, the check is wrong and should learn\n` +
+  `  the ground; do not silence it by moving the declaration.`;
 
-if (process.argv.includes('--update')) {
-  const existing = fs.existsSync(path.join(REPO_ROOT, BASELINE))
-    ? JSON.parse(fs.readFileSync(path.join(REPO_ROOT, BASELINE), 'utf8')).findings
+/**
+ * The token values, the stylesheet sweep and the contrast maths over it — once
+ * per repo root. 646 declarations across 158 stylesheets, and `run`, `summary`
+ * and `--update` all want the same census of them.
+ */
+const inputs = byRoot((repoRoot) => {
+  const values = readValues(repoRoot);
+  const files = stylesheets(repoRoot);
+  const uses = textDeclarations(files, repoRoot);
+  const found = findings(uses, values);
+  return { values, files, uses, found, counts: census(found) };
+});
+
+const baselineOf = (repoRoot) =>
+  JSON.parse(fs.readFileSync(path.join(repoRoot, BASELINE), 'utf8')).findings;
+
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { counts } = inputs(repoRoot);
+  const baseline = baselineOf(repoRoot);
+
+  const found = ratchetFailures(counts, baseline).map((message) => ({ message }));
+
+  // An entry recorded with the placeholder reason is a run where somebody
+  // pressed `--update` and skipped the only step that mattered. It fails on its
+  // own, separately from the ratchet, because nothing about the counts is wrong.
+  const unreviewed = Object.entries(baseline).filter(([, entry]) => entry.why.startsWith('UNREVIEWED'));
+  if (unreviewed.length) {
+    found.push({
+      message:
+        `${unreviewed.length} baseline entr${unreviewed.length === 1 ? 'y has' : 'ies have'} ` +
+        `no reason:\n${unreviewed.map(([k]) => `  ${k}`).join('\n')}\n` +
+        '  --update records the finding; only a person can record why it is allowed to stand.',
+    });
+  }
+  return found;
+}
+
+/** The green line: the size of the sweep, and how much of it is recorded. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { files, uses, found } = inputs(repoRoot);
+  const distinct = new Set(uses.map((u) => u.token)).size;
+  return (
+    `${uses.length} color: declarations across ${files.length} stylesheets, ` +
+    `${distinct} distinct tokens. ${found.length} below AA ${AA_TEXT}:1, all recorded with a reason ` +
+    `(${Object.keys(baselineOf(repoRoot)).length} entries).`
+  );
+}
+
+/** `--update` re-records the baseline. A write, so it stays out of `run`. */
+function update(repoRoot = REPO_ROOT) {
+  const { found, counts } = inputs(repoRoot);
+  const existing = fs.existsSync(path.join(repoRoot, BASELINE))
+    ? JSON.parse(fs.readFileSync(path.join(repoRoot, BASELINE), 'utf8')).findings
     : {};
   const next = {};
   for (const finding of found) {
@@ -81,35 +137,23 @@ if (process.argv.includes('--update')) {
     };
   }
   fs.writeFileSync(
-    path.join(REPO_ROOT, BASELINE),
+    path.join(repoRoot, BASELINE),
     `${JSON.stringify({ measured: `AA ${AA_TEXT}:1, ground from each rule, page fallback ${PAGE_TOKEN}`, findings: next }, null, 2)}\n`,
   );
   console.log(`[text-contrast] wrote ${Object.keys(next).length} entries to ${BASELINE}`);
-  process.exit(0);
 }
 
-const baseline = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, BASELINE), 'utf8')).findings;
-const failures = ratchetFailures(counts, baseline);
-const unreviewed = Object.entries(baseline).filter(([, entry]) => entry.why.startsWith('UNREVIEWED'));
-
-if (failures.length || unreviewed.length) {
-  if (failures.length) {
-    console.error(`[text-contrast] the baseline moved the wrong way:\n\n${failures.join('\n\n')}\n`);
-  }
-  if (unreviewed.length) {
-    console.error(
-      `[text-contrast] ${unreviewed.length} baseline entr${unreviewed.length === 1 ? 'y has' : 'ies have'} ` +
-        `no reason:\n${unreviewed.map(([k]) => `  ${k}`).join('\n')}\n` +
-        '  --update records the finding; only a person can record why it is allowed to stand.\n',
-    );
-  }
-  console.error(report(found));
-  process.exit(1);
+// `--update` writes a file, so it belongs to the CLI and not to `run` — and it
+// runs only when this module IS the process, never when the runner imports it.
+// The CLI is one branch or the other. A side flag prints (or writes) instead of
+// gating, so the gate does not also run; `main()` re-checks the entry guard for
+// itself, which is what keeps an import of this module reaching neither.
+if (
+  process.argv[1] &&
+  pathToFileURL(process.argv[1]).href === import.meta.url &&
+  process.argv.includes('--update')
+) {
+  update();
+} else {
+  main(import.meta.url, 'check:text-contrast', { run, summary, remedy: REMEDY });
 }
-
-const distinct = new Set(uses.map((u) => u.token)).size;
-console.log(
-  `[text-contrast] ${uses.length} color: declarations across ${files.length} stylesheets, ` +
-    `${distinct} distinct tokens. ${found.length} below AA ${AA_TEXT}:1, all recorded with a reason ` +
-    `(${Object.keys(baseline).length} entries).`,
-);

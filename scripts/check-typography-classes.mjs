@@ -56,6 +56,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { documents } from './lib/corpus.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -80,6 +81,14 @@ const TYPE_PROPERTY = /(^|[\s;{])(font-size|font-family|font-weight|line-height|
 
 /** Every `something-txt` identifier, wherever it appears. */
 const TXT_CLASS = /\b([a-z][a-z0-9]*(?:-[a-z0-9]+)*-txt)\b/g;
+
+/**
+ * The closing prose of the old report, which is the remedy: a class that does
+ * not exist cannot fail loudly, so the only cue anyone gets is this line.
+ */
+export const REMEDY =
+  '  A class that does not exist does not fail — the element simply keeps its own\n' +
+  '  type, one step off the scale that was asked for, with nothing to notice it.';
 
 /**
  * Every file under the roots, repo-relative.
@@ -128,11 +137,11 @@ export function blockAfter(source, offset) {
  * class listed in `a, .b-txt { … }` is defined by that block, but a class that
  * appears after the block opened is inside it and is a different rule.
  */
-export function definedClasses(files) {
+export function definedClasses(files, root = REPO_ROOT) {
   const defined = new Map();
   for (const file of files) {
     if (!DEF_EXT.has(path.extname(file))) continue;
-    const source = fs.readFileSync(path.join(REPO_ROOT, file), 'utf8');
+    const source = fs.readFileSync(path.join(root, file), 'utf8');
     for (const match of source.matchAll(TXT_CLASS)) {
       const name = match[1];
       const body = blockAfter(source, match.index);
@@ -145,11 +154,11 @@ export function definedClasses(files) {
 }
 
 /** Every place a `-txt` class is asked for, as `{ class, file, line }`. */
-export function usedClasses(files) {
+export function usedClasses(files, root = REPO_ROOT) {
   const uses = [];
   for (const file of files) {
     if (!USE_EXT.has(path.extname(file))) continue;
-    const source = fs.readFileSync(path.join(REPO_ROOT, file), 'utf8');
+    const source = fs.readFileSync(path.join(root, file), 'utf8');
     const lines = source.split('\n');
     lines.forEach((text, index) => {
       for (const match of text.matchAll(TXT_CLASS)) {
@@ -172,46 +181,66 @@ export function suggestionFor(name) {
   return /^h[1-6]$/.test(stem) ? `.${stem}` : null;
 }
 
-export function report(missing) {
+/**
+ * One block per undefined class: every place it was asked for, and the class
+ * that exists instead. Grouped by class rather than listed by use, because
+ * eleven uses of `.h1-txt` are one mistake made eleven times and reading them
+ * as eleven findings buries that.
+ */
+export function blocks(missing) {
   const byClass = new Map();
   for (const use of missing) {
     if (!byClass.has(use.class)) byClass.set(use.class, []);
     byClass.get(use.class).push(use);
   }
-  const blocks = [...byClass.entries()].map(([name, uses]) => {
+  return [...byClass.entries()].map(([name, uses]) => {
     const hint = suggestionFor(name);
     return (
-      `  .${name} — asked for ${uses.length} time${uses.length === 1 ? '' : 's'}, defined nowhere\n` +
+      `.${name} — asked for ${uses.length} time${uses.length === 1 ? '' : 's'}, defined nowhere\n` +
       uses.map((u) => `      ${u.file}:${u.line}`).join('\n') +
       (hint ? `\n      → this system's heading class is ${hint}; there is no -txt form.` : '')
     );
   });
+}
+
+/**
+ * The whole report as one string. Kept because the tests assert on it, and
+ * because it is still the readable form of the same facts `run` returns.
+ */
+export function report(missing) {
   return (
     `[typography-classes] ${missing.length} use${missing.length === 1 ? '' : 's'} of a ` +
-    `*-txt class that no rule defines:\n\n${blocks.join('\n\n')}\n\n` +
-    '  A class that does not exist does not fail — the element simply keeps its own\n' +
-    '  type, one step off the scale that was asked for, with nothing to notice it.'
+    `*-txt class that no rule defines:\n\n${blocks(missing)
+      .map((block) => `  ${block}`)
+      .join('\n\n')}\n\n${REMEDY}`
   );
 }
 
-function main() {
-  const files = corpusFiles();
+/**
+ * Both directions over one walk. `run` asks which uses resolve to nothing and
+ * `summary` asks how many classes the ones that resolve resolve TO, and the walk
+ * behind both is every file under four roots.
+ */
+const inputs = byRoot((repoRoot) => {
+  const files = corpusFiles(repoRoot);
+  const defined = definedClasses(files, repoRoot);
+  const uses = usedClasses(files, repoRoot);
+  return { defined, uses, missing: uses.filter((u) => !defined.has(u.class)) };
+});
 
-  const defined = definedClasses(files);
-  const uses = usedClasses(files);
-  const missing = uses.filter((u) => !defined.has(u.class));
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  return blocks(inputs(repoRoot).missing).map((message) => ({ message }));
+}
 
-  if (missing.length) {
-    console.error(report(missing));
-    process.exit(1);
-  }
-
+/** The green line, which names the classes that DO exist — the ones to reach for. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { defined, uses } = inputs(repoRoot);
   const names = [...defined.keys()].sort();
-  console.log(
-    `[typography-classes] ${uses.length} uses across ${ROOTS.length} roots, all resolving to ` +
-      `${names.length} defined classes:\n  ${names.join(' ')}`,
+  return (
+    `${uses.length} uses across ${ROOTS.length} roots, all resolving to ` +
+    `${names.length} defined classes:\n  ${names.join(' ')}`
   );
 }
 
-// Importing this module for its exports must not run the check.
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
+main(import.meta.url, 'check:typography-classes', { run, summary, remedy: REMEDY });

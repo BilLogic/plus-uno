@@ -29,80 +29,93 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { documents } from './lib/corpus.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const TOKENS = path.join(REPO_ROOT, 'design-system/src/tokens');
 
-const digest = () =>
+export const REMEDY =
+  '  -> `npm run generate:tokens` is documented in skills/uno-maintain as the way\n' +
+  '     to regenerate SCSS from source. It has to be safe to run.';
+
+const digest = (repoRoot) =>
   Object.fromEntries(
-    documents('design-system/src/tokens/*.scss', { root: REPO_ROOT, ext: ['.scss'] }).map((rel) => [
+    documents('design-system/src/tokens/*.scss', { root: repoRoot, ext: ['.scss'] }).map((rel) => [
       path.basename(rel),
-      crypto.createHash('sha256').update(fs.readFileSync(path.join(REPO_ROOT, rel))).digest('hex'),
+      crypto.createHash('sha256').update(fs.readFileSync(path.join(repoRoot, rel))).digest('hex'),
     ]),
   );
 
-const before = digest();
-
-/*
- * spawnSync, not execFileSync. The refusal is written with `console.error`, and
- * execFileSync returns only stdout when the child exits 0 — so a mutation that
- * printed the refusal and forgot to exit read as a clean pass. That is the exact
- * defect this check exists to catch, and it slipped through the first draft
- * until the mutation test went looking for it.
+/**
+ * The measurement: hash the token files, run the generator dry, hash them
+ * again. It is a spawn because that is what is under test — not because the
+ * check cannot be a function — so it happens inside `run`, once per root, and
+ * `summary` reads the same result rather than running the generator twice.
  */
-const run = spawnSync('node', ['scripts/generate-all-tokens.js', '--dry-run'], {
-  cwd: REPO_ROOT,
-  encoding: 'utf8',
+const measure = byRoot((repoRoot) => {
+  const before = digest(repoRoot);
+
+  /*
+   * spawnSync, not execFileSync. The refusal is written with `console.error`, and
+   * execFileSync returns only stdout when the child exits 0 — so a mutation that
+   * printed the refusal and forgot to exit read as a clean pass. That is the exact
+   * defect this check exists to catch, and it slipped through the first draft
+   * until the mutation test went looking for it.
+   */
+  const generator = spawnSync('node', ['scripts/generate-all-tokens.js', '--dry-run'], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+  });
+  const output = `${generator.stdout ?? ''}${generator.stderr ?? ''}`;
+  const status = generator.status ?? 1;
+
+  const after = digest(repoRoot);
+  return { before, after, output, status, shrinks: output.includes('Refusing to write') };
 });
-const output = `${run.stdout ?? ''}${run.stderr ?? ''}`;
-const status = run.status ?? 1;
 
-const after = digest();
-const found = [];
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { before, after, status, shrinks } = measure(repoRoot);
+  const found = [];
 
-const shrinks = output.includes('Refusing to write');
-if (shrinks && status === 0) {
-  found.push('the generator said a file would shrink and still exited 0 — the refusal is cosmetic.');
-}
-if (!shrinks && status !== 0) {
-  found.push(`the generator exited ${status} without saying why. A refusal has to name what it saved.`);
+  if (shrinks && status === 0) {
+    found.push('the generator said a file would shrink and still exited 0 — the refusal is cosmetic.');
+  }
+  if (!shrinks && status !== 0) {
+    found.push(`the generator exited ${status} without saying why. A refusal has to name what it saved.`);
+  }
+
+  for (const [file, hash] of Object.entries(before)) {
+    if (after[file] !== hash) found.push(`${file} CHANGED during --dry-run. Nothing may be written on that path.`);
+  }
+  for (const file of Object.keys(after)) {
+    if (!(file in before)) found.push(`${file} was created during --dry-run.`);
+  }
+
+  /*
+   * The claim that used to be printed unconditionally beside a validation that had
+   * been commented out. Read from the SOURCE rather than from the run: on the
+   * refusal path the generator exits long before reaching that line, so watching
+   * the output would be watching a branch that is not taken.
+   */
+  const source = fs.readFileSync(path.join(repoRoot, 'scripts/generate-all-tokens.js'), 'utf8');
+  if (/console\.log\([`'"]✅[^`'"]*Validation passed/.test(source)) {
+    found.push(
+      'the generator still prints "✅ Validation passed" — validateSemanticTokens is ' +
+        'commented out, so that is a claim and not a result.',
+    );
+  }
+
+  return found.map((message) => ({ message }));
 }
 
-for (const [file, hash] of Object.entries(before)) {
-  if (after[file] !== hash) found.push(`${file} CHANGED during --dry-run. Nothing may be written on that path.`);
-}
-for (const file of Object.keys(after)) {
-  if (!(file in before)) found.push(`${file} was created during --dry-run.`);
-}
-
-/*
- * The claim that used to be printed unconditionally beside a validation that had
- * been commented out. Read from the SOURCE rather than from the run: on the
- * refusal path the generator exits long before reaching that line, so watching
- * the output would be watching a branch that is not taken.
- */
-const source = fs.readFileSync(path.join(REPO_ROOT, 'scripts/generate-all-tokens.js'), 'utf8');
-if (/console\.log\([`'"]✅[^`'"]*Validation passed/.test(source)) {
-  found.push(
-    'the generator still prints "✅ Validation passed" — validateSemanticTokens is ' +
-      'commented out, so that is a claim and not a result.',
+/** The green line, which carries the exit code and which branch earned it. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { status, shrinks } = measure(repoRoot);
+  return (
+    `--dry-run wrote nothing, exit ${status} ` +
+    `${shrinks ? 'with a named refusal' : 'and no file would shrink'}`
   );
 }
 
-if (found.length) {
-  console.error(`\n[token-generation] ${found.length} finding(s):`);
-  for (const f of found) console.error(`  ${f}`);
-  console.error(`\n${'─'.repeat(72)}`);
-  console.error('✗ check:token-generation\n');
-  console.error(
-    '  -> `npm run generate:tokens` is documented in skills/uno-maintain as the way\n' +
-      '     to regenerate SCSS from source. It has to be safe to run.',
-  );
-  process.exit(1);
-}
-
-console.log(
-  `✓ check:token-generation — --dry-run wrote nothing, exit ${status} ` +
-    `${shrinks ? 'with a named refusal' : 'and no file would shrink'}`,
-);
+main(import.meta.url, 'check:token-generation', { run, summary, remedy: REMEDY });

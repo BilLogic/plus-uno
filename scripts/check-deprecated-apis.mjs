@@ -24,6 +24,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { byRoot, main } from './lib/findings.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 
@@ -38,13 +40,18 @@ export const TRIPWIRES = [
   // from the repo rather than waiting for Storybook 11 to remove it. A settled
   // bet is deleted, not left armed against code that no longer exists.
   //
-  // An empty list is why `main()` says so OUT LOUD on every run. A tripwire file
-  // with nothing in it passes unconditionally, and a green line reading "every
-  // dependency range still pinned below its removal" would be a true sentence
-  // that means nothing — exactly the shape of guard this repo keeps finding and
-  // removing. The zero case gets its own message so the output can never be
-  // mistaken for cover.
+  // An empty list is why the green line says so OUT LOUD on every run. A
+  // tripwire file with nothing in it passes unconditionally, and a green line
+  // reading "every dependency range still pinned below its removal" would be a
+  // true sentence that means nothing — exactly the shape of guard this repo
+  // keeps finding and removing. The zero case gets its own message so the
+  // output can never be mistaken for cover.
 ];
+
+export const REMEDY =
+  '  -> The declared range is what is read, not the installed tree, so the break is\n' +
+  '     caught in the PR that widens the range. Land the port there, or pin below the\n' +
+  '     removal; each finding names the ticket that carries the work.';
 
 /** The lowest major a range can resolve to — `^10.5.0` -> 10, `>=9` -> 9. */
 export function floorMajor(range) {
@@ -76,50 +83,41 @@ export function check(pkg, tripwires = TRIPWIRES) {
   return due;
 }
 
-function main() {
-  const pkg = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
+const manifest = byRoot((repoRoot) =>
+  JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8')),
+);
 
-  if (process.argv.includes('--list')) {
-    console.log(`check:deprecated-apis watches ${TRIPWIRES.length} API(s):\n`);
-    for (const t of TRIPWIRES) {
-      console.log(`  ${t.dep} < ${t.removedIn} — ${t.api}\n    used by ${t.uses}, ported by ${t.ticket}`);
-    }
-    return 0;
-  }
-
-  const due = check(pkg);
-
-  if (due.length) {
-    console.error(
-      `\n[deprecated-apis] ${due.length} dependency range now reaches a major that removes an API in use:\n` +
-        due
-          .map(
-            (t) =>
-              `  ${t.dep} ${t.range} can resolve to ${t.removedIn}.x, which removes ${t.api}\n` +
-              `    still used by ${t.uses}\n` +
-              `    ${t.note}\n` +
-              `    -> Land the port in this PR, or pin below ${t.removedIn}. History: ${t.ticket}.`,
-          )
-          .join('\n\n'),
-    );
-    return 1;
-  }
-
-  if (!TRIPWIRES.length) {
-    console.log(
-      '[deprecated-apis] 0 tripwires armed — this check is currently measuring NOTHING.\n' +
-        '  It passes because there is nothing to test, not because anything was verified.\n' +
-        '  Arm one by adding to TRIPWIRES when a dependency deprecates an API this repo uses.',
-    );
-    return 0;
-  }
-
-  console.log(
-    `[deprecated-apis] ${TRIPWIRES.length} watched API(s), every dependency range still pinned below its removal.`,
-  );
-  return 0;
+/**
+ * One finding per tripwire that has come due, each carrying its own remedy:
+ * which major removes what, who still calls it, and the ticket that ports it.
+ *
+ * @returns {import('./lib/findings.mjs').Finding[]}
+ */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  return check(manifest(repoRoot)).map((t) => ({
+    message:
+      `${t.dep} ${t.range} can resolve to ${t.removedIn}.x, which removes ${t.api}\n` +
+      `    still used by ${t.uses}\n` +
+      `    ${t.note}\n` +
+      `    -> Land the port in this PR, or pin below ${t.removedIn}. History: ${t.ticket}.`,
+  }));
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  process.exit(main());
+/** The green line. With nothing armed it says what it did NOT measure. */
+export const summary = () =>
+  TRIPWIRES.length
+    ? `${TRIPWIRES.length} watched API(s), every dependency range still pinned below its removal.`
+    : '0 tripwires armed — this check is currently measuring NOTHING.\n' +
+      '  It passes because there is nothing to test, not because anything was verified.\n' +
+      '  Arm one by adding to TRIPWIRES when a dependency deprecates an API this repo uses.';
+
+// `--list` prints the armed bets rather than testing them — a side path, so it
+// is answered here and never from `run`, which only ever reads and reports.
+if (process.argv.includes('--list')) {
+  console.log(`check:deprecated-apis watches ${TRIPWIRES.length} API(s):\n`);
+  for (const t of TRIPWIRES) {
+    console.log(`  ${t.dep} < ${t.removedIn} — ${t.api}\n    used by ${t.uses}, ported by ${t.ticket}`);
+  }
+} else {
+  main(import.meta.url, 'check:deprecated-apis', { run, summary, remedy: REMEDY });
 }

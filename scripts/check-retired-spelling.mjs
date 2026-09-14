@@ -44,9 +44,15 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { documents } from './lib/corpus.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(here, '..');
+
+export const REMEDY =
+  '  -> CONTEXT.md § Harness & workflow terms names the current words. The old\n' +
+  '     spelling may fall out of live docs and may not come back: a maintenance\n' +
+  '     "Tier 1" now reads as a LOADING tier to every agent that opens the glossary.';
 
 /** Roots swept, relative to the repo. */
 export const ROOTS = [
@@ -168,13 +174,26 @@ export function sweep(root = REPO_ROOT) {
   return { files: files.length, findings };
 }
 
-const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isMain) {
-  const { files, findings } = sweep();
-  if (findings.length) {
-    console.error(`[check:retired-spelling] ${findings.length} retired spelling(s) in ${files} swept files — CONTEXT.md § Harness & workflow terms names the current words:`);
-    for (const f of findings) console.error(`  ${f.file}:${f.line}  "${f.text}" — ${f.why}`);
-    process.exit(1);
-  }
-  console.log(`[check:retired-spelling] ${files} files swept, no retired maintenance spelling.`);
+/** One sweep of the tree, shared by the findings and the green line. */
+const swept = byRoot((repoRoot) => sweep(repoRoot));
+
+/**
+ * Each retired spelling, located. The sweep already knows the file and the
+ * line, so they travel as such rather than inside the sentence.
+ *
+ * @returns {import('./lib/findings.mjs').Finding[]}
+ */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  return swept(repoRoot).findings.map((f) => ({
+    file: f.file,
+    line: f.line,
+    message: `"${f.text}" — ${f.why}`,
+  }));
 }
+
+/** The green line, which carries the size of the corpus the sweep vouches for. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  return `${swept(repoRoot).files} files swept, no retired maintenance spelling.`;
+}
+
+main(import.meta.url, 'check:retired-spelling', { run, summary, remedy: REMEDY });
