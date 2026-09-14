@@ -26,6 +26,17 @@
  * "suggested tier", the 1/2 slash form, the old file names). A loading use —
  * "Tier 2 — loaded on demand", "## Tier-2 loads" — matches none of them.
  *
+ * THE SECOND RETIREMENT: "lane" in the MODEL-PROVIDER sense (#497). uno-bot ran
+ * two agent loops called the "Gemini lane" and the "Claude lane" until #495/#496
+ * collapsed them into one loop behind the ModelProvider seam; the word is now
+ * "provider" or "adapter". **lane** keeps one meaning and it is the blueprint's:
+ * the actor row a cell sits on (CONTEXT.md § Two vocabularies, ADR-023), which
+ * is a CONTRACT name — `filter_lane_role`, a `lane` column, "| Lane | Step |".
+ * So the shapes below are the provider PHRASES and never the bare word: "Gemini
+ * lane", "model lane", "both lanes". A blueprint lane, a review lens that stays
+ * "in its lane", AGENT.md § My lane and an intake with "no separate lane" match
+ * none of them.
+ *
  * Run: npm run check:retired-spelling
  */
 import { readFileSync } from 'node:fs';
@@ -71,10 +82,32 @@ export const RETIRED = [
   { re: /\buno-tier1-digest\b/g, why: 'the headless skill is scripts/prompts/uno-direct-fix-digest' },
   { re: /\bweekly-tier1-digest\b/g, why: 'the workflow is weekly-direct-fix-digest.yml' },
   { re: /\bNO_TIER1_THIS_WEEK\b/g, why: 'the digest sentinel is NO_DIRECT_FIXES_THIS_WEEK' },
+  // "lane" in the model-provider sense. Anchored on the provider word beside it,
+  // so the blueprint's actor row — the only surviving meaning — always passes.
+  {
+    re: /\b(?:Gemini|Claude|Vertex-Claude|Anthropic|model|models|provider|providers|agent|agents|production|active|fallback|backup)[- ]lanes?\b/gi,
+    why: 'the model-provider sense of "lane" is retired — say provider, ModelProvider or adapter ("lane" is the blueprint\'s actor row)',
+  },
+  {
+    re: /\b(?:both|two|either|each|per)[- ](?:provider |model |agent )?lanes?\b/gi,
+    why: 'there is one agent loop and two adapters behind the ModelProvider seam — count adapters or providers, not lanes',
+  },
+  {
+    re: /\blanes?[- ](?:honours?|honors?|report|reports|run|runs|log|logs)\b/gi,
+    why: 'an adapter honours/reports/runs — "lane" in the provider sense is retired',
+  },
 ];
 
-/** The glossary row that owns the old spelling: its "Do NOT use" cell is exempt. */
-const GLOSSARY_ROW = /^\| \*\*direct fix \/ gated change\*\* \|/;
+/**
+ * The glossary rows that OWN a retired spelling: their "Do NOT use" cell names
+ * it precisely so this sweep has something to point at, and so cannot be swept.
+ * One row per retirement — the maintenance severities, and the ModelProvider
+ * seam that retired the provider sense of "lane".
+ */
+const GLOSSARY_ROWS = [
+  /^\| \*\*direct fix \/ gated change\*\* \|/,
+  /^\| \*\*ModelProvider\*\* \|/,
+];
 
 /** The file types an agent reads. Tested against the name, as the walk hands it. */
 const SWEPT = ['.md', '.mdx', '.yml', '.yaml', '.json'];
@@ -98,7 +131,7 @@ export function findingsIn(text, rel = '') {
   const out = [];
   const lines = text.split('\n');
   lines.forEach((line, i) => {
-    if (rel === 'CONTEXT.md' && GLOSSARY_ROW.test(line)) return;
+    if (rel === 'CONTEXT.md' && GLOSSARY_ROWS.some((re) => re.test(line))) return;
     for (const { re, why } of RETIRED) {
       re.lastIndex = 0;
       const m = re.exec(line);
