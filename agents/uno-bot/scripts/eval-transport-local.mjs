@@ -30,6 +30,11 @@
 //     draft judge fails open by contract, so the local default — ship the draft
 //     — is the behaviour the Worker takes when the judge is unreachable; the
 //     gate's ask is recorded per turn when a case is about the gate.
+//   * A RUN-TIME SUBJECT IS THE RECORDING'S TOO. A case declaring
+//     `subject: { need }` is answered with the row its recording carries — the
+//     row the worker transport's subject read returned when the case was
+//     recorded — so the case replays against the board it was recorded on. A
+//     recording without one skips by name, as a missing recording does.
 //
 // WHAT THAT MEANS FOR A SCORE. A local run measures the TURN — the dispositions,
 // the gate's idempotency, the cancel bounce, the history write, the proposal
@@ -79,6 +84,7 @@ export const UNRECORDED_TOOL_RESULT = JSON.stringify({
 //     "source": "authored" | "captured",
 //     "recordedAt": "2026-09-14",
 //     "note": "why these replies are what they are",
+//     "subject": { "name": "…", "scenario": "…" },   // optional — see below
 //     "turns": [
 //       {
 //         "prompt": "…",                     // the fixture's prompt, verbatim
@@ -101,6 +107,20 @@ export const UNRECORDED_TOOL_RESULT = JSON.stringify({
 //
 // `prompt` is matched against the fixture, so a case whose wording changes fails
 // loudly here instead of replaying the old draw against the new question.
+//
+// `subject` is the ROW a run-time case (#415) was answered about — what the
+// worker transport's subject read returned on the day this was captured. It
+// sits at the TOP LEVEL, once per case, because that is where the runner asks:
+// `run-evals.mjs` resolves `subject: { need }` once before turn 1, so that the
+// three samples of one case ask the same question. A per-turn copy would offer
+// a second answer for a question asked once.
+//
+// It is what lets a `need` case replay at all: the runner substitutes the
+// subject into the prompt BEFORE turn 1, so the prompt a recorded turn carries
+// is the FILLED-IN one, and only the row it was filled in from reproduces it.
+// Hence the row travels with the recording rather than being looked up by
+// condition — three cases declare `scenario-any`, and a condition-keyed lookup
+// would hand two of them another case's afternoon.
 
 const SOURCES = new Set(["authored", "captured"]);
 
@@ -115,6 +135,14 @@ export function parseRecording(json, { file = "(inline)" } = {}) {
     throw new Error(at(`'source' must be one of ${[...SOURCES].join(", ")} (got ${JSON.stringify(json.source)})`));
   }
   if (!Array.isArray(json.turns) || json.turns.length === 0) throw new Error(at("no 'turns'"));
+  if (json.subject !== undefined && json.subject !== null) {
+    // A row, the way the subject route answers with one. An array or a string
+    // here would substitute as `[object Object]` into a prompt and read as a
+    // model that lost the plot, so it is refused where it can still be named.
+    if (typeof json.subject !== "object" || Array.isArray(json.subject)) {
+      throw new Error(at("'subject' is not a row object"));
+    }
+  }
   const turns = json.turns.map((t, i) => {
     const where = at(`turn ${i + 1}`);
     if (typeof t?.prompt !== "string" || !t.prompt.trim()) throw new Error(`${where}: no 'prompt'`);
@@ -133,7 +161,13 @@ export function parseRecording(json, { file = "(inline)" } = {}) {
       gateAsk: typeof t.gateAsk === "string" ? t.gateAsk : null,
     };
   });
-  return { case: json.case, source: json.source, note: json.note ?? "", turns };
+  return {
+    case: json.case,
+    source: json.source,
+    note: json.note ?? "",
+    subject: json.subject ?? null,
+    turns,
+  };
 }
 
 /** Every recording in a directory, by case id. A missing directory is no
@@ -449,23 +483,44 @@ export function localTransport({
     },
 
     /**
-     * Run-time subjects (#415) need a row off the LIVE blueprint, and the read
-     * is the Worker's: `selectSubject`'s ports are built from the Supabase
-     * client in `integrations/blueprint.ts`, which names `Env`. Rebuilding those
-     * reads here would be a second blueprint client — the exact duplication the
-     * eval adapter was written to delete.
+     * Run-time subjects (#415), from the recording.
      *
-     * So this answers `{ subject: null, reason }`: a SKIP, which is the honest
-     * report. A blueprint-grounding case is measured by the worker transport, on
-     * the cron, against the board it is about.
+     * The LIVE read is the Worker's: `selectSubject`'s ports are built from the
+     * Supabase client in `integrations/blueprint.ts`, which names `Env`.
+     * Rebuilding those reads here would be a second blueprint client — the
+     * exact duplication the eval adapter was written to delete. So the row is
+     * one a recording CARRIES, captured off that read when the case was
+     * recorded, and the case replays against the same row it was recorded on.
+     *
+     * Three answers, in the worker transport's own shape so the runner reads
+     * them the same way:
+     *   - the recording carries a subject → that row;
+     *   - the recording carries none      → a SKIP naming the field;
+     *   - no recording at all             → a SKIP naming the transport, which
+     *     is what a case reaches when someone calls this directly; the runner
+     *     has already skipped an unrecorded case at `unsupported`.
+     *
+     * @param {string} need - the condition the case declares
+     * @param {{id?: string}} [spec] - the case being asked about; the subject
+     *   read is once per case (`run-evals.mjs`), so the case is what identifies
+     *   which recording answers.
      */
-    async fetchSubject(need) {
+    async fetchSubject(need, spec) {
+      const rec = spec?.id ? byCase.get(spec.id) : null;
+      if (rec?.subject) return { subject: rec.subject, build: `local (${rec.source} recording)` };
+      if (rec) {
+        return {
+          subject: null,
+          reason: `the recording for ${rec.case} carries no 'subject' for '${need}' — re-record it with scripts/eval-record.mjs, or run this case with --transport=worker`,
+          build: `local (${rec.source} recording)`,
+        };
+      }
       const creds = Boolean(env.SUPABASE_URL && (env.SUPABASE_ANON_KEY || env.SUPABASE_KEY));
       return {
         subject: null,
         reason:
           `the local transport reaches no blueprint${creds ? " (a credential is set, but the subject read is the Worker's — integrations/blueprint.ts names Env)" : ""}` +
-          ` — run '${need}' cases with --transport=worker`,
+          ` — record '${need}' cases with scripts/eval-record.mjs, or run them with --transport=worker`,
         build: "local",
       };
     },

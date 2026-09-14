@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **160,907 chars from 16 files**, against an assembled budget of 170,000 (9,093 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 140,523 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **161,526 chars from 16 files**, against an assembled budget of 170,000 (8,474 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 141,142 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,603 (−7,277 ide-only) | 9,603 | 20,000 (constitution) |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 12,028 | 21,659 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,201 | 47,901 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,036 | 53,981 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,990 | 61,016 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 67,729 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 73,016 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 79,719 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 86,121 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 88,092 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,923 (−4,814 ide-only) | 101,058 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,700 | 114,800 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 118,048 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 148,635 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 153,224 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,635 (−605 ide-only) | 160,907 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 12,647 | 22,278 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,201 | 48,520 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,036 | 54,600 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,990 | 61,635 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 68,348 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 73,635 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 80,338 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 86,740 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 88,711 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,923 (−4,814 ide-only) | 101,677 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,700 | 115,419 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 118,667 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 149,254 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 153,843 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,635 (−605 ide-only) | 161,526 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -223,6 +223,8 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **Turn** | one uno-bot turn as a module (`agents/uno-bot/src/turn/`): one request in — who, where, the text, the images as bytes, the pending proposal — and one outcome out — what was posted, what is staged, what the conversation now remembers, plus the turn's telemetry. Tier routing, the model's context, the draft judges, the proposal card and the history write are its implementation; what a person sees WHILE it runs — the 👀, the thinking line, the narration, the card — goes through its **Delivery** port, which has a Slack adapter and a recording one for tests. Slack is one caller: the envelope adapter (`src/slack/turn-adapter.ts`) turns an event into the request and `Env` into the turn's named dependencies | "the handler", "the message pipeline" |
 | **Gate** | the one place a staged proposal is resolved (`agents/uno-bot/src/gate/`): four signals in — a reaction on the card, the card's ✅/⛔ button, the same emoji typed alone, the model's validated `proposal_resolve` — and one verdict out: won, stale or none, plus the text to post and the confirmed tool to run. The lookup (by card ts, then by conversation), what an emoji means, the claim whose delete IS the lock, and the lost-race wording are its implementation; each door posts the verdict's text through **Turn**'s Delivery and hands the tool to the executor, which is what keeps Gate clear of Slack and `Env` | "the confirmation gate", "the ✅ handler" |
 | **corpus** | the harness's one reader of repo files (`scripts/lib/corpus.mjs`): which documents exist under a path, where a doc's frontmatter stops, its markdown links, its heading outline. A check asks it rather than the filesystem, and it takes a root so its test reads a fixture tree | "the walker", "the parser" (there is one of each) |
+| **recording** | a case's captured model replies, tool results and subject — the local eval transport's input (`docs/evals/fixtures/recordings/`); `source` is `authored` or `captured`, written down rather than inferred, and it reaches the results file | "fixture" (a fixture is what a case ASSERTS; a recording is what answered it) |
+| **transport** | how the eval runner reaches a turn: the deployed Worker's eval route, or **Turn** in-process from a **recording**. The summary names which one answered, because the two are different measurements | "the endpoint", "the eval route" (that is one transport's target) |
 | **sprawl** | a document too long even when every line is live — attention thins across it; the cure is the ladder, not a shorter sentence | "bloat" (bloat is dead weight; sprawl is live weight) |
 
 ## Two vocabularies — the blueprint speaks service-blueprint, the Roadmap speaks project-management

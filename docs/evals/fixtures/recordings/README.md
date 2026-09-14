@@ -12,6 +12,7 @@ One file per fixture case, `<case-id>.json`, holding **the model replies that ca
   "source": "authored",
   "recordedAt": "2026-09-14",
   "note": "why these replies are what they are",
+  "subject": { "name": "Goal Setting", "scenario": "Goal Setting", "phase": "Onboarding" },
   "turns": [
     {
       "prompt": "the fixture's prompt, verbatim",
@@ -30,7 +31,8 @@ One file per fixture case, `<case-id>.json`, holding **the model replies that ca
 |---|---|
 | `case` | the fixture case id. One recording per case; a duplicate is refused. |
 | `source` | **`authored`** — a person wrote the replies from what the case expects. **`captured`** — `scripts/eval-record.mjs` read them off a real `/debug/eval` response. Never inferred, and it reaches the results file in the `build` field. |
-| `turns[].prompt` | the case's prompt, **verbatim**. `eval-transport-local.test.mjs` fails when the two drift, so an edited case cannot keep scoring against the old question's draw. |
+| `subject` | optional, and only for a case declaring `subject: { need }` (#415): **the row that condition was answered with** when the case was recorded — exactly what the worker transport's subject read returned. Top level, once per case, because that is where the runner asks: `run-evals.mjs` resolves the condition once before turn 1 so that a case's three samples ask the same question. The local transport answers the condition from it; a recording without one **skips** by name. |
+| `turns[].prompt` | the case's prompt, **verbatim** — with `subject` substituted in where the case spells `{{subject.…}}`, since that is the prompt the turn was sent. `eval-transport-local.test.mjs` fails when the two drift, so an edited case cannot keep scoring against the old question's draw. |
 | `turns[].replies` | one entry per model round-trip, in the fake provider's `ScriptedReply` shape (`src/agent/providers/fake.ts`): `text`, `toolCalls: [{ name, args }]`, optional `stop`. |
 | `turns[].toolResults` | what each read-only lookup returned, matched by tool name and consumed once. A lookup with none recorded answers `{ ok: true, rows: [], note: "no result recorded…" }` — empty, and saying so. |
 | `turns[].references` | the reference names `read_reference` served that turn, so a receipt-threading case (C1) can be recorded. |
@@ -40,6 +42,8 @@ One file per fixture case, `<case-id>.json`, holding **the model replies that ca
 
 It proves **the turn**: that a side-effect call is staged as a gated proposal rather than executed, that a typed `cancel` resolves the pending card, that a repeat of a just-cancelled ask bounces off the store's outcome marker instead of re-carding, that the history write threads a receipt and not a text.
 
+Where a `subject` is present, it proves the turn **against the row it names** — and nothing about the board today. The row is one afternoon's, and the recording carries it so that the replay is reproducible rather than current: whether the condition still has a satisfying row, and what that row now says, is the worker transport's measurement against the live blueprint.
+
 It proves **nothing about the model** — no in-process run can tell you whether Gemini would reach for `shareout_post` today. That is the worker transport's measurement, and the Monday cron of `.github/workflows/uno-bot-evals.yml` keeps making it. `source` and the `transport` field in `eval-results.json` are what keep the two from being read as one.
 
 ## Capturing the rest
@@ -48,7 +52,7 @@ It proves **nothing about the model** — no in-process run can tell you whether
 WORKER_URL=… DEBUG_TOKEN=… node agents/uno-bot/scripts/eval-record.mjs --case=R1 --case=R2
 ```
 
-Every turn it records is a live billable model run, so it records nothing unless you name cases (or pass `--all`). Cases that declare a run-time `subject` are refused: their prompt is filled in from a board that is edited daily, so the recording would be a fact about one afternoon. Round-trip boundaries and tool-result bodies are not on the wire — see the header of `scripts/eval-record.mjs` for exactly what is reconstructed and what has to be written in by hand.
+Every turn it records is a live billable model run, so it records nothing unless you name cases (or pass `--all`). A case that declares a run-time `subject` is recorded **with its row**: the Worker's subject read answers first, the row fills the case's placeholders as the runner fills them, and it is written into the recording as `subject`. A condition nothing on the board satisfies is reported as a skip, by name — there was nothing to record. Round-trip boundaries and tool-result bodies are not on the wire — see the header of `scripts/eval-record.mjs` for exactly what is reconstructed and what has to be written in by hand.
 
 ## Recorded today
 
