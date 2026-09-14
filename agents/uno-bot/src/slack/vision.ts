@@ -30,10 +30,13 @@ const SUPPORTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/gif", "
 export interface VisionInputs {
   /** Base64 image blocks for the current turn (Slack files first, then the Figma frame). */
   images: AgentImage[];
-  /** userText + model-visible notes (omitted files, figma fetch failure). */
-  modelText: string;
-  /** userText + plain-text markers for the stored history (no base64 ever). */
-  historyText: string;
+  /** Model-visible notes about what could NOT be attached — an omitted file, a
+   *  Figma screenshot that would not render. One line each, and the turn
+   *  decides where they sit relative to the question (`turn/turn.ts`). */
+  notes: string[];
+  /** Plain-text markers for the stored user turn — one per attachment. No
+   *  base64, ever: only these and the pointer below reach the store. */
+  markers: string[];
   /** Rehydrated image blocks anchored to the immediately previous user turn. */
   historicalImages?: HistoricalImages;
   /** Small pointers persisted for the next turn; never base64. */
@@ -104,8 +107,8 @@ export async function collectVisionInputs(
 
   return {
     images,
-    modelText: [userText, ...modelNotes].join("\n"),
-    historyText: [userText, ...historyMarkers].join("\n"),
+    notes: modelNotes,
+    markers: historyMarkers,
     ...(historicalImages ? { historicalImages } : {}),
     ...(reference ? { reference } : {}),
   };

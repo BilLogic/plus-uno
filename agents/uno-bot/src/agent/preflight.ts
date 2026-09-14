@@ -26,30 +26,11 @@ export interface PreflightAsk {
 
 // ---- cheap, null-safe helpers (inputs are Record<string, unknown>) ----
 
-/** All string values in the payload, one level deep into arrays/objects —
- *  enough to see summary, link, section bodies, recipients. (Also used by the
- *  share-out bundle audit in slack/proposal-render.ts.) */
-export function collectStrings(input: Record<string, unknown>): string[] {
-  const out: string[] = [];
-  for (const v of Object.values(input)) {
-    if (typeof v === "string") out.push(v);
-    else if (Array.isArray(v)) {
-      for (const item of v) {
-        if (typeof item === "string") out.push(item);
-        else if (item && typeof item === "object") {
-          for (const nested of Object.values(item as Record<string, unknown>)) {
-            if (typeof nested === "string") out.push(nested);
-          }
-        }
-      }
-    } else if (v && typeof v === "object") {
-      for (const nested of Object.values(v as Record<string, unknown>)) {
-        if (typeof nested === "string") out.push(nested);
-      }
-    }
-  }
-  return out;
-}
+// `collectStrings` moved to `agent/tool-input.ts` — import-free, so the
+// proposal-card path in Turn can read a tool payload without dragging `Env` and
+// the design-system component list behind it. Re-exported here because callers
+// (slack/proposal-render.ts, the share-out bundle audit) reach for it here.
+export { collectStrings } from "./tool-input";
 
 const PLACEHOLDER_RE = /\b(TBD|TODO|lorem|placeholder)\b/i;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

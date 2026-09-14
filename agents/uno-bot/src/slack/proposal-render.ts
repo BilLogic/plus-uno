@@ -4,10 +4,11 @@
 // decision, 2026-07-12). The executable input lives in the DO's pending state;
 // this text is display-only. (Extracted from events.ts, 2026-07-12.)
 
-import type { Env } from "../types";
-import { parseFigmaUrl, fetchFigmaImagePngUrl } from "../integrations/figma";
-import { collectStrings } from "../agent/preflight";
-import { textSections } from "./delivery";
+// Import-free collaborators only: this module renders card TEXT and blocks and
+// posts nothing, so the Turn module can build a card without `Env`. The Figma
+// preview card, which needs a render call, lives in `proposal-figma.ts`.
+import { collectStrings } from "../agent/tool-input";
+import { textSections } from "./render";
 
 // One shared confirmation footer on every card. Anyone in the thread may
 // confirm/cancel (the requester lock was removed 2026-07-14), so it names no
@@ -178,7 +179,7 @@ export function formatNotionUpdateProposal(
   return lines.join("\n");
 }
 
-function renderParamsForHumans(input: Record<string, unknown>): string {
+export function renderParamsForHumans(input: Record<string, unknown>): string {
   const entries = Object.entries(input).filter(
     ([, v]) => v !== undefined && v !== null && v !== "",
   );
@@ -233,50 +234,4 @@ export function proposalVerb(toolName: string): string {
     case "email_send": return "send an email via Gmail";
     default: return toolName;
   }
-}
-
-// Build a richer proposal for implement_design: the same plaintext as
-// formatProposal (used as the Slack notification fallback AND stored in
-// pending.proposalText), plus Slack blocks that embed a Figma preview
-// screenshot when one can be fetched. The image fetch is best-effort — if it
-// returns null we omit blocks entirely and the proposal posts as plain text,
-// identical to every other tool.
-export async function buildImplementDesignProposal(
-  env: Env,
-  input: Record<string, unknown>,
-  requesterUserId: string,
-  previewText: string | undefined,
-): Promise<{ text: string; blocks?: unknown[] }> {
-  const text = formatProposal("prototype_scaffold", input, requesterUserId, previewText);
-
-  const figmaUrl = typeof input.figma_url === "string" ? input.figma_url : "";
-  const parts = figmaUrl ? parseFigmaUrl(figmaUrl) : null;
-  const imageUrl = parts
-    ? await fetchFigmaImagePngUrl(env, parts.fileKey, parts.nodeId, 1)
-    : null;
-  if (!imageUrl) return { text };
-
-  const params = renderParamsForHumans(input);
-  const blocks: unknown[] = [];
-  if (previewText) {
-    blocks.push({ type: "section", text: { type: "mrkdwn", text: previewText } });
-  }
-  blocks.push({
-    type: "image",
-    image_url: imageUrl,
-    alt_text: "Figma preview of the design to implement",
-  });
-  blocks.push({
-    type: "section",
-    text: {
-      type: "mrkdwn",
-      text: `:warning: About to *${proposalVerb("prototype_scaffold")}*:\n${params}`,
-    },
-  });
-  blocks.push({
-    type: "section",
-    text: { type: "mrkdwn", text: CONFIRM_FOOTER },
-  });
-  blocks.push(...proposalActionBlocks());
-  return { text, blocks };
 }
