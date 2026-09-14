@@ -23,6 +23,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { cdnPins, pinConflicts, unusedDeclared } from "./deps.mjs";
+import { byRoot, main } from "./lib/findings.mjs";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -81,173 +82,192 @@ const SOURCE = /\.(m?js|cjs|jsx|ts|tsx|mts|cts|css|scss|mdx|html|json|ya?ml)$/;
 // file people copy a <link> out of, so it is how a fourth would spread.
 const MARKUP = /\.(html|mdx|md)$/;
 
-const tracked = execFileSync("git", ["-C", REPO_ROOT, "ls-files", "-z"], {
-  encoding: "utf8",
-  maxBuffer: 1 << 28,
-})
-  .split("\0")
-  .filter(Boolean);
-
-const read = (rel) => {
-  try {
-    return readFileSync(path.join(REPO_ROOT, rel), "utf8");
-  } catch {
-    return "";
-  }
-};
-
-// Both manifests. `check-harness.mjs` reads both for its own completeness
-// assertion, and dependabot.yml watches both for upgrades; the dead-dependency
-// half was the only thing here looking at one.
+/** The two manifests this repo ships, both watched for upgrades. */
 const MANIFESTS = ["package.json", "agents/uno-bot/package.json"];
-const manifests = MANIFESTS.map((rel) => ({ rel, json: JSON.parse(read(rel)) }));
-const pkg = manifests[0].json;
 
-// Everything except the manifests themselves — a package.json listing a
-// dependency must not count as that dependency being used.
-const sources = tracked
-  .filter((f) => SOURCE.test(f) && path.basename(f) !== "package.json" && path.basename(f) !== "package-lock.json")
-  .map((rel) => ({ path: rel, text: read(rel) }));
+/**
+ * Everything both halves of the check stand on, read once per repo root: one
+ * file listing, one read of every source file, one CDN sweep. The findings and
+ * the green line ask different questions of the same sweep, and doing that
+ * sweep twice is the whole cost of this check.
+ */
+const inputs = byRoot((repoRoot) => {
+  const tracked = execFileSync("git", ["-C", repoRoot, "ls-files", "-z"], {
+    encoding: "utf8",
+    maxBuffer: 1 << 28,
+  })
+    .split("\0")
+    .filter(Boolean);
 
-const unused = [];
-const stale = [];
-let declaredCount = 0;
-for (const { rel, json } of manifests) {
-  const declared = Object.keys({ ...json.dependencies, ...json.devDependencies });
-  declaredCount += declared.length;
-  const r = unusedDeclared({
-    declared,
-    sources,
-    scripts: json.scripts ?? {},
-    allowed: ALLOWED,
-    detailed: true,
-  });
-  // Named by manifest: "typescript is unused" means different things in the
-  // root and in the Worker, which declares its own.
-  unused.push(...r.unused.map((n) => `${n}  (${rel})`));
-  stale.push(...r.stale);
-}
+  const read = (rel) => {
+    try {
+      return readFileSync(path.join(repoRoot, rel), "utf8");
+    } catch {
+      return "";
+    }
+  };
 
-/** What is actually installed, which is what a CDN pin really disagrees with. */
-const installedVersion = (name) => {
-  const p = path.join(REPO_ROOT, "node_modules", name, "package.json");
-  if (!existsSync(p)) return undefined;
-  try {
-    return JSON.parse(readFileSync(p, "utf8")).version;
-  } catch {
-    return undefined;
+  // Both manifests. `check-harness.mjs` reads both for its own completeness
+  // assertion, and dependabot.yml watches both for upgrades; the dead-dependency
+  // half was the only thing here looking at one.
+  const manifests = MANIFESTS.map((rel) => ({ rel, json: JSON.parse(read(rel)) }));
+
+  // Everything except the manifests themselves — a package.json listing a
+  // dependency must not count as that dependency being used.
+  const sources = tracked
+    .filter((f) => SOURCE.test(f) && path.basename(f) !== "package.json" && path.basename(f) !== "package-lock.json")
+    .map((rel) => ({ path: rel, text: read(rel) }));
+
+  const unused = [];
+  const stale = [];
+  let declaredCount = 0;
+  for (const { rel, json } of manifests) {
+    const declared = Object.keys({ ...json.dependencies, ...json.devDependencies });
+    declaredCount += declared.length;
+    const r = unusedDeclared({
+      declared,
+      sources,
+      scripts: json.scripts ?? {},
+      allowed: ALLOWED,
+      detailed: true,
+    });
+    // Named by manifest: "typescript is unused" means different things in the
+    // root and in the Worker, which declares its own.
+    unused.push(...r.unused.map((n) => `${n}  (${rel})`));
+    stale.push(...r.stale);
   }
-};
 
-// Compared against what is INSTALLED, not against the range in package.json: a
-// range of ^5.3.3 and a CDN pin of 5.3.3 look like agreement while the app
-// actually ships 5.3.8.
-const pins = cdnPins(tracked.filter((f) => MARKUP.test(f)).map((rel) => ({ path: rel, text: read(rel) })));
+  /** What is actually installed, which is what a CDN pin really disagrees with. */
+  const installedVersion = (name) => {
+    const p = path.join(repoRoot, "node_modules", name, "package.json");
+    if (!existsSync(p)) return undefined;
+    try {
+      return JSON.parse(readFileSync(p, "utf8")).version;
+    } catch {
+      return undefined;
+    }
+  };
 
-// Derived, not hand-listed: any library both pinned on a CDN and declared as a
-// dependency. A hardcoded list is right until the day someone pins a second one.
-const allDeclared = new Set(manifests.flatMap(({ json }) => Object.keys({ ...json.dependencies, ...json.devDependencies })));
-const declaredVersions = {};
-const unresolved = [];
-for (const name of new Set(pins.map((p) => p.lib))) {
-  if (!allDeclared.has(name)) continue;
-  const v = installedVersion(name);
-  if (v) declaredVersions[name] = v;
-  else unresolved.push(name);
-}
-const conflicts = pinConflicts(pins, { declaredVersions });
-// A recorded split is not a blank cheque for that library. The baseline names
-// the exact versions; a THIRD FontAwesome appearing is new, and has to fail.
-// This is the a11y ratchet's rule: the recorded set may only shrink.
-const newConflicts = [];
-for (const c of conflicts) {
-  const recorded = CDN_BASELINE.get(c.lib);
-  if (!recorded) {
-    newConflicts.push(c);
-    continue;
+  // Compared against what is INSTALLED, not against the range in package.json: a
+  // range of ^5.3.3 and a CDN pin of 5.3.3 look like agreement while the app
+  // actually ships 5.3.8.
+  const pins = cdnPins(tracked.filter((f) => MARKUP.test(f)).map((rel) => ({ path: rel, text: read(rel) })));
+
+  // Derived, not hand-listed: any library both pinned on a CDN and declared as a
+  // dependency. A hardcoded list is right until the day someone pins a second one.
+  const allDeclared = new Set(manifests.flatMap(({ json }) => Object.keys({ ...json.dependencies, ...json.devDependencies })));
+  const declaredVersions = {};
+  const unresolved = [];
+  for (const name of new Set(pins.map((p) => p.lib))) {
+    if (!allDeclared.has(name)) continue;
+    const v = installedVersion(name);
+    if (v) declaredVersions[name] = v;
+    else unresolved.push(name);
   }
-  const extra = c.versions.filter((v) => !recorded.versions.includes(v));
-  if (extra.length) newConflicts.push({ ...c, extra });
-}
+  const conflicts = pinConflicts(pins, { declaredVersions });
 
-// A baseline that never shrinks is a backlog wearing a ratchet's clothes — the
-// same thing the ALLOWED list has a staleness check for.
-const staleBaseline = [];
-for (const [lib, recorded] of CDN_BASELINE) {
-  // Not "no conflict found" — "no conflict found, and we were able to look".
-  // bootstrap's split is CDN-pin-versus-shipped, so without node_modules the
-  // comparison never runs, and calling that closed would delete a live entry.
-  if (unresolved.includes(lib)) continue;
-  const live = conflicts.find((c) => c.lib === lib);
-  const stillSplit = live ? recorded.versions.filter((v) => live.versions.includes(v)) : [];
-  if (stillSplit.length < recorded.versions.length) {
-    staleBaseline.push(`${lib} (recorded ${recorded.versions.join(", ")}; still present: ${stillSplit.join(", ") || "none"})`);
+  return { unused, stale, pins, conflicts, unresolved, declaredCount };
+});
+
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { unused, stale, conflicts, unresolved } = inputs(repoRoot);
+
+  // A recorded split is not a blank cheque for that library. The baseline names
+  // the exact versions; a THIRD FontAwesome appearing is new, and has to fail.
+  // This is the a11y ratchet's rule: the recorded set may only shrink.
+  const newConflicts = [];
+  for (const c of conflicts) {
+    const recorded = CDN_BASELINE.get(c.lib);
+    if (!recorded) {
+      newConflicts.push(c);
+      continue;
+    }
+    const extra = c.versions.filter((v) => !recorded.versions.includes(v));
+    if (extra.length) newConflicts.push({ ...c, extra });
   }
-}
 
-const failures = [];
+  // A baseline that never shrinks is a backlog wearing a ratchet's clothes — the
+  // same thing the ALLOWED list has a staleness check for.
+  const staleBaseline = [];
+  for (const [lib, recorded] of CDN_BASELINE) {
+    // Not "no conflict found" — "no conflict found, and we were able to look".
+    // bootstrap's split is CDN-pin-versus-shipped, so without node_modules the
+    // comparison never runs, and calling that closed would delete a live entry.
+    if (unresolved.includes(lib)) continue;
+    const live = conflicts.find((c) => c.lib === lib);
+    const stillSplit = live ? recorded.versions.filter((v) => live.versions.includes(v)) : [];
+    if (stillSplit.length < recorded.versions.length) {
+      staleBaseline.push(`${lib} (recorded ${recorded.versions.join(", ")}; still present: ${stillSplit.join(", ") || "none"})`);
+    }
+  }
 
-if (unused.length) {
-  failures.push(
-    `${unused.length} declared dependenc(ies) nothing in the repo refers to:\n` +
-      unused.map((n) => `       ${n}`).join("\n") +
-      "\n     Remove them, or add them to ALLOWED in scripts/check-deps.mjs with the reason\n" +
-      "     they are needed without being named.",
-  );
-}
+  const failures = [];
 
-// Shared across manifests, so "stale" means unused by BOTH — the Worker's
-// typescript and the root's are the same exemption.
-const trulyStale = [...new Set(stale)].filter((n) => !unused.some((u) => u.startsWith(`${n}  (`)));
-if (trulyStale.length) {
-  failures.push(
-    `${trulyStale.length} ALLOWED entr(ies) for dependencies that ARE used now: ${trulyStale.join(", ")}.\n` +
-      "     The exemption outlived its reason — delete it, so the list stays a set of\n" +
-      "     decisions rather than a backlog.",
-  );
-}
-
-if (staleBaseline.length) {
-  failures.push(
-    `${staleBaseline.length} CDN_BASELINE entr(ies) describing a split that no longer exists:\n` +
-      staleBaseline.map((l) => `       ${l}`).join("\n") +
-      "\n     Someone closed it. Delete the entry so the file stops asserting something untrue.",
-  );
-}
-
-if (newConflicts.length) {
-  for (const c of newConflicts) {
-    const lines = Object.entries(c.where)
-      .map(([v, files]) => `       ${v}  ${files.length} file(s): ${files.slice(0, 3).join(", ")}${files.length > 3 ? " …" : ""}`)
-      .join("\n");
+  if (unused.length) {
     failures.push(
-      `${c.lib} is pinned at ${c.extra ? `a version not in the baseline (${c.extra.join(", ")})` : "more than one version on a CDN, or disagrees with the installed one"}` +
-        `${c.declared ? ` (package.json installs ${c.declared})` : ""}:\n${lines}\n` +
-        "     A CDN <link> is invisible to Dependabot, so nothing else will ever notice.\n" +
-        "     Unify the version, or record it in CDN_BASELINE with what closing it needs.",
+      `${unused.length} declared dependenc(ies) nothing in the repo refers to:\n` +
+        unused.map((n) => `       ${n}`).join("\n") +
+        "\n     Remove them, or add them to ALLOWED in scripts/check-deps.mjs with the reason\n" +
+        "     they are needed without being named.",
     );
   }
+
+  // Shared across manifests, so "stale" means unused by BOTH — the Worker's
+  // typescript and the root's are the same exemption.
+  const trulyStale = [...new Set(stale)].filter((n) => !unused.some((u) => u.startsWith(`${n}  (`)));
+  if (trulyStale.length) {
+    failures.push(
+      `${trulyStale.length} ALLOWED entr(ies) for dependencies that ARE used now: ${trulyStale.join(", ")}.\n` +
+        "     The exemption outlived its reason — delete it, so the list stays a set of\n" +
+        "     decisions rather than a backlog.",
+    );
+  }
+
+  if (staleBaseline.length) {
+    failures.push(
+      `${staleBaseline.length} CDN_BASELINE entr(ies) describing a split that no longer exists:\n` +
+        staleBaseline.map((l) => `       ${l}`).join("\n") +
+        "\n     Someone closed it. Delete the entry so the file stops asserting something untrue.",
+    );
+  }
+
+  if (newConflicts.length) {
+    for (const c of newConflicts) {
+      const lines = Object.entries(c.where)
+        .map(([v, files]) => `       ${v}  ${files.length} file(s): ${files.slice(0, 3).join(", ")}${files.length > 3 ? " …" : ""}`)
+        .join("\n");
+      failures.push(
+        `${c.lib} is pinned at ${c.extra ? `a version not in the baseline (${c.extra.join(", ")})` : "more than one version on a CDN, or disagrees with the installed one"}` +
+          `${c.declared ? ` (package.json installs ${c.declared})` : ""}:\n${lines}\n` +
+          "     A CDN <link> is invisible to Dependabot, so nothing else will ever notice.\n" +
+          "     Unify the version, or record it in CDN_BASELINE with what closing it needs.",
+      );
+    }
+  }
+
+  return failures.map((message) => ({ message }));
 }
 
-if (failures.length) {
-  console.error(`[deps] ${failures.length} problem(s):`);
-  for (const f of failures) console.error(`  -> ${f}`);
-  process.exit(1);
-}
-
-if (unresolved.length) {
-  // Said out loud, because otherwise this check quietly answers a smaller
-  // question locally than it does in CI, and the difference shows up as a gate
-  // that passed on a laptop and failed on a runner.
-  console.log(
-    `[deps] note: ${unresolved.join(", ")} not installed here, so their CDN pins were not ` +
-      "compared against the shipped version. Run after `npm ci` for the full check.",
+/**
+ * The green line, which carries the four numbers this check exists to hold
+ * steady — and, where a CDN-pinned library is not installed, the note that it
+ * answered a smaller question here than it will in CI. Said out loud, because
+ * otherwise the difference shows up as a gate that passed on a laptop and
+ * failed on a runner.
+ */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { pins, conflicts, unresolved, declaredCount } = inputs(repoRoot);
+  const baselined = conflicts.filter((c) => CDN_BASELINE.has(c.lib)).length;
+  const line =
+    `${declaredCount} declared, all referenced (${ALLOWED.size} documented exception(s)); ` +
+    `${pins.length} CDN pin(s) across ${new Set(pins.map((p) => p.path)).size} file(s), ` +
+    `${baselined} recorded split(s), 0 new.`;
+  if (!unresolved.length) return line;
+  return (
+    `${line}\nnote: ${unresolved.join(", ")} not installed here, so their CDN pins were not ` +
+    "compared against the shipped version. Run after `npm ci` for the full check."
   );
 }
 
-const baselined = conflicts.filter((c) => CDN_BASELINE.has(c.lib)).length;
-console.log(
-  `[deps] ${declaredCount} declared, all referenced (${ALLOWED.size} documented exception(s)); ` +
-    `${pins.length} CDN pin(s) across ${new Set(pins.map((p) => p.path)).size} file(s), ` +
-    `${baselined} recorded split(s), 0 new.`,
-);
+main(import.meta.url, "check:deps", { run, summary });

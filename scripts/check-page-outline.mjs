@@ -53,12 +53,13 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { documents } from './lib/corpus.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const SPECS = path.join(REPO_ROOT, 'design-system', 'src', 'specs');
-const SETUP = path.join(REPO_ROOT, '.storybook', 'vitest.setup.ts');
-const ASSERTION = path.join(REPO_ROOT, '.storybook', 'page-outline.js');
+const specsDir = (root = REPO_ROOT) => path.join(root, 'design-system', 'src', 'specs');
+const setupFile = (root = REPO_ROOT) => path.join(root, '.storybook', 'vitest.setup.ts');
+const assertionFile = (root = REPO_ROOT) => path.join(root, '.storybook', 'page-outline.js');
 
 /**
  * The floor. 42 story files live under `specs/**​/Pages/**` and 3 area overviews
@@ -79,9 +80,9 @@ export const isPageTitle = (title) =>
   typeof title === 'string' && (title.includes('/Pages/') || /^Specs\/[^/]+\/Overview$/.test(title));
 
 /** Every `*.stories.jsx` under `specs/`, absolute. */
-const storyFiles = (dir) =>
-  documents(path.relative(REPO_ROOT, dir), { root: REPO_ROOT, ext: ['.stories.jsx'] }).map((rel) =>
-    path.join(REPO_ROOT, rel),
+const storyFiles = (dir, repoRoot = REPO_ROOT) =>
+  documents(path.relative(repoRoot, dir), { root: repoRoot, ext: ['.stories.jsx'] }).map((rel) =>
+    path.join(repoRoot, rel),
   );
 
 /**
@@ -106,39 +107,65 @@ const read = (f) => (fs.existsSync(f) ? fs.readFileSync(f, 'utf8') : null);
 /** A story file is a page by PATH when it lives under a `Pages/` directory. */
 export const isPagePath = (rel) => rel.split(path.sep).includes('Pages');
 
-function main() {
-  const list = process.argv.slice(2).includes('--list');
-  const findings = [];
-
-  const files = storyFiles(SPECS).sort();
-  if (files.length < 100) {
-    console.error(
-      `[check:page-outline] found ${files.length} story file(s) under ` +
-        `${path.relative(REPO_ROOT, SPECS)} — expected at least 100.\n` +
-        '  -> The corpus moved or the walk broke. A check over nothing passes over everything.',
-    );
-    return 1;
-  }
-
+/**
+ * The walk and the two populations it produces, read once per repo root: the
+ * findings, the green line and `--list` all three ask about the same tree.
+ */
+const inputs = byRoot((repoRoot) => {
+  const specs = specsDir(repoRoot);
+  const files = storyFiles(specs, repoRoot).sort();
+  const titleless = [];
   const byPath = [];
   const byTitle = [];
+
   for (const file of files) {
-    const rel = path.relative(SPECS, file);
+    const rel = path.relative(specs, file);
     const title = metaTitle(fs.readFileSync(file, 'utf8'));
     if (title === null) {
-      findings.push(`${path.relative(REPO_ROOT, file)}  has no \`title:\` on its default export`);
+      titleless.push(`${path.relative(repoRoot, file)}  has no \`title:\` on its default export`);
       continue;
     }
     if (isPagePath(rel)) byPath.push({ rel, title });
     if (isPageTitle(title)) byTitle.push({ rel, title });
   }
 
-  // (2) The path-defined population and the title-selected one must agree.
-  const titleSet = new Set(byTitle.map((e) => e.rel));
   const pathSet = new Set(byPath.map((e) => e.rel));
+  return {
+    specs,
+    files,
+    titleless,
+    byPath,
+    byTitle,
+    pathSet,
+    titleSet: new Set(byTitle.map((e) => e.rel)),
+    overviews: byTitle.filter((e) => !pathSet.has(e.rel)),
+    setupSrc: read(setupFile(repoRoot)),
+    assertionSrc: read(assertionFile(repoRoot)),
+  };
+});
+
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { specs, files, titleless, byPath, byTitle, pathSet, titleSet, overviews, setupSrc, assertionSrc } =
+    inputs(repoRoot);
+
+  if (files.length < 100) {
+    return [
+      {
+        message:
+          `found ${files.length} story file(s) under ` +
+          `${path.relative(repoRoot, specs)} — expected at least 100.\n` +
+          '  -> The corpus moved or the walk broke. A check over nothing passes over everything.',
+      },
+    ];
+  }
+
+  const found = [...titleless];
+
+  // (2) The path-defined population and the title-selected one must agree.
   for (const { rel, title } of byPath) {
     if (!titleSet.has(rel)) {
-      findings.push(
+      found.push(
         `${rel}  lives under Pages/ but its title (${title}) is not selected as a page.\n` +
           '      -> The DOM assertion picks pages by title, so this page is NOT being checked.' +
           '\n         Give it a `Specs/…/Pages/…` title.',
@@ -147,18 +174,16 @@ function main() {
   }
   for (const { rel, title } of byTitle) {
     if (!pathSet.has(rel) && !/^Specs\/[^/]+\/Overview$/.test(title)) {
-      findings.push(
+      found.push(
         `${rel}  is titled as a page (${title}) but does not live under a Pages/ directory.\n` +
           '      -> Either move it, or retitle it. The two definitions of "page" have drifted.',
       );
     }
   }
 
-  const overviews = byTitle.filter((e) => !pathSet.has(e.rel));
-
   // (1) The population must not have collapsed.
   if (byPath.length < MIN_PAGE_STORIES) {
-    findings.push(
+    found.push(
       `only ${byPath.length} page story file(s) under specs/**/Pages/** — expected at least ` +
         `${MIN_PAGE_STORIES}.\n` +
         '      -> Pages were deleted or moved. Lower MIN_PAGE_STORIES deliberately, in a commit' +
@@ -166,36 +191,37 @@ function main() {
     );
   }
   if (overviews.length < AREA_OVERVIEWS) {
-    findings.push(
+    found.push(
       `only ${overviews.length} area-overview story file(s) — expected at least ${AREA_OVERVIEWS}.`,
     );
   }
 
   // (3) The assertion must still be wired into the suite.
-  findings.push(...assertRegistered());
+  found.push(...assertRegistered(setupSrc, assertionSrc));
 
-  if (list) {
-    console.log(
-      `[check:page-outline] ${byPath.length} page story file(s) under specs/**/Pages/** ` +
-        `+ ${overviews.length} area overview(s):\n` +
-        [...byPath, ...overviews].map((e) => `  ${e.rel}  ${e.title}`).join('\n'),
-    );
-    return 0;
-  }
+  return found.map((message) => ({ message }));
+}
 
-  if (findings.length) {
-    console.error(
-      `[check:page-outline] ${findings.length} finding(s):\n` +
-        findings.map((f) => `  ${f}`).join('\n'),
-    );
-    return 1;
-  }
-
-  console.log(
-    `[check:page-outline] ${byPath.length} page + ${overviews.length} overview story file(s), ` +
-      'selector agrees with the tree, assertion registered.',
+/** The green line, which carries both populations and what agreed about them. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { byPath, overviews } = inputs(repoRoot);
+  return (
+    `${byPath.length} page + ${overviews.length} overview story file(s), ` +
+    'selector agrees with the tree, assertion registered.'
   );
-  return 0;
+}
+
+/**
+ * `--list` prints the population and asserts nothing, so it stays outside
+ * `run`: a check the runner imports writes nothing on its own account.
+ */
+function list(repoRoot = REPO_ROOT) {
+  const { byPath, overviews } = inputs(repoRoot);
+  console.log(
+    `[check:page-outline] ${byPath.length} page story file(s) under specs/**/Pages/** ` +
+      `+ ${overviews.length} area overview(s):\n` +
+      [...byPath, ...overviews].map((e) => `  ${e.rel}  ${e.title}`).join('\n'),
+  );
 }
 
 /**
@@ -205,7 +231,7 @@ function main() {
  * reported.
  * @returns {string[]}
  */
-export function assertRegistered(setupSrc = read(SETUP), assertionSrc = read(ASSERTION)) {
+export function assertRegistered(setupSrc = read(setupFile()), assertionSrc = read(assertionFile())) {
   const findings = [];
   // A deleted file is the loudest disarm of all, and it must read as a finding
   // rather than as an unhandled ENOENT stack trace nobody parses.
@@ -244,6 +270,15 @@ export function assertRegistered(setupSrc = read(SETUP), assertionSrc = read(ASS
 // path.resolve + fileURLToPath, not string comparison: `file://${argv[1]}` never
 // matches once the repo path contains a space or any non-ASCII char, because the
 // URL form percent-encodes them. Same idiom as check-unspread-rest.mjs.
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  process.exit(main());
+// The CLI is one branch or the other. A side flag prints (or writes) instead of
+// gating, so the gate does not also run; `main()` re-checks the entry guard for
+// itself, which is what keeps an import of this module reaching neither.
+if (
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) &&
+  process.argv.slice(2).includes('--list')
+) {
+  list();
+} else {
+  main(import.meta.url, 'check:page-outline', { run, summary });
 }

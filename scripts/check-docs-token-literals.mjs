@@ -135,6 +135,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { documents } from './lib/corpus.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -150,8 +151,8 @@ const REPO_ROOT = path.resolve(__dirname, '..');
  * definitions for the shadcn theme layer. It is a token sheet, and the paragraph
  * above about the DS SCSS applies to it word for word.
  */
-const DOCS_STYLE_DIR = path.join(REPO_ROOT, '.storybook');
-const TOKENS_DIR = path.join(REPO_ROOT, 'design-system', 'src', 'tokens');
+const docsStyleDir = (root = REPO_ROOT) => path.join(root, '.storybook');
+const tokensDir = (root = REPO_ROOT) => path.join(root, 'design-system', 'src', 'tokens');
 
 /** Primitive tokens carry a DO NOT USE DIRECTLY banner; semantic names sort first. */
 const PRIMITIVES_FILE = '_primitives.scss';
@@ -159,12 +160,12 @@ const PRIMITIVES_FILE = '_primitives.scss';
 // ── the token table ─────────────────────────────────────────────────────────
 
 /** `--name: value` across the token SCSS, first definition wins (`:root` order). */
-function readTokenDefinitions(dir = TOKENS_DIR) {
+function readTokenDefinitions(dir = tokensDir(), repoRoot = REPO_ROOT) {
   const defs = new Map();
   if (!fs.existsSync(dir)) return defs;
-  for (const rel of documents(`${path.relative(REPO_ROOT, dir)}/*.scss`, { root: REPO_ROOT, ext: ['.scss'] })) {
+  for (const rel of documents(`${path.relative(repoRoot, dir)}/*.scss`, { root: repoRoot, ext: ['.scss'] })) {
     const file = path.basename(rel);
-    const source = fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
+    const source = fs.readFileSync(path.join(repoRoot, rel), 'utf8');
     for (const m of source.matchAll(/(--[\w-]+)\s*:\s*([^;{}]+);/g)) {
       if (!defs.has(m[1])) defs.set(m[1], { value: m[2].trim(), file });
     }
@@ -418,78 +419,103 @@ export function findings(source, index) {
 
 // ── the runner ──────────────────────────────────────────────────────────────
 
-const cssFiles = (dir) =>
-  documents(`${path.relative(REPO_ROOT, dir)}/*.css`, { root: REPO_ROOT, ext: ['.css'] }).map((rel) =>
-    path.join(REPO_ROOT, rel),
+const cssFiles = (dir, repoRoot = REPO_ROOT) =>
+  documents(`${path.relative(repoRoot, dir)}/*.css`, { root: repoRoot, ext: ['.css'] }).map((rel) =>
+    path.join(repoRoot, rel),
   );
 
-function main() {
-  const files = cssFiles(DOCS_STYLE_DIR);
-  const index = buildTokenIndex();
+/**
+ * The corpus and the token table, read once per repo root: the findings, the
+ * green line and `--list` all three stand on the same two reads.
+ */
+const inputs = byRoot((repoRoot) => {
+  const tokens = tokensDir(repoRoot);
+  const index = buildTokenIndex(readTokenDefinitions(tokens, repoRoot));
+  return {
+    styleDir: docsStyleDir(repoRoot),
+    tokensDir: tokens,
+    files: cssFiles(docsStyleDir(repoRoot), repoRoot),
+    index,
+    tokenCount: Object.values(index).reduce((n, b) => n + [...b.values()].reduce((k, l) => k + l.length, 0), 0),
+  };
+});
+
+export const REMEDY =
+  '  -> Use the token whose ROLE fits — the list above is every token carrying' +
+  '\n     that value, semantic names first. If the value genuinely has no token,' +
+  '\n     say why in a comment on the declaration or the line above it; that is' +
+  '\n     the only way past this check, and it is meant to be read in review.';
+
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { styleDir, tokensDir: tokens, files, index, tokenCount } = inputs(repoRoot);
 
   // A corpus that vanished is not a clean corpus, and a token table that
   // vanished exonerates every literal in it. Both floors report rather than
   // pass silently — the same reason `check-token-collision.mjs` refuses to run
   // over fewer than 100 stylesheets.
   if (!files.length) {
-    console.error(
-      `[check:docs-token-literals] no .css under ${path.relative(REPO_ROOT, DOCS_STYLE_DIR)}.\n` +
-        '  -> The docs stylesheet moved. A check over nothing passes over everything.',
-    );
-    return process.exit(1);
+    return [
+      {
+        message:
+          `no .css under ${path.relative(repoRoot, styleDir)}.\n` +
+          '  -> The docs stylesheet moved. A check over nothing passes over everything.',
+      },
+    ];
   }
-  const tokenCount = Object.values(index).reduce((n, b) => n + [...b.values()].reduce((k, l) => k + l.length, 0), 0);
   if (tokenCount < 200) {
-    console.error(
-      `[check:docs-token-literals] indexed ${tokenCount} tokens from ${path.relative(REPO_ROOT, TOKENS_DIR)} — expected at least 200.\n` +
-        '  -> The token SCSS moved or the parse broke. With no tokens, every literal looks fine.',
-    );
-    return process.exit(1);
+    return [
+      {
+        message:
+          `indexed ${tokenCount} tokens from ${path.relative(repoRoot, tokens)} — expected at least 200.\n` +
+          '  -> The token SCSS moved or the parse broke. With no tokens, every literal looks fine.',
+      },
+    ];
   }
 
-  if (process.argv.includes('--list')) {
-    console.log(`check:docs-token-literals reads ${files.length} docs stylesheet(s):\n`);
-    for (const f of files) console.log(`  ${path.relative(REPO_ROOT, f)}`);
-    console.log(`\nagainst ${tokenCount} token definitions in ${path.relative(REPO_ROOT, TOKENS_DIR)}:\n`);
-    for (const [bucket, map] of Object.entries(index)) {
-      console.log(`  ${bucket.padEnd(18)} ${[...map.values()].reduce((k, l) => k + l.length, 0)} tokens over ${map.size} distinct values`);
-    }
-    return process.exit(0);
-  }
-
-  const failures = [];
+  const found = [];
   for (const file of files) {
     for (const f of findings(fs.readFileSync(file, 'utf8'), index)) {
-      failures.push({ file: path.relative(REPO_ROOT, file), ...f });
+      const offered = `${f.tokens.slice(0, 4).join('  ')}${f.tokens.length > 4 ? `  (+${f.tokens.length - 4} more)` : ''}`;
+      found.push({
+        file: path.relative(repoRoot, file),
+        line: f.line,
+        message: `${f.prop}: … ${f.literal} …  -> ${offered}`,
+      });
     }
   }
-
-  if (!failures.length) {
-    console.log(
-      `✓ check:docs-token-literals — ${files.length} docs stylesheet(s), no literal the design system already tokenises`,
-    );
-    return process.exit(0);
-  }
-
-  console.error(
-    `[check:docs-token-literals] ${failures.length} hand-picked value(s) the design system already has a token for:\n`,
-  );
-  let current = '';
-  for (const f of failures) {
-    if (f.file !== current) {
-      console.error(`  ${f.file}`);
-      current = f.file;
-    }
-    console.error(`    :${String(f.line).padEnd(4)} ${f.prop}: … ${f.literal} …`);
-    console.error(`           -> ${f.tokens.slice(0, 4).join('  ')}${f.tokens.length > 4 ? `  (+${f.tokens.length - 4} more)` : ''}`);
-  }
-  console.error(
-    '\n  -> Use the token whose ROLE fits — the list above is every token carrying' +
-      '\n     that value, semantic names first. If the value genuinely has no token,' +
-      '\n     say why in a comment on the declaration or the line above it; that is' +
-      '\n     the only way past this check, and it is meant to be read in review.',
-  );
-  process.exit(1);
+  return found;
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
+/** The green line, which carries the size of the corpus that was read. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { files } = inputs(repoRoot);
+  return `${files.length} docs stylesheet(s), no literal the design system already tokenises`;
+}
+
+/**
+ * `--list` prints the corpus and the token counts and asserts nothing, so it
+ * stays outside `run`: a check the runner imports writes nothing on its own.
+ */
+function list(repoRoot = REPO_ROOT) {
+  const { files, index, tokenCount, tokensDir: tokens } = inputs(repoRoot);
+  console.log(`check:docs-token-literals reads ${files.length} docs stylesheet(s):\n`);
+  for (const f of files) console.log(`  ${path.relative(repoRoot, f)}`);
+  console.log(`\nagainst ${tokenCount} token definitions in ${path.relative(repoRoot, tokens)}:\n`);
+  for (const [bucket, map] of Object.entries(index)) {
+    console.log(`  ${bucket.padEnd(18)} ${[...map.values()].reduce((k, l) => k + l.length, 0)} tokens over ${map.size} distinct values`);
+  }
+}
+
+// The CLI is one branch or the other. A side flag prints (or writes) instead of
+// gating, so the gate does not also run; `main()` re-checks the entry guard for
+// itself, which is what keeps an import of this module reaching neither.
+if (
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) &&
+  process.argv.includes('--list')
+) {
+  list();
+} else {
+  main(import.meta.url, 'check:docs-token-literals', { run, summary, remedy: REMEDY });
+}
