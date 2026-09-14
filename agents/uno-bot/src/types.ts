@@ -1,3 +1,9 @@
+// Type-only, so it adds no runtime edge to the import graph: it types the
+// THREAD_STATE binding below with the Durable Object class, which is what makes
+// every RPC method name and signature in src/thread-state/durable-object.ts a
+// compile-time check rather than a runtime 404 (#493).
+import type { ThreadState as ThreadStateDurableObject } from "./thread-state";
+
 // Slack context threaded into every tool executor: where the run lives + who
 // asked. (Moved here from tools/dispatcher.ts, 2026-07-12, so both the tool
 // layer and the agent loop reference it without importing the dispatcher.)
@@ -112,7 +118,7 @@ export interface Env {
   // first, and the judged evals are compared CASE BY CASE (a stable total hides
   // one case breaking as another recovers) before it goes wide.
   BLUEPRINT_INDEX?: string;
-  THREAD_STATE: DurableObjectNamespace;
+  THREAD_STATE: DurableObjectNamespace<ThreadStateDurableObject>;
   // Per-thread agent-run executor: DO alarms escape the waitUntil() 30s
   // wall-clock cancellation that silently killed long agent runs (👀-then-
   // silence, 2026-07-09). See agent-runner.ts.

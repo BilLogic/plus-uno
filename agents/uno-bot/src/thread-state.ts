@@ -17,53 +17,56 @@
 //
 // Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `event:{event_id}`,
 // `actx:{channel}:{thread}`.
+//
+// ── AND the ThreadState RPC surface (#493) ──────────────────────────────────
+//
+// The routes above are the OLD contract — hand-encoded URL strings on both
+// sides, parsed back out of query parameters. Beside them this class now
+// exposes Durable Object RPC methods whose signatures ARE the
+// `src/thread-state` interface: `readHistory`, `appendHistory`,
+// `compactHistory`, `putProposal`, `getProposalByTs`, `getProposalByThread`,
+// `claimProposal`, `get/putAssistantContext`, `requestCancel`,
+// `consumeCancel`, `cancelForUser`, `setActiveRun`, `checkAndRecordEvent`,
+// `claimRun`, `markRunDone`. A rename is a type error rather than a runtime
+// 404, which is the whole point.
+//
+// ONE STATE, TWO DOORS. Every RPC method reads and writes the SAME SQLite
+// storage under the SAME keys and the SAME record shapes as the routes — the
+// key helpers at the bottom of this file are shared, not duplicated - so while
+// both doors are open (this ticket is the expand phase; #494 moves the callers
+// and deletes the routes) a proposal staged through a route is found by RPC and
+// a lease claimed by RPC is seen by a route.
+//
+// WHY EVERY RPC METHOD TAKES `at: number`. Timings are owned by
+// `src/thread-state/store.ts`, and so is the clock: `ThreadStateDeps.now` is
+// what makes a 20-minute lease testable without a 20-minute sleep. The adapter
+// therefore stamps each hop with its own `now()`, and this class never reads
+// the wall clock on an RPC path. In production that value IS `Date.now()`, one
+// stub hop away. The legacy routes still call `Date.now()` themselves, and the
+// two agree to the millisecond because it is the same invocation.
+
+import { DurableObject } from "cloudflare:workers";
 
 import type { Env } from "./types";
-import type { VisionReference } from "./slack/vision-reference";
+import {
+  CANCEL_TTL_MS,
+  EVENT_DEDUP_TTL_MS,
+  HISTORY_TTL_MS,
+  MAX_HISTORY_TURNS,
+  PROPOSAL_TTL_MS,
+  RUN_LEASE_MS,
+  type HistoryTurn,
+  type PendingProposal,
+  type ProposalLookup,
+  type RunClaim,
+  type ThreadRef,
+} from "./thread-state/store";
+import type { AssistantContext } from "./slack/types";
 
-export interface HistoryTurn {
-  role: "user" | "assistant";
-  content: string;
-  /** Slack ts of the message this turn was delivered as, when known.
-   *
-   *  The merge key for `retrieval` below. buildThreadHistory (slack/events.ts)
-   *  rebuilds history from the RAW Slack thread and returns without touching
-   *  this store on the common path, so a receipt recorded only here would be
-   *  invisible everywhere except the fallback path. Matching on ts is what
-   *  makes it reachable. */
-  ts?: string;
-  /** Names of the references `read_reference` served during this turn, on the
-   *  user turn that opened it (same key as `retrieval`, for the same reason).
-   *  The TEXT is deliberately not persisted (#423): it rode the turn's provider
-   *  contents while the turn ran, and a later turn sees only a one-line stub per
-   *  name (provider-conversation.ts) — a re-read is one baked-map lookup. */
-  references?: string[];
-  /** What this turn actually retrieved — the tool, the query, and the shape of
-   *  what came back. Rows are deliberately NOT persisted.
-   *
-   *  WHY IT EXISTS: with `{role, content}` only, turn 1's claim sits in turn 2's
-   *  context as authoritative prose with no counter-evidence. A user correcting
-   *  the bot is then arguing against the record. The receipt gives the next turn
-   *  something to check the prose against, and names the query that must not be
-   *  reissued verbatim. */
-  retrieval?: {
-    tool: string;
-    query: string;
-    path?: string;
-    count: number;
-    scenarios: string[];
-    /** Rows came from the short-lived cache, not from a read made this turn.
-     *  Mirrors RetrievalReceipt.cached (agent/loop-shared.ts) — the confidence
-     *  pre-check needs it to tell a fetch from a cache hit. */
-    cached?: boolean;
-  };
-  /** Re-fetchable pointers for one follow-up turn. Image bytes never enter DO
-   *  storage; the next turn rehydrates these through Slack or Figma. */
-  vision?: VisionReference;
-  /** Canvas ids explicitly shared on this user turn. Content stays in Slack;
-   *  this pointer only preserves the conversation-scoped authorization fact. */
-  sharedCanvasIds?: string[];
-}
+// The turn shape lives in the module now (src/thread-state/store.ts), with the
+// same field-by-field reasoning it carried here. Re-exported so every existing
+// importer of `./thread-state` keeps compiling until #494 moves them across.
+export type { HistoryTurn };
 
 interface HistoryRecord {
   turns: HistoryTurn[];
@@ -89,33 +92,19 @@ interface EventRecord {
   status?: "running" | "done";
 }
 
-// dial raised 2026-07-09 — team prefers thorough over fast (user decision)
-const MAX_HISTORY_TURNS = 50;
-const HISTORY_TTL_MS = 7 * 24 * 60 * 60 * 1000;        // 7 days
-// 60 min — was 15, but the gate waits on a HUMAN: live 2026-07-10 a designer's
-// delayed ✅ landed on an expired card and nothing happened. An hour tolerates
-// meetings/stepping away; the gate (not the clock) is still the safety.
-const PROPOSAL_TTL_MS = 60 * 60 * 1000;
-// 24h — was 10 min ("covers Slack's retry window"), but agent runs can now
-// legally exceed 10 minutes (streaming + MCP; live 2026-07-10 run: 11 min),
-// after which the duplicate app_mention/message copy passed dedup and re-ran
-// the ENTIRE agent turn. One tiny record per user message — keep them a day.
-const EVENT_DEDUP_TTL_MS = 24 * 60 * 60 * 1000;
-// How long a "running" lease is trusted before it's presumed dead and the turn
-// is reclaimed. Longest healthy run observed live is ~11 min; a legit run past
-// this window would get double-run, so keep comfortable headroom above real runs.
-const RUN_LEASE_MS = 20 * 60 * 1000;
-
 // How often the storage-GC alarm runs. Expired records are already ignored on
 // read (TTL checks), but the DO is a single instance whose storage otherwise
 // only grows — event: records in particular are write-once-per-message and were
 // never deleted. A daily sweep keeps storage bounded (review 2026-07-12).
 const GC_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
-export class ThreadState implements DurableObject {
+// Extends the `cloudflare:workers` base class — that is what makes the public
+// methods below callable as Durable Object RPC (compatibility_date 2026-05-01).
+export class ThreadState extends DurableObject<Env> {
   private storage: DurableObjectStorage;
 
-  constructor(state: DurableObjectState, _env: Env) {
+  constructor(state: DurableObjectState, env: Env) {
+    super(state, env);
     this.storage = state.storage;
   }
 
@@ -174,19 +163,19 @@ export class ThreadState implements DurableObject {
     const method = request.method;
 
     try {
-      if (path === "/history" && method === "GET")    return this.getHistory(url);
-      if (path === "/history" && method === "POST")   return this.appendHistory(request);
-      if (path === "/proposals" && method === "POST") return this.putProposal(request);
-      if (path === "/proposals" && method === "GET")  return this.getProposal(url);
-      if (path === "/proposals" && method === "DELETE") return this.deleteProposal(url);
-      if (path === "/proposals/by-thread" && method === "GET") return this.getProposalByThread(url);
-      if (path === "/assistant-context" && method === "POST") return this.putAssistantContext(request);
-      if (path === "/assistant-context" && method === "GET")  return this.getAssistantContext(url);
-      if (path === "/events/check-and-record" && method === "POST") return this.checkAndRecordEvent(request);
-      if (path === "/cancel" && method === "POST")   return this.setCancel(url);
-      if (path === "/cancel" && method === "GET")    return this.getCancel(url);
-      if (path === "/active-run" && method === "POST") return this.setActiveRun(url);
-      if (path === "/cancel/by-user" && method === "POST") return this.cancelByUser(url);
+      if (path === "/history" && method === "GET")    return this.routeGetHistory(url);
+      if (path === "/history" && method === "POST")   return this.routeAppendHistory(request);
+      if (path === "/proposals" && method === "POST") return this.routePutProposal(request);
+      if (path === "/proposals" && method === "GET")  return this.routeGetProposal(url);
+      if (path === "/proposals" && method === "DELETE") return this.routeDeleteProposal(url);
+      if (path === "/proposals/by-thread" && method === "GET") return this.routeGetProposalByThread(url);
+      if (path === "/assistant-context" && method === "POST") return this.routePutAssistantContext(request);
+      if (path === "/assistant-context" && method === "GET")  return this.routeGetAssistantContext(url);
+      if (path === "/events/check-and-record" && method === "POST") return this.routeCheckAndRecordEvent(request);
+      if (path === "/cancel" && method === "POST")   return this.routeSetCancel(url);
+      if (path === "/cancel" && method === "GET")    return this.routeGetCancel(url);
+      if (path === "/active-run" && method === "POST") return this.routeSetActiveRun(url);
+      if (path === "/cancel/by-user" && method === "POST") return this.routeCancelByUser(url);
     } catch (err) {
       console.error(`[thread-state] ${method} ${path} failed:`, err);
       return json({ ok: false, error: String(err) }, 500);
@@ -195,9 +184,224 @@ export class ThreadState implements DurableObject {
     return new Response("not found", { status: 404 });
   }
 
+  // ══ The ThreadState RPC surface ════════════════════════════════════════════
+  //
+  // One method per interface method, same names, same arguments, plus the
+  // caller's `at` (see the header). These are the methods
+  // `createDurableObjectThreadState` calls; they share every storage key and
+  // record shape with the routes below, so both doors see one state.
+
   // ----- history -----
 
-  private async getHistory(url: URL): Promise<Response> {
+  /** Live turns for a conversation, evicting the record if it has aged out.
+   *  Expiry is applied on READ rather than by the GC alarm, so a fresh Durable
+   *  Object with no alarm scheduled answers identically. */
+  private async liveTurns(ref: ThreadRef, at: number): Promise<HistoryTurn[]> {
+    const key = historyKey(ref.channel, ref.thread);
+    const rec = await this.storage.get<HistoryRecord>(key);
+    if (!rec) return [];
+    if (at - rec.updatedAt > HISTORY_TTL_MS) {
+      await this.storage.delete(key);
+      return [];
+    }
+    return rec.turns;
+  }
+
+  async readHistory(ref: ThreadRef, at: number): Promise<HistoryTurn[]> {
+    return this.liveTurns(ref, at);
+  }
+
+  async appendHistory(
+    ref: ThreadRef,
+    turn: HistoryTurn,
+    at: number,
+  ): Promise<{ length: number }> {
+    const prev = await this.liveTurns(ref, at);
+    const turns = [...prev, turn].slice(-MAX_HISTORY_TURNS);
+    await this.storage.put<HistoryRecord>(historyKey(ref.channel, ref.thread), {
+      turns,
+      updatedAt: at,
+    });
+    await this.ensureGcAlarm();
+    return { length: turns.length };
+  }
+
+  async compactHistory(
+    ref: ThreadRef,
+    keepRecent: number,
+    at: number,
+  ): Promise<{ turns: HistoryTurn[]; dropped: number }> {
+    const turns = await this.liveTurns(ref, at);
+    // Nothing to gain once the tail is the whole conversation (or all but the
+    // opening turn, which is kept either way).
+    if (turns.length <= keepRecent + 1) return { turns, dropped: 0 };
+    const kept = [turns[0]!, ...turns.slice(-keepRecent)];
+    await this.storage.put<HistoryRecord>(historyKey(ref.channel, ref.thread), {
+      turns: kept,
+      updatedAt: at,
+    });
+    return { turns: kept, dropped: turns.length - kept.length };
+  }
+
+  // ----- proposals -----
+
+  async putProposal(proposal: PendingProposal, at: number): Promise<void> {
+    await this.storage.put<ProposalRecord>(proposalKey(proposal.proposalTs), {
+      payload: proposal,
+      createdAt: at,
+    });
+    await this.ensureGcAlarm();
+  }
+
+  // "expired" and "none" are different answers on purpose: the gate has to tell
+  // the requester their delayed ✅ hit an aged-out card rather than ignore it.
+  async getProposalByTs(proposalTs: string, at: number): Promise<ProposalLookup> {
+    const rec = await this.storage.get<ProposalRecord>(proposalKey(proposalTs));
+    if (!rec) return { state: "none" };
+    if (at - rec.createdAt > PROPOSAL_TTL_MS) {
+      await this.storage.delete(proposalKey(proposalTs));
+      return { state: "expired" };
+    }
+    return {
+      state: "found",
+      proposal: rec.payload as PendingProposal,
+      createdAt: rec.createdAt,
+    };
+  }
+
+  // Scans the staged set: proposals expire after an hour, so live cardinality
+  // stays small.
+  async getProposalByThread(ref: ThreadRef, at: number): Promise<PendingProposal | null> {
+    const all = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
+    let best: ProposalRecord | null = null;
+    for (const rec of all.values()) {
+      if (at - rec.createdAt > PROPOSAL_TTL_MS) continue;
+      const proposal = rec.payload as PendingProposal | null;
+      if (!proposal || proposal.channel !== ref.channel || proposal.threadTs !== ref.thread) continue;
+      if (!best || rec.createdAt > best.createdAt) best = rec;
+    }
+    return (best?.payload as PendingProposal | undefined) ?? null;
+  }
+
+  // The delete IS the claim. A Durable Object handles one event at a time, so of
+  // two racing resolvers exactly one sees `true` — which is the whole
+  // double-execution guard, because `notion_create` is not idempotent.
+  async claimProposal(proposalTs: string): Promise<boolean> {
+    return this.storage.delete(proposalKey(proposalTs));
+  }
+
+  // ----- assistant context -----
+
+  async getAssistantContext(ref: ThreadRef, at: number): Promise<AssistantContext | null> {
+    const key = assistantContextKey(ref.channel, ref.thread);
+    const rec = await this.storage.get<AssistantContextRecord>(key);
+    if (!rec) return null;
+    if (at - rec.updatedAt > HISTORY_TTL_MS) {
+      await this.storage.delete(key);
+      return null;
+    }
+    return rec.context as AssistantContext;
+  }
+
+  async putAssistantContext(
+    ref: ThreadRef,
+    context: AssistantContext,
+    at: number,
+  ): Promise<void> {
+    await this.storage.put<AssistantContextRecord>(
+      assistantContextKey(ref.channel, ref.thread),
+      { context, updatedAt: at },
+    );
+    await this.ensureGcAlarm();
+  }
+
+  // ----- cancel -----
+
+  async requestCancel(ref: ThreadRef, at: number): Promise<void> {
+    await this.storage.put(cancelKey(ref.channel, ref.thread), { at });
+  }
+
+  /** Reads AND clears the flag — one /stop cancels one turn. A stale flag is
+   *  consumed too: leaving it set would abort the next question instead. */
+  async consumeCancel(ref: ThreadRef, at: number): Promise<boolean> {
+    const key = cancelKey(ref.channel, ref.thread);
+    const rec = await this.storage.get<{ at: number }>(key);
+    if (!rec) return false;
+    await this.storage.delete(key);
+    return at - rec.at < CANCEL_TTL_MS;
+  }
+
+  async cancelForUser(
+    userId: string,
+    at: number,
+  ): Promise<{ cancelled: boolean; channel?: string }> {
+    const rec = await this.storage.get<{ channel: string; thread: string; at: number }>(
+      activeRunKey(userId),
+    );
+    if (!rec || at - rec.at > CANCEL_TTL_MS) return { cancelled: false };
+    await this.storage.put(cancelKey(rec.channel, rec.thread), { at });
+    return { cancelled: true, channel: rec.channel };
+  }
+
+  async setActiveRun(userId: string, ref: ThreadRef, at: number): Promise<void> {
+    await this.storage.put(activeRunKey(userId), {
+      channel: ref.channel,
+      thread: ref.thread,
+      at,
+    });
+  }
+
+  // ----- event dedup + the run lease -----
+  //
+  // One record, two questions: `checkAndRecordEvent` asks "have I seen this?"
+  // and `claimRun` asks "may I run it?". See the interface for why a stale
+  // "running" lease is reclaimed rather than trusted (the 2026-07-10 incident).
+
+  async checkAndRecordEvent(eventId: string, at: number): Promise<{ seen: boolean }> {
+    const key = eventKey(eventId);
+    const existing = await this.storage.get<EventRecord>(key);
+    if (existing && at - existing.seenAt < EVENT_DEDUP_TTL_MS) {
+      const status = existing.status ?? "done"; // legacy records = one-shot
+      if (status === "done") return { seen: true };
+      if (at - existing.seenAt < RUN_LEASE_MS) return { seen: true };
+      // a stale lease is no longer evidence the event was handled
+    }
+    await this.storage.put<EventRecord>(key, { seenAt: at, status: "done" });
+    await this.ensureGcAlarm();
+    return { seen: false };
+  }
+
+  async claimRun(eventId: string, at: number): Promise<RunClaim> {
+    const key = eventKey(eventId);
+    const existing = await this.storage.get<EventRecord>(key);
+    if (existing && at - existing.seenAt < EVENT_DEDUP_TTL_MS) {
+      const status = existing.status ?? "done";
+      if (status === "done") return "done";
+      if (at - existing.seenAt < RUN_LEASE_MS) return "running";
+      // Stale "running" lease → the owner was killed mid-run; reclaim.
+    }
+    await this.storage.put<EventRecord>(key, { seenAt: at, status: "running" });
+    await this.ensureGcAlarm();
+    return "claimed";
+  }
+
+  async markRunDone(eventId: string, at: number): Promise<void> {
+    const key = eventKey(eventId);
+    const existing = await this.storage.get<EventRecord>(key);
+    await this.storage.put<EventRecord>(key, {
+      seenAt: existing?.seenAt ?? at,
+      status: "done",
+    });
+  }
+
+  // ══ The legacy HTTP routes ═════════════════════════════════════════════════
+  //
+  // Still the contract every caller uses today (`src/thread-state-client.ts`);
+  // #494 moves them onto the module and deletes everything below.
+
+  // ----- history -----
+
+  private async routeGetHistory(url: URL): Promise<Response> {
     const channel = url.searchParams.get("channel");
     const thread = url.searchParams.get("thread");
     if (!channel || !thread) return json({ ok: false, error: "missing channel/thread" }, 400);
@@ -213,7 +417,7 @@ export class ThreadState implements DurableObject {
     return json({ ok: true, turns: rec.turns });
   }
 
-  private async appendHistory(request: Request): Promise<Response> {
+  private async routeAppendHistory(request: Request): Promise<Response> {
     const body = await request.json<{ channel: string; thread_ts: string; turn: HistoryTurn }>();
     if (!body?.channel || !body?.thread_ts || !body?.turn) {
       return json({ ok: false, error: "missing fields" }, 400);
@@ -228,7 +432,7 @@ export class ThreadState implements DurableObject {
 
   // ----- proposals -----
 
-  private async putProposal(request: Request): Promise<Response> {
+  private async routePutProposal(request: Request): Promise<Response> {
     const body = await request.json<{ ts: string; payload: unknown }>();
     if (!body?.ts) return json({ ok: false, error: "missing ts" }, 400);
     await this.storage.put<ProposalRecord>(proposalKey(body.ts), {
@@ -239,7 +443,7 @@ export class ThreadState implements DurableObject {
     return json({ ok: true });
   }
 
-  private async getProposal(url: URL): Promise<Response> {
+  private async routeGetProposal(url: URL): Promise<Response> {
     const ts = url.searchParams.get("ts");
     if (!ts) return json({ ok: false, error: "missing ts" }, 400);
     const rec = await this.storage.get<ProposalRecord>(proposalKey(ts));
@@ -257,7 +461,7 @@ export class ThreadState implements DurableObject {
   // whole double-execution guard: `notion_create` is not idempotent, and a
   // reaction landing beside a typed "go ahead" could otherwise have both
   // resolvers read the same pending record and both call executeTool.
-  private async deleteProposal(url: URL): Promise<Response> {
+  private async routeDeleteProposal(url: URL): Promise<Response> {
     const ts = url.searchParams.get("ts");
     if (!ts) return json({ ok: false, error: "missing ts" }, 400);
     const deleted = await this.storage.delete(proposalKey(ts));
@@ -267,7 +471,7 @@ export class ThreadState implements DurableObject {
   // Find the freshest non-expired proposal for a (channel, thread) pair.
   // Scans all `prop:*` keys — acceptable given the small active set
   // (proposals expire after 60 min so cardinality stays low).
-  private async getProposalByThread(url: URL): Promise<Response> {
+  private async routeGetProposalByThread(url: URL): Promise<Response> {
     const channel = url.searchParams.get("channel");
     const thread = url.searchParams.get("thread");
     if (!channel || !thread) return json({ ok: false, error: "missing channel/thread" }, 400);
@@ -292,7 +496,7 @@ export class ThreadState implements DurableObject {
 
   // ----- assistant context -----
 
-  private async putAssistantContext(request: Request): Promise<Response> {
+  private async routePutAssistantContext(request: Request): Promise<Response> {
     const body = await request.json<{ channel: string; thread: string; context: unknown }>();
     if (!body?.channel || !body?.thread) return json({ ok: false, error: "missing channel/thread" }, 400);
     await this.storage.put<AssistantContextRecord>(assistantContextKey(body.channel, body.thread), {
@@ -311,13 +515,13 @@ export class ThreadState implements DurableObject {
   //
   // Short TTL on purpose. A stale flag would abort the NEXT question the person
   // asks, which reads as the bot ignoring them — worse than a stop that missed.
-  private async setCancel(url: URL): Promise<Response> {
+  private async routeSetCancel(url: URL): Promise<Response> {
     const key = cancelKey(url.searchParams.get("channel") ?? "", url.searchParams.get("thread") ?? "");
     await this.storage.put(key, { at: Date.now() });
     return json({ ok: true });
   }
 
-  private async getCancel(url: URL): Promise<Response> {
+  private async routeGetCancel(url: URL): Promise<Response> {
     const key = cancelKey(url.searchParams.get("channel") ?? "", url.searchParams.get("thread") ?? "");
     const rec = await this.storage.get<{ at: number }>(key);
     if (!rec) return json({ ok: true, cancelled: false });
@@ -343,7 +547,7 @@ export class ThreadState implements DurableObject {
   // TTL is CANCEL_TTL_MS, the same five minutes as a cancel flag, and for the
   // same reason: a stale pointer would cancel a conversation the person has
   // long since finished, which reads as the bot dropping a question.
-  private async setActiveRun(url: URL): Promise<Response> {
+  private async routeSetActiveRun(url: URL): Promise<Response> {
     const user = url.searchParams.get("user") ?? "";
     const channel = url.searchParams.get("channel") ?? "";
     const thread = url.searchParams.get("thread") ?? "";
@@ -356,7 +560,7 @@ export class ThreadState implements DurableObject {
   // two-call shape (look up, then cancel) would spend a second DO round trip
   // inside a Slack interaction that has 3 seconds to ack, to no benefit — the
   // caller has nothing to do with the lookup except cancel it.
-  private async cancelByUser(url: URL): Promise<Response> {
+  private async routeCancelByUser(url: URL): Promise<Response> {
     const user = url.searchParams.get("user") ?? "";
     if (!user) return json({ ok: false, error: "missing user" }, 400);
     const rec = await this.storage.get<{ channel: string; thread: string; at: number }>(activeRunKey(user));
@@ -367,7 +571,7 @@ export class ThreadState implements DurableObject {
     return json({ ok: true, cancelled: true, channel: rec.channel });
   }
 
-  private async getAssistantContext(url: URL): Promise<Response> {
+  private async routeGetAssistantContext(url: URL): Promise<Response> {
     const channel = url.searchParams.get("channel");
     const thread = url.searchParams.get("thread");
     if (!channel || !thread) return json({ ok: false, error: "missing channel/thread" }, 400);
@@ -400,7 +604,7 @@ export class ThreadState implements DurableObject {
   //               deploy, then every alarm retry skipped on the stuck marker
   //               and the thread went permanently silent). Stale leases are
   //               reclaimed: the checker gets seen:false and re-runs the turn.
-  private async checkAndRecordEvent(request: Request): Promise<Response> {
+  private async routeCheckAndRecordEvent(request: Request): Promise<Response> {
     const body = await request.json<{ event_id: string; mode?: "run"; mark?: "done" }>();
     if (!body?.event_id) return json({ ok: false, error: "missing event_id" }, 400);
     const key = eventKey(body.event_id);
@@ -442,8 +646,8 @@ function eventKey(eventId: string): string {
 }
 
 // Cancel flags expire fast on purpose: a stale one would abort the NEXT
-// question, which reads as the bot ignoring you.
-const CANCEL_TTL_MS = 5 * 60_000;
+// question, which reads as the bot ignoring you. (The duration itself now lives
+// in src/thread-state/store.ts with every other TTL this class honours.)
 function cancelKey(channel: string, thread: string): string {
   return `cancel:${channel}:${thread}`;
 }
