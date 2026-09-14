@@ -1,14 +1,22 @@
-// Provider-neutral contract + policy shared by BOTH agent loops (the Anthropic
-// loop in run-agent.ts and the Gemini loop in gemini-agent.ts).
+// Provider-neutral contract + per-turn scope shared by the loop and the Claude
+// path that has not moved onto it yet (claude-agent.ts, #496).
 //
-// Extracted 2026-07-12 (review finding) to: (1) break the run-agent ↔
-// gemini-agent value-level import cycle — the shared contract used to live
-// inside one provider's file; and (2) stop the two lanes from silently drifting
-// on the iteration/token/tool caps, the budget-exhausted messages, the interim
-// filter, and proposal_resolve validation, all of which were copy-pasted.
+// WHAT IS LEFT HERE, after the loop landed (#495):
+//   - `AgentInput`: the turn contract the Worker calls an agent with. `Env`
+//     enters here and stops here; the loop itself takes named ports.
+//   - The per-turn AsyncLocalStorage scope (tool ledger, correction flag,
+//     retrieval receipt, absence signal) that the draft judge reads several
+//     frames above the loop.
+//   - `executeReadOnlyTool`, the one read-only tool dispatch.
+//   - The correction/pushback vocabulary, which drives Worker-side control flow.
 //
-// This module owns nothing provider-specific: no Anthropic streaming, no Gemini
-// wire types. Each loop keeps its own transport and calls into these helpers.
+// WHAT MOVED, and why: the loop's dials, budget strings, narration filter and
+// `proposal_resolve` validation now live in `loop-policy.ts`, and `AgentResult`
+// and `TurnDials` in `loop.ts`. This file reaches every tool body and so drags
+// the whole Workers type graph behind it — the loop cannot import from here and
+// still be compiled by `tsconfig.test.json`, which is what makes it testable
+// against a fake adapter. Everything is re-exported below, so no caller of this
+// module changed; #497 retires the re-export surface with the rest of the bag.
 
 import { AsyncLocalStorage } from "node:async_hooks";
 import { GATE_RESERVED } from "../slack/gate-reactions";
@@ -42,6 +50,7 @@ export { NOT_RUN_TURN_ENDED, NO_RESULT_RECORDED } from "./tool-transcript";
 export type { AgentImage } from "./provider-conversation";
 
 import type { ModelTier } from "./routing";
+import type { TurnDials } from "./loop";
 
 export interface AgentInput {
   env: Env;
@@ -87,151 +96,38 @@ export interface AgentInput {
   onToolResult?: (result: ToolResultNote) => void;
 }
 
-/** What one turn actually ran on. `level` is null when the model in use takes
- *  no thinking dial (a 2.x fallback on the Gemini lane; every Claude call). */
-export interface TurnDials {
-  tier: ModelTier;
-  route: string;
-  model: string;
-  level: string | null;
-}
+// The loop's own types, re-exported so callers of this module are unchanged.
+export type { AgentResult, TurnDials } from "./loop";
+export type {
+  ModelProvider,
+  ModelReply,
+  ModelToolCall,
+  ModelToolResult,
+  ModelUsage,
+  ProviderDials,
+  SystemBlock,
+  ToolSpec,
+} from "./model-provider";
 
-export type AgentResult =
-  | { kind: "text"; text: string }
-  | {
-      kind: "proposal";
-      toolName: string;
-      input: Record<string, unknown>;
-      /** Brief structural preview the model wrote alongside the tool_use, if any.
-       *  The Worker combines this with its standardized proposal footer. */
-      previewText?: string;
-    }
-  | {
-      kind: "resolved";
-      decision: "confirm" | "cancel";
-      pending: PendingProposal;
-      messageToUser?: string;
-    };
-
-// ── Loop dials (identical across lanes; change here to change both) ───────────
-
-// Raised from 5: grounding questions legitimately chain several read-only
-// searches before the model has enough to answer. If exhausted, both lanes fall
-// back to a final tools-disabled synthesis pass rather than erroring out.
-// dial raised 2026-07-09 — team prefers thorough over fast (user decision).
-export const MAX_ITERATIONS = 16;
-// dial raised 2026-07-09 — team prefers thorough over fast (user decision):
-// Slack's hard cap is 40k chars, and summary-first readability still applies.
-// Raised again 2026-07-10 for Sonnet 5 + adaptive thinking: thinking tokens
-// share this budget and Sonnet 5's tokenizer counts ~30% more — 8192 risked an
-// all-thinking, truncated answer. We stream, so no timeout risk.
-export const MAX_TOKENS = 16384;
-// Cap on individual read-only tool executions per request. Each execution costs
-// Workers subrequests (a blueprint fallback search alone is ~4 fetches); the
-// free plan allows 50 per request — blowing it kills the request mid-flight so
-// hard even the error post fails ("reacted :eyes: then silence"). Past the cap
-// the model is told to answer with what it has.
-// dial raised 2026-07-09 — team prefers thorough over fast (user decision).
-// NOTE: 12 sits closer to the subrequest cliff than the old 6 — if "eyes then
-// silence" recurs on search-heavy turns, this is the first dial to look at.
-// Kept as a secondary hard COUNT backstop behind the weighted budget below.
-export const READONLY_TOOL_BUDGET = 12;
-
-// ── Subrequest budget: enforced at the boundary ──────────────────────────────
-//
-// The free plan hard-caps each Worker invocation at 50 EXTERNAL subrequests
-// (Notion reads, Slack calls, model calls — everything that leaves Cloudflare;
-// DO and KV hops are a separate 1,000 bucket). Call 51 kills
-// the invocation, and because POSTING the reply also costs a subrequest, it dies
-// silently: 👀 then nothing (live incidents 2026-07-10, 2026-07-13).
-//
-// This ran on estimates twice over. First a hand-typed per-tool cost table with
-// nothing comparing it to reality — it drifted (notion_search priced 4 while
-// scope 'apps' really spent 6) and nothing could notice, because nothing
-// counted. Then a measured counter plus a per-tool WORST-CASE bound, because a
-// gate that decides before a call can't know what the call will cost. That was
-// honest but still a hand-maintained table, and still had to be conservative:
-// a tool bounded at 10 was refused with 9 units left even when it would have
-// spent 2.
-//
-// Now `countedFetch` refuses the call that would cross the ceiling and throws
-// (net.ts). Nothing has to predict anything: the ceiling is unbreachable
-// whatever a tool costs, paging loops turn the stop into a partial read with
-// `truncated: true`, and there is no table left to drift.
-//
-// The one rule handlers must respect: a budget stop is NOT an empty result.
-// Swallowing it reports "there is nothing there" — the false-absence bug this
-// codebase keeps having to fix. Use `rethrowIfBudget` at best-effort catches.
-//
-// That rule is a convention, and a future `catch {}` can break it without ever
-// mentioning the budget. So the tool boundary doesn't rely on it: net.ts counts
-// every stop, the loop compares the count either side of a lookup, and a rise
-// stamps `markPartialLookup` on whatever came back. Swallowing the throw now
-// costs an unnecessary label, not a false absence.
-
-export const SUBREQUEST_CAP = 50; // Cloudflare free-plan EXTERNAL cap per invocation.
-// Reserved for delivery — NEVER spent on lookups: final post + one retry + the
-// pre-send review-judge model call + margin. (History writes are Durable Object
-// hops, which live in the separate 1,000 internal bucket — see net.ts charge.)
-export const DELIVERY_RESERVE = 12;
-// Lookups run under this limit; delivery runs unlimited against the real cap.
-export const LOOKUP_CEILING = SUBREQUEST_CAP - DELIVERY_RESERVE;
-
-/**
- * True when another loop iteration can't be afforded.
- *
- * The model round-trip is the one subrequest every iteration spends, and it is
- * deliberately NOT under the enforced limit — a budget stop there means no reply
- * at all, which is the outcome we're avoiding. So it stays a pre-check: refusing
- * lookups alone left the model free to keep requesting tools, and while each
- * refusal is free, the round-trip carrying it is not. `+ 1` because the
- * tools-disabled synthesis pass still has to be paid for.
- */
-export function outOfIterationBudget(used: number): boolean {
-  return used + 1 >= LOOKUP_CEILING;
-}
-
-// ── Shared prompt strings (must read identically in both lanes) ───────────────
-
-/** Fed back as a tool_result when the read-only budget is spent. */
-export const BUDGET_EXHAUSTED_LOOKUP_NOTE =
-  "Answer NOW from the tool results you already have; if they're insufficient, say exactly what's missing — do not fabricate. If the user asked for an ACTION (filing a card, sending something), you can and should still invoke that one action tool now — actions are not lookups. NEVER mention budgets, limits, turns, or tool mechanics to the user (live 2026-07-10: 'my tool run budget has been exhausted' reached a designer and read as a malfunction). If you couldn't gather everything the user asked for, deliver what you DO have and briefly offer to continue on the SPECIFIC missing piece (e.g. \"I've got X — want me to check Y next?\") — framed as a natural next step, never as an error or a limit.";
-
-/**
- * Stamp a tool result the budget cut short. Appended rather than merged into the
- * JSON: the result may be any shape, and the model reads the text either way.
- *
- * @param resultText - Whatever the tool returned
- */
-export function markPartialLookup(resultText: string): string {
-  return `${resultText}\n\n(system: this lookup was cut short — the turn ran out of lookup capacity mid-read, so the result above is INCOMPLETE. Nothing found here does NOT mean nothing exists; treat it as unread, not empty, and say which part you couldn't check rather than reporting it as absent.)`;
-}
-
-/** Injected as a final user turn to force a tools-disabled synthesis pass. */
-export const BUDGET_EXHAUSTED_SYNTHESIS =
-  "(system: tool budget exhausted — answer the original question NOW from the tool results above; do not request more tools. If the results are insufficient, say what's missing.)";
-
-/** Fallback shown when even the synthesis pass produced no text. */
-export const CLARIFY_FALLBACK =
-  "I pulled up a lot of context but couldn't wrap it into a clean answer — can you narrow the question a little?";
-
-// ── Interim-narration filter (same policy, provider-specific plumbing) ────────
-
-// Between-tool narration is surfaced to the user as SHORT separate messages
-// (never in the final reply). Capped at 3 per request and ~280 chars each; only
-// the first line of a narration block is used. The full monologue is never
-// exposed (user decision 2026-07-10 after a delivered reply included seven
-// paragraphs of it). Returns an emit(raw) each loop calls with candidate text.
-export function makeInterimFilter(onInterim?: (text: string) => void): (raw: string) => void {
-  let interimSent = 0;
-  return (raw: string): void => {
-    if (!onInterim || interimSent >= 3) return;
-    const line = raw.trim().split("\n")[0]?.trim() ?? "";
-    if (line.length < 15) return; // too short to be informative
-    interimSent++;
-    onInterim(line.length > 280 ? `${line.slice(0, 277)}…` : line);
-  };
-}
+// The loop's policy, re-exported for the same reason.
+export {
+  MAX_ITERATIONS,
+  MAX_TOKENS,
+  READONLY_TOOL_BUDGET,
+  SUBREQUEST_CAP,
+  DELIVERY_RESERVE,
+  LOOKUP_CEILING,
+  STOPPED_MESSAGE,
+  BUDGET_EXHAUSTED_LOOKUP_NOTE,
+  BUDGET_EXHAUSTED_SYNTHESIS,
+  CLARIFY_FALLBACK,
+  budgetRefusedResult,
+  markPartialLookup,
+  makeInterimFilter,
+  outOfIterationBudget,
+  validateProposalResolve,
+} from "./loop-policy";
+export type { ResolveValidation } from "./loop-policy";
 
 // ── Confirm/cancel vocabulary: there is none ─────────────────────────────────
 //
@@ -470,34 +366,7 @@ export function isCorrectionTurn(): boolean {
   return turnScope.getStore()?.correction === true;
 }
 
-// ── proposal_resolve validation (Worker-side authorization, both lanes) ───────
-
-export type ResolveValidation =
-  | { ok: true; decision: "confirm" | "cancel"; messageToUser?: string }
-  | { ok: false; error: string };
-
-/** Validate a proposal_resolve call against the thread's pending state and the
- *  current sender. Enforced Worker-side even though the system prompt already
- *  tells the model — defense in depth. */
-export function validateProposalResolve(
-  args: { decision?: unknown; message_to_user?: unknown } | undefined,
-  pending: PendingProposal | null,
-  // Kept for signature stability + logging; no longer gated on — anyone in the
-  // thread may confirm/cancel (2026-07-14).
-  _currentSenderId: string,
-): ResolveValidation {
-  if (!pending) {
-    return { ok: false, error: "no pending proposal in this thread — reply conversationally instead" };
-  }
-  const decision = args?.decision;
-  if (decision !== "confirm" && decision !== "cancel") {
-    return { ok: false, error: "decision must be 'confirm' or 'cancel'" };
-  }
-  const msg = typeof args?.message_to_user === "string" ? args.message_to_user : undefined;
-  return { ok: true, decision, messageToUser: msg };
-}
-
-// ── Read-only tool execution (shared by both lanes) ───────────────────────────
+// ── Read-only tool execution ─────────────────────────────────────────────────
 
 export async function executeReadOnlyTool(
   env: Env,

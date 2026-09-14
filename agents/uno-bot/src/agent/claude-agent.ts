@@ -133,9 +133,10 @@ export async function runClaudeAgent(input: AgentInput): Promise<AgentResult> {
       `[budget] ${subrequestsUsed()}/${SUBREQUEST_CAP} subrequests spent (lookup ceiling ${LOOKUP_CEILING}), ` +
         `${toolCallsUsed} tools, ${subrequestBudgetTrips()} budget stops | ${meterBreakdown()}`,
     );
-    // This lane has a thinking BUDGET (tokens), not a level, so level is null;
-    // reported all the same so the eval route sees the tier on either lane.
-    input.onDials?.({ tier, route: routeReason, model, level: null });
+    // This path has a thinking BUDGET (tokens), not a level — so it reports no
+    // level at all rather than a null one. TODO(#496): this moves into the
+    // Claude adapter's own `dials()` when it lands behind the seam.
+    input.onDials?.({ tier, route: routeReason, model, detail: {} });
     console.log(
       `[uno-bot] request done build=${BUILD} provider=vertex-claude tier=${tier} route=${routeReason} model=${model} ` +
         `iterations=${iterations} tokens_in=${inputTokens} tokens_out=${outputTokens} ` +
