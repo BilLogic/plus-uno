@@ -52,7 +52,16 @@ It proves **nothing about the model** — no in-process run can tell you whether
 WORKER_URL=… DEBUG_TOKEN=… node agents/uno-bot/scripts/eval-record.mjs --case=R1 --case=R2
 ```
 
-Every turn it records is a live billable model run, so it records nothing unless you name cases (or pass `--all`). A case that declares a run-time `subject` is recorded **with its row**: the Worker's subject read answers first, the row fills the case's placeholders as the runner fills them, and it is written into the recording as `subject`. A condition nothing on the board satisfies is reported as a skip, by name — there was nothing to record. Round-trip boundaries and tool-result bodies are not on the wire — see the header of `scripts/eval-record.mjs` for exactly what is reconstructed and what has to be written in by hand.
+Or **from CI, with no credentials of your own** (#544) — the Worker URL and debug token are already repo secrets, so the evals workflow will record the whole suite and hand back the files:
+
+```bash
+gh workflow run uno-bot-evals.yml -f mode=record   # then, once it finishes:
+gh run download <run-id> -n eval-recordings
+```
+
+Read what came back before committing it into this directory in its own PR — a recording is an answer replayed against forever, and a bad afternoon is not a fixture.
+
+Every turn either route records is a live billable model run, so the script records nothing unless you name cases (or pass `--all`), and the CI route is a `workflow_dispatch` rather than a second cron for the same reason. A case that declares a run-time `subject` is recorded **with its row**: the Worker's subject read answers first, the row fills the case's placeholders as the runner fills them, and it is written into the recording as `subject`. A condition nothing on the board satisfies is reported as a skip, by name — there was nothing to record. Round-trip boundaries and tool-result bodies are not on the wire — see the header of `scripts/eval-record.mjs` for exactly what is reconstructed and what has to be written in by hand.
 
 ## Recorded today
 
