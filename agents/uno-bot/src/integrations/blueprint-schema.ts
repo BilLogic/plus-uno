@@ -17,21 +17,94 @@
 // rather than merely written down.
 import { BLUEPRINT_CONTRACT } from "../generated/blueprint-contract";
 
+/** A table the contract declares direct-read columns for. Keyed off the
+ *  contract itself, so a table the app stops declaring is a type error at every
+ *  site that reads it rather than a 404 reported as an empty result. */
+export type DirectReadTable = keyof typeof BLUEPRINT_CONTRACT.botDirectReadColumns;
+
+/**
+ * A select over `table`, BUILT FROM the contract's declaration for it.
+ *
+ * With no `keys`, the select is every column the contract declares, in the
+ * contract's order — the shape of a read that wants the whole declared row
+ * (`cells`, `resources`, `lanes`, `cell_dependencies`). With `keys`, it is the
+ * declared columns narrowed to the ones this read actually uses, still in the
+ * contract's order: an embed like `steps(...)` reads one column of a table the
+ * contract declares two of, and widening the select to make the derivation
+ * tidier would change what the Worker asks PostgREST for.
+ *
+ * `keys` name a ROLE the read needs filled ("the named one"), and the contract
+ * supplies the spelling. A key the contract does not declare throws HERE, at
+ * module load, which fails the Worker's start — the alternative is a select
+ * PostgREST answers with 400 and every call site reports as "the blueprint has
+ * nothing on that". Same discipline as `touchpointSelectFrom` below, which
+ * keeps its own signature because its caller passes the column list in.
+ */
+export function selectFrom(table: DirectReadTable, keys?: readonly string[]): string {
+  const declared = BLUEPRINT_CONTRACT.botDirectReadColumns[table] as readonly string[];
+  if (keys === undefined) return declared.join(",");
+  for (const key of keys) {
+    if (!declared.includes(key)) {
+      throw new Error(
+        `a direct read of \`${table}\` asks for \`${key}\`, which the contract's botDirectReadColumns.${table} does not declare`,
+      );
+    }
+  }
+  return declared.filter((column) => keys.includes(column)).join(",");
+}
+
+/** One column of `table`, taken from the contract rather than restated beside
+ *  it. `column` is the role key; the contract is what says the spelling is
+ *  still current, and an undeclared one throws at module load. */
+export function columnFrom(table: DirectReadTable, column: string): string {
+  return selectFrom(table, [column]);
+}
+
+/** One column the reads ask of SEVERAL tables — the prose column, the position
+ *  column — checked against every one of them. A column that survives on three
+ *  tables and is renamed on the fourth is still a 400 on the fourth read, so
+ *  the narrowest check is the wrong one. */
+function columnFromAll(
+  tables: readonly [DirectReadTable, ...DirectReadTable[]],
+  column: string,
+): string {
+  // Every table is asked, so every table's rename throws; the answers are the
+  // same string by construction, and the first is the contract's own bytes.
+  return tables.map((table) => columnFrom(table, column))[0]!;
+}
+
+/** The single column an embed of a structural table reads — a step, a path, a
+ *  scenario, a phase each contribute their name and nothing else to the cells
+ *  fallback. Written once here rather than four times in the select. */
+const NAME_ONLY: readonly string[] = ["name"];
+
 /**
  * The prose column on every structural table. `description` until
  * 20260820090000 (cells) and earlier for the rest.
+ *
+ * Taken from the contract, and from every table the keyword fallback selects it
+ * on. The role key is still spelled here because `botDirectReadColumns` is an
+ * unlabelled list per table — it cannot say which of `id,name,summary,position`
+ * is the prose one — so a rename cannot be FOLLOWED automatically; it is caught
+ * instead, by the throw in `columnFrom` at module load. Making the contract
+ * name its roles is the app repo's call (see scripts/sync-blueprint-contract.mjs).
  *
  * The bot still EMITS `description`: that is the name `search_blueprint` puts
  * on the wire (`BLUEPRINT_CONTRACT.searchBlueprintColumns.description`), and
  * the RPC's projection is its own decision. Read name and wire name are
  * separate on purpose — conflating them is what makes a rename look optional.
  */
-export const PROSE_COLUMN = "summary";
+export const PROSE_COLUMN = columnFromAll(
+  ["cells", "phases", "scenarios", "paths", "touchpoints"],
+  "summary",
+);
 
 /** Position column. `order_position` until 20260820130000 gave every position
  *  column one name. Ordering by a column that does not exist is a 400, not a
- *  silent fallback to insertion order. */
-export const POSITION_COLUMN = "position";
+ *  silent fallback to insertion order. Taken from the contract, and from both
+ *  tables the outline read orders — `phases` and its embedded `scenarios`; the
+ *  role key is spelled here for the same reason PROSE_COLUMN's is. */
+export const POSITION_COLUMN = columnFromAll(["phases", "scenarios"], "position");
 
 /**
  * The findings table. `findings` until 20260830190000.
@@ -46,8 +119,11 @@ export const FINDINGS_TABLE = "audit_findings";
 /** Edge select columns. `label` became `name` and `note` was dropped by
  *  20260830190000. The FK embed hints are appended at the call site from
  *  `BLUEPRINT_CONTRACT.fkConstraints` — those were already pinned; these were
- *  the half of the same select that nothing watched. */
-export const EDGE_SELECT_COLUMNS = "source_cell_id,target_cell_id,kind,name";
+ *  the half of the same select that nothing watched, until this one derived
+ *  from the contract's declaration for the table it reads. Every column the
+ *  contract declares for `cell_dependencies` is one this read wants, so there
+ *  is nothing to narrow and no column name left in this file. */
+export const EDGE_SELECT_COLUMNS = selectFrom("cell_dependencies");
 
 /**
  * The cells select used by the keyword fallback, and by /health/blueprint's
@@ -67,12 +143,21 @@ export const EDGE_SELECT_COLUMNS = "source_cell_id,target_cell_id,kind,name";
  * every deploy — noticed on 2026-09-05 when the touchpoint probe went green
  * beside it. The hint's name is the contract's, so a renamed constraint moves
  * this string when the sync moves the contract.
+ *
+ * Every column in it now comes the same way. `cells`, `resources` and `lanes`
+ * are read whole, so each is the contract's declaration joined; the four
+ * structural embeds read one column of a table the contract declares more of,
+ * so each is narrowed to what the read uses (see `selectFrom`). The wire shape
+ * is unchanged — what changed is that no column name is written down here.
  */
 export const CELL_FALLBACK_SELECT =
-  `id,content,${PROSE_COLUMN},function,form,value_props,owner,perceived_owner,updated_at,` +
-  "resources(name,url,kind)," +
-  `lane:lanes!${BLUEPRINT_CONTRACT.fkConstraints.cellLane}(name,owner_team,kpis),step:steps(name),` +
-  "path:paths(name,scenario:scenarios(name,phase:phases(name)))";
+  `${selectFrom("cells")},` +
+  `resources(${selectFrom("resources")}),` +
+  `lane:lanes!${BLUEPRINT_CONTRACT.fkConstraints.cellLane}(${selectFrom("lanes")}),` +
+  `step:steps(${selectFrom("steps", NAME_ONLY)}),` +
+  `path:paths(${selectFrom("paths", NAME_ONLY)},` +
+  `scenario:scenarios(${selectFrom("scenarios", NAME_ONLY)},` +
+  `phase:phases(${selectFrom("phases", NAME_ONLY)})))`;
 
 /**
  * The touchpoint registry (#414): the deployment-level catalog of the tools,
