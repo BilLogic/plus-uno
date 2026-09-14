@@ -1,47 +1,19 @@
 import type { Env } from "../types";
 import { charge } from "../net";
-import {
-  runAgent,
-  looksLikeCorrection,
-  correctionDirective,
-  withTurnScope,
-  type AgentResult,
-} from "../agent/run-agent";
-import { buildProviderConversation } from "../agent/provider-conversation";
-import { routeRequest } from "../agent/routing";
-import { bounceLogLine, proposalWasAddressed } from "../agent/pending-notice";
-import { absenceRepairInstruction, judgeAbsence, type AbsenceContext } from "../agent/absence";
-import { typedEmojiDecision } from "./gate-reactions";
-import { resolveProposal } from "../agent/resolve-proposal";
+import { looksLikeCorrection } from "../agent/run-agent";
 import type { HistoryTurn, PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
-import {
-  addReaction,
-  appendTask,
-  conversationsHistoryBefore,
-  conversationsReplies,
-  getBotIdentity,
-  postMessage,
-  startStream,
-  stopStream,
-} from "./api";
-import { parseScope } from "../agent/scope-keywords";
-import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
-import { buildContextBlock, compactHistory } from "../agent/context-state";
+import { conversationsReplies, getBotIdentity, postMessage } from "./api";
 import { buildFailureMessage } from "./failure-message";
 import {
   handleAgentDmOpened,
   handleAppContextChanged,
   setStatus,
-  setAssistantTitle,
-  threadTitleFrom,
   isAssistantThread,
-  formatAssistantContext,
 } from "./assistant";
 import { handleAppHomeOpened } from "./home";
 import { handleReaction } from "./gate";
 import { extractPrdFromThreadRoot } from "./notion-prd";
-import { preflight } from "../agent/preflight";
 import {
   type SlackMessageEvent,
   type SlackAppMentionEvent,
@@ -54,37 +26,14 @@ import {
   type SlackAppContextChangedEvent,
   type RunnerJobPayload,
 } from "./types";
-import { collectVisionInputs } from "./vision";
-import { historyVisionTurn, selectPreviousVisionReference } from "./vision-reference";
+import { historyVisionTurn } from "./vision-reference";
 import { appMentionToMessage } from "./event-provenance";
 import {
-  canvasIdsSharedByMessage,
   canvasIdsSharedBySlackHistoryMessage,
-  canvasIdsSharedIntoConversation,
   messageTextWithCanvasAttachments,
 } from "./canvas-reference";
-import { postVisibleFailure, postTextVerified, renderDeliveredBody, isCapacityError } from "./delivery";
-import { reviewDraft } from "../agent/draft-judge";
-import {
-  judgeConfidence,
-  needsRepair,
-  repairInstruction,
-  retrievalRanIn,
-  type ConfidenceVerdict,
-} from "../agent/confidence";
-import {
-  formatProposal,
-  formatNotionUpdateProposal,
-  proposalVerb,
-  proposalCardBlocks,
-} from "./proposal-render";
-import { buildImplementDesignProposal } from "./proposal-figma";
-import {
-  describeNotionTarget,
-  normalizeName,
-  parseNotionPageId,
-  fetchPageTitles,
-} from "../integrations/notion";
+import { postVisibleFailure, isCapacityError } from "./delivery";
+import { runSlackTurn } from "./turn-adapter";
 
 // Re-exported for index.ts (SlackEnvelope) + agent-runner.ts (RunnerJobPayload)
 // and any other importer that still reaches for the Slack wire types here.
@@ -440,33 +389,12 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
 async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<void> {
   const channel = event.channel;
   const userId = event.user!;
-  const userMsgTs = event.ts;
   const threadTs = replyThreadTs(event);
-  // History + runner ordering key on the CONVERSATION, which in a DM is the whole
-  // channel — threadTs above may be undefined there and is only a post target.
+  // History and the runner's ordering key on the CONVERSATION, which in a DM is
+  // the whole channel — threadTs above may be undefined there and is only a
+  // post target.
   const convTs = conversationTs(event);
-  const rawText = stripBotMentions(event.text!);
-
-  // Leading scope keyword (`ds:`, `notion:`, …) — the asker saying where they
-  // already know the answer lives. Stripped from the question and turned into
-  // an instruction, so the model reads a clean question plus a hint about
-  // where to start rather than a question with a prefix bolted on.
-  const scoped = parseScope(rawText);
-  const userText = scoped ? scoped.text : rawText;
-  if (scoped) console.log(`[scope] ${scoped.scope.name}`);
-
-  // Is the person telling us the last reply was wrong? Classified in the Worker,
-  // not left to the prompt: on turn 2 the bot's own turn-1 claim is sitting in
-  // context as authoritative prose, and a prompt rule has to beat that. A hit
-  // forces `fresh: true` on search_blueprint, injects a one-turn directive
-  // naming the prior query, pulls the retrieval receipts off the DO, and turns
-  // on the judge's correction gate. See run-agent looksLikeCorrection.
-  // TEXT-ONLY half of the test. The other half — "is there actually a previous
-  // reply to correct?" — needs the history, which is not loaded yet, so it is
-  // applied at `isCorrection` below. This value only decides whether to pull
-  // retrieval receipts off the DO, which is a cheap read and harmless when the
-  // guess is wrong.
-  const textReadsAsCorrection = looksLikeCorrection(userText);
+  const text = stripBotMentions(event.text!);
 
   // Where the person's turn is running, so the Home-tab Stop button can find
   // it. Fire-and-forget: this is a convenience control and must never sit in
@@ -475,30 +403,27 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     .setActiveRun(userId, { channel, thread: convTs })
     .catch(() => {});
 
-  // ONE reaction, and only where nothing else says "I'm on it".
-  //
-  // The agent surface (DM) has assistant.threads.setStatus, a titled thread and
-  // a streamed reply — three signals. Adding 👀 ⏳ ✅ on top made four, on a
-  // message the person can already see is being handled. A channel has none of
-  // those, so 👀 is the only acknowledgement there is; it stays there.
-  if (!isAssistantThread(channel)) {
-    await addReaction(env, channel, userMsgTs, "eyes");
-  }
+  // Does this message read as the person correcting the previous reply? The
+  // TEXT-ONLY half of the test, and all it decides here is whether the history
+  // rebuild pays one extra hop for the retrieval receipts — a cheap read, and
+  // harmless when the guess is wrong. The other half ("is there actually a
+  // previous reply to correct?") needs the history, so Turn applies it.
+  const textReadsAsCorrection = looksLikeCorrection(text);
 
   // If this message is a thread reply (not the thread root itself), check the
-  // parent message for a Notion PRD URL — that's how v1 carried PRD context
-  // from the polling bot's notification into the implement workflow.
+  // parent message for a Notion PRD URL — that is how a PRD reaches the
+  // implement workflow from the polling bot's notification.
   const isThreadReply = !!event.thread_ts && event.thread_ts !== event.ts;
 
-  // Loading thread context runs BEFORE the agent call, so a throw here (Slack
-  // history read, DO lookup, Notion PRD extraction) must not be silent — post a
-  // visible error instead of letting the async handler die quietly.
+  // Loading thread context runs BEFORE the turn, so a throw here (a Slack
+  // history read, a store lookup, the Notion PRD extraction) must not be
+  // silent — post a visible error rather than letting the handler die quietly.
   let history: Awaited<ReturnType<typeof buildThreadHistory>>;
   let pending: PendingProposal | null;
   let prd: Awaited<ReturnType<typeof extractPrdFromThreadRoot>>;
   try {
     [history, pending, prd] = await Promise.all([
-      buildThreadHistory(env, channel, convTs, event.thread_ts, userMsgTs, textReadsAsCorrection),
+      buildThreadHistory(env, channel, convTs, event.thread_ts, event.ts, textReadsAsCorrection),
       threadStateFor(env).getProposalByThread({ channel, thread: convTs }),
       isThreadReply
         ? extractPrdFromThreadRoot(env, channel, event.thread_ts!)
@@ -506,783 +431,30 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     ]);
   } catch (err) {
     console.error(`[slack] context load failed: ${err instanceof Error ? err.message : String(err)}`);
-    await postVisibleFailure(env, channel, threadTs, userMsgTs, err, "context");
+    await postVisibleFailure(env, channel, threadTs, event.ts, err, "context");
     return;
   }
-  const currentCanvasIds = canvasIdsSharedByMessage(userText, event.files);
-  const sharedCanvasIds = canvasIdsSharedIntoConversation(userText, event.files, history);
-  const canvasMessageText = messageTextWithCanvasAttachments(userText, event.files);
 
-  // ── The one deterministic text path: a typed gate emoji, alone ─────────────
-  //
-  // A message that is nothing but ✅ / 👍 / ⛔ / ❌ is the reaction, typed. It
-  // resolves the card exactly as the reaction would, through the same claim.
-  //
-  // Everything else typed goes to the model — including "yes", "go ahead",
-  // "sounds good", "thanks", "ok". Until 2026-08-22 a phrase list resolved
-  // some of those with no model call and a second list reacted 🙏 to others
-  // with no model call, and the two lists were the source of every incident
-  // on this path (2026-07-12 they disagreed; 2026-08-21 "sure go ahead"
-  // matched neither and "sounds good" would have been eaten by the wrong
-  // one). The model reads the whole thread; a list reads the phrasings
-  // someone thought of. User decision, 2026-08-22: "if it's a text response,
-  // just go straight to the model route."
-  //
-  // What keeps the model path safe is no longer a vocabulary but a structural
-  // rule further down: if the model answers an approval by re-invoking the
-  // same tool with the same input — the 2026-07-10 Gemini failure — that IS
-  // the confirmation, and the Worker executes it instead of bouncing.
-  if (pending) {
-    const typed = typedEmojiDecision(userText);
-    if (typed) {
-      await resolveProposal(env, pending, typed);
-      await recordExchange(
-        env, channel, convTs, userText,
-        typed === "confirm" ? "(confirmed — executing the proposal)" : "Cancelled.",
-      );
-      return;
-    }
-  }
-
-  // Assistant-panel surface the user currently has open (best-effort; null off
-  // the panel or when nothing is focused). Advisory grounding for deictic asks
-  // — never assumed to be the subject otherwise. Loaded AFTER the fast-path so
-  // a bare "yes" never pays the DO read; gated on thread_ts because panel
-  // messages are always threaded (plain top-level DMs skip the lookup). May be
-  // one hop stale: Slack doesn't order context_changed vs the message event.
-  // Gated on being the assistant/DM surface, NOT on thread_ts: under agent_view
-  // a DM has no thread, and requiring one skipped the lookup for every message
-  // on the new surface — silently dropping the grounding that app_context_changed
-  // stores. convTs already resolves to DM_CONVERSATION for a threadless DM, the
-  // same key handleAppContextChanged writes under.
-  // ROUTE FIRST, then gather. The reverse order — which this file used until
-  // 2026-08-07 — meant a "thanks" in a long thread paid for the assistant-context
-  // read AND the vision pass before anything knew the turn was trivial. Cheap
-  // turns now skip both. routeRequest is a pure string check: no I/O, so putting
-  // it first costs nothing.
-  const { tier: previewTier, reason: routeWhy } = routeRequest({
-    userText,
-    hasPending: pending !== null,
-    override: event.tierOverride,
+  // Envelope to request to outcome. Everything the turn decides is
+  // `turn/turn.ts`; everything it shows the person goes out through the Slack
+  // Delivery adapter, which the request's dependencies carry.
+  const outcome = await runSlackTurn(env, event, {
+    conversationTs: convTs,
+    ...(threadTs ? { replyTs: threadTs } : {}),
+    text,
+    history,
+    pending,
+    prd,
   });
-  const trivialTurn = previewTier === "chill";
-
-  // Assistant-panel surface the user currently has open (best-effort; null off
-  // the panel or when nothing is focused). Advisory grounding for deictic asks
-  // — never assumed to be the subject otherwise.
-  // Gated on being the assistant/DM surface, NOT on thread_ts: under agent_view
-  // a DM has no thread, and requiring one skipped the lookup for every message
-  // on the new surface — silently dropping the grounding that app_context_changed
-  // stores. convTs already resolves to DM_CONVERSATION for a threadless DM, the
-  // same key handleAppContextChanged writes under.
-  const panelContext =
-    !trivialTurn && isAssistantThread(channel)
-      ? formatAssistantContext(
-          // Best-effort: advisory grounding, so a failed read degrades to none.
-          await threadStateFor(env)
-            .getAssistantContext({ channel, thread: convTs })
-            .catch(() => null),
-        )
-      : null;
-
-  // Vision: pasted images + a linked Figma frame become base64 image blocks on
-  // the current turn. Guarded inside — a failure degrades to text-only.
-  //
-  // Skipped on a trivial turn UNLESS the message carries something visual: an
-  // image with "thanks" is not a trivial turn, and deciding that from the text
-  // alone would drop the attachment silently. A figma.com link counts — the
-  // vision pass screenshots frames from TEXT, not just from files, so checking
-  // files alone would have skipped it.
-  const carriesFiles =
-    (event.files?.length ?? 0) > 0 ||
-    /figma\.com/i.test(userText) ||
-    Boolean(selectPreviousVisionReference(history, false));
-  const vision =
-    trivialTurn && !carriesFiles
-      ? { images: [], modelText: userText, historyText: userText }
-      : await collectVisionInputs(env, event, canvasMessageText, history);
-  const visionTurn = {
-    ts: userMsgTs,
-    ...("reference" in vision && vision.reference ? { vision: vision.reference } : {}),
-    ...(currentCanvasIds.length ? { sharedCanvasIds: currentCanvasIds } : {}),
-  };
   console.log(
-    `[route] tier=${previewTier} why=${routeWhy} ctx=${trivialTurn && !carriesFiles ? "skipped" : "gathered"}`,
+    `[turn] ${outcome.disposition} tier=${outcome.telemetry.tier} route=${outcome.telemetry.route} ` +
+      `tools=[${outcome.telemetry.tools.join(",")}] interim=${outcome.telemetry.interim} ` +
+      `wrote=${outcome.wrote.turns.length} compacted=${outcome.wrote.compacted}`,
   );
-
-  // ── What the model actually reads, assembled ───────────────────────────────
-  //
-  // Order matters and is deliberate: the QUESTION first, everything advisory
-  // after it. A prompt that opens with three system blocks and buries the ask
-  // at the bottom is a prompt whose answer is about the blocks.
-  const modelBlocks: string[] = [vision.modelText];
-
-  // The scope hint, if they typed one. Where to START, never a filter — see
-  // scope-keywords.ts.
-  if (scoped) modelBlocks.push(`(system: SCOPE — ${scoped.scope.instruction})`);
-
-  // The antecedent window: what "this" points at. Only for a top-level channel
-  // @mention with a dangling pronoun, and only ever ONE page of the channel the
-  // event came from. Everything about the narrowness is in antecedent.ts.
-  if (!event.thread_ts && !isDm(channel) && !trivialTurn && needsAntecedent(userText)) {
-    const before = await conversationsHistoryBefore(env, channel, userMsgTs, ANTECEDENT_LIMIT).catch(() => []);
-    const usable = before.filter((m) => !m.subtype && (m.text ?? "").trim());
-    const block = formatAntecedent(
-      usable.map((m) => ({ author: m.user ? `<@${m.user}>` : "someone", text: m.text ?? "" })),
-    );
-    if (block) modelBlocks.push(block);
-    console.log(`[antecedent] read=${before.length} used=${usable.length} injected=${block ? "yes" : "no"}`);
-  }
-
-  // The correction directive. Injected for ONE turn only (it is built from this
-  // message, never persisted), naming the query the previous turn ran so it
-  // cannot be reissued verbatim and called a re-check.
-  const priorAssistantTurn = [...history].reverse().find((t) => t.role === "assistant");
-  // Receipts are attached to the USER turn of the exchange they describe (see
-  // the append below for why), so the search is by receipt, not by role.
-  const priorReceipt = [...history].reverse().find((t) => t.retrieval)?.retrieval;
-  // A correction needs something to correct. Without a previous assistant turn
-  // the directive tells the model to treat "your own earlier claim" as
-  // unverified when there is no earlier claim, and the judge gate demands the
-  // reply either cite a fetch made this turn or concede an error it never made
-  // — unsatisfiable by construction, so the first message of a conversation
-  // could only ever fail it. The text patterns lean broad on purpose; this is
-  // the guard that keeps that safe.
-  const isCorrection = textReadsAsCorrection && Boolean(priorAssistantTurn);
-  if (isCorrection) {
-    modelBlocks.push(correctionDirective(priorReceipt?.query));
-    console.log(
-      `[correction] detected prior_query=${priorReceipt?.query ?? "(none)"} receipt=${priorReceipt ? "yes" : "no"}`,
-    );
-  }
-
-  // Phase 5 — structured state + drift detection. FLAGGED OFF by default; see
-  // the header of context-state.ts for why this one does not get to ship on.
-  if (env.CONTEXT_STATE === "on") {
-    const block = buildContextBlock(history, userText);
-    if (block) modelBlocks.push(block);
-  }
-  const modelText = modelBlocks.join("\n\n");
-
-  // Progressive summarisation, same flag. Replaces the dropped middle of a long
-  // conversation with a COUNT rather than deleting it silently — a model told
-  // the record is partial can say so; a model handed a gap reasons across it.
-  const historyForModel =
-    env.CONTEXT_STATE === "on"
-      ? compactHistory(history, { keepRecent: 12, maxChars: 12_000 }).turns
-      : history;
-  // ts of the stream opened for this turn, threaded down to delivery so the
-  // answer closes the same message the indicator lives in. Null = no stream,
-  // deliver normally.
-  if (previewTier !== "chill" || vision.images.length > 0) {
-    if (isAssistantThread(channel)) {
-      // setStatus IS the thinking indicator on an App thread — the documented
-      // one ("await setStatus({ status: 'Thinking...' })"), and it also opens
-      // the thread. Cleared on every exit path in onMessage's finally.
-      //
-      // The stream is deliberately NOT opened here. It used to be, to act as the
-      // indicator, and that was wrong: the agent needs 15–30s before any text
-      // exists, so the client rendered an EMPTY "UNO Bot AGENT" bubble for the
-      // whole run — a blank message impersonating a loading state. A stream
-      // carries content; a status says "working". Delivery opens the stream when
-      // there is something to put in it.
-      await setStatus(env, channel, threadTs, "is thinking…").catch(() => {});
-      // Title the App thread from the question that started it, so it is
-      // findable in History/Messages. Slack: "Set the title initially to capture
-      // the first question from the user." Only for threads we synthesized —
-      // re-titling a thread the user is continuing would overwrite their topic
-      // with a follow-up.
-      if (!event.thread_ts && threadTs) {
-        await setAssistantTitle(env, channel, threadTs, threadTitleFrom(userText)).catch(() => {});
-      }
-    }
-  }
-
-  // Interim updates: long runs are now legal (streaming + MCP can take several
-  // minutes), and ⏳ alone left people typing "any thing???" at the 8-minute
-  // mark. Two complementary signals, both as SEPARATE small messages (never
-  // folded into the final answer): (a) the model's own between-tool narration,
-  // filtered and capped by runAgent's onInterim, arrives as it works; (b) a
-  // generic note at ~75s backstops runs that produced no narration yet.
-  //
-  // PLAN MODE changes where (b) and (a) go, not what they are. With
-  // SLACK_STREAM_PLAN=on the turn opens a stream up front in
-  // `task_display_mode: "plan"` and the same narration lands as task cards
-  // inside it — one filling-in checklist instead of three loose messages, and
-  // the answer closes the same stream. An early stream is only honest in this
-  // mode: with plain text there is nothing to put in it and the client renders
-  // an empty bubble for the whole run (tried, reverted, see api.ts).
-  let planStreamTs: string | null = null;
-  if (env.SLACK_STREAM_PLAN === "on" && threadTs && previewTier !== "chill") {
-    planStreamTs = await startStream(env, channel, threadTs, userId, event.team, "plan");
-    if (planStreamTs) {
-      await appendTask(env, channel, planStreamTs, {
-        id: "understand",
-        title: "Reading the question and this thread",
-        status: "in_progress",
-      });
-    }
-  }
-  // The card currently in progress. Carried whole, not just its id: a
-  // task_update REPLACES the card, so re-sending the id with a placeholder
-  // title would rewrite the step's name to "Done" as it completed.
-  let planCurrent = { id: "understand", title: "Reading the question and this thread" };
-  let planStep = 0;
-
-  let interimPosted = false;
-  const postInterim = (text: string): void => {
-    interimPosted = true;
-    if (planStreamTs) {
-      // Each narration line is its own card, and the previous one is closed by
-      // re-sending its id with status complete — that is what makes it read as
-      // progress rather than as a list of things all still happening.
-      void appendTask(env, channel, planStreamTs, { ...planCurrent, status: "complete" });
-      planCurrent = { id: `step-${++planStep}`, title: text.slice(0, 120) };
-      void appendTask(env, channel, planStreamTs, { ...planCurrent, status: "in_progress" });
-      return;
-    }
-    postMessage(env, { channel, thread_ts: threadTs, text: `:hourglass_flowing_sand: ${text}` }).catch(() => {});
-  };
-  // Varied so heavy days don't read as the same canned line five times over
-  // (tone feedback, 2026-07-10). Picked by message ts — stable per run,
-  // different across runs.
-  const BACKSTOP_LINES = [
-    "Still on it — this one needs a longer dig. The full answer will land right here.",
-    "Still digging — there's more to check than usual. Answer coming in this thread.",
-    "Taking my time on this one so it's right. I'll post the full answer here.",
-  ];
-  const interimTimer = setTimeout(() => {
-    if (interimPosted) return;
-    const pick = Math.abs(parseInt(userMsgTs.replace(".", "").slice(-6), 10)) % BACKSTOP_LINES.length;
-    postInterim(BACKSTOP_LINES[pick] ?? BACKSTOP_LINES[0]!);
-  }, 75_000);
-
-  let result: AgentResult;
-  // Which read-only tools ran, and what the last blueprint lookup retrieved.
-  // Collected by an AsyncLocalStorage scope rather than threaded through both
-  // the loop's signature (run-agent withTurnScope). Both are needed
-  // AFTER the agent returns: the judge gates a correction on "cited something
-  // fetched this turn", and the receipt is persisted for the next turn.
-  let toolsUsedThisTurn: string[] = [];
-  let turnReceipt: HistoryTurn["retrieval"];
-  // Names read_reference served this turn — persisted as the receipt that
-  // stands in for the text once the turn ends (#423).
-  let turnReferences: string[] = [];
-  // Set only when a slack_search this turn came back EMPTY — see agent/absence.ts.
-  let turnAbsence: AbsenceContext | undefined;
-  try {
-    const agentRun = await withTurnScope({ correction: isCorrection }, () =>
-      runAgent({
-      env,
-      userText: modelText,
-      tierOverride: event.tierOverride,
-      images: vision.images.length > 0 ? vision.images : undefined,
-      history: historyForModel,
-      conversation: buildProviderConversation(
-        historyForModel,
-        modelText,
-        vision.images,
-        vision.historicalImages,
-      ),
-      slack: {
-        channel,
-        // A real ts, not convTs: tool-side posts still thread off the user message.
-        threadTs: event.thread_ts ?? event.ts,
-        // …and convTs separately, because that is the key the cancel flag uses.
-        conversationTs: convTs,
-        userMsgTs,
-        requestedBy: userId,
-        // Bot-token search needs the triggering event's action_token; it exists
-        // only for this turn, so it rides the context rather than any store.
-        actionToken: event.action_token,
-        sharedCanvasIds,
-        notionPrdId: prd?.id,
-        notionPrdUrl: prd?.url,
-      },
-      currentSender: { userId },
-      pending,
-      assistantContext: panelContext ?? undefined,
-      onInterim: postInterim,
-      }),
-    );
-    result = agentRun.result;
-    toolsUsedThisTurn = agentRun.tools;
-    turnReceipt = agentRun.receipt;
-    turnReferences = agentRun.references;
-    turnAbsence = agentRun.absence;
-  } catch (err) {
-    console.error(`[agent] failed: ${err instanceof Error ? err.message : String(err)}`);
-    // Close the plan stream before the failure message, or the checklist sits
-    // open above it forever, still claiming a step is in progress.
-    if (planStreamTs) {
-      await appendTask(env, channel, planStreamTs, { ...planCurrent, status: "error" }).catch(() => {});
-      await stopStream(env, channel, planStreamTs).catch(() => {});
-      planStreamTs = null;
-    }
-    await postVisibleFailure(env, channel, threadTs, userMsgTs, err, "agent");
-    return;
-  } finally {
-    clearTimeout(interimTimer);
-  }
-  if (planStreamTs) {
-    await appendTask(env, channel, planStreamTs, { ...planCurrent, status: "complete" }).catch(() => {});
-  }
-
-  // ----- text-only response -----
-  if (result.kind === "text") {
-    // A reaction and no words. The model answered a pure acknowledgement
-    // ("thanks", "got it") with slack_react and ended its turn without text —
-    // the behaviour the no-model react tier approximated with a closed phrase
-    // list and seven guards until 2026-08-22. Now the model decides, with the
-    // whole thread in view, and this is the only thing the Worker has to know:
-    // an empty reply after a reaction is a finished turn, not a failure.
-    const reactedOnly =
-      toolsUsedThisTurn.includes("slack_react") &&
-      (!result.text.trim() || result.text.trim() === "(empty response)");
-    if (reactedOnly) {
-      console.log("[route] reaction-only turn (model chose an emoji, no reply)");
-      await recordExchange(
-        env,
-        channel,
-        convTs,
-        vision.historyText,
-        "(reacted — no reply)",
-        visionTurn,
-      );
-      return;
-    }
-    // Pre-send self-verification (approved 2026-07-12): substantive drafts get
-    // ONE cheap judge call against the condensed D1–D9 rubric, revised once on
-    // a flagged failure. Short replies skip it entirely; any judge error or
-    // timeout ships the original draft (fail open — see agent/draft-judge.ts).
-    // On a correction turn the judge ALSO gets the reply being corrected and the
-    // tools that ran, and the length floor is bypassed — the failing denial of
-    // 2026-08-17 was short, so the one turn the judge had something to catch is
-    // the one it sat out.
-    //
-    // Ahead of it, the deterministic half. D9 (one woven confidence clause) was
-    // only ever checked INSIDE the judge, which skips anything under 1500 chars
-    // — and almost every blueprint answer in Slack is a few hundred. This runs
-    // on the body that will actually SHIP (renderDeliveredBody: strip, then
-    // cap), because capText truncates after the judge has scored and can
-    // amputate a clause from a reply already logged as verdict=pass.
-    const retrievalRan = retrievalRanIn(toolsUsedThisTurn);
-    const servedFromCache = turnReceipt?.cached === true;
-    let verdict: ConfidenceVerdict = { kind: "exempt" };
-    try {
-      verdict = judgeConfidence(renderDeliveredBody(result.text), { retrievalRan, servedFromCache });
-    } catch (err) {
-      // Fail open, in the same direction as the judge itself: a missing
-      // confidence clause is a smaller harm than a dropped answer, so a throw
-      // in the pre-check degrades to "no escalation", never to silence.
-      console.warn(
-        `[confidence] pre-check failed: ${err instanceof Error ? err.message : String(err)} — no escalation`,
-      );
-    }
-    // Absence pre-check, beside the confidence one and for the same reason: a
-    // search came back empty and the draft may be claiming the WORLD is empty.
-    // Only runs when a search actually returned nothing this turn, so an
-    // absolute is not flagged on a turn where it is simply true.
-    let absenceRepair: string | undefined;
-    if (turnAbsence) {
-      try {
-        if (judgeAbsence(renderDeliveredBody(result.text)) === "unscoped") {
-          absenceRepair = absenceRepairInstruction(turnAbsence);
-          console.log(`[absence] unscoped claim over ${turnAbsence.visibility} — forcing repair`);
-        }
-      } catch (err) {
-        // Same direction as the confidence pre-check: fail open. An unscoped
-        // absence is a smaller harm than a dropped answer.
-        console.warn(
-          `[absence] pre-check failed: ${err instanceof Error ? err.message : String(err)} — no escalation`,
-        );
-      }
-    }
-
-    // One judge call carries both repairs when both fire. Sent as two sibling
-    // instructions they compete and the model does one — which is exactly how
-    // the last attempt at the absence rule dropped S3's connect link.
-    const extra = [repairInstruction(verdict) ?? undefined, absenceRepair]
-      .filter(Boolean)
-      .join("\n\n");
-
-    const reviewed = await reviewDraft(env, {
-      userText: modelText,
-      draft: result.text,
-      correction: isCorrection,
-      priorAssistantText: isCorrection ? priorAssistantTurn?.content : undefined,
-      toolsUsedThisTurn,
-      // Both bypass the length floor and tell the judge exactly what to repair.
-      forceReason:
-        needsRepair(verdict) ? verdict.kind : absenceRepair ? "absence-scope" : undefined,
-      extraInstruction: extra || undefined,
-    });
-    // Re-validation, not a second repair round. A judge revision can itself end
-    // in a trailing label, which stripTrailingConfidence then DELETES without
-    // putting anything back — turning "wrong shape" into "no signal at all" in
-    // the one reply we had already noticed was wrong. Logged so that outcome is
-    // countable; looping here would cost another model call per turn and could
-    // land in the same place anyway.
-    try {
-      const finalVerdict = judgeConfidence(renderDeliveredBody(reviewed.text), {
-        retrievalRan,
-        servedFromCache,
-      });
-      console.log(
-        `[confidence] pre=${verdict.kind} post=${finalVerdict.kind} ` +
-          `retrieval=${retrievalRan ? "yes" : "no"} cached=${servedFromCache ? "yes" : "no"} ` +
-          `judge=${reviewed.verdict}`,
-      );
-    } catch (err) {
-      console.warn(
-        `[confidence] post-check failed: ${err instanceof Error ? err.message : String(err)}`,
-      );
-    }
-    const delivery = await postTextVerified(
-      env,
-      channel,
-      threadTs,
-      reviewed.text,
-      // A draft goes out under the PERSON'S name; the standard footer describes
-      // the wrong risk. Set by the shortcut, never sniffed from the body.
-      event.footerHint,
-      // In plan mode the answer closes the stream the checklist lives in,
-      // rather than opening a second one beside it.
-      planStreamTs ?? undefined,
-    );
-    planStreamTs = null;
-    // The receipt rides the USER turn, keyed by the user message's ts.
-    //
-    // It describes the TURN, not the message, and the user ts is the only id
-    // this path has: postTextVerified reports {ok, text} and not the ts it
-    // posted to, so the assistant message has no key to merge on. The user
-    // message's ts is in the same Slack thread buildThreadHistory rebuilds
-    // from, so the merge lands either way.
-    const store = threadStateFor(env);
-    await store.appendHistory({ channel, thread: convTs }, {
-      role: "user",
-      content: vision.historyText,
-      ...visionTurn,
-      ...(turnReceipt ? { retrieval: turnReceipt } : {}),
-      // The names only. The text was this turn's tool result and ends with it;
-      // the next turn sees a one-line stub per name (provider-conversation.ts).
-      ...(turnReferences.length ? { references: turnReferences } : {}),
-    });
-    if (delivery.ok) {
-      // Record what was actually posted (capped/placeholder), not the raw text.
-      await store.appendHistory(
-        { channel, thread: convTs },
-        { role: "assistant", content: delivery.text },
-      );
-      // Proposal B: a card was staged at turn start and this turn neither
-      // resolved it (that would be kind:"resolved") nor said anything about
-      // it. The approval has evaporated silently — the 2026-07-10 failure.
-      // Log-only on purpose: a visible "I still have X staged" belongs on a
-      // measured rate, not a guess (see agent/pending-notice.ts).
-      if (pending && !proposalWasAddressed(delivery.text, pending.toolName)) {
-        console.warn(bounceLogLine(pending.toolName, vision.historyText, delivery.text));
-      }
-      // No ✅ on success: the reply that just landed IS the completion signal,
-      // and a checkmark next to it is a second one saying the same thing. ✅
-      // still means something specific here — it is how a human CONFIRMS a
-      // proposal — so spending it on "I answered" also blunts the gate.
-    } else {
-      // Never ✅ a reply that was never delivered.
-      console.error("[slack] reply delivery failed after retry");
-      await postVisibleFailure(env, channel, threadTs, userMsgTs, undefined, "delivery");
-    }
-    return;
-  }
-
-  // Everything past here posts its own message (a proposal card, a clarifying
-  // question, a resolution note) rather than an answer, so the plan stream has
-  // nothing left to carry — close it now or it stays open above whatever lands.
-  if (planStreamTs) {
-    await stopStream(env, channel, planStreamTs).catch(() => {});
-    planStreamTs = null;
-  }
-
-  // ----- text-path proposal resolution -----
-  if (result.kind === "resolved") {
-    await resolveProposal(env, result.pending, result.decision, result.messageToUser);
-    const finalText = result.messageToUser
-      ?? (result.decision === "confirm" ? "Got it — kicking that off." : "Cancelled.");
-    await recordExchange(env, channel, convTs, vision.historyText, finalText, visionTurn);
-    return;
-  }
-
-  // ----- new side-effect proposal -----
-
-  // Resolve the PRD url for `implement` (thread root notification or a link the
-  // designer pasted); it feeds both the clarify gate and the proposal preview.
-  let implementPrdUrl: string | undefined;
-  if (result.toolName === "component_implement") {
-    const inputPrdUrl =
-      typeof result.input.notion_prd_url === "string" ? result.input.notion_prd_url.trim() : "";
-    implementPrdUrl = prd?.url ?? (inputPrdUrl || undefined);
-  }
-
-  // Clarify-vs-act (D3): if the tool call is missing what it needs, ask here in
-  // the Worker instead of staging a proposal — so gating never depends on the
-  // model remembering to ask (e.g. a component is never implemented PRD-less).
-  const gate = await preflight(result.toolName, result.input, { env, prd, implementPrdUrl });
-  if (gate) {
-    await postMessage(env, { channel, thread_ts: threadTs, text: gate.ask });
-    await recordExchange(env, channel, convTs, vision.historyText, gate.ask, visionTurn);
-    return;
-  }
-
-  // Gate idempotency (R2 regressions): approvals must not re-gate, and cancels
-  // must stick.
-  //
-  // (a) The model re-issued the SAME proposal while one is pending. This is
-  // what a model does when it reads "go ahead" and reaches for the tool again
-  // instead of proposal_resolve — 2026-07-10 (Gemini) and R2's PRD-CREATE,
-  // which re-gated 4× this way. Until 2026-08-22 this branch bounced with a
-  // reminder to react on the card, so the person's approval went nowhere and
-  // a phrase-list fast path existed to catch the common phrasings before the
-  // model could fumble them.
-  //
-  // The honest reading is simpler: the proposal is pending, the person just
-  // replied, and the model wants to do the same thing with the same input.
-  // That is a confirmation. Execute it through the same claim the reaction
-  // and button paths use — no duplicate card, no bounce, and no vocabulary
-  // needed to guess what "go ahead" means.
-  if (
-    pending &&
-    pending.toolName === result.toolName &&
-    stableStringify(pending.input) === stableStringify(result.input)
-  ) {
-    console.log(`[gate] identical re-stage of ${result.toolName} while pending — treating as confirm`);
-    await resolveProposal(env, pending, "confirm", result.previewText || undefined);
-    await recordExchange(
-      env, channel, convTs, vision.historyText,
-      result.previewText || "(confirmed — executing the proposal)",
-      visionTurn,
-    );
-    return;
-  }
-
-  // (b) The user JUST cancelled this same action (the DO history's outcome note
-  // is authoritative — the live-thread history only shows the narrative text).
-  // Don't re-card a cancelled action; require an explicit revival. The check
-  // window is the last few turns, so one clarifying exchange clears it.
-  try {
-    const doHistory = await threadStateFor(env).readHistory({ channel, thread: convTs });
-    const justCancelled = doHistory
-      .slice(-3)
-      .some((t) => t.role === "assistant" && t.content.includes(`(Cancelled the proposed ${result.toolName}`));
-    if (justCancelled) {
-      const ask =
-        `:leftwards_arrow_with_hook: You cancelled that ${proposalVerb(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
-        `Changed your mind? Say so explicitly and I'll stage it again — or tell me what you'd like instead.`;
-      await postMessage(env, { channel, thread_ts: threadTs, text: ask });
-      await recordExchange(env, channel, convTs, vision.historyText, ask, visionTurn);
-      return;
-    }
-  } catch (err) {
-    // Guard is best-effort — a DO hiccup shouldn't block a legitimate proposal.
-    console.warn(`[slack] recent-cancel check failed: ${err instanceof Error ? err.message : String(err)}`);
-  }
-
-  // If there's already a (different) pending proposal in this thread, supersede it.
-  if (pending) {
-    // Only the record's removal is wanted here; the claim boolean belongs to
-    // resolveProposal, which is the path that must not double-execute.
-    await threadStateFor(env).claimProposal(pending.proposalTs);
-  }
-
-  let proposalText: string;
-  let proposalBlocks: unknown[] | undefined;
-  if (result.toolName === "prototype_scaffold") {
-    const built = await buildImplementDesignProposal(env, result.input, userId, result.previewText);
-    proposalText = built.text;
-    proposalBlocks = built.blocks;
-  } else if (result.toolName === "component_implement") {
-    // Show which PRD this implement is tied to, so the requester can see it.
-    const preview = implementPrdUrl ? `Using the PRD for this change: ${implementPrdUrl}` : result.previewText;
-    proposalText = formatProposal(result.toolName, result.input, userId, preview);
-  } else if (result.toolName === "notion_update") {
-    // Conversational card: warm lead + linked card + `current → new` diff. No ⚠️
-    // preamble — the lead, the named card, and the diff speak for themselves.
-    const body = await buildNotionUpdateBody(env, result.input);
-    proposalText = formatNotionUpdateProposal(result.previewText, body);
-  } else if (result.toolName === "notion_archive") {
-    // Writes are no longer DB-allowlisted, so the human ✅ is the backstop — make
-    // the card show the CONCRETE target (page title + parent DB), not a bare id,
-    // so an approver can't be steered into confirming a write on some arbitrary
-    // page a read pulled in (review 2026-07-13). Best-effort; null → no line.
-    const pageUrl = typeof result.input.page_url === "string" ? result.input.page_url : "";
-    const target = pageUrl ? await describeNotionTarget(env, pageUrl) : null;
-    const targetNote = target ? `• *Target:* ${target.title} — in ${target.parent}` : undefined;
-    proposalText = formatProposal(result.toolName, result.input, userId, result.previewText, targetNote);
-  } else {
-    proposalText = formatProposal(result.toolName, result.input, userId, result.previewText);
-  }
-
-  // Every card carries ✅ Approve / ⛔ Cancel buttons (2026-08-22). Cards that
-  // built their own blocks (the Figma preview) already include them; text-only
-  // cards get the text as sections plus the row. The text is kept alongside as
-  // the notification/fallback copy, and `proposalText` in the DO is what the
-  // button handler re-renders the card from.
-  if (!proposalBlocks) proposalBlocks = proposalCardBlocks(proposalText);
-  let posted = await postMessage(env, {
-    channel,
-    thread_ts: threadTs,
-    text: proposalText,
-    blocks: proposalBlocks,
-  });
-  // If Slack rejected the blocks (e.g. it couldn't fetch the Figma image_url,
-  // or a section overflowed), retry text-only so the confirmation gate still
-  // works — reactions and typed emoji resolve a text-only card just the same.
-  if (!posted.ok && proposalBlocks) {
-    console.warn("[slack] proposal with blocks failed; retrying text-only");
-    posted = await postMessage(env, { channel, thread_ts: threadTs, text: proposalText });
-  }
-  if (posted.ok && posted.ts) {
-    // Persist the moment the card posts: it's reactable instantly, and a quick ✅
-    // that lands before the proposal is saved would look up nothing and be
-    // silently lost (the reaction gate keys off saved state). Save first so the
-    // confirmation always finds it.
-    await threadStateFor(env).putProposal({
-      toolName: result.toolName,
-      input: result.input,
-      channel,
-      // The conversation KEY (history). In a DM this is the constant "dm".
-      threadTs: convTs,
-      // A real ts to reply under — the same one the card was posted with.
-      // Without this, resolveProposal posted into "dm" and Slack dropped it.
-      replyTs: threadTs,
-      userMsgTs,
-      proposalTs: posted.ts,
-      proposalText,
-      requesterUserId: userId,
-      notionPrdId: prd?.id,
-      notionPrdUrl: prd?.url,
-    });
-    // A proposal is still a completed conversational turn. Agent-view DMs have
-    // no Slack thread to rebuild, so preserving this exchange in the DO is the
-    // only way its image pointer can reach the immediate follow-up.
-    await recordExchange(env, channel, convTs, vision.historyText, proposalText, visionTurn);
-  }
-}
-
-// Record a full user→assistant exchange in one call — the invariant is that the
-// user turn is always stored WITH the assistant turn (every handleUserMessage
-// exit path recorded the pair by hand, six times; a missed half is a corrupted
-// memory). Sequential, not parallel, so the two turns land in order.
-//
-// It lived on the deleted thread-state client because that was the one module
-// both halves could sit in. It is not a store operation — the store's contract
-// is one turn at a time, and pairing them is a decision about what a Slack turn
-// remembers — so it stays here at the call site until the Turn module owns
-// history append for every path.
-async function recordExchange(
-  env: Env,
-  channel: string,
-  convTs: string,
-  userText: string,
-  assistantText: string,
-  userTurn?: Pick<HistoryTurn, "ts" | "vision" | "sharedCanvasIds">,
-): Promise<void> {
-  const store = threadStateFor(env);
-  const ref = { channel, thread: convTs };
-  await store.appendHistory(ref, { role: "user", content: userText, ...userTurn });
-  await store.appendHistory(ref, { role: "assistant", content: assistantText });
 }
 
 function stripBotMentions(text: string): string {
   return text.replace(/<@[A-Z0-9]+>/g, "").trim();
-}
-
-// ── notion_update card body (linked card + `current → new` diff) ──────────────
-// Builds the DISPLAY body for a notion_update proposal — separate from the
-// executable tool input, which lives untouched in the DO's pending state. Reads
-// the page for its title/URL/parent DB + the current value of each changed field
-// (describeNotionTarget), resolves any people/relation new-values from ids/URLs
-// to real names, and codifies every property value in backticks.
-
-function humanizeFieldName(key: string): string {
-  return key.replace(/[_\s]+/g, " ").trim().replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-// People/relation writes arrive as a Notion id or URL — resolve to a real name
-// so the card never shows a bare `notion.so/e5cb…`. Plain values (a select name,
-// a date) carry no 32-hex id and pass straight through. Best-effort.
-async function resolveNotionValueForDisplay(env: Env, raw: string): Promise<string> {
-  const parts = raw.split(",").map((s) => s.trim()).filter(Boolean);
-  const out: string[] = [];
-  for (const part of parts) {
-    const id = parseNotionPageId(part);
-    if (id) {
-      const titles = await fetchPageTitles(env, [id]).catch(() => []);
-      if (titles.length) { out.push(...titles); continue; }
-    }
-    out.push(part);
-  }
-  return out.join(", ") || raw.trim();
-}
-
-// A one-line note for an `append` (narrative) update, so the card doesn't drop it.
-function describeAppend(append: unknown): string | null {
-  if (!append || typeof append !== "object") return null;
-  const o = append as Record<string, unknown>;
-  const headings = (Array.isArray(o.sections) ? o.sections : [])
-    .map((s) => (s && typeof s === "object" ? String((s as Record<string, unknown>).heading ?? "").trim() : ""))
-    .filter(Boolean);
-  if (headings.length) return `• *Appending:* ${headings.map((h) => `_${h}_`).join(", ")}`;
-  if (typeof o.text === "string" && o.text.trim()) return `• *Appending a note to the page.*`;
-  return null;
-}
-
-async function buildNotionUpdateBody(env: Env, input: Record<string, unknown>): Promise<string> {
-  const pageUrl = typeof input.page_url === "string" ? input.page_url : "";
-  const properties =
-    input.properties && typeof input.properties === "object"
-      ? (input.properties as Record<string, unknown>)
-      : {};
-  const changedFields = Object.keys(properties);
-  const target = pageUrl ? await describeNotionTarget(env, pageUrl, changedFields) : null;
-
-  const lines: string[] = [];
-
-  // Named + linked card — `<url|Title> — in <ParentDB>`, never a bare hex URL.
-  if (target) {
-    lines.push(`*<${target.url}|${target.title}>* — in ${target.parent}`);
-  } else if (pageUrl) {
-    lines.push(`*<${pageUrl}|this Notion page>*`);
-  }
-
-  // One bullet per changed field, always — `current → new`, values backticked.
-  for (const [reqName, rawVal] of Object.entries(properties)) {
-    if (typeof rawVal !== "string") continue;
-    const cur = target?.current?.[normalizeName(reqName)];
-    const label = cur?.label ?? humanizeFieldName(reqName);
-    const newDisplay = await resolveNotionValueForDisplay(env, rawVal);
-    lines.push(
-      cur?.value
-        ? `• *${label}:* \`${cur.value}\` → \`${newDisplay}\``
-        : `• *${label}:* \`${newDisplay}\``,
-    );
-  }
-
-  const appendNote = describeAppend(input.append);
-  if (appendNote) lines.push(appendNote);
-
-  return lines.join("\n");
-}
-
-// Key-order-independent JSON compare, so two generations of the same tool input
-// register as identical even if the model emitted fields in a different order.
-function stableStringify(v: unknown): string {
-  if (Array.isArray(v)) return `[${v.map(stableStringify).join(",")}]`;
-  if (v !== null && typeof v === "object") {
-    return `{${Object.entries(v as Record<string, unknown>)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([k, val]) => `${JSON.stringify(k)}:${stableStringify(val)}`)
-      .join(",")}}`;
-  }
-  return JSON.stringify(v);
 }
 
 // Build the bot's memory from the ACTUAL Slack thread, so it sees every message
