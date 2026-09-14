@@ -1,129 +1,96 @@
-// Reaction-path confirmation gate. Typed confirmations are handled by the
-// agent loop via the proposal_resolve tool; button presses by
-// slack/interactive.ts. All three converge on resolveProposal and its claim.
+// The reaction door. A ✅ / ⛔ on a message becomes a Gate signal, and the
+// verdict is applied: post the text, run the tool.
 //
-// Filters:
-//   - Only the gate emoji resolve — ✅ (and ✔️, 👍) confirm, ⛔ (and ❌, ❎, 🚫)
-//     cancel. The sets and their reasons live in gate-reactions.ts.
-//   - Only reactions ON the live proposal card resolve it. A reaction anywhere
-//     else in the thread points at the card and executes nothing.
-//   - Anyone in the thread may confirm/cancel (the requester lock was removed
-//     2026-07-14; requesterUserId is still stored for the record).
+// Everything this file used to decide is `gate/gate.ts` now — which proposal
+// the reaction is about, what the emoji means, whether the card is still live,
+// whether this caller won the claim, and what to say when it did not. The bug
+// that moved it: the claim's answer was thrown away here, so a reaction that
+// LOST the race still announced the winner's action as its own.
+//
+// What stays is what needs Slack: who reacted (the bot must never resolve its
+// own card), which conversation the reacted message belongs to (a thread-root
+// read), and the posting itself.
+//
+// Anyone in the thread may confirm/cancel — the requester lock was removed
+// 2026-07-14, and `requesterUserId` is still stored for the record (ADR-014).
 
 import type { Env } from "../types";
-import type { PendingProposal } from "../thread-state/index";
+import { resolveSignal } from "../gate/index";
+import { executeVerdict } from "../agent/resolve-proposal";
 import { threadStateFor } from "../thread-state/production";
-import { resolveProposal } from "../agent/resolve-proposal";
 import { mapReaction } from "./gate-reactions";
 import type { SlackReactionAddedEvent } from "./events";
-import { conversationsReplies, getBotIdentity, postMessage } from "./api";
+import { conversationsReplies, getBotIdentity } from "./api";
+import { slackDelivery } from "./slack-delivery";
 
-// The reaction vocabulary lives in gate-reactions.ts so it can be tested —
-// notably that 👍 does NOT confirm. See that file for why.
-
-
-// The thread's live proposal, for a reaction that landed somewhere ELSE — a
-// superseded card (the old one keeps its ⚠️ after a newer one replaces it) or
-// a nearby reply.
-//
-// This used to be an execution fallback: whatever the reaction sat on, resolve
-// the thread's active proposal. That silently answered a different question
-// from the one the person asked. React ✅ on the card in front of you and, if
-// it had been superseded, the NEWER proposal fired — you confirmed one thing
-// and got another. With 👍 still a confirm reaction, a thumbs-up on a
-// colleague's message anywhere in the thread did the same.
-//
-// It is now a POINTER, never an executor: find the live card so we can say
-// where to react, and resolve nothing on this path.
-async function findThreadProposal(
-  env: Env,
-  channel: string,
-  reactedTs: string,
-): Promise<PendingProposal | null> {
-  const replies = await conversationsReplies(env, channel, reactedTs, 1);
-  const root = replies.messages?.[0];
-  const threadTs = root?.thread_ts ?? root?.ts ?? reactedTs;
-  return threadStateFor(env).getProposalByThread({ channel, thread: threadTs });
-}
-
-/** Slack permalink-ish pointer to the live card, for "react over there". */
-function cardPointer(pending: PendingProposal): string {
-  return `the :warning: card for *${pending.toolName}* just above`;
+/** The conversation a reacted message belongs to, for the by-thread lookup
+ *  that finds the live card when the reaction landed elsewhere. */
+async function threadRootOf(env: Env, channel: string, reactedTs: string): Promise<string> {
+  const replies = await conversationsReplies(env, channel, reactedTs, 1).catch(() => null);
+  const root = replies?.messages?.[0];
+  return root?.thread_ts ?? root?.ts ?? reactedTs;
 }
 
 export async function handleReaction(env: Env, event: SlackReactionAddedEvent): Promise<void> {
-  const decision = mapReaction(event.reaction);
-  if (!decision) return; // not a gate reaction; ignore silently
+  if (event.item.type !== "message") return;
+
+  // A cheap pre-filter, not a second opinion: Gate parses the glyph itself and
+  // is the authority on what it means. This one only decides whether the
+  // reaction is worth the thread-root read below — every 🎉 in every channel
+  // the bot is in arrives here, and a Slack call per party popper is a
+  // subrequest spent on nothing.
+  if (!mapReaction(event.reaction)) return;
 
   // The bot must never resolve its own proposals. slack_react refuses the
   // canonical pair, but the gate also accepts aliases (thumbsup et al) the
   // refusal list doesn't cover — without this check a bot-posted 👍 near a
-  // card could self-confirm through the thread-fallback lookup.
+  // card could self-confirm through the by-thread lookup.
   const self = await getBotIdentity(env);
   if (self && event.user === self.userId) return;
 
-  if (event.item.type !== "message") return;
   const channel = event.item.channel;
-
-  // The by-ts lookup, then — when it finds nothing — the by-thread one below,
-  // both kept here at the call site. #500 moves the pair inside Gate.
-  //
-  // Reads as "not a proposal" on a failed lookup, as the client did: the
-  // by-thread pointer path below then handles it, and a reaction used as
-  // ordinary punctuation stays silent.
-  const lookup = await threadStateFor(env)
-    .getProposalByTs(event.item.ts)
-    .catch(() => ({ state: "none" }) as const);
-  if (lookup.state === "expired") {
-    // A delayed ✅/❌ on a proposal that timed out. Never swallow this — the
-    // person believes they just confirmed something (live 2026-07-10: a
-    // delayed reaction met pure silence and read as "the bot is broken").
-    await postMessage(env, {
+  const verdict = await resolveSignal(
+    {
+      kind: "reaction",
+      messageTs: event.item.ts,
       channel,
-      thread_ts: event.item.ts,
-      text:
-        `:hourglass: <@${event.user}> that proposal had already expired when your reaction landed — nothing was executed. ` +
-        `Proposals stay live for an hour. Ask me again and I'll set the same thing up fresh.`,
-    }).catch(() => {});
-    return;
-  }
+      thread: await threadRootOf(env, channel, event.item.ts),
+      glyph: event.reaction,
+      userId: event.user,
+    },
+    { threadState: threadStateFor(env) },
+  );
 
-  if (lookup.state !== "found") {
-    // The reaction is not on a live proposal card. It may be on a superseded
-    // card, or on any other message in a thread that happens to have one
-    // pending. Either way this must NOT execute — a confirmation resolves the
-    // thing it was placed on, or it resolves nothing.
-    //
-    // Point at the live card instead of acting. Silence was the old behaviour
-    // for the "no proposal anywhere" case and is kept, because a ✅ used as
-    // ordinary punctuation in an unrelated thread should not make the bot
-    // speak.
-    const live = await findThreadProposal(env, channel, event.item.ts).catch(() => null);
-    if (!live) return;
-    await postMessage(env, {
-      channel: live.channel,
-      thread_ts: live.replyTs ?? live.threadTs,
-      text:
-        `:eyes: <@${event.user}> I saw your :${event.reaction}:, but it is not on the proposal I am holding — ` +
-        `nothing was executed. Use the buttons on ${cardPointer(live)}, or react there.`,
-    }).catch(() => {});
-    return;
-  }
+  if (!verdict.post) return; // not a gate reaction, or nothing live to point at
 
-  const pending: PendingProposal = lookup.proposal;
+  const delivery = slackDelivery(env, {
+    channel,
+    replyTs: verdict.post.replyTs,
+    userMsgTs: verdict.proposal?.userMsgTs ?? event.item.ts,
+    userId: event.user,
+  });
 
-  // Anyone in the thread may confirm/cancel — no requester check (2026-07-14).
   try {
-    await resolveProposal(env, pending, decision /* narrative: default */);
+    // The narrative first, then the tool — the same order every door keeps, so
+    // the person sees the acknowledgement before the work.
+    const posted = await delivery.postNote(verdict.post.text);
+    // A resolution that cannot speak is the failure this whole path guards
+    // against, so it is never silent in the logs even when it is in Slack.
+    if (!posted.ok) {
+      console.error(`[gate] reaction post FAILED in ${channel} (thread=${verdict.post.replyTs})`);
+    }
+    await executeVerdict(env, verdict);
   } catch (err) {
     // A reaction confirmation must NEVER die silently — that's the exact "✅ did
     // nothing" failure this path fights (live 2026-07-13). Surface it so the user
     // can retry instead of staring at an unacknowledged reaction.
-    console.error(`[gate] reaction resolve failed: ${err instanceof Error ? err.message : String(err)}`);
-    await postMessage(env, {
-      channel: pending.channel,
-      thread_ts: pending.replyTs ?? pending.threadTs,
-      text: `:warning: I caught your :${event.reaction}: but hit a snag executing it — give it another go, or tell me and I'll retry.`,
-    }).catch(() => {});
+    console.error(
+      `[gate] reaction resolve failed: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    await delivery
+      .postNote(
+        `:warning: I caught your :${event.reaction}: but hit a snag executing it — give it another go, or tell me and I'll retry.`,
+      )
+      .catch(() => {});
   }
 }

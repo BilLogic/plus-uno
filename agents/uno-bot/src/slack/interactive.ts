@@ -26,8 +26,10 @@ import { countedFetch } from "../net";
 import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
 import { conversationsOpen, deleteMessage, postMessage } from "./api";
-import { resolveProposal } from "../agent/resolve-proposal";
+import { resolveSignal } from "../gate/index";
+import { executeVerdict } from "../agent/resolve-proposal";
 import { proposalCardBlocks } from "./proposal-render";
+import { slackDelivery } from "./slack-delivery";
 
 /** The subset of Slack's interaction envelope this Worker acts on. */
 interface InteractionPayload {
@@ -114,9 +116,13 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
 //
 // The third way to resolve a card, beside a reaction and a typed emoji, and
 // the one the card itself points at. Like a reaction it resolves ONLY the
-// card it sits on — `payload.message.ts` is the card — through the same claim
-// every other path uses, so a button press racing a reaction is handled by
-// whichever got there first and the other stands down in silence.
+// card it sits on — `payload.message.ts` is the card — and it enters the same
+// Gate every other door does, so the lookup, the claim and the lost-race
+// wording are not this file's to get right.
+//
+// A press that did NOT win is answered where the person is looking: an
+// ephemeral reply via `response_url`, which is the surface a button press
+// already owns. A win speaks in the thread, like every other door.
 //
 // After a win the card is re-rendered without its buttons and with the
 // outcome, via `response_url` (valid 30 minutes, which is within the card's
@@ -132,26 +138,30 @@ async function resolveFromButton(
   const userId = payload.user?.id ?? "someone";
   if (!channel || !ts) return;
 
-  // Reads as "not a proposal" on a failed lookup, exactly as the client did:
-  // the reply below then says the card was already resolved, which is never
-  // silence.
-  const lookup = await threadStateFor(env)
-    .getProposalByTs(ts)
-    .catch(() => ({ state: "none" }) as const);
-  if (lookup.state !== "found") {
-    // Expired, or already resolved by another path. Say so where the person
-    // is looking — an ephemeral reply via response_url — never silence.
-    const why = lookup.state === "expired"
-      ? "that proposal had already expired — nothing was executed. Ask me again and I'll set it up fresh."
-      : "that proposal was already resolved — nothing more to do.";
-    await replyEphemeral(payload, `:hourglass: <@${userId}>, ${why}`);
+  const verdict = await resolveSignal(
+    { kind: "button", messageTs: ts, decision, userId },
+    { threadState: threadStateFor(env) },
+  );
+  console.log(
+    `[interactive] ${decision} button on ${channel}/${ts} by=${userId} outcome=${verdict.outcome}`,
+  );
+
+  if (verdict.outcome !== "won") {
+    // Expired, already resolved, or a press that lost the race. Never silence.
+    if (verdict.post) await replyEphemeral(payload, verdict.post.text);
     return;
   }
 
-  const pending = lookup.proposal;
-  const won = await resolveProposal(env, pending, decision);
-  console.log(`[interactive] ${decision} button on ${channel}/${ts} by=${userId} won=${won}`);
-  if (!won) return; // the other resolver is posting; stay quiet
+  const pending = verdict.proposal;
+  const post = verdict.post;
+  if (!pending || !post) return; // a won verdict always carries both
+  await slackDelivery(env, {
+    channel: pending.channel,
+    replyTs: post.replyTs,
+    userMsgTs: pending.userMsgTs,
+    userId,
+  }).postNote(post.text);
+  await executeVerdict(env, verdict);
 
   const note = decision === "confirm"
     ? `:white_check_mark: Approved by <@${userId}>`

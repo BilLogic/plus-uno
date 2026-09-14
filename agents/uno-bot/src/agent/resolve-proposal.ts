@@ -1,25 +1,25 @@
-// Shared resolution path. Called from:
-//   - slack/gate.ts (reaction path)        — narrative is undefined; we use a default
-//   - slack/events.ts (text path)          — narrative comes from Claude's `message_to_user`
+// What happens AFTER the gate says yes: the confirmed tool, the acknowledging
+// reaction, and the record of what was done.
 //
-// Effects:
-//   0. CLAIM the proposal — the delete doubles as the lock, so exactly one
-//      resolver proceeds past this line
-//   1. Post a thread reply with the narrative
-//   2. React :handshake: or :wave: on the user's ORIGINAL request message
-//      (the message that prompted the proposal, stored as pending.userMsgTs)
-//   3. If confirm: fire the side-effect tool (executeTool, below)
+// The decision half of this file is gone — the lookup, the emoji parse, the
+// claim and the lost-race message are `gate/gate.ts` now, once, for all four
+// doors (#500). What is left is the part that needs `Env`: a side-effect tool
+// only ever runs from here, and only ever on a verdict that WON its claim.
+//
+// So the shape is: a door builds a signal, `resolveSignal` returns a verdict,
+// the door posts `verdict.post` through its Delivery, and hands the verdict
+// here. Three callers do exactly that — `slack/gate.ts` (reaction),
+// `slack/interactive.ts` (button) and `turn/turn.ts` (typed emoji, and the
+// model's own `proposal_resolve`).
 //
 // The side-effect tool table lives HERE, folded in from tools/dispatcher.ts
 // (#497), because this gate is its only caller: a confirmed proposal is the one
 // way a write tool ever runs. Read-only tools dispatch separately, inside the
-// turn, from agent/run-agent.ts. tools/dispatcher.ts also re-exported
-// `SlackContext` "so existing imports keep working" long after the type moved to
-// types.ts; those importers now name types.ts and the file is gone.
+// turn, from agent/run-agent.ts.
 
 import type { Env, SlackContext } from "../types";
-import { addReaction, postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
-import type { PendingProposal } from "../thread-state/index";
+import { addReaction, postReviewRequest, warrantsReviewRequest } from "../slack/api";
+import type { GateVerdict } from "../gate/index";
 import { threadStateFor } from "../thread-state/production";
 import { executeImplement } from "../tools/implement";
 import { executeImplementDesign } from "../tools/implement-design";
@@ -29,93 +29,29 @@ import { executeNotionArchive } from "../tools/notion-archive";
 import { executeSendEmail } from "../tools/send-email";
 import { executeShareForFeedback } from "../tools/share-for-feedback";
 
-export type Decision = "confirm" | "cancel";
-
-/** Resolves the proposal. Returns true if THIS call won the claim and acted;
- *  false if another resolver (reaction, button, typed emoji, model) got there
- *  first — in which case nothing was posted and the caller should stay quiet. */
-export async function resolveProposal(
-  env: Env,
-  pending: PendingProposal,
-  decision: Decision,
-  narrative?: string,
-): Promise<boolean> {
-  // Claim first — before the narrative, before the reaction, and long before
-  // executeTool. A user who reacts ✅ and then, unsure it registered, also
-  // types "go ahead" runs two handlers that each loaded this same record.
-  // Whoever loses here must not post, must not react, and above all must not
-  // execute. Losing is not an error — the winner is handling it — so return
-  // quietly rather than telling the user twice about one action.
+/**
+ * Act on a verdict that won its claim: react on the person's ORIGINAL request
+ * message, run the confirmed tool, and write what happened into thread
+ * history.
+ *
+ * A verdict that did NOT win is a no-op here, so a door may hand over
+ * whatever the gate returned without branching: the one thing that must never
+ * happen past a lost race is execution.
+ */
+export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<void> {
+  if (verdict.outcome !== "won" || !verdict.proposal) return;
+  const pending = verdict.proposal;
   const store = threadStateFor(env);
-  if (!(await store.claimProposal(pending.proposalTs))) {
-    console.log(
-      `[gate] ${pending.toolName} at ${pending.proposalTs} was already claimed — standing down`,
-    );
-    return false;
-  }
-
-  const text =
-    narrative ??
-    (decision === "confirm" ? "Got it — kicking that off." : "Cancelled.");
-
-  // replyTs, NOT threadTs — see PendingProposal. threadTs is the history key
-  // and is the literal string "dm" in a DM, which Slack rejects.
-  const posted = await postMessage(env, {
-    channel: pending.channel,
-    thread_ts: pending.replyTs ?? pending.threadTs,
-    text,
-  });
-  // A resolution that cannot speak is the failure this whole path guards
-  // against, so it is never silent in the logs even when it is silent in Slack.
-  if (!posted.ok) {
-    console.error(
-      `[gate] narrative post FAILED for ${pending.toolName} in ${pending.channel} ` +
-        `(thread=${pending.replyTs ?? pending.threadTs}): ${(posted as { error?: string }).error ?? "unknown"}`,
-    );
-  }
 
   await addReaction(
     env,
     pending.channel,
     pending.userMsgTs,
-    decision === "confirm" ? "handshake" : "wave",
+    verdict.decision === "confirm" ? "handshake" : "wave",
   );
 
-  if (decision === "confirm") {
-    const result = await executeTool(env, pending.toolName, pending.input, {
-      channel: pending.channel,
-      threadTs: pending.threadTs,
-      userMsgTs: pending.userMsgTs,
-      // Carry the PRD resolved at proposal time — it's not re-extractable here.
-      notionPrdId: pending.notionPrdId,
-      notionPrdUrl: pending.notionPrdUrl,
-    });
-    console.log(`[gate] ${pending.toolName} executed: ${result}`);
-    // Record the outcome (including any resulting URL) in thread history, so
-    // later turns know what was actually done — e.g. the created PRD's Notion
-    // link, so "delete that PRD" works and the bot never claims it created
-    // nothing when it did. Neither caller (gate.ts reaction path, events.ts text
-    // path) records the executed result otherwise.
-    await store.appendHistory(
-      { channel: pending.channel, thread: pending.threadTs },
-      { role: "assistant", content: outcomeNote(pending.toolName, result) },
-    );
-
-    // D5: announce a successful reviewable artifact to #plus-design (right place
-    // + person + time). Best-effort — never let a fan-out failure break the flow.
-    if (warrantsReviewRequest(pending.toolName) && isOkResult(result)) {
-      try {
-        await postReviewRequest(env, {
-          toolName: pending.toolName,
-          requesterUserId: pending.requesterUserId,
-          originChannel: pending.channel,
-          artifactUrl: resultUrl(result),
-        });
-      } catch (err) {
-        console.warn(`[gate] review-request fan-out failed: ${err instanceof Error ? err.message : String(err)}`);
-      }
-    }
-  } else {
+  const run = verdict.execute;
+  if (!run) {
     await store.appendHistory(
       { channel: pending.channel, thread: pending.threadTs },
       {
@@ -123,10 +59,43 @@ export async function resolveProposal(
         content: `(Cancelled the proposed ${pending.toolName} — nothing was done.)`,
       },
     );
+    return;
   }
-  // No delete here any more: the claim above already removed the record, which
-  // is what made it a claim.
-  return true;
+
+  const result = await executeTool(env, run.toolName, run.input, {
+    channel: run.channel,
+    threadTs: run.threadTs,
+    userMsgTs: run.userMsgTs,
+    // Carry the PRD resolved at proposal time — it's not re-extractable here.
+    notionPrdId: run.notionPrdId,
+    notionPrdUrl: run.notionPrdUrl,
+  });
+  console.log(`[gate] ${run.toolName} executed: ${result}`);
+  // Record the outcome (including any resulting URL) in thread history, so
+  // later turns know what was actually done — e.g. the created PRD's Notion
+  // link, so "delete that PRD" works and the bot never claims it created
+  // nothing when it did. No door records the executed result otherwise.
+  await store.appendHistory(
+    { channel: run.channel, thread: run.threadTs },
+    { role: "assistant", content: outcomeNote(run.toolName, result) },
+  );
+
+  // D5: announce a successful reviewable artifact to #plus-design (right place
+  // + person + time). Best-effort — never let a fan-out failure break the flow.
+  if (warrantsReviewRequest(run.toolName) && isOkResult(result)) {
+    try {
+      await postReviewRequest(env, {
+        toolName: run.toolName,
+        requesterUserId: run.requesterUserId,
+        originChannel: run.channel,
+        artifactUrl: resultUrl(result),
+      });
+    } catch (err) {
+      console.warn(
+        `[gate] review-request fan-out failed: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
 }
 
 /** True unless the executor explicitly reported ok:false. */

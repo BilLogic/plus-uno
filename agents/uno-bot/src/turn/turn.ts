@@ -42,8 +42,8 @@ import { bounceLogLine, proposalWasAddressed } from "../agent/pending-notice";
 import type { AgentImage, HistoricalImages } from "../agent/provider-conversation";
 import { routeRequest } from "../agent/routing";
 import type { ModelTier } from "../agent/tiers";
+import { resolveSignal, type GateVerdict } from "../gate/index";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "../slack/antecedent";
-import { typedEmojiDecision } from "../slack/gate-reactions";
 import {
   formatNotionUpdateProposal,
   formatProposal,
@@ -284,14 +284,15 @@ export interface TurnDeps {
     ctx: { prd: { id?: string; url?: string } | null; implementPrdUrl?: string },
   ): Promise<{ ask: string } | null>;
 
-  /** Claim-then-act on a staged proposal: the claim is the lock, then the
-   *  narrative and the tool. False means another resolver won the race and this
-   *  caller must stay quiet. Moves to the Gate module in #500. */
-  resolveProposal(
-    pending: PendingProposal,
-    decision: "confirm" | "cancel",
-    narrative?: string,
-  ): Promise<boolean>;
+  /**
+   * Act on a verdict Gate has already won: the confirmed side-effect tool, the
+   * acknowledging reaction, the record of what was done.
+   *
+   * The DECISION half is not a dependency — `resolveSignal` is pure and the
+   * turn calls it directly with `threadState`. Only the execution needs `Env`,
+   * which is why this one line is a port and the gate is not.
+   */
+  applyVerdict(verdict: GateVerdict): Promise<void>;
 
   /** The card bodies that need a read of their own. */
   cards: {
@@ -370,16 +371,27 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
   // approval by re-invoking the same tool with the same input, that IS the
   // confirmation.
   if (request.pending) {
-    const typed = typedEmojiDecision(request.text);
-    if (typed) {
-      await deps.resolveProposal(request.pending, typed);
-      const note =
-        typed === "confirm" ? "(confirmed — executing the proposal)" : "Cancelled.";
-      await memory.remember(note);
-      return {
-        disposition: "resolved",
-        posted: note,
-        wrote: memory.wrote(),
+    const verdict = await resolveSignal(
+      {
+        kind: "typed",
+        channel: request.channel,
+        thread: request.conversationTs,
+        text: request.text,
+        userId: request.userId,
+      },
+      { threadState },
+    );
+    // A verdict with no decision means the message was not a gate emoji — it
+    // is language, and language goes to the model. Anything else the gate has
+    // already settled, win or lost race.
+    if (verdict.decision) {
+      return settleVerdict(verdict, {
+        deps,
+        memory,
+        note:
+          verdict.decision === "confirm"
+            ? "(confirmed — executing the proposal)"
+            : "Cancelled.",
         telemetry: {
           tier: "chill",
           route: "typed-gate-emoji",
@@ -389,7 +401,7 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
           references: [],
           interim: 0,
         },
-      };
+      });
     }
   }
 
@@ -588,17 +600,18 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
 
   // ── A resolution the model itself decided ──────────────────────────────────
   if (result.kind === "resolved") {
-    await deps.resolveProposal(result.pending, result.decision, result.messageToUser);
-    const finalText =
-      result.messageToUser ??
-      (result.decision === "confirm" ? "Got it — kicking that off." : "Cancelled.");
-    await memory.remember(finalText);
-    return {
-      disposition: "resolved",
-      posted: finalText,
-      wrote: memory.wrote(),
-      telemetry,
-    };
+    // The loop already validated the call against the thread's pending state;
+    // Gate claims and says what to run.
+    const verdict = await resolveSignal(
+      {
+        kind: "model",
+        pending: result.pending,
+        decision: result.decision,
+        ...(result.messageToUser ? { messageToUser: result.messageToUser } : {}),
+      },
+      { threadState },
+    );
+    return settleVerdict(verdict, { deps, memory, telemetry });
   }
 
   // ── A new side-effect proposal ─────────────────────────────────────────────
@@ -644,15 +657,21 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
     console.log(
       `[gate] identical re-stage of ${result.toolName} while pending — treating as confirm`,
     );
-    await deps.resolveProposal(request.pending, "confirm", result.previewText || undefined);
-    const note = result.previewText || "(confirmed — executing the proposal)";
-    await memory.remember(note);
-    return {
-      disposition: "resolved",
-      posted: note,
-      wrote: memory.wrote(),
+    const verdict = await resolveSignal(
+      {
+        kind: "model",
+        pending: request.pending,
+        decision: "confirm",
+        ...(result.previewText ? { messageToUser: result.previewText } : {}),
+      },
+      { threadState },
+    );
+    return settleVerdict(verdict, {
+      deps,
+      memory,
+      ...(result.previewText ? {} : { note: "(confirmed — executing the proposal)" }),
       telemetry,
-    };
+    });
   }
 
   // Gate idempotency (b): the person JUST cancelled this same action, and the
@@ -733,6 +752,38 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
     staged: { proposal, card },
     wrote: memory.wrote(),
     telemetry,
+  };
+}
+
+// ── The gate path ────────────────────────────────────────────────────────────
+
+/**
+ * Apply one Gate verdict, and be the turn's outcome.
+ *
+ * Both of the turn's gate doors — the typed emoji and the model's own
+ * `proposal_resolve` — end here, which is what makes a lost race read the same
+ * on each: the verdict's own text is posted, `applyVerdict` executes nothing
+ * unless the claim was won, and the record says what the person was told.
+ *
+ * `note` is what the RECORD should say when that differs from what was posted
+ * ("(confirmed — executing the proposal)" beside "Got it — kicking that
+ * off."), and it applies only to a verdict that won: on a lost race the
+ * conversation should remember what the person actually read.
+ */
+async function settleVerdict(
+  verdict: GateVerdict,
+  ctx: { deps: TurnDeps; memory: ThreadMemory; telemetry: TurnTelemetry; note?: string },
+): Promise<TurnOutcome> {
+  const posted = verdict.post?.text;
+  if (posted) await ctx.deps.delivery.postNote(posted);
+  await ctx.deps.applyVerdict(verdict);
+  const remembered = (verdict.outcome === "won" ? ctx.note : undefined) ?? posted;
+  if (remembered) await ctx.memory.remember(remembered);
+  return {
+    disposition: "resolved",
+    ...(posted ? { posted } : {}),
+    wrote: ctx.memory.wrote(),
+    telemetry: ctx.telemetry,
   };
 }
 

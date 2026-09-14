@@ -13,7 +13,7 @@
 
 import { buildProviderConversation } from "../agent/provider-conversation";
 import { preflight } from "../agent/preflight";
-import { resolveProposal } from "../agent/resolve-proposal";
+import { executeVerdict } from "../agent/resolve-proposal";
 import { reviewDraft } from "../agent/draft-judge";
 import { runAgent, withTurnScope } from "../agent/run-agent";
 import { parseScope } from "../agent/scope-keywords";
@@ -210,8 +210,7 @@ function turnDeps(
         ...(ctx.implementPrdUrl ? { implementPrdUrl: ctx.implementPrdUrl } : {}),
       }),
 
-    resolveProposal: (pending, decision, narrative) =>
-      resolveProposal(env, pending, decision, narrative),
+    applyVerdict: (verdict) => executeVerdict(env, verdict),
 
     cards: {
       notionUpdateBody: (input) => buildNotionUpdateBody(env, input),

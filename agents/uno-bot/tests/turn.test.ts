@@ -83,7 +83,13 @@ interface Harness {
   threadState: ThreadState;
   provider: FakeProvider;
   /** Every proposal resolution the turn asked for, in order. */
-  resolved: Array<{ toolName: string; decision: "confirm" | "cancel"; narrative?: string }>;
+  resolved: Array<{
+    toolName: string;
+    decision: "confirm" | "cancel";
+    narrative?: string;
+    /** Whether the verdict carried a tool to run — a decline carries none. */
+    executed: boolean;
+  }>;
   /** Every draft the judge was handed. */
   judged: string[];
   /** Tool names the loop actually executed. */
@@ -150,13 +156,17 @@ function harness(opts: {
       return opts.preflightAsk ? { ask: opts.preflightAsk } : null;
     },
 
-    async resolveProposal(pending, decision, narrative) {
+    // The gate's EXECUTION port. The decision half is not a dependency: the
+    // turn calls `resolveSignal` itself against the in-memory store, so what
+    // arrives here is a verdict that has already won its claim.
+    async applyVerdict(verdict) {
+      if (verdict.outcome !== "won" || !verdict.proposal || !verdict.decision) return;
       resolved.push({
-        toolName: pending.toolName,
-        decision,
-        ...(narrative === undefined ? {} : { narrative }),
+        toolName: verdict.proposal.toolName,
+        decision: verdict.decision,
+        ...(verdict.post ? { narrative: verdict.post.text } : {}),
+        executed: verdict.execute !== undefined,
       });
-      return true;
     },
 
     cards: {
@@ -184,10 +194,24 @@ function harness(opts: {
 /** Posts a person would actually read, in order. */
 const postsOf = (delivery: RecordingDelivery): string[] => delivery.posted;
 
+/**
+ * Stage `PENDING` for real, in the store.
+ *
+ * A turn that resolves a proposal goes through Gate now, and Gate's claim is a
+ * delete in the store — so a proposal that is only in the request and not in
+ * the store reads as one somebody else already resolved. Which is correct: it
+ * is the same record either way in production.
+ */
+const stage = (h: Harness): Promise<void> => h.threadState.putProposal(PENDING).then(() => {});
+
+/** The narrative Gate posts when the signal brought no words of its own. */
+const DEFAULT_CONFIRM_POST = "Got it — kicking that off.";
+
 // ── (a) a pending proposal, and the reply that resolves it ───────────────────
 
 test("a typed ✅ against a pending proposal resolves it and posts exactly once", async () => {
   const h = harness();
+  await stage(h);
   const outcome: TurnOutcome = await runTurn(
     request({ text: ":white_check_mark:", pending: PENDING }),
     h.deps,
@@ -195,7 +219,18 @@ test("a typed ✅ against a pending proposal resolves it and posts exactly once"
 
   assert.equal(outcome.disposition, "resolved");
   // ONE resolution, through the same claim every other confirmation path uses.
-  assert.deepEqual(h.resolved, [{ toolName: "notion_create", decision: "confirm" }]);
+  assert.deepEqual(h.resolved, [
+    {
+      toolName: "notion_create",
+      decision: "confirm",
+      narrative: DEFAULT_CONFIRM_POST,
+      executed: true,
+    },
+  ]);
+  // The gate's own text, said once, through Delivery.
+  assert.deepEqual(postsOf(h.delivery), [DEFAULT_CONFIRM_POST]);
+  // And the card is gone: the claim took it.
+  assert.equal(await h.threadState.getProposalByThread(REF), null);
   // And nothing else was said: no answer, no second card, no model call.
   assert.equal(h.provider.sends.length, 0);
   assert.equal(
@@ -227,11 +262,17 @@ test("a typed reply the model reads as approval resolves the card once", async (
       },
     ],
   });
+  await stage(h);
   const outcome = await runTurn(request({ text: "yes please", pending: PENDING }), h.deps);
 
   assert.equal(outcome.disposition, "resolved");
   assert.deepEqual(h.resolved, [
-    { toolName: "notion_create", decision: "confirm", narrative: "Filing it now." },
+    {
+      toolName: "notion_create",
+      decision: "confirm",
+      narrative: "Filing it now.",
+      executed: true,
+    },
   ]);
   assert.equal(outcome.posted, "Filing it now.");
   assert.equal(h.delivery.calls.filter((c) => c.kind === "proposal").length, 0);
@@ -403,13 +444,21 @@ test("the same proposal re-staged while one is pending is read as the confirmati
       },
     ],
   });
+  await stage(h);
   const outcome = await runTurn(
     request({ text: "go ahead and do that please", pending: PENDING }),
     h.deps,
   );
 
   assert.equal(outcome.disposition, "resolved");
-  assert.deepEqual(h.resolved, [{ toolName: "notion_create", decision: "confirm" }]);
+  assert.deepEqual(h.resolved, [
+    {
+      toolName: "notion_create",
+      decision: "confirm",
+      narrative: DEFAULT_CONFIRM_POST,
+      executed: true,
+    },
+  ]);
   assert.equal(h.delivery.calls.filter((c) => c.kind === "proposal").length, 0);
 });
 

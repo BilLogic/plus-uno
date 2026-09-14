@@ -130,13 +130,12 @@ function harness(
     },
 
     // The eval adapter's resolver RECORDS rather than executing; so does this.
-    async resolveProposal(pending, decision, narrative) {
+    async applyVerdict(verdict) {
+      if (!verdict.execute) return;
       resolutions.push({
-        toolName: pending.toolName,
-        decision,
-        ...(narrative === undefined ? {} : { narrative }),
+        toolName: verdict.execute.toolName,
+        decision: verdict.decision ?? "confirm",
       });
-      return true;
     },
 
     cards: {
@@ -265,8 +264,12 @@ test("history and a pending proposal reach the turn the same way from both sides
   } satisfies PendingProposal);
 
   // And the turn reads it: a typed ✅ resolves that card rather than answering.
+  // The Gate claims the record in the store, so the card is staged there first —
+  // exactly what the eval adapter does with the pending the runner sent.
   const h = harness();
-  const outcome = await runTurn(evalRequest({ prompt: "✅", history, pending }), h.deps);
+  const request = evalRequest({ prompt: "✅", history, pending });
+  await h.threadState.putProposal(request.pending!);
+  const outcome = await runTurn(request, h.deps);
   assert.equal(outcome.disposition, "resolved");
   assert.deepEqual(h.resolutions, [{ toolName: "notion_create", decision: "confirm" }]);
   assert.equal(h.provider.sends.length, 0);

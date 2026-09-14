@@ -17,7 +17,7 @@
 //     real Slack conversation — and the recording adapter answers the way the
 //     Slack one answers (a post reports what it posted, a staged card reports a
 //     ts), so the turn takes the same paths.
-//   * RESOLUTION RECORDS instead of executing. `resolveProposal` is the one dep
+//   * RESOLUTION RECORDS instead of executing. `applyVerdict` is the one dep
 //     that performs the irreversible thing behind the ✅ gate — a Notion card, a
 //     PR, a share-out post. The old driver never executed one either (it
 //     returned the model's decision as data), and a suite that files a card per
@@ -248,16 +248,15 @@ function evalDeps(
       return ask;
     },
 
-    // RECORDED, never executed — see the header. `true` is the claim the real
-    // resolver returns when it won the race, which is the answer that lets the
-    // turn take its normal path.
-    async resolveProposal(pending, decision, narrative) {
+    // RECORDED, never executed — see the header. The Gate has already claimed
+    // the proposal and decided; production would hand the verdict to the
+    // executor, and an eval run writes it to the report instead.
+    async applyVerdict(verdict) {
+      if (!verdict.execute) return;
       report.resolutions.push({
-        toolName: pending.toolName,
-        decision,
-        ...(narrative === undefined ? {} : { narrative }),
+        toolName: verdict.execute.toolName,
+        decision: verdict.decision ?? "confirm",
       });
-      return true;
     },
 
     cards: {
