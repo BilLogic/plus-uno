@@ -18,7 +18,15 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { IGNORED_DIRS, documents, frontmatter, links, mdxSections } from './corpus.mjs';
+import {
+  IGNORED_DIRS,
+  directories,
+  documents,
+  frontmatter,
+  links,
+  mdxSections,
+  stripLinks,
+} from './corpus.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURES = path.join(__dirname, '__fixtures__/corpus');
@@ -31,6 +39,8 @@ test('documents lists the markdown under a directory, recursively and sorted', (
     'docs/folded.md',
     'docs/nested/deep.md',
     'docs/plain.md',
+    'docs/structured.md',
+    'docs/tiered.md',
     'docs/unterminated.md',
   ]);
 });
@@ -51,12 +61,16 @@ test('documents takes a glob as readily as a directory', () => {
     'docs/folded.md',
     'docs/nested/deep.md',
     'docs/plain.md',
+    'docs/structured.md',
+    'docs/tiered.md',
     'docs/unterminated.md',
   ]);
   assert.deepEqual(documents('docs/*.md', { root: FIXTURES }), [
     'docs/brackets.md',
     'docs/folded.md',
     'docs/plain.md',
+    'docs/structured.md',
+    'docs/tiered.md',
     'docs/unterminated.md',
   ]);
   assert.deepEqual(documents('docs/nested/*.md', { root: FIXTURES }), ['docs/nested/deep.md']);
@@ -117,7 +131,7 @@ test('frontmatter reads a fenced block, and the blank lines after the fence belo
 
 test('frontmatter treats an unterminated block as content, not a guess at where it closes', () => {
   const text = fs.readFileSync(path.join(FIXTURES, 'docs/unterminated.md'), 'utf8');
-  assert.deepEqual(frontmatter(text), { meta: {}, body: text });
+  assert.deepEqual(frontmatter(text), { meta: {}, body: text, raw: null });
 });
 
 test('frontmatter folds a `>` block, reads a `|` block, and unquotes a quoted value', () => {
@@ -186,4 +200,140 @@ test('mdxSections reads past the frontmatter rather than through it', () => {
   assert.deepEqual(mdxSections('---\ntitle: "x"\n# not a heading: a YAML comment\n---\n\n## Only one\n'), [
     { depth: 2, title: 'Only one' },
   ]);
+});
+
+// ── documents: strict, the mode a guard needs ────────────────────────────────
+
+test('strict THROWS on a directory it cannot read, rather than sweeping fewer files', () => {
+  // The forgiving walk returns what it got and the caller reports a number it
+  // did not earn. A guard must stop instead: an unreadable directory is the
+  // sweep failing to see what it is about to vouch for (#429).
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'corpus-strict-'));
+  const dir = path.join(root, 'docs');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'a.md'), '# a\n');
+  fs.chmodSync(dir, 0o000);
+  try {
+    // Running as root defeats the permission bit; skip rather than assert a
+    // guarantee the environment is not providing.
+    let readable = true;
+    try {
+      fs.readdirSync(dir);
+    } catch {
+      readable = false;
+    }
+    if (readable) return;
+    assert.deepEqual(documents('docs', { root }), [], 'the forgiving walk swallows it');
+    assert.throws(
+      () => documents('docs', { root, strict: true }),
+      (err) => err.code === 'EACCES',
+    );
+  } finally {
+    fs.chmodSync(dir, 0o755);
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('strict lets a broken symlink cost only itself', () => {
+  // The other half. `withFileTypes` describes the LINK, so the forgiving walk
+  // returns a dangling one as a document with no file behind it; strict stats
+  // it, and an ENOENT skips that entry and nothing else.
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'corpus-symlink-'));
+  const dir = path.join(root, 'docs');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'a-first.md'), '# a\n');
+  fs.symlinkSync(path.join(root, 'nothing-here'), path.join(dir, 'b-broken.md'));
+  fs.writeFileSync(path.join(dir, 'c-last.md'), '# c\n');
+  try {
+    assert.deepEqual(documents('docs', { root, strict: true }), [
+      'docs/a-first.md',
+      'docs/c-last.md',
+    ]);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('skipEntry skips a name whether it is a file or a directory', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'corpus-skipentry-'));
+  try {
+    fs.mkdirSync(path.join(root, '__planted'), { recursive: true });
+    fs.writeFileSync(path.join(root, '__planted/buried.md'), '# buried\n');
+    fs.writeFileSync(path.join(root, '__fixture.md'), '# fixture\n');
+    fs.writeFileSync(path.join(root, 'real.md'), '# real\n');
+    assert.deepEqual(documents('.', { root, skipEntry: (n) => n.startsWith('__') }), ['real.md']);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+// ── directories ──────────────────────────────────────────────────────────────
+
+test('directories lists the folders, recursively or one level, under the same ignore rules', () => {
+  assert.deepEqual(directories('.', { root: FIXTURES }), ['docs', 'docs/nested']);
+  assert.deepEqual(directories('.', { root: FIXTURES, recursive: false }), ['docs']);
+  assert.deepEqual(directories('docs', { root: FIXTURES }), ['docs/nested']);
+  assert.deepEqual(directories('gone', { root: FIXTURES }), [], 'an absent target is nothing');
+
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'corpus-dirs-'));
+  try {
+    for (const rel of ['kept', 'kept/deeper', 'node_modules', '.hidden']) {
+      fs.mkdirSync(path.join(root, rel), { recursive: true });
+    }
+    assert.deepEqual(directories('.', { root }), ['kept', 'kept/deeper']);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+// ── frontmatter: the two readings a caller can ask for ───────────────────────
+
+test('allowLeadingComment lets the fence open below the house Tier marker', () => {
+  const abs = path.join(FIXTURES, 'docs/tiered.md');
+  assert.deepEqual(frontmatter(abs).meta, {}, 'anchored at byte 0, there is no frontmatter');
+  const { meta, raw } = frontmatter(abs, { allowLeadingComment: true });
+  assert.equal(meta.disposition, 'rule');
+  assert.equal(meta['disposition-target'], 'docs/engineering/coding.md');
+  assert.equal(raw, 'disposition: rule\ndisposition-target: docs/engineering/coding.md');
+});
+
+test('structured reads a block sequence and a nested mapping, comments and all', () => {
+  const abs = path.join(FIXTURES, 'docs/structured.md');
+  assert.equal(frontmatter(abs).meta.trigger_types, '', 'without asking, an empty scalar');
+  const { meta } = frontmatter(abs, { structured: true });
+  assert.deepEqual(meta.trigger_types, ['github_cron', 'github_dispatch']);
+  assert.deepEqual(meta.references_when, {
+    isNewComponent: 'references/new-component-scaffolding.md',
+  });
+  assert.equal(meta.model_default, 'claude-sonnet-4-6', 'the scalars still read as scalars');
+});
+
+test('a `#` in an ordinary scalar is content, not a comment', () => {
+  // docs/connectors/slack.md names a channel: `summary: … #plus-universal …`.
+  // Comment-stripping belongs to the sequence items that carry comments, and
+  // nowhere else, or that summary loses half its text.
+  assert.equal(
+    frontmatter('---\nsummary: Universal is #plus-universal here\n---\n').meta.summary,
+    'Universal is #plus-universal here',
+  );
+});
+
+test('raw is the block verbatim — what a generator re-emits without re-finding the fence', () => {
+  const { raw } = frontmatter('---\nname: uno-x\nargument-hint: "[a] [b]"\n---\n\nBody.\n');
+  assert.equal(raw, 'name: uno-x\nargument-hint: "[a] [b]"');
+});
+
+// ── stripLinks ───────────────────────────────────────────────────────────────
+
+test('stripLinks reduces a link to its text, leaving the prose word count alone', () => {
+  assert.equal(
+    stripLinks('See [the folded doc](folded.md) and [site](https://example.com/x).'),
+    'See the folded doc and site.',
+  );
+  assert.equal(stripLinks('An [empty]() label stays'), 'An empty label stays');
+  assert.equal(
+    stripLinks('`[label](url)` in a code span is stripped too, not blanked'),
+    '`label` in a code span is stripped too, not blanked',
+  );
+  assert.equal(stripLinks('no links here'), 'no links here');
 });

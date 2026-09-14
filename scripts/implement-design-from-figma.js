@@ -28,11 +28,12 @@
  */
 
 import {
-  readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, statSync, appendFileSync,
+  readFileSync, writeFileSync, existsSync, mkdirSync, statSync, appendFileSync,
 } from 'fs';
 import { join, resolve, dirname, extname, relative, sep } from 'path';
 import https from 'https';
 import { fetchNotionPRD } from './create-notion-prd.js';
+import { IGNORED_DIRS, documents } from './lib/corpus.mjs';
 import { loadSkill, loadSkillMetadata } from './lib/skill-loader.js';
 
 // Load .env locally; in CI env vars are injected directly
@@ -203,18 +204,22 @@ function extractDesignProperties(node) {
 
 // ─── Reference scaffold + DS context ─────────────────────────────────────────
 
+/**
+ * The reference scaffold's text files, through the corpus walk (#503).
+ *
+ * `assets/` joins the corpus's own ignore list for this one call — it holds
+ * binaries the model has no use for. The extension set and the size ceiling
+ * stay here, because what counts as text a prompt can afford is this script's
+ * judgement, not the tree's.
+ */
+const REFERENCE_IGNORE = new Set([...IGNORED_DIRS, 'assets']);
+
 function walkReference(dir, baseDir, acc) {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (entry.isDirectory()) {
-      if (entry.name === 'assets' || entry.name === 'node_modules') continue; // skip binary assets
-      walkReference(join(dir, entry.name), baseDir, acc);
-      continue;
-    }
-    const full = join(dir, entry.name);
-    if (!REFERENCE_TEXT_EXT.has(extname(entry.name).toLowerCase())) continue;
+  for (const rel of documents('.', { root: dir, ext: null, ignore: REFERENCE_IGNORE })) {
+    const full = join(dir, rel);
+    if (!REFERENCE_TEXT_EXT.has(extname(rel).toLowerCase())) continue;
     if (statSync(full).size > MAX_REFERENCE_FILE_BYTES) continue;
-    const rel = relative(baseDir, full).split(sep).join('/');
-    acc.push({ rel, content: readFileSync(full, 'utf8') });
+    acc.push({ rel: relative(baseDir, full).split(sep).join('/'), content: readFileSync(full, 'utf8') });
   }
 }
 

@@ -15,6 +15,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { documents, frontmatter } from './lib/corpus.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const OUT = path.join(REPO_ROOT, 'INDEX.md');
@@ -57,34 +59,37 @@ const ROLE_PATHS = [
 
 const rel = (p) => path.relative(REPO_ROOT, p).replace(/\\/g, '/');
 
-function frontmatter(abs) {
-  const text = fs.readFileSync(abs, 'utf8');
-  if (!text.startsWith('---\n')) return {};
-  const close = text.indexOf('\n---', 4);
-  if (close === -1) return {};
-  const meta = {};
-  for (const line of text.slice(4, close).split('\n')) {
-    const m = line.match(/^([a-zA-Z_-]+):\s*(.*)$/);
-    if (m) meta[m[1]] = m[2].trim();
+/**
+ * Index order is per-DIRECTORY, by entry name, the way a reader browses a tree
+ * — so the comparison is segment by segment rather than over the whole path.
+ * A plain string sort puts `docs/x.md` before `docs/x/y.md` (`.` sorts under
+ * `/`) and orders `README.md` against `agents/` by byte, where a browser's
+ * listing — and this index, since it was first generated — uses the locale's
+ * collation. Corpus hands back the paths; which order they read in is this
+ * file's judgement, and it is the one already committed to INDEX.md.
+ */
+function byEntry(a, b) {
+  const as = a.split('/');
+  const bs = b.split('/');
+  for (let i = 0; i < Math.min(as.length, bs.length); i += 1) {
+    if (as[i] !== bs[i]) return as[i].localeCompare(bs[i]);
   }
-  return meta;
+  return as.length - bs.length;
 }
 
-function walk(root, depth = Infinity, level = 0) {
-  const abs = path.join(REPO_ROOT, root);
-  if (!fs.existsSync(abs)) return [];
-  if (fs.statSync(abs).isFile()) return root.endsWith('.md') ? [root] : [];
-  const out = [];
-  for (const entry of fs.readdirSync(abs, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
-    const child = `${root}/${entry.name}`;
-    if (NOT_ROUTABLE.some((skip) => child === skip || child.startsWith(`${skip}/`))) continue;
-    if (entry.isDirectory()) {
-      if (level < depth) out.push(...walk(child, depth, level + 1));
-    } else if (entry.name.endsWith('.md')) {
-      out.push(child);
-    }
-  }
-  return out;
+/**
+ * The routable `.md` under one section root.
+ *
+ * `depth` counts DIRECTORIES descended, as the recursion it replaces counted
+ * them: `depth: 1` over `skills/` reaches `skills/uno-x/SKILL.md` and stops
+ * before `skills/uno-x/references/`.
+ */
+function walk(root, depth = Infinity) {
+  const rootDepth = root.split('/').length;
+  return documents(root, { ext: ['.md'] })
+    .filter((f) => !NOT_ROUTABLE.some((skip) => f === skip || f.startsWith(`${skip}/`)))
+    .filter((f) => f.split('/').length - rootDepth <= depth + 1)
+    .sort(byEntry);
 }
 
 const missing = [];
@@ -105,7 +110,7 @@ for (const section of SECTIONS) {
   doc += `## ${section.title}\n\n`;
   doc += `| Doc | Summary |\n|-----|---------|\n`;
   for (const f of files) {
-    const meta = frontmatter(path.join(REPO_ROOT, f));
+    const { meta } = frontmatter(f);
     if (!meta.summary) {
       missing.push(f);
       continue;

@@ -586,9 +586,19 @@ test("the frontmatter split is the bundler's own, imported rather than copied", 
 });
 
 test('the shared split ends the block where the bundler always has', () => {
-  assert.deepEqual(frontmatter('# No frontmatter\n'), { meta: {}, body: '# No frontmatter\n' });
-  // An unterminated block is content, not a guess at where it meant to close.
-  assert.deepEqual(frontmatter('---\nsummary: x\n'), { meta: {}, body: '---\nsummary: x\n' });
+  assert.deepEqual(frontmatter('# No frontmatter\n'), {
+    meta: {},
+    body: '# No frontmatter\n',
+    raw: null,
+  });
+  // An unterminated block is content, not a guess at where it meant to close —
+  // and `raw: null` says so, which is how a generator that re-emits the block
+  // verbatim tells "no frontmatter" from "an empty one".
+  assert.deepEqual(frontmatter('---\nsummary: x\n'), {
+    meta: {},
+    body: '---\nsummary: x\n',
+    raw: null,
+  });
 
   const { meta, body } = frontmatter('---\nsummary: x\nembodiment: ide\n---\n\n# Doc\n\nBody.\n');
   assert.deepEqual(meta, { summary: 'x', embodiment: 'ide' });

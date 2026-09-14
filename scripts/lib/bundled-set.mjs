@@ -46,7 +46,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import { frontmatter } from './corpus.mjs';
+import { documents, frontmatter } from './corpus.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, '..', '..');
@@ -126,18 +126,6 @@ export const SECTION_ROOTS = [
   'docs/conventions',
 ];
 
-/** Every `.md` under a root, or the root itself when it is a file. */
-function walkDocs(rel) {
-  const abs = path.join(REPO_ROOT, rel);
-  if (!fs.existsSync(abs)) return [];
-  if (fs.statSync(abs).isFile()) return rel.endsWith('.md') ? [rel] : [];
-  const out = [];
-  for (const entry of fs.readdirSync(abs, { withFileTypes: true })) {
-    out.push(...walkDocs(path.posix.join(rel, entry.name)));
-  }
-  return out;
-}
-
 /**
  * A doc's declared `embodiment`, or null when it declares none.
  *
@@ -174,7 +162,7 @@ export function embodimentOf(text) {
  * @returns {string[]} repo-relative paths, sorted.
  */
 export function ideAuthoredFiles() {
-  return SECTION_ROOTS.flatMap(walkDocs)
+  return SECTION_ROOTS.flatMap((rel) => documents(rel))
     .filter((rel) => embodimentOf(fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8')) === 'ide')
     .sort();
 }

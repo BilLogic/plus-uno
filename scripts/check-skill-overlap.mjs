@@ -98,6 +98,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { workerFiles, resolveBundled, unresolvedReport } from './lib/bundled-set.mjs';
+import { directories } from './lib/corpus.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -286,11 +287,10 @@ const rel = (abs) => path.relative(REPO_ROOT, abs).replace(/\\/g, '/');
  * was measured. Pure: reads files, writes nothing.
  */
 export function auditSkills(root = SKILLS_ROOT) {
-  const skills = fs
-    .readdirSync(root, { withFileTypes: true })
-    .filter((e) => e.isDirectory() && e.name.startsWith('uno-'))
-    .map((e) => e.name)
-    .sort();
+  // The folder listing is the corpus's (#503) — one reader of the tree, whether
+  // the question is which documents exist or which directories do.
+  const skills = directories('.', { root, recursive: false })
+    .filter((name) => name.startsWith('uno-'));
 
   const findings = [];
   const incomplete = [];

@@ -17,6 +17,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { documents } from './lib/corpus.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const DS_ROOT = path.join(REPO_ROOT, 'design-system', 'src');
@@ -44,14 +46,11 @@ function groupFromMdxPath(mdxAbsPath) {
     return 'Other';
 }
 
-function walkMdxFiles(dir, acc = []) {
-    if (!fs.existsSync(dir)) return acc;
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-        const full = path.join(dir, entry.name);
-        if (entry.isDirectory()) walkMdxFiles(full, acc);
-        else if (entry.name.endsWith('.mdx') && !/ \d+\.mdx$/.test(entry.name)) acc.push(full);
-    }
-    return acc;
+/** Every authored `.mdx` under `dir`, absolute — the corpus's walk (#503). */
+function walkMdxFiles(dir) {
+    return documents('.', { root: dir, ext: ['.mdx'] })
+        .filter((rel) => !/ \d+\.mdx$/.test(rel))
+        .map((rel) => path.join(dir, rel));
 }
 
 function extractFigmaMeta(content) {
