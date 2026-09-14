@@ -8,11 +8,7 @@ import { startSlackOAuth, handleSlackOAuthCallback, getSlackAccessTokenFor } fro
 import { geminiConfigured, geminiGenerate } from "./gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "./vertex/claude";
 import { MODELS } from "./agent/routing";
-import { runAgent } from "./agent/run-agent";
-import { withTurnScope, type TurnDials } from "./agent/run-agent";
-import { attachToolResult, markUnanswered, type ToolCall } from "./agent/tool-transcript";
-import { preflight } from "./agent/preflight";
-import type { HistoryTurn, PendingProposal } from "./thread-state/index";
+import { handleEvalTurn } from "./eval/turn-adapter";
 import { BUILD } from "./version";
 import { BLUEPRINT_CONTRACT } from "./generated/blueprint-contract";
 import { runFigmaPoll } from "./figma-poll";
@@ -199,15 +195,18 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
     });
   }
 
-  // One HEADLESS agent turn for evals + reasoning investigation. Runs the
-  // exact runAgent the Slack pipeline uses, but with a synthetic context and
-  // NO delivery: replies come back as JSON, proposals come back as data
-  // (nothing is staged or posted — staging/posting live a layer up in
-  // events.ts), and the preflight clarify-gate verdict is included so eval
-  // assertions see the same gating production applies. Multi-turn flows are
-  // driven by the CALLER passing history/pending back in (the DO is never
-  // touched). Auth-gated: every call is a live billable model run.
-  // Driven by scripts/run-evals.mjs; scenarios in docs/evals/.
+  // One HEADLESS turn for evals + reasoning investigation, through the SAME
+  // Turn module a Slack message takes (#499): the eval case becomes a
+  // `TurnRequest`, `Env` becomes the turn's deps, and the only two that differ
+  // from production record instead of acting — Delivery posts nothing, and a
+  // resolution is captured rather than executed. So preflight, the confidence
+  // pre-check, the absence check and the draft judge all run here exactly as
+  // they run for a designer, which the 127-line driver this route used to carry
+  // could not do. Multi-turn flows are driven by the CALLER passing
+  // history/pending back in (no Durable Object is touched — the store is
+  // in-memory, seeded from that history). Auth-gated: every call is a live
+  // billable model run. Driven by scripts/run-evals.mjs; scenarios in
+  // docs/evals/.
   if (request.method === "POST" && url.pathname === "/debug/eval") {
     if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
     return handleEvalTurn(request, env);
@@ -617,159 +616,6 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
   }
 
   return new Response("not found", { status: 404 });
-}
-
-// /debug/eval body: one turn of a (possibly multi-turn) eval conversation.
-interface EvalTurnBody {
-  prompt?: string;
-  history?: HistoryTurn[];
-  /** Minimal pending-proposal shape; synthetic fields are filled in here. */
-  pending?: { toolName: string; input: Record<string, unknown> } | null;
-  /** Surface the turn arrives on. Defaults to the synthetic channel C_EVAL —
-   *  which never starts with "D", so own-visibility search is unreachable and
-   *  any assertion about the ADR-020 surface gate would pass for the wrong
-   *  reason. A case that means to exercise the gate sets these explicitly. */
-  channel?: string;
-  requestedBy?: string;
-}
-
-async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
-  let body: EvalTurnBody;
-  try {
-    body = (await request.json()) as EvalTurnBody;
-  } catch {
-    return Response.json({ ok: false, error: "bad json" }, { status: 400 });
-  }
-  const prompt = typeof body.prompt === "string" ? body.prompt.trim() : "";
-  if (!prompt) return Response.json({ ok: false, error: "missing prompt" }, { status: 400 });
-
-  // Slack ids only — the eval route must not become a way to name arbitrary
-  // surfaces. Anything malformed falls back to the synthetic defaults.
-  const channel = /^[CDG][A-Z0-9]{2,20}$/.test(body.channel ?? "") ? body.channel! : "C_EVAL";
-  const requestedBy = /^[UW][A-Z0-9]{2,20}$/.test(body.requestedBy ?? "")
-    ? body.requestedBy!
-    : "U_EVAL";
-
-  const history: HistoryTurn[] = Array.isArray(body.history)
-    ? body.history.filter(
-        (t): t is HistoryTurn =>
-          !!t && (t.role === "user" || t.role === "assistant") && typeof t.content === "string",
-      )
-    : [];
-  const pending: PendingProposal | null = body.pending?.toolName
-    ? {
-        toolName: body.pending.toolName,
-        input: body.pending.input ?? {},
-        channel,
-        threadTs: "0",
-        userMsgTs: "0",
-        proposalTs: "0",
-        proposalText: "(eval)",
-        requesterUserId: requestedBy,
-      }
-    : null;
-
-  const narration: string[] = [];
-  // The tier the turn routed to and the model + thinking level the last model
-  // call was sent with — what the `request done` log line carries, surfaced
-  // here so an eval case can assert the LEVEL and not just the model (#421,
-  // ADR-028). Null if the loop never reached its finish.
-  let dials = null as TurnDials | null;
-  // Every tool call the model made this turn, with its arguments, in order —
-  // so a case can assert a call happened and what it named (#423: that a
-  // maintain turn read `uno-maintain/method` before proposing), where the
-  // result alone shows only the final proposal or text.
-  //
-  // Each entry also carries what its RESULT said about itself: `note`,
-  // `visibility`, `error` — never rows, never message or blueprint content
-  // (#452). The arguments alone could not explain S3: three samples replied
-  // that workspace search "isn't available on this turn" and the transcript
-  // could not say whether the own-DM gate, the connect URL or the credential
-  // was the leg that failed. `filled` is which entries already have their
-  // result, so a turn that searches twice keeps the two apart.
-  const tools: ToolCall[] = [];
-  const filled = new Set<number>();
-  // Names read_reference SERVED this turn (hits only) — the receipt production
-  // persists on the user HistoryTurn in place of the text (slack/events.ts
-  // turnReferences, #423). Collected the way production collects it, inside
-  // withTurnScope, so the eval runner can thread the same receipt into the
-  // next turn's history and a case can assert the text did not travel with it
-  // (#426). Deriving it from `tools` would count misses too.
-  let references: string[] = [];
-  const startedAt = Date.now();
-  try {
-    const agentRun = await withTurnScope({ correction: false }, () =>
-      runAgent({
-        env,
-        userText: prompt,
-        history,
-        slack: { channel, threadTs: "0", userMsgTs: "0", requestedBy },
-        currentSender: { userId: requestedBy },
-        pending,
-        onInterim: (t) => narration.push(t),
-        onDials: (d) => { dials = d; },
-        onToolCall: (c) => tools.push(c),
-        onToolResult: (r) => { attachToolResult(tools, r, filled); },
-      }),
-    );
-    const result = agentRun.result;
-    references = agentRun.references;
-    // Every call that never reported a result says so, rather than reading like
-    // a tool that answered with nothing (#452 review). An adapter that announces
-    // a call and answers it without reporting leaves a slot the next same-named
-    // call fills by mistake; both adapters report on every path today, so this
-    // should mark nothing — and if it ever marks something, the artifact says
-    // which call rather than quietly filing the wrong outcome against it.
-    markUnanswered(tools, filled, result.kind);
-    // Mirror production's clarify gate: when a proposal comes back, report what
-    // preflight would have asked (events.ts applies this before staging).
-    let gateAsk: string | null = null;
-    if (result.kind === "proposal") {
-      const gate = await preflight(result.toolName, result.input, {
-        env,
-        prd: null,
-        implementPrdUrl: undefined,
-      }).catch(() => null);
-      gateAsk = gate?.ask ?? null;
-    }
-    // subrequests: the measured spend for this invocation. Surfaced so an eval
-    // run can see how close a turn came to the 50-call cap instead of finding
-    // out by way of a silent death in production.
-    return Response.json({
-      ok: true, build: BUILD, ms: Date.now() - startedAt,
-      subrequests: subrequestsUsed(), subrequest_hosts: meterBreakdown(),
-      internal_subrequests: internalSubrequestsUsed(),
-      budget_trips: subrequestBudgetTrips(),
-      narration, dials: reportDials(dials), tools, references, gateAsk, result,
-    });
-  } catch (err) {
-    return Response.json({
-      ok: false,
-      build: BUILD,
-      ms: Date.now() - startedAt,
-      narration,
-      tools,
-      subrequests: subrequestsUsed(), subrequest_hosts: meterBreakdown(),
-      internal_subrequests: internalSubrequestsUsed(),
-      budget_trips: subrequestBudgetTrips(),
-      error: err instanceof Error ? err.message : String(err),
-    });
-  }
-}
-
-/**
- * Flatten the turn's dials for the eval artifact.
- *
- * The shared shape names only `tier`, `route` and `model`; a provider's own
- * dials ride in `detail`, so no provider has to report null into a field named
- * for another provider's dial. On the wire they flatten back out, which is what
- * keeps `dials.level` meaning "the level this turn was sent with" for a Gemini
- * run and simply ABSENT — rather than null — for a provider that has no level.
- */
-function reportDials(dials: TurnDials | null): Record<string, string> | null {
-  if (!dials) return null;
-  const { detail, ...named } = dials;
-  return { ...named, ...detail };
 }
 
 // Gate for /debug/* routes. Requires DEBUG_TOKEN to be configured AND matched
