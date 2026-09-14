@@ -2,6 +2,7 @@
   "name": "plus-ds",
   "private": true,
   "description": "PLUS Design System — internal component library",
+  "type": "module",
   "sideEffects": [
     "*.css",
     "*.scss"

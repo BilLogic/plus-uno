@@ -1,79 +1,36 @@
+/**
+ * Tests for the BUTTON half of `check:button-contrast`.
+ *
+ * The maths — `parseColour`, `composite`, `luminance`, `contrast`,
+ * `resolveToken`, `toHex` and the ratchet — moved to
+ * `design-system/src/lib/tokens.js` in #506, and its tests moved with it to
+ * `design-system/tests/tokens.test.js` (run by `npm test`). What is tested here
+ * is what stayed: reading the `$btn-themes` map, building a ground per style ×
+ * fill, the duplicate-ground assertion, and the findings this check words.
+ *
+ * The point of this file is that the check can FAIL. A guard exercised only
+ * against the repo, which is green by construction once the baseline is
+ * written, is a guard nobody has watched work.
+ *
+ * Run: npm run test:scripts
+ */
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
   combination,
-  composite,
-  contrast,
   duplicateGrounds,
   findings,
-  parseColour,
   readRepo,
-  resolveToken,
   sweep,
   themeMap,
   tokenValues,
-  toHex,
 } from './button-contrast.mjs';
 
-/*
- * The point of this file is that the check can FAIL. A guard exercised only
- * against the repo, which is green by construction once the baseline is
- * written, is a guard nobody has watched work.
- */
-
-test('parseColour reads the three shapes the token file uses', () => {
-  assert.deepEqual(parseColour('#fff'), { r: 255, g: 255, b: 255, a: 1 });
-  assert.deepEqual(parseColour('#9f8205'), { r: 159, g: 130, b: 5, a: 1 });
-  assert.deepEqual(parseColour('rgba(113, 92, 0, 0.08)'), { r: 113, g: 92, b: 0, a: 0.08 });
-});
-
-test('parseColour returns null rather than a guess', () => {
-  assert.equal(parseColour('currentColor'), null);
-  assert.equal(parseColour('var(--color-primary)'), null);
-  assert.equal(parseColour('rgb(300, 0, 0)'), null, 'an out-of-range channel is not a colour');
-  assert.equal(parseColour('rgba(0, 0, 0, 4)'), null, 'nor is an out-of-range alpha');
-  assert.equal(parseColour(undefined), null);
-});
-
-test('composite lays an alpha colour over an opaque one', () => {
-  const over = composite({ r: 0, g: 0, b: 0, a: 0.5 }, { r: 255, g: 255, b: 255, a: 1 });
-  assert.deepEqual(over, { r: 128, g: 128, b: 128, a: 1 });
-});
-
-test('an 8% state layer read as solid is the arithmetic this exists to avoid', () => {
-  const page = { r: 249, g: 249, b: 252, a: 1 };
-  const layer = parseColour('rgba(113, 92, 0, 0.08)');
-  const label = parseColour('#5b4a00');
-
-  const composited = contrast(label, composite(layer, page));
-  const asSolid = contrast(label, { ...layer, a: 1 });
-
-  assert.ok(composited > 4.5, `composited should pass, got ${composited}`);
-  assert.ok(asSolid < 2, `read as solid it looks like a failure, got ${asSolid}`);
-});
-
-test('contrast matches the values WCAG gives for the extremes', () => {
-  assert.equal(contrast({ r: 0, g: 0, b: 0 }, { r: 255, g: 255, b: 255 }), 21);
-  assert.equal(contrast({ r: 255, g: 255, b: 255 }, { r: 255, g: 255, b: 255 }), 1);
-});
-
-test('resolveToken follows an alias to the literal behind it', () => {
-  const values = new Map([
-    ['--color-tertiary', '#0e8175'],
-    ['--color-info', 'var(--color-tertiary)'],
-  ]);
-  assert.equal(resolveToken('--color-info', values), '#0e8175');
-});
-
-test('resolveToken terminates on a cycle rather than hanging', () => {
-  const values = new Map([['--a', 'var(--b)'], ['--b', 'var(--a)']]);
-  assert.equal(resolveToken('--a', values), undefined);
-});
-
-test('tokenValues takes the first definition and ignores the rest', () => {
-  const values = tokenValues(':root { --color-primary: #123456; }\n.dark { --color-primary: #abcdef; }');
+test('tokenValues reads the colour tokens and only those', () => {
+  const values = tokenValues(':root { --color-primary: #123456; --space-2: 8px; }');
   assert.equal(values.get('--color-primary'), '#123456');
+  assert.equal(values.has('--space-2'), false, 'a spacing token is not a colour this check can resolve');
 });
 
 test('themeMap reads the map rather than a copy of it', () => {
@@ -115,6 +72,13 @@ test('the sweep reports a filled label under AA', () => {
   assert.ok(ok.ratio >= 4.5);
 });
 
+test('a tonal ground is composited, so an 8% state layer is not read as paint', () => {
+  const rows = sweep(FAILING.themes, FAILING.values);
+  const tonal = rows.find((row) => row.style === 'bad' && row.fill === 'tonal');
+  // Read as solid this is ~1.3:1; composited over white it clears AA easily.
+  assert.ok(tonal.ratio > 4.5, `expected the composited ratio, got ${tonal.ratio}`);
+});
+
 test('findings reports that failure, and the baseline silences it', () => {
   const loud = findings(FAILING.themes, FAILING.values);
   assert.equal(loud.length, 1);
@@ -145,6 +109,20 @@ test('duplicateGrounds finds two styles pointing at one colour', () => {
     ['--on', '#ffffff'], ['--s', 'rgba(0,0,0,0.08)'], ['--x', '#000000'],
   ]);
   assert.deepEqual(duplicateGrounds(themes, values), [['info', 'tertiary']]);
+
+  const found = findings(themes, values, { contrast: [], duplicates: [] });
+  assert.match(found.at(-1), /^info\+tertiary: these styles render the same filled ground/);
+  assert.deepEqual(findings(themes, values, { contrast: [], duplicates: ['info+tertiary'] }), []);
+});
+
+test('a duplicate baseline entry that no longer duplicates is a finding', () => {
+  const themes = [{ style: 'solo', main: '--t', onMain: '--on', state: '--s', text: '--x' }];
+  const values = new Map([
+    ['--color-surface', '#ffffff'], ['--t', '#00404a'],
+    ['--on', '#ffffff'], ['--s', 'rgba(0,0,0,0.08)'], ['--x', '#000000'],
+  ]);
+  const found = findings(themes, values, { contrast: [], duplicates: ['a+b'] });
+  assert.deepEqual(found, ['baseline entry "a+b" no longer duplicates — remove it']);
 });
 
 test('an unresolvable token is reported, not scored', () => {
@@ -156,10 +134,6 @@ test('an unresolvable token is reported, not scored', () => {
   const built = combination(themes[0], 'filled', values);
   assert.deepEqual(built.unresolved, ['--missing']);
   assert.match(findings(themes, values)[0], /cannot resolve --missing/);
-});
-
-test('toHex round-trips a parsed colour', () => {
-  assert.equal(toHex(parseColour('#9f8205')), '#9f8205');
 });
 
 test('against the real repo, it finds exactly what #312 measured in a browser', () => {
