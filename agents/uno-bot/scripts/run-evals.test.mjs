@@ -17,6 +17,8 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runEvals, parseArgs } from "./run-evals.mjs";
+import { workerTransport } from "./eval-transport.mjs";
+import { localTransport } from "./eval-transport-local.mjs";
 
 const FIXTURE = new URL("../../../docs/evals/fixtures/uno-bot-cases.json", import.meta.url);
 const ALL = JSON.parse(readFileSync(FIXTURE, "utf8"));
@@ -253,12 +255,84 @@ test("a transport that resolves no subjects fails the case by name", async () =>
   assert.match(summary.results[0].failures[0], /transport 'fake' resolves no run-time subjects/);
 });
 
+// ── The local transport scores the same as the Worker would (#512) ──────────
+
+test("a fixture case scores identically through the local transport and a Worker replaying the same replies", async () => {
+  const c = caseById("R3");
+  const path = fixtureOf([c]);
+
+  // (a) LOCAL: the Turn module in-process, on R3's recorded replies. Each
+  // response is kept as it comes back.
+  const local = localTransport({ log: () => {} });
+  const responses = [];
+  const recording = {
+    ...local,
+    async runTurn(req) {
+      const resp = await local.runTurn(req);
+      responses.push(resp);
+      return resp;
+    },
+  };
+  const fromLocal = await run(path, recording);
+
+  // (b) WORKER: the real `workerTransport`, POSTing to a `fetch` that hands back
+  // those same responses. The deployed route IS this same adapter over the same
+  // Turn module (`src/eval/turn-adapter.ts`), so replaying its response body is
+  // what "the same replies through the Worker" means — and it exercises the
+  // worker transport's own request-building and JSON handling on the way.
+  let served = 0;
+  const worker = workerTransport("https://uno-bot.example.workers.dev", "t", {
+    fetchImpl: async (url, init) => {
+      assert.match(String(url), /\/debug\/eval$/);
+      assert.equal(JSON.parse(init.body).prompt, c.turns[0].prompt);
+      return { json: async () => responses[served++] };
+    },
+  });
+  const fromWorker = await run(path, worker);
+
+  assert.equal(responses.length, c.samples, "the local transport answered every sample");
+  assert.equal(served, c.samples, "the worker transport was asked the same number of times");
+
+  // THE PROPERTY: the same case, the same replies, the same score — and the
+  // same reasons, so a divergence cannot hide behind an equal pass count.
+  for (const key of ["passed", "failed", "skipped", "blockerFailures"]) {
+    assert.equal(fromLocal.summary[key], fromWorker.summary[key], `summary.${key} differs`);
+  }
+  assert.equal(fromLocal.summary.passed, 1, JSON.stringify(fromLocal.summary.results[0].failures));
+  assert.deepEqual(fromLocal.summary.results[0].failures, fromWorker.summary.results[0].failures);
+  assert.equal(fromLocal.summary.results[0].passedRuns, fromWorker.summary.results[0].passedRuns);
+  assert.deepEqual(
+    fromLocal.summary.results[0].transcript.turns.map((t) => t.response.result),
+    fromWorker.summary.results[0].transcript.turns.map((t) => t.response.result),
+  );
+
+  // What the two runs must NOT agree on is which instrument answered — that is
+  // the one field that tells an in-process score from a deployed one.
+  assert.equal(fromLocal.summary.transport, "local");
+  assert.match(fromWorker.summary.transport, /^worker /);
+});
+
+test("an unrecorded case skips, counted apart, and never fails a blocker", async () => {
+  // R1 has no recording. A red blocker for "no recording" would be a gate that
+  // is red by construction; a green one would be a lie.
+  const local = localTransport({ log: () => {} });
+  const { summary, lines } = await run(fixtureOf([caseById("R1")]), local);
+  assert.equal(summary.skipped, 1);
+  assert.equal(summary.passed, 0);
+  assert.equal(summary.failed, 0);
+  assert.equal(summary.blockerFailures, 0);
+  assert.match(summary.results[0].reason, /no recording for R1/);
+  assert.ok(lines.some((l) => l.startsWith("[SKIP] R1")));
+});
+
 // ── The CLI's default is the Worker, so the cron is unchanged ────────────────
 
 test("the transport defaults to the worker and an unknown one is refused", () => {
   assert.deepEqual(parseArgs([]), { transport: "worker" });
   assert.deepEqual(parseArgs(["--transport=worker"]), { transport: "worker" });
   assert.deepEqual(parseArgs(["--transport", "worker"]), { transport: "worker" });
-  assert.throws(() => parseArgs(["--transport=local"]), /unknown transport 'local'/);
+  // `local` is a transport now (#512); an invented name still is not.
+  assert.deepEqual(parseArgs(["--transport=local"]), { transport: "local" });
+  assert.throws(() => parseArgs(["--transport=staging"]), /unknown transport 'staging' \(have: worker\|local\)/);
   assert.throws(() => parseArgs(["--worker-url=x"]), /unknown argument/);
 });

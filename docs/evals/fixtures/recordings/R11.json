@@ -1,0 +1,26 @@
+{
+  "case": "R11",
+  "source": "authored",
+  "recordedAt": "2026-09-14",
+  "note": "AUTHORED, NOT CAPTURED. The plain-answer path: a search that comes back empty, and a reply that says the blueprint has nothing on payroll disputes rather than inventing a flow. The recorded lookup result is an EMPTY one on purpose — that is the input the absence check is about, and the turn's handling of it is what a local run measures. The wording of the reply is authored to R11's expectation; whether the model would admit the gap today is the worker transport's measurement.",
+  "turns": [
+    {
+      "prompt": "What does the blueprint say about the tutor payroll dispute escalation flow?",
+      "replies": [
+        {
+          "text": "Checking the blueprint for anything on payroll disputes.",
+          "toolCalls": [{ "name": "search_blueprint", "args": { "query": "payroll dispute escalation" } }]
+        },
+        {
+          "text": "I searched the blueprint for payroll disputes and escalation and it has nothing on them — no phase, scenario or touchpoint covers payroll at all, so I can't tell you how one escalates today. What the blueprint does cover on the tutor side is session scheduling, call-offs and reconfirmation, and the CPO clearance flow. If payroll disputes are handled somewhere, it is outside what the blueprint models; I would not want to guess at a flow that isn't there."
+        }
+      ],
+      "toolResults": [
+        {
+          "tool": "search_blueprint",
+          "text": "{\"ok\":true,\"rows\":[],\"matched_total\":0,\"searched\":\"cells, touchpoints, scenarios\",\"note\":\"no rows matched\"}"
+        }
+      ]
+    }
+  ]
+}

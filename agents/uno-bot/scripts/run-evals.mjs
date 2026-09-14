@@ -35,6 +35,13 @@
 // (and its judge, log, clock and writer) as arguments, so the composition is
 // itself testable: scripts/run-evals.test.mjs drives it with a fake transport.
 //
+// `--transport=local` (#512) is the second one: the Worker's Turn module called
+// IN-PROCESS from recorded model replies (scripts/eval-transport-local.mjs), so
+// a pull request can run the suite with no deployment, no debug token and no
+// model spend. It measures the turn against a fixed draw, not the model — and
+// only the cases that have a recording in docs/evals/fixtures/recordings/; the
+// rest SKIP by name, counted apart, never failed.
+//
 // Env required (by the WORKER transport — another transport needs neither):
 //   WORKER_URL      e.g. the Worker origin (scripts/worker-url.mjs, or UNO_BOT_WORKER_URL)
 //   DEBUG_TOKEN     the Worker's /debug/* gate token
@@ -42,7 +49,7 @@
 //   GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY, GEMINI_PROJECT_ID (default hcii-plus)
 // Optional: JUDGE_MODEL (default gemini-3.1-pro-preview — the grind model; a judge should be at least as strong as what it grades, and the bot's own model shares its blind spots), CASES_PATH
 //
-// Run:  node agents/uno-bot/scripts/run-evals.mjs [--transport=worker]
+// Run:  node agents/uno-bot/scripts/run-evals.mjs [--transport=worker|local]
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -54,6 +61,7 @@ import { passesCase, toolCallMatches, describeCalls } from "./eval-scoring.mjs";
 import { threadTurn, checkHistory, sentSummary } from "./eval-history.mjs";
 import { applySubject, skipReason } from "./eval-subjects.mjs";
 import { workerTransport } from "./eval-transport.mjs";
+import { localTransport } from "./eval-transport-local.mjs";
 import { describeRubric, judgeSystem, loadRubric } from "./eval-rubric.mjs";
 
 const {
@@ -307,8 +315,15 @@ function fixtureStamp(path) {
 // every invocation docs/evals/README.md describes, mean exactly what they meant
 // before. `WORKER_URL` and `DEBUG_TOKEN` are required HERE — by the transport
 // that needs them — and not by the runner, which no longer knows what a URL is.
+//
+// `local` (#512) runs the same Turn module in-process from recorded model
+// replies — no deployment, no token, no model call — which is what lets a pull
+// request run the suite at all. It measures the TURN against a fixed draw, not
+// the model; the summary's `transport` field is what keeps the two apart, and
+// a case with no recording SKIPS (see `transport.unsupported` below).
 const TRANSPORTS = {
   worker: () => workerTransport(required("WORKER_URL", WORKER_URL), required("DEBUG_TOKEN", DEBUG_TOKEN)),
+  local: () => localTransport(),
 };
 
 /** @returns {{transport: string}} */
@@ -345,7 +360,7 @@ export function parseArgs(args) {
  * milliseconds and read the summary it produced (#511).
  *
  * @param {object} deps
- * @param {{name: string, runTurn: Function, fetchSubject?: Function}} deps.transport
+ * @param {{name: string, runTurn: Function, fetchSubject?: Function, unsupported?: Function}} deps.transport
  * @param {string} [deps.casesPath]
  * @param {(c: object, transcript: object) => Promise<{verdict: string, reason?: string}>} [deps.judge]
  * @param {(line: string) => void} [deps.log]
@@ -427,6 +442,21 @@ export async function runEvals({
 
   for (const rawCase of fixture.cases) {
     let c = rawCase;
+    // ── A case this transport cannot measure (#512) ───────────────────────────
+    // Asked BEFORE the subject read, because "there is no recording for this
+    // case" is a fact about the instrument and costs nothing to answer, while
+    // the subject read is a live one.
+    //
+    // SKIPPED, like a condition nothing satisfies: neither a pass nor a
+    // failure, out of the denominator, reason recorded. The local transport
+    // covers the recorded cases only, and failing the other 31 would mean a PR
+    // gate that is red by construction — switched off within a week.
+    const unsupported = transport.unsupported?.(rawCase) ?? null;
+    if (unsupported) {
+      results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, skipped: true, reason: unsupported, samples: 0 });
+      log(`[SKIP] ${rawCase.id} — ${rawCase.name} (${unsupported})`);
+      continue;
+    }
     // ── Run-time subject (#415) ───────────────────────────────────────────────
     // A case declaring `subject: { need }` names a CONDITION; the transport asks
     // for a row from the live board that satisfies it and the placeholders are
@@ -532,6 +562,11 @@ async function main() {
   const summary = await runEvals({
     transport,
     judge: (c, transcript) => judgeCase(judgeToken, system, c, transcript),
+    // The 10s pause between cases and samples sits out a per-minute MODEL
+    // quota. A transport that reaches no model says so by declaring its own
+    // pause (the local one declares 0), which is the difference between a CI
+    // job of seconds and one of minutes spent asleep.
+    ...(Number.isFinite(transport.pauseMs) ? { pauseMs: transport.pauseMs } : {}),
   });
 
   const scored = summary.results.filter((r) => !r.skipped);
