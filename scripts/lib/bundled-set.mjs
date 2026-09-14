@@ -34,11 +34,20 @@
  * the artifact, and a marker format that shifts breaks the match without
  * breaking the bundle. Both narrowings that follow from that are now loud
  * rather than silent — the parse is checked against the count the bundler
- * states about itself (`declaredMemberCount`), and paths that do not resolve on
- * disk are RETURNED rather than filtered away (`resolveBundled`). A guard that
- * quietly measures one doc out of twenty-one and exits 0 is the shape #215 and
- * #232 put corpus floors under; this is that floor for the bundled set, exact
- * rather than approximate, because here the true size is knowable.
+ * states about itself, and paths that do not resolve on disk are RETURNED
+ * rather than filtered away (`resolveBundled`). A guard that quietly measures
+ * one doc out of twenty-one and exits 0 is the shape #215 and #232 put corpus
+ * floors under; this is that floor for the bundled set, exact rather than
+ * approximate, because here the true size is knowable.
+ *
+ * THE SECOND OPINION IS NOW A DATUM, NOT A SENTENCE (#510). Those witnesses —
+ * the member count, the census, the disclosed set — used to be regexes over the
+ * bundler's log lines and its companion's markdown table, which made the
+ * WORDING of a build log load-bearing: reword the census and the parse returns
+ * null, which the code then had to distinguish from a real zero (`|| !census`,
+ * "absent or has changed shape"). The bundler now writes a JSON manifest to a
+ * gitignored build path on `--check --manifest`, and this module reads that. The
+ * stdout sentences are unchanged and are for humans; nothing here parses them.
  */
 
 import fs from 'node:fs';
@@ -54,11 +63,10 @@ export const REPO_ROOT = path.resolve(__dirname, '..', '..');
 const BUNDLER = path.join(REPO_ROOT, 'agents/uno-bot/scripts/bundle-harness.mjs');
 const REBUNDLE = 'npm --prefix agents/uno-bot run bundle:harness';
 const HARNESS_TS = path.join(REPO_ROOT, 'agents/uno-bot/src/generated/harness.ts');
-// The readable companion carries the disclosed-references table — name, path,
-// chars — which is where a disclosed doc's PATH is stated (references.ts keys
-// by name). Read here for the same reason harness.ts is: it is the bundler's
-// own statement, held current by the same --check.
-const COMPANION_MD = path.join(REPO_ROOT, 'agents/uno-bot/harness-bundle.md');
+// Where the bundler is asked to write its manifest (#510). A BUILD path, ignored
+// by git: this module owns the request, so it names the file rather than
+// depending on whatever a previous run happened to leave behind.
+export const MANIFEST_PATH = path.join(REPO_ROOT, 'agents/uno-bot/.bundle/harness-manifest.json');
 
 /**
  * What the reader is owed when the bundler exits non-zero.
@@ -110,9 +118,10 @@ export function bundlerFailureReport({ status, signal, stderr }, caller = {}) {
  *
  * The obvious objection is #159's: a second glob is a glob that can disagree.
  * It is answered the way #234 answered it for the marker parse rather than by
- * pretending the copy is safe — the bundler states its own census on stdout,
- * and `harnessSets` fails when this walk and that census differ. Drop a root
- * here and the count falls short of the bundler's; add one and it overshoots.
+ * pretending the copy is safe — the bundler states its own census in the
+ * manifest, and `harnessSets` fails when this walk and that census differ. Drop
+ * a root here and the count falls short of the bundler's; add one and it
+ * overshoots.
  * Either way it stops, instead of ratcheting a corpus that quietly lost a
  * directory.
  */
@@ -183,43 +192,7 @@ export function ideAuthoredFiles() {
  */
 export function harnessSets(caller = {}) {
   const { tag = 'negation' } = caller;
-  const child = spawnSync('node', [BUNDLER, '--check'], {
-    cwd: path.join(REPO_ROOT, 'agents/uno-bot'),
-    encoding: 'utf8',
-    // the bundler's own warnings are its business on the happy path — but its
-    // stderr is captured rather than discarded, because on failure it is the
-    // only thing worth printing.
-    stdio: ['ignore', 'pipe', 'pipe'],
-  });
-
-  if (child.error) {
-    // Its own branch, because a bundler that could not START says nothing about
-    // whether the bundle is stale, and borrowing the staleness wording here
-    // would trade one misleading diagnostic for another.
-    console.error(
-      `[${tag}] could not run the harness bundler, so this check could not read the\n` +
-        `  bundled set: ${child.error.message}\n` +
-        `  -> ${BUNDLER}`,
-    );
-    process.exit(1);
-  }
-  if (child.status !== 0) {
-    console.error(bundlerFailureReport(child, caller));
-    // The child's own code, as in #191 — this layer adds a diagnosis, not a
-    // verdict of its own.
-    process.exit(typeof child.status === 'number' ? child.status : 1);
-  }
-  if (!/--check OK/.test(child.stdout ?? '')) {
-    // Belt and braces, kept from the throw this replaced: a zero exit with no OK
-    // line means the bundler changed under us, and measuring against a set it
-    // did not confirm is worse than stopping.
-    console.error(
-      `[${tag}] the harness bundler exited 0 without confirming the bundle, so this check\n` +
-        `  is measuring against a set it cannot vouch for. Run it directly to see why:\n` +
-        `    ${REBUNDLE} -- --check`,
-    );
-    process.exit(1);
-  }
+  const manifest = harnessManifest(caller);
 
   const ts = fs.readFileSync(HARNESS_TS, 'utf8');
   const assembled = JSON.parse(ts.slice(ts.indexOf('= ') + 2, ts.lastIndexOf(';')));
@@ -227,34 +200,34 @@ export function harnessSets(caller = {}) {
   const parsed = ['AGENTS.md', ...[...assembled.matchAll(/<!-- ([\w/.-]+\.md) -->/g)].map((m) => m[1])];
 
   // THE PARSE IS CHECKED AGAINST THE BUNDLER'S OWN COUNT (#234). Everything
-  // above establishes that the bundle is current; none of it establishes that
-  // the list just read back OUT of it is complete. Break the marker format and
-  // this returns `['AGENTS.md']` — one doc, zero pairs — and every caller then
-  // measures one twenty-first of the corpus and reports a pass. The bundler
-  // states its member count on the line already being matched for `--check OK`,
-  // so the second opinion costs one regex.
-  const declared = declaredMemberCount(child.stdout ?? '');
+  // `harnessManifest` establishes is that the bundle is current; none of it
+  // establishes that the list just read back OUT of it is complete. Break the
+  // marker format and this returns `['AGENTS.md']` — one doc, zero pairs — and
+  // every caller then measures one sixteenth of the corpus and reports a pass.
+  // The bundler counts its own members in the manifest, so the second opinion
+  // costs a property read (#510 — it used to cost a regex over a log line).
+  const declared = manifest.census.bundled;
   if (declared !== parsed.length) {
     console.error(membershipMismatchReport({ parsed: parsed.length, declared, tag }));
     process.exit(1);
   }
 
   // THE IDE WALK IS CHECKED THE SAME WAY (#174). `SECTION_ROOTS` above is a
-  // copy of the bundler's roots, so it can fall behind them; the census line is
-  // the bundler's own statement of what the same walk found, and comparing the
-  // two is what makes the copy falsifiable. Both numbers are compared, not just
-  // the IDE one — a root that vanished from this list shows up first in the
-  // total, before it has narrowed either half enough to notice.
+  // copy of the bundler's roots, so it can fall behind them; the manifest's
+  // census is the bundler's own statement of what the same walk found, and
+  // comparing the two is what makes the copy falsifiable. Both numbers are
+  // compared, not just the IDE one — a root that vanished from this list shows
+  // up first in the total, before it has narrowed either half enough to notice.
   const ide = ideAuthoredFiles();
-  const census = declaredCensus(child.stdout ?? '');
-  // THE DISCLOSED SET IS CHECKED THE SAME WAY (#423): read off the companion's
-  // table, counted against the census. A table the parse cannot read would
-  // otherwise narrow the Worker corpus by exactly the docs that just left the
-  // prompt — the quiet shrink #234 exists to refuse.
-  const disclosed = disclosedFiles();
+  const census = manifest.census;
+  // THE DISCLOSED SET COMES FROM THE MANIFEST TOO (#423, #510): the rows whose
+  // delivery is `disclosed`, counted against the same census. It used to be
+  // parsed back out of the companion's markdown table, where a reformatted
+  // table would have narrowed the Worker corpus by exactly the docs that had
+  // just left the prompt — the quiet shrink #234 exists to refuse.
+  const disclosed = disclosedFiles(manifest);
   if (
-    !census ||
-    census.ide !== ide.length ||
+    census.ideOnly !== ide.length ||
     census.disclosed !== disclosed.length ||
     census.underRoots !== ide.length + disclosed.length + parsed.length
   ) {
@@ -268,29 +241,127 @@ export function harnessSets(caller = {}) {
 }
 
 /**
- * The disclosed docs' paths, from the companion's `## Disclosed references`
- * table. Empty when the section says "None." or the companion is absent — the
- * census comparison above is what turns an unreadable table into a failure.
+ * The bundler's MANIFEST, from one `--check` run: what it bundled, disclosed and
+ * saw under the section roots, the char budgets it asserts, the floor in force,
+ * and a row per declared doc. See `agents/uno-bot/scripts/bundle-harness.mjs`
+ * § The manifest for its shape and why it is a build artifact.
  *
- * @returns {string[]}
+ * `spawnSync` rather than `execFileSync`: the failure path is a report, not an
+ * exception, and the child's stderr is the substance of it.
+ *
+ * @param {{tag?: string, notThis?: string}} [caller] see `bundlerFailureReport`.
+ * @returns {{census: {underRoots: number, bundled: number, disclosed: number, ideOnly: number},
+ *            budgets: Record<string, number>, floor: object, assembled: object,
+ *            sections: object[], members: object[]}}
  */
-export function disclosedFiles() {
-  if (!fs.existsSync(COMPANION_MD)) return [];
-  return disclosedRows(fs.readFileSync(COMPANION_MD, 'utf8'));
+export function harnessManifest(caller = {}) {
+  const { manifest, error, status } = tryHarnessManifest(caller);
+  if (error) {
+    console.error(error);
+    // The bundler's own code where it gave one, as in #191 — this layer adds a
+    // diagnosis, not a verdict of its own.
+    process.exit(typeof status === 'number' ? status : 1);
+  }
+  return manifest;
 }
 
 /**
- * Pure parse of the companion's disclosed table: `| \`name\` | [\`path\`](…) | chars |`.
+ * The same run, REPORTING its failure instead of exiting on it.
  *
- * @param {string} companion the companion markdown.
- * @returns {string[]} the paths, in table order.
+ * Two callers want the same manifest under two failure policies. A guard
+ * reached from a shell should stop — a bundler that could not confirm the
+ * bundle is not that guard's finding, and #204 is about saying so and exiting.
+ * A check on the findings interface (`scripts/lib/findings.mjs`) must not: the
+ * harness runner calls such a check IN-PROCESS, so a `process.exit` in there
+ * takes the whole composite down and every other check's result with it. So the
+ * spawn lives once, here, and the policy belongs to the caller.
+ *
+ * @param {{tag?: string, notThis?: string}} [caller] see `bundlerFailureReport`.
+ * @returns {{manifest: object|null, error: string|null, status: number|null}}
  */
-export function disclosedRows(companion) {
-  const start = companion.indexOf('## Disclosed references');
-  if (start === -1) return [];
-  const end = companion.indexOf('## The assembled prompt', start);
-  const section = companion.slice(start, end === -1 ? undefined : end);
-  return [...section.matchAll(/^\| `[^`]+` \| \[`([\w/.-]+\.md)`\]\([^)]+\) \| [\d,]+ \|$/gm)].map((m) => m[1]);
+export function tryHarnessManifest(caller = {}) {
+  const { tag = 'negation' } = caller;
+  const child = spawnSync('node', [BUNDLER, '--check', '--manifest', MANIFEST_PATH], {
+    cwd: path.join(REPO_ROOT, 'agents/uno-bot'),
+    encoding: 'utf8',
+    // the bundler's own warnings are its business on the happy path — but its
+    // stderr is captured rather than discarded, because on failure it is the
+    // only thing worth printing.
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+
+  if (child.error) {
+    // Its own branch, because a bundler that could not START says nothing about
+    // whether the bundle is stale, and borrowing the staleness wording here
+    // would trade one misleading diagnostic for another.
+    return {
+      manifest: null,
+      status: 1,
+      error:
+        `[${tag}] could not run the harness bundler, so this check could not read the\n` +
+        `  bundled set: ${child.error.message}\n` +
+        `  -> ${BUNDLER}`,
+    };
+  }
+  if (child.status !== 0) {
+    return { manifest: null, status: child.status, error: bundlerFailureReport(child, caller) };
+  }
+
+  // Belt and braces, in the place the `--check OK` regex used to sit: a zero
+  // exit with no readable manifest means the bundler changed under us, and
+  // measuring against a set it never stated is worse than stopping. Unlike the
+  // regex, this cannot be mistaken for an answer — there is no reworded JSON
+  // that parses into a plausible-but-empty census.
+  let manifest;
+  try {
+    manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+  } catch (err) {
+    return { manifest: null, status: 1, error: manifestUnreadableReport({ why: err.message, tag }) };
+  }
+  if (!manifest?.census || !manifest?.budgets || !Array.isArray(manifest?.members)) {
+    return {
+      manifest: null,
+      status: 1,
+      error: manifestUnreadableReport({ why: 'it states no `census`, `budgets` and `members`', tag }),
+    };
+  }
+  return { manifest, error: null, status: 0 };
+}
+
+/**
+ * What the reader is owed when the bundler exits 0 and leaves no manifest this
+ * module can read.
+ *
+ * Pure, so the message can be asserted without breaking the bundler — same
+ * reason as `bundlerFailureReport`.
+ *
+ * @param {{why: string, tag?: string}} problem
+ * @returns {string}
+ */
+export function manifestUnreadableReport({ why, tag = 'negation' }) {
+  return (
+    `[${tag}] the harness bundler exited 0 but its manifest could not be read, so this\n` +
+    `  check is measuring against a set it cannot vouch for: ${why}\n` +
+    `  -> ${path.relative(REPO_ROOT, MANIFEST_PATH)} is written by\n` +
+    '     agents/uno-bot/scripts/bundle-harness.mjs when it is passed `--manifest`. Run it\n' +
+    '     directly to see what it writes:\n' +
+    `       ${REBUNDLE} -- --check --manifest`
+  );
+}
+
+/**
+ * The disclosed docs' paths, off the manifest's member rows.
+ *
+ * The bundler states delivery per doc — `bundled`, `disclosed`, `ide-only` — so
+ * this is a filter over a datum rather than a parse of the companion's markdown
+ * table, which is what it was until #510. The census comparison in
+ * `harnessSets` is still what turns a set that came back short into a failure.
+ *
+ * @param {{members: {path: string, delivery: string}[]}} manifest
+ * @returns {string[]} the paths, in manifest order.
+ */
+export function disclosedFiles(manifest) {
+  return manifest.members.filter((m) => m.delivery === 'disclosed').map((m) => m.path);
 }
 
 /**
@@ -320,39 +391,23 @@ export function bundledFiles(caller = {}) {
 }
 
 /**
- * What the BUNDLER says its walk found, read off the census line it prints.
- *
- * `[bundle-harness] embodiment census: 67 declared doc(s) under the section roots — 21 bundled, 46 ide-only`
- *
- * @param {string} stdout the bundler's output.
- * @returns {{underRoots: number, bundled: number, ide: number}|null} null when
- *   the line is absent or has changed shape.
- */
-export function declaredCensus(stdout) {
-  // `, N disclosed` is optional in the parse so a census printed before #423
-  // still reads; it is not optional in the bundler, which always prints it.
-  const m =
-    /embodiment census: ([\d,]+) declared doc\(s\) under the section roots [—-] ([\d,]+) bundled, (?:([\d,]+) disclosed, )?([\d,]+) ide-only/.exec(
-      stdout ?? '',
-    );
-  if (!m) return null;
-  const num = (s) => Number(s.replace(/,/g, ''));
-  return { underRoots: num(m[1]), bundled: num(m[2]), disclosed: m[3] === undefined ? 0 : num(m[3]), ide: num(m[4]) };
-}
-
-/**
  * What the reader is owed when this module's walk and the bundler's disagree.
  *
  * Pure, so the message can be asserted without editing `SECTION_ROOTS` to break
  * it — same reason as `bundlerFailureReport` and `membershipMismatchReport`.
  *
- * @param {{walkedIde: number, bundled: number, census: {underRoots: number, ide: number}|null, tag?: string}} counts
+ * The `census: null` branch this used to carry is gone with #510: the census is
+ * a manifest field now, and a manifest that does not state one never reaches
+ * here — `harnessManifest` refuses it, and `manifestUnreadableReport` is the
+ * message for that case. A parse that could come back null had to be told apart
+ * from a real zero at every call site; a datum does not.
+ *
+ * @param {{walkedIde: number, bundled: number, disclosed?: number,
+ *          census: {underRoots: number, disclosed: number, ideOnly: number}, tag?: string}} counts
  * @returns {string}
  */
 export function censusMismatchReport({ walkedIde, bundled, disclosed = 0, census, tag = 'negation' }) {
-  const said = census
-    ? `it says ${census.ide} ide-only and ${census.disclosed ?? 0} disclosed out of ${census.underRoots} under those roots`
-    : 'its `embodiment census` line is absent or has changed shape';
+  const said = `it says ${census.ideOnly} ide-only and ${census.disclosed} disclosed out of ${census.underRoots} under those roots`;
   return (
     `[${tag}] this check's walk of the harness section roots disagrees with the bundler's:\n` +
     `  walked ${walkedIde} ide-only doc(s), ${disclosed} disclosed and ${bundled} bundled (${walkedIde + disclosed + bundled} in all), but ${said}.\n` +
@@ -365,47 +420,30 @@ export function censusMismatchReport({ walkedIde, bundled, disclosed = 0, census
 }
 
 /**
- * How many docs the BUNDLER says it bundled, read off its own `--check` line.
- *
- * `[bundle-harness] --check OK (164398 chars from 21 files; …)`
- *
- * This exists because the list above is RE-DERIVED, not received: the bundler
- * writes `<!-- path -->` markers into the artifact and this module parses them
- * back out. That is a second way of knowing the same fact, and a second way of
- * knowing is a way of being wrong — shift the marker format and the parse
- * quietly yields one member instead of twenty-one, with nothing to notice it.
- * The bundler's own count is the independent witness that makes the parse
- * falsifiable.
- *
- * @param {string} stdout the bundler's `--check` output.
- * @returns {number|null} null when the line is absent or has changed shape.
- */
-export function declaredMemberCount(stdout) {
-  const m = /--check OK \([\d,]+ chars from ([\d,]+) files/.exec(stdout ?? '');
-  return m ? Number(m[1].replace(/,/g, '')) : null;
-}
-
-/**
  * What the reader is owed when the two counts disagree.
+ *
+ * The count the bundler declares is `manifest.census.bundled`. It is the
+ * independent witness the marker parse needs, because that list is RE-DERIVED,
+ * not received: the bundler writes `<!-- path -->` markers into the artifact and
+ * this module parses them back out. A second way of knowing is a way of being
+ * wrong — shift the marker format and the parse quietly yields one member
+ * instead of sixteen, with nothing to notice it.
  *
  * Pure, so the message can be asserted without a broken bundler to hand — same
  * reason as `bundlerFailureReport`.
  *
- * @param {{parsed: number, declared: number|null, tag?: string}} counts
+ * @param {{parsed: number, declared: number, tag?: string}} counts
  * @returns {string}
  */
 export function membershipMismatchReport({ parsed, declared, tag = 'negation' }) {
-  const said =
-    declared === null
-      ? 'its `--check OK` line no longer states a file count at all'
-      : `it says it bundled ${declared}`;
   return (
     `[${tag}] the bundled set could not be read back from the artifact: this check parsed\n` +
-    `  ${parsed} doc(s) out of ${path.relative(REPO_ROOT, HARNESS_TS)}, but ${said}.\n` +
+    `  ${parsed} doc(s) out of ${path.relative(REPO_ROOT, HARNESS_TS)}, but its manifest says it\n` +
+    `  bundled ${declared}.\n` +
     '  -> The membership list is DERIVED by matching `<!-- path -->` markers in the assembled\n' +
     '     bundle. A change to how the bundler writes those markers breaks the match without\n' +
-    '     breaking the bundle, and a check that silently narrows to one doc passes over all\n' +
-    '     twenty-one. Fix the marker parse in scripts/lib/bundled-set.mjs to match what\n' +
+    '     breaking the bundle, and a check that silently narrows to one doc passes over the\n' +
+    '     whole corpus. Fix the marker parse in scripts/lib/bundled-set.mjs to match what\n' +
     '     agents/uno-bot/scripts/bundle-harness.mjs now emits — the count is the symptom.'
   );
 }

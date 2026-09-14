@@ -83,3 +83,8 @@ retrieval-eval-results.json
 # Working output of agents/uno-bot/scripts/embed-model-ab.mjs, which writes
 # beside the fixture it reads rather than wherever the shell happens to be.
 embed-model-ab.json
+
+# The harness bundler's manifest (#510) — build output, not a committed artifact.
+# `agents/uno-bot/scripts/bundle-harness.mjs --manifest` writes it, and the root
+# guards that used to parse the bundler's stdout read it instead.
+agents/uno-bot/.bundle/
