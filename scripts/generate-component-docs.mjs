@@ -24,6 +24,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { documents } from './lib/corpus.mjs';
+import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -290,8 +291,9 @@ function subComponents(source, symbol) {
 const storyExports = (src) =>
   src ? [...src.matchAll(/^export const ([A-Za-z0-9_]+)/gm)].map((m) => m[1]) : [];
 
+/** Every token the component's stylesheet uses. Grammar from the module (#507). */
 const scssTokens = (src) =>
-  src ? [...new Set([...src.matchAll(/var\((--[a-z0-9-]+)/g)].map((m) => m[1]))].sort() : [];
+  src ? [...new Set([...src.matchAll(varReferencePattern())].map((m) => m[1]))].sort() : [];
 
 function authoredCoverage(mdxSource) {
   const found = {};

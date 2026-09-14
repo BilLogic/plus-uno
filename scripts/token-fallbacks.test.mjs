@@ -260,11 +260,11 @@ test('the name pattern selects which family is read', () => {
   // --font-size-* and --font-line-height-* with no shared prefix.
   const text = '  --size-element-gap-md: 10px;\n  --color-primary: #0472a8;';
   assert.equal(tokenDefinitions([{ path: 'a.scss', text }]).size, 1);
-  assert.equal(tokenDefinitions([{ path: 'a.scss', text }], { names: /--[a-z0-9-]+/ }).size, 2);
+  assert.equal(tokenDefinitions([{ path: 'a.scss', text }], { prefix: '--' }).size, 2);
 
   const use = 'gap: var(--size-element-gap-md, 16px);';
   assert.deepEqual(fallbackUsages([{ path: 'a.scss', text: use }]), []);
-  assert.equal(fallbackUsages([{ path: 'a.scss', text: use }], { names: /--[a-z0-9-]+/ }).length, 1);
+  assert.equal(fallbackUsages([{ path: 'a.scss', text: use }], { prefix: '--' }).length, 1);
 });
 
 test('a disagreeing length is reported the same way a disagreeing colour is', () => {

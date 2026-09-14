@@ -1,6 +1,8 @@
 import React from 'react';
 import { expect } from 'storybook/test';
 
+import { contrast as contrastOf, parseColour } from '../lib/tokens.mjs';
+
 /**
  * What each intent colour is FOR — the role layer, and the measurement it came
  * from.
@@ -64,18 +66,17 @@ export default {
 
 const channels = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
 
-const luminance = (hex) => {
-    const [r, g, b] = channels(hex).map((c) => {
-        const s = c / 255;
-        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-    });
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-};
-
-const contrast = (a, b) => {
-    const [x, y] = [luminance(a), luminance(b)].sort((p, q) => q - p);
-    return (x + 0.05) / (y + 0.05);
-};
+/**
+ * The SAME contrast the checks fail the build on — `check:text-contrast`,
+ * `check:button-contrast` and `check:focus-ring` all call this function, from
+ * `design-system/src/lib/tokens.mjs` (#507). This story used to carry its own
+ * copy of WCAG luminance, so the number a designer read here was computed by
+ * different code from the number that gated the PR. One import, one answer.
+ *
+ * The adapter is only about SHAPE: everything below speaks in `#rrggbb`, the
+ * module in `{r, g, b, a}`.
+ */
+const contrast = (a, b) => contrastOf(parseColour(a), parseColour(b));
 
 /** Read a token as it renders, following aliases the way the browser does. */
 const readToken = (name) => {

@@ -27,6 +27,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { resolveToken, tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
+
 /** `_Mastering-Content/Mastering-Content (Text)` -> `--color-mastering-content-text` */
 export function cssName(figmaName) {
   const parts = figmaName.split('/');
@@ -60,20 +62,17 @@ export function cssColours(repoRoot) {
   const declared = new Map();
   for (const file of files) {
     const text = fs.readFileSync(file, 'utf8');
-    for (const m of text.matchAll(/(--color-[a-z0-9-]+)\s*:\s*([^;]+);/g)) {
+    for (const m of text.matchAll(tokenDeclarationPattern('--color-'))) {
       declared.set(m[1], m[2].trim());
     }
   }
 
-  const resolve = (value, depth = 0) => {
-    const alias = /^var\(\s*(--[a-z0-9-]+)\s*\)$/.exec(value);
-    if (!alias || depth > 8) return value;
-    const next = declared.get(alias[1]);
-    return next === undefined ? value : resolve(next.trim(), depth + 1);
-  };
-
+  // Grammar and alias-following are the tokens module's (#507). `resolveToken`
+  // is cycle-guarded where the walk here was depth-capped, and answers
+  // `undefined` for a name that leads nowhere — where the cap returned the
+  // value it started from, which is what `??` restores.
   const out = new Map();
-  for (const [name, value] of declared) out.set(name, resolve(value).toLowerCase());
+  for (const [name, value] of declared) out.set(name, (resolveToken(name, declared) ?? value).toLowerCase());
   return out;
 }
 

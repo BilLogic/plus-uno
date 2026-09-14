@@ -54,18 +54,17 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { ratchet } from '../design-system/src/lib/tokens.mjs';
 import { documents } from './lib/corpus.mjs';
 
 import {
-  AA_TEXT,
-  PAGE_TOKEN,
   composite,
   contrast,
   parseColour,
+  ratchet,
   resolveToken,
-  tokenValues,
-} from './button-contrast.mjs';
+  varReferencePattern,
+} from '../design-system/src/lib/tokens.mjs';
+import { AA_TEXT, PAGE_TOKEN, tokenValues } from './button-contrast.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, '..');
@@ -123,6 +122,14 @@ export function enclosingBlock(source, offset) {
 }
 
 /**
+ * `background[-color]: … var(--color-x`, with the token grammar taken from the
+ * module rather than spelled again here (#507). A fresh RegExp per call because
+ * the module's pattern carries `/g`, and a shared one keeps `lastIndex`.
+ */
+const BACKGROUND_TOKEN = () =>
+  new RegExp(`background(?:-color)?\\s*:\\s*[^;]*?${varReferencePattern('--color-').source}`);
+
+/**
  * The ground a declaration is drawn on: the `background-color` of its own rule
  * if that rule sets one, otherwise the page.
  *
@@ -133,7 +140,7 @@ export function enclosingBlock(source, offset) {
 export function groundFor(source, offset, fallback = PAGE_TOKEN) {
   const block = enclosingBlock(source, offset);
   if (!block) return fallback;
-  const match = /background(?:-color)?\s*:\s*[^;]*?var\((--color-[a-z0-9-]+)/.exec(block);
+  const match = BACKGROUND_TOKEN().exec(block);
   return match ? match[1] : fallback;
 }
 
@@ -156,7 +163,7 @@ export function textDeclarations(files, root = REPO_ROOT) {
       const declaration = /(^|[\s;{])color\s*:\s*([^;]+);/.exec(line);
       if (declaration) {
         const ground = groundFor(source, offset);
-        for (const match of declaration[2].matchAll(/var\((--color-[a-z0-9-]+)/g)) {
+        for (const match of declaration[2].matchAll(varReferencePattern('--color-'))) {
           uses.push({ token: match[1], file, line: index + 1, source: line.trim(), ground });
         }
       }

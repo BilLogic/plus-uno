@@ -9,10 +9,10 @@
  * what is genuinely about BUTTONS: reading the `$btn-themes` map, building a
  * ground per style × fill, and reporting.
  *
- * The maths is re-exported below rather than re-implemented, so the callers
- * that import it from here — `text-contrast.mjs`, `focus-ring.mjs` and the
- * tests — keep working unchanged. #507 points them at the module directly and
- * these re-exports go with it.
+ * The re-exports #506 left here as a bridge are gone (#507): `text-contrast.mjs`
+ * and `focus-ring.mjs` import the maths from the module itself, so there is one
+ * import path to it rather than two. What this file still exports is its own —
+ * `tokenValues`, `PAGE_TOKEN`, `AA_TEXT` and the button sweep.
  *
  * WHAT THIS MEASURES, AND WHY IT IS NOT THE a11y RATCHET'S JOB.
  * `check:storybook` runs axe over what the stories render. Nothing renders a
@@ -51,15 +51,12 @@ import { fileURLToPath } from 'node:url';
 import {
   composite,
   contrast,
-  luminance,
   parseColour,
   ratchet,
   readTokens,
   resolveToken,
   toHex,
 } from '../design-system/src/lib/tokens.mjs';
-
-export { composite, contrast, luminance, parseColour, ratchet, resolveToken, toHex };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');

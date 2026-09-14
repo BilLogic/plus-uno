@@ -1,6 +1,8 @@
 import React from 'react';
 import { expect } from 'storybook/test';
 
+import { composite, contrast as contrastOf, parseColour, toHex } from '../lib/tokens.mjs';
+
 /**
  * The focus ring — what 29 of this system's focus styles looked like before
  * 2026-08-29, and what they look like now.
@@ -59,20 +61,17 @@ export default {
 
 /* -------------------------------------------------------------- measuring */
 
-const channels = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
-
-const luminance = (hex) => {
-    const [r, g, b] = channels(hex).map((c) => {
-        const s = c / 255;
-        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-    });
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-};
-
-const contrast = (a, b) => {
-    const [x, y] = [luminance(a), luminance(b)].sort((p, q) => q - p);
-    return (x + 0.05) / (y + 0.05);
-};
+/**
+ * The SAME contrast the checks fail the build on — `check:text-contrast`,
+ * `check:button-contrast` and `check:focus-ring` all call this function, from
+ * `design-system/src/lib/tokens.mjs` (#507). This story used to carry its own
+ * copy of WCAG luminance, so the number a designer read here was computed by
+ * different code from the number that gated the PR. One import, one answer.
+ *
+ * The adapter is only about SHAPE: everything below speaks in `#rrggbb`, the
+ * module in `{r, g, b, a}`.
+ */
+const contrast = (a, b) => contrastOf(parseColour(a), parseColour(b));
 
 /**
  * Read a token as it renders, compositing translucency over the page.
@@ -86,23 +85,14 @@ const PAGE = '--color-surface';
 
 const readToken = (name, over = null) => {
     const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-    if (!raw) return null;
-    if (raw.startsWith('#')) {
-        return raw.length === 4
-            ? `#${raw[1]}${raw[1]}${raw[2]}${raw[2]}${raw[3]}${raw[3]}`
-            : raw;
-    }
-    const parts = /rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,\s/]+([\d.]+))?/.exec(raw);
-    if (!parts) return null;
-    const [r, g, b] = parts.slice(1, 4).map(Number);
-    const alpha = parts[4] === undefined ? 1 : Number(parts[4]);
-    const ground = over ?? readToken(PAGE);
-    if (alpha === 1 || !ground) {
-        return `#${[r, g, b].map((n) => Math.round(n).toString(16).padStart(2, '0')).join('')}`;
-    }
-    const [gr, gg, gb] = channels(ground);
-    const mix = (top, bottom) => Math.round(top * alpha + bottom * (1 - alpha));
-    return `#${[mix(r, gr), mix(g, gg), mix(b, gb)].map((n) => n.toString(16).padStart(2, '0')).join('')}`;
+    const colour = parseColour(raw);
+    if (!colour) return null;
+    if (colour.a === 1) return toHex(colour);
+    const ground = parseColour(over ?? readToken(PAGE));
+    // No ground to lay it on is not a reason to invent one: the raw channels
+    // are what the old reader returned, and they are at least honest about
+    // which colour this is.
+    return toHex(ground ? composite(colour, ground) : colour);
 };
 
 /** WCAG 1.4.11 — a focus ring is a non-text indicator. */
