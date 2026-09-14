@@ -232,7 +232,11 @@ function globToRegExp(glob) {
  * directory is walked like any other — which is what lets a test build its
  * fixture root under `mkdtemp` and link the source trees it only reads, instead
  * of copying them or planting fixtures in the live tree. A dangling link costs
- * only itself; anything else a stat can raise is strict's to throw.
+ * only itself in both modes; any other stat error (EACCES, ELOOP) is strict's
+ * to throw and the forgiving walk's to skip, the same split as an unreadable
+ * directory. Neither walk keeps a visited set, so a link to itself or to an
+ * ancestor recurses until the stack gives out: no tree this repo reads holds
+ * one, and a fixture root should link a real tree, not a cycle.
  */
 function walk(root, rel, how, out = []) {
   const { ignore, skipDotDirs, skipEntry, strict } = how;

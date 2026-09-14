@@ -122,13 +122,15 @@ const SWEPT = ['.md', '.mdx', '.yml', '.yaml', '.json'];
  * Entries this sweep does not descend into or read.
  *
  * `node_modules` and the dot-directories are the usual exclusions. `__`-prefixed
- * is not: it is a test fixture another test is writing into the live tree RIGHT
- * NOW. `scripts/check-doc-identifiers.test.mjs` plants
- * `design-system/guidelines/__regression-*.md`, runs its checker against the real
- * repo root and deletes it in a `finally`; node's runner runs test files in
- * parallel, so this sweep could list the file and then find it gone. It took CI
- * down twice on changes that had nothing to do with either test. Fixtures are not
- * repo content, so skipping them is right on its own terms.
+ * is not: it is the name shape of a test fixture planted in the live tree.
+ * `scripts/check-doc-identifiers.test.mjs` used to plant
+ * `design-system/guidelines/__regression-*.md`, run its checker against the real
+ * repo root and delete it in a `finally`; node's runner runs test files in
+ * parallel, so this sweep could list the file and then find it gone, and it took
+ * CI down twice on changes that had nothing to do with either test. That test
+ * now builds its root under `mkdtemp` (#469), and the skip stays anyway: it is
+ * what catches the next test that plants a file somewhere it should not, and
+ * fixtures are not repo content, so skipping them is right on its own terms.
  */
 const skipEntry = (name) => name === 'node_modules' || name.startsWith('.') || name.startsWith('__');
 

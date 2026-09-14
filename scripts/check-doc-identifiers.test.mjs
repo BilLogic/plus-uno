@@ -129,11 +129,16 @@ test('0c454cce: every fabricated token is read as a claim, in all three position
  */
 function fixtureRoot(pages) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-identifiers-'));
-  fs.mkdirSync(path.join(root, 'design-system/guidelines'), { recursive: true });
-  fs.symlinkSync(path.join(REPO_ROOT, 'design-system/src'), path.join(root, 'design-system/src'));
-  fs.symlinkSync(path.join(REPO_ROOT, 'src'), path.join(root, 'src'));
-  for (const [name, text] of Object.entries(pages)) {
-    fs.writeFileSync(path.join(root, 'design-system/guidelines', name), text);
+  try {
+    fs.mkdirSync(path.join(root, 'design-system/guidelines'), { recursive: true });
+    fs.symlinkSync(path.join(REPO_ROOT, 'design-system/src'), path.join(root, 'design-system/src'));
+    fs.symlinkSync(path.join(REPO_ROOT, 'src'), path.join(root, 'src'));
+    for (const [name, text] of Object.entries(pages)) {
+      fs.writeFileSync(path.join(root, 'design-system/guidelines', name), text);
+    }
+  } catch (err) {
+    fs.rmSync(root, { recursive: true, force: true });
+    throw err;
   }
   return root;
 }
@@ -150,14 +155,12 @@ function findingsIn(pages) {
 
 test('the checker reads the root it is given, not the repo it lives in', () => {
   // A page that exists only under the fixture root is reported there, with a
-  // path relative to that root — and a run against the real repo, before and
-  // after, never sees it. Without this the fixtures below would prove nothing.
+  // path relative to that root, as the only finding — and the live tree never
+  // held it. Without this the fixtures below would prove nothing.
   const page = 'Use `--a-token-only-this-test-invented` here.\n';
-  const before = run({ repoRoot: REPO_ROOT });
   const lines = findingsIn({ '__regression-root.md': page });
   assert.equal(lines.length, 1, lines.join('\n'));
   assert.match(lines[0], /^design-system\/guidelines\/__regression-root\.md:1 --a-token-only-this-test-invented /);
-  assert.deepEqual(run({ repoRoot: REPO_ROOT }), before);
   assert.ok(!fs.existsSync(path.join(REPO_ROOT, 'design-system/guidelines/__regression-root.md')));
 });
 

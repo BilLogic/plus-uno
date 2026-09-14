@@ -2,10 +2,11 @@
 // of repos that breaks it, and the committed estate proven to pass.
 //
 // FIXTURES LIVE IN A TEMP DIRECTORY, NEVER IN THE LIVE TREE. `scripts/check-doc-identifiers.test.mjs`
-// writes `design-system/guidelines/__regression-*.md` into the working copy for
-// the length of a test, and on 2026-09-05 that raced another sweep reading the
-// same tree and took a CI run red. Every fixture here is a throwaway repo, and
-// `sweep()` takes its three roots as an argument so it can be pointed at them.
+// once wrote `design-system/guidelines/__regression-*.md` into the working copy
+// for the length of a test, and on 2026-09-05 that raced another sweep reading
+// the same tree and took a CI run red (it builds its root under `mkdtemp` now,
+// #469). Every fixture here is a throwaway repo, and `sweep()` takes its three
+// roots as an argument so it can be pointed at them.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
