@@ -54,7 +54,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { ratchet } from '../design-system/src/lib/tokens.js';
+import { ratchet } from '../design-system/src/lib/tokens.mjs';
 import {
   AA_TEXT,
   PAGE_TOKEN,
@@ -289,7 +289,7 @@ export function census(found) {
  * itself reported: a fix must not quietly leave its exemption behind, or the
  * baseline slowly becomes a list of things nobody has looked at.
  *
- * The CLASSIFICATION is `ratchet` in `design-system/src/lib/tokens.js` (#506) —
+ * The CLASSIFICATION is `ratchet` in `design-system/src/lib/tokens.mjs` (#506) —
  * one function for the nine baselines that each had their own rule. What stays
  * here is the wording, and the order: NEW and ROSE are emitted in the order the
  * run found them, not grouped by kind, so the list reads like the run.

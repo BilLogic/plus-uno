@@ -3,7 +3,7 @@
  *
  * The maths — `parseColour`, `composite`, `luminance`, `contrast`,
  * `resolveToken`, `toHex` and the ratchet — moved to
- * `design-system/src/lib/tokens.js` in #506, and its tests moved with it to
+ * `design-system/src/lib/tokens.mjs` in #506, and its tests moved with it to
  * `design-system/tests/tokens.test.js` (run by `npm test`). What is tested here
  * is what stayed: reading the `$btn-themes` map, building a ground per style ×
  * fill, the duplicate-ground assertion, and the findings this check words.

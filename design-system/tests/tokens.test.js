@@ -4,7 +4,7 @@
  * WHY THESE TESTS LIVE HERE AND NOT IN `scripts/`. The maths they exercise used
  * to sit in `scripts/button-contrast.mjs`, which imports `node:fs` at the top
  * and so cannot be imported by a Vite/Storybook story. The maths moved to
- * `design-system/src/lib/tokens.js`; its tests moved with it, into the only
+ * `design-system/src/lib/tokens.mjs`; its tests moved with it, into the only
  * test command the repo has (`npm test` → `npm --prefix design-system test`),
  * beside `component-tabs-contract.test.js`, which uses the same arrangement.
  *
@@ -29,14 +29,14 @@ import {
   toHex,
   tokenDeclarationPattern,
   varReferencePattern,
-} from '../src/lib/tokens.js';
+} from '../src/lib/tokens.mjs';
 
 /*
  * Resolved off the Vitest root (the `design-system` package) rather than off
  * `import.meta.url`: under jsdom that URL is an `http://` one and
  * `fileURLToPath` refuses it.
  */
-const MODULE_PATH = resolve('src/lib/tokens.js');
+const MODULE_PATH = resolve('src/lib/tokens.mjs');
 
 /*
  * THE POINT OF THIS MODULE IS THAT A STORY CAN IMPORT IT. A story runs through
@@ -48,7 +48,7 @@ const MODULE_PATH = resolve('src/lib/tokens.js');
  */
 describe('the module is importable from a browser bundle', () => {
   it('imports and works with no Node globals in scope', async () => {
-    const tokens = await import('../src/lib/tokens.js');
+    const tokens = await import('../src/lib/tokens.mjs');
     expect(typeof tokens.contrast).toBe('function');
     expect(tokens.contrast({ r: 0, g: 0, b: 0 }, { r: 255, g: 255, b: 255 })).toBe(21);
   });
@@ -60,7 +60,7 @@ describe('the module is importable from a browser bundle', () => {
     expect(code).not.toMatch(/from\s+['"]node:/);
     expect(code).not.toMatch(/require\s*\(/);
     for (const global of ['process', '__dirname', '__filename', 'Buffer']) {
-      expect(code, `${global} must not appear in tokens.js`).not.toMatch(
+      expect(code, `${global} must not appear in tokens.mjs`).not.toMatch(
         new RegExp(`\\b${global}\\b`),
       );
     }

@@ -3,7 +3,7 @@
  *
  * THE MATHS IS NO LONGER HERE. Luminance, contrast, compositing, colour
  * parsing, the token grammar, token resolution and the ratchet moved to
- * `design-system/src/lib/tokens.js` (#506), because this file imports `node:fs`
+ * `design-system/src/lib/tokens.mjs` (#506), because this file imports `node:fs`
  * and so could never be imported by a Storybook story — which is why five
  * stories carried their own copy of the same arithmetic. What is left here is
  * what is genuinely about BUTTONS: reading the `$btn-themes` map, building a
@@ -57,7 +57,7 @@ import {
   readTokens,
   resolveToken,
   toHex,
-} from '../design-system/src/lib/tokens.js';
+} from '../design-system/src/lib/tokens.mjs';
 
 export { composite, contrast, luminance, parseColour, ratchet, resolveToken, toHex };
 
