@@ -127,6 +127,13 @@ const BUDGETS = {
   assembled: 170_000,
   persona: 28_000,
   botFace: 7_000,
+  // Tier 1 — the constitution, always loaded. `AGENTS.md` § The loading contract
+  // states this number in prose ("Budget ≤20k chars: a tier that bloats defeats
+  // the tier"), and `check:harness-budgets` (#510) reads the manifest this script
+  // writes to hold that sentence to this constant. The budget attaches to the
+  // constitution's ROLE, like the persona's and the face's, so it cannot be lost
+  // by a rename.
+  constitution: 20_000,
   // A FLOOR beside the ceiling (#418). The assembled bundle is the cached prefix
   // of every Gemini request, and each cache Google offers has a minimum size
   // under which it caches nothing. A bundle cut below that minimum does not
@@ -169,6 +176,7 @@ const BUDGETS = {
 
 /** The budget a member is held to, or null when its role carries none. */
 function budgetFor({ rel, section }) {
+  if (section === "constitution") return { limit: BUDGETS.constitution, role: "constitution" };
   if (section === "persona") return { limit: BUDGETS.persona, role: "persona" };
   if (rel.endsWith("/bot.md")) return { limit: BUDGETS.botFace, role: "Worker face" };
   return null;
@@ -275,6 +283,47 @@ const referencesFile = path.join(outDir, "references.ts");
 
 const CHECK = process.argv.includes("--check");
 
+// ── The manifest (#510) ──────────────────────────────────────────────────────
+//
+// A BUILD artifact, not a committed one. Everything in it is already computed
+// above — members and their embodiment, the section they load in, the chars
+// each contributes, the budgets, the census — and until now the only way for a
+// root guard to have any of it was to parse the sentences this script prints.
+// Three guards did (`scripts/lib/bundled-set.mjs`, and through it
+// `check:negation` and `check:skill-overlap`), which made the wording of a log
+// line load-bearing: reword the census and a guard silently narrows its corpus
+// to nothing, which is the failure #234 built a witness against rather than
+// removed. A datum has no wording to break.
+//
+// THE STDOUT SENTENCES ARE UNCHANGED. They are for a human watching a build and
+// stay exactly as they were; the manifest is for a reader that parses.
+//
+// It is written under `--check` too, and that is not a violation of the "writes
+// nothing" contract above: that contract is about the three COMMITTED artifacts
+// a stale-bundle guard compares, and the manifest is neither committed nor
+// compared — it is gitignored build output, and a guard that asks the bundler
+// `--check` is exactly the caller that needs it.
+const DEFAULT_MANIFEST = path.join(here, "..", ".bundle", "harness-manifest.json");
+
+/** The manifest path this run should write, or null when nothing asked for one. */
+function manifestPath() {
+  const i = process.argv.indexOf("--manifest");
+  if (i !== -1) {
+    const next = process.argv[i + 1];
+    // `--manifest` alone means "the default path"; a following token that is not
+    // another flag is the path to write.
+    return next && !next.startsWith("-") ? path.resolve(next) : DEFAULT_MANIFEST;
+  }
+  const eq = process.argv.find((a) => a.startsWith("--manifest="));
+  if (eq) return path.resolve(eq.slice("--manifest=".length));
+  // The env var exists for a caller that cannot add an argv — an npm script
+  // wrapper, a workflow step — and names the same file.
+  if (process.env.HARNESS_MANIFEST) return path.resolve(process.env.HARNESS_MANIFEST);
+  return null;
+}
+
+const MANIFEST = manifestPath();
+
 // Snapshot the COMMITTED bytes before a single char is assembled. A staleness
 // guard that generates first and compares against what it just wrote cannot
 // fail; reading the working tree up front — and never writing under `--check`
@@ -310,7 +359,10 @@ for (const section of SECTIONS) {
   const found = [];
   for (const root of section.roots) {
     for (const rel of walk(root)) {
-      const { meta } = frontmatter(readFileSync(path.join(repoRoot, rel), "utf8"));
+      // Endings normalised at the read boundary for the same reason the member
+      // read below does it: a body length that depends on WHO checked the repo
+      // out is not a measurement, and the manifest publishes this one.
+      const { meta, body } = frontmatter(readFileSync(path.join(repoRoot, rel), "utf8").replace(/\r\n/g, "\n"));
       if (!meta.embodiment) {
         undeclared.push(rel);
         continue;
@@ -322,16 +374,16 @@ for (const section of SECTIONS) {
         } else if (!workerReads) {
           misdisclosed.push({ rel, why: `\`disclosure: reference\` on an \`embodiment: ${meta.embodiment}\` doc names a Worker delivery for a doc the Worker never reads` });
         } else {
-          disclosed.push({ rel, section: section.name, name: referenceName(rel) });
+          disclosed.push({ rel, section: section.name, name: referenceName(rel), embodiment: meta.embodiment });
         }
         continue;
       }
-      if (workerReads) found.push(rel);
-      else if (meta.embodiment === "ide") ideOnly.push(rel);
+      if (workerReads) found.push({ rel, embodiment: meta.embodiment });
+      else if (meta.embodiment === "ide") ideOnly.push({ rel, section: section.name, chars: body.length });
     }
   }
-  found.sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
-  members.push(...found.map((rel) => ({ rel, section: section.name })));
+  found.sort((a, b) => sortKey(a.rel).localeCompare(sortKey(b.rel)));
+  members.push(...found.map(({ rel, embodiment }) => ({ rel, section: section.name, embodiment })));
 }
 disclosed.sort((a, b) => a.name.localeCompare(b.name));
 
@@ -727,6 +779,96 @@ function renderCompanion() {
 }
 
 const companion = renderCompanion();
+
+// ── The manifest, written from the same assembly ─────────────────────────────
+//
+// One row per DECLARED doc — the three answers the walk can give, under one
+// `delivery` key, so a reader asking "who does the Worker read" filters rather
+// than parses. `chars` is the body the budgets are asserted on (pre-strip, the
+// same number the companion's budget column uses); `shippedChars` is what
+// reaches the prompt or the reference map after `<!-- ide-only -->` regions go.
+// An ide-only doc has no shipped length: nothing of it ships anywhere.
+function renderManifest() {
+  const memberRows = members.map(({ rel, section, embodiment }, i) => ({
+    path: rel,
+    embodiment,
+    section,
+    delivery: "bundled",
+    order: i + 1,
+    chars: raw[i].length,
+    shippedChars: parts[i].length,
+    budget: budgetFor({ rel, section }),
+  }));
+  const disclosedRows = disclosed.map(({ rel, section, name, embodiment }) => ({
+    path: rel,
+    embodiment,
+    section,
+    delivery: "disclosed",
+    name,
+    chars: referenceMap[name].length,
+    shippedChars: referenceMap[name].length,
+    budget: budgetFor({ rel, section }),
+  }));
+  const ideRows = ideOnly.map(({ rel, section, chars }) => ({
+    path: rel,
+    embodiment: "ide",
+    section,
+    delivery: "ide-only",
+    chars,
+    shippedChars: null,
+    budget: null,
+  }));
+  const rows = [...memberRows, ...disclosedRows, ...ideRows];
+
+  // Per-section totals, in SECTIONS order — the bundle's own order, so the
+  // table reads the way the prompt loads.
+  const sections = SECTIONS.map(({ name }) => {
+    const mine = rows.filter((r) => r.section === name);
+    const shipped = mine.filter((r) => r.delivery !== "ide-only");
+    return {
+      name,
+      docs: mine.length,
+      bundled: mine.filter((r) => r.delivery === "bundled").length,
+      disclosed: mine.filter((r) => r.delivery === "disclosed").length,
+      ideOnly: mine.filter((r) => r.delivery === "ide-only").length,
+      chars: shipped.reduce((t, r) => t + r.shippedChars, 0),
+    };
+  });
+
+  return {
+    generatedBy: "agents/uno-bot/scripts/bundle-harness.mjs",
+    // The census, as the datum the stdout sentence states in prose. Same four
+    // numbers, same walk; a guard reads these instead of that sentence.
+    census: {
+      underRoots: members.length + disclosed.length + ideOnly.length,
+      bundled: members.length,
+      disclosed: disclosed.length,
+      ideOnly: ideOnly.length,
+    },
+    // The constants, verbatim, so a doc that writes a budget down in prose can
+    // be held to the number the build actually asserts (`check:harness-budgets`).
+    budgets: { ...BUDGETS },
+    floor: {
+      region: floor.region,
+      cache: floor.cache,
+      value: floor.value,
+      margin: floor.margin,
+      line: floorLine,
+      label: floor.label,
+    },
+    assembled: { chars: assembled.length, files: members.length, budget: BUDGETS.assembled },
+    references: { count: disclosed.length, chars: Object.values(referenceMap).reduce((t, x) => t + x.length, 0) },
+    sections,
+    members: rows,
+  };
+}
+
+// Written BEFORE the `--check` exit below, because the callers that need it are
+// exactly the guards that ask this script `--check`.
+if (MANIFEST) {
+  mkdirSync(path.dirname(MANIFEST), { recursive: true });
+  writeFileSync(MANIFEST, `${JSON.stringify(renderManifest(), null, 2)}\n`, "utf8");
+}
 
 // `--check`: compare what this run WOULD write against the committed bytes
 // snapshotted at the top of this file — before assembly, so the comparison can

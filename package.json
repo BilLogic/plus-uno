@@ -83,6 +83,7 @@
     "check:focus-ring": "node scripts/check-focus-ring.mjs",
     "check:icon-button-name": "node scripts/check-icon-button-name.mjs",
     "check:node-floor": "node scripts/check-node-floor.mjs",
+    "check:harness-budgets": "node scripts/check-harness-budgets.mjs",
     "check:figma-colour-drift": "node scripts/check-figma-colour-drift.mjs",
     "check:token-generation": "node scripts/check-token-generation.mjs",
     "check:atlassian-benchmark": "node scripts/check-atlassian-benchmark.mjs",

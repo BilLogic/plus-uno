@@ -306,6 +306,15 @@ export const CHECKS = [
       "one Node major for the whole repo, with the floor READ from wrangler rather than written down twice. The uno-bot cutover wizard died at stage 2 on \"Wrangler requires at least Node.js v22.0.0. You are using v20.19.3\", and nothing in the repo could have said so first: no .nvmrc, no `engines` in either package.json, and nine workflows pinning three different majors as literals \u2014 20 in uno-bot-evals, 22 in the harness gates, 24 in the figma and blueprint jobs. uno-bot-deploy.yml even carried the comment `# wrangler v4.97+ requires Node >= 22`, so the fact was known, written once, and enforced nowhere. The floor now comes from the installed wrangler's own engines.node, which is the only ordering that helps: bumping wrangler past a Node major fails this check instead of failing a deploy. A workflow literal is a finding even when it AGREES with .nvmrc, because the second copy is the defect and not the number it happens to hold. Mutation-tested five ways: an .nvmrc below the floor, a missing .nvmrc, a literal that disagrees, a literal that agrees, and a manifest whose engines drifted.",
   },
   {
+    name: 'check:harness-budgets',
+    script: 'node scripts/check-harness-budgets.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-harness-budgets.mjs',
+    guards:
+      "the char budgets WRITTEN DOWN in prose still being the ones the bundler asserts. The budgets are decided once, in `BUDGETS` in agents/uno-bot/scripts/bundle-harness.mjs, and a doc that blows one fails the build — but two harness documents also state a budget as a number a reader will act on: AGENTS.md § The loading contract (\"Budget ≤20k chars: a tier that bloats defeats the tier\") and skills/README.md (\"`bot.md` is on a 7,000-char budget the bundler asserts\"). Both are copies, and until #510 nothing compared them: raise `botFace` to 8,000 and the README goes on saying 7,000 with the build green, so the sentence a skill author reads before cutting a face is simply wrong. Prose is what an agent obeys, which makes this the direction the silence costs most. The bundler now writes a JSON manifest of what it computed — members, per-section totals, the census, `BUDGETS` verbatim — and this check reads the number out of each sentence and compares it to the constant it copies, naming the file, the line, the prose value and the constant. A sentence reworded past the pattern is a finding too, rather than a check that quietly matches nothing and passes (#234). On the findings interface (#508), so the runner calls it in-process. Mutation-tested three ways over a fixture root: a prose number raised, a prose number lowered, and a sentence rewritten out of reach.",
+  },
+  {
     name: 'check:figma-colour-drift',
     script: 'node scripts/check-figma-colour-drift.mjs',
     pkg: 'root',

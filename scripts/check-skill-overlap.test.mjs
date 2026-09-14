@@ -24,11 +24,7 @@ import {
   auditBundle,
   findSharedAcross,
 } from './check-skill-overlap.mjs';
-import {
-  declaredMemberCount,
-  membershipMismatchReport,
-  unresolvedReport,
-} from './lib/bundled-set.mjs';
+import { harnessManifest, membershipMismatchReport, unresolvedReport } from './lib/bundled-set.mjs';
 
 const doc = (label, text) => ({ label, text });
 
@@ -260,26 +256,21 @@ test('the report for a short corpus names the shortfall and both numbers', () =>
 test('a marker parse that comes back short is a mismatch, not a pass', () => {
   // The failure mode the ticket describes: `<!-- path -->` markers shift format,
   // the parse yields only member 0, and the guard compares one doc against
-  // nothing and exits 0. The bundler's own `N files` is the second opinion.
-  const ok = '[bundle-harness] --check OK (164398 chars from 21 files; harness.ts + harness-bundle.md both current)';
-  assert.equal(declaredMemberCount(ok), 21);
-
+  // nothing and exits 0. The bundler's own member count is the second opinion —
+  // a manifest field since #510, where it was a regex over `--check OK (N files`.
   const msg = membershipMismatchReport({ parsed: 1, declared: 21, tag: 'skill-overlap' });
   assert.match(msg, /parsed\n?\s*1 doc/, 'must state what the parse found');
-  assert.match(msg, /it says it bundled 21/, 'must state what the bundler declares');
+  assert.match(msg, /bundled 21/, 'must state what the bundler declares');
   assert.match(msg, /bundled-set\.mjs/, 'must point at the parse, not at the corpus');
 });
 
-test('a bundler OK line with no file count is a mismatch too', () => {
-  assert.equal(declaredMemberCount('[bundle-harness] --check OK'), null);
-  assert.equal(declaredMemberCount(''), null);
-  const msg = membershipMismatchReport({ parsed: 21, declared: null, tag: 'skill-overlap' });
-  assert.match(msg, /no longer states a file count/);
-});
-
-test('a comma-grouped file count is still read as a number', () => {
-  // Cheap insurance: the bundler already comma-groups its char counts elsewhere.
-  assert.equal(declaredMemberCount('--check OK (1,234,567 chars from 1,021 files;'), 1021);
+test("the count the mismatch compares against is the manifest's, not a parsed log line", () => {
+  const manifest = harnessManifest({ tag: 'skill-overlap' });
+  assert.equal(typeof manifest.census.bundled, 'number');
+  // And it is the number the guard actually measured over, which is the point:
+  // a witness that disagreed with the corpus would fail the check rather than
+  // sit in the manifest unread.
+  assert.equal(manifest.census.bundled, auditBundle().declared - manifest.census.disclosed);
 });
 
 test('the real run compares every doc the bundler declares', () => {

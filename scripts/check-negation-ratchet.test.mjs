@@ -41,10 +41,11 @@ import {
   REPO_ROOT,
   SECTION_ROOTS,
   censusMismatchReport,
-  declaredCensus,
-  disclosedRows,
+  disclosedFiles,
   embodimentOf,
+  harnessManifest,
   ideAuthoredFiles,
+  manifestUnreadableReport,
   unresolvedReport,
 } from './lib/bundled-set.mjs';
 import { frontmatter } from './lib/corpus.mjs';
@@ -237,54 +238,56 @@ test('a rise names the scope it happened in, and the docs that caused it', () =>
 
 // ── The IDE walk, and the witness that makes it falsifiable ──────────────────
 
-test("the census line is read back off the bundler's own output", () => {
-  const line =
-    '[bundle-harness] embodiment census: 67 declared doc(s) under the section roots — 21 bundled, 46 ide-only';
-  assert.deepEqual(declaredCensus(line), { underRoots: 67, bundled: 21, disclosed: 0, ide: 46 });
+// THE FIXTURE IS A MANIFEST, NOT A LOG LINE (#510). The census and the
+// disclosed set used to be regexed out of the bundler's stdout and out of the
+// companion's markdown table, so the fixtures here were strings of prose and
+// the tests had to cover "the sentence was reworded" as a case of its own. The
+// bundler writes a JSON manifest now; a field is present or it is not.
+const MANIFEST_FIXTURE = {
+  census: { underRoots: 67, bundled: 21, disclosed: 1, ideOnly: 45 },
+  budgets: { assembled: 170_000, persona: 28_000, botFace: 7_000, constitution: 20_000 },
+  members: [
+    { path: 'AGENTS.md', embodiment: 'all', section: 'constitution', delivery: 'bundled', chars: 1 },
+    {
+      path: 'skills/uno-maintain/references/method.md',
+      embodiment: 'all',
+      section: 'skills',
+      delivery: 'disclosed',
+      name: 'uno-maintain/method',
+      chars: 10_198,
+    },
+    { path: 'skills/README.md', embodiment: 'ide', section: 'skills', delivery: 'ide-only', chars: 5_765 },
+  ],
+};
+
+test('the disclosed set is the manifest rows whose delivery is `disclosed`', () => {
+  assert.deepEqual(disclosedFiles(MANIFEST_FIXTURE), ['skills/uno-maintain/references/method.md']);
+  assert.deepEqual(disclosedFiles({ members: [] }), []);
+  // Neither a bundled nor an ide-only row is disclosed — the three deliveries
+  // partition the corpus, and reading one as another is how a Worker-side guard
+  // would quietly measure the wrong set.
+  assert.deepEqual(
+    disclosedFiles({ members: MANIFEST_FIXTURE.members.filter((m) => m.delivery !== 'disclosed') }),
+    [],
+  );
 });
 
-test('the census line carries the disclosed count since #423', () => {
-  const line =
-    '[bundle-harness] embodiment census: 67 declared doc(s) under the section roots — 20 bundled, 1 disclosed, 46 ide-only';
-  assert.deepEqual(declaredCensus(line), { underRoots: 67, bundled: 20, disclosed: 1, ide: 46 });
-});
-
-test('the disclosed table is read back off the companion by path', () => {
-  const md = [
-    '## Disclosed references',
-    '',
-    '| Name | Doc | Chars |',
-    '|------|-----|------:|',
-    '| `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,198 |',
-    '',
-    '## The assembled prompt',
-    '',
-    '| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 1 | 1 | — |',
-  ].join('\n');
-  assert.deepEqual(disclosedRows(md), ['skills/uno-maintain/references/method.md']);
-  assert.deepEqual(disclosedRows('## Disclosed references\n\nNone.\n\n## The assembled prompt\n'), []);
-  assert.deepEqual(disclosedRows(''), []);
-});
-
-test('a census line that is absent or reshaped reads as null rather than as zero', () => {
-  // Zero would be indistinguishable from "the walk found nothing", which is the
-  // exact narrowing this witness exists to catch.
-  assert.equal(declaredCensus(''), null);
-  assert.equal(declaredCensus('[bundle-harness] --check OK (164398 chars from 21 files)'), null);
-  assert.equal(declaredCensus('embodiment census: 67 docs — 21 bundled'), null);
-});
-
-test('the census parse survives thousands separators', () => {
-  const line =
-    'embodiment census: 1,067 declared doc(s) under the section roots — 1,021 bundled, 46 ide-only';
-  assert.deepEqual(declaredCensus(line), { underRoots: 1067, bundled: 1021, disclosed: 0, ide: 46 });
+test('the real bundler states a census, budgets and a row per declared doc', () => {
+  const manifest = harnessManifest({ tag: 'negation' });
+  const { census } = manifest;
+  assert.equal(census.underRoots, census.bundled + census.disclosed + census.ideOnly);
+  assert.equal(manifest.members.length, census.underRoots);
+  assert.equal(typeof manifest.budgets.botFace, 'number');
+  // The two counts this check depends on, against the walk it does itself.
+  assert.equal(census.ideOnly, ideAuthoredFiles().length);
+  assert.equal(census.disclosed, disclosedFiles(manifest).length);
 });
 
 test('a walk that disagrees with the bundler points at the roots, not at the corpus', () => {
   const msg = censusMismatchReport({
     walkedIde: 45,
     bundled: 21,
-    census: { underRoots: 67, bundled: 21, disclosed: 0, ide: 46 },
+    census: { underRoots: 67, bundled: 21, disclosed: 0, ideOnly: 46 },
     tag: 'negation',
   });
   assert.match(msg, /walked 45 ide-only doc\(s\), 0 disclosed and 21 bundled \(66 in all\)/);
@@ -293,9 +296,14 @@ test('a walk that disagrees with the bundler points at the roots, not at the cor
   assert.match(msg, /bundle-harness\.mjs/, 'and the list it must match');
 });
 
-test('a missing census line is reported as a changed bundler, not as a count of zero', () => {
-  const msg = censusMismatchReport({ walkedIde: 46, bundled: 21, census: null });
-  assert.match(msg, /absent or has changed shape/);
+test('a manifest the guard cannot read is reported as a changed bundler, not as a count of zero', () => {
+  // What the `census: null` case became. A census that came back null had to be
+  // told apart from a real zero at every call site; a manifest that states no
+  // census never reaches the comparison at all, and this is the message.
+  const msg = manifestUnreadableReport({ why: 'it states no `census`, `budgets` and `members`', tag: 'negation' });
+  assert.match(msg, /exited 0 but its manifest could not be read/);
+  assert.match(msg, /cannot vouch for/);
+  assert.match(msg, /--manifest/, 'must name the flag that writes it');
 });
 
 test('embodiment is read off frontmatter, and its absence is null', () => {

@@ -67,7 +67,7 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 <!-- ide-only -->
 **Tier 2 — loaded on demand.** Two or three documents per task. § Progressive loading is the trigger table; beyond it: a skill loads its own `SKILL.md` + `references/method.md` on invocation and its `references/*.md` as linked; an agent loads its `agents/<kind>/<name>.md` plus the conventions it names.
 
-**Bundle mechanics (uno-bot).** Sections, order, `ide-only` stripping and the four char budgets — persona, each `bot.md`, the assembled ceiling and its floor — are decided in one place, the header of `agents/uno-bot/scripts/bundle-harness.mjs`. `npm run check:harness` fails the build on a stale bundle, an overrun or a shortfall, and names the file and the distance.
+**Bundle mechanics (uno-bot).** Sections, order, `ide-only` stripping and the five char budgets — this file, the persona, each `bot.md`, the assembled ceiling and its floor — are decided in one place, the header of `agents/uno-bot/scripts/bundle-harness.mjs`. `npm run check:harness` fails the build on a stale bundle, an overrun or a shortfall, and names the file and the distance. The same run writes a JSON manifest (`--manifest`, gitignored) of what it computed, which is what the root guards read instead of parsing its log lines, and what holds the budget numbers written above to the constants that assert them (`check:harness-budgets`).
 
 **GitHub Actions.** `scripts/lib/skill-loader.js` loads `scripts/prompts/*` with meta-stripping; offline, which is fine because conventions are repo-canonical.
 <!-- /ide-only -->

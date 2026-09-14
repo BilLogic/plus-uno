@@ -511,3 +511,105 @@ test("a disclosed doc does not count toward the assembled prompt, and the prompt
   const floor = activeFloor();
   assert.ok(len >= floor.value + floor.margin, `the prompt (${len}) must stay above the floor after the cut`);
 });
+
+// ── The manifest (#510) ──────────────────────────────────────────────────────
+//
+// The datum the root guards read instead of parsing this script's log lines.
+// What is asserted here is its SHAPE and its agreement with the artifacts of
+// the same run: the manifest is only worth reading if a guard can trust the
+// census, the budgets and the delivery of every row.
+
+/** Run the bundler with `--manifest` into a throwaway path, and parse what it wrote. */
+const runWithManifest = (args = ["--check"]) => {
+  const dir = mkdtempSync(path.join(tmpdir(), "harness-manifest-"));
+  const file = path.join(dir, "manifest.json");
+  try {
+    const r = runBundler([...args, "--manifest", file]);
+    return { ...r, manifest: existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : null };
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+};
+
+test("--manifest writes a manifest whose census, budgets and members agree with the bundle", () => {
+  const { code, manifest } = runWithManifest();
+  assert.equal(code, 0);
+  assert.ok(manifest, "--check must still write the manifest: the guards that read it ask for --check");
+
+  // The census, as four numbers rather than as a sentence.
+  const { census } = manifest;
+  for (const key of ["underRoots", "bundled", "disclosed", "ideOnly"]) {
+    assert.equal(typeof census[key], "number", `census.${key} must be a number`);
+  }
+  assert.equal(census.underRoots, census.bundled + census.disclosed + census.ideOnly, "the census must add up");
+
+  // Every declared doc is a row, and the three deliveries partition them.
+  assert.equal(manifest.members.length, census.underRoots, "one row per declared doc");
+  const by = (d) => manifest.members.filter((m) => m.delivery === d);
+  assert.equal(by("bundled").length, census.bundled);
+  assert.equal(by("disclosed").length, census.disclosed);
+  assert.equal(by("ide-only").length, census.ideOnly);
+  for (const row of manifest.members) {
+    assert.ok(row.path.endsWith(".md"), `${row.path} must be a doc path`);
+    assert.ok(["all", "ide", "uno-bot"].includes(row.embodiment), `${row.path} must carry its embodiment`);
+    assert.ok(typeof row.section === "string" && row.section, `${row.path} must name its section`);
+    assert.equal(typeof row.chars, "number", `${row.path} must carry its char count`);
+  }
+
+  // The bundled rows ARE the bundle, in order — the same list the artifact's
+  // `<!-- path -->` markers yield, which is what makes the manifest usable as
+  // the witness for that parse rather than as a second, softer opinion.
+  assert.deepEqual(
+    by("bundled").map((m) => m.path),
+    ["AGENTS.md", ...memberOrder(assembled())],
+  );
+  assert.deepEqual(
+    by("disclosed")
+      .map((m) => m.name)
+      .sort(),
+    Object.keys(references()).sort(),
+  );
+
+  // The budgets, verbatim, so `check:harness-budgets` can hold the prose to
+  // them; and the assembled numbers this run measured.
+  for (const key of ["assembled", "persona", "botFace", "constitution"]) {
+    assert.equal(typeof manifest.budgets[key], "number", `budgets.${key} must be a number`);
+  }
+  assert.equal(manifest.assembled.chars, assembled().length);
+  assert.equal(manifest.assembled.files, census.bundled);
+  assert.equal(manifest.assembled.budget, manifest.budgets.assembled);
+  assert.equal(manifest.floor.line, manifest.floor.value + manifest.floor.margin);
+
+  // Per-section totals, in the bundle's own order.
+  assert.deepEqual(
+    manifest.sections.map((s) => s.name),
+    ["constitution", "persona", "skills", "connectors", "engineering", "conventions"],
+  );
+  assert.equal(
+    manifest.sections.reduce((t, s) => t + s.docs, 0),
+    census.underRoots,
+  );
+});
+
+test("the stdout census sentence is unchanged, and the manifest agrees with it", () => {
+  // The sentence stays for humans (#510). No guard parses it any more, so this
+  // is the one place left that reads it — precisely to prove that the datum and
+  // the prose still say the same thing.
+  const { out, manifest } = runWithManifest();
+  const { census } = manifest;
+  assert.match(
+    out,
+    new RegExp(
+      `embodiment census: ${census.underRoots} declared doc\\(s\\) under the section roots — ` +
+        `${census.bundled} bundled, ${census.disclosed} disclosed, ${census.ideOnly} ide-only`,
+    ),
+  );
+});
+
+test("--manifest disturbs neither committed artifact", () => {
+  const before = { ts: readFileSync(harnessTs, "utf8"), md: readFileSync(companionMd, "utf8") };
+  assert.equal(runBundler(["--check"]).code, 0, "the plain --check must still pass");
+  assert.equal(runWithManifest().code, 0);
+  assert.equal(readFileSync(harnessTs, "utf8"), before.ts, "--check --manifest must not write harness.ts");
+  assert.equal(readFileSync(companionMd, "utf8"), before.md, "--check --manifest must not write the companion");
+});

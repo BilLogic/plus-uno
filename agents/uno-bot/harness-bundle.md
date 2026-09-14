@@ -19,8 +19,8 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,603 (−7,000 ide-only) | 9,603 | — |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 9,994 | 19,625 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,603 (−7,277 ide-only) | 9,603 | 20,000 (constitution) |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 9,994 | 19,625 | 20,000 (constitution) |
 | 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,196 | 45,862 | 28,000 (persona) |
 | 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,036 | 51,942 | 7,000 (Worker face) |
 | 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,990 | 58,977 | 7,000 (Worker face) |
