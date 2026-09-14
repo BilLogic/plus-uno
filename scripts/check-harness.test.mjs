@@ -3,17 +3,18 @@
  *
  * `check:harness` was the last untested script in this harness, which is the
  * defect #191 named in every other script: a guard nobody has watched fail is a
- * guard nobody knows works. The four things asserted here are the four the
- * runner decides — a legacy check's exit code, a findings check's exit code and
- * banner, the completeness assertion, and the agreement between the registry
- * and the three generated blocks.
+ * guard nobody knows works. What is asserted here is what the runner decides —
+ * a findings check's exit code and banner, a `kind: 'spawn'` row's exit code,
+ * the refusal to run a row that declares neither (#509), the completeness
+ * assertion, and the agreement between the registry and the three generated
+ * blocks.
  */
 
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import test from 'node:test';
 
 import {
@@ -78,21 +79,67 @@ test('warnings are printed and do not fail the check', () => {
   assert.match(renderFindings('check:x', warned), /\(warning\) worth saying/);
 });
 
-test('a legacy check is spawned and read by its exit code, unchanged', async () => {
+test("a kind: 'spawn' check is spawned and read by its exit code", async () => {
   const calls = [];
   const spawn = (args) => {
     calls.push(args);
     return { status: 1, stdout: 'out\n', stderr: 'err' };
   };
-  const row = { name: 'check:legacy', pkg: 'root', guards: 'nothing' };
+  const row = { name: 'check:browser', pkg: 'root', kind: 'spawn', guards: 'nothing' };
   const result = await runCheck(row, { repoRoot: REPO_ROOT, spawn });
-  assert.deepEqual(calls, [['run', '--silent', 'check:legacy']]);
+  assert.deepEqual(calls, [['run', '--silent', 'check:browser']]);
   assert.equal(result.ok, false);
   assert.equal(result.output, 'out\nerr');
-  assert.equal(result.invocation, 'npm run --silent check:legacy');
+  assert.equal(result.invocation, 'npm run --silent check:browser');
 
-  const bot = { name: 'check:legacy', pkg: 'bot', guards: 'nothing' };
-  assert.deepEqual(npmArgs(bot), ['--prefix', 'agents/uno-bot', 'run', '--silent', 'check:legacy']);
+  const bot = { name: 'check:browser', pkg: 'bot', kind: 'spawn', guards: 'nothing' };
+  assert.deepEqual(npmArgs(bot), ['--prefix', 'agents/uno-bot', 'run', '--silent', 'check:browser']);
+});
+
+test('a row that declares neither kind fails, rather than being spawned by default', async () => {
+  // This is the whole of what #509 removed. While the runner spawned an
+  // undeclared row, the registry's silence carried a decision — and a reader
+  // could not tell a check that had been thought about from one that had not.
+  let spawned = 0;
+  const result = await runCheck(
+    { name: 'check:undeclared', pkg: 'root', guards: 'nothing' },
+    {
+      repoRoot: REPO_ROOT,
+      spawn: () => {
+        spawned += 1;
+        return { status: 0, stdout: '', stderr: '' };
+      },
+    },
+  );
+  assert.equal(spawned, 0, 'an incomplete row must not be run on a guess');
+  assert.equal(result.ok, false);
+  assert.match(result.output, /declares neither a `module` nor `kind: 'spawn'`/);
+});
+
+test("every registry row is a module on the findings interface or a kind: 'spawn' with a reason", () => {
+  for (const row of ALL) {
+    if (row.module) {
+      assert.ok(!row.kind, `${row.name} declares both a module and a kind`);
+      assert.ok(
+        fs.existsSync(path.join(REPO_ROOT, row.module)),
+        `${row.name} declares module ${row.module}, which does not exist`,
+      );
+      continue;
+    }
+    assert.equal(row.kind, 'spawn', `${row.name} declares neither a module nor kind: 'spawn'`);
+    assert.ok(row.spawnReason, `${row.name} is spawned with no reason`);
+  }
+  // The point of the migration, as a number: the findings interface is the
+  // majority case, not the exception it was when #508 built it.
+  const findings = ALL.filter((row) => row.module);
+  assert.ok(findings.length > ALL.length / 2, `only ${findings.length} of ${ALL.length} rows return findings`);
+});
+
+test('every findings module answers the interface its row claims for it', async () => {
+  for (const row of ALL.filter((r) => r.module)) {
+    const mod = await import(pathToFileURL(path.join(REPO_ROOT, row.module)).href);
+    assert.equal(typeof mod.run, 'function', `${row.name}: ${row.module} exports no run()`);
+  }
 });
 
 test('a row whose module exports no run() falls back to the spawn and says so', async () => {

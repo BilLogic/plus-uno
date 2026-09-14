@@ -33,35 +33,46 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { REPO_ROOT, failures, nameless, sources } from './icon-button-name.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 const RECORD = 'docs/evals/icon-button-name.json';
-
-const record = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, RECORD), 'utf8'));
-const files = sources();
-const found = [];
 
 /*
  * A resolver that stopped finding files reports a clean sweep. The floor is the
  * count on 2026-08-29.
  */
 const MIN_FILES = 400;
-if (files.length < MIN_FILES) {
-  found.push(`only ${files.length} JSX sources scanned (floor ${MIN_FILES}). An empty corpus names nothing.`);
+
+export const REMEDY =
+  '  -> Give the control a name: `aria-label` on a bare <button>, or `text` /\n' +
+  '     `aria-label` on <Button>. Mark the icon `aria-hidden="true"` while you are\n' +
+  '     there — it is decoration once the button has a name. WCAG 4.1.2.';
+
+// The record and the corpus walk are what both questions need, so they happen
+// once per root rather than once at module scope.
+const inputs = byRoot((repoRoot) => ({
+  record: JSON.parse(fs.readFileSync(path.join(repoRoot, RECORD), 'utf8')),
+  files: sources(repoRoot),
+}));
+
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { record, files } = inputs(repoRoot);
+  const found = [];
+
+  if (files.length < MIN_FILES) {
+    found.push({
+      message: `only ${files.length} JSX sources scanned (floor ${MIN_FILES}). An empty corpus names nothing.`,
+    });
+  }
+
+  found.push(...failures(nameless(files), record.exceptions ?? {}).map((message) => ({ message })));
+  return found;
 }
 
-found.push(...failures(nameless(files), record.exceptions ?? {}));
-
-if (found.length) {
-  console.error(`\n[icon-button-name] ${found.length} finding(s):`);
-  for (const f of found) console.error(`  ${f}`);
-  console.error(`\n${'─'.repeat(72)}`);
-  console.error('✗ check:icon-button-name\n');
-  console.error(
-    '  -> Give the control a name: `aria-label` on a bare <button>, or `text` /\n' +
-      '     `aria-label` on <Button>. Mark the icon `aria-hidden="true"` while you are\n' +
-      '     there — it is decoration once the button has a name. WCAG 4.1.2.',
-  );
-  process.exit(1);
+/** The green line, which carries the size of the corpus that was scanned. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  return `${inputs(repoRoot).files.length} JSX sources, every icon-only button has a name`;
 }
 
-console.log(`✓ check:icon-button-name — ${files.length} JSX sources, every icon-only button has a name`);
+main(import.meta.url, 'check:icon-button-name', { run, summary, remedy: REMEDY });

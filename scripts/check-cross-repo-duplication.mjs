@@ -125,9 +125,10 @@
  */
 import { appendFileSync, existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { documents, frontmatter, stripLinks } from './lib/corpus.mjs';
+import { main } from './lib/findings.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(here, '..');
@@ -570,11 +571,99 @@ export function coverageReport({ located, absent, docs, comparisons }) {
   return lines.join('\n');
 }
 
-const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isMain) {
-  const result = sweep();
-  const coverage = coverageReport(result);
+export const REMEDY =
+  '  -> give the meaning ONE home. Either it belongs to one repo and the other points at it, or\n' +
+  '     it is a shared standard and the tool that installs it owns it. If two repos genuinely\n' +
+  '     must both state it, record the pair in RECORDED with the reason and what would close it.';
 
+/**
+ * One sweep per process, shared by `run` and `summary`. The sweep reads three
+ * repositories and shingles every harness document in them, so it is the one
+ * read in this file that must not happen twice — and before #509 it happened
+ * once because the script WAS the process.
+ */
+let swept = null;
+const once = () => (swept ??= sweep());
+
+/**
+ * The findings interface (`scripts/lib/findings.mjs`). Each problem keeps the
+ * sentence it was written as, multi-line and all: a recorded pair's reason and a
+ * passage's quoted text are the evidence, and reflowing them into one line would
+ * be editing the finding to fit the renderer.
+ *
+ * @returns {import('./lib/findings.mjs').Finding[]}
+ */
+export function run() {
+  const result = once();
+  const found = [...result.stale];
+  for (const { rec, now } of result.rises) {
+    found.push(
+      `${rec.a} ↔ ${rec.b} now share ${now} words, against the ${rec.words} recorded.\n` +
+        `  The pair is a BASELINE and may only fall. It reads: ${rec.why}`,
+    );
+  }
+  if (result.findings.length) {
+    found.push(
+      `${result.findings.length} passage(s) stated in two repositories:\n` +
+        result.findings
+          .map(
+            (f) =>
+              `  ${f.words} words\n    ${f.a}\n    ${f.b}\n    "${f.text.slice(0, 200)}${f.text.length > 200 ? '…' : ''}"`,
+          )
+          .join('\n'),
+    );
+  }
+
+  const findings = found.map((message) => ({ message }));
+
+  // COVERAGE RIDES ALONG ON A FAILING RUN THAT ALSO SKIPPED SOMETHING. The green
+  // line carries the coverage block in `summary`, but a failure prints findings
+  // and no summary — and "1 pair over its ceiling" reads differently when a
+  // third of the pairings were never looked at (#258). It is a warning, so it
+  // says so without adding to the count that fails the check, and it is emitted
+  // only when both halves are true: on a clean-coverage failure the block says
+  // "compared 3 of 3" and repeats what the absence of this warning already says.
+  if (findings.length && result.absent.length) {
+    findings.unshift({
+      severity: 'warning',
+      message: `a pairing not compared is not a pairing that passed:\n${coverageReport(result)}`,
+    });
+  }
+  return findings;
+}
+
+/**
+ * The green line — which says what actually happened, and NOTHING is one of the
+ * things that can happen. "no meaning stated twice" printed over zero
+ * comparisons is the sentence #258 is about, whatever the coverage block
+ * underneath says.
+ */
+export function summary() {
+  const result = once();
+  // A recorded pair whose repos were not both reached reports `n/a`, never `0`.
+  // "0/98" on a run that compared nothing reads like the duplication went away.
+  const recorded = RECORDED.map((r) => {
+    const both = [r.a, r.b].every((side) => result.reached.includes(side.split(':')[0]));
+    return both ? `${result.shared.get(`${r.a}|${r.b}`)}/${r.words}` : `n/a (not compared)/${r.words}`;
+  }).join(' · ');
+  const found =
+    result.comparisons.length === 0
+      ? 'NOTHING WAS COMPARED — no sibling repo was reachable, so this run asserts nothing'
+      : `no unrecorded meaning stated twice across the ${result.reached.length} repos reached`;
+  return (
+    `${found} — passages of ` +
+    `${MIN_WORDS}+ words, ${SHINGLE}-word shingles. ${COPIES.size} copies by construction excluded; ` +
+    `${RECORDED.length} recorded pairs at ${recorded} shared words (may fall, never rise).\n${coverageReport(result)}` +
+    (result.absent.length ? '\n  A pairing not compared is not a pairing that passed.' : '')
+  );
+}
+
+if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
+  // The CI annotation for an unreachable sibling stays on this side of the
+  // interface: it is a side effect on the run, not a finding about the repos,
+  // and `run()` is called by the harness runner in-process where writing to
+  // $GITHUB_STEP_SUMMARY on someone else's behalf would be a surprise.
+  const result = once();
   if (result.absent.length) {
     const how = result.absent
       .map((s) =>
@@ -586,55 +675,5 @@ if (isMain) {
     const missed = 3 - result.comparisons.length;
     announce('warning', `${missed} of 3 pairings NOT compared — ${how}.`);
   }
-
-  const problems = [...result.stale];
-  for (const { rec, now } of result.rises) {
-    problems.push(
-      `${rec.a} ↔ ${rec.b} now share ${now} words, against the ${rec.words} recorded.\n` +
-        `  The pair is a BASELINE and may only fall. It reads: ${rec.why}`,
-    );
-  }
-  if (result.findings.length) {
-    problems.push(
-      `${result.findings.length} passage(s) stated in two repositories:\n` +
-        result.findings
-          .map(
-            (f) =>
-              `  ${f.words} words\n    ${f.a}\n    ${f.b}\n    "${f.text.slice(0, 200)}${f.text.length > 200 ? '…' : ''}"`,
-          )
-          .join('\n'),
-    );
-  }
-
-  if (problems.length) {
-    console.error('[check:cross-repo] one meaning is stated in two repositories:');
-    console.error(coverage);
-    for (const p of problems) console.error(p);
-    console.error(
-      '  -> give the meaning ONE home. Either it belongs to one repo and the other points at it, or\n' +
-        '     it is a shared standard and the tool that installs it owns it. If two repos genuinely\n' +
-        '     must both state it, record the pair in RECORDED with the reason and what would close it.',
-    );
-    process.exit(1);
-  }
-
-  // A recorded pair whose repos were not both reached reports `n/a`, never `0`.
-  // "0/98" on a run that compared nothing reads like the duplication went away.
-  const recorded = RECORDED.map((r) => {
-    const both = [r.a, r.b].every((side) => result.reached.includes(side.split(':')[0]));
-    return both ? `${result.shared.get(`${r.a}|${r.b}`)}/${r.words}` : `n/a (not compared)/${r.words}`;
-  }).join(' · ');
-  // The headline says what actually happened, and NOTHING is one of the things
-  // that can happen. "no meaning stated twice" printed over zero comparisons is
-  // the sentence #258 is about, whatever the coverage block underneath says.
-  const found =
-    result.comparisons.length === 0
-      ? 'NOTHING WAS COMPARED — no sibling repo was reachable, so this run asserts nothing'
-      : `no unrecorded meaning stated twice across the ${result.reached.length} repos reached`;
-  console.log(
-    `[check:cross-repo] ${found} — passages of ` +
-      `${MIN_WORDS}+ words, ${SHINGLE}-word shingles. ${COPIES.size} copies by construction excluded; ` +
-      `${RECORDED.length} recorded pairs at ${recorded} shared words (may fall, never rise).\n${coverage}` +
-      (result.absent.length ? '\n  A pairing not compared is not a pairing that passed.' : ''),
-  );
+  main(import.meta.url, 'check:cross-repo', { run, summary, remedy: REMEDY });
 }

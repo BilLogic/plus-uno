@@ -22,6 +22,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { failures, mappings } from './figma-node-types.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -37,43 +38,55 @@ const RECORDING = 'design-system/figma/node-types.json';
  */
 const MIN_RECORDED = 99;
 
-const registry = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, REGISTRY), 'utf8'));
-const recording = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, RECORDING), 'utf8'));
+export const REMEDY =
+  `  -> Re-measure with \`npm run audit:figma-registry\`, run the printed probe in\n` +
+  `     Figma, and record what came back in ${RECORDING} with the date.\n` +
+  `     A node id only means anything inside its own file.`;
 
-const found = failures(registry, recording);
-const recorded = Object.keys(recording.nodes ?? {}).length;
+// The registry and the recording are the two files both questions compare, so
+// they are read once per root.
+const inputs = byRoot((repoRoot) => {
+  const read = (p) => JSON.parse(fs.readFileSync(path.join(repoRoot, p), 'utf8'));
+  return { registry: read(REGISTRY), recording: read(RECORDING) };
+});
 
-if (recorded < MIN_RECORDED) {
-  found.push(
-    `${recorded} recorded node type(s), fewer than the ${MIN_RECORDED} this was measured over. ` +
-      `A comparison against an empty recording agrees with everything.`,
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { registry, recording } = inputs(repoRoot);
+
+  const found = failures(registry, recording).map((message) => ({ message }));
+  const recorded = Object.keys(recording.nodes ?? {}).length;
+
+  if (recorded < MIN_RECORDED) {
+    found.push({
+      message:
+        `${recorded} recorded node type(s), fewer than the ${MIN_RECORDED} this was measured over. ` +
+        `A comparison against an empty recording agrees with everything.`,
+    });
+  }
+
+  return found;
+}
+
+/** The green line, and under it the shape of what was recorded. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { registry, recording } = inputs(repoRoot);
+  const recorded = Object.keys(recording.nodes ?? {}).length;
+
+  const kinds = {};
+  for (const record of Object.values(recording.nodes)) {
+    kinds[record.type] = (kinds[record.type] ?? 0) + 1;
+  }
+  const shape = Object.entries(kinds)
+    .sort((a, b) => b[1] - a[1])
+    .map(([type, n]) => `${n} ${type}`)
+    .join(' · ');
+
+  return (
+    `${mappings(registry).length} mappings over ${recorded} nodes; ` +
+    `every one claims what it is (measured ${recording.measuredAt})\n` +
+    `  ${shape}`
   );
 }
 
-if (found.length) {
-  console.error(`\n[figma-node-types] ${found.length} finding(s):`);
-  for (const f of found) console.error(`  ${f}`);
-  console.error(`\n${'─'.repeat(72)}`);
-  console.error(`✗ check:figma-node-types — ${mappings(registry).length} mappings\n`);
-  console.error(
-    `  -> Re-measure with \`npm run audit:figma-registry\`, run the printed probe in\n` +
-      `     Figma, and record what came back in ${RECORDING} with the date.\n` +
-      `     A node id only means anything inside its own file.`,
-  );
-  process.exit(1);
-}
-
-const kinds = {};
-for (const record of Object.values(recording.nodes)) {
-  kinds[record.type] = (kinds[record.type] ?? 0) + 1;
-}
-const shape = Object.entries(kinds)
-  .sort((a, b) => b[1] - a[1])
-  .map(([type, n]) => `${n} ${type}`)
-  .join(' · ');
-
-console.log(
-  `✓ check:figma-node-types — ${mappings(registry).length} mappings over ${recorded} nodes; ` +
-    `every one claims what it is (measured ${recording.measuredAt})`,
-);
-console.log(`  ${shape}`);
+main(import.meta.url, 'check:figma-node-types', { run, summary, remedy: REMEDY });

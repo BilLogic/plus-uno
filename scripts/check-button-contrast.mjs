@@ -29,49 +29,52 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { AA_TEXT, FILLS, findings, readRepo, sweep } from './button-contrast.mjs';
+import { AA_TEXT, findings, readRepo, sweep } from './button-contrast.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const BASELINE = 'docs/evals/button-contrast-baseline.json';
 
-const baseline = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, BASELINE), 'utf8'));
-const { values, themes } = readRepo(REPO_ROOT);
+export const REMEDY =
+  '  -> A label under 4.5:1, or two styles that render the same ground. If the\n' +
+  `     decision is not yours to make, record it in ${BASELINE}\n` +
+  '     with the issue that owns it — and never as a way to make a new one quiet.';
 
-const rows = sweep(themes, values);
-const found = findings(themes, values, baseline);
+// The baseline, the token values and the theme map are the same read for both
+// questions, so the sweep over them happens once per root.
+const inputs = byRoot((repoRoot) => {
+  const baseline = JSON.parse(fs.readFileSync(path.join(repoRoot, BASELINE), 'utf8'));
+  const { values, themes } = readRepo(repoRoot);
+  return { baseline, values, themes, rows: sweep(themes, values) };
+});
 
-const line = '─'.repeat(72);
-
-if (found.length) {
-  console.error(`\n[button-contrast] ${found.length} finding(s):`);
-  for (const finding of found) console.error(`  ${finding}`);
-  console.error(`\n${line}`);
-  console.error(
-    `✗ check:button-contrast — ${themes.length} styles × ${FILLS.length} fills = ` +
-      `${rows.length} combinations\n`,
-  );
-  console.error(
-    '  -> A label under 4.5:1, or two styles that render the same ground. If the\n' +
-      `     decision is not yours to make, record it in ${BASELINE}\n` +
-      '     with the issue that owns it — and never as a way to make a new one quiet.',
-  );
-  process.exit(1);
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { baseline, values, themes } = inputs(repoRoot);
+  return findings(themes, values, baseline).map((message) => ({ message }));
 }
 
-/*
- * The tightest combination that is NOT baselined — the margin the next change
- * has to beat. Including the baselined ones would print `warning/filled at 3.7`
- * under a line saying everything clears 4.5, which is a green check reporting a
- * red number.
- */
-const worst = rows
-  .filter((row) => row.ratio !== null && !baseline.contrast.includes(`${row.style}/${row.fill}`))
-  .sort((a, b) => a.ratio - b.ratio)[0];
+/** The green line, and the margin the next change has to beat. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { baseline, rows, themes } = inputs(repoRoot);
 
-console.log(
-  `✓ check:button-contrast — ${rows.length} combinations from ${themes.length} styles; ` +
+  /*
+   * The tightest combination that is NOT baselined — the margin the next change
+   * has to beat. Including the baselined ones would print `warning/filled at 3.7`
+   * under a line saying everything clears 4.5, which is a green check reporting a
+   * red number.
+   */
+  const worst = rows
+    .filter((row) => row.ratio !== null && !baseline.contrast.includes(`${row.style}/${row.fill}`))
+    .sort((a, b) => a.ratio - b.ratio)[0];
+
+  return (
+    `${rows.length} combinations from ${themes.length} styles; ` +
     `every label clears ${AA_TEXT}:1 and every style renders its own ground ` +
-    `(${baseline.contrast.length + baseline.duplicates.length} baselined)`,
-);
-console.log(`  tightest unbaselined: ${worst.style}/${worst.fill} at ${worst.ratio}:1`);
+    `(${baseline.contrast.length + baseline.duplicates.length} baselined)\n` +
+    `  tightest unbaselined: ${worst.style}/${worst.fill} at ${worst.ratio}:1`
+  );
+}
+
+main(import.meta.url, 'check:button-contrast', { run, summary, remedy: REMEDY });

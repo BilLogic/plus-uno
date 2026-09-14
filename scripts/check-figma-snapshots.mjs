@@ -15,6 +15,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { REFRESHERS, ages, failures } from './figma-snapshots.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -43,34 +44,47 @@ const MIN_COMPONENTS = 1311;
 /** The library both snapshots are of. */
 const FILE_KEY = 'zAecJNRdvJzAUOcjV32tRX';
 
-const read = (p) => JSON.parse(fs.readFileSync(path.join(REPO_ROOT, p), 'utf8'));
-const files = { variables: read(VARIABLES), components: read(COMPONENTS) };
-const { scripts } = read('package.json');
-const now = new Date();
+export const REMEDY = [
+  '  -> Neither file can be refreshed from CI; both need Figma:',
+  ...Object.values(REFRESHERS).map(
+    ({ file, script, needs }) => `       ${file}\n         npm run ${script} — needs ${needs}`,
+  ),
+].join('\n');
 
-const found = failures(files, {
-  now,
-  fileKey: FILE_KEY,
-  maxAgeDays: MAX_AGE_DAYS,
-  minVariables: MIN_VARIABLES,
-  minComponents: MIN_COMPONENTS,
-  scripts,
+/*
+ * Both snapshots, the package manifest and the clock, read once per root. The
+ * age is a function of `now`, and run() and summary() have to agree about it,
+ * so the clock is captured here with the reads rather than at each call.
+ */
+const inputs = byRoot((repoRoot) => {
+  const read = (p) => JSON.parse(fs.readFileSync(path.join(repoRoot, p), 'utf8'));
+  return {
+    files: { variables: read(VARIABLES), components: read(COMPONENTS) },
+    scripts: read('package.json').scripts,
+    now: new Date(),
+  };
 });
 
-const clock = ages(files, now)
-  .map((a) => `${a.name} ${a.stamp ?? '(no date)'} (${a.age === null ? '?' : `${a.age}d`})`)
-  .join(' · ');
-
-if (found.length) {
-  console.error(`\n[figma-snapshots] ${found.length} finding(s):`);
-  for (const f of found) console.error(`  ${f}`);
-  console.error(`\n${'─'.repeat(72)}`);
-  console.error(`✗ check:figma-snapshots — ${clock}\n`);
-  console.error('  -> Neither file can be refreshed from CI; both need Figma:');
-  for (const { file, script, needs } of Object.values(REFRESHERS)) {
-    console.error(`       ${file}\n         npm run ${script} — needs ${needs}`);
-  }
-  process.exit(1);
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { files, scripts, now } = inputs(repoRoot);
+  return failures(files, {
+    now,
+    fileKey: FILE_KEY,
+    maxAgeDays: MAX_AGE_DAYS,
+    minVariables: MIN_VARIABLES,
+    minComponents: MIN_COMPONENTS,
+    scripts,
+  }).map((message) => ({ message }));
 }
 
-console.log(`✓ check:figma-snapshots — ${clock}, both under the ${MAX_AGE_DAYS}-day ceiling`);
+/** The green line, which carries each snapshot's date and how old it is. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { files, now } = inputs(repoRoot);
+  const clock = ages(files, now)
+    .map((a) => `${a.name} ${a.stamp ?? '(no date)'} (${a.age === null ? '?' : `${a.age}d`})`)
+    .join(' · ');
+  return `${clock}, both under the ${MAX_AGE_DAYS}-day ceiling`;
+}
+
+main(import.meta.url, 'check:figma-snapshots', { run, summary, remedy: REMEDY });

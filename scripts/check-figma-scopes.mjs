@@ -21,30 +21,17 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { convention, failures } from './figma-scopes.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const RECORDING = 'design-system/figma/colour-values.json';
-
-const recording = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, RECORDING), 'utf8'));
-const scopes = recording.scopes ?? {};
-
-const found = [];
 
 /*
  * A recording with no scopes would pass everything. The floor is the count of
  * accent colour variables that carry a role, measured on 2026-08-29.
  */
 const MIN_SCOPED = 75;
-if (Object.keys(scopes).length < MIN_SCOPED) {
-  found.push(
-    `only ${Object.keys(scopes).length} variables have recorded scopes (floor ${MIN_SCOPED}). ` +
-      'Re-read them from Figma; an empty recording agrees with everything.',
-  );
-}
-
-const conventions = convention(scopes);
-found.push(...failures(scopes, conventions));
 
 /*
  * The convention has to have been FOUND. If the naming changed under
@@ -52,29 +39,55 @@ found.push(...failures(scopes, conventions));
  * and the check would pass by having nothing to say.
  */
 const EXPECTED_ROLES = ['base', 'text', 'container', 'on', 'on-container', 'icon', 'border'];
-for (const role of EXPECTED_ROLES) {
-  if (!conventions.has(role)) {
-    found.push(`no convention found for the \`${role}\` role — the names stopped matching classify().`);
+
+export const REMEDY =
+  '  -> Scopes are what the Figma picker OFFERS. Narrowing one changes nothing that\n' +
+  '     already ships — an existing binding is untouched — so the fix is to narrow the\n' +
+  '     variable in Figma and re-read the scopes into ' + RECORDING + '.';
+
+// The recording and the convention derived from it are what both questions ask
+// about, so the read and the derivation happen once per root.
+const inputs = byRoot((repoRoot) => {
+  const recording = JSON.parse(fs.readFileSync(path.join(repoRoot, RECORDING), 'utf8'));
+  const scopes = recording.scopes ?? {};
+  return { scopes, conventions: convention(scopes) };
+});
+
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { scopes, conventions } = inputs(repoRoot);
+  const found = [];
+
+  if (Object.keys(scopes).length < MIN_SCOPED) {
+    found.push({
+      message:
+        `only ${Object.keys(scopes).length} variables have recorded scopes (floor ${MIN_SCOPED}). ` +
+        'Re-read them from Figma; an empty recording agrees with everything.',
+    });
   }
+
+  found.push(...failures(scopes, conventions).map((message) => ({ message })));
+
+  for (const role of EXPECTED_ROLES) {
+    if (!conventions.has(role)) {
+      found.push({
+        message: `no convention found for the \`${role}\` role — the names stopped matching classify().`,
+      });
+    }
+  }
+
+  return found;
 }
 
-if (found.length) {
-  console.error(`\n[figma-scopes] ${found.length} finding(s):`);
-  for (const f of found) console.error(`  ${f}`);
-  console.error(`\n${'─'.repeat(72)}`);
-  console.error('✗ check:figma-scopes\n');
-  console.error(
-    '  -> Scopes are what the Figma picker OFFERS. Narrowing one changes nothing that\n' +
-      '     already ships — an existing binding is untouched — so the fix is to narrow the\n' +
-      '     variable in Figma and re-read the scopes into ' + RECORDING + '.',
+/** The green line, which carries how wide each role's majority was. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { scopes, conventions } = inputs(repoRoot);
+  const roles = [...conventions.entries()]
+    .map(([role, r]) => `${role} ${r.agreeing}/${r.of}`)
+    .join(' · ');
+  return (
+    `${Object.keys(scopes).length} variables, ` + `${conventions.size} roles in agreement (${roles})`
   );
-  process.exit(1);
 }
 
-const roles = [...conventions.entries()]
-  .map(([role, r]) => `${role} ${r.agreeing}/${r.of}`)
-  .join(' · ');
-console.log(
-  `✓ check:figma-scopes — ${Object.keys(scopes).length} variables, ` +
-    `${conventions.size} roles in agreement (${roles})`,
-);
+main(import.meta.url, 'check:figma-scopes', { run, summary, remedy: REMEDY });

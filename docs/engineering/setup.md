@@ -146,10 +146,19 @@ set by hand: the `check:*` block of `package.json`, the check steps of
 `.github/workflows/harness-integrity-sweep.yml` and those of
 `.github/workflows/storybook-gate.yml`. Each carries a generated region between
 markers; run `npm run generate:check-registry` after editing a row, and
-`npm run check:check-registry` fails on drift. A check may also return findings
-instead of exiting — `scripts/lib/findings.mjs` is that interface and
-`scripts/check-node-floor.mjs` the worked example; the runner renders the banner
-and picks the exit code.
+`npm run check:check-registry` fails on drift.
+
+A check returns findings rather than exiting. `scripts/lib/findings.mjs` is that
+interface — a check exports `run(ctx) => Finding[]` and decides nothing about
+output; the runner renders the banner and picks the exit code, and the check's
+own CLI entry (`main()` in that module) prints the same string when you run it
+by hand. `scripts/check-font-families.mjs` is the shape to copy, and
+`scripts/generate-check-scripts.mjs` the shape for a generator whose `--check`
+is one half of it. Each registry row declares its `module`; the few checks whose
+result is an exit code by nature — a browser suite, `tsc`, a test runner, the
+seven-generator composite `check:agent` — declare `kind: 'spawn'` and the reason
+in the same row, and a row declaring neither fails the gate rather than being
+run on a guess (#509).
 
 All three embodiments are swept, not two: the headless Actions prompts under
 `scripts/prompts/` are a subject of the negation ratchet (`check:negation`, its
