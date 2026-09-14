@@ -65,6 +65,8 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const BASELINE = path.join(REPO_ROOT, 'docs/evals/a11y-baseline.json');
+/** The same path as the reader sees it, so the verdict's messages need no root. */
+const BASELINE_REL = path.relative(REPO_ROOT, BASELINE);
 
 const argv = process.argv.slice(2);
 const UPDATE = argv.includes('--update');
@@ -264,16 +266,39 @@ export function baselineRecord({ a11y, totals }) {
   };
 }
 
-function main() {
-  const { report, seconds } = JSON_ARG
-    ? { report: JSON.parse(fs.readFileSync(path.resolve(JSON_ARG), 'utf8')), seconds: null }
-    : runSuite();
 
-  const { a11y, blocking, totals } = classify(report);
+/**
+ * The gate's verdict: everything it decides once a report exists.
+ *
+ * WHY THIS IS A FUNCTION. The decision used to live inside `main()`, wrapped
+ * around the spawn, the printing and the baseline write, which meant the only
+ * way to exercise it was to run a browser suite — so none of it was exercised.
+ * The exit code was therefore an assertion nobody had ever watched fail, which
+ * is how a run that collected zero tests came to pass: every check below is over
+ * what the report CONTAINS, and an empty report contains nothing wrong. Taking
+ * the report and the baseline as arguments and returning the exit code, the lines
+ * to print and what `--update` would record leaves `main()` with the I/O and
+ * makes each of these floors a test case.
+ *
+ * Lines are tagged rather than printed so the caller keeps the choice of stream:
+ * the summary and the green line are stdout, everything a reader must act on is
+ * stderr, exactly as before.
+ *
+ * @param {object} report a vitest `--reporter=json` report
+ * @param {object|null} baseline the parsed committed baseline, or null if absent
+ * @param {{root?: string, update?: boolean, seconds?: number|null}} options
+ * @returns {{status: 0|1, lines: {stream: 'out'|'err', text: string}[], record?: object}}
+ */
+export function verdict(report, baseline, { root = REPO_ROOT, update = false, seconds = null } = {}) {
+  const lines = [];
+  const out = (text) => lines.push({ stream: 'out', text });
+  const err = (text) => lines.push({ stream: 'err', text });
+
+  const { a11y, blocking, totals } = classify(report, root);
   const rules = ruleCounts(a11y);
   const violatingStories = Object.keys(a11y).length;
 
-  console.log(
+  out(
     `\n${'─'.repeat(72)}\n` +
       `[storybook] ${totals.files} story files · ${totals.tests} tests · ` +
       `${totals.passed} passed · ${totals.failed} failed` +
@@ -283,22 +308,35 @@ function main() {
       `across ${Object.keys(rules).length} rule(s)`,
   );
 
-  if (UPDATE) {
-    fs.writeFileSync(BASELINE, `${JSON.stringify(baselineRecord({ a11y, totals }), null, 2)}\n`);
-    console.log(
+  // A run that ran no tests at all is the emptiest version of the same defect the
+  // floors below catch, and it needs no baseline to recognise: the suite either
+  // matched no files or listed files and executed nothing in them. Checked before
+  // --update as well, because recording a baseline from a run that did not happen
+  // would set every floor to zero and disarm the gate permanently.
+  if (!totals.tests) {
+    err(
+      '\n[storybook] the report contains 0 tests — the suite did not run.\n' +
+        '  -> This is a harness failure, not a story failure. Read the vitest output above.',
+    );
+    return { status: 1, lines };
+  }
+
+  if (update) {
+    const record = baselineRecord({ a11y, totals });
+    out(
       `[storybook] a11y baseline recorded: ${violatingStories} stories, ` +
-        `${Object.keys(rules).length} rules -> ${path.relative(REPO_ROOT, BASELINE)}`,
+        `${Object.keys(rules).length} rules -> ${BASELINE_REL}`,
     );
     if (blocking.length) {
-      console.error(
+      err(
         `\n[storybook] ${blocking.length} NON-a11y failure(s) were present during --update.\n` +
           '  -> The baseline covers accessibility only, so these were not recorded and the\n' +
           '     gate will still fail on them. Fix them. Listed below.',
       );
-      for (const b of blocking) console.error(`\n  ✗ ${b.where}\n${b.message}`);
-      return 1;
+      for (const b of blocking) err(`\n  ✗ ${b.where}\n${b.message}`);
+      return { status: 1, lines, record };
     }
-    return 0;
+    return { status: 0, lines, record };
   }
 
   let failed = false;
@@ -306,20 +344,20 @@ function main() {
   // 1. Play functions and render errors. No baseline, no grace.
   if (blocking.length) {
     failed = true;
-    console.error(
+    err(
       `\n${'─'.repeat(72)}\n` +
         `✗ ${blocking.length} story test(s) failed for a reason that is not an accessibility\n` +
         '  violation — a `play` function, or the story failing to render.\n',
     );
-    for (const b of blocking) console.error(`  ✗ ${b.where}\n${b.message}\n`);
-    console.error(
+    for (const b of blocking) err(`  ✗ ${b.where}\n${b.message}\n`);
+    err(
       '  -> These have no baseline. Reproduce one story on its own with:\n' +
         '       npx vitest run --project=storybook -t "<story name>"',
     );
 
     const reopt = reoptimisationFailures(blocking);
     if (reopt.length) {
-      console.error(
+      err(
         `\n  !! ${reopt.length} of those name ${SETUP_FILE} rather than a story.\n` +
           '     That is the Vite re-optimisation flake, and the story above is a bystander\n' +
           '     picked by timing — do not go and read it. Search this log for:\n' +
@@ -332,15 +370,15 @@ function main() {
   }
 
   // 2. Accessibility. Ratchet against the committed baseline.
-  if (!fs.existsSync(BASELINE)) {
-    console.error(
-      `\n✗ no a11y baseline at ${path.relative(REPO_ROOT, BASELINE)}.\n` +
+  if (!baseline) {
+    err(
+      `\n✗ no a11y baseline at ${BASELINE_REL}.\n` +
         '  -> Record it once: npm run check:storybook -- --update',
     );
-    return 1;
+    return { status: 1, lines };
   }
 
-  const base = JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
+  const base = baseline;
 
   // A run that collects fewer files than the baseline recorded is not a pass, it is
   // a run that did not happen. Every assertion below is over what the report
@@ -349,29 +387,43 @@ function main() {
   // measured at, so the floor is free.
   const expectedFiles = base.suite?.storyFiles;
   if (expectedFiles && totals.files < expectedFiles) {
-    console.error(
+    err(
       `\n[storybook] collected ${totals.files} story files, but the baseline was measured at ` +
         `${expectedFiles}. A short run cannot clear a ratchet — it just has less to find.\n` +
         '  -> If story files were deliberately removed, re-record with --update in the same PR.',
     );
-    return 1;
+    return { status: 1, lines };
+  }
+
+  // The same floor one step later. A run can list every story file and still
+  // execute almost nothing in them — a project filter that matches the files but
+  // no tests, a bail, a browser that died after the first file. The file count
+  // then looks right while the ratchet is asked about a fraction of the corpus.
+  const expectedTests = base.suite?.tests;
+  if (expectedTests && totals.tests < expectedTests) {
+    err(
+      `\n[storybook] ran ${totals.tests} tests, but the baseline was measured at ` +
+        `${expectedTests}. A short run cannot clear a ratchet — it just has less to find.\n` +
+        '  -> If tests were deliberately removed, re-record with --update in the same PR.',
+    );
+    return { status: 1, lines };
   }
   const { regressions, cleared } = ratchet(a11y, base.stories ?? {});
 
   if (regressions.length) {
     failed = true;
-    console.error(
+    err(
       `\n${'─'.repeat(72)}\n` +
         `✗ ${regressions.length} stor${regressions.length === 1 ? 'y' : 'ies'} violate an ` +
         'accessibility rule they did not violate at the baseline.\n',
     );
     for (const r of regressions) {
-      console.error(
+      err(
         `  ✗ ${r.story}\n      new: ${r.added.join(', ')}` +
           (r.known.length ? `\n      already baselined: ${r.known.join(', ')}` : ''),
       );
     }
-    console.error(
+    err(
       '\n  -> Fix the violation. The baseline is a floor that may only fall: it exists so an\n' +
         '     inherited count too large to clear in one commit does not block unrelated work,\n' +
         '     and adding to it defeats the point. Where a rule genuinely does not apply to a\n' +
@@ -381,11 +433,11 @@ function main() {
   }
 
   if (failed) {
-    console.error(`\n${'─'.repeat(72)}\n✗ check:storybook FAILED`);
-    return 1;
+    err(`\n${'─'.repeat(72)}\n✗ check:storybook FAILED`);
+    return { status: 1, lines };
   }
 
-  console.log(
+  out(
     '✓ check:storybook — no play failures; no new a11y violations ' +
       `(baseline ${base.violatingStories} stories, measured ${base.measured})` +
       (cleared.length
@@ -393,13 +445,30 @@ function main() {
           ' — re-baseline with `npm run check:storybook -- --update` to lock the gain in.'
         : ''),
   );
-  console.log(
+  out(
     `  heaviest rules: ${Object.entries(rules)
       .slice(0, 4)
       .map(([r, n]) => `${r} (${n})`)
       .join(' · ')}`,
   );
-  return 0;
+  return { status: 0, lines };
+}
+
+function main() {
+  const { report, seconds } = JSON_ARG
+    ? { report: JSON.parse(fs.readFileSync(path.resolve(JSON_ARG), 'utf8')), seconds: null }
+    : runSuite();
+
+  const baseline = fs.existsSync(BASELINE) ? JSON.parse(fs.readFileSync(BASELINE, 'utf8')) : null;
+  const { status, lines, record } = verdict(report, baseline, { update: UPDATE, seconds });
+
+  // The record is written before the lines are printed because one of those lines
+  // announces the write; printing first would announce something that had not
+  // happened yet if the write threw.
+  if (record) fs.writeFileSync(BASELINE, `${JSON.stringify(record, null, 2)}\n`);
+  for (const line of lines) (line.stream === 'err' ? console.error : console.log)(line.text);
+
+  return status;
 }
 
 // Importing this module for its exports must not run a browser suite.

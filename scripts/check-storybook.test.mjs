@@ -25,6 +25,7 @@ import {
   ratchet,
   reoptimisationFailures,
   ruleCounts,
+  verdict,
 } from './check-storybook.mjs';
 
 const ROOT = '/repo';
@@ -239,4 +240,127 @@ test('the flake is reported alongside the real failures, never instead of them',
   ];
   assert.equal(reoptimisationFailures(blocking).length, 1);
   assert.equal(blocking.length, 2);
+});
+
+/* ------------------------------------------------------- the whole verdict */
+
+/*
+ * `verdict` is the exit code, so these are the cases the gate exists for. They
+ * were unreachable while the decision sat inside `main()` beside the spawn, and
+ * the zero-test hole below is what that cost: a run whose project filter matched
+ * nothing printed `0 tests` and exited 0, because every other assertion the gate
+ * makes is over what the report contains.
+ */
+
+/** A committed baseline, in the shape `baselineRecord` writes. */
+const baseline = (stories, suite = {}) => ({
+  measured: '2026-08-26',
+  suite: { storyFiles: Object.keys(stories).length, ...suite },
+  violatingStories: Object.keys(stories).length,
+  rules: ruleCounts(stories),
+  stories,
+});
+
+/** Everything the verdict would print, joined, for matching against. */
+const printed = (lines, stream) =>
+  lines
+    .filter((l) => stream === undefined || l.stream === stream)
+    .map((l) => l.text)
+    .join('\n');
+
+const decide = (rep, base, options = {}) => verdict(rep, base, { root: ROOT, ...options });
+
+test('a run that collected no tests fails, and blames the suite rather than the stories', () => {
+  const { status, lines } = decide(report([]), baseline({}, { tests: 700 }));
+  assert.equal(status, 1);
+  assert.match(printed(lines, 'err'), /0 tests — the suite did not run/);
+  assert.match(printed(lines, 'err'), /harness failure, not a story failure/);
+  assert.doesNotMatch(printed(lines, 'err'), /violation/);
+});
+
+test('zero tests fails even with no baseline to measure against', () => {
+  // The hole seen during #507: the baseline itself had been measured at a moment
+  // the suite was empty, so no floor derived from it could catch the next one.
+  assert.equal(decide(report([]), null).status, 1);
+  assert.equal(decide(report([]), baseline({})).status, 1);
+});
+
+test('zero tests is not recorded as a baseline, even under --update', () => {
+  const { status, record } = decide(report([]), null, { update: true });
+  assert.equal(status, 1);
+  assert.equal(record, undefined, 'a run that did not happen must not set the floors to zero');
+});
+
+test('a run with fewer tests than the baseline recorded fails, as a short file count does', () => {
+  const rep = report([file('a.stories.jsx', [story('Default', 'passed')])]);
+  const { status, lines } = decide(rep, baseline({ 'a.stories.jsx::Default': [] }, { tests: 700 }));
+  assert.equal(status, 1);
+  assert.match(printed(lines, 'err'), /ran 1 tests, but the baseline was measured at 700/);
+  assert.match(printed(lines, 'err'), /A short run cannot clear a ratchet/);
+  assert.match(printed(lines, 'err'), /re-record with --update in the same PR/);
+});
+
+test('a baseline with no recorded test count leaves only the zero floor', () => {
+  // Baselines written before this floor existed carry `suite.storyFiles` alone;
+  // an absent count must not be read as "expected zero tests", nor block.
+  const rep = report([file('a.stories.jsx', [story('Default', 'passed')])]);
+  const base = baseline({});
+  delete base.suite.tests;
+  assert.equal(decide(rep, base).status, 0);
+});
+
+test('a green run passes and says what it compared against', () => {
+  const rep = report([
+    file('a.stories.jsx', [story('Default', 'passed')]),
+    file('b.stories.jsx', [story('Default', 'passed')]),
+  ]);
+  const { status, lines } = decide(rep, baseline({}, { storyFiles: 2, tests: 2 }));
+  assert.equal(status, 0);
+  assert.match(printed(lines, 'out'), /✓ check:storybook/);
+  assert.equal(printed(lines, 'err'), '');
+});
+
+test('a blocking failure fails the gate and is printed with its diagnostic', () => {
+  const rep = report([file('a.stories.jsx', [story('Default', 'failed', [playMessage])])]);
+  const { status, lines } = decide(rep, baseline({}, { storyFiles: 1, tests: 1 }));
+  assert.equal(status, 1);
+  assert.match(printed(lines, 'err'), /failed for a reason that is not an accessibility/);
+  assert.match(printed(lines, 'err'), /a\.stories\.jsx::Default/);
+  assert.match(printed(lines, 'err'), /check:storybook FAILED/);
+});
+
+test('an a11y regression fails the gate and names the new rule', () => {
+  const rep = report([file('a.stories.jsx', [story('Default', 'failed', [a11yMessage('label')])])]);
+  const { status, lines } = decide(rep, baseline({}, { storyFiles: 1, tests: 1 }));
+  assert.equal(status, 1);
+  assert.match(printed(lines, 'err'), /violate an accessibility rule they did not violate/);
+  assert.match(printed(lines, 'err'), /new: label/);
+});
+
+test('a baselined violation that is gone passes, and the gain is reported', () => {
+  const rep = report([file('a.stories.jsx', [story('Default', 'passed')])]);
+  const base = baseline({ 'b.stories.jsx::Default': ['label'] }, { storyFiles: 1, tests: 1 });
+  const { status, lines } = decide(rep, base);
+  assert.equal(status, 0);
+  assert.match(printed(lines, 'out'), /1 baselined story is now clean/);
+  assert.match(printed(lines, 'out'), /lock the gain in/);
+});
+
+test('--update hands the record back to the caller, and still reports blocking failures', () => {
+  const rep = report([
+    file('a.stories.jsx', [story('Default', 'failed', [a11yMessage('label')])]),
+    file('b.stories.jsx', [story('Default', 'failed', [playMessage])]),
+  ]);
+  const { status, lines, record } = decide(rep, null, { update: true });
+  assert.equal(status, 1, 'the baseline covers accessibility only');
+  assert.deepEqual(record.stories, { 'a.stories.jsx::Default': ['label'] });
+  assert.equal(record.suite.tests, 2);
+  assert.match(printed(lines, 'err'), /NON-a11y failure\(s\) were present during --update/);
+});
+
+test('a missing baseline is a failure with the one-off remedy, not a silent pass', () => {
+  const rep = report([file('a.stories.jsx', [story('Default', 'passed')])]);
+  const { status, lines } = decide(rep, null);
+  assert.equal(status, 1);
+  assert.match(printed(lines, 'err'), /no a11y baseline at docs\/evals\/a11y-baseline\.json/);
 });
