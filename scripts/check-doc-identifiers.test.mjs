@@ -3,9 +3,10 @@
  *
  * Two jobs. The first is #191's rule: a guard nobody has watched fail is a
  * guard nobody knows works, so the centrepiece here is the real defect —
- * `elevation.md` exactly as it stood before `0c454cce`, written into the real
- * corpus, with the real check run against it as a subprocess. If that stops
- * exiting 1, this file goes red.
+ * `elevation.md` exactly as it stood before `0c454cce`, written into a fixture
+ * root that links the real source, with the real check pointed at that root.
+ * If that page stops producing findings, this file goes red. (The corpus as it
+ * stands is still run as a subprocess, once, to prove the gate exits 0.)
  *
  * The second is the other half of the same rule, and the one that decides
  * whether the gate survives contact with authors: every shape below marked
@@ -18,6 +19,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import os from 'node:os';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -34,6 +36,7 @@ import {
   splitFences,
   tokenClaims,
 } from './doc-identifiers.mjs';
+import { run } from './check-doc-identifiers.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -115,25 +118,60 @@ test('0c454cce: every fabricated token is read as a claim, in all three position
   assert.deepEqual([...sm].sort((a, b) => a - b), sm, 'lines should be in document order');
 });
 
-test('0c454cce: reintroducing the page fails the check, naming the page and the token', () => {
-  const fixture = path.join(REPO_ROOT, 'design-system/guidelines/__regression-0c454cce.md');
-  try {
-    fs.writeFileSync(fixture, ELEVATION_MD_BEFORE_0C454CCE);
-    const r = spawnSync(process.execPath, [CHECK], { cwd: REPO_ROOT, encoding: 'utf8' });
-    const output = `${r.stdout}${r.stderr}`;
+/**
+ * A repo root under `mkdtemp` for the checker to be pointed at. The source it
+ * reads — `design-system/src` for tokens, components and their pages, `src/`
+ * for the app's own stylesheets — is LINKED, not copied (1,500 files), and the
+ * guidelines folder is a fresh one holding only the pages a test writes. So no
+ * test ever writes into the live tree, which is what the `__regression-*`
+ * fixtures used to do, and what a sweep running alongside this file in the
+ * same `node --test` run could list and then find gone (#469).
+ */
+function fixtureRoot(pages) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-identifiers-'));
+  fs.mkdirSync(path.join(root, 'design-system/guidelines'), { recursive: true });
+  fs.symlinkSync(path.join(REPO_ROOT, 'design-system/src'), path.join(root, 'design-system/src'));
+  fs.symlinkSync(path.join(REPO_ROOT, 'src'), path.join(root, 'src'));
+  for (const [name, text] of Object.entries(pages)) {
+    fs.writeFileSync(path.join(root, 'design-system/guidelines', name), text);
+  }
+  return root;
+}
 
-    assert.equal(r.status, 1, `expected exit 1, got ${r.status}:\n${output}`);
-    assert.match(output, /design-system\/guidelines\/__regression-0c454cce\.md/);
-    for (const name of FABRICATED) {
-      assert.ok(output.includes(name), `the failure must name ${name}`);
-    }
+/** The checker's findings for a fixture root, as the one line each prints. */
+function findingsIn(pages) {
+  const root = fixtureRoot(pages);
+  try {
+    return run({ repoRoot: root }).map((f) => `${f.file}:${f.line} ${f.message}`);
   } finally {
-    fs.rmSync(fixture, { force: true });
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+}
+
+test('the checker reads the root it is given, not the repo it lives in', () => {
+  // A page that exists only under the fixture root is reported there, with a
+  // path relative to that root — and a run against the real repo, before and
+  // after, never sees it. Without this the fixtures below would prove nothing.
+  const page = 'Use `--a-token-only-this-test-invented` here.\n';
+  const before = run({ repoRoot: REPO_ROOT });
+  const lines = findingsIn({ '__regression-root.md': page });
+  assert.equal(lines.length, 1, lines.join('\n'));
+  assert.match(lines[0], /^design-system\/guidelines\/__regression-root\.md:1 --a-token-only-this-test-invented /);
+  assert.deepEqual(run({ repoRoot: REPO_ROOT }), before);
+  assert.ok(!fs.existsSync(path.join(REPO_ROOT, 'design-system/guidelines/__regression-root.md')));
+});
+
+test('0c454cce: reintroducing the page fails the check, naming the page and the token', () => {
+  const lines = findingsIn({ '__regression-0c454cce.md': ELEVATION_MD_BEFORE_0C454CCE });
+  const output = lines.join('\n');
+  assert.ok(lines.length > 0, 'the page that shipped must produce findings');
+  assert.match(output, /design-system\/guidelines\/__regression-0c454cce\.md/);
+  for (const name of FABRICATED) {
+    assert.ok(output.includes(name), `the failure must name ${name}`);
   }
 });
 
 test('a deliberately fabricated token fails the check', () => {
-  const fixture = path.join(REPO_ROOT, 'design-system/guidelines/__regression-fabricated.md');
   // #98's real invention, plus one that never existed anywhere.
   const page = [
     '# Fixture',
@@ -145,20 +183,12 @@ test('a deliberately fabricated token fails the check', () => {
     '```',
     '',
   ].join('\n');
-  try {
-    fs.writeFileSync(fixture, page);
-    const r = spawnSync(process.execPath, [CHECK], { cwd: REPO_ROOT, encoding: 'utf8' });
-    const output = `${r.stdout}${r.stderr}`;
-    assert.equal(r.status, 1, `expected exit 1, got ${r.status}:\n${output}`);
-    assert.ok(output.includes('--size-surface-container-pad-x-sm'));
-    assert.ok(output.includes('--totally-invented-token'));
-  } finally {
-    fs.rmSync(fixture, { force: true });
-  }
+  const output = findingsIn({ '__regression-fabricated.md': page }).join('\n');
+  assert.ok(output.includes('--size-surface-container-pad-x-sm'), output);
+  assert.ok(output.includes('--totally-invented-token'), output);
 });
 
 test('a fabricated prop and a fabricated variant both fail the check', () => {
-  const fixture = path.join(REPO_ROOT, 'design-system/guidelines/__regression-props.md');
   const page = [
     '# Fixture',
     '',
@@ -170,17 +200,10 @@ test('a fabricated prop and a fabricated variant both fail the check', () => {
     'Written inline, `fill="translucent"` is the same claim.',
     '',
   ].join('\n');
-  try {
-    fs.writeFileSync(fixture, page);
-    const r = spawnSync(process.execPath, [CHECK], { cwd: REPO_ROOT, encoding: 'utf8' });
-    const output = `${r.stdout}${r.stderr}`;
-    assert.equal(r.status, 1, `expected exit 1, got ${r.status}:\n${output}`);
-    assert.match(output, /emphasis is not a prop of Button/);
-    assert.match(output, /Badge size="h9"/);
-    assert.match(output, /fill="translucent"/);
-  } finally {
-    fs.rmSync(fixture, { force: true });
-  }
+  const output = findingsIn({ '__regression-props.md': page }).join('\n');
+  assert.match(output, /emphasis is not a prop of Button/);
+  assert.match(output, /Badge size="h9"/);
+  assert.match(output, /fill="translucent"/);
 });
 
 test('the corpus as it stands is clean — the check exits 0 on main', () => {
