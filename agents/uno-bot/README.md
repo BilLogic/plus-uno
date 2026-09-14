@@ -35,6 +35,12 @@ Because the brain is bundled, **guidance changes reach the bot on `deploy`, not 
 
 Both lanes are **local tools only** (no hosted MCP), and share the same tool roster, gate protocol, iteration cap (16) and output-token cap (16384). Auth for both is the Vertex service account (`GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY`, project `GEMINI_PROJECT_ID`), so Claude usage bills to the same GCP project as Gemini. Smoke-test the lanes with `GET /debug/gemini` and `GET /debug/vertex-claude` (both auth-gated by `DEBUG_TOKEN`).
 
+### One loop, behind the ModelProvider seam
+
+Everything a turn *decides* lives once, in `src/agent/loop.ts`: the iteration budget gate, the `/stop` check, authorization of the model's own `proposal_resolve` call, a side-effect call becoming a ✅-gated proposal, read-only calls under the subrequest ceiling with a budget trip stamping the result partial, the tools-disabled synthesis pass, the retry on a backup model, and the one rule that narration is emitted only ahead of read-only work. Behind it sits `ModelProvider` (`src/agent/model-provider.ts`): an adapter is handed a neutral conversation, a tool roster, an opaque tier name and a `toolsEnabled` flag, and answers with text, tool calls, usage and a stop kind. No model's wire format — a `functionCall` part, a `tool_use` block, a `pause_turn`, a thought signature — appears above an adapter, and no provider's dial sits in the shared contract.
+
+`src/agent/providers/gemini.ts` is production's adapter: it owns tier → model → thinking level (ADR-028), the `contents` array it appends to verbatim, the Vertex `cachedContents` harness cache (warmed on the turn's first use, so no route has to warm it), the `GEMINI_FALLBACK_MODEL` backup, and token accounting. `src/agent/providers/fake.ts` replays scripted turns, which is what lets `tests/agent-loop.test.ts` drive the whole loop with no network, no credential and no Cloudflare runtime. `src/agent/claude-agent.ts` still runs its own copy of the loop until #496 moves it behind the seam.
+
 ## What it can / partially can / can't do
 
 **Can (reads are free; Slack messaging is native):** answer grounded questions — Roadmap card status (`roadmap_query`), product behavior from the blueprint (`search_blueprint`), DS/component/repo facts (`github_read`), Slack search + thread reads, Slack Canvases shared into the originating conversation, any linked doc (`source_read`), access-request routing via the Third Party Applications directory (`notion_search` scope `apps` — names the Application Admin to ask + pre-fills the request; the grant stays human) — and post/react in Slack as itself.
@@ -63,7 +69,10 @@ uno-bot/
     ├── index.ts          Fetch handler / routes: /health · /debug/gemini ·
     │                     /debug/vertex-claude · /debug/figma-poll · /slack/events ·
     │                     /oauth/slack/{start,callback} — plus the cron scheduled() handler
-    ├── agent/            run-agent.ts (provider dispatcher) · gemini-agent.ts · claude-agent.ts ·
+    ├── agent/            loop.ts (THE agent loop) · model-provider.ts (the ModelProvider
+    │                     seam) · providers/ (gemini · fake) · loop-policy.ts (the loop's
+    │                     dials and strings) · run-agent.ts (provider dispatcher) ·
+    │                     gemini-agent.ts (Env → the loop's ports) · claude-agent.ts ·
     │                     routing.ts (tiers/model ids) · skills.ts (bundled-harness assembly) ·
     │                     preflight · draft-judge · tool schemas
     ├── gemini/           Google auth (Vertex SA / API key) + Gemini REST client
