@@ -29,11 +29,15 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { frontmatter } from './lib/corpus.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(here, '..');
 export const SUBJECT = 'CONTEXT.md';
 export const BASELINE = path.join(REPO_ROOT, 'docs/evals/glossary-baseline.json');
+
+export const REMEDY =
+  '  -> a glossary defines terms; move the reference behind a pointer, or re-baseline with --update and say why.';
 
 export function measure(text) {
   // The frontmatter is read off by the corpus, not by a second fence-finder
@@ -66,27 +70,67 @@ export function measure(text) {
   return { failures, prose };
 }
 
-const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isMain) {
-  const update = process.argv.includes('--update');
-  const text = readFileSync(path.join(REPO_ROOT, SUBJECT), 'utf8');
-  const { failures, prose } = measure(text);
-  let baseline = null;
-  try { baseline = JSON.parse(readFileSync(BASELINE, 'utf8')); } catch { /* first run */ }
-  if (update) {
-    baseline = { subject: SUBJECT, proseLines: prose, recorded: new Date().toISOString().slice(0, 10), note: 'Ratchet: the count may fall, never rise. Re-record with --update and say why in the PR.' };
-    writeFileSync(BASELINE, JSON.stringify(baseline, null, 2) + '\n');
-    console.log(`[check-glossary] baseline recorded: ${prose} prose lines`);
+/** One read and one measurement of the glossary, shared by both halves. */
+const measured = byRoot((repoRoot) => measure(readFileSync(path.join(repoRoot, SUBJECT), 'utf8')));
+
+const baselinePath = (repoRoot) =>
+  repoRoot === REPO_ROOT ? BASELINE : path.join(repoRoot, 'docs/evals/glossary-baseline.json');
+
+/**
+ * The recorded prose count, or null on a first run. Read on each call rather
+ * than memoised: `--update` writes it and then the run reads it back, and a
+ * cached baseline would answer with the one from before the write.
+ */
+function baselineOf(repoRoot) {
+  try {
+    return JSON.parse(readFileSync(baselinePath(repoRoot), 'utf8'));
+  } catch {
+    return null; // first run
   }
-  if (failures.length) {
-    console.error(`[check-glossary] ${SUBJECT} is not a glossary:\n` + failures.map((f) => `  ${f}`).join('\n'));
-    process.exit(1);
-  }
-  if (!baseline) { console.error('[check-glossary] no baseline; run with --update once'); process.exit(1); }
-  if (prose > baseline.proseLines) {
-    console.error(`[check-glossary] prose lines rose: ${prose} against a baseline of ${baseline.proseLines} (recorded ${baseline.recorded}).\n  -> a glossary defines terms; move the reference behind a pointer, or re-baseline with --update and say why.`);
-    process.exit(1);
-  }
-  const fell = prose < baseline.proseLines ? ` — fell from ${baseline.proseLines}; record it with --update` : '';
-  console.log(`[check-glossary] OK — ${prose} prose lines against a baseline of ${baseline.proseLines}${fell}`);
 }
+
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { failures, prose } = measured(repoRoot);
+  // The structural findings come first and alone: with fenced code or a
+  // chapter heading in it the file is not a glossary yet, and the ratchet on
+  // its prose is not the thing to say.
+  if (failures.length) return failures.map((message) => ({ message }));
+
+  const baseline = baselineOf(repoRoot);
+  if (!baseline) return [{ message: 'no baseline; run with --update once' }];
+  if (prose > baseline.proseLines) {
+    return [
+      {
+        message: `prose lines rose: ${prose} against a baseline of ${baseline.proseLines} (recorded ${baseline.recorded}).`,
+      },
+    ];
+  }
+  return [];
+}
+
+/** The green line: the count, its baseline, and a nudge when it has fallen. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { prose } = measured(repoRoot);
+  const baseline = baselineOf(repoRoot);
+  const fell = prose < baseline.proseLines ? ` — fell from ${baseline.proseLines}; record it with --update` : '';
+  return `${prose} prose lines against a baseline of ${baseline.proseLines}${fell}`;
+}
+
+// `--update` re-records the ratchet — a write, so it lives here and never in
+// `run`, which only measures. The run then continues against what was just
+// written, which is how a deliberate fall is recorded and checked in one go.
+if (process.argv.includes('--update') && process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const { prose } = measured(REPO_ROOT);
+  writeFileSync(
+    BASELINE,
+    JSON.stringify(
+      { subject: SUBJECT, proseLines: prose, recorded: new Date().toISOString().slice(0, 10), note: 'Ratchet: the count may fall, never rise. Re-record with --update and say why in the PR.' },
+      null,
+      2,
+    ) + '\n',
+  );
+  console.log(`[check-glossary] baseline recorded: ${prose} prose lines`);
+}
+
+main(import.meta.url, 'check:glossary', { run, summary, remedy: REMEDY });

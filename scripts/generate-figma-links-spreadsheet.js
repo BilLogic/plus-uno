@@ -15,31 +15,31 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 import { documents } from './lib/corpus.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(__dirname, '..');
-const DS_ROOT = path.join(REPO_ROOT, 'design-system', 'src');
-const FIGMA_DIR = path.join(REPO_ROOT, 'design-system', 'figma');
-const OUT_MD = path.join(FIGMA_DIR, 'component-figma-links.md');
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const DS_ROOT = (repoRoot) => path.join(repoRoot, 'design-system', 'src');
+const FIGMA_DIR = (repoRoot) => path.join(repoRoot, 'design-system', 'figma');
+const OUT_MD = 'design-system/figma/component-figma-links.md';
 
 const FIGMA_LINK_RE = /figmaLink\s*=\s*["']([^"']+)["']/;
 
 const DOCS_COLUMNS = ['Group', 'Component', 'Node ID', 'Figma link'];
 const VARIANT_COLUMNS = ['Group', 'Component', 'Style / variant', 'Node ID', 'Figma link', 'Status'];
 
-function componentNameFromMdx(mdxAbsPath) {
-    const rel = path.relative(DS_ROOT, mdxAbsPath).replace(/\\/g, '/');
+function componentNameFromMdx(dsRoot, mdxAbsPath) {
+    const rel = path.relative(dsRoot, mdxAbsPath).replace(/\\/g, '/');
     const parts = rel.replace(/\.mdx$/, '').split('/');
     if (parts[0] === 'forms' && parts[1] === 'DatePicker') return 'DatePicker';
     if (parts[0] === 'forms' && parts[1] === 'InputGroup') return 'InputGroup';
     return parts[parts.length - 1];
 }
 
-function groupFromMdxPath(mdxAbsPath) {
-    const rel = path.relative(DS_ROOT, mdxAbsPath).replace(/\\/g, '/');
+function groupFromMdxPath(dsRoot, mdxAbsPath) {
+    const rel = path.relative(dsRoot, mdxAbsPath).replace(/\\/g, '/');
     if (rel.startsWith('forms/')) return 'Forms';
     if (rel.startsWith('components/')) return 'Components';
     if (rel.startsWith('DataViz/')) return 'DataViz';
@@ -108,12 +108,12 @@ function sortRows(rows, groupOrder) {
 }
 
 /** Read all component MDX files and split into docs-page vs style/variant rows. */
-function buildRowSetsFromMdx() {
+function buildRowSetsFromMdx(dsRoot) {
     const docsRows = [];
     const variantRows = [];
     const groupOrder = { Components: 0, Forms: 1, DataViz: 2, Other: 3 };
 
-    const mdxFiles = walkMdxFiles(DS_ROOT)
+    const mdxFiles = walkMdxFiles(dsRoot)
         .map((mdxPath) => {
             const content = fs.readFileSync(mdxPath, 'utf8');
             const figmaMeta = extractFigmaMeta(content);
@@ -121,8 +121,8 @@ function buildRowSetsFromMdx() {
             const figmaLinkMatch = content.match(FIGMA_LINK_RE);
             return {
                 mdxPath,
-                name: componentNameFromMdx(mdxPath),
-                group: groupFromMdxPath(mdxPath),
+                name: componentNameFromMdx(dsRoot, mdxPath),
+                group: groupFromMdxPath(dsRoot, mdxPath),
                 figmaMeta,
                 docsPageUrl: figmaLinkMatch ? figmaLinkMatch[1] : null,
             };
@@ -210,28 +210,61 @@ function toMarkdown(docsRows, variantRows, componentCount) {
     ].join('\n');
 }
 
-function main() {
-    const check = process.argv.includes('--check');
-    const { docsRows, variantRows, componentCount } = buildRowSetsFromMdx();
-    const md = toMarkdown(docsRows, variantRows, componentCount);
+/**
+ * The would-be bytes of the one generated artifact, rendered and not written.
+ *
+ * Same split as `scripts/generate-check-scripts.mjs`: rendering is one
+ * function, the comparison below is another, and the writing happens only in
+ * the CLI entry. A `--check` that regenerated its own target would answer "is
+ * the committed file stale?" with the bytes it had just written.
+ *
+ * @returns {{file: string, content: string}[]}
+ */
+export const artifacts = byRoot((repoRoot) => {
+    const { docsRows, variantRows, componentCount } = buildRowSetsFromMdx(DS_ROOT(repoRoot));
+    return [
+        {
+            file: OUT_MD,
+            content: toMarkdown(docsRows, variantRows, componentCount),
+            counts: { docs: docsRows.length, variants: variantRows.length },
+        },
+    ];
+});
 
-    if (check) {
-        const currentMd = fs.existsSync(OUT_MD) ? fs.readFileSync(OUT_MD, 'utf8') : '';
-        if (currentMd !== md) {
-            console.error('✗ component-figma-links.md is stale. Run `npm run generate:figma-links`.');
-            process.exit(1);
+/**
+ * The drift check. Reports and never writes.
+ *
+ * @returns {import('./lib/findings.mjs').Finding[]}
+ */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+    const found = [];
+    for (const { file, content } of artifacts(repoRoot)) {
+        const abs = path.join(repoRoot, file);
+        const current = fs.existsSync(abs) ? fs.readFileSync(abs, 'utf8') : '';
+        if (current !== content) {
+            found.push({ message: `${path.basename(file)} is stale. Run \`npm run generate:figma-links\`.` });
         }
-        console.log(
-            `✓ component-figma-links.md up to date (${docsRows.length} docs-page + ${variantRows.length} variant entries).`
-        );
-        return;
     }
-
-    fs.mkdirSync(FIGMA_DIR, { recursive: true });
-    fs.writeFileSync(OUT_MD, md);
-    console.log(
-        `Wrote ${docsRows.length} docs-page + ${variantRows.length} variant entries → ${path.relative(REPO_ROOT, OUT_MD)}`
-    );
+    return found;
 }
 
-main();
+/** The green line, which carries what the artifact was measured to hold. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+    const [{ file, counts }] = artifacts(repoRoot);
+    return `${path.basename(file)} up to date (${counts.docs} docs-page + ${counts.variants} variant entries).`;
+}
+
+if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
+    if (process.argv.includes('--check')) {
+        main(import.meta.url, 'check:figma-links', { run, summary });
+    } else {
+        // The write path, unchanged: the artifact is rewritten every run, because
+        // this half is the generator and not the guard.
+        const [{ file, content, counts }] = artifacts(REPO_ROOT);
+        fs.mkdirSync(FIGMA_DIR(REPO_ROOT), { recursive: true });
+        fs.writeFileSync(path.join(REPO_ROOT, file), content);
+        console.log(
+            `Wrote ${counts.docs} docs-page + ${counts.variants} variant entries → ${file}`
+        );
+    }
+}

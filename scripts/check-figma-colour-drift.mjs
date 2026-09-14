@@ -21,6 +21,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { cssColours, compare, failures } from './figma-colour-drift.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -28,6 +29,13 @@ const RECORDING = 'design-system/figma/colour-values.json';
 
 /** Half a year, matching check:figma-snapshots — this is refreshed the same way. */
 const MAX_AGE_DAYS = 180;
+
+/*
+ * A recording that compares almost nothing would pass everything. This is the
+ * same floor idea as check:figma-snapshots' MIN_VARIABLES, applied to the pairs
+ * that actually got compared rather than to the file's length.
+ */
+const MIN_COMPARED = 90;
 
 /**
  * The divergences that exist and are Bill's to resolve. Each says what both
@@ -47,49 +55,54 @@ const KNOWN = [
   },
 ];
 
-const recording = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, RECORDING), 'utf8'));
-const result = compare(recording, cssColours(REPO_ROOT));
+export const REMEDY =
+  '  -> A new divergence means one side moved and nothing followed. Decide which side\n' +
+  '     is right; do NOT add it to KNOWN to get the run green. KNOWN is for differences\n' +
+  '     somebody has looked at and chosen to leave, each with its reason.';
 
-const age = Math.floor((Date.now() - Date.parse(recording.measuredAt)) / 86400000);
-const found = failures(result, KNOWN);
-
-if (Number.isNaN(age)) {
-  found.push(`${RECORDING} has no readable measuredAt.`);
-} else if (age > MAX_AGE_DAYS) {
-  found.push(
-    `${RECORDING} is ${age} days old (ceiling ${MAX_AGE_DAYS}). A colour that has not been ` +
-      're-read from Figma this year cannot report drift.',
-  );
-}
-
-/*
- * A recording that compares almost nothing would pass everything. This is the
- * same floor idea as check:figma-snapshots' MIN_VARIABLES, applied to the pairs
- * that actually got compared rather than to the file's length.
+/**
+ * The recording, the comparison against the CSS, and how old the reading is.
+ * Both halves ask the same question of the same tree, so it is read once.
  */
-const MIN_COMPARED = 90;
-if (result.compared < MIN_COMPARED) {
-  found.push(
-    `only ${result.compared} variables mapped to a CSS token (floor ${MIN_COMPARED}). ` +
-      'Either the recording shrank or the naming convention moved under the mapping.',
-  );
+const inputs = byRoot((repoRoot) => {
+  const recording = JSON.parse(fs.readFileSync(path.join(repoRoot, RECORDING), 'utf8'));
+  const result = compare(recording, cssColours(repoRoot));
+  const age = Math.floor((Date.now() - Date.parse(recording.measuredAt)) / 86400000);
+  return { recording, result, age };
+});
+
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { result, age } = inputs(repoRoot);
+  const found = failures(result, KNOWN);
+
+  if (Number.isNaN(age)) {
+    found.push(`${RECORDING} has no readable measuredAt.`);
+  } else if (age > MAX_AGE_DAYS) {
+    found.push(
+      `${RECORDING} is ${age} days old (ceiling ${MAX_AGE_DAYS}). A colour that has not been ` +
+        're-read from Figma this year cannot report drift.',
+    );
+  }
+
+  if (result.compared < MIN_COMPARED) {
+    found.push(
+      `only ${result.compared} variables mapped to a CSS token (floor ${MIN_COMPARED}). ` +
+        'Either the recording shrank or the naming convention moved under the mapping.',
+    );
+  }
+
+  return found.map((message) => ({ message }));
 }
 
-if (found.length) {
-  console.error(`\n[figma-colour-drift] ${found.length} finding(s):`);
-  for (const f of found) console.error(`  ${f}`);
-  console.error(`\n${'─'.repeat(72)}`);
-  console.error(`✗ check:figma-colour-drift — ${result.compared} compared, ${age}d old\n`);
-  console.error(
-    '  -> A new divergence means one side moved and nothing followed. Decide which side\n' +
-      '     is right; do NOT add it to KNOWN to get the run green. KNOWN is for differences\n' +
-      '     somebody has looked at and chosen to leave, each with its reason.',
-  );
-  process.exit(1);
-}
-
-console.log(
-  `✓ check:figma-colour-drift — ${result.compared} colours compared against Figma ` +
+/** The green line, which carries what was compared and how old the reading is. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { recording, result, age } = inputs(repoRoot);
+  return (
+    `${result.compared} colours compared against Figma ` +
     `(${recording.measuredAt}, ${age}d), ${KNOWN.length} known divergence(s), ` +
-    `${result.unmapped.length} Figma-only`,
-);
+    `${result.unmapped.length} Figma-only`
+  );
+}
+
+main(import.meta.url, 'check:figma-colour-drift', { run, summary, remedy: REMEDY });

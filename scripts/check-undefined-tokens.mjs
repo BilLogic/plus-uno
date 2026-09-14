@@ -28,8 +28,9 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
+import { byRoot, main } from './lib/findings.mjs';
 import { audit, corpus, ratchetFailures } from './undefined-tokens.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -45,23 +46,63 @@ const BASELINE = 'docs/evals/undefined-token-baseline.json';
  */
 const MIN_FILES = 1300;
 
-const files = corpus(REPO_ROOT, ROOTS).map((rel) => ({
-  path: rel,
-  text: fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8'),
-}));
+export const REMEDY =
+  '  -> A bare `var(--x)` on a token that does not exist DROPS the declaration.\n' +
+  '     Point it at a real token. If a name genuinely went away, re-record with\n' +
+  `     \`npm run check:undefined-tokens -- --update\` — and only downward.`;
 
-const { undefinedTokens, interpolated, defined } = audit(files);
-const names = Object.keys(undefinedTokens);
-const uses = names.reduce((n, k) => n + undefinedTokens[k].uses, 0);
-const bare = names.reduce((n, k) => n + undefinedTokens[k].bare, 0);
+/**
+ * The corpus walk and the audit over it, once per repo root. `run` asks what is
+ * new, `summary` asks how big the recorded population is, and `--report` asks
+ * for all of it — three questions over one read of 1361 files.
+ */
+const inputs = byRoot((repoRoot) => {
+  const files = corpus(repoRoot, ROOTS).map((rel) => ({
+    path: rel,
+    text: fs.readFileSync(path.join(repoRoot, rel), 'utf8'),
+  }));
+  const { undefinedTokens, interpolated, defined } = audit(files);
+  const names = Object.keys(undefinedTokens);
+  const uses = names.reduce((n, k) => n + undefinedTokens[k].uses, 0);
+  const bare = names.reduce((n, k) => n + undefinedTokens[k].bare, 0);
+  return { files, undefinedTokens, interpolated, defined, names, uses, bare };
+});
 
-if (process.argv.includes('--update')) {
+const baselineOf = (repoRoot) => JSON.parse(fs.readFileSync(path.join(repoRoot, BASELINE), 'utf8'));
+
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { files, undefinedTokens } = inputs(repoRoot);
+  const found = ratchetFailures(undefinedTokens, baselineOf(repoRoot)).map((message) => ({ message }));
+
+  if (files.length < MIN_FILES) {
+    found.unshift({
+      message:
+        `${files.length} files searched, fewer than the ${MIN_FILES} this was measured over. ` +
+        `A walk that stopped matching reports no undefined tokens and reads as a fix.`,
+    });
+  }
+  return found;
+}
+
+/** The green line, which carries the whole recorded population so a drift is visible. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { files, names, uses, bare, defined } = inputs(repoRoot);
+  return (
+    `${names.length} undefined name(s) over ${uses} use(s) ` +
+    `(${bare} bare) in ${files.length} files, none new (${defined} tokens defined)`
+  );
+}
+
+/** `--update` rewrites the baseline. A write, which is why it is never inside `run`. */
+function update(repoRoot = REPO_ROOT) {
+  const { undefinedTokens, names, uses, bare } = inputs(repoRoot);
   const tokens = {};
   for (const name of names) {
     tokens[name] = { uses: undefinedTokens[name].uses, bare: undefinedTokens[name].bare };
   }
   fs.writeFileSync(
-    path.join(REPO_ROOT, BASELINE),
+    path.join(repoRoot, BASELINE),
     `${JSON.stringify(
       {
         note:
@@ -79,21 +120,11 @@ if (process.argv.includes('--update')) {
     )}\n`,
   );
   console.log(`[undefined-tokens] wrote ${BASELINE}: ${names.length} names, ${uses} uses, ${bare} bare.`);
-  process.exit(0);
 }
 
-const report = process.argv.includes('--report');
-const baseline = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, BASELINE), 'utf8'));
-const found = ratchetFailures(undefinedTokens, baseline);
-
-if (files.length < MIN_FILES) {
-  found.unshift(
-    `${files.length} files searched, fewer than the ${MIN_FILES} this was measured over. ` +
-      `A walk that stopped matching reports no undefined tokens and reads as a fix.`,
-  );
-}
-
-if (report) {
+/** `--report` prints the census rather than the ratchet, and passes either way. */
+function printReport(repoRoot = REPO_ROOT) {
+  const { undefinedTokens, interpolated, names, uses, bare } = inputs(repoRoot);
   console.log(`[undefined-tokens] ${names.length} name(s), ${uses} use(s), ${bare} bare:\n`);
   for (const name of names) {
     const entry = undefinedTokens[name];
@@ -105,26 +136,15 @@ if (report) {
   if (interpolated.length) {
     console.log(`\n  Not counted — produced by SCSS interpolation: ${interpolated.join(', ')}`);
   }
-  process.exit(0);
 }
 
-if (found.length) {
-  console.error(`\n[undefined-tokens] ${found.length} finding(s):`);
-  for (const f of found) console.error(`  ${f}`);
-  console.error(`\n${'─'.repeat(72)}`);
-  console.error(
-    `✗ check:undefined-tokens — ${names.length} name(s), ${uses} use(s), ${bare} bare, ` +
-      `over ${files.length} files\n`,
-  );
-  console.error(
-    '  -> A bare `var(--x)` on a token that does not exist DROPS the declaration.\n' +
-      '     Point it at a real token. If a name genuinely went away, re-record with\n' +
-      `     \`npm run check:undefined-tokens -- --update\` — and only downward.`,
-  );
-  process.exit(1);
-}
-
-console.log(
-  `✓ check:undefined-tokens — ${names.length} undefined name(s) over ${uses} use(s) ` +
-    `(${bare} bare) in ${files.length} files, none new (${defined} tokens defined)`,
-);
+// The side flags belong to the CLI and not to `run`: one of them writes a file.
+// Handled here, and only when this module IS the process — the harness runner
+// imports it and must get none of this.
+// The CLI is one branch or the other. A side flag prints (or writes) instead of
+// gating, so the gate does not also run; `main()` re-checks the entry guard for
+// itself, which is what keeps an import of this module reaching neither.
+const entry = process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url;
+if (entry && process.argv.includes('--update')) update();
+else if (entry && process.argv.includes('--report')) printReport();
+else main(import.meta.url, 'check:undefined-tokens', { run, summary, remedy: REMEDY });

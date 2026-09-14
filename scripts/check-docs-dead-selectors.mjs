@@ -70,6 +70,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { IGNORED_DIRS, documents } from './lib/corpus.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -79,7 +80,7 @@ const REPO_ROOT = path.resolve(__dirname, '..');
  * everything under `.storybook/` dresses the docs shell by construction, and a new
  * docs stylesheet dropped there is picked up without editing this file.
  */
-const DOCS_STYLE_DIR = path.join(REPO_ROOT, '.storybook');
+const docsStyleDir = (root = REPO_ROOT) => path.join(root, '.storybook');
 
 /** Where a class may be emitted from. Anything else is not a source of DOM. */
 const SOURCE_EXTENSIONS = ['.mdx', '.js', '.jsx', '.ts', '.tsx', '.html', '.json', '.scss', '.css'];
@@ -218,39 +219,20 @@ export function emitterIndex(texts) {
 
 // ── the CLI ─────────────────────────────────────────────────────────────────────────
 
-const cssFiles = (dir) =>
-  documents(`${path.relative(REPO_ROOT, dir)}/*.css`, { root: REPO_ROOT, ext: ['.css'] }).map((rel) =>
-    path.join(REPO_ROOT, rel),
+const cssFiles = (dir, repoRoot = REPO_ROOT) =>
+  documents(`${path.relative(repoRoot, dir)}/*.css`, { root: repoRoot, ext: ['.css'] }).map((rel) =>
+    path.join(repoRoot, rel),
   );
 
-function main() {
-  const files = cssFiles(DOCS_STYLE_DIR);
-
-  // A corpus that vanished is not a clean corpus. Same floor, same reason, as the
-  // sibling gate: a check over nothing passes over everything.
-  if (!files.length) {
-    console.error(
-      `[check:docs-dead-selectors] no .css under ${path.relative(REPO_ROOT, DOCS_STYLE_DIR)}.\n` +
-        '  -> The docs stylesheet moved. A check over nothing passes over everything.',
-    );
-    return process.exit(1);
-  }
-
-  const excluded = new Set(files);
-  const sources = sourceFiles(REPO_ROOT, { exclude: excluded });
-
-  // The other floor, and the one that matters more here: this check declares a class
-  // dead when it cannot FIND it. A source walk that silently returned twelve files
-  // would report the whole stylesheet dead, which is the failure mode that would get
-  // the check switched off rather than believed.
-  if (sources.length < 500) {
-    console.error(
-      `[check:docs-dead-selectors] walked ${sources.length} source files — expected at least 500.\n` +
-        '  -> The source walk broke. With no sources, every selector looks dead.',
-    );
-    return process.exit(1);
-  }
-
+/**
+ * The stylesheets, the sources they are checked against, and the membership
+ * test over them — read once per repo root, because the walk is the expensive
+ * half and both the findings and the green line stand on it.
+ */
+const inputs = byRoot((repoRoot) => {
+  const dir = docsStyleDir(repoRoot);
+  const files = cssFiles(dir, repoRoot);
+  const sources = sourceFiles(repoRoot, { exclude: new Set(files) });
   const texts = sources.map((f) => {
     try {
       return fs.readFileSync(f, 'utf8');
@@ -258,54 +240,87 @@ function main() {
       return '';
     }
   });
-  const isEmitted = emitterIndex(texts);
+  return { dir, files, sources, isEmitted: emitterIndex(texts) };
+});
 
-  if (process.argv.includes('--list')) {
-    console.log(`check:docs-dead-selectors reads ${files.length} docs stylesheet(s):\n`);
-    for (const f of files) {
-      const n = new Set(selectorClasses(fs.readFileSync(f, 'utf8')).map((c) => c.name)).size;
-      console.log(`  ${path.relative(REPO_ROOT, f).padEnd(46)} ${n} distinct classes in selector position`);
-    }
-    console.log(`\nagainst ${sources.length} source files, and ${VENDOR.size} vendor classes:\n`);
-    for (const [name, where] of VENDOR) console.log(`  ${name.padEnd(26)} ${where}`);
-    return process.exit(0);
+export const REMEDY =
+  '  -> Delete the rule: nothing in this repo puts that class in the DOM, so it has' +
+  '\n     never once applied. If the class is one Storybook or an addon emits, add it' +
+  "\n     to VENDOR in scripts/check-docs-dead-selectors.mjs with the package file it" +
+  '\n     comes from — verified, not assumed. If it is assembled from fragments in a' +
+  '\n     template literal, spell it out in the source instead; that is also what makes' +
+  '\n     it findable by the next person.';
+
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { dir, files, sources, isEmitted } = inputs(repoRoot);
+
+  // A corpus that vanished is not a clean corpus. Same floor, same reason, as the
+  // sibling gate: a check over nothing passes over everything.
+  if (!files.length) {
+    return [
+      {
+        message:
+          `no .css under ${path.relative(repoRoot, dir)}.\n` +
+          '  -> The docs stylesheet moved. A check over nothing passes over everything.',
+      },
+    ];
   }
 
-  const failures = [];
+  // The other floor, and the one that matters more here: this check declares a class
+  // dead when it cannot FIND it. A source walk that silently returned twelve files
+  // would report the whole stylesheet dead, which is the failure mode that would get
+  // the check switched off rather than believed.
+  if (sources.length < 500) {
+    return [
+      {
+        message:
+          `walked ${sources.length} source files — expected at least 500.\n` +
+          '  -> The source walk broke. With no sources, every selector looks dead.',
+      },
+    ];
+  }
+
+  const found = [];
   for (const file of files) {
     const classes = selectorClasses(fs.readFileSync(file, 'utf8'));
     for (const d of deadSelectors(classes, isEmitted)) {
-      failures.push({ file: path.relative(REPO_ROOT, file), ...d });
+      found.push({ file: path.relative(repoRoot, file), line: d.line, message: `.${d.name}` });
     }
   }
-
-  if (!failures.length) {
-    console.log(
-      `✓ check:docs-dead-selectors — ${files.length} docs stylesheet(s), every class in selector position is emitted by something`,
-    );
-    return process.exit(0);
-  }
-
-  console.error(
-    `[check:docs-dead-selectors] ${failures.length} class selector(s) nothing emits:\n`,
-  );
-  let current = '';
-  for (const f of failures) {
-    if (f.file !== current) {
-      console.error(`  ${f.file}`);
-      current = f.file;
-    }
-    console.error(`    :${String(f.line).padEnd(4)} .${f.name}`);
-  }
-  console.error(
-    '\n  -> Delete the rule: nothing in this repo puts that class in the DOM, so it has' +
-      '\n     never once applied. If the class is one Storybook or an addon emits, add it' +
-      "\n     to VENDOR in scripts/check-docs-dead-selectors.mjs with the package file it" +
-      '\n     comes from — verified, not assumed. If it is assembled from fragments in a' +
-      '\n     template literal, spell it out in the source instead; that is also what makes' +
-      '\n     it findable by the next person.',
-  );
-  process.exit(1);
+  return found;
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
+/** The green line, which carries the size of the corpus that was read. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { files } = inputs(repoRoot);
+  return `${files.length} docs stylesheet(s), every class in selector position is emitted by something`;
+}
+
+/**
+ * `--list` prints the corpus and asserts nothing, so it stays outside `run`:
+ * a check the runner imports may not write to stdout on its own account.
+ */
+function list(repoRoot = REPO_ROOT) {
+  const { files, sources } = inputs(repoRoot);
+  console.log(`check:docs-dead-selectors reads ${files.length} docs stylesheet(s):\n`);
+  for (const f of files) {
+    const n = new Set(selectorClasses(fs.readFileSync(f, 'utf8')).map((c) => c.name)).size;
+    console.log(`  ${path.relative(repoRoot, f).padEnd(46)} ${n} distinct classes in selector position`);
+  }
+  console.log(`\nagainst ${sources.length} source files, and ${VENDOR.size} vendor classes:\n`);
+  for (const [name, where] of VENDOR) console.log(`  ${name.padEnd(26)} ${where}`);
+}
+
+// The CLI is one branch or the other. A side flag prints (or writes) instead of
+// gating, so the gate does not also run; `main()` re-checks the entry guard for
+// itself, which is what keeps an import of this module reaching neither.
+if (
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) &&
+  process.argv.includes('--list')
+) {
+  list();
+} else {
+  main(import.meta.url, 'check:docs-dead-selectors', { run, summary, remedy: REMEDY });
+}

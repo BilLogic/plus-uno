@@ -99,6 +99,7 @@ import { fileURLToPath } from 'url';
 
 import { workerFiles, resolveBundled, unresolvedReport } from './lib/bundled-set.mjs';
 import { directories } from './lib/corpus.mjs';
+import { byRoot, renderFindings, report } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -333,75 +334,110 @@ const DISCOUNT_NOTE =
   `\n     (Structure — headings, fences, \`---\`, table rules, HTML comments, lines under` +
   `\n     ${SUBSTANCE_MIN_WORDS} words — is discounted, so every line above is prose that was written twice.)`;
 
-// ── CLI ──────────────────────────────────────────────────────────────────────
-// Guarded so the test file can import the analysis without running it.
-if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))) {
-  const skillScope = auditSkills();
+/**
+ * Three remedies in one paragraph, because the old failure path printed three —
+ * one per shape of failure, each already written here. `renderFindings` gives a
+ * check one remedy slot, and the reader who hit any of the three is owed all of
+ * the reasoning rather than whichever one a migration happened to keep.
+ */
+export const REMEDY =
+  '  -> A rule states itself once. Move it to the skill\'s references/method.md and let both' +
+  '\n     faces load it, or cut it from the face that only echoes it. What belongs where:' +
+  '\n     skills/README.md § Where content goes.' +
+  '\n  -> Every bundled doc is in the prompt on every turn, so a rule written twice is' +
+  '\n     paid for twice and drifts in two places. Keep it in the doc that OWNS it — the' +
+  '\n     constitution for a repo-wide rule, the persona for a voice rule, the method for a' +
+  '\n     procedure — and cite it from the other. A citation names the rule; it does not' +
+  '\n     restate it, which is why the other 200-odd pairs of these docs pass.' +
+  '\n  -> a skill is one method and two faces. skills/README.md § Where content goes.' +
+  DISCOUNT_NOTE;
+
+/**
+ * Both scopes, measured once per repo root.
+ *
+ * Both scopes are measured before either is reported. One run should say
+ * everything that is wrong — stopping at the skills means a second push to
+ * learn about the bundle, which is how a gate earns a reputation for wasting
+ * people's afternoons (`scripts/check-harness.mjs`, same rule). The bundled
+ * half also costs a whole bundler run, so `run` and `summary` share this one.
+ *
+ * The exception is a skill that is not three-part: the bundle is not measured
+ * at all then, because the shape has to be fixed before an overlap count over
+ * it means anything, and this reported the shape and stopped before the
+ * migration too.
+ */
+const measured = byRoot((repoRoot) => {
+  const skillScope = auditSkills(path.join(repoRoot, 'skills'));
+  if (skillScope.incomplete.length) return { skillScope, bundleScope: null };
+  return { skillScope, bundleScope: auditBundle() };
+});
+
+/** One shared line, as the person who has to fix it needs to read it. */
+const finding = (shared) => ({ message: cite(shared).replace(/^ {2}/, '') });
+
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { skillScope, bundleScope } = measured(repoRoot);
 
   if (skillScope.incomplete.length) {
-    console.error(
-      `[skill-overlap] ${skillScope.incomplete.length} skill(s) are not three-part:\n` +
-        skillScope.incomplete.map((m) => `  ${m}`).join('\n') +
-        '\n  -> a skill is one method and two faces. skills/README.md § Where content goes.',
-    );
-    process.exit(1);
+    return skillScope.incomplete.map((message) => ({ message }));
   }
 
-  // Both scopes are measured before either is reported. One run should say
-  // everything that is wrong — stopping at the skills means a second push to
-  // learn about the bundle, which is how a gate earns a reputation for wasting
-  // people's afternoons (`scripts/check-harness.mjs`, same rule).
-  const bundleScope = auditBundle();
-  const failed = [];
+  const found = [];
 
   // A short corpus is reported BEFORE any finding, because it changes what the
   // findings mean: zero overlaps across three docs is not the same claim as
   // zero across twenty-one, and until #234 the summary printed the same
   // sentence for both.
   if (bundleScope.missing.length) {
-    failed.push(unresolvedReport({ ...bundleScope, tag: 'skill-overlap' }));
+    found.push({ message: unresolvedReport({ ...bundleScope, tag: 'skill-overlap' }) });
   }
 
   if (skillScope.findings.length > MAX_SHARED_LINES) {
-    failed.push(
-      `[skill-overlap] ${skillScope.findings.length} substantive line(s) live in two faces of one skill:\n\n` +
-        skillScope.findings.map(cite).join('\n\n') +
-        '\n\n  -> A rule states itself once. Move it to the skill\'s references/method.md and let both' +
-        '\n     faces load it, or cut it from the face that only echoes it. What belongs where:' +
-        '\n     skills/README.md § Where content goes.' +
-        DISCOUNT_NOTE,
-    );
+    found.push(...skillScope.findings.map(finding));
   }
-
   if (bundleScope.findings.length > MAX_SHARED_LINES) {
-    failed.push(
-      `[skill-overlap] ${bundleScope.findings.length} substantive line(s) live in two bundled docs at once:\n\n` +
-        bundleScope.findings.map(cite).join('\n\n') +
-        '\n\n  -> Every bundled doc is in the prompt on every turn, so a rule written twice is' +
-        '\n     paid for twice and drifts in two places. Keep it in the doc that OWNS it — the' +
-        '\n     constitution for a repo-wide rule, the persona for a voice rule, the method for a' +
-        '\n     procedure — and cite it from the other. A citation names the rule; it does not' +
-        '\n     restate it, which is why the other 200-odd pairs of these docs pass.' +
-        DISCOUNT_NOTE,
-    );
+    found.push(...bundleScope.findings.map(finding));
   }
 
-  if (failed.length) {
-    console.error(failed.join(`\n\n${'─'.repeat(72)}\n\n`));
-    process.exit(1);
-  }
+  return found;
+}
 
-  const skillDiscounted = skillScope.rows.filter((r) => r.face).reduce((n, r) => n + r.discounted, 0);
-  console.log(
-    `[skill-overlap] ${skillScope.findings.length + bundleScope.findings.length} substantive shared ` +
-      `line(s) against a ceiling of ${MAX_SHARED_LINES}\n` +
-      `  within skills: ${skillScope.skills.length} skills, ${skillScope.pairings} pairings ` +
-      `(${skillDiscounted} structural lines discounted)\n` +
-      `  across the bundle: ${bundleScope.files.length} of ${bundleScope.declared} docs the bundler ` +
-      `declares, ${bundleScope.pairings} pairings ` +
-      `(${bundleScope.discounted} structural lines discounted)`,
+/**
+ * The green line. Both numbers, always: `N of M docs the bundler declares` is
+ * the only shape in which a narrowed corpus is visible to whoever reads it.
+ */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { skillScope, bundleScope } = measured(repoRoot);
+  const skillDiscounted = skillScope.rows
+    .filter((r) => r.face)
+    .reduce((n, r) => n + r.discounted, 0);
+  return (
+    `${skillScope.findings.length + bundleScope.findings.length} substantive shared ` +
+    `line(s) against a ceiling of ${MAX_SHARED_LINES}\n` +
+    `  within skills: ${skillScope.skills.length} skills, ${skillScope.pairings} pairings ` +
+    `(${skillDiscounted} structural lines discounted)\n` +
+    `  across the bundle: ${bundleScope.files.length} of ${bundleScope.declared} docs the bundler ` +
+    `declares, ${bundleScope.pairings} pairings ` +
+    `(${bundleScope.discounted} structural lines discounted)`
   );
+}
+
+// ── CLI ──────────────────────────────────────────────────────────────────────
+// Guarded so the test file can import the analysis without running it.
+//
+// `main()` from the findings module is not used here for one reason: `--verbose`
+// lists what was discounted AFTER the green line, and `main` exits inside
+// itself. The failing path still goes through `report`, so which stream and
+// which exit code remain decisions this file does not make.
+if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))) {
+  const found = run();
+  if (found.length) report('check:skill-overlap', found, { remedy: REMEDY });
+
+  console.log(renderFindings('check:skill-overlap', found, { summary: summary() }));
+
   if (process.argv.includes('--verbose')) {
+    const { skillScope, bundleScope } = measured(REPO_ROOT);
     for (const r of skillScope.rows.filter((x) => x.pair)) {
       console.log(`  ${r.skill.padEnd(16)} ${r.pair.padEnd(16)} ${r.substantive}`);
     }

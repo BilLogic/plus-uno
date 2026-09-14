@@ -24,18 +24,12 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { REPO_ROOT, edgeUses, failures, stylesheets } from './intent-roles.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 const BASELINE = 'docs/evals/intent-role-adoption.json';
 const ROLES_FILE = 'design-system/src/tokens/_color_roles.scss';
-
-const baseline = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, BASELINE), 'utf8'));
-const files = stylesheets();
-const uses = edgeUses(files);
-
-const found = [];
 
 /*
  * An empty corpus agrees with everything. The floor is the number of
@@ -43,48 +37,72 @@ const found = [];
  * would otherwise read as a clean sweep.
  */
 const MIN_FILES = 150;
-if (files.length < MIN_FILES) {
-  found.push(
-    `only ${files.length} stylesheets scanned (floor ${MIN_FILES}). ` +
-      'A corpus that shrank silently reports every remaining use as fixed.',
+
+const INTENTS = ['primary', 'secondary', 'tertiary', 'danger', 'success', 'warning', 'info'];
+
+export const REMEDY =
+  '  -> An intent colour on an edge names the role: `var(--color-danger-border)`,\n' +
+  `     not \`var(--color-danger)\`. The roles are defined in ${ROLES_FILE}.\n` +
+  `     If a call site genuinely needs the base, record it in ${BASELINE} with a reason.`;
+
+// The baseline, the corpus walk, the edge uses and the roles file are the same
+// read for both questions, so they happen once per root.
+const inputs = byRoot((repoRoot) => {
+  const files = stylesheets(repoRoot);
+  return {
+    baseline: JSON.parse(fs.readFileSync(path.join(repoRoot, BASELINE), 'utf8')),
+    files,
+    uses: edgeUses(files),
+    roles: fs.readFileSync(path.join(repoRoot, ROLES_FILE), 'utf8'),
+  };
+});
+
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { baseline, files, uses, roles } = inputs(repoRoot);
+  const found = [];
+
+  if (files.length < MIN_FILES) {
+    found.push({
+      message:
+        `only ${files.length} stylesheets scanned (floor ${MIN_FILES}). ` +
+        'A corpus that shrank silently reports every remaining use as fixed.',
+    });
+  }
+
+  /*
+   * The roles must EXIST. If `_color_roles.scss` were regenerated away — the
+   * thing its own header warns about — every migrated call site would resolve to
+   * nothing, and this check would still pass, because it counts base uses.
+   */
+  for (const intent of INTENTS) {
+    if (!roles.includes(`--color-${intent}-border:`)) {
+      found.push({
+        message: `${ROLES_FILE} no longer defines --color-${intent}-border, which ${uses.length ? 'call sites' : 'the migration'} depend on.`,
+      });
+    }
+  }
+
+  for (const [file, entry] of Object.entries(baseline.files ?? {})) {
+    if (!entry.why || entry.why.length < 40) {
+      found.push({
+        message: `${file} is baselined without a reason. Say why the base is still right there, or migrate it.`,
+      });
+    }
+  }
+
+  found.push(...failures(uses, baseline.files ?? {}).map((message) => ({ message })));
+  return found;
+}
+
+/** The green line, which carries the remainder and what the baseline records. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { baseline, files, uses } = inputs(repoRoot);
+  const remaining = uses.length;
+  return (
+    `${files.length} stylesheets, ${remaining} edge use(s) of an intent base remain, ` +
+    `all recorded (${baseline.migrated} migrated ${baseline.recordedAt})`
   );
 }
 
-/*
- * The roles must EXIST. If `_color_roles.scss` were regenerated away — the
- * thing its own header warns about — every migrated call site would resolve to
- * nothing, and this check would still pass, because it counts base uses.
- */
-const roles = fs.readFileSync(path.join(REPO_ROOT, ROLES_FILE), 'utf8');
-for (const intent of ['primary', 'secondary', 'tertiary', 'danger', 'success', 'warning', 'info']) {
-  if (!roles.includes(`--color-${intent}-border:`)) {
-    found.push(`${ROLES_FILE} no longer defines --color-${intent}-border, which ${uses.length ? 'call sites' : 'the migration'} depend on.`);
-  }
-}
-
-for (const [file, entry] of Object.entries(baseline.files ?? {})) {
-  if (!entry.why || entry.why.length < 40) {
-    found.push(`${file} is baselined without a reason. Say why the base is still right there, or migrate it.`);
-  }
-}
-
-found.push(...failures(uses, baseline.files ?? {}));
-
-if (found.length) {
-  console.error(`\n[intent-roles] ${found.length} finding(s):`);
-  for (const f of found) console.error(`  ${f}`);
-  console.error(`\n${'─'.repeat(72)}`);
-  console.error('✗ check:intent-roles\n');
-  console.error(
-    '  -> An intent colour on an edge names the role: `var(--color-danger-border)`,\n' +
-      `     not \`var(--color-danger)\`. The roles are defined in ${ROLES_FILE}.\n` +
-      `     If a call site genuinely needs the base, record it in ${BASELINE} with a reason.`,
-  );
-  process.exit(1);
-}
-
-const remaining = uses.length;
-console.log(
-  `✓ check:intent-roles — ${files.length} stylesheets, ${remaining} edge use(s) of an intent base remain, ` +
-    `all recorded (${baseline.migrated} migrated ${baseline.recordedAt})`,
-);
+main(import.meta.url, 'check:intent-roles', { run, summary, remedy: REMEDY });

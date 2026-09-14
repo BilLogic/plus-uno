@@ -63,6 +63,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { directories, documents } from './lib/corpus.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 import {
   DOM_EVENTS,
@@ -83,21 +84,18 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const DS_SRC = path.join(REPO_ROOT, 'design-system/src');
-const GUIDELINES = path.join(REPO_ROOT, 'design-system/guidelines');
+const dsSrc = (root = REPO_ROOT) => path.join(root, 'design-system/src');
+const guidelines = (root = REPO_ROOT) => path.join(root, 'design-system/guidelines');
 
-const REPORT = process.argv.includes('--report');
-const STATS = process.argv.includes('--stats');
-
-const rel = (p) => path.relative(REPO_ROOT, p).replace(/\\/g, '/');
+const rel = (p, root = REPO_ROOT) => path.relative(root, p).replace(/\\/g, '/');
 const read = (p) => fs.readFileSync(p, 'utf8');
 const readIf = (p) => (fs.existsSync(p) ? read(p) : '');
 
 /** Files under `dir` whose basename passes `test`, absolute. */
-const walk = (dir, test) =>
-  documents(path.relative(REPO_ROOT, dir), { root: REPO_ROOT, ext: null })
+const walk = (dir, test, root = REPO_ROOT) =>
+  documents(path.relative(root, dir), { root, ext: null })
     .filter((rel) => test(path.basename(rel)))
-    .map((rel) => path.join(REPO_ROOT, rel));
+    .map((rel) => path.join(root, rel));
 
 /* ---------------------------------------------------------- source truth */
 
@@ -106,10 +104,10 @@ const walk = (dir, test) =>
  * Deliberately wide: a token declared in a component's own SCSS is as real as
  * one in tokens/, and treating it as fabricated would be a false alarm.
  */
-function collectTokens() {
+function collectTokens(repoRoot = REPO_ROOT) {
   const set = new Set();
-  for (const root of [path.join(REPO_ROOT, 'design-system'), path.join(REPO_ROOT, 'src')]) {
-    for (const file of walk(root, (n) => /\.(scss|css|sass)$/.test(n))) {
+  for (const root of [path.join(repoRoot, 'design-system'), path.join(repoRoot, 'src')]) {
+    for (const file of walk(root, (n) => /\.(scss|css|sass)$/.test(n), repoRoot)) {
       for (const t of definedTokens(read(file))) set.add(t);
     }
   }
@@ -125,11 +123,11 @@ function collectTokens() {
  * an example as `<ListGroup.Item>` — indexing only file-named symbols made
  * `selectable="single"` look fabricated when it is `ListGroupItem`'s own prop.
  */
-function collectComponents() {
+function collectComponents(repoRoot = REPO_ROOT) {
   const index = new Map();
-  const roots = ['components', 'dataviz', 'patterns', 'specs', 'assets'].map((d) => path.join(DS_SRC, d));
+  const roots = ['components', 'dataviz', 'patterns', 'specs', 'assets'].map((d) => path.join(dsSrc(repoRoot), d));
   const files = roots.flatMap((root) =>
-    walk(root, (n) => n.endsWith('.jsx') && !/\.(stories|test)\.jsx$/.test(n)),
+    walk(root, (n) => n.endsWith('.jsx') && !/\.(stories|test)\.jsx$/.test(n), repoRoot),
   );
 
   for (const file of files) {
@@ -170,10 +168,10 @@ function collectComponents() {
  */
 const GENERATED_HEADER = '<!-- DO NOT EDIT BY HAND.';
 
-function collectPages(components) {
+function collectPages(components, repoRoot = REPO_ROOT) {
   const pages = [];
 
-  for (const file of walk(DS_SRC, (n) => n.endsWith('.mdx'))) {
+  for (const file of walk(dsSrc(repoRoot), (n) => n.endsWith('.mdx'), repoRoot)) {
     const name = path.basename(file, '.mdx');
     const dir = path.dirname(file);
     const component = components.get(name);
@@ -186,7 +184,7 @@ function collectPages(components) {
     });
   }
 
-  for (const file of walk(GUIDELINES, (n) => n.endsWith('.md'))) {
+  for (const file of walk(guidelines(repoRoot), (n) => n.endsWith('.md'), repoRoot)) {
     const text = read(file);
     if (text.startsWith(GENERATED_HEADER)) continue;
     pages.push({ file, text, component: null, sourceText: '' });
@@ -237,9 +235,9 @@ const isPassThrough = (attr) =>
   DOM_EVENTS.has(attr) ||
   attr.startsWith('...');
 
-function check() {
-  const tokens = collectTokens();
-  const components = collectComponents();
+function check(repoRoot = REPO_ROOT) {
+  const tokens = collectTokens(repoRoot);
+  const components = collectComponents(repoRoot);
 
   const allProps = new Set();
   const allEnumValues = new Set();
@@ -255,7 +253,7 @@ function check() {
   // `forms-and-inputs`, `layout-and-structure` — the group a page belongs to is
   // a real name in this repo, spelled exactly like a kebab-case enum value.
   const folderNames = new Set();
-  for (const root of [DS_SRC, GUIDELINES]) {
+  for (const root of [dsSrc(repoRoot), guidelines(repoRoot)]) {
     for (const dir of directories('.', { root })) folderNames.add(path.basename(dir));
   }
 
@@ -274,14 +272,14 @@ function check() {
   }
 
   const cssClasses = new Set();
-  for (const file of walk(path.join(REPO_ROOT, 'design-system'), (n) => /\.(scss|css)$/.test(n))) {
+  for (const file of walk(path.join(repoRoot, 'design-system'), (n) => /\.(scss|css)$/.test(n), repoRoot)) {
     for (const m of read(file).matchAll(/\.([a-z][a-z0-9]*(?:-{1,2}[a-z0-9]+)+)/g)) cssClasses.add(m[1]);
   }
 
-  const pages = collectPages(components);
+  const pages = collectPages(components, repoRoot);
   const findings = [];
   const record = (page, line, kind, identifier, message) =>
-    findings.push({ file: rel(page.file), line, kind, identifier, message });
+    findings.push({ file: rel(page.file, repoRoot), line, kind, identifier, message });
 
   for (const page of pages) {
     /* ---- tokens: every page, every position ---- */
@@ -313,7 +311,7 @@ function check() {
         if (isPassThrough(attr.name)) continue;
         if (!target.props.has(attr.name)) {
           record(page, el.line, 'prop', `<${el.tag} ${attr.name}=…>`,
-            `${attr.name} is not a prop of ${el.tag} (${rel(target.file)})`);
+            `${attr.name} is not a prop of ${el.tag} (${rel(target.file, repoRoot)})`);
           continue;
         }
         const enumValues = target.props.get(attr.name);
@@ -398,53 +396,83 @@ const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /* --------------------------------------------------------------- reporting */
 
-const { findings, pages, tokens, components } = check();
+/** One walk of the corpus per repo root: the findings and the green line share it. */
+const inputs = byRoot((repoRoot) => check(repoRoot));
 
-if (STATS) {
-  console.log(`pages         ${pages.length} (${pages.filter((p) => p.component).length} with a component context)`);
-  console.log(`components    ${components.size}`);
-  console.log(`tokens        ${tokens.size}`);
-  console.log(`findings      ${findings.length}`);
+export const REMEDY =
+  '  -> Each line above names the page, the line and the identifier that has no' +
+  '\n     referent. Fix the page to use the real name, or add the missing prop,' +
+  '\n     token or variant to the source the page is describing.';
+
+/**
+ * Each finding names a page, a line and the identifier that resolves to
+ * nothing; the identifier and the sentence about it were two printed lines and
+ * are now one, so the location can sit in the column the renderer owns.
+ *
+ * @returns {import('./lib/findings.mjs').Finding[]}
+ */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  return inputs(repoRoot).findings.map((f) => ({
+    file: f.file,
+    line: f.line,
+    message: `${f.identifier} ${f.message}`,
+  }));
 }
 
-const byKind = findings.reduce((acc, f) => ({ ...acc, [f.kind]: (acc[f.kind] ?? 0) + 1 }), {});
-
-if (!findings.length) {
-  console.log(
-    `✓ check:doc-identifiers — every name in ${pages.length} docs pages resolves ` +
-      `(${tokens.size} tokens, ${components.size} components)`,
+/** The green line, which carries the corpus and vocabulary sizes it stands on. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { pages, tokens, components } = inputs(repoRoot);
+  return (
+    `every name in ${pages.length} docs pages resolves ` +
+    `(${tokens.size} tokens, ${components.size} components)`
   );
-  process.exit(0);
 }
 
-const grouped = new Map();
-for (const f of findings) {
-  if (!grouped.has(f.file)) grouped.set(f.file, []);
-  grouped.get(f.file).push(f);
+/**
+ * `--report` and `--stats` print and assert nothing, so they stay out of `run`
+ * and keep the layout they had: `--report` groups by page, which is how a
+ * person reads a sweep of a corpus this size.
+ */
+function reportFindings(findings, out) {
+  const grouped = new Map();
+  for (const f of findings) {
+    if (!grouped.has(f.file)) grouped.set(f.file, []);
+    grouped.get(f.file).push(f);
+  }
+  for (const [file, list] of [...grouped].sort()) {
+    out(`\n${file}`);
+    for (const f of list.sort((a, b) => a.line - b.line)) {
+      out(`  ${String(f.line).padStart(4)}  ${f.kind.padEnd(8)} ${f.identifier}`);
+      out(`        ${f.message}`);
+    }
+  }
+  const byKind = findings.reduce((acc, f) => ({ ...acc, [f.kind]: (acc[f.kind] ?? 0) + 1 }), {});
+  return (
+    `${findings.length} unresolved name(s) across ${grouped.size} page(s) — ` +
+    Object.entries(byKind).map(([k, n]) => `${n} ${k}`).join(', ')
+  );
 }
 
-const out = REPORT ? console.log : console.error;
-for (const [file, list] of [...grouped].sort()) {
-  out(`\n${file}`);
-  for (const f of list.sort((a, b) => a.line - b.line)) {
-    out(`  ${String(f.line).padStart(4)}  ${f.kind.padEnd(8)} ${f.identifier}`);
-    out(`        ${f.message}`);
+// The CLI is one branch or the other. `--report` prints the findings and passes
+// whatever they say, so the gate does not also run; `main()` re-checks the entry
+// guard for itself, which keeps an import of this module reaching neither.
+let reported = false;
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const { findings, pages, tokens, components } = inputs();
+
+  if (process.argv.includes('--stats')) {
+    console.log(`pages         ${pages.length} (${pages.filter((p) => p.component).length} with a component context)`);
+    console.log(`components    ${components.size}`);
+    console.log(`tokens        ${tokens.size}`);
+    console.log(`findings      ${findings.length}`);
+  }
+
+  // `--report` is the read-only half: same findings, exit 0 whatever they say —
+  // which is why it takes the branch the gate does not.
+  if (process.argv.includes('--report') && findings.length) {
+    console.log(`\n${reportFindings(findings, console.log)}`);
+    reported = true;
   }
 }
 
-const summary =
-  `${findings.length} unresolved name(s) across ${grouped.size} page(s) — ` +
-  Object.entries(byKind).map(([k, n]) => `${n} ${k}`).join(', ');
-
-if (REPORT) {
-  console.log(`\n${summary}`);
-  process.exit(0);
-}
-
-console.error(
-  `\n${'─'.repeat(72)}\n✗ check:doc-identifiers — ${summary}` +
-    '\n\n  -> Each line above names the page, the line and the identifier that has no' +
-    '\n     referent. Fix the page to use the real name, or add the missing prop,' +
-    '\n     token or variant to the source the page is describing.',
-);
-process.exit(1);
+if (!reported) main(import.meta.url, 'check:doc-identifiers', { run, summary, remedy: REMEDY });

@@ -27,6 +27,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { documents } from './lib/corpus.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 import {
   TABBED_EXCEPTIONS,
@@ -279,12 +280,30 @@ export function checkFile(file, source, tabbed = isTabbedDocsPage(file)) {
   return found;
 }
 
-function main() {
-  const files = allMdx();
-  const tabbed = files.filter((f) => isTabbedDocsPage(f));
-  const found = files.flatMap((f) =>
-    checkFile(f, fs.readFileSync(path.join(REPO_ROOT, f), 'utf8')),
-  );
+/** The two questions below read the same tree, so the walk happens once. */
+const inputs = byRoot((repoRoot) => {
+  const files = allMdx(repoRoot);
+  return {
+    files,
+    tabbed: files.filter((f) => isTabbedDocsPage(f)),
+    found: files.flatMap((f) => checkFile(f, fs.readFileSync(path.join(repoRoot, f), 'utf8'))),
+  };
+});
+
+/**
+ * `checkFile` writes each finding as `<page>: <what is wrong>`, so the path
+ * comes out of the sentence and into the column every migrated check reports
+ * locations in. The population finding below names no file and stays as written.
+ */
+const LOCATED = /^([\w./-]+\.mdx): ([\s\S]*)$/;
+
+export const REMEDY =
+  '  -> The tag is the tab. See docs/adr/025 and design-system/src/storybook-docs/docs-tabs.jsx.';
+
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { tabbed, found } = inputs(repoRoot);
+  const all = [...found];
 
   // The population itself, so a selector that quietly stops matching is loud
   // rather than green. 52 components + the one named exception — Tag and
@@ -298,29 +317,26 @@ function main() {
   // wanted: the new Badge sits BESIDE the old one rather than replacing it, so
   // both are visible in one group while the deprecation runs.
   if (tabbed.length !== 53) {
-    found.push(
+    all.push(
       `expected 53 tabbed docs pages (52 components + ${TABBED_EXCEPTIONS.length} named ` +
         `exception), found ${tabbed.length}. If a component was added or removed, ` +
         `update this number deliberately.`,
     );
   }
 
-  if (found.length) {
-    console.error(`[docs-tabs] ${found.length} finding(s):`);
-    for (const f of found) console.error(`  ${f}`);
-    console.error(
-      '\n  -> The tag is the tab. See docs/adr/025 and design-system/src/storybook-docs/docs-tabs.jsx.',
-    );
-    return 1;
-  }
+  return all.map((sentence) => {
+    const located = LOCATED.exec(sentence);
+    return located ? { file: located[1], message: located[2] } : { message: sentence };
+  });
+}
 
-  console.log(
-    `[docs-tabs] ${tabbed.length} tabbed docs page(s) of ${files.length} MDX page(s); ` +
-      `every section sits in the tab its heading assigns it.`,
+/** The green line, which carries the size of the population that was read. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { files, tabbed } = inputs(repoRoot);
+  return (
+    `${tabbed.length} tabbed docs page(s) of ${files.length} MDX page(s); ` +
+    `every section sits in the tab its heading assigns it.`
   );
-  return 0;
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  process.exit(main());
-}
+main(import.meta.url, 'check:docs-tabs', { run, summary, remedy: REMEDY });

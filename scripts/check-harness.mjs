@@ -58,11 +58,14 @@
  * `scripts/check-harness.test.mjs` — the single gate was the last untested
  * script here.
  *
- * A CHECK MAY RETURN FINDINGS INSTEAD OF EXITING. A registry row carrying a
+ * A CHECK RETURNS FINDINGS INSTEAD OF EXITING (#509). A registry row carrying a
  * `module` exports `run(ctx) => Finding[]`; this runner calls it in-process and
- * renders one banner (`scripts/lib/findings.mjs`). Legacy checks are spawned
- * and read by exit code exactly as before — 45 of the 46 still are, and #509 is
- * the migration.
+ * renders one banner (`scripts/lib/findings.mjs`). The rows that cannot answer
+ * that interface — a browser suite, `tsc`, a test runner, the seven-generator
+ * composite `check:agent` — declare `kind: 'spawn'` and the reason, and are run
+ * as `npm run <name>` and read by exit code. Those are the only two kinds:
+ * "legacy" was a row that declared nothing and got spawned on a guess, and it
+ * no longer exists.
  *
  * IT GUARDS ITS OWN COMPLETENESS. Every `check:*` script in either package.json
  * must be either registered or listed in `EXCLUDED` with a reason. A new check

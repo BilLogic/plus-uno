@@ -53,14 +53,21 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { documents } from './lib/corpus.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 import { TOKEN_NAME } from '../design-system/src/lib/tokens.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const SCAN_ROOT = path.join(REPO_ROOT, 'design-system', 'src');
+/**
+ * The only corpus this reads. Nothing outside `design-system/src`: prototypes
+ * are not the source of truth, and a prototype's stylesheet going red would
+ * teach people to pass `--allow`. A function of the root rather than a constant,
+ * so `run` can be pointed at a fixture tree.
+ */
+const scanRoot = (repoRoot) => path.join(repoRoot, 'design-system', 'src');
 
 /** Properties that paint the box behind the text. */
 const BACKGROUND_PROPS = new Set(['background', 'background-color']);
@@ -366,61 +373,80 @@ function overridden({ bg, fg, foregrounds }) {
   });
 }
 
-const scssFiles = (dir) =>
-  documents(path.relative(REPO_ROOT, dir), { root: REPO_ROOT, ext: ['.scss'] }).map((rel) =>
-    path.join(REPO_ROOT, rel),
+
+const scssFiles = (repoRoot) =>
+  documents(path.relative(repoRoot, scanRoot(repoRoot)), { root: repoRoot, ext: ['.scss'] }).map((rel) =>
+    path.join(repoRoot, rel),
   );
 
-function main() {
-  const files = scssFiles(SCAN_ROOT);
+/**
+ * The walk and the pairs it survives, once per repo root. `run` asks which
+ * pairs survive and `summary` asks how many stylesheets were read to find out,
+ * and the answer to both is one parse of 162 stylesheets.
+ */
+const inputs = byRoot((repoRoot) => {
+  const files = scssFiles(repoRoot);
+  const pairs = [];
+  for (const file of files) {
+    for (const { bg, fg } of collisions(fs.readFileSync(file, 'utf8'))) {
+      pairs.push({ file: path.relative(repoRoot, file), bg, fg });
+    }
+  }
+  return { files, pairs };
+});
+
+export const REMEDY =
+  '  -> Give the foreground the token that pairs with that background — the `on-*`' +
+  '\n     role for it — scoped to the variant that paints it. Spell out `:hover`,' +
+  '\n     `:focus` and `.active` in the override: at equal specificity the cascade' +
+  '\n     goes to source order, and so does this check.';
+
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { files, pairs } = inputs(repoRoot);
 
   // A corpus that vanished is not a clean corpus. If SCAN_ROOT is renamed or moved,
   // every walk below returns nothing, every assertion holds vacuously, and this exits
   // 0 having examined no files at all. check-storybook.mjs took the same floor for the
   // same reason. The number is a floor, not a target — raise it only when it bites.
   if (files.length < 100) {
-    console.error(
-      `[check:token-collision] found ${files.length} file(s) under ${path.relative(REPO_ROOT, SCAN_ROOT)} — expected at least 100.\n` +
-        '  -> The corpus moved or the walk broke. A check over nothing passes over everything.',
-    );
-    return 1;
+    return [
+      {
+        message:
+          `found ${files.length} file(s) under ${path.relative(repoRoot, scanRoot(repoRoot))} — expected at least 100.\n` +
+          '  -> The corpus moved or the walk broke. A check over nothing passes over everything.',
+      },
+    ];
   }
 
-  if (process.argv.includes('--list')) {
-    console.log(`check:token-collision reads ${files.length} stylesheets under design-system/src:\n`);
-    for (const f of files) console.log(`  ${path.relative(REPO_ROOT, f)}`);
-    process.exit(0);
-  }
-
-  const failures = [];
-  for (const file of files) {
-    for (const { bg, fg } of collisions(fs.readFileSync(file, 'utf8'))) {
-      failures.push({ file: path.relative(REPO_ROOT, file), bg, fg });
-    }
-  }
-
-  if (!failures.length) {
-    console.log(
-      `✓ check:token-collision — ${files.length} stylesheets, no foreground token equal to the background beneath it`,
-    );
-    process.exit(0);
-  }
-
-  console.error(
-    `[check:token-collision] ${failures.length} foreground/background pair(s) share one token — 1.00:1, invisible text:\n`,
-  );
-  for (const { file, bg, fg } of failures) {
-    console.error(`  ${file}`);
-    console.error(`    ${bg.selector}  { ${bg.prop}: var(${bg.token}) }   :${bg.line}`);
-    console.error(`    ${fg.selector}  { color: var(${fg.token}) }   :${fg.line}`);
-  }
-  console.error(
-    '\n  -> Give the foreground the token that pairs with that background — the `on-*`' +
-      '\n     role for it — scoped to the variant that paints it. Spell out `:hover`,' +
-      '\n     `:focus` and `.active` in the override: at equal specificity the cascade' +
-      '\n     goes to source order, and so does this check.',
-  );
-  process.exit(1);
+  // One finding per surviving pair, with the file lifted into the location
+  // column and both declarations kept as written — the pair IS the finding, and
+  // reading it means seeing the background and the foreground together.
+  return pairs.map(({ file, bg, fg }) => ({
+    file,
+    message:
+      `${bg.selector}  { ${bg.prop}: var(${bg.token}) }   :${bg.line}\n` +
+      `    ${fg.selector}  { color: var(${fg.token}) }   :${fg.line}`,
+  }));
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
+/** The green line, which carries the size of the corpus the floor above guards. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  return `${inputs(repoRoot).files.length} stylesheets, no foreground token equal to the background beneath it`;
+}
+
+// `--list` prints what was scanned and gates nothing, so it belongs to the CLI.
+// The CLI is one branch or the other. A side flag prints (or writes) instead of
+// gating, so the gate does not also run; `main()` re-checks the entry guard for
+// itself, which is what keeps an import of this module reaching neither.
+if (
+  process.argv[1] &&
+  pathToFileURL(process.argv[1]).href === import.meta.url &&
+  process.argv.includes('--list')
+) {
+  const { files } = inputs(REPO_ROOT);
+  console.log(`check:token-collision reads ${files.length} stylesheets under design-system/src:\n`);
+  for (const f of files) console.log(`  ${path.relative(REPO_ROOT, f)}`);
+} else {
+  main(import.meta.url, 'check:token-collision', { run, summary, remedy: REMEDY });
+}

@@ -23,16 +23,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { NON_TEXT, REPO_ROOT, colours, failures, focusRules, indicators, stylesheets } from './focus-ring.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 const RECORD = 'docs/evals/focus-ring.json';
 const ROLES_FILE = 'design-system/src/tokens/_color_roles.scss';
-
-const record = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, RECORD), 'utf8'));
-const files = stylesheets();
-const values = colours();
-const rules = indicators(focusRules(files), values);
-
-const found = [];
 
 /*
  * Floors. A resolver that stopped finding stylesheets, or a selector scan that
@@ -41,43 +35,66 @@ const found = [];
  */
 const MIN_FILES = 150;
 const MIN_RULES = 60;
-if (files.length < MIN_FILES) found.push(`only ${files.length} stylesheets scanned (floor ${MIN_FILES}).`);
-if (rules.length < MIN_RULES) {
-  found.push(
-    `only ${rules.length} focus rules found (floor ${MIN_RULES}). ` +
-      'A scan that stopped recognising focus selectors reports every ring as fine.',
+
+export const REMEDY =
+  `  -> A focus indicator is held to ${NON_TEXT}:1 against what it sits on (WCAG 1.4.11),\n` +
+  '     and it is the only thing telling a keyboard user where they are. Use\n' +
+  '     `var(--color-focus-ring)` — 5.02:1 on the page — rather than a state tint or\n' +
+  '     an inverse colour meant for dark grounds.';
+
+// The sweep — the corpus walk, the token values, the measured rules and the
+// record — is the same for both questions, so it happens once per root.
+const inputs = byRoot((repoRoot) => {
+  const files = stylesheets(repoRoot);
+  const values = colours(repoRoot);
+  return {
+    record: JSON.parse(fs.readFileSync(path.join(repoRoot, RECORD), 'utf8')),
+    files,
+    rules: indicators(focusRules(files, repoRoot), values),
+    roles: fs.readFileSync(path.join(repoRoot, ROLES_FILE), 'utf8'),
+  };
+});
+
+/** @returns {import('./lib/findings.mjs').Finding[]} */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const { record, files, rules, roles } = inputs(repoRoot);
+  const found = [];
+
+  if (files.length < MIN_FILES) {
+    found.push({ message: `only ${files.length} stylesheets scanned (floor ${MIN_FILES}).` });
+  }
+  if (rules.length < MIN_RULES) {
+    found.push({
+      message:
+        `only ${rules.length} focus rules found (floor ${MIN_RULES}). ` +
+        'A scan that stopped recognising focus selectors reports every ring as fine.',
+    });
+  }
+
+  /*
+   * The role must exist. 29 call sites resolve through it, and a `var()` naming a
+   * token nobody defines paints NOTHING — `border-color` falls back to
+   * currentColor, `box-shadow` to no shadow at all. That failure is invisible to
+   * a check that measures token VALUES, so it is asserted directly.
+   */
+  if (!/--color-focus-ring:/.test(roles)) {
+    found.push({
+      message: `${ROLES_FILE} no longer defines --color-focus-ring, which every fixed focus rule resolves through.`,
+    });
+  }
+
+  found.push(...failures(rules, record.exceptions ?? {}).map((message) => ({ message })));
+  return found;
+}
+
+/** The green line, which carries the narrowest ring the sweep measured. */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const { rules } = inputs(repoRoot);
+  const worst = rules.reduce((low, entry) => (entry.best.ratio < low.best.ratio ? entry : low), rules[0]);
+  return (
+    `${rules.length} focus rules, all at or above ${NON_TEXT}:1 ` +
+    `(worst ${worst.best.ratio.toFixed(2)}:1, ${worst.best.token} in ${path.basename(worst.file)})`
   );
 }
 
-/*
- * The role must exist. 29 call sites resolve through it, and a `var()` naming a
- * token nobody defines paints NOTHING — `border-color` falls back to
- * currentColor, `box-shadow` to no shadow at all. That failure is invisible to
- * a check that measures token VALUES, so it is asserted directly.
- */
-const roles = fs.readFileSync(path.join(REPO_ROOT, ROLES_FILE), 'utf8');
-if (!/--color-focus-ring:/.test(roles)) {
-  found.push(`${ROLES_FILE} no longer defines --color-focus-ring, which every fixed focus rule resolves through.`);
-}
-
-found.push(...failures(rules, record.exceptions ?? {}));
-
-if (found.length) {
-  console.error(`\n[focus-ring] ${found.length} finding(s):`);
-  for (const f of found) console.error(`  ${f}`);
-  console.error(`\n${'─'.repeat(72)}`);
-  console.error('✗ check:focus-ring\n');
-  console.error(
-    `  -> A focus indicator is held to ${NON_TEXT}:1 against what it sits on (WCAG 1.4.11),\n` +
-      '     and it is the only thing telling a keyboard user where they are. Use\n' +
-      '     `var(--color-focus-ring)` — 5.02:1 on the page — rather than a state tint or\n' +
-      '     an inverse colour meant for dark grounds.',
-  );
-  process.exit(1);
-}
-
-const worst = rules.reduce((low, entry) => (entry.best.ratio < low.best.ratio ? entry : low), rules[0]);
-console.log(
-  `✓ check:focus-ring — ${rules.length} focus rules, all at or above ${NON_TEXT}:1 ` +
-    `(worst ${worst.best.ratio.toFixed(2)}:1, ${worst.best.token} in ${path.basename(worst.file)})`,
-);
+main(import.meta.url, 'check:focus-ring', { run, summary, remedy: REMEDY });

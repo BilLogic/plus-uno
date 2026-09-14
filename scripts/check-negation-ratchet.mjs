@@ -189,11 +189,11 @@ import { fileURLToPath } from 'url';
 import { actionsPromptFiles } from './lib/actions-prompts.mjs';
 import { bundlerFailureReport, harnessSets, resolveBundled, unresolvedReport } from './lib/bundled-set.mjs';
 import { frontmatter } from './lib/corpus.mjs';
+import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 export const BASELINE = path.join(REPO_ROOT, 'docs/evals/negation-baseline.json');
-const UPDATE = process.argv.includes('--update');
 
 /**
  * The five tokens, in one place, so the regex and the label the report prints
@@ -378,22 +378,26 @@ export function readingChangedReport({ scope, was }) {
  * `resolveBundled` RETURNS what did not resolve instead of filtering it out —
  * the `if (!fs.existsSync(abs)) continue;` it replaced dropped docs from the
  * corpus in silence (#234). It is named for the bundled set but is just a
- * reader of repo-relative paths, so both scopes use it.
+ * reader of repo-relative paths, so all three scopes use it.
  *
  * The scope's own `read` decides how much of each file is counted — the bundled
  * body, or the whole file (#238). It is applied HERE, once, so neither scope
  * can acquire a reading that its baseline descriptor does not state.
+ *
+ * A doc the corpus lists and disk does not comes back as an `unresolved` report
+ * rather than being printed and exited on. The caller is `run`, which owes the
+ * reader every scope's answer in one go — and a shortfall that stopped the
+ * process at the first scope hid whatever the other two had to say (#509).
  *
  * @param {{key: string, noun: string, corpus: string, read: (text: string) => string}} scope
  * @param {string[]} files
  */
 function measure(scope, files) {
   const { declared, docs, missing } = resolveBundled(files);
-  if (missing.length) {
-    console.error(unresolvedReport({ missing, declared, tag: 'negation' }));
-    process.exit(1);
-  }
-  return measureDocs(scope, docs, declared);
+  return {
+    ...measureDocs(scope, docs, declared),
+    unresolved: missing.length ? unresolvedReport({ missing, declared, tag: 'negation' }) : null,
+  };
 }
 
 /**
@@ -465,73 +469,58 @@ export function compare(measured, base) {
 }
 
 /**
- * The check itself.
+ * Every scope, measured once per repo root.
  *
- * Wrapped so the module can be imported for `bundlerFailureReport` without
- * running a ratchet — and, more to the point, without a stale bundle taking the
- * test run down with a `process.exit` at import time. Same guard as
- * `check-storybook.mjs`.
+ * ONE bundler run answers both of the scopes that read it. Two runs would be
+ * two chances for the harness to change underneath a check that is comparing
+ * the halves — and `run`, `summary` and `--update` all want the same numbers.
  */
-function main() {
-  // ONE bundler run answers both scopes. Two runs would be two chances for the
-  // harness to change underneath a check that is comparing the halves.
+const readings = byRoot(() => {
   const sets = harnessSets({ tag: 'negation', notThis: 'the prohibition-token count' });
-  const measured = SCOPES.map((scope) => measure(scope, scope.files(sets)));
+  return SCOPES.map((scope) => measure(scope, scope.files(sets)));
+});
 
-  if (UPDATE) {
-    // The metric descriptor rides in the file so the number is never read
-    // without its definition beside it (#234), and each scope carries the doc
-    // count it was recorded over so the floor below has something to stand on.
-    const metric = {
-      counts: METRIC,
-      tokens: PROHIBITION_TOKENS,
-      // What is common to both scopes. HOW MUCH OF EACH FILE IS READ IS NOT
-      // common to them (#238), so it is recorded per scope below rather than
-      // asserted once here — a single line would have to be wrong about one of
-      // them, which is how the old "frontmatter included" outlived being true
-      // of the bundled half.
-      measuredOn: 'outside quoted speech and code spans; how much of each file, per scope below',
-      note: 'NOT a count of negative statements — see scripts/check-negation-ratchet.mjs § What is counted.',
-    };
-    const scopes = {};
-    for (const m of measured) {
-      scopes[m.scope.key] = {
-        corpus: m.scope.corpus,
-        measuredOn: m.scope.measuredOn,
-        docs: m.docs,
-        total: m.total,
-        counts: m.counts,
-      };
-    }
-    fs.writeFileSync(BASELINE, `${JSON.stringify({ metric, scopes }, null, 2)}\n`);
-    console.log(
-      `[negation] baseline recorded: ${measured
-        .map((m) => `${m.total} ${m.scope.key} across ${m.docs} ${m.scope.noun}`)
-        .join(', ')} (${METRIC})`,
-    );
-    process.exit(0);
-  }
+/**
+ * The ratchet, as findings.
+ *
+ * Every scope is reported, never just the first: one PR can raise all three, and
+ * a gate that costs a fix-push-wait cycle per fact is a gate people route
+ * around (`check-harness.mjs` § It does not stop at the first failure). Each
+ * report carries its own remedy, which is why this check declares no shared
+ * one — a rise, a shrunken corpus and a changed ruler want different sentences.
+ *
+ * @returns {import('./lib/findings.mjs').Finding[]}
+ */
+export function run({ repoRoot = REPO_ROOT } = {}) {
+  const measured = readings(repoRoot);
+
+  // A corpus that did not resolve is reported before anything is compared: a
+  // count taken over docs that went missing is not a count of this corpus.
+  const unresolved = measured.filter((m) => m.unresolved);
+  if (unresolved.length) return unresolved.map((m) => ({ message: m.unresolved }));
 
   if (!fs.existsSync(BASELINE)) {
-    console.error('[negation] no baseline — run `npm run check:negation -- --update` once to record it.');
-    process.exit(1);
+    return [
+      { message: '[negation] no baseline — run `npm run check:negation -- --update` once to record it.' },
+    ];
   }
 
+  return compare(measured, JSON.parse(fs.readFileSync(BASELINE, 'utf8'))).map((message) => ({
+    message,
+  }));
+}
+
+/**
+ * The green line.
+ *
+ * Both numbers, always: `N ... across M of M docs` is the only shape in which
+ * a narrowed corpus is visible to whoever reads the pass line (#234). And the
+ * tokens are named because a bare "prohibitions" was read as a claim about
+ * negation in general, which this has never measured.
+ */
+export function summary({ repoRoot = REPO_ROOT } = {}) {
+  const measured = readings(repoRoot);
   const base = JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
-  const failures = compare(measured, base);
-
-  if (failures.length) {
-    // Every scope is reported, never just the first: one PR can raise all three, and
-    // a gate that costs a fix-push-wait cycle per fact is a gate people route
-    // around (`check-harness.mjs` § It does not stop at the first failure).
-    console.error(failures.join('\n\n'));
-    process.exit(1);
-  }
-
-  // Both numbers, always: `N ... across M of M docs` is the only shape in which
-  // a narrowed corpus is visible to whoever reads the pass line (#234). And the
-  // tokens are named because a bare "prohibitions" was read as a claim about
-  // negation in general, which this has never measured.
   const lines = measured.map((m) => {
     const b = base.scopes[m.scope.key];
     const worst = Object.entries(m.counts)
@@ -544,13 +533,61 @@ function main() {
       `\n           heaviest: ${worst.map(([f, n]) => `${f} (${n})`).join(' · ')}`
     );
   });
-  console.log(
-    `[negation] ${METRIC} (${PROHIBITION_TOKENS.join(' / ')}), ${SCOPES.length} scopes, one baseline:\n` +
-      lines.join('\n') +
-      '\n  (imperative bans only — negation in other forms is not counted here;' +
-      " see this script's header.)",
+  return (
+    `${METRIC} (${PROHIBITION_TOKENS.join(' / ')}), ${SCOPES.length} scopes, one baseline:\n` +
+    lines.join('\n') +
+    '\n  (imperative bans only — negation in other forms is not counted here;' +
+    " see this script's header.)"
   );
 }
 
-// Importing this module for its exports must not run the check.
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
+/**
+ * `--update`: record what was just measured as the new baseline.
+ *
+ * This WRITES, which is why it lives here and not in `run`. A check that
+ * re-recorded its own baseline while answering "did the count rise?" would
+ * answer it with the number it had just written down.
+ */
+function recordBaseline(measured) {
+  // The metric descriptor rides in the file so the number is never read
+  // without its definition beside it (#234), and each scope carries the doc
+  // count it was recorded over so the floor has something to stand on.
+  const metric = {
+    counts: METRIC,
+    tokens: PROHIBITION_TOKENS,
+    // What is common to both scopes. HOW MUCH OF EACH FILE IS READ IS NOT
+    // common to them (#238), so it is recorded per scope below rather than
+    // asserted once here — a single line would have to be wrong about one of
+    // them, which is how the old "frontmatter included" outlived being true
+    // of the bundled half.
+    measuredOn: 'outside quoted speech and code spans; how much of each file, per scope below',
+    note: 'NOT a count of negative statements — see scripts/check-negation-ratchet.mjs § What is counted.',
+  };
+  const scopes = {};
+  for (const m of measured) {
+    scopes[m.scope.key] = {
+      corpus: m.scope.corpus,
+      measuredOn: m.scope.measuredOn,
+      docs: m.docs,
+      total: m.total,
+      counts: m.counts,
+    };
+  }
+  fs.writeFileSync(BASELINE, `${JSON.stringify({ metric, scopes }, null, 2)}\n`);
+  console.log(
+    `[negation] baseline recorded: ${measured
+      .map((m) => `${m.total} ${m.scope.key} across ${m.docs} ${m.scope.noun}`)
+      .join(', ')} (${METRIC})`,
+  );
+}
+
+// Importing this module for its exports must not run the check, and must not
+// write a baseline either — `--update` is read here rather than at module scope
+// so that the flag belongs to the process that typed it.
+const ENTRY = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (ENTRY && process.argv.includes('--update')) {
+  recordBaseline(readings(REPO_ROOT));
+} else {
+  main(import.meta.url, 'check:negation', { run, summary });
+}
