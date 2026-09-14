@@ -10,10 +10,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFileSync, writeFileSync, mkdtempSync, rmSync, existsSync, readdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync, existsSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { ARTIFACTS, assemble } from "./bundle-harness.mjs";
+import { run as checkHarnessBundle } from "./check-harness-bundle.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "../../..");
@@ -612,4 +615,101 @@ test("--manifest disturbs neither committed artifact", () => {
   assert.equal(runWithManifest().code, 0);
   assert.equal(readFileSync(harnessTs, "utf8"), before.ts, "--check --manifest must not write harness.ts");
   assert.equal(readFileSync(companionMd, "utf8"), before.md, "--check --manifest must not write the companion");
+});
+
+// ── The assemble function, and the check module over it (#537) ────────────────
+//
+// Every test above drives the CLI, which is the right way to hold the flags and
+// the messages. These hold the seam underneath it: `assemble()` reads a tree and
+// returns it, and `check:harness-bundle` is a caller of that function rather
+// than a process whose exit code has to be interpreted. Both run over a fixture
+// root — a repo the tests build — so a finding can be provoked without editing
+// this repo and without spawning anything.
+
+/** A minimal repo the bundler will accept: the sentinels, one member per budgeted
+ *  section root, and enough unbudgeted prose to clear the implicit floor. */
+function fixtureRoot() {
+  const root = mkdtempSync(path.join(tmpdir(), "harness-assemble-"));
+  const write = (rel, text) => {
+    mkdirSync(path.join(root, path.dirname(rel)), { recursive: true });
+    writeFileSync(path.join(root, rel), text);
+  };
+  const doc = (body) => `---\nembodiment: all\n---\n\n${body}`;
+  write("AGENTS.md", doc("# Constitution\n\nOne rule.\n"));
+  write("CONTEXT.md", doc("# Glossary\n\nOne word.\n"));
+  write("agents/uno-bot/AGENT.md", doc("# Persona\n\nOne voice.\n"));
+  write("agents/uno-bot/wrangler.toml", 'GEMINI_REGION = "global"\n');
+  mkdirSync(path.join(root, "skills"), { recursive: true });
+  // Unbudgeted, and long enough that the assembled prompt clears the implicit
+  // floor — a fixture under it would fail on the floor rather than on the thing
+  // each test is about.
+  write("docs/connectors/pad.md", doc(`# Pad\n\n${"padding padding padding padding\n".repeat(800)}`));
+  return root;
+}
+
+/** Every file in a tree, path to bytes. The witness for "wrote nothing". */
+function treeSnapshot(root, rel = ".") {
+  const out = {};
+  for (const entry of readdirSync(path.join(root, rel), { withFileTypes: true })) {
+    const child = path.posix.join(rel === "." ? "" : rel, entry.name);
+    if (entry.isDirectory()) Object.assign(out, treeSnapshot(root, child));
+    else out[child] = readFileSync(path.join(root, child), "utf8");
+  }
+  return out;
+}
+
+test("assemble reads a tree and writes nothing to it", () => {
+  const root = fixtureRoot();
+  try {
+    const before = treeSnapshot(root);
+    const built = assemble({ repoRoot: root });
+    // The assembly succeeded — otherwise "wrote nothing" would be true of a run
+    // that never reached the writes it is being trusted not to make.
+    assert.deepEqual(built.findings, [], "the fixture must assemble cleanly");
+    assert.deepEqual(
+      Object.keys(built.artifacts).sort(),
+      ARTIFACTS.map((a) => a.rel).sort(),
+    );
+    assert.ok(built.manifest.assembled.chars > 0);
+    assert.deepEqual(treeSnapshot(root), before, "assemble must not write, create or touch a file");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("run({ repoRoot }) returns a finding per stale artifact, naming the file and the command", () => {
+  // One fixture root per `run`: the check memoizes its assembly by root, which is
+  // what lets `run` and the green line share one read of the tree.
+  const root = fixtureRoot();
+  try {
+    // Commit what the assembly says, so the fixture starts current and exactly
+    // one artifact can then be made stale.
+    for (const [rel, text] of Object.entries(assemble({ repoRoot: root }).artifacts)) {
+      mkdirSync(path.join(root, path.dirname(rel)), { recursive: true });
+      writeFileSync(path.join(root, rel), text);
+    }
+    const stale = "agents/uno-bot/src/generated/harness.ts";
+    writeFileSync(path.join(root, stale), 'export const HARNESS = "stale";\n');
+
+    const findings = checkHarnessBundle({ repoRoot: root });
+    assert.equal(findings.length, 1, `expected one stale artifact, got:\n${JSON.stringify(findings, null, 2)}`);
+    assert.equal(findings[0].file, stale, "the finding must name the stale file");
+    assert.match(findings[0].message, /STALE/);
+    assert.match(findings[0].message, /npm run bundle:harness/, "the finding must name the regenerate command");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("run({ repoRoot }) returns the assembly's own findings, not a staleness verdict over them", () => {
+  const root = fixtureRoot();
+  try {
+    writeFileSync(path.join(root, "docs/connectors/zz-undeclared.md"), "# probe\n\nno frontmatter here\n");
+    const findings = checkHarnessBundle({ repoRoot: root });
+    assert.equal(findings.length, 1, "a tree that cannot assemble has no artifacts to be stale against");
+    assert.match(findings[0].message, /declare no `embodiment`/);
+    assert.match(findings[0].message, /zz-undeclared\.md/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

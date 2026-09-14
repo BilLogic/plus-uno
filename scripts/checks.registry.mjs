@@ -45,7 +45,7 @@
  *             exists and that the script names it.
  *   module    a path to an ES module exporting `run(ctx) => Finding[]` (see
  *             `scripts/lib/findings.mjs`). The runner calls it in-process and
- *             renders one banner for it. 40 of the 56 rows carry one.
+ *             renders one banner for it. 42 of the 57 rows carry one.
  *   kind      'spawn' — and nothing else. The row cannot answer the findings
  *             interface, so the runner runs `npm run <name>` and reads its exit
  *             code. A spawn row carries `spawnReason`.
@@ -535,14 +535,10 @@ export const CHECKS = [
   },
   {
     name: 'check:harness-bundle',
-    script: 'node scripts/bundle-harness.mjs --check',
+    script: 'node scripts/check-harness-bundle.mjs',
     pkg: 'bot',
     trigger: 'pull_request',
-    kind: 'spawn',
-    spawnReason:
-      'the harness bundler. `--check` is its assembly pass with the writes withheld, so the ' +
-      'thing that would have to return findings is the generator itself rather than a ' +
-      'wrapper over one — the shape every other row here reduced to.',
+    module: 'agents/uno-bot/scripts/check-harness-bundle.mjs',
     guards:
       'the Worker prompt bundle against the root docs it is assembled from, and the char budgets in AGENTS.md § The loading contract. This is the artifact #196 had to repair.',
   },

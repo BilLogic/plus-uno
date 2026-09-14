@@ -32,6 +32,24 @@
 // A per-doc sort weight was rejected: it spreads one global decision across
 // twenty files and turns a missing weight into a silent misplacement.
 //
+// ── ONE FUNCTION, TWO CALLERS ────────────────────────────────────────────────
+//
+// `assemble({ repoRoot })` reads the tree and returns what it computed: the
+// members, the sections, the disclosed docs, the census, the three artifacts as
+// strings, the committed bytes they are compared against, the manifest, and the
+// findings. It writes nothing, prints nothing and exits nothing, which is what
+// lets two callers share it — the CLI at the bottom of this file, which keeps
+// every flag and message it has always had, and
+// `agents/uno-bot/scripts/check-harness-bundle.mjs`, which returns the same
+// defects as findings so the harness runner can call the staleness guard
+// in-process instead of reading an exit code.
+//
+// A DEFECT ABORTS THE ASSEMBLY at the same point the old `process.exit(1)`
+// stood, and the finding is returned rather than printed. That is deliberate:
+// once a doc under a section root declares no embodiment, or a budget is blown,
+// everything downstream is a measurement of a tree that must not ship, and
+// collecting further findings over it would report consequences as causes.
+//
 // ── The byte-identical requirement is RETIRED (#159) ─────────────────────────
 //
 // This script used to state: "the output must stay byte-identical to what the
@@ -79,7 +97,7 @@
 //
 // Run: npm run bundle:harness
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import path from "node:path";
 
 // Frontmatter is metadata for this script, not content for the model — and
@@ -89,7 +107,8 @@ import path from "node:path";
 import { frontmatter } from "../../../scripts/lib/corpus.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url)); // agents/uno-bot/scripts
-const repoRoot = path.resolve(here, "../../.."); // repo root (two levels above agents/uno-bot)
+/** The repo root this package sits in, for a caller that names none. */
+export const REPO_ROOT = path.resolve(here, "../../.."); // two levels above agents/uno-bot
 
 /**
  * The bundle's sections, in order. This list is the ONLY place order is stated.
@@ -188,44 +207,50 @@ const n = (x) => x.toLocaleString("en-US");
  * The floor in force, chosen by the cache the deployment uses. `GEMINI_REGION`
  * is read from wrangler.toml — the line the Worker deploys with — because the
  * floor is a property of that deployment, and a region stated here would be a
- * second copy of a decision the toml already holds. A toml without the line
- * fails the build: with no region there is no cache, and no floor to assert.
+ * second copy of a decision the toml already holds. A toml without the line is
+ * a finding: with no region there is no cache, and no floor to assert.
+ *
+ * @returns {{floor: object, message: null} | {floor: null, message: string}}
  */
-function activeFloor() {
+function activeFloor(repoRoot) {
   const tomlRel = "agents/uno-bot/wrangler.toml";
   const toml = readFileSync(path.join(repoRoot, tomlRel), "utf8");
   const m = toml.match(/^GEMINI_REGION\s*=\s*"([^"]+)"/m);
   if (!m) {
-    console.error(
-      `[bundle-harness] ${tomlRel} has no \`GEMINI_REGION = "…"\` line, so the floor cannot be chosen: ` +
+    return {
+      floor: null,
+      message:
+        `${tomlRel} has no \`GEMINI_REGION = "…"\` line, so the floor cannot be chosen: ` +
         "the floor follows the cache the deployment uses, and the region decides which cache that is.",
-    );
-    process.exit(1);
+    };
   }
   const region = m[1];
   const implicit = region === "global";
   const value = implicit ? BUDGETS.assembledFloorImplicit : BUDGETS.assembledFloorExplicit;
   const cache = implicit ? "implicit" : "explicit";
   return {
-    region,
-    cache,
-    value,
-    margin: BUDGETS.assembledFloorMargin,
-    // One wording for the manifest and the failure message:
-    // "16,384 + 4,000 (implicit cache, GEMINI_REGION global)".
-    label: `${n(value)} + ${n(BUDGETS.assembledFloorMargin)} (${cache} cache, GEMINI_REGION ${region})`,
+    message: null,
+    floor: {
+      region,
+      cache,
+      value,
+      margin: BUDGETS.assembledFloorMargin,
+      // One wording for the manifest and the failure message:
+      // "16,384 + 4,000 (implicit cache, GEMINI_REGION global)".
+      label: `${n(value)} + ${n(BUDGETS.assembledFloorMargin)} (${cache} cache, GEMINI_REGION ${region})`,
+    },
   };
 }
 
 /** Every .md under a root, or the root itself when it is a file. */
-function walk(rel) {
+function walk(repoRoot, rel) {
   const abs = path.join(repoRoot, rel);
   if (!existsSync(abs)) return [];
   const stat = statSync(abs);
   if (stat.isFile()) return rel.endsWith(".md") ? [rel] : [];
   const out = [];
   for (const entry of readdirSync(abs, { withFileTypes: true })) {
-    out.push(...walk(path.posix.join(rel, entry.name)));
+    out.push(...walk(repoRoot, path.posix.join(rel, entry.name)));
   }
   return out;
 }
@@ -258,285 +283,26 @@ function stripIdeOnly(text) {
   return text.replace(/[^\n]*<!--\s*ide-only\s*-->[\s\S]*?<!--\s*\/ide-only\s*-->[^\n]*\n?/g, "");
 }
 
-// Guard: verify the repo root is the one that actually holds the harness before
-// we trust any path (checked in the task brief).
-// Structural sentinels only — naming a member file here would make the repo
-// check die confusingly the day that file is renamed, and would put a filename
-// back in the one script that is supposed to hold none.
-for (const sentinel of ["AGENTS.md", "CONTEXT.md", "skills"]) {
-  if (!existsSync(path.join(repoRoot, sentinel))) {
-    console.error(`[bundle-harness] repo root check failed: ${sentinel} not found under ${repoRoot}`);
-    process.exit(1);
-  }
-}
-
-// ── Output paths, and the committed bytes, read up front ─────────────────────
+// ── The artifacts this script owns ───────────────────────────────────────────
 //
-// The two artifacts this script owns. `harness.ts` is what the Worker imports;
-// `harness-bundle.md` is the readable companion (#160). Both are derived from
-// one assembly below, so they cannot drift from each other.
-const outDir = path.join(here, "..", "src", "generated");
-const outFile = path.join(outDir, "harness.ts");
-const companionFile = path.join(here, "..", "harness-bundle.md");
-// The reference map (#423): the disclosed docs, keyed by name, for read_reference.
-const referencesFile = path.join(outDir, "references.ts");
-
-const CHECK = process.argv.includes("--check");
-
-// ── The manifest (#510) ──────────────────────────────────────────────────────
+// `harness.ts` is what the Worker imports; `harness-bundle.md` is the readable
+// companion (#160); `references.ts` is the reference map (#423), the disclosed
+// docs keyed by the name `read_reference` takes. All three are derived from one
+// assembly, so they cannot drift from each other, and all three are held to one
+// staleness guard.
 //
-// A BUILD artifact, not a committed one. Everything in it is already computed
-// above — members and their embodiment, the section they load in, the chars
-// each contributes, the budgets, the census — and until now the only way for a
-// root guard to have any of it was to parse the sentences this script prints.
-// Three guards did (`scripts/lib/bundled-set.mjs`, and through it
-// `check:negation` and `check:skill-overlap`), which made the wording of a log
-// line load-bearing: reword the census and a guard silently narrows its corpus
-// to nothing, which is the failure #234 built a witness against rather than
-// removed. A datum has no wording to break.
-//
-// THE STDOUT SENTENCES ARE UNCHANGED. They are for a human watching a build and
-// stay exactly as they were; the manifest is for a reader that parses.
-//
-// It is written under `--check` too, and that is not a violation of the "writes
-// nothing" contract above: that contract is about the three COMMITTED artifacts
-// a stale-bundle guard compares, and the manifest is neither committed nor
-// compared — it is gitignored build output, and a guard that asks the bundler
-// `--check` is exactly the caller that needs it.
-const DEFAULT_MANIFEST = path.join(here, "..", ".bundle", "harness-manifest.json");
+// Named repo-relative because both callers want them that way: a finding says
+// `file`, and the CLI joins the root back on for the sentence a human reads.
+const HARNESS_TS = "agents/uno-bot/src/generated/harness.ts";
+const COMPANION_MD = "agents/uno-bot/harness-bundle.md";
+const REFERENCES_TS = "agents/uno-bot/src/generated/references.ts";
 
-/** The manifest path this run should write, or null when nothing asked for one. */
-function manifestPath() {
-  const i = process.argv.indexOf("--manifest");
-  if (i !== -1) {
-    const next = process.argv[i + 1];
-    // `--manifest` alone means "the default path"; a following token that is not
-    // another flag is the path to write.
-    return next && !next.startsWith("-") ? path.resolve(next) : DEFAULT_MANIFEST;
-  }
-  const eq = process.argv.find((a) => a.startsWith("--manifest="));
-  if (eq) return path.resolve(eq.slice("--manifest=".length));
-  // The env var exists for a caller that cannot add an argv — an npm script
-  // wrapper, a workflow step — and names the same file.
-  if (process.env.HARNESS_MANIFEST) return path.resolve(process.env.HARNESS_MANIFEST);
-  return null;
-}
-
-const MANIFEST = manifestPath();
-
-// Snapshot the COMMITTED bytes before a single char is assembled. A staleness
-// guard that generates first and compares against what it just wrote cannot
-// fail; reading the working tree up front — and never writing under `--check`
-// (this script's only writes are the two calls at the very bottom, both
-// unreachable in check mode) — is what makes the guard able to say no.
-const committed = CHECK
-  ? {
-      [outFile]: existsSync(outFile) ? readFileSync(outFile, "utf8") : "",
-      [companionFile]: existsSync(companionFile) ? readFileSync(companionFile, "utf8") : "",
-      [referencesFile]: existsSync(referencesFile) ? readFileSync(referencesFile, "utf8") : "",
-    }
-  : null;
-
-// ── Membership, derived ──────────────────────────────────────────────────────
-//
-// Every doc under a section root must DECLARE where it belongs. A doc with no
-// `embodiment` fails the build: silence used to mean "not bundled", so a new
-// convention nobody listed was a rule the bot never learned, and nothing said so.
-const members = [];
-const undeclared = [];
-// The docs under these same roots that declare `embodiment: ide` — everything
-// the walk SAW and did not bundle. Not used to assemble anything; counted, and
-// reported below. See the census note after the guards.
-const ideOnly = [];
-// Worker-read docs that declare `disclosure: reference` — the third answer the
-// walk can give. They ship in the reference map, never in the prompt.
-const disclosed = [];
-// `disclosure` on a doc that cannot carry it: an `ide` doc, or a value that is
-// not the one word this script knows. Both fail the build below.
-const misdisclosed = [];
-
-for (const section of SECTIONS) {
-  const found = [];
-  for (const root of section.roots) {
-    for (const rel of walk(root)) {
-      // Endings normalised at the read boundary for the same reason the member
-      // read below does it: a body length that depends on WHO checked the repo
-      // out is not a measurement, and the manifest publishes this one.
-      const { meta, body } = frontmatter(readFileSync(path.join(repoRoot, rel), "utf8").replace(/\r\n/g, "\n"));
-      if (!meta.embodiment) {
-        undeclared.push(rel);
-        continue;
-      }
-      const workerReads = meta.embodiment === "uno-bot" || meta.embodiment === "all";
-      if (meta.disclosure !== undefined) {
-        if (meta.disclosure !== "reference") {
-          misdisclosed.push({ rel, why: `\`disclosure: ${meta.disclosure}\` is not a delivery this script knows` });
-        } else if (!workerReads) {
-          misdisclosed.push({ rel, why: `\`disclosure: reference\` on an \`embodiment: ${meta.embodiment}\` doc names a Worker delivery for a doc the Worker never reads` });
-        } else {
-          disclosed.push({ rel, section: section.name, name: referenceName(rel), embodiment: meta.embodiment });
-        }
-        continue;
-      }
-      if (workerReads) found.push({ rel, embodiment: meta.embodiment });
-      else if (meta.embodiment === "ide") ideOnly.push({ rel, section: section.name, chars: body.length });
-    }
-  }
-  found.sort((a, b) => sortKey(a.rel).localeCompare(sortKey(b.rel)));
-  members.push(...found.map(({ rel, embodiment }) => ({ rel, section: section.name, embodiment })));
-}
-disclosed.sort((a, b) => a.name.localeCompare(b.name));
-
-if (misdisclosed.length) {
-  console.error(
-    `[bundle-harness] ${misdisclosed.length} doc(s) carry a \`disclosure\` this script cannot honour:\n` +
-      misdisclosed.map(({ rel, why }) => `  ${rel}: ${why}`).join("\n") +
-      "\n  -> the one value is `disclosure: reference`, and only a doc the Worker reads (`embodiment: all`" +
-      "\n     or `uno-bot`) can carry it. Absent means loaded into the prompt.",
-  );
-  process.exit(1);
-}
-
-if (undeclared.length) {
-  console.error(
-    `[bundle-harness] ${undeclared.length} doc(s) under a bundle section declare no \`embodiment\`:\n` +
-      undeclared.map((p) => `  ${p}`).join("\n") +
-      "\n  -> add `embodiment: all | ide | uno-bot` to the frontmatter. There is no default:" +
-      "\n     a doc that does not say where it belongs is a rule nobody can find.",
-  );
-  process.exit(1);
-}
-
-if (!members.length) {
-  console.error("[bundle-harness] no members matched — the glob is broken, refusing to ship an empty prompt.");
-  process.exit(1);
-}
-
-// ── The embodiment census (#174) ─────────────────────────────────────────────
-//
-// One line stating what this walk saw: every doc under the section roots, split
-// into the ones bundled and the ones marked `ide`. It changes no artifact — it
-// is stdout only — and the bundle does not need it.
-//
-// IT EXISTS FOR A READER OUTSIDE THIS SCRIPT. `check:negation` now ratchets the
-// IDE-side docs as well as the bundled ones, and the IDE corpus is exactly the
-// complement measured here: same roots, same frontmatter, the other answer. A
-// guard that re-walked those roots on its own would be a second glob that can
-// disagree with this one — the failure #159 deleted — so it walks them and then
-// checks itself against this line. The `--check OK` file count already plays
-// that role for the bundled half (#234); this is the same witness for the other
-// half, and for the total, so a root silently dropped from either list fails
-// instead of narrowing a corpus in silence.
-console.log(
-  `[bundle-harness] embodiment census: ${n(members.length + disclosed.length + ideOnly.length)} declared doc(s) under the ` +
-    `section roots — ${n(members.length)} bundled, ${n(disclosed.length)} disclosed, ${n(ideOnly.length)} ide-only`,
-);
-
-// Read every member from the LOCAL repo. Frontmatter is stripped: it addresses
-// this script, not the model, and paying prompt chars for it would be a tax on
-// having made membership declarative.
-const raw = members.map(({ rel }) => {
-  const abs = path.join(repoRoot, rel);
-  // Normalise endings at the read boundary. Line endings are a checkout
-  // artifact — no .gitattributes here and core.autocrlf defaults on for
-  // Windows — so bundling on Windows baked ~1,500 stray CRs into the prompt
-  // and dirtied this generated file on every run. Semantically inert to a
-  // model, but it makes the baked bytes depend on WHO deployed, and the
-  // system prompt is the cached prefix.
-  const text = readFileSync(abs, "utf8").replace(/\r\n/g, "\n");
-  return frontmatter(text).body;
-});
-
-// The disclosed docs, read the same way: frontmatter off, endings normalised,
-// `ide-only` regions dropped — the Worker is the reader, so the IDE's regions
-// are as foreign here as in the prompt. Keyed by name for the map.
-const referenceMap = Object.fromEntries(
-  disclosed.map(({ rel, name }) => {
-    const text = readFileSync(path.join(repoRoot, rel), "utf8").replace(/\r\n/g, "\n");
-    return [name, stripIdeOnly(frontmatter(text).body)];
-  }),
-);
-
-// ── Char budgets, per file ───────────────────────────────────────────────────
-const overBudget = [];
-raw.forEach((body, i) => {
-  const budget = budgetFor(members[i]);
-  if (budget && body.length > budget.limit) {
-    overBudget.push({ rel: members[i].rel, ...budget, size: body.length });
-  }
-});
-
-if (overBudget.length) {
-  console.error(
-    `[bundle-harness] ${overBudget.length} file(s) over its char budget:\n` +
-      overBudget
-        .map(
-          ({ rel, role, size, limit }) =>
-            `  ${rel} (${role}): ${n(size)} chars against a budget of ${n(limit)} — over by ${n(size - limit)}`,
-        )
-        .join("\n") +
-      "\n  -> every char here ships in the system prompt on every request. Cut restatement first:" +
-      "\n     a rule that is stated elsewhere in the bundle should be cited, not quoted.",
-  );
-  process.exit(1);
-}
-
-// Assembly: first member raw, every other prefixed with a path comment so the
-// bundle stays traceable back to a file; empty (post-strip) members skipped.
-const parts = raw.map(stripIdeOnly);
-const assembled = parts
-  .map((text, i) => {
-    if (!text) return "";
-    return i === 0 ? text : `\n\n---\n\n<!-- ${members[i].rel} -->\n\n${text}`;
-  })
-  .join("");
-
-// stripIdeOnly needs a MATCHED pair — an unbalanced or misspelled marker simply
-// doesn't match, and the IDE-only block ships into the system prompt silently.
-// Fail the build instead: a surviving marker proves something didn't strip.
-if (/<!--\s*\/?\s*ide-only\s*-->/i.test(assembled + Object.values(referenceMap).join(""))) {
-  console.error(
-    "[bundle-harness] an <!-- ide-only --> marker survived assembly — unbalanced or misspelled pair. " +
-      "IDE-only content would ship to the bot (in the prompt or the reference map). Fix the markers and re-run.",
-  );
-  process.exit(1);
-}
-
-// ── Char budget, assembled ───────────────────────────────────────────────────
-if (assembled.length > BUDGETS.assembled) {
-  console.error(
-    `[bundle-harness] the assembled bundle is over its char budget: ${n(assembled.length)} chars ` +
-      `against a budget of ${n(BUDGETS.assembled)} — over by ${n(assembled.length - BUDGETS.assembled)} ` +
-      `(${members.length} files).\n` +
-      "  -> the whole bundle is the prompt's cached prefix, paid on every request. Cut, or raise the" +
-      "\n     budget deliberately in a PR that says what the prompt bought for the chars.",
-  );
-  process.exit(1);
-}
-
-// ── Char floor, assembled (#418) ─────────────────────────────────────────────
-//
-// Asserted on the SAME quantity as the ceiling — the assembled prompt, which is
-// the cached block in its entirety — so the two bounds cannot disagree about
-// what they measure. Fails the build the same way the ceiling does: no artifact
-// is written, and the message names the floor, the cache it follows, the
-// margin and the shortfall.
-const floor = activeFloor();
-const floorLine = floor.value + floor.margin;
-if (assembled.length < floorLine) {
-  const consequence =
-    floor.cache === "implicit"
-      ? "below the floor Google's implicit cache holds none of the prompt, and it ships"
-      : "below the floor the Gemini lane cannot create its explicit context cache, and the prompt ships inline";
-  console.error(
-    `[bundle-harness] the assembled bundle is under its char floor: ${n(assembled.length)} chars ` +
-      `against a floor of ${floor.label} — short by ${n(floorLine - assembled.length)} (${members.length} files).\n` +
-      `  -> ${consequence}` +
-      "\n     at full price every iteration. Put a document back, or lower the floor" +
-      "\n     deliberately in a PR that cites the /debug/gemini-cache measurement it rests on.",
-  );
-  process.exit(1);
-}
+/** The three outputs, in the order a staleness report names them. */
+export const ARTIFACTS = [
+  { rel: HARNESS_TS, hint: "src/generated/harness.ts" },
+  { rel: COMPANION_MD, hint: "harness-bundle.md" },
+  { rel: REFERENCES_TS, hint: "src/generated/references.ts" },
+];
 
 // ── Blueprint instance-data drift guard ──────────────────────────────────────
 //
@@ -554,7 +320,7 @@ if (assembled.length < floorLine) {
 // WHY IT RUNS ON `assembled`, NOT THE SOURCE FILES: `ide-only` regions are
 // stripped by then, which removes the SQL query recipes for free — so the
 // obvious false-positive source (`limit 5`, `union all select`) never reaches
-// the regex. That is also why this sits AFTER the surviving-marker check above:
+// the regex. That is also why this sits AFTER the surviving-marker check below:
 // if stripping didn't happen, the build has already failed.
 //
 // There is no PR CI in this repo — every workflow is `schedule` or
@@ -644,36 +410,6 @@ function findInstanceData(text) {
 // the findings, then flip THIS ONE LINE to true to make it blocking.
 const INSTANCE_DATA_GUARD_BLOCKING = false;
 
-const instanceDataHits = findInstanceData(assembled);
-if (instanceDataHits.length) {
-  const report =
-    `[bundle-harness] ${instanceDataHits.length} possible blueprint INSTANCE DATA hit(s) in the assembled harness:\n` +
-    instanceDataHits
-      .map((h) => `  assembled:${h.line}  (${h.pattern}: "${h.match}")\n    ${h.text}`)
-      .join("\n") +
-    "\n  -> Counts and membership lists about the blueprint's CONTENTS go stale between deploys and" +
-    "\n     ship as confident wrong answers. Delete the number and let search_blueprint retrieve it," +
-    "\n     or, if the figure is deliberate (a historical ledger, a fixed contract), mark the line/block:" +
-    "\n       <!-- instance-data-ok: why this number is allowed to be frozen -->";
-  if (INSTANCE_DATA_GUARD_BLOCKING) {
-    console.error(report);
-    process.exit(1);
-  }
-  console.warn(`${report}\n  (log-only: set INSTANCE_DATA_GUARD_BLOCKING = true in this script to make it blocking)`);
-}
-
-const contents =
-  "// GENERATED by scripts/bundle-harness.mjs — do not edit by hand. Run: npm run bundle:harness\n" +
-  `export const HARNESS = ${JSON.stringify(assembled)};\n`;
-
-// The reference map, from the same walk (#423). Baked, so a read_reference call
-// is a property lookup: zero subrequests, nothing to fail on a cold start.
-const referencesContents =
-  "// GENERATED by scripts/bundle-harness.mjs — do not edit by hand. Run: npm run bundle:harness\n" +
-  "// The disclosed docs (`disclosure: reference` in their frontmatter), keyed by the name\n" +
-  "// the read_reference tool takes. Same assembly as harness.ts; held to the same --check.\n" +
-  `export const REFERENCES: Record<string, string> = ${JSON.stringify(referenceMap)};\n`;
-
 // ── The companion, rendered from the same assembly ───────────────────────────
 //
 // Two halves, in this order because a reviewer asks "what moved?" before "what
@@ -686,7 +422,7 @@ const referencesContents =
 // member after the first contributes and the last row equals the whole prompt.
 // The two columns therefore differ by the dividers, which is the point: the
 // budget column is measured on the body, the running total on the prompt.
-function renderCompanion() {
+function renderCompanion({ members, raw, parts, assembled, disclosed, referenceMap, floor, floorLine }) {
   let running = 0;
   const rows = parts.map((body, i) => {
     const { rel, section } = members[i];
@@ -778,9 +514,26 @@ function renderCompanion() {
   );
 }
 
-const companion = renderCompanion();
-
-// ── The manifest, written from the same assembly ─────────────────────────────
+// ── The manifest (#510) ──────────────────────────────────────────────────────
+//
+// A BUILD artifact, not a committed one. Everything in it is already computed
+// by the assembly — members and their embodiment, the section they load in, the
+// chars each contributes, the budgets, the census — and until it existed the
+// only way for a root guard to have any of it was to parse the sentences the
+// CLI prints. Three guards did (`scripts/lib/bundled-set.mjs`, and through it
+// `check:negation` and `check:skill-overlap`), which made the wording of a log
+// line load-bearing: reword the census and a guard silently narrows its corpus
+// to nothing, which is the failure #234 built a witness against rather than
+// removed. A datum has no wording to break.
+//
+// THE STDOUT SENTENCES ARE UNCHANGED. They are for a human watching a build and
+// stay exactly as they were; the manifest is for a reader that parses.
+//
+// It is written under `--check` too, and that is not a violation of the "writes
+// nothing" contract: that contract is about the three COMMITTED artifacts a
+// stale-bundle guard compares, and the manifest is neither committed nor
+// compared — it is gitignored build output, and a guard that asks this script
+// `--check` is exactly the caller that needs it.
 //
 // One row per DECLARED doc — the three answers the walk can give, under one
 // `delivery` key, so a reader asking "who does the Worker read" filters rather
@@ -788,7 +541,7 @@ const companion = renderCompanion();
 // same number the companion's budget column uses); `shippedChars` is what
 // reaches the prompt or the reference map after `<!-- ide-only -->` regions go.
 // An ide-only doc has no shipped length: nothing of it ships anywhere.
-function renderManifest() {
+function renderManifest({ members, raw, parts, assembled, disclosed, referenceMap, ideOnly, floor, floorLine }) {
   const memberRows = members.map(({ rel, section, embodiment }, i) => ({
     path: rel,
     embodiment,
@@ -863,67 +616,481 @@ function renderManifest() {
   };
 }
 
-// Written BEFORE the `--check` exit below, because the callers that need it are
-// exactly the guards that ask this script `--check`.
-if (MANIFEST) {
-  mkdirSync(path.dirname(MANIFEST), { recursive: true });
-  writeFileSync(MANIFEST, `${JSON.stringify(renderManifest(), null, 2)}\n`, "utf8");
-}
+/**
+ * Read the tree and return the whole assembly. No writes, no prints, no exits.
+ *
+ * @param {{repoRoot?: string}} [ctx]
+ * @returns {{
+ *   members: {rel: string, section: string, embodiment: string}[],
+ *   sections: typeof SECTIONS,
+ *   disclosed: {rel: string, section: string, name: string, embodiment: string}[],
+ *   census: {underRoots: number, bundled: number, disclosed: number, ideOnly: number} | null,
+ *   artifacts: Record<string, string>,
+ *   committed: Record<string, string> | null,
+ *   manifest: object | null,
+ *   findings: import('../../../scripts/lib/findings.mjs').Finding[],
+ * }}
+ *   `artifacts` and `manifest` are empty and null when a finding aborted the
+ *   assembly: there is nothing to compare a tree against that must not ship.
+ */
+export function assemble({ repoRoot = REPO_ROOT } = {}) {
+  /** @type {import('../../../scripts/lib/findings.mjs').Finding[]} */
+  const findings = [];
+  const result = (extra) => ({
+    members: [],
+    sections: SECTIONS,
+    disclosed: [],
+    census: null,
+    artifacts: {},
+    committed: null,
+    manifest: null,
+    findings,
+    ...extra,
+  });
 
-// `--check`: compare what this run WOULD write against the committed bytes
-// snapshotted at the top of this file — before assembly, so the comparison can
-// never be against something this run produced — and write nothing. Every other
-// generator in this repo has a --check counterpart; this one did not, so a
-// harness doc could be edited and the baked copy left behind with nothing
-// noticing until someone read the bot's answer.
-if (CHECK) {
-  // Compare on normalised endings. The HARNESS string itself is JSON-escaped,
-  // so the only real newlines in that file are the two wrapper ones — and on a
-  // Windows checkout those arrive as CRLF while `contents` is built with "\n".
-  // That 2-char difference reported the harness as STALE on every Windows run,
-  // which is a guard crying wolf rather than a guard. The companion is real
-  // markdown and gets the same treatment for the same reason.
-  const norm = (t) => t.replace(/\r\n/g, "\n");
-  // BOTH artifacts, one guard: the companion is not decoration a reviewer can
-  // let rot. Every artifact this script owns is compared, so a doc edited
-  // without regenerating fails on whichever of the two is behind — and the
-  // message names it.
-  const stale = [
-    { file: outFile, expected: contents, hint: "src/generated/harness.ts" },
-    { file: companionFile, expected: companion, hint: "harness-bundle.md" },
-    { file: referencesFile, expected: referencesContents, hint: "src/generated/references.ts" },
-  ].filter(({ file, expected }) => norm(committed[file]) !== norm(expected));
+  // Verify the repo root is the one that actually holds the harness before we
+  // trust any path. Structural sentinels only — naming a member file here would
+  // make the check die confusingly the day that file is renamed, and would put
+  // a filename back in the one script that is supposed to hold none.
+  for (const sentinel of ["AGENTS.md", "CONTEXT.md", "skills"]) {
+    if (!existsSync(path.join(repoRoot, sentinel))) {
+      findings.push({ message: `repo root check failed: ${sentinel} not found under ${repoRoot}` });
+      return result();
+    }
+  }
 
-  if (stale.length) {
-    console.error(
-      `[bundle-harness] ${stale.length} generated artifact(s) STALE — a bundled harness doc changed but the generated file was not regenerated:\n` +
-        stale
+  // Snapshot the COMMITTED bytes before a single char is assembled. A staleness
+  // guard that generates first and compares against what it just wrote cannot
+  // fail; reading the working tree up front is what makes the guard able to say
+  // no, so it happens here rather than in whichever caller remembers to.
+  const committed = Object.fromEntries(
+    ARTIFACTS.map(({ rel }) => {
+      const abs = path.join(repoRoot, rel);
+      return [rel, existsSync(abs) ? readFileSync(abs, "utf8") : ""];
+    }),
+  );
+
+  // ── Membership, derived ────────────────────────────────────────────────────
+  //
+  // Every doc under a section root must DECLARE where it belongs. A doc with no
+  // `embodiment` is a finding: silence used to mean "not bundled", so a new
+  // convention nobody listed was a rule the bot never learned, and nothing said so.
+  const members = [];
+  const undeclared = [];
+  // The docs under these same roots that declare `embodiment: ide` — everything
+  // the walk SAW and did not bundle. Not used to assemble anything; counted, and
+  // carried in the census.
+  const ideOnly = [];
+  // Worker-read docs that declare `disclosure: reference` — the third answer the
+  // walk can give. They ship in the reference map, never in the prompt.
+  const disclosed = [];
+  // `disclosure` on a doc that cannot carry it: an `ide` doc, or a value that is
+  // not the one word this script knows. Both are findings below.
+  const misdisclosed = [];
+
+  for (const section of SECTIONS) {
+    const found = [];
+    for (const root of section.roots) {
+      for (const rel of walk(repoRoot, root)) {
+        // Endings normalised at the read boundary for the same reason the member
+        // read below does it: a body length that depends on WHO checked the repo
+        // out is not a measurement, and the manifest publishes this one.
+        const { meta, body } = frontmatter(readFileSync(path.join(repoRoot, rel), "utf8").replace(/\r\n/g, "\n"));
+        if (!meta.embodiment) {
+          undeclared.push(rel);
+          continue;
+        }
+        const workerReads = meta.embodiment === "uno-bot" || meta.embodiment === "all";
+        if (meta.disclosure !== undefined) {
+          if (meta.disclosure !== "reference") {
+            misdisclosed.push({ rel, why: `\`disclosure: ${meta.disclosure}\` is not a delivery this script knows` });
+          } else if (!workerReads) {
+            misdisclosed.push({ rel, why: `\`disclosure: reference\` on an \`embodiment: ${meta.embodiment}\` doc names a Worker delivery for a doc the Worker never reads` });
+          } else {
+            disclosed.push({ rel, section: section.name, name: referenceName(rel), embodiment: meta.embodiment });
+          }
+          continue;
+        }
+        if (workerReads) found.push({ rel, embodiment: meta.embodiment });
+        else if (meta.embodiment === "ide") ideOnly.push({ rel, section: section.name, chars: body.length });
+      }
+    }
+    found.sort((a, b) => sortKey(a.rel).localeCompare(sortKey(b.rel)));
+    members.push(...found.map(({ rel, embodiment }) => ({ rel, section: section.name, embodiment })));
+  }
+  disclosed.sort((a, b) => a.name.localeCompare(b.name));
+
+  if (misdisclosed.length) {
+    findings.push({
+      message:
+        `${misdisclosed.length} doc(s) carry a \`disclosure\` this script cannot honour:\n` +
+        misdisclosed.map(({ rel, why }) => `  ${rel}: ${why}`).join("\n") +
+        "\n  -> the one value is `disclosure: reference`, and only a doc the Worker reads (`embodiment: all`" +
+        "\n     or `uno-bot`) can carry it. Absent means loaded into the prompt.",
+    });
+    return result({ committed });
+  }
+
+  if (undeclared.length) {
+    findings.push({
+      message:
+        `${undeclared.length} doc(s) under a bundle section declare no \`embodiment\`:\n` +
+        undeclared.map((p) => `  ${p}`).join("\n") +
+        "\n  -> add `embodiment: all | ide | uno-bot` to the frontmatter. There is no default:" +
+        "\n     a doc that does not say where it belongs is a rule nobody can find.",
+    });
+    return result({ committed });
+  }
+
+  if (!members.length) {
+    findings.push({ message: "no members matched — the glob is broken, refusing to ship an empty prompt." });
+    return result({ committed });
+  }
+
+  // ── The embodiment census (#174) ───────────────────────────────────────────
+  //
+  // What this walk saw: every doc under the section roots, split into the ones
+  // bundled, the ones disclosed and the ones marked `ide`. It changes no
+  // artifact, and the bundle does not need it.
+  //
+  // IT EXISTS FOR A READER OUTSIDE THIS SCRIPT. `check:negation` now ratchets
+  // the IDE-side docs as well as the bundled ones, and the IDE corpus is exactly
+  // the complement measured here: same roots, same frontmatter, the other
+  // answer. A guard that re-walked those roots on its own would be a second glob
+  // that can disagree with this one — the failure #159 deleted — so it walks
+  // them and then checks itself against these four numbers. The `--check OK`
+  // file count already plays that role for the bundled half (#234); this is the
+  // same witness for the other half, and for the total, so a root silently
+  // dropped from either list fails instead of narrowing a corpus in silence.
+  const census = {
+    underRoots: members.length + disclosed.length + ideOnly.length,
+    bundled: members.length,
+    disclosed: disclosed.length,
+    ideOnly: ideOnly.length,
+  };
+  const partial = (extra) => result({ members, disclosed, census, committed, ...extra });
+
+  // Read every member from the LOCAL repo. Frontmatter is stripped: it addresses
+  // this script, not the model, and paying prompt chars for it would be a tax on
+  // having made membership declarative.
+  const raw = members.map(({ rel }) => {
+    const abs = path.join(repoRoot, rel);
+    // Normalise endings at the read boundary. Line endings are a checkout
+    // artifact — no .gitattributes here and core.autocrlf defaults on for
+    // Windows — so bundling on Windows baked ~1,500 stray CRs into the prompt
+    // and dirtied this generated file on every run. Semantically inert to a
+    // model, but it makes the baked bytes depend on WHO deployed, and the
+    // system prompt is the cached prefix.
+    const text = readFileSync(abs, "utf8").replace(/\r\n/g, "\n");
+    return frontmatter(text).body;
+  });
+
+  // The disclosed docs, read the same way: frontmatter off, endings normalised,
+  // `ide-only` regions dropped — the Worker is the reader, so the IDE's regions
+  // are as foreign here as in the prompt. Keyed by name for the map.
+  const referenceMap = Object.fromEntries(
+    disclosed.map(({ rel, name }) => {
+      const text = readFileSync(path.join(repoRoot, rel), "utf8").replace(/\r\n/g, "\n");
+      return [name, stripIdeOnly(frontmatter(text).body)];
+    }),
+  );
+
+  // ── Char budgets, per file ─────────────────────────────────────────────────
+  const overBudget = [];
+  raw.forEach((body, i) => {
+    const budget = budgetFor(members[i]);
+    if (budget && body.length > budget.limit) {
+      overBudget.push({ rel: members[i].rel, ...budget, size: body.length });
+    }
+  });
+
+  if (overBudget.length) {
+    findings.push({
+      message:
+        `${overBudget.length} file(s) over its char budget:\n` +
+        overBudget
           .map(
-            ({ file, expected }) =>
-              `  ${file}\n    committed: ${n(committed[file].length)} chars · regenerated: ${n(expected.length)} chars`,
+            ({ rel, role, size, limit }) =>
+              `  ${rel} (${role}): ${n(size)} chars against a budget of ${n(limit)} — over by ${n(size - limit)}`,
           )
           .join("\n") +
-        "\n  -> run `npm run bundle:harness` and commit " +
-        stale.map(({ hint }) => hint).join(" + ") +
-        ".",
-    );
-    process.exit(1);
+        "\n  -> every char here ships in the system prompt on every request. Cut restatement first:" +
+        "\n     a rule that is stated elsewhere in the bundle should be cited, not quoted.",
+    });
+    return partial();
   }
-  console.log(
-    `[bundle-harness] --check OK (${assembled.length} chars from ${members.length} files; ` +
-      `${disclosed.length} reference(s) disclosed; harness.ts + harness-bundle.md + references.ts all current)`,
-  );
-  process.exit(0);
+
+  // Assembly: first member raw, every other prefixed with a path comment so the
+  // bundle stays traceable back to a file; empty (post-strip) members skipped.
+  const parts = raw.map(stripIdeOnly);
+  const assembled = parts
+    .map((text, i) => {
+      if (!text) return "";
+      return i === 0 ? text : `\n\n---\n\n<!-- ${members[i].rel} -->\n\n${text}`;
+    })
+    .join("");
+
+  // stripIdeOnly needs a MATCHED pair — an unbalanced or misspelled marker simply
+  // doesn't match, and the IDE-only block ships into the system prompt silently.
+  // Fail instead: a surviving marker proves something didn't strip.
+  if (/<!--\s*\/?\s*ide-only\s*-->/i.test(assembled + Object.values(referenceMap).join(""))) {
+    findings.push({
+      message:
+        "an <!-- ide-only --> marker survived assembly — unbalanced or misspelled pair. " +
+        "IDE-only content would ship to the bot (in the prompt or the reference map). Fix the markers and re-run.",
+    });
+    return partial();
+  }
+
+  // ── Char budget, assembled ─────────────────────────────────────────────────
+  if (assembled.length > BUDGETS.assembled) {
+    findings.push({
+      message:
+        `the assembled bundle is over its char budget: ${n(assembled.length)} chars ` +
+        `against a budget of ${n(BUDGETS.assembled)} — over by ${n(assembled.length - BUDGETS.assembled)} ` +
+        `(${members.length} files).\n` +
+        "  -> the whole bundle is the prompt's cached prefix, paid on every request. Cut, or raise the" +
+        "\n     budget deliberately in a PR that says what the prompt bought for the chars.",
+    });
+    return partial();
+  }
+
+  // ── Char floor, assembled (#418) ───────────────────────────────────────────
+  //
+  // Asserted on the SAME quantity as the ceiling — the assembled prompt, which is
+  // the cached block in its entirety — so the two bounds cannot disagree about
+  // what they measure. Fails the same way the ceiling does: no artifact is
+  // assembled, and the finding names the floor, the cache it follows, the margin
+  // and the shortfall.
+  const chosen = activeFloor(repoRoot);
+  if (!chosen.floor) {
+    findings.push({ message: chosen.message });
+    return partial();
+  }
+  const floor = chosen.floor;
+  const floorLine = floor.value + floor.margin;
+  if (assembled.length < floorLine) {
+    const consequence =
+      floor.cache === "implicit"
+        ? "below the floor Google's implicit cache holds none of the prompt, and it ships"
+        : "below the floor the Gemini lane cannot create its explicit context cache, and the prompt ships inline";
+    findings.push({
+      message:
+        `the assembled bundle is under its char floor: ${n(assembled.length)} chars ` +
+        `against a floor of ${floor.label} — short by ${n(floorLine - assembled.length)} (${members.length} files).\n` +
+        `  -> ${consequence}` +
+        "\n     at full price every iteration. Put a document back, or lower the floor" +
+        "\n     deliberately in a PR that cites the /debug/gemini-cache measurement it rests on.",
+    });
+    return partial();
+  }
+
+  const instanceDataHits = findInstanceData(assembled);
+  if (instanceDataHits.length) {
+    const report =
+      `${instanceDataHits.length} possible blueprint INSTANCE DATA hit(s) in the assembled harness:\n` +
+      instanceDataHits
+        .map((h) => `  assembled:${h.line}  (${h.pattern}: "${h.match}")\n    ${h.text}`)
+        .join("\n") +
+      "\n  -> Counts and membership lists about the blueprint's CONTENTS go stale between deploys and" +
+      "\n     ship as confident wrong answers. Delete the number and let search_blueprint retrieve it," +
+      "\n     or, if the figure is deliberate (a historical ledger, a fixed contract), mark the line/block:" +
+      "\n       <!-- instance-data-ok: why this number is allowed to be frozen -->";
+    if (INSTANCE_DATA_GUARD_BLOCKING) {
+      findings.push({ message: report });
+      return partial();
+    }
+    // A warning travels: it is printed by the CLI and reported by the check
+    // module, and fails neither. Flipping the constant above makes it blocking
+    // in both, which is the point of the flag living in one place.
+    findings.push({
+      message: `${report}\n  (log-only: set INSTANCE_DATA_GUARD_BLOCKING = true in this script to make it blocking)`,
+      severity: "warning",
+    });
+  }
+
+  const contents =
+    "// GENERATED by scripts/bundle-harness.mjs — do not edit by hand. Run: npm run bundle:harness\n" +
+    `export const HARNESS = ${JSON.stringify(assembled)};\n`;
+
+  // The reference map, from the same walk (#423). Baked, so a read_reference call
+  // is a property lookup: zero subrequests, nothing to fail on a cold start.
+  const referencesContents =
+    "// GENERATED by scripts/bundle-harness.mjs — do not edit by hand. Run: npm run bundle:harness\n" +
+    "// The disclosed docs (`disclosure: reference` in their frontmatter), keyed by the name\n" +
+    "// the read_reference tool takes. Same assembly as harness.ts; held to the same --check.\n" +
+    `export const REFERENCES: Record<string, string> = ${JSON.stringify(referenceMap)};\n`;
+
+  const rendered = { members, raw, parts, assembled, disclosed, referenceMap, ideOnly, floor, floorLine };
+
+  return result({
+    members,
+    disclosed,
+    census,
+    committed,
+    artifacts: {
+      [HARNESS_TS]: contents,
+      [COMPANION_MD]: renderCompanion(rendered),
+      [REFERENCES_TS]: referencesContents,
+    },
+    manifest: renderManifest(rendered),
+  });
 }
 
-mkdirSync(outDir, { recursive: true });
-writeFileSync(outFile, contents, "utf8");
-writeFileSync(companionFile, companion, "utf8");
-writeFileSync(referencesFile, referencesContents, "utf8");
+/**
+ * The artifacts whose committed bytes differ from what this assembly would
+ * write, in the order a report names them.
+ *
+ * Compared on NORMALISED endings. The HARNESS string itself is JSON-escaped, so
+ * the only real newlines in that file are the two wrapper ones — and on a
+ * Windows checkout those arrive as CRLF while the assembly builds with "\n".
+ * That 2-char difference reported the harness as STALE on every Windows run,
+ * which is a guard crying wolf rather than a guard. The companion is real
+ * markdown and gets the same treatment for the same reason.
+ *
+ * BOTH COMPANION AND MAP ARE IN IT, not just harness.ts: the companion is not
+ * decoration a reviewer can let rot. Every artifact this script owns is
+ * compared, so a doc edited without regenerating fails on whichever is behind
+ * — and the report names it.
+ *
+ * @param {{artifacts: Record<string, string>, committed: Record<string, string> | null}} assembly
+ * @returns {{rel: string, hint: string, expected: string, committed: string}[]}
+ */
+export function staleArtifacts({ artifacts, committed }) {
+  if (!committed || !Object.keys(artifacts).length) return [];
+  const norm = (t) => t.replace(/\r\n/g, "\n");
+  return ARTIFACTS.filter(({ rel }) => norm(committed[rel] ?? "") !== norm(artifacts[rel])).map(({ rel, hint }) => ({
+    rel,
+    hint,
+    expected: artifacts[rel],
+    committed: committed[rel] ?? "",
+  }));
+}
 
-console.log(`[bundle-harness] wrote ${outFile} (${assembled.length} chars from ${members.length} files)`);
-console.log(`[bundle-harness] wrote ${companionFile} (manifest + assembled prompt, ${n(companion.length)} chars)`);
-console.log(
-  `[bundle-harness] wrote ${referencesFile} (${disclosed.length} reference(s): ` +
-    `${disclosed.map(({ name }) => `${name} ${n(referenceMap[name].length)} chars`).join(", ") || "none"})`,
-);
+// ═════════════════════════════════════════════════════════════════════════════
+// The CLI. Everything below is presentation and process: it prints the census a
+// human watching a build reads, writes the artifacts, and exits. `--check` and
+// `--manifest` keep the names, messages and exit codes they have always had,
+// because `scripts/lib/bundled-set.mjs` and `scripts/check-harness-budgets.mjs`
+// spawn this file for the manifest and read its exit code.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Where `--manifest` writes when it is given no path. */
+const DEFAULT_MANIFEST = path.join(here, "..", ".bundle", "harness-manifest.json");
+
+/** The manifest path this run should write, or null when nothing asked for one. */
+function manifestPath(argv = process.argv, env = process.env) {
+  const i = argv.indexOf("--manifest");
+  if (i !== -1) {
+    const next = argv[i + 1];
+    // `--manifest` alone means "the default path"; a following token that is not
+    // another flag is the path to write.
+    return next && !next.startsWith("-") ? path.resolve(next) : DEFAULT_MANIFEST;
+  }
+  const eq = argv.find((a) => a.startsWith("--manifest="));
+  if (eq) return path.resolve(eq.slice("--manifest=".length));
+  // The env var exists for a caller that cannot add an argv — an npm script
+  // wrapper, a workflow step — and names the same file.
+  if (env.HARNESS_MANIFEST) return path.resolve(env.HARNESS_MANIFEST);
+  return null;
+}
+
+/** One prefix for every line this script says, so a build log stays greppable. */
+const say = (text) => `[bundle-harness] ${text}`;
+
+function cli() {
+  const CHECK = process.argv.includes("--check");
+  const MANIFEST = manifestPath();
+  const repoRoot = REPO_ROOT;
+
+  const assembly = assemble({ repoRoot });
+  const errors = assembly.findings.filter((f) => (f.severity ?? "error") === "error");
+  const warnings = assembly.findings.filter((f) => (f.severity ?? "error") !== "error");
+
+  // The census sentence stays exactly where it was: after the membership guards,
+  // before the budgets, so a build that fails on a budget still says what the
+  // walk saw.
+  if (assembly.census) {
+    const { underRoots, bundled, disclosed, ideOnly } = assembly.census;
+    console.log(
+      say(
+        `embodiment census: ${n(underRoots)} declared doc(s) under the ` +
+          `section roots — ${n(bundled)} bundled, ${n(disclosed)} disclosed, ${n(ideOnly)} ide-only`,
+      ),
+    );
+  }
+
+  for (const warning of warnings) console.warn(say(warning.message));
+
+  if (errors.length) {
+    for (const error of errors) console.error(say(error.message));
+    process.exit(1);
+  }
+
+  // Written BEFORE the `--check` exit below, because the callers that need it are
+  // exactly the guards that ask this script `--check`.
+  if (MANIFEST) {
+    mkdirSync(path.dirname(MANIFEST), { recursive: true });
+    writeFileSync(MANIFEST, `${JSON.stringify(assembly.manifest, null, 2)}\n`, "utf8");
+  }
+
+  const abs = (rel) => path.join(repoRoot, rel);
+
+  // `--check`: compare what this run WOULD write against the committed bytes
+  // snapshotted before assembly — so the comparison can never be against
+  // something this run produced — and write nothing. Every other generator in
+  // this repo has a --check counterpart; this one did not, so a harness doc
+  // could be edited and the baked copy left behind with nothing noticing until
+  // someone read the bot's answer.
+  if (CHECK) {
+    const stale = staleArtifacts(assembly);
+    if (stale.length) {
+      console.error(
+        say(
+          `${stale.length} generated artifact(s) STALE — a bundled harness doc changed but the generated file was not regenerated:\n`,
+        ) +
+          stale
+            .map(
+              ({ rel, expected, committed }) =>
+                `  ${abs(rel)}\n    committed: ${n(committed.length)} chars · regenerated: ${n(expected.length)} chars`,
+            )
+            .join("\n") +
+          "\n  -> run `npm run bundle:harness` and commit " +
+          stale.map(({ hint }) => hint).join(" + ") +
+          ".",
+      );
+      process.exit(1);
+    }
+    const { chars, files } = assembly.manifest.assembled;
+    console.log(
+      say(
+        `--check OK (${chars} chars from ${files} files; ` +
+          `${assembly.disclosed.length} reference(s) disclosed; harness.ts + harness-bundle.md + references.ts all current)`,
+      ),
+    );
+    process.exit(0);
+  }
+
+  const { chars, files } = assembly.manifest.assembled;
+  for (const { rel } of ARTIFACTS) {
+    mkdirSync(path.dirname(abs(rel)), { recursive: true });
+    writeFileSync(abs(rel), assembly.artifacts[rel], "utf8");
+  }
+
+  console.log(say(`wrote ${abs(HARNESS_TS)} (${chars} chars from ${files} files)`));
+  console.log(
+    say(`wrote ${abs(COMPANION_MD)} (manifest + assembled prompt, ${n(assembly.artifacts[COMPANION_MD].length)} chars)`),
+  );
+  console.log(
+    say(
+      `wrote ${abs(REFERENCES_TS)} (${assembly.disclosed.length} reference(s): ` +
+        `${assembly.manifest.members
+          .filter((m) => m.delivery === "disclosed")
+          .map((m) => `${m.name} ${n(m.chars)} chars`)
+          .join(", ") || "none"})`,
+    ),
+  );
+}
+
+// Imported by the check module and by the tests, so it must do nothing on import.
+if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) cli();
