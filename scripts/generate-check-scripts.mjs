@@ -217,6 +217,30 @@ export function consistencyFindings() {
       });
     }
 
+    // Every row is a function or a process, and says which (#509). A row with
+    // neither used to mean "spawn it", which made the registry's silence carry
+    // a decision; the runner now refuses to guess, so this is where the reader
+    // finds out.
+    if (row.module && row.kind) {
+      found.push({
+        message: `${row.name} declares both a module and kind: '${row.kind}'. It is one or the other.`,
+      });
+    } else if (row.module) {
+      if (!fs.existsSync(path.join(REPO_ROOT, row.module))) {
+        found.push({ message: `${row.name} declares module ${row.module}, which does not exist.` });
+      }
+    } else if (row.kind !== 'spawn') {
+      found.push({
+        message:
+          `${row.name} declares neither a \`module\` on the findings interface nor ` +
+          "`kind: 'spawn'`. One of the two, and a spawn says why.",
+      });
+    } else if (!row.spawnReason) {
+      found.push({
+        message: `${row.name} is kind: 'spawn' with no spawnReason. Say why it cannot return findings.`,
+      });
+    }
+
     if (!row.baseline) continue;
     if (!fs.existsSync(path.join(REPO_ROOT, row.baseline))) {
       found.push({

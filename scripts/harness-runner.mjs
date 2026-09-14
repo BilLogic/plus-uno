@@ -7,12 +7,21 @@
  * last untested script in the harness and a gate nobody has watched fail is a
  * gate nobody knows works (#191, applied to itself).
  *
- * TWO KINDS OF CHECK, ONE REPORT. A registry row with no `module` is legacy:
- * spawn `npm run <name>`, read the exit code, keep whatever it printed. A row
- * with a `module` exports `run(ctx) => Finding[]`: call it in-process, render
- * one banner with `scripts/lib/findings.mjs`, and take the exit code from the
- * findings rather than from a process. Both shapes come back as the same result
- * object, so the composite's summary does not know the difference.
+ * TWO KINDS OF CHECK, ONE REPORT. A row with a `module` exports
+ * `run(ctx) => Finding[]`: call it in-process, render one banner with
+ * `scripts/lib/findings.mjs`, and take the exit code from the findings rather
+ * than from a process. A row with `kind: 'spawn'` cannot answer that interface
+ * — it drives a browser, a type-checker or a test runner, and its result is an
+ * exit code by nature — so it is spawned as `npm run <name>` and whatever it
+ * printed is kept. Both shapes come back as the same result object, so the
+ * composite's summary does not know the difference.
+ *
+ * THERE IS NO THIRD KIND. Until #509 a row with neither was "legacy" and was
+ * spawned by default, which made the registry's silence mean something — and a
+ * default that means something is a default nobody states. Every row now
+ * declares one of the two, `kind: 'spawn'` carries the reason in
+ * `spawnReason`, and a row declaring neither is reported as the registry bug it
+ * is rather than quietly spawned.
  */
 
 import { spawnSync } from 'node:child_process';
@@ -68,7 +77,7 @@ export const ORPHAN_REMEDY =
   '\n     reason. Add it to CHECKS or to EXCLUDED in scripts/checks.registry.mjs.' +
   '\n     A check that runs nowhere protects nothing.';
 
-/** The npm arguments a legacy row is spawned with. */
+/** The npm arguments a `kind: 'spawn'` row is spawned with. */
 export const npmArgs = (row) =>
   row.pkg === 'bot'
     ? ['--prefix', 'agents/uno-bot', 'run', '--silent', row.name]
@@ -111,12 +120,12 @@ export async function runCheck(row, { repoRoot, spawn = defaultSpawn, load = def
     // registry is wrong about it — fall back to the spawn rather than crash, and
     // say so, because a gate that dies on its own metadata protects nothing.
     if (typeof mod.run !== 'function') {
-      const legacy = await runCheck({ ...row, module: undefined }, { repoRoot, spawn, load });
+      const spawned = await runSpawn(row, { repoRoot, spawn, since });
       return {
-        ...legacy,
+        ...spawned,
         output:
           `[registry] ${row.name} declares module ${row.module}, which exports no run().` +
-          `\n           Ran \`npm run ${row.name}\` instead.\n${legacy.output}`,
+          `\n           Ran \`npm run ${row.name}\` instead.\n${spawned.output}`,
       };
     }
     try {
@@ -137,6 +146,25 @@ export async function runCheck(row, { repoRoot, spawn = defaultSpawn, load = def
     }
   }
 
+  if (row.kind === 'spawn') return runSpawn(row, { repoRoot, spawn, since });
+
+  // Neither kind. Before #509 this was the majority case and meant "spawn it";
+  // now it means the row is incomplete, and saying so is worth more than a run
+  // that happens to work — the next reader of the registry would learn the
+  // wrong rule from a green line.
+  return {
+    ok: false,
+    seconds: since(),
+    output:
+      `[registry] ${row.name} declares neither a \`module\` nor \`kind: 'spawn'\`.\n` +
+      "           Give it a module on the findings interface, or kind: 'spawn' with the\n" +
+      '           reason it cannot answer one (scripts/checks.registry.mjs).',
+    invocation: `(nothing — ${row.name} is an incomplete registry row)`,
+  };
+}
+
+/** `npm run <name>`, read by its exit code. The shape a spawn row comes back as. */
+function runSpawn(row, { repoRoot, spawn, since }) {
   const args = npmArgs(row);
   const result = spawn(args, repoRoot);
   return {

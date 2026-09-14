@@ -43,18 +43,27 @@
  *             than a threshold. Declared so a reader can find the record
  *             without opening the script; the drift check asserts the file
  *             exists and that the script names it.
- *   module    a path to an ES module exporting `run(ctx) => Finding[]`. Present
- *             only on checks migrated to the findings interface (see
- *             `scripts/lib/findings.mjs`); the runner calls those in-process
- *             and renders one banner for them. Absent means legacy: the runner
- *             spawns `npm run <name>` and reads its exit code, which is how
- *             every other check here still works and will until #509.
+ *   module    a path to an ES module exporting `run(ctx) => Finding[]` (see
+ *             `scripts/lib/findings.mjs`). The runner calls it in-process and
+ *             renders one banner for it. 40 of the 56 rows carry one.
+ *   kind      'spawn' — and nothing else. The row cannot answer the findings
+ *             interface, so the runner runs `npm run <name>` and reads its exit
+ *             code. A spawn row carries `spawnReason`.
+ *   spawnReason  why this row is a process rather than a function, in one
+ *             sentence, on the same rule as `guards` and `reason`: written for
+ *             whoever reads the registry next.
  *
- *             The runner imports ONLY a declared `module`. It cannot discover
- *             the interface by importing a script to look for `run`, because a
- *             legacy check does its work at module scope and calls
- *             `process.exit` — importing one to interrogate it would run it,
- *             inside the runner's own process.
+ * EVERY ROW DECLARES ONE OR THE OTHER (#509). Before it, a row with no `module`
+ * was "legacy" and got spawned by default — so the registry's SILENCE was a
+ * decision, made 45 times and stated nowhere, and "migrate the legacy checks"
+ * was a category nobody could enumerate without reading every script. The two
+ * kinds are now both explicit, the spawned ones each say why, and a row
+ * carrying neither is a registry bug the runner reports rather than guesses at.
+ *
+ * THE RUNNER IMPORTS ONLY A DECLARED `module`. It cannot discover the interface
+ * by importing a script to look for `run`: a spawn-kind script does its work at
+ * module scope and calls `process.exit`, so importing one to interrogate it
+ * would run it, inside the runner's own process.
  */
 
 /**
@@ -69,6 +78,11 @@ export const CHECKS = [
     script: 'node scripts/generate-agent.js --check',
     pkg: 'root',
     trigger: 'pull_request',
+    kind: 'spawn',
+    spawnReason:
+      'a composite. It runs the seven generators as sub-processes with inherited stdio so ' +
+      'each names its own failing step; the findings are theirs, and each generator is its ' +
+      'own row in EXCLUDED below. What this row owns is the order they run in.',
     guards:
       'seven generated artifacts against the design-system SSOT (cheat sheet, component + forms index, component docs, INDEX.md, Figma component registry, token registry, knowledge audit). Names its own failing step.',
   },
@@ -77,6 +91,7 @@ export const CHECKS = [
     script: 'node scripts/check-deps.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-deps.mjs',
     guards:
       "the two dependency questions a version bumper cannot ask. Dependabot (.github/dependabot.yml) says what is out of date; this says what is DEAD — declared, upgraded forever, imported nowhere — and what is real but UNDECLARED, because a CDN <link> is invisible to every dependency tool there is. Both were live: two packages with zero references anywhere, and FontAwesome loaded from two CDNs at two different MAJOR versions in one codebase.",
   },
@@ -85,6 +100,7 @@ export const CHECKS = [
     script: 'node scripts/check-deprecated-apis.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-deprecated-apis.mjs',
     guards:
       'dependency ranges against the majors that remove an API this repo still uses. A deprecation is otherwise discovered twice — once when someone reads the warning, once when the upgrade breaks — and only the second one is loud.',
   },
@@ -93,6 +109,7 @@ export const CHECKS = [
     script: 'node scripts/check-doc-links.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-doc-links.mjs',
     guards:
       'every relative markdown link in skills/ agents/ docs/ design-system/guidelines/ + root, and the repo paths inside the JSON indexes.',
   },
@@ -101,6 +118,7 @@ export const CHECKS = [
     script: 'node scripts/check-doc-identifiers.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-doc-identifiers.mjs',
     guards:
       'every prop, variant, size and design token named in a docs page resolving to something in source. This is the #78 / #79 / #98 defect class — three fabricated-name fixes by hand in one day, 2026-08-25.',
   },
@@ -109,6 +127,7 @@ export const CHECKS = [
     script: 'node scripts/generate-figma-links-spreadsheet.js --check',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/generate-figma-links-spreadsheet.js',
     guards: 'the generated Figma-links spreadsheet against the component MDX it is built from.',
   },
   {
@@ -116,6 +135,7 @@ export const CHECKS = [
     script: 'node scripts/check-figma-node-types.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-figma-node-types.mjs',
     guards:
       "each registry mapping claiming what its Figma node actually IS, against a dated measurement in design-system/figma/node-types.json. The field is called componentSetNodeId and 15 of the 95 mapped nodes are not sets — 3 PAGEs and 12 plain COMPONENTs. `isComponentSet: false` is how an entry says so, and until this check nothing in the repo READ that field, so six entries carried it and seven that needed it did not. Also catches a mapping nobody has measured, a recording for a mapping that no longer exists, an id recorded against the wrong one of the two Figma files, and a link that opens on nothing.",
   },
@@ -124,6 +144,7 @@ export const CHECKS = [
     script: 'node scripts/check-figma-snapshots.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-figma-snapshots.mjs',
     guards:
       "the two Figma snapshots in scripts/ still describing the library: their capture dates against a 180-day ceiling, their declared totals against their own contents, their file key, and a floor under each so a snapshot that shrank silently is loud. #339's finding was that NOTHING watched these — the variables snapshot was five weeks behind a library that had gained seven variables it had never seen, and check:token-registry was green over every one of them, because it validates the snapshot against the SCSS and nothing validated the snapshot against Figma. The age is printed on every run, green or not. Since the #339 refresh pass it also asserts that the REMEDY it prints exists: each snapshot names the npm script that rewrites it, and that script must be in package.json. The component half had quietly lost its writer — the poller moved into the Worker on 2026-07-16 and the legacy script that remained opens a Notion PRD and posts to Slack before writing — so a ceiling that fired would have handed the reader a command nobody would run.",
   },
@@ -132,6 +153,7 @@ export const CHECKS = [
     script: 'node scripts/generate-uno-skill-surfaces.mjs --check',
     pkg: 'root',
     trigger: ['pull_request', 'sweep'],
+    module: 'scripts/generate-uno-skill-surfaces.mjs',
     guards:
       'the generated skill surfaces — .claude/skills/ stubs, the Worker command map, the Slack app-manifest block — against each SKILL.md.',
   },
@@ -157,6 +179,7 @@ export const CHECKS = [
     script: 'node scripts/check-skill-overlap.mjs',
     pkg: 'root',
     trigger: ['pull_request', 'sweep'],
+    module: 'scripts/check-skill-overlap.mjs',
     guards:
       'one rule, one home — no substantive line living in two faces of the same skill, and none living in two bundled docs. Reads the bundled set from the bundler, so a stale bundle stops it — and since #234 a SHORT set stops it too, rather than comparing the survivors and printing the narrowed number as the corpus.',
   },
@@ -165,6 +188,7 @@ export const CHECKS = [
     script: 'node scripts/check-knowledge-disposition.mjs',
     pkg: 'root',
     trigger: ['pull_request', 'sweep'],
+    module: 'scripts/check-knowledge-disposition.mjs',
     guards: 'every file under docs/knowledge/ declaring what it became (a `disposition:`).',
   },
   {
@@ -172,6 +196,7 @@ export const CHECKS = [
     script: 'node scripts/check-negation-ratchet.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-negation-ratchet.mjs',
     baseline: 'docs/evals/negation-baseline.json',
     guards:
       "the negation ratchet — the density of five imperative-ban tokens (never / don't / do not / cannot / must not) not climbing, over THREE scopes ratcheted separately from one baseline file: the bundled harness docs; since #174, the hand-authored IDE-side docs (the `embodiment: ide` complement of the bundled set within the bundler's own section roots, so docs/adr/ and the generated .claude/skills/ surfaces are out by structure); and since #425 the headless GitHub Actions prompts under scripts/prompts/, the third embodiment, which declare no embodiment: and are never bundled, so they are listed by where they live rather than found through the bundler. It counts PROHIBITION TOKENS, not negation as written: the two differ by roughly 3x and #234 chose the narrow, unarguable one on the evidence. Each scope also refuses to run against fewer docs than its baseline was recorded over — a ratchet only fails on a RISE, so a corpus that vanished otherwise passes with a smaller number. The script header carries the measurement.",
@@ -181,6 +206,7 @@ export const CHECKS = [
     script: 'node scripts/check-pointers.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-pointers.mjs',
     guards:
       "the pointer sweep over the always-loaded router (AGENTS.md): every backticked repo path resolves, every `path § Heading` names a heading that exists, and every § Progressive loading trigger leads with the word that carries its branch rather than filler. A pointer that does not resolve, or buries its trigger, is a document the agent will not reach — the same rot as a stale schema name in prose (#409), one layer up. Conditional pointers (\"when `path` exists\") and bare shape names (`SKILL.md`) are skipped by rule, and the rules are mutation-tested in check-pointers.test.mjs (#420).",
   },
@@ -189,6 +215,7 @@ export const CHECKS = [
     script: 'node scripts/check-glossary.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-glossary.mjs',
     baseline: 'docs/evals/glossary-baseline.json',
     guards:
       'CONTEXT.md staying a glossary: no fenced code, no third-level headings, every section holding term rows, and prose lines ratcheted against docs/evals/glossary-baseline.json — the count may fall, never rise. The two sibling repos grew their CONTEXT.md to 40k and 18k chars one "just one more section" at a time (#420); this is what stops it here.',
@@ -198,6 +225,7 @@ export const CHECKS = [
     script: 'node scripts/check-retired-spelling.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-retired-spelling.mjs',
     guards:
       'the contract of the maintenance-severity rename (#429): "Tier 1 / Tier 2" for a FIX stays retired across every hand-authored doc an agent reads — the constitution, glossary, agents/, skills/, docs/, the DS guidelines, the headless prompts and the workflows — because *Tier* now means the loading tiers and a maintenance "Tier 1" reads as always-loaded. Each shape is anchored on a severity noun (fix, digest, whitelist, pipeline, "suggested tier", the old file names), so the loading uses match nothing. History (docs/plans/, todos/), ADRs, the archive and generated artifacts are left as written by rule; the glossary row that names the old spelling in its Do NOT use cell is the one exemption.',
   },
@@ -206,6 +234,7 @@ export const CHECKS = [
     script: 'node scripts/check-cross-repo-duplication.mjs',
     pkg: 'root',
     trigger: ['pull_request', 'sweep'],
+    module: 'scripts/check-cross-repo-duplication.mjs',
     guards:
       "one meaning stated in TWO REPOSITORIES. The same rename map, in the same shape, sat in plus-uno-blueprint's glossary and in agentic-service-blueprinting's; nothing compared them and they drifted until each was deleted by its own ticket. This sweep compares the three repos' harness documents by SHINGLE — 12 consecutive normalised words, findings merged into runs of 30+ — because paragraph equality is defeated by one edited table cell and would have found ONE shared block across both of those glossaries, which shared 771 words. It reaches the blueprint the way sync-blueprint-contract.mjs does ($BLUEPRINT_REPO or a sibling checkout) and sb through the pinned development dependency this repo now holds the way the blueprint holds it. A vendored document is exempt by the marker its sync writes; three docs/agents/ files a shared plugin installs are exempt by name; two document pairs already duplicated are RECORDED with a ceiling their shared words may fall below and never rise above, and every exemption fails when it goes stale. WITH A SIBLING MISSING IT SKIPS LOUDLY rather than silently — it names the pairings it did not compare, on stdout and, on CI, as a ::warning:: and a job-summary line, because check:contract spent months exiting 0 on a missing checkout while a header called it a gate (#258).",
   },
@@ -214,6 +243,7 @@ export const CHECKS = [
     script: 'node scripts/check-button-contrast.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-button-contrast.mjs',
     baseline: 'docs/evals/button-contrast-baseline.json',
     guards:
       "every combination Button's `$btn-themes` map GENERATES — 8 styles x 5 fills — rather than the ones a story happens to render. `check:storybook`'s a11y ratchet measures the DOM, and nothing renders a filled `warning` button, so a 3.70:1 label sat in the map unseen for the life of it (#312). It also asserts no two styles resolve to the same filled ground: `--color-info` is `var(--color-tertiary)`, so two names render one appearance, and no accessibility tool compares token values for equality because none knows they were meant to differ. Both current findings are colour-token decisions (#268) rather than Button's, so they are ratcheted in `docs/evals/button-contrast-baseline.json` — which may shrink and never grow, and reports an entry that has stopped failing.",
@@ -223,6 +253,7 @@ export const CHECKS = [
     script: 'node scripts/check-token-collision.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-token-collision.mjs',
     guards:
       'no component stylesheet colouring text in the same token as the surface under it. `Navbar` shipped one for the life of the component at 1.00:1 (#219); axe cannot see this class, because the text sits in a transparent box over a painted ancestor.',
   },
@@ -231,6 +262,7 @@ export const CHECKS = [
     script: 'node scripts/check-colour-fallbacks.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-colour-fallbacks.mjs',
     baseline: 'docs/evals/colour-fallback-baseline.json',
     guards:
       'the literal beside a colour token agreeing with that token (#268). `var(--color-on-surface-variant, #5c5c5c)` reads as one decision and is two — that token is `#3f484a`, and it carries TEN different fallbacks across its uses, none of them the token. 191 of 473 comparable fallbacks disagree, so the recorded set is ratcheted and only a NEW one fails. It also holds 27 `--color-*` names that are referenced and defined nowhere, where the fallback IS the colour. Static and sub-second, which is why it composes here while the browser checks do not.',
@@ -240,6 +272,7 @@ export const CHECKS = [
     script: 'node scripts/check-size-fallbacks.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-size-fallbacks.mjs',
     baseline: 'docs/evals/size-fallback-baseline.json',
     guards:
       "the same rule as check:colour-fallbacks, over the tokens that decide layout rather than colour — and it is the bigger half. 454 of 1075 comparable fallbacks disagree with their token: `var(--size-section-gap-sm, 16px)` is written 61 times for a token that is `8px`, and `var(--size-element-pad-y-lg, 12px)` 52 times for one that is `8px`. Colour's version of this defect paints a wrong shade when the token sheet is late; this one lays out a different page. Ratcheted at 68 distinct pairs. Two entry points rather than one because the families genuinely differ: dimensions have no shared name prefix and are selected by value, and an undefined dimension name is usually a component-local custom property rather than a defect.",
@@ -249,6 +282,7 @@ export const CHECKS = [
     script: 'node scripts/check-undefined-tokens.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-undefined-tokens.mjs',
     baseline: 'docs/evals/undefined-token-baseline.json',
     guards:
       "design tokens that are USED and defined nowhere. A bare `var(--x)` on a token that does not exist DROPS the whole declaration: `var(--font-weight-light)` was in six shipped components against a system that defines `--font-weight-normal: 300`, so text designed at 300 rendered at its inherited weight, and Tooltip's small variant reached for `--font-size-body4`, which does not exist, so its text had no size of its own. Nothing saw either — check:colour-fallbacks and check:size-fallbacks only read tokens written WITH a fallback and only in two namespaces, and check:doc-identifiers resolves names in docs pages, not in stylesheets. A ratchet: 145 names over 508 uses when it was written, and the count may fall and never rise, with the BARE count held down separately so converting a fallback into a bare use cannot pass by keeping the total flat.",
@@ -258,6 +292,7 @@ export const CHECKS = [
     script: 'node scripts/check-font-families.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-font-families.mjs',
     guards:
       "every font stack ending in a CSS generic, and every inline fallback naming the face its token names. A fallback only paints when the token fails to load, so a wrong one is wrong everywhere at once and invisible until then — the reasoning check:colour-fallbacks applies to colour, which nothing applied to type. Seven findings when it was written and all seven fixed: --font-family-display4 named one face and no generic; three files fell back from --font-family-body to Lato, which is the HEADER face, so body text would have rendered in the heading font; two fell back to a bare `Lato`. It also keeps #267's monospace rule, where --font-family-code fell back to sans-serif and the stack measured 171.13px against monospace's 480.08px.",
   },
@@ -266,6 +301,7 @@ export const CHECKS = [
     script: 'node scripts/check-figma-scopes.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-figma-scopes.mjs',
     guards:
       "no Figma colour variable offering itself for a role its contrast cannot carry. A variable's SCOPES are what the picker offers it FOR, and nothing recorded them — not the name snapshot, not the token registry. The sweep of 2026-08-29 found five variables outside the convention their peers follow, and every one of the five was offerable as a TEXT_FILL: `_Primary/Primary` on ALL_SCOPES, which measures 4.31:1 and 4.08:1 on the two darkest surface steps; `_Relationship/Relationship` likewise; `_Warning/Warning Container` and `_Advocacy/Advocacy Container` on ALL_FILLS, which includes text, where #ffe17a is 1.5:1 on white; and `_Warning/Warning (Text)` on ALL_SCOPES — the inverse error, the one warning value that PASSES as text also offered as a ground. That is #368's finding reached from the designer's end: picking `_Primary/Primary` for a label in Figma is what the 108 CSS declarations do, and the file was inviting it. The convention is DERIVED from the majority across the twelve accent groups rather than declared, so a finding reads 'this one disagrees with its peers' and not 'this one disagrees with me', and a new group that follows the pattern needs no edit. It also asserts that a convention was FOUND for each of the seven roles, since a naming change under classify() would otherwise let the check pass by having nothing to say. Mutation-tested by restoring each of the two worst violations and by emptying the recording.",
   },
@@ -274,6 +310,7 @@ export const CHECKS = [
     script: 'node scripts/check-intent-roles.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-intent-roles.mjs',
     baseline: 'docs/evals/intent-role-adoption.json',
     guards:
       "the vocabulary of every intent-coloured EDGE in the design system. `_color_roles.scss` minted `--color-X-icon` and `--color-X-border` on 2026-08-29 and closed with the sentence that these tokens had no users yet \u2014 111 of the 137 border declarations now name the role, and this is the ratchet that keeps them there. The rename changes no pixel for six of the seven intents, which is the point: `border-color: var(--color-danger)` is a use of the bold FILL colour that happens to land on an edge, and `var(--color-danger-border)` is a declaration that an edge was intended and 3:1 was the bar. Only the second can move on its own, and warning must \u2014 #9f8205 is 2.87:1 on the darkest surface step, under even WCAG 1.4.11's non-text bar. It ratchets in BOTH directions: a count below its record is a finding too, because a baseline that describes code that no longer exists has stopped being readable. It also asserts the seven role tokens still EXIST, since a regeneration that removed `_color_roles.scss` would leave 111 call sites resolving to nothing while this check, which counts BASE uses, reported green. Mutation-tested four ways: a reverted call site, a deleted role, a baselined file with its reason removed, and a recorded remainder fixed without lowering the record. 0.1s, measured 2026-08-29.",
@@ -283,6 +320,7 @@ export const CHECKS = [
     script: 'node scripts/check-focus-ring.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-focus-ring.mjs',
     baseline: 'docs/evals/focus-ring.json',
     guards:
       "the one thing that tells a keyboard user where they are. Of the 84 focus rules in the design system, 29 had NO affordance reaching WCAG 1.4.11's 3:1 \u2014 `.plus-input:focus` announced itself with a #84cfff border at 1.62:1, the AM/PM toggle and the file drop zone with an 8% primary tint at 1.13:1, four textarea states at 2.22:1, and six readonly fields with the same grey they wear at rest. axe cannot catch this: it has no focus-appearance rule, so `check:storybook` swept all 416 story files and reported none of it. A rule is scored on its STRONGEST affordance, which is the correction that made the check right \u2014 eleven rules pair a 1.13:1 glow with a 5.02:1 border, and there the border is the indicator. No ratchet and no exceptions: a ring nobody can see is a defect, not a vocabulary to migrate at leisure. Mutation-tested three ways: one ring reverted, the `--color-focus-ring` role deleted, and a stale exception left behind. 0.2s, measured 2026-08-29.",
@@ -292,6 +330,7 @@ export const CHECKS = [
     script: 'node scripts/check-icon-button-name.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-icon-button-name.mjs',
     baseline: 'docs/evals/icon-button-name.json',
     guards:
       "a button that is only an icon still telling you what it does. 20 of them across the design system had no `aria-label`, no `title` and no text \u2014 a screen reader announces \"button\" and nothing else for a control that dismisses an alert, expands a lesson row or opens the session menu. axe reports 23 of these across the story suite, and the two populations overlap without either containing the other: axe counts RENDERED instances, so one component in a loop is many findings and a component nobody storied is none, where this counts SOURCE sites and sees the page nobody wrote a story for. Two of the 20 were not about names at all \u2014 `LessonsSpec` and `OnboardingSpec` call Button with `btnStyle`, `btnFill`, `label` and `icon`, none of which Button has, so those buttons were rendering EMPTY and the missing name was the symptom that surfaced it. No ratchet: the bar is zero and the exception map is empty. Mutation-tested three ways \u2014 a name removed, a stale exception, and `text=\"\"`, which an attribute-presence test reads as a name and which four real call sites are written with. 0.2s, measured 2026-08-29.",
@@ -319,6 +358,7 @@ export const CHECKS = [
     script: 'node scripts/check-figma-colour-drift.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-figma-colour-drift.mjs',
     guards:
       "the CSS still painting what Figma says, or the difference being written down and argued. `scripts/figma-variables-snapshot.json` records every variable in the library by NAME and by count, and check:figma-snapshots holds it to a date and a floor — neither records a single VALUE, so a colour could move on either side and the names would still line up perfectly. Two had, both found in one sweep of the BS4 library on 2026-08-29. `--color-success-container` is #bdf292 in the CSS and #a1eb83 in Figma, and both sides are internally consistent — the CSS state layers are built from rgba(189, 242, 146, …) and the Figma ones from #a1eb83 — so each looks correct alone and only the comparison shows the split. `--color-scrim` is 0.38 in the CSS against 0.32 in Figma: every Modal and Drawer in the product dims its page 19% harder than designed. Both are exempted rather than fixed because each is a decision and not a repair — whichever side changes, a shipping colour moves — and the exemption records what BOTH sides hold, so a change on either fails instead of sliding underneath it. 94 of the 103 non-state-layer colour variables map to a CSS token; the nine that do not are the `_Proposal/` candidates and the Figma-only `Surface roles/` set, reported and not failed. The alias chains are followed on both sides, which is why moving one base reports all three of its dependants. Mutation-tested three ways: a new divergence, a known one that stopped diverging, and a known one that changed shape.",
   },
@@ -327,6 +367,7 @@ export const CHECKS = [
     script: 'node scripts/check-token-generation.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-token-generation.mjs',
     guards:
       "`npm run generate:tokens` being unable to silently delete tokens. It opened with `console.warn('WARNING: Source JSON files are incomplete. Token generation is DISABLED to protect existing tokens.')` and then wrote all four token files four lines later — the warning had no return and no exit, so the protection it announced did not exist. One run of that documented one-word command on 2026-08-29 took `_colors.scss` from 195 colour tokens to 5, keeping only the five bare intents; `_layout.scss` lost every breakpoint token, `_primitives.scss` 9 and `_spacing_semantics.scss` 3. It reported `✅ All token files generated successfully!` while doing it, and printed `✅ Validation passed` beside a validation that had been commented out. `skills/uno-maintain/references/ds-fix.md` lists the command as the way to regenerate SCSS from source, so an agent following the maintenance skill would have run it. The generator now builds every file in memory, refuses by NAME when any file would lose a token, and writes nothing on that path. This check asserts the conditional rather than the refusal — non-zero exit if and only if it says a file would shrink, and a `--dry-run` that leaves every token file byte-identical — because a gate that goes red on the day the Figma exports are fixed is a gate somebody deletes. Mutation-tested three ways: dropping the exit, letting `--dry-run` write, and reinstating the false validation claim. The first draft of the check MISSED the dropped exit, because the refusal is on stderr and `execFileSync` returns only stdout on a zero exit; it uses `spawnSync` now.",
   },
@@ -335,6 +376,7 @@ export const CHECKS = [
     script: 'node scripts/check-atlassian-benchmark.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-atlassian-benchmark.mjs',
     baseline: 'docs/evals/atlassian-benchmark.json',
     guards:
       "the comparison against Atlassian staying a MEASUREMENT rather than a memory, and the three gaps it found staying closed once they close. Their published surface was read live on 2026-08-29: 515 tokens, of which 441 are colour, split by role into `background` 208, `text` 49, `border` 39 and `icon` 23. Ours are 479 and 195. The first draft of this check recorded that we have no role split at all, which is false and the correction is the finding: `--color-surface*` (36) IS the background role and `--color-outline*` (8) IS the border role, under Material's names. What is true is sharper. Our FOREGROUND role is undivided — one `--color-on-*` family (32) where they keep text and icon apart because the bars differ, 4.5:1 against 3:1 — so no token records which bar its value was checked against. And all seven intents carry the identical 9-token shape (base, container, -text, six state overlays), naming two roles while using three: there is no `--color-warning-border` and no `--color-warning-icon`, so an intent-coloured stroke borrows the fill. That is the gap #312 lived in — `--color-warning` is 3.70:1 on white, legal as an icon and illegal as text, and its name says neither. The type row was ALSO wrong at first and is corrected here: counting `--font-size-*` gave 44 and read as bloat, but 27 of those are FontAwesome icon sizes and five are aliases, leaving TWELVE distinct text sizes against their fourteen steps, which is parity. The defect is the spacing rather than the count — the twelve run 12·14·16·20·24·28·32·40·56·64·72·80, giving seven distinct ratios across eleven steps (1.111, 1.125, 1.143, 1.167, 1.200, 1.250, 1.400), a list and not a scale (#267). Four rows are ratcheted by DIRECTION, never by distance: intent border and icon tokens may only rise from zero, the ratio count and the 46 line-heights (against their zero, since line-height travels inside each step — #346) may only fall. Nine more are recorded and not enforced, because 36 surface tokens against 208 backgrounds is a difference and not a defect. `--update` refuses to record a backwards move, and the whole thing fails when the recording goes a year unread.",
@@ -344,6 +386,7 @@ export const CHECKS = [
     script: 'node scripts/check-unspread-rest.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-unspread-rest.mjs',
     guards:
       'no component in the published library collecting a `...rest` and never using it. ' +
       '`DateAndTimePicker` dropped every prop beyond its signature for the life of the ' +
@@ -357,6 +400,7 @@ export const CHECKS = [
     script: 'node scripts/check-docs-tabs.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-docs-tabs.mjs',
     guards:
       'that the component docs pages keep the tab split ADR-025 gave them. Examples · Code · '
       + 'Usage · Changelog stopped being Storybook `types.TAB` addons and became part of the '
@@ -375,6 +419,7 @@ export const CHECKS = [
     script: 'node scripts/check-docs-token-literals.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-docs-token-literals.mjs',
     guards:
       'that the docs stylesheet stops hand-picking values the design system already '
       + 'tokenises. `.storybook/storybook-overrides.css` is the one stylesheet here that '
@@ -393,6 +438,7 @@ export const CHECKS = [
     script: 'node scripts/check-docs-dead-selectors.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-docs-dead-selectors.mjs',
     guards:
       "that no rule in the docs stylesheet aims at a class nothing puts in the DOM. #250's "
       + 'R1 asked for exactly this and was satisfied by a hand sweep, which leaked five: '
@@ -413,6 +459,7 @@ export const CHECKS = [
     script: 'node scripts/check-page-outline.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-page-outline.mjs',
     guards:
       'the OTHER half of the page-outline guard — the half a DOM assertion cannot hold. ' +
       '`.storybook/page-outline.js` asserts in the browser that every page story renders an ' +
@@ -430,6 +477,11 @@ export const CHECKS = [
     script: 'node .cursor/hooks/uno-prototype/test-fsm.mjs',
     pkg: 'root',
     trigger: ['pull_request', 'sweep'],
+    kind: 'spawn',
+    spawnReason:
+      'an assert-based smoke suite over the intake FSM. It throws on the first broken ' +
+      'invariant rather than collecting them, which is what a test suite is for and what a ' +
+      'findings set is not.',
     guards: 'the intake FSM that gates every uno-prototype run.',
   },
   {
@@ -437,6 +489,10 @@ export const CHECKS = [
     script: 'node --test scripts/*.test.mjs scripts/lib/*.test.mjs',
     pkg: 'root',
     trigger: ['pull_request', 'sweep'],
+    kind: 'spawn',
+    spawnReason:
+      '`node --test`. The runner\'s report IS the findings set, in TAP, and re-rendering it ' +
+      'as Finding[] would be a second opinion about a format that already has one.',
     guards:
       'the unit tests of the guards themselves. A guard nobody has watched fail is a guard nobody knows works (#191).',
   },
@@ -445,6 +501,7 @@ export const CHECKS = [
     script: 'node scripts/check-secrets.mjs',
     pkg: 'bot',
     trigger: 'pull_request',
+    module: 'agents/uno-bot/scripts/check-secrets.mjs',
     guards:
       "the secret declaration against `interface Env` and against [vars]. The [vars] half is the one with teeth: that table is COMMITTED, so a secret assigned there is a secret published to GitHub. The rest keeps wrangler.toml's expected-names list honest — hand-maintained, it drifted in both directions at once (four names not set, two set names missing) and #288's account move works from exactly that list.",
   },
@@ -453,6 +510,7 @@ export const CHECKS = [
     script: 'node scripts/check-worker-host.mjs',
     pkg: 'bot',
     trigger: 'pull_request',
+    module: 'agents/uno-bot/scripts/check-worker-host.mjs',
     guards:
       'the single definition of the Worker\'s hostname. Its inputs are repo-root files — the eval workflows and docs/ — so a PR that never touches agents/uno-bot/ can still break it. A second hardcoded host is silent until a cutover (#288) misses one, and an eval pointed at the OLD deployment reports a clean pass, which is the shape of failure #249 already cost this repo.',
   },
@@ -461,6 +519,7 @@ export const CHECKS = [
     script: 'node scripts/check-typography-classes.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-typography-classes.mjs',
     guards:
       "every `*-txt` class a page asks for against a rule that actually sets type. `.h1-txt`\u2013`.h6-txt` have never existed \u2014 headings are `.h1`\u2013`.h6` \u2014 and eleven places asked for them anyway, including two prototype pages and a guidelines example teaching it onward. A missing utility class fails silently by definition: the element keeps its own type, one step off the scale, with nothing to notice it. 0.1s, measured 2026-08-29.",
   },
@@ -469,6 +528,7 @@ export const CHECKS = [
     script: 'node scripts/check-text-contrast.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    module: 'scripts/check-text-contrast.mjs',
     baseline: 'docs/evals/text-contrast-baseline.json',
     guards:
       "every `color:` declaration in the design system's stylesheets against the ground its own rule puts it on, compositing translucent state layers first. `--color-warning` is 3.52:1 on the page \u2014 below AA \u2014 and was the declared text colour in seven places including a `.color-warning` utility anyone could reach for, while `--color-warning-text` (8.24:1) sat in the token file unused. Nothing rendered any of the seven in a story, so `check:storybook`'s axe pass never measured one. Ratchet, because the remaining findings are open #268 token decisions and WCAG's inactive-component exemption, both recorded with a reason. 0.2s, measured 2026-08-29.",
@@ -478,6 +538,11 @@ export const CHECKS = [
     script: 'node scripts/bundle-harness.mjs --check',
     pkg: 'bot',
     trigger: 'pull_request',
+    kind: 'spawn',
+    spawnReason:
+      'the harness bundler. `--check` is its assembly pass with the writes withheld, so the ' +
+      'thing that would have to return findings is the generator itself rather than a ' +
+      'wrapper over one — the shape every other row here reduced to.',
     guards:
       'the Worker prompt bundle against the root docs it is assembled from, and the char budgets in AGENTS.md § The loading contract. This is the artifact #196 had to repair.',
   },
@@ -486,6 +551,10 @@ export const CHECKS = [
     script: 'tsc --noEmit',
     pkg: 'bot',
     trigger: 'pull_request',
+    kind: 'spawn',
+    spawnReason:
+      '`tsc --noEmit`. The type errors are the compiler\'s, in the compiler\'s format, and ' +
+      'nothing in this repo should paraphrase them.',
     guards:
       "the Worker's TypeScript, which no pull request ran until now. `npm run deploy` chains it, so it was gated at the deploy boundary and nowhere earlier — a type error reached the one command whose failure is most expensive to discover. 1.2s, measured 2026-08-29.",
   },
@@ -494,6 +563,8 @@ export const CHECKS = [
     script: 'node --test scripts/*.test.mjs',
     pkg: 'bot',
     trigger: 'pull_request',
+    kind: 'spawn',
+    spawnReason: '`node --test`, for the same reason as test:scripts.',
     guards:
       "the bot's own script tests \u2014 apply-cutover, secrets, deploy, the harness bundler \u2014 which check-harness.yml has run since #266 but check:harness did not, so the local gate was a strict SUBSET of the remote one. That gap cost a red CI on #388: a message reworded in apply-cutover.mjs broke an assertion in apply-cutover.test.mjs, `npm run check:harness` went green locally on all 38 sub-checks, and the failure appeared only after the push. The completeness assertion could not have caught it either, because it scans `check:*` names and this is not one. 0.3s, measured 2026-08-30.",
   },
@@ -502,6 +573,10 @@ export const CHECKS = [
     script: 'tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js',
     pkg: 'bot',
     trigger: 'pull_request',
+    kind: 'spawn',
+    spawnReason:
+      '`tsc -p tsconfig.test.json && node --test`. A build step and a test runner; neither ' +
+      'half is a comparison this process could make.',
     guards:
       "the Worker's 268 unit tests across 39 suites, which ran in NO workflow and are not in `npm run deploy` either — that chain chose `test:bundle` and stopped. So the largest test suite in this repository was gated by nothing at all, and had been since it was written. 1.2s, measured 2026-08-29. Found while verifying the TypeScript 7 bump (#298), which is exactly the change that needed them. Among them is the harness name sweep (tests/harness-blueprint-names.test.ts), which reads the assembled prompt, the tool schemas and — since #425 — the Actions prompts under scripts/prompts/ for blueprint identifiers and conventions the schema no longer has; its inputs are repo-root files, which is the rule that composes a sub-package check here.",
   },
@@ -523,6 +598,10 @@ export const EXCLUDED = [
     script: 'node scripts/check-harness.mjs',
     pkg: 'root',
     trigger: 'pull_request',
+    kind: 'spawn',
+    spawnReason:
+      'this script — the composite itself. It is the process every other row reports into, ' +
+      'so it has no findings of its own to return.',
     reason:
       'this script.',
   },
@@ -531,6 +610,10 @@ export const EXCLUDED = [
     script: 'node scripts/generate-component-docs.mjs --check',
     pkg: 'root',
     trigger: 'pull_request',
+    kind: 'spawn',
+    spawnReason:
+      'a generator. `--check` is its own assembly pass with the writes withheld, and ' +
+      'check:agent spawns it so the step names itself.',
     reason:
       'step 3 of check:agent.',
   },
@@ -539,6 +622,8 @@ export const EXCLUDED = [
     script: 'node scripts/generate-index.mjs --check',
     pkg: 'root',
     trigger: 'pull_request',
+    kind: 'spawn',
+    spawnReason: 'a generator, spawned as a step of check:agent — see check:component-docs.',
     reason:
       'step 4 of check:agent.',
   },
@@ -547,6 +632,8 @@ export const EXCLUDED = [
     script: 'node scripts/generate-component-registry-from-storybook.js --check',
     pkg: 'root',
     trigger: ['pull_request', 'sweep'],
+    kind: 'spawn',
+    spawnReason: 'a generator, spawned as a step of check:agent — see check:component-docs.',
     reason:
       'step 5 of check:agent.',
   },
@@ -555,6 +642,8 @@ export const EXCLUDED = [
     script: 'node scripts/generate-token-registry.mjs --check',
     pkg: 'root',
     trigger: ['pull_request', 'sweep'],
+    kind: 'spawn',
+    spawnReason: 'a generator, spawned as a step of check:agent — see check:component-docs.',
     reason:
       'step 6 of check:agent.',
   },
@@ -563,6 +652,8 @@ export const EXCLUDED = [
     script: 'node scripts/generate-knowledge-audit.js --check',
     pkg: 'root',
     trigger: 'pull_request',
+    kind: 'spawn',
+    spawnReason: 'a generator, spawned as a step of check:agent — see check:component-docs.',
     reason:
       'step 7 of check:agent.',
   },
@@ -571,6 +662,10 @@ export const EXCLUDED = [
     script: 'node scripts/check-storybook.mjs',
     pkg: 'root',
     trigger: 'storybook-gate',
+    kind: 'spawn',
+    spawnReason:
+      'it drives a real Chromium over the story suite. The result is a browser run\'s exit ' +
+      'code and a Playwright report, not a set of findings this process could compute.',
     baseline: 'docs/evals/a11y-baseline.json',
     reason:
 'the only sub-check that is not dependency-free: it needs `npm ci` and a Playwright ' +
@@ -589,6 +684,8 @@ export const EXCLUDED = [
     script: 'node scripts/check-docs-chrome.mjs',
     pkg: 'root',
     trigger: 'storybook-gate',
+    kind: 'spawn',
+    spawnReason: 'it starts a Storybook and drives a real Chromium — see check:storybook.',
     reason:
 'the same reason as check:storybook, and it runs in the same job: it needs `npm ci`, a ' +
     'Playwright chromium and a Storybook server before it can measure anything. It exists ' +
@@ -601,6 +698,7 @@ export const EXCLUDED = [
     script: 'node scripts/check-fetch.mjs',
     pkg: 'bot',
     trigger: 'deploy',
+    module: 'agents/uno-bot/scripts/check-fetch.mjs',
     reason:
       'reads only agents/uno-bot/src/. A root-only PR cannot break it, and `npm run deploy` gates it at its own boundary.',
   },
@@ -609,6 +707,10 @@ export const EXCLUDED = [
     script: 'node scripts/sync-blueprint-contract.mjs --check',
     pkg: 'bot',
     trigger: 'deploy',
+    kind: 'spawn',
+    spawnReason:
+      'a sync. `--check` is that sync with the write withheld, and a missing sibling ' +
+      'checkout is an exit code by design (see the reason above).',
     reason:
       'compares against a sibling checkout of BilLogic/plus-uno-blueprint that no runner has. It exits 1 on a missing source by design, so composing it would make this gate permanently red.',
   },

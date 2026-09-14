@@ -15,11 +15,13 @@
  * banner for it; the check's own CLI wrapper uses `report()` below, so the
  * message a human reads by hand and the message CI prints are the same string.
  *
- * MIGRATION IS PARTIAL ON PURPOSE. #508 builds this path and moves one check
- * onto it (`check:node-floor`, whose findings were already a pure function).
- * The other 45 keep their exit codes and the runner keeps spawning them —
- * #509 is the migration. A row in `scripts/checks.registry.mjs` declares which
- * kind it is by carrying a `module` or not.
+ * THE MIGRATION IS DONE (#509). #508 built this path and moved one check onto
+ * it (`check:node-floor`, whose findings were already a pure function); #509
+ * moved the rest. Every row in `scripts/checks.registry.mjs` now declares
+ * either a `module` on this interface or `kind: 'spawn'` with the reason it
+ * cannot be one — a browser, a type-checker, a test runner. "Legacy" is no
+ * longer a category: a row that declares neither is a registry bug, and the
+ * runner says so instead of guessing.
  *
  * @typedef {object} Finding
  * @property {string}  message           what is wrong, in one sentence.
@@ -29,6 +31,8 @@
  *           printed and does NOT fail the check — for the class of finding that
  *           is worth saying and not worth blocking a merge over.
  */
+
+import { pathToFileURL } from 'node:url';
 
 /** @param {Finding} finding */
 export const isError = (finding) => (finding.severity ?? 'error') === 'error';
@@ -94,4 +98,52 @@ export function report(name, findings, opts = {}) {
   if (code === 0) console.log(text);
   else console.error(text);
   process.exit(code);
+}
+
+/**
+ * The CLI half, as one call. `#509` moved every check onto `run(ctx)`, and the
+ * entry point each one needs is identical: when this module is the process
+ * entry, render its findings and exit on them; when the harness runner imported
+ * it, do nothing at all. Written out by hand in 40 files it is 40 chances to
+ * get the `import.meta.url` comparison subtly wrong, and one of those mistakes
+ * (a check that runs itself on import) is a check that runs inside the runner's
+ * own process.
+ *
+ * `summary` is a THUNK and is called only when there is nothing to report. A
+ * green line usually carries a number the check had to compute — the tightest
+ * contrast ratio, the worst-case age — and several of those expressions are
+ * only meaningful on the passing path; calling it eagerly would crash the
+ * failing one.
+ *
+ * @param {string} moduleUrl  the caller's `import.meta.url`.
+ * @param {string} name       the check's npm script name.
+ * @param {{run: Function, summary?: Function, remedy?: string}} check
+ * @returns {void}  or never, when this module is the entry point.
+ */
+export function main(moduleUrl, name, { run, summary, remedy }) {
+  if (!process.argv[1] || pathToFileURL(process.argv[1]).href !== moduleUrl) return;
+  const findings = run() ?? [];
+  report(name, findings, { remedy, summary: findings.length ? undefined : summary?.() });
+}
+
+/**
+ * Memoize a check's read of the repo, so `run` and `summary` share one parse.
+ *
+ * A migrated check answers two questions about the same tree — what is wrong,
+ * and what the green line should say — and before the migration both were
+ * answered once, at module scope, because the script was the process. Keeping
+ * that single parse without going back to module-scope work is what this is
+ * for: `const inputs = byRoot((root) => …)` reads once per repo root, whichever
+ * question asks first.
+ *
+ * @template T
+ * @param {(repoRoot: string) => T} read
+ * @returns {(repoRoot: string) => T}
+ */
+export function byRoot(read) {
+  const cache = new Map();
+  return (repoRoot) => {
+    if (!cache.has(repoRoot)) cache.set(repoRoot, read(repoRoot));
+    return cache.get(repoRoot);
+  };
 }
