@@ -68,9 +68,12 @@ uno-bot/
 ├── wrangler.toml         Worker + Durable Objects + KV + vars/secrets config (+ free-tier constraints)
 ├── package.json / tsconfig.json / .dev.vars.example
 └── src/
-    ├── index.ts          Fetch handler / routes: /health · /debug/gemini ·
-    │                     /debug/vertex-claude · /debug/figma-poll · /slack/events ·
-    │                     /oauth/slack/{start,callback} — plus the cron scheduled() handler
+    ├── index.ts          Fetch handler — verify, route, export the Durable Objects: /health ·
+    │                     /slack/{events,commands,interactive} · /oauth/slack/{start,callback} ·
+    │                     everything diagnostic → src/diagnostics — plus the cron scheduled() handler
+    ├── diagnostics/      Every probe, behind one token gate and one report envelope: the public
+    │                     /health/blueprint contract probe + eleven /debug/* probes (routes.ts is
+    │                     the route table; probes/ holds the bodies)
     ├── agent/            loop.ts (THE agent loop) · model-provider.ts (the ModelProvider
     │                     seam) · providers/ (gemini · claude · fake) · loop-policy.ts (the
     │                     loop's dials and strings) · run-agent.ts (the one public entry:
@@ -150,6 +153,8 @@ curl https://<worker-url>/health   # expect: uno-bot ok <BUILD>
 - **Bot behavior:** run the Test Plan's smoke trio in `#uno-bot-sandbox` — the injection case (gate + safety), the Goal-Setting retrieval case (grounding + citations), and the bare hi-fi ask (clarify-before-build). Cancel any staged proposals afterward; one case per thread.
 - **Provider health (all auth-gated by `DEBUG_TOKEN`):** `GET /debug/gemini` (live Gemini round-trip) · `GET /debug/vertex-claude` (live Claude-on-Vertex round-trip — run before flipping `MODEL_PROVIDER="vertex-claude"`) · `GET /debug/gemini-cache` (no model call: reports whether the Gemini adapter's system prompt is served from a Vertex `cachedContents` resource, and the exact reason when it isn't — on `GEMINI_REGION = "global"` it never can be, see wrangler.toml).
 - **Figma poll (auth-gated by `DEBUG_TOKEN`):** `GET /debug/figma-poll?dry_run=1` — diffs the DS file against the KV snapshot and reports, without writing KV/Notion/Slack. Drop `dry_run` to fire the real thing (posts to `#uno-bot`, files a PRD). First-ever run (empty KV) seeds the snapshot and notifies nothing.
+- **Every probe's report** carries the same envelope beside its own payload: `build`, `ms`, and the subrequest accounting `subrequests` / `subrequest_hosts` / `internal_subrequests` / `budget_trips` (ADR-022), so a probe says how close the invocation came to Cloudflare's cap and whether any read was cut short. An unauthorized probe and an unknown path answer alike (`404 not found`).
+- **Blueprint contract (public, no token):** `GET /health/blueprint` — booleans only, no row data: every table and select the bot reads, so the product repository's CI fails loudly on a schema change. `GET /debug/blueprint`, `/debug/blueprint-search?q=…` and `/debug/blueprint-subject?need=…` are the token-gated, sample-carrying versions the retrieval evals read.
 - **`prototype_scaffold` (manual, no Slack):** GitHub Actions → "Implement Design (Prototype)" → Run workflow from `main`, `figma_url` = a single **screen frame** (renders < 8000px), `slug` = `test-prototype`. Expect a draft PR with `prototypes/<slug>/` + a root `dev:<slug>` script; `npm install && npm run dev:test-prototype` boots it.
 
 ## Gotchas

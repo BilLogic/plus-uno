@@ -1,46 +1,20 @@
+// The Worker entry: verify, route, export the Durable Objects.
+//
+// Nothing here knows blueprint schema, embed models, Slack probing or cache
+// internals. Those are Diagnostics' (src/diagnostics/) — eleven `/debug/*`
+// probes plus the public `/health/blueprint` contract probe, behind one auth
+// check and one report envelope. `/health` stays here: it is the uptime route,
+// it reads only the build id, and monitoring watches it.
 import type { Env } from "./types";
 import { verifySlackSignature } from "./slack/verify";
 import { handleSlackEnvelope, type SlackEnvelope } from "./slack/events";
 import { handleSlashCommand } from "./slack/commands";
 import { parseInteraction, handleInteraction } from "./slack/interactive";
-import { publishHomeViewForDebug } from "./slack/home";
-import { startSlackOAuth, handleSlackOAuthCallback, getSlackAccessTokenFor } from "./oauth/slack";
-import { geminiConfigured, geminiGenerate } from "./gemini/client";
-import { claudeVertexConfigured, claudeVertexGenerate } from "./vertex/claude";
-import { MODELS } from "./agent/routing";
-import { handleEvalTurn } from "./eval/turn-adapter";
+import { startSlackOAuth, handleSlackOAuthCallback } from "./oauth/slack";
 import { BUILD } from "./version";
-import { BLUEPRINT_CONTRACT } from "./generated/blueprint-contract";
 import { runFigmaPoll } from "./figma-poll";
-import { buildSystemBlocks } from "./agent/skills";
-import { ensureHarnessCache } from "./gemini/cache";
-import { countedFetch, runMetered, subrequestsUsed, meterBreakdown, subrequestBudgetTrips, internalSubrequestsUsed } from "./net";
-import {
-  searchBlueprint,
-  fetchPhaseOutline,
-  fetchTouchpoints,
-  TOUCHPOINT_SUBJECT_PAGE,
-  isBlueprintConfigured,
-  CELL_FALLBACK_SELECT,
-  EDGE_SELECT_COLUMNS,
-  FINDINGS_TABLE,
-  TOUCHPOINTS_TABLE,
-  TOUCHPOINT_SELECT,
-} from "./integrations/blueprint";
-import {
-  SUBJECT_NEEDS,
-  isSubjectNeed,
-  selectSubject,
-  type SubjectReads,
-} from "./integrations/blueprint-subject";
-import {
-  CANDIDATE_RPC,
-  isCallableCandidate,
-  isScoreableEmbedModel,
-  SCOREABLE_EMBED_MODELS,
-} from "./integrations/candidate-rpc";
-import { embedModelName } from "./vertex/embed";
-import { indexSource, resolveIndexModel } from "./integrations/index-model";
+import { runMetered } from "./net";
+import * as diagnostics from "./diagnostics";
 
 export default {
   // Cron (wrangler.toml [triggers]) — the Figma library poll: detect DS
@@ -67,525 +41,19 @@ export default {
   },
 };
 
-let contractProbeCache: { at: number; body: { ok: boolean; build: string; probes: Record<string, boolean> } } | null = null;
-
 async function handleRequest(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const url = new URL(request.url);
 
+  // Uptime. One line, no dependencies, no auth — README and monitoring both
+  // read `uno-bot ok <BUILD>` as the running build.
   if (request.method === "GET" && url.pathname === "/health") {
     return new Response(`uno-bot ok ${BUILD}`, { status: 200 });
   }
 
-  // Public, boolean-only contract probe: does every blueprint read this bot
-  // depends on still work? Exists so the APP repo's CI can fail loudly when a
-  // schema change breaks a bot read — the drift class that twice shipped as
-  // silent empty reads. Unlike /debug/blueprint (auth-gated, carries response
-  // samples), this returns nothing but statuses: table names are public-read
-  // by design, and no row data leaves. Cached per isolate to keep a curl loop
-  // from amplifying into upstream reads.
-  if (request.method === "GET" && url.pathname === "/health/blueprint") {
-    if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) {
-      return Response.json({ ok: false, build: BUILD, error: "blueprint reads not configured" }, { status: 503 });
-    }
-    const now = Date.now();
-    if (contractProbeCache && now - contractProbeCache.at < 60_000) {
-      return Response.json(contractProbeCache.body, { status: contractProbeCache.body.ok ? 200 : 503 });
-    }
-    const base = env.SUPABASE_URL.replace(/\/+$/, "");
-    const h = { apikey: env.SUPABASE_ANON_KEY, authorization: `Bearer ${env.SUPABASE_ANON_KEY}` };
-    const probes: Record<string, boolean> = {};
-    const probe = async (label: string, path: string, init?: RequestInit) => {
-      try {
-        const r = await countedFetch(`${base}${path}`, { ...init, headers: { ...h, ...(init?.headers ?? {}) } });
-        probes[label] = r.ok;
-      } catch {
-        probes[label] = false;
-      }
-    };
-    await probe("rpc_search_blueprint", "/rest/v1/rpc/search_blueprint", {
-      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ q: "tutor" }),
-    });
-    for (const t of BLUEPRINT_CONTRACT.botReadTables) {
-      await probe(`table_${t}`, `/rest/v1/${t}?select=id&limit=1`);
-    }
-    // The exact selects the bot issues, not just table reachability — a
-    // renamed column 400s here while bare selects stay green.
-    //
-    // IMPORTED, not restated. These three probes were written as copies of the
-    // selects and then stayed still while 20260820130000, 20260830190000 and
-    // 20260830280000 renamed the columns underneath them, so the probe agreed
-    // with a read that had stopped working. A copy of a select is a second
-    // thing to keep correct; an import is the same thing.
-    await probe("select_cells_spec", `/rest/v1/cells?select=${encodeURIComponent(CELL_FALLBACK_SELECT)}&limit=1`);
-    await probe("select_edges_kind", `/rest/v1/cell_dependencies?select=${encodeURIComponent(EDGE_SELECT_COLUMNS)}&limit=1`);
-    await probe("select_findings_open", `/rest/v1/${FINDINGS_TABLE}?select=id&status=eq.open&limit=1`);
-    // The touchpoint registry's select (#414), imported like the three above.
-    // `table_touchpoints` comes from the botReadTables loop now that the
-    // contract lists it; this is the fuller check — the columns the read names.
-    await probe("select_touchpoints", `/rest/v1/${TOUCHPOINTS_TABLE}?select=${encodeURIComponent(TOUCHPOINT_SELECT)}&limit=1`);
-    const body = { ok: Object.values(probes).every(Boolean), build: BUILD, probes };
-    contractProbeCache = { at: now, body };
-    return Response.json(body, { status: body.ok ? 200 : 503 });
-  }
-
-  // Gemini credential + reachability smoke test (dual-provider phase 1).
-  // Returns model, latency, auth mode, and a one-line sample — never secrets.
-  // Auth-gated: it triggers a live (billable) model call, so it must not be public.
-  if (request.method === "GET" && url.pathname === "/debug/gemini") {
-    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-    const mode = geminiConfigured(env);
-    if (!mode) {
-      return Response.json({ ok: false, error: "no Gemini credential configured (GEMINI_API_KEY or GEMINI_SA_EMAIL + GEMINI_SA_PRIVATE_KEY)" });
-    }
-    // ?model= probes a SPECIFIC model — the only way to answer "is this model
-    // available to this project?" before wiring a tier to it. A preview model
-    // can be listed in the docs and absent from a given Vertex project, and the
-    // failure would otherwise surface as a 400 on someone's first /grind.
-    const probeModel = url.searchParams.get("model") ?? undefined;
-    const result = await geminiGenerate(env, {
-      prompt: "Reply with exactly: uno-bot gemini link ok",
-      maxTokens: 100,
-      // ?level= too: gemini-3.1-pro rejects MINIMAL outright, so a probe with a
-      // hardcoded level cannot tell "model absent" from "level unsupported".
-      thinkingLevel: (url.searchParams.get("level") ?? "minimal") as
-        | "minimal" | "low" | "medium" | "high",
-      ...(probeModel ? { model: probeModel } : {}),
-    });
-    return Response.json({ auth: mode, ...result, text: result.text?.slice(0, 100) });
-  }
-
-  // Claude-on-Vertex credential + reachability smoke test. Confirms the
-  // service-account token reaches the Anthropic partner models before flipping
-  // MODEL_PROVIDER="vertex-claude". Auth-gated: it triggers a live (billable)
-  // model call, so it must not be public.
-  if (request.method === "GET" && url.pathname === "/debug/vertex-claude") {
-    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-    if (!claudeVertexConfigured(env)) {
-      return Response.json({ ok: false, error: "no Vertex-Claude credential (need GEMINI_SA_EMAIL + GEMINI_SA_PRIVATE_KEY + GEMINI_PROJECT_ID)" });
-    }
-    const model = env.CLAUDE_MODEL ?? MODELS.default;
-    const result = await claudeVertexGenerate(env, {
-      model,
-      prompt: "Reply with exactly: uno-bot vertex-claude link ok",
-      maxTokens: 100,
-    });
-    return Response.json({ ...result, text: result.text?.slice(0, 100) });
-  }
-
-  // Is the Gemini adapter's system prompt actually being cached? Reports the
-  // cachedContents resource (or the exact reason there isn't one) plus the size
-  // of the harness it would hold. Cheap: no model call, and the create is
-  // memoised for the hour either way. Auth-gated like every /debug route.
-  if (request.method === "GET" && url.pathname === "/debug/gemini-cache") {
-    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-    const model = env.GEMINI_MODEL ?? "gemini-3.8-flash";
-    const blocks = await buildSystemBlocks(env, null, null);
-    const stable = (blocks as Array<{ text?: string }>)[0]?.text ?? "";
-    const result = await ensureHarnessCache(env, model, stable);
-    return Response.json({
-      ok: true,
-      build: BUILD,
-      model,
-      region: env.GEMINI_REGION ?? "global",
-      harness_chars: stable.length,
-      cached: result.name !== null,
-      cache_name: result.name,
-      cache_tokens: result.tokens,
-      reason: result.reason,
-    });
-  }
-
-  // One HEADLESS turn for evals + reasoning investigation, through the SAME
-  // Turn module a Slack message takes (#499): the eval case becomes a
-  // `TurnRequest`, `Env` becomes the turn's deps, and the only two that differ
-  // from production record instead of acting — Delivery posts nothing, and a
-  // resolution is captured rather than executed. So preflight, the confidence
-  // pre-check, the absence check and the draft judge all run here exactly as
-  // they run for a designer, which the 127-line driver this route used to carry
-  // could not do. Multi-turn flows are driven by the CALLER passing
-  // history/pending back in (no Durable Object is touched — the store is
-  // in-memory, seeded from that history). Auth-gated: every call is a live
-  // billable model run. Driven by scripts/run-evals.mjs; scenarios in
-  // docs/evals/.
-  if (request.method === "POST" && url.pathname === "/debug/eval") {
-    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-    return handleEvalTurn(request, env);
-  }
-
-  // What the LIVE INSTALL actually grants for search — the three questions the
-  // assistant.search.context plan could not answer from the manifest (a manifest
-  // lists what was requested, not what the installed tokens carry). Reports
-  // scopes and Slack's own error strings; never a token, never message content.
-  // `?q=` overrides the throwaway probe query. Auth-gated: it makes live calls.
-  if (request.method === "GET" && url.pathname === "/debug/slack-search") {
-    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-    return Response.json(await probeSlackSearch(env, url.searchParams.get("q") ?? "design"));
-  }
-
-  // Live probe of chat.startStream, which has rejected every argument shape we
-  // have tried with `invalid_arguments` and names no field (r34–r40).
-  //
-  // A route, not a log line: the agent path runs inside a Durable Object, and a
-  // DO keeps the script version it was instantiated with until evicted — so
-  // several "streaming still fails" readings were actually stale code running.
-  // This runs in the Worker, so what deploys is what answers.
-  //
-  // ?channel= (required) ?thread_ts= ?user= ?team= — each argument independently
-  // omittable, so the failing one can be bisected. Returns Slack's raw response.
-  // Auth-gated: it posts a real (empty) stream to the channel on success.
-  if (request.method === "GET" && url.pathname === "/debug/slack-stream") {
-    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-    const channel = url.searchParams.get("channel");
-    if (!channel) return Response.json({ ok: false, error: "channel required" }, { status: 400 });
-    // ?stop=<ts> closes a stream this probe opened. A started-and-never-stopped
-    // stream spins in the client forever, so the probe has to be able to tidy up
-    // after itself.
-    const stopTs = url.searchParams.get("stop");
-    if (stopTs) {
-      const r = await countedFetch("https://slack.com/api/chat.stopStream", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json; charset=utf-8",
-          authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
-        },
-        body: JSON.stringify({ channel, ts: stopTs }),
-      });
-      return Response.json({ stopped: stopTs, slack: await r.json() });
-    }
-    const payload: Record<string, unknown> = { channel };
-    for (const [param, field] of [
-      ["thread_ts", "thread_ts"],
-      ["user", "recipient_user_id"],
-      ["team", "recipient_team_id"],
-    ] as const) {
-      const v = url.searchParams.get(param);
-      if (v) payload[field] = v;
-    }
-    // ?broadcast=1 — does a stream accept reply_broadcast? A threaded reply is
-    // invisible in the Messages tab until you click "N replies"; broadcasting
-    // puts it in the main timeline too.
-    if (url.searchParams.get("broadcast")) payload.reply_broadcast = true;
-    const res = await countedFetch("https://slack.com/api/chat.startStream", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json; charset=utf-8",
-        authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
-      },
-      body: JSON.stringify(payload),
-    });
-    return Response.json({ sent: payload, status: res.status, slack: await res.json() });
-  }
-
-  // Publish the App Home view and return Slack's raw verdict.
-  //
-  // The Home tab is the one surface with NO failure signal: views.publish is
-  // fired from an event handler, nothing reads its response, and a block Slack
-  // rejects simply leaves the previous view in place. Every Home change until
-  // now was verified by opening the app and squinting. The Stop button is the
-  // first ACTION element up there, so "did the block validate" became a
-  // question worth being able to ask.
-  //
-  // ?user= (required) — views.publish is per-user. Auth-gated: it writes a real
-  // view to that person's Home tab, which is the same thing opening the tab
-  // does, so the blast radius is a refresh.
-  if (request.method === "GET" && url.pathname === "/debug/home") {
-    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-    const user = url.searchParams.get("user");
-    if (!user) return Response.json({ ok: false, error: "user required" }, { status: 400 });
-    return Response.json(await publishHomeViewForDebug(env, user));
-  }
-
-  // What the blueprint deployment actually supports — the question the code
-  // could not answer about itself. searchBlueprint degrades semantic -> rpc ->
-  // table fan-out silently, so "is semantic even deployed?" was unanswerable
-  // without reading production logs and hoping a search happened.
-  //
-  // Reports, per capability: reachable, and readable-by-anon. Auth-gated; all
-  // reads, no writes.
-  if (request.method === "GET" && url.pathname === "/debug/blueprint") {
-    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-    if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) {
-      return Response.json({ ok: false, error: "SUPABASE_URL / SUPABASE_ANON_KEY not configured" });
-    }
-    const base = env.SUPABASE_URL.replace(/\/+$/, "");
-    const h = { apikey: env.SUPABASE_ANON_KEY, authorization: `Bearer ${env.SUPABASE_ANON_KEY}` };
-    const probe = async (label: string, path: string, init?: RequestInit) => {
-      try {
-        const r = await countedFetch(`${base}${path}`, { ...init, headers: { ...h, ...(init?.headers ?? {}) } });
-        const body = await r.text();
-        return { [label]: { status: r.status, ok: r.ok, sample: body.slice(0, 160) } };
-      } catch (err) {
-        return { [label]: { error: err instanceof Error ? err.message : String(err) } };
-      }
-    };
-    const out: Record<string, unknown> = { build: BUILD, semantic_flag: env.SEMANTIC_SEARCH ?? "on" };
-    Object.assign(out, await probe("rpc_search_blueprint", "/rest/v1/rpc/search_blueprint", {
-      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ q: "tutor" }),
-    }));
-    Object.assign(out, await probe("rpc_match_corpus_chunks", "/rest/v1/rpc/match_corpus_chunks", {
-      method: "POST",
-      headers: { "content-type": "application/json", "content-profile": "semantic_search" },
-      // Deliberately malformed embedding: a 404/PGRST202 means the function is
-      // ABSENT, any other error means it exists and rejected the argument —
-      // which is the distinction being probed, with no embedding call spent.
-      body: JSON.stringify({ query_embedding: [0], match_count: 1, filter_source: "blueprint" }),
-    }));
-    // Index health — counts only, via semantic_search.index_health().
-    //
-    // The other probes answer "does the retrieval path respond". This answers
-    // "is what it returns still true", which is the failure that hides: the
-    // backfill's orphan prune 403'd nightly from 2026-08-18 and left 43 chunks
-    // for hard-deleted cells in the index. Embeddings stayed current, every
-    // probe above stayed green, and the only symptom was the bot occasionally
-    // citing a cell that no longer exists with a ?cell= link to nothing.
-    //
-    // orphan_chunks > 0  → the prune is failing (check the embed workflow).
-    // stale_chunks  > 0  → cells edited since the last successful run.
-    try {
-      const r = await countedFetch(`${base}/rest/v1/rpc/index_health`, {
-        method: "POST",
-        headers: { ...h, "content-type": "application/json", "content-profile": "semantic_search" },
-        body: "{}",
-      });
-      out.index_health = r.ok
-        ? (((await r.json()) as unknown[])[0] ?? null)
-        : { status: r.status, error: (await r.text()).slice(0, 160) };
-    } catch (err) {
-      out.index_health = { error: err instanceof Error ? err.message : String(err) };
-    }
-    // Same list as /health/blueprint, from the same source: a hardcoded copy
-    // here kept probing `findings` for a day after the table became
-    // `audit_findings`.
-    for (const t of BLUEPRINT_CONTRACT.botReadTables) {
-      Object.assign(out, await probe(`table_${t}`, `/rest/v1/${t}?select=id&limit=1`));
-    }
-    return Response.json(out);
-  }
-
-  // GET /debug/blueprint-search?q=…  — the REAL searchBlueprint() result.
-  //
-  // WHY THIS EXISTS: /debug/eval scores full agent turns, which take ~15s, burn
-  // model quota, and judge the PROSE. An answer can read beautifully while the
-  // rows behind it are wrong, and the eval suite has no way to tell — it has
-  // been 19/19 green while 5% of the index pointed at deleted cells.
-  //
-  // This route returns row identity (ids, path, scenario, scores, which
-  // retrieval path answered) so a retrieval eval can assert recall@k directly:
-  // deterministic, model-free, seconds not minutes.
-  //
-  // `fresh=1` bypasses the 60s result cache — the eval must measure retrieval,
-  // not the cache. Auth-gated like every /debug route; read-only.
-  if (request.method === "GET" && url.pathname === "/debug/blueprint-search") {
-    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-    const q = (url.searchParams.get("q") ?? "").trim();
-    if (!q) return Response.json({ ok: false, error: "missing ?q=" }, { status: 400 });
-
-    // `?rpc=` scores a CANDIDATE search function without moving the live one.
-    //
-    // Retrieval changes used to be measurable only by editing the function the
-    // whole product calls, so the loop was "apply to production, run the eval,
-    // revert if worse". That is how an OR-ranked keyword arm reached
-    // production, fixed one blocker case, broke three others and was rolled
-    // back (plus-uno-blueprint#154). A candidate created alongside
-    // `search_blueprint` can now be scored while the live one is untouched.
-    //
-    // ALLOWLISTED BY PREFIX, not merely auth-gated. This route already requires
-    // the debug token, but the name is interpolated into a PostgREST `/rpc/`
-    // path — an arbitrary one would let a token holder invoke any function
-    // reachable by the bot's key, which is a much larger surface than "look at
-    // search results". The pattern admits the live name and
-    // `search_blueprint_<something>` candidates, and nothing else.
-    const rpcParam = url.searchParams.get("rpc");
-    if (rpcParam !== null && !isCallableCandidate(rpcParam)) {
-      return Response.json(
-        {
-          ok: false,
-          error:
-            `rpc must match ${CANDIDATE_RPC.source} — a candidate is named ` +
-            `search_blueprint_<suffix>, and only the search family is callable here`,
-        },
-        { status: 400 },
-      );
-    }
-
-    // `?embed_model=` scores a candidate INDEX, which `?rpc=` alone cannot.
-    //
-    // A candidate function reads a candidate column, and the function refuses
-    // a caller whose model does not match the index it is reading — so
-    // pointing this route at a candidate while the Worker embedded with the
-    // live model produced `embedding model mismatch` and no measurement at
-    // all. Allow-listed by VALUE rather than by shape: the database scores an
-    // unknown model's vector as noise instead of refusing it, so a typo here
-    // would come back as plausible rubbish rather than an error.
-    const embedParam = url.searchParams.get("embed_model");
-    if (embedParam !== null && !isScoreableEmbedModel(embedParam)) {
-      return Response.json(
-        {
-          ok: false,
-          error:
-            `embed_model must be one of ${SCOREABLE_EMBED_MODELS.join(", ")} — ` +
-            `a model the index is built with, or one being scored against it`,
-        },
-        { status: 400 },
-      );
-    }
-
-    const started = Date.now();
-    try {
-      // Metered so the eval can report subrequest cost per query — the number
-      // Phase 3 is meant to move (worst case 8 -> 2 against a 50 cap).
-      const result = await runMetered(async () => {
-        const r = await searchBlueprint(env, q, {
-          fresh: url.searchParams.get("fresh") !== "0",
-          ...(rpcParam ? { rpcName: rpcParam } : {}),
-          ...(embedParam ? { embedModel: embedParam } : {}),
-        });
-        return { r, subrequests: subrequestsUsed() };
-      });
-      return Response.json({
-        ok: true,
-        build: BUILD,
-        q,
-        // Echoed ALWAYS, not only when overridden: an eval artifact that does
-        // not say which function produced it can be read as the live result a
-        // week later, which is the mistake this parameter exists to prevent.
-        rpc: rpcParam ?? BLUEPRINT_CONTRACT.rpcs.searchBlueprint,
-        // The MODEL is echoed for the same reason as the function, and it is
-        // the half that cannot be inferred: two runs against the same
-        // candidate function, one on each model, differ in nothing else a
-        // reader of the artifact can see.
-        embed_model:
-          embedParam ??
-          (env.SUPABASE_URL && env.SUPABASE_ANON_KEY
-            ? await resolveIndexModel(
-                env,
-                env.SUPABASE_URL.replace(/\/+$/, ""),
-                env.SUPABASE_ANON_KEY,
-                countedFetch,
-                indexSource(rpcParam ?? BLUEPRINT_CONTRACT.rpcs.searchBlueprint),
-              )
-            : embedModelName(env)),
-        ms: Date.now() - started,
-        subrequests: result.subrequests,
-        ...result.r,
-      });
-    } catch (err) {
-      // Report the failure as a failure. A retrieval eval that reads an error
-      // as "no rows" would score a broken path as a recall miss and send
-      // someone tuning the ranker.
-      return Response.json({
-        ok: false,
-        build: BUILD,
-        q,
-        ms: Date.now() - started,
-        error: err instanceof Error ? err.message : String(err),
-      });
-    }
-  }
-
-  // GET /debug/blueprint-subject?need=…  — a row from the LIVE board that
-  // satisfies a named condition (#415).
-  //
-  // WHY THIS EXISTS: an eval scenario that names its subject — "walk me through
-  // Goal Setting", "where do we use Zoom" — encodes a fact about the board on
-  // the day it was written, and the board is edited daily. A rename turns the
-  // case red with nothing wrong, which is the same defect #411 exists to fix,
-  // one layer up. So the fixture names a CONDITION, and this route answers it
-  // from the database at run time.
-  //
-  // The runner holds no Supabase credential and must not gain one — the Worker
-  // is the only thing here that reads the blueprint, and this route keeps it
-  // that way. Selection is a pure module (integrations/blueprint-subject.ts);
-  // everything below binds it to the reads the bot already makes.
-  //
-  // Auth-gated like every /debug route; read-only. An unknown `need` gets the
-  // known list back, because "no row satisfies your condition" and "that is not
-  // a condition" are different answers and only one of them is a finding.
-  if (request.method === "GET" && url.pathname === "/debug/blueprint-subject") {
-    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-    const need = (url.searchParams.get("need") ?? "").trim();
-    if (!isSubjectNeed(need)) {
-      return Response.json(
-        { ok: false, build: BUILD, need, error: "unknown need", needs: SUBJECT_NEEDS },
-        { status: 400 },
-      );
-    }
-    if (!isBlueprintConfigured(env)) {
-      return Response.json({
-        ok: false,
-        build: BUILD,
-        need,
-        error: "uno-blueprint not configured — missing SUPABASE_URL / SUPABASE_ANON_KEY",
-      });
-    }
-    const reads: SubjectReads = {
-      outline: () => fetchPhaseOutline(env),
-      // A WIDER page than the bot's own tool reads. Rows come back `name.asc`,
-      // and `corpus-term` picks its search term out of these names — so the
-      // product's 15-row page quietly turned the condition into "…among the
-      // alphabetically-first fifteen tools" and skipped B4 on a board that
-      // satisfies it (#452). Still one request.
-      touchpoints: async () => (await fetchTouchpoints(env, "", TOUCHPOINT_SUBJECT_PAGE)).rows,
-      search: async (query, scope) => {
-        const r = await searchBlueprint(env, query, {
-          fresh: true,
-          scope: {
-            ...(scope.filterScenario ? { filterScenario: scope.filterScenario } : {}),
-            ...(scope.granularity === "cell" ? { granularity: "cell" as const } : {}),
-          },
-        });
-        return { rows: r.rows, ...(r.matched_total === undefined ? {} : { matched: r.matched_total }) };
-      },
-      // Read off the vendored contract, not remembered: `absent-detail` claims
-      // the blueprint has no field for a duration, and the day it grows one the
-      // condition must stop being satisfiable rather than keep asserting that
-      // the bot should refuse an answerable question.
-      cellColumns: BLUEPRINT_CONTRACT.botDirectReadColumns.cells,
-    };
-    const started = Date.now();
-    try {
-      // Metered like the search route: a `corpus-term` pick probes several
-      // terms, and a subject read that quietly ate the turn's budget would be
-      // indistinguishable from a board with no qualifying row.
-      const pick = await runMetered(async () => {
-        const p = await selectSubject(need, reads);
-        return { p, subrequests: subrequestsUsed() };
-      });
-      return Response.json({
-        ok: true,
-        build: BUILD,
-        need,
-        ms: Date.now() - started,
-        subrequests: pick.subrequests,
-        subject: pick.p.subject,
-        ...(pick.p.reason ? { reason: pick.p.reason } : {}),
-      });
-    } catch (err) {
-      // A failed READ is not an unsatisfiable condition. Reporting it as
-      // `subject: null` would skip the case for the wrong reason and hide a
-      // broken blueprint behind a tidy log line.
-      return Response.json({
-        ok: false,
-        build: BUILD,
-        need,
-        ms: Date.now() - started,
-        error: err instanceof Error ? err.message : String(err),
-      });
-    }
-  }
-
-  // Manual firing of the Figma library poll (same code path as the cron).
-  // `?dry_run=1` diffs and reports without writing KV / Notion / Slack.
-  // Auth-gated: a live run posts to Slack and files a PRD.
-  if (request.method === "GET" && url.pathname === "/debug/figma-poll") {
-    if (!debugAuthorized(request, env)) return new Response("not found", { status: 404 });
-    const dryRun = url.searchParams.get("dry_run") === "1";
-    try {
-      const result = await runFigmaPoll(env, { dryRun });
-      return Response.json({ ok: true, build: BUILD, dryRun, ...result });
-    } catch (err) {
-      return Response.json({ ok: false, build: BUILD, dryRun, error: err instanceof Error ? err.message : String(err) });
-    }
+  // Every probe. The module owns the auth gate, the report envelope and the
+  // 404 for an unknown or wrong-method path.
+  if (url.pathname === "/health/blueprint" || url.pathname.startsWith("/debug/")) {
+    return diagnostics.handle(request, env, url);
   }
 
   if (request.method === "POST" && url.pathname === "/slack/events") {
@@ -618,27 +86,28 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
   return new Response("not found", { status: 404 });
 }
 
-// Gate for /debug/* routes. Requires DEBUG_TOKEN to be configured AND matched
-// by the x-debug-token header via a constant-time compare — an unconfigured
-// token means the routes are simply closed (404), never open-by-default.
-function debugAuthorized(request: Request, env: Env): boolean {
-  const expected = env.DEBUG_TOKEN;
-  if (!expected) return false;
-  const provided = request.headers.get("x-debug-token") ?? "";
-  return timingSafeEqualStr(provided, expected);
-}
-
-function timingSafeEqualStr(a: string, b: string): boolean {
-  const enc = new TextEncoder();
-  const ab = enc.encode(a);
-  const bb = enc.encode(b);
-  // Compare over a fixed width so length itself doesn't leak via timing.
-  let diff = ab.length ^ bb.length;
-  const width = Math.max(ab.length, bb.length);
-  for (let i = 0; i < width; i++) {
-    diff |= (ab[i] ?? 0) ^ (bb[i] ?? 0);
-  }
-  return diff === 0;
+/**
+ * The raw request body, once Slack's signature is checked — or the 401.
+ *
+ * Read raw before parsing, and read the same way for all three Slack routes:
+ * the signature covers the exact bytes Slack signed, and the scheme is
+ * body-agnostic, so form-encoded verifies identically to JSON.
+ *
+ * @param request - The inbound request
+ * @param env - Carries SLACK_SIGNING_SECRET
+ * @param label - Log prefix for a rejection
+ */
+async function verifiedBody(request: Request, env: Env, label: string): Promise<string | Response> {
+  const rawBody = await request.text();
+  const verification = await verifySlackSignature(
+    rawBody,
+    request.headers.get("x-slack-request-timestamp"),
+    request.headers.get("x-slack-signature"),
+    env.SLACK_SIGNING_SECRET,
+  );
+  if (verification.ok) return rawBody;
+  console.warn(`[${label}] verification failed: ${verification.reason}`);
+  return new Response("unauthorized", { status: 401 });
 }
 
 async function handleSlackEventsRequest(
@@ -646,22 +115,8 @@ async function handleSlackEventsRequest(
   env: Env,
   ctx: ExecutionContext,
 ): Promise<Response> {
-  // Body must be read raw before parsing, because signature verification
-  // checks the exact bytes Slack signed.
-  const rawBody = await request.text();
-  const timestamp = request.headers.get("x-slack-request-timestamp");
-  const signature = request.headers.get("x-slack-signature");
-
-  const verification = await verifySlackSignature(
-    rawBody,
-    timestamp,
-    signature,
-    env.SLACK_SIGNING_SECRET,
-  );
-  if (!verification.ok) {
-    console.warn(`[slack] verification failed: ${verification.reason}`);
-    return new Response("unauthorized", { status: 401 });
-  }
+  const rawBody = await verifiedBody(request, env, "slack");
+  if (rawBody instanceof Response) return rawBody;
 
   let envelope: SlackEnvelope;
   try {
@@ -688,19 +143,8 @@ async function handleSlackCommandRequest(
   env: Env,
   ctx: ExecutionContext,
 ): Promise<Response> {
-  // Same raw-bytes rule as /slack/events — the signature covers the exact body,
-  // and the scheme is body-agnostic, so form-encoded verifies identically.
-  const rawBody = await request.text();
-  const verification = await verifySlackSignature(
-    rawBody,
-    request.headers.get("x-slack-request-timestamp"),
-    request.headers.get("x-slack-signature"),
-    env.SLACK_SIGNING_SECRET,
-  );
-  if (!verification.ok) {
-    console.warn(`[slash] verification failed: ${verification.reason}`);
-    return new Response("unauthorized", { status: 401 });
-  }
+  const rawBody = await verifiedBody(request, env, "slash");
+  if (rawBody instanceof Response) return rawBody;
 
   // Synchronous by design: Slack times the caller out at 3s and does NOT retry
   // a slash command, so the response is built here and the run starts inside
@@ -713,17 +157,8 @@ async function handleSlackInteractiveRequest(
   env: Env,
   ctx: ExecutionContext,
 ): Promise<Response> {
-  const rawBody = await request.text();
-  const verification = await verifySlackSignature(
-    rawBody,
-    request.headers.get("x-slack-request-timestamp"),
-    request.headers.get("x-slack-signature"),
-    env.SLACK_SIGNING_SECRET,
-  );
-  if (!verification.ok) {
-    console.warn(`[interactive] verification failed: ${verification.reason}`);
-    return new Response("unauthorized", { status: 401 });
-  }
+  const rawBody = await verifiedBody(request, env, "interactive");
+  if (rawBody instanceof Response) return rawBody;
 
   const payload = parseInteraction(rawBody);
   if (!payload) {
@@ -734,92 +169,6 @@ async function handleSlackInteractiveRequest(
   }
 
   return handleInteraction(env, payload, ctx);
-}
-
-// ── Live-install search probe (/debug/slack-search) ───────────────────────────
-// Answers, against the real install rather than the manifest:
-//   • which scopes each installed token actually carries (auth.test's
-//     x-oauth-scopes response header — the manifest only records what was asked)
-//   • whether assistant.search.context is permitted for this app at all
-//     (distribution gate: prohibited for unlisted distributed apps — it answers
-//     with an error string, not a 404)
-//   • what a bot-token call without an action_token returns, which is how we
-//     recognize the action_token requirement in the wild
-// Tokens are never echoed. Message content is never echoed — only counts.
-async function probeToken(
-  token: string,
-  label: string,
-  channelTypes: string,
-): Promise<Record<string, unknown>> {
-  const out: Record<string, unknown> = { credential: label };
-  try {
-    const auth = await countedFetch("https://slack.com/api/auth.test", {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${token}`,
-        "content-type": "application/x-www-form-urlencoded; charset=utf-8",
-      },
-    });
-    const authBody = (await auth.json()) as { ok?: boolean; error?: string; user_id?: string };
-    out.auth_ok = authBody.ok === true;
-    out.auth_error = authBody.error;
-    out.identity = authBody.user_id;
-    // Slack reports the token's REAL granted scopes here, comma-joined.
-    out.scopes = auth.headers.get("x-oauth-scopes")?.split(",") ?? null;
-  } catch (err) {
-    out.auth_exception = err instanceof Error ? err.message : String(err);
-  }
-  try {
-    const res = await countedFetch("https://slack.com/api/assistant.search.context", {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${token}`,
-        "content-type": "application/x-www-form-urlencoded; charset=utf-8",
-      },
-      body: new URLSearchParams({
-        query: "probe",
-        limit: "1",
-        channel_types: channelTypes,
-        content_types: "messages",
-        disable_semantic_search: "true",
-      }).toString(),
-    });
-    const body = (await res.json()) as {
-      ok?: boolean;
-      error?: string;
-      needed?: string;
-      results?: { messages?: unknown[] };
-    };
-    out.search_ok = body.ok === true;
-    out.search_error = body.error;
-    out.search_needed_scope = body.needed;
-    out.search_hits = body.results?.messages?.length ?? 0;
-  } catch (err) {
-    out.search_exception = err instanceof Error ? err.message : String(err);
-  }
-  return out;
-}
-
-async function probeSlackSearch(env: Env, query: string): Promise<Record<string, unknown>> {
-  const probes: Record<string, unknown>[] = [];
-  if (env.SLACK_BOT_TOKEN) {
-    probes.push(await probeToken(env.SLACK_BOT_TOKEN, "bot (SLACK_BOT_TOKEN)", "public_channel"));
-  }
-  const legacy = await getSlackAccessTokenFor(env).catch(() => null);
-  if (legacy) {
-    probes.push(await probeToken(legacy.token, "stored user/legacy token", "public_channel"));
-    probes.push(
-      await probeToken(legacy.token, "stored user/legacy token (private)", "private_channel"),
-    );
-  }
-  return {
-    ok: true,
-    build: BUILD,
-    query,
-    note: "search_error 'not_allowed_token_type' or an app-permission error means the method is closed to this app; 'missing_scope' names what to re-consent for. A bot probe erroring on the missing action_token is the expected shape, not a failure.",
-    oauth_configured: !!legacy,
-    probes,
-  };
 }
 
 export { ThreadState } from "./thread-state";
