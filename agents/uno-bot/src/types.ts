@@ -127,7 +127,7 @@ export interface Env {
   // + the alert-throttle timestamp. (The harness itself is now baked into the
   // Worker bundle at build time — src/generated/harness.ts — so serving it costs
   // zero subrequests; this KV is the fallback/alert path. See agent/skills.ts.)
-  /** Tier models on the Gemini lane. A tier is model PLUS thinking level
+  /** Tier models on the Gemini adapter. A tier is model PLUS thinking level
    *  (chill low, default medium, grind high — src/agent/gemini-tiers.ts,
    *  ADR-028); only the model is overridable here, the level moves with the
    *  tier. GEMINI_MODEL remains the `default` tier so existing config keeps
@@ -189,7 +189,7 @@ export interface Env {
   // Gemini auth mode auto-selected by which credential exists (gemini/client.ts).
   // RULE (2026-07-16, ADR-018): the Vertex service-account pair (GEMINI_SA_EMAIL
   // + GEMINI_SA_PRIVATE_KEY + GEMINI_PROJECT_ID) is canonical and takes
-  // precedence; it ALSO powers the Vertex-Claude lane (vertex/claude.ts) — same
+  // precedence; it ALSO powers the Vertex-Claude adapter (vertex/claude.ts) — same
   // token. GEMINI_API_KEY (AI Studio) is a local-dev fallback only — never set
   // it on the Worker.
   GEMINI_API_KEY?: string;
@@ -198,12 +198,12 @@ export interface Env {
   GEMINI_PROJECT_ID?: string; // Vertex only, e.g. "hcii-plus"
   // Backup model for the one-shot mid-turn failover when the active model
   // returns a capacity/availability error (404/429/500/503) — see
-  // agent/gemini-agent.ts. Default "gemini-2.5-pro" (separate quota pool from
+  // agent/providers/gemini.ts. Default "gemini-2.5-pro" (separate quota pool from
   // the flash models, probed healthy during the 2026-07-16 quota incident).
   GEMINI_FALLBACK_MODEL?: string;
   GEMINI_REGION?: string; // Vertex only; default "global"
   GEMINI_MODEL?: string; // default "gemini-3.8-flash"
-  // Vertex-Claude model id for the default lane (chill/grind are fixed in
+  // Vertex-Claude model id for the default tier (chill/grind are fixed in
   // routing.ts). Optional — defaults to MODELS.default ("claude-sonnet-5").
   CLAUDE_MODEL?: string;
 

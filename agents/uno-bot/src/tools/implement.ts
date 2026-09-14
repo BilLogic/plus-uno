@@ -7,7 +7,7 @@
 
 import type { Env } from "../types";
 import { repositoryDispatch } from "./github-dispatch";
-import type { SlackContext } from "./dispatcher";
+import type { SlackContext } from "../types";
 import { extractNotionPrdFromText } from "../slack/notion-prd";
 import { fetchThreadTranscript, withThreadTranscript } from "../slack/thread-transcript";
 

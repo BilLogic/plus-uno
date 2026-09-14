@@ -379,7 +379,7 @@ const CATALOG_PAGE_SIZE = 100;
 // Running Notes, 105 rows). Not higher: the honest thing here is the truncated
 // flag below, which makes a partial read say so at ANY page cap, and every
 // extra page is real worst-case spend on the tool whose budget already sits
-// closest to the edge. loop-shared derives notion_search's bound from this.
+// closest to the edge. agent/run-agent.ts derives notion_search's bound from this.
 export const CATALOG_MAX_PAGES = 3;
 /** Cap how many select/status/url/rich_text fields we surface per row. */
 const CATALOG_META_CAP = 6;
@@ -1328,7 +1328,8 @@ export async function archiveCard(env: Env, pageId: string): Promise<ArchivedCar
 // One page of 100 cards ≈ one subrequest, up to ROADMAP_MAX_PAGES — still far
 // cheaper than a chain of search calls on the free-tier 50-subrequest budget.
 // Title / card-number asks filter server-side, so they cost 1 page, not 5;
-// keep READONLY_TOOL_COST.roadmap_query in loop-shared.ts in step with this.
+// keep roadmap_query's share of READONLY_TOOL_BUDGET (agent/loop-policy.ts) in
+// step with this.
 
 export interface RoadmapCard {
   title: string;

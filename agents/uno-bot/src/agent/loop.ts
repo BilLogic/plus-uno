@@ -25,7 +25,7 @@
 // executor, ThreadState, the subrequest meter — arrives as a named port, so
 // `tsconfig.test.json` compiles this file and `tests/agent-loop.test.ts` drives
 // it with a fake adapter and no network. Production builds those ports from
-// `Env` once, in `gemini-agent.ts`.
+// `Env` once, in `run-agent.ts`.
 
 import { SIDE_EFFECT_TOOLS } from "./types";
 import { BUILD } from "../version";
@@ -129,7 +129,7 @@ export interface LoopDeps {
    *
    * Only the one method the loop needs, so a test builds a boolean and nothing
    * else. Production passes `threadStateFor(env)`, which satisfies this
-   * structurally — see `gemini-agent.ts`.
+   * structurally — see `run-agent.ts`.
    */
   threadState: { consumeCancel(ref: ThreadRef): Promise<boolean> };
   budget: LoopBudget;

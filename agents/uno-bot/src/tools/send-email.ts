@@ -3,7 +3,7 @@
 // + recipients) so the bot never claims it sent something it didn't.
 
 import type { Env } from "../types";
-import type { SlackContext } from "./dispatcher";
+import type { SlackContext } from "../types";
 import { postMessage } from "../slack/api";
 import { sendGmailMessage } from "../integrations/gmail";
 

@@ -8,7 +8,7 @@ dimensions:
   - id: D1
     definition: "grounded answer quality — correct, complete, scoped to what was asked (INFERRED 2026-07-08: the bot's baseline Q&A duty, already satisfied before d892346f closed the other gaps)"
   - id: D2
-    definition: "model routing — the right lane fires (default capable lane; explicit escalation; fast path for proposal confirm/cancel — routeRequest)"
+    definition: "model routing — the right tier fires (default capable tier; explicit escalation; fast path for proposal confirm/cancel — routeRequest)"
   - id: D3
     definition: "clarify-vs-act — asks when required inputs are missing (preflight on prototype_scaffold / component_implement / notion_create) instead of acting on guesses"
   - id: D4

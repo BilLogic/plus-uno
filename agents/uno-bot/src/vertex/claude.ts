@@ -10,7 +10,7 @@
 //   • anthropic_version: "vertex-2023-10-16" goes IN the body.
 // (Confirmed against platform.claude.com/docs .../claude-on-vertex-ai.)
 //
-// rawPredict is non-streaming — fine here because this lane attaches NO
+// rawPredict is non-streaming — fine here because this adapter attaches NO
 // server-side MCP (every tool round is its own short HTTP call, driven by the
 // one agent loop through agent/providers/claude.ts), so the long-single-request
 // 524 that forced streaming on the old direct-Anthropic path can't occur.

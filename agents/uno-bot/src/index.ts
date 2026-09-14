@@ -9,7 +9,8 @@ import { geminiConfigured, geminiGenerate } from "./gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "./vertex/claude";
 import { MODELS } from "./agent/routing";
 import { runAgent } from "./agent/run-agent";
-import { withTurnScope, attachToolResult, markUnanswered, type ToolCall, type TurnDials } from "./agent/loop-shared";
+import { withTurnScope, type TurnDials } from "./agent/run-agent";
+import { attachToolResult, markUnanswered, type ToolCall } from "./agent/tool-transcript";
 import { preflight } from "./agent/preflight";
 import type { HistoryTurn, PendingProposal } from "./thread-state/index";
 import { BUILD } from "./version";
@@ -175,7 +176,7 @@ async function handleRequest(request: Request, env: Env, ctx: ExecutionContext):
     return Response.json({ ...result, text: result.text?.slice(0, 100) });
   }
 
-  // Is the Gemini lane's system prompt actually being cached? Reports the
+  // Is the Gemini adapter's system prompt actually being cached? Reports the
   // cachedContents resource (or the exact reason there isn't one) plus the size
   // of the harness it would hold. Cheap: no model call, and the create is
   // memoised for the hour either way. Auth-gated like every /debug route.
@@ -714,9 +715,9 @@ async function handleEvalTurn(request: Request, env: Env): Promise<Response> {
     const result = agentRun.result;
     references = agentRun.references;
     // Every call that never reported a result says so, rather than reading like
-    // a tool that answered with nothing (#452 review). A lane that announces a
-    // call and answers it without reporting leaves a slot the next same-named
-    // call fills by mistake; both lanes report on every path today, so this
+    // a tool that answered with nothing (#452 review). An adapter that announces
+    // a call and answers it without reporting leaves a slot the next same-named
+    // call fills by mistake; both adapters report on every path today, so this
     // should mark nothing — and if it ever marks something, the artifact says
     // which call rather than quietly filing the wrong outcome against it.
     markUnanswered(tools, filled, result.kind);

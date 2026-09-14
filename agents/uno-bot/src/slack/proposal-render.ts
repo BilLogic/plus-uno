@@ -143,7 +143,7 @@ export function formatProposal(
 // "Stage, but flag gaps loudly" (Bill, 2026-07-16): a share-out stages
 // immediately with whatever is in hand, and the CARD carries the bundle audit —
 // so ✅ is informed consent to post without the missing pieces, and a weaker
-// model lane can't silently skip the disclosure (renderer-level, not
+// model provider can't silently skip the disclosure (renderer-level, not
 // prompt-level). Bundle contract for prototype share-outs: Loom walkthrough +
 // live preview + Decisions DB link (skills/uno-publish/references/method.md).
 function shareoutBundleNote(input: Record<string, unknown>): string | null {

@@ -7,7 +7,7 @@
 // Side effect: it pings people, so it routes through the confirmation gate.
 
 import type { Env } from "../types";
-import type { SlackContext } from "./dispatcher";
+import type { SlackContext } from "../types";
 import { postMessage } from "../slack/api";
 import { fieldsFromInput, renderShareout } from "./share-out-render";
 

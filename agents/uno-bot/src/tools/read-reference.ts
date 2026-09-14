@@ -26,7 +26,7 @@ export type ReferenceMap = Record<string, string>;
 
 /**
  * Serve one document by name. Returns the tool's JSON payload as a string,
- * like every other read-only tool in loop-shared.ts.
+ * like every other read-only tool in agent/run-agent.ts.
  *
  * On a miss the payload carries `known` — every name the map holds, sorted —
  * because the model that asked for `uno-maintain/methods` needs the right
@@ -51,7 +51,7 @@ export function readReference(input: Record<string, unknown>, map: ReferenceMap 
  * place of its text. The next turn learns the method was consulted — so a
  * correction turn can judge the prior reply as grounded, and any turn can
  * re-read in one call — at ~50 chars instead of ~10k riding every iteration
- * of every later turn. Tool results are outside the Gemini lane's explicit
+ * of every later turn. Tool results are outside the Gemini adapter's explicit
  * cache, which is what makes the difference paid, not notional.
  */
 export function referenceStub(name: string): string {

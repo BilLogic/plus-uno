@@ -4,7 +4,7 @@
 // type or trip the silent select auto-create; unknown props are reported back.
 
 import type { Env } from "../types";
-import type { SlackContext } from "./dispatcher";
+import type { SlackContext } from "../types";
 import { postMessage } from "../slack/api";
 import { notionUpdate, normalizeName, parseNotionPageId, type PrdSection } from "../integrations/notion";
 

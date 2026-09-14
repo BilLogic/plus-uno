@@ -1,6 +1,7 @@
 // The Claude-on-Vertex adapter — a ModelProvider, not a loop (#496).
 //
-// This file replaces `claude-agent.ts`'s own copy of the agent loop. Everything
+// This file replaced the second agent loop that `claude-agent.ts` carried (now
+// deleted, #497). Everything
 // that used to be duplicated there — the iteration budget, `/stop`, the
 // `proposal_resolve` authorization, the side-effect-to-proposal rule, the lookup
 // ceiling, the synthesis pass, the narration rule — is the loop's (loop.ts), and
@@ -33,7 +34,7 @@
 // PURE by design — no `Env`, no Workers type, no fetch: the transport is a port
 // (`ClaudeTransport`), so `tsconfig.test.json` compiles this file and
 // `tests/claude-provider.test.ts` drives the whole turn with a stub. Production
-// binds the port to `vertex/claude.ts`'s rawPredict in `claude-agent.ts`.
+// binds the port to `vertex/claude.ts`'s rawPredict in `run-agent.ts`.
 
 import { MODELS } from "../routing";
 import { MAX_TOKENS } from "../loop-policy";

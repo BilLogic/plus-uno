@@ -3,7 +3,7 @@
 // by an allowlisted database, so this can't nuke arbitrary Notion pages.
 
 import type { Env } from "../types";
-import type { SlackContext } from "./dispatcher";
+import type { SlackContext } from "../types";
 import { postMessage } from "../slack/api";
 import { archiveCard, parseNotionPageId } from "../integrations/notion";
 

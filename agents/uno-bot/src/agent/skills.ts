@@ -42,11 +42,11 @@ export async function buildSystemBlocks(
   assistantContext?: string | null,
 ): Promise<SystemBlock[]> {
   const stable = getStableSystem(env);
-  // NB: only the Vertex-Claude lane honours this. gemini-agent.ts flattens these
+  // NB: only the Claude adapter honours this. The Gemini adapter flattens these
   // blocks into one `systemInstruction` string and the Gemini API has no
-  // cache_control, so on the PRODUCTION lane the harness rides uncached on every
-  // iteration unless Google's implicit caching picks up the stable prefix.
-  // gemini-agent.ts logs `cached_in=` so that is measured, not assumed.
+  // cache_control, so on the PRODUCTION provider the harness rides uncached on
+  // every iteration unless Google's implicit caching picks up the stable prefix.
+  // providers/gemini.ts logs `cached_in=` so that is measured, not assumed.
   //
   // 1h cache TTL on the stable block: design-team traffic gaps blow the 5-min
   // cache TTL; 1h costs 2× on write, pays back on the first reuse within the
@@ -58,7 +58,7 @@ export async function buildSystemBlocks(
   // stays stable): who sent the current message. Without this the model knows
   // the whole team roster (harness) but NOT who it's talking to — and a weaker
   // model will guess a roster name for the person speaking ("Hi Meryem!" to
-  // Bill, live incident 2026-07-16 on the gemini-2.5-pro fallback lane).
+  // Bill, live incident 2026-07-16 on the gemini-2.5-pro backup model).
   if (sender && SLACK_USER_ID.test(sender.userId)) {
     blocks.push({ type: "text", text: renderSenderBlock(sender.userId) });
   }
@@ -94,7 +94,7 @@ function renderAssistantContextBlock(ctx: string): string {
   return [
     "<assistant_panel_context>",
     `The user is chatting from the assistant panel and currently has this open: ${ctx}.`,
-    // Deictic examples must map to real tool lanes: "who's in here" →
+    // Deictic examples must map to real tool paths: "who's in here" →
     // slack_channel_members, "this channel" → disambiguation only. "What's
     // happening here" was cut — no tool reads a channel's recent history yet.
     'Use this ONLY to disambiguate a vague, deictic ask ("this channel", "who\'s in here") — never assume it is the subject of a specific question. When in doubt, answer the words, not the panel.',

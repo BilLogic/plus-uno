@@ -66,7 +66,7 @@ export async function executeBlueprintSearch(
   }
 
   try {
-    // `fresh` is forced by the Worker on a correction turn (loop-shared
+    // `fresh` is forced by the Worker on a correction turn (run-agent
     // executeReadOnlyTool) and may also be requested by the model. Either way it
     // bypasses the 60s result cache — a re-check that re-serves the cache is a
     // cache serving a lie.

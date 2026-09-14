@@ -1,9 +1,9 @@
 // The tier union, alone in a file with no imports.
 //
-// It lives here rather than in routing.ts because routing.ts imports
-// loop-shared, which imports the Workers type graph — so anything that wanted
-// just the TYPE dragged the whole Worker into the node-only test build. A type
-// with no runtime cost should not decide what can be unit-tested.
+// It lives here rather than in routing.ts because the tier NAME is all the
+// loop and the adapters need, and a type with no runtime cost should not decide
+// what can be unit-tested: an import-free file can be named from the pure
+// modules `tsconfig.test.json` compiles, dragging nothing behind it.
 //
 // A tier is HOW HARD TO THINK, named for effort and never for a model: these
 // were "haiku" | "sonnet" | "opus" until 2026-08-07, Claude names on a Gemini

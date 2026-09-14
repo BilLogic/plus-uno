@@ -16,8 +16,8 @@
 //     pattern as the per-request line, so pass/fail rates are measurable via
 //     `wrangler tail` / Workers Logs.
 //
-// Provider-aware like the agent loops: Gemini lane → one generateContent on
-// the active GEMINI_MODEL (low thinking); Vertex-Claude lane → one chill call.
+// Provider-aware like the agent loop: the Gemini adapter → one generateContent
+// on the active GEMINI_MODEL (low thinking); Vertex-Claude → one chill call.
 
 import { shouldRejectRevision, looksLikeStalledCorrection } from "./revision-guard";
 // The rubric text lives in its own leaf module so `npm test` can compile it
@@ -128,7 +128,7 @@ async function callJudgeModel(
 
   const system = ctx.correction ? JUDGE_SYSTEM + CORRECTION_GATE : JUDGE_SYSTEM;
 
-  // Judge on the active lane, defaulting to Gemini (production).
+  // Judge on the active provider, defaulting to Gemini (production).
   const provider = (env.MODEL_PROVIDER ?? "gemini").toLowerCase();
   if (provider === "vertex-claude" && claudeVertexConfigured(env)) {
     const res = await claudeVertexGenerate(env, {
@@ -165,7 +165,7 @@ export async function reviewDraft(
     userText: string;
     draft: string;
     /** True when the Worker classified this turn as the user correcting the
-     *  previous reply (loop-shared looksLikeCorrection). Turns on the extra
+     *  previous reply (run-agent looksLikeCorrection). Turns on the extra
      *  gate AND bypasses the length floor. */
     correction?: boolean;
     /** The reply being corrected. Only sent on a correction turn — the judge
