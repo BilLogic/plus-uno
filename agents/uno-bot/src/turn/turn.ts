@@ -48,7 +48,7 @@ import {
   formatNotionUpdateProposal,
   formatProposal,
   proposalVerb,
-  withOperationList,
+  withOperationPlan,
 } from "../slack/proposal-render";
 import { renderDeliveredBody } from "../slack/render";
 import type { AssistantContext } from "../slack/types";
@@ -745,12 +745,16 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // is the path that must not double-execute.
   if (request.pending) await threadState.claimProposal(request.pending.proposalTs);
 
-  const card = await buildCard(
+  const { card, planFollowUp } = await buildCard(
     result,
     request,
     deps,
     implementPrdUrlFor(result.toolName, result.input, prd),
   );
+  // Before the card, never after: the card holds the ✅/⛔ buttons, so it has to
+  // be the last message in the thread — a plan posted under it would leave the
+  // decision above the thing being decided.
+  for (const message of planFollowUp) await delivery.postNote(message);
   const posted = await delivery.stageProposal(card);
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] proposal card was not staged (${result.toolName})`);
@@ -1096,20 +1100,24 @@ function implementPrdUrlFor(
 
 /**
  * The card for one staged Proposal — the batch, as the person reads it before
- * pressing ✅.
+ * pressing ✅ — and, where the batch is too big for one message, the follow-up
+ * that carries the full plan.
+ *
+ * The card is the SOURCE OF TRUTH for what a ✅ runs: it gets the first
+ * operation's real body and then every operation of the batch, grouped by what
+ * it touches and labelled by kind. Nothing is summarised away — past Slack's
+ * limits the groups collapse and the complete list moves to `followUp`, which
+ * the caller posts BEFORE the card so the buttons stay last.
  */
 async function buildCard(
   result: Extract<AgentResult, { kind: "proposal" }>,
   request: TurnRequest,
   deps: TurnDeps,
   implementPrdUrl: string | undefined,
-): Promise<ProposalCard> {
-  // A batch gets the first operation's real body and then a line per operation,
-  // so a ✅ is never given to a card that shows one of four writes. Grouping by
-  // page, kind labels and before/after are the next ticket; listing every
-  // operation is the part that cannot wait.
+): Promise<{ card: ProposalCard; planFollowUp: string[] }> {
   const card = await buildFirstOperationCard(result, request, deps, implementPrdUrl);
-  return { ...card, text: withOperationList(card.text, result.operations) };
+  const plan = withOperationPlan(card.text, result.operations);
+  return { card: { ...card, text: plan.text }, planFollowUp: plan.followUp ?? [] };
 }
 
 /** The card body for the batch's FIRST operation — which per-tool formatter it

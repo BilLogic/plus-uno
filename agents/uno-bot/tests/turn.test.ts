@@ -507,6 +507,78 @@ test("several side-effect calls in one reply stage ONE proposal that holds all o
   assert.equal(staged?.operations?.length, 3);
 });
 
+test("what the card lists is what ThreadState holds — four pages, mixed kinds, none missing", async () => {
+  const operations = [
+    {
+      name: "notion_update",
+      args: {
+        page_url: "https://notion.so/hub",
+        title: "Calendar Sync hub",
+        replace: [
+          {
+            block_id: "24f0c2410aa1",
+            last_edited_time: "2026-09-14T10:00:00.000Z",
+            before: "The sync runs nightly.",
+            content: "The sync runs hourly.",
+          },
+        ],
+      },
+    },
+    {
+      name: "notion_update",
+      args: {
+        page_url: "https://notion.so/prd",
+        title: "Calendar Sync PRD",
+        properties: { design_status: "Ready for QA" },
+      },
+    },
+    {
+      name: "notion_update",
+      args: {
+        page_url: "https://notion.so/runbook",
+        title: "Calendar Sync runbook",
+        append: { sections: [{ heading: "Rollback", body: "…" }] },
+      },
+    },
+    { name: "notion_create", args: { surface: "decision", title: "Calendar Sync cut" } },
+  ];
+  const h = harness({
+    replies: [{ text: "Reconciling the docs after the scope change.", toolCalls: operations }],
+  });
+
+  const outcome = await runTurn(request({ text: "update the notion docs accordingly" }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  const stored = await h.threadState.getProposalByThread(REF);
+  assert.deepEqual(
+    stored?.operations?.map((o) => o.input.title),
+    operations.map((o) => o.args.title),
+  );
+  // The card's numbered list IS the stored batch: same count, same order, and
+  // each operation named by the kind it will run.
+  const listed = [...(outcome.staged?.card.text ?? "").matchAll(/^ {2}(\d+)\. \*(.+?)\*(.*)$/gm)];
+  assert.deepEqual(
+    listed.map((m) => m[1]),
+    ["1", "2", "3", "4"],
+  );
+  assert.deepEqual(
+    listed.map((m) => m[2]),
+    ["replace in place", "set properties", "append", "create row"],
+  );
+  // Grouped by what each one touches — one heading per page, four in all.
+  const headings = [
+    ...(outcome.staged?.card.text ?? "").matchAll(
+      /^\*(?:<[^|]+\|)?([^*>]+)>?\*(?: \(Notion data source\))?$/gm,
+    ),
+  ];
+  assert.deepEqual(
+    headings.map((m) => m[1]),
+    ["Calendar Sync hub", "Calendar Sync PRD", "Calendar Sync runbook", "decision"],
+  );
+  // And the rewrite shows what the block says now, beside what it will say.
+  assert.match(outcome.staged?.card.text ?? "", /_The sync runs nightly\._ → _The sync runs hourly\._/);
+});
+
 test("a ✅ on a batch runs every operation in order, and a failure hides none of the others", async () => {
   const operations = [
     { toolName: "notion_update", input: { title: "Calendar Sync hub" } },

@@ -12,10 +12,15 @@
 // hands in the real side-effect tool table.
 
 import type { ProposalOperation } from "../thread-state/index";
+import { groupOperations, operationKindSummary } from "../slack/proposal-render";
 
 /** What one operation came to. */
 export interface OperationOutcome {
   toolName: string;
+  /** The operation's own input, carried through so the result message can group
+   *  and label an outcome exactly as the card grouped and labelled the plan.
+   *  Optional for an outcome recorded before this shipped. */
+  input?: Record<string, unknown>;
   ok: boolean;
   /** The executor's own JSON result, verbatim — the record of what happened. */
   result: string;
@@ -51,6 +56,7 @@ export async function runOperations(
     console.log(`[gate] ${operation.toolName} executed: ${result}`);
     outcomes.push({
       toolName: operation.toolName,
+      input: operation.input,
       ok: isOkResult(result),
       result,
       message: describeOutcome(operation.toolName, result),
@@ -110,6 +116,11 @@ export function batchOutcomeNote(outcomes: OperationOutcome[]): string {
  * or failed, so a partial result is visible rather than hidden behind the one
  * that succeeded.
  *
+ * Grouped by target and labelled by kind, the same way the card grouped and
+ * labelled the plan: the person is checking the result AGAINST the card they
+ * approved, and two different shapes for the same batch make them do that
+ * matching by hand.
+ *
  * `null` for a single operation: nothing there needs disambiguating, and the
  * tool's own reply already says what happened.
  */
@@ -119,12 +130,17 @@ export function batchResultMessage(outcomes: OperationOutcome[]): string | null 
   const head = failed
     ? `:warning: Ran ${outcomes.length} operations — ${outcomes.length - failed} done, ${failed} failed:`
     : `:white_check_mark: Ran all ${outcomes.length} operations:`;
-  return [
-    head,
-    ...outcomes.map(
-      (o, i) => `${i + 1}. ${o.ok ? ":white_check_mark:" : ":x:"} *${o.toolName}* — ${o.message}`,
-    ),
-  ].join("\n");
+  const planned = outcomes.map((o) => ({ toolName: o.toolName, input: o.input ?? {} }));
+  const lines: string[] = [];
+  for (const group of groupOperations(planned)) {
+    lines.push(group.heading);
+    for (const i of group.members) {
+      const o = outcomes[i]!;
+      const mark = o.ok ? ":white_check_mark:" : ":x:";
+      lines.push(`  ${i + 1}. ${mark} *${operationKindSummary(planned[i]!)}* — ${o.message}`);
+    }
+  }
+  return [head, ...lines].join("\n");
 }
 
 /**
