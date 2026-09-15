@@ -211,6 +211,7 @@ function evalDeps(
           currentSender: req.currentSender,
           pending: req.pending,
           ...(req.assistantContext ? { assistantContext: req.assistantContext } : {}),
+          ...(req.preflight ? { preflight: req.preflight } : {}),
           onInterim: req.onInterim,
           // The three reporters production does not pass: the dials the last
           // model call was sent with (#421), every tool call with its

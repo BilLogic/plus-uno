@@ -118,6 +118,11 @@ export interface AgentInput {
    *  narration, capped + capped-count) so the Worker can post them as separate
    *  interim messages. Never receives the full working monologue. */
   onInterim?: (text: string) => void;
+  /** The clarify-vs-act check, already bound to the thread by the caller. The
+   *  loop asks it before staging a side-effect call so a refusal can go back to
+   *  the model as that call's result; callers that omit it stage unchecked and
+   *  leave the check to whoever runs it afterwards. */
+  preflight?: (name: string, args: Record<string, unknown>) => Promise<{ ask: string } | null>;
   /** Called once, as the turn finishes, with the tier it was routed to and the
    *  model + thinking level the last model call was sent with — the same facts
    *  the `[uno-bot] request done` log line carries. The headless eval route
@@ -206,6 +211,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
       executeReadOnlyTool: (name, args) => executeReadOnlyTool(env, name, args, slack),
       threadState: threadStateFor(env),
       budget: liveBudget,
+      ...(input.preflight ? { preflight: input.preflight } : {}),
     },
     tier,
     routeReason,

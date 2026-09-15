@@ -11,6 +11,9 @@
 
 import type { Env } from "../types";
 import { listDsComponents, matchComponent, closestComponents } from "../integrations/ds-components";
+// Placeholder detection lives next door, import-free, so the loop and a plain
+// Node test can both reach it without dragging `Env` behind them.
+import { placeholderRefusal } from "./placeholder";
 
 export interface PreflightCtx {
   env: Env;
@@ -32,7 +35,6 @@ export interface PreflightAsk {
 // (slack/proposal-render.ts, the share-out bundle audit) reach for it here.
 export { collectStrings } from "./tool-input";
 
-const PLACEHOLDER_RE = /\b(TBD|TODO|lorem|placeholder)\b/i;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function preflight(
@@ -113,8 +115,12 @@ export async function preflight(
         }
       }
 
-      // Placeholder scan: never file a card with TBD/TODO/lorem/placeholder in
-      // it — real content or no card.
+      // Placeholder scan: a genuinely unfilled slot never gets filed, and the
+      // refusal names the surface, the field and the text it matched
+      // (`agent/placeholder.ts`).
+      const placeholder = placeholderRefusal(toolName, input);
+      if (placeholder) return { ask: placeholder };
+
       const sections = Array.isArray(input.sections) ? input.sections : [];
       const sectionStrings = sections.flatMap((s) => {
         if (typeof s === "string") return [s];
@@ -125,17 +131,6 @@ export async function preflight(
         }
         return [];
       });
-      const placeholderHits = [title, summary, ...sectionStrings]
-        .map((t) => t.match(PLACEHOLDER_RE)?.[0])
-        .filter((m): m is string => !!m);
-      if (placeholderHits.length > 0) {
-        const unique = [...new Set(placeholderHits.map((m) => m.toLowerCase()))];
-        return {
-          ask:
-            `:memo: This card still has placeholder content in it (${unique.map((m) => `\`${m}\``).join(", ")}). ` +
-            "Give me the real content for those spots and I'll file it — I won't create a card with placeholders.",
-        };
-      }
 
       // PRD oversize backstop: thread drafts are for alignment — the document
       // of record lives in Notion and is edited there / in the IDE. Fuller

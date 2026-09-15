@@ -189,6 +189,7 @@ function turnDeps(
           currentSender: req.currentSender,
           pending: req.pending,
           ...(req.assistantContext ? { assistantContext: req.assistantContext } : {}),
+          ...(req.preflight ? { preflight: req.preflight } : {}),
           onInterim: req.onInterim,
         }),
       );

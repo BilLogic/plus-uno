@@ -101,6 +101,8 @@ function harness(opts: {
   /** Stand in for the judge. Returning text revises the draft. */
   judge?: (draft: string) => { text: string; verdict: string };
   preflightAsk?: string;
+  /** A refusal that depends on the call — what a real guard does. */
+  preflightFor?: (toolName: string, input: Record<string, unknown>) => string | null;
   delivery?: RecordingDelivery;
   threadState?: ThreadState;
   toolResult?: string;
@@ -128,6 +130,9 @@ function harness(opts: {
           },
           threadState: { async consumeCancel() { return false; } },
           budget: IDLE_BUDGET,
+          // Wired as production wires it: the loop gets the first go at a
+          // refusal, and only a call refused twice reaches the person.
+          ...(req.preflight ? { preflight: req.preflight } : {}),
         },
         tier: req.tier,
         routeReason: req.routeReason,
@@ -152,8 +157,9 @@ function harness(opts: {
       return opts.judge ? opts.judge(draft) : { text: draft, verdict: "pass" };
     },
 
-    async preflight() {
-      return opts.preflightAsk ? { ask: opts.preflightAsk } : null;
+    async preflight(toolName, input) {
+      const ask = opts.preflightFor?.(toolName, input) ?? opts.preflightAsk;
+      return ask ? { ask } : null;
     },
 
     // The gate's EXECUTION port. The decision half is not a dependency: the
@@ -422,8 +428,14 @@ test("a side-effect call comes back as a proposal to stage, and the card was del
 });
 
 test("a tool call that is missing what it needs asks instead of staging", async () => {
+  // Two replies because the model gets one go at fixing the call itself: the
+  // first refusal goes back to it as the call's result, and it is the SECOND
+  // refusal that the person hears.
   const h = harness({
-    replies: [{ toolCalls: [{ name: "component_implement", args: { component: "Button" } }] }],
+    replies: [
+      { toolCalls: [{ name: "component_implement", args: { component: "Button" } }] },
+      { toolCalls: [{ name: "component_implement", args: { component: "Button" } }] },
+    ],
     preflightAsk: "Which PRD is this implementing?",
   });
   const outcome = await runTurn(request({ text: "implement the Button change" }), h.deps);
@@ -432,6 +444,36 @@ test("a tool call that is missing what it needs asks instead of staging", async 
   assert.equal(outcome.posted, "Which PRD is this implementing?");
   assert.equal(h.delivery.calls.filter((c) => c.kind === "proposal").length, 0);
   assert.equal(await h.threadState.getProposalByThread(REF), null);
+});
+
+test("a refusal the model can fix never reaches the person — the corrected call is staged", async () => {
+  const h = harness({
+    replies: [
+      { toolCalls: [{ name: "notion_create", args: { surface: "decision", title: "[TBD]" } }] },
+      {
+        toolCalls: [
+          { name: "notion_create", args: { surface: "decision", title: "Calendar Sync scope cut" } },
+        ],
+      },
+    ],
+    preflightFor: (_tool, input) =>
+      input.title === "[TBD]"
+        ? "I won't file that decision record yet — the *title* is still a placeholder (`[TBD]`)."
+        : null,
+  });
+
+  const outcome = await runTurn(request({ text: "record the scope cut" }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  assert.deepEqual(outcome.staged?.proposal.input, {
+    surface: "decision",
+    title: "Calendar Sync scope cut",
+  });
+  // The person saw a card, not the bot arguing with itself.
+  assert.deepEqual(
+    postsOf(h.delivery).filter((p) => p.includes("placeholder")),
+    [],
+  );
 });
 
 test("the same proposal re-staged while one is pending is read as the confirmation", async () => {

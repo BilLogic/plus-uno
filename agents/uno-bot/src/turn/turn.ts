@@ -235,6 +235,10 @@ export interface TurnAgentRequest {
    *  turns on the judge's correction gate. */
   correction: boolean;
   onInterim(text: string): void;
+  /** The same clarify-vs-act check Turn runs after the loop returns, with this
+   *  thread's PRD already bound, so the loop can put a refusal to the model as
+   *  the call's own result instead of the person seeing the first one. */
+  preflight?(toolName: string, input: Record<string, unknown>): Promise<{ ask: string } | null>;
 }
 
 /** What one agent turn reported back, beside its result. */
@@ -550,6 +554,22 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     postInterim(BACKSTOP_LINES[backstopAt] ?? BACKSTOP_LINES[0]!);
   }, INTERIM_BACKSTOP_MS);
 
+  // Clarify-vs-act, bound to this thread once: the loop asks it mid-turn (so a
+  // refusal reaches the model), and the block below asks it again on whatever
+  // the loop finally staged (so a refusal the model could not fix reaches the
+  // person). One check, one wording, both sides.
+  const prd = request.prd ?? null;
+  const preflightCall = (
+    toolName: string,
+    input: Record<string, unknown>,
+  ): Promise<{ ask: string } | null> => {
+    const prdUrl = implementPrdUrlFor(toolName, input, prd);
+    return deps.preflight(toolName, input, {
+      prd,
+      ...(prdUrl ? { implementPrdUrl: prdUrl } : {}),
+    });
+  };
+
   let run: TurnAgentRun;
   try {
     run = await deps.runAgent({
@@ -563,6 +583,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
       currentSender: { userId: request.userId },
       ...(assistantContext ? { assistantContext } : {}),
       correction,
+      preflight: preflightCall,
       onInterim: postInterim,
     });
   } catch (err) {
@@ -631,20 +652,11 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
 
   // ── A new side-effect proposal ─────────────────────────────────────────────
 
-  // Resolve the PRD url for `implement` (thread-root notification, or a link the
-  // designer pasted); it feeds both the clarify gate and the card preview.
-  const prd = request.prd ?? null;
-  let implementPrdUrl: string | undefined;
-  if (result.toolName === "component_implement") {
-    const inputPrdUrl =
-      typeof result.input.notion_prd_url === "string" ? result.input.notion_prd_url.trim() : "";
-    implementPrdUrl = prd?.url ?? (inputPrdUrl || undefined);
-  }
-
   // Clarify-vs-act (D3): if the tool call is missing what it needs, ask instead
   // of staging — so gating never depends on the model remembering to ask (a
-  // component is never implemented PRD-less).
-  const ask = await deps.preflight(result.toolName, result.input, { prd, implementPrdUrl });
+  // component is never implemented PRD-less). The model has already had its one
+  // go at fixing this call inside the loop, so a refusal here is the ask.
+  const ask = await preflightCall(result.toolName, result.input);
   if (ask) {
     await delivery.postNote(ask.ask);
     await memory.remember(ask.ask);
@@ -727,7 +739,12 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // is the path that must not double-execute.
   if (request.pending) await threadState.claimProposal(request.pending.proposalTs);
 
-  const card = await buildCard(result, request, deps, implementPrdUrl);
+  const card = await buildCard(
+    result,
+    request,
+    deps,
+    implementPrdUrlFor(result.toolName, result.input, prd),
+  );
   const posted = await delivery.stageProposal(card);
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] proposal card was not staged (${result.toolName})`);
@@ -1046,6 +1063,24 @@ function threadMemory(
     },
   };
   return memory;
+}
+
+/**
+ * The PRD url an `implement` runs against: the thread-root notification, or the
+ * link the designer pasted into the call.
+ *
+ * Read twice — by the clarify gate and by the card preview — and derived rather
+ * than held, so the mid-turn check and the staged card cannot disagree about
+ * which PRD this is.
+ */
+function implementPrdUrlFor(
+  toolName: string,
+  input: Record<string, unknown>,
+  prd: { id?: string; url?: string } | null,
+): string | undefined {
+  if (toolName !== "component_implement") return undefined;
+  const pasted = typeof input.notion_prd_url === "string" ? input.notion_prd_url.trim() : "";
+  return prd?.url ?? (pasted || undefined);
 }
 
 // ── Cards ────────────────────────────────────────────────────────────────────
