@@ -30,6 +30,7 @@ import { resolveSignal } from "../gate/index";
 import { executeVerdict } from "../agent/resolve-proposal";
 import { proposalCardBlocks } from "./proposal-render";
 import { slackDelivery } from "./slack-delivery";
+import { withWorkingSignal } from "../turn/index";
 
 /** The subset of Slack's interaction envelope this Worker acts on. */
 interface InteractionPayload {
@@ -155,13 +156,19 @@ async function resolveFromButton(
   const pending = verdict.proposal;
   const post = verdict.post;
   if (!pending || !post) return; // a won verdict always carries both
-  await slackDelivery(env, {
+  const door = slackDelivery(env, {
     channel: pending.channel,
     replyTs: post.replyTs,
     userMsgTs: pending.userMsgTs,
     userId,
-  }).postNote(post.text);
-  await executeVerdict(env, verdict);
+  });
+  // The press runs the tool, and the button is not a Turn — so the working
+  // signal is raised and settled here, through the same pairing Turn uses.
+  await withWorkingSignal(door, async (delivery) => {
+    await delivery.setWorking({ status: "is working on that…" });
+    await delivery.postNote(post.text);
+    await executeVerdict(env, verdict);
+  });
 
   const note = decision === "confirm"
     ? `:white_check_mark: Approved by <@${userId}>`

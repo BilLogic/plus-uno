@@ -92,17 +92,30 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
 
     async setWorking({ status, titleFrom }) {
       // setStatus IS the thinking indicator on an app thread — the documented
-      // one — and it also opens the thread. Cleared on every exit path by the
-      // handler's `finally`. Off the assistant surface there is nothing to set:
-      // a channel's acknowledgement is the 👀.
-      if (!isAssistantThread(channel) || !replyTs) return;
+      // one — and it also opens the thread. A thread is all it needs: the
+      // DM-only condition that used to stand here decided for Slack which
+      // surfaces can show a status, and the cost of guessing wrong was a
+      // channel thread with an indicator nobody could take down. Ask, and let
+      // the API decline where it wants to — a rejection here is a signal that
+      // did not appear, which is exactly what the condition was for.
+      if (!replyTs) return;
       if (status) await setStatus(env, channel, replyTs, status).catch(() => {});
-      if (titleFrom) {
+      // The title is the assistant surface's alone: `assistant.threads.setTitle`
+      // names an App thread, and a channel thread has no such name to set.
+      if (titleFrom && isAssistantThread(channel)) {
         // Title the thread from the question that started it, so it is findable
         // in History/Messages. Slack: "Set the title initially to capture the
         // first question from the user."
         await setAssistantTitle(env, channel, replyTs, threadTitleFrom(titleFrom)).catch(() => {});
       }
+    },
+
+    async clearWorking() {
+      // The empty status IS the clear (`assistant.threads.setStatus` with ""),
+      // and it goes wherever the set went — same condition, or the pairing is
+      // a set on one surface and a clear on another.
+      if (!replyTs) return;
+      await setStatus(env, channel, replyTs, "").catch(() => {});
     },
 
     async beginProgress(label) {
@@ -142,15 +155,23 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
       // The answer CLOSES the checklist's stream instead of opening a second
       // one beside it.
       const openStream = await settlePlan("complete");
-      const posted = await postTextVerified(
-        env,
-        channel,
-        replyTs,
-        text,
-        target.footerHint,
-        openStream ?? undefined,
-      );
-      return { ok: posted.ok, text: posted.text };
+      try {
+        const posted = await postTextVerified(
+          env,
+          channel,
+          replyTs,
+          text,
+          target.footerHint,
+          openStream ?? undefined,
+        );
+        return { ok: posted.ok, text: posted.text };
+      } catch (err) {
+        // The stream was handed over to be closed INTO the answer. If the post
+        // threw before it got there, nobody else holds its ts — and a stream
+        // left open renders as a live "typing" bubble that never settles.
+        if (openStream) await stopStream(env, channel, openStream).catch(() => {});
+        throw err;
+      }
     },
 
     async postNote(text): Promise<PostResult> {

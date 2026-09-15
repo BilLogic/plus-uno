@@ -61,6 +61,20 @@ export interface Delivery {
   setWorking(note: { status?: string; titleFrom?: string }): Promise<void>;
 
   /**
+   * Take the working signal back down.
+   *
+   * It exists as a method because a set with no clear on the port was a signal
+   * only Slack could retract, and only where it happened to look: the one
+   * clear lived in the events handler's `finally` and was gated to DMs, so a
+   * channel thread kept saying "is working…" after the turn was over. A clear
+   * a caller cannot express is a clear that gets forgotten.
+   *
+   * Idempotent by contract, and best-effort like the set: a surface with no
+   * indicator no-ops, and a surface that never had one clears nothing.
+   */
+  clearWorking(): Promise<void>;
+
+  /**
    * Open the progress surface for a substantive turn, and close it.
    *
    * `beginProgress` is what makes the first narration land somewhere other than
@@ -103,6 +117,7 @@ export type DeliveryCall =
   | { kind: "react"; emoji: string }
   | { kind: "removeReaction"; emoji: string }
   | { kind: "working"; status?: string; titleFrom?: string }
+  | { kind: "working-clear" }
   | { kind: "beginProgress"; label: string }
   | { kind: "endProgress"; outcome: "complete" | "error" }
   | { kind: "interim"; text: string }
@@ -158,6 +173,10 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       calls.push({ kind: "working", ...note });
     },
 
+    async clearWorking() {
+      calls.push({ kind: "working-clear" });
+    },
+
     async beginProgress(label) {
       calls.push({ kind: "beginProgress", label });
     },
@@ -200,4 +219,39 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       });
     },
   };
+}
+
+// ── The set/clear pairing, in one place ──────────────────────────────────────
+
+/**
+ * Run something that may raise the working signal, and guarantee the signal is
+ * down when it returns.
+ *
+ * Three callers raise it — a turn, and the two Gate doors that resolve a card
+ * without one — and every one of them has more exits than a person can hold in
+ * mind: the turn alone leaves by nine. So the clear is not written at the
+ * exits at all. The work runs through a Delivery whose `setWorking` is watched,
+ * and the `finally` here clears IF something was raised, which is what makes a
+ * tenth exit safe by construction rather than by review.
+ *
+ * The clear is swallowed: a surface that cannot take the signal down is not a
+ * reason to fail a turn that already did its work.
+ */
+export async function withWorkingSignal<T>(
+  delivery: Delivery,
+  run: (delivery: Delivery) => Promise<T>,
+): Promise<T> {
+  let raised = false;
+  const watched: Delivery = {
+    ...delivery,
+    async setWorking(note) {
+      raised = true;
+      await delivery.setWorking(note);
+    },
+  };
+  try {
+    return await run(watched);
+  } finally {
+    if (raised) await delivery.clearWorking().catch(() => {});
+  }
 }
