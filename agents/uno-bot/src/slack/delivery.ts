@@ -152,16 +152,24 @@ export async function postTextVerified(
       if (!((openStreamTs || env.SLACK_STREAMING === "on") && threadTs)) return false;
       const streamTs = openStreamTs ?? (await startStream(env, channel, threadTs));
       if (!streamTs) return false;
-      // append (the text) then stop (the footer blocks — stopStream is the only
-      // frame that accepts blocks). If either half fails, fall through to a
-      // plain post: a duplicated answer is bad, a missing one is worse.
-      const appended = await appendStream(env, channel, streamTs, piece);
-      const blocks = withFooter && footer.length ? footer : undefined;
-      const stopped = await stopStream(env, channel, streamTs, blocks);
-      if (appended && stopped) return true;
-      console.warn(`[slack] stream finish failed (append=${appended} stop=${stopped}); falling back to post`);
-      await stopStream(env, channel, streamTs).catch(() => {});
-      return false;
+      try {
+        // append (the text) then stop (the footer blocks — stopStream is the only
+        // frame that accepts blocks). If either half fails, fall through to a
+        // plain post: a duplicated answer is bad, a missing one is worse.
+        const appended = await appendStream(env, channel, streamTs, piece);
+        const blocks = withFooter && footer.length ? footer : undefined;
+        const stopped = await stopStream(env, channel, streamTs, blocks);
+        if (appended && stopped) return true;
+        console.warn(`[slack] stream finish failed (append=${appended} stop=${stopped}); falling back to post`);
+        await stopStream(env, channel, streamTs).catch(() => {});
+        return false;
+      } catch (err) {
+        // Every stream opened here is stopped here, throw included: an
+        // unstopped one leaves the thread showing work still in progress long
+        // after the turn ended, and nothing downstream knows its ts.
+        await stopStream(env, channel, streamTs).catch(() => {});
+        throw err;
+      }
     },
 
     // `text` stays populated alongside blocks: it is what notifications and

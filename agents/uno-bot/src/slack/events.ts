@@ -5,12 +5,7 @@ import type { HistoryTurn, PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { conversationsReplies, getBotIdentity, postMessage } from "./api";
 import { buildFailureMessage } from "./failure-message";
-import {
-  handleAgentDmOpened,
-  handleAppContextChanged,
-  setStatus,
-  isAssistantThread,
-} from "./assistant";
+import { handleAgentDmOpened, handleAppContextChanged } from "./assistant";
 import { handleAppHomeOpened } from "./home";
 import { handleReaction } from "./gate";
 import { extractPrdFromThreadRoot } from "./notion-prd";
@@ -375,13 +370,10 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
     // Best-effort by contract: a missed mark self-heals when the lease goes
     // stale, at the cost of one re-run.
     await store.markRunDone(runKey).catch(() => {});
-    // Clear the assistant "thinking…" loader on every exit (success, early
-    // return, or throw) — a stuck status line is worse than none. No-op off
-    // the panel or if one was never set. Same thread_ts gate as the set: only
-    // threaded DM turns (the panel's shape) can have a status to clear.
-    if (isAssistantThread(event.channel)) {
-      await setStatus(env, event.channel, event.thread_ts ?? event.ts, "").catch(() => {});
-    }
+    // No status clear here. Turn raises the working signal and Turn takes it
+    // down, in one `finally` around every exit it has (#555) — a second owner
+    // here could only clear the surfaces IT knew about, which is how a channel
+    // thread kept the indicator a DM-gated clear never reached.
   }
   return "handled";
 }

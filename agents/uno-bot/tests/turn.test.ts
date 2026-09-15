@@ -489,8 +489,170 @@ test("a trivial turn skips the working signals and the progress surface", async 
 
   assert.equal(outcome.telemetry.tier, "chill");
   assert.equal(outcome.telemetry.trivial, true);
-  assert.equal(h.delivery.calls.filter((c) => c.kind === "working").length, 0);
   assert.equal(h.delivery.calls.filter((c) => c.kind === "beginProgress").length, 0);
+  // And nothing is cleared: the exit funnel takes down what the turn RAISED,
+  // so a turn that raised nothing leaves the surface alone.
+  assert.deepEqual(workingSignalOf(h.delivery), []);
+});
+
+/** The working signal's whole life in one turn, in order. */
+const workingSignalOf = (delivery: RecordingDelivery): string[] =>
+  delivery.calls
+    .filter((c) => c.kind === "working" || c.kind === "working-clear")
+    .map((c) => c.kind);
+
+// Every door the turn can leave by, and what the person's surface says after it.
+//
+// The incident this pins: a channel thread that showed "is working…" through a
+// reply, a pending card and a finished gate run, because the set had nine exits
+// and the clear had one — in another file, gated to DMs. So the assertion is
+// not "a clear happens somewhere" but the whole sequence, set then clear and
+// nothing else, on both surfaces. A door added later that skips it fails here.
+const EXITS: Array<{
+  door: string;
+  run: (surface: "channel" | "assistant") => Promise<{ h: Harness; outcome: TurnOutcome }>;
+}> = [
+  {
+    door: "an answer",
+    run: async (surface) => {
+      const h = harness();
+      return { h, outcome: await runTurn(request({ surface }), h.deps) };
+    },
+  },
+  {
+    door: "a clarifying ask",
+    run: async (surface) => {
+      const h = harness({
+        replies: [{ toolCalls: [{ name: "component_implement", args: { component: "Button" } }] }],
+        preflightAsk: "Which PRD is this implementing?",
+      });
+      return {
+        h,
+        outcome: await runTurn(request({ surface, text: "implement the Button change" }), h.deps),
+      };
+    },
+  },
+  {
+    door: "a staged proposal",
+    run: async (surface) => {
+      const h = harness({
+        replies: [
+          {
+            text: "I'll file a Roadmap card.",
+            toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign" } }],
+          },
+        ],
+      });
+      return {
+        h,
+        outcome: await runTurn(
+          request({ surface, text: "file a card for the reflection redesign" }),
+          h.deps,
+        ),
+      };
+    },
+  },
+  {
+    door: "a card Slack refused",
+    run: async (surface) => {
+      const h = harness({
+        delivery: recordingDelivery({ stagingFails: true }),
+        replies: [
+          { toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign" } }] },
+        ],
+      });
+      return {
+        h,
+        outcome: await runTurn(
+          request({ surface, text: "file a card for the reflection redesign" }),
+          h.deps,
+        ),
+      };
+    },
+  },
+  {
+    door: "a reply Slack never accepted",
+    run: async (surface) => {
+      const h = harness({ delivery: recordingDelivery({ answerFails: true }) });
+      return { h, outcome: await runTurn(request({ surface }), h.deps) };
+    },
+  },
+  {
+    door: "a resolution the model decided",
+    run: async (surface) => {
+      const h = harness({
+        replies: [
+          {
+            toolCalls: [
+              {
+                name: "proposal_resolve",
+                args: { decision: "confirm", message_to_user: "Filing it now." },
+              },
+            ],
+          },
+        ],
+      });
+      await stage(h);
+      return {
+        h,
+        outcome: await runTurn(
+          request({
+            surface,
+            text: "that all looks right to me, please go ahead and file the card",
+            pending: PENDING,
+          }),
+          h.deps,
+        ),
+      };
+    },
+  },
+  {
+    door: "a reaction and no words",
+    run: async (surface) => {
+      const h = harness({
+        replies: [{ toolCalls: [{ name: "slack_react", args: { emoji: "pray" } }] }, { text: "" }],
+      });
+      return {
+        h,
+        outcome: await runTurn(request({ surface, text: "thanks, that helps a lot" }), h.deps),
+      };
+    },
+  },
+  {
+    door: "a dead model",
+    run: async (surface) => {
+      const h = harness();
+      const broken: TurnDeps = {
+        ...h.deps,
+        async runAgent() {
+          throw new Error("vertex 429: resource exhausted");
+        },
+      };
+      return { h, outcome: await runTurn(request({ surface }), broken) };
+    },
+  },
+];
+
+for (const exit of EXITS) {
+  for (const surface of ["channel", "assistant"] as const) {
+    test(`the working signal is down after ${exit.door} (${surface})`, async () => {
+      const { h, outcome } = await exit.run(surface);
+      assert.ok(outcome.disposition, "the turn produced an outcome");
+      assert.deepEqual(workingSignalOf(h.delivery), ["working", "working-clear"]);
+    });
+  }
+}
+
+test("a typed gate emoji resolves before anything is raised, so there is nothing to clear", async () => {
+  // The one exit above the working signals: a message that is only ✅ never
+  // reaches the model, so the indicator is never raised — and a clear with no
+  // set would be a second signal saying nothing.
+  const h = harness();
+  await stage(h);
+  const outcome = await runTurn(request({ text: "✅", pending: PENDING }), h.deps);
+
+  assert.equal(outcome.disposition, "resolved");
+  assert.deepEqual(workingSignalOf(h.delivery), []);
 });
 
 test("the model's narration between lookups reaches the person as interim", async () => {
@@ -541,6 +703,12 @@ test("a reaction and no words is a finished turn", async () => {
 
   assert.equal(outcome.disposition, "reacted");
   assert.deepEqual(postsOf(h.delivery), []);
+  // It posts no answer, so nothing else would close the progress surface — an
+  // open one is a plan stream still ticking over a finished turn.
+  assert.deepEqual(
+    h.delivery.calls.filter((c) => c.kind === "endProgress"),
+    [{ kind: "endProgress", outcome: "complete" }],
+  );
   const stored = await h.threadState.readHistory(REF);
   assert.equal(stored[1]!.content, "(reacted — no reply)");
 });

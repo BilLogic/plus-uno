@@ -19,6 +19,8 @@
 // resolves without the model.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 import {
   EXPIRED_POST,
@@ -40,6 +42,7 @@ import {
   type PendingProposal,
   type ThreadState,
 } from "../src/thread-state/index";
+import { recordingDelivery, withWorkingSignal } from "../src/turn/index";
 
 // ── one staged proposal, and the four signals that resolve it ────────────────
 
@@ -348,4 +351,79 @@ describe("the gate's emoji are off-limits to the bot", () => {
       assert.ok(!GATE_RESERVED.has(name), name);
     }
   });
+});
+
+// ── the two doors that resolve a card without a Turn ─────────────────────────
+//
+// A reaction and a button press run the confirmed tool exactly as a turn would,
+// and for as long — but neither goes through Turn, so neither inherited the
+// working signal Turn raises and settles. A ✅ in a channel thread therefore
+// ran its tool in silence, and a thread that DID have the indicator up kept it
+// after the run, because the only clear lived in the message handler.
+//
+// The pairing itself is `withWorkingSignal`, and it is what both doors use: one
+// set, one clear, whatever the run does in between.
+
+describe("the doors outside Turn raise and settle the working signal", () => {
+  const signalOf = (delivery: ReturnType<typeof recordingDelivery>): string[] =>
+    delivery.calls
+      .filter((c) => c.kind === "working" || c.kind === "working-clear")
+      .map((c) => c.kind);
+
+  it("posts the verdict, runs the tool, and leaves nothing up", async () => {
+    const delivery = recordingDelivery();
+    const ran: string[] = [];
+
+    await withWorkingSignal(delivery, async (d) => {
+      await d.setWorking({ status: "is working on that…" });
+      await d.postNote("Got it — kicking that off.");
+      ran.push("executeVerdict");
+    });
+
+    assert.deepEqual(ran, ["executeVerdict"]);
+    assert.deepEqual(signalOf(delivery), ["working", "working-clear"]);
+  });
+
+  it("settles it when the tool dies — the door that swallows and the door that rethrows", async () => {
+    // The reaction door catches and answers in the thread; the button door lets
+    // the throw out. The indicator comes down either way, which is the whole
+    // reason the clear is a `finally` and not a line after the work.
+    const swallowed = recordingDelivery();
+    await withWorkingSignal(swallowed, async (d) => {
+      await d.setWorking({ status: "is working on that…" });
+      try {
+        throw new Error("notion 502");
+      } catch {
+        await d.postNote(":warning: hit a snag executing it — give it another go.");
+      }
+    });
+    assert.deepEqual(signalOf(swallowed), ["working", "working-clear"]);
+
+    const rethrown = recordingDelivery();
+    await assert.rejects(
+      withWorkingSignal(rethrown, async (d) => {
+        await d.setWorking({ status: "is working on that…" });
+        throw new Error("notion 502");
+      }),
+      /notion 502/,
+    );
+    assert.deepEqual(signalOf(rethrown), ["working", "working-clear"]);
+  });
+
+  // Both door files name `Env` and the Slack client, so this suite's compile
+  // cannot reach them (`tsconfig.test.json` types only Node). Read them instead
+  // — the agreement being checked is one line long and the failure is silent:
+  // a door that stops wrapping its run still works, and still strands the
+  // indicator. Same move as the manifest check in `shortcuts.test.ts`.
+  for (const door of ["src/slack/gate.ts", "src/slack/interactive.ts"]) {
+    it(`${door} runs its verdict inside the pairing`, () => {
+      const src = readFileSync(resolve(process.cwd(), door), "utf8");
+      const wrapped = src.slice(src.indexOf("withWorkingSignal("));
+      assert.ok(src.includes("withWorkingSignal"), "the door uses the pairing");
+      assert.ok(wrapped.includes("setWorking("), "it raises the signal inside the pairing");
+      assert.ok(wrapped.includes("executeVerdict("), "and runs the verdict inside it");
+      // No second owner: the door never takes the signal down by hand.
+      assert.ok(!src.includes("clearWorking("), "the clear is the pairing's, not the door's");
+    });
+  }
 });

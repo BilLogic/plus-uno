@@ -59,7 +59,7 @@ import {
   type ThreadRef,
   type ThreadState,
 } from "../thread-state/index";
-import type { Delivery, DeliveryFailureStage, ProposalCard } from "./delivery";
+import { withWorkingSignal, type Delivery, type DeliveryFailureStage, type ProposalCard } from "./delivery";
 
 // ── Policy ───────────────────────────────────────────────────────────────────
 
@@ -334,7 +334,22 @@ export interface TurnDeps {
 
 // ── The turn ─────────────────────────────────────────────────────────────────
 
+/**
+ * One turn, with the working signal guaranteed down when it ends.
+ *
+ * The turn leaves by nine doors — an answer, a clarifying ask, a staged card,
+ * a card Slack refused, four flavours of gate resolution, a dead model — and a
+ * signal cleared at nine sites is a signal the tenth door forgets. So the set
+ * stays where it belongs (beside the work it describes) and the clear is a
+ * `finally` around the whole thing: `withWorkingSignal` watches the Delivery
+ * the turn is handed and takes down whatever the turn raised, whichever door
+ * it left by.
+ */
 export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {
+  return withWorkingSignal(deps.delivery, (delivery) => turnBody(request, { ...deps, delivery }));
+}
+
+async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {
   const { delivery, threadState } = deps;
   const ref: ThreadRef = { channel: request.channel, thread: request.conversationTs };
   const bodyText = request.attachmentsText ?? request.text;
@@ -821,6 +836,10 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
     (!draft.trim() || draft.trim() === "(empty response)");
   if (reactedOnly) {
     console.log("[route] reaction-only turn (model chose an emoji, no reply)");
+    // This exit posts no answer, so nothing downstream closes the progress
+    // surface into one — and a plan stream left open renders as a checklist
+    // still working on a turn that is over.
+    await delivery.endProgress("complete");
     await ctx.memory.remember("(reacted — no reply)");
     return {
       disposition: "reacted",
