@@ -27,7 +27,8 @@
     "evals:embed-ab": "node scripts/embed-model-ab.mjs",
     "evals:retrieval": "node scripts/run-retrieval-evals.mjs",
     "evals:retrieval:selftest": "node scripts/run-retrieval-evals.mjs --self-test",
-    "test:bundle": "node --test scripts/*.test.mjs"
+    "test:bundle": "node --test scripts/*.test.mjs",
+    "evals:local": "cd ../.. && node agents/uno-bot/scripts/run-evals.mjs --transport=local"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.22.0",

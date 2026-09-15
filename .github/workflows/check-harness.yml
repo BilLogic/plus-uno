@@ -87,30 +87,12 @@ jobs:
         working-directory: agents/uno-bot
         run: npm run test:bundle
 
-      # The eval suite through the LOCAL transport (#512): the Worker's Turn
-      # module in-process, on the recorded model replies in
-      # docs/evals/fixtures/recordings/. No WORKER_URL, no DEBUG_TOKEN, no
-      # judge credential and no model spend — which is the whole point: until
-      # now the suite ran for the first time on the Monday cron, against
-      # whatever was already deployed, so a turn-level regression reached main
-      # and sat there for up to a week.
-      #
-      # WHAT THIS DOES AND DOES NOT GATE. It gates the TURN against a fixed
-      # draw — the dispositions, the gate's idempotency, the cancel bounce, the
-      # history write, the proposal routing the loop performs on a side-effect
-      # call. It does NOT gate the model; nothing in-process can. That
-      # measurement stays with `uno-bot-evals.yml`, which keeps
-      # `--transport=worker` on its Monday cron, and the summary's `transport`
-      # field is what keeps the two from being read as one.
-      #
-      # FAST BY CONSTRUCTION: only cases with a recording run (3 of 34 today);
-      # the rest SKIP by name, counted apart, never failed. A blocker that
-      # fails here still exits 1.
-      #
-      # From the REPO ROOT, not from agents/uno-bot: the runner's default
-      # CASES_PATH is repo-relative, as every documented invocation of it is.
-      - name: uno-bot evals through the local transport
-        run: node agents/uno-bot/scripts/run-evals.mjs --transport=local
+      # The eval suite through the local transport used to be spelled out here,
+      # as its own step, while `npm run check:harness` did not run it — the
+      # same local-is-a-subset-of-remote gap `test:bundle`'s registry row
+      # records paying for. It is a composed row now (`evals:local`), so the
+      # composite above runs it and this file no longer restates it. Its
+      # reasons live with the row, per the rule at the top of this file.
 
       # The ThreadState conformance suite against the DURABLE OBJECT adapter,
       # under the real workerd via @cloudflare/vitest-pool-workers (#493). It
