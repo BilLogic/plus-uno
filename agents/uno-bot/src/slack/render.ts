@@ -1,8 +1,8 @@
 // What a reply LOOKS like when it ships — the render, with nothing posted.
 //
 // Two things live here: the body that will actually be sent
-// (`renderDeliveredBody` — trailing-label strip, empty-answer placeholder, cap)
-// and a body as `section` blocks (`textSections`). Both lived in
+// (`renderDeliveredBody` — trailing-label strip, empty-answer placeholder) and
+// a body as `section` blocks (`textSections`). Both lived in
 // `slack/delivery.ts`, which takes `Env`, so neither could be reached by
 // anything `tsconfig.test.json` compiles: the Turn module could not judge the
 // text it was about to deliver, and a proposal card could not be rendered at
@@ -12,8 +12,8 @@
 import { toSlackMrkdwn } from "./mrkdwn";
 import { splitBalanced } from "./split";
 
-// A section's text field caps at 3000 chars, below MAX_POST_CHARS below —
-// so a capped body can still overflow one block.
+// A section's text field caps at 3000 chars, below the 3,900 a single message
+// is held to — so even one message's worth of body can overflow one block.
 const SECTION_CHARS = 2900;
 
 export function textSections(body: string): Array<Record<string, unknown>> {
@@ -38,23 +38,11 @@ export function textSections(body: string): Array<Record<string, unknown>> {
 
 // ── The delivered body ──────────────────────────────────────────────────────
 
-// Slack chat.postMessage hard-fails past 40k chars and renders poorly long
-// before that; AGENTS.md tells the model to keep it short, but the Worker
-// enforces it. Truncation note lets the user ask for the rest.
-const MAX_POST_CHARS = 3900;
-
-const TRUNCATION_NOTE = "_…truncated — ask me for the rest._";
-
-function capText(text: string): string {
-  if (text.length <= MAX_POST_CHARS) return text;
-  // splitBalanced cuts at a line boundary (else a word boundary, so a
-  // <url|label> is never sliced in half — live 2026-07-10 a mid-URL cut
-  // shipped a broken link right above this very notice) AND closes an open
-  // code fence before the cut. Without that last part the notice, and
-  // everything after it, rendered inside the code block.
-  const [first] = splitBalanced(text, MAX_POST_CHARS - TRUNCATION_NOTE.length - 1);
-  return `${first ?? text.slice(0, MAX_POST_CHARS)}\n${TRUNCATION_NOTE}`;
-}
+// The body is NOT capped here any more, and that is the point. A cap belongs to
+// one message, and a long answer is now several: `answer-posts.ts` splits the
+// whole body into continuation messages at paragraph boundaries. What this
+// function returns is the whole answer — which is also what the judges score
+// and what ThreadState remembers.
 
 // The retired confidence affix, killed deterministically instead of by prompt.
 // Banned in the persona since 2026-07-16 and re-worded twice (r19, r21) — it
@@ -88,15 +76,16 @@ function stripTrailingConfidence(text: string): string {
 
 /**
  * The body that will actually be SENT, for a given draft: the trailing-label
- * strip, the empty-answer placeholder, then the cap — in that order.
+ * strip, then the empty-answer placeholder.
  *
  * Exported so the confidence pre-check judges the delivered text rather than
- * the draft. The two used to diverge silently: capText truncates at
- * MAX_POST_CHARS AFTER the judge has scored the draft, so a woven clause
- * sitting in a closing paragraph could be amputated from a message the
- * telemetry had already recorded as `verdict=pass` (2026-08-21).
- * postTextVerified calls this rather than repeating it, so the two cannot
- * drift apart again.
+ * the draft. The two used to diverge silently: a cap truncated the body AFTER
+ * the judge had scored the draft, so a woven clause sitting in a closing
+ * paragraph could be amputated from a message the telemetry had already
+ * recorded as `verdict=pass` (2026-08-21). Nothing is dropped from the body at
+ * all now — the length limit belongs to a message, and a long answer is posted
+ * as several. postTextVerified calls this rather than repeating it, so the two
+ * cannot drift apart again.
  */
 export function renderDeliveredBody(text: string): string {
   // NOTHING is stripped from the Markdown here any more, and that is a
@@ -115,7 +104,7 @@ export function renderDeliveredBody(text: string): string {
   // hold one. The lesson kept: read the RENDER, never the stored text.
   const cleaned = stripTrailingConfidence(text);
   return cleaned.trim()
-    ? capText(cleaned)
+    ? cleaned
     : "(I came back with an empty answer — that's a bug on my side. Try rephrasing, and flag this to the team.)";
 }
 

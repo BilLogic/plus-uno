@@ -1,12 +1,12 @@
 // Cutting a message without breaking what it is made of.
 //
-// Two callers, one problem. `capText` truncates a reply at MAX_POST_CHARS and
-// `textSections` splits a body into ≤3000-character Block Kit sections, and
-// until 2026-08-22 both cut at "the last newline or space before the limit"
-// with no idea what they were cutting through. A cut inside a fenced code
-// block leaves ONE ``` behind, so the truncation notice — and, on the blocks
-// path, the whole next section — renders inside a code block. A cut inside an
-// inline code span does the same to the rest of the line.
+// Two callers, one problem. `answerMessages` cuts a long reply into messages of
+// at most MAX_POST_CHARS and `textSections` splits a body into ≤3000-character
+// Block Kit sections, and until 2026-08-22 both cut at "the last newline or
+// space before the limit" with no idea what they were cutting through. A cut
+// inside a fenced code block leaves ONE ``` behind, so everything after it —
+// the rest of the message, or the whole next section — renders inside a code
+// block. A cut inside an inline code span does the same to the rest of the line.
 //
 // Nothing here tries to be a Markdown parser. It tracks exactly one piece of
 // state, the open fence, because that is the one construct that spans lines and

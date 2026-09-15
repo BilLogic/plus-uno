@@ -4,6 +4,7 @@
 
 import type { Env } from "../types";
 import { addReaction, appendStream, postMessage, startStream, stopStream } from "./api";
+import { answerMessages, deliverAnswer } from "./answer-posts";
 import { footerKindFor, footerNoteFor, type FooterKind } from "./footer-kind";
 import { renderDeliveredBody, textSections } from "./render";
 import { buildFailureMessage, type FailureStage } from "./failure-message";
@@ -138,35 +139,52 @@ export async function postTextVerified(
   const body = renderDeliveredBody(text);
   const footer = footerBlocks(env, footerKindFor(body, footerHint));
 
-  // Streamed delivery, opened HERE rather than at turn start. Opening it early
-  // (to double as the thinking indicator) left an empty "AGENT" bubble sitting
-  // in the thread for the whole run — a blank message impersonating a loader.
-  // The status line is the indicator; the stream carries the answer.
-  if ((openStreamTs || env.SLACK_STREAMING === "on") && threadTs) {
-    const streamTs = openStreamTs ?? (await startStream(env, channel, threadTs));
-    if (streamTs) {
+  // The answer is no longer cut to fit one message: a long body is posted as
+  // continuation messages in the thread, in order. `body` — the whole of it —
+  // is still what comes back, so the judges and ThreadState see the answer the
+  // person read rather than its first message.
+  const ok = await deliverAnswer(answerMessages(body), {
+    // Streamed delivery, opened HERE rather than at turn start. Opening it
+    // early (to double as the thinking indicator) left an empty "AGENT" bubble
+    // sitting in the thread for the whole run — a blank message impersonating a
+    // loader. The status line is the indicator; the stream carries the answer.
+    async stream(piece, withFooter) {
+      if (!((openStreamTs || env.SLACK_STREAMING === "on") && threadTs)) return false;
+      const streamTs = openStreamTs ?? (await startStream(env, channel, threadTs));
+      if (!streamTs) return false;
       // append (the text) then stop (the footer blocks — stopStream is the only
       // frame that accepts blocks). If either half fails, fall through to a
       // plain post: a duplicated answer is bad, a missing one is worse.
-      const appended = await appendStream(env, channel, streamTs, body);
-      const stopped = await stopStream(env, channel, streamTs, footer.length ? footer : undefined);
-      if (appended && stopped) return { ok: true, text: body };
+      const appended = await appendStream(env, channel, streamTs, piece);
+      const blocks = withFooter && footer.length ? footer : undefined;
+      const stopped = await stopStream(env, channel, streamTs, blocks);
+      if (appended && stopped) return true;
       console.warn(`[slack] stream finish failed (append=${appended} stop=${stopped}); falling back to post`);
       await stopStream(env, channel, streamTs).catch(() => {});
-    }
-  }
-  // `text` stays populated alongside blocks: it is what notifications and
-  // screen readers use, and it is the fallback if a block ever fails to render.
-  // A disclaimer on "Got it — cancelled" is how people learn to skip it on the
-  // messages that carry claims. Acknowledgements get no footer; anything
-  // unrecognised falls back to the footer rather than to silence.
-  const withBlocks = { channel, thread_ts: threadTs, text: body, blocks: [...textSections(body), ...footer] };
-  let posted = await postMessage(env, withBlocks).catch(() => ({ ok: false as const }));
-  if (!posted.ok) {
-    // Degrade to plain text rather than lose the answer. A malformed block is a
-    // cosmetic failure; a dropped answer is the 👀-then-silence failure.
-    console.warn("[slack] blocks post failed; retrying as plain text");
-    posted = await postMessage(env, { channel, thread_ts: threadTs, text: body }).catch(() => ({ ok: false as const }));
-  }
-  return { ok: !!posted.ok, text: body };
+      return false;
+    },
+
+    // `text` stays populated alongside blocks: it is what notifications and
+    // screen readers use, and it is the fallback if a block ever fails to
+    // render. A disclaimer on "Got it — cancelled" is how people learn to skip
+    // it on the messages that carry claims. Acknowledgements get no footer;
+    // anything unrecognised falls back to the footer rather than to silence.
+    async post(piece, withFooter) {
+      const blocks = [...textSections(piece), ...(withFooter ? footer : [])];
+      let posted = await postMessage(env, { channel, thread_ts: threadTs, text: piece, blocks }).catch(
+        () => ({ ok: false as const }),
+      );
+      if (!posted.ok) {
+        // Degrade to plain text rather than lose the answer. A malformed block
+        // is a cosmetic failure; a dropped answer is the 👀-then-silence one.
+        console.warn("[slack] blocks post failed; retrying as plain text");
+        posted = await postMessage(env, { channel, thread_ts: threadTs, text: piece }).catch(() => ({
+          ok: false as const,
+        }));
+      }
+      return !!posted.ok;
+    },
+  });
+
+  return { ok, text: body };
 }
