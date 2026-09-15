@@ -9,7 +9,9 @@
 //   • the `/stop` check, cooperative and at a tool boundary, from iteration 2;
 //   • authorization of the model's own `proposal_resolve` call, and answering
 //     every other call in that turn so none is left orphaned;
-//   • a side-effect call becoming a ✅-gated proposal instead of an execution;
+//   • a side-effect call becoming a ✅-gated proposal instead of an execution,
+//     and a preflight refusal going back to the MODEL once before it ever
+//     goes to the person;
 //   • read-only calls executed under the lookup ceiling, with a budget trip
 //     stamping the result partial rather than letting a short read pass as whole;
 //   • the tools-disabled synthesis pass when the ceiling is reached;
@@ -133,6 +135,20 @@ export interface LoopDeps {
    */
   threadState: { consumeCancel(ref: ThreadRef): Promise<boolean> };
   budget: LoopBudget;
+  /**
+   * Clarify-vs-act, asked BEFORE a side-effect call is staged: what does this
+   * call still need, or null when it is actionable.
+   *
+   * The check itself has always run — in Turn, after the loop returned — which
+   * meant the refusal reached the person and never the model, and a model that
+   * cannot see why it was refused re-posts the same proposal (2026-09-15).
+   * Asking here lets the refusal come back as that call's tool RESULT, so the
+   * model corrects it within the turn. Every side-effect call is checked, but
+   * exactly one refusal is handed back: a call refused a second time is
+   * returned as the proposal, and the check Turn runs on it is the ask the
+   * person sees. Optional — a caller with no preflight stages as before.
+   */
+  preflight?(name: string, args: Record<string, unknown>): Promise<{ ask: string } | null>;
 }
 
 export interface LoopInput {
@@ -176,6 +192,8 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
   let iterations = 0;
   let toolCallsUsed = 0;
   let fellBack = false;
+  /** The turn's one preflight correction, once it has been handed to the model. */
+  let preflightSpent = false;
   const toolNamesUsed: string[] = [];
 
   const finish = (result: AgentResult): AgentResult => {
@@ -334,6 +352,25 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
     // (b) Side-effect tool → staged as a ✅-gated proposal, never executed here.
     const sideEffect = reply.toolCalls.find((c) => SIDE_EFFECT_TOOLS.has(c.name as never));
     if (sideEffect) {
+      // …unless preflight refuses it, and the turn still has its one correction
+      // in hand: hand the reason back as that call's result and let the model
+      // fix the call itself. A second refusal is Turn's to put to the person.
+      const refusal = await deps.preflight?.(sideEffect.name, sideEffect.args);
+      if (refusal && !preflightSpent) {
+        preflightSpent = true;
+        provider.recordToolResults(
+          reply.toolCalls.map((c): ModelToolResult => {
+            const text = JSON.stringify(
+              c.id === sideEffect.id
+                ? { ok: false, error: refusal.ask }
+                : { ok: false, error: "deferred — the proposed write needs fixing first" },
+            );
+            input.onToolResult?.(toolResultDigest(c.name, text));
+            return { id: c.id, name: c.name, text, isError: true };
+          }),
+        );
+        continue;
+      }
       return finish({
         kind: "proposal",
         toolName: sideEffect.name,

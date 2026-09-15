@@ -451,6 +451,95 @@ test("a confirm against a pending proposal resolves the turn", async () => {
   });
 });
 
+// ── preflight, mid-turn ──────────────────────────────────────────────────────
+//
+// A refusal used to reach only the person, after the loop returned, so the model
+// never learned why and re-posted the same proposal (2026-09-15). It now comes
+// back as that call's own result — once.
+
+/** A preflight that refuses until the title stops being a slot. */
+function slotGuard(rec: Recorder, alwaysRefuse = false) {
+  const seen: Array<Record<string, unknown>> = [];
+  const deps: LoopDeps = {
+    ...rec.deps,
+    async preflight(_name, args) {
+      seen.push(args);
+      const title = typeof args.title === "string" ? args.title : "";
+      return alwaysRefuse || title === "[TBD]"
+        ? { ask: "the *title* is still a placeholder (`[TBD]`)" }
+        : null;
+    },
+  };
+  return { seen, deps };
+}
+
+test("a refused side-effect call comes back to the model, and the corrected call is staged", async () => {
+  const rec = recorder();
+  const guard = slotGuard(rec);
+  const provider = fake({
+    replies: [
+      { toolCalls: [{ name: "notion_create", args: { surface: "decision", title: "[TBD]" } }] },
+      {
+        toolCalls: [
+          { name: "notion_create", args: { surface: "decision", title: "Calendar Sync scope cut" } },
+        ],
+      },
+    ],
+  });
+
+  const result = await runLoop(loopInput(provider, rec, { deps: guard.deps }));
+
+  // The model saw the reason, in the slot of the call it made.
+  const [handed] = provider.transcript;
+  const results = handed?.kind === "results" ? handed.results : [];
+  assert.equal(results.length, 1);
+  assert.equal(results[0]!.name, "notion_create");
+  assert.match(results[0]!.text, /still a placeholder/);
+  assert.equal(results[0]!.isError, true);
+  // And the call it made instead is what got staged — checked in its turn.
+  assert.equal(result.kind, "proposal");
+  assert.deepEqual(result.kind === "proposal" ? result.input : null, {
+    surface: "decision",
+    title: "Calendar Sync scope cut",
+  });
+  assert.equal(guard.seen.length, 2);
+});
+
+test("a second refusal is staged anyway — that one is Turn's to put to the person", async () => {
+  const rec = recorder();
+  const guard = slotGuard(rec, true);
+  const provider = fake({
+    replies: [
+      { toolCalls: [{ name: "notion_create", args: { title: "[TBD]" } }] },
+      { toolCalls: [{ name: "notion_create", args: { title: "[TBD] still" } }] },
+    ],
+  });
+
+  const result = await runLoop(loopInput(provider, rec, { deps: guard.deps }));
+
+  // One correction, not a loop of them: the second refused call comes back as a
+  // proposal, and Turn's own preflight is what the person hears.
+  assert.equal(guard.seen.length, 2);
+  assert.equal(provider.transcript.length, 1);
+  assert.equal(result.kind, "proposal");
+  assert.deepEqual(
+    result.kind === "proposal" ? result.input : null,
+    { title: "[TBD] still" },
+  );
+});
+
+test("a side-effect call is staged unchecked when the caller has no preflight", async () => {
+  const rec = recorder();
+  const provider = fake({
+    replies: [{ toolCalls: [{ name: "notion_create", args: { title: "A card" } }] }],
+  });
+
+  const result = await runLoop(loopInput(provider, rec));
+
+  assert.equal(result.kind, "proposal");
+  assert.equal(provider.transcript.length, 0);
+});
+
 // ── what the adapter is handed ───────────────────────────────────────────────
 
 test("the provider is opened once with the tier, the conversation, the system blocks and the roster", async () => {
