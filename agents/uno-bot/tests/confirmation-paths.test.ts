@@ -127,6 +127,9 @@ describe("four signals, one verdict", () => {
       assert.deepEqual(
         verdict.execute,
         {
+          operations: [
+            { toolName: "notion_create", input: { title: "Reflection redesign" } },
+          ],
           toolName: "notion_create",
           input: { title: "Reflection redesign" },
           channel: CHANNEL,

@@ -9,9 +9,10 @@
 //   • the `/stop` check, cooperative and at a tool boundary, from iteration 2;
 //   • authorization of the model's own `proposal_resolve` call, and answering
 //     every other call in that turn so none is left orphaned;
-//   • a side-effect call becoming a ✅-gated proposal instead of an execution,
-//     and a preflight refusal going back to the MODEL once before it ever
-//     goes to the person;
+//   • EVERY side-effect call of one reply becoming ONE ✅-gated proposal — a
+//     batch — instead of an execution, with that reply's lookups still answered,
+//     and a preflight refusal going back to the MODEL once before it ever goes
+//     to the person;
 //   • read-only calls executed under the lookup ceiling, with a budget trip
 //     stamping the result partial rather than letting a short read pass as whole;
 //   • the tools-disabled synthesis pass when the ceiling is reached;
@@ -32,7 +33,7 @@
 import { SIDE_EFFECT_TOOLS } from "./types";
 import { BUILD } from "../version";
 import type { ModelTier } from "./tiers";
-import type { PendingProposal, ThreadRef } from "../thread-state/index";
+import type { PendingProposal, ProposalOperation, ThreadRef } from "../thread-state/index";
 import type { ProviderConversationTurn } from "./provider-conversation";
 import { toolResultDigest, type ToolCall, type ToolResultNote } from "./tool-transcript";
 import type {
@@ -79,6 +80,17 @@ export type AgentResult =
   | { kind: "text"; text: string }
   | {
       kind: "proposal";
+      /**
+       * EVERY side-effect call in the reply, in the order the model made them
+       * — one Proposal, one ✅, one batch. The loop used to return the first
+       * and drop the rest, which is how an approved four-document plan became
+       * one append: a second write vanished with no log and nothing the model
+       * or the person could see.
+       */
+      operations: ProposalOperation[];
+      /** The FIRST operation, kept populated for one release so readers that
+       *  have not moved to `operations` yet — the card's tool routing, the
+       *  preflight, the eval scripts — keep working unchanged. */
       toolName: string;
       input: Record<string, unknown>;
       /** Brief structural preview the model wrote alongside the tool call, if
@@ -222,6 +234,49 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
   };
 
   /**
+   * Read-only calls, executed under the ceiling — the loop's one lookup path.
+   *
+   * Shared by the two branches that reach lookups: a reply that is only
+   * lookups, and a reply that also stages a proposal. One copy is what makes
+   * "no announced call goes unanswered" one rule rather than two that drift.
+   */
+  const runLookups = async (calls: ModelToolCall[]): Promise<ModelToolResult[]> => {
+    const results: ModelToolResult[] = [];
+    for (const call of calls) {
+      let text: string;
+      // Fires when the lookup ceiling is already reached, or the tool-count
+      // backstop is hit. LOOKUPS only — side-effect tools are peeled off by the
+      // caller and stay allowed even when the lookup budget is spent.
+      if (toolCallsUsed >= READONLY_TOOL_BUDGET || deps.budget.used() >= LOOKUP_CEILING) {
+        text = budgetRefusedResult();
+      } else {
+        toolCallsUsed++;
+        // Enforced, not forecast: the ceiling refuses the call that would cross
+        // it, so a tool can start with any headroom and simply return less.
+        const tripsBefore = deps.budget.trips();
+        try {
+          text = await deps.budget.withLookupLimit(LOOKUP_CEILING, () =>
+            deps.executeReadOnlyTool(call.name, call.args),
+          );
+          // Cut short but returned normally — a paging loop stopping cleanly, or
+          // a catch that ate the throw. The counter sees it either way, so a
+          // short read cannot pass as a whole one.
+          if (deps.budget.trips() > tripsBefore) text = markPartialLookup(text);
+        } catch (err) {
+          if (!deps.budget.isBudgetError(err)) throw err;
+          text = budgetRefusedResult();
+        }
+      }
+      // The result's own honesty fields, for the eval transcript. Reported for
+      // every outcome including the budget refusal above — "the lookup never
+      // ran" is the answer to a whole class of failure (#452).
+      input.onToolResult?.(toolResultDigest(call.name, text));
+      results.push({ id: call.id, name: call.name, text });
+    }
+    return results;
+  };
+
+  /**
    * One model round-trip, with the turn's single failover.
    *
    * The decision to retry is the LOOP's; whether a backup exists is the
@@ -349,70 +404,89 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
       });
     }
 
-    // (b) Side-effect tool → staged as a ✅-gated proposal, never executed here.
-    const sideEffect = reply.toolCalls.find((c) => SIDE_EFFECT_TOOLS.has(c.name as never));
-    if (sideEffect) {
-      // …unless preflight refuses it, and the turn still has its one correction
-      // in hand: hand the reason back as that call's result and let the model
-      // fix the call itself. A second refusal is Turn's to put to the person.
-      const refusal = await deps.preflight?.(sideEffect.name, sideEffect.args);
-      if (refusal && !preflightSpent) {
-        preflightSpent = true;
-        provider.recordToolResults(
-          reply.toolCalls.map((c): ModelToolResult => {
-            const text = JSON.stringify(
-              c.id === sideEffect.id
-                ? { ok: false, error: refusal.ask }
-                : { ok: false, error: "deferred — the proposed write needs fixing first" },
-            );
-            input.onToolResult?.(toolResultDigest(c.name, text));
-            return { id: c.id, name: c.name, text, isError: true };
-          }),
-        );
-        continue;
+    // (b) Side-effect tools → staged as ONE ✅-gated proposal, never executed
+    // here. Every one of them: the reply is the model's whole plan, and the
+    // batch is what the person approves with a single ✅.
+    const sideEffects = reply.toolCalls.filter((c) => SIDE_EFFECT_TOOLS.has(c.name as never));
+    if (sideEffects.length) {
+      // …unless preflight refuses one of them, and the turn still has its one
+      // correction in hand: hand each reason back as that call's result and
+      // let the model fix the plan itself. A second refusal is Turn's to put to
+      // the person. Every call in the reply is answered, so no slot is orphaned.
+      if (deps.preflight) {
+        const refusals = new Map<string, string>();
+        for (const call of sideEffects) {
+          const refusal = await deps.preflight(call.name, call.args);
+          if (refusal) refusals.set(call.id, refusal.ask);
+        }
+        // Checked every time, acted on once: a second refusal is staged as it
+        // stands, and Turn's own preflight is what the person then hears.
+        if (refusals.size && !preflightSpent) {
+          preflightSpent = true;
+          provider.recordToolResults(
+            reply.toolCalls.map((c): ModelToolResult => {
+              const text = JSON.stringify(
+                refusals.has(c.id)
+                  ? { ok: false, error: refusals.get(c.id) }
+                  : { ok: false, error: "deferred — a proposed write in this batch needs fixing first" },
+              );
+              input.onToolResult?.(toolResultDigest(c.name, text));
+              return { id: c.id, name: c.name, text, isError: true };
+            }),
+          );
+          continue;
+        }
+      }
+      const operations: ProposalOperation[] = [];
+      const unstageable: string[] = [];
+      for (const call of sideEffects) {
+        // An operation is a tool name and an argument OBJECT. A call whose
+        // arguments are not one cannot be staged — so it is said, in the
+        // proposal's preview, rather than quietly left out of the batch.
+        if (call.args && typeof call.args === "object" && !Array.isArray(call.args)) {
+          operations.push({ toolName: call.name, input: call.args });
+        } else {
+          unstageable.push(call.name);
+        }
+      }
+
+      // The read-only calls of the SAME reply still run. This reply ended the
+      // turn — a staged proposal is the outcome — so their results feed the
+      // transcript and the turn's history rather than a further model step;
+      // `recordToolResults` is where they belong either way. What makes running
+      // them right is that each was already ANNOUNCED (`onToolCall` fired, the
+      // turn's telemetry lists it): a reported call with no result is exactly
+      // the silent drop this branch exists to end.
+      const lookups = reply.toolCalls.filter(
+        (c) => !SIDE_EFFECT_TOOLS.has(c.name as never) && c.name !== "proposal_resolve",
+      );
+      if (lookups.length) provider.recordToolResults(await runLookups(lookups));
+
+      const preview = [
+        reply.text || "",
+        unstageable.length
+          ? `I could not stage ${unstageable.join(", ")} with the rest of this batch — tell me what you want there and I'll redo it.`
+          : "",
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+
+      // Nothing stageable at all: the person hears what happened instead of
+      // watching a proposal card that would have been empty.
+      if (!operations.length) {
+        return finish({ kind: "text", text: preview || CLARIFY_FALLBACK });
       }
       return finish({
         kind: "proposal",
-        toolName: sideEffect.name,
-        input: sideEffect.args,
-        previewText: reply.text || undefined,
+        operations,
+        toolName: operations[0]!.toolName,
+        input: operations[0]!.input,
+        previewText: preview || undefined,
       });
     }
 
     // (c) Read-only tools: execute under the ceiling, hand the results back.
-    const results: ModelToolResult[] = [];
-    for (const call of reply.toolCalls) {
-      let text: string;
-      // Fires when the lookup ceiling is already reached, or the tool-count
-      // backstop is hit. LOOKUPS only — side-effect tools were peeled off above
-      // and stay allowed even when the lookup budget is spent.
-      if (toolCallsUsed >= READONLY_TOOL_BUDGET || deps.budget.used() >= LOOKUP_CEILING) {
-        text = budgetRefusedResult();
-      } else {
-        toolCallsUsed++;
-        // Enforced, not forecast: the ceiling refuses the call that would cross
-        // it, so a tool can start with any headroom and simply return less.
-        const tripsBefore = deps.budget.trips();
-        try {
-          text = await deps.budget.withLookupLimit(LOOKUP_CEILING, () =>
-            deps.executeReadOnlyTool(call.name, call.args),
-          );
-          // Cut short but returned normally — a paging loop stopping cleanly, or
-          // a catch that ate the throw. The counter sees it either way, so a
-          // short read cannot pass as a whole one.
-          if (deps.budget.trips() > tripsBefore) text = markPartialLookup(text);
-        } catch (err) {
-          if (!deps.budget.isBudgetError(err)) throw err;
-          text = budgetRefusedResult();
-        }
-      }
-      // The result's own honesty fields, for the eval transcript. Reported for
-      // every outcome including the budget refusal above — "the lookup never
-      // ran" is the answer to a whole class of failure (#452).
-      input.onToolResult?.(toolResultDigest(call.name, text));
-      results.push({ id: call.id, name: call.name, text });
-    }
-    provider.recordToolResults(results);
+    provider.recordToolResults(await runLookups(reply.toolCalls));
   }
 
   // Iteration budget exhausted — force a synthesis pass with tool calling

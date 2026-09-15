@@ -254,10 +254,14 @@ function evalDeps(
     // executor, and an eval run writes it to the report instead.
     async applyVerdict(verdict) {
       if (!verdict.execute) return;
-      report.resolutions.push({
-        toolName: verdict.execute.toolName,
-        decision: verdict.decision ?? "confirm",
-      });
+      // EVERY operation of the approved batch, in order — a suite that recorded
+      // only the first would pass the exact regression this batch exists to stop.
+      for (const operation of verdict.execute.operations) {
+        report.resolutions.push({
+          toolName: operation.toolName,
+          decision: verdict.decision ?? "confirm",
+        });
+      }
     },
 
     cards: {

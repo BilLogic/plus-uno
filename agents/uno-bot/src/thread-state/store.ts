@@ -122,8 +122,27 @@ export interface HistoryTurn {
   sharedCanvasIds?: string[];
 }
 
-/** A tool call staged behind the ✅ gate. */
+/** One write inside a Proposal: the tool to run and the arguments to run it
+ *  with. A batch is an ordered list of these. */
+export interface ProposalOperation {
+  toolName: string;
+  input: Record<string, unknown>;
+}
+
+/** A batch of tool calls staged behind ONE ✅ gate. */
 export interface PendingProposal {
+  /**
+   * The batch, in the order the model asked for it.
+   *
+   * Optional because a record staged before the batch shipped has no such
+   * field, and a proposal pending at deploy time must still resolve: every
+   * reader goes through `proposalOperations`, which reads an old record as a
+   * one-operation batch. `toolName`/`input` below stay populated with the
+   * FIRST operation for one release, so a reader that has not moved across
+   * yet — the eval scripts' `r.toolName`, the card's tool routing, the
+   * pending-notice vocabulary — keeps working unchanged.
+   */
+  operations?: ProposalOperation[];
   toolName: string;
   input: Record<string, unknown>;
   channel: string;
@@ -149,6 +168,20 @@ export interface PendingProposal {
    *  proposal→confirm round trip and reaches the executor. */
   notionPrdId?: string;
   notionPrdUrl?: string;
+}
+
+/**
+ * The operations of a proposal, however it was stored.
+ *
+ * The one reader of the expand–contract pair above: a record written since the
+ * batch shipped answers with its list, and one written before it answers as a
+ * batch of one. Nothing downstream has to know which it read.
+ */
+export function proposalOperations(
+  proposal: Pick<PendingProposal, "operations" | "toolName" | "input">,
+): ProposalOperation[] {
+  if (proposal.operations?.length) return proposal.operations;
+  return [{ toolName: proposal.toolName, input: proposal.input }];
 }
 
 /**

@@ -25,6 +25,7 @@ import {
   type TurnOutcome,
   type TurnRequest,
 } from "../src/turn/index";
+import { batchResultMessage, runOperations, type OperationOutcome } from "../src/gate/index";
 import {
   createInMemoryThreadState,
   type HistoryTurn,
@@ -90,6 +91,8 @@ interface Harness {
     /** Whether the verdict carried a tool to run — a decline carries none. */
     executed: boolean;
   }>;
+  /** What the approved batch actually ran, when the case supplied an executor. */
+  ran: OperationOutcome[];
   /** Every draft the judge was handed. */
   judged: string[];
   /** Tool names the loop actually executed. */
@@ -106,11 +109,15 @@ function harness(opts: {
   delivery?: RecordingDelivery;
   threadState?: ThreadState;
   toolResult?: string;
+  /** Stand in for the side-effect tool table, so a case can fail one operation
+   *  of a batch. Absent — as everywhere else here — nothing is executed. */
+  executeOperation?: (operation: { toolName: string; input: Record<string, unknown> }) => Promise<string>;
 } = {}): Harness {
   const delivery = opts.delivery ?? recordingDelivery();
   const threadState = opts.threadState ?? createInMemoryThreadState();
   const provider = fakeProvider({ replies: opts.replies ?? [{ text: "Here is the answer." }] });
   const resolved: Harness["resolved"] = [];
+  const ran: OperationOutcome[] = [];
   const judged: string[] = [];
   const executed: string[] = [];
 
@@ -173,6 +180,12 @@ function harness(opts: {
         ...(verdict.post ? { narrative: verdict.post.text } : {}),
         executed: verdict.execute !== undefined,
       });
+      // The batch runner production's executor is built on, on a case's own
+      // fake tool table — so "the whole batch runs, in order, past a failure"
+      // is asserted through a Turn rather than against a helper.
+      if (opts.executeOperation && verdict.execute) {
+        ran.push(...(await runOperations(verdict.execute.operations, opts.executeOperation)));
+      }
     },
 
     cards: {
@@ -194,7 +207,7 @@ function harness(opts: {
     describeAssistantContext: () => null,
   };
 
-  return { deps, delivery, threadState, provider, resolved, judged, executed };
+  return { deps, delivery, threadState, provider, resolved, ran, judged, executed };
 }
 
 /** Posts a person would actually read, in order. */
@@ -425,6 +438,78 @@ test("a side-effect call comes back as a proposal to stage, and the card was del
   // And it is confirmable the moment it posts: the store has it.
   const staged = await h.threadState.getProposalByThread(REF);
   assert.equal(staged?.proposalTs, h.delivery.stagedAt[0]);
+});
+
+test("several side-effect calls in one reply stage ONE proposal that holds all of them", async () => {
+  const h = harness({
+    replies: [
+      {
+        text: "Reconciling the four docs after the scope change.",
+        toolCalls: [
+          { name: "notion_update", args: { title: "Calendar Sync hub", heading: "TLDR" } },
+          { name: "notion_update", args: { title: "Calendar Sync PRD", heading: "Scope" } },
+          { name: "notion_create", args: { surface: "decision", title: "Calendar Sync cut" } },
+        ],
+      },
+    ],
+  });
+  const outcome = await runTurn(request({ text: "update the notion docs accordingly" }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  assert.ok(outcome.staged, "the outcome carries the proposal");
+  // ONE card, not three, and not one operation with two dropped.
+  assert.equal(h.delivery.calls.filter((c) => c.kind === "proposal").length, 1);
+  assert.deepEqual(
+    outcome.staged.proposal.operations?.map((o) => o.toolName),
+    ["notion_update", "notion_update", "notion_create"],
+  );
+  // The card names every one of them — the ✅ is consent to what it says.
+  assert.match(outcome.staged.card.text, /3 operations/);
+  assert.match(outcome.staged.card.text, /Calendar Sync hub/);
+  assert.match(outcome.staged.card.text, /Calendar Sync PRD/);
+  assert.match(outcome.staged.card.text, /Calendar Sync cut/);
+  // And the store holds the whole batch, so a later ✅ runs all of it.
+  const staged = await h.threadState.getProposalByThread(REF);
+  assert.equal(staged?.operations?.length, 3);
+});
+
+test("a ✅ on a batch runs every operation in order, and a failure hides none of the others", async () => {
+  const operations = [
+    { toolName: "notion_update", input: { title: "Calendar Sync hub" } },
+    { toolName: "notion_update", input: { title: "Calendar Sync PRD" } },
+    { toolName: "notion_create", input: { surface: "decision", title: "Calendar Sync cut" } },
+  ];
+  const order: string[] = [];
+  const h = harness({
+    async executeOperation(operation) {
+      order.push(String(operation.input.title));
+      // Operation two fails; one and three are still approved and still run.
+      return operation.input.title === "Calendar Sync PRD"
+        ? JSON.stringify({ ok: false, error: "the block moved since it was read" })
+        : JSON.stringify({ ok: true, message: `updated ${String(operation.input.title)}` });
+    },
+  });
+  const batch = { ...PENDING, operations };
+  await h.threadState.putProposal(batch);
+
+  const outcome = await runTurn(
+    request({ text: ":white_check_mark:", pending: batch }),
+    h.deps,
+  );
+
+  assert.equal(outcome.disposition, "resolved");
+  assert.deepEqual(order, ["Calendar Sync hub", "Calendar Sync PRD", "Calendar Sync cut"]);
+  assert.deepEqual(
+    h.ran.map((o) => o.ok),
+    [true, false, true],
+  );
+  // Both outcomes are reported — a partial result is visible, not hidden behind
+  // the operation that worked.
+  const message = batchResultMessage(h.ran) ?? "";
+  assert.match(message, /2 done, 1 failed/);
+  assert.match(message, /the block moved since it was read/);
+  assert.match(message, /updated Calendar Sync hub/);
+  assert.match(message, /updated Calendar Sync cut/);
 });
 
 test("a tool call that is missing what it needs asks instead of staging", async () => {

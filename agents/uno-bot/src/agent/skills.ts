@@ -13,6 +13,10 @@ import type { Env } from "../types";
 import { HARNESS } from "../generated/harness";
 
 export interface PendingContext {
+  /** The whole staged batch. The model has to see every operation it is being
+   *  asked about — one ✅ resolves all of them, so a context showing only the
+   *  first would have it confirm three writes it never read. */
+  operations: Array<{ toolName: string; input: Record<string, unknown> }>;
   toolName: string;
   input: Record<string, unknown>;
   requesterUserId: string;
@@ -106,8 +110,16 @@ function renderPendingBlock(p: PendingContext, sender: SenderContext | null): st
   return [
     "<pending_proposal>",
     "You previously proposed a side-effect action in this Slack thread that is awaiting confirmation:",
-    `- tool: ${p.toolName}`,
-    `- parameters: ${JSON.stringify(p.input, null, 2)}`,
+    // A batch reads as a numbered list; a single operation reads exactly as it
+    // always has, which is what the overwhelming majority of proposals are.
+    ...(p.operations.length > 1
+      ? [
+          `- operations (${p.operations.length}, all resolved together):`,
+          ...p.operations.map(
+            (op, i) => `  ${i + 1}. ${op.toolName} — ${JSON.stringify(op.input)}`,
+          ),
+        ]
+      : [`- tool: ${p.toolName}`, `- parameters: ${JSON.stringify(p.input, null, 2)}`]),
     `- requester: <@${p.requesterUserId}>`,
     sender ? `- current message sender: <@${sender.userId}>` : "",
     "",

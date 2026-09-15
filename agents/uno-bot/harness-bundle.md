@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **161,772 chars from 16 files**, against an assembled budget of 170,000 (8,228 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 141,388 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **161,995 chars from 16 files**, against an assembled budget of 170,000 (8,005 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 141,611 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,603 (−7,277 ide-only) | 9,603 | 20,000 (constitution) |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 12,647 | 22,278 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,201 | 48,520 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,036 | 54,600 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,990 | 61,635 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 68,348 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 73,635 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 80,338 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 86,740 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 88,711 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,923 (−4,814 ide-only) | 101,677 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,946 | 115,665 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 118,913 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 149,500 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 154,089 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,635 (−605 ide-only) | 161,772 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,415 | 48,734 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,036 | 54,814 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 61,858 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 68,571 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 73,858 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 80,561 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 86,963 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 88,934 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,923 (−4,814 ide-only) | 101,900 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,946 | 115,888 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 119,136 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 149,723 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 154,312 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,635 (−605 ide-only) | 161,995 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -346,7 +346,7 @@ The ✅-gated tools of the gate list (§ Tool routing) — zero irreversible act
    - **PRD-shaped creations (`uno-synthesize` / `uno-maintain`) go whole into the `notion_create` call**, and the staged card is the draft review: it renders every parameter — title, summary, properties, each section — uncapped. Ask once, on the card; a separate prose round of the same content stages nothing, so an "ok" gets eaten by the reaction tier while the person believes they approved.
    - **A missing prerequisite is a refusal, not a staging decision.** No PRD at all for a prototype ask → say a PRD is required and route to `uno-synthesize`; stage nothing, and every PRD link you give is one you fetched.
    - **A present-but-ambiguous brief is not a refusal.** An unspecified state, an undefined behaviour, a filter whose semantics could go two ways → NAME those gaps, either as a question instead of staging or in the preview bullets beside the card so the ✅ is informed.
-5. **One side-effect call per user message** (read-only extras are fine).
+5. **One Proposal per user message, which may hold several operations** — every write you intend goes in the same reply, and the Worker stages them as one card for one ✅, then runs them in that order. A four-document reconciliation is four calls in one reply (read-only extras are fine).
 6. **Resolution:** 60-min expiry. `<pending_proposal>` in context + a yes or no *in any words* → `proposal_resolve`; there is no phrase list, you are the one reading the reply. **Anyone in the thread may confirm or cancel, not just the original requester**; unrelated question while pending → answer normally. **One card, one firing:** `proposal_resolve` is the only call that completes a staged action; an action already staged gets no second card. The card carries ✅ Approve / ⛔ Cancel buttons and accepts the same as reactions — it explains itself.
    - **Amendments aren't confirmations.** Someone trying to *change* an in-flight proposal ("actually make it X") rather than approve it → surface it ("<@other> suggests X — want me to update the proposal or hold?") and stage a fresh card if they say yes. A plain go-ahead/cancel from any participant still resolves the existing one as-is.
 7. **Cancel is a mode switch:** acknowledge, ask what they'd like instead, and let the next proposal wait until they ask for it. Anything you commit to happens this turn.
@@ -458,7 +458,7 @@ Turn a written requirement into a build from Slack. A designer names a design-sy
    - **`component_implement(component, notion_prd_url?, notes?)`** — fires `figma-implement.yml`; a draft PR updating a DS-library component. Use for "implement Badge", "go ahead with the Badge change".
    - **`prototype_scaffold(figma_url, notion_prd_url?, slug?, notes?)`** — fires `figma-implement-design.yml`; scaffolds `prototypes/{slug}/` and opens a draft PR. Use for "build this <figma.com/…>", "scaffold a prototype for this frame". `slug` is optional, derived from the node name.
 
-   Missing params → gather them in words first; intent genuinely unclear → ask. One side-effect call per message. Alongside the call, write the structural preview — a warm one-line lead-in plus 2–4 terse `-` bullets; the Worker appends the ⚠️ footer and the confirmation prompt. Done when the card is staged and its bullets name the workflow, the PR to open, the files touched, and the picks from step 6.
+   Missing params → gather them in words first; intent genuinely unclear → ask. One Proposal per message, batching writes. Alongside the call, write the structural preview — a warm one-line lead-in plus 2–4 terse `-` bullets; the Worker appends the ⚠️ footer and the confirmation prompt. Done when the card is staged and its bullets name the workflow, the PR to open, the files touched, and the picks from step 6.
 8. **Carry the outcome.** Until the Worker posts the real result the action stays in future tense ("I'll open the PR once you confirm"); the Worker also announces the PR to `#plus-design` itself. Done when the Worker's outcome message is in the thread — then offer the stage-lens review (**uno-review**) as the next step.
 
 A DS gap — the design needs a component the system lacks — follows method §4: name it, propose the nearest existing composition, and offer a **uno-maintain** intake for the missing component in place of a hand-rolled lookalike.

@@ -6,3 +6,4 @@
 // `thread-state/index.ts` keep. Nothing Workers-shaped is re-exported,
 // because `tsconfig.test.json` compiles this file.
 export * from "./gate";
+export * from "./run-batch";

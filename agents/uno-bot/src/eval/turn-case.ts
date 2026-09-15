@@ -151,7 +151,14 @@ export interface EvalTurnReport {
  *  `scripts/eval-history.mjs` read. */
 export type EvalResult =
   | { kind: "text"; text: string }
-  | { kind: "proposal"; toolName: string; input: Record<string, unknown>; previewText?: string }
+  | {
+      kind: "proposal";
+      /** The whole batch, so a results file shows what ONE ✅ would have run. */
+      operations?: Array<{ toolName: string; input: Record<string, unknown> }>;
+      toolName: string;
+      input: Record<string, unknown>;
+      previewText?: string;
+    }
   | { kind: "resolved"; decision: "confirm" | "cancel"; messageToUser?: string };
 
 /**

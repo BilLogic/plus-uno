@@ -39,6 +39,7 @@ import toolsJson from "../../tool-definitions.json";
 import { GATE_RESERVED } from "../slack/gate-reactions";
 import type { AbsenceContext } from "./absence";
 import type { Env, SlackContext } from "../types";
+import { proposalOperations } from "../thread-state/index";
 import type { HistoryTurn, PendingProposal } from "../thread-state/index";
 import type { Tool } from "./types";
 import type { AgentImage, ProviderConversationTurn } from "./provider-conversation";
@@ -178,7 +179,12 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const routeReason = input.tier ? (input.routeReason ?? "routed-by-turn") : routed.reason;
 
   const pendingForSystem = pending
-    ? { toolName: pending.toolName, input: pending.input, requesterUserId: pending.requesterUserId }
+    ? {
+        operations: proposalOperations(pending),
+        toolName: pending.toolName,
+        input: pending.input,
+        requesterUserId: pending.requesterUserId,
+      }
     : null;
   const blocks = await buildSystemBlocks(env, pendingForSystem, currentSender, assistantContext);
   // Block 0 is the harness: identical for every request on this build, and so

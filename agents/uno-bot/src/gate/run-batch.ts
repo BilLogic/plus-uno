@@ -1,0 +1,149 @@
+// Running an approved batch, and saying what it did.
+//
+// One ✅ approves every operation on the card, so one ✅ runs every operation —
+// in order, past a failure, and with a per-operation account at the end. The
+// incident this exists for is the opposite: an approved four-document plan
+// executed its first append, reported "appended 4 block(s)", and left the other
+// three documents untouched with nothing in the thread or the logs saying so.
+//
+// Env-free on purpose. The executor arrives as a function, so `tsconfig.test.json`
+// compiles this file and a test can fail operation two on demand without a
+// Notion account. `agent/resolve-proposal.ts` is the caller that has `Env` and
+// hands in the real side-effect tool table.
+
+import type { ProposalOperation } from "../thread-state/index";
+
+/** What one operation came to. */
+export interface OperationOutcome {
+  toolName: string;
+  ok: boolean;
+  /** The executor's own JSON result, verbatim — the record of what happened. */
+  result: string;
+  /** One human line for this operation. The history note and the posted result
+   *  both read this field, so the two can never disagree about an operation. */
+  message: string;
+}
+
+/**
+ * Run the batch in order, and keep going past a failure.
+ *
+ * Stopping at the first failure would hide operations three and four behind
+ * operation two, which is the same silence in a different place: a person who
+ * approved four things is owed four answers.
+ */
+export async function runOperations(
+  operations: ProposalOperation[],
+  execute: (operation: ProposalOperation) => Promise<string>,
+): Promise<OperationOutcome[]> {
+  const outcomes: OperationOutcome[] = [];
+  for (const operation of operations) {
+    let result: string;
+    try {
+      result = await execute(operation);
+    } catch (err) {
+      // A throw is a failed operation, not a failed batch — the remaining ones
+      // are still approved and still run.
+      result = JSON.stringify({
+        ok: false,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+    console.log(`[gate] ${operation.toolName} executed: ${result}`);
+    outcomes.push({
+      toolName: operation.toolName,
+      ok: isOkResult(result),
+      result,
+      message: describeOutcome(operation.toolName, result),
+    });
+  }
+  return outcomes;
+}
+
+/** True unless the executor explicitly reported ok:false. */
+export function isOkResult(resultJson: string): boolean {
+  try {
+    return (JSON.parse(resultJson) as { ok?: boolean }).ok !== false;
+  } catch {
+    return false;
+  }
+}
+
+/** One operation, in words. Surfaces the result message and any URL, so the
+ *  bot remembers on a later turn what it actually did — and says plainly when
+ *  an operation did not happen, so it never claims a write it did not make. */
+function describeOutcome(toolName: string, resultJson: string): string {
+  try {
+    const r = JSON.parse(resultJson) as {
+      ok?: boolean; message?: string; url?: string; error?: string; detail?: string;
+    };
+    if (r.ok === false) {
+      return `(${toolName} did NOT complete: ${r.error ?? r.detail ?? "unknown error"}. Nothing was created — do not claim success.)`;
+    }
+    const msg = r.message ?? `${toolName} completed.`;
+    return r.url ? `${msg} Notion link: ${r.url}` : msg;
+  } catch {
+    return `${toolName} completed.`;
+  }
+}
+
+/**
+ * The history note for a whole batch — ONE note, listing every operation.
+ *
+ * A one-operation batch reads exactly as it did before the batch shipped: the
+ * overwhelming majority of proposals are still one write, and the note the
+ * model reads on the next turn should not have grown ceremony it does not need.
+ */
+export function batchOutcomeNote(outcomes: OperationOutcome[]): string {
+  if (outcomes.length === 1) return outcomes[0]!.message;
+  const done = outcomes.filter((o) => o.ok).length;
+  const lines = outcomes.map(
+    (o, i) => `${i + 1}. ${o.ok ? "done" : "FAILED"} — ${o.message}`,
+  );
+  return [
+    `(Ran the approved batch of ${outcomes.length} operations: ${done} done, ${outcomes.length - done} failed.)`,
+    ...lines,
+  ].join("\n");
+}
+
+/**
+ * What the thread is told once the batch has run — every operation named, done
+ * or failed, so a partial result is visible rather than hidden behind the one
+ * that succeeded.
+ *
+ * `null` for a single operation: nothing there needs disambiguating, and the
+ * tool's own reply already says what happened.
+ */
+export function batchResultMessage(outcomes: OperationOutcome[]): string | null {
+  if (outcomes.length <= 1) return null;
+  const failed = outcomes.filter((o) => !o.ok).length;
+  const head = failed
+    ? `:warning: Ran ${outcomes.length} operations — ${outcomes.length - failed} done, ${failed} failed:`
+    : `:white_check_mark: Ran all ${outcomes.length} operations:`;
+  return [
+    head,
+    ...outcomes.map(
+      (o, i) => `${i + 1}. ${o.ok ? ":white_check_mark:" : ":x:"} *${o.toolName}* — ${o.message}`,
+    ),
+  ].join("\n");
+}
+
+/**
+ * The batch's telemetry, one line per Proposal.
+ *
+ * Proposed, approved and executed are three different numbers and the whole
+ * point is that a log can show them disagreeing: the incident behind this work
+ * was four proposed, four approved, one executed, and nothing anywhere said so.
+ */
+export function batchTelemetryLine(input: {
+  proposalTs: string;
+  proposed: number;
+  approved: number;
+  outcomes: OperationOutcome[];
+}): string {
+  const executed = input.outcomes.filter((o) => o.ok).length;
+  const failed = input.outcomes.length - executed;
+  return (
+    `[gate] proposal ${input.proposalTs}: proposed=${input.proposed} ` +
+    `approved=${input.approved} executed=${executed} failed=${failed}`
+  );
+}

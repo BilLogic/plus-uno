@@ -367,10 +367,47 @@ test("narration is NOT emitted ahead of a side-effect call", async () => {
   assert.deepEqual(rec.interim, []);
   assert.deepEqual(result, {
     kind: "proposal",
+    operations: [{ toolName: "notion_create", input: { title: "Reflection redesign" } }],
     toolName: "notion_create",
     input: { title: "Reflection redesign" },
     previewText: "I'll file a Roadmap card for the reflection redesign.",
   });
+});
+
+test("every side-effect call in one reply becomes ONE proposal, and the read-only call still runs", async () => {
+  // The #554 incident, at the seam it happened: the model asked for two writes
+  // and a lookup in a single reply, the loop returned the first write, and the
+  // other two vanished with no log and nothing the person could see.
+  const rec = recorder();
+  const provider = fake({
+    replies: [
+      {
+        text: "Rewriting the TLDR and filing the decision.",
+        toolCalls: [
+          { name: "notion_update", args: { page: "hub", heading: "TLDR" } },
+          { name: "blueprint_query", args: { need: "calendar sync" } },
+          { name: "notion_create", args: { surface: "decision", title: "Calendar Sync cut" } },
+        ],
+      },
+    ],
+  });
+
+  const result = await runLoop(loopInput(provider, rec));
+
+  assert.equal(result.kind, "proposal");
+  assert.deepEqual(result.kind === "proposal" ? result.operations : [], [
+    { toolName: "notion_update", input: { page: "hub", heading: "TLDR" } },
+    { toolName: "notion_create", input: { surface: "decision", title: "Calendar Sync cut" } },
+  ]);
+  // The first operation still fills the single-call fields every reader that has
+  // not moved to `operations` yet is built on.
+  assert.equal(result.kind === "proposal" ? result.toolName : "", "notion_update");
+  // The lookup in the same reply RAN — an announced call left unanswered is the
+  // silent drop this batch exists to end.
+  assert.deepEqual(rec.executed, ["blueprint_query"]);
+  const [handed] = provider.transcript;
+  assert.equal(handed?.kind === "results" ? handed.results.length : 0, 1);
+  assert.equal(handed?.kind === "results" ? handed.results[0]!.name : "", "blueprint_query");
 });
 
 test("narration is NOT emitted ahead of resolving a proposal", async () => {

@@ -27,6 +27,7 @@ import {
   MAX_HISTORY_TURNS,
   PROPOSAL_TTL_MS,
   RUN_LEASE_MS,
+  proposalOperations,
   type PendingProposal,
   type ThreadState,
   type ThreadStateDeps,
@@ -167,6 +168,38 @@ export function runThreadStateConformance(
     const found = await store.getProposalByTs("1700.2");
     assert.equal(found.state, "found");
     assert.equal(found.state === "found" ? found.proposal.toolName : "", "notion_create");
+  });
+
+  it("a batch round-trips with every operation, in order", async () => {
+    const { store } = setup();
+    const operations = [
+      { toolName: "notion_update", input: { page: "hub", heading: "TLDR" } },
+      { toolName: "notion_update", input: { page: "prd", heading: "Scope" } },
+      { toolName: "notion_create", input: { surface: "decision", title: "Calendar Sync cut" } },
+    ];
+    await store.putProposal(proposal({ operations }));
+    const found = await store.getProposalByTs("1700.2");
+    assert.equal(found.state, "found");
+    assert.deepEqual(found.state === "found" ? found.proposal.operations : [], operations);
+    assert.deepEqual(
+      proposalOperations(found.state === "found" ? found.proposal : proposal()),
+      operations,
+    );
+  });
+
+  // Expand–contract: a proposal staged before the batch shipped is still
+  // pending when the batch deploys, and a ✅ on it must run its one write
+  // rather than find a field that is not there.
+  it("a record stored in the old single-call shape reads as a one-operation batch", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal());
+    const found = await store.getProposalByTs("1700.2");
+    assert.equal(found.state, "found");
+    assert.equal(found.state === "found" ? found.proposal.operations : "not-found", undefined);
+    assert.deepEqual(
+      proposalOperations(found.state === "found" ? found.proposal : proposal()),
+      [{ toolName: "notion_create", input: { title: "Onboarding checklist" } }],
+    );
   });
 
   // "expired" and "none" are different answers on purpose: the gate has to tell
