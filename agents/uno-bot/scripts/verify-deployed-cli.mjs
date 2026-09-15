@@ -54,7 +54,10 @@ console.log(`expected: uno-bot ok ${expected}`);
 const result = await verifyDeployed({ expected, url: URL_, holdAttempts: HOLD });
 
 if (result.ok) {
-  announce("notice", `\`${expected}\` is serving, and held for the whole window.`);
+  const stale = result.stale
+    ? ` ${result.stale} stale sample(s) came from an edge still on the old build; that is propagation, not a second deployer.`
+    : "";
+  announce("notice", `\`${expected}\` is serving, and held for the whole window.${stale}`);
   process.exit(0);
 }
 
