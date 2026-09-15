@@ -95,6 +95,61 @@ test("the overwrite has to be caught late, not just on the next sample", async (
   assert.equal(result.reason, "overwritten");
 });
 
+test("one stale sample during the hold is edge propagation, not an overwrite", async () => {
+  // Measured 2026-09-15 on e6269fe9: r324 converged on the first sample, hold
+  // sample 1 read the PREVIOUS build once, and every sample after that was
+  // r324 again — Cloudflare's own deployment list showed one deployment, ours.
+  // An edge answering from the old isolate for a moment is not a second
+  // deployer, and failing the run on it makes the hold cry wolf.
+  const f = fake([OURS, OURS, "uno-bot ok r317-0dcd5c5", OURS, OURS, OURS]);
+  const result = await verifyDeployed({ ...f.opts, holdAttempts: 6 });
+  assert.equal(result.ok, true);
+  assert.equal(result.stale, 1);
+});
+
+test("a foreign stamp that PERSISTS is an overwrite, with the same diagnosis", async () => {
+  // The #278 shape: the other build arrives and STAYS. Three consecutive
+  // foreign samples (15s at the real interval) is past any propagation blip
+  // and well inside the 150s window.
+  const f = fake([OURS, OURS, THEIRS, THEIRS, THEIRS]);
+  const result = await verifyDeployed({ ...f.opts, holdAttempts: 8 });
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "overwritten");
+  assert.equal(result.serving, THEIRS);
+  assert.match(result.diagnosis, /ungated/);
+});
+
+test("an excursion does not extend the hold window", async () => {
+  // Same number of waits whether or not a stale sample appeared: the window
+  // is a fixed alarm, not a timer that resets on every flicker.
+  const waits = [];
+  const f = fake([OURS, OURS, "uno-bot ok r317-0dcd5c5", OURS]);
+  await verifyDeployed({ ...f.opts, holdAttempts: 4, sleep: async (ms) => waits.push(ms) });
+  assert.equal(waits.length, 1 + 4);
+});
+
+test("unreachable samples inside an excursion count as neither ours nor foreign", async () => {
+  // Foreign, blip, foreign, foreign: three foreign reads in a row once the
+  // blips are ignored — still an overwrite. Foreign, blip, ours — still fine.
+  const bad = fake([OURS, THEIRS, null, THEIRS, THEIRS]);
+  assert.equal((await verifyDeployed({ ...bad.opts, holdAttempts: 8 })).reason, "overwritten");
+  const fine = fake([OURS, THEIRS, null, OURS]);
+  assert.equal((await verifyDeployed({ ...fine.opts, holdAttempts: 8 })).ok, true);
+});
+
+test("an excursion still open when the window ends is resolved, not guessed", async () => {
+  // Foreign on the very last sample. Ending there would be a coin flip, so
+  // the hold takes the few extra reads the persist rule needs: ours returns —
+  // pass, one stale; foreign stays — overwrite.
+  const back = fake([OURS, OURS, OURS, OURS, "uno-bot ok r317-0dcd5c5", OURS]);
+  const a = await verifyDeployed({ ...back.opts, holdAttempts: 4 });
+  assert.equal(a.ok, true);
+  assert.equal(a.stale, 1);
+  const stays = fake([OURS, OURS, OURS, OURS, THEIRS]);
+  const b = await verifyDeployed({ ...stays.opts, holdAttempts: 4 });
+  assert.equal(b.reason, "overwritten");
+});
+
 test("`unstamped` is diagnosed as a deploy that never ran deploy.mjs", async () => {
   // The distinction #278 turns on. `unstamped` can only come from the `typeof`
   // fallback in src/version.ts, which means no --define reached the bundle.

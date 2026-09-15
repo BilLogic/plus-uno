@@ -198,7 +198,10 @@ jobs:
         #
         # The logic is a module, not a bash loop in a YAML string, because it
         # now has edge cases worth testing — an unreachable Worker must not read
-        # as an overwrite. See scripts/verify-deployed.test.mjs.
+        # as an overwrite, and neither must ONE stale sample from an edge still
+        # on the old build (seen 2026-09-15): a foreign stamp has to persist for
+        # three consecutive samples to fail the run. See
+        # scripts/verify-deployed.test.mjs.
         working-directory: agents/uno-bot
         env:
           # Escape hatch. Set the repo variable to 0 if this hold is ever the

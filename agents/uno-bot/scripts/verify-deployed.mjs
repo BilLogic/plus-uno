@@ -72,17 +72,21 @@ export function diagnose(serving) {
  * @param {number} [o.convergeAttempts] Samples to wait for our build to appear.
  * @param {number} [o.holdAttempts]     Samples to watch afterwards. 0 disables
  *                                      the hold, restoring first-answer-wins.
+ * @param {number} [o.persistSamples]   Consecutive foreign samples that make an
+ *                                      overwrite. Fewer than that is a stale
+ *                                      edge, logged and forgiven.
  * @param {number} [o.intervalMs]       Delay between samples.
  * @param {Function} [o.fetchImpl]      Injected for tests.
  * @param {Function} [o.sleep]          Injected for tests.
  * @param {Function} [o.log]
- * @returns {Promise<{ok: boolean, reason?: string, serving?: string, diagnosis?: string}>}
+ * @returns {Promise<{ok: boolean, stale?: number, reason?: string, serving?: string, diagnosis?: string}>}
  */
 export async function verifyDeployed({
   expected,
   url,
   convergeAttempts = 18,
   holdAttempts = 30,
+  persistSamples = 3,
   intervalMs = 5000,
   // Every read is bounded. The bash loop this replaced used `curl --max-time
   // 15`; without an equivalent, an edge that accepts the connection and never
@@ -146,15 +150,46 @@ export async function verifyDeployed({
   // this window is set well past that in the workflow rather than trimmed to
   // the measurement — a hold that only just covers the one case we have seen
   // proves nothing about the next one.
+  //
+  // A foreign stamp has to PERSIST to count. Measured 2026-09-15 on e6269fe9:
+  // our build converged, hold sample 1 read the previous build once, and every
+  // sample after that was ours again — Cloudflare's own deployment list showed
+  // one deployment, ours. That is an edge still answering from the old isolate,
+  // not a second deployer, and the overwrite this hold exists for looked
+  // nothing like it: the other build arrived and STAYED, 24 samples running.
+  // So a foreign read opens an excursion; ours coming back closes it as stale
+  // (counted, logged, forgiven); `persistSamples` foreign reads in a row is the
+  // overwrite. Unreachable reads are neither — they neither extend nor close
+  // the excursion. The window itself is fixed: an excursion inside it does not
+  // reset it. The one exception is an excursion still open when the window
+  // ends — the hold takes the few extra samples needed to resolve it, because
+  // ending on an unresolved foreign read would be a guess either way.
   log(`holding for ${holdAttempts} samples to see whether it stays`);
-  for (let i = 0; i < holdAttempts; i += 1) {
+  let stale = 0;
+  let streak = 0;
+  let foreign = null;
+  const extra = persistSamples - 1;
+  for (let i = 0; i < holdAttempts + extra; i += 1) {
+    if (i >= holdAttempts && streak === 0) break;
     await sleep(intervalMs);
     const body = await sample();
     log(`  [hold ${i + 1}] ${body ?? "(unreachable)"}`);
-    if (body === null || body === want) continue;
-    return { ok: false, reason: "overwritten", serving: body, diagnosis: diagnose(body) };
+    if (body === null) continue;
+    if (body === want) {
+      if (streak) {
+        stale += streak;
+        log(`  stale edge: ${foreign} answered ${streak} sample(s), then ${expected} again`);
+      }
+      streak = 0;
+      continue;
+    }
+    streak += 1;
+    foreign = body;
+    if (streak >= persistSamples) {
+      return { ok: false, reason: "overwritten", serving: body, diagnosis: diagnose(body) };
+    }
   }
 
-  log(`${expected} held for the whole window`);
-  return { ok: true };
+  log(`${expected} held for the whole window${stale ? ` (${stale} stale sample(s))` : ""}`);
+  return { ok: true, stale };
 }
