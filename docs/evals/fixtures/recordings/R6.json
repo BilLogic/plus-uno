@@ -1,11 +1,11 @@
 {
-  "case": "R5",
+  "case": "R6",
   "source": "captured",
   "recordedAt": "2026-09-14",
   "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
   "turns": [
     {
-      "prompt": "Share this for feedback in the feedback channel: https://plus-uno.netlify.app/home — summary: quick pass on Home empty states.",
+      "prompt": "Share this for feedback in the feedback channel: https://plus-uno.netlify.app/home — summary: quick pass wanted on the Home empty states.",
       "replies": [
         {
           "toolCalls": [
@@ -20,6 +20,13 @@
               "args": {
                 "title": "Home empty states"
               }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "query": "designer",
+                "scope": "team"
+              }
             }
           ]
         },
@@ -28,18 +35,19 @@
             {
               "name": "shareout_post",
               "args": {
+                "fidelity": "high",
                 "feedback_wanted": [
-                  "Are the empty state illustrations and layout clear and helpful for zero-data states?",
-                  "Do the primary action buttons effectively guide tutors toward their next step?",
-                  "Does the hierarchy match expectations compared to populated states?"
+                  "Do the empty state illustrations and copy clearly guide the tutor on next steps?",
+                  "Does the visual hierarchy and layout feel balanced across viewports?",
+                  "Are any key call-to-actions missing or ambiguous when there are no active sessions or modules?"
                 ],
+                "artifact": "interactive prototype",
+                "project": "Home Empty States",
                 "round": 1,
                 "link": "https://plus-uno.netlify.app/home",
-                "not_looking_for": "Final copy polish or backend data wiring",
-                "summary": "Quick pass on Home empty states.",
-                "artifact": "live prototype",
-                "fidelity": "high",
-                "project": "Home Empty States"
+                "summary": "Quick pass wanted on the Home empty states in the live prototype.",
+                "not_looking_for": "Backend data integration, final copy polish, or edge-case error states outside empty states",
+                "deadline": "EOD Friday"
               }
             }
           ]
@@ -51,27 +59,18 @@
       ]
     },
     {
-      "prompt": "cancel",
+      "prompt": "go ahead",
       "replies": [
         {
           "toolCalls": [
             {
               "name": "proposal_resolve",
               "args": {
-                "decision": "cancel",
-                "message_to_user": "Got it — cancelled that share-out proposal. Let me know if you'd like to adjust anything before we post it."
+                "decision": "confirm",
+                "message_to_user": "Got it — posting the share-out for Home Empty States to #plus-design-feedback now! 🚀"
               }
             }
           ]
-        }
-      ],
-      "toolResults": []
-    },
-    {
-      "prompt": "Share this for feedback in the feedback channel: https://plus-uno.netlify.app/home — summary: quick pass on Home empty states.",
-      "replies": [
-        {
-          "text": "You cancelled that a moment ago — want me to stage it again as-is, or did you want to change the link, reviewers, or questions first?"
         }
       ],
       "toolResults": []

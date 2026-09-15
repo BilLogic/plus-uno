@@ -19,6 +19,10 @@
 //     a side-effect call staged as a proposal, `proposal_resolve` authorized
 //     against the pending card, read-only calls executed and handed back — all
 //     run. Only the draw is fixed.
+//   * THE THINKING LEVEL IS DERIVED, NOT RECORDED. A recorded model reports no
+//     dial. The level is not its to report either — it is the Gemini adapter's
+//     mapping of the tier the ROUTE chose, and the route ran for real — so the
+//     transport states it from that same resolution (`levelForTier`).
 //   * READ-ONLY TOOLS ANSWER FROM THE RECORDING. The Worker's tool executor
 //     names `Env`, Slack, Notion and Supabase. A recorded turn declares the
 //     result text each lookup returned; anything it did not record answers with
@@ -242,15 +246,38 @@ export function ensureTestBuild({ pkg = PKG, log = console.log } = {}) {
  *  `module.exports`. */
 async function loadModules(buildDir = BUILD_DIR) {
   const load = async (rel) => (await import(pathToFileURL(join(buildDir, rel)).href)).default;
-  const [turn, evalCase, threadState, loop, fake, conversation] = await Promise.all([
+  const [turn, evalCase, threadState, loop, fake, conversation, geminiTiers] = await Promise.all([
     load("src/turn/index.js"),
     load("src/eval/turn-case.js"),
     load("src/thread-state/index.js"),
     load("src/agent/loop.js"),
     load("src/agent/providers/fake.js"),
     load("src/agent/provider-conversation.js"),
+    load("src/agent/gemini-tiers.js"),
   ]);
-  return { turn, evalCase, threadState, loop, fake, conversation };
+  return { turn, evalCase, threadState, loop, fake, conversation, geminiTiers };
+}
+
+/**
+ * The thinking level the Gemini adapter would send for a tier — or null when
+ * the tier's model takes no dial.
+ *
+ * WHY THE TRANSPORT STATES THIS AT ALL. A level is not something a model
+ * reports; it is something the adapter SENDS, derived from the tier the route
+ * chose (`gemini-tiers.ts`, ADR-028). The route runs for real here, so the tier
+ * is a genuine Turn fact — and the level is a pure function of it. A recorded
+ * model cannot attest the level, but it was never the model's to attest.
+ *
+ * The resolution is imported, not re-tabulated: a second copy of the table
+ * would let the gate stay green through a tier change.
+ *
+ * The env is deliberately EMPTY. Per-tier model overrides are a deployment's
+ * business (`GEMINI_CHILL_MODEL` and friends); reading the shell's would make a
+ * local score depend on whatever happened to be exported.
+ */
+function levelForTier(geminiTiers, tier) {
+  const model = geminiTiers.resolveGeminiModel(tier, {});
+  return geminiTiers.geminiDials(tier, model).thinkingLevel;
 }
 
 /** The loop's subrequest meter, for a transport that spends none. */
@@ -332,7 +359,7 @@ export function localTransport({
       const startedAt = Date.now();
       try {
         modules ??= await loadModules(buildDir);
-        const { turn, evalCase, threadState: store, loop, fake, conversation } = modules;
+        const { turn, evalCase, threadState: store, loop, fake, conversation, geminiTiers } = modules;
 
         const index = turnIndexOf(history);
         const recorded = byPrompt.get(`${index} ${prompt}`);
@@ -408,7 +435,16 @@ export function localTransport({
               ...(req.onInterim ? { onInterim: req.onInterim } : {}),
               onDials: (d) => {
                 const { detail, ...named } = d;
-                report.dials = { ...named, ...detail };
+                // The recorded model reports an empty `detail` — the fake
+                // provider has no dial of its own — so the level is filled in
+                // from the tier the route chose (see `levelForTier`). `model`
+                // stays whatever the provider said, which here is "recorded":
+                // the tier and its level are Turn facts, the answer under them
+                // is not, and no transcript may read as a Gemini measurement.
+                // A provider that DOES report its own level still wins — its
+                // `detail` is spread last.
+                const level = levelForTier(geminiTiers, named.tier);
+                report.dials = { ...named, ...(level ? { level } : {}), ...detail };
               },
               onToolCall: (c) => report.tools.push(c),
             });

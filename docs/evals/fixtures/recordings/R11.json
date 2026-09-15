@@ -1,26 +1,58 @@
 {
   "case": "R11",
-  "source": "authored",
+  "source": "captured",
   "recordedAt": "2026-09-14",
-  "note": "AUTHORED, NOT CAPTURED. The plain-answer path: a search that comes back empty, and a reply that says the blueprint has nothing on payroll disputes rather than inventing a flow. The recorded lookup result is an EMPTY one on purpose — that is the input the absence check is about, and the turn's handling of it is what a local run measures. The wording of the reply is authored to R11's expectation; whether the model would admit the gap today is the worker transport's measurement.",
+  "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
   "turns": [
     {
       "prompt": "What does the blueprint say about the tutor payroll dispute escalation flow?",
       "replies": [
         {
-          "text": "Checking the blueprint for anything on payroll disputes.",
-          "toolCalls": [{ "name": "search_blueprint", "args": { "query": "payroll dispute escalation" } }]
+          "text": "Checking the service blueprint for any steps covering tutor payroll disputes or payroll escalation flows...",
+          "toolCalls": [
+            {
+              "name": "search_blueprint",
+              "args": {
+                "include": [
+                  "index"
+                ],
+                "query": "tutor payroll dispute escalation"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_scenario": "Reporting Hours",
+                "filter_phase": "Post-session"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "scope": "help_tutors",
+                "query": "payroll dispute"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "query": "payroll dispute",
+                "scope": "any"
+              }
+            },
+            {
+              "name": "roadmap_query",
+              "args": {
+                "title": "payroll dispute"
+              }
+            }
+          ]
         },
         {
-          "text": "I searched the blueprint for payroll disputes and escalation and it has nothing on them — no phase, scenario or touchpoint covers payroll at all, so I can't tell you how one escalates today. What the blueprint does cover on the tutor side is session scheduling, call-offs and reconfirmation, and the CPO clearance flow. If payroll disputes are handled somewhere, it is outside what the blueprint models; I would not want to guess at a flow that isn't there."
+          "text": "The service blueprint does not document a tutor payroll dispute escalation flow. In fact, searching across all 6 `phases` and 23 `scenarios` returned 0 text matches for payroll disputes, and every semantic match was a near-miss. \n\nHere is what the blueprint *does* document about tutor pay and general escalation:\n\n### 1. How payroll works in the blueprint (`Post-session` `phase` › `Reporting Hours` `scenario`)\n- **Self-reporting in Workday:** In [`Post-session › Reporting Hours › Reported on time — Lead Tutor × Report hours`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-0000001e0102), tutors log hours directly into CMU's Workday instance. The PLUS app’s session and attendance data are not connected to Workday, so payroll does not automatically reconcile hours worked, called off, or cancelled.\n- **Disbursement boundary:** In [`Post-session › Reporting Hours › Reported on time — Front Stage Touchpoints × Receive paycheck`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-0000001e0206), pay is direct-deposited via CMU's biweekly payroll cycle. The blueprint explicitly notes that **PLUS has no visibility into or role in this step** beyond the hours Workday reports as approved.\n- **Handling missed or incorrect hours:** In the `Deadline missed` `path`, there is no dispute mechanism. Instead:\n  - If hours go unlogged, supervisors notice during manual reviews and nudge the tutor over Slack or email ([`Back Stage Actions × Supervisor follow-up`](https://uno-blueprint.netlify.app/?cell=b0000000-0000-4000-8000-0000001e1207)).\n  - In [`Regular Tutor × Correct hours (late entry or next cycle)`](https://uno-blueprint.netlify.app/?cell=b0000000-0000-4000-8000-0000001e1303), tutors either enter the missed hours late or self-correct in Workday during the next cycle without supervisor involvement.\n  - In [`Regular Tutor × Receive paycheck`](https://uno-blueprint.netlify.app/?cell=b0000000-0000-4000-8000-0000001e1403), pay for corrected hours simply shifts to that later paycheck.\n\n### 2. General issue escalation (`Post-session` `phase` › `Reporting an Issue` `scenario`)\n- If a tutor needs to escalate a non-standard concern, it falls under the informal issue-reporting flow. \n- In [`Post-session › Reporting an Issue › Standard — Back Stage Actions × Resolve concern`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-0000001d0207), resolution is tracked informally over email and Slack by the `Tutor Supervisors` team: there is no ticketing system (servicedesk selection is in progress), and escalation infrastructure is not yet formalized.\n- In [`Front Stage Actions × Request assistance`](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-0000001d0304), first responders pull in supervisors or IT informally; there is no formal escalation tier.\n\nI searched the blueprint's 6 phases and 23 scenarios and read the `Reporting Hours` and `Reporting an Issue` rows just now, so this absence in the blueprint is confirmed. If a tutor faces an active payroll discrepancy, the operational route today is contacting their **Tutor Supervisor** via Slack/email or reaching out directly to **CMU Payroll** through Workday."
         }
       ],
-      "toolResults": [
-        {
-          "tool": "search_blueprint",
-          "text": "{\"ok\":true,\"rows\":[],\"matched_total\":0,\"searched\":\"cells, touchpoints, scenarios\",\"note\":\"no rows matched\"}"
-        }
-      ]
+      "toolResults": []
     }
   ]
 }

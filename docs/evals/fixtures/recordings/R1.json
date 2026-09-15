@@ -1,0 +1,70 @@
+{
+  "case": "R1",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "What's the difference between Card and Surface?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/agent-views/components/index.md"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src",
+                "search": "Surface"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/patterns/Surface/Surface.mdx"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/guidelines/composition/surfaces.md"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/patterns/Surface/Surface.jsx"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components/layout-and-structure/Card/Card.jsx"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/patterns/Surface/Surface.stories.jsx"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components/layout-and-structure/Card/Card.stories.jsx"
+              }
+            }
+          ]
+        },
+        {
+          "text": "**Surface** is a bare tokenized background layer, while **Card** is a structured, opinionated container with predefined content slots.\n\nThink of **Surface** like a blank sheet of colored paper—you pick the background color, border, and elevation, and drop whatever you want on top. **Card** is a pre-printed form with dedicated spots already carved out for a title, image, body text, and action buttons.\n\n---\n\n### Key differences\n\n| Dimension | `Surface` | `Card` |\n|---|---|---|\n| **Category** | Pattern / foundation layout layer | UI Component (`layout-and-structure`) |\n| **Purpose** | Background shells, elevation planes, and custom wrappers | Grouping self-contained, related information and actions |\n| **Slots & Structure** | Completely open `children` slot | Pre-wired slots: `image`, `header`, `title`, `subtitle`, `body`, `items`, `footer`, `links`, and `actionButton` |\n| **Under the hood** | Token-backed `div` (or custom element via `as`) | React-Bootstrap `<Card>` (`RBCard`) with PLUS styling |\n| **Visual controls** | `level` (6 surface role tokens), `elevation` (0–5), `padding`, `radius`, `border` | `paddingSize`, `gapSize`, `radiusSize`, `borderSize`, `showBorder` |\n\n### When to use which\n\n- **Use `Surface`** when building app-shell regions, custom containers, or backdrops where you need precise control over surface color tokens (`--color-surface`, `--color-surface-container-*`) and elevation without forcing a card structure.\n- **Use `Card`** when presenting bounded information with standard hierarchy—like a student profile snippet, metric stat box, info panel, or wrapping a `<Table>`.\n\nI read `Card.jsx`, `Surface.jsx`, and `Surface.mdx` just now, so this is current.\n\n---\n\n### Where to find it\n\n- **Storybook:**\n  - [Card on Storybook](https://plus-uno.netlify.app/storybook/?path=/docs/components-layout-and-structure-card--docs)\n  - [Surface on Storybook](https://plus-uno.netlify.app/storybook/?path=/docs/foundations-patterns-surfaces--docs)\n- **GitHub:**\n  - [`Card` source folder](https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Card)\n  - [`Surface` source folder](https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Surface)\n- **Figma:**\n  - `Surface` mirrors the Surface slot component in the [PLUS Foundations library](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX)."
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

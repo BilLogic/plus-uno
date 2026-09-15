@@ -1,0 +1,55 @@
+{
+  "case": "B1",
+  "source": "captured",
+  "recordedAt": "2026-09-15",
+  "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here. The prompts carry the subject row below, as the condition 'touchpoint-any' answered on 2026-09-15; a replay is against that row.",
+  "subject": {
+    "name": "72-hour auto-add job",
+    "touchpoint": "72-hour auto-add job",
+    "kind": "other"
+  },
+  "turns": [
+    {
+      "prompt": "where do we use 72-hour auto-add job?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "72-hour auto-add",
+                "include": [
+                  "touchpoints"
+                ]
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": ".",
+                "search": "72-hour"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "query": "72-hour auto-add",
+                "scope": "any"
+              }
+            },
+            {
+              "name": "slack_search",
+              "args": {
+                "query": "72-hour"
+              }
+            }
+          ]
+        },
+        {
+          "text": "We use the **72-hour auto-add job** in the service blueprint at [`Pre-session` › **Fill-in Request** › **Slot gets covered** — `Back Stage Touchpoints` × \"Session enters fill-in pool\"](https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000150108).\n\n### What it does\n- **Surfaces open capacity:** The job continuously pulls sessions with remaining tutor capacity in the upcoming 72 hours into every tutor's **Fill-In** tab (the threshold was raised from 12 hours to 72 hours in November 2025).\n- **Applies exclusion rules:** Tutors who have an active call-off for that specific session are excluded from seeing it in their feed.\n- **Ownership:** The `lane` is owned backstage by the Dev team.\n\nI checked `uno-blueprint` just now, so this location and behavior are current."
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

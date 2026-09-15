@@ -1,0 +1,57 @@
+{
+  "case": "P6",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "PRD, inline:\n\n# Tutor session sign-up sheet\nA tutor opens the week's sign-up sheet and claims open session slots.\nUser flows: (1) tutor opens the sheet and sees open slots grouped by day; (2) tutor claims a slot and sees it move to their own list.\nAcceptance criteria: an open slot shows site, time and subject; a claimed slot leaves the open list; a day with nothing open reads 'No open slots'; a slot someone else claimed moments earlier shows an error and refreshes the list.\nScope: the sheet view and the claim action.\n\nBuild this hi-fi as a new prototype from this frame: https://www.figma.com/design/NUcRDZUzUiuVmx1ydNXpl3/APPLICATION-PROTOTYPES?node-id=158-21725 — anything the PRD leaves open is your call; name your picks on the card.",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "read_reference",
+              "args": {
+                "name": "uno-prototype/method"
+              }
+            },
+            {
+              "name": "source_read",
+              "args": {
+                "url": "https://www.figma.com/design/NUcRDZUzUiuVmx1ydNXpl3/APPLICATION-PROTOTYPES?node-id=158-21725"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "tutor sign up session claim slots"
+              }
+            },
+            {
+              "name": "source_read",
+              "args": {
+                "url": "https://www.figma.com/design/NUcRDZUzUiuVmx1ydNXpl3/APPLICATION-PROTOTYPES?node-id=158-21725"
+              }
+            }
+          ]
+        },
+        {
+          "toolCalls": [
+            {
+              "name": "prototype_scaffold",
+              "args": {
+                "figma_url": "https://www.figma.com/design/NUcRDZUzUiuVmx1ydNXpl3/APPLICATION-PROTOTYPES?node-id=158-21725",
+                "slug": "tutor-session-signup",
+                "notes": "Hi-fi prototype scaffold for tutor session sign-up sheet. Open picks: (1) Concurrency error handled via inline alert toast + auto-refresh; (2) Day grouping organized via Monday–Friday sub-tabs; (3) Optimistic UI moving claimed slot immediately to 'My Sessions' with success feedback; (4) 'No open slots' empty-state banner per day with zero availability. Grounded against Onboarding › Session Sign Up in the service blueprint."
+              }
+            }
+          ]
+        }
+      ],
+      "toolResults": [],
+      "references": [
+        "uno-prototype/method"
+      ]
+    }
+  ]
+}

@@ -1,11 +1,11 @@
 {
-  "case": "R3",
+  "case": "D1",
   "source": "captured",
   "recordedAt": "2026-09-14",
   "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
   "turns": [
     {
-      "prompt": "Publish this prototype for feedback: https://plus-uno.netlify.app/home — I'd love a quick pass on the empty states.",
+      "prompt": "Publish this prototype for feedback — it's the tutor session sign-up sheet, mid-fi, first round: https://plus-uno.netlify.app/prototypes/session-sign-up/ . Ask people about the day grouping and the claim flow; layout polish is out of scope this round.",
       "replies": [
         {
           "toolCalls": [
@@ -19,31 +19,19 @@
               "name": "notion_search",
               "args": {
                 "scope": "team",
-                "query": "Home"
+                "query": "session sign up"
               }
             },
             {
               "name": "roadmap_query",
               "args": {
-                "title": "Home"
+                "title": "session sign up"
               }
             },
             {
               "name": "slack_channel_members",
               "args": {
-                "channel_id": "C03FC8AS69K"
-              }
-            },
-            {
-              "name": "slack_user_profile",
-              "args": {
-                "user_id": "U47N780EA"
-              }
-            },
-            {
-              "name": "slack_user_profile",
-              "args": {
-                "user_id": "U03FYQJRQHX"
+                "channel_id": "C074QG2V7DJ"
               }
             }
           ]
@@ -53,20 +41,16 @@
             {
               "name": "shareout_post",
               "args": {
-                "not_looking_for": "Backend auth, live database connections, or production data pipelines.",
-                "reviewers": [
-                  "U03FYQJRQHX"
-                ],
-                "summary": "Live app prototype for the Home screen, focusing on dashboard layout and empty state treatments.",
-                "link": "https://plus-uno.netlify.app/home",
-                "fidelity": "high",
-                "artifact": "hi-fi prototype",
-                "project": "Home",
                 "feedback_wanted": [
-                  "Are the empty state messaging and visuals clear when no upcoming sessions are scheduled?",
-                  "Does the call-to-action in zero-data containers guide tutors to the right next step?",
-                  "Is layout balance and tone appropriate across empty modules compared to active views?"
+                  "How well does the day grouping structure support scanning and finding sessions?",
+                  "Is the session claiming flow clear and intuitive?"
                 ],
+                "not_looking_for": "Layout polish and visual styling",
+                "artifact": "mid-fi prototype",
+                "link": "https://plus-uno.netlify.app/prototypes/session-sign-up/",
+                "fidelity": "mid",
+                "project": "Session Sign Up",
+                "summary": "Tutor session sign-up sheet prototype to gather early feedback on grouping and slot claiming.",
                 "round": 1
               }
             }

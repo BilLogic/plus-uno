@@ -1,0 +1,80 @@
+{
+  "case": "S1",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "Has anyone in Slack said anything about a hard deadline for the spacing migration?",
+      "replies": [
+        {
+          "text": "Checking Slack discussions for any mention of a deadline for the spacing migration…",
+          "toolCalls": [
+            {
+              "name": "slack_search",
+              "args": {
+                "query": "\"spacing migration\" deadline"
+              }
+            },
+            {
+              "name": "roadmap_query",
+              "args": {
+                "title": "spacing migration"
+              }
+            },
+            {
+              "name": "source_read",
+              "args": {
+                "url": "https://app.notion.com/p/Spacing-Token-Migration-26bb7cca49828002a07ee3bd6c5bfc4c"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "scope": "decisions",
+                "query": "spacing"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "query": "spacing",
+                "scope": "running_notes"
+              }
+            },
+            {
+              "name": "roadmap_query",
+              "args": {
+                "title": "spacing"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "query": "spacing migration",
+                "scope": "any"
+              }
+            },
+            {
+              "name": "source_read",
+              "args": {
+                "url": "https://app.notion.com/p/UNO-Spacing-Token-Eval-390b7cca498280eab8b5ca61e9e3b352"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "scope": "team",
+                "query": "Ashley Xu"
+              }
+            }
+          ]
+        },
+        {
+          "text": "I wasn't able to search workspace Slack channels directly (workspace search is unavailable in this turn without a triggering event token), so I can't confirm what may have been discussed informally in Slack chat. \n\nHowever, looking at our documented design sources:\n\n- **Roadmap Card:** The work is tracked under [Spacing Token Migration](https://app.notion.com/p/Spacing-Token-Migration-26bb7cca49828002a07ee3bd6c5bfc4c) (RM-1911, `Universal` pillar), contributed by Ashley Xu and Bryan Huang. Its `Design Status` is marked `Shipped`, while `Dev Status` sits in `Dev Backlog`.\n- **Card PRD & Guide:** The card content serves as the Spacing Token Guide (defining primitives vs. semantic tokens, gap, and padding usage rules) and does not state any target date or hard deadline.\n- **Decisions & Notes:** Neither the Decisions DB (54 rows scanned) nor Design Running Notes (103 rows scanned) records a deadline or milestone decision for this migration.\n\nI checked the Roadmap board, the card PRD, and the Decisions DB just now, so this documentation status is current. \n\nIf someone shared a deadline in a specific Slack thread, drop the message link here and I can read the thread directly—or check in with <https://www.linkedin.com/in/boyuang/|Bill Guo> (Design Lead) or Ashley and Bryan to see if an engineering timeline was agreed upon outside the card."
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

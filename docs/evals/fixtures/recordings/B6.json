@@ -1,0 +1,50 @@
+{
+  "case": "B6",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here. The prompts carry the subject row below, as the condition 'absent-detail' answered on 2026-09-14; a replay is against that row.",
+  "subject": {
+    "name": "Phase: Application · Scenario: Discovery · Path: Standard (happy) · Step: Discovers PLUS · Lane: Storyboard",
+    "cell": "Phase: Application · Scenario: Discovery · Path: Standard (happy) · Step: Discovers PLUS · Lane: Storyboard",
+    "detail": "duration",
+    "scenario": "Discovery",
+    "phase": "Application"
+  },
+  "turns": [
+    {
+      "prompt": "how long does \"Phase: Application · Scenario: Discovery · Path: Standard (happy) · Step: Discovers PLUS · Lane: Storyboard\" take?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_phase": "Application",
+                "filter_scenario": "Discovery",
+                "query": "Discovers PLUS Storyboard"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "a0000000-0000-4000-8000-000000070110"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "filter_phase": "Application",
+                "filter_scenario": "Discovery",
+                "query": "duration time minutes hours how long"
+              }
+            }
+          ]
+        },
+        {
+          "text": "The service blueprint doesn't track a duration for this — neither in [<https://uno-blueprint.netlify.app/?cell=a0000000-0000-4000-8000-000000070110|this Storyboard cell>] nor anywhere across the `Discovers PLUS` `step`. \n\nIn the blueprint, the `Storyboard` `lane` is a visual representation row (displaying the visual frame or comic strip illustrating the moment across discovery channels like campus booths, Handshake, social media, and the marketing site) rather than a timed task. More broadly, the blueprint schema has no structured duration field, and none of the evidence notes for this step specify a timeframe.\n\nI checked the blueprint rows for the `Application` `phase` and `Discovery` `scenario` just now, so this absence is confirmed. If you need recruiting funnel cycle times or time-to-discovery metrics, those would come from the recruiting/operations team's funnel analytics rather than the blueprint."
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

@@ -576,6 +576,21 @@ export const CHECKS = [
     guards:
       "the Worker's 268 unit tests across 39 suites, which ran in NO workflow and are not in `npm run deploy` either — that chain chose `test:bundle` and stopped. So the largest test suite in this repository was gated by nothing at all, and had been since it was written. 1.2s, measured 2026-08-29. Found while verifying the TypeScript 7 bump (#298), which is exactly the change that needed them. Among them is the harness name sweep (tests/harness-blueprint-names.test.ts), which reads the assembled prompt, the tool schemas and — since #425 — the Actions prompts under scripts/prompts/ for blueprint identifiers and conventions the schema no longer has; its inputs are repo-root files, which is the rule that composes a sub-package check here.",
   },
+  {
+    name: 'evals:local',
+    script: 'cd ../.. && node agents/uno-bot/scripts/run-evals.mjs --transport=local',
+    pkg: 'bot',
+    trigger: 'pull_request',
+    kind: 'spawn',
+    spawnReason:
+      'the eval runner. A process with its own exit code over the committed recordings, ' +
+      'reporting 34 cases at three samples each with a line per case — a shape this ' +
+      "interface would flatten into one. The `cd ../..` is the runner's own contract: its " +
+      'fixture and recording paths are repo-relative, as every documented invocation of it ' +
+      'is, and the alternative is a second copy of those paths in a manifest.',
+    guards:
+      "the eval suite through the LOCAL transport: the Worker's Turn module in-process, on the recorded model replies in docs/evals/fixtures/recordings/. No WORKER_URL, no DEBUG_TOKEN, no judge credential and no model spend, which is what lets it run on a pull request at all — before the local transport (#512) the suite ran for the FIRST time on the Monday cron, against whatever was already deployed, so a turn-level regression reached main and sat there for up to a week. WHAT A RED MEANS: a Turn, routing or pointer regression on a FIXED DRAW — the dispositions, the gate's idempotency, the cancel bounce, the history write, the proposal routing the loop performs on a side-effect call, the reference a `read_reference` was asked for. Never a model that answered differently: nothing in-process measures the model, that stays with `uno-bot-evals.yml`'s Monday `--transport=worker` cron, and the summary's `transport` field is what keeps the two from being read as one number. The judge is absent by construction, so only the deterministic checks decide. A case with no recording SKIPS BY NAME, counted apart and never failed — failing those would turn a cheap gate into 34 reds that all mean \"no recording\", which is the fastest way to have a gate switched off; a blocker that genuinely fails still exits 1. check-harness.yml has run this as a hand-written step since #512 while `npm run check:harness` did not, which is exactly the local-gate-is-a-subset-of-the-remote-one gap `test:bundle` above records paying for; that step is now this row. 0.3s on a warm .test-build, measured 2026-09-14.",
+  },
 ];
 
 /**

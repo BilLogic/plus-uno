@@ -17,9 +17,49 @@ name: uno-bot — evals (R-scenarios vs live Worker)
 # hit the live Worker, so they test what's actually serving).
 #
 # Required repo secrets: DEBUG_TOKEN, GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY.
+#
+# THE `mode` INPUT (#544). `mode: run` — the default, and what the cron does —
+# scores the suite against the live Worker. `mode: record` instead CAPTURES the
+# suite: `eval-record.mjs --all` replays every fixture case through the same
+# /debug/eval route and writes what the model actually said into recordings the
+# local transport (`--transport=local`) replays in-process, uploaded as the
+# eval-recordings artifact. Recording lives HERE because this is where the
+# credentials already are — WORKER_URL and DEBUG_TOKEN are repo secrets and
+# nobody should have to hold a copy locally to refresh a recording, and no
+# secret leaves CI either way. It is a dispatch and not a second cron on
+# purpose: a capture is 34 live billable model runs and the recordings are a
+# fixed draw, so it is done rarely, deliberately, and its artifact is then
+# committed to docs/evals/fixtures/recordings/ in its own PR. The record job
+# needs no Gemini credential — there is no judge in a capture, only the turns.
+#
+# THE `cases` INPUT. Empty — the default — records the whole suite (`--all`).
+# Set it to a space-separated list of case ids and only those are captured, one
+# `--case=` each. That is the re-record path: a single recording goes stale on
+# its own (the board moved under a run-time subject, a fixture's wording
+# changed, one draw is a failing one), and re-capturing 34 live billable runs to
+# refresh one of them is the kind of cost that gets a capture postponed instead
+# of done.
+#
+# Capture and commit:
+#   gh workflow run uno-bot-evals.yml -f mode=record                 # the whole suite
+#   gh workflow run uno-bot-evals.yml -f mode=record -f cases="B1"   # one case
+#   gh run download <id> -n eval-recordings
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "run = score the suite against the Worker; record = capture recordings for the local transport"
+        type: choice
+        default: run
+        options:
+          - run
+          - record
+      cases:
+        description: "record mode only: space-separated case ids to capture (e.g. \"B1\" or \"B1 R7\"); empty records the whole suite"
+        type: string
+        required: false
+        default: ""
   schedule:
     - cron: "0 8 * * 1" # Mondays 08:00 UTC — weekly drift check (paused 2026-09-04 while the
                         # harness was known-stale; restored 2026-09-05 after #412 and #415 landed)
@@ -27,29 +67,63 @@ on:
 jobs:
   evals:
     runs-on: ubuntu-latest
+    # Job-level, because BOTH modes need exactly these two and the host literal
+    # is allowed to appear in this file once — a second copy would be the defect
+    # rather than the number, and `apply-cutover.mjs` asserts the single
+    # occurrence it rewrites at a cutover (#288).
+    env:
+      # Set vars.UNO_BOT_WORKER_URL to point evals at another deployment;
+      # the literal is the fallback and the single other copy of it lives in
+      # agents/uno-bot/scripts/worker-url.mjs (#288).
+      WORKER_URL: ${{ vars.UNO_BOT_WORKER_URL || 'https://uno-bot.plus-uno.workers.dev' }}
+      DEBUG_TOKEN: ${{ secrets.DEBUG_TOKEN }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: ".nvmrc"
       - name: Run eval cases against the live Worker
+        # The cron sends no inputs at all, so `mode` reads empty there — which is
+        # the run mode, and the reason this is written as "not record".
+        if: inputs.mode != 'record'
         env:
-          # Set vars.UNO_BOT_WORKER_URL to point evals at another deployment;
-          # the literal is the fallback and the single other copy of it lives in
-          # agents/uno-bot/scripts/worker-url.mjs (#288).
-          WORKER_URL: ${{ vars.UNO_BOT_WORKER_URL || 'https://uno-bot.plus-uno.workers.dev' }}
-          DEBUG_TOKEN: ${{ secrets.DEBUG_TOKEN }}
           GEMINI_SA_EMAIL: ${{ secrets.GEMINI_SA_EMAIL }}
           GEMINI_SA_PRIVATE_KEY: ${{ secrets.GEMINI_SA_PRIVATE_KEY }}
           GEMINI_PROJECT_ID: "hcii-plus"
-                    # Judge on the grind model, one tier above the bot. Same-model judging shares
+          # Judge on the grind model, one tier above the bot. Same-model judging shares
           # the bot's blind spots (self-preference); a judge should be at least as
           # strong as what it grades. Decided 2026-09-04.
           JUDGE_MODEL: "gemini-3.1-pro-preview"
         run: node agents/uno-bot/scripts/run-evals.mjs
       - name: Upload transcripts
-        if: always()
+        if: always() && inputs.mode != 'record'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: eval-results
           path: eval-results.json
+      - name: Record the suite into recordings
+        # WORKER_URL and DEBUG_TOKEN come from the job env above; no Gemini
+        # credential, because a capture records what the model said and scores
+        # nothing.
+        if: inputs.mode == 'record'
+        env:
+          # Through the environment, not interpolated into the script: an input
+          # is a string a human types and `${{ }}` in a `run:` body would splice
+          # it into the shell.
+          CASES: ${{ inputs.cases }}
+        run: |
+          args="--all"
+          if [ -n "$CASES" ]; then
+            args=""
+            for c in $CASES; do args="$args --case=$c"; done
+          fi
+          node agents/uno-bot/scripts/eval-record.mjs $args --out=eval-recordings
+      - name: Upload recordings
+        # `always()`, because a case whose subject condition the board does not
+        # satisfy is reported as a skip and the recordings the other cases DID
+        # produce are still worth having.
+        if: always() && inputs.mode == 'record'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: eval-recordings
+          path: eval-recordings/
