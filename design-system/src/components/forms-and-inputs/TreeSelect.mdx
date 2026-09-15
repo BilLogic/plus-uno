@@ -8,6 +8,16 @@ export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
   "sets": [
     {
+      "id": "tree-select",
+      "name": "_tree_select",
+      "componentSetNodeId": "13526:17500",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13526-17500",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": false,
+      "note": "The assembled tree select panel — a single COMPONENT, `_`-prefixed per the library's private convention. Owner named it canonical on 2026-09-15, with the two building-block sets below CONTAINED as instances (read via get_metadata that day; it still mixes tree_dropdown ver 1 and ver 3 parts internally). ⚠ The Figma design is NOT finalized — confirm with the owner before treating this mapping or the panel's visuals as final. tree_select_ver2 (13529:2016), mapped here until 2026-09-15, is not part of the canonical trio and was dropped."
+    },
+    {
       "id": "tree-dropdown-layers",
       "name": "tree_dropdown layers",
       "componentSetNodeId": "13529:1075",
@@ -15,17 +25,17 @@ export const figmaMeta = {
       "source": "manual",
       "status": "verified",
       "isComponentSet": true,
-      "note": "The indent layers a tree select is drawn from — 8 variants over open? and # of indents (0-3). Page-level and documented. The two sets under the page's Legacy section (tree_dropdown component ver 1, Indented Tree Select Item List) and the private _tree dropdown Indent are deliberately unmapped."
+      "note": "Building block: the indent layers a tree select row is drawn from — 8 variants over open? and # of indents (0-3). Instantiated inside _tree_select."
     },
     {
-      "id": "tree-select-ver2",
-      "name": "tree_select_ver2",
-      "componentSetNodeId": "13529:2016",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13529-2016",
+      "id": "indented-tree-select-item-list",
+      "name": "Indented Tree Select Item List",
+      "componentSetNodeId": "13520:70443",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13520-70443",
       "source": "manual",
       "status": "verified",
-      "isComponentSet": false,
-      "note": "The v2 tree select itself — a plain COMPONENT and not a set, which is what isComponentSet: false records. Resolved and typed against Figma on 2026-08-29."
+      "isComponentSet": true,
+      "note": "Building block: the indented item list — 9 variants over '# of items' (1-9), verified via get_metadata 2026-09-15. Instantiated inside _tree_select. The earlier note calling this set Legacy-and-deliberately-unmapped was wrong; the owner names it part of the canonical trio."
     }
   ]
 };

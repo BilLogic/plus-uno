@@ -43,16 +43,10 @@ const MIN_COMPARED = 90;
  * exemption.
  */
 const KNOWN = [
-  {
-    token: '--color-success-container',
-    figma: '#a1eb83',
-    css: '#bdf292',
-    why:
-      'Both sides are internally consistent — the CSS state layers are built from ' +
-      'rgba(189, 242, 146, …) and the Figma ones from #a1eb83 — so each looks right ' +
-      'alone and only the comparison shows the split. Success containers ship in ' +
-      'Badge, Alert and the lesson tables; whichever side moves, they move.',
-  },
+  // Empty since 2026-09-15: `--color-success-container` was resolved on the
+  // Figma side — the variable and its state layers now build from the CSS's
+  // #bdf292 (re-measured into the recording the same day). The entry left with
+  // the divergence, per the ratchet above.
 ];
 
 export const REMEDY =
