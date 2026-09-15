@@ -18,8 +18,15 @@
 // turn, from agent/run-agent.ts.
 
 import type { Env, SlackContext } from "../types";
-import { addReaction, postReviewRequest, warrantsReviewRequest } from "../slack/api";
+import { addReaction, postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
+import {
+  batchOutcomeNote,
+  batchResultMessage,
+  batchTelemetryLine,
+  runOperations,
+} from "../gate/index";
 import type { GateVerdict } from "../gate/index";
+import { proposalOperations } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { executeImplement } from "../tools/implement";
 import { executeImplementDesign } from "../tools/implement-design";
@@ -50,8 +57,12 @@ export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<vo
     verdict.decision === "confirm" ? "handshake" : "wave",
   );
 
+  const proposed = proposalOperations(pending).length;
   const run = verdict.execute;
   if (!run) {
+    console.log(
+      batchTelemetryLine({ proposalTs: pending.proposalTs, proposed, approved: 0, outcomes: [] }),
+    );
     await store.appendHistory(
       { channel: pending.channel, thread: pending.threadTs },
       {
@@ -62,48 +73,71 @@ export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<vo
     return;
   }
 
-  const result = await executeTool(env, run.toolName, run.input, {
-    channel: run.channel,
-    threadTs: run.threadTs,
-    userMsgTs: run.userMsgTs,
-    // Carry the PRD resolved at proposal time — it's not re-extractable here.
-    notionPrdId: run.notionPrdId,
-    notionPrdUrl: run.notionPrdUrl,
-  });
-  console.log(`[gate] ${run.toolName} executed: ${result}`);
+  // One ✅ approved the whole batch, so the whole batch runs — in order, past a
+  // failure, with an answer for each. `runOperations` owns that discipline; what
+  // this file adds is the only thing it cannot have: `Env`, and the side-effect
+  // tool table below.
+  const outcomes = await runOperations(run.operations, (operation) =>
+    executeTool(env, operation.toolName, operation.input, {
+      channel: run.channel,
+      threadTs: run.threadTs,
+      userMsgTs: run.userMsgTs,
+      // Carry the PRD resolved at proposal time — it's not re-extractable here.
+      notionPrdId: run.notionPrdId,
+      notionPrdUrl: run.notionPrdUrl,
+    }),
+  );
+
+  // Proposed, approved and executed as three separate numbers: the failure this
+  // ticket exists for is exactly the case where they disagree.
+  console.log(
+    batchTelemetryLine({
+      proposalTs: pending.proposalTs,
+      proposed,
+      approved: run.operations.length,
+      outcomes,
+    }),
+  );
+
   // Record the outcome (including any resulting URL) in thread history, so
   // later turns know what was actually done — e.g. the created PRD's Notion
   // link, so "delete that PRD" works and the bot never claims it created
-  // nothing when it did. No door records the executed result otherwise.
+  // nothing when it did. ONE note for the batch, naming every operation.
   await store.appendHistory(
     { channel: run.channel, thread: run.threadTs },
-    { role: "assistant", content: outcomeNote(run.toolName, result) },
+    { role: "assistant", content: batchOutcomeNote(outcomes) },
   );
+
+  // Say what ran. A batch's partial result is invisible otherwise: the person
+  // approved four things and the thread would show one tool's reply.
+  const resultMessage = batchResultMessage(outcomes);
+  if (resultMessage) {
+    // Under the verdict's own reply target, which the gate already worked out
+    // — the REAL message ts the card was posted with, never the conversation
+    // key (see `PendingProposal.replyTs` for the DM that swallowed a write).
+    await postMessage(env, {
+      channel: run.channel,
+      text: resultMessage,
+      ...(verdict.post?.replyTs ? { thread_ts: verdict.post.replyTs } : {}),
+    });
+  }
 
   // D5: announce a successful reviewable artifact to #plus-design (right place
   // + person + time). Best-effort — never let a fan-out failure break the flow.
-  if (warrantsReviewRequest(run.toolName) && isOkResult(result)) {
+  for (const outcome of outcomes) {
+    if (!warrantsReviewRequest(outcome.toolName) || !outcome.ok) continue;
     try {
       await postReviewRequest(env, {
-        toolName: run.toolName,
+        toolName: outcome.toolName,
         requesterUserId: run.requesterUserId,
         originChannel: run.channel,
-        artifactUrl: resultUrl(result),
+        artifactUrl: resultUrl(outcome.result),
       });
     } catch (err) {
       console.warn(
         `[gate] review-request fan-out failed: ${err instanceof Error ? err.message : String(err)}`,
       );
     }
-  }
-}
-
-/** True unless the executor explicitly reported ok:false. */
-function isOkResult(resultJson: string): boolean {
-  try {
-    return (JSON.parse(resultJson) as { ok?: boolean }).ok !== false;
-  } catch {
-    return false;
   }
 }
 
@@ -114,23 +148,6 @@ function resultUrl(resultJson: string): string | undefined {
     return r.url ?? r.pr_url ?? undefined;
   } catch {
     return undefined;
-  }
-}
-
-/** Human-readable history note for a confirmed tool execution. Surfaces the
- *  result message + any URL so the bot remembers what it did on later turns. */
-function outcomeNote(toolName: string, resultJson: string): string {
-  try {
-    const r = JSON.parse(resultJson) as {
-      ok?: boolean; message?: string; url?: string; error?: string; detail?: string;
-    };
-    if (r.ok === false) {
-      return `(${toolName} did NOT complete: ${r.error ?? r.detail ?? "unknown error"}. Nothing was created — do not claim success.)`;
-    }
-    const msg = r.message ?? `${toolName} completed.`;
-    return r.url ? `${msg} Notion link: ${r.url}` : msg;
-  } catch {
-    return `${toolName} completed.`;
   }
 }
 

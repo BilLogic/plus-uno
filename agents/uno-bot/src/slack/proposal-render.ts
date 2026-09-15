@@ -223,6 +223,57 @@ function humanizeParamKey(key: string): string {
     .replace(/^\w/, (c) => c.toUpperCase());
 }
 
+/**
+ * Splice the batch's operation list into a card that renders one operation's
+ * body — one line each, tool verb and target, in the order they will run.
+ *
+ * NEVER truncated. A card that shows three of four operations is the failure
+ * this exists to end: the person's ✅ is consent to what the card says, so the
+ * card says all of it. Grouping by page, kind labels and before/after belong to
+ * the next pass; a plain, complete list is what a ✅ needs first.
+ *
+ * It goes in ABOVE the confirm footer, so "react with ✅" stays the last thing
+ * read — which is the whole job of that footer.
+ */
+export function withOperationList(
+  cardText: string,
+  operations: ReadonlyArray<{ toolName: string; input: Record<string, unknown> }>,
+): string {
+  if (operations.length <= 1) return cardText;
+  const list = [
+    `:package: *This one ✅ runs ${operations.length} operations, in order:*`,
+    ...operations.map((op, i) => {
+      const target = operationTarget(op.input);
+      return `${i + 1}. ${proposalVerb(op.toolName)}${target ? ` — ${target}` : ""}`;
+    }),
+  ].join("\n");
+  const at = cardText.lastIndexOf(CONFIRM_FOOTER);
+  if (at === -1) return `${cardText}\n${list}`;
+  return `${cardText.slice(0, at)}${list}\n${cardText.slice(at)}`;
+}
+
+/** What an operation acts ON, in the words its input already uses: a page
+ *  title, a link, or the database it lands in. Absent rather than guessed — a
+ *  wrong target on a card is worse than none. */
+function operationTarget(input: Record<string, unknown>): string | null {
+  for (const key of [
+    "title",
+    "page_title",
+    "page_url",
+    "url",
+    "page",
+    "page_id",
+    "database",
+    "data_source",
+    "surface",
+    "component",
+  ]) {
+    const value = input[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return null;
+}
+
 export function proposalVerb(toolName: string): string {
   switch (toolName) {
     case "component_implement": return "implement this component";

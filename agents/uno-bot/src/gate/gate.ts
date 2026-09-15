@@ -27,7 +27,12 @@
 // `tsconfig.test.json` compiles it.
 
 import { mapReaction, typedEmojiDecision, type Decision } from "../slack/gate-reactions";
-import type { PendingProposal, ThreadState } from "../thread-state/index";
+import { proposalOperations } from "../thread-state/index";
+import type {
+  PendingProposal,
+  ProposalOperation,
+  ThreadState,
+} from "../thread-state/index";
 
 export type { Decision };
 
@@ -77,6 +82,11 @@ export type GateSignal =
 /** The confirmed tool, as the executor wants it. Self-contained on purpose: a
  *  door hands this straight to the executor rather than re-deriving it. */
 export interface GateExecution {
+  /** The whole approved batch, in order. One ✅ approved all of it, so the
+   *  executor runs all of it — there is no second card for operation two. */
+  operations: ProposalOperation[];
+  /** The FIRST operation, kept populated for one release so a reader that has
+   *  not moved to `operations` yet keeps working unchanged. */
   toolName: string;
   input: Record<string, unknown>;
   channel: string;
@@ -271,6 +281,7 @@ async function claim(
     ...(decision === "confirm"
       ? {
           execute: {
+            operations: proposalOperations(proposal),
             toolName: proposal.toolName,
             input: proposal.input,
             channel: proposal.channel,

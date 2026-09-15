@@ -387,6 +387,7 @@ test("text beside a side-effect call becomes the proposal preview, not narration
 
   assert.deepEqual(result, {
     kind: "proposal",
+    operations: [{ toolName: "notion_create", input: { title: "Reflection redesign" } }],
     toolName: "notion_create",
     input: { title: "Reflection redesign" },
     previewText: "I'll file a Roadmap card for the reflection redesign.",

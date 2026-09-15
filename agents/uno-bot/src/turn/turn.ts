@@ -48,12 +48,14 @@ import {
   formatNotionUpdateProposal,
   formatProposal,
   proposalVerb,
+  withOperationList,
 } from "../slack/proposal-render";
 import { renderDeliveredBody } from "../slack/render";
 import type { AssistantContext } from "../slack/types";
 import type { VisionReference } from "../slack/vision-reference";
 import {
   MAX_HISTORY_TURNS,
+  proposalOperations,
   type HistoryTurn,
   type PendingProposal,
   type ThreadRef,
@@ -676,10 +678,14 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // confirmation, so execute it through the same claim the reaction and button
   // paths use: no duplicate card, no bounce, and no vocabulary needed to guess
   // what "go ahead" means.
+  //
+  // The comparison is the WHOLE batch, not its first operation: a re-stage that
+  // agrees on operation one and differs on operation three is a different plan,
+  // and reading it as a confirmation would run the plan nobody saw.
   if (
     request.pending &&
-    request.pending.toolName === result.toolName &&
-    stableStringify(request.pending.input) === stableStringify(result.input)
+    stableStringify(proposalOperations(request.pending)) ===
+      stableStringify(result.operations)
   ) {
     console.log(
       `[gate] identical re-stage of ${result.toolName} while pending — treating as confirm`,
@@ -760,6 +766,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // ✅ that lands before the proposal is saved would look up nothing and be
   // silently lost. Save first so the confirmation always finds it.
   const proposal: PendingProposal = {
+    // The WHOLE batch, untruncated: what the card renders is a rendering, and
+    // what a later ✅ executes is this list.
+    operations: result.operations,
     toolName: result.toolName,
     input: result.input,
     channel: request.channel,
@@ -1086,12 +1095,27 @@ function implementPrdUrlFor(
 // ── Cards ────────────────────────────────────────────────────────────────────
 
 /**
- * The card body for one staged tool call.
- *
- * Which card a tool gets is the turn's decision; the two bodies that need a
- * Notion read and the one that needs a Figma render arrive as named clients.
+ * The card for one staged Proposal — the batch, as the person reads it before
+ * pressing ✅.
  */
 async function buildCard(
+  result: Extract<AgentResult, { kind: "proposal" }>,
+  request: TurnRequest,
+  deps: TurnDeps,
+  implementPrdUrl: string | undefined,
+): Promise<ProposalCard> {
+  // A batch gets the first operation's real body and then a line per operation,
+  // so a ✅ is never given to a card that shows one of four writes. Grouping by
+  // page, kind labels and before/after are the next ticket; listing every
+  // operation is the part that cannot wait.
+  const card = await buildFirstOperationCard(result, request, deps, implementPrdUrl);
+  return { ...card, text: withOperationList(card.text, result.operations) };
+}
+
+/** The card body for the batch's FIRST operation — which per-tool formatter it
+ *  gets is the turn's decision, and the two bodies that need a Notion read and
+ *  the one that needs a Figma render arrive as named clients. */
+async function buildFirstOperationCard(
   result: Extract<AgentResult, { kind: "proposal" }>,
   request: TurnRequest,
   deps: TurnDeps,

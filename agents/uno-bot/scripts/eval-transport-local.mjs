@@ -470,10 +470,13 @@ export function localTransport({
           // nobody runs twice.
           async applyVerdict(verdict) {
             if (!verdict.execute) return;
-            report.resolutions.push({
-              toolName: verdict.execute.toolName,
-              decision: verdict.decision ?? "confirm",
-            });
+            // Every operation of the batch, as the Worker adapter records them.
+            for (const operation of verdict.execute.operations) {
+              report.resolutions.push({
+                toolName: operation.toolName,
+                decision: verdict.decision ?? "confirm",
+              });
+            }
           },
 
           cards: {
