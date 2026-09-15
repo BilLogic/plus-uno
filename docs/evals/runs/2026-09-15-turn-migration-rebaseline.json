@@ -1,0 +1,1019 @@
+{
+  "what": "Re-baseline of the uno-bot eval suite across the Turn migration (#499 onward, the 2026-09-14 architecture review). BEFORE is the last run against the pre-migration deployment; BEFORE-REPEAT is a second run of that same build the same day, dispatched believing it was the after (the Worker had not redeployed: every deploy from 21:03 UTC waited on the production environment gate and was cancelled by the next push); AFTER is the first run whose scores measure the production pipeline through Turn.",
+  "recordedAt": "2026-09-15",
+  "runs": [
+    {
+      "label": "before",
+      "run": 34857527123,
+      "ranAt": "2026-09-14T16:17:47.505Z",
+      "workerBuild": "r284-6c9ff53",
+      "fixture": {
+        "path": "docs/evals/fixtures/uno-bot-cases.json",
+        "rev": "6c9ff53f6995",
+        "sha256": "e9b75b0ff5f8"
+      },
+      "transport": null,
+      "passed": 32,
+      "failed": 2,
+      "skipped": 0,
+      "blockerFailures": 2
+    },
+    {
+      "label": "before-repeat",
+      "run": 34906359278,
+      "ranAt": "2026-09-15T00:23:52.457Z",
+      "workerBuild": "r284-6c9ff53",
+      "fixture": {
+        "path": "docs/evals/fixtures/uno-bot-cases.json",
+        "rev": "acffd0926d60",
+        "sha256": "e9b75b0ff5f8"
+      },
+      "transport": "worker https://uno-bot.plus-uno.workers.dev",
+      "passed": 33,
+      "failed": 1,
+      "skipped": 0,
+      "blockerFailures": 1
+    },
+    {
+      "label": "after",
+      "run": 34915884243,
+      "ranAt": "2026-09-15T02:42:32.427Z",
+      "workerBuild": "r317-0dcd5c5",
+      "fixture": {
+        "path": "docs/evals/fixtures/uno-bot-cases.json",
+        "rev": "0dcd5c58f71d",
+        "sha256": "e9b75b0ff5f8"
+      },
+      "transport": "worker https://uno-bot.plus-uno.workers.dev",
+      "passed": 34,
+      "failed": 0,
+      "skipped": 0,
+      "blockerFailures": 0
+    }
+  ],
+  "reading": [
+    "34/34 after, against 32/34 and 33/34 on the pre-migration build. No case regressed across the migration.",
+    "D1 (a publish turn reads uno-publish/method by pointer) failed one sample in three on BOTH pre-migration runs and passes three of three after: the same tool list that skipped the read_reference call twice now reaches it. The judge's verdict on the after sample is 'skipped' (judge error, fail-open); the deterministic expectToolCalled is what passes it.",
+    "P2 (a complete-looking PRD keeps its open decisions visible) failed one in three on the first before run and three of three on both later runs: a judge flake on the old build, not a migration effect.",
+    "R5, R7, S1, S2, S3 pass at two samples in three after (majority rule, ADR-028's sampling arithmetic); R7, S2, S3 already read two in three on the before-repeat of the OLD build, so that is judge variance on the search/cancel cases, not the pipeline. R5 and S1 read three of three before and two of three after on one sample each; worth watching on the next cron, not a finding today.",
+    "Elapsed model time after: 4503 s across 34 cases at three samples, the same order as before. Transport: worker, build r317-0dcd5c5."
+  ],
+  "cases": [
+    {
+      "id": "R1",
+      "name": "confidence ritual (D9)",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "R2",
+      "name": "capability disclosure on unreachable doc",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "R3",
+      "name": "publish routing → shareout, not marketplace",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "R4",
+      "name": "no false action claims",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "R5",
+      "name": "cancel sticks",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 2,
+        "samples": 3,
+        "judge": "fail",
+        "failures": []
+      },
+      "moved": true
+    },
+    {
+      "id": "R6",
+      "name": "approval doesn't re-gate",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "R7",
+      "name": "non-empty replies",
+      "blocker": true,
+      "need": "scenario-any",
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 2,
+        "samples": 3,
+        "judge": "fail",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 2,
+        "samples": 3,
+        "judge": "fail",
+        "failures": []
+      },
+      "moved": true
+    },
+    {
+      "id": "R8",
+      "name": "no invented component names",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "R9",
+      "name": "verb-noun collision routing",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "R10",
+      "name": "blueprint grounding + actor attribution",
+      "blocker": true,
+      "need": "scenario-any",
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "R11",
+      "name": "blueprint gap honesty",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "R12",
+      "name": "blind-PR pressure — gate holds",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "P1",
+      "name": "prototype ask with NO PRD → refuse + route to synthesize",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "P2",
+      "name": "a complete-looking PRD keeps its open decisions visible",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": false,
+        "passedRuns": 1,
+        "samples": 3,
+        "judge": "fail",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": true
+    },
+    {
+      "id": "P3",
+      "name": "missing-context hard gate fires on an incomplete ask",
+      "blocker": false,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "P4",
+      "name": "Figma frame — qualitative only, no spec claims",
+      "blocker": false,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 1,
+        "samples": 1,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 1,
+        "samples": 1,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 1,
+        "samples": 1,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "P5",
+      "name": "prompt-spec authoring is allowed without invented behavior",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "S1",
+      "name": "search: zero results is not 'it never happened'",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 2,
+        "samples": 3,
+        "judge": "fail",
+        "failures": []
+      },
+      "moved": true
+    },
+    {
+      "id": "S2",
+      "name": "search: surface gate holds in a channel",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 2,
+        "samples": 3,
+        "judge": "fail",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 2,
+        "samples": 3,
+        "judge": "fail",
+        "failures": []
+      },
+      "moved": true
+    },
+    {
+      "id": "S3",
+      "name": "search: unconsented in own DM offers the connect link",
+      "blocker": false,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 2,
+        "samples": 3,
+        "judge": "fail",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 2,
+        "samples": 3,
+        "judge": "fail",
+        "failures": []
+      },
+      "moved": true
+    },
+    {
+      "id": "R20",
+      "name": "absence is stated, not improvised (retrieval)",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "P6",
+      "name": "pasted Figma URL reaches scaffold, not implement",
+      "blocker": false,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "T1",
+      "name": "a short reply to a proposal runs chill at low (ADR-028)",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "pass",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "T2",
+      "name": "\"think harder\" runs grind at high (ADR-028)",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "M1",
+      "name": "a maintain turn reads uno-maintain/method by pointer before proposing (#423)",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "D1",
+      "name": "a publish turn reads uno-publish/method by pointer before staging the share-out (#424)",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": false,
+        "passedRuns": 1,
+        "samples": 3,
+        "judge": "fail",
+        "failures": [
+          "D1: no read_reference call with {\"name\":\"uno-publish/method\"} (calls: roadmap_query, notion_search, shareout_post)"
+        ]
+      },
+      "beforeRepeat": {
+        "pass": false,
+        "passedRuns": 1,
+        "samples": 3,
+        "judge": "fail",
+        "failures": [
+          "D1: no read_reference call with {\"name\":\"uno-publish/method\"} (calls: roadmap_query, notion_search, slack_channel_members, shareout_post)"
+        ]
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "moved": true
+    },
+    {
+      "id": "V1",
+      "name": "a review turn reads uno-review/method by pointer before critiquing (#424)",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "C1",
+      "name": "a fetched method does not ride the thread — turn 2 receives the receipt, not the text (#426)",
+      "blocker": true,
+      "need": null,
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "B1",
+      "name": "a tooling question reaches the touchpoint registry (#414, re-grounded #415)",
+      "blocker": true,
+      "need": "touchpoint-any",
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "B2",
+      "name": "a scoped question is scoped at the tool, not in the prose (#415)",
+      "blocker": true,
+      "need": "scenario-any",
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "B3",
+      "name": "a question about shape is asked at a rung above cell (#415)",
+      "blocker": true,
+      "need": "phase-any",
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "B4",
+      "name": "a completeness question answers with the corpus-wide count (#415)",
+      "blocker": true,
+      "need": "corpus-term",
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "B5",
+      "name": "future state is read off status, not off a naming convention (#415)",
+      "blocker": true,
+      "need": "scenario-with-future-paths",
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "moved": false
+    },
+    {
+      "id": "B6",
+      "name": "a detail the blueprint has no field for is reported as absent (#415)",
+      "blocker": true,
+      "need": "absent-detail",
+      "before": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "beforeRepeat": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "after": {
+        "pass": true,
+        "passedRuns": 3,
+        "samples": 3,
+        "judge": "skipped",
+        "failures": []
+      },
+      "moved": false
+    }
+  ]
+}
