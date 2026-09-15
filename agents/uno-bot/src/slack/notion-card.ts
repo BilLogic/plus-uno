@@ -36,6 +36,9 @@ async function resolveNotionValueForDisplay(env: Env, raw: string): Promise<stri
   return out.join(", ") || raw.trim();
 }
 
+/** How much of a replacement's first line the card echoes. */
+const REPLACE_PREVIEW = 100;
+
 // A one-line note for an `append` (narrative) update, so the card doesn't drop it.
 function describeAppend(append: unknown): string | null {
   if (!append || typeof append !== "object") return null;
@@ -46,6 +49,21 @@ function describeAppend(append: unknown): string | null {
   if (headings.length) return `• *Appending:* ${headings.map((h) => `_${h}_`).join(", ")}`;
   if (typeof o.text === "string" && o.text.trim()) return `• *Appending a note to the page.*`;
   return null;
+}
+
+/**
+ * A one-line note for a `replace` (in-place rewrite), so the ✅ is never given
+ * blind to the one operation that changes text a human already wrote.
+ */
+function describeReplace(replace: unknown): string | null {
+  if (!Array.isArray(replace)) return null;
+  const ops = replace.filter((o) => o && typeof o === "object") as Record<string, unknown>[];
+  if (!ops.length) return null;
+  const preview = ops
+    .map((o) => String(o.content ?? "").trim().split("\n")[0]?.slice(0, REPLACE_PREVIEW) ?? "")
+    .filter(Boolean);
+  const head = `• *Rewriting ${ops.length} block(s) in place* (the rest of the page is untouched).`;
+  return preview.length ? `${head}\n${preview.map((t) => `    ↳ _${t}_`).join("\n")}` : head;
 }
 
 /**
@@ -88,6 +106,9 @@ export async function buildNotionUpdateBody(
         : `• *${label}:* \`${newDisplay}\``,
     );
   }
+
+  const replaceNote = describeReplace(input.replace);
+  if (replaceNote) lines.push(replaceNote);
 
   const appendNote = describeAppend(input.append);
   if (appendNote) lines.push(appendNote);

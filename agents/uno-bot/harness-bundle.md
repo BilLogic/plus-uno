@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **161,995 chars from 16 files**, against an assembled budget of 170,000 (8,005 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 141,611 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **163,895 chars from 16 files**, against an assembled budget of 170,000 (6,105 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 143,511 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,603 (−7,277 ide-only) | 9,603 | 20,000 (constitution) |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 12,647 | 22,278 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,415 | 48,734 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,036 | 54,814 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 61,858 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 68,571 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 73,858 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 80,561 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 86,963 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 88,934 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 12,923 (−4,814 ide-only) | 101,900 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,946 | 115,888 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 119,136 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 149,723 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 154,312 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,635 (−605 ide-only) | 161,995 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,970 | 49,289 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 55,682 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 62,726 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 69,439 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 74,726 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 81,429 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 87,831 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 89,802 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 103,800 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 13,946 | 117,788 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 121,036 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 151,623 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 156,212 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,635 (−605 ide-only) | 163,895 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -294,6 +294,8 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 **Gate list.** ✅-gated — a staged proposal, held for confirmation: `notion_create` · `notion_update` · `notion_archive` · `component_implement` · `prototype_scaffold` · `shareout_post` · `email_send`. Direct, ungated: `slack_react`. Read, ungated: every other tool, plus the web search the loop provides. `proposal_resolve` completes a staged card.
 
+**Correct in place, at the block.** A Notion body is no longer append-only: when the ask is to fix what a page already says, `notion_update`'s `replace` rewrites that block where it stands — cite the block id and the `edited` stamp from the page read that showed it to you. Appending the correction instead leaves the page asserting both things. The write refuses itself if the block changed since your read; re-read and re-propose rather than arguing with it. `append` is still right for something the page doesn't say yet, and nothing deletes a block.
+
 **Collision traps (each has bitten live):**
 - A pasted Figma URL → `prototype_scaffold`; `component_implement` takes a component name, so a Figma URL is a scaffold ask.
 - "*surface* this PRD for review" → `shareout_post`; that verb is Slack's, not the Surface component's.
@@ -412,7 +414,7 @@ Across every step: persona, `AGENTS.md` and bot-face edits steer every session, 
 
 ## `notion_update` governance
 
-Works on any page or DB the bot is shared on — Roadmap cards, Decisions DB rows, running notes — with safety in the ✅ gate and exact-match selects rather than a parent-DB fence. Allowed: property changes that exact-match an existing select or status option, appended progress notes, updated decision Status/Evidence. Options, pillars and OKRs come from the page as it is; a missing or renamed option is reported and the write stops. A new durable decision is a ✅-gated `notion_create` with surface `decision` (Roadmap Card + Evidence). A `Design Status` move to `Ready for Design` belongs to the accepted-PRD paired write (uno-synthesize / the IDE); other status moves ("move my card to WIP") are a gated `notion_update` when the option already exists.
+Works on any page or DB the bot is shared on — Roadmap cards, Decisions DB rows, running notes — with safety in the ✅ gate and exact-match selects rather than a parent-DB fence. Allowed: property changes that exact-match an existing select or status option, appended progress notes, updated decision Status/Evidence, and an in-place rewrite of a named block (`replace`, ADR-029) — cite the block id and the `edited` stamp the page read reported, and expect a refusal rather than a write if the block moved since. Correcting what a page says is a `replace`; adding what it doesn't say yet is an `append`. No block is ever deleted. Options, pillars and OKRs come from the page as it is; a missing or renamed option is reported and the write stops. A new durable decision is a ✅-gated `notion_create` with surface `decision` (Roadmap Card + Evidence). A `Design Status` move to `Ready for Design` belongs to the accepted-PRD paired write (uno-synthesize / the IDE); other status moves ("move my card to WIP") are a gated `notion_update` when the option already exists.
 
 ## Output — the review-request post
 
@@ -754,7 +756,11 @@ Create/maintain `[replica]` frames on publish; keep `[spec]` frames library-pure
 
 ## Write surfaces
 
-uno can update properties and append content on **any page or database it's shared on** (Roadmap cards, Decisions DB rows, per-person running-notes pages, any DB) via `notion_update` / `notion_archive` — always behind the requester's ✅. `notion_update` reads the target's live schema and writes each property by its real type (status, select, multi_select, date, people, relation, number, checkbox, url, text…), matching your property name case/space/underscore-insensitively — so there's no hardcoded surface fence and no need to guess a type. It still never invents a select/status option: a value that isn't an existing option is reported back, not created.
+uno can update properties, append content, and rewrite a named block **in place** on **any page or database it's shared on** (Roadmap cards, Decisions DB rows, per-person running-notes pages, any DB) via `notion_update` / `notion_archive` — always behind the requester's ✅. `notion_update` reads the target's live schema and writes each property by its real type (status, select, multi_select, date, people, relation, number, checkbox, url, text…), matching your property name case/space/underscore-insensitively — so there's no hardcoded surface fence and no need to guess a type. It still never invents a select/status option: a value that isn't an existing option is reported back, not created.
+
+**Bodies are no longer append-only** (ADR-029, 2026-09-15). `notion_update` takes a `replace` operation: a block id and the `last_edited_time` that the page read reported for that block, plus the new content in the same Markdown shape as an `append`. The write re-reads the block first and **refuses, without writing, when the stamp has moved** — the replacement was composed against text that no longer exists, so the answer is "read it again", not "overwrite it". A replacement that renders to several blocks rewrites the first where it stands and places the rest directly after it. Everything outside the named blocks is untouched, **nothing is ever deleted**, and the ✅ gate still stands in front of all of it — the proposal card names how many blocks a replace would rewrite.
+
+Use `replace` when the ask is to *correct* what the page says and `append` when it is to *add* something the page doesn't say yet. Appending a correction is what leaves a page holding two contradictory readings.
 
 **Still OUT of scope from Slack** (no Notion-API path, or too structural for a one-shot gated write) — creating a **database**, creating or editing a **view** (the API can't make views at all), creating select options / pillars / OKRs, and any **blueprint** write. Those become a maintenance intake ticket (✅-gated `notion_create`) or an `uno-maintain` IDE handoff — offer that, don't attempt it inline.
 

@@ -1,12 +1,21 @@
-// notion_update executor — change properties and/or append narrative on an
-// existing Notion card. Side effect → routed through the ✅ gate. Property writes
+// notion_update executor — change properties, append narrative, and/or rewrite
+// a named block in place on an existing Notion card. Side effect → routed
+// through the ✅ gate. A replace names one block id and the `last_edited_time`
+// the read reported; the integration refuses it, unwritten, when the block has
+// moved since (ADR-029). Nothing is ever deleted. Property writes
 // are limited to a known set (see notionUpdate) so we never guess a property's
 // type or trip the silent select auto-create; unknown props are reported back.
 
 import type { Env } from "../types";
 import type { SlackContext } from "../types";
 import { postMessage } from "../slack/api";
-import { notionUpdate, normalizeName, parseNotionPageId, type PrdSection } from "../integrations/notion";
+import {
+  notionUpdate,
+  normalizeName,
+  parseNotionPageId,
+  type NotionBlockReplacement,
+  type PrdSection,
+} from "../integrations/notion";
 
 function asString(v: unknown): string {
   return typeof v === "string" ? v.trim() : "";
@@ -46,6 +55,29 @@ function parseAppend(v: unknown): { sections?: PrdSection[]; text?: string } | u
   return { sections, text };
 }
 
+/**
+ * `replace` as the model writes it — snake_case block id and stamp, matching
+ * the marker a page read handed it — into the integration's shape.
+ *
+ * An operation missing either half is dropped here rather than sent on: the
+ * stamp is the only thing standing between a rewrite and a human's unseen
+ * edit, so "no stamp" can never mean "write anyway".
+ */
+function parseReplace(v: unknown): NotionBlockReplacement[] | undefined {
+  if (!Array.isArray(v)) return undefined;
+  const ops = v
+    .map((entry) => {
+      const o = (entry ?? {}) as Record<string, unknown>;
+      return {
+        blockId: asString(o.block_id) || asString(o.blockId),
+        lastEditedTime: asString(o.last_edited_time) || asString(o.lastEditedTime),
+        content: asString(o.content),
+      };
+    })
+    .filter((o) => o.blockId && o.lastEditedTime && o.content);
+  return ops.length ? ops : undefined;
+}
+
 export async function executeNotionUpdate(
   env: Env,
   input: Record<string, unknown>,
@@ -66,28 +98,37 @@ export async function executeNotionUpdate(
         )
       : undefined;
   const append = parseAppend(input.append);
+  const replace = parseReplace(input.replace);
 
-  if ((!properties || !Object.keys(properties).length) && !append) {
-    return JSON.stringify({ ok: false, error: "nothing to update — provide 'properties' and/or 'append'" });
+  if ((!properties || !Object.keys(properties).length) && !append && !replace) {
+    return JSON.stringify({
+      ok: false,
+      error:
+        "nothing to update — provide 'properties', 'append' and/or 'replace' (a replace needs block_id, last_edited_time and content)",
+    });
   }
 
   try {
-    const r = await notionUpdate(env, pageId, { properties, append });
+    const r = await notionUpdate(env, pageId, { properties, append, replace });
     const parts: string[] = [];
     // Name each concrete change with its NEW value codified, e.g.
     // "set *Dev Status* → `Ready for Dev`" — not a bare property name (2026-07-14).
     if (r.updated.length) parts.push(`set ${r.updated.map((u) => echoUpdatedField(u, properties)).join(", ")}`);
+    if (r.replaced) parts.push(`replaced ${r.replaced} block(s)`);
     if (r.appended) parts.push(`appended ${r.appended} block(s)`);
     const skippedNote = r.skipped.length ? ` — couldn't set: ${r.skipped.join("; ")}` : "";
+    // A refused replace is NOT a quiet no-op: the page still says what it said,
+    // and the person who asked for the correction has to hear that.
+    const refusedNote = r.refused.length ? ` — refused: ${r.refused.join("; ")}` : "";
 
     // Nothing landed (every requested property was skipped): report a FAILURE,
     // never a quiet "no changes" — so the bot doesn't claim a move it didn't make
     // (live 2026-07-13: "Dev_Status" was skipped and the run read as done).
-    if (!r.updated.length && !r.appended) {
+    if (!r.updated.length && !r.appended && !r.replaced) {
       await postMessage(env, {
         channel: slack.channel,
         thread_ts: slack.threadTs,
-        text: `:warning: I couldn't change the Notion page${skippedNote || " — nothing to update"}.`,
+        text: `:warning: I couldn't change the Notion page${skippedNote}${refusedNote}${skippedNote || refusedNote ? "" : " — nothing to update"}.`,
       });
       return JSON.stringify({ ok: false, status: "no_changes", ...r });
     }
@@ -95,7 +136,7 @@ export async function executeNotionUpdate(
     await postMessage(env, {
       channel: slack.channel,
       thread_ts: slack.threadTs,
-      text: `:pencil2: Updated the Notion page — ${parts.join("; ")}${skippedNote}.`,
+      text: `:pencil2: Updated the Notion page — ${parts.join("; ")}${skippedNote}${refusedNote}.`,
     });
     return JSON.stringify({ ok: true, status: "updated", ...r });
   } catch (err) {

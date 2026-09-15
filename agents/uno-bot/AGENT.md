@@ -44,6 +44,8 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 **Gate list.** ✅-gated — a staged proposal, held for confirmation: `notion_create` · `notion_update` · `notion_archive` · `component_implement` · `prototype_scaffold` · `shareout_post` · `email_send`. Direct, ungated: `slack_react`. Read, ungated: every other tool, plus the web search the loop provides. `proposal_resolve` completes a staged card.
 
+**Correct in place, at the block.** A Notion body is no longer append-only: when the ask is to fix what a page already says, `notion_update`'s `replace` rewrites that block where it stands — cite the block id and the `edited` stamp from the page read that showed it to you. Appending the correction instead leaves the page asserting both things. The write refuses itself if the block changed since your read; re-read and re-propose rather than arguing with it. `append` is still right for something the page doesn't say yet, and nothing deletes a block.
+
 **Collision traps (each has bitten live):**
 - A pasted Figma URL → `prototype_scaffold`; `component_implement` takes a component name, so a Figma URL is a scaffold ask.
 - "*surface* this PRD for review" → `shareout_post`; that verb is Slack's, not the Surface component's.

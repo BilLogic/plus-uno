@@ -22,6 +22,9 @@ import { isWithheldRepoPath, WITHHELD_NOTE } from "../integrations/repo-read-gua
 
 const GENERIC_TIMEOUT_MS = 8000;
 const GENERIC_TEXT_CAP = 8000;
+/** How much of a block's text the index echoes. Enough to recognise which
+ *  block is which; the full text is already in `content`. */
+const BLOCK_INDEX_PREVIEW = 120;
 
 
 function firstUrl(input: unknown): string | null {
@@ -111,7 +114,14 @@ export async function executeReadSource(
         properties: page.properties,
         people: page.people,
         content: page.text,
-        note: "Answer from THIS page's content/properties and cite it. If asked who owns/reviews it, use the people/Owner property here — do not guess from roles or LinkedIn.",
+        // The block index rides BESIDE the prose, never inside it. Threading
+        // "[block:… · edited …]" through `content` would put markers into the
+        // text the bot quotes back into Slack; a trailing index keeps the page
+        // readable and still gives every line an id to cite.
+        blocks: page.blocks.map(
+          (b) => `${b.id} · ${b.type} · edited ${b.lastEditedTime} · ${b.text.slice(0, BLOCK_INDEX_PREVIEW)}`,
+        ),
+        note: "Answer from THIS page's content/properties and cite it. If asked who owns/reviews it, use the people/Owner property here — do not guess from roles or LinkedIn. `blocks` lists this page's body blocks in order as `id · type · edited <stamp> · text`; to correct one in place pass its id and that exact stamp to notion_update's `replace` (✅-gated) rather than appending a contradicting section.",
       });
     }
 
