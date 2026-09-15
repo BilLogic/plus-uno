@@ -41,6 +41,10 @@ export function classify(figmaName) {
   if (parts.length !== 2) return null;
   const group = parts[0].replace(/^_/, '');
   if (group === 'Proposal') return null; // candidates are not the library yet
+  // Focus Ring is a focus indicator, not an intent: no (Text)/Container/On
+  // peers, and its STROKE_COLOR-only scope is the point (WCAG 2.4.11, #368).
+  // Left unclassified so the intent-base convention is not asked of it.
+  if (group === 'Focus') return null;
   const leaf = parts[1].trim();
 
   // The stray neutral filed under _Advocacy is not an Advocacy role.

@@ -79,7 +79,8 @@
     max-width: 360px;
     max-height: 320px;
     overflow-y: auto;
-    background-color: var(--color-surface-container-high);
+    // Figma _tree_select (13526:17500) panel ground is Neutral Colors/surface.
+    background-color: var(--color-surface);
     border: var(--size-element-stroke-md) solid var(--color-outline-variant);
     border-radius: var(--size-element-radius-sm, 4px);
     box-shadow: var(--elevation-light-2);

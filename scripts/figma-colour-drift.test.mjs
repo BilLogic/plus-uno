@@ -59,8 +59,8 @@ test('the repository is in the state the check records', () => {
   assert.equal(result.unreadable.length, 0);
   assert.deepEqual(
     result.divergences.map((d) => d.token).sort(),
-    ['--color-success-container'],
-    'scrim was resolved to the M3 0.32; success-container is the one Bill still owns',
+    [],
+    'scrim went to the M3 0.32 in CSS; success-container went to #bdf292 in Figma (2026-09-15)',
   );
 });
 

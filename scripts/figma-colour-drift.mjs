@@ -11,11 +11,13 @@
  *
  *   --color-success-container   #bdf292 in _colors.scss,  #a1eb83 in Figma
  *
- * Both sides are internally consistent — the CSS state layers are built from
- * `rgba(189, 242, 146, …)` and the Figma ones from `#a1eb83` — so each looks
- * correct on its own, and only the comparison shows the split. Which side is
- * right is a decision, not a repair: changing either moves a colour that ships.
- * It is recorded as a KNOWN divergence with that reasoning, and the count of
+ * Both sides were internally consistent — the CSS state layers built from
+ * `rgba(189, 242, 146, …)` and the Figma ones from `#a1eb83` — so each looked
+ * correct on its own, and only the comparison showed the split. Which side was
+ * right was a decision, not a repair: changing either moves a colour that
+ * ships. It sat as a KNOWN divergence until 2026-09-15, when the owner chose
+ * #bdf292 and the live library turned out to already hold it — variable and
+ * state layers both, re-measured into the recording that day. The count of
  * divergences is a ratchet.
  *
  * WHY THE MAPPING RUNS FIGMA -> CSS. Figma is the source, and the CSS is
