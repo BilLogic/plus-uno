@@ -19,6 +19,7 @@ import {
   markdownToNotionBlocks,
   parseInline,
   MAX_BLOCKS_PER_REQUEST,
+  type NotionBlock,
 } from "./notion-blocks";
 
 const NOTION_API = "https://api.notion.com/v1";
@@ -540,6 +541,24 @@ export interface NotionPageContent {
   people: Record<string, string[]>;
   /** Flattened block text. */
   text: string;
+  /**
+   * The same blocks `text` was rendered from, each keeping the identity a
+   * later in-place replacement needs: its id and the `last_edited_time` seen
+   * at THIS read. A replace cites both, and the write refuses when the stamp
+   * has moved — so the body is never overwritten on top of an edit the bot
+   * never saw (ADR-029). Same order as `text`, one entry per rendered line.
+   */
+  blocks: NotionPageBlock[];
+}
+
+export interface NotionPageBlock {
+  id: string;
+  /** Notion's own block type: paragraph, heading_2, bulleted_list_item, … */
+  type: string;
+  /** ISO-8601, as Notion reports it. The token a replace has to match. */
+  lastEditedTime: string;
+  /** The block's rendered text — the line it contributed to `text`. */
+  text: string;
 }
 
 interface NotionProperty {
@@ -624,6 +643,7 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
 
     // Block text — paginate a few pages of top-level children.
     const lines: string[] = [];
+    const blocks: NotionPageBlock[] = [];
     let cursor: string | undefined;
     for (let i = 0; i < READ_BLOCK_PAGES; i++) {
       if (subrequestBudgetSpent()) break; // keep the blocks already read
@@ -636,13 +656,29 @@ export async function readNotionPage(env: Env, pageId: string): Promise<NotionPa
       };
       for (const block of bData.results ?? []) {
         const line = blockText(block);
-        if (line) lines.push(line);
+        if (!line) continue;
+        lines.push(line);
+        // Identity travels with the text, not beside it: the model can only
+        // cite a block it was told the id of, and it can only be told here.
+        blocks.push({
+          id: String(block.id ?? ""),
+          type: String(block.type ?? ""),
+          lastEditedTime: String(block.last_edited_time ?? ""),
+          text: line.trim(),
+        });
       }
       if (!bData.has_more || !bData.next_cursor) break;
       cursor = bData.next_cursor;
     }
 
-    const result: NotionPageContent = { id: pageId, title, properties, people, text: lines.join("\n").slice(0, READ_TEXT_CAP) };
+    const result: NotionPageContent = {
+      id: pageId,
+      title,
+      properties,
+      people,
+      text: lines.join("\n").slice(0, READ_TEXT_CAP),
+      blocks,
+    };
     // Cache only successful reads (never a throw). Clear when full — a long-lived
     // isolate shouldn't grow this unbounded; simple beats an LRU here.
     if (readCache.size >= READ_CACHE_MAX) readCache.clear();
@@ -1024,6 +1060,23 @@ function formatPropByType(prop: NotionSchemaProp, raw: string): { value?: unknow
 export interface NotionUpdateInput {
   properties?: Record<string, string>;
   append?: { sections?: PrdSection[]; text?: string };
+  /** In-place rewrites, each keyed to a block id + the stamp seen at read. */
+  replace?: NotionBlockReplacement[];
+}
+
+/**
+ * One block, rewritten where it stands.
+ *
+ * `lastEditedTime` is the whole safety: it is the stamp the read handed over,
+ * and the write compares it against the block's live one first. A body that
+ * moved between the read and the ✅ is left alone and reported, because the
+ * replacement was composed against text that no longer exists.
+ */
+export interface NotionBlockReplacement {
+  blockId: string;
+  lastEditedTime: string;
+  /** Markdown, the same authoring shape as an `append` section body. */
+  content: string;
 }
 
 export interface NotionUpdateResult {
@@ -1031,6 +1084,10 @@ export interface NotionUpdateResult {
   updated: string[];
   skipped: string[];
   appended: number;
+  /** Blocks rewritten in place. */
+  replaced: number;
+  /** Replacements that wrote NOTHING, each saying which block and why. */
+  refused: string[];
 }
 
 // Fetch a page's title + its PARENT DATABASE property schema (real names, types,
@@ -1199,6 +1256,124 @@ export async function describeNotionTarget(
   }
 }
 
+/** A block id, shortened for a message a human reads. Full uuids in a Slack
+ *  line are noise; the first segment is enough to point at one. */
+function shortBlockId(id: string): string {
+  return id.replace(/-/g, "").slice(0, 8);
+}
+
+/**
+ * Notion's block update takes ONE block's own payload — it cannot create
+ * children. A replacement that renders to a table, or to a list item with a
+ * nested child, therefore has no honest in-place write, and quietly dropping
+ * the children would be the silent corruption this feature exists to avoid.
+ */
+function carriesChildren(block: NotionBlock): boolean {
+  const payload = block[block.type] as { children?: unknown[] } | undefined;
+  return Array.isArray(payload?.children) && payload.children.length > 0;
+}
+
+/**
+ * Rewrite ONE block in place, after checking it is still the block that was
+ * read. Returns how many blocks landed, plus a refusal line when something
+ * did not.
+ *
+ * The GET is not an optimisation — it IS the check. `last_edited_time` is the
+ * only thing Notion gives us that moves when a human edits the block, and the
+ * API has no conditional write, so the compare has to happen here.
+ *
+ * A replacement that renders to SEVERAL blocks updates the first where it
+ * stands and appends the rest immediately after it, via the parent's children
+ * endpoint with `after` — so the page keeps its order. Nothing is ever
+ * deleted: the bot has no path to remove a block a human wrote.
+ */
+async function replaceBlock(
+  env: Env,
+  op: NotionBlockReplacement,
+  headers: Record<string, string>,
+  signal: AbortSignal,
+): Promise<{ replaced: number; refusal?: string }> {
+  const label = shortBlockId(op.blockId);
+  const rendered = markdownToNotionBlocks(op.content);
+  if (!rendered.length) {
+    return { replaced: 0, refusal: `${label} (the replacement content is empty)` };
+  }
+  const first = rendered[0]!;
+  if (carriesChildren(first)) {
+    return {
+      replaced: 0,
+      refusal: `${label} (a replacement starting with a table or a nested list can't be written in place — append it instead)`,
+    };
+  }
+
+  const getRes = await countedFetch(`${NOTION_API}/blocks/${op.blockId}`, { headers, signal });
+  const live = (await getRes.json().catch(() => ({}))) as {
+    id?: string; last_edited_time?: string; message?: string; code?: string;
+    parent?: { type?: string; page_id?: string; block_id?: string };
+  };
+  if (!getRes.ok || !live.id) {
+    throw notionError(getRes.status, live, `block ${label} not found`);
+  }
+  const seen = op.lastEditedTime.trim();
+  const now = live.last_edited_time ?? "";
+  // String compare, not date compare: Notion round-trips its own stamp, so a
+  // difference in the text IS a difference in the block — and a stamp we
+  // cannot parse has to fail closed rather than quietly compare equal.
+  if (!seen || seen !== now) {
+    return {
+      replaced: 0,
+      refusal: `${label} changed since read (read ${seen || "no stamp cited"}, now ${now || "unknown"})`,
+    };
+  }
+
+  const res = await countedFetch(`${NOTION_API}/blocks/${op.blockId}`, {
+    method: "PATCH",
+    headers,
+    body: JSON.stringify({ [first.type]: first[first.type] }),
+    signal,
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { message?: string };
+    throw notionError(res.status, err, `block ${label} update failed`);
+  }
+
+  const rest = rendered.slice(1);
+  if (!rest.length) return { replaced: 1 };
+
+  const parentId = live.parent?.page_id ?? live.parent?.block_id;
+  if (!parentId) {
+    // The first block landed; say that, rather than claim the whole rewrite.
+    return {
+      replaced: 1,
+      refusal: `${label} (rewritten, but the remaining ${rest.length} block(s) had nowhere to go — the block reports no parent)`,
+    };
+  }
+  let placed = 0;
+  let after = op.blockId;
+  for (const batch of chunkBlocks(rest, MAX_BLOCKS_PER_REQUEST)) {
+    const followRes = await countedFetch(`${NOTION_API}/blocks/${parentId}/children`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({ children: batch, after }),
+      signal,
+    });
+    if (!followRes.ok) {
+      const err = (await followRes.json().catch(() => ({}))) as { message?: string };
+      return {
+        replaced: 1 + placed,
+        refusal: `${label} (rewritten, but ${rest.length - placed} follow-on block(s) didn't land: ${err.message ?? followRes.status})`,
+      };
+    }
+    const body = (await followRes.json().catch(() => ({}))) as { results?: { id?: string }[] };
+    // Chain the next batch onto the LAST block just written. Anchoring every
+    // batch to the original block would land them in reverse order.
+    const lastId = body.results?.at(-1)?.id;
+    if (lastId) after = lastId;
+    placed += batch.length;
+  }
+  return { replaced: 1 + placed };
+}
+
 export async function notionUpdate(
   env: Env,
   pageId: string,
@@ -1208,7 +1383,9 @@ export async function notionUpdate(
   const headers = notionHeaders(env, { write: true });
   const updated: string[] = [];
   const skipped: string[] = [];
+  const refused: string[] = [];
   let appended = 0;
+  let replaced = 0;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -1249,7 +1426,21 @@ export async function notionUpdate(
       }
     }
 
-    // 2) Narrative append.
+    // 2) In-place rewrites. Before the append, so a turn that both corrects a
+    //    stale section and adds a note leaves the correction above the note.
+    for (const op of input.replace ?? []) {
+      if (!op?.blockId?.trim() || !op.content?.trim()) {
+        refused.push(
+          `${op?.blockId ? shortBlockId(op.blockId) : "(no block id)"} (a replace needs a block id and content)`,
+        );
+        continue;
+      }
+      const r = await replaceBlock(env, op, headers, controller.signal);
+      replaced += r.replaced;
+      if (r.refusal) refused.push(r.refusal);
+    }
+
+    // 3) Narrative append.
     const children: unknown[] = [];
     for (const s of input.append?.sections ?? []) {
       if (!s?.heading?.trim()) continue;
@@ -1281,9 +1472,9 @@ export async function notionUpdate(
     }
 
     // Drop any cached read so the next read reflects this write, not a stale copy.
-    if (updated.length || appended) evictReadCache(pageId);
+    if (updated.length || appended || replaced) evictReadCache(pageId);
 
-    return { id: pageId, updated, skipped, appended };
+    return { id: pageId, updated, skipped, appended, replaced, refused };
   } finally {
     clearTimeout(timer);
   }

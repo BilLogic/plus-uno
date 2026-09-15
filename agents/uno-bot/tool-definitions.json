@@ -349,7 +349,7 @@
   },
   {
     "name": "notion_update",
-    "description": "SIDE EFFECT, routed through the confirmation gate. Update an existing Notion page or card. Use it for 'update / append to this card' and for property changes ('set Dev Status to…', 'assign Max'). Works on ANY page or database the bot is shared on — Roadmap cards, Decisions DB rows, per-person running-notes pages, any DB. Two uses, combinable: (1) change PROPERTIES via `properties` — the tool reads the page's live database schema, matches your property name case/space/underscore-insensitively and writes by the real type, so 'Dev Status', a Date, a Person, a URL, a number and a checkbox all work; a select/status value that is not an existing option is reported back rather than created. (2) append narrative blocks via `append` — append only; a human-owned body stays intact. Pass the page URL. For notion_update the Worker renders the linked card and a current → new diff itself, so the preview is just the warm lead.",
+    "description": "SIDE EFFECT, routed through the confirmation gate. Update an existing Notion page or card. Use it for 'update / append to this card', for 'fix / correct / rewrite that section', and for property changes ('set Dev Status to…', 'assign Max'). Works on ANY page or database the bot is shared on — Roadmap cards, Decisions DB rows, per-person running-notes pages, any DB. Three uses, combinable: (1) change PROPERTIES via `properties` — the tool reads the page's live database schema, matches your property name case/space/underscore-insensitively and writes by the real type, so 'Dev Status', a Date, a Person, a URL, a number and a checkbox all work; a select/status value that is not an existing option is reported back rather than created. (2) append narrative blocks via `append` — added at the end of the body. (3) rewrite a block WHERE IT STANDS via `replace` — cite the block id and the exact `edited` stamp from this page's `blocks` index in a source_read, and the tool refuses the write, unchanged, if the block moved since you read it. Prefer `replace` when the ask is to correct something the page already says: appending a contradicting section leaves both readings on the page. Nothing is ever deleted, and everything outside the named blocks is untouched. Pass the page URL. For notion_update the Worker renders the linked card and a current → new diff itself, so the preview is just the warm lead.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -369,7 +369,7 @@
         "append": {
           "type": "object",
           "additionalProperties": false,
-          "description": "Narrative blocks to append to the end of the page body. Markdown renders: **bold**, _italic_, `code`, - bullets, 1. numbered, [label](url) links, > quotes, ```fenced code```, --- dividers, and - [ ] checkboxes. Headings inside a body render one level below the section heading. Separate paragraphs with a blank line.",
+          "description": "Narrative blocks to append to the END of the page body — use for something the page doesn't say yet; to correct something it already says, use `replace`. Markdown renders: **bold**, _italic_, `code`, - bullets, 1. numbered, [label](url) links, > quotes, ```fenced code```, --- dividers, and - [ ] checkboxes. Headings inside a body render one level below the section heading. Separate paragraphs with a blank line.",
           "properties": {
             "sections": {
               "type": "array",
@@ -394,6 +394,33 @@
             "text": {
               "type": "string",
               "description": "A single block of text to append (use when no heading is needed, e.g. a dated progress pulse). Markdown renders: **bold**, _italic_, `code`, - bullets, 1. numbered, [label](url) links, > quotes, ```fenced code```, --- dividers, and - [ ] checkboxes. Headings inside a body render one level below the section heading. Separate paragraphs with a blank line."
+            }
+          }
+        },
+        "replace": {
+          "type": "array",
+          "description": "In-place rewrites, one entry per block. Each needs the block's id and the exact `edited` stamp that the page read reported for it (source_read returns a `blocks` index of `id · type · edited <stamp> · text`) — never a stamp you guessed or carried over from a different read. If the block has changed since that read the tool writes nothing and says so, because your replacement was composed against text that no longer exists; read the page again and re-propose. A replacement that renders to several blocks rewrites the first in place and puts the rest directly after it. No block is ever deleted.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "block_id",
+              "last_edited_time",
+              "content"
+            ],
+            "properties": {
+              "block_id": {
+                "type": "string",
+                "description": "The block's Notion id, exactly as the page read reported it."
+              },
+              "last_edited_time": {
+                "type": "string",
+                "description": "The `edited` stamp the page read reported for THIS block, copied verbatim. It is the check that stops the rewrite landing on top of an edit you never saw."
+              },
+              "content": {
+                "type": "string",
+                "description": "The block's new content, same Markdown authoring shape as an `append` section body."
+              }
             }
           }
         }

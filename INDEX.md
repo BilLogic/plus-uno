@@ -181,6 +181,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/026-spacing-tokens-grouped-over-flat.md`](docs/adr/026-spacing-tokens-grouped-over-flat.md) | Semantic spacing tokens are grouped (namespaced), not flat |
 | [`docs/adr/027-own-the-worker-rather-than-rent-a-managed-slack-agent.md`](docs/adr/027-own-the-worker-rather-than-rent-a-managed-slack-agent.md) | uno-bot stays a self-hosted Worker rather than a managed Slack agent, until a managed agent can hold the proposal gate and reach the blueprint and Notion, or the plumbing costs more than a stated bound (2026-09-04) |
 | [`docs/adr/028-a-tier-is-model-plus-thinking-level-moving-together.md`](docs/adr/028-a-tier-is-model-plus-thinking-level-moving-together.md) | On the Gemini lane a tier is one named configuration of model PLUS thinking level — chill low, default medium, grind high — reversing the 2026-08-07 call to pin one dial; attribution comes from changing one tier at a time (2026-09-04) |
+| [`docs/adr/029-in-place-block-replacement-behind-the-gate.md`](docs/adr/029-in-place-block-replacement-behind-the-gate.md) | uno-bot may rewrite a named Notion block in place — keyed by a block id plus the last-edited stamp seen at read, behind the ✅ gate — relaxing the append-only rule that made every correction a contradicting section at the bottom of the page (2026-09-15) |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -210,6 +211,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-139 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+140 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 raw eval data are deliberately not indexed — they record what happened rather
 than telling you what to do.

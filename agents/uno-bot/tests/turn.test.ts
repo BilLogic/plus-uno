@@ -440,6 +440,40 @@ test("a side-effect call comes back as a proposal to stage, and the card was del
   assert.equal(staged?.proposalTs, h.delivery.stagedAt[0]);
 });
 
+test("a rewrite ask stages a replace, and never a silent append", async () => {
+  // The Calendar Sync shape (2026-09-15): a page said something that had stopped
+  // being true, and append-only meant the correction could only land BELOW the
+  // stale text, leaving the page holding both readings. A replace carries the
+  // block id and the stamp the read reported, so the gate card and the write
+  // are about ONE block rather than about the bottom of the page.
+  const REPLACE = {
+    page_url: "https://notion.so/Calendar-Sync-2a2a2a2a",
+    replace: [
+      {
+        block_id: "1f2e3d4c-5b6a-7980-1234-56789abcdef0",
+        last_edited_time: "2026-09-15T14:02:00.000Z",
+        content: "Sync runs hourly, not nightly.",
+      },
+    ],
+  };
+  const h = harness({
+    replies: [
+      {
+        text: "I'll correct that line in place.",
+        toolCalls: [{ name: "notion_update", args: REPLACE }],
+      },
+    ],
+  });
+  const outcome = await runTurn(request({ text: "the TLDR on the Calendar Sync page is wrong — fix it" }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  assert.equal(outcome.staged?.proposal.toolName, "notion_update");
+  // The whole operation reaches the store intact — the stamp included, because
+  // it is what the write checks before it touches the block.
+  assert.deepEqual(outcome.staged?.proposal.input, REPLACE);
+  assert.equal((outcome.staged?.proposal.input as Record<string, unknown>).append, undefined);
+});
+
 test("several side-effect calls in one reply stage ONE proposal that holds all of them", async () => {
   const h = harness({
     replies: [
