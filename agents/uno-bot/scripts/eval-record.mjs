@@ -204,7 +204,7 @@ export async function recordCase(rawSpec, transport) {
       source: "captured",
       recordedAt: new Date().toISOString().slice(0, 10),
       note:
-        `CAPTURED from ${transport.name}. Round-trip boundaries are reconstructed, not reported — ` +
+        `CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — ` +
         `the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). ` +
         `Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport ` +
         `answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.` +

@@ -2,7 +2,7 @@
   "case": "P5",
   "source": "captured",
   "recordedAt": "2026-09-14",
-  "note": "CAPTURED from worker https://uno-bot.plus-uno.workers.dev. Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
   "turns": [
     {
       "prompt": "PRD, inline:\n\n# Drop-in question queue\nA student joins a queue during a tutor's drop-in session with a short question. The student sees their position; the tutor opens the next question; the student can leave.\nAcceptance criteria: one queue place per student per session; position is visible while waiting; leaving is one tap.\nScope: joining, the queued state, and the tutor's next-question action.\n\nWrite the full low-fi prompt-spec in this reply so I can paste it into Stitch.",

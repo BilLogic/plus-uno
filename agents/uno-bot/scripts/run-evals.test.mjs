@@ -313,16 +313,17 @@ test("a fixture case scores identically through the local transport and a Worker
 });
 
 test("an unrecorded case skips, counted apart, and never fails a blocker", async () => {
-  // R1 has no recording. A red blocker for "no recording" would be a gate that
+  // Every fixture case is recorded now, so the unrecorded one is R1 under an
+  // id nothing recorded. A red blocker for "no recording" would be a gate that
   // is red by construction; a green one would be a lie.
   const local = localTransport({ log: () => {} });
-  const { summary, lines } = await run(fixtureOf([caseById("R1")]), local);
+  const { summary, lines } = await run(fixtureOf([{ ...caseById("R1"), id: "R0" }]), local);
   assert.equal(summary.skipped, 1);
   assert.equal(summary.passed, 0);
   assert.equal(summary.failed, 0);
   assert.equal(summary.blockerFailures, 0);
-  assert.match(summary.results[0].reason, /no recording for R1/);
-  assert.ok(lines.some((l) => l.startsWith("[SKIP] R1")));
+  assert.match(summary.results[0].reason, /no recording for R0/);
+  assert.ok(lines.some((l) => l.startsWith("[SKIP] R0")));
 });
 
 // ── The CLI's default is the Worker, so the cron is unchanged ────────────────

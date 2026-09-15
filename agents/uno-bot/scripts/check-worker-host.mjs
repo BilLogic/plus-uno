@@ -79,7 +79,10 @@ export const ALLOWED = new Map([
  * An eval run artifact says which Worker it scored. Editing that to the new
  * host would be falsifying the record — the run really did hit the old one.
  */
-const HISTORY = [/^docs\/evals\/runs\//, /^docs\/plans\//];
+// A recording is the same kind of record: what the model SAID, verbatim, on the
+// day it was captured — S3's reply carries the connect link, host and all.
+// Rewriting a reply would replay a draw nobody observed.
+const HISTORY = [/^docs\/evals\/runs\//, /^docs\/plans\//, /^docs\/evals\/fixtures\/recordings\//];
 
 const SKIP_DIRS = new Set(["node_modules", ".git", "dist", "storybook-static", ".test-build"]);
 
