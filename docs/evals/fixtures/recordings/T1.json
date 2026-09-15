@@ -1,0 +1,93 @@
+{
+  "case": "T1",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "File an intake card: the Card component has no content slot, so a Table cannot nest inside a Card instance in Figma.",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "read_reference",
+              "args": {
+                "name": "uno-maintain/method"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components/layout-and-structure"
+              }
+            },
+            {
+              "name": "roadmap_query",
+              "args": {
+                "title": "Card"
+              }
+            }
+          ]
+        },
+        {
+          "toolCalls": [
+            {
+              "name": "notion_create",
+              "args": {
+                "sections": [
+                  {
+                    "heading": "Observation & Context",
+                    "body": "- **Trigger type:** Improvement / Inconsistency\n- **Estate:** Figma\n- **Target:** Component library (`Card`)\n- **Problem:** The Figma `Card` component has no content slot or instance-swap property, so designers cannot nest a `Table` component inside a `Card` instance without detaching or breaking the component structure."
+                  },
+                  {
+                    "heading": "Proposed Fix",
+                    "body": "Update the `Card` component in the Figma library to add a nested component property / content slot (instance swap), enabling structured child components like `Table` to be inserted while keeping Card container auto-layout and styles intact."
+                  },
+                  {
+                    "heading": "Three-Line Brief",
+                    "body": "- **Impact:** High — unblocks table-in-card patterns across admin, dashboard, and roster layouts without detaching instances.\n- **Effort:** Low — Figma component slot / property update.\n- **Risk:** Low — additive property on the Figma component."
+                  }
+                ],
+                "acceptance_criteria": [
+                  "Figma Card component provides a designated slot / instance swap property for child content",
+                  "Table component nests cleanly inside a Card instance in Figma without detaching",
+                  "Auto-layout padding, border, and elevation styling remain consistent with the code implementation in `design-system/src/components/layout-and-structure/Card/`"
+                ],
+                "title": "Card: Add content slot for nested instances (e.g. Table)",
+                "summary": "The Figma Card component lacks a content slot or instance swap property, preventing designers from nesting Table components inside a Card without detaching.",
+                "surface": "intake"
+              }
+            }
+          ]
+        }
+      ],
+      "toolResults": [],
+      "references": [
+        "uno-maintain/method"
+      ]
+    },
+    {
+      "prompt": "yes please",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "proposal_resolve",
+              "args": {
+                "decision": "confirm",
+                "message_to_user": "Got it — filing the maintenance intake for the Card component content slot now."
+              }
+            }
+          ]
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

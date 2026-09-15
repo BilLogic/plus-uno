@@ -118,7 +118,8 @@ test("an authored recording says so in its own note", () => {
 test("an unrecorded case is unsupported — a reason, not a failure", () => {
   const t = localTransport({ recordings, build: false });
   assert.equal(t.unsupported(caseById("R3")), null);
-  assert.match(t.unsupported(caseById("R1")), /no recording for R1/);
+  // Every fixture case is recorded now, so the unrecorded one is invented here.
+  assert.match(t.unsupported({ ...caseById("R1"), id: "R0" }), /no recording for R0/);
 });
 
 test("a subject case with no recording gets an honest skip, never a fabricated row", () => {
@@ -193,7 +194,7 @@ test("R3 runs through Turn in-process and stages the recorded tool", async () =>
   assert.equal(resp.ok, true, resp.error);
   assert.equal(resp.result.kind, "proposal");
   assert.equal(resp.result.toolName, "shareout_post");
-  assert.match(String(resp.build), /authored recording/);
+  assert.match(String(resp.build), /captured recording/);
   assert.equal(resp.turn.staged, true);
 });
 

@@ -1,0 +1,91 @@
+{
+  "case": "C1",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "The bot keeps telling people that a small wording tweak to a skill counts as Tier 1 and can just be applied — that's wrong, Tier 1 is typos, links, dates and formatting only, and anything touching a skill is Tier 2. Take this as an intake.",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "read_reference",
+              "args": {
+                "name": "uno-maintain/method"
+              }
+            },
+            {
+              "name": "roadmap_query",
+              "args": {
+                "title": "intake"
+              }
+            },
+            {
+              "name": "source_read",
+              "args": {
+                "url": "https://app.notion.com/p/Intake-Centralized-Decisions-DB-External-Links-Section-39cb7cca49828178adc2f69dd0c4fb4f"
+              }
+            }
+          ]
+        },
+        {
+          "toolCalls": [
+            {
+              "name": "notion_create",
+              "args": {
+                "sections": [
+                  {
+                    "heading": "Observation & Context",
+                    "body": "Reported in Slack: the bot tells users that a small wording tweak to a skill counts as \"Tier 1\" and can just be applied directly without review.\n\nThis violates two canonical rules:\n1. **Severity rules (`uno-maintain/method` §4):** The direct-fix whitelist is absolute: typos, broken links, stale dates, and pure formatting. A direct fix may **never** touch skill definitions, the persona, DS components, or requirements, no matter how small the diff. Anything touching a skill is a **gated change**.\n2. **Vocabulary rules (`CONTEXT.md`):** Maintenance severities are **direct fix** and **gated change**. Do **not** use \"Tier 1\" or \"Tier 2\" for maintenance severity (Tier 1 / Tier 2 / Tier 3 refer strictly to loading tiers)."
+                  },
+                  {
+                    "heading": "Classification",
+                    "body": "- **Trigger Type:** Bug / Inaccuracy\n- **Estate:** Codebase\n- **Target:** `uno-bot misbehaving` (`agents/uno-bot/**`, `skills/uno-maintain/bot.md`)\n- **Suggested Severity:** Gated change (touches bot instructions / persona / skill rules)"
+                  },
+                  {
+                    "body": "Reinforce severity and terminology guardrails in `agents/uno-bot/AGENT.md` and `skills/uno-maintain/bot.md`:\n1. Reiterate that skill definitions (`skills/*`) are strictly excluded from direct fixes — any edit to a skill, persona, component, or requirement requires the gated-change pipeline (PR + PRD + Slack review verdict).\n2. Explicitly guard against using \"Tier 1\" / \"Tier 2\" when describing maintenance severity; enforce the canonical terms `direct fix` and `gated change`.",
+                    "heading": "Proposed Draft Fix"
+                  },
+                  {
+                    "heading": "Three-Line Brief",
+                    "body": "- **Impact:** High — prevents bot from authorizing or suggesting unreviewed changes to skill contracts and agent behaviors.\n- **Effort:** Low — targeted instruction refinement in bot persona and maintain prompt.\n- **Risk:** Low — strictly aligns bot responses with ratified team conventions (`CONTEXT.md` and ADR-017)."
+                  }
+                ],
+                "title": "Intake: Fix bot misclassifying skill edits as direct fixes",
+                "summary": "Intake to fix uno-bot misclassifying skill wording tweaks as direct fixes (\"Tier 1\") instead of enforcing the gated-change pipeline and canonical terminology.",
+                "surface": "intake"
+              }
+            }
+          ]
+        }
+      ],
+      "toolResults": [],
+      "references": [
+        "uno-maintain/method"
+      ]
+    },
+    {
+      "prompt": "Before you file it — which tier did you land on for this one, and what in the method decided it?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "read_reference",
+              "args": {
+                "name": "uno-maintain/method"
+              }
+            }
+          ]
+        },
+        {
+          "text": "I re-read `uno-maintain/method` just now, so this is current.\n\nFirst, a quick vocabulary note: maintenance severities are called **direct fix** and **gated change**, not \"tiers\" — per our terminology guide, \"Tier 1 / Tier 2 / Tier 3\" refers strictly to prompt loading tiers.\n\nFor this intake, I classified it as a **gated change**. \n\nHere is what decided it in `uno-maintain/method` §4:\n- The **direct fix** whitelist is absolute: typos, broken links, stale dates, and pure formatting — nothing else.\n- The method explicitly forbids direct fixes for skills: *\"A direct fix may **never** touch skill definitions, the persona, DS components, or requirements, no matter how small the diff.\"*\n- Everything outside that whitelist is a **gated change**, which must run through the §5 pipeline (PR paired with a PRD, a Slack review verdict, and two approvals for persona/instruction changes per §5.3).\n\nThe intake card proposal is still staged above — whenever you're ready, just hit **Approve** (or say the word) to file it, or let me know if you want any adjustments!"
+        }
+      ],
+      "toolResults": [],
+      "references": [
+        "uno-maintain/method"
+      ]
+    }
+  ]
+}

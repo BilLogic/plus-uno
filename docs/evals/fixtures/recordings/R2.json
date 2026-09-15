@@ -1,0 +1,41 @@
+{
+  "case": "R2",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "Can you summarize this doc for me? https://www.notion.so/plus/Private-Planning-Notes-00000000000000000000000000000000",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "source_read",
+              "args": {
+                "url": "https://www.notion.so/plus/Private-Planning-Notes-00000000000000000000000000000000"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "scope": "any",
+                "query": "Private Planning Notes"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "query": "Planning Notes",
+                "scope": "running_notes"
+              }
+            }
+          ]
+        },
+        {
+          "text": "I couldn't open that Notion page — Notion returned a `404 object_not_found`, which happens when a page isn't shared with the bot's integration (or has an invalid ID). I searched the team workspace for \"Private Planning Notes\" just now to see if it existed under another URL, but found no matching doc.\n\nIf this page is in the PLUS team workspace, anyone with edit access can connect it:\n\n1. Open the page in Notion.\n2. Click the **•••** menu in the top-right corner.\n3. Select **Connections** (or **Add connections**).\n4. Search for and add **uno-bot** (PLUS API).\n\n*(Note: only pages within the PLUS team workspace can be shared with the bot.)*\n\nOnce connected, paste the link again and I'll summarize it for you!"
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

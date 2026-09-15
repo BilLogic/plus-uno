@@ -1,0 +1,58 @@
+{
+  "case": "R8",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "Implement SpacingToken",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "search": "SpacingToken",
+                "path": "design-system"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/tokens"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/agent-views/components/index.md"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "agents/uno-bot/src/agent/preflight.ts"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/agent-views/tokens/tokens.md"
+              }
+            }
+          ]
+        },
+        {
+          "text": "There is no `SpacingToken` component in the PLUS design system — spacing values are design tokens (CSS variables), not a UI component, so there is nothing to implement via `component_implement`. \n\nIn PLUS, spacing is handled through semantic CSS custom properties (such as `--size-card-gap-md`, `--size-element-pad-x-sm`, `--size-section-gap-lg`) rather than a wrapper component. If you are looking to style a layout, you apply those tokens directly in CSS/SCSS or use structural layout components like [Card](https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Card) or [Divider](https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Divider).\n\nIf you are proposing a brand-new component for the library, it needs a Notion PRD and design review first before anything can be built (and `component_implement` also requires an approved PRD in hand).\n\nI read `design-system/agent-views/components/index.md` and `design-system/agent-views/tokens/tokens.md` just now, so this is current.\n\n### Where to find it\n- **Storybook:** [Design System Storybook](https://plus-uno.netlify.app/storybook/)\n- **Tokens source:** [design-system/src/tokens](https://github.com/BilLogic/plus-uno/tree/main/design-system/src/tokens)\n- **Components directory:** [design-system/src/components](https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components)"
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

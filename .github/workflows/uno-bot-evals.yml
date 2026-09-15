@@ -32,8 +32,17 @@ name: uno-bot — evals (R-scenarios vs live Worker)
 # committed to docs/evals/fixtures/recordings/ in its own PR. The record job
 # needs no Gemini credential — there is no judge in a capture, only the turns.
 #
+# THE `cases` INPUT. Empty — the default — records the whole suite (`--all`).
+# Set it to a space-separated list of case ids and only those are captured, one
+# `--case=` each. That is the re-record path: a single recording goes stale on
+# its own (the board moved under a run-time subject, a fixture's wording
+# changed, one draw is a failing one), and re-capturing 34 live billable runs to
+# refresh one of them is the kind of cost that gets a capture postponed instead
+# of done.
+#
 # Capture and commit:
-#   gh workflow run uno-bot-evals.yml -f mode=record
+#   gh workflow run uno-bot-evals.yml -f mode=record                 # the whole suite
+#   gh workflow run uno-bot-evals.yml -f mode=record -f cases="B1"   # one case
 #   gh run download <id> -n eval-recordings
 
 on:
@@ -46,6 +55,11 @@ on:
         options:
           - run
           - record
+      cases:
+        description: "record mode only: space-separated case ids to capture (e.g. \"B1\" or \"B1 R7\"); empty records the whole suite"
+        type: string
+        required: false
+        default: ""
   schedule:
     - cron: "0 8 * * 1" # Mondays 08:00 UTC — weekly drift check (paused 2026-09-04 while the
                         # harness was known-stale; restored 2026-09-05 after #412 and #415 landed)
@@ -92,7 +106,18 @@ jobs:
         # credential, because a capture records what the model said and scores
         # nothing.
         if: inputs.mode == 'record'
-        run: node agents/uno-bot/scripts/eval-record.mjs --all --out=eval-recordings
+        env:
+          # Through the environment, not interpolated into the script: an input
+          # is a string a human types and `${{ }}` in a `run:` body would splice
+          # it into the shell.
+          CASES: ${{ inputs.cases }}
+        run: |
+          args="--all"
+          if [ -n "$CASES" ]; then
+            args=""
+            for c in $CASES; do args="$args --case=$c"; done
+          fi
+          node agents/uno-bot/scripts/eval-record.mjs $args --out=eval-recordings
       - name: Upload recordings
         # `always()`, because a case whose subject condition the board does not
         # satisfy is reported as a skip and the recordings the other cases DID

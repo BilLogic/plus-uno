@@ -1,0 +1,40 @@
+{
+  "case": "S3",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "Can you look through my Slack history for what we decided about the migration deadline?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "slack_search",
+              "args": {
+                "query": "migration deadline"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "scope": "decisions",
+                "query": "migration deadline"
+              }
+            },
+            {
+              "name": "roadmap_query",
+              "args": {
+                "title": "migration"
+              }
+            }
+          ]
+        },
+        {
+          "text": "I can't search your Slack history right now — workspace search wasn't available for this turn, and searching your personal history (including private channels and DMs) requires connecting your account. \n\nYou can connect your Slack history here so searches cover everything you can see:\n👉 [Connect your Slack history](https://uno-bot.plus-uno.workers.dev/oauth/slack/start)\n\nIn the meantime:\n- **Decisions DB:** I checked all 54 rows in the Decisions DB just now, but nothing was recorded under \"migration deadline\".\n- **Specific thread:** If you have a link to the discussion thread, drop it here and I can read it directly.\n- **Roadmap cards:** If this was tied to a specific project like the [Tutor Schedule Migration Parent Card](https://app.notion.com/p/Tutor-Schedule-Migration-Parent-Card-c558442086fd4d30804862e85d4400e6) or token migrations ([Color](https://app.notion.com/p/Color-Token-Migration-26bb7cca498280ac916af2c298c6bffd) / [Spacing](https://app.notion.com/p/Spacing-Token-Migration-26bb7cca49828002a07ee3bd6c5bfc4c)), let me know and we can pull from the card docs!"
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

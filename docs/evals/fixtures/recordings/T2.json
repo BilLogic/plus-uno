@@ -1,0 +1,52 @@
+{
+  "case": "T2",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "Think harder about this: what is the difference between Card and Surface, and when would I reach for one over the other?",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components/layout-and-structure"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "search": "Surface",
+                "path": "design-system/src/components"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components/layout-and-structure/Card/Card.mdx"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/patterns/Surface/Surface.mdx"
+              }
+            }
+          ]
+        },
+        {
+          "text": "The difference is abstraction: `Surface` is the raw lumber, and `Card` is the pre-built bookshelf.\n\n- **`Surface`** is a bare, token-backed container. It gives you a background layer tied strictly to our design tokens (surface color levels, elevation, padding scale, radius), but absolutely no content structure. Reach for it when you are building the base layer of the application shell or a custom layout that doesn't fit a standard component shape.\n- **`Card`** is a specific UI component with a pre-agreed shape. It gives you named, structured regions out of the box: `image`, `header`, `title`, `body`, and an optional `items` list or `footer` with an `actionButton`. Reach for it when you have a self-contained, bounded piece of content like a dashboard tile, a session summary, or a tutor's stats block.\n\nI read [`Card.mdx`](https://github.com/BilLogic/plus-uno/blob/main/design-system/src/components/layout-and-structure/Card/Card.mdx) and [`Surface.mdx`](https://github.com/BilLogic/plus-uno/blob/main/design-system/src/patterns/Surface/Surface.mdx) just now, so this is current.\n\n**Where to find them**\n- **Card:** [Storybook](https://plus-uno.netlify.app/storybook/?path=/docs/components-card--docs) · [GitHub source](https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Card) · [Figma spec](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4241-27817)\n- **Surface:** [Storybook](https://plus-uno.netlify.app/storybook/) · [GitHub source](https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Surface) · [Figma spec](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX)"
+        }
+      ],
+      "toolResults": []
+    }
+  ]
+}

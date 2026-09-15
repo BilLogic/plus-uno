@@ -1,0 +1,54 @@
+{
+  "case": "P5",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "PRD, inline:\n\n# Drop-in question queue\nA student joins a queue during a tutor's drop-in session with a short question. The student sees their position; the tutor opens the next question; the student can leave.\nAcceptance criteria: one queue place per student per session; position is visible while waiting; leaving is one tap.\nScope: joining, the queued state, and the tutor's next-question action.\n\nWrite the full low-fi prompt-spec in this reply so I can paste it into Stitch.",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "read_reference",
+              "args": {
+                "name": "uno-prototype/method"
+              }
+            },
+            {
+              "name": "search_blueprint",
+              "args": {
+                "query": "drop-in session question queue"
+              }
+            },
+            {
+              "name": "read_reference",
+              "args": {
+                "name": "list"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/tokens"
+              }
+            },
+            {
+              "name": "github_read",
+              "args": {
+                "path": "design-system/src/components"
+              }
+            }
+          ]
+        },
+        {
+          "text": "Here is the low-fi prompt-spec formatted for Stitch, built directly from your inline PRD. \n\nI checked `uno-blueprint` just now—the current service journey documents scheduled `Session`s and in-session help requests, but drop-in queues are absent from the live blueprint (`0` keyword matches; vector results were near-misses on scheduling), so this spec is grounded strictly in your PRD [0].\n\n***\n\n# Prompt-Spec: Drop-In Question Queue (Low-Fi Wireframe Flow)\n\n**Target Tool:** Stitch  \n**Fidelity:** Low-fi wireframe (grayscale, standard layout blocks, functional typography, no brand styling or high-fi assets)  \n**Deliverable:** Multi-screen interactive wireframe flow  \n\n---\n\n### 1. Context & Actors\n- **Actors:** \n  - `Student` (attending a drop-in session, needs targeted assistance)\n  - `Tutor` (hosting the drop-in session, working through student questions sequentially)\n- **Systems:** PLUS drop-in session room & queue state manager\n- **Grounding Constraints:** Single active queue entry per student per session. One-tap exit. Real functional copy only (no lorem ipsum). Unsettled behaviors remain explicitly framed as open decisions.\n\n---\n\n### 2. Flow Definition\n- **Trigger:** A student in a drop-in session encounters a problem and opens the question queue tool.\n- **Steps:**\n  1. Student enters their question and submits.\n  2. System places the student in the queue and displays their live queue position.\n  3. Student waits in the queued state, retaining an instant one-tap option to leave.\n  4. Tutor reviews the queue list and selects the next question.\n- **Outcome:** The tutor activates the next question; the student is notified/transitioned out of the waiting queue.\n\n---\n\n### 3. Out of Scope (Do Not Generate)\n- Video/audio breakout room management or Zoom call controls.\n- Post-session reflection or ratings.\n- File attachments or rich-text question authoring.\n- Multi-tutor triage or question reassignment.\n\n---\n\n### 4. Screen Specifications & States\n\n#### Screen A: Student — Join Queue\n- **Header:** \"Drop-in Question Queue\"\n- **Form Controls:**\n  - Input label: \"What is your question?\"\n  - Text input (multi-line): Placeholder `[Briefly describe what you need help with...]`\n  - Action button: Primary button labeled `Join Queue`\n- **Validation State (Error):**\n  - Trigger: Student attempts to submit while already in the queue for this session.\n  - UI Component: Error banner directly above the input.\n  - Copy: *[See Open Question 1 — copy unspecified in PRD]*\n\n#### Screen B: Student — Queued State (Waiting)\n- **Header:** \"Drop-in Question Queue\"\n- **Status Indicator:**\n  - Large numerical badge / counter: \"Your position in line: #3\"\n  - Secondary text: \"Estimated wait: [See Open Question 2]\"\n- **Summary Box:** Read-only preview of submitted question:\n  - Label: \"Your question:\"\n  - Body: *\"Need help factoring quadratic equation in problem 4\"*\n- **Exit Action:**\n  - Prominent single-tap button: Labeled `Leave Queue` (destructive/secondary outline button).\n  - Interaction: Single click immediately cancels the ticket and navigates student back to Screen A (no confirmation modal to satisfy one-tap criteria).\n\n#### Screen C: Tutor — Queue Dashboard & Action\n- **Header:** \"Session Queue\"\n- **Queue Count:** \"Waiting: 3 students\"\n- **Next Up Action Card:**\n  - Displays top item in queue: Student Name, Time Waiting (\"5m ago\"), Question summary.\n  - Action Button: Primary button labeled `Open Next Question`.\n- **Waiting List View:**\n  - Numbered list showing remaining students (`#2`, `#3`) with truncated questions.\n- **Empty State:**\n  - Displayed when queue count is 0.\n  - UI: Centered neutral container.\n  - Copy: *[See Open Question 3 — copy unspecified in PRD]*\n\n---\n\n### 5. Open Questions (Unsettled Gaps)\n\n#### Screen-Level Gaps\n1. **Duplicate Join Prevention:** When a student who already holds a queue spot reaches Screen A, should the form be disabled entirely with a link to their active spot, or throw an inline validation error on submit?\n2. **Waiting Information:** Does the waiting state show only the queue rank (e.g., `#3`), or also an estimated wait time in minutes?\n3. **Tutor Empty State:** What explicit instructions or empty state messaging does the tutor see when the queue drains?\n\n#### Edge & Actor Coordination Gaps\n4. **Handoff Mechanism:** When the tutor clicks `Open Next Question`, what carries this action to the student's screen? (e.g., An alert banner, automatic modal transition, or an invite to a breakout room?)\n5. **Queue Departure Cascade:** When a waiting student taps `Leave Queue`, how is the rank adjustment pushed to the remaining students behind them in line?\n6. **Race Condition Winner:** If a student taps `Leave Queue` at the exact fraction of a second the tutor clicks `Open Next Question` for that student, which action wins?\n\n---\n\n### 6. Embedded Self-Check Block (for Stitch)\n```markdown\n[STITCH SELF-CHECK]\nVerify the generated prototype against these strict pass/fail checks:\n- [ ] Low-fidelity wireframe styling only (grayscale, simple borders, no decorative imagery).\n- [ ] Student can enter a question and submit to join.\n- [ ] Position in line is clearly visible in the student waiting state.\n- [ ] \"Leave Queue\" action is accessible in a single tap without nested menus or confirmation sheets.\n- [ ] Tutor interface displays incoming questions and an explicit \"Open Next Question\" trigger.\n- [ ] No out-of-scope features generated (no video controls, file uploaders, or tutor reassignment).\n- [ ] Any unsettled states display placeholders pointing to the Open Questions block rather than invented logic.\n\nIf any check fails, regenerate once to correct the layout before finalizing.\n```\n\n***\n\n### Next Steps\nIf you want to file this into a durable Notion PRD card on the Roadmap board before moving to code, let me know and I can stage that for you."
+        }
+      ],
+      "toolResults": [],
+      "references": [
+        "uno-prototype/method"
+      ]
+    }
+  ]
+}

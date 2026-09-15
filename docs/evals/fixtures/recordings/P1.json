@@ -1,0 +1,43 @@
+{
+  "case": "P1",
+  "source": "captured",
+  "recordedAt": "2026-09-14",
+  "note": "CAPTURED off the deployed Worker's /debug/eval route (the host is the transport's, not this file's — check:worker-host keeps it out of tracked text). Round-trip boundaries are reconstructed, not reported — the lookups are replayed as one reply and the answer as the next (scripts/eval-record.mjs). Tool RESULT bodies are not on the wire, so 'toolResults' is empty and the local transport answers each lookup with an honest empty read; if this case turns on what a lookup returned, write it in here.",
+  "turns": [
+    {
+      "prompt": "Hey, can you spin up a prototype for a tutor streak card on the dashboard? Something that shows how many sessions in a row they've reflected on.",
+      "replies": [
+        {
+          "toolCalls": [
+            {
+              "name": "read_reference",
+              "args": {
+                "name": "uno-prototype/method"
+              }
+            },
+            {
+              "name": "roadmap_query",
+              "args": {
+                "title": "streak"
+              }
+            },
+            {
+              "name": "notion_search",
+              "args": {
+                "query": "reflection streak",
+                "scope": "any"
+              }
+            }
+          ]
+        },
+        {
+          "text": "I can't spin up a prototype just yet — prototyping requires an approved PRD first across every fidelity, with no idea-only bypass. \n\nI checked the Roadmap board and Notion workspace just now, so I'm certain there isn't an existing PRD or card logged for a reflection streak card. \n\nWe can draft one right here through **uno-synthesize** and file the card to get things moving. To help shape it, a few quick questions:\n- **Trigger & logic:** What counts toward the streak (every scheduled Session where a Reflection is completed within a certain window, or just raw count), and what resets or freezes it (e.g., an excused Call-Off)?\n- **Placement & states:** Where on the tutor dashboard should it sit, and what does the empty/zero-streak or milestone state look like?\n- **Fidelity:** Once the PRD is filed, are you aiming for a hi-fi coded build using the design system or a prompt-spec for exploratory mockups?\n\nIf you already have rough notes or an outline, paste them in and I'll distill them into a PRD draft for you to review!"
+        }
+      ],
+      "toolResults": [],
+      "references": [
+        "uno-prototype/method"
+      ]
+    }
+  ]
+}
