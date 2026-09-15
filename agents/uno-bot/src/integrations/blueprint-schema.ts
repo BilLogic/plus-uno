@@ -23,6 +23,19 @@ import { BLUEPRINT_CONTRACT } from "../generated/blueprint-contract";
 export type DirectReadTable = keyof typeof BLUEPRINT_CONTRACT.botDirectReadColumns;
 
 /**
+ * What each direct-read column is FOR, per table — the contract's own labels.
+ *
+ * Read through property access, never through a string: `ROLES.phases.prose`
+ * is the prose column of `phases` whatever the app has renamed it to, and a
+ * table that stops declaring the role the read needs is a type error here
+ * rather than a select PostgREST answers with 400. Which is the whole point of
+ * the labels: `botDirectReadColumns` is an unlabelled list per table, so until
+ * plus-uno-blueprint#671 the meanings were spelled a second time in this file
+ * and a rename had to be FOLLOWED by hand.
+ */
+const ROLES = BLUEPRINT_CONTRACT.botDirectReadRoles;
+
+/**
  * A select over `table`, BUILT FROM the contract's declaration for it.
  *
  * With no `keys`, the select is every column the contract declares, in the
@@ -33,12 +46,13 @@ export type DirectReadTable = keyof typeof BLUEPRINT_CONTRACT.botDirectReadColum
  * contract declares two of, and widening the select to make the derivation
  * tidier would change what the Worker asks PostgREST for.
  *
- * `keys` name a ROLE the read needs filled ("the named one"), and the contract
- * supplies the spelling. A key the contract does not declare throws HERE, at
- * module load, which fails the Worker's start — the alternative is a select
- * PostgREST answers with 400 and every call site reports as "the blueprint has
- * nothing on that". Same discipline as `touchpointSelectFrom` below, which
- * keeps its own signature because its caller passes the column list in.
+ * `keys` are the columns playing the roles this read needs filled ("the named
+ * one"), taken from `ROLES` so the contract supplies the spelling. A key the
+ * contract's column list does not declare throws HERE, at module load, which
+ * fails the Worker's start — the alternative is a select PostgREST answers with
+ * 400 and every call site reports as "the blueprint has nothing on that". Same
+ * discipline as `touchpointSelectFrom` below, which keeps its own signature
+ * because its caller passes the column list in.
  */
 export function selectFrom(table: DirectReadTable, keys?: readonly string[]): string {
   const declared = BLUEPRINT_CONTRACT.botDirectReadColumns[table] as readonly string[];
@@ -54,8 +68,9 @@ export function selectFrom(table: DirectReadTable, keys?: readonly string[]): st
 }
 
 /** One column of `table`, taken from the contract rather than restated beside
- *  it. `column` is the role key; the contract is what says the spelling is
- *  still current, and an undeclared one throws at module load. */
+ *  it. `column` is what the contract's role for this read names; the table's
+ *  own column list is what says the two agree, and a column that list does not
+ *  declare throws at module load. */
 export function columnFrom(table: DirectReadTable, column: string): string {
   return selectFrom(table, [column]);
 }
@@ -63,7 +78,16 @@ export function columnFrom(table: DirectReadTable, column: string): string {
 /** One column the reads ask of SEVERAL tables — the prose column, the position
  *  column — checked against every one of them. A column that survives on three
  *  tables and is renamed on the fourth is still a 400 on the fourth read, so
- *  the narrowest check is the wrong one. */
+ *  the narrowest check is the wrong one.
+ *
+ *  `column` comes from `ROLES`, so this no longer CATCHES a rename — the
+ *  vendored contract follows it. What it still does is hold the two halves of
+ *  the contract to each other: a role naming a column the same table's list
+ *  does not declare means the app labelled one thing and promised another, and
+ *  the reads that role feeds span tables the label is only stated on one of.
+ *  `tests/blueprint-contract-read-strings.test.ts` asserts the same agreement
+ *  for every table and role, where a red test beats a Worker that will not
+ *  start. */
 function columnFromAll(
   tables: readonly [DirectReadTable, ...DirectReadTable[]],
   column: string,
@@ -75,19 +99,29 @@ function columnFromAll(
 
 /** The single column an embed of a structural table reads — a step, a path, a
  *  scenario, a phase each contribute their name and nothing else to the cells
- *  fallback. Written once here rather than four times in the select. */
-const NAME_ONLY: readonly string[] = ["name"];
+ *  fallback. Taken per table from that table's own name role: "the name
+ *  column" was never one spelling — the contract labels `slices` with `title`
+ *  — so one shared list would have been right by luck. A table that stops
+ *  declaring a name role does not compile here. */
+function nameOnly(roles: { readonly name: string }): readonly string[] {
+  return [roles.name];
+}
 
 /**
  * The prose column on every structural table. `description` until
  * 20260820090000 (cells) and earlier for the rest.
  *
- * Taken from the contract, and from every table the keyword fallback selects it
- * on. The role key is still spelled here because `botDirectReadColumns` is an
- * unlabelled list per table — it cannot say which of `id,name,summary,position`
- * is the prose one — so a rename cannot be FOLLOWED automatically; it is caught
- * instead, by the throw in `columnFrom` at module load. Making the contract
- * name its roles is the app repo's call (see scripts/sync-blueprint-contract.mjs).
+ * The contract LABELS it now, so this is the label followed rather than the
+ * spelling restated: the next rename reaches the bot in the same vendored
+ * bytes as the column list, with no second edit to remember and nothing left
+ * in this file to forget to change. Before the labels the best available was
+ * to spell `summary` here and let `columnFrom` throw at module load when the
+ * contract stopped declaring it — a rename caught, the Worker refusing to
+ * start, and someone still having to type the new name.
+ *
+ * Still checked against every table the keyword fallback selects it on, which
+ * is the one thing the label cannot say: it is stated per table, and the
+ * reads span five.
  *
  * The bot still EMITS `description`: that is the name `search_blueprint` puts
  * on the wire (`BLUEPRINT_CONTRACT.searchBlueprintColumns.description`), and
@@ -96,25 +130,27 @@ const NAME_ONLY: readonly string[] = ["name"];
  */
 export const PROSE_COLUMN = columnFromAll(
   ["cells", "phases", "scenarios", "paths", "touchpoints"],
-  "summary",
+  ROLES.cells.prose,
 );
 
 /** Position column. `order_position` until 20260820130000 gave every position
  *  column one name. Ordering by a column that does not exist is a 400, not a
- *  silent fallback to insertion order. Taken from the contract, and from both
- *  tables the outline read orders — `phases` and its embedded `scenarios`; the
- *  role key is spelled here for the same reason PROSE_COLUMN's is. */
-export const POSITION_COLUMN = columnFromAll(["phases", "scenarios"], "position");
+ *  silent fallback to insertion order. The contract's label, checked against
+ *  both tables the outline read orders — `phases` and its embedded
+ *  `scenarios` — for the same reason PROSE_COLUMN is. */
+export const POSITION_COLUMN = columnFromAll(["phases", "scenarios"], ROLES.phases.position);
 
 /**
  * The findings table. `findings` until 20260830190000.
  *
- * Pinned against `BLUEPRINT_CONTRACT.botReadTables` by the unit test: the
- * vendored contract already moves when the app renames a table, so tying the
- * literal to it turns the next rename into a red test instead of a 404 that
- * reads as "nothing is flagged here".
+ * The contract names it, so the next rename arrives with the vendored bytes
+ * instead of as a 404 that every call site reports as "nothing is flagged
+ * here". `findingsTableIsInContract` still holds it to `botReadTables` — the
+ * two fields are declared apart in the contract and a table named by one and
+ * dropped from the other would stop being probed by /health/blueprint while
+ * this read went on issuing it.
  */
-export const FINDINGS_TABLE = "audit_findings";
+export const FINDINGS_TABLE = BLUEPRINT_CONTRACT.botFindingsTable;
 
 /** Edge select columns. `label` became `name` and `note` was dropped by
  *  20260830190000. The FK embed hints are appended at the call site from
@@ -154,10 +190,10 @@ export const CELL_FALLBACK_SELECT =
   `${selectFrom("cells")},` +
   `resources(${selectFrom("resources")}),` +
   `lane:lanes!${BLUEPRINT_CONTRACT.fkConstraints.cellLane}(${selectFrom("lanes")}),` +
-  `step:steps(${selectFrom("steps", NAME_ONLY)}),` +
-  `path:paths(${selectFrom("paths", NAME_ONLY)},` +
-  `scenario:scenarios(${selectFrom("scenarios", NAME_ONLY)},` +
-  `phase:phases(${selectFrom("phases", NAME_ONLY)})))`;
+  `step:steps(${selectFrom("steps", nameOnly(ROLES.steps))}),` +
+  `path:paths(${selectFrom("paths", nameOnly(ROLES.paths))},` +
+  `scenario:scenarios(${selectFrom("scenarios", nameOnly(ROLES.scenarios))},` +
+  `phase:phases(${selectFrom("phases", nameOnly(ROLES.phases))})))`;
 
 /**
  * The touchpoint registry (#414): the deployment-level catalog of the tools,
@@ -171,14 +207,16 @@ export const CELL_FALLBACK_SELECT =
  */
 export const TOUCHPOINTS_TABLE = "touchpoints";
 
-/** The columns the touchpoint read USES by key — the link and the notes read
- *  `id`, `name`, `kind`, `summary` and `url` off each row. Kept apart from the
- *  contract's list on purpose: the contract says what the app promises is
- *  there; this says what the code will go looking for. When the two disagree,
+/** The columns the touchpoint read USES by key — the whole projection the link
+ *  and the notes read off each row, which the contract states as its own field
+ *  rather than as a role, a projection being a list where a role is one column
+ *  playing one part. Still a separate field from `botDirectReadColumns`, and
+ *  still compared to it: the first says what this read goes looking for, the
+ *  second what the app promises is there. When the two disagree,
  *  `touchpointSelectFrom` throws at module load — the Worker fails to start
  *  rather than issuing a select PostgREST answers with 400 and the call site
  *  reports as "no touchpoint matched". */
-export const TOUCHPOINT_READ_KEYS: readonly string[] = ["id", "name", "kind", "summary", "url"];
+export const TOUCHPOINT_READ_KEYS: readonly string[] = BLUEPRINT_CONTRACT.botTouchpointReadKeys;
 
 /**
  * The touchpoint select, BUILT FROM the contract's column list rather than
@@ -202,6 +240,22 @@ export function touchpointSelectFrom(columns: readonly string[]): string {
 
 export const TOUCHPOINT_SELECT = touchpointSelectFrom(BLUEPRINT_CONTRACT.botDirectReadColumns.touchpoints);
 
+/**
+ * The three columns a worded registry query is matched on, in the order the
+ * filter states them.
+ *
+ * All three come from the contract's roles like every other read string here:
+ * the label, the prose, and `kind` — the facet a touchpoint is sorted by (an
+ * app screen, an email, a Zoom room), which the contract labels because a
+ * filter spelled against a bare column name would be the second spelling this
+ * module exists to remove.
+ */
+const TOUCHPOINT_FILTER_COLUMNS: readonly string[] = [
+  ROLES.touchpoints.name,
+  ROLES.touchpoints.kind,
+  ROLES.touchpoints.prose,
+];
+
 /** The registry filter for a worded query: any word, in the name, the kind
  *  or the summary. Case-insensitive substring on all three — `kind` is a free
  *  text column ("email", "screen", "zoom room"), so an exact match on a
@@ -210,7 +264,7 @@ export const TOUCHPOINT_SELECT = touchpointSelectFrom(BLUEPRINT_CONTRACT.botDire
  *  escaping against PostgREST's `or=(...)` syntax. */
 export function touchpointFilter(words: readonly string[]): string {
   return `or=(${words
-    .flatMap((w) => [`name.ilike.*${w}*`, `kind.ilike.*${w}*`, `summary.ilike.*${w}*`])
+    .flatMap((w) => TOUCHPOINT_FILTER_COLUMNS.map((column) => `${column}.ilike.*${w}*`))
     .join(",")})`;
 }
 
