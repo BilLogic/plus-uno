@@ -201,9 +201,10 @@ const OFFERED_AS_OPINION =
  * The verdict for one delivered reply.
  *
  * Call this on the body that will actually be SENT — after the trailing-label
- * strip and after capText. The judge sees the draft, and capText truncates at
- * MAX_POST_CHARS afterwards, so a clause in a closing paragraph can be
- * amputated from a message the telemetry has already recorded as `verdict=pass`.
+ * strip. The judge otherwise sees a draft the delivered body has diverged
+ * from, which is how a clause in a closing paragraph came to be amputated (by
+ * the cap that used to live there) from a message the telemetry had already
+ * recorded as `verdict=pass`.
  */
 export function judgeConfidence(
   deliveredText: string,
