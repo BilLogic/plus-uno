@@ -492,6 +492,20 @@ a.sbdocs-a {
   border-width: 0 !important;
 }
 
+/*
+ * The playground canvas must neither scroll nor crop the component. Storybook
+ * draws the inline story inside `.docs-story` (overflow: auto — the scrollbar)
+ * within `.sbdocs-preview` (overflow: hidden — the crop), so an open dropdown
+ * or tree menu was cut at the story's height and scrolled instead of showing.
+ * Inside this panel both stop clipping; DocsInteractivePlayground
+ * (ds-docs-layout.jsx) ratchets the canvas min-height up to the tallest state
+ * seen, so the freed overlay gets real room instead of covering the controls.
+ */
+.sbdocs .sb-ds-docs-interactive-panel .docs-story,
+.sbdocs .sb-ds-docs-interactive-panel .sbdocs-preview {
+  overflow: visible !important;
+}
+
 .sbdocs .sb-ds-docs-interactive-panel__controls .docblock-argstable {
   margin: 0 !important;
 }
@@ -981,6 +995,33 @@ a.sbdocs-a {
   .docs-story:not(:has(.responsive-frame-root))
   > div[scale="1"] {
   padding-bottom: calc(var(--size-spacing-large-space-700) * 2) !important;
+}
+
+/*
+ * D2's gap: the open bottom edge assumes the code strip attaches there, but the
+ * strip only exists while the code is EXPANDED. Collapsed (`Show code` not yet
+ * clicked — no `pre` under the root), nothing completes the card and its bottom
+ * edge is simply missing under the actions row. Close it exactly the way the
+ * no-actions rule above does; the moment a `pre` appears this stops matching
+ * and the edge opens for the strip again.
+ */
+.sbdocs
+  .sb-ds-docs-canvas-shell--source-attached
+  .sb-ds-docs-canvas-attached-root:has(.sbdocs-preview-actions):not(:has(pre))
+  .docs-story:not(:has(.responsive-frame-root))
+  > div[scale="1"] {
+  border-bottom-width: 1px !important;
+  border-bottom-style: solid !important;
+  border-bottom-color: var(--color-outline-variant, #bec8ca) !important;
+  border-radius: var(--size-card-radius-sm);
+}
+
+.sbdocs.dark
+  .sb-ds-docs-canvas-shell--source-attached
+  .sb-ds-docs-canvas-attached-root:has(.sbdocs-preview-actions):not(:has(pre))
+  .docs-story:not(:has(.responsive-frame-root))
+  > div[scale="1"] {
+  border-bottom-color: var(--color-outline-variant, #3f4847) !important;
 }
 
 /*

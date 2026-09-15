@@ -86,15 +86,28 @@ export function FigmaNodesTable({ sets, fileKey }) {
     const rows = figmaVariantRows(sets);
     if (rows.length === 0) return null;
 
+    // One palette for every line, taken from what the Resources cards beside
+    // this table actually render (1px #dee2e6). NOT --color-border: in the docs
+    // iframe that resolves to a different zinc. Storybook injects its own
+    // borders on ALL FOUR sides of th/td (its text colour at 15%); under the
+    // border-collapse those merged away, but this table is border-separate
+    // (see below), where they stack — doubled inner lines, and a thickened
+    // top/left frame edge. Inline 'none' on every side Storybook draws zeroes
+    // them; the row line and the two column dividers are added back explicitly.
+    const lineColor = 'var(--bs-border-color, #dee2e6)';
     const cellStyle = {
         padding: '8px 12px',
-        borderBottom: '1px solid var(--color-border, #e5e7eb)',
+        borderTop: 'none',
+        borderBottom: `1px solid ${lineColor}`,
+        borderLeft: 'none',
+        borderRight: 'none',
         textAlign: 'left',
         verticalAlign: 'top',
         fontSize: '13px',
         lineHeight: 1.4,
     };
     const headStyle = { ...cellStyle, fontWeight: 600, whiteSpace: 'nowrap' };
+    const dividerRight = { borderRight: `1px solid ${lineColor}` };
 
     return (
         <div className="sb-ds-figma-nodes not-prose" style={{ marginTop: '24px' }}>
@@ -112,16 +125,28 @@ export function FigmaNodesTable({ sets, fileKey }) {
             </div>
             <div
                 className="overflow-hidden border border-border bg-surface"
-                style={{ borderRadius: 'var(--size-card-radius-sm)' }}
+                style={{
+                    borderRadius: 'var(--size-card-radius-sm)',
+                    // The Resources cards' shadow, so the two read as one family.
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+                }}
             >
                 <table
-                    className="border-collapse text-on-surface"
-                    style={{ margin: 0, width: '100%', fontSize: '13px' }}
+                    className="text-on-surface"
+                    style={{
+                        margin: 0,
+                        width: '100%',
+                        fontSize: '13px',
+                        // separate: collapsed cell borders paint across the
+                        // wrapper's rounded corners — the "cut corner" artifact.
+                        borderCollapse: 'separate',
+                        borderSpacing: 0,
+                    }}
                 >
                     <thead>
                         <tr className="bg-muted/40">
-                            <th style={headStyle}>Style / variant</th>
-                            <th style={headStyle}>Node ID</th>
+                            <th style={{ ...headStyle, ...dividerRight }}>Style / variant</th>
+                            <th style={{ ...headStyle, ...dividerRight }}>Node ID</th>
                             <th style={headStyle}>Figma link</th>
                         </tr>
                     </thead>
@@ -138,10 +163,10 @@ export function FigmaNodesTable({ sets, fileKey }) {
                             const rowCell = isLast ? { ...cellStyle, borderBottom: 'none' } : cellStyle;
                             return (
                                 <tr key={set.id || nodeId || index}>
-                                    <td style={rowCell} className="font-medium text-on-surface">
+                                    <td style={{ ...rowCell, ...dividerRight }} className="font-medium text-on-surface">
                                         {set.name || set.id || '—'}
                                     </td>
-                                    <td style={{ ...rowCell, whiteSpace: 'nowrap' }}>
+                                    <td style={{ ...rowCell, ...dividerRight, whiteSpace: 'nowrap' }}>
                                         <code style={{ fontSize: '12px' }} className="text-on-surface-variant">{nodeId}</code>
                                     </td>
                                     <td style={{ ...rowCell, whiteSpace: 'nowrap' }}>
@@ -297,6 +322,45 @@ export function DocsCanvasShell({ description, children, attachSourceBelow = tru
  * Single card: inline Canvas + Controls so the playground reads as one panel.
  */
 export function DocsInteractivePlayground({ description, of: ofStory }) {
+    // The canvas region must hold the component's TALLEST state (an open menu,
+    // an expanded panel) without scrolling or cropping it. Storybook's own
+    // .docs-story / .sbdocs-preview stop clipping inside this panel (see
+    // storybook-overrides.css), so an open overlay lands in the canvas's
+    // scrollable overflow; this ratchets min-height up to the largest extent
+    // seen, so the overlay gets real room instead of covering the controls.
+    const canvasRef = React.useRef(null);
+    const [canvasMinHeight, setCanvasMinHeight] = React.useState(null);
+    React.useEffect(() => {
+        const el = canvasRef.current;
+        if (!el || typeof MutationObserver === 'undefined') return undefined;
+        // scrollHeight misses overflow from absolutely-positioned descendants
+        // whose containing block sits deeper in the story, so measure the union
+        // of descendant rects instead. 12px keeps the tallest state off the
+        // controls divider.
+        const measure = () => {
+            const base = el.getBoundingClientRect();
+            let maxBottom = base.bottom;
+            for (const child of el.querySelectorAll('*')) {
+                const r = child.getBoundingClientRect();
+                if (r.height > 0 && r.bottom > maxBottom) maxBottom = r.bottom;
+            }
+            if (maxBottom <= base.bottom) return;
+            const needed = Math.ceil(el.clientHeight + (maxBottom - base.bottom)) + 12;
+            setCanvasMinHeight((prev) => (prev == null || needed > prev ? needed : prev));
+        };
+        let raf = 0;
+        const schedule = () => {
+            if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(measure);
+        };
+        schedule();
+        const observer = new MutationObserver(schedule);
+        observer.observe(el, { subtree: true, attributes: true, childList: true });
+        return () => {
+            observer.disconnect();
+            if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(raf);
+        };
+    }, []);
     return (
         <div className="sb-docs-demo not-prose space-y-6 md:space-y-8">
             {description ? (
@@ -310,7 +374,11 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                     border: '1px solid var(--color-outline-variant)',
                 }}
             >
-                <div className="min-h-[100px] p-10 md:p-12 lg:p-14">
+                <div
+                    ref={canvasRef}
+                    className="min-h-[100px] p-10 md:p-12 lg:p-14"
+                    style={canvasMinHeight != null ? { minHeight: `${canvasMinHeight}px` } : undefined}
+                >
                     <Canvas
                         of={ofStory}
                         story={{ inline: true }}
@@ -323,6 +391,11 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                     style={{
                         borderColor: 'var(--color-outline-variant)',
                         backgroundColor: 'var(--color-surface-container-lowest)',
+                        // The panel is overflow-visible (Controls popovers), so this
+                        // last child's own background must follow the panel's curve
+                        // or it squares off the bottom corners.
+                        borderBottomLeftRadius: 'calc(var(--size-card-radius-sm) - 1px)',
+                        borderBottomRightRadius: 'calc(var(--size-card-radius-sm) - 1px)',
                     }}
                 >
                     <Controls of={ofStory} />
