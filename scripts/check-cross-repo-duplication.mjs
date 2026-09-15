@@ -215,9 +215,9 @@ export const RECORDED = [
   {
     a: 'blueprint:docs/reference/interface-schema-map.md',
     b: 'sb:references/interface-schema-map.md',
-    words: 528,
+    words: 430,
     why:
-      'the rename map\'s sibling, and the finding this sweep opened with. #365 and #137 each MOVED their interface→schema map out of the glossary rather than deduplicating it, so the two now state the same alignment rule, the same "not listed would mean both aligned and nobody looked", and the same quoted complaint, in two repos, already drifting — one says five components, the other seven. Closing it is an edit in two other repositories (sb owns the method, the blueprint owns its deployment of it), which is its own ticket; the ceiling is what stops a third paragraph joining them meanwhile.',
+      'the rename map\'s sibling, and the finding this sweep opened with. #365 and #137 each MOVED their interface→schema map out of the glossary rather than deduplicating it, so the two stated the same alignment rule, the same "not listed would mean both aligned and nobody looked", and the same quoted complaint, in two repos, already drifting — one said five components, the other seven. On 2026-09-14 the blueprint\'s preamble became a pointer at sb\'s (plus-uno-blueprint#672): the method prose has one home now. What remains shared is the GENERATED binding table — each repo\'s `npm run interface-map` writes rows from its own schema, and a deployment of the method binds most of the same words to the same columns — which is duplication by construction, not by hand. Measured at 430 that day, from 609; the ceiling keeps a hand-written paragraph from joining the rows again.',
   },
 ];
 
