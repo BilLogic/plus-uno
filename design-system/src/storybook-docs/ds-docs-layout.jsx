@@ -40,7 +40,7 @@ export function ResourcesCard({ href, icon, title, description }) {
             href={href || '#'} 
             target={isExternalLink ? "_blank" : undefined}
             rel={isExternalLink ? "noreferrer noopener" : undefined}
-            className="group block p-4 border border-border bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-md no-underline transition-all relative text-left"
+            className="group block p-4 border border-border bg-surface shadow-[var(--shadow-docs-card)] hover:shadow-md no-underline transition-all relative text-left"
             style={{
                 width: '200px',
                 textDecoration: 'none',
@@ -86,15 +86,33 @@ export function FigmaNodesTable({ sets, fileKey }) {
     const rows = figmaVariantRows(sets);
     if (rows.length === 0) return null;
 
+    // One palette for every line in this table AND for the frame around it:
+    // --color-outline-variant, the design system's inner-divider Token
+    // (design-system/src/tokens/_colors.scss), which is what the canvas cards
+    // and the collapsed-canvas rules in .storybook/storybook-overrides.css
+    // already draw with. NOT --color-border and NOT --bs-border-color: the
+    // first is the docs chrome's own shadcn variable (storybook-tailwind.css
+    // aliases it to --border, a zinc), the second is Bootstrap's, and neither
+    // is a design-system Token. Storybook injects its own borders on ALL FOUR
+    // sides of th/td (its text colour at 15%); under border-collapse those
+    // merged away, but this table is border-separate (see below), where they
+    // stack — doubled inner lines, and a thickened top/left frame edge.
+    // Inline 'none' on every side Storybook draws zeroes them; the row line and
+    // the two column dividers are added back explicitly.
+    const lineColor = 'var(--color-outline-variant)';
     const cellStyle = {
         padding: '8px 12px',
-        borderBottom: '1px solid var(--color-border, #e5e7eb)',
+        borderTop: 'none',
+        borderBottom: `1px solid ${lineColor}`,
+        borderLeft: 'none',
+        borderRight: 'none',
         textAlign: 'left',
         verticalAlign: 'top',
         fontSize: '13px',
         lineHeight: 1.4,
     };
     const headStyle = { ...cellStyle, fontWeight: 600, whiteSpace: 'nowrap' };
+    const dividerRight = { borderRight: `1px solid ${lineColor}` };
 
     return (
         <div className="sb-ds-figma-nodes not-prose" style={{ marginTop: '24px' }}>
@@ -111,17 +129,35 @@ export function FigmaNodesTable({ sets, fileKey }) {
                 Figma nodes
             </div>
             <div
-                className="overflow-hidden border border-border bg-surface"
-                style={{ borderRadius: 'var(--size-card-radius-sm)' }}
+                className="overflow-hidden bg-surface"
+                style={{
+                    borderRadius: 'var(--size-card-radius-sm)',
+                    // The frame draws the same line as the cells inside it, so
+                    // the table is one palette and moves with the Token. (The
+                    // Token has no dark value today — one grey, both themes —
+                    // which is a question for the colour roles, not for a table.)
+                    border: `1px solid ${lineColor}`,
+                    // The Resources cards' lift, from the one place it is defined
+                    // (storybook-tailwind.css), so the two read as one family.
+                    boxShadow: 'var(--shadow-docs-card)',
+                }}
             >
                 <table
-                    className="border-collapse text-on-surface"
-                    style={{ margin: 0, width: '100%', fontSize: '13px' }}
+                    className="text-on-surface"
+                    style={{
+                        margin: 0,
+                        width: '100%',
+                        fontSize: '13px',
+                        // separate: collapsed cell borders paint across the
+                        // wrapper's rounded corners — the "cut corner" artifact.
+                        borderCollapse: 'separate',
+                        borderSpacing: 0,
+                    }}
                 >
                     <thead>
                         <tr className="bg-muted/40">
-                            <th style={headStyle}>Style / variant</th>
-                            <th style={headStyle}>Node ID</th>
+                            <th style={{ ...headStyle, ...dividerRight }}>Style / variant</th>
+                            <th style={{ ...headStyle, ...dividerRight }}>Node ID</th>
                             <th style={headStyle}>Figma link</th>
                         </tr>
                     </thead>
@@ -138,10 +174,10 @@ export function FigmaNodesTable({ sets, fileKey }) {
                             const rowCell = isLast ? { ...cellStyle, borderBottom: 'none' } : cellStyle;
                             return (
                                 <tr key={set.id || nodeId || index}>
-                                    <td style={rowCell} className="font-medium text-on-surface">
+                                    <td style={{ ...rowCell, ...dividerRight }} className="font-medium text-on-surface">
                                         {set.name || set.id || '—'}
                                     </td>
-                                    <td style={{ ...rowCell, whiteSpace: 'nowrap' }}>
+                                    <td style={{ ...rowCell, ...dividerRight, whiteSpace: 'nowrap' }}>
                                         <code style={{ fontSize: '12px' }} className="text-on-surface-variant">{nodeId}</code>
                                     </td>
                                     <td style={{ ...rowCell, whiteSpace: 'nowrap' }}>
@@ -294,9 +330,84 @@ export function DocsCanvasShell({ description, children, attachSourceBelow = tru
 }
 
 /**
+ * The breathing room between the canvas's tallest state and the Controls
+ * divider. A design value, so it names a Token rather than a number:
+ * `--size-element-gap-lg` is the design system's 12px element gap.
+ */
+const CANVAS_OVERLAY_GAP = 'var(--size-element-gap-lg)';
+
+/**
  * Single card: inline Canvas + Controls so the playground reads as one panel.
  */
 export function DocsInteractivePlayground({ description, of: ofStory }) {
+    // The canvas region must hold the component's TALLEST state (an open menu,
+    // an expanded panel) without scrolling or cropping it. Storybook's own
+    // .docs-story / .sbdocs-preview stop clipping inside this panel (see
+    // storybook-overrides.css), so an open overlay would otherwise paint over
+    // the Controls row; this sizes the canvas to whatever the current state
+    // needs.
+    //
+    // WHY IT MEASURES THE NATURAL HEIGHT EVERY PASS RATHER THAN RATCHETING UP.
+    // A one-way ratchet (`needed > prev`) shipped first and had two faults. It
+    // never released: one transiently-open menu inflated the canvas for the rest
+    // of the page's life, with no reset when the story or its args changed. And
+    // `needed` is derived from the element's own height, so re-measuring while
+    // the write was still applied compounded the pad every pass. Clearing the
+    // inline min-height, measuring, and restoring it inside the same animation
+    // frame reads the height the content actually wants right now: it grows when
+    // the menu opens, releases when it closes, and cannot compound, because no
+    // pass ever measures a previous pass's output. Nothing paints between the
+    // clear and the restore, so there is no flicker.
+    const canvasRef = React.useRef(null);
+    const [canvasMinHeight, setCanvasMinHeight] = React.useState(null);
+    React.useEffect(() => {
+        const el = canvasRef.current;
+        if (!el || typeof MutationObserver === 'undefined') return undefined;
+        // scrollHeight misses overflow from absolutely-positioned descendants
+        // whose containing block sits deeper in the story, so measure the union
+        // of descendant rects instead.
+        const measure = () => {
+            const applied = el.style.minHeight;
+            el.style.minHeight = '';
+            let needed = null;
+            try {
+                const base = el.getBoundingClientRect();
+                let maxBottom = base.bottom;
+                for (const child of el.querySelectorAll('*')) {
+                    const r = child.getBoundingClientRect();
+                    if (r.height > 0 && r.bottom > maxBottom) maxBottom = r.bottom;
+                }
+                if (maxBottom > base.bottom) {
+                    needed = Math.ceil(el.clientHeight + (maxBottom - base.bottom));
+                }
+            } finally {
+                // React owns this property, but it only rewrites it on a re-render
+                // and the state may not have changed — so put it back by hand.
+                el.style.minHeight = applied;
+            }
+            setCanvasMinHeight((prev) => (prev === needed ? prev : needed));
+        };
+        let raf = 0;
+        const schedule = () => {
+            if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(measure);
+        };
+        schedule();
+        // Our own min-height write lands as an `attributes` record on `el`. Left
+        // unfiltered it re-entered `measure`, which is the loop the comment above
+        // describes; every other mutation in the subtree is real news.
+        const observer = new MutationObserver((records) => {
+            const ours = (record) =>
+                record.type === 'attributes' && record.target === el && record.attributeName === 'style';
+            if (records.every(ours)) return;
+            schedule();
+        });
+        observer.observe(el, { subtree: true, attributes: true, childList: true });
+        return () => {
+            observer.disconnect();
+            if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(raf);
+        };
+    }, [ofStory]);
     return (
         <div className="sb-docs-demo not-prose space-y-6 md:space-y-8">
             {description ? (
@@ -310,7 +421,15 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                     border: '1px solid var(--color-outline-variant)',
                 }}
             >
-                <div className="min-h-[100px] p-10 md:p-12 lg:p-14">
+                <div
+                    ref={canvasRef}
+                    className="min-h-[100px] p-10 md:p-12 lg:p-14"
+                    style={
+                        canvasMinHeight != null
+                            ? { minHeight: `calc(${canvasMinHeight}px + ${CANVAS_OVERLAY_GAP})` }
+                            : undefined
+                    }
+                >
                     <Canvas
                         of={ofStory}
                         story={{ inline: true }}
@@ -323,6 +442,11 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                     style={{
                         borderColor: 'var(--color-outline-variant)',
                         backgroundColor: 'var(--color-surface-container-lowest)',
+                        // The panel is overflow-visible (Controls popovers), so this
+                        // last child's own background must follow the panel's curve
+                        // or it squares off the bottom corners.
+                        borderBottomLeftRadius: 'calc(var(--size-card-radius-sm) - 1px)',
+                        borderBottomRightRadius: 'calc(var(--size-card-radius-sm) - 1px)',
                     }}
                 >
                     <Controls of={ofStory} />

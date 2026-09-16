@@ -50,6 +50,16 @@
   --border: oklch(0.92 0.004 286.32);
   --input: oklch(0.92 0.004 286.32);
   --ring: oklch(0.705 0.015 286.067);
+
+  /*
+   * The docs cards' hairline lift. ONE definition, because ResourcesCard and the
+   * Figma-nodes table beside it are meant to read as one family and were drifting
+   * apart as two copies of the same literal. No `--elevation-*` Token matches it:
+   * the design system's elevations are the MD3 ramp, several times heavier, and
+   * this is documentation chrome rather than a product surface — which is what
+   * this file is for.
+   */
+  --shadow-docs-card: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .dark {

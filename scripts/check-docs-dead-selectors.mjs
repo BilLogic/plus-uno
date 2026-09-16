@@ -111,6 +111,7 @@ const VENDOR = new Map([
   ['sbdocs-title', '@storybook/addon-docs/dist/blocks.js'],
   ['sbdocs-preview', '@storybook/addon-docs/dist/blocks.js'],
   ['sbdocs-preview-actions', '@storybook/addon-docs/dist/blocks.js'],
+  ['docblock-code-toggle--expanded', '@storybook/addon-docs/dist/blocks.js'],
   ['sbdocs-toc', '@storybook/addon-docs/dist/blocks.js'],
   ['sbdocs-a', 'storybook/dist/core-server/presets/common-manager.js'],
   ['toc-wrapper', '@storybook/addon-docs/dist/blocks.js'],
