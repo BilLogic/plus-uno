@@ -33,13 +33,13 @@ const MAX_AGE_DAYS = 180;
 
 /**
  * Floors — the count each snapshot held at its last real capture (variables
- * 2026-09-06, components 2026-07-09). A snapshot that shrank without anyone
+ * 2026-09-06, components 2026-09-15). A snapshot that shrank without anyone
  * deciding to shrink it is the failure this pairs with the date: an old
  * snapshot agrees with everything, and so does an empty one. Each floor moves
  * up only when a refresh has been run and its delta written down.
  */
 const MIN_VARIABLES = 361;
-const MIN_COMPONENTS = 1311;
+const MIN_COMPONENTS = 1347;
 
 /** The library both snapshots are of. */
 const FILE_KEY = 'zAecJNRdvJzAUOcjV32tRX';

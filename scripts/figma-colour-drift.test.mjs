@@ -12,15 +12,15 @@ const RECORDING = JSON.parse(
 );
 
 test('the Figma naming convention maps onto the CSS one', () => {
-  assert.equal(cssName('_Primary/Primary'), '--color-primary');
-  assert.equal(cssName('_Primary/Primary (Text)'), '--color-primary-text');
-  assert.equal(cssName('_Primary/Primary Container'), '--color-primary-container');
-  assert.equal(cssName('_Primary/On Primary'), '--color-on-primary');
-  assert.equal(cssName('_Primary/On Primary Container'), '--color-on-primary-container');
-  assert.equal(cssName('_Primary/Inverse Primary'), '--color-inverse-primary');
-  assert.equal(cssName('_Warning/Warning Icon'), '--color-warning-icon');
-  assert.equal(cssName('_Warning/Warning Border'), '--color-warning-border');
-  assert.equal(cssName('_Mastering-Content/Mastering-Content (Text)'), '--color-mastering-content-text');
+  assert.equal(cssName('Primary/Primary'), '--color-primary');
+  assert.equal(cssName('Primary/Primary (Text)'), '--color-primary-text');
+  assert.equal(cssName('Primary/Primary Container'), '--color-primary-container');
+  assert.equal(cssName('Primary/On Primary'), '--color-on-primary');
+  assert.equal(cssName('Primary/On Primary Container'), '--color-on-primary-container');
+  assert.equal(cssName('Primary/Inverse Primary'), '--color-inverse-primary');
+  assert.equal(cssName('Warning/Warning Icon'), '--color-warning-icon');
+  assert.equal(cssName('Warning/Warning Border'), '--color-warning-border');
+  assert.equal(cssName('Mastering-Content/Mastering-Content (Text)'), '--color-mastering-content-text');
   assert.equal(cssName('Neutral Colors/Surface container/surface-container-highest'), '--color-surface-container-highest');
   assert.equal(cssName('Neutral Colors/Alternative/inverse-on-surface'), '--color-inverse-on-surface');
 });
@@ -28,6 +28,13 @@ test('the Figma naming convention maps onto the CSS one', () => {
 test('proposals are not compared', () => {
   // A candidate has no CSS counterpart by definition; treating one as a
   // divergence would make every proposal a failure.
+  assert.equal(cssName('Proposal/Info Bold (candidate)'), null);
+});
+
+test('a name recorded before the 2026-09-06 rename still maps', () => {
+  // The accent groups shed their leading `_` that day. The strip in cssName is
+  // what keeps an older recording readable, so it is pinned rather than assumed.
+  assert.equal(cssName('_Primary/Primary'), '--color-primary');
   assert.equal(cssName('_Proposal/Info Bold (candidate)'), null);
 });
 

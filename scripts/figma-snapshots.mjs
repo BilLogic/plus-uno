@@ -50,7 +50,20 @@
  * and no `FIGMA_ACCESS_TOKEN` exists in this checkout. The canvas, which the
  * Figma MCP can read, held 1,977 COMPONENT nodes in 171 sets against the
  * snapshot's 1,311 published variants in 97 — a different population, not a
- * delta, which is why the floor below stays where the last real capture put it.
+ * delta, which is why the floor stayed where the last real capture put it.
+ *
+ * WHAT THE 2026-09-15 REFRESH MEASURED. A `FIGMA_ACCESS_TOKEN` was available
+ * for one run, so `snapshot:figma-components` rewrote the components file for
+ * the first time since 2026-07-09: 1,311 published variants became 1,347, over
+ * 53 additions and 17 removals. The additions are the two sets the library
+ * gained on 2026-08-29 — `Tag` (28 variants) and `AI label` (6) — plus
+ * `Pattern/Card` (6), `Sidebar Tab` (5), `Pattern/Modal` (3), `Pattern/Section`
+ * (3) and two loose pattern components. The removals are one set withdrawn
+ * (`Breakpoint`, 6 variants) plus two sets FLATTENED into single components:
+ * `Rating System (with text)` and `Scale Options` now publish only their own
+ * node, which is exactly the COMPONENT node-types.json already records for
+ * `13536:195` and `13536:9083`. Two loose experiments left with them.
+ * That delta is what moved `MIN_COMPONENTS` to 1,347 in the check.
  */
 
 /**

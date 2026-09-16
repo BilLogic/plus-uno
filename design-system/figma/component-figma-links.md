@@ -160,7 +160,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Textarea | Form Textarea | `13541:10731` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731) | verified |
 | Components | Toast | Toast | `44:4803` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4803) | verified |
 | Components | Tooltip | Tooltip | `42:6020` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-6020) | verified |
-| Components | TreeSelect | _tree_select | `13526:17500` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13526-17500) | verified |
+| Components | TreeSelect | _tree_select | `13526:17500` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13526-17500) | unpublished |
 | Components | TreeSelect | Indented Tree Select Item List | `13520:70443` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13520-70443) | verified |
 | Components | TreeSelect | tree_dropdown layers | `13529:1075` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13529-1075) | verified |
 | Other | Footer | Footnote | `111:227940` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227940) | verified |
