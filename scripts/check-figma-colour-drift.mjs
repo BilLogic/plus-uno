@@ -6,11 +6,15 @@
  * See `scripts/figma-colour-drift.mjs` for what was unwatched: the variables
  * snapshot records every variable by NAME and by count and not one VALUE, so a
  * colour could move on either side and the names would still line up perfectly.
- * Two had, both found in the same sweep on 2026-08-29 and both listed below.
+ * Two had, both found in the same sweep on 2026-08-29, and both have since been
+ * resolved — `--color-scrim` on the CSS side, `--color-success-container` on the
+ * Figma side on 2026-09-15. `KNOWN` below is empty, which is the state to keep
+ * it in.
  *
- * WHY THE TWO ARE EXEMPTED RATHER THAN FIXED. Each is a decision, not a repair:
- * whichever side you change, a colour that ships today moves. They are recorded
- * with what each side says, and the ratchet is that this list may SHRINK and
+ * WHAT `KNOWN` IS FOR. A divergence that is a decision rather than a repair:
+ * whichever side you change, a colour that ships today moves. Such an entry
+ * records what both sides say, so a change on EITHER side fails rather than
+ * sliding under the exemption. The ratchet is that the list may SHRINK and
  * never grow — a new divergence fails, and so does an entry that has stopped
  * diverging, because a stale exemption is how the next one gets waved through.
  *
@@ -38,21 +42,13 @@ const MAX_AGE_DAYS = 180;
 const MIN_COMPARED = 90;
 
 /**
- * The divergences that exist and are Bill's to resolve. Each says what both
- * sides hold, so a change on EITHER side fails rather than sliding under the
- * exemption.
+ * The divergences somebody has looked at and chosen to leave, each saying what
+ * both sides hold. Empty, and the ratchet above is what keeps it that way.
  */
 const KNOWN = [
-  {
-    token: '--color-success-container',
-    figma: '#a1eb83',
-    css: '#bdf292',
-    why:
-      'Both sides are internally consistent — the CSS state layers are built from ' +
-      'rgba(189, 242, 146, …) and the Figma ones from #a1eb83 — so each looks right ' +
-      'alone and only the comparison shows the split. Success containers ship in ' +
-      'Badge, Alert and the lesson tables; whichever side moves, they move.',
-  },
+  // Empty since 2026-09-15: `--color-success-container` was resolved on the
+  // Figma side, where the variable now records the CSS's #bdf292 (re-measured
+  // into the recording the same day). The entry left with the divergence.
 ];
 
 export const REMEDY =

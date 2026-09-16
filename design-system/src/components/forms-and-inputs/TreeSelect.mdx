@@ -8,6 +8,16 @@ export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
   "sets": [
     {
+      "id": "tree-select",
+      "name": "_tree_select",
+      "componentSetNodeId": "13526:17500",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13526-17500",
+      "source": "manual",
+      "status": "unpublished",
+      "isComponentSet": false,
+      "notes": "The assembled tree select panel — a single COMPONENT, `_`-prefixed per the library's private convention. Owner named it canonical on 2026-09-15, with the two building-block sets below CONTAINED as instances; it still mixes tree_dropdown ver 1 and ver 3 parts internally. ⚠ The Figma design is NOT finalized — confirm with the owner before treating this mapping or the panel's visuals as final. PROVENANCE: resolved by the MCP get_metadata tool on 2026-09-15, which is where its COMPONENT type comes from. It is NOT in scripts/figma-component-snapshot.json — private components are never published, so `unpublished` is its settled state rather than a step on the way to `verified`, and the link opens for someone with access to the file rather than from the library. tree_select_ver2 (13529:2016), mapped here until 2026-09-15, IS published, and was dropped all the same: the owner does not count it part of the canonical trio."
+    },
+    {
       "id": "tree-dropdown-layers",
       "name": "tree_dropdown layers",
       "componentSetNodeId": "13529:1075",
@@ -15,17 +25,17 @@ export const figmaMeta = {
       "source": "manual",
       "status": "verified",
       "isComponentSet": true,
-      "note": "The indent layers a tree select is drawn from — 8 variants over open? and # of indents (0-3). Page-level and documented. The two sets under the page's Legacy section (tree_dropdown component ver 1, Indented Tree Select Item List) and the private _tree dropdown Indent are deliberately unmapped."
+      "notes": "Building block: the indent layers a tree select row is drawn from — 8 variants over open? and # of indents (0-3). Instantiated inside _tree_select. PROVENANCE: all 8 variants are in the 2026-09-15 components snapshot, so this one is published, not merely resolvable."
     },
     {
-      "id": "tree-select-ver2",
-      "name": "tree_select_ver2",
-      "componentSetNodeId": "13529:2016",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13529-2016",
+      "id": "indented-tree-select-item-list",
+      "name": "Indented Tree Select Item List",
+      "componentSetNodeId": "13520:70443",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13520-70443",
       "source": "manual",
       "status": "verified",
-      "isComponentSet": false,
-      "note": "The v2 tree select itself — a plain COMPONENT and not a set, which is what isComponentSet: false records. Resolved and typed against Figma on 2026-08-29."
+      "isComponentSet": true,
+      "notes": "Building block: the indented item list — 9 variants over '# of items' (1-9). Instantiated inside _tree_select. PROVENANCE: typed by get_metadata on 2026-09-15, and all 9 variants (13520:70444 through 13520:70488) are in the components snapshot of that date, so it is published. The earlier note calling this set Legacy-and-deliberately-unmapped was wrong; the owner names it part of the canonical trio."
     }
   ]
 };
@@ -44,6 +54,14 @@ export const figmaMeta = {
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
+
+**The Figma design is not finalized.** `_tree_select` (`13526:17500`) is the
+panel the owner named canonical on 2026-09-15, and it still mixes
+`tree_dropdown` ver 1 and ver 3 parts internally. It is private in the library
+— `_`-prefixed, and absent from the published-components snapshot — so the link
+above opens for someone with access to the file rather than from the published
+library. The two building-block sets beneath it are published. Confirm with the
+owner before treating the mapping, or the panel's visuals, as final.
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 

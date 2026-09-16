@@ -11,16 +11,20 @@
  *
  *   --color-success-container   #bdf292 in _colors.scss,  #a1eb83 in Figma
  *
- * Both sides are internally consistent — the CSS state layers are built from
- * `rgba(189, 242, 146, …)` and the Figma ones from `#a1eb83` — so each looks
- * correct on its own, and only the comparison shows the split. Which side is
- * right is a decision, not a repair: changing either moves a colour that ships.
- * It is recorded as a KNOWN divergence with that reasoning, and the count of
+ * Both sides were internally consistent — the CSS state layers built from
+ * `rgba(189, 242, 146, …)` and the Figma ones from `#a1eb83` — so each looked
+ * correct on its own, and only the comparison showed the split. Which side was
+ * right was a decision, not a repair: changing either moves a colour that
+ * ships. It sat as a KNOWN divergence until 2026-09-15, when the owner chose
+ * #bdf292 and the live library turned out to already hold it: the variable
+ * re-measured to #bdf292 into the recording that day. The state layers are NOT
+ * evidence either way — `colour-values.json` excludes them by design, because
+ * they are the base colour at 8/12/16% and drift with it. The count of
  * divergences is a ratchet.
  *
  * WHY THE MAPPING RUNS FIGMA -> CSS. Figma is the source, and the CSS is
  * generated from it. A variable with no CSS counterpart is normal (candidates
- * under `_Proposal/`, the `Surface roles/` set) and is reported as UNMAPPED
+ * under `Proposal/`, the `Surface roles/` set) and is reported as UNMAPPED
  * rather than failed; a CSS token with no Figma variable is a different
  * question, and `check:token-registry` already asks it.
  */
@@ -29,14 +33,19 @@ import path from 'node:path';
 
 import { resolveToken, tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 
-/** `_Mastering-Content/Mastering-Content (Text)` -> `--color-mastering-content-text` */
+/**
+ * `Mastering-Content/Mastering-Content (Text)` -> `--color-mastering-content-text`
+ *
+ * The accent groups shed their leading `_` in the 2026-09-06 rename. The strip
+ * stays so a name recorded before it still maps to the same token.
+ */
 export function cssName(figmaName) {
   const parts = figmaName.split('/');
   const leaf = parts[parts.length - 1];
   const group = parts[0].replace(/^_/, '');
 
   // Proposals are candidates by definition and have no CSS counterpart.
-  if (group === '_Proposal' || parts[0] === '_Proposal') return null;
+  if (group === 'Proposal') return null;
 
   const slug = (s) =>
     s

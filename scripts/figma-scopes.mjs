@@ -14,18 +14,22 @@
  * Five variables sat outside it, and every one was offerable as a TEXT_FILL its
  * contrast cannot carry:
  *
- *   _Primary/Primary              ALL_SCOPES  — 4.31:1 and 4.08:1 on the two
+ *   Primary/Primary               ALL_SCOPES  — 4.31:1 and 4.08:1 on the two
  *                                               darkest surface steps
- *   _Relationship/Relationship    ALL_SCOPES
- *   _Warning/Warning Container    ALL_FILLS   — #ffe17a is 1.5:1 on white
- *   _Advocacy/Advocacy Container  ALL_FILLS   — the same shape
- *   _Warning/Warning (Text)       ALL_SCOPES  — the INVERSE error: the one
+ *   Relationship/Relationship     ALL_SCOPES
+ *   Warning/Warning Container     ALL_FILLS   — #ffe17a is 1.5:1 on white
+ *   Advocacy/Advocacy Container   ALL_FILLS   — the same shape
+ *   Warning/Warning (Text)        ALL_SCOPES  — the INVERSE error: the one
  *                                               warning value that passes as
  *                                               text was also offered as a ground
  *
+ * (The sweep read them under their `_`-hidden names; the accent groups shed the
+ * leading underscore in the 2026-09-06 rename and are spelled here as the
+ * library spells them now.)
+ *
  * That is the same defect as the 108 CSS declarations painting a foreground from
  * an intent base (#368), reached from the other end: a designer picking
- * `_Primary/Primary` for a label in Figma is doing exactly what the stylesheets
+ * `Primary/Primary` for a label in Figma is doing exactly what the stylesheets
  * do, and the file was inviting it.
  *
  * WHY THE CONVENTION IS DERIVED AND NOT DECLARED. Hard-coding the five scope
@@ -35,15 +39,32 @@
  * than "this one disagrees with me".
  */
 
-/** `_Warning/Warning (Text)` -> `{group: 'Warning', role: 'text'}` */
+/**
+ * What the intent-base convention is NOT asked of, and why. A key is either a
+ * GROUP, which puts every variable in it out of scope, or a full `Group/Leaf`
+ * name, which puts one variable out. Narrow by default: `Focus/Focus Ring` is
+ * exempt, but a future `Focus/*` intent base is not, and gets checked like any
+ * other. Matched after the leading `_` is stripped, so a name recorded before
+ * the 2026-09-06 rename reads the same.
+ */
+export const UNCLASSIFIED = {
+  Proposal: 'candidates are not the library yet',
+  'Focus/Focus Ring':
+    'a focus indicator rather than an intent — no (Text)/Container/On peers, ' +
+    'and its STROKE_COLOR-only scope is the point (WCAG 2.4.11, #368)',
+};
+
+/** `Warning/Warning (Text)` -> `{group: 'Warning', role: 'text'}` */
 export function classify(figmaName) {
   const parts = figmaName.split('/');
   if (parts.length !== 2) return null;
   const group = parts[0].replace(/^_/, '');
-  if (group === 'Proposal') return null; // candidates are not the library yet
   const leaf = parts[1].trim();
+  if (Object.hasOwn(UNCLASSIFIED, group) || Object.hasOwn(UNCLASSIFIED, `${group}/${leaf}`)) {
+    return null;
+  }
 
-  // The stray neutral filed under _Advocacy is not an Advocacy role.
+  // The stray neutral filed under Advocacy is not an Advocacy role.
   if (!leaf.toLowerCase().includes(group.toLowerCase())) return null;
 
   if (/\(Text\)$/.test(leaf)) return { group, role: 'text' };

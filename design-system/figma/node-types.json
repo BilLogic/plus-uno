@@ -1,7 +1,7 @@
 {
-  "note": "What each mapped Figma node ACTUALLY is, read from Figma. Not derived from anything in this repo \u2014 it is a measurement, and check:figma-node-types holds the registry to it. Re-measure with npm run audit:figma-registry and record the date.",
-  "measuredAt": "2026-08-29",
-  "method": "figma.getNodeByIdAsync(id).type, one call per file, via the Figma Plugin API.",
+  "note": "What each mapped Figma node ACTUALLY is, read from Figma. Not derived from anything in this repo — it is a measurement, and check:figma-node-types holds the registry to it. Re-measure with npm run audit:figma-registry and record the date. measuredAt is the date of the MOST RECENT reading in this file, not a claim that every row was read that day: 98 rows were read 2026-08-29 with the Plugin API, and 13526:17500 and 13520:70443 were read 2026-09-15 with the MCP get_metadata tool when the owner named the tree select trio. 13529:2016 (tree_select_ver2) left the registry the same day and its row left with it.",
+  "measuredAt": "2026-09-15",
+  "method": "figma.getNodeByIdAsync(id).type, one call per file, via the Figma Plugin API; the two rows added 2026-09-15 came from the Figma MCP get_metadata tool, which reports the same node type.",
   "files": {
     "zAecJNRdvJzAUOcjV32tRX": "Design System - BS4 Foundation (Component Library)",
     "W0qzhXWxFsMwSJzkdV2yal": "Design System - Web App Specs"
@@ -82,10 +82,6 @@
     "13529:1075": {
       "file": "zAecJNRdvJzAUOcjV32tRX",
       "type": "COMPONENT_SET"
-    },
-    "13529:2016": {
-      "file": "zAecJNRdvJzAUOcjV32tRX",
-      "type": "COMPONENT"
     },
     "13536:195": {
       "file": "zAecJNRdvJzAUOcjV32tRX",
@@ -400,6 +396,14 @@
       "type": "COMPONENT_SET"
     },
     "979:20977": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT_SET"
+    },
+    "13526:17500": {
+      "file": "zAecJNRdvJzAUOcjV32tRX",
+      "type": "COMPONENT"
+    },
+    "13520:70443": {
       "file": "zAecJNRdvJzAUOcjV32tRX",
       "type": "COMPONENT_SET"
     }

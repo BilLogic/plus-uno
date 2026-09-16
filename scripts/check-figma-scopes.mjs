@@ -5,7 +5,7 @@
  *
  * See `scripts/figma-scopes.mjs` for the convention and for the five variables
  * that sat outside it until 2026-08-29 — every one of them offerable as a
- * TEXT_FILL, including `_Warning/Warning Container` at 1.5:1 on white. That is
+ * TEXT_FILL, including `Warning/Warning Container` at 1.5:1 on white. That is
  * the same defect as the 108 CSS declarations painting a foreground from an
  * intent base (#368), reached from the designer's end.
  *

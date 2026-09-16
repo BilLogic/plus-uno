@@ -159,7 +159,7 @@ problem:
 | Select | Multi-Select Option | `15685:6233` | 3 |
 | Tree Select | tree_dropdown layers | `13529:1075` | 8 |
 | Tree Select | tree_dropdown component ver 1 | `13520:62188` | 3 |
-| Tree Select | Indented Tree Select Item List | `13520:70443` | 9 |
+| Tree Select | Indented Tree Select Item List | `13520:70443` | 9 — mapped 2026-09-15, § The tree select trio |
 | Accordion | accordion-item | `13667:4944` | 10 |
 | [wip] Card | Card Components | `59:15771` | 8 |
 | Nav Tabs & Nav Pills | Navbar Components | `72:16339` | 7 |
@@ -181,8 +181,10 @@ problem:
   (18 variants), `53:20700` (6) and `13659:1414` (1). That is the ver1 / ver2 /
   legacy layering the library keeps on purpose. Which is current is a question
   for design; a registry entry has to pick one and would be picking silently.
-  `Tree Select` has the same shape: `tree_dropdown component ver 1` beside the
-  mapped `tree_select_ver2`.
+  `Tree Select` had the same shape: `tree_dropdown component ver 1` beside the
+  then-mapped `tree_select_ver2`. **That reading was superseded on 2026-09-15**
+  — the owner named a different trio, and `tree_select_ver2` is no longer
+  mapped at all. See § The tree select trio below.
 - **Two are legitimately unmapped variants of a mapped component** —
   `Time (no label)` and `Month (no label)` on the Date & Time Picker page, the
   labelless twins of `Time (Date Picker)` and `Month (Date Picker)`. Whether
@@ -293,3 +295,39 @@ code does not have.
 
 **Unpublished.** Every Figma edit in this pass is local to the file until
 somebody publishes the library.
+
+## The tree select trio — 2026-09-15
+
+The owner named which Tree Select nodes the code maps to, and the answer is not
+what either pass above concluded. Three nodes, read with the Figma MCP
+`get_metadata` tool that day:
+
+| set | node | is | published? |
+|---|---|---|---|
+| `_tree_select` | `13526:17500` | COMPONENT | **no** — `_`-prefixed and private |
+| `tree_dropdown layers` | `13529:1075` | COMPONENT_SET, 8 variants | yes |
+| `Indented Tree Select Item List` | `13520:70443` | COMPONENT_SET, 9 variants | yes |
+
+`_tree_select` is the assembled panel and the two sets are instantiated inside
+it. `tree_select_ver2` (`13529:2016`) left the registry the same day: it is
+published, and it is still not what the code implements.
+
+**Two claims above are now false, and both are corrected in place.** The
+reverse sweep listed `Indented Tree Select Item List` among the 28 unmapped
+public sets, on the reading that it sat under the page's Legacy section — it is
+mapped now. And the "three of the same name" paragraph called
+`tree_select_ver2` "the mapped" set, which it has stopped being.
+
+**What `verified` means for each of the three**, because it does not mean the
+same thing twice. `tree_dropdown layers` and `Indented Tree Select Item List`
+are `verified`: every one of their variants is in
+`scripts/figma-component-snapshot.json` as captured 2026-09-15, which is the
+published-component list. `_tree_select` is `unpublished`: `get_metadata`
+resolved it and typed it, and it is absent from that snapshot, as a private
+component always will be. A link to it opens for someone with access to the
+file, not from the published library — so it is recorded as the mapping it is
+rather than as a verification the snapshot does not back.
+
+**And the design is not finalized.** The panel still mixes `tree_dropdown`
+ver 1 and ver 3 parts internally. `TreeSelect.mdx` carries that warning where a
+reader of the docs page will meet it, not only in the registry entry.
