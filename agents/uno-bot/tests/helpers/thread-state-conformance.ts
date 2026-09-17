@@ -212,6 +212,52 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
   });
 
+  // The revised card retires the one it replaces (#573). A person who answers a
+  // card with feedback gets a new card; until this, the old one stayed live for
+  // its full hour and a ✅ on it executed the very input they pushed back on.
+  it("staging a proposal supersedes the one already pending in that thread", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    clock.advance(2_000);
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+
+    const old = await store.getProposalByTs("1700.2");
+    assert.equal(old.state, "superseded");
+    assert.equal(old.state === "superseded" ? old.supersededBy : "", "1700.3");
+    // The newest card is untouched and still resolves normally.
+    assert.equal((await store.getProposalByTs("1700.3")).state, "found");
+    assert.equal((await store.getProposalByThread(THREAD))?.proposalTs, "1700.3");
+  });
+
+  // "superseded" and "expired" are different things to say to a person: one card
+  // was replaced two seconds ago, the other aged out an hour ago.
+  it("a superseded ts is not reported as expired", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    assert.notEqual((await store.getProposalByTs("1700.2")).state, "expired");
+  });
+
+  // Supersession is per conversation: a card pending in another thread is
+  // nobody else's to retire.
+  it("staging in one thread leaves another thread's card pending", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.putProposal(proposal({ proposalTs: "1700.4", threadTs: OTHER.thread }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found");
+    assert.equal((await store.getProposalByTs("1700.4")).state, "found");
+  });
+
+  // Nothing is retired by a card that was already dead: an aged-out record stays
+  // expired rather than being relabelled by the next turn's staging.
+  it("staging does not relabel an aged-out card", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
+  });
+
   it("get-by-thread returns the freshest live proposal for that thread", async () => {
     const { store, clock } = setup();
     await store.putProposal(proposal({ proposalTs: "1700.2" }));

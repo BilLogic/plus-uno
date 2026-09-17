@@ -188,9 +188,18 @@ export function proposalOperations(
  * Why "expired" and "none" are different answers: the gate must tell the
  * requester their delayed ✅/❌ hit an aged-out card, rather than ignore it
  * silently (live 2026-07-10).
+ *
+ * "superseded" is the same argument one step further (#573). A card the person
+ * answered with feedback is replaced by a revised one, and a ✅ on the old card
+ * used to run the very input they were pushing back on. It is deliberately NOT
+ * folded into "expired": a card replaced two seconds ago and one that aged out
+ * an hour ago are different things to say — the first has a live successor in
+ * the thread to point at, the second has nothing.
  */
 export type ProposalLookup =
   | { state: "found"; proposal: PendingProposal; createdAt: number }
+  /** Retired by a newer card in the same conversation; `supersededBy` is its ts. */
+  | { state: "superseded"; supersededBy: string }
   | { state: "expired" }
   | { state: "none" };
 
@@ -245,7 +254,16 @@ export interface ThreadState {
 
   // ----- proposals -----
 
-  /** Stage a proposal under its own `proposalTs`. */
+  /**
+   * Stage a proposal under its own `proposalTs`, retiring any proposal still
+   * pending in the SAME conversation.
+   *
+   * The retirement belongs to the store rather than to a caller because it is
+   * the staging that supersedes: a turn that stages nothing must leave a
+   * pending card alone, and there is exactly one way to stage. A retired card
+   * is kept, not deleted — a late ✅ on it has to be told it was replaced,
+   * rather than get the silence a missing record buys (#573).
+   */
   putProposal(proposal: PendingProposal): Promise<void>;
 
   /** Look one up by the ts of its card. */

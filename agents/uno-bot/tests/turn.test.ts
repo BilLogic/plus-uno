@@ -440,6 +440,45 @@ test("a side-effect call comes back as a proposal to stage, and the card was del
   assert.equal(staged?.proposalTs, h.delivery.stagedAt[0]);
 });
 
+// A revised card retires the one it replaces (#573) — and a turn that stages
+// nothing retires nothing. Someone asking a question while a card is pending
+// must come back to a card that still resolves.
+test("a turn that stages nothing leaves the pending card alone", async () => {
+  const h = harness({ replies: [{ text: "The blueprint says nothing about call-offs." }] });
+  await stage(h);
+
+  const outcome = await runTurn(request({ text: "what does the blueprint say?" }), h.deps);
+
+  assert.equal(outcome.disposition, "answered");
+  assert.equal((await h.threadState.getProposalByTs(PENDING.proposalTs)).state, "found");
+  assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, PENDING.proposalTs);
+});
+
+// The second card is the one the person is looking at, so it is the one that
+// resolves; the first is retired rather than left live for its full hour with
+// the input they pushed back on still loaded.
+test("staging a revised card supersedes the one it replaces", async () => {
+  const h = harness({
+    replies: [
+      {
+        text: "Filing the revised card.",
+        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2" } }],
+      },
+    ],
+  });
+  await stage(h);
+
+  const outcome = await runTurn(request({ text: "make it about reflections only" }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  const revisedTs = outcome.staged!.proposal.proposalTs;
+  const old = await h.threadState.getProposalByTs(PENDING.proposalTs);
+  assert.equal(old.state, "superseded");
+  assert.equal(old.state === "superseded" ? old.supersededBy : "", revisedTs);
+  // And the thread's live card is the new one.
+  assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, revisedTs);
+});
+
 test("a rewrite ask stages a replace, and never a silent append", async () => {
   // The Calendar Sync shape (2026-09-15): a page said something that had stopped
   // being true, and append-only meant the correction could only land BELOW the

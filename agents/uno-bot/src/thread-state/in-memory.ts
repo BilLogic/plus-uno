@@ -41,6 +41,9 @@ interface HistoryRecord {
 interface ProposalRecord {
   proposal: PendingProposal;
   createdAt: number;
+  /** The ts of the card that replaced this one, when a later turn staged a
+   *  revision in the same conversation. Set once and never cleared. */
+  supersededBy?: string;
 }
 
 interface AssistantContextRecord {
@@ -114,16 +117,32 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     // ----- proposals -----
 
     async putProposal(proposal) {
+      // The revised card retires the one it replaces (#573). Only LIVE records
+      // in this conversation are touched: an aged-out card is already answered
+      // by "expired", and another thread's card is not this turn's to retire.
+      for (const rec of proposals.values()) {
+        if (rec.proposal.proposalTs === proposal.proposalTs) continue;
+        if (rec.supersededBy) continue;
+        if (now() - rec.createdAt > PROPOSAL_TTL_MS) continue;
+        if (rec.proposal.channel !== proposal.channel) continue;
+        if (rec.proposal.threadTs !== proposal.threadTs) continue;
+        rec.supersededBy = proposal.proposalTs;
+      }
       proposals.set(proposal.proposalTs, { proposal, createdAt: now() });
     },
 
     async getProposalByTs(proposalTs): Promise<ProposalLookup> {
       const rec = proposals.get(proposalTs);
       if (!rec) return { state: "none" };
+      // TTL is the outer envelope: past it the record is gone either way, and
+      // the storage GC deletes on the same rule. Inside it, "replaced" is the
+      // more useful truth — and the case that actually happens, since a
+      // revision lands seconds after the card it retires.
       if (now() - rec.createdAt > PROPOSAL_TTL_MS) {
         proposals.delete(proposalTs);
         return { state: "expired" };
       }
+      if (rec.supersededBy) return { state: "superseded", supersededBy: rec.supersededBy };
       return { state: "found", proposal: rec.proposal, createdAt: rec.createdAt };
     },
 
@@ -133,6 +152,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       let best: ProposalRecord | null = null;
       for (const rec of proposals.values()) {
         if (now() - rec.createdAt > PROPOSAL_TTL_MS) continue;
+        if (rec.supersededBy) continue; // retired, and never the thread's live card
         if (rec.proposal.channel !== ref.channel || rec.proposal.threadTs !== ref.thread) continue;
         if (!best || rec.createdAt > best.createdAt) best = rec;
       }

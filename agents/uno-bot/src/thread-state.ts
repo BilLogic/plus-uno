@@ -63,6 +63,10 @@ interface HistoryRecord {
 interface ProposalRecord {
   payload: unknown;
   createdAt: number;
+  /** The ts of the card that replaced this one, when a later turn staged a
+   *  revision in the same conversation (#573). Absent on every record written
+   *  before it shipped, which reads as "not superseded" — the right answer. */
+  supersededBy?: string;
 }
 
 // Latest assistant-panel context (what surface the user has open) per thread.
@@ -204,7 +208,26 @@ export class ThreadState extends DurableObject<Env> {
 
   // ----- proposals -----
 
+  // Staging retires whatever was still pending in the same conversation (#573):
+  // a person who answers a card with feedback gets a revised card, and a ✅ on
+  // the old one used to execute the very input they were pushing back on. The
+  // retired record is kept rather than deleted so a late ✅ can be told it was
+  // replaced. One scan of the staged set, as `getProposalByThread` does — live
+  // cardinality is small because proposals expire after an hour.
   async putProposal(proposal: PendingProposal, at: number): Promise<void> {
+    const all = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
+    for (const [key, rec] of all) {
+      if (key === proposalKey(proposal.proposalTs)) continue;
+      if (rec.supersededBy) continue;
+      if (at - rec.createdAt > PROPOSAL_TTL_MS) continue; // already "expired"
+      const pending = rec.payload as PendingProposal | null;
+      if (!pending || pending.channel !== proposal.channel) continue;
+      if (pending.threadTs !== proposal.threadTs) continue;
+      await this.storage.put<ProposalRecord>(key, {
+        ...rec,
+        supersededBy: proposal.proposalTs,
+      });
+    }
     await this.storage.put<ProposalRecord>(proposalKey(proposal.proposalTs), {
       payload: proposal,
       createdAt: at,
@@ -212,8 +235,14 @@ export class ThreadState extends DurableObject<Env> {
     await this.ensureGcAlarm();
   }
 
-  // "expired" and "none" are different answers on purpose: the gate has to tell
-  // the requester their delayed ✅ hit an aged-out card rather than ignore it.
+  // "expired", "superseded" and "none" are different answers on purpose: the
+  // gate has to tell the requester their delayed ✅ hit an aged-out card, or a
+  // card a revision replaced, rather than ignore it.
+  //
+  // TTL is checked first because it is the outer envelope — past it the record
+  // is deleted either way, and the GC alarm sweeps on the same rule. Inside it,
+  // "replaced" is the case that actually happens: a revision lands seconds
+  // after the card it retires.
   async getProposalByTs(proposalTs: string, at: number): Promise<ProposalLookup> {
     const rec = await this.storage.get<ProposalRecord>(proposalKey(proposalTs));
     if (!rec) return { state: "none" };
@@ -221,6 +250,7 @@ export class ThreadState extends DurableObject<Env> {
       await this.storage.delete(proposalKey(proposalTs));
       return { state: "expired" };
     }
+    if (rec.supersededBy) return { state: "superseded", supersededBy: rec.supersededBy };
     return {
       state: "found",
       proposal: rec.payload as PendingProposal,
@@ -235,6 +265,7 @@ export class ThreadState extends DurableObject<Env> {
     let best: ProposalRecord | null = null;
     for (const rec of all.values()) {
       if (at - rec.createdAt > PROPOSAL_TTL_MS) continue;
+      if (rec.supersededBy) continue; // retired, and never the thread's live card
       const proposal = rec.payload as PendingProposal | null;
       if (!proposal || proposal.channel !== ref.channel || proposal.threadTs !== ref.thread) continue;
       if (!best || rec.createdAt > best.createdAt) best = rec;

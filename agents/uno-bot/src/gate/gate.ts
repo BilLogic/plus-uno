@@ -153,6 +153,18 @@ export const EXPIRED_POST =
   ":hourglass: That proposal had already expired — nothing was executed. " +
   "Proposals stay live for an hour. Ask me again and I'll set the same thing up fresh.";
 
+/**
+ * The ✅/⛔ on a card a revision replaced (#573).
+ *
+ * Its own wording, not `EXPIRED_POST`: the person did not wait too long, they
+ * acted on the card above the one I am holding — and unlike an aged-out card,
+ * there is a live one in the thread to send them to. Nothing is executed, which
+ * is the point: the old card carries the very input they pushed back on.
+ */
+export const SUPERSEDED_POST =
+  ":arrows_counterclockwise: That card was replaced by a newer proposal — nothing was executed. " +
+  "Confirm on the latest :warning: card in this thread instead.";
+
 /** The default narrative, when the signal brought no words of its own. */
 export function defaultNarrative(decision: Decision): string {
   return decision === "confirm" ? "Got it — kicking that off." : "Cancelled.";
@@ -204,6 +216,17 @@ export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise
   if (!decision) return { outcome: "none", post: null };
 
   const found = await locate(signal, deps);
+
+  if (found.state === "superseded") {
+    // Answered under the card they acted on, which is where they are looking.
+    // No by-thread pointer: the live card is the newest message in the thread,
+    // and a second lookup to name it buys nothing.
+    return {
+      outcome: "stale",
+      decision,
+      post: { text: SUPERSEDED_POST, replyTs: replyTargetOf(signal) },
+    };
+  }
 
   if (found.state === "expired") {
     // The by-ts lookup knows the card aged out; answer the person under the
@@ -300,23 +323,31 @@ async function claim(
  * By card ts, then by conversation.
  *
  * The by-ts read is the authoritative one — it is the only lookup that can
- * report "expired" — and the by-thread read is what a signal with no card ts
- * (a typed emoji) has instead, and what a reaction needs in order to point at
- * the card it missed. A failed read reads as "none", exactly as the doors'
- * own `.catch` did: every path below has something honest to say about
- * nothing.
+ * report "expired" or "superseded" — and the by-thread read is what a signal
+ * with no card ts (a typed emoji) has instead, and what a reaction needs in
+ * order to point at the card it missed. A failed read reads as "none", exactly
+ * as the doors' own `.catch` did: every path below has something honest to say
+ * about nothing.
  */
 async function locate(
   signal: Exclude<GateSignal, { kind: "model" }>,
   deps: GateDeps,
 ): Promise<
-  { state: "found"; proposal: PendingProposal } | { state: "expired" } | { state: "none" }
+  | { state: "found"; proposal: PendingProposal }
+  | { state: "superseded" }
+  | { state: "expired" }
+  | { state: "none" }
 > {
   if (signal.kind !== "typed") {
     const byTs = await deps.threadState
       .getProposalByTs(signal.messageTs)
       .catch(() => ({ state: "none" }) as const);
     if (byTs.state === "found") return { state: "found", proposal: byTs.proposal };
+    // A superseded or aged-out card stops here rather than falling through to
+    // the by-thread lookup: the fallback would hand back the NEWER proposal and
+    // execute it, which is the "confirmed one thing, got another" bug the
+    // pointer branch below already fights.
+    if (byTs.state === "superseded") return { state: "superseded" };
     if (byTs.state === "expired") return { state: "expired" };
   }
 
