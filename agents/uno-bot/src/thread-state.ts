@@ -47,6 +47,7 @@ import {
   MAX_HISTORY_TURNS,
   PROPOSAL_TTL_MS,
   RUN_LEASE_MS,
+  proposalReplyThread,
   type HistoryTurn,
   type PendingProposal,
   type ProposalLookup,
@@ -63,6 +64,10 @@ interface HistoryRecord {
 interface ProposalRecord {
   payload: unknown;
   createdAt: number;
+  /** The ts of the card that replaced this one, when a later turn staged a
+   *  revision in the same conversation (#573). Absent on every record written
+   *  before it shipped, which reads as "not superseded" — the right answer. */
+  supersededBy?: string;
 }
 
 // Latest assistant-panel context (what surface the user has open) per thread.
@@ -204,7 +209,33 @@ export class ThreadState extends DurableObject<Env> {
 
   // ----- proposals -----
 
+  // Staging retires whatever was still pending in the same REPLY THREAD (#573):
+  // a person who answers a card with feedback gets a revised card, and a ✅ on
+  // the old one used to execute the very input they were pushing back on. The
+  // retired record is kept rather than deleted so a late ✅ can be told it was
+  // replaced. Why the grain is the reply thread rather than the conversation
+  // key — and why that is what keeps two unrelated DM asks apart — is in
+  // `thread-state/store.ts` on `putProposal`. One scan of the staged set, as
+  // `getProposalByThread` does: live cardinality is small because proposals
+  // expire after an hour.
+  //
+  // Retire first, then write — a choice, not an accident: the new card is the
+  // one a racing ✅ has to be able to find, so it is the last thing to land.
   async putProposal(proposal: PendingProposal, at: number): Promise<void> {
+    const thread = proposalReplyThread(proposal);
+    const all = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
+    for (const [key, rec] of all) {
+      if (key === proposalKey(proposal.proposalTs)) continue;
+      if (rec.supersededBy) continue;
+      if (at - rec.createdAt > PROPOSAL_TTL_MS) continue; // already "expired"
+      const pending = rec.payload as PendingProposal | null;
+      if (!pending || pending.channel !== proposal.channel) continue;
+      if (proposalReplyThread(pending) !== thread) continue;
+      await this.storage.put<ProposalRecord>(key, {
+        ...rec,
+        supersededBy: proposal.proposalTs,
+      });
+    }
     await this.storage.put<ProposalRecord>(proposalKey(proposal.proposalTs), {
       payload: proposal,
       createdAt: at,
@@ -212,15 +243,29 @@ export class ThreadState extends DurableObject<Env> {
     await this.ensureGcAlarm();
   }
 
-  // "expired" and "none" are different answers on purpose: the gate has to tell
-  // the requester their delayed ✅ hit an aged-out card rather than ignore it.
+  // Is the card that retired another one still around to be looked at? Its own
+  // retirement does not matter: a chain still ends in a live newest card.
+  private async successorIsLive(ts: string, at: number): Promise<boolean> {
+    const rec = await this.storage.get<ProposalRecord>(proposalKey(ts));
+    return !!rec && at - rec.createdAt <= PROPOSAL_TTL_MS;
+  }
+
+  // "expired", "superseded" and "none" are different answers on purpose: the
+  // gate has to tell the requester their delayed ✅ hit an aged-out card, or a
+  // card a revision replaced, rather than ignore it. A live successor beats the
+  // TTL — the ordering, and the third card it stops the person from asking
+  // for, are on `ProposalLookup` in `thread-state/store.ts`.
   async getProposalByTs(proposalTs: string, at: number): Promise<ProposalLookup> {
     const rec = await this.storage.get<ProposalRecord>(proposalKey(proposalTs));
     if (!rec) return { state: "none" };
+    if (rec.supersededBy && (await this.successorIsLive(rec.supersededBy, at))) {
+      return { state: "superseded" };
+    }
     if (at - rec.createdAt > PROPOSAL_TTL_MS) {
       await this.storage.delete(proposalKey(proposalTs));
       return { state: "expired" };
     }
+    if (rec.supersededBy) return { state: "superseded" };
     return {
       state: "found",
       proposal: rec.payload as PendingProposal,
@@ -235,6 +280,7 @@ export class ThreadState extends DurableObject<Env> {
     let best: ProposalRecord | null = null;
     for (const rec of all.values()) {
       if (at - rec.createdAt > PROPOSAL_TTL_MS) continue;
+      if (rec.supersededBy) continue; // retired, and never the thread's live card
       const proposal = rec.payload as PendingProposal | null;
       if (!proposal || proposal.channel !== ref.channel || proposal.threadTs !== ref.thread) continue;
       if (!best || rec.createdAt > best.createdAt) best = rec;

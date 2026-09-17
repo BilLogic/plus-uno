@@ -212,6 +212,107 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
   });
 
+  // The revised card retires the one it replaces (#573). A person who answers a
+  // card with feedback gets a new card; until this, the old one stayed live for
+  // its full hour and a ✅ on it executed the very input they pushed back on.
+  it("staging a proposal supersedes the one already pending in that thread", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    clock.advance(2_000);
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
+    // The newest card is untouched and still resolves normally.
+    assert.equal((await store.getProposalByTs("1700.3")).state, "found");
+    assert.equal((await store.getProposalByThread(THREAD))?.proposalTs, "1700.3");
+  });
+
+  // The grain is the REPLY THREAD, not the conversation key — and the surface
+  // that proves it is a DM, where `threadTs` is the constant "dm" and every ask
+  // shares it. Retiring by conversation would have one ask retire an unrelated
+  // one and answer its ✅ with "that was replaced".
+  it("a revision retires its predecessor in the same reply thread", async () => {
+    const { store } = setup();
+    const dm = { channel: "D1", threadTs: "dm" };
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.2", replyTs: "1700.1" }));
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.3", replyTs: "1700.1" }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
+  });
+
+  it("a second ask in the same DM conversation retires nothing", async () => {
+    const { store } = setup();
+    const dm = { channel: "D1", threadTs: "dm" };
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.2", replyTs: "1700.1" }));
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.5", replyTs: "1700.4" }));
+    // Two unrelated asks, each still resolvable against the input it carries.
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found");
+    assert.equal((await store.getProposalByTs("1700.5")).state, "found");
+  });
+
+  // A record staged before `replyTs` existed falls back to the conversation
+  // key, and a channel card's `replyTs` IS the thread root — so a channel
+  // behaves the same whether the field is there or not.
+  it("a record with no replyTs is superseded by its channel thread", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" })); // no replyTs
+    await store.putProposal(proposal({ proposalTs: "1700.3", replyTs: THREAD.thread }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
+  });
+
+  // "superseded" and "expired" are different things to say to a person: one card
+  // was replaced two seconds ago, the other aged out an hour ago.
+  it("a superseded ts is not reported as expired", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    assert.notEqual((await store.getProposalByTs("1700.2")).state, "expired");
+  });
+
+  // Supersession is per conversation: a card pending in another thread is
+  // nobody else's to retire.
+  it("staging in one thread leaves another thread's card pending", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.putProposal(proposal({ proposalTs: "1700.4", threadTs: OTHER.thread }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found");
+    assert.equal((await store.getProposalByTs("1700.4")).state, "found");
+  });
+
+  // Nothing is retired by a card that was already dead: an aged-out record stays
+  // expired rather than being relabelled by the next turn's staging.
+  it("staging does not relabel an aged-out card", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
+  });
+
+  // A card that was replaced AND has since aged out reads as superseded while
+  // its successor is live. The expired wording ends "ask me again and I'll set
+  // the same thing up fresh" — in front of a live card that asks for a THIRD
+  // one, and the GC runs at most daily, so the record would say it for hours.
+  it("a live successor beats the TTL on a card that is both", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    clock.advance(PROPOSAL_TTL_MS - 1_000);
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    clock.advance(2_000); // 1700.2 is now past its TTL; 1700.3 is not
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
+  });
+
+  // Once the successor is gone too there is nothing to look at, and the TTL
+  // owns the record again — delete included.
+  it("an aged-out card whose successor also aged out is expired", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
+    // And the delete happened: the second read has nothing left to find.
+    assert.equal((await store.getProposalByTs("1700.2")).state, "none");
+  });
+
   it("get-by-thread returns the freshest live proposal for that thread", async () => {
     const { store, clock } = setup();
     await store.putProposal(proposal({ proposalTs: "1700.2" }));
