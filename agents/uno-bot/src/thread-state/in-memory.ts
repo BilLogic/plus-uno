@@ -45,6 +45,10 @@ interface ProposalRecord {
   /** The ts of the card that replaced this one, when a later turn staged a
    *  revision in the same conversation. Set once and never cleared. */
   supersededBy?: string;
+  /** Retired ahead of the revision that is replacing it (#583), before that
+   *  card exists to be named. Readable, and out of reach of every lookup that
+   *  can lead to an execution. */
+  retired?: boolean;
 }
 
 interface AssistantContextRecord {
@@ -132,6 +136,9 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       const thread = proposalReplyThread(proposal);
       for (const rec of proposals.values()) {
         if (rec.proposal.proposalTs === proposal.proposalTs) continue;
+        // A record already stamped with a successor is settled. One only
+        // RETIRED still wants this ts — that is the caller who retired it
+        // ahead of staging this very card.
         if (rec.supersededBy) continue;
         if (now() - rec.createdAt > PROPOSAL_TTL_MS) continue;
         if (rec.proposal.channel !== proposal.channel) continue;
@@ -144,6 +151,13 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       proposals.set(proposal.proposalTs, { proposal, createdAt: now() });
     },
 
+    // Retire without consuming — the counterpart to the claim, and why the two
+    // are different methods is on the interface (#583).
+    async retireProposal(proposalTs) {
+      const rec = proposals.get(proposalTs);
+      if (rec) rec.retired = true;
+    },
+
     async getProposalByTs(proposalTs): Promise<ProposalLookup> {
       const rec = proposals.get(proposalTs);
       if (!rec) return { state: "none" };
@@ -154,7 +168,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         proposals.delete(proposalTs);
         return { state: "expired" };
       }
-      if (rec.supersededBy) return { state: "superseded" };
+      if (rec.supersededBy || rec.retired) return { state: "superseded" };
       return { state: "found", proposal: rec.proposal, createdAt: rec.createdAt };
     },
 
@@ -164,7 +178,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       let best: ProposalRecord | null = null;
       for (const rec of proposals.values()) {
         if (now() - rec.createdAt > PROPOSAL_TTL_MS) continue;
-        if (rec.supersededBy) continue; // retired, and never the thread's live card
+        if (rec.supersededBy || rec.retired) continue; // retired, so never the thread's live card
         if (rec.proposal.channel !== ref.channel || rec.proposal.threadTs !== ref.thread) continue;
         if (!best || rec.createdAt > best.createdAt) best = rec;
       }

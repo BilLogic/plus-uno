@@ -330,6 +330,62 @@ export function runThreadStateConformance(
     assert.equal(await store.getProposalByThread(THREAD), null);
   });
 
+  // ----- retiring, as distinct from claiming (#583) -----
+  //
+  // Two retirements, two methods. A claim CONSUMES a card because someone
+  // approved it; a retirement makes way for a revision and keeps the record
+  // readable, so a ✅ that lands on the replaced card can be told what
+  // happened. Sharing one mechanism is what made the replaced-card message
+  // unreachable on the only path it was written for.
+
+  it("a retired card stays readable, and reads as superseded", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.retireProposal("1700.2");
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
+    // And it is out of reach of the lookup that leads to an execution.
+    assert.equal(await store.getProposalByThread(THREAD), null);
+  });
+
+  // The revision lands after the retirement — that is the whole ordering this
+  // pair exists for — and stamps its own ts on the record it finds retired,
+  // which is what gives the successor tie-break something to check.
+  it("the revision stamps its ts on the card retired ahead of it", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.retireProposal("1700.2");
+    clock.advance(PROPOSAL_TTL_MS - 1_000);
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    clock.advance(2_000); // 1700.2 is past its TTL; its successor is not
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
+    assert.equal((await store.getProposalByTs("1700.3")).state, "found");
+  });
+
+  // With no successor recorded there is nothing in the thread for the replaced
+  // wording to point at, so the TTL owns the record again.
+  it("a retired card whose revision never arrived expires on schedule", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.retireProposal("1700.2");
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
+  });
+
+  it("retiring a card that was never staged is a no-op", async () => {
+    const { store } = setup();
+    await store.retireProposal("1700.2");
+    assert.equal((await store.getProposalByTs("1700.2")).state, "none");
+  });
+
+  // The claim is untouched by any of this: approving a live card consumes it
+  // exactly as before.
+  it("claiming still consumes the record outright", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    assert.equal(await store.claimProposal("1700.2"), true);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "none");
+  });
+
   // The double-execution guard, and the reason the delete is the claim:
   // `notion_create` is not idempotent, so of a ✅ reaction and a typed
   // "go ahead" landing together exactly one may win.

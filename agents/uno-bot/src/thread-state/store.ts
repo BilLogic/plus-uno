@@ -221,6 +221,13 @@ export function proposalOperations(
  * store has a use for it that the thread's own newest card does not answer
  * better, and a chain (A replaced by B, B replaced by C) would hand out a
  * pointer to a card that is itself retired.
+ *
+ * A card RETIRED by `retireProposal` and not yet replaced reads as
+ * "superseded" too, for its remaining hour (#583): the revision it is making
+ * way for is seconds behind it, and that is what the person is being sent to.
+ * Past the TTL it reads as "expired" like any other aged-out card — with no
+ * successor recorded there is nothing in the thread for the replaced wording
+ * to point at.
  */
 export type ProposalLookup =
   | { state: "found"; proposal: PendingProposal; createdAt: number }
@@ -299,6 +306,10 @@ export interface ThreadState {
    * unchanged; in a DM each ask has its own thread since the agent_view
    * migration, so a revision still retires the card it revises.
    *
+   * A card a caller already retired through `retireProposal` is stamped with
+   * this one's ts as it passes, which is what gives the tie-break above its
+   * successor to check.
+   *
    * `replyTs` is optional (it post-dates records staged before 2026-08-22), and
    * a record without one falls back to the conversation key. Safe on both
    * surfaces: in a channel the two are the same value anyway, and in a DM the
@@ -306,6 +317,36 @@ export interface ThreadState {
    * thread to be told apart by in the first place.
    */
   putProposal(proposal: PendingProposal): Promise<void>;
+
+  /**
+   * Retire a card because a revision is about to take its place — keeping the
+   * record readable so a ✅ on it can be told it was replaced.
+   *
+   * TWO RETIREMENTS, TWO METHODS (#583). Until this existed, the staging path
+   * retired the card it was revising by CLAIMING it, and a claim deletes. So on
+   * the one path supersession was written for, the predecessor was already
+   * gone: `getProposalByTs` answered "none", Gate fell through to the by-thread
+   * lookup, and the person was told their ✅ "is not on the proposal I am
+   * holding" instead of that their card had been replaced. Observed live in
+   * `#uno-bot-sandbox` against r332. Consuming a card because someone approved
+   * it is a different event from retiring one because a revision replaced it,
+   * and they no longer share a mechanism: `claimProposal` consumes, this
+   * retires.
+   *
+   * WHY BEFORE THE NEW CARD RATHER THAN AFTER. `putProposal` retires whatever
+   * is still pending in the reply thread, so a caller that stages could leave
+   * this out entirely — at the cost of the seconds a model spends generating
+   * the revision, during which the old card is still live and still carries the
+   * input the person just pushed back on. A caller retires the moment it knows
+   * a revision is coming, and `putProposal` then stamps the successor's ts on
+   * the record it finds already retired.
+   *
+   * A retired card is out of reach of every lookup that can lead to an
+   * execution — it is no longer the thread's live card, and `getProposalByTs`
+   * reports "superseded" rather than "found" — which is the #573 guarantee,
+   * unchanged. Retiring an unknown or already-retired ts is a no-op.
+   */
+  retireProposal(proposalTs: string): Promise<void>;
 
   /** Look one up by the ts of its card. */
   getProposalByTs(proposalTs: string): Promise<ProposalLookup>;
