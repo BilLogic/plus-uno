@@ -1,31 +1,44 @@
-// Slack's stop button: what the press comes to, on both surfaces.
+// Slack's stop control: what the press comes to, on both surfaces.
 //
 // The press cannot be observed from here — the event subscription has to be
 // pasted into the live app by hand (`apps.manifest.update` is refused on this
-// app), so nothing in this repo has ever seen the button. What CAN be pinned is
-// everything the handler decides once the event arrives, and that is all of it:
-// the module is results-only, so each case drives a real signal through
-// `resolveStop` against the in-memory ThreadState and asserts the cancel flag
-// the running loop would read, the status the session settles to, and the line
-// the thread gets.
+// app), so nothing in this repo has ever seen the control. What CAN be pinned
+// is everything the handler decides once the event arrives, and that is all of
+// it: the decision module is results-only, so each case drives a real signal
+// through `resolveStop` against the in-memory ThreadState and asserts the
+// cancel flag the running loop would read, the status the session settles to,
+// and the line the thread gets.
 //
-// The two properties worth the file are the two that are easy to get wrong:
+// The properties worth the file are the ones that are easy to get wrong, and
+// three of them were wrong in the first cut:
 //
-//   1. THE CANCEL LANDS ON THE KEY THE LOOP READS. `run-agent.ts` derives
-//      `cancelThread` as the CONVERSATION key — the thread root in a channel,
-//      the constant "dm" for a loose DM ask — and a flag written anywhere else
-//      is a stop that silently does nothing, which is the bug `/stop` shipped
-//      with (see commands.ts). So the assertions consume the flag through the
-//      same `consumeCancel(ref)` the loop calls, at that key.
-//   2. THE HANDLER AND THE TURN AGREE ON THE SETTLE. Both write the session
-//      status, so they are made to compute it by one rule rather than raced:
-//      a thread holding a live card settles `suspended` from either writer.
+//   1. THE CANCEL LANDS ON THE KEYS THE LOOP READS, AND NOWHERE ELSE.
+//      `run-agent.ts` derives `cancelThread` as the CONVERSATION key — the
+//      thread root in a channel, the constant "dm" for a loose DM ask — so a
+//      flag written anywhere else is a stop that silently does nothing, the
+//      bug `/stop` shipped with. And resolving by PERSON reaches outside this
+//      conversation entirely: `setActiveRun` keeps one record per person,
+//      overwritten by every turn they start anywhere, so it can name a channel
+//      run while the person is pressing stop in a DM.
+//   2. THE HANDLER AND THE TURN AGREE ON THE SETTLE, on every ending that
+//      consults the card: both compute `settledStatus` over the same live-card
+//      question rather than racing two literals.
+//   3. THE ADAPTER'S ORDER IS THE INVARIANT. The settle has to survive a
+//      refused post and has to follow its own read with no Slack call in
+//      between — neither of which any behavioural test can see, since a
+//      reordered pair still typechecks and still passes everything else. So
+//      the adapter is asserted at the source, the way `working-signal.test.ts`
+//      already asserts `assistant.ts`.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { resolveStop } from "../src/slack/session-stop";
+import {
+  NOTHING_UNDONE,
+  STOPPING_PROMISE,
+  resolveStop,
+} from "../src/slack/session-stop";
 import {
   createInMemoryThreadState,
   type PendingProposal,
@@ -53,12 +66,19 @@ function cardIn(channel: string, threadTs: string, conversation: string): Pendin
   };
 }
 
-describe("the stop button stops the run it is looking at", () => {
-  it("flags the channel thread the loop reads, not the person who pressed", async () => {
+describe("the stop control stops the run it was pressed on", () => {
+  it("flags the channel thread the loop reads", async () => {
     const state: ThreadState = createInMemoryThreadState();
-    // The asker's run is in this channel thread; the PRESSER has their own,
-    // unrelated run elsewhere. Resolving a channel press by person would stop
-    // the wrong one and leave this thread running.
+    await resolveStop({ channel: CHANNEL, threadTs: THREAD, userId: PRESSER }, state);
+    assert.equal(await state.consumeCancel({ channel: CHANNEL, thread: THREAD }), true);
+  });
+
+  it("reaches no conversation but the one the event names", async () => {
+    const state: ThreadState = createInMemoryThreadState();
+    // The person pressing has their own, unrelated run somewhere else — the
+    // shape that breaks person-resolution, since `setActiveRun` keeps one
+    // record per person and the latest turn wins. A press here must not touch
+    // it, and must not depend on it either.
     await state.setActiveRun(PRESSER, { channel: "C_OTHER", thread: "1700000000.000900" });
 
     await resolveStop({ channel: CHANNEL, threadTs: THREAD, userId: PRESSER }, state);
@@ -67,32 +87,42 @@ describe("the stop button stops the run it is looking at", () => {
     assert.equal(
       await state.consumeCancel({ channel: "C_OTHER", thread: "1700000000.000900" }),
       false,
-      "a bystander's own run elsewhere is left alone",
+      "a run in another conversation is left alone",
     );
   });
 
-  it("flags the conversation key in a DM, which is 'dm' and not the thread", async () => {
+  it("stops the DM whichever key its run is filed under", async () => {
+    // A DM ask lives under the constant "dm" when it was typed in the composer
+    // and under its own thread ts when the person threaded it by hand, and the
+    // event cannot say which. Both are inside the conversation the event named,
+    // so both are written.
     const state: ThreadState = createInMemoryThreadState();
-    // What a loose DM ask records: the reply thread is per-ask, the
-    // conversation the loop cancels against is the constant.
+    await resolveStop({ channel: DM, threadTs: DM_THREAD, userId: ASKER }, state);
+
+    assert.equal(await state.consumeCancel({ channel: DM, thread: "dm" }), true);
+    assert.equal(await state.consumeCancel({ channel: DM, thread: DM_THREAD }), true);
+  });
+
+  it("stops a DM run when the person is also running somewhere else", async () => {
+    const state: ThreadState = createInMemoryThreadState();
+    // Ask in the DM, then ask in a channel: the person's active-run pointer now
+    // names the CHANNEL. Pressing stop on the DM must stop the DM and leave the
+    // channel run alone — the exact sequence person-resolution got backwards.
     await state.setActiveRun(ASKER, { channel: DM, thread: "dm" });
+    await state.setActiveRun(ASKER, { channel: "C_LATER", thread: "1700000000.000800" });
 
     await resolveStop({ channel: DM, threadTs: DM_THREAD, userId: ASKER }, state);
 
     assert.equal(await state.consumeCancel({ channel: DM, thread: "dm" }), true);
-  });
-
-  it("falls back to the DM thread when the active-run pointer knows nothing", async () => {
-    const state: ThreadState = createInMemoryThreadState();
-    // A hand-threaded DM whose pointer has aged out: the thread ref is the
-    // remaining candidate, and it is the right one on that surface.
-    await resolveStop({ channel: DM, threadTs: DM_THREAD, userId: ASKER }, state);
-
-    assert.equal(await state.consumeCancel({ channel: DM, thread: DM_THREAD }), true);
+    assert.equal(
+      await state.consumeCancel({ channel: "C_LATER", thread: "1700000000.000800" }),
+      false,
+      "the channel run the pointer happened to name keeps going",
+    );
   });
 });
 
-describe("the session leaves the working state by the turn's own rule", () => {
+describe("the session leaves the working state by the turn's own card rule", () => {
   it("settles active when the thread holds nothing to decide", async () => {
     const state: ThreadState = createInMemoryThreadState();
     const verdict = await resolveStop(
@@ -135,7 +165,7 @@ describe("the session leaves the working state by the turn's own rule", () => {
   });
 });
 
-describe("the confirmation says who stopped it", () => {
+describe("the confirmation says who stopped it, in the words the other doors use", () => {
   it("names the presser, who in a channel need not be the asker", async () => {
     const state: ThreadState = createInMemoryThreadState();
     const verdict = await resolveStop(
@@ -146,11 +176,62 @@ describe("the confirmation says who stopped it", () => {
     assert.doesNotMatch(verdict.text, new RegExp(`<@${ASKER}>`));
   });
 
-  it("promises the step in flight finishes, because cancellation is cooperative", async () => {
+  it("makes the same two promises, from the same two constants", async () => {
     const state: ThreadState = createInMemoryThreadState();
     const verdict = await resolveStop({ channel: DM, threadTs: DM_THREAD, userId: ASKER }, state);
-    assert.match(verdict.text, /finish the step I'm on/);
-    assert.match(verdict.text, /already confirmed stays done/);
+    assert.ok(verdict.text.includes(STOPPING_PROMISE), "the cooperative-cancel promise, verbatim");
+    assert.ok(verdict.text.includes(NOTHING_UNDONE), "the not-an-undo reassurance, verbatim");
+  });
+
+  it("is the same wording the other two doors read", () => {
+    // The constants are only worth having if the doors actually read them: a
+    // door that re-types the sentence is how the three drifted the first time.
+    for (const door of ["src/slack/commands.ts", "src/slack/interactive.ts"]) {
+      const src = readFileSync(resolve(process.cwd(), door), "utf8");
+      assert.match(src, /STOPPING_PROMISE/, `${door} reads the shared promise`);
+      assert.match(src, /NOTHING_UNDONE/, `${door} reads the shared reassurance`);
+      assert.ok(
+        !src.includes("I'll finish the step I'm on"),
+        `${door} keeps no second copy of the promise`,
+      );
+    }
+  });
+});
+
+// ── The adapter's order, asserted at the source ─────────────────────────────
+//
+// `assistant.ts` names `Env`, so this is the same genre of check
+// `working-signal.test.ts` runs against the same file: read the module and
+// assert on what it does, because the properties here are ORDERINGS and a
+// reordered pair typechecks, runs, and passes every behavioural test in the
+// repo while leaving a session in `processing` for Slack's full hour — the
+// artefact #574 removed.
+describe("the stop handler settles before it speaks, and settles regardless", () => {
+  const src = readFileSync(resolve(process.cwd(), "src/slack/assistant.ts"), "utf8");
+  const handler = src.slice(src.indexOf("export async function handleSessionStopped"));
+
+  it("settles with the verdict's status rather than a literal", () => {
+    assert.match(handler, /setSessionStatus\(env, channel, thread_ts, verdict\.settleTo\)/);
+  });
+
+  it("catches the confirmation post, so a refused post cannot skip the settle", () => {
+    assert.match(handler, /postMessage\(env, \{ channel, thread_ts, text: verdict\.text \}\)\.catch\(/);
+  });
+
+  it("puts the settle above the post, with no Slack call between read and write", () => {
+    const settleAt = handler.indexOf("setSessionStatus(");
+    const postAt = handler.indexOf("postMessage(");
+    assert.ok(settleAt > 0 && postAt > 0, "both calls are present");
+    assert.ok(
+      settleAt < postAt,
+      "the settle runs first: a post in between gives the in-flight turn a whole " +
+        "round trip to stage a card and settle suspended, after which this lands active and wrong",
+    );
+  });
+
+  it("reports the malformed-payload drop rather than returning in silence", () => {
+    const guard = handler.slice(0, handler.indexOf("resolveStop("));
+    assert.match(guard, /\[stop\]/, "the early return logs");
   });
 });
 
@@ -158,10 +239,16 @@ describe("the confirmation says who stopped it", () => {
 //
 // Two files that have to match, and the failure is silent in the worse
 // direction: an event the app subscribes to with no `case` in the dispatcher
-// arrives, logs `[slack] unhandled event type:` and is dropped. That log line
-// exists to report a SLACK-SIDE SURPRISE — an event we stopped asking for that
-// arrived anyway — so a subscription of our own landing in it spends the one
-// signal that was supposed to mean something else.
+// arrives, logs `[slack] unhandled event type:` and is dropped. That log exists
+// to report a SLACK-SIDE SURPRISE — an event we stopped asking for that arrived
+// anyway — so a subscription of our own landing in it spends the one signal it
+// was supposed to carry.
+//
+// ABSOLUTE, WITH NO EXEMPTION LIST. `emoji_changed` and `reaction_removed` were
+// in exactly that state and are removed from the manifest instead (#576); a
+// list here would have had no owner, no date, and no visibility to whoever
+// edits the YAML next, and the next unhandled subscription would have been one
+// `.add` away from green.
 //
 // Read as text rather than imported: `events.ts` names `Env` and the Durable
 // Object bindings, which this Node build has no runtime for. Parsed with a
@@ -169,44 +256,49 @@ describe("the confirmation says who stopped it", () => {
 // gives — a test that needs a parser is a test people delete.
 function manifestBotEvents(): string[] {
   const yaml = readFileSync(resolve(process.cwd(), "slack-app-manifest.yaml"), "utf8");
-  const section = yaml.split("\n    bot_events:")[1]?.split("\n  interactivity:")[0] ?? "";
-  return [...section.matchAll(/^\s+- (\S+)$/gm)].map((m) => m[1]!);
+  const after = yaml.split("\n    bot_events:")[1];
+  assert.ok(after !== undefined, "the manifest still has a bot_events block under this anchor");
+  const section = after.split("\n  interactivity:")[0];
+  assert.ok(
+    section !== undefined && section.length < after.length,
+    "the bot_events block still ends at the interactivity anchor",
+  );
+  const events = [...section.matchAll(/^\s+- (\S+)$/gm)].map((m) => m[1]!);
+  // The guard below is a loop over this list, so an empty or truncated parse
+  // passes it VACUOUSLY — which is the silent direction this whole section
+  // exists to close, reappearing one level up in the test's own plumbing.
+  // Both anchors can move; neither may take the assertions with it.
+  assert.ok(events.length >= 8, `parsed only ${events.length} bot_events — the anchors moved`);
+  assert.ok(events.includes("app_mention"), "the parse finds a known subscription");
+  return events;
 }
 
 function dispatcherCases(): Set<string> {
   const src = readFileSync(resolve(process.cwd(), "src/slack/events.ts"), "utf8");
-  return new Set([...src.matchAll(/case "([a-z_.]+)":/g)].map((m) => m[1]!));
+  const cases = new Set([...src.matchAll(/case "([a-z_.]+)":/g)].map((m) => m[1]!));
+  assert.ok(cases.has("message"), "the parse finds a known dispatcher case");
+  return cases;
 }
 
 // The `message.*` family all arrive as one inner event type.
-const dispatchedAs = (event: string): string =>
-  event.startsWith("message.") ? "message" : event;
+const dispatchedAs = (event: string): string => (event.startsWith("message.") ? "message" : event);
 
-// Subscribed on the app and deliberately unread, recorded here rather than
-// left to be rediscovered: both predate this guard and both land in the
-// unhandled log every time they fire. `emoji_changed` was subscribed for a
-// custom-emoji feature that was never built; `reaction_removed` is the other
-// half of the gate's `reaction_added` and taking a ✅ back off a card resolves
-// nothing, since the claim already happened. Either is a fair thing to drop
-// from the subscription list on the next hand-paste of the manifest.
-const SUBSCRIBED_AND_UNREAD = new Set(["emoji_changed", "reaction_removed"]);
-
-describe("the stop subscription reaches a handler", () => {
+describe("every subscription reaches a handler", () => {
   it("declares agent_session_stopped on the app", () => {
     assert.ok(
       manifestBotEvents().includes("agent_session_stopped"),
-      "without the subscription Slack renders no stop button at all",
+      "without the subscription Slack offers no stop control at all",
     );
   });
 
-  it("gives every subscribed event a case, or records why it has none", () => {
+  it("gives every subscribed event a case in the dispatcher", () => {
     const cases = dispatcherCases();
     for (const event of manifestBotEvents()) {
-      if (SUBSCRIBED_AND_UNREAD.has(event)) continue;
       assert.ok(
         cases.has(dispatchedAs(event)),
         `the manifest subscribes to ${event} and the dispatcher has no case for it`,
       );
     }
   });
+
 });

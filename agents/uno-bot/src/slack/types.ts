@@ -100,8 +100,10 @@ export interface SlackAppContextChangedEvent {
   event_ts: string;
 }
 
-/** Slack's own stop control, pressed: the button that renders beside the
- *  working signal for an app subscribed to this event (#576).
+/** Slack's own stop control, pressed: the control Slack offers on a session
+ *  for an app subscribed to this event (#576). Slack documents that it exists
+ *  and that the app owns the status transition; it documents no placement, and
+ *  nothing here has seen it, so nothing here describes how it looks.
  *
  *  There is NO session id in the payload — the channel and the thread are the
  *  identity, which is convenient rather than lossy, since they are what every

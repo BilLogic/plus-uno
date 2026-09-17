@@ -25,6 +25,7 @@ import { postMessage } from "./api";
 import { enqueueAgentJob } from "./events";
 import { threadStateFor } from "../thread-state/production";
 import { EFFORT_COMMANDS, type EffortMode } from "./effort";
+import { NOTHING_UNDONE, STOPPING_PROMISE } from "./session-stop";
 import { SLASH_COMMANDS } from "../generated/slack-commands";
 import type { SlackMessageEvent } from "./types";
 
@@ -92,9 +93,12 @@ export function handleSlashCommand(
           console.log(`[stop] command from ${payload.userId} cancelled=${r.cancelled}`);
         }),
     );
+    // The promise and the reassurance are shared with the other two doors
+    // (`session-stop.ts`), because one control saying two things is how they
+    // drifted once already (#586). What is local to `/stop` is the last
+    // clause: this door can be typed when nothing is running at all.
     return ephemeral(
-      "Stopping — I'll finish the step I'm on and stop there. " +
-        "(Nothing already confirmed gets undone. If nothing of mine was running, this did nothing.)",
+      `${STOPPING_PROMISE} (${NOTHING_UNDONE} If nothing of mine was running, this did nothing.)`,
     );
   }
 

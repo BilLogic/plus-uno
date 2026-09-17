@@ -119,10 +119,10 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
       return;
     }
     case "agent_session_stopped": {
-      // Slack's own stop button, which renders beside the working signal only
-      // because this app now subscribes to the event (#576). It is the third
-      // door into the one cancel path, beside `/stop` and the Home-tab button,
-      // and it is the only one that sits where the person is already looking.
+      // Slack's own stop control, which exists only because this app now
+      // subscribes to the event (#576). It is the third door into the one
+      // cancel path, beside `/stop` and the Home-tab button, and the only one
+      // reachable from the thread the person is already reading.
       //
       // Handled INLINE rather than enqueued onto the AgentRunner. The runner
       // serialises work per thread, and the work this thread is running is
@@ -391,6 +391,14 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
     // down, in one `finally` around every exit it has (#555) — a second owner
     // here could only clear the surfaces IT knew about, which is how a channel
     // thread kept the indicator a DM-gated clear never reached.
+    //
+    // ONE SANCTIONED EXCEPTION, added #576: `handleSessionStopped` settles the
+    // session itself when Slack's stop control is pressed, because Slack says
+    // plainly that the press moves no status of its own. It escapes the defect
+    // above by construction — the event names the exact channel and thread, so
+    // there is no surface it could fail to know about — and it settles by the
+    // same card-based rule the turn uses, so the two writers agree on every
+    // ending that consults the card. It is the only other settler there is.
   }
   return "handled";
 }

@@ -312,43 +312,56 @@ export async function handleAppContextChanged(
 }
 
 /**
- * Slack's stop button, pressed (#576).
+ * Slack's stop control, pressed (#576).
  *
- * The three jobs come from Slack's own reference, in its order: stop the
- * in-progress work for the channel and thread, confirm to the person that work
- * has stopped, and move the session out of `processing` — "The session status
- * does not update automatically when the user clicks stop."
+ * The three jobs come from Slack's own reference: stop the in-progress work for
+ * the channel and thread, confirm to the person that work has stopped, and move
+ * the session out of `processing` — "The session status does not update
+ * automatically when the user clicks stop."
  *
  * WHAT IS DECIDED WHERE. Everything that can be decided from the thread's
- * memory alone — which cancel key is exact on this surface, whether a card is
+ * memory alone — which conversation keys the cancel lands on, whether a card is
  * live, therefore which status settles it and what the line says — lives in
  * `session-stop.ts` and is asserted in a Node test. This function is the
  * adapter: it holds `Env` and makes the two Slack calls.
  *
- * THE SETTLE RUNS EVEN IF THE POST FAILS. The confirmation is the courtesy and
- * the settle is the fix: a thread that stopped silently is a nuisance, while a
- * session left in `processing` shows a working signal for the hour Slack takes
- * to time it out (#574) — which is the artefact this control exists to end. So
- * the post is best-effort and the settle follows it regardless.
+ * THE SETTLE GOES FIRST, AND IT IS UNCONDITIONAL. Two reasons, and the second
+ * is the one that moved it ahead of the post (#586 review). A session left in
+ * `processing` shows a working signal for the hour Slack takes to time it out
+ * (#574) — the artefact this control exists to end — so it must survive a
+ * refused post, which is why the post is caught and the settle is above it
+ * rather than after it. And the status it writes is justified by a read taken
+ * inside `resolveStop`: with the post in between, the in-flight turn had a
+ * whole Slack round trip in which to stage a card and settle `suspended`,
+ * leaving this call to land `active` last and wrong. Adjacent read and write
+ * closes that. `tests/session-stop.test.ts` asserts all three properties
+ * against this source, because each of them is an ordering a green test suite
+ * would otherwise let anyone undo.
  */
 export async function handleSessionStopped(
   env: Env,
   event: SlackAgentSessionStoppedEvent,
 ): Promise<void> {
   const { channel, thread_ts, user } = event;
-  if (!channel || !thread_ts) return;
+  if (!channel || !thread_ts) {
+    // Logged rather than dropped in silence: a control whose outcome is legible
+    // only from a screenshot is the thing #571 set out to fix, and a malformed
+    // payload here would otherwise present as a button that does nothing.
+    console.log(`[stop] session control event with no channel/thread — channel=${channel ?? "-"} thread_ts=${thread_ts ?? "-"}`);
+    return;
+  }
   const verdict = await resolveStop(
     { channel, threadTs: thread_ts, userId: user },
     threadStateFor(env),
   );
-  await postMessage(env, { channel, thread_ts, text: verdict.text }).catch(() => {});
   const result = await setSessionStatus(env, channel, thread_ts, verdict.settleTo);
+  await postMessage(env, { channel, thread_ts, text: verdict.text }).catch(() => {});
   // One line per press, carrying what the run of it actually did. `[stop]` is
   // the prefix `/stop` and the Home-tab button already log under, so the three
   // doors read as one control in `wrangler tail` (#571's standing ask: a
   // control's outcome is legible from the logs rather than from a screenshot).
   console.log(
-    `[stop] session button from ${user} in ${channel}/${thread_ts} ` +
+    `[stop] session control from ${user} in ${channel}/${thread_ts} ` +
       `settled=${verdict.settleTo} ok=${result.ok}${result.error ? ` error=${result.error}` : ""}`,
   );
 }
