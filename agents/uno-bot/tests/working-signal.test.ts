@@ -139,6 +139,7 @@ describe("what the thread says once the turn is over", () => {
   const statusFor = (disposition: TurnDisposition, cardLive: boolean): SessionStatus =>
     settledStatus(settlementOf({ disposition, cardLive }));
 
+  /** No card live in this reply thread: the disposition is the whole story. */
   const WITH_NO_CARD_LIVE: Record<TurnDisposition, SessionStatus> = {
     // A card is up behind ✅ / ⛔ and nothing moves until it is clicked.
     staged: "suspended",
@@ -163,21 +164,47 @@ describe("what the thread says once the turn is over", () => {
     });
   }
 
-  it("suspends an answer delivered while a card is still live in the thread", () => {
-    // The case that makes this a function of the thread and not of the
-    // disposition alone: ask something unrelated while a card is pending, get
-    // a text answer, and the turn ended fine with the thread still blocked.
-    assert.equal(statusFor("answered", true), "suspended");
-    assert.equal(statusFor("answered", false), "active");
-  });
+  /**
+   * A card live in this reply thread, which one ending consumed.
+   *
+   * The second column, keyed the same way so it cannot fall behind the first.
+   * #575's text listed `failed` and `reacted` as `active` outright; that would
+   * let a turn which merely went wrong — or acknowledged with a 🙏 — overwrite
+   * a thread's `suspended` with `active` while the card it is about sits there,
+   * which is the claim the ticket's own third case exists to stop. The issue is
+   * being updated to match this table.
+   */
+  const WITH_A_CARD_LIVE: Record<TurnDisposition, SessionStatus> = {
+    staged: "suspended",
+    asked: "suspended",
+    // The ending the disposition alone gets wrong: the answer landed and the
+    // card is still sitting there needing a click.
+    answered: "suspended",
+    // A later turn going wrong, or saying nothing, does not stop the thread
+    // waiting on the decision it was already waiting on.
+    failed: "suspended",
+    reacted: "suspended",
+    // The one ending that consumed the card: the claim IS the resolution.
+    resolved: "active",
+  };
 
-  it("does not let a live card override the endings that are nobody's turn", () => {
-    // `resolved` retires the card it resolved, and a `failed` turn leaves a
-    // person deciding about a retry rather than about a card. Reading the
-    // thread's card as "suspended" everywhere would make the status a
-    // property of the thread's history instead of this turn's ending.
-    for (const disposition of ["resolved", "reacted", "failed"] as const) {
-      assert.equal(statusFor(disposition, true), "active", disposition);
+  for (const [disposition, expected] of Object.entries(WITH_A_CARD_LIVE) as Array<
+    [TurnDisposition, SessionStatus]
+  >) {
+    it(`a turn that ${disposition} with a card live settles to ${expected}`, () => {
+      assert.equal(statusFor(disposition, true), expected);
+    });
+  }
+
+  it("reads the card as the deciding fact wherever the two columns differ", () => {
+    // Stated as a relation rather than a third list: the live card may only
+    // move an ending TOWARDS suspended, never away from it. A mapping that
+    // ever read a live card as a reason to say `active` would be the original
+    // bug wearing the new argument.
+    for (const disposition of Object.keys(WITH_NO_CARD_LIVE) as TurnDisposition[]) {
+      if (WITH_NO_CARD_LIVE[disposition] === "suspended") {
+        assert.equal(WITH_A_CARD_LIVE[disposition], "suspended", disposition);
+      }
     }
   });
 

@@ -92,9 +92,14 @@ export const WORKING_STATUS: SessionStatus = "processing";
  * at each exit, and there is exactly one line to change if Slack's vocabulary
  * moves again.
  *
- * `suspended` is Slack's own word for it: "If the agent needs user input to
- * continue, it sets `status: 'suspended'`". `closed` is reachable from nothing
- * here — "the conversation is complete" is a claim no turn of ours can make.
+ * `suspended` is Slack's own word for it. The Agent sessions guide, § Session
+ * lifecycle: "If the agent needs user input to continue, it sets
+ * `status: "suspended"`." The same guide describes the `processing` indicator
+ * and says nothing about how `suspended` renders, so nothing here claims it
+ * does.
+ *
+ * `closed` is reachable from nothing — "the conversation is complete" is a
+ * claim no turn of ours can make.
  *
  * @param settlement - What the finished work left behind (#575)
  */

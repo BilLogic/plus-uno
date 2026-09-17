@@ -164,11 +164,19 @@ async function resolveFromButton(
   });
   // The press runs the tool, and the button is not a Turn — so the working
   // signal is raised and settled here, through the same pairing Turn uses.
-  await withWorkingSignal(door, async (delivery) => {
-    await delivery.setWorking({ status: "is working on that…" });
-    await delivery.postNote(post.text);
-    await executeVerdict(env, verdict);
-  });
+  await withWorkingSignal(
+    door,
+    async (delivery) => {
+      await delivery.setWorking({ status: "is working on that…" });
+      await delivery.postNote(post.text);
+      await executeVerdict(env, verdict);
+    },
+    // What the thread needs afterwards, stated rather than defaulted: this
+    // door RESOLVED the card, so nothing in the thread is waiting on anybody.
+    // The argument is required precisely so a door cannot inherit an answer it
+    // never thought about (#575).
+    () => "idle",
+  );
 
   const note = decision === "confirm"
     ? `:white_check_mark: Approved by <@${userId}>`

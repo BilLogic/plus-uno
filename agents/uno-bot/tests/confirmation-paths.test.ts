@@ -474,17 +474,21 @@ describe("the doors outside Turn raise and settle the working signal", () => {
     const delivery = recordingDelivery();
     const ran: string[] = [];
 
-    await withWorkingSignal(delivery, async (d) => {
-      await d.setWorking({ status: "is working on that…" });
-      await d.postNote("Got it — kicking that off.");
-      ran.push("executeVerdict");
-    });
+    await withWorkingSignal(
+      delivery,
+      async (d) => {
+        await d.setWorking({ status: "is working on that…" });
+        await d.postNote("Got it — kicking that off.");
+        ran.push("executeVerdict");
+      },
+      () => "idle",
+    );
 
     assert.deepEqual(ran, ["executeVerdict"]);
     assert.deepEqual(signalOf(delivery), ["working", "working-clear"]);
-    // A door resolving a card leaves nobody waiting on anybody, and it says so
-    // by passing no mapper at all: the wrapper's default is the whole answer
-    // here, which is why neither door had to learn about settlements (#575).
+    // A door resolving a card leaves nobody waiting on anybody, and it states
+    // that rather than inheriting it: the mapper is a required argument, so a
+    // door cannot get an answer it never thought about (#575).
     assert.equal(clearedWith(delivery), "idle");
   });
 
@@ -493,29 +497,41 @@ describe("the doors outside Turn raise and settle the working signal", () => {
     // the throw out. The indicator comes down either way, which is the whole
     // reason the clear is a `finally` and not a line after the work.
     const swallowed = recordingDelivery();
-    await withWorkingSignal(swallowed, async (d) => {
-      await d.setWorking({ status: "is working on that…" });
-      try {
-        throw new Error("notion 502");
-      } catch {
-        await d.postNote(":warning: hit a snag executing it — give it another go.");
-      }
-    });
+    await withWorkingSignal(
+      swallowed,
+      async (d) => {
+        await d.setWorking({ status: "is working on that…" });
+        try {
+          throw new Error("notion 502");
+        } catch {
+          await d.postNote(":warning: hit a snag executing it — give it another go.");
+        }
+      },
+      () => "idle",
+    );
     assert.deepEqual(signalOf(swallowed), ["working", "working-clear"]);
     assert.equal(clearedWith(swallowed), "idle");
 
     const rethrown = recordingDelivery();
     await assert.rejects(
-      withWorkingSignal(rethrown, async (d) => {
-        await d.setWorking({ status: "is working on that…" });
-        throw new Error("notion 502");
-      }),
+      withWorkingSignal(
+        rethrown,
+        async (d) => {
+          await d.setWorking({ status: "is working on that…" });
+          throw new Error("notion 502");
+        },
+        // Never reached: a run that throws never produces a result to map, and
+        // the settlement the clear carries is the wrapper's own `"idle"`.
+        () => "waiting-on-person",
+      ),
       /notion 502/,
     );
     assert.deepEqual(signalOf(rethrown), ["working", "working-clear"]);
-    // A run that threw has no result to map, and `idle` is the honest answer:
-    // the person is deciding whether to retry, not answering something the
-    // agent asked for.
+    // A run that threw has no result to map, so the mapper above never ran and
+    // the clear carried the wrapper's own answer — which is the honest one: the
+    // person is deciding whether to retry, not answering something the agent
+    // asked for. The mapper was deliberately written to return the OTHER
+    // settlement, so a wrapper that consulted it anyway fails here.
     assert.equal(clearedWith(rethrown), "idle");
   });
 
@@ -533,10 +549,17 @@ describe("the doors outside Turn raise and settle the working signal", () => {
       assert.ok(wrapped.includes("executeVerdict("), "and runs the verdict inside it");
       // No second owner: the door never takes the signal down by hand.
       assert.ok(!src.includes("clearWorking("), "the clear is the pairing's, not the door's");
-      // And no third argument: a door that mapped a settlement would be
-      // claiming to know what the thread still needs after a card it just
-      // resolved, which is what the wrapper's default already answers.
-      assert.ok(!src.includes("settlementOf"), "the door maps no settlement");
+      // And it settles the thread to `idle` and nothing else. This is asserted
+      // on the literal a door would actually write, because the first version
+      // of this check looked for the identifier `settlementOf` — which no door
+      // would ever write, since a door writes an inline arrow. Appending
+      // `, () => "waiting-on-person"` to the call typechecked clean and passed
+      // the whole suite. It fails both of these.
+      assert.ok(wrapped.includes('() => "idle"'), "the door settles the thread to idle");
+      assert.ok(
+        !src.includes("waiting-on-person"),
+        "no door claims a person is being waited on after a card it just resolved",
+      );
     });
   }
 });

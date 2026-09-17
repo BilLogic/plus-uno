@@ -56,6 +56,7 @@ import type { VisionReference } from "../slack/vision-reference";
 import {
   MAX_HISTORY_TURNS,
   proposalOperations,
+  proposalReplyThread,
   type HistoryTurn,
   type PendingProposal,
   type ThreadRef,
@@ -349,24 +350,33 @@ export interface TurnDeps {
 /**
  * What the turn leaves the thread needing — the one place the mapping lives.
  *
- * `active` was honest for none of the three endings that genuinely wait on a
- * person, and a surface that claims a blocked thread is idle is how a staged
- * card sits unclicked: it says the agent is done and nothing says the person
- * is not (#575).
+ * `active` was the settle at every exit, and it is honest at only some of them:
+ * it reports the thread as ready, and a thread holding a card behind ✅ / ⛔ is
+ * not ready, whatever the turn itself managed to do (#575).
  *
- * Three of the six dispositions wait:
- *   - `staged` — a card is up behind ✅ / ⛔ and nothing happens until it is
- *     clicked.
- *   - `asked` — the turn asked a clarifying question instead of acting.
- *   - `answered` WITH a card still live in the thread. This is the case that
- *     makes the mapping a function of the thread and not of the disposition
- *     alone: ask something unrelated while a card is pending, and the turn
- *     ends perfectly well with the thread still blocked.
+ * TWO REASONS TO WAIT, and the second is a fact about the THREAD rather than
+ * about this turn:
+ *   - the turn itself asked for something — `staged` put a card up, `asked`
+ *     asked a clarifying question instead of acting;
+ *   - a card is live in this reply thread and this turn did not consume it.
  *
- * The other three do not. `resolved` and `reacted` finished the job; `failed`
- * is the person choosing whether to retry, which is not the agent waiting on
- * an input it asked for. A turn that THREW never reaches here at all and its
- * default says the same thing (`withWorkingSignal`).
+ * WHICH DEVIATES FROM #575's LETTER, deliberately, and the issue is being
+ * updated to match. It listed `failed` and `reacted` as `active` outright; the
+ * consequence is that a turn that fails — or acknowledges with a 🙏 — while an
+ * earlier card is still pending would OVERWRITE that thread's `suspended` with
+ * `active`, which is the same claim case three of the ticket exists to stop.
+ * The thread does not stop waiting because a later turn went wrong. `resolved`
+ * is the one ending that consumed the card, so it is the one exempt from the
+ * live-card rule.
+ *
+ * ONE KNOWN IMPRECISION, in the safe direction. `cardLive` is the card the
+ * thread held when the turn BEGAN, and one exit retires a card without
+ * replacing it: the staging branch supersedes the pending card and then Slack
+ * refuses the new one (`disposition: "failed"`). That thread settles
+ * `suspended` with nothing live, until the next turn in it settles again.
+ * Pinning it exactly would need the turn to report the retirement on its
+ * outcome — a field set at one exit — and a false "still waiting" after a
+ * visible failure is cheaper than a false "nothing to do" over a live card.
  *
  * The switch is exhaustive on purpose: a seventh disposition leaves it without
  * a return on that arm and `tsc` refuses the build, which is the only kind of
@@ -378,14 +388,20 @@ export function settlementOf(settle: {
   cardLive: boolean;
 }): TurnSettlement {
   switch (settle.disposition) {
+    // The turn asked for something itself, so the card need not be read: a
+    // store that failed to record the card cannot turn the ask into a
+    // "nothing to do".
     case "staged":
     case "asked":
       return "waiting-on-person";
+    // The thread decides. An answer, a bare 🙏 and a failure all leave a live
+    // card exactly as they found it.
     case "answered":
-      return settle.cardLive ? "waiting-on-person" : "idle";
-    case "resolved":
     case "reacted":
     case "failed":
+      return settle.cardLive ? "waiting-on-person" : "idle";
+    // The one ending that consumed the card — the claim IS the resolution.
+    case "resolved":
       return "idle";
   }
 }
@@ -402,14 +418,29 @@ export function settlementOf(settle: {
  * it left by.
  */
 export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {
-  // The card the thread was holding when this turn began. It is still holding
-  // it at an `answered` exit, because every exit that retires a card reports a
-  // different disposition — a claim is `resolved`, a revision is `staged` (the
-  // store retires the predecessor in the same reply thread, #579). So this is
-  // the live-card fact the mapping needs, and it costs no second read: the
-  // adapter's `getProposalByThread` at the top of the request is where it came
-  // from.
-  const cardLive = Boolean(request.pending);
+  // The card THIS REPLY THREAD was holding when the turn began — and the grain
+  // is the whole of it.
+  //
+  // `pending` arrives from a `getProposalByThread` read keyed on the
+  // CONVERSATION, which in an unthreaded DM is the constant `"dm"`: every ask
+  // on that surface shares it. Settling by conversation would let a card
+  // staged under ask A suspend the unrelated thread of ask B, and a ✅ on A
+  // settles A's thread only — leaving B suspended with nothing in it to click.
+  // That is the grain error #573 fixed one layer down, and the comparison is
+  // the store's own (`proposalReplyThread`, #579) rather than a second
+  // derivation of the same fallback. In a channel `replyTs` IS the thread root,
+  // so channel behaviour is unchanged.
+  //
+  // It costs no read of its own: the adapter's read at the top of the request
+  // is where it came from. It is also the card as of the turn's START, which
+  // every exit but one leaves untouched — see `settlementOf`.
+  const turnThread = proposalReplyThread({
+    ...(request.replyTs ? { replyTs: request.replyTs } : {}),
+    threadTs: request.conversationTs,
+  });
+  const cardLive = request.pending
+    ? proposalReplyThread(request.pending) === turnThread
+    : false;
   return withWorkingSignal(
     deps.delivery,
     (delivery) => turnBody(request, { ...deps, delivery }),

@@ -26,6 +26,9 @@ export type DeliveryFailureStage = "context" | "agent" | "delivery" | "internal"
  * What the finished work left behind, in the port's own words: whether a
  * person now has to act before this thread can go anywhere.
  *
+ * Deliberately NOT glossed in CONTEXT.md: `TurnDisposition` is not either, and
+ * the vocabulary is internal.
+ *
  * Two words rather than Slack's four-value lifecycle, because this is the only
  * distinction a turn is entitled to make. Which status renders it is the Slack
  * adapter's business (`slack/working-signal.ts` `settledStatus`) — a port that
@@ -92,8 +95,10 @@ export interface Delivery {
    * `settlement` is what the surface should say once the indicator is down. It
    * is an argument because "the work is over" and "the thread is ready" are
    * different facts: a turn that ends holding a staged card is over and still
-   * blocked, and a surface told the second thing invites a person to move on
-   * from a card that is waiting on them (#575).
+   * blocked, and a surface told the second reports the thread as ready while a
+   * decision on it is still outstanding (#575). What that difference LOOKS like
+   * to a person is not asserted anywhere here — Slack documents what
+   * `processing` renders as and says nothing about the rest.
    */
   clearWorking(settlement: TurnSettlement): Promise<void>;
 
@@ -264,15 +269,24 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
  * is instantiated with `T = void` by the two Gate doors, and one that inspected
  * what it wrapped would have to know every shape any caller might return — so
  * the caller that has an outcome hands over a function from it, and the
- * wrapper stays a `finally` that knows nothing. Both defaults are `"idle"`: a
- * door resolving a card leaves nobody waiting, and a run that THREW has no
- * result to map, which is the honest answer there too — the person is deciding
- * whether to retry, not being waited on (#575).
+ * wrapper stays a `finally` that knows nothing (#575).
+ *
+ * REQUIRED, even for the `T = void` callers whose answer is a constant. It was
+ * optional for one revision, and an optional argument nobody passes is the
+ * shape of #578: a stream argument defaulted away for six revisions and
+ * silently disabled the feature, and the fix was to make it required so the
+ * next caller gets no hole. Here the hole is a caller that raises the signal
+ * and settles a thread to whatever the default happened to be, which no test
+ * outside the exit table would catch. So the type carries the guarantee and
+ * each call site states its own fact — one line for a door.
+ *
+ * A run that THREW never reaches the mapper, and `"idle"` stands: the person is
+ * deciding whether to retry, not answering something the agent asked for.
  */
 export async function withWorkingSignal<T>(
   delivery: Delivery,
   run: (delivery: Delivery) => Promise<T>,
-  settlementOf?: (result: T) => TurnSettlement,
+  settlementFrom: (result: T) => TurnSettlement,
 ): Promise<T> {
   let raised = false;
   let settlement: TurnSettlement = "idle";
@@ -285,7 +299,7 @@ export async function withWorkingSignal<T>(
   };
   try {
     const result = await run(watched);
-    if (settlementOf) settlement = settlementOf(result);
+    settlement = settlementFrom(result);
     return result;
   } finally {
     if (raised) await delivery.clearWorking(settlement).catch(() => {});
