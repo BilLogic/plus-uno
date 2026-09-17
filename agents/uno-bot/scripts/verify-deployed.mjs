@@ -42,8 +42,9 @@ export function diagnose(serving) {
   if (/\bok unstamped\b/.test(serving)) {
     return (
       "`unstamped` means no --define reached the bundle, so scripts/deploy.mjs did " +
-      "NOT run — and nothing ran typecheck, check:fetch, check:contract, test:bundle " +
-      "or bundle:harness either. Production is ungated. See #278."
+      "NOT run — and nothing ran typecheck, check:fetch, check:contract, check:secrets, " +
+      "test:bundle, the unit suite or bundle:harness either. Production is ungated. " +
+      "See #278."
     );
   }
   if (/\bok dev\b/.test(serving)) {

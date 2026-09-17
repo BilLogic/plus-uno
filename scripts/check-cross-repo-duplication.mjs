@@ -283,7 +283,7 @@ export function documentsIn(root, spec) {
  *
  * Built ONCE per repo and reused across the three pairings. The first draft
  * re-shingled both documents inside the comparison loop and took 9.3s against
- * this gate's ~20s total; the index takes it to under a second, which is what
+ * the ~14s the whole composite costs; the index takes it to under a second, which is what
  * keeps the check composable (`check-harness.mjs` § No member that costs minutes).
  */
 function indexOf(docs) {

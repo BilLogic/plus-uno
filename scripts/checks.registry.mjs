@@ -500,7 +500,7 @@ export const CHECKS = [
     name: 'check:secrets',
     script: 'node scripts/check-secrets.mjs',
     pkg: 'bot',
-    trigger: 'pull_request',
+    trigger: ['pull_request', 'deploy'],
     module: 'agents/uno-bot/scripts/check-secrets.mjs',
     guards:
       "the secret declaration against `interface Env` and against [vars]. The [vars] half is the one with teeth: that table is COMMITTED, so a secret assigned there is a secret published to GitHub. The rest keeps wrangler.toml's expected-names list honest — hand-maintained, it drifted in both directions at once (four names not set, two set names missing) and #288's account move works from exactly that list.",
@@ -546,19 +546,19 @@ export const CHECKS = [
     name: 'typecheck',
     script: 'tsc --noEmit',
     pkg: 'bot',
-    trigger: 'pull_request',
+    trigger: ['pull_request', 'deploy'],
     kind: 'spawn',
     spawnReason:
       '`tsc --noEmit`. The type errors are the compiler\'s, in the compiler\'s format, and ' +
       'nothing in this repo should paraphrase them.',
     guards:
-      "the Worker's TypeScript, which no pull request ran until now. `npm run deploy` chains it, so it was gated at the deploy boundary and nowhere earlier — a type error reached the one command whose failure is most expensive to discover. 1.2s, measured 2026-08-29.",
+      "the Worker's TypeScript — every file under agents/uno-bot/src/ (tsconfig.json § include). Before it was composed here it ran only inside `npm run deploy`, so a type error reached the one command whose failure is most expensive to discover. It ALSO has its own named pull-request job (.github/workflows/uno-bot-checks.yml § typecheck), because the whole composite shares one GitHub check, so a reviewer reading a red `check:harness` learns a type failure and a test failure as the same line and has to open the log to tell which (#580). 1.2s, measured 2026-09-17.",
   },
   {
     name: 'test:bundle',
     script: 'node --test scripts/*.test.mjs',
     pkg: 'bot',
-    trigger: 'pull_request',
+    trigger: ['pull_request', 'deploy'],
     kind: 'spawn',
     spawnReason: '`node --test`, for the same reason as test:scripts.',
     guards:
@@ -568,13 +568,13 @@ export const CHECKS = [
     name: 'test',
     script: 'tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js',
     pkg: 'bot',
-    trigger: 'pull_request',
+    trigger: ['pull_request', 'deploy'],
     kind: 'spawn',
     spawnReason:
       '`tsc -p tsconfig.test.json && node --test`. A build step and a test runner; neither ' +
       'half is a comparison this process could make.',
     guards:
-      "the Worker's 268 unit tests across 39 suites, which ran in NO workflow and are not in `npm run deploy` either — that chain chose `test:bundle` and stopped. So the largest test suite in this repository was gated by nothing at all, and had been since it was written. 1.2s, measured 2026-08-29. Found while verifying the TypeScript 7 bump (#298), which is exactly the change that needed them. Among them is the harness name sweep (tests/harness-blueprint-names.test.ts), which reads the assembled prompt, the tool schemas and — since #425 — the Actions prompts under scripts/prompts/ for blueprint identifiers and conventions the schema no longer has; its inputs are repo-root files, which is the rule that composes a sub-package check here.",
+      "the Worker's unit suite — 723 tests across 65 suites at 2026-09-17, the largest in this repository, and gated by nothing at all until it was composed here: it ran in no workflow, and `npm run deploy` chose `test:bundle` and stopped. 2.2s, measured 2026-09-17. Found while verifying the TypeScript 7 bump (#298), which is exactly the change that needed them. #580 finished the job in both directions: `npm test` is in the deploy chain now, so a direct push to unprotected `main` meets it too, and the suite has its own named pull-request job (.github/workflows/uno-bot-checks.yml § tests) so its red is legible from the check list rather than only from a 40-second log. Among them is the harness name sweep (tests/harness-blueprint-names.test.ts), which reads the assembled prompt, the tool schemas and — since #425 — the Actions prompts under scripts/prompts/ for blueprint identifiers and conventions the schema no longer has; its inputs are repo-root files, which is the rule that composes a sub-package check here.",
   },
   {
     name: 'evals:local',

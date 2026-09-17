@@ -125,15 +125,17 @@ fails the harness gate on drift.
 
 ## The harness gate
 
-Two workflows run on every `pull_request`, concurrently: this one, and the
-Storybook gate below.
+Three workflows run on every `pull_request`, concurrently: this one, the
+Worker checks below it, and the Storybook gate further down.
 
 `npm run check:harness` is the command to run before opening a PR
 (`.github/workflows/check-harness.yml`). It composes the deterministic guards
 into a single exit code and a report that
 names each sub-check that failed, with that sub-check's own diagnostic under it —
 it does not stop at the first, so one run tells you everything wrong with the
-branch. Takes about 20 seconds and installs nothing.
+branch. The composite itself takes about 14 seconds; the job around it adds one
+`npm ci` scoped to `agents/uno-bot`, which the Worker's `typecheck` and `test`
+rows need.
 
 `npm run check:harness -- --list` prints what it composes, what it deliberately
 does not, and why. Those reasons are stated once, in `scripts/checks.registry.mjs` —
@@ -174,6 +176,29 @@ npm run generate:agent
 npm run generate:index
 npm --prefix agents/uno-bot run bundle:harness
 ```
+
+## The Worker's own checks
+
+`.github/workflows/uno-bot-checks.yml` runs two jobs on every pull request —
+`typecheck` (`tsc --noEmit` over `agents/uno-bot/src/**`) and `tests` (the
+Worker's unit suite, the largest in this repository). Both commands are registry
+rows composed into
+`check:harness` as well, so the pre-push command stays whole; the jobs exist for
+their NAMES. A red `check:harness` is one GitHub check covering the whole
+composite, so
+"the types broke" and "a test broke" arrive as the same line, and telling them
+apart means opening the log. From the check list, `uno-bot — Worker checks /
+typecheck` and `… / tests` answer that directly (#580).
+
+Both commands are in the `npm run deploy` chain too, so a push straight to
+`main` — unprotected, and 19 people can make one — meets the same two gates on
+the way to production. Neither reads a secret: `tsc` reads the checkout, and the
+suite is pure functions plus mocked `fetch`, so a fork PR runs both. The one
+Worker suite that needs a runtime, `tests/workerd/` under workerd, stays a step
+of the harness workflow, which already pays for miniflare's startup.
+
+Run them locally with `npm --prefix agents/uno-bot run typecheck` and
+`npm --prefix agents/uno-bot test`.
 
 ## The Storybook gate
 
