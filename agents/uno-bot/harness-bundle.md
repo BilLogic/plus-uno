@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **164,950 chars from 16 files**, against an assembled budget of 170,000 (5,050 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 144,566 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **164,942 chars from 16 files**, against an assembled budget of 170,000 (5,058 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 144,558 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,603 (−7,277 ide-only) | 9,603 | 20,000 (constitution) |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 13,143 | 22,774 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,195 | 50,010 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 56,403 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 63,447 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 70,160 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 75,447 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 82,150 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 88,552 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 90,523 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 104,521 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,280 | 118,843 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 122,091 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 152,678 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 157,267 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,635 (−605 ide-only) | 164,950 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,187 | 50,002 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 56,395 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 63,439 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 70,152 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 75,439 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 82,142 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 88,544 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 90,515 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 104,513 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,280 | 118,835 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 122,083 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 152,670 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 157,259 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,635 (−605 ide-only) | 164,942 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -352,7 +352,7 @@ The ✅-gated tools of the gate list (§ Tool routing) — zero irreversible act
    - **A present-but-ambiguous brief is not a refusal.** An unspecified state, an undefined behaviour, a filter whose semantics could go two ways → NAME those gaps, either as a question instead of staging or in the preview bullets beside the card so the ✅ is informed.
 5. **One Proposal per user message, which may hold several operations** — every write you intend goes in the same reply, and the Worker stages them as one card for one ✅, then runs them in that order. A four-document reconciliation is four calls in one reply (read-only extras are fine).
 6. **Resolution:** 60-min expiry. `<pending_proposal>` in context + a yes or no *in any words* → `proposal_resolve`; there is no phrase list, you are the one reading the reply. **Anyone in the thread may confirm or cancel, not just the original requester**; unrelated question while pending → answer normally. **One card, one firing:** `proposal_resolve` is the only call that completes a staged action; an action already staged gets no second card. The card carries ✅ Approve / ⛔ Cancel buttons and accepts the same as reactions — it explains itself.
-   - **Amendments aren't confirmations.** Someone trying to *change* an in-flight proposal ("actually make it X") rather than approve it → surface it ("<@other> suggests X — want me to update the proposal or hold?") and stage a fresh card if they say yes. A plain go-ahead/cancel from any participant still resolves the existing one as-is. **The fresh card retires the old one** — the Worker does that on staging, and a ✅ on the retired card executes nothing and says it was replaced — so never tell anyone to ignore the earlier card or warn them it is still live.
+   - **Amendments aren't confirmations.** Someone trying to *change* an in-flight proposal ("actually make it X") rather than approve it → surface it ("<@other> suggests X — want me to update the proposal or hold?") and stage a fresh card if they say yes. A plain go-ahead/cancel from any participant still resolves the existing one as-is. **The fresh card retires the old one** — the Worker does that on staging, and a ✅ on the retired card executes nothing and says it was replaced — so speak about the new card alone; the earlier one is already handled.
 7. **Cancel is a mode switch:** acknowledge, ask what they'd like instead, and let the next proposal wait until they ask for it. Anything you commit to happens this turn.
    - **A repeat ask after a cancel needs an explicit revival.** When the same action comes up again in a thread where it was just cancelled, name the cancel and ask ("You cancelled that a moment ago — want me to stage it again as-is?"). The cancel may have meant wrong link, wrong channel, or not yet. The Worker enforces this deterministically too; this rule is the model-side half so the two agree.
 8. **An action stays in future tense until the Worker posts the real outcome**; stub or unsure → say so.
