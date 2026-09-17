@@ -231,7 +231,10 @@ export function proposalOperations(
  */
 export type ProposalLookup =
   | { state: "found"; proposal: PendingProposal; createdAt: number }
-  /** Retired by a newer card staged in the same reply thread. */
+  /** Retired by a newer card staged in the same reply thread, or retired ahead
+   *  of one by `retireProposal` — in which case it reads this way from the
+   *  moment of retirement, and for the rest of its hour if the revision it made
+   *  way for never lands. */
   | { state: "superseded" }
   | { state: "expired" }
   | { state: "none" };
@@ -291,11 +294,15 @@ export interface ThreadState {
    * Stage a proposal under its own `proposalTs`, retiring any proposal still
    * pending in the SAME REPLY THREAD.
    *
-   * The retirement belongs to the store rather than to a caller because it is
-   * the staging that supersedes: a turn that stages nothing must leave a
-   * pending card alone, and there is exactly one way to stage. A retired card
-   * is kept, not deleted — a late ✅ on it has to be told it was replaced,
-   * rather than get the silence a missing record buys (#573).
+   * THIS RETIREMENT IS THE BACKSTOP, and it lives in the store because staging
+   * is what supersedes: a turn that stages nothing leaves a pending card alone,
+   * and there is exactly one way to stage, so every revision retires its
+   * predecessor whether or not its caller remembered to. A caller that knows a
+   * revision is coming may retire EARLIER, through `retireProposal`, and gains
+   * the seconds the revision spends being written; this pass then finds that
+   * record already retired and stamps it with the successor. Either way a
+   * retired card is kept rather than deleted — a late ✅ on it has to be told it
+   * was replaced, rather than get the silence a missing record buys (#573).
    *
    * THE GRAIN IS THE REPLY THREAD (`replyTs`), not the conversation key, and
    * the difference is a DM. `threadTs` is the CONVERSATION key, which in an
@@ -341,10 +348,20 @@ export interface ThreadState {
    * a revision is coming, and `putProposal` then stamps the successor's ts on
    * the record it finds already retired.
    *
-   * A retired card is out of reach of every lookup that can lead to an
-   * execution — it is no longer the thread's live card, and `getProposalByTs`
-   * reports "superseded" rather than "found" — which is the #573 guarantee,
-   * unchanged. Retiring an unknown or already-retired ts is a no-op.
+   * A retired card is out of reach of everything that can lead to an execution:
+   * it is no longer the thread's live card, `getProposalByTs` reports
+   * "superseded" rather than "found", and `claimProposal` refuses it outright —
+   * which is the #573 guarantee, unchanged. Retiring an unknown or
+   * already-retired ts is a no-op.
+   *
+   * THE COST, WHEN THE REVISION NEVER ARRIVES. One exit retires a card and then
+   * fails to post its replacement (`disposition: "failed"`), leaving a retired
+   * record with no successor. A ✅ on it is told to confirm on the thread's
+   * newest card when there is none, for the hour until its TTL turns the answer
+   * back into "expired". That is the better of the two available wrongs — the
+   * claim-and-delete it replaces answered "already resolved, another
+   * confirmation got there first", which invents a second person — and it is
+   * bounded, so it is accepted rather than fixed.
    */
   retireProposal(proposalTs: string): Promise<void>;
 
@@ -364,6 +381,21 @@ export interface ThreadState {
    * registered, also types "go ahead" runs two independent handlers, and
    * `notion_create` is not idempotent — two cards, no error, nothing downstream
    * to catch it.
+   *
+   * **A RETIRED CARD IS REFUSED**, `false`, record untouched. Review of #583
+   * found the hole this closes: two doors reach the claim without a lookup in
+   * front of them — Gate's `model` branch claims the proposal the agent loop
+   * validated in memory, and Turn's identical-re-stage branch claims
+   * `request.pending` — so excluding retired cards from the two LOOKUPS left
+   * them reachable. The run lease is per MESSAGE (`msg:<channel>:<ts>`), not
+   * per thread, so two messages in one thread run at once: turn two reads card
+   * A while turn one is writing its revision, turn one retires A, and turn
+   * two's `proposal_resolve` used to execute the input the person had just
+   * pushed back on. Before `retireProposal` existed the delete closed that race
+   * by construction; refusing here is what keeps it closed now, and keeps THE
+   * STORE the one place a card stops being executable. Nothing legitimate
+   * claims a retired or superseded card: every door that could is answering
+   * about a card the thread has already moved past.
    *
    * Callers that only want the record gone ignore the boolean.
    *

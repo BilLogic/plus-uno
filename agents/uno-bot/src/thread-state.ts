@@ -15,8 +15,8 @@
 //
 // Every public method below is Durable Object RPC and its signature IS the
 // `src/thread-state` interface: `readHistory`, `appendHistory`,
-// `compactHistory`, `putProposal`, `getProposalByTs`, `getProposalByThread`,
-// `claimProposal`, `get/putAssistantContext`, `requestCancel`,
+// `compactHistory`, `putProposal`, `retireProposal`, `getProposalByTs`,
+// `getProposalByThread`, `claimProposal`, `get/putAssistantContext`, `requestCancel`,
 // `consumeCancel`, `cancelForUser`, `setActiveRun`, `checkAndRecordEvent`,
 // `claimRun`, `markRunDone`. A rename is a type error rather than a runtime
 // 404, which is the whole point.
@@ -307,9 +307,20 @@ export class ThreadState extends DurableObject<Env> {
 
   // The delete IS the claim. A Durable Object handles one event at a time, so of
   // two racing resolvers exactly one sees `true` — which is the whole
-  // double-execution guard, because `notion_create` is not idempotent.
+  // double-execution guard, because `notion_create` is not idempotent. The read
+  // added below is safe inside that guarantee: the input gate stays closed
+  // across a storage await, so no second claim is delivered between the two.
+  //
+  // A RETIRED or superseded record is refused rather than deleted (#583): two
+  // doors reach the claim with a proposal they are holding in memory instead of
+  // one they just looked up, and the lookups alone therefore left a replaced
+  // card executable. The reason this is the store's job, and the per-message
+  // run lease that makes the race reachable, are on the interface.
   async claimProposal(proposalTs: string): Promise<boolean> {
-    return this.storage.delete(proposalKey(proposalTs));
+    const key = proposalKey(proposalTs);
+    const rec = await this.storage.get<ProposalRecord>(key);
+    if (!rec || rec.retired || rec.supersededBy) return false;
+    return this.storage.delete(key);
   }
 
   // ----- assistant context -----

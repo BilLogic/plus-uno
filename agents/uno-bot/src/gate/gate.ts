@@ -289,12 +289,26 @@ async function claim(
   // ahead" runs two handlers that each loaded this same record. Whoever loses
   // here must not post the winner's narrative and above all must not execute.
   if (!(await deps.threadState.claimProposal(proposal.proposalTs))) {
-    console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs} was already claimed`);
+    console.log(`[gate] ${proposal.toolName} at ${proposal.proposalTs} was not claimable`);
+    // WHY the claim was refused decides what to say, and the store is the only
+    // one who knows (#583). Two doors reach this function with a proposal they
+    // are holding in memory rather than one they looked up — the model's
+    // `proposal_resolve` and Turn's identical re-stage — so this is the first
+    // point on either path at which a replaced card can be recognised. Telling
+    // that person "another confirmation got there first" invents a second
+    // person; what happened is that their card was revised. One extra read, on
+    // the losing path only.
+    const why = await deps.threadState
+      .getProposalByTs(proposal.proposalTs)
+      .catch(() => ({ state: "none" }) as const);
     return {
       outcome: "stale",
       proposal,
       decision,
-      post: { text: STALE_POST, replyTs: replyTarget(proposal) },
+      post: {
+        text: why.state === "superseded" ? SUPERSEDED_POST : STALE_POST,
+        replyTs: replyTarget(proposal),
+      },
     };
   }
 

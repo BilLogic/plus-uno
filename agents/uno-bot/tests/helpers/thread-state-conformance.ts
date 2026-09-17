@@ -386,6 +386,29 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByTs("1700.2")).state, "none");
   });
 
+  // Excluding retired cards from the two LOOKUPS was not enough, and review of
+  // #583 found why: two doors reach the claim holding a proposal in memory
+  // rather than one they just looked up. The store is where a card stops being
+  // executable, so the refusal belongs here.
+  it("claiming a retired card is refused, and leaves the record readable", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.retireProposal("1700.2");
+    assert.equal(await store.claimProposal("1700.2"), false);
+    // Refused, not consumed: it can still say what happened to it.
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
+  });
+
+  it("claiming a card a revision replaced is refused too", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    assert.equal(await store.claimProposal("1700.2"), false);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
+    // And the live card is claimable exactly as it was.
+    assert.equal(await store.claimProposal("1700.3"), true);
+  });
+
   // The double-execution guard, and the reason the delete is the claim:
   // `notion_create` is not idempotent, so of a ✅ reaction and a typed
   // "go ahead" landing together exactly one may win.

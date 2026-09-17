@@ -22,6 +22,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  STALE_POST,
   SUPERSEDED_POST,
   resolveSignal,
   type GateSignal,
@@ -198,4 +199,58 @@ test("a ✅ that misses every card still gets the pointer, and executes nothing"
   assert.match(verdict.post?.text ?? "", /notion_create/);
   // And the card it pointed at is still there to be clicked.
   assert.equal((await h.threadState.getProposalByTs(cardTs)).state, "found");
+});
+
+// ── the door that skips the lookup (#583, found in review) ───────────────────
+
+test("a model-decided confirm on a card retired mid-flight executes nothing", async () => {
+  // THE RACE, and it is reachable: the run lease is keyed per MESSAGE
+  // (`msg:<channel>:<ts>`, slack/events.ts), not per thread, so two messages in
+  // one thread run at once. Turn two reads the thread's card while turn one is
+  // still writing its revision; turn one retires it; turn two's model answers
+  // "go ahead" and calls `proposal_resolve` against the copy it is holding.
+  //
+  // That door claims WITHOUT a lookup in front of it, so keeping retired cards
+  // out of `getProposalByTs` and `getProposalByThread` left this path open —
+  // until `retireProposal` existed, the claim-delete closed it by construction.
+  // The refusal in the store is what keeps #573's guarantee structural.
+  const h = harness({ replies: REPLIES });
+  const first = await runTurn(request({ text: "file a card for the reflection redesign" }), h.deps);
+  const stale = first.staged!.proposal;
+
+  // Turn one retires the card it is about to replace.
+  await h.threadState.retireProposal(stale.proposalTs);
+
+  // Turn two, holding the copy it read a moment earlier.
+  const verdict = await resolveSignal(
+    { kind: "model", pending: stale, decision: "confirm" },
+    { threadState: h.threadState },
+  );
+
+  assert.equal(verdict.outcome, "stale");
+  assert.equal(verdict.execute, undefined, "the input the person pushed back on stays unrun");
+  // And the person is told the true thing. "Another confirmation got there
+  // first" would invent a second person; their card was revised.
+  assert.equal(verdict.post?.text, SUPERSEDED_POST);
+  // The record is refused, not consumed, so it keeps saying so.
+  assert.equal((await h.threadState.getProposalByTs(stale.proposalTs)).state, "superseded");
+});
+
+test("a lost race on a LIVE card still reads as already resolved", async () => {
+  // The refusal above is about replaced cards only. Two people confirming the
+  // same live card is a different event and keeps its own sentence.
+  const h = harness({ replies: REPLIES });
+  const first = await runTurn(request({ text: "file a card for the reflection redesign" }), h.deps);
+  const card = first.staged!.proposal;
+
+  const won = await resolveSignal(reactionOn(card.proposalTs), { threadState: h.threadState });
+  assert.equal(won.outcome, "won");
+
+  const lost = await resolveSignal(
+    { kind: "model", pending: card, decision: "confirm" },
+    { threadState: h.threadState },
+  );
+  assert.equal(lost.outcome, "stale");
+  assert.equal(lost.execute, undefined);
+  assert.equal(lost.post?.text, STALE_POST);
 });

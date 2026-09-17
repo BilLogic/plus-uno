@@ -187,7 +187,16 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
 
     // The delete IS the claim — see the interface. Nothing is awaited between
     // the read and the delete, so two concurrent callers cannot both win.
+    //
+    // A RETIRED or superseded record is refused rather than deleted (#583): two
+    // doors reach the claim with a proposal they are holding in memory instead
+    // of one they just looked up, and the lookups alone therefore left a
+    // replaced card executable. The reason this is the store's job, and the
+    // per-message run lease that makes the race reachable, are on the
+    // interface.
     async claimProposal(proposalTs) {
+      const rec = proposals.get(proposalTs);
+      if (!rec || rec.retired || rec.supersededBy) return false;
       return proposals.delete(proposalTs);
     },
 

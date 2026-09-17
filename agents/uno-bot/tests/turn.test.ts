@@ -279,6 +279,13 @@ test("a turn that stages nothing leaves the pending card alone", async () => {
 // The second card is the one the person is looking at, so it is the one that
 // resolves; the first is retired rather than left live for its full hour with
 // the input they pushed back on still loaded.
+//
+// THE REQUEST CARRIES `pending`, and that is load-bearing (#583). This case
+// passed `pending: null` for two releases, so the staging path's retirement of
+// the card it is revising never ran in it — and that retirement, done by
+// CLAIMING (which deletes), is exactly what made the replaced-card message
+// unreachable in production while this test stayed green. With the real
+// argument in, the store-level assertion below pins the retire call.
 test("staging a revised card supersedes the one it replaces", async () => {
   const h = harness({
     replies: [
@@ -290,7 +297,10 @@ test("staging a revised card supersedes the one it replaces", async () => {
   });
   await stage(h);
 
-  const outcome = await runTurn(request({ text: "make it about reflections only" }), h.deps);
+  const outcome = await runTurn(
+    request({ text: "make it about reflections only", pending: PENDING }),
+    h.deps,
+  );
 
   assert.equal(outcome.disposition, "staged");
   const revisedTs = outcome.staged!.proposal.proposalTs;
