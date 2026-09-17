@@ -10,6 +10,12 @@
 # deliberate config change. Pasting it back REPLACES the whole manifest, so read
 # the diff first; additive changes are safer made through the feature pages.
 #
+# ── ONE PENDING DIFFERENCE: agent_session_stopped (#576, 2026-09-17) ────────
+# This file subscribes to `agent_session_stopped`; the live app does not yet.
+# `npm run slack:diff` therefore reports exactly that one difference, and it is
+# the expected reading until the YAML is pasted into the App Manifest page by
+# hand. Everything below this line was in sync when it was written.
+#
 # ── IN SYNC WITH LIVE (verified `npm run slack:diff`, 2026-08-06) ────────────
 # `messages_tab_enabled: true` and the `app_context_changed` subscription are
 # both applied on the app now, and the handlers for the agent surface shipped
@@ -277,16 +283,37 @@ settings:
   event_subscriptions:
     request_url: https://uno-bot.plus-uno.workers.dev/slack/events
     bot_events:
+      # Slack's stop control, which exists ONLY for an app subscribed to this
+      # event — which is why a live turn had no in-thread way out before #576,
+      # just `/stop` or the Home-tab button, both of them somewhere other than
+      # where the person is looking. Scope is `chat:write`, already held, so
+      # this is a subscription and nothing else. Handled by
+      # `handleSessionStopped` (src/slack/assistant.ts).
+      #
+      # NOT APPLIED TO THE LIVE APP YET at the time this landed: `slack:diff`
+      # reports the difference until the YAML is pasted into the App Manifest
+      # page by hand (the API refuses this app — see the header). Until then
+      # Slack offers no control and the handler stays unreached.
+      - agent_session_stopped
       - app_context_changed
       - app_home_opened
       - app_mention
-      - emoji_changed
+      # emoji_changed and reaction_removed were REMOVED here (#576). Nothing in
+      # src/ has ever read either: `emoji_changed` was subscribed for a
+      # custom-emoji feature that was never built, and `reaction_removed` is
+      # the other half of the gate's `reaction_added` — taking a ✅ back off a
+      # card resolves nothing, because the claim already happened and the
+      # record is already gone. Every fire of either landed in the
+      # `[slack] unhandled event type:` log, which exists to report a
+      # SLACK-SIDE surprise; a subscription of our own sitting in it spends
+      # that signal on noise. `tests/session-stop.test.ts` now asserts that
+      # every event listed here reaches a case in the dispatcher, with no
+      # exemption list to add the next one to.
       - message.channels
       - message.groups
       - message.im
       - message.mpim
       - reaction_added
-      - reaction_removed
   interactivity:
     is_enabled: true
     # Repointed from a Netlify function that never existed (confirmed 404) to the

@@ -5,7 +5,7 @@ import type { HistoryTurn, PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { conversationsReplies, getBotIdentity, postMessage } from "./api";
 import { buildFailureMessage } from "./failure-message";
-import { handleAgentDmOpened, handleAppContextChanged } from "./assistant";
+import { handleAgentDmOpened, handleAppContextChanged, handleSessionStopped } from "./assistant";
 import { handleAppHomeOpened } from "./home";
 import { handleReaction } from "./gate";
 import { extractPrdFromThreadRoot } from "./notion-prd";
@@ -19,6 +19,7 @@ import {
   type SlackEnvelope,
   type SlackAppHomeOpenedEvent,
   type SlackAppContextChangedEvent,
+  type SlackAgentSessionStoppedEvent,
   type RunnerJobPayload,
 } from "./types";
 import { historyVisionTurn } from "./vision-reference";
@@ -115,6 +116,21 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
       // switched what they're looking at. Stored under the DM conversation key
       // so the next message grounds on it. No user-visible output.
       await handleAppContextChanged(env, event as SlackAppContextChangedEvent, DM_CONVERSATION);
+      return;
+    }
+    case "agent_session_stopped": {
+      // Slack's own stop control, which exists only because this app now
+      // subscribes to the event (#576). It is the third door into the one
+      // cancel path, beside `/stop` and the Home-tab button, and the only one
+      // reachable from the thread the person is already reading.
+      //
+      // Handled INLINE rather than enqueued onto the AgentRunner. The runner
+      // serialises work per thread, and the work this thread is running is
+      // exactly what the press is trying to stop — a stop queued behind it
+      // would arrive after the run it was meant to interrupt. It is also two
+      // Slack calls and two store reads, which fits the ack window that the
+      // enqueue exists to protect long runs from.
+      await handleSessionStopped(env, event as SlackAgentSessionStoppedEvent);
       return;
     }
     default:
@@ -375,6 +391,14 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
     // down, in one `finally` around every exit it has (#555) — a second owner
     // here could only clear the surfaces IT knew about, which is how a channel
     // thread kept the indicator a DM-gated clear never reached.
+    //
+    // ONE SANCTIONED EXCEPTION, added #576: `handleSessionStopped` settles the
+    // session itself when Slack's stop control is pressed, because Slack says
+    // plainly that the press moves no status of its own. It escapes the defect
+    // above by construction — the event names the exact channel and thread, so
+    // there is no surface it could fail to know about — and it settles by the
+    // same card-based rule the turn uses, so the two writers agree on every
+    // ending that consults the card. It is the only other settler there is.
   }
   return "handled";
 }

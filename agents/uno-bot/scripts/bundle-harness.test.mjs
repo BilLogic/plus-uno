@@ -281,12 +281,28 @@ test("GEMINI_REGION `global` selects the implicit-cache floor", () => {
 });
 
 test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
-  // Three connector docs emptied take the committed bundle under 131k — three, not
-  // one, because no single member is large enough, and because a floor that one
-  // missing doc could trip would be a ceiling in disguise.
+  // Four connector docs emptied take the committed bundle under 131k — several,
+  // not one, because no single member is large enough, and because a floor that
+  // one missing doc could trip would be a ceiling in disguise.
+  //
+  // IT WAS THREE UNTIL #576. The corpus grows, and the three above had been
+  // ground down to 153 chars of margin — a fixture that a one-line glossary
+  // edit flips, which is what happened: two rows added to `CONTEXT.md` put the
+  // emptied bundle back over the floor, the bundler stopped reporting the
+  // shortfall, and this assertion failed for a reason that had nothing to do
+  // with the floor logic it guards. `supabase/overview.md` is the fourth
+  // because it restores real headroom (about 4.4k) rather than the next
+  // hairline. If this trips again, add another member rather than trimming
+  // prose to fit a fixture — the bundle growing is the healthy direction, and
+  // the thing under test is the bundler's refusal, not the corpus's size.
   const result = withFile(wranglerToml, withRegion("us-central1"), () =>
     withFiles(
-      ["docs/connectors/notion.md", "docs/connectors/slack.md", "docs/connectors/supabase/blueprint-navigation.md"],
+      [
+        "docs/connectors/notion.md",
+        "docs/connectors/slack.md",
+        "docs/connectors/supabase/blueprint-navigation.md",
+        "docs/connectors/supabase/overview.md",
+      ],
       frontmatterOnly,
       () => runBundler(["--check"]),
     ),

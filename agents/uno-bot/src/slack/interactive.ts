@@ -29,6 +29,7 @@ import { conversationsOpen, deleteMessage, postMessage } from "./api";
 import { resolveSignal } from "../gate/index";
 import { executeVerdict } from "../agent/resolve-proposal";
 import { proposalCardBlocks } from "./proposal-render";
+import { NOTHING_UNDONE, STOPPING_PROMISE } from "./session-stop";
 import { slackDelivery } from "./slack-delivery";
 import { withWorkingSignal } from "../turn/index";
 
@@ -230,8 +231,10 @@ async function stopRun(env: Env, payload: InteractionPayload): Promise<void> {
     // Both outcomes are worth saying. "Nothing running" is the more common
     // click and the more confusing silence: without it, a button that did
     // exactly what it should reads as a button that is broken.
+    // Shared with `/stop` and the in-thread stop control (`session-stop.ts`) —
+    // three doors into one cancel, saying one thing (#586).
     text: result.cancelled
-      ? "Stopping — I'll finish the step I'm on and stop there. Nothing already confirmed gets undone."
+      ? `${STOPPING_PROMISE} ${NOTHING_UNDONE}`
       : "Nothing of mine is running right now, so there was nothing to stop. (If you asked me something in the last few minutes and it's still going, ask again here and I'll look.)",
   }).catch(() => {});
 }
