@@ -2,7 +2,8 @@
  * The deploy's "is my build actually serving?" check.
  *
  * #278: this Worker has TWO deployers. The gated GitHub Actions workflow runs
- * typecheck, check:fetch, check:contract, test:bundle and bundle:harness before
+ * typecheck, check:fetch, check:contract, test:bundle, the unit suite (#580) and
+ * bundle:harness before
  * shipping; Cloudflare Workers Builds also builds this repo and deploys on its
  * own, from a command that lives in the Cloudflare dashboard and cannot be read
  * from here.

@@ -75,8 +75,9 @@
  * THAT ASSERTION HAS A BLIND SPOT, AND IT COST SOMETHING. It matches on the
  * `check:` prefix, so a guard that does not carry the prefix is invisible to it.
  * `agents/uno-bot`'s `typecheck` and `test` are both guards by any reading —
- * 268 unit tests across 39 suites, and the Worker's whole type surface — and
- * neither ran in any workflow. `test` was not even in `npm run deploy`. They are
+ * 692 unit tests across 60 suites, and the Worker's whole type surface — and
+ * neither ran in any workflow. `test` was not even in `npm run deploy`, and
+ * joined that chain only in #580. They are
  * registered BY NAME because the assertion cannot find them for us; the
  * prefix is not widened to catch them, because the rest of that package's
  * scripts (`dev`, `tail`, `deploy`, `secrets:set`) are commands rather than

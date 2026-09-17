@@ -20,9 +20,19 @@ name: uno-bot — deploy Worker
 # repo ran on a PR at all; `check-harness.yml` now does, and it composes
 # `check:harness-bundle`, so a stale bundle is caught on the branch rather than
 # here. What protects the DEPLOY is still the gating inside `npm run deploy`
-# (typecheck · check:fetch · check:contract · bundle:harness · wrangler deploy),
-# and that runs either way — the PR gate deliberately leaves `check:fetch` and
-# `check:contract` to this boundary (scripts/check-harness.mjs § EXCLUDED).
+# (typecheck · check:fetch · check:contract · check:secrets · test:bundle ·
+# test · bundle:harness · wrangler deploy), and that runs either way — the PR
+# gate deliberately leaves `check:fetch` and `check:contract` to this boundary
+# (scripts/check-harness.mjs § EXCLUDED).
+#
+# `test` — the Worker's 692 unit tests — joined that chain in #580. It had been
+# a pull-request check since 2026-08-29 (a row of scripts/checks.registry.mjs,
+# composed into `npm run check:harness`) and was absent from this chain, so a
+# direct push to `main` reached production having run none of it. `main` is
+# unprotected and 19 people can push to it, which is precisely the path a
+# PR-only gate does not sit on. The PR side of #580 is the two named jobs of
+# `uno-bot-checks.yml`, so a type failure and a test failure read apart in a
+# PR's check list; this chain is the other half, and 2.2s is the whole cost.
 #
 # `check:contract` is only a real gate when the app repo is checked out beside
 # this one — it compares the vendored blueprint contract against the app's

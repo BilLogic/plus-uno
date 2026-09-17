@@ -552,7 +552,7 @@ export const CHECKS = [
       '`tsc --noEmit`. The type errors are the compiler\'s, in the compiler\'s format, and ' +
       'nothing in this repo should paraphrase them.',
     guards:
-      "the Worker's TypeScript, which no pull request ran until now. `npm run deploy` chains it, so it was gated at the deploy boundary and nowhere earlier — a type error reached the one command whose failure is most expensive to discover. 1.2s, measured 2026-08-29.",
+      "the Worker's TypeScript — every file under agents/uno-bot/src/ (tsconfig.json § include). Before it was composed here it ran only inside `npm run deploy`, so a type error reached the one command whose failure is most expensive to discover. It ALSO has its own named pull-request job (.github/workflows/uno-bot-checks.yml § typecheck), because 48 sub-checks share one GitHub check and a reviewer reading a red `check:harness` cannot tell a type failure from a test failure without opening the log (#580). 1.2s, measured 2026-09-17.",
   },
   {
     name: 'test:bundle',
@@ -574,7 +574,7 @@ export const CHECKS = [
       '`tsc -p tsconfig.test.json && node --test`. A build step and a test runner; neither ' +
       'half is a comparison this process could make.',
     guards:
-      "the Worker's 268 unit tests across 39 suites, which ran in NO workflow and are not in `npm run deploy` either — that chain chose `test:bundle` and stopped. So the largest test suite in this repository was gated by nothing at all, and had been since it was written. 1.2s, measured 2026-08-29. Found while verifying the TypeScript 7 bump (#298), which is exactly the change that needed them. Among them is the harness name sweep (tests/harness-blueprint-names.test.ts), which reads the assembled prompt, the tool schemas and — since #425 — the Actions prompts under scripts/prompts/ for blueprint identifiers and conventions the schema no longer has; its inputs are repo-root files, which is the rule that composes a sub-package check here.",
+      "the Worker's 692 unit tests across 60 suites — the largest suite in this repository, and gated by nothing at all until it was composed here: it ran in no workflow, and `npm run deploy` chose `test:bundle` and stopped. 2.2s, measured 2026-09-17. Found while verifying the TypeScript 7 bump (#298), which is exactly the change that needed them. #580 finished the job in both directions: `npm test` is in the deploy chain now, so a direct push to unprotected `main` meets it too, and the suite has its own named pull-request job (.github/workflows/uno-bot-checks.yml § tests) so its red is legible from the check list rather than only from a 40-second log. Among them is the harness name sweep (tests/harness-blueprint-names.test.ts), which reads the assembled prompt, the tool schemas and — since #425 — the Actions prompts under scripts/prompts/ for blueprint identifiers and conventions the schema no longer has; its inputs are repo-root files, which is the rule that composes a sub-package check here.",
   },
   {
     name: 'evals:local',

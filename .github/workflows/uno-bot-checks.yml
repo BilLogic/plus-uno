@@ -1,0 +1,117 @@
+name: uno-bot — Worker checks
+
+# The Worker's own typecheck and its own unit suite, each as a PULL-REQUEST
+# CHECK WITH ITS OWN NAME (#580).
+#
+# WHAT THIS DOES AND DOES NOT ADD. Both commands already ran on every pull
+# request before this file existed: `typecheck` and `test` are rows of
+# `scripts/checks.registry.mjs` with `trigger: 'pull_request'`, composed into
+# `npm run check:harness` since 2026-08-29, and `check-harness.yml` runs that
+# composite. What was missing is the part a reviewer reads. All 48 sub-checks
+# land on one GitHub check named `check:harness / harness`, so a type error and
+# a failing test are the same red line in the PR's check list, and telling them
+# apart means opening a 40-second log. Two named jobs answer the question from
+# the list: "uno-bot — Worker checks / typecheck" and "… / tests".
+#
+# THE REGISTRY ROWS STAY COMPOSED, so the two commands run twice on a PR: once
+# inside the composite, once here. That is deliberate and it is the cheaper of
+# the two mistakes. `npm run check:harness` is the one command this repo asks
+# for before opening a PR (docs/engineering/setup.md § The harness gate), and a
+# local gate that is a strict SUBSET of the remote one is what cost #388 a red
+# CI — a rewording that passed 38 green sub-checks locally and failed only after
+# the push. Dropping the rows here to save 3.4s of runner time would rebuild
+# exactly that gap. The duplicate work is 1.2s of `tsc` and 2.2s of `node --test`
+# (measured 2026-09-17), inside two jobs whose real cost is the install, and both
+# run concurrently with the harness job, so a PR's wall clock is unchanged.
+#
+# NO SECRET, BY CONSTRUCTION, which is what lets a fork PR run it. `tsc` reads
+# the checkout. The suite is `node --test` over compiled TypeScript: pure
+# functions, mocked `fetch`, and a few files read off disk — no Worker, no
+# Cloudflare token, no model call and no spend. The one Worker suite that needs
+# a runtime (tests/workerd/, under workerd via vitest) stays a step of
+# `check-harness.yml`, where its ~2s of miniflare startup is already paid for.
+#
+# NOT PATHS-FILTERED, on the same reasoning as `check-harness.yml` and
+# `uno-bot-deploy.yml`: `tests/harness-blueprint-names.test.ts` reads the
+# assembled prompt, the tool schemas and the Actions prompts under
+# `scripts/prompts/`, so a PR that touches nothing under `agents/` can turn this
+# suite red — and a filter narrow enough to save an install is a filter that
+# misses that.
+#
+# WHY TWO JOBS RATHER THAN TWO STEPS OF ONE. A GitHub check is a JOB; steps are
+# log lines inside one. Two steps would put the type failure and the test
+# failure back on a single red check, which is the thing this file exists to fix.
+#
+# Spot-run: `gh workflow run uno-bot-checks.yml`.
+
+on:
+  pull_request:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  # A superseded push to the same PR should cancel its in-flight run — the older
+  # answer is about a tree that no longer exists.
+  group: uno-bot-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    # The command is ~1.2s and the install is the rest. 10 lets a cold npm cache
+    # through and still stops a hang from burning an hour.
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: ".nvmrc"
+          # Keyed on the Worker's own lockfile: this job installs nothing from
+          # the root manifest, so the root lockfile changing should not miss the
+          # cache and the Worker's changing must.
+          cache: npm
+          cache-dependency-path: agents/uno-bot/package-lock.json
+
+      - name: Install uno-bot deps
+        working-directory: agents/uno-bot
+        run: npm ci
+
+      # `tsc --noEmit` over agents/uno-bot/src/**, which is the whole Worker
+      # surface (tsconfig.json § include). `npm run deploy` chains it too, so a
+      # direct push to `main` still meets it — a gate that exists only on PRs is
+      # a gate a direct push walks past.
+      - name: npm run typecheck
+        working-directory: agents/uno-bot
+        run: npm run typecheck
+
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: ".nvmrc"
+          cache: npm
+          cache-dependency-path: agents/uno-bot/package-lock.json
+
+      - name: Install uno-bot deps
+        working-directory: agents/uno-bot
+        run: npm ci
+
+      # `tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js` —
+      # 692 tests across 60 suites, the largest suite in this repository. It is
+      # also part of `npm run deploy` as of #580, for the direct-push reason
+      # above: before that, this suite ran on pull requests and nowhere else, so
+      # a push straight to `main` reached production having run none of it.
+      - name: npm test
+        working-directory: agents/uno-bot
+        run: npm test

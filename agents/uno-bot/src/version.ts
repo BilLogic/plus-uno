@@ -29,7 +29,7 @@ declare const __BUILD_ID__: string;
  * of #278. `deploy.mjs` stamps "dev" when it runs outside CI — so while both
  * said "dev", a Worker reporting it could equally mean "someone deployed from a
  * laptop" or "something deployed WITHOUT deploy.mjs, and therefore without
- * typecheck, check:fetch, check:contract, test:bundle or bundle:harness". Those
+ * typecheck, check:fetch, check:contract, the unit suite or bundle:harness". Those
  * need completely different responses and were indistinguishable.
  *
  * Now they are not, and the distinction costs nothing and depends on nothing:

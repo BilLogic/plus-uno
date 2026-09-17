@@ -26,6 +26,13 @@ name: check:harness
 # generators themselves, so a filter narrow enough to be worth having is a filter
 # that misses the drift. The whole run is cheaper than reasoning about the filter.
 #
+# ONE CHECK, 48 SUB-CHECKS — and that is the limit of what a PR's check list can
+# say about a red here. `uno-bot-checks.yml` runs the Worker's `typecheck` and
+# its `test` suite as two SEPARATELY NAMED jobs for that reason (#580): both are
+# composed into the composite below and stay composed, so the pre-push command
+# is whole, and the named jobs are what make a type failure legible apart from a
+# test failure without opening this log.
+#
 # Spot-run: `gh workflow run check-harness.yml`.
 
 on:
@@ -57,7 +64,7 @@ jobs:
           node-version-file: ".nvmrc"
 
       # BEFORE `check:harness`, not after, and the order is load-bearing:
-      # that composite now runs the Worker's `typecheck` and its 268 tests, and
+      # that composite now runs the Worker's `typecheck` and its 692 tests, and
       # both need this package's devDependencies. With the install below the
       # check, CI failed on `Cannot find type definition file for
       # '@cloudflare/workers-types'` while the same command passed on any
