@@ -307,6 +307,34 @@ describe("a card a revision replaced", () => {
     }
   });
 
+  // The DM regression this grain exists for: `threadTs` is the constant "dm"
+  // there, so two independent asks share a conversation key. Retiring by
+  // conversation would tell the second ✅ its proposal "was replaced by a newer
+  // one" — untrue, a different request — and leave the first ask unresolvable.
+  it("leaves an unrelated ask in the same DM resolvable", async () => {
+    const threadState = createInMemoryThreadState();
+    const first = { ...PROPOSAL, channel: "D1", threadTs: "dm", replyTs: "1700000000.000100" };
+    const second = {
+      ...PROPOSAL,
+      channel: "D1",
+      threadTs: "dm",
+      replyTs: "1700000000.000200",
+      proposalTs: "1700000000.000295",
+      input: { title: "Something else entirely" },
+    };
+    await threadState.putProposal(first);
+    await threadState.putProposal(second);
+
+    for (const card of [first, second]) {
+      const verdict = await resolveSignal(
+        reaction({ messageTs: card.proposalTs, channel: "D1", thread: "dm" }),
+        { threadState },
+      );
+      assert.equal(verdict.outcome, "won", card.proposalTs);
+      assert.deepEqual(verdict.execute?.input, card.input, card.proposalTs);
+    }
+  });
+
   it("sends a typed ✅ to the newest card, not the one it replaced", async () => {
     const { threadState, revisedTs } = await twoCards();
     const verdict = await resolveSignal(typed(), { threadState });

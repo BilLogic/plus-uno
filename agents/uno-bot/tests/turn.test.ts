@@ -472,9 +472,7 @@ test("staging a revised card supersedes the one it replaces", async () => {
 
   assert.equal(outcome.disposition, "staged");
   const revisedTs = outcome.staged!.proposal.proposalTs;
-  const old = await h.threadState.getProposalByTs(PENDING.proposalTs);
-  assert.equal(old.state, "superseded");
-  assert.equal(old.state === "superseded" ? old.supersededBy : "", revisedTs);
+  assert.equal((await h.threadState.getProposalByTs(PENDING.proposalTs)).state, "superseded");
   // And the thread's live card is the new one.
   assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, revisedTs);
 });

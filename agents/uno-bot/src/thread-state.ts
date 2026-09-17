@@ -47,6 +47,7 @@ import {
   MAX_HISTORY_TURNS,
   PROPOSAL_TTL_MS,
   RUN_LEASE_MS,
+  proposalReplyThread,
   type HistoryTurn,
   type PendingProposal,
   type ProposalLookup,
@@ -208,13 +209,20 @@ export class ThreadState extends DurableObject<Env> {
 
   // ----- proposals -----
 
-  // Staging retires whatever was still pending in the same conversation (#573):
+  // Staging retires whatever was still pending in the same REPLY THREAD (#573):
   // a person who answers a card with feedback gets a revised card, and a ✅ on
   // the old one used to execute the very input they were pushing back on. The
   // retired record is kept rather than deleted so a late ✅ can be told it was
-  // replaced. One scan of the staged set, as `getProposalByThread` does — live
-  // cardinality is small because proposals expire after an hour.
+  // replaced. Why the grain is the reply thread rather than the conversation
+  // key — and why that is what keeps two unrelated DM asks apart — is in
+  // `thread-state/store.ts` on `putProposal`. One scan of the staged set, as
+  // `getProposalByThread` does: live cardinality is small because proposals
+  // expire after an hour.
+  //
+  // Retire first, then write — a choice, not an accident: the new card is the
+  // one a racing ✅ has to be able to find, so it is the last thing to land.
   async putProposal(proposal: PendingProposal, at: number): Promise<void> {
+    const thread = proposalReplyThread(proposal);
     const all = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
     for (const [key, rec] of all) {
       if (key === proposalKey(proposal.proposalTs)) continue;
@@ -222,7 +230,7 @@ export class ThreadState extends DurableObject<Env> {
       if (at - rec.createdAt > PROPOSAL_TTL_MS) continue; // already "expired"
       const pending = rec.payload as PendingProposal | null;
       if (!pending || pending.channel !== proposal.channel) continue;
-      if (pending.threadTs !== proposal.threadTs) continue;
+      if (proposalReplyThread(pending) !== thread) continue;
       await this.storage.put<ProposalRecord>(key, {
         ...rec,
         supersededBy: proposal.proposalTs,
@@ -235,22 +243,29 @@ export class ThreadState extends DurableObject<Env> {
     await this.ensureGcAlarm();
   }
 
+  // Is the card that retired another one still around to be looked at? Its own
+  // retirement does not matter: a chain still ends in a live newest card.
+  private async successorIsLive(ts: string, at: number): Promise<boolean> {
+    const rec = await this.storage.get<ProposalRecord>(proposalKey(ts));
+    return !!rec && at - rec.createdAt <= PROPOSAL_TTL_MS;
+  }
+
   // "expired", "superseded" and "none" are different answers on purpose: the
   // gate has to tell the requester their delayed ✅ hit an aged-out card, or a
-  // card a revision replaced, rather than ignore it.
-  //
-  // TTL is checked first because it is the outer envelope — past it the record
-  // is deleted either way, and the GC alarm sweeps on the same rule. Inside it,
-  // "replaced" is the case that actually happens: a revision lands seconds
-  // after the card it retires.
+  // card a revision replaced, rather than ignore it. A live successor beats the
+  // TTL — the ordering, and the third card it stops the person from asking
+  // for, are on `ProposalLookup` in `thread-state/store.ts`.
   async getProposalByTs(proposalTs: string, at: number): Promise<ProposalLookup> {
     const rec = await this.storage.get<ProposalRecord>(proposalKey(proposalTs));
     if (!rec) return { state: "none" };
+    if (rec.supersededBy && (await this.successorIsLive(rec.supersededBy, at))) {
+      return { state: "superseded" };
+    }
     if (at - rec.createdAt > PROPOSAL_TTL_MS) {
       await this.storage.delete(proposalKey(proposalTs));
       return { state: "expired" };
     }
-    if (rec.supersededBy) return { state: "superseded", supersededBy: rec.supersededBy };
+    if (rec.supersededBy) return { state: "superseded" };
     return {
       state: "found",
       proposal: rec.payload as PendingProposal,

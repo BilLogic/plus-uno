@@ -154,7 +154,7 @@ export const EXPIRED_POST =
   "Proposals stay live for an hour. Ask me again and I'll set the same thing up fresh.";
 
 /**
- * The ✅/⛔ on a card a revision replaced (#573).
+ * The ✅/⛔ on a proposal a revision replaced (#573).
  *
  * Its own wording, not `EXPIRED_POST`: the person did not wait too long, they
  * acted on the card above the one I am holding — and unlike an aged-out card,
@@ -162,8 +162,8 @@ export const EXPIRED_POST =
  * is the point: the old card carries the very input they pushed back on.
  */
 export const SUPERSEDED_POST =
-  ":arrows_counterclockwise: That card was replaced by a newer proposal — nothing was executed. " +
-  "Confirm on the latest :warning: card in this thread instead.";
+  ":arrows_counterclockwise: That proposal was replaced by a newer one — nothing was executed. " +
+  "Confirm on the newest :warning: card in this thread instead.";
 
 /** The default narrative, when the signal brought no words of its own. */
 export function defaultNarrative(decision: Decision): string {
@@ -219,8 +219,8 @@ export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise
 
   if (found.state === "superseded") {
     // Answered under the card they acted on, which is where they are looking.
-    // No by-thread pointer: the live card is the newest message in the thread,
-    // and a second lookup to name it buys nothing.
+    // No by-thread pointer: the live one is the thread's newest CARD (replies
+    // land after it), and a second lookup to name it buys nothing.
     return {
       outcome: "stale",
       decision,
@@ -256,8 +256,10 @@ export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise
   // A reaction or a button resolves the card it was placed ON, or it resolves
   // nothing. This used to be an execution fallback — whatever the reaction sat
   // on, resolve the thread's live proposal — and it silently answered a
-  // different question: react ✅ on a superseded card and the NEWER proposal
-  // fired. The by-thread lookup is a POINTER here, never an executor.
+  // different question: react ✅ on a card that is not the thread's live one
+  // and the NEWER proposal fired. The by-thread lookup is a POINTER here, never
+  // an executor, and that is the execution guarantee the superseded branch
+  // above leans on rather than duplicates.
   if (signal.kind !== "typed" && signal.messageTs !== proposal.proposalTs) {
     return {
       outcome: "none",
@@ -344,9 +346,13 @@ async function locate(
       .catch(() => ({ state: "none" }) as const);
     if (byTs.state === "found") return { state: "found", proposal: byTs.proposal };
     // A superseded or aged-out card stops here rather than falling through to
-    // the by-thread lookup: the fallback would hand back the NEWER proposal and
-    // execute it, which is the "confirmed one thing, got another" bug the
-    // pointer branch below already fights.
+    // the by-thread lookup. Not for the execution guarantee — the pointer
+    // branch in `resolveSignal` already holds that independently, since a
+    // signal whose `messageTs` is not the found card's resolves nothing on
+    // either door. This is about WORDING: the fallback would hand back the
+    // thread's newest card and the person would be told their ✅ "is not on
+    // the proposal I am holding", when what actually happened is that the card
+    // they acted on was replaced.
     if (byTs.state === "superseded") return { state: "superseded" };
     if (byTs.state === "expired") return { state: "expired" };
   }

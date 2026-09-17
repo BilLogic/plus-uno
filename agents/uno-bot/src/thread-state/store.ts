@@ -171,6 +171,19 @@ export interface PendingProposal {
 }
 
 /**
+ * The reply thread a card was posted under — the grain supersession works at.
+ *
+ * `replyTs` is the real ts the card went out with; `threadTs` is the fallback
+ * for records staged before it existed. Both adapters compare proposals with
+ * this, so "same thread" means one thing in the module. See `putProposal`.
+ */
+export function proposalReplyThread(
+  proposal: Pick<PendingProposal, "replyTs" | "threadTs">,
+): string {
+  return proposal.replyTs ?? proposal.threadTs;
+}
+
+/**
  * The operations of a proposal, however it was stored.
  *
  * The one reader of the expand–contract pair above: a record written since the
@@ -194,12 +207,25 @@ export function proposalOperations(
  * used to run the very input they were pushing back on. It is deliberately NOT
  * folded into "expired": a card replaced two seconds ago and one that aged out
  * an hour ago are different things to say — the first has a live successor in
- * the thread to point at, the second has nothing.
+ * the thread to send the person to, the second has nothing.
+ *
+ * WHICH ANSWER WINS THE TIE. A card that was replaced AND has since aged out
+ * reads as "superseded" while its successor is still live, and only then. The
+ * expired wording ends "ask me again and I'll set the same thing up fresh",
+ * which in front of a live card asks for a THIRD one — and the storage GC runs
+ * at most daily, so the record would keep giving that answer for hours. Once
+ * the successor is gone too, there is nothing to look at and the TTL owns the
+ * record again, delete included.
+ *
+ * The successor's ts is deliberately NOT on this answer. Nothing outside the
+ * store has a use for it that the thread's own newest card does not answer
+ * better, and a chain (A replaced by B, B replaced by C) would hand out a
+ * pointer to a card that is itself retired.
  */
 export type ProposalLookup =
   | { state: "found"; proposal: PendingProposal; createdAt: number }
-  /** Retired by a newer card in the same conversation; `supersededBy` is its ts. */
-  | { state: "superseded"; supersededBy: string }
+  /** Retired by a newer card staged in the same reply thread. */
+  | { state: "superseded" }
   | { state: "expired" }
   | { state: "none" };
 
@@ -256,13 +282,28 @@ export interface ThreadState {
 
   /**
    * Stage a proposal under its own `proposalTs`, retiring any proposal still
-   * pending in the SAME conversation.
+   * pending in the SAME REPLY THREAD.
    *
    * The retirement belongs to the store rather than to a caller because it is
    * the staging that supersedes: a turn that stages nothing must leave a
    * pending card alone, and there is exactly one way to stage. A retired card
    * is kept, not deleted — a late ✅ on it has to be told it was replaced,
    * rather than get the silence a missing record buys (#573).
+   *
+   * THE GRAIN IS THE REPLY THREAD (`replyTs`), not the conversation key, and
+   * the difference is a DM. `threadTs` is the CONVERSATION key, which in an
+   * unthreaded DM is the constant `"dm"` — every ask on that surface shares it,
+   * so retiring by conversation would let one ask retire an unrelated one, and
+   * answer a ✅ on it with "that was replaced" when it was nothing of the kind.
+   * In a channel `replyTs` IS the thread root, so channel behaviour is
+   * unchanged; in a DM each ask has its own thread since the agent_view
+   * migration, so a revision still retires the card it revises.
+   *
+   * `replyTs` is optional (it post-dates records staged before 2026-08-22), and
+   * a record without one falls back to the conversation key. Safe on both
+   * surfaces: in a channel the two are the same value anyway, and in a DM the
+   * fallback only ever compares a pre-migration record, which had no per-ask
+   * thread to be told apart by in the first place.
    */
   putProposal(proposal: PendingProposal): Promise<void>;
 

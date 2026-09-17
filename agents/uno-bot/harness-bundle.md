@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **164,507 chars from 16 files**, against an assembled budget of 170,000 (5,493 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 144,123 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **164,950 chars from 16 files**, against an assembled budget of 170,000 (5,050 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 144,566 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,603 (−7,277 ide-only) | 9,603 | 20,000 (constitution) |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 13,051 | 22,682 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,970 | 49,693 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 56,086 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 63,130 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 69,843 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 75,130 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 81,833 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 88,235 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 90,206 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 104,204 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,154 | 118,400 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 121,648 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 152,235 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 156,824 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,635 (−605 ide-only) | 164,507 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 13,143 | 22,774 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,195 | 50,010 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 56,403 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 63,447 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 70,160 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 75,447 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 82,150 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 88,552 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 90,523 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 104,521 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,280 | 118,843 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 122,091 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 152,678 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 157,267 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,635 (−605 ide-only) | 164,950 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -211,8 +211,6 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **direct fix / gated change** | the two maintenance severities: a trivial fix applied straight to main with a digest line, vs a PR + PRD through a Slack verdict. | "Tier 1", "Tier 2" |
 | **Tier 1 / Tier 2 / Tier 3** | the loading tiers: always-loaded · on demand · retrieved live (`AGENTS.md` § The loading contract). *Tier* means loading and nothing else | "Tier" for a maintenance severity |
 | **RM-ID** | Roadmap card id (`RM-<n>`) — the Figma↔Notion join key | — |
-| **proposal card** | the ✅-gated card uno-bot posts before a write, resolved by a reaction, the card's own button, the emoji typed alone, or the model | "confirmation dialog", "prompt" |
-| **superseded card** | a proposal card retired by a revision staged later in the same thread — it executes nothing and answers that it was replaced | "expired card" (that is the hour-long TTL, a different answer) |
 | **embodiment** | a runtime uno runs in — the IDE, the uno-bot Worker, headless GitHub Actions — each with its own powers and its own slice of the harness; `embodiment:` frontmatter says which docs a runtime bundles | "mode", "environment" |
 | **check registry** | `scripts/checks.registry.mjs` — one row per check (name, command, package, trigger, baseline, guards prose), read by the harness runner and by the generator that writes the `check:*` block of package.json and the check steps of the two workflows. The list has one home; a check listed in one place and forgotten in another fails `check:check-registry` | "the check list", "COMPOSED" |
 | **persona** | uno-bot's own always-loaded document (`agents/uno-bot/AGENT.md`): voice, audience, gate, etiquette — what the Worker is, beside what every embodiment obeys | "system prompt", "soul" |
@@ -224,6 +222,8 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **ModelProvider** | uno-bot's seam between its one agent loop (`agents/uno-bot/src/agent/loop.ts`) and a model. An adapter takes a neutral conversation, a tool roster and an opaque tier name and returns text, tool calls, usage and a stop kind; the wire format, the tier's model and dials, the prompt cache and the backup model stay inside it. Gemini is production's adapter, Claude-on-Vertex the opt-in second, the fake one is what the loop's tests run on. Above the seam the loop's whole public surface is one function, `runAgent(input)` in `agent/run-agent.ts`, which is also the one place `MODEL_PROVIDER` is read | "the provider loop", "provider lane", "Gemini lane", "Claude lane", "model lane", "both lanes" (there is one loop, adapters behind one seam — and **lane** is the blueprint's actor row) |
 | **Turn** | one uno-bot turn as a module (`agents/uno-bot/src/turn/`): one request in — who, where, the text, the images as bytes, the pending proposal — and one outcome out — what was posted, what is staged, what the conversation now remembers, plus the turn's telemetry. Tier routing, the model's context, the draft judges, the proposal card and the history write are its implementation; what a person sees WHILE it runs — the 👀, the thinking line, the narration, the card — goes through its **Delivery** port, which has a Slack adapter and a recording one for tests. Slack is one caller: the envelope adapter (`src/slack/turn-adapter.ts`) turns an event into the request and `Env` into the turn's named dependencies | "the handler", "the message pipeline" |
 | **Gate** | the one place a staged proposal is resolved (`agents/uno-bot/src/gate/`): four signals in — a reaction on the card, the card's ✅/⛔ button, the same emoji typed alone, the model's validated `proposal_resolve` — and one verdict out: won, stale or none, plus the text to post and the confirmed tool to run. The lookup (by card ts, then by conversation), what an emoji means, the claim whose delete IS the lock, and the lost-race wording are its implementation; each door posts the verdict's text through **Turn**'s Delivery and hands the tool to the executor, which is what keeps Gate clear of Slack and `Env` | "the confirmation gate", "the ✅ handler" |
+| **proposal card** | the ⚠️ card uno-bot posts to hold a side-effect tool call until a person approves it — the thing **Gate**'s four signals resolve; its message ts is the proposal's identity in **ThreadState** | "confirmation dialog", "prompt" |
+| **superseded card** | a proposal card retired by a revision staged later in the same reply thread: it executes nothing and answers that it was replaced — a different answer from expired, which is the hour-long TTL running out | "expired card" |
 | **corpus** | the harness's one reader of repo files (`scripts/lib/corpus.mjs`): which documents exist under a path, where a doc's frontmatter stops, its markdown links, its heading outline. A check asks it rather than the filesystem, and it takes a root so its test reads a fixture tree | "the walker", "the parser" (there is one of each) |
 | **recording** | a case's captured model replies, tool results and subject — the local eval transport's input (`docs/evals/fixtures/recordings/`); `source` is `authored` or `captured`, written down rather than inferred, and it reaches the results file | "fixture" (a fixture is what a case ASSERTS; a recording is what answered it) |
 | **transport** | how the eval runner reaches a turn: the deployed Worker's eval route, or **Turn** in-process from a **recording**. The summary names which one answered, because the two are different measurements | "the endpoint", "the eval route" (that is one transport's target) |
@@ -352,7 +352,7 @@ The ✅-gated tools of the gate list (§ Tool routing) — zero irreversible act
    - **A present-but-ambiguous brief is not a refusal.** An unspecified state, an undefined behaviour, a filter whose semantics could go two ways → NAME those gaps, either as a question instead of staging or in the preview bullets beside the card so the ✅ is informed.
 5. **One Proposal per user message, which may hold several operations** — every write you intend goes in the same reply, and the Worker stages them as one card for one ✅, then runs them in that order. A four-document reconciliation is four calls in one reply (read-only extras are fine).
 6. **Resolution:** 60-min expiry. `<pending_proposal>` in context + a yes or no *in any words* → `proposal_resolve`; there is no phrase list, you are the one reading the reply. **Anyone in the thread may confirm or cancel, not just the original requester**; unrelated question while pending → answer normally. **One card, one firing:** `proposal_resolve` is the only call that completes a staged action; an action already staged gets no second card. The card carries ✅ Approve / ⛔ Cancel buttons and accepts the same as reactions — it explains itself.
-   - **Amendments aren't confirmations.** Someone trying to *change* an in-flight proposal ("actually make it X") rather than approve it → surface it ("<@other> suggests X — want me to update the proposal or hold?") and stage a fresh card if they say yes. A plain go-ahead/cancel from any participant still resolves the existing one as-is.
+   - **Amendments aren't confirmations.** Someone trying to *change* an in-flight proposal ("actually make it X") rather than approve it → surface it ("<@other> suggests X — want me to update the proposal or hold?") and stage a fresh card if they say yes. A plain go-ahead/cancel from any participant still resolves the existing one as-is. **The fresh card retires the old one** — the Worker does that on staging, and a ✅ on the retired card executes nothing and says it was replaced — so never tell anyone to ignore the earlier card or warn them it is still live.
 7. **Cancel is a mode switch:** acknowledge, ask what they'd like instead, and let the next proposal wait until they ask for it. Anything you commit to happens this turn.
    - **A repeat ask after a cancel needs an explicit revival.** When the same action comes up again in a thread where it was just cancelled, name the cancel and ask ("You cancelled that a moment ago — want me to stage it again as-is?"). The cancel may have meant wrong link, wrong channel, or not yet. The Worker enforces this deterministically too; this rule is the model-side half so the two agree.
 8. **An action stays in future tense until the Worker posts the real outcome**; stub or unsure → say so.
@@ -910,7 +910,7 @@ Bundle links (Loom · live preview · Figma replica · Decisions DB) go in `link
 
 ## Two gates — never conflate
 
-1. **Proposal-confirmation gate** (uno-bot side-effect proposals): ⚠️ card with ✅ Approve / ⛔ Cancel buttons; a ✅ (or 👍) / ⛔ (or ❌) reaction on the card, or that emoji typed alone, does the same; a typed reply in words goes to the model, which reads it in context. Anyone in the thread may confirm or cancel (the requester lock was removed 2026-07-14), 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state/store.ts` is the source of truth). **One live card per thread:** staging a revised card retires the one it replaces — a ✅ or ⛔ on the superseded card executes nothing and says it was replaced, which is a different answer from the expired one.
+1. **Proposal-confirmation gate** (uno-bot side-effect proposals): ⚠️ card with ✅ Approve / ⛔ Cancel buttons; a ✅ (or 👍) / ⛔ (or ❌) reaction on the card, or that emoji typed alone, does the same; a typed reply in words goes to the model, which reads it in context. Anyone in the thread may confirm or cancel (the requester lock was removed 2026-07-14), 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state/store.ts` is the source of truth). **One live card per reply thread:** staging a revised card retires the one it replaces — a ✅ or ⛔ on the superseded card executes nothing and says it was replaced, which is a different answer from the expired one. The grain is the reply thread rather than the conversation, so two independent asks in one DM each keep their own card.
 2. **Reviewer-verdict gate** (Flow 5 maintenance review, routed reviewers in #plus-design): ✅ approve · 🔁 request changes · ❌ reject. Never auto-merge; 🔁 loops the proposal with changes.
 
 Decisions reached in threads are written to **Decisions DB** (row with **Roadmap Card** = the project + **Evidence** = Slack permalink) **before** the thread is considered resolved. Do not append to obsolete Decision Log subpages.

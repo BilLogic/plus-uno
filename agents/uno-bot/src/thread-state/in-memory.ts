@@ -23,6 +23,7 @@ import {
   MAX_HISTORY_TURNS,
   PROPOSAL_TTL_MS,
   RUN_LEASE_MS,
+  proposalReplyThread,
   type HistoryTurn,
   type PendingProposal,
   type ProposalLookup,
@@ -89,6 +90,13 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     return rec;
   }
 
+  /** Is the card that retired another one still around to be looked at? Its own
+   *  retirement does not matter: a chain still ends in a live newest card. */
+  function successorIsLive(ts: string): boolean {
+    const rec = proposals.get(ts);
+    return !!rec && now() - rec.createdAt <= PROPOSAL_TTL_MS;
+  }
+
   return {
     // ----- history -----
 
@@ -117,32 +125,36 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     // ----- proposals -----
 
     async putProposal(proposal) {
-      // The revised card retires the one it replaces (#573). Only LIVE records
-      // in this conversation are touched: an aged-out card is already answered
-      // by "expired", and another thread's card is not this turn's to retire.
+      // The revised card retires the one it replaces, per REPLY THREAD — the
+      // grain, and why a DM needs it, are in `putProposal`'s contract. Only
+      // LIVE records are touched: an aged-out card is already answered by
+      // "expired".
+      const thread = proposalReplyThread(proposal);
       for (const rec of proposals.values()) {
         if (rec.proposal.proposalTs === proposal.proposalTs) continue;
         if (rec.supersededBy) continue;
         if (now() - rec.createdAt > PROPOSAL_TTL_MS) continue;
         if (rec.proposal.channel !== proposal.channel) continue;
-        if (rec.proposal.threadTs !== proposal.threadTs) continue;
+        if (proposalReplyThread(rec.proposal) !== thread) continue;
         rec.supersededBy = proposal.proposalTs;
       }
+      // Retire first, then write — a choice, not an accident: the new card is
+      // the one a racing ✅ has to be able to find, so it is the last thing to
+      // land.
       proposals.set(proposal.proposalTs, { proposal, createdAt: now() });
     },
 
     async getProposalByTs(proposalTs): Promise<ProposalLookup> {
       const rec = proposals.get(proposalTs);
       if (!rec) return { state: "none" };
-      // TTL is the outer envelope: past it the record is gone either way, and
-      // the storage GC deletes on the same rule. Inside it, "replaced" is the
-      // more useful truth — and the case that actually happens, since a
-      // revision lands seconds after the card it retires.
+      // A live successor beats the TTL — the ordering, and the third card it
+      // stops the person from asking for, are in `ProposalLookup`.
+      if (rec.supersededBy && successorIsLive(rec.supersededBy)) return { state: "superseded" };
       if (now() - rec.createdAt > PROPOSAL_TTL_MS) {
         proposals.delete(proposalTs);
         return { state: "expired" };
       }
-      if (rec.supersededBy) return { state: "superseded", supersededBy: rec.supersededBy };
+      if (rec.supersededBy) return { state: "superseded" };
       return { state: "found", proposal: rec.proposal, createdAt: rec.createdAt };
     },
 
