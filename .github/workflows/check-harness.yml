@@ -15,18 +15,23 @@ name: check:harness
 # caught on the second PR rather than on main.
 #
 # EXACTLY ONE `npm ci`, AND IT IS SCOPED. The composite is ~14s, and the job
-# around it is ~40s: the difference is the single `npm ci` in `agents/uno-bot`
-# that the step below explains. That is the whole dependency budget. This header
-# read "NO `npm ci`, DELIBERATELY … every composed sub-check is dependency-free"
-# for three weeks after the install landed with the Worker's `typecheck` and
-# `test` rows (2026-08-29) — a file arguing for a number forty lines above the
-# step that changed it. Re-measured and restated in #580.
+# around it is ~36s: the difference is mostly the single `npm ci` in
+# `agents/uno-bot` (~13s) that the step below explains. That is the whole
+# dependency budget. This header read "NO `npm ci`, DELIBERATELY … every
+# composed sub-check is dependency-free" for three weeks after the install
+# landed with the Worker's `typecheck` and `test` rows (2026-08-29) — a file
+# arguing for a number forty lines above the step that changed it. Re-measured
+# and restated in #580, and re-measured again in #587, which moved the 4s
+# workerd step out to its own job: 40s became 36s (run 35277835410 measured the
+# 40s and its per-step breakdown, 2026-09-17).
 #
-# ~40s is still what keeps this gate switched on, and the rule the old paragraph
+# ~36s is still what keeps this gate switched on, and the rule the old paragraph
 # was protecting stands: a future sub-check that needs a package installs it in
 # its own step and says what it bought, rather than growing a blanket `npm ci`
 # at the root. A gate that costs ten minutes gets marked "not required" the
-# first busy week.
+# first busy week. A sub-check that would need a RUNTIME goes further out still
+# — to its own job, on its own name — which is what #587 decided for
+# `test:workerd` and wrote up in `uno-bot-checks.yml`.
 #
 # NOT PATHS-FILTERED, for the same reason `uno-bot-deploy.yml` is not: the
 # generated artifacts are assembled from docs/, skills/, design-system/ and the
@@ -34,11 +39,13 @@ name: check:harness
 # that misses the drift. The whole run is cheaper than reasoning about the filter.
 #
 # ONE CHECK FOR THE WHOLE COMPOSITE — and that is the limit of what a PR's check
-# list can say about a red here. `uno-bot-checks.yml` runs the Worker's `typecheck` and
-# its `test` suite as two SEPARATELY NAMED jobs for that reason (#580): both are
-# composed into the composite below and stay composed, so the pre-push command
-# is whole, and the named jobs are what make a type failure legible apart from a
-# test failure without opening this log.
+# list can say about a red here. `uno-bot-checks.yml` runs the Worker's
+# `typecheck`, its `test` suite and its `test:workerd` conformance suite as three
+# SEPARATELY NAMED jobs for that reason (#580, #587): the first two are composed
+# into the composite below and stay composed, so the pre-push command is whole,
+# and the named jobs are what make a type failure legible apart from a test
+# failure without opening this log. The third was never composed and is not a
+# step here any more either — see the note where that step used to be.
 #
 # Spot-run: `gh workflow run check-harness.yml`.
 
@@ -108,16 +115,11 @@ jobs:
       # composite above runs it and this file no longer restates it. Its
       # reasons live with the row, per the rule at the top of this file.
 
-      # The ThreadState conformance suite against the DURABLE OBJECT adapter,
-      # under the real workerd via @cloudflare/vitest-pool-workers (#493). It
-      # sits here, beside `test:bundle` and beside the `test` that `check:harness`
-      # already runs, because it is the same kind of gate — but it is NOT
-      # composed into `check:harness`: that gate's whole argument is that it
-      # stays seconds long, and this one starts a runtime (~2s locally, plus
-      # miniflare's own startup). `npm test` stays on `node --test`; exactly one
-      # file pays for workerd, and it is the file whose subject IS the runtime —
-      # Durable Object RPC, SQLite storage, and the input gate that makes "the
-      # delete is the claim" true.
-      - name: uno-bot ThreadState conformance under workerd
-        working-directory: agents/uno-bot
-        run: npm run test:workerd
+      # The ThreadState conformance suite under workerd used to be spelled out
+      # here too, from #493 until #587. It is still uncomposed — a runtime in
+      # this gate is what the header above refuses — but it is a registry row
+      # now (`test:workerd`, in EXCLUDED, with its reason and its numbers) and a
+      # NAMED JOB of `uno-bot-checks.yml`, which runs concurrently with this one.
+      # A Durable Object regression is a line in the check list that says so,
+      # rather than a red `check:harness / harness` shared with 48 other
+      # sub-checks; and this job is 4s shorter for it.

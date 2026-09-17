@@ -30,7 +30,7 @@ declare const __BUILD_ID__: string;
  * said "dev", a Worker reporting it could equally mean "someone deployed from a
  * laptop" or "something deployed WITHOUT deploy.mjs, and therefore without
  * typecheck, check:fetch, check:contract, check:secrets, test:bundle, the unit
- * suite or bundle:harness". Those need completely different responses and were
+ * suite, the conformance suite or bundle:harness". Those need completely different responses and were
  * indistinguishable.
  *
  * Now they are not, and the distinction costs nothing and depends on nothing:

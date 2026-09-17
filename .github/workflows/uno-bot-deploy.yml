@@ -21,9 +21,9 @@ name: uno-bot — deploy Worker
 # `check:harness-bundle`, so a stale bundle is caught on the branch rather than
 # here. What protects the DEPLOY is still the gating inside `npm run deploy`
 # (typecheck · check:fetch · check:contract · check:secrets · test:bundle ·
-# test · bundle:harness · wrangler deploy), and that runs either way — the PR
-# gate deliberately leaves `check:fetch` and `check:contract` to this boundary
-# (scripts/check-harness.mjs § EXCLUDED).
+# test · test:workerd · bundle:harness · wrangler deploy), and that runs either
+# way — the PR gate deliberately leaves `check:fetch` and `check:contract` to
+# this boundary (scripts/check-harness.mjs § EXCLUDED).
 #
 # `test` — the Worker's unit suite — joined that chain in #580. It had been
 # a pull-request check since 2026-08-29 (a row of scripts/checks.registry.mjs,
@@ -33,6 +33,15 @@ name: uno-bot — deploy Worker
 # PR-only gate does not sit on. The PR side of #580 is the two named jobs of
 # `uno-bot-checks.yml`, so a type failure and a test failure read apart in a
 # PR's check list; this chain is the other half, and 2.2s is the whole cost.
+#
+# `test:workerd` — the ThreadState conformance suite against a real Durable
+# Object — joined it in #587, one layer down and for the same reason: it ran as
+# a hand-written step of `check-harness.yml` and nowhere on this path, so the
+# contract between the two store adapters was something production could be
+# reached without. 3.1s warm, measured 2026-09-17, and it is the only member of
+# this chain that boots a runtime — workerd locally, through the `wrangler` this
+# chain already installs, so it adds no dependency. Its PR half is the third
+# named job of `uno-bot-checks.yml`.
 #
 # `check:contract` is only a real gate when the app repo is checked out beside
 # this one — it compares the vendored blueprint contract against the app's

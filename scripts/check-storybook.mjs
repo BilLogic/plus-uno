@@ -41,7 +41,7 @@
  *
  * WHY IT IS NOT PART OF `check:harness`. It needs `npm ci` and a Playwright
  * chromium download, and the run itself is ~130s against ~14s for the whole of
- * `check:harness` — ~40s for that gate's job, including the one `npm ci` it
+ * `check:harness` — ~36s for that gate's job, including the one `npm ci` it
  * scopes to `agents/uno-bot`. That gate's own header says that number is what
  * keeps it switched on. This one runs as its own `pull_request` job
  * (`.github/workflows/storybook-gate.yml`), concurrently — so a PR still waits

@@ -28,14 +28,16 @@
  *             lets the package.json block be GENERATED rather than compared:
  *             the registry is the author of those lines.
  *   pkg       'root' | 'bot' — which package.json owns the name.
- *   trigger   where the check actually runs: 'pull_request' (composed into
- *             `check:harness`, or reached through it as a step of
- *             `check:agent`), 'sweep' (a step of the monthly integrity sweep),
- *             'storybook-gate' (the browser job), 'deploy' (gated at
- *             `npm run deploy` in agents/uno-bot). A string, or an array when a
- *             check genuinely runs in more than one place — the two registry
- *             generators both read it, so a `sweep` here and no step there is a
- *             drift failure.
+ *   trigger   where the check actually runs: 'pull_request' (on every pull
+ *             request — composed into `check:harness`, reached through it as a
+ *             step of `check:agent`, or standing as its own named job in
+ *             `.github/workflows/uno-bot-checks.yml`, which is where an
+ *             EXCLUDED row can still carry this trigger), 'sweep' (a step of
+ *             the monthly integrity sweep), 'storybook-gate' (the browser job),
+ *             'deploy' (gated at `npm run deploy` in agents/uno-bot). A string,
+ *             or an array when a check genuinely runs in more than one place —
+ *             the two registry generators both read it, so a `sweep` here and
+ *             no step there is a drift failure.
  *   guards    what goes red when it fails, written for whoever reads the CI log
  *             and did not write the check. Registered rows only.
  *   reason    why the row is NOT composed. `EXCLUDED` rows only.
@@ -45,7 +47,7 @@
  *             exists and that the script names it.
  *   module    a path to an ES module exporting `run(ctx) => Finding[]` (see
  *             `scripts/lib/findings.mjs`). The runner calls it in-process and
- *             renders one banner for it. 42 of the 57 rows carry one.
+ *             renders one banner for it. 42 of the 59 rows carry one.
  *   kind      'spawn' — and nothing else. The row cannot answer the findings
  *             interface, so the runner runs `npm run <name>` and reads its exit
  *             code. A spawn row carries `spawnReason`.
@@ -598,10 +600,16 @@ export const CHECKS = [
  * assertion in `scripts/harness-runner.mjs` reads this; an unlisted,
  * uncomposed check fails the gate.
  *
+ * A guard whose name lacks the `check:` prefix is invisible to that assertion,
+ * so it is listed here BY NAME or nowhere — which is how `test:workerd` came to
+ * be a row (#587). It was gated, as a hand-written step of a workflow, and the
+ * registry said it ran nowhere at all: the shape of orphan this file exists to
+ * prevent one level up.
+ *
  * These rows carry `script`, `pkg` and `trigger` like any other, because the
  * package.json block is generated from the whole registry: a check excluded
- * from the composite is still a line in a manifest, and `check:storybook` and
- * `check:docs-chrome` are still steps of a workflow.
+ * from the composite is still a line in a manifest, and `check:storybook`,
+ * `check:docs-chrome` and `test:workerd` are still jobs or steps of a workflow.
  */
 export const EXCLUDED = [
   {
@@ -724,6 +732,36 @@ export const EXCLUDED = [
       'checkout is an exit code by design (see the reason above).',
     reason:
       'compares against a sibling checkout of BilLogic/plus-uno-blueprint that no runner has. It exits 1 on a missing source by design, so composing it would make this gate permanently red.',
+  },
+  {
+    name: 'test:workerd',
+    script: 'vitest run --config vitest.workerd.config.mts',
+    pkg: 'bot',
+    trigger: ['pull_request', 'deploy'],
+    kind: 'spawn',
+    spawnReason:
+      'vitest, in a pool that boots workerd. The result is a runtime run\'s exit code, and the ' +
+      'interesting failures are a Durable Object\'s — an RPC that threw, storage that read back ' +
+      'wrong — in vitest\'s own format.',
+    reason:
+      "it boots a RUNTIME, and this gate's whole argument is that it stays seconds long: " +
+      '3.1s warm and 4.5s cold locally, 4s as a step of the harness job (measured 2026-09-17), ' +
+      'against a ~14s composite. The cost is the startup rather than the assertions — vitest ' +
+      "reports 1.7s for the run, of which 1.05s is the import. So it sits beside the composite " +
+      'rather than inside it, on the same `pull_request` trigger, as its OWN NAMED JOB — ' +
+      '`.github/workflows/uno-bot-checks.yml` § conformance — which is also what makes its red ' +
+      'legible: a step of `check-harness.yml` (where it lived from #493 until #587) landed on ' +
+      "the same single `check:harness / harness` check as 48 other sub-checks, so \"the Durable " +
+      'Object broke" and "a doc link broke" arrived as one line. It is in the `npm run deploy` ' +
+      'chain too (#587), because `main` is unprotected and a PR-only gate is a gate a direct ' +
+      'push walks past. WHAT A RED MEANS: the two ThreadState adapters have stopped agreeing. ' +
+      'The suite is the contract between the in-memory store and the Durable Object — 49 cases ' +
+      'over one shared conformance body (tests/helpers/thread-state-conformance.ts), run twice: ' +
+      'here against real DO SQLite through RPC, and inside `npm test` against the in-memory ' +
+      'adapter. Durable Object storage, the input gate that makes "the delete is the claim" ' +
+      'true, and the retirement semantics that keep a replaced proposal card from executing are ' +
+      'all only observable in the runtime, which is why exactly one file pays for workerd and ' +
+      'it is the file whose subject IS the runtime.',
   },
 ];
 

@@ -179,26 +179,35 @@ npm --prefix agents/uno-bot run bundle:harness
 
 ## The Worker's own checks
 
-`.github/workflows/uno-bot-checks.yml` runs two jobs on every pull request —
-`typecheck` (`tsc --noEmit` over `agents/uno-bot/src/**`) and `tests` (the
-Worker's unit suite, the largest in this repository). Both commands are registry
-rows composed into
-`check:harness` as well, so the pre-push command stays whole; the jobs exist for
-their NAMES. A red `check:harness` is one GitHub check covering the whole
-composite, so
+`.github/workflows/uno-bot-checks.yml` runs three jobs on every pull request —
+`typecheck` (`tsc --noEmit` over `agents/uno-bot/src/**`), `tests` (the Worker's
+unit suite, the largest in this repository) and `conformance` (`test:workerd`,
+the ThreadState suite against a real Durable Object under workerd). All three
+are registry rows; the first two are composed into `check:harness` as well, so
+the pre-push command stays whole. The jobs exist for their NAMES. A red
+`check:harness` is one GitHub check covering the whole composite, so
 "the types broke" and "a test broke" arrive as the same line, and telling them
 apart means opening the log. From the check list, `uno-bot — Worker checks /
-typecheck` and `… / tests` answer that directly (#580).
+typecheck`, `… / tests` and `… / conformance` answer that directly (#580, #587).
 
-Both commands are in the `npm run deploy` chain too, so a push straight to
-`main` — unprotected, and 19 people can make one — meets the same two gates on
-the way to production. Neither reads a secret: `tsc` reads the checkout, and the
-suite is pure functions plus mocked `fetch`, so a fork PR runs both. The one
-Worker suite that needs a runtime, `tests/workerd/` under workerd, stays a step
-of the harness workflow, which already pays for miniflare's startup.
+All three commands are in the `npm run deploy` chain too, so a push straight to
+`main` — unprotected, and 19 people can make one — meets the same gates on the
+way to production. None reads a secret: `tsc` reads the checkout, the unit suite
+is pure functions plus mocked `fetch`, and `conformance` boots workerd locally
+from the `wrangler` already in devDependencies, against a Durable Object
+miniflare creates in a temporary directory. So a fork PR runs all three.
 
-Run them locally with `npm --prefix agents/uno-bot run typecheck` and
-`npm --prefix agents/uno-bot test`.
+`conformance` is the one that costs a runtime, which is why it is a job of its
+own rather than a member of the fast composite: 3.1s warm and 4.5s cold locally,
+4s as a step of the harness job, against that composite's ~14s (measured
+2026-09-17). It was a step of the harness workflow from #493 until #587, where
+its red was indistinguishable from a broken doc link; moving it out shortened
+that job to ~36s and gave the failure its own line. `scripts/checks.registry.mjs`
+§ EXCLUDED carries the full reasoning.
+
+Run them locally with `npm --prefix agents/uno-bot run typecheck`,
+`npm --prefix agents/uno-bot test` and
+`npm --prefix agents/uno-bot run test:workerd`.
 
 ## The Storybook gate
 

@@ -77,7 +77,11 @@
  * `agents/uno-bot`'s `typecheck` and `test` are both guards by any reading —
  * the largest unit suite in the repository, and the Worker's whole type surface — and
  * neither ran in any workflow. `test` was not even in `npm run deploy`, and
- * joined that chain only in #580. They are
+ * joined that chain only in #580. `test:workerd` — the Durable Object
+ * conformance suite — was the same blind spot one layer down, gated as a
+ * hand-written workflow step while the registry described it nowhere, until
+ * #587 made it an `EXCLUDED` row with its reason and put it in the deploy
+ * chain. All three are
  * registered BY NAME because the assertion cannot find them for us; the
  * prefix is not widened to catch them, because the rest of that package's
  * scripts (`dev`, `tail`, `deploy`, `secrets:set`) are commands rather than

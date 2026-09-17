@@ -36,7 +36,8 @@ export function buildId({ runNumber, sha } = {}) {
  *
  * TWO CI SYSTEMS DEPLOY THIS WORKER. The GitHub Actions workflow is the gated
  * one — it runs typecheck, check:fetch, check:contract, check:secrets,
- * test:bundle, the Worker's unit suite (`npm test`, added in #580) and
+ * test:bundle, the Worker's unit suite (`npm test`, added in #580), the
+ * Durable Object conformance suite (`test:workerd`, added in #587) and
  * bundle:harness before deploying. Cloudflare Workers Builds also builds this
  * repo and deploys on its own, and on 2026-08-28 it was found to be winning:
  * production served `dev` on every sample while the Actions run had just

@@ -3,7 +3,8 @@
  *
  * #278: this Worker has TWO deployers. The gated GitHub Actions workflow runs
  * typecheck, check:fetch, check:contract, check:secrets, test:bundle, the unit
- * suite (#580) and bundle:harness before shipping; Cloudflare Workers Builds
+ * suite (#580), the Durable Object conformance suite (#587) and bundle:harness
+ * before shipping; Cloudflare Workers Builds
  * also builds this repo and deploys on its own, from a command that lives in
  * the Cloudflare dashboard and cannot be read from here.
  *
