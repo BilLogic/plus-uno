@@ -32,6 +32,14 @@ import { postTextVerified, postVisibleFailure } from "./delivery";
 import type { FooterKind } from "./footer-kind";
 import { proposalCardBlocks } from "./proposal-render";
 import type { Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
+import { isSubrequestBudgetError, subrequestsUsed } from "../net";
+import {
+  outcomeOf,
+  workingSignalLine,
+  type StatusResult,
+  type WorkingSignalOutcome,
+  type WorkingSignalPhase,
+} from "./working-signal";
 
 /** Where this turn is happening, as Slack knows it. */
 export interface SlackDeliveryTarget {
@@ -48,6 +56,48 @@ export interface SlackDeliveryTarget {
    *  whose answer goes out under the PERSON'S name, so the standard "check
    *  before acting" line is wrong for it. Never sniffed from the body. */
   footerHint?: FooterKind;
+}
+
+/**
+ * Make one status call and leave its verdict in the logs.
+ *
+ * Still best-effort — nothing here can fail a turn that already did its work —
+ * but the swallow is no longer silent, and it logs on SUCCESS too. That is the
+ * whole instrument: Slack's own refusals were always logged by api.ts, so what
+ * a stuck indicator needed was evidence of the cases that produce no Slack
+ * response at all. A `set` line with no `clear` line after it is an invocation
+ * that died before delivery (#571).
+ *
+ * That pairing is the claim, and it is the only one made here: a surface with
+ * no thread raises nothing and so logs neither half, which is why absence is
+ * read as a BROKEN PAIR rather than as absence.
+ *
+ * @param phase - Which half of the pairing this is
+ * @param call - The status call to make
+ */
+async function reportStatus(
+  phase: WorkingSignalPhase,
+  call: () => Promise<StatusResult>,
+): Promise<void> {
+  // Read the meter at the call, not after it: the number that matters is what
+  // the turn had already spent by the time it reached delivery.
+  const spent = subrequestsUsed();
+  let outcome: WorkingSignalOutcome;
+  try {
+    outcome = outcomeOf(await call());
+  } catch (err) {
+    // One thing reaches here by construction: `slackCall` degrades every
+    // transport and parse failure into `{ ok: false, error }` and rethrows
+    // exactly the budget stop (`rethrowIfBudget`, api.ts). The second arm is
+    // the compiler's, not a case — and it still refuses to put a JS exception
+    // message behind the words "declined by Slack".
+    outcome = isSubrequestBudgetError(err)
+      ? { kind: "budget-stop" }
+      : { kind: "unanswered", error: err instanceof Error ? err.message : String(err) };
+  }
+  const line = workingSignalLine(phase, outcome, spent);
+  if (outcome.kind === "ok") console.log(line);
+  else console.warn(line);
 }
 
 export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
@@ -99,7 +149,7 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
       // the API decline where it wants to — a rejection here is a signal that
       // did not appear, which is exactly what the condition was for.
       if (!replyTs) return;
-      if (status) await setStatus(env, channel, replyTs, status).catch(() => {});
+      if (status) await reportStatus("set", () => setStatus(env, channel, replyTs, status));
       // The title is the assistant surface's alone: `assistant.threads.setTitle`
       // names an App thread, and a channel thread has no such name to set.
       if (titleFrom && isAssistantThread(channel)) {
@@ -115,7 +165,7 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
       // and it goes wherever the set went — same condition, or the pairing is
       // a set on one surface and a clear on another.
       if (!replyTs) return;
-      await setStatus(env, channel, replyTs, "").catch(() => {});
+      await reportStatus("clear", () => setStatus(env, channel, replyTs, ""));
     },
 
     async beginProgress(label) {
