@@ -5,7 +5,7 @@ import type { HistoryTurn, PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { conversationsReplies, getBotIdentity, postMessage } from "./api";
 import { buildFailureMessage } from "./failure-message";
-import { handleAgentDmOpened, handleAppContextChanged } from "./assistant";
+import { handleAgentDmOpened, handleAppContextChanged, handleSessionStopped } from "./assistant";
 import { handleAppHomeOpened } from "./home";
 import { handleReaction } from "./gate";
 import { extractPrdFromThreadRoot } from "./notion-prd";
@@ -19,6 +19,7 @@ import {
   type SlackEnvelope,
   type SlackAppHomeOpenedEvent,
   type SlackAppContextChangedEvent,
+  type SlackAgentSessionStoppedEvent,
   type RunnerJobPayload,
 } from "./types";
 import { historyVisionTurn } from "./vision-reference";
@@ -115,6 +116,21 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
       // switched what they're looking at. Stored under the DM conversation key
       // so the next message grounds on it. No user-visible output.
       await handleAppContextChanged(env, event as SlackAppContextChangedEvent, DM_CONVERSATION);
+      return;
+    }
+    case "agent_session_stopped": {
+      // Slack's own stop button, which renders beside the working signal only
+      // because this app now subscribes to the event (#576). It is the third
+      // door into the one cancel path, beside `/stop` and the Home-tab button,
+      // and it is the only one that sits where the person is already looking.
+      //
+      // Handled INLINE rather than enqueued onto the AgentRunner. The runner
+      // serialises work per thread, and the work this thread is running is
+      // exactly what the press is trying to stop — a stop queued behind it
+      // would arrive after the run it was meant to interrupt. It is also two
+      // Slack calls and two store reads, which fits the ack window that the
+      // enqueue exists to protect long runs from.
+      await handleSessionStopped(env, event as SlackAgentSessionStoppedEvent);
       return;
     }
     default:

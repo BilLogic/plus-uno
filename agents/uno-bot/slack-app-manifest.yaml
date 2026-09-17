@@ -10,6 +10,12 @@
 # deliberate config change. Pasting it back REPLACES the whole manifest, so read
 # the diff first; additive changes are safer made through the feature pages.
 #
+# ── ONE PENDING DIFFERENCE: agent_session_stopped (#576, 2026-09-17) ────────
+# This file subscribes to `agent_session_stopped`; the live app does not yet.
+# `npm run slack:diff` therefore reports exactly that one difference, and it is
+# the expected reading until the YAML is pasted into the App Manifest page by
+# hand. Everything below this line was in sync when it was written.
+#
 # ── IN SYNC WITH LIVE (verified `npm run slack:diff`, 2026-08-06) ────────────
 # `messages_tab_enabled: true` and the `app_context_changed` subscription are
 # both applied on the app now, and the handlers for the agent surface shipped
@@ -277,6 +283,17 @@ settings:
   event_subscriptions:
     request_url: https://uno-bot.plus-uno.workers.dev/slack/events
     bot_events:
+      # Slack's stop button. It renders beside the working signal ONLY for an
+      # app subscribed to this event, which is why a live turn had no in-thread
+      # way out before #576 — just `/stop` or the Home-tab button, both of them
+      # somewhere other than where the person is looking. Scope is `chat:write`,
+      # already held, so this is a subscription and nothing else.
+      #
+      # NOT APPLIED TO THE LIVE APP YET at the time this landed: `slack:diff`
+      # will report this one difference until the YAML is pasted into the App
+      # Manifest page by hand (the API refuses this app — see the header).
+      # Until then the button stays hidden and the handler stays unreached.
+      - agent_session_stopped
       - app_context_changed
       - app_home_opened
       - app_mention
