@@ -192,10 +192,21 @@ export async function startStream(
   // an ugly artifact on every single turn.
   taskDisplayMode?: TaskDisplayMode,
 ): Promise<string | null> {
-  // thread_ts is REQUIRED (a stream is a threaded message), and
-  // recipient_user_id / recipient_team_id are required "when streaming to
-  // channels" — which includes a DM. Omitting the pair returns
-  // invalid_arguments, with nothing in the error naming the missing field.
+  // THE ARGUMENT CONTRACT. Stated here once; everywhere else cites this.
+  //
+  // thread_ts is REQUIRED — a stream is a threaded message. recipient_user_id
+  // and recipient_team_id are required "when streaming to channels", which is
+  // all Slack's reference says: whether a DM counts as a channel for this is
+  // NOT settled, and an earlier note here asserted that it does on no evidence
+  // beyond the sentence reading that way. So callers pass the pair on every
+  // surface, and the answer path declines to open a stream without it
+  // (`slack/stream-recipient.ts`) rather than betting on a reading.
+  //
+  // Omitting the pair returns invalid_arguments, and nothing in the error names
+  // the missing field — which is how "Slack rejects our arguments" survived as
+  // an explanation for six revisions while the answer path was sending none.
+  // The stream probe (`diagnostics/probes/slack.ts`) is what settles any of
+  // this against the live install: it can omit each argument independently.
   try {
     const res = await slackCall<SlackResponse & { ts?: string }>(env, "chat.startStream", {
       channel,

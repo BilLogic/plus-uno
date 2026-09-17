@@ -221,11 +221,12 @@ things that were:
 
 ### Flags shipped off, and what turning each one on needs
 
-Three of these ship disabled. Each one has a specific reason it cannot simply
+Four of these ship disabled. Each one has a specific reason it cannot simply
 default on, and a specific check that would let it:
 
 | Flag | Why off | To turn on |
 |---|---|---|
+| `SLACK_STREAMING` | Joined this list in #572. It was never a feature waiting on a decision — it was on, and refused: the answer path sent neither recipient id, so `chat.startStream` answered `invalid_arguments` and delivery fell back to an ordinary post on every channel turn. With the arguments fixed, turning it on changes how every reply renders for the whole team, which is a call rather than a deploy. | Flip the var, then watch, in a channel and in a DM: a short answer; the footer (it rides `stopStream`, the only frame carrying blocks); and a long answer, where only the first message streams and the continuations are plain posts. |
 | `SLACK_NATIVE_FEEDBACK` | An invalid block degrades SILENTLY — delivery falls back to plain text, dropping the footer from every answer while looking fine. | Enable, look at one real answer, then default it. |
 | `SLACK_STREAM_PLAN` | Opens the stream at turn start. That was tried with plain text and reverted (empty bubble for the whole run); plan mode should be different because the stream carries task cards, but "should" is doing work in that sentence. | Enable, watch one multi-tool turn render. |
 | `CONTEXT_STATE` | Changes what the model sees on **every** turn. Failure mode is subtly worse answers, not an error. | Judged evals compared **case by case** — a stable 19/19 hid a live BLOCKER once already (r48). |
