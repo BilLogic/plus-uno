@@ -51,10 +51,11 @@ name: uno-bot — Worker checks
 #     as the step it replaced.
 #
 #   - ITS OWN NAMED JOB, HERE. Chosen. The suite's 4s (measured as a step of the
-#     harness job, run 35277835410, 2026-09-17) moves off a 40s job — which is
-#     36s now — and into a job that runs CONCURRENTLY with it, so a PR's wall
-#     clock falls rather than rises, and the check list gains a line that says
-#     which thing broke. This is the same trade `check:storybook` records making
+#     harness job, run 35277835410) moves off a 40s job — which measures 34s
+#     without it, run 35279458463 — and into a job that runs CONCURRENTLY with
+#     it, so a PR's wall clock falls rather than rises, and the check list gains
+#     a line that says which thing broke. This job itself is 26s: 13s of install,
+#     5s of suite, the rest checkout and setup (same run, all 2026-09-17). This is the same trade `check:storybook` records making
 #     for the browser suite, two orders of magnitude cheaper.
 #
 # UNLIKE `typecheck` AND `test`, THIS ROW IS NOT COMPOSED — so the suite runs

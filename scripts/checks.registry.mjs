@@ -745,8 +745,8 @@ export const EXCLUDED = [
       'wrong — in vitest\'s own format.',
     reason:
       "it boots a RUNTIME, and this gate's whole argument is that it stays seconds long: " +
-      '3.1s warm and 4.5s cold locally, 4s as a step of the harness job (measured 2026-09-17), ' +
-      'against a ~14s composite. The cost is the startup rather than the assertions — vitest ' +
+      '3.1s warm and 4.5s cold locally, 4s as a step of the harness job and 5s as the ' +
+      'job of its own it became (measured 2026-09-17), against a ~14s composite. The cost is the startup rather than the assertions — vitest ' +
       "reports 1.7s for the run, of which 1.05s is the import. So it sits beside the composite " +
       'rather than inside it, on the same `pull_request` trigger, as its OWN NAMED JOB — ' +
       '`.github/workflows/uno-bot-checks.yml` § conformance — which is also what makes its red ' +

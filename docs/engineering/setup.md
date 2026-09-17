@@ -202,7 +202,7 @@ own rather than a member of the fast composite: 3.1s warm and 4.5s cold locally,
 4s as a step of the harness job, against that composite's ~14s (measured
 2026-09-17). It was a step of the harness workflow from #493 until #587, where
 its red was indistinguishable from a broken doc link; moving it out shortened
-that job to ~36s and gave the failure its own line. `scripts/checks.registry.mjs`
+that job from 40s to 34s and gave the failure its own line. `scripts/checks.registry.mjs`
 § EXCLUDED carries the full reasoning.
 
 Run them locally with `npm --prefix agents/uno-bot run typecheck`,
