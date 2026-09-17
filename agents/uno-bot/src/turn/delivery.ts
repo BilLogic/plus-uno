@@ -22,6 +22,23 @@
  *  sees can honestly promise (`slack/failure-message.ts`). */
 export type DeliveryFailureStage = "context" | "agent" | "delivery" | "internal";
 
+/**
+ * What the finished work left behind, in the port's own words: whether a
+ * person now has to act before this thread can go anywhere.
+ *
+ * Two words rather than Slack's four-value lifecycle, because this is the only
+ * distinction a turn is entitled to make. Which status renders it is the Slack
+ * adapter's business (`slack/working-signal.ts` `settledStatus`) — a port that
+ * named Slack's enum would be Slack leaking upward, and "the conversation is
+ * complete" (`closed`) is a claim no turn of ours can make at all (#575).
+ */
+export type TurnSettlement =
+  /** Nobody is waiting on anybody: the thread is open and quiet. */
+  | "idle"
+  /** The thread cannot proceed until a person does something — clicks a ✅ on
+   *  a staged card, or answers a clarifying question. */
+  | "waiting-on-person";
+
 /** What a turn asks Delivery to stage behind the ✅ gate. `blocks` is present
  *  only for the cards that build their own (the Figma preview); a text-only
  *  card is shaped by the adapter. */
@@ -71,8 +88,14 @@ export interface Delivery {
    *
    * Idempotent by contract, and best-effort like the set: a surface with no
    * indicator no-ops, and a surface that never had one clears nothing.
+   *
+   * `settlement` is what the surface should say once the indicator is down. It
+   * is an argument because "the work is over" and "the thread is ready" are
+   * different facts: a turn that ends holding a staged card is over and still
+   * blocked, and a surface told the second thing invites a person to move on
+   * from a card that is waiting on them (#575).
    */
-  clearWorking(): Promise<void>;
+  clearWorking(settlement: TurnSettlement): Promise<void>;
 
   /**
    * Open the progress surface for a substantive turn, and close it.
@@ -117,7 +140,7 @@ export type DeliveryCall =
   | { kind: "react"; emoji: string }
   | { kind: "removeReaction"; emoji: string }
   | { kind: "working"; status?: string; titleFrom?: string }
-  | { kind: "working-clear" }
+  | { kind: "working-clear"; settlement: TurnSettlement }
   | { kind: "beginProgress"; label: string }
   | { kind: "endProgress"; outcome: "complete" | "error" }
   | { kind: "interim"; text: string }
@@ -173,8 +196,8 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       calls.push({ kind: "working", ...note });
     },
 
-    async clearWorking() {
-      calls.push({ kind: "working-clear" });
+    async clearWorking(settlement) {
+      calls.push({ kind: "working-clear", settlement });
     },
 
     async beginProgress(label) {
@@ -236,12 +259,23 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
  *
  * The clear is swallowed: a surface that cannot take the signal down is not a
  * reason to fail a turn that already did its work.
+ *
+ * WHAT THE CLEAR SAYS is a MAPPER, not a read of the run's result. The wrapper
+ * is instantiated with `T = void` by the two Gate doors, and one that inspected
+ * what it wrapped would have to know every shape any caller might return — so
+ * the caller that has an outcome hands over a function from it, and the
+ * wrapper stays a `finally` that knows nothing. Both defaults are `"idle"`: a
+ * door resolving a card leaves nobody waiting, and a run that THREW has no
+ * result to map, which is the honest answer there too — the person is deciding
+ * whether to retry, not being waited on (#575).
  */
 export async function withWorkingSignal<T>(
   delivery: Delivery,
   run: (delivery: Delivery) => Promise<T>,
+  settlementOf?: (result: T) => TurnSettlement,
 ): Promise<T> {
   let raised = false;
+  let settlement: TurnSettlement = "idle";
   const watched: Delivery = {
     ...delivery,
     async setWorking(note) {
@@ -250,8 +284,10 @@ export async function withWorkingSignal<T>(
     },
   };
   try {
-    return await run(watched);
+    const result = await run(watched);
+    if (settlementOf) settlement = settlementOf(result);
+    return result;
   } finally {
-    if (raised) await delivery.clearWorking().catch(() => {});
+    if (raised) await delivery.clearWorking(settlement).catch(() => {});
   }
 }

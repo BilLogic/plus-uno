@@ -27,6 +27,7 @@ import {
   type SessionStatus,
   type WorkingSignalOutcome,
 } from "../src/slack/working-signal";
+import { settlementOf, type TurnDisposition, type TurnSettlement } from "../src/turn/index";
 
 describe("what came back, classified", () => {
   it("reads an accepted call as ok", () => {
@@ -70,15 +71,35 @@ describe("the agent-session status the signal moves through", () => {
     assert.equal(WORKING_STATUS, "processing");
   });
 
-  it("settles to active, which is open-and-idle rather than off", () => {
+  it("settles an idle thread to active, which is open-and-idle rather than off", () => {
     // The other half of the same row: the empty-string clear becomes "active".
-    assert.equal(settledStatus(), "active");
+    assert.equal(settledStatus("idle"), "active");
+  });
+
+  it("settles a thread waiting on a person to suspended", () => {
+    // Slack's own sentence: "If the agent needs user input to continue, it sets
+    // `status: 'suspended'`". A thread holding a staged card is exactly that,
+    // and `active` there told the person the agent was done and said nothing
+    // about the ✅ still owed (#575).
+    assert.equal(settledStatus("waiting-on-person"), "suspended");
+  });
+
+  it("maps every settlement the port can express, and nothing else", () => {
+    // The guard is the COMPILE again: `settledStatus` switches exhaustively
+    // over `TurnSettlement`, so a third settlement added to the port leaves it
+    // without a return on that arm and `tsc` fails. What is asserted here is
+    // that the two it has are DIFFERENT statuses — a mapping that collapsed
+    // them would restore the bug while every other test passed.
+    const settlements: TurnSettlement[] = ["idle", "waiting-on-person"];
+    const statuses = settlements.map(settledStatus);
+    assert.deepEqual(statuses, ["active", "suspended"]);
+    assert.equal(new Set(statuses).size, settlements.length);
   });
 
   it("names all four lifecycle statuses, including the two it does not send", () => {
-    // `suspended` and `closed` are Slack's vocabulary whether this app sends
-    // them or not, and a type missing them would make #575 widen it before it
-    // could write the mapping at all.
+    // `closed` is Slack's vocabulary whether this app sends it or not, and a
+    // type that named only what the app sends would have to be widened before
+    // any mapping could be written against the rest.
     //
     // The guard is the COMPILE, not the assertion: `meaningOf` is exhaustive
     // over `SessionStatus`, so a fifth member added to the union leaves this
@@ -87,19 +108,88 @@ describe("the agent-session status the signal moves through", () => {
     const meaningOf = (status: SessionStatus): string => {
       switch (status) {
         case "active":
-          return "open and idle — the settle this ticket ships";
+          return "open and idle — where a turn that blocks nobody settles";
         case "processing":
-          return "work in flight — the raise this ticket ships";
+          return "work in flight — the raise";
         case "suspended":
-          return "awaiting user input — #575's";
+          return "awaiting user input — where a turn waiting on a person settles";
         case "closed":
           return "the conversation is over — sent by nothing here";
       }
     };
     assert.match(meaningOf(WORKING_STATUS), /work in flight/);
-    assert.match(meaningOf(settledStatus()), /open and idle/);
+    assert.match(meaningOf(settledStatus("idle")), /open and idle/);
+    assert.match(meaningOf(settledStatus("waiting-on-person")), /awaiting user input/);
     assert.match(meaningOf("suspended"), /awaiting user input/);
     assert.match(meaningOf("closed"), /conversation is over/);
+  });
+});
+
+// The whole of #575, as one table: what a turn ended up being, and what the
+// person's surface says afterwards.
+//
+// It is read through BOTH halves — `settlementOf` (the turn's fact) then
+// `settledStatus` (Slack's word for it) — because either half alone can be
+// right while the pair is wrong, and the pair is what a person sees.
+//
+// The `Record` is the compile-time guard: it is keyed by `TurnDisposition`, so
+// a seventh disposition added to Turn leaves this object missing a key and
+// `tsc` refuses the build. Counting entries would not.
+describe("what the thread says once the turn is over", () => {
+  const statusFor = (disposition: TurnDisposition, cardLive: boolean): SessionStatus =>
+    settledStatus(settlementOf({ disposition, cardLive }));
+
+  const WITH_NO_CARD_LIVE: Record<TurnDisposition, SessionStatus> = {
+    // A card is up behind ✅ / ⛔ and nothing moves until it is clicked.
+    staged: "suspended",
+    // The turn asked instead of acting, so the next move is the person's.
+    asked: "suspended",
+    // Answered, and nothing outstanding.
+    answered: "active",
+    // The decision was taken and the tool ran.
+    resolved: "active",
+    // A 🙏 and no words is a finished turn.
+    reacted: "active",
+    // The person is choosing whether to retry — which is not the agent
+    // waiting on an input it asked for.
+    failed: "active",
+  };
+
+  for (const [disposition, expected] of Object.entries(WITH_NO_CARD_LIVE) as Array<
+    [TurnDisposition, SessionStatus]
+  >) {
+    it(`a turn that ${disposition} with no card live settles to ${expected}`, () => {
+      assert.equal(statusFor(disposition, false), expected);
+    });
+  }
+
+  it("suspends an answer delivered while a card is still live in the thread", () => {
+    // The case that makes this a function of the thread and not of the
+    // disposition alone: ask something unrelated while a card is pending, get
+    // a text answer, and the turn ended fine with the thread still blocked.
+    assert.equal(statusFor("answered", true), "suspended");
+    assert.equal(statusFor("answered", false), "active");
+  });
+
+  it("does not let a live card override the endings that are nobody's turn", () => {
+    // `resolved` retires the card it resolved, and a `failed` turn leaves a
+    // person deciding about a retry rather than about a card. Reading the
+    // thread's card as "suspended" everywhere would make the status a
+    // property of the thread's history instead of this turn's ending.
+    for (const disposition of ["resolved", "reacted", "failed"] as const) {
+      assert.equal(statusFor(disposition, true), "active", disposition);
+    }
+  });
+
+  it("settles to closed from nothing at all", () => {
+    // "The conversation is complete" is a claim no turn of ours can make: a
+    // thread is never over, it is only quiet. Asserted over the whole table
+    // rather than case by case, so a later ending cannot quietly acquire it.
+    for (const disposition of Object.keys(WITH_NO_CARD_LIVE) as TurnDisposition[]) {
+      for (const cardLive of [false, true]) {
+        assert.notEqual(statusFor(disposition, cardLive), "closed", disposition);
+      }
+    }
   });
 });
 
@@ -176,7 +266,7 @@ describe("the Slack adapter routes both halves through the report", () => {
 
   it("reports the set and the clear instead of swallowing them", () => {
     assert.match(src, /reportStatus\("set", \(\) => setSessionStatus\(/);
-    assert.match(src, /reportStatus\("clear", \(\) => setSessionStatus\(/);
+    assert.match(src, /reportStatus\("clear", \(\) =>\s*setSessionStatus\(/);
     // The swallow that made the signal undiagnosable in the first place.
     assert.ok(
       !/setSessionStatus\([^)]*\)\.catch\(/.test(src),
@@ -198,7 +288,7 @@ describe("the Slack adapter routes both halves through the report", () => {
     // a doc comment that merely quotes a status name. An assertion that strict
     // in the wrong places and absent in the right ones is worse than none.
     assert.match(src, /setSessionStatus\(env, channel, replyTs, WORKING_STATUS\)/);
-    assert.match(src, /setSessionStatus\(env, channel, replyTs, settledStatus\(\)\)/);
+    assert.match(src, /setSessionStatus\(env, channel, replyTs, settledStatus\(settlement\)\)/s);
   });
 
   it("reads the subrequest meter and tells a budget stop apart", () => {

@@ -61,7 +61,13 @@ import {
   type ThreadRef,
   type ThreadState,
 } from "../thread-state/index";
-import { withWorkingSignal, type Delivery, type DeliveryFailureStage, type ProposalCard } from "./delivery";
+import {
+  withWorkingSignal,
+  type Delivery,
+  type DeliveryFailureStage,
+  type ProposalCard,
+  type TurnSettlement,
+} from "./delivery";
 
 // ── Policy ───────────────────────────────────────────────────────────────────
 
@@ -341,6 +347,50 @@ export interface TurnDeps {
 // ── The turn ─────────────────────────────────────────────────────────────────
 
 /**
+ * What the turn leaves the thread needing — the one place the mapping lives.
+ *
+ * `active` was honest for none of the three endings that genuinely wait on a
+ * person, and a surface that claims a blocked thread is idle is how a staged
+ * card sits unclicked: it says the agent is done and nothing says the person
+ * is not (#575).
+ *
+ * Three of the six dispositions wait:
+ *   - `staged` — a card is up behind ✅ / ⛔ and nothing happens until it is
+ *     clicked.
+ *   - `asked` — the turn asked a clarifying question instead of acting.
+ *   - `answered` WITH a card still live in the thread. This is the case that
+ *     makes the mapping a function of the thread and not of the disposition
+ *     alone: ask something unrelated while a card is pending, and the turn
+ *     ends perfectly well with the thread still blocked.
+ *
+ * The other three do not. `resolved` and `reacted` finished the job; `failed`
+ * is the person choosing whether to retry, which is not the agent waiting on
+ * an input it asked for. A turn that THREW never reaches here at all and its
+ * default says the same thing (`withWorkingSignal`).
+ *
+ * The switch is exhaustive on purpose: a seventh disposition leaves it without
+ * a return on that arm and `tsc` refuses the build, which is the only kind of
+ * reminder that survives a year.
+ */
+export function settlementOf(settle: {
+  disposition: TurnDisposition;
+  /** Whether a proposal card in this thread is still awaiting a decision. */
+  cardLive: boolean;
+}): TurnSettlement {
+  switch (settle.disposition) {
+    case "staged":
+    case "asked":
+      return "waiting-on-person";
+    case "answered":
+      return settle.cardLive ? "waiting-on-person" : "idle";
+    case "resolved":
+    case "reacted":
+    case "failed":
+      return "idle";
+  }
+}
+
+/**
  * One turn, with the working signal guaranteed down when it ends.
  *
  * The turn leaves by nine doors — an answer, a clarifying ask, a staged card,
@@ -352,7 +402,19 @@ export interface TurnDeps {
  * it left by.
  */
 export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {
-  return withWorkingSignal(deps.delivery, (delivery) => turnBody(request, { ...deps, delivery }));
+  // The card the thread was holding when this turn began. It is still holding
+  // it at an `answered` exit, because every exit that retires a card reports a
+  // different disposition — a claim is `resolved`, a revision is `staged` (the
+  // store retires the predecessor in the same reply thread, #579). So this is
+  // the live-card fact the mapping needs, and it costs no second read: the
+  // adapter's `getProposalByThread` at the top of the request is where it came
+  // from.
+  const cardLive = Boolean(request.pending);
+  return withWorkingSignal(
+    deps.delivery,
+    (delivery) => turnBody(request, { ...deps, delivery }),
+    (outcome) => settlementOf({ disposition: outcome.disposition, cardLive }),
+  );
 }
 
 async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {

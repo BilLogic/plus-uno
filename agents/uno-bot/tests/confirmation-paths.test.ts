@@ -43,7 +43,7 @@ import {
   type PendingProposal,
   type ThreadState,
 } from "../src/thread-state/index";
-import { recordingDelivery, withWorkingSignal } from "../src/turn/index";
+import { recordingDelivery, withWorkingSignal, type TurnSettlement } from "../src/turn/index";
 
 // ── one staged proposal, and the four signals that resolve it ────────────────
 
@@ -464,6 +464,12 @@ describe("the doors outside Turn raise and settle the working signal", () => {
       .filter((c) => c.kind === "working" || c.kind === "working-clear")
       .map((c) => c.kind);
 
+  /** What the clear told the surface the thread now needs. */
+  const clearedWith = (
+    delivery: ReturnType<typeof recordingDelivery>,
+  ): TurnSettlement | undefined =>
+    delivery.calls.find((c) => c.kind === "working-clear")?.settlement;
+
   it("posts the verdict, runs the tool, and leaves nothing up", async () => {
     const delivery = recordingDelivery();
     const ran: string[] = [];
@@ -476,6 +482,10 @@ describe("the doors outside Turn raise and settle the working signal", () => {
 
     assert.deepEqual(ran, ["executeVerdict"]);
     assert.deepEqual(signalOf(delivery), ["working", "working-clear"]);
+    // A door resolving a card leaves nobody waiting on anybody, and it says so
+    // by passing no mapper at all: the wrapper's default is the whole answer
+    // here, which is why neither door had to learn about settlements (#575).
+    assert.equal(clearedWith(delivery), "idle");
   });
 
   it("settles it when the tool dies — the door that swallows and the door that rethrows", async () => {
@@ -492,6 +502,7 @@ describe("the doors outside Turn raise and settle the working signal", () => {
       }
     });
     assert.deepEqual(signalOf(swallowed), ["working", "working-clear"]);
+    assert.equal(clearedWith(swallowed), "idle");
 
     const rethrown = recordingDelivery();
     await assert.rejects(
@@ -502,6 +513,10 @@ describe("the doors outside Turn raise and settle the working signal", () => {
       /notion 502/,
     );
     assert.deepEqual(signalOf(rethrown), ["working", "working-clear"]);
+    // A run that threw has no result to map, and `idle` is the honest answer:
+    // the person is deciding whether to retry, not answering something the
+    // agent asked for.
+    assert.equal(clearedWith(rethrown), "idle");
   });
 
   // Both door files name `Env` and the Slack client, so this suite's compile
@@ -518,6 +533,10 @@ describe("the doors outside Turn raise and settle the working signal", () => {
       assert.ok(wrapped.includes("executeVerdict("), "and runs the verdict inside it");
       // No second owner: the door never takes the signal down by hand.
       assert.ok(!src.includes("clearWorking("), "the clear is the pairing's, not the door's");
+      // And no third argument: a door that mapped a settlement would be
+      // claiming to know what the thread still needs after a card it just
+      // resolved, which is what the wrapper's default already answers.
+      assert.ok(!src.includes("settlementOf"), "the door maps no settlement");
     });
   }
 });

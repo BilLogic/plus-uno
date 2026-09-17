@@ -180,7 +180,7 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
       }
     },
 
-    async clearWorking() {
+    async clearWorking(settlement) {
       // Settling the session is the clear, and it is now the ONLY clear: the
       // migration guide is explicit that "Unlike `assistant.threads.setStatus`,
       // the loading UX no longer disappears automatically when your app posts a
@@ -190,10 +190,14 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
       //
       // It goes wherever the set went — same condition, or the pairing is a set
       // on one surface and a clear on another. WHICH settled status is
-      // `settledStatus`'s decision, not a literal here: #575 maps it from the
-      // turn's disposition, and a suspended session is not an idle one.
+      // `settledStatus`'s decision, not a literal here: the turn hands over
+      // what it left behind and the pure module picks the lifecycle word, so a
+      // thread waiting on a ✅ settles to `suspended` rather than claiming to
+      // be idle (#575).
       if (!replyTs) return;
-      await reportStatus("clear", () => setSessionStatus(env, channel, replyTs, settledStatus()));
+      await reportStatus("clear", () =>
+        setSessionStatus(env, channel, replyTs, settledStatus(settlement)),
+      );
     },
 
     async beginProgress(label) {

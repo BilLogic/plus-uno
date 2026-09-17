@@ -24,6 +24,7 @@ import {
   type TurnDeps,
   type TurnOutcome,
   type TurnRequest,
+  type TurnSettlement,
 } from "../src/turn/index";
 import { batchResultMessage, runOperations, type OperationOutcome } from "../src/gate/index";
 import {
@@ -771,6 +772,10 @@ const workingSignalOf = (delivery: RecordingDelivery): string[] =>
     .filter((c) => c.kind === "working" || c.kind === "working-clear")
     .map((c) => c.kind);
 
+/** What the clear told the surface the thread now needs. */
+const clearedWith = (delivery: RecordingDelivery): TurnSettlement | undefined =>
+  delivery.calls.find((c) => c.kind === "working-clear")?.settlement;
+
 // Every door the turn can leave by, and what the person's surface says after it.
 //
 // The incident this pins: a channel thread that showed "is working…" through a
@@ -778,12 +783,20 @@ const workingSignalOf = (delivery: RecordingDelivery): string[] =>
 // and the clear had one — in another file, gated to DMs. So the assertion is
 // not "a clear happens somewhere" but the whole sequence, set then clear and
 // nothing else, on both surfaces. A door added later that skips it fails here.
+//
+// `settles` is the second half of the same list (#575): taking the indicator
+// down is not the same as saying the thread is ready, and three of these doors
+// leave a person owing a decision. The status word each settlement becomes is
+// asserted in `working-signal.test.ts`; what is pinned here is that a REAL turn
+// through each door reports the right one, on both surfaces.
 const EXITS: Array<{
   door: string;
+  settles: TurnSettlement;
   run: (surface: "channel" | "assistant") => Promise<{ h: Harness; outcome: TurnOutcome }>;
 }> = [
   {
     door: "an answer",
+    settles: "idle",
     run: async (surface) => {
       const h = harness();
       return { h, outcome: await runTurn(request({ surface }), h.deps) };
@@ -791,9 +804,17 @@ const EXITS: Array<{
   },
   {
     door: "a clarifying ask",
+    settles: "waiting-on-person",
     run: async (surface) => {
+      // TWO refusals, because the model gets one go at fixing the call itself
+      // and it is the second refusal the person hears. With one reply this
+      // door answered instead of asking — which the settlement below is what
+      // caught: a check on the clear's presence alone could not see it.
       const h = harness({
-        replies: [{ toolCalls: [{ name: "component_implement", args: { component: "Button" } }] }],
+        replies: [
+          { toolCalls: [{ name: "component_implement", args: { component: "Button" } }] },
+          { toolCalls: [{ name: "component_implement", args: { component: "Button" } }] },
+        ],
         preflightAsk: "Which PRD is this implementing?",
       });
       return {
@@ -804,6 +825,7 @@ const EXITS: Array<{
   },
   {
     door: "a staged proposal",
+    settles: "waiting-on-person",
     run: async (surface) => {
       const h = harness({
         replies: [
@@ -824,6 +846,7 @@ const EXITS: Array<{
   },
   {
     door: "a card Slack refused",
+    settles: "idle",
     run: async (surface) => {
       const h = harness({
         delivery: recordingDelivery({ stagingFails: true }),
@@ -842,6 +865,7 @@ const EXITS: Array<{
   },
   {
     door: "a reply Slack never accepted",
+    settles: "idle",
     run: async (surface) => {
       const h = harness({ delivery: recordingDelivery({ answerFails: true }) });
       return { h, outcome: await runTurn(request({ surface }), h.deps) };
@@ -849,6 +873,7 @@ const EXITS: Array<{
   },
   {
     door: "a resolution the model decided",
+    settles: "idle",
     run: async (surface) => {
       const h = harness({
         replies: [
@@ -878,6 +903,7 @@ const EXITS: Array<{
   },
   {
     door: "a reaction and no words",
+    settles: "idle",
     run: async (surface) => {
       const h = harness({
         replies: [{ toolCalls: [{ name: "slack_react", args: { emoji: "pray" } }] }, { text: "" }],
@@ -889,7 +915,30 @@ const EXITS: Array<{
     },
   },
   {
+    // The ending the disposition alone gets wrong: the person asked something
+    // else while a card was pending, the answer landed, and the card is still
+    // sitting there needing a click.
+    door: "an answer with a card still live in the thread",
+    settles: "waiting-on-person",
+    run: async (surface) => {
+      const h = harness({ replies: [{ text: "A call-off reaches a fill-in through the board." }] });
+      await stage(h);
+      return {
+        h,
+        outcome: await runTurn(
+          request({
+            surface,
+            text: "different question — how does a call-off reach a fill-in?",
+            pending: PENDING,
+          }),
+          h.deps,
+        ),
+      };
+    },
+  },
+  {
     door: "a dead model",
+    settles: "idle",
     run: async (surface) => {
       const h = harness();
       const broken: TurnDeps = {
@@ -909,6 +958,7 @@ for (const exit of EXITS) {
       const { h, outcome } = await exit.run(surface);
       assert.ok(outcome.disposition, "the turn produced an outcome");
       assert.deepEqual(workingSignalOf(h.delivery), ["working", "working-clear"]);
+      assert.equal(clearedWith(h.delivery), exit.settles, outcome.disposition);
     });
   }
 }
