@@ -142,11 +142,11 @@ curl http://localhost:8787/health
 ```bash
 cd agents/uno-bot
 npx wrangler login       # if not already authenticated to the Cloudflare account
-npm run deploy           # check:fetch + bundle:harness + wrangler deploy
+npm run deploy           # the gates, then bundle:harness, then wrangler deploy
 curl https://<worker-url>/health   # expect: uno-bot ok <BUILD>
 ```
 
-`npm run deploy` runs `check:fetch` and `bundle:harness` first (see `package.json`), so it ships the whole `src/` of the current branch **and** re-bakes the latest harness sources into the bundle. Bare `npx wrangler deploy` does NOT re-bake — it ships whatever `src/generated/harness.ts` is on disk, which is exactly the stale-brain trap this section exists to prevent. Confirm the branch's Worker code and harness are production-ready first.
+`npm run deploy` runs every gate and `bundle:harness` before wrangler sees anything, so it ships the whole `src/` of the current branch **and** re-bakes the latest harness sources into the bundle. The chain itself is the `deploy` script in `package.json` — read it there rather than here: it was spelled out in five places, each drifting on its own schedule, and this was the most-read and the most wrong of them (#580). Bare `npx wrangler deploy` skips all of it: no gate runs, and it ships whatever `src/generated/harness.ts` is on disk, which is exactly the stale-brain trap this section exists to prevent. Confirm the branch's Worker code and harness are production-ready first.
 
 ## Smoke test
 

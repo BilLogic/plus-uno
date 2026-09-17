@@ -183,7 +183,8 @@ npm --prefix agents/uno-bot run bundle:harness
 `typecheck` (`tsc --noEmit` over `agents/uno-bot/src/**`) and `tests` (692 unit
 tests across 60 suites). Both commands are registry rows composed into
 `check:harness` as well, so the pre-push command stays whole; the jobs exist for
-their NAMES. A red `check:harness` is one GitHub check covering 48 sub-checks, so
+their NAMES. A red `check:harness` is one GitHub check covering the whole
+composite, so
 "the types broke" and "a test broke" arrive as the same line, and telling them
 apart means opening the log. From the check list, `uno-bot — Worker checks /
 typecheck` and `… / tests` answer that directly (#580).

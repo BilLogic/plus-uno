@@ -7,8 +7,8 @@ name: uno-bot — Worker checks
 # request before this file existed: `typecheck` and `test` are rows of
 # `scripts/checks.registry.mjs` with `trigger: 'pull_request'`, composed into
 # `npm run check:harness` since 2026-08-29, and `check-harness.yml` runs that
-# composite. What was missing is the part a reviewer reads. All 48 sub-checks
-# land on one GitHub check named `check:harness / harness`, so a type error and
+# composite. What was missing is the part a reviewer reads. The whole composite
+# lands on one GitHub check named `check:harness / harness`, so a type error and
 # a failing test are the same red line in the PR's check list, and telling them
 # apart means opening a 40-second log. Two named jobs answer the question from
 # the list: "uno-bot — Worker checks / typecheck" and "… / tests".

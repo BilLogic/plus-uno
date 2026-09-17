@@ -500,7 +500,7 @@ export const CHECKS = [
     name: 'check:secrets',
     script: 'node scripts/check-secrets.mjs',
     pkg: 'bot',
-    trigger: 'pull_request',
+    trigger: ['pull_request', 'deploy'],
     module: 'agents/uno-bot/scripts/check-secrets.mjs',
     guards:
       "the secret declaration against `interface Env` and against [vars]. The [vars] half is the one with teeth: that table is COMMITTED, so a secret assigned there is a secret published to GitHub. The rest keeps wrangler.toml's expected-names list honest — hand-maintained, it drifted in both directions at once (four names not set, two set names missing) and #288's account move works from exactly that list.",
@@ -546,19 +546,19 @@ export const CHECKS = [
     name: 'typecheck',
     script: 'tsc --noEmit',
     pkg: 'bot',
-    trigger: 'pull_request',
+    trigger: ['pull_request', 'deploy'],
     kind: 'spawn',
     spawnReason:
       '`tsc --noEmit`. The type errors are the compiler\'s, in the compiler\'s format, and ' +
       'nothing in this repo should paraphrase them.',
     guards:
-      "the Worker's TypeScript — every file under agents/uno-bot/src/ (tsconfig.json § include). Before it was composed here it ran only inside `npm run deploy`, so a type error reached the one command whose failure is most expensive to discover. It ALSO has its own named pull-request job (.github/workflows/uno-bot-checks.yml § typecheck), because 48 sub-checks share one GitHub check and a reviewer reading a red `check:harness` cannot tell a type failure from a test failure without opening the log (#580). 1.2s, measured 2026-09-17.",
+      "the Worker's TypeScript — every file under agents/uno-bot/src/ (tsconfig.json § include). Before it was composed here it ran only inside `npm run deploy`, so a type error reached the one command whose failure is most expensive to discover. It ALSO has its own named pull-request job (.github/workflows/uno-bot-checks.yml § typecheck), because the whole composite shares one GitHub check, so a reviewer reading a red `check:harness` learns a type failure and a test failure as the same line and has to open the log to tell which (#580). 1.2s, measured 2026-09-17.",
   },
   {
     name: 'test:bundle',
     script: 'node --test scripts/*.test.mjs',
     pkg: 'bot',
-    trigger: 'pull_request',
+    trigger: ['pull_request', 'deploy'],
     kind: 'spawn',
     spawnReason: '`node --test`, for the same reason as test:scripts.',
     guards:
@@ -568,7 +568,7 @@ export const CHECKS = [
     name: 'test',
     script: 'tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js',
     pkg: 'bot',
-    trigger: 'pull_request',
+    trigger: ['pull_request', 'deploy'],
     kind: 'spawn',
     spawnReason:
       '`tsc -p tsconfig.test.json && node --test`. A build step and a test runner; neither ' +

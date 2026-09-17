@@ -4,16 +4,20 @@ name: check:storybook
 # is a ratchet rather than a threshold is written once, in
 # `scripts/check-storybook.mjs` — never restate it here.
 #
-# WHY A SECOND WORKFLOW INSTEAD OF A SUB-CHECK OF `check-harness.yml`. That gate
-# runs in ~14s with no `npm ci`, and its own header says the ~20s is what keeps it
-# switched on. This job needs `npm ci` plus a Playwright chromium download before
-# it can run a ~130s browser suite. Folding it in would turn the number people
-# wait on from seconds into minutes, and a gate people wait on is a gate people
-# route around. Two workflows on the same `pull_request` trigger run
-# concurrently, so a PR waits `max(fast, slow)` — the same wall clock as putting
-# them together, with the fast answer still arriving fast. The decision is
-# recorded where composition decisions live: `EXCLUDED` in
-# `scripts/check-harness.mjs`.
+# WHY A SECOND WORKFLOW INSTEAD OF A SUB-CHECK OF `check-harness.yml`. That
+# gate's composite runs in ~14s, ~40s for its job once the one `npm ci` it needs
+# is counted, and its own header says that number is what keeps it switched on.
+# This job needs `npm ci` plus a Playwright chromium download before it can run a
+# ~130s browser suite. Folding it in would turn the number people wait on from
+# seconds into minutes, and a gate people wait on is a gate people route around.
+# THREE workflows now share the `pull_request` trigger and run concurrently —
+# this one, `check-harness.yml`, and `uno-bot-checks.yml` (the Worker's typecheck
+# and its suite, named separately so the two reds read apart, #580) — so a PR
+# waits `max(fast, …, slow)`, the same wall clock as putting them together, with
+# every fast answer still arriving fast. A third fast job strengthens that
+# arithmetic rather than weakening it: the slow one is still the only one anybody
+# waits on. The decision is recorded where composition decisions live: `EXCLUDED`
+# in `scripts/check-harness.mjs`.
 #
 # NOT NIGHTLY, DELIBERATELY. A nightly run observes `main` after the merge, which
 # is the exact defect #155 was opened to fix. A `play` function that a PR breaks
