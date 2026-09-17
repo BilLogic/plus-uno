@@ -75,30 +75,38 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
   // A ✅ on a card runs the tool, which can take as long as any turn — and
   // this door never goes through Turn, so the signal Turn owns has to be
   // raised and settled here. Same pairing, same `finally`.
-  await withWorkingSignal(door, async (delivery) => {
-    await delivery.setWorking({ status: "is working on that…" });
-    try {
-      // The narrative first, then the tool — the same order every door keeps, so
-      // the person sees the acknowledgement before the work.
-      const posted = await delivery.postNote(post.text);
-      // A resolution that cannot speak is the failure this whole path guards
-      // against, so it is never silent in the logs even when it is in Slack.
-      if (!posted.ok) {
-        console.error(`[gate] reaction post FAILED in ${channel} (thread=${post.replyTs})`);
+  await withWorkingSignal(
+    door,
+    async (delivery) => {
+      await delivery.setWorking({ status: "is working on that…" });
+      try {
+        // The narrative first, then the tool — the same order every door keeps, so
+        // the person sees the acknowledgement before the work.
+        const posted = await delivery.postNote(post.text);
+        // A resolution that cannot speak is the failure this whole path guards
+        // against, so it is never silent in the logs even when it is in Slack.
+        if (!posted.ok) {
+          console.error(`[gate] reaction post FAILED in ${channel} (thread=${post.replyTs})`);
+        }
+        await executeVerdict(env, verdict);
+      } catch (err) {
+        // A reaction confirmation must NEVER die silently — that's the exact "✅
+        // did nothing" failure this path fights (live 2026-07-13). Surface it so
+        // the user can retry instead of staring at an unacknowledged reaction.
+        console.error(
+          `[gate] reaction resolve failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
+        await delivery
+          .postNote(
+            `:warning: I caught your :${event.reaction}: but hit a snag executing it — give it another go, or tell me and I'll retry.`,
+          )
+          .catch(() => {});
       }
-      await executeVerdict(env, verdict);
-    } catch (err) {
-      // A reaction confirmation must NEVER die silently — that's the exact "✅
-      // did nothing" failure this path fights (live 2026-07-13). Surface it so
-      // the user can retry instead of staring at an unacknowledged reaction.
-      console.error(
-        `[gate] reaction resolve failed: ${err instanceof Error ? err.message : String(err)}`,
-      );
-      await delivery
-        .postNote(
-          `:warning: I caught your :${event.reaction}: but hit a snag executing it — give it another go, or tell me and I'll retry.`,
-        )
-        .catch(() => {});
-    }
-  });
+    },
+    // What the thread needs afterwards, stated rather than defaulted: this
+    // door RESOLVED the card, so nothing in the thread is waiting on anybody.
+    // The argument is required precisely so a door cannot inherit an answer it
+    // never thought about (#575).
+    () => "idle",
+  );
 }

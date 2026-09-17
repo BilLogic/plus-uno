@@ -56,12 +56,19 @@ import type { VisionReference } from "../slack/vision-reference";
 import {
   MAX_HISTORY_TURNS,
   proposalOperations,
+  proposalReplyThread,
   type HistoryTurn,
   type PendingProposal,
   type ThreadRef,
   type ThreadState,
 } from "../thread-state/index";
-import { withWorkingSignal, type Delivery, type DeliveryFailureStage, type ProposalCard } from "./delivery";
+import {
+  withWorkingSignal,
+  type Delivery,
+  type DeliveryFailureStage,
+  type ProposalCard,
+  type TurnSettlement,
+} from "./delivery";
 
 // ── Policy ───────────────────────────────────────────────────────────────────
 
@@ -341,6 +348,65 @@ export interface TurnDeps {
 // ── The turn ─────────────────────────────────────────────────────────────────
 
 /**
+ * What the turn leaves the thread needing — the one place the mapping lives.
+ *
+ * `active` was the settle at every exit, and it is honest at only some of them:
+ * it reports the thread as ready, and a thread holding a card behind ✅ / ⛔ is
+ * not ready, whatever the turn itself managed to do (#575).
+ *
+ * TWO REASONS TO WAIT, and the second is a fact about the THREAD rather than
+ * about this turn:
+ *   - the turn itself asked for something — `staged` put a card up, `asked`
+ *     asked a clarifying question instead of acting;
+ *   - a card is live in this reply thread and this turn did not consume it.
+ *
+ * WHICH DEVIATES FROM #575's LETTER, deliberately, and the issue is being
+ * updated to match. It listed `failed` and `reacted` as `active` outright; the
+ * consequence is that a turn that fails — or acknowledges with a 🙏 — while an
+ * earlier card is still pending would OVERWRITE that thread's `suspended` with
+ * `active`, which is the same claim case three of the ticket exists to stop.
+ * The thread does not stop waiting because a later turn went wrong. `resolved`
+ * is the one ending that consumed the card, so it is the one exempt from the
+ * live-card rule.
+ *
+ * ONE KNOWN IMPRECISION, in the safe direction. `cardLive` is the card the
+ * thread held when the turn BEGAN, and one exit retires a card without
+ * replacing it: the staging branch supersedes the pending card and then Slack
+ * refuses the new one (`disposition: "failed"`). That thread settles
+ * `suspended` with nothing live, until the next turn in it settles again.
+ * Pinning it exactly would need the turn to report the retirement on its
+ * outcome — a field set at one exit — and a false "still waiting" after a
+ * visible failure is cheaper than a false "nothing to do" over a live card.
+ *
+ * The switch is exhaustive on purpose: a seventh disposition leaves it without
+ * a return on that arm and `tsc` refuses the build, which is the only kind of
+ * reminder that survives a year.
+ */
+export function settlementOf(settle: {
+  disposition: TurnDisposition;
+  /** Whether a proposal card in this thread is still awaiting a decision. */
+  cardLive: boolean;
+}): TurnSettlement {
+  switch (settle.disposition) {
+    // The turn asked for something itself, so the card need not be read: a
+    // store that failed to record the card cannot turn the ask into a
+    // "nothing to do".
+    case "staged":
+    case "asked":
+      return "waiting-on-person";
+    // The thread decides. An answer, a bare 🙏 and a failure all leave a live
+    // card exactly as they found it.
+    case "answered":
+    case "reacted":
+    case "failed":
+      return settle.cardLive ? "waiting-on-person" : "idle";
+    // The one ending that consumed the card — the claim IS the resolution.
+    case "resolved":
+      return "idle";
+  }
+}
+
+/**
  * One turn, with the working signal guaranteed down when it ends.
  *
  * The turn leaves by nine doors — an answer, a clarifying ask, a staged card,
@@ -352,7 +418,34 @@ export interface TurnDeps {
  * it left by.
  */
 export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {
-  return withWorkingSignal(deps.delivery, (delivery) => turnBody(request, { ...deps, delivery }));
+  // The card THIS REPLY THREAD was holding when the turn began — and the grain
+  // is the whole of it.
+  //
+  // `pending` arrives from a `getProposalByThread` read keyed on the
+  // CONVERSATION, which in an unthreaded DM is the constant `"dm"`: every ask
+  // on that surface shares it. Settling by conversation would let a card
+  // staged under ask A suspend the unrelated thread of ask B, and a ✅ on A
+  // settles A's thread only — leaving B suspended with nothing in it to click.
+  // That is the grain error #573 fixed one layer down, and the comparison is
+  // the store's own (`proposalReplyThread`, #579) rather than a second
+  // derivation of the same fallback. In a channel `replyTs` IS the thread root,
+  // so channel behaviour is unchanged.
+  //
+  // It costs no read of its own: the adapter's read at the top of the request
+  // is where it came from. It is also the card as of the turn's START, which
+  // every exit but one leaves untouched — see `settlementOf`.
+  const turnThread = proposalReplyThread({
+    ...(request.replyTs ? { replyTs: request.replyTs } : {}),
+    threadTs: request.conversationTs,
+  });
+  const cardLive = request.pending
+    ? proposalReplyThread(request.pending) === turnThread
+    : false;
+  return withWorkingSignal(
+    deps.delivery,
+    (delivery) => turnBody(request, { ...deps, delivery }),
+    (outcome) => settlementOf({ disposition: outcome.disposition, cardLive }),
+  );
 }
 
 async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {

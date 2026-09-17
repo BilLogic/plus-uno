@@ -27,6 +27,7 @@
 // Node test build.
 
 import { SUBREQUEST_CAP } from "../agent/loop-policy";
+import type { TurnSettlement } from "../turn/index";
 
 /** Which half of the pairing spoke: the set that raises the indicator, or the
  *  clear that takes it down. Named in the line because the whole diagnostic is
@@ -81,18 +82,34 @@ export type SessionStatus = "active" | "processing" | "suspended" | "closed";
 export const WORKING_STATUS: SessionStatus = "processing";
 
 /**
- * The status a finished turn settles to.
+ * The status a finished turn settles to, from what the turn left behind.
  *
- * A function rather than a literal at each exit because settling is NOT one
- * status: a turn that ends holding a question — a staged proposal waiting on a
- * ✅ — is `suspended` (awaiting user input), not `active` (open and idle), and
- * #575 adds that mapping from the turn's disposition. It maps here, in the one
- * pure place both doors and the turn already route through, so that ticket
- * changes one body and not three call sites. Today every exit is the same
- * answer, and saying so plainly is cheaper than pretending otherwise.
+ * TWO LAYERS, ON PURPOSE. Whether a person is being waited on is the TURN's
+ * fact, decided once from its disposition and its thread (`turn.ts`
+ * `settlementOf`), and it reaches the adapter as a `TurnSettlement`. Which of
+ * Slack's lifecycle words says that fact is the ADAPTER's, and it is this
+ * function — so the Delivery port carries neither Slack's enum nor a literal
+ * at each exit, and there is exactly one line to change if Slack's vocabulary
+ * moves again.
+ *
+ * `suspended` is Slack's own word for it. The Agent sessions guide, § Session
+ * lifecycle: "If the agent needs user input to continue, it sets
+ * `status: "suspended"`." The same guide describes the `processing` indicator
+ * and says nothing about how `suspended` renders, so nothing here claims it
+ * does.
+ *
+ * `closed` is reachable from nothing — "the conversation is complete" is a
+ * claim no turn of ours can make.
+ *
+ * @param settlement - What the finished work left behind (#575)
  */
-export function settledStatus(): SessionStatus {
-  return "active";
+export function settledStatus(settlement: TurnSettlement): SessionStatus {
+  switch (settlement) {
+    case "waiting-on-person":
+      return "suspended";
+    case "idle":
+      return "active";
+  }
 }
 
 /** What `agents.sessions.setStatus` answered, as its callers need it: Slack's

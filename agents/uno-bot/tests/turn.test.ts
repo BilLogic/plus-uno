@@ -23,7 +23,9 @@ import {
   type RecordingDelivery,
   type TurnDeps,
   type TurnOutcome,
+  type TurnDisposition,
   type TurnRequest,
+  type TurnSettlement,
 } from "../src/turn/index";
 import { batchResultMessage, runOperations, type OperationOutcome } from "../src/gate/index";
 import {
@@ -771,6 +773,10 @@ const workingSignalOf = (delivery: RecordingDelivery): string[] =>
     .filter((c) => c.kind === "working" || c.kind === "working-clear")
     .map((c) => c.kind);
 
+/** What the clear told the surface the thread now needs. */
+const clearedWith = (delivery: RecordingDelivery): TurnSettlement | undefined =>
+  delivery.calls.find((c) => c.kind === "working-clear")?.settlement;
+
 // Every door the turn can leave by, and what the person's surface says after it.
 //
 // The incident this pins: a channel thread that showed "is working…" through a
@@ -778,12 +784,28 @@ const workingSignalOf = (delivery: RecordingDelivery): string[] =>
 // and the clear had one — in another file, gated to DMs. So the assertion is
 // not "a clear happens somewhere" but the whole sequence, set then clear and
 // nothing else, on both surfaces. A door added later that skips it fails here.
+//
+// `settles` is the second half of the same list (#575): taking the indicator
+// down is not the same as saying the thread is ready, and several of these
+// doors leave a person owing a decision. The status word each settlement
+// becomes is asserted in `working-signal.test.ts`; what is pinned here is that
+// a REAL turn through each door reports the right one, on both surfaces.
+//
+// `disposition` names the door in the turn's own vocabulary, and it is here
+// because without it the table asserted only that SOME outcome came back — a
+// row could stop exercising the door it is named after and nothing would say
+// so. One did: "a clarifying ask" had been answering instead of asking since
+// it was written, because it scripted one refusal where the model gets two.
 const EXITS: Array<{
   door: string;
+  disposition: TurnDisposition;
+  settles: TurnSettlement;
   run: (surface: "channel" | "assistant") => Promise<{ h: Harness; outcome: TurnOutcome }>;
 }> = [
   {
     door: "an answer",
+    disposition: "answered",
+    settles: "idle",
     run: async (surface) => {
       const h = harness();
       return { h, outcome: await runTurn(request({ surface }), h.deps) };
@@ -791,9 +813,18 @@ const EXITS: Array<{
   },
   {
     door: "a clarifying ask",
+    disposition: "asked",
+    settles: "waiting-on-person",
     run: async (surface) => {
+      // TWO refusals, because the model gets one go at fixing the call itself
+      // and it is the second refusal the person hears. With one reply this
+      // door answered instead of asking — which the settlement below is what
+      // caught: a check on the clear's presence alone could not see it.
       const h = harness({
-        replies: [{ toolCalls: [{ name: "component_implement", args: { component: "Button" } }] }],
+        replies: [
+          { toolCalls: [{ name: "component_implement", args: { component: "Button" } }] },
+          { toolCalls: [{ name: "component_implement", args: { component: "Button" } }] },
+        ],
         preflightAsk: "Which PRD is this implementing?",
       });
       return {
@@ -804,6 +835,8 @@ const EXITS: Array<{
   },
   {
     door: "a staged proposal",
+    disposition: "staged",
+    settles: "waiting-on-person",
     run: async (surface) => {
       const h = harness({
         replies: [
@@ -824,6 +857,8 @@ const EXITS: Array<{
   },
   {
     door: "a card Slack refused",
+    disposition: "failed",
+    settles: "idle",
     run: async (surface) => {
       const h = harness({
         delivery: recordingDelivery({ stagingFails: true }),
@@ -842,6 +877,8 @@ const EXITS: Array<{
   },
   {
     door: "a reply Slack never accepted",
+    disposition: "failed",
+    settles: "idle",
     run: async (surface) => {
       const h = harness({ delivery: recordingDelivery({ answerFails: true }) });
       return { h, outcome: await runTurn(request({ surface }), h.deps) };
@@ -849,6 +886,8 @@ const EXITS: Array<{
   },
   {
     door: "a resolution the model decided",
+    disposition: "resolved",
+    settles: "idle",
     run: async (surface) => {
       const h = harness({
         replies: [
@@ -878,6 +917,8 @@ const EXITS: Array<{
   },
   {
     door: "a reaction and no words",
+    disposition: "reacted",
+    settles: "idle",
     run: async (surface) => {
       const h = harness({
         replies: [{ toolCalls: [{ name: "slack_react", args: { emoji: "pray" } }] }, { text: "" }],
@@ -889,7 +930,62 @@ const EXITS: Array<{
     },
   },
   {
+    // The ending the disposition alone gets wrong: the person asked something
+    // else while a card was pending, the answer landed, and the card is still
+    // sitting there needing a click.
+    door: "an answer with a card still live in the thread",
+    disposition: "answered",
+    settles: "waiting-on-person",
+    run: async (surface) => {
+      const h = harness({ replies: [{ text: "A call-off reaches a fill-in through the board." }] });
+      await stage(h);
+      return {
+        h,
+        outcome: await runTurn(
+          request({
+            surface,
+            text: "different question — how does a call-off reach a fill-in?",
+            pending: PENDING,
+          }),
+          h.deps,
+        ),
+      };
+    },
+  },
+  {
+    // #575's text said `failed` settles `active`; that would let a turn which
+    // merely went wrong overwrite the thread's `suspended` while the card it is
+    // about sits there. The thread does not stop waiting because a later turn
+    // died.
+    door: "a dead model with a card still live in the thread",
+    disposition: "failed",
+    settles: "waiting-on-person",
+    run: async (surface) => {
+      const h = harness();
+      const broken: TurnDeps = {
+        ...h.deps,
+        async runAgent() {
+          throw new Error("vertex 429: resource exhausted");
+        },
+      };
+      await stage(h);
+      return {
+        h,
+        outcome: await runTurn(
+          request({
+            surface,
+            text: "different question — how does a call-off reach a fill-in?",
+            pending: PENDING,
+          }),
+          broken,
+        ),
+      };
+    },
+  },
+  {
     door: "a dead model",
+    disposition: "failed",
+    settles: "idle",
     run: async (surface) => {
       const h = harness();
       const broken: TurnDeps = {
@@ -907,11 +1003,81 @@ for (const exit of EXITS) {
   for (const surface of ["channel", "assistant"] as const) {
     test(`the working signal is down after ${exit.door} (${surface})`, async () => {
       const { h, outcome } = await exit.run(surface);
-      assert.ok(outcome.disposition, "the turn produced an outcome");
+      assert.equal(outcome.disposition, exit.disposition);
       assert.deepEqual(workingSignalOf(h.delivery), ["working", "working-clear"]);
+      assert.equal(clearedWith(h.delivery), exit.settles, outcome.disposition);
     });
   }
 }
+
+// ── the grain the settle is decided at ───────────────────────────────────────
+//
+// A DM's CONVERSATION key is the constant "dm", and the card read that feeds
+// `pending` is keyed on it — so on that surface a pending card arrives on every
+// ask, including the ones it has nothing to do with. The settle, meanwhile, is
+// addressed to a reply thread. Deciding it at conversation grain therefore
+// suspends a thread that holds no card, and the ✅ that eventually resolves the
+// real card settles only ITS thread, so the other one stays suspended with
+// nothing in it to click. That is #573's error one layer down, and the
+// comparison is the store's own (`proposalReplyThread`, #579).
+const DM_CONVERSATION = "dm";
+const DM_ASK_A = "1700000000.000500";
+const DM_ASK_B = "1700000000.000600";
+
+test("a DM card suspends the ask it was staged under, and leaves the next ask alone", async () => {
+  const cardUnderA: PendingProposal = {
+    ...PENDING,
+    threadTs: DM_CONVERSATION,
+    replyTs: DM_ASK_A,
+  };
+  const dmTurn = (replyTs: string): TurnRequest =>
+    request({
+      surface: "assistant",
+      conversationTs: DM_CONVERSATION,
+      replyTs,
+      text: "different question — how does a call-off reach a fill-in?",
+      pending: cardUnderA,
+    });
+
+  const sameAsk = harness();
+  const inside = await runTurn(dmTurn(DM_ASK_A), sameAsk.deps);
+  assert.equal(inside.disposition, "answered");
+  assert.equal(clearedWith(sameAsk.delivery), "waiting-on-person");
+
+  const nextAsk = harness();
+  const beside = await runTurn(dmTurn(DM_ASK_B), nextAsk.deps);
+  assert.equal(beside.disposition, "answered");
+  assert.equal(clearedWith(nextAsk.delivery), "idle");
+});
+
+test("a channel thread is unaffected: there, the reply thread IS the conversation", async () => {
+  // Both grains are the same value in a channel, so the gate above can only
+  // ever agree with itself there — asserted rather than reasoned, because the
+  // fix would be worthless if it changed the surface it was not aimed at.
+  const h = harness();
+  const outcome = await runTurn(request({ pending: PENDING }), h.deps);
+  assert.equal(outcome.disposition, "answered");
+  assert.equal(clearedWith(h.delivery), "waiting-on-person");
+});
+
+test("a card recorded before reply threads existed falls back to the conversation", async () => {
+  // `replyTs` post-dates 2026-08-22, and `proposalReplyThread` falls back to
+  // the record's conversation key. In a channel that is the thread root, so an
+  // old record still suspends its own thread.
+  const legacyCard: PendingProposal = {
+    toolName: PENDING.toolName,
+    input: PENDING.input,
+    channel: PENDING.channel,
+    threadTs: CONVERSATION,
+    userMsgTs: PENDING.userMsgTs,
+    proposalTs: PENDING.proposalTs,
+    proposalText: PENDING.proposalText,
+    requesterUserId: PENDING.requesterUserId,
+  };
+  const h = harness();
+  await runTurn(request({ pending: legacyCard }), h.deps);
+  assert.equal(clearedWith(h.delivery), "waiting-on-person");
+});
 
 test("a typed gate emoji resolves before anything is raised, so there is nothing to clear", async () => {
   // The one exit above the working signals: a message that is only ✅ never
