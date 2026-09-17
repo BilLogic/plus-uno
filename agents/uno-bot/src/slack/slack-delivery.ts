@@ -30,6 +30,7 @@ import {
 import { isAssistantThread, renameSession, setSessionStatus, threadTitleFrom } from "./assistant";
 import { postTextVerified, postVisibleFailure } from "./delivery";
 import type { FooterKind } from "./footer-kind";
+import { narrationOrder } from "./narration-order";
 import { proposalCardBlocks } from "./proposal-render";
 import type { Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
@@ -112,6 +113,11 @@ async function reportStatus(
 
 export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
   const { channel, replyTs, userMsgTs } = target;
+
+  // Where an ⏳ narration sits relative to the answer. The discipline is
+  // `narration-order.ts`; this file only says which posts are narrations and
+  // which are a turn's last word.
+  const narration = narrationOrder();
 
   // The plan stream, if one is open: its ts, the card currently in progress,
   // and how many steps have passed. The card is carried WHOLE, not just its id
@@ -216,6 +222,7 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
     endProgress,
 
     postInterim(text) {
+      if (!narration.open()) return;
       if (planTs) {
         // Each narration line is its own card, and the previous one is closed
         // by re-sending its id with status complete — that is what makes it
@@ -226,14 +233,17 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
         void appendTask(env, channel, open, { ...planCurrent, status: "in_progress" });
         return;
       }
-      postMessage(env, {
-        channel,
-        thread_ts: replyTs,
-        text: `:hourglass_flowing_sand: ${text}`,
-      }).catch(() => {});
+      narration.track(
+        postMessage(env, {
+          channel,
+          thread_ts: replyTs,
+          text: `:hourglass_flowing_sand: ${text}`,
+        }).catch(() => {}),
+      );
     },
 
     async postAnswer(text): Promise<PostResult> {
+      await narration.lastWord();
       // The answer CLOSES the checklist's stream instead of opening a second
       // one beside it.
       const openStream = await settlePlan("complete");
@@ -261,6 +271,9 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
     },
 
     async postNote(text): Promise<PostResult> {
+      // Drained, not closed: a clarifying question is a last word, but the Gate
+      // doors post their verdict here and then run the real tool.
+      await narration.drain();
       const posted = await postMessage(env, { channel, thread_ts: replyTs, text }).catch(() => ({
         ok: false as const,
       }));
@@ -272,6 +285,7 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
     },
 
     async stageProposal(card: ProposalCard): Promise<PostResult> {
+      await narration.lastWord();
       // Every card carries ✅ Approve / ⛔ Cancel buttons (2026-08-22). Cards
       // that built their own blocks (the Figma preview) already include them;
       // a text-only card gets the text as sections plus the row. The text is
@@ -300,6 +314,7 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
     },
 
     async postFailure(stage: DeliveryFailureStage, err) {
+      await narration.lastWord();
       // The checklist is settled by the turn's own `endProgress("error")`
       // before it gets here — a failure message under a step that still claims
       // to be in progress is how the plan stream read after a dead run.
