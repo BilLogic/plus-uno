@@ -15,18 +15,21 @@ name: check:harness
 # caught on the second PR rather than on main.
 #
 # EXACTLY ONE `npm ci`, AND IT IS SCOPED. The composite is ~14s, and the job
-# around it is ~34s: the difference is mostly the single `npm ci` in
+# around it is 34–38s: the difference is mostly the single `npm ci` in
 # `agents/uno-bot` (~11s) that the step below explains. That is the whole
 # dependency budget. This header read "NO `npm ci`, DELIBERATELY … every
 # composed sub-check is dependency-free" for three weeks after the install
 # landed with the Worker's `typecheck` and `test` rows (2026-08-29) — a file
 # arguing for a number forty lines above the step that changed it. Re-measured
 # and restated in #580, and re-measured again in #587, which moved the 4s
-# workerd step out to its own job: 40s became 34s. Both ends measured, not
-# derived — run 35277835410 for the 40s and its per-step breakdown, run
-# 35279458463 for the 34s (2026-09-17).
+# workerd step out to its own job: 40s became 34–38s. Every figure here is a
+# measurement rather than a subtraction — run 35277835410 for the 40s and its
+# per-step breakdown, runs 35279458463 and 35280023516 for the 34s and the 38s
+# (all 2026-09-17). WHICH IS THE HONEST SHAPE OF THE SAVING: 4s off a job whose
+# run-to-run spread is itself about 4s, so the seconds are a rounding error and
+# the reason that step moved is legibility, argued in `uno-bot-checks.yml`.
 #
-# ~34s is still what keeps this gate switched on, and the rule the old paragraph
+# 34–38s is still what keeps this gate switched on, and the rule the old paragraph
 # was protecting stands: a future sub-check that needs a package installs it in
 # its own step and says what it bought, rather than growing a blanket `npm ci`
 # at the root. A gate that costs ten minutes gets marked "not required" the
@@ -123,5 +126,5 @@ jobs:
       # NAMED JOB of `uno-bot-checks.yml`, which runs concurrently with this one.
       # A Durable Object regression is a line in the check list that says so,
       # rather than a red `check:harness / harness` shared with 48 other
-      # sub-checks; and this job is ~5s shorter for it (40s to 34s across the two
-      # measured runs above).
+      # sub-checks. This job is a few seconds shorter for it, and that was never
+      # the argument — see the header.

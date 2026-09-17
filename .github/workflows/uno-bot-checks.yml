@@ -50,12 +50,14 @@ name: uno-bot — Worker checks
 #     clean checkout in seconds, and it would leave the red exactly as illegible
 #     as the step it replaced.
 #
-#   - ITS OWN NAMED JOB, HERE. Chosen. The suite's 4s (measured as a step of the
-#     harness job, run 35277835410) moves off a 40s job — which measures 34s
-#     without it, run 35279458463 — and into a job that runs CONCURRENTLY with
-#     it, so a PR's wall clock falls rather than rises, and the check list gains
-#     a line that says which thing broke. This job itself is 26s: 13s of install,
-#     5s of suite, the rest checkout and setup (same run, all 2026-09-17). This is the same trade `check:storybook` records making
+#   - ITS OWN NAMED JOB, HERE. Chosen, and NOT for the seconds. The suite's 4s
+#     (measured as a step of the harness job, run 35277835410) comes off a 40s
+#     job that measures 34s and 38s without it (runs 35279458463 and
+#     35280023516) — a saving inside the runner's own spread. What the move
+#     actually buys is a CHECK-LIST LINE that says which thing broke, at no cost
+#     to a PR's wall clock, because this job runs CONCURRENTLY with the harness
+#     job and finishes first: 16–26s, of which ~13s is the install and 5s the
+#     suite (same runs, all 2026-09-17). This is the same trade `check:storybook` records making
 #     for the browser suite, two orders of magnitude cheaper.
 #
 # UNLIKE `typecheck` AND `test`, THIS ROW IS NOT COMPOSED — so the suite runs
