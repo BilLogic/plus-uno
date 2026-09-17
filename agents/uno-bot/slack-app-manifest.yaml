@@ -42,7 +42,7 @@
 #
 # DM replies are THREADED (changed 2026-08-06, reversing 74f1b17c's "chat, not
 # threads"). Both thinking-indicator mechanisms Slack offers —
-# assistant.threads.setStatus and chat.startStream — require a thread_ts, so a
+# agents.sessions.setStatus and chat.startStream — require a thread_ts, so a
 # threadless DM could never show one. Slack's own agent experience threads for
 # the same reason: "threads shown in a timeline above the composer".
 #

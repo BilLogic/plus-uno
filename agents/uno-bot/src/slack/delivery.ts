@@ -151,9 +151,10 @@ export async function postTextVerified(
   // person read rather than its first message.
   const ok = await deliverAnswer(answerMessages(body), {
     // Streamed delivery, opened HERE rather than at turn start. Opening it
-    // early (to double as the thinking indicator) left an empty "AGENT" bubble
+    // early (to double as the working signal) left an empty "AGENT" bubble
     // sitting in the thread for the whole run — a blank message impersonating a
-    // loader. The status line is the indicator; the stream carries the answer.
+    // loader. The working signal says work is happening; the stream carries
+    // the answer.
     async stream(piece, withFooter) {
       if (!((openStreamTs || env.SLACK_STREAMING === "on") && threadTs)) return false;
       // Both recipient ids, or no call at all — the argument contract and why

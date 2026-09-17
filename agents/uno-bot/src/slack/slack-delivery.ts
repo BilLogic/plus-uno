@@ -4,7 +4,7 @@
 // "here is the answer", "approve this?" — and this file decides how Slack
 // renders it. Three renderings live here and nowhere else now:
 //
-//   • the ONE acknowledgement rule: 👀 in a channel, the status line on the
+//   • the ONE acknowledgement rule: 👀 in a channel, the working signal on the
 //     assistant surface, never both;
 //   • the plan stream. With `SLACK_STREAM_PLAN=on` a substantive turn opens a
 //     stream in `task_display_mode: "plan"` and each narration line lands as a
@@ -27,7 +27,7 @@ import {
   startStream,
   stopStream,
 } from "./api";
-import { isAssistantThread, setAssistantTitle, setStatus, threadTitleFrom } from "./assistant";
+import { isAssistantThread, renameSession, setSessionStatus, threadTitleFrom } from "./assistant";
 import { postTextVerified, postVisibleFailure } from "./delivery";
 import type { FooterKind } from "./footer-kind";
 import { proposalCardBlocks } from "./proposal-render";
@@ -35,7 +35,9 @@ import type { Delivery, DeliveryFailureStage, PostResult, ProposalCard } from ".
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
 import {
   outcomeOf,
+  settledStatus,
   workingSignalLine,
+  WORKING_STATUS,
   type StatusResult,
   type WorkingSignalOutcome,
   type WorkingSignalPhase,
@@ -149,31 +151,49 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
     },
 
     async setWorking({ status, titleFrom }) {
-      // setStatus IS the thinking indicator on an app thread — the documented
-      // one — and it also opens the thread. A thread is all it needs: the
-      // DM-only condition that used to stand here decided for Slack which
-      // surfaces can show a status, and the cost of guessing wrong was a
+      // Moving the session to `processing` IS the working signal — the
+      // documented one — and it is also what opens the SESSION: the reference
+      // gives `title` and `initiator_user_id` as the arguments used "when
+      // creating new sessions", which is a session coming into being, not a
+      // thread root being posted. A thread is all it needs: the DM-only
+      // condition that used to stand here decided for Slack
+      // which surfaces can show a status, and the cost of guessing wrong was a
       // channel thread with an indicator nobody could take down. Ask, and let
       // the API decline where it wants to — a rejection here is a signal that
       // did not appear, which is exactly what the condition was for.
       if (!replyTs) return;
-      if (status) await reportStatus("set", () => setStatus(env, channel, replyTs, status));
-      // The title is the assistant surface's alone: `assistant.threads.setTitle`
-      // names an App thread, and a channel thread has no such name to set.
+      // `status` is now a request to raise the signal, not the words to raise
+      // it with: `agents.sessions.setStatus` takes a lifecycle value out of a
+      // closed set and no text (#574). The port keeps the string because the
+      // turn and both Gate doors express the same intent through it, and
+      // because a port that named Slack's enum would be Slack leaking upward.
+      if (status) {
+        await reportStatus("set", () => setSessionStatus(env, channel, replyTs, WORKING_STATUS));
+      }
+      // The title is the DM surface's alone: it is how a conversation is found
+      // again in History / Messages, and a channel thread has no such name to
+      // set.
       if (titleFrom && isAssistantThread(channel)) {
-        // Title the thread from the question that started it, so it is findable
-        // in History/Messages. Slack: "Set the title initially to capture the
-        // first question from the user."
-        await setAssistantTitle(env, channel, replyTs, threadTitleFrom(titleFrom)).catch(() => {});
+        // Title the session from the question that started it. Slack: "Set the
+        // title initially to capture the first question from the user."
+        await renameSession(env, channel, replyTs, threadTitleFrom(titleFrom)).catch(() => {});
       }
     },
 
     async clearWorking() {
-      // The empty status IS the clear (`assistant.threads.setStatus` with ""),
-      // and it goes wherever the set went — same condition, or the pairing is
-      // a set on one surface and a clear on another.
+      // Settling the session is the clear, and it is now the ONLY clear: the
+      // migration guide is explicit that "Unlike `assistant.threads.setStatus`,
+      // the loading UX no longer disappears automatically when your app posts a
+      // message to the thread", so the answer landing no longer takes the
+      // indicator down. A session left in `processing` stays there for the hour
+      // Slack takes to time it out (#574).
+      //
+      // It goes wherever the set went — same condition, or the pairing is a set
+      // on one surface and a clear on another. WHICH settled status is
+      // `settledStatus`'s decision, not a literal here: #575 maps it from the
+      // turn's disposition, and a suspended session is not an idle one.
       if (!replyTs) return;
-      await reportStatus("clear", () => setStatus(env, channel, replyTs, ""));
+      await reportStatus("clear", () => setSessionStatus(env, channel, replyTs, settledStatus()));
     },
 
     async beginProgress(label) {

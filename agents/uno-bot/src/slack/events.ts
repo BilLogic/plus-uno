@@ -226,9 +226,10 @@ function isDm(channel: string): boolean {
 //
 // That DM branch reverses 74f1b17c ("DMs are chat, not threads"), deliberately
 // and with the tradeoff understood. chat.startStream requires a thread_ts, and
-// so does assistant.threads.setStatus — with a threadless DM there is no way to
-// show a thinking indicator at all, which is the affordance agent_view is
-// supposed to bring. Slack's own agent experience is threaded for this reason:
+// so does agents.sessions.setStatus on a thread-based session — with a
+// threadless DM there is no way to show a working signal at all, which is the
+// affordance agent_view is supposed to bring. Slack's own agent experience is
+// threaded for this reason:
 // their docs describe "threads shown in a timeline above the composer".
 //
 // Conversation continuity is unaffected: the user still types in the composer,

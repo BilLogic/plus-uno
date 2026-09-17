@@ -2,13 +2,18 @@
 // (enabled via the app's Agent toggle). Three native affordances the plain
 // message path doesn't have:
 //   • suggested prompts  — starter chips shown when the panel opens
-//   • status             — the "is thinking…" line during a run
-//   • title              — an auto-name for the assistant thread
+//   • status             — the session's lifecycle, which is what renders the
+//                          working signal during a run
+//   • title              — an auto-name for the session
 //
-// These use the assistant.threads.* Web API methods — JSON body with the param
-// names `channel_id`/`thread_ts` (NOT `channel`/`ts`). The actual conversation
-// still flows through message.im events into the normal agent path; this module
-// only decorates the container.
+// Status and title are AGENT SESSION methods now (`agents.sessions.setStatus`,
+// `agents.sessions.rename`), not `assistant.threads.*` — see #574 and the two
+// functions below for why. Suggested prompts are still
+// `assistant.threads.setSuggestedPrompts`: Slack has published no replacement,
+// so the one bridged call left is the one with nowhere to go. All of them take
+// a JSON body with the param names `channel_id`/`thread_ts` (NOT `channel`/`ts`).
+// The actual conversation still flows through message.im events into the normal
+// agent path; this module only decorates the container.
 //
 // Every call is best-effort: a failure here degrades the panel's polish, never
 // the answer, so callers don't await-and-throw on these. Transport goes through
@@ -16,7 +21,7 @@
 
 import type { Env } from "../types";
 import { postMessage, slackCall } from "./api";
-import type { StatusResult } from "./working-signal";
+import type { SessionStatus, StatusResult } from "./working-signal";
 import { threadStateFor } from "../thread-state/production";
 import { hasOwnSlackToken, slackConnectUrl } from "../oauth/slack";
 import type {
@@ -85,66 +90,89 @@ async function setSuggestedPrompts(
   });
 }
 
-/** What the status line cycles through while a turn runs.
- *
- *  A single frozen "is thinking…" reads as hung on a 20–30s grounded run — the
- *  user cannot tell a slow answer from a dead one. Slack cycles this array
- *  client-side, so it costs one field, not one API call per step.
- *
- *  Ordered to match what the loop actually does (read sources, then reason,
- *  then write), so it stays honest rather than decorative. */
-const LOADING_MESSAGES = [
-  "reading the sources…",
-  "checking Notion and GitHub…",
-  "cross-checking what's current…",
-  "putting it together…",
-];
+// LOADING_MESSAGES is gone with this module's move to agent sessions (#574).
+// It was `assistant.threads.setStatus`'s `loading_messages` field — four lines
+// Slack cycled client-side so a 20–30s run did not read as hung, for the price
+// of one field rather than one API call per step. `agents.sessions.setStatus`
+// documents no such argument: its arguments are `status`, `channel_id`,
+// `thread_ts`, `title`, `initiator_user_id` and the `chat:write.customize`
+// icon/username trio. Sending a field the method does not define is how a call
+// starts getting refused, so the cycling is dropped rather than smuggled. What
+// replaces it is nothing, deliberately: the spinner is Slack's to render, and
+// this app no longer has a say in its wording.
 
-/** Set (or, with an empty string, clear) the status line on an App thread.
+/**
+ * Move the agent session's status: `processing` to raise the working signal,
+ * `active` to settle it.
  *
- *  Reports what came back rather than returning nothing. api.ts already logs
- *  Slack's refusals, so the gap was never a refusal: it was that the CALLER
- *  could not tell a clear that worked from a clear that never happened, and the
- *  two are what a stuck "Working…" is made of (#571). The call stays
- *  best-effort — the caller decides what any of it is worth — but it can no
- *  longer fail to know. `slack/working-signal.ts` turns this into the line. */
-export async function setStatus(
+ * WHY THIS IS A SESSION CALL. It was `assistant.threads.setStatus`, with a
+ * human-readable string to show and the empty string as the clear. Those
+ * methods now run over a compatibility bridge onto agent sessions, and Slack's
+ * migration guide states plainly that "Unlike `assistant.threads.setStatus`,
+ * the loading UX no longer disappears automatically when your app posts a
+ * message to the thread." Posting the answer was what used to clear the
+ * indicator; under sessions it is not, which is the whole of the regression a
+ * channel thread showed as "le goat is working…" beneath a delivered answer.
+ * The mapping is the guide's own: a non-empty status becomes `processing`, the
+ * empty one becomes `active`, and `assistant.threads.setTitle` becomes
+ * `agents.sessions.rename` (#574). The migration guide says only that the old
+ * methods are deprecated "eventually"; the DATE is the changelog's, 2026-08-20,
+ * "The next wave of Agent messaging experience": "The Assistant messaging
+ * experience (`assistant_view`) will be deprecated in February 2027." So this
+ * is the supported path, not a patch.
+ *
+ * WHAT IT NO LONGER TAKES. The status text itself. `status` is a lifecycle
+ * value out of a closed set, not a sentence — nothing this app writes reaches
+ * the indicator any more.
+ *
+ * Reports what came back rather than returning nothing. api.ts already logs
+ * Slack's refusals, so the gap was never a refusal: it was that the CALLER
+ * could not tell a settle that worked from a settle that never happened, and
+ * the two are what a stuck "Working…" is made of (#571). The call stays
+ * best-effort — the caller decides what any of it is worth — but it can no
+ * longer fail to know. `slack/working-signal.ts` turns this into the line.
+ */
+export async function setSessionStatus(
   env: Env,
   channel: string,
   thread_ts: string | undefined,
-  status: string,
+  status: SessionStatus,
 ): Promise<StatusResult> {
-  // assistant.threads.setStatus addresses a THREAD. Without one there is
-  // nothing to decorate — skip rather than send a bad request. Both callers
-  // already guard on the same thing, so this is defence, not a path: the
-  // sentinel is spelled out of Slack's vocabulary (`outcomeOf` gives it its own
-  // kind) so that it can never be read back as a refusal Slack never made.
+  // `thread_ts` is documented as required for thread-based sessions in regular
+  // channels and DMs, which is every surface this bot has — only a public
+  // channel-level session can go without one. So the guard that stood here for
+  // `assistant.threads.setStatus` stands unchanged: without a thread there is
+  // nothing to address, and we skip rather than send a bad request. Both
+  // callers already guard on the same thing, so this is defence, not a path:
+  // the sentinel is spelled out of Slack's vocabulary (`outcomeOf` gives it its
+  // own kind) so that it can never be read back as a refusal Slack never made.
   if (!thread_ts) return { ok: false, error: "no_thread" };
-  const clearing = status === "";
-  const res = await slackCall(env, "assistant.threads.setStatus", {
+  const res = await slackCall(env, "agents.sessions.setStatus", {
     channel_id: channel,
     thread_ts,
     status,
-    // Only while working. Sending them alongside the clear would re-arm the
-    // spinner we are trying to take down.
-    ...(clearing ? {} : { loading_messages: LOADING_MESSAGES }),
   });
   return res.ok ? { ok: true } : { ok: false, error: res.error };
 }
 
-/** Name an App thread. Slack asks for this explicitly — "Set the title
+/** Name an agent session. Slack asks for this explicitly — "Set the title
  *  initially to capture the first question from the user" — because the title
  *  is how a conversation is found again in History / Messages.
  *
- *  Removed during the agent_view migration on the reasoning that the agent DM
- *  had no thread. It does now (DM replies are threaded), so it is back. */
-export async function setAssistantTitle(
+ *  `agents.sessions.rename` replaces `assistant.threads.setTitle`, one row of
+ *  the migration guide's mapping table (#574). Same three arguments, same
+ *  `chat:write` scope, same best-effort standing: a session that goes unnamed
+ *  costs findability, never an answer.
+ *
+ *  Removed once during the agent_view migration on the reasoning that the agent
+ *  DM had no thread. It does now (DM replies are threaded), so it is back. */
+export async function renameSession(
   env: Env,
   channel: string,
   thread_ts: string,
   title: string,
 ): Promise<void> {
-  await slackCall(env, "assistant.threads.setTitle", {
+  await slackCall(env, "agents.sessions.rename", {
     channel_id: channel,
     thread_ts,
     title,

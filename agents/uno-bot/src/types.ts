@@ -145,8 +145,8 @@ export interface Env {
    *  fact sending neither recipient id (#572), which the argument contract
    *  above `startStream` in slack/api.ts says it needs. Which of the two
    *  readings the r34–r37 observation was has not been re-checked — the stream
-   *  probe is what would. The thinking indicator is assistant.threads.setStatus
-   *  either way. */
+   *  probe is what would. The working signal is agents.sessions.setStatus
+   *  either way (#574). */
   SLACK_STREAMING?: string;
   /** "on" opens the turn's stream UP FRONT in `task_display_mode: "plan"` and
    *  routes the between-tool narration into it as task cards, instead of
