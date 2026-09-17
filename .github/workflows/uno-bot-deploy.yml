@@ -25,7 +25,7 @@ name: uno-bot — deploy Worker
 # gate deliberately leaves `check:fetch` and `check:contract` to this boundary
 # (scripts/check-harness.mjs § EXCLUDED).
 #
-# `test` — the Worker's 692 unit tests — joined that chain in #580. It had been
+# `test` — the Worker's unit suite — joined that chain in #580. It had been
 # a pull-request check since 2026-08-29 (a row of scripts/checks.registry.mjs,
 # composed into `npm run check:harness`) and was absent from this chain, so a
 # direct push to `main` reached production having run none of it. `main` is

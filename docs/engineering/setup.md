@@ -180,8 +180,9 @@ npm --prefix agents/uno-bot run bundle:harness
 ## The Worker's own checks
 
 `.github/workflows/uno-bot-checks.yml` runs two jobs on every pull request —
-`typecheck` (`tsc --noEmit` over `agents/uno-bot/src/**`) and `tests` (692 unit
-tests across 60 suites). Both commands are registry rows composed into
+`typecheck` (`tsc --noEmit` over `agents/uno-bot/src/**`) and `tests` (the
+Worker's unit suite, the largest in this repository). Both commands are registry
+rows composed into
 `check:harness` as well, so the pre-push command stays whole; the jobs exist for
 their NAMES. A red `check:harness` is one GitHub check covering the whole
 composite, so

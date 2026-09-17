@@ -108,7 +108,7 @@ jobs:
         run: npm ci
 
       # `tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js` —
-      # 692 tests across 60 suites, the largest suite in this repository. It is
+      # the largest unit suite in this repository. It is
       # also part of `npm run deploy` as of #580, for the direct-push reason
       # above: before that, this suite ran on pull requests and nowhere else, so
       # a push straight to `main` reached production having run none of it.
