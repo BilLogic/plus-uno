@@ -25,6 +25,7 @@ import { resolve } from "node:path";
 import {
   EXPIRED_POST,
   STALE_POST,
+  SUPERSEDED_POST,
   resolveSignal,
   type GateSignal,
   type GateVerdict,
@@ -249,6 +250,96 @@ describe("a card that is no longer there", () => {
     });
     assert.equal(verdict.outcome, "none");
     assert.equal(verdict.post, null);
+  });
+});
+
+describe("a card a revision replaced", () => {
+  /** Two cards in one thread: the one the person pushed back on, then its
+   *  revision. */
+  async function twoCards(): Promise<{ threadState: ThreadState; revisedTs: string }> {
+    const revisedTs = "1700000000.000295";
+    const threadState = await staged();
+    await threadState.putProposal({
+      ...PROPOSAL,
+      proposalTs: revisedTs,
+      input: { title: "Reflection redesign, tutors only" },
+      proposalText: "(the revised card)",
+    });
+    return { threadState, revisedTs };
+  }
+
+  // The bug this closes (#573): the older card stayed live for its full hour,
+  // so a ✅ on it ran the very input the person was pushing back on.
+  it("tells a ✅ on the older card it was replaced, and executes nothing", async () => {
+    const { threadState } = await twoCards();
+    const verdict = await resolveSignal(reaction(), { threadState });
+    assert.equal(verdict.outcome, "stale");
+    assert.equal(verdict.post?.text, SUPERSEDED_POST);
+    assert.equal(verdict.execute, undefined);
+  });
+
+  it("says the same thing through the button door", async () => {
+    const { threadState } = await twoCards();
+    const verdict = await resolveSignal(button(), { threadState });
+    assert.equal(verdict.outcome, "stale");
+    assert.equal(verdict.post?.text, SUPERSEDED_POST);
+    assert.equal(verdict.execute, undefined);
+  });
+
+  it("declines on the older card without executing or resolving the newer one", async () => {
+    const { threadState, revisedTs } = await twoCards();
+    const verdict = await resolveSignal(reaction({ glyph: "no_entry" }), { threadState });
+    assert.equal(verdict.outcome, "stale");
+    assert.equal(verdict.execute, undefined);
+    // ⛔ on a retired card is not a decision about the live one.
+    assert.equal((await threadState.getProposalByTs(revisedTs)).state, "found");
+  });
+
+  it("resolves the newest card normally, through both doors", async () => {
+    for (const door of ["reaction", "button"] as const) {
+      const { threadState, revisedTs } = await twoCards();
+      const signal =
+        door === "reaction" ? reaction({ messageTs: revisedTs }) : { ...button(), messageTs: revisedTs };
+      const verdict = await resolveSignal(signal as GateSignal, { threadState });
+      assert.equal(verdict.outcome, "won", door);
+      assert.equal(verdict.proposal?.proposalTs, revisedTs, door);
+      assert.deepEqual(verdict.execute?.input, { title: "Reflection redesign, tutors only" }, door);
+    }
+  });
+
+  // The DM regression this grain exists for: `threadTs` is the constant "dm"
+  // there, so two independent asks share a conversation key. Retiring by
+  // conversation would tell the second ✅ its proposal "was replaced by a newer
+  // one" — untrue, a different request — and leave the first ask unresolvable.
+  it("leaves an unrelated ask in the same DM resolvable", async () => {
+    const threadState = createInMemoryThreadState();
+    const first = { ...PROPOSAL, channel: "D1", threadTs: "dm", replyTs: "1700000000.000100" };
+    const second = {
+      ...PROPOSAL,
+      channel: "D1",
+      threadTs: "dm",
+      replyTs: "1700000000.000200",
+      proposalTs: "1700000000.000295",
+      input: { title: "Something else entirely" },
+    };
+    await threadState.putProposal(first);
+    await threadState.putProposal(second);
+
+    for (const card of [first, second]) {
+      const verdict = await resolveSignal(
+        reaction({ messageTs: card.proposalTs, channel: "D1", thread: "dm" }),
+        { threadState },
+      );
+      assert.equal(verdict.outcome, "won", card.proposalTs);
+      assert.deepEqual(verdict.execute?.input, card.input, card.proposalTs);
+    }
+  });
+
+  it("sends a typed ✅ to the newest card, not the one it replaced", async () => {
+    const { threadState, revisedTs } = await twoCards();
+    const verdict = await resolveSignal(typed(), { threadState });
+    assert.equal(verdict.outcome, "won");
+    assert.equal(verdict.proposal?.proposalTs, revisedTs);
   });
 });
 
