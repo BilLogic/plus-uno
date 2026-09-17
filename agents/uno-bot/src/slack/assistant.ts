@@ -16,6 +16,7 @@
 
 import type { Env } from "../types";
 import { postMessage, slackCall } from "./api";
+import type { StatusResult } from "./working-signal";
 import { threadStateFor } from "../thread-state/production";
 import { hasOwnSlackToken, slackConnectUrl } from "../oauth/slack";
 import type {
@@ -99,18 +100,25 @@ const LOADING_MESSAGES = [
   "putting it together…",
 ];
 
-/** Set (or, with an empty string, clear) the status line on an App thread. */
+/** Set (or, with an empty string, clear) the status line on an App thread.
+ *
+ *  Reports Slack's own verdict rather than returning nothing. This call IS the
+ *  thinking indicator, and it used to throw the response away, so an indicator
+ *  Slack refused to take down left no trace anywhere and the same stuck
+ *  "Working…" got diagnosed three times from screenshots. The call stays
+ *  best-effort — the caller decides what a refusal is worth — but the caller
+ *  can no longer fail to know about one. */
 export async function setStatus(
   env: Env,
   channel: string,
   thread_ts: string | undefined,
   status: string,
-): Promise<void> {
+): Promise<StatusResult> {
   // assistant.threads.setStatus addresses a THREAD. Without one there is
   // nothing to decorate — skip rather than send a bad request.
-  if (!thread_ts) return;
+  if (!thread_ts) return { ok: false, error: "no_thread" };
   const clearing = status === "";
-  await slackCall(env, "assistant.threads.setStatus", {
+  const res = await slackCall(env, "assistant.threads.setStatus", {
     channel_id: channel,
     thread_ts,
     status,
@@ -118,6 +126,7 @@ export async function setStatus(
     // spinner we are trying to take down.
     ...(clearing ? {} : { loading_messages: LOADING_MESSAGES }),
   });
+  return res.ok ? { ok: true } : { ok: false, error: res.error };
 }
 
 /** Name an App thread. Slack asks for this explicitly — "Set the title

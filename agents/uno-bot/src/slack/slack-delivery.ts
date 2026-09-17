@@ -32,6 +32,13 @@ import { postTextVerified, postVisibleFailure } from "./delivery";
 import type { FooterKind } from "./footer-kind";
 import { proposalCardBlocks } from "./proposal-render";
 import type { Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
+import { isSubrequestBudgetError, subrequestsUsed } from "../net";
+import {
+  outcomeOf,
+  workingSignalLine,
+  type StatusResult,
+  type WorkingSignalPhase,
+} from "./working-signal";
 
 /** Where this turn is happening, as Slack knows it. */
 export interface SlackDeliveryTarget {
@@ -48,6 +55,39 @@ export interface SlackDeliveryTarget {
    *  whose answer goes out under the PERSON'S name, so the standard "check
    *  before acting" line is wrong for it. Never sniffed from the body. */
   footerHint?: FooterKind;
+}
+
+/**
+ * Make one status call and leave its verdict in the logs.
+ *
+ * Still best-effort — nothing here can fail a turn that already did its work —
+ * but the swallow is no longer silent. Three outcomes have to stay distinct: a
+ * clear Slack refused, a clear the subrequest budget stopped before it left the
+ * Worker, and a clear that never ran at all because the invocation died. The
+ * first two are these lines; the third is their ABSENCE, which is why the
+ * clear logs on success too (#571).
+ *
+ * @param phase - Which half of the pairing this is
+ * @param call - The status call to make
+ */
+async function reportStatus(
+  phase: WorkingSignalPhase,
+  call: () => Promise<StatusResult>,
+): Promise<void> {
+  // Read the meter at the call, not after it: the number that matters is what
+  // the turn had already spent by the time it reached delivery.
+  const spent = subrequestsUsed();
+  let outcome;
+  try {
+    outcome = outcomeOf(await call());
+  } catch (err) {
+    outcome = isSubrequestBudgetError(err)
+      ? ({ kind: "budget-stop" } as const)
+      : ({ kind: "declined", error: err instanceof Error ? err.message : String(err) } as const);
+  }
+  const line = workingSignalLine(phase, outcome, spent);
+  if (outcome.kind === "ok") console.log(line);
+  else console.warn(line);
 }
 
 export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
@@ -99,7 +139,7 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
       // the API decline where it wants to — a rejection here is a signal that
       // did not appear, which is exactly what the condition was for.
       if (!replyTs) return;
-      if (status) await setStatus(env, channel, replyTs, status).catch(() => {});
+      if (status) await reportStatus("set", () => setStatus(env, channel, replyTs, status));
       // The title is the assistant surface's alone: `assistant.threads.setTitle`
       // names an App thread, and a channel thread has no such name to set.
       if (titleFrom && isAssistantThread(channel)) {
@@ -115,7 +155,7 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
       // and it goes wherever the set went — same condition, or the pairing is
       // a set on one surface and a clear on another.
       if (!replyTs) return;
-      await setStatus(env, channel, replyTs, "").catch(() => {});
+      await reportStatus("clear", () => setStatus(env, channel, replyTs, ""));
     },
 
     async beginProgress(label) {
