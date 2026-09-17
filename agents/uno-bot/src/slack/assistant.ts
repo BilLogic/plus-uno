@@ -16,6 +16,7 @@
 
 import type { Env } from "../types";
 import { postMessage, slackCall } from "./api";
+import type { StatusResult } from "./working-signal";
 import { threadStateFor } from "../thread-state/production";
 import { hasOwnSlackToken, slackConnectUrl } from "../oauth/slack";
 import type {
@@ -99,18 +100,28 @@ const LOADING_MESSAGES = [
   "putting it together…",
 ];
 
-/** Set (or, with an empty string, clear) the status line on an App thread. */
+/** Set (or, with an empty string, clear) the status line on an App thread.
+ *
+ *  Reports what came back rather than returning nothing. api.ts already logs
+ *  Slack's refusals, so the gap was never a refusal: it was that the CALLER
+ *  could not tell a clear that worked from a clear that never happened, and the
+ *  two are what a stuck "Working…" is made of (#571). The call stays
+ *  best-effort — the caller decides what any of it is worth — but it can no
+ *  longer fail to know. `slack/working-signal.ts` turns this into the line. */
 export async function setStatus(
   env: Env,
   channel: string,
   thread_ts: string | undefined,
   status: string,
-): Promise<void> {
+): Promise<StatusResult> {
   // assistant.threads.setStatus addresses a THREAD. Without one there is
-  // nothing to decorate — skip rather than send a bad request.
-  if (!thread_ts) return;
+  // nothing to decorate — skip rather than send a bad request. Both callers
+  // already guard on the same thing, so this is defence, not a path: the
+  // sentinel is spelled out of Slack's vocabulary (`outcomeOf` gives it its own
+  // kind) so that it can never be read back as a refusal Slack never made.
+  if (!thread_ts) return { ok: false, error: "no_thread" };
   const clearing = status === "";
-  await slackCall(env, "assistant.threads.setStatus", {
+  const res = await slackCall(env, "assistant.threads.setStatus", {
     channel_id: channel,
     thread_ts,
     status,
@@ -118,6 +129,7 @@ export async function setStatus(
     // spinner we are trying to take down.
     ...(clearing ? {} : { loading_messages: LOADING_MESSAGES }),
   });
+  return res.ok ? { ok: true } : { ok: false, error: res.error };
 }
 
 /** Name an App thread. Slack asks for this explicitly — "Set the title
