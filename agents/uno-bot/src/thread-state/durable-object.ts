@@ -98,6 +98,12 @@ export function createDurableObjectThreadState(
       return hop().putProposal(proposal, now());
     },
 
+    // Retire, as distinct from claim: the record stays readable so a ✅ on the
+    // replaced card can be told it was replaced (#583).
+    retireProposal(proposalTs: string): Promise<void> {
+      return hop().retireProposal(proposalTs);
+    },
+
     getProposalByTs(proposalTs: string): Promise<ProposalLookup> {
       return hop().getProposalByTs(proposalTs, now());
     },

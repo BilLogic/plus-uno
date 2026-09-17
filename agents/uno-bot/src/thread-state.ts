@@ -15,8 +15,8 @@
 //
 // Every public method below is Durable Object RPC and its signature IS the
 // `src/thread-state` interface: `readHistory`, `appendHistory`,
-// `compactHistory`, `putProposal`, `getProposalByTs`, `getProposalByThread`,
-// `claimProposal`, `get/putAssistantContext`, `requestCancel`,
+// `compactHistory`, `putProposal`, `retireProposal`, `getProposalByTs`,
+// `getProposalByThread`, `claimProposal`, `get/putAssistantContext`, `requestCancel`,
 // `consumeCancel`, `cancelForUser`, `setActiveRun`, `checkAndRecordEvent`,
 // `claimRun`, `markRunDone`. A rename is a type error rather than a runtime
 // 404, which is the whole point.
@@ -68,6 +68,10 @@ interface ProposalRecord {
    *  revision in the same conversation (#573). Absent on every record written
    *  before it shipped, which reads as "not superseded" — the right answer. */
   supersededBy?: string;
+  /** Retired ahead of the revision that is replacing it (#583), before that
+   *  card exists to be named. Readable, and out of reach of every lookup that
+   *  can lead to an execution. */
+  retired?: boolean;
 }
 
 // Latest assistant-panel context (what surface the user has open) per thread.
@@ -226,6 +230,9 @@ export class ThreadState extends DurableObject<Env> {
     const all = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
     for (const [key, rec] of all) {
       if (key === proposalKey(proposal.proposalTs)) continue;
+      // A record already stamped with a successor is settled. One only RETIRED
+      // still wants this ts — that is the caller who retired it ahead of
+      // staging this very card (#583).
       if (rec.supersededBy) continue;
       if (at - rec.createdAt > PROPOSAL_TTL_MS) continue; // already "expired"
       const pending = rec.payload as PendingProposal | null;
@@ -241,6 +248,16 @@ export class ThreadState extends DurableObject<Env> {
       createdAt: at,
     });
     await this.ensureGcAlarm();
+  }
+
+  // Retire without consuming — the counterpart to the claim, and why the two
+  // are different methods is on the interface (#583). A missing record is a
+  // no-op: there is nothing left that could be acted on.
+  async retireProposal(proposalTs: string): Promise<void> {
+    const key = proposalKey(proposalTs);
+    const rec = await this.storage.get<ProposalRecord>(key);
+    if (!rec) return;
+    await this.storage.put<ProposalRecord>(key, { ...rec, retired: true });
   }
 
   // Is the card that retired another one still around to be looked at? Its own
@@ -265,7 +282,7 @@ export class ThreadState extends DurableObject<Env> {
       await this.storage.delete(proposalKey(proposalTs));
       return { state: "expired" };
     }
-    if (rec.supersededBy) return { state: "superseded" };
+    if (rec.supersededBy || rec.retired) return { state: "superseded" };
     return {
       state: "found",
       proposal: rec.payload as PendingProposal,
@@ -280,7 +297,7 @@ export class ThreadState extends DurableObject<Env> {
     let best: ProposalRecord | null = null;
     for (const rec of all.values()) {
       if (at - rec.createdAt > PROPOSAL_TTL_MS) continue;
-      if (rec.supersededBy) continue; // retired, and never the thread's live card
+      if (rec.supersededBy || rec.retired) continue; // retired, so never the thread's live card
       const proposal = rec.payload as PendingProposal | null;
       if (!proposal || proposal.channel !== ref.channel || proposal.threadTs !== ref.thread) continue;
       if (!best || rec.createdAt > best.createdAt) best = rec;
@@ -290,9 +307,20 @@ export class ThreadState extends DurableObject<Env> {
 
   // The delete IS the claim. A Durable Object handles one event at a time, so of
   // two racing resolvers exactly one sees `true` — which is the whole
-  // double-execution guard, because `notion_create` is not idempotent.
+  // double-execution guard, because `notion_create` is not idempotent. The read
+  // added below is safe inside that guarantee: the input gate stays closed
+  // across a storage await, so no second claim is delivered between the two.
+  //
+  // A RETIRED or superseded record is refused rather than deleted (#583): two
+  // doors reach the claim with a proposal they are holding in memory instead of
+  // one they just looked up, and the lookups alone therefore left a replaced
+  // card executable. The reason this is the store's job, and the per-message
+  // run lease that makes the race reachable, are on the interface.
   async claimProposal(proposalTs: string): Promise<boolean> {
-    return this.storage.delete(proposalKey(proposalTs));
+    const key = proposalKey(proposalTs);
+    const rec = await this.storage.get<ProposalRecord>(key);
+    if (!rec || rec.retired || rec.supersededBy) return false;
+    return this.storage.delete(key);
   }
 
   // ----- assistant context -----

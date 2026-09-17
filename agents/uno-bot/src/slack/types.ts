@@ -100,6 +100,26 @@ export interface SlackAppContextChangedEvent {
   event_ts: string;
 }
 
+/** Slack's own stop control, pressed: the control Slack offers on a session
+ *  for an app subscribed to this event (#576). Slack documents that it exists
+ *  and that the app owns the status transition; it documents no placement, and
+ *  nothing here has seen it, so nothing here describes how it looks.
+ *
+ *  There is NO session id in the payload — the channel and the thread are the
+ *  identity, which is convenient rather than lossy, since they are what every
+ *  other record here is keyed on. `user` is whoever pressed, which in a channel
+ *  thread need not be whoever asked. `streaming_message_ts` lists any streams
+ *  open on the session; this app settles the session rather than reaching into
+ *  them, so it is carried in the type and unread. */
+export interface SlackAgentSessionStoppedEvent {
+  type: "agent_session_stopped";
+  channel: string;
+  thread_ts: string;
+  user: string;
+  streaming_message_ts?: string[];
+  event_ts: string;
+}
+
 export interface SlackAppMentionEvent {
   type: "app_mention";
   channel: string;
@@ -130,6 +150,7 @@ export type SlackInnerEvent =
   | SlackAssistantThreadContextChangedEvent
   | SlackAppHomeOpenedEvent
   | SlackAppContextChangedEvent
+  | SlackAgentSessionStoppedEvent
   | { type: string };
 
 export interface SlackEventCallback {
