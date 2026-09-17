@@ -37,6 +37,7 @@ import {
   outcomeOf,
   workingSignalLine,
   type StatusResult,
+  type WorkingSignalOutcome,
   type WorkingSignalPhase,
 } from "./working-signal";
 
@@ -61,11 +62,15 @@ export interface SlackDeliveryTarget {
  * Make one status call and leave its verdict in the logs.
  *
  * Still best-effort — nothing here can fail a turn that already did its work —
- * but the swallow is no longer silent. Three outcomes have to stay distinct: a
- * clear Slack refused, a clear the subrequest budget stopped before it left the
- * Worker, and a clear that never ran at all because the invocation died. The
- * first two are these lines; the third is their ABSENCE, which is why the
- * clear logs on success too (#571).
+ * but the swallow is no longer silent, and it logs on SUCCESS too. That is the
+ * whole instrument: Slack's own refusals were always logged by api.ts, so what
+ * a stuck indicator needed was evidence of the cases that produce no Slack
+ * response at all. A `set` line with no `clear` line after it is an invocation
+ * that died before delivery (#571).
+ *
+ * That pairing is the claim, and it is the only one made here: a surface with
+ * no thread raises nothing and so logs neither half, which is why absence is
+ * read as a BROKEN PAIR rather than as absence.
  *
  * @param phase - Which half of the pairing this is
  * @param call - The status call to make
@@ -77,13 +82,18 @@ async function reportStatus(
   // Read the meter at the call, not after it: the number that matters is what
   // the turn had already spent by the time it reached delivery.
   const spent = subrequestsUsed();
-  let outcome;
+  let outcome: WorkingSignalOutcome;
   try {
     outcome = outcomeOf(await call());
   } catch (err) {
+    // One thing reaches here by construction: `slackCall` degrades every
+    // transport and parse failure into `{ ok: false, error }` and rethrows
+    // exactly the budget stop (`rethrowIfBudget`, api.ts). The second arm is
+    // the compiler's, not a case — and it still refuses to put a JS exception
+    // message behind the words "declined by Slack".
     outcome = isSubrequestBudgetError(err)
-      ? ({ kind: "budget-stop" } as const)
-      : ({ kind: "declined", error: err instanceof Error ? err.message : String(err) } as const);
+      ? { kind: "budget-stop" }
+      : { kind: "unanswered", error: err instanceof Error ? err.message : String(err) };
   }
   const line = workingSignalLine(phase, outcome, spent);
   if (outcome.kind === "ok") console.log(line);

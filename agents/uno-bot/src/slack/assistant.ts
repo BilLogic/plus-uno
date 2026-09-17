@@ -102,12 +102,12 @@ const LOADING_MESSAGES = [
 
 /** Set (or, with an empty string, clear) the status line on an App thread.
  *
- *  Reports Slack's own verdict rather than returning nothing. This call IS the
- *  thinking indicator, and it used to throw the response away, so an indicator
- *  Slack refused to take down left no trace anywhere and the same stuck
- *  "Working…" got diagnosed three times from screenshots. The call stays
- *  best-effort — the caller decides what a refusal is worth — but the caller
- *  can no longer fail to know about one. */
+ *  Reports what came back rather than returning nothing. api.ts already logs
+ *  Slack's refusals, so the gap was never a refusal: it was that the CALLER
+ *  could not tell a clear that worked from a clear that never happened, and the
+ *  two are what a stuck "Working…" is made of (#571). The call stays
+ *  best-effort — the caller decides what any of it is worth — but it can no
+ *  longer fail to know. `slack/working-signal.ts` turns this into the line. */
 export async function setStatus(
   env: Env,
   channel: string,
@@ -115,7 +115,10 @@ export async function setStatus(
   status: string,
 ): Promise<StatusResult> {
   // assistant.threads.setStatus addresses a THREAD. Without one there is
-  // nothing to decorate — skip rather than send a bad request.
+  // nothing to decorate — skip rather than send a bad request. Both callers
+  // already guard on the same thing, so this is defence, not a path: the
+  // sentinel is spelled out of Slack's vocabulary (`outcomeOf` gives it its own
+  // kind) so that it can never be read back as a refusal Slack never made.
   if (!thread_ts) return { ok: false, error: "no_thread" };
   const clearing = status === "";
   const res = await slackCall(env, "assistant.threads.setStatus", {
