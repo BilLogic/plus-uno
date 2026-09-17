@@ -4,7 +4,7 @@
 
 import type { Env } from "../types";
 import { addReaction, appendStream, postMessage, startStream, stopStream } from "./api";
-import { canOpenStream, type StreamRecipient } from "./stream-recipient";
+import { decideStream, type StreamRecipient } from "./stream-recipient";
 import { answerMessages, deliverAnswer } from "./answer-posts";
 import { footerKindFor, footerNoteFor, type FooterKind } from "./footer-kind";
 import { renderDeliveredBody, textSections } from "./render";
@@ -158,11 +158,30 @@ export async function postTextVerified(
       if (!((openStreamTs || env.SLACK_STREAMING === "on") && threadTs)) return false;
       // Both recipient ids, or no call at all — the argument contract and why
       // it is a pair are in `api.ts` above `startStream`, and the decision
-      // itself is `canOpenStream` (its own module, so it can be tested by
+      // itself is `decideStream` (its own module, so it can be tested by
       // running it). Until #572 the answer path passed neither id, so a
       // channel turn bought an `invalid_arguments` and a console.warn on its
       // way to the ordinary post it was going to make anyway.
-      if (!canOpenStream(openStreamTs, recipient)) return false;
+      const decision = decideStream(openStreamTs, recipient);
+      if (!decision.open) {
+        // A HALF recipient is a turn that quietly lost streaming, and this
+        // ticket is the argument for the line: what made #572 survive six
+        // revisions was a fallback whose only symptom was a warning nobody
+        // read, and a fallback with NO symptom is worse than that. So the one
+        // case that should never happen says which half went missing, and says
+        // it where the other Slack degradations are already logged. A path
+        // with no recipient at all was never going to stream and stays quiet.
+        if (decision.missing !== "recipient") {
+          const user = recipient?.userId || "MISSING";
+          const team = recipient?.team || "MISSING";
+          console.warn(
+            `[slack] stream skipped: recipient missing ${decision.missing}` +
+              ` | sent={recipient_user_id:${user},recipient_team_id:${team}}` +
+              " — the answer posts as an ordinary message",
+          );
+        }
+        return false;
+      }
       const streamTs =
         openStreamTs ??
         (await startStream(env, channel, threadTs, recipient.userId, recipient.team));

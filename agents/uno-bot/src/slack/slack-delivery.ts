@@ -48,7 +48,7 @@ export interface SlackDeliveryTarget {
    *  payload, neither of which carries a team id here (the reaction's sits on
    *  the envelope, outside the DO job payload). Harmless today: those doors
    *  post through `postNote`, never `postAnswer`, so they never reach a stream
-   *  — and if one ever does, `canOpenStream` makes it a plain post rather than
+   *  — and if one ever does, `decideStream` makes it a plain post rather than
    *  the `invalid_arguments` of #572. */
   userId: string;
   team?: string;

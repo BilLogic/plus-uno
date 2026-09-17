@@ -18,7 +18,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { canOpenStream } from "../src/slack/stream-recipient";
+import { decideStream } from "../src/slack/stream-recipient";
 
 /** A source file with its whitespace collapsed, so a reflow cannot fail a test
  *  about arguments with a message about formatting. */
@@ -31,24 +31,43 @@ const OPEN_TS = "1700000000.000200";
 
 describe("opening a stream", () => {
   it("needs both recipient ids", () => {
-    assert.equal(canOpenStream(undefined, BOTH), true);
+    assert.deepEqual(decideStream(undefined, BOTH), { open: true });
   });
 
-  it("is refused when either id is missing", () => {
-    assert.equal(canOpenStream(undefined, { userId: "U1" }), false, "no team");
-    assert.equal(canOpenStream(undefined, { userId: "", team: "T1" }), false, "no user");
-    assert.equal(canOpenStream(undefined, { userId: "", team: "" }), false, "neither");
+  it("is refused when either id is missing, and names the half", () => {
+    // Named, because the caller logs it: a turn that lost streaming without
+    // saying so is the same silence #572 was about.
+    assert.deepEqual(decideStream(undefined, { userId: "U1" }), {
+      open: false,
+      missing: "team",
+    });
+    assert.deepEqual(decideStream(undefined, { userId: "", team: "T1" }), {
+      open: false,
+      missing: "user",
+    });
+  });
+
+  it("calls a recipient with nothing in it unremarkable", () => {
+    // Neither half: a path that never had a recipient, not a turn that lost
+    // one — so `delivery.ts` stays quiet about it.
+    assert.deepEqual(decideStream(undefined, { userId: "", team: "" }), {
+      open: false,
+      missing: "recipient",
+    });
     // `userId` reaches this via `event.user!` in slack/turn-adapter.ts, so a
     // wholly absent recipient is reachable at runtime whatever the type says.
-    assert.equal(canOpenStream(undefined, undefined), false, "no recipient at all");
+    assert.deepEqual(decideStream(undefined, undefined), {
+      open: false,
+      missing: "recipient",
+    });
   });
 
   it("reuses a stream already open, whatever the recipient looks like", () => {
     // Plan mode opened it WITH the ids; the answer only closes it, and a
     // handed-over stream left unclosed renders as work still in progress.
-    assert.equal(canOpenStream(OPEN_TS, BOTH), true);
-    assert.equal(canOpenStream(OPEN_TS, { userId: "" }), true);
-    assert.equal(canOpenStream(OPEN_TS, undefined), true);
+    assert.deepEqual(decideStream(OPEN_TS, BOTH), { open: true });
+    assert.deepEqual(decideStream(OPEN_TS, { userId: "" }), { open: true });
+    assert.deepEqual(decideStream(OPEN_TS, undefined), { open: true });
   });
 });
 
@@ -61,14 +80,22 @@ describe("the answer path", () => {
     assert.ok(args.includes("recipient.team"), "and their workspace with them");
   });
 
-  it("consults the guard before it calls Slack", () => {
-    // `canOpenStream` being correct is no use if the answer path stops asking
+  it("consults the decision before it calls Slack, and says when it skips", () => {
+    // `decideStream` being correct is no use if the answer path stops asking
     // it. Positions, not formatting: the question has to be put BEFORE the
     // call, or it is not a guard.
     const src = flatSource("src/slack/delivery.ts");
-    const guard = src.indexOf("canOpenStream(");
+    const guard = src.indexOf("decideStream(");
     assert.ok(guard > 0, "the answer path asks whether it may open a stream");
     assert.ok(guard < src.indexOf("await startStream("), "and asks first");
+    // And an incomplete recipient is never a silent no-op — the whole lesson
+    // of #572 is that an unlogged fallback outlives the people who caused it.
+    const skip = src.indexOf("[slack] stream skipped");
+    assert.ok(skip > guard, "the skip is logged where it is decided");
+    assert.ok(
+      src.slice(guard, skip).includes('decision.missing !== "recipient"'),
+      "and only for the surprising half-recipient case",
+    );
   });
 
   it("is handed the ids by the adapter that holds them", () => {
