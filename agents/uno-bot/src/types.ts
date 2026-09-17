@@ -138,14 +138,15 @@ export interface Env {
   GEMINI_GRIND_MODEL?: string;
 
   HARNESS_KV?: KVNamespace;
-  /** "on" enables chat.startStream, on every surface. OFF by default — but no
-   *  longer because Slack refuses us: the earlier note here read the failure as
-   *  Slack rejecting a correct request, when the answer path was sending no
-   *  recipient_user_id or recipient_team_id at all and chat.startStream
-   *  requires the pair when it streams to a channel (#572). It is off because
-   *  turning it on changes how every reply renders for the whole team and that
-   *  deserves someone watching; the thinking indicator is served by
-   *  assistant.threads.setStatus either way. */
+  /** "on" enables chat.startStream, on every surface. Shipped off, and the
+   *  reason is `wrangler.toml`'s — not the one that used to stand here.
+   *  This comment read `invalid_arguments` "even with thread_ts +
+   *  recipient_user_id + recipient_team_id (r34–r37)"; the answer path was in
+   *  fact sending neither recipient id (#572), which the argument contract
+   *  above `startStream` in slack/api.ts says it needs. Which of the two
+   *  readings the r34–r37 observation was has not been re-checked — the stream
+   *  probe is what would. The thinking indicator is assistant.threads.setStatus
+   *  either way. */
   SLACK_STREAMING?: string;
   /** "on" opens the turn's stream UP FRONT in `task_display_mode: "plan"` and
    *  routes the between-tool narration into it as task cards, instead of

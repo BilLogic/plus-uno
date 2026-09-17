@@ -41,7 +41,15 @@ export interface SlackDeliveryTarget {
   replyTs?: string;
   /** The person's own message — what a reaction lands on. */
   userMsgTs: string;
-  /** Who asked, and their workspace: `chat.startStream` wants both. */
+  /** Who asked, and their workspace: `chat.startStream` wants both.
+   *
+   *  `team` is optional because two callers cannot supply it — `slack/gate.ts`
+   *  and `slack/interactive.ts` build a door from a reaction event and a button
+   *  payload, neither of which carries a team id here (the reaction's sits on
+   *  the envelope, outside the DO job payload). Harmless today: those doors
+   *  post through `postNote`, never `postAnswer`, so they never reach a stream
+   *  — and if one ever does, `canOpenStream` makes it a plain post rather than
+   *  the `invalid_arguments` of #572. */
   userId: string;
   team?: string;
   /** Forces the footer variant on the answer. Set by the `draft` shortcut,
@@ -161,13 +169,12 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
           channel,
           replyTs,
           text,
+          // The recipient pair. The plan stream above has always passed it;
+          // the answer path could not, because this was the only place holding
+          // the ids and it never handed them over (#572).
+          { userId: target.userId, team: target.team },
           target.footerHint,
           openStream ?? undefined,
-          // The pair `chat.startStream` requires when it streams to a channel.
-          // The plan stream above has always passed them; the answer did not,
-          // so every channel turn opened a stream Slack refused and fell back
-          // to an ordinary post (#572). This adapter is where the ids live.
-          { userId: target.userId, team: target.team },
         );
         return { ok: posted.ok, text: posted.text };
       } catch (err) {

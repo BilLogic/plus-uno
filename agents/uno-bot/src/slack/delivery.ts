@@ -4,6 +4,7 @@
 
 import type { Env } from "../types";
 import { addReaction, appendStream, postMessage, startStream, stopStream } from "./api";
+import { canOpenStream, type StreamRecipient } from "./stream-recipient";
 import { answerMessages, deliverAnswer } from "./answer-posts";
 import { footerKindFor, footerNoteFor, type FooterKind } from "./footer-kind";
 import { renderDeliveredBody, textSections } from "./render";
@@ -122,22 +123,16 @@ function footerBlocks(_env: Env, kind: FooterKind): Array<Record<string, unknown
   return note ? [{ type: "context", elements: [{ type: "mrkdwn", text: note }] }] : [];
 }
 
-/** Who a stream is being opened FOR: the asker and their workspace.
- *  `chat.startStream` requires `recipient_user_id` and `recipient_team_id`
- *  "when streaming to channels", and a DM accepts the pair happily, so this
- *  travels with every answer rather than being worked out per surface. The
- *  Slack Delivery adapter holds both ids already; `postTextVerified` never
- *  saw them, which is the whole of #572. */
-export interface StreamRecipient {
-  userId: string;
-  team?: string;
-}
-
 export async function postTextVerified(
   env: Env,
   channel: string,
   threadTs: string | undefined,
   text: string,
+  /** Who a stream would be for. REQUIRED, and positioned ahead of the optional
+   *  arguments to keep it that way: #572 was an optional positional argument
+   *  nobody passed, and an optional replacement leaves the same hole open for
+   *  the next caller. The type checker is the regression test. */
+  recipient: StreamRecipient,
   /** Forces the footer variant. Set by the relay, never sniffed from the text:
    *  the `draft` shortcut is the one caller that knows its answer goes out
    *  under the PERSON'S name, and the standard "check before acting" line is
@@ -146,9 +141,6 @@ export async function postTextVerified(
   /** ts of a stream already open for this turn (plan mode). When present the
    *  answer CLOSES that stream instead of opening a new one. */
   openStreamTs?: string,
-  /** Who the stream is for. Absent, the answer cannot open one — see the
-   *  `stream` callback below. */
-  recipient?: StreamRecipient,
 ): Promise<{ ok: boolean; text: string }> {
   const body = renderDeliveredBody(text);
   const footer = footerBlocks(env, footerKindFor(body, footerHint));
@@ -164,17 +156,16 @@ export async function postTextVerified(
     // loader. The status line is the indicator; the stream carries the answer.
     async stream(piece, withFooter) {
       if (!((openStreamTs || env.SLACK_STREAMING === "on") && threadTs)) return false;
-      // No recipient, no attempt. Slack refuses a channel stream that names no
-      // recipient with `invalid_arguments`, and a long answer is several
-      // messages, so the doomed call used to be paid for once per message out
-      // of the 50 subrequests a turn gets — for a fallback that was going to
-      // happen anyway. The ids are always to hand on a real turn; their absence
-      // means something upstream lost them, and guessing the surface is DM to
-      // try anyway is how this stayed invisible for six revisions.
-      if (!openStreamTs && !recipient?.userId) return false;
+      // Both recipient ids, or no call at all — the argument contract and why
+      // it is a pair are in `api.ts` above `startStream`, and the decision
+      // itself is `canOpenStream` (its own module, so it can be tested by
+      // running it). Until #572 the answer path passed neither id, so a
+      // channel turn bought an `invalid_arguments` and a console.warn on its
+      // way to the ordinary post it was going to make anyway.
+      if (!canOpenStream(openStreamTs, recipient)) return false;
       const streamTs =
         openStreamTs ??
-        (await startStream(env, channel, threadTs, recipient?.userId, recipient?.team));
+        (await startStream(env, channel, threadTs, recipient.userId, recipient.team));
       if (!streamTs) return false;
       try {
         // append (the text) then stop (the footer blocks — stopStream is the only

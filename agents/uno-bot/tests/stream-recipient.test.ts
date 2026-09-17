@@ -1,46 +1,78 @@
-// `chat.startStream` requires `recipient_user_id` and `recipient_team_id` when
-// it streams to a channel. The plan-mode call site passed both from the day it
-// was written; the answer path passed neither, so for six revisions every
-// channel turn opened a stream Slack refused, fell back to an ordinary post,
-// and said so only in a console.warn that read as Slack being fussy. A long
-// answer is several messages, so the same refused call was bought once per
-// message out of the 50 subrequests a turn gets (#572).
+// `chat.startStream` needs `recipient_user_id` and `recipient_team_id` when it
+// streams to a channel (the argument contract is stated once, above
+// `startStream` in src/slack/api.ts). The plan-mode call site passed both from
+// the day it was written; the answer path passed neither, so for six revisions
+// every channel turn opened a stream Slack refused, fell back to an ordinary
+// post, and said so only in a console.warn that read as Slack being fussy —
+// one wasted call per turn, invisible because the fallback works (#572).
 //
-// The regression is silent by construction — the fallback works — so what
-// catches it is this file. It reads SOURCE rather than calling the code:
-// `src/slack/delivery.ts` and `src/slack/slack-delivery.ts` both name `Env` and
-// the Slack client, which this suite's compile cannot reach (tsconfig.test.json
-// types only Node). Same move as the door check in `confirmation-paths.test.ts`.
+// The decision itself lives in `slack/stream-recipient.ts` so it can be tested
+// by RUNNING it. What is left to source assertions is only what the Node lane
+// cannot reach: `slack/delivery.ts` and `slack/slack-delivery.ts` both name
+// `Env` and the Slack client, and `startStream`'s recipient parameters are
+// optional, so a caller can drop them again with the type checker none the
+// wiser. Reading source for that is the same move as the door check in
+// `confirmation-paths.test.ts`.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-function source(file: string): string {
-  return readFileSync(resolve(process.cwd(), file), "utf8");
+import { canOpenStream } from "../src/slack/stream-recipient";
+
+/** A source file with its whitespace collapsed, so a reflow cannot fail a test
+ *  about arguments with a message about formatting. */
+function flatSource(file: string): string {
+  return readFileSync(resolve(process.cwd(), file), "utf8").replace(/\s+/g, " ");
 }
 
-describe("the answer path's stream", () => {
-  it("asks Slack for the recipient ids it requires", () => {
-    const src = source("src/slack/delivery.ts");
-    const call = src.slice(src.indexOf("await startStream("));
-    const args = call.slice(0, call.indexOf(")"));
-    assert.ok(args.includes("recipient?.userId"), "the asker reaches startStream");
-    assert.ok(args.includes("recipient?.team"), "and so does their workspace");
+const BOTH = { userId: "U1", team: "T1" };
+const OPEN_TS = "1700000000.000200";
+
+describe("opening a stream", () => {
+  it("needs both recipient ids", () => {
+    assert.equal(canOpenStream(undefined, BOTH), true);
   });
 
-  it("spends no subrequest on a stream it cannot open", () => {
-    const src = source("src/slack/delivery.ts");
-    const guard = "if (!openStreamTs && !recipient?.userId) return false;";
-    assert.ok(src.includes(guard), "no recipient, no call");
-    assert.ok(
-      src.indexOf(guard) < src.indexOf("await startStream("),
-      "the guard stands BEFORE the call, or it is not a guard",
-    );
+  it("is refused when either id is missing", () => {
+    assert.equal(canOpenStream(undefined, { userId: "U1" }), false, "no team");
+    assert.equal(canOpenStream(undefined, { userId: "", team: "T1" }), false, "no user");
+    assert.equal(canOpenStream(undefined, { userId: "", team: "" }), false, "neither");
+    // `userId` reaches this via `event.user!` in slack/turn-adapter.ts, so a
+    // wholly absent recipient is reachable at runtime whatever the type says.
+    assert.equal(canOpenStream(undefined, undefined), false, "no recipient at all");
+  });
+
+  it("reuses a stream already open, whatever the recipient looks like", () => {
+    // Plan mode opened it WITH the ids; the answer only closes it, and a
+    // handed-over stream left unclosed renders as work still in progress.
+    assert.equal(canOpenStream(OPEN_TS, BOTH), true);
+    assert.equal(canOpenStream(OPEN_TS, { userId: "" }), true);
+    assert.equal(canOpenStream(OPEN_TS, undefined), true);
+  });
+});
+
+describe("the answer path", () => {
+  it("asks Slack for the recipient ids it requires", () => {
+    const src = flatSource("src/slack/delivery.ts");
+    const call = src.slice(src.indexOf("await startStream("));
+    const args = call.slice(0, call.indexOf(")"));
+    assert.ok(args.includes("recipient.userId"), "the asker reaches startStream");
+    assert.ok(args.includes("recipient.team"), "and their workspace with them");
+  });
+
+  it("consults the guard before it calls Slack", () => {
+    // `canOpenStream` being correct is no use if the answer path stops asking
+    // it. Positions, not formatting: the question has to be put BEFORE the
+    // call, or it is not a guard.
+    const src = flatSource("src/slack/delivery.ts");
+    const guard = src.indexOf("canOpenStream(");
+    assert.ok(guard > 0, "the answer path asks whether it may open a stream");
+    assert.ok(guard < src.indexOf("await startStream("), "and asks first");
   });
 
   it("is handed the ids by the adapter that holds them", () => {
-    const src = source("src/slack/slack-delivery.ts");
+    const src = flatSource("src/slack/slack-delivery.ts");
     const call = src.slice(src.indexOf("await postTextVerified("));
     const args = call.slice(0, call.indexOf(");"));
     assert.ok(

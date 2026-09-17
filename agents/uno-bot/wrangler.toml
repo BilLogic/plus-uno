@@ -46,23 +46,24 @@ crons = ["*/15 13-23 * * 1-5"]
 # docs/conventions/). `bundle:harness` reads those at build time; the Worker
 # dispatches repository_dispatch events against GITHUB_REPO.
 [vars]
-# Streaming replies (chat.startStream). "on" to enable, on every surface.
-# The long-standing note here blamed Slack for rejecting our arguments since
-# r34. The arguments were ours: the answer path sent no recipient_user_id or
-# recipient_team_id, which chat.startStream requires when it streams to a
-# channel, so every channel turn bought an invalid_arguments and a silent
-# fallback to an ordinary post. Fixed in #572 — the retest is now a flip of
-# this var rather than a code change.
-# Off while the retest waits, and off in DMs too, where the missing arguments
-# were never the problem: one delivery path on both surfaces beats an
-# unreviewed difference between them. Flipping this on changes how every reply
-# renders for the whole team, so watch one long answer (several messages, each
-# opening its own stream) and one short one, in a channel and in a DM, and
-# check the footer survives — stopStream is the only frame that carries blocks.
-SLACK_STREAMING = "off"
-# ── Three features that are BUILT and OFF ────────────────────────────────────
+# ── Four features that are BUILT and OFF ─────────────────────────────────────
 # Each one is off for a different specific reason, and each has a check that
 # would let it default on. Full reasoning: docs/plans/2026-08-07-004.
+#
+# Streamed replies (chat.startStream), on every surface. The note here used to
+# say Slack had been rejecting our arguments since r34; the answer path was in
+# fact sending neither recipient id, which the argument contract above
+# `startStream` in src/slack/api.ts says the call needs (#572). So the flag is
+# no longer waiting on Slack — it is waiting on someone, because turning it on
+# changes how every reply renders for the whole team. What to watch on the
+# flip: a SHORT answer in a channel and in a DM (whether a DM needs the
+# recipient pair is not settled — the Worker sends it either way); the FOOTER,
+# which rides stopStream because that is the only frame carrying blocks; and a
+# LONG answer, where only the first message streams and the continuations are
+# ordinary posts — a streamed bubble followed by plain follow-ups is the part
+# most likely to read wrong, and it is the reason the retest needs eyes rather
+# than a green check.
+SLACK_STREAMING = "off"
 #
 # Plan-mode streaming: opens the turn's stream up front in
 # `task_display_mode: "plan"` and routes the between-tool narration into it as
