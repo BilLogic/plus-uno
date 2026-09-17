@@ -4,7 +4,7 @@
 // "here is the answer", "approve this?" — and this file decides how Slack
 // renders it. Three renderings live here and nowhere else now:
 //
-//   • the ONE acknowledgement rule: 👀 in a channel, the status line on the
+//   • the ONE acknowledgement rule: 👀 in a channel, the working signal on the
 //     assistant surface, never both;
 //   • the plan stream. With `SLACK_STREAM_PLAN=on` a substantive turn opens a
 //     stream in `task_display_mode: "plan"` and each narration line lands as a
@@ -51,7 +51,15 @@ export interface SlackDeliveryTarget {
   replyTs?: string;
   /** The person's own message — what a reaction lands on. */
   userMsgTs: string;
-  /** Who asked, and their workspace: `chat.startStream` wants both. */
+  /** Who asked, and their workspace: `chat.startStream` wants both.
+   *
+   *  `team` is optional because two callers cannot supply it — `slack/gate.ts`
+   *  and `slack/interactive.ts` build a door from a reaction event and a button
+   *  payload, neither of which carries a team id here (the reaction's sits on
+   *  the envelope, outside the DO job payload). Harmless today: those doors
+   *  post through `postNote`, never `postAnswer`, so they never reach a stream
+   *  — and if one ever does, `decideStream` makes it a plain post rather than
+   *  the `invalid_arguments` of #572. */
   userId: string;
   team?: string;
   /** Forces the footer variant on the answer. Set by the `draft` shortcut,
@@ -144,8 +152,11 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
 
     async setWorking({ status, titleFrom }) {
       // Moving the session to `processing` IS the working signal — the
-      // documented one — and it also opens the thread. A thread is all it
-      // needs: the DM-only condition that used to stand here decided for Slack
+      // documented one — and it is also what opens the SESSION: the reference
+      // gives `title` and `initiator_user_id` as the arguments used "when
+      // creating new sessions", which is a session coming into being, not a
+      // thread root being posted. A thread is all it needs: the DM-only
+      // condition that used to stand here decided for Slack
       // which surfaces can show a status, and the cost of guessing wrong was a
       // channel thread with an indicator nobody could take down. Ask, and let
       // the API decline where it wants to — a rejection here is a signal that
@@ -228,6 +239,10 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
           channel,
           replyTs,
           text,
+          // The recipient pair. The plan stream above has always passed it;
+          // the answer path could not, because this was the only place holding
+          // the ids and it never handed them over (#572).
+          { userId: target.userId, team: target.team },
           target.footerHint,
           openStream ?? undefined,
         );

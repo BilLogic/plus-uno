@@ -4,6 +4,7 @@
 
 import type { Env } from "../types";
 import { addReaction, appendStream, postMessage, startStream, stopStream } from "./api";
+import { decideStream, type StreamRecipient } from "./stream-recipient";
 import { answerMessages, deliverAnswer } from "./answer-posts";
 import { footerKindFor, footerNoteFor, type FooterKind } from "./footer-kind";
 import { renderDeliveredBody, textSections } from "./render";
@@ -127,6 +128,11 @@ export async function postTextVerified(
   channel: string,
   threadTs: string | undefined,
   text: string,
+  /** Who a stream would be for. REQUIRED, and positioned ahead of the optional
+   *  arguments to keep it that way: #572 was an optional positional argument
+   *  nobody passed, and an optional replacement leaves the same hole open for
+   *  the next caller. The type checker is the regression test. */
+  recipient: StreamRecipient,
   /** Forces the footer variant. Set by the relay, never sniffed from the text:
    *  the `draft` shortcut is the one caller that knows its answer goes out
    *  under the PERSON'S name, and the standard "check before acting" line is
@@ -145,12 +151,41 @@ export async function postTextVerified(
   // person read rather than its first message.
   const ok = await deliverAnswer(answerMessages(body), {
     // Streamed delivery, opened HERE rather than at turn start. Opening it
-    // early (to double as the thinking indicator) left an empty "AGENT" bubble
+    // early (to double as the working signal) left an empty "AGENT" bubble
     // sitting in the thread for the whole run — a blank message impersonating a
-    // loader. The status line is the indicator; the stream carries the answer.
+    // loader. The working signal says work is happening; the stream carries
+    // the answer.
     async stream(piece, withFooter) {
       if (!((openStreamTs || env.SLACK_STREAMING === "on") && threadTs)) return false;
-      const streamTs = openStreamTs ?? (await startStream(env, channel, threadTs));
+      // Both recipient ids, or no call at all — the argument contract and why
+      // it is a pair are in `api.ts` above `startStream`, and the decision
+      // itself is `decideStream` (its own module, so it can be tested by
+      // running it). Until #572 the answer path passed neither id, so a
+      // channel turn bought an `invalid_arguments` and a console.warn on its
+      // way to the ordinary post it was going to make anyway.
+      const decision = decideStream(openStreamTs, recipient);
+      if (!decision.open) {
+        // A HALF recipient is a turn that quietly lost streaming, and this
+        // ticket is the argument for the line: what made #572 survive six
+        // revisions was a fallback whose only symptom was a warning nobody
+        // read, and a fallback with NO symptom is worse than that. So the one
+        // case that should never happen says which half went missing, and says
+        // it where the other Slack degradations are already logged. A path
+        // with no recipient at all was never going to stream and stays quiet.
+        if (decision.missing !== "recipient") {
+          const user = recipient?.userId || "MISSING";
+          const team = recipient?.team || "MISSING";
+          console.warn(
+            `[slack] stream skipped: recipient missing ${decision.missing}` +
+              ` | sent={recipient_user_id:${user},recipient_team_id:${team}}` +
+              " — the answer posts as an ordinary message",
+          );
+        }
+        return false;
+      }
+      const streamTs =
+        openStreamTs ??
+        (await startStream(env, channel, threadTs, recipient.userId, recipient.team));
       if (!streamTs) return false;
       try {
         // append (the text) then stop (the footer blocks — stopStream is the only

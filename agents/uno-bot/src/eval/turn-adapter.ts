@@ -13,7 +13,7 @@
 // nothing else does:
 //
 //   * DELIVERY RECORDS instead of posting (`recordingDelivery`). An eval turn
-//     must not put a 👀, a thinking line, a narration or a proposal card into a
+//     must not put a 👀, a working signal, a narration or a proposal card into a
 //     real Slack conversation — and the recording adapter answers the way the
 //     Slack one answers (a post reports what it posted, a staged card reports a
 //     ts), so the turn takes the same paths.

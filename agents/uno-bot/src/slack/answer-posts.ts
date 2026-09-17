@@ -157,7 +157,7 @@ export interface AnswerTransport {
  * Only the first is streamed because a stream IS one message — `appendStream`
  * appends into the message `startStream` opened and `stopStream` closes it for
  * good. A stream per piece would mean a fresh "AGENT" bubble and its own
- * thinking indicator for each continuation, which reads as the bot starting
+ * working signal for each continuation, which reads as the bot starting
  * over rather than carrying on.
  *
  * The footer rides the LAST piece only: a feedback note under every

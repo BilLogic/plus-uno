@@ -50,8 +50,8 @@ export interface Delivery {
   removeReaction(emoji: string): Promise<void>;
 
   /**
-   * The working signals a surface with an indicator gets: a status line, and a
-   * title for a thread this turn opened.
+   * The two things a surface with a working signal gets: the signal itself,
+   * and a title for a thread this turn opened.
    *
    * One call rather than two because they are one gesture — "this is being
    * worked on, and here is what it is about" — and a surface with neither (a

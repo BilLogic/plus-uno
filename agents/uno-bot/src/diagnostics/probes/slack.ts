@@ -16,8 +16,14 @@ export const slackSearchProbe: ProbeRun = async (env, url) => ({
   body: await probeSlackSearch(env, url.searchParams.get("q") ?? "design"),
 });
 
-// Live probe of chat.startStream, which has rejected every argument shape we
-// have tried with `invalid_arguments` and names no field (r34–r40).
+// Live probe of chat.startStream, which answered `invalid_arguments` and named
+// no field through r34–r40. Two candidate explanations, neither retired: the
+// answer path sent no recipient ids at all until #572 (that much is a plain
+// code reading, and the argument contract above `startStream` in slack/api.ts
+// says the call needs them), and the DO script-version staleness described
+// below made some "streaming still fails" readings stale code. This probe is
+// how either gets settled instead of argued — it omits each argument
+// independently, and it answers from the Worker.
 //
 // A route, not a log line: the agent path runs inside a Durable Object, and a
 // DO keeps the script version it was instantiated with until evicted — so

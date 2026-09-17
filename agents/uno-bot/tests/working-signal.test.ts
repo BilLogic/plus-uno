@@ -75,21 +75,31 @@ describe("the agent-session status the signal moves through", () => {
     assert.equal(settledStatus(), "active");
   });
 
-  it("settles through one function, so #575 has one body to change", () => {
-    // Not a literal at the exits. #575 maps the settle from the turn's
-    // disposition — a turn that ends holding a ✅ is `suspended`, not `active`
-    // — and the seam only saves that ticket anything if every exit already
-    // asks the same question. Today the answer does not vary, and pinning that
-    // is what makes a later variation a visible change.
-    assert.equal(settledStatus(), settledStatus());
-  });
-
   it("names all four lifecycle statuses, including the two it does not send", () => {
-    // `suspended` and `closed` are Slack's vocabulary whether this app uses
-    // them or not, and a type that omitted them would make #575 widen the type
-    // before it could write the mapping.
-    const all: SessionStatus[] = ["active", "processing", "suspended", "closed"];
-    assert.equal(all.length, 4);
+    // `suspended` and `closed` are Slack's vocabulary whether this app sends
+    // them or not, and a type missing them would make #575 widen it before it
+    // could write the mapping at all.
+    //
+    // The guard is the COMPILE, not the assertion: `meaningOf` is exhaustive
+    // over `SessionStatus`, so a fifth member added to the union leaves this
+    // switch without a return on that arm and `tsc` fails the build. A runtime
+    // check over a hand-written array would keep passing.
+    const meaningOf = (status: SessionStatus): string => {
+      switch (status) {
+        case "active":
+          return "open and idle — the settle this ticket ships";
+        case "processing":
+          return "work in flight — the raise this ticket ships";
+        case "suspended":
+          return "awaiting user input — #575's";
+        case "closed":
+          return "the conversation is over — sent by nothing here";
+      }
+    };
+    assert.match(meaningOf(WORKING_STATUS), /work in flight/);
+    assert.match(meaningOf(settledStatus()), /open and idle/);
+    assert.match(meaningOf("suspended"), /awaiting user input/);
+    assert.match(meaningOf("closed"), /conversation is over/);
   });
 });
 
@@ -174,15 +184,21 @@ describe("the Slack adapter routes both halves through the report", () => {
     );
   });
 
-  it("raises and settles through the named statuses, not string literals", () => {
+  it("raises and settles through the named statuses rather than writing them here", () => {
     // The settle is the ONLY thing that clears the indicator now — the guide:
     // "the loading UX no longer disappears automatically when your app posts a
-    // message to the thread" — so a literal "active" written at the exit is a
-    // settle #575 would have to find again. Both halves go through the pure
-    // module (#574).
+    // message to the thread" — so a literal `"active"` written at the exit is a
+    // settle #575 would have to go and find again. Both halves read the pure
+    // module instead (#574).
+    //
+    // These two positive matches are the whole guard, deliberately. A negative
+    // one — grepping this file for the literals — was written and dropped: it
+    // sees only this file and only the double-quoted spelling, so it would
+    // miss a literal in `assistant.ts` or in either Gate door while failing on
+    // a doc comment that merely quotes a status name. An assertion that strict
+    // in the wrong places and absent in the right ones is worse than none.
     assert.match(src, /setSessionStatus\(env, channel, replyTs, WORKING_STATUS\)/);
     assert.match(src, /setSessionStatus\(env, channel, replyTs, settledStatus\(\)\)/);
-    assert.ok(!/"processing"|"active"/.test(src), "no lifecycle status is hard-coded here");
   });
 
   it("reads the subrequest meter and tells a budget stop apart", () => {

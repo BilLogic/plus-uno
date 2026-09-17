@@ -8,7 +8,7 @@
 // `slack/events.ts`, reachable only by a real Slack event, and so none of it
 // was tested.
 //
-// THE TWO SEAMS. Mid-turn effects — the 👀, the thinking indicator, the
+// THE TWO SEAMS. Mid-turn effects — the 👀, the working signal, the
 // narration, the proposal card — go out through the `Delivery` port
 // (`delivery.ts`), which has a Slack adapter and a recording one. Everything
 // else the turn needs arrives as a NAMED dependency (`TurnDeps`): the thread
@@ -374,7 +374,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     // ── Acknowledge ────────────────────────────────────────────────────────────
   //
   // ONE reaction, and only where nothing else says "I'm on it". The assistant
-  // surface has a status line, a titled thread and a streamed reply — three
+  // surface has a working signal, a titled thread and a streamed reply — three
   // signals; adding 👀 ⏳ ✅ on top made four, on a message the person can
   // already see is being handled. A channel has none of those.
   if (request.surface !== "assistant") await delivery.react("eyes");

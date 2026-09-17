@@ -138,12 +138,15 @@ export interface Env {
   GEMINI_GRIND_MODEL?: string;
 
   HARNESS_KV?: KVNamespace;
-  /** "on" enables chat.startStream for the agent surface. OFF by default:
-   *  Slack returns invalid_arguments for this app even with thread_ts +
-   *  recipient_user_id + recipient_team_id (r34–r37, 2026-08-06), and each
-   *  attempt burns one of the 50 subrequests an invocation gets. The thinking
-   *  indicator is served by agents.sessions.setStatus instead. Flip to "on"
-   *  to retest once the argument shape is known. */
+  /** "on" enables chat.startStream, on every surface. Shipped off, and the
+   *  reason is `wrangler.toml`'s — not the one that used to stand here.
+   *  This comment read `invalid_arguments` "even with thread_ts +
+   *  recipient_user_id + recipient_team_id (r34–r37)"; the answer path was in
+   *  fact sending neither recipient id (#572), which the argument contract
+   *  above `startStream` in slack/api.ts says it needs. Which of the two
+   *  readings the r34–r37 observation was has not been re-checked — the stream
+   *  probe is what would. The working signal is agents.sessions.setStatus
+   *  either way (#574). */
   SLACK_STREAMING?: string;
   /** "on" opens the turn's stream UP FRONT in `task_display_mode: "plan"` and
    *  routes the between-tool narration into it as task cards, instead of

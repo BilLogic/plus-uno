@@ -115,8 +115,11 @@ async function setSuggestedPrompts(
  * channel thread showed as "le goat is working…" beneath a delivered answer.
  * The mapping is the guide's own: a non-empty status becomes `processing`, the
  * empty one becomes `active`, and `assistant.threads.setTitle` becomes
- * `agents.sessions.rename` (#574). The assistant experience is dated for
- * deprecation in February 2027, so this is the supported path, not a patch.
+ * `agents.sessions.rename` (#574). The migration guide says only that the old
+ * methods are deprecated "eventually"; the DATE is the changelog's, 2026-08-20,
+ * "The next wave of Agent messaging experience": "The Assistant messaging
+ * experience (`assistant_view`) will be deprecated in February 2027." So this
+ * is the supported path, not a patch.
  *
  * WHAT IT NO LONGER TAKES. The status text itself. `status` is a lifecycle
  * value out of a closed set, not a sentence — nothing this app writes reaches
