@@ -26,8 +26,9 @@
 //    search may only activate in the requester's own DM (ADR-020), which is
 //    exactly where these answers land.
 //
-// 2. A TITLED ANCHOR is posted first. assistant.threads.setStatus needs a
-//    thread_ts and a fresh DM has none, so a shortcut click would otherwise
+// 2. A TITLED ANCHOR is posted first. agents.sessions.setStatus needs a
+//    thread_ts for a thread-based session and a fresh DM has none, so a
+//    shortcut click would otherwise
 //    leave the DM empty for 30-90s — indistinguishable from nothing happening.
 //    The anchor gives immediate confirmation that the right message was picked,
 //    creates the thread the answer lands in, and names it in the timeline.
@@ -40,7 +41,7 @@
 
 import type { Env } from "../types";
 import { conversationsOpen, getPermalink, postMessage } from "./api";
-import { setAssistantTitle } from "./assistant";
+import { renameSession } from "./assistant";
 import { enqueueAgentJob } from "./events";
 import type { SlackMessageEvent } from "./types";
 import { SHORTCUTS } from "./shortcut-specs";
@@ -82,8 +83,8 @@ export async function runMessageShortcut(
     const rootTs = posted?.ts;
     if (!rootTs) throw new Error("anchor post returned no ts — cannot thread the run");
 
-    await setAssistantTitle(env, dm, rootTs, spec.title).catch(() => {
-      /* a nameless thread still works */
+    await renameSession(env, dm, rootTs, spec.title).catch(() => {
+      /* a nameless session still works */
     });
 
     // Synthetic message event, same shape the slash-command path builds, so

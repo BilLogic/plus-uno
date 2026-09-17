@@ -21,7 +21,10 @@ import { resolve } from "node:path";
 import { SUBREQUEST_CAP } from "../src/agent/loop-policy";
 import {
   outcomeOf,
+  settledStatus,
   workingSignalLine,
+  WORKING_STATUS,
+  type SessionStatus,
   type WorkingSignalOutcome,
 } from "../src/slack/working-signal";
 
@@ -48,7 +51,7 @@ describe("what came back, classified", () => {
   });
 
   it("keeps the threadless sentinel out of Slack's vocabulary", () => {
-    // `setStatus` returns this when there is no thread to decorate; nothing was
+    // `setSessionStatus` returns this when there is no thread to decorate; nothing was
     // ever sent, so nothing declined it.
     assert.deepEqual(outcomeOf({ ok: false, error: "no_thread" }), { kind: "no-thread" });
   });
@@ -57,6 +60,36 @@ describe("what came back, classified", () => {
     // An empty `error=` in the log is the same dead end as no log at all.
     assert.deepEqual(outcomeOf({ ok: false }), { kind: "declined", error: "unknown" });
     assert.deepEqual(outcomeOf({ ok: false, error: "" }), { kind: "declined", error: "unknown" });
+  });
+});
+
+describe("the agent-session status the signal moves through", () => {
+  it("raises with the one status that means work is in flight", () => {
+    // The migration guide's mapping: a non-empty `assistant.threads.setStatus`
+    // becomes `agents.sessions.setStatus` with `status: "processing"`.
+    assert.equal(WORKING_STATUS, "processing");
+  });
+
+  it("settles to active, which is open-and-idle rather than off", () => {
+    // The other half of the same row: the empty-string clear becomes "active".
+    assert.equal(settledStatus(), "active");
+  });
+
+  it("settles through one function, so #575 has one body to change", () => {
+    // Not a literal at the exits. #575 maps the settle from the turn's
+    // disposition — a turn that ends holding a ✅ is `suspended`, not `active`
+    // — and the seam only saves that ticket anything if every exit already
+    // asks the same question. Today the answer does not vary, and pinning that
+    // is what makes a later variation a visible change.
+    assert.equal(settledStatus(), settledStatus());
+  });
+
+  it("names all four lifecycle statuses, including the two it does not send", () => {
+    // `suspended` and `closed` are Slack's vocabulary whether this app uses
+    // them or not, and a type that omitted them would make #575 widen the type
+    // before it could write the mapping.
+    const all: SessionStatus[] = ["active", "processing", "suspended", "closed"];
+    assert.equal(all.length, 4);
   });
 });
 
@@ -132,10 +165,24 @@ describe("the Slack adapter routes both halves through the report", () => {
   const src = readFileSync(resolve(process.cwd(), "src/slack/slack-delivery.ts"), "utf8");
 
   it("reports the set and the clear instead of swallowing them", () => {
-    assert.match(src, /reportStatus\("set", \(\) => setStatus\(/);
-    assert.match(src, /reportStatus\("clear", \(\) => setStatus\(/);
+    assert.match(src, /reportStatus\("set", \(\) => setSessionStatus\(/);
+    assert.match(src, /reportStatus\("clear", \(\) => setSessionStatus\(/);
     // The swallow that made the signal undiagnosable in the first place.
-    assert.ok(!/setStatus\([^)]*\)\.catch\(/.test(src), "no status call is silently swallowed");
+    assert.ok(
+      !/setSessionStatus\([^)]*\)\.catch\(/.test(src),
+      "no status call is silently swallowed",
+    );
+  });
+
+  it("raises and settles through the named statuses, not string literals", () => {
+    // The settle is the ONLY thing that clears the indicator now — the guide:
+    // "the loading UX no longer disappears automatically when your app posts a
+    // message to the thread" — so a literal "active" written at the exit is a
+    // settle #575 would have to find again. Both halves go through the pure
+    // module (#574).
+    assert.match(src, /setSessionStatus\(env, channel, replyTs, WORKING_STATUS\)/);
+    assert.match(src, /setSessionStatus\(env, channel, replyTs, settledStatus\(\)\)/);
+    assert.ok(!/"processing"|"active"/.test(src), "no lifecycle status is hard-coded here");
   });
 
   it("reads the subrequest meter and tells a budget stop apart", () => {
@@ -145,5 +192,43 @@ describe("the Slack adapter routes both halves through the report", () => {
     // fires it must not render a JS exception message as a Slack refusal.
     const caught = src.slice(src.indexOf("isSubrequestBudgetError(err)"));
     assert.ok(!/kind: "declined"/.test(caught), "a throw is never reported as a Slack decline");
+  });
+});
+
+// `assistant.ts` names `Env` too, so this is the same genre of check: read the
+// module and assert on what it sends. The acceptance criterion is a negative
+// one — "no bridged assistant status or title calls remain" — and a negative is
+// exactly what a behavioural test cannot see, because a bridged call still
+// works today. It works until February 2027, and it no longer clears the
+// indicator when the answer posts, which is the defect (#574).
+describe("the methods the working signal sends", () => {
+  const src = readFileSync(resolve(process.cwd(), "src/slack/assistant.ts"), "utf8");
+
+  it("moves the session's status and renames the session", () => {
+    assert.match(src, /slackCall\(env, "agents\.sessions\.setStatus"/);
+    assert.match(src, /slackCall\(env, "agents\.sessions\.rename"/);
+  });
+
+  it("sends no bridged status or title call", () => {
+    assert.ok(!src.includes('"assistant.threads.setStatus"'), "setStatus is gone");
+    assert.ok(!src.includes('"assistant.threads.setTitle"'), "setTitle is gone");
+  });
+
+  it("leaves suggested prompts alone — Slack has published no replacement", () => {
+    assert.match(src, /slackCall\(env, "assistant\.threads\.setSuggestedPrompts"/);
+  });
+
+  it("keeps the thread guard the session methods still need", () => {
+    // `thread_ts` is required for thread-based sessions in regular channels and
+    // DMs, which is every surface this bot has.
+    assert.match(src, /if \(!thread_ts\) return \{ ok: false, error: "no_thread" \}/);
+    assert.match(src, /thread_ts,/);
+  });
+
+  it("sends no argument the session method does not define", () => {
+    // `loading_messages` was `assistant.threads.setStatus`'s. `agents.sessions.
+    // setStatus` documents status, channel_id, thread_ts, title,
+    // initiator_user_id and the customize trio — and nothing else.
+    assert.ok(!/loading_messages:/.test(src), "loading_messages is not a session argument");
   });
 });

@@ -145,8 +145,9 @@ export async function postMessage(env: Env, input: PostMessageInput) {
 // ── Streaming (chat.startStream / appendStream / stopStream) ─────────────────
 //
 // Opening a stream is what renders the native "thinking" state on the agent
-// surface. assistant.threads.setStatus cannot do it here: that addresses a
-// THREAD, and an agent_view DM has none — the channel is the conversation.
+// surface. agents.sessions.setStatus cannot do it here: a thread-based session
+// is addressed by thread_ts, and an agent_view DM has none — the channel is the
+// conversation.
 //
 // The agent runs to completion inside a DO alarm before any text exists, so we
 // do NOT stream tokens. We open the stream when the turn starts (the indicator),

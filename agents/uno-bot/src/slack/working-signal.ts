@@ -55,10 +55,47 @@ export type WorkingSignalOutcome =
    *  Slack failure — the fix is a cheaper turn, not a Slack scope. */
   | { kind: "budget-stop" }
   /** There was no thread to decorate, so nothing was sent. Also not Slack's
-   *  word; see `setStatus`, whose guard this comes from. */
+   *  word; see `setSessionStatus`, whose guard this comes from. */
   | { kind: "no-thread" };
 
-/** What `assistant.threads.setStatus` answered, as its callers need it: Slack's
+/**
+ * Slack's agent-session lifecycle, whole.
+ *
+ * All four are named even though this bot sends two, because the two it sends
+ * only make sense against the two it doesn't: `active` is not "off", it is
+ * "the session is open and idle", and reading it as a clear is how a settle
+ * gets written as a literal in three places and then diverges.
+ *
+ * Why sessions at all: the `assistant.threads.*` methods now run over a
+ * compatibility bridge, and Slack's migration guide is explicit that "Unlike
+ * `assistant.threads.setStatus`, the loading UX no longer disappears
+ * automatically when your app posts a message to the thread." Posting the
+ * answer used to take the indicator down for free. It does not any more — the
+ * explicit settle is the only thing that clears it, and a session left in
+ * `processing` stays that way for the hour Slack takes to time it out (#574).
+ */
+export type SessionStatus = "active" | "processing" | "suspended" | "closed";
+
+/** Raising the working signal is one status, and there is no second candidate:
+ *  `processing` is the only one that renders as work in flight. */
+export const WORKING_STATUS: SessionStatus = "processing";
+
+/**
+ * The status a finished turn settles to.
+ *
+ * A function rather than a literal at each exit because settling is NOT one
+ * status: a turn that ends holding a question — a staged proposal waiting on a
+ * ✅ — is `suspended` (awaiting user input), not `active` (open and idle), and
+ * #575 adds that mapping from the turn's disposition. It maps here, in the one
+ * pure place both doors and the turn already route through, so that ticket
+ * changes one body and not three call sites. Today every exit is the same
+ * answer, and saying so plainly is cheaper than pretending otherwise.
+ */
+export function settledStatus(): SessionStatus {
+  return "active";
+}
+
+/** What `agents.sessions.setStatus` answered, as its callers need it: Slack's
  *  own `ok`, and the code behind anything else. */
 export interface StatusResult {
   ok: boolean;
@@ -82,7 +119,7 @@ function neverReachedSlack(error: string): boolean {
  * Slack's answer as an outcome — the classification, kept here rather than in
  * the adapter so it can be tested without a Worker.
  *
- * @param result - What `setStatus` reported
+ * @param result - What `setSessionStatus` reported
  */
 export function outcomeOf(result: StatusResult): WorkingSignalOutcome {
   if (result.ok) return { kind: "ok" };

@@ -142,7 +142,7 @@ export interface Env {
    *  Slack returns invalid_arguments for this app even with thread_ts +
    *  recipient_user_id + recipient_team_id (r34–r37, 2026-08-06), and each
    *  attempt burns one of the 50 subrequests an invocation gets. The thinking
-   *  indicator is served by assistant.threads.setStatus instead. Flip to "on"
+   *  indicator is served by agents.sessions.setStatus instead. Flip to "on"
    *  to retest once the argument shape is known. */
   SLACK_STREAMING?: string;
   /** "on" opens the turn's stream UP FRONT in `task_display_mode: "plan"` and
