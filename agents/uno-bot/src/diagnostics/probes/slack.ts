@@ -16,8 +16,10 @@ export const slackSearchProbe: ProbeRun = async (env, url) => ({
   body: await probeSlackSearch(env, url.searchParams.get("q") ?? "design"),
 });
 
-// Live probe of chat.startStream, which has rejected every argument shape we
-// have tried with `invalid_arguments` and names no field (r34–r40).
+// Live probe of chat.startStream, which answered `invalid_arguments` and named
+// no field through r34–r40 — because the answer path sent no recipient ids at
+// all, and the API requires them when it streams to a channel (#572). The
+// probe is how the next argument question gets bisected instead of guessed.
 //
 // A route, not a log line: the agent path runs inside a Durable Object, and a
 // DO keeps the script version it was instantiated with until evicted — so

@@ -163,6 +163,11 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
           text,
           target.footerHint,
           openStream ?? undefined,
+          // The pair `chat.startStream` requires when it streams to a channel.
+          // The plan stream above has always passed them; the answer did not,
+          // so every channel turn opened a stream Slack refused and fell back
+          // to an ordinary post (#572). This adapter is where the ids live.
+          { userId: target.userId, team: target.team },
         );
         return { ok: posted.ok, text: posted.text };
       } catch (err) {
