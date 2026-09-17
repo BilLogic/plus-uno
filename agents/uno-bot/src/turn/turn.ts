@@ -833,10 +833,20 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     );
   }
 
-  // A different proposal is already pending: supersede it. Only the record's
-  // removal is wanted here — the claim boolean belongs to the resolver, which
-  // is the path that must not double-execute.
-  if (request.pending) await threadState.claimProposal(request.pending.proposalTs);
+  // A different proposal is already pending: retire it, because the card about
+  // to go up replaces it. RETIRE, never claim (#583): a claim DELETES, and the
+  // record deleted here is the one a late ✅ needs in order to be told its card
+  // was replaced. With the delete in place the by-ts lookup answered "none",
+  // Gate fell through to the thread's newest card, and the person got "it is
+  // not on the proposal I am holding" — true of a reaction that missed, and the
+  // wrong thing to say to someone whose card was revised out from under them.
+  // Observed live in `#uno-bot-sandbox` against r332.
+  //
+  // Here rather than after the card posts, even though `putProposal` retires
+  // the thread's pending card too: this closes the seconds the revision spends
+  // being written, during which the old card would otherwise still execute the
+  // input the person just pushed back on.
+  if (request.pending) await threadState.retireProposal(request.pending.proposalTs);
 
   const { card, planFollowUp } = await buildCard(
     result,
