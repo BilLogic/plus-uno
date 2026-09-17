@@ -47,10 +47,11 @@ export const npmScripts = (dir) =>
  * it fail without writing a package.json.
  *
  * It matches on the `check:` prefix, so a guard that does not carry the prefix
- * is invisible to it; `agents/uno-bot`'s `typecheck` and `test` are therefore
- * registered BY NAME. The prefix is not widened, because that package's `dev`,
- * `tail` and `deploy` are commands rather than guards and a rule that demanded
- * a decision on each would be noise.
+ * is invisible to it; `agents/uno-bot`'s `typecheck`, `test` and `test:workerd`
+ * are therefore registered BY NAME — the first two composed, the third
+ * EXCLUDED with its reason (#587). The prefix stays as it is, because that
+ * package's `dev`, `tail` and `deploy` are commands rather than guards and a
+ * rule that demanded a decision on each would be noise.
  *
  * @param {{label: string, scripts: string[]}[]} manifests
  * @param {Set<string>} [declared]

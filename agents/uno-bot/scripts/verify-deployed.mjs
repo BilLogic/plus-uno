@@ -43,7 +43,8 @@ export function diagnose(serving) {
     return (
       "`unstamped` means no --define reached the bundle, so scripts/deploy.mjs did " +
       "NOT run — and nothing ran typecheck, check:fetch, check:contract, check:secrets, " +
-      "test:bundle, the unit suite or bundle:harness either. Production is ungated. " +
+      "test:bundle, the unit suite, the conformance suite or bundle:harness either. " +
+      "Production is ungated. " +
       "See #278."
     );
   }

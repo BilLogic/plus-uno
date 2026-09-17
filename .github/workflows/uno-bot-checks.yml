@@ -1,7 +1,8 @@
 name: uno-bot — Worker checks
 
-# The Worker's own typecheck and its own unit suite, each as a PULL-REQUEST
-# CHECK WITH ITS OWN NAME (#580).
+# The Worker's own typecheck, its own unit suite and its Durable Object
+# conformance suite, each as a PULL-REQUEST CHECK WITH ITS OWN NAME (#580,
+# #587).
 #
 # WHAT THIS DOES AND DOES NOT ADD. Both commands already ran on every pull
 # request before this file existed: `typecheck` and `test` are rows of
@@ -10,8 +11,9 @@ name: uno-bot — Worker checks
 # composite. What was missing is the part a reviewer reads. The whole composite
 # lands on one GitHub check named `check:harness / harness`, so a type error and
 # a failing test are the same red line in the PR's check list, and telling them
-# apart means opening a 40-second log. Two named jobs answer the question from
-# the list: "uno-bot — Worker checks / typecheck" and "… / tests".
+# apart means opening a 40-second log. Three named jobs answer the question from
+# the list: "uno-bot — Worker checks / typecheck", "… / tests" and
+# "… / conformance".
 #
 # THE REGISTRY ROWS STAY COMPOSED, so the two commands run twice on a PR: once
 # inside the composite, once here. That is deliberate and it is the cheaper of
@@ -27,9 +29,44 @@ name: uno-bot — Worker checks
 # NO SECRET, BY CONSTRUCTION, which is what lets a fork PR run it. `tsc` reads
 # the checkout. The suite is `node --test` over compiled TypeScript: pure
 # functions, mocked `fetch`, and a few files read off disk — no Worker, no
-# Cloudflare token, no model call and no spend. The one Worker suite that needs
-# a runtime (tests/workerd/, under workerd via vitest) stays a step of
-# `check-harness.yml`, where its ~2s of miniflare startup is already paid for.
+# Cloudflare token, no model call and no spend. The conformance job is the same:
+# workerd runs LOCALLY on the runner, from the `wrangler` already in
+# devDependencies, against a Durable Object namespace miniflare creates in a
+# temporary directory. Nothing it touches is an account resource, so a fork PR
+# runs all three.
+#
+# WHERE THE CONFORMANCE SUITE BELONGS, AND WHY IT IS HERE RATHER THAN A ROW OF
+# THE FAST GATE. It was a hand-written step of `check-harness.yml` from #493
+# until #587, which made it gated but illegible: 48 sub-checks plus that step
+# land on one GitHub check, so "the Durable Object broke" and "a doc link broke"
+# were the same red line. The two candidates #587 weighed, both measured:
+#
+#   - COMPOSE IT INTO `check:harness`. Rejected on the number that gate is
+#     defended by. `npm run check:harness` is the command this repo asks for
+#     before a push, and 4.5s cold / 3.1s warm on a 14s composite is a third
+#     again on the thing everyone waits for — and it is startup, not assertions:
+#     vitest reports 1.7s for the run, 1.05s of it the import. It would also put
+#     a RUNTIME inside a gate whose stated rule is that every member runs on a
+#     clean checkout in seconds, and it would leave the red exactly as illegible
+#     as the step it replaced.
+#
+#   - ITS OWN NAMED JOB, HERE. Chosen, and NOT for the seconds. The suite's 4s
+#     (measured as a step of the harness job, run 35277835410) comes off a 40s
+#     job that measures 34s and 38s without it (runs 35279458463 and
+#     35280023516) — a saving inside the runner's own spread. What the move
+#     actually buys is a CHECK-LIST LINE that says which thing broke, at no cost
+#     to a PR's wall clock, because this job runs CONCURRENTLY with the harness
+#     job and finishes first: 16–26s, of which ~13s is the install and 5s the
+#     suite (same runs, all 2026-09-17). This is the same trade `check:storybook` records making
+#     for the browser suite, two orders of magnitude cheaper.
+#
+# UNLIKE `typecheck` AND `test`, THIS ROW IS NOT COMPOSED — so the suite runs
+# ONCE on a pull request, here. The duplicate-work argument above turns on
+# `check:harness` being the pre-push command and therefore needing to be a
+# superset; `test:workerd` was outside that composite before this change and
+# stays outside it, so there is no subset to protect. Its registry row
+# (scripts/checks.registry.mjs § EXCLUDED) carries that reasoning and the
+# measured numbers.
 #
 # NOT PATHS-FILTERED, on the same reasoning as `check-harness.yml` and
 # `uno-bot-deploy.yml`: `tests/harness-blueprint-names.test.ts` reads the
@@ -38,9 +75,11 @@ name: uno-bot — Worker checks
 # suite red — and a filter narrow enough to save an install is a filter that
 # misses that.
 #
-# WHY TWO JOBS RATHER THAN TWO STEPS OF ONE. A GitHub check is a JOB; steps are
-# log lines inside one. Two steps would put the type failure and the test
-# failure back on a single red check, which is the thing this file exists to fix.
+# WHY THREE JOBS RATHER THAN THREE STEPS OF ONE. A GitHub check is a JOB; steps
+# are log lines inside one. Three steps would put the type failure, the test
+# failure and the conformance failure back on a single red check, which is the
+# thing this file exists to fix. The price is three installs instead of one, and
+# they are concurrent: the install is ~13s of a job whose commands are seconds.
 #
 # Spot-run: `gh workflow run uno-bot-checks.yml`.
 
@@ -115,3 +154,33 @@ jobs:
       - name: npm test
         working-directory: agents/uno-bot
         run: npm test
+
+  conformance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: ".nvmrc"
+          cache: npm
+          cache-dependency-path: agents/uno-bot/package-lock.json
+
+      - name: Install uno-bot deps
+        working-directory: agents/uno-bot
+        run: npm ci
+
+      # `vitest run --config vitest.workerd.config.mts` — 49 cases from one
+      # shared conformance body (tests/helpers/thread-state-conformance.ts),
+      # here against a real Durable Object over RPC on real DO SQLite. The same
+      # body runs inside `npm test` against the in-memory adapter, so a red here
+      # and a green there is the two store adapters disagreeing, which is the
+      # single thing this suite is for. It is also part of `npm run deploy` as
+      # of #587: `main` is unprotected, so a gate that lives only on pull
+      # requests is a gate a direct push walks past.
+      - name: npm run test:workerd
+        working-directory: agents/uno-bot
+        run: npm run test:workerd
