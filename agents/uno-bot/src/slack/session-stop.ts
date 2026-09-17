@@ -226,15 +226,24 @@ function stopText(userId: string, cardLive: boolean): string {
  *
  * WHAT IS NOT, and the first version of this comment overclaimed it. Two
  * dispositions never consult the card: `staged` and `asked` return
- * `waiting-on-person` outright. `staged` is harmless — it staged a card, so the
- * read finds one and both writers say `suspended`. `asked` is a real
- * divergence: a clarifying question leaves no card, so the turn settles
- * `suspended` where this handler computes `active`. It is held by ORDERING
- * rather than by agreement — the handler writes within this event, the turn
- * writes at its exit afterwards, so the turn's `suspended` is the later write
- * and wins — and the residue is a thread reading idle for the moment between
- * them. `resolved` returns `idle`, and is also the ending that consumed the
- * card, so it agrees.
+ * `waiting-on-person` outright.
+ *
+ *   - `staged` agrees once the card is up, since the read then finds it. It
+ *     has one window where it does not, and #583 widened it: a turn revising
+ *     an earlier card now RETIRES that card the moment it commits to writing
+ *     the revision, ahead of the new one posting, precisely so the old card
+ *     stops being executable while the replacement is written
+ *     (`turn.ts`). A press inside those seconds reads no live card —
+ *     `getProposalByThread` skips retired and superseded records — and
+ *     computes `active`.
+ *   - `asked` diverges outright: a clarifying question leaves no card at all,
+ *     so the turn settles `suspended` where this handler computes `active`.
+ *
+ * Both are held by ORDERING rather than by agreement — the handler writes
+ * within this event, the turn writes at its exit afterwards, so the turn's
+ * `suspended` is the later write and wins — and the residue is a thread
+ * reading idle for the moment between them. `resolved` returns `idle`, and is
+ * also the ending that consumed the card, so it agrees.
  *
  * THE READ AND THE WRITE ARE ADJACENT, which the first cut got wrong. It read
  * the card here, posted the confirmation, and settled after — putting a Slack
