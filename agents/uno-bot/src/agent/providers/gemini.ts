@@ -24,12 +24,14 @@
 
 import type { Env } from "../../types";
 import { geminiDials, resolveGeminiModel, type ThinkingLevel } from "../gemini-tiers";
-import { geminiGenerateRaw } from "../../gemini/client";
+import { geminiGenerate, geminiGenerateRaw } from "../../gemini/client";
 import { ensureHarnessCache } from "../../gemini/cache";
 import { MAX_TOKENS } from "../loop-policy";
 import type {
+  ModelPrompt,
   ModelProvider,
   ModelReply,
+  ModelText,
   ModelToolCall,
   ModelToolResult,
   ModelTurn,
@@ -133,6 +135,29 @@ export function geminiProvider(env: Env): ModelProvider {
 
   return {
     name: "gemini",
+
+    /**
+     * One prompt, one reply, no tools — and nothing of the turn's: the
+     * `contents` array, the cache reference and the usage counters stay where
+     * they are, so a one-shot beside a turn in flight leaves it untouched. The
+     * tier still decides the model AND its thinking level together (ADR-028),
+     * derived here the same way `start` derives them.
+     */
+    async generate(prompt: ModelPrompt): Promise<ModelText> {
+      const oneShotModel = resolveGeminiModel(prompt.tier, env);
+      const { thinkingLevel: level } = geminiDials(prompt.tier, oneShotModel);
+      const res = await geminiGenerate(env, {
+        model: oneShotModel,
+        prompt: prompt.prompt,
+        ...(prompt.system ? { system: prompt.system } : {}),
+        ...(prompt.maxTokens ? { maxTokens: prompt.maxTokens } : {}),
+        ...(level ? { thinkingLevel: level } : {}),
+      });
+      if (!res.ok) {
+        return { ok: false, model: res.model, message: res.error ?? "generateContent failed" };
+      }
+      return { ok: true, model: res.model, text: res.text ?? "" };
+    },
 
     async start(turn: ModelTurn): Promise<void> {
       tier = turn.tier;

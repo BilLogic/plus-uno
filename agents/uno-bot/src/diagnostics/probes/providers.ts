@@ -2,7 +2,7 @@
 // system prompt actually cached?
 import { geminiConfigured, geminiGenerate } from "../../gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "../../vertex/claude";
-import { MODELS } from "../../agent/routing";
+import { CLAUDE_MODELS } from "../../agent/providers/claude";
 import { buildSystemBlocks } from "../../agent/skills";
 import { ensureHarnessCache } from "../../gemini/cache";
 import { BUILD } from "../../version";
@@ -51,7 +51,7 @@ export const vertexClaudeProbe: ProbeRun = async (env) => {
       },
     };
   }
-  const model = env.CLAUDE_MODEL ?? MODELS.default;
+  const model = env.CLAUDE_MODEL ?? CLAUDE_MODELS.default;
   const result = await claudeVertexGenerate(env, {
     model,
     prompt: "Reply with exactly: uno-bot vertex-claude link ok",
