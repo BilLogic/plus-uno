@@ -11,14 +11,6 @@ export interface SlackContext {
   channel: string;
   threadTs: string;
   userMsgTs: string;
-  /** The CONVERSATION's identity — `thread_ts` in a channel, the constant "dm"
-   *  in an agent_view DM. Distinct from threadTs, which is only a post target.
-   *
-   *  It exists here for one reader: the cancel check. `/stop` and the Home-tab
-   *  button both record and clear a flag keyed by conversation, and the loop
-   *  has to read the SAME key or the flag is set somewhere nothing looks. It
-   *  was derived independently in three places and two of them disagreed. */
-  conversationTs?: string;
   requestedBy?: string;
   /** Slack's per-event action token, forwarded from the triggering message.
    *  assistant.search.context requires it for BOT-token calls, which is why a

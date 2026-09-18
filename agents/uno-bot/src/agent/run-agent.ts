@@ -26,6 +26,27 @@
 //     now read off the tool table (`agent/tools.ts`), which is where the
 //     schemas and what a tool IS are joined.
 //
+// WHAT WENT (#624), and it is the same lesson the Delivery port wrote down: an
+// optional argument nobody passes is the shape of a past bug, and the fix is to
+// make it required so the next caller gets no hole. `AgentInput` was wider than
+// its one caller — `turn/env-deps.ts`, which always passed the tier, the reason
+// and the conversation — and each optional entry paid for a fallback:
+//   - the tier and the route reason were optional, so this entry ROUTED on
+//     every turn purely to feed a default — on `userText`, which was the model's
+//     whole context block rather than the question the person typed, and that is
+//     how a turn and its loop came to disagree about the tier. Routing happens
+//     once, in Turn (#498); nothing here reads a tier it was not handed.
+//   - the conversation was optional, so `userText`, `history` and a legacy
+//     `images` list existed to be assembled into it a second time. All four
+//     arguments are one required `conversation` now — the turns the model
+//     actually reads — and `buildProviderConversation` has one caller again.
+//   - the conversation key was an optional FIELD of `slack`, recomputed here
+//     when absent by an expression that cannot be right (an explicitly threaded
+//     DM resolves to the thread, not to "dm"). It is a required argument, and
+//     the field is gone from `SlackContext`, which had no other reader.
+// No re-export bag replaced them: `HistoryTurn` and `AgentImage` were passed
+// through this module for no importer, and went with the fields that used them.
+//
 // Provider selection:
 //   MODEL_PROVIDER = "gemini"        → providers/gemini.ts  (DEFAULT/production)
 //   MODEL_PROVIDER = "vertex-claude" → providers/claude.ts  (Claude on Vertex AI,
@@ -40,11 +61,9 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import type { AbsenceContext } from "./absence";
 import type { Env, SlackContext } from "../types";
 import { proposalOperations } from "../thread-state/index";
-import type { HistoryTurn, PendingProposal } from "../thread-state/index";
-import type { AgentImage, ProviderConversationTurn } from "./provider-conversation";
-import { buildProviderConversation } from "./provider-conversation";
+import type { PendingProposal, ThreadRef } from "../thread-state/index";
+import type { ProviderConversationTurn } from "./provider-conversation";
 import { buildSystemBlocks } from "./skills";
-import { routeRequest } from "./routing";
 import { threadStateFor } from "../thread-state/production";
 import {
   isSubrequestBudgetError,
@@ -57,47 +76,58 @@ import { claudeVertexConfigured, claudeVertexRaw } from "../vertex/claude";
 import { runLoop, type AgentResult, type LoopBudget, type TurnDials } from "./loop";
 import { geminiProvider } from "./providers/gemini";
 import { claudeProvider } from "./providers/claude";
-import type { ModelTier } from "./routing";
+import type { ModelTier } from "./tiers";
 import type { ModelProvider, SystemBlock, ToolSpec } from "./model-provider";
 import type { ToolBody } from "./tool-bodies";
 import { isToolName, type ToolName } from "./tool-table";
 import { TOOLS, TOOLS_BY_NAME } from "./tools";
 import type { ToolCall, ToolResultNote } from "./tool-transcript";
 
-export type { HistoryTurn };
-export type { AgentImage } from "./provider-conversation";
 export type { AgentResult, TurnDials } from "./loop";
 
 // ── The provider-neutral contract (input of one agent turn) ──────────────────
 
 export interface AgentInput {
   env: Env;
-  userText: string;
   /**
    * The tier this turn is running at, already routed.
    *
    * Routing is a TURN decision — it reads the words the person typed and
    * whether a proposal is pending (#498) — and the tier travels from there as
-   * an opaque name the adapter maps to a model and its dials. Absent when the
-   * caller has not routed, in which case this entry routes on the text it was
-   * handed; that fallback is why a turn and its loop could disagree about the
-   * tier, each routing on a different string.
+   * an opaque name the adapter maps to a model and its dials. REQUIRED, so
+   * there is no text here to route on and no second routing to disagree with
+   * the first (#624).
    */
-  tier?: ModelTier;
+  tier: ModelTier;
   /** Why that tier — carried for the turn's one telemetry line. */
-  routeReason?: string;
-  /** Explicit tier from /grind, /chill or a shortcut. Beats every routing
-   *  heuristic — see routeRequest. Absent on ordinary turns. */
-  tierOverride?: ModelTier;
-  history: HistoryTurn[];
+  routeReason: string;
+  /**
+   * The turns the model reads, already provider-ready: the history, the
+   * question and the image blocks, each left on the turn that introduced it.
+   *
+   * REQUIRED, and the ONLY form of the conversation this entry takes. The raw
+   * text, the history rows and a separate current-turn image list were three
+   * further arguments whose one use here was to be assembled into this one, by
+   * a builder the caller already runs. Two assemblies of one conversation is
+   * what the fallback kept alive; there is one now, above this entry, and the
+   * string the turn routed on cannot differ from what the model reads (#624).
+   */
+  conversation: ProviderConversationTurn[];
   slack: SlackContext;
+  /**
+   * The CONVERSATION's identity — `thread_ts` in a channel, the constant "dm"
+   * in an agent_view DM — and the one thing the cancel check is keyed on.
+   *
+   * REQUIRED, and an argument rather than a field of `slack`, because this
+   * entry is its only reader: `/stop` and the Home-tab button record the flag
+   * under this key and the loop has to read the SAME one. It was derived here
+   * as a fallback behind an optional field, and the derivation is wrong for
+   * the case that matters — an explicitly threaded DM resolves to the thread,
+   * not to "dm", and no expression here can know that (#624).
+   */
+  conversationTs: string;
   currentSender: { userId: string };
   pending: PendingProposal | null;
-  /** Legacy current-turn vision input; provider-ready callers use conversation. */
-  images?: AgentImage[];
-  /** Provider-ready multimodal turns. When present, image blocks remain on the
-   *  user turn that introduced them instead of being moved to the latest ask. */
-  conversation?: ProviderConversationTurn[];
   /** Pre-rendered one-line description of what the user has open in the
    *  assistant panel (e.g. "channel <#C123>"), when chatting from the panel.
    *  Injected as an advisory system block. Absent for channel/@mention turns. */
@@ -147,26 +177,8 @@ const liveBudget: LoopBudget = {
 };
 
 export async function runAgent(input: AgentInput): Promise<AgentResult> {
-  const { env, userText, history, currentSender, pending, images, slack, assistantContext } = input;
-  const conversation = input.conversation ?? buildProviderConversation(history, userText, images);
-
-  // Routing reads turn knowledge (the words, whether a proposal is pending) and
-  // produces an opaque tier NAME. The adapter maps that name to a model and a
-  // thinking level (ADR-028); nothing between the two knows either.
-  //
-  // The Turn module routes and hands the name down (#498), so the common path
-  // takes it as given rather than routing a second time on a different string —
-  // `userText` here is the model's whole context block, not the question the
-  // person typed, and routing the two separately is how a turn and its loop came
-  // to disagree about the tier. A caller that has not routed still gets routed
-  // for, on what it did hand over.
-  const routed = routeRequest({
-    userText,
-    hasPending: pending !== null,
-    override: input.tierOverride,
-  });
-  const tier = input.tier ?? routed.tier;
-  const routeReason = input.tier ? (input.routeReason ?? "routed-by-turn") : routed.reason;
+  const { env, conversation, tier, routeReason, currentSender, pending, slack, assistantContext } =
+    input;
 
   const pendingForSystem = pending
     ? {
@@ -197,18 +209,17 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   // collapses to the single "dm" conversation (mirroring conversationTs in
   // events.ts), a channel uses its thread.
   //
-  // PASSED IN (slack.conversationTs) rather than re-derived, because
-  // re-deriving it is exactly how the two ends drifted: an explicitly threaded
-  // DM resolves to the thread, not to "dm", and the expression below cannot
-  // know that. The fallback keeps the old behaviour for any caller that has not
-  // supplied it. One mechanism, read in one place, whichever adapter answers.
-  const cancelThread =
-    slack?.conversationTs ?? (slack?.channel?.startsWith("D") ? "dm" : (slack?.threadTs ?? "dm"));
+  // PASSED IN (`input.conversationTs`) and NOT derivable here — see that
+  // argument's own doc. One mechanism, computed once in `slack/events.ts`,
+  // read in one place, whichever adapter answers.
+  const cancelKey: ThreadRef | null = slack.channel
+    ? { channel: slack.channel, thread: input.conversationTs }
+    : null;
 
   return runLoop({
     provider: selectProvider(env),
     deps: {
-      executeReadOnlyTool: (name, args) => executeUngatedTool(env, name, args, slack),
+      executeUngatedTool: (name, args) => executeUngatedTool(env, name, args, slack),
       threadState: threadStateFor(env),
       budget: liveBudget,
       ...(input.preflight ? { preflight: input.preflight } : {}),
@@ -220,7 +231,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     tools,
     pending,
     currentSenderId: currentSender.userId,
-    cancelKey: slack?.channel ? { channel: slack.channel, thread: cancelThread } : null,
+    cancelKey,
     ...(input.cancelSince !== undefined ? { cancelSince: input.cancelSince } : {}),
     onInterim: input.onInterim,
     onDials: input.onDials,

@@ -78,13 +78,12 @@ export interface TurnWiring {
 export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring): TurnDeps {
   const reporters = wiring.reporters ?? {};
 
-  // The tool-side Slack context: where a tool's own posts go, which
-  // conversation `/stop` is keyed on, and the per-event facts a tool may use.
+  // The tool-side Slack context: where a tool's own posts go and the per-event
+  // facts a tool may use. NOT the conversation key — that is the agent run's own
+  // required argument, below, because the cancel check is its only reader.
   const slack = {
     channel: request.channel,
     threadTs: wiring.toolThreadTs,
-    // …and the conversation key separately, because that is what cancel reads.
-    conversationTs: request.conversationTs,
     userMsgTs: request.userMsgTs,
     requestedBy: request.userId,
     // Bot-token search needs the triggering event's action_token; it exists
@@ -107,13 +106,12 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
         runAgent({
           env,
           // Routing already happened, in Turn: the tier travels as an opaque
-          // name so nothing routes a second time on a different string.
+          // name, and the agent run has no way left to route a second time on
+          // a different string (#624).
           tier: req.tier,
           routeReason: req.routeReason,
-          userText: req.userText,
-          ...(request.tierOverride ? { tierOverride: request.tierOverride } : {}),
-          ...(req.images?.length ? { images: req.images } : {}),
-          history: req.history,
+          // The conversation, assembled ONCE. The raw text, the history rows
+          // and the images reach the agent only through it.
           conversation: buildProviderConversation(
             req.history,
             req.userText,
@@ -121,6 +119,9 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
             req.historicalImages,
           ),
           slack,
+          // The conversation key, beside the tool-side context, because cancel
+          // is what reads it and it is not derivable downstream.
+          conversationTs: request.conversationTs,
           currentSender: req.currentSender,
           pending: req.pending,
           ...(req.assistantContext ? { assistantContext: req.assistantContext } : {}),
