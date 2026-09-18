@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **171,043 chars from 16 files**, against an assembled budget of 175,000 (3,957 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 150,659 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **171,151 chars from 16 files**, against an assembled budget of 175,000 (3,849 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 150,767 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,603 (−7,277 ide-only) | 9,603 | 20,000 (constitution) |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 18,330 | 27,961 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,187 | 55,189 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 61,582 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 68,626 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 75,339 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 80,626 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 87,329 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 93,731 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 95,702 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 109,700 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,280 | 124,022 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 127,270 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 157,857 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 162,446 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 171,043 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 18,438 | 28,069 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,187 | 55,297 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 61,690 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 68,734 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 75,447 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 80,734 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 87,437 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 93,839 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 95,810 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 109,808 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,280 | 124,130 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 127,378 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 157,965 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 162,554 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 171,151 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -227,7 +227,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **superseded card** | a proposal card retired by a revision staged later in the same reply thread, or retired the moment a turn commits to writing that revision: it executes nothing and answers that it was replaced — a different answer from expired, which is the hour-long TTL running out | "expired card" |
 | **agent session** | the Slack object a uno-bot conversation runs inside on the agent surface, addressed by `channel_id` + `thread_ts` and moved between four lifecycle statuses — `active` · `processing` · `suspended` · `closed` — with `agents.sessions.setStatus`. Replaces the `assistant.threads.*` methods, which now run over a compatibility bridge and are dated for deprecation in February 2027. While it sits in `processing` Slack offers a stop control on the session, for a subscriber to `agent_session_stopped`; the press moves no status of its own, so the app transitions the session itself (#576) | "assistant thread", "the panel thread" |
 | **working signal** | what tells a person a turn is in flight: the **agent session** moved to `processing` when the work starts and settled on every exit, raised and cleared as ONE pairing by `withWorkingSignal` (`agents/uno-bot/src/turn/delivery.ts`), whose `finally` is what makes the clear survive a new exit. Under agent sessions the settle is the only thing that takes it down — posting the answer no longer does — and each half logs a `[working]` line carrying the turn's external spend. Turn owns that pairing; the one other settler is `handleSessionStopped`, which Slack requires to transition the session when a person presses stop (#576) | "the thinking indicator", "the status line" (the status is what Slack is told; the signal is what the person sees) |
-| **corpus** | the harness's one reader of repo files (`scripts/lib/corpus.mjs`): which documents exist under a path, where a doc's frontmatter stops, its markdown links, its heading outline. A check asks it rather than the filesystem, and it takes a root so its test reads a fixture tree | "the walker", "the parser" (there is one of each) |
+| **corpus** | the harness's one reader of repo files (`scripts/lib/corpus.mjs`): which documents exist under a path, what a file says, where a doc's frontmatter stops, its markdown links, its heading outline. A check asks it rather than the filesystem, and it takes a root so its test reads a fixture tree — the listing and the read taking the same root is what keeps a second one from appearing | "the walker", "the parser" (there is one of each) |
 | **recording** | a case's captured model replies, tool results and subject — the local eval transport's input (`docs/evals/fixtures/recordings/`); `source` is `authored` or `captured`, written down rather than inferred, and it reaches the results file | "fixture" (a fixture is what a case ASSERTS; a recording is what answered it) |
 | **transport** | how the eval runner reaches a turn: the deployed Worker's eval route, or **Turn** in-process from a **recording**. The summary names which one answered, because the two are different measurements | "the endpoint", "the eval route" (that is one transport's target) |
 | **judge** | who grades an eval answer — a module beside the **transport** and the same shape (`agents/uno-bot/scripts/eval-judge.mjs`): `{ name, judgeCase(case, transcript) }`, owning the rubric, the credential, the call, the cut and the fail-open. Three verdicts: `pass`, `fail`, `skipped`. A skip fails OPEN, so it carries its reason and the summary counts what was judged — an unjudged run reads as unjudged rather than as a clean sweep | "the rubric" (that is the document a judge grades against) |

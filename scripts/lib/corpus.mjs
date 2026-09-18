@@ -1,10 +1,20 @@
 /**
  * The corpus — the harness's one reader of repo files.
  *
- * Six questions the checks and generators used to answer privately, in one
- * place: which documents exist under a path, which directories do, where a
- * document's frontmatter stops, which markdown links it carries, what it reads
- * like with those links reduced to their text, and what its heading outline is.
+ * Seven questions the checks and generators used to answer privately, in one
+ * place: which documents exist under a path, which directories do, WHAT A FILE
+ * SAYS, where a document's frontmatter stops, which markdown links it carries,
+ * what it reads like with those links reduced to their text, and what its
+ * heading outline is.
+ *
+ * `text` is the seventh and the plainest, and it is exported for the same
+ * reason as the other six rather than for a new one: a caller that listed a
+ * file through `documents` and then read it with its own `fs.readFileSync` has
+ * half a reader of its own, and half a reader is where a second root comes
+ * from — the one it resolves the relative path against. `text` takes the same
+ * `root` as the walk, so the listing and the read cannot disagree about which
+ * tree they are looking at (#620). The callers that still pair `documents`
+ * with a private `readFileSync` are unconverted, not endorsed.
  *
  * TWO MODES, BECAUSE A GENERATOR AND A GUARD WANT OPPOSITE THINGS of an
  * unreadable directory. The default walk is forgiving; `strict: true` throws on
@@ -281,6 +291,26 @@ function resolveIsDirectory(entry, abs, strict) {
 }
 
 /**
+ * WHAT A FILE SAYS. A path in, its text out.
+ *
+ * Deliberately NOT path-or-text like `textOf` below, and deliberately not
+ * forgiving: a caller here is holding a path it means to read, so an
+ * unreadable one throws rather than coming back as its own name. It is any
+ * file, not only a document — the token stylesheets are read through this —
+ * because the reason to have one reader is the root, not the extension.
+ *
+ * @param {string} target repo-relative or absolute path.
+ * @param {{root?: string}} [opts] the tree to read; defaults to this repo's root.
+ * @returns {string}
+ */
+export function text(target, { root = REPO_ROOT } = {}) {
+  if (typeof target !== 'string') {
+    throw new TypeError('corpus: text() takes a path');
+  }
+  return fs.readFileSync(path.isAbsolute(target) ? target : path.join(root, target), 'utf8');
+}
+
+/**
  * A document's text, whether the caller held the path or the contents.
  *
  * A single-line string that names a readable file is read; anything else is
@@ -294,7 +324,7 @@ function textOf(input, opts = {}) {
   if (!input.includes('\n') && input.length < 4096) {
     const abs = path.isAbsolute(input) ? input : path.join(opts.root ?? REPO_ROOT, input);
     try {
-      if (fs.statSync(abs).isFile()) return fs.readFileSync(abs, 'utf8');
+      if (fs.statSync(abs).isFile()) return text(abs);
     } catch {
       /* not a path: it is the text */
     }
