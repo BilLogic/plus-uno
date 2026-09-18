@@ -25,7 +25,11 @@
 // findings interface (scripts/lib/findings.mjs): a failed blocker is an error, a
 // failed non-blocker a warning, and that module decides the banner and the exit
 // code. The per-case log below is the runner's own and is untouched — a line per
-// case across the suite is why this check stays spawn-shaped.
+// case across the suite is why this check stays spawn-shaped. The SUMMARY's
+// spine is that module's too (#619): the date, the fixture stamp and every
+// tally, counted off the rows — `summaryOf` below is handed only what the turn
+// suite alone measures. The retrieval suite (scripts/run-retrieval-evals.mjs)
+// is the second caller of all three, with its own row keys and its own fixture.
 //
 // A case may also declare `subject: { need }` — a CONDITION the live blueprint
 // answers with a row, fetched once before turn 1 through the transport (the
@@ -83,7 +87,7 @@ import { argv } from "node:process";
 import { resolve } from "node:path";
 import { isEntry, report } from "../../../scripts/lib/findings.mjs";
 import { censusOf, describeCensus, fixtureStamp, hasOwnSpec, loadCases } from "./eval-case.mjs";
-import { REMEDY, RESULTS_PATH, findingsFor, resultRow, writeResults } from "./eval-results.mjs";
+import { REMEDY, RESULTS_PATH, findingsFor, resultRow, summaryOf, writeResults } from "./eval-results.mjs";
 import { passesCase, toolCallMatches, describeCalls } from "./eval-scoring.mjs";
 import { threadTurn, checkHistory, sentSummary } from "./eval-history.mjs";
 import { applySubject, skipReason } from "./eval-subjects.mjs";
@@ -469,12 +473,17 @@ export async function runEvals({
     await sleep(pauseMs);
   }
 
-  // Skipped cases are neither passed nor failed, so they come out of the
-  // denominator too. A suite that reported 33/34 while one case never ran would
-  // be describing a run that did not happen.
-  const scored = results.filter((r) => !r.skipped);
-  return {
-    ranAt: new Date().toISOString(),
+  // THE TALLIES, THE DATE AND THE STAMP ARE THE SHARED SPINE (eval-results.mjs
+  // `summaryOf`, #619) — counted off the rows, so the number a reader sees and
+  // the number that decides the exit code cannot disagree. What is listed here
+  // is what only the TURN suite measures.
+  return summaryOf(results, {
+    // WHAT WAS MEASURED, AGAINST WHAT. The acceptance criterion is that results
+    // are recorded with the revision they were measured against (#415), and
+    // that is two facts, not one: which Worker answered, and which fixture
+    // asked. Neither is inferable from the other, and a results file carrying
+    // only a date is unreadable a week later.
+    fixture: fixtureStamp(casesPath),
     // HOW the turns were run. A results file whose scores were produced
     // in-process and one produced against a deployment are different
     // measurements, and nothing else in here tells them apart.
@@ -485,20 +494,12 @@ export async function runEvals({
     // judge's own (an expired service account names itself apart from an
     // absent one) and the counts are over the verdicts this run collected.
     judge: { name: judge.name, ...judgeTally(judgeVerdicts) },
-    // WHAT WAS MEASURED, AGAINST WHAT. The acceptance criterion is that results
-    // are recorded with the revision they were measured against (#415), and
-    // that is two facts, not one: which Worker answered, and which fixture
-    // asked. Neither is inferable from the other, and a results file carrying
-    // only a date is unreadable a week later.
+    /** Which Worker answered — the other half of "measured against what". */
     workerBuild: firstBuild(results),
-    fixture: fixtureStamp(casesPath),
     // WHAT THE SUITE IS, counted rather than typed — and which of its cases
     // this instrument said it could not reach. `ungated` is the number a reader
     // needs to know how much of the suite a green run actually stands for.
     census,
-    passed: scored.filter((r) => r.pass).length,
-    failed: scored.filter((r) => !r.pass).length,
-    skipped: results.length - scored.length,
     // TWO HOMES FOR ONE WORD, DELIBERATELY. `census.ungated` above is the CLAIM:
     // read from `transport.recordedCases` before the walk starts, which is what
     // lets the run say what it will not measure in its opening line. This one is
@@ -507,14 +508,7 @@ export async function runEvals({
     // reach is exactly the run where they would not — so folding them into one
     // field would delete the only evidence of the disagreement.
     ungated: results.filter((r) => r.ungated).map((r) => r.id),
-    // COUNTED OFF THE ROWS, not accumulated as the walk goes. A counter
-    // incremented at three depths is a second answer to a question the rows
-    // already hold, and the one the gate reads is the rows' (eval-results.mjs
-    // `findingsFor`) — so the number a reader sees and the number that decides
-    // the exit code cannot disagree.
-    blockerFailures: scored.filter((r) => r.blocker && !r.pass).length,
-    results,
-  };
+  });
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────

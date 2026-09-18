@@ -29,11 +29,9 @@
  *
  * Run: `npm run check:icon-button-name`.
  */
-import fs from 'node:fs';
-import path from 'node:path';
-
-import { REPO_ROOT, failures, nameless, sources } from './icon-button-name.mjs';
+import { REPO_ROOT, failures, nameless, sites, sources } from './icon-button-name.mjs';
 import { byRoot, main } from './lib/findings.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
 
 const RECORD = 'docs/evals/icon-button-name.json';
 
@@ -48,16 +46,13 @@ export const REMEDY =
   '     `aria-label` on <Button>. Mark the icon `aria-hidden="true"` while you are\n' +
   '     there — it is decoration once the button has a name. WCAG 4.1.2.';
 
-// The record and the corpus walk are what both questions need, so they happen
-// once per root rather than once at module scope.
-const inputs = byRoot((repoRoot) => ({
-  record: JSON.parse(fs.readFileSync(path.join(repoRoot, RECORD), 'utf8')),
-  files: sources(repoRoot),
-}));
+// The corpus walk is what both questions need, so it happens once per root
+// rather than once at module scope.
+const inputs = byRoot((repoRoot) => ({ files: sources(repoRoot) }));
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
-  const { record, files } = inputs(repoRoot);
+  const { files } = inputs(repoRoot);
   const found = [];
 
   if (files.length < MIN_FILES) {
@@ -66,7 +61,27 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     });
   }
 
-  found.push(...failures(nameless(files), record.exceptions ?? {}).map((message) => ({ message })));
+  /*
+   * The record, through `scripts/lib/ratchet.mjs` (#600). Its exception map
+   * keys a call site to THE REASON ITSELF, the shape declared for it in
+   * `scripts/lib/ratchet-shapes.mjs` — so a recorded site that now has a name
+   * is reported stale, and a recorded site whose reason says nothing is
+   * reported unreviewed. Maintained BY HAND, with no `--update`: the bar is
+   * zero, and a flag that recorded a nameless control for you would be a way of
+   * agreeing that "button" is enough.
+   */
+  const gate = openRatchet({ file: RECORD, repoRoot });
+  const hits = sites(nameless(files));
+  const side = Object.fromEntries([...hits.keys()].map((key) => [key, '']));
+  if (gate.absent) return [...found, ...gate.failures(side).map(({ message }) => ({ message }))];
+
+  found.push(
+    ...failures(hits, {
+      fresh: gate.failures(side).map((f) => f.key),
+      stale: gate.stale(side).map((s) => s.key),
+      unreviewed: gate.unreviewed().map((u) => u.key),
+    }).map((message) => ({ message })),
+  );
   return found;
 }
 

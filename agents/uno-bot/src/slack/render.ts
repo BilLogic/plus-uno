@@ -3,8 +3,8 @@
 // Two things live here: the body that will actually be sent
 // (`renderDeliveredBody` — trailing-label strip, empty-answer placeholder) and
 // a body as `section` blocks (`textSections`). Both lived in
-// `slack/delivery.ts`, which takes `Env`, so neither could be reached by
-// anything `tsconfig.test.json` compiles: the Turn module could not judge the
+// `slack/delivery.ts`, which takes `Env` and posts, so neither could be
+// exercised without a Worker: the Turn module could not judge the
 // text it was about to deliver, and a proposal card could not be rendered at
 // all. Splitting the render from the posting is the whole change; `delivery.ts`
 // re-exports both for its existing callers.

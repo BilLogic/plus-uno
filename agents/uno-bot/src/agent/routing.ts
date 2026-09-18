@@ -19,11 +19,13 @@
 // gemini-tiers.ts. This module is provider-neutral, and a Claude id sitting in
 // it was read by no Gemini turn ever.
 //
-// Defined in tiers.ts (import-free) so pure modules can name a tier without
-// pulling in the Workers type graph. Re-exported here: routing is where callers
-// expect to find it.
-export type { ModelTier } from "./tiers";
-import type { ModelTier } from "./tiers";
+// The union is DECLARED HERE, beside the decision that produces it. It spent a
+// while in a file of its own (`tiers.ts`, deleted by #595) so that pure modules
+// could name a tier "without pulling in the Workers type graph" — a graph this
+// file never had: routing imports nothing, and every one of its nine readers
+// was already importing a type from a one-line module next door to reach a name
+// this one exports.
+export type ModelTier = "chill" | "default" | "grind";
 
 export interface RouteDecision {
   tier: ModelTier;

@@ -25,7 +25,7 @@
     "slack:diff": "slack manifest diff --team T0C5GFUPJ --app A0APS0L8HJR",
     "slack:manifest": "slack manifest info --source remote --team T0C5GFUPJ --app A0APS0L8HJR",
     "evals:embed-ab": "node scripts/embed-model-ab.mjs",
-    "evals:retrieval": "node scripts/run-retrieval-evals.mjs",
+    "evals:retrieval": "cd ../.. && node agents/uno-bot/scripts/run-retrieval-evals.mjs",
     "evals:retrieval:selftest": "node scripts/run-retrieval-evals.mjs --self-test",
     "test:bundle": "node --test scripts/*.test.mjs",
     "evals:local": "cd ../.. && node agents/uno-bot/scripts/run-evals.mjs --transport=local",

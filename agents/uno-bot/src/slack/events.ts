@@ -31,6 +31,7 @@ import {
 } from "./canvas-reference";
 import { postVisibleFailure, isCapacityError } from "./delivery";
 import { runSlackTurn } from "./turn-adapter";
+import { turnSurfaceOf } from "../turn/request";
 
 // Re-exported for index.ts (SlackEnvelope) + agent-runner.ts (RunnerJobPayload)
 // and any other importer that still reaches for the Slack wire types here.
@@ -234,7 +235,7 @@ async function onMessageVisiblyFailing(env: Env, msg: SlackMessageEvent): Promis
 type ThreadedEvent = { channel: string; ts: string; thread_ts?: string };
 
 function isDm(channel: string): boolean {
-  return channel.startsWith("D");
+  return turnSurfaceOf(channel) === "assistant";
 }
 
 // Where the reply goes. In a channel: the existing thread, else a new one under
@@ -287,8 +288,9 @@ function isUserTurn(event: SlackMessageEvent): boolean {
 async function shouldHandleMessage(env: Env, event: SlackMessageEvent): Promise<boolean> {
   if (!isUserTurn(event)) return false;
 
-  // DMs (channel id starts with "D") are direct to the bot.
-  if (event.channel.startsWith("D")) return true;
+  // An app DM is direct to the bot. Which channel ids those are is
+  // `turn/request.ts` § `turnSurfaceOf`, not a literal here (#595).
+  if (isDm(event.channel)) return true;
 
   const identity = await getBotIdentity(env);
   // Explicit @mention of the bot anywhere in the text.

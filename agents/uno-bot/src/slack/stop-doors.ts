@@ -18,10 +18,10 @@
 // recording Delivery and the in-memory ThreadState. They used to be READ there
 // instead — `readFileSync` and a regex over these three adapters' source,
 // checking that each mentioned `inThreadStopLine(`, `threadArg(`,
-// `cancelForUser(` and the two `console.error` lines — because a door that
-// named `Env` was a door the Node compile could not reach. A regex could only
-// ask whether the call appeared in the file; the suite now asks what the
-// person gets, in which conversation, and in what order.
+// `cancelForUser(` and the two `console.error` lines — because a door whose one
+// argument was an `Env` was a door a Node test had nothing to call. A regex
+// could only ask whether the call appeared in the file; the suite now asks what
+// the person gets, in which conversation, and in what order.
 //
 // THE POST GOES THROUGH DELIVERY, not through `api.ts`. What these doors send
 // is a note — no footer, no confidence pre-check, no stream — which is exactly
@@ -32,8 +32,8 @@
 // reason on the way past, so the reason is not lost — only the second copy of
 // it is.
 //
-// PURE by design: no `Env`, no Workers global, no fetch, so
-// `tsconfig.test.json` compiles it.
+// PURE by design: no `Env`, no Workers global, no fetch — which is what lets
+// the Node suite DRIVE the three doors rather than read them.
 
 import type { Delivery } from "../turn/index";
 import type { ThreadState } from "../thread-state/index";
@@ -43,7 +43,7 @@ import {
   inThreadStopLine,
   resolveStop,
 } from "./session-stop";
-import type { SessionStatus, StatusResult } from "./working-signal";
+import type { SessionStatus, StatusResult } from "./session-status";
 
 /** Where a stop door speaks: the stopped run's own conversation, or — for the
  *  Home-tab button, which is pressed somewhere that is not a conversation at

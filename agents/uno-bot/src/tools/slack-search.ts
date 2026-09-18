@@ -33,6 +33,7 @@
 
 import type { Env, SlackContext } from "../types";
 import { slackConnectUrl } from "../oauth/slack";
+import { turnSurfaceOf } from "../turn/request";
 import {
   slackSearchCredentials,
   type SearchCredentialKind,
@@ -109,7 +110,7 @@ export async function executeSlackSearch(
   if (!query) return JSON.stringify({ ok: false, error: "missing query" });
 
   // Own-visibility is surface-gated: only in the requester's own bot DM.
-  const inOwnDm = Boolean(slack?.channel?.startsWith("D"));
+  const inOwnDm = Boolean(slack?.channel && turnSurfaceOf(slack.channel) === "assistant");
   const requester = inOwnDm ? slack?.requestedBy : undefined;
   const credentials = await slackSearchCredentials(env, requester);
   // The connect link, resolved ONCE and above the credential loop.

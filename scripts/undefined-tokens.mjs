@@ -39,8 +39,6 @@ import { documents } from './lib/corpus.mjs';
 
 import { TOKEN_NAME, varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 
-import { ratchet } from './lib/ratchet.mjs';
-
 /** The extensions a token name can be written in. */
 const SEARCHED = ['.scss', '.css', '.jsx', '.tsx', '.mdx', '.html'];
 
@@ -158,53 +156,58 @@ export function audit(files) {
 }
 
 /**
- * The ratchet. Counts may FALL and must never RISE, and a name that is no
- * longer used at all is itself reported — a baseline entry nothing matches is
- * a claim about code that has gone.
+ * The WORDING of the ratchet's four verdicts. Counts may FALL and must never
+ * RISE, and a name that is no longer used at all is itself reported — a baseline
+ * entry nothing matches is a claim about code that has gone.
  *
- * NEW and STALE are `ratchet` in `scripts/lib/ratchet.mjs` (#507, moved there
- * by #599). The ROSE test is not, and cannot be: this baseline records TWO
- * numbers per name — total uses and bare uses — and a bare use is a dropped
- * declaration where a fallen-back one is only a fiction, so they are checked
- * separately. The classifier classifies; the comparison and the wording stay
- * here.
+ * NEW, ROSE and STALE ARE ALL `scripts/lib/ratchet.mjs`'s NOW (#600). Both of
+ * this record's numbers per name — total uses and bare uses — are declared as
+ * ratcheted FIELDS of its entry in `scripts/lib/ratchet-shapes.mjs`, so the
+ * module moves them separately and says WHICH one moved, which is the
+ * distinction this function used to have to draw for itself and drew as an
+ * `else`: a name whose uses and bare uses both rose reported only the first.
+ * Now both are reported, which is the direction of the bug.
  *
- * The walk is over the found names rather than over the classifier's three lists,
- * which is what keeps NEW and ROSE interleaved in name order the way this
- * report has always printed them.
+ * A bare use is a dropped declaration where a fallen-back one is only a
+ * fiction, and that is why the two are separate rather than summed.
  *
+ * The walk is over the ratchet's list rather than over the found names, which
+ * is where the ORDER of this report comes from: the module reports in the order
+ * the run found them, and the run walks names in sorted order.
+ *
+ * @param {Record<string, {uses: number, bare: number, files: string[]}>} undefinedTokens
+ *        what the run measured, for the detail a finding needs and the record
+ *        does not hold — the first file a new name appears in.
+ * @param {{failures?: object[], stale?: object[]}} verdicts  from the ratchet.
  * @returns {string[]} One line per problem; empty when the tree is at or under
  *   its baseline.
  */
-export function ratchetFailures(undefinedTokens, baseline) {
+export function ratchetFailures(undefinedTokens, { failures = [], stale = [] } = {}) {
   const found = [];
-  const recorded = baseline.tokens ?? {};
-  const classified = ratchet(undefinedTokens, recorded);
-  const unrecorded = new Set(classified.new.map((entry) => entry.key));
 
-  for (const [name, entry] of Object.entries(undefinedTokens)) {
-    const before = recorded[name];
-    if (unrecorded.has(name)) {
+  for (const failure of failures) {
+    if (failure.kind === 'new') {
+      const entry = undefinedTokens[failure.key];
       found.push(
-        `NEW  ${name} — used ${entry.uses}x (${entry.bare} bare) and defined nowhere. ` +
+        `NEW  ${failure.key} — used ${entry.uses}x (${entry.bare} bare) and defined nowhere. ` +
           `First: ${entry.files[0]}`,
       );
       continue;
     }
-    if (entry.uses > before.uses) {
-      found.push(
-        `ROSE ${name} — ${before.uses} recorded, ${entry.uses} now. The baseline may fall, ` +
+    // FELL is not worded at all: this record is shrink-only, so a count that
+    // came in under its entry is the ratchet working, and the entry that has
+    // gone all the way to zero is `stale` below.
+    if (failure.kind !== 'rose') continue;
+    found.push(
+      failure.field === 'bare'
+        ? `ROSE ${failure.key} — ${failure.recorded} bare recorded, ${failure.count} now. A bare use is a ` +
+          `dropped declaration, not a cosmetic one.`
+        : `ROSE ${failure.key} — ${failure.recorded} recorded, ${failure.count} now. The baseline may fall, ` +
           `never rise.`,
-      );
-    } else if (entry.bare > (before.bare ?? 0)) {
-      found.push(
-        `ROSE ${name} — ${before.bare} bare recorded, ${entry.bare} now. A bare use is a ` +
-          `dropped declaration, not a cosmetic one.`,
-      );
-    }
+    );
   }
 
-  for (const { key } of classified.fixed) {
+  for (const { key } of stale) {
     found.push(
       `STALE ${key} — recorded, and no longer used-and-undefined. Remove the entry; a ` +
         `baseline nobody prunes stops being a measurement.`,

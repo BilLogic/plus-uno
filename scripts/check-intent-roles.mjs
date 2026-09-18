@@ -20,29 +20,15 @@
  * EVERY ENTRY CARRIES A `why`. A baseline is a list of exceptions, and an
  * exception without a reason is just a number nobody can argue with.
  *
- * THE RECORD IS READ THROUGH `scripts/lib/ratchet.mjs` (#601), which owns the
- * two directions, the stale-entry sweep, the empty-reason sweep and the one
- * stated absent-record error mode. This record has no `--update` and never had:
- * it is maintained by hand, because the sentence beside each entry is the whole
- * point of it and no tool can write one. The wording of the findings stays in
- * `scripts/intent-roles.mjs`, so the migration changed no sentence a reader
- * sees.
- *
  * Run: `npm run check:intent-roles`.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { REPO_ROOT, counts, edgeUses, ratchetFailures, stylesheets } from './intent-roles.mjs';
+import { REPO_ROOT, counts, edgeUses, failures, stylesheets } from './intent-roles.mjs';
 import { byRoot, main } from './lib/findings.mjs';
-import { openRatchet } from './lib/ratchet.mjs';
+import { isUnreviewed, openRatchet } from './lib/ratchet.mjs';
 
-/**
- * The record, named here because this is the check that reads it — and because
- * it is the key its shape is declared under in `scripts/lib/ratchet-shapes.mjs`
- * and the path `scripts/checks.registry.mjs` declares for this row. One
- * spelling, three readers.
- */
 const BASELINE = 'docs/evals/intent-role-adoption.json';
 const ROLES_FILE = 'design-system/src/tokens/_color_roles.scss';
 
@@ -61,29 +47,49 @@ export const REMEDY =
   `     If a call site genuinely needs the base, record it in ${BASELINE} with a reason.`;
 
 // The corpus walk, the edge uses and the roles file are the same read for both
-// questions, so they happen once per root. The record is not among them: it is
-// read through the ratchet, which is opened per call so a run always compares
-// against what is on disk now.
+// questions, so they happen once per root.
 const inputs = byRoot((repoRoot) => {
   const files = stylesheets(repoRoot);
-  const uses = edgeUses(files);
   return {
     files,
-    uses,
-    // What the run measured, in the record's own shape — `{file: {border, outline}}`,
-    // sorted, so the module reads both sides on one declared form and reports
-    // them in the order a reader scans the record in.
-    measured: Object.fromEntries(Object.entries(counts(uses)).sort(([a], [b]) => a.localeCompare(b))),
+    uses: edgeUses(files),
     roles: fs.readFileSync(path.join(repoRoot, ROLES_FILE), 'utf8'),
   };
 });
 
-const ratchetFor = (repoRoot) => openRatchet({ file: BASELINE, repoRoot });
+/**
+ * The record, through `scripts/lib/ratchet.mjs` (#600). Its row declares an
+ * entry of TWO ratcheted counts with the reason in the entry's own `why`, and a
+ * direction of BOTH — so the module reports a rise, a fall, a file the record
+ * has stopped describing, and an entry whose reason says nothing, and this file
+ * only words them.
+ *
+ * NO `--update`, by its row's `command: null`. The record is the document that
+ * says why each remainder is allowed to remain, and every line of that is a
+ * person's: a flag that re-recorded the counts and stamped the reasons
+ * UNREVIEWED would produce a record the check immediately fails on, which is
+ * the honest outcome and still not a thing worth offering.
+ */
+const gate = (repoRoot) => openRatchet({ file: BASELINE, repoRoot });
+
+/**
+ * A REASON THAT IS TOO SHORT TO BE ONE. The module's own test is that a reason
+ * is not blank and not one of the four words people type instead of thinking;
+ * this check has always held its own to 40 characters as well, because every
+ * entry here has to name a decision and nothing that short does. The two are
+ * unioned rather than one replacing the other.
+ */
+const reasonless = (ratchet) => {
+  const keys = new Set(ratchet.unreviewed().map((entry) => entry.key));
+  for (const [key, entry] of ratchet.entries) {
+    if (isUnreviewed(entry.reason) || entry.reason.length < 40) keys.add(key);
+  }
+  return [...keys];
+};
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
-  const { files, uses, measured, roles } = inputs(repoRoot);
-  const ratchet = ratchetFor(repoRoot);
+  const { files, uses, roles } = inputs(repoRoot);
   const found = [];
 
   if (files.length < MIN_FILES) {
@@ -107,26 +113,16 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     }
   }
 
-  /*
-   * EVERY ENTRY CARRIES A `why`, and two ways of having none are the same
-   * finding: the placeholder `--update` would stamp — which the ratchet reports
-   * from `unreviewed()`, against the one definition of an empty reason the whole
-   * repo uses — and a reason too short to be an argument. This record is
-   * maintained by hand, so the second is the one that actually happens here.
-   */
-  const noReason = new Set(ratchet.unreviewed().map(({ key }) => key));
-  for (const [file, entry] of ratchet.entries) {
-    if (noReason.has(file) || String(entry.reason).length < 40) {
-      found.push({
-        message: `${file} is baselined without a reason. Say why the base is still right there, or migrate it.`,
-      });
-    }
-  }
+  const ratchet = gate(repoRoot);
+  const side = counts(uses);
+  if (ratchet.absent) return [...found, ...ratchet.failures(side).map(({ message }) => ({ message }))];
 
   found.push(
-    ...ratchetFailures(ratchet.failures(measured), ratchet.stale(measured), uses).map((message) => ({
-      message,
-    })),
+    ...failures(uses, {
+      failures: ratchet.failures(side),
+      stale: ratchet.stale(side),
+      unreviewed: reasonless(ratchet),
+    }).map((message) => ({ message })),
   );
   return found;
 }
@@ -134,11 +130,13 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 /** The green line, which carries the remainder and what the baseline records. */
 export function summary({ repoRoot = REPO_ROOT } = {}) {
   const { files, uses } = inputs(repoRoot);
-  const ratchet = ratchetFor(repoRoot);
   const remaining = uses.length;
+  // `migrated` and `recordedAt` are envelope, not set: the ratchet does not own
+  // them and this is the one line that reads them, so it reads them directly.
+  const record = JSON.parse(fs.readFileSync(path.join(repoRoot, BASELINE), 'utf8'));
   return (
     `${files.length} stylesheets, ${remaining} edge use(s) of an intent base remain, ` +
-    `all recorded (${ratchet.envelope('migrated')} migrated ${ratchet.envelope('recordedAt')})`
+    `all recorded (${record.migrated} migrated ${record.recordedAt})`
   );
 }
 

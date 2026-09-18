@@ -103,7 +103,7 @@ function harness(
       const result = await runLoop({
         provider,
         deps: {
-          async executeReadOnlyTool(name) {
+          async executeUngatedTool(name) {
             executed.push(name);
             return JSON.stringify({ ok: true, rows: [] });
           },

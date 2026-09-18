@@ -84,7 +84,7 @@ function recorder(opts: { cancel?: boolean } = {}): Recorder {
     cancelReads: 0,
     interim: [],
     deps: {
-      async executeReadOnlyTool(name) {
+      async executeUngatedTool(name) {
         rec.executed.push(name);
         return JSON.stringify({ ok: true, rows: [] });
       },
@@ -135,7 +135,7 @@ function loopInput(
   };
 }
 
-/** A turn that asks for one read-only lookup. */
+/** A turn that asks for one ungated lookup. */
 const LOOKUP: WireReply = {
   content: [
     { type: "text", text: "Let me read the call-off path in the blueprint first." },
@@ -327,7 +327,7 @@ test("every tool_use in a rejected proposal_resolve turn gets a tool_result bloc
   assert.deepEqual(rec.interim, []);
 });
 
-test("a read-only tool round echoes the assistant turn then one tool_result per call", async () => {
+test("an ungated tool round echoes the assistant turn then one tool_result per call", async () => {
   const rec = recorder();
   const s = stub([
     {
@@ -346,7 +346,7 @@ test("a read-only tool round echoes the assistant turn then one tool_result per 
 
   assert.deepEqual(result, { kind: "text", text: "Both paths read." });
   assert.deepEqual(rec.executed, ["search_blueprint", "search_blueprint"]);
-  // THE narration rule, and it is the loop's: text ahead of read-only work is
+  // THE narration rule, and it is the loop's: text ahead of ungated work is
   // posted. The old Claude loop narrated unconditionally; that difference is
   // gone by construction.
   assert.deepEqual(rec.interim, ["Let me read the call-off path in the blueprint first."]);

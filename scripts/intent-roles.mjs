@@ -118,53 +118,49 @@ export function counts(uses) {
 }
 
 /**
- * The ratchet's findings, WORDED. The classification itself is
- * `scripts/lib/ratchet.mjs` — this record ratchets in BOTH directions, keeps its
- * reason inside each entry and is one of the twelve surveyed in
- * `scripts/lib/ratchet-shapes.mjs` (#601). What stays here is the sentence a
- * reader gets, which is why the migration changed no byte of it: a recorded
- * remainder may shrink only after the record shrinks with it, because a
- * baseline that no longer describes the code is a baseline nobody can read.
+ * The WORDING of the ratchet's verdicts. A recorded remainder may shrink only
+ * after the record shrinks with it: a count BELOW its baseline is a finding in
+ * its own right, because a baseline that no longer describes the code is a
+ * baseline nobody can read. That is the BOTH-directions ratchet this record's
+ * row declares in `scripts/lib/ratchet-shapes.mjs`, and since #600 the module
+ * decides it — per named count, `border` and `outline` separately — while what
+ * a verdict says stays here.
  *
- * Pure, and handed both halves of the module's answer, so the four mutations
- * #368 argued each have a sentence a test can hold.
+ * THE ORDER IS THE RUN'S. It used to be a walk over the union of the two sides
+ * in filename order; the module reports in the order the run met each file, and
+ * the stale entries and the reasonless ones after. Nothing about a single
+ * finding's text changed.
  *
- * @param {import('./lib/ratchet.mjs').RatchetFailure[]} moved  `failures()`.
- * @param {{key: string}[]} gone  `stale()`.
- * @param {{file: string, line: number, property: string}[]} uses  for the line
- *        numbers a file the record has never seen has to be named by.
- * @returns {string[]}
+ * @param {object[]} uses  the measurement, for the lines a new file's finding
+ *        names — the record holds counts, not places.
+ * @param {{failures?: object[], stale?: object[], unreviewed?: string[]}} verdicts
  */
-export function ratchetFailures(moved, gone, uses) {
+export function failures(uses, { failures: verdicts = [], stale = [], unreviewed = [] } = {}) {
   const found = [];
-  for (const failure of moved) {
-    // The one stated absent-record mode arrives already worded.
-    if (failure.kind === 'absent') {
-      found.push(failure.message);
-      continue;
-    }
-    if (failure.kind === 'new') {
-      const lines = uses.filter((u) => u.file === failure.key).map((u) => `${u.line} (${u.property})`);
+
+  for (const verdict of verdicts) {
+    if (verdict.kind === 'new') {
+      const lines = uses.filter((u) => u.file === verdict.key).map((u) => `${u.line} (${u.property})`);
       found.push(
-        `${failure.key} paints an edge from an intent base and is not in the baseline: ` +
+        `${verdict.key} paints an edge from an intent base and is not in the baseline: ` +
           `line ${lines.join(', ')}. Use the \`-border\` role, or record the reason it cannot.`,
       );
       continue;
     }
-    if (failure.kind === 'rose') {
-      found.push(
-        `${failure.key} has ${failure.count} ${failure.field} use(s) of an intent base, ` +
-          `up from ${failure.recorded}. The roles exist; use them.`,
-      );
-      continue;
-    }
     found.push(
-      `${failure.key} has ${failure.count} ${failure.field} use(s), down from ${failure.recorded} — ` +
-        'the ratchet moved and the record did not. Lower the baseline to match.',
+      verdict.kind === 'rose'
+        ? `${verdict.key} has ${verdict.count} ${verdict.field} use(s) of an intent base, up from ` +
+          `${verdict.recorded}. The roles exist; use them.`
+        : `${verdict.key} has ${verdict.count} ${verdict.field} use(s), down from ${verdict.recorded} — ` +
+          'the ratchet moved and the record did not. Lower the baseline to match.',
     );
   }
-  for (const { key } of gone) {
+
+  for (const { key } of stale) {
     found.push(`${key} is recorded in the baseline and no longer has any use. Delete its entry.`);
+  }
+  for (const key of unreviewed) {
+    found.push(`${key} is baselined without a reason. Say why the base is still right there, or migrate it.`);
   }
   return found;
 }

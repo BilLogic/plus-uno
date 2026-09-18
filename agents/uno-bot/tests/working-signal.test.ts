@@ -14,8 +14,8 @@
 // themselves, because api.ts degrades all of them into the one `{ ok: false,
 // error }` shape a refusal arrives in.
 //
-// And then the ADAPTER, driven. The pure vocabulary above was always testable;
-// what was not was whether the thing that calls it does. That half used to be a
+// And then the ADAPTER, driven. The vocabulary above was always testable; what
+// was not was whether the thing that calls it does. That half used to be a
 // `readFileSync` and three regexes over `slack-delivery.ts` — a check that
 // could ask whether `reportStatus("set", () => setSessionStatus(` appeared in a
 // file and nothing else. It went green on an adapter nobody calls, it could not
@@ -24,21 +24,26 @@
 // now (#594), so every case below runs the real adapter on a recording client
 // and asserts which status Slack was handed, on which thread, and what the
 // pairing reported.
+//
+// TWO IMPORTS, ONE SUBJECT, since #595: the classification and the line moved
+// into `slack/delivery-adapter.ts`, the one module that calls them, once #594
+// had made that module reachable. What is left in `slack/session-status.ts` is
+// the lifecycle vocabulary the Env-facing API layer and the stop doors also
+// speak.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { SUBREQUEST_CAP } from "../src/agent/loop-policy";
 import { SubrequestBudgetError } from "../src/net";
-import {
-  outcomeOf,
-  settledStatus,
-  workingSignalLine,
-  WORKING_STATUS,
-  type SessionStatus,
-  type WorkingSignalOutcome,
-} from "../src/slack/working-signal";
+import { settledStatus, WORKING_STATUS, type SessionStatus } from "../src/slack/session-status";
 import { settlementOf, type TurnDisposition, type TurnSettlement } from "../src/turn/index";
-import { deliveryAdapter, type SlackDeliveryTarget } from "../src/slack/delivery-adapter";
+import {
+  deliveryAdapter,
+  outcomeOf,
+  workingSignalLine,
+  type SlackDeliveryTarget,
+  type WorkingSignalOutcome,
+} from "../src/slack/delivery-adapter";
 import { recordingSlack } from "./helpers/recording-slack";
 
 describe("what came back, classified", () => {

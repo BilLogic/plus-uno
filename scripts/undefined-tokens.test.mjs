@@ -16,6 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { openRatchet } from './lib/ratchet.mjs';
 import {
   EXTERNAL,
   audit,
@@ -96,36 +97,57 @@ test('definitions and usages read the shapes they claim to', () => {
   );
 });
 
-/* ------------------------------------------------------------ the ratchet */
+/* --------------------------------------------- the wording of a verdict */
 
-const BASE = { tokens: { '--x': { uses: 2, bare: 1 } } };
+/*
+ * WHAT MOVED OUT OF HERE IN #600. Which names are new, which counts rose and
+ * which entries have gone stale is `scripts/lib/ratchet.mjs`'s, and the whole
+ * invariant is asserted once, against all twelve live records, in
+ * `scripts/lib/ratchet-conformance.mjs`. What is still this module's is what a
+ * verdict SAYS — and the last case below drives the real record through the
+ * real ratchet, which is the assertion that the two still fit.
+ */
 
-test('the ratchet passes when the count falls', () => {
-  assert.deepEqual(ratchetFailures({ '--x': { uses: 1, bare: 0, files: ['a'] } }, BASE), []);
+const FOUND = { '--x': { uses: 3, bare: 2, files: ['a.scss'] } };
+
+test('nothing moved is nothing said', () => {
+  assert.deepEqual(ratchetFailures(FOUND, {}), []);
 });
 
-test('a rise fails, and says the baseline may only fall', () => {
-  const found = ratchetFailures({ '--x': { uses: 3, bare: 1, files: ['a'] } }, BASE);
-  assert.equal(found.length, 1);
+test('a rise says which count moved, and that the baseline may only fall', () => {
+  const found = ratchetFailures(FOUND, {
+    failures: [{ kind: 'rose', key: '--x', field: 'uses', count: 3, recorded: 2 }],
+  });
+  assert.deepEqual(found.length, 1);
   assert.match(found[0], /^ROSE --x — 2 recorded, 3 now/);
 });
 
-test('turning a fallback into a bare use fails even though the total is flat', () => {
-  const found = ratchetFailures({ '--x': { uses: 2, bare: 2, files: ['a'] } }, BASE);
-  assert.equal(found.length, 1);
+test('a bare use is worded as its own regression, not as a count', () => {
+  // The total can stay flat while a fallback becomes a bare use, which drops
+  // the whole declaration. The two fields ratchet separately for that reason.
+  const found = ratchetFailures(FOUND, {
+    failures: [{ kind: 'rose', key: '--x', field: 'bare', count: 2, recorded: 1 }],
+  });
   assert.match(found[0], /bare recorded, 2 now/);
 });
 
-test('a name nobody recorded is always a failure', () => {
-  const found = ratchetFailures({ '--y': { uses: 1, bare: 1, files: ['a.scss'] } }, BASE);
-  assert.equal(found.length, 2, 'the new name, and --x having gone stale');
-  assert.match(found[0], /^NEW  --y/);
+test('a fall is not worded at all — this record is shrink-only', () => {
+  const found = ratchetFailures(FOUND, {
+    failures: [{ kind: 'fell', key: '--x', field: 'uses', count: 1, recorded: 2 }],
+  });
+  assert.deepEqual(found, []);
 });
 
-test('a fixed entry left in the baseline is itself a finding', () => {
-  const found = ratchetFailures({}, BASE);
+test('a new name is worded with the first file it appears in', () => {
+  const found = ratchetFailures(FOUND, { failures: [{ kind: 'new', key: '--x', count: 3 }] });
   assert.equal(found.length, 1);
-  assert.match(found[0], /^STALE --x/);
+  assert.match(found[0], /^NEW  --x — used 3x \(2 bare\) and defined nowhere\. First: a\.scss$/);
+});
+
+test('a fixed entry left in the record is itself a finding', () => {
+  const found = ratchetFailures(FOUND, { stale: [{ key: '--gone', recorded: 2 }] });
+  assert.equal(found.length, 1);
+  assert.match(found[0], /^STALE --gone/);
 });
 
 /* ------------------------------------------------------------- the corpus */
@@ -136,10 +158,18 @@ test('the real corpus is walked, and the real baseline matches it', () => {
     text: fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8'),
   }));
   assert.ok(files.length > 1300, `${files.length} files — the walk must not narrow silently`);
-  const baseline = JSON.parse(
-    fs.readFileSync(path.join(REPO_ROOT, 'docs/evals/undefined-token-baseline.json'), 'utf8'),
+  // Through the real ratchet, on the shape the record declares: the measured
+  // side is `{ name: { uses, bare } }` and nothing else, which is also what
+  // `--update` writes back.
+  const { undefinedTokens } = audit(files);
+  const entries = openRatchet({ file: 'docs/evals/undefined-token-baseline.json', set: 'tokens', repoRoot: REPO_ROOT });
+  const side = Object.fromEntries(
+    Object.entries(undefinedTokens).map(([name, entry]) => [name, { uses: entry.uses, bare: entry.bare }]),
   );
-  assert.deepEqual(ratchetFailures(audit(files).undefinedTokens, baseline), []);
+  assert.deepEqual(
+    ratchetFailures(undefinedTokens, { failures: entries.failures(side), stale: entries.stale(side) }),
+    [],
+  );
 });
 
 test('the tokens this pass repointed are gone from the corpus', () => {

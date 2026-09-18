@@ -17,7 +17,7 @@
 // PURE, like the rest of the module: no `Env`, no fetch, no Slack client.
 
 import type { AgentImage, HistoricalImages } from "../agent/provider-conversation";
-import type { ModelTier } from "../agent/tiers";
+import type { ModelTier } from "../agent/routing";
 import type { HistoryTurn, PendingProposal } from "../thread-state/index";
 import type { VisionReference } from "../slack/vision-reference";
 import type { TurnRequest, TurnSurface } from "./turn";
@@ -57,10 +57,18 @@ export interface TurnFacts {
 /**
  * Which surface a channel id is.
  *
- * The ONE statement of the rule: an app DM (`D…`) is the assistant surface,
- * everything else is a channel — and an app DM and the assistant panel are the
- * same conversation (`slack/delivery-adapter.ts` § `isAssistantThread`, which reads
- * it from here).
+ * THE ONE STATEMENT OF THE RULE, and since #595 the only one: an app DM (`D…`)
+ * is the assistant surface, everything else is a channel — and an app DM and
+ * the assistant panel are the same conversation.
+ *
+ * Every reader reads it from here rather than testing the prefix itself. There
+ * were five that did: the Slack Delivery adapter's title gate
+ * (`slack/delivery-adapter.ts` § `isAssistantThread`), the stop control's key
+ * and card resolution (`slack/session-stop.ts`), which channels the event
+ * envelope engages on at all (`slack/events.ts`), the ADR-020 own-visibility
+ * search gate (`tools/slack-search.ts`) and the cancel-key fallback
+ * (`agent/run-agent.ts`). A rule with one statement and five copies is a rule
+ * that can be changed in one place and still be wrong in five.
  */
 export function turnSurfaceOf(channel: string): TurnSurface {
   return channel.startsWith("D") ? "assistant" : "channel";

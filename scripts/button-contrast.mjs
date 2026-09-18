@@ -13,8 +13,10 @@
  * and `focus-ring.mjs` import the maths from the module itself, so there is one
  * import path to it rather than two. The RATCHET went with the maths in #506
  * and moved again in #599, to `scripts/lib/ratchet.mjs`, which is also where
- * this check's record shape is declared. What this file still exports is its own —
- * `tokenValues`, `PAGE_TOKEN`, `AA_TEXT` and the button sweep.
+ * this check's record shape is declared — and in #600 the rest of the record
+ * went with it, so this file no longer imports the classifier at all. What it
+ * still exports is its own: `tokenValues`, `PAGE_TOKEN`, `AA_TEXT`, the button
+ * sweep, the two sides the record is written in, and the wording.
  *
  * WHAT THIS MEASURES, AND WHY IT IS NOT THE a11y RATCHET'S JOB.
  * `check:storybook` runs axe over what the stories render. Nothing renders a
@@ -167,55 +169,45 @@ export function duplicateGrounds(themes, values) {
 }
 
 /**
- * Findings, as the check reports them. A baseline entry silences a finding and
- * nothing else: entries are `"style/fill"` for contrast and `"a+b"` for a
- * duplicate pair, and an entry that no longer matches anything is itself a
- * finding — a ratchet that cannot shrink is a list.
- *
- * The classification is the module's, and since #601 it is the RECORD's own —
- * two `openRatchet` handles, one per set, opened by the check. What is left here
- * is the WORDING and the ORDER, both of which are this check's own. The order in
- * particular is preserved deliberately: an unresolved combination is reported in
- * sweep position, interleaved with the contrast findings, so a reader walks the
- * map the way the map is written.
- *
- * TWO SETS, ONE `notes` MAP BESIDE THEM, which is why each set is opened by name
- * and asked separately: a write that rebuilt the notes from one set's keys would
- * delete the other set's reasons. This record has no `--update` at all — both
- * entries are #268 token decisions and the argument for each is the note — so
- * the only thing asked of the module here is the read and the two directions.
- *
- * @param {{style: string, main: string}[]} themes
- * @param {Map<string, string>} values
- * @param {{contrast: import('./lib/ratchet.mjs').Ratchet,
- *          duplicates: import('./lib/ratchet.mjs').Ratchet}} records
+ * The two sides of the record, measured — in the shape
+ * `docs/evals/button-contrast-baseline.json` holds them, which is two arrays of
+ * keys: `"style/fill"` for contrast and `"a+b"` for a duplicate pair. This is
+ * what `scripts/lib/ratchet.mjs` is handed (#600), and it is the whole of what
+ * this module says about the record.
  */
-export function findings(themes, values, records) {
+export function measured(themes, values) {
+  return {
+    contrast: sweep(themes, values)
+      .filter((row) => row.ratio !== null && row.ratio < AA_TEXT)
+      .map((row) => `${row.style}/${row.fill}`),
+    duplicates: duplicateGrounds(themes, values).map((group) => group.join('+')),
+  };
+}
+
+/**
+ * The WORDING of both ratchets' verdicts, and the one finding neither ratchet
+ * can have an opinion about — a combination whose ground will not resolve.
+ *
+ * A baseline entry silences a finding and nothing else, and an entry that no
+ * longer matches anything is itself a finding: a ratchet that cannot shrink is
+ * a list. THE ORDER is preserved deliberately — an unresolved combination is
+ * reported in sweep position, interleaved with the contrast findings, so a
+ * reader walks the map the way the map is written.
+ *
+ * @param {object[]} themes
+ * @param {Map<string, string>} values
+ * @param {{contrast?: {fresh?: string[], stale?: string[]},
+ *          duplicates?: {fresh?: string[], stale?: string[]}}} verdicts
+ *        what the ratchet said about each of the record's two sets. Empty is
+ *        "nothing moved", not "nothing is recorded": which keys are new is
+ *        `scripts/lib/ratchet.mjs`'s call, and this function has no record.
+ */
+export function findings(themes, values, verdicts = {}) {
+  const { contrast = {}, duplicates = {} } = verdicts;
   const rows = sweep(themes, values);
-  const failing = rows
-    .filter((row) => row.ratio !== null && row.ratio < AA_TEXT)
-    .map((row) => `${row.style}/${row.fill}`);
-  const duplicates = duplicateGrounds(themes, values).map((group) => group.join('+'));
+  const unrecordedContrast = new Set(contrast.fresh ?? []);
 
   const found = [];
-  const unrecorded = (record, keys) => {
-    const fresh = new Set();
-    for (const failure of record.failures(keys)) {
-      // The one stated absent-record mode arrives already worded: with nothing
-      // recorded, every combination would otherwise be reported as new and bury
-      // the one fact that matters. ONE record, so it is said ONCE, even though
-      // both sets of it are missing — two copies of the same sentence tell a
-      // reader twice that there is one file to write.
-      if (failure.kind === 'absent') {
-        if (!found.includes(failure.message)) found.push(failure.message);
-      } else {
-        fresh.add(failure.key);
-      }
-    }
-    return fresh;
-  };
-  const unrecordedContrast = unrecorded(records.contrast, failing);
-  const unrecordedDuplicates = unrecorded(records.duplicates, duplicates);
 
   for (const row of rows) {
     if (row.ratio === null) {
@@ -228,14 +220,14 @@ export function findings(themes, values, records) {
     }
   }
 
-  for (const key of unrecordedDuplicates) {
+  for (const key of duplicates.fresh ?? []) {
     found.push(`${key}: these styles render the same filled ground, so the names are a distinction the interface does not draw`);
   }
 
-  for (const { key } of records.contrast.stale(failing)) {
+  for (const key of contrast.stale ?? []) {
     found.push(`baseline entry "${key}" no longer fails — remove it`);
   }
-  for (const { key } of records.duplicates.stale(duplicates)) {
+  for (const key of duplicates.stale ?? []) {
     found.push(`baseline entry "${key}" no longer duplicates — remove it`);
   }
 

@@ -8,11 +8,12 @@
 //
 // The decision itself lives in `slack/stream-recipient.ts` so it can be tested
 // by RUNNING it, and the adapter that hands the pair over is DRIVEN below — it
-// takes its Slack client by name since #594. What is left to a source
-// assertion is only what the Node lane still cannot reach: `slack/delivery.ts`
-// names `Env` and the Slack client, and `startStream`'s recipient parameters
-// are optional, so a caller can drop them again with the type checker none the
-// wiser.
+// takes its Slack client by name since #594. What is left to a source assertion
+// is the one adapter this suite still has nothing to call: `slack/delivery.ts`
+// takes an `Env` and posts through the Slack client, and `startStream`'s
+// recipient parameters are optional, so a caller can drop them again with the
+// type checker none the wiser. That door taking its client by name is its own
+// ticket; #595 left it.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";

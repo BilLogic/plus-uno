@@ -41,9 +41,12 @@
 // paraphrase asserted as a rule is not.
 
 // Structurally identical to HistoryTurn in thread-state.ts, declared locally
-// rather than imported: importing it drags in Env, which drags in the Workers
-// type graph, which cannot compile under the node-only test config. This module
-// is the one in the backlog most in need of tests, so it stays import-free.
+// rather than imported so this module keeps its one property: it imports
+// nothing, so every branch of the context budget can be driven from a plain
+// test with no store, no `Env` and no bindings. (The compile was never the
+// obstacle — `tsconfig.test.json` types the Workers globals beside the Node
+// ones and globs `src/**` since #595. The duplicated shape is the cost, and
+// `tests/context-state.test.ts` is what it buys.)
 export interface HistoryTurn {
   role: "user" | "assistant";
   content: string;
