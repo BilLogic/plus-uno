@@ -2,7 +2,7 @@
 
 One file per fixture case, `<case-id>.json`, holding **the model replies that case's turns were answered with** — and nothing else. No scores, no expectations: what a case asserts lives in `../uno-bot-cases.json`, and a recording that carried an expectation would be a second answer key nobody updates.
 
-`agents/uno-bot/scripts/run-evals.mjs --transport=local` replays these through the same `evalTurnRequest → runTurn → evalTurnResponse` path the Worker's `/debug/eval` route takes (`agents/uno-bot/src/eval/turn-adapter.ts`), with the in-memory ThreadState seeded from the runner's history and the recording Delivery. A case with **no** recording here is reported **ungated** by name — counted apart, never failed, and never silent: a skip nobody counts is a case that gates nothing while reading as though it did.
+`agents/uno-bot/scripts/run-evals.mjs --transport=local` replays these through the same `evalTurnRequest → runTurn → evalTurnResponse` path the Worker's `/debug/eval` route takes (`agents/uno-bot/src/eval/turn-adapter.ts`), with the in-memory ThreadState seeded from the runner's history and the recording Delivery. A case with **no** recording here is reported **unreachable** by name — counted apart, never failed, and never silent: a skip nobody counts is a case that gates nothing while reading as though it did.
 
 ## The shape
 

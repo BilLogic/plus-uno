@@ -97,6 +97,14 @@ export function rowShape(label, measurements) {
   return {
     keys,
     row(fields) {
+      // #656 renamed the turn-suite field `ungated` → `unreachable`. A results
+      // file written before that still carries the old key; accept it as the
+      // new one rather than refuse the row. Construction after the rename
+      // uses `unreachable` only.
+      if (Object.prototype.hasOwnProperty.call(fields, "ungated") && !Object.prototype.hasOwnProperty.call(fields, "unreachable")) {
+        const { ungated, ...rest } = fields;
+        fields = { ...rest, unreachable: ungated };
+      }
       for (const key of Object.keys(fields)) {
         if (!(key in defaults)) {
           throw new Error(`${label} row for '${fields.id ?? "?"}' carries unknown key '${key}'`);
@@ -112,7 +120,7 @@ export function rowShape(label, measurements) {
 /**
  * What the TURN suite measured, on top of the spine.
  *
- * `ungated` is here rather than in the spine on purpose: it is a fact about a
+ * `unreachable` is here rather than in the spine on purpose: it is a fact about a
  * transport that answers from recordings, and the retrieval suite has none —
  * its one instrument reaches every case, and a query that fails to reach the
  * Worker is scored a MISS rather than waved through as unreachable.
@@ -121,7 +129,7 @@ const TURN_MEASUREMENTS = {
   /** Skipped because THIS RUN'S INSTRUMENT cannot reach the case — no
    *  recording, for the local transport. The word is the point: whatever the
    *  case asserts is not being enforced on this run. */
-  ungated: false,
+  unreachable: false,
   /** The sampling arithmetic behind the score (`eval-scoring.mjs`). */
   samples: 0,
   passedRuns: 0,
@@ -169,11 +177,11 @@ export const REMEDY = [
  * warning, which is what the runner's `blockerFailures` counter meant by
  * counting only some of the failures it printed.
  *
- * UNGATED CASES ARE NOT FINDINGS. They fail nothing by design — a gate that is
+ * UNREACHABLE CASES ARE NOT FINDINGS. They fail nothing by design — a gate that is
  * red for "no recording" is a gate that gets switched off — and they are
  * already named twice in the run's own output, in the opening census and in the
  * score line. What IS worth saying is a run that scored NOTHING: every case
- * skipped or ungated reads as a clean sweep and measured nothing at all. A
+ * skipped or unreachable reads as a clean sweep and measured nothing at all. A
  * warning, not an error, because the no-recording case has to stay green.
  *
  * @param {object} summary - what `runEvals` returned.
@@ -195,7 +203,7 @@ export function findingsFor(summary) {
   if (!scored.length) {
     findings.push({
       severity: "warning",
-      message: `nothing was scored: all ${summary.results.length} case(s) skipped or ungated, so this run measured nothing`,
+      message: `nothing was scored: all ${summary.results.length} case(s) skipped or unreachable, so this run measured nothing`,
     });
   }
   return findings;

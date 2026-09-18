@@ -17,7 +17,7 @@ import { RESULT_KEYS, findingsFor, resultRow } from "./eval-results.mjs";
 test("every row carries the same keys, whatever the branch that wrote it knew", () => {
   // The five branches of the walk, at their thinnest and their fullest.
   const rows = [
-    resultRow({ id: "R0", name: "no recording", skipped: true, ungated: true, reason: "no recording for R0" }),
+    resultRow({ id: "R0", name: "no recording", skipped: true, unreachable: true, reason: "no recording for R0" }),
     resultRow({ id: "B2", name: "subject read failed", failures: ["subject route for 'scenario-any': HTTP 500"] }),
     resultRow({ id: "B2", name: "nothing satisfies it", skipped: true, need: "scenario-any", reason: "nothing on this board" }),
     resultRow({ id: "B2", name: "placeholder unfilled", need: "scenario-any", subject: { name: "x" }, failures: ["carries no 'phase'"] }),
@@ -27,7 +27,7 @@ test("every row carries the same keys, whatever the branch that wrote it knew", 
 });
 
 test("absent is not a value: a skipped row still answers 'did it pass?'", () => {
-  const row = resultRow({ id: "R0", name: "no recording", skipped: true, ungated: true, reason: "no recording" });
+  const row = resultRow({ id: "R0", name: "no recording", skipped: true, unreachable: true, reason: "no recording" });
   assert.equal(row.pass, false, "a case that did not run did not pass, and the field says so");
   assert.equal(row.skipped, true, "and `skipped` is the field that keeps it out of the denominator");
   assert.deepEqual(row.failures, []);
@@ -43,6 +43,13 @@ test("a key outside the vocabulary is refused, not written", () => {
     () => resultRow({ id: "R3", name: "ran", passedRun: 3 }),
     /results row for 'R3' carries unknown key 'passedRun'/,
   );
+});
+
+test("a results row written before #656 still reads: ungated is unreachable", () => {
+  const row = resultRow({ id: "R0", name: "no recording", skipped: true, ungated: true, reason: "no recording" });
+  assert.equal(row.unreachable, true);
+  assert.equal("ungated" in row, false, "the old key does not survive on the row");
+  assert.deepEqual(Object.keys(row), RESULT_KEYS);
 });
 
 // ── The gate ─────────────────────────────────────────────────────────────────
@@ -73,19 +80,19 @@ test("a run where everything passed finds nothing, and exits 0", () => {
   assert.equal(exitCodeFor(findingsFor(summary)), 0);
 });
 
-test("a skipped or ungated case is not a finding, so a missing recording cannot redden the gate", () => {
+test("a skipped or unreachable case is not a finding, so a missing recording cannot redden the gate", () => {
   // A gate that is red for "no recording" is a gate that gets switched off.
   // But a run that scored NOTHING reads as a clean sweep and measured nothing,
   // so it says so — as a warning, which prints and does not fail.
   const summary = {
     results: [
-      resultRow({ id: "R0", name: "a case", skipped: true, ungated: true, blocker: true, reason: "no recording" }),
+      resultRow({ id: "R0", name: "a case", skipped: true, unreachable: true, blocker: true, reason: "no recording" }),
       resultRow({ id: "B2", name: "a case", skipped: true, blocker: true, reason: "nothing on this board" }),
     ],
   };
   const findings = findingsFor(summary);
   assert.equal(findings.length, 1);
   assert.equal(findings[0].severity, "warning");
-  assert.match(findings[0].message, /nothing was scored: all 2 case\(s\) skipped or ungated/);
+  assert.match(findings[0].message, /nothing was scored: all 2 case\(s\) skipped or unreachable/);
   assert.equal(exitCodeFor(findings), 0, "two unmeasured blockers must not fail the run");
 });

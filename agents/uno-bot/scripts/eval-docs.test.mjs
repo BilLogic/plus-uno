@@ -61,15 +61,15 @@ test("a census block with no markers fails loudly", () => {
   assert.throws(() => replaceBlock("# nothing here", "uno-bot-cases", "x"), /census block/);
 });
 
-test("an ungated case is named in every document that counts cases", () => {
+test("an unreachable case is named in every document that counts cases", () => {
   const { cases, proposed } = loadCases();
   const census = censusOf(cases, { recorded: cases.slice(1).map((c) => c.id) });
   const id = cases[0].id;
   const block = renderCensusBlock(census);
-  assert.match(block, new RegExp(`ungated[^|]*\\|[^|]*${id}`));
+  assert.match(block, new RegExp(`unreachable[^|]*\\|[^|]*${id}`));
   const doc = renderScenarios({ cases, proposed, census });
-  assert.match(doc, /> \*\*Ungated\.\*\*/);
-  assert.match(doc, /\*\*UNGATED — no recording\*\*/);
+  assert.match(doc, /> \*\*Unreachable\.\*\*/);
+  assert.match(doc, /\*\*UNREACHABLE — no recording\*\*/);
 });
 
 test("the renderer writes nothing", () => {

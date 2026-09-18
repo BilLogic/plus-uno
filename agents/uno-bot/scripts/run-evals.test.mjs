@@ -382,7 +382,7 @@ test("a fixture case scores identically through the local transport and a Worker
   assert.match(fromWorker.summary.transport, /^worker /);
 });
 
-test("an unrecorded case is reported UNGATED, counted apart, and never fails a blocker", async () => {
+test("an unrecorded case is reported UNREACHABLE, counted apart, and never fails a blocker", async () => {
   // Every fixture case is recorded now, so the unrecorded one is R1 under an
   // id nothing recorded. A red blocker for "no recording" would be a gate that
   // is red by construction; a green one would be a lie. What the case must not
@@ -395,12 +395,12 @@ test("an unrecorded case is reported UNGATED, counted apart, and never fails a b
   assert.equal(summary.failed, 0);
   assert.equal(summary.blockerFailures, 0);
   assert.match(summary.results[0].reason, /no recording for R0/);
-  assert.equal(summary.results[0].ungated, true);
-  assert.deepEqual(summary.ungated, ["R0"]);
-  assert.deepEqual(summary.census.ungated, ["R0"]);
+  assert.equal(summary.results[0].unreachable, true);
+  assert.deepEqual(summary.unreachable, ["R0"]);
+  assert.deepEqual(summary.census.unreachable, ["R0"]);
   assert.equal(summary.census.total, 1);
-  assert.ok(lines.some((l) => l.startsWith("[UNGATED] R0")));
-  assert.ok(lines.some((l) => /UNGATED \(no recording\): R0/.test(l)));
+  assert.ok(lines.some((l) => l.startsWith("[UNREACHABLE] R0")));
+  assert.ok(lines.some((l) => /UNREACHABLE \(no recording\): R0/.test(l)));
 });
 
 test("every row of the results file has the same shape, whichever branch wrote it", async () => {
@@ -417,9 +417,9 @@ test("every row of the results file has the same shape, whichever branch wrote i
   const { summary } = await run(fixtureOf(cases), instrument);
   assert.equal(summary.results.length, 3);
   assert.deepEqual(summary.results.map((r) => Object.keys(r)), summary.results.map(() => RESULT_KEYS));
-  // And the three branches really were three: a pass, a skip, an ungated skip.
+  // And the three branches really were three: a pass, a skip, an unreachable skip.
   assert.deepEqual(
-    summary.results.map((r) => [r.pass, r.skipped, r.ungated]),
+    summary.results.map((r) => [r.pass, r.skipped, r.unreachable]),
     [[true, false, false], [false, true, false], [false, true, true]],
   );
 });
@@ -433,7 +433,7 @@ test("a run states its census before it starts", async () => {
   assert.equal(summary.census.blockers, 1);
   // A transport with no recordings to report says so: every case is gated.
   assert.equal(summary.census.recorded, null);
-  assert.deepEqual(summary.ungated, []);
+  assert.deepEqual(summary.unreachable, []);
   assert.ok(lines.some((l) => l.startsWith("[evals] 1 cases, 1 blockers")));
 });
 

@@ -114,6 +114,7 @@ test("a transport failure is scored a miss, so nothing is waved through as unrea
   });
   assert.equal(results[0].pass, false);
   assert.equal(results[0].skipped, false, "the retrieval suite has no unreachable case");
+  assert.equal("unreachable" in results[0], false, "unreachable is a turn measurement; retrieval has no such field");
   assert.match(results[0].failures[0], /request failed: HTTP 404/);
 });
 
