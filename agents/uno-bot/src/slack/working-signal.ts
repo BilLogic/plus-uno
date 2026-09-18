@@ -22,9 +22,10 @@
 // what the turn had spent by then.
 //
 // PURE by design — no `Env`, no Slack client, no `net.ts` — so the formatter AND
-// the classification are compiled and asserted by `tsconfig.test.json`, while
-// the adapter that calls them (`slack-delivery.ts`) stays out of reach of the
-// Node test build.
+// the classification are compiled and asserted by `tsconfig.test.json`. The
+// adapter that calls them is on that compile too since #594: it takes its Slack
+// client by name (`slack/delivery-adapter.ts`), so the suite drives the pairing
+// rather than matching the adapter's source.
 
 import { SUBREQUEST_CAP } from "../agent/loop-policy";
 import type { TurnSettlement } from "../turn/index";

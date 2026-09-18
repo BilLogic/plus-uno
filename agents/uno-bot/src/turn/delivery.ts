@@ -10,9 +10,12 @@
 // So they are METHODS here and nothing else. The port names what the turn
 // means, never how Slack renders it: `postInterim` is "say something is still
 // happening", and whether that becomes a task card inside a plan stream or a
-// loose ⏳ message is the Slack adapter's business (`slack/slack-delivery.ts`).
+// loose ⏳ message is the Slack adapter's business
+// (`slack/delivery-adapter.ts`, built from `Env` by `slack/slack-delivery.ts`).
 // Two adapters exist: that one, and `recordingDelivery` below, which every
-// Turn test runs on.
+// Turn test runs on. A third recording stands one layer further down, for the
+// Slack adapter's own tests: `tests/helpers/recording-slack.ts` stands in for
+// the Slack CLIENT rather than for this port.
 //
 // PURE by design — no `Env`, no Workers type, no fetch — so
 // `tsconfig.test.json` compiles this file and the recording adapter beside the
