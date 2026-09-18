@@ -38,7 +38,7 @@ const ROLES_FILE = `${TOKEN_DIR}/_color_roles.scss`;
  * stylesheets found on 2026-08-29; a resolver change that stopped finding them
  * would otherwise read as a clean sweep.
  */
-const MIN_FILES = 150;
+export const MIN_FILES = 150;
 
 const INTENTS = ['primary', 'secondary', 'tertiary', 'danger', 'success', 'warning', 'info'];
 

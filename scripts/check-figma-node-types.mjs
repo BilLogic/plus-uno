@@ -37,7 +37,7 @@ const RECORDING = 'design-system/figma/node-types.json';
  * asserted rather than assumed. Lower it only when a mapping is genuinely
  * deleted, and say which one in the commit.
  */
-const MIN_RECORDED = 100;
+export const MIN_RECORDED = 100;
 
 export const REMEDY =
   `  -> Re-measure with \`npm run audit:figma-registry\`, run the printed probe in\n` +

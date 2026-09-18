@@ -71,7 +71,7 @@ const SCAN_ROOT = 'design-system/src/components';
 // every walk below returns nothing, every assertion holds vacuously, and this exits
 // 0 having examined no files at all. check-storybook.mjs took the same floor for the
 // same reason. The number is a floor, not a target — raise it only when it bites.
-const MIN_FILES = 100;
+export const MIN_FILES = 100;
 
 export const REMEDY =
   '  -> The component takes everything the caller passed beyond its declared\n' +

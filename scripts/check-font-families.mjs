@@ -30,7 +30,7 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const ROOTS = ['design-system/src', '.storybook', 'prototypes'];
 
 /** The floor, measured 2026-08-29. A walk that stopped matching finds nothing. */
-const MIN_FILES = 1300;
+export const MIN_FILES = 1300;
 
 export const REMEDY =
   '  -> A fallback only paints when the token fails to load, which is exactly when\n' +

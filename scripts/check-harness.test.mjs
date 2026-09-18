@@ -373,6 +373,57 @@ test('the one check that still parses its own record is named, and the exemption
   assert.ok(stale.some((m) => /Delete the exemption/.test(m)), stale.join('\n'));
 });
 
+// ---------------------------------------------------------------------------
+// the `floors` column (#613)
+//
+// Sentinel floors — the minimum file / rule / component / variable counts and
+// the maximum ages — are the same class of datum as a baseline. The registry
+// declares each one, and asserts the number is the one the check enforces.
+// A floor that lives only as a private `const` in the check is a finding.
+// ---------------------------------------------------------------------------
+
+test('a sentinel the check enforces but the row does not declare is a finding', () => {
+  const row = { ...byName('check:focus-ring') };
+  delete row.floors;
+  const messages = registryGenerator.floorFindings(row).map((f) => f.message);
+  assert.ok(
+    messages.some((m) => /MIN_FILES = 150 as a private constant/.test(m)),
+    messages.join('\n'),
+  );
+  assert.ok(
+    messages.some((m) => /MIN_RULES = 60 as a private constant/.test(m)),
+    messages.join('\n'),
+  );
+});
+
+test('a floor the row declares that the check does not enforce is a finding', () => {
+  const row = { ...byName('check:focus-ring'), floors: { MIN_FILES: 150, MIN_RULES: 60, MIN_WIDGETS: 3 } };
+  const messages = registryGenerator.floorFindings(row).map((f) => f.message);
+  assert.ok(
+    messages.some((m) => /floors\.MIN_WIDGETS = 3, which .+ never enforces/.test(m)),
+    messages.join('\n'),
+  );
+});
+
+test('a declared floor that disagrees with the number the check enforces is a finding', () => {
+  const row = { ...byName('check:focus-ring'), floors: { MIN_FILES: 1, MIN_RULES: 60 } };
+  const messages = registryGenerator.floorFindings(row).map((f) => f.message);
+  assert.ok(
+    messages.some((m) => /floors\.MIN_FILES = 1, but .+ enforces 150/.test(m)),
+    messages.join('\n'),
+  );
+});
+
+test('every sentinel floor is on its registry row and matches what the check enforces', () => {
+  const found = ALL.flatMap((row) => registryGenerator.floorFindings(row));
+  assert.deepEqual(
+    found.map((f) => `${f.file ?? ''} ${f.message}`),
+    [],
+  );
+  const keys = ALL.flatMap((row) => Object.keys(row.floors ?? {}));
+  assert.equal(keys.length, 17, `expected 17 sentinel floors, found ${keys.length}: ${keys.join(', ')}`);
+});
+
 test('drift in a generated block is visible: an edited package.json no longer renders itself', () => {
   const text = fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8');
   const tampered = text.replace(

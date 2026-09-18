@@ -68,8 +68,8 @@ const assertionFile = (root = REPO_ROOT) => path.join(root, '.storybook', 'page-
  * vanished, so the size is asserted too. Lower it only when a page is genuinely
  * deleted, and say which one in the commit.
  */
-const MIN_PAGE_STORIES = 42;
-const AREA_OVERVIEWS = 3;
+export const MIN_PAGE_STORIES = 42;
+export const AREA_OVERVIEWS = 3;
 
 /**
  * The runtime predicate, restated. Kept in step with `IS_PAGE` in

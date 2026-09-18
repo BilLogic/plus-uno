@@ -65,6 +65,12 @@
  *             `scripts/lib/ratchet-shapes.mjs` (#599) — the twelve records here
  *             are twelve shapes, and the path declared on this row is the key
  *             they are surveyed under.
+ *   floors    the sentinel thresholds the check enforces — minimum file / rule /
+ *             component / variable counts, and maximum ages. Same class of
+ *             datum as a `baseline`, and asserted the same way (#613): the
+ *             drift check reads the number the check compares and refuses a
+ *             row whose declared floor is not that number, and a check that
+ *             still holds the number as a private constant.
  *   module    a path to an ES module exporting `run(ctx) => Finding[]` (see
  *             `scripts/lib/findings.mjs`). The runner calls it in-process and
  *             renders one banner for it. 42 of the 59 rows carry one.
@@ -160,6 +166,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-figma-node-types.mjs',
+    floors: { MIN_RECORDED: 100 },
     guards:
       "each registry mapping claiming what its Figma node actually IS, against a dated measurement in design-system/figma/node-types.json. The field is called componentSetNodeId and 15 of the 95 mapped nodes are not sets — 3 PAGEs and 12 plain COMPONENTs. `isComponentSet: false` is how an entry says so, and until this check nothing in the repo READ that field, so six entries carried it and seven that needed it did not. Also catches a mapping nobody has measured, a recording for a mapping that no longer exists, an id recorded against the wrong one of the two Figma files, and a link that opens on nothing.",
   },
@@ -169,6 +176,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-figma-snapshots.mjs',
+    floors: { MAX_AGE_DAYS: 180, MIN_VARIABLES: 361, MIN_COMPONENTS: 1347 },
     guards:
       "the two Figma snapshots in scripts/ still describing the library: their capture dates against a 180-day ceiling, their declared totals against their own contents, their file key, and a floor under each so a snapshot that shrank silently is loud. #339's finding was that NOTHING watched these — the variables snapshot was five weeks behind a library that had gained seven variables it had never seen, and check:token-registry was green over every one of them, because it validates the snapshot against the SCSS and nothing validated the snapshot against Figma. The age is printed on every run, green or not. Since the #339 refresh pass it also asserts that the REMEDY it prints exists: each snapshot names the npm script that rewrites it, and that script must be in package.json. The component half had quietly lost its writer — the poller moved into the Worker on 2026-07-16 and the legacy script that remained opens a Notion PRD and posts to Slack before writing — so a ceiling that fired would have handed the reader a command nobody would run.",
   },
@@ -201,7 +209,9 @@ export const CHECKS = [
       'that would read as an empty set fails), that the check declaring it reaches it through ' +
       'its own IMPORTS rather than by naming the file, and that the `--update` its shape row ' +
       'advertises is a flag the check really offers — or, for the four records maintained by ' +
-      'hand, that it offers none.',
+      'hand, that it offers none — and since #613 what a declared `floors` is: each sentinel ' +
+      'the check enforces (a minimum file / rule / component / variable count, or a maximum ' +
+      'age) is named on the row, and the number is the one the check compares.',
   },
   {
     name: 'check:skill-overlap',
@@ -312,6 +322,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-undefined-tokens.mjs',
+    floors: { MIN_FILES: 1300 },
     baseline: 'docs/evals/undefined-token-baseline.json',
     guards:
       "design tokens that are USED and defined nowhere. A bare `var(--x)` on a token that does not exist DROPS the whole declaration: `var(--font-weight-light)` was in six shipped components against a system that defines `--font-weight-normal: 300`, so text designed at 300 rendered at its inherited weight, and Tooltip's small variant reached for `--font-size-body4`, which does not exist, so its text had no size of its own. Nothing saw either — check:colour-fallbacks and check:size-fallbacks only read tokens written WITH a fallback and only in two namespaces, and check:doc-identifiers resolves names in docs pages, not in stylesheets. A ratchet: 145 names over 508 uses when it was written, and the count may fall and never rise, with the BARE count held down separately so converting a fallback into a bare use cannot pass by keeping the total flat.",
@@ -322,6 +333,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-font-families.mjs',
+    floors: { MIN_FILES: 1300 },
     guards:
       "every font stack ending in a CSS generic, and every inline fallback naming the face its token names. A fallback only paints when the token fails to load, so a wrong one is wrong everywhere at once and invisible until then — the reasoning check:colour-fallbacks applies to colour, which nothing applied to type. Seven findings when it was written and all seven fixed: --font-family-display4 named one face and no generic; three files fell back from --font-family-body to Lato, which is the HEADER face, so body text would have rendered in the heading font; two fell back to a bare `Lato`. It also keeps #267's monospace rule, where --font-family-code fell back to sans-serif and the stack measured 171.13px against monospace's 480.08px.",
   },
@@ -331,6 +343,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-figma-scopes.mjs',
+    floors: { MIN_SCOPED: 75 },
     guards:
       "no Figma colour variable offering itself for a role its contrast cannot carry. A variable's SCOPES are what the picker offers it FOR, and nothing recorded them — not the name snapshot, not the token registry. The sweep of 2026-08-29 found five variables outside the convention their peers follow, and every one of the five was offerable as a TEXT_FILL: `Primary/Primary` on ALL_SCOPES, which measures 4.31:1 and 4.08:1 on the two darkest surface steps; `Relationship/Relationship` likewise; `Warning/Warning Container` and `Advocacy/Advocacy Container` on ALL_FILLS, which includes text, where #ffe17a is 1.5:1 on white; and `Warning/Warning (Text)` on ALL_SCOPES — the inverse error, the one warning value that PASSES as text also offered as a ground. That is #368's finding reached from the designer's end: picking `Primary/Primary` for a label in Figma is what the 108 CSS declarations do, and the file was inviting it. The convention is DERIVED from the majority across the twelve accent groups rather than declared, so a finding reads 'this one disagrees with its peers' and not 'this one disagrees with me', and a new group that follows the pattern needs no edit. It also asserts that a convention was FOUND for each of the seven roles, since a naming change under classify() would otherwise let the check pass by having nothing to say. Mutation-tested by restoring each of the two worst violations and by emptying the recording.",
   },
@@ -340,6 +353,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-intent-roles.mjs',
+    floors: { MIN_FILES: 150 },
     baseline: 'docs/evals/intent-role-adoption.json',
     guards:
       "the vocabulary of every intent-coloured EDGE in the design system. `_color_roles.scss` minted `--color-X-icon` and `--color-X-border` on 2026-08-29 and closed with the sentence that these tokens had no users yet \u2014 111 of the 137 border declarations now name the role, and this is the ratchet that keeps them there. The rename changes no pixel for six of the seven intents, which is the point: `border-color: var(--color-danger)` is a use of the bold FILL colour that happens to land on an edge, and `var(--color-danger-border)` is a declaration that an edge was intended and 3:1 was the bar. Only the second can move on its own, and warning must \u2014 #9f8205 is 2.87:1 on the darkest surface step, under even WCAG 1.4.11's non-text bar. It ratchets in BOTH directions: a count below its record is a finding too, because a baseline that describes code that no longer exists has stopped being readable. It also asserts the seven role tokens still EXIST, since a regeneration that removed `_color_roles.scss` would leave 111 call sites resolving to nothing while this check, which counts BASE uses, reported green. Mutation-tested four ways: a reverted call site, a deleted role, a baselined file with its reason removed, and a recorded remainder fixed without lowering the record — each driven through `scripts/lib/ratchet.mjs`, which has owned both directions since #601. 0.1s, measured 2026-08-29.",
@@ -350,6 +364,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-focus-ring.mjs',
+    floors: { MIN_FILES: 150, MIN_RULES: 60 },
     baseline: 'docs/evals/focus-ring.json',
     guards:
       "the one thing that tells a keyboard user where they are. Of the 84 focus rules in the design system, 29 had NO affordance reaching WCAG 1.4.11's 3:1 \u2014 `.plus-input:focus` announced itself with a #84cfff border at 1.62:1, the AM/PM toggle and the file drop zone with an 8% primary tint at 1.13:1, four textarea states at 2.22:1, and six readonly fields with the same grey they wear at rest. axe cannot catch this: it has no focus-appearance rule, so `check:storybook` swept all 416 story files and reported none of it. A rule is scored on its STRONGEST affordance, which is the correction that made the check right \u2014 eleven rules pair a 1.13:1 glow with a 5.02:1 border, and there the border is the indicator. No ratchet and no exceptions: a ring nobody can see is a defect, not a vocabulary to migrate at leisure. Mutation-tested three ways: one ring reverted, the `--color-focus-ring` role deleted, and a stale exception left behind. 0.2s, measured 2026-08-29.",
@@ -360,6 +375,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-icon-button-name.mjs',
+    floors: { MIN_FILES: 400 },
     baseline: 'docs/evals/icon-button-name.json',
     guards:
       "a button that is only an icon still telling you what it does. 20 of them across the design system had no `aria-label`, no `title` and no text \u2014 a screen reader announces \"button\" and nothing else for a control that dismisses an alert, expands a lesson row or opens the session menu. axe reports 23 of these across the story suite, and the two populations overlap without either containing the other: axe counts RENDERED instances, so one component in a loop is many findings and a component nobody storied is none, where this counts SOURCE sites and sees the page nobody wrote a story for. Two of the 20 were not about names at all \u2014 `LessonsSpec` and `OnboardingSpec` call Button with `btnStyle`, `btnFill`, `label` and `icon`, none of which Button has, so those buttons were rendering EMPTY and the missing name was the symptom that surfaced it. No ratchet: the bar is zero and the exception map is empty. Mutation-tested three ways \u2014 a name removed, a stale exception, and `text=\"\"`, which an attribute-presence test reads as a name and which four real call sites are written with. 0.2s, measured 2026-08-29.",
@@ -388,6 +404,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-figma-colour-drift.mjs',
+    floors: { MAX_AGE_DAYS: 180, MIN_COMPARED: 90 },
     guards:
       "the CSS still painting what Figma says, or the difference being written down and argued. `scripts/figma-variables-snapshot.json` records every variable in the library by NAME and by count, and check:figma-snapshots holds it to a date and a floor — neither records a single VALUE, so a colour could move on either side and the names would still line up perfectly. Two had, both found in one sweep of the BS4 library on 2026-08-29. `--color-success-container` is #bdf292 in the CSS and #a1eb83 in Figma, and both sides are internally consistent — the CSS state layers are built from rgba(189, 242, 146, …) and the Figma ones from #a1eb83 — so each looks correct alone and only the comparison shows the split. `--color-scrim` is 0.38 in the CSS against 0.32 in Figma: every Modal and Drawer in the product dims its page 19% harder than designed. Both are exempted rather than fixed because each is a decision and not a repair — whichever side changes, a shipping colour moves — and the exemption records what BOTH sides hold, so a change on either fails instead of sliding underneath it. 94 of the 103 non-state-layer colour variables map to a CSS token; the nine that do not are the `_Proposal/` candidates and the Figma-only `Surface roles/` set, reported and not failed. The alias chains are followed on both sides, which is why moving one base reports all three of its dependants. Mutation-tested three ways: a new divergence, a known one that stopped diverging, and a known one that changed shape.",
   },
@@ -406,6 +423,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-atlassian-benchmark.mjs',
+    floors: { MAX_AGE_DAYS: 365 },
     baseline: 'docs/evals/atlassian-benchmark.json',
     guards:
       "the comparison against Atlassian staying a MEASUREMENT rather than a memory, and the three gaps it found staying closed once they close. Their published surface was read live on 2026-08-29: 515 tokens, of which 441 are colour, split by role into `background` 208, `text` 49, `border` 39 and `icon` 23. Ours are 479 and 195. The first draft of this check recorded that we have no role split at all, which is false and the correction is the finding: `--color-surface*` (36) IS the background role and `--color-outline*` (8) IS the border role, under Material's names. What is true is sharper. Our FOREGROUND role is undivided — one `--color-on-*` family (32) where they keep text and icon apart because the bars differ, 4.5:1 against 3:1 — so no token records which bar its value was checked against. And all seven intents carry the identical 9-token shape (base, container, -text, six state overlays), naming two roles while using three: there is no `--color-warning-border` and no `--color-warning-icon`, so an intent-coloured stroke borrows the fill. That is the gap #312 lived in — `--color-warning` is 3.70:1 on white, legal as an icon and illegal as text, and its name says neither. The type row was ALSO wrong at first and is corrected here: counting `--font-size-*` gave 44 and read as bloat, but 27 of those are FontAwesome icon sizes and five are aliases, leaving TWELVE distinct text sizes against their fourteen steps, which is parity. The defect is the spacing rather than the count — the twelve run 12·14·16·20·24·28·32·40·56·64·72·80, giving seven distinct ratios across eleven steps (1.111, 1.125, 1.143, 1.167, 1.200, 1.250, 1.400), a list and not a scale (#267). Four rows are ratcheted by DIRECTION, never by distance: intent border and icon tokens may only rise from zero, the ratio count and the 46 line-heights (against their zero, since line-height travels inside each step — #346) may only fall. Nine more are recorded and not enforced, because 36 surface tokens against 208 backgrounds is a difference and not a defect. `--update` refuses to record a backwards move — and since #601 it is a MERGE through `scripts/lib/ratchet.mjs`, so Atlassian's whole published half survives a re-record, and a recorded floor no argued row measures any more is itself a finding. The whole thing fails when the recording goes a year unread.",
@@ -416,6 +434,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-unspread-rest.mjs',
+    floors: { MIN_FILES: 100 },
     guards:
       'no component in the published library collecting a `...rest` and never using it. ' +
       '`DateAndTimePicker` dropped every prop beyond its signature for the life of the ' +
@@ -489,6 +508,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-page-outline.mjs',
+    floors: { MIN_PAGE_STORIES: 42, AREA_OVERVIEWS: 3 },
     guards:
       'the OTHER half of the page-outline guard — the half a DOM assertion cannot hold. ' +
       '`.storybook/page-outline.js` asserts in the browser that every page story renders an ' +

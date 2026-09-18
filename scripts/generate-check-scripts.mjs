@@ -406,10 +406,79 @@ export function baselineFindings(
 }
 
 /**
+ * Sentinel names a check may enforce as a corpus floor or an age ceiling.
+ * Word-count bars (`MIN_WORDS`) and overlap ceilings are not this class.
+ */
+const SENTINEL_DECL =
+  /(?:export\s+)?const\s+(MIN_FILES|MIN_RULES|MIN_PAGE_STORIES|MIN_VARIABLES|MIN_COMPONENTS|MIN_SCOPED|MIN_RECORDED|MIN_COMPARED|MAX_AGE_DAYS|AREA_OVERVIEWS)\s*=\s*(\d+)/g;
+
+/**
+ * The sentinels a check source enforces, keyed by the constant's name.
+ *
+ * @param {string} source
+ * @returns {Record<string, number>}
+ */
+export function enforcedFloors(source) {
+  return Object.fromEntries([...source.matchAll(SENTINEL_DECL)].map((m) => [m[1], Number(m[2])]));
+}
+
+/**
+ * What a `floors:` row claims, asserted against the number the check actually
+ * compares. A floor that lives only as a private constant in the check is the
+ * finding this exists to name: the registry is where a reader sees what a
+ * check refuses to believe, the same way `baseline:` is where they see the
+ * record.
+ *
+ * @param {object} row  a registry row.
+ * @param {{repoRoot?: string}} [opts]
+ * @returns {import('./lib/findings.mjs').Finding[]}
+ */
+export function floorFindings(row, { repoRoot = REPO_ROOT } = {}) {
+  const found = [];
+  const declared = row.floors && typeof row.floors === 'object' ? row.floors : {};
+  if (!row.module) {
+    if (Object.keys(declared).length) {
+      found.push({
+        message: `${row.name} declares floors but has no module to enforce them.`,
+      });
+    }
+    return found;
+  }
+  const full = path.join(repoRoot, row.module);
+  if (!fs.existsSync(full)) return found;
+
+  const enforced = enforcedFloors(fs.readFileSync(full, 'utf8'));
+  for (const [name, value] of Object.entries(declared)) {
+    if (!Object.hasOwn(enforced, name)) {
+      found.push({
+        file: row.module,
+        message: `${row.name} declares floors.${name} = ${value}, which ${row.module} never enforces.`,
+      });
+    } else if (enforced[name] !== value) {
+      found.push({
+        file: row.module,
+        message: `${row.name} declares floors.${name} = ${value}, but ${row.module} enforces ${enforced[name]}.`,
+      });
+    }
+  }
+  for (const [name, value] of Object.entries(enforced)) {
+    if (!Object.hasOwn(declared, name)) {
+      found.push({
+        file: row.module,
+        message:
+          `${row.module} enforces ${name} = ${value} as a private constant. Declare it on the ` +
+          'registry row so a reader can see what the check refuses to believe.',
+      });
+    }
+  }
+  return found;
+}
+
+/**
  * Everything the registry claims that a generated block cannot state: that each
  * row's command is the one its manifest holds, what a declared baseline is
- * (above), and that the workflow steps and the `trigger` column agree in both
- * directions.
+ * (above), what a declared floor is, and that the workflow steps and the
+ * `trigger` column agree in both directions.
  *
  * @returns {import('./lib/findings.mjs').Finding[]}
  */
@@ -459,6 +528,7 @@ export function consistencyFindings() {
     }
 
     if (row.baseline) found.push(...baselineFindings(row, scripts[row.pkg]));
+    found.push(...floorFindings(row));
   }
 
   const registered = new Map(ALL.map((row) => [row.name, row]));
