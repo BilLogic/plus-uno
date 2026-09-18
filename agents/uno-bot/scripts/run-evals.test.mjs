@@ -17,6 +17,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runEvals, parseArgs } from "./run-evals.mjs";
+import { noJudge } from "./eval-judge.mjs";
 import { workerTransport } from "./eval-transport.mjs";
 import { localTransport } from "./eval-transport-local.mjs";
 
@@ -72,9 +73,12 @@ async function run(casesPath, transport, opts = {}) {
     casesPath,
     log: (l) => lines.push(l),
     sleep: async (ms) => waits.push(ms),
-    judge: async (c, transcript) => {
-      judged.push({ id: c.id, transcript });
-      return opts.verdict ?? { verdict: "pass" };
+    judge: {
+      name: "fake",
+      judgeCase: async (c, transcript) => {
+        judged.push({ id: c.id, transcript });
+        return opts.verdict ?? { verdict: "pass" };
+      },
     },
     ...opts.deps,
   });
@@ -126,6 +130,8 @@ test("a fixture case replays end to end: transport → scoring → judge → sum
   assert.equal(result.ms, 1234 * 3);
   assert.equal(result.transcript.turns.length, 1);
   assert.equal(result.judge.verdict, "pass");
+  assert.equal(result.judged, true, "this pass was graded, and the row says so");
+  assert.deepEqual(summary.judge, { name: "fake", pass: 1, fail: 0, skipped: 0, skipReasons: {} });
   assert.ok(lines.some((l) => l.startsWith("[PASS] R3")) && lines.some((l) => l.includes("[3/3 samples]")));
 
   // The judge sees the transcript, not the fixture's answer key.
@@ -143,7 +149,70 @@ test("a case fails deterministically on the wrong tool, and a failing blocker is
   // a paid verdict on an answer already known to be wrong.
   assert.equal(judged.length, 0);
   assert.equal(summary.results[0].judge.reason, "deterministic checks failed");
+  assert.equal(summary.results[0].judged, false, "nothing graded this answer");
+  // And it is not counted as a fail the JUDGE returned: the tally is what the
+  // judge did, and it was never asked.
+  assert.deepEqual(summary.judge, {
+    name: "fake",
+    pass: 0,
+    fail: 0,
+    skipped: 1,
+    skipReasons: { "not asked — the deterministic checks failed first": 1 },
+  });
   assert.ok(lines.some((l) => l.startsWith("[FAIL] R3")));
+});
+
+test("a skipped verdict is not a pass: the row, the summary and the log all say unjudged", async () => {
+  // THE MONDAY-CRON FAILURE MODE. The service account expired on Friday, so
+  // every case fails open to green off the deterministic checks alone. The
+  // case still passes — that is the fail-open contract, and a network hiccup is
+  // not evidence about the bot — but nothing in this run may claim it was
+  // graded, and the reason has to survive into the results file.
+  const judge = noJudge("credential could not be exchanged for a token");
+  const { summary, lines } = await run(fixtureOf([caseById("R3")]), fakeTransport([R3_OK]), {
+    deps: { judge },
+  });
+
+  assert.equal(summary.passed, 1, "fail-open: the deterministic checks still ran and still passed");
+  assert.equal(summary.blockerFailures, 0);
+
+  const [row] = summary.results;
+  assert.equal(row.pass, true);
+  assert.equal(row.judged, false, "a skip must not read as a graded pass");
+  assert.equal(row.judge.verdict, "skipped");
+  assert.equal(
+    row.judge.reason,
+    "credential could not be exchanged for a token",
+    "the reason survives to the results, where it is read a week later",
+  );
+
+  assert.deepEqual(summary.judge, {
+    name: "none — credential could not be exchanged for a token; deterministic checks only",
+    pass: 0,
+    fail: 0,
+    // One count per CASE, as `passed` and `failed` are — not per sample.
+    skipped: 1,
+    skipReasons: { "credential could not be exchanged for a token": 1 },
+  });
+  assert.ok(
+    lines.some((l) => /^\[PASS\] R3 .*\(UNJUDGED: credential could not be exchanged for a token\)/.test(l)),
+    `the log must name the skip, got ${JSON.stringify(lines)}`,
+  );
+});
+
+test("the runner's default judge is a judge that says it was never given one", async () => {
+  // No `judge` argument at all — the default must be an object that skips with
+  // a reason, not a null and not a silent pass.
+  const summary = await runEvals({
+    transport: fakeTransport([R3_OK]),
+    casesPath: fixtureOf([caseById("R3")]),
+    log: () => {},
+    sleep: async () => {},
+  });
+  assert.equal(summary.judge.name, "none — no judge was given to the runner; deterministic checks only");
+  assert.equal(summary.judge.pass + summary.judge.fail, 0);
+  assert.deepEqual(summary.judge.skipReasons, { "no judge was given to the runner": 1 });
+  assert.equal(summary.results[0].judged, false);
 });
 
 test("a turn that errors fails the case, and a transient error is retried first", async () => {
