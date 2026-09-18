@@ -24,7 +24,7 @@ Because the brain is bundled, **guidance changes reach the bot on `deploy`, not 
 
 ## Model providers — two adapters, one switch
 
-`MODEL_PROVIDER` in `wrangler.toml` selects which adapter answers every turn (`src/agent/run-agent.ts` reads it — the one place it is read):
+`MODEL_PROVIDER` in `wrangler.toml` selects which adapter answers every turn (`src/agent/run-agent.ts` § `selectProvider` reads it — the one place it is read, asserted by `agents/uno-bot/scripts/provider-read.test.mjs`; every other caller that wants a model, the pre-send draft judge included, takes the provider that function returns):
 
 | | `gemini` (**default / active**) | `vertex-claude` |
 |---|---|---|

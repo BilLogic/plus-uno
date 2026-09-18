@@ -58,7 +58,7 @@
 // green, so the summary carries a `judge` stanza — who graded, how many
 // verdicts came back, and the reason behind every skip — and each result row
 // carries `judged`. Without it "34/34 passed" reads the same whether the grind
-// model approved every case or an expired service account graded none, which is
+// tier approved every case or an expired service account graded none, which is
 // the one thing a weekly drift check must never be ambiguous about.
 //
 // Env required (by the WORKER transport — another transport needs neither):
@@ -66,7 +66,7 @@
 //   DEBUG_TOKEN     the Worker's /debug/* gate token
 // Judge (optional — judge is skipped without it; deterministic checks still run):
 //   GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY, GEMINI_PROJECT_ID (default hcii-plus)
-// Optional: JUDGE_MODEL (default gemini-3.1-pro-preview — the grind model; a judge should be at least as strong as what it grades, and the bot's own model shares its blind spots), CASES_PATH
+// Optional: JUDGE_MODEL (default gemini-3.1-pro-preview, the GRIND tier's model — the judge grades on that tier, model and thinking level together, because a judge should be at least as strong as what it grades and the bot's own model shares its blind spots; the level travels with the tier and is not overridable), CASES_PATH
 //
 // Run:  node agents/uno-bot/scripts/run-evals.mjs [--transport=worker|local]
 

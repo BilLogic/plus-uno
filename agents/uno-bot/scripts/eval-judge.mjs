@@ -135,19 +135,32 @@ export function judgeSystem(rubric) {
 // ── The credential ────────────────────────────────────────────────────────────
 
 /**
- * The default judge model: the model the GRIND tier runs, because a judge should
- * be at least as strong as what it grades and the bot's own model shares its
- * blind spots.
+ * THE TIER THE JUDGE GRADES ON: `grind`, because a judge should be at least as
+ * strong as what it grades and the bot's own model shares its blind spots.
  *
- * The MODEL, not the tier. This judge sends it `thinkingLevel: "low"` (see the
- * call below), and ADR-028 says a tier is a model and a thinking level moving
- * together — grind is this model at `high`. So the pair here is no tier, and
- * naming it "the grind tier" would be the claim ADR-028 exists to stop. Left as
- * the pair the suite has always scored on rather than changed under a
- * refactor's cover: #605 is where the judge names a tier and calls through the
- * ModelProvider seam, and the pair stops being the judge's to pick.
+ * A TIER, model AND thinking level together (ADR-028). Until #605 this was the
+ * grind MODEL sent at `thinkingLevel: "low"` — a pair no tier described, which
+ * ADR-028 exists to stop, and which the comment here used to admit while
+ * leaving in place. The judge names the tier now and takes both halves of it:
+ * `gemini-3.1-pro-preview` at `high`. That is more thinking per case than the
+ * suite used to buy — 34 cases on the weekly cron, and every dispatch — and the
+ * judged baseline under docs/evals/runs/ was re-recorded at `high` in #605
+ * rather than left standing as a score from a configuration nobody runs.
+ *
+ * ONE HALF IS OVERRIDABLE AND THE OTHER IS NOT, exactly as on the Worker's own
+ * Gemini lane: `JUDGE_MODEL` swaps the model without a deploy, and the level
+ * stays in code, because config that could move the level without the model
+ * would put the two-variable attribution problem back (ADR-028 § why the level
+ * is in code).
+ *
+ * This is the Worker's own grind row, restated here because a Node script
+ * cannot import the Worker's TypeScript. `eval-judge.test.mjs` reads
+ * `src/agent/gemini-tiers.ts` and fails if the two drift.
  */
-export const DEFAULT_JUDGE_MODEL = "gemini-3.1-pro-preview";
+export const JUDGE_TIER = "grind";
+export const JUDGE_TIER_DIALS = { model: "gemini-3.1-pro-preview", level: "high" };
+/** The tier's model, which is what a `JUDGE_MODEL` override replaces. */
+export const DEFAULT_JUDGE_MODEL = JUDGE_TIER_DIALS.model;
 export const DEFAULT_PROJECT_ID = "hcii-plus";
 
 /**
@@ -156,10 +169,10 @@ export const DEFAULT_PROJECT_ID = "hcii-plus";
  * Was 8,000 chars, and a full prompt-spec is longer than that: on 2026-09-05
  * (run 33972756077) P2's Open Questions block began at char 8,190, so the judge
  * failed the reply for "documenting none of the open decisions" it had
- * documented — a verdict about the cut, not the reply. The judge runs grind's
- * model, whose context is long; 60,000 chars covers every transcript the
- * fixture produces today with room to grow, and the marker below tells the
- * judge when it still is not the whole thing.
+ * documented — a verdict about the cut, not the reply. The judge runs the grind
+ * tier, whose context is long; 60,000 chars covers every transcript the fixture
+ * produces today with room to grow, and the marker below tells the judge when it
+ * still is not the whole thing.
  */
 export const JUDGE_TRANSCRIPT_CHARS = 60_000;
 
@@ -314,7 +327,7 @@ export function vertexJudge({
   const system = judgeSystem(rubric);
   const url = `https://aiplatform.googleapis.com/v1/projects/${projectId}/locations/global/publishers/google/models/${model}:generateContent`;
   return {
-    name: `${model} against ${describeRubric(rubric)} from docs/evals/rubrics/bot-answer.md`,
+    name: `${model} at ${JUDGE_TIER_DIALS.level} (the ${JUDGE_TIER} tier) against ${describeRubric(rubric)} from docs/evals/rubrics/bot-answer.md`,
     async judgeCase(c, transcript) {
       try {
         const prompt =
@@ -328,8 +341,12 @@ export function vertexJudge({
             systemInstruction: { parts: [{ text: system }] },
             generationConfig: {
               maxOutputTokens: 2000,
-              // thinking_level is Gemini 3.x-only; 2.5-gen models 400 on it.
-              ...(/^gemini-3/.test(model) ? { thinkingConfig: { thinkingLevel: "low" } } : {}),
+              // The TIER's level, not the judge's own (#605). thinking_level is
+              // Gemini 3.x-only; 2.5-gen models 400 on it, so it drops on an
+              // older model exactly as the Worker's adapter drops it.
+              ...(/^gemini-3/.test(model)
+                ? { thinkingConfig: { thinkingLevel: JUDGE_TIER_DIALS.level } }
+                : {}),
             },
           }),
         });
