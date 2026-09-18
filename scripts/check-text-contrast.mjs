@@ -34,29 +34,37 @@
  * its reason, the count may shrink and never grow, and a recorded entry that
  * stops failing is reported so a fix cannot leave its exemption behind.
  *
+ * THE RECORD IS `docs/evals/text-contrast-baseline.json`, and the RATCHET over
+ * it is `scripts/lib/ratchet.mjs` rather than anything in this file. The
+ * shrink-only invariant, the stale-entry sweep, the placeholder reason and the
+ * one stated absent-record failure are the module's, stated once for the twelve
+ * records that used to each spell them privately; what stays here is the
+ * WORDING of the verdict and the census the verdict is read from. This check is
+ * the pilot: its own tests run the module's conformance suite against its
+ * ratchet, so a migration cannot quietly re-declare a direction.
+ *
  * Re-baseline with `--update` after reading every line of the diff.
  *
  * Run: `npm run check:text-contrast`.
  */
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { AA_TEXT, PAGE_TOKEN } from './button-contrast.mjs';
+import { AA_TEXT } from './button-contrast.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 import {
   census,
   findings,
-  keyOf,
+  measured,
   ratchetFailures,
   readValues,
   stylesheets,
+  textContrastRatchet,
   textDeclarations,
 } from './text-contrast.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const BASELINE = 'docs/evals/text-contrast-baseline.json';
 
 /**
  * The paragraph `scripts/text-contrast.mjs` closed its own report with, kept
@@ -82,25 +90,25 @@ const inputs = byRoot((repoRoot) => {
   return { values, files, uses, found, counts: census(found) };
 });
 
-const baselineOf = (repoRoot) =>
-  JSON.parse(fs.readFileSync(path.join(repoRoot, BASELINE), 'utf8')).findings;
-
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
-  const { counts } = inputs(repoRoot);
-  const baseline = baselineOf(repoRoot);
+  const { found: sweep, counts } = inputs(repoRoot);
+  const ratchet = textContrastRatchet(repoRoot);
+  const seen = measured(sweep, counts);
 
-  const found = ratchetFailures(counts, baseline).map((message) => ({ message }));
+  const found = ratchetFailures(ratchet.failures(seen), ratchet.stale(seen)).map((message) => ({
+    message,
+  }));
 
   // An entry recorded with the placeholder reason is a run where somebody
   // pressed `--update` and skipped the only step that mattered. It fails on its
   // own, separately from the ratchet, because nothing about the counts is wrong.
-  const unreviewed = Object.entries(baseline).filter(([, entry]) => entry.why.startsWith('UNREVIEWED'));
+  const unreviewed = ratchet.unreviewed();
   if (unreviewed.length) {
     found.push({
       message:
         `${unreviewed.length} baseline entr${unreviewed.length === 1 ? 'y has' : 'ies have'} ` +
-        `no reason:\n${unreviewed.map(([k]) => `  ${k}`).join('\n')}\n` +
+        `no reason:\n${unreviewed.map(({ key }) => `  ${key}`).join('\n')}\n` +
         '  --update records the finding; only a person can record why it is allowed to stand.',
     });
   }
@@ -114,33 +122,22 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   return (
     `${uses.length} color: declarations across ${files.length} stylesheets, ` +
     `${distinct} distinct tokens. ${found.length} below AA ${AA_TEXT}:1, all recorded with a reason ` +
-    `(${Object.keys(baselineOf(repoRoot)).length} entries).`
+    `(${textContrastRatchet(repoRoot).entries.size} entries).`
   );
 }
 
-/** `--update` re-records the baseline. A write, so it stays out of `run`. */
+/**
+ * `--update` re-records the baseline. A write, so it stays out of `run`.
+ *
+ * The envelope, the carried-across reason and the `UNREVIEWED` stamp on an
+ * entry nobody has read yet are the ratchet's, not this file's — which is the
+ * whole point of the module: a reason is never invented by the tool, and that
+ * rule is now impossible to forget when writing the twelfth check.
+ */
 function update(repoRoot = REPO_ROOT) {
   const { found, counts } = inputs(repoRoot);
-  const existing = fs.existsSync(path.join(repoRoot, BASELINE))
-    ? JSON.parse(fs.readFileSync(path.join(repoRoot, BASELINE), 'utf8')).findings
-    : {};
-  const next = {};
-  for (const finding of found) {
-    const key = keyOf(finding);
-    next[key] = {
-      count: counts[key],
-      ratio: finding.ratio,
-      // A reason is never invented by the tool. A new entry gets a placeholder
-      // that says so, and a run whose baseline still contains one is a run
-      // where somebody skipped the only step that matters.
-      why: existing[key]?.why ?? 'UNREVIEWED — replace with the reason this is not a defect, or fix it.',
-    };
-  }
-  fs.writeFileSync(
-    path.join(repoRoot, BASELINE),
-    `${JSON.stringify({ measured: `AA ${AA_TEXT}:1, ground from each rule, page fallback ${PAGE_TOKEN}`, findings: next }, null, 2)}\n`,
-  );
-  console.log(`[text-contrast] wrote ${Object.keys(next).length} entries to ${BASELINE}`);
+  const written = textContrastRatchet(repoRoot).update(measured(found, counts));
+  console.log(`[text-contrast] wrote ${written.entries} entries to ${written.file}`);
 }
 
 // `--update` writes a file, so it belongs to the CLI and not to `run` — and it

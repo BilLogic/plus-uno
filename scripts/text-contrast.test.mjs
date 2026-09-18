@@ -12,8 +12,12 @@
  *      48 findings were an 8% wash mistaken for a colour — the same arithmetic
  *      #268's audit made and had to correct.
  *
- * The ratchet is tested too, in all three directions it can move, because a
- * baseline that only ever gets appended to is not a ratchet.
+ * The ratchet itself is NOT tested here in the three directions it can move.
+ * That invariant belongs to `scripts/lib/ratchet.mjs` and is asserted by
+ * `scripts/lib/ratchet-conformance.mjs`, which this file runs against THIS
+ * check's ratchet — the pilot adapter. What is left below is the WORDING of the
+ * verdict, which is this check's own and is what keeps its report byte-identical
+ * across the migration.
  *
  * Run: npm run test:scripts
  */
@@ -24,15 +28,18 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
+import { runRatchetConformance } from './lib/ratchet-conformance.mjs';
 import {
   census,
   enclosingBlock,
   findings,
   groundFor,
   keyOf,
+  measured,
   opaqueGround,
   ratchetFailures,
   ratio,
+  textContrastRatchet,
   textDeclarations,
   textSibling,
 } from './text-contrast.mjs';
@@ -133,29 +140,62 @@ test('the same colour via the -text sibling is not a finding', () => {
 });
 
 const KEY = 'a.scss|--color-warning|--color-surface';
+const OTHER = 'b.scss|--color-outline|--color-surface';
 
-test('the ratchet fails on a NEW finding', () => {
-  const failures = ratchetFailures({ [KEY]: 1 }, {});
-  assert.equal(failures.length, 1);
-  assert.match(failures[0], /NEW/);
+// The pilot adapter. One suite states the invariant; this check answering it is
+// what proves reading the module did not quietly re-declare a direction.
+runRatchetConformance(
+  'check:text-contrast',
+  {
+    open: (repoRoot) => textContrastRatchet(repoRoot),
+    keys: [KEY, OTHER],
+    payload: (count) => ({ count, ratio: 3.52 }),
+  },
+  { test },
+);
+
+test('the key and the payload are what the ratchet reads on both sides', () => {
+  const found = [
+    { file: 'a.scss', token: '--color-warning', ground: '--color-surface', line: 1, ratio: 3.52 },
+    { file: 'a.scss', token: '--color-warning', ground: '--color-surface', line: 40, ratio: 3.52 },
+  ];
+  assert.deepEqual([...measured(found, census(found))], [[KEY, { count: 2, ratio: 3.52 }]]);
 });
 
-test('the ratchet fails when a recorded count ROSE', () => {
-  const failures = ratchetFailures({ [KEY]: 3 }, { [KEY]: { count: 2, why: 'x' } });
+test('a NEW finding is worded as NEW, and names where it is', () => {
+  const failures = ratchetFailures([{ kind: 'new', key: KEY, count: 1 }], []);
+  assert.equal(failures.length, 1);
+  assert.match(failures[0], /^ {2}NEW {6}a\.scss {2}--color-warning {2}--color-surface$/m);
+  assert.match(failures[0], /record it with a reason/);
+});
+
+test('a count that ROSE is worded with both numbers', () => {
+  const failures = ratchetFailures([{ kind: 'rose', key: KEY, count: 3, recorded: 2 }], []);
   assert.equal(failures.length, 1);
   assert.match(failures[0], /ROSE/);
+  assert.match(failures[0], /2 recorded, 3 found/);
 });
 
-test('the ratchet fails on a STALE entry that no longer occurs', () => {
+test('a STALE entry is worded last, after the run\'s own findings', () => {
   // The direction most baselines forget. A fix that leaves its exemption
   // behind turns the baseline into a list of things nobody has looked at.
-  const failures = ratchetFailures({}, { [KEY]: { count: 1, why: 'x' } });
-  assert.equal(failures.length, 1);
-  assert.match(failures[0], /STALE/);
+  const failures = ratchetFailures(
+    [{ kind: 'new', key: KEY, count: 1 }],
+    [{ key: OTHER, recorded: 1 }],
+  );
+  assert.equal(failures.length, 2);
+  assert.match(failures[0], /NEW/);
+  assert.match(failures[1], /STALE/);
+  assert.match(failures[1], /recorded 1, found 0/);
 });
 
-test('the ratchet passes when the count shrank', () => {
-  assert.deepEqual(ratchetFailures({ [KEY]: 1 }, { [KEY]: { count: 2, why: 'x' } }), []);
+test('an absent record is the module\'s one message, passed through unworded', () => {
+  const failures = ratchetFailures([{ kind: 'absent', message: 'no baseline is recorded' }], []);
+  assert.deepEqual(failures, ['no baseline is recorded']);
+});
+
+test('nothing wrong is no wording at all', () => {
+  assert.deepEqual(ratchetFailures([], []), []);
 });
 
 test('the baseline key is file + token + ground, not a line number', () => {
