@@ -9,6 +9,12 @@
 // review-request set in `slack/api.ts`. Nothing derived from anything, so
 // every one of them could be forgotten independently — and several had been.
 //
+// Three of the nine are gone. The union is an alias of `ToolName` (#596), and
+// both dispatches are lookups against this table, keyed on `access` (#597) —
+// so a tool with no dispatch arm is no longer a thing that can exist. The
+// remaining restatements are the ones the columns below stand beside, held
+// equal by `tests/tool-table.test.ts` until their readers move over.
+//
 // The shape is Diagnostics' (`src/diagnostics/routes.ts`): the DATUM is
 // declared apart from the JOIN, as a module that imports nothing — not the
 // vendored schema file least of all, because `tsc` does not copy JSON into
@@ -113,11 +119,11 @@ export interface SchemaRow extends ToolRow {
 /**
  * Join the rows to the schemas, refusing either one without the other.
  *
- * A schema with no row would be offered to the model and dispatch off the end
- * of a switch; a row with no schema is a column three readers consult about a
- * tool nobody can call. Both are silent today, so both throw here — when the
- * table is built, which `src/agent/tools.ts` does at its module load, naming
- * the tool rather than a count.
+ * A schema with no row would be offered to the model and come back refused by
+ * the dispatch it has no row for; a row with no schema is a column three
+ * readers consult about a tool nobody can call. Both are silent, so both
+ * throw here — when the table is built, which `src/agent/tools.ts` does at its
+ * module load, naming the tool rather than a count.
  *
  * @param schemas - The vendored tool schemas, in file order
  */
