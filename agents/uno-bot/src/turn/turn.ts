@@ -191,8 +191,9 @@ export type TurnDisposition =
   | "staged"
   | "failed"
   /** Stop was pressed before the answer was delivered, so it was not delivered.
-   *  The turn posts nothing: the door that took the press already told the
-   *  thread, and one press earns one stop message (#589). */
+   *  The turn posts nothing, because the door that took the press has already
+   *  confirmed it — one press, one stop message. Which door says it where is
+   *  set out at the exit itself, in `turnBody` (#589). */
   | "stopped";
 
 export interface TurnTelemetry {
@@ -418,9 +419,10 @@ export function settlementOf(settle: {
 /**
  * One turn, with the working signal guaranteed down when it ends.
  *
- * The turn leaves by nine doors — an answer, a clarifying ask, a staged card,
- * a card Slack refused, four flavours of gate resolution, a dead model — and a
- * signal cleared at nine sites is a signal the tenth door forgets. So the set
+ * The turn leaves by ten doors — an answer, a clarifying ask, a staged card,
+ * a card Slack refused, four flavours of gate resolution, a stop pressed
+ * before the answer landed, a dead model — and a signal cleared at ten sites
+ * is a signal the eleventh door forgets. So the set
  * stays where it belongs (beside the work it describes) and the clear is a
  * `finally` around the whole thing: `withWorkingSignal` watches the Delivery
  * the turn is handed and takes down whatever the turn raised, whichever door
@@ -732,13 +734,20 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     });
   }
 
-  // ── A stop, pressed before the answer was delivered ────────────────────
+  // ── A stop, pressed before the answer was delivered ────────────────────────
   //
-  // The one exit that posts NOTHING AT ALL. Whichever door took the press has
-  // already said so in the thread, naming who pressed it
-  // (`slack/session-stop.ts`, `slack/commands.ts`, `slack/interactive.ts`), so
-  // a line from here would be the second stop message for one press — which,
-  // with the answer arriving under it, is the failure #589 was filed on.
+  // The one exit that posts NOTHING AT ALL. The door that took the press has
+  // confirmed it — and on Slack's in-thread control, which is the door #589 was
+  // filed on, confirmed it right here in the thread naming who pressed
+  // (`slack/session-stop.ts`). A line from here would be the second stop
+  // message for one press, which with the answer arriving under it is that
+  // exact failure.
+  //
+  // The other two doors confirm to the presser alone — `/stop` by ephemeral,
+  // the Home-tab button by DM — so a run they stop leaves this thread with no
+  // line at all. Recorded, not solved: putting the line in the thread belongs
+  // in those doors, where it can name the presser, rather than here, where it
+  // would double the one door that already does it.
   //
   // The progress surface still closes, and it closes COMPLETE rather than
   // error: the turn ended the way it was asked to. The exchange is remembered

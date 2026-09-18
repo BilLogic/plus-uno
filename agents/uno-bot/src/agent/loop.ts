@@ -81,12 +81,19 @@ export type AgentResult =
   /**
    * The turn was stopped, and the answer goes undelivered.
    *
-   * It carries NO TEXT on purpose. All three stop doors — `/stop`
-   * (`slack/commands.ts`), the Home-tab button (`slack/interactive.ts`) and
-   * Slack's own control (`slack/session-stop.ts`) — post the confirmation
-   * themselves, naming who pressed, so a line from here would be the second
-   * stop message for one press (#589). What the loop reports is the fact; what
-   * the person reads was already said.
+   * It carries NO TEXT on purpose. Every stop door confirms the press itself,
+   * so a line from here would be the second stop message for one press (#589).
+   * What the loop reports is the fact; what the person reads was already said.
+   *
+   * WHERE each door says it differs, and only one of the three says it in the
+   * run's own thread: Slack's in-thread control posts there and names the
+   * presser (`slack/session-stop.ts`), `/stop` answers the presser with an
+   * ephemeral in the channel it was typed in (`slack/commands.ts`), and the
+   * Home-tab button DMs the presser (`slack/interactive.ts`). So on the latter
+   * two a stopped channel run leaves the THREAD silent — the press is
+   * confirmed to whoever pressed it and to nobody else. That is a gap in the
+   * doors, not a reason for this variant to carry text: a line from the loop
+   * would be a second message on the one door that already speaks there.
    */
   | { kind: "stopped" }
   | {
@@ -337,8 +344,20 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
    * AND ONCE AFTER THE LAST REPLY, which no iteration count could cover. A
    * press arriving during the final model call is invisible to the read at the
    * top of that iteration, because the flag was not there yet; the loop then
-   * returns through `finish` and delivers. So every exit that delivers an
-   * answer reads the flag immediately before it.
+   * returns through `finish` and delivers. So every exit that delivers TEXT
+   * reads the flag immediately before it: the ordinary answer, the preview a
+   * reply with nothing stageable leaves behind, and the budget-exhausted
+   * synthesis pass.
+   *
+   * TWO EXITS DELIBERATELY DO NOT, and they are worth naming so that the next
+   * reader tidying "every delivering exit" does not add a read to either.
+   * `proposal_resolve` is the person's own ✅ or 🚫 being carried out: dropping
+   * it would leave a decision they already made unacted, and for a confirm it
+   * would contradict the promise that a stop is not an undo. A staged proposal
+   * CARD is the other, and it is a live question rather than a settled one —
+   * whether a press should take the card away as well as the answer is a
+   * product call that #589 did not make, so it is left as it was and raised
+   * rather than decided here.
    *
    * WHAT THE READS COST, since the rule they replace made its own cost
    * argument. Each read is one Durable Object hop, and a hop is an INTERNAL
@@ -523,6 +542,12 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
       // Nothing stageable at all: the person hears what happened instead of
       // watching a proposal card that would have been empty.
       if (!operations.length) {
+        // A preview IS an answer by the measure that matters — the person
+        // reads it — so it reads the flag on the same rule as the exits above.
+        if (await stopPressed()) {
+          console.log(`[stop] stopped at iteration ${iter}, preview undelivered`);
+          return finish({ kind: "stopped" });
+        }
         return finish({ kind: "text", text: preview || CLARIFY_FALLBACK });
       }
       return finish({

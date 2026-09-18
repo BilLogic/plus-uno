@@ -190,6 +190,95 @@ test("a stop landing after the last model reply suppresses the answer", async ()
   assert.equal(await store.consumeCancel(CANCEL_REF), false);
 });
 
+test("a stop landing after a reply with nothing stageable suppresses the preview too", async () => {
+  // The fourth delivering exit, and the one the first pass missed. A reply
+  // whose only side-effect call cannot be staged — its arguments are not an
+  // object — stages no proposal and delivers a PREVIEW instead, which is an
+  // answer by every measure that matters here: the person reads it. It needs
+  // the same read immediately before it as the other three.
+  const store = createInMemoryThreadState();
+  const rec = recorder();
+  rec.deps.threadState = store;
+  const scripted = fake({
+    replies: [
+      {
+        text: "here is what I would have done",
+        // The wire can carry a non-object here and the loop is written for it
+        // (`Array.isArray` is what makes the call unstageable); the type cannot
+        // say so, so the case says it in a cast.
+        toolCalls: [{ name: "notion_create", args: [] as unknown as Record<string, unknown> }],
+      },
+    ],
+  });
+  const pressedWhileAnswering: LoopInput["provider"] = {
+    ...scripted,
+    async send(opts) {
+      const reply = await scripted.send(opts);
+      await store.requestCancel(CANCEL_REF);
+      return reply;
+    },
+  };
+
+  const result = await runLoop(loopInput(pressedWhileAnswering, rec, { cancelKey: CANCEL_REF }));
+
+  assert.deepEqual(result, { kind: "stopped" });
+  assert.equal(await store.consumeCancel(CANCEL_REF), false);
+});
+
+test("a stop landing during the last call of a multi-iteration turn suppresses the answer", async () => {
+  // Criterion 2 in the issue's own words — "during the final model call of a
+  // MULTI-iteration turn". Two lookups run first, so the reads at the top of
+  // iterations 0, 1 and 2 all see nothing; the press lands while the third
+  // reply is being produced, and only the pre-delivery read can catch it.
+  const store = createInMemoryThreadState();
+  const rec = recorder();
+  rec.deps.threadState = store;
+  const scripted = fake({ replies: [LOOKUP, LOOKUP, { text: "the answer two lookups paid for" }] });
+  const pressedOnTheLastCall: LoopInput["provider"] = {
+    ...scripted,
+    async send(opts) {
+      const reply = await scripted.send(opts);
+      if (scripted.sends.length === 3) await store.requestCancel(CANCEL_REF);
+      return reply;
+    },
+  };
+
+  const result = await runLoop(loopInput(pressedOnTheLastCall, rec, { cancelKey: CANCEL_REF }));
+
+  assert.deepEqual(result, { kind: "stopped" });
+  // Both lookups ran and the final call completed: cooperative throughout, and
+  // only the delivery is dropped.
+  assert.equal(scripted.sends.length, 3);
+  assert.deepEqual(rec.executed, ["search_blueprint", "search_blueprint"]);
+});
+
+test("a stop landing during the synthesis pass suppresses what it synthesised", async () => {
+  // The budget-exhausted pass delivers text like any other exit, so it reads
+  // the flag like any other exit — the case that had no coverage at all.
+  const store = createInMemoryThreadState();
+  const rec = recorder({ budget: { used: () => LOOKUP_CEILING - 1 } });
+  rec.deps.threadState = store;
+  const scripted = fake({ replies: [{ text: "what I managed to gather" }] });
+  const pressedWhileSynthesising: LoopInput["provider"] = {
+    ...scripted,
+    async send(opts) {
+      const reply = await scripted.send(opts);
+      await store.requestCancel(CANCEL_REF);
+      return reply;
+    },
+  };
+
+  const result = await runLoop(loopInput(pressedWhileSynthesising, rec, { cancelKey: CANCEL_REF }));
+
+  assert.deepEqual(result, { kind: "stopped" });
+  // The synthesis pass itself ran — the flag is read after it, not instead of
+  // it — and its text went undelivered.
+  assert.deepEqual(
+    scripted.sends.map((c) => c.toolsEnabled),
+    [false],
+  );
+});
+
 test("a turn with no conversation to cancel never reads the /stop flag", async () => {
   // The headless eval path has no Slack conversation, so there is no key to
   // read — and reading one anyway is how the writer and the reader drifted.
