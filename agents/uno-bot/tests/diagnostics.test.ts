@@ -16,10 +16,10 @@
 //   whichever was declared first, which reads as a probe that silently stopped
 //   existing.
 //
-// Driven with FAKE probes: the real bodies name `Env`, whose Workers types this
-// Node compile does not have. The real route TABLE is read directly, so the
-// gate and uniqueness assertions are about the registry that ships, not a
-// restatement of it.
+// Driven with FAKE probes: the real bodies take an `Env` and make real calls
+// through it, so there is nothing to hand them here. The real route TABLE is
+// read directly, so the gate and uniqueness assertions are about the registry
+// that ships, not a restatement of it.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { DIAGNOSTIC_ROUTES, duplicateRoutes, type ProbeRoute } from "../src/diagnostics/routes";

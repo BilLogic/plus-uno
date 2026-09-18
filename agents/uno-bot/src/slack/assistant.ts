@@ -21,7 +21,7 @@
 
 import type { Env } from "../types";
 import { postMessage, slackCall } from "./api";
-import type { SessionStatus, StatusResult } from "./working-signal";
+import type { SessionStatus, StatusResult } from "./session-status";
 import { threadStateFor } from "../thread-state/production";
 import { getSlackAccessTokenFor, slackConnectUrl } from "../oauth/slack";
 import type { AssistantContext, SlackAppContextChangedEvent } from "./types";
@@ -127,7 +127,7 @@ async function setSuggestedPrompts(
  * could not tell a settle that worked from a settle that never happened, and
  * the two are what a stuck "Working…" is made of (#571). The call stays
  * best-effort — the caller decides what any of it is worth — but it can no
- * longer fail to know. `slack/working-signal.ts` turns this into the line.
+ * longer fail to know. `slack/delivery-adapter.ts` turns this into the line.
  */
 export async function setSessionStatus(
   env: Env,

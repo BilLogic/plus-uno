@@ -8,8 +8,8 @@
 // request. The tool DESCRIPTION says only when to ask for the registry; the
 // explanation of what came back rides here, in the result, with the rows it
 // explains. Same shape as blueprint-inventory-notes.ts: a module with no
-// `Env` and no Workers globals, so tsconfig.test.json compiles it, the
-// triggers are asserted rather than assumed, and the harness name sweep
+// `Env` and no Workers globals, so the triggers are asserted by RUNNING them
+// rather than assumed, and the harness name sweep
 // (tests/harness-blueprint-names.test.ts) can read every string as a subject.
 //
 // Vocabulary is the vendored account's (docs/connectors/supabase/blueprint.md

@@ -1,14 +1,30 @@
 // Worker code is TypeScript and the runtime here is plain Node, so `npm test`
 // compiles the modules under test to .test-build/ and runs node:test over the
-// output. Only what the tests import gets compiled — no bundler, and no
-// workerd.
+// output. No bundler, and no workerd.
+//
+// WHAT IT COMPILES IS A GLOB — `tests/**` and `src/**`, and no per-file
+// inventory (#595). It used to be a hand-kept list of seventy-odd source paths,
+// which was three things at once and honest about none of them: a build input,
+// a claim that "only what the tests import gets compiled", and a de-facto
+// purity register. All three had already failed. The list never governed what
+// was compiled — `tsc` follows imports, so 140 source files were on this build
+// while seventy were named — and a module's absence from it read as a boundary
+// when it was usually an omission nobody had noticed. Adding a module now means
+// adding a module.
 //
 // The Workers types sit BESIDE the Node ones (rather than instead of, as in
 // tsconfig.json) since `tests/notion-write.test.ts`: a mocked-fetch test over a
 // real integration reaches `Env`, and `Env` names the Durable Object and KV
-// binding types. `skipLibCheck` keeps the two global sets from arguing. The
-// boundary that still holds is the RUNTIME one — a test here runs on Node, so a
-// module that needs workerd belongs in tests/workerd/ (see the exclude below).
+// binding types. `skipLibCheck` keeps the two global sets from arguing. So
+// naming `Env`, or any Workers type, does not keep a module off this compile
+// and has not for some time — which is why no module's header should give it as
+// the reason the module exists (#595 swept the ones that did).
+//
+// THE BOUNDARY THAT HOLDS IS THE RUNTIME ONE. A test here runs on Node, so a
+// module that needs a real `fetch`, a binding call or a Workers global to do
+// its work is one this suite can compile and cannot DRIVE; a module free of
+// them can be driven. That is a property of the module, stated in the module,
+// and demonstrated by the test that imports it — not a line in this file.
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
@@ -20,10 +36,9 @@
   },
   // tests/workerd/ is the ONE suite that needs Cloudflare's runtime: vitest
   // compiles it itself (vitest.workerd.config.mts, `npm run test:workerd`), and
-  // it reaches the Durable Object adapter, which names Workers types this
-  // compile does not have. Compiling it here would drag `DurableObjectNamespace`
-  // and `cloudflare:test` into the Node build and fail — the same
-  // Workers-global-free boundary the module's own files keep.
+  // it imports `cloudflare:test`, a specifier that resolves under vitest's
+  // Workers pool and not under NodeNext here. It stays the only carve-out, and
+  // it is a RUNTIME one — the same distinction the header draws.
   "exclude": ["tests/workerd/**"],
-  "include": ["tests/**/*.ts", "src/integrations/notion.ts", "src/agent/draft-judge-rubric.ts", "src/tools/slack-search-filter.ts", "src/agent/revision-guard.ts", "src/tools/slack-search-response.ts", "src/slack/footer-kind.ts", "src/slack/stream-recipient.ts", "src/slack/transcript-window.ts", "src/slack/shortcut-specs.ts", "src/slack/effort.ts", "src/agent/tiers.ts", "src/agent/routing.ts", "src/agent/gemini-tiers.ts", "src/slack/failure-message.ts", "src/slack/antecedent.ts", "src/agent/scope-keywords.ts", "src/agent/context-state.ts", "src/integrations/blueprint-link.ts", "src/integrations/blueprint-index.ts", "src/integrations/blueprint-include.ts", "src/integrations/candidate-rpc.ts", "src/vertex/embed-model.ts", "src/integrations/index-model.ts", "src/slack/gate-reactions.ts", "src/agent/confidence.ts", "src/slack/mrkdwn.ts", "src/integrations/notion-blocks.ts", "src/integrations/email-render.ts", "src/slack/split.ts", "src/slack/answer-posts.ts", "src/slack/render.ts", "src/tools/share-out-render.ts", "src/agent/pending-notice.ts", "src/agent/absence.ts", "src/integrations/repo-read-guard.ts", "src/integrations/figma-reading.ts", "src/integrations/blueprint-schema.ts", "src/tools/read-reference.ts", "src/generated/references.ts", "src/tools/blueprint-inventory-notes.ts", "src/integrations/blueprint-scope.ts", "src/tools/blueprint-touchpoint-notes.ts", "src/integrations/blueprint-subject.ts", "src/integrations/blueprint-read.ts", "src/agent/tool-transcript.ts", "src/agent/placeholder.ts", "src/thread-state/index.ts", "src/version.ts", "src/agent/model-provider.ts", "src/agent/loop-policy.ts", "src/agent/loop.ts", "src/agent/providers/fake.ts", "src/agent/providers/claude.ts", "src/turn/index.ts", "src/eval/turn-case.ts", "src/gate/index.ts", "src/slack/working-signal.ts", "src/slack/session-stop.ts", "src/agent/tool-table.ts", "src/tools/slack-react.ts", "src/agent/tool-bodies.ts", "src/oauth/slack.ts", "src/diagnostics/routes.ts", "src/diagnostics/auth.ts", "src/diagnostics/router.ts", "src/tools/blueprint-search.ts", "src/slack/stop-doors.ts", "src/agent/draft-judge.ts", "src/slack/delivery-adapter.ts"]
+  "include": ["tests/**/*.ts", "src/**/*.ts"]
 }

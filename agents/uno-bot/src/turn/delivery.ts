@@ -17,9 +17,9 @@
 // Slack adapter's own tests: `tests/helpers/recording-slack.ts` stands in for
 // the Slack CLIENT rather than for this port.
 //
-// PURE by design — no `Env`, no Workers type, no fetch — so
-// `tsconfig.test.json` compiles this file and the recording adapter beside the
-// turn's own tests.
+// PURE by design — no `Env`, no Workers type, no fetch — which is what lets
+// the turn's own tests run on the recording adapter beside it, with no Worker
+// anywhere. (Not a compile property: `tsconfig.test.json` globs `src/**`.)
 
 /** How far a turn got before it failed. Drives what the message the person
  *  sees can honestly promise (`slack/failure-message.ts`). */
@@ -34,7 +34,7 @@ export type DeliveryFailureStage = "context" | "agent" | "delivery" | "internal"
  *
  * Two words rather than Slack's four-value lifecycle, because this is the only
  * distinction a turn is entitled to make. Which status renders it is the Slack
- * adapter's business (`slack/working-signal.ts` `settledStatus`) — a port that
+ * adapter's business (`slack/session-status.ts` `settledStatus`) — a port that
  * named Slack's enum would be Slack leaking upward, and "the conversation is
  * complete" (`closed`) is a claim no turn of ours can make at all (#575).
  */

@@ -7,8 +7,9 @@
 // the session and what the line says. Everything it then DOES with that
 // verdict — the settle, the post, the order they go in — is
 // `stop-doors.ts`, which takes ThreadState, the settle and the Delivery port by
-// name. That is what puts the door on the Node test compile: a door that named
-// `Env` could only be read with a regex (`tests/session-stop.test.ts`, #593).
+// name. That is what lets the Node suite DRIVE the door: a door whose one
+// argument was an `Env` could only be read with a regex
+// (`tests/session-stop.test.ts`, #593).
 //
 // What is left here is what genuinely belongs to the envelope: the Slack event
 // shape, the Slack client, and the bindings.

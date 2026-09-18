@@ -33,7 +33,7 @@
 
 import { rowFor } from "./tool-table";
 import { BUILD } from "../version";
-import type { ModelTier } from "./tiers";
+import type { ModelTier } from "./routing";
 import type { PendingProposal, ProposalOperation, ThreadRef } from "../thread-state/index";
 import type { ProviderConversationTurn } from "./provider-conversation";
 import { toolResultDigest, type ToolCall, type ToolResultNote } from "./tool-transcript";

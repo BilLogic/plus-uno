@@ -76,7 +76,7 @@ import { claudeVertexConfigured, claudeVertexRaw } from "../vertex/claude";
 import { runLoop, type AgentResult, type LoopBudget, type TurnDials } from "./loop";
 import { geminiProvider } from "./providers/gemini";
 import { claudeProvider } from "./providers/claude";
-import type { ModelTier } from "./tiers";
+import type { ModelTier } from "./routing";
 import type { ModelProvider, SystemBlock, ToolSpec } from "./model-provider";
 import type { ToolBody } from "./tool-bodies";
 import { isToolName, type ToolName } from "./tool-table";
@@ -278,7 +278,7 @@ export function selectProvider(env: Env): ModelProvider {
 // ── Correction / pushback vocabulary ────────────────────────────────────────
 //
 // It lives in `agent/correction.ts`, import-free, because the module that ACTS
-// on it is Turn (`turn/turn.ts`) — which `tsconfig.test.json` compiles, and
+// on it is Turn (`turn/turn.ts`) — which a Node test can drive, and
 // this entry, which reaches every tool body, it cannot. Re-exported here
 // because this is the agent's one public surface, and `isCorrectionTurn` below
 // is the scope's own read of the same fact.

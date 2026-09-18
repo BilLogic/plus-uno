@@ -20,7 +20,7 @@
 // PURE by design — no `Env`, no Workers type, no fetch — so `tsconfig.test.json`
 // compiles it and the fake adapter beside the loop's own tests.
 
-import type { ModelTier } from "./tiers";
+import type { ModelTier } from "./routing";
 import type { ProviderConversationTurn } from "./provider-conversation";
 
 /** One tool as the roster offers it to a model. The schema travels as written

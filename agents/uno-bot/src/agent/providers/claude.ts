@@ -37,7 +37,7 @@
 // binds the port to `vertex/claude.ts`'s rawPredict in `run-agent.ts`.
 
 import { MAX_TOKENS } from "../loop-policy";
-import type { ModelTier } from "../tiers";
+import type { ModelTier } from "../routing";
 import type {
   ModelPrompt,
   ModelProvider,

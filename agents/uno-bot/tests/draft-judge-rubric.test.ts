@@ -6,6 +6,11 @@
 // requiring the retired format while nothing checked that the replacement was
 // present at all.
 //
+// The prompt now lives in `src/agent/draft-judge.ts`, beside the call that
+// sends it (#595); the leaf module it used to sit in existed only so this file
+// could compile it apart from the Workers-typed graph, which the test compile
+// stopped caring about.
+//
 // D9 itself is fixed. These tests are what stops the next drift. They are
 // deliberately few and do not try to validate the whole prompt — they pin the
 // one dimension that has already gone wrong, and they read the canonical rubric
@@ -15,7 +20,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { JUDGE_SYSTEM } from "../src/agent/draft-judge-rubric";
+import { JUDGE_SYSTEM } from "../src/agent/draft-judge";
 
 // Resolved from the package dir (npm test runs from agents/uno-bot) rather than
 // from the compiled file, which lives under .test-build/.

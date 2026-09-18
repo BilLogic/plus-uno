@@ -25,8 +25,10 @@
 // and what lets the eval route (#499) be the second caller rather than a
 // second pipeline.
 //
-// PURE by design: no `Env`, no Workers type, no fetch, so
-// `tsconfig.test.json` compiles this file.
+// PURE by design: no `Env`, no Workers type, no fetch — which is what lets the
+// Node suite DRIVE it rather than read it. (Not a compile property: the test
+// compile is a glob over `src/**` and types the Workers globals beside the Node
+// ones, so it would compile this file either way — `tsconfig.test.json`.)
 
 import { judgeAbsence, absenceRepairInstruction, type AbsenceContext } from "../agent/absence";
 import {
@@ -42,7 +44,7 @@ import type { AgentResult } from "../agent/loop";
 import { bounceLogLine, proposalWasAddressed } from "../agent/pending-notice";
 import type { AgentImage, HistoricalImages } from "../agent/provider-conversation";
 import { routeRequest } from "../agent/routing";
-import type { ModelTier } from "../agent/tiers";
+import type { ModelTier } from "../agent/routing";
 import { resolveSignal, type GateVerdict } from "../gate/index";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "../slack/antecedent";
 import {
