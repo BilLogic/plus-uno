@@ -60,7 +60,12 @@ export async function claudeVertexRaw(
 
 /**
  * One-shot text generation (no tools) — used by the /debug/vertex-claude smoke
- * test and the pre-send draft judge. Returns the joined text of the response.
+ * test. Returns the joined text of the response.
+ *
+ * Not the way a FEATURE asks this lane for text: the draft judge called it
+ * directly until #605 and goes through the `ModelProvider` seam's `generate`
+ * now, which is where the tier, the dials and the fallback live. What is left
+ * here is the probe, whose subject is the credential rather than the answer.
  */
 export async function claudeVertexGenerate(
   env: Env,

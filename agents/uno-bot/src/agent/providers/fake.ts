@@ -57,6 +57,11 @@ export interface FakeProviderOptions {
   /** When set, every `generate` fails with this message — the caller's
    *  fail-open path (the draft judge sends the original draft). */
   generateFailMessage?: string;
+  /** When set, every `generate` comes back UNAVAILABLE with this message: the
+   *  adapter was never able to ask (no credential). A different outcome from
+   *  `generateFailMessage`, and the caller is meant to treat it differently —
+   *  the draft judge skips on this and errors on that (#605). */
+  generateUnavailableMessage?: string;
   model?: string;
   usage?: Partial<ModelUsage>;
 }
@@ -112,6 +117,14 @@ export function fakeProvider(opts: FakeProviderOptions = {}): FakeProvider {
 
     async generate(prompt: ModelPrompt): Promise<ModelText> {
       generated.push(prompt);
+      if (opts.generateUnavailableMessage !== undefined) {
+        return {
+          ok: false,
+          unavailable: true,
+          model,
+          message: opts.generateUnavailableMessage,
+        };
+      }
       if (opts.generateFailMessage !== undefined) {
         return { ok: false, model, message: opts.generateFailMessage };
       }

@@ -57,13 +57,13 @@ import type {
  * table lives HERE and not in the provider-neutral routing module, which used
  * to carry Claude ids that no Gemini turn ever read.
  *
- * EXPORTED, and therefore read above the seam in two places: the diagnostics
- * probe, which needs a model id to smoke-test the credential with, and the
- * draft judge, which still calls the Vertex client directly and picks this
- * table's `chill` id itself. Both are callers this seam has not swallowed yet.
- * A caller that goes through `generate` or a turn names a TIER and nothing
- * else — that is the contract, and the two direct readers are what is left of
- * the old one.
+ * EXPORTED, and therefore read above the seam in ONE place: the diagnostics
+ * probe, which needs a model id to smoke-test the credential with — checking a
+ * credential is the one job a tier cannot describe. The draft judge was the
+ * second reader, picking this table's `chill` id itself, until #605 put it
+ * through `generate` on a named tier. A caller that goes through `generate` or
+ * a turn names a TIER and nothing else; the probe is what is left of the old
+ * contract.
  */
 export const CLAUDE_MODELS: Record<ModelTier, string> = {
   chill: "claude-haiku-4-5@20251001",

@@ -24,7 +24,7 @@
 import { buildProviderConversation } from "../agent/provider-conversation";
 import { preflight } from "../agent/preflight";
 import { reviewDraft } from "../agent/draft-judge";
-import { runAgent, withTurnScope, type AgentResult, type TurnDials } from "../agent/run-agent";
+import { runAgent, selectProvider, withTurnScope, type AgentResult, type TurnDials } from "../agent/run-agent";
 import type { ToolCall, ToolResultNote } from "../agent/tool-transcript";
 import type { GateVerdict } from "../gate/index";
 import { conversationsHistoryBefore } from "../slack/api";
@@ -141,7 +141,9 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
       };
     },
 
-    reviewDraft: (args) => reviewDraft(env, args),
+    // The judge takes the same adapter the turn runs on, selected once (#605):
+    // `MODEL_PROVIDER` is `selectProvider`'s to read, not the judge's.
+    reviewDraft: (args) => reviewDraft(selectProvider(env), args),
 
     async preflight(toolName, input, ctx) {
       const ask = await preflight(toolName, input, {

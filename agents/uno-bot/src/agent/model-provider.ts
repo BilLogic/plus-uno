@@ -108,9 +108,10 @@ export interface ProviderDials {
  *
  * The caller names a TIER and nothing else about the model, exactly as it does
  * for a turn: the tier's model and its dials move together inside the adapter
- * (ADR-028), so nothing that comes through here spells a model id. (Two
- * callers still bypass the seam and name one themselves — the diagnostics
- * probe and the draft judge; the contract is about what crosses this file.)
+ * (ADR-028), so nothing that comes through here spells a model id. (One caller
+ * still bypasses the seam and names a model itself — the diagnostics probe,
+ * whose whole job is to check one provider's credential; the draft judge came
+ * through here in #605. The contract is about what crosses this file.)
  */
 export interface ModelPrompt {
   tier: ModelTier;
@@ -131,17 +132,35 @@ export interface ModelPrompt {
  * one, and a field the others must report as null is the mistake `ProviderDials`
  * avoids. The status, where there is one, is inside `message`.
  *
- * `ok: false` means THE MODEL DID NOT ANSWER — it was asked and something went
- * wrong. It does not mean "nothing was asked": the seam has no question for
- * whether a provider is usable at all, so an adapter with no credential answers
- * a `generate` the only way it can, as a failure. A caller that must tell those
- * apart — a judge that skips rather than errors when there is no credential to
- * judge with — needs a state of its own, and the way to get one is a THIRD ARM
- * on this union, not parsing `message`. Deliberately left open.
+ * THREE DISPOSITIONS, because "did not answer" and "was never asked" are not
+ * the same fact about a run:
+ *
+ *   `ok: true`                    — the model answered; `text` is the answer.
+ *   `ok: false`                   — it WAS asked and something went wrong: a
+ *                                   429, a timeout, an empty candidate.
+ *   `ok: false, unavailable: true` — it was NEVER asked, because the adapter
+ *                                   cannot ask: no credential, no endpoint.
+ *
+ * The third arm landed in #605 (it was left open by #604) for the draft judge,
+ * whose two outcomes are not interchangeable: a judge that errored should be
+ * reported as an error, and a judge that was never configured should be
+ * reported as a skip. Collapsing them is the fail-open blindness the eval
+ * judge's own skip reasons exist to prevent.
+ *
+ * WHICH ADAPTER DECIDES IS THE POINT. How a provider authenticates is exactly
+ * what this seam hides, so the alternative — the caller checking credentials
+ * before it calls — would put one adapter's auth knowledge above the seam, and
+ * add a second check the day a second provider is asked to judge.
+ *
+ * `unavailable` is optional-and-false on the failure arm rather than absent
+ * from it, so `res.unavailable === true` NARROWS: TypeScript's excess-property
+ * check does not run on a value already typed, and two arms that differ only
+ * by an extra property would otherwise be mutually assignable.
  */
 export type ModelText =
   | { ok: true; model: string; text: string }
-  | { ok: false; model: string; message: string };
+  | { ok: false; unavailable?: false; model: string; message: string }
+  | { ok: false; unavailable: true; model: string; message: string };
 
 /** Everything an adapter needs to open a turn. */
 export interface ModelTurn {

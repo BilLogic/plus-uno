@@ -81,6 +81,18 @@ the project and the turn fell back — a real finding, not noise.
 The Vertex-Claude lane is untouched: its tiers carry a thinking *budget* in
 tokens, not a level, and it reports `level: null`.
 
+**Both judges name a tier rather than assemble a pair (2026-09-18, #605).** The
+pre-send draft judge (`src/agent/draft-judge.ts`) and the eval judge
+(`scripts/eval-judge.mjs`) each used to take grind's *model* and send it at
+`low` — a configuration no tier described, which is exactly what this decision
+forbids. Both name `grind` now and set no level of their own, so a judged reply
+and a judged eval case run at `high`. That costs thinking and latency per
+judgement, and it was the cheaper of the two: the alternative was maintaining a
+fourth, unnamed configuration that only the judges used and no measurement
+covered. The eval judge restates grind's row because a Node script cannot import
+the Worker's TypeScript; `scripts/eval-judge.test.mjs` reads
+`gemini-tiers.ts` and fails if the restatement drifts.
+
 `docs/plans/2026-08-07-006` stays as written; it is the record of the decision
 this one reverses, and the "one dial, held constant" reasoning in it is the
 reasoning this ADR answers.

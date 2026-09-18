@@ -16,18 +16,34 @@
 //     pattern as the per-request line, so pass/fail rates are measurable via
 //     `wrangler tail` / Workers Logs.
 //
-// Provider-aware like the agent loop: the Gemini adapter → one generateContent
-// on the active GEMINI_MODEL (low thinking); Vertex-Claude → one chill call.
+// THROUGH THE SEAM, ON A NAMED TIER (#605). This module used to read
+// `MODEL_PROVIDER` itself and then pick a model and a thinking level per
+// provider — the active GEMINI_MODEL at `low`, or Claude's chill model. Two
+// things were wrong with that. `MODEL_PROVIDER` was read in two places while
+// the code and CONTEXT.md both claimed one (`run-agent.ts`'s `selectProvider`,
+// now the only reader and this module's supplier). And a model plus a level the
+// caller chose is not a tier (ADR-028), so the judge was assembling a
+// configuration nobody had named or measured.
+//
+// The judge now names `grind` and nothing else: the model, the thinking level,
+// the prompt cache, the backup model and the per-call telemetry are the
+// adapter's. On the Gemini lane that means `gemini-3.1-pro-preview` at `high`
+// — where this module used to send that generation's flash model at `low` —
+// which is more thinking and more latency per judged draft, accepted as part of
+// the decision (2026-09-18) to stop maintaining an unnamed dial pair here.
+//
+// Taking a `ModelProvider` rather than an `Env` also puts the judge on the Node
+// test compile: tests/draft-judge.test.ts drives verdict parsing, the
+// correction gate, the skip and the fail-open on the fake adapter, with no
+// credential and no Workers runtime.
 
 import { shouldRejectRevision, looksLikeStalledCorrection } from "./revision-guard";
 // The rubric text lives in its own leaf module so `npm test` can compile it
 // without dragging the Workers-typed graph in — see draft-judge-rubric.ts
 // (split out on main, PR #126, so tests/draft-judge-rubric.test.ts can pin it).
 import { JUDGE_SYSTEM } from "./draft-judge-rubric";
-import type { Env } from "../types";
-import { geminiConfigured, geminiGenerate } from "../gemini/client";
-import { claudeVertexConfigured, claudeVertexGenerate } from "../vertex/claude";
-import { CLAUDE_MODELS } from "./providers/claude";
+import type { ModelProvider, ModelText } from "./model-provider";
+import type { ModelTier } from "./tiers";
 import { BUILD } from "../version";
 
 // Drafts under this length are never judged, unless a caller forces it — a
@@ -53,6 +69,18 @@ const MAX_PRIOR_CHARS = 4_000;
 // A "revision" shorter than this fraction of the original is treated as a
 // judge malfunction (e.g. it answered instead of revising) — original ships.
 const MIN_REVISION_RATIO = 0.25;
+// Room for a full revised draft to come back in the same call.
+const JUDGE_MAX_TOKENS = 6000;
+
+/**
+ * The tier the judge grades on — the ONLY thing it says about the model.
+ *
+ * `grind` because a judge should be at least as strong as what it grades, and
+ * because a tier is a model AND a thinking level moving together (ADR-028): the
+ * judge naming a level of its own is how it ended up on a configuration no tier
+ * described. Exported so the test can assert the tier rather than infer it.
+ */
+export const JUDGE_TIER: ModelTier = "grind";
 
 /** Appended to the judge system prompt ONLY on a detected correction turn — the
  *  one-obligation-per-field rule that governs tool payloads applies here too.
@@ -73,6 +101,20 @@ export interface JudgeOutcome {
   /** The text to send: the revised draft on a usable "fail", else the original. */
   text: string;
   verdict: "pass" | "fail" | "skip" | "error";
+  /** Why, on a verdict that graded nothing. A skip fails open — the draft ships
+   *  either way — so an unexplained one is indistinguishable in the logs from a
+   *  draft the judge read and approved. `judgeSkipped` below is the only
+   *  constructor for a skip, so no path can forget it; the same rule the eval
+   *  judge keeps with its own `judgeSkipped` (#618). */
+  reason?: string;
+}
+
+/** What a skip with no reason is recorded as — a bug, named rather than blank. */
+const UNRECORDED_SKIP_REASON = "skipped for no recorded reason";
+
+/** A skip, which always carries why, and always ships the draft unchanged. */
+function judgeSkipped(draft: string, reason: string): JudgeOutcome {
+  return { text: draft, verdict: "skip", reason: reason.trim() || UNRECORDED_SKIP_REASON };
 }
 
 interface JudgeJson {
@@ -94,7 +136,7 @@ function parseJudgeJson(raw: string): JudgeJson | null {
 }
 
 async function callJudgeModel(
-  env: Env,
+  provider: ModelProvider,
   userText: string,
   draft: string,
   ctx: {
@@ -104,7 +146,7 @@ async function callJudgeModel(
     stalled: boolean;
     extraInstruction?: string;
   },
-): Promise<string | null> {
+): Promise<ModelText> {
   const prompt =
     (ctx.correction && ctx.priorAssistantText
       ? `Previous reply (the one the user is correcting):\n${ctx.priorAssistantText.slice(0, MAX_PRIOR_CHARS)}\n\n`
@@ -128,31 +170,10 @@ async function callJudgeModel(
 
   const system = ctx.correction ? JUDGE_SYSTEM + CORRECTION_GATE : JUDGE_SYSTEM;
 
-  // Judge on the active provider, defaulting to Gemini (production).
-  const provider = (env.MODEL_PROVIDER ?? "gemini").toLowerCase();
-  if (provider === "vertex-claude" && claudeVertexConfigured(env)) {
-    const res = await claudeVertexGenerate(env, {
-      model: CLAUDE_MODELS.chill,
-      system,
-      prompt,
-      maxTokens: 6000, // room for a full revised draft
-    });
-    if (!res.ok) throw new Error(res.error ?? "vertex-claude judge call failed");
-    return res.text ?? null;
-  }
-
-  if (geminiConfigured(env)) {
-    const res = await geminiGenerate(env, {
-      system,
-      prompt,
-      maxTokens: 6000, // room for a full revised draft
-      thinkingLevel: "low",
-    });
-    if (!res.ok) throw new Error(res.error ?? "gemini judge call failed");
-    return res.text ?? null;
-  }
-
-  return null; // no judge credential — caller treats as skip
+  // A tier, a system block, a prompt and a ceiling. Whether that is Gemini or
+  // Claude, which model the tier resolves to, what level it thinks at and
+  // whether a credential exists at all are all the adapter's side of the seam.
+  return provider.generate({ tier: JUDGE_TIER, system, prompt, maxTokens: JUDGE_MAX_TOKENS });
 }
 
 /**
@@ -160,7 +181,7 @@ async function callJudgeModel(
  * Never throws; never blocks a reply (fail open on error/timeout).
  */
 export async function reviewDraft(
-  env: Env,
+  provider: ModelProvider,
   args: {
     userText: string;
     draft: string;
@@ -197,7 +218,7 @@ export async function reviewDraft(
     console.log(
       `[uno-bot] draft-judge build=${BUILD} verdict=skip reason=short draft_chars=${draft.length} correction=no`,
     );
-    return { text: draft, verdict: "skip" };
+    return judgeSkipped(draft, "draft shorter than the judged floor");
   }
 
   // Deterministic mirror of shouldRejectRevision: a post-correction reply that
@@ -207,13 +228,14 @@ export async function reviewDraft(
 
   const startedAt = Date.now();
   let verdict: JudgeOutcome["verdict"] = "error";
+  let reason = "";
   let failed: string[] = [];
   let revisedUsed = false;
   let text = draft;
 
   try {
-    const raw = await Promise.race([
-      callJudgeModel(env, userText, draft, {
+    const answer = await Promise.race([
+      callJudgeModel(provider, userText, draft, {
         correction,
         priorAssistantText,
         toolsUsedThisTurn,
@@ -223,12 +245,24 @@ export async function reviewDraft(
       new Promise<"__timeout__">((resolve) => setTimeout(() => resolve("__timeout__"), JUDGE_TIMEOUT_MS)),
     ]);
 
-    if (raw === "__timeout__") {
+    if (answer === "__timeout__") {
       verdict = "error";
+      reason = `timed out after ${JUDGE_TIMEOUT_MS}ms`;
       console.warn("[draft-judge] timed out — sending the original draft");
-    } else if (raw === null) {
-      verdict = "skip"; // no judge credential configured
+    } else if (answer.ok === false && answer.unavailable === true) {
+      // NEVER ASKED: the adapter has no credential, so there is no judgement to
+      // report either way. A skip, not an error — the distinction the seam's
+      // third disposition exists to carry (#605), and the reason is the
+      // adapter's own words about what is missing.
+      verdict = "skip";
+      reason = answer.message;
+    } else if (answer.ok === false) {
+      // ASKED AND DID NOT ANSWER — an error, which fails open to the original.
+      verdict = "error";
+      reason = answer.message;
+      console.warn(`[draft-judge] judge call failed: ${answer.message} — sending the original draft`);
     } else {
+      const raw = answer.text;
       const parsed = parseJudgeJson(raw);
       if (parsed?.verdict === "pass") {
         verdict = "pass";
@@ -250,20 +284,24 @@ export async function reviewDraft(
         }
       } else {
         verdict = "error";
+        reason = "unparseable judge output";
         console.warn(`[draft-judge] unparseable judge output (${raw.slice(0, 120)}) — sending the original draft`);
       }
     }
   } catch (err) {
     verdict = "error"; // fail open
-    console.warn(`[draft-judge] failed: ${err instanceof Error ? err.message : String(err)} — sending the original draft`);
+    reason = err instanceof Error ? err.message : String(err);
+    console.warn(`[draft-judge] failed: ${reason} — sending the original draft`);
   }
 
   console.log(
-    `[uno-bot] draft-judge build=${BUILD} verdict=${verdict} failed=[${failed.join(",")}] ` +
+    `[uno-bot] draft-judge build=${BUILD} verdict=${verdict} reason=${reason || "-"} ` +
+      `failed=[${failed.join(",")}] ` +
       `revised=${revisedUsed} ms=${Date.now() - startedAt} draft_chars=${draft.length} ` +
       `correction=${correction ? "yes" : "no"} stalled=${stalled ? "yes" : "no"} ` +
       `forced=${forceReason ?? "no"} ` +
       `tools=[${toolsUsedThisTurn.join(",")}]`,
   );
-  return { text, verdict };
+  if (verdict === "skip") return judgeSkipped(text, reason);
+  return { text, verdict, ...(reason ? { reason } : {}) };
 }

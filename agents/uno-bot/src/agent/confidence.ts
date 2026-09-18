@@ -3,7 +3,7 @@
 // AGENT.md § Grounding requires exactly one woven confidence clause per factual
 // reply, and forbids a trailing "Confidence: high" label. The only thing that
 // checked that rule was rubric dimension D9 inside the draft judge — which
-// skips any draft under MIN_DRAFT_CHARS (1500). Almost every blueprint answer
+// skips any draft under MIN_DRAFT_CHARS (1000, and 1500 when this was written). Almost every blueprint answer
 // in Slack is a few hundred characters, so the rule went unenforced on the
 // common case, and the one deterministic guard that did fire
 // (stripTrailingConfidence) DELETES a malformed label without putting anything

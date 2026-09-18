@@ -21,6 +21,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { generateKeyPairSync } from "node:crypto";
 import {
+  DEFAULT_JUDGE_MODEL,
+  JUDGE_TIER,
+  JUDGE_TIER_DIALS,
   RUBRIC_PATH,
   UNRECORDED_SKIP_REASON,
   describeRubric,
@@ -127,7 +130,7 @@ test("the judge posts the rubric and the case to the model, and reads the verdic
 
   assert.equal(
     j.name,
-    "gemini-3.1-pro-preview against 9 dimensions (D1–D9) from docs/evals/rubrics/bot-answer.md",
+    "gemini-3.1-pro-preview at high (the grind tier) against 9 dimensions (D1–D9) from docs/evals/rubrics/bot-answer.md",
   );
   assert.deepEqual(await j.judgeCase(CASE, { turns: [] }), { verdict: "pass" });
 
@@ -141,7 +144,23 @@ test("the judge posts the rubric and the case to the model, and reads the verdic
   assert.match(body.systemInstruction.parts[0].text, /id: D9/, "the rubric travels in the system instruction");
   assert.match(body.contents[0].parts[0].text, /Case R3 — a share-out is proposed/);
   assert.match(body.contents[0].parts[0].text, /the bot proposes rather than posts/);
-  assert.equal(body.generationConfig.thinkingConfig.thinkingLevel, "low");
+  // THE TIER'S LEVEL, not one the judge picked (#605). It was "low" beside
+  // grind's model until then — a pair no tier described (ADR-028).
+  assert.equal(body.generationConfig.thinkingConfig.thinkingLevel, "high");
+});
+
+// A RATCHET over the one thing this file cannot import. The Worker's grind row
+// lives in TypeScript (src/agent/gemini-tiers.ts) and a Node script cannot read
+// it, so `JUDGE_TIER_DIALS` restates it — and a restatement with nothing
+// holding it is how the rubric paraphrase this module deleted got there. Move
+// grind on the Worker and this fails until the judge moves with it.
+test("the judge's grind tier is the Worker adapter's grind tier", () => {
+  const tiers = readFileSync(new URL("../src/agent/gemini-tiers.ts", import.meta.url), "utf8");
+  const row = /grind:\s*\{\s*model:\s*"([^"]+)",\s*level:\s*"([^"]+)"\s*\}/.exec(tiers);
+  assert.ok(row, "GEMINI_TIERS.grind is not where this test expects it");
+  assert.equal(JUDGE_TIER, "grind");
+  assert.deepEqual(JUDGE_TIER_DIALS, { model: row[1], level: row[2] });
+  assert.equal(DEFAULT_JUDGE_MODEL, row[1]);
 });
 
 test("thinking_level is a 3.x key — an older judge model is not sent one", async () => {
@@ -303,13 +322,16 @@ test("a service account that cannot be exchanged names itself apart from one tha
   );
 });
 
-test("a service account that exchanges names the model and the rubric it will grade with", async () => {
+test("a service account that exchanges names the tier, the model and the rubric it will grade with", async () => {
   const fetchImpl = fakeFetch({ ok: true, status: 200, json: async () => ({ access_token: "ya29.exchanged" }) });
   const j = await judgeFromEnv(
     { GEMINI_SA_EMAIL: "evals@hcii-plus.iam.gserviceaccount.com", GEMINI_SA_PRIVATE_KEY: TEST_KEY },
     { fetchImpl },
   );
-  assert.equal(j.name, "gemini-3.1-pro-preview against 9 dimensions (D1–D9) from docs/evals/rubrics/bot-answer.md");
+  assert.equal(
+    j.name,
+    "gemini-3.1-pro-preview at high (the grind tier) against 9 dimensions (D1–D9) from docs/evals/rubrics/bot-answer.md",
+  );
 });
 
 test("a token exchange that fails names the status and never the credential", async () => {

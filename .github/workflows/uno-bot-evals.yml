@@ -90,9 +90,12 @@ jobs:
           GEMINI_SA_EMAIL: ${{ secrets.GEMINI_SA_EMAIL }}
           GEMINI_SA_PRIVATE_KEY: ${{ secrets.GEMINI_SA_PRIVATE_KEY }}
           GEMINI_PROJECT_ID: "hcii-plus"
-          # Judge on the grind model, one tier above the bot. Same-model judging shares
-          # the bot's blind spots (self-preference); a judge should be at least as
-          # strong as what it grades. Decided 2026-09-04.
+          # Judge on the GRIND TIER, one tier above the bot. Same-model judging
+          # shares the bot's blind spots (self-preference); a judge should be at
+          # least as strong as what it grades. Decided 2026-09-04. This pins the
+          # tier's MODEL only — its thinking level travels with the tier in code
+          # (ADR-028), and is `high` since #605, where the judge stopped sending
+          # this model at a level of its own choosing.
           JUDGE_MODEL: "gemini-3.1-pro-preview"
         run: node agents/uno-bot/scripts/run-evals.mjs
       - name: Upload transcripts

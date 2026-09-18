@@ -24,7 +24,7 @@
 
 import type { Env } from "../../types";
 import { geminiDials, resolveGeminiModel, type ThinkingLevel } from "../gemini-tiers";
-import { geminiGenerate, geminiGenerateRaw } from "../../gemini/client";
+import { geminiConfigured, geminiGenerate, geminiGenerateRaw } from "../../gemini/client";
 import { ensureHarnessCache } from "../../gemini/cache";
 import { MAX_TOKENS } from "../loop-policy";
 import type {
@@ -145,6 +145,19 @@ export function geminiProvider(env: Env): ModelProvider {
      */
     async generate(prompt: ModelPrompt): Promise<ModelText> {
       const oneShotModel = resolveGeminiModel(prompt.tier, env);
+      // NEVER ASKED, and said so (#605). Whether this deployment has a Gemini
+      // credential at all is this adapter's knowledge, not its caller's: the
+      // draft judge skips rather than errors when nothing can be asked, and the
+      // only way it can tell those apart without learning how Gemini
+      // authenticates is the seam's `unavailable` disposition.
+      if (!geminiConfigured(env)) {
+        return {
+          ok: false,
+          unavailable: true,
+          model: oneShotModel,
+          message: "no Gemini credential configured",
+        };
+      }
       const { thinkingLevel: level } = geminiDials(prompt.tier, oneShotModel);
       const res = await geminiGenerate(env, {
         model: oneShotModel,

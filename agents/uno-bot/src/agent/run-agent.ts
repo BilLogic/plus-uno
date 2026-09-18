@@ -238,13 +238,21 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
 }
 
 /**
- * Which adapter answers this turn — the ONE place `MODEL_PROVIDER` is read.
+ * Which adapter answers — the ONE place `MODEL_PROVIDER` is read, and now
+ * actually the only one (#605): the draft judge read it too until it started
+ * taking a provider built here, and `scripts/provider-read.test.mjs` fails
+ * the build if a second reader appears.
+ *
+ * EXPORTED for that reason. Every caller that wants a model — the loop's own
+ * turn below, and the draft judge through `turn/env-deps.ts` — takes the
+ * provider this returns, so "which provider" is decided once per `Env` rather
+ * than re-derived per caller from the same var.
  *
  * The Claude adapter takes a transport port rather than an `Env`, so it compiles
  * in the Node test build and `tests/claude-provider.test.ts` drives a whole
  * Claude-shaped turn with a stubbed rawPredict and no network.
  */
-function selectProvider(env: Env): ModelProvider {
+export function selectProvider(env: Env): ModelProvider {
   const provider = (env.MODEL_PROVIDER ?? "gemini").toLowerCase();
   if (provider === "vertex-claude" && claudeVertexConfigured(env)) {
     return claudeProvider({
