@@ -53,7 +53,7 @@ const BENCHMARK = 'docs/evals/atlassian-benchmark.json';
  * by hand. The age prints on every run, so the number is visible long before it
  * is reached.
  */
-const MAX_AGE_DAYS = 365;
+export const MAX_AGE_DAYS = 365;
 
 export const REMEDY =
   '  -> A row that moved the wrong way is a real regression: role coverage was\n' +

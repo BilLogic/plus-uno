@@ -39,7 +39,7 @@ const RECORD = 'docs/evals/icon-button-name.json';
  * A resolver that stopped finding files reports a clean sweep. The floor is the
  * count on 2026-08-29.
  */
-const MIN_FILES = 400;
+export const MIN_FILES = 400;
 
 export const REMEDY =
   '  -> Give the control a name: `aria-label` on a bare <button>, or `text` /\n' +

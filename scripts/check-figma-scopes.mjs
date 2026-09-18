@@ -31,7 +31,7 @@ const RECORDING = 'design-system/figma/colour-values.json';
  * A recording with no scopes would pass everything. The floor is the count of
  * accent colour variables that carry a role, measured on 2026-08-29.
  */
-const MIN_SCOPED = 75;
+export const MIN_SCOPED = 75;
 
 /*
  * The convention has to have been FOUND. If the naming changed under

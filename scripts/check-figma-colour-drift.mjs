@@ -32,14 +32,14 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const RECORDING = 'design-system/figma/colour-values.json';
 
 /** Half a year, matching check:figma-snapshots — this is refreshed the same way. */
-const MAX_AGE_DAYS = 180;
+export const MAX_AGE_DAYS = 180;
 
 /*
  * A recording that compares almost nothing would pass everything. This is the
  * same floor idea as check:figma-snapshots' MIN_VARIABLES, applied to the pairs
  * that actually got compared rather than to the file's length.
  */
-const MIN_COMPARED = 90;
+export const MIN_COMPARED = 90;
 
 /**
  * The divergences somebody has looked at and chosen to leave, each saying what

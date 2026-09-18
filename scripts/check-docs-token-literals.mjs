@@ -402,6 +402,9 @@ export const REMEDY =
   '\n     say why in a comment on the declaration or the line above it; that is' +
   '\n     the only way past this check, and it is meant to be read in review.';
 
+/** Indexed tokens. A vanished table exonerates every literal. */
+export const MIN_TOKENS = 200;
+
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
   const { styleDir, tokensDir: tokens, files, index, tokenCount } = inputs(repoRoot);
@@ -419,11 +422,11 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
       },
     ];
   }
-  if (tokenCount < 200) {
+  if (tokenCount < MIN_TOKENS) {
     return [
       {
         message:
-          `indexed ${tokenCount} tokens from ${path.relative(repoRoot, tokens)} — expected at least 200.\n` +
+          `indexed ${tokenCount} tokens from ${path.relative(repoRoot, tokens)} — expected at least ${MIN_TOKENS}.\n` +
           '  -> The token SCSS moved or the parse broke. With no tokens, every literal looks fine.',
       },
     ];

@@ -29,7 +29,7 @@ const COMPONENTS = 'scripts/figma-component-snapshot.json';
  * visible long before it is reached. Raise it only with a reason, and never to
  * get past a run that has already gone red.
  */
-const MAX_AGE_DAYS = 180;
+export const MAX_AGE_DAYS = 180;
 
 /**
  * Floors — the count each snapshot held at its last real capture (variables
@@ -38,8 +38,8 @@ const MAX_AGE_DAYS = 180;
  * snapshot agrees with everything, and so does an empty one. Each floor moves
  * up only when a refresh has been run and its delta written down.
  */
-const MIN_VARIABLES = 361;
-const MIN_COMPONENTS = 1347;
+export const MIN_VARIABLES = 361;
+export const MIN_COMPONENTS = 1347;
 
 /** The library both snapshots are of. */
 const FILE_KEY = 'zAecJNRdvJzAUOcjV32tRX';

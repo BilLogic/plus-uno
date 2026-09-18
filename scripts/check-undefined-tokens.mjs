@@ -52,7 +52,7 @@ const BASELINE = 'docs/evals/undefined-token-baseline.json';
  * failure #234 found in the negation ratchet and `check:unspread-rest` found in
  * its own corpus walk.
  */
-const MIN_FILES = 1300;
+export const MIN_FILES = 1300;
 
 export const REMEDY =
   '  -> A bare `var(--x)` on a token that does not exist DROPS the declaration.\n' +
