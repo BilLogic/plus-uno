@@ -7,18 +7,20 @@
 // one wasted call per turn, invisible because the fallback works (#572).
 //
 // The decision itself lives in `slack/stream-recipient.ts` so it can be tested
-// by RUNNING it. What is left to source assertions is only what the Node lane
-// cannot reach: `slack/delivery.ts` and `slack/slack-delivery.ts` both name
-// `Env` and the Slack client, and `startStream`'s recipient parameters are
-// optional, so a caller can drop them again with the type checker none the
-// wiser. Reading source for that is the same move as the door check in
-// `confirmation-paths.test.ts`.
+// by RUNNING it, and the adapter that hands the pair over is DRIVEN below — it
+// takes its Slack client by name since #594. What is left to a source
+// assertion is only what the Node lane still cannot reach: `slack/delivery.ts`
+// names `Env` and the Slack client, and `startStream`'s recipient parameters
+// are optional, so a caller can drop them again with the type checker none the
+// wiser.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { decideStream } from "../src/slack/stream-recipient";
+import { deliveryAdapter } from "../src/slack/delivery-adapter";
+import { recordingSlack } from "./helpers/recording-slack";
 
 /** A source file with its whitespace collapsed, so a reflow cannot fail a test
  *  about arguments with a message about formatting. */
@@ -98,14 +100,26 @@ describe("the answer path", () => {
     );
   });
 
-  it("is handed the ids by the adapter that holds them", () => {
-    const src = flatSource("src/slack/slack-delivery.ts");
-    const call = src.slice(src.indexOf("await postTextVerified("));
-    const args = call.slice(0, call.indexOf(");"));
-    assert.ok(
-      args.includes("userId: target.userId"),
-      "postAnswer passes the asker through to the answer path",
+  it("is handed the ids by the adapter that holds them", async () => {
+    // DRIVEN, not read: the Slack Delivery adapter takes its client by name
+    // (#594), so the pair can be watched arriving rather than matched in the
+    // adapter's source. The regex that stood here looked for
+    // `userId: target.userId` inside `await postTextVerified(` — it could not
+    // see whether the adapter was ever called at all, and it would have gone
+    // green on a pair handed to the wrong call.
+    const slack = recordingSlack();
+    await deliveryAdapter(slack.deps(), {
+      channel: "C_DESIGN",
+      replyTs: OPEN_TS,
+      userMsgTs: "1700000000.000090",
+      userId: BOTH.userId,
+      team: BOTH.team,
+    }).postAnswer("Tabs are documented in the design system.");
+
+    assert.deepEqual(
+      slack.of("answer").map(({ userId, team }) => ({ userId, team })),
+      [BOTH],
+      "the asker and their workspace reach the answer path together",
     );
-    assert.ok(args.includes("team: target.team"), "and their workspace with them");
   });
 });

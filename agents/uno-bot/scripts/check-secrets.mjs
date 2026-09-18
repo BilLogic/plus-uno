@@ -26,7 +26,7 @@
 // the harness runner can import it from the root and call `run({ repoRoot })`.
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 import {
   SECRETS,
   envInterfaceNames,
@@ -35,7 +35,7 @@ import {
   secretNames,
   varsInWrangler,
 } from "./secrets.mjs";
-import { byRoot, main } from "../../../scripts/lib/findings.mjs";
+import { byRoot, isEntry, main } from "../../../scripts/lib/findings.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(here, "..", "..", "..");
@@ -50,8 +50,7 @@ export const REMEDY =
  * The harness runner imports this module into its own process, and a `--fix` on
  * somebody else's command line must not turn a read-only check into a write.
  */
-const entered = () =>
-  Boolean(process.argv[1]) && pathToFileURL(process.argv[1]).href === import.meta.url;
+const entered = () => isEntry(import.meta.url);
 const fixRequested = () => entered() && process.argv.includes("--fix");
 
 /** One read of the two files per repo root, shared by `run` and the fix path. */

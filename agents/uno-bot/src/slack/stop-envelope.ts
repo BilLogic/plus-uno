@@ -14,9 +14,9 @@
 // shape, the Slack client, and the bindings.
 //
 // IT IS ITS OWN FILE rather than assistant.ts's, where it used to live, for one
-// mechanical reason: the door speaks through `slack-delivery.ts`, and
-// `slack-delivery.ts` reads `assistant.ts` for the session methods. An envelope
-// inside `assistant.ts` would close that into an import cycle.
+// mechanical reason: the door speaks through `slack-delivery.ts`, and that
+// envelope reads `assistant.ts` for the session methods. An envelope inside
+// `assistant.ts` would close that into an import cycle.
 //
 // `Env` enters here and stops here.
 

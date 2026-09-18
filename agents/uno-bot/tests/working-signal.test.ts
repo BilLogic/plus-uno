@@ -13,12 +13,22 @@
 // dropped socket, a 502, a budget stop, a threadless surface — reach the log as
 // themselves, because api.ts degrades all of them into the one `{ ok: false,
 // error }` shape a refusal arrives in.
+//
+// And then the ADAPTER, driven. The pure vocabulary above was always testable;
+// what was not was whether the thing that calls it does. That half used to be a
+// `readFileSync` and three regexes over `slack-delivery.ts` — a check that
+// could ask whether `reportStatus("set", () => setSessionStatus(` appeared in a
+// file and nothing else. It went green on an adapter nobody calls, it could not
+// tell a status computed from the settlement from a literal written on the way
+// past, and it broke on a reflow. The adapter takes its Slack client by name
+// now (#594), so every case below runs the real adapter on a recording client
+// and asserts which status Slack was handed, on which thread, and what the
+// pairing reported.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 
 import { SUBREQUEST_CAP } from "../src/agent/loop-policy";
+import { SubrequestBudgetError } from "../src/net";
 import {
   outcomeOf,
   settledStatus,
@@ -28,6 +38,8 @@ import {
   type WorkingSignalOutcome,
 } from "../src/slack/working-signal";
 import { settlementOf, type TurnDisposition, type TurnSettlement } from "../src/turn/index";
+import { deliveryAdapter, type SlackDeliveryTarget } from "../src/slack/delivery-adapter";
+import { recordingSlack } from "./helpers/recording-slack";
 
 describe("what came back, classified", () => {
   it("reads an accepted call as ok", () => {
@@ -289,85 +301,190 @@ describe("the line a set or a clear leaves behind", () => {
   });
 });
 
-// `slack-delivery.ts` names `Env` and the Slack client, so this suite's compile
-// cannot reach it (`tsconfig.test.json` types only Node). Read it instead —
-// same move as the door check in `confirmation-paths.test.ts`. The failure this
-// guards is silent: an adapter that goes back to `.catch(() => {})` still
-// clears the indicator, and still reports nothing when it doesn't.
-describe("the Slack adapter routes both halves through the report", () => {
-  const src = readFileSync(resolve(process.cwd(), "src/slack/slack-delivery.ts"), "utf8");
 
-  it("reports the set and the clear instead of swallowing them", () => {
-    assert.match(src, /reportStatus\("set", \(\) => setSessionStatus\(/);
-    assert.match(src, /reportStatus\("clear", \(\) =>\s*setSessionStatus\(/);
-    // The swallow that made the signal undiagnosable in the first place.
-    assert.ok(
-      !/setSessionStatus\([^)]*\)\.catch\(/.test(src),
-      "no status call is silently swallowed",
-    );
+// ── Driving the adapter ──────────────────────────────────────────────────────
+//
+// The real Slack Delivery adapter, on a recording Slack client. What each case
+// asks is what Slack was HANDED: which status, on which channel and thread, in
+// what order, and what the pairing reported about it.
+
+const CHANNEL = "C_DESIGN";
+const THREAD = "1700000000.000100";
+const DM = "D_ASSISTANT";
+const ASKER = "U_ASKER";
+
+function target(over: Partial<SlackDeliveryTarget> = {}): SlackDeliveryTarget {
+  return {
+    channel: CHANNEL,
+    replyTs: THREAD,
+    userMsgTs: "1700000000.000090",
+    userId: ASKER,
+    team: "T1",
+    ...over,
+  };
+}
+
+describe("the Slack adapter raises the signal on the thread it will settle", () => {
+  it("raises the one status that means work is in flight", async () => {
+    const slack = recordingSlack();
+    await deliveryAdapter(slack.deps(), target()).setWorking({ status: "is working on that…" });
+
+    assert.deepEqual(slack.of("status"), [
+      { kind: "status", channel: CHANNEL, threadTs: THREAD, status: WORKING_STATUS },
+    ]);
   });
 
-  it("raises and settles through the named statuses rather than writing them here", () => {
-    // The settle is the ONLY thing that clears the indicator now — the guide:
-    // "the loading UX no longer disappears automatically when your app posts a
-    // message to the thread" — so a literal `"active"` written at the exit is a
-    // settle #575 would have to go and find again. Both halves read the pure
-    // module instead (#574).
-    //
-    // These two positive matches are the whole guard, deliberately. A negative
-    // one — grepping this file for the literals — was written and dropped: it
-    // sees only this file and only the double-quoted spelling, so it would
-    // miss a literal in `assistant.ts` or in either Gate door while failing on
-    // a doc comment that merely quotes a status name. An assertion that strict
-    // in the wrong places and absent in the right ones is worse than none.
-    assert.match(src, /setSessionStatus\(env, channel, replyTs, WORKING_STATUS\)/);
-    assert.match(src, /setSessionStatus\(env, channel, replyTs, settledStatus\(settlement\)\)/s);
+  it("raises nothing on a surface with no thread to decorate", async () => {
+    // An agent_view DM posts at channel level; there is nothing to address, so
+    // neither half is sent and neither half is reported. Absence of a PAIR is
+    // the instrument — a lone set is what says an invocation died — so a half
+    // that was never sent must not leave a line either.
+    const slack = recordingSlack();
+    const delivery = deliveryAdapter(slack.deps(), target({ replyTs: undefined }));
+    await delivery.setWorking({ status: "is working on that…" });
+    await delivery.clearWorking("idle");
+
+    assert.deepEqual(slack.of("status"), []);
+    assert.deepEqual(slack.lines, []);
   });
 
-  it("reads the subrequest meter and tells a budget stop apart", () => {
-    assert.match(src, /subrequestsUsed\(\)/);
-    assert.match(src, /isSubrequestBudgetError\(err\)/);
-    // The catch's other arm is the compiler's, not a case — but if it ever
-    // fires it must not render a JS exception message as a Slack refusal.
-    const caught = src.slice(src.indexOf("isSubrequestBudgetError(err)"));
-    assert.ok(!/kind: "declined"/.test(caught), "a throw is never reported as a Slack decline");
+  it("raises nothing when the turn asked for no signal", async () => {
+    const slack = recordingSlack();
+    await deliveryAdapter(slack.deps(), target()).setWorking({ titleFrom: "How do tabs work?" });
+    assert.deepEqual(slack.of("status"), []);
+  });
+
+  it("clears where it set, so the pairing is one thread", async () => {
+    // A set on one surface and a clear on another is an indicator nobody can
+    // take down and a log that reads as if it had been.
+    const slack = recordingSlack();
+    const delivery = deliveryAdapter(slack.deps(), target());
+    await delivery.setWorking({ status: "is working on that…" });
+    await delivery.clearWorking("idle");
+
+    const addressed = slack.of("status").map(({ channel, threadTs }) => ({ channel, threadTs }));
+    assert.deepEqual(addressed, [
+      { channel: CHANNEL, threadTs: THREAD },
+      { channel: CHANNEL, threadTs: THREAD },
+    ]);
   });
 });
 
-// `assistant.ts` names `Env` too, so this is the same genre of check: read the
-// module and assert on what it sends. The acceptance criterion is a negative
-// one — "no bridged assistant status or title calls remain" — and a negative is
-// exactly what a behavioural test cannot see, because a bridged call still
-// works today. It works until February 2027, and it no longer clears the
-// indicator when the answer posts, which is the defect (#574).
-describe("the methods the working signal sends", () => {
-  const src = readFileSync(resolve(process.cwd(), "src/slack/assistant.ts"), "utf8");
+// #575's two layers, joined: the turn says what it left behind, and what Slack
+// is handed for it comes out of `settledStatus` rather than a literal at the
+// exit. Asserted THROUGH the adapter, because both halves being right
+// separately is exactly what a settle written in place already looked like.
+describe("the status a settlement produces, as Slack receives it", () => {
+  const settleThrough = async (settlement: TurnSettlement) => {
+    const slack = recordingSlack();
+    await deliveryAdapter(slack.deps(), target()).clearWorking(settlement);
+    return slack.of("status")[0]?.status;
+  };
 
-  it("moves the session's status and renames the session", () => {
-    assert.match(src, /slackCall\(env, "agents\.sessions\.setStatus"/);
-    assert.match(src, /slackCall\(env, "agents\.sessions\.rename"/);
+  it("hands Slack suspended for a thread waiting on a person", async () => {
+    assert.equal(await settleThrough("waiting-on-person"), "suspended");
   });
 
-  it("sends no bridged status or title call", () => {
-    assert.ok(!src.includes('"assistant.threads.setStatus"'), "setStatus is gone");
-    assert.ok(!src.includes('"assistant.threads.setTitle"'), "setTitle is gone");
+  it("hands Slack active for a thread waiting on nobody", async () => {
+    assert.equal(await settleThrough("idle"), "active");
   });
 
-  it("leaves suggested prompts alone — Slack has published no replacement", () => {
-    assert.match(src, /slackCall\(env, "assistant\.threads\.setSuggestedPrompts"/);
+  it("reads every settlement through the pure mapping, never a literal", async () => {
+    // The relation, not two more cases: whatever `settledStatus` says for a
+    // settlement is what Slack is handed for it. A literal at the exit passes
+    // the two cases above on the day it is written and diverges on the day the
+    // mapping moves — which is the defect #575 went and found.
+    const settlements: TurnSettlement[] = ["idle", "waiting-on-person"];
+    for (const settlement of settlements) {
+      assert.equal(await settleThrough(settlement), settledStatus(settlement), settlement);
+    }
+  });
+});
+
+describe("the adapter reports both halves instead of swallowing them", () => {
+  const reported = async (opts: Parameters<typeof recordingSlack>[0] = {}) => {
+    const slack = recordingSlack(opts);
+    const delivery = deliveryAdapter(slack.deps(), target());
+    await delivery.setWorking({ status: "is working on that…" });
+    await delivery.clearWorking("idle");
+    return slack.lines;
+  };
+
+  it("reports the successful pairing too — the silence was the whole defect", async () => {
+    const lines = await reported();
+    assert.deepEqual(
+      lines.map(({ outcome }) => outcome.kind),
+      ["ok", "ok"],
+    );
+    assert.match(lines[0]?.line ?? "", /^\[working\] set ok /);
+    assert.match(lines[1]?.line ?? "", /^\[working\] clear ok /);
   });
 
-  it("keeps the thread guard the session methods still need", () => {
-    // `thread_ts` is required for thread-based sessions in regular channels and
-    // DMs, which is every surface this bot has.
-    assert.match(src, /if \(!thread_ts\) return \{ ok: false, error: "no_thread" \}/);
-    assert.match(src, /thread_ts,/);
+  it("carries Slack's own code when Slack refused", async () => {
+    const lines = await reported({ status: { ok: false, error: "thread_not_found" } });
+    assert.deepEqual(
+      lines.map(({ outcome }) => outcome),
+      [
+        { kind: "declined", error: "thread_not_found" },
+        { kind: "declined", error: "thread_not_found" },
+      ],
+    );
   });
 
-  it("sends no argument the session method does not define", () => {
-    // `loading_messages` was `assistant.threads.setStatus`'s. `agents.sessions.
-    // setStatus` documents status, channel_id, thread_ts, title,
-    // initiator_user_id and the customize trio — and nothing else.
-    assert.ok(!/loading_messages:/.test(src), "loading_messages is not a session argument");
+  it("does not put Slack's name on a call Slack never answered", async () => {
+    const lines = await reported({ status: { ok: false, error: "network_error" } });
+    assert.equal(lines[0]?.outcome.kind, "unanswered");
+    assert.doesNotMatch(lines[0]?.line ?? "", /Slack/);
+  });
+
+  it("names a budget stop as never sent, not as a refusal", async () => {
+    // The one throw that reaches the adapter by construction: `api.ts`
+    // degrades every transport and parse failure into `{ ok: false, error }`
+    // and rethrows exactly this.
+    const lines = await reported({ statusThrows: new SubrequestBudgetError(SUBREQUEST_CAP) });
+    assert.deepEqual(lines[0]?.outcome, { kind: "budget-stop" });
+    assert.match(lines[0]?.line ?? "", /subrequest budget/);
+  });
+
+  it("refuses to render any other throw as a Slack decline", async () => {
+    const lines = await reported({ statusThrows: new Error("socket hang up") });
+    assert.deepEqual(lines[0]?.outcome, { kind: "unanswered", error: "socket hang up" });
+    assert.doesNotMatch(lines[0]?.line ?? "", /Slack/);
+  });
+
+  it("never fails the turn over a signal, however the call went", async () => {
+    // Best-effort is the contract: the work is already done by the time the
+    // clear runs, and a thrown settle would lose the answer with it.
+    await reported({ statusThrows: new Error("boom") });
+    await reported({ status: { ok: false } });
+  });
+});
+
+describe("the title is the assistant surface's alone", () => {
+  it("names the session from the question that started it", async () => {
+    const slack = recordingSlack();
+    await deliveryAdapter(slack.deps(), target({ channel: DM })).setWorking({
+      titleFrom: "  How\ndo   tabs work?  ",
+    });
+    assert.deepEqual(slack.of("rename"), [
+      { kind: "rename", channel: DM, threadTs: THREAD, title: "How do tabs work?" },
+    ]);
+  });
+
+  it("leaves a channel thread unnamed — there is no such name to set", async () => {
+    const slack = recordingSlack();
+    await deliveryAdapter(slack.deps(), target()).setWorking({
+      status: "is working on that…",
+      titleFrom: "How do tabs work?",
+    });
+    assert.deepEqual(slack.of("rename"), []);
+  });
+
+  it("names nothing when the turn handed over no question", async () => {
+    const slack = recordingSlack();
+    await deliveryAdapter(slack.deps(), target({ channel: DM })).setWorking({
+      status: "is working on that…",
+    });
+    assert.deepEqual(slack.of("rename"), []);
   });
 });

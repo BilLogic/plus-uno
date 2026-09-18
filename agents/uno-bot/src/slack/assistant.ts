@@ -20,7 +20,6 @@
 // api.ts's slackCall — the single Slack egress point with the defensive parse.
 
 import type { Env } from "../types";
-import { turnSurfaceOf } from "../turn/request";
 import { postMessage, slackCall } from "./api";
 import type { SessionStatus, StatusResult } from "./working-signal";
 import { threadStateFor } from "../thread-state/production";
@@ -175,28 +174,6 @@ export async function renameSession(
     thread_ts,
     title,
   });
-}
-
-/** A thread title from the opening question: one line, trimmed to something a
- *  sidebar can show. Slack truncates anyway; doing it here keeps the ellipsis
- *  on a word boundary. */
-export function threadTitleFrom(text: string): string {
-  const oneLine = text.replace(/\s+/g, " ").trim();
-  if (!oneLine) return "Chat with UNO Bot";
-  if (oneLine.length <= 60) return oneLine;
-  const cut = oneLine.slice(0, 60);
-  const brk = cut.lastIndexOf(" ");
-  return `${brk > 30 ? cut.slice(0, brk) : cut}…`;
-}
-
-/** Assistant threads are IM channels (id starts with "D"). Used to gate the
- *  status/loader affordances, which only apply to the assistant surface.
- *
- *  The rule itself is `turn/request.ts` § `turnSurfaceOf`, which is what every
- *  caller of Turn reads it from — one statement, so a surface cannot be read
- *  one way when the request is built and another way here. */
-export function isAssistantThread(channel: string): boolean {
-  return turnSurfaceOf(channel) === "assistant";
 }
 
 /** One-line, model-facing description of the open surface — only the channel is

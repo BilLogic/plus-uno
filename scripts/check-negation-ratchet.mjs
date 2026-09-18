@@ -582,12 +582,11 @@ function recordBaseline(measured) {
 }
 
 // Importing this module for its exports must not run the check, and must not
-// write a baseline either — `--update` is read here rather than at module scope
-// so that the flag belongs to the process that typed it.
-const ENTRY = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-
-if (ENTRY && process.argv.includes('--update')) {
-  recordBaseline(readings(REPO_ROOT));
-} else {
-  main(import.meta.url, 'check:negation', { run, summary });
-}
+// write a baseline either — which is `main()`'s entry comparison, so `--update`
+// belongs to the process that typed it and to no importer. It is TERMINAL: it
+// writes the record and the gate does not also run.
+main(import.meta.url, 'check:negation', {
+  run,
+  summary,
+  flags: { '--update': () => recordBaseline(readings(REPO_ROOT)) },
+});

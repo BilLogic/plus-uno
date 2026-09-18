@@ -291,21 +291,20 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   return `${inputs(repoRoot).length} component file(s), no dropped rest elements.`;
 }
 
-// path.resolve + fileURLToPath, not string comparison: `file://${argv[1]}` never
-// matches once the repo path contains a space or any non-ASCII char, because the
-// URL form percent-encodes them. This check silently did nothing under such a
-// path — exit 0, main() never invoked. Same idiom as check-token-collision.mjs.
-const ENTRY = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-
-// `--list` answers "what did you scan?", which is an inventory and not a
-// verdict, so it replaces the green line rather than adding to it. The floor
-// still applies: a list of nothing is the same corpus failure as a scan of
-// nothing, and it was checked first here before the migration too.
-if (ENTRY && process.argv.includes('--list')) {
+/**
+ * `--list` answers "what did you scan?", which is an inventory and not a
+ * verdict, so it replaces the green line rather than adding to it — a TERMINAL
+ * side door. The floor still applies: a list of nothing is the same corpus
+ * failure as a scan of nothing, and it is checked first here as it always was.
+ */
+function list() {
   const files = inputs(REPO_ROOT);
   const short = shortCorpus(files);
   if (short.length) report('check:unspread-rest', short);
   console.log(`[check:unspread-rest] ${files.length} file(s) under ${SCAN_ROOT}`);
-} else {
-  main(import.meta.url, 'check:unspread-rest', { run, summary, remedy: REMEDY });
 }
+
+// The entry comparison is `isEntry`'s, inside `main()`: written out by hand
+// here it once compared `file://${argv[1]}` and so did nothing at all under a
+// repo path containing a space — exit 0, `main()` never invoked (#610).
+main(import.meta.url, 'check:unspread-rest', { run, summary, remedy: REMEDY, flags: { '--list': list } });

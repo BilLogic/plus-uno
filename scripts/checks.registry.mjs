@@ -291,7 +291,7 @@ export const CHECKS = [
     module: 'scripts/check-size-fallbacks.mjs',
     baseline: 'docs/evals/size-fallback-baseline.json',
     guards:
-      "the same rule as check:colour-fallbacks, over the tokens that decide layout rather than colour — and it is the bigger half. 454 of 1075 comparable fallbacks disagree with their token: `var(--size-section-gap-sm, 16px)` is written 61 times for a token that is `8px`, and `var(--size-element-pad-y-lg, 12px)` 52 times for one that is `8px`. Colour's version of this defect paints a wrong shade when the token sheet is late; this one lays out a different page. Ratcheted at 68 distinct pairs. Two entry points rather than one because the families genuinely differ: dimensions have no shared name prefix and are selected by value, and an undefined dimension name is usually a component-local custom property rather than a defect.",
+      "the same rule as check:colour-fallbacks, over the tokens that decide layout rather than colour — and it is the bigger half. 454 of 1075 comparable fallbacks disagree with their token: `var(--size-section-gap-sm, 16px)` is written 61 times for a token that is `8px`, and `var(--size-element-pad-y-lg, 12px)` 52 times for one that is `8px`. Colour's version of this defect paints a wrong shade when the token sheet is late; this one lays out a different page. Ratcheted at 68 distinct pairs. One implementation (`scripts/lib/fallback-check.mjs`) and two entry points, because the families genuinely differ: dimensions have no shared name prefix and are selected by value, and an undefined dimension name is usually a component-local custom property rather than a defect.",
   },
   {
     name: 'check:undefined-tokens',
@@ -599,9 +599,12 @@ export const CHECKS = [
     trigger: 'pull_request',
     kind: 'spawn',
     spawnReason:
-      'the eval runner. A process with its own exit code over the committed recordings, ' +
-      'reporting its census and then a line per case — a shape this ' +
-      "interface would flatten into one. The `cd ../..` is the runner's own contract: its " +
+      'the eval runner. A walk of the committed recordings that reports its census and then ' +
+      'a LINE PER CASE — the shape this interface would flatten into one, which is the half ' +
+      'that cannot move. The other half did (#617): the runner renders its findings and takes ' +
+      'its exit code from `scripts/lib/findings.mjs` like every composed check, so a failing ' +
+      'blocker is an error and a failing non-blocker a warning. ' +
+      "The `cd ../..` is the runner's own contract: its " +
       'fixture and recording paths are repo-relative, as every documented invocation of it ' +
       'is, and the alternative is a second copy of those paths in a manifest.',
     guards:

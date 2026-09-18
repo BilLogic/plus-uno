@@ -33,10 +33,10 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 import { directories, frontmatter } from "./lib/corpus.mjs";
-import { byRoot, main } from "./lib/findings.mjs";
+import { byRoot, isEntry, main } from "./lib/findings.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -300,7 +300,10 @@ export function summary({ repoRoot = ROOT } = {}) {
   return `${artifacts({ repoRoot }).length} skill surfaces match their sources`;
 }
 
-if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
+// As in `generate-check-scripts.mjs`: the default branch here is the write, not
+// the gate, so `main()` is asked for only the `--check` half and the entry
+// comparison comes from the same module that owns it (#610).
+if (isEntry(import.meta.url)) {
   if (process.argv.includes("--check")) {
     main(import.meta.url, "check:skill-surfaces", { run, summary });
   } else {

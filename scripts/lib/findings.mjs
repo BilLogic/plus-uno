@@ -101,6 +101,28 @@ export function report(name, findings, opts = {}) {
 }
 
 /**
+ * Is this module the process, or did something import it?
+ *
+ * The one comparison the whole repo asks. `pathToFileURL`, not
+ * `file://${argv[1]}`: a repo path containing a space or any non-ASCII char
+ * percent-encodes in the URL form and the naive string never matches — which
+ * reads as "imported", so a check silently does nothing when run by hand. Two
+ * checks shipped that defect under `.claude/worktrees/`-style paths before the
+ * idiom settled.
+ *
+ * `main()` below asks it for every check on the findings interface, so a check
+ * with a `run` never calls this directly. What is left is the population that
+ * has no findings to render — a generator, a snapshot writer, an async CLI, a
+ * browser suite whose result is an exit code by nature — and each of those used
+ * to spell the comparison itself, in six spellings across 23 scripts (#610).
+ *
+ * @param {string} moduleUrl  the caller's `import.meta.url`.
+ * @returns {boolean}
+ */
+export const isEntry = (moduleUrl) =>
+  Boolean(process.argv[1]) && pathToFileURL(process.argv[1]).href === moduleUrl;
+
+/**
  * The CLI half, as one call. `#509` moved every check onto `run(ctx)`, and the
  * entry point each one needs has the same spine: when this module is the
  * process entry, render its findings and exit on them; when the harness runner
@@ -109,10 +131,10 @@ export function report(name, findings, opts = {}) {
  * those mistakes (a check that runs itself on import) is a check that runs
  * inside the runner's own process.
  *
- * The spine is not the whole entry point, which is what `flags` below is for:
- * a check that also offers `--list` or `--update` has a second branch, and
- * until #609 it could only get one by hand-rolling the comparison again. Both
- * branches are now decided here, so there is still exactly one place that
+ * The spine is not the whole entry point, which is what the two flag slots
+ * below are for: a check that also offers `--list` or `--update` has a second
+ * branch, and until #609 it could only get one by hand-rolling the comparison
+ * again. Every branch is now decided here, so there is exactly one place that
  * knows how to tell "run as a script" from "imported by the runner".
  *
  * `summary` is a THUNK and is called only when there is nothing to report. A
@@ -128,33 +150,39 @@ export function report(name, findings, opts = {}) {
  * hand-roll the entry comparison this function exists to own, which is how the
  * same three lines came to be written out in six spellings across 23 scripts.
  *
- * TERMINAL IS THE WHOLE CONTRACT, AND NOT EVERY SIDE FLAG IN THIS REPO IS ONE.
- * `--report` in `check-colour-fallbacks.mjs` and `check-size-fallbacks.mjs`,
- * `--table` and `--how` in `check-atlassian-benchmark.mjs`, `--stats` in
- * `check-doc-identifiers.mjs`: each prints and then FALLS THROUGH, so the gate
- * still runs and the exit code is still the findings'. Moving one of those into
- * this map would make it terminal and stop the check gating — green, quietly,
- * for whoever typed the flag. So migrating a check means reading what each of
- * its flags does, not matching the name; a fall-through flag stays where it is
- * until this slot models one.
+ * TERMINAL IS NOT THE WHOLE CONTRACT, BECAUSE NOT EVERY SIDE FLAG IS ONE, and
+ * `fallThrough` is the slot for the rest. `--report` on the two fallback
+ * checks, `--table` and `--how` on the benchmark, `--stats` on
+ * `check-doc-identifiers.mjs`, `--update` on `check-glossary.mjs`: each prints
+ * or writes and then the GATE STILL RUNS, with the exit code still the
+ * findings'. #609 modelled only the terminal kind, and warned that dropping
+ * one of these into `flags` would make it terminal and quietly stop the check
+ * gating — green, for whoever typed the flag. So the two kinds are two slots,
+ * and which one a flag belongs in is a reading of what it does rather than of
+ * what it is called. Every fall-through flag that was typed runs, in
+ * declaration order, and then the gate; a terminal flag ends the CLI there.
  *
- * Declaration order decides which of two typed flags wins, so the precedence a
- * check wants is the order it lists them in; the flags are read from `argv[2]`
- * on, so the script's own path can never be mistaken for one.
+ * Declaration order also decides which of two typed TERMINAL flags wins, so
+ * the precedence a check wants is the order it lists them in; the flags are
+ * read from `argv[2]` on, so the script's own path can never be mistaken for
+ * one.
  *
  * @param {string} moduleUrl  the caller's `import.meta.url`.
  * @param {string} name       the check's npm script name.
  * @param {{run: Function, summary?: Function, remedy?: string,
- *          flags?: Record<string, () => void>}} check
+ *          flags?: Record<string, () => void>,
+ *          fallThrough?: Record<string, () => void>}} check
  * @returns {void}  or never, when this module is the entry point.
  */
-export function main(moduleUrl, name, { run, summary, remedy, flags }) {
-  // `pathToFileURL`, not `file://${argv[1]}`: a repo path containing a space or
-  // any non-ASCII char percent-encodes in the URL form and the naive string
-  // never matches — which reads as "imported", so the check silently does
-  // nothing when run by hand. Same idiom as `check-unspread-rest.mjs`.
-  if (!process.argv[1] || pathToFileURL(process.argv[1]).href !== moduleUrl) return;
+export function main(moduleUrl, name, { run, summary, remedy, flags, fallThrough }) {
+  if (!isEntry(moduleUrl)) return;
   const typed = process.argv.slice(2);
+  // Before the terminal flags, because a check that offers both — the fallback
+  // pair offers `--report` and `--update` — printed the report and then wrote,
+  // and that order is the one its reader has.
+  for (const [flag, handle] of Object.entries(fallThrough ?? {})) {
+    if (typed.includes(flag)) handle();
+  }
   for (const [flag, handle] of Object.entries(flags ?? {})) {
     if (typed.includes(flag)) {
       handle();
