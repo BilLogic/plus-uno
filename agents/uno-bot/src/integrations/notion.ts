@@ -527,8 +527,11 @@ const READ_CACHE_MAX = 50; // cap growth in a long-lived isolate
 const readCache = new Map<string, { at: number; value: NotionPageContent }>();
 
 // Drop a page's cached read so a subsequent read reflects a write we just made
-// (notionUpdate/archiveCard) instead of serving a stale copy.
-export function evictReadCache(pageId: string): void {
+// (notionUpdate/archiveCard) instead of serving a stale copy. Module-private:
+// the cache is this module's own, and every write that invalidates it is in
+// here — an exported handle would invite a caller to guess at when to clear a
+// cache it cannot see.
+function evictReadCache(pageId: string): void {
   readCache.delete(pageId);
 }
 
