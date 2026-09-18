@@ -1,5 +1,5 @@
 // A Slack message event, as a `TurnRequest` — the pure half of the Slack
-// envelope adapter.
+// envelope adapter (#603).
 //
 // TWO HALVES, and this is the one that fetches nothing: the event and the
 // envelope facts become a request here, through the shared request builder

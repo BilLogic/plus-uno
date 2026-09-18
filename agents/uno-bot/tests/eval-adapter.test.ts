@@ -1,4 +1,4 @@
-// An eval case and a Slack message, taking the SAME turn.
+// An eval case and a Slack message, taking the SAME turn (#499, #603).
 //
 // The acceptance criterion is a parity one: an eval case and a Slack message
 // with the same text must build the same request, read the same dependencies

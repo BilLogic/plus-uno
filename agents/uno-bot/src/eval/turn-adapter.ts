@@ -1,5 +1,5 @@
 // The eval envelope adapter: a /debug/eval body becomes a `TurnRequest`, `Env`
-// becomes `TurnDeps`, and `runTurn` does the rest.
+// becomes `TurnDeps`, and `runTurn` does the rest (#499).
 //
 // This is the SECOND caller of the Turn module: an eval case and a Slack
 // message take the same turn. Preflight, the confidence pre-check, the absence
@@ -7,8 +7,8 @@
 // all run here exactly as they run in production, because they are Turn's
 // implementation and there is no second pipeline left to drift from it.
 //
-// AND NO SECOND WIRING EITHER. The dependencies are built by the shared builder
-// both callers use (`turn/env-deps.ts`); this file names only what genuinely
+// AND NO SECOND WIRING EITHER (#603). The dependencies are built by the shared
+// builder both callers use (`turn/env-deps.ts`); this file names only what genuinely
 // differs, which is the point the header used to make in prose and the wiring
 // then quietly stopped keeping:
 //
@@ -118,7 +118,7 @@ export async function handleEvalTurn(request: Request, env: Env): Promise<Respon
     );
 
     // Every call that never reported a result says so, rather than reading like
-    // a tool that answered with nothing.
+    // a tool that answered with nothing (#452).
     if (agentResult) markUnanswered(report.tools, filled, agentResult.kind);
 
     return Response.json(

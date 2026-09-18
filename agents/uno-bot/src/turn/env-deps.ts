@@ -1,4 +1,4 @@
-// One dependency builder, for every caller of Turn.
+// One dependency builder, for every caller of Turn (#603).
 //
 // `Env`, once, as the dependencies a turn actually reads. Both adapters — the
 // Slack envelope one (`slack/turn-adapter.ts`) and the eval one
@@ -44,11 +44,11 @@ import type { TurnDeps, TurnRequest } from "./turn";
  * what the log would have said.
  */
 export interface TurnReporters {
-  /** The dials the last model call was sent with. */
+  /** The dials the last model call was sent with (#421). */
   onDials?(dials: TurnDials): void;
-  /** Every tool call the model made, in order, with its arguments. */
+  /** Every tool call the model made, in order, with its arguments (#423). */
   onToolCall?(call: ToolCall): void;
-  /** What each tool result said about itself. */
+  /** What each tool result said about itself (#452). */
   onToolResult?(note: ToolResultNote): void;
   /** What the clarify gate asked, or null when it did not ask. */
   onGateAsk?(ask: string | null): void;
