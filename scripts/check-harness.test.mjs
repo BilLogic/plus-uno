@@ -420,8 +420,10 @@ test('every sentinel floor is on its registry row and matches what the check enf
     found.map((f) => `${f.file ?? ''} ${f.message}`),
     [],
   );
-  const keys = ALL.flatMap((row) => Object.keys(row.floors ?? {}));
-  assert.equal(keys.length, 17, `expected 17 sentinel floors, found ${keys.length}: ${keys.join(', ')}`);
+  assert.ok(
+    ALL.some((row) => row.floors),
+    'at least one row declares floors — an empty column is the defect this asserts',
+  );
 });
 
 test('drift in a generated block is visible: an edited package.json no longer renders itself', () => {

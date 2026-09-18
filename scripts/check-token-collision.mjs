@@ -80,6 +80,9 @@ const BACKGROUND_PROPS = new Set(['background', 'background-color']);
  */
 const INTERPOLATION = '#*';
 
+/** The floor. A walk that stopped matching finds nothing. */
+export const MIN_FILES = 100;
+
 /**
  * Blanks what only LOOKS like structure — comment bodies, string contents and
  * `#{…}` interpolations — keeping every newline, every real brace and every
@@ -409,11 +412,11 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   // every walk below returns nothing, every assertion holds vacuously, and this exits
   // 0 having examined no files at all. check-storybook.mjs took the same floor for the
   // same reason. The number is a floor, not a target — raise it only when it bites.
-  if (files.length < 100) {
+  if (files.length < MIN_FILES) {
     return [
       {
         message:
-          `found ${files.length} file(s) under ${path.relative(repoRoot, scanRoot(repoRoot))} — expected at least 100.\n` +
+          `found ${files.length} file(s) under ${path.relative(repoRoot, scanRoot(repoRoot))} — expected at least ${MIN_FILES}.\n` +
           '  -> The corpus moved or the walk broke. A check over nothing passes over everything.',
       },
     ];

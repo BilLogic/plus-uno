@@ -70,6 +70,8 @@ const assertionFile = (root = REPO_ROOT) => path.join(root, '.storybook', 'page-
  */
 export const MIN_PAGE_STORIES = 42;
 export const AREA_OVERVIEWS = 3;
+/** Story files under `specs/`, so a walk that stopped matching finds nothing. */
+export const MIN_FILES = 100;
 
 /**
  * The runtime predicate, restated. Kept in step with `IS_PAGE` in
@@ -149,12 +151,12 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   const { specs, files, titleless, byPath, byTitle, pathSet, titleSet, overviews, setupSrc, assertionSrc } =
     inputs(repoRoot);
 
-  if (files.length < 100) {
+  if (files.length < MIN_FILES) {
     return [
       {
         message:
           `found ${files.length} story file(s) under ` +
-          `${path.relative(repoRoot, specs)} — expected at least 100.\n` +
+          `${path.relative(repoRoot, specs)} — expected at least ${MIN_FILES}.\n` +
           '  -> The corpus moved or the walk broke. A check over nothing passes over everything.',
       },
     ];

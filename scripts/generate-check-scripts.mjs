@@ -410,7 +410,7 @@ export function baselineFindings(
  * Word-count bars (`MIN_WORDS`) and overlap ceilings are not this class.
  */
 const SENTINEL_DECL =
-  /(?:export\s+)?const\s+(MIN_FILES|MIN_RULES|MIN_PAGE_STORIES|MIN_VARIABLES|MIN_COMPONENTS|MIN_SCOPED|MIN_RECORDED|MIN_COMPARED|MAX_AGE_DAYS|AREA_OVERVIEWS)\s*=\s*(\d+)/g;
+  /(?:export\s+)?const\s+(MIN_FILES|MIN_RULES|MIN_PAGE_STORIES|MIN_VARIABLES|MIN_COMPONENTS|MIN_SCOPED|MIN_RECORDED|MIN_COMPARED|MIN_SOURCES|MIN_TOKENS|MAX_AGE_DAYS|AREA_OVERVIEWS)\s*=\s*(\d+)/g;
 
 /**
  * The sentinels a check source enforces, keyed by the constant's name.

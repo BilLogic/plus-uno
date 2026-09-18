@@ -293,6 +293,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-token-collision.mjs',
+    floors: { MIN_FILES: 100 },
     guards:
       'no component stylesheet colouring text in the same token as the surface under it. `Navbar` shipped one for the life of the component at 1.00:1 (#219); axe cannot see this class, because the text sits in a transparent box over a painted ancestor.',
   },
@@ -468,6 +469,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-docs-token-literals.mjs',
+    floors: { MIN_TOKENS: 200 },
     guards:
       'that the docs stylesheet stops hand-picking values the design system already '
       + 'tokenises. `.storybook/storybook-overrides.css` is the one stylesheet here that '
@@ -487,6 +489,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-docs-dead-selectors.mjs',
+    floors: { MIN_SOURCES: 500 },
     guards:
       "that no rule in the docs stylesheet aims at a class nothing puts in the DOM. #250's "
       + 'R1 asked for exactly this and was satisfied by a hand sweep, which leaked five: '
@@ -508,7 +511,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-page-outline.mjs',
-    floors: { MIN_PAGE_STORIES: 42, AREA_OVERVIEWS: 3 },
+    floors: { MIN_FILES: 100, MIN_PAGE_STORIES: 42, AREA_OVERVIEWS: 3 },
     guards:
       'the OTHER half of the page-outline guard — the half a DOM assertion cannot hold. ' +
       '`.storybook/page-outline.js` asserts in the browser that every page story renders an ' +

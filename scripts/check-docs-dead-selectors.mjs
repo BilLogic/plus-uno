@@ -252,6 +252,9 @@ export const REMEDY =
   '\n     template literal, spell it out in the source instead; that is also what makes' +
   '\n     it findable by the next person.';
 
+/** Source files walked. A walk that stopped matching reports every selector dead. */
+export const MIN_SOURCES = 500;
+
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
   const { dir, files, sources, isEmitted } = inputs(repoRoot);
@@ -272,11 +275,11 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   // dead when it cannot FIND it. A source walk that silently returned twelve files
   // would report the whole stylesheet dead, which is the failure mode that would get
   // the check switched off rather than believed.
-  if (sources.length < 500) {
+  if (sources.length < MIN_SOURCES) {
     return [
       {
         message:
-          `walked ${sources.length} source files — expected at least 500.\n` +
+          `walked ${sources.length} source files — expected at least ${MIN_SOURCES}.\n` +
           '  -> The source walk broke. With no sources, every selector looks dead.',
       },
     ];
