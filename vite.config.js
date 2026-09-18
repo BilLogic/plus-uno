@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'module';
 import { nodeModulesDirFrom } from './scripts/node-modules-dir.mjs';
+import { TOKEN_DIR } from './design-system/src/lib/tokens-node.mjs';
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 
@@ -107,7 +108,7 @@ export default defineConfig({
       scss: {
         api: 'modern-compiler',
         loadPaths: [
-          path.resolve(dirname, 'design-system/src/tokens'),
+          path.resolve(dirname, TOKEN_DIR),
           path.resolve(dirname, 'design-system/src/styles')
         ],
         silenceDeprecations: ['import', 'legacy-js-api']

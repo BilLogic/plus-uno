@@ -57,6 +57,7 @@ import {
   resolveToken,
   varReferencePattern,
 } from '../design-system/src/lib/tokens.mjs';
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { PAGE_TOKEN, tokenValues } from './button-contrast.mjs';
 import { REPO_ROOT, groundFor, stylesheets } from './text-contrast.mjs';
 
@@ -99,7 +100,7 @@ export const NEGATED = /:not\(\s*:focus[^)]*\)/gi;
  * @returns {Map<string, string>}
  */
 export function colours(root = REPO_ROOT) {
-  const source = ['design-system/src/tokens/_colors.scss', 'design-system/src/tokens/_color_roles.scss']
+  const source = [`${TOKEN_DIR}/_colors.scss`, `${TOKEN_DIR}/_color_roles.scss`]
     .map((file) => path.join(root, file))
     .filter((file) => fs.existsSync(file))
     .map((file) => fs.readFileSync(file, 'utf8'))

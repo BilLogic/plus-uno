@@ -32,6 +32,7 @@
  * Run: `npm run check:atlassian-benchmark`. `npm run benchmark:atlassian`
  * prints the same table without the gate.
  */
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { ourTokens, compare, ageInDays, failures } from './atlassian-benchmark.mjs';
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { byRoot, main, report } from './lib/findings.mjs';
@@ -164,7 +165,7 @@ function printHow(repoRoot = REPO_ROOT) {
       `  1. Open ${benchmark.source}\n` +
       `  2. ${benchmark.method}\n` +
       `  3. Write the counts into ${BENCHMARK} and set measuredAt to today.\n\n` +
-      `  Our side needs no step: it is counted from design-system/src/tokens on\n` +
+      `  Our side needs no step: it is counted from ${TOKEN_DIR} on\n` +
       `  every run. Only the recorded FLOOR is written down, with --update.\n`,
   );
 }

@@ -36,6 +36,7 @@ import {
   splitFences,
   tokenClaims,
 } from './doc-identifiers.mjs';
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { run } from './check-doc-identifiers.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -96,7 +97,7 @@ const FABRICATED = ['--elevation-none', '--elevation-sm', '--elevation-md', '--e
 
 test('0c454cce: the four fabricated elevation tokens are absent from _elevation.scss', () => {
   const scss = fs.readFileSync(
-    path.join(REPO_ROOT, 'design-system/src/tokens/_elevation.scss'),
+    path.join(REPO_ROOT, `${TOKEN_DIR}/_elevation.scss`),
     'utf8',
   );
   const defined = new Set(definedTokens(scss));

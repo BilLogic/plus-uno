@@ -134,6 +134,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { TOKEN_DIR, familyOf } from '../design-system/src/lib/tokens-node.mjs';
 import { documents } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
@@ -152,7 +153,7 @@ const REPO_ROOT = path.resolve(__dirname, '..');
  * above about the DS SCSS applies to it word for word.
  */
 const docsStyleDir = (root = REPO_ROOT) => path.join(root, '.storybook');
-const tokensDir = (root = REPO_ROOT) => path.join(root, 'design-system', 'src', 'tokens');
+const tokensDir = (root = REPO_ROOT) => path.join(root, TOKEN_DIR);
 
 /** Primitive tokens carry a DO NOT USE DIRECTLY banner; semantic names sort first. */
 const PRIMITIVES_FILE = '_primitives.scss';
@@ -216,6 +217,19 @@ export function colourKey(literal) {
  * The four families this check knows how to offer, keyed by what a literal in
  * that position could actually be replaced with. Families outside this list are
  * limitation 5 in the header.
+ *
+ * WHICH FAMILY A NAME IS IN is not decided here. `familyOf` (#620) is the one
+ * statement of that, longest prefix first, and these four keys are its answers
+ * — so the ladder this replaced could disagree with the module about
+ * `--font-line-height-*` and nothing would have said so. What stays this
+ * check's is WHICH of the families it offers, which is a judgement about its
+ * report and not about token names.
+ *
+ * MEASURED, not assumed (#621): over the 494 live tokens the ladder and
+ * `familyOf` bucket every name identically, and the check's output is
+ * unchanged by the move. The one name they would read differently is a bare
+ * `--color-`, which `familyOf` refuses because a family is not a token; no
+ * such declaration exists.
  */
 export function buildTokenIndex(defs = readTokenDefinitions()) {
   const index = {
@@ -232,16 +246,8 @@ export function buildTokenIndex(defs = readTokenDefinitions()) {
   for (const [name, def] of defs) {
     const value = terminal(name, defs);
     if (!value) continue;
-    const bucket = name.startsWith('--color-')
-      ? 'colour'
-      : name.startsWith('--font-size-')
-        ? 'font-size'
-        : name.startsWith('--font-line-height-')
-          ? 'font-line-height'
-          : name.startsWith('--size-')
-            ? 'size'
-            : null;
-    if (!bucket) continue;
+    const bucket = familyOf(name);
+    if (!bucket || !(bucket in index)) continue;
     const key = bucket === 'colour' ? colourKey(value) : dimensionKey(value);
     if (key) push(bucket, key, name, def.file);
   }

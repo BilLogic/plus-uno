@@ -34,6 +34,7 @@ const COLOUR = fallbackCheck({
   baseline: 'docs/evals/colour-fallback-baseline.json',
   noun: 'colour',
   absent: '--color-*',
+  prefix: '--color-',
   reportUndefined: true,
   why:
     'Literal fallbacks that disagree with their own token (#268). Keyed on ' +

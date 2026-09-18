@@ -24,11 +24,17 @@
  * which tokens the family covers, whether an undefined name is a finding, and
  * what the baseline record says about itself.
  *
- * WHAT IT DOES NOT DO. `design-system/src/lib/tokens-node.mjs` (#620) now owns
- * the corpus, the family map and value-equality, and these two checks are its
- * obvious callers — but #621 is the ticket that moves them, and the seam it
- * moves is `token-fallbacks.mjs`'s, not this one's. Collapsing here leaves that
- * migration with one caller instead of two.
+ * WHERE THE TOKENS COME FROM. `design-system/src/lib/tokens-node.mjs` (#620),
+ * since #621: `tokenCorpus` is the walk, the read and the alias resolution, and
+ * `TOKEN_DIR` is the one place the path is written. Because #610 had already
+ * collapsed the two checks here, that migration was one caller rather than two.
+ *
+ * PRECEDENCE IS DECLARED, not defaulted. These checks compare a fallback
+ * against what the CASCADE resolves the token to, so they ask for `last`.
+ * `tokenCorpus`'s default is `first` — `readTokens`' rule, the `:root` light
+ * value — and the two agree over today's sources; they would stop agreeing the
+ * day a token is redefined, and that is the day this line has to have said
+ * which one it meant.
  */
 
 import { execFileSync } from 'node:child_process';
@@ -36,6 +42,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { TOKEN_DIR, tokenCorpus } from '../../design-system/src/lib/tokens-node.mjs';
 import { byRoot } from './findings.mjs';
 import { openRatchet } from './ratchet.mjs';
 import {
@@ -43,15 +50,12 @@ import {
   fallbackFailures,
   fallbackSides,
   fallbackUsages,
-  resolveAliases,
-  tokenDefinitions,
 } from '../token-fallbacks.mjs';
 
 /** Two levels up from `scripts/lib/`, which is where both callers also sat. */
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
-/** Where the token sources are, and which of the tree is searched for uses. */
-const TOKEN_DIR = 'design-system/src/tokens';
+/** Which of the tree is searched for USES. Where the tokens are is `TOKEN_DIR`. */
 const SEARCHED = /\.(scss|css|jsx|tsx|mdx|html)$/;
 const SEARCH_ROOTS = ['design-system/src', '.storybook', 'prototypes'];
 
@@ -66,7 +70,11 @@ const SEARCH_ROOTS = ['design-system/src', '.storybook', 'prototypes'];
  *           for — a name pattern for colour, a kind for dimensions.
  * @property {string} [census]   the word before `token(s)` in the green line.
  *           Absent for the family whose whole namespace is its own name.
- * @property {string} [prefix]   the name `tokenDefinitions` selects on.
+ * @property {string} prefix     the name `tokenCorpus` narrows to, and the one
+ *           `fallbackUsages` scans for. Stated by both families rather than
+ *           defaulted: `--color-` used to be the default of two separate
+ *           functions, which made the colour family's most load-bearing fact
+ *           the one thing its descriptor did not say.
  * @property {(value: string) => unknown} [normalise]  how two values of this
  *           family are compared. Defaults to colour's.
  * @property {(tokens: Map<string, string>) => Map<string, string>} [select]
@@ -110,16 +118,26 @@ export function fallbackCheck(family) {
    * dimension half is the bigger one, at 1093 comparable fallbacks.
    */
   const inputs = byRoot((repoRoot) => {
-    const tokenFiles = tracked(repoRoot, [TOKEN_DIR])
-      .filter((f) => /\.(scss|css)$/.test(f))
-      .map((rel) => read(repoRoot, rel));
-    // Aliases resolved so `--color-x: var(--color-y)` compares as `--color-y`'s
-    // value rather than as an incomparable `var()`. Load-bearing for dimensions
-    // (124 of 207 tokens are aliases) and measured, not assumed, for colour:
-    // adding it found two more `--color-info-*` disagreements, one alias hop
-    // from `--color-tertiary-*` and so invisible to the check that shipped in
-    // #313. Both were fixed rather than recorded; colour's set is still 191.
-    const resolved = resolveAliases(tokenDefinitions(tokenFiles, prefix ? { prefix } : undefined));
+    // Aliases are resolved by `tokenCorpus`, so `--color-x: var(--color-y)`
+    // compares as `--color-y`'s value rather than as an incomparable `var()`.
+    // Load-bearing for dimensions (124 of 207 tokens are aliases) and measured,
+    // not assumed, for colour: adding it found two more `--color-info-*`
+    // disagreements, one alias hop from `--color-tertiary-*` and so invisible to
+    // the check that shipped in #313. Both were fixed rather than recorded;
+    // colour's set is still 191.
+    //
+    // The corpus resolves the WHOLE table before narrowing to the prefix, where
+    // the walk this replaced resolved inside the narrowed map — so a colour
+    // token aliased to a name outside `--color-*` now resolves where it used to
+    // come back as a `var()`. Measured over this tree: no such token exists, and
+    // both families' maps are byte-identical across the move (210 colour, 231
+    // dimension, no differing value).
+    const resolved = new Map(
+      [...tokenCorpus({ root: repoRoot, prefix, precedence: 'last' })].map(([name, entry]) => [
+        name,
+        entry.value,
+      ]),
+    );
     const tokens = select ? select(resolved) : resolved;
 
     const sources = tracked(repoRoot, SEARCH_ROOTS)
@@ -127,7 +145,7 @@ export function fallbackCheck(family) {
       .map((rel) => read(repoRoot, rel));
     const audit = fallbackAudit({
       tokens,
-      usages: fallbackUsages(sources, prefix ? { prefix } : undefined),
+      usages: fallbackUsages(sources, { prefix }),
       ...(normalise ? { normalise } : {}),
       reportUndefined,
     });

@@ -20,6 +20,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'fs';
 import { join, resolve } from 'path';
 import https from 'https';
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { fetchNotionPRD, findPRDByComponent, updatePRDStatus } from './create-notion-prd.js';
 import { loadSkill, loadSkillMetadata } from './lib/skill-loader.js';
 
@@ -34,7 +35,7 @@ const PR_BODY_FILE = process.env.PR_BODY_FILE;
 const NOTION_PRD_ID = process.env.NOTION_PRD_ID || '';
 // CLAUDE_MODEL is loaded from scripts/prompts/uno-implement/SKILL.md frontmatter at runtime — see main()
 const COMPONENTS_DIR = resolve('design-system/src/components');
-const TOKENS_DIR = resolve('design-system/src/tokens');
+const TOKENS_DIR = resolve(TOKEN_DIR);
 
 // ─── Helpers ───────────────────────────────────────────────
 

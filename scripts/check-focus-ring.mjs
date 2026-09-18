@@ -22,6 +22,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import {
   NON_TEXT,
   REPO_ROOT,
@@ -36,7 +37,7 @@ import { byRoot, main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 
 const RECORD = 'docs/evals/focus-ring.json';
-const ROLES_FILE = 'design-system/src/tokens/_color_roles.scss';
+const ROLES_FILE = `${TOKEN_DIR}/_color_roles.scss`;
 
 /*
  * Floors. A resolver that stopped finding stylesheets, or a selector scan that

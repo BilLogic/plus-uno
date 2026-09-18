@@ -16,17 +16,19 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const MD_SOURCE = path.join(REPO_ROOT, 'design-system/guidelines/figma/token-mapping.md');
 const VARIABLES_SNAPSHOT = path.join(REPO_ROOT, 'scripts/figma-variables-snapshot.json');
-const TOKENS_DIR = path.join(REPO_ROOT, 'design-system/src/tokens');
+const TOKENS_DIR = path.join(REPO_ROOT, TOKEN_DIR);
 const OUT = path.join(REPO_ROOT, 'design-system/figma/token-registry.json');
 
 const STATIC = {
   figmaFileKey: 'zAecJNRdvJzAUOcjV32tRX',
   syncCommand: 'npm run sync:tokens && npm run generate:tokens',
-  codeTokenRoot: 'design-system/src/tokens/',
+  codeTokenRoot: `${TOKEN_DIR}/`,
   humanReference: 'design-system/guidelines/figma/token-mapping.md',
 };
 
@@ -258,7 +260,9 @@ function build() {
     version: '1.1.0',
     generated: true,
     generatedBy: 'scripts/generate-token-registry.mjs',
-    note: 'DO NOT EDIT BY HAND. Two inputs: design-system/guidelines/figma/token-mapping.md (curated semantics, authoritative) and scripts/figma-variables-snapshot.json (bulk, derived mechanically). Every token in both is validated against design-system/src/tokens/*.scss. Run `npm run generate:token-registry`.',
+    note:
+      'DO NOT EDIT BY HAND. Two inputs: design-system/guidelines/figma/token-mapping.md (curated semantics, authoritative) and scripts/figma-variables-snapshot.json (bulk, derived mechanically). ' +
+      `Every token in both is validated against ${TOKEN_DIR}/*.scss. Run \`npm run generate:token-registry\`.`,
     ...STATIC,
     variablesSnapshot: 'scripts/figma-variables-snapshot.json',
     mappings: { colors, typography, spacing, elevation },

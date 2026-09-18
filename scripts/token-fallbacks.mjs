@@ -72,133 +72,40 @@
  *                     Colour's recorded set is unchanged by it — measured, not
  *                     assumed; the test below pins that.
  *
- * ─── WHERE THE GRAMMAR AND THE MATHS COME FROM ──────────────────────────────
+ * ─── WHERE THE GRAMMAR, THE MATHS AND THE CORPUS COME FROM ──────────────────
  * `design-system/src/lib/tokens.mjs` (#506), not from this file (#507): the
- * token grammar, colour parsing and alias resolution are the module's. THE
- * RECORD IS `scripts/lib/ratchet.mjs`'s, entire: #599 moved the classification
- * there — a baseline record is a harness concern rather than a colour one — and
- * #600 moved the read, the stale sweep and the absent-record error mode with
- * it, so this file no longer knows a baseline exists. What is left here is what
- * is about FALLBACKS — capturing the literal beside a token, comparing two
- * values of a FAMILY, and the wording of the two reports.
+ * token grammar and colour parsing are the module's. THE RECORD IS
+ * `scripts/lib/ratchet.mjs`'s, entire: #599 moved the classification there — a
+ * baseline record is a harness concern rather than a colour one — and #600
+ * moved the read, the stale sweep and the absent-record error mode with it, so
+ * this file no longer knows a baseline exists.
+ *
+ * THE CORPUS AND THE EQUALITY ANSWER ARE `tokens-node.mjs`'s (#620), since
+ * #621. This file used to carry `tokenDefinitions` and `resolveAliases` — a
+ * second walk of the token sources — and `normaliseColour` and
+ * `normaliseDimension`, one of the two colour keys and two dimension
+ * normalisers #620 exists to collapse. `tokenCorpus` is the walk;
+ * `colourKey` and `dimensionKey` are the keys. What is left here is what is
+ * about FALLBACKS — capturing the literal beside a token, auditing a FAMILY's
+ * uses against their tokens, and the wording of the two reports.
+ *
+ * THE NEW KEY IS FINER THAN THE ONE IT REPLACES, and the migration was measured
+ * rather than assumed. `colourKey` keeps alpha where `normaliseColour`
+ * (`parseColour` then `toHex`) dropped it, which over the live corpus is 315
+ * token pairs called equal before and unequal after. None of them reaches a
+ * comparison here, and the reason is `fallbackUsages` below rather than
+ * anything about the key: the fallback literal is captured with `[^),]+`, which
+ * admits neither a comma nor a `)`, and the pattern then demands the `var()`'s
+ * own `)`. A whole `rgba()` fallback satisfies neither, so the 25 sites writing
+ * `var(--color-x, rgba(…))` are not matched at all — not captured, not counted
+ * incomparable, simply not seen. Of the 476 comparable colour comparisons that
+ * are left in this tree, zero carry alpha on either side.
+ * `design-system/tests/tokens-node.test.js` pins that mechanism, so a check
+ * that one day widens the capture is told what it has changed.
  */
 
-import {
-  parseColour,
-  resolveToken,
-  toHex,
-  tokenDeclarationPattern,
-  varReferencePattern,
-} from '../design-system/src/lib/tokens.mjs';
-
-/**
- * `#abc`, `#aabbcc` and `rgb(a, b, c)` all normalise to `#aabbcc`.
- *
- * The parsing and the hex are the module's (#507) — this file used to spell
- * both. Out of range is still not a colour: `parseColour` returns null for
- * `rgb(300, 0, 0)` rather than clamping, which is what keeps a typo from
- * reporting agreement with something nobody wrote.
- *
- * The module's parser is slightly STRICTER than the one it replaces: it wants
- * the whole value to be the colour, where this matched an `rgb(` prefix and
- * ignored the tail. Measured over the token sources and every captured
- * fallback literal, nothing in the tree is in the gap — a fallback literal is
- * captured up to the first comma, so an `rgba()` fallback never reaches here at
- * all, and no token value carries trailing content after its `rgb()`.
- */
-export function normaliseColour(value) {
-  const colour = parseColour(value);
-  return colour ? toHex(colour) : null;
-}
-
-/**
- * `12px`, `0.75rem` and `120%` normalise to a comparable string.
- *
- * `rem` is 16px and only 16px, the same assumption `check:docs-token-literals`
- * makes and for the same reason: nothing here renders anything, and a repo that
- * changed its root font size would have to revisit both.
- *
- * A PERCENTAGE IS NOT CONVERTED TO PX, and that is the point rather than a
- * shortcut. `--size-element-radius-full` is `999px` and falls back to `50%`
- * eleven times; on a non-square box those are visibly different shapes, so they
- * must compare unequal. Keeping the unit in the key is what makes them so.
- *
- * `0` is accepted in any unit and normalises to `0px`, because zero is zero.
- */
-export function normaliseDimension(value) {
-  if (typeof value !== 'string') return null;
-  const v = value.trim().toLowerCase();
-  const m = /^(-?\d*\.?\d+)(px|rem|em|%)?$/.exec(v);
-  if (!m) return null;
-  const n = Number(m[1]);
-  if (!Number.isFinite(n)) return null;
-  // A bare number is only a length when it is zero: `line-height: 1.5` is a
-  // ratio, and calling it `1.5px` would invent a disagreement with every
-  // line-height token in the system.
-  if (!m[2]) return n === 0 ? '0px' : null;
-  if (m[2] === '%') return `${n}%`;
-  // `em` is relative to the element's own font size, which this cannot know.
-  // It is not comparable, and guessing 16px would report agreement with a
-  // number nobody wrote.
-  if (m[2] === 'em') return null;
-  return `${m[2] === 'rem' ? n * 16 : n}px`;
-}
-
-/**
- * Token definitions from the token sources.
- *
- * Later definitions win, which is how the cascade reads them, and is why the
- * light-mode value is what a bare `:root` definition means here. That is the
- * one reason this is not the module's `readTokens`, which takes the FIRST
- * definition because it reads a single stylesheet; the grammar is the module's
- * either way (#507).
- *
- * The pattern this replaced was anchored to the start of a line. Dropping the
- * anchor is measured rather than assumed: over `design-system/src/tokens`, both
- * spellings find the same 518 declarations, because every token in those files
- * is written one per line.
- *
- * @param {{path: string, text: string}[]} files
- * @param {{prefix?: string}} [options] e.g. `--color-`; defaults to every token
- * @returns {Map<string, string>} name -> raw value
- */
-export function tokenDefinitions(files, { prefix = '--color-' } = {}) {
-  const tokens = new Map();
-  for (const { text } of files) {
-    for (const m of text.matchAll(tokenDeclarationPattern(prefix))) {
-      tokens.set(m[1], m[2].trim());
-    }
-  }
-  return tokens;
-}
-
-/**
- * Follow `var(--other)` aliases to the value at the end of the chain.
- *
- * Returns a NEW map rather than mutating, so a caller can still see what each
- * token literally says. Cycle-safe: a token that eventually refers to itself
- * keeps its raw value and is therefore incomparable, which is the honest answer
- * — a cycle has no value.
- *
- * The walk itself is the module's `resolveToken` (#507), including its cycle
- * guard; what stays here is the `?? raw` — the module answers `undefined` for a
- * cycle or a dead end, and this map's contract is that every token keeps a
- * value.
- *
- * One behaviour the module adds: it follows `var(--b, fallback)` through to
- * `--b`, where the pattern here followed only a bare `var(--b)`. No token in
- * `design-system/src/tokens` is declared as an aliased `var()` WITH a fallback,
- * so nothing in the tree is in the gap.
- *
- * @param {Map<string,string>} tokens
- */
-export function resolveAliases(tokens) {
-  const resolved = new Map();
-  for (const [name, raw] of tokens) {
-    resolved.set(name, resolveToken(name, tokens) ?? raw);
-  }
-  return resolved;
-}
+import { colourKey } from '../design-system/src/lib/tokens-node.mjs';
+import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 
 /**
  * Every `var(--color-*, …)` in the given files, with the file and line.
@@ -232,7 +139,7 @@ export function fallbackUsages(files, { prefix = '--color-' } = {}) {
  *
  * @param {{tokens: Map<string,string>, usages: Usage[]}} o
  */
-export function fallbackAudit({ tokens, usages, normalise = normaliseColour, reportUndefined = true }) {
+export function fallbackAudit({ tokens, usages, normalise = colourKey, reportUndefined = true }) {
   const disagreements = [];
   const undefinedTokens = new Map();
   let comparable = 0;
