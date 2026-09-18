@@ -5,6 +5,8 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import { cssName, cssColours, normalise, compare, failures } from './figma-colour-drift.mjs';
+import { run } from './check-figma-colour-drift.mjs';
+import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const RECORDING = JSON.parse(
@@ -120,4 +122,69 @@ test('the recording is a measurement with its method attached', () => {
     Object.keys(RECORDING.variables).every((k) => k.includes('::')),
     'each key names its collection, since two collections both define surface-container',
   );
+});
+
+/*
+ * The policy half (#611). Measurement above maps names; the gate is a run
+ * against a fixture tree — one CSS value that drifted, and an emptied token
+ * directory so nothing maps.
+ */
+
+/**
+ * 90 Figma↔CSS pairs that agree, plus an optional drifted primary.
+ *
+ * @param {{drift?: boolean}} [opts]
+ * @returns {{scss: string, recording: string}}
+ */
+function colourPairs({ drift = false } = {}) {
+  const variables = {};
+  const decls = [];
+  for (let i = 0; i < 90; i += 1) {
+    const hex = `#${i.toString(16).padStart(6, '0')}`;
+    variables[`colors / accent::Tone${i}/Tone${i}`] = hex;
+    decls.push(`  --color-tone${i}: ${hex};`);
+  }
+  variables['colors / accent::Primary/Primary'] = '#0472a8';
+  decls.push(`  --color-primary: ${drift ? '#000000' : '#0472a8'};`);
+  return {
+    scss: `:root {\n${decls.join('\n')}\n}\n`,
+    recording: JSON.stringify({
+      measuredAt: '2026-09-15',
+      variables,
+    }),
+  };
+}
+
+test('a CSS colour that drifted from Figma in a fixture tree is a finding', () => {
+  const { scss, recording } = colourPairs({ drift: true });
+  const { root, done } = policyTree({
+    'design-system/src/tokens/_colors.scss': scss,
+    'design-system/figma/colour-values.json': recording,
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(
+      found.some((message) => /--color-primary/.test(message) && /nothing followed/.test(message)),
+      `expected a drift finding, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
+});
+
+test('an empty token directory fires the sentinel floor, not a clean sweep', () => {
+  const { recording } = colourPairs();
+  const { root, done } = policyTree({
+    'design-system/figma/colour-values.json': recording,
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(found.length > 0, 'an empty token directory must not report a clean sweep');
+    assert.ok(
+      found.some((message) => /only 0 variables mapped to a CSS token \(floor 90\)/.test(message)),
+      `expected the compared-pairs floor, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
 });

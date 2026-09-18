@@ -18,6 +18,8 @@ import { fileURLToPath } from 'node:url';
 
 import { GENERICS, failures, familyTokens, resolve, stack } from './font-families.mjs';
 import { corpus } from './undefined-tokens.mjs';
+import { run } from './check-font-families.mjs';
+import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -121,4 +123,39 @@ test('quotes are not part of a family name, and the generics are the CSS ones', 
   ]);
   assert.ok(GENERICS.has('ui-monospace'));
   assert.ok(!GENERICS.has('Lato'));
+});
+
+/*
+ * The policy half (#611). Measurement above plants file objects; the gate is a
+ * run against a fixture tree — a stack with no generic, and an empty token
+ * directory.
+ */
+
+test('a font stack with no generic in a fixture tree is a finding', () => {
+  const { root, done } = policyTree({
+    'design-system/src/tokens/_fonts.scss': ':root { --font-family-display4: "Open Sans"; }\n',
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(
+      found.some((message) => /ends in "Open Sans", not a CSS generic/.test(message)),
+      `expected a missing-generic finding, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
+});
+
+test('an empty token directory fires the sentinel floor, not a clean sweep', () => {
+  const { root, done } = policyTree({});
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(found.length > 0, 'an empty token directory must not report a clean sweep');
+    assert.ok(
+      found.some((message) => /fewer than the 1300 this was measured over/.test(message)),
+      `expected the searched-files floor, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
 });

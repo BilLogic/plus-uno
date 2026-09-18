@@ -17,6 +17,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { openRatchet } from './lib/ratchet.mjs';
+import { messagesOf, policyTree } from './lib/policy-tree.mjs';
+import { run } from './check-undefined-tokens.mjs';
 import {
   EXTERNAL,
   audit,
@@ -216,4 +218,51 @@ test('only five bare uses remain, and each is a token the system does not have',
     '--size-modal-min-height-sm',
     '--size-modal-width-sm',
   ]);
+});
+
+/*
+ * The policy half (#611). Measurement above plants file objects; the gate is a
+ * run against a fixture tree — a used-and-undefined name, and an empty token
+ * directory.
+ */
+
+const UNDEFINED_BASELINE = JSON.stringify({
+  note: 'Token names used and defined nowhere. Counts may fall, never rise.',
+  measuredAt: '2026-09-18',
+  roots: ['design-system/src', '.storybook', 'prototypes'],
+  totals: { names: 0, uses: 0, bare: 0 },
+  tokens: {},
+});
+
+test('a used-and-undefined token in a fixture tree is a finding', () => {
+  const { root, done } = policyTree({
+    'design-system/src/tokens/_fonts.scss': ':root { --font-weight-normal: 300; }\n',
+    'design-system/src/Select.scss': '.x { font-weight: var(--font-weight-light); }\n',
+    'docs/evals/undefined-token-baseline.json': UNDEFINED_BASELINE,
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(
+      found.some((message) => /NEW\s+--font-weight-light/.test(message)),
+      `expected a NEW undefined-token finding, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
+});
+
+test('an empty token directory fires the sentinel floor, not a clean sweep', () => {
+  const { root, done } = policyTree({
+    'docs/evals/undefined-token-baseline.json': UNDEFINED_BASELINE,
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(found.length > 0, 'an empty token directory must not report a clean sweep');
+    assert.ok(
+      found.some((message) => /fewer than the 1300 this was measured over/.test(message)),
+      `expected the searched-files floor, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
 });

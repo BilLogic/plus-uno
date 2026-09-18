@@ -88,10 +88,21 @@ export const AFFORDANCE = new RegExp(
  */
 export const NEGATED = /:not\(\s*:focus[^)]*\)/gi;
 
-/** Token definitions, from the colour file and the role layer that follows it. */
+/**
+ * Token definitions, from the colour file and the role layer that follows it.
+ *
+ * Missing files are skipped rather than thrown: a vanished token directory is
+ * the sentinel-floor case, and throwing would report a crash instead of the
+ * floor (#611).
+ *
+ * @param {string} [root]
+ * @returns {Map<string, string>}
+ */
 export function colours(root = REPO_ROOT) {
   const source = ['design-system/src/tokens/_colors.scss', 'design-system/src/tokens/_color_roles.scss']
-    .map((file) => fs.readFileSync(path.join(root, file), 'utf8'))
+    .map((file) => path.join(root, file))
+    .filter((file) => fs.existsSync(file))
+    .map((file) => fs.readFileSync(file, 'utf8'))
     .join('\n');
   return tokenValues(source);
 }

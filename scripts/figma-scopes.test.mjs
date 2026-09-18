@@ -5,6 +5,8 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import { classify, convention, failures, NEVER_TEXT, UNCLASSIFIED } from './figma-scopes.mjs';
+import { run } from './check-figma-scopes.mjs';
+import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const RECORDING = JSON.parse(
@@ -127,5 +129,88 @@ test('a role whose groups genuinely disagree has no majority', () => {
 test('every never-text role names its reason', () => {
   for (const [role, why] of Object.entries(NEVER_TEXT)) {
     assert.ok(why.length > 30, `${role} has no reason worth printing`);
+  }
+});
+
+/*
+ * The policy half (#611). Measurement above classifies names; the gate is a
+ * run against a fixture recording — a base offered as text, and an emptied
+ * scopes map (the recording's analogue of an empty token directory).
+ */
+
+const SCOPE_ROLES = {
+  base: 'EFFECT_COLOR,FRAME_FILL,SHAPE_FILL,STROKE_COLOR',
+  text: 'TEXT_FILL',
+  container: 'FRAME_FILL,SHAPE_FILL,STROKE_COLOR',
+  on: 'ALL_SCOPES',
+  'on-container': 'ALL_FILLS,STROKE_COLOR',
+  icon: 'SHAPE_FILL',
+  border: 'STROKE_COLOR',
+};
+
+const SCOPE_GROUPS = [
+  'Primary',
+  'Secondary',
+  'Tertiary',
+  'Danger',
+  'Success',
+  'Warning',
+  'Info',
+  'Focus',
+  'Advocacy',
+  'Relationship',
+  'Social-Emotional',
+];
+
+/**
+ * A recording whose majority matches the library convention, optionally with
+ * one base offered as text.
+ *
+ * @param {{violateBase?: boolean}} [opts]
+ * @returns {Record<string, string>}
+ */
+function scopedLibrary({ violateBase = false } = {}) {
+  const scopes = {};
+  for (const group of SCOPE_GROUPS) {
+    scopes[`colors / accent::${group}/${group}`] =
+      violateBase && group === 'Primary' ? 'ALL_SCOPES' : SCOPE_ROLES.base;
+    scopes[`colors / accent::${group}/${group} (Text)`] = SCOPE_ROLES.text;
+    scopes[`colors / accent::${group}/${group} Container`] = SCOPE_ROLES.container;
+    scopes[`colors / accent::${group}/On ${group}`] = SCOPE_ROLES.on;
+    scopes[`colors / accent::${group}/On ${group} Container`] = SCOPE_ROLES['on-container'];
+    scopes[`colors / accent::${group}/${group} Icon`] = SCOPE_ROLES.icon;
+    scopes[`colors / accent::${group}/${group} Border`] = SCOPE_ROLES.border;
+  }
+  return scopes;
+}
+
+test('a base offered as text in a fixture recording is a finding', () => {
+  const { root, done } = policyTree({
+    'design-system/figma/colour-values.json': JSON.stringify({ scopes: scopedLibrary({ violateBase: true }) }),
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(
+      found.some((message) => /Primary\/Primary/.test(message) && /TEXT_FILL/.test(message)),
+      `expected a TEXT_FILL offer on the Primary base, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
+});
+
+test('an emptied scopes recording fires the sentinel floor, not a clean sweep', () => {
+  const { root, done } = policyTree({
+    'design-system/figma/colour-values.json': JSON.stringify({ scopes: {} }),
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(found.length > 0, 'an empty scopes recording must not report a clean sweep');
+    assert.ok(
+      found.some((message) => /only 0 variables have recorded scopes \(floor 75\)/.test(message)),
+      `expected the scoped-variables floor, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
   }
 });

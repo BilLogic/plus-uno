@@ -4,7 +4,9 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
+import { run } from './check-focus-ring.mjs';
 import { AFFORDANCE, NEGATED, colours, failures, focusRules, indicators, invisible, ratio } from './focus-ring.mjs';
+import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
 const VALUES = colours();
 
@@ -111,4 +113,56 @@ test('a stale exception and a reasonless one are each their own finding', () => 
   const unreviewed = failures(invisible([ENTRY]), { unreviewed: ['a.scss:3'] });
   assert.equal(unreviewed.length, 1);
   assert.match(unreviewed[0], /with no reason/);
+});
+
+/*
+ * The policy half (#611). The measurement above plants a rule; the gate is a
+ * run against a fixture tree — an invisible ring, and a vanished token directory.
+ */
+
+const FOCUS_BASELINE = JSON.stringify({
+  note: 'Focus rules whose strongest visible affordance is under 3:1.',
+  recordedAt: '2026-09-18',
+  measured: { focusRules: 0, wereUnder3to1: 0, fixedBy: '--color-focus-ring' },
+  exceptions: {},
+});
+
+test('an invisible focus ring in a fixture tree is a finding', () => {
+  const { root, done } = policyTree({
+    'design-system/src/tokens/_colors.scss':
+      ':root { --color-surface: #f9f9fc; --color-inverse-primary: #84cfff; --color-focus-ring: #0472a8; }\n',
+    'design-system/src/tokens/_color_roles.scss': ':root { --color-focus-ring: var(--color-primary); }\n',
+    'design-system/src/a.scss': '.a:focus { outline: 2px solid var(--color-inverse-primary); }\n',
+    'docs/evals/focus-ring.json': FOCUS_BASELINE,
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(
+      found.some((message) => /strongest focus affordance/.test(message) && /--color-inverse-primary/.test(message)),
+      `expected an invisible-ring finding, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
+});
+
+test('an empty token directory fires the sentinel floor, not a clean sweep', () => {
+  const { root, done } = policyTree({
+    'design-system/src/a.scss': '.a:focus { outline: 2px solid var(--color-inverse-primary); }\n',
+    'docs/evals/focus-ring.json': FOCUS_BASELINE,
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(found.length > 0, 'an empty token directory must not report a clean sweep');
+    assert.ok(
+      found.some((message) => /only \d+ stylesheets scanned \(floor 150\)/.test(message)),
+      `expected the stylesheet floor, got:\n${found.join('\n')}`,
+    );
+    assert.ok(
+      found.some((message) => /no longer defines --color-focus-ring/.test(message)),
+      `expected the vanished role, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
 });
