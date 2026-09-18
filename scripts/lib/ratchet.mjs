@@ -6,10 +6,20 @@
  * the read, the comparison, the stale-entry sweep and the `--update` write,
  * spelled twelve times and never the same way twice. `ratchet()` in
  * `design-system/src/lib/tokens.mjs` (#506) already unified the CLASSIFICATION
- * for nine of them — it moves here, because a baseline record has nothing to do
- * with colour maths and because classification was only the middle third of the
- * job. What was still twelve-times-over is the READ (which container in the
- * record holds the set, and where the human's reason lives) and the WRITE.
+ * for nine of them, and #599 moved it here, because a baseline record has
+ * nothing to do with colour maths and because classification was only the
+ * middle third of the job. What was still twelve-times-over is the READ (which
+ * container in the record holds the set, and where the human's reason lives)
+ * and the WRITE.
+ *
+ * That shape-agnostic classifier is GONE (#602). It survived #599 because four
+ * scripts still worded their findings off a pair of sides they had read
+ * themselves; #600 and #601 moved all four onto `openRatchet`, and it sat here
+ * for one commit as an export with no importer and a comment that named its
+ * callers. `failures()` and `stale()` below are the classification now, and the
+ * difference is the whole module: they read a DECLARED shape and throw on a
+ * record they cannot read, where the classifier took whatever two sides it was
+ * handed and could not tell a mis-read from an empty set.
  *
  * So the ratchet is a module: it owns the record's ENVELOPE, the direction that
  * fails, the STALE-ENTRY report, the UNREVIEWED-REASON report, and the
@@ -555,67 +565,4 @@ export function openRatchet({ file, set: name, repoRoot = REPO_ROOT }) {
       return { file, entries: runs.size };
     },
   };
-}
-
-/**
- * The classification on its own, for a caller that already holds both sides and
- * has no record to read — the shape `ratchet()` in
- * `design-system/src/lib/tokens.mjs` had before #599 moved it here, kept
- * because four scripts word their findings off it and their wording is theirs.
- *
- * @param {string[]|Record<string, number|{count?: number}>} failures
- * @param {string[]|Record<string, number|{count?: number}>} [baseline]
- * @returns {{
- *   new: {key: string, count: number}[],
- *   known: {key: string, count: number, recorded: number, rose: boolean, entry: object|undefined}[],
- *   fixed: {key: string, recorded: number, entry: object|undefined}[],
- * }}
- */
-export function ratchet(failures, baseline) {
-  const found = loose(failures);
-  const recorded = loose(baseline);
-
-  const fresh = [];
-  const known = [];
-  for (const [key, count] of found.counts) {
-    if (!recorded.counts.has(key)) {
-      fresh.push({ key, count });
-      continue;
-    }
-    const was = recorded.counts.get(key);
-    known.push({ key, count, recorded: was, rose: count > was, entry: recorded.entries.get(key) });
-  }
-
-  const fixed = [];
-  for (const [key, was] of recorded.counts) {
-    if (found.counts.has(key)) continue;
-    fixed.push({ key, recorded: was, entry: recorded.entries.get(key) });
-  }
-
-  return { new: fresh, known, fixed };
-}
-
-/**
- * `ratchet`'s own normaliser: shape-agnostic on purpose, because its callers
- * hand it two sides they have already read and it has no row to read them on.
- * `openRatchet` never uses this — it reads a DECLARED shape and throws on a
- * record it cannot read, which is the whole difference between the two.
- */
-function loose(side) {
-  const counts = new Map();
-  const entries = new Map();
-  if (!side) return { counts, entries };
-
-  const pairs = Array.isArray(side)
-    ? side.map((key) => [key, 1])
-    : side instanceof Map
-      ? [...side.entries()]
-      : Object.entries(side);
-
-  for (const [key, value] of pairs) {
-    const count = typeof value === 'number' ? value : Number(value?.count ?? 1);
-    counts.set(key, Number.isFinite(count) ? count : 1);
-    entries.set(key, typeof value === 'object' && value !== null ? value : undefined);
-  }
-  return { counts, entries };
 }

@@ -131,12 +131,14 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 export function summary({ repoRoot = REPO_ROOT } = {}) {
   const { files, uses } = inputs(repoRoot);
   const remaining = uses.length;
-  // `migrated` and `recordedAt` are envelope, not set: the ratchet does not own
-  // them and this is the one line that reads them, so it reads them directly.
-  const record = JSON.parse(fs.readFileSync(path.join(repoRoot, BASELINE), 'utf8'));
+  // `migrated` and `recordedAt` are ENVELOPE, not set: the ratchet does not own
+  // them, and `envelope()` is how a check reads the record's unowned half (#601).
+  // This line used to open the file a second time, which is the one thing
+  // `scripts/lib/ratchet.mjs` says no check does — the record is opened once.
+  const record = gate(repoRoot);
   return (
     `${files.length} stylesheets, ${remaining} edge use(s) of an intent base remain, ` +
-    `all recorded (${record.migrated} migrated ${record.recordedAt})`
+    `all recorded (${record.envelope('migrated')} migrated ${record.envelope('recordedAt')})`
   );
 }
 
