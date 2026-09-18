@@ -38,12 +38,10 @@
  *
  * Run: `npm run check:text-contrast`.
  */
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-
 import { AA_TEXT, PAGE_TOKEN } from './button-contrast.mjs';
+import { REPO_ROOT } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
 import {
   census,
   findings,
@@ -54,8 +52,12 @@ import {
   textDeclarations,
 } from './text-contrast.mjs';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(__dirname, '..');
+/**
+ * The record, named here because this is the check that reads it — and because
+ * it is the key its shape is declared under in `scripts/lib/ratchet-shapes.mjs`
+ * and the path `scripts/checks.registry.mjs` declares for this row. One
+ * spelling, three readers.
+ */
 const BASELINE = 'docs/evals/text-contrast-baseline.json';
 
 /**
@@ -82,29 +84,42 @@ const inputs = byRoot((repoRoot) => {
   return { values, files, uses, found, counts: census(found) };
 });
 
-const baselineOf = (repoRoot) =>
-  JSON.parse(fs.readFileSync(path.join(repoRoot, BASELINE), 'utf8')).findings;
+/**
+ * What the run measured, in the record's own shape — one object, because
+ * `failures`, `stale` and `--update` are three questions about the same
+ * measurement and the ratchet reads both sides on the same declared form.
+ */
+const measured = byRoot((repoRoot) => {
+  const { found, counts } = inputs(repoRoot);
+  return Object.fromEntries(found.map((finding) => {
+    const key = keyOf(finding);
+    return [key, { count: counts[key], ratio: finding.ratio }];
+  }));
+});
+
+const ratchetFor = (repoRoot) => openRatchet({ file: BASELINE, repoRoot });
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
-  const { counts } = inputs(repoRoot);
-  const baseline = baselineOf(repoRoot);
+  const ratchet = ratchetFor(repoRoot);
+  const found = measured(repoRoot);
 
-  const found = ratchetFailures(counts, baseline).map((message) => ({ message }));
+  const reported = ratchetFailures(ratchet.failures(found), ratchet.stale(found))
+    .map((message) => ({ message }));
 
   // An entry recorded with the placeholder reason is a run where somebody
   // pressed `--update` and skipped the only step that mattered. It fails on its
   // own, separately from the ratchet, because nothing about the counts is wrong.
-  const unreviewed = Object.entries(baseline).filter(([, entry]) => entry.why.startsWith('UNREVIEWED'));
+  const unreviewed = ratchet.unreviewed();
   if (unreviewed.length) {
-    found.push({
+    reported.push({
       message:
         `${unreviewed.length} baseline entr${unreviewed.length === 1 ? 'y has' : 'ies have'} ` +
-        `no reason:\n${unreviewed.map(([k]) => `  ${k}`).join('\n')}\n` +
+        `no reason:\n${unreviewed.map(({ key }) => `  ${key}`).join('\n')}\n` +
         '  --update records the finding; only a person can record why it is allowed to stand.',
     });
   }
-  return found;
+  return reported;
 }
 
 /** The green line: the size of the sweep, and how much of it is recorded. */
@@ -114,46 +129,30 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   return (
     `${uses.length} color: declarations across ${files.length} stylesheets, ` +
     `${distinct} distinct tokens. ${found.length} below AA ${AA_TEXT}:1, all recorded with a reason ` +
-    `(${Object.keys(baselineOf(repoRoot)).length} entries).`
+    `(${ratchetFor(repoRoot).entries.size} entries).`
   );
 }
 
-/** `--update` re-records the baseline. A write, so it stays out of `run`. */
+/**
+ * `--update` re-records the baseline. A WRITE, so it stays out of `run` — and a
+ * MERGE, so the record's envelope survives it: the ratchet replaces the
+ * `findings` container and writes the rest of the record back untouched, and a
+ * reason already recorded is carried across rather than restated.
+ */
 function update(repoRoot = REPO_ROOT) {
-  const { found, counts } = inputs(repoRoot);
-  const existing = fs.existsSync(path.join(repoRoot, BASELINE))
-    ? JSON.parse(fs.readFileSync(path.join(repoRoot, BASELINE), 'utf8')).findings
-    : {};
-  const next = {};
-  for (const finding of found) {
-    const key = keyOf(finding);
-    next[key] = {
-      count: counts[key],
-      ratio: finding.ratio,
-      // A reason is never invented by the tool. A new entry gets a placeholder
-      // that says so, and a run whose baseline still contains one is a run
-      // where somebody skipped the only step that matters.
-      why: existing[key]?.why ?? 'UNREVIEWED — replace with the reason this is not a defect, or fix it.',
-    };
-  }
-  fs.writeFileSync(
-    path.join(repoRoot, BASELINE),
-    `${JSON.stringify({ measured: `AA ${AA_TEXT}:1, ground from each rule, page fallback ${PAGE_TOKEN}`, findings: next }, null, 2)}\n`,
-  );
-  console.log(`[text-contrast] wrote ${Object.keys(next).length} entries to ${BASELINE}`);
+  const written = ratchetFor(repoRoot).update(measured(repoRoot), {
+    seed: { measured: `AA ${AA_TEXT}:1, ground from each rule, page fallback ${PAGE_TOKEN}` },
+  });
+  console.log(`[text-contrast] wrote ${written.entries} entries to ${written.file}`);
 }
 
-// `--update` writes a file, so it belongs to the CLI and not to `run` — and it
-// runs only when this module IS the process, never when the runner imports it.
-// The CLI is one branch or the other. A side flag prints (or writes) instead of
-// gating, so the gate does not also run; `main()` re-checks the entry guard for
-// itself, which is what keeps an import of this module reaching neither.
-if (
-  process.argv[1] &&
-  pathToFileURL(process.argv[1]).href === import.meta.url &&
-  process.argv.includes('--update')
-) {
-  update();
-} else {
-  main(import.meta.url, 'check:text-contrast', { run, summary, remedy: REMEDY });
-}
+// `--update` writes and stops, which is what makes it a TERMINAL flag and lets
+// it sit in `main`'s flags slot (#609) rather than hand-rolling the entry-point
+// comparison beside it. The gate never runs on the same invocation: the CLI is
+// one branch or the other.
+main(import.meta.url, 'check:text-contrast', {
+  run,
+  summary,
+  remedy: REMEDY,
+  flags: { '--update': () => update() },
+});

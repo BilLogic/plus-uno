@@ -258,10 +258,19 @@ Two kinds of failure, two mechanisms:
   highest-usage components whose behaviour is the product. Everything else in
   the corpus is asserted to render, and to survive axe, and nothing more.)
 - **Accessibility is a ratchet**, not a threshold. `docs/evals/a11y-baseline.json`
-  records which axe rules each story already violates (126 stories, 14 rules at
-  2026-08-26). A story violating a rule it did not carry before fails the gate; a
+  records which axe rules each story already violates (54 stories, 8 rules at
+  2026-08-29). A story violating a rule it did not carry before fails the gate; a
   count that falls does not. Re-record a genuine improvement with
   `npm run check:storybook -- --update` and commit the file in the same PR.
+- **What a ratchet IS, for every check that holds one**, is
+  `scripts/lib/ratchet.mjs`: the record's shape, which direction fails, the
+  stale-entry sweep, the placeholder-reason sweep and the `--update` write, with
+  the invariant asserted once in `scripts/lib/ratchet-conformance.mjs` against
+  all twelve live records. The twelve are twelve SHAPES, surveyed one row each in
+  `scripts/lib/ratchet-shapes.mjs` — three of them keep the human's reason
+  outside the entry, so `--update` is a merge that leaves every key the module
+  does not own exactly as it found it. A check migrating onto the module adds no
+  row: it opens its record by the path it already names.
 
 **Which components carry `play` blocks, and why not all of them.** A `play`
 block costs runtime on every PR, so the set is chosen rather than grown: a

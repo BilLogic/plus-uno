@@ -10,7 +10,10 @@
  *
  * The check-shaped tests — the Button theme map, the stylesheet walk, the
  * rendered NEW/ROSE/STALE lines — stayed in `scripts/*.test.mjs`, because that
- * is where those things stayed.
+ * is where those things stayed. So did the RATCHET's, which lived here between
+ * #506 and #599 and now live in `scripts/lib/ratchet.test.mjs`: a baseline
+ * record is a harness concern, and its tests belong beside the module that
+ * reads it rather than beside the colour maths.
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -23,7 +26,6 @@ import {
   contrast,
   luminance,
   parseColour,
-  ratchet,
   readTokens,
   resolveToken,
   toHex,
@@ -177,47 +179,5 @@ describe('the contrast maths', () => {
 
   it('round-trips a parsed colour through toHex', () => {
     expect(toHex(parseColour('#9f8205'))).toBe('#9f8205');
-  });
-});
-
-/*
- * ONE RATCHET. Nine baseline files carried their own rule for "new failure vs
- * known failure"; two of them — button-contrast's inline arrays and
- * text-contrast's counted object — are the shapes this has to serve at once,
- * which is why both are asserted here.
- */
-describe('ratchet', () => {
-  it('classifies a keyed count against a counted baseline', () => {
-    const result = ratchet(
-      { kept: 1, shrank: 1, rose: 3, fresh: 2 },
-      { kept: { count: 1, why: 'x' }, shrank: { count: 2 }, rose: { count: 2 }, gone: { count: 1 } },
-    );
-
-    expect(result.new.map((e) => e.key)).toEqual(['fresh']);
-    expect(result.new[0].count).toBe(2);
-    expect(result.known.map((e) => e.key)).toEqual(['kept', 'shrank', 'rose']);
-    expect(result.known.filter((e) => e.rose).map((e) => e.key)).toEqual(['rose']);
-    expect(result.fixed.map((e) => e.key)).toEqual(['gone']);
-  });
-
-  it('carries the baseline entry through, so a caller can read its reason', () => {
-    const { known } = ratchet({ k: 1 }, { k: { count: 1, why: 'inactive sort arrow' } });
-    expect(known[0].entry.why).toBe('inactive sort arrow');
-    expect(known[0].recorded).toBe(1);
-  });
-
-  it('classifies a plain list of keys against a plain list baseline', () => {
-    const result = ratchet(['bad/filled'], ['bad/filled', 'ok/filled']);
-    expect(result.new).toEqual([]);
-    expect(result.known.map((e) => e.key)).toEqual(['bad/filled']);
-    expect(result.fixed.map((e) => e.key)).toEqual(['ok/filled']);
-  });
-
-  it('treats a missing baseline as everything being new', () => {
-    expect(ratchet(['a', 'b'], undefined).new.map((e) => e.key)).toEqual(['a', 'b']);
-  });
-
-  it('reports nothing at all when both sides are empty', () => {
-    expect(ratchet([], [])).toEqual({ new: [], known: [], fixed: [] });
   });
 });

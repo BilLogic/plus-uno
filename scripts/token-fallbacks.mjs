@@ -73,21 +73,24 @@
  *                     assumed; the test below pins that.
  *
  * ─── WHERE THE GRAMMAR AND THE MATHS COME FROM ──────────────────────────────
- * `design-system/src/lib/tokens.mjs` (#506), not from this file (#507). The
- * token grammar, colour parsing, alias resolution and the new/known/fixed
- * classification are all the module's; what is left here is what is about
- * FALLBACKS — capturing the literal beside a token, comparing two values of a
- * FAMILY, and the wording of the two reports.
+ * `design-system/src/lib/tokens.mjs` (#506), not from this file (#507): the
+ * token grammar, colour parsing and alias resolution are the module's. The
+ * new/known/fixed classification is `ratchet` in `scripts/lib/ratchet.mjs`,
+ * which is where #599 moved it — a baseline record is a harness concern rather
+ * than a colour one. What is left here is what is about FALLBACKS — capturing
+ * the literal beside a token, comparing two values of a FAMILY, and the wording
+ * of the two reports.
  */
 
 import {
   parseColour,
-  ratchet,
   resolveToken,
   toHex,
   tokenDeclarationPattern,
   varReferencePattern,
 } from '../design-system/src/lib/tokens.mjs';
+
+import { ratchet } from './lib/ratchet.mjs';
 
 /**
  * `#abc`, `#aabbcc` and `rgb(a, b, c)` all normalise to `#aabbcc`.
