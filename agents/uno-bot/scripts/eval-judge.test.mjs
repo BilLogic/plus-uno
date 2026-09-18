@@ -6,6 +6,11 @@
 // sharpened in the document changed nothing about what was measured — and
 // nothing said so. This test is what makes that silence impossible.
 //
+// The credential's own property is here too: the judge asks for a token PER
+// CASE. The fake below issues tokens that EXPIRE, and rejects a bearer it
+// issued more than an hour of fake-clock ago, so a judge that captures one
+// token fails this file rather than a Monday run (#657).
+//
 // And the second half: the credential, the call, the cut and the fail-open are
 // exercised here with no network and no service account, because they are the
 // judge module's now rather than closures in the runner.
@@ -29,8 +34,10 @@ import {
   describeRubric,
   describeTally,
   dimensionIds,
+  TOKEN_SAFETY_MS,
   extractBlock,
   googleAccessToken,
+  googleTokenSource,
   judgeFromEnv,
   judgeSkipped,
   judgeSystem,
@@ -121,7 +128,7 @@ const CASE = { id: "R3", name: "a share-out is proposed", judgeNote: "the bot pr
 test("the judge posts the rubric and the case to the model, and reads the verdict back", async () => {
   const fetchImpl = fakeFetch(vertexReply('{"verdict":"pass"}'));
   const j = vertexJudge({
-    token: "ya29.fake",
+    accessToken: async () => "ya29.fake",
     rubric: loadRubric(),
     model: "gemini-3.1-pro-preview",
     projectId: "hcii-plus",
@@ -165,14 +172,14 @@ test("the judge's grind tier is the Worker adapter's grind tier", () => {
 
 test("thinking_level is a 3.x key — an older judge model is not sent one", async () => {
   const fetchImpl = fakeFetch(vertexReply('{"verdict":"fail","reason":"it posted"}'));
-  const j = vertexJudge({ token: "t", rubric: loadRubric(), model: "gemini-2.5-pro", projectId: "p", fetchImpl });
+  const j = vertexJudge({ accessToken: async () => "t", rubric: loadRubric(), model: "gemini-2.5-pro", projectId: "p", fetchImpl });
   assert.deepEqual(await j.judgeCase(CASE, {}), { verdict: "fail", reason: "it posted" });
   assert.equal(JSON.parse(fetchImpl.calls[0].init.body).generationConfig.thinkingConfig, undefined);
 });
 
 test("a transcript longer than the cut is truncated, and says so where the judge can read it", async () => {
   const fetchImpl = fakeFetch(vertexReply('{"verdict":"pass"}'));
-  const j = vertexJudge({ token: "t", rubric: loadRubric(), model: "m", projectId: "p", fetchImpl, transcriptChars: 200 });
+  const j = vertexJudge({ accessToken: async () => "t", rubric: loadRubric(), model: "m", projectId: "p", fetchImpl, transcriptChars: 200 });
   await j.judgeCase(CASE, { turns: [{ text: "x".repeat(5000) }] });
   const sent = JSON.parse(fetchImpl.calls[0].init.body).contents[0].parts[0].text;
   assert.match(sent, /…\[transcript truncated at 200 chars — judge only what is shown\]/);
@@ -181,7 +188,7 @@ test("a transcript longer than the cut is truncated, and says so where the judge
 
 test("a transcript inside the cut travels whole, with no truncation marker", async () => {
   const fetchImpl = fakeFetch(vertexReply('{"verdict":"pass"}'));
-  const j = vertexJudge({ token: "t", rubric: loadRubric(), model: "m", projectId: "p", fetchImpl });
+  const j = vertexJudge({ accessToken: async () => "t", rubric: loadRubric(), model: "m", projectId: "p", fetchImpl });
   const transcript = { turns: [{ text: "short" }] };
   await j.judgeCase(CASE, transcript);
   const sent = JSON.parse(fetchImpl.calls[0].init.body).contents[0].parts[0].text;
@@ -191,7 +198,7 @@ test("a transcript inside the cut travels whole, with no truncation marker", asy
 
 test("the judge fails OPEN: a thrown call, an HTTP error and unparseable output all skip", async () => {
   const thrown = vertexJudge({
-    token: "t",
+    accessToken: async () => "t",
     rubric: loadRubric(),
     model: "m",
     projectId: "p",
@@ -202,16 +209,20 @@ test("the judge fails OPEN: a thrown call, an HTTP error and unparseable output 
   assert.deepEqual(await thrown.judgeCase(CASE, {}), { verdict: "skipped", reason: "ECONNRESET" });
 
   const http500 = vertexJudge({
-    token: "t",
+    accessToken: async () => "t",
     rubric: loadRubric(),
     model: "m",
     projectId: "p",
     fetchImpl: fakeFetch({ ok: false, status: 500, json: async () => ({ error: { message: "boom" } }) }),
   });
-  assert.equal((await http500.judgeCase(CASE, {})).verdict, "skipped");
+  // A rejected call names the status, not a parse failure: the body is unread.
+  assert.deepEqual(await http500.judgeCase(CASE, {}), {
+    verdict: "skipped",
+    reason: "judge call rejected (HTTP 500)",
+  });
 
   const babble = vertexJudge({
-    token: "t",
+    accessToken: async () => "t",
     rubric: loadRubric(),
     model: "m",
     projectId: "p",
@@ -323,7 +334,7 @@ test("a service account that cannot be exchanged names itself apart from one tha
 });
 
 test("a service account that exchanges names the tier, the model and the rubric it will grade with", async () => {
-  const fetchImpl = fakeFetch({ ok: true, status: 200, json: async () => ({ access_token: "ya29.exchanged" }) });
+  const fetchImpl = fakeFetch({ ok: true, status: 200, json: async () => ({ access_token: "ya29.exchanged", expires_in: 3600 }) });
   const j = await judgeFromEnv(
     { GEMINI_SA_EMAIL: "evals@hcii-plus.iam.gserviceaccount.com", GEMINI_SA_PRIVATE_KEY: TEST_KEY },
     { fetchImpl },
@@ -352,11 +363,15 @@ test("a token exchange that fails names the status and never the credential", as
 
 test("the service-account JWT is signed with the key and exchanged for a bearer token", async () => {
   const fetchImpl = fakeFetch({ ok: true, status: 200, json: async () => ({ access_token: "ya29.exchanged" }) });
-  const token = await googleAccessToken(
+  const { token, expiresIn } = await googleAccessToken(
     { email: "evals@hcii-plus.iam.gserviceaccount.com", privateKey: TEST_KEY },
     { fetchImpl },
   );
   assert.equal(token, "ya29.exchanged");
+  // The LIFETIME comes back with the token. Dropping it is what let the judge
+  // hold one token across a run twice its length (#657); absent from the reply,
+  // an hour is the assumption, which is what Google grants.
+  assert.equal(expiresIn, 3600);
   const [{ url, init }] = fetchImpl.calls;
   assert.equal(url, "https://oauth2.googleapis.com/token");
   const sent = new URLSearchParams(init.body);
@@ -368,4 +383,104 @@ test("the service-account JWT is signed with the key and exchanged for a bearer 
   assert.equal(parsed.aud, "https://oauth2.googleapis.com/token");
   assert.equal(parsed.scope, "https://www.googleapis.com/auth/cloud-platform");
   assert.equal(parsed.exp - parsed.iat, 3600);
+});
+
+test("a 401 from Vertex is a rejected call, not unparseable output", async () => {
+  // Run 35360560929 printed "unparseable judge output (HTTP 401)" for every
+  // case after the token died. The status was right; the reason was about
+  // parsing, which hid that the judge had never been asked.
+  const j = vertexJudge({
+    accessToken: async () => "ya29.expired",
+    rubric: loadRubric(),
+    model: "m",
+    projectId: "p",
+    fetchImpl: fakeFetch({
+      ok: false,
+      status: 401,
+      json: async () => ({ error: { message: "Request had invalid authentication credentials" } }),
+    }),
+  });
+  const skipped = await j.judgeCase(CASE, {});
+  assert.deepEqual(skipped, { verdict: "skipped", reason: "judge call rejected (HTTP 401)" });
+  assert.ok(!/unparseable/.test(skipped.reason));
+  assert.ok(!/ya29/.test(skipped.reason), "the bearer must not travel in the skip reason");
+  assert.ok(!/invalid authentication/.test(skipped.reason), "the response body must not travel in the skip reason");
+});
+
+test("a token that expires mid-suite is re-minted; a captured token grades nothing after the hour", async () => {
+  // THE PROPERTY #657 IS: the judge does not close over one bearer. A fake
+  // Vertex that rejects a bearer older than an hour of this clock, plus a
+  // source that re-mints inside TOKEN_SAFETY_MS, is what fails this file if
+  // the token is captured again.
+  let clock = 0;
+  /** @type {Array<{token: string, at: number}>} */
+  const issued = [];
+  const fetchImpl = fakeFetch(async (url, init) => {
+    if (String(url).includes("oauth2.googleapis.com/token")) {
+      const token = `ya29.t${issued.length}`;
+      issued.push({ token, at: clock });
+      return { ok: true, status: 200, json: async () => ({ access_token: token, expires_in: 3600 }) };
+    }
+    const bearer = String(init.headers?.authorization ?? "").slice("Bearer ".length);
+    const issue = issued.find((row) => row.token === bearer);
+    if (!issue || clock - issue.at >= 3600_000) {
+      return { ok: false, status: 401, json: async () => ({ error: "invalid_token" }) };
+    }
+    return vertexReply('{"verdict":"pass"}');
+  });
+
+  const j = await judgeFromEnv(
+    { GEMINI_SA_EMAIL: "evals@hcii-plus.iam.gserviceaccount.com", GEMINI_SA_PRIVATE_KEY: TEST_KEY },
+    { fetchImpl, now: () => clock },
+  );
+  assert.equal(issued.length, 1, "startup exchange mints once");
+  assert.deepEqual(await j.judgeCase(CASE, {}), { verdict: "pass" });
+  assert.equal(issued.length, 1, "a live token is reused, not re-exchanged per case");
+
+  // Past the 5-minute safety margin, still inside the hour: the source must
+  // re-mint even though Vertex would still accept the first bearer. That is
+  // the margin, not the expiry.
+  clock = 3600_000 - TOKEN_SAFETY_MS + 1;
+  assert.deepEqual(await j.judgeCase(CASE, {}), { verdict: "pass" });
+  assert.equal(issued.length, 2, "re-minted inside the safety margin rather than capturing the first token");
+
+  // Past the first token's hour. The source's second mint is still young;
+  // a judge that had closed over the first bearer would 401 here.
+  clock = 70 * 60_000;
+  assert.deepEqual(await j.judgeCase(CASE, {}), { verdict: "pass" });
+  assert.equal(issued.length, 2, "the second token still has life; no third mint");
+
+  const captured = vertexJudge({
+    accessToken: async () => issued[0].token,
+    rubric: loadRubric(),
+    model: "m",
+    projectId: "p",
+    fetchImpl,
+  });
+  const skipped = await captured.judgeCase(CASE, {});
+  assert.deepEqual(skipped, { verdict: "skipped", reason: "judge call rejected (HTTP 401)" });
+  assert.ok(!issued.some((row) => skipped.reason.includes(row.token)), "no minted token reaches the skip reason");
+});
+
+test("googleTokenSource reuses inside the margin and re-mints once past it", async () => {
+  let clock = 0;
+  let mints = 0;
+  const fetchImpl = fakeFetch({
+    ok: true,
+    status: 200,
+    json: async () => ({ access_token: `ya29.n${mints++}`, expires_in: 3600 }),
+  });
+  const source = googleTokenSource(
+    { email: "evals@hcii-plus.iam.gserviceaccount.com", privateKey: TEST_KEY },
+    { fetchImpl, now: () => clock },
+  );
+  const first = await source();
+  const again = await source();
+  assert.equal(first, again);
+  assert.equal(mints, 1);
+
+  clock = 3600_000 - TOKEN_SAFETY_MS + 1;
+  const refreshed = await source();
+  assert.notEqual(refreshed, first);
+  assert.equal(mints, 2);
 });

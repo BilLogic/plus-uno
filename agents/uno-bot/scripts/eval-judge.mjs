@@ -31,6 +31,14 @@
 //   2. `judgeTally` counts the verdicts a run actually collected, which the
 //      runner records in the summary and prints beside the score.
 //
+// THE CREDENTIAL IS A SOURCE, NOT A STRING, for the same reason. A Google
+// service-account access token lives one hour and a 34-case run on the grind
+// tier takes about twice that, so the judge below asks for a token PER CASE
+// from a source that re-mints inside a safety margin — the shape the Worker's
+// own Vertex path has always had (src/gemini/auth.ts). Holding the one token
+// the run started with cost run 35360560929 fourteen ungraded cases, every one
+// of them after the sixtieth minute (#657).
+//
 // On the rubric, which this module has always owned: the judge prompt used to
 // carry its own condensed paraphrase of D1–D9 as a string constant in
 // run-evals.mjs, beside the canonical rubric in docs/evals/rubrics/bot-answer.md.
@@ -180,16 +188,32 @@ function b64url(buf) {
   return Buffer.from(buf).toString("base64url");
 }
 
+/** What the token endpoint is taken to have promised when it says nothing. */
+export const DEFAULT_TOKEN_LIFETIME_S = 3600;
+
+/**
+ * How long before expiry a token counts as spent — the Worker's own `SAFETY_MS`
+ * (src/gemini/auth.ts), restated because a .mjs script cannot import the
+ * Worker's TypeScript. One judge case on the grind tier runs for minutes, so a
+ * token that expires during the call was already too old to begin it.
+ */
+export const TOKEN_SAFETY_MS = 5 * 60_000;
+
 /**
  * Exchange a Google service account for an access token (the same
  * signed-JWT-for-bearer pattern as the backfill script).
  *
- * Returns the token; never logs it, and never puts it in an error message —
- * every caller here logs what it failed at, not what it failed with.
+ * Returns the token AND WHEN IT DIES. `expires_in` used to be dropped on the
+ * floor here, which is how the judge came to hold one token across a run longer
+ * than a token lives: an hour of validity against a ~1h 47m suite (#657).
+ *
+ * Never logs the token, and never puts it — or the response body, which can
+ * carry the credential's own details — in an error message. Every caller here
+ * logs what it failed at, not what it failed with.
  *
  * @param {{email: string, privateKey: string}} sa
  * @param {{fetchImpl?: typeof fetch}} [opts]
- * @returns {Promise<string>}
+ * @returns {Promise<{token: string, expiresIn: number}>}
  */
 export async function googleAccessToken({ email, privateKey }, { fetchImpl = fetch } = {}) {
   const now = Math.floor(Date.now() / 1000);
@@ -220,7 +244,34 @@ export async function googleAccessToken({ email, privateKey }, { fetchImpl = fet
   // reads it on Monday to the wrong door. The body can carry the credential's
   // own details, so it stays out of the message.
   if (!res.ok || !data.access_token) throw new Error(`token exchange failed (HTTP ${res.status})`);
-  return data.access_token;
+  const expiresIn = Number(data.expires_in);
+  return { token: data.access_token, expiresIn: expiresIn > 0 ? expiresIn : DEFAULT_TOKEN_LIFETIME_S };
+}
+
+/**
+ * A token SOURCE: mint on demand, reuse the token while it is comfortably
+ * alive, re-mint once inside `TOKEN_SAFETY_MS` of expiry.
+ *
+ * `() => Promise<string>` — the same one-function shape the Worker's
+ * `getGoogleAccessToken(env)` has, and the same cache-and-margin rule, because
+ * the tree should end this with one shape rather than two. What differs is the
+ * cache's scope: the Worker's is per isolate and this one is per source, so a
+ * run holds one and a test holds one per case, and neither can hand a token to
+ * the other.
+ *
+ * @param {{email: string, privateKey: string}} sa
+ * @param {{fetchImpl?: typeof fetch, now?: () => number}} [opts]
+ * @returns {() => Promise<string>} throws what `googleAccessToken` throws: a status, no body
+ */
+export function googleTokenSource({ email, privateKey }, { fetchImpl = fetch, now = Date.now } = {}) {
+  /** @type {{token: string, expiresAt: number}|null} */
+  let cached = null;
+  return async function accessToken() {
+    if (cached && now() < cached.expiresAt - TOKEN_SAFETY_MS) return cached.token;
+    const { token, expiresIn } = await googleAccessToken({ email, privateKey }, { fetchImpl });
+    cached = { token, expiresAt: now() + expiresIn * 1000 };
+    return token;
+  };
 }
 
 // ── The verdicts ──────────────────────────────────────────────────────────────
@@ -309,7 +360,9 @@ export function noJudge(reason = "no credential") {
  * and its transcript as the turn, a strict-JSON verdict back.
  *
  * @param {object} deps
- * @param {string} deps.token - a cloud-platform bearer token
+ * @param {() => Promise<string>} deps.accessToken - a token SOURCE rather than a
+ *   token: asked once per case, so a run that outlives one token keeps grading
+ *   (#657). `googleTokenSource` makes one; a test can pass any thunk.
  * @param {{block: string, ids: string[]}} deps.rubric
  * @param {string} [deps.model]
  * @param {string} [deps.projectId]
@@ -317,7 +370,7 @@ export function noJudge(reason = "no credential") {
  * @param {number} [deps.transcriptChars]
  */
 export function vertexJudge({
-  token,
+  accessToken,
   rubric,
   model = DEFAULT_JUDGE_MODEL,
   projectId = DEFAULT_PROJECT_ID,
@@ -333,6 +386,9 @@ export function vertexJudge({
         const prompt =
           `Case ${c.id} — ${c.name}\nExpectation: ${c.judgeNote}\n\nTranscript (JSON):\n` +
           truncateTranscript(transcript, transcriptChars);
+        // Per case, never captured: whether this is the token the run started
+        // with or its third is the source's business.
+        const token = await accessToken();
         const res = await fetchImpl(url, {
           method: "POST",
           headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
@@ -350,6 +406,14 @@ export function vertexJudge({
             },
           }),
         });
+        // A REJECTED CALL IS NOT UNPARSEABLE OUTPUT. Both used to end in the
+        // one sentence — "unparseable judge output (HTTP 401)", the status
+        // appended to a reason about parsing — so the fourteen cases an expired
+        // token locked out of run 35360560929 read as fourteen cases the model
+        // had babbled through, and the defect hid behind its own report (#657).
+        // The body is not read on this path: a status is the whole of what a
+        // reader needs, and the body can carry the credential's details (#615).
+        if (!res.ok) return judgeSkipped(`judge call rejected (HTTP ${res.status})`);
         const data = await res.json();
         const text = (data.candidates?.[0]?.content?.parts ?? [])
           .filter((p) => p.text && !p.thought)
@@ -358,9 +422,9 @@ export function vertexJudge({
         const m = text && text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
         const parsed = m ? JSON.parse(m) : null;
         if (parsed?.verdict === "pass" || parsed?.verdict === "fail") return parsed;
-        // The status belongs in the reason: an HTTP 429 and a model that
-        // answered in prose are both "unparseable" from here, and they are not
-        // the same problem to go and fix.
+        // Reached only on a 200, now that a rejection has its own reason: the
+        // model answered, and what it said was not a verdict. The status stays
+        // in the sentence anyway, because it is the thing that says so.
         return judgeSkipped(`unparseable judge output (HTTP ${res.status})`);
       } catch (err) {
         return judgeSkipped(String(err?.message ?? err));
@@ -389,29 +453,32 @@ export function truncateTranscript(transcript, max = JUDGE_TRANSCRIPT_CHARS) {
  * be exchanged for a token" rather than a clean sweep.
  *
  * @param {Record<string, string|undefined>} [env]
- * @param {{rubric?: object, fetchImpl?: typeof fetch}} [opts]
+ * @param {{rubric?: object, fetchImpl?: typeof fetch, now?: () => number}} [opts]
  */
-export async function judgeFromEnv(env = process.env, { rubric = loadRubric(), fetchImpl = fetch } = {}) {
+export async function judgeFromEnv(
+  env = process.env,
+  { rubric = loadRubric(), fetchImpl = fetch, now = Date.now } = {},
+) {
   const { GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY, GEMINI_PROJECT_ID, JUDGE_MODEL } = env;
   if (!GEMINI_SA_EMAIL || !GEMINI_SA_PRIVATE_KEY) return noJudge("no credential");
-  // WHY the exchange failed travels with the skip. Swallowing it — which this
-  // line used to do — left an expired service account reporting the same
-  // sentence as one that was never configured.
-  const exchanged = await googleAccessToken(
+  const accessToken = googleTokenSource(
     { email: GEMINI_SA_EMAIL, privateKey: GEMINI_SA_PRIVATE_KEY },
-    { fetchImpl },
-  ).then(
-    (token) => ({ token }),
-    (err) => ({ why: String(err?.message ?? err) }),
+    { fetchImpl, now },
   );
-  if (!exchanged.token) {
-    return noJudge(
-      `credential could not be exchanged for a token${exchanged.why ? `: ${exchanged.why}` : ""}`,
-    );
-  }
-  const { token } = exchanged;
+  // Exchanged once HERE and not held: the source keeps what it minted and
+  // re-mints when a later case finds it near expiry. The exchange still happens
+  // before the first case, because a credential that cannot be exchanged at all
+  // should be a judge that says so in its NAME rather than 34 identical skips.
+  // And WHY it failed travels with it. Swallowing that — which this used to do
+  // — left an expired service account reporting the same sentence as one that
+  // was never configured.
+  const why = await accessToken().then(
+    () => null,
+    (err) => String(err?.message ?? err),
+  );
+  if (why) return noJudge(`credential could not be exchanged for a token: ${why}`);
   return vertexJudge({
-    token,
+    accessToken,
     rubric,
     model: JUDGE_MODEL || DEFAULT_JUDGE_MODEL,
     projectId: GEMINI_PROJECT_ID || DEFAULT_PROJECT_ID,
