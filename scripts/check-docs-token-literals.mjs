@@ -28,12 +28,11 @@
  *              `--font-line-height-*` for a `line-height`, and `--size-*`
  *              otherwise.
  *
- * The token table is read live from `design-system/src/tokens/*.scss` — the
- * same files `scripts/generate-token-registry.mjs` validates every
- * `var(--token)` in the Figma mapping against, which makes it the existence
- * truth for tokens in this repo. Aliases are resolved transitively, so
- * `--size-card-gap-md → --size-spacing-medium-space-300 → 16px` all index at
- * 16px and the report can offer the semantic name rather than the primitive.
+ * The token table is `tokenCorpus` (#620): one read, aliases followed, family
+ * from the name, colour and dimension keys from the same module. This check
+ * used to carry its own copies of all four; they disagreed with `parseColour`
+ * on alpha and with each other on a bare `0`. Indexing still prefers the
+ * semantic name over the primitive `_primitives.scss` bans.
  *
  * WHAT HAPPENS WHEN A TOKEN MOVES. There is no baseline file and no snapshot.
  * Adding a token whose value equals a literal already in the docs stylesheet
@@ -134,7 +133,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { TOKEN_DIR, familyOf } from '../design-system/src/lib/tokens-node.mjs';
+import { resolveToken } from '../design-system/src/lib/tokens.mjs';
+import {
+  TOKEN_DIR,
+  colourKey,
+  dimensionKey,
+  familyOf,
+  tokenCorpus,
+} from '../design-system/src/lib/tokens-node.mjs';
 import { documents } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
@@ -160,78 +166,17 @@ const PRIMITIVES_FILE = '_primitives.scss';
 
 // ── the token table ─────────────────────────────────────────────────────────
 
-/** `--name: value` across the token SCSS, first definition wins (`:root` order). */
-function readTokenDefinitions(dir = tokensDir(), repoRoot = REPO_ROOT) {
-  const defs = new Map();
-  if (!fs.existsSync(dir)) return defs;
-  for (const rel of documents(`${path.relative(repoRoot, dir)}/*.scss`, { root: repoRoot, ext: ['.scss'] })) {
-    const file = path.basename(rel);
-    const source = fs.readFileSync(path.join(repoRoot, rel), 'utf8');
-    for (const m of source.matchAll(/(--[\w-]+)\s*:\s*([^;{}]+);/g)) {
-      if (!defs.has(m[1])) defs.set(m[1], { value: m[2].trim(), file });
-    }
-  }
-  return defs;
-}
-
-/** Follow `var(--other)` aliases to the literal at the end. Cycle-safe. */
-function terminal(name, defs, seen = new Set()) {
-  if (seen.has(name)) return null;
-  seen.add(name);
-  const def = defs.get(name);
-  if (!def) return null;
-  const alias = def.value.match(/^var\(\s*(--[\w-]+)\s*\)$/);
-  return alias ? terminal(alias[1], defs, seen) : def.value;
-}
-
-/** `12px` / `0.75rem` / `140%` → a comparable key. `rem` is 16px, and only 16px. */
-export function dimensionKey(literal) {
-  const m = /^(-?\d*\.?\d+)(px|rem|%)$/.exec(literal.trim().toLowerCase());
-  if (!m) return null;
-  const n = parseFloat(m[1]);
-  if (m[2] === '%') return `${n}%`;
-  return `${m[2] === 'rem' ? n * 16 : n}px`;
-}
-
-/** `#ABC` → `#aabbcc`; `rgba( 0 , 0 ,0, .5 )` → `rgba(0,0,0,0.5)`. */
-export function colourKey(literal) {
-  const v = literal.trim().toLowerCase();
-  const hex = /^#([0-9a-f]{3,8})$/.exec(v);
-  if (hex) {
-    const h = hex[1];
-    if (h.length === 3 || h.length === 4) return `#${[...h].map((c) => c + c).join('')}`;
-    if (h.length === 6 || h.length === 8) return `#${h}`;
-    return null;
-  }
-  const fn = /^(rgba?|hsla?)\(([^)]*)\)$/.exec(v);
-  if (!fn) return null;
-  const parts = fn[2]
-    .split(/[,/]/)
-    .map((p) => p.trim())
-    .filter(Boolean)
-    .map((p) => (/^\.\d/.test(p) ? `0${p}` : p));
-  return `${fn[1]}(${parts.join(',')})`;
-}
-
 /**
- * The four families this check knows how to offer, keyed by what a literal in
- * that position could actually be replaced with. Families outside this list are
- * limitation 5 in the header.
+ * Index token names by comparable value. `defs` is injected so the tests can
+ * run against a stub table; production reads `tokenCorpus`.
  *
- * WHICH FAMILY A NAME IS IN is not decided here. `familyOf` (#620) is the one
- * statement of that, longest prefix first, and these four keys are its answers
- * — so the ladder this replaced could disagree with the module about
- * `--font-line-height-*` and nothing would have said so. What stays this
- * check's is WHICH of the families it offers, which is a judgement about its
- * report and not about token names.
+ * Family comes from `familyOf`. Alias follow and the colour/dimension keys
+ * come from the tokens module. What stays this check's is WHICH of the
+ * families it offers — limitation 5 in the header.
  *
- * MEASURED, not assumed (#621): over the 494 live tokens the ladder and
- * `familyOf` bucket every name identically, and the check's output is
- * unchanged by the move. The one name they would read differently is a bare
- * `--color-`, which `familyOf` refuses because a family is not a token; no
- * such declaration exists.
+ * @param {Map<string, {value: string, file: string}>} [defs]
  */
-export function buildTokenIndex(defs = readTokenDefinitions()) {
+export function buildTokenIndex(defs = new Map()) {
   const index = {
     colour: new Map(),
     'font-size': new Map(),
@@ -243,9 +188,10 @@ export function buildTokenIndex(defs = readTokenDefinitions()) {
     index[bucket].get(key).push({ name, primitive: file === PRIMITIVES_FILE });
   };
 
+  const values = new Map([...defs].map(([name, def]) => [name, def.value]));
   for (const [name, def] of defs) {
-    const value = terminal(name, defs);
-    if (!value) continue;
+    const value = resolveToken(name, values);
+    if (value === undefined) continue;
     const bucket = familyOf(name);
     if (!bucket || !(bucket in index)) continue;
     const key = bucket === 'colour' ? colourKey(value) : dimensionKey(value);
@@ -436,7 +382,11 @@ const cssFiles = (dir, repoRoot = REPO_ROOT) =>
  */
 const inputs = byRoot((repoRoot) => {
   const tokens = tokensDir(repoRoot);
-  const index = buildTokenIndex(readTokenDefinitions(tokens, repoRoot));
+  const corpus = tokenCorpus({ root: repoRoot, precedence: 'first' });
+  const defs = new Map(
+    [...corpus].map(([name, entry]) => [name, { value: entry.raw, file: entry.file }]),
+  );
+  const index = buildTokenIndex(defs);
   return {
     styleDir: docsStyleDir(repoRoot),
     tokensDir: tokens,

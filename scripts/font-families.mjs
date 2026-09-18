@@ -36,6 +36,12 @@
  * is a safety net, not a duplicate.
  */
 
+import {
+  resolveToken,
+  tokenDeclarationPattern,
+  varReferencePattern,
+} from '../design-system/src/lib/tokens.mjs';
+
 /** The CSS generic families a stack may legally end in. */
 export const GENERICS = new Set([
   'serif',
@@ -65,21 +71,41 @@ export function stack(value) {
 export function familyTokens(files) {
   const out = new Map();
   for (const { path: file, text } of files) {
-    for (const m of text.matchAll(/(--font-family-[a-z0-9-]+)\s*:\s*([^;\n]+);/g)) {
+    for (const m of text.matchAll(tokenDeclarationPattern('--font-family-'))) {
       out.set(m[1], { value: m[2].trim(), file, line: text.slice(0, m.index).split('\n').length });
     }
   }
   return out;
 }
 
-/** Every `var(--font-family-*, …)` in the corpus. */
+/**
+ * Every `var(--font-family-*, …)` in the corpus. The name is the module's
+ * `varReferencePattern`; the fallback is the rest of that `var()` call, so a
+ * nested `var()` inside it is one allowance and not a truncated name.
+ *
+ * @param {{path: string, text: string}[]} files
+ */
 export function familyFallbacks(files) {
   const out = [];
   for (const { path: file, text } of files) {
-    for (const m of text.matchAll(/var\(\s*(--font-family-[a-z0-9-]+)\s*,\s*([^)]*)\)/g)) {
+    for (const m of text.matchAll(varReferencePattern('--font-family-'))) {
+      let i = m.index + m[0].length;
+      while (i < text.length && /\s/.test(text[i])) i += 1;
+      if (text[i] !== ',') continue;
+      i += 1;
+      let depth = 1;
+      let j = i;
+      while (j < text.length && depth > 0) {
+        if (text[j] === '(') depth += 1;
+        else if (text[j] === ')') {
+          depth -= 1;
+          if (depth === 0) break;
+        }
+        j += 1;
+      }
       out.push({
         token: m[1],
-        fallback: m[2].trim(),
+        fallback: text.slice(i, j).trim(),
         file,
         line: text.slice(0, m.index).split('\n').length,
       });
@@ -89,18 +115,17 @@ export function familyFallbacks(files) {
 }
 
 /**
- * Resolve a token to its own stack, following `var(--font-family-x)` aliases
- * within the token set. `null` when it cannot be resolved — an alias out of the
- * set, or a cycle.
+ * Resolve a token to its own stack, following aliases through `resolveToken`.
+ * `null` when it cannot be resolved — an alias out of the set, or a cycle.
+ *
+ * @param {string} name
+ * @param {Map<string, {value: string}>} tokens
+ * @returns {string[]|null}
  */
-export function resolve(name, tokens, seen = new Set()) {
-  if (seen.has(name)) return null;
-  seen.add(name);
-  const entry = tokens.get(name);
-  if (!entry) return null;
-  const alias = /^var\(\s*(--font-family-[a-z0-9-]+)\s*\)$/.exec(entry.value);
-  if (alias) return resolve(alias[1], tokens, seen);
-  return stack(entry.value);
+export function resolve(name, tokens) {
+  const values = new Map([...tokens].map(([n, entry]) => [n, entry.value]));
+  const literal = resolveToken(name, values);
+  return literal === undefined ? null : stack(literal);
 }
 
 const wantsMono = (name) => /(^|-)(code|mono|monospace)(-|$)/.test(name);
@@ -139,8 +164,10 @@ export function failures(files) {
   // 3. The inline fallbacks.
   for (const use of familyFallbacks(files)) {
     const where = `${use.file}:${use.line} — var(${use.token}, …)`;
-    // An alias to another token is a fallback that cannot disagree.
-    if (/^var\(\s*--font-family-[a-z0-9-]+\s*\)?$/.test(use.fallback)) continue;
+    // An alias to another family token is a fallback that cannot disagree.
+    if (new RegExp(`^${varReferencePattern('--font-family-').source}\\s*\\)?$`).test(use.fallback)) {
+      continue;
+    }
 
     const given = stack(use.fallback);
     const last = given[given.length - 1];

@@ -16,13 +16,13 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
+import { tokenDeclarationPattern, varReferencePattern } from '../design-system/src/lib/tokens.mjs';
+import { TOKEN_DIR, tokenSources } from '../design-system/src/lib/tokens-node.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const MD_SOURCE = path.join(REPO_ROOT, 'design-system/guidelines/figma/token-mapping.md');
 const VARIABLES_SNAPSHOT = path.join(REPO_ROOT, 'scripts/figma-variables-snapshot.json');
-const TOKENS_DIR = path.join(REPO_ROOT, TOKEN_DIR);
 const OUT = path.join(REPO_ROOT, 'design-system/figma/token-registry.json');
 
 const STATIC = {
@@ -35,11 +35,10 @@ const STATIC = {
 /** All `--token` names defined across the SCSS token files (existence truth). */
 function collectScssTokens() {
   const set = new Set();
-  if (!fs.existsSync(TOKENS_DIR)) return set;
-  for (const file of fs.readdirSync(TOKENS_DIR)) {
-    if (!file.endsWith('.scss')) continue;
-    const content = fs.readFileSync(path.join(TOKENS_DIR, file), 'utf8');
-    for (const m of content.matchAll(/(--[\w-]+)\s*:/g)) set.add(m[1]);
+  for (const source of tokenSources()) {
+    for (const [, name] of source.text.matchAll(tokenDeclarationPattern())) {
+      set.add(name);
+    }
   }
   return set;
 }
@@ -60,11 +59,37 @@ function expandBraces(str) {
   return out;
 }
 
+/**
+ * Interior of each `var(...)` in a mapping cell. The opening `var(` and the
+ * grammar-legal name prefix are the module's `varReferencePattern`; the rest
+ * of the call is walked because the mapping DSL writes brace groups
+ * (`--size-card-gap-{sm|md}`) that are not token characters and that
+ * `expandBraces` expands before the name is checked against SCSS.
+ *
+ * @param {string} cell
+ * @returns {string[]}
+ */
+function varInteriors(cell) {
+  const out = [];
+  for (const m of cell.matchAll(varReferencePattern())) {
+    let depth = 1;
+    let j = m.index + 4;
+    while (j < cell.length && depth > 0) {
+      if (cell[j] === '(') depth += 1;
+      else if (cell[j] === ')') {
+        depth -= 1;
+        if (depth === 0) break;
+      }
+      j += 1;
+    }
+    out.push(cell.slice(m.index + 4, j).trim());
+  }
+  return out;
+}
+
 /** Pull every `var(--...)` inner token name from a markdown cell. */
 function tokensInCell(cell) {
-  const out = [];
-  for (const m of cell.matchAll(/var\((--[^)]+)\)/g)) out.push(m[1]);
-  return out;
+  return varInteriors(cell);
 }
 
 /** Parse markdown into tables tagged with their nearest heading. */
@@ -235,7 +260,7 @@ function build() {
       } else if (h.includes('typograph')) {
         typography[label] = cellTokens.map((t) => `var(${t})`);
       } else if (h.includes('spacing')) {
-        spacing[label] = row[1].match(/var\([^)]+\)/)?.[0] || `var(${cellTokens[0]})`;
+        spacing[label] = `var(${cellTokens[0]})`;
       } else if (h.includes('elevation')) {
         elevation[label] = `var(${cellTokens[0]})`;
       }

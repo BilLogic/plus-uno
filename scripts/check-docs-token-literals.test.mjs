@@ -27,8 +27,6 @@ import assert from 'node:assert/strict';
 import {
   buildTokenIndex,
   findings,
-  colourKey,
-  dimensionKey,
   blankFallbacks,
   alwaysAllowed,
   run,
@@ -215,29 +213,7 @@ test('11. token families outside colour / font-size / line-height / size are not
   assert.deepEqual(literals(rule('  width: 164px;')), []);
 });
 
-test('12. an alias chain resolves to the literal at its end', () => {
-  // `--size-section-gap-md → --size-spacing-medium-space-300 → 16px`. Without
-  // this, only the primitives would ever be offered and the report would send
-  // people straight at the tokens marked DO NOT USE DIRECTLY.
-  assert.ok(index.size.get('16px').some((t) => t.name === '--size-section-gap-md'));
-});
-
-test('12b. a cyclic alias does not hang the build', () => {
-  const cyclic = new Map([
-    ['--size-a', { value: 'var(--size-b)', file: '_x.scss' }],
-    ['--size-b', { value: 'var(--size-a)', file: '_x.scss' }],
-  ]);
-  assert.deepEqual([...buildTokenIndex(cyclic).size.keys()], []);
-});
-
-test('unit — the normalisers agree with the shapes the corpus actually contains', () => {
-  assert.equal(dimensionKey('0.625rem'), '10px');
-  assert.equal(dimensionKey('12PX'), '12px');
-  assert.equal(dimensionKey('140%'), '140%');
-  assert.equal(dimensionKey('5vw'), null);
-  assert.equal(colourKey('#FFF'), '#ffffff');
-  assert.equal(colourKey('rgba( 0 , 0 ,0 , .38 )'), 'rgba(0,0,0,0.38)');
-  assert.equal(colourKey('transparent'), null);
+test('unit — the allowances and the fallback blanker', () => {
   assert.equal(blankFallbacks('var(--a, #fff)').includes('#fff'), false);
   assert.equal(blankFallbacks('var(--a)'), 'var(--a)');
   assert.equal(alwaysAllowed('1px'), true);
