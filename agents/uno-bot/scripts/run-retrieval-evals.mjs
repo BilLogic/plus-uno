@@ -11,6 +11,37 @@
 // which is the only question that can tell you whether a retrieval change
 // helped.
 //
+// WHAT IT SHARES WITH THE TURN SUITE, AND WHAT IT DOES NOT (#619). This runner
+// used to re-implement the parts of a run that have nothing to do with
+// retrieval: its own row literals, its own tallies, its own `writeFileSync`,
+// its own `process.exit(1)`. Those are now the eval suite's shared machinery:
+//
+//   * THE ROW ENVELOPE — `eval-results.mjs` `rowShape`. A row carries the
+//     shared verdict spine (`id`/`blocker`/`skipped`/`pass`/`failures`) plus
+//     the keys declared below, every key is filled, and a key outside the
+//     vocabulary throws instead of vanishing into the artifact.
+//   * THE SUMMARY SPINE — `summaryOf`. The date, the fixture stamp and every
+//     tally, counted off the rows.
+//   * THE GATE AND THE EXIT — `findingsFor` rendered by `scripts/lib/findings.mjs`
+//     `report`. A failed blocker is an error and exits 1; a failed diagnostic is
+//     a warning that prints and does not fail the job, which is the rule this
+//     file used to spell by hand.
+//   * THE WRITE — the shared artifact writer, which also says where it wrote.
+//
+// WHAT STAYS HERE, deliberately: the measurements and the fixture shape. A
+// retrieval row records a rank, a retrieval path, a subrequest count and the
+// embedding model; a turn row records samples, a judge verdict and a
+// transcript. And the FIXTURE is a different document — a bare array of
+// `class`/`q`/`k`/`expect*` cases with no turns and no judge note — so its
+// shape, its validation and its loader are below rather than in
+// `eval-case.mjs`. #616's `CASE_KEYS`/`loadCases` stay the turn suite's: the
+// keys overlap in `id` and `blocker` and in none of the assertions, and every
+// rule `loadCases` enforces (a `name`, a `judgeNote`, at least one turn) is a
+// turn-case rule. Parameterising them would leave a shared `JSON.parse` calling
+// somebody else's validator. What IS shared is the DISCIPLINE, applied here to
+// this fixture: a misspelt `expectCellIds` would leave a case that still runs,
+// still passes and asserts nothing, so `loadRetrievalCases` refuses it.
+//
 // Scoring per case (k is per-case, from the fixture):
 //   expectCellIds      — ANY of these ids within top-k        (hit)
 //   expectAllCellIds   — ALL of these ids within top-k
@@ -28,24 +59,41 @@
 //   WORKER_URL   e.g. the Worker origin (scripts/worker-url.mjs, or UNO_BOT_WORKER_URL)
 //   DEBUG_TOKEN  the Worker's /debug/* gate token
 // Optional:
-//   CASES_PATH   default docs/evals/fixtures/blueprint-retrieval-cases.json
-//   OUT_PATH     default retrieval-eval-results.json (gitignored working output)
+//   CASES_PATH   another fixture. THE fixture needs no path: it is resolved
+//                from this file (`RETRIEVAL_FIXTURE_PATH`), so no caller
+//                repeats it and none can state a stale one (#616's rule for
+//                the turn fixture, and the reason the documented command below
+//                used to read the wrong one from `agents/uno-bot`).
+//   OUT_PATH     default retrieval-eval-results.json, written relative to the
+//                working directory — the npm script runs from the repository
+//                root, where the workflow uploads it from
 //   BASELINE     path to a previous results file; prints a per-class delta
 //
 // Run:  npm run evals:retrieval           (from agents/uno-bot)
-//       npm run evals:retrieval:selftest  (no network — pins the scorer itself)
+//       npm run evals:retrieval:selftest  (no network — pins the scorer and the
+//                                          fixture's shape, so a pull request
+//                                          with no deployment still measures
+//                                          something)
 //
 // BASELINE CONVENTION: the working output is gitignored, like eval-results.json.
 // A run worth keeping gets copied to docs/evals/runs/YYYY-MM-DD-retrieval-*.json
-// and committed — that is what BASELINE points at. Phase 2 must not start
-// before one exists, or there is nothing to have improved on.
+// and committed — that is what BASELINE points at. Two exist:
+// `2026-08-19-retrieval-baseline.json` and `2026-08-19-retrieval-after-hybrid.json`,
+// the latter 26/26 with recall 1.000, which is the score to compare against.
+// The comparison reads `summary.byClass`, so a run recorded before this file
+// grew its fixture stamp is still readable as a baseline.
 
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { isEntry, report } from "../../../scripts/lib/findings.mjs";
+import { fixtureStamp } from "./eval-case.mjs";
+import { findingsFor, rowShape, summaryOf, writeResults } from "./eval-results.mjs";
 
 const {
   WORKER_URL,
   DEBUG_TOKEN,
-  CASES_PATH = "docs/evals/fixtures/blueprint-retrieval-cases.json",
+  CASES_PATH,
   OUT_PATH = "retrieval-eval-results.json",
   BASELINE,
   // Score a CANDIDATE search function instead of the live one.
@@ -76,6 +124,13 @@ const {
 
 const REQUEST_TIMEOUT_MS = 30_000;
 
+/** The repository's retrieval fixture, from this file — so no caller repeats
+ *  the path, and a run from any working directory measures the same document. */
+export const RETRIEVAL_FIXTURE_PATH = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  "../../../docs/evals/fixtures/blueprint-retrieval-cases.json",
+);
+
 function required(name, v) {
   if (!v) {
     console.error(`missing env ${name}`);
@@ -83,6 +138,122 @@ function required(name, v) {
   }
   return v;
 }
+
+// ── The fixture: its shape, and its one loader ────────────────────────────────
+
+/** The keys that make a retrieval case ASSERT something. A case with none of
+ *  them runs, passes and measures nothing, which is the worst kind of eval
+ *  bug — so the loader refuses it. Every one of them is scored by `scoreCase`. */
+export const RETRIEVAL_ASSERTION_KEYS = [
+  "expectCellIds",
+  "expectAllCellIds",
+  "expectPath",
+  "expectScenario",
+  "expectMatchedByOnly",
+  "expectTopScoreBelow",
+];
+
+/** Everything a retrieval case may say. Anything else is a typo, named rather
+ *  than ignored — `expectCellIDs` would otherwise assert nothing in silence. */
+export const RETRIEVAL_CASE_KEYS = [
+  "id",
+  /** Which retrieval behaviour the case exercises; the rollup groups by it. */
+  "class",
+  /** Whether a failure here fails the run. The rest are diagnostics. */
+  "blocker",
+  /** The top-k the case is scored on, per case. */
+  "k",
+  /** The question, as a person would type it. */
+  "q",
+  /** How many rows must satisfy `expectPath`/`expectScenario`. */
+  "minMatches",
+  /** Why this case is the case it is, and where its ids were read from. */
+  "note",
+  ...RETRIEVAL_ASSERTION_KEYS,
+];
+
+/** Everything wrong with one case, as sentences — empty when it is well formed.
+ *  Returned rather than thrown so one run names every bad case (`eval-case.mjs`
+ *  `problemsWithCase`, same reason: three typos should take one run to fix). */
+export function problemsWithRetrievalCase(c, where = "case") {
+  if (!c || typeof c !== "object" || Array.isArray(c)) return [`${where} is not an object`];
+  const at = typeof c.id === "string" && c.id.trim() ? c.id : where;
+  const problems = [];
+  if (typeof c.id !== "string" || !c.id.trim()) problems.push(`${where} has no 'id'`);
+  if (typeof c.q !== "string" || !c.q.trim()) problems.push(`${at} has no query 'q'`);
+  if (typeof c.class !== "string" || !c.class.trim()) problems.push(`${at} has no 'class'`);
+  for (const k of Object.keys(c)) {
+    if (!RETRIEVAL_CASE_KEYS.includes(k)) problems.push(`${at} carries unknown key '${k}'`);
+  }
+  if (!RETRIEVAL_ASSERTION_KEYS.some((k) => k in c)) {
+    problems.push(`${at} asserts nothing (expected one of ${RETRIEVAL_ASSERTION_KEYS.join(", ")})`);
+  }
+  return problems;
+}
+
+/**
+ * The retrieval fixture, validated. The one reader of it.
+ *
+ * The array's first member carries only `_readme` — the fixture's own prose
+ * about how to run it — and is separated out here rather than skipped by a
+ * `filter(c => c.id)` that would equally skip a case whose id was misspelt away.
+ *
+ * @param {string} [path]
+ * @returns {{path: string, cases: object[], readme: string}}
+ */
+export function loadRetrievalCases(path = RETRIEVAL_FIXTURE_PATH) {
+  let raw;
+  try {
+    raw = JSON.parse(readFileSync(path, "utf8"));
+  } catch (err) {
+    throw new Error(`${path}: cannot be read as JSON — ${err.message}`);
+  }
+  if (!Array.isArray(raw)) throw new Error(`${path}: is not an array of cases`);
+  const readme = raw.find((c) => typeof c?._readme === "string" && Object.keys(c).length === 1);
+  const cases = raw.filter((c) => c !== readme);
+  if (!cases.length) throw new Error(`${path}: holds no cases`);
+
+  const problems = cases.flatMap((c, i) => problemsWithRetrievalCase(c, `case ${i + 1}`));
+  const ids = cases.map((c) => c?.id).filter(Boolean);
+  for (const id of new Set(ids)) {
+    if (ids.filter((x) => x === id).length > 1) problems.push(`case id '${id}' appears twice`);
+  }
+  if (problems.length) throw new Error(`${path}:\n  - ${problems.join("\n  - ")}`);
+
+  return { path, cases, readme: readme?._readme ?? "" };
+}
+
+// ── The row: the shared spine, plus what RETRIEVAL measured ───────────────────
+
+/**
+ * `reasons` was this file's word for what the spine calls `failures`, and the
+ * spine's word wins: the gate reads that key on both suites. A results file
+ * written before #619 carries `reasons`; the per-class rollup a baseline is
+ * compared on does not touch either, so the recorded baselines stay readable.
+ */
+export const { keys: RETRIEVAL_RESULT_KEYS, row: retrievalRow } = rowShape("retrieval results", {
+  /** Which class of retrieval behaviour, and what was asked. */
+  class: null,
+  q: "",
+  /** 1-based rank of the first matching row, or 0 when nothing matched. */
+  rank: 0,
+  /** Which arm answered, and how strong its best match was. `top_score` is
+   *  only present on semantic results, so `null` is "no similarity to judge". */
+  retrieval: null,
+  top_score: null,
+  /** What the query cost: rows returned, subrequests spent, wall time. */
+  rows: 0,
+  subrequests: null,
+  ms: null,
+  /** What the WORKER says it embedded with, not what was asked for. A
+   *  deployment that predates the parameter ignores it silently, and this is
+   *  the field that shows that: the live model comes back where the candidate
+   *  was requested, instead of a run that looks like a candidate measurement
+   *  and is not one. */
+  embedModel: null,
+  /** The judged window, for eyeballing a miss without re-running by hand. */
+  top: [],
+});
 
 /** One query against the live Worker. Never throws — a transport failure is a
  *  RESULT ("this case errored"), not a crash that loses the other 25 cases. */
@@ -116,7 +287,7 @@ function rankOf(rows, pred) {
   return 0;
 }
 
-function scoreCase(c, res) {
+export function scoreCase(c, res) {
   if (!res.ok) return { pass: false, rank: 0, reasons: [`request failed: ${res.error}`] };
 
   const k = c.k ?? 10;
@@ -246,70 +417,130 @@ function selfTest() {
   check("transport failure is not a pass",
     scoreCase({ k: 5, expectCellIds: ["a"] }, { ok: false, error: "boom" }).pass === false);
 
+  // THE FIXTURE AND THE ENVELOPE, offline (#619). The scorer is one half of the
+  // instrument; the other half is that the fixture says what it means to say
+  // and the artifact records it. Both are checkable with no Worker, which is
+  // the whole point of running this step before the scored one.
+  const raises = (fn, re) => {
+    try {
+      fn();
+      return false;
+    } catch (err) {
+      return re.test(err.message);
+    }
+  };
+  const good = { id: "X1", class: "paraphrase", q: "a question", expectCellIds: ["a"] };
+
+  check("the repository's fixture loads and every case is well formed",
+    loadRetrievalCases().cases.length > 0);
+  check("the fixture's _readme is separated, not scored as a case",
+    loadRetrievalCases().cases.every((c) => c.id) && loadRetrievalCases().readme.length > 0);
+  check("a misspelt assertion key is named rather than ignored",
+    problemsWithRetrievalCase({ ...good, expectCellIDs: ["a"] })
+      .some((p) => p.includes("unknown key 'expectCellIDs'")));
+  check("a case that asserts nothing is refused",
+    problemsWithRetrievalCase({ id: "X1", class: "paraphrase", q: "a question" })
+      .some((p) => p.includes("asserts nothing")));
+  check("a case with no query is refused",
+    problemsWithRetrievalCase({ id: "X1", class: "paraphrase", expectCellIds: ["a"] })
+      .some((p) => p.includes("no query 'q'")));
+  check("a well-formed case has no problems", problemsWithRetrievalCase(good).length === 0);
+  check("the fixture's own shape is the vocabulary the scorer reads",
+    RETRIEVAL_ASSERTION_KEYS.every((k) => RETRIEVAL_CASE_KEYS.includes(k)));
+
+  check("a results row carries the same keys whichever branch wrote it",
+    [retrievalRow({ id: "X1" }), retrievalRow({ id: "X2", pass: true, rank: 1, ms: 40 })]
+      .every((r) => JSON.stringify(Object.keys(r)) === JSON.stringify(RETRIEVAL_RESULT_KEYS)));
+  check("a key outside the row's vocabulary is refused, not written",
+    raises(() => retrievalRow({ id: "X1", reasons: ["typo'd key"] }), /unknown key 'reasons'/));
+  check("a summary with no fixture stamp is refused",
+    raises(() => summaryOf([retrievalRow({ id: "X1" })], {}), /must carry its fixture stamp/));
+  check("a run's summary counts its blocker failures off the rows",
+    summariseRetrieval([
+      retrievalRow({ id: "X1", class: "paraphrase", blocker: true, pass: false, failures: ["miss"] }),
+      retrievalRow({ id: "X2", class: "paraphrase", pass: true, rank: 1 }),
+    ]).blockerFailures === 1);
+  check("a failed blocker is an error and a failed diagnostic a warning",
+    (() => {
+      const findings = findingsFor(summariseRetrieval([
+        retrievalRow({ id: "X1", class: "paraphrase", blocker: true, pass: false, failures: ["miss"] }),
+        retrievalRow({ id: "X2", class: "absence", pass: false, failures: ["diag"] }),
+      ]));
+      return findings.length === 2 &&
+        findings[0].message === "BLOCKER X1: miss" &&
+        findings[1].severity === "warning";
+    })());
+  check("a summary carries the fixture it measured against",
+    /^[0-9a-f]{12}$/.test(summariseRetrieval([retrievalRow({ id: good.id })]).fixture.sha256));
+
   const failed = checks.filter((c) => !c.pass);
   for (const c of checks) console.log(`  ${c.pass ? "ok" : "FAIL"}  ${c.name}`);
   console.log(`\n[self-test] ${checks.length - failed.length}/${checks.length} passed`);
   process.exit(failed.length ? 1 : 0);
 }
 
-if (process.argv.includes("--self-test")) selfTest();
+if (isEntry(import.meta.url) && process.argv.includes("--self-test")) selfTest();
 
-async function main() {
-  required("WORKER_URL", WORKER_URL);
-  required("DEBUG_TOKEN", DEBUG_TOKEN);
-
-  const cases = JSON.parse(readFileSync(CASES_PATH, "utf8")).filter((c) => c.id);
-  console.log(`[retrieval] ${cases.length} cases against ${WORKER_URL}\n`);
-
+// ── The walk ──────────────────────────────────────────────────────────────────
+/**
+ * Every case, queried and scored, as rows.
+ *
+ * The instrument is an ARGUMENT, as the turn suite's transport is: `search`
+ * takes a query and answers `{ ok, rows, ... }`, so the walk can be driven from
+ * canned answers with no Worker and no deployment. Nothing here writes a file
+ * or exits a process — `main` below does both.
+ *
+ * @param {{cases: object[], search: (q: string) => Promise<object>, log?: Function}} deps
+ */
+export async function walkRetrieval({ cases, search, log = console.log }) {
   const results = [];
   for (const c of cases) {
     const res = await search(c.q);
     const { pass, rank, reasons } = scoreCase(c, res);
-    results.push({
-      id: c.id,
-      class: c.class,
-      blocker: !!c.blocker,
-      q: c.q,
-      pass,
-      rank,
-      reasons,
-      retrieval: res.retrieval ?? null,
-      top_score: res.top_score ?? null,
-      rows: res.rows?.length ?? 0,
-      subrequests: res.subrequests ?? null,
-      ms: res.ms ?? null,
-      // What the WORKER says it embedded with, not what was asked for. A
-      // deployment that predates the parameter ignores it silently, and this
-      // is the field that shows that: the live model comes back where the
-      // candidate was requested, instead of a run that looks like a candidate
-      // measurement and is not one.
-      embedModel: res.embed_model ?? null,
-      // Keep the judged window for eyeballing a miss without re-running by
-      // hand. `k`, not 3: a case is scored on top-k, and recording fewer rows
-      // than were judged means a miss cannot be diagnosed from the artifact —
-      // which is exactly what happened when the `Lane:` breadcrumb re-embed
-      // moved BR3 and BR4 (plus-uno-blueprint#154).
-      //
-      // `r.lane`, not `r.layer`: the RPC's output column was renamed by
-      // 20260820120100 and this line was not, so every artifact since has
-      // recorded `undefined` — dropped silently by JSON.stringify, so the
-      // field simply vanished rather than reading as wrong.
-      top: (res.rows ?? []).slice(0, c.k ?? 10).map((r) => ({
-        id: r.id, scenario: r.scenario, path: r.path, step: r.step, lane: r.lane, score: r.score,
-      })),
-    });
+    results.push(
+      retrievalRow({
+        id: c.id,
+        class: c.class,
+        blocker: !!c.blocker,
+        q: c.q,
+        pass,
+        rank,
+        failures: reasons,
+        retrieval: res.retrieval ?? null,
+        top_score: res.top_score ?? null,
+        rows: res.rows?.length ?? 0,
+        subrequests: res.subrequests ?? null,
+        ms: res.ms ?? null,
+        embedModel: res.embed_model ?? null,
+        // Keep the judged window for eyeballing a miss without re-running by
+        // hand. `k`, not 3: a case is scored on top-k, and recording fewer rows
+        // than were judged means a miss cannot be diagnosed from the artifact —
+        // which is exactly what happened when the `Lane:` breadcrumb re-embed
+        // moved BR3 and BR4 (plus-uno-blueprint#154).
+        //
+        // `r.lane`, not `r.layer`: the RPC's output column was renamed by
+        // 20260820120100 and this line was not, so every artifact since has
+        // recorded `undefined` — dropped silently by JSON.stringify, so the
+        // field simply vanished rather than reading as wrong.
+        top: (res.rows ?? []).slice(0, c.k ?? 10).map((r) => ({
+          id: r.id, scenario: r.scenario, path: r.path, step: r.step, lane: r.lane, score: r.score,
+        })),
+      }),
+    );
     const tag = pass ? "PASS" : c.blocker ? "FAIL" : "diag";
-    console.log(
+    log(
       `[${tag}] ${c.id} (${c.class}) rank=${rank || "-"} ` +
         `retrieval=${res.retrieval ?? "?"} sub=${res.subrequests ?? "?"} ${res.ms ?? "?"}ms` +
         `${reasons.length ? ` — ${reasons.join("; ")}` : ""}`,
     );
   }
+  return results;
+}
 
-  // ── Per-class rollup ────────────────────────────────────────────────────────
-  const classes = [...new Set(results.map((r) => r.class))];
+/** The per-class rollup: recall, and MRR over the rank of the first hit. */
+export function rollupByClass(results) {
   const byClass = {};
-  for (const cls of classes) {
+  for (const cls of [...new Set(results.map((r) => r.class))]) {
     const rs = results.filter((r) => r.class === cls);
     const hits = rs.filter((r) => r.pass);
     // MRR over cases that produced a rank; a miss contributes 0, which is the
@@ -322,63 +553,113 @@ async function main() {
       mrr: Number(mrr.toFixed(3)),
     };
   }
+  return byClass;
+}
 
-  const blockers = results.filter((r) => r.blocker);
-  const blockerFails = blockers.filter((r) => !r.pass);
+/**
+ * This run, as one object. The tallies, the date and the fixture stamp are the
+ * shared spine (`eval-results.mjs` `summaryOf`); everything named here is what
+ * RETRIEVAL measured, and with what.
+ *
+ * @param {object[]} results
+ * @param {{casesPath?: string, worker?: string, rpc?: string, embedModel?: string}} opts
+ */
+export function summariseRetrieval(results, { casesPath = RETRIEVAL_FIXTURE_PATH, worker, rpc, embedModel } = {}) {
   const subs = results.map((r) => r.subrequests).filter((n) => typeof n === "number");
-  const summary = {
-    ranAt: new Date().toISOString(),
-    worker: WORKER_URL,
+  const passed = results.filter((r) => r.pass).length;
+  return summaryOf(results, {
+    // WHAT WAS MEASURED, AGAINST WHAT — the stamp this file had no answer for
+    // before #619. A retrieval score is only comparable to another score taken
+    // against the same golden set, and the set is edited: ids get re-read out
+    // of the live blueprint, cases get added, a `k` gets widened. A results
+    // file that says only "26 cases, recall 1.000" cannot be told from one
+    // taken against a laxer fixture.
+    fixture: fixtureStamp(casesPath),
+    worker: worker ?? null,
     // Which function produced these numbers. Recorded ALWAYS, not only when
     // overridden: a results file that does not say is one someone compares
     // against the live baseline a week later without noticing it is not one.
-    rpc: RPC_NAME ?? "search_blueprint",
+    rpc: rpc ?? "search_blueprint",
     // The MODEL, for the same reason and with one difference: the function's
     // name is knowable from the override, the model is not. Two runs against
     // one candidate function, one per model, differ in nothing else a reader
     // of this file can see. Recorded as what the WORKER said it used rather
     // than what was asked for, so a silently ignored parameter shows up here
     // as the live model instead of the candidate.
-    embedModel: results.find((r) => r.embedModel)?.embedModel ?? EMBED_MODEL ?? null,
+    embedModel: results.find((r) => r.embedModel)?.embedModel ?? embedModel ?? null,
     cases: results.length,
-    passed: results.filter((r) => r.pass).length,
-    blockers: blockers.length,
-    blockerFailures: blockerFails.length,
-    recallOverall: Number((results.filter((r) => r.pass).length / results.length).toFixed(3)),
+    blockers: results.filter((r) => r.blocker).length,
+    recallOverall: Number((passed / results.length).toFixed(3)),
     subrequestsAvg: subs.length ? Number((subs.reduce((a, b) => a + b, 0) / subs.length).toFixed(2)) : null,
     subrequestsMax: subs.length ? Math.max(...subs) : null,
-    byClass,
-  };
+    byClass: rollupByClass(results),
+  });
+}
+
+/** Printed only on a red, by the shared findings renderer. */
+export const RETRIEVAL_REMEDY = [
+  "A failing BLOCKER case fails this run; a failing diagnostic is a warning — the aggregate",
+  "and absence classes are expected to fail before Phase 2 (the fixture's notes on BR25).",
+  "Every verdict, the judged window of rows and what each query cost are in the results file",
+  "named above; read it rather than re-running.",
+  "",
+  "A red here is a RETRIEVAL result only if some cases passed. All of them failing at the",
+  "transport means the eval never reached the Worker, which the lines above say directly.",
+].join("\n");
+
+async function main() {
+  required("WORKER_URL", WORKER_URL);
+  required("DEBUG_TOKEN", DEBUG_TOKEN);
+
+  const fixture = loadRetrievalCases(CASES_PATH ?? RETRIEVAL_FIXTURE_PATH);
+  console.log(`[retrieval] ${fixture.cases.length} cases against ${WORKER_URL}\n`);
+
+  const results = await walkRetrieval({ cases: fixture.cases, search });
+  const summary = summariseRetrieval(results, {
+    casesPath: fixture.path,
+    worker: WORKER_URL,
+    rpc: RPC_NAME,
+    embedModel: EMBED_MODEL,
+  });
 
   console.log("\n── by class ──");
-  for (const [cls, s] of Object.entries(byClass)) {
+  for (const [cls, s] of Object.entries(summary.byClass)) {
     console.log(`  ${cls.padEnd(17)} recall ${pct(s.passed, s.cases).padStart(4)} (${s.passed}/${s.cases})  MRR ${s.mrr}`);
   }
   console.log(
     `\n  overall ${summary.passed}/${summary.cases}` +
-      `   subrequests avg ${summary.subrequestsAvg} max ${summary.subrequestsMax}`,
+      `   subrequests avg ${summary.subrequestsAvg} max ${summary.subrequestsMax}` +
+      `   (fixture ${summary.fixture.rev}/${summary.fixture.sha256})`,
   );
 
   if (BASELINE && existsSync(BASELINE)) {
-    const base = JSON.parse(readFileSync(BASELINE, "utf8")).summary;
+    const parsed = JSON.parse(readFileSync(BASELINE, "utf8"));
+    // A run recorded before #619 nested its tallies under `summary`; one
+    // recorded since is the summary. Both are baselines worth comparing, and
+    // the rollup a comparison reads is in the same place in either.
+    const base = parsed.summary ?? parsed;
     console.log("\n── vs baseline ──");
-    for (const cls of classes) {
+    for (const cls of Object.keys(summary.byClass)) {
       const b = base.byClass?.[cls];
       if (!b) continue;
-      const d = byClass[cls].recall - b.recall;
+      const d = summary.byClass[cls].recall - b.recall;
       const sign = d > 0 ? "+" : "";
-      console.log(`  ${cls.padEnd(17)} ${sign}${(d * 100).toFixed(0)}pp recall, MRR ${sign}${(byClass[cls].mrr - b.mrr).toFixed(3)}`);
+      console.log(`  ${cls.padEnd(17)} ${sign}${(d * 100).toFixed(0)}pp recall, MRR ${sign}${(summary.byClass[cls].mrr - b.mrr).toFixed(3)}`);
     }
   }
 
-  writeFileSync(OUT_PATH, JSON.stringify({ summary, results }, null, 2));
-  console.log(`\n[retrieval] wrote ${OUT_PATH}`);
-
-  if (blockerFails.length) {
-    console.error(`\n[retrieval] ${blockerFails.length} BLOCKER case(s) failed: ${blockerFails.map((r) => r.id).join(", ")}`);
-    diagnoseWholesaleFailure(results);
-    process.exit(1);
-  }
+  writeResults(summary, OUT_PATH);
+  // Said before the gate renders, because it is what makes a red readable: a
+  // wholesale transport failure is not a retrieval result at all.
+  diagnoseWholesaleFailure(results);
+  // THE GATE IS THE HARNESS'S. A failing blocker is an error and a failing
+  // diagnostic a warning (eval-results.mjs `findingsFor`), and
+  // scripts/lib/findings.mjs decides the banner, the stream and the exit code.
+  // The per-case log above is untouched, which is why this stays spawn-shaped.
+  report("evals:retrieval", findingsFor(summary), {
+    remedy: `${RETRIEVAL_REMEDY}\n\nResults: ${OUT_PATH}`,
+    summary: `${summary.passed}/${summary.cases} passed, recall ${summary.recallOverall}, no blocker failed`,
+  });
 }
 
 /**
@@ -401,7 +682,7 @@ function diagnoseWholesaleFailure(results) {
   const failures = results.filter((r) => !r.pass);
   if (failures.length !== results.length || results.length === 0) return;
 
-  const errors = failures.map((r) => (r.reasons ?? []).join(" ")).filter((e) => e.includes("request failed"));
+  const errors = failures.map((r) => (r.failures ?? []).join(" ")).filter((e) => e.includes("request failed"));
   if (errors.length !== results.length) return;
 
   const say = (...lines) => {
@@ -438,7 +719,12 @@ function diagnoseWholesaleFailure(results) {
   say(`[retrieval] all ${results.length} cases failed at the transport, so nothing about retrieval was measured.`);
 }
 
-main().catch((err) => {
-  console.error(`[retrieval] FAILED: ${err.message}`);
-  process.exit(2);
-});
+// Imported by the test, executed by the npm script — so the walk only starts
+// when this file IS the entry point (#610). Before, importing this module to
+// test one of its functions fired a live run.
+if (isEntry(import.meta.url)) {
+  main().catch((err) => {
+    console.error(`[retrieval] FAILED: ${err.message}`);
+    process.exit(2);
+  });
+}

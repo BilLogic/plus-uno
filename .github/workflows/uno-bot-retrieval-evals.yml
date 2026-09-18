@@ -54,8 +54,11 @@ jobs:
 
       # The scorer is the instrument for the whole retrieval upgrade. A bug in
       # it does not look like a bug — it looks like a confident recall number.
-      # Pin it before trusting anything it reports.
-      - name: Self-test the scorer
+      # Pin it before trusting anything it reports. It also loads the fixture
+      # and builds a row and a summary, so a misspelt assertion key or a
+      # stampless results file fails here rather than scoring a green run
+      # against a case that asserts nothing (#619).
+      - name: Self-test the scorer and the fixture
         working-directory: agents/uno-bot
         run: npm run evals:retrieval:selftest
 

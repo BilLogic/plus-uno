@@ -29,14 +29,13 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
+
 /** The repository's fixture, from this file — so no caller repeats the path. */
-export const FIXTURE_PATH = resolve(
-  dirname(fileURLToPath(import.meta.url)),
-  "../../../docs/evals/fixtures/uno-bot-cases.json",
-);
+export const FIXTURE_PATH = resolve(REPO_ROOT, "docs/evals/fixtures/uno-bot-cases.json");
 
 // ── The shape ────────────────────────────────────────────────────────────────
 
@@ -172,6 +171,12 @@ export function loadCases(path = FIXTURE_PATH) {
  * per-file `git log` returns nothing unless that commit happened to touch the
  * fixture, and a locally-edited fixture is not the committed one at all. The
  * hash is the fact; the revision is the context.
+ *
+ * `path` comes back REPO-RELATIVE where the fixture is in the repository, so a
+ * results file worth committing as a baseline names the document rather than
+ * somebody's home directory — the fixture a caller is given is resolved from
+ * this module and is therefore absolute. A path outside the checkout is
+ * reported as it was given.
  */
 export function fixtureStamp(path) {
   const bytes = readFileSync(path);
@@ -195,7 +200,9 @@ export function fixtureStamp(path) {
   } catch {
     /* not a checkout — the hash still identifies the bytes */
   }
-  return { path, rev: `${rev.slice(0, 12)}${dirty ? "+dirty" : ""}`, sha256 };
+  const inside = relative(REPO_ROOT, resolve(path));
+  const named = inside && !inside.startsWith("..") ? inside : path;
+  return { path: named, rev: `${rev.slice(0, 12)}${dirty ? "+dirty" : ""}`, sha256 };
 }
 
 // ── The census ───────────────────────────────────────────────────────────────
