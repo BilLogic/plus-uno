@@ -31,6 +31,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { resolveToken, tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 
 /**
@@ -65,7 +66,7 @@ export function cssName(figmaName) {
 /** Every `--color-*` declaration, with `var()` chains followed to a literal. */
 export function cssColours(repoRoot) {
   const files = ['_colors.scss', '_color_roles.scss']
-    .map((f) => path.join(repoRoot, 'design-system/src/tokens', f))
+    .map((f) => path.join(repoRoot, TOKEN_DIR, f))
     .filter((f) => fs.existsSync(f));
 
   const declared = new Map();

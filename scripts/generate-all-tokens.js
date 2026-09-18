@@ -1,7 +1,16 @@
 import fs from 'fs';
 import path from 'path';
 
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { compare, refusals } from './token-generation.mjs';
+
+/**
+ * The Figma exports the SCSS is generated FROM, and where the SCSS lands.
+ * Both hang off `TOKEN_DIR` (#620/#621) rather than being spelled seven times,
+ * so moving the token directory is one edit and the generator cannot end up
+ * reading one tree and writing another.
+ */
+const SOURCE_DIR = `${TOKEN_DIR}/source`;
 
 /**
  * Convert RGB to hex/rgba
@@ -110,8 +119,8 @@ function toM3ColorName(name) {
  * Process and generate colors SCSS
  */
 function generateColorsSCSS() {
-    const accent = JSON.parse(fs.readFileSync('design-system/src/tokens/source/colors _ accent.json', 'utf8'));
-    const neutral = JSON.parse(fs.readFileSync('design-system/src/tokens/source/colors _ neutral.json', 'utf8'));
+    const accent = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/colors _ accent.json`, 'utf8'));
+    const neutral = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/colors _ neutral.json`, 'utf8'));
 
     const accentMode = Object.keys(accent.modes)[0];
     const neutralMode = Object.keys(neutral.modes)[0];
@@ -287,7 +296,7 @@ function generateColorsSCSS() {
  * Generate primitives SCSS
  */
 function generatePrimitivesSCSS() {
-    const primitives = JSON.parse(fs.readFileSync('design-system/src/tokens/source/size _ primitive.json', 'utf8'));
+    const primitives = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/size _ primitive.json`, 'utf8'));
     const mode = Object.keys(primitives.modes)[0];
 
     let scss = `/**
@@ -366,7 +375,7 @@ function generatePrimitivesSCSS() {
  * Generate semantic tokens SCSS
  */
 function generateSemanticsSCSS() {
-    const semantics = JSON.parse(fs.readFileSync('design-system/src/tokens/source/size _ semantics.json', 'utf8'));
+    const semantics = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/size _ semantics.json`, 'utf8'));
     const mode = Object.keys(semantics.modes)[0];
 
     let scss = `/**
@@ -433,7 +442,7 @@ function generateSemanticsSCSS() {
         // Get primitive value for radius-1000 (999px)
         let radiusPillValue = 999; // Default fallback
         try {
-            const primitives = JSON.parse(fs.readFileSync('design-system/src/tokens/source/size _ primitive.json', 'utf8'));
+            const primitives = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/size _ primitive.json`, 'utf8'));
             const primitiveMode = Object.keys(primitives.modes)[0];
             const radius1000 = primitives.variables.find(v => {
                 const name = v.name.toLowerCase();
@@ -500,7 +509,7 @@ function generateSemanticsSCSS() {
  * Generate layout tokens SCSS
  */
 function generateLayoutSCSS() {
-    const layout = JSON.parse(fs.readFileSync('design-system/src/tokens/source/size _ layout.json', 'utf8'));
+    const layout = JSON.parse(fs.readFileSync(`${SOURCE_DIR}/size _ layout.json`, 'utf8'));
 
     let scss = `/**
  * Layout Tokens
@@ -594,7 +603,7 @@ function validateSemanticTokens(scssContent, filename) {
 // `scripts/token-generation.mjs` for the rule and the measurement.
 console.log('Generating token SCSS files...');
 
-const OUT_DIR = 'design-system/src/tokens';
+const OUT_DIR = TOKEN_DIR;
 const built = [
     { file: '_colors.scss', generated: generateColorsSCSS() },
     { file: '_primitives.scss', generated: generatePrimitivesSCSS() },
@@ -622,7 +631,7 @@ if (refused.length && !force) {
     console.error('\n❌ Refusing to write. A generator may not shrink the thing it generates.\n');
     for (const line of refused) console.error(`   ${line}`);
     console.error(
-        '\n   The source JSONs under design-system/src/tokens/source/ no longer\n' +
+        `\n   The source JSONs under ${SOURCE_DIR}/ no longer\n` +
         '   resolve to the full library — export them from Figma with every\n' +
         '   variable resolved, then run this again. Nothing was written.\n' +
         '\n   `--force` writes anyway, and is for a deliberate REMOVAL of tokens.\n' +

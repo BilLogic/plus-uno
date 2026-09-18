@@ -4,6 +4,8 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import tailwindcss from '@tailwindcss/vite';
 
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -122,7 +124,7 @@ const config = {
     config.css.preprocessorOptions.scss = {
       includePaths: [
         path.resolve(srcPath, 'components'),
-        path.resolve(rootDir, 'design-system/src/tokens'),
+        path.resolve(rootDir, TOKEN_DIR),
         path.resolve(srcPath, 'styles')
       ],
       api: 'modern-compiler',

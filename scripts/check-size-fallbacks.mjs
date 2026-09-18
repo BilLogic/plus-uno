@@ -38,9 +38,9 @@
  *   npm run check:size-fallbacks -- --report  print the whole audit, and gate
  */
 
+import { dimensionKey } from '../design-system/src/lib/tokens-node.mjs';
 import { fallbackCheck } from './lib/fallback-check.mjs';
 import { main } from './lib/findings.mjs';
-import { normaliseDimension } from './token-fallbacks.mjs';
 
 /**
  * Every custom-property name — the `--` prefix and nothing narrower, since the
@@ -57,10 +57,12 @@ const SIZE = fallbackCheck({
   absent: 'dimension',
   census: 'dimension',
   prefix: ANY_TOKEN,
-  normalise: normaliseDimension,
+  normalise: dimensionKey,
   // The value-level half of "which tokens count": read every custom property,
-  // then keep the ones whose resolved value is a length.
-  select: (tokens) => new Map([...tokens].filter(([, value]) => normaliseDimension(value) !== null)),
+  // then keep the ones whose resolved value is a length. The kind is read off
+  // the VALUE and the answer is `tokens-node`'s (#620/#621) — which is the same
+  // rule this file already argued for itself, now stated once.
+  select: (tokens) => new Map([...tokens].filter(([, value]) => dimensionKey(value) !== null)),
   reportUndefined: false,
   why:
     'Literal fallbacks that disagree with their own DIMENSION token (#268). The colour ' +

@@ -32,6 +32,7 @@ import {
 } from 'fs';
 import { join, resolve, dirname, extname, relative, sep } from 'path';
 import https from 'https';
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { fetchNotionPRD } from './create-notion-prd.js';
 import { IGNORED_DIRS, documents } from './lib/corpus.mjs';
 import { loadSkill, loadSkillMetadata } from './lib/skill-loader.js';
@@ -48,7 +49,7 @@ const NOTES = process.env.NOTES || '';
 
 const PLAYGROUND_DIR = resolve('prototypes');
 const ROOT_PACKAGE_JSON = resolve('package.json');
-const TOKENS_DIR = resolve('design-system/src/tokens');
+const TOKENS_DIR = resolve(TOKEN_DIR);
 const DOCS_DIR = resolve('design-system/guidelines/components');
 const KNOWLEDGE_LAYOUT = resolve('design-system/guidelines/composition/layout.md');
 const REFERENCE_SLUG = 'home-redesign';

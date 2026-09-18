@@ -52,6 +52,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import {
   composite,
   contrast,
@@ -64,7 +65,7 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 
-export const TOKENS_FILE = 'design-system/src/tokens/_colors.scss';
+export const TOKENS_FILE = `${TOKEN_DIR}/_colors.scss`;
 export const BUTTON_SCSS = 'design-system/src/components/actions/Button/Button.scss';
 
 /** The page a button sits on when its own fill draws no ground. */

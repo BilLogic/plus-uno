@@ -54,6 +54,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { documents } from './lib/corpus.mjs';
 
 import {
@@ -69,7 +70,7 @@ import { AA_TEXT, PAGE_TOKEN, tokenValues } from './button-contrast.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, '..');
 
-export const TOKENS_FILE = 'design-system/src/tokens/_colors.scss';
+export const TOKENS_FILE = `${TOKEN_DIR}/_colors.scss`;
 
 /** Stylesheets that consume tokens. The files that DEFINE them are not scanned. */
 export const CORPUS = 'design-system/src';

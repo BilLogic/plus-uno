@@ -19,19 +19,23 @@
  *
  * The third is the one with teeth, in two directions:
  *
- *   WIDER than `parseColour`: two harness checks each carry their own colour
+ *   WIDER than `parseColour`: two harness checks each carried their own colour
  *   key, and `check:docs-token-literals`' accepts `#abcd`, `#aabbccdd` and
  *   `hsl()`, which `parseColour` returns null for. A module that could not
  *   read those is a module neither check can call, so the parity is asserted
  *   against the rival implementations themselves rather than against a list
- *   somebody typed.
+ *   somebody typed. #621 retired the fallback checks' rival; the docs check's
+ *   is still live, so it is still imported here, and the retired one is
+ *   spelled below.
  *
  *   FINER than `normaliseColour`: alpha is part of this key and is not part of
  *   that one. Over the live corpus that is 315 token pairs, and the two tests
  *   under "finer than the normaliser" assert the difference directly and then
  *   pin the narrow reason today's output does not move — rather than asserting
  *   "output unchanged", which is a property of the fallback CAPTURE and not of
- *   this key.
+ *   this key. #621 migrated the fallback checks onto this key and MEASURED the
+ *   move: both families' token maps and both reports came out byte-identical,
+ *   for the reason the last test in that block pins.
  */
 import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -43,15 +47,9 @@ import {
   colourKey as docsColourKey,
   dimensionKey as docsDimensionKey,
 } from '../../scripts/check-docs-token-literals.mjs';
-import { text } from '../../scripts/lib/corpus.mjs';
-import {
-  fallbackUsages,
-  normaliseColour,
-  normaliseDimension,
-  resolveAliases,
-  tokenDefinitions,
-} from '../../scripts/token-fallbacks.mjs';
-import { parseColour } from '../src/lib/tokens.mjs';
+import { documents, text } from '../../scripts/lib/corpus.mjs';
+import { fallbackUsages } from '../../scripts/token-fallbacks.mjs';
+import { parseColour, toHex } from '../src/lib/tokens.mjs';
 import {
   FAMILIES,
   TOKEN_DIR,
@@ -63,6 +61,25 @@ import {
   tokenSources,
   valueKey,
 } from '../src/lib/tokens-node.mjs';
+
+/**
+ * THE RETIRED NORMALISER, SPELLED HERE BECAUSE #621 DELETED IT.
+ *
+ * `scripts/token-fallbacks.mjs` compared two colours as `parseColour` followed
+ * by `toHex` — and `toHex` drops alpha — until #621 moved the fallback checks
+ * on to `colourKey`. The assertions below measure what that migration cost, so
+ * they need the thing that was retired; two lines of test scaffolding is not a
+ * second production key, and writing it out is what keeps "finer than the
+ * normaliser" from quietly becoming "the module agrees with itself".
+ *
+ * There is no dimension twin, because there was no difference to keep:
+ * `normaliseDimension` and `dimensionKey` were the same function, which is why
+ * #621 could delete one of them without measuring anything.
+ */
+const normaliseColour = (value) => {
+  const colour = parseColour(value);
+  return colour ? toHex(colour) : null;
+};
 
 describe('the corpus — where tokens live, answered once and read through the one reader', () => {
   it('names the token directory as one repo-relative string', () => {
@@ -319,43 +336,73 @@ describe('the colour key is finer than the normaliser it replaces', () => {
   });
 
   /*
-   * WHY THE FALLBACK CHECKS' OUTPUT DOES NOT MOVE TODAY — and it is luck about
-   * the CAPTURE, not a property of the key, which is why it is pinned as a
-   * fact with its mechanism rather than asserted as "output unchanged".
+   * WHY `check:colour-fallbacks` DID NOT MOVE WHEN #621 PUT IT ON THIS KEY —
+   * and it is a fact about the CAPTURE, not a property of the key, which is
+   * why it is pinned with its mechanism over the whole live corpus rather than
+   * asserted as "output unchanged".
    *
-   * `fallbackUsages` captures the literal beside a token with `[^),]+`, so it
-   * stops at the first comma: `var(--color-x, rgba(4, 114, 168, 0.08))` arrives
-   * as the fragment `rgba(4`, which no key can read, and the audit counts it
-   * INCOMPARABLE. So no comparison in the live tree has alpha on either side,
-   * and the 315 pairs above are all outside the compared set. The day a check
-   * captures a whole `rgba()` fallback, that stops being true.
+   * THE MECHANISM, CORRECTED. `fallbackUsages` captures the fallback with
+   * `[^),]+`, which admits no comma and no `)`, and then requires the closing
+   * `)` of the `var()`. A whole `rgba()` fallback satisfies neither branch: the
+   * 25 sites writing `var(--color-x, rgba(4, 114, 168, 0.08))` are not captured
+   * with a truncated literal and are not counted incomparable — the regex does
+   * not match them AT ALL, so they never reach the audit in any form. (#620's
+   * docblock had the fragment `rgba(4` arriving in the incomparable count;
+   * measured here the fragment is never produced, and #621 corrected the
+   * docblock to match.)
+   *
+   * So every colour comparison the check makes is opaque on both sides, and the
+   * 315 pairs above are all outside the compared set. The day the capture is
+   * widened to read a whole `rgba()` fallback, that stops being true, and this
+   * test is what says so.
    */
-  it('has no live fallback comparison with alpha on either side, because the capture truncates', () => {
-    const sources = [
-      'design-system/src/components/forms-and-inputs/Select.scss',
-      'design-system/src/components/forms-and-inputs/Dropdown/Dropdown.scss',
-    ].map((rel) => ({ path: rel, text: text(resolve('..', rel)) }));
-
-    const tokens = resolveAliases(
-      tokenDefinitions(tokenSources().map(({ path, text: source }) => ({ path, text: source }))),
+  it('makes no live colour comparison with alpha on either side, because the capture refuses a whole rgba()', () => {
+    const roots = ['design-system/src', '.storybook', 'prototypes'];
+    const extensions = ['.scss', '.css', '.jsx', '.tsx', '.mdx', '.html'];
+    const root = resolve('..');
+    const sources = roots.flatMap((dir) =>
+      documents(dir, { root, ext: extensions }).map((rel) => ({
+        path: rel,
+        text: text(rel, { root }),
+      })),
     );
-    const usages = fallbackUsages(sources);
 
-    // The sheets really do write an `rgba()` fallback beside a colour token…
-    expect(sources.some((s) => /var\(\s*--color-[a-z0-9-]+\s*,\s*rgba\(/.test(s.text))).toBe(true);
+    // The tree really does write `rgba()` fallbacks beside colour tokens — 25
+    // of them, which is the population this test is about.
+    const withRgba = sources.filter((s) =>
+      /var\(\s*--color-[a-z0-9-]+\s*,\s*rgba\(/.test(s.text),
+    );
+    expect(withRgba.length).toBeGreaterThan(0);
 
-    // …and every literal that reaches a comparison is opaque, because the
-    // capture stopped at the first comma inside that `rgba(`.
-    const captured = usages.filter((use) => use.literal !== null);
-    expect(captured.length).toBeGreaterThan(0);
-    for (const use of captured) {
+    const tokens = new Map(
+      [...tokenCorpus({ prefix: '--color-', precedence: 'last' })].map(([name, entry]) => [
+        name,
+        entry.value,
+      ]),
+    );
+    const usages = fallbackUsages(sources, { prefix: '--color-' });
+
+    // Not one of them is captured, in any form.
+    expect(usages.filter((use) => /rgba?\(/i.test(use.literal ?? ''))).toEqual([]);
+
+    // And every comparison the check does make is opaque on both sides. The
+    // count is asserted because a DROP in it is how a capture quietly stops
+    // reading fallbacks at all.
+    let comparable = 0;
+    for (const use of usages) {
+      if (use.literal === null || !tokens.has(use.token)) continue;
       const literal = colourKey(use.literal);
-      expect(literal === null || literal.length === 7, `${use.literal} carries alpha`).toBe(true);
-      if (literal === null || !tokens.has(use.token)) continue;
       const tokenValue = colourKey(tokens.get(use.token));
-      expect(tokenValue === null || tokenValue.length === 7).toBe(true);
+      if (literal === null || tokenValue === null) continue;
+      comparable += 1;
+      expect(literal.length, `${use.literal} carries alpha`).toBe(7);
+      expect(tokenValue.length, `${use.token} carries alpha`).toBe(7);
     }
-  });
+    expect(comparable).toBe(476);
+    // The default 5s is not enough under a loaded runner: this is the one test
+    // in the file that reads three source trees rather than the token
+    // directory, and a timeout here would read as a finding it never made.
+  }, 30_000);
 });
 
 describe('the dimension key — one normaliser, rem at 16px', () => {
@@ -369,16 +416,18 @@ describe('the dimension key — one normaliser, rem at 16px', () => {
   });
 
   /*
-   * THE ONE PLACE THE TWO RIVALS DISAGREE, measured rather than asserted from
-   * the docblock: a bare `0`. `normaliseDimension` reads it and the docs
-   * check's key answers null, so the module has to CHOOSE, and it takes the
-   * reading that loses no comparison. `0em` stays null, because both rivals
-   * refuse it and a widening nobody asked for is a migration surprise.
+   * THE ONE PLACE THE TWO RIVALS DISAGREED, measured rather than asserted from
+   * the docblock: a bare `0`. `normaliseDimension` read it and the docs
+   * check's key answers null, so the module had to CHOOSE, and it took the
+   * reading that loses no comparison — which is why #621 could retire
+   * `normaliseDimension` outright, and why the surviving rival is still
+   * asserted against here. `0em` stays null, because both rivals refuse it and
+   * a widening nobody asked for is a migration surprise.
    */
   it('takes the reading that loses nothing where the two rivals disagree', () => {
-    expect([docsDimensionKey('0'), normaliseDimension('0')]).toEqual([null, '0px']);
+    expect(docsDimensionKey('0')).toBe(null);
     expect(dimensionKey('0')).toBe('0px');
-    expect([docsDimensionKey('0em'), normaliseDimension('0em')]).toEqual([null, null]);
+    expect(docsDimensionKey('0em')).toBe(null);
     expect(dimensionKey('0em')).toBe(null);
   });
 
@@ -394,7 +443,7 @@ describe('the dimension key — one normaliser, rem at 16px', () => {
   it('accepts every literal the rival implementations accept, and agrees with them', () => {
     const literals = ['16px', '1rem', '0.75rem', '50%', '100%', '0', '0px', '-1px', '1.5', '1em'];
     for (const literal of literals) {
-      const rivals = [docsDimensionKey(literal), normaliseDimension(literal)];
+      const rivals = [docsDimensionKey(literal)];
       if (rivals.every((key) => key === null)) continue;
       expect(
         dimensionKey(literal),

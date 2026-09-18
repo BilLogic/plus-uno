@@ -24,11 +24,11 @@
  */
 import { spawnSync } from 'node:child_process';
 import crypto from 'node:crypto';
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { documents } from './lib/corpus.mjs';
+import { tokenSources } from '../design-system/src/lib/tokens-node.mjs';
+import { text } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -38,11 +38,19 @@ export const REMEDY =
   '  -> `npm run generate:tokens` is documented in skills/uno-maintain as the way\n' +
   '     to regenerate SCSS from source. It has to be safe to run.';
 
+/**
+ * The token files by name, each with the hash of what it says right now.
+ *
+ * WHERE THEY ARE is `tokens-node`'s (#620/#621) rather than a path spelled
+ * here, and so is the read: `tokenSources` hands back the text, so this check
+ * no longer pairs a listing with a `readFileSync` of its own and cannot end up
+ * hashing a different tree from the one it listed.
+ */
 const digest = (repoRoot) =>
   Object.fromEntries(
-    documents('design-system/src/tokens/*.scss', { root: repoRoot, ext: ['.scss'] }).map((rel) => [
-      path.basename(rel),
-      crypto.createHash('sha256').update(fs.readFileSync(path.join(repoRoot, rel))).digest('hex'),
+    tokenSources({ root: repoRoot }).map((source) => [
+      source.file,
+      crypto.createHash('sha256').update(source.text).digest('hex'),
     ]),
   );
 
@@ -98,7 +106,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
    * refusal path the generator exits long before reaching that line, so watching
    * the output would be watching a branch that is not taken.
    */
-  const source = fs.readFileSync(path.join(repoRoot, 'scripts/generate-all-tokens.js'), 'utf8');
+  const source = text('scripts/generate-all-tokens.js', { root: repoRoot });
   if (/console\.log\([`'"]✅[^`'"]*Validation passed/.test(source)) {
     found.push(
       'the generator still prints "✅ Validation passed" — validateSemanticTokens is ' +

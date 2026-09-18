@@ -25,12 +25,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { REPO_ROOT, counts, edgeUses, failures, stylesheets } from './intent-roles.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 import { isUnreviewed, openRatchet } from './lib/ratchet.mjs';
 
 const BASELINE = 'docs/evals/intent-role-adoption.json';
-const ROLES_FILE = 'design-system/src/tokens/_color_roles.scss';
+const ROLES_FILE = `${TOKEN_DIR}/_color_roles.scss`;
 
 /*
  * An empty corpus agrees with everything. The floor is the number of

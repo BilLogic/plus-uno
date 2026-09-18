@@ -37,8 +37,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
+
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ELEVATION = path.join(REPO_ROOT, 'design-system/src/tokens/_elevation.scss');
+const ELEVATION = path.join(REPO_ROOT, `${TOKEN_DIR}/_elevation.scss`);
 const MAPPING = path.join(REPO_ROOT, 'design-system/guidelines/figma/token-mapping.md');
 
 /**

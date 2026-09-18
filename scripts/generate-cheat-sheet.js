@@ -8,12 +8,13 @@
 
 import fs from 'fs';
 import path from 'path';
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { AGENT_ROOT } from './agent-views-paths.js';
 import { checkArtifacts, writeArtifacts } from './lib/generated-artifact.js';
 
 const ROOT_DIR = path.resolve(import.meta.dirname, '../');
-const TOKENS_DIR = path.join(ROOT_DIR, 'design-system/src/tokens');
+const TOKENS_DIR = path.join(ROOT_DIR, TOKEN_DIR);
 const OUTPUT_TOKENS = path.join(AGENT_ROOT, 'tokens/tokens.md');
 
 function extractScssVariables(filePath) {
@@ -46,7 +47,7 @@ function renderTokensDoc() {
     tokensDoc += `<!-- Load when: styling with DS tokens | Route: design-system/guidelines/overview.md -->\n`;
     tokensDoc += `# PLUS DS — Tokens\n\n`;
     tokensDoc += `> **CRITICAL**: Never hardcode values. Use these exact token strings.\n\n`;
-    tokensDoc += `Mirrors \`design-system/src/tokens/\`.\n\n`;
+    tokensDoc += `Mirrors \`${TOKEN_DIR}/\`.\n\n`;
 
     tokensDoc += `## Spacing Semantics\n`;
     tokensDoc += `Use for padding, margin, and gaps.\n\n`;

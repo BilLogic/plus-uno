@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { run } from './check-intent-roles.mjs';
 import { EDGE, INTENTS, counts, edgeUses, failures, stylesheets } from './intent-roles.mjs';
 import { messagesOf, policyTree } from './lib/policy-tree.mjs';
@@ -64,7 +65,7 @@ test('properties that carry no colour do not match', () => {
 
 test('the token directory is not scanned, because it DEFINES the roles', () => {
   const root = corpus({
-    'design-system/src/tokens/_color_roles.scss': ':root { --color-danger-border: var(--color-danger); }',
+    [`${TOKEN_DIR}/_color_roles.scss`]: ':root { --color-danger-border: var(--color-danger); }',
     'design-system/src/a.scss': '.a { color: var(--color-danger); }',
   });
   assert.deepEqual(stylesheets(root), ['design-system/src/a.scss']);
@@ -153,7 +154,7 @@ const INTENT_BASELINE = JSON.stringify({
 
 test('an intent base on an edge in a fixture tree is a finding', () => {
   const { root, done } = policyTree({
-    'design-system/src/tokens/_color_roles.scss': ROLES_SCSS,
+    [`${TOKEN_DIR}/_color_roles.scss`]: ROLES_SCSS,
     'design-system/src/a.scss': '.a { border-color: var(--color-danger); }\n',
     'docs/evals/intent-role-adoption.json': INTENT_BASELINE,
   });

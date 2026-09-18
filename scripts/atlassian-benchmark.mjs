@@ -52,27 +52,23 @@
  * 208 backgrounds is a difference, not a defect, and a gate that demanded the
  * number rise would be demanding growth for its own sake.
  */
-import fs from 'node:fs';
-import path from 'node:path';
-
-import { documents } from './lib/corpus.mjs';
+import { TOKEN_DIR, tokenCorpus } from '../design-system/src/lib/tokens-node.mjs';
 import { resolveToken, tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
+import { text as read } from './lib/corpus.mjs';
 
 /**
- * Every `--token:` declared under `design-system/src/tokens`.
+ * Every `--token:` declared under the token sources.
  *
- * The grammar is the tokens module's (#507). The pattern it replaced matched a
- * name followed by a colon and stopped there, where the module's wants the value
- * and its `;` as well; over these files the two find the same 518 declarations,
- * because every token in them is written as one complete line.
+ * The grammar is the tokens module's (#507) and the WALK is `tokenCorpus`'s
+ * (#620/#621) — where the tokens live is not this benchmark's business, and the
+ * listing and the read are one call rather than a `documents()` paired with a
+ * `readFileSync` of its own. The pattern this replaced matched a name followed
+ * by a colon and stopped there, where the module's wants the value and its `;`
+ * as well; over these files the two find the same 518 declarations, because
+ * every token in them is written as one complete line.
  */
 export function ourTokens(repoRoot) {
-  const names = new Set();
-  for (const file of documents('design-system/src/tokens/*.scss', { root: repoRoot, ext: ['.scss'] })) {
-    const text = fs.readFileSync(path.join(repoRoot, file), 'utf8');
-    for (const m of text.matchAll(tokenDeclarationPattern())) names.add(m[1]);
-  }
-  return [...names].sort();
+  return [...tokenCorpus({ root: repoRoot }).keys()].sort();
 }
 
 /**
@@ -102,8 +98,7 @@ export function ourTokens(repoRoot) {
  * 1.260; that clean 1.2 run scores 1.065.
  */
 export function textScale(repoRoot) {
-  const file = path.join(repoRoot, 'design-system/src/tokens/_fonts.scss');
-  const text = fs.readFileSync(file, 'utf8');
+  const text = read(`${TOKEN_DIR}/_fonts.scss`, { root: repoRoot });
   const declared = new Map(
     [...text.matchAll(tokenDeclarationPattern('--font-size-'))].map((m) => [m[1], m[2].trim()]),
   );

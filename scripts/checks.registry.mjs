@@ -82,6 +82,8 @@
  * would run it, inside the runner's own process.
  */
 
+import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
+
 /**
  * The composition of `check:harness`. Four rules decided the set, and they are
  * argued in the header of `scripts/check-harness.mjs`: no member another member
@@ -443,7 +445,7 @@ export const CHECKS = [
       + 'accumulated `clamp(2.5rem, 5vw, 4rem)`, `1.5rem`, `0.625rem` and a `#e4e4e7`, each '
       + 'a few lines from a `var(--size-…)` doing the same job, and #251 had to sweep some of '
       + 'them by hand. Every declaration value is read against the live token table in '
-      + 'design-system/src/tokens/, matched by VALUE and filtered by family so a font-size is '
+      + `${TOKEN_DIR}/, matched by VALUE and filtered by family so a font-size is `
       + 'never offered a spacing step. Zero, `100%`, `1px` hairlines, `var()` fallbacks and a '
       + 'comment against the declaration are allowed, and each allowance has a red twin in the '
       + 'tests. It cannot see a NEAR miss (13px is not 12px), and it cannot see a fallback that '

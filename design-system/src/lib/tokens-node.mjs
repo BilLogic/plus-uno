@@ -7,10 +7,12 @@
  * story and `node --test` load the same contrast formula. Its header has named
  * this file since #506 and said what belongs in it — "anything that needs the
  * filesystem" — and for two releases the file did not exist, so every check
- * answered the three questions below privately. Seventeen of them hardcode the
- * token directory, the family map is restated in three places, and there are
- * two colour keys and two dimension normalisers in `scripts/` that do not
- * agree with each other or with `parseColour`.
+ * answered the three questions below privately: seventeen hardcoded the token
+ * directory, the family map was restated beside them, and `scripts/` carried
+ * two colour keys and two dimension normalisers that agreed neither with each
+ * other nor with `parseColour`. #621 moved the checks and the generators on to
+ * this file; `check:docs-token-literals` still keeps a colour key of its own,
+ * and retiring it is a ticket of its own.
  *
  * ─── THE THREE QUESTIONS ────────────────────────────────────────────────────
  *
@@ -66,24 +68,28 @@
  * `#f00` and `#FF0000` all key as `#ff0000`, where the docs check's key is
  * syntactic and calls the first two of those different colours.
  *
- * FINER, AND THE NUMBER IS MEASURED. Alpha is part of this key and is not part
- * of `normaliseColour` in `scripts/token-fallbacks.mjs`, which is
- * `parseColour` followed by `toHex` and `toHex` drops it. Over the live token
- * corpus that is not a rounding difference: 315 pairs of colour tokens are
- * EQUAL under the old normaliser and UNEQUAL under this key — every one of them
- * a translucent state overlay keyed against a solid of the same channels, such
+ * FINER, AND THE NUMBER IS MEASURED. Alpha is part of this key and was not
+ * part of `normaliseColour`, the normaliser `scripts/token-fallbacks.mjs`
+ * carried until #621 moved the fallback checks here: `parseColour` followed by
+ * `toHex`, and `toHex` drops alpha. Over the live token corpus that is not a
+ * rounding difference: 315 pairs of colour tokens are EQUAL under the old
+ * normaliser and UNEQUAL under this key — every one of them a translucent
+ * state overlay keyed against a solid of the same channels, such
  * as `--color-secondary-state-08` (`rgba(68, 92, 106, 0.08)`) against
  * `--color-secondary-border` (`#445c6a`).
  *
  * A caller migrating on to this key therefore has to MEASURE its own output
- * rather than assume it. What is true today is narrower and is pinned in
- * `tokens-node.test.js` rather than asserted as an invariant: no captured
- * fallback literal in the tree pairs an opaque hex against a translucent
- * token, because a fallback literal is captured up to the first comma, so an
- * `rgba()` fallback never reaches a comparison at all. That is luck about the
- * capture, not a property of the key — the day a check captures a whole
- * `rgba()` fallback, 315 pairs' worth of behaviour changes, and the test says
- * so where a "output unchanged" assertion would have hidden it.
+ * rather than assume it — which #621 did for both fallback checks, and their
+ * reports came out byte-identical. What makes that true today is narrower than
+ * the key and is pinned in `tokens-node.test.js` rather than asserted as an
+ * invariant: no comparison either check makes pairs an opaque hex against a
+ * translucent token, because `fallbackUsages` captures a fallback with
+ * `[^),]+` and then demands the `var()`'s closing `)`, so the 25 sites writing
+ * `var(--color-x, rgba(…))` are not matched AT ALL and never reach a
+ * comparison in any form. That is a fact about the capture, not a property of
+ * the key — the day a check reads a whole `rgba()` fallback, 315 pairs' worth
+ * of behaviour changes, and the test says so where an "output unchanged"
+ * assertion would have hidden it.
  *
  * ALPHA IS PART OF THE KEY, then, deliberately: `rgba(0,0,0,.5)` keys as
  * `#00000080`, because a state overlay compared against a solid by a key that
@@ -309,8 +315,9 @@ const hex2 = (n) => n.toString(16).padStart(2, '0');
  * Reads `#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`, `rgb()`, `rgba()`, `hsl()`
  * and `hsla()`, in comma or space syntax, with an alpha after `/` or after the
  * third comma, and channels as numbers or percentages. See the header for why
- * this is wider than `parseColour`, finer than `normaliseColour`, and what the
- * finer half costs a migrating caller.
+ * this is wider than `parseColour`, finer than the normaliser the fallback
+ * checks carried before #621, and what the finer half costs a migrating
+ * caller.
  *
  * @param {string} value
  * @returns {string|null}
@@ -375,10 +382,11 @@ export function colourKey(value) {
  * eleven times, and on a non-square box those are different shapes.
  *
  * A BARE `0` is `0px`, because zero is zero, and that is the one place the two
- * normalisers this replaces disagree: `normaliseDimension` in
- * `scripts/token-fallbacks.mjs` reads it and `check:docs-token-literals`'
- * `dimensionKey` answers null. This takes the reading that loses nothing — the
- * check that answered null was passing up a comparison it could have made.
+ * normalisers this replaces disagreed: `normaliseDimension`, retired from
+ * `scripts/token-fallbacks.mjs` by #621, read it, and
+ * `check:docs-token-literals`' surviving `dimensionKey` answers null. This
+ * takes the reading that loses nothing — the check that answered null was
+ * passing up a comparison it could have made.
  * A bare number is otherwise NOT a length (`line-height: 1.5` is a ratio), and
  * `em` is relative to the element's own font size, which this cannot know;
  * guessing 16px there would report agreement with a number nobody wrote. So
