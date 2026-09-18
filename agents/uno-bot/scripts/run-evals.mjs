@@ -47,7 +47,14 @@
 // of it — the rubric, the service-account credential, the Vertex call, the
 // transcript cut and the fail-open to "skipped". `judgeFromEnv()` hands back
 // the Vertex judge when the SA is present and a judge that skips when it is
-// not, so a run with no credential is a run with fewer verdicts, not a crash.
+// not, so a run with no credential is a run with fewer VERDICTS, not a crash.
+//
+// FEWER VERDICTS, AND THE RUN SAYS SO. Failing open means a skipped case stays
+// green, so the summary carries a `judge` stanza — who graded, how many
+// verdicts came back, and the reason behind every skip — and each result row
+// carries `judged`. Without it "34/34 passed" reads the same whether the grind
+// model approved every case or an expired service account graded none, which is
+// the one thing a weekly drift check must never be ambiguous about.
 //
 // Env required (by the WORKER transport — another transport needs neither):
 //   WORKER_URL      e.g. the Worker origin (scripts/worker-url.mjs, or UNO_BOT_WORKER_URL)
@@ -69,7 +76,7 @@ import { threadTurn, checkHistory, sentSummary } from "./eval-history.mjs";
 import { applySubject, skipReason } from "./eval-subjects.mjs";
 import { workerTransport } from "./eval-transport.mjs";
 import { localTransport } from "./eval-transport-local.mjs";
-import { judgeFromEnv, noJudge } from "./eval-judge.mjs";
+import { describeTally, judgeFromEnv, judgeSkipped, judgeTally, noJudge } from "./eval-judge.mjs";
 
 const {
   WORKER_URL,
@@ -291,14 +298,24 @@ export function parseArgs(args) {
 export async function runEvals({
   transport,
   casesPath = CASES_PATH,
-  judge = noJudge(),
+  judge = noJudge("no judge was given to the runner"),
   log = console.log,
   sleep = (ms) => new Promise((r) => setTimeout(r, ms)),
   pauseMs = PAUSE_BETWEEN_CASES_MS,
 }) {
   const fixture = JSON.parse(readFileSync(casesPath, "utf8"));
 
+  /** A verdict for a case the judge was never asked about. Not "skipped" for
+   *  the judge's own reasons — the case failed before grading, or never ran —
+   *  and the results must be able to tell the two apart. */
+  const notAsked = (why) => judgeSkipped(`not asked — ${why}`);
+
   const results = [];
+  /** Every verdict this run collected for a case that RAN, in case order — the
+   *  judge stanza's input. A case skipped before its first turn (no recording,
+   *  no satisfying subject) is not in here: it is `summary.skipped`, and
+   *  counting it as unjudged would blame the judge for the instrument. */
+  const judgeVerdicts = [];
   /** case id → the condition it asked for and the row the board answered with,
    *  so a transcript read a week later says WHICH scenario "what happens in X"
    *  was actually about. */
@@ -354,11 +371,16 @@ export async function runEvals({
       pending = threadTurn(history, turn.prompt, resp, pending);
     }
 
-    const verdict = failures.length
-      ? { verdict: "fail", reason: "deterministic checks failed" }
-      : await judge.judgeCase(c, transcript);
-    const pass = failures.length === 0 && verdict.verdict !== "fail";
-    return { pass, failures, judge: verdict, transcript };
+    // A case that already failed its deterministic checks is not sent to the
+    // judge, so `asked` travels with the verdict: "deterministic checks failed"
+    // is the RUNNER talking, and counting it among the judge's fails would
+    // credit the judge with work it never did.
+    const asked = failures.length === 0;
+    const verdict = asked
+      ? await judge.judgeCase(c, transcript)
+      : { verdict: "fail", reason: "deterministic checks failed" };
+    const pass = asked && verdict.verdict !== "fail";
+    return { pass, failures, asked, judge: verdict, transcript };
   }
 
   for (const rawCase of fixture.cases) {
@@ -400,7 +422,8 @@ export async function runEvals({
         // A broken route or a failed read is a FAILURE. Reporting it as a skip
         // would retire a blocker by breaking the thing that feeds it.
         const failure = `subject route for '${need}': ${got.error}`;
-        results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, pass: false, samples: 0, passedRuns: 0, need, failures: [failure], judge: { verdict: "skipped" }, ms: 0 });
+        results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, pass: false, samples: 0, passedRuns: 0, need, failures: [failure], judged: false, judge: notAsked("the subject read failed"), ms: 0 });
+        judgeVerdicts.push(notAsked("the subject read failed"));
         if (rawCase.blocker) blockerFailures++;
         log(`[FAIL] ${rawCase.id} — ${rawCase.name} (${failure})`);
         continue;
@@ -422,7 +445,8 @@ export async function runEvals({
         // condition promises. That is a bug in one of them, not a property of
         // the board, and it must not be swallowed as a skip.
         const failure = `subject for '${need}' carries no ${missing.map((f) => `'${f}'`).join(", ")} (got ${JSON.stringify(got.subject)})`;
-        results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, pass: false, samples: 0, passedRuns: 0, need, subject: got.subject, failures: [failure], judge: { verdict: "skipped" }, ms: 0 });
+        results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, pass: false, samples: 0, passedRuns: 0, need, subject: got.subject, failures: [failure], judged: false, judge: notAsked("the case never ran"), ms: 0 });
+        judgeVerdicts.push(notAsked("the case never ran"));
         if (rawCase.blocker) blockerFailures++;
         log(`[FAIL] ${rawCase.id} — ${rawCase.name} (${failure})`);
         continue;
@@ -441,9 +465,20 @@ export async function runEvals({
     const pass = passesCase(passedRuns, samples);
     const rep = runs.find((r) => !r.pass) ?? runs[0];
     if (!pass && c.blocker) blockerFailures++;
-    results.push({ id: c.id, name: c.name, blocker: !!c.blocker, pass, samples, passedRuns, ...(subjectsUsed[c.id] ?? {}), failures: rep.failures, judge: rep.judge, ms: runs.reduce((s2, r) => s2 + r.transcript.turns.reduce((s3, t) => s3 + (t.response?.ms ?? 0), 0), 0), transcript: rep.transcript });
+    // `judged` is what keeps a FAIL-OPEN pass from reading as a graded one: the
+    // case is green either way, and only this field and the judge's reason say
+    // whether anything actually looked at the answer.
+    judgeVerdicts.push(rep.asked ? rep.judge : notAsked("the deterministic checks failed first"));
+    results.push({ id: c.id, name: c.name, blocker: !!c.blocker, pass, samples, passedRuns, ...(subjectsUsed[c.id] ?? {}), failures: rep.failures, judged: rep.asked && rep.judge.verdict !== "skipped", judge: rep.judge, ms: runs.reduce((s2, r) => s2 + r.transcript.turns.reduce((s3, t) => s3 + (t.response?.ms ?? 0), 0), 0), transcript: rep.transcript });
     const tally = samples > 1 ? ` [${passedRuns}/${samples} samples]` : "";
-    log(`[${pass ? "PASS" : "FAIL"}] ${c.id} — ${c.name}${tally}${rep.failures.length ? ` (${rep.failures.join("; ")})` : rep.judge.verdict === "fail" ? ` (judge: ${rep.judge.reason})` : ""}`);
+    const note = rep.failures.length
+      ? ` (${rep.failures.join("; ")})`
+      : rep.judge.verdict === "fail"
+        ? ` (judge: ${rep.judge.reason})`
+        : rep.judge.verdict === "skipped"
+          ? ` (UNJUDGED: ${rep.judge.reason})`
+          : "";
+    log(`[${pass ? "PASS" : "FAIL"}] ${c.id} — ${c.name}${tally}${note}`);
     await sleep(pauseMs);
   }
 
@@ -457,6 +492,12 @@ export async function runEvals({
     // in-process and one produced against a deployment are different
     // measurements, and nothing else in here tells them apart.
     transport: transport.name,
+    // WHO GRADED, AND HOW MUCH OF THE RUN THEY GRADED. `passed` below cannot
+    // answer it: a skipped verdict fails open to a pass, so a run judged by
+    // nobody and a run judged clean produce the same score. The name is the
+    // judge's own (an expired service account names itself apart from an
+    // absent one) and the counts are over the verdicts this run collected.
+    judge: { name: judge.name, ...judgeTally(judgeVerdicts) },
     // WHAT WAS MEASURED, AGAINST WHAT. The acceptance criterion is that results
     // are recorded with the revision they were measured against (#415), and
     // that is two facts, not one: which Worker answered, and which fixture
@@ -496,6 +537,17 @@ async function main() {
     `\n[evals] ${summary.passed}/${scored.length} passed${skipNote} ` +
       `(build ${summary.workerBuild}, fixture ${summary.fixture.rev}/${summary.fixture.sha256}) — details in eval-results.json`,
   );
+  // Beside the score, always: what the score was judged by. A pass count on its
+  // own is the deterministic checks plus however much grading happened to
+  // succeed, and those are not the same measurement week to week.
+  console.log(`[evals] judge ${summary.judge.name} — ${describeTally(summary.judge)}`);
+  // Stated, not WARNED. A local run has no credential by construction, so a
+  // warning would fire on every pull request and be trained away — and the
+  // reason on the line above is what tells a credential that was never there
+  // from one that expired. This says what the score is, which is the fact.
+  if (summary.judge.pass + summary.judge.fail === 0 && summary.judge.skipped > 0) {
+    console.log(`[evals] no answer was graded — this score is the deterministic checks alone`);
+  }
   if (summary.blockerFailures > 0) {
     console.error(`[evals] ${summary.blockerFailures} BLOCKER case(s) failed`);
     process.exit(1);

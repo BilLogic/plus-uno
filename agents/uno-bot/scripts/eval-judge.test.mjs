@@ -9,18 +9,29 @@
 // And the second half: the credential, the call, the cut and the fail-open are
 // exercised here with no network and no service account, because they are the
 // judge module's now rather than closures in the runner.
+//
+// The fail-open half carries its own property, asserted from "a skip is not a
+// pass" downwards: every skip names a reason, no two no-judge reasons share a
+// name, and the tally a run publishes counts what was graded rather than what
+// came out green. An expired service account must not read like a deliberate
+// deterministic-only run — that is the same thing as the suite being honest
+// about what it measured.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { generateKeyPairSync } from "node:crypto";
 import {
   RUBRIC_PATH,
+  UNRECORDED_SKIP_REASON,
   describeRubric,
+  describeTally,
   dimensionIds,
   extractBlock,
   googleAccessToken,
   judgeFromEnv,
+  judgeSkipped,
   judgeSystem,
+  judgeTally,
   loadRubric,
   noJudge,
   vertexJudge,
@@ -189,30 +200,107 @@ test("the judge fails OPEN: a thrown call, an HTTP error and unparseable output 
   });
   assert.deepEqual(await babble.judgeCase(CASE, {}), {
     verdict: "skipped",
-    reason: "unparseable judge output",
+    reason: "unparseable judge output (HTTP 200)",
   });
+
+  // Every one of those is a SKIP WITH A REASON. A skip failing open to a green
+  // case is only tolerable while the run can still say the case was not graded
+  // and why, so a reasonless skip is the shape this module must not produce.
+  for (const [what, judge] of [["thrown", thrown], ["HTTP error", http500], ["babble", babble]]) {
+    const v = await judge.judgeCase(CASE, {});
+    assert.equal(v.verdict, "skipped");
+    assert.ok(v.reason && v.reason !== UNRECORDED_SKIP_REASON, `the ${what} skip records no reason`);
+  }
+});
+
+test("a skip is a verdict with a reason, and a reasonless one is named as the bug it is", () => {
+  assert.deepEqual(judgeSkipped("ECONNRESET"), { verdict: "skipped", reason: "ECONNRESET" });
+  // Not a blank, not a missing key: a reason nobody can act on still has to be
+  // legible as a defect where it lands, in eval-results.json.
+  for (const nothing of ["", "   ", null, undefined]) {
+    assert.deepEqual(judgeSkipped(nothing), { verdict: "skipped", reason: UNRECORDED_SKIP_REASON });
+  }
+});
+
+test("the tally counts what was JUDGED, not what came out green", () => {
+  const tally = judgeTally([
+    { verdict: "pass" },
+    { verdict: "pass" },
+    { verdict: "fail", reason: "it posted" },
+    { verdict: "skipped", reason: "no credential" },
+    { verdict: "skipped", reason: "no credential" },
+    { verdict: "skipped", reason: "ECONNRESET" },
+    undefined,
+  ]);
+  assert.deepEqual(tally, {
+    pass: 2,
+    fail: 1,
+    skipped: 4,
+    skipReasons: { "no credential": 2, ECONNRESET: 1, [UNRECORDED_SKIP_REASON]: 1 },
+  });
+  assert.equal(
+    describeTally(tally),
+    "3 judged (2 pass, 1 fail), 4 unjudged — 2× no credential, 1× ECONNRESET, " +
+      `1× ${UNRECORDED_SKIP_REASON}`,
+  );
+});
+
+test("a whole run nobody judged is legible as exactly that", () => {
+  // The Monday cron's failure mode: 34 cases, 34 deterministic passes, and a
+  // service account that expired on Friday. The tally is what stops that from
+  // reading like a clean sweep.
+  const judge = noJudge("credential could not be exchanged for a token");
+  const verdicts = Array.from({ length: 34 }, () => ({ verdict: "skipped", reason: "credential could not be exchanged for a token" }));
+  const tally = judgeTally(verdicts);
+  assert.equal(tally.pass + tally.fail, 0, "nothing was judged");
+  assert.equal(tally.skipped, 34);
+  assert.match(describeTally(tally), /^0 judged \(0 pass, 0 fail\), 34 unjudged — 34× credential could not be exchanged/);
+  assert.match(judge.name, /credential could not be exchanged for a token/);
 });
 
 test("a judge with no credential is an object, not a null — it skips every case", async () => {
   const j = noJudge("no credential");
-  assert.equal(j.name, "none — no credential, deterministic checks only");
+  assert.equal(j.name, "none — no credential; deterministic checks only");
   assert.deepEqual(await j.judgeCase(CASE, {}), { verdict: "skipped", reason: "no credential" });
+  // The reason reaches the verdict for EVERY case, not just the log line: the
+  // results file is what someone reads on Monday, and the log is gone by then.
+  assert.deepEqual(await j.judgeCase({ id: "C1" }, { turns: [] }), { verdict: "skipped", reason: "no credential" });
 });
 
 test("no service-account env means no token exchange and no judge", async () => {
   const fetchImpl = fakeFetch(vertexReply('{"verdict":"pass"}'));
   const j = await judgeFromEnv({}, { fetchImpl });
-  assert.equal(j.name, "none — no credential, deterministic checks only");
+  assert.equal(j.name, "none — no credential; deterministic checks only");
   assert.equal(fetchImpl.calls.length, 0, "a judge with no credential asks the network nothing");
 });
 
-test("a service account that cannot be exchanged for a token fails open to no judge", async () => {
+test("a service account that cannot be exchanged names itself apart from one that was never there", async () => {
   const fetchImpl = fakeFetch({ ok: false, status: 401, json: async () => ({ error: "unauthorized_client" }) });
-  const j = await judgeFromEnv(
+  const expired = await judgeFromEnv(
     { GEMINI_SA_EMAIL: "evals@hcii-plus.iam.gserviceaccount.com", GEMINI_SA_PRIVATE_KEY: TEST_KEY },
     { fetchImpl },
   );
-  assert.equal(j.name, "none — no credential, deterministic checks only");
+  // The STATUS is in the reason: an expired key (401) and a project whose API
+  // is off (403) are both "could not be exchanged", and they are not the same
+  // thing to go and fix.
+  assert.equal(
+    expired.name,
+    "none — credential could not be exchanged for a token: token exchange failed (HTTP 401); deterministic checks only",
+  );
+  assert.deepEqual(await expired.judgeCase(CASE, {}), {
+    verdict: "skipped",
+    reason: "credential could not be exchanged for a token: token exchange failed (HTTP 401)",
+  });
+
+  // THE DEFECT THIS ASSERTS AWAY: both paths used to print "no credential", so
+  // an expired key on the Monday cron was indistinguishable from a run nobody
+  // meant to judge. Same fail-open, different reason, and the run says which.
+  const absent = await judgeFromEnv({}, { fetchImpl: fakeFetch(vertexReply("{}")) });
+  assert.notEqual(expired.name, absent.name);
+  assert.notEqual(
+    (await expired.judgeCase(CASE, {})).reason,
+    (await absent.judgeCase(CASE, {})).reason,
+  );
 });
 
 test("a service account that exchanges names the model and the rubric it will grade with", async () => {
@@ -222,6 +310,22 @@ test("a service account that exchanges names the model and the rubric it will gr
     { fetchImpl },
   );
   assert.equal(j.name, "gemini-3.1-pro-preview against 9 dimensions (D1–D9) from docs/evals/rubrics/bot-answer.md");
+});
+
+test("a token exchange that fails names the status and never the credential", async () => {
+  const fetchImpl = fakeFetch({
+    ok: false,
+    status: 403,
+    json: async () => ({ error: { message: "Vertex AI API has not been used in project hcii-plus" } }),
+  });
+  await assert.rejects(
+    () => googleAccessToken({ email: "evals@hcii-plus.iam.gserviceaccount.com", privateKey: TEST_KEY }, { fetchImpl }),
+    (err) => {
+      assert.equal(err.message, "token exchange failed (HTTP 403)");
+      assert.ok(!/PRIVATE KEY/.test(err.message), "the key must not travel in an error message");
+      return true;
+    },
+  );
 });
 
 test("the service-account JWT is signed with the key and exchanged for a bearer token", async () => {

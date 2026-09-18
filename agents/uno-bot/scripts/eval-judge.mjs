@@ -20,6 +20,17 @@
 // still ran and a network hiccup is not evidence about the bot. Every path out
 // of `judgeCase` below is one of those three, never a throw.
 //
+// A SKIP IS NOT A PASS, THOUGH, AND MUST NOT READ AS ONE. Failing open means a
+// skipped case stays green, so on its own it is indistinguishable from a case
+// the grind model read and approved — "34/34 passed" would say the same thing
+// whether every case was judged or an expired service account judged none. Two
+// rules keep a run honest about that, and both are this module's:
+//
+//   1. every skip carries its REASON — `judgeSkipped` below is the only way to
+//      make one, so no path can forget — and
+//   2. `judgeTally` counts the verdicts a run actually collected, which the
+//      runner records in the summary and prints beside the score.
+//
 // On the rubric, which this module has always owned: the judge prompt used to
 // carry its own condensed paraphrase of D1–D9 as a string constant in
 // run-evals.mjs, beside the canonical rubric in docs/evals/rubrics/bot-answer.md.
@@ -123,8 +134,19 @@ export function judgeSystem(rubric) {
 
 // ── The credential ────────────────────────────────────────────────────────────
 
-/** The default judge model: the grind tier. A judge should be at least as
- *  strong as what it grades, and the bot's own model shares its blind spots. */
+/**
+ * The default judge model: the model the GRIND tier runs, because a judge should
+ * be at least as strong as what it grades and the bot's own model shares its
+ * blind spots.
+ *
+ * The MODEL, not the tier. This judge sends it `thinkingLevel: "low"` (see the
+ * call below), and ADR-028 says a tier is a model and a thinking level moving
+ * together — grind is this model at `high`. So the pair here is no tier, and
+ * naming it "the grind tier" would be the claim ADR-028 exists to stop. Left as
+ * the pair the suite has always scored on rather than changed under a
+ * refactor's cover: #605 is where the judge names a tier and calls through the
+ * ModelProvider seam, and the pair stops being the judge's to pick.
+ */
 export const DEFAULT_JUDGE_MODEL = "gemini-3.1-pro-preview";
 export const DEFAULT_PROJECT_ID = "hcii-plus";
 
@@ -134,8 +156,8 @@ export const DEFAULT_PROJECT_ID = "hcii-plus";
  * Was 8,000 chars, and a full prompt-spec is longer than that: on 2026-09-05
  * (run 33972756077) P2's Open Questions block began at char 8,190, so the judge
  * failed the reply for "documenting none of the open decisions" it had
- * documented — a verdict about the cut, not the reply. The judge runs on the
- * grind tier with a long context; 60,000 chars covers every transcript the
+ * documented — a verdict about the cut, not the reply. The judge runs grind's
+ * model, whose context is long; 60,000 chars covers every transcript the
  * fixture produces today with room to grow, and the marker below tells the
  * judge when it still is not the whole thing.
  */
@@ -180,8 +202,67 @@ export async function googleAccessToken({ email, privateKey }, { fetchImpl = fet
     body: new URLSearchParams({ grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer", assertion: jwt }),
   });
   const data = await res.json();
-  if (!res.ok || !data.access_token) throw new Error(`token exchange failed (${res.status})`);
+  // The STATUS and nothing else: a 401 is an expired or revoked key, a 403 is
+  // the API or the role, and a reason that says only "it failed" sends whoever
+  // reads it on Monday to the wrong door. The body can carry the credential's
+  // own details, so it stays out of the message.
+  if (!res.ok || !data.access_token) throw new Error(`token exchange failed (HTTP ${res.status})`);
   return data.access_token;
+}
+
+// ── The verdicts ──────────────────────────────────────────────────────────────
+
+/** What a skip with no reason is recorded as — a bug, named rather than blank. */
+export const UNRECORDED_SKIP_REASON = "skipped for no recorded reason";
+
+/**
+ * A skipped verdict, which always carries why.
+ *
+ * The only constructor for one: a bare `{ verdict: "skipped" }` reaching the
+ * results is a case nobody can tell from a judged pass a week later, and that
+ * is the failure this module exists to prevent.
+ *
+ * @param {string} reason
+ * @returns {{verdict: "skipped", reason: string}}
+ */
+export function judgeSkipped(reason) {
+  return { verdict: "skipped", reason: String(reason ?? "").trim() || UNRECORDED_SKIP_REASON };
+}
+
+/**
+ * What the judge did across a whole run: a count per verdict, and the distinct
+ * reasons behind the skips with how many cases each accounts for.
+ *
+ * Pure, and over VERDICTS rather than over result rows, so the runner can keep
+ * it and the results envelope (#617) can read it without either owning it.
+ *
+ * @param {Array<{verdict?: string, reason?: string}|null|undefined>} verdicts
+ * @returns {{pass: number, fail: number, skipped: number, skipReasons: Record<string, number>}}
+ */
+export function judgeTally(verdicts) {
+  const tally = { pass: 0, fail: 0, skipped: 0, skipReasons: {} };
+  for (const v of verdicts) {
+    if (v?.verdict === "pass" || v?.verdict === "fail") {
+      tally[v.verdict]++;
+      continue;
+    }
+    tally.skipped++;
+    const { reason } = judgeSkipped(v?.reason);
+    tally.skipReasons[reason] = (tally.skipReasons[reason] ?? 0) + 1;
+  }
+  return tally;
+}
+
+/** The tally as one line for the log: what was graded, what was not, and why. */
+export function describeTally(tally) {
+  const graded = tally.pass + tally.fail;
+  const why = Object.entries(tally.skipReasons)
+    .map(([reason, n]) => `${n}× ${reason}`)
+    .join(", ");
+  return (
+    `${graded} judged (${tally.pass} pass, ${tally.fail} fail), ${tally.skipped} unjudged` +
+    (why ? ` — ${why}` : "")
+  );
 }
 
 // ── The judges ────────────────────────────────────────────────────────────────
@@ -192,13 +273,20 @@ export async function googleAccessToken({ email, privateKey }, { fetchImpl = fet
  * A null judge would make every caller ask whether there is one; an object that
  * skips makes "no judge" the same shape as a judge, and the runner's default.
  *
+ * THE NAME CARRIES THE REASON, because the reasons are not interchangeable: a
+ * checkout with no service account configured and a service account that has
+ * expired both end up here, and only one of them is somebody's Monday morning.
+ * A fixed name — which this used to have — printed "no credential" for an
+ * expired key, so a broken cron read as a deliberately unjudged run.
+ *
  * @param {string} [reason]
  */
 export function noJudge(reason = "no credential") {
+  const verdict = judgeSkipped(reason);
   return {
-    name: "none — no credential, deterministic checks only",
+    name: `none — ${verdict.reason}; deterministic checks only`,
     async judgeCase() {
-      return { verdict: "skipped", reason };
+      return verdict;
     },
   };
 }
@@ -253,9 +341,12 @@ export function vertexJudge({
         const m = text && text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
         const parsed = m ? JSON.parse(m) : null;
         if (parsed?.verdict === "pass" || parsed?.verdict === "fail") return parsed;
-        return { verdict: "skipped", reason: "unparseable judge output" };
+        // The status belongs in the reason: an HTTP 429 and a model that
+        // answered in prose are both "unparseable" from here, and they are not
+        // the same problem to go and fix.
+        return judgeSkipped(`unparseable judge output (HTTP ${res.status})`);
       } catch (err) {
-        return { verdict: "skipped", reason: String(err?.message ?? err) };
+        return judgeSkipped(String(err?.message ?? err));
       }
     },
   };
@@ -275,7 +366,10 @@ export function truncateTranscript(transcript, max = JUDGE_TRANSCRIPT_CHARS) {
  *
  * A missing or unusable credential is not an error here. The suite's
  * deterministic checks do not need a judge, and a token exchange that failed at
- * 3am should leave a run with fewer verdicts, not no run.
+ * 3am should leave a run with fewer VERDICTS, not no run — and a run that says
+ * which: the judge it returns names the reason, every case it skips records
+ * one, so the summary reads "0 judged, 34 unjudged — 34× credential could not
+ * be exchanged for a token" rather than a clean sweep.
  *
  * @param {Record<string, string|undefined>} [env]
  * @param {{rubric?: object, fetchImpl?: typeof fetch}} [opts]
@@ -283,11 +377,22 @@ export function truncateTranscript(transcript, max = JUDGE_TRANSCRIPT_CHARS) {
 export async function judgeFromEnv(env = process.env, { rubric = loadRubric(), fetchImpl = fetch } = {}) {
   const { GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY, GEMINI_PROJECT_ID, JUDGE_MODEL } = env;
   if (!GEMINI_SA_EMAIL || !GEMINI_SA_PRIVATE_KEY) return noJudge("no credential");
-  const token = await googleAccessToken(
+  // WHY the exchange failed travels with the skip. Swallowing it — which this
+  // line used to do — left an expired service account reporting the same
+  // sentence as one that was never configured.
+  const exchanged = await googleAccessToken(
     { email: GEMINI_SA_EMAIL, privateKey: GEMINI_SA_PRIVATE_KEY },
     { fetchImpl },
-  ).catch(() => null);
-  if (!token) return noJudge("credential could not be exchanged for a token");
+  ).then(
+    (token) => ({ token }),
+    (err) => ({ why: String(err?.message ?? err) }),
+  );
+  if (!exchanged.token) {
+    return noJudge(
+      `credential could not be exchanged for a token${exchanged.why ? `: ${exchanged.why}` : ""}`,
+    );
+  }
+  const { token } = exchanged;
   return vertexJudge({
     token,
     rubric,
