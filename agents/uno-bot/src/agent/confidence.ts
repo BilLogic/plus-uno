@@ -18,36 +18,28 @@
 // Bias: false NEGATIVES are cheap (one extra judge call), false POSITIVES are
 // not (a non-compliant reply ships believing itself checked). Every pattern
 // below is therefore narrow on purpose.
+//
+// The one import is the tool table, which imports nothing: whether a tool
+// fetched from a source is the table's `retrieval` column, and the regexes
+// below are all that is left of this module's own judgement.
+import { rowFor } from "./tool-table";
 
 /**
- * The tools that FETCH FROM A SOURCE. This is the READ-ONLY half of
- * tool-definitions.json minus `slack_react`, which is read-only in the "no
- * confirmation gate" sense but retrieves nothing — it posts a reaction. The
- * side-effect tools (notion_create/update/archive, component_implement,
- * prototype_scaffold, shareout_post, email_send, proposal_resolve) are absent
- * for the same reason: none of them is a source the answer can rest on.
+ * True when any tool that reaches a source ran this turn.
  *
- * Still stated here rather than read off the tool table's `retrieval` column
- * (`agent/tool-table.ts`) — and purity is no longer the reason it is: that
- * table is import-free and compiles in the same Node build this module does.
- * The column landed BESIDE this set, and `tests/tool-table.test.ts` holds the
- * two accounts equal in both directions until the reader moves over.
+ * Which tools those are is the tool table's `retrieval` column
+ * (`agent/tool-table.ts`), not a set restated here: the set this module kept
+ * had to be remembered alongside every new tool, and a tool missing from it
+ * read as "nothing was fetched", which is the branch that lets a grounded
+ * answer ship with no clause at all. The table is import-free, so reading it
+ * costs this module nothing — it still compiles and runs under plain Node.
+ *
+ * A name nobody registered counts as no retrieval. Tool names here come from
+ * the turn's own telemetry, so that case means a tool was renamed and the
+ * telemetry lagged: one extra judge call, which is the cheap direction.
  */
-export const RETRIEVAL_TOOLS: ReadonlySet<string> = new Set([
-  "roadmap_query",
-  "notion_search",
-  "source_read",
-  "search_blueprint",
-  "github_read",
-  "slack_user_profile",
-  "slack_channel_members",
-  "slack_thread_read",
-  "slack_search",
-]);
-
-/** True when any tool that reaches a source ran this turn. */
 export function retrievalRanIn(toolsUsed: readonly string[]): boolean {
-  return toolsUsed.some((tool) => RETRIEVAL_TOOLS.has(tool));
+  return toolsUsed.some((tool) => rowFor(tool)?.retrieval === true);
 }
 
 /** What the turn did, as far as the confidence rule cares. */
