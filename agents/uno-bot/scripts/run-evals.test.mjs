@@ -17,6 +17,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { loadCases } from "./eval-case.mjs";
+import { RESULT_KEYS } from "./eval-results.mjs";
 import { runEvals, parseArgs } from "./run-evals.mjs";
 import { noJudge } from "./eval-judge.mjs";
 import { workerTransport } from "./eval-transport.mjs";
@@ -400,6 +401,27 @@ test("an unrecorded case is reported UNGATED, counted apart, and never fails a b
   assert.equal(summary.census.total, 1);
   assert.ok(lines.some((l) => l.startsWith("[UNGATED] R0")));
   assert.ok(lines.some((l) => /UNGATED \(no recording\): R0/.test(l)));
+});
+
+test("every row of the results file has the same shape, whichever branch wrote it", async () => {
+  // THE ENVELOPE (#617). One run, three branches of the walk: a case that ran
+  // and passed, a case whose condition nothing satisfied, and a case this
+  // transport cannot reach. A reader of eval-results.json — or a jq expression,
+  // or the next runner — must not have to tell "this case did not fail" from
+  // "this branch never wrote the field".
+  const cases = [caseById("R3"), caseById("B2"), { ...caseById("R1"), id: "R0" }];
+  const instrument = {
+    ...fakeTransport([R3_OK], { subjects: {} }),
+    unsupported: (c) => (c.id === "R0" ? "no recording for R0" : null),
+  };
+  const { summary } = await run(fixtureOf(cases), instrument);
+  assert.equal(summary.results.length, 3);
+  assert.deepEqual(summary.results.map((r) => Object.keys(r)), summary.results.map(() => RESULT_KEYS));
+  // And the three branches really were three: a pass, a skip, an ungated skip.
+  assert.deepEqual(
+    summary.results.map((r) => [r.pass, r.skipped, r.ungated]),
+    [[true, false, false], [false, true, false], [false, true, true]],
+  );
 });
 
 test("a run states its census before it starts", async () => {

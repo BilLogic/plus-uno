@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **172,677 chars from 16 files**, against an assembled budget of 175,000 (2,323 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,293 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **172,685 chars from 16 files**, against an assembled budget of 175,000 (2,315 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,301 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,603 (−7,277 ide-only) | 9,603 | 20,000 (constitution) |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,964 | 29,595 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,187 | 56,823 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,216 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 70,260 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 76,973 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,260 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 88,963 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,365 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,336 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,334 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,280 | 125,656 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 128,904 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 159,491 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 164,080 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 172,677 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,972 | 29,603 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,187 | 56,831 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,224 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 70,268 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 76,981 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,268 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 88,971 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,373 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,344 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,342 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,280 | 125,664 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 128,912 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 159,499 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 164,088 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 172,685 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -232,8 +232,8 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **recording** | a case's captured model replies, tool results and subject — the local eval transport's input (`docs/evals/fixtures/recordings/`); `source` is `authored` or `captured`, written down rather than inferred, and it reaches the results file | "fixture" (a fixture is what a case ASSERTS; a recording is what answered it) |
 | **transport** | how the eval runner reaches a turn: the deployed Worker's eval route, or **Turn** in-process from a **recording**. The summary names which one answered, because the two are different measurements | "the endpoint", "the eval route" (that is one transport's target) |
 | **judge** | who grades an eval answer — a module beside the **transport** and the same shape (`agents/uno-bot/scripts/eval-judge.mjs`): `{ name, judgeCase(case, transcript) }`, owning the rubric, the credential, the call, the cut and the fail-open, and grading on the `grind` tier — model AND thinking level, ADR-028, rather than a pair of its own picking. Three verdicts: `pass`, `fail`, `skipped`. A skip fails OPEN, so it carries its reason and the summary counts what was judged — an unjudged run reads as unjudged rather than as a clean sweep | "the rubric" (that is the document a judge grades against) |
-| **eval case** | one scored eval conversation as a module (`agents/uno-bot/scripts/eval-case.mjs`): its declared shape (`CASE_KEYS`/`TURN_KEYS` — a key outside them is refused, not ignored), its one loader, and the **census** of them. Every count about the suite is read from the census rather than typed, and `docs/evals/scenarios/uno-bot.md` is generated from the fixture | "the fixture" (a fixture is the file of cases; a case is one of them) |
-| **ungated** | a case this run's **transport** has no way to reach — for the local one, a case with no **recording**. It skips by name and stays out of the denominator, and it is counted and named wherever the run reports itself: a skip nobody counts is a case that gates nothing while reading as though it did | "skipped" (a skip is a reachable case whose subject condition nothing satisfied) |
+| **eval case** | one scored eval conversation as a module (`agents/uno-bot/scripts/eval-case.mjs`): its declared shape (`CASE_KEYS`/`TURN_KEYS` — a key outside them is refused, not ignored), its one loader, and the **census** of them, from which every count about the suite is read rather than typed. A run's results are `eval-results.mjs`: one row constructor, so the file has one shape | "the fixture" (a fixture is the file of cases; a case is one of them) |
+| **ungated** | a case this run's **transport** has no way to reach — for the local one, a case with no **recording**. It skips by name, stays out of the denominator, and is named wherever the run reports itself — twice, deliberately: the **census** claims it before the walk, the summary records it after | "skipped" (a skip is a reachable case whose subject condition nothing satisfied) |
 | **sprawl** | a document too long even when every line is live — attention thins across it; the cure is the ladder, not a shorter sentence | "bloat" (bloat is dead weight; sprawl is live weight) |
 
 ## Two vocabularies — the blueprint speaks service-blueprint, the Roadmap speaks project-management
