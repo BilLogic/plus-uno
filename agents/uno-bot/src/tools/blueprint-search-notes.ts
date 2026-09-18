@@ -1,9 +1,16 @@
 // The notes a `search_blueprint` result carries about the blueprint's time
 // axis, as exported strings.
 //
-// They live apart from blueprint-search.ts for one reason: that module imports
-// Env and fetch, so it cannot compile under tsconfig.test.json, and a string
-// nobody can import is a string nobody can sweep. Until #443 the prompt said
+// They live apart from blueprint-search.ts because a string nobody can import
+// is a string nobody can sweep, and these are the swept ones: `SEARCH_NOTES`
+// below is the sweep's named subject. The reason this header used to give —
+// that blueprint-search.ts reaches Env and the metered fetch and so cannot
+// compile under tsconfig.test.json — is not the reason: the Workers types sit
+// beside the Node ones in that build, and a test drives that module directly
+// now (tests/blueprint-unavailable.test.ts). What is still true is that the
+// notes left INSIDE it — the grounding rule, the cache note, the failure
+// notes — are not exported, so the sweep cannot name them; moving one here is
+// what puts it under the sweep. Until #443 the prompt said
 // "status", the tool schema said "status", and every tool RESULT still said a
 // path's future was spelled in its name — `Planned:` / `Prototype:` — eleven
 // days after the last such name was renamed away. The harness name sweep

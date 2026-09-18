@@ -154,7 +154,10 @@ A check returns findings rather than exiting. `scripts/lib/findings.mjs` is that
 interface — a check exports `run(ctx) => Finding[]` and decides nothing about
 output; the runner renders the banner and picks the exit code, and the check's
 own CLI entry (`main()` in that module) prints the same string when you run it
-by hand. `scripts/check-font-families.mjs` is the shape to copy, and
+by hand. `main()` also takes a `flags` map for a check's TERMINAL side doors —
+`--list`, `--update` — so the entry comparison is written once; a side flag that
+prints and then still gates is not one of those and stays hand-rolled (#609).
+`scripts/check-font-families.mjs` is the shape to copy, and
 `scripts/generate-check-scripts.mjs` the shape for a generator whose `--check`
 is one half of it. Each registry row declares its `module`; the few checks whose
 result is an exit code by nature — a browser suite, `tsc`, a test runner, the

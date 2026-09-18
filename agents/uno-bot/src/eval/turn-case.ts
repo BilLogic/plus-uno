@@ -25,7 +25,7 @@
 import type { AgentResult } from "../agent/loop";
 import type { ToolCall } from "../agent/tool-transcript";
 import type { HistoryTurn, PendingProposal } from "../thread-state/index";
-import type { DeliveryCall, TurnOutcome, TurnRequest } from "../turn/index";
+import { buildTurnRequest, type DeliveryCall, type TurnOutcome, type TurnRequest } from "../turn/index";
 
 /** The synthetic surface an eval turn arrives on. `C_EVAL` never starts with
  *  "D", so own-visibility search is unreachable and any assertion about the
@@ -93,24 +93,22 @@ export function evalTurnRequest(
 
   return {
     ok: true,
-    request: {
+    // Through the same builder the Slack adapter calls, so the surface rule,
+    // the empty defaults and which optional fields are ABSENT are decided in
+    // one place for both callers (`turn/request.ts`).
+    request: buildTurnRequest({
       userId,
       channel,
       conversationTs: EVAL_TS,
       userMsgTs: EVAL_TS,
-      // The same rule the Slack adapter applies: an app DM and the assistant
-      // panel are one conversation, and a `D…` channel is that surface.
-      surface: channel.startsWith("D") ? "assistant" : "channel",
       // An eval conversation is a thread the runner is continuing, which is
       // also what keeps the antecedent window — a read of a Slack channel the
       // eval surface does not have — out of the measurement.
       threaded: true,
       text: prompt,
-      images: [],
       history,
       pending,
-      prd: null,
-    },
+    }),
   };
 }
 

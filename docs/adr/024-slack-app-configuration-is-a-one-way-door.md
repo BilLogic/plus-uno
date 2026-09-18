@@ -46,7 +46,7 @@ the bot token from 39 scopes to 36, with `search:read.im`, `search:read.mpim` an
 `search:read.private` gone — verified against the live token. A fresh install (unlike
 a reinstall) mints a new `xoxb-`, so `SLACK_BOT_TOKEN` had to be replaced everywhere
 it is stored. Every stored user token was revoked, and stale keys had to be deleted
-by hand: in `agents/uno-bot/src/oauth/mcp-oauth.ts` the shared default key
+by hand: in `agents/uno-bot/src/oauth/slack.ts` the shared default key
 (`slack_oauth_token`) is written only when empty, so re-consenting leaves a dead
 value in place, and `agents/uno-bot/src/tools/slack-search.ts` takes the first viable
 candidate without falling through — a revoked stored token makes search hard-error

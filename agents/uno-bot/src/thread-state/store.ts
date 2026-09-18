@@ -162,7 +162,7 @@ export interface PendingProposal {
   userMsgTs: string;
   proposalTs: string;
   proposalText: string;
-  /** Who asked. Kept for the record; anyone in the thread may confirm (lock removed 2026-07-14, see slack/gate.ts). */
+  /** Who asked. Kept for the record; anyone in the thread may confirm (lock removed 2026-07-14, see gate/reaction-door.ts). */
   requesterUserId: string;
   /** Notion PRD resolved at proposal time, carried so it survives the
    *  proposal→confirm round trip and reaches the executor. */

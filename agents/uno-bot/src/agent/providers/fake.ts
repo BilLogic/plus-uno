@@ -2,16 +2,21 @@
 //
 // It replays the replies it was handed, records everything the loop sent it, can
 // be told to fail once with a given HTTP status, and answers `fallback` with
-// whether a backup exists. That is the whole surface: the loop's behaviour is
-// then observable without a network call, a credential or a Cloudflare runtime.
+// whether a backup exists. The one-shot `generate` is scripted the same way,
+// and records the tier and prompt it was asked on, so a caller of the seam's
+// second call is as testable as the loop. That is the whole surface: the loop's
+// behaviour is then observable without a network call, a credential or a
+// Cloudflare runtime.
 //
 // Workers-global-free on purpose — no `Env`, no fetch — so `tsconfig.test.json`
 // compiles it alongside the loop and the tests that drive it.
 
 import type {
+  ModelPrompt,
   ModelProvider,
   ModelReply,
   ModelStop,
+  ModelText,
   ModelToolCall,
   ModelToolResult,
   ModelTurn,
@@ -45,6 +50,13 @@ export interface FakeProviderOptions {
   backupModel?: string | null;
   /** Statuses the backup is worth trying on. */
   fallbackStatuses?: number[];
+  /** Canned one-shot replies, replayed in order by `generate`. Past the end it
+   *  answers with empty text, so a caller that generates more often than the
+   *  script cannot hang. */
+  generateReplies?: string[];
+  /** When set, every `generate` fails with this message — the caller's
+   *  fail-open path (the draft judge sends the original draft). */
+  generateFailMessage?: string;
   model?: string;
   usage?: Partial<ModelUsage>;
 }
@@ -59,6 +71,9 @@ export interface FakeProvider extends ModelProvider {
   readonly transcript: FakeTranscriptEntry[];
   /** Every tool call the fake announced, so a test can assert none ran. */
   readonly announced: ModelToolCall[];
+  /** Every one-shot the fake was asked for, in order — which tier it was asked
+   *  on and what prompt it carried. */
+  readonly generated: ModelPrompt[];
 }
 
 export function fakeProvider(opts: FakeProviderOptions = {}): FakeProvider {
@@ -72,6 +87,9 @@ export function fakeProvider(opts: FakeProviderOptions = {}): FakeProvider {
   const sends: Array<{ toolsEnabled: boolean; model: string }> = [];
   const transcript: FakeTranscriptEntry[] = [];
   const announced: ModelToolCall[] = [];
+  const generated: ModelPrompt[] = [];
+  const generateReplies = [...(opts.generateReplies ?? [])];
+  let generateCursor = 0;
   const usage: ModelUsage = {
     inputTokens: 0,
     outputTokens: 0,
@@ -86,9 +104,18 @@ export function fakeProvider(opts: FakeProviderOptions = {}): FakeProvider {
     sends,
     transcript,
     announced,
+    generated,
 
     async start(turn: ModelTurn): Promise<void> {
       (fake as { started: ModelTurn | null }).started = turn;
+    },
+
+    async generate(prompt: ModelPrompt): Promise<ModelText> {
+      generated.push(prompt);
+      if (opts.generateFailMessage !== undefined) {
+        return { ok: false, model, message: opts.generateFailMessage };
+      }
+      return { ok: true, model, text: generateReplies[generateCursor++] ?? "" };
     },
 
     async send({ toolsEnabled }): Promise<ModelReply> {

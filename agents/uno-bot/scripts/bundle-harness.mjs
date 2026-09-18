@@ -140,10 +140,18 @@ const SECTIONS = [
  * so renaming a skill cannot silently drop its budget.
  */
 const BUDGETS = {
-  // Headroom over today's ~163k, sized to absorb ordinary authoring and to fail
+  // Headroom over today's ~170k, sized to absorb ordinary authoring and to fail
   // on a whole doc arriving unnoticed. Raise it deliberately, in a PR that says
   // what the prompt bought for the chars.
-  assembled: 170_000,
+  //
+  // RAISED 170k -> 175k (#616). The deep-module batch #592-#625 spent the old
+  // ceiling's whole headroom on vocabulary: nine modules landed and five of them
+  // added the CONTEXT.md glossary row every seam in this repo carries, which is
+  // what lets a later ticket name the thing instead of re-describing it. What the
+  // 5k bought: the `eval case` and `ungated` rows here, and room for the rows the
+  // rest of the batch's tickets will need. The floor below is untouched, so this
+  // moves the ceiling only.
+  assembled: 175_000,
   persona: 28_000,
   botFace: 7_000,
   // Tier 1 — the constitution, always loaded. `AGENTS.md` § The loading contract

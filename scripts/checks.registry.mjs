@@ -34,10 +34,19 @@
  *             `.github/workflows/uno-bot-checks.yml`, which is where an
  *             EXCLUDED row can still carry this trigger), 'sweep' (a step of
  *             the monthly integrity sweep), 'storybook-gate' (the browser job),
- *             'deploy' (gated at `npm run deploy` in agents/uno-bot). A string,
- *             or an array when a check genuinely runs in more than one place —
- *             the two registry generators both read it, so a `sweep` here and
- *             no step there is a drift failure.
+ *             'deploy' (a gate of the `deploy` chain in agents/uno-bot —
+ *             `DEPLOY_CHAIN`, below). A string, or an array when a check
+ *             genuinely runs in more than one place. ALL FOUR ARE ASSERTED, in
+ *             both directions: a row with a trigger and no step fails, and a
+ *             step with no row fails. 'sweep' and 'storybook-gate' against
+ *             `WORKFLOW_STEPS`, 'pull_request' against the run lines of
+ *             `PULL_REQUEST_WORKFLOWS`, 'deploy' against `DEPLOY_CHAIN`.
+ *   stepOf    the composed row that runs this row as a sub-process, for a row
+ *             that reaches its trigger through another. The five generators of
+ *             `check:agent` are the only ones: each is uncomposed, so the
+ *             `pull_request` assertion would call it unreachable, and it is in
+ *             fact gated one level down. `reason` says the same thing in prose
+ *             and the drift check holds the two together.
  *   guards    what goes red when it fails, written for whoever reads the CI log
  *             and did not write the check. Registered rows only.
  *   reason    why the row is NOT composed. `EXCLUDED` rows only.
@@ -633,6 +642,7 @@ export const EXCLUDED = [
     spawnReason:
       'a generator. `--check` is its own assembly pass with the writes withheld, and ' +
       'check:agent spawns it so the step names itself.',
+    stepOf: 'check:agent',
     reason:
       'step 3 of check:agent.',
   },
@@ -643,6 +653,7 @@ export const EXCLUDED = [
     trigger: 'pull_request',
     kind: 'spawn',
     spawnReason: 'a generator, spawned as a step of check:agent — see check:component-docs.',
+    stepOf: 'check:agent',
     reason:
       'step 4 of check:agent.',
   },
@@ -653,6 +664,7 @@ export const EXCLUDED = [
     trigger: ['pull_request', 'sweep'],
     kind: 'spawn',
     spawnReason: 'a generator, spawned as a step of check:agent — see check:component-docs.',
+    stepOf: 'check:agent',
     reason:
       'step 5 of check:agent.',
   },
@@ -663,6 +675,7 @@ export const EXCLUDED = [
     trigger: ['pull_request', 'sweep'],
     kind: 'spawn',
     spawnReason: 'a generator, spawned as a step of check:agent — see check:component-docs.',
+    stepOf: 'check:agent',
     reason:
       'step 6 of check:agent.',
   },
@@ -673,6 +686,7 @@ export const EXCLUDED = [
     trigger: 'pull_request',
     kind: 'spawn',
     spawnReason: 'a generator, spawned as a step of check:agent — see check:component-docs.',
+    stepOf: 'check:agent',
     reason:
       'step 7 of check:agent.',
   },
@@ -877,6 +891,77 @@ export const WORKFLOW_STEPS = [
       "for by this point, and a failure here should not hide a story failure.",
     ],
     runs: ["check:docs-chrome"],
+  },
+];
+
+/**
+ * The name of the composite. Every `CHECKS` row reaches `pull_request` through
+ * it, so the assertion below needs it as a datum rather than as prose.
+ */
+export const COMPOSITE = 'check:harness';
+
+/**
+ * The workflows that honour the `pull_request` trigger.
+ *
+ * These two are NOT generated, and the reason is in their own headers: their
+ * steps are jobs with installs, working directories and forty lines of
+ * measured argument around each `run:`, and a generator that owned them would
+ * eat that reasoning — the same rule the marked regions of the other two
+ * workflows are narrow for. What they get instead is an assertion in both
+ * directions (`scripts/generate-check-scripts.mjs § pullRequestFindings`): a
+ * run line naming something this registry does not hold fails, and a row
+ * declaring `pull_request` that neither of them reaches — directly, through
+ * `COMPOSITE`, or through `stepOf` — fails too. Before that, the trigger was
+ * honoured by hand: `test:workerd` had been a gated step for three months
+ * while the registry said it ran nowhere at all (#587).
+ */
+export const PULL_REQUEST_WORKFLOWS = [
+  '.github/workflows/check-harness.yml',
+  '.github/workflows/uno-bot-checks.yml',
+];
+
+/**
+ * The `deploy` script of agents/uno-bot, in order, as data — the seven `deploy`
+ * rows plus the two steps that are not checks.
+ *
+ * WHY ASSERTED AND NOT GENERATED. The rows alone cannot write this chain: they
+ * are a set and the chain is a sequence, and its last two segments are not
+ * checks at all. Writing it would also mean this generator authoring the line
+ * that INVOKES the deployment — `node scripts/deploy.mjs`, the command that
+ * reaches a real Cloudflare account — and how the deployment is authorised is
+ * not a thing a drift check should hold the pen on. So the order and the tail
+ * are stated here, once, and everything else is derived: every `runs` entry
+ * must be a row carrying trigger 'deploy', every row carrying trigger 'deploy'
+ * must be a `runs` entry, and the rendered chain must equal the one the
+ * manifest holds, verbatim.
+ *
+ *   step      the segment of the `&&` chain, exactly as the manifest spells it.
+ *   runs      the registry row that segment runs. A gate.
+ *   notAGate  why this segment is in the chain without being a check. The
+ *             chain's non-gates, said once, so a new segment appearing here
+ *             is a decision rather than a silence.
+ */
+export const DEPLOY_CHAIN = [
+  { step: 'npm run typecheck', runs: 'typecheck' },
+  { step: 'npm run check:fetch', runs: 'check:fetch' },
+  { step: 'npm run check:contract', runs: 'check:contract' },
+  { step: 'npm run check:secrets', runs: 'check:secrets' },
+  { step: 'npm run test:bundle', runs: 'test:bundle' },
+  { step: 'npm test', runs: 'test' },
+  { step: 'npm run test:workerd', runs: 'test:workerd' },
+  {
+    step: 'npm run bundle:harness',
+    notAGate:
+      'it WRITES. The harness bundle the Worker serves is assembled here so the deployed ' +
+      'artifact carries the tree that just passed the seven gates above; `check:harness-bundle` ' +
+      'is the check that the committed bundle matches, and that one is a pull-request row.',
+  },
+  {
+    step: 'node scripts/deploy.mjs',
+    notAGate:
+      'it is the deployment. Everything before it is what earns the right to run it, and its ' +
+      'own configuration — the deployment name, the account, the secrets — is the Worker\'s, ' +
+      'not this registry\'s.',
   },
 ];
 
