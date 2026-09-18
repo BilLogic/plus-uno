@@ -8,16 +8,18 @@
 // that blueprint-search.ts reaches Env and the metered fetch and so cannot
 // compile under tsconfig.test.json — is not the reason: the Workers types sit
 // beside the Node ones in that build, and a test drives that module directly
-// now (tests/blueprint-unavailable.test.ts). What is still true is that the
-// notes left INSIDE it were not exported, so the sweep could not name them.
+// now (tests/blueprint-unavailable.test.ts, and blueprint-search-payload
+// .test.ts drives its note assembly). What is still true is that the notes
+// left INSIDE it were not exported, so the sweep could not name them.
 // #607 moved the swept-blind ones out: the grounding rule, the cache note, the
 // zero-row note, the three failure-path notes and the per-enrichment
 // disposition notes are all below, and all in `SEARCH_NOTES`. What stays
 // inline in the tool is the prose computed from the rows in hand — the
 // breadcrumb caveat, the `url` and `links` instructions — which has no fixed
-// text to sweep. Until #443 the prompt said
-// "status", the tool schema said "status", and every tool RESULT still said a
-// path's future was spelled in its name — `Planned:` / `Prototype:` — eleven
+// text to sweep.
+//
+// Until #443 the prompt said "status", the tool schema said "status", and
+// every tool RESULT still said a path's future was spelled in its name — `Planned:` / `Prototype:` — eleven
 // days after the last such name was renamed away. The harness name sweep
 // (tests/harness-blueprint-names.test.ts) reads these as a subject now, so the
 // next retired convention cannot survive here while it is swept out of the
