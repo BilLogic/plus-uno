@@ -36,18 +36,36 @@
 // `tests/claude-provider.test.ts` drives the whole turn with a stub. Production
 // binds the port to `vertex/claude.ts`'s rawPredict in `run-agent.ts`.
 
-import { MODELS } from "../routing";
 import { MAX_TOKENS } from "../loop-policy";
+import type { ModelTier } from "../tiers";
 import type {
+  ModelPrompt,
   ModelProvider,
   ModelReply,
   ModelStop,
+  ModelText,
   ModelToolCall,
   ModelToolResult,
   ModelTurn,
   ModelUsage,
   ProviderDials,
 } from "../model-provider";
+
+/**
+ * Tier → Vertex model id. ADR-028: a tier is a model plus a thinking dial,
+ * moving together, and both belong to the adapter that sends them — so this
+ * table lives HERE and not in the provider-neutral routing module, which used
+ * to carry Claude ids that no Gemini turn ever read.
+ *
+ * Exported for the diagnostics probe, which needs a model id to smoke-test the
+ * credential with. Nothing else above the seam names one: a caller says which
+ * tier it wants.
+ */
+export const CLAUDE_MODELS: Record<ModelTier, string> = {
+  chill: "claude-haiku-4-5@20251001",
+  default: "claude-sonnet-5",
+  grind: "claude-opus-4-8",
+};
 
 // ── Anthropic Messages wire types (the subset we touch) ──────────────────────
 
@@ -104,7 +122,7 @@ export type ClaudeTransport = (
 export interface ClaudeProviderOptions {
   transport: ClaudeTransport;
   /** `CLAUDE_MODEL`: pins the default tier to an exact @-versioned id. The
-   *  chill and grind tiers stay on `MODELS`. */
+   *  chill and grind tiers stay on `CLAUDE_MODELS`. */
   defaultModel?: string;
 }
 
@@ -115,15 +133,20 @@ export interface ClaudeProviderOptions {
 const WEB_SEARCH_TOOL = { type: "web_search_20250305", name: "web_search", max_uses: 3 };
 
 // Standard extended thinking for the reasoning tiers. This is the adapter's own
-// dial and nothing else's: routing.ts maps a tier to a Claude MODEL and stops
-// there, so there is no thinking LEVEL on this path the way ADR-028 gives the
-// Gemini tiers one. `chill` turns are trivial confirms and skip it.
+// dial and nothing else's: a tier maps to a Claude MODEL and stops there, so
+// there is no thinking LEVEL on this path the way ADR-028 gives the Gemini
+// tiers one. `chill` turns are trivial confirms and skip it.
 const THINKING_BUDGET_TOKENS = 6000;
 
 // A paused turn is resumed here, but not forever: a server tool that pauses
 // every round would otherwise spin inside one `send` with the loop's iteration
 // budget unable to see it. Past this the content is read as it stands.
 const MAX_PAUSE_RESUMES = 4;
+
+// Default ceiling for a one-shot `generate` when the caller names none. Modest
+// on purpose: a one-shot is a judgement or a classification, and a caller that
+// wants a long answer back (a re-drafted reply) says so.
+const ONE_SHOT_MAX_TOKENS = 2048;
 
 function textOf(content: ContentBlock[]): string {
   return content
@@ -166,6 +189,12 @@ export function claudeProvider(opts: ClaudeProviderOptions): ModelProvider {
     cachedInputTokens: 0,
   };
 
+  /** Tier → model id, one resolution for a turn and for a one-shot. The default
+   *  tier is overridable so an exact @-versioned id can be pinned without a code
+   *  change; chill and grind are fixed. */
+  const modelFor = (t: ModelTier): string =>
+    t === "default" ? (opts.defaultModel ?? CLAUDE_MODELS.default) : CLAUDE_MODELS[t];
+
   const addUsage = (u: ClaudeMessage["usage"]): void => {
     // Cache CREATION is billed as input, so it belongs in the input count;
     // cache READS are the ones that were not billed fresh, which is what
@@ -180,12 +209,39 @@ export function claudeProvider(opts: ClaudeProviderOptions): ModelProvider {
   return {
     name: "vertex-claude",
 
+    /**
+     * One prompt, one reply, no tools — and no contact with the turn's state:
+     * the messages array, the cached system blocks and the usage counters all
+     * belong to the turn, so a one-shot beside a turn in flight leaves it
+     * exactly as it was. Only the transport is shared.
+     *
+     * No extended thinking here either. A one-shot is a judgement or a
+     * classification, and the budget would double its latency for a caller that
+     * asked for a short answer.
+     */
+    async generate(prompt: ModelPrompt): Promise<ModelText> {
+      const oneShotModel = modelFor(prompt.tier);
+      const { status, data } = await opts.transport(oneShotModel, {
+        max_tokens: prompt.maxTokens ?? ONE_SHOT_MAX_TOKENS,
+        messages: [{ role: "user", content: prompt.prompt }],
+        ...(prompt.system ? { system: prompt.system } : {}),
+      });
+      const parsed = (data ?? {}) as ClaudeMessage;
+      if (status !== 200) {
+        return {
+          ok: false,
+          model: oneShotModel,
+          // The status rides in the message: not every provider reports one, so
+          // the seam has no field for it.
+          message: `HTTP ${status}: ${parsed.error?.message ?? "rawPredict failed"}`,
+        };
+      }
+      return { ok: true, model: oneShotModel, text: textOf(parsed.content ?? []) };
+    },
+
     async start(turn: ModelTurn): Promise<void> {
       tier = turn.tier;
-      // Tier → Vertex model id. The default tier is overridable so an exact
-      // @-versioned id can be pinned without a code change; chill and grind are
-      // fixed.
-      model = tier === "default" ? (opts.defaultModel ?? MODELS.default) : MODELS[tier];
+      model = modelFor(tier);
       thinkingBudget = tier === "chill" ? null : THINKING_BUDGET_TOKENS;
 
       // The loop says WHICH block is stable; the `cache_control` shape that

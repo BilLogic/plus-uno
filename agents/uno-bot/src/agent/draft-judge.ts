@@ -27,7 +27,7 @@ import { JUDGE_SYSTEM } from "./draft-judge-rubric";
 import type { Env } from "../types";
 import { geminiConfigured, geminiGenerate } from "../gemini/client";
 import { claudeVertexConfigured, claudeVertexGenerate } from "../vertex/claude";
-import { MODELS } from "./routing";
+import { CLAUDE_MODELS } from "./providers/claude";
 import { BUILD } from "../version";
 
 // Drafts under this length are never judged, unless a caller forces it — a
@@ -132,7 +132,7 @@ async function callJudgeModel(
   const provider = (env.MODEL_PROVIDER ?? "gemini").toLowerCase();
   if (provider === "vertex-claude" && claudeVertexConfigured(env)) {
     const res = await claudeVertexGenerate(env, {
-      model: MODELS.chill,
+      model: CLAUDE_MODELS.chill,
       system,
       prompt,
       maxTokens: 6000, // room for a full revised draft

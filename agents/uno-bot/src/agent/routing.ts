@@ -10,20 +10,16 @@
 // after a model means every model swap turns the name into a lie, and this one
 // already had. Renamed with no behaviour change; the model wiring is separate.
 //
-// On the Vertex-Claude adapter a tier maps to the model IDs below. On the Gemini
-// adapter a tier is a model PLUS a thinking level, moving together (gemini-tiers.ts,
-// ADR-028) — so a tier is one named configuration, changed one tier at a time.
+// NO MODEL IDS LIVE HERE. A tier is a model plus its dials, moving together
+// (ADR-028), and both belong to the adapter that sends them: the Claude ids are
+// in providers/claude.ts (CLAUDE_MODELS), the Gemini model-plus-level pairs in
+// gemini-tiers.ts. This module is provider-neutral, and a Claude id sitting in
+// it was read by no Gemini turn ever.
 // Defined in tiers.ts (import-free) so pure modules can name a tier without
 // pulling in the Workers type graph. Re-exported here: routing is where callers
 // expect to find it.
 export type { ModelTier } from "./tiers";
 import type { ModelTier } from "./tiers";
-
-export const MODELS: Record<ModelTier, string> = {
-  chill: "claude-haiku-4-5@20251001",
-  default: "claude-sonnet-5",
-  grind: "claude-opus-4-8",
-};
 
 export interface RouteDecision {
   tier: ModelTier;

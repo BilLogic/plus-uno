@@ -207,7 +207,8 @@ export interface Env {
   GEMINI_REGION?: string; // Vertex only; default "global"
   GEMINI_MODEL?: string; // default "gemini-3.8-flash"
   // Vertex-Claude model id for the default tier (chill/grind are fixed in
-  // routing.ts). Optional — defaults to MODELS.default ("claude-sonnet-5").
+  // agent/providers/claude.ts). Optional — defaults to CLAUDE_MODELS.default
+  // ("claude-sonnet-5").
   CLAUDE_MODEL?: string;
 
   // --- Operational guards ----------------------------------------------------
