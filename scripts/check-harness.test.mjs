@@ -20,6 +20,7 @@ import test from 'node:test';
 import {
   ALL,
   CHECKS,
+  DEPLOY_CHAIN,
   EXCLUDED,
   WORKFLOW_STEPS,
   byName,
@@ -244,4 +245,145 @@ test('the migrated example check answers the findings interface', async () => {
   } finally {
     fs.rmSync(empty, { recursive: true, force: true });
   }
+});
+
+// ---------------------------------------------------------------------------
+// The other two triggers: `pull_request` and `deploy`
+//
+// `sweep` and `storybook-gate` have been asserted against WORKFLOW_STEPS since
+// the registry existed. These two were honoured by hand — the pull-request
+// workflows are not generated and nothing compared their run lines to the
+// rows, and the Worker's deploy chain agreed with its seven `deploy` rows only
+// because someone kept both lists in step.
+// ---------------------------------------------------------------------------
+
+test('a workflow\'s run lines are read as npm script names, installs excluded', () => {
+  const runs = registryGenerator.runsIn(
+    [
+      '      - name: Install deps',
+      '        run: npm ci',
+      '      - name: npm run check:harness',
+      '        run: npm run check:harness',
+      '      - name: two of them',
+      '        run: |',
+      '          npm run check:glossary',
+      '          npm test',
+      '      - name: not npm at all',
+      '        run: node scripts/verify-deployed-cli.mjs',
+    ].join('\n'),
+  );
+  assert.deepEqual(runs, ['check:harness', 'check:glossary', 'test']);
+});
+
+test("a row declaring 'pull_request' that no workflow reaches fails", () => {
+  const rows = [
+    { name: 'check:harness', pkg: 'root', trigger: 'pull_request' },
+    { name: 'check:orphaned', pkg: 'root', trigger: 'pull_request' },
+  ];
+  const found = registryGenerator.pullRequestFindings(
+    new Map([['.github/workflows/check-harness.yml', ['check:harness']]]),
+    { rows, composed: [] },
+  );
+  assert.equal(found.length, 1);
+  assert.match(found[0].message, /check:orphaned declares trigger 'pull_request'/);
+});
+
+test('a composed row is reached through the composite, and so is a stepOf row', () => {
+  const composite = { name: 'check:harness', pkg: 'root', trigger: 'pull_request' };
+  const composed = { name: 'check:composed', pkg: 'root', trigger: 'pull_request' };
+  const parent = { name: 'check:agent', pkg: 'root', trigger: 'pull_request' };
+  const child = {
+    name: 'check:index',
+    pkg: 'root',
+    trigger: 'pull_request',
+    stepOf: 'check:agent',
+    reason: 'step 4 of check:agent.',
+  };
+  const found = registryGenerator.pullRequestFindings(
+    new Map([['.github/workflows/check-harness.yml', ['check:harness']]]),
+    { rows: [composite, composed, parent, child], composed: [composed, parent] },
+  );
+  assert.deepEqual(found, []);
+});
+
+test('a pull-request workflow that runs something the registry does not hold fails', () => {
+  const found = registryGenerator.pullRequestFindings(
+    new Map([['.github/workflows/uno-bot-checks.yml', ['check:invented']]]),
+    { rows: [], composed: [] },
+  );
+  assert.equal(found.length, 1);
+  assert.match(found[0].message, /check:invented.*not a registry row/);
+});
+
+test("a pull-request step whose row does not declare 'pull_request' fails", () => {
+  const row = { name: 'check:storybook', pkg: 'root', trigger: 'storybook-gate' };
+  const found = registryGenerator.pullRequestFindings(
+    new Map([['.github/workflows/check-harness.yml', ['check:storybook']]]),
+    { rows: [row], composed: [] },
+  );
+  assert.equal(found.length, 1);
+  assert.match(found[0].message, /add 'pull_request'/);
+});
+
+test('this repo\'s pull-request workflows and the trigger column agree', () => {
+  assert.deepEqual(registryGenerator.pullRequestFindings(registryGenerator.pullRequestRuns()), []);
+});
+
+test('the deploy chain the manifest holds is the one the registry states', () => {
+  assert.deepEqual(registryGenerator.deployChainFindings(), []);
+  // …and every gate of it is a row carrying the trigger.
+  const gates = DEPLOY_CHAIN.filter((entry) => entry.runs).map((entry) => entry.runs);
+  assert.deepEqual(
+    gates.slice().sort(),
+    ALL.filter((row) => triggersOf(row).includes('deploy'))
+      .map((row) => row.name)
+      .sort(),
+  );
+});
+
+test('a deploy chain that has drifted from the registry fails', () => {
+  const found = registryGenerator.deployChainFindings(
+    'npm run typecheck && node scripts/deploy.mjs',
+  );
+  assert.equal(found.length, 1);
+  assert.match(found[0].message, /deploy chain/);
+});
+
+test("a row declaring 'deploy' that the chain does not run fails", () => {
+  const rows = [{ name: 'check:unreached', pkg: 'bot', trigger: 'deploy' }];
+  const chain = [{ step: 'node scripts/deploy.mjs', notAGate: 'it is the deployment.' }];
+  const found = registryGenerator.deployChainFindings('node scripts/deploy.mjs', { rows, chain });
+  assert.equal(found.length, 1);
+  assert.match(found[0].message, /check:unreached declares trigger 'deploy'/);
+});
+
+test("a chain gate whose row does not declare 'deploy' fails", () => {
+  const rows = [{ name: 'check:fetch', pkg: 'bot', trigger: 'pull_request' }];
+  const chain = [{ step: 'npm run check:fetch', runs: 'check:fetch' }];
+  const found = registryGenerator.deployChainFindings('npm run check:fetch', { rows, chain });
+  assert.equal(found.length, 1);
+  assert.match(found[0].message, /add 'deploy'/);
+});
+
+test('a stepOf that names no row, or prose that disagrees with it, fails', () => {
+  const rows = [
+    { name: 'check:a', pkg: 'root', trigger: 'pull_request', stepOf: 'check:nobody' },
+    {
+      name: 'check:b',
+      pkg: 'root',
+      trigger: 'pull_request',
+      stepOf: 'check:agent',
+      reason: 'excluded because reasons.',
+    },
+    { name: 'check:agent', pkg: 'root', trigger: 'pull_request' },
+    { name: 'check:harness', pkg: 'root', trigger: 'pull_request' },
+  ];
+  const messages = registryGenerator
+    .pullRequestFindings(new Map([['.github/workflows/check-harness.yml', ['check:harness']]]), {
+      rows,
+      composed: [rows[2]],
+    })
+    .map((f) => f.message);
+  assert.ok(messages.some((m) => /check:a declares stepOf 'check:nobody'/.test(m)));
+  assert.ok(messages.some((m) => /check:b.*reason.*never names/.test(m)));
 });
