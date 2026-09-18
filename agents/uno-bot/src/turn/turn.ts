@@ -12,10 +12,25 @@
 // narration, the proposal card — go out through the `Delivery` port
 // (`delivery.ts`), which has a Slack adapter and a recording one. Everything
 // else the turn needs arrives as a NAMED dependency (`TurnDeps`): the thread
-// store, the agent loop, the judge, preflight, the gate's resolver, the two
-// Notion card clients, the antecedent read. `Env` never enters — it is turned
-// into `TurnDeps` once, in `turn/env-deps.ts`, which is the ONE builder both
+// store, the agent loop, the judge, preflight, the gate's resolver, the three
+// card reads, the antecedent read. `Env` never enters — it is turned into
+// `TurnDeps` once, in `turn/env-deps.ts`, which is the ONE builder both
 // callers go through (#603).
+//
+// AND THE CARD GOES OVER THAT SEAM AS DATA (#623). `buildCard` below decides
+// which card a staged proposal gets, what verb names it, which caveats a person
+// must see and which batch the ✅ runs; `slack/proposal-render.ts` decides how
+// all of that reads, and the turn stores and remembers what the adapter reports
+// posting. The turn's own words are still its own — a clarifying question, the
+// backstop lines, the cancelled-that bounce — and those go through `postNote`
+// as before. What is gone is the turn spelling Slack mrkdwn for the two things
+// a person ACTS on: the card, and a gate verdict.
+//
+// WHAT IS STILL IMPORTED FROM `slack/` and is not the card's business:
+// `renderDeliveredBody` (the judges score the draft as Slack will deliver it)
+// and the antecedent window (a block the MODEL reads, not a person). Both are
+// honest residue rather than the leak #623 closed, and both are named in the
+// issue's report.
 //
 // SO THE CALLER IS NOT SLACK. A request carries who, where, the text, the
 // images as BYTES already decoded, and the pending proposal; nothing in here
@@ -46,13 +61,9 @@ import type { AgentImage, HistoricalImages } from "../agent/provider-conversatio
 import { routeRequest } from "../agent/routing";
 import type { ModelTier } from "../agent/routing";
 import { resolveSignal, type GateVerdict } from "../gate/index";
+import { collectStrings } from "../agent/tool-input";
+import { gateWordsFor } from "../agent/tool-table";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "../slack/antecedent";
-import {
-  formatNotionUpdateProposal,
-  formatProposal,
-  proposalVerb,
-  withOperationPlan,
-} from "../slack/proposal-render";
 import { renderDeliveredBody } from "../slack/render";
 import type { AssistantContext } from "../slack/types";
 import type { VisionReference } from "../slack/vision-reference";
@@ -67,6 +78,11 @@ import {
 } from "../thread-state/index";
 import {
   withWorkingSignal,
+  type CardCaveat,
+  type CardField,
+  type CardRevision,
+  type CardRow,
+  type CardTarget,
   type Delivery,
   type DeliveryFailureStage,
   type ProposalCard,
@@ -328,18 +344,22 @@ export interface TurnDeps {
    */
   applyVerdict(verdict: GateVerdict): Promise<void>;
 
-  /** The card bodies that need a read of their own. */
+  /**
+   * The parts of a card that need a read of their own.
+   *
+   * Each hands back a STRUCTURE, not a line: the read is theirs — Turn may not
+   * call Notion or Figma itself — and the words are the adapter's (#623). They
+   * used to hand back Slack mrkdwn, and a whole rendered card in the Figma
+   * case, which is how the turn ended up splicing text.
+   */
   cards: {
-    /** The `notion_update` diff: linked card, `current → new` per field. */
-    notionUpdateBody(input: Record<string, unknown>): Promise<string>;
-    /** The `notion_archive` target line: page title and parent database. */
-    notionArchiveTargetNote(input: Record<string, unknown>): Promise<string | undefined>;
-    /** The `prototype_scaffold` card, with a Figma preview when one renders. */
-    implementDesignCard(
-      input: Record<string, unknown>,
-      requesterUserId: string,
-      previewText?: string,
-    ): Promise<ProposalCard>;
+    /** The `notion_update` diff: the page, and `current → new` per field. */
+    notionRevision(input: Record<string, unknown>): Promise<CardRevision>;
+    /** The `notion_archive` target: page title and parent database. */
+    notionTarget(input: Record<string, unknown>): Promise<CardTarget | undefined>;
+    /** A render of the Figma node a `prototype_scaffold` implements, or null
+     *  where there is no node or the render failed. Best-effort by contract. */
+    designPreviewImage(input: Record<string, unknown>): Promise<string | null>;
   };
 
   /**
@@ -871,7 +891,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
       );
     if (justCancelled) {
       const bounce =
-        `:leftwards_arrow_with_hook: You cancelled that ${proposalVerb(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
+        `:leftwards_arrow_with_hook: You cancelled that ${verbFor(result.toolName)} a moment ago, so I'm not re-proposing it on my own. ` +
         `Changed your mind? Say so explicitly and I'll stage it again — or tell me what you'd like instead.`;
       await delivery.postNote(bounce);
       await memory.remember(bounce);
@@ -903,16 +923,15 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // input the person just pushed back on.
   if (request.pending) await threadState.retireProposal(request.pending.proposalTs);
 
-  const { card, planFollowUp } = await buildCard(
+  const card = await buildCard(
     result,
-    request,
     deps,
     implementPrdUrlFor(result.toolName, result.input, prd),
   );
-  // Before the card, never after: the card holds the ✅/⛔ buttons, so it has to
-  // be the last message in the thread — a plan posted under it would leave the
-  // decision above the thing being decided.
-  for (const message of planFollowUp) await delivery.postNote(message);
+  // Anything the batch's plan needs posted BEFORE the card — because the card
+  // holds the ✅/⛔ buttons and has to be the last message in the thread — is
+  // the adapter's to send, since it is Slack's message limits that decide
+  // whether there is anything to send at all (#623).
   const posted = await delivery.stageProposal(card);
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] proposal card was not staged (${result.toolName})`);
@@ -938,7 +957,10 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     ...(request.replyTs ? { replyTs: request.replyTs } : {}),
     userMsgTs: request.userMsgTs,
     proposalTs: posted.ts,
-    proposalText: card.text,
+    // What the adapter actually posted, never a copy rendered here: the button
+    // door re-renders the resolved card from this field, so a second rendering
+    // that drifted would repaint the card with words it never had (#623).
+    proposalText: posted.text,
     requesterUserId: request.userId,
     ...(prd?.id ? { notionPrdId: prd.id } : {}),
     ...(prd?.url ? { notionPrdUrl: prd.url } : {}),
@@ -947,11 +969,11 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // A proposal is still a completed conversational turn. An agent_view DM has
   // no Slack thread to rebuild, so preserving this exchange in the store is the
   // only way its image pointer reaches the immediate follow-up.
-  await memory.remember(card.text);
+  await memory.remember(posted.text);
 
   return {
     disposition: "staged",
-    posted: card.text,
+    posted: posted.text,
     staged: { proposal, card },
     wrote: memory.wrote(),
     telemetry,
@@ -965,8 +987,13 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
  *
  * Both of the turn's gate doors — the typed emoji and the model's own
  * `proposal_resolve` — end here, which is what makes a lost race read the same
- * on each: the verdict's own text is posted, `applyVerdict` executes nothing
+ * on each: the verdict's own note is posted, `applyVerdict` executes nothing
  * unless the claim was won, and the record says what the person was told.
+ *
+ * WHAT THE RECORD REMEMBERS is what the adapter reports posting, not a second
+ * rendering of the note made here — the turn has none, and the conversation's
+ * memory is read by the model on the next turn, so a copy that drifted would
+ * make the bot remember a line nobody saw (#623).
  *
  * `note` is what the RECORD should say when that differs from what was posted
  * ("(confirmed — executing the proposal)" beside "Got it — kicking that
@@ -977,8 +1004,10 @@ async function settleVerdict(
   verdict: GateVerdict,
   ctx: { deps: TurnDeps; memory: ThreadMemory; telemetry: TurnTelemetry; note?: string },
 ): Promise<TurnOutcome> {
-  const posted = verdict.post?.text;
-  if (posted) await ctx.deps.delivery.postNote(posted);
+  const said = verdict.post
+    ? await ctx.deps.delivery.postGateNote(verdict.post.note)
+    : undefined;
+  const posted = said?.text;
   await ctx.deps.applyVerdict(verdict);
   const remembered = (verdict.outcome === "won" ? ctx.note : undefined) ?? posted;
   if (remembered) await ctx.memory.remember(remembered);
@@ -1257,67 +1286,179 @@ function implementPrdUrlFor(
 // ── Cards ────────────────────────────────────────────────────────────────────
 
 /**
- * The card for one staged Proposal — the batch, as the person reads it before
- * pressing ✅ — and, where the batch is too big for one message, the follow-up
- * that carries the full plan.
+ * The card for one staged Proposal: what a person is being asked to approve, as
+ * DATA.
  *
- * The card is the SOURCE OF TRUTH for what a ✅ runs: it gets the first
- * operation's real body and then every operation of the batch, grouped by what
- * it touches and labelled by kind. Nothing is summarised away — past Slack's
- * limits the groups collapse and the complete list moves to `followUp`, which
- * the caller posts BEFORE the card so the buttons stay last.
+ * It used to be a Slack string — `formatProposal` and `withOperationPlan`
+ * called from here, plus a list of follow-up messages handed back to be posted
+ * — and so the turn owned an `:warning:`, a confirm footer and Slack's
+ * message-size limits (#623). What it owns now is the decisions: which card
+ * this is, which verb names it, which caveats a person must see, and the WHOLE
+ * batch the one ✅ runs. `slack/proposal-render.ts` § `renderProposalCard`
+ * decides how all of that reads, and `Delivery.stageProposal` reports back what
+ * it actually posted.
+ *
+ * The card is still the SOURCE OF TRUTH for what a ✅ runs: `operations` is the
+ * batch untruncated, which is what lets the adapter group and never summarise
+ * it away.
  */
 async function buildCard(
   result: Extract<AgentResult, { kind: "proposal" }>,
-  request: TurnRequest,
-  deps: TurnDeps,
-  implementPrdUrl: string | undefined,
-): Promise<{ card: ProposalCard; planFollowUp: string[] }> {
-  const card = await buildFirstOperationCard(result, request, deps, implementPrdUrl);
-  const plan = withOperationPlan(card.text, result.operations);
-  return { card: { ...card, text: plan.text }, planFollowUp: plan.followUp ?? [] };
-}
-
-/** The card body for the batch's FIRST operation — which per-tool formatter it
- *  gets is the turn's decision, and the two bodies that need a Notion read and
- *  the one that needs a Figma render arrive as named clients. */
-async function buildFirstOperationCard(
-  result: Extract<AgentResult, { kind: "proposal" }>,
-  request: TurnRequest,
   deps: TurnDeps,
   implementPrdUrl: string | undefined,
 ): Promise<ProposalCard> {
-  if (result.toolName === "prototype_scaffold") {
-    return deps.cards.implementDesignCard(result.input, request.userId, result.previewText);
+  const { toolName, input } = result;
+  const card: ProposalCard = {
+    kind: toolName === "notion_update" ? "revision" : "confirm",
+    verb: verbFor(toolName),
+    ...(result.previewText ? { lead: result.previewText } : {}),
+    fields: cardFieldsOf(input),
+    caveats: caveatsFor(toolName, input, result.previewText),
+    operations: result.operations,
+  };
+
+  if (toolName === "prototype_scaffold") {
+    // The Figma render, when one can be fetched — a URL on the card, not a
+    // block: what Slack does with an image is the adapter's.
+    const previewImageUrl = await deps.cards.designPreviewImage(input);
+    return previewImageUrl ? { ...card, previewImageUrl } : card;
   }
-  if (result.toolName === "component_implement") {
+  if (toolName === "component_implement") {
     // Show which PRD this implement is tied to, so the requester can see it.
-    const preview = implementPrdUrl
-      ? `Using the PRD for this change: ${implementPrdUrl}`
-      : result.previewText;
-    return { text: formatProposal(result.toolName, result.input, request.userId, preview) };
+    return implementPrdUrl
+      ? { ...card, lead: `Using the PRD for this change: ${implementPrdUrl}` }
+      : card;
   }
-  if (result.toolName === "notion_update") {
-    // Conversational card: warm lead, linked card, `current → new` diff. No ⚠️
-    // preamble — the lead, the named card and the diff speak for themselves.
-    const body = await deps.cards.notionUpdateBody(result.input);
-    return { text: formatNotionUpdateProposal(result.previewText, body) };
+  if (toolName === "notion_update") {
+    // The conversational card: the diff leads, and there is no ⚠️ preamble —
+    // the lead, the named page and the `current → new` lines speak for
+    // themselves. The read behind it is a named client's.
+    return { ...card, revision: await deps.cards.notionRevision(input), fields: [] };
   }
-  if (result.toolName === "notion_archive") {
-    const targetNote = await deps.cards.notionArchiveTargetNote(result.input);
+  if (toolName === "notion_archive") {
+    const target = await deps.cards.notionTarget(input);
+    return target ? { ...card, target } : card;
+  }
+  return card;
+}
+
+/**
+ * What one ✅ does, in the gated row's own words.
+ *
+ * Read from `agent/tool-table.ts` — import-free, and the ONE place these words
+ * live since the two switches in the renderer went (#598). The fallback is the
+ * bare tool name, which is what a switch arm nobody added used to print at a
+ * designer; it is unreachable for anything the Gate can stage, because a gated
+ * row carries its `verb` or does not compile.
+ */
+function verbFor(toolName: string): string {
+  return gateWordsFor(toolName)?.verb ?? toolName;
+}
+
+/**
+ * The staged input as the card's labelled fields, nesting exactly as the input
+ * nests.
+ *
+ * Labels are the input's OWN keys: turning `page_url` into `Page link` is
+ * presentation and belongs in the adapter. A value that is absent, null or
+ * empty is dropped rather than shown as a blank — the card is read by
+ * designers, not machines (user decision, 2026-07-12).
+ */
+function cardFieldsOf(input: Record<string, unknown>): CardField[] {
+  return Object.entries(input)
+    .filter(([, v]) => v !== undefined && v !== null && v !== "")
+    .map(([k, v]) => cardFieldOf(k, v));
+}
+
+function cardFieldOf(label: string, value: unknown): CardField {
+  if (Array.isArray(value)) {
+    // A list of scalars becomes bullets; a list with any structure in it
+    // becomes the sub-fields of each item, in order, so nothing is flattened
+    // into a JSON blob on the way past.
+    if (value.every((item) => typeof item !== "object" || item === null)) {
+      return { label, under: value.map((item) => ({ item: String(item) })) };
+    }
+    const under: CardRow[] = [];
+    for (const item of value) {
+      if (item !== null && typeof item === "object") {
+        for (const [k, v] of Object.entries(item as Record<string, unknown>)) {
+          under.push({ field: cardFieldOf(k, v) });
+        }
+        continue;
+      }
+      under.push({ item: String(item) });
+    }
+    return { label, under };
+  }
+  if (value !== null && typeof value === "object") {
     return {
-      text: formatProposal(
-        result.toolName,
-        result.input,
-        request.userId,
-        result.previewText,
-        targetNote,
-      ),
+      label,
+      under: Object.entries(value as Record<string, unknown>).map(([k, v]) => ({
+        field: cardFieldOf(k, v),
+      })),
     };
   }
-  return {
-    text: formatProposal(result.toolName, result.input, request.userId, result.previewText),
-  };
+  return { label, value: String(value) };
+}
+
+/**
+ * What a person must be told about this staged input before they press ✅.
+ *
+ * A JUDGEMENT, which is why it is here and not in the renderer: both caveats
+ * are reached by READING the staged input, and the renderer only knows how each
+ * one reads.
+ *
+ * THE MISSING-CONTEXT GATE (todo 070): the model is told to name a brief's open
+ * questions before staging and does so inconsistently. If nothing staged
+ * mentions a gap, say so ON the card — the ✅ then knowingly accepts a gap-free
+ * reading of the brief instead of silently inheriting one. It covers PRD-shaped
+ * `notion_create` as well as `prototype_scaffold` since 2026-08-22: eval P3
+ * regressed 3/3 → 2/3 the moment AGENT.md rule 4 started steering a
+ * build-from-this-brief ask toward staging the PRD card, because the flag
+ * existed for one tool and the model reached for the other. A gate that depends
+ * on which tool the model picked is not a gate.
+ *
+ * THE BUNDLE AUDIT is "stage, but flag gaps loudly" (Bill, 2026-07-16): a
+ * share-out stages immediately with whatever is in hand, and the CARD carries
+ * the audit — so ✅ is informed consent to post without the missing pieces, and
+ * a weaker model provider cannot silently skip the disclosure. The bundle
+ * contract for prototype share-outs is a Loom walkthrough, a live preview and a
+ * Decisions DB link (`skills/uno-publish/references/method.md`).
+ */
+function caveatsFor(
+  toolName: string,
+  input: Record<string, unknown>,
+  previewText: string | undefined,
+): CardCaveat[] {
+  if (toolName === "shareout_post") {
+    const summary = typeof input.summary === "string" ? input.summary : "";
+    if (!/prototype|prototypes|scaffold/i.test(summary)) return [];
+    const haystack = collectStrings(input).join("\n");
+    const missing: string[] = [];
+    if (!/https?:\/\/[^\s]*loom\.com/i.test(haystack)) missing.push("Loom walkthrough");
+    if (!/https?:\/\/[^\s]*(netlify\.app|workers\.dev)/i.test(haystack)) {
+      missing.push("live preview");
+    }
+    if (!/https?:\/\/[^\s]*(notion\.so|notion\.site|app\.notion\.com)/i.test(haystack)) {
+      missing.push("Decisions DB link");
+    }
+    return missing.length ? [{ kind: "bundle-incomplete", missing }] : [];
+  }
+  const gapGated =
+    toolName === "prototype_scaffold" ||
+    (toolName === "notion_create" && input.surface === "prd");
+  if (!gapGated) return [];
+  const staged = [
+    previewText ?? "",
+    typeof input.notes === "string" ? input.notes : "",
+    JSON.stringify(input.sections ?? ""),
+    typeof input.summary === "string" ? input.summary : "",
+  ]
+    .join(" ")
+    .toLowerCase();
+  return /(open question|gap|ambiguit|unspecified|undecided|to confirm|tbd)/.test(staged)
+    ? []
+    : [{ kind: "no-open-questions" }];
 }
 
 // ── Small pure helpers ───────────────────────────────────────────────────────

@@ -148,15 +148,20 @@ function harness(
       });
     },
 
+    // Structures, not words — the reads a card needs, as the port takes them
+    // since #623.
     cards: {
-      async notionUpdateBody() {
-        return "• *Design Status:* `WIP` → `Ready for QA`";
+      async notionRevision() {
+        return {
+          page: { url: "https://notion.so/a-card", title: "A card", parent: "Roadmap" },
+          properties: [{ label: "Design Status", from: "WIP", to: "Ready for QA" }],
+        };
       },
-      async notionArchiveTargetNote() {
-        return "• *Target:* A card — in Roadmap";
+      async notionTarget() {
+        return { title: "A card", parent: "Roadmap" };
       },
-      async implementDesignCard(_input, _userId, previewText) {
-        return { text: `(figma card) ${previewText ?? ""}` };
+      async designPreviewImage() {
+        return null;
       },
     },
 

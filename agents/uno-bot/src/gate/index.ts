@@ -7,5 +7,6 @@
 // re-exported: Gate's front door is Gate's vocabulary, and everything on it is
 // a thing the Node suite can drive.
 export * from "./gate";
+export * from "./reactions";
 export * from "./reaction-door";
 export * from "./run-batch";

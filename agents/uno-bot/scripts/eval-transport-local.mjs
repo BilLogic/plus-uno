@@ -246,16 +246,29 @@ export function ensureTestBuild({ pkg = PKG, log = console.log } = {}) {
  *  `module.exports`. */
 async function loadModules(buildDir = BUILD_DIR) {
   const load = async (rel) => (await import(pathToFileURL(join(buildDir, rel)).href)).default;
-  const [turn, evalCase, threadState, loop, fake, conversation, geminiTiers] = await Promise.all([
-    load("src/turn/index.js"),
-    load("src/eval/turn-case.js"),
-    load("src/thread-state/index.js"),
-    load("src/agent/loop.js"),
-    load("src/agent/providers/fake.js"),
-    load("src/agent/provider-conversation.js"),
-    load("src/agent/gemini-tiers.js"),
-  ]);
-  return { turn, evalCase, threadState, loop, fake, conversation, geminiTiers };
+  const [turn, evalCase, threadState, loop, fake, conversation, geminiTiers, proposalRender, gateNote] =
+    await Promise.all([
+      load("src/turn/index.js"),
+      load("src/eval/turn-case.js"),
+      load("src/thread-state/index.js"),
+      load("src/agent/loop.js"),
+      load("src/agent/providers/fake.js"),
+      load("src/agent/provider-conversation.js"),
+      load("src/agent/gemini-tiers.js"),
+      load("src/slack/proposal-render.js"),
+      load("src/slack/gate-note.js"),
+    ]);
+  return {
+    turn,
+    evalCase,
+    threadState,
+    loop,
+    fake,
+    conversation,
+    geminiTiers,
+    proposalRender,
+    gateNote,
+  };
 }
 
 /**
@@ -359,7 +372,17 @@ export function localTransport({
       const startedAt = Date.now();
       try {
         modules ??= await loadModules(buildDir);
-        const { turn, evalCase, threadState: store, loop, fake, conversation, geminiTiers } = modules;
+        const {
+          turn,
+          evalCase,
+          threadState: store,
+          loop,
+          fake,
+          conversation,
+          geminiTiers,
+          proposalRender,
+          gateNote,
+        } = modules;
 
         const index = turnIndexOf(history);
         const recorded = byPrompt.get(`${index} ${prompt}`);
@@ -384,7 +407,15 @@ export function localTransport({
         const request = built.request;
 
         // ── the two recording deps the Worker adapter also uses ──────────────
-        const delivery = turn.recordingDelivery();
+        // Spelled by Slack's own renderers (#623): a card and a gate verdict
+        // cross the port as data, and the transcript the next turn reads is
+        // what a person would have seen. The Worker eval adapter does the same.
+        const delivery = turn.recordingDelivery({
+          spelling: {
+            card: proposalRender.renderProposalCard,
+            gateNote: gateNote.renderGateNote,
+          },
+        });
         const threadState = store.createInMemoryThreadState();
         const ref = { channel: request.channel, thread: request.conversationTs };
         for (const h of request.history) await threadState.appendHistory(ref, h);
@@ -479,15 +510,18 @@ export function localTransport({
             }
           },
 
+          // Structures, not words — the reads a card needs, as the port takes
+          // them since #623. No Notion or Figma in this transport: the card
+          // still stages, and the adapter spells whatever the turn handed over.
           cards: {
-            async notionUpdateBody() {
-              return "• (local transport — no Notion read)";
+            async notionRevision() {
+              return { properties: [] };
             },
-            async notionArchiveTargetNote() {
+            async notionTarget() {
               return undefined;
             },
-            async implementDesignCard(_input, _userId, previewText) {
-              return { text: `(local transport — no Figma render) ${previewText ?? ""}`.trim() };
+            async designPreviewImage() {
+              return null;
             },
           },
 

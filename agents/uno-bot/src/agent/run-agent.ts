@@ -324,7 +324,7 @@ export function selectProvider(env: Env): ModelProvider {
 // the model, which reads it with <pending_proposal> in context and calls
 // proposal_resolve. The only deterministic resolution left is an emoji — a
 // reaction on the card, a button on the card, or a typed emoji alone — and
-// that vocabulary is slack/gate-reactions.ts.
+// that vocabulary is gate/reactions.ts.
 
 // ── Correction / pushback vocabulary ────────────────────────────────────────
 //

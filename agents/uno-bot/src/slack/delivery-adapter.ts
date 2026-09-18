@@ -21,6 +21,13 @@
 //   • the answer closing the stream the checklist lives in, rather than opening
 //     a second one beside it.
 //
+// AND THE TWO THINGS A PERSON ACTS ON, since #623: the proposal card and a
+// gate verdict both arrive as data and are spelled on the way out —
+// `proposal-render.ts` § `renderProposalCard` and `gate-note.ts` §
+// `renderGateNote`. That includes what Slack's message-size limits force:
+// a batch plan too long for the card posts as its own messages, from here,
+// before the card. Turn used to build the mrkdwn and hand back the overflow.
+//
 // AND THE `[working]` LINE, which moved in from `slack/working-signal.ts`
 // (#595). It was carved out of this file because "the adapter that calls them
 // stays out of reach of the Node test build" — the classification and the
@@ -55,7 +62,8 @@
 
 import { turnSurfaceOf } from "../turn/request";
 import type { FooterKind } from "./footer-kind";
-import { proposalCardBlocks } from "./proposal-render";
+import { proposalCardBlocks, renderProposalCard } from "./proposal-render";
+import { renderGateNote } from "./gate-note";
 import type { Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
 import { SUBREQUEST_CAP } from "../agent/loop-policy";
@@ -400,6 +408,19 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
     if (ts) await slack.stopStream(channel, ts).catch(() => {});
   };
 
+  /** A plain post into the thread. A local rather than only a port method,
+   *  because `postGateNote` is the same post with the verdict spelled first. */
+  const postNote = async (text: string): Promise<PostResult> => {
+    const posted = await slack
+      .postMessage({ channel, thread_ts: replyTs, text })
+      .catch(() => ({ ok: false as const }));
+    return {
+      ok: !!posted.ok,
+      text,
+      ...("ts" in posted && posted.ts ? { ts: posted.ts } : {}),
+    };
+  };
+
   return {
     async react(emoji) {
       await slack.addReaction(channel, userMsgTs, emoji).catch(() => {});
@@ -528,28 +549,35 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       }
     },
 
-    async postNote(text): Promise<PostResult> {
-      const posted = await slack
-        .postMessage({ channel, thread_ts: replyTs, text })
-        .catch(() => ({ ok: false as const }));
-      return {
-        ok: !!posted.ok,
-        text,
-        ...("ts" in posted && posted.ts ? { ts: posted.ts } : {}),
-      };
-    },
+    postNote,
+
+    // A gate verdict is spelled HERE and nowhere else (#623): every
+    // `:hourglass:`, the one `<@user>`, and the line that points at the live
+    // card. Gate hands over which verdict it is; `slack/gate-note.ts` says it.
+    postGateNote: (note) => postNote(renderGateNote(note)),
 
     async stageProposal(card: ProposalCard): Promise<PostResult> {
+      // THE CARD ARRIVES AS DATA and is spelled here (#623): the turn decided
+      // what a person is being asked to approve, and this is where that becomes
+      // mrkdwn, an ⚠️, a confirm footer and a button row.
+      const rendered = renderProposalCard(card);
+      // A batch too long for one Slack message posts its full plan as its own
+      // messages FIRST, so the card — which carries the buttons — stays the
+      // last thing in the thread. Slack's size limits are what decide there is
+      // anything to send, so the decision is the adapter's and not the turn's.
+      for (const message of rendered.followUp ?? []) {
+        await slack.postMessage({ channel, thread_ts: replyTs, text: message }).catch(() => ({}));
+      }
       // Every card carries ✅ Approve / ⛔ Cancel buttons (2026-08-22). Cards
-      // that built their own blocks (the Figma preview) already include them;
-      // a text-only card gets the text as sections plus the row. The text is
+      // with blocks of their own (the Figma preview) already include them; a
+      // text-only card gets the text as sections plus the row. The text is
       // kept alongside as the notification/fallback copy, and it is what the
       // button handler re-renders the card from.
-      const blocks = card.blocks ?? proposalCardBlocks(card.text);
+      const blocks = rendered.blocks ?? proposalCardBlocks(rendered.text);
       let posted = await slack.postMessage({
         channel,
         thread_ts: replyTs,
-        text: card.text,
+        text: rendered.text,
         blocks,
       });
       // If Slack rejected the blocks (it could not fetch the Figma image_url,
@@ -558,11 +586,11 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
       // the same.
       if (!posted.ok) {
         console.warn("[slack] proposal with blocks failed; retrying text-only");
-        posted = await slack.postMessage({ channel, thread_ts: replyTs, text: card.text });
+        posted = await slack.postMessage({ channel, thread_ts: replyTs, text: rendered.text });
       }
       return {
         ok: !!posted.ok,
-        text: card.text,
+        text: rendered.text,
         ...(posted.ok && posted.ts ? { ts: posted.ts } : {}),
       };
     },

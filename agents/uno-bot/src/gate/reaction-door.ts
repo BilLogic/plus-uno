@@ -25,7 +25,7 @@
 // PURE by design: no `Env`, no Workers global, no fetch — which is what lets
 // the Node suite DRIVE it rather than read it.
 
-import { mapReaction } from "../slack/gate-reactions";
+import { mapReaction } from "./reactions";
 import type { ThreadState } from "../thread-state/index";
 import { withWorkingSignal, type Delivery } from "../turn/index";
 import { resolveSignal, type GateVerdict } from "./gate";
@@ -133,7 +133,7 @@ export async function runReactionDoor(
       try {
         // The narrative first, then the tool — the same order every door keeps, so
         // the person sees the acknowledgement before the work.
-        const posted = await delivery.postNote(post.text);
+        const posted = await delivery.postGateNote(post.note);
         // A resolution that cannot speak is the failure this whole path guards
         // against, so it is never silent in the logs even when it is in Slack.
         if (!posted.ok) {
@@ -148,9 +148,7 @@ export async function runReactionDoor(
           `[gate] reaction resolve failed: ${err instanceof Error ? err.message : String(err)}`,
         );
         await delivery
-          .postNote(
-            `:warning: I caught your :${request.glyph}: but hit a snag executing it — give it another go, or tell me and I'll retry.`,
-          )
+          .postGateNote({ kind: "resolve-failed", glyph: request.glyph })
           .catch(() => {});
       }
     },

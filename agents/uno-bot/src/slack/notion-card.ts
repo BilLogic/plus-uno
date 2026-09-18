@@ -1,12 +1,21 @@
 // The Notion reads a proposal card needs to name its target in human words.
 //
-// Two card bodies, both Notion clients rather than presentation: the
+// Two card parts, both Notion CLIENTS rather than presentation: the
 // `notion_update` diff (`current → new`, with people and relation ids resolved
-// to real names) and the `notion_archive` target line (page title + parent
+// to real names) and the `notion_archive` target (page title + parent
 // database). They lived at the bottom of `slack/events.ts`; the Turn module
 // decides WHICH card a tool gets and reaches for these as named clients on
 // `TurnDeps.cards`, because a Notion read is not something Turn may do itself.
+//
+// EACH HANDS BACK A STRUCTURE, not a line (#623). They used to return Slack
+// mrkdwn — `*<url|Title>* — in <DB>`, backticked values, `↳` continuations —
+// which Turn spliced into the card's text; the whole card is data now, so what
+// these return is a `CardRevision` and a `CardTarget` and the words are
+// `slack/proposal-render.ts`'s. The one thing still named here is a property's
+// LABEL, which is the page's own field name as the read reported it (or, with
+// no read, the request key made readable) — a name, not a rendering.
 
+import type { CardRevision, CardTarget } from "../turn/index";
 import type { Env } from "../types";
 import {
   describeNotionTarget,
@@ -39,44 +48,45 @@ async function resolveNotionValueForDisplay(env: Env, raw: string): Promise<stri
 /** How much of a replacement's first line the card echoes. */
 const REPLACE_PREVIEW = 100;
 
-// A one-line note for an `append` (narrative) update, so the card doesn't drop it.
-function describeAppend(append: unknown): string | null {
-  if (!append || typeof append !== "object") return null;
+/** What an `append` (narrative) update adds, so the card doesn't drop it: the
+ *  sections it writes, or — with none — a bare note on the page. */
+function appendOf(append: unknown): { headings: string[] } | undefined {
+  if (!append || typeof append !== "object") return undefined;
   const o = append as Record<string, unknown>;
   const headings = (Array.isArray(o.sections) ? o.sections : [])
     .map((s) => (s && typeof s === "object" ? String((s as Record<string, unknown>).heading ?? "").trim() : ""))
     .filter(Boolean);
-  if (headings.length) return `• *Appending:* ${headings.map((h) => `_${h}_`).join(", ")}`;
-  if (typeof o.text === "string" && o.text.trim()) return `• *Appending a note to the page.*`;
-  return null;
+  if (headings.length) return { headings };
+  if (typeof o.text === "string" && o.text.trim()) return { headings: [] };
+  return undefined;
 }
 
 /**
- * A one-line note for a `replace` (in-place rewrite), so the ✅ is never given
- * blind to the one operation that changes text a human already wrote.
+ * The `replace` (in-place rewrite), so the ✅ is never given blind to the one
+ * operation that changes text a human already wrote.
  */
-function describeReplace(replace: unknown): string | null {
-  if (!Array.isArray(replace)) return null;
+function rewriteOf(replace: unknown): { blocks: number; previews: string[] } | undefined {
+  if (!Array.isArray(replace)) return undefined;
   const ops = replace.filter((o) => o && typeof o === "object") as Record<string, unknown>[];
-  if (!ops.length) return null;
-  const preview = ops
+  if (!ops.length) return undefined;
+  const previews = ops
     .map((o) => String(o.content ?? "").trim().split("\n")[0]?.slice(0, REPLACE_PREVIEW) ?? "")
     .filter(Boolean);
-  const head = `• *Rewriting ${ops.length} block(s) in place* (the rest of the page is untouched).`;
-  return preview.length ? `${head}\n${preview.map((t) => `    ↳ _${t}_`).join("\n")}` : head;
+  return { blocks: ops.length, previews };
 }
 
 /**
- * The DISPLAY body for a `notion_update` proposal — separate from the
- * executable tool input, which lives untouched in the store's pending state.
+ * A `notion_update` as the revision it is — separate from the executable tool
+ * input, which lives untouched in the store's pending state.
+ *
  * Reads the page for its title/URL/parent database and the current value of
- * each changed field, resolves people/relation new-values from ids or URLs to
- * real names, and codifies every property value in backticks.
+ * each changed field, and resolves people/relation new-values from ids or URLs
+ * to real names. What it does NOT do is decide how any of that reads.
  */
-export async function buildNotionUpdateBody(
+export async function buildNotionRevision(
   env: Env,
   input: Record<string, unknown>,
-): Promise<string> {
+): Promise<CardRevision> {
   const pageUrl = typeof input.page_url === "string" ? input.page_url : "";
   const properties =
     input.properties && typeof input.properties === "object"
@@ -85,51 +95,47 @@ export async function buildNotionUpdateBody(
   const changedFields = Object.keys(properties);
   const target = pageUrl ? await describeNotionTarget(env, pageUrl, changedFields) : null;
 
-  const lines: string[] = [];
-
-  // Named + linked card — `<url|Title> — in <ParentDB>`, never a bare hex URL.
+  const revision: CardRevision = { properties: [] };
+  // The page, named where the read could name it. A `title` we could not
+  // resolve leaves the link to name itself — never a bare hex URL on the card.
   if (target) {
-    lines.push(`*<${target.url}|${target.title}>* — in ${target.parent}`);
+    revision.page = { url: target.url, title: target.title, parent: target.parent };
   } else if (pageUrl) {
-    lines.push(`*<${pageUrl}|this Notion page>*`);
+    revision.page = { url: pageUrl };
   }
 
-  // One bullet per changed field, always — `current → new`, values backticked.
+  // One entry per changed field, always — what it says now, what it will say.
   for (const [reqName, rawVal] of Object.entries(properties)) {
     if (typeof rawVal !== "string") continue;
     const cur = target?.current?.[normalizeName(reqName)];
-    const label = cur?.label ?? humanizeFieldName(reqName);
-    const newDisplay = await resolveNotionValueForDisplay(env, rawVal);
-    lines.push(
-      cur?.value
-        ? `• *${label}:* \`${cur.value}\` → \`${newDisplay}\``
-        : `• *${label}:* \`${newDisplay}\``,
-    );
+    revision.properties.push({
+      label: cur?.label ?? humanizeFieldName(reqName),
+      ...(cur?.value ? { from: cur.value } : {}),
+      to: await resolveNotionValueForDisplay(env, rawVal),
+    });
   }
 
-  const replaceNote = describeReplace(input.replace);
-  if (replaceNote) lines.push(replaceNote);
-
-  const appendNote = describeAppend(input.append);
-  if (appendNote) lines.push(appendNote);
-
-  return lines.join("\n");
+  const rewrite = rewriteOf(input.replace);
+  if (rewrite) revision.rewrite = rewrite;
+  const append = appendOf(input.append);
+  if (append) revision.append = append;
+  return revision;
 }
 
 /**
- * The one-line target note on a `notion_archive` card.
+ * The target a `notion_archive` card names.
  *
  * Writes are no longer database-allowlisted, so the human ✅ is the backstop —
  * the card shows the CONCRETE target (page title + parent database) rather than
  * a bare id, so an approver cannot be steered into confirming a write on some
  * arbitrary page a read pulled in (review 2026-07-13). Best-effort; no target
- * resolved means no line.
+ * resolved means no line on the card.
  */
-export async function buildNotionArchiveTargetNote(
+export async function buildNotionTarget(
   env: Env,
   input: Record<string, unknown>,
-): Promise<string | undefined> {
+): Promise<CardTarget | undefined> {
   const pageUrl = typeof input.page_url === "string" ? input.page_url : "";
   const target = pageUrl ? await describeNotionTarget(env, pageUrl) : null;
-  return target ? `• *Target:* ${target.title} — in ${target.parent}` : undefined;
+  return target ? { title: target.title, parent: target.parent, url: target.url } : undefined;
 }

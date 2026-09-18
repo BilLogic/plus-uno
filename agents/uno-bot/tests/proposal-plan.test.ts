@@ -17,7 +17,8 @@ import {
   withOperationPlan,
   type PlannedOperation,
 } from "../src/slack/proposal-render";
-import { batchResultMessage, type OperationOutcome } from "../src/gate/index";
+import { batchResultMessage } from "../src/slack/batch-result";
+import type { OperationOutcome } from "../src/gate/index";
 
 const CARD = [":warning: About to *update this Notion page*:", "• *Page link:* …", CONFIRM_FOOTER].join(
   "\n",

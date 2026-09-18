@@ -3,7 +3,7 @@
 // The rejection cases below matter more than the accepting ones.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { mapReaction, CONFIRM_REACTIONS } from "../src/slack/gate-reactions";
+import { mapReaction, CONFIRM_REACTIONS } from "../src/gate/reactions";
 
 describe("gate reactions", () => {
   it("confirms on the check marks", () => {

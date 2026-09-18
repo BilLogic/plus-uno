@@ -28,12 +28,8 @@
 
 import type { Env, SlackContext } from "../types";
 import { addReaction, postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
-import {
-  batchOutcomeNote,
-  batchResultMessage,
-  batchTelemetryLine,
-  runOperations,
-} from "../gate/index";
+import { batchOutcomeNote, batchTelemetryLine, runOperations } from "../gate/index";
+import { batchResultMessage } from "../slack/batch-result";
 import type { GateVerdict } from "../gate/index";
 import { proposalOperations } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";

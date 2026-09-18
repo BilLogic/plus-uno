@@ -8,7 +8,7 @@
 //
 // So every case here drives a real signal through `resolveSignal` against one
 // staged proposal in the in-memory ThreadState, and asserts the VERDICT: the
-// same outcome, the same text to post, and one execution between all four.
+// same outcome, the same note, and one execution between all four.
 // Past the verdict, the reaction door (#592) and the button door (#654) are
 // driven too — they take their dependencies by name, so the whole door runs
 // here on the recording Delivery rather than being read with a regex.
@@ -22,11 +22,10 @@
 // resolves without the model.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync, readdirSync } from "node:fs";
+import { resolve } from "node:path";
 
 import {
-  EXPIRED_POST,
-  STALE_POST,
-  SUPERSEDED_POST,
   resolveSignal,
   runReactionDoor,
   type GateSignal,
@@ -39,7 +38,7 @@ import {
   GATE_RESERVED,
   mapReaction,
   typedEmojiDecision,
-} from "../src/slack/gate-reactions";
+} from "../src/gate/reactions";
 import {
   PROPOSAL_TTL_MS,
   createInMemoryThreadState,
@@ -120,7 +119,7 @@ const DOORS: Array<{ name: string; signal: GateSignal }> = [
 ];
 
 describe("four signals, one verdict", () => {
-  it("wins, posts the same text, and executes the same tool on every door", async () => {
+  it("wins, posts the same verdict, and executes the same tool on every door", async () => {
     const verdicts: GateVerdict[] = [];
     for (const door of DOORS) {
       verdicts.push(await resolveSignal(door.signal, { threadState: await staged() }));
@@ -131,9 +130,13 @@ describe("four signals, one verdict", () => {
       assert.equal(verdict.outcome, "won", where);
       assert.equal(verdict.decision, "confirm", where);
       assert.equal(verdict.proposal?.proposalTs, CARD_TS, where);
-      // The text, and where it goes: `replyTs`, never `threadTs` — see
+      // The verdict, and where it goes: `replyTs`, never `threadTs` — see
       // PendingProposal for the DM that swallowed an approved write.
-      assert.deepEqual(verdict.post, { text: "Got it — kicking that off.", replyTs: THREAD }, where);
+      assert.deepEqual(
+        verdict.post,
+        { note: { kind: "resolved", decision: "confirm" }, replyTs: THREAD },
+        where,
+      );
       assert.deepEqual(
         verdict.execute,
         {
@@ -159,7 +162,7 @@ describe("four signals, one verdict", () => {
 
   it("carries the model's own words when it brought some", async () => {
     const verdict = await resolveSignal(model("Filing it now."), { threadState: await staged() });
-    assert.equal(verdict.post?.text, "Filing it now.");
+    assert.deepEqual(verdict.post?.note, { kind: "said", text: "Filing it now." });
   });
 
   it("lets exactly one of two racing confirmers win, and tells the other", async () => {
@@ -180,7 +183,7 @@ describe("four signals, one verdict", () => {
       // Only the winner is told to run anything, and the loser is told why.
       assert.notEqual(won[0]?.execute, undefined, second.name);
       assert.equal(lost[0]?.execute, undefined, second.name);
-      assert.equal(lost[0]?.post?.text, STALE_POST, second.name);
+      assert.deepEqual(lost[0]?.post?.note, { kind: "already-resolved" }, second.name);
     }
   });
 
@@ -194,7 +197,7 @@ describe("four signals, one verdict", () => {
       const after = await resolveSignal(second, { threadState });
       assert.equal(after.outcome, "stale", second.kind);
       assert.equal(after.execute, undefined, second.kind);
-      assert.equal(after.post?.text, STALE_POST, second.kind);
+      assert.deepEqual(after.post?.note, { kind: "already-resolved" }, second.kind);
     }
   });
 
@@ -222,7 +225,11 @@ describe("four signals, one verdict", () => {
       const verdict = await resolveSignal(signal, { threadState: await staged() });
       assert.equal(verdict.outcome, "won", signal.kind);
       assert.equal(verdict.decision, "cancel", signal.kind);
-      assert.deepEqual(verdict.post, { text: "Cancelled.", replyTs: THREAD }, signal.kind);
+      assert.deepEqual(
+        verdict.post,
+        { note: { kind: "resolved", decision: "cancel" }, replyTs: THREAD },
+        signal.kind,
+      );
       // The whole point of a decline: there is nothing for the caller to run.
       assert.equal(verdict.execute, undefined, signal.kind);
     }
@@ -237,7 +244,7 @@ describe("a card that is no longer there", () => {
 
     const verdict = await resolveSignal(reaction(), { threadState });
     assert.equal(verdict.outcome, "stale");
-    assert.equal(verdict.post?.text, EXPIRED_POST);
+    assert.deepEqual(verdict.post?.note, { kind: "expired" });
     assert.equal(verdict.execute, undefined);
     // Expiry is the store's answer, not a second clock in the gate — and the
     // by-thread fallback must not resurrect an aged-out card either.
@@ -249,7 +256,7 @@ describe("a card that is no longer there", () => {
   it("answers a button press on a card that is gone", async () => {
     const verdict = await resolveSignal(button(), { threadState: createInMemoryThreadState() });
     assert.equal(verdict.outcome, "stale");
-    assert.equal(verdict.post?.text, STALE_POST);
+    assert.deepEqual(verdict.post?.note, { kind: "already-resolved" });
   });
 
   it("stays silent when a reaction lands in a thread holding nothing", async () => {
@@ -283,7 +290,7 @@ describe("a card a revision replaced", () => {
     const { threadState } = await twoCards();
     const verdict = await resolveSignal(reaction(), { threadState });
     assert.equal(verdict.outcome, "stale");
-    assert.equal(verdict.post?.text, SUPERSEDED_POST);
+    assert.deepEqual(verdict.post?.note, { kind: "superseded" });
     assert.equal(verdict.execute, undefined);
   });
 
@@ -291,7 +298,7 @@ describe("a card a revision replaced", () => {
     const { threadState } = await twoCards();
     const verdict = await resolveSignal(button(), { threadState });
     assert.equal(verdict.outcome, "stale");
-    assert.equal(verdict.post?.text, SUPERSEDED_POST);
+    assert.deepEqual(verdict.post?.note, { kind: "superseded" });
     assert.equal(verdict.execute, undefined);
   });
 
@@ -367,8 +374,14 @@ describe("lookup: by card ts, then by thread", () => {
     // thing and got another.
     assert.equal(verdict.outcome, "none");
     assert.equal(verdict.execute, undefined);
-    assert.match(verdict.post?.text ?? "", /not on the proposal I am holding/);
-    assert.match(verdict.post?.text ?? "", /notion_create/);
+    // The verdict names the gesture, the person and the live card; the
+    // SENTENCE that points them at it is `slack/gate-note.ts`'s (#623).
+    assert.deepEqual(verdict.post?.note, {
+      kind: "not-on-the-card",
+      toolName: "notion_create",
+      glyph: "white_check_mark",
+      userId: "U2",
+    });
     // And the card is still claimable afterwards, by the door that is actually on it.
     assert.equal((await resolveSignal(reaction(), { threadState })).outcome, "won");
   });
@@ -531,8 +544,10 @@ describe("the reaction door", () => {
 
     // The raise sits inside the pairing, the answer follows it, and the settle
     // comes last — one clear, and the door never writes it by hand.
-    assert.deepEqual(kindsOf(delivery), ["working", "note", "working-clear"]);
-    assert.deepEqual(delivery.posted, ["Got it — kicking that off."]);
+    assert.deepEqual(kindsOf(delivery), ["working", "gate-note", "working-clear"]);
+    // The verdict as a MEANING — what it reads as in Slack is asserted in
+    // `tests/replaced-card-message.test.ts` against the one renderer (#623).
+    assert.deepEqual(delivery.gateNotes, [{ kind: "resolved", decision: "confirm" }]);
     // A door resolving a card leaves nobody waiting on anybody, and it states
     // that rather than inheriting it: the mapper is a required argument, so a
     // door cannot get an answer it never thought about (#575).
@@ -540,7 +555,7 @@ describe("the reaction door", () => {
 
     // The tool runs AFTER the verdict is posted — the person sees the
     // acknowledgement before the work, the same order every door keeps.
-    assert.deepEqual(saidBeforeRunning, ["working", "note"]);
+    assert.deepEqual(saidBeforeRunning, ["working", "gate-note"]);
     assert.equal(ran.length, 1);
     assert.deepEqual(ran[0]?.execute?.input, { title: "Reflection redesign" });
   });
@@ -563,9 +578,13 @@ describe("the reaction door", () => {
       },
     });
 
-    assert.deepEqual(kindsOf(delivery), ["working", "note", "note", "working-clear"]);
-    assert.match(delivery.posted[1] ?? "", /hit a snag executing it/);
-    assert.match(delivery.posted[1] ?? "", /:white_check_mark:/);
+    assert.deepEqual(kindsOf(delivery), ["working", "gate-note", "gate-note", "working-clear"]);
+    // The door says it caught THIS gesture and could not run it — the glyph is
+    // on the verdict, and the sentence carrying it is the adapter's (#623).
+    assert.deepEqual(delivery.gateNotes[1], {
+      kind: "resolve-failed",
+      glyph: "white_check_mark",
+    });
     assert.equal(clearedWith(delivery), "idle");
   });
 
@@ -660,8 +679,8 @@ describe("the button door", () => {
 
     // The raise sits inside the pairing, the answer follows it, and the settle
     // comes last — one clear, and the door never writes it by hand.
-    assert.deepEqual(kindsOf(delivery), ["working", "note", "working-clear"]);
-    assert.deepEqual(delivery.posted, ["Got it — kicking that off."]);
+    assert.deepEqual(kindsOf(delivery), ["working", "gate-note", "working-clear"]);
+    assert.deepEqual(delivery.gateNotes, [{ kind: "resolved", decision: "confirm" }]);
     // A door resolving a card leaves nobody waiting on anybody, and it states
     // that rather than inheriting it: the mapper is a required argument, so a
     // door cannot get an answer it never thought about (#575).
@@ -670,7 +689,7 @@ describe("the button door", () => {
 
     // The tool runs AFTER the verdict is posted — the person sees the
     // acknowledgement before the work, the same order every door keeps.
-    assert.deepEqual(saidBeforeRunning, ["working", "note"]);
+    assert.deepEqual(saidBeforeRunning, ["working", "gate-note"]);
     assert.equal(ran.length, 1);
     assert.deepEqual(ran[0]?.execute?.input, { title: "Reflection redesign" });
     assert.deepEqual(replacements, [
@@ -721,7 +740,7 @@ describe("the button door", () => {
       ),
       /notion 502/,
     );
-    assert.deepEqual(kindsOf(delivery), ["working", "note", "working-clear"]);
+    assert.deepEqual(kindsOf(delivery), ["working", "gate-note", "working-clear"]);
     assert.equal(clearedWith(delivery), "idle");
     assert.notEqual(clearedWith(delivery), "waiting-on-person");
   });
@@ -753,3 +772,19 @@ describe("the button door", () => {
   });
 });
 
+// ── Slack stays on the other side of the seam (#623) ─────────────────────────
+
+describe("Gate imports no Slack module", () => {
+  const files = readdirSync(resolve(process.cwd(), "src/gate")).filter((f) => f.endsWith(".ts"));
+
+  for (const file of files) {
+    it(`src/gate/${file} does not import from slack/`, () => {
+      const src = readFileSync(resolve(process.cwd(), "src/gate", file), "utf8");
+      assert.equal(
+        /from ["']\.\.\/slack\//.test(src),
+        false,
+        `${file} still imports a Slack module`,
+      );
+    });
+  }
+});

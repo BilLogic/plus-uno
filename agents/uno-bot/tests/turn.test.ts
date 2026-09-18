@@ -14,6 +14,8 @@
 // flow tests that drive a turn and then ask Gate what a person was told (#583).
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 import {
   recordingDelivery,
@@ -27,7 +29,8 @@ import {
   type TurnRequest,
   type TurnSettlement,
 } from "../src/turn/index";
-import { batchResultMessage } from "../src/gate/index";
+import { batchResultMessage } from "../src/slack/batch-result";
+import { renderProposalCard } from "../src/slack/proposal-render";
 import {
   createInMemoryThreadState,
   type HistoryTurn,
@@ -37,7 +40,7 @@ import {
 import {
   CHANNEL,
   CONVERSATION,
-  DEFAULT_CONFIRM_POST,
+  DEFAULT_CONFIRM_NOTE,
   PENDING,
   REF,
   harness,
@@ -64,12 +67,13 @@ test("a typed ✅ against a pending proposal resolves it and posts exactly once"
     {
       toolName: "notion_create",
       decision: "confirm",
-      narrative: DEFAULT_CONFIRM_POST,
+      note: DEFAULT_CONFIRM_NOTE,
       executed: true,
     },
   ]);
-  // The gate's own text, said once, through Delivery.
-  assert.deepEqual(postsOf(h.delivery), [DEFAULT_CONFIRM_POST]);
+  // The gate's own verdict, said once, through Delivery — as the MEANING the
+  // turn handed over, not the line Slack spells from it (#623).
+  assert.deepEqual(h.delivery.gateNotes, [DEFAULT_CONFIRM_NOTE]);
   // And the card is gone: the claim took it.
   assert.equal(await h.threadState.getProposalByThread(REF), null);
   // And nothing else was said: no answer, no second card, no model call.
@@ -111,7 +115,7 @@ test("a typed reply the model reads as approval resolves the card once", async (
     {
       toolName: "notion_create",
       decision: "confirm",
-      narrative: "Filing it now.",
+      note: { kind: "said", text: "Filing it now." },
       executed: true,
     },
   ]);
@@ -370,7 +374,12 @@ test("a side-effect call comes back as a proposal to stage, and the card was del
   const cards = h.delivery.calls.filter((c) => c.kind === "proposal");
   assert.equal(cards.length, 1);
   assert.equal(outcome.staged.proposal.proposalTs, h.delivery.stagedAt[0]);
-  assert.match(outcome.staged.card.text, /Reflection redesign/);
+  // WHAT THE CARD MEANS, not how Slack spells it: the staged title is a field
+  // on the card the turn handed over (#623).
+  assert.deepEqual(outcome.staged.card.fields, [
+    { label: "title", value: "Reflection redesign" },
+  ]);
+  assert.equal(outcome.staged.card.kind, "confirm");
   // And it is confirmable the moment it posts: the store has it.
   const staged = await h.threadState.getProposalByThread(REF);
   assert.equal(staged?.proposalTs, h.delivery.stagedAt[0]);
@@ -480,11 +489,12 @@ test("several side-effect calls in one reply stage ONE proposal that holds all o
     outcome.staged.proposal.operations?.map((o) => o.toolName),
     ["notion_update", "notion_update", "notion_create"],
   );
-  // The card names every one of them — the ✅ is consent to what it says.
-  assert.match(outcome.staged.card.text, /3 operations/);
-  assert.match(outcome.staged.card.text, /Calendar Sync hub/);
-  assert.match(outcome.staged.card.text, /Calendar Sync PRD/);
-  assert.match(outcome.staged.card.text, /Calendar Sync cut/);
+  // The card CARRIES every one of them — the ✅ is consent to the whole batch,
+  // so the batch is on the card as data and not as a sentence about it (#623).
+  assert.deepEqual(
+    outcome.staged.card.operations.map((o) => o.input.title),
+    ["Calendar Sync hub", "Calendar Sync PRD", "Calendar Sync cut"],
+  );
   // And the store holds the whole batch, so a later ✅ runs all of it.
   const staged = await h.threadState.getProposalByThread(REF);
   assert.equal(staged?.operations?.length, 3);
@@ -539,7 +549,12 @@ test("what the card lists is what ThreadState holds — four pages, mixed kinds,
   );
   // The card's numbered list IS the stored batch: same count, same order, and
   // each operation named by the kind it will run.
-  const listed = [...(outcome.staged?.card.text ?? "").matchAll(/^ {2}(\d+)\. \*(.+?)\*(.*)$/gm)];
+  // Rendered HERE, through the adapter's one renderer: the turn hands over the
+  // batch and Slack's spelling of it is `proposal-render.ts`'s (#623), so what
+  // a person reads is asserted against that rendering rather than against a
+  // card that no longer carries any.
+  const cardText = outcome.staged ? renderProposalCard(outcome.staged.card).text : "";
+  const listed = [...cardText.matchAll(/^ {2}(\d+)\. \*(.+?)\*(.*)$/gm)];
   assert.deepEqual(
     listed.map((m) => m[1]),
     ["1", "2", "3", "4"],
@@ -550,16 +565,14 @@ test("what the card lists is what ThreadState holds — four pages, mixed kinds,
   );
   // Grouped by what each one touches — one heading per page, four in all.
   const headings = [
-    ...(outcome.staged?.card.text ?? "").matchAll(
-      /^\*(?:<[^|]+\|)?([^*>]+)>?\*(?: \(Notion data source\))?$/gm,
-    ),
+    ...cardText.matchAll(/^\*(?:<[^|]+\|)?([^*>]+)>?\*(?: \(Notion data source\))?$/gm),
   ];
   assert.deepEqual(
     headings.map((m) => m[1]),
     ["Calendar Sync hub", "Calendar Sync PRD", "Calendar Sync runbook", "decision"],
   );
   // And the rewrite shows what the block says now, beside what it will say.
-  assert.match(outcome.staged?.card.text ?? "", /_The sync runs nightly\._ → _The sync runs hourly\._/);
+  assert.match(cardText, /_The sync runs nightly\._ → _The sync runs hourly\._/);
 });
 
 test("a ✅ on a batch runs every operation in order, and a failure hides none of the others", async () => {
@@ -671,7 +684,7 @@ test("the same proposal re-staged while one is pending is read as the confirmati
     {
       toolName: "notion_create",
       decision: "confirm",
-      narrative: DEFAULT_CONFIRM_POST,
+      note: DEFAULT_CONFIRM_NOTE,
       executed: true,
     },
   ]);
@@ -1163,4 +1176,45 @@ test("the scope hint and the correction directive land after the question, never
   assert.ok(question === 0, "the question opens the block");
   assert.ok(scope > question, "the scope hint follows it");
   assert.ok(directive > scope, "and the correction directive after that");
+});
+
+test("a brief staged with no named gap carries that caveat as data, not as Slack copy", async () => {
+  // WHETHER the caveat is on the card is the turn's judgement (#623); the
+  // words are the adapter's. A test matching `:mag:` here would pass on a
+  // recording that spelled the card and fail to notice the judgement moving.
+  const h = harness({
+    replies: [
+      {
+        text: "I'll scaffold this.",
+        toolCalls: [
+          {
+            name: "prototype_scaffold",
+            args: { figma_url: "https://figma.com/file/x", notes: "Build the roster view." },
+          },
+        ],
+      },
+    ],
+  });
+  const outcome = await runTurn(request({ text: "build this figma" }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  assert.deepEqual(outcome.staged?.card.caveats, [{ kind: "no-open-questions" }]);
+  assert.equal(outcome.staged?.card.kind, "confirm");
+  assert.equal(outcome.staged?.card.verb, "scaffold a new prototype from this Figma design");
+});
+
+test("Turn's decision files do not import Slack's card or verdict renderers", () => {
+  // Residue named in turn.ts still imports slack/antecedent and slack/render
+  // (the model's window, and the body the judges score). The leak #623 closed
+  // is the other direction: Turn spelling a card or a verdict.
+  for (const file of ["src/turn/turn.ts", "src/turn/delivery.ts", "src/turn/index.ts"]) {
+    const src = readFileSync(resolve(process.cwd(), file), "utf8");
+    for (const banned of ["proposal-render", "gate-note", "batch-result", "notion-card"]) {
+      assert.equal(
+        new RegExp(`from ["']\\.\\./slack/${banned}["']`).test(src),
+        false,
+        `${file} imports slack/${banned}`,
+      );
+    }
+  }
 });

@@ -11,11 +11,16 @@
 // So the claim lives here, once. A door builds a signal, calls
 // `resolveSignal`, and applies what comes back.
 //
-// WHAT A VERDICT IS. Results, never effects: the text to post and the tool to
-// execute. Gate makes no Slack call and never touches `Env` — a door holds
-// both and does the speaking through its Delivery. That is also what lets the
-// whole four-path agreement be asserted in one Node test against the
-// in-memory ThreadState (`tests/confirmation-paths.test.ts`).
+// WHAT A VERDICT IS. Results, never effects: WHICH verdict this is, and the
+// tool to execute. Gate makes no Slack call, imports no Slack module and never
+// touches `Env` — a door holds all three and does the speaking through its
+// Delivery. The verdict used to carry the TEXT as well, `:hourglass:` and
+// `<@user>` and all, which made "no Slack call" true of the effects and false
+// of the content (#623); the wordings now live in `slack/gate-note.ts` and the
+// emoji vocabulary moved in here, as `gate/reactions.ts`. That is also what
+// lets the whole four-path agreement be asserted in one Node test against the
+// in-memory ThreadState (`tests/confirmation-paths.test.ts`) — as MEANINGS
+// now, not as strings.
 //
 // THE CLAIM IS THE LOCK. `ThreadState.claimProposal` deletes the record, one
 // caller at a time, and fails closed. Of two racing resolvers exactly one gets
@@ -28,15 +33,14 @@
 // compile is a glob over `src/**` and types the Workers globals beside the Node
 // ones, so it would compile this file either way — `tsconfig.test.json`.)
 
-import { mapReaction, typedEmojiDecision, type Decision } from "../slack/gate-reactions";
+import { mapReaction, typedEmojiDecision, type Decision } from "./reactions";
 import { proposalOperations } from "../thread-state/index";
 import type {
   PendingProposal,
   ProposalOperation,
   ThreadState,
 } from "../thread-state/index";
-
-export type { Decision };
+import type { GateNote } from "../turn/index";
 
 // ── The signal ───────────────────────────────────────────────────────────────
 
@@ -105,9 +109,9 @@ export interface GateExecution {
 /**
  * What the signal came to:
  *
- *   `won`   — this caller owns the resolution: post `post.text`, and run
+ *   `won`   — this caller owns the resolution: post `post.note`, and run
  *             `execute` when it is set.
- *   `stale` — someone else already resolved it, or it aged out. `post.text`
+ *   `stale` — someone else already resolved it, or it aged out. `post.note`
  *             says which; nothing is executed.
  *   `none`  — there is nothing here to resolve: the glyph carries no decision,
  *             or the reaction sits somewhere other than the card. `post` is
@@ -123,8 +127,15 @@ export interface GateVerdict {
   /** The proposal the signal was about, when one was found. */
   proposal?: PendingProposal;
   decision?: Decision;
-  /** What to say, and the ts to say it under. Null means say nothing. */
-  post: { text: string; replyTs: string } | null;
+  /**
+   * What to say, and the ts to say it under. Null means say nothing.
+   *
+   * A `GateNote`, not a string: the note names the verdict and carries the
+   * facts it turned on, and `slack/gate-note.ts` is where it becomes a line
+   * with an emoji and — for the one verdict aimed at a person's own gesture —
+   * a mention in it (#623). A door posts it through `Delivery.postGateNote`.
+   */
+  post: { note: GateNote; replyTs: string } | null;
   execute?: GateExecution;
 }
 
@@ -139,47 +150,15 @@ export interface GateDeps {
 // ── What the doors say ───────────────────────────────────────────────────────
 
 /**
- * The lost race. One wording for all four doors, and deliberately without a
- * `<@user>`: the model's signal has no user, and a message that differs by
- * door is a message that drifts by door. Each door posts it where the person
- * is already looking.
- */
-export const STALE_POST =
-  ":hourglass: That proposal was already resolved — another confirmation got there first, " +
-  "so nothing was executed twice.";
-
-/** The delayed ✅/❌ on a card that aged out. Never silence: the person
- *  believes they just confirmed something (live 2026-07-10, where silence read
- *  as "the bot is broken"). */
-export const EXPIRED_POST =
-  ":hourglass: That proposal had already expired — nothing was executed. " +
-  "Proposals stay live for an hour. Ask me again and I'll set the same thing up fresh.";
-
-/**
- * The ✅/⛔ on a proposal a revision replaced (#573).
+ * A reaction that landed somewhere other than the card: say where the card is,
+ * and resolve nothing.
  *
- * Its own wording, not `EXPIRED_POST`: the person did not wait too long, they
- * acted on the card above the one I am holding — and unlike an aged-out card,
- * there is a live one in the thread to send them to. Nothing is executed, which
- * is the point: the old card carries the very input they pushed back on.
+ * The only verdict that carries facts beyond the decision, and the reason a
+ * note is a shape rather than an enum: the line names the gesture, the person
+ * who made it and the tool on the live card, none of which Gate may spell.
  */
-export const SUPERSEDED_POST =
-  ":arrows_counterclockwise: That proposal was replaced by a newer one — nothing was executed. " +
-  "Confirm on the newest :warning: card in this thread instead.";
-
-/** The default narrative, when the signal brought no words of its own. */
-export function defaultNarrative(decision: Decision): string {
-  return decision === "confirm" ? "Got it — kicking that off." : "Cancelled.";
-}
-
-/** A reaction that landed somewhere other than the card: say where the card
- *  is, and resolve nothing. */
-function pointerPost(live: PendingProposal, glyph: string, userId: string): string {
-  return (
-    `:eyes: <@${userId}> I saw your :${glyph}:, but it is not on the proposal I am holding — ` +
-    `nothing was executed. Use the buttons on the :warning: card for *${live.toolName}* just above, ` +
-    `or react there.`
-  );
+function pointerNote(live: PendingProposal, glyph: string, userId: string): GateNote {
+  return { kind: "not-on-the-card", toolName: live.toolName, glyph, userId };
 }
 
 /** Where a resolution speaks: the card's own reply target, never `threadTs` —
@@ -226,7 +205,7 @@ export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise
     return {
       outcome: "stale",
       decision,
-      post: { text: SUPERSEDED_POST, replyTs: replyTargetOf(signal) },
+      post: { note: { kind: "superseded" }, replyTs: replyTargetOf(signal) },
     };
   }
 
@@ -236,7 +215,7 @@ export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise
     return {
       outcome: "stale",
       decision,
-      post: { text: EXPIRED_POST, replyTs: replyTargetOf(signal) },
+      post: { note: { kind: "expired" }, replyTs: replyTargetOf(signal) },
     };
   }
 
@@ -249,7 +228,7 @@ export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise
     return {
       outcome: "stale",
       decision,
-      post: { text: STALE_POST, replyTs: replyTargetOf(signal) },
+      post: { note: { kind: "already-resolved" }, replyTs: replyTargetOf(signal) },
     };
   }
 
@@ -270,10 +249,10 @@ export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise
       post:
         signal.kind === "reaction"
           ? {
-              text: pointerPost(proposal, signal.glyph, signal.userId),
+              note: pointerNote(proposal, signal.glyph, signal.userId),
               replyTs: replyTarget(proposal),
             }
-          : { text: STALE_POST, replyTs: replyTarget(proposal) },
+          : { note: { kind: "already-resolved" }, replyTs: replyTarget(proposal) },
     };
   }
 
@@ -308,7 +287,7 @@ async function claim(
       proposal,
       decision,
       post: {
-        text: why.state === "superseded" ? SUPERSEDED_POST : STALE_POST,
+        note: why.state === "superseded" ? { kind: "superseded" } : { kind: "already-resolved" },
         replyTs: replyTarget(proposal),
       },
     };
@@ -318,7 +297,12 @@ async function claim(
     outcome: "won",
     proposal,
     decision,
-    post: { text: narrative ?? defaultNarrative(decision), replyTs: replyTarget(proposal) },
+    post: {
+      // The model's own words when it brought any, and otherwise the fact that
+      // the card resolved — which is all Gate knows and all it needs to say.
+      note: narrative ? { kind: "said", text: narrative } : { kind: "resolved", decision },
+      replyTs: replyTarget(proposal),
+    },
     ...(decision === "confirm"
       ? {
           execute: {

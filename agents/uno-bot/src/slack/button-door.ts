@@ -24,6 +24,7 @@
 import type { ThreadState } from "../thread-state/index";
 import { withWorkingSignal, type Delivery } from "../turn/index";
 import { resolveSignal, type GateVerdict } from "../gate/index";
+import { renderGateNote } from "./gate-note";
 
 /** One button press, in the facts the envelope already has. */
 export interface ButtonRequest {
@@ -101,7 +102,7 @@ export async function runButtonDoor(
 
   if (verdict.outcome !== "won") {
     // Expired, already resolved, or a press that lost the race. Never silence.
-    if (verdict.post) await deps.replyEphemeral(verdict.post.text);
+    if (verdict.post) await deps.replyEphemeral(renderGateNote(verdict.post.note));
     return;
   }
 
@@ -120,7 +121,7 @@ export async function runButtonDoor(
     door,
     async (delivery) => {
       await delivery.setWorking({ status: "is working on that…" });
-      await delivery.postNote(post.text);
+      await delivery.postGateNote(post.note);
       await deps.applyVerdict(verdict);
     },
     // What the thread needs afterwards, stated rather than defaulted: this
