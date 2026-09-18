@@ -13,7 +13,7 @@
 //      receipt and not as its text, #426), and
 //   2. an LLM judge (Gemini on Vertex, same SA as everything else) against the
 //      D1–D9 bot-answer rubric — loaded from docs/evals/rubrics/bot-answer.md
-//      and quoted verbatim, scripts/eval-rubric.mjs — + the case's judgeNote.
+//      and quoted verbatim, scripts/eval-judge.mjs — + the case's judgeNote.
 // A failing BLOCKER case fails the job (exit 1) — mirroring the scenario doc's
 // "a failing row is a release blocker". Full transcripts land in
 // eval-results.json for reasoning investigation.
@@ -42,6 +42,13 @@
 // only the cases that have a recording in docs/evals/fixtures/recordings/; the
 // rest SKIP by name, counted apart, never failed.
 //
+// WHO GRADES is the other dependency, and the same shape: a judge is
+// `{ name, judgeCase(case, transcript) }` and scripts/eval-judge.mjs owns all
+// of it — the rubric, the service-account credential, the Vertex call, the
+// transcript cut and the fail-open to "skipped". `judgeFromEnv()` hands back
+// the Vertex judge when the SA is present and a judge that skips when it is
+// not, so a run with no credential is a run with fewer verdicts, not a crash.
+//
 // Env required (by the WORKER transport — another transport needs neither):
 //   WORKER_URL      e.g. the Worker origin (scripts/worker-url.mjs, or UNO_BOT_WORKER_URL)
 //   DEBUG_TOKEN     the Worker's /debug/* gate token
@@ -54,7 +61,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { argv } from "node:process";
-import { createHash, createSign } from "node:crypto";
+import { createHash } from "node:crypto";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { passesCase, toolCallMatches, describeCalls } from "./eval-scoring.mjs";
@@ -62,15 +69,11 @@ import { threadTurn, checkHistory, sentSummary } from "./eval-history.mjs";
 import { applySubject, skipReason } from "./eval-subjects.mjs";
 import { workerTransport } from "./eval-transport.mjs";
 import { localTransport } from "./eval-transport-local.mjs";
-import { describeRubric, judgeSystem, loadRubric } from "./eval-rubric.mjs";
+import { judgeFromEnv, noJudge } from "./eval-judge.mjs";
 
 const {
   WORKER_URL,
   DEBUG_TOKEN,
-  GEMINI_SA_EMAIL,
-  GEMINI_SA_PRIVATE_KEY,
-  GEMINI_PROJECT_ID = "hcii-plus",
-  JUDGE_MODEL = "gemini-3.1-pro-preview",
   CASES_PATH = "docs/evals/fixtures/uno-bot-cases.json",
 } = process.env;
 
@@ -84,37 +87,6 @@ function required(name, v) {
     process.exit(2);
   }
   return v;
-}
-
-// ── Google SA token (same pattern as the backfill script) ─────────────────────
-function b64url(buf) {
-  return Buffer.from(buf).toString("base64url");
-}
-async function googleToken() {
-  const now = Math.floor(Date.now() / 1000);
-  const header = b64url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
-  const claims = b64url(
-    JSON.stringify({
-      iss: GEMINI_SA_EMAIL,
-      scope: "https://www.googleapis.com/auth/cloud-platform",
-      aud: "https://oauth2.googleapis.com/token",
-      iat: now,
-      exp: now + 3600,
-    }),
-  );
-  const input = `${header}.${claims}`;
-  const signer = createSign("RSA-SHA256");
-  signer.update(input);
-  signer.end();
-  const jwt = `${input}.${b64url(signer.sign(GEMINI_SA_PRIVATE_KEY.replace(/\\n/g, "\n")))}`;
-  const res = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer", assertion: jwt }),
-  });
-  const data = await res.json();
-  if (!res.ok || !data.access_token) throw new Error(`token exchange failed (${res.status})`);
-  return data.access_token;
 }
 
 // ── One headless agent turn (with transient-error retries) ────────────────────
@@ -134,58 +106,6 @@ async function evalTurn(transport, req, { log, sleep }) {
     if (resp?.ok || !transient || attempt >= TRANSIENT_RETRIES) return resp;
     log(`  … transient model error (${msg.slice(0, 80)}) — retrying in ${TRANSIENT_BACKOFF_MS / 1000}s`);
     await sleep(TRANSIENT_BACKOFF_MS);
-  }
-}
-
-// ── LLM judge (fail-open: any judge error → "skipped") ────────────────────────
-// The rubric the judge grades against is NOT written here. It is loaded from
-// docs/evals/rubrics/bot-answer.md and quoted verbatim — scripts/eval-rubric.mjs
-// (#511). The condensed paraphrase this constant used to hold was a second copy
-// of what "good" means, updated by hand or not at all.
-
-// How much of the transcript the judge reads. Was 8,000 chars, and a full
-// prompt-spec is longer than that: on 2026-09-05 (run 33972756077) P2's Open
-// Questions block began at char 8,190, so the judge failed the reply for
-// "documenting none of the open decisions" it had documented — a verdict about
-// the cut, not the reply. The judge runs on the grind tier with a long context;
-// 60,000 chars covers every transcript the fixture produces today with room to
-// grow, and the marker tells the judge when it still is not the whole thing.
-const JUDGE_TRANSCRIPT_CHARS = 60_000;
-
-async function judgeCase(token, system, c, transcript) {
-  if (!token) return { verdict: "skipped" };
-  try {
-    const url = `https://aiplatform.googleapis.com/v1/projects/${GEMINI_PROJECT_ID}/locations/global/publishers/google/models/${JUDGE_MODEL}:generateContent`;
-    const full = JSON.stringify(transcript);
-    const shown =
-      full.length > JUDGE_TRANSCRIPT_CHARS
-        ? `${full.slice(0, JUDGE_TRANSCRIPT_CHARS)} …[transcript truncated at ${JUDGE_TRANSCRIPT_CHARS} chars — judge only what is shown]`
-        : full;
-    const prompt = `Case ${c.id} — ${c.name}\nExpectation: ${c.judgeNote}\n\nTranscript (JSON):\n` + shown;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        systemInstruction: { parts: [{ text: system }] },
-        generationConfig: {
-          maxOutputTokens: 2000,
-          // thinking_level is Gemini 3.x-only; 2.5-gen models 400 on it.
-          ...(/^gemini-3/.test(JUDGE_MODEL) ? { thinkingConfig: { thinkingLevel: "low" } } : {}),
-        },
-      }),
-    });
-    const data = await res.json();
-    const text = (data.candidates?.[0]?.content?.parts ?? [])
-      .filter((p) => p.text && !p.thought)
-      .map((p) => p.text)
-      .join("");
-    const m = text && text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
-    const parsed = m ? JSON.parse(m) : null;
-    if (parsed?.verdict === "pass" || parsed?.verdict === "fail") return parsed;
-    return { verdict: "skipped", reason: "unparseable judge output" };
-  } catch (err) {
-    return { verdict: "skipped", reason: String(err?.message ?? err) };
   }
 }
 
@@ -354,15 +274,16 @@ export function parseArgs(args) {
  * Walk the fixture through one transport and return the summary.
  *
  * Everything the run reaches outside itself is an argument: the transport (how
- * a turn happens, and how a run-time subject is answered), the judge, the log,
- * the clock. Nothing here writes a file or exits a process — `main` below does
- * both — so scripts/run-evals.test.mjs can replay a fixture case in
- * milliseconds and read the summary it produced (#511).
+ * a turn happens, and how a run-time subject is answered), the judge (what the
+ * rubric is and who grades against it — scripts/eval-judge.mjs, the same shape
+ * as the transport), the log, the clock. Nothing here writes a file or exits a
+ * process — `main` below does both — so scripts/run-evals.test.mjs can replay a
+ * fixture case in milliseconds and read the summary it produced (#511).
  *
  * @param {object} deps
  * @param {{name: string, runTurn: Function, fetchSubject?: Function, unsupported?: Function}} deps.transport
  * @param {string} [deps.casesPath]
- * @param {(c: object, transcript: object) => Promise<{verdict: string, reason?: string}>} [deps.judge]
+ * @param {{name: string, judgeCase: (c: object, transcript: object) => Promise<{verdict: string, reason?: string}>}} [deps.judge]
  * @param {(line: string) => void} [deps.log]
  * @param {(ms: number) => Promise<void>} [deps.sleep]
  * @param {number} [deps.pauseMs] - the wait between cases and between samples
@@ -370,7 +291,7 @@ export function parseArgs(args) {
 export async function runEvals({
   transport,
   casesPath = CASES_PATH,
-  judge = async () => ({ verdict: "skipped" }),
+  judge = noJudge(),
   log = console.log,
   sleep = (ms) => new Promise((r) => setTimeout(r, ms)),
   pauseMs = PAUSE_BETWEEN_CASES_MS,
@@ -435,7 +356,7 @@ export async function runEvals({
 
     const verdict = failures.length
       ? { verdict: "fail", reason: "deterministic checks failed" }
-      : await judge(c, transcript);
+      : await judge.judgeCase(c, transcript);
     const pass = failures.length === 0 && verdict.verdict !== "fail";
     return { pass, failures, judge: verdict, transcript };
   }
@@ -555,16 +476,12 @@ export async function runEvals({
 async function main() {
   const opts = parseArgs(argv.slice(2));
   const transport = TRANSPORTS[opts.transport]();
-  const rubric = loadRubric();
-  const judgeToken =
-    GEMINI_SA_EMAIL && GEMINI_SA_PRIVATE_KEY ? await googleToken().catch(() => null) : null;
-  if (!judgeToken) console.log("[evals] no judge credential — deterministic checks only");
-  else console.log(`[evals] judge ${JUDGE_MODEL} against ${describeRubric(rubric)} from docs/evals/rubrics/bot-answer.md`);
-  const system = judgeSystem(rubric);
+  const judge = await judgeFromEnv();
+  console.log(`[evals] judge ${judge.name}`);
 
   const summary = await runEvals({
     transport,
-    judge: (c, transcript) => judgeCase(judgeToken, system, c, transcript),
+    judge,
     // The 10s pause between cases and samples sits out a per-minute MODEL
     // quota. A transport that reaches no model says so by declaring its own
     // pause (the local one declares 0), which is the difference between a CI

@@ -72,9 +72,12 @@ async function run(casesPath, transport, opts = {}) {
     casesPath,
     log: (l) => lines.push(l),
     sleep: async (ms) => waits.push(ms),
-    judge: async (c, transcript) => {
-      judged.push({ id: c.id, transcript });
-      return opts.verdict ?? { verdict: "pass" };
+    judge: {
+      name: "fake",
+      judgeCase: async (c, transcript) => {
+        judged.push({ id: c.id, transcript });
+        return opts.verdict ?? { verdict: "pass" };
+      },
     },
     ...opts.deps,
   });
