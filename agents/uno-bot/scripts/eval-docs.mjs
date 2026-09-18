@@ -27,6 +27,8 @@ import { argv } from "node:process";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { isEntry } from "../../../scripts/lib/findings.mjs";
+
 import { CASE_SPEC_KEYS, TURN_SPEC_KEYS, censusOf, loadCases, samplesOf } from "./eval-case.mjs";
 import { loadRecordings } from "./eval-transport-local.mjs";
 
@@ -246,4 +248,4 @@ function main() {
   console.log(`[eval-docs] wrote:\n  - ${stale.join("\n  - ")}`);
 }
 
-if (argv[1] && resolve(argv[1]) === fileURLToPath(import.meta.url)) main();
+if (isEntry(import.meta.url)) main();

@@ -17,9 +17,9 @@
 //   npm run check:node-floor
 
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
-import { report } from './lib/findings.mjs';
+import { main } from './lib/findings.mjs';
 import { findings, hardcoded, nvmrcMajor, wranglerFloor } from './node-floor.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -57,7 +57,6 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   );
 }
 
-// Imported by the harness runner, so it must do nothing on import.
-if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
-  report('check:node-floor', run(), { remedy: REMEDY, summary: summary() });
-}
+// Imported by the harness runner, so it must do nothing on import — which is
+// `main()`'s entry comparison, not this file's (#610).
+main(import.meta.url, 'check:node-floor', { run, summary, remedy: REMEDY });

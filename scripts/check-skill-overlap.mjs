@@ -99,7 +99,7 @@ import { fileURLToPath } from 'url';
 
 import { workerFiles, resolveBundled, unresolvedReport } from './lib/bundled-set.mjs';
 import { directories } from './lib/corpus.mjs';
-import { byRoot, renderFindings, report } from './lib/findings.mjs';
+import { byRoot, isEntry, renderFindings, report } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -426,11 +426,13 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
 // ── CLI ──────────────────────────────────────────────────────────────────────
 // Guarded so the test file can import the analysis without running it.
 //
-// `main()` from the findings module is not used here for one reason: `--verbose`
-// lists what was discounted AFTER the green line, and `main` exits inside
-// itself. The failing path still goes through `report`, so which stream and
-// which exit code remain decisions this file does not make.
-if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))) {
+// `main()` from the findings module is not used here for one reason: it models
+// a side flag that runs BEFORE the gate, terminally or falling through, and
+// `--verbose` lists what was discounted AFTER the green line — past the point
+// `main` has already exited. The entry comparison is still the module's
+// (`isEntry`, #610), and the failing path still goes through `report`, so which
+// stream and which exit code remain decisions this file does not make.
+if (isEntry(import.meta.url)) {
   const found = run();
   if (found.length) report('check:skill-overlap', found, { remedy: REMEDY });
 

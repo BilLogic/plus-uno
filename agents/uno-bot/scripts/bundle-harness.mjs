@@ -97,7 +97,7 @@
 //
 // Run: npm run bundle:harness
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from "node:fs";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 // Frontmatter is metadata for this script, not content for the model — and
@@ -105,6 +105,7 @@ import path from "node:path";
 // bundled count (#238), so the split lives in one shared module rather than
 // once here and once in each guard that has to agree with it.
 import { frontmatter } from "../../../scripts/lib/corpus.mjs";
+import { isEntry } from "../../../scripts/lib/findings.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url)); // agents/uno-bot/scripts
 /** The repo root this package sits in, for a caller that names none. */
@@ -1101,4 +1102,4 @@ function cli() {
 }
 
 // Imported by the check module and by the tests, so it must do nothing on import.
-if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) cli();
+if (isEntry(import.meta.url)) cli();

@@ -28,7 +28,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 import { byRoot, main } from './lib/findings.mjs';
 import { audit, corpus, ratchetFailures } from './undefined-tokens.mjs';
@@ -139,12 +139,12 @@ function printReport(repoRoot = REPO_ROOT) {
 }
 
 // The side flags belong to the CLI and not to `run`: one of them writes a file.
-// Handled here, and only when this module IS the process — the harness runner
-// imports it and must get none of this.
-// The CLI is one branch or the other. A side flag prints (or writes) instead of
-// gating, so the gate does not also run; `main()` re-checks the entry guard for
-// itself, which is what keeps an import of this module reaching neither.
-const entry = process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url;
-if (entry && process.argv.includes('--update')) update();
-else if (entry && process.argv.includes('--report')) printReport();
-else main(import.meta.url, 'check:undefined-tokens', { run, summary, remedy: REMEDY });
+// Both are TERMINAL — they print or write instead of gating — so `main()` owns
+// the entry comparison and the dispatch, and `--update` wins when both are
+// typed because it is declared first.
+main(import.meta.url, 'check:undefined-tokens', {
+  run,
+  summary,
+  remedy: REMEDY,
+  flags: { '--update': () => update(), '--report': () => printReport() },
+});

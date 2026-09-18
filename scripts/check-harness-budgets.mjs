@@ -40,9 +40,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
-import { report } from './lib/findings.mjs';
+import { main } from './lib/findings.mjs';
 import { tryHarnessManifest } from './lib/bundled-set.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -172,11 +172,8 @@ export function summary({ repoRoot = REPO_ROOT, manifest, claims = CLAIMS } = {}
     .join(' · ')}`;
 }
 
-// Imported by the harness runner, so it must do nothing on import.
-if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
-  const findings = run();
-  report('check:harness-budgets', findings, {
-    remedy: REMEDY,
-    summary: findings.length ? undefined : summary(),
-  });
-}
+// Imported by the harness runner, so it must do nothing on import — which is
+// `main()`'s entry comparison, not this file's (#610). It also holds the
+// summary thunk back on a red run, which is what this spelling was doing by
+// hand.
+main(import.meta.url, 'check:harness-budgets', { run, summary, remedy: REMEDY });

@@ -22,7 +22,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 import { ourTokens, compare, ageInDays, failures } from './atlassian-benchmark.mjs';
 import { byRoot, main, report } from './lib/findings.mjs';
@@ -169,22 +169,30 @@ function update(repoRoot = REPO_ROOT) {
 }
 
 // The side flags belong to the CLI: two of them print instead of gating and one
-// writes the recording. `--table` and `--how` fall through to the gate, as they
-// always did; `--update` is terminal, and reports its refusal as a finding so
-// the exit code still comes from the one place that decides exit codes.
-// The CLI is one branch or the other. A side flag prints (or writes) instead of
-// gating, so the gate does not also run; `main()` re-checks the entry guard for
-// itself, which is what keeps an import of this module reaching neither.
-const entry = process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url;
-if (entry) {
-  if (process.argv.includes('--table') || process.argv.includes('--print')) printTable();
-  if (process.argv.includes('--how')) printHow();
-}
-if (entry && process.argv.includes('--update')) {
-  report('check:atlassian-benchmark', update(), {
-    remedy: '  -> Re-recording a backwards move is how a ratchet stops being one.',
-    summary: 'the recording now matches what was measured',
-  });
-} else {
-  main(import.meta.url, 'check:atlassian-benchmark', { run, summary, remedy: REMEDY });
-}
+// writes the recording. `--table` and `--how` FALL THROUGH to the gate, as they
+// always did, so they go in the slot that models that (#610); `--update` is
+// terminal, and reports its refusal as a finding so the exit code still comes
+// from the one place that decides exit codes.
+//
+// `--print` is the older spelling of `--table` and both are honoured, so typing
+// both has to print one table rather than two.
+let tabled = false;
+const printTableOnce = () => {
+  if (tabled) return;
+  tabled = true;
+  printTable();
+};
+
+main(import.meta.url, 'check:atlassian-benchmark', {
+  run,
+  summary,
+  remedy: REMEDY,
+  fallThrough: { '--table': printTableOnce, '--print': printTableOnce, '--how': () => printHow() },
+  flags: {
+    '--update': () =>
+      report('check:atlassian-benchmark', update(), {
+        remedy: '  -> Re-recording a backwards move is how a ratchet stops being one.',
+        summary: 'the recording now matches what was measured',
+      }),
+  },
+});

@@ -53,7 +53,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 import { documents } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
@@ -435,18 +435,12 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   return `${inputs(repoRoot).files.length} stylesheets, no foreground token equal to the background beneath it`;
 }
 
-// `--list` prints what was scanned and gates nothing, so it belongs to the CLI.
-// The CLI is one branch or the other. A side flag prints (or writes) instead of
-// gating, so the gate does not also run; `main()` re-checks the entry guard for
-// itself, which is what keeps an import of this module reaching neither.
-if (
-  process.argv[1] &&
-  pathToFileURL(process.argv[1]).href === import.meta.url &&
-  process.argv.includes('--list')
-) {
+/** `--list` prints what was scanned and gates nothing, so it is TERMINAL. */
+function list() {
   const { files } = inputs(REPO_ROOT);
   console.log(`check:token-collision reads ${files.length} stylesheets under design-system/src:\n`);
   for (const f of files) console.log(`  ${path.relative(REPO_ROOT, f)}`);
-} else {
-  main(import.meta.url, 'check:token-collision', { run, summary, remedy: REMEDY });
 }
+
+// The CLI is one branch or the other, and `main()` owns both.
+main(import.meta.url, 'check:token-collision', { run, summary, remedy: REMEDY, flags: { '--list': list } });

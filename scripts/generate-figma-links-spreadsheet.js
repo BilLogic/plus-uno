@@ -15,10 +15,10 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath, pathToFileURL } from 'url';
+import { fileURLToPath } from 'url';
 
 import { documents } from './lib/corpus.mjs';
-import { byRoot, main } from './lib/findings.mjs';
+import { byRoot, isEntry, main } from './lib/findings.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DS_ROOT = (repoRoot) => path.join(repoRoot, 'design-system', 'src');
@@ -254,7 +254,10 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
     return `${path.basename(file)} up to date (${counts.docs} docs-page + ${counts.variants} variant entries).`;
 }
 
-if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
+// As in the other generators: the default branch here is the write, not the
+// gate, so `main()` is asked for only the `--check` half and the entry
+// comparison comes from the module that owns it (#610).
+if (isEntry(import.meta.url)) {
     if (process.argv.includes('--check')) {
         main(import.meta.url, 'check:figma-links', { run, summary });
     } else {

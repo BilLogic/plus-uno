@@ -23,9 +23,9 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 import { DEFAULT_WORKER_ORIGIN } from "./worker-url.mjs";
-import { main } from "../../../scripts/lib/findings.mjs";
+import { isEntry, main } from "../../../scripts/lib/findings.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(here, "../../..");
@@ -177,8 +177,7 @@ export function findStrays(root = REPO_ROOT, host = HOST) {
  * asks about the invariant; a stray `--host=` on somebody else's command line
  * must not silently turn that into a cutover audit.
  */
-const entered = () =>
-  Boolean(process.argv[1]) && pathToFileURL(process.argv[1]).href === import.meta.url;
+const entered = () => isEntry(import.meta.url);
 
 function hostArgument() {
   if (!entered()) return HOST;
