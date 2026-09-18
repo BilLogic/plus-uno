@@ -20,13 +20,10 @@
  * The third is the one with teeth, in two directions:
  *
  *   WIDER than `parseColour`: two harness checks each carried their own colour
- *   key, and `check:docs-token-literals`' accepts `#abcd`, `#aabbccdd` and
- *   `hsl()`, which `parseColour` returns null for. A module that could not
- *   read those is a module neither check can call, so the parity is asserted
- *   against the rival implementations themselves rather than against a list
- *   somebody typed. #621 retired the fallback checks' rival; the docs check's
- *   is still live, so it is still imported here, and the retired one is
- *   spelled below.
+ *   key. #621 retired the fallback checks' rival; #622 retired the docs
+ *   check's. Both are spelled below, so the parity stays a measurement against
+ *   the implementations that were deleted rather than against the module
+ *   agreeing with itself.
  *
  *   FINER than `normaliseColour`: alpha is part of this key and is not part of
  *   that one. Over the live corpus that is 315 token pairs, and the two tests
@@ -43,10 +40,6 @@ import { join, resolve } from 'node:path';
 
 import { describe, it, expect } from 'vitest';
 
-import {
-  colourKey as docsColourKey,
-  dimensionKey as docsDimensionKey,
-} from '../../scripts/check-docs-token-literals.mjs';
 import { documents, text } from '../../scripts/lib/corpus.mjs';
 import { fallbackUsages } from '../../scripts/token-fallbacks.mjs';
 import { parseColour, toHex } from '../src/lib/tokens.mjs';
@@ -79,6 +72,49 @@ import {
 const normaliseColour = (value) => {
   const colour = parseColour(value);
   return colour ? toHex(colour) : null;
+};
+
+/**
+ * THE RETIRED DOCS KEYS, SPELLED HERE BECAUSE #622 DELETED THEM.
+ *
+ * `check:docs-token-literals` compared colours as a syntactic canonicaliser
+ * (hex expanded, `rgba()` kept as `rgba(...)`) and dimensions that refused a
+ * bare `0`. The module's keys are finer (alpha is part of the colour) and
+ * wider on zero. The assertions below still measure that difference, so they
+ * need the thing that was retired.
+ *
+ * @param {string} literal
+ * @returns {string|null}
+ */
+const docsColourKey = (literal) => {
+  const v = literal.trim().toLowerCase();
+  const hex = /^#([0-9a-f]{3,8})$/.exec(v);
+  if (hex) {
+    const h = hex[1];
+    if (h.length === 3 || h.length === 4) return `#${[...h].map((c) => c + c).join('')}`;
+    if (h.length === 6 || h.length === 8) return `#${h}`;
+    return null;
+  }
+  const fn = /^(rgba?|hsla?)\(([^)]*)\)$/.exec(v);
+  if (!fn) return null;
+  const parts = fn[2]
+    .split(/[,/]/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map((p) => (/^\.\d/.test(p) ? `0${p}` : p));
+  return `${fn[1]}(${parts.join(',')})`;
+};
+
+/**
+ * @param {string} literal
+ * @returns {string|null}
+ */
+const docsDimensionKey = (literal) => {
+  const m = /^(-?\d*\.?\d+)(px|rem|%)$/.exec(literal.trim().toLowerCase());
+  if (!m) return null;
+  const n = parseFloat(m[1]);
+  if (m[2] === '%') return `${n}%`;
+  return `${m[2] === 'rem' ? n * 16 : n}px`;
 };
 
 describe('the corpus — where tokens live, answered once and read through the one reader', () => {

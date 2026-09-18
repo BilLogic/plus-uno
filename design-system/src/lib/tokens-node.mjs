@@ -11,8 +11,9 @@
  * directory, the family map was restated beside them, and `scripts/` carried
  * two colour keys and two dimension normalisers that agreed neither with each
  * other nor with `parseColour`. #621 moved the checks and the generators on to
- * this file; `check:docs-token-literals` still keeps a colour key of its own,
- * and retiring it is a ticket of its own.
+ * this file; #622 retired the docs check's remaining colour key, alias
+ * resolver and declaration regex, and replaced the registry generator's
+ * `var()` — the loosest in the tree.
  *
  * ─── THE THREE QUESTIONS ────────────────────────────────────────────────────
  *
@@ -63,10 +64,11 @@
  * is WCAG maths that needs channels. But `check:docs-token-literals` scans
  * stylesheets that contain `#abcd`, `#aabbccdd` and `hsl()`, and a module that
  * answered null for those is a module that check cannot call. That is exactly
- * why it kept its own key. This one reads every form either rival reads, and
- * canonicalises rather than spelling: `hsl(0, 100%, 50%)`, `rgb(100%, 0%, 0%)`,
- * `#f00` and `#FF0000` all key as `#ff0000`, where the docs check's key is
- * syntactic and calls the first two of those different colours.
+ * why it kept its own key until #622. This one reads every form either rival
+ * reads, and canonicalises rather than spelling: `hsl(0, 100%, 50%)`,
+ * `rgb(100%, 0%, 0%)`, `#f00` and `#FF0000` all key as `#ff0000`, where the
+ * docs check's retired key is syntactic and called the first two of those
+ * different colours.
  *
  * FINER, AND THE NUMBER IS MEASURED. Alpha is part of this key and was not
  * part of `normaliseColour`, the normaliser `scripts/token-fallbacks.mjs`
@@ -383,10 +385,9 @@ export function colourKey(value) {
  *
  * A BARE `0` is `0px`, because zero is zero, and that is the one place the two
  * normalisers this replaces disagreed: `normaliseDimension`, retired from
- * `scripts/token-fallbacks.mjs` by #621, read it, and
- * `check:docs-token-literals`' surviving `dimensionKey` answers null. This
- * takes the reading that loses nothing — the check that answered null was
- * passing up a comparison it could have made.
+ * `scripts/token-fallbacks.mjs` by #621, read it, and the docs check's key,
+ * retired by #622, answered null. This takes the reading that loses nothing —
+ * the check that answered null was passing up a comparison it could have made.
  * A bare number is otherwise NOT a length (`line-height: 1.5` is a ratio), and
  * `em` is relative to the element's own font size, which this cannot know;
  * guessing 16px there would report agreement with a number nobody wrote. So
