@@ -24,6 +24,7 @@ import { runOperations, type OperationOutcome } from "../../src/gate/index";
 import {
   createInMemoryThreadState,
   type PendingProposal,
+  type ThreadRef,
   type ThreadState,
 } from "../../src/thread-state/index";
 
@@ -104,6 +105,15 @@ export function harness(opts: {
   /** Stand in for the side-effect tool table, so a case can fail one operation
    *  of a batch. Absent — as everywhere else here — nothing is executed. */
   executeOperation?: (operation: { toolName: string; input: Record<string, unknown> }) => Promise<string>;
+  /**
+   * The conversation key the loop reads the stop flag on, for a case about
+   * cancellation. Production computes it from the conversation
+   * (`run-agent.ts`), and the reader is the store itself — so a case presses
+   * stop by writing the flag with `requestCancel` and the loop consumes it
+   * exactly as it does in Slack. Absent, the turn cannot be cancelled, which
+   * is every other case here.
+   */
+  cancelKey?: ThreadRef;
 } = {}): Harness {
   const delivery = opts.delivery ?? recordingDelivery();
   const threadState = opts.threadState ?? createInMemoryThreadState();
@@ -127,7 +137,8 @@ export function harness(opts: {
             executed.push(name);
             return opts.toolResult ?? JSON.stringify({ ok: true, rows: [] });
           },
-          threadState: { async consumeCancel() { return false; } },
+          // The real store, as production wires it (`threadStateFor(env)`).
+          threadState,
           budget: IDLE_BUDGET,
           // Wired as production wires it: the loop gets the first go at a
           // refusal, and only a call refused twice reaches the person.
@@ -145,7 +156,7 @@ export function harness(opts: {
         tools: [],
         pending: req.pending,
         currentSenderId: req.currentSender.userId,
-        cancelKey: null,
+        cancelKey: opts.cancelKey ?? null,
         ...(req.onInterim ? { onInterim: req.onInterim } : {}),
       });
       return { result, tools: executed.slice(), references: [] };

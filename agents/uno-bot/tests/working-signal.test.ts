@@ -133,7 +133,7 @@ describe("the agent-session status the signal moves through", () => {
 // right while the pair is wrong, and the pair is what a person sees.
 //
 // The `Record` is the compile-time guard: it is keyed by `TurnDisposition`, so
-// a seventh disposition added to Turn leaves this object missing a key and
+// a further disposition added to Turn leaves this object missing a key and
 // `tsc` refuses the build. Counting entries would not.
 describe("what the thread says once the turn is over", () => {
   const statusFor = (disposition: TurnDisposition, cardLive: boolean): SessionStatus =>
@@ -154,6 +154,9 @@ describe("what the thread says once the turn is over", () => {
     // The person is choosing whether to retry — which is not the agent
     // waiting on an input it asked for.
     failed: "active",
+    // Stop was pressed, the answer went undelivered, and nothing is owed
+    // either way: the thread is open and quiet (#589).
+    stopped: "active",
   };
 
   for (const [disposition, expected] of Object.entries(WITH_NO_CARD_LIVE) as Array<
@@ -184,6 +187,9 @@ describe("what the thread says once the turn is over", () => {
     // waiting on the decision it was already waiting on.
     failed: "suspended",
     reacted: "suspended",
+    // A stop does not touch the card it found — it is not an undo, and the
+    // click the card is waiting for is still owed.
+    stopped: "suspended",
     // The one ending that consumed the card: the claim IS the resolution.
     resolved: "active",
   };

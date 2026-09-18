@@ -51,9 +51,10 @@ import { settledStatus, type SessionStatus } from "./working-signal";
 // What is shared is the promise, which is the part that has to match.
 
 /** The honest promise, and the reason all three make it: cancellation is
- *  COOPERATIVE. The loop reads the flag between iterations, so the step in
+ *  COOPERATIVE. The loop reads the flag at a tool boundary, so the step in
  *  flight finishes — nothing here can interrupt a tool mid-call, which is what
- *  keeps a half-executed proposal impossible. */
+ *  keeps a half-executed proposal impossible. What a press does reach in time
+ *  is the delivery of the answer, which is suppressed (#589). */
 export const STOPPING_PROMISE = "Stopping — I'll finish the step I'm on and stop there.";
 
 /** The reassurance that follows it: a stop is not an undo. Anything the gate
@@ -164,15 +165,23 @@ async function cardLiveInThread(state: ThreadState, signal: StopSignal): Promise
  * Best-effort throughout: a cancel that fails to land leaves the turn to finish
  * on its own, which is slower than asked and still correct.
  *
- * ONE LIMIT THE PROMISE DOES NOT COVER, recorded because this control makes it
- * reachable. The loop skips the flag check on iterations 0 and 1 to save two
- * Durable Object reads per turn (`agent/loop.ts`), on the premise that "nobody
- * types `/stop` inside the first few seconds". A control inside the thread
- * weakens that premise — the press costs one tap and arrives immediately — so
- * on a short turn the flag is written, never read, and the person gets a full
- * answer (possibly a new card) after being told work would stop. Left as it is
- * here: when the loop reads is a cost decision for every turn, and belongs in
- * its own ticket rather than riding along with a subscription.
+ * WHAT THE WRITTEN FLAG IS NOW WORTH, since it once bought less than this
+ * comment claimed. A control inside the thread is one tap on something already
+ * on screen, so a press lands in the first seconds of a turn — and the loop
+ * used to skip the flag check on iterations 0 and 1, to save two Durable
+ * Object reads, on the premise that a stop had to be typed. A short turn
+ * therefore had its flag written and never read, and the person got a full
+ * answer (possibly a new card) under the line that had just promised the work
+ * would stop; seen in production on r336, twice in one thread (#589). The loop
+ * now reads the flag on every iteration and once more after the last model
+ * reply, before an answer is delivered, so a press that reaches this function
+ * reaches the turn as well. The step in flight still finishes — that part of
+ * the promise is the cooperative one, and it is unchanged.
+ *
+ * WHICH IS ALSO WHY THE LINE BELOW IS THE ONLY ONE THE THREAD GETS. The turn
+ * it stops posts nothing of its own (`agent/loop.ts` returns `stopped`,
+ * `turn/turn.ts` delivers no answer for it), so one press earns one stop
+ * message.
  */
 async function raiseCancel(state: ThreadState, signal: StopSignal): Promise<void> {
   for (const thread of conversationKeys(signal)) {

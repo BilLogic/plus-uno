@@ -18,7 +18,6 @@ import assert from "node:assert/strict";
 
 import { runLoop, type LoopBudget, type LoopDeps, type LoopInput } from "../src/agent/loop";
 import { claudeProvider, type ClaudeTransport } from "../src/agent/providers/claude";
-import { STOPPED_MESSAGE } from "../src/agent/loop-policy";
 import type { PendingProposal, ThreadRef } from "../src/thread-state/index";
 
 // ── harness ──────────────────────────────────────────────────────────────────
@@ -147,22 +146,21 @@ const LOOKUP: WireReply = {
 
 // ── the acceptance test: `/stop` on Claude ───────────────────────────────────
 
-test("`/stop` halts a Claude turn at iteration two and runs no further tool", async () => {
+test("a stop halts a Claude turn and runs no further tool", async () => {
   const rec = recorder({ cancel: true });
-  // Iterations 0 and 1 each ask for a lookup and are served; the flag is only
-  // read from iteration 2, which is where the cancellation lands.
+  // The flag is read at the top of every iteration, the first included, so a
+  // press already standing when the turn starts is seen before the model is
+  // called at all — and the four lookups the script had waiting never run.
   const s = stub([LOOKUP, LOOKUP, LOOKUP, LOOKUP]);
 
   const result = await runLoop(loopInput(s.transport, rec));
 
-  assert.deepEqual(result, { kind: "text", text: STOPPED_MESSAGE });
-  // Two lookups ran — the two iterations before the flag is consulted. The
-  // third tool_use the script had waiting never executed.
-  assert.deepEqual(rec.executed, ["search_blueprint", "search_blueprint"]);
+  // No text of its own: the door that took the press has already told the
+  // thread who pressed and what it means (`slack/session-stop.ts`), and a
+  // second line here would be the duplicate stop message of #589.
+  assert.deepEqual(result, { kind: "stopped" });
+  assert.deepEqual(rec.executed, []);
   assert.equal(rec.cancelReads, 1);
-  // And nothing was written: a `/stop` lands at a tool boundary, so the message
-  // can promise that outright.
-  assert.match(result.kind === "text" ? result.text : "", /Nothing was created or changed/);
 });
 
 test("a Claude turn with no `/stop` pressed runs to its own end", async () => {

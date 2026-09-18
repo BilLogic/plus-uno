@@ -564,6 +564,41 @@ test("the same proposal re-staged while one is pending is read as the confirmati
   assert.equal(h.delivery.calls.filter((c) => c.kind === "proposal").length, 0);
 });
 
+// ── a stop press ─────────────────────────────────────────────────────────────
+
+test("a stop pressed while a one-iteration turn is in flight suppresses the answer", async () => {
+  // The production failure (#589): this turn answers on ITERATION 0, and the
+  // flag was only read from iteration 2 — so the press was written, never read,
+  // and the answer landed under the stop line that had just promised it would
+  // not.
+  const h = harness({ cancelKey: REF, replies: [{ text: "Here is the answer." }] });
+  await h.threadState.requestCancel(REF);
+
+  const outcome = await runTurn(request(), h.deps);
+
+  assert.equal(outcome.disposition, "stopped");
+  // NOTHING was said. The door that took the press posts the confirmation
+  // naming who pressed (`slack/session-stop.ts`), so a line from here would be
+  // the second stop message for one press.
+  assert.deepEqual(postsOf(h.delivery), []);
+  assert.equal(h.delivery.calls.filter((c) => c.kind === "answer").length, 0);
+  // The press was already standing when the loop took its first look, so the
+  // model was never called — and this turn would have answered on iteration 0,
+  // where the old rule never looked at all.
+  assert.equal(h.provider.sends.length, 0);
+  // One press, one stop: the flag is consumed, so the next question in this
+  // thread is answered normally.
+  assert.equal(await h.threadState.consumeCancel(REF), false);
+  // And the thread remembers the exchange, both halves, as the reaction-only
+  // turn does — a question with no answer, rather than a gap.
+  const stored = await h.threadState.readHistory(REF);
+  assert.deepEqual(
+    stored.map((t) => t.role),
+    ["user", "assistant"],
+  );
+  assert.match(stored[1]!.content, /stopped/);
+});
+
 // ── the effects a turn has along the way ─────────────────────────────────────
 
 test("a channel turn acknowledges with 👀; the assistant surface says it is working instead", async () => {
@@ -810,6 +845,16 @@ const EXITS: Array<{
           broken,
         ),
       };
+    },
+  },
+  {
+    door: "a stop pressed before the answer was delivered",
+    disposition: "stopped",
+    settles: "idle",
+    run: async (surface) => {
+      const h = harness({ cancelKey: REF, replies: [{ text: "Here is the answer." }] });
+      await h.threadState.requestCancel(REF);
+      return { h, outcome: await runTurn(request({ surface }), h.deps) };
     },
   },
   {

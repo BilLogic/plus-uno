@@ -418,12 +418,15 @@ export interface ThreadState {
   // ----- cancel (the /stop command and the Home-tab Stop button) -----
 
   /** Raise the flag. A flag, not a signal: a running turn cannot be
-   *  interrupted, so the loop reads this between iterations and returns early —
-   *  cancellation lands at a tool boundary rather than mid-write. */
+   *  interrupted, so the loop reads this at the top of every iteration and
+   *  again before it delivers an answer, then returns early — cancellation
+   *  lands at a tool boundary rather than mid-write. */
   requestCancel(ref: ThreadRef): Promise<void>;
 
-  /** Read AND clear the flag: one /stop cancels one turn. A flag older than
-   *  `CANCEL_TTL_MS` reports false and is cleared. */
+  /** Read AND clear the flag: one press stops one turn, and the turn that
+   *  consumes it is the one that goes quiet — the loop reads several times per
+   *  turn now, and only the first read can see a given press. A flag older
+   *  than `CANCEL_TTL_MS` reports false and is cleared. */
   consumeCancel(ref: ThreadRef): Promise<boolean>;
 
   /**

@@ -72,9 +72,11 @@ export function handleSlashCommand(
   // /stop is not a skill, so it does not go through SLASH_COMMANDS. It is a
   // system control: it must be fast, take no arguments, and never start work.
   //
-  // It sets a flag the running agent loop reads between iterations — the Worker
-  // cannot interrupt a DO alarm, so cancellation is cooperative. The reply is
-  // deliberately honest about that: the current step finishes.
+  // It sets a flag the running agent loop reads at every iteration and once
+  // more before it delivers an answer — the Worker cannot interrupt a DO alarm,
+  // so cancellation is cooperative. The reply is deliberately honest about
+  // that: the current step finishes, and what the press takes away is the
+  // answer (#589).
   // Resolved by PERSON, not by channel — the same path the Home-tab Stop
   // button takes. The channel-derived key this used to compute was wrong for
   // channel runs: a /uno-* run lives in a THREAD under the framing message, so

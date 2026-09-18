@@ -189,7 +189,11 @@ export type TurnDisposition =
   | "asked"
   | "resolved"
   | "staged"
-  | "failed";
+  | "failed"
+  /** Stop was pressed before the answer was delivered, so it was not delivered.
+   *  The turn posts nothing: the door that took the press already told the
+   *  thread, and one press earns one stop message (#589). */
+  | "stopped";
 
 export interface TurnTelemetry {
   tier: ModelTier;
@@ -378,7 +382,7 @@ export interface TurnDeps {
  * outcome — a field set at one exit — and a false "still waiting" after a
  * visible failure is cheaper than a false "nothing to do" over a live card.
  *
- * The switch is exhaustive on purpose: a seventh disposition leaves it without
+ * The switch is exhaustive on purpose: a further disposition leaves it without
  * a return on that arm and `tsc` refuses the build, which is the only kind of
  * reminder that survives a year.
  */
@@ -394,11 +398,16 @@ export function settlementOf(settle: {
     case "staged":
     case "asked":
       return "waiting-on-person";
-    // The thread decides. An answer, a bare 🙏 and a failure all leave a live
-    // card exactly as they found it.
+    // The thread decides. An answer, a bare 🙏, a failure and a turn stopped
+    // before its answer landed all leave a live card exactly as they found it.
+    // A stop settles like the rest of them for the reason the whole ticket
+    // turns on: the person pressed a button and the indicator has to come down
+    // — and it has to come down saying the same thing the stop handler says,
+    // which computes this same card-based arm (`slack/session-stop.ts`).
     case "answered":
     case "reacted":
     case "failed":
+    case "stopped":
       return settle.cardLive ? "waiting-on-person" : "idle";
     // The one ending that consumed the card — the claim IS the resolution.
     case "resolved":
@@ -721,6 +730,24 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
       telemetry,
       memory,
     });
+  }
+
+  // ── A stop, pressed before the answer was delivered ────────────────────
+  //
+  // The one exit that posts NOTHING AT ALL. Whichever door took the press has
+  // already said so in the thread, naming who pressed it
+  // (`slack/session-stop.ts`, `slack/commands.ts`, `slack/interactive.ts`), so
+  // a line from here would be the second stop message for one press — which,
+  // with the answer arriving under it, is the failure #589 was filed on.
+  //
+  // The progress surface still closes, and it closes COMPLETE rather than
+  // error: the turn ended the way it was asked to. The exchange is remembered
+  // in both halves, as the reaction-only turn remembers it, so the next turn in
+  // the thread reads a question that went unanswered rather than a gap.
+  if (result.kind === "stopped") {
+    await delivery.endProgress("complete");
+    await memory.remember("(stopped — the answer was not delivered)");
+    return { disposition: "stopped", wrote: memory.wrote(), telemetry };
   }
 
   // Everything past here posts its own message (a proposal card, a clarifying
