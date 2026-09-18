@@ -74,12 +74,13 @@
  *
  * ─── WHERE THE GRAMMAR AND THE MATHS COME FROM ──────────────────────────────
  * `design-system/src/lib/tokens.mjs` (#506), not from this file (#507): the
- * token grammar, colour parsing and alias resolution are the module's. The
- * new/known/fixed classification is `ratchet` in `scripts/lib/ratchet.mjs`,
- * which is where #599 moved it — a baseline record is a harness concern rather
- * than a colour one. What is left here is what is about FALLBACKS — capturing
- * the literal beside a token, comparing two values of a FAMILY, and the wording
- * of the two reports.
+ * token grammar, colour parsing and alias resolution are the module's. THE
+ * RECORD IS `scripts/lib/ratchet.mjs`'s, entire: #599 moved the classification
+ * there — a baseline record is a harness concern rather than a colour one — and
+ * #600 moved the read, the stale sweep and the absent-record error mode with
+ * it, so this file no longer knows a baseline exists. What is left here is what
+ * is about FALLBACKS — capturing the literal beside a token, comparing two
+ * values of a FAMILY, and the wording of the two reports.
  */
 
 import {
@@ -89,8 +90,6 @@ import {
   tokenDeclarationPattern,
   varReferencePattern,
 } from '../design-system/src/lib/tokens.mjs';
-
-import { ratchet } from './lib/ratchet.mjs';
 
 /**
  * `#abc`, `#aabbcc` and `rgb(a, b, c)` all normalise to `#aabbcc`.
@@ -283,31 +282,47 @@ export function fallbackAudit({ tokens, usages, normalise = normaliseColour, rep
 }
 
 /**
- * The two sides of the audit as the module's `ratchet` wants them: `Map<key,
- * count>`, in the order the audit found them, because both reports render in
- * that order.
+ * The audit in the SHAPE ITS RECORD IS WRITTEN IN — two arrays of keys, in the
+ * order the audit found them, because both reports render in that order. That
+ * is the whole of what the ratchet is handed: the colour record holds two
+ * `keys` sets and the dimension record one, and a check on
+ * `scripts/lib/ratchet.mjs` measures its side on the form its record declares
+ * (#600).
  *
  * `disagreements` is keyed on `token + literal`, so several uses of the same
  * wrong pair collapse to one entry — which is what the old `seen` set did while
- * it walked the list, and what makes the count a count of DECISIONS.
+ * it walked the list, and what makes the count a count of DECISIONS. The
+ * per-key `detail` and `uses` maps come back with them because the WORDING of a
+ * finding needs the place and the number, and neither is in the record.
  */
-function sides(audit) {
+export function fallbackSides(audit) {
   const disagreements = new Map();
   const detail = new Map();
   for (const d of audit.disagreements) {
     disagreements.set(d.key, (disagreements.get(d.key) ?? 0) + 1);
     if (!detail.has(d.key)) detail.set(d.key, d);
   }
-  const undefinedTokens = new Map(audit.undefinedTokens.map((u) => [u.token, u.count]));
-  return { disagreements, detail, undefinedTokens };
+  const uses = new Map(audit.undefinedTokens.map((u) => [u.token, u.count]));
+  return {
+    disagreements: [...disagreements.keys()],
+    undefinedTokens: [...uses.keys()],
+    detail,
+    uses,
+  };
 }
 
 /**
- * The ratchet.
+ * The WORDING of the two ratchet failures — everything about them except which
+ * keys are NEW, which is `scripts/lib/ratchet.mjs`'s to decide (#600).
  *
- * The new/known/fixed classification is the module's `ratchet` (#507); the
- * WORDING of both failures, and which of the three directions is fatal for this
- * check, stay here — which is what keeps the two reports byte-identical.
+ * WHY IT TAKES KEYS AND NOT A RECORD. Until #600 this function read the
+ * baseline object itself and classified against it, which made the direction
+ * that fails, the stale sweep and the absent-record error mode this file's
+ * business as well as eleven other checks' — each spelling all three
+ * differently. The ratchet module owns them now. What could never move is what a
+ * finding SAYS, because the two reports have to stay byte-identical across the
+ * migration, and saying it needs the place and the use count, neither of which
+ * the record holds.
  *
  * 191 disagreements across 30 tokens cannot be fixed in one commit and reviewed
  * honestly — several are load-bearing in prototypes no story renders. So the
@@ -320,34 +335,26 @@ function sides(audit) {
  * appears is not.
  *
  * @param {ReturnType<typeof fallbackAudit>} audit
- * @param {{disagreements: string[], undefinedTokens: string[]}|null} baseline
+ * @param {{disagreements?: string[], undefinedTokens?: string[]}} fresh
+ *        the keys the ratchet reported NEW, per set, in the order it found them.
  */
-export function fallbackFailures(audit, baseline, { noun = 'colour' } = {}) {
+export function fallbackFailures(audit, fresh, { noun = 'colour' } = {}) {
   const failures = [];
+  const found = fallbackSides(audit);
+  const newUndefined = fresh.undefinedTokens ?? [];
+  const added = fresh.disagreements ?? [];
 
-  if (!baseline) {
-    failures.push(
-      'no baseline is recorded, so this check has nothing to hold to. Run it once with ' +
-        '--update and commit the result.',
-    );
-    return failures;
-  }
-
-  const found = sides(audit);
-
-  const newUndefined = ratchet(found.undefinedTokens, baseline.undefinedTokens ?? []).new;
   if (newUndefined.length) {
     failures.push(
       `${newUndefined.length} new ${noun} token(s) referenced and never defined:\n` +
-        newUndefined.map((u) => `       ${u.key}  (${u.count} use(s))`).join('\n') +
+        newUndefined.map((key) => `       ${key}  (${found.uses.get(key)} use(s))`).join('\n') +
         `\n     For these the fallback IS the ${noun} and the token is fiction — changing the\n` +
         '     token changes nothing. Define it, or fix the name.',
     );
   }
 
-  const added = ratchet(found.disagreements, baseline.disagreements ?? []).new;
   if (added.length) {
-    const lines = added.map(({ key }) => {
+    const lines = added.map((key) => {
       const d = found.detail.get(key);
       return `       ${d.token}  is ${d.expected}, fallback says ${d.found}  (${d.where})`;
     });
@@ -359,21 +366,4 @@ export function fallbackFailures(audit, baseline, { noun = 'colour' } = {}) {
   }
 
   return failures;
-}
-
-/**
- * Recorded entries that are no longer true — a baseline must be able to shrink.
- *
- * `fixed` is the module's word for it, and the direction most baselines forget.
- * The two lists are reported together and in baseline order, with the undefined
- * half labelled, because "no longer disagrees" and "now defined" are different
- * news about the same file.
- */
-export function staleEntries(audit, baseline) {
-  if (!baseline) return [];
-  const found = sides(audit);
-  return [
-    ...ratchet(found.disagreements, baseline.disagreements ?? []).fixed.map((f) => f.key),
-    ...ratchet(found.undefinedTokens, baseline.undefinedTokens ?? []).fixed.map((f) => `${f.key} (now defined)`),
-  ];
 }

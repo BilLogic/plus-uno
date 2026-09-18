@@ -208,16 +208,43 @@ export function nameless(files, root = REPO_ROOT) {
   return found;
 }
 
-export function failures(found, baseline) {
+/**
+ * The measured side, in the shape `docs/evals/icon-button-name.json` holds its
+ * exceptions: one key per nameless control, `file:line`, with the hit beside it
+ * for the wording. That map is what `scripts/lib/ratchet.mjs` is handed (#600);
+ * the record's VALUE is the argument a person wrote for the entry, and a
+ * measurement has none to offer.
+ */
+export function sites(found) {
+  return new Map(found.map((hit) => [`${hit.file}:${hit.line}`, hit]));
+}
+
+/**
+ * The WORDING of the ratchet's three verdicts over that map.
+ *
+ * @param {Map<string, object>} hits  from `sites`.
+ * @param {{fresh?: string[], stale?: string[], unreviewed?: string[]}} verdicts
+ */
+export function failures(hits, { fresh = [], stale = [], unreviewed = [] } = {}) {
   const problems = [];
-  const keys = new Set(found.map((f) => `${f.file}:${f.line}`));
-  for (const hit of found) {
-    const key = `${hit.file}:${hit.line}`;
-    if (baseline[key]) continue;
+  for (const key of fresh) {
+    const hit = hits.get(key);
     problems.push(`${key} — <${hit.tag}> has an icon and no name: ${hit.source}`);
   }
-  for (const key of Object.keys(baseline)) {
-    if (!keys.has(key)) problems.push(`${key} is recorded as a nameless icon button and is not one. Delete the entry.`);
+  for (const key of stale) {
+    problems.push(`${key} is recorded as a nameless icon button and is not one. Delete the entry.`);
+  }
+  /*
+   * An exception whose value says nothing. The value here IS the argument for
+   * the entry — that a screen reader announcing "button" and nothing else is
+   * enough for this control — so an entry without one is a nameless button
+   * nobody defended.
+   */
+  for (const key of unreviewed) {
+    problems.push(
+      `${key} is recorded as a nameless icon button with no reason. Say why "button" and ` +
+        'nothing else is enough for this control, or give it a name.',
+    );
   }
   return problems;
 }

@@ -4,9 +4,10 @@
  *
  * What the defect is, and why one half of it is ratcheted and the other is not,
  * is written once in `scripts/token-fallbacks.mjs`. How a check of it reads the
- * tree, holds its ratchet and writes its record is written once in
- * `scripts/lib/fallback-check.mjs`. This file is neither: it is the colour
- * family's three differences, and nothing else (#610).
+ * tree is written once in `scripts/lib/fallback-check.mjs`, and how its RECORD
+ * is read, compared and written is written once in `scripts/lib/ratchet.mjs`,
+ * which both families reach through that same file (#600). This file is none of
+ * the three: it is the colour family's differences, and nothing else (#610).
  *
  * WHY IT COMPOSES INTO `check:harness` when `check:storybook` and
  * `check:docs-chrome` do not: it is static. No browser, no server, no `npm ci` —

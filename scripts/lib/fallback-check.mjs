@@ -5,10 +5,18 @@
  * defect is and how the colour and dimension families differ. What it does not
  * own is the FILESYSTEM: the repo root, the `git ls-files` helper that exists
  * because this repository keeps agent worktrees under `.claude/worktrees/`, the
- * read, the memoized parse, the empty-corpus floor, the stale-entry sweep, the
- * `--report` dump and the `--update` write. Those were spelled out twice, 110
- * lines each, in `check-colour-fallbacks.mjs` and `check-size-fallbacks.mjs`,
- * and the two copies had already drifted in wording while agreeing in fact.
+ * read, the memoized parse, the empty-corpus floor, the `--report` dump, and
+ * the one place both families reach their RECORD. Those were spelled out twice,
+ * 110 lines each, in `check-colour-fallbacks.mjs` and
+ * `check-size-fallbacks.mjs`, and the two copies had already drifted in wording
+ * while agreeing in fact.
+ *
+ * THE RECORD ITSELF IS `scripts/lib/ratchet.mjs`'s (#600): the comparison, the
+ * stale-entry sweep, the unreviewed-reason sweep and the `--update` merge are
+ * one module's, for all twelve baselines in the repo. Because this file is
+ * where both families reach theirs, migrating the pair was one read and one
+ * write here rather than two of each. What stays is the WORDING, which is why
+ * both reports are byte-identical across the move.
  *
  * So the two entry points keep exactly what differs between them — a `Family`
  * below — and this module is everything they share. The differences are facts
@@ -29,12 +37,13 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { byRoot } from './findings.mjs';
+import { openRatchet } from './ratchet.mjs';
 import {
   fallbackAudit,
   fallbackFailures,
+  fallbackSides,
   fallbackUsages,
   resolveAliases,
-  staleEntries,
   tokenDefinitions,
 } from '../token-fallbacks.mjs';
 
@@ -66,8 +75,12 @@ const SEARCH_ROOTS = ['design-system/src', '.storybook', 'prototypes'];
  *           prefix to select on.
  * @property {boolean} reportUndefined  whether a `var()` on a name with no
  *           definition anywhere is a finding in this family.
- * @property {string} why        the baseline record's own explanation, written
- *           into it by `--update` so the record argues for itself.
+ * @property {string} why        the baseline record's own explanation. SEEDED
+ *           rather than written: `--update` puts it on a record that has none,
+ *           so a brand-new record argues for itself, and leaves the sentence
+ *           alone on a record that already carries one. The envelope is the
+ *           check's to state once and its reader's to edit afterwards, and an
+ *           `--update` that restated it would be the rewrite #599 removed.
  */
 
 /**
@@ -119,19 +132,27 @@ export function fallbackCheck(family) {
       reportUndefined,
     });
 
-    let record = null;
-    try {
-      record = JSON.parse(fs.readFileSync(path.join(repoRoot, BASELINE), 'utf8'));
-    } catch {
-      /* absent — reported by fallbackFailures */
-    }
-
-    return { tokens, audit, baseline: record };
+    return { tokens, audit };
   });
+
+  /**
+   * The record, on the shape `scripts/lib/ratchet-shapes.mjs` declares for it
+   * (#600). Both families' records hold their set as a `keys` array, so a
+   * presence-only ratchet is the whole comparison and a rise cannot be
+   * expressed: every failure of these two is NEW, and the other direction that
+   * matters — a recorded pair that has stopped disagreeing — is `stale()`.
+   *
+   * OPENED PER CALL rather than memoized with the audit. `openRatchet` reads
+   * the record when it is opened and `update` merges into what it read, so a
+   * ratchet held across a write would write the pre-write record back. The
+   * colour family writes two sets into one file and would undo its own first
+   * write; one named JSON file per call is nothing beside the corpus parse.
+   */
+  const gate = (repoRoot, set) => openRatchet({ file: BASELINE, set, repoRoot });
 
   /** @returns {import('./findings.mjs').Finding[]} */
   function run({ repoRoot = REPO_ROOT } = {}) {
-    const { tokens, audit, baseline } = inputs(repoRoot);
+    const { tokens, audit } = inputs(repoRoot);
 
     // An empty token map makes every comparison vacuous — and, where undefined
     // names are reported, makes every `var()` look like one. It is the shape a
@@ -147,8 +168,33 @@ export function fallbackCheck(family) {
       ];
     }
 
-    const failures = fallbackFailures(audit, baseline, { noun });
-    const stale = baseline ? staleEntries(audit, baseline) : [];
+    const found = fallbackSides(audit);
+    const pairs = gate(repoRoot, 'disagreements');
+
+    // The absent record is ONE stated error mode and it is the module's — said
+    // once even for the family whose record holds two sets, because with nothing
+    // recorded every finding would otherwise be reported new, twice over, and
+    // bury the one fact that matters.
+    if (pairs.absent) return pairs.failures(found.disagreements).map(({ message }) => ({ message }));
+
+    const names = reportUndefined ? gate(repoRoot, 'undefinedTokens') : null;
+    const fresh = (ratchet, side) => ratchet.failures(side).map((f) => f.key);
+
+    const failures = fallbackFailures(
+      audit,
+      {
+        disagreements: fresh(pairs, found.disagreements),
+        undefinedTokens: names ? fresh(names, found.undefinedTokens) : [],
+      },
+      { noun },
+    );
+
+    // "No longer disagrees" and "now defined" are different news, reported
+    // together and in record order, which is what the one message below reads as.
+    const stale = [
+      ...pairs.stale(found.disagreements).map((entry) => entry.key),
+      ...(names ? names.stale(found.undefinedTokens).map((entry) => `${entry.key} (now defined)`) : []),
+    ];
     if (stale.length) {
       failures.push(
         `${stale.length} baseline entr(ies) that no longer disagree:\n` +
@@ -179,7 +225,14 @@ export function fallbackCheck(family) {
   }
 
   /**
-   * `--update` re-records the baseline. A write, so it stays out of `run`.
+   * `--update` re-records the baseline. A write, so it stays out of `run`, and
+   * it is the RATCHET's write and not one of its own (#600): the module reads
+   * the record, replaces the container at the declared path and writes the whole
+   * record back, so every key it does not own survives by construction. This
+   * function used to rebuild the file from an envelope and a set, which is the
+   * defect that sank the first attempt at #599 — for these two records it would
+   * have lost nothing today, and it is the same write that deleted three other
+   * records' reasons.
    *
    * The record is keyed on `"<token> <literal>"` and not on file and line: a
    * line number churns on every edit above it, while the pair is the actual
@@ -188,20 +241,26 @@ export function fallbackCheck(family) {
    */
   function update(repoRoot = REPO_ROOT) {
     const { audit } = inputs(repoRoot);
-    const keys = [...new Set(audit.disagreements.map((d) => d.key))].sort();
-    const undef = reportUndefined ? audit.undefinedTokens.map((u) => u.token).sort() : null;
-    const file = path.join(repoRoot, BASELINE);
-    fs.mkdirSync(path.dirname(file), { recursive: true });
-    fs.writeFileSync(
-      file,
-      `${JSON.stringify(
-        { why, disagreements: keys, ...(undef ? { undefinedTokens: undef } : {}) },
-        null,
-        2,
-      )}\n`,
-    );
+    const found = fallbackSides(audit);
+    // SORTED for the write, found-order for the gate. A record is read by
+    // people and a diff that reorders is a diff nobody reads; a finding, on the
+    // other hand, reads in the order the run met it.
+    const keys = [...found.disagreements].sort();
+    const undef = reportUndefined ? [...found.undefinedTokens].sort() : null;
+
+    // The seed is what a BRAND-NEW record carries. It names the sibling set as
+    // well as the prose, because a record written from nothing is written one
+    // set at a time and the second set's container has to exist before its own
+    // ratchet can be opened at all. A seed key is written only where the record
+    // has none, so on a record that exists this whole object is inert.
+    const written = gate(repoRoot, 'disagreements').update(keys, {
+      seed: { why, ...(undef ? { undefinedTokens: [] } : {}) },
+    });
+    // Opened AFTER that write, never held from before it — see `gate`.
+    if (undef) gate(repoRoot, 'undefinedTokens').update(undef, { seed: { why } });
+
     console.log(
-      `${label} baseline written: ${keys.length} distinct disagreeing pair(s)` +
+      `${label} baseline written: ${written.entries} distinct disagreeing pair(s)` +
         (undef ? `, ${undef.length} undefined token(s).` : '.'),
     );
   }

@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { AFFORDANCE, NEGATED, colours, failures, focusRules, indicators, ratio } from './focus-ring.mjs';
+import { AFFORDANCE, NEGATED, colours, failures, focusRules, indicators, invisible, ratio } from './focus-ring.mjs';
 
 const VALUES = colours();
 
@@ -48,7 +48,7 @@ test('a rule is scored on its strongest affordance, not its weakest', () => {
   const entries = indicators(focusRules(['design-system/src/a.scss'], root), VALUES);
   assert.equal(entries.length, 1);
   assert.equal(entries[0].best.token, '--color-primary');
-  assert.deepEqual(failures(entries, {}), []);
+  assert.deepEqual([...invisible(entries).keys()], []);
 });
 
 test('`:not(:focus)` is the unfocused state and is not a focus rule', () => {
@@ -72,21 +72,43 @@ test('a focus style nested under a focus parent counts', () => {
   });
   const entries = indicators(focusRules(['design-system/src/a.scss'], root), VALUES);
   assert.equal(entries.length, 1);
-  assert.equal(failures(entries, {}).length, 1);
+  assert.equal(invisible(entries).size, 1);
 });
 
-test('failures report the unseen ring, and a stale exception', () => {
-  const entry = {
-    file: 'a.scss',
-    line: 3,
-    selector: '.a:focus',
-    best: { token: '--color-inverse-primary', ratio: 1.62, property: 'border-color', ground: '--color-surface' },
-  };
-  const found = failures([entry], {});
+/*
+ * The three verdicts, worded. Which rule is NEW, which recorded one has gone
+ * STALE and which reason says nothing is `scripts/lib/ratchet.mjs`'s, asserted
+ * once against all twelve live records in `scripts/lib/ratchet-conformance.mjs`
+ * (#600). What is asserted here is the measured side this check hands it, and
+ * what each verdict says.
+ */
+
+const ENTRY = {
+  file: 'a.scss',
+  line: 3,
+  selector: '.a:focus',
+  best: { token: '--color-inverse-primary', ratio: 1.62, property: 'border-color', ground: '--color-surface' },
+};
+
+test('the measured side is keyed the way the record is, and holds only rules under the bar', () => {
+  assert.deepEqual([...invisible([ENTRY]).keys()], ['a.scss:3']);
+  assert.equal(invisible([{ ...ENTRY, best: { ...ENTRY.best, ratio: 5 } }]).size, 0);
+});
+
+test('a new ring is worded with its ratio, and nothing new is nothing said', () => {
+  const under = invisible([ENTRY]);
+  const found = failures(under, { fresh: ['a.scss:3'] });
   assert.equal(found.length, 1);
   assert.match(found[0], /1\.62:1/);
-  assert.deepEqual(failures([entry], { 'a.scss:3': 'recorded' }), []);
-  const stale = failures([{ ...entry, best: { ...entry.best, ratio: 5 } }], { 'a.scss:3': 'recorded' });
+  assert.deepEqual(failures(under, {}), []);
+});
+
+test('a stale exception and a reasonless one are each their own finding', () => {
+  const stale = failures(new Map(), { stale: ['a.scss:3'] });
   assert.equal(stale.length, 1);
   assert.match(stale[0], /no longer is one/);
+
+  const unreviewed = failures(invisible([ENTRY]), { unreviewed: ['a.scss:3'] });
+  assert.equal(unreviewed.length, 1);
+  assert.match(unreviewed[0], /with no reason/);
 });

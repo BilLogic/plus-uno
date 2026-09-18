@@ -73,28 +73,55 @@ test('`color:` is not an edge', () => {
   assert.equal(edgeUses(stylesheets(root), root).length, 0);
 });
 
-test('the ratchet fails in both directions, and on a file it has never seen', () => {
-  const uses = [
-    { file: 'a.scss', kind: 'border', line: 1, property: 'border-color' },
-    { file: 'a.scss', kind: 'outline', line: 2, property: 'outline' },
-  ];
-  assert.deepEqual(failures(uses, { 'a.scss': { border: 1, outline: 1 } }), []);
+/*
+ * The verdicts, worded. Which count rose, which fell, which file the record has
+ * never seen and which entry has no reason is `scripts/lib/ratchet.mjs`'s — a
+ * record declaring `direction: 'both'`, asserted once against all twelve live
+ * records in `scripts/lib/ratchet-conformance.mjs` (#600). What is asserted
+ * here is the measured side this check hands it, and what each verdict says.
+ */
 
-  const up = failures(uses, { 'a.scss': { border: 0, outline: 1 } });
+const USES = [
+  { file: 'a.scss', kind: 'border', line: 1, property: 'border-color' },
+  { file: 'a.scss', kind: 'outline', line: 2, property: 'outline' },
+];
+
+test('the measured side is the record shape — both counts per file, zeroes included', () => {
+  assert.deepEqual(counts(USES), { 'a.scss': { border: 1, outline: 1 } });
+});
+
+test('nothing moved is nothing said', () => {
+  assert.deepEqual(failures(USES, {}), []);
+});
+
+test('a rise and a fall are each worded, and say which count moved', () => {
+  const up = failures(USES, {
+    failures: [{ kind: 'rose', key: 'a.scss', field: 'border', count: 1, recorded: 0 }],
+  });
   assert.equal(up.length, 1);
-  assert.match(up[0], /up from 0/);
+  assert.match(up[0], /1 border use\(s\) of an intent base, up from 0/);
 
-  const down = failures(uses, { 'a.scss': { border: 1, outline: 3 } });
+  const down = failures(USES, {
+    failures: [{ kind: 'fell', key: 'a.scss', field: 'outline', count: 1, recorded: 3 }],
+  });
   assert.equal(down.length, 1);
   assert.match(down[0], /down from 3/);
+});
 
-  const unseen = failures(uses, {});
+test('a file the record has never seen is named with its lines', () => {
+  const unseen = failures(USES, { failures: [{ kind: 'new', key: 'a.scss', count: 1 }] });
   assert.equal(unseen.length, 1);
-  assert.match(unseen[0], /not in the baseline/);
+  assert.match(unseen[0], /not in the baseline: line 1 \(border-color\), 2 \(outline\)/);
+});
 
-  const gone = failures([], { 'a.scss': { border: 1, outline: 0 } });
+test('a stale entry and a reasonless one are each their own finding', () => {
+  const gone = failures([], { stale: [{ key: 'a.scss', recorded: 1 }] });
   assert.equal(gone.length, 1);
   assert.match(gone[0], /Delete its entry/);
+
+  const bare = failures(USES, { unreviewed: ['a.scss'] });
+  assert.equal(bare.length, 1);
+  assert.match(bare[0], /baselined without a reason/);
 });
 
 test('counts group by file and kind', () => {

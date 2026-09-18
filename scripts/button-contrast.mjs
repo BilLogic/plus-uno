@@ -13,8 +13,10 @@
  * and `focus-ring.mjs` import the maths from the module itself, so there is one
  * import path to it rather than two. The RATCHET went with the maths in #506
  * and moved again in #599, to `scripts/lib/ratchet.mjs`, which is also where
- * this check's record shape is declared. What this file still exports is its own —
- * `tokenValues`, `PAGE_TOKEN`, `AA_TEXT` and the button sweep.
+ * this check's record shape is declared — and in #600 the rest of the record
+ * went with it, so this file no longer imports the classifier at all. What it
+ * still exports is its own: `tokenValues`, `PAGE_TOKEN`, `AA_TEXT`, the button
+ * sweep, the two sides the record is written in, and the wording.
  *
  * WHAT THIS MEASURES, AND WHY IT IS NOT THE a11y RATCHET'S JOB.
  * `check:storybook` runs axe over what the stories render. Nothing renders a
@@ -58,8 +60,6 @@ import {
   resolveToken,
   toHex,
 } from '../design-system/src/lib/tokens.mjs';
-
-import { ratchet } from './lib/ratchet.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -169,27 +169,43 @@ export function duplicateGrounds(themes, values) {
 }
 
 /**
- * Findings, as the check reports them. A baseline entry silences a finding and
- * nothing else: entries are `"style/fill"` for contrast and `"a+b"` for a
- * duplicate pair, and an entry that no longer matches anything is itself a
- * finding — a ratchet that cannot shrink is a list.
+ * The two sides of the record, measured — in the shape
+ * `docs/evals/button-contrast-baseline.json` holds them, which is two arrays of
+ * keys: `"style/fill"` for contrast and `"a+b"` for a duplicate pair. This is
+ * what `scripts/lib/ratchet.mjs` is handed (#600), and it is the whole of what
+ * this module says about the record.
+ */
+export function measured(themes, values) {
+  return {
+    contrast: sweep(themes, values)
+      .filter((row) => row.ratio !== null && row.ratio < AA_TEXT)
+      .map((row) => `${row.style}/${row.fill}`),
+    duplicates: duplicateGrounds(themes, values).map((group) => group.join('+')),
+  };
+}
+
+/**
+ * The WORDING of both ratchets' verdicts, and the one finding neither ratchet
+ * can have an opinion about — a combination whose ground will not resolve.
  *
- * The new/known/fixed classification is the module's `ratchet`; what is left
- * here is the WORDING and the ORDER, both of which are this check's own. The
- * order in particular is preserved deliberately: an unresolved combination is
+ * A baseline entry silences a finding and nothing else, and an entry that no
+ * longer matches anything is itself a finding: a ratchet that cannot shrink is
+ * a list. THE ORDER is preserved deliberately — an unresolved combination is
  * reported in sweep position, interleaved with the contrast findings, so a
  * reader walks the map the way the map is written.
+ *
+ * @param {object[]} themes
+ * @param {Map<string, string>} values
+ * @param {{contrast?: {fresh?: string[], stale?: string[]},
+ *          duplicates?: {fresh?: string[], stale?: string[]}}} verdicts
+ *        what the ratchet said about each of the record's two sets. Empty is
+ *        "nothing moved", not "nothing is recorded": which keys are new is
+ *        `scripts/lib/ratchet.mjs`'s call, and this function has no record.
  */
-export function findings(themes, values, baseline = { contrast: [], duplicates: [] }) {
+export function findings(themes, values, verdicts = {}) {
+  const { contrast = {}, duplicates = {} } = verdicts;
   const rows = sweep(themes, values);
-  const failing = rows
-    .filter((row) => row.ratio !== null && row.ratio < AA_TEXT)
-    .map((row) => `${row.style}/${row.fill}`);
-  const duplicates = duplicateGrounds(themes, values).map((group) => group.join('+'));
-
-  const contrastRatchet = ratchet(failing, baseline.contrast);
-  const duplicateRatchet = ratchet(duplicates, baseline.duplicates);
-  const unrecordedContrast = new Set(contrastRatchet.new.map((entry) => entry.key));
+  const unrecordedContrast = new Set(contrast.fresh ?? []);
 
   const found = [];
 
@@ -204,14 +220,14 @@ export function findings(themes, values, baseline = { contrast: [], duplicates: 
     }
   }
 
-  for (const { key } of duplicateRatchet.new) {
+  for (const key of duplicates.fresh ?? []) {
     found.push(`${key}: these styles render the same filled ground, so the names are a distinction the interface does not draw`);
   }
 
-  for (const { key } of contrastRatchet.fixed) {
+  for (const key of contrast.stale ?? []) {
     found.push(`baseline entry "${key}" no longer fails — remove it`);
   }
-  for (const { key } of duplicateRatchet.fixed) {
+  for (const key of duplicates.stale ?? []) {
     found.push(`baseline entry "${key}" no longer duplicates — remove it`);
   }
 

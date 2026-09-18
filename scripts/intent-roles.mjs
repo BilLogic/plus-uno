@@ -118,41 +118,49 @@ export function counts(uses) {
 }
 
 /**
- * The ratchet. A recorded remainder may shrink only after the record shrinks
- * with it: a count BELOW its baseline is a finding in its own right, because a
- * baseline that no longer describes the code is a baseline nobody can read.
+ * The WORDING of the ratchet's verdicts. A recorded remainder may shrink only
+ * after the record shrinks with it: a count BELOW its baseline is a finding in
+ * its own right, because a baseline that no longer describes the code is a
+ * baseline nobody can read. That is the BOTH-directions ratchet this record's
+ * row declares in `scripts/lib/ratchet-shapes.mjs`, and since #600 the module
+ * decides it — per named count, `border` and `outline` separately — while what
+ * a verdict says stays here.
+ *
+ * THE ORDER IS THE RUN'S. It used to be a walk over the union of the two sides
+ * in filename order; the module reports in the order the run met each file, and
+ * the stale entries and the reasonless ones after. Nothing about a single
+ * finding's text changed.
+ *
+ * @param {object[]} uses  the measurement, for the lines a new file's finding
+ *        names — the record holds counts, not places.
+ * @param {{failures?: object[], stale?: object[], unreviewed?: string[]}} verdicts
  */
-export function failures(uses, baseline) {
+export function failures(uses, { failures: verdicts = [], stale = [], unreviewed = [] } = {}) {
   const found = [];
-  const now = counts(uses);
-  const files = new Set([...Object.keys(now), ...Object.keys(baseline)]);
-  for (const file of [...files].sort()) {
-    const before = baseline[file];
-    const after = now[file];
-    if (!before) {
-      const lines = uses.filter((u) => u.file === file).map((u) => `${u.line} (${u.property})`);
+
+  for (const verdict of verdicts) {
+    if (verdict.kind === 'new') {
+      const lines = uses.filter((u) => u.file === verdict.key).map((u) => `${u.line} (${u.property})`);
       found.push(
-        `${file} paints an edge from an intent base and is not in the baseline: ` +
+        `${verdict.key} paints an edge from an intent base and is not in the baseline: ` +
           `line ${lines.join(', ')}. Use the \`-border\` role, or record the reason it cannot.`,
       );
       continue;
     }
-    if (!after) {
-      found.push(`${file} is recorded in the baseline and no longer has any use. Delete its entry.`);
-      continue;
-    }
-    for (const kind of ['border', 'outline']) {
-      const was = before[kind] ?? 0;
-      const is = after[kind] ?? 0;
-      if (is > was) {
-        found.push(`${file} has ${is} ${kind} use(s) of an intent base, up from ${was}. The roles exist; use them.`);
-      } else if (is < was) {
-        found.push(
-          `${file} has ${is} ${kind} use(s), down from ${was} — the ratchet moved and the record did not. ` +
-            'Lower the baseline to match.',
-        );
-      }
-    }
+    found.push(
+      verdict.kind === 'rose'
+        ? `${verdict.key} has ${verdict.count} ${verdict.field} use(s) of an intent base, up from ` +
+          `${verdict.recorded}. The roles exist; use them.`
+        : `${verdict.key} has ${verdict.count} ${verdict.field} use(s), down from ${verdict.recorded} — ` +
+          'the ratchet moved and the record did not. Lower the baseline to match.',
+    );
+  }
+
+  for (const { key } of stale) {
+    found.push(`${key} is recorded in the baseline and no longer has any use. Delete its entry.`);
+  }
+  for (const key of unreviewed) {
+    found.push(`${key} is baselined without a reason. Say why the base is still right there, or migrate it.`);
   }
   return found;
 }

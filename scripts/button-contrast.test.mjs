@@ -6,9 +6,11 @@
  * #506, and its tests moved with it to `design-system/tests/tokens.test.js`
  * (run by `npm test`). The ratchet went the same way and then on to
  * `scripts/lib/ratchet.mjs` in #599, where it is asserted against every live
- * baseline record by `scripts/lib/ratchet-conformance.mjs`. What is tested here
- * is what stayed: reading the `$btn-themes` map, building a ground per style ×
- * fill, the duplicate-ground assertion, and the findings this check words.
+ * baseline record by `scripts/lib/ratchet-conformance.mjs` — and in #600 this
+ * check's own read of its record went with it. What is tested here is what
+ * stayed: reading the `$btn-themes` map, building a ground per style × fill,
+ * the duplicate-ground assertion, the two sides the record is written in, and
+ * the wording of every verdict the ratchet can hand back.
  *
  * The point of this file is that the check can FAIL. A guard exercised only
  * against the repo, which is green by construction once the baseline is
@@ -23,6 +25,7 @@ import {
   combination,
   duplicateGrounds,
   findings,
+  measured,
   readRepo,
   sweep,
   themeMap,
@@ -81,20 +84,24 @@ test('a tonal ground is composited, so an 8% state layer is not read as paint', 
   assert.ok(tonal.ratio > 4.5, `expected the composited ratio, got ${tonal.ratio}`);
 });
 
-test('findings reports that failure, and the baseline silences it', () => {
-  const loud = findings(FAILING.themes, FAILING.values);
+test('the measured side is the record shape, and the failure is in it', () => {
+  // What the ratchet is handed (#600): two arrays of keys, the shape
+  // `docs/evals/button-contrast-baseline.json` holds.
+  assert.deepEqual(measured(FAILING.themes, FAILING.values), { contrast: ['bad/filled'], duplicates: [] });
+});
+
+test('findings words a failure the ratchet called new, and says nothing about a recorded one', () => {
+  const loud = findings(FAILING.themes, FAILING.values, { contrast: { fresh: ['bad/filled'] } });
   assert.equal(loud.length, 1);
   assert.match(loud[0], /^bad\/filled: label is 3\.7:1/);
 
-  const quiet = findings(FAILING.themes, FAILING.values, { contrast: ['bad/filled'], duplicates: [] });
-  assert.deepEqual(quiet, []);
+  // Nothing new is nothing said. Which keys are new is the ratchet's call and
+  // is asserted once, over all twelve records, in ratchet-conformance.mjs.
+  assert.deepEqual(findings(FAILING.themes, FAILING.values, {}), []);
 });
 
 test('a baseline entry that no longer fails is itself a finding', () => {
-  const found = findings(FAILING.themes, FAILING.values, {
-    contrast: ['bad/filled', 'ok/filled'],
-    duplicates: [],
-  });
+  const found = findings(FAILING.themes, FAILING.values, { contrast: { stale: ['ok/filled'] } });
   assert.equal(found.length, 1);
   assert.match(found[0], /baseline entry "ok\/filled" no longer fails/);
 });
@@ -111,10 +118,11 @@ test('duplicateGrounds finds two styles pointing at one colour', () => {
     ['--on', '#ffffff'], ['--s', 'rgba(0,0,0,0.08)'], ['--x', '#000000'],
   ]);
   assert.deepEqual(duplicateGrounds(themes, values), [['info', 'tertiary']]);
+  assert.deepEqual(measured(themes, values).duplicates, ['info+tertiary']);
 
-  const found = findings(themes, values, { contrast: [], duplicates: [] });
+  const found = findings(themes, values, { duplicates: { fresh: ['info+tertiary'] } });
   assert.match(found.at(-1), /^info\+tertiary: these styles render the same filled ground/);
-  assert.deepEqual(findings(themes, values, { contrast: [], duplicates: ['info+tertiary'] }), []);
+  assert.deepEqual(findings(themes, values, {}), []);
 });
 
 test('a duplicate baseline entry that no longer duplicates is a finding', () => {
@@ -123,7 +131,7 @@ test('a duplicate baseline entry that no longer duplicates is a finding', () => 
     ['--color-surface', '#ffffff'], ['--t', '#00404a'],
     ['--on', '#ffffff'], ['--s', 'rgba(0,0,0,0.08)'], ['--x', '#000000'],
   ]);
-  const found = findings(themes, values, { contrast: [], duplicates: ['a+b'] });
+  const found = findings(themes, values, { duplicates: { stale: ['a+b'] } });
   assert.deepEqual(found, ['baseline entry "a+b" no longer duplicates — remove it']);
 });
 
