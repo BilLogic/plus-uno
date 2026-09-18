@@ -12,7 +12,10 @@
  * import: it is PLAIN ESM with no Node-only import and no Node global anywhere
  * in it, so Vite bundles it for the browser and `node --test` loads it
  * unchanged. Anything that needs the filesystem — reading the token stylesheet
- * off disk — belongs in `tokens-node.js` beside it, or in the check.
+ * off disk — belongs in `tokens-node.mjs` beside it, or in the check. That
+ * half now exists and owns the other three questions about a token: where
+ * tokens live, which family a name is in, and whether two values are the same
+ * value.
  *
  * ─── THE TOKEN GRAMMAR ──────────────────────────────────────────────────────
  *
