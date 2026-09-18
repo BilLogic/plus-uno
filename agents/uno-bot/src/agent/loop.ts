@@ -31,7 +31,7 @@
 // it with a fake adapter and no network. Production builds those ports from
 // `Env` once, in `run-agent.ts`.
 
-import { SIDE_EFFECT_TOOLS } from "./types";
+import { rowFor } from "./tool-table";
 import { BUILD } from "../version";
 import type { ModelTier } from "./tiers";
 import type { PendingProposal, ProposalOperation, ThreadRef } from "../thread-state/index";
@@ -456,7 +456,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
     // lookup, and never when it is a side effect, because a proposal's preview
     // is delivered on the proposal card and narrating it would duplicate it.
     const anySideEffect = reply.toolCalls.some(
-      (c) => SIDE_EFFECT_TOOLS.has(c.name as never) || c.name === "proposal_resolve",
+      (c) => rowFor(c.name)?.access === "gated" || c.name === "proposal_resolve",
     );
     if (reply.text && !anySideEffect) emitInterim(reply.text);
 
@@ -498,7 +498,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
     // (b) Side-effect tools → staged as ONE ✅-gated proposal, never executed
     // here. Every one of them: the reply is the model's whole plan, and the
     // batch is what the person approves with a single ✅.
-    const sideEffects = reply.toolCalls.filter((c) => SIDE_EFFECT_TOOLS.has(c.name as never));
+    const sideEffects = reply.toolCalls.filter((c) => rowFor(c.name)?.access === "gated");
     if (sideEffects.length) {
       // …unless preflight refuses one of them, and the turn still has its one
       // correction in hand: hand each reason back as that call's result and
@@ -549,7 +549,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
       // turn's telemetry lists it): a reported call with no result is exactly
       // the silent drop this branch exists to end.
       const lookups = reply.toolCalls.filter(
-        (c) => !SIDE_EFFECT_TOOLS.has(c.name as never) && c.name !== "proposal_resolve",
+        (c) => rowFor(c.name)?.access !== "gated" && c.name !== "proposal_resolve",
       );
       if (lookups.length) provider.recordToolResults(await runLookups(lookups));
 

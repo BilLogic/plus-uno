@@ -13,7 +13,10 @@
 // unrelated question while the card waits" would be worse than the silence.
 // So the Worker learns how often this happens first.
 //
-// Pure and import-free so the judgement is testable.
+// Pure, and its one import is the tool table, which imports nothing — so the
+// judgement is still testable under plain Node.
+
+import { gateWordsFor } from "./tool-table";
 
 /**
  * Words that mean the reply is TALKING ABOUT the staged action, whichever tool
@@ -26,31 +29,26 @@ const GATE_WORDS = [
 ];
 
 /**
- * The noun each tool's proposal is about. A reply that mentions the *thing*
- * ("the card", "the email") is addressing the proposal even without gate
- * vocabulary — which is how people actually write.
- */
-const TOOL_NOUNS: Record<string, string[]> = {
-  notion_create: ["card", "prd", "intake", "ticket", "notion", "decision"],
-  notion_update: ["card", "update", "notion", "property"],
-  notion_archive: ["archive", "card", "notion"],
-  component_implement: ["component", "implement", "build", "pr"],
-  prototype_scaffold: ["prototype", "scaffold", "build", "pr"],
-  shareout_post: ["share", "share-out", "shareout", "feedback", "post"],
-  email_send: ["email", "mail", "send"],
-};
-
-/**
  * True when `reply` plausibly refers to the pending `toolName` proposal.
  *
+ * Beyond the gate's vocabulary, a reply that mentions the *thing* ("the card",
+ * "the email") is addressing the proposal — which is how people actually
+ * write. Those nouns are the gated row's own (`agent/tool-table.ts`
+ * § `GateWords`), not a second list keyed by tool name here: this module kept
+ * one, and a gated tool absent from it had only the gate words to match on,
+ * which would have counted every on-topic reply as a bounce and inflated the
+ * one rate this exists to measure. A name with no gated row — an ungated tool,
+ * or a tool that no longer exists — contributes no nouns and is judged on the
+ * gate words alone.
+ *
  * Leans towards saying YES — a false "addressed" only loses one log line,
- * while a false "unaddressed" would inflate the very rate this exists to
- * measure and make the number useless.
+ * while a false "unaddressed" would inflate that rate and make the number
+ * useless.
  */
 export function proposalWasAddressed(reply: string, toolName: string): boolean {
   const text = (reply ?? "").toLowerCase();
   if (!text.trim()) return false;
-  const terms = [...GATE_WORDS, ...(TOOL_NOUNS[toolName] ?? [])];
+  const terms = [...GATE_WORDS, ...(gateWordsFor(toolName)?.nouns ?? [])];
   return terms.some((t) => wordRe(t).test(text));
 }
 
