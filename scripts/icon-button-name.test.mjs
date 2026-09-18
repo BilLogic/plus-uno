@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { bodyOf, endOfOpenTag, failures, hasName, iconOnly, nameless, sources } from './icon-button-name.mjs';
+import { bodyOf, endOfOpenTag, failures, hasName, iconOnly, nameless, sites, sources } from './icon-button-name.mjs';
 
 function corpus(files) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'icon-button-'));
@@ -81,11 +81,33 @@ test('nested buttons of the same name do not confuse the body scan', () => {
   assert.match(body.body, /<\/span>$/);
 });
 
-test('failures report each site, and a stale exception', () => {
-  const hit = { file: 'a.jsx', line: 3, tag: 'button', source: '<button>' };
-  assert.equal(failures([hit], {}).length, 1);
-  assert.deepEqual(failures([hit], { 'a.jsx:3': 'recorded' }), []);
-  const stale = failures([], { 'a.jsx:3': 'recorded' });
+/*
+ * The three verdicts, worded. Which site is NEW, which recorded one has gone
+ * STALE and which reason says nothing is `scripts/lib/ratchet.mjs`'s, asserted
+ * once against all twelve live records in `scripts/lib/ratchet-conformance.mjs`
+ * (#600). What is asserted here is the measured side this check hands it, and
+ * what each verdict says.
+ */
+
+const HIT = { file: 'a.jsx', line: 3, tag: 'button', source: '<button>' };
+
+test('the measured side is keyed the way the record is', () => {
+  assert.deepEqual([...sites([HIT]).keys()], ['a.jsx:3']);
+});
+
+test('a new site is worded with its tag and source, and nothing new is nothing said', () => {
+  const hits = sites([HIT]);
+  assert.equal(failures(hits, { fresh: ['a.jsx:3'] }).length, 1);
+  assert.match(failures(hits, { fresh: ['a.jsx:3'] })[0], /<button> has an icon and no name/);
+  assert.deepEqual(failures(hits, {}), []);
+});
+
+test('a stale exception and a reasonless one are each their own finding', () => {
+  const stale = failures(new Map(), { stale: ['a.jsx:3'] });
   assert.equal(stale.length, 1);
   assert.match(stale[0], /is not one/);
+
+  const unreviewed = failures(sites([HIT]), { unreviewed: ['a.jsx:3'] });
+  assert.equal(unreviewed.length, 1);
+  assert.match(unreviewed[0], /with no reason/);
 });

@@ -22,8 +22,18 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { NON_TEXT, REPO_ROOT, colours, failures, focusRules, indicators, stylesheets } from './focus-ring.mjs';
+import {
+  NON_TEXT,
+  REPO_ROOT,
+  colours,
+  failures,
+  focusRules,
+  indicators,
+  invisible,
+  stylesheets,
+} from './focus-ring.mjs';
 import { byRoot, main } from './lib/findings.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
 
 const RECORD = 'docs/evals/focus-ring.json';
 const ROLES_FILE = 'design-system/src/tokens/_color_roles.scss';
@@ -42,13 +52,12 @@ export const REMEDY =
   '     `var(--color-focus-ring)` — 5.02:1 on the page — rather than a state tint or\n' +
   '     an inverse colour meant for dark grounds.';
 
-// The sweep — the corpus walk, the token values, the measured rules and the
-// record — is the same for both questions, so it happens once per root.
+// The sweep — the corpus walk, the token values and the measured rules — is the
+// same for both questions, so it happens once per root.
 const inputs = byRoot((repoRoot) => {
   const files = stylesheets(repoRoot);
   const values = colours(repoRoot);
   return {
-    record: JSON.parse(fs.readFileSync(path.join(repoRoot, RECORD), 'utf8')),
     files,
     rules: indicators(focusRules(files, repoRoot), values),
     roles: fs.readFileSync(path.join(repoRoot, ROLES_FILE), 'utf8'),
@@ -57,7 +66,7 @@ const inputs = byRoot((repoRoot) => {
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
-  const { record, files, rules, roles } = inputs(repoRoot);
+  const { files, rules, roles } = inputs(repoRoot);
   const found = [];
 
   if (files.length < MIN_FILES) {
@@ -83,7 +92,27 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     });
   }
 
-  found.push(...failures(rules, record.exceptions ?? {}).map((message) => ({ message })));
+  /*
+   * The record, through `scripts/lib/ratchet.mjs` (#600). Its exception map
+   * keys a rule to THE REASON ITSELF, which is the shape declared for it in
+   * `scripts/lib/ratchet-shapes.mjs` — so the module reports a recorded rule
+   * that is no longer invisible as stale, and a recorded rule whose reason says
+   * nothing as unreviewed. It is maintained BY HAND and offers no `--update`:
+   * the bar here is zero, and a flag that recorded an invisible focus ring for
+   * you would be the leisurely migration this check exists not to allow.
+   */
+  const gate = openRatchet({ file: RECORD, repoRoot });
+  const under = invisible(rules);
+  const side = Object.fromEntries([...under.keys()].map((key) => [key, '']));
+  if (gate.absent) return [...found, ...gate.failures(side).map(({ message }) => ({ message }))];
+
+  found.push(
+    ...failures(under, {
+      fresh: gate.failures(side).map((f) => f.key),
+      stale: gate.stale(side).map((s) => s.key),
+      unreviewed: gate.unreviewed().map((u) => u.key),
+    }).map((message) => ({ message })),
+  );
   return found;
 }
 

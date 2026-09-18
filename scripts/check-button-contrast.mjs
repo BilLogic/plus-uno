@@ -25,12 +25,12 @@
  *
  * Run: `npm run check:button-contrast`.
  */
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { AA_TEXT, findings, readRepo, sweep } from './button-contrast.mjs';
+import { AA_TEXT, findings, measured, readRepo, sweep } from './button-contrast.mjs';
 import { byRoot, main } from './lib/findings.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -41,23 +41,68 @@ export const REMEDY =
   `     decision is not yours to make, record it in ${BASELINE}\n` +
   '     with the issue that owns it — and never as a way to make a new one quiet.';
 
-// The baseline, the token values and the theme map are the same read for both
-// questions, so the sweep over them happens once per root.
+// The token values and the theme map are the same read for both questions, so
+// the sweep over them happens once per root.
 const inputs = byRoot((repoRoot) => {
-  const baseline = JSON.parse(fs.readFileSync(path.join(repoRoot, BASELINE), 'utf8'));
   const { values, themes } = readRepo(repoRoot);
-  return { baseline, values, themes, rows: sweep(themes, values) };
+  return { values, themes, rows: sweep(themes, values), side: measured(themes, values) };
 });
+
+/**
+ * The record's two sets, on the shape `scripts/lib/ratchet-shapes.mjs` declares
+ * (#600). Both keep their reasons in ONE sibling `notes` map, which is the
+ * arrangement that makes a rebuilt record lose them — so the read and the sweep
+ * over them are the module's and this file only words what they say.
+ *
+ * NO `--update`. The record's value IS the argument for each entry, and it is
+ * maintained by hand for that reason: a flag that recorded a new finding and
+ * stamped it UNREVIEWED would be exactly the way of making the next 3.70:1
+ * label quiet that this check's remedy tells a reader not to take. That is why
+ * its row declares `command: null`, and why the absent-record message it
+ * inherits says "record it by hand, with a reason per entry".
+ */
+const gate = (repoRoot, set) => openRatchet({ file: BASELINE, set, repoRoot });
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
-  const { baseline, values, themes } = inputs(repoRoot);
-  return findings(themes, values, baseline).map((message) => ({ message }));
+  const { values, themes, side } = inputs(repoRoot);
+  const contrast = gate(repoRoot, 'contrast');
+  if (contrast.absent) return contrast.failures(side.contrast).map(({ message }) => ({ message }));
+  const duplicates = gate(repoRoot, 'duplicates');
+
+  // Presence-only sets, so every failure is NEW and the other direction that
+  // matters is `stale()`.
+  const verdict = (ratchet, found) => ({
+    fresh: ratchet.failures(found).map((f) => f.key),
+    stale: ratchet.stale(found).map((s) => s.key),
+  });
+
+  const found = findings(themes, values, {
+    contrast: verdict(contrast, side.contrast),
+    duplicates: verdict(duplicates, side.duplicates),
+  }).map((message) => ({ message }));
+
+  /*
+   * A RECORDED ENTRY WITH NO REASON. Both findings here are somebody else's
+   * open colour-token decision, and the `notes` entry is the whole of what makes
+   * recording one honest rather than a way of turning the check off. An entry
+   * with no note is a number nobody can argue with.
+   */
+  for (const { key } of [...contrast.unreviewed(), ...duplicates.unreviewed()]) {
+    found.push({
+      message:
+        `baseline entry "${key}" carries no reason in \`notes\`. Say which decision owns it ` +
+        'and who — an entry nobody argued for is a finding made quiet.',
+    });
+  }
+  return found;
 }
 
 /** The green line, and the margin the next change has to beat. */
 export function summary({ repoRoot = REPO_ROOT } = {}) {
-  const { baseline, rows, themes } = inputs(repoRoot);
+  const { rows, themes } = inputs(repoRoot);
+  const contrast = gate(repoRoot, 'contrast');
+  const baselined = contrast.entries.size + gate(repoRoot, 'duplicates').entries.size;
 
   /*
    * The tightest combination that is NOT baselined — the margin the next change
@@ -66,13 +111,13 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
    * red number.
    */
   const worst = rows
-    .filter((row) => row.ratio !== null && !baseline.contrast.includes(`${row.style}/${row.fill}`))
+    .filter((row) => row.ratio !== null && !contrast.entries.has(`${row.style}/${row.fill}`))
     .sort((a, b) => a.ratio - b.ratio)[0];
 
   return (
     `${rows.length} combinations from ${themes.length} styles; ` +
     `every label clears ${AA_TEXT}:1 and every style renders its own ground ` +
-    `(${baseline.contrast.length + baseline.duplicates.length} baselined)\n` +
+    `(${baselined} baselined)\n` +
     `  tightest unbaselined: ${worst.style}/${worst.fill} at ${worst.ratio}:1`
   );
 }

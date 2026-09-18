@@ -278,7 +278,13 @@ Two kinds of failure, two mechanisms:
   `scripts/lib/ratchet-shapes.mjs` — three of them keep the human's reason
   outside the entry, so `--update` is a merge that leaves every key the module
   does not own exactly as it found it. A check migrating onto the module adds no
-  row: it opens its record by the path it already names.
+  row: it opens its record by the path it already names. The design-system
+  checks read it already — colour fallbacks, size fallbacks, undefined tokens,
+  button contrast, focus ring, icon-button name and intent roles (#600), the
+  first two through `scripts/lib/fallback-check.mjs`, which is where both
+  families reach their record. Four of those records are maintained by hand and
+  offer no `--update` (`command: null` in their row), because the value of an
+  entry in them IS the argument for it.
 
 **Which components carry `play` blocks, and why not all of them.** A `play`
 block costs runtime on every PR, so the set is chosen rather than grown: a

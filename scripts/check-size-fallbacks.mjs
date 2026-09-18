@@ -4,10 +4,12 @@
  *
  * `check:colour-fallbacks` holds the literal beside a COLOUR token to that
  * token's value. This holds the literal beside a DIMENSION token to its value,
- * over the same corpus, with the same ratchet, from the same two modules:
- * `scripts/token-fallbacks.mjs` says what the defect is, and
- * `scripts/lib/fallback-check.mjs` reads the tree and writes the record for
- * both. What is left here is the three ways this family differs (#610).
+ * over the same corpus, with the same ratchet, from the same modules:
+ * `scripts/token-fallbacks.mjs` says what the defect is,
+ * `scripts/lib/fallback-check.mjs` reads the tree for both, and
+ * `scripts/lib/ratchet.mjs` owns both records — the comparison, the stale sweep
+ * and the `--update` merge, reached through that same file (#600). What is left
+ * here is the three ways this family differs (#610).
  *
  * IT IS THE BIGGER HALF. 546 disagreements inside `design-system/src` against
  * colour's 191 across the whole corpus, and the spread is worse: 61 uses of

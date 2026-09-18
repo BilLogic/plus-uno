@@ -189,25 +189,52 @@ export function indicators(rules, values) {
   return [...byBlock.values()].filter((entry) => entry.best);
 }
 
-export function failures(entries, baseline) {
-  const found = [];
-  const recorded = new Set(Object.keys(baseline));
-  const seen = new Set();
+/**
+ * The measured side, in the shape `docs/evals/focus-ring.json` holds its
+ * exceptions: one key per rule under the bar, `file:line`, and the rule itself
+ * beside it for the wording. That map is what `scripts/lib/ratchet.mjs` is
+ * handed (#600); the record's VALUE is the reason a person wrote, so the
+ * measured side has none to offer and says so with an empty one.
+ */
+export function invisible(entries) {
+  const out = new Map();
   for (const entry of entries) {
     if (entry.best.ratio >= NON_TEXT) continue;
-    const key = `${entry.file}:${entry.line}`;
-    seen.add(key);
-    if (recorded.has(key)) continue;
+    out.set(`${entry.file}:${entry.line}`, entry);
+  }
+  return out;
+}
+
+/**
+ * The WORDING of the ratchet's three verdicts over that map.
+ *
+ * @param {Map<string, object>} under  from `invisible`.
+ * @param {{fresh?: string[], stale?: string[], unreviewed?: string[]}} verdicts
+ */
+export function failures(under, { fresh = [], stale = [], unreviewed = [] } = {}) {
+  const found = [];
+  for (const key of fresh) {
+    const entry = under.get(key);
     found.push(
       `${key} — the strongest focus affordance is ${entry.best.property}: ${entry.best.token} at ` +
         `${entry.best.ratio.toFixed(2)}:1 on ${entry.best.ground}, under ${NON_TEXT}:1. ` +
         `Selector \`${entry.selector}\`.`,
     );
   }
-  for (const key of recorded) {
-    if (!seen.has(key)) {
-      found.push(`${key} is recorded as an invisible focus ring and no longer is one. Delete the entry.`);
-    }
+  for (const key of stale) {
+    found.push(`${key} is recorded as an invisible focus ring and no longer is one. Delete the entry.`);
+  }
+  /*
+   * An exception whose value says nothing. The value of an entry here IS the
+   * argument for it — that a keyboard user does not need to see this particular
+   * thing — so an entry with no argument is an invisible focus ring nobody
+   * defended, which is the defect rather than an exception to it.
+   */
+  for (const key of unreviewed) {
+    found.push(
+      `${key} is recorded as an invisible focus ring with no reason. Say why a keyboard user ` +
+        'does not need to see this one, or give it a ring they can see.',
+    );
   }
   return found;
 }

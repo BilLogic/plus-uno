@@ -22,11 +22,11 @@ import assert from 'node:assert/strict';
 import {
   fallbackAudit,
   fallbackFailures,
+  fallbackSides,
   fallbackUsages,
   normaliseColour,
   normaliseDimension,
   resolveAliases,
-  staleEntries,
   tokenDefinitions,
 } from './token-fallbacks.mjs';
 
@@ -127,72 +127,75 @@ test('an incomparable pair is counted rather than silently dropped', () => {
   assert.equal(audit.comparable, 0);
 });
 
-/* ------------------------------------------------------------------ ratchet */
+/* --------------------------------------------------- the two sides, and the
+                                                        wording of a failure */
 
-const baseline = { disagreements: ['--color-primary #ff0000'], undefinedTokens: ['--color-border'] };
+/*
+ * WHAT MOVED OUT OF HERE IN #600. The classification these tests used to drive
+ * — what is new, what has gone stale, what an absent record does — is
+ * `scripts/lib/ratchet.mjs`'s, and it is asserted once, against all twelve live
+ * records, in `scripts/lib/ratchet-conformance.mjs`. Asserting it a thirteenth
+ * time over a hand-built baseline object would be asserting the shape this
+ * module would have chosen rather than the one on disk, which is the mistake the
+ * first attempt at #599 made. What is still this module's, and tested here, is
+ * the SHAPE it hands the ratchet and what a finding SAYS.
+ */
+
 const auditWith = (usages, tokens = new Map([['--color-primary', '#0472a8']])) =>
   fallbackAudit({ tokens, usages });
 
-test('the recorded set holds', () => {
-  const audit = auditWith([{ path: 'a.scss', line: 1, token: '--color-primary', literal: '#ff0000' }]);
-  assert.deepEqual(fallbackFailures(audit, baseline), []);
+test('the measured side is keyed on token+literal, so the same pair in a new file is one key', () => {
+  // A line number churns when someone adds an import above it, and a baseline
+  // that churns gets regenerated blindly. The pair is the decision.
+  const audit = auditWith([
+    { path: 'a.scss', line: 9, token: '--color-primary', literal: '#ff0000' },
+    { path: 'moved.scss', line: 400, token: '--color-primary', literal: '#ff0000' },
+  ]);
+  assert.deepEqual(fallbackSides(audit).disagreements, ['--color-primary #ff0000']);
 });
 
-test('a NEW disagreement fails, and names the token, both values and the place', () => {
+test('the measured side carries the detail a finding needs and the record does not', () => {
   const audit = auditWith([{ path: 'a.scss', line: 9, token: '--color-primary', literal: '#ff00ff' }]);
-  const failures = fallbackFailures(audit, baseline);
+  const sides = fallbackSides(audit);
+  assert.equal(sides.detail.get('--color-primary #ff00ff').where, 'a.scss:9');
+  assert.deepEqual(sides.undefinedTokens, []);
+});
+
+test('an undefined name comes back with its use count, which is not in the record either', () => {
+  const audit = auditWith([
+    { path: 'a.scss', line: 1, token: '--color-invented', literal: '#000000' },
+    { path: 'b.scss', line: 2, token: '--color-invented', literal: '#000000' },
+  ]);
+  const sides = fallbackSides(audit);
+  assert.deepEqual(sides.undefinedTokens, ['--color-invented']);
+  assert.equal(sides.uses.get('--color-invented'), 2);
+});
+
+test('a NEW disagreement names the token, both values and the place', () => {
+  const audit = auditWith([{ path: 'a.scss', line: 9, token: '--color-primary', literal: '#ff00ff' }]);
+  const failures = fallbackFailures(audit, { disagreements: ['--color-primary #ff00ff'] });
   assert.equal(failures.length, 1);
   assert.match(failures[0], /#0472a8/);
   assert.match(failures[0], /#ff00ff/);
   assert.match(failures[0], /a\.scss:9/);
 });
 
-test('the same recorded pair in a NEW file does not fail', () => {
-  // Keyed on token+literal, not on file and line: a line number churns when
-  // someone adds an import above it, and a baseline that churns gets
-  // regenerated blindly.
-  const audit = auditWith([{ path: 'moved.scss', line: 400, token: '--color-primary', literal: '#ff0000' }]);
-  assert.deepEqual(fallbackFailures(audit, baseline), []);
-});
-
-test('a NEW undefined token fails; a recorded one does not', () => {
+test('a NEW undefined token names itself and how many uses it has', () => {
   const audit = auditWith([
     { path: 'a.scss', line: 1, token: '--color-border', literal: '#e5e7eb' },
     { path: 'a.scss', line: 2, token: '--color-invented', literal: '#000000' },
   ]);
-  const failures = fallbackFailures(audit, baseline);
+  const failures = fallbackFailures(audit, { undefinedTokens: ['--color-invented'] });
   assert.equal(failures.length, 1);
-  assert.match(failures[0], /--color-invented/);
+  assert.match(failures[0], /--color-invented {2}\(1 use\(s\)\)/);
   assert.doesNotMatch(failures[0], /--color-border/);
 });
 
-test('fewer disagreements than recorded is not a failure', () => {
-  // The point of a ratchet: fixing one must not fail the build.
-  assert.deepEqual(fallbackFailures(auditWith([]), baseline), []);
-});
-
-test('no baseline fails rather than passing vacuously', () => {
-  const failures = fallbackFailures(auditWith([]), null);
-  assert.equal(failures.length, 1);
-  assert.match(failures[0], /--update/);
-});
-
-test('a recorded entry that no longer holds is reported stale', () => {
-  // A baseline that never shrinks is a backlog wearing a ratchet's clothes.
-  const stale = staleEntries(auditWith([]), baseline);
-  assert.ok(stale.includes('--color-primary #ff0000'));
-  assert.ok(stale.some((s) => s.startsWith('--color-border')));
-});
-
-test('nothing is stale while every entry is still true', () => {
-  const audit = fallbackAudit({
-    tokens: new Map([['--color-primary', '#0472a8']]),
-    usages: [
-      { path: 'a.scss', line: 1, token: '--color-primary', literal: '#ff0000' },
-      { path: 'a.scss', line: 2, token: '--color-border', literal: '#e5e7eb' },
-    ],
-  });
-  assert.deepEqual(staleEntries(audit, baseline), []);
+test('nothing new is nothing said, whatever the audit found', () => {
+  // The point of a ratchet: fixing one, or holding 87 of them, must not fail
+  // the build. Which keys are new is the ratchet's call, not this function's.
+  const audit = auditWith([{ path: 'a.scss', line: 1, token: '--color-primary', literal: '#ff0000' }]);
+  assert.deepEqual(fallbackFailures(audit, {}), []);
 });
 
 /* ------------------------------------------------- the dimension family */
@@ -297,6 +300,6 @@ test('the failure text names the family it is talking about', () => {
     usages: [{ path: 'a.scss', line: 1, token: '--size-invented', literal: '4px' }],
     normalise: normaliseDimension,
   });
-  const failures = fallbackFailures(audit, { disagreements: [], undefinedTokens: [] }, { noun: 'dimension' });
+  const failures = fallbackFailures(audit, { undefinedTokens: ['--size-invented'] }, { noun: 'dimension' });
   assert.match(failures[0], /dimension token/);
 });
