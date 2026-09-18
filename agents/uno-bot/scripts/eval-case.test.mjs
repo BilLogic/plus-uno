@@ -86,10 +86,12 @@ test("a case with no recording is UNGATED — named, not silently absent", () =>
   const census = censusOf(cases, { recorded });
   assert.deepEqual(census.ungated, [cases[0].id]);
   assert.equal(census.gated, cases.length - 1);
-  // No recordings known at all is a different fact from none recorded: the
-  // worker transport gates every case and has no recordings to report.
+  // No recordings known at all is a different fact from none recorded AND a
+  // different fact from all of them gated: the worker transport has no
+  // recordings to report, so the census answers neither question with a number.
   assert.deepEqual(censusOf(cases).ungated, []);
   assert.equal(censusOf(cases).recorded, null);
+  assert.equal(censusOf(cases).gated, null);
 });
 
 test("adding a case is ONE edit — every derived count follows from the fixture", () => {

@@ -6,6 +6,8 @@ summary: uno-bot — regression scenarios
 
 # uno-bot — regression scenarios
 
+<!-- The hand-written ancestor of this file was migrated 2026-07-07 from agents/uno-bot/REGRESSION.md (eval rounds 1-3); it became generated with #616. -->
+
 Every scenario the suite runs, read off the fixture that runs it. Each is one
 Slack conversation with a binary outcome, scored two ways: the deterministic
 assertions below, and an LLM judge against `docs/evals/rubrics/bot-answer.md`

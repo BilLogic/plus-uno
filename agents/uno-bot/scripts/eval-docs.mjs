@@ -72,20 +72,27 @@ export function renderCensusBlock(census, { pointer = true } = {}) {
     `| blockers | ${census.blockers} |`,
     `| turns · sample runs | ${census.turns} · ${census.samples} |`,
     `| cases picking a subject from the live board | ${census.withSubject} (${census.subjects.map((s) => `\`${s.need}\`×${s.count}`).join(", ")}) |`,
-    `| recorded, so the pull-request gate reaches them | ${census.recorded ?? 0} |`,
+    `| recorded, so the pull-request gate reaches them | ${census.recorded ?? "not reported by this transport"} |`,
     `| **ungated** — no recording, skipped by name, gating nothing | ${census.ungated.length ? `**${census.ungated.join(", ")}**` : "none"} |`,
     "",
     `Counted, not typed: \`${GENERATED_BY}\`, from the fixture and \`fixtures/recordings/\`.${pointer ? " The scenario-by-scenario census is `scenarios/uno-bot.md`." : ""}`,
   ].join("\n");
 }
 
-/** What is recorded, for `docs/evals/fixtures/recordings/README.md`. */
+/**
+ * What is recorded, for `docs/evals/fixtures/recordings/README.md`.
+ *
+ * A census with no recordings reported has nothing to say here, so this refuses
+ * rather than printing `null` as `0` — "none are recorded" is a claim, and this
+ * renderer is never given the input to make it.
+ */
 export function renderRecordedBlock(census, sources) {
+  if (census.recorded === null) throw new Error("no recordings reported — nothing to say about what is recorded");
   const kinds = [...sources.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([source, n]) => `${n} \`${source}\``)
     .join(", ");
-  const head = `**${census.recorded ?? 0} of ${census.total} fixture cases are recorded** — ${kinds || "none"}.`;
+  const head = `**${census.recorded} of ${census.total} fixture cases are recorded** — ${kinds || "none"}.`;
   const tail = census.ungated.length
     ? `The other ${census.ungated.length} are **ungated**: ${census.ungated.join(", ")}. Each skips by name on the pull-request gate, so nothing about it is measured there — record it (\`-f cases=<id>\` below) or accept that it gates nothing.`
     : "No case skips for want of a recording, so the local run is the whole suite's turn behaviour against one afternoon's draw.";
@@ -150,6 +157,8 @@ export function renderScenarios({ cases, proposed = [], census }) {
     `<!-- GENERATED from docs/evals/fixtures/uno-bot-cases.json by ${GENERATED_BY}; do not edit by hand. Add or change a case in the fixture, then run \`node ${GENERATED_BY} --write\`. -->`,
     "",
     "# uno-bot — regression scenarios",
+    "",
+    "<!-- The hand-written ancestor of this file was migrated 2026-07-07 from agents/uno-bot/REGRESSION.md (eval rounds 1-3); it became generated with #616. -->",
     "",
     "Every scenario the suite runs, read off the fixture that runs it. Each is one",
     "Slack conversation with a binary outcome, scored two ways: the deterministic",

@@ -26,7 +26,7 @@
 // instrument (CONTEXT.md), and the census only takes the recorded case ids as an
 // argument so it can report which cases the instrument does not reach.
 
-import { createHash, } from "node:crypto";
+import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -210,9 +210,12 @@ export function fixtureStamp(path) {
  * construction), but a skip nobody counts is a case that gates nothing and
  * reads as if it did.
  *
- * Omit `recorded` and the census says `recorded: null` — the honest answer for
- * the worker transport, which reaches every case and has no recordings to
- * report. That is a different fact from "none are recorded".
+ * Omit `recorded` and the census says `recorded: null` AND `gated: null` — the
+ * honest answer for the worker transport, which has no recordings to report.
+ * That is a different fact from "none are recorded", and a different fact from
+ * "all of them are gated": nothing here knows either way, and a census that
+ * answered 0 or `total` to a question it was not given the input for is the
+ * kind of number this module exists to stop.
  *
  * @param {object[]} cases
  * @param {{recorded?: string[]|null}} [opts]
@@ -244,7 +247,7 @@ export function censusOf(cases, { recorded = null } = {}) {
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([prefix, ids]) => ({ prefix, count: ids.length, ids })),
     recorded: known ? cases.filter((c) => known.has(c.id)).length : null,
-    gated: known ? cases.length - ungated.length : cases.length,
+    gated: known ? cases.length - ungated.length : null,
     ungated,
   };
 }
