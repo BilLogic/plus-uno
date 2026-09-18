@@ -354,26 +354,29 @@ export class ThreadState extends DurableObject<Env> {
     await this.storage.put(cancelKey(ref.channel, ref.thread), { at });
   }
 
-  /** Reads AND clears the flag — one /stop cancels one turn. A stale flag is
-   *  consumed too: leaving it set would abort the next question instead. */
-  async consumeCancel(ref: ThreadRef, at: number): Promise<boolean> {
+  /** Reads AND clears the flag — one press cancels one turn. A stale flag is
+   *  consumed too: leaving it set would abort the next question instead. So is
+   *  one raised before the reading turn began (`since`), which is the same
+   *  hazard arriving from the other direction — see the interface. */
+  async consumeCancel(ref: ThreadRef, at: number, since?: number): Promise<boolean> {
     const key = cancelKey(ref.channel, ref.thread);
     const rec = await this.storage.get<{ at: number }>(key);
     if (!rec) return false;
     await this.storage.delete(key);
+    if (since !== undefined && rec.at < since) return false;
     return at - rec.at < CANCEL_TTL_MS;
   }
 
   async cancelForUser(
     userId: string,
     at: number,
-  ): Promise<{ cancelled: boolean; channel?: string }> {
+  ): Promise<{ cancelled: boolean; channel?: string; thread?: string }> {
     const rec = await this.storage.get<{ channel: string; thread: string; at: number }>(
       activeRunKey(userId),
     );
     if (!rec || at - rec.at > CANCEL_TTL_MS) return { cancelled: false };
     await this.storage.put(cancelKey(rec.channel, rec.thread), { at });
-    return { cancelled: true, channel: rec.channel };
+    return { cancelled: true, channel: rec.channel, thread: rec.thread };
   }
 
   async setActiveRun(userId: string, ref: ThreadRef, at: number): Promise<void> {

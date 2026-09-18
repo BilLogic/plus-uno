@@ -223,13 +223,14 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       cancels.set(threadKey(ref), { at: now() });
     },
 
-    async consumeCancel(ref) {
+    async consumeCancel(ref, since) {
       const key = threadKey(ref);
       const rec = cancels.get(key);
       if (!rec) return false;
-      // Consumed whether or not it was fresh: a stale flag must not survive to
-      // abort the next question either.
+      // Consumed whether or not it counts: neither a stale flag nor one raised
+      // before this turn began may survive to abort the next question.
       cancels.delete(key);
+      if (since !== undefined && rec.at < since) return false;
       return now() - rec.at < CANCEL_TTL_MS;
     },
 
@@ -237,7 +238,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       const rec = activeRuns.get(userId);
       if (!rec || now() - rec.at > CANCEL_TTL_MS) return { cancelled: false };
       cancels.set(threadKey(rec), { at: now() });
-      return { cancelled: true, channel: rec.channel };
+      return { cancelled: true, channel: rec.channel, thread: rec.thread };
     },
 
     async setActiveRun(userId, ref) {

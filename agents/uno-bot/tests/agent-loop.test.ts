@@ -279,6 +279,54 @@ test("a stop landing during the synthesis pass suppresses what it synthesised", 
   );
 });
 
+test("a stop landing before a proposal is staged takes the card away too", async () => {
+  // A card is delivery, not execution: nothing in a staged batch has run, so
+  // dropping it takes nothing back — and a fresh card arriving under the stop
+  // line is what the incident looked like from the thread (#589).
+  const store = createInMemoryThreadState();
+  const rec = recorder();
+  rec.deps.threadState = store;
+  const scripted = fake({
+    replies: [{ text: "staging this", toolCalls: [{ name: "notion_create", args: { title: "A page" } }] }],
+  });
+  const pressedWhileStaging: LoopInput["provider"] = {
+    ...scripted,
+    async send(opts) {
+      const reply = await scripted.send(opts);
+      await store.requestCancel(CANCEL_REF);
+      return reply;
+    },
+  };
+
+  const result = await runLoop(loopInput(pressedWhileStaging, rec, { cancelKey: CANCEL_REF }));
+
+  assert.deepEqual(result, { kind: "stopped" });
+  // And nothing was executed on the way — the batch was never run, only staged
+  // and then dropped, so a stop is still not an undo.
+  assert.deepEqual(rec.executed, []);
+});
+
+test("a stop flag raised before this turn began does not stop it", async () => {
+  // The leftover-flag hazard (#589). Slack's in-thread control raises BOTH of a
+  // DM's conversation keys because it cannot tell which holds the run; the turn
+  // consumes one and the other stands for five minutes. Unscoped, it would
+  // silently swallow the answer to the NEXT, unrelated question on that key —
+  // silently, because a stopped turn posts nothing.
+  const store = createInMemoryThreadState();
+  await store.requestCancel(CANCEL_REF);
+  const rec = recorder();
+  rec.deps.threadState = store;
+  const provider = fake({ replies: [{ text: "the answer the leftover would have eaten" }] });
+
+  const result = await runLoop(
+    loopInput(provider, rec, { cancelKey: CANCEL_REF, cancelSince: Date.now() + 1 }),
+  );
+
+  assert.deepEqual(result, { kind: "text", text: "the answer the leftover would have eaten" });
+  // Consumed anyway, so it cannot claim the turn after this one either.
+  assert.equal(await store.consumeCancel(CANCEL_REF), false);
+});
+
 test("a turn with no conversation to cancel never reads the /stop flag", async () => {
   // The headless eval path has no Slack conversation, so there is no key to
   // read — and reading one anyway is how the writer and the reader drifted.

@@ -29,7 +29,7 @@ import { conversationsOpen, deleteMessage, postMessage } from "./api";
 import { resolveSignal } from "../gate/index";
 import { executeVerdict } from "../agent/resolve-proposal";
 import { proposalCardBlocks } from "./proposal-render";
-import { NOTHING_UNDONE, STOPPING_PROMISE } from "./session-stop";
+import { NOTHING_UNDONE, STOPPING_PROMISE, inThreadStopLine, threadArg } from "./session-stop";
 import { slackDelivery } from "./slack-delivery";
 import { withWorkingSignal } from "../turn/index";
 
@@ -221,11 +221,38 @@ async function stopRun(env: Env, payload: InteractionPayload): Promise<void> {
   // message this button already has to be able to send.
   const result = await threadStateFor(env)
     .cancelForUser(userId)
-    .catch(() => ({ cancelled: false, channel: undefined }));
+    .catch(() => ({ cancelled: false, channel: undefined, thread: undefined }));
   console.log(`[stop] home-tab from ${userId} cancelled=${result.cancelled} channel=${result.channel ?? "-"}`);
 
+  // The RUN'S OWN THREAD first, because that is where the answer was due and
+  // where the person who ASKED is looking — who, on a channel run, need not be
+  // the person who pressed. The loop used to post a stop line there and is
+  // silent now (#589), so this door owes it; the DM below stays as the
+  // presser's own receipt, and is the only message when nothing was running.
+  if (result.cancelled && result.channel && result.thread) {
+    const posted = await postMessage(env, {
+      channel: result.channel,
+      ...threadArg(result.thread),
+      text: inThreadStopLine(userId),
+    }).catch((err: unknown) => {
+      // Logged rather than swallowed: with the loop silent, a failed post is a
+      // press with no visible trace at all, and this is the only place it can
+      // be counted from.
+      console.error(`[stop] in-thread line failed for ${userId}: ${String(err)}`);
+      return null;
+    });
+    if (posted && posted.ok === false) {
+      console.error(`[stop] in-thread line refused for ${userId}: ${posted.error}`);
+    }
+  }
+
   const dm = await conversationsOpen(env, userId).catch(() => null);
-  if (!dm) return;
+  if (!dm) {
+    // The flag is already raised, so the turn will stop either way. Worth a
+    // line: the press was honoured and this receipt was not delivered.
+    console.error(`[stop] home-tab receipt undeliverable for ${userId}: no DM channel`);
+    return;
+  }
   await postMessage(env, {
     channel: dm,
     // Both outcomes are worth saying. "Nothing running" is the more common
@@ -236,7 +263,9 @@ async function stopRun(env: Env, payload: InteractionPayload): Promise<void> {
     text: result.cancelled
       ? `${STOPPING_PROMISE} ${NOTHING_UNDONE}`
       : "Nothing of mine is running right now, so there was nothing to stop. (If you asked me something in the last few minutes and it's still going, ask again here and I'll look.)",
-  }).catch(() => {});
+  }).catch((err: unknown) => {
+    console.error(`[stop] home-tab receipt failed for ${userId}: ${String(err)}`);
+  });
 }
 
 // The `icon_button` delete on an answer footer (native-feedback mode).

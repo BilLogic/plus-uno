@@ -248,6 +248,9 @@ export interface TurnAgentRequest {
   /** True when this turn is a correction — forces a fresh blueprint read and
    *  turns on the judge's correction gate. */
   correction: boolean;
+  /** When the turn began, so a stop flag raised before it cannot claim it. See
+   *  `agent/loop.ts` `cancelSince`. */
+  cancelSince?: number;
   onInterim(text: string): void;
   /** The same clarify-vs-act check Turn runs after the loop returns, with this
    *  thread's PRD already bound, so the loop can put a refusal to the model as
@@ -461,6 +464,13 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
 
 async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {
   const { delivery, threadState } = deps;
+
+  // When this turn began, which is what scopes a stop press to it. Taken HERE
+  // rather than in the loop: the gather between this line and the first model
+  // call does real work over real seconds, and a press during it is a real
+  // press. A flag older than this line belongs to a turn that has already
+  // ended (`agent/loop.ts` `stopPressed`, `thread-state/store.ts`).
+  const startedAt = deps.now?.() ?? Date.now();
   const ref: ThreadRef = { channel: request.channel, thread: request.conversationTs };
   const bodyText = request.attachmentsText ?? request.text;
   const modelBase = [bodyText, ...(request.visionNotes ?? [])].join("\n");
@@ -691,6 +701,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
       correction,
       preflight: preflightCall,
       onInterim: postInterim,
+      cancelSince: startedAt,
     });
   } catch (err) {
     console.error(`[agent] failed: ${err instanceof Error ? err.message : String(err)}`);
@@ -736,18 +747,13 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
 
   // ── A stop, pressed before the answer was delivered ────────────────────────
   //
-  // The one exit that posts NOTHING AT ALL. The door that took the press has
-  // confirmed it — and on Slack's in-thread control, which is the door #589 was
-  // filed on, confirmed it right here in the thread naming who pressed
-  // (`slack/session-stop.ts`). A line from here would be the second stop
-  // message for one press, which with the answer arriving under it is that
-  // exact failure.
-  //
-  // The other two doors confirm to the presser alone — `/stop` by ephemeral,
-  // the Home-tab button by DM — so a run they stop leaves this thread with no
-  // line at all. Recorded, not solved: putting the line in the thread belongs
-  // in those doors, where it can name the presser, rather than here, where it
-  // would double the one door that already does it.
+  // The one exit that posts NOTHING AT ALL. Whichever door took the press has
+  // already put the line in THIS thread, naming who pressed — Slack's
+  // in-thread control directly (`slack/session-stop.ts`), `/stop` and the
+  // Home-tab button off the conversation `cancelForUser` reports
+  // (`slack/commands.ts`, `slack/interactive.ts`). A line from here would be
+  // the second stop message for one press, which with the answer arriving
+  // under it is the failure #589 was filed on.
   //
   // The progress surface still closes, and it closes COMPLETE rather than
   // error: the turn ended the way it was asked to. The exchange is remembered

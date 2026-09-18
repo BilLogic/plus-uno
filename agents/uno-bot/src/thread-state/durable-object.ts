@@ -134,11 +134,13 @@ export function createDurableObjectThreadState(
       return hop().requestCancel(ref, now());
     },
 
-    consumeCancel(ref: ThreadRef): Promise<boolean> {
-      return hop().consumeCancel(ref, now());
+    consumeCancel(ref: ThreadRef, since?: number): Promise<boolean> {
+      return hop().consumeCancel(ref, now(), since);
     },
 
-    cancelForUser(userId: string): Promise<{ cancelled: boolean; channel?: string }> {
+    cancelForUser(
+      userId: string,
+    ): Promise<{ cancelled: boolean; channel?: string; thread?: string }> {
       return hop().cancelForUser(userId, now());
     },
 

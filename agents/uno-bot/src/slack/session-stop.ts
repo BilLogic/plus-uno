@@ -181,7 +181,14 @@ async function cardLiveInThread(state: ThreadState, signal: StopSignal): Promise
  * WHICH IS ALSO WHY THE LINE BELOW IS THE ONLY ONE THE THREAD GETS. The turn
  * it stops posts nothing of its own (`agent/loop.ts` returns `stopped`,
  * `turn/turn.ts` delivers no answer for it), so one press earns one stop
- * message.
+ * message. The other two doors post the same line into the run's thread for the
+ * same reason — see `inThreadStopLine`.
+ *
+ * AND WHY THE DOUBLE WRITE NO LONGER OUTLIVES THE TURN. Raising both DM keys
+ * leaves one standing for `CANCEL_TTL_MS`, which once the loop reads from
+ * iteration 0 would silently swallow a LATER, unrelated question's answer. The
+ * consume is scoped to the reading turn's start, so a flag older than the turn
+ * reports false and is cleared (`thread-state/store.ts` `consumeCancel`).
  */
 async function raiseCancel(state: ThreadState, signal: StopSignal): Promise<void> {
   for (const thread of conversationKeys(signal)) {
@@ -212,10 +219,40 @@ async function raiseCancel(state: ThreadState, signal: StopSignal): Promise<void
  * thread rather than only in the status.
  */
 function stopText(userId: string, cardLive: boolean): string {
-  const base = `:octagonal_sign: <@${userId}> pressed stop. ${STOPPING_PROMISE} ${NOTHING_UNDONE}`;
+  const base = inThreadStopLine(userId);
   return cardLive
     ? `${base} The card above is still waiting on a :white_check_mark: or :no_entry:.`
     : base;
+}
+
+/**
+ * The line a stopped run's own thread gets, shared with the other two doors.
+ *
+ * All three doors put this in the run's thread, and it has to be the same
+ * sentence from each: the thread is where the answer was due, and it is the one
+ * place the ASKER is looking — who in a channel need not be the person who
+ * pressed, which is why the line names the presser. Before #589 the loop posted
+ * a stop line here; the loop is silent now, so the doors owe it.
+ *
+ * WITHOUT THE CARD CLAUSE that `stopText` adds. Only this door can say it for
+ * free: it already reads the live card to compute the status it must settle, so
+ * the other two would be buying a Durable Object hop inside a three-second ack
+ * to add a sentence about a card the person can see above them anyway.
+ */
+export function inThreadStopLine(userId: string): string {
+  return `:octagonal_sign: <@${userId}> pressed stop. ${STOPPING_PROMISE} ${NOTHING_UNDONE}`;
+}
+
+/**
+ * The `thread_ts` to post a stop line with, for a conversation key.
+ *
+ * A conversation key is NOT always a timestamp: every loose DM line resolves to
+ * the constant `"dm"` (`events.ts`), and posting that as a `thread_ts` is a
+ * Slack error rather than a thread. An unthreaded DM wants a top-level message
+ * in that DM, which is exactly what omitting the argument gives.
+ */
+export function threadArg(thread: string): { thread_ts?: string } {
+  return thread.includes(".") ? { thread_ts: thread } : {};
 }
 
 /**

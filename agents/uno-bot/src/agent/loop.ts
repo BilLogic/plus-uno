@@ -85,15 +85,15 @@ export type AgentResult =
    * so a line from here would be the second stop message for one press (#589).
    * What the loop reports is the fact; what the person reads was already said.
    *
-   * WHERE each door says it differs, and only one of the three says it in the
-   * run's own thread: Slack's in-thread control posts there and names the
-   * presser (`slack/session-stop.ts`), `/stop` answers the presser with an
-   * ephemeral in the channel it was typed in (`slack/commands.ts`), and the
-   * Home-tab button DMs the presser (`slack/interactive.ts`). So on the latter
-   * two a stopped channel run leaves the THREAD silent — the press is
-   * confirmed to whoever pressed it and to nobody else. That is a gap in the
-   * doors, not a reason for this variant to carry text: a line from the loop
-   * would be a second message on the one door that already speaks there.
+   * ALL THREE SAY IT IN THE RUN'S OWN THREAD, which is what makes silence here
+   * correct rather than merely quiet. Slack's in-thread control posts there
+   * directly (`slack/session-stop.ts`); `/stop` and the Home-tab button each
+   * post there too, off the conversation `cancelForUser` reports, and keep
+   * their ephemeral and their DM as the presser's private receipt
+   * (`slack/commands.ts`, `slack/interactive.ts`). One shared sentence, naming
+   * the presser, because on a channel run the person who asked and the person
+   * who pressed are two people and it is the ASKER who is watching that thread
+   * for an answer.
    */
   | { kind: "stopped" }
   | {
@@ -163,7 +163,7 @@ export interface LoopDeps {
    * else. Production passes `threadStateFor(env)`, which satisfies this
    * structurally — see `run-agent.ts`.
    */
-  threadState: { consumeCancel(ref: ThreadRef): Promise<boolean> };
+  threadState: { consumeCancel(ref: ThreadRef, since?: number): Promise<boolean> };
   budget: LoopBudget;
   /**
    * Clarify-vs-act, asked BEFORE a side-effect call is staged: what does this
@@ -206,6 +206,16 @@ export interface LoopInput {
    * and no expression here could know that. See `slack.conversationTs`.
    */
   cancelKey: ThreadRef | null;
+
+  /**
+   * When this turn began, so a stop flag raised before it cannot claim it.
+   *
+   * Anchored at the START of the turn rather than here, because the gather that
+   * runs before the loop takes real time and a press during it is a real press
+   * (`turn/turn.ts` passes its own clock through `run-agent.ts`). Omitted, every
+   * flag counts, which is the old behaviour and what the eval path wants.
+   */
+  cancelSince?: number;
 
   onInterim?: (text: string) => void;
   onDials?: (dials: TurnDials) => void;
@@ -349,15 +359,16 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
    * reply with nothing stageable leaves behind, and the budget-exhausted
    * synthesis pass.
    *
-   * TWO EXITS DELIBERATELY DO NOT, and they are worth naming so that the next
-   * reader tidying "every delivering exit" does not add a read to either.
-   * `proposal_resolve` is the person's own ✅ or 🚫 being carried out: dropping
-   * it would leave a decision they already made unacted, and for a confirm it
-   * would contradict the promise that a stop is not an undo. A staged proposal
-   * CARD is the other, and it is a live question rather than a settled one —
-   * whether a press should take the card away as well as the answer is a
-   * product call that #589 did not make, so it is left as it was and raised
-   * rather than decided here.
+   * A STAGED CARD COUNTS AS DELIVERY, and reads the flag too. Nothing in a
+   * staged batch has run — it is waiting on a ✅ — so dropping it takes nothing
+   * back, and a card arriving under the stop line is what the incident looked
+   * like from the thread.
+   *
+   * ONE EXIT DELIBERATELY DOES NOT, worth naming so that the next reader
+   * tidying "every delivering exit" does not add a read to it. `proposal_resolve`
+   * is the person's own ✅ or 🚫 being carried out: dropping it would leave a
+   * decision they already made unacted, and for a confirm it would contradict
+   * the promise that a stop is not an undo.
    *
    * WHAT THE READS COST, since the rule they replace made its own cost
    * argument. Each read is one Durable Object hop, and a hop is an INTERNAL
@@ -373,13 +384,25 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
    * first read that sees it, leaving nothing for the next turn in the thread to
    * stop itself on.
    *
+   * AND SCOPED TO THIS TURN, which is what stops a flag consuming the WRONG
+   * one. Slack's in-thread control cannot tell which of a DM's two conversation
+   * keys holds the run, so it raises the flag on both (`slack/session-stop.ts`
+   * `conversationKeys`); the running turn takes one and the other stands for
+   * the five minutes of `CANCEL_TTL_MS`. Once the loop reads from iteration 0
+   * and a stopped turn posts nothing, that leftover is a later, unrelated
+   * question silently going unanswered — so `cancelSince` makes a flag raised
+   * before this turn began report false. It is still CLEARED: a stale flag must
+   * not survive to claim the turn after this one either.
+   *
    * Best-effort, as it has always been: a failed read lets the turn continue,
    * which is the same annoyance as a press that missed and never worth failing
    * a turn over.
    */
   const stopPressed = async (): Promise<boolean> => {
     if (!input.cancelKey) return false;
-    return deps.threadState.consumeCancel(input.cancelKey).catch(() => false);
+    return deps.threadState
+      .consumeCancel(input.cancelKey, input.cancelSince)
+      .catch(() => false);
   };
 
   const emitInterim = makeInterimFilter(input.onInterim);
@@ -549,6 +572,15 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
           return finish({ kind: "stopped" });
         }
         return finish({ kind: "text", text: preview || CLARIFY_FALLBACK });
+      }
+      // A CARD IS DELIVERY TOO, so it reads the flag like the answers above.
+      // Nothing here has been executed — the batch is staged, waiting on a ✅ —
+      // so suppressing it takes nothing back and is not an undo. What it spares
+      // the person is the thing the incident actually looked like: a fresh card
+      // arriving under the line that had just told them work would stop.
+      if (await stopPressed()) {
+        console.log(`[stop] stopped at iteration ${iter}, proposal unstaged`);
+        return finish({ kind: "stopped" });
       }
       return finish({
         kind: "proposal",
