@@ -175,7 +175,15 @@ and commit:
 npm run generate:agent
 npm run generate:index
 npm --prefix agents/uno-bot run bundle:harness
+npm --prefix agents/uno-bot run evals:docs
 ```
+
+The last one writes the three documents that state facts about the uno-bot eval
+suite — `docs/evals/scenarios/uno-bot.md` in full, and the census blocks in
+`docs/evals/README.md` and `docs/evals/fixtures/recordings/README.md` — from the
+fixture and the recordings. `test:bundle` fails when what is committed is not
+what the fixture says, which is how a count in prose stops drifting from a count
+in a file.
 
 ## The Worker's own checks
 

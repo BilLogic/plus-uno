@@ -12,8 +12,8 @@
 //      that edit fail here instead.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 
+import { loadCases } from "./eval-case.mjs";
 import { applySubject } from "./eval-subjects.mjs";
 import {
   RECORDINGS_DIR,
@@ -24,8 +24,7 @@ import {
   turnIndexOf,
 } from "./eval-transport-local.mjs";
 
-const FIXTURE = new URL("../../../docs/evals/fixtures/uno-bot-cases.json", import.meta.url);
-const cases = JSON.parse(readFileSync(FIXTURE, "utf8")).cases;
+const { cases } = loadCases();
 const caseById = (id) => cases.find((c) => c.id === id);
 
 const MINIMAL = {

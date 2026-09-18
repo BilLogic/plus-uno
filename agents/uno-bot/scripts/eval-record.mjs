@@ -49,11 +49,11 @@
 // what lets the local transport replay the case against the same one.
 
 import { mkdirSync, writeFileSync } from "node:fs";
-import { readFileSync } from "node:fs";
 import { argv, exit } from "node:process";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { loadCases } from "./eval-case.mjs";
 import { workerTransport } from "./eval-transport.mjs";
 import { threadTurn } from "./eval-history.mjs";
 import { applySubject, skipReason } from "./eval-subjects.mjs";
@@ -224,7 +224,7 @@ async function main() {
     console.error("missing env DEBUG_TOKEN");
     exit(2);
   }
-  const fixture = JSON.parse(readFileSync(CASES_PATH, "utf8"));
+  const fixture = loadCases(CASES_PATH);
   const wanted = opts.all
     ? fixture.cases
     : fixture.cases.filter((c) => opts.cases.includes(c.id));

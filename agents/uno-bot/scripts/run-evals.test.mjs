@@ -13,15 +13,15 @@
 // hand-written case would test the runner against a shape nothing runs.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { loadCases } from "./eval-case.mjs";
 import { runEvals, parseArgs } from "./run-evals.mjs";
 import { workerTransport } from "./eval-transport.mjs";
 import { localTransport } from "./eval-transport-local.mjs";
 
-const FIXTURE = new URL("../../../docs/evals/fixtures/uno-bot-cases.json", import.meta.url);
-const ALL = JSON.parse(readFileSync(FIXTURE, "utf8"));
+const ALL = loadCases();
 const caseById = (id) => {
   const c = ALL.cases.find((x) => x.id === id);
   assert.ok(c, `fixture has no case ${id}`);
@@ -312,10 +312,12 @@ test("a fixture case scores identically through the local transport and a Worker
   assert.match(fromWorker.summary.transport, /^worker /);
 });
 
-test("an unrecorded case skips, counted apart, and never fails a blocker", async () => {
+test("an unrecorded case is reported UNGATED, counted apart, and never fails a blocker", async () => {
   // Every fixture case is recorded now, so the unrecorded one is R1 under an
   // id nothing recorded. A red blocker for "no recording" would be a gate that
-  // is red by construction; a green one would be a lie.
+  // is red by construction; a green one would be a lie. What the case must not
+  // be is INVISIBLE: a blocker nothing measured is the thing a reader of this
+  // summary most needs told, and `skipped: 1` does not tell them.
   const local = localTransport({ log: () => {} });
   const { summary, lines } = await run(fixtureOf([{ ...caseById("R1"), id: "R0" }]), local);
   assert.equal(summary.skipped, 1);
@@ -323,7 +325,25 @@ test("an unrecorded case skips, counted apart, and never fails a blocker", async
   assert.equal(summary.failed, 0);
   assert.equal(summary.blockerFailures, 0);
   assert.match(summary.results[0].reason, /no recording for R0/);
-  assert.ok(lines.some((l) => l.startsWith("[SKIP] R0")));
+  assert.equal(summary.results[0].ungated, true);
+  assert.deepEqual(summary.ungated, ["R0"]);
+  assert.deepEqual(summary.census.ungated, ["R0"]);
+  assert.equal(summary.census.total, 1);
+  assert.ok(lines.some((l) => l.startsWith("[UNGATED] R0")));
+  assert.ok(lines.some((l) => /UNGATED \(no recording\): R0/.test(l)));
+});
+
+test("a run states its census before it starts", async () => {
+  // The count a reader needs is the suite's, not the summary line's: 1/1 passed
+  // means something different when the fixture holds 34.
+  const c = caseById("R3");
+  const { summary, lines } = await run(fixtureOf([c]), fakeTransport([R3_OK]));
+  assert.equal(summary.census.total, 1);
+  assert.equal(summary.census.blockers, 1);
+  // A transport with no recordings to report says so: every case is gated.
+  assert.equal(summary.census.recorded, null);
+  assert.deepEqual(summary.ungated, []);
+  assert.ok(lines.some((l) => l.startsWith("[evals] 1 cases, 1 blockers")));
 });
 
 // ── The CLI's default is the Worker, so the cron is unchanged ────────────────
