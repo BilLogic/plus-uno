@@ -21,6 +21,13 @@
  * is removed after each case — which is also the only way to test the absent
  * record, the one case a tracked fixture cannot carry.
  *
+ * ONE CASE PER RECORD, NOT PER SET: its ENCODING. Everything else here is a
+ * property of a declared set, but the bytes are a property of the file, and a
+ * record the writer cannot reproduce has a no-movement `--update` that churns
+ * lines nobody moved (#644). The no-movement write is asserted on BYTES for the
+ * same reason — a `deepEqual` over two `JSON.parse` results was green over
+ * exactly that defect for two tickets running.
+ *
  * RUNNER-AGNOSTIC, for the same reason the ThreadState suite is: it is handed
  * its `test` rather than importing one.
  */
@@ -161,10 +168,46 @@ function unowned(record, set) {
  */
 export function runRatchetConformance(runner, { repoRoot = REPO_ROOT } = {}) {
   for (const shape of SHAPES) {
+    runRecordEncoding(runner, shape, repoRoot);
     for (const declared of shape.sets) {
       runSetConformance(runner, shape, declared, repoRoot);
     }
   }
+}
+
+/**
+ * The record on disk is encoded the way `update` writes it — asserted per
+ * RECORD rather than per set, because an encoding is a property of the file and
+ * a record with six sets has one.
+ *
+ * WHY THIS IS A CASE AND NOT A CONVENTION. A baseline is hand-edited as often
+ * as it is written: the count comes from `--update`, the reason beside it comes
+ * from a person, and a person's editor is under no obligation to agree with
+ * `JSON.stringify`. Where it does not, the next `--update` rewrites lines
+ * nobody touched, the diff stops being readable, and the reviewer reverts the
+ * write instead of reading it — which is precisely what happened to
+ * `text-contrast-baseline.json` (17 lines) and `atlassian-benchmark.json` (2)
+ * through #599 and #601 before #644 re-encoded both. The ratchet's whole claim
+ * is that a baseline diff is the movement it recorded; a record the writer
+ * cannot reproduce falsifies that claim before any movement happens.
+ *
+ * It holds for the four HAND-MAINTAINED records too. They have no `--update`
+ * today, so nothing would churn — but they are the ones edited only by hand,
+ * which is the way the drift gets in, and a record that gains a `--update`
+ * later should not have to be re-encoded on the same commit.
+ */
+function runRecordEncoding(runner, shape, repoRoot) {
+  runner.test(`[${path.basename(shape.file)}] is encoded the way \`update\` writes it`, () => {
+    const text = fs.readFileSync(path.join(repoRoot, shape.file), 'utf8');
+    assert.equal(
+      text,
+      `${JSON.stringify(JSON.parse(text), null, 2)}\n`,
+      `${shape.file} is not in the shape \`update\` emits, so the next ` +
+        `${shape.command ?? 'write'} will churn lines nobody moved. Re-encode it once: read it ` +
+        'with JSON.parse, write it back with JSON.stringify(record, null, 2) and a trailing ' +
+        'newline, and keep non-ASCII characters literal — \\uXXXX escapes are the usual culprit.',
+    );
+  });
 }
 
 /** One record, one of its sets. Exported so a migrating check can drive one. */
@@ -337,10 +380,27 @@ export function runSetConformance(runner, shape, declared, repoRoot = REPO_ROOT)
 
   // ── `--update` IS A MERGE ─────────────────────────────────────────────────
 
-  test('--update over what is already recorded changes nothing', () => {
+  /*
+   * BYTES, not parsed values. `deepEqual` on two `JSON.parse` results is what
+   * this case asserted until #644, and it is green over a record whose ENCODING
+   * the writer does not reproduce: `text-contrast-baseline.json` kept its
+   * em-dashes as `\u2014`, which `JSON.stringify` does not emit, so a
+   * no-movement `--update` churned 17 lines and every parsed comparison passed
+   * anyway. #599 and #601 each met that diff and reverted the write rather than
+   * land the re-encoding, which is how a record stays un-writable for two
+   * tickets running. A no-movement write is a no-op on the FILE or it is not a
+   * no-op.
+   */
+  test('--update over what is already recorded changes not one byte', () => {
     inScratch((root, file) => {
+      const before = fs.readFileSync(file, 'utf8');
       open(root).update(found());
-      assert.deepEqual(written(file), live, 'a no-movement write is a no-op on the whole record');
+      assert.equal(
+        fs.readFileSync(file, 'utf8'),
+        before,
+        'a no-movement write is a no-op on the whole record, encoding included',
+      );
+      assert.deepEqual(written(file), live, 'and its values are the ones it was opened on');
     });
   });
 

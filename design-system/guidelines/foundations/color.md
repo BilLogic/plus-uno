@@ -17,6 +17,19 @@ Each color role has multiple variants:
 - `--color-{role}-container` - Container/background version
 - `--color-{role}-state-08/12/16` - State layers for hover/active states
 
+**`-state-NN` names an overlay; it does not derive one.** The suffix reads as
+"`--color-{role}` at 8/12/16%", and for 84 of the 117 overlays that is what it
+is. For 33 of them — eleven bases × three steps — it is not: thirty are washed
+from a different colour than the role they name, and three — the shadow steps —
+name a role that has no token at all and are simply black. `--color-primary` is
+`#0472a8` and `--color-primary-state-08` is 8% of `#00658e`: the solid was
+re-picked in Figma without the wash following. Do not compute an overlay from
+its base, and do not assume a `-state-NN` token and its role share channels.
+The eleven bases are named in
+`design-system/tests/tokens-node.test.js`, which fails on a twelfth and on a
+base that gets re-mixed to agree; whether the solid or the wash is the intended
+colour is a visible design change and belongs to #268.
+
 ## Accent Colors
 
 | Role | Main Token | Text Token | Usage |
