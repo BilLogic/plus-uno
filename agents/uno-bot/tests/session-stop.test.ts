@@ -57,7 +57,7 @@ import {
   type CancelledRun,
   type StopDoorTarget,
 } from "../src/slack/stop-doors";
-import type { SessionStatus } from "../src/slack/working-signal";
+import type { SessionStatus } from "../src/slack/session-status";
 import {
   recordingDelivery,
   type RecordingDelivery,

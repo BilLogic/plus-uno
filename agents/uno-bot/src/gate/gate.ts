@@ -23,8 +23,10 @@
 // the claim runs twice, which matters because `notion_create` is not
 // idempotent.
 //
-// PURE by design: no `Env`, no Workers global, no fetch, so
-// `tsconfig.test.json` compiles it.
+// PURE by design: no `Env`, no Workers global, no fetch — which is what lets the
+// Node suite DRIVE it rather than read it. (Not a compile property: the test
+// compile is a glob over `src/**` and types the Workers globals beside the Node
+// ones, so it would compile this file either way — `tsconfig.test.json`.)
 
 import { mapReaction, typedEmojiDecision, type Decision } from "../slack/gate-reactions";
 import { proposalOperations } from "../thread-state/index";

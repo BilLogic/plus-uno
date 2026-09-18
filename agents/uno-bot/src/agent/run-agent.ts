@@ -45,6 +45,7 @@ import type { AgentImage, ProviderConversationTurn } from "./provider-conversati
 import { buildProviderConversation } from "./provider-conversation";
 import { buildSystemBlocks } from "./skills";
 import { routeRequest } from "./routing";
+import { turnSurfaceOf } from "../turn/request";
 import { threadStateFor } from "../thread-state/production";
 import {
   isSubrequestBudgetError,
@@ -203,7 +204,10 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   // know that. The fallback keeps the old behaviour for any caller that has not
   // supplied it. One mechanism, read in one place, whichever adapter answers.
   const cancelThread =
-    slack?.conversationTs ?? (slack?.channel?.startsWith("D") ? "dm" : (slack?.threadTs ?? "dm"));
+    slack?.conversationTs ??
+    (slack?.channel && turnSurfaceOf(slack.channel) === "assistant"
+      ? "dm"
+      : (slack?.threadTs ?? "dm"));
 
   return runLoop({
     provider: selectProvider(env),
@@ -267,7 +271,7 @@ export function selectProvider(env: Env): ModelProvider {
 // ── Correction / pushback vocabulary ────────────────────────────────────────
 //
 // It lives in `agent/correction.ts`, import-free, because the module that ACTS
-// on it is Turn (`turn/turn.ts`) — which `tsconfig.test.json` compiles, and
+// on it is Turn (`turn/turn.ts`) — which a Node test can drive, and
 // this entry, which reaches every tool body, it cannot. Re-exported here
 // because this is the agent's one public surface, and `isCorrectionTurn` below
 // is the scope's own read of the same fact.

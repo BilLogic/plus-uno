@@ -464,8 +464,8 @@ describe("the gate's emoji are off-limits to the bot", () => {
 // Turn owns, on the same `withWorkingSignal` pairing.
 //
 // This suite used to READ the door's source and match a regex for that, because
-// the door named `Env` and this compile types only Node. It takes its
-// dependencies by name now — the Delivery port, ThreadState, the thread-root
+// a door whose one argument was an `Env` was a door this suite had nothing to
+// call. It takes its dependencies by name now — the Delivery port, ThreadState, the thread-root
 // read, the bot's own id, the confirmed tool — so the whole door runs here on
 // the recording adapter, and the orderings are asserted rather than
 // pattern-matched.
@@ -601,12 +601,14 @@ describe("the reaction door", () => {
 // ── the other door outside Turn ──────────────────────────────────────────────
 
 describe("the button door raises and settles the working signal", () => {
-  // The button door still names `Env` and the Slack client, so this suite's
-  // compile cannot reach it (`tsconfig.test.json` types only Node). Read it
-  // instead — the agreement being checked is one line long and the failure is
-  // silent: a door that stops wrapping its run still works, and still strands
-  // the indicator. Same move as the manifest check in `shortcuts.test.ts`, and
-  // it goes the moment that door takes its dependencies by name too.
+  // The button door still takes an `Env` and posts through the Slack client, so
+  // this suite can compile it and has nothing to call it with. Read it instead
+  // — the agreement being checked is one line long and the failure is silent: a
+  // door that stops wrapping its run still works, and still strands the
+  // indicator. Same move as the manifest check in `shortcuts.test.ts`, and it
+  // goes the moment that door takes its dependencies by name too, the way the
+  // reaction door (#592), the stop doors (#593) and the Delivery adapter (#594)
+  // did. It and `slack/delivery.ts` are the two left; #595 left both.
   const door = "src/slack/interactive.ts";
 
   it(`${door} runs its verdict inside the pairing`, () => {

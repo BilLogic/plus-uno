@@ -14,10 +14,15 @@
 // than a second constructor each, so a case that needs a refusal reads as one
 // word.
 
-import type { PlanTask, SlackDeliveryClient, SlackDeliveryDeps } from "../../src/slack/delivery-adapter";
+import type {
+  PlanTask,
+  SlackDeliveryClient,
+  SlackDeliveryDeps,
+  WorkingSignalOutcome,
+} from "../../src/slack/delivery-adapter";
 import type { FooterKind } from "../../src/slack/footer-kind";
 import type { DeliveryFailureStage } from "../../src/turn/index";
-import type { SessionStatus, StatusResult, WorkingSignalOutcome } from "../../src/slack/working-signal";
+import type { SessionStatus, StatusResult } from "../../src/slack/session-status";
 
 /** One thing the adapter asked Slack to do, in order. */
 export type SlackCall =

@@ -5,10 +5,11 @@
 // and the GitHub Action behind it, `/debug/blueprint-search` and
 // `/debug/blueprint-subject` are read by the retrieval evals, and monitoring
 // watches `/health` (which stays in the Worker entry as the uptime route). So
-// the table is declared apart from the probe bodies: a pure module the Node
-// test suite can read — the probe bodies name `Env`, which carries Workers
-// types the Node compile does not have — and the one place a path, a method or
-// an auth posture is written down.
+// the table is declared apart from the probe bodies: a module that imports
+// nothing, which the Node suite reads as the one place a path, a method or an
+// auth posture is written down. The probe bodies take an `Env` and make real
+// calls through it, so they are the half a test cannot drive — not the half a
+// test cannot compile (`tsconfig.test.json` globs `src/**`, #595).
 //
 // `auth` is a posture, not a flag. Everything under `/debug/*` triggers a live
 // billable call, a write, or carries response samples, so it answers only to

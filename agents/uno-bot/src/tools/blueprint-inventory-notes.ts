@@ -8,8 +8,10 @@
 // belong where the data is returned: `search_blueprint` already carries one
 // obligation per field in its `notes`, and these are two more, each emitted
 // only when the result it explains is in hand. A module with no `Env` and no
-// Workers globals, so tsconfig.test.json compiles it and the trigger
-// conditions are asserted rather than assumed.
+// Workers globals, so the trigger conditions are asserted by RUNNING them
+// rather than assumed — and, like `blueprint-search-notes.ts`, so that the
+// harness name sweep has a named subject to read instead of a string buried in
+// a tool body. (Not a compile reason: tsconfig.test.json globs `src/**`, #595.)
 
 /** A question after a detail class the blueprint has no structured field
  *  for. Such details appear only inside general cell evidence, and only

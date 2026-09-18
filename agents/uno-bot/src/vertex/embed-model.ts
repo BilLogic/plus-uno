@@ -1,11 +1,12 @@
 // WHICH embedding model a request uses — separated from the call that makes it.
 //
-// It lives in its own file for one reason: `embed.ts` reaches the Workers
-// runtime (fetch, the SA token exchange), so it cannot be compiled by the plain
-// Node test build. The CHOICE of model is pure, and it is the part with a bug
+// It lives in its own file for one reason: `embed.ts` DOES the call — fetch and
+// the SA token exchange — so nothing there can be exercised without standing up
+// a transport. The CHOICE of model is pure, and it is the part with a bug
 // available: the query must be declared to the database as the same model it
 // was embedded with, or the vector is scored against a space it does not belong
-// to. So it is testable on its own.
+// to. So it is driven on its own. (Compiling `embed.ts` was never the problem;
+// `tsconfig.test.json` globs `src/**` and types the Workers globals — #595.)
 
 /**
  * Only the credential fields the choice depends on, rather than the Worker's

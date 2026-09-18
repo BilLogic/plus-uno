@@ -22,7 +22,7 @@
 // lite model above its own (docs/plans/2026-08-07-006). The attribution rule
 // that pinning bought — a regression is the model or the level, never both —
 // is replaced by a rule about process: change one tier at a time.
-import type { ModelTier } from "./tiers";
+import type { ModelTier } from "./routing";
 
 export type ThinkingLevel = "minimal" | "low" | "medium" | "high";
 

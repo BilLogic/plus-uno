@@ -32,11 +32,14 @@
 // asserted in a Node test against the in-memory ThreadState and the recording
 // Delivery (`tests/session-stop.test.ts`).
 //
-// PURE by design: no `Env`, no Workers global, no fetch, so
-// `tsconfig.test.json` compiles it.
+// PURE by design: no `Env`, no Workers global, no fetch — which is what lets the
+// Node suite DRIVE it rather than read it. (Not a compile property: the test
+// compile is a glob over `src/**` and types the Workers globals beside the Node
+// ones, so it would compile this file either way — `tsconfig.test.json`.)
 
 import { proposalReplyThread, type ThreadRef, type ThreadState } from "../thread-state/index";
-import { settledStatus, type SessionStatus } from "./working-signal";
+import { settledStatus, type SessionStatus } from "./session-status";
+import { turnSurfaceOf } from "../turn/request";
 
 // ── The words the three doors share ─────────────────────────────────────────
 //
@@ -68,9 +71,14 @@ export const NOTHING_UNDONE = "Nothing already confirmed gets undone.";
 const DM_CONVERSATION = "dm";
 
 /** Assistant/agent DMs are IM channels. The surface decides both halves below:
- *  which conversation keys can hold the run, and which can hold the card. */
+ *  which conversation keys can hold the run, and which can hold the card.
+ *
+ *  Read from `turn/request.ts` § `turnSurfaceOf` rather than restated: the rule
+ *  had five copies of `channel.startsWith("D")` across the Worker and one
+ *  statement of itself, and a surface read one way when the request is built
+ *  and another way here is a bug nothing would catch (#595). */
 function isDm(channel: string): boolean {
-  return channel.startsWith("D");
+  return turnSurfaceOf(channel) === "assistant";
 }
 
 /** One press of Slack's stop control, in the terms the event delivers it. */
