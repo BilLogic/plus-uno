@@ -1522,7 +1522,7 @@ export async function archiveCard(env: Env, pageId: string): Promise<ArchivedCar
 // One page of 100 cards ≈ one subrequest, up to ROADMAP_MAX_PAGES — still far
 // cheaper than a chain of search calls on the free-tier 50-subrequest budget.
 // Title / card-number asks filter server-side, so they cost 1 page, not 5;
-// keep roadmap_query's share of READONLY_TOOL_BUDGET (agent/loop-policy.ts) in
+// keep roadmap_query's share of UNGATED_TOOL_BUDGET (agent/loop-policy.ts) in
 // step with this.
 
 export interface RoadmapCard {

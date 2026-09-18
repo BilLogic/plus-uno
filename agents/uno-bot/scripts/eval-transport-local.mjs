@@ -405,7 +405,7 @@ export function localTransport({
             const result = await loop.runLoop({
               provider,
               deps: {
-                async executeReadOnlyTool(name) {
+                async executeUngatedTool(name) {
                   executed.push(name);
                   const i = lookups.findIndex((r) => r.tool === name);
                   if (i === -1) return UNRECORDED_TOOL_RESULT;
