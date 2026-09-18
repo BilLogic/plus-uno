@@ -15,9 +15,12 @@
 //     fetchSubject?(need, case) -> Promise<{ subject | null, reason?, error?, build? }>,
 //   }
 //
-// `response` is the /debug/eval response shape the scoring reads — `ok`,
-// `result`, `dials`, `tools`, `references`, `gateAsk`, `build`, `ms`. A
-// transport that cannot answer a run-time subject omits `fetchSubject`, and the
+// `response` is the /debug/eval response shape the scoring reads. Its field
+// names are not listed here: they have one definition, `EVAL_RESPONSE_FIELDS`
+// in src/eval/turn-case.ts, which is the module that builds the envelope and
+// the one the parity test reads it off.
+//
+// A transport that cannot answer a run-time subject omits `fetchSubject`, and the
 // runner fails the cases that declare one by name rather than pretending the
 // board answered. The case travels beside the condition for a transport that
 // answers per case — this one asks the live board, so the row it gets back is

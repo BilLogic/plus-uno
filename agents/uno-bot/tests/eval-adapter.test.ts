@@ -27,7 +27,9 @@ import { runLoop, type AgentResult, type LoopBudget } from "../src/agent/loop";
 import { fakeProvider, type FakeProvider, type ScriptedReply } from "../src/agent/providers/fake";
 import { buildProviderConversation } from "../src/agent/provider-conversation";
 import {
+  CONDITIONAL_RESPONSE_FIELDS,
   EVAL_CHANNEL,
+  EVAL_RESPONSE_FIELDS,
   EVAL_USER,
   evalTurnRequest,
   evalTurnResponse,
@@ -368,23 +370,26 @@ test("the response keeps every field the eval runner names", async () => {
   const outcome = await runTurn(evalRequest({ prompt: TEXT }), h.deps);
   const body = evalTurnResponse(report(outcome, h));
 
-  for (const field of [
-    "ok",
-    "build",
-    "ms",
-    "result",
-    "dials",
-    "tools",
-    "references",
-    "gateAsk",
-    "narration",
-    "subrequests",
-    "subrequest_hosts",
-    "internal_subrequests",
-    "budget_trips",
-  ]) {
+  // The field names are READ, not restated (`EVAL_RESPONSE_FIELDS`, #617). A
+  // list copied into this file is a list that agrees with the envelope only
+  // until someone adds a field, which is the drift this test exists to catch.
+  const conditional: readonly string[] = CONDITIONAL_RESPONSE_FIELDS;
+  for (const field of EVAL_RESPONSE_FIELDS) {
+    if (conditional.includes(field)) continue;
     assert.ok(field in body, `response is missing '${field}'`);
   }
+  // A successful turn carries `result` and no `error` — the two conditional
+  // ones, in the state this turn is in.
+  assert.ok("result" in body);
+  assert.ok(!("error" in body));
+  // And the envelope carries NOTHING the list does not name: a field added to
+  // `evalTurnResponse` and to no reader's vocabulary is a field nothing knows
+  // it can read.
+  assert.deepEqual(
+    Object.keys(body).filter((k) => !(EVAL_RESPONSE_FIELDS as readonly string[]).includes(k)),
+    [],
+    "every field of the envelope must be named in EVAL_RESPONSE_FIELDS",
+  );
   assert.equal(body.ok, true);
   assert.equal(body.subrequests, 3);
   assert.equal(body.subrequest_hosts, "fake:3");
