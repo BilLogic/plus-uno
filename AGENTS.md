@@ -58,7 +58,7 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 
 ## The loading contract
 
-**Tier 1 — always loaded.** This file, and nothing else. Budget ≤20k chars: a tier that bloats defeats the tier.
+**Tier 1 — always loaded.** This file, and nothing else. Budget ≤20k chars: a tier that bloats defeats the tier. **A module's glossary row REPLACES rather than adds**: when a module takes over what another one did, its row absorbs that row instead of sitting beside it, so the glossary stays a vocabulary rather than a ledger of everything that has ever been built. The budget is what makes that a rule rather than a preference — a wave of tickets each adding a row spends it, and the honest answer is a shorter glossary, not a bigger tier.
 
 **Tier 3 — retrieved live, never cached.** Product truth from `uno-blueprint` (`writers/blueprint` / `search_blueprint`); design-system truth from `uno-storybook` (read the source and stories). Team conventions are *not* Tier 3 — they are canonical in-repo (ADR-017) and load as plain files.
 
