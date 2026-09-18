@@ -75,7 +75,7 @@ export function renderCensusBlock(census, { pointer = true } = {}) {
     `| turns · sample runs | ${census.turns} · ${census.samples} |`,
     `| cases picking a subject from the live board | ${census.withSubject} (${census.subjects.map((s) => `\`${s.need}\`×${s.count}`).join(", ")}) |`,
     `| recorded, so the pull-request gate reaches them | ${census.recorded ?? "not reported by this transport"} |`,
-    `| **ungated** — no recording, skipped by name, gating nothing | ${census.ungated.length ? `**${census.ungated.join(", ")}**` : "none"} |`,
+    `| **unreachable** — no recording, skipped by name, gating nothing | ${census.unreachable.length ? `**${census.unreachable.join(", ")}**` : "none"} |`,
     "",
     `Counted, not typed: \`${GENERATED_BY}\`, from the fixture and \`fixtures/recordings/\`.${pointer ? " The scenario-by-scenario census is `scenarios/uno-bot.md`." : ""}`,
   ].join("\n");
@@ -95,8 +95,8 @@ export function renderRecordedBlock(census, sources) {
     .map(([source, n]) => `${n} \`${source}\``)
     .join(", ");
   const head = `**${census.recorded} of ${census.total} fixture cases are recorded** — ${kinds || "none"}.`;
-  const tail = census.ungated.length
-    ? `The other ${census.ungated.length} are **ungated**: ${census.ungated.join(", ")}. Each skips by name on the pull-request gate, so nothing about it is measured there — record it (\`-f cases=<id>\` below) or accept that it gates nothing.`
+  const tail = census.unreachable.length
+    ? `The other ${census.unreachable.length} are **unreachable**: ${census.unreachable.join(", ")}. Each skips by name on the pull-request gate, so nothing about it is measured there — record it (\`-f cases=<id>\` below) or accept that it gates nothing.`
     : "No case skips for want of a recording, so the local run is the whole suite's turn behaviour against one afternoon's draw.";
   return `${head} ${tail}`;
 }
@@ -117,7 +117,7 @@ function renderCase(c, { recorded }) {
   const badges = [
     c.blocker ? "**blocker**" : "advisory",
     `${samplesOf(c)} sample${samplesOf(c) === 1 ? "" : "s"}`,
-    recorded === null ? null : recorded ? "recorded" : "**UNGATED — no recording**",
+    recorded === null ? null : recorded ? "recorded" : "**UNREACHABLE — no recording**",
   ].filter(Boolean);
   const lines = [`## ${c.id} — ${c.name}`, "", `_${badges.join(" · ")}_`, ""];
   if (c.subject?.need) {
@@ -150,7 +150,7 @@ function renderCase(c, { recorded }) {
 /** The whole document. */
 export function renderScenarios({ cases, proposed = [], census }) {
   const recordedKnown = census.recorded !== null;
-  const ungated = new Set(census.ungated);
+  const unreachable = new Set(census.unreachable);
   const head = [
     "---",
     "summary: uno-bot — regression scenarios",
@@ -176,14 +176,14 @@ export function renderScenarios({ cases, proposed = [], census }) {
     renderCensusBlock(census, { pointer: false }),
     "",
   ];
-  if (recordedKnown && ungated.size) {
+  if (recordedKnown && unreachable.size) {
     head.push(
-      `> **Ungated.** ${[...ungated].join(", ")} have no recording in \`docs/evals/fixtures/recordings/\`, so the pull-request gate skips them by name and measures nothing about them. Only the Monday \`--transport=worker\` cron reaches them.`,
+      `> **Unreachable.** ${[...unreachable].join(", ")} have no recording in \`docs/evals/fixtures/recordings/\`, so the pull-request gate skips them by name and measures nothing about them. Only the Monday \`--transport=worker\` cron reaches them.`,
       "",
     );
   }
   const body = cases.map((c) =>
-    renderCase(c, { recorded: recordedKnown ? !ungated.has(c.id) : null }),
+    renderCase(c, { recorded: recordedKnown ? !unreachable.has(c.id) : null }),
   );
   const tail = [];
   if (proposed.length) {

@@ -81,15 +81,15 @@ test("the census counts the fixture, and nothing counts it twice", () => {
   );
 });
 
-test("a case with no recording is UNGATED — named, not silently absent", () => {
+test("a case with no recording is UNREACHABLE — named, not silently absent", () => {
   const recorded = cases.slice(1).map((c) => c.id);
   const census = censusOf(cases, { recorded });
-  assert.deepEqual(census.ungated, [cases[0].id]);
+  assert.deepEqual(census.unreachable, [cases[0].id]);
   assert.equal(census.gated, cases.length - 1);
   // No recordings known at all is a different fact from none recorded AND a
   // different fact from all of them gated: the worker transport has no
   // recordings to report, so the census answers neither question with a number.
-  assert.deepEqual(censusOf(cases).ungated, []);
+  assert.deepEqual(censusOf(cases).unreachable, []);
   assert.equal(censusOf(cases).recorded, null);
   assert.equal(censusOf(cases).gated, null);
 });
@@ -97,7 +97,7 @@ test("a case with no recording is UNGATED — named, not silently absent", () =>
 test("adding a case is ONE edit — every derived count follows from the fixture", () => {
   // The whole point of the module. A new case is appended to the fixture and
   // nothing else is registered anywhere: the loader takes it, the census counts
-  // it, it is reported ungated until a recording exists, and the generated
+  // it, it is reported unreachable until a recording exists, and the generated
   // scenarios document names it. If this test ever needs a second edit to pass,
   // adding a case needs a second edit too.
   const added = {
@@ -114,7 +114,7 @@ test("adding a case is ONE edit — every derived count follows from the fixture
   const census = censusOf(grown, { recorded: cases.map((c) => c.id) });
   assert.equal(census.total, cases.length + 1);
   assert.equal(census.blockers, cases.filter((c) => c.blocker).length + 1);
-  assert.deepEqual(census.ungated, ["Z9"]);
+  assert.deepEqual(census.unreachable, ["Z9"]);
   const doc = renderScenarios({ cases: grown, proposed: [], census });
   assert.match(doc, /## Z9 — a case added by one edit/);
   assert.match(doc, /does one edit carry\?/);

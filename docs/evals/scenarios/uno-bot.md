@@ -26,7 +26,7 @@ twelve that did.
 | turns · sample runs | 40 · 100 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
 | recorded, so the pull-request gate reaches them | 34 |
-| **ungated** — no recording, skipped by name, gating nothing | none |
+| **unreachable** — no recording, skipped by name, gating nothing | none |
 
 Counted, not typed: `agents/uno-bot/scripts/eval-docs.mjs`, from the fixture and `fixtures/recordings/`.
 

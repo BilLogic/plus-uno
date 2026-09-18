@@ -53,7 +53,7 @@
 // a pull request can run the suite with no deployment, no debug token and no
 // model spend. It measures the turn against a fixed draw, not the model — and
 // only the cases that have a recording in docs/evals/fixtures/recordings/; the
-// rest are reported UNGATED by name, counted apart, never failed.
+// rest are reported UNREACHABLE by name, counted apart, never failed.
 //
 // WHAT A CASE IS — its declared shape, its one loader and the census of them —
 // is scripts/eval-case.mjs. Nothing here parses the fixture, and no count in
@@ -291,7 +291,7 @@ export async function runEvals({
   // from recordings reaches only the cases it has one for; the rest skip by
   // name, which is right — failing them would make a gate that is red by
   // construction — but a skip nobody counts is a case that gates nothing while
-  // reading as though it did. So they are counted and named here as UNGATED,
+  // reading as though it did. So they are counted and named here as UNREACHABLE,
   // and the count travels in the summary.
   const census = censusOf(fixture.cases, { recorded: transport.recordedCases ?? null });
   log(`[evals] ${describeCensus(census)}`);
@@ -385,13 +385,13 @@ export async function runEvals({
     // covers the recorded cases only, and failing the rest would mean a PR
     // gate that is red by construction — switched off within a week.
     //
-    // UNGATED is what the result is MARKED, and the word is the point: this
+    // UNREACHABLE is what the result is MARKED, and the word is the point: this
     // case was not measured, so whatever it asserts is not being enforced on
     // this run. `[SKIP]` on its own reads like a case that chose to sit out.
     const unsupported = transport.unsupported?.(rawCase) ?? null;
     if (unsupported) {
-      results.push(resultRow({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, skipped: true, ungated: true, reason: unsupported }));
-      log(`[UNGATED] ${rawCase.id} — ${rawCase.name} (${unsupported})`);
+      results.push(resultRow({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, skipped: true, unreachable: true, reason: unsupported }));
+      log(`[UNREACHABLE] ${rawCase.id} — ${rawCase.name} (${unsupported})`);
       continue;
     }
     // ── Run-time subject (#415) ───────────────────────────────────────────────
@@ -497,17 +497,17 @@ export async function runEvals({
     /** Which Worker answered — the other half of "measured against what". */
     workerBuild: firstBuild(results),
     // WHAT THE SUITE IS, counted rather than typed — and which of its cases
-    // this instrument said it could not reach. `ungated` is the number a reader
+    // this instrument said it could not reach. `unreachable` is the number a reader
     // needs to know how much of the suite a green run actually stands for.
     census,
-    // TWO HOMES FOR ONE WORD, DELIBERATELY. `census.ungated` above is the CLAIM:
+    // TWO HOMES FOR ONE WORD, DELIBERATELY. `census.unreachable` above is the CLAIM:
     // read from `transport.recordedCases` before the walk starts, which is what
     // lets the run say what it will not measure in its opening line. This one is
-    // the OUTCOME: the cases the walk actually marked `ungated` as it reached
+    // the OUTCOME: the cases the walk actually marked `unreachable` as it reached
     // them. They agree today, and the run whose instrument mis-states its own
     // reach is exactly the run where they would not — so folding them into one
     // field would delete the only evidence of the disagreement.
-    ungated: results.filter((r) => r.ungated).map((r) => r.id),
+    unreachable: results.filter((r) => r.unreachable).map((r) => r.id),
   });
 }
 
@@ -530,12 +530,12 @@ async function main() {
 
   const scored = summary.results.filter((r) => !r.skipped);
   writeResults(summary);
-  const skipped = summary.skipped - summary.ungated.length;
+  const skipped = summary.skipped - summary.unreachable.length;
   const notes = [
     skipped ? `${skipped} skipped` : null,
-    // Named, never just counted. "2 ungated" is a number; "2 ungated: D1, V1"
+    // Named, never just counted. "2 unreachable" is a number; "2 unreachable: D1, V1"
     // is the two assertions this run did not make.
-    summary.ungated.length ? `${summary.ungated.length} UNGATED (${summary.ungated.join(", ")})` : null,
+    summary.unreachable.length ? `${summary.unreachable.length} UNREACHABLE (${summary.unreachable.join(", ")})` : null,
   ].filter(Boolean);
   console.log(
     `\n[evals] ${summary.passed}/${scored.length} passed${notes.length ? `, ${notes.join(", ")}` : ""} ` +

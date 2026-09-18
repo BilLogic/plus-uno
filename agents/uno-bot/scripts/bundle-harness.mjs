@@ -149,7 +149,7 @@ const BUDGETS = {
   // ceiling's whole headroom on vocabulary: nine modules landed and five of them
   // added the CONTEXT.md glossary row every seam in this repo carries, which is
   // what lets a later ticket name the thing instead of re-describing it. What the
-  // 5k bought: the `eval case` and `ungated` rows here, and room for the rows the
+  // 5k bought: the `eval case` and `unreachable` rows here, and room for the rows the
   // rest of the batch's tickets will need. The floor below is untouched, so this
   // moves the ceiling only.
   assembled: 175_000,

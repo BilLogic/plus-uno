@@ -212,7 +212,7 @@ export function fixtureStamp(path) {
  *
  * `recorded` is the list of case ids some instrument can answer — the local
  * transport's recordings. Given it, the census names the cases that instrument
- * does NOT reach: **ungated**. That word is the point. Such a case is skipped
+ * does NOT reach: **unreachable**. That word is the point. Such a case is skipped
  * by name, which is correct (failing it would make a gate that is red by
  * construction), but a skip nobody counts is a case that gates nothing and
  * reads as if it did.
@@ -226,6 +226,8 @@ export function fixtureStamp(path) {
  *
  * @param {object[]} cases
  * @param {{recorded?: string[]|null}} [opts]
+ * @returns {object} the census. `unreachable` is the case ids this instrument
+ *          cannot reach — empty when `recorded` is omitted, which is not "none".
  */
 export function censusOf(cases, { recorded = null } = {}) {
   const known = recorded ? new Set(recorded) : null;
@@ -240,7 +242,7 @@ export function censusOf(cases, { recorded = null } = {}) {
     const need = c.subject?.need;
     if (need) subjects.set(need, (subjects.get(need) ?? 0) + 1);
   }
-  const ungated = known ? cases.filter((c) => !known.has(c.id)).map((c) => c.id) : [];
+  const unreachable = known ? cases.filter((c) => !known.has(c.id)).map((c) => c.id) : [];
   return {
     total: cases.length,
     blockers: cases.filter((c) => c.blocker).length,
@@ -254,12 +256,19 @@ export function censusOf(cases, { recorded = null } = {}) {
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([prefix, ids]) => ({ prefix, count: ids.length, ids })),
     recorded: known ? cases.filter((c) => known.has(c.id)).length : null,
-    gated: known ? cases.length - ungated.length : null,
-    ungated,
+    gated: known ? cases.length - unreachable.length : null,
+    unreachable,
   };
 }
 
-/** The census as one log line — what a run says about itself before it starts. */
+/**
+ * The census as one log line — what a run says about itself before it starts.
+ * Names unreachable cases (the transport cannot reach them) rather than
+ * counting them as a skip nobody can tell from a subject miss.
+ *
+ * @param {{total: number, blockers: number, samples: number, recorded: number|null, unreachable: string[]}} census
+ * @returns {string}
+ */
 export function describeCensus(census) {
   const parts = [
     `${census.total} cases`,
@@ -268,9 +277,9 @@ export function describeCensus(census) {
   ];
   if (census.recorded !== null) {
     parts.push(
-      census.ungated.length
-        ? `${census.ungated.length} UNGATED (no recording): ${census.ungated.join(", ")}`
-        : "0 ungated",
+      census.unreachable.length
+        ? `${census.unreachable.length} UNREACHABLE (no recording): ${census.unreachable.join(", ")}`
+        : "0 unreachable",
     );
   }
   return parts.join(", ");
