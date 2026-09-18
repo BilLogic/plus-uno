@@ -66,8 +66,16 @@ export interface ReactionDoorDeps {
   /** Who the bot is, so it never resolves its own card. */
   botUserId(): Promise<string | undefined>;
 
-  /** Act on a verdict Gate has already won: the confirmed side-effect tool,
-   *  the acknowledging reaction, the record of what was done. */
+  /**
+   * Act on a verdict: the confirmed side-effect tool, the acknowledging
+   * reaction, the record of what was done.
+   *
+   * EVERY verdict that has something to post is handed here, including a stale
+   * or cancelled one — the adapter is what decides a losing verdict costs
+   * nothing (`agent/resolve-proposal.ts` returns early unless `outcome` is
+   * `won`). An adapter that assumed it only ever sees a winner would run a
+   * tool the claim awarded to somebody else.
+   */
   applyVerdict(verdict: GateVerdict): Promise<void>;
 }
 

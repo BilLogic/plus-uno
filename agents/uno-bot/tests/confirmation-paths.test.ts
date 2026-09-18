@@ -9,6 +9,9 @@
 // So every case here drives a real signal through `resolveSignal` against one
 // staged proposal in the in-memory ThreadState, and asserts the VERDICT: the
 // same outcome, the same text to post, and one execution between all four.
+// Past the verdict, the reaction door is driven too — it takes its
+// dependencies by name (#592), so the whole door runs here on the recording
+// Delivery rather than being read with a regex.
 //
 // Slack devoli/C0ARJ2A3A69 p1787296549114929, 2026-08-21: Bryan typed "sure go
 // ahead" and the bot asked a second time. The fix on 2026-08-22 was to delete
