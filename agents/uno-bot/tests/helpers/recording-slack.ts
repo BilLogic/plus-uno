@@ -21,6 +21,7 @@ import type {
   WorkingSignalOutcome,
 } from "../../src/slack/delivery-adapter";
 import type { FooterKind } from "../../src/slack/footer-kind";
+import type { PostingClient, PostingDeps } from "../../src/slack/delivery";
 import type { DeliveryFailureStage } from "../../src/turn/index";
 import type { SessionStatus, StatusResult } from "../../src/slack/session-status";
 
@@ -175,5 +176,96 @@ export function recordingSlack(opts: RecordingSlackOptions = {}): RecordingSlack
     }),
     of: <K extends SlackCall["kind"]>(kind: K) =>
       calls.filter((call): call is Extract<SlackCall, { kind: K }> => call.kind === kind),
+  };
+}
+
+/** One thing the posting functions asked Slack to do, in order. */
+export type PostingCall =
+  | { kind: "react"; channel: string; ts: string; name: string }
+  | { kind: "message"; channel: string; threadTs?: string; text: string; blocks: boolean }
+  | { kind: "startStream"; channel: string; threadTs: string; userId: string; team?: string }
+  | { kind: "appendStream"; channel: string; ts: string; text: string }
+  | { kind: "stopStream"; channel: string; ts: string; blocks: boolean };
+
+export interface RecordingPostingOptions {
+  /** What `startStream` opens. `null` is a stream Slack would not open. */
+  streamTs?: string | null;
+  /** Refuse every plain post. */
+  messageFails?: boolean;
+  /** Refuse only a post carrying blocks. */
+  blocksFail?: boolean;
+  /** Refuse `appendStream`, so the finish-failed fallback is reachable. */
+  appendFails?: boolean;
+  /** Refuse `stopStream`. */
+  stopFails?: boolean;
+}
+
+export interface RecordingPosting {
+  client: PostingClient;
+  calls: PostingCall[];
+  /** The posting functions' dependencies, with this client in them. */
+  deps(over?: Partial<Omit<PostingDeps, "slack">>): PostingDeps;
+  of<K extends PostingCall["kind"]>(kind: K): Array<Extract<PostingCall, { kind: K }>>;
+}
+
+/**
+ * A Slack posting client that records instead of calling Slack — the stand-in
+ * `postTextVerified` / `postVisibleFailure` are driven on (#654).
+ *
+ * One layer below `recordingSlack`: that one stands in for the Delivery
+ * adapter's client (plan streams, session status); this one stands in for the
+ * posting functions' client (answer streams, the recipient pair).
+ */
+export function recordingPosting(opts: RecordingPostingOptions = {}): RecordingPosting {
+  const calls: PostingCall[] = [];
+  let posted = 0;
+
+  const client: PostingClient = {
+    async addReaction(channel, ts, name) {
+      calls.push({ kind: "react", channel, ts, name });
+    },
+    async postMessage(input) {
+      const blocks = !!input.blocks;
+      calls.push({
+        kind: "message",
+        channel: input.channel,
+        ...(input.thread_ts === undefined ? {} : { threadTs: input.thread_ts }),
+        text: input.text,
+        blocks,
+      });
+      if (opts.messageFails || (blocks && opts.blocksFail)) return { ok: false };
+      return { ok: true, ts: `posted-${++posted}` } as { ok: boolean };
+    },
+    async startStream(channel, threadTs, userId, team) {
+      calls.push({
+        kind: "startStream",
+        channel,
+        threadTs,
+        userId,
+        ...(team === undefined ? {} : { team }),
+      });
+      return opts.streamTs === undefined ? "stream-1" : opts.streamTs;
+    },
+    async appendStream(channel, ts, text) {
+      calls.push({ kind: "appendStream", channel, ts, text });
+      return !opts.appendFails;
+    },
+    async stopStream(channel, ts, blocks) {
+      calls.push({ kind: "stopStream", channel, ts, blocks: !!blocks?.length });
+      return !opts.stopFails;
+    },
+  };
+
+  return {
+    client,
+    calls,
+    deps: (over = {}) => ({
+      slack: client,
+      streamingOn: over.streamingOn ?? true,
+      alertChannel: over.alertChannel ?? "C_ALERT",
+      ...(over.throttle === undefined ? {} : { throttle: over.throttle }),
+    }),
+    of: <K extends PostingCall["kind"]>(kind: K) =>
+      calls.filter((call): call is Extract<PostingCall, { kind: K }> => call.kind === kind),
   };
 }

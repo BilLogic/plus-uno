@@ -30,6 +30,7 @@ import {
   messageTextWithCanvasAttachments,
 } from "./canvas-reference";
 import { postVisibleFailure, isCapacityError } from "./delivery";
+import { postingDeps } from "./slack-delivery";
 import { runSlackTurn } from "./turn-adapter";
 import { turnSurfaceOf } from "../turn/request";
 
@@ -451,7 +452,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     ]);
   } catch (err) {
     console.error(`[slack] context load failed: ${err instanceof Error ? err.message : String(err)}`);
-    await postVisibleFailure(env, channel, threadTs, event.ts, err, "context");
+    await postVisibleFailure(postingDeps(env), channel, threadTs, event.ts, err, "context");
     return;
   }
 

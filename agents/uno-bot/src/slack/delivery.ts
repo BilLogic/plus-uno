@@ -1,9 +1,15 @@
 // Reply delivery + failure surfacing. Guards the class of R2 defects where the
 // bot reacted 👀 and then went silent, or ✅'d a reply that never posted.
 // (Extracted from events.ts, 2026-07-12.)
+//
+// IT TAKES NAMED DEPENDENCIES, the way the stop doors do (`slack/stop-doors.ts`,
+// #593) and the Delivery adapter does (`slack/delivery-adapter.ts`, #594): the
+// Slack posting client, the streaming switch, the alert channel, the throttle
+// store. `Env` never enters — it is turned into that record once, in
+// `slack/slack-delivery.ts` (and `events.ts` for the one failure path that
+// does not go through Delivery). That is what lets the Node suite DRIVE the
+// answer path rather than read it (`tests/stream-recipient.test.ts`, #654).
 
-import type { Env } from "../types";
-import { addReaction, appendStream, postMessage, startStream, stopStream } from "./api";
 import { decideStream, type StreamRecipient } from "./stream-recipient";
 import { answerMessages, deliverAnswer } from "./answer-posts";
 import { footerKindFor, footerNoteFor, type FooterKind } from "./footer-kind";
@@ -22,66 +28,126 @@ export function isCapacityError(err: unknown): boolean {
   return CAPACITY_ERR_RE.test(m);
 }
 
-// Default alert channel (#uno-bot) — overridable via UNO_BOT_ALERT_CHANNEL.
-const DEFAULT_ALERT_CHANNEL = "C0ARJ2A3A69";
+/** Default alert channel (#uno-bot) — the envelope may override via `UNO_BOT_ALERT_CHANNEL`. */
+export const DEFAULT_ALERT_CHANNEL = "C0ARJ2A3A69";
 const ALERT_THROTTLE_KEY = "alert:capacity";
 const ALERT_THROTTLE_S = 600; // 10 min — one ping per outage, not per message
 
-// Throttled team alert on a capacity/quota outage. Best-effort and fully
-// self-contained: a failure inside here never propagates into the reply path.
-async function alertCapacity(env: Env, err: unknown): Promise<void> {
+/**
+ * The Slack calls the posting functions actually make.
+ *
+ * A subset of the Web API, named, so a test can stand in for Slack without
+ * constructing an `Env`.
+ */
+export interface PostingClient {
+  addReaction(channel: string, ts: string, name: string): Promise<unknown>;
+  postMessage(input: {
+    channel: string;
+    thread_ts?: string;
+    text: string;
+    blocks?: Array<Record<string, unknown>>;
+  }): Promise<{ ok: boolean }>;
+  startStream(
+    channel: string,
+    threadTs: string,
+    userId: string,
+    team?: string,
+  ): Promise<string | null | undefined>;
+  appendStream(channel: string, streamTs: string, text: string): Promise<boolean>;
+  stopStream(
+    channel: string,
+    streamTs: string,
+    blocks?: Array<Record<string, unknown>>,
+  ): Promise<boolean>;
+}
+
+/** The throttle store a capacity alert consults, if one is bound. */
+export interface PostingThrottle {
+  get(key: string): Promise<string | null>;
+  put(key: string, value: string, opts: { expirationTtl: number }): Promise<void>;
+}
+
+/**
+ * What the posting functions need, by name.
+ *
+ * `Env` is turned into this once, in the envelope. Nothing here is optional
+ * "because a test might omit it": a missing streaming switch or a missing
+ * alert channel would silently change what a person sees.
+ */
+export interface PostingDeps {
+  slack: PostingClient;
+  /** `SLACK_STREAMING === "on"` — whether a new answer stream may open. */
+  streamingOn: boolean;
+  /** Where a capacity outage pings the team. */
+  alertChannel: string;
+  /** Best-effort throttle; absent means every capacity failure alerts. */
+  throttle?: PostingThrottle | null;
+}
+
+/**
+ * Throttled team alert on a capacity/quota outage. Best-effort: a failure
+ * inside here never propagates into the reply path.
+ *
+ * @param deps named posting dependencies
+ * @param err the capacity error, snippeted into the ping
+ */
+export async function alertCapacity(deps: PostingDeps, err: unknown): Promise<void> {
   try {
-    const kv = env.HARNESS_KV;
+    const kv = deps.throttle;
     if (kv) {
-      if (await kv.get(ALERT_THROTTLE_KEY)) return; // already alerted this window
+      if (await kv.get(ALERT_THROTTLE_KEY)) return;
       await kv.put(ALERT_THROTTLE_KEY, String(Date.now()), { expirationTtl: ALERT_THROTTLE_S });
     }
     const snippet = (err instanceof Error ? err.message : String(err ?? "")).slice(0, 300);
-    await postMessage(env, {
-      channel: env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL,
-      text:
-        ":rotating_light: uno-bot replies are failing on model *capacity/quota* — users are getting errors until this clears.\n" +
-        `> ${snippet}\n` +
-        "Check GCP Console → IAM & Admin → Quotas (filter *Vertex AI* + the active model), or point `GEMINI_MODEL` at a model with headroom.",
-    }).catch(() => {});
+    await deps.slack
+      .postMessage({
+        channel: deps.alertChannel,
+        text:
+          ":rotating_light: uno-bot replies are failing on model *capacity/quota* — users are getting errors until this clears.\n" +
+          `> ${snippet}\n` +
+          "Check GCP Console → IAM & Admin → Quotas (filter *Vertex AI* + the active model), or point `GEMINI_MODEL` at a model with headroom.",
+      })
+      .catch(() => {});
   } catch {
     /* never let alerting break the failure path */
   }
 }
 
-// Make failure VISIBLE, resiliently: try the ❌ reaction first (cheapest call —
-// most likely to still succeed if the request is out of subrequest budget),
-// then the error text. Every step is .catch-wrapped so a failure inside the
-// failure path can never re-throw into silence (R2's ":eyes: then nothing").
-// Pass `err` so capacity/quota outages surface distinctly (clearer user message
-// + a throttled team alert) instead of the generic "something went wrong".
-// threadTs is optional: in an agent_view DM there is no thread, and an
-// undefined thread_ts posts at channel level.
+/**
+ * Make failure VISIBLE, resiliently: try the ❌ reaction first (cheapest call —
+ * most likely to still succeed if the request is out of subrequest budget),
+ * then the error text. Every step is .catch-wrapped so a failure inside the
+ * failure path can never re-throw into silence (R2's ":eyes: then nothing").
+ *
+ * @param deps named posting dependencies
+ * @param channel conversation the person is in
+ * @param threadTs optional: in an agent_view DM there is no thread
+ * @param userMsgTs the person's message — what the ❌ lands on
+ * @param err so capacity/quota outages surface distinctly
+ * @param stage how far the turn got; drives what the message can honestly promise
+ */
 export async function postVisibleFailure(
-  env: Env,
+  deps: PostingDeps,
   channel: string,
   threadTs: string | undefined,
   userMsgTs: string,
   err?: unknown,
-  /** How far the turn got. Drives what the message can honestly promise —
-   *  see failure-message.ts. Defaults to the least-informed stage. */
   stage: FailureStage = "internal",
 ): Promise<void> {
   const capacity = isCapacityError(err);
-  await addReaction(env, channel, userMsgTs, "x").catch(() => {});
-  await postMessage(env, {
-    channel,
-    thread_ts: threadTs,
-    // Progress + blocker + next step, instead of the dead-end "something went
-    // wrong on my end" this used to send. The stage is the progress: the relay
-    // knows exactly how far it got, and that is the part the person cannot see.
-    text: buildFailureMessage({
-      stage,
-      capacity,
-      alertChannel: env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL,
-    }),
-  }).catch(() => {});
-  if (capacity) await alertCapacity(env, err);
+  await deps.slack.addReaction(channel, userMsgTs, "x").catch(() => {});
+  await deps.slack
+    .postMessage({
+      channel,
+      thread_ts: threadTs,
+      text: buildFailureMessage({
+        stage,
+        capacity,
+        alertChannel: deps.alertChannel,
+      }),
+    })
+    .catch(() => {});
+  if (capacity) await alertCapacity(deps, err);
 }
 
 // The render — what a reply looks like when it ships — moved to
@@ -117,14 +183,27 @@ export { renderDeliveredBody, textSections } from "./render";
 //
 // `kind === "none"` still means no footer at all: a short acknowledgement is
 // not making checkable claims and does not need the label.
-function footerBlocks(_env: Env, kind: FooterKind): Array<Record<string, unknown>> {
+function footerBlocks(kind: FooterKind): Array<Record<string, unknown>> {
   if (kind === "none") return [];
   const note = footerNoteFor(kind);
   return note ? [{ type: "context", elements: [{ type: "mrkdwn", text: note }] }] : [];
 }
 
+/**
+ * Post a verified answer: stream it when the recipient pair is complete, else
+ * fall back to an ordinary message. The recipient is REQUIRED — #572 was an
+ * optional positional argument nobody passed.
+ *
+ * @param deps named posting dependencies
+ * @param channel conversation
+ * @param threadTs thread to reply under, or undefined at channel level
+ * @param text the answer body
+ * @param recipient who a stream would be for
+ * @param footerHint forces the footer variant; absent = classify from the body
+ * @param openStreamTs ts of a stream already open for this turn (plan mode)
+ */
 export async function postTextVerified(
-  env: Env,
+  deps: PostingDeps,
   channel: string,
   threadTs: string | undefined,
   text: string,
@@ -143,35 +222,18 @@ export async function postTextVerified(
   openStreamTs?: string,
 ): Promise<{ ok: boolean; text: string }> {
   const body = renderDeliveredBody(text);
-  const footer = footerBlocks(env, footerKindFor(body, footerHint));
+  const footer = footerBlocks(footerKindFor(body, footerHint));
 
-  // The answer is no longer cut to fit one message: a long body is posted as
-  // continuation messages in the thread, in order. `body` — the whole of it —
-  // is still what comes back, so the judges and ThreadState see the answer the
-  // person read rather than its first message.
   const ok = await deliverAnswer(answerMessages(body), {
-    // Streamed delivery, opened HERE rather than at turn start. Opening it
-    // early (to double as the working signal) left an empty "AGENT" bubble
-    // sitting in the thread for the whole run — a blank message impersonating a
-    // loader. The working signal says work is happening; the stream carries
-    // the answer.
     async stream(piece, withFooter) {
-      if (!((openStreamTs || env.SLACK_STREAMING === "on") && threadTs)) return false;
+      if (!((openStreamTs || deps.streamingOn) && threadTs)) return false;
       // Both recipient ids, or no call at all — the argument contract and why
       // it is a pair are in `api.ts` above `startStream`, and the decision
-      // itself is `decideStream` (its own module, so it can be tested by
-      // running it). Until #572 the answer path passed neither id, so a
-      // channel turn bought an `invalid_arguments` and a console.warn on its
-      // way to the ordinary post it was going to make anyway.
+      // itself is `decideStream`. Until #572 the answer path passed neither
+      // id, so a channel turn bought an `invalid_arguments` and a console.warn
+      // on its way to the ordinary post it was going to make anyway.
       const decision = decideStream(openStreamTs, recipient);
       if (!decision.open) {
-        // A HALF recipient is a turn that quietly lost streaming, and this
-        // ticket is the argument for the line: what made #572 survive six
-        // revisions was a fallback whose only symptom was a warning nobody
-        // read, and a fallback with NO symptom is worse than that. So the one
-        // case that should never happen says which half went missing, and says
-        // it where the other Slack degradations are already logged. A path
-        // with no recipient at all was never going to stream and stays quiet.
         if (decision.missing !== "recipient") {
           const user = recipient?.userId || "MISSING";
           const team = recipient?.team || "MISSING";
@@ -185,45 +247,32 @@ export async function postTextVerified(
       }
       const streamTs =
         openStreamTs ??
-        (await startStream(env, channel, threadTs, recipient.userId, recipient.team));
+        (await deps.slack.startStream(channel, threadTs, recipient.userId, recipient.team));
       if (!streamTs) return false;
       try {
-        // append (the text) then stop (the footer blocks — stopStream is the only
-        // frame that accepts blocks). If either half fails, fall through to a
-        // plain post: a duplicated answer is bad, a missing one is worse.
-        const appended = await appendStream(env, channel, streamTs, piece);
+        const appended = await deps.slack.appendStream(channel, streamTs, piece);
         const blocks = withFooter && footer.length ? footer : undefined;
-        const stopped = await stopStream(env, channel, streamTs, blocks);
+        const stopped = await deps.slack.stopStream(channel, streamTs, blocks);
         if (appended && stopped) return true;
         console.warn(`[slack] stream finish failed (append=${appended} stop=${stopped}); falling back to post`);
-        await stopStream(env, channel, streamTs).catch(() => {});
+        await deps.slack.stopStream(channel, streamTs).catch(() => {});
         return false;
       } catch (err) {
-        // Every stream opened here is stopped here, throw included: an
-        // unstopped one leaves the thread showing work still in progress long
-        // after the turn ended, and nothing downstream knows its ts.
-        await stopStream(env, channel, streamTs).catch(() => {});
+        await deps.slack.stopStream(channel, streamTs).catch(() => {});
         throw err;
       }
     },
 
-    // `text` stays populated alongside blocks: it is what notifications and
-    // screen readers use, and it is the fallback if a block ever fails to
-    // render. A disclaimer on "Got it — cancelled" is how people learn to skip
-    // it on the messages that carry claims. Acknowledgements get no footer;
-    // anything unrecognised falls back to the footer rather than to silence.
     async post(piece, withFooter) {
       const blocks = [...textSections(piece), ...(withFooter ? footer : [])];
-      let posted = await postMessage(env, { channel, thread_ts: threadTs, text: piece, blocks }).catch(
-        () => ({ ok: false as const }),
-      );
+      let posted = await deps.slack
+        .postMessage({ channel, thread_ts: threadTs, text: piece, blocks })
+        .catch(() => ({ ok: false as const }));
       if (!posted.ok) {
-        // Degrade to plain text rather than lose the answer. A malformed block
-        // is a cosmetic failure; a dropped answer is the 👀-then-silence one.
         console.warn("[slack] blocks post failed; retrying as plain text");
-        posted = await postMessage(env, { channel, thread_ts: threadTs, text: piece }).catch(() => ({
-          ok: false as const,
-        }));
+        posted = await deps.slack
+          .postMessage({ channel, thread_ts: threadTs, text: piece })
+          .catch(() => ({ ok: false as const }));
       }
       return !!posted.ok;
     },

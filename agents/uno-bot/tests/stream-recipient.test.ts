@@ -7,30 +7,42 @@
 // one wasted call per turn, invisible because the fallback works (#572).
 //
 // The decision itself lives in `slack/stream-recipient.ts` so it can be tested
-// by RUNNING it, and the adapter that hands the pair over is DRIVEN below — it
-// takes its Slack client by name since #594. What is left to a source assertion
-// is the one adapter this suite still has nothing to call: `slack/delivery.ts`
-// takes an `Env` and posts through the Slack client, and `startStream`'s
-// recipient parameters are optional, so a caller can drop them again with the
-// type checker none the wiser. That door taking its client by name is its own
-// ticket; #595 left it.
+// by RUNNING it. The posting functions that consult it take a named Slack
+// client (#654), so the recipient pair is watched arriving rather than matched
+// in source. The Slack Delivery adapter that hands the pair over is DRIVEN
+// too — it takes its client by name since #594.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 
 import { decideStream } from "../src/slack/stream-recipient";
+import { postTextVerified } from "../src/slack/delivery";
 import { deliveryAdapter } from "../src/slack/delivery-adapter";
-import { recordingSlack } from "./helpers/recording-slack";
-
-/** A source file with its whitespace collapsed, so a reflow cannot fail a test
- *  about arguments with a message about formatting. */
-function flatSource(file: string): string {
-  return readFileSync(resolve(process.cwd(), file), "utf8").replace(/\s+/g, " ");
-}
+import { recordingPosting, recordingSlack } from "./helpers/recording-slack";
 
 const BOTH = { userId: "U1", team: "T1" };
 const OPEN_TS = "1700000000.000200";
+const CHANNEL = "C_DESIGN";
+const ANSWER = "Tabs are documented in the design system.";
+
+/**
+ * Capture `console.warn` for the duration of `fn`.
+ *
+ * @param fn the posting call that may log a skip
+ * @returns every warning line, in order
+ */
+async function withWarns(fn: () => Promise<unknown>): Promise<string[]> {
+  const warns: string[] = [];
+  const orig = console.warn;
+  console.warn = (...args: unknown[]) => {
+    warns.push(args.map(String).join(" "));
+  };
+  try {
+    await fn();
+    return warns;
+  } finally {
+    console.warn = orig;
+  }
+}
 
 describe("opening a stream", () => {
   it("needs both recipient ids", () => {
@@ -75,47 +87,64 @@ describe("opening a stream", () => {
 });
 
 describe("the answer path", () => {
-  it("asks Slack for the recipient ids it requires", () => {
-    const src = flatSource("src/slack/delivery.ts");
-    const call = src.slice(src.indexOf("await startStream("));
-    const args = call.slice(0, call.indexOf(")"));
-    assert.ok(args.includes("recipient.userId"), "the asker reaches startStream");
-    assert.ok(args.includes("recipient.team"), "and their workspace with them");
+  it("asks Slack for the recipient ids it requires", async () => {
+    const slack = recordingPosting();
+    await postTextVerified(slack.deps(), CHANNEL, OPEN_TS, ANSWER, BOTH);
+
+    assert.deepEqual(
+      slack.of("startStream").map(({ userId, team }) => ({ userId, team })),
+      [BOTH],
+      "the asker and their workspace reach startStream together",
+    );
+    assert.equal(slack.of("appendStream").length, 1);
+    assert.equal(slack.of("stopStream").length, 1);
+    // Stream finished: the ordinary post is the fallback, not a second copy.
+    assert.deepEqual(slack.of("message"), []);
   });
 
-  it("consults the decision before it calls Slack, and says when it skips", () => {
-    // `decideStream` being correct is no use if the answer path stops asking
-    // it. Positions, not formatting: the question has to be put BEFORE the
-    // call, or it is not a guard.
-    const src = flatSource("src/slack/delivery.ts");
-    const guard = src.indexOf("decideStream(");
-    assert.ok(guard > 0, "the answer path asks whether it may open a stream");
-    assert.ok(guard < src.indexOf("await startStream("), "and asks first");
-    // And an incomplete recipient is never a silent no-op — the whole lesson
-    // of #572 is that an unlogged fallback outlives the people who caused it.
-    const skip = src.indexOf("[slack] stream skipped");
-    assert.ok(skip > guard, "the skip is logged where it is decided");
-    assert.ok(
-      src.slice(guard, skip).includes('decision.missing !== "recipient"'),
-      "and only for the surprising half-recipient case",
+  it("does not open a stream for a half recipient, and says so", async () => {
+    // The surprising case: a turn that quietly lost streaming. Until #572 the
+    // only symptom was a wasted `invalid_arguments` on the way to the ordinary
+    // post. A call that cannot succeed must not be made.
+    const slack = recordingPosting();
+    const warns = await withWarns(() =>
+      postTextVerified(slack.deps(), CHANNEL, OPEN_TS, ANSWER, { userId: "U1" }),
+    );
+
+    assert.deepEqual(slack.of("startStream"), [], "startStream is not called with a half recipient");
+    assert.ok(slack.of("message").length > 0, "the answer still posts as an ordinary message");
+    assert.match(warns.join("\n"), /stream skipped: recipient missing team/);
+  });
+
+  it("stays quiet, and still does not call Slack, when there is no recipient at all", async () => {
+    // A path that never had a recipient was never going to stream — logging
+    // that is noise, calling Slack for it is the #572 defect again.
+    const slack = recordingPosting();
+    const warns = await withWarns(() =>
+      postTextVerified(slack.deps(), CHANNEL, OPEN_TS, ANSWER, { userId: "", team: "" }),
+    );
+
+    assert.deepEqual(slack.of("startStream"), []);
+    assert.ok(slack.of("message").length > 0);
+    assert.equal(
+      warns.filter((line) => line.includes("stream skipped")).length,
+      0,
+      "an absent recipient is unremarkable and is not logged",
     );
   });
 
   it("is handed the ids by the adapter that holds them", async () => {
     // DRIVEN, not read: the Slack Delivery adapter takes its client by name
     // (#594), so the pair can be watched arriving rather than matched in the
-    // adapter's source. The regex that stood here looked for
-    // `userId: target.userId` inside `await postTextVerified(` — it could not
-    // see whether the adapter was ever called at all, and it would have gone
-    // green on a pair handed to the wrong call.
+    // adapter's source.
     const slack = recordingSlack();
     await deliveryAdapter(slack.deps(), {
-      channel: "C_DESIGN",
+      channel: CHANNEL,
       replyTs: OPEN_TS,
       userMsgTs: "1700000000.000090",
       userId: BOTH.userId,
       team: BOTH.team,
-    }).postAnswer("Tabs are documented in the design system.");
+    }).postAnswer(ANSWER);
 
     assert.deepEqual(
       slack.of("answer").map(({ userId, team }) => ({ userId, team })),

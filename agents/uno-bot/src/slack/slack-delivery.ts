@@ -18,6 +18,7 @@
 import type { Env } from "../types";
 import {
   addReaction,
+  appendStream,
   appendTask,
   postMessage,
   slackCall,
@@ -25,7 +26,13 @@ import {
   stopStream,
 } from "./api";
 import { renameSession, setSessionStatus } from "./assistant";
-import { postTextVerified, postVisibleFailure } from "./delivery";
+import {
+  DEFAULT_ALERT_CHANNEL,
+  postTextVerified,
+  postVisibleFailure,
+  type PostingClient,
+  type PostingDeps,
+} from "./delivery";
 import {
   consoleWorkingLog,
   deliveryAdapter,
@@ -48,6 +55,23 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
 }
 
 /**
+ * `Env`, once, as the posting functions actually read it.
+ *
+ * The answer path (`postTextVerified`) and the failure path
+ * (`postVisibleFailure`) take this record by name — they never see `Env`.
+ * The adapter's `postAnswer` / `postFailure` and the one failure site in
+ * `events.ts` are the envelopes.
+ */
+export function postingDeps(env: Env): PostingDeps {
+  return {
+    slack: postingClientFor(env),
+    streamingOn: env.SLACK_STREAMING === "on",
+    alertChannel: env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL,
+    throttle: env.HARNESS_KV ?? null,
+  };
+}
+
+/**
  * `Env`, once, as the Slack calls the adapter actually makes.
  *
  * Each method is a thin currying of the module-level function the Worker has
@@ -55,6 +79,7 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
  * judgement in this file is a line the Node suite cannot reach.
  */
 function slackClientFor(env: Env): SlackDeliveryClient {
+  const posting = postingDeps(env);
   return {
     async addReaction(channel, ts, name) {
       await addReaction(env, channel, ts, name);
@@ -64,9 +89,9 @@ function slackClientFor(env: Env): SlackDeliveryClient {
     },
     postMessage: (input) => postMessage(env, input),
     postAnswer: ({ channel, threadTs, text, recipient, footerHint, openStreamTs }) =>
-      postTextVerified(env, channel, threadTs, text, recipient, footerHint, openStreamTs),
+      postTextVerified(posting, channel, threadTs, text, recipient, footerHint, openStreamTs),
     postFailure: ({ channel, threadTs, userMsgTs, stage, err }) =>
-      postVisibleFailure(env, channel, threadTs, userMsgTs, err, stage),
+      postVisibleFailure(posting, channel, threadTs, userMsgTs, err, stage),
     startStream: (channel, threadTs, userId, team) =>
       startStream(env, channel, threadTs, userId, team, "plan"),
     async appendTask(channel, ts, task) {
@@ -78,5 +103,22 @@ function slackClientFor(env: Env): SlackDeliveryClient {
     setSessionStatus: (channel, threadTs, status) =>
       setSessionStatus(env, channel, threadTs, status),
     renameSession: (channel, threadTs, title) => renameSession(env, channel, threadTs, title),
+  };
+}
+
+/**
+ * The posting functions' Slack client: answer streams, not plan streams.
+ *
+ * `startStream` here is the answer-path call — no `task_display_mode: "plan"`.
+ * Plan mode is the adapter's `startStream`, gated on `SLACK_STREAM_PLAN`.
+ */
+function postingClientFor(env: Env): PostingClient {
+  return {
+    addReaction: (channel, ts, name) => addReaction(env, channel, ts, name),
+    postMessage: (input) => postMessage(env, input),
+    startStream: (channel, threadTs, userId, team) =>
+      startStream(env, channel, threadTs, userId, team),
+    appendStream: (channel, ts, text) => appendStream(env, channel, ts, text),
+    stopStream: (channel, ts, blocks) => stopStream(env, channel, ts, blocks),
   };
 }
