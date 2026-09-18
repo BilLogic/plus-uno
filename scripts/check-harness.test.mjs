@@ -256,6 +256,123 @@ test('the generated blocks match the registry', () => {
   );
 });
 
+// ---------------------------------------------------------------------------
+// the `baseline` column (#602)
+//
+// The registry asserts three things about a `baseline:` row: the record parses
+// on the shape it declares, the check that declares it reaches it THROUGH ITS
+// IMPORTS, and the `--update` its shape row advertises is a flag the check
+// really offers — or, where the row says `command: null`, that it offers none.
+// Each is watched failing below, because the live tree passes all three.
+// ---------------------------------------------------------------------------
+
+const BASELINE_ROWS = ALL.filter((row) => row.baseline);
+const rootScripts = () => JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8')).scripts;
+
+test('every baseline row reaches its record and offers exactly the flag its table names', () => {
+  assert.equal(BASELINE_ROWS.length, 12);
+  for (const row of BASELINE_ROWS) {
+    assert.deepEqual(
+      registryGenerator.baselineFindings(row, rootScripts()).map((f) => f.message),
+      [],
+      row.name,
+    );
+  }
+});
+
+test('a row pointing at a record its check never opens fails, however the check is named', () => {
+  const row = { ...byName('check:glossary'), baseline: 'docs/evals/focus-ring.json' };
+  const messages = registryGenerator.baselineFindings(row, rootScripts()).map((f) => f.message);
+  assert.ok(
+    messages.some((m) => /opens\s+through scripts\/lib\/ratchet\.mjs/.test(m)),
+    messages.join('\n'),
+  );
+});
+
+test('the reach is the whole import closure: the fallback pair opens its record one hop away', () => {
+  // The case the old basename search passed by luck. `check-colour-fallbacks.mjs`
+  // names the file in the `Family` literal it hands over and opens nothing; the
+  // `openRatchet`, the read, the stale sweep and the write are all in
+  // `scripts/lib/fallback-check.mjs`. So the assertion has to follow the hop —
+  // and it must also not be satisfied by the entry's own filename alone.
+  const row = byName('check:colour-fallbacks');
+  const entry = fs.readFileSync(path.join(REPO_ROOT, 'scripts/check-colour-fallbacks.mjs'), 'utf8');
+  assert.ok(entry.includes(row.baseline), 'the fixture assumes the entry still names the record');
+  assert.equal(entry.includes('openRatchet'), false, 'the entry is not where the record is opened');
+  assert.deepEqual(registryGenerator.baselineFindings(row, rootScripts()), []);
+});
+
+test('a hand-maintained record whose check offers --update fails, and the four that do not pass', () => {
+  for (const name of ['check:button-contrast', 'check:focus-ring', 'check:icon-button-name', 'check:intent-roles']) {
+    assert.deepEqual(registryGenerator.baselineFindings(byName(name), rootScripts()), [], name);
+  }
+  // `focus-ring.json` is surveyed `command: null` — the value of an entry in it
+  // IS the argument for it. Read by a check that does offer the flag, that is a
+  // finding: a `--update` on a record whose bar is zero is a way to make a new
+  // failure quiet.
+  const row = { ...byName('check:focus-ring'), script: 'node scripts/check-glossary.mjs' };
+  const messages = registryGenerator.baselineFindings(row, rootScripts()).map((f) => f.message);
+  assert.ok(messages.some((m) => /offers --update in its fallThrough slot/.test(m)), messages.join('\n'));
+});
+
+test("glossary's --update is asserted in the slot it is IN, not in the terminal one", () => {
+  // #610: `flags` is terminal, `fallThrough` prints and then still gates, and
+  // which one a flag belongs in is a reading of what it does. Demanding the
+  // terminal slot here would move this one and quietly stop the check gating.
+  const source = fs.readFileSync(path.join(REPO_ROOT, 'scripts/check-glossary.mjs'), 'utf8');
+  assert.match(source, /fallThrough: \{ '--update'/);
+  assert.deepEqual(registryGenerator.baselineFindings(byName('check:glossary'), rootScripts()), []);
+});
+
+test('a record whose flag is advertised and offered nowhere fails', () => {
+  const row = { ...byName('check:text-contrast'), script: 'node scripts/check-focus-ring.mjs' };
+  const messages = registryGenerator.baselineFindings(row, rootScripts()).map((f) => f.message);
+  assert.ok(messages.some((m) => /offers --update — in either/.test(m)), messages.join('\n'));
+});
+
+test('a re-record line naming an npm script nobody has is a remedy nobody can type', () => {
+  const messages = registryGenerator
+    .baselineFindings(byName('check:colour-fallbacks'), {})
+    .map((f) => f.message);
+  assert.ok(messages.some((m) => /no check:colour-fallbacks script exists/.test(m)), messages.join('\n'));
+});
+
+test('a record that will not parse on its declared shape is reported, never read as empty', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'baseline-shape-'));
+  try {
+    const row = byName('check:focus-ring');
+    fs.mkdirSync(path.join(root, 'docs/evals'), { recursive: true });
+    // The declared container is an object of reasons. As an array it reads as
+    // no entries at all, and an empty baseline is a green ratchet.
+    fs.writeFileSync(path.join(root, row.baseline), JSON.stringify({ note: 'x', exceptions: [] }));
+    const messages = registryGenerator
+      .baselineFindings(row, rootScripts(), { repoRoot: root })
+      .map((f) => f.message);
+    assert.ok(messages.some((m) => /cannot be read as the baseline shape it declares/.test(m)), messages.join('\n'));
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('the one check that still parses its own record is named, and the exemption cannot outlive it', () => {
+  const row = byName('check:storybook');
+  // Unexempted, it is a finding — which is the assertion, not a quirk: #600
+  // listed the a11y baseline and migrated the other seven.
+  const unexempt = registryGenerator
+    .baselineFindings(row, rootScripts(), { exemptions: new Map() })
+    .map((f) => f.message);
+  assert.ok(unexempt.some((m) => /parses the record itself/.test(m)), unexempt.join('\n'));
+  // Exempted, it is still held to naming the record.
+  assert.deepEqual(registryGenerator.baselineFindings(row, rootScripts()), []);
+  // And an exemption for a check that HAS migrated is itself a finding.
+  const stale = registryGenerator
+    .baselineFindings(byName('check:glossary'), rootScripts(), {
+      exemptions: new Map([['check:glossary', 'a reason that has stopped being true']]),
+    })
+    .map((f) => f.message);
+  assert.ok(stale.some((m) => /Delete the exemption/.test(m)), stale.join('\n'));
+});
+
 test('drift in a generated block is visible: an edited package.json no longer renders itself', () => {
   const text = fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8');
   const tampered = text.replace(

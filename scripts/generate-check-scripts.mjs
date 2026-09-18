@@ -69,6 +69,9 @@ import {
   workflowRegions,
 } from './checks.registry.mjs';
 import { isEntry, report } from './lib/findings.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
+import { shapeOf } from './lib/ratchet-shapes.mjs';
+import { reachOf } from './lib/script-reach.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -207,11 +210,206 @@ export function artifacts() {
 const manifestScripts = (pkg) =>
   JSON.parse(read(pkg === 'bot' ? 'agents/uno-bot/package.json' : PKG)).scripts ?? {};
 
+// ---------------------------------------------------------------------------
+// the `baseline` column
+// ---------------------------------------------------------------------------
+
+/**
+ * The file the shape table is, so the reach walk does not take it as evidence.
+ * It surveys ALL TWELVE records, so it names every one of them by construction.
+ */
+const SHAPE_TABLE = 'scripts/lib/ratchet-shapes.mjs';
+
+/**
+ * The check that still parses its own record, and the argument for naming it
+ * here rather than letting a weaker assertion pass all twelve quietly.
+ *
+ * #600 listed "the a11y baseline" among the records that would read the module
+ * and migrated the other seven; #601's message says "not one check parses a
+ * record any more", and this one does — `check-storybook.mjs` reads
+ * `docs/evals/a11y-baseline.json` with `JSON.parse` and rebuilds the whole
+ * record on `--update`, which is the rewrite `update()` exists not to be. It is
+ * the one check whose measurement needs a browser and a built Storybook, so its
+ * migration is a piece of work with its own verification and not a line of this
+ * one. What this map buys is that the gap is WRITTEN DOWN and cannot grow: a
+ * row named here is held to the weak assertion — its reach must still name the
+ * record — and a row named here that has since migrated is itself a finding, so
+ * the exemption cannot outlive the defect.
+ */
+const PARSES_ITS_OWN_RECORD = new Map([
+  [
+    'check:storybook',
+    'its verdict takes the parsed record as an argument and returns a rebuilt one, and its ' +
+      'measurement needs a browser — the migration #600 left behind, not a line of #602.',
+  ],
+]);
+
+/**
+ * What a `baseline:` row claims, asserted through the ratchet module rather
+ * than by searching the owning script for a filename.
+ *
+ * THE RECORD'S SHAPE IS FREE THROUGH THE MODULE, so nothing here re-implements
+ * a schema. `shapeOf` refuses a record it has no row for, and `openRatchet`
+ * throws `UnreadableRecord` on a record that will not parse on the shape it
+ * declares — including one whose declared container is missing or the wrong
+ * type, which is the failure that would otherwise read as an EMPTY set and an
+ * empty baseline is a green ratchet. Opening every declared set of every
+ * declared record is therefore the whole of "the file is a well-formed ratchet
+ * record", said in the module's own words.
+ *
+ * THE REACH, NOT THE FILE (#602). The question "does the check that declares
+ * this record actually read it" used to be a basename search of the entry
+ * script, which every migrated check happens to pass and which the two fallback
+ * families passed BY LUCK — the basename sits in the `Family` literal and every
+ * piece of record logic is in `scripts/lib/fallback-check.mjs`. It is asked of
+ * the entry script's whole import reach now (`scripts/lib/script-reach.mjs`),
+ * and asked as the strong question: is the record OPENED through
+ * `scripts/lib/ratchet.mjs` somewhere in that reach, with `openRatchet({ file:
+ * BASELINE })` recognised when `BASELINE` is imported or destructured rather
+ * than spelled. A check that reads its record through the module and never
+ * names the file passes — which is the point, because the alternative is
+ * eleven checks carrying a header line naming a file they no longer open.
+ *
+ * `--update` IS ASSERTED PER ROW, FROM THE SHAPE ROW'S `command`. Four of the
+ * twelve declare `command: null` and offer no flag, correctly: their records
+ * are maintained by hand because the value of an entry in them IS the argument
+ * for it, and `check:button-contrast`'s own remedy ends "and never as a way to
+ * make a new one quiet". An unconditional assertion would fail those four, and
+ * "fixing" them would put a footgun on three checks whose bar is zero. So the
+ * two directions are both asserted: a row with a command offers exactly the
+ * flag that command ends in, and a row with `command: null` offers none.
+ *
+ * WHAT IS NOT ASSERTED IS WHICH SLOT. #610 gave `main()` two — `flags` is
+ * terminal, `fallThrough` prints and then still gates — and which one a flag
+ * belongs in is a reading of what the flag DOES. `check:glossary`'s `--update`
+ * writes the record and then gates, deliberately, and demanding the terminal
+ * slot would move it and quietly stop it gating for whoever typed the flag:
+ * the exact footgun #610 warned about, which `scripts/lib/side-flags.test.mjs`
+ * asserts the difference of by banner and exit code. The registry asserts the
+ * flag its own table tells a person to type EXISTS; the slot stays the check's.
+ *
+ * @param {object} row  a registry row with a `baseline`.
+ * @param {Record<string, string>} manifest  its package's `scripts`.
+ * @param {{repoRoot?: string, exemptions?: Map<string, string>}} [opts]  both
+ *        injected for the tests, which drive a doctored row over a scratch tree
+ *        rather than planting a malformed record in the live one.
+ * @returns {import('./lib/findings.mjs').Finding[]}
+ */
+export function baselineFindings(
+  row,
+  manifest,
+  { repoRoot = REPO_ROOT, exemptions = PARSES_ITS_OWN_RECORD } = {},
+) {
+  const found = [];
+  if (!fs.existsSync(path.join(repoRoot, row.baseline))) {
+    return [{ message: `${row.name} declares baseline ${row.baseline}, which does not exist.` }];
+  }
+
+  /** @type {import('./lib/ratchet-shapes.mjs').RatchetShape} */
+  let shape;
+  try {
+    shape = shapeOf(row.baseline);
+  } catch (error) {
+    return [{ file: SHAPE_TABLE, message: error.message }];
+  }
+  if (shape.check !== row.name) {
+    found.push({
+      file: SHAPE_TABLE,
+      message:
+        `${row.baseline} is surveyed as ${shape.check}'s record, but ${row.name} is the row ` +
+        'that declares it. One record, one owner, one spelling of the path.',
+    });
+  }
+
+  // Well-formedness, in the module's words: every declared set of the record
+  // opens, or says why it cannot.
+  for (const set of shape.sets) {
+    try {
+      openRatchet({ file: row.baseline, set: set.name, repoRoot });
+    } catch (error) {
+      found.push({ file: row.baseline, message: error.message });
+    }
+  }
+
+  const entry = /(scripts\/[\w.-]+\.(?:mjs|js))/.exec(row.script)?.[1];
+  if (!entry || !fs.existsSync(path.join(repoRoot, entry))) return found;
+  const reach = reachOf(entry, { repoRoot, notEvidence: [SHAPE_TABLE] });
+  const hops = `${entry} and the ${reach.files.length - 1} file(s) it imports`;
+  const exempt = exemptions.get(row.name);
+
+  if (!reach.opens(row.baseline)) {
+    if (!exempt) {
+      found.push({
+        file: entry,
+        message:
+          `${row.name} declares baseline ${row.baseline}, which nothing in ${hops} opens ` +
+          'through scripts/lib/ratchet.mjs. The registry is describing a ratchet the check ' +
+          'does not read — or the check parses the record itself, which the module exists ' +
+          'to end.',
+      });
+    } else if (!reach.names(row.baseline)) {
+      found.push({
+        file: entry,
+        message:
+          `${row.name} declares baseline ${row.baseline}, which ${hops} never names. ` +
+          'The registry is describing a ratchet the check does not read.',
+      });
+    }
+  } else if (exempt) {
+    found.push({
+      message:
+        `${row.name} is exempted in generate-check-scripts.mjs as a check that parses its own ` +
+        `record (${exempt}) — and it now opens ${row.baseline} through the module. Delete the ` +
+        'exemption: a stated gap that has been closed is a gap the next reader believes.',
+    });
+  }
+
+  const flag = shape.command ? /(--[a-z][\w-]*)\s*$/.exec(shape.command)?.[1] : null;
+  if (shape.command && !flag) {
+    found.push({
+      file: SHAPE_TABLE,
+      message:
+        `${row.name}'s record declares command ${JSON.stringify(shape.command)}, which ends in ` +
+        'no flag. It is the line a person is told to run to re-record; it ends in the flag.',
+    });
+  } else if (flag) {
+    const named = /^npm run ([\w:-]+)/.exec(shape.command)?.[1];
+    if (named && manifest[named] === undefined) {
+      found.push({
+        file: SHAPE_TABLE,
+        message:
+          `${row.name}'s record says to run ${JSON.stringify(shape.command)}, but no ${named} ` +
+          'script exists to run. A remedy nobody can type is worse than none.',
+      });
+    }
+    if (!reach.slotOf(flag)) {
+      found.push({
+        file: entry,
+        message:
+          `${row.name}'s record is re-recorded with ${JSON.stringify(shape.command)}, but ` +
+          `nothing in ${hops} offers ${flag} — in either of main()'s flag slots or off argv. ` +
+          'The table is telling a reader to type a flag the check ignores.',
+      });
+    }
+  } else if (reach.slotOf('--update')) {
+    found.push({
+      file: entry,
+      message:
+        `${row.baseline} is surveyed with \`command: null\` — maintained by hand — yet ` +
+        `${hops} offers --update in its ${reach.slotOf('--update')} slot. Either the record has ` +
+        'a re-record line and the table should say so, or the check is offering a way to make ' +
+        'a new finding quiet on a record whose bar is zero.',
+    });
+  }
+
+  return found;
+}
+
 /**
  * Everything the registry claims that a generated block cannot state: that each
- * row's command is the one its manifest holds, that a declared baseline exists
- * and is read by the script that declares it, and that the workflow steps and
- * the `trigger` column agree in both directions.
+ * row's command is the one its manifest holds, what a declared baseline is
+ * (above), and that the workflow steps and the `trigger` column agree in both
+ * directions.
  *
  * @returns {import('./lib/findings.mjs').Finding[]}
  */
@@ -260,25 +458,7 @@ export function consistencyFindings() {
       });
     }
 
-    if (!row.baseline) continue;
-    if (!fs.existsSync(path.join(REPO_ROOT, row.baseline))) {
-      found.push({
-        message: `${row.name} declares baseline ${row.baseline}, which does not exist.`,
-      });
-      continue;
-    }
-    const implementation = /(scripts\/[\w.-]+\.(?:mjs|js))/.exec(row.script)?.[1];
-    if (implementation && fs.existsSync(path.join(REPO_ROOT, implementation))) {
-      const source = read(implementation);
-      if (!source.includes(path.basename(row.baseline))) {
-        found.push({
-          file: implementation,
-          message:
-            `${row.name} declares baseline ${row.baseline}, which ${implementation} never names. ` +
-            'The registry is describing a ratchet the check does not read.',
-        });
-      }
-    }
+    if (row.baseline) found.push(...baselineFindings(row, scripts[row.pkg]));
   }
 
   const registered = new Map(ALL.map((row) => [row.name, row]));

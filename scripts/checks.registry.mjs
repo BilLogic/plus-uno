@@ -52,8 +52,14 @@
  *   reason    why the row is NOT composed. `EXCLUDED` rows only.
  *   baseline  the ratchet file, where the check holds a recorded set rather
  *             than a threshold. Declared so a reader can find the record
- *             without opening the script; the drift check asserts the file
- *             exists and that the script names it. What SHAPE that record is,
+ *             without opening the script. The drift check asserts the row
+ *             POINTS AT SOMETHING (#602): the record opens on the shape it
+ *             declares, the check reaches it through its imports — a check that
+ *             reads its record through the module and never names the file
+ *             passes, which is why the assertion is not a filename search —
+ *             and the `--update` the shape row advertises is one the check
+ *             offers, or, where that row says `command: null`, is offered
+ *             nowhere. What SHAPE that record is,
  *             and what reading and writing it means, is `scripts/lib/ratchet.mjs`
  *             and the one-row-per-record survey beside it in
  *             `scripts/lib/ratchet-shapes.mjs` (#599) — the twelve records here
@@ -189,8 +195,13 @@ export const CHECKS = [
       'a workflow while the registry said it ran nowhere, and every file read as correct from ' +
       'the inside. It also asserts what a generated block cannot state: that each row\'s command ' +
       'is the one its package.json holds (including agents/uno-bot/, which is compared rather ' +
-      'than generated), that a declared `baseline` exists and is read by the script that ' +
-      'declares it, and that `trigger` and the workflow steps agree in BOTH directions.',
+      'than generated), that `trigger` and the workflow steps agree in BOTH directions, and ' +
+      'what a declared `baseline` is — since #602 that the record OPENS on the shape it ' +
+      'declares (every set of it, through `scripts/lib/ratchet.mjs`, which is where a record ' +
+      'that would read as an empty set fails), that the check declaring it reaches it through ' +
+      'its own IMPORTS rather than by naming the file, and that the `--update` its shape row ' +
+      'advertises is a flag the check really offers — or, for the four records maintained by ' +
+      'hand, that it offers none.',
   },
   {
     name: 'check:skill-overlap',

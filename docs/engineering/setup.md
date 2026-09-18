@@ -293,6 +293,19 @@ Two kinds of failure, two mechanisms:
   argument for it. `--update` seeds the envelope onto a record written from
   nothing and then leaves it to whoever edits the file, which is why the two
   checks that stamp a date ask for it by hand.
+- **The registry asserts the pointer, not the filename** (#602). A `baseline:`
+  row is checked by `check:check-registry`: every set of the record opens on the
+  shape it declares (an unreadable record fails there rather than reading as an
+  empty set, which is green), the check that declares it reaches the record
+  through its own imports — so a check that opens its record through the module
+  without naming the file passes, and the fallback pair is credited to
+  `scripts/lib/fallback-check.mjs` where the record work actually is — and the
+  `--update` its shape row advertises is a flag the check offers, in whichever
+  of `main()`'s two slots the check chose (`check:glossary`'s writes and then
+  still gates). A row with `command: null` must offer none. The a11y baseline is
+  the one record its check still parses itself, named as an exemption in
+  `scripts/generate-check-scripts.mjs` with the reason: the browser suite's
+  migration is its own piece of work.
 
 **Which components carry `play` blocks, and why not all of them.** A `play`
 block costs runtime on every PR, so the set is chosen rather than grown: a
