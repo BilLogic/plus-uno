@@ -124,6 +124,9 @@ export interface AgentInput {
    *  the model as that call's result; callers that omit it stage unchecked and
    *  leave the check to whoever runs it afterwards. */
   preflight?: (name: string, args: Record<string, unknown>) => Promise<{ ask: string } | null>;
+  /** When the turn began. Passed straight through to the loop, which uses it to
+   *  ignore a stop flag raised before this turn — see `loop.ts` `cancelSince`. */
+  cancelSince?: number;
   /** Called once, as the turn finishes, with the tier it was routed to and the
    *  model + thinking level the last model call was sent with — the same facts
    *  the `[uno-bot] request done` log line carries. The headless eval route
@@ -227,6 +230,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     pending,
     currentSenderId: currentSender.userId,
     cancelKey: slack?.channel ? { channel: slack.channel, thread: cancelThread } : null,
+    ...(input.cancelSince !== undefined ? { cancelSince: input.cancelSince } : {}),
     onInterim: input.onInterim,
     onDials: input.onDials,
     onToolCall: input.onToolCall,

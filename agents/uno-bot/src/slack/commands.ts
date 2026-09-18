@@ -25,7 +25,7 @@ import { postMessage } from "./api";
 import { enqueueAgentJob } from "./events";
 import { threadStateFor } from "../thread-state/production";
 import { EFFORT_COMMANDS, type EffortMode } from "./effort";
-import { NOTHING_UNDONE, STOPPING_PROMISE } from "./session-stop";
+import { NOTHING_UNDONE, STOPPING_PROMISE, inThreadStopLine, threadArg } from "./session-stop";
 import { SLASH_COMMANDS } from "../generated/slack-commands";
 import type { SlackMessageEvent } from "./types";
 
@@ -72,9 +72,11 @@ export function handleSlashCommand(
   // /stop is not a skill, so it does not go through SLASH_COMMANDS. It is a
   // system control: it must be fast, take no arguments, and never start work.
   //
-  // It sets a flag the running agent loop reads between iterations — the Worker
-  // cannot interrupt a DO alarm, so cancellation is cooperative. The reply is
-  // deliberately honest about that: the current step finishes.
+  // It sets a flag the running agent loop reads at every iteration and once
+  // more before it delivers an answer — the Worker cannot interrupt a DO alarm,
+  // so cancellation is cooperative. The reply is deliberately honest about
+  // that: the current step finishes, and what the press takes away is the
+  // answer (#589).
   // Resolved by PERSON, not by channel — the same path the Home-tab Stop
   // button takes. The channel-derived key this used to compute was wrong for
   // channel runs: a /uno-* run lives in a THREAD under the framing message, so
@@ -88,15 +90,38 @@ export function handleSlashCommand(
         // Best-effort: a failed cancel means the turn finishes, which is
         // annoying and not broken — never worth failing the ack over.
         .cancelForUser(payload.userId)
-        .catch(() => ({ cancelled: false }))
-        .then((r) => {
+        .catch(() => ({ cancelled: false, channel: undefined, thread: undefined }))
+        .then(async (r) => {
           console.log(`[stop] command from ${payload.userId} cancelled=${r.cancelled}`);
+          // And the RUN'S OWN THREAD is told, which the ephemeral below cannot
+          // do: it is visible only to the presser, and in the channel the
+          // command was typed in rather than the thread a /uno-* run lives in.
+          // The loop used to post a stop line there and no longer does (#589),
+          // so this door owes it — otherwise the person who ASKED watches their
+          // answer never arrive with nothing to explain it.
+          if (!r.cancelled || !r.channel || !r.thread) return;
+          const posted = await postMessage(env, {
+            channel: r.channel,
+            ...threadArg(r.thread),
+            text: inThreadStopLine(payload.userId),
+          }).catch((err: unknown) => {
+            // Logged, not swallowed: with the loop silent, a failed post is a
+            // press that leaves no trace anywhere, and the only way that gets
+            // counted is from here (#589).
+            console.error(`[stop] in-thread line failed for ${payload.userId}: ${String(err)}`);
+            return null;
+          });
+          if (posted && posted.ok === false) {
+            console.error(`[stop] in-thread line refused for ${payload.userId}: ${posted.error}`);
+          }
         }),
     );
-    // The promise and the reassurance are shared with the other two doors
-    // (`session-stop.ts`), because one control saying two things is how they
-    // drifted once already (#586). What is local to `/stop` is the last
-    // clause: this door can be typed when nothing is running at all.
+    // The presser also gets an immediate, private answer. The promise and the
+    // reassurance are shared with the other two doors (`session-stop.ts`),
+    // because one control saying two things is how they drifted once already
+    // (#586). What is local to `/stop` is the last clause: this door can be
+    // typed when nothing is running at all, and in that case the in-thread line
+    // above is correctly never posted.
     return ephemeral(
       `${STOPPING_PROMISE} (${NOTHING_UNDONE} If nothing of mine was running, this did nothing.)`,
     );

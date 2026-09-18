@@ -6,7 +6,8 @@
 //
 //   • the iteration budget gate, so the round-trip that carries a refusal is
 //     paid for before it is spent (ADR-022, `outOfIterationBudget`);
-//   • the `/stop` check, cooperative and at a tool boundary, from iteration 2;
+//   • the stop check, cooperative and at a tool boundary, on every iteration
+//     and once more before an answer is delivered;
 //   • authorization of the model's own `proposal_resolve` call, and answering
 //     every other call in that turn so none is left orphaned;
 //   • EVERY side-effect call of one reply becoming ONE ✅-gated proposal — a
@@ -50,7 +51,6 @@ import {
   LOOKUP_CEILING,
   MAX_ITERATIONS,
   READONLY_TOOL_BUDGET,
-  STOPPED_MESSAGE,
   SUBREQUEST_CAP,
   budgetRefusedResult,
   makeInterimFilter,
@@ -78,6 +78,24 @@ export interface TurnDials {
 
 export type AgentResult =
   | { kind: "text"; text: string }
+  /**
+   * The turn was stopped, and the answer goes undelivered.
+   *
+   * It carries NO TEXT on purpose. Every stop door confirms the press itself,
+   * so a line from here would be the second stop message for one press (#589).
+   * What the loop reports is the fact; what the person reads was already said.
+   *
+   * ALL THREE SAY IT IN THE RUN'S OWN THREAD, which is what makes silence here
+   * correct rather than merely quiet. Slack's in-thread control posts there
+   * directly (`slack/session-stop.ts`); `/stop` and the Home-tab button each
+   * post there too, off the conversation `cancelForUser` reports, and keep
+   * their ephemeral and their DM as the presser's private receipt
+   * (`slack/commands.ts`, `slack/interactive.ts`). One shared sentence, naming
+   * the presser, because on a channel run the person who asked and the person
+   * who pressed are two people and it is the ASKER who is watching that thread
+   * for an answer.
+   */
+  | { kind: "stopped" }
   | {
       kind: "proposal";
       /**
@@ -139,13 +157,13 @@ export interface LoopDeps {
    *  environment and the Slack context by the caller. */
   executeReadOnlyTool(name: string, args: Record<string, unknown>): Promise<string>;
   /**
-   * The `/stop` flag, consumed once.
+   * The stop flag, consumed once.
    *
    * Only the one method the loop needs, so a test builds a boolean and nothing
    * else. Production passes `threadStateFor(env)`, which satisfies this
    * structurally — see `run-agent.ts`.
    */
-  threadState: { consumeCancel(ref: ThreadRef): Promise<boolean> };
+  threadState: { consumeCancel(ref: ThreadRef, since?: number): Promise<boolean> };
   budget: LoopBudget;
   /**
    * Clarify-vs-act, asked BEFORE a side-effect call is staged: what does this
@@ -188,6 +206,16 @@ export interface LoopInput {
    * and no expression here could know that. See `slack.conversationTs`.
    */
   cancelKey: ThreadRef | null;
+
+  /**
+   * When this turn began, so a stop flag raised before it cannot claim it.
+   *
+   * Anchored at the START of the turn rather than here, because the gather that
+   * runs before the loop takes real time and a press during it is a real press
+   * (`turn/turn.ts` passes its own clock through `run-agent.ts`). Omitted, every
+   * flag counts, which is the old behaviour and what the eval path wants.
+   */
+  cancelSince?: number;
 
   onInterim?: (text: string) => void;
   onDials?: (dials: TurnDials) => void;
@@ -304,6 +332,79 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
     }
   };
 
+  /**
+   * Has stop been pressed? Read at the top of every iteration, and once more
+   * after the last model reply, before an answer is delivered.
+   *
+   * COOPERATIVE, and that has not changed: the Worker cannot interrupt a
+   * running alarm, so a stop lands at a tool boundary rather than mid-write, a
+   * tool call already in flight completes, and a proposal is never left half
+   * executed. A stop is not an undo either — anything the gate already ran has
+   * happened. What a press buys is that the ANSWER is not delivered.
+   *
+   * ON EVERY ITERATION, the first included. The earlier rule skipped iterations
+   * 0 and 1, reasoning that nobody types `/stop` inside the first few seconds.
+   * That was true of a typed command and false of a button: Slack's stop
+   * control and the Home-tab button are one click on something already on
+   * screen, so the first two iterations are precisely when a press arrives —
+   * and a short turn answers on iteration 0, where the flag was never read at
+   * all. Seen in production on r336 (2026-09-17), twice in one thread: the stop
+   * line posted and the answer followed it (#589).
+   *
+   * AND ONCE AFTER THE LAST REPLY, which no iteration count could cover. A
+   * press arriving during the final model call is invisible to the read at the
+   * top of that iteration, because the flag was not there yet; the loop then
+   * returns through `finish` and delivers. So every exit that delivers TEXT
+   * reads the flag immediately before it: the ordinary answer, the preview a
+   * reply with nothing stageable leaves behind, and the budget-exhausted
+   * synthesis pass.
+   *
+   * A STAGED CARD COUNTS AS DELIVERY, and reads the flag too. Nothing in a
+   * staged batch has run — it is waiting on a ✅ — so dropping it takes nothing
+   * back, and a card arriving under the stop line is what the incident looked
+   * like from the thread.
+   *
+   * ONE EXIT DELIBERATELY DOES NOT, worth naming so that the next reader
+   * tidying "every delivering exit" does not add a read to it. `proposal_resolve`
+   * is the person's own ✅ or 🚫 being carried out: dropping it would leave a
+   * decision they already made unacted, and for a confirm it would contradict
+   * the promise that a stop is not an undo.
+   *
+   * WHAT THE READS COST, since the rule they replace made its own cost
+   * argument. Each read is one Durable Object hop, and a hop is an INTERNAL
+   * subrequest: Cloudflare allows 1,000 of those to its own services per
+   * invocation, counted apart from the 50 EXTERNAL subrequests that kill a
+   * Worker when they run out (ADR-022's 2026-07-30 correction; `src/net.ts`
+   * meters the two separately and the lookup gate reads only the external
+   * one). A short turn now spends two hops where it spent none, a long one a
+   * hop per iteration plus one — and the external cap that the delivery
+   * reserve protects is untouched by every one of them.
+   *
+   * CONSUMED, which is what makes one press one stop: the flag is taken by the
+   * first read that sees it, leaving nothing for the next turn in the thread to
+   * stop itself on.
+   *
+   * AND SCOPED TO THIS TURN, which is what stops a flag consuming the WRONG
+   * one. Slack's in-thread control cannot tell which of a DM's two conversation
+   * keys holds the run, so it raises the flag on both (`slack/session-stop.ts`
+   * `conversationKeys`); the running turn takes one and the other stands for
+   * the five minutes of `CANCEL_TTL_MS`. Once the loop reads from iteration 0
+   * and a stopped turn posts nothing, that leftover is a later, unrelated
+   * question silently going unanswered — so `cancelSince` makes a flag raised
+   * before this turn began report false. It is still CLEARED: a stale flag must
+   * not survive to claim the turn after this one either.
+   *
+   * Best-effort, as it has always been: a failed read lets the turn continue,
+   * which is the same annoyance as a press that missed and never worth failing
+   * a turn over.
+   */
+  const stopPressed = async (): Promise<boolean> => {
+    if (!input.cancelKey) return false;
+    return deps.threadState
+      .consumeCancel(input.cancelKey, input.cancelSince)
+      .catch(() => false);
+  };
+
   const emitInterim = makeInterimFilter(input.onInterim);
 
   await provider.start({
@@ -320,25 +421,9 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
     // the tools-disabled synthesis pass below instead.
     if (outOfIterationBudget(deps.budget.used())) break;
 
-    // `/stop`, checked between iterations. The Worker cannot interrupt a running
-    // alarm, so cancellation is cooperative: it lands at a tool boundary, never
-    // mid-write, which is what keeps a half-executed proposal impossible.
-    //
-    // NOT checked on the first two iterations. The flag costs an internal
-    // Durable Object read per check, and nobody types `/stop` inside the first
-    // few seconds — paying for it on every short turn to serve a case that
-    // cannot have happened yet is the wrong trade.
-    //
-    // Best-effort, as it has always been: a failed read lets the turn continue,
-    // which is the same annoyance as a `/stop` that missed and never worth
-    // failing a turn over.
-    if (
-      iter >= 2 &&
-      input.cancelKey &&
-      (await deps.threadState.consumeCancel(input.cancelKey).catch(() => false))
-    ) {
-      console.log(`[stop] cancelled at iteration ${iter}`);
-      return finish({ kind: "text", text: STOPPED_MESSAGE });
+    if (await stopPressed()) {
+      console.log(`[stop] stopped at iteration ${iter}, before the model was called`);
+      return finish({ kind: "stopped" });
     }
 
     const reply = await send(true);
@@ -352,6 +437,12 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
     }
 
     if (reply.stop === "end" || reply.toolCalls.length === 0) {
+      // The turn has its answer and is about to hand it over — the last moment
+      // a press can still be honoured.
+      if (await stopPressed()) {
+        console.log(`[stop] stopped at iteration ${iter}, answer undelivered`);
+        return finish({ kind: "stopped" });
+      }
       return finish({ kind: "text", text: reply.text || "(empty response)" });
     }
 
@@ -474,7 +565,22 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
       // Nothing stageable at all: the person hears what happened instead of
       // watching a proposal card that would have been empty.
       if (!operations.length) {
+        // A preview IS an answer by the measure that matters — the person
+        // reads it — so it reads the flag on the same rule as the exits above.
+        if (await stopPressed()) {
+          console.log(`[stop] stopped at iteration ${iter}, preview undelivered`);
+          return finish({ kind: "stopped" });
+        }
         return finish({ kind: "text", text: preview || CLARIFY_FALLBACK });
+      }
+      // A CARD IS DELIVERY TOO, so it reads the flag like the answers above.
+      // Nothing here has been executed — the batch is staged, waiting on a ✅ —
+      // so suppressing it takes nothing back and is not an undo. What it spares
+      // the person is the thing the incident actually looked like: a fresh card
+      // arriving under the line that had just told them work would stop.
+      if (await stopPressed()) {
+        console.log(`[stop] stopped at iteration ${iter}, proposal unstaged`);
+        return finish({ kind: "stopped" });
       }
       return finish({
         kind: "proposal",
@@ -493,5 +599,11 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
   // disabled, so the model answers from what it already gathered.
   provider.recordUserText(BUDGET_EXHAUSTED_SYNTHESIS);
   const final = await send(false);
+  // This pass delivers an answer too, so it reads the flag on the same rule as
+  // the exit above.
+  if (await stopPressed()) {
+    console.log("[stop] stopped after the synthesis pass, answer undelivered");
+    return finish({ kind: "stopped" });
+  }
   return finish({ kind: "text", text: final.text || CLARIFY_FALLBACK });
 }

@@ -37,7 +37,9 @@ import { resolve } from "node:path";
 import {
   NOTHING_UNDONE,
   STOPPING_PROMISE,
+  inThreadStopLine,
   resolveStop,
+  threadArg,
 } from "../src/slack/session-stop";
 import {
   createInMemoryThreadState,
@@ -194,6 +196,63 @@ describe("the confirmation says who stopped it, in the words the other doors use
         !src.includes("I'll finish the step I'm on"),
         `${door} keeps no second copy of the promise`,
       );
+    }
+  });
+});
+
+// ── The line the run's own thread gets, from whichever door ─────────────────
+//
+// All three doors put the same sentence in the run's thread now. Before #589
+// the loop posted a stop line there and the other two doors only spoke
+// privately — `/stop` by ephemeral, the Home-tab button by DM — so once the
+// loop went silent, a run stopped by either left the ASKER watching a thread
+// where nothing arrived and nothing explained it.
+describe("the stop line the run's thread gets", () => {
+  it("names the presser and makes both shared promises", () => {
+    const line = inThreadStopLine(PRESSER);
+    assert.match(line, new RegExp(`<@${PRESSER}>`));
+    assert.ok(line.includes(STOPPING_PROMISE), "the cooperative-cancel promise, verbatim");
+    assert.ok(line.includes(NOTHING_UNDONE), "the not-an-undo reassurance, verbatim");
+  });
+
+  it("is the line the in-thread control's own verdict is built from", async () => {
+    // One sentence from three doors, or the three drift again (#586).
+    const state: ThreadState = createInMemoryThreadState();
+    const verdict = await resolveStop({ channel: DM, threadTs: DM_THREAD, userId: PRESSER }, state);
+    assert.ok(verdict.text.startsWith(inThreadStopLine(PRESSER)));
+  });
+
+  // A conversation key is not always a timestamp: every loose DM line resolves
+  // to the constant "dm" (`events.ts`), and posting THAT as a thread_ts is a
+  // Slack error rather than a thread. An unthreaded DM wants a top-level
+  // message, which is what omitting the argument gives.
+  it("threads the post on a real timestamp and not on the DM constant", () => {
+    assert.deepEqual(threadArg(THREAD), { thread_ts: THREAD });
+    assert.deepEqual(threadArg(DM_THREAD), { thread_ts: DM_THREAD });
+    assert.deepEqual(threadArg("dm"), {});
+  });
+
+  it("is posted into the cancelled run's own conversation by both other doors", () => {
+    // Neither door can be driven from here — both take `Env` and call Slack —
+    // so they are asserted at the source, the genre this file already uses for
+    // the adapter's ordering below.
+    for (const door of ["src/slack/commands.ts", "src/slack/interactive.ts"]) {
+      const src = readFileSync(resolve(process.cwd(), door), "utf8");
+      assert.match(src, /inThreadStopLine\(/, `${door} posts the shared line`);
+      assert.match(src, /\.\.\.threadArg\(/, `${door} threads it on the conversation key`);
+      // Off the conversation the cancel itself reported, not off the payload:
+      // neither door's payload can name the run's thread.
+      assert.match(src, /cancelForUser\(/, `${door} resolves the run by person`);
+    }
+  });
+
+  it("is countable when it fails, on both doors", () => {
+    // With the loop silent, a swallowed post is a press that leaves no trace
+    // anywhere — so the failure is logged rather than dropped (#589).
+    for (const door of ["src/slack/commands.ts", "src/slack/interactive.ts"]) {
+      const src = readFileSync(resolve(process.cwd(), door), "utf8");
+      assert.match(src, /console\.error\(`\[stop\] in-thread line failed/, `${door} logs a failed post`);
+      assert.match(src, /console\.error\(`\[stop\] in-thread line refused/, `${door} logs a refused post`);
     }
   });
 });

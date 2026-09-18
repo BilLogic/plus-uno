@@ -20,9 +20,12 @@ import {
   LOOKUP_CEILING,
   MAX_ITERATIONS,
   READONLY_TOOL_BUDGET,
-  STOPPED_MESSAGE,
 } from "../src/agent/loop-policy";
-import type { PendingProposal, ThreadRef } from "../src/thread-state/index";
+import {
+  createInMemoryThreadState,
+  type PendingProposal,
+  type ThreadRef,
+} from "../src/thread-state/index";
 
 // ── harness ──────────────────────────────────────────────────────────────────
 
@@ -49,6 +52,9 @@ interface Recorder {
 
 function recorder(opts: {
   cancel?: boolean;
+  /** The 1-based read the flag first answers true on, for a case about WHEN
+   *  the loop looks. `cancel` is the flag standing raised the whole turn. */
+  cancelOnRead?: number;
   toolResult?: (name: string) => string;
   budget?: Partial<LoopBudget>;
 } = {}): Recorder {
@@ -64,6 +70,7 @@ function recorder(opts: {
       threadState: {
         async consumeCancel(_ref: ThreadRef) {
           rec.cancelReads++;
+          if (opts.cancelOnRead !== undefined) return rec.cancelReads === opts.cancelOnRead;
           return opts.cancel === true;
         },
       },
@@ -105,6 +112,9 @@ function loopInput(
   };
 }
 
+/** The conversation key the stop cases below press on — `loopInput`'s own. */
+const CANCEL_REF: ThreadRef = { channel: "C1", thread: "t1" };
+
 /** A reply that asks for one read-only lookup. */
 const LOOKUP = { toolCalls: [{ name: "search_blueprint", args: { query: "reflection" } }] };
 
@@ -118,20 +128,203 @@ function fake(opts: FakeProviderOptions) {
 
 // ── /stop ────────────────────────────────────────────────────────────────────
 
-test("/stop at iteration two returns the stop message and runs no further tool", async () => {
-  const rec = recorder({ cancel: true });
+test("a stop mid-turn stops the turn and runs no further tool", async () => {
+  // The press lands while the second lookup is running, so the reads at
+  // iterations 0 and 1 saw nothing and the read at iteration 2 sees it.
+  const rec = recorder({ cancelOnRead: 3 });
   const provider = fake({ replies: repeat(6, LOOKUP) });
 
   const result = await runLoop(loopInput(provider, rec));
 
-  assert.deepEqual(result, { kind: "text", text: STOPPED_MESSAGE });
+  assert.deepEqual(result, { kind: "stopped" });
   // Two model calls happened (iterations 0 and 1) and each ran its lookup; the
-  // third iteration checked the flag and stopped BEFORE calling the model.
+  // third iteration read the flag and stopped BEFORE calling the model — the
+  // tool boundary that keeps a half-executed proposal impossible.
   assert.equal(provider.sends.length, 2);
   assert.deepEqual(rec.executed, ["search_blueprint", "search_blueprint"]);
-  // The flag is read once, at iteration 2 — not on the two short-turn
-  // iterations before it, each of which would cost a Durable Object read.
+  // One read per iteration, the first included: a turn that answers on
+  // iteration 0 is exactly the turn a button press arrives during (#589).
+  assert.equal(rec.cancelReads, 3);
+});
+
+test("a stop visible on iteration 0 stops the turn before the model is called", async () => {
+  const rec = recorder({ cancel: true });
+  const provider = fake({ replies: [{ text: "an answer nobody waited for" }] });
+
+  const result = await runLoop(loopInput(provider, rec));
+
+  assert.deepEqual(result, { kind: "stopped" });
+  assert.equal(provider.sends.length, 0);
   assert.equal(rec.cancelReads, 1);
+});
+
+test("a stop landing after the last model reply suppresses the answer", async () => {
+  // The other half of #589, and the half no iteration count could fix: the
+  // press arrives DURING the final model call. The read at the top of the
+  // iteration is honest — the flag was not there yet — so the only read that
+  // can see this press is the one before the answer is delivered.
+  //
+  // The store is the real in-memory adapter, so the flag is written by
+  // `requestCancel` and consumed once, exactly as it is in production.
+  const store = createInMemoryThreadState();
+  const rec = recorder();
+  rec.deps.threadState = store;
+  const scripted = fake({ replies: [{ text: "the answer that goes undelivered" }] });
+  const pressedWhileAnswering: LoopInput["provider"] = {
+    ...scripted,
+    async send(opts) {
+      const reply = await scripted.send(opts);
+      // Somebody clicks stop while the model is producing this reply.
+      await store.requestCancel(CANCEL_REF);
+      return reply;
+    },
+  };
+
+  const result = await runLoop(loopInput(pressedWhileAnswering, rec, { cancelKey: CANCEL_REF }));
+
+  assert.deepEqual(result, { kind: "stopped" });
+  // The model call itself completed: cancellation is cooperative, and what is
+  // suppressed is the DELIVERY of what it said.
+  assert.equal(scripted.sends.length, 1);
+  // Consumed, so the next turn in this thread is not stopped by the same press.
+  assert.equal(await store.consumeCancel(CANCEL_REF), false);
+});
+
+test("a stop landing after a reply with nothing stageable suppresses the preview too", async () => {
+  // The fourth delivering exit, and the one the first pass missed. A reply
+  // whose only side-effect call cannot be staged — its arguments are not an
+  // object — stages no proposal and delivers a PREVIEW instead, which is an
+  // answer by every measure that matters here: the person reads it. It needs
+  // the same read immediately before it as the other three.
+  const store = createInMemoryThreadState();
+  const rec = recorder();
+  rec.deps.threadState = store;
+  const scripted = fake({
+    replies: [
+      {
+        text: "here is what I would have done",
+        // The wire can carry a non-object here and the loop is written for it
+        // (`Array.isArray` is what makes the call unstageable); the type cannot
+        // say so, so the case says it in a cast.
+        toolCalls: [{ name: "notion_create", args: [] as unknown as Record<string, unknown> }],
+      },
+    ],
+  });
+  const pressedWhileAnswering: LoopInput["provider"] = {
+    ...scripted,
+    async send(opts) {
+      const reply = await scripted.send(opts);
+      await store.requestCancel(CANCEL_REF);
+      return reply;
+    },
+  };
+
+  const result = await runLoop(loopInput(pressedWhileAnswering, rec, { cancelKey: CANCEL_REF }));
+
+  assert.deepEqual(result, { kind: "stopped" });
+  assert.equal(await store.consumeCancel(CANCEL_REF), false);
+});
+
+test("a stop landing during the last call of a multi-iteration turn suppresses the answer", async () => {
+  // Criterion 2 in the issue's own words — "during the final model call of a
+  // MULTI-iteration turn". Two lookups run first, so the reads at the top of
+  // iterations 0, 1 and 2 all see nothing; the press lands while the third
+  // reply is being produced, and only the pre-delivery read can catch it.
+  const store = createInMemoryThreadState();
+  const rec = recorder();
+  rec.deps.threadState = store;
+  const scripted = fake({ replies: [LOOKUP, LOOKUP, { text: "the answer two lookups paid for" }] });
+  const pressedOnTheLastCall: LoopInput["provider"] = {
+    ...scripted,
+    async send(opts) {
+      const reply = await scripted.send(opts);
+      if (scripted.sends.length === 3) await store.requestCancel(CANCEL_REF);
+      return reply;
+    },
+  };
+
+  const result = await runLoop(loopInput(pressedOnTheLastCall, rec, { cancelKey: CANCEL_REF }));
+
+  assert.deepEqual(result, { kind: "stopped" });
+  // Both lookups ran and the final call completed: cooperative throughout, and
+  // only the delivery is dropped.
+  assert.equal(scripted.sends.length, 3);
+  assert.deepEqual(rec.executed, ["search_blueprint", "search_blueprint"]);
+});
+
+test("a stop landing during the synthesis pass suppresses what it synthesised", async () => {
+  // The budget-exhausted pass delivers text like any other exit, so it reads
+  // the flag like any other exit — the case that had no coverage at all.
+  const store = createInMemoryThreadState();
+  const rec = recorder({ budget: { used: () => LOOKUP_CEILING - 1 } });
+  rec.deps.threadState = store;
+  const scripted = fake({ replies: [{ text: "what I managed to gather" }] });
+  const pressedWhileSynthesising: LoopInput["provider"] = {
+    ...scripted,
+    async send(opts) {
+      const reply = await scripted.send(opts);
+      await store.requestCancel(CANCEL_REF);
+      return reply;
+    },
+  };
+
+  const result = await runLoop(loopInput(pressedWhileSynthesising, rec, { cancelKey: CANCEL_REF }));
+
+  assert.deepEqual(result, { kind: "stopped" });
+  // The synthesis pass itself ran — the flag is read after it, not instead of
+  // it — and its text went undelivered.
+  assert.deepEqual(
+    scripted.sends.map((c) => c.toolsEnabled),
+    [false],
+  );
+});
+
+test("a stop landing before a proposal is staged takes the card away too", async () => {
+  // A card is delivery, not execution: nothing in a staged batch has run, so
+  // dropping it takes nothing back — and a fresh card arriving under the stop
+  // line is what the incident looked like from the thread (#589).
+  const store = createInMemoryThreadState();
+  const rec = recorder();
+  rec.deps.threadState = store;
+  const scripted = fake({
+    replies: [{ text: "staging this", toolCalls: [{ name: "notion_create", args: { title: "A page" } }] }],
+  });
+  const pressedWhileStaging: LoopInput["provider"] = {
+    ...scripted,
+    async send(opts) {
+      const reply = await scripted.send(opts);
+      await store.requestCancel(CANCEL_REF);
+      return reply;
+    },
+  };
+
+  const result = await runLoop(loopInput(pressedWhileStaging, rec, { cancelKey: CANCEL_REF }));
+
+  assert.deepEqual(result, { kind: "stopped" });
+  // And nothing was executed on the way — the batch was never run, only staged
+  // and then dropped, so a stop is still not an undo.
+  assert.deepEqual(rec.executed, []);
+});
+
+test("a stop flag raised before this turn began does not stop it", async () => {
+  // The leftover-flag hazard (#589). Slack's in-thread control raises BOTH of a
+  // DM's conversation keys because it cannot tell which holds the run; the turn
+  // consumes one and the other stands for five minutes. Unscoped, it would
+  // silently swallow the answer to the NEXT, unrelated question on that key —
+  // silently, because a stopped turn posts nothing.
+  const store = createInMemoryThreadState();
+  await store.requestCancel(CANCEL_REF);
+  const rec = recorder();
+  rec.deps.threadState = store;
+  const provider = fake({ replies: [{ text: "the answer the leftover would have eaten" }] });
+
+  const result = await runLoop(
+    loopInput(provider, rec, { cancelKey: CANCEL_REF, cancelSince: Date.now() + 1 }),
+  );
+
+  assert.deepEqual(result, { kind: "text", text: "the answer the leftover would have eaten" });
+  // Consumed anyway, so it cannot claim the turn after this one either.
+  assert.equal(await store.consumeCancel(CANCEL_REF), false);
 });
 
 test("a turn with no conversation to cancel never reads the /stop flag", async () => {

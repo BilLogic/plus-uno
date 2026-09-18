@@ -127,11 +127,6 @@ export const BUDGET_EXHAUSTED_SYNTHESIS =
 export const CLARIFY_FALLBACK =
   "I pulled up a lot of context but couldn't wrap it into a clean answer — can you narrow the question a little?";
 
-/** What a cancelled turn says. A `/stop` lands at a tool boundary, so nothing
- *  was half-written and the message can promise that outright. */
-export const STOPPED_MESSAGE =
-  "Stopped there — I didn't finish that one. Nothing was created or changed.";
-
 // ── Interim-narration filter ─────────────────────────────────────────────────
 
 // Between-tool narration is surfaced to the user as SHORT separate messages

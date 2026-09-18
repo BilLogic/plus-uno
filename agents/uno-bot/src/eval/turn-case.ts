@@ -211,8 +211,17 @@ function evalResult(report: EvalTurnReport): EvalResult | null {
         ? agentResult
         : { kind: "text", text: posted };
 
+    case "stopped":
+      // Stop was pressed and the answer went undelivered. Nothing was posted,
+      // which is the empty text — the same shape the reaction-only turn reports
+      // for the same reason.
+      return { kind: "text", text: "" };
+
     case "failed":
-      return agentResult ?? null;
+      // Reported as the loop produced it — except a stop, which carries no text
+      // and no tool call for the runner to score, and reaches this arm only if
+      // a turn were ever to fail after one was seen.
+      return agentResult && agentResult.kind !== "stopped" ? agentResult : null;
   }
 }
 

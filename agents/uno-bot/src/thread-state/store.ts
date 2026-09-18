@@ -418,13 +418,25 @@ export interface ThreadState {
   // ----- cancel (the /stop command and the Home-tab Stop button) -----
 
   /** Raise the flag. A flag, not a signal: a running turn cannot be
-   *  interrupted, so the loop reads this between iterations and returns early —
-   *  cancellation lands at a tool boundary rather than mid-write. */
+   *  interrupted, so the loop reads this at the top of every iteration and
+   *  again before it delivers an answer, then returns early — cancellation
+   *  lands at a tool boundary rather than mid-write. */
   requestCancel(ref: ThreadRef): Promise<void>;
 
-  /** Read AND clear the flag: one /stop cancels one turn. A flag older than
-   *  `CANCEL_TTL_MS` reports false and is cleared. */
-  consumeCancel(ref: ThreadRef): Promise<boolean>;
+  /**
+   * Read AND clear the flag: one press stops one turn, and the turn that
+   * consumes it is the one that goes quiet — the loop reads several times per
+   * turn now, and only the first read can see a given press. A flag older than
+   * `CANCEL_TTL_MS` reports false and is cleared.
+   *
+   * `since` is when the reading turn began. A flag raised BEFORE that belongs
+   * to an earlier turn, so it reports false — and is cleared all the same, so
+   * it cannot claim the turn after this one either. Slack's in-thread stop
+   * control is why this exists: it cannot tell which of a DM's two conversation
+   * keys holds the run, so it raises both and one is always left standing
+   * (`slack/session-stop.ts`). Omitted, every flag counts.
+   */
+  consumeCancel(ref: ThreadRef, since?: number): Promise<boolean>;
 
   /**
    * Cancel whatever this person has running, wherever it is — resolving the
@@ -432,8 +444,18 @@ export interface ThreadState {
    * that calls this has three seconds to ack and has nothing to do with the
    * lookup except cancel it. `cancelled: false` means there was nothing to
    * stop.
+   *
+   * It reports the conversation it cancelled — `channel` AND `thread` — because
+   * the two doors that call this owe the run's own thread a line, and neither
+   * can name that thread from its payload: `/stop` arrives with a channel and
+   * no reliable thread, the Home-tab button with a person and nowhere at all.
+   * `thread` is the CONVERSATION KEY, so for an unthreaded DM it is the
+   * constant `"dm"` rather than a timestamp — a caller posting with it must
+   * check (`slack/session-stop.ts` `threadArg`).
    */
-  cancelForUser(userId: string): Promise<{ cancelled: boolean; channel?: string }>;
+  cancelForUser(
+    userId: string,
+  ): Promise<{ cancelled: boolean; channel?: string; thread?: string }>;
 
   /**
    * Record which conversation this person's turn is running in.

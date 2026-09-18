@@ -189,7 +189,12 @@ export type TurnDisposition =
   | "asked"
   | "resolved"
   | "staged"
-  | "failed";
+  | "failed"
+  /** Stop was pressed before the answer was delivered, so it was not delivered.
+   *  The turn posts nothing, because the door that took the press has already
+   *  confirmed it — one press, one stop message. Which door says it where is
+   *  set out at the exit itself, in `turnBody` (#589). */
+  | "stopped";
 
 export interface TurnTelemetry {
   tier: ModelTier;
@@ -243,6 +248,9 @@ export interface TurnAgentRequest {
   /** True when this turn is a correction — forces a fresh blueprint read and
    *  turns on the judge's correction gate. */
   correction: boolean;
+  /** When the turn began, so a stop flag raised before it cannot claim it. See
+   *  `agent/loop.ts` `cancelSince`. */
+  cancelSince?: number;
   onInterim(text: string): void;
   /** The same clarify-vs-act check Turn runs after the loop returns, with this
    *  thread's PRD already bound, so the loop can put a refusal to the model as
@@ -378,7 +386,7 @@ export interface TurnDeps {
  * outcome — a field set at one exit — and a false "still waiting" after a
  * visible failure is cheaper than a false "nothing to do" over a live card.
  *
- * The switch is exhaustive on purpose: a seventh disposition leaves it without
+ * The switch is exhaustive on purpose: a further disposition leaves it without
  * a return on that arm and `tsc` refuses the build, which is the only kind of
  * reminder that survives a year.
  */
@@ -394,11 +402,16 @@ export function settlementOf(settle: {
     case "staged":
     case "asked":
       return "waiting-on-person";
-    // The thread decides. An answer, a bare 🙏 and a failure all leave a live
-    // card exactly as they found it.
+    // The thread decides. An answer, a bare 🙏, a failure and a turn stopped
+    // before its answer landed all leave a live card exactly as they found it.
+    // A stop settles like the rest of them for the reason the whole ticket
+    // turns on: the person pressed a button and the indicator has to come down
+    // — and it has to come down saying the same thing the stop handler says,
+    // which computes this same card-based arm (`slack/session-stop.ts`).
     case "answered":
     case "reacted":
     case "failed":
+    case "stopped":
       return settle.cardLive ? "waiting-on-person" : "idle";
     // The one ending that consumed the card — the claim IS the resolution.
     case "resolved":
@@ -409,9 +422,10 @@ export function settlementOf(settle: {
 /**
  * One turn, with the working signal guaranteed down when it ends.
  *
- * The turn leaves by nine doors — an answer, a clarifying ask, a staged card,
- * a card Slack refused, four flavours of gate resolution, a dead model — and a
- * signal cleared at nine sites is a signal the tenth door forgets. So the set
+ * The turn leaves by ten doors — an answer, a clarifying ask, a staged card,
+ * a card Slack refused, four flavours of gate resolution, a stop pressed
+ * before the answer landed, a dead model — and a signal cleared at ten sites
+ * is a signal the eleventh door forgets. So the set
  * stays where it belongs (beside the work it describes) and the clear is a
  * `finally` around the whole thing: `withWorkingSignal` watches the Delivery
  * the turn is handed and takes down whatever the turn raised, whichever door
@@ -450,6 +464,13 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
 
 async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {
   const { delivery, threadState } = deps;
+
+  // When this turn began, which is what scopes a stop press to it. Taken HERE
+  // rather than in the loop: the gather between this line and the first model
+  // call does real work over real seconds, and a press during it is a real
+  // press. A flag older than this line belongs to a turn that has already
+  // ended (`agent/loop.ts` `stopPressed`, `thread-state/store.ts`).
+  const startedAt = deps.now?.() ?? Date.now();
   const ref: ThreadRef = { channel: request.channel, thread: request.conversationTs };
   const bodyText = request.attachmentsText ?? request.text;
   const modelBase = [bodyText, ...(request.visionNotes ?? [])].join("\n");
@@ -680,6 +701,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
       correction,
       preflight: preflightCall,
       onInterim: postInterim,
+      cancelSince: startedAt,
     });
   } catch (err) {
     console.error(`[agent] failed: ${err instanceof Error ? err.message : String(err)}`);
@@ -721,6 +743,26 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
       telemetry,
       memory,
     });
+  }
+
+  // ── A stop, pressed before the answer was delivered ────────────────────────
+  //
+  // The one exit that posts NOTHING AT ALL. Whichever door took the press has
+  // already put the line in THIS thread, naming who pressed — Slack's
+  // in-thread control directly (`slack/session-stop.ts`), `/stop` and the
+  // Home-tab button off the conversation `cancelForUser` reports
+  // (`slack/commands.ts`, `slack/interactive.ts`). A line from here would be
+  // the second stop message for one press, which with the answer arriving
+  // under it is the failure #589 was filed on.
+  //
+  // The progress surface still closes, and it closes COMPLETE rather than
+  // error: the turn ended the way it was asked to. The exchange is remembered
+  // in both halves, as the reaction-only turn remembers it, so the next turn in
+  // the thread reads a question that went unanswered rather than a gap.
+  if (result.kind === "stopped") {
+    await delivery.endProgress("complete");
+    await memory.remember("(stopped — the answer was not delivered)");
+    return { disposition: "stopped", wrote: memory.wrote(), telemetry };
   }
 
   // Everything past here posts its own message (a proposal card, a clarifying

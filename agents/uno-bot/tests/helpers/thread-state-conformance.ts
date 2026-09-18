@@ -477,6 +477,32 @@ export function runThreadStateConformance(
     assert.equal(await store.consumeCancel(THREAD), false);
   });
 
+  // A flag is scoped to the turn that reads it. Slack's in-thread stop control
+  // cannot tell which of a DM's two conversation keys holds the run, so it
+  // raises BOTH and the turn consumes one — leaving the other standing for five
+  // minutes. Unscoped, that leftover silently swallows the answer to the next,
+  // unrelated question on that key (#589).
+  it("a cancel flag raised before the reading turn consumes false, and is cleared", async () => {
+    const { store, clock } = setup();
+    await store.requestCancel(THREAD);
+    const laterTurnStartedAt = clock.now() + 1;
+    clock.advance(10);
+
+    assert.equal(await store.consumeCancel(THREAD, laterTurnStartedAt), false);
+    // Cleared all the same: it must not survive to claim the turn after this
+    // one either, which is the same rule a stale flag gets.
+    assert.equal(await store.consumeCancel(THREAD), false);
+  });
+
+  it("a cancel flag raised after the turn began consumes true", async () => {
+    const { store, clock } = setup();
+    const startedAt = clock.now();
+    clock.advance(10);
+    await store.requestCancel(THREAD);
+
+    assert.equal(await store.consumeCancel(THREAD, startedAt), true);
+  });
+
   // ----- active run + cancel-by-user (the Home-tab Stop button) -----
 
   it("cancel-by-user reports nothing to stop when no run was marked", async () => {
@@ -489,7 +515,11 @@ export function runThreadStateConformance(
     await store.setActiveRun("U1", THREAD);
     const outcome = await store.cancelForUser("U1");
     assert.equal(outcome.cancelled, true);
+    // BOTH halves of the conversation are reported: the two doors that call
+    // this owe the run's own thread a stop line and cannot name that thread
+    // from their own payload (#589).
     assert.equal(outcome.channel, THREAD.channel);
+    assert.equal(outcome.thread, THREAD.thread);
     assert.equal(await store.consumeCancel(THREAD), true);
   });
 
