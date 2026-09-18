@@ -5,6 +5,7 @@ import type { Env } from "../types";
 import { toSlackMrkdwn } from "./mrkdwn";
 import { countedFetch, rethrowIfBudget } from "../net";
 import type { SlackEventFile } from "./types";
+import { rowFor } from "../agent/tool-table";
 
 interface SlackOk {
   ok: true;
@@ -309,24 +310,20 @@ export async function addReaction(
   return slackCall<SlackResponse>(env, "reactions.add", { channel, timestamp: ts, name });
 }
 
-// Confirmed tools that produce a reviewable artifact (a draft PR or a new PRD)
-// and so warrant a heads-up in #plus-design for team review (D5). delete_prd is
-// a removal — no review-request.
-const REVIEW_REQUEST_TOOLS: ReadonlySet<string> = new Set([
-  "component_implement",
-  "prototype_scaffold",
-  "notion_create",
-]);
-
+/**
+ * True when a confirmed run leaves a reviewable artifact — a draft PR, a new
+ * PRD — and so warrants a heads-up in #plus-design for team review (D5).
+ *
+ * The roster and the artifact's name are both the tool table's `reviewRequest`
+ * column (`agent/tool-table.ts`): this module kept a set of three names and a
+ * second map of three labels beside it, so a new tool that opened a PR was
+ * announced nowhere, and one that was in the set but not the map announced
+ * itself by its raw tool name. An archive or an update is not in the column —
+ * a removal has nothing to review.
+ */
 export function warrantsReviewRequest(toolName: string): boolean {
-  return REVIEW_REQUEST_TOOLS.has(toolName);
+  return rowFor(toolName)?.reviewRequest != null;
 }
-
-const REVIEW_VERB: Record<string, string> = {
-  component_implement: "component implementation PR",
-  prototype_scaffold: "new prototype scaffold PR",
-  notion_create: "new PRD / intake / decision",
-};
 
 export interface ReviewRequestInput {
   toolName: string;
@@ -345,7 +342,7 @@ export interface ReviewRequestInput {
 export async function postReviewRequest(env: Env, input: ReviewRequestInput) {
   const channel = env.PLUS_DESIGN_CHANNEL_ID?.trim();
   if (!channel) return; // fan-out disabled
-  const what = REVIEW_VERB[input.toolName] ?? input.toolName;
+  const what = rowFor(input.toolName)?.reviewRequest ?? input.toolName;
   const reviewers = (input.reviewerUserIds ?? []).map((id) => `<@${id}>`).join(" ");
   const lines = [
     `:eyes: *Review request* — a ${what} is ready.`,

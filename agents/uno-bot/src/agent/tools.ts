@@ -23,17 +23,19 @@
 // disagree, rather than in a module nobody loads.
 //
 // It re-exports nothing: a reader that wants a row's standing, the `ToolName`
-// union or `isToolName` imports `./tool-table`, which is cheaper to reach and
-// loadable everywhere. A pass-through bag over two modules everyone can
+// union, `isToolName` or `rowFor` imports `./tool-table`, which is cheaper to
+// reach and loadable everywhere — which is how the confidence check, the
+// pending notice, the proposal card and the review-request fan-out read their
+// rosters off a row (#598). A pass-through bag over two modules everyone can
 // already import is what `loop-shared.ts` was (#497).
 import toolsJson from "../../tool-definitions.json";
 import { TOOL_BODIES, type ToolBody } from "./tool-bodies";
 import { withSchemas, TOOL_NAMES, type SchemaRow, type ToolName, type ToolSchema } from "./tool-table";
 
-/** One tool, whole: what it is, the schema it is offered under, and what runs. */
-export interface ToolEntry extends SchemaRow {
-  readonly run: ToolBody;
-}
+/** One tool, whole: what it is, the schema it is offered under, and what runs.
+ *  A type rather than an interface: `SchemaRow` is a union on `access`, so the
+ *  card words come with the gated rows and with nothing else. */
+export type ToolEntry = SchemaRow & { readonly run: ToolBody };
 
 const ROWS = withSchemas(toolsJson as ToolSchema[]);
 
