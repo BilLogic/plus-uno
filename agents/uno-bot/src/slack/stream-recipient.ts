@@ -1,16 +1,12 @@
 // Who a stream is being opened FOR, and whether one can be opened at all.
 //
 // Its own module because this is the one part of the answer path's streaming
-// decision that is pure. `slack/delivery.ts` takes an `Env` and posts through
-// the Slack client, so the Node suite can compile that file and has nothing to
-// call it with — and a rule this small deserves to be checked by RUNNING it
-// rather than by reading its source for a substring.
-//
-// `slack/delivery.ts` is the last adapter on the answer path still holding
-// `Env` rather than taking its Slack client by name, which is why
-// `tests/stream-recipient.test.ts` still keeps ONE source assertion over it.
-// Splitting it the way the Delivery adapter (#594), the stop doors (#593) and
-// the reaction door (#592) were split is its own ticket, not #595's.
+// decision that is pure — `decideStream` is checked by RUNNING it, and the
+// posting functions that consult it (`slack/delivery.ts`) take a named Slack
+// client so the Node suite can drive the call itself (`tests/stream-recipient.test.ts`,
+// #654). Splitting them the way the Delivery adapter (#594), the stop doors
+// (#593) and the reaction door (#592) were split is what retired the last
+// source assertion over the answer path.
 
 /** The asker and their workspace: `chat.startStream`'s `recipient_user_id` and
  *  `recipient_team_id`. The argument contract is stated once, in `slack/api.ts`

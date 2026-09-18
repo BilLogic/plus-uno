@@ -9,7 +9,7 @@
 // So the shape is: a door builds a signal, `resolveSignal` returns a verdict,
 // the door posts `verdict.post` through its Delivery, and hands the verdict
 // here. Three doors do exactly that — `gate/reaction-door.ts` (reaction),
-// `slack/interactive.ts` (button) and `turn/turn.ts` (typed emoji, and the
+// `slack/button-door.ts` (button) and `turn/turn.ts` (typed emoji, and the
 // model's own `proposal_resolve`).
 //
 // A door that names `Env` calls this function directly; a door that takes its

@@ -9,9 +9,9 @@
 // So every case here drives a real signal through `resolveSignal` against one
 // staged proposal in the in-memory ThreadState, and asserts the VERDICT: the
 // same outcome, the same text to post, and one execution between all four.
-// Past the verdict, the reaction door is driven too — it takes its
-// dependencies by name (#592), so the whole door runs here on the recording
-// Delivery rather than being read with a regex.
+// Past the verdict, the reaction door (#592) and the button door (#654) are
+// driven too — they take their dependencies by name, so the whole door runs
+// here on the recording Delivery rather than being read with a regex.
 //
 // Slack devoli/C0ARJ2A3A69 p1787296549114929, 2026-08-21: Bryan typed "sure go
 // ahead" and the bot asked a second time. The fix on 2026-08-22 was to delete
@@ -22,8 +22,6 @@
 // resolves without the model.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 
 import {
   EXPIRED_POST,
@@ -54,6 +52,7 @@ import {
   type RecordingDelivery,
   type TurnSettlement,
 } from "../src/turn/index";
+import { runButtonDoor, type ButtonDoorTarget } from "../src/slack/button-door";
 
 // ── one staged proposal, and the four signals that resolve it ────────────────
 
@@ -600,43 +599,138 @@ describe("the reaction door", () => {
 
 // ── the other door outside Turn ──────────────────────────────────────────────
 
-describe("the button door raises and settles the working signal", () => {
-  // The button door still takes an `Env` and posts through the Slack client, so
-  // this suite can compile it and has nothing to call it with. Read it instead
-  // — the agreement being checked is one line long and the failure is silent: a
-  // door that stops wrapping its run still works, and still strands the
-  // indicator. Same move as the manifest check in `shortcuts.test.ts`, and it
-  // goes the moment that door takes its dependencies by name too, the way the
-  // reaction door (#592), the stop doors (#593) and the Delivery adapter (#594)
-  // did. It and `slack/delivery.ts` are the two left; #595 left both.
-  const door = "src/slack/interactive.ts";
+describe("the button door", () => {
+  const kindsOf = (delivery: RecordingDelivery): string[] => delivery.calls.map((c) => c.kind);
 
-  it(`${door} runs its verdict inside the pairing`, () => {
-    const src = readFileSync(resolve(process.cwd(), door), "utf8");
-    const wrapped = src.slice(src.indexOf("withWorkingSignal("));
-    assert.ok(src.includes("withWorkingSignal"), "the door uses the pairing");
-    assert.ok(wrapped.includes("setWorking("), "it raises the signal inside the pairing");
-    assert.ok(wrapped.includes("executeVerdict("), "and runs the verdict inside it");
-    // No second owner: the door never takes the signal down by hand.
-    assert.ok(!src.includes("clearWorking("), "the clear is the pairing's, not the door's");
-    // And it settles the thread to `idle` and nothing else. This is asserted
-    // on the literal a door would actually write, because the first version
-    // of this check looked for the identifier `settlementOf` — which no door
-    // would ever write, since a door writes an inline arrow. Appending
-    // `, () => "waiting-on-person"` to the call typechecked clean and passed
-    // the whole suite. It fails both of these.
-    assert.ok(wrapped.includes('() => "idle"'), "the door settles the thread to idle");
-    assert.ok(
-      !src.includes("waiting-on-person"),
-      "no door claims a person is being waited on after a card it just resolved",
+  /** What the clear told the surface the thread now needs. */
+  const clearedWith = (delivery: RecordingDelivery): TurnSettlement | undefined =>
+    delivery.calls.find((c) => c.kind === "working-clear")?.settlement;
+
+  /** Drive the real door against one staged card, on the recording adapter. */
+  async function drive(
+    opts: {
+      threadState?: ThreadState;
+      decision?: "confirm" | "cancel";
+      messageTs?: string;
+      userId?: string;
+      applyVerdict?: (verdict: GateVerdict) => Promise<void>;
+    } = {},
+  ) {
+    const threadState = opts.threadState ?? (await staged());
+    const delivery = recordingDelivery();
+    const ran: GateVerdict[] = [];
+    /** What the door had already said by the time the tool ran. */
+    let saidBeforeRunning: string[] | undefined;
+    const targets: ButtonDoorTarget[] = [];
+    const ephemerals: string[] = [];
+    const replacements: Array<{ text: string; note: string }> = [];
+
+    await runButtonDoor(
+      {
+        channel: CHANNEL,
+        messageTs: opts.messageTs ?? CARD_TS,
+        decision: opts.decision ?? "confirm",
+        userId: opts.userId ?? "U2",
+      },
+      {
+        threadState,
+        delivery: (target) => {
+          targets.push(target);
+          return delivery;
+        },
+        async applyVerdict(verdict) {
+          saidBeforeRunning = kindsOf(delivery);
+          ran.push(verdict);
+          if (opts.applyVerdict) await opts.applyVerdict(verdict);
+        },
+        async replyEphemeral(text) {
+          ephemerals.push(text);
+        },
+        async replaceCard(text, note) {
+          replacements.push({ text, note });
+        },
+      },
     );
+
+    return { delivery, ran, targets, ephemerals, replacements, threadState, saidBeforeRunning };
+  }
+
+  it("speaks the verdict, runs the tool, and leaves nothing up", async () => {
+    const { delivery, ran, saidBeforeRunning, replacements } = await drive();
+
+    // The raise sits inside the pairing, the answer follows it, and the settle
+    // comes last — one clear, and the door never writes it by hand.
+    assert.deepEqual(kindsOf(delivery), ["working", "note", "working-clear"]);
+    assert.deepEqual(delivery.posted, ["Got it — kicking that off."]);
+    // A door resolving a card leaves nobody waiting on anybody, and it states
+    // that rather than inheriting it: the mapper is a required argument, so a
+    // door cannot get an answer it never thought about (#575).
+    assert.equal(clearedWith(delivery), "idle");
+    assert.notEqual(clearedWith(delivery), "waiting-on-person");
+
+    // The tool runs AFTER the verdict is posted — the person sees the
+    // acknowledgement before the work, the same order every door keeps.
+    assert.deepEqual(saidBeforeRunning, ["working", "note"]);
+    assert.equal(ran.length, 1);
+    assert.deepEqual(ran[0]?.execute?.input, { title: "Reflection redesign" });
+    assert.deepEqual(replacements, [
+      {
+        text: PROPOSAL.proposalText,
+        note: ":white_check_mark: Approved by <@U2>",
+      },
+    ]);
+  });
+
+  it("posts where the verdict said, against the person's own message", async () => {
+    const { targets } = await drive();
+    assert.deepEqual(targets, [
+      { channel: CHANNEL, replyTs: THREAD, userMsgTs: PROPOSAL.userMsgTs, userId: "U2" },
+    ]);
+  });
+
+  it("answers a losing press where the person is looking, and raises nothing", async () => {
+    // Expired, already resolved, or a press that lost the race. Never silence,
+    // and never a working signal to strand either.
+    const { delivery, ran, ephemerals, replacements } = await drive({
+      threadState: createInMemoryThreadState(),
+    });
+    assert.deepEqual(kindsOf(delivery), []);
+    assert.deepEqual(ran, []);
+    assert.deepEqual(ephemerals, [STALE_POST]);
+    assert.deepEqual(replacements, []);
+  });
+
+  it("lets the throw out rather than answering in the thread, and still settles", async () => {
+    // Unlike the reaction door, this one does not catch: the pairing is what
+    // brings the indicator down, and the settlement the clear carries is the
+    // wrapper's own `"idle"` — a run that threw never produced a result to map.
+    const threadState = await staged();
+    const delivery = recordingDelivery();
+    await assert.rejects(
+      runButtonDoor(
+        { channel: CHANNEL, messageTs: CARD_TS, decision: "confirm", userId: "U2" },
+        {
+          threadState,
+          delivery: () => delivery,
+          applyVerdict: async () => {
+            throw new Error("notion 502");
+          },
+          replyEphemeral: async () => {},
+          replaceCard: async () => {},
+        },
+      ),
+      /notion 502/,
+    );
+    assert.deepEqual(kindsOf(delivery), ["working", "note", "working-clear"]);
+    assert.equal(clearedWith(delivery), "idle");
+    assert.notEqual(clearedWith(delivery), "waiting-on-person");
   });
 
   it("keeps the indicator's clear on the exit that rethrows", async () => {
-    // That door lets the throw out rather than answering in the thread. The
-    // pairing is what brings the indicator down anyway, and the settlement the
-    // clear carries is the wrapper's own `"idle"` — a run that threw never
-    // produced a result to map.
+    // The pairing itself, independent of either door: a throw never reaches
+    // the mapper, so a door that wrote `() => "waiting-on-person"` still
+    // settles idle. The test above drives the button door; this one pins the
+    // wrapper the door uses.
     const delivery = recordingDelivery();
     await assert.rejects(
       withWorkingSignal(
@@ -658,3 +752,4 @@ describe("the button door raises and settles the working signal", () => {
     assert.equal(delivery.calls.find((c) => c.kind === "working-clear")?.settlement, "idle");
   });
 });
+

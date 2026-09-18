@@ -26,12 +26,11 @@ import { countedFetch } from "../net";
 import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
 import { conversationsOpen, deleteMessage } from "./api";
-import { resolveSignal } from "../gate/index";
 import { executeVerdict } from "../agent/resolve-proposal";
 import { proposalCardBlocks } from "./proposal-render";
 import { runHomeStopDoor, type HomeStopDoorDeps } from "./stop-doors";
 import { slackDelivery } from "./slack-delivery";
-import { withWorkingSignal } from "../turn/index";
+import { runButtonDoor, type ButtonDoorDeps } from "./button-door";
 
 /** The subset of Slack's interaction envelope this Worker acts on. */
 interface InteractionPayload {
@@ -116,20 +115,12 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
 
 // ✅ Approve / ⛔ Cancel on a proposal card (2026-08-22).
 //
-// The third way to resolve a card, beside a reaction and a typed emoji, and
-// the one the card itself points at. Like a reaction it resolves ONLY the
-// card it sits on — `payload.message.ts` is the card — and it enters the same
-// Gate every other door does, so the lookup, the claim and the lost-race
-// wording are not this file's to get right.
+// The Slack envelope for the button door: a button payload becomes a press,
+// `Env` becomes the door's named dependencies, and `runButtonDoor` does the
+// rest (`button-door.ts`). See that file for why the press raises the working
+// signal Turn owns.
 //
-// A press that did NOT win is answered where the person is looking: an
-// ephemeral reply via `response_url`, which is the surface a button press
-// already owns. A win speaks in the thread, like every other door.
-//
-// After a win the card is re-rendered without its buttons and with the
-// outcome, via `response_url` (valid 30 minutes, which is within the card's
-// 60-minute life for any press that could still succeed). A button that stays
-// clickable after it has acted reads as a button that did nothing.
+// `Env` enters here and stops here.
 async function resolveFromButton(
   env: Env,
   payload: InteractionPayload,
@@ -139,50 +130,24 @@ async function resolveFromButton(
   const ts = payload.message?.ts;
   const userId = payload.user?.id ?? "someone";
   if (!channel || !ts) return;
+  await runButtonDoor({ channel, messageTs: ts, decision, userId }, buttonDoorDeps(env, payload));
+}
 
-  const verdict = await resolveSignal(
-    { kind: "button", messageTs: ts, decision, userId },
-    { threadState: threadStateFor(env) },
-  );
-  console.log(
-    `[interactive] ${decision} button on ${channel}/${ts} by=${userId} outcome=${verdict.outcome}`,
-  );
-
-  if (verdict.outcome !== "won") {
-    // Expired, already resolved, or a press that lost the race. Never silence.
-    if (verdict.post) await replyEphemeral(payload, verdict.post.text);
-    return;
-  }
-
-  const pending = verdict.proposal;
-  const post = verdict.post;
-  if (!pending || !post) return; // a won verdict always carries both
-  const door = slackDelivery(env, {
-    channel: pending.channel,
-    replyTs: post.replyTs,
-    userMsgTs: pending.userMsgTs,
-    userId,
-  });
-  // The press runs the tool, and the button is not a Turn — so the working
-  // signal is raised and settled here, through the same pairing Turn uses.
-  await withWorkingSignal(
-    door,
-    async (delivery) => {
-      await delivery.setWorking({ status: "is working on that…" });
-      await delivery.postNote(post.text);
-      await executeVerdict(env, verdict);
-    },
-    // What the thread needs afterwards, stated rather than defaulted: this
-    // door RESOLVED the card, so nothing in the thread is waiting on anybody.
-    // The argument is required precisely so a door cannot inherit an answer it
-    // never thought about (#575).
-    () => "idle",
-  );
-
-  const note = decision === "confirm"
-    ? `:white_check_mark: Approved by <@${userId}>`
-    : `:no_entry: Cancelled by <@${userId}> — tell me what to change and I'll stage it again.`;
-  await replaceCard(payload, pending.proposalText, note);
+/**
+ * `Env`, once, as the dependencies the button door actually reads.
+ *
+ * The Delivery factory speaks on the verdict's reply thread, which is not
+ * known until the claim is settled — same reason the reaction door takes a
+ * factory rather than an instance.
+ */
+function buttonDoorDeps(env: Env, payload: InteractionPayload): ButtonDoorDeps {
+  return {
+    threadState: threadStateFor(env),
+    delivery: (target) => slackDelivery(env, target),
+    applyVerdict: (verdict) => executeVerdict(env, verdict),
+    replyEphemeral: (text) => replyEphemeral(payload, text),
+    replaceCard: (text, note) => replaceCard(payload, text, note),
+  };
 }
 
 async function replyEphemeral(payload: InteractionPayload, text: string): Promise<void> {
