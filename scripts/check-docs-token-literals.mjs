@@ -507,15 +507,9 @@ function list(repoRoot = REPO_ROOT) {
   }
 }
 
-// The CLI is one branch or the other. A side flag prints (or writes) instead of
-// gating, so the gate does not also run; `main()` re-checks the entry guard for
-// itself, which is what keeps an import of this module reaching neither.
-if (
-  process.argv[1] &&
-  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) &&
-  process.argv.includes('--list')
-) {
-  list();
-} else {
-  main(import.meta.url, 'check:docs-token-literals', { run, summary, remedy: REMEDY });
-}
+main(import.meta.url, 'check:docs-token-literals', {
+  run,
+  summary,
+  remedy: REMEDY,
+  flags: { '--list': list },
+});

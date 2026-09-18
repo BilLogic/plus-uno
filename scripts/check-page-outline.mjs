@@ -267,18 +267,4 @@ export function assertRegistered(setupSrc = read(setupFile()), assertionSrc = re
   return findings;
 }
 
-// path.resolve + fileURLToPath, not string comparison: `file://${argv[1]}` never
-// matches once the repo path contains a space or any non-ASCII char, because the
-// URL form percent-encodes them. Same idiom as check-unspread-rest.mjs.
-// The CLI is one branch or the other. A side flag prints (or writes) instead of
-// gating, so the gate does not also run; `main()` re-checks the entry guard for
-// itself, which is what keeps an import of this module reaching neither.
-if (
-  process.argv[1] &&
-  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) &&
-  process.argv.slice(2).includes('--list')
-) {
-  list();
-} else {
-  main(import.meta.url, 'check:page-outline', { run, summary });
-}
+main(import.meta.url, 'check:page-outline', { run, summary, flags: { '--list': list } });

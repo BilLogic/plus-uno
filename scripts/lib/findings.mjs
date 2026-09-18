@@ -115,13 +115,31 @@ export function report(name, findings, opts = {}) {
  * only meaningful on the passing path; calling it eagerly would crash the
  * failing one.
  *
+ * `flags` is the slot for the side doors a check offers its reader: `--list`,
+ * `--report`, `--update`, `--stats`. Every one of them prints or writes INSTEAD
+ * of gating, and that is the whole rule — the CLI is one branch or the other,
+ * so a dispatched flag returns and the gate below never runs. Without a slot
+ * for them a check had to hand-roll the entry comparison this function exists
+ * to own, which is how the same three lines came to be written out in six
+ * spellings. Declaration order decides which of two typed flags wins, so the
+ * precedence a check wants is the order it lists them in; the flags are read
+ * from `argv[2]` on, so the script's own path can never be mistaken for one.
+ *
  * @param {string} moduleUrl  the caller's `import.meta.url`.
  * @param {string} name       the check's npm script name.
- * @param {{run: Function, summary?: Function, remedy?: string}} check
+ * @param {{run: Function, summary?: Function, remedy?: string,
+ *          flags?: Record<string, () => void>}} check
  * @returns {void}  or never, when this module is the entry point.
  */
-export function main(moduleUrl, name, { run, summary, remedy }) {
+export function main(moduleUrl, name, { run, summary, remedy, flags }) {
   if (!process.argv[1] || pathToFileURL(process.argv[1]).href !== moduleUrl) return;
+  const typed = process.argv.slice(2);
+  for (const [flag, handle] of Object.entries(flags ?? {})) {
+    if (typed.includes(flag)) {
+      handle();
+      return;
+    }
+  }
   const findings = run() ?? [];
   report(name, findings, { remedy, summary: findings.length ? undefined : summary?.() });
 }
