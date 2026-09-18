@@ -259,6 +259,14 @@ export function recordingPosting(opts: RecordingPostingOptions = {}): RecordingP
   return {
     client,
     calls,
+    /**
+     * The posting functions' dependencies, with this client in them.
+     *
+     * `streamingOn` defaults true so a test of the recipient pair actually
+     * reaches `startStream` — the production envelope reads `SLACK_STREAMING`.
+     *
+     * @param over optional overrides for the streaming switch, alert channel, or throttle
+     */
     deps: (over = {}) => ({
       slack: client,
       streamingOn: over.streamingOn ?? true,

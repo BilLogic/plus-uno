@@ -17,8 +17,9 @@
 // unbroken line; and only then a character cut. A fenced block is carried whole
 // — the blank lines inside one are not paragraph breaks.
 //
-// Pure and import-light on purpose: `delivery.ts` reaches for `Env` and the
-// Slack API, so nothing there can be reached by `npm test`.
+// Pure and import-light on purpose: splitting a body is not a Slack call, and
+// this module stays free of the posting client so the packing can be checked
+// by running it (`tests/answer-posts.test.ts`).
 
 import { splitBalanced } from "./split";
 

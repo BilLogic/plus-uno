@@ -700,11 +700,37 @@ describe("the button door", () => {
     assert.deepEqual(replacements, []);
   });
 
+  it("lets the throw out rather than answering in the thread, and still settles", async () => {
+    // Unlike the reaction door, this one does not catch: the pairing is what
+    // brings the indicator down, and the settlement the clear carries is the
+    // wrapper's own `"idle"` — a run that threw never produced a result to map.
+    const threadState = await staged();
+    const delivery = recordingDelivery();
+    await assert.rejects(
+      runButtonDoor(
+        { channel: CHANNEL, messageTs: CARD_TS, decision: "confirm", userId: "U2" },
+        {
+          threadState,
+          delivery: () => delivery,
+          applyVerdict: async () => {
+            throw new Error("notion 502");
+          },
+          replyEphemeral: async () => {},
+          replaceCard: async () => {},
+        },
+      ),
+      /notion 502/,
+    );
+    assert.deepEqual(kindsOf(delivery), ["working", "note", "working-clear"]);
+    assert.equal(clearedWith(delivery), "idle");
+    assert.notEqual(clearedWith(delivery), "waiting-on-person");
+  });
+
   it("keeps the indicator's clear on the exit that rethrows", async () => {
-    // That door lets the throw out rather than answering in the thread. The
-    // pairing is what brings the indicator down anyway, and the settlement the
-    // clear carries is the wrapper's own `"idle"` — a run that threw never
-    // produced a result to map.
+    // The pairing itself, independent of either door: a throw never reaches
+    // the mapper, so a door that wrote `() => "waiting-on-person"` still
+    // settles idle. The test above drives the button door; this one pins the
+    // wrapper the door uses.
     const delivery = recordingDelivery();
     await assert.rejects(
       withWorkingSignal(

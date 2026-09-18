@@ -91,7 +91,7 @@ export interface PostingDeps {
  * @param deps named posting dependencies
  * @param err the capacity error, snippeted into the ping
  */
-export async function alertCapacity(deps: PostingDeps, err: unknown): Promise<void> {
+async function alertCapacity(deps: PostingDeps, err: unknown): Promise<void> {
   try {
     const kv = deps.throttle;
     if (kv) {
