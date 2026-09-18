@@ -14,7 +14,11 @@
  *   the corpus   where tokens live, read once, aliases followed — and read
  *                THROUGH the one reader, which is the defect a first
  *                implementation of this module committed and this file guards.
- *   the family   which family a token name belongs to.
+ *   the family   which family a token name belongs to — and, since #644, the
+ *                one place the colour family's naming promises MORE than its
+ *                values keep: 33 of the 117 `-state-08/12/16` overlays are
+ *                washes of a different colour than the role they are named
+ *                after, and the eleven bases are pinned so a twelfth fails.
  *   equality     whether two values are the same value.
  *
  * The third is the one with teeth, in two directions:
@@ -254,6 +258,102 @@ describe('the family map — one statement of which family a name is in', () => 
     for (const family of FAMILIES) {
       expect(family.prefix.startsWith('--')).toBe(true);
       expect(family.what.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+/*
+ * `-state-NN` NAMES AN OVERLAY; IT DOES NOT DERIVE ONE (#644).
+ *
+ * `--color-{role}-state-08/12/16` reads like `--color-{role}` at 8/12/16%, and
+ * `design-system/guidelines/foundations/color.md` presents it in the same table
+ * as the other `--color-{role}-*` modifiers. For 84 of the 117 overlays it IS
+ * that. For 33 of them — eleven bases × three steps — it is an 8/12/16% wash of
+ * a DIFFERENT colour, because `_colors.scss` is generated from Figma and the
+ * solid roles were re-picked at some point without the washes following:
+ * `--color-primary` is `#0472a8`, and `--color-primary-state-08` is 8% of
+ * `#00658e`. An implementer assumed the derivation during #592–#625 and took a
+ * red test for it, which is what made this worth writing down.
+ *
+ * WHY THE LIST IS PINNED RATHER THAN CORRECTED. Both are one-line changes and
+ * only one of them is reversible. Re-mixing 33 overlays from their named bases
+ * repaints hover, pressed and focus washes across the product — 113 stylesheets
+ * under `design-system/src` reach for a `-state-08/12/16` token, 70 of them for
+ * one of the eleven divergent bases — and it moves measurements that are already
+ * recorded: `docs/evals/text-contrast-baseline.json` holds three entries whose
+ * ground is `--color-primary-state-08` or `-12`, and the 315 alpha-only pairs
+ * asserted further down this file are counted over these same live values, so a
+ * re-mix is news there too. Which of the two halves is the intended colour is a
+ * Figma question and a visible design change, so it is #268's and Bill's, not a
+ * test's. What a test CAN do is make the divergence a recorded fact instead of a
+ * trap: the eleven are named here, a twelfth fails, and a base that gets
+ * re-mixed to agree fails too so the list cannot outlive the exception.
+ */
+describe('a state overlay is named after a base it is not always mixed from', () => {
+  /** Every `--color-*-state-08/12/16`, aliases resolved, with its named base. */
+  const overlays = () => {
+    const corpus = tokenCorpus();
+    return [...corpus.keys()]
+      .filter((name) => /^--color-.+-state-(08|12|16)$/.test(name))
+      .map((name) => {
+        const base = name.replace(/-state-(08|12|16)$/, '');
+        const mixed = colourKey(corpus.get(name).value);
+        const solid = corpus.get(base) ? colourKey(corpus.get(base).value) : null;
+        // Channels only: the overlay's whole job is to carry an alpha the solid
+        // does not have, so `colourKey`'s alpha byte is the one thing that must
+        // differ. `#rrggbb` is the first seven characters of either key.
+        return { name, base, mixed: mixed?.slice(0, 7) ?? null, solid: solid?.slice(0, 7) ?? null };
+      });
+  };
+
+  /**
+   * The exception, by BASE rather than by overlay: all three steps of a base
+   * diverge together, because they are three alphas over one colour.
+   *
+   * `--color-shadow` is in the list for a different reason and is the one row
+   * that is not a drift — there is no `--color-shadow` token at all, and a
+   * shadow wash is black. It is recorded rather than special-cased so that
+   * minting `--color-shadow` some day has to come past this test.
+   */
+  const KNOWN = {
+    '--color-primary': '#00658e',
+    '--color-primary-container': '#c7e7ff',
+    '--color-danger': '#be0c16',
+    '--color-warning': '#715c00',
+    '--color-social-emotional': '#7d5700',
+    '--color-social-emotional-container': '#ffdeaa',
+    '--color-mastering-content': '#7f3fb1',
+    '--color-outline': '#71787e',
+    '--color-outline-variant': '#c1c7ce',
+    '--color-on-surface-variant': '#41484d',
+    '--color-shadow': '#000000',
+  };
+
+  it('mixes 84 of the 117 overlays from the base their name points at', () => {
+    const all = overlays();
+    expect(all.length).toBe(117);
+    const agree = all.filter((o) => o.mixed !== null && o.mixed === o.solid);
+    expect(agree.length).toBe(117 - Object.keys(KNOWN).length * 3);
+  });
+
+  it('diverges on exactly the eleven recorded bases, and mixes what is recorded', () => {
+    const found = {};
+    for (const { base, mixed, solid } of overlays()) {
+      if (mixed !== null && mixed === solid) continue;
+      // Every step of a base has to mix the SAME colour, or the name is not the
+      // only thing that has stopped describing the family.
+      if (base in found) expect(found[base]).toBe(mixed);
+      found[base] = mixed;
+    }
+    expect(found).toEqual(KNOWN);
+  });
+
+  it('records a base for every divergent name, so the exception is readable', () => {
+    for (const base of Object.keys(KNOWN)) {
+      const solid = tokenCorpus().get(base);
+      // `--color-shadow` is the row with no solid, which is its whole reason.
+      if (base === '--color-shadow') expect(solid).toBe(undefined);
+      else expect(colourKey(solid.value)?.slice(0, 7)).not.toBe(KNOWN[base]);
     }
   });
 });

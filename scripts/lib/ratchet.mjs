@@ -76,6 +76,17 @@
  * read through it: the set has a shape, a direction and an error mode, and
  * `entries` is the only reading of it that carries them.
  *
+ * THE RECORD IS ENCODED THE WAY THIS MODULE WRITES IT, AND THAT IS ASSERTED.
+ * `update` writes `JSON.stringify(record, null, 2)` plus a newline, which emits
+ * every non-ASCII character literally. A record hand-edited into any other
+ * encoding therefore has a no-movement `--update` that rewrites lines nobody
+ * moved: `text-contrast-baseline.json` held its em-dashes as `\u2014` and
+ * churned 17 lines, `atlassian-benchmark.json` 2, and the reviewer of #599 and
+ * then of #601 reverted the write rather than read past the noise. A baseline
+ * diff is the movement it recorded or it is not worth reading, so the encoding
+ * is a case per record in `ratchet-conformance.mjs` rather than a convention
+ * (#644).
+ *
  * A REASON IS NEVER INVENTED BY THE TOOL. `update` carries an existing reason
  * across untouched and stamps `UNREVIEWED` on an entry it has never seen, so a
  * run whose record still holds one is a run where somebody pressed `--update`

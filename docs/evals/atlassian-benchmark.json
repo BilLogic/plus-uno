@@ -43,10 +43,10 @@
       "font.metric.small",
       "font.code"
     ],
-    "note": "Each of these is ONE token carrying size, line-height and weight together. There is no separate `font.lineHeight.*` namespace on the page at all \u2014 the 23 `font.*` tokens are these 14 steps plus 4 weights and 5 families."
+    "note": "Each of these is ONE token carrying size, line-height and weight together. There is no separate `font.lineHeight.*` namespace on the page at all — the 23 `font.*` tokens are these 14 steps plus 4 weights and 5 families."
   },
   "ours": {
-    "note": "OUR side of the comparison, recorded 2026-08-29 so the enforced rows have a starting point. Only the four ARGUED rows are recorded \u2014 see ROWS in scripts/atlassian-benchmark.mjs, where each direction carries its reason. Re-record with `npm run benchmark:atlassian -- --update` AFTER a move in the argued direction; it refuses a backwards one.",
+    "note": "OUR side of the comparison, recorded 2026-08-29 so the enforced rows have a starting point. Only the four ARGUED rows are recorded — see ROWS in scripts/atlassian-benchmark.mjs, where each direction carries its reason. Re-record with `npm run benchmark:atlassian -- --update` AFTER a move in the argued direction; it refuses a backwards one.",
     "recordedAt": "2026-08-29",
     "intent.borderTokens": 7,
     "intent.iconTokens": 7,

@@ -22,7 +22,16 @@
    --color-inverse-primary: #84cfff;
 
    /* Primary State Layers */
-   /* Using actual primary color #0472a8 = rgb(0, 101, 142) from Figma */
+   /*
+    * A `-state-NN` NAME IS NOT A DERIVATION (#644). These three are 8/12/16% of
+    * #00658e, and --color-primary above is #0472a8 — the comment that used to
+    * sit here asserted the two were the same colour, which they are not. The
+    * solid roles were re-picked in Figma at some point and the washes did not
+    * follow; 33 of the 117 `--color-*-state-*` overlays do not match the role
+    * they name, and the eleven bases they belong to are named in
+    * `design-system/tests/tokens-node.test.js` so that a twelfth fails. Which
+    * half is the intended colour is a visible design change and is #268's.
+    */
    --color-primary-state-08: rgba(0, 101, 142, 0.08);
    --color-primary-state-12: rgba(0, 101, 142, 0.12);
    --color-primary-state-16: rgba(0, 101, 142, 0.16);
