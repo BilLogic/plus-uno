@@ -14,6 +14,11 @@
 // entry now builds from `TOOLS` rather than from the raw file: that is what
 // makes `withSchemas` throw on a real deployment when a schema and a row
 // disagree, rather than in a module nobody loads.
+//
+// It re-exports nothing: a reader that wants a row's standing, the `ToolName`
+// union or `isToolName` imports `./tool-table`, which is cheaper to reach and
+// loadable everywhere. A pass-through bag over two modules everyone can
+// already import is what `loop-shared.ts` was (#497).
 import toolsJson from "../../tool-definitions.json";
 import { TOOL_BODIES, type ToolBody } from "./tool-bodies";
 import { withSchemas, TOOL_NAMES, type SchemaRow, type ToolName, type ToolSchema } from "./tool-table";
@@ -32,7 +37,3 @@ export const TOOLS_BY_NAME: Record<ToolName, ToolEntry> = Object.fromEntries(
 
 /** The rows, in declaration order. */
 export const TOOLS: readonly ToolEntry[] = TOOL_NAMES.map((name) => TOOLS_BY_NAME[name]);
-
-export { TOOL_TABLE, TOOL_NAMES, isToolName, withSchemas } from "./tool-table";
-export type { SchemaRow, ToolAccess, ToolName, ToolRow, ToolSchema } from "./tool-table";
-export type { ToolBody } from "./tool-bodies";

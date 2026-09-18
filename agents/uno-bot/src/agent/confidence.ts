@@ -27,8 +27,11 @@
  * prototype_scaffold, shareout_post, email_send, proposal_resolve) are absent
  * for the same reason: none of them is a source the answer can rest on.
  *
- * Kept here rather than imported from agent/run-agent.ts so this module stays pure
- * — it is compiled and tested outside the Worker runtime.
+ * Still stated here rather than read off the tool table's `retrieval` column
+ * (`agent/tool-table.ts`) — and purity is no longer the reason it is: that
+ * table is import-free and compiles in the same Node build this module does.
+ * The column landed BESIDE this set, and `tests/tool-table.test.ts` holds the
+ * two accounts equal in both directions until the reader moves over.
  */
 export const RETRIEVAL_TOOLS: ReadonlySet<string> = new Set([
   "roadmap_query",

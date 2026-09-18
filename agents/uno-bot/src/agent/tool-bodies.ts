@@ -6,10 +6,12 @@
 // (`src/diagnostics/index.ts`), and for the same reason: a registry whose two
 // halves are two independent lists is a registry that loses an entry quietly.
 //
-// This module names `Env`, so it is the half that cannot be pure. It reaches
-// the tool bodies DIRECTLY rather than through the two dispatches, so that
-// neither the agent entry's per-turn bookkeeping nor the Gate's Durable
-// Object imports come with them.
+// This module names `Env` and imports every tool body, so it is the half that
+// is not pure — but it still compiles and loads in the Node test build, which
+// is where the pairing gets its runtime second reading. It reaches the tool
+// bodies DIRECTLY rather than through the two dispatches, so that neither the
+// agent entry's per-turn bookkeeping nor the Gate's Durable Object imports
+// come with them.
 //
 // A BODY IS THE TOOL, NOT THE TURN. Three of the read arms are wrapped where
 // they are dispatched, in `agent/run-agent.ts`: a correction turn forces

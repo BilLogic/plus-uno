@@ -76,7 +76,6 @@ export type { HistoryTurn };
 export type { AgentImage } from "./provider-conversation";
 export type { AgentResult, TurnDials } from "./loop";
 
-
 // ── The provider-neutral contract (input of one agent turn) ──────────────────
 
 export interface AgentInput {

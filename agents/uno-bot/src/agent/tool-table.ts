@@ -10,11 +10,14 @@
 // every one of them could be forgotten independently — and several had been.
 //
 // The shape is Diagnostics' (`src/diagnostics/routes.ts`): the DATUM is
-// declared apart from the bodies, as a pure module the Node test suite can
-// read — a tool body names `Env`, which carries Workers types that compile is
-// short of, and the vendored schema file is not emitted into the test build at
-// all. `src/agent/tools.ts` joins the two, pairing rows with bodies as a
-// `Record`, so a row with no body or a body with no row fails the typecheck.
+// declared apart from the JOIN, as a module that imports nothing — not the
+// vendored schema file least of all, because `tsc` does not copy JSON into
+// `.test-build/`, which makes `src/agent/tools.ts` the one module in this seam
+// a Node test cannot load. The BODIES it can load: `tool-bodies.ts` is in
+// `tsconfig.test.json` and naming `Env` as a type costs nothing outside the
+// Worker build. So a test reads the two halves directly and `tools.ts` joins
+// them, pairing rows with bodies as a `Record`, so a row with no body or a
+// body with no row fails the typecheck.
 //
 // `tool-definitions.json` stays the SCHEMA's source: this table declares what
 // a tool is beyond its schema, and `withSchemas` joins the two, refusing a
