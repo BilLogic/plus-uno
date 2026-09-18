@@ -25,6 +25,11 @@ import {
   resolveIndexModel,
 } from "./index-model";
 import { countedFetch, rethrowIfBudget, subrequestBudgetSpent } from "../net";
+// Every read below declares HOW IT WENT, not just what it got. `served` with
+// an empty page is an answer; `failed` and `unavailable` say nothing about
+// what the source holds. Deciding that here is the only place it can be
+// decided — a 400 and an empty table arrive at the caller as the same rows.
+import { BlueprintUnavailableError, type BlueprintDisposition } from "./blueprint-read";
 import { cellUrl, sliceUrl, parseChunkTitle, chunkBody } from "./blueprint-link";
 import { BLUEPRINT_CONTRACT } from "../generated/blueprint-contract";
 import { type BlueprintScope, hasFilter, hasScope, scopeBody, scopeKey } from "./blueprint-scope";
@@ -227,7 +232,11 @@ function normalizeLinks(raw: unknown): string[] | undefined {
   return out.length ? out : undefined;
 }
 
-export class BlueprintUnavailableError extends Error {}
+// Declared in blueprint-read.ts, beside the disposition rule that has to tell
+// an unconfigured source from a failed read — a PURE module cannot import this
+// one for a type. One name, one definition; every existing importer of it
+// still imports it from here.
+export { BlueprintUnavailableError } from "./blueprint-read";
 
 export function isBlueprintConfigured(env: Env): boolean {
   return Boolean(env.SUPABASE_URL && env.SUPABASE_ANON_KEY);
@@ -990,10 +999,11 @@ let indexCache: { at: number; index: BlueprintIndex } | undefined;
  * Read the live index: one PostgREST call, both FKs declared so the two-level
  * embed resolves server-side (6 phases / 23 scenarios / 39 paths ≈ 2.3KB).
  *
- * Returns undefined rather than throwing on any failure — same degradation
- * posture as fetchEdges/fetchRows. The caller distinguishes "unavailable" from
- * "no future path exists"; an omitted key that reads as absence is the exact
- * bug this exists to fix.
+ * Answers with a `disposition` rather than throwing on any failure — same
+ * degradation posture as fetchEdges/fetchRows, and the same reason each of
+ * them now says how it went: an absent index and an unreadable one are
+ * different facts, and only this function knows which happened. An omitted key
+ * that reads as absence is the exact bug this exists to fix.
  *
  * @param env - Worker env (SUPABASE_URL / SUPABASE_ANON_KEY)
  * @param opts - `fresh` is accepted for signature symmetry with
@@ -1006,12 +1016,14 @@ let indexCache: { at: number; index: BlueprintIndex } | undefined;
 export async function fetchBlueprintIndex(
   env: Env,
   opts: { fresh?: boolean } = {},
-): Promise<BlueprintIndex | undefined> {
+): Promise<{ index?: BlueprintIndex; disposition: BlueprintDisposition }> {
   void opts.fresh; // see @param — intentionally ignored, not forgotten
-  if (!isBlueprintConfigured(env)) return undefined;
+  if (!isBlueprintConfigured(env)) return { disposition: "unavailable" };
 
   const hit = indexCache;
-  if (hit && Date.now() - hit.at < INDEX_TTL_MS) return hit.index;
+  if (hit && Date.now() - hit.at < INDEX_TTL_MS) {
+    return { index: hit.index, disposition: "served" };
+  }
 
   // Checked BEFORE the fetch, and never caught-and-swallowed after it: the
   // index is an enrichment on a search that has ALREADY succeeded, so it must
@@ -1020,14 +1032,14 @@ export async function fetchBlueprintIndex(
   // returned less than it was asked for.)
   if (subrequestBudgetSpent()) {
     console.warn("[blueprint] index read failed (subrequest budget spent)");
-    return undefined;
+    return { disposition: "failed" };
   }
 
   const data = await fetchPhaseOutline(env);
-  if (!data) return undefined;
+  if (!data) return { disposition: "failed" };
   const index = renderBlueprintIndex(data, new Date().toISOString().slice(0, 10));
   indexCache = { at: Date.now(), index };
-  return index;
+  return { index, disposition: "served" };
 }
 
 /**
@@ -1107,16 +1119,28 @@ export async function fetchPhaseOutline(env: Env): Promise<unknown[] | undefined
  * something that already exists — the bot's honest job is "here is what sits
  * next to this, go trace it properly", not a half-built tracer.
  */
-export async function fetchEdges(env: Env, cellIds: string[]): Promise<BlueprintEdge[]> {
+export async function fetchEdges(
+  env: Env,
+  cellIds: string[],
+): Promise<{ edges: BlueprintEdge[]; disposition: BlueprintDisposition }> {
   const ids = cellIds.filter(Boolean).slice(0, 10);
-  if (!isBlueprintConfigured(env) || ids.length === 0) return [];
+  // An empty edge LIST is the one answer here that carries no evidence of its
+  // own: "these cells have no dependencies" and "the request 400d" were the
+  // same `[]` until #606, and the second one reached Slack as the first. So
+  // the disposition travels beside the list, and the three ways of getting
+  // nothing are three different answers.
+  if (!isBlueprintConfigured(env)) return { edges: [], disposition: "unavailable" };
+  // No matched cells, so there is nothing to look either side of.
+  if (ids.length === 0) return { edges: [], disposition: "served" };
   const base = env.SUPABASE_URL!.replace(/\/+$/, "");
   const list = `(${ids.join(",")})`;
   // The two hint names are Postgres DEFAULTS (`<table>_<column>_fkey`) that no
   // migration ever writes down, which is exactly why a table rename breaks them
-  // silently: PostgREST 400s, this function warns and returns [], and Slack
-  // reports "no dependencies" for cells that have them. Reading them from the
-  // contract makes the app's test the thing that catches a rename.
+  // silently: PostgREST 400s, this function warns and returns an empty list,
+  // and Slack reported "no dependencies" for cells that have them. Reading the
+  // hints from the contract makes the app's test the thing that catches a
+  // rename; the `disposition` beside the list is what stops the 400 reading as
+  // an answer in the meantime.
   const select =
     // `label` became `name` and `note` was dropped by 20260830190000. The
     // comment above describes exactly this failure and it still happened,
@@ -1132,15 +1156,18 @@ export async function fetchEdges(env: Env, cellIds: string[]): Promise<Blueprint
   const res = await countedFetch(url, { headers: headers(env.SUPABASE_ANON_KEY!) });
   if (!res.ok) {
     console.warn(`[blueprint] edges read failed (${res.status})`);
-    return [];
+    return { edges: [], disposition: "failed" };
   }
-  const data = (await res.json().catch(() => [])) as Array<Record<string, unknown>>;
-  if (!Array.isArray(data)) return [];
+  const data = (await res.json().catch(() => null)) as Array<Record<string, unknown>> | null;
+  if (!Array.isArray(data)) {
+    console.warn("[blueprint] edges read failed (unexpected payload)");
+    return { edges: [], disposition: "failed" };
+  }
   const text = (v: unknown) =>
     typeof (v as { content?: unknown } | null)?.content === "string"
       ? (v as { content: string }).content.slice(0, 120)
       : "";
-  return data.flatMap((r): BlueprintEdge[] => {
+  const edges = data.flatMap((r): BlueprintEdge[] => {
     const from = text(r.source);
     const to = text(r.target);
     if (!from || !to) return [];
@@ -1159,6 +1186,7 @@ export async function fetchEdges(env: Env, cellIds: string[]): Promise<Blueprint
       },
     ];
   });
+  return { edges, disposition: "served" };
 }
 
 /** Rows from a table whose columns this Worker does not pin.
@@ -1177,8 +1205,14 @@ async function fetchRows(
   // columns instead — a select built from the contract is what lets a
   // rename fail the sync and the probe rather than this call's 400 branch.
   select = "*",
-): Promise<{ rows: Array<Record<string, unknown>>; total: number | undefined }> {
-  if (!isBlueprintConfigured(env)) return { rows: [], total: undefined };
+): Promise<{
+  rows: Array<Record<string, unknown>>;
+  total: number | undefined;
+  disposition: BlueprintDisposition;
+}> {
+  if (!isBlueprintConfigured(env)) {
+    return { rows: [], total: undefined, disposition: "unavailable" };
+  }
   const base = env.SUPABASE_URL!.replace(/\/+$/, "");
   const res = await countedFetch(`${base}/rest/v1/${table}?select=${encodeURIComponent(select)}&${qs}&limit=${limit}`, {
     // count=exact rides the SAME request (PostgREST answers in
@@ -1190,11 +1224,20 @@ async function fetchRows(
   if (!res.ok) {
     // A missing table is a legitimate outcome (not every deployment has run
     // every migration), so this degrades to "no rows" rather than failing the
-    // whole search.
+    // whole search — but it degrades to a `failed` READ, never to an empty
+    // table. The two were the same value here until #606, and "no findings"
+    // in Slack for cells that had them is what that cost.
     console.warn(`[blueprint] ${table} read failed (${res.status})`);
-    return { rows: [], total: undefined };
+    return { rows: [], total: undefined, disposition: "failed" };
   }
-  const data = await res.json().catch(() => []);
+  const data = await res.json().catch(() => null);
+  if (!Array.isArray(data)) {
+    // A 200 whose body will not parse, or is not a list, is a failed read too
+    // — same call as fetchPhaseOutline makes. It used to fall through as an
+    // empty page.
+    console.warn(`[blueprint] ${table} read failed (unexpected payload)`);
+    return { rows: [], total: undefined, disposition: "failed" };
+  }
   // content-range: "0-9/14" — the denominator is the unfiltered-by-limit total.
   const range = res.headers.get("content-range");
   const totalText = range?.split("/")[1];
@@ -1202,10 +1245,7 @@ async function fetchRows(
     totalText && totalText !== "*" && Number.isFinite(Number(totalText))
       ? Number(totalText)
       : undefined;
-  return {
-    rows: Array.isArray(data) ? (data as Array<Record<string, unknown>>) : [],
-    total,
-  };
+  return { rows: data as Array<Record<string, unknown>>, total, disposition: "served" };
 }
 
 /** Audit findings already recorded against these cells. A READ — triage is a
@@ -1219,9 +1259,15 @@ async function fetchRows(
 export async function fetchFindings(
   env: Env,
   cellIds: string[],
-): Promise<{ rows: Array<Record<string, unknown>>; total: number | undefined }> {
+): Promise<{
+  rows: Array<Record<string, unknown>>;
+  total: number | undefined;
+  disposition: BlueprintDisposition;
+}> {
   const ids = cellIds.filter(Boolean).slice(0, 10);
-  if (ids.length === 0) return { rows: [], total: 0 };
+  // No cells matched, so there is nothing a finding could be against: an
+  // answered zero, not an unmade read.
+  if (ids.length === 0) return { rows: [], total: 0, disposition: "served" };
   // Open findings only: the app's triage invariant is "dismissed stays
   // dismissed" — re-surfacing closed findings in Slack re-litigates a call
   // the team already made in-app, and closed rows eat the 20-row cap.
@@ -1229,13 +1275,13 @@ export async function fetchFindings(
   // The total rides along: `fetchRows` already counted the full matched set
   // under count=exact, and dropping it re-creates the counted-the-capped-page
   // bug that 258cfd02 fixed for slices ("5 of 14").
-  const { rows, total } = await fetchRows(
+  const { rows, total, disposition } = await fetchRows(
     env,
     FINDINGS_TABLE,
     `cell_ids=ov.{${ids.join(",")}}&status=eq.open`,
     20,
   );
-  return { rows, total };
+  return { rows, total, disposition };
 }
 
 /** Named slices someone already cut. Points at an existing view instead of
@@ -1248,12 +1294,23 @@ export async function fetchFindings(
 export async function fetchSlices(
   env: Env,
   query: string,
-): Promise<{ rows: Array<Record<string, unknown>>; total: number | undefined }> {
+): Promise<{
+  rows: Array<Record<string, unknown>>;
+  total: number | undefined;
+  disposition: BlueprintDisposition;
+}> {
   const words = terms(query);
   const filter = words.length
     ? `or=(${words.flatMap((w) => [`title.ilike.*${w}*`, `actor.ilike.*${w}*`]).join(",")})`
     : "order=updated_at.desc";
-  const { rows, total } = await fetchRows(env, "slices", filter, 10);
+  const { rows, total, disposition } = await fetchRows(env, "slices", filter, 10);
+  // The PAGE read is this read's disposition, and a failed page short-circuits
+  // the head-count below. Two reasons. It would spend a metered subrequest
+  // sizing a table whose page could not be read; and a successful head-count
+  // behind a failed page produced `{ rows: [], total: 14 }` — a shape that
+  // looks exactly like "no slices match this question", which is the false
+  // absence this read must not be able to manufacture.
+  if (disposition !== "served") return { rows: [], total: undefined, disposition };
   // `total` counts the FILTERED set. A worded query narrows it, and a "how
   // many slices are there" answer must not inherit that narrowing — so when
   // a filter was applied, fetch the table's true size with a rows-free
@@ -1272,6 +1329,7 @@ export async function fetchSlices(
       return url ? { ...row, url } : row;
     }),
     total: tableTotal,
+    disposition,
   };
 }
 
@@ -1308,10 +1366,23 @@ export async function fetchTouchpoints(
   total: number | undefined;
   registryTotal: number | undefined;
   words: string[];
+  disposition: BlueprintDisposition;
 }> {
   const words = terms(query);
   const filter = words.length ? touchpointFilter(words) : "order=name.asc";
-  const { rows, total } = await fetchRows(env, TOUCHPOINTS_TABLE, filter, limit, TOUCHPOINT_SELECT);
+  const { rows, total, disposition } = await fetchRows(
+    env,
+    TOUCHPOINTS_TABLE,
+    filter,
+    limit,
+    TOUCHPOINT_SELECT,
+  );
+  // A failed page short-circuits the head-count, exactly as in fetchSlices and
+  // for the same reason. `words` still rides along: the absence note names what
+  // was searched for, and a failed read owes that sentence too.
+  if (disposition !== "served") {
+    return { rows: [], total: undefined, registryTotal: undefined, words, disposition };
+  }
   // Same two-count shape as fetchSlices, for the same reason: `total` is the
   // FILTERED set, and a "how many tools do we use" answer must not inherit a
   // query's narrowing. An unfiltered read already IS the registry's size; a
@@ -1321,5 +1392,5 @@ export async function fetchTouchpoints(
     words.length > 0
       ? (await fetchRows(env, TOUCHPOINTS_TABLE, "limit=0", 0, TOUCHPOINT_SELECT)).total
       : total;
-  return { rows, total, registryTotal, words };
+  return { rows, total, registryTotal, words, disposition };
 }
