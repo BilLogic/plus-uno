@@ -20,10 +20,11 @@
 // api.ts's slackCall — the single Slack egress point with the defensive parse.
 
 import type { Env } from "../types";
+import { turnSurfaceOf } from "../turn/request";
 import { postMessage, slackCall } from "./api";
 import type { SessionStatus, StatusResult } from "./working-signal";
 import { threadStateFor } from "../thread-state/production";
-import { hasOwnSlackToken, slackConnectUrl } from "../oauth/slack";
+import { getSlackAccessTokenFor, slackConnectUrl } from "../oauth/slack";
 import { resolveStop } from "./session-stop";
 import type {
   AssistantContext,
@@ -194,9 +195,13 @@ export function threadTitleFrom(text: string): string {
 }
 
 /** Assistant threads are IM channels (id starts with "D"). Used to gate the
- *  status/loader affordances, which only apply to the assistant surface. */
+ *  status/loader affordances, which only apply to the assistant surface.
+ *
+ *  The rule itself is `turn/request.ts` § `turnSurfaceOf`, which is what every
+ *  caller of Turn reads it from — one statement, so a surface cannot be read
+ *  one way when the request is built and another way here. */
 export function isAssistantThread(channel: string): boolean {
-  return channel.startsWith("D");
+  return turnSurfaceOf(channel) === "assistant";
 }
 
 /** One-line, model-facing description of the open surface — only the channel is
@@ -239,6 +244,14 @@ function connectNudge(url: string): string {
 // assistant_view is deprecated by Slack and the switch is irreversible, so
 // there is no path back that these would serve.
 
+/** Has this person connected their own Slack history at /oauth/slack/start?
+ *  The resolved credential answers it: `own` is true only when the requester's
+ *  own token is the one that would run (ADR-020). */
+async function hasConnectedOwnSlack(env: Env, userId: string): Promise<boolean> {
+  if (!userId) return false;
+  return (await getSlackAccessTokenFor(env, userId))?.own === true;
+}
+
 /** agent_view: the user opened the Messages tab, i.e. a DM with us. Replaces
  *  assistant_thread_started, which no longer fires on this surface.
  *
@@ -260,7 +273,7 @@ export async function handleAgentDmOpened(
   // connected is a harmless redundancy, the reverse is a dead-end chip.
   let connected = false;
   try {
-    connected = Boolean(userId) && (await hasOwnSlackToken(env, userId));
+    connected = await hasConnectedOwnSlack(env, userId);
   } catch {
     /* unconnected set */
   }
@@ -287,7 +300,7 @@ async function greetOnce(env: Env, channel: string, userId: string): Promise<voi
   let welcome = WELCOME;
   try {
     const url = slackConnectUrl(env);
-    if (url && !(await hasOwnSlackToken(env, userId))) welcome += connectNudge(url);
+    if (url && !(await hasConnectedOwnSlack(env, userId))) welcome += connectNudge(url);
   } catch {
     /* plain welcome */
   }

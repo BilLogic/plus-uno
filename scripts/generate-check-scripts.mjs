@@ -34,6 +34,19 @@
 // catches the same drift without taking authorship of a file this registry
 // only half describes.
 //
+// AND EVERY TRIGGER IS ASSERTED, NOT JUST THE TWO THIS SCRIPT WRITES. The
+// `trigger` column names four places a check runs, and generation reaches two
+// of them. The other two — the pull-request workflows and the Worker's `deploy`
+// chain — were honoured by hand: a row could claim `pull_request` and be run by
+// nothing, or the chain could gain a step no row knew about, and each file read
+// as correct alone. Both are now READ and compared in both directions, at the
+// bottom of this file: a row with a trigger and no step fails, and a step with
+// no row fails. Neither is generated, and the reasons are with
+// `PULL_REQUEST_WORKFLOWS` and `DEPLOY_CHAIN` in the registry — briefly, the
+// pull-request workflows are jobs wrapped in forty lines of measured argument,
+// and the last segment of the deploy chain is the command that reaches a real
+// Cloudflare account.
+//
 // Usage:
 //   node scripts/generate-check-scripts.mjs           # write
 //   node scripts/generate-check-scripts.mjs --check   # CI: fail on drift
@@ -45,7 +58,10 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   ALL,
   CHECKS,
+  COMPOSITE,
+  DEPLOY_CHAIN,
   EXCLUDED,
+  PULL_REQUEST_WORKFLOWS,
   WORKFLOW_STEPS,
   rootCheckRows,
   stepsIn,
@@ -60,6 +76,9 @@ export const REMEDY =
   '  The registry in scripts/checks.registry.mjs is the author of these blocks.\n' +
   '  Edit the row, then:\n' +
   '    npm run generate:check-registry\n' +
+  "  The pull-request workflows and the Worker's deploy chain are COMPARED, not\n" +
+  '  written: a finding about either is answered by editing the trigger, the\n' +
+  '  DEPLOY_CHAIN entry or the step — regenerating will not move it.\n' +
   '  A check listed in one place and forgotten in another is the orphan this\n' +
   '  harness exists to prevent, one level up.';
 
@@ -303,6 +322,238 @@ export function consistencyFindings() {
     }
   }
 
+  // The other two triggers. All four are asserted now, which is the whole of
+  // the registry's `trigger` column no longer has a column nobody reads.
+  found.push(...pullRequestFindings(pullRequestRuns()));
+  found.push(...deployChainFindings());
+
+  return found;
+}
+
+// ---------------------------------------------------------------------------
+// the two triggers that are honoured by hand-written files
+//
+// `sweep` and `storybook-gate` are asserted above, against WORKFLOW_STEPS,
+// because the registry writes those steps. The other two are not written from
+// here — the pull-request workflows are jobs with installs and forty lines of
+// measured argument around each `run:`, and the deploy chain ends in the
+// command that reaches a real Cloudflare account. Both are therefore READ and
+// compared, in both directions, which is the same guarantee without the
+// generator taking the pen.
+// ---------------------------------------------------------------------------
+
+/**
+ * The npm script names a workflow's steps run, in file order.
+ *
+ * Read with a line regex rather than a YAML parse, on the rule every member of
+ * this gate keeps: it runs on a clean checkout with no install
+ * (`scripts/check-harness.mjs`), and the root manifest has no YAML dependency
+ * to reach for. `scripts/node-floor.mjs` reads `node-version:` the same way.
+ *
+ * Installs are not gates, so `npm ci` and `npm install` are skipped; anything
+ * that is not an npm invocation (a checkout, a shell script, an action) is not
+ * a named script and cannot be a registry row either.
+ *
+ * @param {string} text  the workflow file.
+ * @returns {string[]}
+ */
+export function runsIn(text) {
+  const names = [];
+  const lines = text.split('\n');
+  const take = (command) => {
+    const trimmed = command.trim();
+    if (/^npm\s+(ci|install)\b/.test(trimmed)) return;
+    const run = /^npm\s+run\s+(?:--silent\s+)?([\w:.@/-]+)/.exec(trimmed);
+    if (run) {
+      names.push(run[1]);
+      return;
+    }
+    const bare = /^npm\s+(test|start)\s*$/.exec(trimmed);
+    if (bare) names.push(bare[1]);
+  };
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const block = /^(\s*)run:\s*[|>][-+]?\s*$/.exec(lines[i]);
+    if (block) {
+      const outer = block[1].length;
+      for (let j = i + 1; j < lines.length; j += 1) {
+        if (lines[j].trim() === '') continue;
+        if (lines[j].search(/\S/) <= outer) break;
+        take(lines[j]);
+        i = j;
+      }
+      continue;
+    }
+    const inline = /^\s*run:\s*(\S.*)$/.exec(lines[i]);
+    if (inline) take(inline[1]);
+  }
+  return names;
+}
+
+/** Each pull-request workflow with the script names its steps run. */
+export const pullRequestRuns = () =>
+  new Map(PULL_REQUEST_WORKFLOWS.map((file) => [file, runsIn(read(file))]));
+
+/**
+ * The `pull_request` trigger against the steps that honour it, both ways.
+ *
+ * A row reaches a pull request by one of three routes, and the registry states
+ * all three: a step names it; it is composed into `COMPOSITE`, which a step
+ * names; or it declares `stepOf`, naming the composed row that spawns it. A
+ * row with the trigger and none of the three is the orphan this file exists to
+ * report — `test:workerd` was one for three months, gated as a hand-written
+ * step while the registry said it ran nowhere (#587).
+ *
+ * @param {Map<string, string[]>} workflowRuns
+ * @returns {import('./lib/findings.mjs').Finding[]}
+ */
+export function pullRequestFindings(workflowRuns, { rows = ALL, composed = CHECKS } = {}) {
+  const found = [];
+  const byRowName = new Map(rows.map((row) => [row.name, row]));
+  const composedNames = new Set(composed.map((row) => row.name));
+  const named = new Map();
+
+  for (const [file, names] of workflowRuns) {
+    for (const name of names) {
+      named.set(name, file);
+      const row = byRowName.get(name);
+      if (!row) {
+        found.push({
+          file,
+          message: `a step runs \`npm run ${name}\`, which is not a registry row. Add one, or stop running it.`,
+        });
+      } else if (!triggersOf(row).includes('pull_request')) {
+        found.push({
+          file,
+          message:
+            `${name} is run by ${file}, a pull-request workflow, but its trigger is ` +
+            `[${triggersOf(row).join(', ')}] — add 'pull_request'.`,
+        });
+      }
+    }
+  }
+
+  const reaches = (row, seen = new Set()) => {
+    if (seen.has(row.name)) return false;
+    seen.add(row.name);
+    if (named.has(row.name)) return true;
+    if (composedNames.has(row.name) && named.has(COMPOSITE)) return true;
+    const parent = row.stepOf && byRowName.get(row.stepOf);
+    return parent ? reaches(parent, seen) : false;
+  };
+
+  const files = [...workflowRuns.keys()].join(' or ');
+  for (const row of rows) {
+    if (row.stepOf) {
+      if (!byRowName.has(row.stepOf)) {
+        found.push({
+          message: `${row.name} declares stepOf '${row.stepOf}', which is not a registry row.`,
+        });
+      } else if (row.reason && !row.reason.includes(row.stepOf)) {
+        found.push({
+          message:
+            `${row.name} declares stepOf '${row.stepOf}', which its \`reason\` never names. ` +
+            'The column and the prose are the same claim; say it the same way.',
+        });
+      }
+    }
+    if (!triggersOf(row).includes('pull_request') || reaches(row)) continue;
+    found.push({
+      message:
+        `${row.name} declares trigger 'pull_request' but no step of ${files} runs it, it is ` +
+        `not composed into ${COMPOSITE}, and it names no \`stepOf\`. Add a step, compose it, ` +
+        'or correct the trigger.',
+    });
+  }
+
+  return found;
+}
+
+/** The `deploy` script of the Worker's manifest, as its `&&`-separated segments. */
+export const deployChain = () =>
+  (manifestScripts('bot').deploy ?? '')
+    .split('&&')
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+
+/**
+ * The `deploy` trigger against the chain that honours it, both ways.
+ *
+ * @param {string} [script]  the `deploy` script; the manifest's, by default.
+ * @returns {import('./lib/findings.mjs').Finding[]}
+ */
+export function deployChainFindings(script, { rows = ALL, chain = DEPLOY_CHAIN } = {}) {
+  const found = [];
+  const manifest = 'agents/uno-bot/package.json';
+  const actual =
+    script === undefined
+      ? deployChain()
+      : script
+          .split('&&')
+          .map((segment) => segment.trim())
+          .filter(Boolean);
+  const expected = chain.map((entry) => entry.step);
+
+  if (actual.join(' && ') !== expected.join(' && ')) {
+    found.push({
+      file: manifest,
+      message:
+        'the deploy chain and the registry disagree.\n' +
+        `           manifest: ${actual.join(' && ')}\n` +
+        `           registry: ${expected.join(' && ')}`,
+    });
+  }
+
+  const byRowName = new Map(rows.map((row) => [row.name, row]));
+  const gates = new Set();
+  for (const entry of chain) {
+    if (entry.runs && entry.notAGate) {
+      found.push({
+        message: `the deploy chain's '${entry.step}' is both a gate and not one. It is one or the other.`,
+      });
+      continue;
+    }
+    if (!entry.runs) {
+      if (!entry.notAGate) {
+        found.push({
+          message:
+            `the deploy chain's '${entry.step}' runs no registry row and says nothing about ` +
+            'why. Give it a `runs`, or a `notAGate` saying what it is.',
+        });
+      }
+      continue;
+    }
+    gates.add(entry.runs);
+    const invocations = [`npm run ${entry.runs}`, `npm ${entry.runs}`];
+    if (!invocations.includes(entry.step)) {
+      found.push({
+        message: `the deploy chain's '${entry.step}' claims to run ${entry.runs}. It does not.`,
+      });
+    }
+    const row = byRowName.get(entry.runs);
+    if (!row) {
+      found.push({
+        message: `the deploy chain runs ${entry.runs}, which is not a registry row.`,
+      });
+    } else if (!triggersOf(row).includes('deploy')) {
+      found.push({
+        message:
+          `${entry.runs} is a gate of the deploy chain but its trigger is ` +
+          `[${triggersOf(row).join(', ')}] — add 'deploy'.`,
+      });
+    }
+  }
+
+  for (const row of rows) {
+    if (!triggersOf(row).includes('deploy') || gates.has(row.name)) continue;
+    found.push({
+      file: manifest,
+      message:
+        `${row.name} declares trigger 'deploy' but no step of the chain runs it. Add a ` +
+        'DEPLOY_CHAIN entry, or correct the trigger.',
+    });
+  }
+
   return found;
 }
 
@@ -332,7 +583,9 @@ export function run() {
 
 export const summary = () =>
   `${CHECKS.length} registered + ${EXCLUDED.length} excluded checks, ` +
-  `${rootCheckRows().length} in package.json, ${WORKFLOW_STEPS.length} workflow steps — no drift`;
+  `${rootCheckRows().length} in package.json, ${WORKFLOW_STEPS.length} workflow steps, ` +
+  `${PULL_REQUEST_WORKFLOWS.length} pull-request workflows, ` +
+  `${DEPLOY_CHAIN.length}-step deploy chain — all four triggers asserted, no drift`;
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
   if (process.argv.includes('--check')) {

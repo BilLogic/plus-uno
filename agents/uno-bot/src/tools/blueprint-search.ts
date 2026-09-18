@@ -7,7 +7,7 @@ import type { Env } from "../types";
 import { rethrowIfBudget, SubrequestBudgetError } from "../net";
 import {
   searchBlueprint,
-  isBlueprintConfigured,
+  BlueprintUnavailableError,
   fetchBlueprintIndex,
   fetchEdges,
   fetchFindings,
@@ -55,16 +55,16 @@ export async function executeBlueprintSearch(
   if (!query && !hasFilter(scope)) {
     return JSON.stringify({ ok: false, error: "missing 'query' (optional only when a filter_* is set)" });
   }
-  if (!isBlueprintConfigured(env)) {
-    // Degrade honestly: tell the model the blueprint is unavailable so it says
-    // so rather than inventing an answer.
-    return JSON.stringify({
-      ok: false,
-      error: "uno-blueprint is not configured on this deployment",
-      note: "Do NOT fabricate an answer. Tell the user the blueprint isn't reachable and fall back to cited docs, or say you don't know.",
-    });
-  }
-
+  // No configuration pre-check here. `searchBlueprint` tests its own
+  // credentials and throws BlueprintUnavailableError before it spends
+  // anything, so this side was a second decision point for one question — and
+  // the one it made was the weaker answer: it returned `ok: false` with a
+  // sentence and NO `reason`, the only failure of this tool the model could
+  // not tell from the others by machine, while the module's own error mode was
+  // left with no handler anywhere. One decision point now, and the catch turns
+  // it into a named reason. (`isBlueprintConfigured` still has one other
+  // caller — the /debug/blueprint-subject probe, which REPORTS configuration
+  // as a finding rather than reading rows, so asking is its job.)
   try {
     // `fresh` is forced by the Worker on a correction turn (run-agent
     // executeReadOnlyTool) and may also be requested by the model. Either way it
@@ -318,6 +318,26 @@ export async function executeBlueprintSearch(
             ].filter(Boolean),
     });
   } catch (err) {
+    // This deployment has no blueprint credentials, so there is nothing to
+    // reach. Distinct from `unreachable` on purpose: that one says the source
+    // of truth exists and this turn could not read it, which sends a person
+    // looking for an outage. This one is a fact about the Worker's
+    // configuration, and the only fix is wiring it up.
+    if (err instanceof BlueprintUnavailableError) {
+      // WHICH credentials are missing goes to the log, where the person who
+      // can add them is looking; the model is told the fact, in the words a
+      // requester in Slack should hear. Same split as a failed Slack call
+      // (slack/api.ts): the operator gets the detail, the caller gets a
+      // reason. A tool result naming SUPABASE_URL invites an answer that
+      // reads like a stack trace to a designer.
+      console.warn(`[search_blueprint] ${err.message}`);
+      return JSON.stringify({
+        ok: false,
+        error: "uno-blueprint is not configured on this deployment",
+        reason: "not_configured",
+        note: "This deployment has NO blueprint configured — the source of truth was never wired up here, and nothing about this says whether the answer is in it. Do NOT fabricate an answer and do not report absence. Say the blueprint isn't available on this deployment, and fall back to cited docs or say you don't know.",
+      });
+    }
     // Two failures that read identically to the model unless separated. Running
     // out of subrequests is NOT "the blueprint is unreachable" — the source is
     // fine and the answer may well be in it; this invocation simply cannot

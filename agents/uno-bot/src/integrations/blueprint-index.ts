@@ -1,11 +1,16 @@
 // Pure shape helpers for the blueprint integration: the live table-of-contents
 // renderer, and the two cap discriminators that say WHY a result was clipped.
 //
-// Split out of blueprint.ts for the same reason blueprint-link.ts was: that
-// module imports Env and fetch, so it cannot compile under tsconfig.test.json
-// (plain Node, no Workers types) and nothing in it can be unit-tested. These
-// are the parts with real logic and no I/O, so they live where tests can reach
-// them. blueprint.ts re-exports them; callers import from either.
+// Split out of blueprint.ts for the same reason blueprint-link.ts was: these
+// are the parts with real logic and no I/O, so they live where a test can call
+// them without standing up a fetch. blueprint.ts re-exports them; callers
+// import from either.
+//
+// Not because blueprint.ts is unreachable from the Node test build — it is
+// reachable: the Workers types sit beside the Node ones under
+// tsconfig.test.json, and tests/blueprint-unavailable.test.ts imports
+// blueprint.ts to assert its one own error mode. Testing a read there costs a
+// transport stub; testing these costs nothing, which is the split.
 
 /** The non-`live` values of the blueprint's `entity_status` domain, in the
  *  order the board thinks about them: least committed first.
