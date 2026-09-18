@@ -169,6 +169,17 @@ export interface RecordingDeliveryOptions {
   answerFails?: boolean;
   /** Stage nothing — a card Slack rejected outright. */
   stagingFails?: boolean;
+  /**
+   * Make a note fail, the way Slack refuses a post into a conversation the bot
+   * was removed from.
+   *
+   * The stop doors are what this exists for (`slack/stop-doors.ts`): each of
+   * them has a duty that must outlive a refused line — the Home-tab button
+   * still owes the presser a receipt, and the in-thread control must settle
+   * the session whatever Slack does with the confirmation, since an indicator
+   * that outlives the press is the failure the control exists to remove.
+   */
+  noteFails?: boolean;
 }
 
 /**
@@ -226,6 +237,7 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
 
     async postNote(text) {
       calls.push({ kind: "note", text });
+      if (opts.noteFails) return { ok: false, text };
       posted.push(text);
       return { ok: true, text, ts: `note-${calls.length}` };
     },

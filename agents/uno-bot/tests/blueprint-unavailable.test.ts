@@ -52,12 +52,13 @@ test("the tool reports an unconfigured blueprint with its own reason, not `unrea
   // exists and the read failed", which is a different thing to tell a person.
   assert.notEqual(out.reason, "unreachable");
   assert.match(String(out.error), /not configured on this deployment/i);
-  // And it is not the OTHER shape an unconfigured read can take. Three of the
-  // blueprint's reads answer an unconfigured deployment with an empty page
-  // (`{ rows: [], total: undefined }`) rather than a throw, which is
-  // indistinguishable from "the blueprint has nothing on this" — so the one
-  // path a model-facing tool takes must never arrive as a served result. No
-  // rows, no totals, `ok: false`.
+  // And it is not the OTHER shape an unconfigured read can take. The rest of
+  // the blueprint's reads answer an unconfigured deployment with an empty page
+  // rather than a throw — which was indistinguishable from "the blueprint has
+  // nothing on this" until each one started declaring
+  // `disposition: "unavailable"` beside it (#606). The one path a model-facing
+  // tool takes must never arrive as a served result either way: no rows, no
+  // totals, `ok: false`.
   assert.equal(out.rows, undefined);
   assert.equal(out.retrieval, undefined);
   // The credential names are the operator's business, not the requester's:
@@ -66,6 +67,51 @@ test("the tool reports an unconfigured blueprint with its own reason, not `unrea
   // Whatever the reason, the false-absence guard travels with it: a failure to
   // look is never evidence the subject is missing from the blueprint.
   assert.match(String(out.note), /fabricate/i);
+});
+
+test("the read entry puts the search FIRST, so an unconfigured deployment still throws", async () => {
+  // The ORDERING, not just the shape. `not_configured` is honest only because
+  // `searchBlueprint` is the first read on the tool's path and is the one that
+  // throws; every other read answers instead of throwing. Cache ahead of it,
+  // or let an enrichment run first, and an unconfigured deployment becomes a
+  // served empty result again — which the tests above would not catch, because
+  // they pin what the tool RETURNS and not the order it reads in.
+  const { searchBlueprint, fetchBlueprintIndex, fetchEdges, fetchFindings, fetchSlices, fetchTouchpoints } =
+    await import("../src/integrations/blueprint.js");
+  const { readBlueprint, BlueprintUnavailableError } = await import(
+    "../src/integrations/blueprint-read.js"
+  );
+  await assert.rejects(
+    () =>
+      readBlueprint(
+        { query: "how does goal setting work", scope: {}, autoIndex: true, include: ["edges", "findings", "slices", "touchpoints"] },
+        {
+          search: (query, options) => searchBlueprint(UNCONFIGURED, query, options),
+          index: (options) => fetchBlueprintIndex(UNCONFIGURED, options),
+          edges: (cellIds) => fetchEdges(UNCONFIGURED, cellIds),
+          findings: (cellIds) => fetchFindings(UNCONFIGURED, cellIds),
+          slices: (query) => fetchSlices(UNCONFIGURED, query),
+          touchpoints: (query) => fetchTouchpoints(UNCONFIGURED, query),
+        },
+      ),
+    (e: unknown) => e instanceof BlueprintUnavailableError,
+  );
+});
+
+test("and if the order ever moved, each enrichment read still says `unavailable`", async () => {
+  // Defence in depth for the test above: the ordering is the guarantee, and
+  // this is what stops a reordering from being SILENT. Every one of these
+  // answers an unconfigured deployment with an empty page rather than a throw
+  // — which is indistinguishable from "the blueprint has nothing on this"
+  // unless the read says how it went. Now each one does.
+  const { fetchBlueprintIndex, fetchEdges, fetchFindings, fetchSlices, fetchTouchpoints } =
+    await import("../src/integrations/blueprint.js");
+  assert.equal((await fetchBlueprintIndex(UNCONFIGURED)).disposition, "unavailable");
+  assert.equal((await fetchEdges(UNCONFIGURED, ["cell-aaa"])).disposition, "unavailable");
+  assert.equal((await fetchFindings(UNCONFIGURED, ["cell-aaa"])).disposition, "unavailable");
+  assert.equal((await fetchSlices(UNCONFIGURED, "goal setting")).disposition, "unavailable");
+  assert.equal((await fetchTouchpoints(UNCONFIGURED, "zoom")).disposition, "unavailable");
+  // Zero subrequests: the tripwire at the top of this file is what asserts it.
 });
 
 test("a scope or query error still precedes the configuration report", async () => {

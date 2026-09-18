@@ -17,8 +17,15 @@
  * and pointed them here. This module is the one both can
  * import: it is PLAIN ESM with no Node-only import and no Node global anywhere
  * in it, so Vite bundles it for the browser and `node --test` loads it
- * unchanged. Anything that needs the filesystem — reading the token stylesheet
- * off disk — belongs in `tokens-node.js` beside it, or in the check.
+ * unchanged.
+ *
+ * ANYTHING THAT NEEDS THE FILESYSTEM IS NEXT DOOR, IN `tokens-node.mjs`
+ * (#620): where the tokens live, what the families are, and whether two values
+ * are the same value — the corpus read through `scripts/lib/corpus.mjs` rather
+ * than through an `fs` of its own. For two releases this sentence named a file
+ * that did not exist and every check answered those three questions privately;
+ * it now names the file that answers them. A story imports THIS half; a check
+ * imports either.
  *
  * ─── THE TOKEN GRAMMAR ──────────────────────────────────────────────────────
  *

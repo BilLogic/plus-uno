@@ -451,7 +451,7 @@ export interface ThreadState {
    * no reliable thread, the Home-tab button with a person and nowhere at all.
    * `thread` is the CONVERSATION KEY, so for an unthreaded DM it is the
    * constant `"dm"` rather than a timestamp — a caller posting with it must
-   * check (`slack/session-stop.ts` `threadArg`).
+   * check (`slack/stop-doors.ts` `stopPostTarget`).
    */
   cancelForUser(
     userId: string,

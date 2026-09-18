@@ -143,6 +143,23 @@ the check registry — and add a new `check:*` script to that file's `CHECKS` or
 `EXCLUDED` when you write one. The gate fails on a check that is in neither,
 because a check that runs nowhere protects nothing.
 
+It asks the same question from the other end too (#612): a `check-*.mjs` in
+`scripts/` or `agents/uno-bot/scripts/` that no row names — by `module` or
+inside its `script` — is reported by name. The name scan alone could only see
+an npm script, so a check with no script of its own read as part of the harness
+to anyone opening the folder while running nowhere. The Figma-links reporter
+was one from the day it landed, 2026-05-11: it printed a summary and exited
+zero whatever it found, so it was deleted rather than bound.
+
+And write the check's test with it. A guard nobody has watched fail is a guard
+nobody knows works (#191): the test plants the failure the check exists to
+catch, in a fixture tree, and proves each exemption by breaking the rule
+somewhere the pass is meant to leave alone. `run({ repoRoot })` is what makes
+that cheap — every findings check takes the root, so a test hands it a
+throwaway directory instead of the repo. `scripts/check-doc-links.test.mjs` and
+`scripts/check-knowledge-disposition.test.mjs` are the shape to copy, and
+`npm run test:scripts` runs them.
+
 That registry is also the author of the three places that used to state the same
 set by hand: the `check:*` block of `package.json`, the check steps of
 `.github/workflows/harness-integrity-sweep.yml` and those of

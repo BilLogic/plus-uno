@@ -19,10 +19,12 @@
 // verdict may be handed here: the `won` check below is what makes a stale or
 // cancelled one cost nothing.
 //
-// The side-effect tool table lives HERE, folded in from tools/dispatcher.ts
-// (#497), because this gate is its only caller: a confirmed proposal is the one
-// way a write tool ever runs. Read-only tools dispatch separately, inside the
-// turn, from agent/run-agent.ts.
+// The gated dispatch lives HERE, folded in from tools/dispatcher.ts (#497),
+// because this gate is its only caller: a confirmed proposal is the one way a
+// write tool ever runs. Ungated tools dispatch separately, inside the turn,
+// from agent/run-agent.ts. Both are lookups against the same table now (#597)
+// — this one keyed on `access === "gated"`, which is exactly the standing that
+// put the proposal in front of a person in the first place.
 
 import type { Env, SlackContext } from "../types";
 import { addReaction, postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
@@ -35,13 +37,8 @@ import {
 import type { GateVerdict } from "../gate/index";
 import { proposalOperations } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
-import { executeImplement } from "../tools/implement";
-import { executeImplementDesign } from "../tools/implement-design";
-import { executeNotionCreate } from "../tools/notion-create";
-import { executeNotionUpdate } from "../tools/notion-update";
-import { executeNotionArchive } from "../tools/notion-archive";
-import { executeSendEmail } from "../tools/send-email";
-import { executeShareForFeedback } from "../tools/share-for-feedback";
+import { isToolName } from "./tool-table";
+import { TOOLS_BY_NAME } from "./tools";
 
 /**
  * Act on a verdict that won its claim: react on the person's ORIGINAL request
@@ -159,11 +156,22 @@ function resultUrl(resultJson: string): string | undefined {
 }
 
 /**
- * The side-effect tool table. Each body returns a JSON string that goes
- * straight into a tool_result content block.
+ * Run the confirmed tool: one lookup in the tool table, one body.
  *
- * Reached only past the gate — an unknown name is a caller bug, not a user
- * error, so it answers ok:false rather than throwing into the resolution path.
+ * It was a seven-arm `switch` over tool names with a `default` that answered
+ * "unknown tool" (#597) — an arm nobody held equal to the `gated` rows, so a
+ * new write tool could be proposed, staged, approved and then quietly do
+ * nothing. The body comes off the row now, and every `gated` row has one by
+ * type.
+ *
+ * What remains is the gate's own invariant, checked once: only a `gated` tool
+ * runs from here. A proposal naming an `ungated` read or the `control` tool is
+ * a caller bug, not a user error, so it answers `ok:false` — the resolution
+ * path is mid-flight and a throw here would cost the acknowledgement, the
+ * history note and the rest of the batch.
+ *
+ * Each body returns a JSON string that goes straight into a `tool_result`
+ * content block.
  */
 async function executeTool(
   env: Env,
@@ -171,22 +179,15 @@ async function executeTool(
   input: Record<string, unknown>,
   slack: SlackContext,
 ): Promise<string> {
-  switch (name) {
-    case "notion_create":
-      return executeNotionCreate(env, input, slack);
-    case "notion_update":
-      return executeNotionUpdate(env, input, slack);
-    case "notion_archive":
-      return executeNotionArchive(env, input, slack);
-    case "component_implement":
-      return executeImplement(env, input, slack);
-    case "prototype_scaffold":
-      return executeImplementDesign(env, input, slack);
-    case "shareout_post":
-      return executeShareForFeedback(env, input, slack);
-    case "email_send":
-      return executeSendEmail(env, input, slack);
-    default:
-      return JSON.stringify({ ok: false, error: `unknown tool: ${name}` });
+  if (!isToolName(name)) {
+    return JSON.stringify({ ok: false, error: `unknown tool: ${name}` });
   }
+  const row = TOOLS_BY_NAME[name];
+  if (row.access !== "gated") {
+    return JSON.stringify({
+      ok: false,
+      error: `'${name}' is ${row.access} and does not run from the gate`,
+    });
+  }
+  return row.run(env, input, slack);
 }

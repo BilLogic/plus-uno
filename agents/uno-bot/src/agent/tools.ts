@@ -8,11 +8,18 @@
 //                   makes the pairing exhaustive by type
 //   tools.ts        this — the join, plus the schemas from the vendored file
 //
-// The two dispatches — the read chain in `agent/run-agent.ts` and the switch
-// past the Gate in `agent/resolve-proposal.ts` — still run, unchanged. What
-// this table already owns is the roster the model is offered, which the agent
-// entry now builds from `TOOLS` rather than from the raw file: that is what
-// makes `withSchemas` throw on a real deployment when a schema and a row
+// Everything that runs a tool now runs it from a row here (#597). The two
+// dispatches used to be hand-written string chains beside this table — the
+// eleven-arm `if` chain in `agent/run-agent.ts` and the seven-arm `switch` in
+// `agent/resolve-proposal.ts`, each ending in an `ok:false` for a name it did
+// not recognise. Both are one lookup now, `TOOLS_BY_NAME[name]`, filtered on
+// the row's `access`: `ungated` inside the turn, `gated` past the Gate. The
+// arm cannot be the missing thing, because a row with no body does not
+// compile.
+//
+// The other thing this table owns is the roster the model is offered, which
+// the agent entry builds from `TOOLS` rather than from the raw file: that is
+// what makes `withSchemas` throw on a real deployment when a schema and a row
 // disagree, rather than in a module nobody loads.
 //
 // It re-exports nothing: a reader that wants a row's standing, the `ToolName`

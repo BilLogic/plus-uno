@@ -25,10 +25,12 @@
 //
 // RESULTS, NEVER EFFECTS — the boundary `gate/gate.ts` keeps. This module
 // raises the cancel flag (a ThreadState write) and reads the thread's card, and
-// hands back the status to settle to and the line to post. The Slack calls
-// belong to the adapter (`assistant.ts` `handleSessionStopped`), which is also
-// what lets the whole decision be asserted in a Node test against the in-memory
-// ThreadState (`tests/session-stop.test.ts`).
+// hands back the status to settle to and the line to post. What is then DONE
+// with that verdict — the settle, the post — is the door's
+// (`stop-doors.ts` `runSessionStopDoor`), and the Slack calls behind it are the
+// envelope's (`assistant.ts` `handleSessionStopped`). All three layers are
+// asserted in a Node test against the in-memory ThreadState and the recording
+// Delivery (`tests/session-stop.test.ts`).
 //
 // PURE by design: no `Env`, no Workers global, no fetch, so
 // `tsconfig.test.json` compiles it.
@@ -42,13 +44,12 @@ import { settledStatus, type SessionStatus } from "./working-signal";
 // times in three files is how "Anything already confirmed stays done" shipped
 // beside two copies of "Nothing already confirmed gets undone" — a difference
 // nobody chose, in the one sentence whose job is to be reassuring. So the
-// clauses live here and `commands.ts` (`/stop`), `interactive.ts` (the
-// Home-tab button) and this module read them.
+// clauses live here and all three doors (`stop-doors.ts`) read them.
 //
 // Each door still composes its own line, because they answer different
 // questions: `/stop` adds what happens when nothing was running, the Home-tab
-// button picks between two whole messages, and this one names who pressed.
-// What is shared is the promise, which is the part that has to match.
+// button picks between two whole messages, and the in-thread control names who
+// pressed. What is shared is the promise, which is the part that has to match.
 
 /** The honest promise, and the reason all three make it: cancellation is
  *  COOPERATIVE. The loop reads the flag at a tool boundary, so the step in
@@ -244,18 +245,6 @@ export function inThreadStopLine(userId: string): string {
 }
 
 /**
- * The `thread_ts` to post a stop line with, for a conversation key.
- *
- * A conversation key is NOT always a timestamp: every loose DM line resolves to
- * the constant `"dm"` (`events.ts`), and posting that as a `thread_ts` is a
- * Slack error rather than a thread. An unthreaded DM wants a top-level message
- * in that DM, which is exactly what omitting the argument gives.
- */
-export function threadArg(thread: string): { thread_ts?: string } {
-  return thread.includes(".") ? { thread_ts: thread } : {};
-}
-
-/**
  * One press of Slack's stop control, resolved.
  *
  * THE TWO-WRITER QUESTION, stated accurately (#576, narrowed by the #586
@@ -291,16 +280,12 @@ export function threadArg(thread: string): { thread_ts?: string } {
  * reading idle for the moment between them. `resolved` returns `idle`, and is
  * also the ending that consumed the card, so it agrees.
  *
- * THE READ AND THE WRITE ARE ADJACENT, which the first cut got wrong. It read
- * the card here, posted the confirmation, and settled after — putting a Slack
- * round trip between the read and the write it justifies, wide enough for the
- * turn to stage a card and settle `suspended` inside it, after which the
- * handler's `active` landed last and was wrong. The adapter now settles
- * straight off this verdict and posts afterwards, so the gap is the two
- * statements below. That deviates from the reference's listed order (stop,
- * confirm, transition) in one respect, deliberately: the stop still happens
- * first, which is the part with a deadline, and a confirmation arriving a beat
- * after the indicator drops is better than an indicator that outlives it.
+ * THE READ AND THE WRITE HAVE TO STAY ADJACENT, which is why the write is not
+ * here: a Slack round trip between them is wide enough for the turn to stage a
+ * card and settle `suspended` inside it, after which this verdict's `active`
+ * lands last and is wrong. The door settles straight off the verdict and posts
+ * afterwards, and states its own case for that order
+ * (`stop-doors.ts` `runSessionStopDoor`).
  *
  * @param signal - The press, as the event delivered it
  * @param state - The thread's memory, for the cancel flag and the live card

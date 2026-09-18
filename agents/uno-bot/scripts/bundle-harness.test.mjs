@@ -281,20 +281,20 @@ test("GEMINI_REGION `global` selects the implicit-cache floor", () => {
 });
 
 test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
-  // Four connector docs emptied take the committed bundle under 131k — several,
-  // not one, because no single member is large enough, and because a floor that
-  // one missing doc could trip would be a ceiling in disguise.
+  // Connector docs emptied take the committed bundle under 131k — several, not
+  // one, because no single member is large enough, and because a floor that one
+  // missing doc could trip would be a ceiling in disguise.
   //
-  // IT WAS THREE UNTIL #576 AND FOUR UNTIL #599. The corpus grows, and each
-  // time the margin is ground away this fixture fails for a reason that has
-  // nothing to do with the floor logic it guards: in #576 two rows added to
-  // `CONTEXT.md` put the emptied bundle back over the floor, and in #599 the
-  // glossary's `ratchet` row did it again. The instruction the last round left
-  // was followed rather than argued with — `supabase/blueprint.md` is the
-  // fifth member, for about 15k of real headroom rather than the next
-  // hairline. If this trips again, add another member rather than trimming
-  // prose to fit a fixture: the bundle growing is the healthy direction, and
-  // the thing under test is the bundler's refusal, not the corpus's size.
+  // IT WAS THREE UNTIL #576, FOUR UNTIL #593. The corpus grows, and each time
+  // the margin is ground away this fixture fails for a reason that has nothing
+  // to do with the floor logic it guards: in #576 two rows added to `CONTEXT.md`
+  // put the emptied bundle back over the floor, and the deep-module batch
+  // #592-#625 did it again by adding a glossary row per module landed.
+  // `figma.md` is the fifth member for the reason `supabase/overview.md` was the
+  // fourth: about 6.8k of real headroom rather than the next hairline. If this
+  // trips again, add another member rather than trimming prose to fit a
+  // fixture — the bundle growing is the healthy direction, and the thing under
+  // test is the bundler's refusal, not the corpus's size.
   const result = withFile(wranglerToml, withRegion("us-central1"), () =>
     withFiles(
       [
@@ -302,7 +302,7 @@ test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
         "docs/connectors/slack.md",
         "docs/connectors/supabase/blueprint-navigation.md",
         "docs/connectors/supabase/overview.md",
-        "docs/connectors/supabase/blueprint.md",
+        "docs/connectors/figma.md",
       ],
       frontmatterOnly,
       () => runBundler(["--check"]),

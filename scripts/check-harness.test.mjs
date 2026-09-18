@@ -29,7 +29,16 @@ import {
 } from './checks.registry.mjs';
 import * as nodeFloor from './check-node-floor.mjs';
 import * as registryGenerator from './generate-check-scripts.mjs';
-import { npmArgs, orphans, orphansInRepo, runAll, runCheck } from './harness-runner.mjs';
+import {
+  checkFiles,
+  namedFiles,
+  npmArgs,
+  orphans,
+  orphansInRepo,
+  runAll,
+  runCheck,
+  unboundCheckFiles,
+} from './harness-runner.mjs';
 import { exitCodeFor, renderFindings } from './lib/findings.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -181,7 +190,42 @@ test('a registered name and a non-check script are both complete', () => {
   assert.deepEqual(orphans(manifests, new Set(['check:secrets'])), []);
 });
 
-test('this repo has no orphan checks', () => {
+test('a check-*.mjs on disk that no row names is an orphan too', () => {
+  const named = namedFiles([
+    { name: 'check:kept', script: 'node scripts/check-kept.mjs', pkg: 'root' },
+  ]);
+  const found = unboundCheckFiles(['scripts/check-kept.mjs', 'scripts/check-stray.mjs'], named);
+  assert.equal(found.length, 1);
+  assert.match(found[0], /scripts\/check-stray\.mjs/);
+  assert.match(found[0], /no registry row names it/);
+});
+
+test("a row names its file through `module` as well as through `script`", () => {
+  const named = namedFiles([
+    { name: 'check:agent', script: 'node scripts/generate-agent.js --check', pkg: 'root' },
+    { name: 'check:x', script: 'npm run something', pkg: 'root', module: 'scripts/check-x.mjs' },
+  ]);
+  assert.ok(named.has('scripts/generate-agent.js'));
+  assert.ok(named.has('scripts/check-x.mjs'));
+});
+
+test("a Worker row's `scripts/…` is read against agents/uno-bot, not the repo root", () => {
+  const named = namedFiles([
+    { name: 'check:secrets', script: 'node scripts/check-secrets.mjs', pkg: 'bot' },
+  ]);
+  assert.ok(named.has('agents/uno-bot/scripts/check-secrets.mjs'));
+  assert.deepEqual(unboundCheckFiles(['agents/uno-bot/scripts/check-secrets.mjs'], named), []);
+});
+
+test('the test beside a check is not itself a check', () => {
+  const files = checkFiles(REPO_ROOT);
+  assert.ok(files.length > 20, 'the scan found almost nothing — it is looking in the wrong place');
+  assert.deepEqual(files.filter((file) => file.includes('.test.')), []);
+  assert.ok(files.includes('scripts/check-doc-links.mjs'));
+  assert.ok(files.includes('agents/uno-bot/scripts/check-secrets.mjs'));
+});
+
+test('this repo has no orphan checks, by name or by file', () => {
   assert.deepEqual(orphansInRepo(REPO_ROOT), []);
 });
 
