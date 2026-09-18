@@ -22,7 +22,9 @@
 //     an expression, not a module boundary, and `executeReadOnlyTool` stopped
 //     being exported because those two files were its only callers.
 //   - `tool-definitions.ts`, a nine-line re-export of the JSON roster. Its only
-//     importers were those same two files; the roster is read here directly.
+//     importers were those same two files; the roster the model is offered is
+//     now read off the tool table (`agent/tools.ts`), which is where the
+//     schemas and what a tool IS are joined.
 //
 // Provider selection:
 //   MODEL_PROVIDER = "gemini"        → providers/gemini.ts  (DEFAULT/production)
@@ -35,13 +37,10 @@
 // answer the same `ModelProvider` seam (CONTEXT.md § ModelProvider).
 
 import { AsyncLocalStorage } from "node:async_hooks";
-import toolsJson from "../../tool-definitions.json";
-import { GATE_RESERVED } from "../slack/gate-reactions";
 import type { AbsenceContext } from "./absence";
 import type { Env, SlackContext } from "../types";
 import { proposalOperations } from "../thread-state/index";
 import type { HistoryTurn, PendingProposal } from "../thread-state/index";
-import type { Tool } from "./types";
 import type { AgentImage, ProviderConversationTurn } from "./provider-conversation";
 import { buildProviderConversation } from "./provider-conversation";
 import { buildSystemBlocks } from "./skills";
@@ -60,7 +59,6 @@ import { geminiProvider } from "./providers/gemini";
 import { claudeProvider } from "./providers/claude";
 import type { ModelTier } from "./routing";
 import type { ModelProvider, SystemBlock, ToolSpec } from "./model-provider";
-import { addReaction } from "../slack/api";
 import { executeNotionSearch } from "../tools/notion-search";
 import { executeRoadmapQuery } from "../tools/roadmap-query";
 import { executeBlueprintSearch } from "../tools/blueprint-search";
@@ -70,16 +68,14 @@ import { executeSlackThreadRead } from "../tools/slack-thread-read";
 import { executeSlackSearch } from "../tools/slack-search";
 import { executeSlackUserProfile, executeSlackChannelMembers } from "../tools/slack-people";
 import { readReference } from "../tools/read-reference";
+import { executeSlackReact } from "../tools/slack-react";
+import { TOOLS } from "./tools";
 import type { ToolCall, ToolResultNote } from "./tool-transcript";
 
 export type { HistoryTurn };
 export type { AgentImage } from "./provider-conversation";
 export type { AgentResult, TurnDials } from "./loop";
 
-/** Source of truth: ../../tool-definitions.json (agents/uno-bot/), co-located
- *  there alongside the SKILL.md files so the schemas and the natural-language
- *  guidance live together. */
-const TOOLS: Tool[] = toolsJson as Tool[];
 
 // ── The provider-neutral contract (input of one agent turn) ──────────────────
 
@@ -195,10 +191,14 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   // per-request — who sent this, what proposal is pending.
   const system: SystemBlock[] = blocks.map((b, i) => ({ text: b.text, stable: i === 0 }));
 
+  // Off the tool table, not off the schema file: the table's join is what
+  // refuses a schema with no row and a row with no schema, and building the
+  // model's roster through it is what makes that refusal reach a deployment.
+  // `tool-definitions.json` is still where every schema is written.
   const tools: ToolSpec[] = TOOLS.map((t) => ({
     name: t.name,
-    description: t.description,
-    input_schema: t.input_schema,
+    description: t.schema.description,
+    input_schema: t.schema.input_schema,
   }));
 
   // Keyed like the CONVERSATION, not the thread. `/stop` arrives carrying only
@@ -480,32 +480,4 @@ async function executeReadOnlyTool(
     return out;
   }
   return JSON.stringify({ ok: false, error: `tool '${name}' is not read-only or not implemented` });
-}
-
-// Reactions post AS UNO-BOT via the bot token — the Slack MCP was demoted to
-// reads-only because its user-token writes carried the consenting human's
-// identity (team decision 2026-07-10: everything visible is uno-bot). Ungated:
-// reactions are reversible, the same class as the bot's own replies.
-async function executeSlackReact(
-  env: Env,
-  input: Record<string, unknown>,
-  slack: SlackContext,
-): Promise<string> {
-  const emoji = typeof input.emoji === "string" ? input.emoji.replace(/:/g, "").trim() : "";
-  if (!emoji) return JSON.stringify({ ok: false, error: "missing emoji name" });
-  // Every emoji the gate would read as a decision is off-limits to the bot —
-  // the same set the gate reads, imported rather than mirrored.
-  if (GATE_RESERVED.has(emoji)) {
-    return JSON.stringify({
-      ok: false,
-      error: `${emoji} is reserved for confirm/cancel on proposal cards`,
-    });
-  }
-  const ts = typeof input.message_ts === "string" && input.message_ts ? input.message_ts : slack.userMsgTs;
-  try {
-    await addReaction(env, slack.channel, ts, emoji);
-    return JSON.stringify({ ok: true, reacted: emoji, message_ts: ts });
-  } catch (err) {
-    return JSON.stringify({ ok: false, error: err instanceof Error ? err.message : String(err) });
-  }
 }
