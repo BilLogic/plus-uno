@@ -20,6 +20,7 @@
 // api.ts's slackCall — the single Slack egress point with the defensive parse.
 
 import type { Env } from "../types";
+import { turnSurfaceOf } from "../turn/request";
 import { postMessage, slackCall } from "./api";
 import type { SessionStatus, StatusResult } from "./working-signal";
 import { threadStateFor } from "../thread-state/production";
@@ -194,9 +195,13 @@ export function threadTitleFrom(text: string): string {
 }
 
 /** Assistant threads are IM channels (id starts with "D"). Used to gate the
- *  status/loader affordances, which only apply to the assistant surface. */
+ *  status/loader affordances, which only apply to the assistant surface.
+ *
+ *  The rule itself is `turn/request.ts` § `turnSurfaceOf`, which is what every
+ *  caller of Turn reads it from — one statement, so a surface cannot be read
+ *  one way when the request is built and another way here. */
 export function isAssistantThread(channel: string): boolean {
-  return channel.startsWith("D");
+  return turnSurfaceOf(channel) === "assistant";
 }
 
 /** One-line, model-facing description of the open surface — only the channel is

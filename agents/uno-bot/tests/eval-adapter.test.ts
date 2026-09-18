@@ -1,23 +1,25 @@
-// An eval case and a Slack message, taking the SAME turn (#499).
+// An eval case and a Slack message, taking the SAME turn.
 //
-// The acceptance criterion of the ticket is a parity one: an eval case and a
-// Slack message with the same text must produce the same `TurnOutcome`. So the
-// first case here builds both requests — the eval one through the real builder
-// (`evalTurnRequest`), the Slack one as `slack/turn-adapter.ts` builds it for a
-// plain message — and drives each through `runTurn` on the same three fakes the
-// Turn tests use: the fake ModelProvider behind the real agent loop, an
-// in-memory ThreadState, and a recording Delivery. If the two ever diverge,
-// the eval suite is measuring a turn production does not take, which is the
-// defect this ticket closes.
+// The acceptance criterion is a parity one: an eval case and a Slack message
+// with the same text must build the same request, read the same dependencies
+// and produce the same `TurnOutcome`. BOTH SIDES ARE THE REAL BUILDERS here —
+// `evalTurnRequest` and `slackTurnRequest` for the request, and the one shared
+// `buildTurnDeps` with each adapter's own wiring for the dependencies.
+//
+// WHICH IS THE POINT. This file used to hand-write a request it called "field
+// for field what the Slack turn builds" and compare the eval builder to that
+// copy — so it kept passing while production set three fields the copy omitted
+// (`attachmentsText`, `currentCanvasIds`, `sharedCanvasIds`). A parity test
+// that drives a copy measures the copy.
 //
 // The rest of the file pins the RESPONSE SHAPE, which is a contract:
 // `scripts/run-evals.mjs`, `scripts/eval-history.mjs` and
 // `docs/evals/README.md` all name fields on it.
 //
-// Workers-global-free, like the module it tests: `eval/turn-case.ts` is the
-// pure half of the adapter and the only half that compiles here — the `Env`
-// half (`eval/turn-adapter.ts`) names the model, the meter and the Slack
-// client, exactly as `slack/turn-adapter.ts` does.
+// Runs on Node, like the rest of `npm test`: the two request builders are pure,
+// and the dependency builder only READS `Env` inside the closures it hands the
+// turn — so `{} as Env` builds the same shape production builds without a
+// Workers runtime, and nothing here makes a call.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
@@ -31,6 +33,12 @@ import {
   evalTurnResponse,
   type EvalTurnReport,
 } from "../src/eval/turn-case";
+import { evalTurnWiring } from "../src/eval/turn-adapter";
+import { slackTurnRequest, type TurnEnvelope } from "../src/slack/turn-request";
+import { slackTurnWiring } from "../src/slack/turn-adapter";
+import { buildTurnDeps } from "../src/turn/env-deps";
+import type { SlackMessageEvent } from "../src/slack/types";
+import type { Env } from "../src/types";
 import {
   recordingDelivery,
   runTurn,
@@ -168,30 +176,25 @@ function evalRequest(body: Parameters<typeof evalTurnRequest>[0]): TurnRequest {
 }
 
 /**
- * The same message as a Slack turn.
+ * The same message, through the REAL Slack request builder.
  *
- * Field for field what `runSlackTurn` builds for a plain threaded message with
- * no files, no scope keyword and no PRD: the envelope's two ts values, the
- * surface from the channel id, `threaded` from `thread_ts`, and `images: []`
- * because the vision pass is skipped when nothing visual arrived. The envelope
- * facts are the eval conversation's, so the two requests are comparable at all.
+ * The event and the envelope are the INPUTS a plain threaded message arrives
+ * with — no files, no scope keyword, no PRD, and the eval conversation's ts
+ * values so the two requests are comparable at all. Everything the request then
+ * says is the builder's, not this file's: the surface from the channel id,
+ * `threaded` from `thread_ts`, the attachment body, the canvas ids, and
+ * `images: []` because the vision pass never runs when nothing visual arrived.
  */
-function slackRequest(over: Partial<TurnRequest> = {}): TurnRequest {
-  const event = { channel: EVAL_CHANNEL, user: EVAL_USER, ts: "0", thread_ts: "0" };
-  return {
-    userId: event.user,
-    channel: event.channel,
-    conversationTs: event.thread_ts,
-    userMsgTs: event.ts,
-    surface: event.channel.startsWith("D") ? "assistant" : "channel",
-    threaded: Boolean(event.thread_ts),
-    text: TEXT,
-    images: [],
-    history: [],
-    pending: null,
-    prd: null,
-    ...over,
-  };
+function slackEvent(text = TEXT): SlackMessageEvent {
+  return { type: "message", channel: EVAL_CHANNEL, user: EVAL_USER, ts: "0", thread_ts: "0", text };
+}
+
+function slackEnvelope(text = TEXT, over: Partial<TurnEnvelope> = {}): TurnEnvelope {
+  return { conversationTs: "0", text, history: [], pending: null, prd: null, ...over };
+}
+
+function slackRequest(text = TEXT, over: Partial<TurnEnvelope> = {}): TurnRequest {
+  return slackTurnRequest(slackEvent(text), slackEnvelope(text, over));
 }
 
 /** The report fields the adapter collects, with the harness's captures in them. */
@@ -218,7 +221,70 @@ function report(
 // ── (a) parity: the same text, the same turn ─────────────────────────────────
 
 test("an eval case and a Slack message with the same text build the same request", () => {
+  // Both sides are the real builders, so a field one of them starts setting —
+  // and the other does not — fails here rather than in production.
   assert.deepEqual(evalRequest({ prompt: TEXT }), slackRequest());
+});
+
+test("every dependency a turn reads is wired the same way from both adapters", () => {
+  // ONE builder, two wirings. A dependency added to `turn/env-deps.ts` reaches
+  // both callers or neither, and each adapter's file may name only its own
+  // differences — which is what these two assertions pin.
+  const env = {} as Env;
+
+  const forSlack = slackRequest();
+  const slackWiring = slackTurnWiring(env, slackEvent(), forSlack);
+
+  const forEval = evalRequest({ prompt: TEXT });
+  const delivery = recordingDelivery();
+  const evalWiring = evalTurnWiring(forEval, {
+    delivery,
+    threadState: createInMemoryThreadState(),
+    report: { resolutions: [], gateAsk: null, tools: [], calls: delivery.calls, dials: null },
+    filled: new Set<number>(),
+    onResult: () => {},
+  });
+
+  // The differences each adapter supplies — and nothing else. The eval side's
+  // extra entry is the reporters, which production reads its log lines for.
+  assert.deepEqual(Object.keys(slackWiring).sort(), [
+    "applyVerdict",
+    "delivery",
+    "threadState",
+    "toolThreadTs",
+  ]);
+  assert.deepEqual(Object.keys(evalWiring).sort(), [
+    "applyVerdict",
+    "delivery",
+    "reporters",
+    "threadState",
+    "toolThreadTs",
+  ]);
+
+  // And the dependencies the turn actually reads are the same list, entry for
+  // entry, on both sides.
+  // The two ports are the differences themselves, so what is compared is that
+  // each is THERE; `cards` is shared wiring, so its three entries are compared
+  // by name.
+  const shapeOf = (deps: TurnDeps) =>
+    Object.fromEntries(
+      Object.entries(deps)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([key, value]) => [
+          key,
+          key === "cards" ? Object.keys(value as object).sort() : typeof value,
+        ]),
+    );
+
+  const slackDeps = shapeOf(buildTurnDeps(env, forSlack, slackWiring));
+  const evalDeps = shapeOf(buildTurnDeps(env, forEval, evalWiring));
+  assert.deepEqual(slackDeps, evalDeps);
+  // …and every one of them is populated, so a hole reads as a failure here
+  // rather than as a `TypeError` mid-turn.
+  for (const [name, shape] of Object.entries(slackDeps)) {
+    assert.notEqual(shape, "undefined", `dependency '${name}' is not wired`);
+  }
+  assert.ok("runAgent" in slackDeps && "delivery" in slackDeps && "threadState" in slackDeps);
 });
 
 test("an eval case and a Slack message with the same text produce the same outcome", async () => {
