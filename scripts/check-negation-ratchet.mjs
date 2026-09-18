@@ -177,23 +177,49 @@
  * these prompts by root; this scope and the harness name sweep are the two
  * that did not, and now do.
  *
+ * ── THE RECORD IS THE RATCHET MODULE'S (#601) ───────────────────────────────
+ *
+ * `scripts/lib/ratchet.mjs` owns the read, the direction, the absent-record
+ * error mode and the `--update` write; the six sets this record declares — a
+ * `counts` map and a `docs` FLOOR per scope — are surveyed one row each in
+ * `scripts/lib/ratchet-shapes.mjs`. Three consequences worth knowing before
+ * reading `compare`:
+ *
+ *   A SCOPE'S TOTAL IS SUMMED, never stored. The record held a `total` beside
+ *   each `counts` map and nothing compared the two, so a hand-edited total was
+ *   a number the gate would trust over the counts underneath it — and it was
+ *   the one thing a merge could not keep current, since `--update` replaces the
+ *   container it owns and leaves every other key exactly as it found it.
+ *
+ *   `--update` NO LONGER RESTATES THE READING. It is a merge: the counts and
+ *   the doc count are replaced, and each scope's `corpus` and `measuredOn` are
+ *   seeded onto a record written from nothing and afterwards belong to whoever
+ *   edits the file. That is the point — while `--update` rewrote `measuredOn`,
+ *   the ruler comparison below could be silenced by re-recording (#238).
+ *
+ *   A SCOPE THE RECORD DOES NOT HOLD is an UNREADABLE record and throws, rather
+ *   than being reported per scope here. One stated error mode for twelve
+ *   records, because a record read on a shape it does not have reads as EMPTY
+ *   and an empty baseline is a green ratchet.
+ *
  * Usage:
  *   node scripts/check-negation-ratchet.mjs           report, fail if any scope's count rose
  *   node scripts/check-negation-ratchet.mjs --update  record the current counts as the new baseline
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
 import { actionsPromptFiles } from './lib/actions-prompts.mjs';
 import { bundlerFailureReport, harnessSets, resolveBundled, unresolvedReport } from './lib/bundled-set.mjs';
-import { frontmatter } from './lib/corpus.mjs';
+import { REPO_ROOT, frontmatter } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(__dirname, '..');
-export const BASELINE = path.join(REPO_ROOT, 'docs/evals/negation-baseline.json');
+/**
+ * The record, named here because this is the check that reads it — and because
+ * it is the key its shape is declared under in `scripts/lib/ratchet-shapes.mjs`
+ * and the path `scripts/checks.registry.mjs` declares for this row. One
+ * spelling, three readers.
+ */
+export const BASELINE = 'docs/evals/negation-baseline.json';
 
 /**
  * The five tokens, in one place, so the regex and the label the report prints
@@ -430,43 +456,83 @@ export function measureDocs(scope, docs, declared = docs.length) {
  * scope is load-bearing and stated at each step: the RULER first, then the
  * corpus floor, then the count.
  *
+ * THREE SCOPES, SIX SETS, ONE RECORD, all read through `scripts/lib/ratchet.mjs`
+ * (#601): each scope's per-doc `counts` and, beside it, the `docs` FLOOR — a
+ * `grow-only` scalar, so the module reports a corpus that shrank as FELL, which
+ * is the direction this guard turns on. Two things this check words for itself
+ * and says why:
+ *
+ *   THE RULER, which is not a count at all. The recorded `measuredOn` is
+ *   envelope prose and lives beside the set; a scope reading whole files where
+ *   its record was taken on the bundled body is not comparable to that record
+ *   at all, so it is asked first and the count is not reported at all.
+ *
+ *   THE RATCHETED QUANTITY IS THE SCOPE TOTAL, not each doc's count. The
+ *   per-doc numbers are the record's EVIDENCE — what to fix first — over a
+ *   corpus that gains and loses docs every week; the thing this guard asks is
+ *   that the scope's total go down. So the module's per-key NEW, ROSE and STALE
+ *   are not reported here: a doc losing its last prohibition would otherwise
+ *   fail the build for improving, and a ratchet whose failure mode is "you made
+ *   it better" is one people switch off. What the total cannot hide is a corpus
+ *   that shrank, and that is exactly what the floor beside it is for.
+ *
  * @param {ReturnType<typeof measureDocs>[]} measured
- * @param {{scopes?: Record<string, {measuredOn?: string, docs: number, total: number, counts: Record<string, number>}>}} base
+ * @param {Record<string, {counts: import('./lib/ratchet.mjs').Ratchet,
+ *                         corpus: import('./lib/ratchet.mjs').Ratchet}>} records
  * @returns {string[]} one report per failing scope; empty when every scope holds.
  */
-export function compare(measured, base) {
+export function compare(measured, records) {
   const failures = [];
   for (const m of measured) {
-    const b = base.scopes?.[m.scope.key];
-    if (!b) {
-      failures.push(
-        `[negation] the baseline records no \`${m.scope.key}\` scope, so this run has nothing to ratchet\n` +
-          `  against for ${m.scope.corpus}.\n` +
-          '  -> A scope added to SCOPES without a recorded baseline is a scope that cannot fail.\n' +
-          '     Record it from a real run: `npm run check:negation -- --update`.',
-      );
+    const { counts, corpus } = records[m.scope.key];
+
+    // No record: the one stated error mode, worded by the module. A scope's
+    // record that is there but has no `scopes.<key>` at all is UNREADABLE and
+    // throws when it is opened — also the module's, and also stated once.
+    const absent = counts.failures(m.counts).find((failure) => failure.kind === 'absent');
+    if (absent) {
+      failures.push(absent.message);
       continue;
     }
+
     // The RULER before the corpus: a count taken through a different reading is
     // not comparable to this baseline at all, whatever the corpus did.
-    if (b.measuredOn !== m.scope.measuredOn) {
-      failures.push(readingChangedReport({ scope: m.scope, was: b.measuredOn }));
+    const reading = counts.envelope(`scopes.${m.scope.key}.measuredOn`);
+    if (reading !== m.scope.measuredOn) {
+      failures.push(readingChangedReport({ scope: m.scope, was: reading }));
       continue;
     }
+
     // Corpus floor next. A shrunken corpus makes the count below meaningless,
     // and reporting a fall as good news is the failure this ordering prevents.
-    if (m.docs < b.docs) {
-      failures.push(corpusShrankReport({ scope: m.scope, was: b.docs, now: m.docs }));
+    const fell = corpus.failures({ docs: m.docs }).find((failure) => failure.kind === 'fell');
+    if (fell) {
+      failures.push(corpusShrankReport({ scope: m.scope, was: fell.recorded, now: fell.count }));
       continue;
     }
-    if (m.total > b.total) {
-      failures.push(
-        roseReport({ scope: m.scope, was: b.total, now: m.total, counts: m.counts, baseCounts: b.counts }),
-      );
+
+    const baseCounts = recordedCounts(counts);
+    const was = totalOf(baseCounts);
+    if (m.total > was) {
+      failures.push(roseReport({ scope: m.scope, was, now: m.total, counts: m.counts, baseCounts }));
     }
   }
   return failures;
 }
+
+/** One scope's recorded per-doc counts, as the record writes them. */
+const recordedCounts = (ratchet) =>
+  Object.fromEntries([...ratchet.entries].map(([key, entry]) => [key, entry.counts.get('count')]));
+
+/**
+ * A scope's recorded total: the SUM of its per-doc counts, never a number
+ * stored beside them. The record held one until #601 and nothing compared the
+ * two, so a hand-edited total was a baseline the gate would trust over the
+ * counts underneath it. It is also the half of the old envelope that `--update`
+ * could not own, and an `--update` that leaves a number stale is worse than one
+ * that never wrote it.
+ */
+const totalOf = (counts) => Object.values(counts).reduce((sum, n) => sum + n, 0);
 
 /**
  * Every scope, measured once per repo root.
@@ -499,15 +565,38 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   const unresolved = measured.filter((m) => m.unresolved);
   if (unresolved.length) return unresolved.map((m) => ({ message: m.unresolved }));
 
-  if (!fs.existsSync(BASELINE)) {
-    return [
-      { message: '[negation] no baseline — run `npm run check:negation -- --update` once to record it.' },
-    ];
-  }
+  const opened = records(repoRoot);
 
-  return compare(measured, JSON.parse(fs.readFileSync(BASELINE, 'utf8'))).map((message) => ({
-    message,
-  }));
+  // ONE record, so the absent mode is reported ONCE rather than per scope: six
+  // copies of the same sentence tells a reader six times that there is one file
+  // to write. `compare` states it per scope too, for a caller that asks about
+  // one scope alone.
+  const absent = SCOPES.map((scope) => opened[scope.key].counts).find((ratchet) => ratchet.absent);
+  if (absent) return absent.failures({}).map(({ message }) => ({ message }));
+
+  return compare(measured, opened).map((message) => ({ message }));
+}
+
+/**
+ * Both sets of every scope, opened over the record.
+ *
+ * Opened per call rather than memoised: `--update` writes the record and the
+ * next question reads it back, and a cached ratchet would answer with the
+ * record from before the write.
+ *
+ * @returns {Record<string, {counts: import('./lib/ratchet.mjs').Ratchet,
+ *                           corpus: import('./lib/ratchet.mjs').Ratchet}>}
+ */
+function records(repoRoot) {
+  return Object.fromEntries(
+    SCOPES.map((scope) => [
+      scope.key,
+      {
+        counts: openRatchet({ file: BASELINE, set: scope.key, repoRoot }),
+        corpus: openRatchet({ file: BASELINE, set: `${scope.key}-corpus`, repoRoot }),
+      },
+    ]),
+  );
 }
 
 /**
@@ -520,16 +609,16 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
  */
 export function summary({ repoRoot = REPO_ROOT } = {}) {
   const measured = readings(repoRoot);
-  const base = JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
+  const opened = records(repoRoot);
   const lines = measured.map((m) => {
-    const b = base.scopes[m.scope.key];
+    const recorded = totalOf(recordedCounts(opened[m.scope.key].counts));
     const worst = Object.entries(m.counts)
       .sort((a, c) => c[1] - a[1])
       .slice(0, 3);
     return (
       `  ${m.scope.key.padEnd(8)} ${String(m.total).padStart(3)} across ${m.docs} of ${m.declared} ` +
-      `${m.scope.noun} (baseline ${b.total})` +
-      (m.total < b.total ? ` — down ${b.total - m.total}, re-baseline with --update` : '') +
+      `${m.scope.noun} (baseline ${recorded})` +
+      (m.total < recorded ? ` — down ${recorded - m.total}, re-baseline with --update` : '') +
       `\n           heaviest: ${worst.map(([f, n]) => `${f} (${n})`).join(' · ')}`
     );
   });
@@ -548,32 +637,48 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
  * re-recorded its own baseline while answering "did the count rise?" would
  * answer it with the number it had just written down.
  */
-function recordBaseline(measured) {
-  // The metric descriptor rides in the file so the number is never read
-  // without its definition beside it (#234), and each scope carries the doc
-  // count it was recorded over so the floor has something to stand on.
-  const metric = {
-    counts: METRIC,
-    tokens: PROHIBITION_TOKENS,
-    // What is common to both scopes. HOW MUCH OF EACH FILE IS READ IS NOT
-    // common to them (#238), so it is recorded per scope below rather than
-    // asserted once here — a single line would have to be wrong about one of
-    // them, which is how the old "frontmatter included" outlived being true
-    // of the bundled half.
-    measuredOn: 'outside quoted speech and code spans; how much of each file, per scope below',
-    note: 'NOT a count of negative statements — see scripts/check-negation-ratchet.mjs § What is counted.',
+function recordBaseline(measured, repoRoot = REPO_ROOT) {
+  /*
+   * SIX WRITES, ONE PER SET, each a MERGE through the ratchet. All six handles
+   * are opened BEFORE the first write, because opening a set whose container no
+   * write has created yet is an UNREADABLE record — which is the state a record
+   * written from nothing is in between the six. The merge itself re-reads the
+   * file, so no write undoes the one before it. The floor goes first so a
+   * brand-new record carries its keys in the order the reader reads them in:
+   * the corpus sentence, the reading, the doc count, then the counts.
+   *
+   * WHAT IS SEEDED IS THE ENVELOPE, and only onto a record that does not
+   * already hold it: the metric descriptor, so the number is never read without
+   * its definition beside it (#234), and per scope the corpus and the READING
+   * it was taken under. The reading in particular is the reader's afterwards —
+   * before #601 this rewrote it on every run, which meant an `--update` could
+   * silence the ruler comparison by making the record agree with whatever the
+   * code now did (#238). Now it stands until a person moves it, and the gate
+   * says so.
+   */
+  const seed = {
+    metric: {
+      counts: METRIC,
+      tokens: PROHIBITION_TOKENS,
+      // What is common to all three scopes. HOW MUCH OF EACH FILE IS READ IS
+      // NOT common to them (#238), so it is seeded per scope rather than
+      // asserted once here — a single line would have to be wrong about one of
+      // them, which is how the old "frontmatter included" outlived being true
+      // of the bundled half.
+      measuredOn: 'outside quoted speech and code spans; how much of each file, per scope below',
+      note: 'NOT a count of negative statements — see scripts/check-negation-ratchet.mjs § What is counted.',
+    },
   };
-  const scopes = {};
   for (const m of measured) {
-    scopes[m.scope.key] = {
-      corpus: m.scope.corpus,
-      measuredOn: m.scope.measuredOn,
-      docs: m.docs,
-      total: m.total,
-      counts: m.counts,
-    };
+    seed[`scopes.${m.scope.key}.corpus`] = m.scope.corpus;
+    seed[`scopes.${m.scope.key}.measuredOn`] = m.scope.measuredOn;
   }
-  fs.writeFileSync(BASELINE, `${JSON.stringify({ metric, scopes }, null, 2)}\n`);
+
+  const opened = records(repoRoot);
+  for (const m of measured) {
+    opened[m.scope.key].corpus.update({ docs: m.docs }, { seed });
+    opened[m.scope.key].counts.update(m.counts, { seed });
+  }
   console.log(
     `[negation] baseline recorded: ${measured
       .map((m) => `${m.total} ${m.scope.key} across ${m.docs} ${m.scope.noun}`)

@@ -7,28 +7,42 @@
  * See `scripts/atlassian-benchmark.mjs` for what is compared and why each
  * enforced row has the direction it has. This file is the gate.
  *
- * WHAT MAKES IT FAIL. Three things, and deliberately not a fourth:
+ * WHAT MAKES IT FAIL. Five things, and deliberately not a sixth:
  *   · a row with a direction moved AGAINST it — role coverage fell, or the type
  *     surface grew;
  *   · the Atlassian recording has no readable date, or a future one;
- *   · the recording is past the age ceiling, i.e. nobody has re-measured.
+ *   · the recording is past the age ceiling, i.e. nobody has re-measured;
+ *   · a recorded floor that no argued row measures any more, which is the
+ *     ratchet module's stale-entry sweep (#601): a number nothing enforces
+ *     still reads like a commitment;
+ *   · no record at all — the module's one stated absent-record mode, because an
+ *     empty baseline reads as a green ratchet.
  *
  * It does NOT fail on distance from Atlassian. They ship 100 chart colours and
  * 21 elevation tokens for a product surface we do not have, and a gate that
  * demanded parity would be demanding the wrong thing loudly.
  *
+ * OUR SIDE IS A FLOOR, and the direction is per ROW rather than per record: two
+ * of the four argued rows may only rise and two may only fall, each for the
+ * reason written beside it in `ROWS`. That is why the directions stay in
+ * `scripts/atlassian-benchmark.mjs` and are not read off the set's own
+ * `direction` in `scripts/lib/ratchet-shapes.mjs`, which is one word for the
+ * whole set and correctly says the set may only grow.
+ *
  * Run: `npm run check:atlassian-benchmark`. `npm run benchmark:atlassian`
  * prints the same table without the gate.
  */
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
 import { ourTokens, compare, ageInDays, failures } from './atlassian-benchmark.mjs';
+import { REPO_ROOT } from './lib/corpus.mjs';
 import { byRoot, main, report } from './lib/findings.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(__dirname, '..');
+/**
+ * The record, named here because this is the check that reads it — and because
+ * it is the key its shape is declared under in `scripts/lib/ratchet-shapes.mjs`
+ * and the path `scripts/checks.registry.mjs` declares for this row. One
+ * spelling, three readers.
+ */
 const BENCHMARK = 'docs/evals/atlassian-benchmark.json';
 
 /**
@@ -52,12 +66,26 @@ export const REMEDY =
  * and the age `summary` prints are the same reading rather than two.
  */
 const inputs = byRoot((repoRoot) => {
-  const benchmark = JSON.parse(fs.readFileSync(path.join(repoRoot, BENCHMARK), 'utf8'));
+  const ratchet = openRatchet({ file: BENCHMARK, repoRoot });
+  /*
+   * The record has two halves and the module owns one of them. `ours` is the
+   * ratcheted set — four argued rows, a FLOOR, with `note` and `recordedAt`
+   * mixed in among them and preserved across a write. The rest of the record is
+   * ATLASSIAN'S published surface: a measurement of somebody else's system,
+   * read by hand off a rendered page, with no direction to hold it to and
+   * nothing for a ratchet to do. So it comes back through `envelope()`, and the
+   * file is still opened exactly once by the one module that reads records.
+   */
+  const benchmark = ratchet.envelope() ?? {};
   const tokens = ourTokens(repoRoot);
-  const rows = compare(tokens, benchmark, repoRoot);
+  const rows = ratchet.absent ? [] : compare(tokens, benchmark, repoRoot);
   const now = new Date();
-  return { benchmark, rows, now, age: ageInDays(benchmark.measuredAt, now) };
+  return { ratchet, benchmark, rows, now, age: ageInDays(benchmark.measuredAt, now) };
 });
+
+/** The recorded floor per argued row: `{key: number}`, the set without its prose. */
+const recordedFloor = (ratchet) =>
+  Object.fromEntries([...ratchet.entries].map(([key, entry]) => [key, entry.counts.get('count')]));
 
 /** The comparison as a table, for `--table` and for `npm run benchmark:atlassian`. */
 function tableFor(rows) {
@@ -75,12 +103,31 @@ function tableFor(rows) {
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
-  const { benchmark, rows, now } = inputs(repoRoot);
-  return failures(rows, benchmark, {
+  const { ratchet, benchmark, rows, now } = inputs(repoRoot);
+  // With no record there is no Atlassian side to compare against and no floor to
+  // hold to, so the one stated absent-record mode is the whole answer.
+  if (ratchet.absent) return ratchet.failures({}).map(({ message }) => ({ message }));
+
+  const measured = Object.fromEntries(rows.filter((r) => r.direction).map((r) => [r.key, r.ours]));
+  const found = failures(rows, recordedFloor(ratchet), {
     now,
     measuredAt: benchmark.measuredAt,
     maxAgeDays: MAX_AGE_DAYS,
-  }).map((message) => ({ message }));
+  });
+
+  /*
+   * A recorded row nothing measures any more. The floor is only a floor while a
+   * row still asks for it: delete the row from `ROWS` and its number sits here
+   * unenforced, reading like a commitment. That is the direction most records
+   * forget, and it is the module's `stale()`.
+   */
+  for (const { key, recorded } of ratchet.stale(measured)) {
+    found.push(
+      `${key}: recorded at ${recorded}, and no argued row measures it any more. ` +
+        'Delete the entry, or put the row back in ROWS with its direction and its reason.',
+    );
+  }
+  return found.map((message) => ({ message }));
 }
 
 /**
@@ -140,12 +187,14 @@ function printHow(repoRoot = REPO_ROOT) {
  * @returns {import('./lib/findings.mjs').Finding[]}
  */
 function update(repoRoot = REPO_ROOT) {
-  const { benchmark, rows } = inputs(repoRoot);
-  const recorded = { ...(benchmark.ours ?? {}) };
+  const { ratchet, rows } = inputs(repoRoot);
+  const recorded = recordedFloor(ratchet);
   const refused = [];
   const moved = [];
+  const measured = {};
   for (const row of rows) {
     if (!row.direction) continue;
+    measured[row.key] = row.ours;
     const before = recorded[row.key];
     if (before === row.ours) continue;
     const forwards = row.direction === 'up' ? row.ours > before : row.ours < before;
@@ -153,17 +202,30 @@ function update(repoRoot = REPO_ROOT) {
       refused.push(`${row.key}: ${before} -> ${row.ours} is against its direction (${row.direction}).`);
       continue;
     }
-    recorded[row.key] = row.ours;
     moved.push(`${row.key}: ${before ?? '(new)'} -> ${row.ours}`);
   }
   // A refusal is a finding like any other, so `--update` reports through the same
-  // renderer and takes its exit code from the same place the gate does.
+  // renderer and takes its exit code from the same place the gate does — and
+  // nothing is written, so a refused run leaves the floor where it was.
   if (refused.length) return refused.map((message) => ({ message }));
-  benchmark.ours = { ...recorded, note: benchmark.ours?.note, recordedAt: benchmark.ours?.recordedAt };
-  // Key order: keep `note` and `recordedAt` first, as they were authored.
-  const { note, recordedAt, ...counts } = benchmark.ours;
-  benchmark.ours = { note, recordedAt, ...counts };
-  fs.writeFileSync(path.join(repoRoot, BENCHMARK), `${JSON.stringify(benchmark, null, 2)}\n`);
+
+  /*
+   * A MERGE, through the ratchet: the `ours` container is replaced and every
+   * other key on the record survives, Atlassian's whole published surface
+   * included. `note` and `recordedAt` are declared IGNORED in the shape table,
+   * so they are carried across in place rather than counted — which is also
+   * what keeps them first in the container, as they were authored. The date is
+   * not restated by a tool, which is why the line below asks for it by hand.
+   */
+  ratchet.update(measured, {
+    seed: {
+      'ours.note':
+        'OUR side of the comparison. Only the ARGUED rows are recorded — see ROWS in ' +
+        'scripts/atlassian-benchmark.mjs, where each direction carries its reason. Re-record with ' +
+        '`npm run benchmark:atlassian -- --update` AFTER a move in the argued direction; it refuses ' +
+        'a backwards one.',
+    },
+  });
   console.log(moved.length ? `\nRe-recorded:\n  ${moved.join('\n  ')}\n  (set recordedAt by hand)\n` : '\nNothing moved.\n');
   return [];
 }

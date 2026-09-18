@@ -19,22 +19,28 @@
  *     one-line pointer to where a convention now lives is prose and is allowed;
  *     the ratchet keeps it to one line.
  *
- * Same ratchet idiom as check-negation-ratchet.mjs: fails on a rise; a fall
- * passes with a nudge to record it with --update.
+ * THE RECORD IS THE ONE WITH NO KEYED SET AT ALL — a single number on the
+ * record, which is the `scalar` form in `scripts/lib/ratchet-shapes.mjs`. It is
+ * read and written through `scripts/lib/ratchet.mjs` like every other baseline
+ * in the repo (#601), so the direction, the absent-record error mode and the
+ * `--update` write are the module's and the wording is this check's. There is
+ * no keyed set, so there is no stale entry to report and no reason to require:
+ * a number cannot go missing, and the argument for it is the note on the record
+ * and the PR that moved it.
  *
  * Run: npm run check:glossary            (--update records the current prose count)
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-import { frontmatter } from './lib/corpus.mjs';
+import { REPO_ROOT, frontmatter } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
 
-const here = path.dirname(fileURLToPath(import.meta.url));
-export const REPO_ROOT = path.resolve(here, '..');
+export { REPO_ROOT };
 export const SUBJECT = 'CONTEXT.md';
-export const BASELINE = path.join(REPO_ROOT, 'docs/evals/glossary-baseline.json');
+/** Repo-relative: also this record's key in the shape table, and what the registry row declares. */
+export const BASELINE = 'docs/evals/glossary-baseline.json';
 
 export const REMEDY =
   '  -> a glossary defines terms; move the reference behind a pointer, or re-baseline with --update and say why.';
@@ -73,21 +79,15 @@ export function measure(text) {
 /** One read and one measurement of the glossary, shared by both halves. */
 const measured = byRoot((repoRoot) => measure(readFileSync(path.join(repoRoot, SUBJECT), 'utf8')));
 
-const baselinePath = (repoRoot) =>
-  repoRoot === REPO_ROOT ? BASELINE : path.join(repoRoot, 'docs/evals/glossary-baseline.json');
-
 /**
- * The recorded prose count, or null on a first run. Read on each call rather
- * than memoised: `--update` writes it and then the run reads it back, and a
- * cached baseline would answer with the one from before the write.
+ * The ratchet over the record, opened fresh on every call rather than memoised:
+ * `--update` writes the record and then FALLS THROUGH to the gate, which reads
+ * it back, and a cached record would answer with the one from before the write.
  */
-function baselineOf(repoRoot) {
-  try {
-    return JSON.parse(readFileSync(baselinePath(repoRoot), 'utf8'));
-  } catch {
-    return null; // first run
-  }
-}
+const ratchetFor = (repoRoot) => openRatchet({ file: BASELINE, repoRoot });
+
+/** The record's one number. `scalar` keys its entries by field name. */
+const recordedProse = (ratchet) => ratchet.entries.get('proseLines')?.counts.get('proseLines');
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
@@ -97,24 +97,26 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   // its prose is not the thing to say.
   if (failures.length) return failures.map((message) => ({ message }));
 
-  const baseline = baselineOf(repoRoot);
-  if (!baseline) return [{ message: 'no baseline; run with --update once' }];
-  if (prose > baseline.proseLines) {
-    return [
-      {
-        message: `prose lines rose: ${prose} against a baseline of ${baseline.proseLines} (recorded ${baseline.recorded}).`,
-      },
-    ];
-  }
-  return [];
+  const ratchet = ratchetFor(repoRoot);
+  return ratchet.failures({ proseLines: prose }).map((failure) =>
+    // A missing record arrives already worded: there is nothing check-specific
+    // to say about a baseline that is not there.
+    failure.kind === 'absent'
+      ? { message: failure.message }
+      : {
+          message:
+            `prose lines rose: ${failure.count} against a baseline of ${failure.recorded} ` +
+            `(recorded ${ratchet.envelope('recorded')}).`,
+        },
+  );
 }
 
 /** The green line: the count, its baseline, and a nudge when it has fallen. */
 export function summary({ repoRoot = REPO_ROOT } = {}) {
   const { prose } = measured(repoRoot);
-  const baseline = baselineOf(repoRoot);
-  const fell = prose < baseline.proseLines ? ` — fell from ${baseline.proseLines}; record it with --update` : '';
-  return `${prose} prose lines against a baseline of ${baseline.proseLines}${fell}`;
+  const recorded = recordedProse(ratchetFor(repoRoot));
+  const fell = prose < recorded ? ` — fell from ${recorded}; record it with --update` : '';
+  return `${prose} prose lines against a baseline of ${recorded}${fell}`;
 }
 
 /**
@@ -125,15 +127,23 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
  */
 function record() {
   const { prose } = measured(REPO_ROOT);
-  writeFileSync(
-    BASELINE,
-    JSON.stringify(
-      { subject: SUBJECT, proseLines: prose, recorded: new Date().toISOString().slice(0, 10), note: 'Ratchet: the count may fall, never rise. Re-record with --update and say why in the PR.' },
-      null,
-      2,
-    ) + '\n',
+  // A MERGE, through the ratchet: the number is replaced and the record's
+  // envelope survives. `recorded` is seeded onto a record written from nothing
+  // and never restated, which is why the line below asks for it by hand — the
+  // day the count was argued about is not the day a tool re-recorded it. Before
+  // #601 this rewrote the whole record, so an --update that moved nothing still
+  // stamped today's date and churned the file.
+  openRatchet({ file: BASELINE }).update(
+    { proseLines: prose },
+    {
+      seed: {
+        subject: SUBJECT,
+        recorded: new Date().toISOString().slice(0, 10),
+        note: 'Ratchet: the count may fall, never rise. Re-record with --update, set `recorded` to the day it was argued, and say why in the PR.',
+      },
+    },
   );
-  console.log(`[check-glossary] baseline recorded: ${prose} prose lines`);
+  console.log(`[check-glossary] baseline recorded: ${prose} prose lines (set \`recorded\` by hand)`);
 }
 
 main(import.meta.url, 'check:glossary', { run, summary, remedy: REMEDY, fallThrough: { '--update': record } });

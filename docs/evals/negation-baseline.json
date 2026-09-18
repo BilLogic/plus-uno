@@ -16,7 +16,6 @@
       "corpus": "docs the bundler assembles for the Worker (embodiment: all | uno-bot) — the prompt, plus the disclosed references behind read_reference (disclosure: reference), told on the turns that fetch them",
       "measuredOn": "the bundled body — frontmatter stripped, as bundle-harness.mjs strips it before assembly, so the count is tokens the model is actually told",
       "docs": 22,
-      "total": 150,
       "counts": {
         "AGENTS.md": 5,
         "CONTEXT.md": 7,
@@ -41,7 +40,6 @@
       "corpus": "hand-authored docs under the bundler section roots declaring embodiment: ide — docs/adr/ and the generated .claude/skills/ surfaces are not section roots and so are out",
       "measuredOn": "whole files, frontmatter included — there is no bundler here, and a SKILL.md's description: is agent-facing routing text that steers exactly as the body does",
       "docs": 47,
-      "total": 105,
       "counts": {
         "docs/conventions/writing.md": 8,
         "docs/engineering/coding.md": 3,
@@ -78,7 +76,6 @@
       "corpus": "the headless GitHub Actions prompts under scripts/prompts/ — every .md the skill-loader root holds: the adapter SKILL.mds, their references/, and the shared headless-intake contract. Listed by where they live, since they carry no embodiment: and are never bundled (#425)",
       "measuredOn": "whole files, frontmatter included — the sweep workflows hand a SKILL.md to the model as a prompt-file: with nothing stripped, and the loader route the implement adapters take is narrower",
       "docs": 7,
-      "total": 68,
       "counts": {
         "scripts/prompts/references/headless-intake.md": 4,
         "scripts/prompts/uno-direct-fix-digest/SKILL.md": 3,
