@@ -6,8 +6,11 @@
 
 // Import-free collaborators only: this module renders card TEXT and blocks and
 // posts nothing, so the Turn module can build a card without `Env`. The Figma
-// preview card, which needs a render call, lives in `proposal-figma.ts`.
+// preview card, which needs a render call, lives in `proposal-figma.ts`. The
+// tool table is import-free for the same reason, and the words this module
+// used to keep in two switches are its gated rows' (#598).
 import { collectStrings } from "../agent/tool-input";
+import { gateWordsFor } from "../agent/tool-table";
 import { textSections } from "./render";
 
 // One shared confirmation footer on every card. Anyone in the thread may
@@ -458,9 +461,13 @@ function operationGroupKey(op: PlannedOperation): { key: string; heading: string
 export function operationKinds(
   op: PlannedOperation,
 ): Array<{ label: string; details: string[] }> {
+  // The row's own word for one operation of this kind, and the raw tool name
+  // only for something the table does not gate — which a planned operation
+  // never is.
+  const kind = gateWordsFor(op.toolName)?.kind ?? op.toolName;
   if (op.toolName !== "notion_update") {
     const detail = operationTarget(op.input);
-    return [{ label: simpleKind(op.toolName), details: detail ? [detail] : [] }];
+    return [{ label: kind, details: detail ? [detail] : [] }];
   }
   const kinds: Array<{ label: string; details: string[] }> = [];
   const properties =
@@ -480,7 +487,7 @@ export function operationKinds(
   if (replaces.length) kinds.push({ label: "replace in place", details: replaces.map(replaceGist) });
   const append = appendDetail(op.input.append);
   if (append) kinds.push({ label: "append", details: [append] });
-  return kinds.length ? kinds : [{ label: "update", details: [] }];
+  return kinds.length ? kinds : [{ label: kind, details: [] }];
 }
 
 /** The kinds of one operation on one line — what a result line names an outcome
@@ -489,18 +496,6 @@ export function operationKindSummary(op: PlannedOperation): string {
   return operationKinds(op)
     .map((k) => k.label)
     .join(" · ");
-}
-
-function simpleKind(toolName: string): string {
-  switch (toolName) {
-    case "notion_create": return "create row";
-    case "notion_archive": return "archive";
-    case "shareout_post": return "post a share-out";
-    case "component_implement": return "dispatch an implementation";
-    case "prototype_scaffold": return "scaffold a prototype";
-    case "email_send": return "send an email";
-    default: return toolName;
-  }
 }
 
 /**
@@ -582,15 +577,13 @@ function operationTarget(input: Record<string, unknown>): string | null {
   return null;
 }
 
+/**
+ * What the card says it is about to do, in the gated row's own words.
+ *
+ * The fallback is the bare tool name, which is what a switch arm nobody added
+ * used to print at a designer. It is now unreachable for anything the Gate can
+ * stage: a gated row carries its `verb` or does not compile.
+ */
 export function proposalVerb(toolName: string): string {
-  switch (toolName) {
-    case "component_implement": return "implement this component";
-    case "prototype_scaffold": return "scaffold a new prototype from this Figma design";
-    case "notion_create": return "create this card in Notion";
-    case "notion_update": return "update this Notion page";
-    case "notion_archive": return "archive this Notion card";
-    case "shareout_post": return "share this for feedback in #plus-design-feedback";
-    case "email_send": return "send an email via Gmail";
-    default: return toolName;
-  }
+  return gateWordsFor(toolName)?.verb ?? toolName;
 }
