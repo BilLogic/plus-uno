@@ -599,9 +599,12 @@ export const CHECKS = [
     trigger: 'pull_request',
     kind: 'spawn',
     spawnReason:
-      'the eval runner. A process with its own exit code over the committed recordings, ' +
-      'reporting its census and then a line per case — a shape this ' +
-      "interface would flatten into one. The `cd ../..` is the runner's own contract: its " +
+      'the eval runner. A walk of the committed recordings that reports its census and then ' +
+      'a LINE PER CASE — the shape this interface would flatten into one, which is the half ' +
+      'that cannot move. The other half did (#617): the runner renders its findings and takes ' +
+      'its exit code from `scripts/lib/findings.mjs` like every composed check, so a failing ' +
+      'blocker is an error and a failing non-blocker a warning. ' +
+      "The `cd ../..` is the runner's own contract: its " +
       'fixture and recording paths are repo-relative, as every documented invocation of it ' +
       'is, and the alternative is a second copy of those paths in a manifest.',
     guards:

@@ -59,8 +59,8 @@ export interface TurnFacts {
  *
  * The ONE statement of the rule: an app DM (`D…`) is the assistant surface,
  * everything else is a channel — and an app DM and the assistant panel are the
- * same conversation (`slack/assistant.ts` § `isAssistantThread`, which reads it
- * from here).
+ * same conversation (`slack/delivery-adapter.ts` § `isAssistantThread`, which reads
+ * it from here).
  */
 export function turnSurfaceOf(channel: string): TurnSurface {
   return channel.startsWith("D") ? "assistant" : "channel";

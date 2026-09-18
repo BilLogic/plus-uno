@@ -8,6 +8,13 @@
 // present, return null and the proposal proceeds (act when sufficient).
 //
 // This generalizes the original `implement`-only PRD check.
+//
+// The one seam beside the tool table that keeps a switch on tool names, and it
+// keeps it on purpose (#598): each arm is a SUBSTANCE check — does this
+// component exist in the library, does this PRD resolve, is that a real email
+// address — not a restatement of which tools are gated, which is the table's
+// `access` column. A tool with no arm here is a tool with nothing to check,
+// which `default` already says, so a new row needs no edit in this file.
 
 import type { Env } from "../types";
 import { listDsComponents, matchComponent, closestComponents } from "../integrations/ds-components";

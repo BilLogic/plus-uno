@@ -18,9 +18,11 @@
 // and compare the two outcomes, in the Workers-global-free compile
 // (`tsconfig.test.json`).
 //
-// THE RESPONSE SHAPE IS A CONTRACT. `scripts/run-evals.mjs`,
-// `scripts/eval-history.mjs` and `docs/evals/README.md` all name fields on it;
-// every one of them still means what it meant (see `evalTurnResponse`).
+// THE RESPONSE SHAPE IS A CONTRACT — `scripts/run-evals.mjs`,
+// `scripts/eval-history.mjs` and `docs/evals/README.md` all read fields off it,
+// and every one of them still means what it meant (see `evalTurnResponse`). The
+// field NAMES have one definition, `EVAL_RESPONSE_FIELDS` below, which the
+// parity test reads; the three readers point at it rather than restating it.
 
 import type { AgentResult } from "../agent/loop";
 import type { ToolCall } from "../agent/tool-transcript";
@@ -235,12 +237,46 @@ function failureError(report: EvalTurnReport): string {
 }
 
 /**
+ * EVERY FIELD NAME THE /debug/eval ENVELOPE CARRIES — the one definition of it.
+ *
+ * The list was narrated in three places and defined in none: this file's
+ * JSDoc, a hand-copied array in `tests/eval-adapter.test.ts`, and a sentence of
+ * `docs/evals/README.md`. Three copies of a wire contract is three chances for
+ * a field to be added to the envelope and named nowhere, or named everywhere
+ * and carried by nothing. So the names live here and the test reads them: a
+ * field the envelope carries and this list omits fails
+ * `tests/eval-adapter.test.ts`, and so does the reverse.
+ *
+ * `error` and `result` are conditional, and `CONDITIONAL_RESPONSE_FIELDS` says
+ * which: `error` only on a failed turn, `result` only where the turn produced
+ * an answer shape at all.
+ */
+export const EVAL_RESPONSE_FIELDS = [
+  "ok",
+  "error",
+  "build",
+  "ms",
+  "result",
+  "dials",
+  "tools",
+  "references",
+  "gateAsk",
+  "narration",
+  "subrequests",
+  "subrequest_hosts",
+  "internal_subrequests",
+  "budget_trips",
+  "turn",
+] as const;
+
+/** The two of the above a response may legitimately not carry. */
+export const CONDITIONAL_RESPONSE_FIELDS = ["error", "result"] as const;
+
+/**
  * One `TurnOutcome`, as the /debug/eval response.
  *
- * EVERY FIELD THE RUNNER NAMES IS STILL HERE, and means what it meant:
- * `ok` · `error` · `build` · `ms` · `result` · `dials` · `tools` ·
- * `references` · `gateAsk` · `narration` · `subrequests` ·
- * `subrequest_hosts` · `internal_subrequests` · `budget_trips`.
+ * EVERY FIELD THE RUNNER NAMES IS STILL HERE, and means what it meant —
+ * `EVAL_RESPONSE_FIELDS` above is the list, and the only one.
  *
  * Two are now reported from the turn rather than assembled beside it:
  * `references` is the turn's own telemetry (the names `read_reference` served),

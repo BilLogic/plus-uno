@@ -2,7 +2,7 @@
 //
 // Two directions, both of which used to be checked nowhere: a tool the model
 // is offered with no row here would dispatch off the end of a switch, and a
-// row for a tool the model is never offered is a dead column three readers
+// row for a tool the model is never offered is a dead column five readers
 // would still consult. `withSchemas` refuses both, and this is the test that
 // runs it over the real schema file.
 //
@@ -21,15 +21,18 @@ import { resolve } from "node:path";
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  gateWordsFor,
   isToolName,
+  rowFor,
   TOOL_NAMES,
   TOOL_TABLE,
   withSchemas,
   type ToolSchema,
 } from "../src/agent/tool-table";
 import { TOOL_BODIES } from "../src/agent/tool-bodies";
-import { SIDE_EFFECT_TOOLS } from "../src/agent/types";
-import { RETRIEVAL_TOOLS } from "../src/agent/confidence";
+import { retrievalRanIn } from "../src/agent/confidence";
+import { proposalWasAddressed } from "../src/agent/pending-notice";
+import { operationKinds, proposalVerb } from "../src/slack/proposal-render";
 import { warrantsReviewRequest } from "../src/slack/api";
 
 function schemasFromDisk(): ToolSchema[] {
@@ -99,47 +102,89 @@ describe("the access column partitions the tools across the two dispatches", () 
   });
 });
 
-describe("the table's roster columns say what the three readers say", () => {
-  // The expand half: the columns land beside the sets that are still read, and
-  // this is what holds the two accounts equal until the readers move over.
-  // Both directions where the set allows it — a set of plain strings can name
-  // a tool that does not exist, and that is as silent as a missing column.
-  it("gates exactly the side-effect tools", () => {
+describe("the readers answer from the row", () => {
+  // The contract #598 landed: none of these modules keeps a list of tool names
+  // any more, so none of them can disagree with a row — and the tests that
+  // held their lists equal to these columns went with the lists.
+  //
+  // What is left to check is that each reader's answer IS the row's, for every
+  // row, which is what makes adding a row the only edit a new tool needs. The
+  // type carries the other half: a gated row without its card words does not
+  // compile, so "the noun list nobody updated" is not a state this table has.
+  it("counts a turn as grounded exactly when a retrieval row ran", () => {
     for (const name of TOOL_NAMES) {
       assert.equal(
-        TOOL_TABLE[name].access === "gated",
-        SIDE_EFFECT_TOOLS.has(name),
-        `${name} disagrees with SIDE_EFFECT_TOOLS`,
-      );
-    }
-  });
-
-  it("marks exactly the tools that reach a source", () => {
-    for (const name of TOOL_NAMES) {
-      assert.equal(
+        retrievalRanIn([name]),
         TOOL_TABLE[name].retrieval,
-        RETRIEVAL_TOOLS.has(name),
-        `${name} disagrees with RETRIEVAL_TOOLS`,
+        `confidence disagrees with ${name}'s retrieval column`,
       );
     }
-    // RETRIEVAL_TOOLS is a set of plain strings, so this half is not a type.
-    assert.deepEqual(
-      [...RETRIEVAL_TOOLS].filter((name) => !isToolName(name)),
-      [],
-      "RETRIEVAL_TOOLS names something that is not a tool",
-    );
+    // A name off the table is not a fetch — the cheap direction (one extra
+    // judge call), and the only one a renamed tool can fall in.
+    assert.equal(retrievalRanIn(["moon_landing"]), false);
+    assert.equal(retrievalRanIn([]), false);
   });
 
-  it("marks exactly the tools whose result warrants a review request", () => {
+  it("gives every gated tool its card words, and nothing else any", () => {
     for (const name of TOOL_NAMES) {
-      assert.equal(
-        TOOL_TABLE[name].reviewRequest,
-        warrantsReviewRequest(name),
-        `${name} disagrees with the review-request roster`,
+      const row = rowFor(name);
+      assert.ok(row, `${name} has no row`);
+      const words = gateWordsFor(name);
+      if (row.access !== "gated") {
+        assert.equal(words, null, `${name} is not gated but carries card words`);
+        continue;
+      }
+      assert.ok(words, `${name} is gated with no card words`);
+      assert.ok(words.verb.length > 0, `${name} has no card verb`);
+      assert.ok(words.kind.length > 0, `${name} has no operation kind`);
+      assert.ok(words.nouns.length > 0, `${name} has no nouns to be referred to by`);
+    }
+  });
+
+  it("says on the card what the gated row says, never the tool's own name", () => {
+    for (const name of TOOL_NAMES) {
+      const words = gateWordsFor(name);
+      if (!words) continue;
+      assert.equal(proposalVerb(name), words.verb, `the card renames ${name}`);
+      assert.notEqual(proposalVerb(name), name, `the card shows a designer ${name}`);
+      const kinds = operationKinds({ toolName: name, input: {} });
+      assert.deepEqual(
+        kinds.map((k) => k.label),
+        [words.kind],
+        `the batch line renames ${name}`,
       );
     }
-    // The review-request set is private behind `warrantsReviewRequest`, so a
-    // member that is not a tool is unreachable from here — it stays unguarded
-    // until the reader moves onto this column.
+  });
+
+  it("hears each of a gated row's nouns as addressing its proposal", () => {
+    for (const name of TOOL_NAMES) {
+      for (const noun of gateWordsFor(name)?.nouns ?? []) {
+        assert.equal(
+          proposalWasAddressed(`Not much to add about the ${noun} beyond that.`, name),
+          true,
+          `${name}'s "${noun}" reads as a bounce`,
+        );
+      }
+    }
+    // Gate vocabulary works whatever is staged, including a name with no row —
+    // the pending notice is telemetry, and a renamed tool must not zero it.
+    assert.equal(proposalWasAddressed("it is still pending", "moon_landing"), true);
+  });
+
+  it("announces exactly the rows that name a reviewable artifact", () => {
+    for (const name of TOOL_NAMES) {
+      const artifact = TOOL_TABLE[name].reviewRequest;
+      assert.equal(
+        warrantsReviewRequest(name),
+        artifact !== null,
+        `the review-request fan-out disagrees with ${name}`,
+      );
+      if (artifact === null) continue;
+      assert.ok(artifact.length > 0, `${name} names an empty artifact`);
+      // An artifact is something a CONFIRMED run left, so it can only be a
+      // tool that went past the Gate.
+      assert.equal(TOOL_TABLE[name].access, "gated", `${name} reviews an ungated run`);
+    }
+    assert.equal(warrantsReviewRequest("moon_landing"), false);
   });
 });

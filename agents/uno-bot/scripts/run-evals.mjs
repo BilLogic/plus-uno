@@ -18,6 +18,15 @@
 // "a failing row is a release blocker". Full transcripts land in
 // eval-results.json for reasoning investigation.
 //
+// WHAT A RESULTS ROW IS, and what the run exits on, is scripts/eval-results.mjs
+// (#617): one constructor, so every branch of the walk — an unreachable case, a
+// failed subject read, an unsatisfiable condition, an unfilled placeholder, a
+// case that ran — writes the same key set. The gate is the harness's shared
+// findings interface (scripts/lib/findings.mjs): a failed blocker is an error, a
+// failed non-blocker a warning, and that module decides the banner and the exit
+// code. The per-case log below is the runner's own and is untouched — a line per
+// case across the suite is why this check stays spawn-shaped.
+//
 // A case may also declare `subject: { need }` — a CONDITION the live blueprint
 // answers with a row, fetched once before turn 1 through the transport (the
 // Worker's /debug/blueprint-subject route) and substituted into every `{{subject.…}}` the
@@ -32,7 +41,7 @@
 // adapter now lives. Everything else here — the fixture walk, the subject
 // substitution, the deterministic checks, the history threading, the sampling
 // arithmetic — is transport-agnostic, and `runEvals` below takes the transport
-// (and its judge, log, clock and writer) as arguments, so the composition is
+// (and its judge, log and clock) as arguments, so the composition is
 // itself testable: scripts/run-evals.test.mjs drives it with a fake transport.
 //
 // `--transport=local` (#512) is the second one: the Worker's Turn module called
@@ -70,11 +79,11 @@
 //
 // Run:  node agents/uno-bot/scripts/run-evals.mjs [--transport=worker|local]
 
-import { writeFileSync } from "node:fs";
 import { argv } from "node:process";
 import { resolve } from "node:path";
-import { isEntry } from "../../../scripts/lib/findings.mjs";
+import { isEntry, report } from "../../../scripts/lib/findings.mjs";
 import { censusOf, describeCensus, fixtureStamp, hasOwnSpec, loadCases } from "./eval-case.mjs";
+import { REMEDY, RESULTS_PATH, findingsFor, resultRow, writeResults } from "./eval-results.mjs";
 import { passesCase, toolCallMatches, describeCalls } from "./eval-scoring.mjs";
 import { threadTurn, checkHistory, sentSummary } from "./eval-history.mjs";
 import { applySubject, skipReason } from "./eval-subjects.mjs";
@@ -298,7 +307,6 @@ export async function runEvals({
    *  so a transcript read a week later says WHICH scenario "what happens in X"
    *  was actually about. */
   const subjectsUsed = {};
-  let blockerFailures = 0;
 
   // A case may declare `samples: N` (default 1) and passes on a MAJORITY of
   // them — see scripts/eval-scoring.mjs for the rule and the arithmetic.
@@ -378,7 +386,7 @@ export async function runEvals({
     // this run. `[SKIP]` on its own reads like a case that chose to sit out.
     const unsupported = transport.unsupported?.(rawCase) ?? null;
     if (unsupported) {
-      results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, skipped: true, ungated: true, reason: unsupported, samples: 0 });
+      results.push(resultRow({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, skipped: true, ungated: true, reason: unsupported }));
       log(`[UNGATED] ${rawCase.id} — ${rawCase.name} (${unsupported})`);
       continue;
     }
@@ -404,9 +412,8 @@ export async function runEvals({
         // A broken route or a failed read is a FAILURE. Reporting it as a skip
         // would retire a blocker by breaking the thing that feeds it.
         const failure = `subject route for '${need}': ${got.error}`;
-        results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, pass: false, samples: 0, passedRuns: 0, need, failures: [failure], judged: false, judge: notAsked("the subject read failed"), ms: 0 });
+        results.push(resultRow({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, need, failures: [failure], judge: notAsked("the subject read failed") }));
         judgeVerdicts.push(notAsked("the subject read failed"));
-        if (rawCase.blocker) blockerFailures++;
         log(`[FAIL] ${rawCase.id} — ${rawCase.name} (${failure})`);
         continue;
       }
@@ -416,7 +423,7 @@ export async function runEvals({
         // recorded green for that would be the silent-empty-read lie all over
         // again, one layer up.
         const reason = skipReason(need, got.reason);
-        results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, skipped: true, need, reason, samples: 0, workerBuild: got.build });
+        results.push(resultRow({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, skipped: true, need, reason, workerBuild: got.build }));
         log(`[SKIP] ${rawCase.id} — ${rawCase.name} (${reason})`);
         continue;
       }
@@ -427,9 +434,8 @@ export async function runEvals({
         // condition promises. That is a bug in one of them, not a property of
         // the board, and it must not be swallowed as a skip.
         const failure = `subject for '${need}' carries no ${missing.map((f) => `'${f}'`).join(", ")} (got ${JSON.stringify(got.subject)})`;
-        results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, pass: false, samples: 0, passedRuns: 0, need, subject: got.subject, failures: [failure], judged: false, judge: notAsked("the case never ran"), ms: 0 });
+        results.push(resultRow({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, need, subject: got.subject, failures: [failure], judge: notAsked("the case never ran") }));
         judgeVerdicts.push(notAsked("the case never ran"));
-        if (rawCase.blocker) blockerFailures++;
         log(`[FAIL] ${rawCase.id} — ${rawCase.name} (${failure})`);
         continue;
       }
@@ -446,12 +452,11 @@ export async function runEvals({
     const passedRuns = runs.filter((r) => r.pass).length;
     const pass = passesCase(passedRuns, samples);
     const rep = runs.find((r) => !r.pass) ?? runs[0];
-    if (!pass && c.blocker) blockerFailures++;
     // `judged` is what keeps a FAIL-OPEN pass from reading as a graded one: the
     // case is green either way, and only this field and the judge's reason say
     // whether anything actually looked at the answer.
     judgeVerdicts.push(rep.asked ? rep.judge : notAsked("the deterministic checks failed first"));
-    results.push({ id: c.id, name: c.name, blocker: !!c.blocker, pass, samples, passedRuns, ...(subjectsUsed[c.id] ?? {}), failures: rep.failures, judged: rep.asked && rep.judge.verdict !== "skipped", judge: rep.judge, ms: runs.reduce((s2, r) => s2 + r.transcript.turns.reduce((s3, t) => s3 + (t.response?.ms ?? 0), 0), 0), transcript: rep.transcript });
+    results.push(resultRow({ id: c.id, name: c.name, blocker: !!c.blocker, pass, samples, passedRuns, ...(subjectsUsed[c.id] ?? {}), failures: rep.failures, judged: rep.asked && rep.judge.verdict !== "skipped", judge: rep.judge, ms: runs.reduce((s2, r) => s2 + r.transcript.turns.reduce((s3, t) => s3 + (t.response?.ms ?? 0), 0), 0), transcript: rep.transcript }));
     const tally = samples > 1 ? ` [${passedRuns}/${samples} samples]` : "";
     const note = rep.failures.length
       ? ` (${rep.failures.join("; ")})`
@@ -488,14 +493,26 @@ export async function runEvals({
     workerBuild: firstBuild(results),
     fixture: fixtureStamp(casesPath),
     // WHAT THE SUITE IS, counted rather than typed — and which of its cases
-    // this instrument could not reach. `ungated` is the number a reader needs
-    // to know how much of the suite a green run actually stands for.
+    // this instrument said it could not reach. `ungated` is the number a reader
+    // needs to know how much of the suite a green run actually stands for.
     census,
     passed: scored.filter((r) => r.pass).length,
     failed: scored.filter((r) => !r.pass).length,
     skipped: results.length - scored.length,
+    // TWO HOMES FOR ONE WORD, DELIBERATELY. `census.ungated` above is the CLAIM:
+    // read from `transport.recordedCases` before the walk starts, which is what
+    // lets the run say what it will not measure in its opening line. This one is
+    // the OUTCOME: the cases the walk actually marked `ungated` as it reached
+    // them. They agree today, and the run whose instrument mis-states its own
+    // reach is exactly the run where they would not — so folding them into one
+    // field would delete the only evidence of the disagreement.
     ungated: results.filter((r) => r.ungated).map((r) => r.id),
-    blockerFailures,
+    // COUNTED OFF THE ROWS, not accumulated as the walk goes. A counter
+    // incremented at three depths is a second answer to a question the rows
+    // already hold, and the one the gate reads is the rows' (eval-results.mjs
+    // `findingsFor`) — so the number a reader sees and the number that decides
+    // the exit code cannot disagree.
+    blockerFailures: scored.filter((r) => r.blocker && !r.pass).length,
     results,
   };
 }
@@ -518,7 +535,7 @@ async function main() {
   });
 
   const scored = summary.results.filter((r) => !r.skipped);
-  writeFileSync("eval-results.json", JSON.stringify(summary, null, 2));
+  writeResults(summary);
   const skipped = summary.skipped - summary.ungated.length;
   const notes = [
     skipped ? `${skipped} skipped` : null,
@@ -529,7 +546,7 @@ async function main() {
   console.log(
     `\n[evals] ${summary.passed}/${scored.length} passed${notes.length ? `, ${notes.join(", ")}` : ""} ` +
       `of ${summary.census.total} cases ` +
-      `(build ${summary.workerBuild}, fixture ${summary.fixture.rev}/${summary.fixture.sha256}) — details in eval-results.json`,
+      `(build ${summary.workerBuild}, fixture ${summary.fixture.rev}/${summary.fixture.sha256}) — details in ${RESULTS_PATH}`,
   );
   // Beside the score, always: what the score was judged by. A pass count on its
   // own is the deterministic checks plus however much grading happened to
@@ -542,10 +559,15 @@ async function main() {
   if (summary.judge.pass + summary.judge.fail === 0 && summary.judge.skipped > 0) {
     console.log(`[evals] no answer was graded — this score is the deterministic checks alone`);
   }
-  if (summary.blockerFailures > 0) {
-    console.error(`[evals] ${summary.blockerFailures} BLOCKER case(s) failed`);
-    process.exit(1);
-  }
+  // THE GATE IS THE HARNESS'S. A failing blocker is a finding and a failing
+  // non-blocker is a warning (eval-results.mjs `findingsFor`), and
+  // scripts/lib/findings.mjs decides the banner, the stream and the exit code —
+  // the same three lines every other check in this repository ends on. The
+  // per-case log above is untouched, which is why this check stays spawn-shaped.
+  report("evals", findingsFor(summary), {
+    remedy: REMEDY,
+    summary: `${summary.passed}/${scored.length} passed, no blocker failed`,
+  });
 }
 
 // Imported by the test, executed by the Action — so the walk only starts when

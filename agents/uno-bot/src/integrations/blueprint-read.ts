@@ -60,8 +60,11 @@
 // because a second way to reach the network is exactly what ADR-022 deleted
 // src/http.ts for.
 //
-// Nothing calls this yet — rewiring the tool onto it is #607, which is what
-// turns the eight fixes the tool carries into assertions.
+// ONE CALLER: `src/tools/blueprint-search.ts`, rewired onto this in #607 —
+// which is what turned the eight fixes the tool used to carry in comments into
+// assertions, and what the per-read dispositions are for: the tool's notes can
+// now say "the findings table could not be read" where a failed read and an
+// empty table used to leave the same silence.
 
 import { rethrowIfBudget } from "../net";
 import type { BlueprintCappedBy, BlueprintIndex } from "./blueprint-index";
