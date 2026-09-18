@@ -29,7 +29,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-import { CHECKS, declaredNames } from './checks.registry.mjs';
+import { ALL, CHECKS, declaredNames } from './checks.registry.mjs';
 import { exitCodeFor, renderFindings } from './lib/findings.mjs';
 
 /** The two manifests the completeness assertion scans. */
@@ -67,16 +67,104 @@ export function orphans(manifests, declared = declaredNames()) {
   return found;
 }
 
-/** Read both manifests off disk and ask `orphans` about them. */
-export const orphansInRepo = (repoRoot) =>
-  orphans(
+/**
+ * The second orphan, which the first could not see (#612).
+ *
+ * `orphans` above scans NAMES: an npm script called `check:*` that no row
+ * declares. So a check that never earned a name is invisible to it — a
+ * `check-*.mjs` on disk, bound to no row, no script and no workflow, which
+ * reads as part of the harness to anyone who opens `scripts/` and runs
+ * nowhere. `scripts/check-figma-links.mjs` was one from the day it landed,
+ * 2026-05-11: a reporter that printed a summary and exited zero whatever it
+ * found, deleted by the ticket that added this pass. The two halves answer the
+ * same question from the two ends the drift happens at — a name with no
+ * implementation, and an implementation with no name.
+ */
+
+/** Where a check's implementation lives. Both packages, so both are covered. */
+const SCRIPT_DIRS = ['scripts', 'agents/uno-bot/scripts'];
+
+/** `check-*.mjs` / `check-*.js`, and not the test beside it. */
+const CHECK_FILE = /^check-[\w.-]+\.(?:mjs|js)$/;
+const TEST_FILE = /\.test\.(?:mjs|js)$/;
+
+/**
+ * Every check implementation on disk, repo-root-relative and sorted.
+ *
+ * @param {string} repoRoot
+ * @returns {string[]}
+ */
+export function checkFiles(repoRoot) {
+  const found = [];
+  for (const dir of SCRIPT_DIRS) {
+    let entries;
+    try {
+      entries = fs.readdirSync(path.join(repoRoot, dir));
+    } catch {
+      continue; // a tree that does not have this package is not a finding.
+    }
+    for (const entry of entries) {
+      if (CHECK_FILE.test(entry) && !TEST_FILE.test(entry)) found.push(`${dir}/${entry}`);
+    }
+  }
+  return found.sort();
+}
+
+/** `scripts/…` in a row's `script` is relative to the package that owns it. */
+const PKG_DIR = { root: '.', bot: 'agents/uno-bot' };
+const SCRIPT_PATH = /(?:^|[\s=])((?:[\w.-]+\/)*[\w.-]+\.(?:mjs|js))/g;
+
+/**
+ * Every implementation path the registry names, repo-root-relative.
+ *
+ * Both columns count. `module` is already a repo path; the paths inside
+ * `script` are a command line, read against the manifest that holds it — the
+ * Worker's rows say `node scripts/check-secrets.mjs` and mean
+ * `agents/uno-bot/scripts/check-secrets.mjs`.
+ *
+ * @param {object[]} [rows]
+ * @returns {Set<string>}
+ */
+export function namedFiles(rows = ALL) {
+  const named = new Set();
+  for (const row of rows) {
+    if (row.module) named.add(row.module);
+    const dir = PKG_DIR[row.pkg] ?? '.';
+    for (const [, token] of (row.script ?? '').matchAll(SCRIPT_PATH)) {
+      named.add(dir === '.' ? token : `${dir}/${token}`);
+    }
+  }
+  return named;
+}
+
+/**
+ * The files half of the assertion, as a function of the two lists — so a test
+ * can watch it fail without planting a file in the repo.
+ *
+ * @param {string[]} files
+ * @param {Set<string>} [named]
+ * @returns {string[]} one line per unbound file; empty when complete.
+ */
+export function unboundCheckFiles(files, named = namedFiles()) {
+  return files
+    .filter((file) => !named.has(file))
+    .map((file) => `${file}  (no registry row names it)`);
+}
+
+/** Read both manifests and both script trees off disk, and ask about each. */
+export const orphansInRepo = (repoRoot) => [
+  ...orphans(
     MANIFESTS.map(({ dir, label }) => ({ label, scripts: npmScripts(path.join(repoRoot, dir)) })),
-  );
+  ),
+  ...unboundCheckFiles(checkFiles(repoRoot)),
+];
 
 export const ORPHAN_REMEDY =
   '  -> Every check:* script is either composed into this gate or excluded with a' +
   '\n     reason. Add it to CHECKS or to EXCLUDED in scripts/checks.registry.mjs.' +
-  '\n     A check that runs nowhere protects nothing.';
+  '\n     A check that runs nowhere protects nothing.' +
+  '\n     A check-*.mjs no row names is the same orphan from the other end: give it' +
+  '\n     a row, or delete it — nothing runs it as it stands.';
 
 /** The npm arguments a `kind: 'spawn'` row is spawned with. */
 export const npmArgs = (row) =>

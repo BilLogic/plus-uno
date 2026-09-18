@@ -143,6 +143,23 @@ the check registry — and add a new `check:*` script to that file's `CHECKS` or
 `EXCLUDED` when you write one. The gate fails on a check that is in neither,
 because a check that runs nowhere protects nothing.
 
+It asks the same question from the other end too (#612): a `check-*.mjs` in
+`scripts/` or `agents/uno-bot/scripts/` that no row names — by `module` or
+inside its `script` — is reported by name. The name scan alone could only see
+an npm script, so a check with no script of its own read as part of the harness
+to anyone opening the folder while running nowhere. The Figma-links reporter
+was one from the day it landed, 2026-05-11: it printed a summary and exited
+zero whatever it found, so it was deleted rather than bound.
+
+And write the check's test with it. A guard nobody has watched fail is a guard
+nobody knows works (#191): the test plants the failure the check exists to
+catch, in a fixture tree, and proves each exemption by breaking the rule
+somewhere the pass is meant to leave alone. `run({ repoRoot })` is what makes
+that cheap — every findings check takes the root, so a test hands it a
+throwaway directory instead of the repo. `scripts/check-doc-links.test.mjs` and
+`scripts/check-knowledge-disposition.test.mjs` are the shape to copy, and
+`npm run test:scripts` runs them.
+
 That registry is also the author of the three places that used to state the same
 set by hand: the `check:*` block of `package.json`, the check steps of
 `.github/workflows/harness-integrity-sweep.yml` and those of
@@ -241,10 +258,19 @@ Two kinds of failure, two mechanisms:
   highest-usage components whose behaviour is the product. Everything else in
   the corpus is asserted to render, and to survive axe, and nothing more.)
 - **Accessibility is a ratchet**, not a threshold. `docs/evals/a11y-baseline.json`
-  records which axe rules each story already violates (126 stories, 14 rules at
-  2026-08-26). A story violating a rule it did not carry before fails the gate; a
+  records which axe rules each story already violates (54 stories, 8 rules at
+  2026-08-29). A story violating a rule it did not carry before fails the gate; a
   count that falls does not. Re-record a genuine improvement with
   `npm run check:storybook -- --update` and commit the file in the same PR.
+- **What a ratchet IS, for every check that holds one**, is
+  `scripts/lib/ratchet.mjs`: the record's shape, which direction fails, the
+  stale-entry sweep, the placeholder-reason sweep and the `--update` write, with
+  the invariant asserted once in `scripts/lib/ratchet-conformance.mjs` against
+  all twelve live records. The twelve are twelve SHAPES, surveyed one row each in
+  `scripts/lib/ratchet-shapes.mjs` — three of them keep the human's reason
+  outside the entry, so `--update` is a merge that leaves every key the module
+  does not own exactly as it found it. A check migrating onto the module adds no
+  row: it opens its record by the path it already names.
 
 **Which components carry `play` blocks, and why not all of them.** A `play`
 block costs runtime on every PR, so the set is chosen rather than grown: a

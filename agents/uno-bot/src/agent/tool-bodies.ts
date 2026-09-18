@@ -13,13 +13,14 @@
 // agent entry's per-turn bookkeeping nor the Gate's Durable Object imports
 // come with them.
 //
-// A BODY IS THE TOOL, NOT THE TURN. Three of the read arms are wrapped where
-// they are dispatched, in `agent/run-agent.ts`: a correction turn forces
+// A BODY IS THE TOOL, NOT THE TURN. Three of the ungated tools are wrapped
+// where they are dispatched, in `agent/run-agent.ts`: a correction turn forces
 // `search_blueprint` to re-fetch, and `search_blueprint`, `slack_search` and
 // `read_reference` each leave a per-turn receipt. Those wrappers read the
 // turn's scope, which is the dispatch's knowledge and not the tool's, so they
-// stay there — and a dispatch folded onto this table has to keep composing
-// them around the body rather than assume the body carries them.
+// stay there — as `TURN_WRAPPERS`, a `Partial<Record<ToolName, …>>` the
+// dispatch composes around the body it looked up (#597). Nothing here carries
+// them, and a caller that reaches a body directly gets the tool, not the turn.
 import type { Env, SlackContext } from "../types";
 import { executeNotionSearch } from "../tools/notion-search";
 import { executeRoadmapQuery } from "../tools/roadmap-query";

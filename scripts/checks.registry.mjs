@@ -53,7 +53,12 @@
  *   baseline  the ratchet file, where the check holds a recorded set rather
  *             than a threshold. Declared so a reader can find the record
  *             without opening the script; the drift check asserts the file
- *             exists and that the script names it.
+ *             exists and that the script names it. What SHAPE that record is,
+ *             and what reading and writing it means, is `scripts/lib/ratchet.mjs`
+ *             and the one-row-per-record survey beside it in
+ *             `scripts/lib/ratchet-shapes.mjs` (#599) — the twelve records here
+ *             are twelve shapes, and the path declared on this row is the key
+ *             they are surveyed under.
  *   module    a path to an ES module exporting `run(ctx) => Finding[]` (see
  *             `scripts/lib/findings.mjs`). The runner calls it in-process and
  *             renders one banner for it. 42 of the 59 rows carry one.
@@ -542,7 +547,7 @@ export const CHECKS = [
     module: 'scripts/check-text-contrast.mjs',
     baseline: 'docs/evals/text-contrast-baseline.json',
     guards:
-      "every `color:` declaration in the design system's stylesheets against the ground its own rule puts it on, compositing translucent state layers first. `--color-warning` is 3.52:1 on the page \u2014 below AA \u2014 and was the declared text colour in seven places including a `.color-warning` utility anyone could reach for, while `--color-warning-text` (8.24:1) sat in the token file unused. Nothing rendered any of the seven in a story, so `check:storybook`'s axe pass never measured one. Ratchet, because the remaining findings are open #268 token decisions and WCAG's inactive-component exemption, both recorded with a reason. 0.2s, measured 2026-08-29.",
+      "every `color:` declaration in the design system's stylesheets against the ground its own rule puts it on, compositing translucent state layers first. `--color-warning` is 3.52:1 on the page \u2014 below AA \u2014 and was the declared text colour in seven places including a `.color-warning` utility anyone could reach for, while `--color-warning-text` (8.24:1) sat in the token file unused. Nothing rendered any of the seven in a story, so `check:storybook`'s axe pass never measured one. Ratchet, because the remaining findings are open #268 token decisions and WCAG's inactive-component exemption, both recorded with a reason \u2014 and since #599 the ratchet itself is `scripts/lib/ratchet.mjs` rather than this check's own read and write, so an absent record now fails loudly instead of throwing ENOENT. 0.2s, measured 2026-08-29.",
   },
   {
     name: 'check:harness-bundle',

@@ -12,8 +12,10 @@
  *      48 findings were an 8% wash mistaken for a colour — the same arithmetic
  *      #268's audit made and had to correct.
  *
- * The ratchet is tested too, in all three directions it can move, because a
- * baseline that only ever gets appended to is not a ratchet.
+ * The ratchet's WORDING is tested here — the NEW / ROSE / STALE columns this
+ * check has always printed. Whether the classification behind them is right is
+ * asserted once for the whole repo, against all twelve live baseline records,
+ * in `scripts/lib/ratchet-conformance.mjs` (#599).
  *
  * Run: npm run test:scripts
  */
@@ -134,28 +136,46 @@ test('the same colour via the -text sibling is not a finding', () => {
 
 const KEY = 'a.scss|--color-warning|--color-surface';
 
-test('the ratchet fails on a NEW finding', () => {
-  const failures = ratchetFailures({ [KEY]: 1 }, {});
+// The four cases below are about the WORDING, which is what stayed with the
+// check when #599 moved the record, the direction and the write into
+// `scripts/lib/ratchet.mjs`. That the classification itself is right is
+// asserted once, against all twelve live records, in
+// `scripts/lib/ratchet-conformance.mjs` — restating it here would be the
+// one-rule-two-homes defect this repo keeps deleting.
+
+test('the ratchet words a NEW finding', () => {
+  const failures = ratchetFailures([{ kind: 'new', key: KEY, count: 1 }], []);
   assert.equal(failures.length, 1);
   assert.match(failures[0], /NEW/);
+  // The key is rendered as columns, not as the `|` it is stored under.
+  assert.ok(!failures[0].includes('|'));
 });
 
-test('the ratchet fails when a recorded count ROSE', () => {
-  const failures = ratchetFailures({ [KEY]: 3 }, { [KEY]: { count: 2, why: 'x' } });
+test('the ratchet words a recorded count that ROSE, with both numbers', () => {
+  const failures = ratchetFailures(
+    [{ kind: 'rose', key: KEY, field: 'count', count: 3, recorded: 2 }],
+    [],
+  );
   assert.equal(failures.length, 1);
   assert.match(failures[0], /ROSE/);
+  assert.match(failures[0], /2 recorded, 3 found/);
 });
 
-test('the ratchet fails on a STALE entry that no longer occurs', () => {
+test('the ratchet words a STALE entry that no longer occurs', () => {
   // The direction most baselines forget. A fix that leaves its exemption
   // behind turns the baseline into a list of things nobody has looked at.
-  const failures = ratchetFailures({}, { [KEY]: { count: 1, why: 'x' } });
+  const failures = ratchetFailures([], [{ key: KEY, recorded: 1, reason: 'x' }]);
   assert.equal(failures.length, 1);
   assert.match(failures[0], /STALE/);
 });
 
-test('the ratchet passes when the count shrank', () => {
-  assert.deepEqual(ratchetFailures({ [KEY]: 1 }, { [KEY]: { count: 2, why: 'x' } }), []);
+test('the one stated absent-record mode is passed through as written', () => {
+  const failures = ratchetFailures([{ kind: 'absent', message: 'no baseline is recorded at x' }], []);
+  assert.deepEqual(failures, ['no baseline is recorded at x']);
+});
+
+test('the ratchet says nothing when nothing moved', () => {
+  assert.deepEqual(ratchetFailures([], []), []);
 });
 
 test('the baseline key is file + token + ground, not a line number', () => {

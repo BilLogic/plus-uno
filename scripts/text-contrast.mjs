@@ -60,10 +60,10 @@ import {
   composite,
   contrast,
   parseColour,
-  ratchet,
   resolveToken,
   varReferencePattern,
 } from '../design-system/src/lib/tokens.mjs';
+
 import { AA_TEXT, PAGE_TOKEN, tokenValues } from './button-contrast.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -281,38 +281,42 @@ export function census(found) {
 }
 
 /**
- * A ratchet, not a threshold.
+ * A ratchet, not a threshold — the WORDING of one, which is all that is left
+ * here.
  *
- * Recorded may shrink and must never grow. An entry that no longer fails is
- * itself reported: a fix must not quietly leave its exemption behind, or the
- * baseline slowly becomes a list of things nobody has looked at.
+ * `scripts/lib/ratchet.mjs` owns the record, the direction that fails, the
+ * stale sweep and the write (#599); this turns what it classified into the
+ * lines this check has always printed. NEW and ROSE are emitted in the order
+ * the run found them, not grouped by kind, so the list reads like the run, and
+ * STALE follows because it is about the record rather than about the run.
  *
- * The CLASSIFICATION is `ratchet` in `design-system/src/lib/tokens.mjs` (#506) —
- * one function for the nine baselines that each had their own rule. What stays
- * here is the wording, and the order: NEW and ROSE are emitted in the order the
- * run found them, not grouped by kind, so the list reads like the run.
+ * @param {import('./lib/ratchet.mjs').RatchetFailure[]} failures
+ * @param {{key: string, recorded: number}[]} stale
+ * @returns {string[]}
  */
-export function ratchetFailures(counts, baseline) {
-  const { new: unrecorded, known, fixed } = ratchet(counts, baseline);
-  const isNew = new Set(unrecorded.map((entry) => entry.key));
-  const byKey = new Map(known.map((entry) => [entry.key, entry]));
+export function ratchetFailures(failures, stale) {
+  const columns = (key) => key.split('|').join('  ');
+  const lines = [];
 
-  const failures = [];
-  for (const key of Object.keys(counts)) {
-    if (isNew.has(key)) {
-      failures.push(`  NEW      ${key.split('|').join('  ')}\n           not in the baseline. Fix it, or record it with a reason.`);
+  for (const failure of failures) {
+    // The one stated absent-record mode arrives already worded, because there
+    // is nothing check-specific to say about a record that is not there.
+    if (failure.kind === 'absent') {
+      lines.push(failure.message);
       continue;
     }
-    const entry = byKey.get(key);
-    if (entry?.rose) {
-      failures.push(`  ROSE     ${key.split('|').join('  ')}\n           ${entry.recorded} recorded, ${entry.count} found.`);
+    if (failure.kind === 'new') {
+      lines.push(`  NEW      ${columns(failure.key)}\n           not in the baseline. Fix it, or record it with a reason.`);
+    } else {
+      lines.push(`  ROSE     ${columns(failure.key)}\n           ${failure.recorded} recorded, ${failure.count} found.`);
     }
   }
-  for (const { key, recorded } of fixed) {
-    failures.push(
-      `  STALE    ${key.split('|').join('  ')}\n           recorded ${recorded}, found 0 — it was fixed. ` +
+
+  for (const { key, recorded } of stale) {
+    lines.push(
+      `  STALE    ${columns(key)}\n           recorded ${recorded}, found 0 — it was fixed. ` +
         'Remove the entry so the baseline stays a list of live findings.',
     );
   }
-  return failures;
+  return lines;
 }

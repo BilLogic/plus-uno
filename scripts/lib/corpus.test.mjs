@@ -26,6 +26,7 @@ import {
   links,
   mdxSections,
   stripLinks,
+  text,
 } from './corpus.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -113,6 +114,28 @@ test('documents skips the ignored directories, and the list is one exported cons
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
+});
+
+// ── text: what a file says ───────────────────────────────────────────────────
+
+test('text reads a file against the root it is given, not the working directory', () => {
+  assert.equal(text('docs/plain.md', { root: FIXTURES }), fs.readFileSync(path.join(FIXTURES, 'docs/plain.md'), 'utf8'));
+  assert.equal(text(path.join(FIXTURES, 'docs/plain.md')), text('docs/plain.md', { root: FIXTURES }));
+});
+
+test('text reads whatever a caller listed, document or stylesheet', () => {
+  // `ext: null` is the shape a stylesheet walker asks `documents` for, and the
+  // read that follows it is this one — the pairing #620 exists to keep honest.
+  const found = documents('docs', { root: FIXTURES, ext: ['.txt'] });
+  assert.deepEqual(found, ['docs/notes.txt']);
+  assert.ok(text(found[0], { root: FIXTURES }).length > 0);
+});
+
+test('text THROWS for a path that is not there, rather than echoing its own name', () => {
+  // The difference from `frontmatter`'s forgiving path-or-text read: a caller
+  // holding a path it means to read wants the failure, not the string back.
+  assert.throws(() => text('docs/absent.md', { root: FIXTURES }), /ENOENT/);
+  assert.throws(() => text(undefined), /takes a path/);
 });
 
 // ── frontmatter ──────────────────────────────────────────────────────────────

@@ -37,7 +37,9 @@
  */
 import { documents } from './lib/corpus.mjs';
 
-import { TOKEN_NAME, ratchet, varReferencePattern } from '../design-system/src/lib/tokens.mjs';
+import { TOKEN_NAME, varReferencePattern } from '../design-system/src/lib/tokens.mjs';
+
+import { ratchet } from './lib/ratchet.mjs';
 
 /** The extensions a token name can be written in. */
 const SEARCHED = ['.scss', '.css', '.jsx', '.tsx', '.mdx', '.html'];
@@ -160,13 +162,14 @@ export function audit(files) {
  * longer used at all is itself reported — a baseline entry nothing matches is
  * a claim about code that has gone.
  *
- * NEW and STALE are the module's `ratchet` (#507). The ROSE test is not, and
- * cannot be: this baseline records TWO numbers per name — total uses and bare
- * uses — and a bare use is a dropped declaration where a fallen-back one is
- * only a fiction, so they are checked separately. The module classifies; the
- * comparison and the wording stay here.
+ * NEW and STALE are `ratchet` in `scripts/lib/ratchet.mjs` (#507, moved there
+ * by #599). The ROSE test is not, and cannot be: this baseline records TWO
+ * numbers per name — total uses and bare uses — and a bare use is a dropped
+ * declaration where a fallen-back one is only a fiction, so they are checked
+ * separately. The classifier classifies; the comparison and the wording stay
+ * here.
  *
- * The walk is over the found names rather than over the module's three lists,
+ * The walk is over the found names rather than over the classifier's three lists,
  * which is what keeps NEW and ROSE interleaved in name order the way this
  * report has always printed them.
  *

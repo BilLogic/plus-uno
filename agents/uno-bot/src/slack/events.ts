@@ -5,7 +5,8 @@ import type { HistoryTurn, PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { conversationsReplies, getBotIdentity, postMessage } from "./api";
 import { buildFailureMessage } from "./failure-message";
-import { handleAgentDmOpened, handleAppContextChanged, handleSessionStopped } from "./assistant";
+import { handleAgentDmOpened, handleAppContextChanged } from "./assistant";
+import { handleSessionStopped } from "./stop-envelope";
 import { handleAppHomeOpened } from "./home";
 import { handleReaction } from "./gate";
 import { extractPrdFromThreadRoot } from "./notion-prd";
@@ -392,7 +393,7 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
     // here could only clear the surfaces IT knew about, which is how a channel
     // thread kept the indicator a DM-gated clear never reached.
     //
-    // ONE SANCTIONED EXCEPTION, added #576: `handleSessionStopped` settles the
+    // ONE SANCTIONED EXCEPTION, added #576: the in-thread stop door settles the
     // session itself when Slack's stop control is pressed, because Slack says
     // plainly that the press moves no status of its own. It escapes the defect
     // above by construction — the event names the exact channel and thread, so

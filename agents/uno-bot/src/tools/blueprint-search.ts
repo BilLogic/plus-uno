@@ -105,7 +105,11 @@ export async function executeBlueprintSearch(
     // instruction and broke a different eval case — so this is enabled in ONE DM
     // first and the judged evals are compared CASE BY CASE before it goes wide.
     const wantIndex = env.BLUEPRINT_INDEX === "on" || include.includes("index");
-    const index = wantIndex ? await fetchBlueprintIndex(env, { fresh }) : undefined;
+    // The read says how it went; this call site still asks only whether there
+    // is an index to attach. Telling the model WHY there is not — unconfigured
+    // vs unreadable — is #607's job, once every enrichment here reports its
+    // own disposition through readBlueprint.
+    const index = wantIndex ? (await fetchBlueprintIndex(env, { fresh })).index : undefined;
     // Mirrors how `retrieval` is surfaced: an OMITTED key is indistinguishable
     // from "no future path exists", which regenerates the bug this fixes. The
     // status is always stated when the index was asked for at all.
@@ -144,7 +148,7 @@ export async function executeBlueprintSearch(
     // makes the switch safe to deploy before the migration is everywhere.
     const edges =
       fusedEdges ??
-      (await optional(include.includes("edges"), () => fetchEdges(env, cellIds), "edges"));
+      (await optional(include.includes("edges"), () => fetchEdges(env, cellIds), "edges"))?.edges;
     const findingsRead =
       fusedFindings ??
       (await optional(include.includes("findings"), () => fetchFindings(env, cellIds), "findings"));

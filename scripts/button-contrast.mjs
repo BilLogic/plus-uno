@@ -2,7 +2,7 @@
  * The pure half of `check:button-contrast` (#312).
  *
  * THE MATHS IS NO LONGER HERE. Luminance, contrast, compositing, colour
- * parsing, the token grammar, token resolution and the ratchet moved to
+ * parsing, the token grammar and token resolution moved to
  * `design-system/src/lib/tokens.mjs` (#506), because this file imports `node:fs`
  * and so could never be imported by a Storybook story — which is why five
  * stories carried their own copy of the same arithmetic. What is left here is
@@ -11,7 +11,9 @@
  *
  * The re-exports #506 left here as a bridge are gone (#507): `text-contrast.mjs`
  * and `focus-ring.mjs` import the maths from the module itself, so there is one
- * import path to it rather than two. What this file still exports is its own —
+ * import path to it rather than two. The RATCHET went with the maths in #506
+ * and moved again in #599, to `scripts/lib/ratchet.mjs`, which is also where
+ * this check's record shape is declared. What this file still exports is its own —
  * `tokenValues`, `PAGE_TOKEN`, `AA_TEXT` and the button sweep.
  *
  * WHAT THIS MEASURES, AND WHY IT IS NOT THE a11y RATCHET'S JOB.
@@ -52,11 +54,12 @@ import {
   composite,
   contrast,
   parseColour,
-  ratchet,
   readTokens,
   resolveToken,
   toHex,
 } from '../design-system/src/lib/tokens.mjs';
+
+import { ratchet } from './lib/ratchet.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
