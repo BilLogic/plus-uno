@@ -118,41 +118,53 @@ export function counts(uses) {
 }
 
 /**
- * The ratchet. A recorded remainder may shrink only after the record shrinks
- * with it: a count BELOW its baseline is a finding in its own right, because a
+ * The ratchet's findings, WORDED. The classification itself is
+ * `scripts/lib/ratchet.mjs` — this record ratchets in BOTH directions, keeps its
+ * reason inside each entry and is one of the twelve surveyed in
+ * `scripts/lib/ratchet-shapes.mjs` (#601). What stays here is the sentence a
+ * reader gets, which is why the migration changed no byte of it: a recorded
+ * remainder may shrink only after the record shrinks with it, because a
  * baseline that no longer describes the code is a baseline nobody can read.
+ *
+ * Pure, and handed both halves of the module's answer, so the four mutations
+ * #368 argued each have a sentence a test can hold.
+ *
+ * @param {import('./lib/ratchet.mjs').RatchetFailure[]} moved  `failures()`.
+ * @param {{key: string}[]} gone  `stale()`.
+ * @param {{file: string, line: number, property: string}[]} uses  for the line
+ *        numbers a file the record has never seen has to be named by.
+ * @returns {string[]}
  */
-export function failures(uses, baseline) {
+export function ratchetFailures(moved, gone, uses) {
   const found = [];
-  const now = counts(uses);
-  const files = new Set([...Object.keys(now), ...Object.keys(baseline)]);
-  for (const file of [...files].sort()) {
-    const before = baseline[file];
-    const after = now[file];
-    if (!before) {
-      const lines = uses.filter((u) => u.file === file).map((u) => `${u.line} (${u.property})`);
+  for (const failure of moved) {
+    // The one stated absent-record mode arrives already worded.
+    if (failure.kind === 'absent') {
+      found.push(failure.message);
+      continue;
+    }
+    if (failure.kind === 'new') {
+      const lines = uses.filter((u) => u.file === failure.key).map((u) => `${u.line} (${u.property})`);
       found.push(
-        `${file} paints an edge from an intent base and is not in the baseline: ` +
+        `${failure.key} paints an edge from an intent base and is not in the baseline: ` +
           `line ${lines.join(', ')}. Use the \`-border\` role, or record the reason it cannot.`,
       );
       continue;
     }
-    if (!after) {
-      found.push(`${file} is recorded in the baseline and no longer has any use. Delete its entry.`);
+    if (failure.kind === 'rose') {
+      found.push(
+        `${failure.key} has ${failure.count} ${failure.field} use(s) of an intent base, ` +
+          `up from ${failure.recorded}. The roles exist; use them.`,
+      );
       continue;
     }
-    for (const kind of ['border', 'outline']) {
-      const was = before[kind] ?? 0;
-      const is = after[kind] ?? 0;
-      if (is > was) {
-        found.push(`${file} has ${is} ${kind} use(s) of an intent base, up from ${was}. The roles exist; use them.`);
-      } else if (is < was) {
-        found.push(
-          `${file} has ${is} ${kind} use(s), down from ${was} — the ratchet moved and the record did not. ` +
-            'Lower the baseline to match.',
-        );
-      }
-    }
+    found.push(
+      `${failure.key} has ${failure.count} ${failure.field} use(s), down from ${failure.recorded} — ` +
+        'the ratchet moved and the record did not. Lower the baseline to match.',
+    );
+  }
+  for (const { key } of gone) {
+    found.push(`${key} is recorded in the baseline and no longer has any use. Delete its entry.`);
   }
   return found;
 }

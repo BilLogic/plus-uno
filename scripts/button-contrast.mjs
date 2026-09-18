@@ -59,8 +59,6 @@ import {
   toHex,
 } from '../design-system/src/lib/tokens.mjs';
 
-import { ratchet } from './lib/ratchet.mjs';
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 
@@ -174,24 +172,50 @@ export function duplicateGrounds(themes, values) {
  * duplicate pair, and an entry that no longer matches anything is itself a
  * finding — a ratchet that cannot shrink is a list.
  *
- * The new/known/fixed classification is the module's `ratchet`; what is left
- * here is the WORDING and the ORDER, both of which are this check's own. The
- * order in particular is preserved deliberately: an unresolved combination is
- * reported in sweep position, interleaved with the contrast findings, so a
- * reader walks the map the way the map is written.
+ * The classification is the module's, and since #601 it is the RECORD's own —
+ * two `openRatchet` handles, one per set, opened by the check. What is left here
+ * is the WORDING and the ORDER, both of which are this check's own. The order in
+ * particular is preserved deliberately: an unresolved combination is reported in
+ * sweep position, interleaved with the contrast findings, so a reader walks the
+ * map the way the map is written.
+ *
+ * TWO SETS, ONE `notes` MAP BESIDE THEM, which is why each set is opened by name
+ * and asked separately: a write that rebuilt the notes from one set's keys would
+ * delete the other set's reasons. This record has no `--update` at all — both
+ * entries are #268 token decisions and the argument for each is the note — so
+ * the only thing asked of the module here is the read and the two directions.
+ *
+ * @param {{style: string, main: string}[]} themes
+ * @param {Map<string, string>} values
+ * @param {{contrast: import('./lib/ratchet.mjs').Ratchet,
+ *          duplicates: import('./lib/ratchet.mjs').Ratchet}} records
  */
-export function findings(themes, values, baseline = { contrast: [], duplicates: [] }) {
+export function findings(themes, values, records) {
   const rows = sweep(themes, values);
   const failing = rows
     .filter((row) => row.ratio !== null && row.ratio < AA_TEXT)
     .map((row) => `${row.style}/${row.fill}`);
   const duplicates = duplicateGrounds(themes, values).map((group) => group.join('+'));
 
-  const contrastRatchet = ratchet(failing, baseline.contrast);
-  const duplicateRatchet = ratchet(duplicates, baseline.duplicates);
-  const unrecordedContrast = new Set(contrastRatchet.new.map((entry) => entry.key));
-
   const found = [];
+  const unrecorded = (record, keys) => {
+    const fresh = new Set();
+    for (const failure of record.failures(keys)) {
+      // The one stated absent-record mode arrives already worded: with nothing
+      // recorded, every combination would otherwise be reported as new and bury
+      // the one fact that matters. ONE record, so it is said ONCE, even though
+      // both sets of it are missing — two copies of the same sentence tell a
+      // reader twice that there is one file to write.
+      if (failure.kind === 'absent') {
+        if (!found.includes(failure.message)) found.push(failure.message);
+      } else {
+        fresh.add(failure.key);
+      }
+    }
+    return fresh;
+  };
+  const unrecordedContrast = unrecorded(records.contrast, failing);
+  const unrecordedDuplicates = unrecorded(records.duplicates, duplicates);
 
   for (const row of rows) {
     if (row.ratio === null) {
@@ -204,14 +228,14 @@ export function findings(themes, values, baseline = { contrast: [], duplicates: 
     }
   }
 
-  for (const { key } of duplicateRatchet.new) {
+  for (const key of unrecordedDuplicates) {
     found.push(`${key}: these styles render the same filled ground, so the names are a distinction the interface does not draw`);
   }
 
-  for (const { key } of contrastRatchet.fixed) {
+  for (const { key } of records.contrast.stale(failing)) {
     found.push(`baseline entry "${key}" no longer fails — remove it`);
   }
-  for (const { key } of duplicateRatchet.fixed) {
+  for (const { key } of records.duplicates.stale(duplicates)) {
     found.push(`baseline entry "${key}" no longer duplicates — remove it`);
   }
 

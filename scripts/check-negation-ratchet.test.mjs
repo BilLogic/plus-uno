@@ -24,7 +24,6 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 
 import {
-  BASELINE,
   METRIC,
   PROHIBITION_TOKENS,
   SCOPES,
@@ -49,8 +48,40 @@ import {
   unresolvedReport,
 } from './lib/bundled-set.mjs';
 import { frontmatter } from './lib/corpus.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
 
 const scopeBy = (key) => SCOPES.find((s) => s.key === key);
+
+/** The record, the way the check names it: repo-relative, and its key in the shape table. */
+const RECORD = 'docs/evals/negation-baseline.json';
+const BASELINE = path.join(REPO_ROOT, RECORD);
+
+/**
+ * A record in a scratch tree, and the sets of it opened the way `run` opens
+ * them, handed to `fn`.
+ *
+ * Since #601 `compare` is handed ratchets rather than a parsed baseline, so a
+ * fixture is a real file read by the real module on its declared shape — which
+ * is the point: the readings could agree on every string a test invents and
+ * still be wired to the wrong container. `null` writes no file at all, which is
+ * the absent case.
+ */
+function withRecord(record, fn) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'negation-record-'));
+  if (record) {
+    fs.mkdirSync(path.join(root, 'docs/evals'), { recursive: true });
+    fs.writeFileSync(path.join(root, RECORD), `${JSON.stringify(record, null, 2)}\n`);
+  }
+  const opened = (key) => ({
+    counts: openRatchet({ file: RECORD, set: key, repoRoot: root }),
+    corpus: openRatchet({ file: RECORD, set: `${key}-corpus`, repoRoot: root }),
+  });
+  try {
+    return fn(opened);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+}
 
 /** The bundler's real `--check` failure, verbatim in shape (2026-08-26). */
 const realStderr =
@@ -191,7 +222,6 @@ test('all three scopes are declared, and the baseline records each one', () => {
   for (const scope of SCOPES) {
     const recorded = base.scopes[scope.key];
     assert.ok(recorded, `no baseline recorded for the ${scope.key} scope`);
-    assert.equal(typeof recorded.total, 'number', `${scope.key} records no total`);
     // The doc count is what the corpus floor stands on — a scope recorded
     // without it cannot notice its corpus vanishing.
     assert.equal(typeof recorded.docs, 'number', `${scope.key} records no doc count`);
@@ -203,12 +233,19 @@ test('all three scopes are declared, and the baseline records each one', () => {
 
 test('the scopes ratchet separately, so a fall on one cannot pay for a rise on another', () => {
   const base = JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
-  // A single summed total would let 202 + 107 stay flat while the IDE side
-  // climbed and the bundle fell. The file has no such number to compare.
-  assert.equal(base.total, undefined, 'a summed total would make one scope pay for the other');
-  assert.notEqual(base.scopes.bundled.total, undefined);
-  assert.notEqual(base.scopes.ide.total, undefined);
-  assert.notEqual(base.scopes.actions.total, undefined);
+  // A single summed set would let 202 + 107 stay flat while the IDE side
+  // climbed and the bundle fell. The file has no such container to compare:
+  // every count sits under a scope, and each scope is a set of its own in
+  // `scripts/lib/ratchet-shapes.mjs` with a corpus floor beside it.
+  assert.equal(base.counts, undefined, 'a summed set would make one scope pay for the other');
+  assert.equal(base.total, undefined, 'and so would a summed total');
+  for (const scope of SCOPES) {
+    assert.equal(typeof base.scopes[scope.key].counts, 'object');
+    // No per-scope `total` either: it was the sum of the counts beside it and
+    // nothing compared the two, so a hand-edited total was a number the gate
+    // would trust over the counts underneath it (#601). It is summed now.
+    assert.equal(base.scopes[scope.key].total, undefined, 'a stored total is a second source of truth');
+  }
 });
 
 test('a corpus that shrank is a failure, not a lower score', () => {
@@ -510,13 +547,18 @@ test('MUTATION: a ban planted in a prompt fixture raises the actions scope and f
   // baseline, so the gate's own path is what bites and nothing is re-implemented.
   const scope = scopeBy('actions');
   const clean = [{ label: 'scripts/prompts/x/SKILL.md', text: '---\nname: x\n---\n\n# x\n\nState the target.\n' }];
-  const base = { scopes: { actions: { measuredOn: scope.measuredOn, docs: 1, total: 0, counts: {} } } };
-  assert.deepEqual(compare([measureDocs(scope, clean)], base), [], 'the clean fixture holds');
-
+  const base = { scopes: { actions: { measuredOn: scope.measuredOn, docs: 1, counts: {} } } };
   const planted = [
     { label: 'scripts/prompts/x/SKILL.md', text: `${clean[0].text}\nYou must not skip the machine check.\n` },
   ];
-  const failures = compare([measureDocs(scope, planted)], base);
+  const failures = withRecord(base, (opened) => {
+    assert.deepEqual(
+      compare([measureDocs(scope, clean)], { actions: opened('actions') }),
+      [],
+      'the clean fixture holds',
+    );
+    return compare([measureDocs(scope, planted)], { actions: opened('actions') });
+  });
   assert.equal(failures.length, 1, 'one scope rose, one report');
   assert.match(failures[0], /Actions prompts rose 0 -> 1/, 'must name WHICH corpus rose');
   assert.match(failures[0], /scripts\/prompts\/x\/SKILL\.md: 0 -> 1/, 'and the doc that caused it');
@@ -524,11 +566,15 @@ test('MUTATION: a ban planted in a prompt fixture raises the actions scope and f
 
 test('MUTATION: the actions scope shrinking refuses to run rather than passing smaller', () => {
   const scope = scopeBy('actions');
-  const base = { scopes: { actions: { measuredOn: scope.measuredOn, docs: 2, total: 5, counts: {} } } };
+  const base = {
+    scopes: { actions: { measuredOn: scope.measuredOn, docs: 2, counts: { 'scripts/prompts/y/SKILL.md': 5 } } },
+  };
   // One doc where two were recorded — and fewer bans than the baseline, which
   // is exactly the shape a ratchet passes on its own.
   const shrunk = [{ label: 'scripts/prompts/x/SKILL.md', text: 'You never ship it unreviewed.\n' }];
-  const failures = compare([measureDocs(scope, shrunk)], base);
+  const failures = withRecord(base, (opened) =>
+    compare([measureDocs(scope, shrunk)], { actions: opened('actions') }),
+  );
   assert.equal(failures.length, 1);
   assert.match(failures[0], /the actions corpus shrank: 1 Actions prompts measured, against the 2/);
 });
@@ -536,11 +582,29 @@ test('MUTATION: the actions scope shrinking refuses to run rather than passing s
 test('a scope in the code with no baseline is a failure, not a pass', () => {
   // The state this scope was in for one run between being added and being
   // recorded — asserted so the next scope cannot ship without its number.
+  // Since #601 it is the ratchet module's UNREADABLE error and not a finding of
+  // this check's: a record read on a shape it does not have reads as EMPTY, and
+  // an empty baseline is a green ratchet, so it is an error stated once for all
+  // twelve records rather than a sentence written twelve times.
+  assert.throws(
+    () => withRecord({ scopes: {} }, (opened) => opened('actions')),
+    (error) => {
+      assert.equal(error.name, 'UnreadableRecord');
+      assert.match(error.message, /it has no `scopes\.actions\.counts`/);
+      assert.match(error.message, /an empty baseline is a green ratchet/);
+      return true;
+    },
+  );
+});
+
+test('no record at all is the one stated absent mode, not an empty baseline', () => {
   const scope = scopeBy('actions');
-  const failures = compare([measureDocs(scope, [])], { scopes: {} });
+  const failures = withRecord(null, (opened) =>
+    compare([measureDocs(scope, [])], { actions: opened('actions') }),
+  );
   assert.equal(failures.length, 1);
-  assert.match(failures[0], /records no `actions` scope/);
-  assert.match(failures[0], /--update/);
+  assert.match(failures[0], /no baseline is recorded at docs\/evals\/negation-baseline\.json/);
+  assert.match(failures[0], /node scripts\/check-negation-ratchet\.mjs --update/);
 });
 
 test('the actions numbers on record are whole-file counts over the real corpus', () => {

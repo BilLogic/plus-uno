@@ -3,7 +3,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { measure, REPO_ROOT, SUBJECT } from './check-glossary.mjs';
+import { BASELINE, measure, REPO_ROOT, SUBJECT } from './check-glossary.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
 
 const glossary = (extra = '') => `---\nsummary: g\n---\n\n# Terms\n\nUse these.\n\n## Product terms\n\n| Term | Meaning |\n|---|---|\n| **Session** | a slot |\n${extra}`;
 
@@ -38,6 +39,9 @@ test('the committed glossary is a glossary and within its baseline', () => {
   const text = readFileSync(path.join(REPO_ROOT, SUBJECT), 'utf8');
   const { failures, prose } = measure(text);
   assert.deepEqual(failures, []);
-  const baseline = JSON.parse(readFileSync(path.join(REPO_ROOT, 'docs/evals/glossary-baseline.json'), 'utf8'));
-  assert.ok(prose <= baseline.proseLines, `${prose} prose lines against a baseline of ${baseline.proseLines}`);
+  // Read through the ratchet, the way the check reads it (#601): the record is
+  // a `scalar` set — one number, keyed by its field name — and a test that
+  // parsed the file itself would be the second reader the module exists to end.
+  const recorded = openRatchet({ file: BASELINE }).entries.get('proseLines').counts.get('proseLines');
+  assert.ok(prose <= recorded, `${prose} prose lines against a baseline of ${recorded}`);
 });

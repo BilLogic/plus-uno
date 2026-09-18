@@ -49,6 +49,23 @@
  * a set deletes all three; that is what happened, and it is asserted per shape
  * in the conformance suite.
  *
+ * THE RECORD HAS AN UNOWNED HALF, AND `envelope()` IS HOW A CHECK READS IT.
+ * The module owns the ratcheted container; a record also carries prose and
+ * measurements that are nobody's to ratchet, and three checks GATE on that
+ * half. `check:negation` compares each scope's recorded `measuredOn` against
+ * the reading its scope takes now, because switching one reading for another
+ * moves the number with no doc edited (#238); `check:glossary` prints the date
+ * its count was recorded on; `check:atlassian-benchmark` reads Atlassian's
+ * published surface out of the same file, which is a measurement of somebody
+ * else's system and has no direction at all. Without a read for that half each
+ * of them would open the file a second time — and a check that parses its own
+ * record is the whole defect this module exists to end, so the read lives here
+ * and the file is opened once.
+ *
+ * `envelope()` is READ-ONLY and hands back a clone. A declared SET is never
+ * read through it: the set has a shape, a direction and an error mode, and
+ * `entries` is the only reading of it that carries them.
+ *
  * A REASON IS NEVER INVENTED BY THE TOOL. `update` carries an existing reason
  * across untouched and stamps `UNREVIEWED` on an entry it has never seen, so a
  * run whose record still holds one is a run where somebody pressed `--update`
@@ -328,6 +345,8 @@ export const absentMessage = (file, command) =>
  * @property {string} set
  * @property {boolean} absent
  * @property {string} why        the record's own explanatory prose, `''` when absent.
+ * @property {(dotted?: string) => unknown} envelope  the record's unowned half,
+ *           by dotted path; `''` is the whole record. A clone, and read-only.
  * @property {Map<string, {counts: Map<string, number>, reason: string|undefined, raw: unknown}>} entries
  * @property {(found: unknown) => RatchetFailure[]} failures
  * @property {(found: unknown) => {key: string, recorded: number, reason: string|undefined}[]} stale
@@ -370,6 +389,22 @@ export function openRatchet({ file, set: name, repoRoot = REPO_ROOT }) {
     // would make the absent-record path unreachable.
     why: absent || !shape.prose ? '' : String(soft(record, shape.prose) ?? ''),
     entries,
+
+    /**
+     * The record's UNOWNED half, by dotted path — the envelope prose, a date, a
+     * measurement of somebody else's system. `''` is the whole record, the same
+     * convention a set's `at` uses. A CLONE, because a reader of the envelope
+     * must not be able to edit the module's reading of the record; `undefined`
+     * where the path is not there, and where there is no record at all, since
+     * every caller of this is reporting rather than deciding.
+     *
+     * Not for a declared set: `entries` is the only reading that carries the
+     * set's shape, its direction and its error mode.
+     */
+    envelope(dotted = '') {
+      if (absent) return undefined;
+      return dotted === '' ? structuredClone(record) : soft(record, dotted);
+    },
 
     /**
      * NEW, ROSE and FELL in the order the run found them — never grouped by
@@ -428,17 +463,39 @@ export function openRatchet({ file, set: name, repoRoot = REPO_ROOT }) {
      * else on the record is touched.
      *
      * `seed` is the envelope prose a check wants a BRAND-NEW record to carry —
-     * what it measured, and when. It is written only where the record does not
-     * already hold that key, because the envelope is the check's to state once
-     * and the reader's to edit afterwards; an `--update` that restated it would
-     * be the rewrite this method exists not to be.
+     * what it measured, and where the corpus came from. It is written only
+     * where the record does not already hold that path, because the envelope is
+     * the check's to state once and the reader's to edit afterwards; an
+     * `--update` that restated it would be the rewrite this method exists not
+     * to be. So a date stamp is NOT a seed: `check:glossary` and the benchmark
+     * both say "set it by hand" on the line they print, because the day a count
+     * was argued about is not the day a tool happened to re-record it.
+     *
+     * A seed key is a DOTTED PATH, like a set's `at` — `negation`'s envelope is
+     * one corpus sentence and one reading per SCOPE, three levels in, and a
+     * seed that could only reach the top level would leave a record written
+     * from nothing failing its own reading comparison on the next run.
      *
      * @param {unknown} found
      * @param {{seed?: Record<string, unknown>}} [opts]
      */
     update(found, { seed = {} } = {}) {
-      const next = absent ? {} : structuredClone(record);
-      for (const [key, value] of Object.entries(seed)) if (!(key in next)) next[key] = value;
+      /*
+       * THE MERGE STARTS FROM THE RECORD ON DISK NOW, not from the copy this
+       * handle read when it was opened. A record with more than one set is
+       * written one set at a time — `negation` writes six — and every one of
+       * those handles has to be opened BEFORE the first write, because opening a
+       * set whose container a previous write has not created yet is an
+       * UNREADABLE record. Merging from the opened copy would then have each
+       * write undo the last, which is the rewrite this method exists not to be,
+       * one handle over. The RECORDED side stays as it was read: a reason is
+       * carried from the record the comparison was made against.
+       */
+      const current = readRecord(absolute, file);
+      const next = current === null ? {} : current;
+      for (const [key, value] of Object.entries(seed)) {
+        if (soft(next, key) === undefined) put(next, key, value);
+      }
       const runs = measured(found);
 
       if (set.form === 'keys') {
@@ -455,9 +512,13 @@ export function openRatchet({ file, set: name, repoRoot = REPO_ROOT }) {
         }
         put(next, set.at, grouped);
       } else if (set.form === 'counts') {
+        // Read out of `next` rather than out of `record`: `next` is the record
+        // plus whatever the seed just wrote, and a brand-new record's ignored
+        // keys — the benchmark's `note`, saying whose measurement this half is —
+        // arrive by seed and would otherwise be replaced by the container write.
         const kept = {};
         for (const key of set.ignore ?? []) {
-          const before = absent ? undefined : at(record, set.at, { file, whole: set.at })[key];
+          const before = soft(next, set.at)?.[key];
           if (before !== undefined) kept[key] = before;
         }
         const written = { ...kept };

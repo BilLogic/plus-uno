@@ -5,17 +5,29 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import { INTENT, ROWS, ourTokens, textScale, compare, ageInDays, failures } from './atlassian-benchmark.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BENCHMARK = JSON.parse(
   fs.readFileSync(path.join(REPO_ROOT, 'docs/evals/atlassian-benchmark.json'), 'utf8'),
 );
+/**
+ * The recorded floor, read the way the check reads it — through
+ * `scripts/lib/ratchet.mjs`, which strips the `note` and `recordedAt` the `ours`
+ * container keeps in among its numbers (#601). `failures` is handed the numbers
+ * and nothing else, so a test that built the container by hand would be
+ * asserting against a shape the check no longer passes.
+ */
+const floorOf = (ratchet) =>
+  Object.fromEntries([...ratchet.entries].map(([key, entry]) => [key, entry.counts.get('count')]));
+const FLOOR = floorOf(openRatchet({ file: 'docs/evals/atlassian-benchmark.json' }));
+
 const NOW = new Date('2026-08-29T00:00:00Z');
 const opts = { now: NOW, measuredAt: BENCHMARK.measuredAt, maxAgeDays: 365 };
 
 test('the repository passes its own benchmark', () => {
   const rows = compare(ourTokens(REPO_ROOT), BENCHMARK, REPO_ROOT);
-  assert.deepEqual(failures(rows, BENCHMARK, opts), []);
+  assert.deepEqual(failures(rows, FLOOR, opts), []);
 });
 
 test('every enforced row carries the argument for its direction', () => {
@@ -36,7 +48,7 @@ test('the token count is a real read of the token files', () => {
 
 test('an `up` row that FALLS is a finding, and one that rises is not', () => {
   const rows = [{ key: 'intent.iconTokens', ours: 0, direction: 'up', why: 'x' }];
-  const base = { ours: { 'intent.iconTokens': 3 } };
+  const base = { 'intent.iconTokens': 3 };
   const found = failures(rows, base, opts);
   assert.equal(found.length, 1);
   assert.match(found[0], /may only RISE/);
@@ -47,7 +59,7 @@ test('an `up` row that FALLS is a finding, and one that rises is not', () => {
 
 test('a `down` row that GROWS is a finding, and one that shrinks is not', () => {
   const rows = [{ key: 'type.scaleSpread', ours: 1.4, direction: 'down', why: 'x' }];
-  const base = { ours: { 'type.scaleSpread': 1.26 } };
+  const base = { 'type.scaleSpread': 1.26 };
   const found = failures(rows, base, opts);
   assert.equal(found.length, 1);
   assert.match(found[0], /may only FALL/);
@@ -59,18 +71,18 @@ test('a row with no direction is never a finding, however far apart', () => {
   // Differing from Atlassian is often correct — they ship 100 chart colours for
   // a surface we do not have. Only the argued rows are gated.
   const rows = [{ key: 'colour.total', ours: 1, theirs: 441, direction: null }];
-  assert.deepEqual(failures(rows, { ours: {} }, opts), []);
+  assert.deepEqual(failures(rows, {}, opts), []);
 });
 
 test('an enforced row with no recorded floor is itself a finding', () => {
   const rows = [{ key: 'type.lineHeights', ours: 46, direction: 'down', why: 'x' }];
-  const found = failures(rows, { ours: {} }, opts);
+  const found = failures(rows, {}, opts);
   assert.equal(found.length, 1);
   assert.match(found[0], /no recorded starting point/);
 });
 
 test('a stale, undated or future recording fails', () => {
-  const clean = { ours: {} };
+  const clean = {};
   assert.match(
     failures([], clean, { ...opts, measuredAt: '2024-01-01' })[0],
     /days old \(ceiling 365\)/,

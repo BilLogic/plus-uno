@@ -4,7 +4,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { EDGE, counts, edgeUses, failures, stylesheets } from './intent-roles.mjs';
+import { EDGE, counts, edgeUses, ratchetFailures, stylesheets } from './intent-roles.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
 
 /** A throwaway corpus, so the tests describe the rule rather than today's code. */
 function corpus(files) {
@@ -73,28 +74,65 @@ test('`color:` is not an edge', () => {
   assert.equal(edgeUses(stylesheets(root), root).length, 0);
 });
 
+/**
+ * The findings, through the REAL ratchet over a real record in a scratch tree.
+ *
+ * Since #601 the comparison is `scripts/lib/ratchet.mjs` and only the wording
+ * is here, so a test that handed `ratchetFailures` invented failure objects
+ * would assert the sentences and nothing about the wiring — and the wiring is
+ * where a migration goes wrong. `null` for the record writes no file at all,
+ * which is the absent case.
+ */
+function worded(uses, baselineFiles) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'intent-roles-record-'));
+  const file = 'docs/evals/intent-role-adoption.json';
+  if (baselineFiles) {
+    fs.mkdirSync(path.join(root, 'docs/evals'), { recursive: true });
+    fs.writeFileSync(
+      path.join(root, file),
+      `${JSON.stringify({ note: 'a scratch record', files: baselineFiles }, null, 2)}\n`,
+    );
+  }
+  try {
+    const ratchet = openRatchet({ file, repoRoot: root });
+    const found = counts(uses);
+    return ratchetFailures(ratchet.failures(found), ratchet.stale(found), uses);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+}
+
 test('the ratchet fails in both directions, and on a file it has never seen', () => {
   const uses = [
     { file: 'a.scss', kind: 'border', line: 1, property: 'border-color' },
     { file: 'a.scss', kind: 'outline', line: 2, property: 'outline' },
   ];
-  assert.deepEqual(failures(uses, { 'a.scss': { border: 1, outline: 1 } }), []);
+  assert.deepEqual(worded(uses, { 'a.scss': { border: 1, outline: 1 } }), []);
 
-  const up = failures(uses, { 'a.scss': { border: 0, outline: 1 } });
+  const up = worded(uses, { 'a.scss': { border: 0, outline: 1 } });
   assert.equal(up.length, 1);
   assert.match(up[0], /up from 0/);
 
-  const down = failures(uses, { 'a.scss': { border: 1, outline: 3 } });
+  const down = worded(uses, { 'a.scss': { border: 1, outline: 3 } });
   assert.equal(down.length, 1);
   assert.match(down[0], /down from 3/);
 
-  const unseen = failures(uses, {});
+  const unseen = worded(uses, {});
   assert.equal(unseen.length, 1);
   assert.match(unseen[0], /not in the baseline/);
 
-  const gone = failures([], { 'a.scss': { border: 1, outline: 0 } });
+  const gone = worded([], { 'a.scss': { border: 1, outline: 0 } });
   assert.equal(gone.length, 1);
   assert.match(gone[0], /Delete its entry/);
+});
+
+test('no record at all is the one stated error mode, not an empty baseline', () => {
+  // An empty baseline reads as a GREEN ratchet, so the absent case has to be
+  // loud — and it is the module's sentence, worded once for all twelve records.
+  const absent = worded([{ file: 'a.scss', kind: 'border', line: 1, property: 'border-color' }], null);
+  assert.equal(absent.length, 1);
+  assert.match(absent[0], /no baseline is recorded at docs\/evals\/intent-role-adoption\.json/);
+  assert.match(absent[0], /Record it by hand, with a reason per entry/);
 });
 
 test('counts group by file and kind', () => {

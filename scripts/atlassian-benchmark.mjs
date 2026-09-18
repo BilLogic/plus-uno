@@ -243,12 +243,22 @@ export const ageInDays = (stamp, now) => {
 };
 
 /**
+ * The gate's findings, over the recorded floor.
+ *
+ * `recorded` is `{key: number}` — the record's `ours` set as
+ * `scripts/lib/ratchet.mjs` reads it (#601), without the `note` and `recordedAt`
+ * it keeps in among its numbers. The DIRECTION stays here rather than in the
+ * shape table, because it is per ROW and not per set: two of the four argued
+ * rows may only rise and two may only fall, each for the reason written beside
+ * it in `ROWS`, and a set carries one direction.
+ *
+ * @param {{key: string, ours: number, direction: 'up'|'down'|null, why?: string}[]} rows
+ * @param {Record<string, number>} recorded
  * @returns {string[]} One line per problem; empty when every enforced row has
  *   moved in its argued direction or not at all.
  */
-export function failures(rows, baseline, { now, measuredAt, maxAgeDays }) {
+export function failures(rows, recorded, { now, measuredAt, maxAgeDays }) {
   const found = [];
-  const recorded = baseline.ours ?? {};
 
   for (const row of rows) {
     if (!row.direction) continue;

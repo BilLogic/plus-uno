@@ -279,6 +279,14 @@ Two kinds of failure, two mechanisms:
   outside the entry, so `--update` is a merge that leaves every key the module
   does not own exactly as it found it. A check migrating onto the module adds no
   row: it opens its record by the path it already names.
+- **The harness and docs records read it** (#601) — the glossary's prose count,
+  the negation scopes with their corpus floors, the benchmark's floor, and the
+  intent-role and button-contrast exception lists. Each words its own findings
+  and reads its record through the module: the half the module owns as `entries`,
+  the rest — a recorded reading, a date, Atlassian's published surface — through
+  `envelope()`. `--update` seeds the envelope onto a record written from nothing
+  and then leaves it to whoever edits the file, which is why the two checks that
+  stamp a date ask for it by hand.
 
 **Which components carry `play` blocks, and why not all of them.** A `play`
 block costs runtime on every PR, so the set is chosen rather than grown: a
