@@ -121,7 +121,8 @@ if (process.argv.includes('--list')) {
 // The completeness assertion runs before anything else: a check added to a
 // package.json without being registered or excluded is exactly the orphan this
 // gate exists to prevent, and learning that after seventeen seconds of green
-// sub-checks reads like an afterthought.
+// sub-checks reads like an afterthought. It asks from both ends (#612) — a
+// `check:*` name no row declares, and a `check-*.mjs` on disk no row names.
 const found = orphansInRepo(REPO_ROOT);
 if (found.length) {
   console.error(
