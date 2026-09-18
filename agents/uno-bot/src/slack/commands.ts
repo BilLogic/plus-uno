@@ -25,7 +25,12 @@ import { postMessage } from "./api";
 import { enqueueAgentJob } from "./events";
 import { threadStateFor } from "../thread-state/production";
 import { EFFORT_COMMANDS, type EffortMode } from "./effort";
-import { NOTHING_UNDONE, STOPPING_PROMISE, inThreadStopLine, threadArg } from "./session-stop";
+import {
+  SLASH_STOP_RECEIPT,
+  runSlashStopDoor,
+  type SlashStopDoorDeps,
+} from "./stop-doors";
+import { slackDelivery } from "./slack-delivery";
 import { SLASH_COMMANDS } from "../generated/slack-commands";
 import type { SlackMessageEvent } from "./types";
 
@@ -58,6 +63,21 @@ function ephemeral(text: string): Response {
   return Response.json({ response_type: "ephemeral", text });
 }
 
+/**
+ * `Env`, once, as the dependencies `/stop` actually reads — the same shape
+ * `slack/gate.ts` builds for the reaction door, so a test builds a recording
+ * Delivery and an in-memory store and nothing else.
+ *
+ * `userMsgTs` is empty because this door has no message to react on: it only
+ * ever calls `postNote`, and the field exists for `react`.
+ */
+function slashStopDeps(env: Env): SlashStopDoorDeps {
+  return {
+    cancelForUser: (userId) => threadStateFor(env).cancelForUser(userId),
+    delivery: (target) => slackDelivery(env, { ...target, userMsgTs: "" }),
+  };
+}
+
 export function handleSlashCommand(
   env: Env,
   form: URLSearchParams,
@@ -77,54 +97,17 @@ export function handleSlashCommand(
   // so cancellation is cooperative. The reply is deliberately honest about
   // that: the current step finishes, and what the press takes away is the
   // answer (#589).
-  // Resolved by PERSON, not by channel — the same path the Home-tab Stop
-  // button takes. The channel-derived key this used to compute was wrong for
-  // channel runs: a /uno-* run lives in a THREAD under the framing message, so
-  // the loop reads `cancel:<channel>:<thread_ts>` while /stop was writing
-  // `cancel:<channel>:<channel>`. The flag landed on a key nothing looks at and
-  // /stop silently did nothing there. The person's active-run pointer knows the
-  // conversation exactly, and it is the one thing both surfaces can resolve.
+  //
+  // What the press COMES TO is `stop-doors.ts` `runSlashStopDoor`, which takes
+  // the cancel and the Delivery port by name; `Env` stops here. The door runs
+  // behind the ack, in `ctx.waitUntil`, because Slack gives this response three
+  // seconds and the cancel plus a post is two round trips.
   if (payload.command === "/stop") {
-    ctx.waitUntil(
-      threadStateFor(env)
-        // Best-effort: a failed cancel means the turn finishes, which is
-        // annoying and not broken — never worth failing the ack over.
-        .cancelForUser(payload.userId)
-        .catch(() => ({ cancelled: false, channel: undefined, thread: undefined }))
-        .then(async (r) => {
-          console.log(`[stop] command from ${payload.userId} cancelled=${r.cancelled}`);
-          // And the RUN'S OWN THREAD is told, which the ephemeral below cannot
-          // do: it is visible only to the presser, and in the channel the
-          // command was typed in rather than the thread a /uno-* run lives in.
-          // The loop used to post a stop line there and no longer does (#589),
-          // so this door owes it — otherwise the person who ASKED watches their
-          // answer never arrive with nothing to explain it.
-          if (!r.cancelled || !r.channel || !r.thread) return;
-          const posted = await postMessage(env, {
-            channel: r.channel,
-            ...threadArg(r.thread),
-            text: inThreadStopLine(payload.userId),
-          }).catch((err: unknown) => {
-            // Logged, not swallowed: with the loop silent, a failed post is a
-            // press that leaves no trace anywhere, and the only way that gets
-            // counted is from here (#589).
-            console.error(`[stop] in-thread line failed for ${payload.userId}: ${String(err)}`);
-            return null;
-          });
-          if (posted && posted.ok === false) {
-            console.error(`[stop] in-thread line refused for ${payload.userId}: ${posted.error}`);
-          }
-        }),
-    );
-    // The presser also gets an immediate, private answer. The promise and the
-    // reassurance are shared with the other two doors (`session-stop.ts`),
-    // because one control saying two things is how they drifted once already
-    // (#586). What is local to `/stop` is the last clause: this door can be
-    // typed when nothing is running at all, and in that case the in-thread line
-    // above is correctly never posted.
-    return ephemeral(
-      `${STOPPING_PROMISE} (${NOTHING_UNDONE} If nothing of mine was running, this did nothing.)`,
-    );
+    ctx.waitUntil(runSlashStopDoor({ userId: payload.userId }, slashStopDeps(env)));
+    // The presser's own answer is immediate and private, and is the envelope's
+    // to return rather than the door's: it goes back in this HTTP response,
+    // before the door has done anything.
+    return ephemeral(SLASH_STOP_RECEIPT);
   }
 
   // /grind and /chill are effort modes, not skills: they take the question you
