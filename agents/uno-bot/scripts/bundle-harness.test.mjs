@@ -295,6 +295,12 @@ test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
   // hairline. If this trips again, add another member rather than trimming
   // prose to fit a fixture — the bundle growing is the healthy direction, and
   // the thing under test is the bundler's refusal, not the corpus's size.
+  //
+  // IT WAS FOUR UNTIL #593. The deep-module batch #592-#625 grew the glossary
+  // by a row per module landed, and the four above went back over the floor on
+  // the fifth of them. `figma.md` is the fifth member for the same reason
+  // `supabase/overview.md` was the fourth: about 6.8k of real headroom rather
+  // than the next hairline.
   const result = withFile(wranglerToml, withRegion("us-central1"), () =>
     withFiles(
       [
@@ -302,6 +308,7 @@ test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
         "docs/connectors/slack.md",
         "docs/connectors/supabase/blueprint-navigation.md",
         "docs/connectors/supabase/overview.md",
+        "docs/connectors/figma.md",
       ],
       frontmatterOnly,
       () => runBundler(["--check"]),

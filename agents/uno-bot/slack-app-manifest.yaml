@@ -288,7 +288,8 @@ settings:
       # just `/stop` or the Home-tab button, both of them somewhere other than
       # where the person is looking. Scope is `chat:write`, already held, so
       # this is a subscription and nothing else. Handled by
-      # `handleSessionStopped` (src/slack/assistant.ts).
+      # `handleSessionStopped` (src/slack/stop-envelope.ts), which builds the
+      # door's named dependencies and runs it (src/slack/stop-doors.ts).
       #
       # NOT APPLIED TO THE LIVE APP YET at the time this landed: `slack:diff`
       # reports the difference until the YAML is pasted into the App Manifest
@@ -306,8 +307,8 @@ settings:
       # record is already gone. Every fire of either landed in the
       # `[slack] unhandled event type:` log, which exists to report a
       # SLACK-SIDE surprise; a subscription of our own sitting in it spends
-      # that signal on noise. `tests/session-stop.test.ts` now asserts that
-      # every event listed here reaches a case in the dispatcher, with no
+      # that signal on noise. `tests/manifest-subscriptions.test.ts` asserts
+      # that every event listed here reaches a case in the dispatcher, with no
       # exemption list to add the next one to.
       - message.channels
       - message.groups

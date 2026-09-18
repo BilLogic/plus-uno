@@ -1,13 +1,24 @@
-// Slack's stop control: what the press comes to, on both surfaces.
+// Slack's stop control: what a press comes to, on all three doors.
 //
-// The press cannot be observed from here — the event subscription has to be
-// pasted into the live app by hand (`apps.manifest.update` is refused on this
-// app), so nothing in this repo has ever seen the control. What CAN be pinned
-// is everything the handler decides once the event arrives, and that is all of
-// it: the decision module is results-only, so each case drives a real signal
-// through `resolveStop` against the in-memory ThreadState and asserts the
+// The press cannot be observed from here — the in-thread control's event
+// subscription has to be pasted into the live app by hand
+// (`apps.manifest.update` is refused on this app), so nothing in this repo has
+// ever seen the control. What CAN be pinned is everything the doors decide and
+// do once a press arrives, and that is all of it. Each door takes named
+// dependencies rather than `Env` (#593), so every case here drives a real door
+// on the in-memory ThreadState and the recording Delivery, and asserts the
 // cancel flag the running loop would read, the status the session settles to,
-// and the line the thread gets.
+// and the line the thread gets — where it was posted and in what order.
+//
+// NOTHING HERE READS SOURCE. It used to: three doors that held `Env` could only
+// be checked with `readFileSync` and a regex over their adapters, which could
+// ask whether `inThreadStopLine(`, `threadArg(` and two `console.error` lines
+// appeared in a file and nothing else. A regex cannot tell a line posted into
+// the run's thread from the same call posted into the wrong conversation, and
+// it goes green on a door nobody ever calls. The doors are modules now, so the
+// suite drives them instead. (The manifest-to-dispatcher check that also lived
+// here is not about the stop control and could not become behavioural; it moved
+// intact to `manifest-subscriptions.test.ts`.)
 //
 // The properties worth the file are the ones that are easy to get wrong, and
 // three of them were wrong in the first cut:
@@ -23,24 +34,35 @@
 //   2. THE HANDLER AND THE TURN AGREE ON THE SETTLE, on every ending that
 //      consults the card: both compute `settledStatus` over the same live-card
 //      question rather than racing two literals.
-//   3. THE ADAPTER'S ORDER IS THE INVARIANT. The settle has to survive a
+//   3. THE IN-THREAD DOOR'S ORDER IS AN INVARIANT. The settle has to survive a
 //      refused post and has to follow its own read with no Slack call in
-//      between — neither of which any behavioural test can see, since a
-//      reordered pair still typechecks and still passes everything else. So
-//      the adapter is asserted at the source, the way `working-signal.test.ts`
-//      already asserts `assistant.ts`.
+//      between — a reordered pair typechecks and breaks nothing else. The door
+//      takes the settle and the Delivery port by name, so the order is
+//      observable: the settle is asserted to happen with nothing yet posted.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 
 import {
   NOTHING_UNDONE,
   STOPPING_PROMISE,
   inThreadStopLine,
   resolveStop,
-  threadArg,
 } from "../src/slack/session-stop";
+import {
+  SLASH_STOP_RECEIPT,
+  homeStopReceipt,
+  runHomeStopDoor,
+  runSessionStopDoor,
+  runSlashStopDoor,
+  type CancelledRun,
+  type StopDoorTarget,
+} from "../src/slack/stop-doors";
+import type { SessionStatus } from "../src/slack/working-signal";
+import {
+  recordingDelivery,
+  type RecordingDelivery,
+  type RecordingDeliveryOptions,
+} from "../src/turn/index";
 import {
   createInMemoryThreadState,
   type PendingProposal,
@@ -167,36 +189,253 @@ describe("the session leaves the working state by the turn's own card rule", () 
   });
 });
 
-describe("the confirmation says who stopped it, in the words the other doors use", () => {
-  it("names the presser, who in a channel need not be the asker", async () => {
-    const state: ThreadState = createInMemoryThreadState();
-    const verdict = await resolveStop(
-      { channel: CHANNEL, threadTs: THREAD, userId: PRESSER },
-      state,
-    );
-    assert.match(verdict.text, new RegExp(`<@${PRESSER}>`));
-    assert.doesNotMatch(verdict.text, new RegExp(`<@${ASKER}>`));
-  });
 
-  it("makes the same two promises, from the same two constants", async () => {
-    const state: ThreadState = createInMemoryThreadState();
-    const verdict = await resolveStop({ channel: DM, threadTs: DM_THREAD, userId: ASKER }, state);
-    assert.ok(verdict.text.includes(STOPPING_PROMISE), "the cooperative-cancel promise, verbatim");
-    assert.ok(verdict.text.includes(NOTHING_UNDONE), "the not-an-undo reassurance, verbatim");
-  });
+// ── Driving the doors ────────────────────────────────────────────────────────
+//
+// One stand-in for the Delivery port, shared by all three doors. It records
+// WHERE each delivery was opened as well as what was said through it, because
+// the property that used to be checked with a regex — "the line goes into the
+// stopped run's own conversation, threaded on a real ts" — is a fact about the
+// target and not about the text.
+interface Spoken {
+  channel: string;
+  replyTs?: string;
+  text: string;
+}
 
-  it("is the same wording the other two doors read", () => {
-    // The constants are only worth having if the doors actually read them: a
-    // door that re-types the sentence is how the three drifted the first time.
-    for (const door of ["src/slack/commands.ts", "src/slack/interactive.ts"]) {
-      const src = readFileSync(resolve(process.cwd(), door), "utf8");
-      assert.match(src, /STOPPING_PROMISE/, `${door} reads the shared promise`);
-      assert.match(src, /NOTHING_UNDONE/, `${door} reads the shared reassurance`);
-      assert.ok(
-        !src.includes("I'll finish the step I'm on"),
-        `${door} keeps no second copy of the promise`,
+function stage(opts: RecordingDeliveryOptions = {}) {
+  const opened: Array<{ target: StopDoorTarget; delivery: RecordingDelivery }> = [];
+  return {
+    opened,
+    delivery(target: StopDoorTarget): RecordingDelivery {
+      const delivery = recordingDelivery(opts);
+      opened.push({ target, delivery });
+      return delivery;
+    },
+    /** Every note ATTEMPTED, in order — including one Slack refused, which is
+     *  the case where "was it sent" and "did it land" come apart. */
+    attempts(): Spoken[] {
+      return opened.flatMap(({ target, delivery }) =>
+        delivery.calls
+          .filter((call) => call.kind === "note")
+          .map((call) => ({
+            channel: target.channel,
+            ...(target.replyTs === undefined ? {} : { replyTs: target.replyTs }),
+            text: (call as { kind: "note"; text: string }).text,
+          })),
       );
-    }
+    },
+  };
+}
+
+const running = (channel: string, thread: string): CancelledRun => ({
+  cancelled: true,
+  channel,
+  thread,
+});
+const NOTHING_RUNNING: CancelledRun = { cancelled: false };
+
+describe("/stop tells the run's own thread, wherever the run turned out to be", () => {
+  it("posts the shared line into the conversation the cancel reported", async () => {
+    const speak = stage();
+    await runSlashStopDoor(
+      { userId: PRESSER },
+      { cancelForUser: async () => running(CHANNEL, THREAD), delivery: speak.delivery },
+    );
+    assert.deepEqual(speak.attempts(), [
+      { channel: CHANNEL, replyTs: THREAD, text: inThreadStopLine(PRESSER) },
+    ]);
+  });
+
+  it("posts at the top of the DM when the run was a loose DM ask", async () => {
+    // The conversation key is the constant "dm", not a timestamp: passing it as
+    // a thread_ts is a Slack error rather than a thread, so the post is made
+    // with no reply target at all.
+    const speak = stage();
+    await runSlashStopDoor(
+      { userId: ASKER },
+      { cancelForUser: async () => running(DM, "dm"), delivery: speak.delivery },
+    );
+    assert.deepEqual(speak.attempts(), [{ channel: DM, text: inThreadStopLine(ASKER) }]);
+  });
+
+  it("says nothing in any thread when nothing was running", async () => {
+    // The ephemeral receipt covers this case; a stop line in a thread nobody
+    // was waiting in would be noise in someone else's conversation.
+    const speak = stage();
+    await runSlashStopDoor(
+      { userId: PRESSER },
+      { cancelForUser: async () => NOTHING_RUNNING, delivery: speak.delivery },
+    );
+    assert.deepEqual(speak.attempts(), []);
+  });
+
+  it("treats a failed cancel as nothing running rather than failing the press", async () => {
+    const speak = stage();
+    await runSlashStopDoor(
+      { userId: PRESSER },
+      {
+        cancelForUser: async () => {
+          throw new Error("durable object unreachable");
+        },
+        delivery: speak.delivery,
+      },
+    );
+    assert.deepEqual(speak.attempts(), []);
+  });
+
+  it("answers its caller with the shared promises and its own last clause", () => {
+    assert.ok(SLASH_STOP_RECEIPT.includes(STOPPING_PROMISE), "the cooperative-cancel promise");
+    assert.ok(SLASH_STOP_RECEIPT.includes(NOTHING_UNDONE), "the not-an-undo reassurance");
+    assert.match(SLASH_STOP_RECEIPT, /nothing of mine was running/i);
+  });
+});
+
+describe("the Home-tab button answers the thread first and the presser second", () => {
+  const homeDeps = (
+    speak: ReturnType<typeof stage>,
+    run: CancelledRun,
+    dm: string | null = DM,
+  ) => ({
+    cancelForUser: async () => run,
+    dmChannelFor: async () => dm,
+    delivery: speak.delivery,
+  });
+
+  it("posts the shared line in the run's thread, then the receipt in the DM", async () => {
+    const speak = stage();
+    await runHomeStopDoor({ userId: PRESSER }, homeDeps(speak, running(CHANNEL, THREAD)));
+    assert.deepEqual(speak.attempts(), [
+      { channel: CHANNEL, replyTs: THREAD, text: inThreadStopLine(PRESSER) },
+      { channel: DM, text: homeStopReceipt(true) },
+    ]);
+  });
+
+  it("sends only the receipt when nothing was running, and says so", async () => {
+    const speak = stage();
+    await runHomeStopDoor({ userId: PRESSER }, homeDeps(speak, NOTHING_RUNNING));
+    assert.deepEqual(speak.attempts(), [{ channel: DM, text: homeStopReceipt(false) }]);
+    assert.match(homeStopReceipt(false), /nothing to stop/);
+  });
+
+  it("still sends the receipt when the in-thread line is refused", async () => {
+    // A press that reached the cancel and lost the thread line is still a press
+    // the person is owed an answer to.
+    const speak = stage({ noteFails: true });
+    await runHomeStopDoor({ userId: PRESSER }, homeDeps(speak, running(CHANNEL, THREAD)));
+    assert.equal(speak.attempts().length, 2);
+  });
+
+  it("honours the press when Slack will not open a DM to report it", async () => {
+    const speak = stage();
+    await runHomeStopDoor({ userId: PRESSER }, homeDeps(speak, running(CHANNEL, THREAD), null));
+    assert.deepEqual(speak.attempts(), [
+      { channel: CHANNEL, replyTs: THREAD, text: inThreadStopLine(PRESSER) },
+    ]);
+  });
+});
+
+describe("the in-thread control settles before it speaks, and settles regardless", () => {
+  interface Settled {
+    channel: string;
+    threadTs: string;
+    status: SessionStatus;
+    /** How much had been said when the settle ran. The ordering invariant is
+     *  that this is zero: a post between the card read and the status write
+     *  gives the in-flight turn a whole Slack round trip in which to stage a
+     *  card and settle `suspended`, after which this door's `active` lands last
+     *  and is wrong. */
+    saidSoFar: number;
+  }
+
+  function sessionDeps(state: ThreadState, speak: ReturnType<typeof stage>, settles: Settled[]) {
+    return {
+      threadState: state,
+      delivery: speak.delivery,
+      async settleSession(channel: string, threadTs: string, status: SessionStatus) {
+        settles.push({ channel, threadTs, status, saidSoFar: speak.attempts().length });
+        return { ok: true };
+      },
+    };
+  }
+
+  it("settles with the verdict's status and posts the verdict's line, in that order", async () => {
+    const state: ThreadState = createInMemoryThreadState();
+    const speak = stage();
+    const settles: Settled[] = [];
+    await runSessionStopDoor(
+      { channel: CHANNEL, threadTs: THREAD, userId: PRESSER },
+      sessionDeps(state, speak, settles),
+    );
+
+    assert.deepEqual(settles, [
+      { channel: CHANNEL, threadTs: THREAD, status: "active", saidSoFar: 0 },
+    ]);
+    assert.deepEqual(speak.attempts(), [
+      { channel: CHANNEL, replyTs: THREAD, text: inThreadStopLine(PRESSER) },
+    ]);
+    // And the cancel the loop reads was raised before either of them.
+    assert.equal(await state.consumeCancel({ channel: CHANNEL, thread: THREAD }), true);
+  });
+
+  it("settles suspended over a live card, and says the card is still waiting", async () => {
+    const state: ThreadState = createInMemoryThreadState();
+    await state.putProposal(cardIn(CHANNEL, THREAD, THREAD));
+    const speak = stage();
+    const settles: Settled[] = [];
+    await runSessionStopDoor(
+      { channel: CHANNEL, threadTs: THREAD, userId: PRESSER },
+      sessionDeps(state, speak, settles),
+    );
+
+    assert.equal(settles[0]?.status, "suspended");
+    assert.match(speak.attempts()[0]?.text ?? "", /still waiting/);
+  });
+
+  it("settles even when Slack refuses the confirmation", async () => {
+    // An indicator that outlives the press is the failure this control exists
+    // to remove, so a line Slack would not take is no reason to leave it up.
+    const state: ThreadState = createInMemoryThreadState();
+    const speak = stage({ noteFails: true });
+    const settles: Settled[] = [];
+    await runSessionStopDoor(
+      { channel: CHANNEL, threadTs: THREAD, userId: PRESSER },
+      sessionDeps(state, speak, settles),
+    );
+
+    assert.equal(settles.length, 1);
+    assert.equal(speak.attempts().length, 1, "the line was attempted and refused");
+  });
+
+  it("settles even when the post throws rather than refusing", async () => {
+    const state: ThreadState = createInMemoryThreadState();
+    const settles: Settled[] = [];
+    await runSessionStopDoor(
+      { channel: CHANNEL, threadTs: THREAD, userId: PRESSER },
+      {
+        threadState: state,
+        delivery: () => ({
+          ...recordingDelivery(),
+          postNote: async () => {
+            throw new Error("slack is down");
+          },
+        }),
+        async settleSession(channel: string, threadTs: string, status: SessionStatus) {
+          settles.push({ channel, threadTs, status, saidSoFar: 0 });
+          return { ok: true };
+        },
+      },
+    );
+    assert.equal(settles.length, 1);
+  });
+
+  it("drops a malformed payload without settling or speaking", async () => {
+    const state: ThreadState = createInMemoryThreadState();
+    const speak = stage();
+    const settles: Settled[] = [];
+    await runSessionStopDoor({ channel: CHANNEL, userId: PRESSER }, sessionDeps(state, speak, settles));
+    assert.deepEqual(settles, []);
+    assert.deepEqual(speak.attempts(), []);
   });
 });
 
@@ -215,155 +454,50 @@ describe("the stop line the run's thread gets", () => {
     assert.ok(line.includes(NOTHING_UNDONE), "the not-an-undo reassurance, verbatim");
   });
 
-  it("is the line the in-thread control's own verdict is built from", async () => {
-    // One sentence from three doors, or the three drift again (#586).
+  it("is one sentence from three doors, or the three drift again (#586)", async () => {
     const state: ThreadState = createInMemoryThreadState();
-    const verdict = await resolveStop({ channel: DM, threadTs: DM_THREAD, userId: PRESSER }, state);
-    assert.ok(verdict.text.startsWith(inThreadStopLine(PRESSER)));
-  });
+    const slash = stage();
+    const home = stage();
+    const inThread = stage();
 
-  // A conversation key is not always a timestamp: every loose DM line resolves
-  // to the constant "dm" (`events.ts`), and posting THAT as a thread_ts is a
-  // Slack error rather than a thread. An unthreaded DM wants a top-level
-  // message, which is what omitting the argument gives.
-  it("threads the post on a real timestamp and not on the DM constant", () => {
-    assert.deepEqual(threadArg(THREAD), { thread_ts: THREAD });
-    assert.deepEqual(threadArg(DM_THREAD), { thread_ts: DM_THREAD });
-    assert.deepEqual(threadArg("dm"), {});
-  });
-
-  it("is posted into the cancelled run's own conversation by both other doors", () => {
-    // Neither door can be driven from here — both take `Env` and call Slack —
-    // so they are asserted at the source, the genre this file already uses for
-    // the adapter's ordering below.
-    for (const door of ["src/slack/commands.ts", "src/slack/interactive.ts"]) {
-      const src = readFileSync(resolve(process.cwd(), door), "utf8");
-      assert.match(src, /inThreadStopLine\(/, `${door} posts the shared line`);
-      assert.match(src, /\.\.\.threadArg\(/, `${door} threads it on the conversation key`);
-      // Off the conversation the cancel itself reported, not off the payload:
-      // neither door's payload can name the run's thread.
-      assert.match(src, /cancelForUser\(/, `${door} resolves the run by person`);
-    }
-  });
-
-  it("is countable when it fails, on all three doors", () => {
-    // With the loop silent, a swallowed post is a press that leaves no trace
-    // anywhere — so the failure is logged rather than dropped (#589). All three
-    // doors, this one included: it was the last one still swallowing it, and it
-    // is the door the incident was filed on.
-    for (const door of [
-      "src/slack/commands.ts",
-      "src/slack/interactive.ts",
-      "src/slack/assistant.ts",
-    ]) {
-      const src = readFileSync(resolve(process.cwd(), door), "utf8");
-      assert.match(src, /console\.error\(`\[stop\] in-thread line failed/, `${door} logs a failed post`);
-      assert.match(src, /console\.error\(`\[stop\] in-thread line refused/, `${door} logs a refused post`);
-    }
-  });
-});
-
-// ── The adapter's order, asserted at the source ─────────────────────────────
-//
-// `assistant.ts` names `Env`, so this is the same genre of check
-// `working-signal.test.ts` runs against the same file: read the module and
-// assert on what it does, because the properties here are ORDERINGS and a
-// reordered pair typechecks, runs, and passes every behavioural test in the
-// repo while leaving a session in `processing` for Slack's full hour — the
-// artefact #574 removed.
-describe("the stop handler settles before it speaks, and settles regardless", () => {
-  const src = readFileSync(resolve(process.cwd(), "src/slack/assistant.ts"), "utf8");
-  const handler = src.slice(src.indexOf("export async function handleSessionStopped"));
-
-  it("settles with the verdict's status rather than a literal", () => {
-    assert.match(handler, /setSessionStatus\(env, channel, thread_ts, verdict\.settleTo\)/);
-  });
-
-  it("catches the confirmation post, so a refused post cannot skip the settle", () => {
-    assert.match(handler, /postMessage\(env, \{ channel, thread_ts, text: verdict\.text \}\)\.catch\(/);
-  });
-
-  it("puts the settle above the post, with no Slack call between read and write", () => {
-    const settleAt = handler.indexOf("setSessionStatus(");
-    const postAt = handler.indexOf("postMessage(");
-    assert.ok(settleAt > 0 && postAt > 0, "both calls are present");
-    assert.ok(
-      settleAt < postAt,
-      "the settle runs first: a post in between gives the in-flight turn a whole " +
-        "round trip to stage a card and settle suspended, after which this lands active and wrong",
+    await runSlashStopDoor(
+      { userId: PRESSER },
+      { cancelForUser: async () => running(CHANNEL, THREAD), delivery: slash.delivery },
     );
-  });
-
-  it("reports the malformed-payload drop rather than returning in silence", () => {
-    const guard = handler.slice(0, handler.indexOf("resolveStop("));
-    assert.match(guard, /\[stop\]/, "the early return logs");
-  });
-});
-
-// ── The subscription and the dispatcher agree ────────────────────────────────
-//
-// Two files that have to match, and the failure is silent in the worse
-// direction: an event the app subscribes to with no `case` in the dispatcher
-// arrives, logs `[slack] unhandled event type:` and is dropped. That log exists
-// to report a SLACK-SIDE SURPRISE — an event we stopped asking for that arrived
-// anyway — so a subscription of our own landing in it spends the one signal it
-// was supposed to carry.
-//
-// ABSOLUTE, WITH NO EXEMPTION LIST. `emoji_changed` and `reaction_removed` were
-// in exactly that state and are removed from the manifest instead (#576); a
-// list here would have had no owner, no date, and no visibility to whoever
-// edits the YAML next, and the next unhandled subscription would have been one
-// `.add` away from green.
-//
-// Read as text rather than imported: `events.ts` names `Env` and the Durable
-// Object bindings, which this Node build has no runtime for. Parsed with a
-// regex rather than a YAML dependency, for the reason `shortcuts.test.ts`
-// gives — a test that needs a parser is a test people delete.
-function manifestBotEvents(): string[] {
-  const yaml = readFileSync(resolve(process.cwd(), "slack-app-manifest.yaml"), "utf8");
-  const after = yaml.split("\n    bot_events:")[1];
-  assert.ok(after !== undefined, "the manifest still has a bot_events block under this anchor");
-  const section = after.split("\n  interactivity:")[0];
-  assert.ok(
-    section !== undefined && section.length < after.length,
-    "the bot_events block still ends at the interactivity anchor",
-  );
-  const events = [...section.matchAll(/^\s+- (\S+)$/gm)].map((m) => m[1]!);
-  // The guard below is a loop over this list, so an empty or truncated parse
-  // passes it VACUOUSLY — which is the silent direction this whole section
-  // exists to close, reappearing one level up in the test's own plumbing.
-  // Both anchors can move; neither may take the assertions with it.
-  assert.ok(events.length >= 8, `parsed only ${events.length} bot_events — the anchors moved`);
-  assert.ok(events.includes("app_mention"), "the parse finds a known subscription");
-  return events;
-}
-
-function dispatcherCases(): Set<string> {
-  const src = readFileSync(resolve(process.cwd(), "src/slack/events.ts"), "utf8");
-  const cases = new Set([...src.matchAll(/case "([a-z_.]+)":/g)].map((m) => m[1]!));
-  assert.ok(cases.has("message"), "the parse finds a known dispatcher case");
-  return cases;
-}
-
-// The `message.*` family all arrive as one inner event type.
-const dispatchedAs = (event: string): string => (event.startsWith("message.") ? "message" : event);
-
-describe("every subscription reaches a handler", () => {
-  it("declares agent_session_stopped on the app", () => {
-    assert.ok(
-      manifestBotEvents().includes("agent_session_stopped"),
-      "without the subscription Slack offers no stop control at all",
+    await runHomeStopDoor(
+      { userId: PRESSER },
+      {
+        cancelForUser: async () => running(CHANNEL, THREAD),
+        dmChannelFor: async () => null,
+        delivery: home.delivery,
+      },
     );
-  });
+    await runSessionStopDoor(
+      { channel: CHANNEL, threadTs: THREAD, userId: PRESSER },
+      {
+        threadState: state,
+        delivery: inThread.delivery,
+        settleSession: async () => ({ ok: true }),
+      },
+    );
 
-  it("gives every subscribed event a case in the dispatcher", () => {
-    const cases = dispatcherCases();
-    for (const event of manifestBotEvents()) {
-      assert.ok(
-        cases.has(dispatchedAs(event)),
-        `the manifest subscribes to ${event} and the dispatcher has no case for it`,
-      );
+    const said = [slash, home, inThread].map((s) => s.attempts()[0]?.text ?? "");
+    for (const text of said) {
+      assert.ok(text.startsWith(inThreadStopLine(PRESSER)), `"${text}" opens with the shared line`);
     }
+    // Two of the three say nothing else. The card clause is the in-thread
+    // door's alone, and only it can afford one: it already reads the live card
+    // to compute the status it must settle.
+    assert.deepEqual(said.slice(0, 2), [inThreadStopLine(PRESSER), inThreadStopLine(PRESSER)]);
   });
 
+  it("names the presser, who in a channel need not be the asker", async () => {
+    const state: ThreadState = createInMemoryThreadState();
+    const verdict = await resolveStop(
+      { channel: CHANNEL, threadTs: THREAD, userId: PRESSER },
+      state,
+    );
+    assert.match(verdict.text, new RegExp(`<@${PRESSER}>`));
+    assert.doesNotMatch(verdict.text, new RegExp(`<@${ASKER}>`));
+  });
 });
