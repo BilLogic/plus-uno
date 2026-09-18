@@ -14,7 +14,8 @@
 // else the turn needs arrives as a NAMED dependency (`TurnDeps`): the thread
 // store, the agent loop, the judge, preflight, the gate's resolver, the two
 // Notion card clients, the antecedent read. `Env` never enters — it is turned
-// into `TurnDeps` once, in `slack/turn-adapter.ts`.
+// into `TurnDeps` once, in `turn/env-deps.ts`, which is the ONE builder both
+// callers go through (#603).
 //
 // SO THE CALLER IS NOT SLACK. A request carries who, where, the text, the
 // images as BYTES already decoded, and the pending proposal; nothing in here
@@ -109,7 +110,9 @@ const PROGRESS_LABEL = "Reading the question and this thread";
  * line, a titled thread and a streamed reply, which is why it does NOT also get
  * a 👀. A `channel` has none of those, so the reaction is the only
  * acknowledgement there is. The Worker draws no third distinction: an app DM and
- * the assistant panel are the same conversation (`isAssistantThread`).
+ * the assistant panel are the same conversation. Which channel id is which
+ * surface is `request.ts` § `turnSurfaceOf` — the one statement of the rule,
+ * read by both callers and by `slack/assistant.ts`.
  */
 export type TurnSurface = "channel" | "assistant";
 

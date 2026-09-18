@@ -1,9 +1,9 @@
 // Which credential searches Slack — selection only, no transport.
 //
-// It lives here, not in oauth/slack.ts, because every export there short-circuits
-// on slackOAuthConfigured(env): a bot resolver placed in that module would go
-// silently unavailable exactly when OAuth is unconfigured, which is the failure
-// this floor exists to fix. The bot token is an install-time credential
+// It lives here, not in oauth/slack.ts, because every export there answers null
+// when the OAuth path is unconfigured: a bot resolver placed in that module
+// would go silently unavailable exactly when OAuth is unconfigured, which is the
+// failure this floor exists to fix. The bot token is an install-time credential
 // (types.ts), not an OAuth one — selection now spans two stores.
 //
 // Returns an ORDERED CANDIDATE LIST, not a single pick. slack_search walks it

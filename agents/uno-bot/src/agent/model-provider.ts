@@ -7,6 +7,10 @@
 // shape, the system-prompt mechanics, the tier's model and dials, the cache, the
 // backup model, the tool-result echo discipline.
 //
+// Two ways through: a TURN (`start` / `send` / `recordToolResults` …), which is
+// the loop's, and a one-shot `generate`, which is for every other caller that
+// wants text back from a named tier and no tools at all.
+//
 // So everything crossing this file is neutral. A `functionCall` part, a
 // `tool_use` block, a `pause_turn`, a thought signature, a `cachedContent`
 // reference: none of those names may appear above an adapter. That is what lets
@@ -98,6 +102,47 @@ export interface ProviderDials {
   detail: Record<string, string>;
 }
 
+/**
+ * One prompt-and-reply with no tools and no history — everything `generate`
+ * needs.
+ *
+ * The caller names a TIER and nothing else about the model, exactly as it does
+ * for a turn: the tier's model and its dials move together inside the adapter
+ * (ADR-028), so nothing that comes through here spells a model id. (Two
+ * callers still bypass the seam and name one themselves — the diagnostics
+ * probe and the draft judge; the contract is about what crosses this file.)
+ */
+export interface ModelPrompt {
+  tier: ModelTier;
+  /** The instruction block, when there is one. Omitted rather than empty. */
+  system?: string;
+  prompt: string;
+  /** Output ceiling for this call. The adapter's own default applies without it;
+   *  a caller expecting a long answer (a re-drafted reply) should say so. */
+  maxTokens?: number;
+}
+
+/**
+ * What a one-shot came back with. `model` is named for the same reason
+ * `ProviderDials` names it — every provider has one, and a caller's telemetry
+ * line wants to say which answered.
+ *
+ * A FAILURE is data here too, but there is no status: only some providers give
+ * one, and a field the others must report as null is the mistake `ProviderDials`
+ * avoids. The status, where there is one, is inside `message`.
+ *
+ * `ok: false` means THE MODEL DID NOT ANSWER — it was asked and something went
+ * wrong. It does not mean "nothing was asked": the seam has no question for
+ * whether a provider is usable at all, so an adapter with no credential answers
+ * a `generate` the only way it can, as a failure. A caller that must tell those
+ * apart — a judge that skips rather than errors when there is no credential to
+ * judge with — needs a state of its own, and the way to get one is a THIRD ARM
+ * on this union, not parsing `message`. Deliberately left open.
+ */
+export type ModelText =
+  | { ok: true; model: string; text: string }
+  | { ok: false; model: string; message: string };
+
 /** Everything an adapter needs to open a turn. */
 export interface ModelTurn {
   /** Opaque to the adapter's caller: the loop never maps a tier to a model.
@@ -111,6 +156,19 @@ export interface ModelTurn {
 export interface ModelProvider {
   /** Provider label for the turn's telemetry — "gemini", "fake". */
   readonly name: string;
+
+  /**
+   * One prompt, one reply, no tools and no history — a single round-trip that
+   * stands entirely outside a turn.
+   *
+   * This is for the callers that are not the loop: the draft judge scoring a
+   * draft, a probe checking a credential, a one-line classification. It reads
+   * nothing the adapter is holding and writes nothing back, so it may be called
+   * before `start`, after it, or beside a turn in flight without disturbing it.
+   *
+   * The tier is the only thing the caller says about the model.
+   */
+  generate(prompt: ModelPrompt): Promise<ModelText>;
 
   /**
    * Open the turn. The adapter builds its wire-shaped message list here and

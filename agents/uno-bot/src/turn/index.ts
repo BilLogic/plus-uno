@@ -12,5 +12,9 @@
 // this module runtime-free — the same boundary `thread-state/index.ts` keeps,
 // for the same reason. The Worker has the Workers types and pays the import
 // path instead.
+// `env-deps.ts` is the other deliberate omission, for the same reason from the
+// other direction: it is where `Env` becomes `TurnDeps` for both callers, so it
+// necessarily names `Env`. A caller that HAS an `Env` imports it by path.
 export * from "./turn";
 export * from "./delivery";
+export * from "./request";

@@ -37,7 +37,7 @@ Both adapters are **local tools only** (no hosted MCP), and run the same agent l
 
 ### One loop, behind the ModelProvider seam
 
-Everything a turn *decides* lives once, in `src/agent/loop.ts`: the iteration budget gate, the `/stop` check, authorization of the model's own `proposal_resolve` call, a side-effect call becoming a ✅-gated proposal, read-only calls under the subrequest ceiling with a budget trip stamping the result partial, the tools-disabled synthesis pass, the retry on a backup model, and the one rule that narration is emitted only ahead of read-only work. Behind it sits `ModelProvider` (`src/agent/model-provider.ts`): an adapter is handed a neutral conversation, a tool roster, an opaque tier name and a `toolsEnabled` flag, and answers with text, tool calls, usage and a stop kind. No model's wire format — a `functionCall` part, a `tool_use` block, a `pause_turn`, a thought signature — appears above an adapter, and no provider's dial sits in the shared contract.
+Everything a turn *decides* lives once, in `src/agent/loop.ts`: the iteration budget gate, the `/stop` check, authorization of the model's own `proposal_resolve` call, a side-effect call becoming a ✅-gated proposal, read-only calls under the subrequest ceiling with a budget trip stamping the result partial, the tools-disabled synthesis pass, the retry on a backup model, and the one rule that narration is emitted only ahead of read-only work. Behind it sits `ModelProvider` (`src/agent/model-provider.ts`): an adapter is handed a neutral conversation, a tool roster, an opaque tier name and a `toolsEnabled` flag, and answers with text, tool calls, usage and a stop kind. The seam's other call is a one-shot `generate` — a tier, a system prompt and a prompt in, text out, no tools — for the callers that are not the loop. No model's wire format — a `functionCall` part, a `tool_use` block, a `pause_turn`, a thought signature — appears above an adapter, and no provider's dial sits in the shared contract.
 
 `src/agent/providers/gemini.ts` is production's adapter: it owns tier → model → thinking level (ADR-028), the `contents` array it appends to verbatim, the Vertex `cachedContents` harness cache (warmed on the turn's first use, so no route has to warm it), the `GEMINI_FALLBACK_MODEL` backup, and token accounting. `src/agent/providers/claude.ts` is the Claude-on-Vertex adapter: the `messages` array it appends to verbatim (so a thinking block survives a tool round), tool_use ⇄ neutral tool call, the tool_result echo that keeps every announced call answered, `pause_turn` resumed inside the adapter so the loop never sees it, the tier → model id and thinking budget, server-side `web_search`, the `cache_control` prefix, and usage accounting. It reports **no backup model** — `fallback` always returns false, so a 429 surfaces through the same no-backup path a Gemini turn takes with `GEMINI_FALLBACK_MODEL` unset. Its transport is a port, so `tests/claude-provider.test.ts` drives a whole Claude-shaped turn against a stubbed rawPredict. `src/agent/providers/fake.ts` replays scripted turns, which is what lets `tests/agent-loop.test.ts` drive the whole loop with no network, no credential and no Cloudflare runtime.
 
@@ -64,7 +64,8 @@ The full behavioral contract (voice, grounding rules, gate protocol, Slack etiqu
 ```
 uno-bot/
 ├── AGENT.md              Persona delta (constitution is repo-root AGENTS.md)
-├── tool-definitions.json Local tool schemas (source of truth; read by src/agent/run-agent.ts)
+├── tool-definitions.json Local tool schemas (source of truth; joined to the tool table in
+│                      src/agent/tools.ts, which is what the model's roster is built from)
 ├── wrangler.toml         Worker + Durable Objects + KV + vars/secrets config (+ free-tier constraints)
 ├── package.json / tsconfig.json / .dev.vars.example
 └── src/
@@ -78,8 +79,10 @@ uno-bot/
     │                     seam) · providers/ (gemini · claude · fake) · loop-policy.ts (the
     │                     loop's dials and strings) · run-agent.ts (the one public entry:
     │                     Env → the loop's ports, adapter choice, read-only tool dispatch) ·
-    │                     routing.ts (tiers/model ids) · skills.ts (bundled-harness assembly) ·
-    │                     preflight · draft-judge · tool schemas
+    │                     routing.ts (tier routing, no model ids) · skills.ts (bundled-harness assembly) ·
+    │                     tool-table.ts (one row per tool: standing + roster columns) ·
+    │                     tool-bodies.ts (one body per row, paired by type) · tools.ts (the
+    │                     join, with the schemas) · preflight · draft-judge
     ├── gemini/           Google auth (Vertex SA / API key) + Gemini REST client
     ├── vertex/           claude.ts — Claude-on-Vertex rawPredict client (reuses gemini/auth)
     ├── slack/            Events · proposal gate · signature verify · mrkdwn · Web-API wrappers

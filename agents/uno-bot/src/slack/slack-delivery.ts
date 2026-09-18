@@ -59,8 +59,9 @@ export interface SlackDeliveryTarget {
   userMsgTs: string;
   /** Who asked, and their workspace: `chat.startStream` wants both.
    *
-   *  `team` is optional because two callers cannot supply it — `slack/gate.ts`
-   *  and `slack/interactive.ts` build a door from a reaction event and a button
+   *  `team` is optional because two doors cannot supply it — the reaction door
+   *  (`gate/reaction-door.ts`, built here by `slack/gate.ts`) and the button
+   *  door (`slack/interactive.ts`) start from a reaction event and a button
    *  payload, neither of which carries a team id here (the reaction's sits on
    *  the envelope, outside the DO job payload). Harmless today: those doors
    *  post through `postNote`, never `postAnswer`, so they never reach a stream
