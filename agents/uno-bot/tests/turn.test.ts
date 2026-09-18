@@ -148,7 +148,7 @@ test("an image on the request reaches the model, and the tier routed in Turn goe
 test("a draft-judge rejection posts the revision, not the draft", async () => {
   const h = harness({
     replies: [{ text: "The blueprint says nothing about call-offs." }],
-    judge: (draft) => ({
+    judge: ({ draft }) => ({
       text: `${draft} (revised: scoped to the paths I read.)`,
       verdict: "fail",
     }),
@@ -163,6 +163,120 @@ test("a draft-judge rejection posts the revision, not the draft", async () => {
   // What was posted is what is remembered — not the draft that lost.
   const stored = await h.threadState.readHistory(REF);
   assert.match(stored[1]!.content, /revised/);
+});
+
+// ── (c2) the pre-send chain, as the judge actually receives it ───────────────
+//
+// The five checks a draft passes before it ships are pure and thoroughly
+// tested one by one (`tests/confidence.test.ts`, `tests/absence.test.ts`,
+// `tests/draft-judge.test.ts`). The rules that FAIL are in the call, and they
+// were unobservable until #625: the harness kept the draft and threw every
+// other argument away, so nothing could see whether two repairs competed as
+// two calls, what force reason bypassed the length floor, or what the judge
+// was told the turn had fetched.
+//
+// A SEARCH THAT FOUND NOTHING. Scripted as a real loop tool call — the ledger
+// is production's — with the empty-search signal injected, because production
+// derives that from the tool result inside `run-agent.ts` and this harness
+// runs a fake tool table.
+const SEARCH_REPLY = {
+  text: "Looking for a deadline.",
+  toolCalls: [{ name: "slack_search", args: { query: "reflection deadline" } }],
+};
+const FOUND_NOTHING = { visibility: "bot-token", searchedSurfaces: "public channels" };
+
+test("both repairs ride ONE judge call, and the forced reason names the confidence kind", async () => {
+  const h = harness({
+    absence: FOUND_NOTHING,
+    replies: [
+      SEARCH_REPLY,
+      // Unscoped absence AND no word about what it rests on: both pre-checks
+      // fire on the same draft.
+      { text: "Nobody has mentioned a hard deadline for the reflection redesign." },
+    ],
+  });
+  const outcome = await runTurn(request({ text: "has anyone set a deadline?" }), h.deps);
+
+  assert.equal(outcome.disposition, "answered");
+  // ONE call. Sent as two sibling instructions the repairs compete and the
+  // model does one of them.
+  assert.equal(h.judged.length, 1);
+  const call = h.judged[0]!;
+  assert.match(call.extraInstruction ?? "", /never says what was\s+checked/);
+  assert.match(call.extraInstruction ?? "", /ABSENCE SCOPE/);
+  // The force reason is the CONFIDENCE kind when confidence is what fired —
+  // the absence scope is carried by the instruction, not by a second reason.
+  assert.equal(call.forceReason, "absent");
+  assert.equal(outcome.telemetry.confidence, "absent");
+  // And the judge is told what actually ran, which is what makes D9 judgeable.
+  assert.deepEqual(call.toolsUsedThisTurn, ["slack_search"]);
+  assert.equal(call.correction, false);
+});
+
+test("an absence-only failure forces the judge under its own reason", async () => {
+  const h = harness({
+    absence: FOUND_NOTHING,
+    replies: [
+      SEARCH_REPLY,
+      // Calibrated ("I checked …") but still absolute about the world.
+      { text: "Nobody has mentioned a hard deadline. I checked the Roadmap board and it lists no date." },
+    ],
+  });
+  const outcome = await runTurn(request({ text: "has anyone set a deadline?" }), h.deps);
+
+  assert.equal(outcome.disposition, "answered");
+  assert.equal(h.judged.length, 1);
+  const call = h.judged[0]!;
+  assert.equal(outcome.telemetry.confidence, "ok", "confidence had nothing to repair");
+  assert.equal(call.forceReason, "absence-scope");
+  assert.match(call.extraInstruction ?? "", /^ABSENCE SCOPE/);
+  // The scope is the one the search REPORTED, never a hardcoded "public".
+  assert.match(call.extraInstruction ?? "", /visibility "bot-token" over: public channels/);
+});
+
+test("a cache-served receipt escalates a freshness claim", async () => {
+  const h = harness({
+    replies: [
+      {
+        text: "Checking the blueprint.",
+        toolCalls: [{ name: "search_blueprint", args: { query: "call-off" } }],
+      },
+      { text: "I checked the blueprint just now — a call-off opens the slot a fill-in claims." },
+    ],
+    // The rows came from the short-lived cache, so "just now" is a false
+    // claim rather than a missing one — the 2026-08-17 shape.
+    receipt: { tool: "search_blueprint", query: "call-off", count: 3, scenarios: [], cached: true },
+  });
+  const outcome = await runTurn(request(), h.deps);
+
+  assert.equal(outcome.disposition, "answered");
+  assert.equal(outcome.telemetry.confidence, "false-freshness");
+  const call = h.judged[0]!;
+  assert.equal(call.forceReason, "false-freshness");
+  assert.match(call.extraInstruction ?? "", /claims its information is current/);
+  // Nothing else fired, so nothing else was asked for.
+  assert.doesNotMatch(call.extraInstruction ?? "", /ABSENCE SCOPE/);
+  assert.deepEqual(call.toolsUsedThisTurn, ["search_blueprint"]);
+});
+
+test("the same draft over a LIVE read is not escalated", async () => {
+  // The control for the case above: same claim, same tool, receipt not cached
+  // — and the chain has nothing to repair, so the judge is not forced.
+  const h = harness({
+    replies: [
+      {
+        text: "Checking the blueprint.",
+        toolCalls: [{ name: "search_blueprint", args: { query: "call-off" } }],
+      },
+      { text: "I checked the blueprint just now — a call-off opens the slot a fill-in claims." },
+    ],
+    receipt: { tool: "search_blueprint", query: "call-off", count: 3, scenarios: [] },
+  });
+  const outcome = await runTurn(request(), h.deps);
+
+  assert.equal(outcome.telemetry.confidence, "ok");
+  assert.equal(h.judged[0]!.forceReason, undefined);
+  assert.equal(h.judged[0]!.extraInstruction, undefined);
 });
 
 test("a reply Slack never accepted is reported as a failure and never remembered as posted", async () => {

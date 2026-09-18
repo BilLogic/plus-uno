@@ -21,12 +21,28 @@ import {
   type TurnRequest,
 } from "../../src/turn/index";
 import { runOperations, type OperationOutcome } from "../../src/gate/index";
+import type { AbsenceContext } from "../../src/agent/absence";
 import {
   createInMemoryThreadState,
+  type HistoryTurn,
   type PendingProposal,
   type ThreadRef,
   type ThreadState,
 } from "../../src/thread-state/index";
+
+/**
+ * Every argument the draft review received, as the contract declares them.
+ *
+ * READ OFF `TurnDeps` rather than restated (#625). The harness used to keep
+ * `judged: string[]` — the draft and nothing else — so the whole pre-send chain
+ * was unobservable: which repair instruction was sent, whether both repairs
+ * rode ONE call, what force reason bypassed the length floor, what the judge
+ * was told had run. Those are the rules that actually fail in production, and
+ * none of them could be asserted. Derived from the dependency's own parameter
+ * type, an argument added to the contract is recorded here without anyone
+ * remembering to widen a copy.
+ */
+export type JudgeCall = Parameters<TurnDeps["reviewDraft"]>[0];
 
 export const CHANNEL = "C1";
 export const CONVERSATION = "1700000000.000100";
@@ -86,16 +102,29 @@ export interface Harness {
   }>;
   /** What the approved batch actually ran, when the case supplied an executor. */
   ran: OperationOutcome[];
-  /** Every draft the judge was handed. */
-  judged: string[];
+  /** Every judge call, with every argument it carried. */
+  judged: JudgeCall[];
   /** Tool names the loop actually executed. */
   executed: string[];
 }
 
 export function harness(opts: {
   replies?: ScriptedReply[];
-  /** Stand in for the judge. Returning text revises the draft. */
-  judge?: (draft: string) => { text: string; verdict: string };
+  /** Stand in for the judge. Returning text revises the draft, and the whole
+   *  call is on `harness().judged` either way. */
+  judge?: (call: JudgeCall) => { text: string; verdict: string };
+  /**
+   * What the turn's lookups retrieved, as the agent run reports it.
+   *
+   * INJECTABLE (#625) because production derives both inside `run-agent.ts`,
+   * from the tool result payloads, and this harness runs the loop on a fake
+   * tool table. Without them two branches of the turn were DEAD in test: a
+   * cache-served receipt (which is what turns a freshness claim into a false
+   * one) and an empty search (the absence check's only trigger) could never be
+   * set, so neither the escalation nor the repair could be asserted.
+   */
+  receipt?: HistoryTurn["retrieval"];
+  absence?: AbsenceContext;
   preflightAsk?: string;
   /** A refusal that depends on the call — what a real guard does. */
   preflightFor?: (toolName: string, input: Record<string, unknown>) => string | null;
@@ -120,7 +149,7 @@ export function harness(opts: {
   const provider = fakeProvider({ replies: opts.replies ?? [{ text: "Here is the answer." }] });
   const resolved: Harness["resolved"] = [];
   const ran: OperationOutcome[] = [];
-  const judged: string[] = [];
+  const judged: JudgeCall[] = [];
   const executed: string[] = [];
 
   const deps: TurnDeps = {
@@ -159,12 +188,18 @@ export function harness(opts: {
         cancelKey: opts.cancelKey ?? null,
         ...(req.onInterim ? { onInterim: req.onInterim } : {}),
       });
-      return { result, tools: executed.slice(), references: [] };
+      return {
+        result,
+        tools: executed.slice(),
+        references: [],
+        ...(opts.receipt ? { receipt: opts.receipt } : {}),
+        ...(opts.absence ? { absence: opts.absence } : {}),
+      };
     },
 
-    async reviewDraft({ draft }) {
-      judged.push(draft);
-      return opts.judge ? opts.judge(draft) : { text: draft, verdict: "pass" };
+    async reviewDraft(call) {
+      judged.push(call);
+      return opts.judge ? opts.judge(call) : { text: call.draft, verdict: "pass" };
     },
 
     async preflight(toolName, input) {

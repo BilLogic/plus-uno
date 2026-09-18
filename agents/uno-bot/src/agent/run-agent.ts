@@ -47,6 +47,18 @@
 // No re-export bag replaced them: `HistoryTurn` and `AgentImage` were passed
 // through this module for no importer, and went with the fields that used them.
 //
+// WHAT MOVED IN (#625), and it is the same lesson one layer out: a dependency
+// a caller has to REMEMBER to establish is the shape of a future bug. The tool
+// ledger, the retrieval receipt, the reference names and the absence signal
+// crossed frames on an `AsyncLocalStorage` scope the CALLER opened around this
+// entry. An adapter that forgot it got empty tools, a false "nothing was
+// fetched" and a silently different confidence verdict, and nothing failed —
+// the scope is a no-op outside itself by design, which is right for a leak and
+// wrong for a contract. The scope is opened HERE now, so it cannot be
+// forgotten, and those four facts come back as the return value (`AgentRun`).
+// `correction` became an argument for the same reason the tier did: the scope
+// is keyed on it, this entry is what needs it, and its one caller always knew.
+//
 // Provider selection:
 //   MODEL_PROVIDER = "gemini"        → providers/gemini.ts  (DEFAULT/production)
 //   MODEL_PROVIDER = "vertex-claude" → providers/claude.ts  (Claude on Vertex AI,
@@ -115,6 +127,16 @@ export interface AgentInput {
   conversation: ProviderConversationTurn[];
   slack: SlackContext;
   /**
+   * True when Turn read this turn as the person correcting the previous reply.
+   *
+   * REQUIRED, because the turn scope opened below is keyed on it and a default
+   * would be this entry guessing at a classification Turn already made
+   * (`agent/correction.ts`, acted on in `turn/turn.ts`). What it buys inside
+   * the loop: `search_blueprint` is forced to `fresh: true`, so a pushback
+   * cannot be answered out of the cache under an "I just re-checked" claim.
+   */
+  correction: boolean;
+  /**
    * The CONVERSATION's identity — `thread_ts` in a channel, the constant "dm"
    * in an agent_view DM — and the one thing the cancel check is keyed on.
    *
@@ -165,6 +187,30 @@ export interface AgentInput {
   onToolResult?: (result: ToolResultNote) => void;
 }
 
+/**
+ * What one agent turn came back with: the loop's result, and everything the
+ * turn's own frames recorded about what it retrieved.
+ *
+ * ALL OF IT THROUGH THE RETURN (#625). The four fields below were read off an
+ * ambient scope the caller had to open; they are answers to questions asked
+ * several frames above the loop — did anything get fetched, what was fetched,
+ * was it served from a cache, did a search come back empty — and a return value
+ * is where an answer belongs. A caller cannot now hold an `AgentRun` and be
+ * missing them.
+ */
+export interface AgentRun {
+  result: AgentResult;
+  /** Every ungated tool the loop dispatched, in call order — attempts, not
+   *  successes: a tool that threw still ran. */
+  tools: string[];
+  /** The names `read_reference` served this turn, deduped (#423). */
+  references: string[];
+  /** What the last lookup retrieved, when one did. */
+  receipt?: RetrievalReceipt;
+  /** Set only when a `slack_search` this turn came back EMPTY. */
+  absence?: AbsenceContext;
+}
+
 // ── The entry ────────────────────────────────────────────────────────────────
 
 /** The loop's budget port over the real per-invocation meter (net.ts, ADR-022). */
@@ -176,7 +222,7 @@ const liveBudget: LoopBudget = {
   breakdown: meterBreakdown,
 };
 
-export async function runAgent(input: AgentInput): Promise<AgentResult> {
+export async function runAgent(input: AgentInput): Promise<AgentRun> {
   const { env, conversation, tier, routeReason, currentSender, pending, slack, assistantContext } =
     input;
 
@@ -216,28 +262,33 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
     ? { channel: slack.channel, thread: input.conversationTs }
     : null;
 
-  return runLoop({
-    provider: selectProvider(env),
-    deps: {
-      executeUngatedTool: (name, args) => executeUngatedTool(env, name, args, slack),
-      threadState: threadStateFor(env),
-      budget: liveBudget,
-      ...(input.preflight ? { preflight: input.preflight } : {}),
-    },
-    tier,
-    routeReason,
-    conversation,
-    system,
-    tools,
-    pending,
-    currentSenderId: currentSender.userId,
-    cancelKey,
-    ...(input.cancelSince !== undefined ? { cancelSince: input.cancelSince } : {}),
-    onInterim: input.onInterim,
-    onDials: input.onDials,
-    onToolCall: input.onToolCall,
-    onToolResult: input.onToolResult,
-  });
+  // The turn scope, opened HERE rather than by the caller (#625): everything
+  // the loop's frames record about what this turn retrieved comes back below,
+  // in the return value, so no adapter can get an answer without it.
+  return withTurnScope({ correction: input.correction }, () =>
+    runLoop({
+      provider: selectProvider(env),
+      deps: {
+        executeUngatedTool: (name, args) => executeUngatedTool(env, name, args, slack),
+        threadState: threadStateFor(env),
+        budget: liveBudget,
+        ...(input.preflight ? { preflight: input.preflight } : {}),
+      },
+      tier,
+      routeReason,
+      conversation,
+      system,
+      tools,
+      pending,
+      currentSenderId: currentSender.userId,
+      cancelKey,
+      ...(input.cancelSince !== undefined ? { cancelSince: input.cancelSince } : {}),
+      onInterim: input.onInterim,
+      onDials: input.onDials,
+      onToolCall: input.onToolCall,
+      onToolResult: input.onToolResult,
+    }),
+  );
 }
 
 /**
@@ -286,20 +337,26 @@ export { looksLikeCorrection, correctionDirective } from "./correction";
 
 // ── Per-turn scope: tool ledger + correction flag ────────────────────────────
 //
-// Two things have to cross frames the AgentInput contract does not carry:
+// Two things have to cross frames the loop's signature does not carry:
 //
-//  1. WHICH TOOLS RAN. The draft judge gates a correction reply on whether it
-//     cites something fetched this turn; the executions happen deep inside
-//     the loop, and the judge runs in slack/events.ts, several frames above.
+//  1. WHICH TOOLS RAN, and what they retrieved. The draft judge gates a
+//     correction reply on whether it cites something fetched this turn, and the
+//     confidence pre-check asks whether a cache answered; the executions happen
+//     deep inside the loop and both checks run in `turn/turn.ts`, several frames
+//     above.
 //  2. WHETHER THIS IS A CORRECTION TURN, so `search_blueprint` can be forced to
 //     `fresh: true` at the boundary. Left to the model, a pushback re-runs a
 //     near-identical query and the SAME rows come back under an "I just
 //     re-checked" claim — a cache serving a lie.
 //
 // Rather than thread a context object through the loop's signature, this
-// mirrors net.ts's per-invocation meter: an AsyncLocalStorage scope entered by
-// the caller. Outside a scope every call is a no-op, so a test or a direct
-// integration call costs nothing and leaks nothing across requests.
+// mirrors net.ts's per-invocation meter: an AsyncLocalStorage scope. What it no
+// longer is (#625) is the CALLER's to enter. `runAgent` opens it around its own
+// loop call and hands what it collected back as `AgentRun`, so the direction of
+// travel is one way — in as `correction`, out as a return value — and an
+// adapter cannot get a run without the ledger. Outside a scope every record
+// below is still a no-op, which is what keeps a direct integration call from
+// leaking anything across requests.
 const turnScope = new AsyncLocalStorage<{
   tools: Set<string>;
   correction: boolean;
@@ -332,18 +389,17 @@ export interface RetrievalReceipt {
   cached?: boolean;
 }
 
-/** Run `fn` inside a fresh turn scope; returns its result, the tools used, and
- *  the retrieval receipt if one was recorded. */
-export async function withTurnScope<T>(
+/**
+ * Run `fn` inside a fresh turn scope and collect what it recorded.
+ *
+ * NOT EXPORTED (#625). `runAgent` above is its one caller, which is what makes
+ * the collection unforgettable: the only way to run the loop through this
+ * module is through the entry that opens the scope.
+ */
+async function withTurnScope(
   opts: { correction: boolean },
-  fn: () => Promise<T>,
-): Promise<{
-  result: T;
-  tools: string[];
-  references: string[];
-  receipt?: RetrievalReceipt;
-  absence?: AbsenceContext;
-}> {
+  fn: () => Promise<AgentResult>,
+): Promise<AgentRun> {
   const store: {
     tools: Set<string>;
     correction: boolean;
