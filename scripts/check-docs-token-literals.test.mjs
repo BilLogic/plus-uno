@@ -31,7 +31,9 @@ import {
   dimensionKey,
   blankFallbacks,
   alwaysAllowed,
+  run,
 } from './check-docs-token-literals.mjs';
+import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
 /** A token table small enough to hold in your head, shaped like the real one. */
 const defs = new Map([
@@ -240,4 +242,56 @@ test('unit — the normalisers agree with the shapes the corpus actually contain
   assert.equal(blankFallbacks('var(--a)'), 'var(--a)');
   assert.equal(alwaysAllowed('1px'), true);
   assert.equal(alwaysAllowed('2px'), false);
+});
+
+/*
+ * The policy half (#611). Measurement above plants a stylesheet string; the
+ * gate is a run against a fixture tree — a hand-picked hex the token table
+ * already holds, and an emptied token directory so every literal looks fine.
+ */
+
+/**
+ * Enough colour tokens to clear the 200-token floor, plus one whose value
+ * matches a planted docs literal.
+ *
+ * @returns {string}
+ */
+function tokenSheet() {
+  const decls = ['  --color-outline-variant: #bec8ca;'];
+  for (let i = 0; i < 200; i += 1) {
+    decls.push(`  --color-n${i}: #${(i + 1).toString(16).padStart(6, '0')};`);
+  }
+  return `:root {\n${decls.join('\n')}\n}\n`;
+}
+
+test('a hand-planted hex in a fixture docs stylesheet is a finding', () => {
+  const { root, done } = policyTree({
+    'design-system/src/tokens/_colors.scss': tokenSheet(),
+    '.storybook/storybook-overrides.css': '.sb-ds-doc-section { border-bottom: 1px solid #bec8ca; }\n',
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(
+      found.some((message) => /#bec8ca/.test(message) && /--color-outline-variant/.test(message)),
+      `expected a token-literal finding, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
+});
+
+test('an empty token directory fires the sentinel floor, not a clean sweep', () => {
+  const { root, done } = policyTree({
+    '.storybook/storybook-overrides.css': '.sb-ds-doc-section { border-bottom: 1px solid #bec8ca; }\n',
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(found.length > 0, 'an empty token directory must not report a clean sweep');
+    assert.ok(
+      found.some((message) => /indexed 0 tokens/.test(message) && /expected at least 200/.test(message)),
+      `expected the token-table floor, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
 });

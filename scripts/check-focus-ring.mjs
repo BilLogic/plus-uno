@@ -57,10 +57,12 @@ export const REMEDY =
 const inputs = byRoot((repoRoot) => {
   const files = stylesheets(repoRoot);
   const values = colours(repoRoot);
+  const rolesPath = path.join(repoRoot, ROLES_FILE);
   return {
     files,
     rules: indicators(focusRules(files, repoRoot), values),
-    roles: fs.readFileSync(path.join(repoRoot, ROLES_FILE), 'utf8'),
+    // A vanished roles file is the floor case, not a crash (#611).
+    roles: fs.existsSync(rolesPath) ? fs.readFileSync(rolesPath, 'utf8') : '',
   };
 });
 

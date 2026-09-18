@@ -50,10 +50,12 @@ export const REMEDY =
 // questions, so they happen once per root.
 const inputs = byRoot((repoRoot) => {
   const files = stylesheets(repoRoot);
+  const rolesPath = path.join(repoRoot, ROLES_FILE);
   return {
     files,
-    uses: edgeUses(files),
-    roles: fs.readFileSync(path.join(repoRoot, ROLES_FILE), 'utf8'),
+    uses: edgeUses(files, repoRoot),
+    // A vanished roles file is the floor case, not a crash (#611).
+    roles: fs.existsSync(rolesPath) ? fs.readFileSync(rolesPath, 'utf8') : '',
   };
 });
 

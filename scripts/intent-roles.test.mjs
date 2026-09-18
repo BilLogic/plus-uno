@@ -4,7 +4,9 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { EDGE, counts, edgeUses, failures, stylesheets } from './intent-roles.mjs';
+import { run } from './check-intent-roles.mjs';
+import { EDGE, INTENTS, counts, edgeUses, failures, stylesheets } from './intent-roles.mjs';
+import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
 /** A throwaway corpus, so the tests describe the rule rather than today's code. */
 function corpus(files) {
@@ -133,4 +135,56 @@ test('counts group by file and kind', () => {
     ]),
     { a: { border: 2, outline: 0 }, b: { border: 0, outline: 1 } },
   );
+});
+
+/*
+ * The policy half (#611). Measurement above plants strings; the gate is a run
+ * against a fixture tree — a reverted call site, and a vanished token directory.
+ */
+
+const ROLES_SCSS = `:root {\n${INTENTS.map((intent) => `  --color-${intent}-border: var(--color-${intent});`).join('\n')}\n}\n`;
+
+const INTENT_BASELINE = JSON.stringify({
+  note: 'Remaining edge uses of an intent base, recorded so a new one fails.',
+  recordedAt: '2026-09-18',
+  migrated: 0,
+  files: {},
+});
+
+test('an intent base on an edge in a fixture tree is a finding', () => {
+  const { root, done } = policyTree({
+    'design-system/src/tokens/_color_roles.scss': ROLES_SCSS,
+    'design-system/src/a.scss': '.a { border-color: var(--color-danger); }\n',
+    'docs/evals/intent-role-adoption.json': INTENT_BASELINE,
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(
+      found.some((message) => /paints an edge from an intent base/.test(message)),
+      `expected a planted edge-use finding, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
+});
+
+test('an empty token directory fires the sentinel floor, not a clean sweep', () => {
+  const { root, done } = policyTree({
+    'design-system/src/a.scss': '.a { border-color: var(--color-danger); }\n',
+    'docs/evals/intent-role-adoption.json': INTENT_BASELINE,
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(found.length > 0, 'an empty token directory must not report a clean sweep');
+    assert.ok(
+      found.some((message) => /only \d+ stylesheets scanned \(floor 150\)/.test(message)),
+      `expected the stylesheet floor, got:\n${found.join('\n')}`,
+    );
+    assert.ok(
+      found.some((message) => /no longer defines --color-danger-border/.test(message)),
+      `expected the vanished role, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
 });
