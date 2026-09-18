@@ -108,7 +108,9 @@ export interface ProviderDials {
  *
  * The caller names a TIER and nothing else about the model, exactly as it does
  * for a turn: the tier's model and its dials move together inside the adapter
- * (ADR-028), so no caller above the seam spells a model id.
+ * (ADR-028), so nothing that comes through here spells a model id. (Two
+ * callers still bypass the seam and name one themselves — the diagnostics
+ * probe and the draft judge; the contract is about what crosses this file.)
  */
 export interface ModelPrompt {
   tier: ModelTier;
@@ -128,6 +130,14 @@ export interface ModelPrompt {
  * A FAILURE is data here too, but there is no status: only some providers give
  * one, and a field the others must report as null is the mistake `ProviderDials`
  * avoids. The status, where there is one, is inside `message`.
+ *
+ * `ok: false` means THE MODEL DID NOT ANSWER — it was asked and something went
+ * wrong. It does not mean "nothing was asked": the seam has no question for
+ * whether a provider is usable at all, so an adapter with no credential answers
+ * a `generate` the only way it can, as a failure. A caller that must tell those
+ * apart — a judge that skips rather than errors when there is no credential to
+ * judge with — needs a state of its own, and the way to get one is a THIRD ARM
+ * on this union, not parsing `message`. Deliberately left open.
  */
 export type ModelText =
   | { ok: true; model: string; text: string }

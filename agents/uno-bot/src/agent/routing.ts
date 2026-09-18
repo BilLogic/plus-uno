@@ -1,4 +1,7 @@
-// Model tiers + request routing, shared by both model providers.
+// Tier names + request routing: WHICH tier a request deserves, decided above
+// every adapter. No provider imports this file — once the model table moved
+// adapter-side, none needed to; the readers are the turn (turn/turn.ts) and the
+// agent's entry (run-agent.ts).
 //
 // (Was anthropic-client.ts — the direct-Anthropic SDK client was removed when
 // Claude moved to Vertex; only the provider-neutral routing survives.)
@@ -15,6 +18,7 @@
 // in providers/claude.ts (CLAUDE_MODELS), the Gemini model-plus-level pairs in
 // gemini-tiers.ts. This module is provider-neutral, and a Claude id sitting in
 // it was read by no Gemini turn ever.
+//
 // Defined in tiers.ts (import-free) so pure modules can name a tier without
 // pulling in the Workers type graph. Re-exported here: routing is where callers
 // expect to find it.

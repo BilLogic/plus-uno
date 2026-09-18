@@ -3,8 +3,8 @@
 // This is the seam's second call, for the callers that want an answer and no
 // tools: the draft judge, a probe, a one-line classification. A caller names a
 // TIER and nothing else about the model, exactly as it does for a turn, so the
-// tier's model and dials stay inside the adapter (ADR-028) and no caller above
-// the seam ever spells a model id.
+// tier's model and dials stay inside the adapter (ADR-028) and nothing that
+// comes through the seam spells a model id.
 //
 // The Gemini adapter is absent here for the reason it is absent from every unit
 // suite: it names `Env` and the Workers type graph, which this Node build does
@@ -14,6 +14,7 @@ import assert from "node:assert/strict";
 
 import { claudeProvider, CLAUDE_MODELS, type ClaudeTransport } from "../src/agent/providers/claude";
 import { fakeProvider } from "../src/agent/providers/fake";
+import * as routing from "../src/agent/routing";
 
 // ── the model table lives adapter-side ───────────────────────────────────────
 
@@ -23,6 +24,29 @@ test("the Claude model table maps every tier, and the adapter owns it", () => {
     default: "claude-sonnet-5",
     grind: "claude-opus-4-8",
   });
+});
+
+// A RATCHET, not a tautology: the Claude table sat in the provider-neutral
+// routing module for months, where a Gemini turn never read it. Nothing stops it
+// drifting back except a test that fails the moment a model id appears there
+// again — whichever provider's it is.
+test("the provider-neutral routing module exports no model id", () => {
+  const strings = Object.entries(routing as Record<string, unknown>).flatMap(
+    ([name, value]): string[] => {
+      if (typeof value === "string") return [`${name}: ${value}`];
+      // A tier table is a plain object of strings — the shape the Claude ids
+      // used to have here.
+      if (value && typeof value === "object")
+        return Object.values(value)
+          .filter((v): v is string => typeof v === "string")
+          .map((v) => `${name}: ${v}`);
+      return [];
+    },
+  );
+  const modelish = strings.filter((s) =>
+    /claude|gemini|haiku|sonnet|opus|flash|-pro/i.test(s),
+  );
+  assert.deepEqual(modelish, []);
 });
 
 // ── the Claude adapter's generate ────────────────────────────────────────────
