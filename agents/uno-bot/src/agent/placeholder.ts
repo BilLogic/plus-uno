@@ -8,9 +8,10 @@
 // Prose that merely mentions the word is content — and so is anything quoted or
 // in a code span, which is how a person NAMES a token rather than leaving one.
 //
-// Import-free, like `tool-input.ts` beside it: `preflight.ts` carries `Env` and
-// the design-system component list, so a detector living there is one
-// `tsconfig.test.json` cannot compile and no test can drive directly.
+// Import-free, like `tool-input.ts` beside it, and for the same reason it
+// gives: `preflight.ts` carries `Env` and the design-system component list, and
+// a shape detector has no business with either. Not a compile reason — the test
+// compile is a glob over `src/**` (#595) — a dependency one.
 
 /** A field that is nothing but one of these is a slot nobody filled in. */
 const PLACEHOLDER_TOKEN_RE =

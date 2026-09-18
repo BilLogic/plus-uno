@@ -3,8 +3,9 @@
 //
 // Import from here rather than from `./gate`, so that where a piece lives
 // stays the module's business — the same boundary `turn/index.ts` and
-// `thread-state/index.ts` keep. Nothing Workers-shaped is re-exported,
-// because `tsconfig.test.json` compiles this file.
+// `thread-state/index.ts` keep. Nothing Slack-shaped or `Env`-facing is
+// re-exported: Gate's front door is Gate's vocabulary, and everything on it is
+// a thing the Node suite can drive.
 export * from "./gate";
 export * from "./reaction-door";
 export * from "./run-batch";

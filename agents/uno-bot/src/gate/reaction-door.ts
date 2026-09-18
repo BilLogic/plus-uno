@@ -14,13 +14,16 @@
 // So the whole door is exercised in `tests/confirmation-paths.test.ts` on the
 // recording Delivery and the in-memory ThreadState. It used to be READ there
 // instead — a `readFileSync` and a regex over this file's source — because a
-// door that named `Env` was a door that compile could not reach.
+// door whose one argument was an `Env` was a door a Node test had nothing to
+// call. (Not a compile boundary, though that is what this note used to say:
+// `tsconfig.test.json` carries the Workers types beside the Node ones and globs
+// `src/**` — #595.)
 //
 // Anyone in the thread may confirm/cancel — the requester lock was removed
 // 2026-07-14, and `requesterUserId` is still stored for the record (ADR-014).
 //
-// PURE by design: no `Env`, no Workers global, no fetch, so
-// `tsconfig.test.json` compiles it.
+// PURE by design: no `Env`, no Workers global, no fetch — which is what lets
+// the Node suite DRIVE it rather than read it.
 
 import { mapReaction } from "../slack/gate-reactions";
 import type { ThreadState } from "../thread-state/index";

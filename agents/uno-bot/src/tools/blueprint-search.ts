@@ -1,7 +1,7 @@
 // search_blueprint executor — READ-ONLY. Queries the uno-blueprint Supabase
 // (the grounded source of truth) so the bot can answer/justify factual and
 // status questions from it and cite the rows, instead of fabricating (D8).
-// Runs inline in the agent loop, like the other read-only tools.
+// Runs inline in the agent loop, like the other ungated tools.
 //
 // WHAT IS LEFT HERE, and what stopped being this file's problem (#607).
 //
@@ -326,7 +326,7 @@ export async function executeBlueprintSearch(
   // as a finding rather than reading rows, so asking is its job.)
   try {
     // `fresh` is forced by the Worker on a correction turn (run-agent
-    // executeReadOnlyTool) and may also be requested by the model. Either way it
+    // executeUngatedTool) and may also be requested by the model. Either way it
     // bypasses the 60s result cache — a re-check that re-serves the cache is a
     // cache serving a lie.
     const fresh = input.fresh === true;

@@ -77,10 +77,10 @@ export const FIGMA_TRUNCATION_NOTE =
 // ── URL parsing ─────────────────────────────────────────────────────────────
 //
 // Lives here rather than in figma.ts because two Slack-side modules need to
-// agree on what counts as a frame link, and figma.ts imports the Workers fetch
-// wrapper — which the test build cannot compile. A recognizer nothing can
-// unit-test is how vision.ts and vision-reference.ts came to hold two
-// different answers to the same question.
+// agree on what counts as a frame link, and everything in figma.ts goes through
+// the metered fetch — so a test of the recognizer there would be a test with a
+// transport stub in it. A recognizer nothing can unit-test is how vision.ts and
+// vision-reference.ts came to hold two different answers to the same question.
 
 export interface FigmaUrlParts {
   fileKey: string;

@@ -29,10 +29,12 @@ import type { ToolCall } from "../agent/tool-transcript";
 import type { HistoryTurn, PendingProposal } from "../thread-state/index";
 import { buildTurnRequest, type DeliveryCall, type TurnOutcome, type TurnRequest } from "../turn/index";
 
-/** The synthetic surface an eval turn arrives on. `C_EVAL` never starts with
- *  "D", so own-visibility search is unreachable and any assertion about the
- *  ADR-020 surface gate would pass for the wrong reason — a case that means to
- *  exercise the gate names a `D…` channel explicitly. */
+/** The synthetic surface an eval turn arrives on. `C_EVAL` is a channel by the
+ *  one statement of the rule (`turn/request.ts` § `turnSurfaceOf`, which the
+ *  builder below reaches through `buildTurnRequest`), so own-visibility search
+ *  is unreachable and any assertion about the ADR-020 surface gate would pass
+ *  for the wrong reason — a case that means to exercise the gate names a `D…`
+ *  channel explicitly. */
 export const EVAL_CHANNEL = "C_EVAL";
 export const EVAL_USER = "U_EVAL";
 

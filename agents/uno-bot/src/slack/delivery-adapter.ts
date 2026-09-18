@@ -21,6 +21,15 @@
 //   • the answer closing the stream the checklist lives in, rather than opening
 //     a second one beside it.
 //
+// AND THE `[working]` LINE, which moved in from `slack/working-signal.ts`
+// (#595). It was carved out of this file because "the adapter that calls them
+// stays out of reach of the Node test build" — the classification and the
+// formatter were testable there and the thing that called them was not. #594
+// ended that, and a module whose only stated reason was a compile boundary that
+// no longer exists is a module. What stayed behind is the part with four
+// readers, one of them Env-facing: Slack's session-status vocabulary, in
+// `slack/session-status.ts`.
+//
 // IT TAKES NAMED DEPENDENCIES, the way the stop doors do (`slack/stop-doors.ts`,
 // #593), the reaction door does (`gate/reaction-door.ts`, #592) and Turn does
 // (`turn/turn.ts`): the Slack client as ONE record of the calls this adapter
@@ -38,24 +47,24 @@
 // calls. What the suite asks now is which status Slack was handed, on which
 // thread, for which settlement.
 //
-// PURE by design: no `Env`, no Workers global, no fetch, so
-// `tsconfig.test.json` compiles it.
+// PURE by design: no `Env`, no Workers global, no fetch — which is what lets
+// the Node suite DRIVE it rather than read it. (Not a compile property: the
+// test compile is a glob over `src/**` and types the Workers globals beside the
+// Node ones, so it would compile this file either way — see
+// `tsconfig.test.json`.)
 
 import { turnSurfaceOf } from "../turn/request";
 import type { FooterKind } from "./footer-kind";
 import { proposalCardBlocks } from "./proposal-render";
 import type { Delivery, DeliveryFailureStage, PostResult, ProposalCard } from "../turn/index";
 import { isSubrequestBudgetError, subrequestsUsed } from "../net";
+import { SUBREQUEST_CAP } from "../agent/loop-policy";
 import {
-  outcomeOf,
   settledStatus,
-  workingSignalLine,
   WORKING_STATUS,
   type SessionStatus,
   type StatusResult,
-  type WorkingSignalOutcome,
-  type WorkingSignalPhase,
-} from "./working-signal";
+} from "./session-status";
 
 /** Where this turn is happening, as Slack knows it. */
 export interface SlackDeliveryTarget {
@@ -209,6 +218,118 @@ export function threadTitleFrom(text: string): string {
  *  one way when the request is built and another way here. */
 export function isAssistantThread(channel: string): boolean {
   return turnSurfaceOf(channel) === "assistant";
+}
+
+// ── the `[working]` line, and what it classifies ────────────────────────────
+//
+// THE GAP IT CLOSES, stated accurately. A Slack refusal was never the untraced
+// case: `parseSlackResponse` in api.ts has logged `[slack] <method> failed:
+// <error>` on every `ok: false` since long before any of this existed. What was
+// silence is the pair either side of it — a clear that SUCCEEDED, and a clear
+// that never left the Worker because the invocation died on the free plan's
+// external-subrequest cap (SUBREQUEST_CAP) or was hard-killed mid-turn. Neither
+// produces a Slack response, so neither produced a line, and a stuck "Working…"
+// therefore had three possible causes and one symptom. That is why the same
+// artefact kept being diagnosed from screenshots.
+//
+// So the pairing reports itself EVERY time, success included, carrying the
+// turn's external spend. The instrument is not any one line: it is that a `set`
+// line with no `clear` line after it means the invocation died before delivery,
+// which no amount of failure logging could ever have shown.
+//
+// ON THE DOUBLE LINE. A refusal now logs twice — api.ts's `[slack]` line owns
+// Slack's error, this one owns the phase and the spend — and that is deliberate:
+// #571 asks for one line naming WHICH half was refused and its code, and the
+// api.ts line knows the method but not whether it was the set or the clear, nor
+// what the turn had spent by then.
+
+/** Which half of the pairing spoke: the set that raises the indicator, or the
+ *  clear that takes it down. Named in the line because the whole diagnostic is
+ *  reading one against the other. */
+export type WorkingSignalPhase = "set" | "clear";
+
+/**
+ * What a status call came back as.
+ *
+ * Four kinds because there are four genuinely different things to do about it,
+ * and exactly one of them is Slack saying no. Collapsing the rest into
+ * "declined" is the misdirection #571 exists to end.
+ */
+export type WorkingSignalOutcome =
+  /** The indicator moved. */
+  | { kind: "ok" }
+  /** Slack answered, and said no. `error` is its own code — the only kind
+   *  entitled to the word "Slack" in its line. */
+  | { kind: "declined"; error: string }
+  /** The call left the Worker and nothing came back that could be read: a
+   *  transport failure or an unparseable body, which api.ts degrades into the
+   *  same `{ ok: false, error }` shape a refusal arrives in. Slack may never
+   *  have seen it, so the line must not claim Slack refused anything. */
+  | { kind: "unanswered"; error: string }
+  /** The call never left the Worker: the subrequest budget stopped it. NOT a
+   *  Slack failure — the fix is a cheaper turn, not a Slack scope. */
+  | { kind: "budget-stop" }
+  /** There was no thread to decorate, so nothing was sent. Also not Slack's
+   *  word; see `setSessionStatus`, whose guard this comes from. */
+  | { kind: "no-thread" };
+
+/**
+ * The codes in `error` that did NOT come from Slack.
+ *
+ * `slackCall` degrades a fetch throw to `network_error` and an unreadable body
+ * to `http_<status>` (api.ts), precisely so that every caller can handle one
+ * shape. The cost of that kindness is that the shape lies about its origin, and
+ * a 502 or a dropped socket reported as "Slack declined: network_error" sends
+ * the next person to check app scopes for a problem in the network.
+ */
+function neverReachedSlack(error: string): boolean {
+  return error === "network_error" || error.startsWith("http_");
+}
+
+/**
+ * Slack's answer as an outcome.
+ *
+ * @param result - What the Slack client's `setSessionStatus` reported
+ */
+export function outcomeOf(result: StatusResult): WorkingSignalOutcome {
+  if (result.ok) return { kind: "ok" };
+  const error = result.error || "unknown";
+  if (error === "no_thread") return { kind: "no-thread" };
+  if (neverReachedSlack(error)) return { kind: "unanswered", error };
+  return { kind: "declined", error };
+}
+
+/**
+ * The one line a set or a clear leaves behind.
+ *
+ * `spent` is the turn's EXTERNAL subrequest count at the moment the call was
+ * made, against the free plan's cap. It is on every line, including the happy
+ * one, because the number is only useful as a series: a clear logged at two
+ * short of SUBREQUEST_CAP says the next turn of the same shape will die before
+ * it gets here, which is exactly the reading no screenshot could give.
+ *
+ * @param phase - Which half of the pairing spoke
+ * @param outcome - What came back
+ * @param spent - External subrequests spent this invocation so far
+ */
+export function workingSignalLine(
+  phase: WorkingSignalPhase,
+  outcome: WorkingSignalOutcome,
+  spent: number,
+): string {
+  const budget = `spent=${spent}/${SUBREQUEST_CAP}`;
+  switch (outcome.kind) {
+    case "ok":
+      return `[working] ${phase} ok ${budget}`;
+    case "declined":
+      return `[working] ${phase} declined by Slack: error=${outcome.error} ${budget}`;
+    case "unanswered":
+      return `[working] ${phase} got no answer: error=${outcome.error} ${budget}`;
+    case "budget-stop":
+      return `[working] ${phase} never sent — subrequest budget stopped it ${budget}`;
+    case "no-thread":
+      return `[working] ${phase} never sent — no thread to decorate ${budget}`;
+  }
 }
 
 /**

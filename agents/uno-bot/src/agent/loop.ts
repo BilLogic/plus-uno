@@ -14,11 +14,11 @@
 //     batch — instead of an execution, with that reply's lookups still answered,
 //     and a preflight refusal going back to the MODEL once before it ever goes
 //     to the person;
-//   • read-only calls executed under the lookup ceiling, with a budget trip
+//   • ungated calls executed under the lookup ceiling, with a budget trip
 //     stamping the result partial rather than letting a short read pass as whole;
 //   • the tools-disabled synthesis pass when the ceiling is reached;
 //   • retry on a backup model when the provider says it has one;
-//   • the ONE interim-narration rule: narrate only ahead of read-only work.
+//   • the ONE interim-narration rule: narrate only ahead of ungated work.
 //
 // What does NOT live here is any model's wire format. The loop speaks
 // `ModelProvider` (model-provider.ts): a neutral conversation and tool roster
@@ -33,7 +33,7 @@
 
 import { rowFor } from "./tool-table";
 import { BUILD } from "../version";
-import type { ModelTier } from "./tiers";
+import type { ModelTier } from "./routing";
 import type { PendingProposal, ProposalOperation, ThreadRef } from "../thread-state/index";
 import type { ProviderConversationTurn } from "./provider-conversation";
 import { toolResultDigest, type ToolCall, type ToolResultNote } from "./tool-transcript";
@@ -50,7 +50,7 @@ import {
   CLARIFY_FALLBACK,
   LOOKUP_CEILING,
   MAX_ITERATIONS,
-  READONLY_TOOL_BUDGET,
+  UNGATED_TOOL_BUDGET,
   SUBREQUEST_CAP,
   budgetRefusedResult,
   makeInterimFilter,
@@ -153,9 +153,11 @@ export interface LoopBudget {
 }
 
 export interface LoopDeps {
-  /** Execute one read-only tool and return its result text. Bound to the
-   *  environment and the Slack context by the caller. */
-  executeReadOnlyTool(name: string, args: Record<string, unknown>): Promise<string>;
+  /** Execute one UNGATED tool — the dispatch distinction, not a read/write one:
+   *  `slack_react` is ungated and writes (see CONTEXT.md § tool table). Returns
+   *  its result text. Bound to the environment and the Slack context by the
+   *  caller. */
+  executeUngatedTool(name: string, args: Record<string, unknown>): Promise<string>;
   /**
    * The stop flag, consumed once.
    *
@@ -203,7 +205,8 @@ export interface LoopInput {
    *
    * Passed in rather than derived: the writer and this reader drifted once
    * already — an explicitly threaded DM resolves to the thread, not to "dm",
-   * and no expression here could know that. See `slack.conversationTs`.
+   * and no expression here could know that. See `AgentInput.conversationTs`,
+   * which is a required argument for the same reason (#624).
    */
   cancelKey: ThreadRef | null;
 
@@ -262,7 +265,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
   };
 
   /**
-   * Read-only calls, executed under the ceiling — the loop's one lookup path.
+   * Ungated calls, executed under the ceiling — the loop's one lookup path.
    *
    * Shared by the two branches that reach lookups: a reply that is only
    * lookups, and a reply that also stages a proposal. One copy is what makes
@@ -275,7 +278,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
       // Fires when the lookup ceiling is already reached, or the tool-count
       // backstop is hit. LOOKUPS only — side-effect tools are peeled off by the
       // caller and stay allowed even when the lookup budget is spent.
-      if (toolCallsUsed >= READONLY_TOOL_BUDGET || deps.budget.used() >= LOOKUP_CEILING) {
+      if (toolCallsUsed >= UNGATED_TOOL_BUDGET || deps.budget.used() >= LOOKUP_CEILING) {
         text = budgetRefusedResult();
       } else {
         toolCallsUsed++;
@@ -284,7 +287,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
         const tripsBefore = deps.budget.trips();
         try {
           text = await deps.budget.withLookupLimit(LOOKUP_CEILING, () =>
-            deps.executeReadOnlyTool(call.name, call.args),
+            deps.executeUngatedTool(call.name, call.args),
           );
           // Cut short but returned normally — a paging loop stopping cleanly, or
           // a catch that ate the throw. The counter sees it either way, so a
@@ -541,7 +544,7 @@ export async function runLoop(input: LoopInput): Promise<AgentResult> {
         }
       }
 
-      // The read-only calls of the SAME reply still run. This reply ended the
+      // The ungated calls of the SAME reply still run. This reply ended the
       // turn — a staged proposal is the outcome — so their results feed the
       // transcript and the turn's history rather than a further model step;
       // `recordToolResults` is where they belong either way. What makes running

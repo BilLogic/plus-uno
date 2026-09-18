@@ -12,7 +12,7 @@
 // Chill has only the command surface today; it is defined the same way so the
 // second surface costs nothing when it arrives.
 
-import type { ModelTier } from "../agent/tiers";
+import type { ModelTier } from "../agent/routing";
 
 export interface EffortMode {
   tier: ModelTier;

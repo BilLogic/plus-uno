@@ -1,9 +1,9 @@
 // What each message shortcut ASKS — pure data, no imports.
 //
-// Split from shortcuts.ts so it is unit-testable: the runtime half imports
-// api.ts and events.ts, which drag in the Workers type graph and cannot compile
-// under the node-only test config. Every bug worth catching here is in the
-// WORDING, so the wording is what got extracted.
+// Split from shortcuts.ts so it is unit-testable: the runtime half posts, opens
+// modals and runs turns, so nothing there can be exercised without a Worker.
+// Every bug worth catching here is in the WORDING, so the wording is what got
+// extracted — as data, which a test reads directly.
 //
 // The manifest carries only the menu label and callback_id; these strings are
 // the actual behaviour, kept in code so they are reviewable in a diff.

@@ -8,14 +8,17 @@
 // joins the module, it changes one function in `durable-object.ts` rather than
 // a dozen call sites.
 //
-// WHY THIS IS A SEPARATE FILE and not `index.ts`. `index.ts` is compiled by
-// `tsconfig.test.json`, which types only Node. This file names `Env` and so,
-// transitively, every Workers type in `src/types.ts` — and the adapter it
-// builds names `DurableObjectNamespace` outright. Re-exporting either from the
-// module's front door would drag Workers globals into every module test and
-// break the compile that keeps the rest of the module runtime-free. The Worker
-// has the Workers types and pays the import path instead; read the note at the
-// top of `index.ts` for the same reasoning from the other side.
+// WHY THIS IS A SEPARATE FILE and not `index.ts`. This file needs a real `Env`
+// to do anything at all: it reads `env.THREAD_STATE` and hands back an adapter
+// whose every call is a Durable Object stub call. `index.ts` is the module's
+// front door, and putting this behind it would mean a caller that only wants
+// the interface and the in-memory adapter gets the binding lookup too. The
+// Worker, which has an `Env`, pays the import path instead; read the note at
+// the top of `index.ts` for the same reasoning from the other side.
+//
+// (Not a compile boundary. `tsconfig.test.json` globs `src/**` and carries the
+// Workers types beside the Node ones — #595 — so both files are on that build;
+// what a Node test cannot do is CALL this one.)
 //
 // This is also the ONLY module file that takes `Env` — the interface itself
 // takes named dependencies (`ThreadStateDeps`), which is what lets a test build
