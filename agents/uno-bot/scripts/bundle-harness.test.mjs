@@ -285,15 +285,15 @@ test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
   // not one, because no single member is large enough, and because a floor that
   // one missing doc could trip would be a ceiling in disguise.
   //
-  // IT WAS THREE UNTIL #576. The corpus grows, and the three above had been
-  // ground down to 153 chars of margin — a fixture that a one-line glossary
-  // edit flips, which is what happened: two rows added to `CONTEXT.md` put the
-  // emptied bundle back over the floor, the bundler stopped reporting the
-  // shortfall, and this assertion failed for a reason that had nothing to do
-  // with the floor logic it guards. `supabase/overview.md` is the fourth
-  // because it restores real headroom (about 4.4k) rather than the next
+  // IT WAS THREE UNTIL #576 AND FOUR UNTIL #599. The corpus grows, and each
+  // time the margin is ground away this fixture fails for a reason that has
+  // nothing to do with the floor logic it guards: in #576 two rows added to
+  // `CONTEXT.md` put the emptied bundle back over the floor, and in #599 the
+  // glossary's `ratchet` row did it again. The instruction the last round left
+  // was followed rather than argued with — `supabase/blueprint.md` is the
+  // fifth member, for about 15k of real headroom rather than the next
   // hairline. If this trips again, add another member rather than trimming
-  // prose to fit a fixture — the bundle growing is the healthy direction, and
+  // prose to fit a fixture: the bundle growing is the healthy direction, and
   // the thing under test is the bundler's refusal, not the corpus's size.
   const result = withFile(wranglerToml, withRegion("us-central1"), () =>
     withFiles(
@@ -302,6 +302,7 @@ test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
         "docs/connectors/slack.md",
         "docs/connectors/supabase/blueprint-navigation.md",
         "docs/connectors/supabase/overview.md",
+        "docs/connectors/supabase/blueprint.md",
       ],
       frontmatterOnly,
       () => runBundler(["--check"]),

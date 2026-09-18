@@ -1,6 +1,12 @@
 /**
  * The design system's tokens module: one grammar, one resolver, one set of
- * contrast maths, one ratchet (#506, parent #491 § "Tokens module (C)").
+ * contrast maths (#506, parent #491 § "Tokens module (C)").
+ *
+ * IT NO LONGER HOLDS THE RATCHET. #506 put the baseline classifier here because
+ * nine of the baselines it served were colour records; #599 moved it to
+ * `scripts/lib/ratchet.mjs`, with the record's shape, its reasons and its
+ * `--update` write, because a baseline record is a harness concern and has
+ * nothing to do with colour maths. What stays here is what a colour is.
  *
  * WHY IT LIVES HERE AND NOT IN `scripts/`. The WCAG core this file now holds
  * was correct and well tested inside `scripts/button-contrast.mjs` — and
@@ -205,85 +211,4 @@ export function contrast(foreground, background) {
 /** `#rrggbb` for a resolved colour, so two grounds can be compared by name. */
 export function toHex({ r, g, b }) {
   return `#${[r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('')}`;
-}
-
-/* ─── THE RATCHET ──────────────────────────────────────────────────────────── */
-
-/**
- * Normalise either side of a ratchet into `Map<key, count>` plus the original
- * entries, so one function serves every baseline shape the repo has written.
- *
- * Accepted: an array of keys (each counted once, which is the shape
- * `button-contrast-baseline.json` uses), a plain object of key → count, a
- * plain object of key → `{count, …}` (the shape `text-contrast-baseline.json`
- * uses, where the rest of the record is the human's reason), or a Map of
- * either. Insertion order is preserved, because callers render in it.
- */
-function tally(side) {
-  const counts = new Map();
-  const entries = new Map();
-  if (!side) return { counts, entries };
-
-  const pairs = Array.isArray(side)
-    ? side.map((key) => [key, 1])
-    : side instanceof Map ? [...side.entries()] : Object.entries(side);
-
-  for (const [key, value] of pairs) {
-    const count = typeof value === 'number' ? value : Number(value?.count ?? 1);
-    counts.set(key, Number.isFinite(count) ? count : 1);
-    entries.set(key, typeof value === 'object' && value !== null ? value : undefined);
-  }
-  return { counts, entries };
-}
-
-/**
- * A ratchet, not a threshold: classify a run's failures against a recorded
- * baseline.
- *
- * Nine baseline files across `scripts/` each spelled this rule for themselves
- * and none of them spelled all of it. The rule, entire:
- *
- *   NEW    a failure the baseline does not record. The build fails: fix it, or
- *          record it with a reason.
- *   KNOWN  a failure the baseline records. Silent — unless `rose` is set,
- *          because a recorded count may SHRINK and must never GROW.
- *   FIXED  a recorded entry that no longer occurs. Also a failure, and the
- *          direction most baselines forget: a fix that leaves its exemption
- *          behind turns the baseline into a list of things nobody has looked
- *          at. A ratchet that cannot shrink is a list.
- *
- * It classifies and nothing else. How a caller WORDS a finding, and whether
- * `rose` or `fixed` is fatal for that particular check, stays with the check —
- * which is what keeps the existing reports byte-identical.
- *
- * @param {string[]|Record<string, number|{count?: number}>|Map<string, unknown>} failures
- * @param {string[]|Record<string, number|{count?: number}>|Map<string, unknown>} [baseline]
- * @returns {{
- *   new: {key: string, count: number}[],
- *   known: {key: string, count: number, recorded: number, rose: boolean, entry: object|undefined}[],
- *   fixed: {key: string, recorded: number, entry: object|undefined}[],
- * }}
- */
-export function ratchet(failures, baseline) {
-  const found = tally(failures);
-  const recorded = tally(baseline);
-
-  const fresh = [];
-  const known = [];
-  for (const [key, count] of found.counts) {
-    if (!recorded.counts.has(key)) {
-      fresh.push({ key, count });
-      continue;
-    }
-    const was = recorded.counts.get(key);
-    known.push({ key, count, recorded: was, rose: count > was, entry: recorded.entries.get(key) });
-  }
-
-  const fixed = [];
-  for (const [key, was] of recorded.counts) {
-    if (found.counts.has(key)) continue;
-    fixed.push({ key, recorded: was, entry: recorded.entries.get(key) });
-  }
-
-  return { new: fresh, known, fixed };
 }
