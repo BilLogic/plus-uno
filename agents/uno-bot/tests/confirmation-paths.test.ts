@@ -52,6 +52,7 @@ import {
   type TurnSettlement,
 } from "../src/turn/index";
 import { runButtonDoor, type ButtonDoorTarget } from "../src/slack/button-door";
+import { STALE_POST } from "../src/slack/gate-note";
 
 // ── one staged proposal, and the four signals that resolve it ────────────────
 

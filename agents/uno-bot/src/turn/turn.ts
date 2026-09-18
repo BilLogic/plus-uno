@@ -19,18 +19,15 @@
 //
 // AND THE CARD GOES OVER THAT SEAM AS DATA (#623). `buildCard` below decides
 // which card a staged proposal gets, what verb names it, which caveats a person
-// must see and which batch the ✅ runs; `slack/proposal-render.ts` decides how
-// all of that reads, and the turn stores and remembers what the adapter reports
-// posting. The turn's own words are still its own — a clarifying question, the
-// backstop lines, the cancelled-that bounce — and those go through `postNote`
-// as before. What is gone is the turn spelling Slack mrkdwn for the two things
-// a person ACTS on: the card, and a gate verdict.
-//
-// WHAT IS STILL IMPORTED FROM `slack/` and is not the card's business:
-// `renderDeliveredBody` (the judges score the draft as Slack will deliver it)
-// and the antecedent window (a block the MODEL reads, not a person). Both are
-// honest residue rather than the leak #623 closed, and both are named in the
-// issue's report.
+// must see and which batch the ✅ runs; `Delivery.card` is the hand-over, and
+// `slack/proposal-render.ts` decides how all of that reads. The turn stores and
+// remembers what the adapter reports posting. The turn's own words are still
+// its own — a clarifying question, the backstop lines, the cancelled-that
+// bounce — and those go through `postNote` as before. What is gone is the turn
+// spelling Slack mrkdwn for the two things a person ACTS on: the card, and a
+// gate verdict. The antecedent window and the body the judges score used to
+// import Slack too; they live on `TurnDeps` and `./antecedent` now, so this
+// file names no Slack module.
 //
 // SO THE CALLER IS NOT SLACK. A request carries who, where, the text, the
 // images as BYTES already decoded, and the pending proposal; nothing in here
@@ -63,19 +60,18 @@ import type { ModelTier } from "../agent/routing";
 import { resolveSignal, type GateVerdict } from "../gate/index";
 import { collectStrings } from "../agent/tool-input";
 import { gateWordsFor } from "../agent/tool-table";
-import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "../slack/antecedent";
-import { renderDeliveredBody } from "../slack/render";
-import type { AssistantContext } from "../slack/types";
-import type { VisionReference } from "../slack/vision-reference";
 import {
   MAX_HISTORY_TURNS,
   proposalOperations,
   proposalReplyThread,
+  type AssistantContext,
   type HistoryTurn,
   type PendingProposal,
   type ThreadRef,
   type ThreadState,
+  type VisionReference,
 } from "../thread-state/index";
+import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import {
   withWorkingSignal,
   type CardCaveat,
@@ -378,6 +374,18 @@ export interface TurnDeps {
 
   /** One line naming the surface the person has open in the panel, or null. */
   describeAssistantContext(context: AssistantContext | null): string | null;
+
+  /**
+   * The body the judges score: how this surface will actually deliver the draft.
+   *
+   * Slack strips trailing confidence labels and substitutes an empty-answer
+   * placeholder (`slack/render.ts` `renderDeliveredBody`). A recording is the
+   * identity, because a turn test is asserting the draft, not Slack's copy.
+   * Injected so this file never imports a Slack module (#623).
+   *
+   * @param text the model's draft, before posting
+   */
+  deliveredBody(text: string): string;
 
   /** Structured state + progressive summarisation (`CONTEXT_STATE`). Flagged
    *  off in production; see the header of `agent/context-state.ts`. */
@@ -932,7 +940,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // holds the ✅/⛔ buttons and has to be the last message in the thread — is
   // the adapter's to send, since it is Slack's message limits that decide
   // whether there is anything to send at all (#623).
-  const posted = await delivery.stageProposal(card);
+  const posted = await delivery.card(card);
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] proposal card was not staged (${result.toolName})`);
     return {
@@ -1076,7 +1084,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   const servedFromCache = run.receipt?.cached === true;
   let verdict: ConfidenceVerdict = { kind: "exempt" };
   try {
-    verdict = judgeConfidence(renderDeliveredBody(draft), { retrievalRan, servedFromCache });
+    verdict = judgeConfidence(deps.deliveredBody(draft), { retrievalRan, servedFromCache });
   } catch (err) {
     // Fail open, in the same direction as the judge itself: a missing
     // confidence clause is a smaller harm than a dropped answer.
@@ -1093,7 +1101,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   let absenceRepair: string | undefined;
   if (run.absence) {
     try {
-      if (judgeAbsence(renderDeliveredBody(draft)) === "unscoped") {
+      if (judgeAbsence(deps.deliveredBody(draft)) === "unscoped") {
         absenceRepair = absenceRepairInstruction(run.absence);
         console.log(`[absence] unscoped claim over ${run.absence.visibility} — forcing repair`);
       }
@@ -1135,7 +1143,7 @@ async function finishTextTurn(draft: string, ctx: TextTurnCtx): Promise<TurnOutc
   // here would cost another model call per turn and could land in the same
   // place anyway.
   try {
-    const finalVerdict = judgeConfidence(renderDeliveredBody(reviewed.text), {
+    const finalVerdict = judgeConfidence(deps.deliveredBody(reviewed.text), {
       retrievalRan,
       servedFromCache,
     });
@@ -1295,7 +1303,7 @@ function implementPrdUrlFor(
  * message-size limits (#623). What it owns now is the decisions: which card
  * this is, which verb names it, which caveats a person must see, and the WHOLE
  * batch the one ✅ runs. `slack/proposal-render.ts` § `renderProposalCard`
- * decides how all of that reads, and `Delivery.stageProposal` reports back what
+ * decides how all of that reads, and `Delivery.card` reports back what
  * it actually posted.
  *
  * The card is still the SOURCE OF TRUTH for what a ✅ runs: `operations` is the

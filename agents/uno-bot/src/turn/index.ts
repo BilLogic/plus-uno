@@ -20,3 +20,4 @@
 export * from "./turn";
 export * from "./delivery";
 export * from "./request";
+export * from "./antecedent";

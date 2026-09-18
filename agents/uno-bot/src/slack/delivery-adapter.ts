@@ -556,7 +556,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
     // card. Gate hands over which verdict it is; `slack/gate-note.ts` says it.
     postGateNote: (note) => postNote(renderGateNote(note)),
 
-    async stageProposal(card: ProposalCard): Promise<PostResult> {
+    async card(card: ProposalCard): Promise<PostResult> {
       // THE CARD ARRIVES AS DATA and is spelled here (#623): the turn decided
       // what a person is being asked to approve, and this is where that becomes
       // mrkdwn, an ⚠️, a confirm footer and a button row.

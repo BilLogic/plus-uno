@@ -13,7 +13,7 @@
 // loose ⏳ message is the Slack adapter's business
 // (`slack/delivery-adapter.ts`, built from `Env` by `slack/slack-delivery.ts`).
 //
-// WHICH NOW HOLDS FOR THE TWO THINGS A PERSON ACTS ON. `stageProposal` takes a
+// WHICH NOW HOLDS FOR THE TWO THINGS A PERSON ACTS ON. `card` takes a
 // `ProposalCard` that is DATA — a verb, a lead, the staged fields, the caveats
 // the turn decided, the whole batch — and `postGateNote` takes a `GateNote`.
 // Both used to be strings the caller had already spelled in Slack mrkdwn, from
@@ -303,7 +303,8 @@ export interface Delivery {
   postGateNote(note: GateNote): Promise<PostResult>;
 
   /**
-   * Stage a proposal card.
+   * Stage a proposal card — the agreed hand-over (#623):
+   * `Turn ──► Delivery.card({ kind, subject, fields, actions })`.
    *
    * The ts it comes back with is the card's identity — what a ✅ resolves
    * against — so a null ts means nothing was staged. `text` on the result is
@@ -315,8 +316,10 @@ export interface Delivery {
    * Slack message goes out as its own messages, before the card, so the
    * buttons stay the last thing in the thread. That is the adapter's business
    * because it is Slack's size limits doing the deciding.
+   *
+   * @param proposal what the person is being asked to approve
    */
-  stageProposal(card: ProposalCard): Promise<PostResult>;
+  card(proposal: ProposalCard): Promise<PostResult>;
 
   /** Make a failure visible. Best-effort and never throwing, because the one
    *  thing worse than an error message is silence. */
@@ -476,8 +479,8 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       return { ok: true, text, ts: `note-${calls.length}` };
     },
 
-    async stageProposal(card) {
-      const { text, followUp } = spelling.card(card);
+    async card(proposal) {
+      const { text, followUp } = spelling.card(proposal);
       // A plan too long for one Slack message goes out as its own messages
       // BEFORE the card, so the buttons stay last — recorded here in that same
       // order, and recorded whether or not the card itself then lands.
@@ -485,8 +488,8 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
         calls.push({ kind: "note", text: message });
         posted.push(message);
       }
-      calls.push({ kind: "proposal", card });
-      stagedCards.push(card);
+      calls.push({ kind: "proposal", card: proposal });
+      stagedCards.push(proposal);
       if (opts.stagingFails) return { ok: false, text };
       posted.push(text);
       const ts = `card-${++staged}`;

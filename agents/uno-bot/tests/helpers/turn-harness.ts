@@ -251,6 +251,8 @@ export function harness(opts: {
     },
 
     describeAssistantContext: () => null,
+
+    deliveredBody: (text) => text,
   };
 
   return { deps, delivery, threadState, provider, resolved, ran, judged, executed };

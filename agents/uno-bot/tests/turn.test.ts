@@ -14,7 +14,7 @@
 // flow tests that drive a turn and then ask Gate what a person was told (#583).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 
 import {
@@ -1203,18 +1203,19 @@ test("a brief staged with no named gap carries that caveat as data, not as Slack
   assert.equal(outcome.staged?.card.verb, "scaffold a new prototype from this Figma design");
 });
 
-test("Turn's decision files do not import Slack's card or verdict renderers", () => {
-  // Residue named in turn.ts still imports slack/antecedent and slack/render
-  // (the model's window, and the body the judges score). The leak #623 closed
-  // is the other direction: Turn spelling a card or a verdict.
-  for (const file of ["src/turn/turn.ts", "src/turn/delivery.ts", "src/turn/index.ts"]) {
-    const src = readFileSync(resolve(process.cwd(), file), "utf8");
-    for (const banned of ["proposal-render", "gate-note", "batch-result", "notion-card"]) {
-      assert.equal(
-        new RegExp(`from ["']\\.\\./slack/${banned}["']`).test(src),
-        false,
-        `${file} imports slack/${banned}`,
-      );
-    }
+test("Turn does not import a Slack module", () => {
+  // env-deps.ts is the wiring layer: Env becomes TurnDeps, so it names Slack
+  // on purpose. The rest of the module — including the antecedent window and
+  // the body the judges score — does not (#623).
+  const dir = resolve(process.cwd(), "src/turn");
+  const files = readdirSync(dir).filter((f) => f.endsWith(".ts") && f !== "env-deps.ts");
+  assert.ok(files.includes("turn.ts"), "the turn itself is in the sample");
+  for (const file of files) {
+    const src = readFileSync(resolve(dir, file), "utf8");
+    assert.equal(
+      /from ["']\.\.\/slack\//.test(src),
+      false,
+      `${file} still imports a Slack module`,
+    );
   }
 });

@@ -170,6 +170,8 @@ function harness(
     },
 
     describeAssistantContext: () => null,
+
+    deliveredBody: (text) => text,
   };
 
   return { deps, delivery, threadState, provider, resolutions, gate, agent };

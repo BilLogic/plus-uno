@@ -30,6 +30,7 @@ import type { GateVerdict } from "../gate/index";
 import { conversationsHistoryBefore } from "../slack/api";
 import { formatAssistantContext } from "../slack/assistant";
 import { buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
+import { renderDeliveredBody } from "../slack/render";
 import { fetchFigmaImagePngUrl, parseFigmaUrl } from "../integrations/figma";
 import type { ThreadState } from "../thread-state/index";
 import type { Env } from "../types";
@@ -183,6 +184,8 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     },
 
     describeAssistantContext: (context) => formatAssistantContext(context),
+
+    deliveredBody: (text) => renderDeliveredBody(text),
 
     // Phase 5 — structured state, drift detection and progressive
     // summarisation. FLAGGED OFF by default; see the header of
