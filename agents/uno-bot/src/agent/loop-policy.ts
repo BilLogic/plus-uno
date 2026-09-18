@@ -18,7 +18,7 @@ import type { PendingProposal } from "../thread-state/index";
 
 // ── Loop dials ───────────────────────────────────────────────────────────────
 
-// Raised from 5: grounding questions legitimately chain several read-only
+// Raised from 5: grounding questions legitimately chain several ungated
 // searches before the model has enough to answer. If exhausted, the loop falls
 // back to a final tools-disabled synthesis pass rather than erroring out.
 // dial raised 2026-07-09 — team prefers thorough over fast (user decision).
@@ -29,7 +29,7 @@ export const MAX_ITERATIONS = 16;
 // share this budget and Sonnet 5's tokenizer counts ~30% more — 8192 risked an
 // all-thinking, truncated answer. We stream, so no timeout risk.
 export const MAX_TOKENS = 16384;
-// Cap on individual read-only tool executions per request. Each execution costs
+// Cap on individual ungated tool executions per request. Each execution costs
 // Workers subrequests (a blueprint fallback search alone is ~4 fetches); the
 // free plan allows 50 per request — blowing it kills the request mid-flight so
 // hard even the error post fails ("reacted :eyes: then silence"). Past the cap
@@ -38,7 +38,7 @@ export const MAX_TOKENS = 16384;
 // NOTE: 12 sits closer to the subrequest cliff than the old 6 — if "eyes then
 // silence" recurs on search-heavy turns, this is the first dial to look at.
 // Kept as a secondary hard COUNT backstop behind the weighted budget below.
-export const READONLY_TOOL_BUDGET = 12;
+export const UNGATED_TOOL_BUDGET = 12;
 
 // ── Subrequest budget: enforced at the boundary ──────────────────────────────
 //
@@ -96,7 +96,7 @@ export function outOfIterationBudget(used: number): boolean {
 
 // ── Shared prompt strings ────────────────────────────────────────────────────
 
-/** Fed back as a tool result when the read-only budget is spent. */
+/** Fed back as a tool result when the lookup budget is spent. */
 export const BUDGET_EXHAUSTED_LOOKUP_NOTE =
   "Answer NOW from the tool results you already have; if they're insufficient, say exactly what's missing — do not fabricate. If the user asked for an ACTION (filing a card, sending something), you can and should still invoke that one action tool now — actions are not lookups. NEVER mention budgets, limits, turns, or tool mechanics to the user (live 2026-07-10: 'my tool run budget has been exhausted' reached a designer and read as a malfunction). If you couldn't gather everything the user asked for, deliver what you DO have and briefly offer to continue on the SPECIFIC missing piece (e.g. \"I've got X — want me to check Y next?\") — framed as a natural next step, never as an error or a limit.";
 

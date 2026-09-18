@@ -19,7 +19,7 @@ import {
   BUDGET_EXHAUSTED_SYNTHESIS,
   LOOKUP_CEILING,
   MAX_ITERATIONS,
-  READONLY_TOOL_BUDGET,
+  UNGATED_TOOL_BUDGET,
 } from "../src/agent/loop-policy";
 import {
   createInMemoryThreadState,
@@ -63,7 +63,7 @@ function recorder(opts: {
     cancelReads: 0,
     interim: [],
     deps: {
-      async executeReadOnlyTool(name) {
+      async executeUngatedTool(name) {
         rec.executed.push(name);
         return opts.toolResult?.(name) ?? JSON.stringify({ ok: true, rows: [] });
       },
@@ -115,7 +115,7 @@ function loopInput(
 /** The conversation key the stop cases below press on — `loopInput`'s own. */
 const CANCEL_REF: ThreadRef = { channel: "C1", thread: "t1" };
 
-/** A reply that asks for one read-only lookup. */
+/** A reply that asks for one ungated lookup. */
 const LOOKUP = { toolCalls: [{ name: "search_blueprint", args: { query: "reflection" } }] };
 
 function repeat<T>(n: number, value: T): T[] {
@@ -427,7 +427,7 @@ test("hitting the iteration ceiling triggers the tools-disabled synthesis pass",
   assert.deepEqual(nudge, [{ kind: "user", text: BUDGET_EXHAUSTED_SYNTHESIS }]);
   // The count backstop held too: past it the lookups were refused rather than
   // run, so the turn cannot keep spending on a model that will not stop asking.
-  assert.equal(rec.executed.length, READONLY_TOOL_BUDGET);
+  assert.equal(rec.executed.length, UNGATED_TOOL_BUDGET);
 });
 
 test("no iteration budget left goes straight to the synthesis pass", async () => {
@@ -531,7 +531,7 @@ test("lookups past the ceiling are refused without running", async () => {
 
 // ── the narration rule ───────────────────────────────────────────────────────
 
-test("narration is emitted ahead of read-only work", async () => {
+test("narration is emitted ahead of ungated work", async () => {
   const rec = recorder();
   const provider = fake({
     replies: [{ text: "Let me check the blueprint for the reflection path.", ...LOOKUP }, { text: "done" }],
@@ -567,7 +567,7 @@ test("narration is NOT emitted ahead of a side-effect call", async () => {
   });
 });
 
-test("every side-effect call in one reply becomes ONE proposal, and the read-only call still runs", async () => {
+test("every side-effect call in one reply becomes ONE proposal, and the ungated call still runs", async () => {
   // The #554 incident, at the seam it happened: the model asked for two writes
   // and a lookup in a single reply, the loop returned the first write, and the
   // other two vanished with no log and nothing the person could see.

@@ -26,7 +26,7 @@ export type ReferenceMap = Record<string, string>;
 
 /**
  * Serve one document by name. Returns the tool's JSON payload as a string,
- * like every other read-only tool in agent/run-agent.ts.
+ * like every other ungated tool in agent/run-agent.ts.
  *
  * On a miss the payload carries `known` — every name the map holds, sorted —
  * because the model that asked for `uno-maintain/methods` needs the right
