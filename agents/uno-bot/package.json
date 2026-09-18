@@ -28,7 +28,8 @@
     "evals:retrieval": "node scripts/run-retrieval-evals.mjs",
     "evals:retrieval:selftest": "node scripts/run-retrieval-evals.mjs --self-test",
     "test:bundle": "node --test scripts/*.test.mjs",
-    "evals:local": "cd ../.. && node agents/uno-bot/scripts/run-evals.mjs --transport=local"
+    "evals:local": "cd ../.. && node agents/uno-bot/scripts/run-evals.mjs --transport=local",
+    "evals:docs": "node scripts/eval-docs.mjs --write"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.22.0",

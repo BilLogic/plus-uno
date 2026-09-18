@@ -8,13 +8,12 @@
 // same `node --test` pass as everything else.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 
+import { loadCases } from "./eval-case.mjs";
 import { parseArgs, recordCase, reconstructReplies, resolveSubject } from "./eval-record.mjs";
 import { parseRecording } from "./eval-transport-local.mjs";
 
-const FIXTURE = new URL("../../../docs/evals/fixtures/uno-bot-cases.json", import.meta.url);
-const cases = JSON.parse(readFileSync(FIXTURE, "utf8")).cases;
+const { cases } = loadCases();
 const caseById = (id) => cases.find((c) => c.id === id);
 
 /** B2 declares `subject: { need: "scenario-any" }` and asks one question. */

@@ -2,7 +2,7 @@
 
 One file per fixture case, `<case-id>.json`, holding **the model replies that case's turns were answered with** — and nothing else. No scores, no expectations: what a case asserts lives in `../uno-bot-cases.json`, and a recording that carried an expectation would be a second answer key nobody updates.
 
-`agents/uno-bot/scripts/run-evals.mjs --transport=local` replays these through the same `evalTurnRequest → runTurn → evalTurnResponse` path the Worker's `/debug/eval` route takes (`agents/uno-bot/src/eval/turn-adapter.ts`), with the in-memory ThreadState seeded from the runner's history and the recording Delivery. A case with **no** recording here is **skipped** by name — counted apart, never failed.
+`agents/uno-bot/scripts/run-evals.mjs --transport=local` replays these through the same `evalTurnRequest → runTurn → evalTurnResponse` path the Worker's `/debug/eval` route takes (`agents/uno-bot/src/eval/turn-adapter.ts`), with the in-memory ThreadState seeded from the runner's history and the recording Delivery. A case with **no** recording here is reported **ungated** by name — counted apart, never failed, and never silent: a skip nobody counts is a case that gates nothing while reading as though it did.
 
 ## The shape
 
@@ -60,7 +60,7 @@ gh workflow run uno-bot-evals.yml -f mode=record -f cases=B1  # just this one
 gh run download <run-id> -n eval-recordings                   # once it finishes
 ```
 
-`-f cases=` takes a space-separated list of case ids (`-f cases="B1 R7"`) and becomes one `--case=` each; empty means `--all`. Re-recording ONE stale draw should not cost 34 live model runs, because a capture that costs the whole suite is a capture that gets postponed.
+`-f cases=` takes a space-separated list of case ids (`-f cases="B1 R7"`) and becomes one `--case=` each; empty means `--all`. Re-recording ONE stale draw should not cost the whole suite in live model runs, because a capture that costs the whole suite is a capture that gets postponed.
 
 Read what came back before committing it into this directory in its own PR — a recording is an answer replayed against forever, and a bad afternoon is not a fixture.
 
@@ -68,6 +68,10 @@ Every turn either route records is a live billable model run, so the script reco
 
 ## Recorded today
 
-All 34 fixture cases, every one **`captured`** — off a single `mode=record` CI run. So no case skips for want of a recording, and the local run is the whole suite's turn behaviour against one afternoon's draw. `source` per file is the thing to read before trusting a green run; the three that shipped authored with #512 (R3, R5, R11) were replaced by the capture.
+<!-- census:recorded — generated from docs/evals/fixtures/uno-bot-cases.json by agents/uno-bot/scripts/eval-docs.mjs; do not edit by hand -->
+**34 of 34 fixture cases are recorded** — 34 `captured`. No case skips for want of a recording, so the local run is the whole suite's turn behaviour against one afternoon's draw.
+<!-- /census:recorded -->
+
+Off a single `mode=record` CI run. `source` per file is the thing to read before trusting a green run; the three that shipped authored with #512 (R3, R5, R11) were replaced by the capture.
 
 Each file's own `note` says what its draw is, which is where a draw known to be a FAILING one is written down — a recording is not edited to make a case pass; the case is re-recorded (`-f cases=<id>` above).

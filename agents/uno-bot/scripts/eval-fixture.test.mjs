@@ -7,26 +7,20 @@
 // checks them, so this file checks them.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync } from "node:fs";
+import { loadCases, samplesOf } from "./eval-case.mjs";
 import { passesCase } from "./eval-scoring.mjs";
 import { NEED_FIELDS, SUBJECT_NEEDS, placeholdersIn } from "./eval-subjects.mjs";
 
-const FIXTURE = new URL("../../../docs/evals/fixtures/uno-bot-cases.json", import.meta.url);
-const README = new URL("../../../docs/evals/README.md", import.meta.url);
 const PROTOTYPE_SEEDS = new URL("../../../docs/evals/fixtures/uno-prototype-seeds/", import.meta.url);
 
-const raw = JSON.parse(readFileSync(FIXTURE, "utf8"));
-const cases = Array.isArray(raw) ? raw : raw.cases;
-const samplesOf = (c) => (Number.isInteger(c.samples) && c.samples > 1 ? c.samples : 1);
-
-test("the fixture parses and holds cases", () => {
-  assert.ok(Array.isArray(cases) && cases.length > 0);
-});
-
-test("every case id is unique", () => {
-  const ids = cases.map((c) => c.id);
-  assert.equal(new Set(ids).size, ids.length, "duplicate case id");
-});
+// THE ONE LOADER (`eval-case.mjs`). It parses, it validates the declared shape
+// and it refuses a duplicate id, so the three assertions that used to open this
+// file are gone: they are the loader's, and every reader of the fixture gets
+// them now rather than this one. What is left here is what the SHAPE cannot
+// say — the sampling decisions, the subject vocabulary and the plain-text
+// rubric, which are properties of these cases and not of any case.
+const { cases } = loadCases();
 
 test("every case carries its rubric, in plain text", () => {
   // The inverse of what this asserted for one day. Hiding the judgeNote from
@@ -178,15 +172,9 @@ test("no case hard-codes a blueprint row, status value or count", () => {
   }
 });
 
-test("the README's case count matches the fixture", () => {
-  // It said 16 while the file held 20 — R20 and S1–S3 were added without it.
-  // A number in prose that nothing compares is a number that will be wrong.
-  const readme = readFileSync(README, "utf8");
-  const claimed = readme.match(/carries \*\*(\d+) cases\*\*/);
-  assert.ok(claimed, "docs/evals/README.md no longer states a case count in the expected form");
-  assert.equal(
-    Number(claimed[1]),
-    cases.length,
-    `README says ${claimed[1]} cases, fixture holds ${cases.length}`,
-  );
-});
+// THE README'S CASE COUNT is no longer compared here, because it is no longer
+// typed there. It said 16 while the file held 20, and a second document said
+// something else again — so both are generated from the census now, and
+// `eval-docs.test.mjs` fails when what is committed is not what the fixture
+// says. A number nothing compares is a number that will be wrong; a number
+// nobody writes cannot be.

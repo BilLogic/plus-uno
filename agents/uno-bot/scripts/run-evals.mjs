@@ -40,7 +40,12 @@
 // a pull request can run the suite with no deployment, no debug token and no
 // model spend. It measures the turn against a fixed draw, not the model — and
 // only the cases that have a recording in docs/evals/fixtures/recordings/; the
-// rest SKIP by name, counted apart, never failed.
+// rest are reported UNGATED by name, counted apart, never failed.
+//
+// WHAT A CASE IS — its declared shape, its one loader and the census of them —
+// is scripts/eval-case.mjs. Nothing here parses the fixture, and no count in
+// this file or in the documents about it is typed: a run states its census
+// before it starts, and names the cases it could not measure.
 //
 // WHO GRADES is the other dependency, and the same shape: a judge is
 // `{ name, judgeCase(case, transcript) }` and scripts/eval-judge.mjs owns all
@@ -65,12 +70,11 @@
 //
 // Run:  node agents/uno-bot/scripts/run-evals.mjs [--transport=worker|local]
 
-import { readFileSync, writeFileSync } from "node:fs";
-import { execFileSync } from "node:child_process";
+import { writeFileSync } from "node:fs";
 import { argv } from "node:process";
-import { createHash } from "node:crypto";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { censusOf, describeCensus, fixtureStamp, hasOwnSpec, loadCases } from "./eval-case.mjs";
 import { passesCase, toolCallMatches, describeCalls } from "./eval-scoring.mjs";
 import { threadTurn, checkHistory, sentSummary } from "./eval-history.mjs";
 import { applySubject, skipReason } from "./eval-subjects.mjs";
@@ -181,10 +185,10 @@ function checkTurn(spec, resp, historySent = []) {
   return failures;
 }
 
-// Which fixture keys make a turn carry its own assertions (else the case-level
-// spec applies to the final turn only).
-const TURN_SPEC_KEYS = ["expectKind", "expectTool", "expectDecision", "expectTier", "expectLevel", "expectToolCalled", "expectHistory", "forbidTool", "textRegex"];
-const hasOwnSpec = (turn) => TURN_SPEC_KEYS.some((k) => k in turn);
+// WHICH FIXTURE KEYS MAKE A TURN CARRY ITS OWN ASSERTIONS is the case module's
+// (`eval-case.mjs`, `hasOwnSpec`), with the rest of a case's declared shape.
+// The list lived here and the validation lived in a test file, so a key could
+// be added to one and not the other.
 
 // ── What this run measured, and what it measured it with ─────────────────────
 
@@ -200,41 +204,6 @@ function firstBuild(results) {
     }
   }
   return "unknown";
-}
-
-/**
- * The fixture's identity: the repo revision it was read at, and a hash of the
- * bytes actually loaded.
- *
- * BOTH, deliberately. `rev` places the run in history; `sha256` says what was
- * measured even when `rev` cannot — Actions checks out at depth 1, so a
- * per-file `git log` returns nothing unless that commit happened to touch the
- * fixture, and a locally-edited fixture is not the committed one at all. The
- * hash is the fact; the revision is the context.
- */
-function fixtureStamp(path) {
-  const bytes = readFileSync(path);
-  const sha256 = createHash("sha256").update(bytes).digest("hex").slice(0, 12);
-  // stderr ignored on both: git is being ASKED a question it may not be able to
-  // answer (no checkout, a fixture outside the work tree via CASES_PATH), and a
-  // `fatal:` printed into the middle of the eval log reads like the run broke.
-  const git = (args) =>
-    execFileSync("git", args, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
-  let rev = process.env.GITHUB_SHA ?? "";
-  if (!rev) {
-    try {
-      rev = git(["rev-parse", "HEAD"]);
-    } catch {
-      rev = "unknown";
-    }
-  }
-  let dirty = false;
-  try {
-    dirty = git(["status", "--porcelain", "--", path]) !== "";
-  } catch {
-    /* not a checkout — the hash still identifies the bytes */
-  }
-  return { path, rev: `${rev.slice(0, 12)}${dirty ? "+dirty" : ""}`, sha256 };
 }
 
 // ── Which transport a run uses ────────────────────────────────────────────────
@@ -288,7 +257,7 @@ export function parseArgs(args) {
  * fixture case in milliseconds and read the summary it produced (#511).
  *
  * @param {object} deps
- * @param {{name: string, runTurn: Function, fetchSubject?: Function, unsupported?: Function}} deps.transport
+ * @param {{name: string, runTurn: Function, fetchSubject?: Function, unsupported?: Function, recordedCases?: string[]}} deps.transport
  * @param {string} [deps.casesPath]
  * @param {{name: string, judgeCase: (c: object, transcript: object) => Promise<{verdict: string, reason?: string}>}} [deps.judge]
  * @param {(line: string) => void} [deps.log]
@@ -303,7 +272,16 @@ export async function runEvals({
   sleep = (ms) => new Promise((r) => setTimeout(r, ms)),
   pauseMs = PAUSE_BETWEEN_CASES_MS,
 }) {
-  const fixture = JSON.parse(readFileSync(casesPath, "utf8"));
+  const fixture = loadCases(casesPath);
+
+  // WHAT THIS RUN CAN MEASURE, said before it starts. A transport that answers
+  // from recordings reaches only the cases it has one for; the rest skip by
+  // name, which is right — failing them would make a gate that is red by
+  // construction — but a skip nobody counts is a case that gates nothing while
+  // reading as though it did. So they are counted and named here as UNGATED,
+  // and the count travels in the summary.
+  const census = censusOf(fixture.cases, { recorded: transport.recordedCases ?? null });
+  log(`[evals] ${describeCensus(census)}`);
 
   /** A verdict for a case the judge was never asked about. Not "skipped" for
    *  the judge's own reasons — the case failed before grading, or never ran —
@@ -392,12 +370,16 @@ export async function runEvals({
     //
     // SKIPPED, like a condition nothing satisfies: neither a pass nor a
     // failure, out of the denominator, reason recorded. The local transport
-    // covers the recorded cases only, and failing the other 31 would mean a PR
+    // covers the recorded cases only, and failing the rest would mean a PR
     // gate that is red by construction — switched off within a week.
+    //
+    // UNGATED is what the result is MARKED, and the word is the point: this
+    // case was not measured, so whatever it asserts is not being enforced on
+    // this run. `[SKIP]` on its own reads like a case that chose to sit out.
     const unsupported = transport.unsupported?.(rawCase) ?? null;
     if (unsupported) {
-      results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, skipped: true, reason: unsupported, samples: 0 });
-      log(`[SKIP] ${rawCase.id} — ${rawCase.name} (${unsupported})`);
+      results.push({ id: rawCase.id, name: rawCase.name, blocker: !!rawCase.blocker, skipped: true, ungated: true, reason: unsupported, samples: 0 });
+      log(`[UNGATED] ${rawCase.id} — ${rawCase.name} (${unsupported})`);
       continue;
     }
     // ── Run-time subject (#415) ───────────────────────────────────────────────
@@ -505,9 +487,14 @@ export async function runEvals({
     // only a date is unreadable a week later.
     workerBuild: firstBuild(results),
     fixture: fixtureStamp(casesPath),
+    // WHAT THE SUITE IS, counted rather than typed — and which of its cases
+    // this instrument could not reach. `ungated` is the number a reader needs
+    // to know how much of the suite a green run actually stands for.
+    census,
     passed: scored.filter((r) => r.pass).length,
     failed: scored.filter((r) => !r.pass).length,
     skipped: results.length - scored.length,
+    ungated: results.filter((r) => r.ungated).map((r) => r.id),
     blockerFailures,
     results,
   };
@@ -532,9 +519,16 @@ async function main() {
 
   const scored = summary.results.filter((r) => !r.skipped);
   writeFileSync("eval-results.json", JSON.stringify(summary, null, 2));
-  const skipNote = summary.skipped ? `, ${summary.skipped} skipped` : "";
+  const skipped = summary.skipped - summary.ungated.length;
+  const notes = [
+    skipped ? `${skipped} skipped` : null,
+    // Named, never just counted. "2 ungated" is a number; "2 ungated: D1, V1"
+    // is the two assertions this run did not make.
+    summary.ungated.length ? `${summary.ungated.length} UNGATED (${summary.ungated.join(", ")})` : null,
+  ].filter(Boolean);
   console.log(
-    `\n[evals] ${summary.passed}/${scored.length} passed${skipNote} ` +
+    `\n[evals] ${summary.passed}/${scored.length} passed${notes.length ? `, ${notes.join(", ")}` : ""} ` +
+      `of ${summary.census.total} cases ` +
       `(build ${summary.workerBuild}, fixture ${summary.fixture.rev}/${summary.fixture.sha256}) — details in eval-results.json`,
   );
   // Beside the score, always: what the score was judged by. A pass count on its
