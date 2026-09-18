@@ -18,8 +18,7 @@
 
 import type { AgentImage, HistoricalImages } from "../agent/provider-conversation";
 import type { ModelTier } from "../agent/routing";
-import type { HistoryTurn, PendingProposal } from "../thread-state/index";
-import type { VisionReference } from "../slack/vision-reference";
+import type { HistoryTurn, PendingProposal, VisionReference } from "../thread-state/index";
 import type { TurnRequest, TurnSurface } from "./turn";
 
 /**

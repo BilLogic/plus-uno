@@ -33,6 +33,8 @@
 import type { AssistantContext } from "../slack/types";
 import type { VisionReference } from "../slack/vision-reference";
 
+export type { AssistantContext, VisionReference };
+
 // ── Timings ──────────────────────────────────────────────────────────────────
 //
 // Every TTL and lease the module honours, owned here rather than split across

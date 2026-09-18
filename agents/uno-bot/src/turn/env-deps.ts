@@ -6,9 +6,9 @@
 // genuinely differs: their thread store, their Delivery, what a won verdict
 // does, the ts a tool's own posts thread off, and (the eval side only) the
 // reporters an artifact is collected through. Everything else — the agent run,
-// the draft judge, preflight, the three cards, the antecedent read, the panel
-// context line and the context-state flag — is the same wiring for both, and
-// was hand-copied in two files until it drifted.
+// the draft judge, preflight, the three card reads, the antecedent read, the
+// panel context line and the context-state flag — is the same wiring for both,
+// and was hand-copied in two files until it drifted.
 //
 // WHY THIS FILE TAKES `Env` when the rest of the module refuses to. It is the
 // boundary itself: `Env` enters here and stops here, the way it stops in
@@ -29,8 +29,9 @@ import type { ToolCall, ToolResultNote } from "../agent/tool-transcript";
 import type { GateVerdict } from "../gate/index";
 import { conversationsHistoryBefore } from "../slack/api";
 import { formatAssistantContext } from "../slack/assistant";
-import { buildNotionArchiveTargetNote, buildNotionUpdateBody } from "../slack/notion-card";
-import { buildImplementDesignProposal } from "../slack/proposal-figma";
+import { buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
+import { renderDeliveredBody } from "../slack/render";
+import { fetchFigmaImagePngUrl, parseFigmaUrl } from "../integrations/figma";
 import type { ThreadState } from "../thread-state/index";
 import type { Env } from "../types";
 import type { Delivery } from "./delivery";
@@ -157,11 +158,22 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
 
     applyVerdict: (verdict) => wiring.applyVerdict(verdict),
 
+    // The three reads a card needs and Turn may not make itself. Each answers
+    // with a STRUCTURE the turn puts on the card; the words are the Slack
+    // adapter's (#623).
     cards: {
-      notionUpdateBody: (input) => buildNotionUpdateBody(env, input),
-      notionArchiveTargetNote: (input) => buildNotionArchiveTargetNote(env, input),
-      implementDesignCard: (input, requesterUserId, previewText) =>
-        buildImplementDesignProposal(env, input, requesterUserId, previewText),
+      notionRevision: (input) => buildNotionRevision(env, input),
+      notionTarget: (input) => buildNotionTarget(env, input),
+      // The Figma render behind a `prototype_scaffold` card. Best-effort by
+      // contract: no url, an unparseable one or a failed render all mean no
+      // preview, and the card posts as every other card does. It used to build
+      // the whole card — text, image block, footer and buttons — in
+      // `slack/proposal-figma.ts`, which is a module this one line replaced.
+      async designPreviewImage(input) {
+        const figmaUrl = typeof input.figma_url === "string" ? input.figma_url : "";
+        const parts = figmaUrl ? parseFigmaUrl(figmaUrl) : null;
+        return parts ? await fetchFigmaImagePngUrl(env, parts.fileKey, parts.nodeId, 1) : null;
+      },
     },
 
     async readAntecedent(channel, beforeTs, limit) {
@@ -172,6 +184,8 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     },
 
     describeAssistantContext: (context) => formatAssistantContext(context),
+
+    deliveredBody: (text) => renderDeliveredBody(text),
 
     // Phase 5 — structured state, drift detection and progressive
     // summarisation. FLAGGED OFF by default; see the header of

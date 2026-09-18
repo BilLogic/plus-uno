@@ -32,7 +32,7 @@ import {
 import { TOOL_BODIES } from "../src/agent/tool-bodies";
 import { retrievalRanIn } from "../src/agent/confidence";
 import { proposalWasAddressed } from "../src/agent/pending-notice";
-import { operationKinds, proposalVerb } from "../src/slack/proposal-render";
+import { operationKinds, renderProposalCard } from "../src/slack/proposal-render";
 import { warrantsReviewRequest } from "../src/slack/api";
 
 function schemasFromDisk(): ToolSchema[] {
@@ -145,8 +145,17 @@ describe("the readers answer from the row", () => {
     for (const name of TOOL_NAMES) {
       const words = gateWordsFor(name);
       if (!words) continue;
-      assert.equal(proposalVerb(name), words.verb, `the card renames ${name}`);
-      assert.notEqual(proposalVerb(name), name, `the card shows a designer ${name}`);
+      // Turn puts the row's verb on the card and the adapter spells it (#623),
+      // so the check is what a person ends up reading rather than a lookup.
+      const card = renderProposalCard({
+        kind: "confirm",
+        verb: words.verb,
+        fields: [],
+        caveats: [],
+        operations: [],
+      });
+      assert.ok(card.text.includes(`About to *${words.verb}*`), `the card renames ${name}`);
+      assert.notEqual(words.verb, name, `the card shows a designer ${name}`);
       const kinds = operationKinds({ toolName: name, input: {} });
       assert.deepEqual(
         kinds.map((k) => k.label),

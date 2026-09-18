@@ -1,10 +1,16 @@
 // Which emoji resolve a staged proposal — as a reaction on the card, or typed
 // alone as a message.
 //
-// Split out of gate.ts so it can be tested: gate.ts reaches for Env, the DO
-// client and the Slack API, none of which exist under `npm test`. This module
-// is pure on purpose — the question "does 👍 authorize an irreversible write"
-// deserves an assertion, not a code review.
+// Gate's own vocabulary, and pure on purpose — the question "does 👍 authorize
+// an irreversible write" deserves an assertion, not a code review.
+//
+// It sat in `slack/` until #623, which is what made `gate/gate.ts` — a module
+// declared Slack-free — import a Slack module. The path was the only thing
+// Slack about it: a reaction event sends an emoji NAME, and what that name
+// MEANS on a card is the gate's policy, exactly as CONTEXT.md's Gate row says.
+// The one genuinely Slack-shaped fact, that a typed emoji arrives as either the
+// glyph or the `:shortcode:` depending on the client, is a fact about the input
+// and is handled below rather than delegated.
 //
 // THIS IS THE WHOLE DETERMINISTIC VOCABULARY. Until 2026-08-22 there were
 // four more lists beside it — confirm/cancel phrases for routing, an

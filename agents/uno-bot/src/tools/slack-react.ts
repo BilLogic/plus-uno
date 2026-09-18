@@ -10,7 +10,7 @@
 // only through the agent entry would drag that entry's Durable Object imports
 // into every reader of the table.
 import { addReaction } from "../slack/api";
-import { GATE_RESERVED } from "../slack/gate-reactions";
+import { GATE_RESERVED } from "../gate/reactions";
 import type { Env, SlackContext } from "../types";
 
 export async function executeSlackReact(

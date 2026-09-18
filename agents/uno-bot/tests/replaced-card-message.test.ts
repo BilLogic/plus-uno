@@ -3,7 +3,7 @@
 // WHY THIS FILE EXISTS (#583). The supersede work (#573/#579) was covered at
 // two seams and both were right: the store's conformance suite proved
 // `putProposal` marks the predecessor superseded, and `confirmation-paths`
-// proved Gate answers a superseded card with `SUPERSEDED_POST`. Five reviews,
+// proved Gate answers a superseded card with the superseded verdict. Five reviews,
 // 692 tests and two ratchets passed — and in `#uno-bot-sandbox` a person who
 // revised a card and then ✅'d the old one still got the vaguer pointer text.
 //
@@ -18,21 +18,36 @@
 // both the reaction door and the button door. The assertion is the WORDING,
 // not only the absence of an execution: "nothing ran" was already true while
 // the message was wrong.
+//
+// Gate now returns a verdict rather than a line (#623), so the wording is
+// reached the way a door reaches it — through `slack/gate-note.ts`, the one
+// place a verdict becomes words. Asserting the note's kind alone would give
+// this file back the blind spot it was written to close.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import {
-  STALE_POST,
-  SUPERSEDED_POST,
   resolveSignal,
   type GateSignal,
   type GateVerdict,
 } from "../src/gate/index";
+import {
+  EXPIRED_POST,
+  STALE_POST,
+  SUPERSEDED_POST,
+  defaultNarrative,
+  renderGateNote,
+} from "../src/slack/gate-note";
 import { runTurn, type TurnOutcome } from "../src/turn/index";
 import type { PendingProposal } from "../src/thread-state/index";
 import { CHANNEL, CONVERSATION, REF, harness, request } from "./helpers/turn-harness";
 
 const USER = "U1";
+
+/** What the door would put in the thread: the verdict, spelled by the one
+ *  renderer every door reaches through `Delivery.postGateNote` (#623). */
+const said = (verdict: GateVerdict): string =>
+  verdict.post ? renderGateNote(verdict.post.note) : "";
 
 /** The two model replies the flow needs: a card, then its revision. */
 const REPLIES = [
@@ -120,7 +135,7 @@ test("a ✅ on the card a revision replaced is told it was replaced, through bot
     // is not on the proposal I am holding" — is a true thing to say about a
     // reaction that missed, and the wrong thing to say to someone whose card
     // was replaced out from under them.
-    assert.equal(verdict.post?.text, SUPERSEDED_POST, door);
+    assert.equal(said(verdict), SUPERSEDED_POST, door);
     assert.equal(verdict.outcome, "stale", door);
     // And still the guarantee #573 bought: the input they pushed back on does
     // not run.
@@ -135,7 +150,7 @@ test("a ⛔ on the replaced card is told the same, and leaves the revision live"
     threadState: h.threadState,
   });
 
-  assert.equal(verdict.post?.text, SUPERSEDED_POST);
+  assert.equal(said(verdict), SUPERSEDED_POST);
   assert.equal(verdict.execute, undefined);
   // A decision about a retired card is not a decision about the live one: the
   // person still has something to confirm.
@@ -156,7 +171,7 @@ test("the revised card still resolves normally, through both doors", async () =>
 
     assert.equal(verdict.outcome, "won", door);
     assert.equal(verdict.decision, "confirm", door);
-    assert.equal(verdict.post?.text, "Got it — kicking that off.", door);
+    assert.equal(said(verdict), defaultNarrative("confirm"), door);
     assert.deepEqual(verdict.execute?.input, { title: "Reflection redesign, tutors only" }, door);
   }
 });
@@ -195,8 +210,8 @@ test("a ✅ that misses every card still gets the pointer, and executes nothing"
 
   assert.equal(verdict.outcome, "none");
   assert.equal(verdict.execute, undefined);
-  assert.match(verdict.post?.text ?? "", /not on the proposal I am holding/);
-  assert.match(verdict.post?.text ?? "", /notion_create/);
+  assert.match(said(verdict), /not on the proposal I am holding/);
+  assert.match(said(verdict), /notion_create/);
   // And the card it pointed at is still there to be clicked.
   assert.equal((await h.threadState.getProposalByTs(cardTs)).state, "found");
 });
@@ -231,7 +246,7 @@ test("a model-decided confirm on a card retired mid-flight executes nothing", as
   assert.equal(verdict.execute, undefined, "the input the person pushed back on stays unrun");
   // And the person is told the true thing. "Another confirmation got there
   // first" would invent a second person; their card was revised.
-  assert.equal(verdict.post?.text, SUPERSEDED_POST);
+  assert.equal(said(verdict), SUPERSEDED_POST);
   // The record is refused, not consumed, so it keeps saying so.
   assert.equal((await h.threadState.getProposalByTs(stale.proposalTs)).state, "superseded");
 });
@@ -252,5 +267,33 @@ test("a lost race on a LIVE card still reads as already resolved", async () => {
   );
   assert.equal(lost.outcome, "stale");
   assert.equal(lost.execute, undefined);
-  assert.equal(lost.post?.text, STALE_POST);
+  assert.equal(said(lost), STALE_POST);
+});
+
+test("the Slack renderer is the one place a verdict becomes words", () => {
+  // What a person reads, pinned at the renderer so a wording change in Gate
+  // cannot silently ship (#623). The mention and the emoji live here; Gate
+  // hands over the facts.
+  assert.equal(renderGateNote({ kind: "expired" }), EXPIRED_POST);
+  assert.equal(renderGateNote({ kind: "already-resolved" }), STALE_POST);
+  assert.equal(renderGateNote({ kind: "superseded" }), SUPERSEDED_POST);
+  assert.equal(renderGateNote({ kind: "resolved", decision: "confirm" }), defaultNarrative("confirm"));
+  assert.equal(renderGateNote({ kind: "resolved", decision: "cancel" }), defaultNarrative("cancel"));
+  assert.equal(renderGateNote({ kind: "said", text: "Filing it now." }), "Filing it now.");
+
+  const pointer = renderGateNote({
+    kind: "not-on-the-card",
+    toolName: "notion_create",
+    glyph: "white_check_mark",
+    userId: "U2",
+  });
+  assert.match(pointer, /<@U2>/);
+  assert.match(pointer, /:white_check_mark:/);
+  assert.match(pointer, /:eyes:/);
+  assert.match(pointer, /notion_create/);
+
+  const failed = renderGateNote({ kind: "resolve-failed", glyph: "white_check_mark" });
+  assert.match(failed, /:white_check_mark:/);
+  assert.match(failed, /:warning:/);
+  assert.match(failed, /hit a snag executing it/);
 });

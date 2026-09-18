@@ -12,6 +12,14 @@
 // happening", and whether that becomes a task card inside a plan stream or a
 // loose ⏳ message is the Slack adapter's business
 // (`slack/delivery-adapter.ts`, built from `Env` by `slack/slack-delivery.ts`).
+//
+// WHICH NOW HOLDS FOR THE TWO THINGS A PERSON ACTS ON. `card` takes a
+// `ProposalCard` that is DATA — a verb, a lead, the staged fields, the caveats
+// the turn decided, the whole batch — and `postGateNote` takes a `GateNote`.
+// Both used to be strings the caller had already spelled in Slack mrkdwn, from
+// inside modules documented as Slack-free (#623). Now the arrow only ever runs
+// outward: Turn and Gate say what they mean, the Slack adapter says it in
+// Slack, and a recording is HANDED a spelling rather than owning one.
 // Two adapters exist: that one, and `recordingDelivery` below, which every
 // Turn test runs on. A third recording stands one layer further down, for the
 // Slack adapter's own tests: `tests/helpers/recording-slack.ts` stands in for
@@ -20,6 +28,8 @@
 // PURE by design — no `Env`, no Workers type, no fetch — which is what lets
 // the turn's own tests run on the recording adapter beside it, with no Worker
 // anywhere. (Not a compile property: `tsconfig.test.json` globs `src/**`.)
+
+import type { ProposalOperation } from "../thread-state/index";
 
 /** How far a turn got before it failed. Drives what the message the person
  *  sees can honestly promise (`slack/failure-message.ts`). */
@@ -45,13 +55,161 @@ export type TurnSettlement =
    *  a staged card, or answers a clarifying question. */
   | "waiting-on-person";
 
-/** What a turn asks Delivery to stage behind the ✅ gate. `blocks` is present
- *  only for the cards that build their own (the Figma preview); a text-only
- *  card is shaped by the adapter. */
-export interface ProposalCard {
-  text: string;
-  blocks?: unknown[];
+// ── The card ─────────────────────────────────────────────────────────────────
+
+/**
+ * One labelled thing on a card: a staged parameter, or a parameter inside one.
+ *
+ * `label` is the tool input's OWN key, raw — `page_url`, not `Page link`.
+ * Turning a key into words a designer reads is presentation, so the adapter
+ * does it; a card that carried `Page link` would have spelled itself.
+ */
+export interface CardField {
+  label: string;
+  /** A scalar value, which belongs on the label's own line. */
+  value?: string;
+  /** What sits UNDER the label, in the order the input had it: a bare bullet
+   *  for a scalar, a labelled sub-field for anything with structure. */
+  under?: CardRow[];
 }
+
+export type CardRow = { item: string } | { field: CardField };
+
+/**
+ * Something the turn decided a person must see BEFORE pressing ✅.
+ *
+ * A caveat is a JUDGEMENT, so it is the turn's: "this brief named no open
+ * questions" and "this share-out bundle is missing two of its three links" are
+ * both reached by reading the staged input, and both used to be reached inside
+ * the renderer. The WORDS are the adapter's — a caveat carries only which
+ * caveat it is and what it found.
+ */
+export type CardCaveat =
+  /** A PRD-shaped brief that named no ambiguity of its own, so the ✅ is
+   *  knowingly accepting a gap-free reading of it. */
+  | { kind: "no-open-questions" }
+  /** A prototype share-out staged without the bundle's full set of links. */
+  | { kind: "bundle-incomplete"; missing: string[] };
+
+/** The page a write lands on, in the words a Notion read reported — never a
+ *  bare hex id, which is the whole reason the read happens. */
+export interface CardTarget {
+  title: string;
+  parent?: string;
+  url?: string;
+}
+
+/**
+ * A `notion_update` as a revision of a page that already says something: what
+ * it says now, and what it will say.
+ *
+ * Its own shape rather than `fields`, because this card leads with the diff
+ * instead of the ⚠️ preamble — the one proposal that reads as a conversation.
+ */
+export interface CardRevision {
+  /** The page, as the read named it. A `title` the read could not resolve
+   *  leaves the link to name itself — never a bare hex URL. */
+  page?: { url: string; title?: string; parent?: string };
+  /** One changed property: `from` absent where the page has no value yet. */
+  properties: Array<{ label: string; from?: string; to: string }>;
+  /** Blocks rewritten in place, with the first line of each new text — the one
+   *  operation that overwrites words a human already wrote. */
+  rewrite?: { blocks: number; previews: string[] };
+  /** What an append adds: the section headings it writes, or — with none — a
+   *  bare note on the page. */
+  append?: { headings: string[] };
+}
+
+/**
+ * What a turn asks Delivery to stage behind the ✅ gate — as DATA.
+ *
+ * It used to be `{ text, blocks? }`: Slack mrkdwn, the ⚠️, the `:mag:` and the
+ * confirm footer, all built inside Turn from `slack/proposal-render.ts`. So the
+ * import arrow ran from a module declared Slack-free into Slack, a turn test
+ * could only match rendered strings, and the eval suite measured Slack's
+ * spelling as the turn's outcome (#623).
+ *
+ * Now the turn states what a person is being asked to approve and the adapter
+ * spells it: `slack/proposal-render.ts` § `renderProposalCard` is the ONE place
+ * mrkdwn, the emoji and the button row come from, and the recording adapter
+ * below is handed a spelling rather than owning one.
+ *
+ * WHAT IS STILL SPELLED ELSEWHERE, and why it is not a leak: `target` and
+ * `revision` are filled by `TurnDeps.cards`, named clients that perform the
+ * Notion read Turn may not perform itself (`slack/notion-card.ts`). They hand
+ * back these structures, not text — the read is theirs, the words are the
+ * adapter's.
+ */
+export interface ProposalCard {
+  /**
+   * Which card this is.
+   *
+   * `confirm` is the ⚠️ card every gated tool gets: a preamble naming the verb,
+   * then the staged parameters. `revision` is `notion_update`'s — the diff
+   * leads and there is no preamble, because the named page and the
+   * `current → new` lines say it better than a warning would.
+   */
+  kind: "confirm" | "revision";
+  /** What one ✅ does, in the GATED ROW's own words (`agent/tool-table.ts`
+   *  § `GateWords`, #598) — never the bare tool name a designer cannot read. */
+  verb: string;
+  /** The model's own lead line, when it wrote one. Prose, so it passes
+   *  through: this is the one thing on the card the turn did not decide. */
+  lead?: string;
+  /** The concrete page a write lands on, where a read resolved one. */
+  target?: CardTarget;
+  /** The diff, on a `revision` card. */
+  revision?: CardRevision;
+  /** The staged parameters of the batch's FIRST operation. */
+  fields: CardField[];
+  caveats: CardCaveat[];
+  /**
+   * The WHOLE batch this one ✅ runs, in order.
+   *
+   * On the card because the card is what a person consents to: the adapter
+   * groups it by what each operation touches and never truncates it, moving
+   * the full list to its own messages rather than dropping any of it. Turn
+   * used to splice that plan itself and hand the follow-up messages back to be
+   * posted — which put Slack's message-size limits inside the turn.
+   */
+  operations: ProposalOperation[];
+  /** A Figma render of the design a `prototype_scaffold` implements, when one
+   *  could be fetched. A URL, not a block: what Slack does with an image is
+   *  the adapter's. */
+  previewImageUrl?: string;
+}
+
+// ── What Gate's verdict says ─────────────────────────────────────────────────
+
+/**
+ * The verdict a gate signal came to, in the port's words rather than Slack's.
+ *
+ * The port's, not Gate's, for the same reason `TurnSettlement` is: Gate posts
+ * through this port and may not import Slack, so the thing a door hands over
+ * has to be vocabulary the port already holds. Every one of these used to be a
+ * `:hourglass:`-carrying string constant in `gate/gate.ts`, and one of them
+ * carried a `<@user>` mention — which made a module documented as "results,
+ * never effects; no Slack call" the author of Slack copy (#623).
+ *
+ * `slack/gate-note.ts` is where each becomes a line.
+ */
+export type GateNote =
+  /** The claim was won and the signal brought no words of its own. */
+  | { kind: "resolved"; decision: "confirm" | "cancel" }
+  /** The claim was won and the model said what it was doing. Prose, so it
+   *  passes through — the same exemption `ProposalCard.lead` gets. */
+  | { kind: "said"; text: string }
+  /** The lost race: someone else's confirmation got there first. */
+  | { kind: "already-resolved" }
+  /** A ✅ on a card that aged out of the store. */
+  | { kind: "expired" }
+  /** A ✅ on a card a revision replaced (#573). */
+  | { kind: "superseded" }
+  /** A reaction that landed somewhere other than the card it claims: say where
+   *  the live card is, and resolve nothing. */
+  | { kind: "not-on-the-card"; toolName: string; glyph: string; userId: string }
+  /** The door caught the gesture and then failed to run it. */
+  | { kind: "resolve-failed"; glyph: string };
 
 /** What a post actually did. `text` is what was posted, which is not always
  *  what was handed in — the body is stripped and capped on the way out. */
@@ -132,9 +290,36 @@ export interface Delivery {
    *  "you just cancelled that" bounce. No footer, no confidence pre-check. */
   postNote(text: string): Promise<PostResult>;
 
-  /** Stage a proposal card. The ts it comes back with is the card's identity —
-   *  what a ✅ resolves against — so a null ts means nothing was staged. */
-  stageProposal(card: ProposalCard): Promise<PostResult>;
+  /**
+   * Say what a gate signal came to.
+   *
+   * Its own method rather than a `postNote` with the words already in it,
+   * because the four gate doors are the callers that may NOT hold Slack's
+   * copy: three of them live in Gate and one in Turn, and every verdict line
+   * carries an emoji and one of them a user mention. Handing over the verdict
+   * is what lets those lines be spelled once, in the adapter, and asserted as
+   * meanings in `tests/confirmation-paths.test.ts`.
+   */
+  postGateNote(note: GateNote): Promise<PostResult>;
+
+  /**
+   * Stage a proposal card — the agreed hand-over (#623):
+   * `Turn ──► Delivery.card({ kind, subject, fields, actions })`.
+   *
+   * The ts it comes back with is the card's identity — what a ✅ resolves
+   * against — so a null ts means nothing was staged. `text` on the result is
+   * what the adapter actually POSTED, and is what the turn stores as the
+   * proposal's text and writes into the conversation's memory: the turn no
+   * longer has a rendering of its own to store instead (#623).
+   *
+   * An adapter may post MORE than the card — a batch plan too long for one
+   * Slack message goes out as its own messages, before the card, so the
+   * buttons stay the last thing in the thread. That is the adapter's business
+   * because it is Slack's size limits doing the deciding.
+   *
+   * @param proposal what the person is being asked to approve
+   */
+  card(proposal: ProposalCard): Promise<PostResult>;
 
   /** Make a failure visible. Best-effort and never throwing, because the one
    *  thing worse than an error message is silence. */
@@ -154,6 +339,7 @@ export type DeliveryCall =
   | { kind: "interim"; text: string }
   | { kind: "answer"; text: string }
   | { kind: "note"; text: string }
+  | { kind: "gate-note"; note: GateNote }
   | { kind: "proposal"; card: ProposalCard }
   | { kind: "failure"; stage: DeliveryFailureStage; message?: string };
 
@@ -164,9 +350,40 @@ export interface RecordingDelivery extends Delivery {
   readonly posted: string[];
   /** Fake ts values handed back, newest last. */
   readonly stagedAt: string[];
+  /** Every card the turn staged, as the turn MEANT it — which is what a test
+   *  about what a person approves should be asserting, rather than the string
+   *  the spelling below happened to produce. */
+  readonly stagedCards: ProposalCard[];
+  /** Every gate verdict said out loud, as a meaning. */
+  readonly gateNotes: GateNote[];
+}
+
+/**
+ * How a recording turns a card and a verdict into the text it reports posting.
+ *
+ * INJECTED, because the two things a recording is used for want different
+ * answers. A turn test is asserting what the turn meant, and reads `calls`; the
+ * eval route is measuring a real transcript — the card's words reach the model
+ * on the next turn through the thread's history — so it must be spelled exactly
+ * as Slack spells it, and `eval/turn-adapter.ts` hands in
+ * `slack/proposal-render.ts`'s own renderer to get that.
+ *
+ * A caller that hands in nothing gets `describeCard` / `describeGateNote`
+ * below: a flat description in the PORT's vocabulary, deliberately not
+ * Slack-shaped. That is the safe default in both directions — a test that only
+ * wants "a card went up" gets a readable line, and a test that asserts Slack
+ * copy against an unwired recording fails loudly instead of passing on a
+ * lookalike.
+ */
+export interface DeliverySpelling {
+  /** The card's text, and anything the adapter would post BEFORE it. */
+  card(card: ProposalCard): { text: string; followUp?: string[] };
+  gateNote(note: GateNote): string;
 }
 
 export interface RecordingDeliveryOptions {
+  /** How this recording spells a card and a verdict. */
+  spelling?: DeliverySpelling;
   /** Make a post fail, so the turn's "never ✅ a reply that was never
    *  delivered" path is reachable in a test. */
   answerFails?: boolean;
@@ -196,12 +413,20 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
   const calls: DeliveryCall[] = [];
   const posted: string[] = [];
   const stagedAt: string[] = [];
+  const stagedCards: ProposalCard[] = [];
+  const gateNotes: GateNote[] = [];
+  const spelling: DeliverySpelling = opts.spelling ?? {
+    card: (card) => ({ text: describeCard(card) }),
+    gateNote: describeGateNote,
+  };
   let staged = 0;
 
   return {
     calls,
     posted,
     stagedAt,
+    stagedCards,
+    gateNotes,
 
     async react(emoji) {
       calls.push({ kind: "react", emoji });
@@ -245,13 +470,31 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       return { ok: true, text, ts: `note-${calls.length}` };
     },
 
-    async stageProposal(card) {
-      calls.push({ kind: "proposal", card });
-      if (opts.stagingFails) return { ok: false, text: card.text };
-      posted.push(card.text);
+    async postGateNote(note) {
+      calls.push({ kind: "gate-note", note });
+      gateNotes.push(note);
+      const text = spelling.gateNote(note);
+      if (opts.noteFails) return { ok: false, text };
+      posted.push(text);
+      return { ok: true, text, ts: `note-${calls.length}` };
+    },
+
+    async card(proposal) {
+      const { text, followUp } = spelling.card(proposal);
+      // A plan too long for one Slack message goes out as its own messages
+      // BEFORE the card, so the buttons stay last — recorded here in that same
+      // order, and recorded whether or not the card itself then lands.
+      for (const message of followUp ?? []) {
+        calls.push({ kind: "note", text: message });
+        posted.push(message);
+      }
+      calls.push({ kind: "proposal", card: proposal });
+      stagedCards.push(proposal);
+      if (opts.stagingFails) return { ok: false, text };
+      posted.push(text);
       const ts = `card-${++staged}`;
       stagedAt.push(ts);
-      return { ok: true, text: card.text, ts };
+      return { ok: true, text, ts };
     },
 
     async postFailure(stage, err) {
@@ -262,6 +505,50 @@ export function recordingDelivery(opts: RecordingDeliveryOptions = {}): Recordin
       });
     },
   };
+}
+
+// ── The port's own description of a card and a verdict ───────────────────────
+
+/**
+ * A card in the port's words, for a recording nobody handed a spelling to.
+ *
+ * Deliberately NOT Slack-shaped — no mrkdwn, no ⚠️, no confirm footer. A
+ * lookalike would be the worse fake of the two the header warns about: a test
+ * asserting Slack copy would pass here and the real path would still be broken.
+ * What it does carry is everything a reader needs to see which card this is.
+ */
+export function describeCard(card: ProposalCard): string {
+  const parts = [`card(${card.kind}): ${card.verb}`];
+  if (card.lead) parts.push(`lead: ${card.lead}`);
+  if (card.target) parts.push(`target: ${card.target.title}`);
+  for (const field of card.fields) parts.push(describeField(field));
+  for (const caveat of card.caveats) parts.push(`caveat: ${caveat.kind}`);
+  if (card.operations.length > 1) parts.push(`${card.operations.length} operations`);
+  return parts.join("\n");
+}
+
+function describeField(field: CardField): string {
+  const under = (field.under ?? [])
+    .map((row) => ("item" in row ? row.item : describeField(row.field)))
+    .join(", ");
+  const value = field.value ?? "";
+  return `${field.label}: ${[value, under].filter(Boolean).join(" ")}`.trimEnd();
+}
+
+/** A verdict in the port's words, on the same terms. */
+export function describeGateNote(note: GateNote): string {
+  switch (note.kind) {
+    case "resolved":
+      return `gate: ${note.decision}ed`;
+    case "said":
+      return note.text;
+    case "not-on-the-card":
+      return `gate: not-on-the-card (${note.toolName})`;
+    case "resolve-failed":
+      return `gate: resolve-failed (${note.glyph})`;
+    default:
+      return `gate: ${note.kind}`;
+  }
 }
 
 // ── The set/clear pairing, in one place ──────────────────────────────────────

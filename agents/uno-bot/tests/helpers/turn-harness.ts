@@ -16,6 +16,7 @@ import { fakeProvider, type FakeProvider, type ScriptedReply } from "../../src/a
 import { buildProviderConversation } from "../../src/agent/provider-conversation";
 import {
   recordingDelivery,
+  type GateNote,
   type RecordingDelivery,
   type TurnDeps,
   type TurnRequest,
@@ -96,7 +97,9 @@ export interface Harness {
   resolved: Array<{
     toolName: string;
     decision: "confirm" | "cancel";
-    narrative?: string;
+    /** The verdict the door would have said out loud, as a MEANING — the
+     *  wording is `slack/gate-note.ts`'s and is asserted there (#623). */
+    note?: GateNote;
     /** Whether the verdict carried a tool to run — a decline carries none. */
     executed: boolean;
   }>;
@@ -215,7 +218,7 @@ export function harness(opts: {
       resolved.push({
         toolName: verdict.proposal.toolName,
         decision: verdict.decision,
-        ...(verdict.post ? { narrative: verdict.post.text } : {}),
+        ...(verdict.post ? { note: verdict.post.note } : {}),
         executed: verdict.execute !== undefined,
       });
       // The batch runner production's executor is built on, on a case's own
@@ -226,15 +229,20 @@ export function harness(opts: {
       }
     },
 
+    // The three reads a card needs, answering with the STRUCTURES the turn
+    // puts on the card — never words, which are the adapter's (#623).
     cards: {
-      async notionUpdateBody() {
-        return "• *Design Status:* `WIP` → `Ready for QA`";
+      async notionRevision() {
+        return {
+          page: { url: "https://notion.so/a-card", title: "A card", parent: "Roadmap" },
+          properties: [{ label: "Design Status", from: "WIP", to: "Ready for QA" }],
+        };
       },
-      async notionArchiveTargetNote() {
-        return "• *Target:* A card — in Roadmap";
+      async notionTarget() {
+        return { title: "A card", parent: "Roadmap" };
       },
-      async implementDesignCard(_input, _userId, previewText) {
-        return { text: `(figma card) ${previewText ?? ""}`, blocks: [{ type: "image" }] };
+      async designPreviewImage() {
+        return "https://figma.example/preview.png";
       },
     },
 
@@ -243,6 +251,8 @@ export function harness(opts: {
     },
 
     describeAssistantContext: () => null,
+
+    deliveredBody: (text) => text,
   };
 
   return { deps, delivery, threadState, provider, resolved, ran, judged, executed };
@@ -261,5 +271,6 @@ export const postsOf = (delivery: RecordingDelivery): string[] => delivery.poste
  */
 export const stage = (h: Harness): Promise<void> => h.threadState.putProposal(PENDING).then(() => {});
 
-/** The narrative Gate posts when the signal brought no words of its own. */
-export const DEFAULT_CONFIRM_POST = "Got it — kicking that off.";
+/** The verdict Gate comes to when the winning signal brought no words of its
+ *  own. A MEANING: what it reads as in Slack is `slack/gate-note.ts`'s. */
+export const DEFAULT_CONFIRM_NOTE: GateNote = { kind: "resolved", decision: "confirm" };

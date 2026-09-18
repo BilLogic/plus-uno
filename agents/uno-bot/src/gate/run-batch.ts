@@ -10,9 +10,15 @@
 // compiles this file and a test can fail operation two on demand without a
 // Notion account. `agent/resolve-proposal.ts` is the caller that has `Env` and
 // hands in the real side-effect tool table.
+//
+// AND SLACK-FREE, since #623: what the thread is TOLD about a finished batch —
+// the ✅/❌ marks, the grouped mrkdwn list — is `slack/batch-result.ts`. It was
+// written here, which made Gate import `slack/proposal-render.ts` to reuse the
+// card's grouping, and made the module declared "results, never effects" the
+// author of the message a person reads. What stays is the outcome each
+// operation came to, and the history note the MODEL reads.
 
 import type { ProposalOperation } from "../thread-state/index";
-import { groupOperations, operationKindSummary } from "../slack/proposal-render";
 
 /** What one operation came to. */
 export interface OperationOutcome {
@@ -109,38 +115,6 @@ export function batchOutcomeNote(outcomes: OperationOutcome[]): string {
     `(Ran the approved batch of ${outcomes.length} operations: ${done} done, ${outcomes.length - done} failed.)`,
     ...lines,
   ].join("\n");
-}
-
-/**
- * What the thread is told once the batch has run — every operation named, done
- * or failed, so a partial result is visible rather than hidden behind the one
- * that succeeded.
- *
- * Grouped by target and labelled by kind, the same way the card grouped and
- * labelled the plan: the person is checking the result AGAINST the card they
- * approved, and two different shapes for the same batch make them do that
- * matching by hand.
- *
- * `null` for a single operation: nothing there needs disambiguating, and the
- * tool's own reply already says what happened.
- */
-export function batchResultMessage(outcomes: OperationOutcome[]): string | null {
-  if (outcomes.length <= 1) return null;
-  const failed = outcomes.filter((o) => !o.ok).length;
-  const head = failed
-    ? `:warning: Ran ${outcomes.length} operations — ${outcomes.length - failed} done, ${failed} failed:`
-    : `:white_check_mark: Ran all ${outcomes.length} operations:`;
-  const planned = outcomes.map((o) => ({ toolName: o.toolName, input: o.input ?? {} }));
-  const lines: string[] = [];
-  for (const group of groupOperations(planned)) {
-    lines.push(group.heading);
-    for (const i of group.members) {
-      const o = outcomes[i]!;
-      const mark = o.ok ? ":white_check_mark:" : ":x:";
-      lines.push(`  ${i + 1}. ${mark} *${operationKindSummary(planned[i]!)}* — ${o.message}`);
-    }
-  }
-  return [head, ...lines].join("\n");
 }
 
 /**

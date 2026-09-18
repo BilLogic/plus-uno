@@ -1,17 +1,26 @@
-// Proposal-card presentation: turn a staged side-effect tool call into the
-// ⚠️ confirmation card the requester sees. Cards are read by designers, not
+// Proposal-card presentation: turn the `ProposalCard` a turn handed over into
+// the ⚠️ confirmation card the requester sees. Cards are read by designers, not
 // machines — parameters render as labeled `•` bullets, never raw JSON (user
 // decision, 2026-07-12). The executable input lives in the DO's pending state;
 // this text is display-only. (Extracted from events.ts, 2026-07-12.)
-
+//
+// THE CARD ARRIVES AS DATA, and this is the one place it becomes words (#623).
+// `renderProposalCard` is the whole entry: every `:warning:`, every `*bold*`,
+// the confirm footer and the button row come from here and from nowhere else.
+// Until now the text was assembled inside `turn/turn.ts` out of this module's
+// `formatProposal` — so a module declared Slack-free imported Slack, and a turn
+// test could only match the rendered string. What the turn hands over instead
+// is a verb, a lead, the fields, the caveats it decided and the whole batch;
+// what it gets back is what was posted.
+//
 // Import-free collaborators only: this module renders card TEXT and blocks and
-// posts nothing, so the Turn module can build a card without `Env`. The Figma
-// preview card, which needs a render call, lives in `proposal-figma.ts`. The
-// tool table is import-free for the same reason, and the words this module
-// used to keep in two switches are its gated rows' (#598).
-import { collectStrings } from "../agent/tool-input";
-import { gateWordsFor } from "../agent/tool-table";
+// posts nothing. The Figma preview arrives on the card as a URL — the render
+// call that fetches it is a named client on `TurnDeps.cards`, wired in
+// `turn/env-deps.ts`, which is what keeps `Env` out of here.
 import { textSections } from "./render";
+import type { CardCaveat, CardField, CardRevision, ProposalCard } from "../turn/index";
+import type { ProposalOperation } from "../thread-state/index";
+import { gateWordsFor } from "../agent/tool-table";
 
 // One shared confirmation footer on every card. Anyone in the thread may
 // confirm/cancel (the requester lock was removed 2026-07-14), so it names no
@@ -86,136 +95,153 @@ export function proposalCardBlocks(text: string, resolvedNote?: string): unknown
   return blocks;
 }
 
-export function formatProposal(
-  toolName: string,
-  input: Record<string, unknown>,
-  // Kept in the signature for callers that still pass it (the id is stored on the
-  // proposal for the record) — no longer rendered, since anyone can confirm.
-  _requesterUserId: string,
-  previewText: string | undefined,
-  // Optional resolved-target line (e.g. "• *Target:* «title» — in «DB»") shown
-  // above the raw params, so the approver of a write sees the CONCRETE page it
-  // will touch, not just an opaque id. Used for notion_archive.
-  targetNote?: string,
-): string {
-  const body = renderParamsForHumans(input);
+/** A card, as Slack: the notification/fallback text, the blocks when the card
+ *  has any of its own, and the messages that go out BEFORE it. */
+export interface RenderedCard {
+  text: string;
+  blocks?: unknown[];
+  /** Posted before the card, so the buttons stay last in the thread. */
+  followUp?: string[];
+}
+
+/**
+ * The one door: a `ProposalCard` in, Slack in, nothing else.
+ *
+ * Every decision above this line is the turn's — which card, which verb, which
+ * caveats, which batch. Every decision below it is Slack's: the ⚠️, the bullet
+ * shapes, the footer, the button row, and what to do about a plan that will not
+ * fit in one message.
+ */
+export function renderProposalCard(card: ProposalCard): RenderedCard {
+  const body = card.kind === "revision" ? revisionText(card) : confirmText(card);
+  const plan = withOperationPlan(body, card.operations);
+  const followUp = plan.followUp ?? [];
+  if (!card.previewImageUrl) {
+    return followUp.length ? { text: plan.text, followUp } : { text: plan.text };
+  }
+  // The Figma preview card. Its BLOCKS carry the screenshot, the preamble and
+  // the footer; the planned text rides along as Slack's notification and
+  // fallback copy, and as what the button handler re-renders from. A
+  // `prototype_scaffold` is a single operation, so there is no plan to lose.
+  const blocks: unknown[] = [];
+  if (card.lead) blocks.push({ type: "section", text: { type: "mrkdwn", text: card.lead } });
+  blocks.push({
+    type: "image",
+    image_url: card.previewImageUrl,
+    alt_text: "Figma preview of the design to implement",
+  });
+  blocks.push({
+    type: "section",
+    text: { type: "mrkdwn", text: `${aboutTo(card)}\n${renderFields(card.fields)}` },
+  });
+  blocks.push({ type: "section", text: { type: "mrkdwn", text: CONFIRM_FOOTER } });
+  blocks.push(...proposalActionBlocks());
+  return followUp.length ? { text: plan.text, blocks, followUp } : { text: plan.text, blocks };
+}
+
+function aboutTo(card: ProposalCard): string {
+  return `:warning: About to *${card.verb}*:`;
+}
+
+/** The ⚠️ card every gated tool but `notion_update` gets. */
+function confirmText(card: ProposalCard): string {
   const lines: string[] = [];
-  if (previewText) {
-    lines.push(previewText, "");
-  }
-  lines.push(`:warning: About to *${proposalVerb(toolName)}*:`);
-  if (targetNote) lines.push(targetNote);
-  lines.push(body);
-  if (toolName === "shareout_post") {
-    const audit = shareoutBundleNote(input);
-    if (audit) lines.push(audit);
-  }
-  // Missing-context gate, made visible at confirm time (todo 070): the model is
-  // told to name a brief's open questions before staging, but does so
-  // inconsistently. If nothing staged mentions a gap, say so ON the card — the
-  // ✅ then knowingly accepts a gap-free reading of the brief instead of
-  // silently inheriting one.
-  //
-  // Covers PRD-shaped `notion_create` as well as `prototype_scaffold` since
-  // 2026-08-22. Eval P3 regressed 3/3 → 2/3 the moment AGENT.md rule 4 started
-  // steering a build-from-this-brief ask toward staging the PRD card: the flag
-  // existed for one tool and the model reached for the other, so an incomplete
-  // brief was staged with nothing marking it incomplete. A gate that depends on
-  // which tool the model picked is not a gate.
-  const gapGated =
-    toolName === "prototype_scaffold" ||
-    (toolName === "notion_create" && input.surface === "prd");
-  if (gapGated) {
-    const staged = [
-      previewText ?? "",
-      typeof input.notes === "string" ? input.notes : "",
-      JSON.stringify(input.sections ?? ""),
-      typeof input.summary === "string" ? input.summary : "",
-    ]
-      .join(" ")
-      .toLowerCase();
-    if (!/(open question|gap|ambiguit|unspecified|undecided|to confirm|tbd)/.test(staged)) {
-      lines.push(
-        ":mag: *No open questions were named for this brief.* If it leaves anything ambiguous (states, interactions, semantics), cancel and ask — confirming builds it as-is.",
-      );
-    }
-  }
+  if (card.lead) lines.push(card.lead, "");
+  lines.push(aboutTo(card));
+  // The resolved target above the raw params, so the approver of a write sees
+  // the CONCRETE page it will touch, not just an opaque id.
+  if (card.target) lines.push(`• *Target:* ${targetWords(card.target)}`);
+  lines.push(renderFields(card.fields));
+  for (const caveat of card.caveats) lines.push(caveatText(caveat));
   lines.push(CONFIRM_FOOTER);
   return lines.join("\n");
 }
 
-// "Stage, but flag gaps loudly" (Bill, 2026-07-16): a share-out stages
-// immediately with whatever is in hand, and the CARD carries the bundle audit —
-// so ✅ is informed consent to post without the missing pieces, and a weaker
-// model provider can't silently skip the disclosure (renderer-level, not
-// prompt-level). Bundle contract for prototype share-outs: Loom walkthrough +
-// live preview + Decisions DB link (skills/uno-publish/references/method.md).
-function shareoutBundleNote(input: Record<string, unknown>): string | null {
-  const summary = typeof input.summary === "string" ? input.summary : "";
-  if (!/prototype|prototypes|scaffold/i.test(summary)) return null;
-  const haystack = collectStrings(input).join("\n");
-  const missing: string[] = [];
-  if (!/https?:\/\/[^\s]*loom\.com/i.test(haystack)) missing.push("Loom walkthrough");
-  if (!/https?:\/\/[^\s]*(netlify\.app|workers\.dev)/i.test(haystack)) missing.push("live preview");
-  if (!/https?:\/\/[^\s]*(notion\.so|notion\.site|app\.notion\.com)/i.test(haystack)) {
-    missing.push("Decisions DB link");
-  }
-  if (missing.length === 0) return null;
-  return (
-    `:rotating_light: *Bundle incomplete — missing: ${missing.join(" · ")}.*\n` +
-    `:white_check_mark: posts *without* them — or drop the links in this thread first and I'll fold them in.`
-  );
-}
-
-// notion_update gets its OWN conversational card (no ⚠️ preamble): a warm lead,
-// a named + linked card line, and a `current → new` diff — all built by the
-// caller (events.ts), which has the Notion reads. This just frames the lead +
-// body with the shared footer. `body` is the linked-card line + diff bullets.
-export function formatNotionUpdateProposal(
-  previewText: string | undefined,
-  body: string,
-): string {
+/** `notion_update`'s own conversational card: no ⚠️ preamble, because the warm
+ *  lead, the named page and the `current → new` diff say it better. */
+function revisionText(card: ProposalCard): string {
   const lines: string[] = [];
-  if (previewText) lines.push(previewText, "");
+  if (card.lead) lines.push(card.lead, "");
+  const body = card.revision ? revisionBody(card.revision) : "";
   if (body) lines.push(body);
+  for (const caveat of card.caveats) lines.push(caveatText(caveat));
   lines.push(CONFIRM_FOOTER);
   return lines.join("\n");
 }
 
-export function renderParamsForHumans(input: Record<string, unknown>): string {
-  const entries = Object.entries(input).filter(
-    ([, v]) => v !== undefined && v !== null && v !== "",
-  );
-  if (!entries.length) return "• _(no parameters)_";
-  return entries.map(([k, v]) => renderParamEntry(k, v, "")).join("\n");
+function targetWords(target: { title: string; parent?: string }): string {
+  return target.parent ? `${target.title} — in ${target.parent}` : target.title;
 }
 
-function renderParamEntry(key: string, value: unknown, indent: string): string {
-  const label = `${indent}• *${humanizeParamKey(key)}:*`;
-  if (Array.isArray(value)) {
-    if (value.every((item) => typeof item !== "object" || item === null)) {
-      return [label, ...value.map((item) => `${indent}    ◦ ${String(item)}`)].join("\n");
-    }
-    return [
-      label,
-      ...value.map((item) =>
-        typeof item === "object" && item !== null
-          ? Object.entries(item as Record<string, unknown>)
-              .map(([k, v]) => renderParamEntry(k, v, indent + "    "))
-              .join("\n")
-          : `${indent}    ◦ ${String(item)}`,
-      ),
-    ].join("\n");
+function revisionBody(revision: CardRevision): string {
+  const lines: string[] = [];
+  const { page } = revision;
+  if (page) {
+    // Named + linked card — `<url|Title> — in <ParentDB>`, never a bare hex URL.
+    lines.push(
+      page.title
+        ? `*<${page.url}|${page.title}>*${page.parent ? ` — in ${page.parent}` : ""}`
+        : `*<${page.url}|this Notion page>*`,
+    );
   }
-  if (typeof value === "object" && value !== null) {
-    return [
-      label,
-      ...Object.entries(value as Record<string, unknown>).map(([k, v]) =>
-        renderParamEntry(k, v, indent + "    "),
-      ),
-    ].join("\n");
+  // One bullet per changed field, always — `current → new`, values backticked.
+  for (const p of revision.properties) {
+    lines.push(
+      p.from ? `• *${p.label}:* \`${p.from}\` → \`${p.to}\`` : `• *${p.label}:* \`${p.to}\``,
+    );
   }
-  return `${label} ${String(value)}`;
+  if (revision.rewrite) {
+    const { blocks, previews } = revision.rewrite;
+    const head = `• *Rewriting ${blocks} block(s) in place* (the rest of the page is untouched).`;
+    lines.push(
+      previews.length ? `${head}\n${previews.map((t) => `    ↳ _${t}_`).join("\n")}` : head,
+    );
+  }
+  if (revision.append) {
+    const { headings } = revision.append;
+    lines.push(
+      headings.length
+        ? `• *Appending:* ${headings.map((h) => `_${h}_`).join(", ")}`
+        : `• *Appending a note to the page.*`,
+    );
+  }
+  return lines.join("\n");
+}
+
+/**
+ * A caveat, in words.
+ *
+ * WHETHER a caveat is on the card is the turn's judgement and lives in
+ * `turn/turn.ts`; this is only how each one reads. Both of them are informed
+ * consent rather than decoration — "stage, but flag gaps loudly" (Bill,
+ * 2026-07-16) — which is why they sit above the footer and not in the prompt: a
+ * weaker model provider cannot silently skip a disclosure the renderer writes.
+ */
+function caveatText(caveat: CardCaveat): string {
+  if (caveat.kind === "bundle-incomplete") {
+    return (
+      `:rotating_light: *Bundle incomplete — missing: ${caveat.missing.join(" · ")}.*\n` +
+      `:white_check_mark: posts *without* them — or drop the links in this thread first and I'll fold them in.`
+    );
+  }
+  return ":mag: *No open questions were named for this brief.* If it leaves anything ambiguous (states, interactions, semantics), cancel and ask — confirming builds it as-is.";
+}
+
+function renderFields(fields: ReadonlyArray<CardField>): string {
+  if (!fields.length) return "• _(no parameters)_";
+  return fields.map((f) => renderField(f, "")).join("\n");
+}
+
+function renderField(field: CardField, indent: string): string {
+  const label = `${indent}• *${humanizeParamKey(field.label)}:*`;
+  const under = field.under ?? [];
+  if (!under.length) return `${label} ${field.value ?? ""}`;
+  return [
+    label,
+    ...under.map((row) =>
+      "item" in row ? `${indent}    ◦ ${row.item}` : renderField(row.field, `${indent}    `),
+    ),
+  ].join("\n");
 }
 
 function humanizeParamKey(key: string): string {
@@ -245,11 +271,9 @@ const FOLLOW_UP_CHARS = 3500;
 /** How much of a replacement's text a plan line echoes, either side of the →. */
 const GIST = 90;
 
-/** One staged tool call, as the plan reads it. */
-export interface PlannedOperation {
-  toolName: string;
-  input: Record<string, unknown>;
-}
+/** One staged tool call, as the plan reads it — the batch's own row, so the
+ *  plan and the thing a ✅ executes can never be two different shapes. */
+export type PlannedOperation = ProposalOperation;
 
 /** The card text, and — when the full plan would not fit on it — the messages
  *  that carry the plan instead, in the order they are posted. */
@@ -577,13 +601,3 @@ function operationTarget(input: Record<string, unknown>): string | null {
   return null;
 }
 
-/**
- * What the card says it is about to do, in the gated row's own words.
- *
- * The fallback is the bare tool name, which is what a switch arm nobody added
- * used to print at a designer. It is now unreachable for anything the Gate can
- * stage: a gated row carries its `verb` or does not compile.
- */
-export function proposalVerb(toolName: string): string {
-  return gateWordsFor(toolName)?.verb ?? toolName;
-}
