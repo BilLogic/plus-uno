@@ -8,9 +8,16 @@
 //
 // So the shape is: a door builds a signal, `resolveSignal` returns a verdict,
 // the door posts `verdict.post` through its Delivery, and hands the verdict
-// here. Three callers do exactly that — `slack/gate.ts` (reaction),
+// here. Three doors do exactly that — `gate/reaction-door.ts` (reaction),
 // `slack/interactive.ts` (button) and `turn/turn.ts` (typed emoji, and the
 // model's own `proposal_resolve`).
+//
+// A door that names `Env` calls this function directly; a door that takes its
+// dependencies BY NAME (#592 — the reaction door is the first) takes it as one
+// named entry, and the Slack envelope binds `Env` into that entry once. Either
+// way this file is the only place a side-effect tool runs, and every posted
+// verdict may be handed here: the `won` check below is what makes a stale or
+// cancelled one cost nothing.
 //
 // The side-effect tool table lives HERE, folded in from tools/dispatcher.ts
 // (#497), because this gate is its only caller: a confirmed proposal is the one

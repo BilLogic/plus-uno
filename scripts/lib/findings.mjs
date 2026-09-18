@@ -102,12 +102,18 @@ export function report(name, findings, opts = {}) {
 
 /**
  * The CLI half, as one call. `#509` moved every check onto `run(ctx)`, and the
- * entry point each one needs is identical: when this module is the process
- * entry, render its findings and exit on them; when the harness runner imported
- * it, do nothing at all. Written out by hand in 40 files it is 40 chances to
- * get the `import.meta.url` comparison subtly wrong, and one of those mistakes
- * (a check that runs itself on import) is a check that runs inside the runner's
- * own process.
+ * entry point each one needs has the same spine: when this module is the
+ * process entry, render its findings and exit on them; when the harness runner
+ * imported it, do nothing at all. Written out by hand in 40 files it is 40
+ * chances to get the `import.meta.url` comparison subtly wrong, and one of
+ * those mistakes (a check that runs itself on import) is a check that runs
+ * inside the runner's own process.
+ *
+ * The spine is not the whole entry point, which is what `flags` below is for:
+ * a check that also offers `--list` or `--update` has a second branch, and
+ * until #609 it could only get one by hand-rolling the comparison again. Both
+ * branches are now decided here, so there is still exactly one place that
+ * knows how to tell "run as a script" from "imported by the runner".
  *
  * `summary` is a THUNK and is called only when there is nothing to report. A
  * green line usually carries a number the check had to compute — the tightest
@@ -115,13 +121,46 @@ export function report(name, findings, opts = {}) {
  * only meaningful on the passing path; calling it eagerly would crash the
  * failing one.
  *
+ * `flags` is the slot for the TERMINAL side doors a check offers its reader —
+ * `--list`, `--update`, and any `--report` or `--stats` that stops there. A
+ * dispatched flag prints or writes and returns, and the gate below never runs:
+ * the CLI is one branch or the other. Without a slot for them a check had to
+ * hand-roll the entry comparison this function exists to own, which is how the
+ * same three lines came to be written out in six spellings across 23 scripts.
+ *
+ * TERMINAL IS THE WHOLE CONTRACT, AND NOT EVERY SIDE FLAG IN THIS REPO IS ONE.
+ * `--report` in `check-colour-fallbacks.mjs` and `check-size-fallbacks.mjs`,
+ * `--table` and `--how` in `check-atlassian-benchmark.mjs`, `--stats` in
+ * `check-doc-identifiers.mjs`: each prints and then FALLS THROUGH, so the gate
+ * still runs and the exit code is still the findings'. Moving one of those into
+ * this map would make it terminal and stop the check gating — green, quietly,
+ * for whoever typed the flag. So migrating a check means reading what each of
+ * its flags does, not matching the name; a fall-through flag stays where it is
+ * until this slot models one.
+ *
+ * Declaration order decides which of two typed flags wins, so the precedence a
+ * check wants is the order it lists them in; the flags are read from `argv[2]`
+ * on, so the script's own path can never be mistaken for one.
+ *
  * @param {string} moduleUrl  the caller's `import.meta.url`.
  * @param {string} name       the check's npm script name.
- * @param {{run: Function, summary?: Function, remedy?: string}} check
+ * @param {{run: Function, summary?: Function, remedy?: string,
+ *          flags?: Record<string, () => void>}} check
  * @returns {void}  or never, when this module is the entry point.
  */
-export function main(moduleUrl, name, { run, summary, remedy }) {
+export function main(moduleUrl, name, { run, summary, remedy, flags }) {
+  // `pathToFileURL`, not `file://${argv[1]}`: a repo path containing a space or
+  // any non-ASCII char percent-encodes in the URL form and the naive string
+  // never matches — which reads as "imported", so the check silently does
+  // nothing when run by hand. Same idiom as `check-unspread-rest.mjs`.
   if (!process.argv[1] || pathToFileURL(process.argv[1]).href !== moduleUrl) return;
+  const typed = process.argv.slice(2);
+  for (const [flag, handle] of Object.entries(flags ?? {})) {
+    if (typed.includes(flag)) {
+      handle();
+      return;
+    }
+  }
   const findings = run() ?? [];
   report(name, findings, { remedy, summary: findings.length ? undefined : summary?.() });
 }

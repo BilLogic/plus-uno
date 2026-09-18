@@ -64,7 +64,8 @@ The full behavioral contract (voice, grounding rules, gate protocol, Slack etiqu
 ```
 uno-bot/
 ├── AGENT.md              Persona delta (constitution is repo-root AGENTS.md)
-├── tool-definitions.json Local tool schemas (source of truth; read by src/agent/run-agent.ts)
+├── tool-definitions.json Local tool schemas (source of truth; joined to the tool table in
+│                      src/agent/tools.ts, which is what the model's roster is built from)
 ├── wrangler.toml         Worker + Durable Objects + KV + vars/secrets config (+ free-tier constraints)
 ├── package.json / tsconfig.json / .dev.vars.example
 └── src/
@@ -79,7 +80,9 @@ uno-bot/
     │                     loop's dials and strings) · run-agent.ts (the one public entry:
     │                     Env → the loop's ports, adapter choice, read-only tool dispatch) ·
     │                     routing.ts (tiers/model ids) · skills.ts (bundled-harness assembly) ·
-    │                     preflight · draft-judge · tool schemas
+    │                     tool-table.ts (one row per tool: standing + roster columns) ·
+    │                     tool-bodies.ts (one body per row, paired by type) · tools.ts (the
+    │                     join, with the schemas) · preflight · draft-judge
     ├── gemini/           Google auth (Vertex SA / API key) + Gemini REST client
     ├── vertex/           claude.ts — Claude-on-Vertex rawPredict client (reuses gemini/auth)
     ├── slack/            Events · proposal gate · signature verify · mrkdwn · Web-API wrappers
