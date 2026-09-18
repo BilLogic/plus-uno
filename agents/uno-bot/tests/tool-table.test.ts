@@ -68,6 +68,37 @@ describe("the tool table", () => {
   });
 });
 
+describe("the access column partitions the tools across the two dispatches", () => {
+  // What #597 rests on. Both dispatches are `TOOLS_BY_NAME[name]` filtered on
+  // `access` — `agent/run-agent.ts` runs `ungated` inside the turn,
+  // `agent/resolve-proposal.ts` runs `gated` past the Gate, and `control` is
+  // intercepted by the loop before either. Neither module is loadable here
+  // (both name `Env` and reach `tools.ts`, which imports the JSON `tsc` does
+  // not copy into `.test-build/`), so what is checked is the fact they read:
+  // every tool falls to exactly one dispatch, and the one that falls to
+  // neither is named rather than merely absent.
+  it("puts every tool in exactly one of the three standings", () => {
+    const seen = { ungated: 0, gated: 0, control: 0 };
+    for (const name of TOOL_NAMES) {
+      const access = TOOL_TABLE[name].access;
+      assert.ok(access in seen, `${name} has an access no dispatch reads: ${access}`);
+      seen[access]++;
+    }
+    // A degenerate table — nothing gated, say — would satisfy every other
+    // assertion in this file while meaning the Gate is never reached.
+    assert.ok(seen.ungated > 0, "no tool runs inside the turn");
+    assert.ok(seen.gated > 0, "no tool runs past the Gate");
+    assert.equal(seen.ungated + seen.gated + seen.control, TOOL_NAMES.length);
+  });
+
+  it("intercepts proposal_resolve and nothing else", () => {
+    assert.deepEqual(
+      TOOL_NAMES.filter((name) => TOOL_TABLE[name].access === "control"),
+      ["proposal_resolve"],
+    );
+  });
+});
+
 describe("the table's roster columns say what the three readers say", () => {
   // The expand half: the columns land beside the sets that are still read, and
   // this is what holds the two accounts equal until the readers move over.

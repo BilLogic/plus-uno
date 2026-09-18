@@ -3,7 +3,7 @@
 // This module IS the loop's interface to the Worker. Everything the Worker
 // hands an agent turn (`AgentInput`) enters here, and everything that needs an
 // `Env` — the adapter construction, the system prompt, the tool roster, the
-// read-only tool dispatch, the per-turn bookkeeping — stops here. Below it the
+// ungated tool dispatch, the per-turn bookkeeping — stops here. Below it the
 // loop (`loop.ts`) takes named ports and a `ModelProvider`, which is what lets
 // it be compiled and driven by `tests/agent-loop.test.ts` with no Cloudflare
 // runtime.
@@ -13,14 +13,14 @@
 //     `model-provider.ts` and `tool-transcript.ts`. Every caller and every test
 //     already reached the real module; the bag only made the loop's surface look
 //     29 exports wide. Its own contents — `AgentInput`, the per-turn scope, the
-//     correction vocabulary, `executeReadOnlyTool` — are the Env-facing half of
-//     this entry, so they live here and the bag is gone.
+//     correction vocabulary, the ungated tool dispatch — are the Env-facing
+//     half of this entry, so they live here and the bag is gone.
 //   - `gemini-agent.ts` and `claude-agent.ts`, two wiring functions that were
 //     the same sixty lines with one differing expression (which adapter to
 //     construct). Provider selection was a third file (`runAgent`) passing
 //     through to them. All three are one function now: the choice of adapter is
-//     an expression, not a module boundary, and `executeReadOnlyTool` stopped
-//     being exported because those two files were its only callers.
+//     an expression, not a module boundary, and the dispatch stopped being
+//     exported because those two files were its only callers.
 //   - `tool-definitions.ts`, a nine-line re-export of the JSON roster. Its only
 //     importers were those same two files; the roster the model is offered is
 //     now read off the tool table (`agent/tools.ts`), which is where the
@@ -59,17 +59,9 @@ import { geminiProvider } from "./providers/gemini";
 import { claudeProvider } from "./providers/claude";
 import type { ModelTier } from "./routing";
 import type { ModelProvider, SystemBlock, ToolSpec } from "./model-provider";
-import { executeNotionSearch } from "../tools/notion-search";
-import { executeRoadmapQuery } from "../tools/roadmap-query";
-import { executeBlueprintSearch } from "../tools/blueprint-search";
-import { executeReadSource } from "../tools/read-source";
-import { executeGithubRead } from "../tools/github-read";
-import { executeSlackThreadRead } from "../tools/slack-thread-read";
-import { executeSlackSearch } from "../tools/slack-search";
-import { executeSlackUserProfile, executeSlackChannelMembers } from "../tools/slack-people";
-import { readReference } from "../tools/read-reference";
-import { executeSlackReact } from "../tools/slack-react";
-import { TOOLS } from "./tools";
+import type { ToolBody } from "./tool-bodies";
+import { isToolName, type ToolName } from "./tool-table";
+import { TOOLS, TOOLS_BY_NAME } from "./tools";
 import type { ToolCall, ToolResultNote } from "./tool-transcript";
 
 export type { HistoryTurn };
@@ -216,7 +208,7 @@ export async function runAgent(input: AgentInput): Promise<AgentResult> {
   return runLoop({
     provider: selectProvider(env),
     deps: {
-      executeReadOnlyTool: (name, args) => executeReadOnlyTool(env, name, args, slack),
+      executeReadOnlyTool: (name, args) => executeUngatedTool(env, name, args, slack),
       threadState: threadStateFor(env),
       budget: liveBudget,
       ...(input.preflight ? { preflight: input.preflight } : {}),
@@ -427,9 +419,60 @@ function isCorrectionTurn(): boolean {
   return turnScope.getStore()?.correction === true;
 }
 
-// ── Read-only tool execution ─────────────────────────────────────────────────
+// ── Ungated tool dispatch ────────────────────────────────────────────────────
+//
+// ONE LOOKUP. A call names a tool, the table answers with that tool's row, and
+// the row carries both the standing that says whether this dispatch may run it
+// and the body that runs it (`agent/tools.ts`).
+//
+// It was a chain of eleven `if (name === …)` comparisons ending in an
+// `ok:false` that read "not read-only or not implemented" (#597). That ending
+// was reachable for a tool the model had been correctly offered: a name in the
+// union with no arm in the chain fell off the end and came back as a
+// non-answer the model could not tell from a real refusal, and nothing held
+// the chain and the union equal. There is no end to fall off now — every
+// `ungated` row has a body by type, so the arm cannot be the missing thing.
+//
+// The two guards below refuse facts about the NAME that arrived, neither of
+// them about this dispatch's coverage: a name that is no tool at all (the
+// model invented one), and a tool that is not `ungated` (the loop peels those
+// off, so one arriving here is a caller bug). Both answer `ok:false` rather
+// than throw, because the model is the reader.
 
-async function executeReadOnlyTool(
+/**
+ * What the TURN knows that the tool does not — composed around the body rather
+ * than folded into it.
+ *
+ * A body is the tool, and `tool-bodies.ts` is where it is paired with its row.
+ * These three wrappers read the per-turn scope instead: whether this is a
+ * correction turn, and what the turn should remember having looked at. That is
+ * the dispatch's knowledge, so it stays with whoever dispatches. A row with no
+ * wrapper runs its body as it stands.
+ *
+ * The receipts are derived HERE rather than inside the tools, so
+ * `blueprint-search.ts` and `slack-search.ts` stay free of a value-level
+ * import back into this module — the cycle this file was extracted to break.
+ */
+const TURN_WRAPPERS: Partial<Record<ToolName, (body: ToolBody) => ToolBody>> = {
+  search_blueprint: (body) => async (env, input, slack) => {
+    // On a correction turn the cache MUST NOT answer — see withTurnScope.
+    const out = await body(env, isCorrectionTurn() ? { ...input, fresh: true } : input, slack);
+    recordBlueprintReceipt(out);
+    return out;
+  },
+  slack_search: (body) => async (env, input, slack) => {
+    const out = await body(env, input, slack);
+    recordAbsenceSignal(out);
+    return out;
+  },
+  read_reference: (body) => async (env, input, slack) => {
+    const out = await body(env, input, slack);
+    recordReferenceHit(out);
+    return out;
+  },
+};
+
+async function executeUngatedTool(
   env: Env,
   name: string,
   input: Record<string, unknown>,
@@ -438,45 +481,34 @@ async function executeReadOnlyTool(
   // Ledger first: a tool that THREW still ran, and "did this turn fetch
   // anything?" is a question about attempts, not successes.
   turnScope.getStore()?.tools.add(name);
-  if (name === "notion_search") return executeNotionSearch(env, input);
-  if (name === "roadmap_query") return executeRoadmapQuery(env, input);
-  if (name === "search_blueprint") {
-    // On a correction turn the cache MUST NOT answer — see withTurnScope.
-    const out = await executeBlueprintSearch(env, isCorrectionTurn() ? { ...input, fresh: true } : input);
-    // The receipt is derived HERE, not inside the tool, so blueprint-search.ts
-    // stays free of an import back into this module (the value-level cycle this
-    // file was extracted to break).
-    recordBlueprintReceipt(out);
-    return out;
+  if (!isToolName(name)) {
+    return JSON.stringify({ ok: false, error: `no tool named '${name}'` });
   }
-  if (name === "source_read") return executeReadSource(env, input, slack);
-  if (name === "github_read") return executeGithubRead(env, input);
-  if (name === "slack_thread_read") return executeSlackThreadRead(env, input);
-  if (name === "slack_search") {
-    const out = await executeSlackSearch(env, input, slack);
-    // Derived HERE rather than inside the tool, so slack-search.ts stays free
-    // of a value-level import back into this module — the same reason
-    // recordBlueprintReceipt lives here.
-    recordAbsenceSignal(out);
-    return out;
+  const row = TOOLS_BY_NAME[name];
+  if (row.access !== "ungated") {
+    return JSON.stringify({
+      ok: false,
+      error: `'${name}' is ${row.access} and does not run inside the turn`,
+    });
   }
-  if (name === "slack_react") return executeSlackReact(env, input, slack);
-  if (name === "slack_user_profile") return executeSlackUserProfile(env, input);
-  if (name === "slack_channel_members") return executeSlackChannelMembers(env, input);
-  if (name === "read_reference") {
-    // A property lookup, no fetch. Recorded on a HIT only: the receipt says
-    // what the turn read, and a miss read nothing.
-    const out = readReference(input);
-    const store = turnScope.getStore();
-    if (store) {
-      try {
-        const parsed = JSON.parse(out) as { ok?: unknown; name?: unknown };
-        if (parsed.ok === true && typeof parsed.name === "string") store.references.push(parsed.name);
-      } catch {
-        // the receipt is a courtesy to the next turn, never load-bearing
-      }
-    }
-    return out;
+  const wrap = TURN_WRAPPERS[name];
+  return (wrap ? wrap(row.run) : row.run)(env, input, slack);
+}
+
+/**
+ * Record a `read_reference` HIT on the turn's reference list.
+ *
+ * A property lookup, no fetch — and a miss read nothing, so only a hit is
+ * worth carrying past the turn (#423). Best-effort: the list is a courtesy to
+ * the next turn, never load-bearing.
+ */
+function recordReferenceHit(resultJson: string): void {
+  const store = turnScope.getStore();
+  if (!store) return;
+  try {
+    const parsed = JSON.parse(resultJson) as { ok?: unknown; name?: unknown };
+    if (parsed.ok === true && typeof parsed.name === "string") store.references.push(parsed.name);
+  } catch {
+    // the receipt is a courtesy to the next turn, never load-bearing
   }
-  return JSON.stringify({ ok: false, error: `tool '${name}' is not read-only or not implemented` });
 }
