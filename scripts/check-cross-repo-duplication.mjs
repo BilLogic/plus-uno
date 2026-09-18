@@ -125,10 +125,10 @@
  */
 import { appendFileSync, existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 import { documents, frontmatter, stripLinks } from './lib/corpus.mjs';
-import { main } from './lib/findings.mjs';
+import { isEntry, main } from './lib/findings.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(here, '..');
@@ -658,7 +658,9 @@ export function summary() {
   );
 }
 
-if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
+// Not a side flag: the annotation happens on every by-hand run, so this is the
+// entry comparison itself, asked of `isEntry` rather than spelled again (#610).
+if (isEntry(import.meta.url)) {
   // The CI annotation for an unreachable sibling stays on this side of the
   // interface: it is a side effect on the run, not a finding about the repos,
   // and `run()` is called by the harness runner in-process where writing to

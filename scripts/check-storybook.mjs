@@ -63,6 +63,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { isEntry } from './lib/findings.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const BASELINE = path.join(REPO_ROOT, 'docs/evals/a11y-baseline.json');
@@ -472,7 +474,10 @@ function main() {
   return status;
 }
 
-// Importing this module for its exports must not run a browser suite.
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+// Importing this module for its exports must not run a browser suite. The
+// comparison that decides it is `isEntry`'s (#610); `main()` from the findings
+// module is not, because this check's result is an exit code by nature — it
+// declares `kind: 'spawn'` in the registry for the same reason.
+if (isEntry(import.meta.url)) {
   process.exit(main());
 }

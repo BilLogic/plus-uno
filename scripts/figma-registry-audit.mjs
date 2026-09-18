@@ -52,6 +52,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { isEntry } from './lib/findings.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const REGISTRY = 'design-system/figma/component-registry.json';
@@ -147,4 +149,4 @@ function main() {
   );
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
+if (isEntry(import.meta.url)) main();

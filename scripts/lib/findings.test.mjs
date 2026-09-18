@@ -1,12 +1,19 @@
 /**
  * Tests for the findings interface — the module every check renders through.
  *
- * Two of its four exports never exit and are asserted directly: `renderFindings`
- * (the banner, and how errors and warnings group inside it) and `exitCodeFor`
- * (warnings do not fail). `main` is the entry point, so it is asserted twice
- * over: in-process for the decisions that return — not the entry, or a side
- * flag that prints instead of gating — and once in a child process for the
+ * The exports that never exit are asserted directly: `renderFindings` (the
+ * banner, and how errors and warnings group inside it), `exitCodeFor` (warnings
+ * do not fail) and `isEntry` (the one comparison that tells "run as a script"
+ * from "imported by the runner"). `main` is the entry point, so it is asserted
+ * twice over: in-process for the decisions that return — not the entry, or a
+ * side flag that prints instead of gating — and once in a child process for the
  * gating path, which ends in `process.exit` and cannot be observed from inside.
+ *
+ * The two flag slots are the part worth reading closely. A TERMINAL flag ends
+ * the CLI; a FALL-THROUGH flag prints or writes and the gate still runs. The
+ * pair of child-process tests at the bottom shows both, side by side, over the
+ * same red tree: the same handler under `fallThrough` exits 1 and under `flags`
+ * exits 0, which is the silent defect the two slots exist to keep apart.
  *
  * Run: npm run test:scripts
  */
@@ -19,7 +26,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { exitCodeFor, isError, main, renderFindings } from './findings.mjs';
+import { exitCodeFor, isEntry, isError, main, renderFindings } from './findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -182,6 +189,92 @@ test('main runs the gate when the flag typed is not one this check offers', () =
   );
 });
 
+// ── the fall-through slot ────────────────────────────────────────────────────
+//
+// The distinction the whole slot exists for: a fall-through flag prints or
+// writes and the GATE STILL RUNS, so the exit code is still the findings'.
+// Dropping one of those into `flags` makes it terminal and stops the check
+// gating — green, quietly, for whoever typed it (#609's warning, #610's slot).
+
+test('main runs a fall-through flag AND THEN the gate', () => {
+  const called = [];
+  assert.throws(
+    () =>
+      withArgv(['node', AS_SCRIPT, '--report'], () =>
+        main(AS_URL, 'check:demo', {
+          run: GATE,
+          fallThrough: { '--report': () => called.push('--report') },
+        }),
+      ),
+    /the gate ran/,
+    'a fall-through flag is not a side door out of the gate',
+  );
+  assert.deepEqual(called, ['--report']);
+});
+
+test('main runs every fall-through flag that was typed, in declaration order', () => {
+  const called = [];
+  assert.throws(
+    () =>
+      withArgv(['node', AS_SCRIPT, '--how', '--table'], () =>
+        main(AS_URL, 'check:demo', {
+          run: GATE,
+          fallThrough: {
+            '--table': () => called.push('--table'),
+            '--how': () => called.push('--how'),
+          },
+        }),
+      ),
+    /the gate ran/,
+  );
+  assert.deepEqual(called, ['--table', '--how'], 'both ran, and the file order is the rule');
+});
+
+test('main runs the fall-through flags before a terminal one', () => {
+  const called = [];
+  withArgv(['node', AS_SCRIPT, '--report', '--update'], () =>
+    main(AS_URL, 'check:demo', {
+      run: GATE,
+      fallThrough: { '--report': () => called.push('--report') },
+      flags: { '--update': () => called.push('--update') },
+    }),
+  );
+  assert.deepEqual(called, ['--report', '--update'], 'print, then write — the order its reader has');
+});
+
+test('main reaches no flag of either kind when the module was imported', () => {
+  const called = [];
+  withArgv(['node', path.join(__dirname, 'harness-runner.mjs'), '--report'], () =>
+    main(AS_URL, 'check:demo', {
+      run: GATE,
+      fallThrough: { '--report': () => called.push('--report') },
+    }),
+  );
+  assert.deepEqual(called, [], 'the runner imports a check and must reach nothing');
+});
+
+// ── the entry comparison ─────────────────────────────────────────────────────
+
+test('isEntry says yes only for the module that is the process', () => {
+  assert.equal(withArgv(['node', AS_SCRIPT], () => isEntry(AS_URL)), true);
+  assert.equal(
+    withArgv(['node', path.join(__dirname, 'harness-runner.mjs')], () => isEntry(AS_URL)),
+    false,
+  );
+  assert.equal(withArgv(['node'], () => isEntry(AS_URL)), false, 'no argv[1] is not an entry');
+});
+
+test('isEntry matches a path holding a space, which the string form never did', () => {
+  const dir = path.join(os.tmpdir(), 'a dir with spaces');
+  const file = path.join(dir, 'pretend-check.mjs');
+  assert.equal(
+    withArgv(['node', file], () => isEntry(pathToFileURL(file).href)),
+    true,
+    'the URL form percent-encodes the space, so both sides must be URLs',
+  );
+  assert.notEqual(pathToFileURL(file).href, `file://${file}`, 'which is why `file://${argv[1]}` failed');
+});
+
 test('main takes the script path itself for a flag name from no one', () => {
   assert.throws(
     () =>
@@ -222,6 +315,7 @@ main(import.meta.url, 'check:demo', {
   summary: () => 'nothing to see',
   remedy: 'do this',
   flags: { '--list': () => console.log('listed') },
+  fallThrough: { '--report': () => console.log('reported') },
 });
 `;
 
@@ -244,6 +338,27 @@ test('main as the process: a side flag prints its own thing and exits 0', () => 
   const { code, stdout } = runPretendCheck(PRETEND, ['--list', '--fail']);
   assert.equal(code, 0, 'a flag that prints gates nothing, even over a failing tree');
   assert.equal(stdout, 'listed\n');
+});
+
+test('main as the process: a fall-through flag prints and STILL FAILS on a red tree', () => {
+  const { code, stdout, stderr } = runPretendCheck(PRETEND, ['--report', '--fail']);
+  assert.equal(code, 1, 'a flag that prints and falls through must not turn a red check green');
+  assert.equal(stdout, 'reported\n');
+  assert.match(stderr, /✗ check:demo — 1 finding\(s\)/);
+});
+
+test('main as the process: the same flag in the terminal slot would have gone green', () => {
+  const { code } = runPretendCheck(
+    `
+    import { main } from 'FINDINGS_MODULE';
+    main(import.meta.url, 'check:demo', {
+      run: () => [{ message: 'bad' }],
+      flags: { '--report': () => console.log('reported') },
+    });
+    `,
+    ['--report'],
+  );
+  assert.equal(code, 0, 'which is exactly the defect the two slots exist to keep apart');
 });
 
 test('main as the process: the summary thunk is not called on the failing path', () => {

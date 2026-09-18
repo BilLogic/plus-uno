@@ -117,10 +117,13 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   return `${prose} prose lines against a baseline of ${baseline.proseLines}${fell}`;
 }
 
-// `--update` re-records the ratchet — a write, so it lives here and never in
-// `run`, which only measures. The run then continues against what was just
-// written, which is how a deliberate fall is recorded and checked in one go.
-if (process.argv.includes('--update') && process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+/**
+ * `--update` re-records the ratchet — a write, so it lives here and never in
+ * `run`, which only measures. It FALLS THROUGH: the run then continues against
+ * what was just written, which is how a deliberate fall is recorded and checked
+ * in one go, so it belongs to the fall-through slot and not the terminal one.
+ */
+function record() {
   const { prose } = measured(REPO_ROOT);
   writeFileSync(
     BASELINE,
@@ -133,4 +136,4 @@ if (process.argv.includes('--update') && process.argv[1] && path.resolve(process
   console.log(`[check-glossary] baseline recorded: ${prose} prose lines`);
 }
 
-main(import.meta.url, 'check:glossary', { run, summary, remedy: REMEDY });
+main(import.meta.url, 'check:glossary', { run, summary, remedy: REMEDY, fallThrough: { '--update': record } });

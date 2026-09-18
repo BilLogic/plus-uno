@@ -63,7 +63,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { directories, documents } from './lib/corpus.mjs';
-import { byRoot, main } from './lib/findings.mjs';
+import { byRoot, main, renderFindings } from './lib/findings.mjs';
 
 import {
   DOM_EVENTS,
@@ -453,26 +453,33 @@ function reportFindings(findings, out) {
   );
 }
 
-// The CLI is one branch or the other. `--report` prints the findings and passes
-// whatever they say, so the gate does not also run; `main()` re-checks the entry
-// guard for itself, which keeps an import of this module reaching neither.
-let reported = false;
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+/** `--stats` counts the corpus and then FALLS THROUGH to the gate (#610). */
+function printStats() {
   const { findings, pages, tokens, components } = inputs();
-
-  if (process.argv.includes('--stats')) {
-    console.log(`pages         ${pages.length} (${pages.filter((p) => p.component).length} with a component context)`);
-    console.log(`components    ${components.size}`);
-    console.log(`tokens        ${tokens.size}`);
-    console.log(`findings      ${findings.length}`);
-  }
-
-  // `--report` is the read-only half: same findings, exit 0 whatever they say —
-  // which is why it takes the branch the gate does not.
-  if (process.argv.includes('--report') && findings.length) {
-    console.log(`\n${reportFindings(findings, console.log)}`);
-    reported = true;
-  }
+  console.log(`pages         ${pages.length} (${pages.filter((p) => p.component).length} with a component context)`);
+  console.log(`components    ${components.size}`);
+  console.log(`tokens        ${tokens.size}`);
+  console.log(`findings      ${findings.length}`);
 }
 
-if (!reported) main(import.meta.url, 'check:doc-identifiers', { run, summary, remedy: REMEDY });
+/**
+ * `--report` is the read-only half: the same findings, grouped by page, and
+ * exit 0 whatever they say — so it is TERMINAL, and the gate does not also run.
+ *
+ * A clean corpus has no report to print, and printing nothing at all would be
+ * the one case where a person could not tell the flag from a typo. So it says
+ * what the gate would have said, through the same renderer, and still exits 0.
+ */
+function printReport() {
+  const { findings } = inputs();
+  if (findings.length) console.log(`\n${reportFindings(findings, console.log)}`);
+  else console.log(renderFindings('check:doc-identifiers', [], { summary: summary() }));
+}
+
+main(import.meta.url, 'check:doc-identifiers', {
+  run,
+  summary,
+  remedy: REMEDY,
+  fallThrough: { '--stats': printStats },
+  flags: { '--report': printReport },
+});

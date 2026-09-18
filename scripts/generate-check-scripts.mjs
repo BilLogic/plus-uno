@@ -53,7 +53,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 import {
   ALL,
@@ -68,7 +68,7 @@ import {
   triggersOf,
   workflowRegions,
 } from './checks.registry.mjs';
-import { report } from './lib/findings.mjs';
+import { isEntry, report } from './lib/findings.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -587,7 +587,10 @@ export const summary = () =>
   `${PULL_REQUEST_WORKFLOWS.length} pull-request workflows, ` +
   `${DEPLOY_CHAIN.length}-step deploy chain — all four triggers asserted, no drift`;
 
-if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
+// `main()` is not the shape here: its default branch is the gate, and this
+// file's default is the WRITE — `--check` is the side door. So the entry
+// comparison is asked of `isEntry` and the two branches stay here (#610).
+if (isEntry(import.meta.url)) {
   if (process.argv.includes('--check')) {
     report('check:check-registry', run(), { remedy: REMEDY, summary: summary() });
   } else {

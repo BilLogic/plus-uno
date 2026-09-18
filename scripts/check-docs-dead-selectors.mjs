@@ -313,15 +313,11 @@ function list(repoRoot = REPO_ROOT) {
   for (const [name, where] of VENDOR) console.log(`  ${name.padEnd(26)} ${where}`);
 }
 
-// The CLI is one branch or the other. A side flag prints (or writes) instead of
-// gating, so the gate does not also run; `main()` re-checks the entry guard for
-// itself, which is what keeps an import of this module reaching neither.
-if (
-  process.argv[1] &&
-  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) &&
-  process.argv.includes('--list')
-) {
-  list();
-} else {
-  main(import.meta.url, 'check:docs-dead-selectors', { run, summary, remedy: REMEDY });
-}
+// `--list` prints the inventory and gates nothing, so it is a TERMINAL side
+// door: the CLI is one branch or the other, and `main()` owns both.
+main(import.meta.url, 'check:docs-dead-selectors', {
+  run,
+  summary,
+  remedy: REMEDY,
+  flags: { '--list': () => list() },
+});

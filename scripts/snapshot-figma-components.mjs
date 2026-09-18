@@ -49,6 +49,8 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
+import { isEntry } from './lib/findings.mjs';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const SNAPSHOT = 'scripts/figma-component-snapshot.json';
@@ -266,6 +268,6 @@ async function main() {
   console.log(`\nWrote ${SNAPSHOT}. Next: npm run check:figma-snapshots`);
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isEntry(import.meta.url)) {
   await main();
 }

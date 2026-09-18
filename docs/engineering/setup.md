@@ -171,9 +171,17 @@ A check returns findings rather than exiting. `scripts/lib/findings.mjs` is that
 interface — a check exports `run(ctx) => Finding[]` and decides nothing about
 output; the runner renders the banner and picks the exit code, and the check's
 own CLI entry (`main()` in that module) prints the same string when you run it
-by hand. `main()` also takes a `flags` map for a check's TERMINAL side doors —
-`--list`, `--update` — so the entry comparison is written once; a side flag that
-prints and then still gates is not one of those and stays hand-rolled (#609).
+by hand. `main()` takes both of the side-door maps a check's CLI needs, so the
+entry comparison is written once (#610): `flags` for a TERMINAL `--list` or
+`--update`, which ends the run there, and `fallThrough` for a `--report`,
+`--table` or `--stats` that prints and then lets the gate run, keeping the exit
+code the findings'. Which map a flag belongs in is a reading of what it does
+rather than of what it is called, and putting a fall-through flag in `flags`
+would leave it printing the same text while the check stopped gating — so
+`scripts/lib/side-flags.test.mjs` runs each of those flags against the real
+check and holds its banner and exit code to the plain run's. A script with no
+findings to render — a generator, a snapshot writer, a browser suite — asks the
+same comparison as `isEntry(import.meta.url)`.
 `scripts/check-font-families.mjs` is the shape to copy, and
 `scripts/generate-check-scripts.mjs` the shape for a generator whose `--check`
 is one half of it. Each registry row declares its `module`; the few checks whose

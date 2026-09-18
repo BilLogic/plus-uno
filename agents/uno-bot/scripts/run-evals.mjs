@@ -73,7 +73,7 @@
 import { writeFileSync } from "node:fs";
 import { argv } from "node:process";
 import { resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { isEntry } from "../../../scripts/lib/findings.mjs";
 import { censusOf, describeCensus, fixtureStamp, hasOwnSpec, loadCases } from "./eval-case.mjs";
 import { passesCase, toolCallMatches, describeCalls } from "./eval-scoring.mjs";
 import { threadTurn, checkHistory, sentSummary } from "./eval-history.mjs";
@@ -550,7 +550,7 @@ async function main() {
 
 // Imported by the test, executed by the Action — so the walk only starts when
 // this file IS the entry point.
-if (argv[1] && resolve(argv[1]) === fileURLToPath(import.meta.url)) {
+if (isEntry(import.meta.url)) {
   main().catch((err) => {
     console.error(`[evals] FAILED: ${err.message}`);
     process.exit(1);
