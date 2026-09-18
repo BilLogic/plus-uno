@@ -4,8 +4,14 @@
 // "here is the answer", "approve this?" — and this file decides how Slack
 // renders it. Three renderings live here and nowhere else now:
 //
-//   • the ONE acknowledgement rule: 👀 in a channel, the working signal on the
-//     assistant surface, never both;
+//   • the ONE acknowledgement rule: 👀 off the assistant surface only, because
+//     there the working signal, the titled thread and the streamed reply
+//     already say it and a fourth signal on one message is noise. The working
+//     signal itself is raised on EVERY surface — this once read "never both",
+//     which the code has not done since the DM-only condition came off
+//     `setWorking` below: a channel turn gets 👀 AND a session status, and that
+//     status is what makes Slack's native stop button available in a channel
+//     thread at all (#576);
 //   • the plan stream. With `SLACK_STREAM_PLAN=on` a substantive turn opens a
 //     stream in `task_display_mode: "plan"` and each narration line lands as a
 //     task card that closes as the next one opens, so the person reads one

@@ -246,10 +246,16 @@ describe("the stop line the run's thread gets", () => {
     }
   });
 
-  it("is countable when it fails, on both doors", () => {
+  it("is countable when it fails, on all three doors", () => {
     // With the loop silent, a swallowed post is a press that leaves no trace
-    // anywhere — so the failure is logged rather than dropped (#589).
-    for (const door of ["src/slack/commands.ts", "src/slack/interactive.ts"]) {
+    // anywhere — so the failure is logged rather than dropped (#589). All three
+    // doors, this one included: it was the last one still swallowing it, and it
+    // is the door the incident was filed on.
+    for (const door of [
+      "src/slack/commands.ts",
+      "src/slack/interactive.ts",
+      "src/slack/assistant.ts",
+    ]) {
       const src = readFileSync(resolve(process.cwd(), door), "utf8");
       assert.match(src, /console\.error\(`\[stop\] in-thread line failed/, `${door} logs a failed post`);
       assert.match(src, /console\.error\(`\[stop\] in-thread line refused/, `${door} logs a refused post`);
