@@ -1,16 +1,16 @@
 // The eval envelope adapter: a /debug/eval body becomes a `TurnRequest`, `Env`
 // becomes `TurnDeps`, and `runTurn` does the rest (#499).
 //
-// This is the SECOND caller of the Turn module, and the whole point of the
-// ticket: an eval case and a Slack message now take the same turn. Preflight,
-// the confidence pre-check, the absence check, the draft judge, the gate's
-// idempotency rules and the history write all run here exactly as they run in
-// production, because they are Turn's implementation and there is no second
-// pipeline left to drift from it. What the route used to be — 127 lines calling
-// `runAgent` and `preflight` side by side in `index.ts` — is deleted.
+// This is the SECOND caller of the Turn module: an eval case and a Slack
+// message take the same turn. Preflight, the confidence pre-check, the absence
+// check, the draft judge, the gate's idempotency rules and the history write
+// all run here exactly as they run in production, because they are Turn's
+// implementation and there is no second pipeline left to drift from it.
 //
-// TWO DEPENDENCIES DIFFER FROM `slack/turn-adapter.ts`, both deliberately, and
-// nothing else does:
+// AND NO SECOND WIRING EITHER (#603). The dependencies are built by the shared
+// builder both callers use (`turn/env-deps.ts`); this file names only what genuinely
+// differs, which is the point the header used to make in prose and the wiring
+// then quietly stopped keeping:
 //
 //   * DELIVERY RECORDS instead of posting (`recordingDelivery`). An eval turn
 //     must not put a 👀, a working signal, a narration or a proposal card into a
@@ -24,32 +24,29 @@
 //     sample is a suite nobody can run three times. So the decision is
 //     captured, reported, and remembered by the turn exactly as a real one
 //     would be; only the write is absent.
-//
-// THREAD STATE IS IN-MEMORY, seeded with the history the runner sent. The eval
-// conversation has no Durable Object, and the runner already threads each
-// turn's outcome forward the way production records it
-// (`scripts/eval-history.mjs`). Seeding the store from that history is what
-// makes the store-backed rules — the "(Cancelled the proposed …)" bounce, the
-// compaction trigger — read the same conversation production would.
+//   * THREAD STATE IS IN-MEMORY, seeded with the history the runner sent. The
+//     eval conversation has no Durable Object, and the runner already threads
+//     each turn's outcome forward the way production records it
+//     (`scripts/eval-history.mjs`). Seeding the store from that history is what
+//     makes the store-backed rules — the "(Cancelled the proposed …)" bounce,
+//     the compaction trigger — read the same conversation production would.
+//   * THE REPORTERS production does not pass: the dials the last model call was
+//     sent with, every tool call with its arguments, what each result said
+//     about itself, what the gate asked and what the loop returned. Production
+//     reads its log lines; a case scored from an artifact cannot.
 
-import { preflight } from "../agent/preflight";
-import { buildProviderConversation } from "../agent/provider-conversation";
-import { runAgent, withTurnScope, type AgentResult, type TurnDials } from "../agent/run-agent";
-import { reviewDraft } from "../agent/draft-judge";
-import { attachToolResult, markUnanswered, type ToolCall } from "../agent/tool-transcript";
+import { markUnanswered, attachToolResult } from "../agent/tool-transcript";
+import type { AgentResult, TurnDials } from "../agent/run-agent";
 import {
   internalSubrequestsUsed,
   meterBreakdown,
   subrequestBudgetTrips,
   subrequestsUsed,
 } from "../net";
-import { conversationsHistoryBefore } from "../slack/api";
-import { formatAssistantContext } from "../slack/assistant";
-import { buildNotionArchiveTargetNote, buildNotionUpdateBody } from "../slack/notion-card";
-import { buildImplementDesignProposal } from "../slack/proposal-figma";
 import { createInMemoryThreadState } from "../thread-state/index";
 import type { Env } from "../types";
-import { recordingDelivery, runTurn, type TurnDeps, type TurnRequest } from "../turn/index";
+import { buildTurnDeps, type TurnWiring } from "../turn/env-deps";
+import { recordingDelivery, runTurn, type TurnRequest } from "../turn/index";
 import { BUILD } from "../version";
 import {
   evalTurnRequest,
@@ -57,6 +54,9 @@ import {
   type EvalTurnBody,
   type EvalTurnReport,
 } from "./turn-case";
+
+/** What the route collects on the way through the dependencies that see it. */
+type EvalCollected = Omit<EvalTurnReport, "outcome" | "meter" | "build" | "ms">;
 
 /**
  * One headless turn for the eval suite.
@@ -89,9 +89,7 @@ export async function handleEvalTurn(request: Request, env: Env): Promise<Respon
   }
   if (turnRequest.pending) await threadState.putProposal(turnRequest.pending);
 
-  // What the route reports beside the outcome, collected on the way through the
-  // dependencies that see it.
-  const report: Omit<EvalTurnReport, "outcome" | "meter" | "build" | "ms"> = {
+  const report: EvalCollected = {
     resolutions: [],
     gateAsk: null,
     tools: [],
@@ -104,15 +102,19 @@ export async function handleEvalTurn(request: Request, env: Env): Promise<Respon
   try {
     const outcome = await runTurn(
       turnRequest,
-      evalDeps(env, turnRequest, {
-        delivery,
-        threadState,
-        report,
-        filled,
-        onResult: (r) => {
-          agentResult = r;
-        },
-      }),
+      buildTurnDeps(
+        env,
+        turnRequest,
+        evalTurnWiring(turnRequest, {
+          delivery,
+          threadState,
+          report,
+          filled,
+          onResult: (r) => {
+            agentResult = r;
+          },
+        }),
+      ),
     );
 
     // Every call that never reported a result says so, rather than reading like
@@ -158,96 +160,29 @@ function meterNow() {
   };
 }
 
-/**
- * `Env`, once, as the dependencies an eval turn reads — the same list
- * `slack/turn-adapter.ts` builds, with the two recording substitutions named in
- * this file's header.
- */
-function evalDeps(
-  env: Env,
-  request: TurnRequest,
-  wiring: {
-    delivery: ReturnType<typeof recordingDelivery>;
-    threadState: ReturnType<typeof createInMemoryThreadState>;
-    report: Omit<EvalTurnReport, "outcome" | "meter" | "build" | "ms">;
-    filled: Set<number>;
-    onResult(result: AgentResult): void;
-  },
-): TurnDeps {
-  const { delivery, threadState, report, filled } = wiring;
+/** Where an eval run collects what the artifact carries and the log cannot. */
+export interface EvalCollectors {
+  delivery: ReturnType<typeof recordingDelivery>;
+  threadState: ReturnType<typeof createInMemoryThreadState>;
+  report: EvalCollected;
+  /** Which reported calls already have a result attached. */
+  filled: Set<number>;
+  onResult(result: AgentResult): void;
+}
 
-  // The tool-side Slack context. The synthetic ts values are the eval
-  // conversation's: a tool that posts has nowhere to post, which is the same
-  // truth the recording Delivery tells.
-  const slack = {
-    channel: request.channel,
-    threadTs: request.conversationTs,
-    conversationTs: request.conversationTs,
-    userMsgTs: request.userMsgTs,
-    requestedBy: request.userId,
-    sharedCanvasIds: [],
-  };
+/**
+ * The eval suite's four differences, and nothing else.
+ *
+ * Exported so the parity test can build the real wiring on both sides: a
+ * dependency added to `turn/env-deps.ts` reaches both callers or neither, and
+ * that test is what says so.
+ */
+export function evalTurnWiring(request: TurnRequest, collectors: EvalCollectors): TurnWiring {
+  const { delivery, threadState, report, filled } = collectors;
 
   return {
     threadState,
     delivery,
-
-    async runAgent(req) {
-      const run = await withTurnScope({ correction: req.correction }, () =>
-        runAgent({
-          env,
-          tier: req.tier,
-          routeReason: req.routeReason,
-          userText: req.userText,
-          ...(req.images?.length ? { images: req.images } : {}),
-          history: req.history,
-          conversation: buildProviderConversation(
-            req.history,
-            req.userText,
-            req.images ?? [],
-            req.historicalImages,
-          ),
-          slack,
-          currentSender: req.currentSender,
-          pending: req.pending,
-          ...(req.assistantContext ? { assistantContext: req.assistantContext } : {}),
-          ...(req.preflight ? { preflight: req.preflight } : {}),
-          onInterim: req.onInterim,
-          // The three reporters production does not pass: the dials the last
-          // model call was sent with (#421), every tool call with its
-          // arguments (#423), and what each result said about itself (#452).
-          onDials: (d: TurnDials) => {
-            report.dials = flattenDials(d);
-          },
-          onToolCall: (c: ToolCall) => {
-            report.tools.push(c);
-          },
-          onToolResult: (r) => {
-            attachToolResult(report.tools, r, filled);
-          },
-        }),
-      );
-      wiring.onResult(run.result);
-      return {
-        result: run.result,
-        tools: run.tools,
-        references: run.references,
-        ...(run.receipt ? { receipt: run.receipt } : {}),
-        ...(run.absence ? { absence: run.absence } : {}),
-      };
-    },
-
-    reviewDraft: (args) => reviewDraft(env, args),
-
-    async preflight(toolName, input, ctx) {
-      const ask = await preflight(toolName, input, {
-        env,
-        prd: ctx.prd,
-        ...(ctx.implementPrdUrl ? { implementPrdUrl: ctx.implementPrdUrl } : {}),
-      });
-      report.gateAsk = ask?.ask ?? null;
-      return ask;
-    },
 
     // RECORDED, never executed — see the header. The Gate has already claimed
     // the proposal and decided; production would hand the verdict to the
@@ -255,7 +190,7 @@ function evalDeps(
     async applyVerdict(verdict) {
       if (!verdict.execute) return;
       // EVERY operation of the approved batch, in order — a suite that recorded
-      // only the first would pass the exact regression this batch exists to stop.
+      // only the first would pass the exact regression that batch exists to stop.
       for (const operation of verdict.execute.operations) {
         report.resolutions.push({
           toolName: operation.toolName,
@@ -264,26 +199,27 @@ function evalDeps(
       }
     },
 
-    cards: {
-      notionUpdateBody: (input) => buildNotionUpdateBody(env, input),
-      notionArchiveTargetNote: (input) => buildNotionArchiveTargetNote(env, input),
-      implementDesignCard: (input, requesterUserId, previewText) =>
-        buildImplementDesignProposal(env, input, requesterUserId, previewText),
+    // The synthetic ts the eval conversation has: a tool that posts has nowhere
+    // to post, which is the same truth the recording Delivery tells.
+    toolThreadTs: request.conversationTs,
+
+    reporters: {
+      onDials: (dials) => {
+        report.dials = flattenDials(dials);
+      },
+      onToolCall: (call) => {
+        report.tools.push(call);
+      },
+      onToolResult: (note) => {
+        attachToolResult(report.tools, note, filled);
+      },
+      onGateAsk: (ask) => {
+        report.gateAsk = ask;
+      },
+      onAgentResult: (result) => {
+        collectors.onResult(result);
+      },
     },
-
-    // Unreachable as the request is built (`threaded: true` closes the
-    // antecedent window), and the real read regardless — an eval surface that
-    // grew a channel should read it the way production does.
-    async readAntecedent(channel, beforeTs, limit) {
-      const before = await conversationsHistoryBefore(env, channel, beforeTs, limit);
-      return before
-        .filter((m) => !m.subtype && (m.text ?? "").trim())
-        .map((m) => ({ author: m.user ? `<@${m.user}>` : "someone", text: m.text ?? "" }));
-    },
-
-    describeAssistantContext: (context) => formatAssistantContext(context),
-
-    contextState: env.CONTEXT_STATE === "on",
   };
 }
 
