@@ -355,7 +355,21 @@ export async function handleSessionStopped(
     threadStateFor(env),
   );
   const result = await setSessionStatus(env, channel, thread_ts, verdict.settleTo);
-  await postMessage(env, { channel, thread_ts, text: verdict.text }).catch(() => {});
+  // Caught so that a refused post cannot skip the settle above — and LOGGED,
+  // which it was not. Since #589 the stopped turn itself posts nothing, so this
+  // line is the only thing the thread gets from this door; swallowing its
+  // failure is a press that leaves no trace anywhere, the silence that made the
+  // same artefact get diagnosed from screenshots three times. The other two
+  // doors log the same pair (`commands.ts`, `interactive.ts`).
+  const posted = await postMessage(env, { channel, thread_ts, text: verdict.text }).catch(
+    (err: unknown) => {
+      console.error(`[stop] in-thread line failed for ${user}: ${String(err)}`);
+      return null;
+    },
+  );
+  if (posted && posted.ok === false) {
+    console.error(`[stop] in-thread line refused for ${user}: ${posted.error}`);
+  }
   // One line per press, carrying what the run of it actually did. `[stop]` is
   // the prefix `/stop` and the Home-tab button already log under, so the three
   // doors read as one control in `wrangler tail` (#571's standing ask: a
