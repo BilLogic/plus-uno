@@ -263,10 +263,18 @@ export interface TurnAgentRequest {
   preflight?(toolName: string, input: Record<string, unknown>): Promise<{ ask: string } | null>;
 }
 
-/** What one agent turn reported back, beside its result. */
+/**
+ * What one agent turn reported back, beside its result.
+ *
+ * Every field below is part of what the run RETURNS (#625). They used to be
+ * collected by the caller from an ambient scope it had to remember to open —
+ * and an adapter that forgot got empty tools, a false "nothing was fetched" and
+ * a different confidence verdict two checks below, with nothing failing. The
+ * shape is the same; what changed is that it can no longer arrive hollow.
+ */
 export interface TurnAgentRun {
   result: AgentResult;
-  /** Read-only tools that ran. */
+  /** Ungated tools that ran, in call order. */
   tools: string[];
   references: string[];
   receipt?: HistoryTurn["retrieval"];

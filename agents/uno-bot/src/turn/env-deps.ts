@@ -24,7 +24,7 @@
 import { buildProviderConversation } from "../agent/provider-conversation";
 import { preflight } from "../agent/preflight";
 import { reviewDraft } from "../agent/draft-judge";
-import { runAgent, selectProvider, withTurnScope, type AgentResult, type TurnDials } from "../agent/run-agent";
+import { runAgent, selectProvider, type AgentResult, type TurnDials } from "../agent/run-agent";
 import type { ToolCall, ToolResultNote } from "../agent/tool-transcript";
 import type { GateVerdict } from "../gate/index";
 import { conversationsHistoryBefore } from "../slack/api";
@@ -99,47 +99,46 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     delivery: wiring.delivery,
 
     async runAgent(req) {
-      // The per-turn scope the tool ledger, the retrieval receipt and the
-      // absence signal cross on — read several frames above the loop, which is
-      // why it is a scope rather than a return value (`agent/run-agent.ts`).
-      const run = await withTurnScope({ correction: req.correction }, () =>
-        runAgent({
-          env,
-          // Routing already happened, in Turn: the tier travels as an opaque
-          // name, and the agent run has no way left to route a second time on
-          // a different string (#624).
-          tier: req.tier,
-          routeReason: req.routeReason,
-          // The conversation, assembled ONCE. The raw text, the history rows
-          // and the images reach the agent only through it.
-          conversation: buildProviderConversation(
-            req.history,
-            req.userText,
-            req.images ?? [],
-            req.historicalImages,
-          ),
-          slack,
-          // The conversation key, beside the tool-side context, because cancel
-          // is what reads it and it is not derivable downstream.
-          conversationTs: request.conversationTs,
-          currentSender: req.currentSender,
-          pending: req.pending,
-          ...(req.assistantContext ? { assistantContext: req.assistantContext } : {}),
-          ...(req.preflight ? { preflight: req.preflight } : {}),
-          onInterim: req.onInterim,
-          ...(reporters.onDials ? { onDials: reporters.onDials } : {}),
-          ...(reporters.onToolCall ? { onToolCall: reporters.onToolCall } : {}),
-          ...(reporters.onToolResult ? { onToolResult: reporters.onToolResult } : {}),
-        }),
-      );
+      // The tool ledger, the retrieval receipt, the reference names and the
+      // absence signal arrive IN THE RETURN VALUE (#625). This builder used to
+      // wrap the call in `withTurnScope` to collect them — an ambient scope
+      // every adapter had to remember, where forgetting bought empty tools, a
+      // false "nothing was fetched" and a different confidence verdict with
+      // nothing failing. There is nothing to remember now: the entry opens its
+      // own scope, and what it collected is part of what it answers with.
+      const run = await runAgent({
+        env,
+        // Routing already happened, in Turn: the tier travels as an opaque
+        // name, and the agent run has no way left to route a second time on
+        // a different string (#624).
+        tier: req.tier,
+        routeReason: req.routeReason,
+        // The conversation, assembled ONCE. The raw text, the history rows
+        // and the images reach the agent only through it.
+        conversation: buildProviderConversation(
+          req.history,
+          req.userText,
+          req.images ?? [],
+          req.historicalImages,
+        ),
+        slack,
+        // What the turn classified, travelling down rather than being guessed
+        // at: the blueprint cache must not answer a pushback.
+        correction: req.correction,
+        // The conversation key, beside the tool-side context, because cancel
+        // is what reads it and it is not derivable downstream.
+        conversationTs: request.conversationTs,
+        currentSender: req.currentSender,
+        pending: req.pending,
+        ...(req.assistantContext ? { assistantContext: req.assistantContext } : {}),
+        ...(req.preflight ? { preflight: req.preflight } : {}),
+        onInterim: req.onInterim,
+        ...(reporters.onDials ? { onDials: reporters.onDials } : {}),
+        ...(reporters.onToolCall ? { onToolCall: reporters.onToolCall } : {}),
+        ...(reporters.onToolResult ? { onToolResult: reporters.onToolResult } : {}),
+      });
       reporters.onAgentResult?.(run.result);
-      return {
-        result: run.result,
-        tools: run.tools,
-        references: run.references,
-        ...(run.receipt ? { receipt: run.receipt } : {}),
-        ...(run.absence ? { absence: run.absence } : {}),
-      };
+      return run;
     },
 
     // The judge takes the same adapter the turn runs on, selected once (#605):
