@@ -1,7 +1,7 @@
 [
   {
     "name": "roadmap_query",
-    "description": "Read-only, ungated. Query the live Notion Roadmap board: per card its title, link, card number, Design Status, Dev Status, pillars and people. Use it for any ask in Roadmap frame words — card, RM-ID, Design Status, Dev Status, pillar, owner, 'what's WIP / under review', 'where are we on X' — and for finding a card from a vague or partial title. Cards live on this board only; notion_search covers the doc surfaces. Title and card-number lookups are matched by the server across the whole board, so a card is found wherever it sits; a title lookup returns ranked fuzzy candidates, so a vague description becomes a 'did you mean…' list with links rather than a request for a URL. Believe the result's `note` over any assumption of completeness: a large unfiltered read may report a PARTIAL set, and a miss on a partial read means 'I couldn't find it'. A named thing that is not a card may be a doc — check notion_search before concluding it is absent. Filters combine freely (e.g. design_status + person). For a card's body beyond these properties, source_read its url.",
+    "description": "Read-only, ungated. Query the live Notion Roadmap board: per card its title, link, card number, Design Status, Dev Status, pillars and people. Use it for any ask in Roadmap frame words — card, RM-ID, Design Status, Dev Status, pillar, owner, 'what's WIP / under review', 'where are we on X' — and for finding a card from a vague or partial title. Cards live on this board only; notion_search covers the doc surfaces. Title and card-number lookups are matched by the server across the whole board, so a card is found wherever it sits; a title lookup returns every card whose title contains the phrase — all of them, counted in `contains_count`, so 'how many cards are titled X' has an exact answer — then ranked fuzzy candidates, so a vague description becomes a 'did you mean…' list with links rather than a request for a URL. Believe the result's `note` over any assumption of completeness: a large unfiltered read may report a PARTIAL set, and a miss on a partial read means 'I couldn't find it'. A named thing that is not a card may be a doc — check notion_search before concluding it is absent. Filters combine freely (e.g. design_status + person). For a card's body beyond these properties, source_read its url.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -12,7 +12,7 @@
         },
         "title": {
           "type": "string",
-          "description": "Full, partial, or vague card title/description — fuzzy-matched against every card on the board; returns ranked candidates."
+          "description": "Full, partial, or vague card title/description. Every card whose title contains it as a phrase comes back and is counted; beyond those, ranked fuzzy candidates from across the board."
         },
         "person": {
           "type": "string",

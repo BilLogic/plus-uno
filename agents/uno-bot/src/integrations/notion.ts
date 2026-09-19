@@ -1555,6 +1555,7 @@ const ROADMAP_ID_PROP = "ID";
 function roadmapFilter(opts: {
   designStatus?: string;
   titleTokens?: string[];
+  titlePhrase?: string;
   cardNumber?: number | null;
 }): unknown {
   const clauses: unknown[] = [];
@@ -1572,10 +1573,19 @@ function roadmapFilter(opts: {
   // about" and drops the proper noun that actually discriminates — which left
   // the named card invisible while adjacent ones matched.
   const toks = [...(opts.titleTokens ?? [])].sort((a, b) => b.length - a.length).slice(0, 6);
+  const phrase = opts.titlePhrase?.trim();
   if (toks.length) {
     clauses.push({
       or: toks.map((t) => ({ property: ROADMAP_TITLE_PROP, title: { contains: t } })),
     });
+  } else if (phrase) {
+    // A title made only of short words ("DS", "AI", "UX") yields no tokens, and
+    // used to fall through to an UNFILTERED read: five pages of a board that no
+    // longer fits in five, ranked against no words, so it came back empty every
+    // time (2026-09-18). The phrase is a filter Notion can run itself — and with
+    // tokens present it adds nothing, since a title holding the phrase holds
+    // every one of its words.
+    clauses.push({ property: ROADMAP_TITLE_PROP, title: { contains: phrase } });
   }
   if (!clauses.length) return undefined;
   return clauses.length === 1 ? clauses[0] : { and: clauses };
@@ -1583,7 +1593,7 @@ function roadmapFilter(opts: {
 
 export async function queryRoadmapCards(
   env: Env,
-  opts: { designStatus?: string; titleTokens?: string[]; cardNumber?: number | null } = {},
+  opts: { designStatus?: string; titleTokens?: string[]; titlePhrase?: string; cardNumber?: number | null } = {},
 ): Promise<{ rows: RoadmapCard[]; truncated: boolean }> {
   if (!env.NOTION_ROADMAP_DB_ID) throw new Error("NOTION_ROADMAP_DB_ID not configured");
   return queryDatabaseRows(

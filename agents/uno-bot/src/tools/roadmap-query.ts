@@ -6,6 +6,15 @@
 // wherever it sits on the board) and ranks fuzzy title matches in the Worker so
 // vague descriptions come back as "did you mean" candidates. A partial read is
 // reported as partial — never as a complete scan.
+//
+// A title lookup serves two questions that want different shapes. "Find the
+// card about X" wants a short ranked list; "how many cards are titled X" wants
+// every card with X in its title. Both used to get the first: asked on
+// 2026-09-18 how many cards start with "DS Update", the bot received the six
+// newest of nine under a note saying the whole board had been searched, and
+// answered "at least 7" with the wrong earliest card. So a card whose title
+// contains the asked-for phrase is a HIT — every hit comes back and is counted —
+// and the candidate cap applies only to the looser matches after them.
 
 import type { Env } from "../types";
 import { queryRoadmapCards, type RoadmapCard } from "../integrations/notion";
@@ -26,16 +35,68 @@ function tokens(text: string): string[] {
   );
 }
 
+/** Lowercased, every run of punctuation and space collapsed to one space — so
+ *  "DS Update:" and "ds update" read as the same words. */
+function normalizeTitle(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+/** True when the title contains the query as a run of whole words. A substring
+ *  test is not enough for a short query: "DS" is a word in "DS Update: Tag" and
+ *  only a pair of letters in "Cards". */
+function containsPhrase(title: string, query: string): boolean {
+  const q = normalizeTitle(query);
+  return q !== "" && ` ${normalizeTitle(title)} `.includes(` ${q} `);
+}
+
 // Fuzzy title score: token overlap (weighted by query coverage) with a bonus
 // for a literal substring hit. Good enough for "vague description → card".
+// A query made only of short words ("DS", "AI") has no tokens, so it scores on
+// the substring bonus alone — it used to score zero against every card.
 function scoreTitle(queryToks: string[], rawQuery: string, title: string): number {
   const titleLower = title.toLowerCase();
   const titleToks = new Set(tokens(title));
-  if (!queryToks.length) return 0;
-  const overlap = queryToks.filter((t) => titleToks.has(t)).length;
-  let score = overlap / queryToks.length;
-  if (titleLower.includes(rawQuery.toLowerCase().trim())) score += 1;
+  let score = queryToks.length
+    ? queryToks.filter((t) => titleToks.has(t)).length / queryToks.length
+    : 0;
+  const q = rawQuery.toLowerCase().trim();
+  if (q && titleLower.includes(q)) score += 1;
   return score;
+}
+
+const plural = (n: number, word: string): string => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+/**
+ * The note on a non-empty title result. Every branch says whether the hits are
+ * the whole set, because the failure it exists to prevent is a cut list read as
+ * a complete one.
+ */
+function titleNote(
+  title: string,
+  r: { hits: number; listedHits: number; similar: number; similarTotal: number; truncated: boolean },
+): string {
+  const pick =
+    "If they want one card and the top hit clearly matches, answer from it and cite its link; if it's ambiguous, offer the top few as 'did you mean' WITH their links — never dead-end asking for a link without suggesting candidates.";
+  if (r.hits > 0) {
+    const set =
+      r.hits > r.listedHits
+        ? `${r.truncated ? "At least " : ""}${plural(r.hits, "card")} have "${title}" in their title; only the first ${r.listedHits} are listed, so say the list is partial and give the total.`
+        : r.truncated
+          ? `Found ${plural(r.hits, "card")} with "${title}" in the title, but the board was too large to read fully, so there may be more — say "at least ${r.hits}".`
+          : `Every card with "${title}" in its title is listed first (${r.hits} in all), from a search of the whole board — this is the complete set, and ${r.hits} is the exact count.`;
+    const rest =
+      r.similar > 0
+        ? ` The ${plural(r.similar, "card")} after that only resemble the phrase (title_match "similar") — offer those as 'did you mean', never count them.`
+        : "";
+    return `${set}${rest} ${pick}`;
+  }
+  return (
+    `No card title contains "${title}" as written; these are the ${r.similar} closest ${r.similarTotal > r.similar ? `of ${r.similarTotal} ` : ""}ranked candidates from the live Roadmap board` +
+    (r.truncated
+      ? ", from a PARTIAL read (the board was too large to read fully)."
+      : " (the whole board was searched for these words, not a keyword sample).") +
+    ` ${pick}`
+  );
 }
 
 export async function executeRoadmapQuery(
@@ -64,6 +125,7 @@ export async function executeRoadmapQuery(
       ({ rows: cards, truncated } = await queryRoadmapCards(env, {
         designStatus,
         titleTokens,
+        titlePhrase: title,
         cardNumber,
       }));
     } catch (err) {
@@ -85,18 +147,39 @@ export async function executeRoadmapQuery(
       );
     }
 
-    let results: (RoadmapCard & { match_score?: number })[];
+    let results: (RoadmapCard & { match_score?: number; title_match?: "contains" | "similar" })[];
+    let containsCount: number | undefined;
     let note: string;
     if (title) {
-      results = cards
-        .map((c) => ({ ...c, match_score: Number(scoreTitle(titleTokens, title, c.title).toFixed(2)) }))
+      const ranked = cards
+        .map((c) => ({
+          ...c,
+          match_score: Number(scoreTitle(titleTokens, title, c.title).toFixed(2)),
+          title_match: containsPhrase(c.title, title) ? ("contains" as const) : ("similar" as const),
+        }))
         // An exact card-number hit is authoritative — don't drop it because the
         // user's remembered title shares no word with the real one.
-        .filter((c) => (c.match_score ?? 0) > 0 || c.card_number === cardNumber)
-        .sort((a, b) => (b.match_score ?? 0) - (a.match_score ?? 0))
-        .slice(0, MAX_TITLE_CANDIDATES);
+        .filter((c) => c.title_match === "contains" || c.match_score > 0 || c.card_number === cardNumber)
+        // Hits first: a card that merely scores as high must never crowd one out.
+        .sort(
+          (a, b) =>
+            Number(b.title_match === "contains") - Number(a.title_match === "contains") ||
+            b.match_score - a.match_score,
+        );
+      const hits = ranked.filter((c) => c.title_match === "contains").length;
+      const listedHits = Math.min(hits, MAX_ENUMERATION_ROWS);
+      // Every hit, up to the enumeration cap; candidates only fill what is left
+      // of the candidate list, so they never pad out a set of hits.
+      results = ranked.slice(0, Math.max(listedHits, MAX_TITLE_CANDIDATES));
+      containsCount = hits;
       note = results.length
-        ? "Ranked title candidates from the live Roadmap board (the whole board was searched for these words, not a keyword sample). If the top hit clearly matches, answer from it and cite its link; if it's ambiguous, offer the top few as 'did you mean' WITH their links — never dead-end asking for a link without suggesting candidates."
+        ? titleNote(title, {
+            hits,
+            listedHits,
+            similar: results.length - listedHits,
+            similarTotal: ranked.length - hits,
+            truncated,
+          })
         : truncated
           ? "No match among the cards read, BUT the board was too large to read fully — do NOT say the card doesn't exist. Say you couldn't find it and ask for the link or a distinctive word from its title."
           : "No Roadmap card resembles that title (the whole board was searched for those words, so this is a real absence, not a search miss). Say so plainly — and if the thing they named might be a doc rather than a card, check the docs before concluding.";
@@ -119,6 +202,7 @@ export async function executeRoadmapQuery(
         ...(cardNumber !== null ? { card_number: cardNumber } : {}),
       },
       count: results.length,
+      ...(containsCount !== undefined ? { contains_count: containsCount } : {}),
       cards: results,
       note,
     });
