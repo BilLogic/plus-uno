@@ -174,6 +174,23 @@
     }
   },
   {
+    "name": "github_intake_search",
+    "description": "Read-only, ungated. Search the open GitHub intakes on the harness repo (issues labelled harness-intake, awaiting triage) by keyword. Run it before staging github_issue_create, every time: if an open intake already covers the request, name it by title and link and ask whether to link that one instead or file a new one anyway — stage the card only on 'file anyway'. The Worker fixes the repo, the open state and the label; you send keywords only.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "keywords"
+      ],
+      "properties": {
+        "keywords": {
+          "type": "string",
+          "description": "Two to six distinctive words that name the problem, e.g. 'github issue refuses', 'canvas export timeout'. Every word must match, so fewer finds more."
+        }
+      }
+    }
+  },
+  {
     "name": "slack_user_profile",
     "description": "Read-only, ungated. Look up a Slack user's profile by id — display name, title/role, email, timezone, status. Use it when you need to know WHO someone is: a member id from slack_channel_members, an @-mention in the thread, a card contributor's Slack identity. Mention people as <@id> in replies.",
     "input_schema": {
@@ -629,7 +646,7 @@
   },
   {
     "name": "github_issue_create",
-    "description": "SIDE EFFECT (creates a real issue in a PUBLIC repo), routed through the confirmation gate. File an intake as a GitHub issue on the harness repo, where harness work is specced and fixed. Use it when someone asks to track, file or report a problem with uno-bot itself or the harness (skills, persona, harness docs, evals) — 'track this on GitHub', 'file an issue for someone to fix'. Product and design maintenance (a DS component, a product flow, a design doc) is a Roadmap intake card (notion_create, surface 'intake') instead; say which surface you chose so the requester can redirect it. You write the title and body only — the Worker sets the repo and the triage labels and appends a footer naming the requester and linking this thread. Anyone on the internet can read the issue: content from a DM or private channel other than this conversation never goes in it.",
+    "description": "SIDE EFFECT (creates a real issue in a PUBLIC repo), routed through the confirmation gate. File an intake as a GitHub issue on the harness repo, where harness work is specced and fixed. Use it when someone asks to track, file or report a problem with uno-bot itself or the harness (skills, persona, harness docs, evals) — 'track this on GitHub', 'file an issue for someone to fix'. Run github_intake_search first, and stage this only when no open intake covers the request or the requester chose to file anyway. Product and design maintenance (a DS component, a product flow, a design doc) is a Roadmap intake card (notion_create, surface 'intake') instead; say which surface you chose so the requester can redirect it. You write the title and body only — the Worker sets the repo and the triage labels and appends a footer naming the requester and linking this thread. Anyone on the internet can read the issue: content from a DM or private channel other than this conversation never goes in it.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,

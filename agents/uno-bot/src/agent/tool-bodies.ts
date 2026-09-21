@@ -27,6 +27,7 @@ import { executeRoadmapQuery } from "../tools/roadmap-query";
 import { executeBlueprintSearch } from "../tools/blueprint-search";
 import { executeReadSource } from "../tools/read-source";
 import { executeGithubRead } from "../tools/github-read";
+import { executeGithubIntakeSearch } from "../tools/github-intake-search";
 import { executeSlackThreadRead } from "../tools/slack-thread-read";
 import { executeSlackSearch } from "../tools/slack-search";
 import { executeSlackUserProfile, executeSlackChannelMembers } from "../tools/slack-people";
@@ -63,6 +64,7 @@ export const TOOL_BODIES: Record<ToolName, ToolBody> = {
   source_read: (env, input, slack) => executeReadSource(env, input, slack),
   search_blueprint: (env, input) => executeBlueprintSearch(env, input),
   github_read: (env, input) => executeGithubRead(env, input),
+  github_intake_search: (env, input) => executeGithubIntakeSearch(env, input),
   slack_user_profile: (env, input) => executeSlackUserProfile(env, input),
   slack_channel_members: (env, input) => executeSlackChannelMembers(env, input),
   slack_thread_read: (env, input) => executeSlackThreadRead(env, input),
