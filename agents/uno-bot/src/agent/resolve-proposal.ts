@@ -81,6 +81,10 @@ export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<vo
     executeTool(env, operation.toolName, operation.input, {
       channel: run.channel,
       threadTs: run.threadTs,
+      // The real ts to reply under, and who asked: a relayed DM names the
+      // requester to its recipient and confirms in their thread.
+      ...(verdict.post?.replyTs ? { replyTs: verdict.post.replyTs } : {}),
+      requestedBy: run.requesterUserId,
       userMsgTs: run.userMsgTs,
       // Carry the PRD resolved at proposal time — it's not re-extractable here.
       notionPrdId: run.notionPrdId,

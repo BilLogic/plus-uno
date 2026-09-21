@@ -295,6 +295,9 @@ test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
   // trips again, add another member rather than trimming prose to fit a
   // fixture — the bundle growing is the healthy direction, and the thing under
   // test is the bundler's refusal, not the corpus's size.
+  //
+  // It tripped again when the persona learned the relayed DM, and
+  // `engineering/operations.md` is the sixth member, which buys back ~8.5k.
   const result = withFile(wranglerToml, withRegion("us-central1"), () =>
     withFiles(
       [
@@ -303,6 +306,7 @@ test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
         "docs/connectors/supabase/blueprint-navigation.md",
         "docs/connectors/supabase/overview.md",
         "docs/connectors/figma.md",
+        "docs/engineering/operations.md",
       ],
       frontmatterOnly,
       () => runBundler(["--check"]),

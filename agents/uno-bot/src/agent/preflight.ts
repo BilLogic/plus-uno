@@ -21,6 +21,7 @@ import { listDsComponents, matchComponent, closestComponents } from "../integrat
 // Placeholder detection lives next door, import-free, so the loop and a plain
 // Node test can both reach it without dragging `Env` behind them.
 import { placeholderRefusal } from "./placeholder";
+import { relayRecipientId } from "../tools/relayed-dm-render";
 
 export interface PreflightCtx {
   env: Env;
@@ -181,6 +182,23 @@ export async function preflight(
           ask:
             ":e-mail: That email body is too thin to send. Write out (or dictate) the full message — a couple of real sentences minimum — and I'll stage it.",
         };
+      }
+      return null;
+    }
+
+    case "dm_relay": {
+      // A relay goes to ONE resolved person. A name is not a recipient: the
+      // wrong "Coco" is a DM in the wrong inbox, so resolve it or ask.
+      if (!relayRecipientId(input.recipient)) {
+        return {
+          ask:
+            ":incoming_envelope: Who should get this? I need the exact person — tell me who you mean, " +
+            "and if the name matches more than one teammate I'll ask which one before staging anything.",
+        };
+      }
+      const text = typeof input.text === "string" ? input.text.trim() : "";
+      if (!text) {
+        return { ask: ":incoming_envelope: What should the DM say? Give me the message and I'll stage it for your ✅." };
       }
       return null;
     }
