@@ -32,6 +32,7 @@ import {
 import { postVisibleFailure, isCapacityError } from "./delivery";
 import { postingDeps } from "./slack-delivery";
 import { runSlackTurn } from "./turn-adapter";
+import { stripBotMentions } from "./mention";
 import { turnSurfaceOf } from "../turn/request";
 
 // Re-exported for index.ts (SlackEnvelope) + agent-runner.ts (RunnerJobPayload)
@@ -415,7 +416,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // the whole channel — threadTs above may be undefined there and is only a
   // post target.
   const convTs = conversationTs(event);
-  const text = stripBotMentions(event.text!);
+  const text = stripBotMentions(event.text!, (await getBotIdentity(env))?.userId);
 
   // Where the person's turn is running, so the Home-tab Stop button can find
   // it. Fire-and-forget: this is a convenience control and must never sit in
@@ -474,10 +475,6 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   );
 }
 
-function stripBotMentions(text: string): string {
-  return text.replace(/<@[A-Z0-9]+>/g, "").trim();
-}
-
 // Build the bot's memory from the ACTUAL Slack thread, so it sees every message
 // in the thread — humans' messages, its own posts (including the Notion links
 // and proposals it side-posts), and poll notifications — and can't "forget"
@@ -531,7 +528,7 @@ async function buildThreadHistory(
       for (const m of replies.messages) {
         if (m.ts === currentTs) continue;
         const isBot = m.user === identity.userId || (!!m.bot_id && m.bot_id === identity.botId);
-        const rawContent = stripBotMentions(m.text ?? "").trim();
+        const rawContent = stripBotMentions(m.text ?? "", identity.userId);
         const canvasContent = messageTextWithCanvasAttachments(rawContent, m.files);
         const sharedCanvasIds = canvasIdsSharedBySlackHistoryMessage({
           user: m.user,
