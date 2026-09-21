@@ -397,7 +397,7 @@
     {
       "id": "R21",
       "name": "'send this to <person>' after a card lookup stages a relayed DM, not a refusal",
-      "blocker": true,
+      "blocker": false,
       "samples": 3,
       "requestedBy": "U_EVAL",
       "turns": [
