@@ -27,21 +27,25 @@ brief → build.
 
 ## How to ask — the contract, not a tool name
 
-**One question per message.** How it renders depends on what your runtime has,
-and both forms are equally valid:
+**One question per message.** Use the interactive tool for every question this
+step, whenever your runtime has one:
 
 - **Runtime has an interactive question/choice tool** (any name — Claude Code's
-  `AskUserQuestion`, Cursor's question UI, anything equivalent): use it for a
-  SINGLE question with the options.
-- **Runtime has no such tool** (some Cursor models, Codex, headless, plain
-  chat): ask in plain text with the options as a **numbered list**.
+  `AskUserQuestion`, Cursor's question UI, anything equivalent): render every
+  question through it — that's the default whenever the tool exists, including
+  single-choice confirm steps. It matters most on `multiSelect` questions: the
+  tool is what lets the designer pick more than one option at once, so a
+  multi-select step goes through it whenever it's there.
+- **Runtime genuinely has no such tool this session** (some Cursor models,
+  Codex, headless, plain chat): ask in plain text with the options as a
+  **numbered list** — the fallback for when nothing else is available.
 
-The plain-text form is a first-class rendering, **not a degradation** — the
-contract is one question, options shown, recommendation marked, free-form
-answer always accepted (a bare number matching an option parses too — phrase
-that affordance however fits the question you just asked, or leave it implicit).
-Don't narrate tool mechanics mid-intake — just ask the question — and never
-refuse to proceed because a tool is missing.
+Either rendering keeps the same contract: one question, options shown,
+recommendation marked, free-form answer always accepted (a bare number
+matching an option parses too — phrase that affordance however fits the
+question you just asked, or leave it implicit). Ask the question directly,
+skipping any narration of tool mechanics mid-intake; when no tool is
+available this session, keep the interview moving with the plain-text form.
 
 **When no answer can come back at all** — a single-shot or non-interactive run
 (headless, CI, cron, a scripted driver), where there is no turn in which a
@@ -126,18 +130,47 @@ The lists below are vocabulary to pick from, not menus to show.
    data-flow map · wireframe · static mockup · concept image · storyboard ·
    interactive prototype · functional prototype · hi-fi build on the design
    system. Name the tradeoff for each.
-3. **What fidelity is actually needed?** Render each dimension as a labeled
-   low↔high dial line, each placement justified by PRD evidence:
+3. **What fidelity is actually needed?** Five dimensions — Visual, Interaction,
+   Scope, Complexity, Content (how realistic the sample data is, vs.
+   lorem-ipsum placeholder). Work out a 0-100 position for each internally,
+   justified by concrete PRD evidence, but state that justification to the
+   designer in response text as **dimension + tier label + one-line reason
+   only** — e.g. "Visual — High: the PRD asks for a hi-fi build reviewed
+   against real design-system components". The tier label and reason are
+   what reach the designer; the numeric score stays internal, used only to
+   place the widget's slider (or the fallback scale's marker).
+
+   If `mcp__visualize__show_widget` is available this session, render the
+   interactive dial widget **exactly once**: copy
+   `skills/uno-prototype/references/fidelity-dial-widget.html` verbatim,
+   filling only the five `__..._VALUE__` placeholders with the computed
+   positions, and pass a `title` on that call — the call fails without one,
+   and a failed call followed by a retry is what makes the widget appear to
+   render twice. The widget's own Confirm button is the only confirmation
+   this step needs, and rendering it once completes the step — end the turn
+   there.
+
+   The Confirm button sends back a message naming each dimension's tier (e.g.
+   "Confirmed fidelity — Visual: High, Interaction: Functional, Scope: Core
+   screen, Complexity: Standard, Content: Realistic."). Treat that message as
+   the recorded answer for this step — carry those tier labels verbatim into
+   the brief card's Fidelity line rather than re-asking or re-deriving them.
+
+   Otherwise (no widget tool this session) fall back to a labeled low↔high
+   scale line per dimension, naming the tier rather than the number:
 
    ```
-   Visual        low ──●───── high — wireframe-clean is enough
-   Interaction   low ────●─── high — the filter flow must actually work
-   Scope         low ──●───── high — 3 screens, no settings
-   Complexity    low ─●────── high — happy path only
+   Visual        low ──●───── high — High: needs to look production-real
+   Interaction   low ────●─── high — Functional: the filter flow must actually work
+   Scope         low ──●───── high — Core screen: 3 screens, no settings
+   Complexity    low ─●────── high — Standard: happy path only
+   Content       low ───●──── high — Realistic: a couple of realistic sample rows is enough
    ```
 
-   Then ONE question to confirm or adjust; the confirm option restates the
-   settings ("Yes: mid visual, real interactions, 3 screens").
+   Then ONE question, through the interactive tool when available, to confirm
+   or adjust; the confirm option restates the settings using tier labels
+   ("Yes: high visual, functional interaction, core screen scope, standard
+   complexity, realistic content").
 4. **What should it intentionally NOT include?** State the won't-include list
    in prose (screens skipped · interactions left fake · flows that need not
    exist), each item traceable to the PRD or goal; confirm with an option that

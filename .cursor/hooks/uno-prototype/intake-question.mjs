@@ -102,11 +102,17 @@ export function clearIntakeQuestion(conversationId) {
  * `AskUserQuestion` API shape, sent verbatim to every model. A runtime without
  * that exact tool (Cursor on a non-Claude model, Codex, headless) had no good
  * option: hallucinate a failing tool call, or silently drop to prose. Naming
- * the contract instead means every runtime can satisfy it, and the numbered
- * plain-text form is a first-class rendering, not a degradation.
+ * the contract instead means every runtime can satisfy it — but the contract
+ * still has a default: the tool is what a designer actually experiences as a
+ * picker, so use it whenever the runtime has one. The numbered plain-text
+ * list is the fallback for when it genuinely doesn't, not an equally-weighted
+ * alternative — an earlier version of this string called both renderings
+ * "first-class," which read as license to reach for plain text even when the
+ * tool was sitting right there, including on multi-select steps where plain
+ * text can't actually take more than one answer at a time.
  */
 const ONE_QUESTION_CONTRACT =
-  'ASK EXACTLY ONE QUESTION THIS MESSAGE. If your runtime has an interactive question/choice tool (whatever it is named), use it for a SINGLE question with the options. If it does not, ask in plain text with the options as a numbered list. Both renderings are first-class — the plain-text one is NOT a degraded fallback. Either way: one question, options shown, and a free-form answer always accepted — a bare number matching an option is accepted too, so phrase the affordance however fits the question you just asked.';
+  'ASK EXACTLY ONE QUESTION THIS MESSAGE. If your runtime has an interactive question/choice tool (whatever it is named), use it for a SINGLE question with the options — that is the default whenever the tool exists, including single-choice confirm steps, and it matters most on multi-select questions, where the tool is what lets the designer pick more than one option at once. Only ask in plain text with the options as a numbered list when your runtime genuinely has no such tool this session. Either way: one question, options shown, and a free-form answer always accepted — a bare number matching an option is accepted too, so phrase the affordance however fits the question you just asked.';
 
 export function buildAgentIntakeInstruction(state) {
   const effectiveType = state.type;
