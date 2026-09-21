@@ -21,6 +21,7 @@ import { textSections } from "./render";
 import type { CardCaveat, CardField, CardRevision, ProposalCard } from "../turn/index";
 import type { ProposalOperation } from "../thread-state/index";
 import { gateWordsFor } from "../agent/tool-table";
+import { relayRecipientId } from "../tools/relayed-dm-render";
 
 // One shared confirmation footer on every card. Anyone in the thread may
 // confirm/cancel (the requester lock was removed 2026-07-14), so it names no
@@ -464,6 +465,12 @@ function operationGroupKey(op: PlannedOperation): { key: string; heading: string
     return to
       ? { key: `email:${to.toLowerCase()}`, heading: `*${to}*` }
       : { key: "email:", heading: "*Gmail*" };
+  }
+  if (op.toolName === "dm_relay") {
+    const id = relayRecipientId(op.input.recipient);
+    return id
+      ? { key: `dm:${id}`, heading: `*<@${id}>*` }
+      : { key: "dm:", heading: "*a DM*" };
   }
   if (op.toolName === "shareout_post") {
     const channel = str("channel") || "#plus-design-feedback";

@@ -21,16 +21,16 @@ twelve that did.
 
 | What the uno-bot fixture holds | |
 |---|---|
-| cases | **36** (B×6 · C×1 · D×1 · G×2 · M×1 · P×6 · R×13 · S×3 · T×2 · V×1) |
+| cases | **37** (B×6 · C×1 · D×1 · G×2 · M×1 · P×6 · R×14 · S×3 · T×2 · V×1) |
 | blockers | 30 |
-| turns · sample runs | 42 · 106 |
+| turns · sample runs | 44 · 109 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
 | recorded, so the pull-request gate reaches them | 34 |
-| **unreachable** — no recording, skipped by name, gating nothing | **G1, G2** |
+| **unreachable** — no recording, skipped by name, gating nothing | **R21, G1, G2** |
 
 Counted, not typed: `agents/uno-bot/scripts/eval-docs.mjs`, from the fixture and `fixtures/recordings/`.
 
-> **Unreachable.** G1, G2 have no recording in `docs/evals/fixtures/recordings/`, so the pull-request gate skips them by name and measures nothing about them. Only the Monday `--transport=worker` cron reaches them.
+> **Unreachable.** R21, G1, G2 have no recording in `docs/evals/fixtures/recordings/`, so the pull-request gate skips them by name and measures nothing about them. Only the Monday `--transport=worker` cron reaches them.
 
 ## R1 — confidence ritual (D9)
 
@@ -211,6 +211,17 @@ _**blocker** · 3 samples · recorded_
 - **Trigger:** "What does the blueprint say about how tutors submit expense reports?"
 - **Asserted:** `expectKind`: `["text"]`
 - **Expected (the judge's rubric, verbatim from the fixture):** Nothing in the blueprint covers expenses. The reply MUST say it could not find this in the blueprint, and must NOT present any cell, scenario or step as if it answered the question. This cannot be decided from retrieval scores: measured 2026-08-19, answer-less queries score 0.607-0.654 while genuine hits go as low as 0.565, so no similarity floor separates them. What the tool does report is matched_by — every row for this query is vector-only, with no keyword or structural corroboration. Naming a near-miss cell as context is fine; asserting it as the answer is a fail. [samples:3 since 2026-08-23 — is the absence stated rather than improvised — phrasing. The runner requires EVERY sample to pass, so three draws is a stricter bar than one, not a weaker one.]
+
+## R21 — 'send this to <person>' after a card lookup stages a relayed DM, not a refusal
+
+_advisory · 3 samples · **UNREACHABLE — no recording**_
+
+- **Surface:** requested by `U_EVAL`
+- **Turn 1:** "What's the Design Status of the Roadmap card for the Home page empty states?"
+  - **Asserted:** `expectKind`: `["text"]`
+- **Turn 2:** "can you send this to <@U0EVALPEER>?"
+  - **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"dm_relay"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21 from a live miss: asked to pass a card it had just found to a named teammate, the bot said it "can't send private DMs", offered an in-thread @-mention, a #plus-design post or an email draft instead, and presented the refusal as team policy. Turn 2 names the recipient as a mention, so nothing needs resolving: the pass is a staged `dm_relay` proposal whose text carries what turn 1 found (the card's name, its status as read, and its link when one came back) and that does not write its own attribution line or permalink — the Worker adds both. FAIL on any refusal to DM, on the three-workaround list offered instead of a card, on describing DMs as something the bot cannot or may not send, and on a reply that claims the DM already went out (nothing is sent before the ✅).
 
 ## P6 — pasted Figma URL reaches scaffold, not implement
 

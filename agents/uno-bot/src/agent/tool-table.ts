@@ -205,6 +205,19 @@ export const TOOL_TABLE = {
       nouns: ["email", "mail", "send"],
     },
   },
+  // The relayed DM (CONTEXT.md). One operation per recipient, so "send this to
+  // Coco and Meryem" is one card of two. No review request: a DM is not a
+  // reviewable artifact, so nothing fans out to `#plus-design`.
+  dm_relay: {
+    access: "gated",
+    retrieval: false,
+    reviewRequest: null,
+    gate: {
+      verb: "send a DM on your behalf",
+      kind: "send a DM",
+      nouns: ["dm", "message", "send", "relay"],
+    },
+  },
   github_issue_create: {
     access: "gated",
     retrieval: false,

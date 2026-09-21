@@ -154,7 +154,9 @@ export async function executeGithubIssueCreate(
       return getPermalink(env, slack.channel, slack.userMsgTs).catch(() => null);
     },
     async postToThread(text) {
-      await postMessage(env, { channel: slack.channel, thread_ts: slack.threadTs, text });
+      // Under the real ts the card was posted with (`SlackContext.replyTs`) —
+      // in a threadless DM the conversation key is not one Slack accepts.
+      await postMessage(env, { channel: slack.channel, thread_ts: slack.replyTs ?? slack.threadTs, text });
     },
   });
 }

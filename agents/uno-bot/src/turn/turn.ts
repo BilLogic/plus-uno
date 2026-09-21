@@ -60,6 +60,7 @@ import type { ModelTier } from "../agent/routing";
 import { resolveSignal, type GateVerdict } from "../gate/index";
 import { collectStrings } from "../agent/tool-input";
 import { gateWordsFor } from "../agent/tool-table";
+import { relayRecipientId } from "../tools/relayed-dm-render";
 import {
   MAX_HISTORY_TURNS,
   proposalOperations,
@@ -67,6 +68,7 @@ import {
   type AssistantContext,
   type HistoryTurn,
   type PendingProposal,
+  type ProposalOperation,
   type ThreadRef,
   type ThreadState,
   type VisionReference,
@@ -1357,7 +1359,43 @@ async function buildCard(
     const target = await deps.cards.notionTarget(input);
     return target ? { ...card, target } : card;
   }
+  if (toolName === "dm_relay") return { ...card, fields: relayFieldsOf(result.operations) };
   return card;
+}
+
+/**
+ * A relayed DM's card: who will be DM'd, and the text they will read.
+ *
+ * The fields are built from EVERY relay in the batch, not the first operation's
+ * input, because each recipient is an operation of its own and the ✅ is
+ * consent to each of them. A recipient reads as the mention Slack would ping —
+ * the check that the name resolved to the right person is made by looking at
+ * it. One text shared by every recipient is shown once; texts that differ are
+ * shown per recipient, verbatim.
+ */
+function relayFieldsOf(operations: ReadonlyArray<ProposalOperation>): CardField[] {
+  const relays = operations.filter((op) => op.toolName === "dm_relay");
+  const mention = (op: ProposalOperation): string => {
+    const id = relayRecipientId(op.input.recipient);
+    return id ? `<@${id}>` : String(op.input.recipient ?? "");
+  };
+  const textOf = (op: ProposalOperation): string =>
+    typeof op.input.text === "string" ? op.input.text : "";
+  if (new Set(relays.map(textOf)).size > 1) {
+    return [
+      {
+        label: "messages",
+        under: relays.map((op) => ({ field: { label: mention(op), value: textOf(op) } })),
+      },
+    ];
+  }
+  const recipients = relays.map(mention);
+  return [
+    recipients.length === 1
+      ? { label: "recipient", value: recipients[0]! }
+      : { label: "recipients", value: recipients.join(", ") },
+    { label: "text", value: textOf(relays[0]!) },
+  ];
 }
 
 /**

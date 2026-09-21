@@ -31,6 +31,7 @@ import {
 } from "../src/turn/index";
 import { batchResultMessage } from "../src/slack/batch-result";
 import { renderProposalCard } from "../src/slack/proposal-render";
+import { executeRelayDm, type RelaySlack } from "../src/tools/relay-dm";
 import {
   createInMemoryThreadState,
   type HistoryTurn,
@@ -551,6 +552,82 @@ test("several side-effect calls in one reply stage ONE proposal that holds all o
   // And the store holds the whole batch, so a later ✅ runs all of it.
   const staged = await h.threadState.getProposalByThread(REF);
   assert.equal(staged?.operations?.length, 3);
+});
+
+// A relayed DM: the card names the person and shows the words, nobody's inbox
+// hears anything until the ✅, and the ✅ reaches each recipient once.
+test("'send this to <@…>' stages a relayed DM, and only the ✅ sends it — once per recipient", async () => {
+  const text = "RM-2436 Calendar Sync is Ready for QA:\n<https://notion.so/rm-2436|the card>";
+  const opened: string[] = [];
+  const dms: Array<{ channel: string; text: string }> = [];
+  const slack: RelaySlack = {
+    async openDm(userId) {
+      opened.push(userId);
+      return { ok: true, channel: `D-${userId}` };
+    },
+    async postMessage(message) {
+      if (message.channel.startsWith("D-")) dms.push(message);
+      return { ok: true };
+    },
+    async permalink(channel, ts) {
+      return `https://plus.slack.com/archives/${channel}/p${ts.replace(".", "")}`;
+    },
+  };
+  const h = harness({
+    replies: [
+      {
+        text: "I'll pass the card along to both of them.",
+        toolCalls: [
+          { name: "dm_relay", args: { recipient: "<@U0COCO>", text } },
+          { name: "dm_relay", args: { recipient: "U0MERYEM", text } },
+        ],
+      },
+    ],
+    executeOperation: (op) =>
+      executeRelayDm({ slack }, op.input, {
+        channel: CHANNEL,
+        threadTs: CONVERSATION,
+        replyTs: CONVERSATION,
+        userMsgTs: "1700000000.000200",
+        requestedBy: "U1",
+      }),
+  });
+
+  const outcome = await runTurn(
+    request({ text: "can you send this to <@U0COCO> and <@U0MERYEM>?" }),
+    h.deps,
+  );
+
+  assert.equal(outcome.disposition, "staged");
+  assert.ok(outcome.staged);
+  // ONE card for both recipients, one operation each.
+  assert.equal(h.delivery.calls.filter((c) => c.kind === "proposal").length, 1);
+  assert.deepEqual(
+    outcome.staged.proposal.operations?.map((o) => o.toolName),
+    ["dm_relay", "dm_relay"],
+  );
+  // The card names each recipient as a mention and carries the text verbatim.
+  const card = renderProposalCard(outcome.staged.card).text;
+  assert.match(card, /send a DM on your behalf/);
+  assert.ok(card.includes("<@U0COCO>"), card);
+  assert.ok(card.includes("<@U0MERYEM>"), card);
+  assert.ok(card.includes(text), card);
+  // Nothing reached anyone: staging opens no DM.
+  assert.equal(opened.length, 0);
+  assert.equal(dms.length, 0);
+
+  const pending = await h.threadState.getProposalByThread(REF);
+  assert.ok(pending);
+  await runTurn(request({ text: ":white_check_mark:", pending }), h.deps);
+
+  assert.deepEqual(opened, ["U0COCO", "U0MERYEM"]);
+  assert.deepEqual(dms.map((d) => d.channel), ["D-U0COCO", "D-U0MERYEM"]);
+  for (const dm of dms) {
+    assert.ok(dm.text.startsWith("<@U1> asked me to pass this on:"), dm.text);
+    assert.ok(dm.text.includes(text));
+    assert.ok(dm.text.includes("https://plus.slack.com/archives/C1/p1700000000000200"), dm.text);
+  }
+  assert.deepEqual(h.ran.map((o) => o.ok), [true, true]);
 });
 
 test("what the card lists is what ThreadState holds — four pages, mixed kinds, none missing", async () => {

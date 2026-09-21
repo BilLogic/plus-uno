@@ -606,6 +606,28 @@
     }
   },
   {
+    "name": "dm_relay",
+    "description": "SIDE EFFECT (sends a real Slack DM), routed through the confirmation gate. A relayed DM: pass something to a named person as a DM, on the requester's behalf — 'send this to Coco', 'pass this along to <@U…>'. One call per recipient; several recipients are several calls in the same reply, which stage as one card. `recipient` is a Slack user id: resolve a name first with notion_search (scope 'team', the roster carries Slack ids), slack_channel_members + slack_user_profile, or an @-mention in the thread, and when a name matches more than one person ask which one instead of staging. The Worker opens the DM with who asked and closes it with a link back to this conversation — write neither yourself. Carry only what is visible in this conversation; private material from any other space never travels in a relay.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recipient",
+        "text"
+      ],
+      "properties": {
+        "recipient": {
+          "type": "string",
+          "description": "One Slack user id (U…), bare or as an <@U…> mention. Never a name — resolve it first."
+        },
+        "text": {
+          "type": "string",
+          "description": "The message, in standard Markdown, exactly as the recipient should read it. Readable on its own, from a phone: name the card or doc, its status, and its link."
+        }
+      }
+    }
+  },
+  {
     "name": "github_issue_create",
     "description": "SIDE EFFECT (creates a real issue in a PUBLIC repo), routed through the confirmation gate. File an intake as a GitHub issue on the harness repo, where harness work is specced and fixed. Use it when someone asks to track, file or report a problem with uno-bot itself or the harness (skills, persona, harness docs, evals) — 'track this on GitHub', 'file an issue for someone to fix'. Product and design maintenance (a DS component, a product flow, a design doc) is a Roadmap intake card (notion_create, surface 'intake') instead; say which surface you chose so the requester can redirect it. You write the title and body only — the Worker sets the repo and the triage labels and appends a footer naming the requester and linking this thread. Anyone on the internet can read the issue: content from a DM or private channel other than this conversation never goes in it.",
     "input_schema": {
