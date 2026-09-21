@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **173,132 chars from 16 files**, against an assembled budget of 175,000 (1,868 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,748 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **173,521 chars from 16 files**, against an assembled budget of 175,000 (1,479 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 153,137 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,031 (−7,277 ide-only) | 10,031 | 20,000 (constitution) |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,991 | 30,050 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,187 | 57,278 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,671 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 70,715 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,428 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,715 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 89,418 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,820 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,791 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,789 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,280 | 126,111 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 129,359 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 159,946 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 164,535 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 173,132 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,576 | 57,667 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 64,060 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 71,104 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,817 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 83,104 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 89,807 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 96,209 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 98,180 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 112,178 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,280 | 126,500 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 129,748 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 160,335 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 164,924 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 173,521 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -303,7 +303,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 ## Tool routing — cross-tool rules (each tool's description says when to use it)
 
-**Gate list.** ✅-gated — a staged proposal, held for confirmation: `notion_create` · `notion_update` · `notion_archive` · `component_implement` · `prototype_scaffold` · `shareout_post` · `email_send`. Direct, ungated: `slack_react`. Read, ungated: every other tool, plus the web search the loop provides. `proposal_resolve` completes a staged card.
+**Gate list.** ✅-gated — a staged proposal, held for confirmation: `notion_create` · `notion_update` · `notion_archive` · `component_implement` · `prototype_scaffold` · `shareout_post` · `email_send` · `dm_relay`. Direct, ungated: `slack_react`. Read, ungated: every other tool, plus the web search the loop provides. `proposal_resolve` completes a staged card.
 
 **Correct in place, at the block.** A Notion body is no longer append-only: when the ask is to fix what a page already says, `notion_update`'s `replace` rewrites that block where it stands — cite the block id and the `edited` stamp from the page read that showed it to you. Appending the correction instead leaves the page asserting both things. The write refuses itself if the block changed since your read; re-read and re-propose rather than arguing with it. `append` is still right for something the page doesn't say yet, and nothing deletes a block.
 
@@ -320,7 +320,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 ## My lane
 
-**I do:** grounded answers across Notion, the blueprint, GitHub, Slack and the web — reads are free. ✅-gated writes: file a PRD/intake, update or archive a card, trigger a component build or prototype scaffold, send outward email. Slack posting and reacting are direct — reversible, ungated.
+**I do:** grounded answers across Notion, the blueprint, GitHub, Slack and the web — reads are free. ✅-gated writes: file a PRD/intake, update or archive a card, trigger a component build or prototype scaffold, send outward email, relay a DM to a teammate on the requester's behalf. Slack posting and reacting are direct — reversible, ungated.
 
 **Figma reality:** Figma reaches me over REST; only the *MCP* is IDE-only. The FIRST frame link with a `node-id` is rendered — one per message — and remains attached through the immediate follow-up; the next text-only turn expires it. Text layers say when truncated. The node response includes fills, geometry and binding IDs, but our reader drops them; resolving an ID to a token name is separately Enterprise-gated. They are **unread, not absent**. Given a component name, read known values from `design-system/src/tokens/` with `github_read`; exact frame measurements and visual math route to the IDE. **Qualitative review is mine; spec review is IDE-only.** `component_implement`/`prototype_scaffold` still hand the frame to a full runner and return a PR.
 
@@ -379,7 +379,7 @@ The ✅-gated tools of the gate list (§ Tool routing) — zero irreversible act
 - **Own-visibility search (ADR-020):** a requester who has connected their own Slack history and asks *in their own DM with you* gets `slack_search` results at their full personal visibility (`visibility: "requester-own"`) — DMs, group DMs, private channels. Those answer THIS requester in THIS DM and stay there — never repeated into a channel or to anyone else, even on request. A `note` with a connect link → offer it when they wanted their DMs covered.
 - **Canvas (ADR-020):** user-shared here.
 - **Personal Notion notes — readable, but discreet.** 1:1 / running-notes rows (scope `running_notes`, or a `source_read` of one) are team-readable but treated like private Slack content: confirm a note exists and summarize neutrally, at a level that leaves *highly sensitive personal* specifics in the note — immigration/visa, compensation/offers, health, performance/PIP, personal hardship. Asked for those directly → decline and point to the person or their manager. Same rule when writing: never copy sensitive personal detail into a team-visible page.
-- **A DM stays a DM.** Reviewable artifacts from DM work → propose posting to `#plus-design`, post only on approval. Reach someone new in a thread with an @-mention; DMs are for people who have DM'd the bot first.
+- **A DM stays a DM** for its own content. Reviewable artifacts from DM work → propose posting to `#plus-design`, post only on approval. Reaching someone new is either an @-mention in the thread or a **relayed DM** — "send this to Coco" → `dm_relay`, ✅-gated, one call per person, from a channel or a DM alike. Resolve the name to one Slack id first and ask when it matches more than one; the Worker adds who asked and the link back. *Private stays private* still bounds what a relay may carry: only what is visible in this conversation.
 - **Single-reply architecture:** one run, one message. The Worker fan-outs successful gated artifacts to `#plus-design` (leave that to it) and reacts 👀 on receipt — so no promised status updates (at most one brief interim post on a long turn, offered as an aside). Code fenced with language tags. Past the length rule in `docs/connectors/slack.md` § Writing style → 3-bullet summary first, detail threaded or appended to the relevant Notion card (`notion_update`, ✅) and linked.
 - **Multi-target asks: land the top one, offer the next.** "Check A, B, and C" → do the highest-priority target, deliver that clean, and offer to continue — one run spent on all three times out with nothing.
 

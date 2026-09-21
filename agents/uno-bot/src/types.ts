@@ -10,6 +10,14 @@ import type { ThreadState as ThreadStateDurableObject } from "./thread-state";
 export interface SlackContext {
   channel: string;
   threadTs: string;
+  /** A REAL message ts to reply under in the requesting conversation, when the
+   *  caller knows one — the Gate's reply target. `threadTs` is the conversation
+   *  key, which in a threadless DM is not a ts Slack accepts. */
+  replyTs?: string;
+  /** This operation is one of several approved together. The Gate posts ONE
+   *  summary for the batch, naming each operation's result, so a tool that
+   *  would confirm itself in the thread leaves that to the summary. */
+  batched?: boolean;
   userMsgTs: string;
   requestedBy?: string;
   /** Slack's per-event action token, forwarded from the triggering message.

@@ -371,12 +371,24 @@ export interface ConversationsRepliesResult extends SlackOk {
  *  posted publicly announces you were not following it, and "is this still
  *  true?" reads as calling out whoever wrote the message. */
 export async function conversationsOpen(env: Env, userId: string): Promise<string | null> {
+  const res = await openConversation(env, userId);
+  return res.ok ? res.channel : null;
+}
+
+/** `conversations.open` with Slack's refusal kept. A relayed DM has to say WHY
+ *  a DM could not be opened — a deactivated account, a bot, a Slack Connect
+ *  user — and `conversationsOpen` above answers every one of those as null. */
+export async function openConversation(
+  env: Env,
+  userId: string,
+): Promise<{ ok: true; channel: string } | { ok: false; error: string }> {
   const res = await slackCall<SlackResponse & { channel?: { id?: string } }>(
     env,
     "conversations.open",
     { users: userId },
   );
-  return res.ok ? (res.channel?.id ?? null) : null;
+  if (!res.ok) return { ok: false, error: res.error };
+  return res.channel?.id ? { ok: true, channel: res.channel.id } : { ok: false, error: "no_channel" };
 }
 
 /** Permalink for a message. Fetched, never constructed: the archive URL shape

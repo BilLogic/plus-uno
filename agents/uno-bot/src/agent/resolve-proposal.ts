@@ -81,6 +81,16 @@ export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<vo
     executeTool(env, operation.toolName, operation.input, {
       channel: run.channel,
       threadTs: run.threadTs,
+      // The real ts to reply under, and who asked: a relayed DM names the
+      // requester to its recipient and confirms in their thread.
+      // Who ASKED — the requester of record — not whoever pressed ✅: anyone
+      // in the thread may approve, and `email_send`'s allowlist and a relayed
+      // DM's attribution are both about the person the action is for.
+      ...(verdict.post?.replyTs ? { replyTs: verdict.post.replyTs } : {}),
+      requestedBy: run.requesterUserId,
+      // More than one operation → `batchResultMessage` below is the thread's
+      // one account of the outcome.
+      ...(run.operations.length > 1 ? { batched: true } : {}),
       userMsgTs: run.userMsgTs,
       // Carry the PRD resolved at proposal time — it's not re-extractable here.
       notionPrdId: run.notionPrdId,

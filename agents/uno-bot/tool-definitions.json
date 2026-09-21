@@ -606,6 +606,28 @@
     }
   },
   {
+    "name": "dm_relay",
+    "description": "SIDE EFFECT (sends a real Slack DM), routed through the confirmation gate. A relayed DM: pass something to a named person as a DM, on the requester's behalf — 'send this to Coco', 'pass this along to <@U…>'. One call per recipient; several recipients are several calls in the same reply, which stage as one card. `recipient` is a Slack user id: resolve a name first with notion_search (scope 'team', the roster carries Slack ids), slack_channel_members + slack_user_profile, or an @-mention in the thread, and when a name matches more than one person ask which one instead of staging. The Worker opens the DM with who asked and closes it with a link back to this conversation — write neither yourself. Carry only what is visible in this conversation; private material from any other space never travels in a relay.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recipient",
+        "text"
+      ],
+      "properties": {
+        "recipient": {
+          "type": "string",
+          "description": "One Slack user id (U…), bare or as an <@U…> mention. Never a name — resolve it first."
+        },
+        "text": {
+          "type": "string",
+          "description": "The message, in standard Markdown, exactly as the recipient should read it. Readable on its own, from a phone: name the card or doc, its status, and its link."
+        }
+      }
+    }
+  },
+  {
     "name": "proposal_resolve",
     "description": "Resolve a side-effect proposal that is awaiting confirmation. Use it when the system prompt shows a pending proposal AND the user's current message is a decision about it, in whatever words — a yes ('go ahead', 'sure', 'ok', 'sounds good', 'yep do it') confirms; a no ('cancel', 'no', 'scrap it') cancels. Anyone in the thread may confirm or cancel, not just the original requester. A message that asks for a change, or asks something unrelated, gets a conversational reply instead, and the proposal sits until someone presses ✅ / ⛔ on the card, reacts, or it expires after 60 minutes.",
     "input_schema": {
