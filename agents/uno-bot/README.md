@@ -45,7 +45,7 @@ Deleting the second loop is what made `/stop` work on Claude (#496): `claude-age
 
 ## What it can / partially can / can't do
 
-**Can (reads are free; Slack messaging is native):** answer grounded questions — Roadmap card status (`roadmap_query`), product behavior from the blueprint (`search_blueprint`), DS/component/repo facts (`github_read`), Slack search + thread reads, Slack Canvases shared into the originating conversation, any linked doc (`source_read`), access-request routing via the Third Party Applications directory (`notion_search` scope `apps` — names the Application Admin to ask + pre-fills the request; the grant stays human) — and post/react in Slack as itself.
+**Can (reads are free; Slack messaging is native):** answer grounded questions — Roadmap card status (`roadmap_query`), product behavior from the blueprint (`search_blueprint`), DS/component/repo facts (`github_read`), open GitHub intakes by keyword before filing another (`github_intake_search`), Slack search + thread reads, Slack Canvases shared into the originating conversation, any linked doc (`source_read`), access-request routing via the Third Party Applications directory (`notion_search` scope `apps` — names the Application Admin to ask + pre-fills the request; the grant stays human) — and post/react in Slack as itself.
 
 **Can, behind the ✅ gate (proposal card, 60-min expiry, anyone in the thread may confirm):** file a PRD or intake card (`notion_create`), update/append to a card (`notion_update`), archive a card (`notion_archive`), trigger a DS component build (`component_implement` → `figma-implement.yml`), scaffold a prototype from a Figma frame (`prototype_scaffold` → `figma-implement-design.yml`), post a share-out (`shareout_post`), send outward email (`email_send`), file a uno-bot/harness intake as a GitHub issue on the public repo (`github_issue_create` — the Worker fixes the repo and the `harness-intake` + `needs-triage` labels and adds a footer naming the requester and linking the thread). Confirmed implement/scaffold dispatches also carry the **full triggering-thread transcript** (names resolved, last ~50 messages / ~10k chars, truncation noted) in the `client_payload` (`thread_transcript`), so the Actions runner sees the whole discussion — the bot itself still never edits repos.
 
@@ -131,7 +131,7 @@ curl http://localhost:8787/health
 | `SLACK_BOT_TOKEN` | `xoxb-…` for `chat.postMessage`, `reactions.add`, `conversations.replies` |
 | `SLACK_MCP_CLIENT_SECRET` | Secret for the static Slack OAuth client (the `slack_search` user token) |
 | `GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY` | Vertex service account — powers BOTH the Gemini and Vertex-Claude adapters (billed to the GCP project). Canonical credential, wins whenever fully set (ADR-018); `GEMINI_API_KEY` (AI Studio) is a local-dev fallback for Gemini only — never set it on the Worker |
-| `GITHUB_TOKEN` | PAT for `repository_dispatch`, `github_read` and issue creation (`github_issue_create` — needs Issues: write on `GITHUB_REPO`) |
+| `GITHUB_TOKEN` | PAT for `repository_dispatch`, `github_read`, the intake duplicate check (`github_intake_search`) and issue creation (`github_issue_create` — needs Issues: write on `GITHUB_REPO`) |
 | `NOTION_API_KEY` | Notion integration token (`notion_create` / `notion_update` / `notion_archive` + catalog reads) |
 | `FIGMA_ACCESS_TOKEN` | Figma read token — the `prototype_scaffold` proposal screenshot + the library poll's reads |
 | `SUPABASE_ANON_KEY` | read-only blueprint key (`search_blueprint`) |

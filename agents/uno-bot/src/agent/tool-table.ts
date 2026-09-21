@@ -126,6 +126,8 @@ export const TOOL_TABLE = {
   source_read: { access: "ungated", retrieval: true, reviewRequest: null },
   search_blueprint: { access: "ungated", retrieval: true, reviewRequest: null },
   github_read: { access: "ungated", retrieval: true, reviewRequest: null },
+  // The duplicate check before `github_issue_create`: open intakes by keyword.
+  github_intake_search: { access: "ungated", retrieval: true, reviewRequest: null },
   slack_user_profile: { access: "ungated", retrieval: true, reviewRequest: null },
   slack_channel_members: { access: "ungated", retrieval: true, reviewRequest: null },
   slack_thread_read: { access: "ungated", retrieval: true, reviewRequest: null },

@@ -174,6 +174,23 @@
     }
   },
   {
+    "name": "github_intake_search",
+    "description": "Read-only, ungated. Search the open GitHub intakes on the harness repo (issues labelled harness-intake, awaiting triage) by keyword. Run it before staging github_issue_create, every time: if an open intake already covers the request, name it by title and link and ask whether to link that one instead or file a new one anyway — stage the card only on 'file anyway'. The Worker fixes the repo, the open state and the label; you send keywords only.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "keywords"
+      ],
+      "properties": {
+        "keywords": {
+          "type": "string",
+          "description": "Two to four distinctive words that name the problem, e.g. 'github issue refuses', 'canvas export timeout'. Every word must match, so fewer finds more."
+        }
+      }
+    }
+  },
+  {
     "name": "slack_user_profile",
     "description": "Read-only, ungated. Look up a Slack user's profile by id — display name, title/role, email, timezone, status. Use it when you need to know WHO someone is: a member id from slack_channel_members, an @-mention in the thread, a card contributor's Slack identity. Mention people as <@id> in replies.",
     "input_schema": {

@@ -749,6 +749,25 @@
       "expectTool": "notion_create",
       "forbidTool": "github_issue_create",
       "judgeNote": "AUTHORED 2026-09-21. The routing half of the GitHub intake: a design-system gap is product/design maintenance, and that still lands as a Roadmap intake card (notion_create, surface 'intake'), not a GitHub issue — the GitHub route is for problems with uno-bot and the harness. For the judge: the card is surface 'intake', names the gap as the designer described it without inventing evidence, the reply names the Roadmap as the surface it chose so the requester can redirect it, and it stays in future tense. Staging a GitHub issue fails deterministically. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed yet, so neither G case can be captured; it becomes a blocker in the PR that commits its recording.]"
+    },
+    {
+      "id": "G3",
+      "name": "a request an open intake already covers gets a duplicate offer, not a fresh card",
+      "blocker": false,
+      "samples": 3,
+      "turns": [
+        {
+          "prompt": "uno-bot told me it can't open GitHub issues and gave me a template to paste instead. Please track this on GitHub."
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "expectToolCalled": {
+        "tool": "github_intake_search"
+      },
+      "forbidTool": "github_issue_create",
+      "judgeNote": "AUTHORED 2026-09-21. The duplicate check before a GitHub intake. SEED: recorded while an open issue labelled harness-intake on the harness repo covers this same problem (the bot refusing to open GitHub issues) — file that intake through G1 first, then record this case. Deterministic: the route's tool list holds a github_intake_search call, and no github_issue_create is staged. For the judge: the reply names the open intake the search returned by its title and link, exactly as the tool gave them, and asks whether to link that issue or file a new one anyway — a choice, not a decision made for the requester. It invents no issue number or URL the search did not return, and does not claim to have linked or commented on anything (the bot can only file). A fresh card staged over the match, or a reply that never mentions the match, fails. [samples:3 — whether the check runs before the card is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed and the seed does not exist yet; it becomes a blocker in the PR that commits its recording.]"
     }
   ]
 }

@@ -7,7 +7,9 @@
 // One write lives here too: creating an issue, for `github_issue_create`. It is
 // a CLIENT rather than a function, so the executor takes it by name and a test
 // hands it a fake (`tests/github-intake.test.ts`). Create only — nothing here
-// comments on, edits, closes or relabels an issue.
+// comments on, edits, closes or relabels an issue. Beside it, the read the
+// duplicate check runs first — open issues by label and keyword, for
+// `github_intake_search` — a client for the same reason.
 
 import type { Env } from "../types";
 import { countedFetch } from "../net";
@@ -185,6 +187,81 @@ export function githubIssueClient(env: Env): GithubIssueClient {
         );
       }
       return { number: data.number, url: data.html_url };
+    },
+  };
+}
+
+/** An open issue a search found — enough to name it and link it. */
+export interface OpenIssue {
+  number: number;
+  title: string;
+  /** The issue's github.com page. */
+  url: string;
+  /** When it last changed, as GitHub stamps it; "" when GitHub gave none. */
+  updated: string;
+}
+
+/** The read the duplicate check needs, bound to the same one repo. */
+export interface GithubIssueSearch {
+  /** `owner/name` — the repo every search reads. */
+  readonly repo: string;
+  /** Open issues carrying `label` that match `terms`, best match first.
+   *  Throws `GithubRequestError` on any non-2xx. */
+  searchOpenIssues(label: string, terms: string): Promise<OpenIssue[]>;
+}
+
+const ISSUE_SEARCH_LIMIT = 5;
+
+/**
+ * Issue search on the Worker's own repo and token (GET /search/issues), for
+ * `github_intake_search`.
+ *
+ * The repo, `is:issue` and `is:open` are written here, never taken from the
+ * caller, so a search reads open issues on `GITHUB_REPO` and nothing else. One
+ * subrequest per search.
+ */
+export function githubIssueSearch(env: Env): GithubIssueSearch {
+  const repo = env.GITHUB_REPO;
+  return {
+    repo,
+    async searchOpenIssues(label, terms) {
+      if (!env.GITHUB_TOKEN || !repo) {
+        throw new Error("GitHub not configured on the Worker (GITHUB_TOKEN/GITHUB_REPO)");
+      }
+      const q = `repo:${repo} is:issue is:open label:${label} ${terms}`;
+      const url =
+        `https://api.github.com/search/issues?q=${encodeURIComponent(q)}` +
+        `&per_page=${ISSUE_SEARCH_LIMIT}`;
+      const res = await countedFetch(url, {
+        headers: {
+          authorization: `Bearer ${env.GITHUB_TOKEN}`,
+          accept: "application/vnd.github+json",
+          "x-github-api-version": "2022-11-28",
+          "user-agent": "uno-bot",
+        },
+      }, GH_TIMEOUT_MS);
+      if (!res.ok) {
+        // The status only, as the create logs it.
+        console.warn(`[github] issue search on ${repo} refused: ${res.status}`);
+        throw new GithubRequestError(res.status, `GitHub issue search ${res.status} for ${repo}`);
+      }
+      const data = (await res.json().catch(() => ({}))) as {
+        items?: Array<{ number?: unknown; title?: unknown; html_url?: unknown; updated_at?: unknown }>;
+      };
+      // A hit with no number, title or link is not one the reply can name.
+      return (data.items ?? []).flatMap((i) =>
+        typeof i.number === "number" &&
+        typeof i.title === "string" &&
+        typeof i.html_url === "string" &&
+        i.html_url
+          ? [{
+              number: i.number,
+              title: i.title,
+              url: i.html_url,
+              updated: typeof i.updated_at === "string" ? i.updated_at : "",
+            }]
+          : [],
+      );
     },
   };
 }

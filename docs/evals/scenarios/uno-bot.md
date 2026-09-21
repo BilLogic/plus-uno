@@ -21,16 +21,16 @@ twelve that did.
 
 | What the uno-bot fixture holds | |
 |---|---|
-| cases | **37** (B×6 · C×1 · D×1 · G×2 · M×1 · P×6 · R×14 · S×3 · T×2 · V×1) |
+| cases | **38** (B×6 · C×1 · D×1 · G×3 · M×1 · P×6 · R×14 · S×3 · T×2 · V×1) |
 | blockers | 30 |
-| turns · sample runs | 44 · 109 |
+| turns · sample runs | 45 · 112 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
 | recorded, so the pull-request gate reaches them | 34 |
-| **unreachable** — no recording, skipped by name, gating nothing | **R21, G1, G2** |
+| **unreachable** — no recording, skipped by name, gating nothing | **R21, G1, G2, G3** |
 
 Counted, not typed: `agents/uno-bot/scripts/eval-docs.mjs`, from the fixture and `fixtures/recordings/`.
 
-> **Unreachable.** R21, G1, G2 have no recording in `docs/evals/fixtures/recordings/`, so the pull-request gate skips them by name and measures nothing about them. Only the Monday `--transport=worker` cron reaches them.
+> **Unreachable.** R21, G1, G2, G3 have no recording in `docs/evals/fixtures/recordings/`, so the pull-request gate skips them by name and measures nothing about them. Only the Monday `--transport=worker` cron reaches them.
 
 ## R1 — confidence ritual (D9)
 
@@ -352,6 +352,14 @@ _advisory · 3 samples · **UNREACHABLE — no recording**_
 - **Trigger:** "File an intake: the Button component's disabled state has no Figma spec, so designers keep guessing the opacity. Someone should add it to the design system."
 - **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"notion_create"` · `forbidTool`: `"github_issue_create"`
 - **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. The routing half of the GitHub intake: a design-system gap is product/design maintenance, and that still lands as a Roadmap intake card (notion_create, surface 'intake'), not a GitHub issue — the GitHub route is for problems with uno-bot and the harness. For the judge: the card is surface 'intake', names the gap as the designer described it without inventing evidence, the reply names the Roadmap as the surface it chose so the requester can redirect it, and it stays in future tense. Staging a GitHub issue fails deterministically. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed yet, so neither G case can be captured; it becomes a blocker in the PR that commits its recording.]
+
+## G3 — a request an open intake already covers gets a duplicate offer, not a fresh card
+
+_advisory · 3 samples · **UNREACHABLE — no recording**_
+
+- **Trigger:** "uno-bot told me it can't open GitHub issues and gave me a template to paste instead. Please track this on GitHub."
+- **Asserted:** `expectKind`: `["text"]` · `expectToolCalled`: `{"tool":"github_intake_search"}` · `forbidTool`: `"github_issue_create"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. The duplicate check before a GitHub intake. SEED: recorded while an open issue labelled harness-intake on the harness repo covers this same problem (the bot refusing to open GitHub issues) — file that intake through G1 first, then record this case. Deterministic: the route's tool list holds a github_intake_search call, and no github_issue_create is staged. For the judge: the reply names the open intake the search returned by its title and link, exactly as the tool gave them, and asks whether to link that issue or file a new one anyway — a choice, not a decision made for the requester. It invents no issue number or URL the search did not return, and does not claim to have linked or commented on anything (the bot can only file). A fresh card staged over the match, or a reply that never mentions the match, fails. [samples:3 — whether the check runs before the card is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed and the seed does not exist yet; it becomes a blocker in the PR that commits its recording.]
 
 ## Written down, and not in the fixture
 
