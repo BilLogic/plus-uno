@@ -291,10 +291,13 @@ test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
   // put the emptied bundle back over the floor, and the deep-module batch
   // #592-#625 did it again by adding a glossary row per module landed.
   // `figma.md` is the fifth member for the reason `supabase/overview.md` was the
-  // fourth: about 6.8k of real headroom rather than the next hairline. If this
-  // trips again, add another member rather than trimming prose to fit a
-  // fixture — the bundle growing is the healthy direction, and the thing under
-  // test is the bundler's refusal, not the corpus's size.
+  // fourth: about 6.8k of real headroom rather than the next hairline. The
+  // floor is checked with its 4,000 margin, though, and the GitHub intake's
+  // persona lines put the emptied bundle back over it;
+  // `engineering/operations.md` is the sixth member, for another ~8.5k.
+  // If this trips again, add another member rather than trimming prose to fit
+  // a fixture — the bundle growing is the healthy direction, and the thing
+  // under test is the bundler's refusal, not the corpus's size.
   const result = withFile(wranglerToml, withRegion("us-central1"), () =>
     withFiles(
       [
@@ -303,6 +306,7 @@ test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
         "docs/connectors/supabase/blueprint-navigation.md",
         "docs/connectors/supabase/overview.md",
         "docs/connectors/figma.md",
+        "docs/engineering/operations.md",
       ],
       frontmatterOnly,
       () => runBundler(["--check"]),
