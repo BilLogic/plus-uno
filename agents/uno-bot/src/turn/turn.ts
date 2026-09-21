@@ -356,6 +356,9 @@ export interface TurnDeps {
     /** A render of the Figma node a `prototype_scaffold` implements, or null
      *  where there is no node or the render failed. Best-effort by contract. */
     designPreviewImage(input: Record<string, unknown>): Promise<string | null>;
+    /** The repo a `github_issue_create` files into — the Worker's
+     *  `GITHUB_REPO`, so the card names where the issue will actually land. */
+    issueRepo(): string;
   };
 
   /**
@@ -1325,6 +1328,13 @@ async function buildCard(
     operations: result.operations,
   };
 
+  if (toolName === "github_issue_create") {
+    // THE PUBLIC REPO: an intake is readable by anyone the moment it is filed,
+    // and the card is the one place a person reads the body before it goes
+    // out — so every such card says so, naming the repo the Worker files into.
+    return { ...card, caveats: [{ kind: "public-repo", repo: deps.cards.issueRepo() }] };
+  }
+
   if (toolName === "prototype_scaffold") {
     // The Figma render, when one can be fetched — a URL on the card, not a
     // block: what Slack does with an image is the adapter's.
@@ -1433,16 +1443,14 @@ function cardFieldOf(label: string, value: unknown): CardField {
  * contract for prototype share-outs is a Loom walkthrough, a live preview and a
  * Decisions DB link (`skills/uno-publish/references/method.md`).
  *
- * THE PUBLIC REPO: a GitHub intake is readable by anyone the moment it is
- * filed, and the card is the one place a person reads the body before it goes
- * out — so every such card says so, whatever the body holds.
+ * The public-repo caveat is `buildCard`'s, because naming the repo takes a
+ * read of the Worker's config through `deps.cards`.
  */
 function caveatsFor(
   toolName: string,
   input: Record<string, unknown>,
   previewText: string | undefined,
 ): CardCaveat[] {
-  if (toolName === "github_issue_create") return [{ kind: "public-repo" }];
   if (toolName === "shareout_post") {
     const summary = typeof input.summary === "string" ? input.summary : "";
     if (!/prototype|prototypes|scaffold/i.test(summary)) return [];

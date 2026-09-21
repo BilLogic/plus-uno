@@ -22,7 +22,7 @@ twelve that did.
 | What the uno-bot fixture holds | |
 |---|---|
 | cases | **36** (B×6 · C×1 · D×1 · G×2 · M×1 · P×6 · R×13 · S×3 · T×2 · V×1) |
-| blockers | 32 |
+| blockers | 30 |
 | turns · sample runs | 42 · 106 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
 | recorded, so the pull-request gate reaches them | 34 |
@@ -328,19 +328,19 @@ _**blocker** · 3 samples · recorded_
 
 ## G1 — "track this on GitHub" stages an issue, not a refusal
 
-_**blocker** · 3 samples · **UNREACHABLE — no recording**_
+_advisory · 3 samples · **UNREACHABLE — no recording**_
 
 - **Trigger:** "uno-bot keeps answering that it can't open GitHub issues, then pastes a template for me to file by hand. Can you track this on GitHub so someone fixes it?"
 - **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"github_issue_create"`
-- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. The failure this case exists to stop is the old answer: asked to track a uno-bot problem on GitHub, the bot said it could not open issues and offered a template to paste. A problem with the bot itself is a uno-bot/harness intake, which the persona routes to a GitHub issue — so the turn must stage github_issue_create, with a title that names the problem and a body that states the problem, what was expected and what happened instead, in the bot's own summary. For the judge: the reply stays in future tense (the Worker posts the issue link after the ✅), names GitHub as the surface it chose so the requester can redirect it, and invents no issue number or URL. A refusal, a ready-to-paste template in place of a card, a Roadmap card for this bot problem, or a body carrying content from outside this conversation fails. [samples:3 — routing is a model choice, and a choice is what sampling measures.]
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. The failure this case exists to stop is the old answer: asked to track a uno-bot problem on GitHub, the bot said it could not open issues and offered a template to paste. A problem with the bot itself is a uno-bot/harness intake, which the persona routes to a GitHub issue — so the turn must stage github_issue_create, with a title that names the problem and a body that states the problem, what was expected and what happened instead, in the bot's own summary. For the judge: the reply stays in future tense (the Worker posts the issue link after the ✅), names GitHub as the surface it chose so the requester can redirect it, and invents no issue number or URL. A refusal, a ready-to-paste template in place of a card, a Roadmap card for this bot problem, or a body carrying content from outside this conversation fails. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed yet, so neither G case can be captured; it becomes a blocker in the PR that commits its recording.]
 
 ## G2 — a product-maintenance intake still stages a Roadmap card
 
-_**blocker** · 3 samples · **UNREACHABLE — no recording**_
+_advisory · 3 samples · **UNREACHABLE — no recording**_
 
 - **Trigger:** "File an intake: the Button component's disabled state has no Figma spec, so designers keep guessing the opacity. Someone should add it to the design system."
 - **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"notion_create"` · `forbidTool`: `"github_issue_create"`
-- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. The routing half of the GitHub intake: a design-system gap is product/design maintenance, and that still lands as a Roadmap intake card (notion_create, surface 'intake'), not a GitHub issue — the GitHub route is for problems with uno-bot and the harness. For the judge: the card is surface 'intake', names the gap as the designer described it without inventing evidence, the reply names the Roadmap as the surface it chose so the requester can redirect it, and it stays in future tense. Staging a GitHub issue fails deterministically. [samples:3 — routing is a model choice, and a choice is what sampling measures.]
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. The routing half of the GitHub intake: a design-system gap is product/design maintenance, and that still lands as a Roadmap intake card (notion_create, surface 'intake'), not a GitHub issue — the GitHub route is for problems with uno-bot and the harness. For the judge: the card is surface 'intake', names the gap as the designer described it without inventing evidence, the reply names the Roadmap as the surface it chose so the requester can redirect it, and it stays in future tense. Staging a GitHub issue fails deterministically. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed yet, so neither G case can be captured; it becomes a blocker in the PR that commits its recording.]
 
 ## Written down, and not in the fixture
 

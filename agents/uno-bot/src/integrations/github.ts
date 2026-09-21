@@ -171,12 +171,20 @@ export function githubIssueClient(env: Env): GithubIssueClient {
         body: JSON.stringify({ title: issue.title, body: issue.body, labels: [...issue.labels] }),
       }, GH_TIMEOUT_MS);
       if (!res.ok) {
-        const detail = await res.text().catch(() => "");
-        console.warn(`[github] create issue on ${repo} failed: ${res.status} ${detail}`);
+        // The status only: a refusal's body can echo what was sent.
+        console.warn(`[github] create issue on ${repo} refused: ${res.status}`);
         throw new GithubRequestError(res.status, `GitHub issues ${res.status} for ${repo}`);
       }
-      const data = (await res.json()) as { number?: number; html_url?: string };
-      return { number: data.number ?? 0, url: data.html_url ?? "" };
+      const data = (await res.json().catch(() => ({}))) as { number?: unknown; html_url?: unknown };
+      // A success that names no issue is not a filing anyone can follow — no
+      // "#0" link in the thread.
+      if (typeof data.number !== "number" || typeof data.html_url !== "string" || !data.html_url) {
+        throw new GithubRequestError(
+          res.status,
+          `GitHub answered ${res.status} for ${repo} without the new issue's number and link`,
+        );
+      }
+      return { number: data.number, url: data.html_url };
     },
   };
 }

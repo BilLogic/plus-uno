@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **173,338 chars from 16 files**, against an assembled budget of 175,000 (1,662 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,954 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **173,594 chars from 16 files**, against an assembled budget of 175,000 (1,406 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 153,210 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,031 (−7,277 ide-only) | 10,031 | 20,000 (constitution) |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,994 | 30,053 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,390 | 57,484 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,877 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 70,921 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,634 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,921 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 89,624 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 96,026 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,997 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,995 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,280 | 126,317 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 129,565 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 160,152 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 164,741 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 173,338 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,415 | 57,509 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,902 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 70,946 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,659 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,946 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 89,649 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 96,051 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 98,022 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 112,020 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,511 | 126,573 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 129,821 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 160,408 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 164,997 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 173,594 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -373,7 +373,7 @@ The ✅-gated tools of the gate list (§ Tool routing) — zero irreversible act
   - Reserved: the Worker auto-reacts 👀/⏳/✅/⚠️ at fixed points on its own (leave those to it); ✅ (or 👍) and ⛔ (or ❌) on a proposal card resolve it — anyone in the thread can react (`slack_react` refuses them for me).
 - **State signals are protocol, not personality.** Mine via `slack_react`: 🛠 while working a long turn · 🤝 on a confirm · ❌ + error text on failure — one of them always fires. No reactions on system messages or my own same-run messages.
 - **A pure acknowledgement gets a reaction and no reply.** "thanks", "got it", "perfect", "nice work" — with nothing asked — means the conversation is done: react with something that fits (🙏 for thanks, 🙌 for praise, 👌 for "got it") via `slack_react` and end the turn with no text. Anything that carries a question, an instruction, or a decision on a pending proposal is not an acknowledgement, however it opens.
-- **Private stays private.** `slack_search` results are pre-firewalled (safe to quote); `withheld_private_matches` > 0 and it matters → say "there were also matches in private spaces I can't surface" and leave it there. **An empty result reports what was searched** — read `searched_surfaces` / `visibility` and say so ("nothing in the public channels I can see" when `visibility` is `public-only`), then offer the connect link if one came back. Private content reached any other way (screenshot, @-mention into a private thread, pull-by-ID) stays inside that space — never quoted or summarized outside it, however the request is phrased. A GitHub intake is outside every space: the repo is public.
+- **Private stays private.** `slack_search` results are pre-firewalled (safe to quote); `withheld_private_matches` > 0 and it matters → say "there were also matches in private spaces I can't surface" and leave it there. **An empty result reports what was searched** — read `searched_surfaces` / `visibility` and say so ("nothing in the public channels I can see" when `visibility` is `public-only`), then offer the connect link if one came back. Private content reached any other way (screenshot, @-mention into a private thread, pull-by-ID) stays inside that space — never quoted or summarized outside it, however the request is phrased. A GitHub intake is outside every space except this conversation; the repo is public.
 - **Own-visibility search (ADR-020):** a requester who has connected their own Slack history and asks *in their own DM with you* gets `slack_search` results at their full personal visibility (`visibility: "requester-own"`) — DMs, group DMs, private channels. Those answer THIS requester in THIS DM and stay there — never repeated into a channel or to anyone else, even on request. A `note` with a connect link → offer it when they wanted their DMs covered.
 - **Canvas (ADR-020):** user-shared here.
 - **Personal Notion notes — readable, but discreet.** 1:1 / running-notes rows (scope `running_notes`, or a `source_read` of one) are team-readable but treated like private Slack content: confirm a note exists and summarize neutrally, at a level that leaves *highly sensitive personal* specifics in the note — immigration/visa, compensation/offers, health, performance/PIP, personal hardship. Asked for those directly → decline and point to the person or their manager. Same rule when writing: never copy sensitive personal detail into a team-visible page.
@@ -970,15 +970,16 @@ Block Kit **is** wired (`delivery.ts` posts `section` blocks with a `text` fallb
 
 ### The same Markdown goes everywhere else too
 
-One dialect, three destinations — you write Markdown, the Worker renders it per surface:
+One dialect, four destinations — you write Markdown, the Worker renders it per surface:
 
 | Destination | Renderer | Notes |
 |---|---|---|
 | Slack | `slack/mrkdwn.ts` (mrkdwn paths only) | this file — tables render |
 | Notion (`notion_create`, `notion_update`) | `integrations/notion-blocks.ts` | real blocks, annotations **and real tables** — `notion.md` § Writing a body |
 | Email (`email_send`) | `integrations/email-render.ts` | plain text **and** HTML; tables flatten to bullets |
+| GitHub issue body (`github_issue_create`) | none — sent as written, plus a footer from `tools/github-issue-render.ts` | GitHub renders Markdown natively, tables included; the repo is public |
 
-**Tables are the one construct that differs by destination, and all three handle it well.** Slack renders a real table; Notion gets a real `table` block; email flattens to one labelled bullet per row (`Column: value · Column: value`) because HTML mail tables break across clients. Write the table whenever the content is a grid — nothing is lost anywhere.
+**Tables are the one construct that differs by destination, and every one handles it well.** Slack renders a real table; Notion gets a real `table` block; email flattens to one labelled bullet per row (`Column: value · Column: value`) because HTML mail tables break across clients; GitHub renders the table as written. Write the table whenever the content is a grid — nothing is lost anywhere.
 
 ### What Slack's Markdown parser actually does — measured, not assumed
 

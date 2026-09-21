@@ -41,6 +41,7 @@ import {
   CHANNEL,
   CONVERSATION,
   DEFAULT_CONFIRM_NOTE,
+  ISSUE_REPO,
   PENDING,
   REF,
   harness,
@@ -416,17 +417,19 @@ test("'track this on GitHub' stages an issue card showing the title, the body an
   assert.deepEqual(outcome.staged!.proposal.input, { title, body });
 
   const card = outcome.staged!.card;
-  assert.match(card.verb, /GitHub issue on BilLogic\/plus-uno \(public\)/);
+  assert.equal(card.verb, "file a GitHub issue");
   assert.deepEqual(card.fields, [
     { label: "title", value: title },
     { label: "body", value: body },
   ]);
-  assert.deepEqual(card.caveats, [{ kind: "public-repo" }]);
-  // And as a person reads it: both verbatim, and the repo named public.
+  // The repo is the one the Worker files into — read, never a literal.
+  assert.deepEqual(card.caveats, [{ kind: "public-repo", repo: ISSUE_REPO }]);
+  // And as a person reads it: both verbatim, and the repo named public, once.
   const text = renderProposalCard(card).text;
   assert.ok(text.includes(title), text);
   assert.ok(text.includes(body), text);
-  assert.match(text, /public/i);
+  assert.ok(text.includes(`${ISSUE_REPO}* is public`), text);
+  assert.equal(text.match(/public/gi)?.length, 1, text);
 
   // Staged, not filed: the store holds the card and nothing was executed.
   assert.equal((await h.threadState.getProposalByThread(REF))?.toolName, "github_issue_create");

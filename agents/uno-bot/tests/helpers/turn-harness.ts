@@ -48,6 +48,9 @@ export type JudgeCall = Parameters<TurnDeps["reviewDraft"]>[0];
 export const CHANNEL = "C1";
 export const CONVERSATION = "1700000000.000100";
 export const REF = { channel: CHANNEL, thread: CONVERSATION };
+/** The repo a GitHub intake lands in, as the Worker's config would name it —
+ *  deliberately not the production value, so a literal in the turn would show. */
+export const ISSUE_REPO = "example-org/harness";
 
 /** A meter that spends nothing: no case here is about the budget (that is
  *  `agent-loop.test.ts`), and a turn must not need one to run. */
@@ -244,6 +247,7 @@ export function harness(opts: {
       async designPreviewImage() {
         return "https://figma.example/preview.png";
       },
+      issueRepo: () => ISSUE_REPO,
     },
 
     async readAntecedent() {

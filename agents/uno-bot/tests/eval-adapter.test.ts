@@ -163,6 +163,7 @@ function harness(
       async designPreviewImage() {
         return null;
       },
+      issueRepo: () => "BilLogic/plus-uno",
     },
 
     async readAntecedent() {

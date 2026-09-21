@@ -92,7 +92,7 @@ export type CardCaveat =
   | { kind: "bundle-incomplete"; missing: string[] }
   /** A write that lands somewhere anyone can read — a GitHub issue on the
    *  public repo — so the ✅ is consent to publish the words on the card. */
-  | { kind: "public-repo" };
+  | { kind: "public-repo"; repo: string };
 
 /** The page a write lands on, in the words a Notion read reported — never a
  *  bare hex id, which is the whole reason the read happens. */

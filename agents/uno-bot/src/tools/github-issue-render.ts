@@ -28,6 +28,9 @@ export interface IssueFiling {
   requester: string;
   /** The source thread's permalink, or null when Slack would not give one. */
   permalink: string | null;
+  /** Asked for in a DM: the footer says so and links nothing, because a DM
+   *  stays a DM and the issue is public. */
+  dm?: boolean;
 }
 
 /**
@@ -48,11 +51,22 @@ export function issueDraftFromInput(input: Record<string, unknown>): IssueDraft 
  * lives, and can tell the requester's words from the bot's.
  */
 export function renderIssueBody(draft: IssueDraft, filing: IssueFiling): string {
-  return [
-    draft.body,
-    "",
-    "---",
-    `Filed from Slack by uno-bot on behalf of ${filing.requester}.`,
-    `Source thread: ${filing.permalink ?? "(thread link unavailable)"}`,
-  ].join("\n");
+  const footer = filing.dm
+    ? [`Filed from Slack by uno-bot on behalf of ${filing.requester}, filed from a DM.`]
+    : [
+        `Filed from Slack by uno-bot on behalf of ${filing.requester}.`,
+        `Source thread: ${filing.permalink ?? "(thread link unavailable)"}`,
+      ];
+  return [draft.body, "", "---", ...footer].join("\n");
+}
+
+/**
+ * The draft as a person pastes it: the title, then the body in a code block
+ * whose fence is longer than any backtick run inside it, so a body carrying
+ * its own ``` cannot close the block early.
+ */
+export function pasteableDraft(draft: IssueDraft): string {
+  const longest = Math.max(0, ...(draft.body.match(/`+/g) ?? []).map((run) => run.length));
+  const fence = "`".repeat(Math.max(3, longest + 1));
+  return `*${draft.title}*\n${fence}\n${draft.body}\n${fence}`;
 }

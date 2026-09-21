@@ -56,6 +56,18 @@ test("the client names the repo it files into", async () => {
   assert.equal((await client()).repo, REPO);
 });
 
+test("a success that names no issue is an error, never a link to #0", async () => {
+  const { GithubRequestError } = await import("../src/integrations/github.js");
+  for (const body of [{ html_url: "https://github.com/x/y/issues/1" }, { number: 1 }, {}]) {
+    reply = { status: 201, body };
+    await assert.rejects(
+      (await client()).createIssue({ title: "t", body: "b", labels: LABELS }),
+      (err) => err instanceof GithubRequestError && err.status === 201,
+      JSON.stringify(body),
+    );
+  }
+});
+
 test("the client turns a refusal into an error carrying GitHub's status", async () => {
   const { GithubRequestError } = await import("../src/integrations/github.js");
   reply = { status: 403, body: { message: "Resource not accessible by personal access token" } };

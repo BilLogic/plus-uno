@@ -212,7 +212,9 @@ export const TOOL_TABLE = {
     // review heads-up in the design channel.
     reviewRequest: null,
     gate: {
-      verb: "file a GitHub issue on BilLogic/plus-uno (public)",
+      // The repo and that it is public are the card's public-repo caveat,
+      // named from `GITHUB_REPO` — said once, and never a literal here.
+      verb: "file a GitHub issue",
       kind: "file an issue",
       nouns: ["issue", "github", "track", "file"],
     },

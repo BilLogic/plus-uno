@@ -11,8 +11,8 @@
 // footer naming the requester and the thread (`github-issue-render.ts`), added
 // here so the model can neither choose a label nor leave the footer out.
 //
-// IT TAKES NAMED DEPENDENCIES — the GitHub client, the requester's name, the
-// thread permalink and the thread post — so `fileGithubIssue` is driven in
+// IT TAKES NAMED DEPENDENCIES — the GitHub client, the requester's name,
+// whether the ask came from a DM, the thread permalink and the thread post — so `fileGithubIssue` is driven in
 // `tests/github-intake.test.ts` with a fake client, and `Env` enters only in
 // `executeGithubIssueCreate`, the binding at the foot of this file.
 
@@ -24,13 +24,21 @@ import {
   type CreatedIssue,
   type GithubIssueClient,
 } from "../integrations/github";
-import { INTAKE_LABELS, issueDraftFromInput, renderIssueBody, type IssueDraft } from "./github-issue-render";
+import {
+  INTAKE_LABELS,
+  issueDraftFromInput,
+  pasteableDraft,
+  renderIssueBody,
+} from "./github-issue-render";
 
 export interface GithubIssueDeps {
   /** Creates the issue on its one repo. */
   github: GithubIssueClient;
   /** The requester's display name, for the footer. */
   requesterName(): Promise<string>;
+  /** Whether the request came from a DM — whose link stays out of a public
+   *  issue. */
+  requestedInDm: boolean;
   /** The source thread's permalink, or null when Slack would not give one. */
   threadPermalink(): Promise<string | null>;
   /** Say what happened, in the thread the card was approved in. */
@@ -55,13 +63,14 @@ export async function fileGithubIssue(
   const repo = deps.github.repo;
   let issue: CreatedIssue;
   try {
+    // A DM's link is never fetched: the issue is public and a DM stays a DM.
     const [requester, permalink] = await Promise.all([
       deps.requesterName(),
-      deps.threadPermalink(),
+      deps.requestedInDm ? null : deps.threadPermalink(),
     ]);
     issue = await deps.github.createIssue({
       title: draft.title,
-      body: renderIssueBody(draft, { requester, permalink }),
+      body: renderIssueBody(draft, { requester, permalink, dm: deps.requestedInDm }),
       labels: INTAKE_LABELS,
     });
   } catch (err) {
@@ -69,7 +78,7 @@ export async function fileGithubIssue(
     await say(
       deps,
       `:x: Couldn't file that GitHub issue — ${cause}. Here's the draft to file by hand:\n` +
-        pasteable(draft),
+        pasteableDraft(draft),
     );
     return JSON.stringify({ ok: false, status: "github_failed", error: cause, draft });
   }
@@ -114,16 +123,13 @@ function failureCause(err: unknown, repo: string): string {
     case 410:
       return `issues are turned off on ${repo} (410)`;
     default:
-      return `GitHub answered ${err.status} for ${repo}`;
+      // A 2xx lands here only when it named no issue; its message says so.
+      return err.status < 300 ? err.message : `GitHub answered ${err.status} for ${repo}`;
   }
 }
 
-function pasteable(draft: IssueDraft): string {
-  return `*${draft.title}*\n\`\`\`\n${draft.body}\n\`\`\``;
-}
-
 /**
- * The binding: `Env` and the thread, turned into the four named dependencies.
+ * The binding: `Env` and the thread, turned into the named dependencies.
  * @param env - Worker bindings
  * @param input - Tool args from the model — `title` and `body`
  * @param slack - Thread context: where to post, and who asked
@@ -141,6 +147,8 @@ export async function executeGithubIssueCreate(
       const user = res?.ok ? res.user : undefined;
       return user?.profile?.display_name || user?.real_name || user?.name || "a Slack teammate";
     },
+    // Slack's DM (im) conversation ids start with D.
+    requestedInDm: slack.channel.startsWith("D"),
     async threadPermalink() {
       // The request message's own link opens the thread around it.
       return getPermalink(env, slack.channel, slack.userMsgTs).catch(() => null);

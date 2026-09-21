@@ -697,7 +697,7 @@
     {
       "id": "G1",
       "name": "\"track this on GitHub\" stages an issue, not a refusal",
-      "blocker": true,
+      "blocker": false,
       "samples": 3,
       "turns": [
         {
@@ -708,12 +708,12 @@
         "proposal"
       ],
       "expectTool": "github_issue_create",
-      "judgeNote": "AUTHORED 2026-09-21. The failure this case exists to stop is the old answer: asked to track a uno-bot problem on GitHub, the bot said it could not open issues and offered a template to paste. A problem with the bot itself is a uno-bot/harness intake, which the persona routes to a GitHub issue — so the turn must stage github_issue_create, with a title that names the problem and a body that states the problem, what was expected and what happened instead, in the bot's own summary. For the judge: the reply stays in future tense (the Worker posts the issue link after the ✅), names GitHub as the surface it chose so the requester can redirect it, and invents no issue number or URL. A refusal, a ready-to-paste template in place of a card, a Roadmap card for this bot problem, or a body carrying content from outside this conversation fails. [samples:3 — routing is a model choice, and a choice is what sampling measures.]"
+      "judgeNote": "AUTHORED 2026-09-21. The failure this case exists to stop is the old answer: asked to track a uno-bot problem on GitHub, the bot said it could not open issues and offered a template to paste. A problem with the bot itself is a uno-bot/harness intake, which the persona routes to a GitHub issue — so the turn must stage github_issue_create, with a title that names the problem and a body that states the problem, what was expected and what happened instead, in the bot's own summary. For the judge: the reply stays in future tense (the Worker posts the issue link after the ✅), names GitHub as the surface it chose so the requester can redirect it, and invents no issue number or URL. A refusal, a ready-to-paste template in place of a card, a Roadmap card for this bot problem, or a body carrying content from outside this conversation fails. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed yet, so neither G case can be captured; it becomes a blocker in the PR that commits its recording.]"
     },
     {
       "id": "G2",
       "name": "a product-maintenance intake still stages a Roadmap card",
-      "blocker": true,
+      "blocker": false,
       "samples": 3,
       "turns": [
         {
@@ -725,7 +725,7 @@
       ],
       "expectTool": "notion_create",
       "forbidTool": "github_issue_create",
-      "judgeNote": "AUTHORED 2026-09-21. The routing half of the GitHub intake: a design-system gap is product/design maintenance, and that still lands as a Roadmap intake card (notion_create, surface 'intake'), not a GitHub issue — the GitHub route is for problems with uno-bot and the harness. For the judge: the card is surface 'intake', names the gap as the designer described it without inventing evidence, the reply names the Roadmap as the surface it chose so the requester can redirect it, and it stays in future tense. Staging a GitHub issue fails deterministically. [samples:3 — routing is a model choice, and a choice is what sampling measures.]"
+      "judgeNote": "AUTHORED 2026-09-21. The routing half of the GitHub intake: a design-system gap is product/design maintenance, and that still lands as a Roadmap intake card (notion_create, surface 'intake'), not a GitHub issue — the GitHub route is for problems with uno-bot and the harness. For the judge: the card is surface 'intake', names the gap as the designer described it without inventing evidence, the reply names the Roadmap as the surface it chose so the requester can redirect it, and it stays in future tense. Staging a GitHub issue fails deterministically. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed yet, so neither G case can be captured; it becomes a blocker in the PR that commits its recording.]"
     }
   ]
 }

@@ -69,6 +69,7 @@ function deps(github: GithubIssueClient, over: Partial<GithubIssueDeps> = {}) {
   const bound: GithubIssueDeps = {
     github,
     requesterName: async () => "Bill Guo",
+    requestedInDm: false,
     threadPermalink: async () => PERMALINK,
     postToThread: async (text) => {
       posted.push(text);
@@ -98,6 +99,14 @@ test("a thread with no permalink still names the requester, and says the link is
   assert.match(body, /on behalf of Bill Guo/);
   assert.doesNotMatch(body, /https:\/\/[^\s]*slack\.com/);
   assert.match(body, /thread link unavailable/i);
+});
+
+test("a DM's footer says it came from a DM, and carries no link into it", () => {
+  const body = renderIssueBody(DRAFT, { requester: "Bill Guo", permalink: null, dm: true });
+  assert.match(body, /on behalf of Bill Guo/);
+  assert.match(body, /filed from a DM/i);
+  assert.doesNotMatch(body, /thread link unavailable/i);
+  assert.doesNotMatch(body, /slack\.com/);
 });
 
 test("the draft is title and body only — anything else the model sent is not read", () => {
@@ -176,6 +185,38 @@ for (const [status, cause] of [
     assert.deepEqual(result.draft, DRAFT);
   });
 }
+
+test("an intake asked for in a DM files without the DM's link, and says where it came from", async () => {
+  const github = fakeClient(() => FILED);
+  let asked = false;
+  const { deps: d } = deps(github, {
+    requestedInDm: true,
+    threadPermalink: async () => {
+      asked = true;
+      return "https://plus.slack.com/archives/D0123/p1700000000000190";
+    },
+  });
+
+  await fileGithubIssue({ ...DRAFT }, d);
+
+  const sent = github.sent[0]!;
+  assert.equal(asked, false, "a DM's permalink is never fetched for a public issue");
+  assert.doesNotMatch(sent.body, /slack\.com/);
+  assert.match(sent.body, /filed from a DM/i);
+  assert.match(sent.body, /on behalf of Bill Guo/);
+});
+
+test("the pasteable draft survives a body that carries its own code fence", async () => {
+  const body = "Repro:\n```js\nbot.file()\n```\nthen it refuses.";
+  const github = fakeClient(() => new GithubRequestError(403, "GitHub issues 403"));
+  const { deps: d, posted } = deps(github);
+
+  await fileGithubIssue({ title: DRAFT.title, body }, d);
+
+  // A fence longer than any backtick run inside, so the body's own ``` cannot
+  // close the block early.
+  assert.ok(posted[0]!.includes("````\n" + body + "\n````"), String(posted[0]));
+});
 
 test("a draft with no title or no body files nothing", async () => {
   for (const input of [{ body: DRAFT.body }, { title: DRAFT.title }, { title: " ", body: " " }]) {

@@ -226,7 +226,7 @@ function caveatText(caveat: CardCaveat): string {
   }
   if (caveat.kind === "public-repo") {
     return (
-      ":globe_with_meridians: *This repo is public* — anyone can read the issue once it's filed. " +
+      `:globe_with_meridians: *${caveat.repo}* is public — anyone can read the issue once it's filed. ` +
       "Check the body for anything from a DM or private channel before you approve; I add a footer naming you and linking this thread."
     );
   }

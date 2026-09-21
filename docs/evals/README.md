@@ -19,7 +19,7 @@ Populated 2026-07-07: 7 rubrics (six skills + bot-answer) rebuilt from the Notio
 | What the uno-bot fixture holds | |
 |---|---|
 | cases | **36** (B×6 · C×1 · D×1 · G×2 · M×1 · P×6 · R×13 · S×3 · T×2 · V×1) |
-| blockers | 32 |
+| blockers | 30 |
 | turns · sample runs | 42 · 106 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
 | recorded, so the pull-request gate reaches them | 34 |
