@@ -205,6 +205,18 @@ export const TOOL_TABLE = {
       nouns: ["email", "mail", "send"],
     },
   },
+  github_issue_create: {
+    access: "gated",
+    retrieval: false,
+    // Triage is uno-maintain's, through the labels the Worker applies — not a
+    // review heads-up in the design channel.
+    reviewRequest: null,
+    gate: {
+      verb: "file a GitHub issue on BilLogic/plus-uno (public)",
+      kind: "file an issue",
+      nouns: ["issue", "github", "track", "file"],
+    },
+  },
   proposal_resolve: { access: "control", retrieval: false, reviewRequest: null },
 } as const satisfies Record<string, ToolRow>;
 

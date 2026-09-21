@@ -259,9 +259,10 @@ CLAUDE_MODEL = "claude-sonnet-5"
 #       xoxb- token for chat.postMessage, reactions.add and threaded
 #       replies. Unset, the bot reads and never answers.
 #   GITHUB_TOKEN
-#       PAT with repo:dispatch + Contents:Read. Powers component_implement
-#       / prototype_scaffold, which dispatch workflows in
-#       BilLogic/plus-uno.
+#       PAT with repo:dispatch + Contents:Read + Issues:Write. Powers
+#       component_implement / prototype_scaffold, which dispatch workflows
+#       in BilLogic/plus-uno, and github_issue_create, which files intakes
+#       there.
 #   FIGMA_ACCESS_TOKEN
 #       Figma read PAT. Two consumers: the proposal screenshot fetch in
 #       events.ts, and the library poll's component/version reads on the

@@ -1412,7 +1412,7 @@ function cardFieldOf(label: string, value: unknown): CardField {
 /**
  * What a person must be told about this staged input before they press ✅.
  *
- * A JUDGEMENT, which is why it is here and not in the renderer: both caveats
+ * A JUDGEMENT, which is why it is here and not in the renderer: the caveats
  * are reached by READING the staged input, and the renderer only knows how each
  * one reads.
  *
@@ -1432,12 +1432,17 @@ function cardFieldOf(label: string, value: unknown): CardField {
  * a weaker model provider cannot silently skip the disclosure. The bundle
  * contract for prototype share-outs is a Loom walkthrough, a live preview and a
  * Decisions DB link (`skills/uno-publish/references/method.md`).
+ *
+ * THE PUBLIC REPO: a GitHub intake is readable by anyone the moment it is
+ * filed, and the card is the one place a person reads the body before it goes
+ * out — so every such card says so, whatever the body holds.
  */
 function caveatsFor(
   toolName: string,
   input: Record<string, unknown>,
   previewText: string | undefined,
 ): CardCaveat[] {
+  if (toolName === "github_issue_create") return [{ kind: "public-repo" }];
   if (toolName === "shareout_post") {
     const summary = typeof input.summary === "string" ? input.summary : "";
     if (!/prototype|prototypes|scaffold/i.test(summary)) return [];

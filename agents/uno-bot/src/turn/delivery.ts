@@ -89,7 +89,10 @@ export type CardCaveat =
    *  knowingly accepting a gap-free reading of it. */
   | { kind: "no-open-questions" }
   /** A prototype share-out staged without the bundle's full set of links. */
-  | { kind: "bundle-incomplete"; missing: string[] };
+  | { kind: "bundle-incomplete"; missing: string[] }
+  /** A write that lands somewhere anyone can read — a GitHub issue on the
+   *  public repo — so the ✅ is consent to publish the words on the card. */
+  | { kind: "public-repo" };
 
 /** The page a write lands on, in the words a Notion read reported — never a
  *  bare hex id, which is the whole reason the read happens. */

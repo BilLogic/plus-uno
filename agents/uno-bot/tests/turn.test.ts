@@ -385,6 +385,56 @@ test("a side-effect call comes back as a proposal to stage, and the card was del
   assert.equal(staged?.proposalTs, h.delivery.stagedAt[0]);
 });
 
+// A GitHub intake is a gated write to a PUBLIC repo, so the card is where a
+// person reads exactly what goes public: the title and body verbatim, and the
+// fact that anyone can read it. Nothing reaches GitHub until the ✅.
+test("'track this on GitHub' stages an issue card showing the title, the body and the public repo", async () => {
+  const title = "uno-bot can't open a GitHub issue from Slack";
+  const body =
+    "**Problem.** Asked to track a gap on GitHub, uno-bot says it can't.\n\n" +
+    "**Expected.** It files the issue after a ✅.";
+  const filed: string[] = [];
+  const h = harness({
+    replies: [
+      {
+        text: "I'll file this as a GitHub intake.",
+        toolCalls: [{ name: "github_issue_create", args: { title, body } }],
+      },
+    ],
+    executeOperation: async (operation) => {
+      filed.push(operation.toolName);
+      return JSON.stringify({ ok: true });
+    },
+  });
+  const outcome = await runTurn(
+    request({ text: "the bot can't file GitHub issues — track this on GitHub for someone to fix" }),
+    h.deps,
+  );
+
+  assert.equal(outcome.disposition, "staged");
+  assert.equal(outcome.staged!.proposal.toolName, "github_issue_create");
+  assert.deepEqual(outcome.staged!.proposal.input, { title, body });
+
+  const card = outcome.staged!.card;
+  assert.match(card.verb, /GitHub issue on BilLogic\/plus-uno \(public\)/);
+  assert.deepEqual(card.fields, [
+    { label: "title", value: title },
+    { label: "body", value: body },
+  ]);
+  assert.deepEqual(card.caveats, [{ kind: "public-repo" }]);
+  // And as a person reads it: both verbatim, and the repo named public.
+  const text = renderProposalCard(card).text;
+  assert.ok(text.includes(title), text);
+  assert.ok(text.includes(body), text);
+  assert.match(text, /public/i);
+
+  // Staged, not filed: the store holds the card and nothing was executed.
+  assert.equal((await h.threadState.getProposalByThread(REF))?.toolName, "github_issue_create");
+  assert.deepEqual(filed, []);
+  assert.deepEqual(h.ran, []);
+  assert.deepEqual(h.resolved, []);
+});
+
 // A revised card retires the one it replaces (#573) — and a turn that stages
 // nothing retires nothing. Someone asking a question while a card is pending
 // must come back to a card that still resolves.

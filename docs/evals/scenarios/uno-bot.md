@@ -21,14 +21,16 @@ twelve that did.
 
 | What the uno-bot fixture holds | |
 |---|---|
-| cases | **34** (B×6 · C×1 · D×1 · M×1 · P×6 · R×13 · S×3 · T×2 · V×1) |
-| blockers | 30 |
-| turns · sample runs | 40 · 100 |
+| cases | **36** (B×6 · C×1 · D×1 · G×2 · M×1 · P×6 · R×13 · S×3 · T×2 · V×1) |
+| blockers | 32 |
+| turns · sample runs | 42 · 106 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
 | recorded, so the pull-request gate reaches them | 34 |
-| **unreachable** — no recording, skipped by name, gating nothing | none |
+| **unreachable** — no recording, skipped by name, gating nothing | **G1, G2** |
 
 Counted, not typed: `agents/uno-bot/scripts/eval-docs.mjs`, from the fixture and `fixtures/recordings/`.
+
+> **Unreachable.** G1, G2 have no recording in `docs/evals/fixtures/recordings/`, so the pull-request gate skips them by name and measures nothing about them. Only the Monday `--transport=worker` cron reaches them.
 
 ## R1 — confidence ritual (D9)
 
@@ -242,7 +244,7 @@ _**blocker** · 3 samples · recorded_
 
 - **Trigger:** "The bot keeps telling people that a small wording tweak to a skill counts as Tier 1 and can just be applied — that's wrong, Tier 1 is typos, links, dates and formatting only, and anything touching a skill is Tier 2. Take this as an intake."
 - **Asserted:** `expectKind`: `["text","proposal"]` · `expectToolCalled`: `{"tool":"read_reference","args":{"name":"uno-maintain/method"}}`
-- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-05 (#423). uno-maintain's method left the always-loaded prompt for the reference map, and its Worker face ends in a pointer naming `uno-maintain/method`; this case proves a maintain turn still runs the method by reaching it through that pointer. Deterministic: the route's tool list holds a read_reference call whose name is exactly `uno-maintain/method` — a turn that classifies and drafts from the face alone, or reads a different name, fails here regardless of how good the prose is. For the judge, the reply must show the method's steps in order: (1) the flag classified as one of the four trigger types (this one is an inaccuracy) with an estate and target (codebase — the uno-bot faces or the maintain skill), (2) a concrete drafted fix stated before any judgement of worth, (3) the three-line brief — impact, effort, risk — put to the spotter with the worth-incorporating question, and (4) a suggested severity consistent with the whitelist (Tier 2, since it touches a skill). Either shape passes: an in-thread intake ending at the human gate (kind text), or a staged notion_create for the Roadmap intake card (kind proposal) that carries the same classification, draft and brief. A reply that applies the fix itself, opens a PR, invents evidence beyond what the designer said, or names reviewers without a notion_search fails.
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-05 (#423). uno-maintain's method left the always-loaded prompt for the reference map, and its Worker face ends in a pointer naming `uno-maintain/method`; this case proves a maintain turn still runs the method by reaching it through that pointer. Deterministic: the route's tool list holds a read_reference call whose name is exactly `uno-maintain/method` — a turn that classifies and drafts from the face alone, or reads a different name, fails here regardless of how good the prose is. For the judge, the reply must show the method's steps in order: (1) the flag classified as one of the four trigger types (this one is an inaccuracy) with an estate and target (codebase — the uno-bot faces or the maintain skill), (2) a concrete drafted fix stated before any judgement of worth, (3) the three-line brief — impact, effort, risk — put to the spotter with the worth-incorporating question, and (4) a suggested severity consistent with the whitelist (Tier 2, since it touches a skill). Either shape passes: an in-thread intake ending at the human gate (kind text), or a staged intake (kind proposal) that carries the same classification, draft and brief — a github_issue_create, since the flag is about the bot and the persona routes uno-bot/harness intakes to GitHub, or a notion_create Roadmap intake card that names why it chose the Roadmap. A reply that applies the fix itself, opens a PR, invents evidence beyond what the designer said, or names reviewers without a notion_search fails.
 
 ## D1 — a publish turn reads uno-publish/method by pointer before staging the share-out (#424)
 
@@ -323,6 +325,22 @@ _**blocker** · 3 samples · recorded_
 - **Trigger:** "how long does "{{subject.cell}}" take?"
 - **Asserted:** `expectKind`: `["text"]` · `forbidTool`: `"notion_create"` · `textRegex`: `"^(?![\\s\\S]*(?:\\d+(?:[.,]\\d+)?|[Aa] few|[Oo]ne|[Tt]wo|[Tt]hree|[Ff]our|[Ff]ive|[Tt]en|[Ff]ifteen|[Tt]wenty|[Tt]hirty|[Ff]orty|[Ff]ifty|[Ss]ixty)[\\s-]*(?:[Mm]in|[Hh]our|[Hh]r|[Ss]ec))[\\s\\S]*$"`
 - **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-05 (#415). The cell is real and chosen from the live board; the QUESTION is not answerable, because `cells` has no duration field — the route checks that against the contract's column list before offering this subject, so the premise is verified rather than remembered. The reply must say the blueprint does not record how long things take, name what it DOES record for that cell (what happens, the lane, the owner, its resources), and offer the next-best source if there is one. The deterministic half rejects any stated duration — a number or a spelled-out number followed by minutes/hours/seconds — because the failure this case exists to catch is a plausible figure improvised to fill the gap. NOTE FOR A REVIEWER READING THIS RED: the check cannot tell an invented figure from one quoted out of a cell's own prose. If it fires, read the transcript — a duration the blueprint genuinely wrote down in a cell's summary is a finding about that cell, not about the bot. Absence must be stated, not staged: proposing a Notion write to 'capture' the missing duration is a fail, and so is any invented number. [samples:3 — absence behaviour is phrasing, and phrasing is what sampling measures.]
+
+## G1 — "track this on GitHub" stages an issue, not a refusal
+
+_**blocker** · 3 samples · **UNREACHABLE — no recording**_
+
+- **Trigger:** "uno-bot keeps answering that it can't open GitHub issues, then pastes a template for me to file by hand. Can you track this on GitHub so someone fixes it?"
+- **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"github_issue_create"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. The failure this case exists to stop is the old answer: asked to track a uno-bot problem on GitHub, the bot said it could not open issues and offered a template to paste. A problem with the bot itself is a uno-bot/harness intake, which the persona routes to a GitHub issue — so the turn must stage github_issue_create, with a title that names the problem and a body that states the problem, what was expected and what happened instead, in the bot's own summary. For the judge: the reply stays in future tense (the Worker posts the issue link after the ✅), names GitHub as the surface it chose so the requester can redirect it, and invents no issue number or URL. A refusal, a ready-to-paste template in place of a card, a Roadmap card for this bot problem, or a body carrying content from outside this conversation fails. [samples:3 — routing is a model choice, and a choice is what sampling measures.]
+
+## G2 — a product-maintenance intake still stages a Roadmap card
+
+_**blocker** · 3 samples · **UNREACHABLE — no recording**_
+
+- **Trigger:** "File an intake: the Button component's disabled state has no Figma spec, so designers keep guessing the opacity. Someone should add it to the design system."
+- **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"notion_create"` · `forbidTool`: `"github_issue_create"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. The routing half of the GitHub intake: a design-system gap is product/design maintenance, and that still lands as a Roadmap intake card (notion_create, surface 'intake'), not a GitHub issue — the GitHub route is for problems with uno-bot and the harness. For the judge: the card is surface 'intake', names the gap as the designer described it without inventing evidence, the reply names the Roadmap as the surface it chose so the requester can redirect it, and it stays in future tense. Staging a GitHub issue fails deterministically. [samples:3 — routing is a model choice, and a choice is what sampling measures.]
 
 ## Written down, and not in the fixture
 

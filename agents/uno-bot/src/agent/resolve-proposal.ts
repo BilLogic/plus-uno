@@ -82,6 +82,9 @@ export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<vo
       channel: run.channel,
       threadTs: run.threadTs,
       userMsgTs: run.userMsgTs,
+      // Who asked — the requester, not whoever pressed ✅. A GitHub intake's
+      // footer names them.
+      requestedBy: run.requesterUserId,
       // Carry the PRD resolved at proposal time — it's not re-extractable here.
       notionPrdId: run.notionPrdId,
       notionPrdUrl: run.notionPrdUrl,
