@@ -281,7 +281,7 @@ test("GEMINI_REGION `global` selects the implicit-cache floor", () => {
 });
 
 test("a regional GEMINI_REGION selects the explicit-cache floor", () => {
-  // Connector docs emptied take the committed bundle under 131k — several, not
+  // Docs emptied take the committed bundle under 131k — several, not
   // one, because no single member is large enough, and because a floor that one
   // missing doc could trip would be a ceiling in disguise.
   //

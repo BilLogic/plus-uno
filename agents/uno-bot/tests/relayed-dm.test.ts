@@ -81,7 +81,31 @@ describe("relayFailure", () => {
     }
     assert.match(relayFailure("user_disabled").cause, /deactivated/);
     assert.match(relayFailure("cannot_dm_bot").cause, /bot/);
-    assert.match(relayFailure("ratelimited").cause, /ratelimited/);
+  });
+
+  it("reads account_inactive as the bot's own credential, not a deactivated recipient", () => {
+    // Slack answers `account_inactive` when the TOKEN's user or workspace is
+    // gone — the same reading `slack-search.ts` gives it.
+    const { cause, next } = relayFailure("account_inactive");
+    assert.doesNotMatch(cause, /deactivated/);
+    assert.match(cause, /credential/);
+    assert.match(next, /Bill/);
+  });
+
+  it("offers a retry only for a transient refusal", () => {
+    for (const transient of ["ratelimited", "network_error", "http_503", "internal_error"]) {
+      assert.match(relayFailure(transient).next, /try again/, transient);
+    }
+    for (const lasting of [
+      "missing_scope",
+      "not_authed",
+      "invalid_auth",
+      "restricted_action",
+      "not_allowed_token_type",
+      "something_new",
+    ]) {
+      assert.doesNotMatch(relayFailure(lasting).next, /try again/, lasting);
+    }
   });
 });
 
@@ -150,7 +174,9 @@ describe("an approved relay", () => {
       { toolName: "dm_relay", input: { recipient: "<@U0COCO>", text: "RM-2436 is Ready for QA." } },
       { toolName: "dm_relay", input: { recipient: "U0MERYEM", text: "RM-2436 is Ready for QA." } },
     ];
-    const outcomes = await runOperations(operations, (op) => executeRelayDm({ slack }, op.input, CONTEXT));
+    const outcomes = await runOperations(operations, (op) =>
+      executeRelayDm({ slack }, op.input, { ...CONTEXT, batched: true }),
+    );
 
     assert.deepEqual(outcomes.map((o) => o.ok), [true, true]);
     assert.deepEqual(slack.opened, ["U0COCO", "U0MERYEM"]);
@@ -161,12 +187,20 @@ describe("an approved relay", () => {
       assert.ok(dm.text.includes("RM-2436 is Ready for QA."));
       assert.ok(dm.text.includes("https://plus.slack.com/archives/C1/p1700000000000200"), dm.text);
     }
-    // The requesting thread hears where each one went — under the real reply
-    // ts, never the conversation key.
+    // In a batch the thread hears ONE outcome — the Gate's summary, which
+    // names each recipient from these results — not a line per recipient too.
+    assert.equal(slack.posts.filter((p) => p.channel === "C1").length, 0);
+    assert.match(outcomes[0]!.message, /Sent to <@U0COCO>/);
+    assert.match(outcomes[1]!.message, /Sent to <@U0MERYEM>/);
+  });
+
+  it("confirms a single relay in the requesting thread, under the real reply ts", async () => {
+    const slack = fakeSlack();
+    await executeRelayDm({ slack }, { recipient: "U0COCO", text: "hi" }, CONTEXT);
     const notes = slack.posts.filter((p) => p.channel === "C1");
-    assert.deepEqual(notes.map((p) => p.thread_ts), [CONTEXT.replyTs, CONTEXT.replyTs]);
+    assert.equal(notes.length, 1);
+    assert.equal(notes[0]!.thread_ts, CONTEXT.replyTs);
     assert.match(notes[0]!.text, /Sent to <@U0COCO>/);
-    assert.match(notes[1]!.text, /Sent to <@U0MERYEM>/);
   });
 
   it("links a DM-origin request without promising the recipient they can open it", async () => {

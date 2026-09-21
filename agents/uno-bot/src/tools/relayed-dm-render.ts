@@ -73,11 +73,42 @@ export function relayRecipientId(value: unknown): string | null {
  * relay with. There is no allowlist in front of the relay — the Gate decides
  * who is appropriate — so a recipient Slack cannot DM is found here, at
  * execution, and has to be said plainly.
+ *
+ * "Try again" is offered only for a refusal that is over by itself — a rate
+ * limit, a network or server error. A missing scope or a dead token fails the
+ * same way on every retry, and telling someone to retry it is sending them
+ * round a loop.
  */
 export function relayFailure(error: string): { cause: string; next: string } {
+  if (TRANSIENT.has(error) || /^http_5\d\d$/.test(error)) {
+    return {
+      cause: `Slack couldn't take it just then (\`${error}\`)`,
+      next: "try again in a moment",
+    };
+  }
   switch (error) {
-    case "user_disabled":
+    // The BOT's token, not the recipient: `account_inactive` is Slack saying
+    // the token's own user or workspace is gone (`slack-search.ts` reads it the
+    // same way), so no recipient would have fared better.
     case "account_inactive":
+    case "invalid_auth":
+    case "not_authed":
+    case "token_revoked":
+    case "token_expired":
+      return {
+        cause: `my Slack credential isn't working (\`${error}\`)`,
+        next: "tell Bill so the bot's token can be fixed — nothing will send until it is",
+      };
+    case "missing_scope":
+    case "restricted_action":
+    case "not_allowed_token_type":
+    case "team_access_not_granted":
+    case "ekm_access_denied":
+      return {
+        cause: `this workspace doesn't let me send that DM (\`${error}\`)`,
+        next: "I can @-mention them in a thread instead, and Bill can look at the app's permissions",
+      };
+    case "user_disabled":
       return {
         cause: "that account is deactivated",
         next: "pick someone else to send it to, or tell me who took over their work",
@@ -101,7 +132,18 @@ export function relayFailure(error: string): { cause: string; next: string } {
     default:
       return {
         cause: `Slack answered \`${error}\``,
-        next: "try again in a moment, or I can @-mention them in a thread instead",
+        next: "I can @-mention them in a thread instead",
       };
   }
 }
+
+/** Refusals that pass on their own: throttling, the network, Slack's side. */
+const TRANSIENT = new Set([
+  "ratelimited",
+  "rate_limited",
+  "network_error",
+  "internal_error",
+  "fatal_error",
+  "service_unavailable",
+  "request_timeout",
+]);

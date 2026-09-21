@@ -70,18 +70,27 @@ export async function executeRelayDm(
   }
 
   // Under the Gate's reply target, never the conversation key (see
-  // `SlackContext.replyTs`).
-  const tellThread = (line: string) =>
-    slack
+  // `SlackContext.replyTs`). In a batch the Gate's one summary names every
+  // recipient from the results below, so a line per recipient would say it
+  // twice.
+  const tellThread = async (line: string): Promise<void> => {
+    if (context.batched) return;
+    await slack
       .postMessage({ channel: context.channel, thread_ts: context.replyTs ?? context.threadTs, text: line })
       .catch(() => ({ ok: false }));
+  };
 
   const permalink = await slack.permalink(context.channel, context.userMsgTs).catch(() => null);
 
   const refused = async (error: string): Promise<string> => {
     const { cause, next } = relayFailure(error);
     await tellThread(`:x: Couldn't send that to <@${recipient}> — ${cause}. Next: ${next}.`);
-    return JSON.stringify({ ok: false, status: "not_sent", recipient, error: `${cause} (${error})`, next });
+    return JSON.stringify({
+      ok: false,
+      status: "not_sent",
+      recipient,
+      error: `couldn't send to <@${recipient}> — ${cause} (\`${error}\`). Next: ${next}`,
+    });
   };
 
   const dm = await slack.openDm(recipient);
@@ -103,6 +112,6 @@ export async function executeRelayDm(
     ok: true,
     status: "sent",
     recipient,
-    message: `Relayed DM sent to <@${recipient}>.`,
+    message: `Sent to <@${recipient}> as a relayed DM.`,
   });
 }
