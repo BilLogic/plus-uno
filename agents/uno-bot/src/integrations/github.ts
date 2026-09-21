@@ -139,6 +139,18 @@ export class GithubRequestError extends Error {
   }
 }
 
+/**
+ * A refusal because the token's rate limit is spent — a 403 or 429 with
+ * `x-ratelimit-remaining: 0`. Its own class so the caller says "try later"
+ * rather than "the token lacks permission", which a bare 403 would read as.
+ */
+export class GithubRateLimitError extends GithubRequestError {
+  constructor(status: number, message: string) {
+    super(status, message);
+    this.name = "GithubRateLimitError";
+  }
+}
+
 /** The one GitHub write the issue executor needs, bound to one repo. */
 export interface GithubIssueClient {
   /** `owner/name` — the repo every issue lands in. */
@@ -229,9 +241,13 @@ export function githubIssueSearch(env: Env): GithubIssueSearch {
         throw new Error("GitHub not configured on the Worker (GITHUB_TOKEN/GITHUB_REPO)");
       }
       const q = `repo:${repo} is:issue is:open label:${label} ${terms}`;
+      // The search mode is named rather than left to GitHub's default, which is
+      // moving to advanced search. Under it a bare OR or a parenthesis in the
+      // terms would split them from the qualifiers above, so the caller hands
+      // words only (`intakeSearchTerms`).
       const url =
         `https://api.github.com/search/issues?q=${encodeURIComponent(q)}` +
-        `&per_page=${ISSUE_SEARCH_LIMIT}`;
+        `&advanced_search=true&per_page=${ISSUE_SEARCH_LIMIT}`;
       const res = await countedFetch(url, {
         headers: {
           authorization: `Bearer ${env.GITHUB_TOKEN}`,
@@ -243,6 +259,12 @@ export function githubIssueSearch(env: Env): GithubIssueSearch {
       if (!res.ok) {
         // The status only, as the create logs it.
         console.warn(`[github] issue search on ${repo} refused: ${res.status}`);
+        if (
+          (res.status === 403 || res.status === 429) &&
+          res.headers.get("x-ratelimit-remaining") === "0"
+        ) {
+          throw new GithubRateLimitError(res.status, `GitHub issue search rate-limited (${res.status}) for ${repo}`);
+        }
         throw new GithubRequestError(res.status, `GitHub issue search ${res.status} for ${repo}`);
       }
       const data = (await res.json().catch(() => ({}))) as {

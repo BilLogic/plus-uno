@@ -757,17 +757,24 @@
       "samples": 3,
       "turns": [
         {
-          "prompt": "uno-bot told me it can't open GitHub issues and gave me a template to paste instead. Please track this on GitHub."
+          "prompt": "uno-bot told me it can't open GitHub issues and gave me a template to paste instead. Please track this on GitHub.",
+          "expectKind": [
+            "text"
+          ],
+          "expectToolCalled": {
+            "tool": "github_intake_search"
+          },
+          "forbidTool": "github_issue_create"
+        },
+        {
+          "prompt": "I've seen that one — mine's a different angle. File anyway, please.",
+          "expectKind": [
+            "proposal"
+          ],
+          "expectTool": "github_issue_create"
         }
       ],
-      "expectKind": [
-        "text"
-      ],
-      "expectToolCalled": {
-        "tool": "github_intake_search"
-      },
-      "forbidTool": "github_issue_create",
-      "judgeNote": "AUTHORED 2026-09-21. The duplicate check before a GitHub intake. SEED: recorded while an open issue labelled harness-intake on the harness repo covers this same problem (the bot refusing to open GitHub issues) — file that intake through G1 first, then record this case. Deterministic: the route's tool list holds a github_intake_search call, and no github_issue_create is staged. For the judge: the reply names the open intake the search returned by its title and link, exactly as the tool gave them, and asks whether to link that issue or file a new one anyway — a choice, not a decision made for the requester. It invents no issue number or URL the search did not return, and does not claim to have linked or commented on anything (the bot can only file). A fresh card staged over the match, or a reply that never mentions the match, fails. [samples:3 — whether the check runs before the card is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed and the seed does not exist yet; it becomes a blocker in the PR that commits its recording.]"
+      "judgeNote": "AUTHORED 2026-09-21. The duplicate check before a GitHub intake, and the way past it. SEED: recorded while an open issue labelled harness-intake on the harness repo covers this same problem (the bot refusing to open GitHub issues) — file that intake through G1 first, then record this case. Deterministic: turn 1's tool list holds a github_intake_search call and no github_issue_create is staged; turn 2, where the requester chooses to file anyway, stages github_issue_create. For the judge: turn 1's reply names the open intake the search returned by its title and link, exactly as the tool gave them, and asks whether to link that issue or file a new one anyway — a choice, not a decision made for the requester. Turn 2's card drafts the requester's problem, not the seeded issue's, and the reply stays in future tense. It invents no issue number or URL the search did not return, and does not claim to have linked or commented on anything (the bot can only file). A fresh card staged over the match, or a reply that never mentions the match, fails. [samples:3 — whether the check runs before the card is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed and the seed does not exist yet; it becomes a blocker in the PR that commits its recording.]"
     }
   ]
 }

@@ -16,6 +16,7 @@ import assert from "node:assert/strict";
 
 import { findOpenIntakes, intakeSearchTerms } from "../src/tools/github-intake-search";
 import {
+  GithubRateLimitError,
   GithubRequestError,
   type GithubIssueSearch,
   type OpenIssue,
@@ -97,6 +98,28 @@ test("a qualifier in the keywords cannot aim the search elsewhere", () => {
     "dm relay fails",
   );
   assert.equal(intakeSearchTerms("  canvas   export  "), "canvas export");
+  assert.equal(intakeSearchTerms("-label:needs-triage is_closed:x canvas"), "canvas");
+});
+
+test("boolean operators and grouping cannot split the repo, state and label off the words", () => {
+  // Under advanced search `a OR b` binds the Worker's qualifiers to `a` alone,
+  // and `b` then matches every issue on GitHub.
+  assert.equal(intakeSearchTerms("foo OR bar"), "foo bar");
+  assert.equal(intakeSearchTerms("NOT x"), "x");
+  assert.equal(intakeSearchTerms("(a b)"), "a b");
+  assert.equal(intakeSearchTerms("dm AND (relay OR relayed)"), "dm relay relayed");
+});
+
+test("only qualifier-shaped words are dropped — an error name or a URL survives", () => {
+  assert.equal(intakeSearchTerms("TypeError: undefined"), "TypeError: undefined");
+  assert.equal(
+    intakeSearchTerms("https://github.com/BilLogic/plus-uno/issues/1 broken"),
+    "https://github.com/BilLogic/plus-uno/issues/1 broken",
+  );
+});
+
+test("at most six words go to GitHub", () => {
+  assert.equal(intakeSearchTerms("one two three four five six seven eight"), "one two three four five six");
 });
 
 test("keywords that are only qualifiers, or none, search nothing", async () => {
@@ -116,5 +139,14 @@ test("a failed search is reported, and does not block filing", async () => {
   assert.match(result.error!, /403/);
   // The check is a courtesy to the tracker, not a gate on the request.
   assert.match(result.note!, /couldn't check/i);
+  assert.match(result.note!, /github_issue_create/);
+});
+
+test("a spent rate limit is named as such, and still does not block filing", async () => {
+  const github = fakeSearch(() => new GithubRateLimitError(403, "GitHub issue search rate-limited"));
+  const result = await run({ keywords: "github issue" }, github);
+
+  assert.equal(result.ok, false);
+  assert.match(result.note!, /rate limit/i);
   assert.match(result.note!, /github_issue_create/);
 });

@@ -15,7 +15,7 @@ interface FetchCall {
   body: Record<string, unknown> | null;
 }
 let calls: FetchCall[] = [];
-let reply: { status: number; body: unknown } = { status: 201, body: {} };
+let reply: { status: number; body: unknown; headers?: Record<string, string> } = { status: 201, body: {} };
 
 globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
   calls.push({
@@ -26,7 +26,7 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
   });
   return new Response(JSON.stringify(reply.body), {
     status: reply.status,
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", ...reply.headers },
   });
 }) as typeof fetch;
 
@@ -122,6 +122,8 @@ test("the search GETs open issues on the configured repo, carrying the label and
   for (const part of [`repo:${REPO}`, "is:issue", "is:open", "label:harness-intake", "github", "issue"]) {
     assert.ok(q.includes(part), `${part} missing from ${q.join(" ")}`);
   }
+  // The search mode is named, not left to GitHub's default, which is changing.
+  assert.equal(url.searchParams.get("advanced_search"), "true");
 });
 
 test("the search names the repo it reads", async () => {
@@ -152,5 +154,25 @@ test("the search turns a refusal into an error carrying GitHub's status", async 
   await assert.rejects(
     (await search()).searchOpenIssues("harness-intake", "anything"),
     (err) => err instanceof GithubRequestError && err.status === 422,
+  );
+});
+
+for (const status of [403, 429]) {
+  test(`a ${status} with the rate limit spent is a rate-limit error, not a permissions one`, async () => {
+    const { GithubRateLimitError } = await import("../src/integrations/github.js");
+    reply = { status, body: { message: "API rate limit exceeded" }, headers: { "x-ratelimit-remaining": "0" } };
+    await assert.rejects(
+      (await search()).searchOpenIssues("harness-intake", "anything"),
+      (err) => err instanceof GithubRateLimitError && err.status === status,
+    );
+  });
+}
+
+test("a 403 with rate limit to spare stays a plain refusal", async () => {
+  const { GithubRateLimitError, GithubRequestError } = await import("../src/integrations/github.js");
+  reply = { status: 403, body: {}, headers: { "x-ratelimit-remaining": "12" } };
+  await assert.rejects(
+    (await search()).searchOpenIssues("harness-intake", "anything"),
+    (err) => err instanceof GithubRequestError && !(err instanceof GithubRateLimitError),
   );
 });

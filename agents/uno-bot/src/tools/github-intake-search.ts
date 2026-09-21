@@ -10,15 +10,20 @@
 //
 // The model sends keywords and nothing else. The repo, the open state and the
 // label are the Worker's: the client writes the first two, this file the third,
-// and `intakeSearchTerms` drops any `qualifier:value` from the keywords, so a
-// search cannot be aimed at another repo, a closed issue or another label.
+// and `intakeSearchTerms` drops any qualifier, boolean operator or grouping
+// from the keywords, so a search cannot be aimed at another repo, a closed
+// issue or another label.
 //
 // IT TAKES ITS SEARCH BY NAME — `findOpenIntakes` is driven in
 // `tests/github-intake-search.test.ts` with a fake, and `Env` enters only in
 // `executeGithubIntakeSearch`, the binding at the foot of this file.
 
 import type { Env } from "../types";
-import { githubIssueSearch, type GithubIssueSearch } from "../integrations/github";
+import {
+  GithubRateLimitError,
+  githubIssueSearch,
+  type GithubIssueSearch,
+} from "../integrations/github";
 import { INTAKE_LABELS } from "./github-issue-render";
 
 /** The label every intake carries, bot-filed or sweep-found — the one the
@@ -27,22 +32,32 @@ import { INTAKE_LABELS } from "./github-issue-render";
 const INTAKE_LABEL = INTAKE_LABELS[0];
 
 /** Enough words to find a match; more and GitHub's AND of every term finds
- *  nothing. */
-const MAX_TERMS = 8;
+ *  nothing. The schema asks for two to six. */
+const MAX_TERMS = 6;
+
+/** A search qualifier — `repo:`, `is:`, `-label:` — but not a URL's scheme,
+ *  and not a word that merely ends in a colon (`TypeError:`). */
+const QUALIFIER = /^-?[a-z_]+:(?!\/\/)./;
+
+/** GitHub's boolean operators, which under advanced search bind the Worker's
+ *  qualifiers to one side only. Upper-case, as GitHub reads them. */
+const OPERATOR = /^(?:AND|OR|NOT)$/;
 
 export interface IntakeSearchDeps {
   github: GithubIssueSearch;
 }
 
 /**
- * The model's keywords as words only: every `qualifier:value` dropped, double quotes
- * stripped, whitespace collapsed, at most `MAX_TERMS` words.
+ * The model's keywords as words only: every qualifier, boolean operator,
+ * parenthesis and double quote dropped, whitespace collapsed, at most
+ * `MAX_TERMS` words — so nothing in them can regroup the query around the
+ * repo, state and label the Worker wrote.
  */
 export function intakeSearchTerms(keywords: string): string {
   return keywords
-    .replace(/"/g, " ")
+    .replace(/["()]/g, " ")
     .split(/\s+/)
-    .filter((w) => w !== "" && !w.includes(":"))
+    .filter((w) => w !== "" && !QUALIFIER.test(w) && !OPERATOR.test(w))
     .slice(0, MAX_TERMS)
     .join(" ");
 }
@@ -61,7 +76,7 @@ export async function findOpenIntakes(
   if (!terms) {
     return JSON.stringify({
       ok: false,
-      error: "missing 'keywords' — two to four words that name the problem",
+      error: "missing 'keywords' — two to six words that name the problem",
     });
   }
 
@@ -87,7 +102,10 @@ export async function findOpenIntakes(
       repo,
       error: err instanceof Error ? err.message : String(err),
       note:
-        "Couldn't check for a duplicate. Say so in one clause and stage github_issue_create anyway — " +
+        (err instanceof GithubRateLimitError
+          ? "Couldn't check for a duplicate: GitHub's search rate limit is spent for now. "
+          : "Couldn't check for a duplicate. ") +
+        "Say so in one clause and stage github_issue_create anyway — " +
         "triage catches a duplicate the check missed.",
     });
   }
