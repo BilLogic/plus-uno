@@ -3,6 +3,11 @@
 // already on the Worker for repository_dispatch; this reuses it read-only.
 // Fail-loud (throws) so the tool can report honestly — unlike ds-components.ts,
 // which fails-open because it's a preflight guard, not a user-facing read.
+//
+// One write lives here too: creating an issue, for `github_issue_create`. It is
+// a CLIENT rather than a function, so the executor takes it by name and a test
+// hands it a fake (`tests/github-intake.test.ts`). Create only — nothing here
+// comments on, edits, closes or relabels an issue.
 
 import type { Env } from "../types";
 import { countedFetch } from "../net";
@@ -102,4 +107,84 @@ export async function githubSearchCode(env: Env, query: string): Promise<GithubC
   return (data.items ?? [])
     .map((i) => ({ path: i.path ?? "", url: i.html_url ?? "" }))
     .filter((i) => i.path);
+}
+
+/** An issue to create: the Worker decides every field, the labels included. */
+export interface NewIssue {
+  title: string;
+  body: string;
+  labels: readonly string[];
+}
+
+export interface CreatedIssue {
+  number: number;
+  /** The issue's github.com page. */
+  url: string;
+}
+
+/**
+ * A refusal from GitHub, carrying its status — so the caller can say WHY
+ * (a token without Issues write answers 403; one that cannot see the repo, 404)
+ * rather than pass on a bare message.
+ */
+export class GithubRequestError extends Error {
+  constructor(
+    readonly status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = "GithubRequestError";
+  }
+}
+
+/** The one GitHub write the issue executor needs, bound to one repo. */
+export interface GithubIssueClient {
+  /** `owner/name` — the repo every issue lands in. */
+  readonly repo: string;
+  /** Create the issue. Throws `GithubRequestError` on any non-2xx. */
+  createIssue(issue: NewIssue): Promise<CreatedIssue>;
+}
+
+/**
+ * The issue client on the Worker's own repo and token (POST /repos/{repo}/issues).
+ *
+ * The repo is `GITHUB_REPO`, never an argument: the model cannot aim a filing
+ * anywhere else. One subrequest per issue.
+ */
+export function githubIssueClient(env: Env): GithubIssueClient {
+  const repo = env.GITHUB_REPO;
+  return {
+    repo,
+    async createIssue(issue) {
+      if (!env.GITHUB_TOKEN || !repo) {
+        throw new Error("GitHub not configured on the Worker (GITHUB_TOKEN/GITHUB_REPO)");
+      }
+      const res = await countedFetch(`https://api.github.com/repos/${repo}/issues`, {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${env.GITHUB_TOKEN}`,
+          accept: "application/vnd.github+json",
+          "x-github-api-version": "2022-11-28",
+          "content-type": "application/json",
+          "user-agent": "uno-bot",
+        },
+        body: JSON.stringify({ title: issue.title, body: issue.body, labels: [...issue.labels] }),
+      }, GH_TIMEOUT_MS);
+      if (!res.ok) {
+        // The status only: a refusal's body can echo what was sent.
+        console.warn(`[github] create issue on ${repo} refused: ${res.status}`);
+        throw new GithubRequestError(res.status, `GitHub issues ${res.status} for ${repo}`);
+      }
+      const data = (await res.json().catch(() => ({}))) as { number?: unknown; html_url?: unknown };
+      // A success that names no issue is not a filing anyone can follow — no
+      // "#0" link in the thread.
+      if (typeof data.number !== "number" || typeof data.html_url !== "string" || !data.html_url) {
+        throw new GithubRequestError(
+          res.status,
+          `GitHub answered ${res.status} for ${repo} without the new issue's number and link`,
+        );
+      }
+      return { number: data.number, url: data.html_url };
+    },
+  };
 }

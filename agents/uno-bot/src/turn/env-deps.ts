@@ -174,6 +174,9 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
         const parts = figmaUrl ? parseFigmaUrl(figmaUrl) : null;
         return parts ? await fetchFigmaImagePngUrl(env, parts.fileKey, parts.nodeId, 1) : null;
       },
+      // The repo a GitHub intake lands in, for the card's public-repo notice —
+      // the same `GITHUB_REPO` the issue client files into.
+      issueRepo: () => env.GITHUB_REPO,
     },
 
     async readAntecedent(channel, beforeTs, limit) {

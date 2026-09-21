@@ -628,6 +628,28 @@
     }
   },
   {
+    "name": "github_issue_create",
+    "description": "SIDE EFFECT (creates a real issue in a PUBLIC repo), routed through the confirmation gate. File an intake as a GitHub issue on the harness repo, where harness work is specced and fixed. Use it when someone asks to track, file or report a problem with uno-bot itself or the harness (skills, persona, harness docs, evals) — 'track this on GitHub', 'file an issue for someone to fix'. Product and design maintenance (a DS component, a product flow, a design doc) is a Roadmap intake card (notion_create, surface 'intake') instead; say which surface you chose so the requester can redirect it. You write the title and body only — the Worker sets the repo and the triage labels and appends a footer naming the requester and linking this thread. Anyone on the internet can read the issue: content from a DM or private channel other than this conversation never goes in it.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "body"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Issue title: the problem in one line, specific enough to find again."
+        },
+        "body": {
+          "type": "string",
+          "description": "Issue body in GitHub Markdown: the problem, what was expected, what happened instead, and how to reproduce it where known. A summary in your words; short quotes from this conversation are fine. No placeholders."
+        }
+      }
+    }
+  },
+  {
     "name": "proposal_resolve",
     "description": "Resolve a side-effect proposal that is awaiting confirmation. Use it when the system prompt shows a pending proposal AND the user's current message is a decision about it, in whatever words — a yes ('go ahead', 'sure', 'ok', 'sounds good', 'yep do it') confirms; a no ('cancel', 'no', 'scrap it') cancels. Anyone in the thread may confirm or cancel, not just the original requester. A message that asks for a change, or asks something unrelated, gets a conversational reply instead, and the proposal sits until someone presses ✅ / ⛔ on the card, reacts, or it expires after 60 minutes.",
     "input_schema": {

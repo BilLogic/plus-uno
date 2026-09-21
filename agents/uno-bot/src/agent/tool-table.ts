@@ -218,6 +218,20 @@ export const TOOL_TABLE = {
       nouns: ["dm", "message", "send", "relay"],
     },
   },
+  github_issue_create: {
+    access: "gated",
+    retrieval: false,
+    // Triage is uno-maintain's, through the labels the Worker applies — not a
+    // review heads-up in the design channel.
+    reviewRequest: null,
+    gate: {
+      // The repo and that it is public are the card's public-repo caveat,
+      // named from `GITHUB_REPO` — said once, and never a literal here.
+      verb: "file a GitHub issue",
+      kind: "file an issue",
+      nouns: ["issue", "github", "track", "file"],
+    },
+  },
   proposal_resolve: { access: "control", retrieval: false, reviewRequest: null },
 } as const satisfies Record<string, ToolRow>;
 

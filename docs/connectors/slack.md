@@ -96,15 +96,16 @@ Block Kit **is** wired (`delivery.ts` posts `section` blocks with a `text` fallb
 
 ### The same Markdown goes everywhere else too
 
-One dialect, three destinations — you write Markdown, the Worker renders it per surface:
+One dialect, four destinations — you write Markdown, the Worker renders it per surface:
 
 | Destination | Renderer | Notes |
 |---|---|---|
 | Slack | `slack/mrkdwn.ts` (mrkdwn paths only) | this file — tables render |
 | Notion (`notion_create`, `notion_update`) | `integrations/notion-blocks.ts` | real blocks, annotations **and real tables** — `notion.md` § Writing a body |
 | Email (`email_send`) | `integrations/email-render.ts` | plain text **and** HTML; tables flatten to bullets |
+| GitHub issue body (`github_issue_create`) | none — sent as written, plus a footer from `tools/github-issue-render.ts` | GitHub renders Markdown natively, tables included; the repo is public |
 
-**Tables are the one construct that differs by destination, and all three handle it well.** Slack renders a real table; Notion gets a real `table` block; email flattens to one labelled bullet per row (`Column: value · Column: value`) because HTML mail tables break across clients. Write the table whenever the content is a grid — nothing is lost anywhere.
+**Tables are the one construct that differs by destination, and every one handles it well.** Slack renders a real table; Notion gets a real `table` block; email flattens to one labelled bullet per row (`Column: value · Column: value`) because HTML mail tables break across clients; GitHub renders the table as written. Write the table whenever the content is a grid — nothing is lost anywhere.
 
 ### What Slack's Markdown parser actually does — measured, not assumed
 

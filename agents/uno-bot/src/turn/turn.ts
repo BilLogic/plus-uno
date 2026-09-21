@@ -358,6 +358,9 @@ export interface TurnDeps {
     /** A render of the Figma node a `prototype_scaffold` implements, or null
      *  where there is no node or the render failed. Best-effort by contract. */
     designPreviewImage(input: Record<string, unknown>): Promise<string | null>;
+    /** The repo a `github_issue_create` files into — the Worker's
+     *  `GITHUB_REPO`, so the card names where the issue will actually land. */
+    issueRepo(): string;
   };
 
   /**
@@ -1327,6 +1330,13 @@ async function buildCard(
     operations: result.operations,
   };
 
+  if (toolName === "github_issue_create") {
+    // THE PUBLIC REPO: an intake is readable by anyone the moment it is filed,
+    // and the card is the one place a person reads the body before it goes
+    // out — so every such card says so, naming the repo the Worker files into.
+    return { ...card, caveats: [{ kind: "public-repo", repo: deps.cards.issueRepo() }] };
+  }
+
   if (toolName === "prototype_scaffold") {
     // The Figma render, when one can be fetched — a URL on the card, not a
     // block: what Slack does with an image is the adapter's.
@@ -1450,7 +1460,7 @@ function cardFieldOf(label: string, value: unknown): CardField {
 /**
  * What a person must be told about this staged input before they press ✅.
  *
- * A JUDGEMENT, which is why it is here and not in the renderer: both caveats
+ * A JUDGEMENT, which is why it is here and not in the renderer: the caveats
  * are reached by READING the staged input, and the renderer only knows how each
  * one reads.
  *
@@ -1470,6 +1480,9 @@ function cardFieldOf(label: string, value: unknown): CardField {
  * a weaker model provider cannot silently skip the disclosure. The bundle
  * contract for prototype share-outs is a Loom walkthrough, a live preview and a
  * Decisions DB link (`skills/uno-publish/references/method.md`).
+ *
+ * The public-repo caveat is `buildCard`'s, because naming the repo takes a
+ * read of the Worker's config through `deps.cards`.
  */
 function caveatsFor(
   toolName: string,

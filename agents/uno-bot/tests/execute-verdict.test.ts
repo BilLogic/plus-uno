@@ -49,7 +49,17 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
   if (url.includes("slack.com/api/conversations.open")) {
     return reply({ ok: true, channel: { id: `D-${String(body?.users)}` } });
   }
+  if (url.includes("slack.com/api/users.info")) {
+    const user = new URL(url).searchParams.get("user");
+    return reply({ ok: true, user: { id: user, profile: { display_name: user === "U0REQ1" ? "Bill Guo" : "" } } });
+  }
   if (url.includes("slack.com/api/")) return reply({ ok: true, ts: "1700000000.999999" });
+  if (url.startsWith("https://api.github.com/repos/") && url.endsWith("/issues")) {
+    return new Response(
+      JSON.stringify({ number: 701, html_url: "https://github.com/BilLogic/plus-uno/issues/701" }),
+      { status: 201, headers: { "content-type": "application/json" } },
+    );
+  }
   if (url.includes("oauth2.googleapis.com/token")) return reply({ access_token: "ya29.test" });
   if (url.includes("gmail.googleapis.com")) return reply({ id: "msg-1" });
   throw new Error(`no stub route for ${url}`);
@@ -167,4 +177,28 @@ test("email_send's user allowlist sees who asked: anyone else is refused", async
   await run(env({ ...GMAIL, EMAIL_AUTHORIZED_USERS: "U0SOMEONEELSE" }), won([EMAIL]));
   assert.equal(gmailSends(), 0);
   assert.ok(posts().some((p) => /isn't enabled for you/.test(String(p.text))));
+});
+
+test("an approved GitHub intake names who asked in its footer, and links the issue under the reply ts", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env({ GITHUB_TOKEN: "ghp_test", GITHUB_REPO: "BilLogic/plus-uno" }),
+    won([{ toolName: "github_issue_create", input: { title: "A bot gap", body: "What went wrong." } }]),
+  );
+
+  const filed = calls.find((c) => c.url === "https://api.github.com/repos/BilLogic/plus-uno/issues");
+  assert.ok(filed, "the issue was filed on the configured repo");
+  const body = String(filed.body?.body);
+  // The requester of record, resolved to a name — not whoever pressed ✅.
+  assert.match(body, /on behalf of Bill Guo/);
+  // Asked in a DM, so the public issue carries no link into it.
+  assert.match(body, /filed from a DM/);
+  assert.doesNotMatch(body, /slack\.com/);
+  assert.deepEqual(filed.body?.labels, ["harness-intake", "needs-triage"]);
+
+  const note = posts().find((p) => String(p.text).includes("issues/701"));
+  assert.ok(note, "the issue link came back to the requesting conversation");
+  assert.equal(note.channel, "D0REQUESTER");
+  assert.equal(note.thread_ts, "1700000000.000100", "under the real reply ts, not the conversation key");
 });
