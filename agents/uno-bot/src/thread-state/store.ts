@@ -79,6 +79,12 @@ export const DEFER_RETRY_MS = 2 * 60 * 1000;
  *  bot ignoring them — worse than a stop that missed. */
 export const CANCEL_TTL_MS = 5 * 60_000;
 
+/** The conversation key of an unthreaded DM: every loose line of one DM
+ *  resolves to it, so the whole DM is one conversation (see `ThreadRef`). The
+ *  one statement of it — the Slack door, the stop door and the relay all key
+ *  a DM's history by this. */
+export const DM_CONVERSATION = "dm";
+
 // ── Records ──────────────────────────────────────────────────────────────────
 
 /** Where a conversation lives. `thread` is the CONVERSATION key, which in a
@@ -272,7 +278,10 @@ export interface ThreadState {
 
   /** Append one turn, capped at `MAX_HISTORY_TURNS` (oldest dropped). Returns
    *  the stored length. Callers record a user turn WITH its assistant turn: a
-   *  missed half is a corrupted memory. */
+   *  missed half is a corrupted memory. The one exception is a message the bot
+   *  opens a conversation with and no one asked for there: a relayed DM is
+   *  recorded alone, as an assistant turn in the recipient's DM, because the
+   *  request behind it lives in the requester's conversation, not this one. */
   appendHistory(ref: ThreadRef, turn: HistoryTurn): Promise<{ length: number }>;
 
   /**

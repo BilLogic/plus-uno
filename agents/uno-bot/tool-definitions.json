@@ -214,7 +214,6 @@
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
-      "required": [],
       "properties": {
         "user_id": {
           "type": "string",

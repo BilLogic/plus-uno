@@ -34,7 +34,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh label create harness-intake --repo "$GITHUB_REPOSITORY" \
+          gh label create harness-intake --force --repo "$GITHUB_REPOSITORY" \
             --description "Harness intake — headless sweep finding or uno-bot-filed request, awaiting uno-maintain triage" \
             --color D93F0B || true
           gh label create automation-blocked --repo "$GITHUB_REPOSITORY" \

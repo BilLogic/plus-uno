@@ -14,7 +14,8 @@ import {
   relayRecipientId,
   renderRelayedDm,
 } from "../src/tools/relayed-dm-render";
-import { executeRelayDm, type RelayMemory, type RelaySlack } from "../src/tools/relay-dm";
+import { executeRelayDm, relayMemoryOver, type RelayMemory, type RelaySlack } from "../src/tools/relay-dm";
+import { createInMemoryThreadState, DM_CONVERSATION } from "../src/thread-state/index";
 import { runOperations } from "../src/gate/index";
 import { preflight } from "../src/agent/preflight";
 import type { Env, SlackContext } from "../src/types";
@@ -285,6 +286,24 @@ describe("an approved relay", () => {
     assert.deepEqual(memory.remembered.map((r) => r.channel), ["D-U0COCO"]);
     assert.equal(memory.remembered[0]!.content, dm.text, "remembered as the recipient read it");
     assert.ok(memory.remembered[0]!.ts, "under the ts Slack gave the DM");
+  });
+
+  it("stores the relay where the recipient's unthreaded reply reads its history", async () => {
+    // The real memory over a real (in-memory) store: an unthreaded DM line
+    // reads the conversation `{ channel, DM_CONVERSATION }`, so that is where
+    // the recipient's "what's this about?" finds what was sent.
+    const store = createInMemoryThreadState();
+    const slack = fakeSlack();
+    await executeRelayDm(
+      { slack, memory: relayMemoryOver(store) },
+      { recipient: "U0COCO", text: "RM-2436 is Ready for QA." },
+      CONTEXT,
+    );
+    const history = await store.readHistory({ channel: "D-U0COCO", thread: DM_CONVERSATION });
+    assert.equal(history.length, 1);
+    assert.equal(history[0]!.role, "assistant");
+    assert.equal(history[0]!.content, slack.posts.find((p) => p.channel === "D-U0COCO")!.text);
+    assert.deepEqual(await store.readHistory({ channel: "C1", thread: CONTEXT.threadTs }), [], "nothing in the requester's thread");
   });
 
   it("remembers nothing for a relay Slack refused", async () => {

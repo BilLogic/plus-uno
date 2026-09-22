@@ -37,7 +37,7 @@
 // compile is a glob over `src/**` and types the Workers globals beside the Node
 // ones, so it would compile this file either way — `tsconfig.test.json`.)
 
-import type { ThreadRef, ThreadState } from "../thread-state/index";
+import { DM_CONVERSATION, type ThreadRef, type ThreadState } from "../thread-state/index";
 import { settledStatus, type SessionStatus } from "./session-status";
 import { turnSurfaceOf } from "../turn/request";
 
@@ -64,11 +64,6 @@ export const STOPPING_PROMISE = "Stopping — I'll finish the step I'm on and st
 /** The reassurance that follows it: a stop is not an undo. Anything the gate
  *  already executed has already happened. */
 export const NOTHING_UNDONE = "Nothing already confirmed gets undone.";
-
-/** The conversation key of an unthreaded DM — the same constant `events.ts`
- *  resolves every loose DM line to, restated here because a stop event carries
- *  a `thread_ts` and the keys it has to be read against include this one. */
-const DM_CONVERSATION = "dm";
 
 /** Assistant/agent DMs are IM channels. The surface decides both halves below:
  *  which conversation keys can hold the run, and which can hold the card.

@@ -25,6 +25,7 @@
 
 import type { Env, SlackContext } from "../types";
 import { getPermalink, openConversation, postMessage } from "../slack/api";
+import { DM_CONVERSATION, type ThreadState } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { relayFailure, relayRecipientId, renderRelayedDm } from "./relayed-dm-render";
 
@@ -62,17 +63,19 @@ export function relaySlackFor(env: Env): RelaySlack {
   };
 }
 
-/** The unthreaded DM's conversation key — every composer line in a DM shares
- *  it (`thread-state/store.ts` § ThreadRef). */
-const DM_CONVERSATION = "dm";
+/** The memory over a thread store: the relay goes in under the key an
+ *  unthreaded reply in that DM reads its history from. */
+export function relayMemoryOver(store: Pick<ThreadState, "appendHistory">): RelayMemory {
+  return {
+    async remember(dmChannel, turn) {
+      await store.appendHistory({ channel: dmChannel, thread: DM_CONVERSATION }, { role: "assistant", ...turn });
+    },
+  };
+}
 
 /** The production memory: the thread store, with `Env` bound. */
 export function relayMemoryFor(env: Env): RelayMemory {
-  return {
-    async remember(dmChannel, turn) {
-      await threadStateFor(env).appendHistory({ channel: dmChannel, thread: DM_CONVERSATION }, { role: "assistant", ...turn });
-    },
-  };
+  return relayMemoryOver(threadStateFor(env));
 }
 
 export async function executeRelayDm(

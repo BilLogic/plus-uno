@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { findSlackUsers, type SlackDirectory } from "../src/tools/slack-people";
+import { cachingDirectory, DIRECTORY_TTL_MS, findSlackUsers, type SlackDirectory } from "../src/tools/slack-people";
 import type { SlackUserInfo } from "../src/slack/api";
 
 const person = (id: string, real: string, display = "", extra: Partial<SlackUserInfo> = {}): SlackUserInfo => ({
@@ -110,6 +110,49 @@ test("a directory Slack refused is an error the model can say, not an empty resu
   const result = JSON.parse(await findSlackUsers(directory([TEAM], { error: "missing_scope" }), "coco"));
   assert.equal(result.ok, false);
   assert.match(result.error, /missing_scope/);
+});
+
+test("a guest is found, and said to be a guest", async () => {
+  const team = [
+    person("U0GUEST", "Coco Partner", "", { is_restricted: true }),
+    person("U0SINGLE", "Coco Visitor", "", { is_restricted: true, is_ultra_restricted: true }),
+  ];
+  const result = JSON.parse(await findSlackUsers(directory([team]), "coco"));
+  const byId = Object.fromEntries(result.matches.map((m: { id: string; guest?: string }) => [m.id, m.guest]));
+  assert.deepEqual(byId, { U0GUEST: "multi-channel", U0SINGLE: "single-channel" });
+});
+
+test("two lookups inside the cache window read the directory once", async () => {
+  // users.list is rate-limited hard: a relay to two people is two lookups in
+  // one turn, and must not walk the directory twice.
+  let clock = 0;
+  const dir = directory([[TEAM[0]!, TEAM[1]!], [TEAM[2]!]]);
+  const cached = cachingDirectory(dir, { cache: new Map(), now: () => clock });
+  const first = JSON.parse(await findSlackUsers(cached, "coco"));
+  const second = JSON.parse(await findSlackUsers(cached, "meryem"));
+  assert.deepEqual(first.matches.map((m: { id: string }) => m.id), ["U0COCO"]);
+  assert.deepEqual(second.matches.map((m: { id: string }) => m.id), ["U0MERYEM"]);
+  assert.equal(dir.reads, 2, "each page once");
+
+  clock = DIRECTORY_TTL_MS + 1;
+  await findSlackUsers(cached, "bill");
+  assert.equal(dir.reads, 4, "read again once the window has passed");
+});
+
+test("a refused directory read is not cached", async () => {
+  let refuse = true;
+  const inner: SlackDirectory & { reads: number } = {
+    reads: 0,
+    async listUsers() {
+      inner.reads++;
+      return refuse ? { ok: false, error: "ratelimited" } : { ok: true, members: TEAM };
+    },
+  };
+  const cached = cachingDirectory(inner, { cache: new Map(), now: () => 0 });
+  assert.equal(JSON.parse(await findSlackUsers(cached, "coco")).ok, false);
+  refuse = false;
+  assert.equal(JSON.parse(await findSlackUsers(cached, "coco")).matches.length, 1);
+  assert.equal(inner.reads, 2);
 });
 
 test("a blank name is refused before any read", async () => {

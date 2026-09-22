@@ -58,14 +58,51 @@ export interface SlackDirectory {
   listUsers(cursor?: string): Promise<{ ok: boolean; error?: string; members?: SlackUserInfo[]; next_cursor?: string }>;
 }
 
-/** The production directory: users.list, with `Env` bound. */
+/** The production directory: users.list, with `Env` bound, behind the
+ *  isolate's page cache. */
 export function slackDirectoryFor(env: Env): SlackDirectory {
+  return cachingDirectory(
+    {
+      async listUsers(cursor) {
+        const res = await usersList(env, cursor);
+        if (!res.ok) return { ok: false, error: (res as { error?: string }).error ?? "users.list failed" };
+        const next = res.response_metadata?.next_cursor;
+        return { ok: true, members: res.members ?? [], ...(next ? { next_cursor: next } : {}) };
+      },
+    },
+    { cache: ISOLATE_DIRECTORY_PAGES },
+  );
+}
+
+type DirectoryPage = Awaited<ReturnType<SlackDirectory["listUsers"]>>;
+
+/** How long a directory page is reused. users.list is a Tier 2 method (about
+ *  20 calls a minute), and a relay to two people is two lookups in one turn —
+ *  a few minutes is fresh enough for who works here. */
+export const DIRECTORY_TTL_MS = 5 * 60_000;
+
+/** The isolate's pages, by cursor. Per isolate and short-lived on purpose: a
+ *  new teammate is found within minutes, and nothing here outlives a deploy. */
+const ISOLATE_DIRECTORY_PAGES = new Map<string, { at: number; page: DirectoryPage }>();
+
+/**
+ * A directory that reuses each page for `ttlMs`. Only a page Slack answered
+ * is kept: a refusal is asked again next time rather than remembered.
+ */
+export function cachingDirectory(
+  inner: SlackDirectory,
+  opts: { cache: Map<string, { at: number; page: DirectoryPage }>; now?: () => number; ttlMs?: number },
+): SlackDirectory {
+  const now = opts.now ?? Date.now;
+  const ttlMs = opts.ttlMs ?? DIRECTORY_TTL_MS;
   return {
     async listUsers(cursor) {
-      const res = await usersList(env, cursor);
-      if (!res.ok) return { ok: false, error: (res as { error?: string }).error ?? "users.list failed" };
-      const next = res.response_metadata?.next_cursor;
-      return { ok: true, members: res.members ?? [], ...(next ? { next_cursor: next } : {}) };
+      const key = cursor ?? "";
+      const hit = opts.cache.get(key);
+      if (hit && now() - hit.at < ttlMs) return hit.page;
+      const page = await inner.listUsers(cursor);
+      if (page.ok) opts.cache.set(key, { at: now(), page });
+      return page;
     },
   };
 }
@@ -122,6 +159,13 @@ export async function findSlackUsers(directory: SlackDirectory, name: string): P
     name: u.profile?.display_name || u.real_name || u.name,
     real_name: u.real_name,
     title: u.profile?.title,
+    // A guest is a valid recipient; saying so lets the requester check it's
+    // the person they meant, not a same-named guest.
+    ...(u.is_ultra_restricted
+      ? { guest: "single-channel" }
+      : u.is_restricted
+        ? { guest: "multi-channel" }
+        : {}),
   }));
   const partial = complete ? "" : " This searched part of the workspace, not all of it — say so if you found no one.";
   const note =

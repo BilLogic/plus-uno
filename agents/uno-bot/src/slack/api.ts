@@ -121,6 +121,10 @@ export interface SlackUserInfo {
   profile?: { title?: string; email?: string; display_name?: string; status_text?: string };
   tz?: string;
   is_bot?: boolean;
+  /** A guest: multi-channel (`is_restricted`) or single-channel
+   *  (`is_ultra_restricted`). */
+  is_restricted?: boolean;
+  is_ultra_restricted?: boolean;
   deleted?: boolean;
 }
 
