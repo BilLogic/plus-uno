@@ -126,7 +126,7 @@
     "@tailwindcss/vite": "^4.3.3",
     "@vitest/browser-playwright": "^4.1.11",
     "@vitest/coverage-v8": "^4.1.0",
-    "agentic-service-blueprinting": "github:BilLogic/agentic-service-blueprinting#v1.6.4",
+    "agentic-service-blueprinting": "github:BilLogic/agentic-service-blueprinting#v1.44.29",
     "concurrently": "^10.0.5",
     "dotenv": "^18.0.0",
     "playwright": "^1.63.0",
