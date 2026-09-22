@@ -148,8 +148,22 @@ export async function executeGithubIssueCreate(
   // backstop for a card staged before the list changed.
   const target = resolveRepoFor(env, input.repo);
   if (!target.ok) return JSON.stringify({ ok: false, status: "github_failed", error: target.error });
-  return fileGithubIssue(input, {
-    github: githubIssueClient(env, target.entry),
+  return fileGithubIssue(input, { github: githubIssueClient(env, target.entry), ...slackFilingDeps(env, slack) });
+}
+
+/** The Slack half of a GitHub write's dependencies — who asked, whether it was
+ *  a DM, the thread's link, and the post back — shared by every executor that
+ *  writes to GitHub on a requester's behalf. */
+export type SlackFilingDeps = Pick<GithubIssueDeps, "requesterName" | "requestedInDm" | "threadPermalink" | "postToThread">;
+
+/**
+ * The binding for `SlackFilingDeps`: `Env` and the thread, turned into the four
+ * named dependencies.
+ * @param env - Worker bindings
+ * @param slack - Thread context: where to post, and who asked
+ */
+export function slackFilingDeps(env: Env, slack: SlackContext): SlackFilingDeps {
+  return {
     async requesterName() {
       if (!slack.requestedBy) return "a Slack teammate";
       const res = await usersInfo(env, slack.requestedBy).catch(() => null);
@@ -167,5 +181,5 @@ export async function executeGithubIssueCreate(
       // in a threadless DM the conversation key is not one Slack accepts.
       await postMessage(env, { channel: slack.channel, thread_ts: slack.replyTs ?? slack.threadTs, text });
     },
-  });
+  };
 }

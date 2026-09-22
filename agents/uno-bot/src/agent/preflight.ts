@@ -23,6 +23,7 @@ import { listDsComponents, matchComponent, closestComponents } from "../integrat
 import { placeholderRefusal } from "./placeholder";
 import { relayRecipientId } from "../tools/relayed-dm-render";
 import { resolveRepoFor } from "../integrations/github";
+import { issueUpdateFromInput } from "../tools/github-issue-update-render";
 
 export interface PreflightCtx {
   env: Env;
@@ -216,6 +217,20 @@ export async function preflight(
         return { ask: `:x: I can't file a GitHub issue right now — ${target.error} Tell Bill the repo list is broken.` };
       }
       return { ask: `:mag: ${target.error} Which of those should this intake go on?` };
+    }
+
+    case "github_issue_update": {
+      // Read as the executor reads it, so no card offers a follow-up the
+      // executor would refuse: a triage outcome, nothing to do, a bad number
+      // or state. Then the repo, as for an intake.
+      const read = issueUpdateFromInput(input);
+      if (!read.ok) return { ask: `:x: I can't stage that issue update — ${read.error}.` };
+      const target = resolveRepoFor(ctx.env, input.repo);
+      if (target.ok) return null;
+      if (target.misconfigured) {
+        return { ask: `:x: I can't update a GitHub issue right now — ${target.error} Tell Bill the repo list is broken.` };
+      }
+      return { ask: `:mag: ${target.error} Which of those is the issue on?` };
     }
 
     case "shareout_post": {

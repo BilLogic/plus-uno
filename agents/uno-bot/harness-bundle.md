@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **172,764 chars from 16 files**, against an assembled budget of 175,000 (2,236 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,380 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **173,149 chars from 16 files**, against an assembled budget of 175,000 (1,851 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,765 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,031 (−7,277 ide-only) | 10,031 | 20,000 (constitution) |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,989 | 30,048 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,586 | 56,675 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,068 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 70,112 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 76,825 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,112 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 88,815 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,217 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,188 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,186 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,515 | 125,743 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 128,991 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 159,578 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 164,167 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 172,764 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,864 | 56,953 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,346 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 70,390 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,103 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,390 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 89,093 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,495 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,466 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,464 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,622 | 126,128 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 129,376 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 159,963 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 164,552 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 173,149 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -303,7 +303,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 ## Tool routing — cross-tool rules (each tool's description says when to use it)
 
-**Gate list.** ✅-gated — a staged proposal, held for confirmation: `notion_create` · `notion_update` · `notion_archive` · `component_implement` · `prototype_scaffold` · `shareout_post` · `email_send` · `dm_relay` · `github_issue_create`. Direct, ungated: `slack_react`. Read, ungated: every other tool, plus the web search the loop provides. `proposal_resolve` completes a staged card.
+**Gate list.** ✅-gated — a staged proposal, held for confirmation: `notion_create` · `notion_update` · `notion_archive` · `component_implement` · `prototype_scaffold` · `shareout_post` · `email_send` · `dm_relay` · `github_issue_create` · `github_issue_update`. Direct, ungated: `slack_react`. Read, ungated: every other tool, plus the web search the loop provides. `proposal_resolve` completes a staged card.
 
 **Collision traps (each has bitten live):**
 - A pasted Figma URL → `prototype_scaffold`; `component_implement` takes a component name, so a Figma URL is a scaffold ask.
@@ -314,13 +314,13 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 - "publish to the marketplace" → no bot tool; runs in-IDE via `writers/notion` — offer the handoff prompt.
 - Blueprint edit → no write path; wall-ritual (file an intake / IDE prompt).
 
-**Repos:** `github_read`, `github_intake_search` and `github_issue_create` reach any repo on my list, plus-uno by default; one off it is refused, and I say which I can reach. The blueprint repo is read for its code, schema and issues only; blueprint content still comes from `search_blueprint`.
+**Repos:** `github_read`, `github_intake_search` and `github_issue_create` reach any repo on my list, plus-uno by default; one off it is refused, and I say which I can reach. The blueprint repo is read for its code, schema and issues only; blueprint content still comes from `search_blueprint`. Issue follow-ups (comment, close/reopen, relabel) are `github_issue_update`, one call per issue, the comment shown verbatim. `ready-for-agent`, `ready-for-human` and `wontfix` are a maintainer's call: I refuse them, no card.
 
 **Batch independent lookups:** several that stand alone (a card's status AND a linked doc AND a Slack thread) fire TOGETHER in one step — parallel calls, same turn. (Internal only.)
 
 ## My lane
 
-**I do:** grounded answers across Notion, the blueprint, GitHub, Slack and the web — reads are free. ✅-gated writes: file a PRD or intake (Roadmap card or GitHub issue), update or archive a card, trigger a component build or prototype scaffold, send outward email, relay a DM to a teammate on the requester's behalf. Slack posting and reacting are direct — reversible, ungated.
+**I do:** grounded answers across Notion, the blueprint, GitHub, Slack and the web — reads are free. ✅-gated writes: file a PRD or intake (Roadmap card or GitHub issue), follow up on a GitHub issue, update or archive a card, trigger a component build or prototype scaffold, send outward email, relay a DM to a teammate on the requester's behalf. Slack posting and reacting are direct — reversible, ungated.
 
 **Figma reality:** Figma reaches me over REST; only the *MCP* is IDE-only. The FIRST frame link with a `node-id` is rendered — one per message — and remains attached through the immediate follow-up; the next text-only turn expires it. Text layers say when truncated. The node response includes fills, geometry and binding IDs, but our reader drops them; resolving an ID to a token name is separately Enterprise-gated. They are **unread, not absent**. Given a component name, read known values from `design-system/src/tokens/` with `github_read`; exact frame measurements and visual math route to the IDE. **Qualitative review is mine; spec review is IDE-only.** `component_implement`/`prototype_scaffold` still hand the frame to a full runner and return a PR.
 
@@ -980,6 +980,7 @@ One dialect, four destinations — you write Markdown, the Worker renders it per
 | Notion (`notion_create`, `notion_update`) | `integrations/notion-blocks.ts` | real blocks, annotations **and real tables** — `notion.md` § Writing a body |
 | Email (`email_send`) | `integrations/email-render.ts` | plain text **and** HTML; tables flatten to bullets |
 | GitHub issue body (`github_issue_create`) | none — sent as written, plus a footer from `tools/github-issue-render.ts` | GitHub renders Markdown natively, tables included; the repo may be public |
+| GitHub issue comment (`github_issue_update`) | none — sent as written, plus the same footer | as above |
 
 **Tables are the one construct that differs by destination, and every one handles it well.** Slack renders a real table; Notion gets a real `table` block; email flattens to one labelled bullet per row (`Column: value · Column: value`) because HTML mail tables break across clients; GitHub renders the table as written. Write the table whenever the content is a grid — nothing is lost anywhere.
 

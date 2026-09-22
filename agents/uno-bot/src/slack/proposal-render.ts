@@ -226,16 +226,21 @@ function caveatText(caveat: CardCaveat): string {
     );
   }
   if (caveat.kind === "repo-visibility") {
+    // What goes out, and the words a person checks before it does.
+    const [what, when, check] =
+      caveat.write === "comment"
+        ? ["the comment", "once it's posted", "Check it"]
+        : ["the issue", "once it's filed", "Check the body"];
     const who =
       caveat.visibility === "public"
-        ? `:globe_with_meridians: *${caveat.repo}* is public — anyone can read the issue once it's filed.`
+        ? `:globe_with_meridians: *${caveat.repo}* is public — anyone can read ${what} ${when}.`
         : caveat.visibility === "private"
-          ? `:lock: *${caveat.repo}* is private — only people with access to it can read the issue.`
-          : `:globe_with_meridians: *${caveat.repo}* may be public — I couldn't check, so treat the issue as readable by anyone.`;
-    return (
-      `${who} ` +
-      "Check the body for anything from a DM or private channel before you approve; I add a footer naming you and linking this thread."
-    );
+          ? `:lock: *${caveat.repo}* is private — only people with access to it can read ${what}.`
+          : `:globe_with_meridians: *${caveat.repo}* may be public — I couldn't check, so treat ${what} as readable by anyone.`;
+    // A DM's footer names the requester and links nothing, so the card
+    // promises no link either.
+    const footer = caveat.fromDm ? "I add a footer naming you." : "I add a footer naming you and linking this thread.";
+    return `${who} ${check} for anything from a DM or private channel before you approve; ${footer}`;
   }
   return ":mag: *No open questions were named for this brief.* If it leaves anything ambiguous (states, interactions, semantics), cancel and ask — confirming builds it as-is.";
 }

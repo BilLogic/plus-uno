@@ -92,7 +92,15 @@ export type CardCaveat =
   | { kind: "bundle-incomplete"; missing: string[] }
   /** A GitHub issue, readable by whoever can read its repo — anyone, when the
    *  repo is public — so the ✅ is consent to publish the words on the card. */
-  | { kind: "repo-visibility"; repo: string; visibility: RepoVisibility };
+  | {
+      kind: "repo-visibility";
+      repo: string;
+      visibility: RepoVisibility;
+      /** What goes out: a new issue (absent) or a comment on an existing one. */
+      write?: "comment";
+      /** Asked for in a DM: the footer names the requester and links nothing. */
+      fromDm?: true;
+    };
 
 /** Who can read a listed repo's issues; `unknown` when GitHub would not say,
  *  which the card words as "may be public". The same union as

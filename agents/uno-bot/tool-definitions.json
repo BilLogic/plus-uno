@@ -694,6 +694,59 @@
     }
   },
   {
+    "name": "github_issue_update",
+    "description": "SIDE EFFECT (writes to a real issue on a listed GitHub repo), routed through the confirmation gate. Follow up on an existing GitHub issue in a listed repo: comment on it ('add this repro to #688'), close it as completed or not planned, or reopen it ('close #688 as done'), and add or remove labels that already exist on the repo ('label #688 bug'). One call per issue, carrying every change asked for on it; several issues are several calls in the same reply, which stage as one card. Never the triage outcomes ready-for-agent, ready-for-human or wontfix, either way — those are a maintainer's decision, so say so instead of staging. The Worker refuses a repo off its list and a label the repo lacks, and appends a footer naming the requester to every comment — write the comment only. The card says whether the repo is public; write every comment as if anyone can read it: content from a DM or private channel other than this conversation never goes in one.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "issue_number"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "enum": [
+            "BilLogic/plus-uno",
+            "BilLogic/plus-marketing-website",
+            "BilLogic/plus-uno-blueprint"
+          ],
+          "description": "Optional: the repo the issue is on, from the bot's list; omit for the default, plus-uno."
+        },
+        "issue_number": {
+          "type": "integer",
+          "description": "The issue's number, e.g. 688."
+        },
+        "comment": {
+          "type": "string",
+          "description": "Optional: a comment in GitHub Markdown, exactly as it should read on the issue. When closing, the reason in a sentence belongs here."
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "closed_completed",
+            "closed_not_planned",
+            "open"
+          ],
+          "description": "Optional: close as completed (done or fixed), close as not planned (won't do, duplicate, stale), or reopen."
+        },
+        "add_labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional: labels to add, by their name on the repo."
+        },
+        "remove_labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional: labels to take off the issue."
+        }
+      }
+    }
+  },
+  {
     "name": "proposal_resolve",
     "description": "Resolve a side-effect proposal that is awaiting confirmation. Use it when the system prompt shows a pending proposal AND the user's current message is a decision about it, in whatever words — a yes ('go ahead', 'sure', 'ok', 'sounds good', 'yep do it') confirms; a no ('cancel', 'no', 'scrap it') cancels. Anyone in the thread may confirm or cancel, not just the original requester. A message that asks for a change, or asks something unrelated, gets a conversational reply instead, and the proposal sits until someone presses ✅ / ⛔ on the card, reacts, or it expires after 60 minutes.",
     "input_schema": {

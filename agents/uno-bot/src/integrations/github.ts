@@ -12,8 +12,9 @@
 //
 // One write lives here too: creating an issue, for `github_issue_create`. It is
 // a CLIENT rather than a function, so the executor takes it by name and a test
-// hands it a fake (`tests/github-intake.test.ts`). Create only — nothing here
-// comments on, edits, closes or relabels an issue. Beside it, the read the
+// hands it a fake (`tests/github-intake.test.ts`). The follow-ups on an issue
+// (comment, close or reopen, relabel) are a second client, for
+// `github_issue_update`, for the same reason. Beside them, the read the
 // duplicate check runs first — open issues by label and keyword, for
 // `github_intake_search` — a client for the same reason. And the read the
 // intake card makes: whether the repo is public, asked once per isolate.
@@ -338,6 +339,113 @@ export async function githubRepoVisibility(env: Env, target: RepoEntry): Promise
     console.warn(`[github] visibility of ${repo} unread: ${err instanceof Error ? err.message : String(err)}`);
     return "unknown";
   }
+}
+
+/** The follow-up writes `github_issue_update` makes, bound to one repo. Each
+ *  throws `GithubRequestError` (or `GithubRateLimitError`) on any non-2xx. */
+export interface GithubIssueUpdateClient {
+  /** `owner/name` — the repo every call reaches. */
+  readonly repo: string;
+  /** Every label defined on the repo, by name. Cached for the isolate. */
+  labels(): Promise<string[]>;
+  /** Comment on the issue; answers the comment's github.com link. */
+  comment(issue: number, body: string): Promise<{ url: string }>;
+  /** Close with a reason, or reopen. */
+  setState(issue: number, state: "open" | "closed", reason: "completed" | "not_planned" | "reopened"): Promise<void>;
+  /** Add existing labels to the issue, keeping the ones it has. */
+  addLabels(issue: number, labels: readonly string[]): Promise<void>;
+  /** Take one label off the issue. */
+  removeLabel(issue: number, label: string): Promise<void>;
+}
+
+/** A repo's label names, kept for the isolate's life with a short expiry — a
+ *  label a maintainer adds is usable within minutes, and an update that
+ *  labels an issue costs one read, not one per ask. */
+const LABEL_CACHE_MS = 10 * 60 * 1000;
+const LABEL_PAGE = 100;
+const LABEL_PAGES_MAX = 5;
+const labelCache = new Map<string, { at: number; names: string[] }>();
+
+/**
+ * The follow-up client on one listed repo and the Worker's token — comments
+ * (POST …/comments), state (PATCH the issue with `state` + `state_reason`),
+ * labels (POST / DELETE …/labels) and the repo's label list (GET /labels).
+ *
+ * The repo is a resolved entry, never the model's string. One subrequest per
+ * call, plus at most one label read per repo per ten minutes.
+ */
+export function githubIssueUpdateClient(env: Env, target: RepoEntry): GithubIssueUpdateClient {
+  const repo = target.repo;
+  const base = `https://api.github.com/repos/${repo}`;
+  const call = async (what: string, url: string, init: { method: string; body?: unknown }): Promise<Response> => {
+    if (!env.GITHUB_TOKEN) {
+      throw new Error("GitHub not configured on the Worker (GITHUB_TOKEN)");
+    }
+    const res = await countedFetch(url, {
+      method: init.method,
+      headers: {
+        authorization: `Bearer ${env.GITHUB_TOKEN}`,
+        accept: "application/vnd.github+json",
+        "x-github-api-version": "2022-11-28",
+        ...(init.body === undefined ? {} : { "content-type": "application/json" }),
+        "user-agent": "uno-bot",
+      },
+      ...(init.body === undefined ? {} : { body: JSON.stringify(init.body) }),
+    }, GH_TIMEOUT_MS);
+    if (!res.ok) {
+      // The status only: a refusal's body can echo what was sent.
+      console.warn(`[github] ${what} on ${repo} refused: ${res.status}`);
+      // A spent primary limit says `x-ratelimit-remaining: 0`; a secondary
+      // (abuse) limit is a 403 or 429 carrying `retry-after` instead. Both
+      // are "try later", never "the token lacks permission".
+      if (
+        (res.status === 403 || res.status === 429) &&
+        (res.headers.get("x-ratelimit-remaining") === "0" || res.headers.has("retry-after"))
+      ) {
+        throw new GithubRateLimitError(res.status, `GitHub ${what} rate-limited (${res.status}) for ${repo}`);
+      }
+      throw new GithubRequestError(res.status, `GitHub ${what} ${res.status} for ${repo}`);
+    }
+    return res;
+  };
+  const issueUrl = (issue: number) => `${base}/issues/${issue}`;
+
+  return {
+    repo,
+    async labels() {
+      const cached = labelCache.get(repo);
+      if (cached && Date.now() - cached.at < LABEL_CACHE_MS) return cached.names;
+      const names: string[] = [];
+      for (let page = 1; page <= LABEL_PAGES_MAX; page++) {
+        const res = await call("labels read", `${base}/labels?per_page=${LABEL_PAGE}&page=${page}`, { method: "GET" });
+        const data = (await res.json().catch(() => [])) as Array<{ name?: unknown }>;
+        const batch = Array.isArray(data) ? data : [];
+        names.push(...batch.flatMap((l) => (typeof l.name === "string" ? [l.name] : [])));
+        if (batch.length < LABEL_PAGE) break;
+        if (page === LABEL_PAGES_MAX) {
+          // A label past the cap reads as missing, and an update naming it is
+          // refused — said here so the refusal has a cause in the logs.
+          console.warn(`[github] ${repo} has more than ${LABEL_PAGE * LABEL_PAGES_MAX} labels; read the first ${names.length}`);
+        }
+      }
+      labelCache.set(repo, { at: Date.now(), names });
+      return names;
+    },
+    async comment(issue, body) {
+      const res = await call("comment", `${issueUrl(issue)}/comments`, { method: "POST", body: { body } });
+      const data = (await res.json().catch(() => ({}))) as { html_url?: unknown };
+      return { url: typeof data.html_url === "string" && data.html_url ? data.html_url : `https://github.com/${repo}/issues/${issue}` };
+    },
+    async setState(issue, state, reason) {
+      await call("state change", issueUrl(issue), { method: "PATCH", body: { state, state_reason: reason } });
+    },
+    async addLabels(issue, labels) {
+      await call("labels add", `${issueUrl(issue)}/labels`, { method: "POST", body: { labels: [...labels] } });
+    },
+    async removeLabel(issue, label) {
+      await call("label remove", `${issueUrl(issue)}/labels/${encodeURIComponent(label)}`, { method: "DELETE" });
+    },
+  };
 }
 
 /** An open issue a search found — enough to name it and link it. */

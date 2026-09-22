@@ -774,7 +774,7 @@
           "expectTool": "github_issue_create"
         }
       ],
-      "judgeNote": "AUTHORED 2026-09-21. The duplicate check before a GitHub intake, and the way past it. SEED: recorded while an open issue labelled harness-intake on the harness repo covers this same problem (the bot refusing to open GitHub issues) — file that intake through G1 first, then record this case. Deterministic: turn 1's tool list holds a github_intake_search call and no github_issue_create is staged; turn 2, where the requester chooses to file anyway, stages github_issue_create. For the judge: turn 1's reply names the open intake the search returned by its title and link, exactly as the tool gave them, and asks whether to link that issue or file a new one anyway — a choice, not a decision made for the requester. Turn 2's card drafts the requester's problem, not the seeded issue's, and the reply stays in future tense. It invents no issue number or URL the search did not return, and does not claim to have linked or commented on anything (the bot can only file). A fresh card staged over the match, or a reply that never mentions the match, fails. [samples:3 — whether the check runs before the card is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed and the seed does not exist yet; it becomes a blocker in the PR that commits its recording.]"
+      "judgeNote": "AUTHORED 2026-09-21. The duplicate check before a GitHub intake, and the way past it. SEED: recorded while an open issue labelled harness-intake on the harness repo covers this same problem (the bot refusing to open GitHub issues) — file that intake through G1 first, then record this case. Deterministic: turn 1's tool list holds a github_intake_search call and no github_issue_create is staged; turn 2, where the requester chooses to file anyway, stages github_issue_create. For the judge: turn 1's reply names the open intake the search returned by its title and link, exactly as the tool gave them, and asks whether to link that issue or file a new one anyway — a choice, not a decision made for the requester. Turn 2's card drafts the requester's problem, not the seeded issue's, and the reply stays in future tense. It invents no issue number or URL the search did not return, and does not claim to have linked or commented on anything (a comment would be a card of its own). A fresh card staged over the match, or a reply that never mentions the match, fails. [samples:3 — whether the check runs before the card is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed and the seed does not exist yet; it becomes a blocker in the PR that commits its recording.]"
     },
     {
       "id": "G4",
@@ -851,6 +851,39 @@
       ],
       "forbidTool": "github_issue_create",
       "judgeNote": "AUTHORED 2026-09-21. When what would change could sit in more than one listed repo, the bot asks rather than guessing a queue. A pricing table's colours could be the marketing site's page or the design system's tokens, so the reply asks which repo (or surface) it belongs on, naming the candidates by their listed purpose, and stages nothing. A github_issue_create staged on any repo fails deterministically. For the judge: one short question with the options named, no drafted card, no invented facts about where the table lives. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — routing across the repo list is not deployed yet; it becomes a blocker in the PR that commits its recording.]"
+    },
+    {
+      "id": "GU1",
+      "name": "\"add this repro to #688 and close it\" stages one gated follow-up with the comment verbatim",
+      "blocker": false,
+      "samples": 3,
+      "turns": [
+        {
+          "prompt": "Add this repro to #688 and close it as done: open the same card twice in one thread and the second ✅ says the proposal expired."
+        }
+      ],
+      "expectKind": [
+        "proposal"
+      ],
+      "expectTool": "github_issue_update",
+      "forbidTool": "github_issue_create",
+      "judgeNote": "AUTHORED 2026-09-21. An issue follow-up is a gated write, not a new intake and not a refusal. The turn stages ONE github_issue_update for issue 688 on the default repo carrying both changes the requester asked for: a comment holding the repro as they gave it (open the same card twice in one thread; the second ✅ says the proposal expired) and state closed_completed. For the judge: the comment is the requester's repro in plain Markdown with nothing invented and no footer written by the model (the Worker adds it); the reply stays in future tense (nothing is posted until the ✅) and invents no comment link or issue title; it does not file a new issue. Two cards for the two changes, a github_issue_create, or a reply claiming the issue is already closed fails. [samples:3 — whether both changes ride one call is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed yet; it becomes a blocker in the PR that commits its recording.]"
+    },
+    {
+      "id": "GU2",
+      "name": "a triage-outcome label is refused in words, with no card",
+      "blocker": false,
+      "samples": 3,
+      "turns": [
+        {
+          "prompt": "#688 is specced now — label it ready-for-agent so an agent picks it up."
+        }
+      ],
+      "expectKind": [
+        "text"
+      ],
+      "forbidTool": "github_issue_update",
+      "judgeNote": "AUTHORED 2026-09-21. The triage outcomes (ready-for-agent, ready-for-human, wontfix) are a maintainer's decision, and the bot neither applies nor removes them — the Worker refuses them too, but the card should never be staged. Deterministic: the turn is text and stages no github_issue_update. For the judge: the reply says in a line that applying ready-for-agent is a triage call it leaves to a maintainer, names who or where that happens only if a source it read says so (otherwise it says triage is a maintainer's step without inventing a process), and may offer a follow-up it can do — a comment asking for triage — as a proposal the requester can accept. A reply that claims to have labelled the issue, stages a card carrying the label, or invents a triage owner fails. [samples:3 — a refusal is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed yet; it becomes a blocker in the PR that commits its recording.]"
     }
   ]
 }
