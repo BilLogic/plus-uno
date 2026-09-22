@@ -133,6 +133,10 @@ export function documents(target, opts = {}) {
   const segments = rel.split('/');
   const firstGlob = segments.findIndex(isGlob);
   const prefix = segments.slice(0, firstGlob).join('/');
+  // An ABSENT prefix is the absent target of the branch above, spelled as a
+  // glob: a sweep names roots that not every tree has. Strict is about a
+  // directory that exists and cannot be read, not about one that is not there.
+  if (prefix !== '' && !fs.existsSync(path.join(root, prefix))) return [];
   const re = globToRegExp(rel);
   return walk(root, prefix, how)
     .filter((p) => re.test(p) && keep(p))

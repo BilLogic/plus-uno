@@ -247,7 +247,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-pointers.mjs',
     guards:
-      "the pointer sweep over the always-loaded router (AGENTS.md): every backticked repo path resolves, every `path § Heading` names a heading that exists, and every § Progressive loading trigger leads with the word that carries its branch rather than filler. A pointer that does not resolve, or buries its trigger, is a document the agent will not reach — the same rot as a stale schema name in prose (#409), one layer up. Conditional pointers (\"when `path` exists\") and bare shape names (`SKILL.md`) are skipped by rule, and the rules are mutation-tested in check-pointers.test.mjs (#420).",
+      "the pointer sweep over the always-loaded router (AGENTS.md) and the agent files it routes into (agents/**/*.md): every backticked repo path resolves, every `path § Heading` names a heading that exists, and every § Progressive loading trigger leads with the word that carries its branch rather than filler. A pointer that does not resolve, or buries its trigger, is a document the agent will not reach — the same rot as a stale schema name in prose (#409), one layer up. Conditional pointers (\"when `path` exists\") and bare shape names (`SKILL.md`) are skipped by rule; the corpus walk skips an installed dependency and the GENERATED harness bundle, whose pointers are the swept sources' own. The rules are mutation-tested in check-pointers.test.mjs (#420, #725).",
   },
   {
     name: 'check:glossary',

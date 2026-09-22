@@ -20,8 +20,9 @@
  *      The trigger cell of every § Progressive loading row must lead with a
  *      word that carries the branch.
  *
- * SUBJECTS are the always-loaded router(s); the sweep is by structure, not by a
- * list of pointers, so a pointer added tomorrow is swept tomorrow.
+ * SUBJECTS are the always-loaded router and the agent files it routes into;
+ * the sweep is by structure, not by a list of pointers, so a pointer added
+ * tomorrow is swept tomorrow and an agent file added tomorrow is swept too.
  *
  * Run: npm run check:pointers
  */
@@ -29,6 +30,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { documents } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -37,20 +39,63 @@ export const REPO_ROOT = path.resolve(here, '..');
 export const REMEDY =
   '  -> a pointer that does not resolve, or buries its trigger, is a document the agent will not reach.';
 
-/** The always-loaded routers. */
-export const SUBJECTS = ['AGENTS.md'];
+/**
+ * The always-loaded router, and the agent files that answer to it.
+ *
+ * A subject is a path or a glob, and the glob is walked by the corpus rather
+ * than by a reader of this file's own: that is what keeps an installed
+ * dependency out of the sweep, since `IGNORED_DIRS` already holds
+ * `node_modules` and a private walk would have had to be told again.
+ */
+export const SUBJECTS = ['AGENTS.md', 'agents/**/*.md'];
+
+/**
+ * `agents/uno-bot/harness-bundle.md` is GENERATED from the swept sources. Its
+ * pointers are theirs, checked at their own paths, and resolving them from the
+ * bundle only invents misses — the same exclusion, for the same reason, that
+ * `scripts/check-doc-links.mjs` makes for its pointer passes.
+ */
+const GENERATED = [/^agents\/uno-bot\/harness-bundle\.md$/];
+
+/** The files a subject list names: a literal path, or a glob the corpus walks. */
+export function subjectFiles(root = REPO_ROOT, subjects = SUBJECTS) {
+  const seen = new Set();
+  for (const subject of subjects) {
+    for (const rel of documents(subject, { root, ext: ['.md'], strict: true })) {
+      if (!GENERATED.some((pattern) => pattern.test(rel))) seen.add(rel);
+    }
+  }
+  return [...seen].sort();
+}
 
 /** Words that carry no branch. A pointer that opens with one has buried its trigger. */
 export const FILLER = new Set(['a', 'an', 'the', 'any', 'when', 'if', 'need', 'needs', 'you', 'to', 'for', 'please', 'also', 'some']);
 
-/** `path.ext` inside backticks, optionally followed by ` § Heading`. */
-const POINTER = /`([A-Za-z0-9_@./-]+\.(?:md|json|mjs|js|ts|yml|yaml|toml|sh))`(?:\s*§\s*([^`|\n(—–:;]+))?/g;
+/**
+ * `path.ext` inside backticks, optionally followed by ` § Heading`.
+ *
+ * The heading runs to the first character that belongs to the SENTENCE rather
+ * than to the section: a bracket either side of it, a dash or an arrow handing
+ * over to the instruction, a colon or a semicolon. A pointer written inside a
+ * parenthetical — "(the values: `CONTEXT.md` § Two vocabularies)" — ends at the
+ * bracket that closes it, which the opening bracket's absence used not to say.
+ */
+const POINTER = /`([A-Za-z0-9_@./-]+\.(?:md|json|mjs|js|ts|yml|yaml|toml|sh))`(?:\s*§\s*([^`|\n()—–→:;]+))?/g;
 
-/** A section name ends where the sentence resumes. */
+/**
+ * A section name ends where the sentence resumes: at a connective word, or at
+ * the punctuation that belongs to the sentence rather than to the heading.
+ *
+ * `, . ;` is the same set `scripts/check-doc-links.mjs` strips off a backticked
+ * path before resolving it — one convention for where a pointer ends, not two.
+ * Cutting at a comma costs nothing when the heading really carries one: the
+ * match is a prefix match, so `§ Two sources` still reaches "Two sources, one
+ * time axis (ADR-021)".
+ */
 function sectionName(raw) {
   if (!raw) return null;
-  const cut = raw.search(/\s(is|are|has|have|says|for|and|or|then|which|that)\s|\s[-,.]|$/);
-  return raw.slice(0, cut === -1 ? undefined : cut).replace(/[.,]$/, '').trim() || null;
+  const cut = raw.search(/\s(is|are|has|have|says|for|and|or|then|which|that)\s|\s[-,.]|[,.;](?=\s)|$/);
+  return raw.slice(0, cut === -1 ? undefined : cut).trim().replace(/[,.;]+$/, '') || null;
 }
 
 /** A pointer names a PLACE in this repo: its first path segment is a real top-level entry.
@@ -109,7 +154,7 @@ export function sweep(root = REPO_ROOT, subjects = SUBJECTS) {
   const failures = [];
   let pointers = 0;
   let triggers = 0;
-  for (const rel of subjects) {
+  for (const rel of subjectFiles(root, subjects)) {
     const text = readFileSync(path.join(root, rel), 'utf8');
     for (const p of pointersIn(text, root)) {
       pointers += 1;

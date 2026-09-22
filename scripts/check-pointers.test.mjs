@@ -47,6 +47,81 @@ test('a section pointer to a renamed heading fails', () => {
   } finally { r.done(); }
 });
 
+// ── Where a pointer ends ──────────────────────────────────────────────────
+// The heading runs until the sentence resumes. Each shape below is one the
+// harness actually writes, and each was read past before #725.
+
+test('a pointer inside a parenthetical ends at the closing paren', () => {
+  const r = repo('The values: (see `docs/t.md` § Two vocabularies). **Only** live rows count.', {
+    'docs/t.md': '# T\n\n## Two vocabularies\n',
+  });
+  try { assert.deepEqual(sweep(r.root).failures, []); } finally { r.done(); }
+});
+
+test('an aside after the heading is not part of it', () => {
+  const r = repo('See `docs/foo.md` § Some Heading (with an aside).', {
+    'docs/foo.md': '# F\n\n## Some Heading\n',
+  });
+  try { assert.deepEqual(sweep(r.root).failures, []); } finally { r.done(); }
+});
+
+test('a pointer ends at the sentence that follows it', () => {
+  const r = repo('The probe in `docs/t.md` § Streamed text. Then the next sentence.', {
+    'docs/t.md': '# T\n\n## Streamed text\n',
+  });
+  try { assert.deepEqual(sweep(r.root).failures, []); } finally { r.done(); }
+});
+
+test('a pointer ends where an arrow hands over to the instruction', () => {
+  const r = repo('Past the rule in `docs/t.md` § Writing style → 3-bullet summary first.', {
+    'docs/t.md': '# T\n\n## Writing style\n',
+  });
+  try { assert.deepEqual(sweep(r.root).failures, []); } finally { r.done(); }
+});
+
+test('a clause that resumes after a comma is not part of the heading', () => {
+  const r = repo('Hygiene in `docs/t.md` § Agent duties in the workspace, integrity elsewhere.', {
+    'docs/t.md': '# T\n\n## Agent duties in the workspace\n',
+  });
+  try { assert.deepEqual(sweep(r.root).failures, []); } finally { r.done(); }
+});
+
+test('a heading that really does carry a comma still resolves', () => {
+  const r = repo('Routing table: `docs/t.md` § Two sources, one time axis (ADR-021).', {
+    'docs/t.md': '# T\n\n## Two sources, one time axis\n',
+  });
+  try { assert.deepEqual(sweep(r.root).failures, []); } finally { r.done(); }
+});
+
+// ── What the sweep reads ──────────────────────────────────────────────────
+
+test('a dangling § citation in an agent file fails', () => {
+  const r = repo('# Router', {
+    'agents/reviewers/auditor.md': 'Load `docs/t.md` § Imports.',
+    'docs/t.md': '# T\n\n## Exports\n',
+  });
+  try {
+    const { failures } = sweep(r.root);
+    assert.equal(failures.length, 1);
+    assert.match(failures[0], /^agents\/reviewers\/auditor\.md: /);
+    assert.match(failures[0], /§ Imports/);
+  } finally { r.done(); }
+});
+
+test('an installed dependency is not an agent file', () => {
+  const r = repo('# Router', {
+    'agents/uno-bot/node_modules/ws/README.md': 'See `docs/gone.md` for more.',
+  });
+  try { assert.deepEqual(sweep(r.root).failures, []); } finally { r.done(); }
+});
+
+test('the generated harness bundle is not swept', () => {
+  const r = repo('# Router', {
+    'agents/uno-bot/harness-bundle.md': 'See `docs/gone.md` for more.',
+  });
+  try { assert.deepEqual(sweep(r.root).failures, []); } finally { r.done(); }
+});
+
 test('a bare filename names a shape, not a place, and is skipped', () => {
   const r = repo('A skill loads its own `SKILL.md` and `references/method.md`.', { 'docs/x.md': '' });
   try { assert.deepEqual(pointersIn('`SKILL.md` and `references/method.md`', r.root), []); } finally { r.done(); }
