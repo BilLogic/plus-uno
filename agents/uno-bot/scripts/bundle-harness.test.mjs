@@ -25,11 +25,12 @@ const checkout = path.resolve(here, "../../..");
 // failure by editing a file and running the bundler over the tree — and they
 // used to edit this repo's own files and put them back. `node --test` runs the
 // other script test files beside this one, in other processes, and several read
-// the same files: `wrangler.toml` is rewritten here, and read at import by
-// `repo-list-config.test.mjs`. `writeFileSync` truncates before it writes, so a
+// the same files: `wrangler.toml` was rewritten here, and `repo-list-config.test.mjs`
+// used to read it at import. `writeFileSync` truncates before it writes, so a
 // reader landing in that window got an empty or half-written file — a toml with
-// no `GITHUB_REPO` — and failed a test that had nothing to do with the edit. The
-// copy holds exactly what the bundler reads, and the bundler script itself, so
+// no `GITHUB_REPO` — and failed a test that had nothing to do with the edit.
+// That is why these tests run on a copy. It holds everything the bundler reads,
+// and the bundler script itself, so
 // the copied script finds the copied tree as its repo root and a test's edit is
 // visible to nothing outside this file.
 const COPIED = [
