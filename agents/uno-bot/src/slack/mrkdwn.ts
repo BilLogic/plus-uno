@@ -19,6 +19,162 @@
 // touch. Fenced code blocks are protected so JSON proposal cards / code are
 // never mangled.
 
+/**
+ * Words that must reach a reader exactly as written, where even VALID markup
+ * would be wrong — above all a title inside a `<url|label>`, where a `>` ends
+ * the link. Slack decodes the three entities for display.
+ *
+ * Everything posted as text also passes `sanitizeSlackMarkup`, which leaves
+ * these entities alone, so the two never double-escape.
+ */
+export function escapeSlackText(text: string): string {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/**
+ * Keep the `<…>` markup Slack can parse, and entity-escape every other `<`,
+ * `>` and bare `&`.
+ *
+ * Slack treats `&`, `<` and `>` in message text as control characters
+ * (docs.slack.dev, "Formatting message text" § Escaping text), and markup it
+ * cannot parse does not degrade — it blanks the WHOLE text. Reproduced live
+ * 2026-09-22: a relayed DM whose body quoted `<@U...>` and `<@teammate>` in a
+ * code fence posted with empty text, attribution line and all, while the same
+ * relay without those tokens posted in full. The 2026-09-21 GitHub failure
+ * note that went out blank carried the same two tokens.
+ *
+ * Runs over the whole text, fences included: a code block is no shelter, the
+ * repro's tokens were inside one. Idempotent: `&amp;`, `&lt;` and `&gt;` are
+ * already entities and pass unchanged.
+ */
+export function sanitizeSlackMarkup(text: string): string {
+  return text.replace(
+    /(?<=^|\n)>+|<([^<>\n]*)>|[<>]|&/g,
+    (match, inner: string | undefined, offset: number) => {
+      // A `>` run opening a line is mrkdwn's quote marker (`>` or `>>>`).
+      if (match[0] === ">" && (offset === 0 || text[offset - 1] === "\n")) return match;
+      if (inner !== undefined) {
+        const safe = validMarkup(inner);
+        return safe === null ? escapeBare(match) : `<${safe}>`;
+      }
+      if (match === "&") return ENTITY.test(text.slice(offset)) ? "&" : "&amp;";
+      return match === "<" ? "&lt;" : "&gt;";
+    },
+  );
+}
+
+/**
+ * The same pass over Block Kit: every `mrkdwn` text object, at any depth.
+ *
+ * Blocks are what a reader sees whenever a message has them — an answer's
+ * sections, a proposal card — so a pass over `text` alone would guard the
+ * notification copy and leave the message itself exposed. `plain_text` objects
+ * are left alone: Slack parses no markup there. Returns a copy.
+ */
+export function sanitizeSlackBlocks<T>(blocks: T): T {
+  const walk = (node: unknown): unknown => {
+    if (Array.isArray(node)) return node.map(walk);
+    if (!node || typeof node !== "object") return node;
+    const out: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(node)) out[key] = walk(value);
+    if (out.type === "mrkdwn" && typeof out.text === "string") out.text = sanitizeSlackMarkup(out.text);
+    return out;
+  };
+  return walk(blocks) as T;
+}
+
+/**
+ * Where a stream's markup pass stands between two appends: the tail it has not
+ * sent yet, and whether the text sent so far ends a line.
+ */
+export interface StreamMarkupState {
+  /** Raw text held back because the next chunk could still change its reading. */
+  held: string;
+  /** True when the text sent so far is empty or ends with a newline. */
+  lineStart: boolean;
+}
+
+export const STREAM_MARKUP_START: StreamMarkupState = { held: "", lineStart: true };
+
+/**
+ * `sanitizeSlackMarkup` for a streamed message, one append at a time.
+ *
+ * A stream arrives in pieces, and markup does not respect the cut: `<@team`
+ * in one append and `mate>` in the next are one token, and passing each
+ * piece on its own would escape a valid `<@U…>` split the same way. So the
+ * tail that the next piece could still complete is held back — an unclosed
+ * `<…` on the last line, a partial entity (`&`, `&am`, `&lt`), a `>` run
+ * opening the last line — and goes out with the next piece, or escaped on
+ * `final`, which the stream's close passes.
+ *
+ * The pieces this returns, joined, equal `sanitizeSlackMarkup` of the joined
+ * input, wherever the cuts fall.
+ */
+export function sanitizeStreamChunk(
+  state: StreamMarkupState,
+  chunk: string,
+  final = false,
+): { text: string; state: StreamMarkupState } {
+  const input = state.held + chunk;
+  const cut = final ? input.length : holdFrom(input);
+  const emit = input.slice(0, cut);
+  // `sanitizeSlackMarkup` reads a `>` at offset 0 as a quote marker. A lead
+  // character tells it whether this piece really starts a line: a newline if
+  // it does, a letter if it continues one. Neither is touched by the pass.
+  const text = sanitizeSlackMarkup((state.lineStart ? "\n" : "x") + emit).slice(1);
+  return {
+    text,
+    state: { held: input.slice(cut), lineStart: emit ? emit.endsWith("\n") : state.lineStart },
+  };
+}
+
+/** Where the tail the next piece could still complete begins. */
+function holdFrom(input: string): number {
+  const lt = input.lastIndexOf("<");
+  if (lt >= 0 && !/[>\n]/.test(input.slice(lt))) return lt;
+  const amp = input.match(/&(?:a|am|amp|l|lt|g|gt)?$/);
+  if (amp) return input.length - amp[0].length;
+  const quote = input.match(/(?:^|\n)(>+)$/);
+  if (quote) return input.length - quote[1]!.length;
+  return input.length;
+}
+
+/**
+ * A Slack user id: `U…` or `W…` and at least six more capitals and digits. The
+ * one pattern for "is this a person Slack can mention" — `<@U...>` and
+ * `<@teammate>` are exactly the tokens that blanked a message.
+ */
+export const SLACK_USER_ID = /^[UW][A-Z0-9]{6,}$/;
+
+/** The only entities Slack decodes — and so the only ones a pass may keep. */
+const ENTITY = /^&(?:amp|lt|gt);/;
+
+/** `<`, `>` and bare `&` as entities, leaving existing entities alone. */
+function escapeBare(text: string): string {
+  return text
+    .replace(/&(?!(?:amp|lt|gt);)/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+/** The inside of a `<…>` Slack can parse, with its label made safe — or null. */
+function validMarkup(inner: string): string | null {
+  const bar = inner.indexOf("|");
+  const target = bar < 0 ? inner : inner.slice(0, bar);
+  const label = bar < 0 ? null : inner.slice(bar + 1);
+  const ok =
+    (target.startsWith("@") && SLACK_USER_ID.test(target.slice(1))) ||
+    // Channels, private channels and DMs: the Worker links `<#D…>` itself.
+    /^#[CGD][A-Z0-9]+$/.test(target) ||
+    /^!(?:here|channel|everyone)$/.test(target) ||
+    /^!subteam\^[A-Z0-9]+$/.test(target) ||
+    /^!date\^\d+\^[^\s|]+(?:\^\S+)?$/.test(target) ||
+    /^https?:\/\/[^\s|]+$/.test(target) ||
+    /^mailto:[^\s|@]+@[^\s|]+$/.test(target);
+  if (!ok) return null;
+  return label === null ? target : `${target}|${escapeBare(label)}`;
+}
+
 /** Split on ```fenced``` blocks; transform only the non-fenced segments. */
 export function toSlackMrkdwn(input: string): string {
   if (!input) return input;

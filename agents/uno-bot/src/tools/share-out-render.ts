@@ -19,6 +19,8 @@
 // not decoration, so the tool grew to carry it rather than the doc shrinking to
 // match an under-built tool.
 
+import { SLACK_USER_ID } from "../slack/mrkdwn";
+
 /** At most this many feedback questions. The cap IS the convention — an
  *  open-ended list is the "thoughts?" the ritual exists to prevent. */
 export const MAX_FEEDBACK_QUESTIONS = 3;
@@ -40,7 +42,7 @@ export interface ShareoutFields {
 /** A Slack user id ("U…"/"W…") gets @-mentioned; anything else is shown as-is. */
 export function renderReviewer(r: string): string {
   const t = r.trim();
-  return /^[UW][A-Z0-9]{6,}$/.test(t) ? `<@${t}>` : t;
+  return SLACK_USER_ID.test(t) ? `<@${t}>` : t;
 }
 
 /**

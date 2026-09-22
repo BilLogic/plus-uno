@@ -10,6 +10,14 @@ import type { ThreadState as ThreadStateDurableObject } from "./thread-state";
 export interface SlackContext {
   channel: string;
   threadTs: string;
+  /** A REAL message ts to reply under in the requesting conversation, when the
+   *  caller knows one — the Gate's reply target. `threadTs` is the conversation
+   *  key, which in a threadless DM is not a ts Slack accepts. */
+  replyTs?: string;
+  /** This operation is one of several approved together. The Gate posts ONE
+   *  summary for the batch, naming each operation's result, so a tool that
+   *  would confirm itself in the thread leaves that to the summary. */
+  batched?: boolean;
   userMsgTs: string;
   requestedBy?: string;
   /** Slack's per-event action token, forwarded from the triggering message.
@@ -32,6 +40,9 @@ export interface Env {
   SLACK_BOT_TOKEN: string;
   GITHUB_TOKEN: string;
   GITHUB_REPO: string;
+  /** The repos the GitHub tools may reach, as a JSON array — parsed by
+   *  `integrations/repo-list.mjs`. Unset → `GITHUB_REPO` alone. */
+  GITHUB_REPOS?: string;
   FIGMA_ACCESS_TOKEN: string;
   // Figma library poll (figma-poll.ts, cron-fired). Both optional — unset →
   // the poll logs a skip and does nothing. FIGMA_FILE_KEY is the DS file
@@ -147,6 +158,11 @@ export interface Env {
    *  bubble for the whole run — tried and reverted), so if Slack renders the
    *  cards differently than expected the artifact is on every turn. */
   SLACK_STREAM_PLAN?: string;
+  /** The markup probe's pass, recorded by whoever ran it: `pass:YYYY-MM-DD`
+   *  and an optional note. Either streaming flag stays off without one —
+   *  `streamFlagOn` in slack/slack-delivery.ts, the probe in
+   *  docs/connectors/slack.md. */
+  SLACK_STREAM_MARKUP_PROBE?: string;
   /** "on" swaps the hand-rolled 👍/👎 `actions` row for Slack's native
    *  `context_actions` block (`feedback_buttons` + an `icon_button` delete).
    *  Off by default only because an invalid block degrades SILENTLY here —

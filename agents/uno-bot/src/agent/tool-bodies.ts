@@ -27,6 +27,7 @@ import { executeRoadmapQuery } from "../tools/roadmap-query";
 import { executeBlueprintSearch } from "../tools/blueprint-search";
 import { executeReadSource } from "../tools/read-source";
 import { executeGithubRead } from "../tools/github-read";
+import { executeGithubIntakeSearch } from "../tools/github-intake-search";
 import { executeSlackThreadRead } from "../tools/slack-thread-read";
 import { executeSlackSearch } from "../tools/slack-search";
 import { executeSlackUserProfile, executeSlackChannelMembers } from "../tools/slack-people";
@@ -39,6 +40,10 @@ import { executeNotionUpdate } from "../tools/notion-update";
 import { executeNotionArchive } from "../tools/notion-archive";
 import { executeSendEmail } from "../tools/send-email";
 import { executeShareForFeedback } from "../tools/share-for-feedback";
+import { executeRelayDm, relayMemoryFor, relaySlackFor } from "../tools/relay-dm";
+import { executeGithubIssueCreate } from "../tools/github-issue";
+import { executeGithubIssueUpdate } from "../tools/github-issue-update";
+import { executeGithubWorkflowRun } from "../tools/github-workflow";
 import type { ToolName } from "./tool-table";
 
 /**
@@ -61,6 +66,7 @@ export const TOOL_BODIES: Record<ToolName, ToolBody> = {
   source_read: (env, input, slack) => executeReadSource(env, input, slack),
   search_blueprint: (env, input) => executeBlueprintSearch(env, input),
   github_read: (env, input) => executeGithubRead(env, input),
+  github_intake_search: (env, input) => executeGithubIntakeSearch(env, input),
   slack_user_profile: (env, input) => executeSlackUserProfile(env, input),
   slack_channel_members: (env, input) => executeSlackChannelMembers(env, input),
   slack_thread_read: (env, input) => executeSlackThreadRead(env, input),
@@ -74,6 +80,10 @@ export const TOOL_BODIES: Record<ToolName, ToolBody> = {
   prototype_scaffold: (env, input, slack) => executeImplementDesign(env, input, slack),
   shareout_post: (env, input, slack) => executeShareForFeedback(env, input, slack),
   email_send: (env, input, slack) => executeSendEmail(env, input, slack),
+  dm_relay: (env, input, slack) => executeRelayDm({ slack: relaySlackFor(env), memory: relayMemoryFor(env) }, input, slack),
+  github_issue_create: (env, input, slack) => executeGithubIssueCreate(env, input, slack),
+  github_issue_update: (env, input, slack) => executeGithubIssueUpdate(env, input, slack),
+  github_workflow_run: (env, input, slack) => executeGithubWorkflowRun(env, input, slack),
   // `control`, and so the one row whose body is never reached: the loop
   // intercepts `proposal_resolve` and validates it against the standing card
   // before any dispatch. The row still carries a body because the pairing is

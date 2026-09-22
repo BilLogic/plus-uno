@@ -83,28 +83,36 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 | Path | What is sent | Converted by |
 |---|---|---|
-| Streamed reply (every ordinary answer) | `markdown_text` — your Markdown, untouched | nothing |
+| Streamed reply (when streaming is on) | `markdown_text` — your Markdown, with only the markup pass below | `sanitizeStreamChunk` in `appendStream` / `stopStream` |
 | Blocks fallback (stream failed) | `section` blocks, which are mrkdwn-only | `toSlackMrkdwn` in `textSections` |
 | `chat.postMessage` `text` | mrkdwn | `toSlackMrkdwn` in `postMessage` |
 | Proposal card | mrkdwn sections + ✅/⛔ buttons | `toSlackMrkdwn` via `textSections` |
 
 Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading` → `*Heading*`, `[label](url)` → `<url|label>`, tables → `•` lines, and strips the fence language tag (mrkdwn code blocks take no info string).
 
-**Don't hand-escape `&` `<` `>`.** Nothing escapes them and nothing should: on the Markdown path an `&amp;` would render as literal `&amp;`. Raw angle brackets in prose are fine. The one case to watch is text that *looks* like a Slack token — `<@`, `<#`, `<http` — which Slack will try to resolve; put that in backticks.
+**Don't hand-escape `&` `<` `>` in prose.** Posted `text` and every mrkdwn block pass `sanitizeSlackMarkup`: valid markup (a real `<@U…>`, `<#C…>`, `<!here>`, `<https://…|label>`) stays, every other `<` `>` and bare `&` is escaped, since markup Slack can't parse blanks the message (live 2026-09-22). Worker code escapes a title inside a link label (`escapeSlackText`).
+
+#### Streamed text
+
+**The stream takes the same rule**, across append boundaries: `<@team` ending one append and `mate>` starting the next are one token, so an unclosed `<…` is held until the next append or the close (`sanitizeStreamChunk`). Slack documents `markdown_text` only as "message text formatted in markdown", not whether it parses or blanks on `<…>`; until seen, the proven rule stands.
+
+**Streaming stays off until a live probe passes.** Either flag is refused unless `SLACK_STREAM_MARKUP_PROBE` records `pass:YYYY-MM-DD`: stream a body with a bare `<@teammate>` and one in a code fence to a test DM, raw, via `/debug/slack-stream?…&text=`, and check it isn't blank. Note too whether the fence shows `&lt;` and whether a real `<@U…>` pings.
 
 Block Kit **is** wired (`delivery.ts` posts `section` blocks with a `text` fallback; proposal cards carry buttons via `interactive.ts`) — the claim that it wasn't stood in this file until 2026-08-22. `reply_broadcast` exists on `PostMessageInput` but is used only by a test route.
 
 ### The same Markdown goes everywhere else too
 
-One dialect, three destinations — you write Markdown, the Worker renders it per surface:
+One dialect, four destinations — you write Markdown, the Worker renders it per surface:
 
 | Destination | Renderer | Notes |
 |---|---|---|
 | Slack | `slack/mrkdwn.ts` (mrkdwn paths only) | this file — tables render |
 | Notion (`notion_create`, `notion_update`) | `integrations/notion-blocks.ts` | real blocks, annotations **and real tables** — `notion.md` § Writing a body |
 | Email (`email_send`) | `integrations/email-render.ts` | plain text **and** HTML; tables flatten to bullets |
+| GitHub issue body (`github_issue_create`) | none — sent as written, plus a footer from `tools/github-issue-render.ts` | GitHub renders Markdown natively, tables included; the repo may be public |
+| GitHub issue comment (`github_issue_update`) | none — sent as written, plus the same footer | as above |
 
-**Tables are the one construct that differs by destination, and all three handle it well.** Slack renders a real table; Notion gets a real `table` block; email flattens to one labelled bullet per row (`Column: value · Column: value`) because HTML mail tables break across clients. Write the table whenever the content is a grid — nothing is lost anywhere.
+**Tables are the one construct that differs by destination, and every one handles it well.** Slack renders a real table; Notion gets a real `table` block; email flattens to one labelled bullet per row (`Column: value · Column: value`) because HTML mail tables break across clients; GitHub renders the table as written. Write the table whenever the content is a grid — nothing is lost anywhere.
 
 ### What Slack's Markdown parser actually does — measured, not assumed
 

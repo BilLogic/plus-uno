@@ -1,7 +1,7 @@
 import type { Env } from "../types";
 import { charge } from "../net";
 import { looksLikeCorrection } from "../agent/run-agent";
-import type { HistoryTurn, PendingProposal } from "../thread-state/index";
+import { DM_CONVERSATION, type HistoryTurn, type PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { conversationsReplies, getBotIdentity, postMessage } from "./api";
 import { buildFailureMessage } from "./failure-message";
@@ -32,7 +32,8 @@ import {
 import { postVisibleFailure, isCapacityError } from "./delivery";
 import { postingDeps } from "./slack-delivery";
 import { runSlackTurn } from "./turn-adapter";
-import { turnSurfaceOf } from "../turn/request";
+import { stripBotMentions } from "./mention";
+import { cardThreadOf, turnSurfaceOf } from "../turn/request";
 
 // Re-exported for index.ts (SlackEnvelope) + agent-runner.ts (RunnerJobPayload)
 // and any other importer that still reaches for the Slack wire types here.
@@ -259,8 +260,8 @@ function replyThreadTs(e: ThreadedEvent): string | undefined {
 }
 
 // Constant, not the message ts: every unthreaded message in a DM has to resolve
-// to the SAME conversation, or each line would start with an empty history.
-const DM_CONVERSATION = "dm";
+// to the SAME conversation, or each line would start with an empty history —
+// `DM_CONVERSATION`, stated once in the thread store.
 
 function conversationTs(e: ThreadedEvent): string {
   return isDm(e.channel) ? (e.thread_ts ?? DM_CONVERSATION) : (e.thread_ts ?? e.ts);
@@ -412,10 +413,10 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   const userId = event.user!;
   const threadTs = replyThreadTs(event);
   // History and the runner's ordering key on the CONVERSATION, which in a DM is
-  // the whole channel — threadTs above may be undefined there and is only a
-  // post target.
+  // the whole channel — threadTs above is the post target, and the key the
+  // pending card is held on.
   const convTs = conversationTs(event);
-  const text = stripBotMentions(event.text!);
+  const text = stripBotMentions(event.text!, (await getBotIdentity(env))?.userId);
 
   // Where the person's turn is running, so the Home-tab Stop button can find
   // it. Fire-and-forget: this is a convenience control and must never sit in
@@ -445,7 +446,12 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   try {
     [history, pending, prd] = await Promise.all([
       buildThreadHistory(env, channel, convTs, event.thread_ts, event.ts, textReadsAsCorrection),
-      threadStateFor(env).getProposalByThread({ channel, thread: convTs }),
+      // The card, by contrast, is the REPLY THREAD's: in a DM a card staged
+      // under one ask is no business of the next unthreaded ask.
+      threadStateFor(env).getProposalByThread({
+        channel,
+        thread: cardThreadOf({ conversationTs: convTs, ...(threadTs ? { replyTs: threadTs } : {}) }),
+      }),
       isThreadReply
         ? extractPrdFromThreadRoot(env, channel, event.thread_ts!)
         : Promise.resolve(null),
@@ -472,10 +478,6 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
       `tools=[${outcome.telemetry.tools.join(",")}] interim=${outcome.telemetry.interim} ` +
       `wrote=${outcome.wrote.turns.length} compacted=${outcome.wrote.compacted}`,
   );
-}
-
-function stripBotMentions(text: string): string {
-  return text.replace(/<@[A-Z0-9]+>/g, "").trim();
 }
 
 // Build the bot's memory from the ACTUAL Slack thread, so it sees every message
@@ -531,7 +533,7 @@ async function buildThreadHistory(
       for (const m of replies.messages) {
         if (m.ts === currentTs) continue;
         const isBot = m.user === identity.userId || (!!m.bot_id && m.bot_id === identity.botId);
-        const rawContent = stripBotMentions(m.text ?? "").trim();
+        const rawContent = stripBotMentions(m.text ?? "", identity.userId);
         const canvasContent = messageTextWithCanvasAttachments(rawContent, m.files);
         const sharedCanvasIds = canvasIdsSharedBySlackHistoryMessage({
           user: m.user,

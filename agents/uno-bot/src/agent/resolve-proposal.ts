@@ -28,7 +28,7 @@
 
 import type { Env, SlackContext } from "../types";
 import { addReaction, postMessage, postReviewRequest, warrantsReviewRequest } from "../slack/api";
-import { batchOutcomeNote, batchTelemetryLine, runOperations } from "../gate/index";
+import { batchOutcomeNote, batchTelemetryLine, runOperations, settleInto } from "../gate/index";
 import { batchResultMessage } from "../slack/batch-result";
 import type { GateVerdict } from "../gate/index";
 import { proposalOperations } from "../thread-state/index";
@@ -77,49 +77,95 @@ export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<vo
   // failure, with an answer for each. `runOperations` owns that discipline; what
   // this file adds is the only thing it cannot have: `Env`, and the side-effect
   // tool table below.
-  const outcomes = await runOperations(run.operations, (operation) =>
-    executeTool(env, operation.toolName, operation.input, {
-      channel: run.channel,
-      threadTs: run.threadTs,
-      userMsgTs: run.userMsgTs,
-      // Carry the PRD resolved at proposal time — it's not re-extractable here.
-      notionPrdId: run.notionPrdId,
-      notionPrdUrl: run.notionPrdUrl,
+  // Each operation is marked in the execution record Gate opened at the claim
+  // as it comes back, so a run cut off part-way can be told apart from one
+  // that never started — and what finished is never offered back. The mark
+  // also answers whether a later look has already TAKEN this run as cut off;
+  // if so the batch stops there and tells nothing (the fence,
+  // `ThreadState.settleOperation`): the person already has a note and a card
+  // for the rest, and a second account would contradict it.
+  let fenced = false;
+  const outcomes = await runOperations(
+    run.operations,
+    (operation) =>
+      executeTool(env, operation.toolName, operation.input, {
+        channel: run.channel,
+        threadTs: run.threadTs,
+        // The real ts to reply under, and who asked: a relayed DM names the
+        // requester to its recipient and confirms in their thread.
+        // Who ASKED — the requester of record — not whoever pressed ✅: anyone
+        // in the thread may approve, and `email_send`'s allowlist and a relayed
+        // DM's attribution are both about the person the action is for.
+        ...(verdict.post?.replyTs ? { replyTs: verdict.post.replyTs } : {}),
+        requestedBy: run.requesterUserId,
+        // More than one operation → `batchResultMessage` below is the thread's
+        // one account of the outcome.
+        ...(run.operations.length > 1 ? { batched: true } : {}),
+        userMsgTs: run.userMsgTs,
+        // Carry the PRD resolved at proposal time — it's not re-extractable here.
+        notionPrdId: run.notionPrdId,
+        notionPrdUrl: run.notionPrdUrl,
+      }),
+    settleInto(store, pending.proposalTs, () => {
+      fenced = true;
     }),
   );
 
-  // Proposed, approved and executed as three separate numbers: the failure this
-  // ticket exists for is exactly the case where they disagree.
-  console.log(
-    batchTelemetryLine({
-      proposalTs: pending.proposalTs,
-      proposed,
-      approved: run.operations.length,
-      outcomes,
-    }),
-  );
+  // Past the batch every operation has come back, or the fence stopped it, so
+  // whatever happens next the execution record goes. A throw below — the
+  // history write, the result post — is the door's to report
+  // ("resolve-failed"), and a record left standing would add a cut-off note
+  // five minutes later about a run that was not cut off. One note, not two.
+  try {
+    // Proposed, approved and executed as three separate numbers: the failure
+    // this ticket exists for is exactly the case where they disagree.
+    console.log(
+      batchTelemetryLine({
+        proposalTs: pending.proposalTs,
+        proposed,
+        approved: run.operations.length,
+        outcomes,
+      }),
+    );
 
-  // Record the outcome (including any resulting URL) in thread history, so
-  // later turns know what was actually done — e.g. the created PRD's Notion
-  // link, so "delete that PRD" works and the bot never claims it created
-  // nothing when it did. ONE note for the batch, naming every operation.
-  await store.appendHistory(
-    { channel: run.channel, thread: run.threadTs },
-    { role: "assistant", content: batchOutcomeNote(outcomes) },
-  );
+    // Record the outcome (including any resulting URL) in thread history, so
+    // later turns know what was actually done — e.g. the created PRD's Notion
+    // link, so "delete that PRD" works and the bot never claims it created
+    // nothing when it did. ONE note for the batch, naming every operation.
+    // Written when fenced too: it is memory rather than a post, and it is true.
+    await store.appendHistory(
+      { channel: run.channel, thread: run.threadTs },
+      { role: "assistant", content: batchOutcomeNote(outcomes) },
+    );
+    if (fenced) return;
 
-  // Say what ran. A batch's partial result is invisible otherwise: the person
-  // approved four things and the thread would show one tool's reply.
-  const resultMessage = batchResultMessage(outcomes);
-  if (resultMessage) {
-    // Under the verdict's own reply target, which the gate already worked out
-    // — the REAL message ts the card was posted with, never the conversation
-    // key (see `PendingProposal.replyTs` for the DM that swallowed a write).
-    await postMessage(env, {
-      channel: run.channel,
-      text: resultMessage,
-      ...(verdict.post?.replyTs ? { thread_ts: verdict.post.replyTs } : {}),
-    });
+    // Say what ran. A batch's partial result is invisible otherwise: the person
+    // approved four things and the thread would show one tool's reply.
+    const resultMessage = batchResultMessage(outcomes);
+    if (resultMessage) {
+      // Under the verdict's own reply target, which the gate already worked out
+      // — the REAL message ts the card was posted with, never the conversation
+      // key (see `PendingProposal.replyTs` for the DM that swallowed a write).
+      await postMessage(env, {
+        channel: run.channel,
+        text: resultMessage,
+        ...(verdict.post?.replyTs ? { thread_ts: verdict.post.replyTs } : {}),
+      });
+    }
+  } finally {
+    // Told, fenced, or telling it threw: the run is over either way. Only what
+    // stops this function BEFORE the batch returns — an evicted isolate, a
+    // `waitUntil` past its budget — leaves the record standing, and the next
+    // look at the card or its thread says so (`gate/gate.ts` `cutOffVerdict`).
+    // A failed delete is a false "this was cut off" note later, so it is logged
+    // where it can be seen.
+    try {
+      await store.endExecution(pending.proposalTs);
+    } catch (err) {
+      console.error(
+        `[gate] execution record for ${pending.proposalTs} not cleared: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
   }
 
   // D5: announce a successful reviewable artifact to #plus-design (right place

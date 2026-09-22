@@ -208,6 +208,10 @@ export function evalTurnWiring(request: TurnRequest, collectors: EvalCollectors)
     // executor, and an eval run writes it to the report instead.
     async applyVerdict(verdict) {
       if (!verdict.execute) return;
+      // Recorded is as good as told: close the execution record Gate opened at
+      // the claim, or a long eval conversation would later read its own
+      // approval as a run that was cut off.
+      if (verdict.proposal) await threadState.endExecution(verdict.proposal.proposalTs);
       // EVERY operation of the approved batch, in order — a suite that recorded
       // only the first would pass the exact regression that batch exists to stop.
       for (const operation of verdict.execute.operations) {

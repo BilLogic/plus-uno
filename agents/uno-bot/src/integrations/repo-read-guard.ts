@@ -5,6 +5,10 @@
 // instructions. Nothing stopped the system under test from fetching the file
 // that says what a passing answer looks like.
 //
+// The corpus is THIS repo's — the harness repo, `GITHUB_REPO`, the repo list's
+// default. `github_read` applies the guard only when it reads that repo, so a
+// `docs/evals/` in another listed repo is an ordinary folder.
+//
 // ── Why a read guard and not a secret ─────────────────────────────────────
 //
 // The first attempt sealed the answer key with AES-256-GCM. It was sound

@@ -17,6 +17,7 @@ import { buildProviderConversation } from "../../src/agent/provider-conversation
 import {
   recordingDelivery,
   type GateNote,
+  type IssueTarget,
   type RecordingDelivery,
   type TurnDeps,
   type TurnRequest,
@@ -48,6 +49,12 @@ export type JudgeCall = Parameters<TurnDeps["reviewDraft"]>[0];
 export const CHANNEL = "C1";
 export const CONVERSATION = "1700000000.000100";
 export const REF = { channel: CHANNEL, thread: CONVERSATION };
+/** The repo a GitHub intake lands in, as the Worker's config would name it —
+ *  deliberately not the production value, so a literal in the turn would show. */
+export const ISSUE_REPO = "example-org/harness";
+/** The default branch a workflow run with no ref goes to, as the Worker's read
+ *  of the repo would answer — not "main", so a literal in the turn would show. */
+export const WORKFLOW_DEFAULT_REF = "trunk";
 
 /** A meter that spends nothing: no case here is about the budget (that is
  *  `agent-loop.test.ts`), and a turn must not need one to run. */
@@ -137,6 +144,9 @@ export function harness(opts: {
   /** Stand in for the side-effect tool table, so a case can fail one operation
    *  of a batch. Absent — as everywhere else here — nothing is executed. */
   executeOperation?: (operation: { toolName: string; input: Record<string, unknown> }) => Promise<string>;
+  /** The default branch a workflow card reads; null is a read that failed.
+   *  Absent, the read answers `WORKFLOW_DEFAULT_REF`. */
+  workflowBranch?: string | null;
   /**
    * The conversation key the loop reads the stop flag on, for a case about
    * cancellation. Production computes it from the conversation
@@ -146,6 +156,10 @@ export function harness(opts: {
    * is every other case here.
    */
   cancelKey?: ThreadRef;
+  /** The repo a staged intake would land in, and whether it is public — what
+   *  the Worker's resolver and visibility read would answer. Absent, every
+   *  intake is on `ISSUE_REPO`, public. */
+  issueTarget?: (input: Record<string, unknown>) => IssueTarget;
 } = {}): Harness {
   const delivery = opts.delivery ?? recordingDelivery();
   const threadState = opts.threadState ?? createInMemoryThreadState();
@@ -243,6 +257,13 @@ export function harness(opts: {
       },
       async designPreviewImage() {
         return "https://figma.example/preview.png";
+      },
+      async issueTarget(input) {
+        return opts.issueTarget?.(input) ?? { repo: ISSUE_REPO, visibility: "public" };
+      },
+      async workflowTarget(input) {
+        const repo = typeof input.repo === "string" && input.repo ? input.repo : ISSUE_REPO;
+        return { repo, branch: opts.workflowBranch === undefined ? WORKFLOW_DEFAULT_REF : opts.workflowBranch };
       },
     },
 

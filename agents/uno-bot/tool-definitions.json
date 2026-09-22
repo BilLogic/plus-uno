@@ -150,7 +150,7 @@
   },
   {
     "name": "github_read",
-    "description": "Read-only, ungated. Read the plus-uno GitHub repo by repo-relative path: a file's contents (DS agent-views, rule docs, AGENTS.md, a component's source, token values under design-system/src/tokens/) or a directory listing (a directory path returns its entries). Use it for any DS component / token / prop / rule-doc fact, to confirm a component exists under design-system/src/components before proposing component_implement, and to ground a review in the actual rule docs. `search` finds where something lives when the path is unknown. For a GitHub URL a designer pasted, source_read reads it directly.",
+    "description": "Read-only, ungated. Read a GitHub repo on the bot's repo list by repo-relative path: a file's contents (DS agent-views, rule docs, AGENTS.md, a component's source, token values under design-system/src/tokens/) or a directory listing (a directory path returns its entries). Use it for any DS component / token / prop / rule-doc fact, to confirm a component exists under design-system/src/components before proposing component_implement, and to ground a review in the actual rule docs. `search` finds where something lives when the path is unknown. `repo` picks the repo; omitted, it is plus-uno. For a GitHub URL a designer pasted, source_read reads it directly.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -169,23 +169,59 @@
         "search": {
           "type": "string",
           "description": "Code-search mode: find WHERE something lives in the repo (e.g. 'focus-ring', 'PageLayout') — returns matching file paths + github.com links to read or cite. When set, 'path' is ignored."
+        },
+        "repo": {
+          "type": "string",
+          "enum": [
+            "BilLogic/plus-uno",
+            "BilLogic/plus-marketing-website",
+            "BilLogic/plus-uno-blueprint"
+          ],
+          "description": "Optional: a repo on the bot's list; omit for the default, plus-uno. The blueprint repo is read for its code, schema and issues — blueprint CONTENT comes from search_blueprint."
+        }
+      }
+    }
+  },
+  {
+    "name": "github_intake_search",
+    "description": "Read-only, ungated. Search the open GitHub intakes (issues labelled harness-intake, awaiting triage) by keyword, on a listed repo — plus-uno unless `repo` names another. Run it before staging github_issue_create, every time: if an open intake already covers the request, name it by title and link and ask whether to link that one instead or file a new one anyway — stage the card only on 'file anyway'. The Worker fixes the open state and the label and refuses a repo off its list; you send keywords, and a repo when it is not plus-uno.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "keywords"
+      ],
+      "properties": {
+        "keywords": {
+          "type": "string",
+          "description": "Two to six distinctive words that name the problem, e.g. 'github issue refuses', 'canvas export timeout'. Every word must match, so fewer finds more."
+        },
+        "repo": {
+          "type": "string",
+          "enum": [
+            "BilLogic/plus-uno",
+            "BilLogic/plus-marketing-website",
+            "BilLogic/plus-uno-blueprint"
+          ],
+          "description": "Optional: a repo on the bot's list; omit for the default, plus-uno."
         }
       }
     }
   },
   {
     "name": "slack_user_profile",
-    "description": "Read-only, ungated. Look up a Slack user's profile by id — display name, title/role, email, timezone, status. Use it when you need to know WHO someone is: a member id from slack_channel_members, an @-mention in the thread, a card contributor's Slack identity. Mention people as <@id> in replies.",
+    "description": "Read-only, ungated. Look up a Slack user — by id for their profile (display name, title/role, email, timezone, status), or by `name` to find who someone is ('Coco', 'Meryem') among active teammates. Use it when you need to know WHO someone is: a member id from slack_channel_members, an @-mention in the thread, a card contributor's Slack identity, a person named for a relayed DM. A name lookup returns every match: one → name them as <@id>; several → ask which one before staging anything; none → say so, never guess. Mention people as <@id> in replies.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "user_id"
-      ],
       "properties": {
         "user_id": {
           "type": "string",
-          "description": "Slack user id (U…), bare or as an <@U…> mention."
+          "description": "Slack user id (U…), bare or as an <@U…> mention. Omit it to look someone up by name."
+        },
+        "name": {
+          "type": "string",
+          "description": "A first name, surname, full name or display name to find, e.g. 'Coco'. Used only when user_id is omitted."
         }
       }
     }
@@ -601,6 +637,147 @@
         "body": {
           "type": "string",
           "description": "Email body, written in standard Markdown — the same dialect as everywhere else. The Worker sends it as both plain text and HTML, so **bold**, _italic_, `code`, - bullets, 1. numbered, [label](url) links, > quotes, ```fenced code``` and --- dividers all render. Write it out fully — no placeholders. This is outward mail to someone outside the team: greeting, the point up front, and a sign-off."
+        }
+      }
+    }
+  },
+  {
+    "name": "dm_relay",
+    "description": "SIDE EFFECT (sends a real Slack DM), routed through the confirmation gate. A relayed DM: pass something to a named person as a DM, on the requester's behalf — 'send this to Coco', 'pass this along to <@U…>'. One call per recipient; several recipients are several calls in the same reply, which stage as one card. `recipient` is a Slack user id: take it from an @-mention in the thread, or resolve a name first with slack_user_profile's `name` lookup, and when a name matches more than one person ask which one instead of staging. The Worker opens the DM with who asked and closes it with a link back to this conversation — write neither yourself. Carry only what is visible in this conversation; private material from any other space never travels in a relay.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recipient",
+        "text"
+      ],
+      "properties": {
+        "recipient": {
+          "type": "string",
+          "description": "One Slack user id (U…), bare or as an <@U…> mention. Never a name — resolve it first."
+        },
+        "text": {
+          "type": "string",
+          "description": "The message, in standard Markdown, exactly as the recipient should read it. Readable on its own, from a phone: name the card or doc, its status, and its link."
+        }
+      }
+    }
+  },
+  {
+    "name": "github_issue_create",
+    "description": "SIDE EFFECT (creates a real issue on a listed GitHub repo), routed through the confirmation gate. File an intake as a GitHub issue on the listed repo whose purpose matches what would change — uno-bot or the harness (skills, persona, harness docs, evals) on plus-uno, the marketing site on plus-marketing-website, the service-blueprint app's code or schema on plus-uno-blueprint; unclear which, ask before staging. Use it when someone asks to track, file or report such a problem — 'track this on GitHub', 'file an issue for someone to fix'. Run github_intake_search on the same repo first, and stage this only when no open intake covers the request or the requester chose to file anyway. Product and design maintenance (a DS component, a product flow, a design doc) is a Roadmap intake card (notion_create, surface 'intake') instead; say which surface and repo you chose so the requester can redirect it. You write the title, the body and the repo — the Worker refuses a repo off its list, sets the triage labels and appends a footer naming the requester and linking this thread. The card says whether the repo is public; write every intake as if anyone can read it: content from a DM or private channel other than this conversation never goes in it.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "body"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Issue title: the problem in one line, specific enough to find again."
+        },
+        "body": {
+          "type": "string",
+          "description": "Issue body in GitHub Markdown: the problem, what was expected, what happened instead, and how to reproduce it where known. A summary in your words; short quotes from this conversation are fine. No placeholders."
+        },
+        "repo": {
+          "type": "string",
+          "enum": [
+            "BilLogic/plus-uno",
+            "BilLogic/plus-marketing-website",
+            "BilLogic/plus-uno-blueprint"
+          ],
+          "description": "Optional: the listed repo the intake belongs on; omit for the default, plus-uno. Named by what would change, never guessed."
+        }
+      }
+    }
+  },
+  {
+    "name": "github_issue_update",
+    "description": "SIDE EFFECT (writes to a real issue on a listed GitHub repo), routed through the confirmation gate. Follow up on an existing GitHub issue in a listed repo: comment on it ('add this repro to #688'), close it as completed or not planned, or reopen it ('close #688 as done'), and add or remove labels that already exist on the repo ('label #688 bug'). One call per issue, carrying every change asked for on it; several issues are several calls in the same reply, which stage as one card. Never the triage outcomes ready-for-agent, ready-for-human or wontfix, either way — those are a maintainer's decision, so say so instead of staging. The Worker refuses a repo off its list and a label the repo lacks, and appends a footer naming the requester to every comment — write the comment only. The card says whether the repo is public; write every comment as if anyone can read it: content from a DM or private channel other than this conversation never goes in one.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "issue_number"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "enum": [
+            "BilLogic/plus-uno",
+            "BilLogic/plus-marketing-website",
+            "BilLogic/plus-uno-blueprint"
+          ],
+          "description": "Optional: the repo the issue is on, from the bot's list; omit for the default, plus-uno."
+        },
+        "issue_number": {
+          "type": "integer",
+          "description": "The issue's number, e.g. 688."
+        },
+        "comment": {
+          "type": "string",
+          "description": "Optional: a comment in GitHub Markdown, exactly as it should read on the issue. When closing, the reason in a sentence belongs here."
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "closed_completed",
+            "closed_not_planned",
+            "open"
+          ],
+          "description": "Optional: close as completed (done or fixed), close as not planned (won't do, duplicate, stale), or reopen."
+        },
+        "add_labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional: labels to add, by their name on the repo."
+        },
+        "remove_labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional: labels to take off the issue."
+        }
+      }
+    }
+  },
+  {
+    "name": "github_workflow_run",
+    "description": "SIDE EFFECT (starts a real GitHub Actions run), routed through the confirmation gate. Run a workflow the bot's repo list allows on a listed repo — 're-sync Notion on the marketing site' (sync-notion.yml on plus-marketing-website), 'run the render walk on the blueprint' (render-walk.yml on plus-uno-blueprint). Only a workflow named for that repo on the list can run; anything else is refused before a card, and the refusal names the allowed ones. Never a stand-in for component_implement or prototype_scaffold. It always runs on the repo's default branch and takes no inputs. The card shows the repo, the workflow and that branch; past the ✅ the thread gets the workflow's runs page.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "workflow"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "enum": [
+            "BilLogic/plus-uno",
+            "BilLogic/plus-marketing-website",
+            "BilLogic/plus-uno-blueprint"
+          ],
+          "description": "The listed repo the workflow belongs to. Required: the default repo, plus-uno, lists no runnable workflows."
+        },
+        "workflow": {
+          "type": "string",
+          "enum": [
+            "sync-notion.yml",
+            "bot-contract-probe.yml",
+            "docs-harness.yml",
+            "gates.yml",
+            "offline-board.yml",
+            "render-walk.yml"
+          ],
+          "description": "The workflow's file name under .github/workflows/, as the repo list names it for that repo."
         }
       }
     }
