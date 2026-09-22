@@ -33,7 +33,7 @@ Anything not listed is not a valid value.
 
 ## Related
 
-Same group: `CompetencyBadge` · `Footer` · `LoadingGif` · `Navbar` · `PageLayout` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Sidebar` · `StaticBadgeSmart` · `Table`
+Same group: `CompetencyBadge` · `Footer` · `LoadingGif` · `Navbar` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Sidebar` · `StaticBadgeSmart` · `Table`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

@@ -22,7 +22,7 @@ Per Figma spec: node-id=111-227939 Simple footer with version, copyright, and te
 
 ## Related
 
-Same group: `CompetencyBadge` · `LoadingGif` · `Navbar` · `PageLayout` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Sidebar` · `StaticBadgeSmart` · `Table` · `UserAvatar`
+Same group: `CompetencyBadge` · `LoadingGif` · `Navbar` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Sidebar` · `StaticBadgeSmart` · `Table` · `UserAvatar`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

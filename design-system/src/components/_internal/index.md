@@ -2,7 +2,7 @@
 
 # Internal
 
-11 components. Each row links to the generated facts; the three columns after it are the
+10 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
@@ -11,7 +11,6 @@ authored half (#166), counted rather than assumed.
 | [Footer](Footer/index.md) | 6 | ✕ | ✕ | ✕ |
 | [LoadingGif](LoadingGif/index.md) | 5 | ✕ | ✕ | ✕ |
 | [Navbar](Navbar/index.md) | 6 | ✕ | ✕ | ✕ |
-| [PageLayout](PageLayout/index.md) | 8 | ✕ | ✕ | ✕ |
 | [SessionAvailabilitySnackbar](SessionAvailabilitySnackbar/index.md) | 5 | ✕ | ✕ | ✕ |
 | [SessionManagementSnackbar](SessionManagementSnackbar/index.md) | 4 | ✕ | ✕ | ✕ |
 | [Sidebar](Sidebar/index.md) | 7 | ✕ | ✕ | ✕ |
@@ -19,7 +18,7 @@ authored half (#166), counted rather than assumed.
 | [Table](Table/index.md) | 9 | ✕ | ✕ | ✕ |
 | [UserAvatar](UserAvatar/index.md) | 9 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 0/11 (0%) · Correct/incorrect 0/11 (0%) · Accessibility 0/11 (0%)
+**Authored coverage:** When to use 0/10 (0%) · Correct/incorrect 0/10 (0%) · Accessibility 0/10 (0%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says
