@@ -37,7 +37,7 @@
 // compile is a glob over `src/**` and types the Workers globals beside the Node
 // ones, so it would compile this file either way — `tsconfig.test.json`.)
 
-import { proposalReplyThread, type ThreadRef, type ThreadState } from "../thread-state/index";
+import type { ThreadRef, ThreadState } from "../thread-state/index";
 import { settledStatus, type SessionStatus } from "./session-status";
 import { turnSurfaceOf } from "../turn/request";
 
@@ -120,11 +120,9 @@ function conversationKeys(signal: StopSignal): string[] {
 /**
  * Was a proposal card live in this reply thread at the moment stop was pressed?
  *
- * The grain is the REPLY THREAD, as `putProposal` and `runTurn` both keep it:
- * `getProposalByThread` is keyed on the CONVERSATION, which in an unthreaded DM
- * is the constant `"dm"` shared by every ask on that surface, so the record it
- * answers with is compared against this thread through the store's own
- * `proposalReplyThread` (#579) rather than a second derivation of the fallback.
+ * The grain is the REPLY THREAD, which is the key the store holds a card on
+ * (`getProposalByThread`), so this is one read of the event's own thread — no
+ * matter which of a DM's two conversation keys the run was filed under.
  *
  * A store error reads as "no card", which settles the session `active`. That is
  * the safe direction here for a reason particular to this control: the person
@@ -132,12 +130,8 @@ function conversationKeys(signal: StopSignal): string[] {
  * stays up is the one failure this whole ticket exists to remove.
  */
 async function cardLiveInThread(state: ThreadState, signal: StopSignal): Promise<boolean> {
-  for (const thread of conversationKeys(signal)) {
-    const ref: ThreadRef = { channel: signal.channel, thread };
-    const pending = await state.getProposalByThread(ref).catch(() => null);
-    if (pending && proposalReplyThread(pending) === signal.threadTs) return true;
-  }
-  return false;
+  const ref: ThreadRef = { channel: signal.channel, thread: signal.threadTs };
+  return (await state.getProposalByThread(ref).catch(() => null)) !== null;
 }
 
 /**

@@ -330,6 +330,48 @@ export function runThreadStateConformance(
     assert.equal(await store.getProposalByThread(THREAD), null);
   });
 
+  // The pending card is keyed on the REPLY THREAD it was posted in, not the
+  // conversation. In a DM every unthreaded ask shares the conversation "dm",
+  // and keying the card there let a second ask pick up — and retire — a card
+  // that lives in another thread.
+  it("get-by-thread in a DM answers per reply thread, not per conversation", async () => {
+    const { store, clock } = setup();
+    const dm = { channel: "D1", threadTs: "dm" };
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.2", replyTs: "1700.1" }));
+    clock.advance(1_000);
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.5", replyTs: "1700.4" }));
+
+    assert.equal((await store.getProposalByThread({ channel: "D1", thread: "1700.1" }))?.proposalTs, "1700.2");
+    assert.equal((await store.getProposalByThread({ channel: "D1", thread: "1700.4" }))?.proposalTs, "1700.5");
+    // The conversation key names no thread a card was posted in.
+    assert.equal(await store.getProposalByThread({ channel: "D1", thread: "dm" }), null);
+  });
+
+  // What an unthreaded ✅ in a DM needs: every card still live in the
+  // conversation, newest first, so one card resolves and several ask which.
+  it("get-by-conversation lists the live cards of a DM conversation, newest first", async () => {
+    const { store, clock } = setup();
+    const dm = { channel: "D1", threadTs: "dm" };
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.2", replyTs: "1700.1" }));
+    clock.advance(1_000);
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.5", replyTs: "1700.4" }));
+    clock.advance(1_000);
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.8", replyTs: "1700.7" }));
+    await store.retireProposal("1700.8");
+    // Another conversation, and another channel, are nobody's here.
+    await store.putProposal(proposal({ channel: "D1", threadTs: "1700.3", proposalTs: "1700.6", replyTs: "1700.3" }));
+    await store.putProposal(proposal({ channel: "D2", threadTs: "dm", proposalTs: "1700.9", replyTs: "1700.9" }));
+
+    const live = await store.getProposalsByConversation({ channel: "D1", thread: "dm" });
+    assert.deepEqual(live.map((p) => p.proposalTs), ["1700.5", "1700.2"]);
+
+    clock.advance(PROPOSAL_TTL_MS - 1_500); // 1700.2 has aged out; 1700.5 has not
+    assert.deepEqual(
+      (await store.getProposalsByConversation({ channel: "D1", thread: "dm" })).map((p) => p.proposalTs),
+      ["1700.5"],
+    );
+  });
+
   // ----- retiring, as distinct from claiming (#583) -----
   //
   // Two retirements, two methods. A claim CONSUMES a card because someone

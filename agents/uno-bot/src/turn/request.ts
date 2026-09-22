@@ -18,6 +18,7 @@
 
 import type { AgentImage, HistoricalImages } from "../agent/provider-conversation";
 import type { ModelTier } from "../agent/routing";
+import { proposalReplyThread } from "../thread-state/index";
 import type { HistoryTurn, PendingProposal, VisionReference } from "../thread-state/index";
 import type { TurnRequest, TurnSurface } from "./turn";
 
@@ -71,6 +72,23 @@ export interface TurnFacts {
  */
 export function turnSurfaceOf(channel: string): TurnSurface {
   return channel.startsWith("D") ? "assistant" : "channel";
+}
+
+/**
+ * The thread a turn's card lives in: where its pending proposal is read, and
+ * where a card it stages is posted and kept.
+ *
+ * The reply thread, not the conversation. In a channel they are one value; in
+ * a DM every unthreaded ask shares the conversation `"dm"` but has a thread of
+ * its own, and a card belongs to that thread — history is what the whole DM
+ * shares. The comparison is the store's own (`proposalReplyThread`), so a
+ * record and a request mean the same thing by "its thread".
+ */
+export function cardThreadOf(facts: { conversationTs: string; replyTs?: string }): string {
+  return proposalReplyThread({
+    ...(facts.replyTs ? { replyTs: facts.replyTs } : {}),
+    threadTs: facts.conversationTs,
+  });
 }
 
 /** Envelope facts, as the request a turn takes. */

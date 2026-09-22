@@ -75,6 +75,7 @@ import {
   type VisionReference,
 } from "../thread-state/index";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
+import { cardThreadOf } from "./request";
 import {
   withWorkingSignal,
   type CardCaveat,
@@ -491,23 +492,18 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
   // The card THIS REPLY THREAD was holding when the turn began — and the grain
   // is the whole of it.
   //
-  // `pending` arrives from a `getProposalByThread` read keyed on the
-  // CONVERSATION, which in an unthreaded DM is the constant `"dm"`: every ask
-  // on that surface shares it. Settling by conversation would let a card
-  // staged under ask A suspend the unrelated thread of ask B, and a ✅ on A
-  // settles A's thread only — leaving B suspended with nothing in it to click.
-  // That is the grain error #573 fixed one layer down, and the comparison is
-  // the store's own (`proposalReplyThread`, #579) rather than a second
-  // derivation of the same fallback. In a channel `replyTs` IS the thread root,
-  // so channel behaviour is unchanged.
+  // `pending` is read on the reply thread (`cardThreadOf`), not the
+  // conversation, which in an unthreaded DM is the constant `"dm"` shared by
+  // every ask. The comparison stays as the guard on that: settling by
+  // conversation would let a card staged under ask A suspend the unrelated
+  // thread of ask B, and a ✅ on A settles A's thread only — leaving B
+  // suspended with nothing in it to click. In a channel `replyTs` IS the
+  // thread root, so channel behaviour is unchanged.
   //
   // It costs no read of its own: the adapter's read at the top of the request
   // is where it came from. It is also the card as of the turn's START, which
   // every exit but one leaves untouched — see `settlementOf`.
-  const turnThread = proposalReplyThread({
-    ...(request.replyTs ? { replyTs: request.replyTs } : {}),
-    threadTs: request.conversationTs,
-  });
+  const turnThread = cardThreadOf(request);
   const cardLive = request.pending
     ? proposalReplyThread(request.pending) === turnThread
     : false;
@@ -561,21 +557,30 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // vocabulary but the structural rule further down: if the model answers an
   // approval by re-invoking the same tool with the same input, that IS the
   // confirmation.
-  if (request.pending) {
+  //
+  // A line whose conversation spans more than its own thread — an unthreaded
+  // DM line — sits in no card's thread, so it carries the conversation too:
+  // one live card in the DM is the card it means, several get asked about.
+  const cardThread = cardThreadOf(request);
+  const outsideAnyCard = cardThread !== request.conversationTs;
+  if (request.pending || outsideAnyCard) {
     const verdict = await resolveSignal(
       {
         kind: "typed",
         channel: request.channel,
-        thread: request.conversationTs,
+        thread: cardThread,
         text: request.text,
         userId: request.userId,
+        ...(request.pending ? {} : { conversation: request.conversationTs }),
       },
       { threadState },
     );
     // A verdict with no decision means the message was not a gate emoji — it
-    // is language, and language goes to the model. Anything else the gate has
+    // is language, and language goes to the model; so is a gate emoji with no
+    // card anywhere to answer and nothing to say. Anything else the gate has
     // already settled, win or lost race.
-    if (verdict.decision) {
+    const nothingToSettle = verdict.outcome === "none" && !verdict.post;
+    if (verdict.decision && !nothingToSettle) {
       return settleVerdict(verdict, {
         deps,
         memory,

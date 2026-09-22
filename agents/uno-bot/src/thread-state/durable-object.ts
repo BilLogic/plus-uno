@@ -112,6 +112,10 @@ export function createDurableObjectThreadState(
       return hop().getProposalByThread(ref, now());
     },
 
+    getProposalsByConversation(ref: ThreadRef): Promise<PendingProposal[]> {
+      return hop().getProposalsByConversation(ref, now());
+    },
+
     // The delete IS the claim, and it is the Durable Object's input gate that
     // makes it one: of two racing resolvers exactly one hop returns true.
     claimProposal(proposalTs: string): Promise<boolean> {
