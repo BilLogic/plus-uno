@@ -87,10 +87,10 @@ function withSlackFooter(text: string, filing: IssueFiling, verb: "Filed" | "Pos
  * whose fence is longer than any backtick run inside it, so a body carrying
  * its own ``` cannot close the block early.
  *
- * Escaped for Slack, because it is posted as message text: a drafted
- * `<@teammate>` or `a -> b` is a control sequence there, and a note that
- * carried two of them went out blank. Slack decodes the entities for display,
- * so what the person sees and copies is the draft as written.
+ * Escaped whole, valid-looking markup included: this is text to copy, not to
+ * render, and a quoted `<@teammate>` blanks a message (live 2026-09-22,
+ * `slack/mrkdwn.ts` § sanitizeSlackMarkup). Slack decodes the entities for
+ * display, so what the person sees and copies is the draft as written.
  */
 export function pasteableDraft(draft: IssueDraft): string {
   const longest = Math.max(0, ...(draft.body.match(/`+/g) ?? []).map((run) => run.length));

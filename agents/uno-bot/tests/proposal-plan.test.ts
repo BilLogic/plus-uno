@@ -174,6 +174,17 @@ test("groups keep the batch's own order and numbering", () => {
   );
 });
 
+test("a group heading links only a real URL, and escapes the title inside the label", () => {
+  const [linked] = groupOperations([
+    { toolName: "notion_update", input: { page_url: "https://notion.so/p1", title: "Q&A > notes" } },
+  ]);
+  assert.equal(linked!.heading, "*<https://notion.so/p1|Q&amp;A &gt; notes>*");
+  const [bare] = groupOperations([
+    { toolName: "notion_update", input: { page_url: "p1>oops", title: "" } },
+  ]);
+  assert.equal(bare!.heading, "*p1&gt;oops*");
+});
+
 test("the result message mirrors the card's grouping, done or failed per operation", () => {
   const outcomes: OperationOutcome[] = BATCH.map((op, i) => ({
     toolName: op.toolName,

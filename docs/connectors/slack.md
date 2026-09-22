@@ -90,7 +90,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading` → `*Heading*`, `[label](url)` → `<url|label>`, tables → `•` lines, and strips the fence language tag (mrkdwn code blocks take no info string).
 
-**Don't hand-escape `&` `<` `>`.** Nothing escapes them and nothing should: on the Markdown path an `&amp;` would render as literal `&amp;`. Raw angle brackets in prose are fine. The one case to watch is text that *looks* like a Slack token — `<@`, `<#`, `<http` — which Slack will try to resolve; put that in backticks.
+**Don't hand-escape `&` `<` `>`.** On the Markdown path `&amp;` renders literally. On `postMessage` text, `sanitizeSlackMarkup` keeps valid markup (a real `<@U…>`, `<#C…>`, `<!here>`, `<https://…|label>`) and escapes every other `<` `>` and bare `&`: markup Slack can't parse blanks the whole message (live 2026-09-22). Backticks don't shelter a fake `<@…>`.
 
 Block Kit **is** wired (`delivery.ts` posts `section` blocks with a `text` fallback; proposal cards carry buttons via `interactive.ts`) — the claim that it wasn't stood in this file until 2026-08-22. `reply_broadcast` exists on `PostMessageInput` but is used only by a test route.
 

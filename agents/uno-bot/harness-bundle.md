@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **173,330 chars from 16 files**, against an assembled budget of 175,000 (1,670 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,946 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **173,368 chars from 16 files**, against an assembled budget of 175,000 (1,632 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,984 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -30,11 +30,11 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,676 | 7,000 (Worker face) |
 | 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,647 | — |
 | 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,645 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,622 | 126,309 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 129,557 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 160,144 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 164,733 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 173,330 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,660 | 126,347 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 129,595 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 160,182 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 164,771 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 173,368 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -966,7 +966,7 @@ Reach for one when the content genuinely is a grid: three or more rows compared 
 
 Conversion covers `**bold**` → `*bold*`, `- item` → `• item`, `## Heading` → `*Heading*`, `[label](url)` → `<url|label>`, tables → `•` lines, and strips the fence language tag (mrkdwn code blocks take no info string).
 
-**Don't hand-escape `&` `<` `>`.** Nothing escapes them and nothing should: on the Markdown path an `&amp;` would render as literal `&amp;`. Raw angle brackets in prose are fine. The one case to watch is text that *looks* like a Slack token — `<@`, `<#`, `<http` — which Slack will try to resolve; put that in backticks.
+**Don't hand-escape `&` `<` `>`.** On the Markdown path `&amp;` renders literally. On `postMessage` text, `sanitizeSlackMarkup` keeps valid markup (a real `<@U…>`, `<#C…>`, `<!here>`, `<https://…|label>`) and escapes every other `<` `>` and bare `&`: markup Slack can't parse blanks the whole message (live 2026-09-22). Backticks don't shelter a fake `<@…>`.
 
 Block Kit **is** wired (`delivery.ts` posts `section` blocks with a `text` fallback; proposal cards carry buttons via `interactive.ts`) — the claim that it wasn't stood in this file until 2026-08-22. `reply_broadcast` exists on `PostMessageInput` but is used only by a test route.
 

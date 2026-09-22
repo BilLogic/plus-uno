@@ -20,19 +20,75 @@
 // never mangled.
 
 /**
- * Words that must reach a reader exactly as written — a draft handed back to
- * paste, a title inside a link label — with Slack's three control characters
- * turned into the entities Slack decodes for display.
+ * Words that must reach a reader exactly as written, where even VALID markup
+ * would be wrong — above all a title inside a `<url|label>`, where a `>` ends
+ * the link. Slack decodes the three entities for display.
  *
- * Slack parses `&`, `<` and `>` in message text as control characters
- * (docs.slack.dev, "Formatting message text" § Escaping text), so a quoted
- * `<@teammate>` is a mention Slack tries to resolve, not seven characters. A
- * failure note carrying such tokens went out blank (live 2026-09-21), and the
- * same note without them rendered. Only for Worker-quoted text: the model's own
- * `<url|label>` links are meant to be parsed.
+ * Everything posted as text also passes `sanitizeSlackMarkup`, which leaves
+ * these entities alone, so the two never double-escape.
  */
 export function escapeSlackText(text: string): string {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/**
+ * Keep the `<…>` markup Slack can parse, and entity-escape every other `<`,
+ * `>` and bare `&`.
+ *
+ * Slack treats `&`, `<` and `>` in message text as control characters
+ * (docs.slack.dev, "Formatting message text" § Escaping text), and markup it
+ * cannot parse does not degrade — it blanks the WHOLE text. Reproduced live
+ * 2026-09-22: a relayed DM whose body quoted `<@U...>` and `<@teammate>` in a
+ * code fence posted with empty text, attribution line and all, while the same
+ * relay without those tokens posted in full. The 2026-09-21 GitHub failure
+ * note that went out blank carried the same two tokens.
+ *
+ * Runs over the whole text, fences included: a code block is no shelter, the
+ * repro's tokens were inside one. Idempotent: `&amp;`, `&lt;` and `&gt;` are
+ * already entities and pass unchanged.
+ */
+export function sanitizeSlackMarkup(text: string): string {
+  return text.replace(/<([^<>]*)>|[<>]|&/g, (match, inner: string | undefined, offset: number) => {
+    if (inner !== undefined) {
+      const safe = validMarkup(inner);
+      return safe === null ? escapeBare(match) : `<${safe}>`;
+    }
+    if (match === "&") return ENTITY.test(text.slice(offset)) ? "&" : "&amp;";
+    return match === "<" ? "&lt;" : "&gt;";
+  });
+}
+
+/** The only entities Slack decodes — and so the only ones a pass may keep. */
+const ENTITY = /^&(?:amp|lt|gt);/;
+
+/** `<`, `>` and bare `&` as entities, leaving existing entities alone. */
+function escapeBare(text: string): string {
+  return text
+    .replace(/&(?!(?:amp|lt|gt);)/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+/**
+ * The inside of a `<…>` Slack can parse, with its label made safe — or null.
+ *
+ * A mention needs an id that looks like one: `<@U...>` and `<@teammate>` are
+ * exactly the tokens that blanked a message.
+ */
+function validMarkup(inner: string): string | null {
+  const bar = inner.indexOf("|");
+  const target = bar < 0 ? inner : inner.slice(0, bar);
+  const label = bar < 0 ? null : inner.slice(bar + 1);
+  const ok =
+    /^@[UW][A-Z0-9]{8,}$/.test(target) ||
+    /^#[CG][A-Z0-9]+$/.test(target) ||
+    /^!(?:here|channel|everyone)$/.test(target) ||
+    /^!subteam\^[A-Z0-9]+$/.test(target) ||
+    (/^!date\^\d+\^[^\s|]+(?:\^\S+)?$/.test(target) && label !== null) ||
+    /^https?:\/\/[^\s|]+$/.test(target) ||
+    /^mailto:[^\s|@]+@[^\s|]+$/.test(target);
+  if (!ok) return null;
+  return label === null ? target : `${target}|${escapeBare(label)}`;
 }
 
 /** Split on ```fenced``` blocks; transform only the non-fenced segments. */

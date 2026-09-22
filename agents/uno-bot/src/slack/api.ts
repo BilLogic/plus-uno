@@ -2,7 +2,7 @@
 // because we only need 3-4 methods and Workers prefers a small bundle.
 
 import type { Env } from "../types";
-import { toSlackMrkdwn } from "./mrkdwn";
+import { sanitizeSlackMarkup, toSlackMrkdwn } from "./mrkdwn";
 import { countedFetch, rethrowIfBudget } from "../net";
 import type { SlackEventFile } from "./types";
 import { rowFor } from "../agent/tool-table";
@@ -136,10 +136,13 @@ export async function postMessage(env: Env, input: PostMessageInput) {
   // slips into GitHub-flavored Markdown (## / **bold** / tables) under load, and
   // Slack renders none of it. Idempotent on Worker-authored text. (blocks, when
   // present, are Worker-built and already valid.)
+  //
+  // Then the markup pass, on everything: `<…>` Slack cannot parse blanks the
+  // whole message (live 2026-09-22), so only valid markup leaves as markup.
   return slackCall<SlackResponse & { ts?: string; channel?: string }>(env, "chat.postMessage", {
     mrkdwn: true,
     ...input,
-    ...(input.text ? { text: toSlackMrkdwn(input.text) } : {}),
+    ...(input.text ? { text: sanitizeSlackMarkup(toSlackMrkdwn(input.text)) } : {}),
   });
 }
 
