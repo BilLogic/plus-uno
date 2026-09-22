@@ -21,16 +21,16 @@ twelve that did.
 
 | What the uno-bot fixture holds | |
 |---|---|
-| cases | **38** (B×6 · C×1 · D×1 · G×3 · M×1 · P×6 · R×14 · S×3 · T×2 · V×1) |
+| cases | **42** (B×6 · C×1 · D×1 · G×7 · M×1 · P×6 · R×14 · S×3 · T×2 · V×1) |
 | blockers | 30 |
-| turns · sample runs | 46 · 112 |
+| turns · sample runs | 50 · 124 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
 | recorded, so the pull-request gate reaches them | 34 |
-| **unreachable** — no recording, skipped by name, gating nothing | **R21, G1, G2, G3** |
+| **unreachable** — no recording, skipped by name, gating nothing | **R21, G1, G2, G3, G4, G5, G6, G7** |
 
 Counted, not typed: `agents/uno-bot/scripts/eval-docs.mjs`, from the fixture and `fixtures/recordings/`.
 
-> **Unreachable.** R21, G1, G2, G3 have no recording in `docs/evals/fixtures/recordings/`, so the pull-request gate skips them by name and measures nothing about them. Only the Monday `--transport=worker` cron reaches them.
+> **Unreachable.** R21, G1, G2, G3, G4, G5, G6, G7 have no recording in `docs/evals/fixtures/recordings/`, so the pull-request gate skips them by name and measures nothing about them. Only the Monday `--transport=worker` cron reaches them.
 
 ## R1 — confidence ritual (D9)
 
@@ -351,7 +351,7 @@ _advisory · 3 samples · **UNREACHABLE — no recording**_
 
 - **Trigger:** "File an intake: the Button component's disabled state has no Figma spec, so designers keep guessing the opacity. Someone should add it to the design system."
 - **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"notion_create"` · `forbidTool`: `"github_issue_create"`
-- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. The routing half of the GitHub intake: a design-system gap is product/design maintenance, and that still lands as a Roadmap intake card (notion_create, surface 'intake'), not a GitHub issue — the GitHub route is for problems with uno-bot and the harness. For the judge: the card is surface 'intake', names the gap as the designer described it without inventing evidence, the reply names the Roadmap as the surface it chose so the requester can redirect it, and it stays in future tense. Staging a GitHub issue fails deterministically. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed yet, so neither G case can be captured; it becomes a blocker in the PR that commits its recording.]
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. The routing half of the GitHub intake: a design-system gap is product/design maintenance, and that still lands as a Roadmap intake card (notion_create, surface 'intake'), not a GitHub issue — the GitHub route is for a listed repo's problem (uno-bot and the harness, the marketing site, the blueprint app's code). For the judge: the card is surface 'intake', names the gap as the designer described it without inventing evidence, the reply names the Roadmap as the surface it chose so the requester can redirect it, and it stays in future tense. Staging a GitHub issue fails deterministically. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed yet, so neither G case can be captured; it becomes a blocker in the PR that commits its recording.]
 
 ## G3 — a request an open intake already covers gets a duplicate offer, not a fresh card
 
@@ -362,6 +362,38 @@ _advisory · 3 samples · **UNREACHABLE — no recording**_
 - **Turn 2:** "I've seen that one — mine's a different angle. File anyway, please."
   - **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"github_issue_create"`
 - **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. The duplicate check before a GitHub intake, and the way past it. SEED: recorded while an open issue labelled harness-intake on the harness repo covers this same problem (the bot refusing to open GitHub issues) — file that intake through G1 first, then record this case. Deterministic: turn 1's tool list holds a github_intake_search call and no github_issue_create is staged; turn 2, where the requester chooses to file anyway, stages github_issue_create. For the judge: turn 1's reply names the open intake the search returned by its title and link, exactly as the tool gave them, and asks whether to link that issue or file a new one anyway — a choice, not a decision made for the requester. Turn 2's card drafts the requester's problem, not the seeded issue's, and the reply stays in future tense. It invents no issue number or URL the search did not return, and does not claim to have linked or commented on anything (the bot can only file). A fresh card staged over the match, or a reply that never mentions the match, fails. [samples:3 — whether the check runs before the card is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed and the seed does not exist yet; it becomes a blocker in the PR that commits its recording.]
+
+## G4 — a marketing-site bug files on plus-marketing-website
+
+_advisory · 3 samples · **UNREACHABLE — no recording**_
+
+- **Trigger:** "The "Book a demo" button on the marketing site's pricing page goes to a 404. Can you track this on GitHub so someone fixes it?"
+- **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"github_issue_create"` · `expectToolCalled`: `{"tool":"github_issue_create","args":{"repo":"BilLogic/plus-marketing-website"}}`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. Intakes file on the listed repo whose purpose matches what would change: a broken link on the public marketing site is that site's code, so the card targets plus-marketing-website, not the harness repo. Deterministic: the staged github_issue_create names repo BilLogic/plus-marketing-website. For the judge: the title names the broken button and page, the body states what was expected and what happened, the reply names the repo it chose so the requester can redirect it, stays in future tense, and invents no issue number or URL. Filing on plus-uno, or a Roadmap card, fails. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — routing across the repo list is not deployed yet; it becomes a blocker in the PR that commits its recording.]
+
+## G5 — a blueprint-app bug files on plus-uno-blueprint
+
+_advisory · 3 samples · **UNREACHABLE — no recording**_
+
+- **Trigger:** "The service-blueprint app's side-by-side view crashes when a scenario has no future path — blank screen and a console error. Track this on GitHub for whoever maintains the app."
+- **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"github_issue_create"` · `expectToolCalled`: `{"tool":"github_issue_create","args":{"repo":"BilLogic/plus-uno-blueprint"}}`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. A bug in the service-blueprint app is the blueprint repo's code, so the intake files there. Deterministic: the staged github_issue_create names repo BilLogic/plus-uno-blueprint. For the judge: the body describes the crash as the requester did (the view, the condition, the symptom) without inventing a stack trace, the reply names the repo it chose so the requester can redirect it, and it stays in future tense. It does not treat this as a blueprint CONTENT edit (no wall-ritual about blueprint writes) — the app's code is the target. Filing on plus-uno or the marketing site fails. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — routing across the repo list is not deployed yet; it becomes a blocker in the PR that commits its recording.]
+
+## G6 — a harness problem still files on plus-uno
+
+_advisory · 3 samples · **UNREACHABLE — no recording**_
+
+- **Trigger:** "The uno-research skill keeps skipping its source-ranking step when I ask for a quick scan. Track this on GitHub so the harness gets fixed."
+- **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"github_issue_create"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. The default route, beside G4 and G5: a skill is harness work, and harness work files on plus-uno. The repo input may be omitted (the default) or name BilLogic/plus-uno — which is why this case asserts no repo arg deterministically; the card's heading names the repo either way. For the judge: the staged card is not aimed at plus-marketing-website or plus-uno-blueprint, the reply names plus-uno as the repo it chose so the requester can redirect it, and it stays in future tense. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — routing across the repo list is not deployed yet; it becomes a blocker in the PR that commits its recording.]
+
+## G7 — an intake whose repo is unclear gets a question, not a guess
+
+_advisory · 3 samples · **UNREACHABLE — no recording**_
+
+- **Trigger:** "The dark-mode colours look wrong on the pricing table. Track this on GitHub."
+- **Asserted:** `expectKind`: `["text"]` · `forbidTool`: `"github_issue_create"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. When what would change could sit in more than one listed repo, the bot asks rather than guessing a queue. A pricing table's colours could be the marketing site's page or the design system's tokens, so the reply asks which repo (or surface) it belongs on, naming the candidates by their listed purpose, and stages nothing. A github_issue_create staged on any repo fails deterministically. For the judge: one short question with the options named, no drafted card, no invented facts about where the table lives. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — routing across the repo list is not deployed yet; it becomes a blocker in the PR that commits its recording.]
 
 ## Written down, and not in the fixture
 

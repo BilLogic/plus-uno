@@ -22,6 +22,7 @@ import { listDsComponents, matchComponent, closestComponents } from "../integrat
 // Node test can both reach it without dragging `Env` behind them.
 import { placeholderRefusal } from "./placeholder";
 import { relayRecipientId } from "../tools/relayed-dm-render";
+import { resolveRepoFor } from "../integrations/github";
 
 export interface PreflightCtx {
   env: Env;
@@ -201,6 +202,20 @@ export async function preflight(
         return { ask: ":incoming_envelope: What should the DM say? Give me the message and I'll stage it for your ✅." };
       }
       return null;
+    }
+
+    case "github_issue_create": {
+      // The repo must be on the Worker's list: an unlisted one is refused here,
+      // naming the list, so no card offers a filing the executor would refuse.
+      // An omitted repo is the default, which resolves whenever the list parses.
+      const target = resolveRepoFor(ctx.env, input.repo);
+      if (target.ok) return null;
+      // A list that fails to parse offers no repo to choose from, so there is
+      // nothing to ask — only a cause, and who can fix it.
+      if (target.misconfigured) {
+        return { ask: `:x: I can't file a GitHub issue right now — ${target.error} Tell Bill the repo list is broken.` };
+      }
+      return { ask: `:mag: ${target.error} Which of those should this intake go on?` };
     }
 
     case "shareout_post": {

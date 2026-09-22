@@ -15,7 +15,8 @@
 // hands it a fake (`tests/github-intake.test.ts`). Create only — nothing here
 // comments on, edits, closes or relabels an issue. Beside it, the read the
 // duplicate check runs first — open issues by label and keyword, for
-// `github_intake_search` — a client for the same reason.
+// `github_intake_search` — a client for the same reason. And the read the
+// intake card makes: whether the repo is public, asked once per isolate.
 
 import type { Env } from "../types";
 import { countedFetch } from "../net";
@@ -64,6 +65,7 @@ export function resolveRepoFor(env: Env, requested: unknown): RepoResolution {
   if (list instanceof RepoListError) {
     return {
       ok: false,
+      misconfigured: true,
       error: `The Worker's GitHub repo list is misconfigured (${list.message}), so no repo is reachable until it is fixed.`,
     };
   }
@@ -290,6 +292,52 @@ export function githubIssueClient(env: Env, target: RepoEntry): GithubIssueClien
       return { number: data.number, url: data.html_url };
     },
   };
+}
+
+/** Who can read a listed repo's issues, as the intake card states it —
+ *  `unknown` when GitHub would not say. Restated as the card's type in
+ *  `turn/delivery.ts`; keep the two in step. */
+export type RepoVisibility = "public" | "private" | "unknown";
+
+/** Answers GitHub gave, kept for the isolate's life: a repo turning private is
+ *  rare, and every intake card would otherwise spend a subrequest asking. A
+ *  failed lookup is not kept, so the next card asks again. Keyed lower-case
+ *  because GitHub repo names are case-insensitive, as the list's own matching
+ *  (`repo-list.mjs`) treats them. */
+const visibilityByRepo = new Map<string, "public" | "private">();
+
+/**
+ * Whether a listed repo is public (GET /repos/{repo}), for the intake card's
+ * notice. Never throws: no token, a refusal or a reply without GitHub's
+ * `private` flag are all `unknown`, and the card words that as "may be public".
+ */
+export async function githubRepoVisibility(env: Env, target: RepoEntry): Promise<RepoVisibility> {
+  const repo = target.repo;
+  const known = visibilityByRepo.get(repo.toLowerCase());
+  if (known) return known;
+  if (!env.GITHUB_TOKEN) return "unknown";
+  try {
+    const res = await countedFetch(`https://api.github.com/repos/${repo}`, {
+      headers: {
+        authorization: `Bearer ${env.GITHUB_TOKEN}`,
+        accept: "application/vnd.github+json",
+        "x-github-api-version": "2022-11-28",
+        "user-agent": "uno-bot",
+      },
+    }, GH_TIMEOUT_MS);
+    if (!res.ok) {
+      console.warn(`[github] visibility of ${repo} unread: ${res.status}`);
+      return "unknown";
+    }
+    const data = (await res.json().catch(() => ({}))) as { private?: unknown };
+    if (typeof data.private !== "boolean") return "unknown";
+    const visibility = data.private ? "private" : "public";
+    visibilityByRepo.set(repo.toLowerCase(), visibility);
+    return visibility;
+  } catch (err) {
+    console.warn(`[github] visibility of ${repo} unread: ${err instanceof Error ? err.message : String(err)}`);
+    return "unknown";
+  }
 }
 
 /** An open issue a search found — enough to name it and link it. */

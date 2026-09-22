@@ -225,9 +225,15 @@ function caveatText(caveat: CardCaveat): string {
       `:white_check_mark: posts *without* them — or drop the links in this thread first and I'll fold them in.`
     );
   }
-  if (caveat.kind === "public-repo") {
+  if (caveat.kind === "repo-visibility") {
+    const who =
+      caveat.visibility === "public"
+        ? `:globe_with_meridians: *${caveat.repo}* is public — anyone can read the issue once it's filed.`
+        : caveat.visibility === "private"
+          ? `:lock: *${caveat.repo}* is private — only people with access to it can read the issue.`
+          : `:globe_with_meridians: *${caveat.repo}* may be public — I couldn't check, so treat the issue as readable by anyone.`;
     return (
-      `:globe_with_meridians: *${caveat.repo}* is public — anyone can read the issue once it's filed. ` +
+      `${who} ` +
       "Check the body for anything from a DM or private channel before you approve; I add a footer naming you and linking this thread."
     );
   }
