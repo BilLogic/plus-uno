@@ -128,7 +128,7 @@
     "@vitest/coverage-v8": "^4.1.0",
     "agentic-service-blueprinting": "github:BilLogic/agentic-service-blueprinting#v1.44.29",
     "concurrently": "^10.0.5",
-    "dotenv": "^18.0.0",
+    "dotenv": "^18.0.1",
     "playwright": "^1.63.0",
     "sass": "^1.104.1",
     "storybook": "^10.5.0",
@@ -137,7 +137,7 @@
     "vitest": "^4.0.15"
   },
   "dependencies": {
-    "@assistant-ui/react": "^0.15.20",
+    "@assistant-ui/react": "^0.15.21",
     "@popperjs/core": "^2.11.8",
     "@vitejs/plugin-react": "^6.1.1",
     "bootstrap": "^5.3.3",
