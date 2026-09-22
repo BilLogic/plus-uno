@@ -74,7 +74,7 @@ crons = ["*/15 13-23 * * 1-5"]
 # value is wiped by the next deploy — as "pass:YYYY-MM-DD" plus any note. Until
 # then "on" is refused at runtime, logged once per isolate —
 # docs/connectors/slack.md § Streamed text.
-# SLACK_STREAM_MARKUP_PROBE = "pass:YYYY-MM-DD <what you saw>"
+SLACK_STREAM_MARKUP_PROBE = "pass:2026-09-22 r393 DM: raw bare <@teammate> + fenced <@teammate> <@U…> streamed via markdown_text, not blank; both shown literally, fenced one as code, real id in code did not ping"
 SLACK_STREAMING = "off"
 #
 # Plan-mode streaming: opens the turn's stream up front in
