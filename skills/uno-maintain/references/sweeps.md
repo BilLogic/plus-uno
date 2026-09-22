@@ -15,7 +15,7 @@ summary: docs/engineering/operations.md owns the sweep names (shipped watchdog �
   **headlessly on cron** — adapters in `scripts/prompts/uno-*/`, registry rows
   in `docs/engineering/operations.md`. Spot-run one with
   `gh workflow run <workflow-file>`; outcomes land in the Actions job summary
-  (`gh run view`). Their findings arrive via the headless sweep queue
+  (`gh run view`). Their findings arrive via the intake queue
   (SKILL.md § Intake sources), so don't re-run a sweep whose issues are still
   undrained.
 - Integrity sweep checklist:
