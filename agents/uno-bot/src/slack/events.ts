@@ -1,7 +1,7 @@
 import type { Env } from "../types";
 import { charge } from "../net";
 import { looksLikeCorrection } from "../agent/run-agent";
-import type { HistoryTurn, PendingProposal } from "../thread-state/index";
+import { DM_CONVERSATION, type HistoryTurn, type PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { conversationsReplies, getBotIdentity, postMessage } from "./api";
 import { buildFailureMessage } from "./failure-message";
@@ -260,8 +260,8 @@ function replyThreadTs(e: ThreadedEvent): string | undefined {
 }
 
 // Constant, not the message ts: every unthreaded message in a DM has to resolve
-// to the SAME conversation, or each line would start with an empty history.
-const DM_CONVERSATION = "dm";
+// to the SAME conversation, or each line would start with an empty history —
+// `DM_CONVERSATION`, stated once in the thread store.
 
 function conversationTs(e: ThreadedEvent): string {
   return isDm(e.channel) ? (e.thread_ts ?? DM_CONVERSATION) : (e.thread_ts ?? e.ts);

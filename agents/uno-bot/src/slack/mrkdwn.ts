@@ -84,6 +84,62 @@ export function sanitizeSlackBlocks<T>(blocks: T): T {
 }
 
 /**
+ * Where a stream's markup pass stands between two appends: the tail it has not
+ * sent yet, and whether the text sent so far ends a line.
+ */
+export interface StreamMarkupState {
+  /** Raw text held back because the next chunk could still change its reading. */
+  held: string;
+  /** True when the text sent so far is empty or ends with a newline. */
+  lineStart: boolean;
+}
+
+export const STREAM_MARKUP_START: StreamMarkupState = { held: "", lineStart: true };
+
+/**
+ * `sanitizeSlackMarkup` for a streamed message, one append at a time.
+ *
+ * A stream arrives in pieces, and markup does not respect the cut: `<@team`
+ * in one append and `mate>` in the next are one token, and passing each
+ * piece on its own would escape a valid `<@U…>` split the same way. So the
+ * tail that the next piece could still complete is held back — an unclosed
+ * `<…` on the last line, a partial entity (`&`, `&am`, `&lt`), a `>` run
+ * opening the last line — and goes out with the next piece, or escaped on
+ * `final`, which the stream's close passes.
+ *
+ * The pieces this returns, joined, equal `sanitizeSlackMarkup` of the joined
+ * input, wherever the cuts fall.
+ */
+export function sanitizeStreamChunk(
+  state: StreamMarkupState,
+  chunk: string,
+  final = false,
+): { text: string; state: StreamMarkupState } {
+  const input = state.held + chunk;
+  const cut = final ? input.length : holdFrom(input);
+  const emit = input.slice(0, cut);
+  // `sanitizeSlackMarkup` reads a `>` at offset 0 as a quote marker. A lead
+  // character tells it whether this piece really starts a line: a newline if
+  // it does, a letter if it continues one. Neither is touched by the pass.
+  const text = sanitizeSlackMarkup((state.lineStart ? "\n" : "x") + emit).slice(1);
+  return {
+    text,
+    state: { held: input.slice(cut), lineStart: emit ? emit.endsWith("\n") : state.lineStart },
+  };
+}
+
+/** Where the tail the next piece could still complete begins. */
+function holdFrom(input: string): number {
+  const lt = input.lastIndexOf("<");
+  if (lt >= 0 && !/[>\n]/.test(input.slice(lt))) return lt;
+  const amp = input.match(/&(?:a|am|amp|l|lt|g|gt)?$/);
+  if (amp) return input.length - amp[0].length;
+  const quote = input.match(/(?:^|\n)(>+)$/);
+  if (quote) return input.length - quote[1]!.length;
+  return input.length;
+}
+
+/**
  * A Slack user id: `U…` or `W…` and at least six more capitals and digits. The
  * one pattern for "is this a person Slack can mention" — `<@U...>` and
  * `<@teammate>` are exactly the tokens that blanked a message.

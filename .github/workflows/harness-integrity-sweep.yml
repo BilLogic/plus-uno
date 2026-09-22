@@ -140,8 +140,8 @@ jobs:
         run: |
           # `gh issue create --label X` errors if the label is missing —
           # ensure both intake labels deterministically, idempotently.
-          gh label create harness-intake --repo "$GITHUB_REPOSITORY" \
-            --description "Headless sweep finding awaiting uno-maintain triage" \
+          gh label create harness-intake --force --repo "$GITHUB_REPOSITORY" \
+            --description "Harness intake — headless sweep finding or uno-bot-filed request, awaiting uno-maintain triage" \
             --color D93F0B || true
           gh label create automation-blocked --repo "$GITHUB_REPOSITORY" \
             --description "A scheduled automation could not run — ops signal, not a design intake" \

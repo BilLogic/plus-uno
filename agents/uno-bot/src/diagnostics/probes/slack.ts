@@ -6,6 +6,7 @@ import { countedFetch } from "../../net";
 import { BUILD } from "../../version";
 import type { Env } from "../../types";
 import type { ProbeRun } from "../probe";
+import { DEFAULT_ALERT_CHANNEL } from "../../slack/delivery";
 
 // What the LIVE INSTALL actually grants for search — the three questions the
 // assistant.search.context plan could not answer from the manifest (a manifest
@@ -31,8 +32,11 @@ export const slackSearchProbe: ProbeRun = async (env, url) => ({
 // This runs in the Worker, so what deploys is what answers.
 //
 // ?channel= (required) ?thread_ts= ?user= ?team= — each argument independently
-// omittable, so the failing one can be bisected. Returns Slack's raw response.
-// Token-gated: it posts a real (empty) stream to the channel on success.
+// omittable, so the failing one can be bisected; ?text= streams that text
+// raw and closes (the markup probe). Returns Slack's raw responses.
+// Token-gated: it posts a real stream to the channel on success — empty
+// without ?text=, and left open until ?stop=; with ?text=, carrying that text
+// and closed.
 export const slackStreamProbe: ProbeRun = async (env, url) => {
   const channel = url.searchParams.get("channel");
   if (!channel) return { body: { ok: false, error: "channel required" }, status: 400 };
@@ -51,6 +55,11 @@ export const slackStreamProbe: ProbeRun = async (env, url) => {
     });
     return { body: { stopped: stopTs, slack: await r.json() } };
   }
+  const text = url.searchParams.get("text");
+  if (text !== null) {
+    const refusal = probeTextRefusal(channel, text, env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL);
+    if (refusal) return { body: { ok: false, error: refusal }, status: 400 };
+  }
   const payload: Record<string, unknown> = { channel };
   for (const [param, field] of [
     ["thread_ts", "thread_ts"],
@@ -64,16 +73,48 @@ export const slackStreamProbe: ProbeRun = async (env, url) => {
   // invisible in the Messages tab until you click "N replies"; broadcasting
   // puts it in the main timeline too.
   if (url.searchParams.get("broadcast")) payload.reply_broadcast = true;
-  const res = await countedFetch("https://slack.com/api/chat.startStream", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-      authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
-    },
-    body: JSON.stringify(payload),
-  });
-  return { body: { sent: payload, status: res.status, slack: await res.json() } };
+  const call = (method: string, body: Record<string, unknown>) =>
+    countedFetch(`https://slack.com/api/${method}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
+      },
+      body: JSON.stringify(body),
+    });
+  const res = await call("chat.startStream", payload);
+  const slack = (await res.json()) as { ok?: boolean; ts?: string };
+  // ?text= — the markup probe (docs/connectors/slack.md § Streamed text):
+  // append this text AS GIVEN, bypassing the markup pass on purpose, then
+  // close the stream. Whether the rendered message is blank is what it asks,
+  // so the answer is in the channel, not in this response.
+  //
+  // Raw text is the one thing this route sends that the Worker would not, so
+  // it goes only to a DM or the alert channel, and only so much of it.
+  if (text && slack.ok && slack.ts) {
+    const append = (await (await call("chat.appendStream", { channel, ts: slack.ts, markdown_text: text })).json()) as {
+      ok?: boolean;
+    };
+    const stop = await call("chat.stopStream", { channel, ts: slack.ts });
+    // `appended` up top: a failed append is no probe, whatever `slack` says.
+    return {
+      body: { appended: append.ok === true, sent: payload, status: res.status, slack, append, stop: await stop.json() },
+    };
+  }
+  return { body: { sent: payload, status: res.status, slack } };
 };
+
+/** The longest raw text the markup probe streams. */
+export const PROBE_TEXT_LIMIT = 2_000;
+
+/** Why the markup probe will not stream `text` to `channel`, or null if it will. */
+export function probeTextRefusal(channel: string, text: string, alertChannel: string): string | null {
+  if (!text) return "text is empty";
+  if (text.length > PROBE_TEXT_LIMIT) return `text is ${text.length} chars; the probe takes at most ${PROBE_TEXT_LIMIT}`;
+  if (!channel.startsWith("D") && channel !== alertChannel)
+    return `text= streams raw text only to a DM (D…) or the alert channel ${alertChannel}, not ${channel}`;
+  return null;
+}
 
 // Publish the App Home view and return Slack's raw verdict.
 //

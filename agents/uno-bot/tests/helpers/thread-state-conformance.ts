@@ -22,6 +22,7 @@ import assert from "node:assert/strict";
 
 import {
   CANCEL_TTL_MS,
+  DM_CONVERSATION,
   EVENT_DEDUP_TTL_MS,
   EXECUTION_CUTOFF_MS,
   HISTORY_TTL_MS,
@@ -567,13 +568,13 @@ export function runThreadStateConformance(
 
   it("the in-thread take is keyed on the card's reply thread", async () => {
     const { store, clock } = setup();
-    // A DM: every ask shares the conversation "dm", and each card has its own
-    // reply thread — the grain `getProposalByThread` answers on.
+    // A DM: every ask shares the conversation `DM_CONVERSATION`, and each card
+    // has its own reply thread — the grain `getProposalByThread` answers on.
     await store.beginExecution(
-      proposal({ channel: "D1", threadTs: "dm", replyTs: "1700.5", proposalTs: "1700.6" }),
+      proposal({ channel: "D1", threadTs: DM_CONVERSATION, replyTs: "1700.5", proposalTs: "1700.6" }),
     );
     clock.advance(EXECUTION_CUTOFF_MS + 1);
-    assert.equal(await store.takeCutOffExecutionInThread({ channel: "D1", thread: "dm" }), null);
+    assert.equal(await store.takeCutOffExecutionInThread({ channel: "D1", thread: DM_CONVERSATION }), null);
     assert.equal(await store.takeCutOffExecutionInThread({ channel: "D1", thread: "1700.9" }), null);
     const taken = await store.takeCutOffExecutionInThread({ channel: "D1", thread: "1700.5" });
     assert.equal(taken?.proposal.proposalTs, "1700.6");
