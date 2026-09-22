@@ -177,9 +177,11 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
       },
       // The repo a GitHub intake lands in, resolved from its `repo` input as
       // the executor resolves it, and whether that repo is public — asked of
-      // GitHub once per isolate. Preflight has already turned a repo the
-      // resolver refuses into an ask, so the fallback is never a card anyone
-      // sees — and the executor would refuse that filing anyway.
+      // GitHub once per isolate. Preflight has already turned every refusal —
+      // an unlisted repo, or a misconfigured list that reaches none — into an
+      // ask or a plain refusal before staging (`tests/github-intake.test.ts`),
+      // so this fallback, which names `GITHUB_REPO`, is never a card anyone
+      // sees; and the executor would refuse that filing anyway.
       async issueTarget(input) {
         const target = resolveRepoFor(env, input.repo);
         if (!target.ok) return { repo: env.GITHUB_REPO, visibility: "unknown" };

@@ -470,6 +470,36 @@ test("a marketing-site 'track this' stages a card naming plus-marketing-website 
   assert.deepEqual(h.ran, []);
 });
 
+// The requester stays in control of routing: "put it on plus-uno instead"
+// retires the first card and stages one naming the new repo.
+test("redirecting an intake's repo supersedes its card with one naming the new repo", async () => {
+  const SITE = "BilLogic/plus-marketing-website";
+  const HARNESS = "BilLogic/plus-uno";
+  const draft = { title: "Hero CTA links nowhere", body: "The hero button on the home page 404s." };
+  const h = harness({
+    replies: [
+      { text: "Filing it on the marketing site.", toolCalls: [{ name: "github_issue_create", args: { ...draft, repo: SITE } }] },
+      { text: "Moving it to plus-uno.", toolCalls: [{ name: "github_issue_create", args: { ...draft, repo: HARNESS } }] },
+    ],
+    issueTarget: (staged) => ({ repo: String(staged.repo), visibility: "public" }),
+  });
+
+  const first = await runTurn(request({ text: "the hero button 404s — track this on GitHub" }), h.deps);
+  assert.equal(first.staged!.card.verb, `file a GitHub issue on ${SITE}`);
+  const firstTs = first.staged!.proposal.proposalTs;
+
+  const second = await runTurn(
+    request({ text: "put it on plus-uno instead", pending: first.staged!.proposal }),
+    h.deps,
+  );
+  assert.equal(second.disposition, "staged");
+  assert.equal(second.staged!.card.verb, `file a GitHub issue on ${HARNESS}`);
+  assert.deepEqual(second.staged!.card.caveats, [{ kind: "repo-visibility", repo: HARNESS, visibility: "public" }]);
+  assert.equal((await h.threadState.getProposalByTs(firstTs)).state, "superseded");
+  assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, second.staged!.proposal.proposalTs);
+  assert.deepEqual(h.ran, []);
+});
+
 test("an intake card says a private repo is private, and a repo it couldn't check may be public", async () => {
   for (const [visibility, words] of [
     ["private", "* is private"],

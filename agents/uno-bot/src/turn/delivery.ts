@@ -95,7 +95,9 @@ export type CardCaveat =
   | { kind: "repo-visibility"; repo: string; visibility: RepoVisibility };
 
 /** Who can read a listed repo's issues; `unknown` when GitHub would not say,
- *  which the card words as "may be public". */
+ *  which the card words as "may be public". The same union as
+ *  `RepoVisibility` in `integrations/github.ts`, restated so the turn imports
+ *  no integration; keep the two in step. */
 export type RepoVisibility = "public" | "private" | "unknown";
 
 /** Where a staged intake would land: the listed repo the Worker resolved, and

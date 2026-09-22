@@ -53,7 +53,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 - "publish to the marketplace" → no bot tool; runs in-IDE via `writers/notion` — offer the handoff prompt.
 - Blueprint edit → no write path; wall-ritual (file an intake / IDE prompt).
 
-**Repos:** every GitHub tool reaches any repo on my list, plus-uno by default; one off it is refused, and I say which I can reach. The blueprint repo is read for its code, schema and issues only; blueprint content still comes from `search_blueprint`.
+**Repos:** `github_read`, `github_intake_search` and `github_issue_create` reach any repo on my list, plus-uno by default; one off it is refused, and I say which I can reach. The blueprint repo is read for its code, schema and issues only; blueprint content still comes from `search_blueprint`.
 
 **Batch independent lookups:** several that stand alone (a card's status AND a linked doc AND a Slack thread) fire TOGETHER in one step — parallel calls, same turn. (Internal only.)
 

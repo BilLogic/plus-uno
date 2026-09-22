@@ -65,6 +65,7 @@ export function resolveRepoFor(env: Env, requested: unknown): RepoResolution {
   if (list instanceof RepoListError) {
     return {
       ok: false,
+      misconfigured: true,
       error: `The Worker's GitHub repo list is misconfigured (${list.message}), so no repo is reachable until it is fixed.`,
     };
   }
@@ -294,12 +295,15 @@ export function githubIssueClient(env: Env, target: RepoEntry): GithubIssueClien
 }
 
 /** Who can read a listed repo's issues, as the intake card states it —
- *  `unknown` when GitHub would not say. */
+ *  `unknown` when GitHub would not say. Restated as the card's type in
+ *  `turn/delivery.ts`; keep the two in step. */
 export type RepoVisibility = "public" | "private" | "unknown";
 
 /** Answers GitHub gave, kept for the isolate's life: a repo turning private is
  *  rare, and every intake card would otherwise spend a subrequest asking. A
- *  failed lookup is not kept, so the next card asks again. */
+ *  failed lookup is not kept, so the next card asks again. Keyed lower-case
+ *  because GitHub repo names are case-insensitive, as the list's own matching
+ *  (`repo-list.mjs`) treats them. */
 const visibilityByRepo = new Map<string, "public" | "private">();
 
 /**

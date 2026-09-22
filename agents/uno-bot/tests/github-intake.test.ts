@@ -248,6 +248,26 @@ test("preflight refuses an intake aimed at a repo off the list, naming the list,
   assert.ok(ask, "an unlisted repo must not reach the card");
   assert.match(ask.ask, /someone\/else/);
   assert.match(ask.ask, /BilLogic\/plus-marketing-website \(the public marketing site\)/);
+  assert.match(ask.ask, /Which of those/);
+});
+
+test("preflight refuses plainly when the repo list itself is broken — no repo to choose, so no question", async () => {
+  const broken = { GITHUB_REPO: REPO, GITHUB_REPOS: "[not json" } as unknown as Env;
+  for (const input of [{ ...DRAFT }, { ...DRAFT, repo: "BilLogic/plus-marketing-website" }]) {
+    const ask = await preflight("github_issue_create", input, { env: broken, prd: null });
+    assert.ok(ask, JSON.stringify(input));
+    assert.match(ask.ask, /misconfigured/);
+    assert.match(ask.ask, /Tell Bill the repo list is broken/);
+    assert.doesNotMatch(ask.ask, /Which of those/);
+  }
+});
+
+test("an omitted repo is the default, with or without a list", async () => {
+  const unset = { GITHUB_REPO: REPO } as unknown as Env;
+  for (const env of [unset, LISTED_ENV]) {
+    assert.equal(await preflight("github_issue_create", { ...DRAFT }, { env, prd: null }), null);
+    assert.equal(await preflight("github_issue_create", { ...DRAFT, repo: "  " }, { env, prd: null }), null);
+  }
 });
 
 test("preflight lets a listed repo, or none, through to the card", async () => {

@@ -207,11 +207,15 @@ export async function preflight(
     case "github_issue_create": {
       // The repo must be on the Worker's list: an unlisted one is refused here,
       // naming the list, so no card offers a filing the executor would refuse.
+      // An omitted repo is the default, which resolves whenever the list parses.
       const target = resolveRepoFor(ctx.env, input.repo);
-      if (!target.ok) {
-        return { ask: `:mag: ${target.error} Which of those should this intake go on?` };
+      if (target.ok) return null;
+      // A list that fails to parse offers no repo to choose from, so there is
+      // nothing to ask — only a cause, and who can fix it.
+      if (target.misconfigured) {
+        return { ask: `:x: I can't file a GitHub issue right now — ${target.error} Tell Bill the repo list is broken.` };
       }
-      return null;
+      return { ask: `:mag: ${target.error} Which of those should this intake go on?` };
     }
 
     case "shareout_post": {
