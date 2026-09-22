@@ -46,11 +46,11 @@ the marker is what a relaxed or raised budget would have to explain.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **6 reference(s), 42,979 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **6 reference(s), 43,144 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,254 |
+| `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,419 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
 | `uno-research/method` | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 |
@@ -1724,10 +1724,12 @@ The taxonomy is the harness map — when a new component joins the harness, this
 
 **Headless surrogate:** scheduled sweeps run without Notion access and file
 their intakes as GitHub issues labeled `harness-intake` (transport contract:
-`scripts/prompts/references/headless-intake.md`). That queue feeds THIS
-pipeline: every maintain session's intake step starts by draining it — triage
-each open `harness-intake` issue into a Roadmap card (or straight into §2–§4
-when acted on immediately), then close the issue as incorporated. An
+`scripts/prompts/references/headless-intake.md`); uno-bot files its intakes
+the same way, on whichever repo in its `GITHUB_REPOS` list the change belongs
+to. That multi-repo queue feeds THIS pipeline: every maintain session's intake
+step starts by draining it — `npm run intake:queue` reads every listed repo —
+triaging each open `harness-intake` issue into a Roadmap card (or straight
+into §2–§4 when acted on immediately), then closing it as incorporated. An
 unwatched surrogate queue silently defeats every sweep that files into it.
 
 **Cross-estate inconsistencies are a known open area.** When two estates disagree, decide which side is believed wrong (DS precedence: uno-storybook > BS4 Foundation library > Figma spec pages), route there, and **flag the intake as cross-estate** — don't improvise a routing convention.
