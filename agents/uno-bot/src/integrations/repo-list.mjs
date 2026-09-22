@@ -8,7 +8,7 @@
 //   { "repo": "owner/name", "purpose": "what the repo is for", "workflows": [] }
 //
 // — `purpose` is the short phrase the persona routes on, and `workflows` names
-// the workflow files that may be dispatched there (none yet). `GITHUB_REPO` is
+// the workflow files `github_workflow_run` may dispatch there. `GITHUB_REPO` is
 // the default entry: a tool call that names no repo lands there, and an unset
 // list is that one repo alone, so a Worker without the var behaves as it did
 // before there was one.

@@ -63,16 +63,41 @@ test("a value this reader cannot read throws rather than reading as unset", () =
 
 const LIST = parseRepoList(varValueInWrangler(TOML, "GITHUB_REPOS"), varValueInWrangler(TOML, "GITHUB_REPO"));
 
-test("the committed list declares the three repos, each with a purpose and no workflows yet", () => {
+test("the committed list declares the three repos, each with a purpose and its runnable workflows", () => {
   assert.deepEqual(
     LIST.entries.map((e) => e.repo),
     ["BilLogic/plus-uno", "BilLogic/plus-marketing-website", "BilLogic/plus-uno-blueprint"],
   );
   assert.equal(LIST.defaultEntry.repo, "BilLogic/plus-uno");
-  for (const e of LIST.entries) {
-    assert.ok(e.purpose.length > 0, `${e.repo} has no purpose`);
-    assert.deepEqual(e.workflows, [], `${e.repo} lists workflows`);
-  }
+  for (const e of LIST.entries) assert.ok(e.purpose.length > 0, `${e.repo} has no purpose`);
+  // Which workflows a Slack ✅ may start is a reviewed choice: a change here is
+  // a change to what the bot can run, so it is spelled out rather than counted.
+  assert.deepEqual(
+    Object.fromEntries(LIST.entries.map((e) => [e.repo, e.workflows])),
+    {
+      "BilLogic/plus-uno": [],
+      "BilLogic/plus-marketing-website": ["sync-notion.yml"],
+      "BilLogic/plus-uno-blueprint": [
+        "bot-contract-probe.yml",
+        "docs-harness.yml",
+        "gates.yml",
+        "offline-board.yml",
+        "render-walk.yml",
+      ],
+    },
+  );
+});
+
+test("github_workflow_run offers exactly the workflows the list allows", () => {
+  // The enum is the model's copy of the allowlist; the Worker still checks
+  // the workflow against the chosen repo's own entry.
+  const tools = JSON.parse(readFileSync(path.join(PKG, "tool-definitions.json"), "utf8"));
+  const run = tools.find((t) => t.name === "github_workflow_run");
+  assert.ok(run, "github_workflow_run has a schema");
+  assert.deepEqual(
+    run.input_schema.properties.workflow.enum,
+    LIST.entries.flatMap((e) => e.workflows),
+  );
 });
 
 test("every tool schema that takes a repo offers exactly the listed repos", () => {

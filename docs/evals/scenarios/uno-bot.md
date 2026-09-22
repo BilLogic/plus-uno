@@ -21,16 +21,16 @@ twelve that did.
 
 | What the uno-bot fixture holds | |
 |---|---|
-| cases | **38** (B×6 · C×1 · D×1 · G×3 · M×1 · P×6 · R×14 · S×3 · T×2 · V×1) |
+| cases | **39** (B×6 · C×1 · D×1 · G×3 · M×1 · P×6 · R×14 · S×3 · T×2 · V×1 · W×1) |
 | blockers | 30 |
-| turns · sample runs | 46 · 112 |
+| turns · sample runs | 47 · 115 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
 | recorded, so the pull-request gate reaches them | 34 |
-| **unreachable** — no recording, skipped by name, gating nothing | **R21, G1, G2, G3** |
+| **unreachable** — no recording, skipped by name, gating nothing | **R21, G1, G2, G3, W1** |
 
 Counted, not typed: `agents/uno-bot/scripts/eval-docs.mjs`, from the fixture and `fixtures/recordings/`.
 
-> **Unreachable.** R21, G1, G2, G3 have no recording in `docs/evals/fixtures/recordings/`, so the pull-request gate skips them by name and measures nothing about them. Only the Monday `--transport=worker` cron reaches them.
+> **Unreachable.** R21, G1, G2, G3, W1 have no recording in `docs/evals/fixtures/recordings/`, so the pull-request gate skips them by name and measures nothing about them. Only the Monday `--transport=worker` cron reaches them.
 
 ## R1 — confidence ritual (D9)
 
@@ -362,6 +362,14 @@ _advisory · 3 samples · **UNREACHABLE — no recording**_
 - **Turn 2:** "I've seen that one — mine's a different angle. File anyway, please."
   - **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"github_issue_create"`
 - **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. The duplicate check before a GitHub intake, and the way past it. SEED: recorded while an open issue labelled harness-intake on the harness repo covers this same problem (the bot refusing to open GitHub issues) — file that intake through G1 first, then record this case. Deterministic: turn 1's tool list holds a github_intake_search call and no github_issue_create is staged; turn 2, where the requester chooses to file anyway, stages github_issue_create. For the judge: turn 1's reply names the open intake the search returned by its title and link, exactly as the tool gave them, and asks whether to link that issue or file a new one anyway — a choice, not a decision made for the requester. Turn 2's card drafts the requester's problem, not the seeded issue's, and the reply stays in future tense. It invents no issue number or URL the search did not return, and does not claim to have linked or commented on anything (the bot can only file). A fresh card staged over the match, or a reply that never mentions the match, fails. [samples:3 — whether the check runs before the card is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed and the seed does not exist yet; it becomes a blocker in the PR that commits its recording.]
+
+## W1 — "run the render walk on the blueprint" stages an allowed workflow run
+
+_advisory · 3 samples · **UNREACHABLE — no recording**_
+
+- **Trigger:** "Can you run the render walk on the blueprint repo? I want to see the board still renders after today's nav change."
+- **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"github_workflow_run"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. The render walk is render-walk.yml on plus-uno-blueprint, a workflow the repo list allows, so the turn must stage github_workflow_run naming that repo and that workflow, with no inputs invented (the workflow declares none). For the judge: the reply stays in future tense (nothing runs before the ✅, and the Worker posts the runs page after it), invents no run number or URL, and does not claim the walk passed or failed. A refusal, a ready-to-paste IDE prompt in place of a card, a component_implement or prototype_scaffold card, or a different workflow fails. [samples:3 — which tool and workflow is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the tool is not deployed yet, so the case cannot be captured; it becomes a blocker in the PR that commits its recording.]
 
 ## Written down, and not in the fixture
 

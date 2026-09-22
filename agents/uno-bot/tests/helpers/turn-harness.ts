@@ -51,6 +51,9 @@ export const REF = { channel: CHANNEL, thread: CONVERSATION };
 /** The repo a GitHub intake lands in, as the Worker's config would name it —
  *  deliberately not the production value, so a literal in the turn would show. */
 export const ISSUE_REPO = "example-org/harness";
+/** The default branch a workflow run with no ref goes to, as the Worker's read
+ *  of the repo would answer — not "main", so a literal in the turn would show. */
+export const WORKFLOW_DEFAULT_REF = "trunk";
 
 /** A meter that spends nothing: no case here is about the budget (that is
  *  `agent-loop.test.ts`), and a turn must not need one to run. */
@@ -248,6 +251,11 @@ export function harness(opts: {
         return "https://figma.example/preview.png";
       },
       issueRepo: () => ISSUE_REPO,
+      async workflowTarget(input) {
+        const repo = typeof input.repo === "string" && input.repo ? input.repo : ISSUE_REPO;
+        const ref = typeof input.ref === "string" && input.ref ? input.ref : WORKFLOW_DEFAULT_REF;
+        return { repo, ref };
+      },
     },
 
     async readAntecedent() {

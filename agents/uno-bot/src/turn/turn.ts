@@ -361,6 +361,10 @@ export interface TurnDeps {
     /** The repo a `github_issue_create` files into — the Worker's
      *  `GITHUB_REPO`, so the card names where the issue will actually land. */
     issueRepo(): string;
+    /** Where a `github_workflow_run` would run: the listed repo its `repo`
+     *  resolves to and the ref — its own, or the repo's default branch — or
+     *  null when the repo is off the list. */
+    workflowTarget(input: Record<string, unknown>): Promise<{ repo: string; ref: string } | null>;
   };
 
   /**
@@ -1335,6 +1339,19 @@ async function buildCard(
     // and the card is the one place a person reads the body before it goes
     // out — so every such card says so, naming the repo the Worker files into.
     return { ...card, caveats: [{ kind: "public-repo", repo: deps.cards.issueRepo() }] };
+  }
+
+  if (toolName === "github_workflow_run") {
+    // What the ✅ starts, in full: the repo and ref as they will be sent — a
+    // repo or ref the model left out is named, not left for a person to guess.
+    const target = await deps.cards.workflowTarget(input);
+    const inputs =
+      input.inputs && typeof input.inputs === "object" && Object.keys(input.inputs).length > 0
+        ? input.inputs
+        : undefined;
+    return target
+      ? { ...card, fields: cardFieldsOf({ repo: target.repo, workflow: input.workflow, ref: target.ref, inputs }) }
+      : card;
   }
 
   if (toolName === "prototype_scaffold") {

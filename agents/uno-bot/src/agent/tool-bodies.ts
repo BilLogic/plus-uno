@@ -42,6 +42,7 @@ import { executeSendEmail } from "../tools/send-email";
 import { executeShareForFeedback } from "../tools/share-for-feedback";
 import { executeRelayDm, relaySlackFor } from "../tools/relay-dm";
 import { executeGithubIssueCreate } from "../tools/github-issue";
+import { executeGithubWorkflowRun } from "../tools/github-workflow";
 import type { ToolName } from "./tool-table";
 
 /**
@@ -80,6 +81,7 @@ export const TOOL_BODIES: Record<ToolName, ToolBody> = {
   email_send: (env, input, slack) => executeSendEmail(env, input, slack),
   dm_relay: (env, input, slack) => executeRelayDm({ slack: relaySlackFor(env) }, input, slack),
   github_issue_create: (env, input, slack) => executeGithubIssueCreate(env, input, slack),
+  github_workflow_run: (env, input, slack) => executeGithubWorkflowRun(env, input, slack),
   // `control`, and so the one row whose body is never reached: the loop
   // intercepts `proposal_resolve` and validates it against the standing card
   // before any dispatch. The row still carries a body because the pairing is

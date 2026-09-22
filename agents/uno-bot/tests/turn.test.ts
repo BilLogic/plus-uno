@@ -44,6 +44,7 @@ import {
   DEFAULT_CONFIRM_NOTE,
   ISSUE_REPO,
   PENDING,
+  WORKFLOW_DEFAULT_REF,
   REF,
   harness,
   postsOf,
@@ -437,6 +438,51 @@ test("'track this on GitHub' stages an issue card showing the title, the body an
   assert.deepEqual(filed, []);
   assert.deepEqual(h.ran, []);
   assert.deepEqual(h.resolved, []);
+});
+
+// A workflow run starts a real Actions run, so the card names everything the
+// ✅ sends — the repo and ref too, when the model left them to the defaults —
+// and nothing is dispatched until the ✅.
+test("'run the render walk on the blueprint' stages a card naming repo, workflow, ref and inputs, and dispatches nothing", async () => {
+  const dispatched: string[] = [];
+  const h = harness({
+    replies: [
+      {
+        text: "I'll start the render walk on the blueprint.",
+        toolCalls: [
+          {
+            name: "github_workflow_run",
+            args: { repo: "BilLogic/plus-uno-blueprint", workflow: "render-walk.yml", inputs: { note: "after the nav change" } },
+          },
+        ],
+      },
+    ],
+    executeOperation: async (operation) => {
+      dispatched.push(operation.toolName);
+      return JSON.stringify({ ok: true });
+    },
+  });
+  const outcome = await runTurn(request({ text: "run the render walk on the blueprint" }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  assert.equal(outcome.staged!.proposal.toolName, "github_workflow_run");
+  const card = outcome.staged!.card;
+  assert.equal(card.verb, "run a GitHub workflow");
+  assert.deepEqual(card.fields, [
+    { label: "repo", value: "BilLogic/plus-uno-blueprint" },
+    { label: "workflow", value: "render-walk.yml" },
+    // No ref was named, so the card names the default branch it will run at.
+    { label: "ref", value: WORKFLOW_DEFAULT_REF },
+    { label: "inputs", under: [{ field: { label: "note", value: "after the nav change" } }] },
+  ]);
+  const text = renderProposalCard(card).text;
+  assert.ok(text.includes("render-walk.yml"), text);
+  assert.ok(text.includes(WORKFLOW_DEFAULT_REF), text);
+
+  // Staged, not run.
+  assert.equal((await h.threadState.getProposalByThread(REF))?.toolName, "github_workflow_run");
+  assert.deepEqual(dispatched, []);
+  assert.deepEqual(h.ran, []);
 });
 
 // A revised card retires the one it replaces (#573) — and a turn that stages

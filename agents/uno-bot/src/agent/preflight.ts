@@ -22,6 +22,8 @@ import { listDsComponents, matchComponent, closestComponents } from "../integrat
 // Node test can both reach it without dragging `Env` behind them.
 import { placeholderRefusal } from "./placeholder";
 import { relayRecipientId } from "../tools/relayed-dm-render";
+import { checkWorkflowRun } from "../tools/github-workflow-render";
+import { resolveRepoFor } from "../integrations/github";
 
 export interface PreflightCtx {
   env: Env;
@@ -201,6 +203,13 @@ export async function preflight(
         return { ask: ":incoming_envelope: What should the DM say? Give me the message and I'll stage it for your ✅." };
       }
       return null;
+    }
+
+    case "github_workflow_run": {
+      // Only a workflow the repo list names, on a repo it lists — refused here,
+      // naming what IS allowed, so nothing unlisted is ever put on a card.
+      const checked = checkWorkflowRun(input, resolveRepoFor(ctx.env, input.repo));
+      return checked.ok ? null : { ask: `:gear: ${checked.error}` };
     }
 
     case "shareout_post": {

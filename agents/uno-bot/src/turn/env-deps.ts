@@ -32,6 +32,7 @@ import { formatAssistantContext } from "../slack/assistant";
 import { buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
 import { renderDeliveredBody } from "../slack/render";
 import { fetchFigmaImagePngUrl, parseFigmaUrl } from "../integrations/figma";
+import { githubWorkflowClient, resolveRepoFor } from "../integrations/github";
 import type { ThreadState } from "../thread-state/index";
 import type { Env } from "../types";
 import type { Delivery } from "./delivery";
@@ -177,6 +178,19 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
       // The repo a GitHub intake lands in, for the card's public-repo notice —
       // the same `GITHUB_REPO` the issue client files into.
       issueRepo: () => env.GITHUB_REPO,
+      // A run's repo and ref as the executor will send them: the same resolver,
+      // and the same cached default branch when no ref was named.
+      async workflowTarget(input) {
+        const target = resolveRepoFor(env, input.repo);
+        if (!target.ok) return null;
+        const asked = typeof input.ref === "string" ? input.ref.trim() : "";
+        const ref =
+          asked ||
+          (await githubWorkflowClient(env, target.entry)
+            .defaultBranch()
+            .catch(() => "the repo's default branch"));
+        return { repo: target.entry.repo, ref };
+      },
     },
 
     async readAntecedent(channel, beforeTs, limit) {

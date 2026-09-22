@@ -164,6 +164,9 @@ function harness(
         return null;
       },
       issueRepo: () => "BilLogic/plus-uno",
+      async workflowTarget() {
+        return null;
+      },
     },
 
     async readAntecedent() {

@@ -685,6 +685,51 @@
     }
   },
   {
+    "name": "github_workflow_run",
+    "description": "SIDE EFFECT (starts a real GitHub Actions run), routed through the confirmation gate. Run a workflow the bot's repo list allows on a listed repo — 're-sync Notion on the marketing site' (sync-notion.yml on plus-marketing-website), 'run the render walk on the blueprint' (render-walk.yml on plus-uno-blueprint). Only a workflow named for that repo on the list can run; anything else is refused before a card, and the refusal names the allowed ones. Never a stand-in for component_implement or prototype_scaffold. The card shows the repo, workflow, ref and inputs; past the ✅ the thread gets the workflow's runs page.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workflow"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "enum": [
+            "BilLogic/plus-uno",
+            "BilLogic/plus-marketing-website",
+            "BilLogic/plus-uno-blueprint"
+          ],
+          "description": "Optional: a repo on the bot's list; omit for the default, plus-uno."
+        },
+        "workflow": {
+          "type": "string",
+          "enum": [
+            "sync-notion.yml",
+            "bot-contract-probe.yml",
+            "docs-harness.yml",
+            "gates.yml",
+            "offline-board.yml",
+            "render-walk.yml"
+          ],
+          "description": "The workflow's file name under .github/workflows/, as the repo list names it for that repo."
+        },
+        "ref": {
+          "type": "string",
+          "description": "Optional branch or tag to run at. Omit for the repo's default branch."
+        },
+        "inputs": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional workflow_dispatch inputs as string key/values, passed through verbatim. Omit when the workflow takes none."
+        }
+      }
+    }
+  },
+  {
     "name": "proposal_resolve",
     "description": "Resolve a side-effect proposal that is awaiting confirmation. Use it when the system prompt shows a pending proposal AND the user's current message is a decision about it, in whatever words — a yes ('go ahead', 'sure', 'ok', 'sounds good', 'yep do it') confirms; a no ('cancel', 'no', 'scrap it') cancels. Anyone in the thread may confirm or cancel, not just the original requester. A message that asks for a change, or asks something unrelated, gets a conversational reply instead, and the proposal sits until someone presses ✅ / ⛔ on the card, reacts, or it expires after 60 minutes.",
     "input_schema": {
