@@ -283,13 +283,18 @@ test('an exemption whose OWN repos were both read is still asserted', () => {
   // makes a single absent repo a normal month rather than an exceptional one,
   // so a deduplicated pair could survive as a stale entry indefinitely.
   //
-  // Both RECORDED entries are blueprint↔sb, so dropping plus-uno leaves them
-  // fully reachable while the run as a whole is not.
+  // Every RECORDED entry is blueprint↔sb, so dropping plus-uno leaves them all
+  // fully reachable while the run as a whole is not. Counted from the list
+  // rather than written out, so recording a pair does not fail this.
   const e = estate({});
   try {
     const r = sweep({ ...e.roots, 'plus-uno': null });
     assert.deepEqual(r.reached, ['blueprint', 'sb']);
-    assert.equal(r.stale.length, 2, `both entries are asserted:\n${r.stale.join('\n')}`);
+    assert.equal(
+      r.stale.length,
+      RECORDED.length,
+      `every entry is asserted:\n${r.stale.join('\n')}`,
+    );
     for (const s of r.stale) assert.match(s, /shares nothing any more/);
   } finally {
     e.done();
