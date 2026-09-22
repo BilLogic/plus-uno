@@ -57,7 +57,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`agents/reviewers/a11y-lens.md`](agents/reviewers/a11y-lens.md) | Judges an artifact's accessibility: color contrast, focus order, accessible labels, touch-target sizes, keyboard operability |
 | [`agents/reviewers/auditor.md`](agents/reviewers/auditor.md) | The standing-sweep role: given a named checklist (shipped watchdog, conventions staleness, Figma hygiene, agents↔docs cross-references), walks the estate and files an intake per di |
 | [`agents/reviewers/design-qa.md`](agents/reviewers/design-qa.md) | Catches spec-vs-implementation drift before ship: walks the QA site against the [spec] Figma file for the Roadmap card, using the Design QA checklist |
-| [`agents/reviewers/ds-lens.md`](agents/reviewers/ds-lens.md) | Judges an artifact against the design system — components, tokens, layout, and the forbidden patterns. |
+| [`agents/reviewers/ds-lens.md`](agents/reviewers/ds-lens.md) | Judges an artifact against the design system — components, tokens, layout, and the hard rules. |
 | [`agents/reviewers/rubric-applier.md`](agents/reviewers/rubric-applier.md) | The one agent that turns 'is this good?' into numbers: given an artifact + a rubric name, scores every dimension 1–5, checks every hard gate pass/fail, and appends the run entry |
 | [`agents/reviewers/uno-lens.md`](agents/reviewers/uno-lens.md) | Judges whether the artifact does what the PRD says and violates no known blueprint constraint (target: docs/evals/rubrics/uno-review.md → groundingfidelity) |
 | [`agents/uno-bot/AGENT.md`](agents/uno-bot/AGENT.md) | The Worker persona delta — how uno-bot differs from the constitution. |

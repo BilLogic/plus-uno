@@ -1,7 +1,7 @@
 ---
 name: reviewers/ds-lens
 description: Design-system conformance lens — real components, real tokens, no lookalikes. Diagnose-only.
-summary: Judges an artifact against the design system — components, tokens, layout, and the forbidden patterns.
+summary: Judges an artifact against the design system — components, tokens, layout, and the hard rules.
 ---
 
 # reviewers/ds-lens
@@ -23,5 +23,5 @@ Judges an artifact against the design system: components sourced from BS4/uno-st
 
 ## Conventions it obeys
 
-- `AGENTS.md` § Hard rules — the DS rules by their parenthesised names: `tokens-over-literals`, `DS-knowledge-is-law`, `no-hallucinated-layouts`, `no-hallucinated-props`, `read-source-first`, `PLUS-components-first`, `no-deep-imports`, `no-duplicate-components`, `generated-tokens`, `Storybook-validation`, `FA-Free-only`
+- `AGENTS.md` § Hard rules — the DS rules by their parenthesised names: `tokens-over-literals`, `DS-knowledge-is-law`, `layout-formulas-first`, `no-hallucinated-props`, `read-source-first`, `PLUS-components-first`, `no-deep-imports`, `no-duplicate-components`, `no-hand-edited-generated-files`, `Storybook-validation`, `FA-Free-only`
 - Scored by: `docs/evals/rubrics/uno-review.md` (recall/precision on the golden defect set)

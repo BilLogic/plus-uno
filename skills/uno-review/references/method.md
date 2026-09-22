@@ -30,11 +30,11 @@ Lenses run **in parallel** and stay in-lane — no lens comments outside its own
 |---|---|---|
 | low (FigJam flows, sketches, paper) | flow logic, structure, product intent, structural a11y (reading order, labeled steps) | tokens, components, visual polish |
 | mid (interactive drafts) | the above + layout patterns, interaction behavior, terminology, content voice | token-level fidelity, prop correctness |
-| high / coded | everything: tokens vs hardcoded values, real DS components with verified props, computed contrast, focus behavior, forbidden patterns | — |
+| high / coded | everything: tokens vs hardcoded values, real DS components with verified props, computed contrast, focus behavior, the hard rules | — |
 
 What each lens applies (the rules live in the docs, not here):
 
-- `reviewers/ds-lens` — components / tokens / layout vs the DS agent-views and AGENTS.md forbidden patterns. Coded artifacts: also the catch-pattern greps (`references/catch-patterns.md`, automated by `skills/uno-review/scripts/run-review-checks.sh`).
+- `reviewers/ds-lens` — components / tokens / layout vs the DS agent-views and `AGENTS.md` § Hard rules. Coded artifacts: also the catch-pattern greps (`references/catch-patterns.md`, automated by `skills/uno-review/scripts/run-review-checks.sh`).
 - `reviewers/uno-lens` — artifact vs PRD + uno-blueprint constraints, queried live at review time.
 - `reviewers/a11y-lens` — `design-system/guidelines/foundations/accessibility.md`: WCAG AA contrast, 44×44 targets, keyboard reach, focus order + visibility, semantic HTML / screen readers, color-not-alone, reduced motion.
 - `reviewers/design-qa` — the `[spec]` frames' Dev Mode annotations (`docs/connectors/figma.md`) + the Design QA checklist (Notion 🧩 Templates): components, tokens, spacing, typography, states, interaction behavior.
@@ -45,7 +45,7 @@ Every finding carries **severity · lens · evidence (what's in the artifact) ·
 
 | Severity | Meaning | Effect |
 |---|---|---|
-| **blocker** | forbidden pattern, WCAG AA break, non-existent component or prop, spec contradiction | flips the gate; in Design QA, holds `Ready for Prod` |
+| **blocker** | a hard rule broken, WCAG AA break, non-existent component or prop, spec contradiction | flips the gate; in Design QA, holds `Ready for Prod` |
 | **major** | unjustified divergence from PRD / DS patterns, hierarchy skipping, missing required state | flips the gate |
 | **minor** | terminology drift, copy-case, polish | advisory — travels with the artifact, never blocks |
 

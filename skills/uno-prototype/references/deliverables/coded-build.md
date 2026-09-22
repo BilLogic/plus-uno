@@ -44,7 +44,7 @@ d. **Gate — DS gap (method §4):** needed component not in
 e. Playground frames or wip placement in Figma → summon **writers/figma**
    (obeys `docs/connectors/figma.md`).
 
-Hi-fi hard rules (AGENTS.md forbidden patterns in full): tokens over literals ·
+Hi-fi hard rules (`AGENTS.md` § Hard rules in full): tokens over literals ·
 official layout formulas · PLUS components before generic primitives · no deep
 imports from `design-system/src/` · FA Free icons only. Build only what the
 plan names — never add screens or interactions just because the PRD lists more.

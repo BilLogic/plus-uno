@@ -104,7 +104,7 @@ cheaply before the next rung.
   artifact. Direct production is sanctioned only where UNO holds the medium
   (in-chat ASCII, or a gated MCP writer — Figma, image gen); each deliverable
   doc names its own routes.
-- Hi-fi: AGENTS.md forbidden patterns apply in full — tokens over literals,
+- Hi-fi: `AGENTS.md` § Hard rules apply in full — tokens over literals,
   agent-views are law, no deep imports from `design-system/src/`, PLUS
   components first, FA Free icons only.
 - This skill builds; it does not judge (uno-review), share (uno-publish), or
