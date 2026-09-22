@@ -6,7 +6,7 @@
 // — declared versus actually set — is `npm run secrets:audit`, a command you
 // run, because a gate that needs a credential is a gate that gets skipped.
 //
-// Three things it will not let drift:
+// Four things it will not let drift:
 //
 //   1. A declared secret the Env interface does not have. The Worker cannot
 //      read it, so it would sit on the deployment granting whatever it grants
@@ -17,9 +17,14 @@
 //   3. wrangler.toml's expected-names comment falling behind. It was
 //      hand-maintained and drifted in both directions at once — four names that
 //      were not set, two set names it never mentioned.
+//   4. A `GITHUB_REPOS` repo list the Worker would refuse. It is config rather
+//      than a secret, but it is the one var whose shape the Worker validates —
+//      and a list that fails to parse makes every GitHub tool a refusal, which
+//      belongs here, before a deploy, not in somebody's live turn. It is parsed
+//      by the Worker's own parser (`src/integrations/repo-list.mjs`).
 //
 // `--fix` rewrites the comment block. Nothing else is auto-fixable: the other
-// two are decisions.
+// three are decisions.
 //
 // It reads only this package, but it takes the repo root like every other check
 // on the findings interface (#509) and derives its own two paths from it, so
@@ -33,8 +38,10 @@ import {
   expectedBlock,
   readExpectedBlock,
   secretNames,
+  varValueInWrangler,
   varsInWrangler,
 } from "./secrets.mjs";
+import { parseRepoList } from "../src/integrations/repo-list.mjs";
 import { byRoot, isEntry, main } from "../../../scripts/lib/findings.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -121,13 +128,28 @@ export function run({ repoRoot = REPO_ROOT, fix = fixRequested() } = {}) {
     }
   }
 
+  // 4. The repo list is one the Worker will read.
+  try {
+    parseRepoList(varValueInWrangler(toml, "GITHUB_REPOS"), varValueInWrangler(toml, "GITHUB_REPO"));
+  } catch (err) {
+    failures.push(
+      `wrangler.toml's repo list does not parse: ${err instanceof Error ? err.message : String(err)}.\n` +
+        "     Every GitHub tool would refuse until it does. The shape is in src/integrations/repo-list.mjs.",
+    );
+  }
+
   return failures.map((message) => ({ message }));
 }
 
 /** The green line, which carries the size of the declaration it just agreed with. */
 export function summary() {
   const required = SECRETS.filter((s) => s.required).length;
-  return `${SECRETS.length} declared (${required} required); Env, [vars] and wrangler.toml agree.`;
+  const { toml } = inputs(REPO_ROOT);
+  const repos = parseRepoList(varValueInWrangler(toml, "GITHUB_REPOS"), varValueInWrangler(toml, "GITHUB_REPO"));
+  return (
+    `${SECRETS.length} declared (${required} required); Env, [vars] and wrangler.toml agree; ` +
+    `the repo list parses (${repos.entries.length} repos).`
+  );
 }
 
 main(import.meta.url, "check:secrets", { run, summary, remedy: REMEDY });

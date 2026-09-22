@@ -1,5 +1,7 @@
 // The requests that would reach GitHub, over a stubbed fetch: the create a
-// GitHub intake files, and the search the duplicate check runs before it.
+// GitHub intake files, the search the duplicate check runs before it, and the
+// file read and code search `github_read` sends — each on the repo the
+// resolver handed it.
 //
 // `net.ts` binds the real fetch at its first evaluation, so the stub goes onto
 // `globalThis` at the top of this file and the integration is imported lazily
@@ -31,12 +33,30 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
 }) as typeof fetch;
 
 const REPO = "BilLogic/plus-uno";
+const SITE = "BilLogic/plus-marketing-website";
 const LABELS = ["harness-intake", "needs-triage"] as const;
+
+type Env = import("../src/types").Env;
+const ENV = {
+  GITHUB_TOKEN: "ghp_test",
+  GITHUB_REPO: REPO,
+  GITHUB_REPOS: JSON.stringify([
+    { repo: REPO, purpose: "uno-bot and the harness", workflows: [] },
+    { repo: SITE, purpose: "the public marketing site", workflows: [] },
+  ]),
+} as Env;
+
+/** A listed repo, the one way the integration takes a repo. */
+async function listed(requested?: string) {
+  const { resolveRepoFor } = await import("../src/integrations/github.js");
+  const target = resolveRepoFor(ENV, requested);
+  assert.ok(target.ok, JSON.stringify(target));
+  return target.entry;
+}
 
 async function client() {
   const { githubIssueClient } = await import("../src/integrations/github.js");
-  const env = { GITHUB_TOKEN: "ghp_test", GITHUB_REPO: REPO } as Parameters<typeof githubIssueClient>[0];
-  return githubIssueClient(env);
+  return githubIssueClient(ENV, await listed());
 }
 
 test("the client POSTs the issue to the configured repo's issues endpoint with the token", async () => {
@@ -82,8 +102,11 @@ test("the client turns a refusal into an error carrying GitHub's status", async 
 
 async function search() {
   const { githubIssueSearch } = await import("../src/integrations/github.js");
-  const env = { GITHUB_TOKEN: "ghp_test", GITHUB_REPO: REPO } as Parameters<typeof githubIssueSearch>[0];
-  return githubIssueSearch(env);
+  const github = githubIssueSearch(ENV);
+  const target = await listed();
+  return {
+    searchOpenIssues: (label: string, terms: string) => github.searchOpenIssues(target, label, terms),
+  };
 }
 
 test("the search GETs open issues on the configured repo, carrying the label and the keywords", async () => {
@@ -126,8 +149,15 @@ test("the search GETs open issues on the configured repo, carrying the label and
   assert.equal(url.searchParams.get("advanced_search"), "true");
 });
 
-test("the search names the repo it reads", async () => {
-  assert.equal((await search()).repo, REPO);
+test("the search reads the listed repo it is handed", async () => {
+  const { githubIssueSearch } = await import("../src/integrations/github.js");
+  calls = [];
+  reply = { status: 200, body: { items: [] } };
+  await githubIssueSearch(ENV).searchOpenIssues(await listed(SITE), "harness-intake", "hero image");
+
+  const q = new URL(calls[0]!.url).searchParams.get("q")!.split(" ");
+  assert.ok(q.includes(`repo:${SITE}`), q.join(" "));
+  assert.ok(!q.includes(`repo:${REPO}`), q.join(" "));
 });
 
 test("a search hit without a number, title or link is dropped rather than cited", async () => {
@@ -175,4 +205,44 @@ test("a 403 with rate limit to spare stays a plain refusal", async () => {
     (await search()).searchOpenIssues("harness-intake", "anything"),
     (err) => err instanceof GithubRequestError && !(err instanceof GithubRateLimitError),
   );
+});
+
+// ── github_read's two requests, on a listed repo ─────────────────────────────
+
+test("a file read GETs that repo's contents endpoint, and decodes the file", async () => {
+  const { githubReadPath } = await import("../src/integrations/github.js");
+  calls = [];
+  reply = { status: 200, body: { content: btoa('{"name":"plus-marketing-website"}'), encoding: "base64" } };
+  const read = await githubReadPath(ENV, await listed(SITE), "/package.json", "main");
+
+  assert.deepEqual(read, { path: "package.json", kind: "file", text: '{"name":"plus-marketing-website"}', truncated: false });
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0]!.method, "GET");
+  assert.equal(calls[0]!.url, `https://api.github.com/repos/${SITE}/contents/package.json?ref=main`);
+  assert.equal(calls[0]!.headers.authorization, "Bearer ghp_test");
+});
+
+test("a read with no repo named goes to the default repo", async () => {
+  const { githubReadPath } = await import("../src/integrations/github.js");
+  calls = [];
+  reply = { status: 200, body: [{ name: "src", type: "dir" }, { name: "README.md", type: "file" }] };
+  const read = await githubReadPath(ENV, await listed(), "agents/uno-bot");
+
+  assert.deepEqual(read, { path: "agents/uno-bot", kind: "dir", entries: ["src/", "README.md"] });
+  assert.equal(calls[0]!.url, `https://api.github.com/repos/${REPO}/contents/agents/uno-bot`);
+});
+
+test("a code search carries the listed repo's qualifier, and no scope qualifier of the model's", async () => {
+  const { githubSearchCode } = await import("../src/integrations/github.js");
+  calls = [];
+  reply = {
+    status: 200,
+    body: { items: [{ path: "src/pages/index.astro", html_url: `https://github.com/${SITE}/blob/main/src/pages/index.astro` }] },
+  };
+  const hits = await githubSearchCode(ENV, await listed(SITE), "hero repo:someone/else org:other -user:x path:src");
+
+  assert.deepEqual(hits, [{ path: "src/pages/index.astro", url: `https://github.com/${SITE}/blob/main/src/pages/index.astro` }]);
+  const url = new URL(calls[0]!.url);
+  assert.equal(url.origin + url.pathname, "https://api.github.com/search/code");
+  assert.deepEqual(url.searchParams.get("q")!.split(" ").sort(), ["hero", "path:src", `repo:${SITE}`].sort());
 });
