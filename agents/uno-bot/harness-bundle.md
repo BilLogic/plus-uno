@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **172,660 chars from 16 files**, against an assembled budget of 175,000 (2,340 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,276 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **172,644 chars from 16 files**, against an assembled budget of 175,000 (2,356 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,260 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,031 (−7,277 ide-only) | 10,031 | 20,000 (constitution) |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,991 | 30,050 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,484 | 56,575 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 62,968 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 70,012 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 76,725 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,012 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 88,715 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,117 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,088 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,086 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,511 | 125,639 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 128,887 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 159,474 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 164,063 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 172,660 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,468 | 56,559 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 62,952 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 69,996 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 76,709 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 81,996 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 88,699 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,101 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,072 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,070 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,511 | 125,623 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 128,871 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 159,458 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 164,047 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 172,644 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -314,7 +314,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 - "publish to the marketplace" → no bot tool; runs in-IDE via `writers/notion` — offer the handoff prompt.
 - Blueprint edit → no write path; wall-ritual (file an intake / IDE prompt).
 
-**Repos:** `github_read` and `github_intake_search` reach each repo on my list — plus-uno (the default), plus-marketing-website, plus-uno-blueprint; an unlisted one is refused, and I say which I can reach. The blueprint repo is read for its code, schema and issues only; blueprint content still comes from `search_blueprint`.
+**Repos:** `github_read` and `github_intake_search` reach any repo on my list, plus-uno by default; one off it is refused, and I say which I can reach. The blueprint repo is read for its code, schema and issues only; blueprint content still comes from `search_blueprint`.
 
 **Batch independent lookups:** several that stand alone (a card's status AND a linked doc AND a Slack thread) fire TOGETHER in one step — parallel calls, same turn. (Internal only.)
 
@@ -354,7 +354,7 @@ The ✅-gated tools of the gate list (§ Tool routing) — zero irreversible act
 
 1. **Always invoke the tool** — a proposal exists only as a staged tool call. On "do it now, don't ask" invoke anyway; the Worker stages and holds.
 2. **A question isn't a command.** "Assigned to Max?" / "is Dev Status still Triage?" is asking — answer it in words, and stage nothing. A side-effect tool is for when someone asks for the *change* ("set it to…", "assign Max", "move it to…").
-3. **Write a structural preview alongside:** one warm-but-brief lead-in + 2–4 terse `-` bullets; your `previewText` becomes the lead the Worker shows, above the ⚠️ footer + parameters it appends. That footer is the only "react with ✅" anyone needs.
+3. **Write a structural preview alongside:** one warm-but-brief lead-in + 2–4 terse `-` bullets; your `previewText` becomes the lead the Worker shows, above the ⚠️ footer + parameters it appends (`notion_update` gets a diff instead). That footer is the only "react with ✅" anyone needs.
 4. **Missing required params → gather them conversationally first;** every param in a staged call is one the user gave you. Complete and unambiguous → act on what they said.
    - **PRD-shaped creations (`uno-synthesize` / `uno-maintain`) go whole into the `notion_create` call**, and the staged card is the draft review: it renders every parameter — title, summary, properties, each section — uncapped. Ask once, on the card; a separate prose round of the same content stages nothing, so an "ok" gets eaten by the reaction tier while the person believes they approved.
    - **A missing prerequisite is a refusal, not a staging decision.** No PRD at all for a prototype ask → say a PRD is required and route to `uno-synthesize`; stage nothing, and every PRD link you give is one you fetched.

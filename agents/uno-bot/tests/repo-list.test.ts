@@ -4,8 +4,8 @@
 // Worker's binding `resolveRepoFor` for the one case only the binding owns — a
 // list that does not parse refuses every repo rather than throwing into a
 // turn. That the COMMITTED list parses, and that the tool schemas offer
-// exactly its repos, is `scripts/secrets.test.mjs`, beside the offline check
-// that reads wrangler.toml.
+// exactly its repos, is `scripts/repo-list-config.test.mjs`, beside the
+// offline check that reads wrangler.toml.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
@@ -44,6 +44,10 @@ test("a listed repo resolves to the list's own entry, whatever the case", () => 
   const r = resolveRepo(LIST, SITE);
   assert.ok(r.ok);
   assert.deepEqual(r.entry, ENTRIES[1]);
+  assert.equal(r.isDefault, false);
+  const d = resolveRepo(LIST, "plus-uno");
+  assert.ok(d.ok);
+  assert.equal(d.isDefault, true);
 });
 
 test("a bare repo name resolves when one listed repo carries it", () => {

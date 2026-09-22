@@ -44,6 +44,8 @@ export async function readGithub(input: Record<string, unknown>, deps: GithubRea
     });
   }
   const repo = target.entry.repo;
+  // The eval corpus is the harness repo's — the default — and nobody else's.
+  const withheldHere = (p: string) => target.isDefault && isWithheldRepoPath(p);
 
   // Search mode (added 2026-07-10): find WHERE something lives, then read it
   // by path. Replaces the hosted GitHub MCP's code search in gemini mode.
@@ -52,7 +54,7 @@ export async function readGithub(input: Record<string, unknown>, deps: GithubRea
       const allHits = await deps.searchCode(target.entry, search);
       // The eval corpus is filtered out of results too, not just out of
       // direct reads: a search that returns the path is half the answer.
-      const hits = allHits.filter((hit) => !isWithheldRepoPath(hit?.path ?? ""));
+      const hits = allHits.filter((hit) => !withheldHere(hit?.path ?? ""));
       const withheld = allHits.length - hits.length;
       return JSON.stringify({
         ok: true,
@@ -76,7 +78,7 @@ export async function readGithub(input: Record<string, unknown>, deps: GithubRea
   }
 
   if (!path) return JSON.stringify({ ok: false, error: "missing 'path' (or use 'search')" });
-  if (isWithheldRepoPath(path)) {
+  if (withheldHere(path)) {
     return JSON.stringify({ ok: false, error: `${path} is withheld`, note: WITHHELD_NOTE });
   }
 

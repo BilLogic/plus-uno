@@ -177,7 +177,7 @@
             "BilLogic/plus-marketing-website",
             "BilLogic/plus-uno-blueprint"
           ],
-          "description": "Optional repo, from the bot's list; omit for BilLogic/plus-uno (uno-bot, the harness and the design system). BilLogic/plus-marketing-website is the public marketing site; BilLogic/plus-uno-blueprint is the service-blueprint app and its schema — its code, schema and issues, while blueprint CONTENT comes from search_blueprint."
+          "description": "Optional: a repo on the bot's list; omit for the default, plus-uno. The blueprint repo is read for its code, schema and issues — blueprint CONTENT comes from search_blueprint."
         }
       }
     }
@@ -203,7 +203,7 @@
             "BilLogic/plus-marketing-website",
             "BilLogic/plus-uno-blueprint"
           ],
-          "description": "Optional repo to search, from the same list as github_read's; omit for BilLogic/plus-uno."
+          "description": "Optional: a repo on the bot's list; omit for the default, plus-uno."
         }
       }
     }

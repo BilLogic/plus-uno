@@ -25,6 +25,7 @@ import {
   GithubRateLimitError,
   githubIssueSearch,
   resolveRepoFor,
+  searchWords,
   type GithubIssueSearch,
   type RepoResolution,
 } from "../integrations/github";
@@ -43,10 +44,6 @@ const MAX_TERMS = 6;
  *  and not a word that merely ends in a colon (`TypeError:`). */
 const QUALIFIER = /^-?[a-z_]+:(?!\/\/)./;
 
-/** GitHub's boolean operators, which under advanced search bind the Worker's
- *  qualifiers to one side only. Upper-case, as GitHub reads them. */
-const OPERATOR = /^(?:AND|OR|NOT)$/;
-
 export interface IntakeSearchDeps {
   github: GithubIssueSearch;
   /** The model's `repo` input, resolved against the repo list. */
@@ -60,10 +57,8 @@ export interface IntakeSearchDeps {
  * repo, state and label the Worker wrote.
  */
 export function intakeSearchTerms(keywords: string): string {
-  return keywords
-    .replace(/["()]/g, " ")
-    .split(/\s+/)
-    .filter((w) => w !== "" && !QUALIFIER.test(w) && !OPERATOR.test(w))
+  return searchWords(keywords)
+    .filter((w) => !QUALIFIER.test(w))
     .slice(0, MAX_TERMS)
     .join(" ");
 }
@@ -91,7 +86,7 @@ export async function findOpenIntakes(
     return JSON.stringify({
       ok: false,
       error: target.error,
-      note: "Nothing is filed off the list. Say which repos you can reach, from the error, and ask which one they meant.",
+      note: "Nothing is searched off the list. Say which repos you can reach, from the error, and ask which one they meant.",
     });
   }
   const repo = target.entry.repo;

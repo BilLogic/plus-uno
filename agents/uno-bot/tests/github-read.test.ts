@@ -98,10 +98,20 @@ test("an unlisted repo is refused with the list named, and nothing is read or se
   }
 });
 
-test("the eval corpus stays withheld on every repo", async () => {
+test("the eval corpus stays withheld on the harness repo, the default", async () => {
+  for (const repo of [undefined, UNO]) {
+    const deps = fakes();
+    const result = await run({ path: "docs/evals/cases.yaml", repo }, deps);
+
+    assert.equal(result.ok, false, String(repo));
+    assert.deepEqual(deps.reads, []);
+  }
+});
+
+test("another repo's docs/evals/ is an ordinary folder, read like any other", async () => {
   const deps = fakes();
   const result = await run({ path: "docs/evals/cases.yaml", repo: SITE }, deps);
 
-  assert.equal(result.ok, false);
-  assert.deepEqual(deps.reads, []);
+  assert.equal(result.ok, true);
+  assert.deepEqual(deps.reads, [`${SITE}:docs/evals/cases.yaml`]);
 });

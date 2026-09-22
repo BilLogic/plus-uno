@@ -140,6 +140,23 @@ export interface GithubCodeHit {
   url: string;
 }
 
+/** GitHub's boolean operators, which bind the Worker's qualifiers to one side
+ *  only. Upper-case, as GitHub reads them. */
+const OPERATOR = /^(?:AND|OR|NOT)$/;
+
+/**
+ * A model's search text as loose words: every parenthesis and double quote
+ * dropped, every boolean operator dropped, whitespace collapsed — so nothing
+ * in it can regroup a query around the qualifiers the Worker writes. Both
+ * searches start here; each then drops the qualifiers it does not allow.
+ */
+export function searchWords(text: string): string[] {
+  return text
+    .replace(/["()]/g, " ")
+    .split(/\s+/)
+    .filter((w) => w !== "" && !OPERATOR.test(w));
+}
+
 /** A qualifier that names where to search — `repo:`, `org:`, `user:`, negated
  *  or not. The Worker writes the one `repo:` a search carries; another from
  *  the model would add a repo off the list to it. */
@@ -149,9 +166,8 @@ const SCOPE_QUALIFIER = /^-?(?:repo|org|user):/i;
  *  other qualifier (`path:`, `extension:`, `language:`) narrows within the
  *  repo, so it stays. */
 export function codeSearchTerms(query: string): string {
-  return query
-    .split(/\s+/)
-    .filter((w) => w !== "" && !SCOPE_QUALIFIER.test(w))
+  return searchWords(query)
+    .filter((w) => !SCOPE_QUALIFIER.test(w))
     .join(" ");
 }
 

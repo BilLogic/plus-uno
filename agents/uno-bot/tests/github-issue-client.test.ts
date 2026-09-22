@@ -246,3 +246,10 @@ test("a code search carries the listed repo's qualifier, and no scope qualifier 
   assert.equal(url.origin + url.pathname, "https://api.github.com/search/code");
   assert.deepEqual(url.searchParams.get("q")!.split(" ").sort(), ["hero", "path:src", `repo:${SITE}`].sort());
 });
+
+test("grouping, quotes and boolean operators cannot carry a scope qualifier past the filter", async () => {
+  const { codeSearchTerms } = await import("../src/integrations/github.js");
+  assert.equal(codeSearchTerms("hero (repo:other/x)"), "hero");
+  assert.equal(codeSearchTerms("hero OR org:y"), "hero");
+  assert.equal(codeSearchTerms('"hero" AND (user:z OR path:src)'), "hero path:src");
+});

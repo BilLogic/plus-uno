@@ -38,9 +38,10 @@
  */
 
 /**
- * What a tool's `repo` input resolves to: a listed repo, or a refusal whose
+ * What a tool's `repo` input resolves to: a listed repo — with whether it is
+ * the default, `GITHUB_REPO`, which is the harness repo — or a refusal whose
  * text names the list.
- * @typedef {{ ok: true, entry: RepoEntry } | { ok: false, error: string }} RepoResolution
+ * @typedef {{ ok: true, entry: RepoEntry, isDefault: boolean } | { ok: false, error: string }} RepoResolution
  */
 
 /** A list the Worker will not read. Thrown by `parseRepoList`, never at a
@@ -167,19 +168,21 @@ export function describeRepoList(list) {
  * @returns {RepoResolution}
  */
 export function resolveRepo(list, requested) {
-  if (requested === undefined || requested === null) return { ok: true, entry: list.defaultEntry };
+  /** @param {RepoEntry} entry @returns {RepoResolution} */
+  const found = (entry) => ({ ok: true, entry, isDefault: entry === list.defaultEntry });
+  if (requested === undefined || requested === null) return found(list.defaultEntry);
   if (typeof requested !== "string") {
     return { ok: false, error: `'repo' must be a repo name. Repos I can reach: ${describeRepoList(list)}.` };
   }
   const asked = requested.trim();
-  if (!asked) return { ok: true, entry: list.defaultEntry };
+  if (!asked) return found(list.defaultEntry);
 
   const wanted = keyOf(asked);
   const exact = list.entries.find((e) => keyOf(e.repo) === wanted);
-  if (exact) return { ok: true, entry: exact };
+  if (exact) return found(exact);
   if (!asked.includes("/")) {
     const byName = list.entries.filter((e) => keyOf(e.repo.split("/")[1] ?? "") === wanted);
-    if (byName.length === 1 && byName[0]) return { ok: true, entry: byName[0] };
+    if (byName.length === 1 && byName[0]) return found(byName[0]);
   }
   return {
     ok: false,
