@@ -439,6 +439,78 @@ test("'track this on GitHub' stages an issue card showing the title, the body an
   assert.deepEqual(h.resolved, []);
 });
 
+// A follow-up on an issue writes to the same public repos, so its card shows
+// what will happen — the issue, each operation, and the comment verbatim —
+// before anything reaches GitHub.
+test("'add this repro to #688 and close it' stages one card naming the issue, the operations and the comment", async () => {
+  const comment = "Repro: open the card twice in one thread.\n\n```\nerror: stale ts\n```";
+  const sent: string[] = [];
+  const h = harness({
+    replies: [
+      {
+        text: "I'll add the repro and close it.",
+        toolCalls: [
+          {
+            name: "github_issue_update",
+            args: { issue_number: 688, comment, state: "closed_completed", add_labels: ["bug"] },
+          },
+        ],
+      },
+    ],
+    executeOperation: async (operation) => {
+      sent.push(operation.toolName);
+      return JSON.stringify({ ok: true });
+    },
+  });
+  const outcome = await runTurn(request({ text: "add this repro to #688, label it bug and close it as done" }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  assert.equal(outcome.staged!.proposal.toolName, "github_issue_update");
+  const card = outcome.staged!.card;
+  assert.equal(card.verb, "update a GitHub issue");
+  assert.deepEqual(card.fields, [
+    { label: "issue", value: `${ISSUE_REPO}#688` },
+    { label: "operations", value: "comment · add label `bug` · close as completed" },
+    { label: "comment", value: comment },
+  ]);
+  // The comment goes public, so the card says so, naming the repo.
+  assert.deepEqual(card.caveats, [{ kind: "public-comment", repo: ISSUE_REPO }]);
+  const text = renderProposalCard(card).text;
+  assert.ok(text.includes(comment), text);
+  assert.ok(text.includes(`${ISSUE_REPO}#688`), text);
+  assert.ok(text.includes(`${ISSUE_REPO}* is public`), text);
+
+  // Staged, not sent: nothing reached GitHub before the ✅.
+  assert.equal((await h.threadState.getProposalByThread(REF))?.toolName, "github_issue_update");
+  assert.deepEqual(sent, []);
+  assert.deepEqual(h.ran, []);
+});
+
+test("follow-ups on two issues are one card with each issue's operations", async () => {
+  const h = harness({
+    replies: [
+      {
+        text: "Relabelling both.",
+        toolCalls: [
+          { name: "github_issue_update", args: { repo: "BilLogic/plus-uno-blueprint", issue_number: 4, remove_labels: ["bug"] } },
+          { name: "github_issue_update", args: { issue_number: 688, state: "open" } },
+        ],
+      },
+    ],
+  });
+  const outcome = await runTurn(request({ text: "take bug off blueprint #4 and reopen #688" }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  const card = outcome.staged!.card;
+  assert.equal(card.operations.length, 2);
+  assert.deepEqual(card.fields, [
+    { label: "BilLogic/plus-uno-blueprint#4", under: [{ field: { label: "operations", value: "remove label `bug`" } }] },
+    { label: `${ISSUE_REPO}#688`, under: [{ field: { label: "operations", value: "reopen" } }] },
+  ]);
+  // No comment, so nothing new is published: no public notice.
+  assert.deepEqual(card.caveats, []);
+});
+
 // A revised card retires the one it replaces (#573) — and a turn that stages
 // nothing retires nothing. Someone asking a question while a card is pending
 // must come back to a card that still resolves.

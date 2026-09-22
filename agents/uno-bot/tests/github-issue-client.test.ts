@@ -1,7 +1,7 @@
 // The requests that would reach GitHub, over a stubbed fetch: the create a
-// GitHub intake files, the search the duplicate check runs before it, and the
-// file read and code search `github_read` sends — each on the repo the
-// resolver handed it.
+// GitHub intake files, the search the duplicate check runs before it, the
+// file read and code search `github_read` sends, and the comment, state and
+// label calls of an issue follow-up — each on the repo the resolver handed it.
 //
 // `net.ts` binds the real fetch at its first evaluation, so the stub goes onto
 // `globalThis` at the top of this file and the integration is imported lazily
@@ -18,6 +18,7 @@ interface FetchCall {
 }
 let calls: FetchCall[] = [];
 let reply: { status: number; body: unknown; headers?: Record<string, string> } = { status: 201, body: {} };
+let queued: Array<typeof reply> = [];
 
 globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
   calls.push({
@@ -26,9 +27,11 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
     headers: (init?.headers ?? {}) as Record<string, string>,
     body: typeof init?.body === "string" ? (JSON.parse(init.body) as Record<string, unknown>) : null,
   });
-  return new Response(JSON.stringify(reply.body), {
-    status: reply.status,
-    headers: { "content-type": "application/json", ...reply.headers },
+  // One reply per call from `queued` while it lasts, then `reply`.
+  const answer = queued.shift() ?? reply;
+  return new Response(JSON.stringify(answer.body), {
+    status: answer.status,
+    headers: { "content-type": "application/json", ...answer.headers },
   });
 }) as typeof fetch;
 
@@ -253,3 +256,90 @@ test("grouping, quotes and boolean operators cannot carry a scope qualifier past
   assert.equal(codeSearchTerms("hero OR org:y"), "hero");
   assert.equal(codeSearchTerms('"hero" AND (user:z OR path:src)'), "hero path:src");
 });
+
+// ── github_issue_update's requests, on a listed repo ─────────────────────────
+
+async function updater(requested?: string) {
+  const { githubIssueUpdateClient } = await import("../src/integrations/github.js");
+  return githubIssueUpdateClient(ENV, await listed(requested));
+}
+
+test("a comment POSTs the body to the issue's comments endpoint, and answers its link", async () => {
+  calls = [];
+  reply = { status: 201, body: { html_url: `https://github.com/${SITE}/issues/12#issuecomment-9` } };
+  const posted = await (await updater(SITE)).comment(12, "text\n\n---\nPosted from Slack by uno-bot on behalf of Bill Guo.");
+
+  assert.deepEqual(posted, { url: `https://github.com/${SITE}/issues/12#issuecomment-9` });
+  assert.equal(calls.length, 1);
+  const call = calls[0]!;
+  assert.equal(call.method, "POST");
+  assert.equal(call.url, `https://api.github.com/repos/${SITE}/issues/12/comments`);
+  assert.equal(call.headers.authorization, "Bearer ghp_test");
+  assert.deepEqual(call.body, { body: "text\n\n---\nPosted from Slack by uno-bot on behalf of Bill Guo." });
+});
+
+test("a close PATCHes the issue with its state and reason; a reopen says reopened", async () => {
+  const github = await updater();
+  for (const [state, reason] of [["closed", "not_planned"], ["open", "reopened"]] as const) {
+    calls = [];
+    reply = { status: 200, body: { number: 688 } };
+    await github.setState(688, state, reason);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0]!.method, "PATCH");
+    assert.equal(calls[0]!.url, `https://api.github.com/repos/${REPO}/issues/688`);
+    assert.deepEqual(calls[0]!.body, { state, state_reason: reason });
+  }
+});
+
+test("labels are added with a POST of the list, and removed one DELETE each", async () => {
+  const github = await updater();
+  calls = [];
+  reply = { status: 200, body: [] };
+  await github.addLabels(688, ["bug", "good first issue"]);
+  await github.removeLabel(688, "good first issue");
+
+  assert.deepEqual(
+    calls.map((c) => [c.method, c.url, c.body]),
+    [
+      ["POST", `https://api.github.com/repos/${REPO}/issues/688/labels`, { labels: ["bug", "good first issue"] }],
+      ["DELETE", `https://api.github.com/repos/${REPO}/issues/688/labels/good%20first%20issue`, null],
+    ],
+  );
+});
+
+test("the repo's labels are read page by page, then kept, so the next ask costs no read", async () => {
+  const { githubIssueUpdateClient } = await import("../src/integrations/github.js");
+  const target = await listed(SITE);
+  calls = [];
+  const full = Array.from({ length: 100 }, (_, i) => ({ name: `label-${i}` }));
+  queued = [
+    { status: 200, body: full },
+    { status: 200, body: [{ name: "bug" }] },
+  ];
+  const names = await githubIssueUpdateClient(ENV, target).labels();
+
+  assert.equal(names.length, 101);
+  assert.ok(names.includes("bug"));
+  assert.deepEqual(
+    calls.map((c) => c.url),
+    [
+      `https://api.github.com/repos/${SITE}/labels?per_page=100&page=1`,
+      `https://api.github.com/repos/${SITE}/labels?per_page=100&page=2`,
+    ],
+  );
+
+  calls = [];
+  assert.deepEqual(await githubIssueUpdateClient(ENV, target).labels(), names);
+  assert.equal(calls.length, 0, "a second client on the same repo reads the kept list");
+});
+
+for (const status of [403, 404, 422]) {
+  test(`an update refused with ${status} is an error carrying the status`, async () => {
+    const { GithubRequestError } = await import("../src/integrations/github.js");
+    reply = { status, body: { message: "no" } };
+    await assert.rejects(
+      (await updater()).comment(688, "x"),
+      (err) => err instanceof GithubRequestError && err.status === status,
+    );
+  });
+}

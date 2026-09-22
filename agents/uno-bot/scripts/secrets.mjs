@@ -40,7 +40,7 @@ export const SECRETS = [
   {
     name: "GITHUB_TOKEN",
     required: true,
-    why: "PAT with repo:dispatch + Contents:Read + Issues:Write, on every repo in GITHUB_REPOS. Powers component_implement / prototype_scaffold, which dispatch workflows in BilLogic/plus-uno, github_issue_create, which files intakes there, and github_read / github_intake_search on each listed repo.",
+    why: "PAT with repo:dispatch + Contents:Read + Issues:Write, on every repo in GITHUB_REPOS. Powers component_implement / prototype_scaffold, which dispatch workflows in BilLogic/plus-uno, github_issue_create, which files intakes there, github_issue_update, which follows up on issues in any listed repo, and github_read / github_intake_search on each listed repo.",
   },
   {
     name: "FIGMA_ACCESS_TOKEN",

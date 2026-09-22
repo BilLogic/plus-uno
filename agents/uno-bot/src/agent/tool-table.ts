@@ -234,6 +234,18 @@ export const TOOL_TABLE = {
       nouns: ["issue", "github", "track", "file"],
     },
   },
+  // A follow-up on an issue in a listed repo: comment, close or reopen, labels.
+  // One operation per issue, so several issues in one ask are one card.
+  github_issue_update: {
+    access: "gated",
+    retrieval: false,
+    reviewRequest: null,
+    gate: {
+      verb: "update a GitHub issue",
+      kind: "update an issue",
+      nouns: ["issue", "github", "comment", "close", "reopen", "label"],
+    },
+  },
   proposal_resolve: { access: "control", retrieval: false, reviewRequest: null },
 } as const satisfies Record<string, ToolRow>;
 

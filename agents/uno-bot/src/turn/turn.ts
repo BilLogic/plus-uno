@@ -61,6 +61,7 @@ import { resolveSignal, type GateVerdict } from "../gate/index";
 import { collectStrings } from "../agent/tool-input";
 import { gateWordsFor } from "../agent/tool-table";
 import { relayRecipientId } from "../tools/relayed-dm-render";
+import { describeIssueUpdate, issueUpdateFromInput } from "../tools/github-issue-update-render";
 import {
   MAX_HISTORY_TURNS,
   proposalOperations,
@@ -1336,6 +1337,9 @@ async function buildCard(
     // out — so every such card says so, naming the repo the Worker files into.
     return { ...card, caveats: [{ kind: "public-repo", repo: deps.cards.issueRepo() }] };
   }
+  if (toolName === "github_issue_update") {
+    return { ...card, ...issueUpdateCardOf(result.operations, deps.cards.issueRepo()) };
+  }
 
   if (toolName === "prototype_scaffold") {
     // The Figma render, when one can be fetched — a URL on the card, not a
@@ -1361,6 +1365,43 @@ async function buildCard(
   }
   if (toolName === "dm_relay") return { ...card, fields: relayFieldsOf(result.operations) };
   return card;
+}
+
+/**
+ * An issue follow-up's card: per issue, `repo#number`, what will happen to it
+ * in the order it runs, and any comment verbatim — read through the same
+ * `issueUpdateFromInput` the executor runs, so the card says what the ✅ does.
+ * An input that reading refuses shows as the input itself; the executor
+ * refuses it again, saying why.
+ *
+ * The repo shown is the one the model named (the schema offers only listed
+ * repos) or the default; the executor resolves it against the list. A comment
+ * goes public, so each repo a comment lands on gets the public notice.
+ */
+function issueUpdateCardOf(
+  operations: ReadonlyArray<ProposalOperation>,
+  defaultRepo: string,
+): Pick<ProposalCard, "fields" | "caveats"> {
+  const updates = operations.filter((op) => op.toolName === "github_issue_update");
+  const commentedOn = new Set<string>();
+  const perIssue = updates.map((op): { target: string; fields: CardField[] } => {
+    const repo = typeof op.input.repo === "string" && op.input.repo.trim() ? op.input.repo.trim() : defaultRepo;
+    const read = issueUpdateFromInput(op.input);
+    if (!read.ok) return { target: `${repo}#${String(op.input.issue_number ?? "?")}`, fields: cardFieldsOf(op.input) };
+    if (read.update.comment) commentedOn.add(repo);
+    return {
+      target: `${repo}#${read.update.issue}`,
+      fields: [
+        { label: "operations", value: describeIssueUpdate(read.update).join(" · ") },
+        ...(read.update.comment ? [{ label: "comment", value: read.update.comment }] : []),
+      ],
+    };
+  });
+  const fields: CardField[] =
+    perIssue.length === 1
+      ? [{ label: "issue", value: perIssue[0]!.target }, ...perIssue[0]!.fields]
+      : perIssue.map((u) => ({ label: u.target, under: u.fields.map((field) => ({ field })) }));
+  return { fields, caveats: [...commentedOn].map((repo) => ({ kind: "public-comment", repo })) };
 }
 
 /**

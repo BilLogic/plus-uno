@@ -272,8 +272,9 @@ CLAUDE_MODEL = "claude-sonnet-5"
 #       PAT with repo:dispatch + Contents:Read + Issues:Write, on every
 #       repo in GITHUB_REPOS. Powers component_implement /
 #       prototype_scaffold, which dispatch workflows in BilLogic/plus-uno,
-#       github_issue_create, which files intakes there, and github_read /
-#       github_intake_search on each listed repo.
+#       github_issue_create, which files intakes there,
+#       github_issue_update, which follows up on issues in any listed
+#       repo, and github_read / github_intake_search on each listed repo.
 #   FIGMA_ACCESS_TOKEN
 #       Figma read PAT. Two consumers: the proposal screenshot fetch in
 #       events.ts, and the library poll's component/version reads on the

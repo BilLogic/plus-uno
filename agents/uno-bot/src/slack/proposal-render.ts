@@ -231,6 +231,12 @@ function caveatText(caveat: CardCaveat): string {
       "Check the body for anything from a DM or private channel before you approve; I add a footer naming you and linking this thread."
     );
   }
+  if (caveat.kind === "public-comment") {
+    return (
+      `:globe_with_meridians: *${caveat.repo}* is public — anyone can read the comment once it's posted. ` +
+      "Check it for anything from a DM or private channel before you approve; I add a footer naming you and linking this thread."
+    );
+  }
   return ":mag: *No open questions were named for this brief.* If it leaves anything ambiguous (states, interactions, semantics), cancel and ask — confirming builds it as-is.";
 }
 

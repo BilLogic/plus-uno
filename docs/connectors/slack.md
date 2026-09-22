@@ -104,6 +104,7 @@ One dialect, four destinations — you write Markdown, the Worker renders it per
 | Notion (`notion_create`, `notion_update`) | `integrations/notion-blocks.ts` | real blocks, annotations **and real tables** — `notion.md` § Writing a body |
 | Email (`email_send`) | `integrations/email-render.ts` | plain text **and** HTML; tables flatten to bullets |
 | GitHub issue body (`github_issue_create`) | none — sent as written, plus a footer from `tools/github-issue-render.ts` | GitHub renders Markdown natively, tables included; the repo is public |
+| GitHub issue comment (`github_issue_update`) | none — sent as written, plus the same footer | as above |
 
 **Tables are the one construct that differs by destination, and every one handles it well.** Slack renders a real table; Notion gets a real `table` block; email flattens to one labelled bullet per row (`Column: value · Column: value`) because HTML mail tables break across clients; GitHub renders the table as written. Write the table whenever the content is a grid — nothing is lost anywhere.
 
