@@ -63,6 +63,18 @@ crons = ["*/15 13-23 * * 1-5"]
 # ordinary posts — a streamed bubble followed by plain follow-ups is the part
 # most likely to read wrong, and it is the reason the retest needs eyes rather
 # than a green check.
+#
+# GATE — a markup probe before either streaming flag goes on. On posted text,
+# `<…>` markup Slack cannot parse blanks the whole message (live 2026-09-22);
+# whether `markdown_text` does the same is not documented. Streamed text takes
+# the same markup pass regardless, but run the probe once: stream a body with a
+# bare `<@teammate>` AND one inside a code fence to a test DM, raw, through
+# `/debug/slack-stream?...&text=` (flags can stay off), and check it is not
+# blank. On a pass, set SLACK_STREAM_MARKUP_PROBE HERE in [vars] — a dashboard
+# value is wiped by the next deploy — as "pass:YYYY-MM-DD" plus any note. Until
+# then "on" is refused at runtime, logged once per isolate —
+# docs/connectors/slack.md § Streamed text.
+# SLACK_STREAM_MARKUP_PROBE = "pass:YYYY-MM-DD <what you saw>"
 SLACK_STREAMING = "off"
 #
 # Plan-mode streaming: opens the turn's stream up front in

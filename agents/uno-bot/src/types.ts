@@ -158,6 +158,11 @@ export interface Env {
    *  bubble for the whole run — tried and reverted), so if Slack renders the
    *  cards differently than expected the artifact is on every turn. */
   SLACK_STREAM_PLAN?: string;
+  /** The markup probe's pass, recorded by whoever ran it: `pass:YYYY-MM-DD`
+   *  and an optional note. Either streaming flag stays off without one —
+   *  `streamFlagOn` in slack/slack-delivery.ts, the probe in
+   *  docs/connectors/slack.md. */
+  SLACK_STREAM_MARKUP_PROBE?: string;
   /** "on" swaps the hand-rolled 👍/👎 `actions` row for Slack's native
    *  `context_actions` block (`feedback_buttons` + an `icon_button` delete).
    *  Off by default only because an invalid block degrades SILENTLY here —
