@@ -1,0 +1,57 @@
+name: vitest 5 watch
+
+# vitest 5 is held back by two plugins whose peer range stops at 4 (the ignore
+# entries in .github/dependabot.yml say which and why). Each side of the repo
+# waits on one of them and can move on its own:
+#
+#   /               @storybook/addon-vitest          (the Storybook gate)
+#   /agents/uno-bot @cloudflare/vitest-pool-workers  (test:workerd)
+#
+# Weekly, this reads each plugin's latest stable peer range from the registry
+# and, once one accepts vitest 5, files a needs-triage issue for that side —
+# once; an open issue with the same title stops a second. The upgrade itself
+# is that issue's work, including removing the matching ignore entry.
+# Spot-run: `gh workflow run vitest-5-watch.yml`.
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 10 * * 1" # Mondays 10:00 UTC, after Dependabot's run
+
+permissions:
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read peer ranges and file an issue for a side that is unblocked
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          check() {
+            local side="$1" plugin="$2"
+            local version range
+            version=$(npm view "$plugin@latest" version)
+            range=$(npm view "$plugin@latest" peerDependencies.vitest)
+            echo "$side: $plugin@$version peers vitest '$range'" | tee -a "$GITHUB_STEP_SUMMARY"
+            # A range that names major 5: ^5, ~5, >=5, 5.x, "|| 5".
+            if ! grep -Eq '(^|[^0-9.<])(\^|~|>=?)?5(\.|$| )' <<<"$range"; then return 0; fi
+            local title="Move $side to vitest 5 ($plugin $version accepts it)"
+            if gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "\"Move $side to vitest 5\" in:title" --json number --jq 'length' | grep -qv '^0$'; then
+              echo "$side: issue already open" | tee -a "$GITHUB_STEP_SUMMARY"
+              return 0
+            fi
+            gh issue create --repo "$GITHUB_REPOSITORY" --label needs-triage --title "$title" --body "$(printf '%s\n' \
+              "\`$plugin@$version\` (latest stable) peers vitest \`$range\`, so the vitest 5 hold on \`$side\` can lift." \
+              "" \
+              "- Remove the vitest / @vitest/* major ignore for \`$side\` in \`.github/dependabot.yml\`." \
+              "- Bump vitest and every @vitest/* package together, with $plugin at a version that accepts 5." \
+              "- Run that side's full test suite, including the plugin's own tests, before merging." \
+              "" \
+              "Filed by .github/workflows/vitest-5-watch.yml.")"
+          }
+          check "/" "@storybook/addon-vitest"
+          check "/agents/uno-bot" "@cloudflare/vitest-pool-workers"
