@@ -333,6 +333,42 @@ test("the repo's labels are read page by page, then kept, so the next ask costs 
   assert.equal(calls.length, 0, "a second client on the same repo reads the kept list");
 });
 
+test("a 403 carrying retry-after is GitHub's secondary rate limit, not a permission refusal", async () => {
+  const { GithubRateLimitError } = await import("../src/integrations/github.js");
+  reply = { status: 403, body: { message: "You have exceeded a secondary rate limit" }, headers: { "retry-after": "60" } };
+  await assert.rejects(
+    (await updater()).comment(688, "x"),
+    (err) => err instanceof GithubRateLimitError && err.status === 403,
+  );
+});
+
+test("a repo with more labels than the cap is read to the cap, and says so", async () => {
+  const { githubIssueUpdateClient } = await import("../src/integrations/github.js");
+  const { resolveRepoFor } = await import("../src/integrations/github.js");
+  const env = {
+    ...ENV,
+    GITHUB_REPOS: JSON.stringify([
+      { repo: REPO, purpose: "uno-bot and the harness", workflows: [] },
+      { repo: "BilLogic/plus-uno-blueprint", purpose: "the service-blueprint app", workflows: [] },
+    ]),
+  } as Env;
+  const target = resolveRepoFor(env, "BilLogic/plus-uno-blueprint");
+  assert.ok(target.ok);
+  calls = [];
+  reply = { status: 200, body: Array.from({ length: 100 }, (_, i) => ({ name: `l-${i}` })) };
+  const warned: string[] = [];
+  const warn = console.warn;
+  console.warn = (msg: unknown) => void warned.push(String(msg));
+  try {
+    const names = await githubIssueUpdateClient(env, target.entry).labels();
+    assert.equal(names.length, 500);
+  } finally {
+    console.warn = warn;
+  }
+  assert.equal(calls.length, 5, "five pages, then it stops");
+  assert.ok(warned.some((w) => /more than 500 labels/.test(w)), warned.join("\n"));
+});
+
 for (const status of [403, 404, 422]) {
   test(`an update refused with ${status} is an error carrying the status`, async () => {
     const { GithubRequestError } = await import("../src/integrations/github.js");
@@ -343,3 +379,37 @@ for (const status of [403, 404, 422]) {
     );
   });
 }
+
+/* ------------------------------------------------------ repo visibility */
+
+test("visibility GETs the listed repo once per isolate, and reads GitHub's private flag", async () => {
+  const { githubRepoVisibility } = await import("../src/integrations/github.js");
+  calls = [];
+  reply = { status: 200, body: { full_name: SITE, private: false, visibility: "public" } };
+  assert.equal(await githubRepoVisibility(ENV, await listed(SITE)), "public");
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0]!.url, `https://api.github.com/repos/${SITE}`);
+  assert.equal(calls[0]!.method, "GET");
+  assert.equal(calls[0]!.headers.authorization, "Bearer ghp_test");
+
+  // The same isolate asks again: the answer is remembered, nothing is fetched.
+  reply = { status: 200, body: { private: true } };
+  assert.equal(await githubRepoVisibility(ENV, await listed(SITE)), "public");
+  assert.equal(calls.length, 1);
+});
+
+test("a visibility lookup that fails is unknown, and is not remembered", async () => {
+  const { githubRepoVisibility } = await import("../src/integrations/github.js");
+  calls = [];
+  reply = { status: 404, body: { message: "Not Found" } };
+  assert.equal(await githubRepoVisibility(ENV, await listed(REPO)), "unknown");
+  // A reply without the flag is not an answer either.
+  reply = { status: 200, body: { full_name: REPO } };
+  assert.equal(await githubRepoVisibility(ENV, await listed(REPO)), "unknown");
+
+  reply = { status: 200, body: { private: true } };
+  assert.equal(await githubRepoVisibility(ENV, await listed(REPO)), "private");
+  assert.equal(calls.length, 3, "each failure is retried on the next card");
+  assert.equal(await githubRepoVisibility(ENV, await listed(REPO)), "private");
+  assert.equal(calls.length, 3);
+});

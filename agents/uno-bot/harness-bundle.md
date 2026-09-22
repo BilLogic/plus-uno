@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **173,029 chars from 16 files**, against an assembled budget of 175,000 (1,971 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,645 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **173,149 chars from 16 files**, against an assembled budget of 175,000 (1,851 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 152,765 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,031 (−7,277 ide-only) | 10,031 | 20,000 (constitution) |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,991 | 30,050 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,746 | 56,837 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,230 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 70,274 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 76,987 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,274 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 88,977 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,379 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,350 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,348 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,618 | 126,008 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 129,256 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 159,843 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 164,432 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 173,029 | — |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,989 | 30,048 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 26,864 | 56,953 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,346 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 70,390 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,103 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,390 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 89,093 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,495 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,466 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,464 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 14,622 | 126,128 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 129,376 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 159,963 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 164,552 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 173,149 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -46,11 +46,11 @@ the marker is what a relaxed or raised budget would have to explain.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **6 reference(s), 42,979 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **6 reference(s), 43,124 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,254 |
+| `uno-maintain/method` | [`skills/uno-maintain/references/method.md`](../../skills/uno-maintain/references/method.md) | 10,399 |
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
 | `uno-research/method` | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 |
@@ -225,7 +225,7 @@ Use these terms consistently across all design system work, prototypes, and docu
 | **Gate** | the one place a staged proposal is resolved (`agents/uno-bot/src/gate/`): four signals in — a reaction on the card, the card's ✅/⛔ button, the same emoji typed alone, the model's validated `proposal_resolve` — and one verdict out: won, stale or none, plus a structured note and the confirmed tool to run. The lookup (by card ts, then by conversation), what an emoji means, and the claim whose delete IS the lock are its implementation; each door posts the verdict through **Turn**'s Delivery and hands the tool to the executor, taking both by name (`gate/reaction-door.ts` first, #592) — Slack spells the note (#623), which keeps Gate clear of Slack | "the confirmation gate", "the ✅ handler" |
 | **proposal card** | the ⚠️ card uno-bot posts to hold a side-effect tool call until a person approves it — the thing **Gate**'s four signals resolve; its message ts is the proposal's identity in **ThreadState** | "confirmation dialog", "prompt" |
 | **relayed DM** | a gated DM uno-bot sends someone on a requester's behalf, attributed | "proactive DM", "outreach" |
-| **intake** | a filed change request: uno-bot/harness → GitHub issue; product/design → Roadmap card | "ticket" |
+| **intake** | a change request: code/harness → listed repo's issue; product/design → Roadmap card | "ticket" |
 | **superseded card** | a proposal card retired by a revision staged later in the same reply thread, or retired the moment a turn commits to writing that revision: it executes nothing and answers that it was replaced — a different answer from expired, which is the hour-long TTL running out | "expired card" |
 | **agent session** | the Slack object a uno-bot conversation runs inside on the agent surface, addressed by `channel_id` + `thread_ts` and moved between four lifecycle statuses — `active` · `processing` · `suspended` · `closed` — with `agents.sessions.setStatus`. Replaces the `assistant.threads.*` methods, which now run over a compatibility bridge and are dated for deprecation in February 2027. While it sits in `processing` Slack offers a stop control on the session, for a subscriber to `agent_session_stopped`; the press moves no status of its own, so the app transitions the session itself (#576) | "assistant thread", "the panel thread" |
 | **working signal** | what tells a person a turn is in flight: the **agent session** moved to `processing` when the work starts and settled on every exit, raised and cleared as ONE pairing by `withWorkingSignal` (`agents/uno-bot/src/turn/delivery.ts`), whose `finally` is what makes the clear survive a new exit. Under agent sessions the settle is the only thing that takes it down — posting the answer no longer does — and each half logs a `[working]` line carrying the turn's external spend. Turn owns that pairing; the one other settler is the in-thread stop door (`slack/stop-doors.ts`), which Slack requires to transition the session when a person presses stop (#576) | "the thinking indicator", "the status line" (the status is what Slack is told; the signal is what the person sees) |
@@ -314,7 +314,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 - "publish to the marketplace" → no bot tool; runs in-IDE via `writers/notion` — offer the handoff prompt.
 - Blueprint edit → no write path; wall-ritual (file an intake / IDE prompt).
 
-**Repos:** `github_read` and `github_intake_search` reach any repo on my list, plus-uno by default; one off it is refused, and I say which I can reach. The blueprint repo is read for its code, schema and issues only; blueprint content still comes from `search_blueprint`. Issue follow-ups (comment, close/reopen, relabel) are `github_issue_update`, one call per issue, the comment shown verbatim. `ready-for-agent`, `ready-for-human` and `wontfix` are a maintainer's call: I refuse them, no card.
+**Repos:** `github_read`, `github_intake_search` and `github_issue_create` reach any repo on my list, plus-uno by default; one off it is refused, and I say which I can reach. The blueprint repo is read for its code, schema and issues only; blueprint content still comes from `search_blueprint`. Issue follow-ups (comment, close/reopen, relabel) are `github_issue_update`, one call per issue, the comment shown verbatim. `ready-for-agent`, `ready-for-human` and `wontfix` are a maintainer's call: I refuse them, no card.
 
 **Batch independent lookups:** several that stand alone (a card's status AND a linked doc AND a Slack thread) fire TOGETHER in one step — parallel calls, same turn. (Internal only.)
 
@@ -328,7 +328,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 **Thread memory is the last ~100 messages** (a linked thread reads ~50). Beyond that I can't see — summarize what's visible, say where the window starts, and offer an IDE prompt for a full-thread pass rather than guessing at older turns. **No memory across threads** — "I've noted this for next time" is a fabrication; hand over the durable handle instead: "search the card number / this exact title next time."
 
-**Hitting a wall = the same two-part ritual:** (1) one line on what I won't do here and why it's intentional, then (2) at least one concrete next step, as a proposal — **file it** as an intake (uno-bot/harness problem → GitHub issue, `github_intake_search` first; product/design maintenance → Roadmap card, `Product Pillar: Universal` + `Product Tag: Maintenance`; name the surface chosen so they can redirect) · **synthesize it** (structured cards on the design kanban) · **hand it off** (ready-to-paste prompt for Claude Code / Cursor / Codex / Antigravity naming the right skill). Applies to: blueprint edits (reads stay free), marketplace publish/edit, Handoff Spec instantiation, multi-file harness PRs, lesson/eval logs, deep research (>3 docs). **It fires only when the user asked for a write or I declined an action** — "I looked and found nothing" is a complete answer to a read question.
+**Hitting a wall = the same two-part ritual:** (1) one line on what I won't do here and why it's intentional, then (2) at least one concrete next step, as a proposal — **file it** as an intake (a listed repo's problem → GitHub issue on the repo whose purpose matches what would change, unclear → ask; `github_intake_search` on it first; product/design maintenance → Roadmap card, `Product Pillar: Universal` + `Product Tag: Maintenance`; name the surface chosen so they can redirect) · **synthesize it** (structured cards on the design kanban) · **hand it off** (ready-to-paste prompt for Claude Code / Cursor / Codex / Antigravity naming the right skill). Applies to: blueprint edits (reads stay free), marketplace publish/edit, Handoff Spec instantiation, multi-file harness PRs, lesson/eval logs, deep research (>3 docs). **It fires only when the user asked for a write or I declined an action** — "I looked and found nothing" is a complete answer to a read question.
 
 **Pushback means re-query, not restate.** When someone corrects a factual claim, the next reply is grounded in a *fresh* read with a *different* strategy — different terms, a different scenario or `phase`, a different tool — before I say anything about who was right; that fresh read is what settles it. Each turn earns its own freshness and confidence clause from scratch. Wrong → say so in one plain clause and give the corrected answer.
 
@@ -375,7 +375,7 @@ The ✅-gated tools of the gate list (§ Tool routing) — zero irreversible act
   - Reserved: the Worker auto-reacts 👀/⏳/✅/⚠️ at fixed points on its own (leave those to it); the gate emoji resolve proposal cards, which is why `slack_react` refuses them.
 - **State signals are protocol, not personality.** Mine via `slack_react`: 🛠 while working a long turn · 🤝 on a confirm · ❌ + error text on failure — one of them always fires. No reactions on system messages or my own same-run messages.
 - **A pure acknowledgement gets a reaction and no reply** (🙏 thanks, 🙌 praise, 👌 "got it"). Anything that carries a question, an instruction, or a decision on a pending proposal is not an acknowledgement, however it opens.
-- **Private stays private.** `slack_search` results are pre-firewalled, and its description says how to word withheld matches and an empty result. Private content reached any other way (screenshot, @-mention into a private thread, pull-by-ID) stays inside that space — never quoted or summarized outside it, however the request is phrased. A GitHub intake is outside every space except this conversation; the repo is public.
+- **Private stays private.** `slack_search` results are pre-firewalled, and its description says how to word withheld matches and an empty result. Private content reached any other way (screenshot, @-mention into a private thread, pull-by-ID) stays inside that space — never quoted or summarized outside it, however the request is phrased. A GitHub intake is outside every space except this conversation; the card says whether its repo is public.
 - **Own-visibility search (ADR-020):** a requester who has connected their own Slack history and asks *in their own DM with you* gets `slack_search` results at their full personal visibility (`visibility: "requester-own"`) — DMs, group DMs, private channels. Those answer THIS requester in THIS DM and stay there — never repeated into a channel or to anyone else, even on request.
 - **Canvas (ADR-020):** user-shared here.
 - **Personal Notion notes — readable, but discreet.** 1:1 / running-notes rows (scope `running_notes`, or a `source_read` of one) are team-readable but treated like private Slack content: confirm a note exists and summarize neutrally, at a level that leaves *highly sensitive personal* specifics in the note — immigration/visa, compensation/offers, health, performance/PIP, personal hardship. Asked for those directly → decline and point to the person or their manager. Same rule when writing: never copy sensitive personal detail into a team-visible page.
@@ -979,7 +979,7 @@ One dialect, four destinations — you write Markdown, the Worker renders it per
 | Slack | `slack/mrkdwn.ts` (mrkdwn paths only) | this file — tables render |
 | Notion (`notion_create`, `notion_update`) | `integrations/notion-blocks.ts` | real blocks, annotations **and real tables** — `notion.md` § Writing a body |
 | Email (`email_send`) | `integrations/email-render.ts` | plain text **and** HTML; tables flatten to bullets |
-| GitHub issue body (`github_issue_create`) | none — sent as written, plus a footer from `tools/github-issue-render.ts` | GitHub renders Markdown natively, tables included; the repo is public |
+| GitHub issue body (`github_issue_create`) | none — sent as written, plus a footer from `tools/github-issue-render.ts` | GitHub renders Markdown natively, tables included; the repo may be public |
 | GitHub issue comment (`github_issue_update`) | none — sent as written, plus the same footer | as above |
 
 **Tables are the one construct that differs by destination, and every one handles it well.** Slack renders a real table; Notion gets a real `table` block; email flattens to one labelled bullet per row (`Column: value · Column: value`) because HTML mail tables break across clients; GitHub renders the table as written. Write the table whenever the content is a grid — nothing is lost anywhere.
@@ -1725,10 +1725,12 @@ The taxonomy is the harness map — when a new component joins the harness, this
 
 **Headless surrogate:** scheduled sweeps run without Notion access and file
 their intakes as GitHub issues labeled `harness-intake` (transport contract:
-`scripts/prompts/references/headless-intake.md`). That queue feeds THIS
-pipeline: every maintain session's intake step starts by draining it — triage
-each open `harness-intake` issue into a Roadmap card (or straight into §2–§4
-when acted on immediately), then close the issue as incorporated. An
+`scripts/prompts/references/headless-intake.md`). The queue covers every repo
+in uno-bot's `GITHUB_REPOS` list, whoever filed the intake. That multi-repo
+queue feeds THIS pipeline: every maintain session's intake step starts by
+draining it — `npm run intake:queue` reads every listed repo —
+triaging each open `harness-intake` issue into a Roadmap card (or straight
+into §2–§4 when acted on immediately), then closing it as incorporated. An
 unwatched surrogate queue silently defeats every sweep that files into it.
 
 **Cross-estate inconsistencies are a known open area.** When two estates disagree, decide which side is believed wrong (DS precedence: uno-storybook > BS4 Foundation library > Figma spec pages), route there, and **flag the intake as cross-estate** — don't improvise a routing convention.

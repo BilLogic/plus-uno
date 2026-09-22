@@ -22,7 +22,7 @@
 // `executeGithubIssueUpdate`, the binding at the foot of this file.
 
 import type { Env, SlackContext } from "../types";
-import { getPermalink, postMessage, usersInfo } from "../slack/api";
+import { slackFilingDeps, type SlackFilingDeps } from "./github-issue";
 import {
   GithubRateLimitError,
   GithubRequestError,
@@ -42,19 +42,13 @@ import {
   type IssueUpdate,
 } from "./github-issue-update-render";
 
-export interface GithubIssueUpdateDeps {
+/** The resolver and a client per repo, plus the Slack half every GitHub write
+ *  shares (`SlackFilingDeps`: who asked, DM or not, the permalink, the post). */
+export interface GithubIssueUpdateDeps extends SlackFilingDeps {
   /** The model's `repo` input, resolved against the repo list. */
   resolveRepo(requested: unknown): RepoResolution;
   /** The issue client on one listed repo. */
   github(target: RepoEntry): GithubIssueUpdateClient;
-  /** The requester's display name, for the comment footer. */
-  requesterName(): Promise<string>;
-  /** Whether the request came from a DM — whose link stays off a public repo. */
-  requestedInDm: boolean;
-  /** The source thread's permalink, or null when Slack would not give one. */
-  threadPermalink(): Promise<string | null>;
-  /** Say what happened, in the thread the card was approved in. */
-  postToThread(text: string): Promise<void>;
 }
 
 /**
@@ -116,7 +110,7 @@ export async function updateGithubIssue(
     steps.push(["comment", async () => {
       const [requester, permalink] = await Promise.all([
         deps.requesterName(),
-        // A DM's link is never fetched: the repo is public and a DM stays a DM.
+        // A DM's link is never fetched: the repo may be public and a DM stays a DM.
         deps.requestedInDm ? null : deps.threadPermalink(),
       ]);
       commentUrl = (await github.comment(update.issue, renderCommentBody(text, { requester, permalink, dm: deps.requestedInDm }))).url;
@@ -222,20 +216,6 @@ export async function executeGithubIssueUpdate(
   return updateGithubIssue(input, {
     resolveRepo: (requested) => resolveRepoFor(env, requested),
     github: (target) => githubIssueUpdateClient(env, target),
-    async requesterName() {
-      if (!slack.requestedBy) return "a Slack teammate";
-      const res = await usersInfo(env, slack.requestedBy).catch(() => null);
-      const user = res?.ok ? res.user : undefined;
-      return user?.profile?.display_name || user?.real_name || user?.name || "a Slack teammate";
-    },
-    // Slack's DM (im) conversation ids start with D.
-    requestedInDm: slack.channel.startsWith("D"),
-    async threadPermalink() {
-      return getPermalink(env, slack.channel, slack.userMsgTs).catch(() => null);
-    },
-    async postToThread(text) {
-      // Under the real ts the card was posted with, as the intake posts.
-      await postMessage(env, { channel: slack.channel, thread_ts: slack.replyTs ?? slack.threadTs, text });
-    },
+    ...slackFilingDeps(env, slack),
   });
 }

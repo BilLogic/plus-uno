@@ -31,6 +31,7 @@ import {
 } from "../src/turn/index";
 import { batchResultMessage } from "../src/slack/batch-result";
 import { renderProposalCard } from "../src/slack/proposal-render";
+import { parseRepoList, resolveRepo } from "../src/integrations/repo-list.mjs";
 import { executeRelayDm, type RelaySlack } from "../src/tools/relay-dm";
 import {
   createInMemoryThreadState,
@@ -418,15 +419,16 @@ test("'track this on GitHub' stages an issue card showing the title, the body an
   assert.deepEqual(outcome.staged!.proposal.input, { title, body });
 
   const card = outcome.staged!.card;
-  assert.equal(card.verb, "file a GitHub issue");
+  // The heading names the repo the Worker files into — read, never a literal.
+  assert.equal(card.verb, `file a GitHub issue on ${ISSUE_REPO}`);
   assert.deepEqual(card.fields, [
     { label: "title", value: title },
     { label: "body", value: body },
   ]);
-  // The repo is the one the Worker files into — read, never a literal.
-  assert.deepEqual(card.caveats, [{ kind: "public-repo", repo: ISSUE_REPO }]);
+  assert.deepEqual(card.caveats, [{ kind: "repo-visibility", repo: ISSUE_REPO, visibility: "public" }]);
   // And as a person reads it: both verbatim, and the repo named public, once.
   const text = renderProposalCard(card).text;
+  assert.ok(text.includes(`About to *file a GitHub issue on ${ISSUE_REPO}*`), text);
   assert.ok(text.includes(title), text);
   assert.ok(text.includes(body), text);
   assert.ok(text.includes(`${ISSUE_REPO}* is public`), text);
@@ -438,10 +440,101 @@ test("'track this on GitHub' stages an issue card showing the title, the body an
   assert.deepEqual(h.ran, []);
   assert.deepEqual(h.resolved, []);
 });
+// A marketing-site bug belongs on the marketing site's repo: the model names
+// it, and the card's heading and notice are the resolved repo's, read.
+test("a marketing-site 'track this' stages a card naming plus-marketing-website and its visibility", async () => {
+  const SITE = "BilLogic/plus-marketing-website";
+  const input = { title: "Hero CTA links nowhere", body: "The hero button on the home page 404s.", repo: SITE };
+  const asked: Array<Record<string, unknown>> = [];
+  const h = harness({
+    replies: [{ text: "Filing it on the marketing site.", toolCalls: [{ name: "github_issue_create", args: input }] }],
+    issueTarget(staged) {
+      asked.push(staged);
+      return { repo: String(staged.repo), visibility: "public" };
+    },
+    executeOperation: async () => {
+      throw new Error("nothing reaches GitHub before the ✅");
+    },
+  });
+  const outcome = await runTurn(
+    request({ text: "the hero button on the marketing site 404s — track this on GitHub" }),
+    h.deps,
+  );
 
-// A follow-up on an issue writes to the same public repos, so its card shows
-// what will happen — the issue, each operation, and the comment verbatim —
-// before anything reaches GitHub.
+  assert.equal(outcome.disposition, "staged");
+  assert.deepEqual(outcome.staged!.proposal.input, input);
+  assert.deepEqual(asked, [input], "the card read the staged repo");
+  const card = outcome.staged!.card;
+  assert.equal(card.verb, `file a GitHub issue on ${SITE}`);
+  assert.deepEqual(card.caveats, [{ kind: "repo-visibility", repo: SITE, visibility: "public" }]);
+  assert.ok(renderProposalCard(card).text.includes(`${SITE}* is public`));
+  assert.deepEqual(h.ran, []);
+});
+
+// The requester stays in control of routing: "put it on plus-uno instead"
+// retires the first card and stages one naming the new repo.
+test("redirecting an intake's repo supersedes its card with one naming the new repo", async () => {
+  const SITE = "BilLogic/plus-marketing-website";
+  const HARNESS = "BilLogic/plus-uno";
+  const draft = { title: "Hero CTA links nowhere", body: "The hero button on the home page 404s." };
+  const h = harness({
+    replies: [
+      { text: "Filing it on the marketing site.", toolCalls: [{ name: "github_issue_create", args: { ...draft, repo: SITE } }] },
+      { text: "Moving it to plus-uno.", toolCalls: [{ name: "github_issue_create", args: { ...draft, repo: HARNESS } }] },
+    ],
+    issueTarget: (staged) => ({ repo: String(staged.repo), visibility: "public" }),
+  });
+
+  const first = await runTurn(request({ text: "the hero button 404s — track this on GitHub" }), h.deps);
+  assert.equal(first.staged!.card.verb, `file a GitHub issue on ${SITE}`);
+  const firstTs = first.staged!.proposal.proposalTs;
+
+  const second = await runTurn(
+    request({ text: "put it on plus-uno instead", pending: first.staged!.proposal }),
+    h.deps,
+  );
+  assert.equal(second.disposition, "staged");
+  assert.equal(second.staged!.card.verb, `file a GitHub issue on ${HARNESS}`);
+  assert.deepEqual(second.staged!.card.caveats, [{ kind: "repo-visibility", repo: HARNESS, visibility: "public" }]);
+  assert.equal((await h.threadState.getProposalByTs(firstTs)).state, "superseded");
+  assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, second.staged!.proposal.proposalTs);
+  assert.deepEqual(h.ran, []);
+});
+
+test("an intake card says a private repo is private, and a repo it couldn't check may be public", async () => {
+  for (const [visibility, words] of [
+    ["private", "* is private"],
+    ["unknown", "* may be public"],
+  ] as const) {
+    const h = harness({
+      replies: [{ text: "Filing it.", toolCalls: [{ name: "github_issue_create", args: { title: "A gap", body: "Details." } }] }],
+      issueTarget: () => ({ repo: ISSUE_REPO, visibility }),
+    });
+    const outcome = await runTurn(request({ text: "track this on GitHub" }), h.deps);
+    const text = renderProposalCard(outcome.staged!.card).text;
+    assert.ok(text.includes(`${ISSUE_REPO}${words}`), text);
+    if (visibility === "private") assert.doesNotMatch(text, /public/i);
+  }
+});
+
+
+// A follow-up on an issue writes to the same repos an intake does, so its card
+// shows what will happen — the resolved issue, each operation, and the comment
+// verbatim — before anything reaches GitHub.
+const UPDATE_LIST = parseRepoList(
+  JSON.stringify([
+    { repo: "BilLogic/plus-uno", purpose: "uno-bot and the harness", workflows: [] },
+    { repo: "BilLogic/plus-uno-blueprint", purpose: "the service-blueprint app", workflows: [] },
+  ]),
+  "BilLogic/plus-uno",
+);
+/** The card's read of the staged repo, through the real resolver. */
+const resolvedTarget = (staged: Record<string, unknown>) => {
+  const r = resolveRepo(UPDATE_LIST, staged.repo);
+  if (!r.ok) throw new Error(r.error);
+  return { repo: r.entry.repo, visibility: "public" as const };
+};
+
 test("'add this repro to #688 and close it' stages one card naming the issue, the operations and the comment", async () => {
   const comment = "Repro: open the card twice in one thread.\n\n```\nerror: stale ts\n```";
   const sent: string[] = [];
@@ -473,17 +566,50 @@ test("'add this repro to #688 and close it' stages one card naming the issue, th
     { label: "operations", value: "comment · add label `bug` · close as completed" },
     { label: "comment", value: comment },
   ]);
-  // The comment goes public, so the card says so, naming the repo.
-  assert.deepEqual(card.caveats, [{ kind: "public-comment", repo: ISSUE_REPO }]);
+  // The comment goes out, so the card says who can read it, naming the repo.
+  assert.deepEqual(card.caveats, [{ kind: "repo-visibility", repo: ISSUE_REPO, visibility: "public", write: "comment" }]);
   const text = renderProposalCard(card).text;
   assert.ok(text.includes(comment), text);
   assert.ok(text.includes(`${ISSUE_REPO}#688`), text);
-  assert.ok(text.includes(`${ISSUE_REPO}* is public`), text);
+  assert.ok(text.includes(`${ISSUE_REPO}* is public — anyone can read the comment`), text);
+  assert.ok(text.includes("linking this thread"), text);
 
   // Staged, not sent: nothing reached GitHub before the ✅.
   assert.equal((await h.threadState.getProposalByThread(REF))?.toolName, "github_issue_update");
   assert.deepEqual(sent, []);
   assert.deepEqual(h.ran, []);
+});
+
+test("an update card names the resolved repo — the list's spelling, not the model's", async () => {
+  for (const [asked, shown] of [
+    ["plus-uno", "BilLogic/plus-uno"],
+    ["BILLOGIC/Plus-Uno-Blueprint", "BilLogic/plus-uno-blueprint"],
+  ] as const) {
+    const h = harness({
+      replies: [
+        { text: "Commenting.", toolCalls: [{ name: "github_issue_update", args: { repo: asked, issue_number: 7, comment: "Seen again today." } }] },
+      ],
+      issueTarget: resolvedTarget,
+    });
+    const outcome = await runTurn(request({ text: "note on #7 that it happened again" }), h.deps);
+    const card = outcome.staged!.card;
+    assert.deepEqual(card.fields[0], { label: "issue", value: `${shown}#7` }, asked);
+    assert.equal((card.caveats[0] as { repo: string }).repo, shown, asked);
+  }
+});
+
+test("a comment asked for in a DM: the notice promises no link into the DM", async () => {
+  const h = harness({
+    replies: [{ text: "Commenting.", toolCalls: [{ name: "github_issue_update", args: { issue_number: 7, comment: "x" } }] }],
+  });
+  const outcome = await runTurn(request({ text: "comment on #7", channel: "D0DM", surface: "assistant" }), h.deps);
+  const card = outcome.staged!.card;
+  assert.deepEqual(card.caveats, [
+    { kind: "repo-visibility", repo: ISSUE_REPO, visibility: "public", write: "comment", fromDm: true },
+  ]);
+  const text = renderProposalCard(card).text;
+  assert.doesNotMatch(text, /linking this thread/);
+  assert.match(text, /I add a footer naming you\./);
 });
 
 test("follow-ups on two issues are one card with each issue's operations", async () => {
@@ -492,11 +618,12 @@ test("follow-ups on two issues are one card with each issue's operations", async
       {
         text: "Relabelling both.",
         toolCalls: [
-          { name: "github_issue_update", args: { repo: "BilLogic/plus-uno-blueprint", issue_number: 4, remove_labels: ["bug"] } },
+          { name: "github_issue_update", args: { repo: "plus-uno-blueprint", issue_number: 4, remove_labels: ["bug"] } },
           { name: "github_issue_update", args: { issue_number: 688, state: "open" } },
         ],
       },
     ],
+    issueTarget: resolvedTarget,
   });
   const outcome = await runTurn(request({ text: "take bug off blueprint #4 and reopen #688" }), h.deps);
 
@@ -505,9 +632,9 @@ test("follow-ups on two issues are one card with each issue's operations", async
   assert.equal(card.operations.length, 2);
   assert.deepEqual(card.fields, [
     { label: "BilLogic/plus-uno-blueprint#4", under: [{ field: { label: "operations", value: "remove label `bug`" } }] },
-    { label: `${ISSUE_REPO}#688`, under: [{ field: { label: "operations", value: "reopen" } }] },
+    { label: "BilLogic/plus-uno#688", under: [{ field: { label: "operations", value: "reopen" } }] },
   ]);
-  // No comment, so nothing new is published: no public notice.
+  // No comment, so nothing new is published: no visibility notice.
   assert.deepEqual(card.caveats, []);
 });
 

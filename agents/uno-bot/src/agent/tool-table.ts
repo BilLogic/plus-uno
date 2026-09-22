@@ -227,8 +227,8 @@ export const TOOL_TABLE = {
     // review heads-up in the design channel.
     reviewRequest: null,
     gate: {
-      // The repo and that it is public are the card's public-repo caveat,
-      // named from `GITHUB_REPO` — said once, and never a literal here.
+      // The card adds the resolved repo to this verb, and its visibility as
+      // the repo-visibility caveat — read, and never a literal here.
       verb: "file a GitHub issue",
       kind: "file an issue",
       nouns: ["issue", "github", "track", "file"],

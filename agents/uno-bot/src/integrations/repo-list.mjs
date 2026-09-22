@@ -41,7 +41,9 @@
  * What a tool's `repo` input resolves to: a listed repo — with whether it is
  * the default, `GITHUB_REPO`, which is the harness repo — or a refusal whose
  * text names the list.
- * @typedef {{ ok: true, entry: RepoEntry, isDefault: boolean } | { ok: false, error: string }} RepoResolution
+ * `misconfigured` marks the refusal of a list that failed to parse, which lists
+ * no repo to choose from.
+ * @typedef {{ ok: true, entry: RepoEntry, isDefault: boolean } | { ok: false, error: string, misconfigured?: boolean }} RepoResolution
  */
 
 /** A list the Worker will not read. Thrown by `parseRepoList`, never at a

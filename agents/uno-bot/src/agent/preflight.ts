@@ -22,6 +22,8 @@ import { listDsComponents, matchComponent, closestComponents } from "../integrat
 // Node test can both reach it without dragging `Env` behind them.
 import { placeholderRefusal } from "./placeholder";
 import { relayRecipientId } from "../tools/relayed-dm-render";
+import { resolveRepoFor } from "../integrations/github";
+import { issueUpdateFromInput } from "../tools/github-issue-update-render";
 
 export interface PreflightCtx {
   env: Env;
@@ -201,6 +203,34 @@ export async function preflight(
         return { ask: ":incoming_envelope: What should the DM say? Give me the message and I'll stage it for your ✅." };
       }
       return null;
+    }
+
+    case "github_issue_create": {
+      // The repo must be on the Worker's list: an unlisted one is refused here,
+      // naming the list, so no card offers a filing the executor would refuse.
+      // An omitted repo is the default, which resolves whenever the list parses.
+      const target = resolveRepoFor(ctx.env, input.repo);
+      if (target.ok) return null;
+      // A list that fails to parse offers no repo to choose from, so there is
+      // nothing to ask — only a cause, and who can fix it.
+      if (target.misconfigured) {
+        return { ask: `:x: I can't file a GitHub issue right now — ${target.error} Tell Bill the repo list is broken.` };
+      }
+      return { ask: `:mag: ${target.error} Which of those should this intake go on?` };
+    }
+
+    case "github_issue_update": {
+      // Read as the executor reads it, so no card offers a follow-up the
+      // executor would refuse: a triage outcome, nothing to do, a bad number
+      // or state. Then the repo, as for an intake.
+      const read = issueUpdateFromInput(input);
+      if (!read.ok) return { ask: `:x: I can't stage that issue update — ${read.error}.` };
+      const target = resolveRepoFor(ctx.env, input.repo);
+      if (target.ok) return null;
+      if (target.misconfigured) {
+        return { ask: `:x: I can't update a GitHub issue right now — ${target.error} Tell Bill the repo list is broken.` };
+      }
+      return { ask: `:mag: ${target.error} Which of those is the issue on?` };
     }
 
     case "shareout_post": {

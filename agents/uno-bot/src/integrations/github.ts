@@ -16,7 +16,8 @@
 // (comment, close or reopen, relabel) are a second client, for
 // `github_issue_update`, for the same reason. Beside them, the read the
 // duplicate check runs first — open issues by label and keyword, for
-// `github_intake_search` — a client for the same reason.
+// `github_intake_search` — a client for the same reason. And the read the
+// intake card makes: whether the repo is public, asked once per isolate.
 
 import type { Env } from "../types";
 import { countedFetch } from "../net";
@@ -65,6 +66,7 @@ export function resolveRepoFor(env: Env, requested: unknown): RepoResolution {
   if (list instanceof RepoListError) {
     return {
       ok: false,
+      misconfigured: true,
       error: `The Worker's GitHub repo list is misconfigured (${list.message}), so no repo is reachable until it is fixed.`,
     };
   }
@@ -293,6 +295,52 @@ export function githubIssueClient(env: Env, target: RepoEntry): GithubIssueClien
   };
 }
 
+/** Who can read a listed repo's issues, as the intake card states it —
+ *  `unknown` when GitHub would not say. Restated as the card's type in
+ *  `turn/delivery.ts`; keep the two in step. */
+export type RepoVisibility = "public" | "private" | "unknown";
+
+/** Answers GitHub gave, kept for the isolate's life: a repo turning private is
+ *  rare, and every intake card would otherwise spend a subrequest asking. A
+ *  failed lookup is not kept, so the next card asks again. Keyed lower-case
+ *  because GitHub repo names are case-insensitive, as the list's own matching
+ *  (`repo-list.mjs`) treats them. */
+const visibilityByRepo = new Map<string, "public" | "private">();
+
+/**
+ * Whether a listed repo is public (GET /repos/{repo}), for the intake card's
+ * notice. Never throws: no token, a refusal or a reply without GitHub's
+ * `private` flag are all `unknown`, and the card words that as "may be public".
+ */
+export async function githubRepoVisibility(env: Env, target: RepoEntry): Promise<RepoVisibility> {
+  const repo = target.repo;
+  const known = visibilityByRepo.get(repo.toLowerCase());
+  if (known) return known;
+  if (!env.GITHUB_TOKEN) return "unknown";
+  try {
+    const res = await countedFetch(`https://api.github.com/repos/${repo}`, {
+      headers: {
+        authorization: `Bearer ${env.GITHUB_TOKEN}`,
+        accept: "application/vnd.github+json",
+        "x-github-api-version": "2022-11-28",
+        "user-agent": "uno-bot",
+      },
+    }, GH_TIMEOUT_MS);
+    if (!res.ok) {
+      console.warn(`[github] visibility of ${repo} unread: ${res.status}`);
+      return "unknown";
+    }
+    const data = (await res.json().catch(() => ({}))) as { private?: unknown };
+    if (typeof data.private !== "boolean") return "unknown";
+    const visibility = data.private ? "private" : "public";
+    visibilityByRepo.set(repo.toLowerCase(), visibility);
+    return visibility;
+  } catch (err) {
+    console.warn(`[github] visibility of ${repo} unread: ${err instanceof Error ? err.message : String(err)}`);
+    return "unknown";
+  }
+}
+
 /** The follow-up writes `github_issue_update` makes, bound to one repo. Each
  *  throws `GithubRequestError` (or `GithubRateLimitError`) on any non-2xx. */
 export interface GithubIssueUpdateClient {
@@ -347,7 +395,13 @@ export function githubIssueUpdateClient(env: Env, target: RepoEntry): GithubIssu
     if (!res.ok) {
       // The status only: a refusal's body can echo what was sent.
       console.warn(`[github] ${what} on ${repo} refused: ${res.status}`);
-      if ((res.status === 403 || res.status === 429) && res.headers.get("x-ratelimit-remaining") === "0") {
+      // A spent primary limit says `x-ratelimit-remaining: 0`; a secondary
+      // (abuse) limit is a 403 or 429 carrying `retry-after` instead. Both
+      // are "try later", never "the token lacks permission".
+      if (
+        (res.status === 403 || res.status === 429) &&
+        (res.headers.get("x-ratelimit-remaining") === "0" || res.headers.has("retry-after"))
+      ) {
         throw new GithubRateLimitError(res.status, `GitHub ${what} rate-limited (${res.status}) for ${repo}`);
       }
       throw new GithubRequestError(res.status, `GitHub ${what} ${res.status} for ${repo}`);
@@ -368,6 +422,11 @@ export function githubIssueUpdateClient(env: Env, target: RepoEntry): GithubIssu
         const batch = Array.isArray(data) ? data : [];
         names.push(...batch.flatMap((l) => (typeof l.name === "string" ? [l.name] : [])));
         if (batch.length < LABEL_PAGE) break;
+        if (page === LABEL_PAGES_MAX) {
+          // A label past the cap reads as missing, and an update naming it is
+          // refused — said here so the refusal has a cause in the logs.
+          console.warn(`[github] ${repo} has more than ${LABEL_PAGE * LABEL_PAGES_MAX} labels; read the first ${names.length}`);
+        }
       }
       labelCache.set(repo, { at: Date.now(), names });
       return names;

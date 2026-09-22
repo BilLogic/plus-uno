@@ -34,16 +34,16 @@ export interface IssueFiling {
   /** The source thread's permalink, or null when Slack would not give one. */
   permalink: string | null;
   /** Asked for in a DM: the footer says so and links nothing, because a DM
-   *  stays a DM and the issue is public. */
+   *  stays a DM and the issue may be public. */
   dm?: boolean;
 }
 
 /**
  * The draft as the tool input carries it.
  *
- * Reads `title` and `body` and nothing else, so a `labels` or `repo` the model
- * sent anyway goes nowhere — the schema refuses them too, but the executor does
- * not rely on the schema.
+ * Reads `title` and `body` and nothing else, so a `labels` the model sent
+ * anyway goes nowhere — the schema refuses it too, but the executor does not
+ * rely on the schema. The `repo` is the executor's, through the resolver.
  */
 export function issueDraftFromInput(input: Record<string, unknown>): IssueDraft {
   const str = (v: unknown): string => (typeof v === "string" ? v.trim() : "");

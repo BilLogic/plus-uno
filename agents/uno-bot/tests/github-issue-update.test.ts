@@ -21,12 +21,15 @@ import { TRIAGE_OUTCOME_LABELS, renderCommentBody } from "../src/tools/github-is
 import { describeIssueUpdate, issueUpdateFromInput } from "../src/tools/github-issue-update-render";
 import { updateGithubIssue, type GithubIssueUpdateDeps } from "../src/tools/github-issue-update";
 import {
+  GithubRateLimitError,
   GithubRequestError,
   type GithubIssueUpdateClient,
   type RepoEntry,
 } from "../src/integrations/github";
 import { parseRepoList, resolveRepo } from "../src/integrations/repo-list.mjs";
 import { batchOutcomeNote, runOperations } from "../src/gate/index";
+import { preflight } from "../src/agent/preflight";
+import type { Env } from "../src/types";
 
 const UNO = "BilLogic/plus-uno";
 const SITE = "BilLogic/plus-marketing-website";
@@ -288,6 +291,15 @@ for (const [status, cause] of [
   });
 }
 
+test("a rate-limited 403 is a try-later note, not a permission one", async () => {
+  const github = fakeGithub({ op: "comment", err: new GithubRateLimitError(403, "GitHub comment rate-limited (403)") });
+  const { deps: d } = deps(github);
+  const result = parse(await updateGithubIssue({ issue_number: 688, comment: "x" }, d));
+  assert.equal(result.ok, false);
+  assert.match(result.error!, /rate limit/);
+  assert.doesNotMatch(result.error!, /permission/);
+});
+
 test("a failure part-way names what was done before it stopped", async () => {
   const github = fakeGithub({ op: "state", err: new GithubRequestError(403, "GitHub 403") });
   const { deps: d } = deps(github);
@@ -309,4 +321,41 @@ test("the issue link comes back in the gate's note", async () => {
   assert.ok(note.includes(`https://github.com/${UNO}/issues/688`), note);
   assert.match(note, /reopen/);
   assert.doesNotMatch(note, /Notion/);
+});
+
+// ── preflight: refused before a card is staged ───────────────────────────────
+
+const PREFLIGHT_ENV = {
+  GITHUB_REPO: UNO,
+  GITHUB_REPOS: JSON.stringify([
+    { repo: UNO, purpose: "uno-bot and the harness", workflows: [] },
+    { repo: SITE, purpose: "the public marketing site", workflows: [] },
+  ]),
+} as unknown as Env;
+
+test("preflight refuses what the executor would refuse — a triage outcome, nothing to do — so no card is staged", async () => {
+  for (const [input, cause] of [
+    [{ issue_number: 688, add_labels: ["ready-for-agent"] }, /triage outcome/],
+    [{ issue_number: 688, remove_labels: ["wontfix"], comment: "x" }, /triage outcome/],
+    [{ issue_number: 688 }, /nothing to do/],
+    [{ issue_number: 688, state: "closed" }, /'state' must be one of/],
+  ] as const) {
+    const ask = await preflight("github_issue_update", input, { env: PREFLIGHT_ENV, prd: null });
+    assert.ok(ask, JSON.stringify(input));
+    assert.match(ask.ask, cause);
+  }
+});
+
+test("preflight asks which listed repo when the named one is off the list, and passes a listed one", async () => {
+  const ask = await preflight("github_issue_update", { repo: "someone/else", issue_number: 1, comment: "x" }, {
+    env: PREFLIGHT_ENV,
+    prd: null,
+  });
+  assert.ok(ask);
+  assert.match(ask.ask, /someone\/else/);
+  assert.ok(ask.ask.includes(SITE), ask.ask);
+  for (const repo of [undefined, "plus-marketing-website", "BILLOGIC/PLUS-UNO"]) {
+    const input = { issue_number: 1, comment: "x", ...(repo ? { repo } : {}) };
+    assert.equal(await preflight("github_issue_update", input, { env: PREFLIGHT_ENV, prd: null }), null, String(repo));
+  }
 });
