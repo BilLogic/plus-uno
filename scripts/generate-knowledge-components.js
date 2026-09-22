@@ -18,61 +18,12 @@
 import fs from 'fs';
 import path from 'path';
 import { AGENT_ROOT, REPO_ROOT } from './agent-views-paths.js';
+import { extractExports } from './lib/barrel-exports.js';
+import { isEntry } from './lib/findings.mjs';
 import { checkArtifacts, writeArtifacts } from './lib/generated-artifact.js';
 
-const COMPONENTS_INDEX = path.join(REPO_ROOT, 'design-system/src/components/index.js');
-
-/** Resolve an import specifier (`@/components/x`, `./x`) to a barrel file. */
-function resolveBarrel(spec, fromFile) {
-  const base = spec.startsWith('@/')
-    ? path.join(REPO_ROOT, 'design-system/src', spec.slice(2))
-    : path.resolve(path.dirname(fromFile), spec);
-  for (const candidate of [base, `${base}.js`, path.join(base, 'index.js')]) {
-    if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) return candidate;
-  }
-  return null;
-}
-
-/**
- * Every component name a barrel exports, following `export * from` one barrel at
- * a time.
- *
- * The star form is not cosmetic: `components/index.js` re-exports the whole
- * `forms-and-inputs` group that way, so a named-export-only regex silently
- * dropped DatePicker and InputGroup — real, documented, exported components —
- * from an index whose own header says "If it's not listed, it DOES NOT EXIST."
- * A generator that quietly under-reports is worse than one that fails.
- */
-function extractExports(indexPath, seen = new Set()) {
-  if (!fs.existsSync(indexPath) || seen.has(indexPath)) return [];
-  seen.add(indexPath);
-  const content = fs.readFileSync(indexPath, 'utf8');
-  const names = [];
-
-  const named = /export\s+\{.*as\s+([a-zA-Z0-9]+)\s*\}/g;
-  let m;
-  while ((m = named.exec(content)) !== null) names.push(m[1]);
-
-  // Follow `export *` only into sibling barrels under the same root. This index
-  // "mirrors design-system/src/components/" — `components/index.js` also stars
-  // `@/dataviz`, and pulling 47 chart wrappers in here would file them under
-  // "UI components". Charts have their own home in the IA.
-  const root = path.dirname(indexPath).startsWith(path.join(REPO_ROOT, 'design-system/src/components'))
-    ? path.join(REPO_ROOT, 'design-system/src/components')
-    : path.dirname(indexPath);
-  const star = /export\s+\*\s+from\s+['"]([^'"]+)['"]/g;
-  while ((m = star.exec(content)) !== null) {
-    const barrel = resolveBarrel(m[1], indexPath);
-    if (!barrel) {
-      console.warn(`  ! export * from '${m[1]}' in ${path.relative(REPO_ROOT, indexPath)} — unresolvable; its components would be MISSING from the index`);
-      continue;
-    }
-    if (!barrel.startsWith(root)) continue; // e.g. @/dataviz — a different section
-    names.push(...extractExports(barrel, seen));
-  }
-
-  return [...new Set(names)].sort();
-}
+const COMPONENTS_ROOT = path.join(REPO_ROOT, 'design-system/src/components');
+const COMPONENTS_INDEX = path.join(COMPONENTS_ROOT, 'index.js');
 
 /**
  * `export { default as Scale } from './RadioButtonGroup'` — the barrels alias
@@ -172,7 +123,17 @@ Regenerate: \`npm run generate:agent\`
 
 function main() {
   const check = process.argv.includes('--check');
-  const components = extractExports(COMPONENTS_INDEX);
+  // The index mirrors `design-system/src/components/`, and `export *` into
+  // `@/dataviz` would file 47 chart wrappers under "UI components". Charts have
+  // their own home in the IA, so the walk stops at the components boundary.
+  const components = extractExports(COMPONENTS_INDEX, {
+    repoRoot: REPO_ROOT,
+    boundary: COMPONENTS_ROOT,
+    onUnresolved: (spec, from) =>
+      console.warn(
+        `  ! export * from '${spec}' in ${path.relative(REPO_ROOT, from)} — unresolvable; its components would be MISSING from the index`,
+      ),
+  });
 
   const artifacts = [
     { file: path.join(AGENT_ROOT, 'components/index.md'), content: renderComponentIndex(components) },
@@ -193,4 +154,7 @@ function main() {
   console.log(`Done. ${components.length} components indexed.`);
 }
 
-main();
+// Only when run as a script: this module writes generated files, and the
+// parsing seam now lives in lib/barrel-exports.js, so importing it to read
+// anything must not rewrite the agent views as a side effect.
+if (isEntry(import.meta.url)) main();
