@@ -20,6 +20,7 @@
 
 import type { Env, SlackContext } from "../types";
 import { getPermalink, postMessage, usersInfo } from "../slack/api";
+import { escapeSlackText } from "../slack/mrkdwn";
 import {
   GithubRequestError,
   githubIssueClient,
@@ -90,7 +91,8 @@ export async function fileGithubIssue(
   // the issue exists, and the result says so either way.
   await say(
     deps,
-    `:white_check_mark: Filed <${issue.url}|#${issue.number} ${draft.title}> on ${repo} — ` +
+    // The title is escaped inside the label: a `>` in it would end the link.
+    `:white_check_mark: Filed <${issue.url}|#${issue.number} ${escapeSlackText(draft.title)}> on ${repo} — ` +
       `labelled \`${INTAKE_LABELS.join("` + `")}\`, so it's in the triage queue.`,
   );
   return JSON.stringify({

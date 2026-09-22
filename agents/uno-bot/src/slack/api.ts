@@ -2,7 +2,7 @@
 // because we only need 3-4 methods and Workers prefers a small bundle.
 
 import type { Env } from "../types";
-import { toSlackMrkdwn } from "./mrkdwn";
+import { sanitizeSlackBlocks, sanitizeSlackMarkup, toSlackMrkdwn } from "./mrkdwn";
 import { countedFetch, rethrowIfBudget } from "../net";
 import type { SlackEventFile } from "./types";
 import { rowFor } from "../agent/tool-table";
@@ -53,7 +53,7 @@ export async function slackCall<T extends SlackResponse>(
         "content-type": "application/json; charset=utf-8",
         authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(withSafeBlocks(payload)),
     });
   } catch (err) {
     // A budget stop is not a network error — let the loop report it as one and
@@ -63,6 +63,32 @@ export async function slackCall<T extends SlackResponse>(
     return { ok: false, error: "network_error" } as unknown as T;
   }
   return parseSlackResponse<T>(res, method);
+}
+
+/**
+ * Every Block Kit payload leaves through the markup pass: the blocks are what a
+ * reader sees, and `<…>` Slack cannot parse blanks a message (live 2026-09-22,
+ * `mrkdwn.ts` § sanitizeSlackMarkup). Here, once, rather than at each builder.
+ */
+function withSafeBlocks(payload: Record<string, unknown>): Record<string, unknown> {
+  return payload.blocks ? { ...payload, blocks: sanitizeSlackBlocks(payload.blocks) } : payload;
+}
+
+/**
+ * Answer through an interaction's or a slash command's `response_url` — the one
+ * way the Worker posts without `chat.postMessage`, so it takes the same markup
+ * pass: `text` and every mrkdwn block. Throws what the fetch throws; the
+ * callers decide what a failed reply is worth.
+ */
+export async function postToResponseUrl(
+  responseUrl: string,
+  body: { text: string; blocks?: unknown[] } & Record<string, unknown>,
+): Promise<void> {
+  await countedFetch(responseUrl, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(withSafeBlocks({ ...body, text: sanitizeSlackMarkup(body.text) })),
+  });
 }
 
 // Slack READ methods reject JSON bodies (invalid_arguments — the
@@ -136,10 +162,13 @@ export async function postMessage(env: Env, input: PostMessageInput) {
   // slips into GitHub-flavored Markdown (## / **bold** / tables) under load, and
   // Slack renders none of it. Idempotent on Worker-authored text. (blocks, when
   // present, are Worker-built and already valid.)
+  //
+  // Then the markup pass, on everything: `<…>` Slack cannot parse blanks the
+  // whole message (live 2026-09-22), so only valid markup leaves as markup.
   return slackCall<SlackResponse & { ts?: string; channel?: string }>(env, "chat.postMessage", {
     mrkdwn: true,
     ...input,
-    ...(input.text ? { text: toSlackMrkdwn(input.text) } : {}),
+    ...(input.text ? { text: sanitizeSlackMarkup(toSlackMrkdwn(input.text)) } : {}),
   });
 }
 

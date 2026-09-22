@@ -51,7 +51,7 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
   }
   if (url.includes("slack.com/api/users.info")) {
     const user = new URL(url).searchParams.get("user");
-    return reply({ ok: true, user: { id: user, profile: { display_name: user === "U0REQ1" ? "Bill Guo" : "" } } });
+    return reply({ ok: true, user: { id: user, profile: { display_name: user === "U0REQUESTR1" ? "Bill Guo" : "" } } });
   }
   if (url.includes("slack.com/api/")) return reply({ ok: true, ts: "1700000000.999999" });
   if (url.startsWith("https://api.github.com/repos/") && url.endsWith("/issues")) {
@@ -95,7 +95,7 @@ function won(operations: Array<{ toolName: string; input: Record<string, unknown
     userMsgTs: "1700000000.000200",
     proposalTs: "1700000000.000300",
     proposalText: "(the card)",
-    requesterUserId: "U0REQ1",
+    requesterUserId: "U0REQUESTR1",
   };
   return {
     outcome: "won",
@@ -123,11 +123,11 @@ const posts = () => calls.filter((c) => c.url.includes("chat.postMessage")).map(
 test("an approved relay reaches its recipient attributed to the requester, and confirms under the reply ts", async () => {
   calls = [];
   const run = await executeVerdict();
-  await run(env(), won([{ toolName: "dm_relay", input: { recipient: "U0COCO", text: "RM-2436 is **Ready for QA**." } }]));
+  await run(env(), won([{ toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "RM-2436 is **Ready for QA**." } }]));
 
-  const dm = posts().find((p) => p.channel === "D-U0COCO");
+  const dm = posts().find((p) => p.channel === "D-U0COCO0001");
   assert.ok(dm, "the recipient got a DM");
-  assert.ok(String(dm.text).startsWith("<@U0REQ1> asked me to pass this on:"), String(dm.text));
+  assert.ok(String(dm.text).startsWith("<@U0REQUESTR1> asked me to pass this on:"), String(dm.text));
   // The text goes out through the same Markdown → mrkdwn conversion as any
   // other reply: the schema asks for standard Markdown.
   assert.ok(String(dm.text).includes("RM-2436 is *Ready for QA*."), String(dm.text));
@@ -135,7 +135,7 @@ test("an approved relay reaches its recipient attributed to the requester, and c
 
   const note = posts().find((p) => p.channel === "D0REQUESTER");
   assert.ok(note, "the requesting conversation heard where it went");
-  assert.match(String(note.text), /Sent to <@U0COCO>/);
+  assert.match(String(note.text), /Sent to <@U0COCO0001>/);
   assert.equal(note.thread_ts, "1700000000.000100", "under the real reply ts, not the conversation key");
 });
 
@@ -145,18 +145,18 @@ test("a multi-recipient relay tells the thread once", async () => {
   await run(
     env(),
     won([
-      { toolName: "dm_relay", input: { recipient: "U0COCO", text: "hi" } },
-      { toolName: "dm_relay", input: { recipient: "U0MERYEM", text: "hi" } },
+      { toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "hi" } },
+      { toolName: "dm_relay", input: { recipient: "U0MERYEM01", text: "hi" } },
     ]),
   );
   assert.deepEqual(
     posts().filter((p) => String(p.channel).startsWith("D-")).map((p) => p.channel),
-    ["D-U0COCO", "D-U0MERYEM"],
+    ["D-U0COCO0001", "D-U0MERYEM01"],
   );
   const inThread = posts().filter((p) => p.channel === "D0REQUESTER");
   assert.equal(inThread.length, 1, inThread.map((p) => p.text).join("\n---\n"));
-  assert.match(String(inThread[0]!.text), /<@U0COCO>/);
-  assert.match(String(inThread[0]!.text), /<@U0MERYEM>/);
+  assert.match(String(inThread[0]!.text), /<@U0COCO0001>/);
+  assert.match(String(inThread[0]!.text), /<@U0MERYEM01>/);
 });
 
 const EMAIL = {
@@ -174,7 +174,7 @@ const gmailSends = () => calls.filter((c) => c.url.includes("gmail.googleapis.co
 test("email_send's user allowlist sees who asked: an allowlisted requester sends", async () => {
   calls = [];
   const run = await executeVerdict();
-  await run(env({ ...GMAIL, EMAIL_AUTHORIZED_USERS: "U0REQ1" }), won([EMAIL]));
+  await run(env({ ...GMAIL, EMAIL_AUTHORIZED_USERS: "U0REQUESTR1" }), won([EMAIL]));
   assert.equal(gmailSends(), 1);
 });
 

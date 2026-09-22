@@ -220,6 +220,54 @@ test("the pasteable draft survives a body that carries its own code fence", asyn
   assert.ok(posted[0]!.includes("````\n" + body + "\n````"), String(posted[0]));
 });
 
+// Slack reads `&`, `<` and `>` in message text as control characters, so a
+// draft that quotes a mention token or an HTML tag has to reach the thread
+// escaped. The live draft that went out blank carried `<@U...>` and
+// `<@teammate>` in inline code; the one that rendered carried neither.
+const CONTROL_DRAFT = {
+  title: "Worker strips <@U…> mentions & more",
+  body: [
+    "### Problem",
+    "Other user mentions (`<@U...>` tokens) should be preserved.",
+    "2. Inspect the turn text: the `<@teammate>` token is missing, and a -> b & c.",
+  ].join("\n"),
+};
+
+/** What Slack displays for escaped text: only these three entities decode. */
+function slackDisplay(text: string): string {
+  return text.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+}
+
+test("the failure note escapes Slack's control characters, and still reads as the draft", async () => {
+  const github = fakeClient(() => new GithubRequestError(403, "GitHub issues 403"));
+  const { deps: d, posted } = deps(github);
+
+  const result = JSON.parse(await fileGithubIssue({ ...CONTROL_DRAFT }, d)) as {
+    draft?: { title: string; body: string };
+  };
+
+  const note = posted[0]!;
+  const draftPart = note.slice(note.indexOf("file by hand:"));
+  assert.doesNotMatch(draftPart, /[<>]/, draftPart);
+  assert.doesNotMatch(draftPart, /&(?!amp;|lt;|gt;)/, draftPart);
+  // What the person sees, and copies, is the draft itself.
+  assert.ok(slackDisplay(draftPart).includes(CONTROL_DRAFT.body), slackDisplay(draftPart));
+  assert.ok(slackDisplay(draftPart).includes(CONTROL_DRAFT.title), slackDisplay(draftPart));
+  // The record keeps the words as written: escaping is Slack's, not the draft's.
+  assert.deepEqual(result.draft, CONTROL_DRAFT);
+});
+
+test("the filed note's link label escapes the title, so the link is not cut short", async () => {
+  const github = fakeClient(() => FILED);
+  const { deps: d, posted } = deps(github);
+
+  await fileGithubIssue({ ...CONTROL_DRAFT }, d);
+
+  assert.equal(github.sent[0]!.title, CONTROL_DRAFT.title, "GitHub gets the title as written");
+  const label = posted[0]!.match(/<[^|>]+\|([^>]*)>/)?.[1] ?? "";
+  assert.equal(slackDisplay(label), `#${FILED.number} ${CONTROL_DRAFT.title}`, String(posted[0]));
+});
+
 test("a draft with no title or no body files nothing", async () => {
   for (const input of [{ body: DRAFT.body }, { title: DRAFT.title }, { title: " ", body: " " }]) {
     const github = fakeClient(() => FILED);

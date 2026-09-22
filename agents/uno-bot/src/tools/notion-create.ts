@@ -9,6 +9,7 @@
 import type { Env } from "../types";
 import type { SlackContext } from "../types";
 import { postMessage } from "../slack/api";
+import { escapeSlackText } from "../slack/mrkdwn";
 import { notionCreate, type NotionCreateSurface, type PrdSection } from "../integrations/notion";
 
 const SURFACES = new Set<NotionCreateSurface>(["prd", "intake", "decision"]);
@@ -96,7 +97,8 @@ export async function executeNotionCreate(
     await postMessage(env, {
       channel: slack.channel,
       thread_ts: slack.threadTs,
-      text: `:memo: Created on *${created.label}*: <${created.url}|${title}>`,
+      // Escaped inside the label: a `>` in the title would end the link.
+      text: `:memo: Created on *${created.label}*: <${created.url}|${escapeSlackText(title)}>`,
     });
     return JSON.stringify({
       ok: true,

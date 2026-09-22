@@ -18,6 +18,7 @@
 // call that fetches it is a named client on `TurnDeps.cards`, wired in
 // `turn/env-deps.ts`, which is what keeps `Env` out of here.
 import { textSections } from "./render";
+import { escapeSlackText } from "./mrkdwn";
 import type { CardCaveat, CardField, CardRevision, ProposalCard } from "../turn/index";
 import type { ProposalOperation } from "../thread-state/index";
 import { gateWordsFor } from "../agent/tool-table";
@@ -494,7 +495,11 @@ function operationGroupKey(op: PlannedOperation): { key: string; heading: string
   const pageUrl = str("page_url") || str("url");
   const title = str("title") || str("page_title") || str("page");
   if (pageUrl || title) {
-    const heading = pageUrl ? `*<${pageUrl}|${title || "this Notion page"}>*` : `*${title}*`;
+    // Only a real URL becomes a link, and the title is escaped inside its
+    // label: a `>` in either would end the link early.
+    const linked = /^https?:\/\/[^\s|<>]+$/.test(pageUrl);
+    const label = escapeSlackText(title || (linked ? "this Notion page" : pageUrl));
+    const heading = linked ? `*<${pageUrl}|${label}>*` : `*${label}*`;
     return { key: `page:${(pageUrl || title).toLowerCase()}`, heading };
   }
   const target = operationTarget(op.input);
