@@ -38,7 +38,7 @@ From `design-system/src/components/_internal/Navbar/Navbar.scss`. Override these
 
 ## Related
 
-Same group: `CompetencyBadge` · `Footer` · `LoadingGif` · `PageLayout` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Sidebar` · `StaticBadgeSmart` · `Table` · `UserAvatar`
+Same group: `CompetencyBadge` · `Footer` · `LoadingGif` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Sidebar` · `StaticBadgeSmart` · `Table` · `UserAvatar`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

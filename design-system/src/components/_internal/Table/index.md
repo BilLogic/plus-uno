@@ -41,7 +41,7 @@ From `design-system/src/components/_internal/Table/Table.scss`. Override these t
 
 ## Related
 
-Same group: `CompetencyBadge` · `Footer` · `LoadingGif` · `Navbar` · `PageLayout` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Sidebar` · `StaticBadgeSmart` · `UserAvatar`
+Same group: `CompetencyBadge` · `Footer` · `LoadingGif` · `Navbar` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Sidebar` · `StaticBadgeSmart` · `UserAvatar`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 
