@@ -257,6 +257,24 @@ test('strict THROWS on a directory it cannot read, rather than sweeping fewer fi
   }
 });
 
+test('an absent glob prefix answers empty under strict, as an absent path does', () => {
+  // A sweep names roots that not every tree has — `agents/**/*.md` against a
+  // fixture root with no agents/ — and strict is about a directory that exists
+  // and cannot be read, not about one that is not there. The literal branch
+  // always said so; the glob branch used to throw.
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'corpus-absent-glob-'));
+  fs.mkdirSync(path.join(root, 'docs'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'docs/a.md'), '# a\n');
+  try {
+    assert.deepEqual(documents('agents/**/*.md', { root, strict: true }), []);
+    assert.deepEqual(documents('agents/**/*.md', { root }), []);
+    // Present, so still walked — the guard skips nothing it could have read.
+    assert.deepEqual(documents('docs/**/*.md', { root, strict: true }), ['docs/a.md']);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('a broken symlink costs only itself, in both modes', () => {
   // The other half. `withFileTypes` describes the LINK, so a walk that trusted
   // the dirent would return a dangling one as a document with no file behind

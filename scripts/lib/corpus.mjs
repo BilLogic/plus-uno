@@ -58,6 +58,18 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(HERE, '../..');
 
 /**
+ * The GENERATED harness bundle, which is not an authored document.
+ *
+ * It is assembled from documents the sweeps already read at their own paths,
+ * so every pointer and every link inside it is a second copy — and one that
+ * resolves from the bundle's directory rather than the source's, which invents
+ * misses that no author can fix. Both `check-doc-links.mjs` and
+ * `check-pointers.mjs` exclude it, which is two checks with the same rule and
+ * so one home for it, per this module's own header.
+ */
+export const GENERATED_BUNDLE = /^agents\/uno-bot\/harness-bundle\.md$/;
+
+/**
  * Directories that hold no authored document, collected from the private
  * walkers this module replaces: `node_modules` and `.git` from every one of
  * them, `.claude` (worktrees, not code) and the build outputs from

@@ -93,6 +93,45 @@ test('a heading that really does carry a comma still resolves', () => {
   try { assert.deepEqual(sweep(r.root).failures, []); } finally { r.done(); }
 });
 
+test('a comma-bearing heading renamed PAST the comma fails', () => {
+  // The counterpart of the test above, and the reason it is not enough on its
+  // own: the tail after the comma is exactly what a rename edits, so a sweep
+  // that checked the stub would pass this and say nothing.
+  const r = repo('Routing table: `docs/t.md` § Two sources, one time axis (ADR-021).', {
+    'docs/t.md': '# T\n\n## Two sources of truth, one axis\n',
+  });
+  try {
+    const { failures } = sweep(r.root);
+    assert.equal(failures.length, 1);
+    assert.match(failures[0], /§ Two sources, one time axis/);
+  } finally { r.done(); }
+});
+
+test('a heading stub too short to name the section is rejected', () => {
+  const r = repo('See `docs/t.md` § Two.', { 'docs/t.md': '# T\n\n## Two vocabularies\n' });
+  try {
+    const { failures } = sweep(r.root);
+    assert.equal(failures.length, 1);
+    assert.match(failures[0], /§ Two /);
+  } finally { r.done(); }
+});
+
+test('a citation may drop the heading\'s trailing aside', () => {
+  const r = repo('Routing table: `docs/t.md` § Two sources, one time axis.', {
+    'docs/t.md': '# T\n\n## Two sources, one time axis (ADR-021)\n',
+  });
+  try { assert.deepEqual(sweep(r.root).failures, []); } finally { r.done(); }
+});
+
+test('a citation may drop a dash gloss too, but not the name in front of it', () => {
+  const heading = '# T\n\n## Two vocabularies — the blueprint speaks service-blueprint\n';
+  const named = repo('Route by frame words: `docs/t.md` § Two vocabularies.', { 'docs/t.md': heading });
+  try { assert.deepEqual(sweep(named.root).failures, []); } finally { named.done(); }
+
+  const stub = repo('Route by frame words: `docs/t.md` § Two.', { 'docs/t.md': heading });
+  try { assert.equal(sweep(stub.root).failures.length, 1); } finally { stub.done(); }
+});
+
 // ── What the sweep reads ──────────────────────────────────────────────────
 
 test('a dangling § citation in an agent file fails', () => {
