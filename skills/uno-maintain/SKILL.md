@@ -28,7 +28,7 @@ Fix the harness, not project design work. The shared procedure — taxonomy, sev
 |---|---|
 | Human spot | "this is wrong / stale / off" — any of the four trigger types |
 | Auditor sweep | `reviewers/auditor` files intakes from a named registry checklist |
-| Intake queue | open GitHub issues labeled `harness-intake` on every repo in uno-bot's `GITHUB_REPOS` list — filed by the cron sweeps (method §1 headless surrogate) and by uno-bot on whichever listed repo the change belongs to. **Drain first on every maintain session**: `npm run intake:queue` (reads the Worker's own list), triage each into the pipeline, close as incorporated on its own repo |
+| Intake queue | open GitHub issues labeled `harness-intake` on every repo in uno-bot's `GITHUB_REPOS` list, whoever filed them (the cron sweeps file on plus-uno — method §1 headless surrogate). **Drain first on every maintain session**: `npm run intake:queue` (reads the Worker's own list), triage each into the pipeline, close as incorporated on its own repo |
 | DS gap from prototyping | `uno-prototype` hits a missing/broken component or token |
 | Legacy-source conflict | a legacy Notion/Figma page contradicts repo-canonical `docs/conventions/*` (method §6) |
 | Post-ship reconciliation | a handoff shipped; DS + harness **+ blueprint** reconcile against built reality (ship-time is when the blueprint must be updated — the paired-write contract, `docs/connectors/supabase/overview.md`) |

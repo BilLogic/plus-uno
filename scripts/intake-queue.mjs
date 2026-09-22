@@ -16,12 +16,12 @@
 //   npm run intake:queue            table, oldest first
 //   npm run intake:queue -- --json  the merged list as JSON
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { parseRepoList } from "../agents/uno-bot/src/integrations/repo-list.mjs";
 import { varValueInWrangler } from "../agents/uno-bot/scripts/secrets.mjs";
+import { text } from "./lib/corpus.mjs";
 import { isEntry } from "./lib/findings.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -30,13 +30,17 @@ const REPO_ROOT = path.resolve(here, "..");
 /** The label every intake carries, whoever filed it. */
 export const INTAKE_LABEL = "harness-intake";
 
+/** Issues asked for per repo. A repo answering with exactly this many may
+ *  have more, so the reader says so. */
+export const PER_REPO_LIMIT = 200;
+
 /**
  * The repos the queue reads: the Worker's list, in its order.
  * @param {{ repoRoot?: string }} [ctx]
  * @returns {string[]}
  */
 export function intakeRepos({ repoRoot = REPO_ROOT } = {}) {
-  const toml = readFileSync(path.join(repoRoot, "agents", "uno-bot", "wrangler.toml"), "utf8");
+  const toml = text("agents/uno-bot/wrangler.toml", { root: repoRoot });
   const list = parseRepoList(varValueInWrangler(toml, "GITHUB_REPOS"), varValueInWrangler(toml, "GITHUB_REPO"));
   return list.entries.map((e) => e.repo);
 }
@@ -50,20 +54,23 @@ export function intakeRepos({ repoRoot = REPO_ROOT } = {}) {
  * Ask each repo for its open intakes and merge the answers, oldest first.
  * @param {readonly string[]} repos
  * @param {ListIssues} listIssues
- * @returns {{ items: (Issue & { repo: string })[], failures: { repo: string, error: string }[] }}
+ * @returns {{ items: (Issue & { repo: string })[], failures: { repo: string, error: string }[], truncated: string[] }}
  */
 export function readQueue(repos, listIssues) {
   const items = [];
   const failures = [];
+  const truncated = [];
   for (const repo of repos) {
     try {
-      for (const issue of listIssues(repo, INTAKE_LABEL)) items.push({ repo, ...issue });
+      const issues = listIssues(repo, INTAKE_LABEL);
+      if (issues.length >= PER_REPO_LIMIT) truncated.push(repo);
+      for (const issue of issues) items.push({ repo, ...issue });
     } catch (err) {
       failures.push({ repo, error: err instanceof Error ? err.message : String(err) });
     }
   }
   items.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-  return { items, failures };
+  return { items, failures, truncated };
 }
 
 /** @type {ListIssues} */
@@ -71,7 +78,7 @@ const ghListIssues = (repo, label) =>
   JSON.parse(
     execFileSync(
       "gh",
-      ["issue", "list", "--repo", repo, "--label", label, "--state", "open", "--limit", "200",
+      ["issue", "list", "--repo", repo, "--label", label, "--state", "open", "--limit", String(PER_REPO_LIMIT),
         "--json", "number,title,url,createdAt"],
       { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
     ),
@@ -79,9 +86,12 @@ const ghListIssues = (repo, label) =>
 
 if (isEntry(import.meta.url)) {
   const repos = intakeRepos();
-  const { items, failures } = readQueue(repos, ghListIssues);
+  const { items, failures, truncated } = readQueue(repos, ghListIssues);
+  for (const repo of truncated) {
+    console.error(`  ${repo} returned ${PER_REPO_LIMIT} intakes, the per-repo limit — there may be more.`);
+  }
   if (process.argv.includes("--json")) {
-    console.log(JSON.stringify({ repos, items, failures }, null, 2));
+    console.log(JSON.stringify({ repos, items, failures, truncated }, null, 2));
   } else {
     console.log(`Open ${INTAKE_LABEL} issues across ${repos.length} repos (${repos.join(", ")}): ${items.length}`);
     for (const i of items) console.log(`  ${i.createdAt.slice(0, 10)}  ${i.repo}#${i.number}  ${i.title}  ${i.url}`);

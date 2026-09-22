@@ -36,10 +36,10 @@ The taxonomy is the harness map — when a new component joins the harness, this
 
 **Headless surrogate:** scheduled sweeps run without Notion access and file
 their intakes as GitHub issues labeled `harness-intake` (transport contract:
-`scripts/prompts/references/headless-intake.md`); uno-bot files its intakes
-the same way, on whichever repo in its `GITHUB_REPOS` list the change belongs
-to. That multi-repo queue feeds THIS pipeline: every maintain session's intake
-step starts by draining it — `npm run intake:queue` reads every listed repo —
+`scripts/prompts/references/headless-intake.md`). The queue covers every repo
+in uno-bot's `GITHUB_REPOS` list, whoever filed the intake. That multi-repo
+queue feeds THIS pipeline: every maintain session's intake step starts by
+draining it — `npm run intake:queue` reads every listed repo —
 triaging each open `harness-intake` issue into a Roadmap card (or straight
 into §2–§4 when acted on immediately), then closing it as incorporated. An
 unwatched surrogate queue silently defeats every sweep that files into it.
