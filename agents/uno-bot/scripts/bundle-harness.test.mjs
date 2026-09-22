@@ -7,10 +7,10 @@
  * that stops running the first time the toolchain breaks.
  */
 
-import { test } from "node:test";
+import { after, before, test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync, existsSync, readdirSync } from "node:fs";
+import { cpSync, realpathSync, readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync, existsSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -19,11 +19,49 @@ import { ARTIFACTS, assemble } from "./bundle-harness.mjs";
 import { run as checkHarnessBundle } from "./check-harness-bundle.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(here, "../../..");
-const bundler = path.join(here, "bundle-harness.mjs");
-const harnessTs = path.join(here, "..", "src", "generated", "harness.ts");
-const companionMd = path.join(here, "..", "harness-bundle.md");
-const referencesTs = path.join(here, "..", "src", "generated", "references.ts");
+const checkout = path.resolve(here, "../../..");
+
+// THE CLI TESTS RUN AGAINST A COPY, NEVER THE CHECKOUT. They provoke each
+// failure by editing a file and running the bundler over the tree — and they
+// used to edit this repo's own files and put them back. `node --test` runs the
+// other script test files beside this one, in other processes, and several read
+// the same files: `wrangler.toml` was rewritten here, and `repo-list-config.test.mjs`
+// used to read it at import. `writeFileSync` truncates before it writes, so a
+// reader landing in that window got an empty or half-written file — a toml with
+// no `GITHUB_REPO` — and failed a test that had nothing to do with the edit.
+// That is why these tests run on a copy. It holds everything the bundler reads,
+// and the bundler script itself, so
+// the copied script finds the copied tree as its repo root and a test's edit is
+// visible to nothing outside this file.
+const COPIED = [
+  "AGENTS.md",
+  "CONTEXT.md",
+  "skills",
+  "docs",
+  "scripts/lib",
+  "agents/uno-bot/AGENT.md",
+  "agents/uno-bot/wrangler.toml",
+  "agents/uno-bot/harness-bundle.md",
+  "agents/uno-bot/src/generated",
+  "agents/uno-bot/scripts/bundle-harness.mjs",
+];
+
+let repoRoot, bundler, harnessTs, companionMd, referencesTs;
+
+before(() => {
+  // The real path, because macOS's tmpdir is behind a symlink: node runs the
+  // copied bundler from its resolved path, and a script started under the
+  // other spelling does not recognise itself as the entry point and exits 0
+  // having done nothing — which every test below would read as a pass.
+  repoRoot = realpathSync(mkdtempSync(path.join(tmpdir(), "harness-tree-")));
+  for (const rel of COPIED) cpSync(path.join(checkout, rel), path.join(repoRoot, rel), { recursive: true });
+  bundler = path.join(repoRoot, "agents/uno-bot/scripts/bundle-harness.mjs");
+  harnessTs = path.join(repoRoot, "agents/uno-bot/src/generated/harness.ts");
+  companionMd = path.join(repoRoot, "agents/uno-bot/harness-bundle.md");
+  referencesTs = path.join(repoRoot, "agents/uno-bot/src/generated/references.ts");
+});
+
+after(() => rmSync(repoRoot, { recursive: true, force: true }));
 
 /** The baked reference map: name → text, the second output of the same assembly (#423). */
 const references = () => {
@@ -44,9 +82,19 @@ const embodimentOf = (rel) => {
   return (src.match(/^embodiment:\s*(\S+)/m) || [])[1];
 };
 
-/** Run the bundler against a temporarily modified repo, then always restore. */
+/** A path under the copy, refused if it would land in the checkout — or anywhere but the copy. */
+function inCopy(rel) {
+  const abs = path.resolve(repoRoot, rel);
+  const within = path.relative(repoRoot, abs);
+  if (repoRoot === checkout || within.startsWith("..") || path.isAbsolute(within)) {
+    throw new Error(`refusing to edit ${abs}: the bundler tests edit only their copy of the tree`);
+  }
+  return abs;
+}
+
+/** Run the bundler against a temporarily modified copy of the repo, then always restore. */
 function withFile(rel, mutate, fn) {
-  const abs = path.join(repoRoot, rel);
+  const abs = inCopy(rel);
   const original = existsSync(abs) ? readFileSync(abs, "utf8") : null;
   const backup = mkdtempSync(path.join(tmpdir(), "harness-test-"));
   try {
@@ -59,6 +107,21 @@ function withFile(rel, mutate, fn) {
     rmSync(backup, { recursive: true, force: true });
   }
 }
+
+test("the CLI tests edit their copy of the tree, never the checkout", () => {
+  assert.notEqual(repoRoot, checkout);
+  assert.throws(() => inCopy(path.join(checkout, "agents/uno-bot/wrangler.toml")), /refusing to edit/);
+  assert.throws(() => inCopy("../outside"), /refusing to edit/);
+  // And the copied bundler takes the copy for its repo root: a probe written
+  // there fails its build, and the checkout never holds the probe.
+  const rel = "docs/conventions/zz-test-copy-probe.md";
+  const result = withFile(rel, (abs) => writeFileSync(abs, "# probe\n\nno frontmatter here\n"), () => {
+    assert.ok(!existsSync(path.join(checkout, rel)), "the probe must not reach the checkout");
+    return runBundler(["--check"]);
+  });
+  assert.equal(result.code, 1, "the copied bundler must read the copied tree");
+  assert.match(result.out, /zz-test-copy-probe\.md/);
+});
 
 const runBundler = (args = []) => {
   try {
