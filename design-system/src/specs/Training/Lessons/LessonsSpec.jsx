@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
-import { PageLayout, Card, Table, Button, Badge, Select, Input } from '@/components';
+import { Card, Table, Button, Badge, Select } from '@/components';
+import { PageLayout } from '@/specs/Universal/Pages';
 
 export const LessonsSpec = () => {
     const [view, setView] = useState('list');
 
     // Configuration
     const topBarConfig = {
-        brand: 'PLUS',
-        items: [
+        breadcrumbs: [
             { text: 'Home', href: '#' },
-            { text: 'Lessons', active: true } // Breadcrumb style simulation
+            { text: 'Lessons' }
         ],
-        components: [
-            { type: 'custom', content: <div className="d-flex align-items-center gap-2"><div className="avatar-circle">J</div><span className="body2-txt">John Doe</span></div> }
-        ]
+        user: {
+            name: 'John Doe',
+            counter: true,
+            counterValue: 2,
+            type: 'lead tutor'
+        }
     };
 
     const sidebarConfig = {

@@ -30,7 +30,7 @@ From `design-system/src/components/_internal/SessionManagementSnackbar/SessionMa
 
 ## Related
 
-Same group: `CompetencyBadge` · `Footer` · `LoadingGif` · `Navbar` · `PageLayout` · `SessionAvailabilitySnackbar` · `Sidebar` · `StaticBadgeSmart` · `Table` · `UserAvatar`
+Same group: `CompetencyBadge` · `Footer` · `LoadingGif` · `Navbar` · `SessionAvailabilitySnackbar` · `Sidebar` · `StaticBadgeSmart` · `Table` · `UserAvatar`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

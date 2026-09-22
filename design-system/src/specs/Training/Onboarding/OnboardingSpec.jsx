@@ -1,19 +1,21 @@
 import React from 'react';
-import { PageLayout, Card, Table, Button, Badge } from '@/components';
+import { Card, Table, Button, Badge } from '@/components';
+import { PageLayout } from '@/specs/Universal/Pages';
 import PatternSection from '@/patterns/PatternSection';
 import { Select } from '@/components/forms-and-inputs';
 
 export const OnboardingSpec = () => {
     // Configuration
     const topBarConfig = {
-        brand: 'PLUS',
-        items: [
+        breadcrumbs: [
             { text: 'Home', href: '#' },
-            { text: 'Onboarding', active: true }
+            { text: 'Onboarding' }
         ],
-        components: [
-            { type: 'custom', content: <div className="d-flex align-items-center gap-2"><div className="avatar-circle">J</div><span className="body2-txt">John Doe</span></div> }
-        ]
+        user: {
+            name: 'John Doe',
+            counter: true,
+            counterValue: 2
+        }
     };
 
     const sidebarConfig = {
