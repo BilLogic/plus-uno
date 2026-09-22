@@ -51,7 +51,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import { documents, links } from './lib/corpus.mjs';
+import { documents, links, GENERATED_BUNDLE } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -72,7 +72,6 @@ function markdownUnder(dirs, { exclude = [], plus = [], root = REPO_ROOT } = {})
 }
 
 const TRANSCRIPTS = /(^|\/)transcripts\//;
-const BUNDLE = /^agents\/uno-bot\/harness-bundle\.md$/;
 
 /** The trees pass 1 reads: the router, the glossary, and what they point into. */
 const LINK_DIRS = [
@@ -171,7 +170,7 @@ const inputs = byRoot((repoRoot) => {
   );
 
   for (const file of md(LINK_DIRS, {
-    exclude: [TRANSCRIPTS, BUNDLE],
+    exclude: [TRANSCRIPTS, GENERATED_BUNDLE],
     plus: ['AGENTS.md', 'CONTEXT.md', 'SETUP.md', 'README.md'],
   })) {
     for (const { target } of links(file, { root: repoRoot })) {
@@ -196,7 +195,7 @@ const inputs = byRoot((repoRoot) => {
   ].map((m) => m[1]);
 
   for (const file of md(POINTER_DIRS, {
-    exclude: [BUNDLE, ...VENDORED_POINTERS],
+    exclude: [GENERATED_BUNDLE, ...VENDORED_POINTERS],
     plus: ['AGENTS.md', 'CONTEXT.md', 'SETUP.md'],
   })) {
     for (const raw of codeSpans(file)) {
@@ -240,7 +239,7 @@ const inputs = byRoot((repoRoot) => {
   );
 
   for (const file of md(POINTER_DIRS, {
-    exclude: [BUNDLE],
+    exclude: [GENERATED_BUNDLE],
     plus: ['AGENTS.md', 'CONTEXT.md', 'SETUP.md'],
   })) {
     for (const raw of codeSpans(file)) {
