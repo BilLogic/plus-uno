@@ -7,7 +7,8 @@
 // it reads only the build id, and monitoring watches it.
 import type { Env } from "./types";
 import { verifySlackSignature } from "./slack/verify";
-import { handleSlackEnvelope, type SlackEnvelope } from "./slack/events";
+import { handleSlackEnvelope, handOffCutOffRunsFor, type SlackEnvelope } from "./slack/events";
+import { ThreadState as ThreadStateObject } from "./thread-state";
 import { handleSlashCommand } from "./slack/commands";
 import { parseInteraction, handleInteraction } from "./slack/interactive";
 import { startSlackOAuth, handleSlackOAuthCallback } from "./oauth/slack";
@@ -171,5 +172,15 @@ async function handleSlackInteractiveRequest(
   return handleInteraction(env, payload, ctx);
 }
 
-export { ThreadState } from "./thread-state";
+/**
+ * The ThreadState Durable Object, with its alarm's one Worker-side dependency
+ * bound by name: a cut-off run the alarm finds is handed to the card's
+ * AgentRunner, which tells the thread the way a look does
+ * (`slack/cut-off-sweep.ts`). `Env` stops at the binding function.
+ */
+export class ThreadState extends ThreadStateObject {
+  constructor(state: DurableObjectState, env: Env) {
+    super(state, env, { handOffCutOffRuns: handOffCutOffRunsFor(env) });
+  }
+}
 export { AgentRunner } from "./agent-runner";

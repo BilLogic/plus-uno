@@ -19,11 +19,12 @@
 import {
   CANCEL_TTL_MS,
   EVENT_DEDUP_TTL_MS,
-  EXECUTION_CUTOFF_MS,
   HISTORY_TTL_MS,
   MAX_HISTORY_TURNS,
   PROPOSAL_TTL_MS,
   RUN_LEASE_MS,
+  afterFailedNote,
+  cutOffTakeable,
   proposalReplyThread,
   type Execution,
   type HistoryTurn,
@@ -87,17 +88,18 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
    *  leave it alone if it may still be running. */
   function takeIfCutOff(ts: string): Execution | null {
     const rec = executions.get(ts);
-    if (!rec || rec.takenAt !== undefined) return null;
-    const age = now() - rec.startedAt;
-    if (age <= EXECUTION_CUTOFF_MS) return null;
-    if (age > PROPOSAL_TTL_MS) {
+    if (!rec) return null;
+    if (now() - rec.startedAt > PROPOSAL_TTL_MS) {
       executions.delete(ts);
       return null;
     }
+    if (!cutOffTakeable(rec, now())) return null;
+    const taken = { ...rec, settled: [...rec.settled] };
     // Marked, not deleted: a run that is only slow reads the mark at its next
     // operation and stops (the fence, on `settleOperation`).
-    rec.takenAt = now();
-    return { ...rec, settled: [...rec.settled] };
+    rec.takenAt ??= now();
+    delete rec.noteOwed;
+    return taken;
   }
 
   /** Live turns for a conversation, evicting the record if it has aged out.
@@ -245,7 +247,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     },
 
     async endExecution(proposalTs) {
-      executions.delete(proposalTs);
+      if (executions.get(proposalTs)?.takenAt === undefined) executions.delete(proposalTs);
     },
 
     async takeCutOffExecution(proposalTs) {
@@ -257,12 +259,27 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       for (const rec of executions.values()) {
         if (rec.proposal.channel !== ref.channel) continue;
         if (proposalReplyThread(rec.proposal) !== ref.thread) continue;
-        if (rec.takenAt !== undefined) continue;
-        const age = now() - rec.startedAt;
-        if (age <= EXECUTION_CUTOFF_MS || age > PROPOSAL_TTL_MS) continue;
+        if (!cutOffTakeable(rec, now())) continue;
         if (!best || rec.startedAt > best.startedAt) best = rec;
       }
       return best ? takeIfCutOff(best.proposal.proposalTs) : null;
+    },
+
+    async findCutOffExecutions() {
+      const found: Execution[] = [];
+      for (const rec of executions.values()) {
+        if (!cutOffTakeable(rec, now())) continue;
+        found.push({ ...rec, settled: [...rec.settled] });
+      }
+      return found.sort((a, b) => a.startedAt - b.startedAt);
+    },
+
+    async reportCutOffNote(proposalTs, posted) {
+      const rec = executions.get(proposalTs);
+      if (!rec || rec.takenAt === undefined || posted) return "told";
+      const { record, report } = afterFailedNote(rec);
+      executions.set(proposalTs, record);
+      return report;
     },
 
     // ----- assistant context -----

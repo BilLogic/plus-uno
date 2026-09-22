@@ -27,6 +27,7 @@
 // Import-free and Env-free: it renders and posts nothing.
 
 import type { GateNote } from "../turn/index";
+import { SLACK_USER_ID } from "./mrkdwn";
 
 /** The lost race. */
 export const STALE_POST =
@@ -93,8 +94,11 @@ export function renderGateNote(note: GateNote): string {
  * escaping.
  */
 function cutOffLine(note: Extract<GateNote, { kind: "cut-off" }>): string {
+  // Only a Slack user id is mentioned, which is what the markup sanitiser
+  // keeps (`SLACK_USER_ID`); anything else would blank the post.
+  const to = note.mention && SLACK_USER_ID.test(note.mention) ? `<@${note.mention}> ` : "";
   const lines = [
-    ":warning: That approved run was cut off before it reported back, so this may not all have run.",
+    `:warning: ${to}That approved run was cut off before it reported back, so this may not all have run.`,
   ];
   if (note.finished.length) {
     const done = note.finished

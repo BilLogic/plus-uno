@@ -34,6 +34,7 @@ import { charge } from "../net";
 import type { AssistantContext } from "../slack/types";
 import type { ThreadState as ThreadStateDurableObject } from "../thread-state";
 import type {
+  CutOffNoteReport,
   Execution,
   HistoryTurn,
   PendingProposal,
@@ -145,6 +146,14 @@ export function createDurableObjectThreadState(
 
     takeCutOffExecutionInThread(ref: ThreadRef): Promise<Execution | null> {
       return hop().takeCutOffExecutionInThread(ref, now());
+    },
+
+    findCutOffExecutions(): Promise<Execution[]> {
+      return hop().findCutOffExecutions(now());
+    },
+
+    reportCutOffNote(proposalTs: string, posted: boolean): Promise<CutOffNoteReport> {
+      return hop().reportCutOffNote(proposalTs, posted);
     },
 
     // ----- assistant context -----

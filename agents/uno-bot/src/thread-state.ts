@@ -10,7 +10,7 @@
 //
 // Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `exec:{ts}`,
 // `event:{event_id}`, `actx:{channel}:{thread}`, `cancel:{channel}:{thread}`,
-// `run:{user}`.
+// `run:{user}`, and the alarm's own `gc:next`.
 //
 // ── THE CONTRACT IS THIS CLASS'S OWN SIGNATURE (#493, #494) ─────────────────
 //
@@ -19,7 +19,8 @@
 // `compactHistory`, `putProposal`, `retireProposal`, `getProposalByTs`,
 // `getProposalByThread`, `getProposalsByChannel`, `claimProposal`,
 // `beginExecution`, `settleOperation`, `endExecution`, `takeCutOffExecution`,
-// `takeCutOffExecutionInThread`, `get/putAssistantContext`, `requestCancel`,
+// `takeCutOffExecutionInThread`, `findCutOffExecutions`,
+// `reportCutOffNote`, `get/putAssistantContext`, `requestCancel`,
 // `consumeCancel`, `cancelForUser`, `setActiveRun`, `checkAndRecordEvent`,
 // `claimRun`, `markRunDone`. A rename is a type error rather than a runtime
 // 404, which is the whole point.
@@ -45,13 +46,19 @@ import { DurableObject } from "cloudflare:workers";
 import type { Env } from "./types";
 import {
   CANCEL_TTL_MS,
+  CUT_OFF_SWEEP_RETRY_MS,
+  CUT_OFF_SWEEP_SLACK_MS,
   EVENT_DEDUP_TTL_MS,
   EXECUTION_CUTOFF_MS,
   HISTORY_TTL_MS,
   MAX_HISTORY_TURNS,
   PROPOSAL_TTL_MS,
   RUN_LEASE_MS,
+  afterFailedNote,
+  cutOffSweepAt,
+  cutOffTakeable,
   proposalReplyThread,
+  type CutOffNoteReport,
   type Execution,
   type HistoryTurn,
   type PendingProposal,
@@ -99,14 +106,37 @@ interface EventRecord {
 // never deleted. A daily sweep keeps storage bounded (review 2026-07-12).
 const GC_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
+// When the day's sweep is next due. The alarm now also wakes for cut-off runs,
+// and those passes must not each pay for a full scan of every record.
+const GC_NEXT_KEY = "gc:next";
+
+/**
+ * What the alarm is handed, by name, by the Worker entry that exports this
+ * class (`src/index.ts`) — never `Env`.
+ *
+ * The alarm FINDS a cut-off run nobody has looked at; telling the thread is
+ * the Worker's. Posting from here would mean Slack and card reads inside this
+ * class, and the re-staged card is written back through the ThreadState stub,
+ * which from inside this object is a call to itself behind its own input gate
+ * (see `src/agent-runner.ts`). So the found records are handed over, and the
+ * take, the note and the card happen outside, on the path every look takes.
+ */
+export interface ThreadStateAlarmDeps {
+  /** Hand over executions `findCutOffExecutions` found. Takes nothing and
+   *  may fail: a record nobody took is found again on the next pass. */
+  handOffCutOffRuns?(due: Execution[]): Promise<void>;
+}
+
 // Extends the `cloudflare:workers` base class — that is what makes the public
 // methods below callable as Durable Object RPC (compatibility_date 2026-05-01).
 export class ThreadState extends DurableObject<Env> {
   private storage: DurableObjectStorage;
+  private alarmDeps: ThreadStateAlarmDeps;
 
-  constructor(state: DurableObjectState, env: Env) {
+  constructor(state: DurableObjectState, env: Env, alarmDeps: ThreadStateAlarmDeps = {}) {
     super(state, env);
     this.storage = state.storage;
+    this.alarmDeps = alarmDeps;
   }
 
   // Ensure a GC alarm is scheduled. Cheap (one storage read) and idempotent —
@@ -118,13 +148,47 @@ export class ThreadState extends DurableObject<Env> {
     }
   }
 
-  // Delete expired records by their own TTL, then reschedule if anything remains.
-  // Keys: event:{id} (EVENT_DEDUP_TTL_MS), hist:{…} (HISTORY_TTL_MS),
-  // prop:{ts} and exec:{ts} (PROPOSAL_TTL_MS). Runs at most once a day.
+  // A Durable Object has ONE alarm, so every reason to wake shares it: an
+  // earlier alarm already set is kept, never pushed back by a later one. The
+  // alarm that is firing may still read back while its handler runs, and is
+  // not a sooner one to keep.
+  private async armAlarmBy(at: number, firing = false): Promise<void> {
+    const existing = await this.storage.getAlarm();
+    const keep = existing !== null && existing <= at && !(firing && existing <= Date.now());
+    if (!keep) await this.storage.setAlarm(at);
+  }
+
+  // First, hand over any cut-off run nobody has told, so its requester hears
+  // before the record ages out. Then, when the day's sweep is due and only
+  // then, delete expired records by their own TTL — the two-minute passes that
+  // come back for an untold run scan executions and nothing else. Then re-arm
+  // for whichever comes first: the next day's sweep, or the next execution due
+  // a look.
   async alarm(): Promise<void> {
     const now = Date.now();
-    let remaining = 0;
 
+    const due = await this.findCutOffExecutions(now);
+    if (due.length > 0 && this.alarmDeps.handOffCutOffRuns) {
+      await this.alarmDeps.handOffCutOffRuns(due).catch((err: unknown) => {
+        console.error(
+          `[thread-state] cut-off hand-off failed (${due.length}): ${err instanceof Error ? err.message : String(err)}`,
+        );
+      });
+    }
+
+    const gcAt = (await this.storage.get<number>(GC_NEXT_KEY)) ?? 0;
+    let next = now >= gcAt ? await this.collectGarbage(now) : gcAt;
+    const execs = await this.storage.list<Execution>({ prefix: "exec:" });
+    for (const rec of execs.values()) next = Math.min(next, cutOffSweepAt(rec, now) ?? Infinity);
+    if (next !== Infinity) await this.armAlarmBy(next, true);
+  }
+
+  // Delete expired records by their own TTL. Keys: event:{id}
+  // (EVENT_DEDUP_TTL_MS), hist:{…} (HISTORY_TTL_MS), prop:{ts} and exec:{ts}
+  // (PROPOSAL_TTL_MS). Answers when the next sweep is due: a day away if
+  // anything remains, never if the store is empty.
+  private async collectGarbage(now: number): Promise<number> {
+    let remaining = 0;
     const events = await this.storage.list<EventRecord>({ prefix: "event:" });
     for (const [key, rec] of events) {
       if (now - rec.seenAt > EVENT_DEDUP_TTL_MS) await this.storage.delete(key);
@@ -160,7 +224,12 @@ export class ThreadState extends DurableObject<Env> {
       else remaining++;
     }
 
-    if (remaining > 0) await this.storage.setAlarm(now + GC_INTERVAL_MS);
+    if (remaining === 0) {
+      await this.storage.delete(GC_NEXT_KEY);
+      return Infinity;
+    }
+    await this.storage.put(GC_NEXT_KEY, now + GC_INTERVAL_MS);
+    return now + GC_INTERVAL_MS;
   }
 
   // ══ The ThreadState RPC surface ════════════════════════════════════════════
@@ -364,7 +433,9 @@ export class ThreadState extends DurableObject<Env> {
       startedAt: at,
       settled: [],
     });
-    await this.ensureGcAlarm();
+    // Woken just past the cut-off, so a run nobody looks at is still told.
+    // The alarm reads its own clock, so it is armed on that clock too.
+    await this.armAlarmBy(Date.now() + EXECUTION_CUTOFF_MS + CUT_OFF_SWEEP_SLACK_MS);
   }
 
   // The fence: a taken execution is reported to the run that is still settling
@@ -384,24 +455,35 @@ export class ThreadState extends DurableObject<Env> {
     return { taken: false };
   }
 
+  // A taken execution is the teller's, and the fence for a run that is only
+  // slow: the run's own end leaves it where it is.
   async endExecution(proposalTs: string): Promise<void> {
-    await this.storage.delete(executionKey(proposalTs));
+    const key = executionKey(proposalTs);
+    const rec = await this.storage.get<Execution>(key);
+    if (rec && rec.takenAt === undefined) await this.storage.delete(key);
   }
 
   async takeCutOffExecution(proposalTs: string, at: number): Promise<Execution | null> {
     const key = executionKey(proposalTs);
     const rec = await this.storage.get<Execution>(key);
-    if (!rec || rec.takenAt !== undefined) return null;
-    const age = at - rec.startedAt;
-    if (age <= EXECUTION_CUTOFF_MS) return null; // may still be running
-    if (age > PROPOSAL_TTL_MS) {
+    if (!rec) return null;
+    if (at - rec.startedAt > PROPOSAL_TTL_MS) {
       await this.storage.delete(key);
       return null;
     }
-    // Marked, not deleted: a run that is only slow reads the mark at its next
-    // operation and stops.
-    await this.storage.put<Execution>(key, { ...rec, takenAt: at });
+    if (!cutOffTakeable(rec, at)) return null; // may still be running, or told
+    await this.markTaken(rec, at);
     return rec;
+  }
+
+  // Marked, not deleted: a run that is only slow reads the mark at its next
+  // operation and stops. A retake of an owed note keeps the first mark.
+  private async markTaken(rec: Execution, at: number): Promise<void> {
+    const { noteOwed: _owed, ...taken } = rec;
+    await this.storage.put<Execution>(executionKey(rec.proposal.proposalTs), {
+      ...taken,
+      takenAt: rec.takenAt ?? at,
+    });
   }
 
   // Scans the in-flight set, which is empty whenever nothing was cut off: an
@@ -413,14 +495,32 @@ export class ThreadState extends DurableObject<Env> {
     for (const rec of all.values()) {
       if (rec.proposal.channel !== ref.channel) continue;
       if (proposalReplyThread(rec.proposal) !== ref.thread) continue;
-      if (rec.takenAt !== undefined) continue;
-      const age = at - rec.startedAt;
-      if (age <= EXECUTION_CUTOFF_MS || age > PROPOSAL_TTL_MS) continue;
+      if (!cutOffTakeable(rec, at)) continue;
       if (!best || rec.startedAt > best.startedAt) best = rec;
     }
     if (!best) return null;
-    await this.storage.put<Execution>(executionKey(best.proposal.proposalTs), { ...best, takenAt: at });
+    await this.markTaken(best, at);
     return best;
+  }
+
+  async findCutOffExecutions(at: number): Promise<Execution[]> {
+    const all = await this.storage.list<Execution>({ prefix: "exec:" });
+    const found: Execution[] = [];
+    for (const rec of all.values()) {
+      if (cutOffTakeable(rec, at)) found.push(rec);
+    }
+    return found.sort((a, b) => a.startedAt - b.startedAt);
+  }
+
+  // An owed note is the alarm's to come back for.
+  async reportCutOffNote(proposalTs: string, posted: boolean): Promise<CutOffNoteReport> {
+    const key = executionKey(proposalTs);
+    const rec = await this.storage.get<Execution>(key);
+    if (!rec || rec.takenAt === undefined || posted) return "told";
+    const { record, report } = afterFailedNote(rec);
+    await this.storage.put<Execution>(key, record);
+    if (report === "owed") await this.armAlarmBy(Date.now() + CUT_OFF_SWEEP_RETRY_MS);
+    return report;
   }
 
   // ----- assistant context -----

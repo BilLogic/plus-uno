@@ -1,7 +1,7 @@
 import type { Env } from "../types";
 import { charge } from "../net";
 import { looksLikeCorrection } from "../agent/run-agent";
-import { DM_CONVERSATION, type HistoryTurn, type PendingProposal } from "../thread-state/index";
+import { DM_CONVERSATION, type Execution, type HistoryTurn, type PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { conversationsReplies, getBotIdentity, postMessage } from "./api";
 import { buildFailureMessage } from "./failure-message";
@@ -9,6 +9,7 @@ import { handleAgentDmOpened, handleAppContextChanged } from "./assistant";
 import { handleSessionStopped } from "./stop-envelope";
 import { handleAppHomeOpened } from "./home";
 import { handleReaction } from "./gate";
+import { cutOffRunJob, handleCutOffRun } from "./cut-off-sweep";
 import { extractPrdFromThreadRoot } from "./notion-prd";
 import {
   type SlackMessageEvent,
@@ -165,6 +166,9 @@ export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey
     // this codebase fights elsewhere), so warn on both job kinds — each posts
     // into its own thread.
     console.error(`[slack] runner enqueue failed (${job.kind}): ${res.status}`);
+    // A cut-off job has nobody waiting on it: the record stays untaken, and
+    // the ThreadState alarm hands it over again.
+    if (job.kind === "cut-off") return;
     const target =
       job.kind === "message"
         ? { channel: job.event.channel, thread_ts: replyThreadTs(job.event) }
@@ -176,6 +180,27 @@ export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey
   }
 }
 
+/**
+ * The ThreadState alarm's `handOffCutOffRuns`, bound to `Env`: one AgentRunner
+ * job per cut-off run it found. Taking nothing is the point — the job takes,
+ * as a look does, so a hand-off that never lands leaves the record for the
+ * alarm's next pass.
+ */
+export function handOffCutOffRunsFor(env: Env): (due: Execution[]) => Promise<void> {
+  return async (due) => {
+    // Each on its own: one enqueue that throws must not keep the rest from
+    // their runners. The one that threw is found again on the next pass.
+    for (const execution of due) {
+      const { job, threadKey } = cutOffRunJob(execution);
+      await enqueueAgentJob(env, job, threadKey).catch((err: unknown) => {
+        console.error(
+          `[slack] cut-off hand-off for ${job.kind === "cut-off" ? job.proposalTs : "?"} failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      });
+    }
+  };
+}
+
 // (The open-stream registry that lived here is gone: a stream is now opened and
 // closed inside delivery, within one function, so there is no window in which a
 // turn can end holding one.)
@@ -185,6 +210,10 @@ export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey
 // the turn's run-lease is held by another (possibly killed) invocation — the
 // runner must then KEEP the job and retry later instead of deleting it.
 export async function onRunnerJob(env: Env, job: RunnerJobPayload): Promise<"handled" | "deferred"> {
+  if (job.kind === "cut-off") {
+    await handleCutOffRun(env, job.proposalTs);
+    return "handled";
+  }
   if (job.kind === "reaction") {
     await handleReaction(env, job.event);
     return "handled";

@@ -16,6 +16,7 @@ import assert from "node:assert/strict";
 import {
   resolveSignal,
   runOperations,
+  tellCutOffRun,
   runReactionDoor,
   settleInto,
   type GateRestage,
@@ -23,8 +24,13 @@ import {
   type GateVerdict,
 } from "../src/gate/index";
 import {
+  CUT_OFF_SWEEP_RETRY_MS,
+  CUT_OFF_SWEEP_SLACK_MS,
+  DM_CONVERSATION,
   EXECUTION_CUTOFF_MS,
+  PROPOSAL_TTL_MS,
   createInMemoryThreadState,
+  cutOffSweepAt,
   type PendingProposal,
   type ProposalOperation,
   type ThreadState,
@@ -32,6 +38,7 @@ import {
 import { recordingDelivery, runTurn, type RecordingDelivery } from "../src/turn/index";
 import { runButtonDoor } from "../src/slack/button-door";
 import { renderGateNote } from "../src/slack/gate-note";
+import { sanitizeSlackMarkup } from "../src/slack/mrkdwn";
 import { renderProposalCard } from "../src/slack/proposal-render";
 import { harness, postsOf, request } from "./helpers/turn-harness";
 
@@ -341,6 +348,235 @@ describe("the later looks", () => {
     assert.equal(delivery.gateNotes[0]?.kind, "cut-off");
     assert.deepEqual(restaged.map((r) => r.operations), [[BATCH[1], BATCH[2]]]);
     assert.equal(settled(delivery), "waiting-on-person");
+  });
+});
+
+describe("the alarm's look, when nobody else looks", () => {
+  /** A real Slack user id, which is what the note may mention. */
+  const REQUESTER = "U0REQUESTR";
+
+  /** Stage `proposal`, approve it, and leave operation one hanging past the
+   *  cut-off. `release` lets the hung operation come back later. */
+  async function cutOff(proposal: PendingProposal = { ...PROPOSAL, requesterUserId: REQUESTER }) {
+    const time = clock();
+    const store = createInMemoryThreadState({ now: time.now });
+    await store.putProposal(proposal);
+    const verdict = await resolveSignal(press(), { threadState: store });
+    assert.equal(verdict.outcome, "won");
+    const ran: string[] = [];
+    let release!: (result: string) => void;
+    const batch = runOperations(
+      verdict.execute!.operations,
+      (op) => {
+        ran.push(op.toolName);
+        return ran.length === 2
+          ? new Promise<string>((r) => (release = r))
+          : Promise.resolve(JSON.stringify({ ok: true }));
+      },
+      settleInto(store, CARD_TS),
+    );
+    await drain();
+    time.advance(EXECUTION_CUTOFF_MS + 1);
+    return { store, time, ran, batch, release: (result: string) => release(result) };
+  }
+
+  function sweepDeps(store: ThreadState, delivery: RecordingDelivery) {
+    const restaged: Array<{ restage: GateRestage; delivery: unknown }> = [];
+    const targets: unknown[] = [];
+    return {
+      restaged,
+      targets,
+      deps: {
+        threadState: store,
+        delivery: (target: unknown) => {
+          targets.push(target);
+          return delivery;
+        },
+        restage: async (r: GateRestage, d: unknown) => void restaged.push({ restage: r, delivery: d }),
+      },
+    };
+  }
+
+  it("tells the requester in the card's thread, pinged, and re-stages only the remainder", async () => {
+    const { store } = await cutOff();
+    assert.deepEqual((await store.findCutOffExecutions()).map((e) => e.proposal.proposalTs), [CARD_TS]);
+
+    const delivery = recordingDelivery();
+    const sweep = sweepDeps(store, delivery);
+    assert.equal(await tellCutOffRun(CARD_TS, sweep.deps), "told");
+    assert.deepEqual(sweep.targets, [
+      { channel: CHANNEL, replyTs: THREAD, userMsgTs: PROPOSAL.userMsgTs, userId: REQUESTER },
+    ]);
+    assert.deepEqual(delivery.gateNotes, [
+      {
+        kind: "cut-off",
+        finished: [{ toolName: "notion_create", ok: true }],
+        unfinished: ["github_issue_create", "dm_relay"],
+        restaged: true,
+        mention: REQUESTER,
+      },
+    ]);
+    // The mention survives the markup sanitiser because it is a real user id.
+    const line = renderGateNote(delivery.gateNotes[0]!);
+    assert.match(line, new RegExp(`^:warning: <@${REQUESTER}> That approved run was cut off`));
+    assert.equal(sanitizeSlackMarkup(line), line);
+    assert.deepEqual(sweep.restaged.map((r) => r.restage.operations), [[BATCH[1], BATCH[2]]]);
+    // The card leaves the thread waiting on a person, as it does after a look.
+    assert.equal(settled(delivery), "waiting-on-person");
+    // Told: the alarm's next pass finds nothing, and a look gets nothing.
+    assert.deepEqual(await store.findCutOffExecutions(), []);
+    assert.equal(await tellCutOffRun(CARD_TS, sweep.deps), "taken");
+    assert.equal(delivery.gateNotes.length, 1);
+  });
+
+  it("names nobody it cannot mention", () => {
+    const line = renderGateNote({ kind: "cut-off", finished: [], unfinished: ["dm_relay"], restaged: true, mention: "teammate" });
+    assert.doesNotMatch(line, /<@/);
+  });
+
+  it("leaves a run still inside the threshold alone", async () => {
+    const { store, time } = await staged();
+    await approveAndCutOff(store, 1);
+    time.advance(EXECUTION_CUTOFF_MS);
+    const delivery = recordingDelivery();
+    assert.deepEqual(await store.findCutOffExecutions(), []);
+    assert.equal(await tellCutOffRun(CARD_TS, sweepDeps(store, delivery).deps), "taken");
+    assert.deepEqual(delivery.calls, []);
+  });
+
+  it("a run whose operations all came back gets the note and no card, and settles idle", async () => {
+    const { store, time } = await staged();
+    const verdict = await resolveSignal(press(), { threadState: store });
+    await runOperations(verdict.execute!.operations, async () => JSON.stringify({ ok: true }), settleInto(store, CARD_TS));
+    time.advance(EXECUTION_CUTOFF_MS + 1);
+    const delivery = recordingDelivery();
+    const sweep = sweepDeps(store, delivery);
+    assert.equal(await tellCutOffRun(CARD_TS, sweep.deps), "told");
+    assert.equal(delivery.gateNotes[0]?.kind, "cut-off");
+    assert.deepEqual(sweep.restaged, []);
+    assert.equal(settled(delivery), "idle");
+  });
+
+  it("in an unthreaded DM, answers in the card's reply thread and pings nobody", async () => {
+    const dm: PendingProposal = {
+      ...PROPOSAL,
+      channel: "D1",
+      threadTs: DM_CONVERSATION,
+      replyTs: "1700000000.000150",
+      requesterUserId: REQUESTER,
+    };
+    const { store } = await cutOff(dm);
+    const delivery = recordingDelivery();
+    const sweep = sweepDeps(store, delivery);
+    assert.equal(await tellCutOffRun(CARD_TS, sweep.deps), "told");
+    assert.deepEqual(sweep.targets, [
+      { channel: "D1", replyTs: "1700000000.000150", userMsgTs: dm.userMsgTs, userId: REQUESTER },
+    ]);
+    const note = delivery.gateNotes[0]!;
+    assert.equal(note.kind === "cut-off" ? note.mention : "not a cut-off note", undefined);
+    // The card goes out through the same Delivery, so it lands under the note.
+    assert.equal((sweep.restaged[0]?.delivery as RecordingDelivery).calls, delivery.calls);
+  });
+
+  it("a DM card recorded before replyTs falls back to its thread ts", async () => {
+    const relayed: PendingProposal = {
+      ...PROPOSAL,
+      channel: "D2",
+      threadTs: "1700000000.000140",
+      requesterUserId: REQUESTER,
+    };
+    delete relayed.replyTs;
+    const { store } = await cutOff(relayed);
+    const delivery = recordingDelivery();
+    const sweep = sweepDeps(store, delivery);
+    assert.equal(await tellCutOffRun(CARD_TS, sweep.deps), "told");
+    assert.deepEqual(sweep.targets, [
+      { channel: "D2", replyTs: "1700000000.000140", userMsgTs: relayed.userMsgTs, userId: REQUESTER },
+    ]);
+    assert.deepEqual(sweep.restaged.map((r) => r.restage.operations), [[BATCH[1], BATCH[2]]]);
+    assert.equal((sweep.restaged[0]?.delivery as RecordingDelivery).calls, delivery.calls);
+  });
+
+  it("a note that fails is owed, never un-fenced, and told on the next pass", async () => {
+    const { store, ran, batch, release } = await cutOff();
+    const failing = recordingDelivery({ noteFails: true });
+    const first = sweepDeps(store, failing);
+    assert.equal(await tellCutOffRun(CARD_TS, first.deps), "owed");
+    assert.deepEqual(first.restaged, [], "no card after a note nobody saw");
+    assert.equal(settled(failing), "idle");
+
+    // The slow operation comes back now: the fence holds, nothing resumes.
+    release(JSON.stringify({ ok: true }));
+    await batch;
+    assert.deepEqual(ran, ["notion_create", "github_issue_create"]);
+
+    assert.deepEqual((await store.findCutOffExecutions()).map((e) => e.proposal.proposalTs), [CARD_TS]);
+    const delivery = recordingDelivery();
+    const second = sweepDeps(store, delivery);
+    assert.equal(await tellCutOffRun(CARD_TS, second.deps), "told");
+    assert.equal(delivery.gateNotes.length, 1);
+    assert.deepEqual(second.restaged.map((r) => r.restage.operations), [[BATCH[1], BATCH[2]]]);
+    assert.deepEqual(await store.findCutOffExecutions(), []);
+  });
+
+  it("gives up after three failed notes", async () => {
+    const { store } = await cutOff();
+    const outcomes: string[] = [];
+    for (let i = 0; i < 4; i++) {
+      outcomes.push(await tellCutOffRun(CARD_TS, sweepDeps(store, recordingDelivery({ noteFails: true })).deps));
+    }
+    assert.deepEqual(outcomes, ["owed", "owed", "given-up", "taken"]);
+    assert.deepEqual(await store.findCutOffExecutions(), []);
+  });
+
+  it("the alarm and a look racing post one note between them", async () => {
+    const { store } = await cutOff();
+    const swept = recordingDelivery();
+    const looked = recordingDelivery();
+    const sweep = sweepDeps(store, swept);
+    const lookRestaged: GateRestage[] = [];
+    const [outcome] = await Promise.all([
+      tellCutOffRun(CARD_TS, sweep.deps),
+      runReactionDoor(
+        { channel: CHANNEL, messageTs: CARD_TS, glyph: "white_check_mark", userId: "U2" },
+        {
+          threadState: store,
+          delivery: () => looked,
+          threadRootOf: async () => THREAD,
+          botUserId: async () => "UBOT",
+          applyVerdict: async () => {},
+          restage: async (r) => void lookRestaged.push(r),
+        },
+      ),
+    ]);
+    const notes = [...swept.gateNotes, ...looked.gateNotes].filter((n) => n.kind === "cut-off");
+    assert.equal(notes.length, 1);
+    assert.equal(sweep.restaged.length + lookRestaged.length, 1);
+    assert.equal(outcome === "told", swept.gateNotes.length === 1);
+  });
+});
+
+describe("when the alarm wakes for an execution", () => {
+  const started = 1_700_000_000_000;
+  const execution = { proposal: PROPOSAL, startedAt: started, settled: [] };
+
+  it("just past the cut-off, while it may still be running", () => {
+    const due = started + EXECUTION_CUTOFF_MS + CUT_OFF_SWEEP_SLACK_MS;
+    assert.equal(cutOffSweepAt(execution, started), due);
+    assert.equal(cutOffSweepAt(execution, started + EXECUTION_CUTOFF_MS), due);
+  });
+
+  it("again shortly, once it is cut off and nobody has taken it", () => {
+    const now = started + EXECUTION_CUTOFF_MS + 1;
+    assert.equal(cutOffSweepAt(execution, now), now + CUT_OFF_SWEEP_RETRY_MS);
+  });
+
+  it("never, once taken with no note owed, or past its hour", () => {
+    assert.equal(cutOffSweepAt({ ...execution, takenAt: started + 1 }, started + 2), null);
+    const owed = { ...execution, takenAt: started + EXECUTION_CUTOFF_MS + 1, noteOwed: true };
+    const now = started + EXECUTION_CUTOFF_MS + 2;
+    assert.equal(cutOffSweepAt(owed, now), now + CUT_OFF_SWEEP_RETRY_MS);
+    assert.equal(cutOffSweepAt(execution, started + PROPOSAL_TTL_MS + 1), null);
   });
 });
 

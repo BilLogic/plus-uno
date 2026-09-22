@@ -22,6 +22,7 @@ import assert from "node:assert/strict";
 
 import {
   CANCEL_TTL_MS,
+  CUT_OFF_NOTE_ATTEMPTS,
   DM_CONVERSATION,
   EVENT_DEDUP_TTL_MS,
   EXECUTION_CUTOFF_MS,
@@ -594,15 +595,18 @@ export function runThreadStateConformance(
     assert.equal(await store.takeCutOffExecution("1700.2"), null);
   });
 
-  it("ending a taken execution removes the record", async () => {
+  it("a taken record survives endExecution, and keeps fencing", async () => {
     const { store, clock } = setup();
-    await store.beginExecution(proposal());
+    await store.beginExecution(proposal({ operations: BATCH }));
     clock.advance(EXECUTION_CUTOFF_MS + 1);
     assert.ok(await store.takeCutOffExecution("1700.2"));
+    // The fenced run's own end: the record is the teller's now, not the run's.
     await store.endExecution("1700.2");
-    // Nothing left to fence: a settle now finds no record at all.
-    assert.deepEqual(await store.settleOperation("1700.2", 0, true), { taken: false });
+    // A settle still hears the fence — deleted, it would find nothing and the
+    // run would carry on.
+    assert.deepEqual(await store.settleOperation("1700.2", 1, true), { taken: true });
     assert.equal(await store.takeCutOffExecution("1700.2"), null);
+    assert.deepEqual(await store.findCutOffExecutions(), []);
   });
 
   it("settling or ending an execution that was never begun is a no-op", async () => {
@@ -611,6 +615,134 @@ export function runThreadStateConformance(
     await store.endExecution("1700.2");
     clock.advance(EXECUTION_CUTOFF_MS + 1);
     assert.equal(await store.takeCutOffExecution("1700.2"), null);
+  });
+
+  // The alarm's pass. It FINDS a cut-off run nobody has looked at and takes
+  // nothing — each one it finds goes through the same take a look makes, so
+  // an alarm and a look racing still come to one note.
+
+  it("the alarm's find leaves a run still inside the threshold alone", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal());
+    clock.advance(EXECUTION_CUTOFF_MS);
+    assert.deepEqual(await store.findCutOffExecutions(), []);
+  });
+
+  it("the alarm's find lists a cut-off run, oldest first, and takes nothing", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal({ operations: BATCH }));
+    await store.settleOperation("1700.2", 0, true);
+    clock.advance(1);
+    await store.beginExecution(proposal({ proposalTs: "1700.3" }));
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    const found = await store.findCutOffExecutions();
+    assert.deepEqual(found.map((e) => e.proposal.proposalTs), ["1700.2", "1700.3"]);
+    assert.deepEqual(found[0]?.settled, [{ index: 0, ok: true }]);
+    // Found twice, still there to take: finding is not taking.
+    assert.equal((await store.findCutOffExecutions()).length, 2);
+    assert.ok(await store.takeCutOffExecution("1700.2"));
+    assert.deepEqual(await store.settleOperation("1700.2", 1, true), { taken: true });
+  });
+
+  it("the alarm's find skips a run a look took, one that ended, and one past its hour", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal({ proposalTs: "1700.2" }));
+    await store.beginExecution(proposal({ proposalTs: "1700.3" }));
+    await store.endExecution("1700.3");
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    assert.ok(await store.takeCutOffExecution("1700.2"));
+    assert.deepEqual(await store.findCutOffExecutions(), []);
+
+    const { store: old, clock: later } = setup();
+    await old.beginExecution(proposal());
+    later.advance(PROPOSAL_TTL_MS + 1);
+    assert.deepEqual(await old.findCutOffExecutions(), []);
+  });
+
+  it("the alarm's find and a look racing leave one taker", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal());
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    const [found, ...looks] = await Promise.all([
+      store.findCutOffExecutions(),
+      store.takeCutOffExecution("1700.2"),
+      store.takeCutOffExecution("1700.2"),
+    ]);
+    assert.equal(looks.filter(Boolean).length, 1);
+    // Whatever the find saw, the alarm's own take now finds it gone.
+    assert.ok(Array.isArray(found));
+    assert.equal(await store.takeCutOffExecution("1700.2"), null);
+  });
+
+  it("a posted note leaves nothing owed", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal());
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    assert.ok(await store.takeCutOffExecution("1700.2"));
+    assert.equal(await store.reportCutOffNote("1700.2", true), "told");
+    assert.deepEqual(await store.findCutOffExecutions(), []);
+    assert.equal(await store.takeCutOffExecution("1700.2"), null);
+  });
+
+  it("a failed note is owed: found again and taken once more, never un-fenced", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal({ operations: BATCH }));
+    await store.settleOperation("1700.2", 0, true);
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    assert.ok(await store.takeCutOffExecution("1700.2"));
+    assert.equal(await store.reportCutOffNote("1700.2", false), "owed");
+    // Nothing resumes after the fence: the owed record is still taken.
+    assert.deepEqual(await store.settleOperation("1700.2", 1, true), { taken: true });
+    assert.deepEqual((await store.findCutOffExecutions()).map((e) => e.proposal.proposalTs), ["1700.2"]);
+    // Taken once more by one teller, with what came back and the count carried.
+    const retakes = await Promise.all([
+      store.takeCutOffExecution("1700.2"),
+      store.takeCutOffExecution("1700.2"),
+      store.takeCutOffExecutionInThread(THREAD),
+    ]);
+    const retaken = retakes.filter(Boolean);
+    assert.equal(retaken.length, 1);
+    assert.deepEqual(retaken[0]?.settled, [{ index: 0, ok: true }]);
+    assert.equal(retaken[0]?.attempts, 1);
+    assert.deepEqual(await store.findCutOffExecutions(), []);
+    assert.deepEqual(await store.settleOperation("1700.2", 2, true), { taken: true });
+  });
+
+  it("the owed-note retry is bounded at three attempts", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal());
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    const reports: string[] = [];
+    for (let i = 0; i < CUT_OFF_NOTE_ATTEMPTS; i++) {
+      assert.ok(await store.takeCutOffExecution("1700.2"), `attempt ${i + 1} is taken`);
+      reports.push(await store.reportCutOffNote("1700.2", false));
+    }
+    assert.deepEqual(reports, ["owed", "owed", "given-up"]);
+    assert.deepEqual(await store.findCutOffExecutions(), []);
+    assert.equal(await store.takeCutOffExecution("1700.2"), null);
+    // Given up is still fenced.
+    assert.deepEqual(await store.settleOperation("1700.2", 0, true), { taken: true });
+  });
+
+  it("an owed note is not retried past the record's hour", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal());
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    assert.ok(await store.takeCutOffExecution("1700.2"));
+    assert.equal(await store.reportCutOffNote("1700.2", false), "owed");
+    clock.advance(PROPOSAL_TTL_MS);
+    assert.deepEqual(await store.findCutOffExecutions(), []);
+    assert.equal(await store.takeCutOffExecution("1700.2"), null);
+  });
+
+  it("a report on an untaken or unknown execution changes nothing", async () => {
+    const { store, clock } = setup();
+    assert.equal(await store.reportCutOffNote("1700.9", false), "told");
+    await store.beginExecution(proposal());
+    assert.equal(await store.reportCutOffNote("1700.2", false), "told");
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    const taken = await store.takeCutOffExecution("1700.2");
+    assert.equal(taken?.attempts, undefined);
   });
 
   it("an execution leaves the proposal lookups alone", async () => {

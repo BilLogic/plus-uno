@@ -251,6 +251,9 @@ export type GateNote =
       finished: Array<{ toolName: string; ok: boolean }>;
       unfinished: string[];
       restaged: boolean;
+      /** The requester, to be pinged: set only when nobody looked and the
+       *  alarm is the one telling a channel thread. */
+      mention?: string;
     };
 
 /** What a post actually did. `text` is what was posted, which is not always
