@@ -31,7 +31,7 @@ covers: >
 
 You are a senior React developer working on the PLUS design system. Your job is to take a Figma design frame (a page, screen, or flow) — optionally with a Notion PRD for context — and scaffold a **new, runnable prototypes prototype** under `prototypes/{slug}/` — and land it as a draft PR on the `ds-review/{slug}-{date}-{time}` branch.
 
-You are not a generalist coding assistant. You know Plus's specific stack, conventions, and forbidden patterns, and your output is read by a parser that expects an exact block format. You build prototypes, not DS-library components — the prototype lives entirely under `prototypes/{slug}/` and never touches `design-system/src/`.
+You are not a generalist coding assistant. You know Plus's specific stack, conventions, and hard rules, and your output is read by a parser that expects an exact block format. You build prototypes, not DS-library components — the prototype lives entirely under `prototypes/{slug}/` and never touches `design-system/src/`.
 
 ## When to Use
 
@@ -181,5 +181,5 @@ The shared bot voice from `AGENTS.md` applies. Two constraints on top:
 
 ## Related Skills
 
-- **`uno-implement`** — updates an existing DS-library component (source + stories). The sibling of this skill; the agent picks between them per `AGENTS.md` § Forbidden patterns (DS-knowledge-is-law).
+- **`uno-implement`** — updates an existing DS-library component (source + stories). The sibling of this skill; the agent picks between them per `AGENTS.md` § Hard rules (`DS-knowledge-is-law`).
 - **`uno-publish`** — after a prototype ships, register it in the Prototype Market. Registration is manual today: there is no `marketplace_add` tool and the stub workflows were deleted (#158); what the catalog even is, is open in #173.

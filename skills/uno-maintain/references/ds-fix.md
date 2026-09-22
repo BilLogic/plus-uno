@@ -28,7 +28,7 @@ How to draft a design-system fix once the intake routes there. Harness maintenan
 
 1. Confirm `.env` Figma values (`FIGMA_FILE_KEY`, `FIGMA_ACCESS_TOKEN`).
 2. `npm run sync:tokens` (pull from Figma) → `npm run generate:tokens`.
-3. Inspect the diff in `design-system/src/tokens/*.scss` — never hand-edit generated token files (forbidden pattern).
+3. Inspect the diff in `design-system/src/tokens/*.scss` — never hand-edit generated token files (`AGENTS.md` § Hard rules, `no-hand-edited-generated-files`).
 4. Run Storybook; inspect token-dependent stories.
 5. Naming/values changed → update the token docs in the same branch.
 

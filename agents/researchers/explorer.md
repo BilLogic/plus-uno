@@ -23,5 +23,5 @@ Sweeps this repo (components, stories, tokens, prototypes, knowledge) to answer 
 
 ## Conventions it obeys
 
-- `AGENTS.md` forbidden patterns (read-only scope)
+- `AGENTS.md` § Hard rules (read-only scope)
 - DS truth boundary: component/style documentation lives in uno-storybook — cite stories, don't restate them

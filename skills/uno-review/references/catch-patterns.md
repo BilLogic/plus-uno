@@ -7,7 +7,7 @@ summary: Grep checks for the mechanical share of DS-compliance findings
 
 # Catch patterns — coded artifacts
 
-Grep checks for the mechanical share of DS-compliance findings. Each maps to a NAMED AGENTS.md forbidden pattern — cited by name, never by number, because the list renumbers (2026-07-30); the rule lives there, not here. Output is **evidence for ds-lens findings**, not a verdict: hits still need the severity + reference + re-entry treatment from `method.md`.
+Grep checks for the mechanical share of DS-compliance findings. Each maps to a NAMED rule in `AGENTS.md` § Hard rules — cited by the name that rule carries, never by number, because the list renumbers (2026-07-30); the rule lives there, not here. Output is **evidence for ds-lens findings**, not a verdict: hits still need the severity + reference + re-entry treatment from `method.md`.
 
 Run all at once:
 

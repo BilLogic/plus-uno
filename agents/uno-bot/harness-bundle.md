@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,201 chars from 16 files**, against an assembled budget of 175,000 (799 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 153,817 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,338 chars from 16 files**, against an assembled budget of 175,000 (662 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 153,954 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,031 (−7,277 ide-only) | 10,031 | 20,000 (constitution) |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,993 | 30,052 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,041 | 57,134 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,527 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 70,571 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,284 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,571 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 89,274 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,676 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,647 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,645 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 15,493 | 127,180 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 130,428 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 161,015 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 165,604 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 174,201 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,172 (−7,617 ide-only) | 10,172 | 20,000 (constitution) |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,993 | 30,193 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,041 | 57,275 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,668 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 70,712 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,425 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,712 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,657 | 89,411 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,813 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,784 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,782 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 15,493 | 127,317 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 130,565 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 161,152 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 165,741 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 174,338 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -46,7 +46,7 @@ the marker is what a relaxed or raised budget would have to explain.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **6 reference(s), 43,124 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **6 reference(s), 43,117 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -54,7 +54,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `uno-prototype/method` | [`skills/uno-prototype/references/method.md`](../../skills/uno-prototype/references/method.md) | 10,700 |
 | `uno-publish/method` | [`skills/uno-publish/references/method.md`](../../skills/uno-publish/references/method.md) | 6,129 |
 | `uno-research/method` | [`skills/uno-research/references/method.md`](../../skills/uno-research/references/method.md) | 4,153 |
-| `uno-review/method` | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,858 |
+| `uno-review/method` | [`skills/uno-review/references/method.md`](../../skills/uno-review/references/method.md) | 5,851 |
 | `uno-synthesize/method` | [`skills/uno-synthesize/references/method.md`](../../skills/uno-synthesize/references/method.md) | 5,885 |
 
 ## The assembled prompt
@@ -131,13 +131,13 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 
 ## Hard rules
 
-Every embodiment, including Slack:
+Every embodiment, including Slack.
 
-1. **The design system's generated index is the existence law.** Start at `design-system/guidelines/overview.md`, then load only what the task needs (e.g. `design-system/agent-views/components/index.md`, `design-system/agent-views/tokens/tokens.md`). A component absent from the index does not exist — propose creating it rather than asserting it, and check the index before creating one so you do not duplicate what is there.
-2. **Read the source for every name you use.** Props, variants and types come from the component `.jsx` / `.stories.jsx` — or from `get-documentation` on the Storybook MCP endpoint (`docs/connectors/storybook-mcp.md`) — before you write them.
-3. **Icons are Font Awesome Free**: `fa-solid`, `fa-regular`, `fa-brands` — including the brand glyphs (`fa-brands fa-notion`, `fa-brands fa-figma`). Pro families and Pro-only names (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, `fa-grid-2`) are not licensed here and render as blanks.
+1. **The design system's generated index is the existence law** (`DS-knowledge-is-law`, `no-duplicate-components`). Start at `design-system/guidelines/overview.md`, then load only what the task needs (e.g. `design-system/agent-views/components/index.md`, `design-system/agent-views/tokens/tokens.md`). A component absent from the index does not exist — propose creating it rather than asserting it, and check the index before creating one so you do not duplicate what is there.
+2. **Read the source for every name you use** (`read-source-first`, `no-hallucinated-props`). Props, variants and types come from the component `.jsx` / `.stories.jsx` — or from `get-documentation` on the Storybook MCP endpoint (`docs/connectors/storybook-mcp.md`) — before you write them.
+3. **Icons are Font Awesome Free** (`FA-Free-only`): `fa-solid`, `fa-regular`, `fa-brands` — including the brand glyphs (`fa-brands fa-notion`, `fa-brands fa-figma`). Pro families and Pro-only names (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, `fa-grid-2`) are not licensed here and render as blanks.
 4. **Notion writes follow `docs/connectors/notion.md`** — the convention surfaces and the ✅-gated tools. Select options, pillars, features and OKRs are exact-matched against what the database already offers; a value that does not exist is a question for the requester. Safety is the gate + schema match, not a hardcoded database fence.
-5. **PLUS components first**, then generic React-Bootstrap where no PLUS equivalent exists (ADR-009). Bootstrap is the UI framework for product UI; Tailwind is present but scoped to the Storybook documentation chrome in `design-system/src/storybook-docs/`, so it is not a precedent for product code.
+5. **PLUS components first** (`PLUS-components-first`), then generic React-Bootstrap where no PLUS equivalent exists (ADR-009). Bootstrap is the UI framework for product UI; Tailwind is present but scoped to the Storybook documentation chrome in `design-system/src/storybook-docs/`, so it is not a precedent for product code.
 
 
 ## Knowledge
@@ -622,7 +622,7 @@ Poke holes in a design from Slack. A designer links a frame, a prototype, a spec
 1. **Read the method.** The pointer at the foot of this file names it; make that `read_reference` call before anything below — intake, scenarios, lens depth, severity and verdict are its sections. Done when the method is in this turn's context.
 2. **Take the manifest.** A designer-initiated review starts from the one-liner — fidelity (low / mid / high / coded) · tools used · PRD link. Missing → ask once in-thread. The target is in hand only when the read returns the artifact's own content — its text layers, its markup, its rendered screen. Still missing, or not in hand (no link; `source_read` fails; or the page answers with an application shell and none of the artifact in it) → say so plainly, record an intake (`notion_create`, surface `intake`, gated) and route to a human. A URL that loaded is not an artifact that loaded. Where the artifact is code, its source in the repo is the artifact; where it is a link, the blueprint rows and the feature's specs are context around the thing under review rather than the thing itself. Design QA arrives when someone brings the card at RTT (no auto-trigger exists): resolve RM-ID → the `[spec]` Figma file per the method, in place of a manifest. Done when fidelity, tools and PRD are known, or the turn has ended at the intake.
 3. **Inspect before judging.** `source_read` the linked frame (rendered screenshot + text layers) and the PRD or spec; `github_read` the rule docs each lens applies — `design-system/guidelines/foundations/accessibility.md`, the agent-views, the component's source for a coded artifact. Every finding rests on fetched content. Done when you can quote what is in the artifact.
-4. **Apply the lenses yourself**, one at a time, in-lane, at the manifest's fidelity depth — there is no sub-agent dispatch here: ds-lens (components, tokens, layout, forbidden patterns), uno-lens (artifact vs PRD and `search_blueprint` rows, queried live), a11y-lens (contrast, targets, keyboard, focus, semantics, colour-not-alone, motion); Design QA walks the build against the `[spec]` frames' Dev Mode annotations and the checklist. **The fidelity wall:** qualitative review from the screenshot is yours — layout, hierarchy, alignment, spacing feel, glaring contrast, flow logic, structure, terminology, copy, PRD conformance. Computed values are IDE-only — exact WCAG ratios, token fidelity, 44×44 measurement, focus order, responsive behaviour (`skills/uno-review` + Figma MCP + `run-review-checks.sh`, the catch-pattern greps included). Say the boundary plainly, mark depth-limited findings as *partial*, and offer an intake or a ready-to-paste IDE prompt with the frame and PRD links pre-filled. No image renderable → a text-layer review, labelled as such. Done when each lens has run at its depth or been marked partial.
+4. **Apply the lenses yourself**, one at a time, in-lane, at the manifest's fidelity depth — there is no sub-agent dispatch here: ds-lens (components, tokens, layout, the hard rules), uno-lens (artifact vs PRD and `search_blueprint` rows, queried live), a11y-lens (contrast, targets, keyboard, focus, semantics, colour-not-alone, motion); Design QA walks the build against the `[spec]` frames' Dev Mode annotations and the checklist. **The fidelity wall:** qualitative review from the screenshot is yours — layout, hierarchy, alignment, spacing feel, glaring contrast, flow logic, structure, terminology, copy, PRD conformance. Computed values are IDE-only — exact WCAG ratios, token fidelity, 44×44 measurement, focus order, responsive behaviour (`skills/uno-review` + Figma MCP + `run-review-checks.sh`, the catch-pattern greps included). Say the boundary plainly, mark depth-limited findings as *partial*, and offer an intake or a ready-to-paste IDE prompt with the frame and PRD links pre-filled. No image renderable → a text-layer review, labelled as such. Done when each lens has run at its depth or been marked partial.
 5. **Write each finding** with severity · lens · evidence (what is in the artifact) · reference (the doc or rule) · re-entry point. Blockers and majors flip the verdict; minors are advisory and travel with the artifact. Three strong findings beat seven mushy ones — a low-confidence finding is omitted. "What's working" is mandatory: 1–3 specific strengths with the principle they match. Done when every finding carries all five parts.
 6. **Post the critique in-thread first**, in the 🔍 shape below, as a normal reply — a review ask is answered with findings in prose, and routing comes after, in the same message: a maintain intake (`notion_create`, gated) for harness, DS or doc defects, or the offer of a separate **uno-prototype** ask for an artifact fix. Zero actionable findings → say so honestly: "I don't see anything that violates Plus conventions — what were you specifically worried about?" Past the summary threshold (`docs/connectors/slack.md § Writing style`) → a 3-bullet summary inline plus an offer to append the full critique to the Notion card (`notion_update`, ✅). Confidence follows the persona's *woven* clause. Done when the critique is in the thread and any routing sits after it.
 7. **Carry the verdict.** Stage-lens: `Issues? = Yes` only on a major or above → re-enters **uno-prototype**, each finding saying whether at the fidelity choice or the content. Handoff gate: a major+ holds the publish. Design QA: findings go to dev before Ready for Prod; a blocker holds it. Pushback on a finding → re-read the cited doc, then concede or stand by it with reasoning. Done when the verdict and the re-entry are stated.
@@ -2207,11 +2207,11 @@ Lenses run **in parallel** and stay in-lane — no lens comments outside its own
 |---|---|---|
 | low (FigJam flows, sketches, paper) | flow logic, structure, product intent, structural a11y (reading order, labeled steps) | tokens, components, visual polish |
 | mid (interactive drafts) | the above + layout patterns, interaction behavior, terminology, content voice | token-level fidelity, prop correctness |
-| high / coded | everything: tokens vs hardcoded values, real DS components with verified props, computed contrast, focus behavior, forbidden patterns | — |
+| high / coded | everything: tokens vs hardcoded values, real DS components with verified props, computed contrast, focus behavior, the hard rules | — |
 
 What each lens applies (the rules live in the docs, not here):
 
-- `reviewers/ds-lens` — components / tokens / layout vs the DS agent-views and AGENTS.md forbidden patterns. Coded artifacts: also the catch-pattern greps (`references/catch-patterns.md`, automated by `skills/uno-review/scripts/run-review-checks.sh`).
+- `reviewers/ds-lens` — components / tokens / layout vs the DS agent-views and `AGENTS.md` § Hard rules. Coded artifacts: also the catch-pattern greps (`references/catch-patterns.md`, automated by `skills/uno-review/scripts/run-review-checks.sh`).
 - `reviewers/uno-lens` — artifact vs PRD + uno-blueprint constraints, queried live at review time.
 - `reviewers/a11y-lens` — `design-system/guidelines/foundations/accessibility.md`: WCAG AA contrast, 44×44 targets, keyboard reach, focus order + visibility, semantic HTML / screen readers, color-not-alone, reduced motion.
 - `reviewers/design-qa` — the `[spec]` frames' Dev Mode annotations (`docs/connectors/figma.md`) + the Design QA checklist (Notion 🧩 Templates): components, tokens, spacing, typography, states, interaction behavior.
@@ -2222,7 +2222,7 @@ Every finding carries **severity · lens · evidence (what's in the artifact) ·
 
 | Severity | Meaning | Effect |
 |---|---|---|
-| **blocker** | forbidden pattern, WCAG AA break, non-existent component or prop, spec contradiction | flips the gate; in Design QA, holds `Ready for Prod` |
+| **blocker** | a hard rule broken, WCAG AA break, non-existent component or prop, spec contradiction | flips the gate; in Design QA, holds `Ready for Prod` |
 | **major** | unjustified divergence from PRD / DS patterns, hierarchy skipping, missing required state | flips the gate |
 | **minor** | terminology drift, copy-case, polish | advisory — travels with the artifact, never blocks |
 

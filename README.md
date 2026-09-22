@@ -167,7 +167,7 @@ Hosted on Netlify (free tier). Build: `npm run build:all` (Vite + Storybook). De
 | Document | What |
 |----------|------|
 | [`docs/product-and-service/onboarding.md`](docs/product-and-service/onboarding.md) | **New here? Start with this** — the six skills + where things live |
-| [`AGENTS.md`](AGENTS.md) | Agent constitution — identity, skill roster, forbidden patterns |
+| [`AGENTS.md`](AGENTS.md) | Agent constitution — identity, skill roster, hard rules |
 | [`docs/product-and-service/plus-app.md`](docs/product-and-service/plus-app.md) | PLUS product landscape (mission, users, features, flows) |
 | [`docs/product-and-service/plus-uno.md`](docs/product-and-service/plus-uno.md) | This repo's structure and inventory |
 | [`docs/conventions/`](docs/conventions/) | Normative rules — coding, terminology, tech stack, Notion/Figma/Slack/Supabase, writing style |
