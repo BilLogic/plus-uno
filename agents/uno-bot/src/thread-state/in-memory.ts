@@ -87,11 +87,17 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
    *  leave it alone if it may still be running. */
   function takeIfCutOff(ts: string): Execution | null {
     const rec = executions.get(ts);
-    if (!rec) return null;
+    if (!rec || rec.takenAt !== undefined) return null;
     const age = now() - rec.startedAt;
     if (age <= EXECUTION_CUTOFF_MS) return null;
-    executions.delete(ts);
-    return age > PROPOSAL_TTL_MS ? null : rec;
+    if (age > PROPOSAL_TTL_MS) {
+      executions.delete(ts);
+      return null;
+    }
+    // Marked, not deleted: a run that is only slow reads the mark at its next
+    // operation and stops (the fence, on `settleOperation`).
+    rec.takenAt = now();
+    return { ...rec, settled: [...rec.settled] };
   }
 
   /** Live turns for a conversation, evicting the record if it has aged out.
@@ -232,8 +238,10 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
 
     async settleOperation(proposalTs, index, ok) {
       const rec = executions.get(proposalTs);
-      if (!rec || rec.settled.some((s) => s.index === index)) return;
-      rec.settled = [...rec.settled, { index, ok }];
+      if (!rec) return { taken: false };
+      if (rec.takenAt !== undefined) return { taken: true };
+      if (!rec.settled.some((s) => s.index === index)) rec.settled = [...rec.settled, { index, ok }];
+      return { taken: false };
     },
 
     async endExecution(proposalTs) {
@@ -249,6 +257,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       for (const rec of executions.values()) {
         if (rec.proposal.channel !== ref.channel) continue;
         if (proposalReplyThread(rec.proposal) !== ref.thread) continue;
+        if (rec.takenAt !== undefined) continue;
         const age = now() - rec.startedAt;
         if (age <= EXECUTION_CUTOFF_MS || age > PROPOSAL_TTL_MS) continue;
         if (!best || rec.startedAt > best.startedAt) best = rec;

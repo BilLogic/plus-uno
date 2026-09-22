@@ -615,9 +615,15 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
       .takeCutOffExecutionInThread({ channel: request.channel, thread: cardThread })
       .catch(() => null);
     if (cutOff) {
-      return settleVerdict(cutOffVerdict(cutOff, "confirm"), {
+      const verdict = cutOffVerdict(cutOff, "confirm");
+      return settleVerdict(verdict, {
         deps,
         memory,
+        // Whatever they wrote went unanswered, and they should know it did
+        // rather than read the note as the answer.
+        aside: verdict.restage
+          ? "I haven't answered your message yet — ask again once you've sorted the card below."
+          : "I haven't answered your message yet — ask it again and I'll pick it up.",
         telemetry: {
           tier: "chill",
           route: "cut-off-run",
@@ -1061,7 +1067,14 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
  */
 async function settleVerdict(
   verdict: GateVerdict,
-  ctx: { deps: TurnDeps; memory: ThreadMemory; telemetry: TurnTelemetry; note?: string },
+  ctx: {
+    deps: TurnDeps;
+    memory: ThreadMemory;
+    telemetry: TurnTelemetry;
+    note?: string;
+    /** A line after the verdict's note and before any re-staged card. */
+    aside?: string;
+  },
 ): Promise<TurnOutcome> {
   const said = verdict.post
     ? await ctx.deps.delivery.postGateNote(verdict.post.note)
@@ -1070,6 +1083,10 @@ async function settleVerdict(
   await ctx.deps.applyVerdict(verdict);
   const remembered = (verdict.outcome === "won" ? ctx.note : undefined) ?? posted;
   if (remembered) await ctx.memory.remember(remembered);
+  if (ctx.aside) {
+    await ctx.deps.delivery.postNote(ctx.aside);
+    await ctx.memory.remember(ctx.aside);
+  }
   // A cut-off run's leftovers go back on a card of their own, after the note
   // that explains them — the card holds the buttons, so it comes last.
   const staged = verdict.restage ? await restageExecution(verdict.restage, ctx.deps) : null;
@@ -1106,7 +1123,7 @@ export async function restageExecution(
 ): Promise<{ proposal: PendingProposal; card: ProposalCard } | null> {
   const original = restage.proposal;
   const first = restage.operations[0]!;
-  const card = await buildCard(
+  const built = await buildCard(
     { kind: "proposal", operations: restage.operations, toolName: first.toolName, input: first.input },
     deps,
     implementPrdUrlFor(first.toolName, first.input, {
@@ -1117,6 +1134,9 @@ export async function restageExecution(
     // the proposal record can still name.
     original.channel.startsWith("D"),
   );
+  // The warning rides the card, not only the note before it: a note that
+  // failed to post must not leave a card that reads like any other.
+  const card: ProposalCard = { ...built, caveats: [{ kind: "cut-off-rerun" }, ...built.caveats] };
   const posted = await deps.delivery.card(card);
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] re-staged card was not posted (${first.toolName})`);

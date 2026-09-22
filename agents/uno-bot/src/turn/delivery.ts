@@ -88,6 +88,10 @@ export type CardCaveat =
   /** A PRD-shaped brief that named no ambiguity of its own, so the ✅ is
    *  knowingly accepting a gap-free reading of it. */
   | { kind: "no-open-questions" }
+  /** A card re-staged from an approved run that was cut off: some of it may
+   *  already have happened. On the card itself, so the warning survives a
+   *  note that failed to post. */
+  | { kind: "cut-off-rerun" }
   /** A prototype share-out staged without the bundle's full set of links. */
   | { kind: "bundle-incomplete"; missing: string[] }
   /** A GitHub issue, readable by whoever can read its repo — anyone, when the

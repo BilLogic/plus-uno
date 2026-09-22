@@ -17,6 +17,7 @@ import {
   resolveSignal,
   runOperations,
   runReactionDoor,
+  settleInto,
   type GateRestage,
   type GateSignal,
   type GateVerdict,
@@ -31,7 +32,8 @@ import {
 import { recordingDelivery, runTurn, type RecordingDelivery } from "../src/turn/index";
 import { runButtonDoor } from "../src/slack/button-door";
 import { renderGateNote } from "../src/slack/gate-note";
-import { harness, request } from "./helpers/turn-harness";
+import { renderProposalCard } from "../src/slack/proposal-render";
+import { harness, postsOf, request } from "./helpers/turn-harness";
 
 const CHANNEL = "C1";
 const THREAD = "1700000000.000100";
@@ -95,7 +97,7 @@ async function approveAndCutOff(store: ThreadState, hangAt: number): Promise<{ r
         ? new Promise<string>(() => {})
         : Promise.resolve(JSON.stringify({ ok: true }));
     },
-    (index, outcome) => store.settleOperation(CARD_TS, index, outcome.ok),
+    settleInto(store, CARD_TS),
   );
   await drain();
   return { ran };
@@ -145,34 +147,38 @@ describe("a run cut off after the claim", () => {
     assert.equal(again.restage, undefined);
   });
 
-  it("an executor that throws mid-batch still finishes the batch, and nothing finished is re-staged", async () => {
+  // A slow run is not a dead one. The take fences it: the batch reads the
+  // mark at its next settle and starts nothing else, so the work the fresh
+  // card offers again cannot also complete underneath it. (A throw inside the
+  // batch, and one after it, are driven through the real `executeVerdict` in
+  // `tests/execute-verdict.test.ts`.)
+  it("a run taken mid-batch starts no later operation", async () => {
     const { store, time } = await staged();
     const verdict = await resolveSignal(press(), { threadState: store });
-    const outcomes = await runOperations(
+    let release!: (result: string) => void;
+    const ran: string[] = [];
+    let fenced = false;
+    const batch = runOperations(
       verdict.execute!.operations,
-      async (op) => {
-        if (op.toolName === "github_issue_create") throw new Error("socket hang up");
-        return JSON.stringify({ ok: true });
+      (op) => {
+        ran.push(op.toolName);
+        return ran.length === 1
+          ? new Promise<string>((r) => (release = r))
+          : Promise.resolve(JSON.stringify({ ok: true }));
       },
-      (index, outcome) => store.settleOperation(CARD_TS, index, outcome.ok),
+      settleInto(store, CARD_TS, () => (fenced = true)),
     );
-    assert.deepEqual(outcomes.map((o) => o.ok), [true, false, true]);
-    // The run then dies before its outcome is told — the result post, the
-    // history note, the end of the record never happen.
+    await drain();
+    // Operation one is slow; a later look takes the run as cut off meanwhile.
     time.advance(EXECUTION_CUTOFF_MS + 1);
-
-    const later = await resolveSignal(press(), { threadState: store });
-    assert.deepEqual(later.post?.note, {
-      kind: "cut-off",
-      finished: [
-        { toolName: "notion_create", ok: true },
-        { toolName: "github_issue_create", ok: false },
-        { toolName: "dm_relay", ok: true },
-      ],
-      unfinished: [],
-      restaged: false,
-    });
-    assert.equal(later.restage, undefined, "every operation came back, so none is offered again");
+    const look = await resolveSignal(press(), { threadState: store });
+    assert.deepEqual(look.restage?.operations, BATCH);
+    // Operation one then comes back — and the batch stops there.
+    release(JSON.stringify({ ok: true }));
+    const outcomes = await batch;
+    assert.deepEqual(ran, ["notion_create"]);
+    assert.equal(outcomes.length, 1);
+    assert.equal(fenced, true);
   });
 
   it("a completed run is never re-staged", async () => {
@@ -181,7 +187,7 @@ describe("a run cut off after the claim", () => {
     await runOperations(
       verdict.execute!.operations,
       async () => JSON.stringify({ ok: true }),
-      (index, outcome) => store.settleOperation(CARD_TS, index, outcome.ok),
+      settleInto(store, CARD_TS),
     );
     await store.endExecution(CARD_TS);
     time.advance(EXECUTION_CUTOFF_MS + 1);
@@ -254,9 +260,20 @@ describe("the later looks", () => {
     assert.equal(h.provider.sends.length, 0, "the note and the card are the reply; no model turn stages over them");
     assert.equal(h.delivery.gateNotes[0]?.kind, "cut-off");
     assert.deepEqual(h.delivery.stagedCards.map((c) => c.operations), [[BATCH[1], BATCH[2]]]);
-    // The card comes after the note: it holds the buttons.
-    const kinds = h.delivery.calls.map((c) => c.kind);
-    assert.ok(kinds.indexOf("gate-note") < kinds.indexOf("proposal"));
+    // The note, then a line saying their own message is still unanswered,
+    // then the card — which comes last because it holds the buttons.
+    assert.deepEqual(
+      h.delivery.calls.filter((c) => ["gate-note", "note", "proposal"].includes(c.kind)).map((c) => c.kind),
+      ["gate-note", "note", "proposal"],
+    );
+    assert.match(postsOf(h.delivery).find((p) => p.includes("haven't answered")) ?? "", /ask again once you've sorted the card below/);
+    // The warning rides the card itself, ahead of the card's own caveats, so a
+    // note that failed to post still leaves the person warned.
+    assert.equal(h.delivery.stagedCards[0]!.caveats[0]?.kind, "cut-off-rerun");
+    assert.match(
+      renderProposalCard(h.delivery.stagedCards[0]!).text,
+      /An earlier approved run was cut off; some of this may already have happened.*Check before approving/,
+    );
 
     // The fresh card is a card like any other: live in the thread, and its own
     // ✅ runs exactly what it shows.

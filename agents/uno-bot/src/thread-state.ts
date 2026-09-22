@@ -367,11 +367,21 @@ export class ThreadState extends DurableObject<Env> {
     await this.ensureGcAlarm();
   }
 
-  async settleOperation(proposalTs: string, index: number, ok: boolean): Promise<void> {
+  // The fence: a taken execution is reported to the run that is still settling
+  // it, which stops there (see `settleOperation` in `thread-state/store.ts`).
+  async settleOperation(
+    proposalTs: string,
+    index: number,
+    ok: boolean,
+  ): Promise<{ taken: boolean }> {
     const key = executionKey(proposalTs);
     const rec = await this.storage.get<Execution>(key);
-    if (!rec || rec.settled.some((s) => s.index === index)) return;
-    await this.storage.put<Execution>(key, { ...rec, settled: [...rec.settled, { index, ok }] });
+    if (!rec) return { taken: false };
+    if (rec.takenAt !== undefined) return { taken: true };
+    if (!rec.settled.some((s) => s.index === index)) {
+      await this.storage.put<Execution>(key, { ...rec, settled: [...rec.settled, { index, ok }] });
+    }
+    return { taken: false };
   }
 
   async endExecution(proposalTs: string): Promise<void> {
@@ -381,27 +391,35 @@ export class ThreadState extends DurableObject<Env> {
   async takeCutOffExecution(proposalTs: string, at: number): Promise<Execution | null> {
     const key = executionKey(proposalTs);
     const rec = await this.storage.get<Execution>(key);
-    if (!rec) return null;
+    if (!rec || rec.takenAt !== undefined) return null;
     const age = at - rec.startedAt;
     if (age <= EXECUTION_CUTOFF_MS) return null; // may still be running
-    await this.storage.delete(key);
-    return age > PROPOSAL_TTL_MS ? null : rec;
+    if (age > PROPOSAL_TTL_MS) {
+      await this.storage.delete(key);
+      return null;
+    }
+    // Marked, not deleted: a run that is only slow reads the mark at its next
+    // operation and stops.
+    await this.storage.put<Execution>(key, { ...rec, takenAt: at });
+    return rec;
   }
 
   // Scans the in-flight set, which is empty whenever nothing was cut off: an
-  // execution is removed the moment its outcome has been told.
+  // execution is removed the moment its outcome has been told, and a taken one
+  // is skipped.
   async takeCutOffExecutionInThread(ref: ThreadRef, at: number): Promise<Execution | null> {
     const all = await this.storage.list<Execution>({ prefix: "exec:" });
     let best: Execution | null = null;
     for (const rec of all.values()) {
       if (rec.proposal.channel !== ref.channel) continue;
       if (proposalReplyThread(rec.proposal) !== ref.thread) continue;
+      if (rec.takenAt !== undefined) continue;
       const age = at - rec.startedAt;
       if (age <= EXECUTION_CUTOFF_MS || age > PROPOSAL_TTL_MS) continue;
       if (!best || rec.startedAt > best.startedAt) best = rec;
     }
     if (!best) return null;
-    await this.storage.delete(executionKey(best.proposal.proposalTs));
+    await this.storage.put<Execution>(executionKey(best.proposal.proposalTs), { ...best, takenAt: at });
     return best;
   }
 

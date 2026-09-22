@@ -129,7 +129,7 @@ export function createDurableObjectThreadState(
       return hop().beginExecution(proposal, now());
     },
 
-    settleOperation(proposalTs: string, index: number, ok: boolean): Promise<void> {
+    settleOperation(proposalTs: string, index: number, ok: boolean): Promise<{ taken: boolean }> {
       return hop().settleOperation(proposalTs, index, ok);
     },
 

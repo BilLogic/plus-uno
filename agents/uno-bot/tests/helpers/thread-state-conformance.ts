@@ -491,7 +491,7 @@ export function runThreadStateConformance(
   //
   // A won ✅ is recorded from the claim until its outcome is told, so a run cut
   // off in between can be told apart from one that finished. The take is a
-  // lock like the claim: one later look says so, once.
+  // lock like the claim: one later look says so, once — and a fence, below.
 
   const BATCH = [
     { toolName: "notion_create", input: { title: "One" } },
@@ -579,9 +579,34 @@ export function runThreadStateConformance(
     assert.equal(taken?.proposal.proposalTs, "1700.6");
   });
 
+  // The fence. A take marks the execution rather than deleting it, because
+  // the run may only be slow: its next settle hears it was taken and stops,
+  // so the work the re-staged card offers cannot also complete underneath it.
+  it("a settle after the take reports taken", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal({ operations: BATCH }));
+    assert.deepEqual(await store.settleOperation("1700.2", 0, true), { taken: false });
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    assert.ok(await store.takeCutOffExecutionInThread(THREAD));
+    assert.deepEqual(await store.settleOperation("1700.2", 1, true), { taken: true });
+    // And a taken execution is never taken twice, by either look.
+    assert.equal(await store.takeCutOffExecution("1700.2"), null);
+  });
+
+  it("ending a taken execution removes the record", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal());
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    assert.ok(await store.takeCutOffExecution("1700.2"));
+    await store.endExecution("1700.2");
+    // Nothing left to fence: a settle now finds no record at all.
+    assert.deepEqual(await store.settleOperation("1700.2", 0, true), { taken: false });
+    assert.equal(await store.takeCutOffExecution("1700.2"), null);
+  });
+
   it("settling or ending an execution that was never begun is a no-op", async () => {
     const { store, clock } = setup();
-    await store.settleOperation("1700.2", 0, true);
+    assert.deepEqual(await store.settleOperation("1700.2", 0, true), { taken: false });
     await store.endExecution("1700.2");
     clock.advance(EXECUTION_CUTOFF_MS + 1);
     assert.equal(await store.takeCutOffExecution("1700.2"), null);

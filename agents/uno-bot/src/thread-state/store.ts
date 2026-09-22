@@ -83,16 +83,17 @@ export const CANCEL_TTL_MS = 5 * 60_000;
  * How long an approved execution may go without reporting back before a later
  * look reads it as cut off.
  *
- * Longer than any path's budget for a run that is still alive. A button press
- * executes inside `waitUntil`, which Cloudflare cancels 30 s past the response;
- * a reaction or a typed ✅ executes on the AgentRunner alarm, which has no such
- * guillotine, and a gated batch there is a handful of API calls of seconds
- * each. Five minutes is ten times the one hard budget and a wide margin over
- * the other, so a run this old has been killed rather than slowed — and it is
- * short against the hour a card stays confirmable, which is the window a
- * re-staged card is useful in. Too short is the dangerous side: a note that
- * says "this may not have run" beside a run that is still going invites the
- * person to approve it twice.
+ * NOT a bound on how long a live run can take, and nothing here relies on it
+ * being one. A button press executes inside `waitUntil`, which Cloudflare
+ * cancels 30 s past the response; a reaction or a typed ✅ executes on the
+ * AgentRunner alarm, which has no such cutoff, so a slow batch there can still
+ * be alive past any threshold. What keeps a slow run and a later look from
+ * both producing an outcome is the FENCE: a take marks the execution rather
+ * than deleting it, and the running batch checks that mark after every
+ * operation and stops, telling nothing, once it is set
+ * (`ThreadState.settleOperation`). The note and the re-staged card are then
+ * the only account. Five minutes is how long a person waits to be told; it is
+ * short against the hour a re-staged card stays useful.
  */
 export const EXECUTION_CUTOFF_MS = 5 * 60 * 1000;
 
@@ -236,6 +237,9 @@ export interface Execution {
    *  batch. An operation with no entry never returned: it may have run, it may
    *  not, and it is never re-run without a person approving it again. */
   settled: Array<{ index: number; ok: boolean }>;
+  /** When a later look took it (see `takeCutOffExecution`). Set, the run is
+   *  fenced: it stops at its next operation and tells no outcome. */
+  takenAt?: number;
 }
 
 /** The operations of an execution that never came back, in batch order. */
@@ -484,18 +488,30 @@ export interface ThreadState {
    */
   beginExecution(proposal: PendingProposal): Promise<void>;
 
-  /** Mark one operation of a running execution as having come back. An
-   *  unknown ts is a no-op. */
-  settleOperation(proposalTs: string, index: number, ok: boolean): Promise<void>;
+  /**
+   * Mark one operation of a running execution as having come back, and report
+   * whether a later look has TAKEN the execution meanwhile.
+   *
+   * THE FENCE. `taken: true` means a person has already been told this run
+   * was cut off and handed a card for what had not come back: the running
+   * batch must start no further operation and tell no outcome of its own,
+   * or the work the card offers again would also complete underneath it. The
+   * settle itself is not recorded then — nobody reads it. An unknown ts
+   * reports `taken: false`: there is nobody to fence against.
+   */
+  settleOperation(proposalTs: string, index: number, ok: boolean): Promise<{ taken: boolean }>;
 
-  /** The outcome has been told: forget the execution. An unknown ts is a no-op. */
+  /** The outcome has been told, or the run has stopped at the fence: forget
+   *  the execution, taken or not. An unknown ts is a no-op. */
   endExecution(proposalTs: string): Promise<void>;
 
   /**
-   * The execution behind this card, if it was cut off — and remove it, so one
-   * later look and only one says so. The take is the lock here as the delete
-   * is for the claim: two presses on a stuck card get one note and one
-   * re-staged card between them.
+   * The execution behind this card, if it was cut off — and MARK it taken, so
+   * one later look and only one says so. The take is the lock here as the
+   * delete is for the claim: two presses on a stuck card get one note and one
+   * re-staged card between them. Marked rather than deleted because the run
+   * may not be dead, only slow: the mark is what `settleOperation` reports to
+   * it, and a taken execution is never taken again.
    *
    * An execution younger than `EXECUTION_CUTOFF_MS` is left alone and reads as
    * null: it may simply still be running. One older than `PROPOSAL_TTL_MS` is
