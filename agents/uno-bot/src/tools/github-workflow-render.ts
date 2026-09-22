@@ -6,44 +6,25 @@
 // The allowlist is the repo list's: an entry's `workflows` names the files the
 // bot may dispatch on that repo, so a workflow added to a repo is not
 // bot-runnable until a PR adds it to `GITHUB_REPOS`.
+//
+// THE MODEL NAMES NO REF. A dispatched workflow runs as its file exists at the
+// ref it is dispatched on, so a branch of the model's choosing could carry a
+// different file under an allowed name — the allowlist would name a file and
+// run another. Every run goes to the repo's default branch, which is the copy
+// that was reviewed and merged.
 
 import type { RepoEntry, RepoResolution } from "../integrations/repo-list.mjs";
 
-/** The model's half of a run: which workflow, at which ref, with which inputs. */
-export interface WorkflowRunRequest {
-  /** The workflow's file name under `.github/workflows/`. */
-  workflow: string;
-  /** The ref to run at, or "" for the repo's default branch. */
-  ref: string;
-  /** `workflow_dispatch` inputs, verbatim. */
-  inputs: Record<string, string>;
-}
-
 /**
- * The run as the tool input carries it, or why it cannot be one.
- *
- * Inputs are string key/values and pass through untouched — GitHub reads every
- * `workflow_dispatch` input as a string, and the card shows exactly what is
- * sent, so nothing here trims or coerces them.
+ * The workflow the tool input names, or why it names none. Reads `workflow`
+ * and nothing else, so a `ref` or `inputs` the model sent anyway goes nowhere —
+ * the schema refuses them too, but the executor does not rely on the schema.
  */
-export function workflowRunFromInput(
-  input: Record<string, unknown>,
-): { ok: true; run: WorkflowRunRequest } | { ok: false; error: string } {
+export function workflowFromInput(input: Record<string, unknown>): { ok: true; workflow: string } | { ok: false; error: string } {
   const workflow = typeof input.workflow === "string" ? input.workflow.trim() : "";
-  if (!workflow) return { ok: false, error: "missing 'workflow' — the workflow's file name, e.g. gates.yml" };
-  const ref = typeof input.ref === "string" ? input.ref.trim() : "";
-  const raw = input.inputs ?? {};
-  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
-    return { ok: false, error: "'inputs' must be string key/values" };
-  }
-  const inputs: Record<string, string> = {};
-  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
-    if (typeof value !== "string") {
-      return { ok: false, error: `'inputs' must be string key/values; '${key}' is not a string` };
-    }
-    inputs[key] = value;
-  }
-  return { ok: true, run: { workflow, ref, inputs } };
+  return workflow
+    ? { ok: true, workflow }
+    : { ok: false, error: "missing 'workflow' — the workflow's file name, e.g. gates.yml" };
 }
 
 /**
@@ -63,19 +44,19 @@ export function workflowRefusal(entry: RepoEntry, workflow: string): string | nu
 }
 
 /**
- * The whole check, before a card and again before a dispatch: the input reads
- * as a run, the repo is on the list, and the workflow is on that repo's list.
+ * The whole check, before a card and again before a dispatch: the input names
+ * a workflow, the repo is on the list, and the workflow is on that repo's list.
  */
 export function checkWorkflowRun(
   input: Record<string, unknown>,
   resolution: RepoResolution,
-): { ok: true; entry: RepoEntry; run: WorkflowRunRequest } | { ok: false; error: string } {
-  const parsed = workflowRunFromInput(input);
-  if (!parsed.ok) return parsed;
+): { ok: true; entry: RepoEntry; workflow: string } | { ok: false; error: string } {
+  const named = workflowFromInput(input);
+  if (!named.ok) return named;
   if (!resolution.ok) return resolution;
-  const refusal = workflowRefusal(resolution.entry, parsed.run.workflow);
+  const refusal = workflowRefusal(resolution.entry, named.workflow);
   if (refusal) return { ok: false, error: refusal };
-  return { ok: true, entry: resolution.entry, run: parsed.run };
+  return { ok: true, entry: resolution.entry, workflow: named.workflow };
 }
 
 /** The workflow's runs page, which is where a dispatched run shows up. */

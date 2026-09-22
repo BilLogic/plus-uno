@@ -382,9 +382,10 @@ export interface GithubWorkflowClient {
   /** The repo's default branch, where a run with no ref goes. Throws
    *  `GithubRequestError` on any non-2xx. */
   defaultBranch(): Promise<string>;
-  /** Start `workflow` (a file under `.github/workflows/`) at `ref` with
-   *  `inputs`. Throws `GithubRequestError` on any non-2xx. */
-  dispatchWorkflow(workflow: string, ref: string, inputs: Readonly<Record<string, string>>): Promise<void>;
+  /** Start `workflow` (a file under `.github/workflows/`) at `ref`, with no
+   *  inputs — none of the allowed workflows declares any. Throws
+   *  `GithubRequestError` on any non-2xx. */
+  dispatchWorkflow(workflow: string, ref: string): Promise<void>;
 }
 
 /** Default branches by repo, kept for the isolate's life: a repo's default
@@ -393,7 +394,8 @@ const defaultBranches = new Map<string, string>();
 
 /**
  * The workflow client on one listed repo and the Worker's token
- * (GET /repos/{repo} for the default branch, once per isolate;
+ * (GET /repos/{repo} for the default branch — the only ref a run goes to —
+ * once per isolate;
  * POST /repos/{repo}/actions/workflows/{file}/dispatches for the run).
  *
  * The repo is a resolved entry, never the model's string, and WHICH workflows
@@ -429,13 +431,13 @@ export function githubWorkflowClient(env: Env, target: RepoEntry): GithubWorkflo
       defaultBranches.set(repo.toLowerCase(), data.default_branch);
       return data.default_branch;
     },
-    async dispatchWorkflow(workflow, ref, inputs) {
+    async dispatchWorkflow(workflow, ref) {
       const res = await countedFetch(
         `https://api.github.com/repos/${repo}/actions/workflows/${encodeURIComponent(workflow)}/dispatches`,
         {
           method: "POST",
           headers: { ...headers(), "content-type": "application/json" },
-          body: JSON.stringify({ ref, inputs: { ...inputs } }),
+          body: JSON.stringify({ ref }),
         },
         GH_TIMEOUT_MS,
       );

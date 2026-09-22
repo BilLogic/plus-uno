@@ -37,25 +37,22 @@ interface Dispatch {
   repo: string;
   workflow: string;
   ref: string;
-  inputs: Record<string, string>;
 }
 
 function fakeClients(answer: () => Error | null = () => null) {
   const dispatched: Dispatch[] = [];
-  let branchReads = 0;
   const clientFor = (target: RepoEntry): GithubWorkflowClient => ({
     repo: target.repo,
     async defaultBranch() {
-      branchReads++;
       return "trunk";
     },
-    async dispatchWorkflow(workflow, ref, inputs) {
-      dispatched.push({ repo: target.repo, workflow, ref, inputs });
+    async dispatchWorkflow(workflow, ref) {
+      dispatched.push({ repo: target.repo, workflow, ref });
       const err = answer();
       if (err) throw err;
     },
   });
-  return { clientFor, dispatched, branchReads: () => branchReads };
+  return { clientFor, dispatched };
 }
 
 function deps(clients: ReturnType<typeof fakeClients>) {
@@ -98,47 +95,30 @@ test("a repo off the bot's list is refused before staging, naming the list", asy
   assert.ok(ask.ask.includes(BLUEPRINT), ask.ask);
 });
 
-test("inputs that are not string key/values are asked about rather than staged", async () => {
-  const ask = await preflight(
-    "github_workflow_run",
-    { repo: SITE, workflow: "sync-notion.yml", inputs: { full: true } },
-    ctx,
-  );
-  assert.ok(ask);
-  assert.match(ask.ask, /string/);
-});
-
 test("a listed workflow on a listed repo goes through to the card", async () => {
   assert.equal(await preflight("github_workflow_run", { repo: "plus-uno-blueprint", workflow: "render-walk.yml" }, ctx), null);
-  assert.equal(
-    await preflight("github_workflow_run", { repo: SITE, workflow: "sync-notion.yml", inputs: { note: "x" } }, ctx),
-    null,
-  );
+  assert.equal(await preflight("github_workflow_run", { repo: SITE, workflow: "sync-notion.yml" }, ctx), null);
 });
 
 // ── the executor, behind the Gate ────────────────────────────────────────────
 
-test("an approved run dispatches the workflow on the listed repo, at the given ref, with the inputs verbatim", async () => {
+test("an approved run dispatches the listed workflow on the listed repo's default branch", async () => {
   const clients = fakeClients();
   const { deps: d } = deps(clients);
-  const inputs = { scenario: "  Tutor onboarding ", dry_run: "true" };
 
-  await runGithubWorkflow({ repo: "plus-uno-blueprint", workflow: "render-walk.yml", ref: "feat/x", inputs }, d);
+  await runGithubWorkflow({ repo: "plus-uno-blueprint", workflow: "render-walk.yml" }, d);
 
-  assert.deepEqual(clients.dispatched, [
-    // The list's spelling of the repo, never the model's; inputs untouched.
-    { repo: BLUEPRINT, workflow: "render-walk.yml", ref: "feat/x", inputs },
-  ]);
-  assert.equal(clients.branchReads(), 0, "a named ref needs no default-branch read");
+  // The list's spelling of the repo, never the model's.
+  assert.deepEqual(clients.dispatched, [{ repo: BLUEPRINT, workflow: "render-walk.yml", ref: "trunk" }]);
 });
 
-test("with no ref the run goes to the repo's default branch, and with no inputs it sends none", async () => {
+test("a ref the model sent anyway is ignored: a branch could carry another file under an allowed name", async () => {
   const clients = fakeClients();
   const { deps: d } = deps(clients);
 
-  await runGithubWorkflow({ repo: SITE, workflow: "sync-notion.yml" }, d);
+  await runGithubWorkflow({ repo: SITE, workflow: "sync-notion.yml", ref: "evil-branch", inputs: { x: "y" } }, d);
 
-  assert.deepEqual(clients.dispatched, [{ repo: SITE, workflow: "sync-notion.yml", ref: "trunk", inputs: {} }]);
+  assert.deepEqual(clients.dispatched, [{ repo: SITE, workflow: "sync-notion.yml", ref: "trunk" }]);
 });
 
 test("the runs page comes back in the thread and in the gate's note", async () => {
@@ -163,7 +143,6 @@ for (const [label, input] of [
   ["an unlisted workflow", { repo: BLUEPRINT, workflow: "live-schema.yml" }],
   ["an unlisted repo", { repo: "someone/else", workflow: "gates.yml" }],
   ["a workflow on a repo that lists none", { workflow: "uno-bot-deploy.yml" }],
-  ["non-string inputs", { repo: SITE, workflow: "sync-notion.yml", inputs: { n: 1 } }],
   ["no workflow", { repo: SITE }],
 ] as const) {
   test(`${label} is refused at execution too, and nothing is dispatched`, async () => {

@@ -50,17 +50,17 @@ async function client(requested: string) {
   return githubWorkflowClient(ENV, target.entry);
 }
 
-test("a dispatch POSTs the ref and the inputs to the workflow's dispatches endpoint with the token", async () => {
+test("a dispatch POSTs the default-branch ref to the workflow's dispatches endpoint with the token", async () => {
   calls = [];
   reply = { status: 204, body: null };
-  await (await client("plus-uno-blueprint")).dispatchWorkflow("render-walk.yml", "main", { note: " x " });
+  await (await client("plus-uno-blueprint")).dispatchWorkflow("render-walk.yml", "main");
 
   assert.equal(calls.length, 1);
   const call = calls[0]!;
   assert.equal(call.method, "POST");
   assert.equal(call.url, `https://api.github.com/repos/${BLUEPRINT}/actions/workflows/render-walk.yml/dispatches`);
   assert.equal(call.headers.authorization, "Bearer ghp_test");
-  assert.deepEqual(call.body, { ref: "main", inputs: { note: " x " } });
+  assert.deepEqual(call.body, { ref: "main" });
 });
 
 test("a refused dispatch throws with GitHub's status, for the executor to name the cause", async () => {
@@ -68,7 +68,7 @@ test("a refused dispatch throws with GitHub's status, for the executor to name t
   calls = [];
   reply = { status: 403, body: { message: "Resource not accessible by personal access token" } };
   await assert.rejects(
-    (await client(BLUEPRINT)).dispatchWorkflow("render-walk.yml", "main", {}),
+    (await client(BLUEPRINT)).dispatchWorkflow("render-walk.yml", "main"),
     (err: unknown) => err instanceof GithubRequestError && err.status === 403,
   );
 });

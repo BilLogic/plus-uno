@@ -4,7 +4,7 @@
 //
 // The generic dispatch the two named Actions tools deferred until a third
 // Action appeared. `component_implement` and `prototype_scaffold` stay as they
-// are: their payloads are named, this one's is a workflow's own inputs.
+// are: they carry structured payloads (a PRD, a Figma frame, the transcript).
 //
 // What may run is the repo list's, not the model's: the repo resolves through
 // the one resolver, and the workflow must be on that entry's `workflows`
@@ -50,30 +50,31 @@ export async function runGithubWorkflow(
   const checked = checkWorkflowRun(input, deps.resolveRepo(input.repo));
   if (!checked.ok) return JSON.stringify({ ok: false, status: "refused", error: checked.error });
 
-  const { entry, run } = checked;
+  const { entry, workflow } = checked;
   const repo = entry.repo;
-  const runs = workflowRunsUrl(repo, run.workflow);
+  const runs = workflowRunsUrl(repo, workflow);
   const github = deps.clientFor(entry);
-  let ref = run.ref;
+  let ref: string;
   try {
-    if (!ref) ref = await github.defaultBranch();
-    await github.dispatchWorkflow(run.workflow, ref, run.inputs);
+    // Always the default branch: the reviewed copy of the allowed file.
+    ref = await github.defaultBranch();
+    await github.dispatchWorkflow(workflow, ref);
   } catch (err) {
-    const cause = failureCause(err, repo, run.workflow);
-    await say(deps, `:x: Couldn't start \`${run.workflow}\` on ${repo} — ${cause}.`);
+    const cause = failureCause(err, repo, workflow);
+    await say(deps, `:x: Couldn't start \`${workflow}\` on ${repo} — ${cause}.`);
     return JSON.stringify({ ok: false, status: "github_failed", error: cause });
   }
 
   await say(
     deps,
-    `:white_check_mark: Started \`${run.workflow}\` on ${repo} at \`${ref}\` — ` +
+    `:white_check_mark: Started \`${workflow}\` on ${repo} at \`${ref}\` — ` +
       `follow it on <${runs}|its runs page>.`,
   );
   return JSON.stringify({
     ok: true,
     status: "dispatched",
     runs_url: runs,
-    message: `Started ${run.workflow} on ${repo} at ${ref}; its runs: ${runs}`,
+    message: `Started ${workflow} on ${repo} at ${ref}; its runs: ${runs}`,
   });
 }
 
@@ -97,9 +98,9 @@ function failureCause(err: unknown, repo: string, workflow: string): string {
     case 403:
       return `the bot's GitHub token lacks permission to run workflows on ${repo} (403 — it needs Actions: Read and write)`;
     case 404:
-      return `GitHub answered 404 for ${workflow} on ${repo} — the workflow or the ref is not there, or the token cannot see the repo's Actions`;
+      return `GitHub answered 404 for ${workflow} on ${repo} — the workflow is not on the default branch, or the token cannot see the repo's Actions`;
     case 422:
-      return `GitHub refused the run on ${repo} (422) — ${workflow} has no workflow_dispatch trigger at that ref, or an input is one it does not declare`;
+      return `GitHub refused the run on ${repo} (422) — ${workflow} has no workflow_dispatch trigger on the default branch`;
     default:
       // A 2xx lands here only from the default-branch read naming no branch.
       return err.status < 300 ? err.message : `GitHub answered ${err.status} for ${workflow} on ${repo}`;
@@ -109,7 +110,7 @@ function failureCause(err: unknown, repo: string, workflow: string): string {
 /**
  * The binding: `Env` and the thread, turned into the named dependencies.
  * @param env - Worker bindings
- * @param input - Tool args from the model — `repo`, `workflow`, `ref`, `inputs`
+ * @param input - Tool args from the model — `repo` and `workflow`
  * @param slack - Thread context: where to post
  */
 export async function executeGithubWorkflowRun(

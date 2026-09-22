@@ -362,9 +362,10 @@ export interface TurnDeps {
      *  `GITHUB_REPO`, so the card names where the issue will actually land. */
     issueRepo(): string;
     /** Where a `github_workflow_run` would run: the listed repo its `repo`
-     *  resolves to and the ref — its own, or the repo's default branch — or
-     *  null when the repo is off the list. */
-    workflowTarget(input: Record<string, unknown>): Promise<{ repo: string; ref: string } | null>;
+     *  resolves to and that repo's default branch — the only ref a run goes
+     *  to — or null when the repo is off the list. `branch` is null when the
+     *  default branch could not be read, and the card says so. */
+    workflowTarget(input: Record<string, unknown>): Promise<{ repo: string; branch: string | null } | null>;
   };
 
   /**
@@ -1342,15 +1343,21 @@ async function buildCard(
   }
 
   if (toolName === "github_workflow_run") {
-    // What the ✅ starts, in full: the repo and ref as they will be sent — a
-    // repo or ref the model left out is named, not left for a person to guess.
+    // What the ✅ starts, in full: the repo, the workflow, and the branch it
+    // runs on — always the default one, named rather than left to a guess,
+    // and a failed read of it said plainly rather than papered over.
     const target = await deps.cards.workflowTarget(input);
-    const inputs =
-      input.inputs && typeof input.inputs === "object" && Object.keys(input.inputs).length > 0
-        ? input.inputs
-        : undefined;
     return target
-      ? { ...card, fields: cardFieldsOf({ repo: target.repo, workflow: input.workflow, ref: target.ref, inputs }) }
+      ? {
+          ...card,
+          fields: cardFieldsOf({
+            repo: target.repo,
+            workflow: input.workflow,
+            branch:
+              target.branch ??
+              "couldn't read the default branch — it will run on whatever GitHub's default is",
+          }),
+        }
       : card;
   }
 

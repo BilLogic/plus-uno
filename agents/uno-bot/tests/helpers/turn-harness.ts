@@ -143,6 +143,9 @@ export function harness(opts: {
   /** Stand in for the side-effect tool table, so a case can fail one operation
    *  of a batch. Absent — as everywhere else here — nothing is executed. */
   executeOperation?: (operation: { toolName: string; input: Record<string, unknown> }) => Promise<string>;
+  /** The default branch a workflow card reads; null is a read that failed.
+   *  Absent, the read answers `WORKFLOW_DEFAULT_REF`. */
+  workflowBranch?: string | null;
   /**
    * The conversation key the loop reads the stop flag on, for a case about
    * cancellation. Production computes it from the conversation
@@ -253,8 +256,7 @@ export function harness(opts: {
       issueRepo: () => ISSUE_REPO,
       async workflowTarget(input) {
         const repo = typeof input.repo === "string" && input.repo ? input.repo : ISSUE_REPO;
-        const ref = typeof input.ref === "string" && input.ref ? input.ref : WORKFLOW_DEFAULT_REF;
-        return { repo, ref };
+        return { repo, branch: opts.workflowBranch === undefined ? WORKFLOW_DEFAULT_REF : opts.workflowBranch };
       },
     },
 

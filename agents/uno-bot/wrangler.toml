@@ -86,11 +86,14 @@ CONTEXT_STATE = "off"
 GITHUB_REPO = "BilLogic/plus-uno"
 # The repos the GitHub tools may reach — the default above, and the others the
 # token was granted. Each `purpose` is the phrase the bot routes on; each
-# `workflows` names the workflow files github_workflow_run may dispatch there
-# after a ✅ — read-only checks and the daily Notion sync; nothing that ships code or
-# carries a privileged credential. A repo or workflow missing here is refused
-# whatever the token can see. Parsed by src/integrations/repo-list.mjs, and
-# `check:secrets` fails a list it refuses.
+# `workflows` names the workflow files github_workflow_run may dispatch there,
+# after a ✅ and always on the repo's default branch. The blueprint's five are
+# read-only checks. sync-notion.yml is NOT read-only: it publishes — it commits
+# the Notion cache to the marketing site's main and triggers a Netlify rebuild
+# of the public site. It is listed on Bill's sign-off (2026-09-22) and runs only
+# past the ✅. Nothing here carries a privileged credential. A repo or workflow
+# missing here is refused whatever the token can see. Parsed by
+# src/integrations/repo-list.mjs, and `check:secrets` fails a list it refuses.
 GITHUB_REPOS = '''[
   {"repo": "BilLogic/plus-uno", "purpose": "uno-bot and the harness", "workflows": []},
   {"repo": "BilLogic/plus-marketing-website", "purpose": "the public marketing site", "workflows": ["sync-notion.yml"]},

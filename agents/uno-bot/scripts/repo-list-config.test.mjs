@@ -109,7 +109,10 @@ test("every tool schema that takes a repo offers exactly the listed repos", () =
   assert.ok(withRepo.length >= 2, "github_read and github_intake_search take a repo");
   for (const t of withRepo) {
     assert.deepEqual(t.input_schema.properties.repo.enum, LIST.entries.map((e) => e.repo), t.name);
-    assert.ok(!(t.input_schema.required ?? []).includes("repo"), `${t.name}: repo is optional`);
+    // Optional everywhere but a workflow run: the default repo lists no
+    // runnable workflow, so a run that named no repo could only be refused.
+    const required = (t.input_schema.required ?? []).includes("repo");
+    assert.equal(required, t.name === "github_workflow_run", `${t.name}: repo required = ${required}`);
   }
 });
 
