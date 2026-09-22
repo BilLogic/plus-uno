@@ -45,6 +45,7 @@ import {
   DEFAULT_CONFIRM_NOTE,
   ISSUE_REPO,
   PENDING,
+  WORKFLOW_DEFAULT_REF,
   REF,
   harness,
   postsOf,
@@ -636,6 +637,62 @@ test("follow-ups on two issues are one card with each issue's operations", async
   ]);
   // No comment, so nothing new is published: no visibility notice.
   assert.deepEqual(card.caveats, []);
+});
+
+// A workflow run starts a real Actions run, so the card names everything the
+// ✅ sends — the repo, the workflow and the branch it runs on, which is always
+// the repo's default — and nothing is dispatched until the ✅.
+function workflowTurn(opts: { workflowBranch?: string | null } = {}) {
+  const dispatched: string[] = [];
+  const h = harness({
+    ...opts,
+    replies: [
+      {
+        text: "I'll start the render walk on the blueprint.",
+        toolCalls: [
+          { name: "github_workflow_run", args: { repo: "BilLogic/plus-uno-blueprint", workflow: "render-walk.yml" } },
+        ],
+      },
+    ],
+    executeOperation: async (operation) => {
+      dispatched.push(operation.toolName);
+      return JSON.stringify({ ok: true });
+    },
+  });
+  return { h, dispatched };
+}
+
+test("a workflow card whose default-branch read failed says so plainly", async () => {
+  const { h } = workflowTurn({ workflowBranch: null });
+  const outcome = await runTurn(request({ text: "run the render walk on the blueprint" }), h.deps);
+
+  const text = renderProposalCard(outcome.staged!.card).text;
+  assert.match(text, /couldn't read the default branch/, text);
+  assert.match(text, /whatever GitHub's default is/, text);
+});
+
+test("'run the render walk on the blueprint' stages a card naming repo, workflow and branch, and dispatches nothing", async () => {
+  const { h, dispatched } = workflowTurn();
+  const outcome = await runTurn(request({ text: "run the render walk on the blueprint" }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  assert.equal(outcome.staged!.proposal.toolName, "github_workflow_run");
+  const card = outcome.staged!.card;
+  assert.equal(card.verb, "run a GitHub workflow");
+  assert.deepEqual(card.fields, [
+    { label: "repo", value: "BilLogic/plus-uno-blueprint" },
+    { label: "workflow", value: "render-walk.yml" },
+    // The model names no ref; the card names the default branch it runs on.
+    { label: "branch", value: WORKFLOW_DEFAULT_REF },
+  ]);
+  const text = renderProposalCard(card).text;
+  assert.ok(text.includes("render-walk.yml"), text);
+  assert.ok(text.includes(WORKFLOW_DEFAULT_REF), text);
+
+  // Staged, not run.
+  assert.equal((await h.threadState.getProposalByThread(REF))?.toolName, "github_workflow_run");
+  assert.deepEqual(dispatched, []);
+  assert.deepEqual(h.ran, []);
 });
 
 // A revised card retires the one it replaces (#573) — and a turn that stages

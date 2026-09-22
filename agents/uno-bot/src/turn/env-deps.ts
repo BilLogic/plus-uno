@@ -32,7 +32,7 @@ import { formatAssistantContext } from "../slack/assistant";
 import { buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
 import { renderDeliveredBody } from "../slack/render";
 import { fetchFigmaImagePngUrl, parseFigmaUrl } from "../integrations/figma";
-import { githubRepoVisibility, resolveRepoFor } from "../integrations/github";
+import { githubRepoVisibility, githubWorkflowClient, resolveRepoFor } from "../integrations/github";
 import type { ThreadState } from "../thread-state/index";
 import type { Env } from "../types";
 import type { Delivery } from "./delivery";
@@ -186,6 +186,16 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
         const target = resolveRepoFor(env, input.repo);
         if (!target.ok) return { repo: env.GITHUB_REPO, visibility: "unknown" };
         return { repo: target.entry.repo, visibility: await githubRepoVisibility(env, target.entry) };
+      },
+      // A run's repo and branch as the executor will send them: the same
+      // resolver, and the same cached default-branch read.
+      async workflowTarget(input) {
+        const target = resolveRepoFor(env, input.repo);
+        if (!target.ok) return null;
+        const branch = await githubWorkflowClient(env, target.entry)
+          .defaultBranch()
+          .catch(() => null);
+        return { repo: target.entry.repo, branch };
       },
     },
 

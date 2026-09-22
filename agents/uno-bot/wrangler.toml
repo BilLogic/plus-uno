@@ -86,13 +86,18 @@ CONTEXT_STATE = "off"
 GITHUB_REPO = "BilLogic/plus-uno"
 # The repos the GitHub tools may reach — the default above, and the others the
 # token was granted. Each `purpose` is the phrase the bot routes on; each
-# `workflows` names the workflow files it may dispatch there (none yet). A repo
+# `workflows` names the workflow files github_workflow_run may dispatch there,
+# after a ✅ and always on the repo's default branch. The blueprint's five are
+# read-only checks. sync-notion.yml is NOT read-only: it publishes — it commits
+# the Notion cache to the marketing site's main and triggers a Netlify rebuild
+# of the public site. It is listed on Bill's sign-off (2026-09-22) and runs only
+# past the ✅. Nothing here carries a privileged credential. A repo or workflow
 # missing here is refused whatever the token can see. Parsed by
 # src/integrations/repo-list.mjs, and `check:secrets` fails a list it refuses.
 GITHUB_REPOS = '''[
   {"repo": "BilLogic/plus-uno", "purpose": "uno-bot and the harness", "workflows": []},
-  {"repo": "BilLogic/plus-marketing-website", "purpose": "the public marketing site", "workflows": []},
-  {"repo": "BilLogic/plus-uno-blueprint", "purpose": "the service-blueprint app and its schema", "workflows": []}
+  {"repo": "BilLogic/plus-marketing-website", "purpose": "the public marketing site", "workflows": ["sync-notion.yml"]},
+  {"repo": "BilLogic/plus-uno-blueprint", "purpose": "the service-blueprint app and its schema", "workflows": ["bot-contract-probe.yml", "docs-harness.yml", "gates.yml", "offline-board.yml", "render-walk.yml"]}
 ]'''
 # Notion "Roadmap" database (the Design HQ board). notion_create drops new PRD
 # cards here in the "Need PRD / Under Playground" Design Status column.
@@ -270,10 +275,12 @@ CLAUDE_MODEL = "claude-sonnet-5"
 #       replies. Unset, the bot reads and never answers.
 #   GITHUB_TOKEN
 #       PAT with repo:dispatch + Contents:Read + Issues:Write, on every
-#       repo in GITHUB_REPOS. Powers component_implement /
+#       repo in GITHUB_REPOS, plus Actions: Read and write on each repo
+#       that lists workflows. Powers component_implement /
 #       prototype_scaffold, which dispatch workflows in BilLogic/plus-uno,
 #       github_issue_create, which files intakes on each listed repo,
-#       github_issue_update, which follows up on issues there, and
+#       github_issue_update, which follows up on issues there,
+#       github_workflow_run, which starts a listed workflow, and
 #       github_read / github_intake_search on each listed repo.
 #   FIGMA_ACCESS_TOKEN
 #       Figma read PAT. Two consumers: the proposal screenshot fetch in

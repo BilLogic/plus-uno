@@ -366,6 +366,11 @@ export interface TurnDeps {
      *  visibility — so the card names where the issue will actually land and
      *  who can read it. */
     issueTarget(input: Record<string, unknown>): Promise<IssueTarget>;
+    /** Where a `github_workflow_run` would run: the listed repo its `repo`
+     *  resolves to and that repo's default branch — the only ref a run goes
+     *  to — or null when the repo is off the list. `branch` is null when the
+     *  default branch could not be read, and the card says so. */
+    workflowTarget(input: Record<string, unknown>): Promise<{ repo: string; branch: string | null } | null>;
   };
 
   /**
@@ -1352,6 +1357,25 @@ async function buildCard(
   }
   if (toolName === "github_issue_update") {
     return { ...card, ...(await issueUpdateCardOf(result.operations, deps, fromDm)) };
+  }
+
+  if (toolName === "github_workflow_run") {
+    // What the ✅ starts, in full: the repo, the workflow, and the branch it
+    // runs on — always the default one, named rather than left to a guess,
+    // and a failed read of it said plainly rather than papered over.
+    const target = await deps.cards.workflowTarget(input);
+    return target
+      ? {
+          ...card,
+          fields: cardFieldsOf({
+            repo: target.repo,
+            workflow: input.workflow,
+            branch:
+              target.branch ??
+              "couldn't read the default branch — it will run on whatever GitHub's default is",
+          }),
+        }
+      : card;
   }
 
   if (toolName === "prototype_scaffold") {

@@ -24,6 +24,7 @@ import { placeholderRefusal } from "./placeholder";
 import { relayRecipientId } from "../tools/relayed-dm-render";
 import { resolveRepoFor } from "../integrations/github";
 import { issueUpdateFromInput } from "../tools/github-issue-update-render";
+import { checkWorkflowRun } from "../tools/github-workflow-render";
 
 export interface PreflightCtx {
   env: Env;
@@ -231,6 +232,13 @@ export async function preflight(
         return { ask: `:x: I can't update a GitHub issue right now — ${target.error} Tell Bill the repo list is broken.` };
       }
       return { ask: `:mag: ${target.error} Which of those is the issue on?` };
+    }
+
+    case "github_workflow_run": {
+      // Only a workflow the repo list names, on a repo it lists — refused here,
+      // naming what IS allowed, so nothing unlisted is ever put on a card.
+      const checked = checkWorkflowRun(input, resolveRepoFor(ctx.env, input.repo));
+      return checked.ok ? null : { ask: `:gear: ${checked.error}` };
     }
 
     case "shareout_post": {

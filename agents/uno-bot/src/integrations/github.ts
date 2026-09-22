@@ -17,7 +17,8 @@
 // `github_issue_update`, for the same reason. Beside them, the read the
 // duplicate check runs first — open issues by label and keyword, for
 // `github_intake_search` — a client for the same reason. And the read the
-// intake card makes: whether the repo is public, asked once per isolate.
+// intake card makes: whether the repo is public, asked once per isolate. And
+// the workflow dispatch `github_workflow_run` sends past the Gate.
 
 import type { Env } from "../types";
 import { countedFetch } from "../net";
@@ -526,6 +527,81 @@ export function githubIssueSearch(env: Env): GithubIssueSearch {
             }]
           : [],
       );
+    },
+  };
+}
+
+/** The one GitHub write the workflow executor needs, bound to one repo. */
+export interface GithubWorkflowClient {
+  /** `owner/name` — the repo every run starts on. */
+  readonly repo: string;
+  /** The repo's default branch, where a run with no ref goes. Throws
+   *  `GithubRequestError` on any non-2xx. */
+  defaultBranch(): Promise<string>;
+  /** Start `workflow` (a file under `.github/workflows/`) at `ref`, with no
+   *  inputs — none of the allowed workflows declares any. Throws
+   *  `GithubRequestError` on any non-2xx. */
+  dispatchWorkflow(workflow: string, ref: string): Promise<void>;
+}
+
+/** Default branches by repo, kept for the isolate's life: a repo's default
+ *  branch changes about never, and every run with no ref would read it. */
+const defaultBranches = new Map<string, string>();
+
+/**
+ * The workflow client on one listed repo and the Worker's token
+ * (GET /repos/{repo} for the default branch — the only ref a run goes to —
+ * once per isolate;
+ * POST /repos/{repo}/actions/workflows/{file}/dispatches for the run).
+ *
+ * The repo is a resolved entry, never the model's string, and WHICH workflows
+ * may run is the executor's check against that entry's `workflows` — this
+ * client dispatches what it is handed. One subrequest per run, plus one the
+ * first time a repo's default branch is needed.
+ */
+export function githubWorkflowClient(env: Env, target: RepoEntry): GithubWorkflowClient {
+  const repo = target.repo;
+  const headers = (): Record<string, string> => {
+    if (!env.GITHUB_TOKEN) throw new Error("GitHub not configured on the Worker (GITHUB_TOKEN)");
+    return {
+      authorization: `Bearer ${env.GITHUB_TOKEN}`,
+      accept: "application/vnd.github+json",
+      "x-github-api-version": "2022-11-28",
+      "user-agent": "uno-bot",
+    };
+  };
+  return {
+    repo,
+    async defaultBranch() {
+      const known = defaultBranches.get(repo.toLowerCase());
+      if (known) return known;
+      const res = await countedFetch(`https://api.github.com/repos/${repo}`, { headers: headers() }, GH_TIMEOUT_MS);
+      if (!res.ok) {
+        console.warn(`[github] repo read on ${repo} refused: ${res.status}`);
+        throw new GithubRequestError(res.status, `GitHub repo ${res.status} for ${repo}`);
+      }
+      const data = (await res.json().catch(() => ({}))) as { default_branch?: unknown };
+      if (typeof data.default_branch !== "string" || !data.default_branch) {
+        throw new GithubRequestError(res.status, `GitHub answered ${res.status} for ${repo} without its default branch`);
+      }
+      defaultBranches.set(repo.toLowerCase(), data.default_branch);
+      return data.default_branch;
+    },
+    async dispatchWorkflow(workflow, ref) {
+      const res = await countedFetch(
+        `https://api.github.com/repos/${repo}/actions/workflows/${encodeURIComponent(workflow)}/dispatches`,
+        {
+          method: "POST",
+          headers: { ...headers(), "content-type": "application/json" },
+          body: JSON.stringify({ ref }),
+        },
+        GH_TIMEOUT_MS,
+      );
+      if (!res.ok) {
+        // The status only, as the create logs it.
+        console.warn(`[github] dispatch ${workflow} on ${repo} refused: ${res.status}`);
+        throw new GithubRequestError(res.status, `GitHub workflow dispatch ${res.status} for ${workflow} on ${repo}`);
+      }
     },
   };
 }

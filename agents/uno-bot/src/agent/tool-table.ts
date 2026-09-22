@@ -246,6 +246,18 @@ export const TOOL_TABLE = {
       nouns: ["issue", "github", "comment", "close", "reopen", "label"],
     },
   },
+  // A workflow the repo list allows, on a listed repo. No review request: a
+  // run's result is on its runs page, which the thread is handed.
+  github_workflow_run: {
+    access: "gated",
+    retrieval: false,
+    reviewRequest: null,
+    gate: {
+      verb: "run a GitHub workflow",
+      kind: "run a workflow",
+      nouns: ["workflow", "run", "github", "action", "sync"],
+    },
+  },
   proposal_resolve: { access: "control", retrieval: false, reviewRequest: null },
 } as const satisfies Record<string, ToolRow>;
 
