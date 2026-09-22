@@ -57,7 +57,7 @@ import { bounceLogLine, proposalWasAddressed } from "../agent/pending-notice";
 import type { AgentImage, HistoricalImages } from "../agent/provider-conversation";
 import { routeRequest } from "../agent/routing";
 import type { ModelTier } from "../agent/routing";
-import { resolveSignal, type GateVerdict } from "../gate/index";
+import { cutOffVerdict, resolveSignal, type GateRestage, type GateVerdict } from "../gate/index";
 import { collectStrings } from "../agent/tool-input";
 import { gateWordsFor } from "../agent/tool-table";
 import { relayRecipientId } from "../tools/relayed-dm-render";
@@ -601,6 +601,42 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     }
   }
 
+  // ── A cut-off run in this thread ───────────────────────────────────────────
+  //
+  // A card approved here whose run never reported back (`ThreadState`'s
+  // `Execution`) is answered on the next turn in its thread, before anything
+  // else: the person is owed the note about what may not have run, and a card
+  // for what never came back, whatever they wrote. The turn ends there — the
+  // card is the reply, and a model turn after it could only stage a second one
+  // over it. Only a thread holding no live card can have one: a card consumed
+  // by the claim is what a cut-off leaves behind.
+  if (!request.pending) {
+    const cutOff = await threadState
+      .takeCutOffExecutionInThread({ channel: request.channel, thread: cardThread })
+      .catch(() => null);
+    if (cutOff) {
+      const verdict = cutOffVerdict(cutOff, "confirm");
+      return settleVerdict(verdict, {
+        deps,
+        memory,
+        // Whatever they wrote went unanswered, and they should know it did
+        // rather than read the note as the answer.
+        aside: verdict.restage
+          ? "I haven't answered your message yet — ask again once you've sorted the card below."
+          : "I haven't answered your message yet — ask it again and I'll pick it up.",
+        telemetry: {
+          tier: "chill",
+          route: "cut-off-run",
+          trivial: true,
+          correction: false,
+          tools: [],
+          references: [],
+          interim: 0,
+        },
+      });
+    }
+  }
+
   // ── Route first, then gather ───────────────────────────────────────────────
   //
   // The reverse order meant a "thanks" in a long thread paid for the
@@ -1031,7 +1067,14 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
  */
 async function settleVerdict(
   verdict: GateVerdict,
-  ctx: { deps: TurnDeps; memory: ThreadMemory; telemetry: TurnTelemetry; note?: string },
+  ctx: {
+    deps: TurnDeps;
+    memory: ThreadMemory;
+    telemetry: TurnTelemetry;
+    note?: string;
+    /** A line after the verdict's note and before any re-staged card. */
+    aside?: string;
+  },
 ): Promise<TurnOutcome> {
   const said = verdict.post
     ? await ctx.deps.delivery.postGateNote(verdict.post.note)
@@ -1040,12 +1083,76 @@ async function settleVerdict(
   await ctx.deps.applyVerdict(verdict);
   const remembered = (verdict.outcome === "won" ? ctx.note : undefined) ?? posted;
   if (remembered) await ctx.memory.remember(remembered);
+  if (ctx.aside) {
+    await ctx.deps.delivery.postNote(ctx.aside);
+    await ctx.memory.remember(ctx.aside);
+  }
+  // A cut-off run's leftovers go back on a card of their own, after the note
+  // that explains them — the card holds the buttons, so it comes last.
+  const staged = verdict.restage ? await restageExecution(verdict.restage, ctx.deps) : null;
+  if (staged) await ctx.memory.remember(staged.proposal.proposalText);
   return {
-    disposition: "resolved",
-    ...(posted ? { posted } : {}),
+    disposition: staged ? "staged" : "resolved",
+    ...(staged ? { posted: staged.proposal.proposalText, staged } : posted ? { posted } : {}),
     wrote: ctx.memory.wrote(),
     telemetry: ctx.telemetry,
   };
+}
+
+/**
+ * Put what a cut-off run never finished in front of a person again, as a fresh
+ * card — the one way anything of it runs a second time.
+ *
+ * The card is built exactly as a staged proposal's is, reads included (the
+ * repo an intake lands in and whether it is public, a workflow's branch), so
+ * the person approves what will actually run rather than a copy of the old
+ * card. It keeps the original's requester, thread and PRD, and gets a ts and an
+ * hour of its own; staging it retires any card still live in that reply
+ * thread, as every staging does (`ThreadState.putProposal`).
+ *
+ * Exported because two doors outside Turn — the reaction and the button on the
+ * stuck card — are later looks too, and a card is Turn's to build. Their
+ * envelopes bind this with the same card reads a turn gets.
+ *
+ * @returns the staged card, or null when Slack refused it — said out loud, as
+ *          every failed staging is
+ */
+export async function restageExecution(
+  restage: GateRestage,
+  deps: Pick<TurnDeps, "threadState" | "delivery" | "cards">,
+): Promise<{ proposal: PendingProposal; card: ProposalCard } | null> {
+  const original = restage.proposal;
+  const first = restage.operations[0]!;
+  const built = await buildCard(
+    { kind: "proposal", operations: restage.operations, toolName: first.toolName, input: first.input },
+    deps,
+    implementPrdUrlFor(first.toolName, first.input, {
+      ...(original.notionPrdId ? { id: original.notionPrdId } : {}),
+      ...(original.notionPrdUrl ? { url: original.notionPrdUrl } : {}),
+    }),
+    // The card's DM caveats follow the surface, and a DM channel is the one
+    // the proposal record can still name.
+    original.channel.startsWith("D"),
+  );
+  // The warning rides the card, not only the note before it: a note that
+  // failed to post must not leave a card that reads like any other.
+  const card: ProposalCard = { ...built, caveats: [{ kind: "cut-off-rerun" }, ...built.caveats] };
+  const posted = await deps.delivery.card(card);
+  if (!posted.ok || !posted.ts) {
+    console.error(`[turn] re-staged card was not posted (${first.toolName})`);
+    await deps.delivery.postFailure("delivery");
+    return null;
+  }
+  const proposal: PendingProposal = {
+    ...original,
+    operations: restage.operations,
+    toolName: first.toolName,
+    input: first.input,
+    proposalTs: posted.ts,
+    proposalText: posted.text,
+  };
+  await deps.threadState.putProposal(proposal);
+  return { proposal, card };
 }
 
 // ── The reply path ───────────────────────────────────────────────────────────
@@ -1333,7 +1440,7 @@ function implementPrdUrlFor(
  */
 async function buildCard(
   result: Extract<AgentResult, { kind: "proposal" }>,
-  deps: TurnDeps,
+  deps: Pick<TurnDeps, "cards">,
   implementPrdUrl: string | undefined,
   fromDm: boolean,
 ): Promise<ProposalCard> {
@@ -1437,7 +1544,7 @@ const NOTION_SURFACE_VERBS: Readonly<Record<string, string>> = {
  */
 async function issueUpdateCardOf(
   operations: ReadonlyArray<ProposalOperation>,
-  deps: TurnDeps,
+  deps: Pick<TurnDeps, "cards">,
   fromDm: boolean,
 ): Promise<Pick<ProposalCard, "fields" | "caveats">> {
   const updates = operations.filter((op) => op.toolName === "github_issue_update");

@@ -23,7 +23,7 @@
 
 import type { ThreadState } from "../thread-state/index";
 import { withWorkingSignal, type Delivery } from "../turn/index";
-import { resolveSignal, type GateVerdict } from "../gate/index";
+import { resolveSignal, type GateRestage, type GateVerdict } from "../gate/index";
 import { renderGateNote } from "./gate-note";
 
 /** One button press, in the facts the envelope already has. */
@@ -71,6 +71,10 @@ export interface ButtonDoorDeps {
 
   /** After a win, the card is re-rendered without its buttons. */
   replaceCard(proposalText: string, note: string): Promise<void>;
+
+  /** Stage a fresh card for what a cut-off run never finished — see
+   *  `ReactionDoorDeps.restage`. */
+  restage(restage: GateRestage, delivery: Delivery): Promise<void>;
 }
 
 /**
@@ -99,6 +103,11 @@ export async function runButtonDoor(
   console.log(
     `[interactive] ${request.decision} button on ${request.channel}/${request.messageTs} by=${request.userId} outcome=${verdict.outcome}`,
   );
+
+  if (verdict.post?.note.kind === "cut-off" && verdict.proposal) {
+    await speakCutOff(request, verdict, verdict.proposal, verdict.post, deps);
+    return;
+  }
 
   if (verdict.outcome !== "won") {
     // Expired, already resolved, or a press that lost the race. Never silence.
@@ -136,4 +145,43 @@ export async function runButtonDoor(
       ? `:white_check_mark: Approved by <@${request.userId}>`
       : `:no_entry: Cancelled by <@${request.userId}> — tell me what to change and I'll stage it again.`;
   await deps.replaceCard(pending.proposalText, note);
+}
+
+/**
+ * A press on a card whose approved run never reported back.
+ *
+ * Not ephemeral, unlike every other press that did not win: what may or may
+ * not have run is the thread's business, and the requester may not be the one
+ * who pressed. The note goes in the thread, the unfinished operations go on a
+ * fresh card below it, and the stuck card loses its buttons — they are what
+ * led here, and pressing them again can only land on this same answer.
+ */
+async function speakCutOff(
+  request: ButtonRequest,
+  verdict: GateVerdict,
+  pending: NonNullable<GateVerdict["proposal"]>,
+  post: NonNullable<GateVerdict["post"]>,
+  deps: ButtonDoorDeps,
+): Promise<void> {
+  const door = deps.delivery({
+    channel: pending.channel,
+    replyTs: post.replyTs,
+    userMsgTs: pending.userMsgTs,
+    userId: request.userId,
+  });
+  await withWorkingSignal(
+    door,
+    async (delivery) => {
+      // Raised as a win raises it: building the fresh card reads the repo or
+      // workflow it lands on, and that can take a moment.
+      await delivery.setWorking({ status: "is working on that…" });
+      await delivery.postGateNote(post.note);
+      if (verdict.restage) await deps.restage(verdict.restage, delivery);
+    },
+    () => (verdict.restage ? "waiting-on-person" : "idle"),
+  );
+  await deps.replaceCard(
+    pending.proposalText,
+    ":warning: This run was cut off before it reported back — see the thread for what finished.",
+  );
 }

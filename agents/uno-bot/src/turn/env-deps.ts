@@ -26,7 +26,7 @@ import { preflight } from "../agent/preflight";
 import { reviewDraft } from "../agent/draft-judge";
 import { runAgent, selectProvider, type AgentResult, type TurnDials } from "../agent/run-agent";
 import type { ToolCall, ToolResultNote } from "../agent/tool-transcript";
-import type { GateVerdict } from "../gate/index";
+import type { GateRestage, GateVerdict } from "../gate/index";
 import { conversationsHistoryBefore } from "../slack/api";
 import { formatAssistantContext } from "../slack/assistant";
 import { buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
@@ -36,7 +36,7 @@ import { githubRepoVisibility, githubWorkflowClient, resolveRepoFor } from "../i
 import type { ThreadState } from "../thread-state/index";
 import type { Env } from "../types";
 import type { Delivery } from "./delivery";
-import type { TurnDeps, TurnRequest } from "./turn";
+import { restageExecution, type TurnDeps, type TurnRequest } from "./turn";
 
 /**
  * What a caller reports the run through, beside the outcome.
@@ -159,45 +159,9 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
 
     applyVerdict: (verdict) => wiring.applyVerdict(verdict),
 
-    // The three reads a card needs and Turn may not make itself. Each answers
-    // with a STRUCTURE the turn puts on the card; the words are the Slack
-    // adapter's (#623).
-    cards: {
-      notionRevision: (input) => buildNotionRevision(env, input),
-      notionTarget: (input) => buildNotionTarget(env, input),
-      // The Figma render behind a `prototype_scaffold` card. Best-effort by
-      // contract: no url, an unparseable one or a failed render all mean no
-      // preview, and the card posts as every other card does. It used to build
-      // the whole card — text, image block, footer and buttons — in
-      // `slack/proposal-figma.ts`, which is a module this one line replaced.
-      async designPreviewImage(input) {
-        const figmaUrl = typeof input.figma_url === "string" ? input.figma_url : "";
-        const parts = figmaUrl ? parseFigmaUrl(figmaUrl) : null;
-        return parts ? await fetchFigmaImagePngUrl(env, parts.fileKey, parts.nodeId, 1) : null;
-      },
-      // The repo a GitHub intake lands in, resolved from its `repo` input as
-      // the executor resolves it, and whether that repo is public — asked of
-      // GitHub once per isolate. Preflight has already turned every refusal —
-      // an unlisted repo, or a misconfigured list that reaches none — into an
-      // ask or a plain refusal before staging (`tests/github-intake.test.ts`),
-      // so this fallback, which names `GITHUB_REPO`, is never a card anyone
-      // sees; and the executor would refuse that filing anyway.
-      async issueTarget(input) {
-        const target = resolveRepoFor(env, input.repo);
-        if (!target.ok) return { repo: env.GITHUB_REPO, visibility: "unknown" };
-        return { repo: target.entry.repo, visibility: await githubRepoVisibility(env, target.entry) };
-      },
-      // A run's repo and branch as the executor will send them: the same
-      // resolver, and the same cached default-branch read.
-      async workflowTarget(input) {
-        const target = resolveRepoFor(env, input.repo);
-        if (!target.ok) return null;
-        const branch = await githubWorkflowClient(env, target.entry)
-          .defaultBranch()
-          .catch(() => null);
-        return { repo: target.entry.repo, branch };
-      },
-    },
+    // The reads a card needs and Turn may not make itself — shared with the
+    // doors that re-stage a cut-off run (`restageFor`, below).
+    cards: cardReadsFor(env),
 
     async readAntecedent(channel, beforeTs, limit) {
       const before = await conversationsHistoryBefore(env, channel, beforeTs, limit);
@@ -214,5 +178,69 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
     // summarisation. FLAGGED OFF by default; see the header of
     // `agent/context-state.ts` for why this one does not get to ship on.
     contextState: env.CONTEXT_STATE === "on",
+  };
+}
+
+/**
+ * The reads a card needs and Turn may not make itself, bound to `Env`. Each
+ * answers with a STRUCTURE the turn puts on the card; the words are the Slack
+ * adapter's (#623).
+ *
+ * Its own function because Turn is not the only thing that builds a card: the
+ * reaction and button doors re-stage what a cut-off run never finished
+ * (`restageFor`), and that card is read the way a turn's is.
+ */
+export function cardReadsFor(env: Env): TurnDeps["cards"] {
+  return {
+    notionRevision: (input) => buildNotionRevision(env, input),
+    notionTarget: (input) => buildNotionTarget(env, input),
+    // The Figma render behind a `prototype_scaffold` card. Best-effort by
+    // contract: no url, an unparseable one or a failed render all mean no
+    // preview, and the card posts as every other card does. It used to build
+    // the whole card — text, image block, footer and buttons — in
+    // `slack/proposal-figma.ts`, which is a module this one line replaced.
+    async designPreviewImage(input) {
+      const figmaUrl = typeof input.figma_url === "string" ? input.figma_url : "";
+      const parts = figmaUrl ? parseFigmaUrl(figmaUrl) : null;
+      return parts ? await fetchFigmaImagePngUrl(env, parts.fileKey, parts.nodeId, 1) : null;
+    },
+    // The repo a GitHub intake lands in, resolved from its `repo` input as
+    // the executor resolves it, and whether that repo is public — asked of
+    // GitHub once per isolate. Preflight has already turned every refusal —
+    // an unlisted repo, or a misconfigured list that reaches none — into an
+    // ask or a plain refusal before staging (`tests/github-intake.test.ts`),
+    // so this fallback, which names `GITHUB_REPO`, is never a card anyone
+    // sees; and the executor would refuse that filing anyway.
+    async issueTarget(input) {
+      const target = resolveRepoFor(env, input.repo);
+      if (!target.ok) return { repo: env.GITHUB_REPO, visibility: "unknown" };
+      return { repo: target.entry.repo, visibility: await githubRepoVisibility(env, target.entry) };
+    },
+    // A run's repo and branch as the executor will send them: the same
+    // resolver, and the same cached default-branch read.
+    async workflowTarget(input) {
+      const target = resolveRepoFor(env, input.repo);
+      if (!target.ok) return null;
+      const branch = await githubWorkflowClient(env, target.entry)
+        .defaultBranch()
+        .catch(() => null);
+      return { repo: target.entry.repo, branch };
+    },
+  };
+}
+
+/**
+ * A door's `restage` dependency, bound to `Env`: Turn's own card builder and
+ * staging (`restageExecution`), on the door's store and Delivery. The reaction
+ * and button envelopes bind this, so a card re-staged from a stuck card's ✅ is
+ * the card a turn would have staged.
+ */
+export function restageFor(
+  env: Env,
+  threadState: ThreadState,
+): (restage: GateRestage, delivery: Delivery) => Promise<void> {
+  const cards = cardReadsFor(env);
+  return async (restage, delivery) => {
+    await restageExecution(restage, { threadState, delivery, cards });
   };
 }

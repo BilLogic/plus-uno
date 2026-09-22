@@ -1,10 +1,10 @@
 // ThreadState — the Worker's per-thread memory, as ONE typed interface.
 //
 // Everything a Slack turn remembers between invocations is here: the
-// conversation history, the pending proposal awaiting a ✅, the assistant-panel
-// context, the /stop flag, which thread a person's run is in, the processed
-// event ids, and the run lease that decides whether an alarm retry re-runs a
-// turn or drops it.
+// conversation history, the pending proposal awaiting a ✅, the approved one
+// still executing, the assistant-panel context, the /stop flag, which thread a
+// person's run is in, the processed event ids, and the run lease that decides
+// whether an alarm retry re-runs a turn or drops it.
 //
 // WHY AN INTERFACE. Today every one of these operations is a hand-written URL
 // string on both sides of a Durable Object hop (`/proposals/by-thread`,
@@ -78,6 +78,24 @@ export const DEFER_RETRY_MS = 2 * 60 * 1000;
  *  stale flag would abort the NEXT question the person asks, which reads as the
  *  bot ignoring them — worse than a stop that missed. */
 export const CANCEL_TTL_MS = 5 * 60_000;
+
+/**
+ * How long an approved execution may go without reporting back before a later
+ * look reads it as cut off.
+ *
+ * NOT a bound on how long a live run can take, and nothing here relies on it
+ * being one. A button press executes inside `waitUntil`, which Cloudflare
+ * cancels 30 s past the response; a reaction or a typed ✅ executes on the
+ * AgentRunner alarm, which has no such cutoff, so a slow batch there can still
+ * be alive past any threshold. What keeps a slow run and a later look from
+ * both producing an outcome is the FENCE: a take marks the execution rather
+ * than deleting it, and the running batch checks that mark after every
+ * operation and stops, telling nothing, once it is set
+ * (`ThreadState.settleOperation`). The note and the re-staged card are then
+ * the only account. Five minutes is how long a person waits to be told; it is
+ * short against the hour a re-staged card stays useful.
+ */
+export const EXECUTION_CUTOFF_MS = 5 * 60 * 1000;
 
 /** The conversation key of an unthreaded DM: every loose line of one DM
  *  resolves to it, so the whole DM is one conversation (see `ThreadRef`). The
@@ -203,6 +221,37 @@ export function proposalOperations(
 ): ProposalOperation[] {
   if (proposal.operations?.length) return proposal.operations;
   return [{ toolName: proposal.toolName, input: proposal.input }];
+}
+
+/**
+ * A won ✅ that has started executing and not yet reported back.
+ *
+ * The claim consumes the card, so once it is won nothing about the card is
+ * left — which is right for the lock and wrong for the one case where the run
+ * is then cut off (an evicted isolate, a `waitUntil` past its budget): the card
+ * sits there approved, nothing says whether anything ran, and it cannot be
+ * approved again. This record is what outlives the card. It is written as the
+ * claim is won, each operation is marked as it comes back, and it is removed
+ * once the outcome has been told. One still here past `EXECUTION_CUTOFF_MS`
+ * is a run that never told anyone.
+ */
+export interface Execution {
+  /** The approved card, whole — its operations are the batch that was run. */
+  proposal: PendingProposal;
+  startedAt: number;
+  /** One entry per operation that came back, ok or not, by its index in the
+   *  batch. An operation with no entry never returned: it may have run, it may
+   *  not, and it is never re-run without a person approving it again. */
+  settled: Array<{ index: number; ok: boolean }>;
+  /** When a later look took it (see `takeCutOffExecution`). Set, the run is
+   *  fenced: it stops at its next operation and tells no outcome. */
+  takenAt?: number;
+}
+
+/** The operations of an execution that never came back, in batch order. */
+export function unfinishedOperations(execution: Execution): ProposalOperation[] {
+  const done = new Set(execution.settled.map((s) => s.index));
+  return proposalOperations(execution.proposal).filter((_, i) => !done.has(i));
 }
 
 /**
@@ -438,6 +487,54 @@ export interface ThreadState {
    * and has to be undone by hand.
    */
   claimProposal(proposalTs: string): Promise<boolean>;
+
+  // ----- executions: a won ✅, from the claim until its outcome is told -----
+
+  /**
+   * Record that an approved card has started executing — written by Gate the
+   * moment it wins the claim, before anything runs, so there is no stretch of
+   * a run a cut-off can land in unrecorded. See `Execution`.
+   */
+  beginExecution(proposal: PendingProposal): Promise<void>;
+
+  /**
+   * Mark one operation of a running execution as having come back, and report
+   * whether a later look has TAKEN the execution meanwhile.
+   *
+   * THE FENCE. `taken: true` means a person has already been told this run
+   * was cut off and handed a card for what had not come back: the running
+   * batch must start no further operation and tell no outcome of its own,
+   * or the work the card offers again would also complete underneath it. The
+   * settle itself is not recorded then — nobody reads it. An unknown ts
+   * reports `taken: false`: there is nobody to fence against.
+   */
+  settleOperation(proposalTs: string, index: number, ok: boolean): Promise<{ taken: boolean }>;
+
+  /** The outcome has been told, or the run has stopped at the fence: forget
+   *  the execution, taken or not. An unknown ts is a no-op. */
+  endExecution(proposalTs: string): Promise<void>;
+
+  /**
+   * The execution behind this card, if it was cut off — and MARK it taken, so
+   * one later look and only one says so. The take is the lock here as the
+   * delete is for the claim: two presses on a stuck card get one note and one
+   * re-staged card between them. Marked rather than deleted because the run
+   * may not be dead, only slow: the mark is what `settleOperation` reports to
+   * it, and a taken execution is never taken again.
+   *
+   * An execution younger than `EXECUTION_CUTOFF_MS` is left alone and reads as
+   * null: it may simply still be running. One older than `PROPOSAL_TTL_MS` is
+   * dropped and reads as null too — the same hour a card is confirmable is the
+   * hour an offer to re-stage it stays worth making.
+   */
+  takeCutOffExecution(proposalTs: string): Promise<Execution | null>;
+
+  /**
+   * The same, for a later look that has a thread rather than a card: the next
+   * turn in the card's REPLY THREAD (`proposalReplyThread`, the key
+   * `getProposalByThread` takes). The freshest cut-off execution there, taken.
+   */
+  takeCutOffExecutionInThread(ref: ThreadRef): Promise<Execution | null>;
 
   // ----- assistant context -----
 

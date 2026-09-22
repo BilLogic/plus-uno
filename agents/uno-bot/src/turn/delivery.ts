@@ -88,6 +88,10 @@ export type CardCaveat =
   /** A PRD-shaped brief that named no ambiguity of its own, so the ✅ is
    *  knowingly accepting a gap-free reading of it. */
   | { kind: "no-open-questions" }
+  /** A card re-staged from an approved run that was cut off: some of it may
+   *  already have happened. On the card itself, so the warning survives a
+   *  note that failed to post. */
+  | { kind: "cut-off-rerun" }
   /** A prototype share-out staged without the bundle's full set of links. */
   | { kind: "bundle-incomplete"; missing: string[] }
   /** A GitHub issue, readable by whoever can read its repo — anyone, when the
@@ -236,7 +240,18 @@ export type GateNote =
    *  live cards: ask which one, and resolve none of them. */
   | { kind: "which-card"; count: number }
   /** The door caught the gesture and then failed to run it. */
-  | { kind: "resolve-failed"; glyph: string };
+  | { kind: "resolve-failed"; glyph: string }
+  /**
+   * An approved run that never reported back. `finished` is what came back,
+   * in batch order; `unfinished` never did, and may or may not have happened.
+   * `restaged` says a fresh card for `unfinished` follows this note.
+   */
+  | {
+      kind: "cut-off";
+      finished: Array<{ toolName: string; ok: boolean }>;
+      unfinished: string[];
+      restaged: boolean;
+    };
 
 /** What a post actually did. `text` is what was posted, which is not always
  *  what was handed in — the body is stripped and capped on the way out. */

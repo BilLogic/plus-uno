@@ -220,6 +220,9 @@ function revisionBody(revision: CardRevision): string {
  * weaker model provider cannot silently skip a disclosure the renderer writes.
  */
 function caveatText(caveat: CardCaveat): string {
+  if (caveat.kind === "cut-off-rerun") {
+    return ":warning: *An earlier approved run was cut off; some of this may already have happened.* Check before approving.";
+  }
   if (caveat.kind === "bundle-incomplete") {
     return (
       `:rotating_light: *Bundle incomplete — missing: ${caveat.missing.join(" · ")}.*\n` +

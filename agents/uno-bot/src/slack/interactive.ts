@@ -24,6 +24,7 @@
 import type { Env } from "../types";
 import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
+import { restageFor } from "../turn/env-deps";
 import { conversationsOpen, deleteMessage, postToResponseUrl } from "./api";
 import { executeVerdict } from "../agent/resolve-proposal";
 import { proposalCardBlocks } from "./proposal-render";
@@ -140,12 +141,14 @@ async function resolveFromButton(
  * factory rather than an instance.
  */
 function buttonDoorDeps(env: Env, payload: InteractionPayload): ButtonDoorDeps {
+  const threadState = threadStateFor(env);
   return {
-    threadState: threadStateFor(env),
+    threadState,
     delivery: (target) => slackDelivery(env, target),
     applyVerdict: (verdict) => executeVerdict(env, verdict),
     replyEphemeral: (text) => replyEphemeral(payload, text),
     replaceCard: (text, note) => replaceCard(payload, text, note),
+    restage: restageFor(env, threadState),
   };
 }
 

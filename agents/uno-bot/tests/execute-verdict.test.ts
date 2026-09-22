@@ -38,6 +38,8 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
     }
   }
   calls.push({ url, body });
+  // A transport failure mid-batch, on demand: the text says when.
+  if (String(body?.text ?? "").includes("EXPLODE")) throw new Error("socket hang up");
   const reply = (payload: unknown) =>
     new Response(JSON.stringify(payload), { status: 200, headers: { "content-type": "application/json" } });
   if (url.includes("slack.com/api/chat.getPermalink")) {
@@ -72,14 +74,23 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
   throw new Error(`no stub route for ${url}`);
 }) as typeof fetch;
 
-/** Thread history lands in a Durable Object; here it lands in a list. */
+/** Thread history and the execution record land in a Durable Object; here
+ *  history lands in a list, and the record's calls are kept to be asserted. */
 let appended: Array<{ ref: { channel: string; thread: string }; turn: { role: string; content: string } }> = [];
+let executionCalls: string[] = [];
 const THREAD_STATE = {
   idFromName: () => "thread-state",
   get: () => ({
     appendHistory: async (ref: (typeof appended)[number]["ref"], turn: (typeof appended)[number]["turn"]) => {
       appended.push({ ref, turn });
       return { length: 1 };
+    },
+    settleOperation: async (ts: string, index: number, ok: boolean) => {
+      executionCalls.push(`settle ${ts} ${index} ${ok}`);
+      return { taken: false };
+    },
+    endExecution: async (ts: string) => {
+      executionCalls.push(`end ${ts}`);
     },
   }),
 };
@@ -125,6 +136,27 @@ function executeVerdict(): Promise<typeof import("../src/agent/resolve-proposal"
 }
 
 const posts = () => calls.filter((c) => c.url.includes("chat.postMessage")).map((c) => c.body ?? {});
+
+test("an approved batch marks each operation as it comes back, then ends its execution record", async () => {
+  calls = [];
+  executionCalls = [];
+  const run = await executeVerdict();
+  await run(
+    env(),
+    won([
+      { toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "one" } },
+      { toolName: "not_a_tool", input: {} },
+    ]),
+  );
+  // In batch order, a failed operation settled like any other, and the end
+  // only once the outcome has been told — which is what a cut-off before it
+  // leaves standing for the next look to find.
+  assert.deepEqual(executionCalls, [
+    "settle 1700000000.000300 0 true",
+    "settle 1700000000.000300 1 false",
+    "end 1700000000.000300",
+  ]);
+});
 
 test("an approved relay reaches its recipient attributed to the requester, and confirms under the reply ts", async () => {
   calls = [];
@@ -298,4 +330,89 @@ test("an approved intake naming a repo off the list is refused, and nothing reac
     won([{ toolName: "github_issue_create", input: { title: "A gap", body: "Details.", repo: "someone/else" } }]),
   );
   assert.deepEqual(calls.filter((c) => c.url.startsWith("https://api.github.com/")), []);
+});
+
+// ── The execution record, through the real executor ─────────────────────────
+//
+// The Gate seam's cut-off cases (`tests/cut-off-run.test.ts`) have to stop a
+// run by hand. These drive `executeVerdict` itself, on an in-memory store
+// standing in for the Durable Object — its methods take the same arguments,
+// and ignore the adapter's trailing clock in favour of their own.
+
+async function realStore() {
+  const [{ createInMemoryThreadState, EXECUTION_CUTOFF_MS }, { resolveSignal }] = await Promise.all([
+    import("../src/thread-state/index.js"),
+    import("../src/gate/index.js"),
+  ]);
+  let t = 1_700_000_000_000;
+  const store = createInMemoryThreadState({ now: () => t });
+  const operations = [
+    { toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "one" } },
+    { toolName: "dm_relay", input: { recipient: "U0COCO0002", text: "EXPLODE two" } },
+    { toolName: "dm_relay", input: { recipient: "U0COCO0003", text: "three" } },
+  ];
+  const card = won(operations).proposal!;
+  await store.putProposal(card);
+  const press = () =>
+    resolveSignal(
+      { kind: "button", messageTs: card.proposalTs, decision: "confirm", userId: "U2" },
+      { threadState: store },
+    );
+  const later = () => {
+    t += EXECUTION_CUTOFF_MS + 1;
+    return press();
+  };
+  const envOn = (threadState: object): Env =>
+    ({ SLACK_BOT_TOKEN: "xoxb-test", THREAD_STATE: { idFromName: () => "x", get: () => threadState } }) as unknown as Env;
+  return { store, press, later, envOn };
+}
+
+test("an executor that throws mid-batch finishes the batch and ends the record — no cut-off note follows", async () => {
+  calls = [];
+  const { store, press, later, envOn } = await realStore();
+  const run = await executeVerdict();
+  const verdict = await press();
+  assert.equal(verdict.outcome, "won");
+  await run(envOn(store), verdict);
+  // All three ran; the second failed on the wire and the third still went.
+  assert.ok(calls.some((c) => String(c.body?.text ?? "").includes("three")));
+  const look = await later();
+  assert.deepEqual(look.post?.note, { kind: "already-resolved" });
+  assert.equal(look.restage, undefined);
+});
+
+test("a throw after the batch ends the record, so the door's failure note is the only one", async () => {
+  calls = [];
+  const { store, press, later, envOn } = await realStore();
+  const run = await executeVerdict();
+  const verdict = await press();
+  const failingHistory = {
+    ...store,
+    appendHistory: async () => {
+      throw new Error("history write refused");
+    },
+  };
+  await assert.rejects(run(envOn(failingHistory), verdict), /history write refused/);
+  // The reaction door answers that throw with "resolve-failed"; five minutes
+  // on, the card must not grow a second, cut-off note about the same run.
+  const look = await later();
+  assert.deepEqual(look.post?.note, { kind: "already-resolved" });
+  assert.equal(look.restage, undefined);
+});
+
+test("a run a later look has taken stops at its next operation and tells no outcome of its own", async () => {
+  calls = [];
+  const { store, press, envOn } = await realStore();
+  const run = await executeVerdict();
+  const verdict = await press();
+  // The store answers the fence as a take made mid-run would.
+  const taken = { ...store, settleOperation: async () => ({ taken: true }) };
+  await run(envOn(taken), verdict);
+  const relayed = posts().filter((p) => String(p.channel).startsWith("D-"));
+  assert.equal(relayed.length, 1, "operation one ran; nothing after it started");
+  assert.deepEqual(
+    posts().filter((p) => p.channel === "D0REQUESTER"),
+    [],
+    "the note and the re-staged card are the thread's account, not a batch result",
+  );
 });

@@ -8,15 +8,18 @@
 // picks it, is decided in `src/thread-state/durable-object.ts` — the keying
 // seam — and nowhere else; no caller and not this class computes an id.
 //
-// Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `event:{event_id}`,
-// `actx:{channel}:{thread}`, `cancel:{channel}:{thread}`, `run:{user}`.
+// Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `exec:{ts}`,
+// `event:{event_id}`, `actx:{channel}:{thread}`, `cancel:{channel}:{thread}`,
+// `run:{user}`.
 //
 // ── THE CONTRACT IS THIS CLASS'S OWN SIGNATURE (#493, #494) ─────────────────
 //
 // Every public method below is Durable Object RPC and its signature IS the
 // `src/thread-state` interface: `readHistory`, `appendHistory`,
 // `compactHistory`, `putProposal`, `retireProposal`, `getProposalByTs`,
-// `getProposalByThread`, `getProposalsByChannel`, `claimProposal`, `get/putAssistantContext`, `requestCancel`,
+// `getProposalByThread`, `getProposalsByChannel`, `claimProposal`,
+// `beginExecution`, `settleOperation`, `endExecution`, `takeCutOffExecution`,
+// `takeCutOffExecutionInThread`, `get/putAssistantContext`, `requestCancel`,
 // `consumeCancel`, `cancelForUser`, `setActiveRun`, `checkAndRecordEvent`,
 // `claimRun`, `markRunDone`. A rename is a type error rather than a runtime
 // 404, which is the whole point.
@@ -43,11 +46,13 @@ import type { Env } from "./types";
 import {
   CANCEL_TTL_MS,
   EVENT_DEDUP_TTL_MS,
+  EXECUTION_CUTOFF_MS,
   HISTORY_TTL_MS,
   MAX_HISTORY_TURNS,
   PROPOSAL_TTL_MS,
   RUN_LEASE_MS,
   proposalReplyThread,
+  type Execution,
   type HistoryTurn,
   type PendingProposal,
   type ProposalLookup,
@@ -115,7 +120,7 @@ export class ThreadState extends DurableObject<Env> {
 
   // Delete expired records by their own TTL, then reschedule if anything remains.
   // Keys: event:{id} (EVENT_DEDUP_TTL_MS), hist:{…} (HISTORY_TTL_MS),
-  // prop:{ts} (PROPOSAL_TTL_MS). Runs at most once a day.
+  // prop:{ts} and exec:{ts} (PROPOSAL_TTL_MS). Runs at most once a day.
   async alarm(): Promise<void> {
     const now = Date.now();
     let remaining = 0;
@@ -133,6 +138,11 @@ export class ThreadState extends DurableObject<Env> {
     const props = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
     for (const [key, rec] of props) {
       if (now - rec.createdAt > PROPOSAL_TTL_MS) await this.storage.delete(key);
+      else remaining++;
+    }
+    const execs = await this.storage.list<Execution>({ prefix: "exec:" });
+    for (const [key, rec] of execs) {
+      if (now - rec.startedAt > PROPOSAL_TTL_MS) await this.storage.delete(key);
       else remaining++;
     }
     // Active-run pointers: one key per user, overwritten each turn, so this is
@@ -341,6 +351,78 @@ export class ThreadState extends DurableObject<Env> {
     return this.storage.delete(key);
   }
 
+  // ----- executions -----
+  //
+  // A won ✅ from the claim until its outcome is told — what `Execution` in
+  // `thread-state/store.ts` exists for. Each method is one read-modify-write,
+  // and the input gate stays closed across the storage awaits, so a take has
+  // exactly one winner as the claim does.
+
+  async beginExecution(proposal: PendingProposal, at: number): Promise<void> {
+    await this.storage.put<Execution>(executionKey(proposal.proposalTs), {
+      proposal,
+      startedAt: at,
+      settled: [],
+    });
+    await this.ensureGcAlarm();
+  }
+
+  // The fence: a taken execution is reported to the run that is still settling
+  // it, which stops there (see `settleOperation` in `thread-state/store.ts`).
+  async settleOperation(
+    proposalTs: string,
+    index: number,
+    ok: boolean,
+  ): Promise<{ taken: boolean }> {
+    const key = executionKey(proposalTs);
+    const rec = await this.storage.get<Execution>(key);
+    if (!rec) return { taken: false };
+    if (rec.takenAt !== undefined) return { taken: true };
+    if (!rec.settled.some((s) => s.index === index)) {
+      await this.storage.put<Execution>(key, { ...rec, settled: [...rec.settled, { index, ok }] });
+    }
+    return { taken: false };
+  }
+
+  async endExecution(proposalTs: string): Promise<void> {
+    await this.storage.delete(executionKey(proposalTs));
+  }
+
+  async takeCutOffExecution(proposalTs: string, at: number): Promise<Execution | null> {
+    const key = executionKey(proposalTs);
+    const rec = await this.storage.get<Execution>(key);
+    if (!rec || rec.takenAt !== undefined) return null;
+    const age = at - rec.startedAt;
+    if (age <= EXECUTION_CUTOFF_MS) return null; // may still be running
+    if (age > PROPOSAL_TTL_MS) {
+      await this.storage.delete(key);
+      return null;
+    }
+    // Marked, not deleted: a run that is only slow reads the mark at its next
+    // operation and stops.
+    await this.storage.put<Execution>(key, { ...rec, takenAt: at });
+    return rec;
+  }
+
+  // Scans the in-flight set, which is empty whenever nothing was cut off: an
+  // execution is removed the moment its outcome has been told, and a taken one
+  // is skipped.
+  async takeCutOffExecutionInThread(ref: ThreadRef, at: number): Promise<Execution | null> {
+    const all = await this.storage.list<Execution>({ prefix: "exec:" });
+    let best: Execution | null = null;
+    for (const rec of all.values()) {
+      if (rec.proposal.channel !== ref.channel) continue;
+      if (proposalReplyThread(rec.proposal) !== ref.thread) continue;
+      if (rec.takenAt !== undefined) continue;
+      const age = at - rec.startedAt;
+      if (age <= EXECUTION_CUTOFF_MS || age > PROPOSAL_TTL_MS) continue;
+      if (!best || rec.startedAt > best.startedAt) best = rec;
+    }
+    if (!best) return null;
+    await this.storage.put<Execution>(executionKey(best.proposal.proposalTs), { ...best, takenAt: at });
+    return best;
+  }
+
   // ----- assistant context -----
 
   async getAssistantContext(ref: ThreadRef, at: number): Promise<AssistantContext | null> {
@@ -455,6 +537,10 @@ function historyKey(channel: string, thread: string): string {
 
 function proposalKey(ts: string): string {
   return `prop:${ts}`;
+}
+
+function executionKey(ts: string): string {
+  return `exec:${ts}`;
 }
 
 function eventKey(eventId: string): string {

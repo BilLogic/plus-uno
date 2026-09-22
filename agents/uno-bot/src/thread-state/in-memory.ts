@@ -19,11 +19,13 @@
 import {
   CANCEL_TTL_MS,
   EVENT_DEDUP_TTL_MS,
+  EXECUTION_CUTOFF_MS,
   HISTORY_TTL_MS,
   MAX_HISTORY_TURNS,
   PROPOSAL_TTL_MS,
   RUN_LEASE_MS,
   proposalReplyThread,
+  type Execution,
   type HistoryTurn,
   type PendingProposal,
   type ProposalLookup,
@@ -79,6 +81,24 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
   const cancels = new Map<string, { at: number }>();
   const activeRuns = new Map<string, ActiveRunRecord>();
   const events = new Map<string, EventRecord>();
+  const executions = new Map<string, Execution>();
+
+  /** Take an execution if it has been cut off; drop it if it has aged out;
+   *  leave it alone if it may still be running. */
+  function takeIfCutOff(ts: string): Execution | null {
+    const rec = executions.get(ts);
+    if (!rec || rec.takenAt !== undefined) return null;
+    const age = now() - rec.startedAt;
+    if (age <= EXECUTION_CUTOFF_MS) return null;
+    if (age > PROPOSAL_TTL_MS) {
+      executions.delete(ts);
+      return null;
+    }
+    // Marked, not deleted: a run that is only slow reads the mark at its next
+    // operation and stops (the fence, on `settleOperation`).
+    rec.takenAt = now();
+    return { ...rec, settled: [...rec.settled] };
+  }
 
   /** Live turns for a conversation, evicting the record if it has aged out.
    *  Expiry is applied on READ (as the Durable Object does) rather than by a
@@ -208,6 +228,41 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       const rec = proposals.get(proposalTs);
       if (!rec || rec.retired || rec.supersededBy) return false;
       return proposals.delete(proposalTs);
+    },
+
+    // ----- executions -----
+
+    async beginExecution(proposal) {
+      executions.set(proposal.proposalTs, { proposal, startedAt: now(), settled: [] });
+    },
+
+    async settleOperation(proposalTs, index, ok) {
+      const rec = executions.get(proposalTs);
+      if (!rec) return { taken: false };
+      if (rec.takenAt !== undefined) return { taken: true };
+      if (!rec.settled.some((s) => s.index === index)) rec.settled = [...rec.settled, { index, ok }];
+      return { taken: false };
+    },
+
+    async endExecution(proposalTs) {
+      executions.delete(proposalTs);
+    },
+
+    async takeCutOffExecution(proposalTs) {
+      return takeIfCutOff(proposalTs);
+    },
+
+    async takeCutOffExecutionInThread(ref) {
+      let best: Execution | null = null;
+      for (const rec of executions.values()) {
+        if (rec.proposal.channel !== ref.channel) continue;
+        if (proposalReplyThread(rec.proposal) !== ref.thread) continue;
+        if (rec.takenAt !== undefined) continue;
+        const age = now() - rec.startedAt;
+        if (age <= EXECUTION_CUTOFF_MS || age > PROPOSAL_TTL_MS) continue;
+        if (!best || rec.startedAt > best.startedAt) best = rec;
+      }
+      return best ? takeIfCutOff(best.proposal.proposalTs) : null;
     },
 
     // ----- assistant context -----
