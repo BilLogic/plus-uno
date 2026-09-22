@@ -150,7 +150,7 @@
   },
   {
     "name": "github_read",
-    "description": "Read-only, ungated. Read the plus-uno GitHub repo by repo-relative path: a file's contents (DS agent-views, rule docs, AGENTS.md, a component's source, token values under design-system/src/tokens/) or a directory listing (a directory path returns its entries). Use it for any DS component / token / prop / rule-doc fact, to confirm a component exists under design-system/src/components before proposing component_implement, and to ground a review in the actual rule docs. `search` finds where something lives when the path is unknown. For a GitHub URL a designer pasted, source_read reads it directly.",
+    "description": "Read-only, ungated. Read a GitHub repo on the bot's repo list by repo-relative path: a file's contents (DS agent-views, rule docs, AGENTS.md, a component's source, token values under design-system/src/tokens/) or a directory listing (a directory path returns its entries). Use it for any DS component / token / prop / rule-doc fact, to confirm a component exists under design-system/src/components before proposing component_implement, and to ground a review in the actual rule docs. `search` finds where something lives when the path is unknown. `repo` picks the repo; omitted, it is plus-uno. For a GitHub URL a designer pasted, source_read reads it directly.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -169,13 +169,22 @@
         "search": {
           "type": "string",
           "description": "Code-search mode: find WHERE something lives in the repo (e.g. 'focus-ring', 'PageLayout') — returns matching file paths + github.com links to read or cite. When set, 'path' is ignored."
+        },
+        "repo": {
+          "type": "string",
+          "enum": [
+            "BilLogic/plus-uno",
+            "BilLogic/plus-marketing-website",
+            "BilLogic/plus-uno-blueprint"
+          ],
+          "description": "Optional: a repo on the bot's list; omit for the default, plus-uno. The blueprint repo is read for its code, schema and issues — blueprint CONTENT comes from search_blueprint."
         }
       }
     }
   },
   {
     "name": "github_intake_search",
-    "description": "Read-only, ungated. Search the open GitHub intakes on the harness repo (issues labelled harness-intake, awaiting triage) by keyword. Run it before staging github_issue_create, every time: if an open intake already covers the request, name it by title and link and ask whether to link that one instead or file a new one anyway — stage the card only on 'file anyway'. The Worker fixes the repo, the open state and the label; you send keywords only.",
+    "description": "Read-only, ungated. Search the open GitHub intakes (issues labelled harness-intake, awaiting triage) by keyword, on a listed repo — plus-uno unless `repo` names another. Run it before staging github_issue_create, every time: if an open intake already covers the request, name it by title and link and ask whether to link that one instead or file a new one anyway — stage the card only on 'file anyway'. The Worker fixes the open state and the label and refuses a repo off its list; you send keywords, and a repo when it is not plus-uno.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -186,6 +195,15 @@
         "keywords": {
           "type": "string",
           "description": "Two to six distinctive words that name the problem, e.g. 'github issue refuses', 'canvas export timeout'. Every word must match, so fewer finds more."
+        },
+        "repo": {
+          "type": "string",
+          "enum": [
+            "BilLogic/plus-uno",
+            "BilLogic/plus-marketing-website",
+            "BilLogic/plus-uno-blueprint"
+          ],
+          "description": "Optional: a repo on the bot's list; omit for the default, plus-uno."
         }
       }
     }

@@ -40,7 +40,7 @@ export const SECRETS = [
   {
     name: "GITHUB_TOKEN",
     required: true,
-    why: "PAT with repo:dispatch + Contents:Read + Issues:Write. Powers component_implement / prototype_scaffold, which dispatch workflows in BilLogic/plus-uno, and github_issue_create, which files intakes there.",
+    why: "PAT with repo:dispatch + Contents:Read + Issues:Write, on every repo in GITHUB_REPOS. Powers component_implement / prototype_scaffold, which dispatch workflows in BilLogic/plus-uno, github_issue_create, which files intakes there, and github_read / github_intake_search on each listed repo.",
   },
   {
     name: "FIGMA_ACCESS_TOKEN",
@@ -189,8 +189,15 @@ export function parseSecretList(stdout) {
 export function varsInWrangler(toml) {
   const names = [];
   let inVars = false;
+  let inMultiline = false;
   for (const line of toml.split("\n")) {
     const trimmed = line.trim();
+    // The body of a ''' string is the value, not keys — and a JSON line in it
+    // that opens with `[` is not a new table.
+    if (inMultiline) {
+      if (line.includes("'''")) inMultiline = false;
+      continue;
+    }
     if (trimmed.startsWith("[")) {
       // Any new table ends [vars]. Scanning on would attribute a later
       // section's keys to it — noise. Stopping early is the dangerous
@@ -199,10 +206,68 @@ export function varsInWrangler(toml) {
       continue;
     }
     if (!inVars || trimmed.startsWith("#") || !trimmed) continue;
-    const m = /^([A-Za-z_][A-Za-z0-9_]*)\s*=/.exec(trimmed);
-    if (m) names.push(m[1]);
+    const m = /^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/.exec(trimmed);
+    if (!m) continue;
+    names.push(m[1]);
+    if (m[2].startsWith("'''") && !m[2].slice(3).includes("'''")) inMultiline = true;
   }
   return names;
+}
+
+/**
+ * The value of one `[vars]` entry, or undefined when the table does not assign
+ * it.
+ *
+ * Not a TOML parser: it reads the two string forms this file uses — a one-line
+ * `"basic"` or `'literal'` string, and a `'''` multi-line literal, which is how
+ * `GITHUB_REPOS` holds its JSON without escaping a quote. Any other form
+ * throws, so a value this cannot read is a failed check rather than an unset
+ * var.
+ *
+ * @param {string} toml
+ * @param {string} name
+ * @returns {string | undefined}
+ */
+export function varValueInWrangler(toml, name) {
+  const lines = toml.split("\n");
+  let inVars = false;
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim();
+    if (trimmed.startsWith("[")) {
+      inVars = trimmed === "[vars]";
+      continue;
+    }
+    if (!inVars) continue;
+    const m = /^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/.exec(trimmed);
+    if (!m) continue;
+    const rest = m[2];
+    if (m[1] !== name) {
+      // Another var's ''' body is skipped whole, as `varsInWrangler` skips it.
+      if (rest.startsWith("'''") && !rest.slice(3).includes("'''")) {
+        while (i + 1 < lines.length && !lines[++i].includes("'''"));
+      }
+      continue;
+    }
+    if (rest.startsWith("'''")) {
+      const sameLine = rest.slice(3).indexOf("'''");
+      if (sameLine !== -1) return rest.slice(3, 3 + sameLine);
+      // TOML drops the newline straight after the opening delimiter.
+      const body = [rest.slice(3)];
+      for (let j = i + 1; j < lines.length; j++) {
+        const end = lines[j].indexOf("'''");
+        if (end !== -1) {
+          body.push(lines[j].slice(0, end));
+          return body.join("\n").replace(/^\n/, "");
+        }
+        body.push(lines[j]);
+      }
+      throw new Error(`${name} opens a ''' string in [vars] that never closes`);
+    }
+    const one = /^(["'])(.*)\1\s*(?:#.*)?$/.exec(rest);
+    if (one && !(one[1] === '"' && one[2].includes("\\"))) return one[2];
+    throw new Error(`${name} in [vars] is not a plain string this check can read: ${rest}`);
+  }
+  return undefined;
 }
 
 /**

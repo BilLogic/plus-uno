@@ -1,6 +1,7 @@
 // github_intake_search executor — READ-ONLY. The duplicate check before a
-// GitHub intake: open issues on the Worker's repo carrying the intake label,
-// by keyword. Runs inline in the agent loop (no gate).
+// GitHub intake: open issues carrying the intake label, by keyword, on a repo
+// from the Worker's repo list (the default when none is named). Runs inline in
+// the agent loop (no gate).
 //
 // Its own tool rather than a third mode of `github_read`: `github_read` reads
 // the repo's FILES (a path, or where a term lives in the code), and this reads
@@ -8,21 +9,25 @@
 // model acts on differently (name the match, offer the choice). One tool, one
 // thing, so the tool table's row says what it is.
 //
-// The model sends keywords and nothing else. The repo, the open state and the
-// label are the Worker's: the client writes the first two, this file the third,
-// and `intakeSearchTerms` drops any qualifier, boolean operator or grouping
-// from the keywords, so a search cannot be aimed at another repo, a closed
-// issue or another label.
+// The model sends keywords and, optionally, a repo. The repo reaches the search
+// only as the entry the resolver returns, so an unlisted one is refused before
+// anything is fetched. The open state and the label are the Worker's: the
+// client writes the first, this file the second, and `intakeSearchTerms` drops
+// any qualifier, boolean operator or grouping from the keywords, so a search
+// cannot be aimed at another repo, a closed issue or another label.
 //
-// IT TAKES ITS SEARCH BY NAME — `findOpenIntakes` is driven in
-// `tests/github-intake-search.test.ts` with a fake, and `Env` enters only in
+// IT TAKES ITS SEARCH AND RESOLVER BY NAME — `findOpenIntakes` is driven in
+// `tests/github-intake-search.test.ts` with fakes, and `Env` enters only in
 // `executeGithubIntakeSearch`, the binding at the foot of this file.
 
 import type { Env } from "../types";
 import {
   GithubRateLimitError,
   githubIssueSearch,
+  resolveRepoFor,
+  searchWords,
   type GithubIssueSearch,
+  type RepoResolution,
 } from "../integrations/github";
 import { INTAKE_LABELS } from "./github-issue-render";
 
@@ -39,12 +44,10 @@ const MAX_TERMS = 6;
  *  and not a word that merely ends in a colon (`TypeError:`). */
 const QUALIFIER = /^-?[a-z_]+:(?!\/\/)./;
 
-/** GitHub's boolean operators, which under advanced search bind the Worker's
- *  qualifiers to one side only. Upper-case, as GitHub reads them. */
-const OPERATOR = /^(?:AND|OR|NOT)$/;
-
 export interface IntakeSearchDeps {
   github: GithubIssueSearch;
+  /** The model's `repo` input, resolved against the repo list. */
+  resolveRepo(requested: unknown): RepoResolution;
 }
 
 /**
@@ -54,10 +57,8 @@ export interface IntakeSearchDeps {
  * repo, state and label the Worker wrote.
  */
 export function intakeSearchTerms(keywords: string): string {
-  return keywords
-    .replace(/["()]/g, " ")
-    .split(/\s+/)
-    .filter((w) => w !== "" && !QUALIFIER.test(w) && !OPERATOR.test(w))
+  return searchWords(keywords)
+    .filter((w) => !QUALIFIER.test(w))
     .slice(0, MAX_TERMS)
     .join(" ");
 }
@@ -80,9 +81,17 @@ export async function findOpenIntakes(
     });
   }
 
-  const repo = deps.github.repo;
+  const target = deps.resolveRepo(input.repo);
+  if (!target.ok) {
+    return JSON.stringify({
+      ok: false,
+      error: target.error,
+      note: "Nothing is searched off the list. Say which repos you can reach, from the error, and ask which one they meant.",
+    });
+  }
+  const repo = target.entry.repo;
   try {
-    const matches = await deps.github.searchOpenIssues(INTAKE_LABEL, terms);
+    const matches = await deps.github.searchOpenIssues(target.entry, INTAKE_LABEL, terms);
     return JSON.stringify({
       ok: true,
       repo,
@@ -114,11 +123,14 @@ export async function findOpenIntakes(
 /**
  * The binding: `Env` turned into the named search.
  * @param env - Worker bindings
- * @param input - Tool args from the model — `keywords`
+ * @param input - Tool args from the model — `keywords`, and `repo`
  */
 export async function executeGithubIntakeSearch(
   env: Env,
   input: Record<string, unknown>,
 ): Promise<string> {
-  return findOpenIntakes(input, { github: githubIssueSearch(env) });
+  return findOpenIntakes(input, {
+    github: githubIssueSearch(env),
+    resolveRepo: (requested) => resolveRepoFor(env, requested),
+  });
 }

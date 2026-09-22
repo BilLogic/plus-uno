@@ -1,8 +1,14 @@
-// Read from the plus-uno GitHub repo via the contents API (for github_read):
-// fetch a file's decoded text, or list a directory's entries. GITHUB_TOKEN is
-// already on the Worker for repository_dispatch; this reuses it read-only.
-// Fail-loud (throws) so the tool can report honestly — unlike ds-components.ts,
-// which fails-open because it's a preflight guard, not a user-facing read.
+// Read from the GitHub repos on the Worker's repo list via the contents API
+// (for github_read): fetch a file's decoded text, or list a directory's
+// entries. GITHUB_TOKEN is already on the Worker for repository_dispatch; this
+// reuses it read-only. Fail-loud (throws) so the tool can report honestly —
+// unlike ds-components.ts, which fails-open because it's a preflight guard,
+// not a user-facing read.
+//
+// EVERY CALL HERE TAKES A RESOLVED REPO — a `RepoEntry` off the list, never a
+// string the model wrote. `resolveRepoFor` is the one way to get one: it reads
+// `GITHUB_REPOS` (parsed once per isolate, by `repo-list.mjs`) and turns a
+// tool's optional `repo` input into a listed repo or a refusal naming the list.
 //
 // One write lives here too: creating an issue, for `github_issue_create`. It is
 // a CLIENT rather than a function, so the executor takes it by name and a test
@@ -13,6 +19,56 @@
 
 import type { Env } from "../types";
 import { countedFetch } from "../net";
+import {
+  RepoListError,
+  parseRepoList,
+  resolveRepo,
+  type RepoEntry,
+  type RepoList,
+  type RepoResolution,
+} from "./repo-list.mjs";
+
+export type { RepoEntry, RepoResolution };
+
+/** The parsed list, kept for the isolate's life — keyed on the two vars, so a
+ *  test (or a redeploy) that changes them is read afresh. */
+let parsedList: { raw: string | undefined; fallback: string; list: RepoList | RepoListError } | null = null;
+
+function repoListOf(env: Env): RepoList | RepoListError {
+  const raw = env.GITHUB_REPOS;
+  const fallback = env.GITHUB_REPO;
+  if (!parsedList || parsedList.raw !== raw || parsedList.fallback !== fallback) {
+    let list: RepoList | RepoListError;
+    try {
+      list = parseRepoList(raw, fallback);
+    } catch (err) {
+      list = err instanceof RepoListError ? err : new RepoListError(String(err));
+      console.warn(`[github] repo list refused: ${list.message}`);
+    }
+    parsedList = { raw, fallback, list };
+  }
+  return parsedList.list;
+}
+
+/**
+ * A tool's optional `repo` input, resolved against the Worker's repo list:
+ * absent → `GITHUB_REPO`; listed → that entry; anything else → a refusal whose
+ * text names the list. A list that fails to parse refuses every repo, the
+ * default too — `check:secrets` fails such a list before a deploy, so this is
+ * the backstop, said plainly.
+ * @param env - Worker bindings (`GITHUB_REPOS`, `GITHUB_REPO`)
+ * @param requested - the model's `repo` input, unvalidated
+ */
+export function resolveRepoFor(env: Env, requested: unknown): RepoResolution {
+  const list = repoListOf(env);
+  if (list instanceof RepoListError) {
+    return {
+      ok: false,
+      error: `The Worker's GitHub repo list is misconfigured (${list.message}), so no repo is reachable until it is fixed.`,
+    };
+  }
+  return resolveRepo(list, requested);
+}
 
 const GH_TIMEOUT_MS = 8000;
 const GH_TEXT_CAP = 12000; // keep a big file from blowing the model's budget
@@ -34,15 +90,16 @@ export interface GithubReadResult {
  */
 export async function githubReadPath(
   env: Env,
+  target: RepoEntry,
   path: string,
   ref?: string,
 ): Promise<GithubReadResult> {
-  if (!env.GITHUB_TOKEN || !env.GITHUB_REPO) {
-    throw new Error("GitHub not configured on the Worker (GITHUB_TOKEN/GITHUB_REPO)");
+  if (!env.GITHUB_TOKEN) {
+    throw new Error("GitHub not configured on the Worker (GITHUB_TOKEN)");
   }
   const clean = path.replace(/^\/+/, "").trim();
   const qs = ref ? `?ref=${encodeURIComponent(ref)}` : "";
-  const url = `https://api.github.com/repos/${env.GITHUB_REPO}/contents/${clean}${qs}`;
+  const url = `https://api.github.com/repos/${target.repo}/contents/${clean}${qs}`;
 
   {
     const res = await countedFetch(url, {
@@ -53,7 +110,7 @@ export async function githubReadPath(
       },
     }, GH_TIMEOUT_MS);
     if (!res.ok) {
-      throw new Error(`GitHub contents ${res.status} for ${clean}`);
+      throw new Error(`GitHub contents ${res.status} for ${clean} on ${target.repo}`);
     }
     const data = (await res.json()) as
       | { name?: string; type?: string }[]
@@ -83,17 +140,48 @@ export interface GithubCodeHit {
   url: string;
 }
 
+/** GitHub's boolean operators, which bind the Worker's qualifiers to one side
+ *  only. Upper-case, as GitHub reads them. */
+const OPERATOR = /^(?:AND|OR|NOT)$/;
+
 /**
- * Code search within the configured repo (GET /search/code). Restores the
+ * A model's search text as loose words: every parenthesis and double quote
+ * dropped, every boolean operator dropped, whitespace collapsed — so nothing
+ * in it can regroup a query around the qualifiers the Worker writes. Both
+ * searches start here; each then drops the qualifiers it does not allow.
+ */
+export function searchWords(text: string): string[] {
+  return text
+    .replace(/["()]/g, " ")
+    .split(/\s+/)
+    .filter((w) => w !== "" && !OPERATOR.test(w));
+}
+
+/** A qualifier that names where to search — `repo:`, `org:`, `user:`, negated
+ *  or not. The Worker writes the one `repo:` a search carries; another from
+ *  the model would add a repo off the list to it. */
+const SCOPE_QUALIFIER = /^-?(?:repo|org|user):/i;
+
+/** The model's code-search words, with any scope qualifier dropped. Every
+ *  other qualifier (`path:`, `extension:`, `language:`) narrows within the
+ *  repo, so it stays. */
+export function codeSearchTerms(query: string): string {
+  return searchWords(query)
+    .filter((w) => !SCOPE_QUALIFIER.test(w))
+    .join(" ");
+}
+
+/**
+ * Code search within one listed repo (GET /search/code). Restores the
  * code-search capability the hosted GitHub MCP provided, on the same PAT —
  * needed in gemini mode (no server-side MCP) and useful as a lighter path
  * everywhere. One subrequest. Throws on non-2xx.
  */
-export async function githubSearchCode(env: Env, query: string): Promise<GithubCodeHit[]> {
-  if (!env.GITHUB_TOKEN || !env.GITHUB_REPO) {
-    throw new Error("GitHub not configured on the Worker (GITHUB_TOKEN/GITHUB_REPO)");
+export async function githubSearchCode(env: Env, target: RepoEntry, query: string): Promise<GithubCodeHit[]> {
+  if (!env.GITHUB_TOKEN) {
+    throw new Error("GitHub not configured on the Worker (GITHUB_TOKEN)");
   }
-  const q = `${query} repo:${env.GITHUB_REPO}`;
+  const q = `${codeSearchTerms(query)} repo:${target.repo}`;
   const url = `https://api.github.com/search/code?q=${encodeURIComponent(q)}&per_page=10`;
   const res = await countedFetch(url, {
     headers: {
@@ -102,7 +190,7 @@ export async function githubSearchCode(env: Env, query: string): Promise<GithubC
       "user-agent": "uno-bot",
     },
   }, GH_TIMEOUT_MS);
-  if (!res.ok) throw new Error(`GitHub code search ${res.status}`);
+  if (!res.ok) throw new Error(`GitHub code search ${res.status} on ${target.repo}`);
   const data = (await res.json()) as {
     items?: Array<{ path?: string; html_url?: string }>;
   };
@@ -160,18 +248,19 @@ export interface GithubIssueClient {
 }
 
 /**
- * The issue client on the Worker's own repo and token (POST /repos/{repo}/issues).
+ * The issue client on one listed repo and the Worker's token
+ * (POST /repos/{repo}/issues).
  *
- * The repo is `GITHUB_REPO`, never an argument: the model cannot aim a filing
- * anywhere else. One subrequest per issue.
+ * The repo is a resolved entry, never the model's string: a filing cannot be
+ * aimed off the list. One subrequest per issue.
  */
-export function githubIssueClient(env: Env): GithubIssueClient {
-  const repo = env.GITHUB_REPO;
+export function githubIssueClient(env: Env, target: RepoEntry): GithubIssueClient {
+  const repo = target.repo;
   return {
     repo,
     async createIssue(issue) {
-      if (!env.GITHUB_TOKEN || !repo) {
-        throw new Error("GitHub not configured on the Worker (GITHUB_TOKEN/GITHUB_REPO)");
+      if (!env.GITHUB_TOKEN) {
+        throw new Error("GitHub not configured on the Worker (GITHUB_TOKEN)");
       }
       const res = await countedFetch(`https://api.github.com/repos/${repo}/issues`, {
         method: "POST",
@@ -213,32 +302,29 @@ export interface OpenIssue {
   updated: string;
 }
 
-/** The read the duplicate check needs, bound to the same one repo. */
+/** The read the duplicate check needs, on whichever listed repo it is handed. */
 export interface GithubIssueSearch {
-  /** `owner/name` — the repo every search reads. */
-  readonly repo: string;
-  /** Open issues carrying `label` that match `terms`, best match first.
-   *  Throws `GithubRequestError` on any non-2xx. */
-  searchOpenIssues(label: string, terms: string): Promise<OpenIssue[]>;
+  /** Open issues on `target` carrying `label` that match `terms`, best match
+   *  first. Throws `GithubRequestError` on any non-2xx. */
+  searchOpenIssues(target: RepoEntry, label: string, terms: string): Promise<OpenIssue[]>;
 }
 
 const ISSUE_SEARCH_LIMIT = 5;
 
 /**
- * Issue search on the Worker's own repo and token (GET /search/issues), for
+ * Issue search on the Worker's token (GET /search/issues), for
  * `github_intake_search`.
  *
- * The repo, `is:issue` and `is:open` are written here, never taken from the
- * caller, so a search reads open issues on `GITHUB_REPO` and nothing else. One
- * subrequest per search.
+ * The `repo:` (from the resolved entry), `is:issue` and `is:open` are written
+ * here, never taken from the caller's words, so a search reads open issues on
+ * one listed repo and nothing else. One subrequest per search.
  */
 export function githubIssueSearch(env: Env): GithubIssueSearch {
-  const repo = env.GITHUB_REPO;
   return {
-    repo,
-    async searchOpenIssues(label, terms) {
-      if (!env.GITHUB_TOKEN || !repo) {
-        throw new Error("GitHub not configured on the Worker (GITHUB_TOKEN/GITHUB_REPO)");
+    async searchOpenIssues(target, label, terms) {
+      const repo = target.repo;
+      if (!env.GITHUB_TOKEN) {
+        throw new Error("GitHub not configured on the Worker (GITHUB_TOKEN)");
       }
       const q = `repo:${repo} is:issue is:open label:${label} ${terms}`;
       // The search mode is named rather than left to GitHub's default, which is

@@ -7,7 +7,8 @@
 // tool rather than the start of a generic `github_dispatch`.
 //
 // The model's input is a title and a body. Everything else is the Worker's:
-// the repo (`GITHUB_REPO`, inside the client), the two triage labels and the
+// the repo (the repo list's default, `GITHUB_REPO`, resolved in the binding),
+// the two triage labels and the
 // footer naming the requester and the thread (`github-issue-render.ts`), added
 // here so the model can neither choose a label nor leave the footer out.
 //
@@ -21,6 +22,7 @@ import { getPermalink, postMessage, usersInfo } from "../slack/api";
 import {
   GithubRequestError,
   githubIssueClient,
+  resolveRepoFor,
   type CreatedIssue,
   type GithubIssueClient,
 } from "../integrations/github";
@@ -139,8 +141,12 @@ export async function executeGithubIssueCreate(
   input: Record<string, unknown>,
   slack: SlackContext,
 ): Promise<string> {
+  // The default repo, through the same resolver as every GitHub tool — so a
+  // misconfigured list refuses the filing rather than falling back to a repo.
+  const target = resolveRepoFor(env, undefined);
+  if (!target.ok) return JSON.stringify({ ok: false, status: "github_failed", error: target.error });
   return fileGithubIssue(input, {
-    github: githubIssueClient(env),
+    github: githubIssueClient(env, target.entry),
     async requesterName() {
       if (!slack.requestedBy) return "a Slack teammate";
       const res = await usersInfo(env, slack.requestedBy).catch(() => null);

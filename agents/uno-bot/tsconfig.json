@@ -11,6 +11,10 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    // For the one `.mjs` module the Worker imports: src/integrations/repo-list.mjs,
+    // which the offline checks also run, from outside any TypeScript toolchain.
+    // It carries `// @ts-check`, so it is typed like the rest.
+    "allowJs": true,
     "noEmit": true
   },
   "include": ["src/**/*.ts"]

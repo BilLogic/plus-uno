@@ -8,6 +8,9 @@
 // another label. The mapping is asserted where the model reads it — the JSON a
 // tool result carries.
 //
+// The repo is the resolver's: a listed one reaches the search as the list's
+// entry, and one off the list is refused before any search is asked for.
+//
 // The request the real search sends (repo, `is:open`, the label) is
 // `github-issue-client.test.ts`, over a stubbed fetch, beside the create.
 // Nothing here reaches the real API.
@@ -21,8 +24,16 @@ import {
   type GithubIssueSearch,
   type OpenIssue,
 } from "../src/integrations/github";
+import { parseRepoList, resolveRepo } from "../src/integrations/repo-list.mjs";
 
 const REPO = "BilLogic/plus-uno";
+const LIST = parseRepoList(
+  JSON.stringify([
+    { repo: REPO, purpose: "uno-bot and the harness", workflows: [] },
+    { repo: "BilLogic/plus-marketing-website", purpose: "the public marketing site", workflows: [] },
+  ]),
+  REPO,
+);
 
 const SEEDED: OpenIssue = {
   number: 702,
@@ -32,14 +43,13 @@ const SEEDED: OpenIssue = {
 };
 
 function fakeSearch(answer: () => OpenIssue[] | Error): GithubIssueSearch & {
-  asked: Array<{ label: string; terms: string }>;
+  asked: Array<{ repo: string; label: string; terms: string }>;
 } {
-  const asked: Array<{ label: string; terms: string }> = [];
+  const asked: Array<{ repo: string; label: string; terms: string }> = [];
   return {
-    repo: REPO,
     asked,
-    async searchOpenIssues(label, terms) {
-      asked.push({ label, terms });
+    async searchOpenIssues(target, label, terms) {
+      asked.push({ repo: target.repo, label, terms });
       const result = answer();
       if (result instanceof Error) throw result;
       return result;
@@ -57,14 +67,39 @@ interface SearchResult {
 }
 
 async function run(input: Record<string, unknown>, github: GithubIssueSearch): Promise<SearchResult> {
-  return JSON.parse(await findOpenIntakes(input, { github })) as SearchResult;
+  return JSON.parse(
+    await findOpenIntakes(input, { github, resolveRepo: (requested) => resolveRepo(LIST, requested) }),
+  ) as SearchResult;
 }
 
 test("the search is for open intakes — the intake label, the model's keywords", async () => {
   const github = fakeSearch(() => []);
   await run({ keywords: "github issue refuses" }, github);
 
-  assert.deepEqual(github.asked, [{ label: "harness-intake", terms: "github issue refuses" }]);
+  assert.deepEqual(github.asked, [{ repo: REPO, label: "harness-intake", terms: "github issue refuses" }]);
+});
+
+test("a listed repo is searched as the list spells it; no repo is the default", async () => {
+  const github = fakeSearch(() => []);
+  const named = await run({ keywords: "hero image", repo: "billogic/PLUS-marketing-website" }, github);
+  await run({ keywords: "hero image" }, github);
+
+  assert.equal(named.repo, "BilLogic/plus-marketing-website");
+  assert.deepEqual(
+    github.asked.map((a) => a.repo),
+    ["BilLogic/plus-marketing-website", REPO],
+  );
+});
+
+test("a repo off the list is refused, naming the list, and nothing is searched", async () => {
+  const github = fakeSearch(() => [SEEDED]);
+  const result = await run({ keywords: "hero image", repo: "someone/else" }, github);
+
+  assert.equal(result.ok, false);
+  assert.match(result.error!, /someone\/else/);
+  assert.match(result.error!, /BilLogic\/plus-uno\b/);
+  assert.match(result.error!, /BilLogic\/plus-marketing-website/);
+  assert.equal(github.asked.length, 0);
 });
 
 test("a likely duplicate comes back with its title and link, and the note offers the choice", async () => {
