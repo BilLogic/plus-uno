@@ -72,10 +72,20 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
   throw new Error(`no stub route for ${url}`);
 }) as typeof fetch;
 
-/** Thread history lands in a Durable Object; here it lands nowhere. */
+/** Thread history and the execution record land in a Durable Object; here
+ *  history lands nowhere, and the record's calls are kept to be asserted. */
+let executionCalls: string[] = [];
 const THREAD_STATE = {
   idFromName: () => "thread-state",
-  get: () => ({ appendHistory: async () => ({ length: 1 }) }),
+  get: () => ({
+    appendHistory: async () => ({ length: 1 }),
+    settleOperation: async (ts: string, index: number, ok: boolean) => {
+      executionCalls.push(`settle ${ts} ${index} ${ok}`);
+    },
+    endExecution: async (ts: string) => {
+      executionCalls.push(`end ${ts}`);
+    },
+  }),
 };
 
 function env(over: Partial<Record<string, string>> = {}): Env {
@@ -119,6 +129,27 @@ function executeVerdict(): Promise<typeof import("../src/agent/resolve-proposal"
 }
 
 const posts = () => calls.filter((c) => c.url.includes("chat.postMessage")).map((c) => c.body ?? {});
+
+test("an approved batch marks each operation as it comes back, then ends its execution record", async () => {
+  calls = [];
+  executionCalls = [];
+  const run = await executeVerdict();
+  await run(
+    env(),
+    won([
+      { toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "one" } },
+      { toolName: "not_a_tool", input: {} },
+    ]),
+  );
+  // In batch order, a failed operation settled like any other, and the end
+  // only once the outcome has been told — which is what a cut-off before it
+  // leaves standing for the next look to find.
+  assert.deepEqual(executionCalls, [
+    "settle 1700000000.000300 0 true",
+    "settle 1700000000.000300 1 false",
+    "end 1700000000.000300",
+  ]);
+});
 
 test("an approved relay reaches its recipient attributed to the requester, and confirms under the reply ts", async () => {
   calls = [];

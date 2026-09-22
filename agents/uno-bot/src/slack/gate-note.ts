@@ -80,5 +80,40 @@ export function renderGateNote(note: GateNote): string {
       );
     case "resolve-failed":
       return `:warning: I caught your :${note.glyph}: but hit a snag executing it — give it another go, or tell me and I'll retry.`;
+    case "cut-off":
+      return cutOffLine(note);
   }
+}
+
+/**
+ * An approved run that never reported back. Three things, in the order a
+ * person needs them: that it was cut off, what came back, and what did not —
+ * which may have happened, so it is never promised either way. Tool names are
+ * the only interpolation, and they are identifiers, so nothing here needs
+ * escaping.
+ */
+function cutOffLine(note: Extract<GateNote, { kind: "cut-off" }>): string {
+  const lines = [
+    ":warning: That approved run was cut off before it reported back, so this may not all have run.",
+  ];
+  if (note.finished.length) {
+    const done = note.finished
+      .map((op) => `\`${op.toolName}\` ${op.ok ? "done" : "failed"}`)
+      .join(", ");
+    lines.push(`Finished: ${done}.`);
+  }
+  if (note.unfinished.length) {
+    const open = note.unfinished.map((name) => `\`${name}\``).join(", ");
+    lines.push(
+      `Didn't report back: ${open} — ${note.unfinished.length === 1 ? "it" : "these"} may or may not have happened, so check before approving again.`,
+    );
+    lines.push(
+      note.restaged
+        ? "I've put just what didn't report back on a fresh card below. Nothing runs until you approve it."
+        : "Nothing was re-staged. Ask me if you want it set up again.",
+    );
+  } else {
+    lines.push("Everything came back, so there is nothing to run again.");
+  }
+  return lines.join("\n");
 }

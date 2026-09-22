@@ -45,9 +45,17 @@ export interface OperationOutcome {
 export async function runOperations(
   operations: ProposalOperation[],
   execute: (operation: ProposalOperation) => Promise<string>,
+  /**
+   * Told as each operation comes back, before the next one starts — how the
+   * execution record learns which side effects are done, so a run cut off
+   * part-way is never offered back whole (`ThreadState.settleOperation`). A
+   * failure here is logged and never stops the batch: the bookkeeping is not
+   * worth an approved operation.
+   */
+  onSettled?: (index: number, outcome: OperationOutcome) => Promise<void>,
 ): Promise<OperationOutcome[]> {
   const outcomes: OperationOutcome[] = [];
-  for (const operation of operations) {
+  for (const [index, operation] of operations.entries()) {
     let result: string;
     try {
       result = await execute(operation);
@@ -60,13 +68,21 @@ export async function runOperations(
       });
     }
     console.log(`[gate] ${operation.toolName} executed: ${result}`);
-    outcomes.push({
+    const outcome: OperationOutcome = {
       toolName: operation.toolName,
       input: operation.input,
       ok: isOkResult(result),
       result,
       message: describeOutcome(operation.toolName, result),
-    });
+    };
+    outcomes.push(outcome);
+    try {
+      await onSettled?.(index, outcome);
+    } catch (err) {
+      console.warn(
+        `[gate] ${operation.toolName} settled but not recorded: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
   }
   return outcomes;
 }

@@ -34,6 +34,7 @@ import { charge } from "../net";
 import type { AssistantContext } from "../slack/types";
 import type { ThreadState as ThreadStateDurableObject } from "../thread-state";
 import type {
+  Execution,
   HistoryTurn,
   PendingProposal,
   ProposalLookup,
@@ -120,6 +121,30 @@ export function createDurableObjectThreadState(
     // makes it one: of two racing resolvers exactly one hop returns true.
     claimProposal(proposalTs: string): Promise<boolean> {
       return hop().claimProposal(proposalTs);
+    },
+
+    // ----- executions -----
+
+    beginExecution(proposal: PendingProposal): Promise<void> {
+      return hop().beginExecution(proposal, now());
+    },
+
+    settleOperation(proposalTs: string, index: number, ok: boolean): Promise<void> {
+      return hop().settleOperation(proposalTs, index, ok);
+    },
+
+    endExecution(proposalTs: string): Promise<void> {
+      return hop().endExecution(proposalTs);
+    },
+
+    // A take, like the claim: the Durable Object's input gate is what lets
+    // exactly one of two looks at a stuck card come away with it.
+    takeCutOffExecution(proposalTs: string): Promise<Execution | null> {
+      return hop().takeCutOffExecution(proposalTs, now());
+    },
+
+    takeCutOffExecutionInThread(ref: ThreadRef): Promise<Execution | null> {
+      return hop().takeCutOffExecutionInThread(ref, now());
     },
 
     // ----- assistant context -----

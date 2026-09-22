@@ -236,7 +236,18 @@ export type GateNote =
    *  live cards: ask which one, and resolve none of them. */
   | { kind: "which-card"; count: number }
   /** The door caught the gesture and then failed to run it. */
-  | { kind: "resolve-failed"; glyph: string };
+  | { kind: "resolve-failed"; glyph: string }
+  /**
+   * An approved run that never reported back. `finished` is what came back,
+   * in batch order; `unfinished` never did, and may or may not have happened.
+   * `restaged` says a fresh card for `unfinished` follows this note.
+   */
+  | {
+      kind: "cut-off";
+      finished: Array<{ toolName: string; ok: boolean }>;
+      unfinished: string[];
+      restaged: boolean;
+    };
 
 /** What a post actually did. `text` is what was posted, which is not always
  *  what was handed in — the body is stripped and capped on the way out. */

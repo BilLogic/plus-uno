@@ -34,8 +34,9 @@
 // ones, so it would compile this file either way — `tsconfig.test.json`.)
 
 import { mapReaction, typedEmojiDecision, type Decision } from "./reactions";
-import { proposalOperations } from "../thread-state/index";
+import { proposalOperations, unfinishedOperations } from "../thread-state/index";
 import type {
+  Execution,
   PendingProposal,
   ProposalOperation,
   ThreadState,
@@ -150,6 +151,22 @@ export interface GateVerdict {
    */
   post: { note: GateNote; replyTs: string } | null;
   execute?: GateExecution;
+  /**
+   * Operations to put back in front of a person on a fresh card — set only on
+   * a cut-off verdict, and only for what never came back. Never executed from
+   * here: a re-staged card is a proposal like any other, and runs only on its
+   * own ✅. The door that holds a card builder stages it, after the note.
+   */
+  restage?: GateRestage;
+}
+
+/** What a cut-off verdict asks to have staged again. */
+export interface GateRestage {
+  /** The card that was approved and cut off; the fresh one keeps its
+   *  requester, thread and PRD. */
+  proposal: PendingProposal;
+  /** The operations that never came back, in batch order. Never empty. */
+  operations: ProposalOperation[];
 }
 
 export interface GateDeps {
@@ -230,6 +247,13 @@ export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise
       decision,
       post: { note: { kind: "expired" }, replyTs: replyTargetOf(signal) },
     };
+  }
+
+  if (found.state === "cut-off") {
+    // The card was approved and its run never reported back. Say so, and put
+    // what did not come back on a fresh card — never run it (see
+    // `cutOffVerdict`).
+    return cutOffVerdict(found.execution, decision);
   }
 
   if (found.state === "several") {
@@ -319,6 +343,21 @@ async function claim(
     };
   }
 
+  // Won, and about to run: record that it started, before anything can. The
+  // claim just consumed the card, so from here until the outcome is told this
+  // record is the only trace that an approved run exists — the one a later
+  // look reads when the run never reports back (`cutOffVerdict`). A failed
+  // write is logged and the run goes ahead untracked, as every run did before
+  // the record existed: refusing to run an approved card over bookkeeping
+  // would be a worse answer to the person than the rare untracked cut-off.
+  if (decision === "confirm") {
+    await deps.threadState.beginExecution(proposal).catch((err: unknown) => {
+      console.warn(
+        `[gate] execution record for ${proposal.proposalTs} not written: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    });
+  }
+
   return {
     outcome: "won",
     proposal,
@@ -348,6 +387,50 @@ async function claim(
 }
 
 /**
+ * What a later look at a cut-off run comes to: a note, and a fresh card for
+ * what never came back.
+ *
+ * `stale`, because nothing here is claimed or run. The note names what
+ * finished and what did not — an operation that never returned may still have
+ * happened, so the person is told to check before approving it again, and
+ * nothing is ever re-run on the strength of the original ✅. Completed
+ * operations are never re-staged; a batch that finished every operation and
+ * only failed to say so re-stages nothing at all.
+ *
+ * A ⛔ on the stuck card is answered with the note and no card: the person
+ * asked for nothing more to happen.
+ *
+ * Exported for Turn, whose next turn in the card's thread is the other later
+ * look: it takes the execution itself and brings it here.
+ */
+export function cutOffVerdict(execution: Execution, decision: Decision): GateVerdict {
+  const proposal = execution.proposal;
+  const operations = proposalOperations(proposal);
+  const unfinished = unfinishedOperations(execution);
+  const restaged = decision === "confirm" && unfinished.length > 0;
+  console.log(
+    `[gate] cut-off run on ${proposal.proposalTs}: settled=${execution.settled.length}/${operations.length} restaged=${restaged}`,
+  );
+  return {
+    outcome: "stale",
+    proposal,
+    decision,
+    post: {
+      note: {
+        kind: "cut-off",
+        finished: [...execution.settled]
+          .sort((a, b) => a.index - b.index)
+          .map((s) => ({ toolName: operations[s.index]?.toolName ?? proposal.toolName, ok: s.ok })),
+        unfinished: unfinished.map((op) => op.toolName),
+        restaged,
+      },
+      replyTs: replyTarget(proposal),
+    },
+    ...(restaged ? { restage: { proposal, operations: unfinished } } : {}),
+  };
+}
+
+/**
  * By card ts, then by reply thread — and, for an unthreaded DM line, across
  * the whole DM.
  *
@@ -365,6 +448,7 @@ async function locate(
   | { state: "found"; proposal: PendingProposal }
   | { state: "superseded" }
   | { state: "expired" }
+  | { state: "cut-off"; execution: Execution }
   | { state: "several"; count: number }
   | { state: "none" }
 > {
@@ -383,6 +467,13 @@ async function locate(
     // they acted on was replaced.
     if (byTs.state === "superseded") return { state: "superseded" };
     if (byTs.state === "expired") return { state: "expired" };
+    // No card under this ts — and the claim that consumed it may belong to a
+    // run that was cut off. Only a gesture ON the stuck card asks this: a
+    // reaction anywhere else must not collect another card's note.
+    const cutOff = await deps.threadState
+      .takeCutOffExecution(signal.messageTs)
+      .catch(() => null);
+    if (cutOff) return { state: "cut-off", execution: cutOff };
   }
 
   const ref = threadRefOf(signal);

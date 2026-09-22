@@ -23,6 +23,7 @@ import type { Env } from "../types";
 import { runReactionDoor, type ReactionDoorDeps } from "../gate/index";
 import { executeVerdict } from "../agent/resolve-proposal";
 import { threadStateFor } from "../thread-state/production";
+import { restageFor } from "../turn/env-deps";
 import type { SlackReactionAddedEvent } from "./events";
 import { conversationsReplies, getBotIdentity } from "./api";
 import { slackDelivery } from "./slack-delivery";
@@ -50,8 +51,9 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
  * else.
  */
 function reactionDoorDeps(env: Env): ReactionDoorDeps {
+  const threadState = threadStateFor(env);
   return {
-    threadState: threadStateFor(env),
+    threadState,
 
     delivery: (target) => slackDelivery(env, target),
 
@@ -66,5 +68,7 @@ function reactionDoorDeps(env: Env): ReactionDoorDeps {
     },
 
     applyVerdict: (verdict) => executeVerdict(env, verdict),
+
+    restage: restageFor(env, threadState),
   };
 }

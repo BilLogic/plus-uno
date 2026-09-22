@@ -77,6 +77,9 @@ export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<vo
   // failure, with an answer for each. `runOperations` owns that discipline; what
   // this file adds is the only thing it cannot have: `Env`, and the side-effect
   // tool table below.
+  // Each operation is marked in the execution record Gate opened at the claim
+  // as it comes back, so a run cut off part-way can be told apart from one
+  // that never started — and what finished is never offered back.
   const outcomes = await runOperations(run.operations, (operation) =>
     executeTool(env, operation.toolName, operation.input, {
       channel: run.channel,
@@ -96,6 +99,7 @@ export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<vo
       notionPrdId: run.notionPrdId,
       notionPrdUrl: run.notionPrdUrl,
     }),
+    (index, outcome) => store.settleOperation(pending.proposalTs, index, outcome.ok),
   );
 
   // Proposed, approved and executed as three separate numbers: the failure this
@@ -130,6 +134,20 @@ export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<vo
       text: resultMessage,
       ...(verdict.post?.replyTs ? { thread_ts: verdict.post.replyTs } : {}),
     });
+  }
+
+  // The outcome is recorded and told: the run is over. Anything that stops
+  // this function before here — an evicted isolate, a `waitUntil` past its
+  // budget, a throw — leaves the execution record standing, and the next look
+  // at the card or its thread says so (`gate/gate.ts` `cutOffVerdict`). Not
+  // best-effort in the other direction: a failed delete is a false "this was
+  // cut off" note later, so it is logged where it can be seen.
+  try {
+    await store.endExecution(pending.proposalTs);
+  } catch (err) {
+    console.error(
+      `[gate] execution record for ${pending.proposalTs} not cleared: ${err instanceof Error ? err.message : String(err)}`,
+    );
   }
 
   // D5: announce a successful reviewable artifact to #plus-design (right place
