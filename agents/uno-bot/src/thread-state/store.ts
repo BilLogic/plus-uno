@@ -97,6 +97,16 @@ export const CANCEL_TTL_MS = 5 * 60_000;
  */
 export const EXECUTION_CUTOFF_MS = 5 * 60 * 1000;
 
+/** How long past the cut-off the ThreadState alarm fires for a run nobody has
+ *  looked at. A little past it, not on it: a record the alarm finds is one
+ *  `takeCutOffExecution` will agree is cut off. */
+export const CUT_OFF_SWEEP_SLACK_MS = 30_000;
+
+/** How soon the alarm comes back to a cut-off run it handed over that is
+ *  still untaken — a hand-off that never arrived, or a note that did not post
+ *  and was released. Until the record's hour is up, when the GC drops it. */
+export const CUT_OFF_SWEEP_RETRY_MS = 2 * 60 * 1000;
+
 /** The conversation key of an unthreaded DM: every loose line of one DM
  *  resolves to it, so the whole DM is one conversation (see `ThreadRef`). The
  *  one statement of it — the Slack door, the stop door and the relay all key
@@ -246,6 +256,22 @@ export interface Execution {
   /** When a later look took it (see `takeCutOffExecution`). Set, the run is
    *  fenced: it stops at its next operation and tells no outcome. */
   takenAt?: number;
+}
+
+/**
+ * When the ThreadState alarm should next fire for this execution, or null
+ * when it never needs to: a taken record has been told about, and one past
+ * its hour is the GC's. One not yet cut off is due just past the threshold;
+ * one already past it is what `findCutOffExecutions` found and the alarm
+ * handed over, and is looked at again in `CUT_OFF_SWEEP_RETRY_MS` in case
+ * nobody took it.
+ */
+export function cutOffSweepAt(execution: Execution, now: number): number | null {
+  if (execution.takenAt !== undefined) return null;
+  const age = now - execution.startedAt;
+  if (age > PROPOSAL_TTL_MS) return null;
+  if (age > EXECUTION_CUTOFF_MS) return now + CUT_OFF_SWEEP_RETRY_MS;
+  return execution.startedAt + EXECUTION_CUTOFF_MS + CUT_OFF_SWEEP_SLACK_MS;
 }
 
 /** The operations of an execution that never came back, in batch order. */
@@ -535,6 +561,23 @@ export interface ThreadState {
    * `getProposalByThread` takes). The freshest cut-off execution there, taken.
    */
   takeCutOffExecutionInThread(ref: ThreadRef): Promise<Execution | null>;
+
+  /**
+   * Every execution a look could take right now — past `EXECUTION_CUTOFF_MS`,
+   * not taken, inside its hour — oldest first. Takes NOTHING: it is how the
+   * ThreadState alarm finds a cut-off run nobody has looked at, and each one it
+   * finds goes through `takeCutOffExecution` like any other look, so the alarm
+   * and a look racing still come to one note.
+   */
+  findCutOffExecutions(): Promise<Execution[]>;
+
+  /**
+   * Undo a take whose note never reached the thread, so the alarm's next pass
+   * or a later look can take it again. Only the alarm's path releases: a look
+   * has a person in front of it who saw the failure. An unknown or untaken ts
+   * is a no-op.
+   */
+  releaseCutOffExecution(proposalTs: string): Promise<void>;
 
   // ----- assistant context -----
 

@@ -16,6 +16,7 @@ import assert from "node:assert/strict";
 import {
   resolveSignal,
   runOperations,
+  tellCutOffRun,
   runReactionDoor,
   settleInto,
   type GateRestage,
@@ -23,8 +24,12 @@ import {
   type GateVerdict,
 } from "../src/gate/index";
 import {
+  CUT_OFF_SWEEP_RETRY_MS,
+  CUT_OFF_SWEEP_SLACK_MS,
   EXECUTION_CUTOFF_MS,
+  PROPOSAL_TTL_MS,
   createInMemoryThreadState,
+  cutOffSweepAt,
   type PendingProposal,
   type ProposalOperation,
   type ThreadState,
@@ -341,6 +346,143 @@ describe("the later looks", () => {
     assert.equal(delivery.gateNotes[0]?.kind, "cut-off");
     assert.deepEqual(restaged.map((r) => r.operations), [[BATCH[1], BATCH[2]]]);
     assert.equal(settled(delivery), "waiting-on-person");
+  });
+});
+
+describe("the alarm's look, when nobody else looks", () => {
+  async function cutOffStore(): Promise<{ store: ThreadState; time: ReturnType<typeof clock> }> {
+    const { store, time } = await staged();
+    await approveAndCutOff(store, 1);
+    time.advance(EXECUTION_CUTOFF_MS + 1);
+    return { store, time };
+  }
+
+  function sweepDeps(store: ThreadState, delivery: RecordingDelivery) {
+    const restaged: GateRestage[] = [];
+    const targets: unknown[] = [];
+    return {
+      restaged,
+      targets,
+      deps: {
+        threadState: store,
+        delivery: (target: unknown) => {
+          targets.push(target);
+          return delivery;
+        },
+        restage: async (r: GateRestage) => void restaged.push(r),
+      },
+    };
+  }
+
+  it("tells the requester in the card's thread and re-stages only the remainder", async () => {
+    const { store } = await cutOffStore();
+    const found = await store.findCutOffExecutions();
+    assert.deepEqual(found.map((e) => e.proposal.proposalTs), [CARD_TS]);
+
+    const delivery = recordingDelivery();
+    const sweep = sweepDeps(store, delivery);
+    assert.equal(await tellCutOffRun(CARD_TS, sweep.deps), "told");
+    assert.deepEqual(sweep.targets, [
+      { channel: CHANNEL, replyTs: THREAD, userMsgTs: PROPOSAL.userMsgTs, userId: "U1" },
+    ]);
+    assert.deepEqual(delivery.gateNotes, [
+      {
+        kind: "cut-off",
+        finished: [{ toolName: "notion_create", ok: true }],
+        unfinished: ["github_issue_create", "dm_relay"],
+        restaged: true,
+      },
+    ]);
+    assert.deepEqual(sweep.restaged.map((r) => r.operations), [[BATCH[1], BATCH[2]]]);
+    // Taken: the alarm's next pass finds nothing, and a look gets nothing.
+    assert.deepEqual(await store.findCutOffExecutions(), []);
+    assert.equal(await tellCutOffRun(CARD_TS, sweep.deps), "taken");
+    assert.equal(delivery.gateNotes.length, 1);
+  });
+
+  it("leaves a run still inside the threshold alone", async () => {
+    const { store, time } = await staged();
+    await approveAndCutOff(store, 1);
+    time.advance(EXECUTION_CUTOFF_MS);
+    const delivery = recordingDelivery();
+    assert.deepEqual(await store.findCutOffExecutions(), []);
+    assert.equal(await tellCutOffRun(CARD_TS, sweepDeps(store, delivery).deps), "taken");
+    assert.deepEqual(delivery.calls, []);
+  });
+
+  it("a run whose operations all came back gets the note and no card", async () => {
+    const { store, time } = await staged();
+    const verdict = await resolveSignal(press(), { threadState: store });
+    await runOperations(verdict.execute!.operations, async () => JSON.stringify({ ok: true }), settleInto(store, CARD_TS));
+    time.advance(EXECUTION_CUTOFF_MS + 1);
+    const delivery = recordingDelivery();
+    const sweep = sweepDeps(store, delivery);
+    assert.equal(await tellCutOffRun(CARD_TS, sweep.deps), "told");
+    assert.equal(delivery.gateNotes[0]?.kind, "cut-off");
+    assert.deepEqual(sweep.restaged, []);
+  });
+
+  it("a note that fails to post is released for the next pass, or a look", async () => {
+    const { store } = await cutOffStore();
+    const failing = recordingDelivery({ noteFails: true });
+    const first = sweepDeps(store, failing);
+    assert.equal(await tellCutOffRun(CARD_TS, first.deps), "released");
+    assert.deepEqual(first.restaged, [], "no card after a note nobody saw");
+
+    // Found again by the alarm, and told on its next pass.
+    assert.deepEqual((await store.findCutOffExecutions()).map((e) => e.proposal.proposalTs), [CARD_TS]);
+    const delivery = recordingDelivery();
+    const second = sweepDeps(store, delivery);
+    assert.equal(await tellCutOffRun(CARD_TS, second.deps), "told");
+    assert.equal(delivery.gateNotes.length, 1);
+    assert.deepEqual(second.restaged.map((r) => r.operations), [[BATCH[1], BATCH[2]]]);
+  });
+
+  it("the alarm and a look racing post one note between them", async () => {
+    const { store } = await cutOffStore();
+    const swept = recordingDelivery();
+    const looked = recordingDelivery();
+    const sweep = sweepDeps(store, swept);
+    const lookRestaged: GateRestage[] = [];
+    const [outcome] = await Promise.all([
+      tellCutOffRun(CARD_TS, sweep.deps),
+      runReactionDoor(
+        { channel: CHANNEL, messageTs: CARD_TS, glyph: "white_check_mark", userId: "U2" },
+        {
+          threadState: store,
+          delivery: () => looked,
+          threadRootOf: async () => THREAD,
+          botUserId: async () => "UBOT",
+          applyVerdict: async () => {},
+          restage: async (r) => void lookRestaged.push(r),
+        },
+      ),
+    ]);
+    const notes = [...swept.gateNotes, ...looked.gateNotes].filter((n) => n.kind === "cut-off");
+    assert.equal(notes.length, 1);
+    assert.equal(sweep.restaged.length + lookRestaged.length, 1);
+    assert.equal(outcome === "told", swept.gateNotes.length === 1);
+  });
+});
+
+describe("when the alarm wakes for an execution", () => {
+  const started = 1_700_000_000_000;
+  const execution = { proposal: PROPOSAL, startedAt: started, settled: [] };
+
+  it("just past the cut-off, while it may still be running", () => {
+    const due = started + EXECUTION_CUTOFF_MS + CUT_OFF_SWEEP_SLACK_MS;
+    assert.equal(cutOffSweepAt(execution, started), due);
+    assert.equal(cutOffSweepAt(execution, started + EXECUTION_CUTOFF_MS), due);
+  });
+
+  it("again shortly, once it is cut off and nobody has taken it", () => {
+    const now = started + EXECUTION_CUTOFF_MS + 1;
+    assert.equal(cutOffSweepAt(execution, now), now + CUT_OFF_SWEEP_RETRY_MS);
+  });
+
+  it("never, once taken or past its hour", () => {
+    assert.equal(cutOffSweepAt({ ...execution, takenAt: started + 1 }, started + 2), null);
+    assert.equal(cutOffSweepAt(execution, started + PROPOSAL_TTL_MS + 1), null);
   });
 });
 

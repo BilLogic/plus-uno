@@ -147,6 +147,14 @@ export function createDurableObjectThreadState(
       return hop().takeCutOffExecutionInThread(ref, now());
     },
 
+    findCutOffExecutions(): Promise<Execution[]> {
+      return hop().findCutOffExecutions(now());
+    },
+
+    releaseCutOffExecution(proposalTs: string): Promise<void> {
+      return hop().releaseCutOffExecution(proposalTs);
+    },
+
     // ----- assistant context -----
 
     getAssistantContext(ref: ThreadRef): Promise<AssistantContext | null> {

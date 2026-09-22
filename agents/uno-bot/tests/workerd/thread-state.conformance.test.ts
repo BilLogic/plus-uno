@@ -15,11 +15,19 @@
 // suite's "a FRESH, empty store per test" contract holds against durable
 // storage. The adapter's production keying — one global `idFromName("uno-bot")`
 // instance — is what runs when nobody passes it.
-import { env } from "cloudflare:test";
+import { env, runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { describe, expect, it } from "vitest";
 
 import { internalSubrequestsUsed, runMetered } from "../../src/net";
+import type { ThreadStateAlarmDeps } from "../../src/thread-state";
 import { createDurableObjectThreadState } from "../../src/thread-state/durable-object";
+import {
+  CUT_OFF_SWEEP_RETRY_MS,
+  CUT_OFF_SWEEP_SLACK_MS,
+  EXECUTION_CUTOFF_MS,
+  type Execution,
+  type PendingProposal,
+} from "../../src/thread-state/store";
 import { runThreadStateConformance } from "../helpers/thread-state-conformance";
 
 // `cloudflare:test`'s env is the wrangler config's bindings; the namespace is
@@ -77,5 +85,99 @@ describe("[durable-object] the subrequest charge", () => {
       return internalSubrequestsUsed();
     });
     expect(spent).toBe(3);
+  });
+});
+
+// The alarm, which only the Durable Object has: it is armed just past the
+// cut-off by the claim that opens an execution, keeps an earlier alarm rather
+// than pushing it back, and on firing hands a cut-off run nobody took to the
+// Worker — then comes back for it until somebody does.
+describe("[durable-object] the cut-off alarm", () => {
+  const PROPOSAL: PendingProposal = {
+    toolName: "notion_create",
+    input: { title: "One" },
+    channel: "C1",
+    threadTs: "1700.1",
+    userMsgTs: "1700.0",
+    proposalTs: "1700.2",
+    proposalText: "Create the card?",
+    requesterUserId: "U1",
+  };
+
+  function fresh(now?: () => number) {
+    const instance = `alarm-${instanceCounter++}`;
+    const store = createDurableObjectThreadState({ namespace, instance, ...(now ? { now } : {}) });
+    const stub = namespace.get(namespace.idFromName(instance));
+    const alarm = () => runInDurableObject(stub, (_o, state) => state.storage.getAlarm());
+    return { store, stub, alarm };
+  }
+
+  it("is armed just past the cut-off when an execution begins", async () => {
+    const { store, alarm } = fresh();
+    const before = Date.now();
+    await store.beginExecution(PROPOSAL);
+    const at = await alarm();
+    expect(at).toBeGreaterThanOrEqual(before + EXECUTION_CUTOFF_MS + CUT_OFF_SWEEP_SLACK_MS);
+    expect(at).toBeLessThanOrEqual(Date.now() + EXECUTION_CUTOFF_MS + CUT_OFF_SWEEP_SLACK_MS);
+  });
+
+  it("keeps an earlier alarm, and pulls a later one in", async () => {
+    const early = fresh();
+    const soon = Date.now() + 60_000;
+    await runInDurableObject(early.stub, (_o, state) => state.storage.setAlarm(soon));
+    await early.store.beginExecution(PROPOSAL);
+    expect(await early.alarm()).toBe(soon);
+
+    const late = fresh();
+    const tomorrow = Date.now() + 24 * 60 * 60 * 1000;
+    await runInDurableObject(late.stub, (_o, state) => state.storage.setAlarm(tomorrow));
+    await late.store.beginExecution(PROPOSAL);
+    expect(await late.alarm()).toBeLessThan(tomorrow);
+  });
+
+  it("hands over a cut-off run nobody took, and comes back for it", async () => {
+    const { store, stub, alarm } = fresh(() => Date.now() - EXECUTION_CUTOFF_MS - 1_000);
+    await store.beginExecution(PROPOSAL);
+    const handed: Execution[][] = [];
+    await runInDurableObject(stub, (o) => {
+      (o as unknown as { alarmDeps: ThreadStateAlarmDeps }).alarmDeps = {
+        handOffCutOffRuns: async (due) => void handed.push(due),
+      };
+    });
+    const before = Date.now();
+    expect(await runDurableObjectAlarm(stub)).toBe(true);
+    expect(handed.map((due) => due.map((e) => e.proposal.proposalTs))).toEqual([["1700.2"]]);
+    const at = await alarm();
+    expect(at).toBeGreaterThanOrEqual(before + CUT_OFF_SWEEP_RETRY_MS);
+    expect(at).toBeLessThanOrEqual(Date.now() + CUT_OFF_SWEEP_RETRY_MS);
+  });
+
+  it("hands over nothing while a run is inside the threshold, and wakes at its cut-off", async () => {
+    const { store, stub, alarm } = fresh();
+    await store.beginExecution(PROPOSAL);
+    const handed: Execution[][] = [];
+    await runInDurableObject(stub, (o) => {
+      (o as unknown as { alarmDeps: ThreadStateAlarmDeps }).alarmDeps = {
+        handOffCutOffRuns: async (due) => void handed.push(due),
+      };
+    });
+    const armed = (await alarm())!;
+    expect(await runDurableObjectAlarm(stub)).toBe(true);
+    expect(handed).toEqual([]);
+    // Re-armed from the record's own start, which is the caller's clock: the
+    // same moment to within the hop.
+    expect(Math.abs((await alarm())! - armed)).toBeLessThan(1_000);
+  });
+
+  it("stops coming back once a look has taken the run", async () => {
+    let skew = EXECUTION_CUTOFF_MS + 1_000;
+    const { store, stub, alarm } = fresh(() => Date.now() - skew);
+    await store.beginExecution(PROPOSAL);
+    skew = 0;
+    expect(await store.takeCutOffExecution("1700.2")).not.toBeNull();
+    const before = Date.now();
+    expect(await runDurableObjectAlarm(stub)).toBe(true);
+    // Only the daily sweep is left: the record stays for its hour, untold twice.
+    expect(await alarm()).toBeGreaterThan(before + 60 * 60 * 1000);
   });
 });

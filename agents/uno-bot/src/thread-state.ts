@@ -19,7 +19,8 @@
 // `compactHistory`, `putProposal`, `retireProposal`, `getProposalByTs`,
 // `getProposalByThread`, `getProposalsByChannel`, `claimProposal`,
 // `beginExecution`, `settleOperation`, `endExecution`, `takeCutOffExecution`,
-// `takeCutOffExecutionInThread`, `get/putAssistantContext`, `requestCancel`,
+// `takeCutOffExecutionInThread`, `findCutOffExecutions`,
+// `releaseCutOffExecution`, `get/putAssistantContext`, `requestCancel`,
 // `consumeCancel`, `cancelForUser`, `setActiveRun`, `checkAndRecordEvent`,
 // `claimRun`, `markRunDone`. A rename is a type error rather than a runtime
 // 404, which is the whole point.
@@ -45,12 +46,15 @@ import { DurableObject } from "cloudflare:workers";
 import type { Env } from "./types";
 import {
   CANCEL_TTL_MS,
+  CUT_OFF_SWEEP_RETRY_MS,
+  CUT_OFF_SWEEP_SLACK_MS,
   EVENT_DEDUP_TTL_MS,
   EXECUTION_CUTOFF_MS,
   HISTORY_TTL_MS,
   MAX_HISTORY_TURNS,
   PROPOSAL_TTL_MS,
   RUN_LEASE_MS,
+  cutOffSweepAt,
   proposalReplyThread,
   type Execution,
   type HistoryTurn,
@@ -99,14 +103,33 @@ interface EventRecord {
 // never deleted. A daily sweep keeps storage bounded (review 2026-07-12).
 const GC_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
+/**
+ * What the alarm is handed, by name, by the Worker entry that exports this
+ * class (`src/index.ts`) — never `Env`.
+ *
+ * The alarm FINDS a cut-off run nobody has looked at; telling the thread is
+ * the Worker's. Posting from here would mean Slack and card reads inside this
+ * class, and the re-staged card is written back through the ThreadState stub,
+ * which from inside this object is a call to itself behind its own input gate
+ * (see `src/agent-runner.ts`). So the found records are handed over, and the
+ * take, the note and the card happen outside, on the path every look takes.
+ */
+export interface ThreadStateAlarmDeps {
+  /** Hand over executions `findCutOffExecutions` found. Takes nothing and
+   *  may fail: a record nobody took is found again on the next pass. */
+  handOffCutOffRuns?(due: Execution[]): Promise<void>;
+}
+
 // Extends the `cloudflare:workers` base class — that is what makes the public
 // methods below callable as Durable Object RPC (compatibility_date 2026-05-01).
 export class ThreadState extends DurableObject<Env> {
   private storage: DurableObjectStorage;
+  private alarmDeps: ThreadStateAlarmDeps;
 
-  constructor(state: DurableObjectState, env: Env) {
+  constructor(state: DurableObjectState, env: Env, alarmDeps: ThreadStateAlarmDeps = {}) {
     super(state, env);
     this.storage = state.storage;
+    this.alarmDeps = alarmDeps;
   }
 
   // Ensure a GC alarm is scheduled. Cheap (one storage read) and idempotent —
@@ -118,12 +141,34 @@ export class ThreadState extends DurableObject<Env> {
     }
   }
 
-  // Delete expired records by their own TTL, then reschedule if anything remains.
-  // Keys: event:{id} (EVENT_DEDUP_TTL_MS), hist:{…} (HISTORY_TTL_MS),
-  // prop:{ts} and exec:{ts} (PROPOSAL_TTL_MS). Runs at most once a day.
+  // A Durable Object has ONE alarm, so every reason to wake shares it: an
+  // earlier alarm already set is kept, never pushed back by a later one. The
+  // alarm that is firing may still read back while its handler runs, and is
+  // not a sooner one to keep.
+  private async armAlarmBy(at: number, firing = false): Promise<void> {
+    const existing = await this.storage.getAlarm();
+    const keep = existing !== null && existing <= at && !(firing && existing <= Date.now());
+    if (!keep) await this.storage.setAlarm(at);
+  }
+
+  // First, hand over any cut-off run nobody has looked at, so its requester is
+  // told before the record ages out. Then delete expired records by their own
+  // TTL. Keys: event:{id} (EVENT_DEDUP_TTL_MS), hist:{…} (HISTORY_TTL_MS),
+  // prop:{ts} and exec:{ts} (PROPOSAL_TTL_MS). Then re-arm for whichever
+  // comes first: the next day's sweep, or the next execution due a look.
   async alarm(): Promise<void> {
     const now = Date.now();
     let remaining = 0;
+    let next = Infinity;
+
+    const due = await this.findCutOffExecutions(now);
+    if (due.length > 0 && this.alarmDeps.handOffCutOffRuns) {
+      await this.alarmDeps.handOffCutOffRuns(due).catch((err: unknown) => {
+        console.error(
+          `[thread-state] cut-off hand-off failed (${due.length}): ${err instanceof Error ? err.message : String(err)}`,
+        );
+      });
+    }
 
     const events = await this.storage.list<EventRecord>({ prefix: "event:" });
     for (const [key, rec] of events) {
@@ -142,8 +187,12 @@ export class ThreadState extends DurableObject<Env> {
     }
     const execs = await this.storage.list<Execution>({ prefix: "exec:" });
     for (const [key, rec] of execs) {
-      if (now - rec.startedAt > PROPOSAL_TTL_MS) await this.storage.delete(key);
-      else remaining++;
+      if (now - rec.startedAt > PROPOSAL_TTL_MS) {
+        await this.storage.delete(key);
+        continue;
+      }
+      remaining++;
+      next = Math.min(next, cutOffSweepAt(rec, now) ?? Infinity);
     }
     // Active-run pointers: one key per user, overwritten each turn, so this is
     // a bounded set rather than a leak — but a pointer older than its TTL can
@@ -160,7 +209,8 @@ export class ThreadState extends DurableObject<Env> {
       else remaining++;
     }
 
-    if (remaining > 0) await this.storage.setAlarm(now + GC_INTERVAL_MS);
+    if (remaining > 0) next = Math.min(next, now + GC_INTERVAL_MS);
+    if (next !== Infinity) await this.armAlarmBy(next, true);
   }
 
   // ══ The ThreadState RPC surface ════════════════════════════════════════════
@@ -364,7 +414,9 @@ export class ThreadState extends DurableObject<Env> {
       startedAt: at,
       settled: [],
     });
-    await this.ensureGcAlarm();
+    // Woken just past the cut-off, so a run nobody looks at is still told.
+    // The alarm reads its own clock, so it is armed on that clock too.
+    await this.armAlarmBy(Date.now() + EXECUTION_CUTOFF_MS + CUT_OFF_SWEEP_SLACK_MS);
   }
 
   // The fence: a taken execution is reported to the run that is still settling
@@ -421,6 +473,28 @@ export class ThreadState extends DurableObject<Env> {
     if (!best) return null;
     await this.storage.put<Execution>(executionKey(best.proposal.proposalTs), { ...best, takenAt: at });
     return best;
+  }
+
+  async findCutOffExecutions(at: number): Promise<Execution[]> {
+    const all = await this.storage.list<Execution>({ prefix: "exec:" });
+    const found: Execution[] = [];
+    for (const rec of all.values()) {
+      if (rec.takenAt !== undefined) continue;
+      const age = at - rec.startedAt;
+      if (age <= EXECUTION_CUTOFF_MS || age > PROPOSAL_TTL_MS) continue;
+      found.push(rec);
+    }
+    return found.sort((a, b) => a.startedAt - b.startedAt);
+  }
+
+  // The alarm comes back for it, as it does for any hand-off nobody took.
+  async releaseCutOffExecution(proposalTs: string): Promise<void> {
+    const key = executionKey(proposalTs);
+    const rec = await this.storage.get<Execution>(key);
+    if (!rec || rec.takenAt === undefined) return;
+    const { takenAt: _taken, ...untaken } = rec;
+    await this.storage.put<Execution>(key, untaken);
+    await this.armAlarmBy(Date.now() + CUT_OFF_SWEEP_RETRY_MS);
   }
 
   // ----- assistant context -----

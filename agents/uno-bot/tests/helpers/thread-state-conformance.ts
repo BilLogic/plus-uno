@@ -613,6 +613,93 @@ export function runThreadStateConformance(
     assert.equal(await store.takeCutOffExecution("1700.2"), null);
   });
 
+  // The alarm's pass. It FINDS a cut-off run nobody has looked at and takes
+  // nothing — each one it finds goes through the same take a look makes, so
+  // an alarm and a look racing still come to one note.
+
+  it("the alarm's find leaves a run still inside the threshold alone", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal());
+    clock.advance(EXECUTION_CUTOFF_MS);
+    assert.deepEqual(await store.findCutOffExecutions(), []);
+  });
+
+  it("the alarm's find lists a cut-off run, oldest first, and takes nothing", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal({ operations: BATCH }));
+    await store.settleOperation("1700.2", 0, true);
+    clock.advance(1);
+    await store.beginExecution(proposal({ proposalTs: "1700.3" }));
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    const found = await store.findCutOffExecutions();
+    assert.deepEqual(found.map((e) => e.proposal.proposalTs), ["1700.2", "1700.3"]);
+    assert.deepEqual(found[0]?.settled, [{ index: 0, ok: true }]);
+    // Found twice, still there to take: finding is not taking.
+    assert.equal((await store.findCutOffExecutions()).length, 2);
+    assert.ok(await store.takeCutOffExecution("1700.2"));
+    assert.deepEqual(await store.settleOperation("1700.2", 1, true), { taken: true });
+  });
+
+  it("the alarm's find skips a run a look took, one that ended, and one past its hour", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal({ proposalTs: "1700.2" }));
+    await store.beginExecution(proposal({ proposalTs: "1700.3" }));
+    await store.endExecution("1700.3");
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    assert.ok(await store.takeCutOffExecution("1700.2"));
+    assert.deepEqual(await store.findCutOffExecutions(), []);
+
+    const { store: old, clock: later } = setup();
+    await old.beginExecution(proposal());
+    later.advance(PROPOSAL_TTL_MS + 1);
+    assert.deepEqual(await old.findCutOffExecutions(), []);
+  });
+
+  it("the alarm's find and a look racing leave one taker", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal());
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    const [found, ...looks] = await Promise.all([
+      store.findCutOffExecutions(),
+      store.takeCutOffExecution("1700.2"),
+      store.takeCutOffExecution("1700.2"),
+    ]);
+    assert.equal(looks.filter(Boolean).length, 1);
+    // Whatever the find saw, the alarm's own take now finds it gone.
+    assert.ok(Array.isArray(found));
+    assert.equal(await store.takeCutOffExecution("1700.2"), null);
+  });
+
+  it("a released take can be taken again, and found again", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal({ operations: BATCH }));
+    await store.settleOperation("1700.2", 0, true);
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    assert.ok(await store.takeCutOffExecution("1700.2"));
+    await store.releaseCutOffExecution("1700.2");
+    // Untaken again: the fence is down, and what came back is kept.
+    assert.deepEqual(await store.settleOperation("1700.2", 1, false), { taken: false });
+    assert.deepEqual((await store.findCutOffExecutions()).map((e) => e.proposal.proposalTs), ["1700.2"]);
+    const again = await store.takeCutOffExecution("1700.2");
+    assert.deepEqual(again?.settled, [
+      { index: 0, ok: true },
+      { index: 1, ok: false },
+    ]);
+  });
+
+  it("releasing an untaken, ended or unknown execution changes nothing", async () => {
+    const { store, clock } = setup();
+    await store.releaseCutOffExecution("1700.9");
+    await store.beginExecution(proposal());
+    await store.releaseCutOffExecution("1700.2");
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    assert.ok(await store.takeCutOffExecution("1700.2"));
+    await store.endExecution("1700.2");
+    await store.releaseCutOffExecution("1700.2");
+    assert.deepEqual(await store.findCutOffExecutions(), []);
+    assert.equal(await store.takeCutOffExecution("1700.2"), null);
+  });
+
   it("an execution leaves the proposal lookups alone", async () => {
     const { store } = setup();
     await store.putProposal(proposal());

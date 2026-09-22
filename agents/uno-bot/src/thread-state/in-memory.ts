@@ -265,6 +265,22 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       return best ? takeIfCutOff(best.proposal.proposalTs) : null;
     },
 
+    async findCutOffExecutions() {
+      const found: Execution[] = [];
+      for (const rec of executions.values()) {
+        if (rec.takenAt !== undefined) continue;
+        const age = now() - rec.startedAt;
+        if (age <= EXECUTION_CUTOFF_MS || age > PROPOSAL_TTL_MS) continue;
+        found.push({ ...rec, settled: [...rec.settled] });
+      }
+      return found.sort((a, b) => a.startedAt - b.startedAt);
+    },
+
+    async releaseCutOffExecution(proposalTs) {
+      const rec = executions.get(proposalTs);
+      if (rec) delete rec.takenAt;
+    },
+
     // ----- assistant context -----
 
     async getAssistantContext(ref) {
