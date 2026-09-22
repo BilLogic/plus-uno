@@ -49,13 +49,16 @@ const inThread = (threadTs: string, ts: string, text: string): TurnRequest =>
     text,
   });
 
-/** Run a turn with the pending card the Slack door would have read for it. */
+/** Run a turn as the Slack door would: the pending card read on the card's
+ *  thread, and the history read on the conversation — an agent_view DM has
+ *  no Slack thread to rebuild it from, so the store is its only source. */
 async function turn(h: Harness, req: TurnRequest): Promise<TurnOutcome> {
   const pending = await h.threadState.getProposalByThread({
     channel: req.channel,
     thread: cardThreadOf(req),
   });
-  return runTurn({ ...req, pending }, h.deps);
+  const history = await h.threadState.readHistory({ channel: req.channel, thread: req.conversationTs });
+  return runTurn({ ...req, pending, history }, h.deps);
 }
 
 const CARD_A = {
@@ -117,6 +120,45 @@ test("a ✅ typed inside the earlier card's thread runs that card, and only that
   assert.equal((await h.threadState.getProposalByTs(cardB)).state, "found");
 });
 
+test("the model's proposal_resolve in the earlier thread runs that card, and leaves the later one", async () => {
+  const { h, cardA, cardB } = await twoThreadsTwoCards([
+    { toolCalls: [{ name: "proposal_resolve", args: { decision: "confirm", message_to_user: "Doing it." } }] },
+  ]);
+  const outcome = await turn(h, inThread(ASK_A, "1700000000.000700", "yes, go ahead"));
+
+  assert.equal(outcome.disposition, "resolved");
+  assert.deepEqual(
+    h.resolved.map((r) => [r.decision, r.executed]),
+    [["confirm", true]],
+  );
+  assert.equal((await h.threadState.getProposalByTs(cardA)).state, "none", "claimed");
+  assert.equal((await h.threadState.getProposalByTs(cardB)).state, "found");
+});
+
+test("the second unthreaded ask still reads the first ask's exchange: history stays on the DM", async () => {
+  const { h } = await twoThreadsTwoCards();
+  // The second ask's model call carried the first ask's words.
+  const conversation = JSON.stringify(h.provider.started?.conversation ?? []);
+  assert.match(conversation, /comment on the issue and close it/);
+  assert.match(conversation, /run the render walk/);
+});
+
+test("a ✅ reaction on a non-card message in a DM thread points at that thread's card", async () => {
+  const { h, cardA, cardB } = await twoThreadsTwoCards();
+  // On the person's own ask, which heads the thread card A sits in.
+  const verdict = await resolveSignal(
+    { kind: "reaction", messageTs: ASK_A, channel: DM, thread: ASK_A, glyph: "white_check_mark", userId: "U1" },
+    { threadState: h.threadState },
+  );
+
+  assert.equal(verdict.outcome, "none");
+  assert.equal(verdict.execute, undefined);
+  assert.equal(verdict.post?.note.kind, "not-on-the-card");
+  assert.equal(verdict.proposal?.proposalTs, cardA);
+  assert.equal((await h.threadState.getProposalByTs(cardA)).state, "found");
+  assert.equal((await h.threadState.getProposalByTs(cardB)).state, "found");
+});
+
 test("a revision inside the same DM thread still supersedes that thread's card", async () => {
   const { h, cardA, cardB } = await twoThreadsTwoCards([
     { text: "Revised.", toolCalls: [{ name: "notion_create", args: { title: "Card A, revised" } }] },
@@ -167,6 +209,23 @@ test("an unthreaded ✅ with several live cards in the DM asks which, and runs n
   assert.match(line, /nothing was executed/);
   assert.equal((await h.threadState.getProposalByTs(cardA)).state, "found");
   assert.equal((await h.threadState.getProposalByTs(cardB)).state, "found");
+});
+
+test("an unthreaded ✅ counts a card staged from inside a DM thread too, and asks", async () => {
+  // Card B is staged from a reply typed inside a thread, so it is filed under
+  // that thread rather than "dm". Counting only "dm" would see one card, and
+  // the ✅ would run card A without asking.
+  const h = harness({ replies: [CARD_A, CARD_B] });
+  const a = await turn(h, dmLine(ASK_A, "comment on the issue and close it"));
+  const b = await turn(h, inThread(ASK_B, "1700000000.000650", "and run the render walk"));
+  assert.equal(b.staged?.proposal.threadTs, ASK_B);
+
+  const outcome = await turn(h, dmLine("1700000000.000800", "✅"));
+
+  assert.equal(outcome.disposition, "resolved");
+  assert.deepEqual(h.resolved, []);
+  assert.deepEqual(h.delivery.gateNotes, [{ kind: "which-card", count: 2 }]);
+  assert.equal((await h.threadState.getProposalByTs(a.staged!.proposal.proposalTs)).state, "found");
 });
 
 test("an unthreaded ✅ with no card anywhere in the DM goes to the model", async () => {

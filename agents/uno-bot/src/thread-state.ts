@@ -16,7 +16,7 @@
 // Every public method below is Durable Object RPC and its signature IS the
 // `src/thread-state` interface: `readHistory`, `appendHistory`,
 // `compactHistory`, `putProposal`, `retireProposal`, `getProposalByTs`,
-// `getProposalByThread`, `getProposalsByConversation`, `claimProposal`, `get/putAssistantContext`, `requestCancel`,
+// `getProposalByThread`, `getProposalsByChannel`, `claimProposal`, `get/putAssistantContext`, `requestCancel`,
 // `consumeCancel`, `cancelForUser`, `setActiveRun`, `checkAndRecordEvent`,
 // `claimRun`, `markRunDone`. A rename is a type error rather than a runtime
 // 404, which is the whole point.
@@ -306,16 +306,16 @@ export class ThreadState extends DurableObject<Env> {
     return (best?.payload as PendingProposal | undefined) ?? null;
   }
 
-  // Same scan at conversation grain, newest first: which cards are live
-  // anywhere in it — what an unthreaded ✅ in a DM has to ask.
-  async getProposalsByConversation(ref: ThreadRef, at: number): Promise<PendingProposal[]> {
+  // Same scan at channel grain, newest first: which cards are live anywhere in
+  // it, from any thread — what an unthreaded ✅ in a DM has to ask.
+  async getProposalsByChannel(channel: string, at: number): Promise<PendingProposal[]> {
     const all = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
     const live: ProposalRecord[] = [];
     for (const rec of all.values()) {
       if (at - rec.createdAt > PROPOSAL_TTL_MS) continue;
       if (rec.supersededBy || rec.retired) continue;
       const proposal = rec.payload as PendingProposal | null;
-      if (!proposal || proposal.channel !== ref.channel || proposal.threadTs !== ref.thread) continue;
+      if (!proposal || proposal.channel !== channel) continue;
       live.push(rec);
     }
     return live

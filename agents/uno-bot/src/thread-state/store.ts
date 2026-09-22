@@ -385,14 +385,16 @@ export interface ThreadState {
   getProposalByThread(ref: ThreadRef): Promise<PendingProposal | null>;
 
   /**
-   * Every live proposal staged in a CONVERSATION (`PendingProposal.threadTs`),
-   * newest first — retired, superseded and aged-out cards left out.
+   * Every live proposal in a CHANNEL, whatever thread or conversation it was
+   * staged from, newest first — retired, superseded and aged-out cards left out.
    *
    * The one reader is a gate emoji typed as an unthreaded DM line: it sits in
-   * no card's thread, so it answers the conversation's only card, and asks
-   * which when there are several rather than guess.
+   * no card's thread, so it answers the DM's only card, and asks which when
+   * there are several rather than guess. The whole channel, not the `"dm"`
+   * conversation: a card staged from a reply inside a DM thread is filed under
+   * that thread, and missing it would let the ✅ run the other card unasked.
    */
-  getProposalsByConversation(ref: ThreadRef): Promise<PendingProposal[]>;
+  getProposalsByChannel(channel: string): Promise<PendingProposal[]>;
 
   /**
    * Take exclusive ownership of a proposal, or report that someone else has it.

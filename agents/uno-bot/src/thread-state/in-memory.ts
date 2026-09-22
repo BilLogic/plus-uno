@@ -186,11 +186,11 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       return best?.proposal ?? null;
     },
 
-    async getProposalsByConversation(ref) {
+    async getProposalsByChannel(channel) {
       return [...proposals.values()]
         .filter((rec) => now() - rec.createdAt <= PROPOSAL_TTL_MS)
         .filter((rec) => !rec.supersededBy && !rec.retired)
-        .filter((rec) => rec.proposal.channel === ref.channel && rec.proposal.threadTs === ref.thread)
+        .filter((rec) => rec.proposal.channel === channel)
         .sort((a, b) => b.createdAt - a.createdAt)
         .map((rec) => rec.proposal);
     },

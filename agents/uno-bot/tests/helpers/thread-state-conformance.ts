@@ -347,28 +347,44 @@ export function runThreadStateConformance(
     assert.equal(await store.getProposalByThread({ channel: "D1", thread: "dm" }), null);
   });
 
-  // What an unthreaded ✅ in a DM needs: every card still live in the
-  // conversation, newest first, so one card resolves and several ask which.
-  it("get-by-conversation lists the live cards of a DM conversation, newest first", async () => {
+  // What an unthreaded ✅ in a DM needs: every card still live anywhere in the
+  // DM, newest first, so one card resolves and several ask which. ANYWHERE —
+  // a card staged from a reply inside a DM thread is filed under that thread,
+  // and a list that missed it would let the ✅ run the other card unasked.
+  it("get-by-channel lists every live card in a DM, from any thread, newest first", async () => {
     const { store, clock } = setup();
     const dm = { channel: "D1", threadTs: "dm" };
     await store.putProposal(proposal({ ...dm, proposalTs: "1700.2", replyTs: "1700.1" }));
     clock.advance(1_000);
     await store.putProposal(proposal({ ...dm, proposalTs: "1700.5", replyTs: "1700.4" }));
     clock.advance(1_000);
+    // Retired ahead of a revision: out.
     await store.putProposal(proposal({ ...dm, proposalTs: "1700.8", replyTs: "1700.7" }));
     await store.retireProposal("1700.8");
-    // Another conversation, and another channel, are nobody's here.
+    clock.advance(1_000);
+    // Superseded by a revision in its own thread: out; the revision is in.
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.11", replyTs: "1700.10" }));
+    clock.advance(1_000);
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.12", replyTs: "1700.10" }));
+    clock.advance(1_000);
+    // Staged from a reply inside a DM thread, so filed under that thread: in.
     await store.putProposal(proposal({ channel: "D1", threadTs: "1700.3", proposalTs: "1700.6", replyTs: "1700.3" }));
+    clock.advance(1_000);
+    // A record from before `replyTs` existed: in.
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.13" }));
+    // Another channel is nobody's here.
     await store.putProposal(proposal({ channel: "D2", threadTs: "dm", proposalTs: "1700.9", replyTs: "1700.9" }));
 
-    const live = await store.getProposalsByConversation({ channel: "D1", thread: "dm" });
-    assert.deepEqual(live.map((p) => p.proposalTs), ["1700.5", "1700.2"]);
-
-    clock.advance(PROPOSAL_TTL_MS - 1_500); // 1700.2 has aged out; 1700.5 has not
+    const live = await store.getProposalsByChannel("D1");
     assert.deepEqual(
-      (await store.getProposalsByConversation({ channel: "D1", thread: "dm" })).map((p) => p.proposalTs),
-      ["1700.5"],
+      live.map((p) => p.proposalTs),
+      ["1700.13", "1700.6", "1700.12", "1700.5", "1700.2"],
+    );
+
+    clock.advance(PROPOSAL_TTL_MS - 5_500); // 1700.2 has aged out; 1700.5 has not
+    assert.deepEqual(
+      (await store.getProposalsByChannel("D1")).map((p) => p.proposalTs),
+      ["1700.13", "1700.6", "1700.12", "1700.5"],
     );
   });
 

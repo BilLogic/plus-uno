@@ -71,7 +71,8 @@ export function renderGateNote(note: GateNote): string {
         `or react there.`
       );
     case "which-card":
-      // Two cards are two different writes, and a ✅ outside both threads says
+      // Only an unthreaded DM line reaches this: anywhere else a typed emoji
+      // sits in a card's own thread and answers that card. Two cards are two different writes, and a ✅ outside both threads says
       // nothing about which one it meant. Guessing runs the wrong one.
       return (
         `:point_up: ${note.count} proposals are waiting in this DM, so I can't tell which one that is for — ` +

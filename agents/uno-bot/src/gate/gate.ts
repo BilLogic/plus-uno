@@ -81,12 +81,11 @@ export type GateSignal =
       text: string;
       userId: string;
       /**
-       * The conversation, when it spans more threads than this one: an
-       * unthreaded DM line, which sits in no card's thread. Set, a thread with
-       * no card of its own answers the conversation's only live card, and asks
-       * which when there are several.
+       * Set for an unthreaded DM line, which sits in no card's thread: with no
+       * card of its own it answers the DM's only live card, in whichever
+       * thread, and asks which when there are several.
        */
-      conversation?: string;
+      wholeDm?: true;
     }
   | {
       kind: "model";
@@ -189,7 +188,7 @@ function replyTarget(proposal: PendingProposal): string {
  *
  * The order is fixed and is the whole of the gate's policy: read the decision
  * the signal carries, find the proposal it is about (by card ts, then by
- * conversation), check a reaction is on the card it claims to be, claim, and
+ * reply thread, then — for an unthreaded DM line — the whole DM), check a reaction is on the card it claims to be, claim, and
  * only then describe what to run.
  */
 export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise<GateVerdict> {
@@ -246,7 +245,7 @@ export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise
   if (found.state === "none") {
     // An unthreaded DM line with no card anywhere in the DM is not about a
     // card at all: nothing to say here, so the turn hands it to the model.
-    if (signal.kind === "typed" && signal.conversation) return { outcome: "none", decision, post: null };
+    if (signal.kind === "typed" && signal.wholeDm) return { outcome: "none", decision, post: null };
     // Nothing live anywhere in the thread. A reaction may be ordinary
     // punctuation, so it stays silent; a button press, a typed gate emoji and
     // the model's call are all unambiguously ABOUT a card, so each gets an
@@ -349,8 +348,8 @@ async function claim(
 }
 
 /**
- * By card ts, then by reply thread — and, for an unthreaded DM line, by
- * conversation.
+ * By card ts, then by reply thread — and, for an unthreaded DM line, across
+ * the whole DM.
  *
  * The by-ts read is the authoritative one — it is the only lookup that can
  * report "expired" or "superseded" — and the by-thread read is what a signal
@@ -391,10 +390,8 @@ async function locate(
   const live = await deps.threadState.getProposalByThread(ref).catch(() => null);
   if (live) return { state: "found", proposal: live };
 
-  if (signal.kind !== "typed" || !signal.conversation) return { state: "none" };
-  const all = await deps.threadState
-    .getProposalsByConversation({ channel: signal.channel, thread: signal.conversation })
-    .catch(() => []);
+  if (signal.kind !== "typed" || !signal.wholeDm) return { state: "none" };
+  const all = await deps.threadState.getProposalsByChannel(signal.channel).catch(() => []);
   if (all.length === 1) return { state: "found", proposal: all[0]! };
   return all.length > 1 ? { state: "several", count: all.length } : { state: "none" };
 }

@@ -559,8 +559,8 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // confirmation.
   //
   // A line whose conversation spans more than its own thread — an unthreaded
-  // DM line — sits in no card's thread, so it carries the conversation too:
-  // one live card in the DM is the card it means, several get asked about.
+  // DM line — sits in no card's thread, so it may answer across the whole DM:
+  // one live card there is the card it means, several get asked about.
   const cardThread = cardThreadOf(request);
   const outsideAnyCard = cardThread !== request.conversationTs;
   if (request.pending || outsideAnyCard) {
@@ -571,7 +571,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
         thread: cardThread,
         text: request.text,
         userId: request.userId,
-        ...(request.pending ? {} : { conversation: request.conversationTs }),
+        ...(request.pending ? {} : { wholeDm: true as const }),
       },
       { threadState },
     );

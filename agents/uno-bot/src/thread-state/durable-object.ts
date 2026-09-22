@@ -112,8 +112,8 @@ export function createDurableObjectThreadState(
       return hop().getProposalByThread(ref, now());
     },
 
-    getProposalsByConversation(ref: ThreadRef): Promise<PendingProposal[]> {
-      return hop().getProposalsByConversation(ref, now());
+    getProposalsByChannel(channel: string): Promise<PendingProposal[]> {
+      return hop().getProposalsByChannel(channel, now());
     },
 
     // The delete IS the claim, and it is the Durable Object's input gate that
