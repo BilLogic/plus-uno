@@ -11,6 +11,8 @@
 // a model input, so the one place they are written is the one place they are
 // read from.
 
+import { escapeSlackText } from "../slack/mrkdwn";
+
 /** Every bot-filed issue enters uno-maintain triage beside the headless sweep
  *  findings. Fixed: the model cannot add to or change them, so a triage outcome
  *  such as `ready-for-agent` is never self-applied. */
@@ -84,9 +86,14 @@ function withSlackFooter(text: string, filing: IssueFiling, verb: "Filed" | "Pos
  * The draft as a person pastes it: the title, then the body in a code block
  * whose fence is longer than any backtick run inside it, so a body carrying
  * its own ``` cannot close the block early.
+ *
+ * Escaped for Slack, because it is posted as message text: a drafted
+ * `<@teammate>` or `a -> b` is a control sequence there, and a note that
+ * carried two of them went out blank. Slack decodes the entities for display,
+ * so what the person sees and copies is the draft as written.
  */
 export function pasteableDraft(draft: IssueDraft): string {
   const longest = Math.max(0, ...(draft.body.match(/`+/g) ?? []).map((run) => run.length));
   const fence = "`".repeat(Math.max(3, longest + 1));
-  return `*${draft.title}*\n${fence}\n${draft.body}\n${fence}`;
+  return `*${escapeSlackText(draft.title)}*\n${fence}\n${escapeSlackText(draft.body)}\n${fence}`;
 }

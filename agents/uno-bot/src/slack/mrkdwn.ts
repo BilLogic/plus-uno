@@ -19,6 +19,22 @@
 // touch. Fenced code blocks are protected so JSON proposal cards / code are
 // never mangled.
 
+/**
+ * Words that must reach a reader exactly as written — a draft handed back to
+ * paste, a title inside a link label — with Slack's three control characters
+ * turned into the entities Slack decodes for display.
+ *
+ * Slack parses `&`, `<` and `>` in message text as control characters
+ * (docs.slack.dev, "Formatting message text" § Escaping text), so a quoted
+ * `<@teammate>` is a mention Slack tries to resolve, not seven characters. A
+ * failure note carrying such tokens went out blank (live 2026-09-21), and the
+ * same note without them rendered. Only for Worker-quoted text: the model's own
+ * `<url|label>` links are meant to be parsed.
+ */
+export function escapeSlackText(text: string): string {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 /** Split on ```fenced``` blocks; transform only the non-fenced segments. */
 export function toSlackMrkdwn(input: string): string {
   if (!input) return input;
