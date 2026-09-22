@@ -22,7 +22,19 @@ import { run as checkSecrets } from "./check-secrets.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const PKG = path.resolve(here, "..");
-const TOML = readFileSync(path.join(PKG, "wrangler.toml"), "utf8");
+
+/**
+ * The committed wrangler.toml, read when a test asks and not at import. A read
+ * at import runs outside every test: a file that did not parse there threw
+ * while the runner was between tests, and was reported as an uncaught error
+ * "after the test ended" rather than as the failure of the test that needed
+ * the file. Read here, a bad file fails the test that read it, and says so.
+ */
+const committedToml = () => readFileSync(path.join(PKG, "wrangler.toml"), "utf8");
+const committedList = () => {
+  const toml = committedToml();
+  return parseRepoList(varValueInWrangler(toml, "GITHUB_REPOS"), varValueInWrangler(toml, "GITHUB_REPO"));
+};
 
 /* ------------------------------------------------------ reading the value */
 
@@ -61,19 +73,18 @@ test("a value this reader cannot read throws rather than reading as unset", () =
 
 /* ------------------------------------------------------ the committed list */
 
-const LIST = parseRepoList(varValueInWrangler(TOML, "GITHUB_REPOS"), varValueInWrangler(TOML, "GITHUB_REPO"));
-
 test("the committed list declares the three repos, each with a purpose and its runnable workflows", () => {
+  const list = committedList();
   assert.deepEqual(
-    LIST.entries.map((e) => e.repo),
+    list.entries.map((e) => e.repo),
     ["BilLogic/plus-uno", "BilLogic/plus-marketing-website", "BilLogic/plus-uno-blueprint"],
   );
-  assert.equal(LIST.defaultEntry.repo, "BilLogic/plus-uno");
-  for (const e of LIST.entries) assert.ok(e.purpose.length > 0, `${e.repo} has no purpose`);
+  assert.equal(list.defaultEntry.repo, "BilLogic/plus-uno");
+  for (const e of list.entries) assert.ok(e.purpose.length > 0, `${e.repo} has no purpose`);
   // Which workflows a Slack ✅ may start is a reviewed choice: a change here is
   // a change to what the bot can run, so it is spelled out rather than counted.
   assert.deepEqual(
-    Object.fromEntries(LIST.entries.map((e) => [e.repo, e.workflows])),
+    Object.fromEntries(list.entries.map((e) => [e.repo, e.workflows])),
     {
       "BilLogic/plus-uno": [],
       "BilLogic/plus-marketing-website": ["sync-notion.yml"],
@@ -89,6 +100,7 @@ test("the committed list declares the three repos, each with a purpose and its r
 });
 
 test("github_workflow_run offers exactly the workflows the list allows", () => {
+  const list = committedList();
   // The enum is the model's copy of the allowlist; the Worker still checks
   // the workflow against the chosen repo's own entry.
   const tools = JSON.parse(readFileSync(path.join(PKG, "tool-definitions.json"), "utf8"));
@@ -96,11 +108,12 @@ test("github_workflow_run offers exactly the workflows the list allows", () => {
   assert.ok(run, "github_workflow_run has a schema");
   assert.deepEqual(
     run.input_schema.properties.workflow.enum,
-    LIST.entries.flatMap((e) => e.workflows),
+    list.entries.flatMap((e) => e.workflows),
   );
 });
 
 test("every tool schema that takes a repo offers exactly the listed repos", () => {
+  const list = committedList();
   // The schema's enum is the model's copy of the list. A repo added to the
   // list and not here is one the model cannot name; one here and not on the
   // list is one the Worker refuses.
@@ -108,7 +121,7 @@ test("every tool schema that takes a repo offers exactly the listed repos", () =
   const withRepo = tools.filter((t) => t.input_schema?.properties?.repo);
   assert.ok(withRepo.length >= 2, "github_read and github_intake_search take a repo");
   for (const t of withRepo) {
-    assert.deepEqual(t.input_schema.properties.repo.enum, LIST.entries.map((e) => e.repo), t.name);
+    assert.deepEqual(t.input_schema.properties.repo.enum, list.entries.map((e) => e.repo), t.name);
     // Optional everywhere but a workflow run: the default repo lists no
     // runnable workflow, so a run that named no repo could only be refused.
     const required = (t.input_schema.required ?? []).includes("repo");
@@ -130,16 +143,17 @@ function fixtureRoot(tomlText) {
 }
 
 test("check:secrets passes the committed list", () => {
-  const findings = checkSecrets({ repoRoot: fixtureRoot(TOML), fix: false });
+  const findings = checkSecrets({ repoRoot: fixtureRoot(committedToml()), fix: false });
   assert.deepEqual(findings.filter((f) => /repo list/.test(f.message)), []);
 });
 
 test("check:secrets fails a list the Worker would refuse, saying why", () => {
-  const broken = TOML.replace(
+  const toml = committedToml();
+  const broken = toml.replace(
     '{"repo": "BilLogic/plus-uno", "purpose": "uno-bot and the harness", "workflows": []},',
     '{"repo": "BilLogic/plus-uno", "purpose": "uno-bot and the harness"},',
   );
-  assert.notEqual(broken, TOML, "the fixture edit found its line");
+  assert.notEqual(broken, toml, "the fixture edit found its line");
   const findings = checkSecrets({ repoRoot: fixtureRoot(broken), fix: false });
   const repoFindings = findings.filter((f) => /repo list/.test(f.message));
   assert.equal(repoFindings.length, 1);
