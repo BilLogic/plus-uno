@@ -127,3 +127,62 @@ test("a link label carrying an ampersand is made safe without breaking the link"
 test("the model's Markdown link becomes a valid link that survives", async () => {
   assert.equal(await posted("see [the card](https://x.test/a)"), "see <https://x.test/a|the card>");
 });
+
+// ── id length, DMs, dates, quotes, blocks, response_url ──────────────────────
+
+test("a mention id needs six characters after its U or W — the share-out's own rule", async () => {
+  assert.equal(await posted("<@U0A8JFH>"), "<@U0A8JFH>");
+  assert.equal(await posted("<@U0A8JF>"), "&lt;@U0A8JF&gt;");
+  const { renderReviewer } = await import("../src/tools/share-out-render.js");
+  assert.equal(renderReviewer("U0A8JFH"), "<@U0A8JFH>", "what the share-out mentions, the pass keeps");
+  assert.equal(renderReviewer("U0A8JF"), "U0A8JF");
+});
+
+test("a DM link the Worker builds itself survives, and so does a labelled channel", async () => {
+  assert.equal(await posted("thread in <#D0APTB20SK0>"), "thread in <#D0APTB20SK0>");
+  assert.equal(await posted("see <#C0APTB20SK0|uno-bot>"), "see <#C0APTB20SK0|uno-bot>");
+});
+
+test("a date token survives with or without its fallback label", async () => {
+  assert.equal(await posted("<!date^1392734382^{date_short}>"), "<!date^1392734382^{date_short}>");
+});
+
+test("a quote marker opening a line stays a quote; a `>` mid-line is escaped", async () => {
+  assert.equal(await posted("> quoted\n>>> the rest\na > b"), "> quoted\n>>> the rest\na &gt; b");
+});
+
+test("a section block's mrkdwn is sanitised, its valid mention kept, its plain_text untouched", async () => {
+  const { postMessage } = await import("../src/slack/api.js");
+  const { textSections } = await import("../src/slack/render.js");
+  sent = [];
+  const body = "Ask <@U0A8JFHQPU2>: the `<@teammate>` token is gone";
+  await postMessage(ENV, {
+    channel: "D0123",
+    text: body,
+    blocks: [
+      ...textSections(body),
+      { type: "header", text: { type: "plain_text", text: "a <b> header" } },
+    ],
+  });
+  const blocks = JSON.stringify(sent[0]!.blocks);
+  assert.ok(blocks.includes("Ask <@U0A8JFHQPU2>: the `&lt;@teammate&gt;` token is gone"), blocks);
+  assert.ok(blocks.includes('"text":"a <b> header"'), blocks);
+  assert.equal(sent[0]!.text, "Ask <@U0A8JFHQPU2>: the `&lt;@teammate&gt;` token is gone");
+});
+
+test("a card replaced over response_url is sanitised, text and blocks", async () => {
+  const { postToResponseUrl } = await import("../src/slack/api.js");
+  const { proposalCardBlocks } = await import("../src/slack/proposal-render.js");
+  sent = [];
+  const text = "About to relay: `<@teammate>` should see <https://x|this>";
+  await postToResponseUrl("https://hooks.slack.test/actions/1", {
+    replace_original: true,
+    text,
+    blocks: proposalCardBlocks(text, ":white_check_mark: Approved by <@U03FYQJRQHX>"),
+  });
+  const wire = JSON.stringify(sent[0]);
+  assert.doesNotMatch(wire, /<@teammate>/, wire);
+  assert.ok(wire.includes("<https://x|this>"), wire);
+  assert.ok(wire.includes("Approved by <@U03FYQJRQHX>"), wire);
+  assert.equal(sent[0]!.replace_original, true);
+});

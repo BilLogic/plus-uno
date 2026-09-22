@@ -22,10 +22,9 @@
 // uses) or a normal chat.postMessage, never by holding the response open.
 
 import type { Env } from "../types";
-import { countedFetch } from "../net";
 import { runMessageShortcut } from "./shortcuts";
 import { threadStateFor } from "../thread-state/production";
-import { conversationsOpen, deleteMessage } from "./api";
+import { conversationsOpen, deleteMessage, postToResponseUrl } from "./api";
 import { executeVerdict } from "../agent/resolve-proposal";
 import { proposalCardBlocks } from "./proposal-render";
 import { runHomeStopDoor, type HomeStopDoorDeps } from "./stop-doors";
@@ -152,23 +151,19 @@ function buttonDoorDeps(env: Env, payload: InteractionPayload): ButtonDoorDeps {
 
 async function replyEphemeral(payload: InteractionPayload, text: string): Promise<void> {
   if (!payload.response_url) return;
-  await countedFetch(payload.response_url, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ response_type: "ephemeral", replace_original: false, text }),
+  await postToResponseUrl(payload.response_url, {
+    response_type: "ephemeral",
+    replace_original: false,
+    text,
   }).catch(() => {});
 }
 
 async function replaceCard(payload: InteractionPayload, text: string, note: string): Promise<void> {
   if (!payload.response_url) return;
-  await countedFetch(payload.response_url, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      replace_original: true,
-      text,
-      blocks: proposalCardBlocks(text, note),
-    }),
+  await postToResponseUrl(payload.response_url, {
+    replace_original: true,
+    text,
+    blocks: proposalCardBlocks(text, note),
   }).catch((err: unknown) => {
     // Cosmetic: the action already happened and was announced in the thread.
     console.warn(`[interactive] card re-render failed: ${err instanceof Error ? err.message : String(err)}`);

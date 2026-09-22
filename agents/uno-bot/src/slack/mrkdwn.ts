@@ -48,15 +48,47 @@ export function escapeSlackText(text: string): string {
  * already entities and pass unchanged.
  */
 export function sanitizeSlackMarkup(text: string): string {
-  return text.replace(/<([^<>]*)>|[<>]|&/g, (match, inner: string | undefined, offset: number) => {
-    if (inner !== undefined) {
-      const safe = validMarkup(inner);
-      return safe === null ? escapeBare(match) : `<${safe}>`;
-    }
-    if (match === "&") return ENTITY.test(text.slice(offset)) ? "&" : "&amp;";
-    return match === "<" ? "&lt;" : "&gt;";
-  });
+  return text.replace(
+    /(?<=^|\n)>+|<([^<>\n]*)>|[<>]|&/g,
+    (match, inner: string | undefined, offset: number) => {
+      // A `>` run opening a line is mrkdwn's quote marker (`>` or `>>>`).
+      if (match[0] === ">" && (offset === 0 || text[offset - 1] === "\n")) return match;
+      if (inner !== undefined) {
+        const safe = validMarkup(inner);
+        return safe === null ? escapeBare(match) : `<${safe}>`;
+      }
+      if (match === "&") return ENTITY.test(text.slice(offset)) ? "&" : "&amp;";
+      return match === "<" ? "&lt;" : "&gt;";
+    },
+  );
 }
+
+/**
+ * The same pass over Block Kit: every `mrkdwn` text object, at any depth.
+ *
+ * Blocks are what a reader sees whenever a message has them — an answer's
+ * sections, a proposal card — so a pass over `text` alone would guard the
+ * notification copy and leave the message itself exposed. `plain_text` objects
+ * are left alone: Slack parses no markup there. Returns a copy.
+ */
+export function sanitizeSlackBlocks<T>(blocks: T): T {
+  const walk = (node: unknown): unknown => {
+    if (Array.isArray(node)) return node.map(walk);
+    if (!node || typeof node !== "object") return node;
+    const out: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(node)) out[key] = walk(value);
+    if (out.type === "mrkdwn" && typeof out.text === "string") out.text = sanitizeSlackMarkup(out.text);
+    return out;
+  };
+  return walk(blocks) as T;
+}
+
+/**
+ * A Slack user id: `U…` or `W…` and at least six more capitals and digits. The
+ * one pattern for "is this a person Slack can mention" — `<@U...>` and
+ * `<@teammate>` are exactly the tokens that blanked a message.
+ */
+export const SLACK_USER_ID = /^[UW][A-Z0-9]{6,}$/;
 
 /** The only entities Slack decodes — and so the only ones a pass may keep. */
 const ENTITY = /^&(?:amp|lt|gt);/;
@@ -69,22 +101,18 @@ function escapeBare(text: string): string {
     .replace(/>/g, "&gt;");
 }
 
-/**
- * The inside of a `<…>` Slack can parse, with its label made safe — or null.
- *
- * A mention needs an id that looks like one: `<@U...>` and `<@teammate>` are
- * exactly the tokens that blanked a message.
- */
+/** The inside of a `<…>` Slack can parse, with its label made safe — or null. */
 function validMarkup(inner: string): string | null {
   const bar = inner.indexOf("|");
   const target = bar < 0 ? inner : inner.slice(0, bar);
   const label = bar < 0 ? null : inner.slice(bar + 1);
   const ok =
-    /^@[UW][A-Z0-9]{8,}$/.test(target) ||
-    /^#[CG][A-Z0-9]+$/.test(target) ||
+    (target.startsWith("@") && SLACK_USER_ID.test(target.slice(1))) ||
+    // Channels, private channels and DMs: the Worker links `<#D…>` itself.
+    /^#[CGD][A-Z0-9]+$/.test(target) ||
     /^!(?:here|channel|everyone)$/.test(target) ||
     /^!subteam\^[A-Z0-9]+$/.test(target) ||
-    (/^!date\^\d+\^[^\s|]+(?:\^\S+)?$/.test(target) && label !== null) ||
+    /^!date\^\d+\^[^\s|]+(?:\^\S+)?$/.test(target) ||
     /^https?:\/\/[^\s|]+$/.test(target) ||
     /^mailto:[^\s|@]+@[^\s|]+$/.test(target);
   if (!ok) return null;
