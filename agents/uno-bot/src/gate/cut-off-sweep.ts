@@ -7,15 +7,15 @@
 // Worker hands its ts here. From here it is the path a look takes, not a copy
 // of it: the same take (`takeCutOffExecution`, the one fence two looks share),
 // the same verdict (`cutOffVerdict`), the same note, and the same re-staged
-// card, built by Turn through the door's `restage` dependency. Nothing is ever
-// re-run: the card waits for its own ✅.
+// card, built by Turn through the door's `restage` dependency, inside the same
+// working signal. Nothing is ever re-run: the card waits for its own ✅.
 //
 // NAMED DEPENDENCIES, as the doors take them; `Env` is turned into these once,
 // in `slack/cut-off-sweep.ts`. PURE by design — no `Env`, no Workers global —
 // so the Node suite drives it on the recording Delivery.
 
 import type { ThreadState } from "../thread-state/index";
-import type { Delivery } from "../turn/index";
+import { withWorkingSignal, type Delivery } from "../turn/index";
 import { cutOffVerdict, type GateRestage } from "./gate";
 import type { ReactionDoorTarget } from "./reaction-door";
 
@@ -37,10 +37,11 @@ export interface CutOffSweepDeps {
  *   "told"     — the note posted (and the card, when there was anything left).
  *   "taken"    — a look got there first, the run ended, or it is not cut off
  *                after all: nothing to say, and nothing said.
- *   "released" — the note did not post, so the take was undone. The alarm
- *                comes back for it, and a look in the meantime can take it.
+ *   "owed"     — the note did not post. The record stays taken — the fence
+ *                never re-opens — and the alarm's next pass tells it again.
+ *   "given-up" — the note failed its last attempt (`CUT_OFF_NOTE_ATTEMPTS`).
  */
-export type CutOffSweepOutcome = "told" | "taken" | "released";
+export type CutOffSweepOutcome = "told" | "taken" | "owed" | "given-up";
 
 export async function tellCutOffRun(
   proposalTs: string,
@@ -52,23 +53,46 @@ export async function tellCutOffRun(
   const verdict = cutOffVerdict(execution, "confirm");
   const proposal = execution.proposal;
   const post = verdict.post!;
-  const delivery = deps.delivery({
+  // Nobody asked, so the requester is pinged — in a channel thread, where the
+  // note is otherwise one line among many. A DM is already theirs.
+  const note =
+    post.note.kind === "cut-off" && !proposal.channel.startsWith("D")
+      ? { ...post.note, mention: proposal.requesterUserId }
+      : post.note;
+  const door = deps.delivery({
     channel: proposal.channel,
     replyTs: post.replyTs,
     userMsgTs: proposal.userMsgTs,
     userId: proposal.requesterUserId,
   });
 
-  const said = await delivery.postGateNote(post.note).catch(() => null);
-  if (!said?.ok) {
-    // Nobody was told, so nobody may be left untold: undo the take. A card
-    // posted after a note that never landed would read as one out of nowhere.
-    console.error(`[gate] cut-off note for ${proposalTs} did not post; released for another look`);
-    await deps.threadState.releaseCutOffExecution(proposalTs);
-    return "released";
-  }
-  // Once the note is up, this is one attempt, as it is for a look: a card that
-  // fails to stage says so itself (`restageExecution`).
-  if (verdict.restage) await deps.restage(verdict.restage, delivery);
-  return "told";
+  return withWorkingSignal(
+    door,
+    async (delivery): Promise<CutOffSweepOutcome> => {
+      // Raised as the looks raise it: building the fresh card reads the repo
+      // or workflow it lands on.
+      await delivery.setWorking({ status: "is working on that…" });
+      const said = await delivery.postGateNote(note).catch(() => null);
+      const posted = !!said?.ok;
+      // A failed note is tried again from the record, never re-opened: undoing
+      // the take would let a run that is only slow resume the very work the
+      // card is about to offer. Each attempt can land a duplicate — Slack may
+      // accept a post the adapter then reads as failed (`postNote` maps a
+      // throw to `ok: false`) — so the attempt cap is also the bound on those.
+      const report = await deps.threadState.reportCutOffNote(proposalTs, posted);
+      if (!posted) {
+        if (report === "given-up") {
+          console.error(`[gate] cut-off note for ${proposalTs} failed its last attempt; giving up`);
+          return "given-up";
+        }
+        console.warn(`[gate] cut-off note for ${proposalTs} did not post; the alarm will try again`);
+        return "owed";
+      }
+      // Once the note is up, this is one attempt, as it is for a look: a card
+      // that fails to stage says so itself (`restageExecution`).
+      if (verdict.restage) await deps.restage(verdict.restage, delivery);
+      return "told";
+    },
+    (outcome) => (outcome === "told" && verdict.restage ? "waiting-on-person" : "idle"),
+  );
 }

@@ -103,9 +103,18 @@ export const EXECUTION_CUTOFF_MS = 5 * 60 * 1000;
 export const CUT_OFF_SWEEP_SLACK_MS = 30_000;
 
 /** How soon the alarm comes back to a cut-off run it handed over that is
- *  still untaken — a hand-off that never arrived, or a note that did not post
- *  and was released. Until the record's hour is up, when the GC drops it. */
+ *  still untold — a hand-off that never arrived, or a note that did not post.
+ *  Until the record's hour is up, or its attempts are spent. */
 export const CUT_OFF_SWEEP_RETRY_MS = 2 * 60 * 1000;
+
+/**
+ * How many times a cut-off note is tried before the teller gives up.
+ *
+ * Also the bound on duplicates: a post that Slack accepted and then timed out
+ * reads as a failure (`postNote` maps any throw to `ok: false`), so the same
+ * note can land once per attempt. Three is at most three.
+ */
+export const CUT_OFF_NOTE_ATTEMPTS = 3;
 
 /** The conversation key of an unthreaded DM: every loose line of one DM
  *  resolves to it, so the whole DM is one conversation (see `ThreadRef`). The
@@ -243,7 +252,8 @@ export function proposalOperations(
  * approved again. This record is what outlives the card. It is written as the
  * claim is won, each operation is marked as it comes back, and it is removed
  * once the outcome has been told. One still here past `EXECUTION_CUTOFF_MS`
- * is a run that never told anyone.
+ * is a run that never told anyone; once taken, it stays as the fence until
+ * its hour is up.
  */
 export interface Execution {
   /** The approved card, whole — its operations are the batch that was run. */
@@ -254,20 +264,51 @@ export interface Execution {
    *  not, and it is never re-run without a person approving it again. */
   settled: Array<{ index: number; ok: boolean }>;
   /** When a later look took it (see `takeCutOffExecution`). Set, the run is
-   *  fenced: it stops at its next operation and tells no outcome. */
+   *  fenced: it stops at its next operation and tells no outcome, and the
+   *  record is the teller's from then on — `endExecution` leaves it alone. */
   takenAt?: number;
+  /** A teller took it and its note did not post: the next take tells it
+   *  again (see `reportCutOffNote`). */
+  noteOwed?: boolean;
+  /** Notes that failed to post so far. */
+  attempts?: number;
+}
+
+/** What a teller's report on its note came to. "told" and "given-up" both
+ *  leave nothing to retry; "owed" is taken again on the alarm's next pass. */
+export type CutOffNoteReport = "told" | "owed" | "given-up";
+
+/**
+ * Whether a look may take this execution now: cut off and inside its hour,
+ * and either never taken or owed a note a teller failed to post. Both
+ * adapters decide with this, so find and take cannot disagree.
+ */
+export function cutOffTakeable(execution: Execution, now: number): boolean {
+  const age = now - execution.startedAt;
+  if (age <= EXECUTION_CUTOFF_MS || age > PROPOSAL_TTL_MS) return false;
+  return execution.takenAt === undefined || execution.noteOwed === true;
+}
+
+/** A failed note, counted: owed again, or given up once the attempts are
+ *  spent. Still taken either way — the fence never re-opens. */
+export function afterFailedNote(execution: Execution): { record: Execution; report: CutOffNoteReport } {
+  const attempts = (execution.attempts ?? 0) + 1;
+  const { noteOwed: _owed, ...rest } = execution;
+  return attempts >= CUT_OFF_NOTE_ATTEMPTS
+    ? { record: { ...rest, attempts }, report: "given-up" }
+    : { record: { ...rest, attempts, noteOwed: true }, report: "owed" };
 }
 
 /**
  * When the ThreadState alarm should next fire for this execution, or null
- * when it never needs to: a taken record has been told about, and one past
+ * when it never needs to: a taken record owed no note has a teller, and one past
  * its hour is the GC's. One not yet cut off is due just past the threshold;
  * one already past it is what `findCutOffExecutions` found and the alarm
  * handed over, and is looked at again in `CUT_OFF_SWEEP_RETRY_MS` in case
  * nobody took it.
  */
 export function cutOffSweepAt(execution: Execution, now: number): number | null {
-  if (execution.takenAt !== undefined) return null;
+  if (execution.takenAt !== undefined && !execution.noteOwed) return null;
   const age = now - execution.startedAt;
   if (age > PROPOSAL_TTL_MS) return null;
   if (age > EXECUTION_CUTOFF_MS) return now + CUT_OFF_SWEEP_RETRY_MS;
@@ -536,8 +577,11 @@ export interface ThreadState {
    */
   settleOperation(proposalTs: string, index: number, ok: boolean): Promise<{ taken: boolean }>;
 
-  /** The outcome has been told, or the run has stopped at the fence: forget
-   *  the execution, taken or not. An unknown ts is a no-op. */
+  /** The outcome has been told, or the run has stopped at the fence. An
+   *  untaken execution is forgotten. A TAKEN one is left where it is: it
+   *  belongs to the teller, and it is what keeps fencing a run that is only
+   *  slow — deleted, a settle would find nothing and the run would resume.
+   *  An unknown ts is a no-op. */
   endExecution(proposalTs: string): Promise<void>;
 
   /**
@@ -554,6 +598,8 @@ export interface ThreadState {
    * hour an offer to re-stage it stays worth making.
    */
   takeCutOffExecution(proposalTs: string): Promise<Execution | null>;
+  // (A taken execution whose note failed is taken once more by the next look,
+  // with `attempts` carried: see `reportCutOffNote`.)
 
   /**
    * The same, for a later look that has a thread rather than a card: the next
@@ -563,21 +609,24 @@ export interface ThreadState {
   takeCutOffExecutionInThread(ref: ThreadRef): Promise<Execution | null>;
 
   /**
-   * Every execution a look could take right now — past `EXECUTION_CUTOFF_MS`,
-   * not taken, inside its hour — oldest first. Takes NOTHING: it is how the
-   * ThreadState alarm finds a cut-off run nobody has looked at, and each one it
-   * finds goes through `takeCutOffExecution` like any other look, so the alarm
-   * and a look racing still come to one note.
+   * Every execution a look could take right now (`cutOffTakeable`), oldest
+   * first. Takes NOTHING: it is how the ThreadState alarm finds a cut-off run
+   * nobody has told, and each one it finds goes through `takeCutOffExecution`
+   * like any other look, so the alarm and a look racing still come to one note.
    */
   findCutOffExecutions(): Promise<Execution[]>;
 
   /**
-   * Undo a take whose note never reached the thread, so the alarm's next pass
-   * or a later look can take it again. Only the alarm's path releases: a look
-   * has a person in front of it who saw the failure. An unknown or untaken ts
-   * is a no-op.
+   * The teller's report on the note it owes for a taken execution.
+   *
+   * Posted: "told", and nothing is owed. Failed: the record stays TAKEN — the
+   * fence never re-opens, so a run that is only slow cannot resume work a
+   * later card would offer again — and is marked owed, so the next take tells
+   * it again with the same functions. After `CUT_OFF_NOTE_ATTEMPTS` failed
+   * notes it is "given-up": still taken, owed nothing, gone with its hour. An
+   * unknown or untaken ts reports "told": there is nothing to owe.
    */
-  releaseCutOffExecution(proposalTs: string): Promise<void>;
+  reportCutOffNote(proposalTs: string, posted: boolean): Promise<CutOffNoteReport>;
 
   // ----- assistant context -----
 

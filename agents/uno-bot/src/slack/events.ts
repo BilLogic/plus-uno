@@ -188,9 +188,15 @@ export async function enqueueAgentJob(env: Env, job: RunnerJobPayload, threadKey
  */
 export function handOffCutOffRunsFor(env: Env): (due: Execution[]) => Promise<void> {
   return async (due) => {
+    // Each on its own: one enqueue that throws must not keep the rest from
+    // their runners. The one that threw is found again on the next pass.
     for (const execution of due) {
       const { job, threadKey } = cutOffRunJob(execution);
-      await enqueueAgentJob(env, job, threadKey);
+      await enqueueAgentJob(env, job, threadKey).catch((err: unknown) => {
+        console.error(
+          `[slack] cut-off hand-off for ${job.kind === "cut-off" ? job.proposalTs : "?"} failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      });
     }
   };
 }

@@ -409,7 +409,10 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
   };
 
   /** A plain post into the thread. A local rather than only a port method,
-   *  because `postGateNote` is the same post with the verdict spelled first. */
+   *  because `postGateNote` is the same post with the verdict spelled first.
+   *  A throw reads as `ok: false`, including a timeout after Slack accepted
+   *  the post — so a caller that retries on failure can post twice. The
+   *  cut-off note's retry is capped at `CUT_OFF_NOTE_ATTEMPTS` for that. */
   const postNote = async (text: string): Promise<PostResult> => {
     const posted = await slack
       .postMessage({ channel, thread_ts: replyTs, text })
