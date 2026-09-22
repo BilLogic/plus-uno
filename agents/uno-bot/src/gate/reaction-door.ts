@@ -28,7 +28,7 @@
 import { mapReaction } from "./reactions";
 import type { ThreadState } from "../thread-state/index";
 import { withWorkingSignal, type Delivery } from "../turn/index";
-import { resolveSignal, type GateVerdict } from "./gate";
+import { resolveSignal, type GateRestage, type GateVerdict } from "./gate";
 
 /** One reaction, in the facts the envelope already has. */
 export interface ReactionRequest {
@@ -80,6 +80,14 @@ export interface ReactionDoorDeps {
    * tool the claim awarded to somebody else.
    */
   applyVerdict(verdict: GateVerdict): Promise<void>;
+
+  /**
+   * Stage a fresh card for what a cut-off run never finished, through the
+   * door's own Delivery, after the note that explains it. Only a cut-off
+   * verdict carries anything to re-stage; building the card is Turn's
+   * (`turn/turn.ts` `restageExecution`), and the envelope binds it.
+   */
+  restage(restage: GateRestage, delivery: Delivery): Promise<void>;
 }
 
 export async function runReactionDoor(
@@ -140,6 +148,7 @@ export async function runReactionDoor(
           console.error(`[gate] reaction post FAILED in ${channel} (thread=${post.replyTs})`);
         }
         await deps.applyVerdict(verdict);
+        if (verdict.restage) await deps.restage(verdict.restage, delivery);
       } catch (err) {
         // A reaction confirmation must NEVER die silently — that's the exact "✅
         // did nothing" failure this path fights (live 2026-07-13). Surface it so
@@ -155,7 +164,8 @@ export async function runReactionDoor(
     // What the thread needs afterwards, stated rather than defaulted: this
     // door RESOLVED the card, so nothing in the thread is waiting on anybody.
     // The argument is required precisely so a door cannot inherit an answer it
-    // never thought about (#575).
-    () => "idle",
+    // never thought about (#575). A re-staged card is the one thing this door
+    // can leave waiting on somebody.
+    () => (verdict.restage ? "waiting-on-person" : "idle"),
   );
 }

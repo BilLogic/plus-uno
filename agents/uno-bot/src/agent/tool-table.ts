@@ -126,6 +126,8 @@ export const TOOL_TABLE = {
   source_read: { access: "ungated", retrieval: true, reviewRequest: null },
   search_blueprint: { access: "ungated", retrieval: true, reviewRequest: null },
   github_read: { access: "ungated", retrieval: true, reviewRequest: null },
+  // The duplicate check before `github_issue_create`: open intakes by keyword.
+  github_intake_search: { access: "ungated", retrieval: true, reviewRequest: null },
   slack_user_profile: { access: "ungated", retrieval: true, reviewRequest: null },
   slack_channel_members: { access: "ungated", retrieval: true, reviewRequest: null },
   slack_thread_read: { access: "ungated", retrieval: true, reviewRequest: null },
@@ -203,6 +205,57 @@ export const TOOL_TABLE = {
       verb: "send an email via Gmail",
       kind: "send an email",
       nouns: ["email", "mail", "send"],
+    },
+  },
+  // The relayed DM (CONTEXT.md). One operation per recipient, so "send this to
+  // Coco and Meryem" is one card of two. No review request: a DM is not a
+  // reviewable artifact, so nothing fans out to `#plus-design`.
+  dm_relay: {
+    access: "gated",
+    retrieval: false,
+    reviewRequest: null,
+    gate: {
+      verb: "send a DM on your behalf",
+      kind: "send a DM",
+      nouns: ["dm", "message", "send", "relay"],
+    },
+  },
+  github_issue_create: {
+    access: "gated",
+    retrieval: false,
+    // Triage is uno-maintain's, through the labels the Worker applies — not a
+    // review heads-up in the design channel.
+    reviewRequest: null,
+    gate: {
+      // The card adds the resolved repo to this verb, and its visibility as
+      // the repo-visibility caveat — read, and never a literal here.
+      verb: "file a GitHub issue",
+      kind: "file an issue",
+      nouns: ["issue", "github", "track", "file"],
+    },
+  },
+  // A follow-up on an issue in a listed repo: comment, close or reopen, labels.
+  // One operation per issue, so several issues in one ask are one card.
+  github_issue_update: {
+    access: "gated",
+    retrieval: false,
+    reviewRequest: null,
+    gate: {
+      verb: "update a GitHub issue",
+      kind: "update an issue",
+      nouns: ["issue", "github", "comment", "close", "reopen", "label"],
+    },
+  },
+  // A workflow the repo list allows, on a listed repo. No review request: a
+  // run's result is on its runs page, which the thread is handed.
+  github_workflow_run: {
+    access: "gated",
+    retrieval: false,
+    reviewRequest: null,
+    gate: {
+      verb: "run a GitHub workflow",
+      kind: "run a workflow",
+      nouns: ["workflow", "run", "github", "action", "sync"],
     },
   },
   proposal_resolve: { access: "control", retrieval: false, reviewRequest: null },

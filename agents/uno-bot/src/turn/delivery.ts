@@ -88,8 +88,36 @@ export type CardCaveat =
   /** A PRD-shaped brief that named no ambiguity of its own, so the ✅ is
    *  knowingly accepting a gap-free reading of it. */
   | { kind: "no-open-questions" }
+  /** A card re-staged from an approved run that was cut off: some of it may
+   *  already have happened. On the card itself, so the warning survives a
+   *  note that failed to post. */
+  | { kind: "cut-off-rerun" }
   /** A prototype share-out staged without the bundle's full set of links. */
-  | { kind: "bundle-incomplete"; missing: string[] };
+  | { kind: "bundle-incomplete"; missing: string[] }
+  /** A GitHub issue, readable by whoever can read its repo — anyone, when the
+   *  repo is public — so the ✅ is consent to publish the words on the card. */
+  | {
+      kind: "repo-visibility";
+      repo: string;
+      visibility: RepoVisibility;
+      /** What goes out: a new issue (absent) or a comment on an existing one. */
+      write?: "comment";
+      /** Asked for in a DM: the footer names the requester and links nothing. */
+      fromDm?: true;
+    };
+
+/** Who can read a listed repo's issues; `unknown` when GitHub would not say,
+ *  which the card words as "may be public". The same union as
+ *  `RepoVisibility` in `integrations/github.ts`, restated so the turn imports
+ *  no integration; keep the two in step. */
+export type RepoVisibility = "public" | "private" | "unknown";
+
+/** Where a staged intake would land: the listed repo the Worker resolved, and
+ *  its visibility. */
+export interface IssueTarget {
+  repo: string;
+  visibility: RepoVisibility;
+}
 
 /** The page a write lands on, in the words a Notion read reported — never a
  *  bare hex id, which is the whole reason the read happens. */
@@ -208,8 +236,22 @@ export type GateNote =
   /** A reaction that landed somewhere other than the card it claims: say where
    *  the live card is, and resolve nothing. */
   | { kind: "not-on-the-card"; toolName: string; glyph: string; userId: string }
+  /** A gate emoji typed outside any card's thread, in a DM holding several
+   *  live cards: ask which one, and resolve none of them. */
+  | { kind: "which-card"; count: number }
   /** The door caught the gesture and then failed to run it. */
-  | { kind: "resolve-failed"; glyph: string };
+  | { kind: "resolve-failed"; glyph: string }
+  /**
+   * An approved run that never reported back. `finished` is what came back,
+   * in batch order; `unfinished` never did, and may or may not have happened.
+   * `restaged` says a fresh card for `unfinished` follows this note.
+   */
+  | {
+      kind: "cut-off";
+      finished: Array<{ toolName: string; ok: boolean }>;
+      unfinished: string[];
+      restaged: boolean;
+    };
 
 /** What a post actually did. `text` is what was posted, which is not always
  *  what was handed in — the body is stripped and capped on the way out. */

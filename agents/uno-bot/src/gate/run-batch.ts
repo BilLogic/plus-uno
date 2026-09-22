@@ -18,7 +18,7 @@
 // author of the message a person reads. What stays is the outcome each
 // operation came to, and the history note the MODEL reads.
 
-import type { ProposalOperation } from "../thread-state/index";
+import type { ProposalOperation, ThreadState } from "../thread-state/index";
 
 /** What one operation came to. */
 export interface OperationOutcome {
@@ -45,9 +45,22 @@ export interface OperationOutcome {
 export async function runOperations(
   operations: ProposalOperation[],
   execute: (operation: ProposalOperation) => Promise<string>,
+  /**
+   * Told as each operation comes back, before the next one starts — how the
+   * execution record learns which side effects are done, so a run cut off
+   * part-way is never offered back whole (`ThreadState.settleOperation`).
+   *
+   * Answering `"stop"` is the fence: a later look has already told the person
+   * this run was cut off and put the rest on a fresh card, so no further
+   * operation may start — it would complete the very work that card offers
+   * again. The outcomes so far are returned, and the batch is over. A failure
+   * to record is logged and never stops the batch: the bookkeeping is not
+   * worth an approved operation.
+   */
+  onSettled?: (index: number, outcome: OperationOutcome) => Promise<"stop" | void>,
 ): Promise<OperationOutcome[]> {
   const outcomes: OperationOutcome[] = [];
-  for (const operation of operations) {
+  for (const [index, operation] of operations.entries()) {
     let result: string;
     try {
       result = await execute(operation);
@@ -60,15 +73,49 @@ export async function runOperations(
       });
     }
     console.log(`[gate] ${operation.toolName} executed: ${result}`);
-    outcomes.push({
+    const outcome: OperationOutcome = {
       toolName: operation.toolName,
       input: operation.input,
       ok: isOkResult(result),
       result,
       message: describeOutcome(operation.toolName, result),
-    });
+    };
+    outcomes.push(outcome);
+    let next: "stop" | void = undefined;
+    try {
+      next = await onSettled?.(index, outcome);
+    } catch (err) {
+      console.warn(
+        `[gate] ${operation.toolName} settled but not recorded: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+    if (next === "stop") {
+      console.warn(
+        `[gate] batch fenced after operation ${index + 1}/${operations.length}: a later look already re-staged the rest`,
+      );
+      break;
+    }
   }
   return outcomes;
+}
+
+/**
+ * The `onSettled` an approved batch runs with: each outcome marked in the
+ * execution record Gate opened at the claim, and `"stop"` once a later look
+ * has taken that execution as cut off — the fence (`ThreadState.settleOperation`).
+ * `onFenced` tells the caller, which then tells no outcome of its own.
+ */
+export function settleInto(
+  threadState: Pick<ThreadState, "settleOperation">,
+  proposalTs: string,
+  onFenced: () => void = () => {},
+): (index: number, outcome: OperationOutcome) => Promise<"stop" | void> {
+  return async (index, outcome) => {
+    const { taken } = await threadState.settleOperation(proposalTs, index, outcome.ok);
+    if (!taken) return;
+    onFenced();
+    return "stop";
+  };
 }
 
 /** True unless the executor explicitly reported ok:false. */

@@ -22,12 +22,15 @@ import assert from "node:assert/strict";
 
 import {
   CANCEL_TTL_MS,
+  DM_CONVERSATION,
   EVENT_DEDUP_TTL_MS,
+  EXECUTION_CUTOFF_MS,
   HISTORY_TTL_MS,
   MAX_HISTORY_TURNS,
   PROPOSAL_TTL_MS,
   RUN_LEASE_MS,
   proposalOperations,
+  unfinishedOperations,
   type PendingProposal,
   type ThreadState,
   type ThreadStateDeps,
@@ -330,6 +333,64 @@ export function runThreadStateConformance(
     assert.equal(await store.getProposalByThread(THREAD), null);
   });
 
+  // The pending card is keyed on the REPLY THREAD it was posted in, not the
+  // conversation. In a DM every unthreaded ask shares the conversation "dm",
+  // and keying the card there let a second ask pick up — and retire — a card
+  // that lives in another thread.
+  it("get-by-thread in a DM answers per reply thread, not per conversation", async () => {
+    const { store, clock } = setup();
+    const dm = { channel: "D1", threadTs: "dm" };
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.2", replyTs: "1700.1" }));
+    clock.advance(1_000);
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.5", replyTs: "1700.4" }));
+
+    assert.equal((await store.getProposalByThread({ channel: "D1", thread: "1700.1" }))?.proposalTs, "1700.2");
+    assert.equal((await store.getProposalByThread({ channel: "D1", thread: "1700.4" }))?.proposalTs, "1700.5");
+    // The conversation key names no thread a card was posted in.
+    assert.equal(await store.getProposalByThread({ channel: "D1", thread: "dm" }), null);
+  });
+
+  // What an unthreaded ✅ in a DM needs: every card still live anywhere in the
+  // DM, newest first, so one card resolves and several ask which. ANYWHERE —
+  // a card staged from a reply inside a DM thread is filed under that thread,
+  // and a list that missed it would let the ✅ run the other card unasked.
+  it("get-by-channel lists every live card in a DM, from any thread, newest first", async () => {
+    const { store, clock } = setup();
+    const dm = { channel: "D1", threadTs: "dm" };
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.2", replyTs: "1700.1" }));
+    clock.advance(1_000);
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.5", replyTs: "1700.4" }));
+    clock.advance(1_000);
+    // Retired ahead of a revision: out.
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.8", replyTs: "1700.7" }));
+    await store.retireProposal("1700.8");
+    clock.advance(1_000);
+    // Superseded by a revision in its own thread: out; the revision is in.
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.11", replyTs: "1700.10" }));
+    clock.advance(1_000);
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.12", replyTs: "1700.10" }));
+    clock.advance(1_000);
+    // Staged from a reply inside a DM thread, so filed under that thread: in.
+    await store.putProposal(proposal({ channel: "D1", threadTs: "1700.3", proposalTs: "1700.6", replyTs: "1700.3" }));
+    clock.advance(1_000);
+    // A record from before `replyTs` existed: in.
+    await store.putProposal(proposal({ ...dm, proposalTs: "1700.13" }));
+    // Another channel is nobody's here.
+    await store.putProposal(proposal({ channel: "D2", threadTs: "dm", proposalTs: "1700.9", replyTs: "1700.9" }));
+
+    const live = await store.getProposalsByChannel("D1");
+    assert.deepEqual(
+      live.map((p) => p.proposalTs),
+      ["1700.13", "1700.6", "1700.12", "1700.5", "1700.2"],
+    );
+
+    clock.advance(PROPOSAL_TTL_MS - 5_500); // 1700.2 has aged out; 1700.5 has not
+    assert.deepEqual(
+      (await store.getProposalsByChannel("D1")).map((p) => p.proposalTs),
+      ["1700.13", "1700.6", "1700.12", "1700.5"],
+    );
+  });
+
   // ----- retiring, as distinct from claiming (#583) -----
   //
   // Two retirements, two methods. A claim CONSUMES a card because someone
@@ -425,6 +486,141 @@ export function runThreadStateConformance(
   it("claiming a proposal that was never staged is a loss, not an error", async () => {
     const { store } = setup();
     assert.equal(await store.claimProposal("1700.2"), false);
+  });
+
+  // ----- executions -----
+  //
+  // A won ✅ is recorded from the claim until its outcome is told, so a run cut
+  // off in between can be told apart from one that finished. The take is a
+  // lock like the claim: one later look says so, once — and a fence, below.
+
+  const BATCH = [
+    { toolName: "notion_create", input: { title: "One" } },
+    { toolName: "notion_create", input: { title: "Two" } },
+    { toolName: "notion_create", input: { title: "Three" } },
+  ];
+
+  it("an execution still inside the cut-off window is not taken", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal({ operations: BATCH }));
+    clock.advance(EXECUTION_CUTOFF_MS);
+    assert.equal(await store.takeCutOffExecution("1700.2"), null);
+    assert.equal(await store.takeCutOffExecutionInThread(THREAD), null);
+    // Left alone, not consumed: past the window it is still there to find.
+    clock.advance(1);
+    assert.notEqual(await store.takeCutOffExecution("1700.2"), null);
+  });
+
+  it("a cut-off execution is taken once, with what came back", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal({ operations: BATCH }));
+    await store.settleOperation("1700.2", 0, true);
+    await store.settleOperation("1700.2", 1, false);
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    const taken = await store.takeCutOffExecution("1700.2");
+    assert.ok(taken);
+    assert.equal(taken.proposal.proposalTs, "1700.2");
+    assert.deepEqual(taken.settled, [
+      { index: 0, ok: true },
+      { index: 1, ok: false },
+    ]);
+    assert.deepEqual(unfinishedOperations(taken), [BATCH[2]]);
+    assert.equal(await store.takeCutOffExecution("1700.2"), null);
+  });
+
+  it("a cut-off execution is taken once across concurrent looks", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal());
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    const looks = await Promise.all([
+      ...Array.from({ length: 4 }, () => store.takeCutOffExecution("1700.2")),
+      ...Array.from({ length: 4 }, () => store.takeCutOffExecutionInThread(THREAD)),
+    ]);
+    assert.equal(looks.filter(Boolean).length, 1);
+  });
+
+  it("settling an operation twice records it once", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal({ operations: BATCH }));
+    await store.settleOperation("1700.2", 0, true);
+    await store.settleOperation("1700.2", 0, false);
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    assert.deepEqual((await store.takeCutOffExecution("1700.2"))?.settled, [{ index: 0, ok: true }]);
+  });
+
+  it("an ended execution is never reported as cut off", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal());
+    await store.settleOperation("1700.2", 0, true);
+    await store.endExecution("1700.2");
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    assert.equal(await store.takeCutOffExecution("1700.2"), null);
+    assert.equal(await store.takeCutOffExecutionInThread(THREAD), null);
+  });
+
+  it("an execution older than a card's hour is dropped, not offered", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal());
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    assert.equal(await store.takeCutOffExecutionInThread(THREAD), null);
+    assert.equal(await store.takeCutOffExecution("1700.2"), null);
+  });
+
+  it("the in-thread take is keyed on the card's reply thread", async () => {
+    const { store, clock } = setup();
+    // A DM: every ask shares the conversation `DM_CONVERSATION`, and each card
+    // has its own reply thread — the grain `getProposalByThread` answers on.
+    await store.beginExecution(
+      proposal({ channel: "D1", threadTs: DM_CONVERSATION, replyTs: "1700.5", proposalTs: "1700.6" }),
+    );
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    assert.equal(await store.takeCutOffExecutionInThread({ channel: "D1", thread: DM_CONVERSATION }), null);
+    assert.equal(await store.takeCutOffExecutionInThread({ channel: "D1", thread: "1700.9" }), null);
+    const taken = await store.takeCutOffExecutionInThread({ channel: "D1", thread: "1700.5" });
+    assert.equal(taken?.proposal.proposalTs, "1700.6");
+  });
+
+  // The fence. A take marks the execution rather than deleting it, because
+  // the run may only be slow: its next settle hears it was taken and stops,
+  // so the work the re-staged card offers cannot also complete underneath it.
+  it("a settle after the take reports taken", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal({ operations: BATCH }));
+    assert.deepEqual(await store.settleOperation("1700.2", 0, true), { taken: false });
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    assert.ok(await store.takeCutOffExecutionInThread(THREAD));
+    assert.deepEqual(await store.settleOperation("1700.2", 1, true), { taken: true });
+    // And a taken execution is never taken twice, by either look.
+    assert.equal(await store.takeCutOffExecution("1700.2"), null);
+  });
+
+  it("ending a taken execution removes the record", async () => {
+    const { store, clock } = setup();
+    await store.beginExecution(proposal());
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    assert.ok(await store.takeCutOffExecution("1700.2"));
+    await store.endExecution("1700.2");
+    // Nothing left to fence: a settle now finds no record at all.
+    assert.deepEqual(await store.settleOperation("1700.2", 0, true), { taken: false });
+    assert.equal(await store.takeCutOffExecution("1700.2"), null);
+  });
+
+  it("settling or ending an execution that was never begun is a no-op", async () => {
+    const { store, clock } = setup();
+    assert.deepEqual(await store.settleOperation("1700.2", 0, true), { taken: false });
+    await store.endExecution("1700.2");
+    clock.advance(EXECUTION_CUTOFF_MS + 1);
+    assert.equal(await store.takeCutOffExecution("1700.2"), null);
+  });
+
+  it("an execution leaves the proposal lookups alone", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal());
+    assert.equal(await store.claimProposal("1700.2"), true);
+    await store.beginExecution(proposal());
+    // The claim consumed the card; the execution record is not a card.
+    assert.equal((await store.getProposalByTs("1700.2")).state, "none");
+    assert.equal(await store.getProposalByThread(THREAD), null);
   });
 
   // ----- assistant context -----

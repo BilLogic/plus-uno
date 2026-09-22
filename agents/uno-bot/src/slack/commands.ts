@@ -20,8 +20,7 @@
 // "acknowledged then nothing" failure this codebase fights everywhere else.
 
 import type { Env } from "../types";
-import { countedFetch } from "../net";
-import { postMessage } from "./api";
+import { postMessage, postToResponseUrl } from "./api";
 import { enqueueAgentJob } from "./events";
 import { threadStateFor } from "../thread-state/production";
 import { EFFORT_COMMANDS, type EffortMode } from "./effort";
@@ -241,11 +240,7 @@ async function startRun(
 async function replyPrivately(responseUrl: string, text: string): Promise<void> {
   if (!responseUrl) return;
   try {
-    await countedFetch(responseUrl, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ response_type: "ephemeral", text }),
-    });
+    await postToResponseUrl(responseUrl, { response_type: "ephemeral", text });
   } catch (err) {
     console.error(`[slash] response_url delivery failed: ${err instanceof Error ? err.message : String(err)}`);
   }

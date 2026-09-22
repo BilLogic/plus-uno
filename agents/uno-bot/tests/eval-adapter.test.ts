@@ -163,6 +163,12 @@ function harness(
       async designPreviewImage() {
         return null;
       },
+      async issueTarget() {
+        return { repo: "BilLogic/plus-uno", visibility: "public" as const };
+      },
+      async workflowTarget() {
+        return null;
+      },
     },
 
     async readAntecedent() {

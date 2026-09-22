@@ -2,7 +2,14 @@
 // because we only need 3-4 methods and Workers prefers a small bundle.
 
 import type { Env } from "../types";
-import { toSlackMrkdwn } from "./mrkdwn";
+import {
+  STREAM_MARKUP_START,
+  sanitizeSlackBlocks,
+  sanitizeSlackMarkup,
+  sanitizeStreamChunk,
+  toSlackMrkdwn,
+  type StreamMarkupState,
+} from "./mrkdwn";
 import { countedFetch, rethrowIfBudget } from "../net";
 import type { SlackEventFile } from "./types";
 import { rowFor } from "../agent/tool-table";
@@ -53,7 +60,7 @@ export async function slackCall<T extends SlackResponse>(
         "content-type": "application/json; charset=utf-8",
         authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(withSafeBlocks(payload)),
     });
   } catch (err) {
     // A budget stop is not a network error — let the loop report it as one and
@@ -63,6 +70,32 @@ export async function slackCall<T extends SlackResponse>(
     return { ok: false, error: "network_error" } as unknown as T;
   }
   return parseSlackResponse<T>(res, method);
+}
+
+/**
+ * Every Block Kit payload leaves through the markup pass: the blocks are what a
+ * reader sees, and `<…>` Slack cannot parse blanks a message (live 2026-09-22,
+ * `mrkdwn.ts` § sanitizeSlackMarkup). Here, once, rather than at each builder.
+ */
+function withSafeBlocks(payload: Record<string, unknown>): Record<string, unknown> {
+  return payload.blocks ? { ...payload, blocks: sanitizeSlackBlocks(payload.blocks) } : payload;
+}
+
+/**
+ * Answer through an interaction's or a slash command's `response_url` — the one
+ * way the Worker posts without `chat.postMessage`, so it takes the same markup
+ * pass: `text` and every mrkdwn block. Throws what the fetch throws; the
+ * callers decide what a failed reply is worth.
+ */
+export async function postToResponseUrl(
+  responseUrl: string,
+  body: { text: string; blocks?: unknown[] } & Record<string, unknown>,
+): Promise<void> {
+  await countedFetch(responseUrl, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(withSafeBlocks({ ...body, text: sanitizeSlackMarkup(body.text) })),
+  });
 }
 
 // Slack READ methods reject JSON bodies (invalid_arguments — the
@@ -95,6 +128,10 @@ export interface SlackUserInfo {
   profile?: { title?: string; email?: string; display_name?: string; status_text?: string };
   tz?: string;
   is_bot?: boolean;
+  /** A guest: multi-channel (`is_restricted`) or single-channel
+   *  (`is_ultra_restricted`). */
+  is_restricted?: boolean;
+  is_ultra_restricted?: boolean;
   deleted?: boolean;
 }
 
@@ -103,6 +140,15 @@ export async function usersInfo(env: Env, userId: string) {
   return slackGet<SlackResponse & { user?: SlackUserInfo }>(env, "users.info", {
     user: userId,
   });
+}
+
+/** users.list via the bot token — one page of the workspace directory. */
+export async function usersList(env: Env, cursor?: string) {
+  return slackGet<SlackResponse & { members?: SlackUserInfo[]; response_metadata?: { next_cursor?: string } }>(
+    env,
+    "users.list",
+    { limit: "200", ...(cursor ? { cursor } : {}) },
+  );
 }
 
 /** conversations.members via the bot token — member ids (first page). */
@@ -136,10 +182,13 @@ export async function postMessage(env: Env, input: PostMessageInput) {
   // slips into GitHub-flavored Markdown (## / **bold** / tables) under load, and
   // Slack renders none of it. Idempotent on Worker-authored text. (blocks, when
   // present, are Worker-built and already valid.)
+  //
+  // Then the markup pass, on everything: `<…>` Slack cannot parse blanks the
+  // whole message (live 2026-09-22), so only valid markup leaves as markup.
   return slackCall<SlackResponse & { ts?: string; channel?: string }>(env, "chat.postMessage", {
     mrkdwn: true,
     ...input,
-    ...(input.text ? { text: toSlackMrkdwn(input.text) } : {}),
+    ...(input.text ? { text: sanitizeSlackMarkup(toSlackMrkdwn(input.text)) } : {}),
   });
 }
 
@@ -238,17 +287,50 @@ export async function startStream(
   }
 }
 
+// ── The stream's markup pass ────────────────────────────────────────────────
+//
+// Every word a stream carries leaves through `appendStream` or `stopStream`
+// (`startStream` sends none), and both take `sanitizeSlackMarkup`'s rule by way
+// of `sanitizeStreamChunk`: valid `<…>` markup stays, every other `<`, `>` and
+// bare `&` is escaped. Slack documents `markdown_text` only as "message text
+// formatted in markdown" — not whether it parses `<…>` the way `text` does, and
+// on `text` markup it cannot parse blanked a whole message (live 2026-09-22).
+// So the stream takes the same pass until a live probe says otherwise; the
+// probe and what it settles are in docs/connectors/slack.md.
+//
+// The pass holds back a tail the next append could complete, keyed by stream
+// ts; `stopStream` sends whatever is still held and forgets the stream.
+
+const streamMarkup = new Map<string, StreamMarkupState>();
+
+/** A stream that never closes must not hold its tail forever. */
+const STREAM_MARKUP_LIMIT = 64;
+
+function streamPiece(ts: string, text: string, final: boolean): string {
+  const { text: out, state } = sanitizeStreamChunk(streamMarkup.get(ts) ?? STREAM_MARKUP_START, text, final);
+  streamMarkup.delete(ts);
+  if (!final) {
+    if (streamMarkup.size >= STREAM_MARKUP_LIMIT) streamMarkup.delete(streamMarkup.keys().next().value!);
+    streamMarkup.set(ts, state);
+  }
+  return out;
+}
+
 export async function appendStream(
   env: Env,
   channel: string,
   ts: string,
   markdownText: string,
 ): Promise<boolean> {
+  const text = streamPiece(ts, markdownText, false);
+  // All of it held back (`<@team`, waiting on `mate>`): nothing to send yet,
+  // and an empty append is not something to ask Slack to accept.
+  if (!text) return true;
   try {
     const res = await slackCall<SlackResponse>(env, "chat.appendStream", {
       channel,
       ts,
-      markdown_text: markdownText,
+      markdown_text: text,
     });
     return !!res.ok;
   } catch {
@@ -271,7 +353,7 @@ export async function appendTask(env: Env, channel: string, ts: string, task: Ta
           id: task.id,
           title: task.title.slice(0, 250),
           status: task.status,
-          ...(task.details ? { details: task.details.slice(0, 250) } : {}),
+          ...(task.details ? { details: taskDetails(task.details) } : {}),
         },
       ],
     });
@@ -279,6 +361,21 @@ export async function appendTask(env: Env, channel: string, ts: string, task: Ta
   } catch {
     return false;
   }
+}
+
+/**
+ * A task card's `details`, through the markup pass and within the 256-char
+ * chunk limit.
+ *
+ * Slack documents a task card's `title` as plain text (the task card block
+ * reference, which the `task_update` chunk "looks mighty similar to"), so the
+ * title goes as written. The chunk's `details` is a bare string whose format
+ * no page names — the block's is rich text — so it takes the pass: an escaped
+ * `&lt;` read literally is a blemish, a blanked card is not. Cut after
+ * escaping, and never inside an entity or a kept `<…>`.
+ */
+function taskDetails(details: string): string {
+  return sanitizeSlackMarkup(details).slice(0, 250).replace(/&[a-z]{0,3}$|<[^>]*$/, "");
 }
 
 /** Close the stream. Blocks are only accepted here — which is why the feedback
@@ -289,10 +386,13 @@ export async function stopStream(
   ts: string,
   blocks?: Array<Record<string, unknown>>,
 ): Promise<boolean> {
+  // The held tail, if any: an unclosed `<…` the stream ended on goes out escaped.
+  const tail = streamPiece(ts, "", true);
   try {
     const res = await slackCall<SlackResponse>(env, "chat.stopStream", {
       channel,
       ts,
+      ...(tail ? { markdown_text: tail } : {}),
       ...(blocks?.length ? { blocks } : {}),
     });
     return !!res.ok;
@@ -371,12 +471,24 @@ export interface ConversationsRepliesResult extends SlackOk {
  *  posted publicly announces you were not following it, and "is this still
  *  true?" reads as calling out whoever wrote the message. */
 export async function conversationsOpen(env: Env, userId: string): Promise<string | null> {
+  const res = await openConversation(env, userId);
+  return res.ok ? res.channel : null;
+}
+
+/** `conversations.open` with Slack's refusal kept. A relayed DM has to say WHY
+ *  a DM could not be opened — a deactivated account, a bot, a Slack Connect
+ *  user — and `conversationsOpen` above answers every one of those as null. */
+export async function openConversation(
+  env: Env,
+  userId: string,
+): Promise<{ ok: true; channel: string } | { ok: false; error: string }> {
   const res = await slackCall<SlackResponse & { channel?: { id?: string } }>(
     env,
     "conversations.open",
     { users: userId },
   );
-  return res.ok ? (res.channel?.id ?? null) : null;
+  if (!res.ok) return { ok: false, error: res.error };
+  return res.channel?.id ? { ok: true, channel: res.channel.id } : { ok: false, error: "no_channel" };
 }
 
 /** Permalink for a message. Fetched, never constructed: the archive URL shape

@@ -57,9 +57,11 @@ import { bounceLogLine, proposalWasAddressed } from "../agent/pending-notice";
 import type { AgentImage, HistoricalImages } from "../agent/provider-conversation";
 import { routeRequest } from "../agent/routing";
 import type { ModelTier } from "../agent/routing";
-import { resolveSignal, type GateVerdict } from "../gate/index";
+import { cutOffVerdict, resolveSignal, type GateRestage, type GateVerdict } from "../gate/index";
 import { collectStrings } from "../agent/tool-input";
 import { gateWordsFor } from "../agent/tool-table";
+import { relayRecipientId } from "../tools/relayed-dm-render";
+import { describeIssueUpdate, issueUpdateFromInput } from "../tools/github-issue-update-render";
 import {
   MAX_HISTORY_TURNS,
   proposalOperations,
@@ -67,11 +69,13 @@ import {
   type AssistantContext,
   type HistoryTurn,
   type PendingProposal,
+  type ProposalOperation,
   type ThreadRef,
   type ThreadState,
   type VisionReference,
 } from "../thread-state/index";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
+import { cardThreadOf } from "./request";
 import {
   withWorkingSignal,
   type CardCaveat,
@@ -81,6 +85,7 @@ import {
   type CardTarget,
   type Delivery,
   type DeliveryFailureStage,
+  type IssueTarget,
   type ProposalCard,
   type TurnSettlement,
 } from "./delivery";
@@ -356,6 +361,17 @@ export interface TurnDeps {
     /** A render of the Figma node a `prototype_scaffold` implements, or null
      *  where there is no node or the render failed. Best-effort by contract. */
     designPreviewImage(input: Record<string, unknown>): Promise<string | null>;
+    /** The listed repo a `github_issue_create` files into (or a
+     *  `github_issue_update` writes to), resolved from its
+     *  `repo` input as the executor will resolve it, and that repo's
+     *  visibility — so the card names where the issue will actually land and
+     *  who can read it. */
+    issueTarget(input: Record<string, unknown>): Promise<IssueTarget>;
+    /** Where a `github_workflow_run` would run: the listed repo its `repo`
+     *  resolves to and that repo's default branch — the only ref a run goes
+     *  to — or null when the repo is off the list. `branch` is null when the
+     *  default branch could not be read, and the card says so. */
+    workflowTarget(input: Record<string, unknown>): Promise<{ repo: string; branch: string | null } | null>;
   };
 
   /**
@@ -476,23 +492,18 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
   // The card THIS REPLY THREAD was holding when the turn began — and the grain
   // is the whole of it.
   //
-  // `pending` arrives from a `getProposalByThread` read keyed on the
-  // CONVERSATION, which in an unthreaded DM is the constant `"dm"`: every ask
-  // on that surface shares it. Settling by conversation would let a card
-  // staged under ask A suspend the unrelated thread of ask B, and a ✅ on A
-  // settles A's thread only — leaving B suspended with nothing in it to click.
-  // That is the grain error #573 fixed one layer down, and the comparison is
-  // the store's own (`proposalReplyThread`, #579) rather than a second
-  // derivation of the same fallback. In a channel `replyTs` IS the thread root,
-  // so channel behaviour is unchanged.
+  // `pending` is read on the reply thread (`cardThreadOf`), not the
+  // conversation, which in an unthreaded DM is the constant `"dm"` shared by
+  // every ask. The comparison stays as the guard on that: settling by
+  // conversation would let a card staged under ask A suspend the unrelated
+  // thread of ask B, and a ✅ on A settles A's thread only — leaving B
+  // suspended with nothing in it to click. In a channel `replyTs` IS the
+  // thread root, so channel behaviour is unchanged.
   //
   // It costs no read of its own: the adapter's read at the top of the request
   // is where it came from. It is also the card as of the turn's START, which
   // every exit but one leaves untouched — see `settlementOf`.
-  const turnThread = proposalReplyThread({
-    ...(request.replyTs ? { replyTs: request.replyTs } : {}),
-    threadTs: request.conversationTs,
-  });
+  const turnThread = cardThreadOf(request);
   const cardLive = request.pending
     ? proposalReplyThread(request.pending) === turnThread
     : false;
@@ -546,21 +557,30 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // vocabulary but the structural rule further down: if the model answers an
   // approval by re-invoking the same tool with the same input, that IS the
   // confirmation.
-  if (request.pending) {
+  //
+  // A line whose conversation spans more than its own thread — an unthreaded
+  // DM line — sits in no card's thread, so it may answer across the whole DM:
+  // one live card there is the card it means, several get asked about.
+  const cardThread = cardThreadOf(request);
+  const outsideAnyCard = cardThread !== request.conversationTs;
+  if (request.pending || outsideAnyCard) {
     const verdict = await resolveSignal(
       {
         kind: "typed",
         channel: request.channel,
-        thread: request.conversationTs,
+        thread: cardThread,
         text: request.text,
         userId: request.userId,
+        ...(request.pending ? {} : { wholeDm: true as const }),
       },
       { threadState },
     );
     // A verdict with no decision means the message was not a gate emoji — it
-    // is language, and language goes to the model. Anything else the gate has
+    // is language, and language goes to the model; so is a gate emoji with no
+    // card anywhere to answer and nothing to say. Anything else the gate has
     // already settled, win or lost race.
-    if (verdict.decision) {
+    const nothingToSettle = verdict.outcome === "none" && !verdict.post;
+    if (verdict.decision && !nothingToSettle) {
       return settleVerdict(verdict, {
         deps,
         memory,
@@ -571,6 +591,42 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
         telemetry: {
           tier: "chill",
           route: "typed-gate-emoji",
+          trivial: true,
+          correction: false,
+          tools: [],
+          references: [],
+          interim: 0,
+        },
+      });
+    }
+  }
+
+  // ── A cut-off run in this thread ───────────────────────────────────────────
+  //
+  // A card approved here whose run never reported back (`ThreadState`'s
+  // `Execution`) is answered on the next turn in its thread, before anything
+  // else: the person is owed the note about what may not have run, and a card
+  // for what never came back, whatever they wrote. The turn ends there — the
+  // card is the reply, and a model turn after it could only stage a second one
+  // over it. Only a thread holding no live card can have one: a card consumed
+  // by the claim is what a cut-off leaves behind.
+  if (!request.pending) {
+    const cutOff = await threadState
+      .takeCutOffExecutionInThread({ channel: request.channel, thread: cardThread })
+      .catch(() => null);
+    if (cutOff) {
+      const verdict = cutOffVerdict(cutOff, "confirm");
+      return settleVerdict(verdict, {
+        deps,
+        memory,
+        // Whatever they wrote went unanswered, and they should know it did
+        // rather than read the note as the answer.
+        aside: verdict.restage
+          ? "I haven't answered your message yet — ask again once you've sorted the card below."
+          : "I haven't answered your message yet — ask it again and I'll pick it up.",
+        telemetry: {
+          tier: "chill",
+          route: "cut-off-run",
           trivial: true,
           correction: false,
           tools: [],
@@ -935,6 +991,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     result,
     deps,
     implementPrdUrlFor(result.toolName, result.input, prd),
+    request.surface === "assistant",
   );
   // Anything the batch's plan needs posted BEFORE the card — because the card
   // holds the ✅/⛔ buttons and has to be the last message in the thread — is
@@ -1010,7 +1067,14 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
  */
 async function settleVerdict(
   verdict: GateVerdict,
-  ctx: { deps: TurnDeps; memory: ThreadMemory; telemetry: TurnTelemetry; note?: string },
+  ctx: {
+    deps: TurnDeps;
+    memory: ThreadMemory;
+    telemetry: TurnTelemetry;
+    note?: string;
+    /** A line after the verdict's note and before any re-staged card. */
+    aside?: string;
+  },
 ): Promise<TurnOutcome> {
   const said = verdict.post
     ? await ctx.deps.delivery.postGateNote(verdict.post.note)
@@ -1019,12 +1083,76 @@ async function settleVerdict(
   await ctx.deps.applyVerdict(verdict);
   const remembered = (verdict.outcome === "won" ? ctx.note : undefined) ?? posted;
   if (remembered) await ctx.memory.remember(remembered);
+  if (ctx.aside) {
+    await ctx.deps.delivery.postNote(ctx.aside);
+    await ctx.memory.remember(ctx.aside);
+  }
+  // A cut-off run's leftovers go back on a card of their own, after the note
+  // that explains them — the card holds the buttons, so it comes last.
+  const staged = verdict.restage ? await restageExecution(verdict.restage, ctx.deps) : null;
+  if (staged) await ctx.memory.remember(staged.proposal.proposalText);
   return {
-    disposition: "resolved",
-    ...(posted ? { posted } : {}),
+    disposition: staged ? "staged" : "resolved",
+    ...(staged ? { posted: staged.proposal.proposalText, staged } : posted ? { posted } : {}),
     wrote: ctx.memory.wrote(),
     telemetry: ctx.telemetry,
   };
+}
+
+/**
+ * Put what a cut-off run never finished in front of a person again, as a fresh
+ * card — the one way anything of it runs a second time.
+ *
+ * The card is built exactly as a staged proposal's is, reads included (the
+ * repo an intake lands in and whether it is public, a workflow's branch), so
+ * the person approves what will actually run rather than a copy of the old
+ * card. It keeps the original's requester, thread and PRD, and gets a ts and an
+ * hour of its own; staging it retires any card still live in that reply
+ * thread, as every staging does (`ThreadState.putProposal`).
+ *
+ * Exported because two doors outside Turn — the reaction and the button on the
+ * stuck card — are later looks too, and a card is Turn's to build. Their
+ * envelopes bind this with the same card reads a turn gets.
+ *
+ * @returns the staged card, or null when Slack refused it — said out loud, as
+ *          every failed staging is
+ */
+export async function restageExecution(
+  restage: GateRestage,
+  deps: Pick<TurnDeps, "threadState" | "delivery" | "cards">,
+): Promise<{ proposal: PendingProposal; card: ProposalCard } | null> {
+  const original = restage.proposal;
+  const first = restage.operations[0]!;
+  const built = await buildCard(
+    { kind: "proposal", operations: restage.operations, toolName: first.toolName, input: first.input },
+    deps,
+    implementPrdUrlFor(first.toolName, first.input, {
+      ...(original.notionPrdId ? { id: original.notionPrdId } : {}),
+      ...(original.notionPrdUrl ? { url: original.notionPrdUrl } : {}),
+    }),
+    // The card's DM caveats follow the surface, and a DM channel is the one
+    // the proposal record can still name.
+    original.channel.startsWith("D"),
+  );
+  // The warning rides the card, not only the note before it: a note that
+  // failed to post must not leave a card that reads like any other.
+  const card: ProposalCard = { ...built, caveats: [{ kind: "cut-off-rerun" }, ...built.caveats] };
+  const posted = await deps.delivery.card(card);
+  if (!posted.ok || !posted.ts) {
+    console.error(`[turn] re-staged card was not posted (${first.toolName})`);
+    await deps.delivery.postFailure("delivery");
+    return null;
+  }
+  const proposal: PendingProposal = {
+    ...original,
+    operations: restage.operations,
+    toolName: first.toolName,
+    input: first.input,
+    proposalTs: posted.ts,
+    proposalText: posted.text,
+  };
+  await deps.threadState.putProposal(proposal);
+  return { proposal, card };
 }
 
 // ── The reply path ───────────────────────────────────────────────────────────
@@ -1312,8 +1440,9 @@ function implementPrdUrlFor(
  */
 async function buildCard(
   result: Extract<AgentResult, { kind: "proposal" }>,
-  deps: TurnDeps,
+  deps: Pick<TurnDeps, "cards">,
   implementPrdUrl: string | undefined,
+  fromDm: boolean,
 ): Promise<ProposalCard> {
   const { toolName, input } = result;
   const card: ProposalCard = {
@@ -1324,6 +1453,49 @@ async function buildCard(
     caveats: caveatsFor(toolName, input, result.previewText),
     operations: result.operations,
   };
+
+  if (toolName === "github_issue_create") {
+    // THE REPO AND WHO CAN READ IT: an intake on a public repo is readable by
+    // anyone the moment it is filed, and the card is the one place a person
+    // reads the body before it goes out — so the heading names the repo the
+    // Worker files into, and the caveat says whether it is public. A redirect
+    // ("put it on plus-uno instead") is a new card, naming the new repo.
+    const { repo, visibility } = await deps.cards.issueTarget(input);
+    return {
+      ...card,
+      verb: `${card.verb} on ${repo}`,
+      caveats: [{ kind: "repo-visibility", repo, visibility, ...(fromDm ? { fromDm: true as const } : {}) }],
+    };
+  }
+  if (toolName === "github_issue_update") {
+    return { ...card, ...(await issueUpdateCardOf(result.operations, deps, fromDm)) };
+  }
+  if (toolName === "notion_create") {
+    // THE SURFACE, named the way the issue card names its repo: an intake is
+    // a GitHub issue or a Roadmap card, and a requester redirects by surface
+    // ("put it on the Roadmap instead") — so the heading says which this is.
+    const verb = NOTION_SURFACE_VERBS[String(input.surface ?? "").trim().toLowerCase()];
+    return verb ? { ...card, verb } : card;
+  }
+
+  if (toolName === "github_workflow_run") {
+    // What the ✅ starts, in full: the repo, the workflow, and the branch it
+    // runs on — always the default one, named rather than left to a guess,
+    // and a failed read of it said plainly rather than papered over.
+    const target = await deps.cards.workflowTarget(input);
+    return target
+      ? {
+          ...card,
+          fields: cardFieldsOf({
+            repo: target.repo,
+            workflow: input.workflow,
+            branch:
+              target.branch ??
+              "couldn't read the default branch — it will run on whatever GitHub's default is",
+          }),
+        }
+      : card;
+  }
 
   if (toolName === "prototype_scaffold") {
     // The Figma render, when one can be fetched — a URL on the card, not a
@@ -1347,7 +1519,95 @@ async function buildCard(
     const target = await deps.cards.notionTarget(input);
     return target ? { ...card, target } : card;
   }
+  if (toolName === "dm_relay") return { ...card, fields: relayFieldsOf(result.operations) };
   return card;
+}
+
+/** A `notion_create` card's heading, by the `surface` it files on. A surface
+ *  not listed keeps the row's own verb. */
+const NOTION_SURFACE_VERBS: Readonly<Record<string, string>> = {
+  prd: "create this card on the Roadmap board",
+  intake: "create this card on the Roadmap board",
+  decision: "log this decision in the Decisions DB",
+};
+
+/**
+ * An issue follow-up's card: per issue, `repo#number`, what will happen to it
+ * in the order it runs, and any comment verbatim — read through the same
+ * `issueUpdateFromInput` the executor runs, so the card says what the ✅ does.
+ * Preflight refuses an input that reading rejects before staging, so every
+ * operation here reads.
+ *
+ * The repo shown is the resolver's entry, read through `issueTarget` as the
+ * intake card reads it — the list's spelling, never the model's — and each
+ * repo a comment lands on gets the visibility notice.
+ */
+async function issueUpdateCardOf(
+  operations: ReadonlyArray<ProposalOperation>,
+  deps: Pick<TurnDeps, "cards">,
+  fromDm: boolean,
+): Promise<Pick<ProposalCard, "fields" | "caveats">> {
+  const updates = operations.filter((op) => op.toolName === "github_issue_update");
+  const notices = new Map<string, CardCaveat>();
+  const perIssue: Array<{ target: string; fields: CardField[] }> = [];
+  for (const op of updates) {
+    const { repo, visibility } = await deps.cards.issueTarget(op.input);
+    const read = issueUpdateFromInput(op.input);
+    if (!read.ok) {
+      perIssue.push({ target: `${repo}#${String(op.input.issue_number ?? "?")}`, fields: cardFieldsOf(op.input) });
+      continue;
+    }
+    if (read.update.comment && !notices.has(repo)) {
+      notices.set(repo, { kind: "repo-visibility", repo, visibility, write: "comment", ...(fromDm ? { fromDm: true as const } : {}) });
+    }
+    perIssue.push({
+      target: `${repo}#${read.update.issue}`,
+      fields: [
+        { label: "operations", value: describeIssueUpdate(read.update).join(" · ") },
+        ...(read.update.comment ? [{ label: "comment", value: read.update.comment }] : []),
+      ],
+    });
+  }
+  const fields: CardField[] =
+    perIssue.length === 1
+      ? [{ label: "issue", value: perIssue[0]!.target }, ...perIssue[0]!.fields]
+      : perIssue.map((u) => ({ label: u.target, under: u.fields.map((field) => ({ field })) }));
+  return { fields, caveats: [...notices.values()] };
+}
+
+/**
+ * A relayed DM's card: who will be DM'd, and the text they will read.
+ *
+ * The fields are built from EVERY relay in the batch, not the first operation's
+ * input, because each recipient is an operation of its own and the ✅ is
+ * consent to each of them. A recipient reads as the mention Slack would ping —
+ * the check that the name resolved to the right person is made by looking at
+ * it. One text shared by every recipient is shown once; texts that differ are
+ * shown per recipient, verbatim.
+ */
+function relayFieldsOf(operations: ReadonlyArray<ProposalOperation>): CardField[] {
+  const relays = operations.filter((op) => op.toolName === "dm_relay");
+  const mention = (op: ProposalOperation): string => {
+    const id = relayRecipientId(op.input.recipient);
+    return id ? `<@${id}>` : String(op.input.recipient ?? "");
+  };
+  const textOf = (op: ProposalOperation): string =>
+    typeof op.input.text === "string" ? op.input.text : "";
+  if (new Set(relays.map(textOf)).size > 1) {
+    return [
+      {
+        label: "messages",
+        under: relays.map((op) => ({ field: { label: mention(op), value: textOf(op) } })),
+      },
+    ];
+  }
+  const recipients = relays.map(mention);
+  return [
+    recipients.length === 1
+      ? { label: "recipient", value: recipients[0]! }
+      : { label: "recipients", value: recipients.join(", ") },
+    { label: "text", value: textOf(relays[0]!) },
+  ];
 }
 
 /**
@@ -1412,7 +1672,7 @@ function cardFieldOf(label: string, value: unknown): CardField {
 /**
  * What a person must be told about this staged input before they press ✅.
  *
- * A JUDGEMENT, which is why it is here and not in the renderer: both caveats
+ * A JUDGEMENT, which is why it is here and not in the renderer: the caveats
  * are reached by READING the staged input, and the renderer only knows how each
  * one reads.
  *
@@ -1432,6 +1692,9 @@ function cardFieldOf(label: string, value: unknown): CardField {
  * a weaker model provider cannot silently skip the disclosure. The bundle
  * contract for prototype share-outs is a Loom walkthrough, a live preview and a
  * Decisions DB link (`skills/uno-publish/references/method.md`).
+ *
+ * The repo-visibility caveat is `buildCard`'s, because naming the repo and
+ * its visibility takes a read through `deps.cards`.
  */
 function caveatsFor(
   toolName: string,

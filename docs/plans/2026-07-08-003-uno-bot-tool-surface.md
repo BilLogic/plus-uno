@@ -62,7 +62,7 @@ Domain first (the estate/deliverable, never the backend), verb from a controlled
 
 ### Two considered refinements (vs the earlier sketch)
 
-1. **GitHub writes stay two named tools, not one `github_dispatch`.** Collapsing `implement`/`implement_design` would lose `component_implement`'s "PRD required" guard and force a loose `{workflow, params}` schema. Two tools with rigid schemas is safer; revisit a generic dispatch only if a 3rd Action appears.
+1. **GitHub writes stay two named tools, not one `github_dispatch`.** Collapsing `implement`/`implement_design` would lose `component_implement`'s "PRD required" guard and force a loose `{workflow, params}` schema. Two tools with rigid schemas is safer; revisit a generic dispatch only if a 3rd Action appears. *Amended 2026-09-22:* a generic dispatch now exists — `github_workflow_run`, ✅-gated, limited to the workflows each repo's `GITHUB_REPOS` entry names, always on that repo's default branch. `component_implement` and `prototype_scaffold` stay named, because they carry structured payloads (a PRD, a Figma frame, the thread transcript) that a generic dispatch would lose.
 2. **No generic `slack_post`.** The only legit programmatic cross-channel post is the shareout; a "post anywhere" tool is a spam/blast-radius risk. In-thread replies are **runtime**, not a tool. So Slack = `slack_thread_read` (R) + `shareout_post` (W).
 
 ## 4. Scenario coverage

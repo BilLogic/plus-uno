@@ -28,6 +28,7 @@ import { resolve } from "node:path";
 import {
   resolveSignal,
   runReactionDoor,
+  type GateRestage,
   type GateSignal,
   type GateVerdict,
   type ReactionDoorTarget,
@@ -507,6 +508,7 @@ describe("the reaction door", () => {
     let saidBeforeRunning: string[] | undefined;
     const targets: ReactionDoorTarget[] = [];
     const reads: string[] = [];
+    const restaged: GateRestage[] = [];
 
     await runReactionDoor(
       {
@@ -534,10 +536,13 @@ describe("the reaction door", () => {
           ran.push(verdict);
           if (opts.applyVerdict) await opts.applyVerdict(verdict);
         },
+        async restage(restage) {
+          restaged.push(restage);
+        },
       },
     );
 
-    return { delivery, ran, targets, reads, threadState, saidBeforeRunning };
+    return { delivery, ran, targets, reads, threadState, saidBeforeRunning, restaged };
   }
 
   it("speaks the verdict, runs the tool, and leaves nothing up", async () => {
@@ -644,6 +649,7 @@ describe("the button door", () => {
     const targets: ButtonDoorTarget[] = [];
     const ephemerals: string[] = [];
     const replacements: Array<{ text: string; note: string }> = [];
+    const restaged: GateRestage[] = [];
 
     await runButtonDoor(
       {
@@ -669,10 +675,13 @@ describe("the button door", () => {
         async replaceCard(text, note) {
           replacements.push({ text, note });
         },
+        async restage(restage) {
+          restaged.push(restage);
+        },
       },
     );
 
-    return { delivery, ran, targets, ephemerals, replacements, threadState, saidBeforeRunning };
+    return { delivery, ran, targets, ephemerals, replacements, threadState, saidBeforeRunning, restaged };
   }
 
   it("speaks the verdict, runs the tool, and leaves nothing up", async () => {
@@ -737,6 +746,7 @@ describe("the button door", () => {
           },
           replyEphemeral: async () => {},
           replaceCard: async () => {},
+          restage: async () => {},
         },
       ),
       /notion 502/,
