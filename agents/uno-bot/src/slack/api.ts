@@ -2,7 +2,14 @@
 // because we only need 3-4 methods and Workers prefers a small bundle.
 
 import type { Env } from "../types";
-import { sanitizeSlackBlocks, sanitizeSlackMarkup, toSlackMrkdwn } from "./mrkdwn";
+import {
+  STREAM_MARKUP_START,
+  sanitizeSlackBlocks,
+  sanitizeSlackMarkup,
+  sanitizeStreamChunk,
+  toSlackMrkdwn,
+  type StreamMarkupState,
+} from "./mrkdwn";
 import { countedFetch, rethrowIfBudget } from "../net";
 import type { SlackEventFile } from "./types";
 import { rowFor } from "../agent/tool-table";
@@ -267,17 +274,50 @@ export async function startStream(
   }
 }
 
+// ── The stream's markup pass ────────────────────────────────────────────────
+//
+// Every word a stream carries leaves through `appendStream` or `stopStream`
+// (`startStream` sends none), and both take `sanitizeSlackMarkup`'s rule by way
+// of `sanitizeStreamChunk`: valid `<…>` markup stays, every other `<`, `>` and
+// bare `&` is escaped. Slack documents `markdown_text` only as "message text
+// formatted in markdown" — not whether it parses `<…>` the way `text` does, and
+// on `text` markup it cannot parse blanked a whole message (live 2026-09-22).
+// So the stream takes the same pass until a live probe says otherwise; the
+// probe and what it settles are in docs/connectors/slack.md.
+//
+// The pass holds back a tail the next append could complete, keyed by stream
+// ts; `stopStream` sends whatever is still held and forgets the stream.
+
+const streamMarkup = new Map<string, StreamMarkupState>();
+
+/** A stream that never closes must not hold its tail forever. */
+const STREAM_MARKUP_LIMIT = 64;
+
+function streamPiece(ts: string, text: string, final: boolean): string {
+  const { text: out, state } = sanitizeStreamChunk(streamMarkup.get(ts) ?? STREAM_MARKUP_START, text, final);
+  streamMarkup.delete(ts);
+  if (!final) {
+    if (streamMarkup.size >= STREAM_MARKUP_LIMIT) streamMarkup.delete(streamMarkup.keys().next().value!);
+    streamMarkup.set(ts, state);
+  }
+  return out;
+}
+
 export async function appendStream(
   env: Env,
   channel: string,
   ts: string,
   markdownText: string,
 ): Promise<boolean> {
+  const text = streamPiece(ts, markdownText, false);
+  // All of it held back (`<@team`, waiting on `mate>`): nothing to send yet,
+  // and an empty append is not something to ask Slack to accept.
+  if (!text) return true;
   try {
     const res = await slackCall<SlackResponse>(env, "chat.appendStream", {
       channel,
       ts,
-      markdown_text: markdownText,
+      markdown_text: text,
     });
     return !!res.ok;
   } catch {
@@ -318,10 +358,13 @@ export async function stopStream(
   ts: string,
   blocks?: Array<Record<string, unknown>>,
 ): Promise<boolean> {
+  // The held tail, if any: an unclosed `<…` the stream ended on goes out escaped.
+  const tail = streamPiece(ts, "", true);
   try {
     const res = await slackCall<SlackResponse>(env, "chat.stopStream", {
       channel,
       ts,
+      ...(tail ? { markdown_text: tail } : {}),
       ...(blocks?.length ? { blocks } : {}),
     });
     return !!res.ok;

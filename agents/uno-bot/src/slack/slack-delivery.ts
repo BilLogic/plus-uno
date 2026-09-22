@@ -43,11 +43,34 @@ import type { Delivery } from "../turn/index";
 
 export type { SlackDeliveryTarget } from "./delivery-adapter";
 
+/**
+ * Whether a streaming flag is on — which takes the flag AND a recorded markup
+ * probe, `SLACK_STREAM_MARKUP_PROBE`.
+ *
+ * Streamed text passes the same markup pass as posted text (`api.ts` § The
+ * stream's markup pass), but whether Slack's `markdown_text` blanks on markup
+ * it cannot parse, as `text` does, has not been seen live. The probe that
+ * settles it is in docs/connectors/slack.md; whoever runs it records the result
+ * in the var. A flag set without one stays off, and says why on every turn.
+ */
+export function streamFlagOn(
+  env: Pick<Env, "SLACK_STREAMING" | "SLACK_STREAM_PLAN" | "SLACK_STREAM_MARKUP_PROBE">,
+  flag: "SLACK_STREAMING" | "SLACK_STREAM_PLAN",
+): boolean {
+  if (env[flag] !== "on") return false;
+  if (env.SLACK_STREAM_MARKUP_PROBE?.trim()) return true;
+  console.warn(
+    `[slack] ${flag} is "on" but SLACK_STREAM_MARKUP_PROBE is unset — streaming stays off` +
+      " until the markup probe in docs/connectors/slack.md has passed",
+  );
+  return false;
+}
+
 export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
   return deliveryAdapter(
     {
       slack: slackClientFor(env),
-      planStream: env.SLACK_STREAM_PLAN === "on",
+      planStream: streamFlagOn(env, "SLACK_STREAM_PLAN"),
       logWorking: consoleWorkingLog,
     },
     target,
@@ -65,7 +88,7 @@ export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
 export function postingDeps(env: Env): PostingDeps {
   return {
     slack: postingClientFor(env),
-    streamingOn: env.SLACK_STREAMING === "on",
+    streamingOn: streamFlagOn(env, "SLACK_STREAMING"),
     alertChannel: env.UNO_BOT_ALERT_CHANNEL || DEFAULT_ALERT_CHANNEL,
     throttle: env.HARNESS_KV ?? null,
   };

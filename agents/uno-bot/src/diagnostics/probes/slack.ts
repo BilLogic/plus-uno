@@ -31,7 +31,8 @@ export const slackSearchProbe: ProbeRun = async (env, url) => ({
 // This runs in the Worker, so what deploys is what answers.
 //
 // ?channel= (required) ?thread_ts= ?user= ?team= — each argument independently
-// omittable, so the failing one can be bisected. Returns Slack's raw response.
+// omittable, so the failing one can be bisected; ?text= streams that text
+// raw and closes (the markup probe). Returns Slack's raw responses.
 // Token-gated: it posts a real (empty) stream to the channel on success.
 export const slackStreamProbe: ProbeRun = async (env, url) => {
   const channel = url.searchParams.get("channel");
@@ -64,15 +65,28 @@ export const slackStreamProbe: ProbeRun = async (env, url) => {
   // invisible in the Messages tab until you click "N replies"; broadcasting
   // puts it in the main timeline too.
   if (url.searchParams.get("broadcast")) payload.reply_broadcast = true;
-  const res = await countedFetch("https://slack.com/api/chat.startStream", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-      authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
-    },
-    body: JSON.stringify(payload),
-  });
-  return { body: { sent: payload, status: res.status, slack: await res.json() } };
+  const call = (method: string, body: Record<string, unknown>) =>
+    countedFetch(`https://slack.com/api/${method}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        authorization: `Bearer ${env.SLACK_BOT_TOKEN}`,
+      },
+      body: JSON.stringify(body),
+    });
+  const res = await call("chat.startStream", payload);
+  const slack = (await res.json()) as { ok?: boolean; ts?: string };
+  // ?text= — the markup probe (docs/connectors/slack.md § Streamed text):
+  // append this text AS GIVEN, bypassing the markup pass on purpose, then
+  // close the stream. Whether the rendered message is blank is what it asks,
+  // so the answer is in the channel, not in this response.
+  const text = url.searchParams.get("text");
+  if (text && slack.ok && slack.ts) {
+    const append = await call("chat.appendStream", { channel, ts: slack.ts, markdown_text: text });
+    const stop = await call("chat.stopStream", { channel, ts: slack.ts });
+    return { body: { sent: payload, status: res.status, slack, append: await append.json(), stop: await stop.json() } };
+  }
+  return { body: { sent: payload, status: res.status, slack } };
 };
 
 // Publish the App Home view and return Slack's raw verdict.
