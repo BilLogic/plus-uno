@@ -90,9 +90,30 @@ export type CardCaveat =
   | { kind: "no-open-questions" }
   /** A prototype share-out staged without the bundle's full set of links. */
   | { kind: "bundle-incomplete"; missing: string[] }
-  /** A write that lands somewhere anyone can read — a GitHub issue on the
-   *  public repo — so the ✅ is consent to publish the words on the card. */
-  | { kind: "public-repo"; repo: string };
+  /** A GitHub issue, readable by whoever can read its repo — anyone, when the
+   *  repo is public — so the ✅ is consent to publish the words on the card. */
+  | {
+      kind: "repo-visibility";
+      repo: string;
+      visibility: RepoVisibility;
+      /** What goes out: a new issue (absent) or a comment on an existing one. */
+      write?: "comment";
+      /** Asked for in a DM: the footer names the requester and links nothing. */
+      fromDm?: true;
+    };
+
+/** Who can read a listed repo's issues; `unknown` when GitHub would not say,
+ *  which the card words as "may be public". The same union as
+ *  `RepoVisibility` in `integrations/github.ts`, restated so the turn imports
+ *  no integration; keep the two in step. */
+export type RepoVisibility = "public" | "private" | "unknown";
+
+/** Where a staged intake would land: the listed repo the Worker resolved, and
+ *  its visibility. */
+export interface IssueTarget {
+  repo: string;
+  visibility: RepoVisibility;
+}
 
 /** The page a write lands on, in the words a Notion read reported — never a
  *  bare hex id, which is the whole reason the read happens. */

@@ -32,7 +32,7 @@ import { formatAssistantContext } from "../slack/assistant";
 import { buildNotionRevision, buildNotionTarget } from "../slack/notion-card";
 import { renderDeliveredBody } from "../slack/render";
 import { fetchFigmaImagePngUrl, parseFigmaUrl } from "../integrations/figma";
-import { githubWorkflowClient, resolveRepoFor } from "../integrations/github";
+import { githubRepoVisibility, githubWorkflowClient, resolveRepoFor } from "../integrations/github";
 import type { ThreadState } from "../thread-state/index";
 import type { Env } from "../types";
 import type { Delivery } from "./delivery";
@@ -175,9 +175,18 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
         const parts = figmaUrl ? parseFigmaUrl(figmaUrl) : null;
         return parts ? await fetchFigmaImagePngUrl(env, parts.fileKey, parts.nodeId, 1) : null;
       },
-      // The repo a GitHub intake lands in, for the card's public-repo notice —
-      // the same `GITHUB_REPO` the issue client files into.
-      issueRepo: () => env.GITHUB_REPO,
+      // The repo a GitHub intake lands in, resolved from its `repo` input as
+      // the executor resolves it, and whether that repo is public — asked of
+      // GitHub once per isolate. Preflight has already turned every refusal —
+      // an unlisted repo, or a misconfigured list that reaches none — into an
+      // ask or a plain refusal before staging (`tests/github-intake.test.ts`),
+      // so this fallback, which names `GITHUB_REPO`, is never a card anyone
+      // sees; and the executor would refuse that filing anyway.
+      async issueTarget(input) {
+        const target = resolveRepoFor(env, input.repo);
+        if (!target.ok) return { repo: env.GITHUB_REPO, visibility: "unknown" };
+        return { repo: target.entry.repo, visibility: await githubRepoVisibility(env, target.entry) };
+      },
       // A run's repo and branch as the executor will send them: the same
       // resolver, and the same cached default-branch read.
       async workflowTarget(input) {

@@ -664,7 +664,7 @@
   },
   {
     "name": "github_issue_create",
-    "description": "SIDE EFFECT (creates a real issue in a PUBLIC repo), routed through the confirmation gate. File an intake as a GitHub issue on the harness repo, where harness work is specced and fixed. Use it when someone asks to track, file or report a problem with uno-bot itself or the harness (skills, persona, harness docs, evals) — 'track this on GitHub', 'file an issue for someone to fix'. Run github_intake_search first, and stage this only when no open intake covers the request or the requester chose to file anyway. Product and design maintenance (a DS component, a product flow, a design doc) is a Roadmap intake card (notion_create, surface 'intake') instead; say which surface you chose so the requester can redirect it. You write the title and body only — the Worker sets the repo and the triage labels and appends a footer naming the requester and linking this thread. Anyone on the internet can read the issue: content from a DM or private channel other than this conversation never goes in it.",
+    "description": "SIDE EFFECT (creates a real issue on a listed GitHub repo), routed through the confirmation gate. File an intake as a GitHub issue on the listed repo whose purpose matches what would change — uno-bot or the harness (skills, persona, harness docs, evals) on plus-uno, the marketing site on plus-marketing-website, the service-blueprint app's code or schema on plus-uno-blueprint; unclear which, ask before staging. Use it when someone asks to track, file or report such a problem — 'track this on GitHub', 'file an issue for someone to fix'. Run github_intake_search on the same repo first, and stage this only when no open intake covers the request or the requester chose to file anyway. Product and design maintenance (a DS component, a product flow, a design doc) is a Roadmap intake card (notion_create, surface 'intake') instead; say which surface and repo you chose so the requester can redirect it. You write the title, the body and the repo — the Worker refuses a repo off its list, sets the triage labels and appends a footer naming the requester and linking this thread. The card says whether the repo is public; write every intake as if anyone can read it: content from a DM or private channel other than this conversation never goes in it.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
@@ -680,6 +680,68 @@
         "body": {
           "type": "string",
           "description": "Issue body in GitHub Markdown: the problem, what was expected, what happened instead, and how to reproduce it where known. A summary in your words; short quotes from this conversation are fine. No placeholders."
+        },
+        "repo": {
+          "type": "string",
+          "enum": [
+            "BilLogic/plus-uno",
+            "BilLogic/plus-marketing-website",
+            "BilLogic/plus-uno-blueprint"
+          ],
+          "description": "Optional: the listed repo the intake belongs on; omit for the default, plus-uno. Named by what would change, never guessed."
+        }
+      }
+    }
+  },
+  {
+    "name": "github_issue_update",
+    "description": "SIDE EFFECT (writes to a real issue on a listed GitHub repo), routed through the confirmation gate. Follow up on an existing GitHub issue in a listed repo: comment on it ('add this repro to #688'), close it as completed or not planned, or reopen it ('close #688 as done'), and add or remove labels that already exist on the repo ('label #688 bug'). One call per issue, carrying every change asked for on it; several issues are several calls in the same reply, which stage as one card. Never the triage outcomes ready-for-agent, ready-for-human or wontfix, either way — those are a maintainer's decision, so say so instead of staging. The Worker refuses a repo off its list and a label the repo lacks, and appends a footer naming the requester to every comment — write the comment only. The card says whether the repo is public; write every comment as if anyone can read it: content from a DM or private channel other than this conversation never goes in one.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "issue_number"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "enum": [
+            "BilLogic/plus-uno",
+            "BilLogic/plus-marketing-website",
+            "BilLogic/plus-uno-blueprint"
+          ],
+          "description": "Optional: the repo the issue is on, from the bot's list; omit for the default, plus-uno."
+        },
+        "issue_number": {
+          "type": "integer",
+          "description": "The issue's number, e.g. 688."
+        },
+        "comment": {
+          "type": "string",
+          "description": "Optional: a comment in GitHub Markdown, exactly as it should read on the issue. When closing, the reason in a sentence belongs here."
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "closed_completed",
+            "closed_not_planned",
+            "open"
+          ],
+          "description": "Optional: close as completed (done or fixed), close as not planned (won't do, duplicate, stale), or reopen."
+        },
+        "add_labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional: labels to add, by their name on the repo."
+        },
+        "remove_labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional: labels to take off the issue."
         }
       }
     }

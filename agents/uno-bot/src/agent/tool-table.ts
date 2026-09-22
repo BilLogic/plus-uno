@@ -227,11 +227,23 @@ export const TOOL_TABLE = {
     // review heads-up in the design channel.
     reviewRequest: null,
     gate: {
-      // The repo and that it is public are the card's public-repo caveat,
-      // named from `GITHUB_REPO` — said once, and never a literal here.
+      // The card adds the resolved repo to this verb, and its visibility as
+      // the repo-visibility caveat — read, and never a literal here.
       verb: "file a GitHub issue",
       kind: "file an issue",
       nouns: ["issue", "github", "track", "file"],
+    },
+  },
+  // A follow-up on an issue in a listed repo: comment, close or reopen, labels.
+  // One operation per issue, so several issues in one ask are one card.
+  github_issue_update: {
+    access: "gated",
+    retrieval: false,
+    reviewRequest: null,
+    gate: {
+      verb: "update a GitHub issue",
+      kind: "update an issue",
+      nouns: ["issue", "github", "comment", "close", "reopen", "label"],
     },
   },
   // A workflow the repo list allows, on a listed repo. No review request: a

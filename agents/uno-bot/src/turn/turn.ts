@@ -61,6 +61,7 @@ import { resolveSignal, type GateVerdict } from "../gate/index";
 import { collectStrings } from "../agent/tool-input";
 import { gateWordsFor } from "../agent/tool-table";
 import { relayRecipientId } from "../tools/relayed-dm-render";
+import { describeIssueUpdate, issueUpdateFromInput } from "../tools/github-issue-update-render";
 import {
   MAX_HISTORY_TURNS,
   proposalOperations,
@@ -83,6 +84,7 @@ import {
   type CardTarget,
   type Delivery,
   type DeliveryFailureStage,
+  type IssueTarget,
   type ProposalCard,
   type TurnSettlement,
 } from "./delivery";
@@ -358,9 +360,12 @@ export interface TurnDeps {
     /** A render of the Figma node a `prototype_scaffold` implements, or null
      *  where there is no node or the render failed. Best-effort by contract. */
     designPreviewImage(input: Record<string, unknown>): Promise<string | null>;
-    /** The repo a `github_issue_create` files into — the Worker's
-     *  `GITHUB_REPO`, so the card names where the issue will actually land. */
-    issueRepo(): string;
+    /** The listed repo a `github_issue_create` files into (or a
+     *  `github_issue_update` writes to), resolved from its
+     *  `repo` input as the executor will resolve it, and that repo's
+     *  visibility — so the card names where the issue will actually land and
+     *  who can read it. */
+    issueTarget(input: Record<string, unknown>): Promise<IssueTarget>;
     /** Where a `github_workflow_run` would run: the listed repo its `repo`
      *  resolves to and that repo's default branch — the only ref a run goes
      *  to — or null when the repo is off the list. `branch` is null when the
@@ -945,6 +950,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     result,
     deps,
     implementPrdUrlFor(result.toolName, result.input, prd),
+    request.surface === "assistant",
   );
   // Anything the batch's plan needs posted BEFORE the card — because the card
   // holds the ✅/⛔ buttons and has to be the last message in the thread — is
@@ -1324,6 +1330,7 @@ async function buildCard(
   result: Extract<AgentResult, { kind: "proposal" }>,
   deps: TurnDeps,
   implementPrdUrl: string | undefined,
+  fromDm: boolean,
 ): Promise<ProposalCard> {
   const { toolName, input } = result;
   const card: ProposalCard = {
@@ -1336,10 +1343,20 @@ async function buildCard(
   };
 
   if (toolName === "github_issue_create") {
-    // THE PUBLIC REPO: an intake is readable by anyone the moment it is filed,
-    // and the card is the one place a person reads the body before it goes
-    // out — so every such card says so, naming the repo the Worker files into.
-    return { ...card, caveats: [{ kind: "public-repo", repo: deps.cards.issueRepo() }] };
+    // THE REPO AND WHO CAN READ IT: an intake on a public repo is readable by
+    // anyone the moment it is filed, and the card is the one place a person
+    // reads the body before it goes out — so the heading names the repo the
+    // Worker files into, and the caveat says whether it is public. A redirect
+    // ("put it on plus-uno instead") is a new card, naming the new repo.
+    const { repo, visibility } = await deps.cards.issueTarget(input);
+    return {
+      ...card,
+      verb: `${card.verb} on ${repo}`,
+      caveats: [{ kind: "repo-visibility", repo, visibility, ...(fromDm ? { fromDm: true as const } : {}) }],
+    };
+  }
+  if (toolName === "github_issue_update") {
+    return { ...card, ...(await issueUpdateCardOf(result.operations, deps, fromDm)) };
   }
 
   if (toolName === "github_workflow_run") {
@@ -1385,6 +1402,50 @@ async function buildCard(
   }
   if (toolName === "dm_relay") return { ...card, fields: relayFieldsOf(result.operations) };
   return card;
+}
+
+/**
+ * An issue follow-up's card: per issue, `repo#number`, what will happen to it
+ * in the order it runs, and any comment verbatim — read through the same
+ * `issueUpdateFromInput` the executor runs, so the card says what the ✅ does.
+ * Preflight refuses an input that reading rejects before staging, so every
+ * operation here reads.
+ *
+ * The repo shown is the resolver's entry, read through `issueTarget` as the
+ * intake card reads it — the list's spelling, never the model's — and each
+ * repo a comment lands on gets the visibility notice.
+ */
+async function issueUpdateCardOf(
+  operations: ReadonlyArray<ProposalOperation>,
+  deps: TurnDeps,
+  fromDm: boolean,
+): Promise<Pick<ProposalCard, "fields" | "caveats">> {
+  const updates = operations.filter((op) => op.toolName === "github_issue_update");
+  const notices = new Map<string, CardCaveat>();
+  const perIssue: Array<{ target: string; fields: CardField[] }> = [];
+  for (const op of updates) {
+    const { repo, visibility } = await deps.cards.issueTarget(op.input);
+    const read = issueUpdateFromInput(op.input);
+    if (!read.ok) {
+      perIssue.push({ target: `${repo}#${String(op.input.issue_number ?? "?")}`, fields: cardFieldsOf(op.input) });
+      continue;
+    }
+    if (read.update.comment && !notices.has(repo)) {
+      notices.set(repo, { kind: "repo-visibility", repo, visibility, write: "comment", ...(fromDm ? { fromDm: true as const } : {}) });
+    }
+    perIssue.push({
+      target: `${repo}#${read.update.issue}`,
+      fields: [
+        { label: "operations", value: describeIssueUpdate(read.update).join(" · ") },
+        ...(read.update.comment ? [{ label: "comment", value: read.update.comment }] : []),
+      ],
+    });
+  }
+  const fields: CardField[] =
+    perIssue.length === 1
+      ? [{ label: "issue", value: perIssue[0]!.target }, ...perIssue[0]!.fields]
+      : perIssue.map((u) => ({ label: u.target, under: u.fields.map((field) => ({ field })) }));
+  return { fields, caveats: [...notices.values()] };
 }
 
 /**
@@ -1505,8 +1566,8 @@ function cardFieldOf(label: string, value: unknown): CardField {
  * contract for prototype share-outs is a Loom walkthrough, a live preview and a
  * Decisions DB link (`skills/uno-publish/references/method.md`).
  *
- * The public-repo caveat is `buildCard`'s, because naming the repo takes a
- * read of the Worker's config through `deps.cards`.
+ * The repo-visibility caveat is `buildCard`'s, because naming the repo and
+ * its visibility takes a read through `deps.cards`.
  */
 function caveatsFor(
   toolName: string,

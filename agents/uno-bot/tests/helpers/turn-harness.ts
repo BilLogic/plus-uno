@@ -17,6 +17,7 @@ import { buildProviderConversation } from "../../src/agent/provider-conversation
 import {
   recordingDelivery,
   type GateNote,
+  type IssueTarget,
   type RecordingDelivery,
   type TurnDeps,
   type TurnRequest,
@@ -155,6 +156,10 @@ export function harness(opts: {
    * is every other case here.
    */
   cancelKey?: ThreadRef;
+  /** The repo a staged intake would land in, and whether it is public — what
+   *  the Worker's resolver and visibility read would answer. Absent, every
+   *  intake is on `ISSUE_REPO`, public. */
+  issueTarget?: (input: Record<string, unknown>) => IssueTarget;
 } = {}): Harness {
   const delivery = opts.delivery ?? recordingDelivery();
   const threadState = opts.threadState ?? createInMemoryThreadState();
@@ -253,7 +258,9 @@ export function harness(opts: {
       async designPreviewImage() {
         return "https://figma.example/preview.png";
       },
-      issueRepo: () => ISSUE_REPO,
+      async issueTarget(input) {
+        return opts.issueTarget?.(input) ?? { repo: ISSUE_REPO, visibility: "public" };
+      },
       async workflowTarget(input) {
         const repo = typeof input.repo === "string" && input.repo ? input.repo : ISSUE_REPO;
         return { repo, branch: opts.workflowBranch === undefined ? WORKFLOW_DEFAULT_REF : opts.workflowBranch };

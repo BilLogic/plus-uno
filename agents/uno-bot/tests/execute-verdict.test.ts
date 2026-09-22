@@ -60,6 +60,13 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
       { status: 201, headers: { "content-type": "application/json" } },
     );
   }
+  if (url.startsWith("https://api.github.com/repos/") && url.endsWith("/comments")) {
+    return new Response(
+      JSON.stringify({ html_url: "https://github.com/BilLogic/plus-uno/issues/688#issuecomment-1" }),
+      { status: 201, headers: { "content-type": "application/json" } },
+    );
+  }
+  if (/^https:\/\/api\.github\.com\/repos\/[^/]+\/[^/]+\/issues\/\d+$/.test(url)) return reply({ number: 688 });
   if (url.includes("oauth2.googleapis.com/token")) return reply({ access_token: "ya29.test" });
   if (url.includes("gmail.googleapis.com")) return reply({ id: "msg-1" });
   throw new Error(`no stub route for ${url}`);
@@ -201,4 +208,72 @@ test("an approved GitHub intake names who asked in its footer, and links the iss
   assert.ok(note, "the issue link came back to the requesting conversation");
   assert.equal(note.channel, "D0REQUESTER");
   assert.equal(note.thread_ts, "1700000000.000100", "under the real reply ts, not the conversation key");
+});
+
+test("an approved issue follow-up comments with the requester's footer, then closes with its reason", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env({ GITHUB_TOKEN: "ghp_test", GITHUB_REPO: "BilLogic/plus-uno" }),
+    won([{ toolName: "github_issue_update", input: { issue_number: 688, comment: "Fixed in r384.", state: "closed_completed" } }]),
+  );
+
+  const github = calls.filter((c) => c.url.startsWith("https://api.github.com/"));
+  assert.deepEqual(
+    github.map((c) => c.url),
+    [
+      "https://api.github.com/repos/BilLogic/plus-uno/issues/688/comments",
+      "https://api.github.com/repos/BilLogic/plus-uno/issues/688",
+    ],
+    "the comment lands before the close",
+  );
+  const comment = String(github[0]!.body?.body);
+  assert.ok(comment.startsWith("Fixed in r384."), comment);
+  assert.match(comment, /Posted from Slack by uno-bot on behalf of Bill Guo, posted from a DM/);
+  assert.doesNotMatch(comment, /slack\.com/);
+  assert.deepEqual(github[1]!.body, { state: "closed", state_reason: "completed" });
+
+  const note = posts().find((p) => String(p.text).includes("issues/688"));
+  assert.ok(note, "the issue link came back to the requesting conversation");
+  assert.equal(note.thread_ts, "1700000000.000100", "under the real reply ts, not the conversation key");
+});
+
+const LISTED = {
+  GITHUB_TOKEN: "ghp_test",
+  GITHUB_REPO: "BilLogic/plus-uno",
+  GITHUB_REPOS: JSON.stringify([
+    { repo: "BilLogic/plus-uno", purpose: "uno-bot and the harness", workflows: [] },
+    { repo: "BilLogic/plus-marketing-website", purpose: "the public marketing site", workflows: [] },
+  ]),
+};
+
+test("an approved intake naming a listed repo is filed there, with the two fixed labels and the footer", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env(LISTED),
+    won([{
+      toolName: "github_issue_create",
+      // The model's spelling; the list's is what reaches GitHub.
+      input: { title: "Hero CTA 404s", body: "The hero button links nowhere.", repo: "plus-marketing-website" },
+    }]),
+  );
+
+  const filings = calls.filter((c) => /^https:\/\/api\.github\.com\/repos\/.+\/issues$/.test(c.url));
+  assert.deepEqual(filings.map((c) => c.url), ["https://api.github.com/repos/BilLogic/plus-marketing-website/issues"]);
+  const sent = filings[0]!.body!;
+  assert.deepEqual(sent.labels, ["harness-intake", "needs-triage"]);
+  assert.match(String(sent.body), /^The hero button links nowhere\.\n\n---\nFiled from Slack by uno-bot on behalf of Bill Guo/);
+  assert.equal(sent.repo, undefined, "the repo is the URL's, never a field of the model's");
+  assert.ok(posts().some((p) => /on BilLogic\/plus-marketing-website/.test(String(p.text))));
+});
+
+test("an approved intake naming a repo off the list is refused, and nothing reaches GitHub", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env(LISTED),
+    won([{ toolName: "github_issue_create", input: { title: "A gap", body: "Details.", repo: "someone/else" } }]),
+  );
+  assert.deepEqual(calls.filter((c) => c.url.startsWith("https://api.github.com/")), []);
 });

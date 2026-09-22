@@ -16,6 +16,11 @@
  *  such as `ready-for-agent` is never self-applied. */
 export const INTAKE_LABELS = ["harness-intake", "needs-triage"] as const;
 
+/** The triage outcomes (`docs/agents/triage-labels.md`): a maintainer's
+ *  decision about an intake, so no bot write ever applies or removes one —
+ *  `github_issue_update` refuses them, whatever the model asks. */
+export const TRIAGE_OUTCOME_LABELS = ["ready-for-agent", "ready-for-human", "wontfix"] as const;
+
 /** The model's half of an intake: a title and a body, and nothing else. */
 export interface IssueDraft {
   title: string;
@@ -29,16 +34,16 @@ export interface IssueFiling {
   /** The source thread's permalink, or null when Slack would not give one. */
   permalink: string | null;
   /** Asked for in a DM: the footer says so and links nothing, because a DM
-   *  stays a DM and the issue is public. */
+   *  stays a DM and the issue may be public. */
   dm?: boolean;
 }
 
 /**
  * The draft as the tool input carries it.
  *
- * Reads `title` and `body` and nothing else, so a `labels` or `repo` the model
- * sent anyway goes nowhere — the schema refuses them too, but the executor does
- * not rely on the schema.
+ * Reads `title` and `body` and nothing else, so a `labels` the model sent
+ * anyway goes nowhere — the schema refuses it too, but the executor does not
+ * rely on the schema. The `repo` is the executor's, through the resolver.
  */
 export function issueDraftFromInput(input: Record<string, unknown>): IssueDraft {
   const str = (v: unknown): string => (typeof v === "string" ? v.trim() : "");
@@ -51,13 +56,28 @@ export function issueDraftFromInput(input: Record<string, unknown>): IssueDraft 
  * lives, and can tell the requester's words from the bot's.
  */
 export function renderIssueBody(draft: IssueDraft, filing: IssueFiling): string {
+  return withSlackFooter(draft.body, filing, "Filed");
+}
+
+/**
+ * A comment the bot posts on an issue (`github_issue_update`): the text
+ * verbatim, then the same footer an intake carries — "Posted" where an intake
+ * says "Filed" — so every word the shared token writes names who asked.
+ */
+export function renderCommentBody(text: string, filing: IssueFiling): string {
+  return withSlackFooter(text, filing, "Posted");
+}
+
+/** The words, a rule, then who asked and where. A DM's footer says so and
+ *  links nothing: the repo is public and a DM stays a DM. */
+function withSlackFooter(text: string, filing: IssueFiling, verb: "Filed" | "Posted"): string {
   const footer = filing.dm
-    ? [`Filed from Slack by uno-bot on behalf of ${filing.requester}, filed from a DM.`]
+    ? [`${verb} from Slack by uno-bot on behalf of ${filing.requester}, ${verb.toLowerCase()} from a DM.`]
     : [
-        `Filed from Slack by uno-bot on behalf of ${filing.requester}.`,
+        `${verb} from Slack by uno-bot on behalf of ${filing.requester}.`,
         `Source thread: ${filing.permalink ?? "(thread link unavailable)"}`,
       ];
-  return [draft.body, "", "---", ...footer].join("\n");
+  return [text, "", "---", ...footer].join("\n");
 }
 
 /**

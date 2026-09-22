@@ -17,7 +17,7 @@
 // `executeGithubWorkflowRun`, the binding at the foot of this file.
 
 import type { Env, SlackContext } from "../types";
-import { postMessage } from "../slack/api";
+import { slackFilingDeps } from "./github-issue";
 import {
   GithubRequestError,
   githubWorkflowClient,
@@ -121,9 +121,8 @@ export async function executeGithubWorkflowRun(
   return runGithubWorkflow(input, {
     resolveRepo: (requested) => resolveRepoFor(env, requested),
     clientFor: (target) => githubWorkflowClient(env, target),
-    async postToThread(text) {
-      // Under the real ts the card was posted with, as the issue executor does.
-      await postMessage(env, { channel: slack.channel, thread_ts: slack.replyTs ?? slack.threadTs, text });
-    },
+    // The post back, under the real ts the card was posted with — the same
+    // Slack binding every GitHub write uses.
+    postToThread: slackFilingDeps(env, slack).postToThread,
   });
 }
