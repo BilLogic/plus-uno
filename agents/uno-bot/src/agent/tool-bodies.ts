@@ -40,7 +40,7 @@ import { executeNotionUpdate } from "../tools/notion-update";
 import { executeNotionArchive } from "../tools/notion-archive";
 import { executeSendEmail } from "../tools/send-email";
 import { executeShareForFeedback } from "../tools/share-for-feedback";
-import { executeRelayDm, relaySlackFor } from "../tools/relay-dm";
+import { executeRelayDm, relayMemoryFor, relaySlackFor } from "../tools/relay-dm";
 import { executeGithubIssueCreate } from "../tools/github-issue";
 import { executeGithubIssueUpdate } from "../tools/github-issue-update";
 import { executeGithubWorkflowRun } from "../tools/github-workflow";
@@ -80,7 +80,7 @@ export const TOOL_BODIES: Record<ToolName, ToolBody> = {
   prototype_scaffold: (env, input, slack) => executeImplementDesign(env, input, slack),
   shareout_post: (env, input, slack) => executeShareForFeedback(env, input, slack),
   email_send: (env, input, slack) => executeSendEmail(env, input, slack),
-  dm_relay: (env, input, slack) => executeRelayDm({ slack: relaySlackFor(env) }, input, slack),
+  dm_relay: (env, input, slack) => executeRelayDm({ slack: relaySlackFor(env), memory: relayMemoryFor(env) }, input, slack),
   github_issue_create: (env, input, slack) => executeGithubIssueCreate(env, input, slack),
   github_issue_update: (env, input, slack) => executeGithubIssueUpdate(env, input, slack),
   github_workflow_run: (env, input, slack) => executeGithubWorkflowRun(env, input, slack),

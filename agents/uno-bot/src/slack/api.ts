@@ -128,6 +128,10 @@ export interface SlackUserInfo {
   profile?: { title?: string; email?: string; display_name?: string; status_text?: string };
   tz?: string;
   is_bot?: boolean;
+  /** A guest: multi-channel (`is_restricted`) or single-channel
+   *  (`is_ultra_restricted`). */
+  is_restricted?: boolean;
+  is_ultra_restricted?: boolean;
   deleted?: boolean;
 }
 
@@ -136,6 +140,15 @@ export async function usersInfo(env: Env, userId: string) {
   return slackGet<SlackResponse & { user?: SlackUserInfo }>(env, "users.info", {
     user: userId,
   });
+}
+
+/** users.list via the bot token — one page of the workspace directory. */
+export async function usersList(env: Env, cursor?: string) {
+  return slackGet<SlackResponse & { members?: SlackUserInfo[]; response_metadata?: { next_cursor?: string } }>(
+    env,
+    "users.list",
+    { limit: "200", ...(cursor ? { cursor } : {}) },
+  );
 }
 
 /** conversations.members via the bot token — member ids (first page). */

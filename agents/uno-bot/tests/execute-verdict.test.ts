@@ -72,10 +72,16 @@ globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
   throw new Error(`no stub route for ${url}`);
 }) as typeof fetch;
 
-/** Thread history lands in a Durable Object; here it lands nowhere. */
+/** Thread history lands in a Durable Object; here it lands in a list. */
+let appended: Array<{ ref: { channel: string; thread: string }; turn: { role: string; content: string } }> = [];
 const THREAD_STATE = {
   idFromName: () => "thread-state",
-  get: () => ({ appendHistory: async () => ({ length: 1 }) }),
+  get: () => ({
+    appendHistory: async (ref: (typeof appended)[number]["ref"], turn: (typeof appended)[number]["turn"]) => {
+      appended.push({ ref, turn });
+      return { length: 1 };
+    },
+  }),
 };
 
 function env(over: Partial<Record<string, string>> = {}): Env {
@@ -137,6 +143,22 @@ test("an approved relay reaches its recipient attributed to the requester, and c
   assert.ok(note, "the requesting conversation heard where it went");
   assert.match(String(note.text), /Sent to <@U0COCO0001>/);
   assert.equal(note.thread_ts, "1700000000.000100", "under the real reply ts, not the conversation key");
+});
+
+test("an approved relay is remembered in the recipient's DM conversation, where their reply will look", async () => {
+  calls = [];
+  appended = [];
+  const run = await executeVerdict();
+  await run(env(), won([{ toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "RM-2436 is Ready for QA." } }]));
+
+  const remembered = appended.filter((a) => a.ref.channel === "D-U0COCO0001");
+  assert.equal(remembered.length, 1, JSON.stringify(appended));
+  // The whole DM is one conversation, keyed "dm" — the key an unthreaded
+  // reply from the recipient reads its history under.
+  assert.equal(remembered[0]!.ref.thread, "dm");
+  assert.equal(remembered[0]!.turn.role, "assistant");
+  assert.ok(remembered[0]!.turn.content.startsWith("<@U0REQUESTR1> asked me to pass this on:"), remembered[0]!.turn.content);
+  assert.ok(remembered[0]!.turn.content.includes("RM-2436 is Ready for QA."), remembered[0]!.turn.content);
 });
 
 test("a multi-recipient relay tells the thread once", async () => {

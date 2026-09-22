@@ -210,17 +210,18 @@
   },
   {
     "name": "slack_user_profile",
-    "description": "Read-only, ungated. Look up a Slack user's profile by id — display name, title/role, email, timezone, status. Use it when you need to know WHO someone is: a member id from slack_channel_members, an @-mention in the thread, a card contributor's Slack identity. Mention people as <@id> in replies.",
+    "description": "Read-only, ungated. Look up a Slack user — by id for their profile (display name, title/role, email, timezone, status), or by `name` to find who someone is ('Coco', 'Meryem') among active teammates. Use it when you need to know WHO someone is: a member id from slack_channel_members, an @-mention in the thread, a card contributor's Slack identity, a person named for a relayed DM. A name lookup returns every match: one → name them as <@id>; several → ask which one before staging anything; none → say so, never guess. Mention people as <@id> in replies.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "user_id"
-      ],
       "properties": {
         "user_id": {
           "type": "string",
-          "description": "Slack user id (U…), bare or as an <@U…> mention."
+          "description": "Slack user id (U…), bare or as an <@U…> mention. Omit it to look someone up by name."
+        },
+        "name": {
+          "type": "string",
+          "description": "A first name, surname, full name or display name to find, e.g. 'Coco'. Used only when user_id is omitted."
         }
       }
     }
@@ -642,7 +643,7 @@
   },
   {
     "name": "dm_relay",
-    "description": "SIDE EFFECT (sends a real Slack DM), routed through the confirmation gate. A relayed DM: pass something to a named person as a DM, on the requester's behalf — 'send this to Coco', 'pass this along to <@U…>'. One call per recipient; several recipients are several calls in the same reply, which stage as one card. `recipient` is a Slack user id: resolve a name first with notion_search (scope 'team', the roster carries Slack ids), slack_channel_members + slack_user_profile, or an @-mention in the thread, and when a name matches more than one person ask which one instead of staging. The Worker opens the DM with who asked and closes it with a link back to this conversation — write neither yourself. Carry only what is visible in this conversation; private material from any other space never travels in a relay.",
+    "description": "SIDE EFFECT (sends a real Slack DM), routed through the confirmation gate. A relayed DM: pass something to a named person as a DM, on the requester's behalf — 'send this to Coco', 'pass this along to <@U…>'. One call per recipient; several recipients are several calls in the same reply, which stage as one card. `recipient` is a Slack user id: take it from an @-mention in the thread, or resolve a name first with slack_user_profile's `name` lookup, and when a name matches more than one person ask which one instead of staging. The Worker opens the DM with who asked and closes it with a link back to this conversation — write neither yourself. Carry only what is visible in this conversation; private material from any other space never travels in a relay.",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
