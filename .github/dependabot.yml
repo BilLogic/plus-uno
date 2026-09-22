@@ -47,6 +47,14 @@ updates:
       # scripts/check-deps.mjs). Two Bootstraps have to become one first.
       - dependency-name: bootstrap
         update-types: [version-update:semver-major]
+      # vitest 5 waits on the Storybook vitest addon: 10.6 peers vitest ^3 || ^4,
+      # and only the 11 alpha takes 5. Forcing it past the peer range breaks
+      # the Storybook gate. vitest-5-watch.yml files an issue when a stable
+      # addon accepts 5; drop this entry in that PR.
+      - dependency-name: vitest
+        update-types: [version-update:semver-major]
+      - dependency-name: "@vitest/*"
+        update-types: [version-update:semver-major]
 
   # ── The Cloudflare Worker, which has its own manifest and its own runtime ──
   - package-ecosystem: npm
@@ -58,6 +66,15 @@ updates:
     groups:
       patch-and-minor:
         update-types: [minor, patch]
+    ignore:
+      # vitest 5 waits on @cloudflare/vitest-pool-workers, which peers vitest
+      # ^4.1 and reaches into its runner and snapshot internals — test:workerd,
+      # the only proof the Durable Objects work on the real runtime, runs on
+      # it. vitest-5-watch.yml files an issue when a release accepts 5.
+      - dependency-name: vitest
+        update-types: [version-update:semver-major]
+      - dependency-name: "@vitest/*"
+        update-types: [version-update:semver-major]
 
   # ── Actions themselves. A pinned action drifts silently: nothing in the repo
   # imports it, nothing installs it, and a deprecated runtime is announced in a
