@@ -9,7 +9,7 @@
  * Run: npm run test:scripts
  */
 
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -17,9 +17,12 @@ import path from 'node:path';
 
 import { extractExports, stripComments } from './barrel-exports.js';
 
+const roots = [];
+
 /** Write a throwaway barrel tree and return its root. */
 function fixture(files) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'barrel-exports-'));
+  roots.push(root);
   for (const [rel, content] of Object.entries(files)) {
     const file = path.join(root, rel);
     fs.mkdirSync(path.dirname(file), { recursive: true });
@@ -27,6 +30,10 @@ function fixture(files) {
   }
   return root;
 }
+
+after(() => {
+  for (const root of roots) fs.rmSync(root, { recursive: true, force: true });
+});
 
 test('a commented-out export is not an export', () => {
   const root = fixture({
@@ -86,6 +93,34 @@ test('`export *` outside the boundary belongs to another section', () => {
   assert.deepEqual(names, ['Card']);
 });
 
+test('a `//` inside a specifier is not a comment', () => {
+  const root = fixture({
+    'index.js': [
+      "export { default as Remote } from 'https://esm.sh/remote';",
+      "export { default as Local } from './Local';",
+    ].join('\n'),
+  });
+
+  assert.deepEqual(extractExports(path.join(root, 'index.js'), { repoRoot: root }), ['Local', 'Remote']);
+});
+
+test('a multi-line export is still an export', () => {
+  const root = fixture({
+    'index.js': ['export {', '  default as Wrapped,', "} from './Wrapped';"].join('\n'),
+  });
+
+  assert.deepEqual(extractExports(path.join(root, 'index.js'), { repoRoot: root }), ['Wrapped']);
+});
+
+test('a plain re-export does not swallow the statement after it', () => {
+  const root = fixture({
+    'index.js': ["export { helper };", "export { default as Card } from './Card';"].join('\n'),
+  });
+
+  assert.deepEqual(extractExports(path.join(root, 'index.js'), { repoRoot: root }), ['Card']);
+});
+
 test('stripComments leaves import specifiers intact', () => {
   assert.equal(stripComments("export { default as A } from '@/components/A';").trim(), "export { default as A } from '@/components/A';");
+  assert.equal(stripComments("from 'https://esm.sh/a'; // gone").trim(), "from 'https://esm.sh/a';");
 });

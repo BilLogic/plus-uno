@@ -19,6 +19,7 @@ import fs from 'fs';
 import path from 'path';
 import { AGENT_ROOT, REPO_ROOT } from './agent-views-paths.js';
 import { extractExports } from './lib/barrel-exports.js';
+import { isEntry } from './lib/findings.mjs';
 import { checkArtifacts, writeArtifacts } from './lib/generated-artifact.js';
 
 const COMPONENTS_ROOT = path.join(REPO_ROOT, 'design-system/src/components');
@@ -153,4 +154,7 @@ function main() {
   console.log(`Done. ${components.length} components indexed.`);
 }
 
-main();
+// Only when run as a script: this module writes generated files, and the
+// parsing seam now lives in lib/barrel-exports.js, so importing it to read
+// anything must not rewrite the agent views as a side effect.
+if (isEntry(import.meta.url)) main();
