@@ -219,6 +219,13 @@ export const RECORDED = [
     why:
       'the rename map\'s sibling, and the finding this sweep opened with. #365 and #137 each MOVED their interface→schema map out of the glossary rather than deduplicating it, so the two stated the same alignment rule, the same "not listed would mean both aligned and nobody looked", and the same quoted complaint, in two repos, already drifting — one said five components, the other seven. On 2026-09-14 the blueprint\'s preamble became a pointer at sb\'s (plus-uno-blueprint#672): the method prose has one home now. What remains shared is the GENERATED binding table — each repo\'s `npm run interface-map` writes rows from its own schema, and a deployment of the method binds most of the same words to the same columns — which is duplication by construction, not by hand. Measured at 430 that day, from 609; the ceiling keeps a hand-written paragraph from joining the rows again.',
   },
+  {
+    a: 'blueprint:docs/agents/blueprint.md',
+    b: 'sb:docs/agents/blueprint.md',
+    words: 577,
+    why:
+      "the agent account's hand-written core, in the kit and in this deployment of it. Five sections are byte-identical — what a blueprint is, how to read a cell, what absence means, what a status licenses you to say, paths and the main route — plus the vocabulary preamble; the rest of each file is rendered by the same `generate-agent-account.mjs` from its own schema, and the deployment's Retrieval section is its own. The pointer shape that closed the interface\u2192schema map (plus-uno-blueprint#672) is NOT available here: this document is SERVED to an agent as `agent.references.blueprint`, and a reader handed a reference cannot follow a link into the kit's copy, so the meaning has to be present in both files. Closing it means the deployment RENDERING the core from the kit it already installs, so one edit reaches both — plus-uno-blueprint#695. Measured at 577 on 2026-09-22, the day the pin moved v1.6.4 \u2192 v1.44.29 (#674) and the two texts met; the ceiling keeps a new hand-written paragraph from joining them.",
+  },
 ];
 
 /**
