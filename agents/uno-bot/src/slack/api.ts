@@ -340,7 +340,7 @@ export async function appendTask(env: Env, channel: string, ts: string, task: Ta
           id: task.id,
           title: task.title.slice(0, 250),
           status: task.status,
-          ...(task.details ? { details: task.details.slice(0, 250) } : {}),
+          ...(task.details ? { details: taskDetails(task.details) } : {}),
         },
       ],
     });
@@ -348,6 +348,21 @@ export async function appendTask(env: Env, channel: string, ts: string, task: Ta
   } catch {
     return false;
   }
+}
+
+/**
+ * A task card's `details`, through the markup pass and within the 256-char
+ * chunk limit.
+ *
+ * Slack documents a task card's `title` as plain text (the task card block
+ * reference, which the `task_update` chunk "looks mighty similar to"), so the
+ * title goes as written. The chunk's `details` is a bare string whose format
+ * no page names — the block's is rich text — so it takes the pass: an escaped
+ * `&lt;` read literally is a blemish, a blanked card is not. Cut after
+ * escaping, and never inside an entity or a kept `<…>`.
+ */
+function taskDetails(details: string): string {
+  return sanitizeSlackMarkup(details).slice(0, 250).replace(/&[a-z]{0,3}$|<[^>]*$/, "");
 }
 
 /** Close the stream. Blocks are only accepted here — which is why the feedback

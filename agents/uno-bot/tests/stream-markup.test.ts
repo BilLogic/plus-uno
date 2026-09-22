@@ -119,26 +119,87 @@ test("streamed text already escaped passes unchanged", async () => {
   assert.deepEqual(await streamed([text]), [text]);
 });
 
-test("neither streaming flag turns on without a recorded markup probe", async () => {
+test("neither streaming flag turns on without a recorded probe PASS", async () => {
   const { postingDeps, streamFlagOn } = await import("../src/slack/slack-delivery.js");
   const warn = console.warn;
   const warnings: string[] = [];
   console.warn = (msg: string) => void warnings.push(msg);
   try {
     const on = { SLACK_STREAMING: "on", SLACK_STREAM_PLAN: "on" } as Env;
-    assert.equal(postingDeps(on).streamingOn, false);
-    assert.equal(streamFlagOn(on, "SLACK_STREAM_PLAN"), false);
+    for (const probe of [undefined, "", "yes", "fail:2026-10-01 blank", "2026-10-01 renders", "pass:soon"]) {
+      const env = { ...on, SLACK_STREAM_MARKUP_PROBE: probe } as Env;
+      assert.equal(postingDeps(env).streamingOn, false, String(probe));
+      assert.equal(streamFlagOn(env, "SLACK_STREAM_PLAN"), false, String(probe));
+    }
+    // Once per flag per isolate, not once per turn.
     assert.equal(warnings.length, 2);
-    assert.match(warnings[0]!, /SLACK_STREAM_MARKUP_PROBE/);
+    assert.match(warnings[0]!, /SLACK_STREAMING.*pass:YYYY-MM-DD/);
+    assert.match(warnings[1]!, /SLACK_STREAM_PLAN/);
 
-    const probed = { ...on, SLACK_STREAM_MARKUP_PROBE: "2026-10-01 renders, not blank" } as Env;
-    assert.equal(postingDeps(probed).streamingOn, true);
-    assert.equal(streamFlagOn(probed, "SLACK_STREAM_PLAN"), true);
+    for (const probe of ["pass:2026-10-01", " pass:2026-10-01 fence shows &lt; ", "pass:2026-10-01\tok"]) {
+      const env = { ...on, SLACK_STREAM_MARKUP_PROBE: probe } as Env;
+      assert.equal(postingDeps(env).streamingOn, true, probe);
+      assert.equal(streamFlagOn(env, "SLACK_STREAM_PLAN"), true, probe);
+    }
 
-    const off = { SLACK_STREAMING: "off", SLACK_STREAM_MARKUP_PROBE: "2026-10-01" } as Env;
+    const off = { SLACK_STREAMING: "off", SLACK_STREAM_MARKUP_PROBE: "pass:2026-10-01" } as Env;
     assert.equal(postingDeps(off).streamingOn, false);
     assert.equal(warnings.length, 2, "an off flag says nothing");
   } finally {
     console.warn = warn;
   }
+});
+
+test("a task card's details take the pass and stay within the chunk limit; its plain-text title does not", async () => {
+  const { appendTask } = await import("../src/slack/api.js");
+  sent = [];
+  await appendTask(ENV, "D0123", "9.0", {
+    id: "t1",
+    title: "Read <@teammate>'s note",
+    status: "in_progress",
+    details: "quoting `<@teammate>` for <@U0A8JFHQPU2>",
+  });
+  const chunk = (sent[0]!.body.chunks as Array<Record<string, unknown>>)[0]!;
+  assert.equal(chunk.title, "Read <@teammate>'s note");
+  assert.equal(chunk.details, "quoting `&lt;@teammate&gt;` for <@U0A8JFHQPU2>");
+
+  sent = [];
+  await appendTask(ENV, "D0123", "9.0", { id: "t2", title: "t", status: "complete", details: "x".repeat(245) + "<<<<<" });
+  const long = String((sent[0]!.body.chunks as Array<Record<string, unknown>>)[0]!.details);
+  assert.ok(long.length <= 250, String(long.length));
+  assert.match(long, /^x{245}(&lt;)*$/, "cut at an entity boundary");
+
+  sent = [];
+  await appendTask(ENV, "D0123", "9.0", { id: "t3", title: "t", status: "complete", details: "y".repeat(240) + " <@U0A8JFHQPU2>" });
+  const cut = String((sent[0]!.body.chunks as Array<Record<string, unknown>>)[0]!.details);
+  assert.equal(cut, "y".repeat(240) + " ", "a kept mention is dropped whole, never cut open");
+});
+
+test("the markup probe streams raw text only to a DM or the alert channel, and only so much", async () => {
+  const { slackStreamProbe, PROBE_TEXT_LIMIT } = await import("../src/diagnostics/probes/slack.js");
+  const probe = async (q: string) => {
+    const url = `https://w/debug/slack-stream?${q}`;
+    const report = await slackStreamProbe(ENV, new URL(url), new Request(url));
+    assert.ok("body" in report);
+    return report as { body: Record<string, unknown>; status?: number };
+  };
+  const base = "thread_ts=1.0&user=U0A8JFHQPU2&team=T0123";
+
+  sent = [];
+  let res = await probe(`channel=C0PUBLIC1&${base}&text=hi`);
+  assert.equal(res.status, 400);
+  assert.match(String((res.body as { error: string }).error), /DM \(D…\) or the alert channel/);
+  res = await probe(`channel=D0123&${base}&text=${"x".repeat(PROBE_TEXT_LIMIT + 1)}`);
+  assert.equal(res.status, 400);
+  assert.equal(sent.length, 0, "a refused probe calls nothing");
+
+  res = await probe(`channel=D0123&${base}&text=${encodeURIComponent("a <@teammate>\n```\n<@teammate>\n```")}`);
+  assert.equal((res.body as { appended: boolean }).appended, true);
+  assert.deepEqual(sent.map((s) => s.method), ["chat.startStream", "chat.appendStream", "chat.stopStream"]);
+  assert.equal(sent[1]!.body.markdown_text, "a <@teammate>\n```\n<@teammate>\n```", "raw, on purpose");
+
+  // The alert channel is the one non-DM target.
+  sent = [];
+  res = await probe(`channel=C0ARJ2A3A69&${base}&text=hi`);
+  assert.equal((res.body as { appended: boolean }).appended, true);
 });

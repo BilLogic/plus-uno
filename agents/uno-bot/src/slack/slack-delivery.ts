@@ -44,27 +44,39 @@ import type { Delivery } from "../turn/index";
 export type { SlackDeliveryTarget } from "./delivery-adapter";
 
 /**
- * Whether a streaming flag is on — which takes the flag AND a recorded markup
- * probe, `SLACK_STREAM_MARKUP_PROBE`.
+ * Whether a streaming flag is on — which takes the flag AND a recorded PASS of
+ * the markup probe: `SLACK_STREAM_MARKUP_PROBE = "pass:YYYY-MM-DD"`, optionally
+ * followed by a note (`"pass:2026-10-01 fence shows &lt;"`).
  *
  * Streamed text passes the same markup pass as posted text (`api.ts` § The
  * stream's markup pass), but whether Slack's `markdown_text` blanks on markup
  * it cannot parse, as `text` does, has not been seen live. The probe that
- * settles it is in docs/connectors/slack.md; whoever runs it records the result
- * in the var. A flag set without one stays off, and says why on every turn.
+ * settles it is in docs/connectors/slack.md. A flag set without a recorded
+ * pass — unset, a failure, anything else — stays off, and says so once per
+ * isolate rather than on every turn.
  */
 export function streamFlagOn(
   env: Pick<Env, "SLACK_STREAMING" | "SLACK_STREAM_PLAN" | "SLACK_STREAM_MARKUP_PROBE">,
   flag: "SLACK_STREAMING" | "SLACK_STREAM_PLAN",
 ): boolean {
   if (env[flag] !== "on") return false;
-  if (env.SLACK_STREAM_MARKUP_PROBE?.trim()) return true;
-  console.warn(
-    `[slack] ${flag} is "on" but SLACK_STREAM_MARKUP_PROBE is unset — streaming stays off` +
-      " until the markup probe in docs/connectors/slack.md has passed",
-  );
+  if (PROBE_PASS.test(env.SLACK_STREAM_MARKUP_PROBE?.trim() ?? "")) return true;
+  if (!refusalLogged.has(flag)) {
+    refusalLogged.add(flag);
+    console.warn(
+      `[slack] ${flag} is "on" but SLACK_STREAM_MARKUP_PROBE records no pass` +
+        ` (want "pass:YYYY-MM-DD", have ${JSON.stringify(env.SLACK_STREAM_MARKUP_PROBE ?? null)})` +
+        " — streaming stays off until the markup probe in docs/connectors/slack.md has passed",
+    );
+  }
   return false;
 }
+
+/** A recorded probe pass: `pass:` and an ISO date, then anything. */
+const PROBE_PASS = /^pass:\d{4}-\d{2}-\d{2}(?:\s|$)/;
+
+/** Flags whose refusal this isolate has already logged. */
+const refusalLogged = new Set<string>();
 
 export function slackDelivery(env: Env, target: SlackDeliveryTarget): Delivery {
   return deliveryAdapter(
