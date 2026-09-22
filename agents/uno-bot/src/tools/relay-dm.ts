@@ -7,7 +7,9 @@
 //   2. open the DM with `conversations.open`;
 //   3. post the approved text wrapped in the Worker's attribution and link
 //      (`relayed-dm-render.ts`);
-//   4. say in the requesting thread where it went, or why it could not go.
+//   4. remember the DM in the recipient's own DM conversation with the bot,
+//      so a reply there ("what's this about?") has what was sent to go on;
+//   5. say in the requesting thread where it went, or why it could not go.
 //
 // NO RECIPIENT ALLOWLIST and no member-type filter. Guests and Slack Connect
 // partners are valid recipients when the card was approved; the Gate is what
@@ -17,23 +19,35 @@
 // No `#plus-design` fan-out either: the row's `reviewRequest` is null, because
 // a DM is not a reviewable artifact.
 //
-// The Slack client arrives BY NAME, the way every seam in Turn takes its
-// dependencies, so a test drives a whole approved batch through a fake client;
-// `relaySlackFor` is the one place `Env` is bound into it.
+// The Slack client and the memory arrive BY NAME, the way every seam in Turn
+// takes its dependencies, so a test drives a whole approved batch through
+// fakes; `relaySlackFor` and `relayMemoryFor` are the places `Env` is bound.
 
 import type { Env, SlackContext } from "../types";
 import { getPermalink, openConversation, postMessage } from "../slack/api";
+import { threadStateFor } from "../thread-state/production";
 import { relayFailure, relayRecipientId, renderRelayedDm } from "./relayed-dm-render";
 
 /** The three Slack calls a relay makes, and nothing else. */
 export interface RelaySlack {
   openDm(userId: string): Promise<{ ok: true; channel: string } | { ok: false; error: string }>;
-  postMessage(message: { channel: string; text: string; thread_ts?: string }): Promise<{ ok: boolean; error?: string }>;
+  postMessage(message: { channel: string; text: string; thread_ts?: string }): Promise<{ ok: boolean; error?: string; ts?: string }>;
   permalink(channel: string, ts: string): Promise<string | null>;
+}
+
+/**
+ * Where a sent relay is remembered: the recipient's DM with the bot, as a turn
+ * the bot said. A reply typed in that DM's composer reads its history from the
+ * store and not from Slack (`slack/events.ts` § buildThreadHistory), so a relay
+ * the store never heard of is one the bot cannot talk about.
+ */
+export interface RelayMemory {
+  remember(dmChannel: string, turn: { content: string; ts?: string }): Promise<void>;
 }
 
 export interface RelayDeps {
   slack: RelaySlack;
+  memory: RelayMemory;
 }
 
 /** The production client: the `slack/api.ts` wrappers, with `Env` bound. */
@@ -42,9 +56,22 @@ export function relaySlackFor(env: Env): RelaySlack {
     openDm: (userId) => openConversation(env, userId),
     postMessage: async (message) => {
       const res = await postMessage(env, message);
-      return res.ok ? { ok: true } : { ok: false, error: res.error };
+      return res.ok ? { ok: true, ...(res.ts ? { ts: res.ts } : {}) } : { ok: false, error: res.error };
     },
     permalink: (channel, ts) => getPermalink(env, channel, ts),
+  };
+}
+
+/** The unthreaded DM's conversation key — every composer line in a DM shares
+ *  it (`thread-state/store.ts` § ThreadRef). */
+const DM_CONVERSATION = "dm";
+
+/** The production memory: the thread store, with `Env` bound. */
+export function relayMemoryFor(env: Env): RelayMemory {
+  return {
+    async remember(dmChannel, turn) {
+      await threadStateFor(env).appendHistory({ channel: dmChannel, thread: DM_CONVERSATION }, { role: "assistant", ...turn });
+    },
   };
 }
 
@@ -53,7 +80,7 @@ export async function executeRelayDm(
   input: Record<string, unknown>,
   context: SlackContext,
 ): Promise<string> {
-  const { slack } = deps;
+  const { slack, memory } = deps;
   const recipient = relayRecipientId(input.recipient);
   const text = typeof input.text === "string" ? input.text : "";
   if (!recipient) {
@@ -96,16 +123,22 @@ export async function executeRelayDm(
   const dm = await slack.openDm(recipient);
   if (!dm.ok) return refused(dm.error);
 
-  const posted = await slack.postMessage({
-    channel: dm.channel,
-    text: renderRelayedDm({
-      requesterId: context.requestedBy,
-      text,
-      permalink,
-      originIsDm: context.channel.startsWith("D"),
-    }),
+  const sent = renderRelayedDm({
+    requesterId: context.requestedBy,
+    text,
+    permalink,
+    originIsDm: context.channel.startsWith("D"),
   });
+  const posted = await slack.postMessage({ channel: dm.channel, text: sent });
   if (!posted.ok) return refused(posted.error ?? "unknown");
+
+  // Best-effort: the DM is in their inbox either way, and a store hiccup must
+  // not read as a relay that failed.
+  await memory
+    .remember(dm.channel, { content: sent, ...(posted.ts ? { ts: posted.ts } : {}) })
+    .catch((err: unknown) =>
+      console.warn(`[relay] couldn't remember the DM: ${err instanceof Error ? err.message : String(err)}`),
+    );
 
   await tellThread(`:incoming_envelope: Sent to <@${recipient}>.`);
   return JSON.stringify({

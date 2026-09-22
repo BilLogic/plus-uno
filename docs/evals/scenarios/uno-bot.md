@@ -21,16 +21,16 @@ twelve that did.
 
 | What the uno-bot fixture holds | |
 |---|---|
-| cases | **45** (B×6 · C×1 · D×1 · G×7 · GU×2 · M×1 · P×6 · R×14 · S×3 · T×2 · V×1 · W×1) |
+| cases | **47** (B×6 · C×1 · D×1 · G×8 · GU×2 · M×1 · P×6 · R×15 · S×3 · T×2 · V×1 · W×1) |
 | blockers | 30 |
-| turns · sample runs | 53 · 133 |
+| turns · sample runs | 57 · 139 |
 | cases picking a subject from the live board | 8 (`absent-detail`×1, `corpus-term`×1, `phase-any`×1, `scenario-any`×3, `scenario-with-future-paths`×1, `touchpoint-any`×1) |
 | recorded, so the pull-request gate reaches them | 34 |
-| **unreachable** — no recording, skipped by name, gating nothing | **R21, G1, G2, G3, G4, G5, G6, G7, GU1, GU2, W1** |
+| **unreachable** — no recording, skipped by name, gating nothing | **R21, R22, G1, G2, G3, G4, G5, G6, G7, G8, GU1, GU2, W1** |
 
 Counted, not typed: `agents/uno-bot/scripts/eval-docs.mjs`, from the fixture and `fixtures/recordings/`.
 
-> **Unreachable.** R21, G1, G2, G3, G4, G5, G6, G7, GU1, GU2, W1 have no recording in `docs/evals/fixtures/recordings/`, so the pull-request gate skips them by name and measures nothing about them. Only the Monday `--transport=worker` cron reaches them.
+> **Unreachable.** R21, R22, G1, G2, G3, G4, G5, G6, G7, G8, GU1, GU2, W1 have no recording in `docs/evals/fixtures/recordings/`, so the pull-request gate skips them by name and measures nothing about them. Only the Monday `--transport=worker` cron reaches them.
 
 ## R1 — confidence ritual (D9)
 
@@ -223,6 +223,17 @@ _advisory · 3 samples · **UNREACHABLE — no recording**_
   - **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"dm_relay"`
 - **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21 from a live miss: asked to pass a card it had just found to a named teammate, the bot said it "can't send private DMs", offered an in-thread @-mention, a #plus-design post or an email draft instead, and presented the refusal as team policy. Turn 2 names the recipient as a mention, so nothing needs resolving: the pass is a staged `dm_relay` proposal whose text carries what turn 1 found (the card's name, its status as read, and its link when one came back) and that does not write its own attribution line or permalink — the Worker adds both. FAIL on any refusal to DM, on the three-workaround list offered instead of a card, on describing DMs as something the bot cannot or may not send, and on a reply that claims the DM already went out (nothing is sent before the ✅).
 
+## R22 — a relay to a teammate named, not mentioned, looks the name up before staging
+
+_advisory · 3 samples · **UNREACHABLE — no recording**_
+
+- **Surface:** requested by `U_EVAL`
+- **Turn 1:** "What's the Design Status of the Roadmap card for the Home page empty states?"
+  - **Asserted:** `expectKind`: `["text"]`
+- **Turn 2:** "can you send this to Coco?"
+  - **Asserted:** `expectKind`: `["proposal","text"]` · `expectToolCalled`: `{"tool":"slack_user_profile"}`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-22. R21's sibling, with the recipient given as a name rather than a mention — the shape the live miss actually had ("send RM-2436 to Coco"). A name is not a recipient: the turn looks it up with slack_user_profile's name lookup before anything is staged. Deterministic: turn 2's tool list holds a slack_user_profile call. For the judge, by what the lookup returned: ONE match → a staged dm_relay whose recipient is that match's id, shown as <@id>, with the card's name, status and link from turn 1 in the text; SEVERAL → no card, one short question naming each match as <@id> with their title; NONE → no card, a plain line saying no teammate goes by that name and asking for their @-mention. FAIL on a card whose recipient the lookup did not return, on a relay staged when the lookup returned several people, on a refusal to DM or the three-workaround list, and on a reply claiming the DM already went out. [samples:3 — whether the lookup runs before the card is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the name lookup is not deployed yet; it becomes a blocker in the PR that commits its recording.]
+
 ## P6 — pasted Figma URL reaches scaffold, not implement
 
 _advisory · 3 samples · recorded_
@@ -394,6 +405,16 @@ _advisory · 3 samples · **UNREACHABLE — no recording**_
 - **Trigger:** "The dark-mode colours look wrong on the pricing table. Track this on GitHub."
 - **Asserted:** `expectKind`: `["text"]` · `forbidTool`: `"github_issue_create"`
 - **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-21. When what would change could sit in more than one listed repo, the bot asks rather than guessing a queue. A pricing table's colours could be the marketing site's page or the design system's tokens, so the reply asks which repo (or surface) it belongs on, naming the candidates by their listed purpose, and stages nothing. A github_issue_create staged on any repo fails deterministically. For the judge: one short question with the options named, no drafted card, no invented facts about where the table lives. [samples:3 — routing is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — routing across the repo list is not deployed yet; it becomes a blocker in the PR that commits its recording.]
+
+## G8 — "put it on the Roadmap instead" moves a GitHub intake to a Roadmap card
+
+_advisory · 3 samples · **UNREACHABLE — no recording**_
+
+- **Turn 1:** "The uno-research skill keeps skipping its source-ranking step when I ask for a quick scan. Track this on GitHub so the harness gets fixed."
+  - **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"github_issue_create"`
+- **Turn 2:** "Actually, put it on the Roadmap instead." _(against the previous turn's pending proposal)_
+  - **Asserted:** `expectKind`: `["proposal"]` · `expectTool`: `"notion_create"`
+- **Expected (the judge's rubric, verbatim from the fixture):** AUTHORED 2026-09-22. The requester stays in control of routing (the GitHub intake spec's override story): the bot picked GitHub for a harness problem, and the requester redirects it to the Roadmap. Turn 1 stages github_issue_create, as G6 does. Deterministic: turn 2 stages notion_create — the new card replaces the GitHub one, and is not read as a confirmation of it (no proposal_resolve, nothing filed on GitHub). For the judge: turn 2's card is surface 'intake' and carries the same problem turn 1 drafted, rewritten for a Roadmap card rather than pasted as an issue body; the reply names the Roadmap as where it now goes and stays in future tense; it does not argue the requester back to GitHub, though one line noting that harness fixes usually go there is fine. A reply that refuses the redirect, files on GitHub, or stages both fails. [samples:3 — honouring a redirect is a model choice, and a choice is what sampling measures.] [blocker:false until recorded — the intake tools are not deployed yet; it becomes a blocker in the PR that commits its recording.]
 
 ## GU1 — "add this repro to #688 and close it" stages one gated follow-up with the comment verbatim
 

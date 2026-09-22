@@ -131,6 +131,15 @@ export async function usersInfo(env: Env, userId: string) {
   });
 }
 
+/** users.list via the bot token — one page of the workspace directory. */
+export async function usersList(env: Env, cursor?: string) {
+  return slackGet<SlackResponse & { members?: SlackUserInfo[]; response_metadata?: { next_cursor?: string } }>(
+    env,
+    "users.list",
+    { limit: "200", ...(cursor ? { cursor } : {}) },
+  );
+}
+
 /** conversations.members via the bot token — member ids (first page). */
 export async function conversationsMembers(env: Env, channel: string, limit = 100) {
   return slackGet<SlackResponse & { members?: string[]; response_metadata?: { next_cursor?: string } }>(

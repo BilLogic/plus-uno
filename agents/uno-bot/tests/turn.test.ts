@@ -502,6 +502,51 @@ test("redirecting an intake's repo supersedes its card with one naming the new r
   assert.deepEqual(h.ran, []);
 });
 
+// The other redirect: "put it on the Roadmap instead" moves a GitHub intake to
+// a Roadmap card, and that card names the Roadmap as the surface it files on —
+// the requester redirected by surface, so the card has to say which one.
+test("redirecting a GitHub intake to the Roadmap supersedes it with a card naming the Roadmap", async () => {
+  const draft = { title: "Button disabled state has no Figma spec", body: "Designers keep guessing the opacity." };
+  const h = harness({
+    replies: [
+      { text: "Filing it on plus-uno.", toolCalls: [{ name: "github_issue_create", args: draft }] },
+      {
+        text: "Moving it to the Roadmap.",
+        toolCalls: [{ name: "notion_create", args: { surface: "intake", title: draft.title, summary: draft.body } }],
+      },
+    ],
+  });
+
+  const first = await runTurn(request({ text: "track this on GitHub: the disabled Button has no spec" }), h.deps);
+  const firstTs = first.staged!.proposal.proposalTs;
+  const second = await runTurn(
+    request({ text: "actually, put it on the Roadmap instead", pending: first.staged!.proposal }),
+    h.deps,
+  );
+
+  assert.equal(second.disposition, "staged");
+  assert.equal(second.staged!.proposal.toolName, "notion_create");
+  assert.match(second.staged!.card.verb, /Roadmap board/);
+  assert.ok(renderProposalCard(second.staged!.card).text.includes("Roadmap board"));
+  assert.equal((await h.threadState.getProposalByTs(firstTs)).state, "superseded");
+  assert.deepEqual(h.ran, []);
+});
+
+test("a Notion card names the surface it files on", async () => {
+  for (const [surface, extra, words] of [
+    ["intake", {}, "Roadmap board"],
+    ["prd", { summary: "A PRD for the Home empty states, what they show and why." }, "Roadmap board"],
+    ["decision", { properties: { roadmap_card: "https://www.notion.so/plus/rm-1" } }, "Decisions"],
+  ] as const) {
+    const h = harness({
+      replies: [{ text: "Staging it.", toolCalls: [{ name: "notion_create", args: { surface, title: "A title", ...extra } }] }],
+    });
+    const outcome = await runTurn(request({ text: `file a ${surface}` }), h.deps);
+    assert.equal(outcome.disposition, "staged", surface);
+    assert.ok(outcome.staged!.card.verb.includes(words), `${surface}: ${outcome.staged!.card.verb}`);
+  }
+});
+
 test("an intake card says a private repo is private, and a repo it couldn't check may be public", async () => {
   for (const [visibility, words] of [
     ["private", "* is private"],
@@ -840,7 +885,7 @@ test("'send this to <@…>' stages a relayed DM, and only the ✅ sends it — o
       },
     ],
     executeOperation: (op) =>
-      executeRelayDm({ slack }, op.input, {
+      executeRelayDm({ slack, memory: { remember: async () => {} } }, op.input, {
         channel: CHANNEL,
         threadTs: CONVERSATION,
         replyTs: CONVERSATION,

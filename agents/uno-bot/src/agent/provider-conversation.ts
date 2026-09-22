@@ -82,6 +82,15 @@ export function buildProviderConversation(
     const images = [...(last.images ?? []), ...(turn.images ?? [])];
     if (images.length) last.images = images;
   }
-  while (merged.length && merged[0]!.role !== "user") merged.shift();
+  // The provider needs a user turn first. A conversation the bot opened — a
+  // relayed DM, a share-out post, a notification someone replies under — used
+  // to lose its opening here, so "what's this about?" reached a bot that could
+  // not see what it had sent. The opening rides at the head of the first user
+  // turn instead, labelled as the bot's own words.
+  const opening: string[] = [];
+  while (merged.length && merged[0]!.role !== "user") opening.push(merged.shift()!.text);
+  if (opening.length && merged.length) {
+    merged[0]!.text = `[Earlier in this conversation, you (uno-bot) said:]\n${opening.join("\n\n")}\n[End of what you said.]\n\n${merged[0]!.text}`;
+  }
   return merged;
 }

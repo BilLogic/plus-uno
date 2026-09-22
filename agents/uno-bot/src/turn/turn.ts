@@ -1363,6 +1363,13 @@ async function buildCard(
   if (toolName === "github_issue_update") {
     return { ...card, ...(await issueUpdateCardOf(result.operations, deps, fromDm)) };
   }
+  if (toolName === "notion_create") {
+    // THE SURFACE, named the way the issue card names its repo: an intake is
+    // a GitHub issue or a Roadmap card, and a requester redirects by surface
+    // ("put it on the Roadmap instead") — so the heading says which this is.
+    const verb = NOTION_SURFACE_VERBS[String(input.surface ?? "").trim().toLowerCase()];
+    return verb ? { ...card, verb } : card;
+  }
 
   if (toolName === "github_workflow_run") {
     // What the ✅ starts, in full: the repo, the workflow, and the branch it
@@ -1408,6 +1415,14 @@ async function buildCard(
   if (toolName === "dm_relay") return { ...card, fields: relayFieldsOf(result.operations) };
   return card;
 }
+
+/** A `notion_create` card's heading, by the `surface` it files on. A surface
+ *  not listed keeps the row's own verb. */
+const NOTION_SURFACE_VERBS: Readonly<Record<string, string>> = {
+  prd: "create this card on the Roadmap board",
+  intake: "create this card on the Roadmap board",
+  decision: "log this decision in the Decisions DB",
+};
 
 /**
  * An issue follow-up's card: per issue, `repo#number`, what will happen to it

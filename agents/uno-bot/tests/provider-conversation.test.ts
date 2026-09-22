@@ -25,14 +25,35 @@ test("a rehydrated image stays on the historical user turn", () => {
 
 test("current images stay on the current user turn", () => {
   const conversation = buildProviderConversation(
-    [{ role: "assistant", content: "Earlier answer" }],
+    [{ role: "user", content: "Earlier ask" }, { role: "assistant", content: "Earlier answer" }],
     "Compare this one.",
     [CURRENT_IMAGE],
   );
 
   assert.deepEqual(conversation, [
+    { role: "user", text: "Earlier ask" },
+    { role: "assistant", text: "Earlier answer" },
     { role: "user", text: "Compare this one.", images: [CURRENT_IMAGE] },
   ]);
+});
+
+test("a conversation the bot opened keeps what the bot said, ahead of the first user turn", () => {
+  // A relayed DM, a share-out post, a notification a reply hangs off: the
+  // bot's message comes first, and "what's this about?" is a question about
+  // it. The provider needs a user turn first, so the opening rides at the head
+  // of that turn, labelled as the bot's own — dropping it left the bot unable
+  // to say what it had sent.
+  const conversation = buildProviderConversation(
+    [{ role: "assistant", content: "<@U0REQ> asked me to pass this on:\n\nRM-2436 is Ready for QA." }],
+    "what's this about?",
+  );
+
+  assert.deepEqual(conversation.map((t) => t.role), ["user"]);
+  const text = conversation[0]!.text;
+  assert.ok(text.includes("RM-2436 is Ready for QA."), text);
+  assert.match(text, /you \(uno-bot\) said/i);
+  assert.ok(text.endsWith("what's this about?"), text);
+  assert.ok(text.indexOf("RM-2436") < text.indexOf("what's this about?"));
 });
 
 test("consecutive same-role turns merge even when one carries images", () => {
@@ -58,7 +79,7 @@ test("consecutive same-role turns merge even when one carries images", () => {
     "the image turn and the follow-up are one user turn",
   );
   assert.deepEqual(conversation[0]!.images, [PRIOR_IMAGE]);
-  assert.equal(conversation[0]!.text, "here is the frame\n\nwhat about the spacing?");
+  assert.ok(conversation[0]!.text.endsWith("here is the frame\n\nwhat about the spacing?"), conversation[0]!.text);
 });
 
 test("roles always alternate, whatever the images do", () => {

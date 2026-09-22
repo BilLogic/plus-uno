@@ -14,7 +14,7 @@ import {
   relayRecipientId,
   renderRelayedDm,
 } from "../src/tools/relayed-dm-render";
-import { executeRelayDm, type RelaySlack } from "../src/tools/relay-dm";
+import { executeRelayDm, type RelayMemory, type RelaySlack } from "../src/tools/relay-dm";
 import { runOperations } from "../src/gate/index";
 import { preflight } from "../src/agent/preflight";
 import type { Env, SlackContext } from "../src/types";
@@ -136,6 +136,22 @@ interface FakeSlack extends RelaySlack {
   posts: Array<{ channel: string; text: string; thread_ts?: string }>;
 }
 
+/** What each recipient's DM conversation was told the bot said. */
+interface FakeMemory extends RelayMemory {
+  remembered: Array<{ channel: string; content: string; ts?: string }>;
+}
+
+function fakeMemory(opts: { fail?: boolean } = {}): FakeMemory {
+  const remembered: FakeMemory["remembered"] = [];
+  return {
+    remembered,
+    async remember(channel, turn) {
+      if (opts.fail) throw new Error("store down");
+      remembered.push({ channel, ...turn });
+    },
+  };
+}
+
 function fakeSlack(opts: { refuse?: Record<string, string>; permalink?: string | null } = {}): FakeSlack {
   const opened: string[] = [];
   const posts: FakeSlack["posts"] = [];
@@ -149,7 +165,7 @@ function fakeSlack(opts: { refuse?: Record<string, string>; permalink?: string |
     },
     async postMessage(message) {
       posts.push(message);
-      return { ok: true };
+      return { ok: true, ts: `1700000001.00000${posts.length}` };
     },
     async permalink(channel, ts) {
       return opts.permalink === undefined
@@ -175,7 +191,7 @@ describe("an approved relay", () => {
       { toolName: "dm_relay", input: { recipient: "U0MERYEM", text: "RM-2436 is Ready for QA." } },
     ];
     const outcomes = await runOperations(operations, (op) =>
-      executeRelayDm({ slack }, op.input, { ...CONTEXT, batched: true }),
+      executeRelayDm({ slack, memory: fakeMemory() }, op.input, { ...CONTEXT, batched: true }),
     );
 
     assert.deepEqual(outcomes.map((o) => o.ok), [true, true]);
@@ -196,7 +212,7 @@ describe("an approved relay", () => {
 
   it("confirms a single relay in the requesting thread, under the real reply ts", async () => {
     const slack = fakeSlack();
-    await executeRelayDm({ slack }, { recipient: "U0COCO", text: "hi" }, CONTEXT);
+    await executeRelayDm({ slack, memory: fakeMemory() }, { recipient: "U0COCO", text: "hi" }, CONTEXT);
     const notes = slack.posts.filter((p) => p.channel === "C1");
     assert.equal(notes.length, 1);
     assert.equal(notes[0]!.thread_ts, CONTEXT.replyTs);
@@ -206,7 +222,7 @@ describe("an approved relay", () => {
   it("links a DM-origin request without promising the recipient they can open it", async () => {
     const slack = fakeSlack();
     await executeRelayDm(
-      { slack },
+      { slack, memory: fakeMemory() },
       { recipient: "U0COCO", text: "RM-2436 is Ready for QA." },
       { ...CONTEXT, channel: "D0REQUESTER", threadTs: "dm" },
     );
@@ -219,7 +235,7 @@ describe("an approved relay", () => {
     const slack = fakeSlack({ refuse: { U0GONE: "user_disabled" } });
     const [outcome] = await runOperations(
       [{ toolName: "dm_relay", input: { recipient: "U0GONE", text: "hello" } }],
-      (op) => executeRelayDm({ slack }, op.input, CONTEXT),
+      (op) => executeRelayDm({ slack, memory: fakeMemory() }, op.input, CONTEXT),
     );
     assert.equal(outcome!.ok, false);
     assert.match(outcome!.message, /deactivated/);
@@ -237,7 +253,7 @@ describe("an approved relay", () => {
         { toolName: "dm_relay", input: { recipient: "U0COCO", text: "hello" } },
         { toolName: "dm_relay", input: { recipient: "U0MERYEM", text: "hello" } },
       ],
-      (op) => executeRelayDm({ slack }, op.input, CONTEXT),
+      (op) => executeRelayDm({ slack, memory: fakeMemory() }, op.input, CONTEXT),
     );
     assert.deepEqual(outcomes.map((o) => o.ok), [false, true]);
     assert.deepEqual(slack.posts.filter((p) => p.channel.startsWith("D-")).map((p) => p.channel), ["D-U0MERYEM"]);
@@ -245,7 +261,7 @@ describe("an approved relay", () => {
 
   it("refuses a recipient that is not a user id without opening anything", async () => {
     const slack = fakeSlack();
-    const result = JSON.parse(await executeRelayDm({ slack }, { recipient: "Coco", text: "hi" }, CONTEXT));
+    const result = JSON.parse(await executeRelayDm({ slack, memory: fakeMemory() }, { recipient: "Coco", text: "hi" }, CONTEXT));
     assert.equal(result.ok, false);
     assert.deepEqual(slack.opened, []);
   });
@@ -253,8 +269,37 @@ describe("an approved relay", () => {
   it("will not send an unattributed relay", async () => {
     const slack = fakeSlack();
     const { requestedBy: _unused, ...anonymous } = CONTEXT;
-    const result = JSON.parse(await executeRelayDm({ slack }, { recipient: "U0COCO", text: "hi" }, anonymous));
+    const result = JSON.parse(await executeRelayDm({ slack, memory: fakeMemory() }, { recipient: "U0COCO", text: "hi" }, anonymous));
     assert.equal(result.ok, false);
     assert.deepEqual(slack.opened, []);
+  });
+
+  it("remembers what it sent in the recipient's DM, so their reply has it to go on", async () => {
+    // A reply typed in the composer reads the DM's history from the store, not
+    // from a Slack thread — so a relay the store never heard of is one the bot
+    // cannot talk about when the recipient asks what it is.
+    const slack = fakeSlack();
+    const memory = fakeMemory();
+    await executeRelayDm({ slack, memory }, { recipient: "U0COCO", text: "RM-2436 is Ready for QA." }, CONTEXT);
+    const dm = slack.posts.find((p) => p.channel === "D-U0COCO")!;
+    assert.deepEqual(memory.remembered.map((r) => r.channel), ["D-U0COCO"]);
+    assert.equal(memory.remembered[0]!.content, dm.text, "remembered as the recipient read it");
+    assert.ok(memory.remembered[0]!.ts, "under the ts Slack gave the DM");
+  });
+
+  it("remembers nothing for a relay Slack refused", async () => {
+    const slack = fakeSlack({ refuse: { U0GONE: "user_disabled" } });
+    const memory = fakeMemory();
+    await executeRelayDm({ slack, memory }, { recipient: "U0GONE", text: "hello" }, CONTEXT);
+    assert.deepEqual(memory.remembered, []);
+  });
+
+  it("still reports a sent relay as sent when remembering it fails", async () => {
+    const slack = fakeSlack();
+    const result = JSON.parse(
+      await executeRelayDm({ slack, memory: fakeMemory({ fail: true }) }, { recipient: "U0COCO", text: "hi" }, CONTEXT),
+    );
+    assert.equal(result.ok, true);
+    assert.match(slack.posts.find((p) => p.channel === "C1")!.text, /Sent to <@U0COCO>/);
   });
 });
