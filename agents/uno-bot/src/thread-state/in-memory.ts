@@ -179,10 +179,20 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       for (const rec of proposals.values()) {
         if (now() - rec.createdAt > PROPOSAL_TTL_MS) continue;
         if (rec.supersededBy || rec.retired) continue; // retired, so never the thread's live card
-        if (rec.proposal.channel !== ref.channel || rec.proposal.threadTs !== ref.thread) continue;
+        if (rec.proposal.channel !== ref.channel) continue;
+        if (proposalReplyThread(rec.proposal) !== ref.thread) continue; // keyed on the card's thread
         if (!best || rec.createdAt > best.createdAt) best = rec;
       }
       return best?.proposal ?? null;
+    },
+
+    async getProposalsByChannel(channel) {
+      return [...proposals.values()]
+        .filter((rec) => now() - rec.createdAt <= PROPOSAL_TTL_MS)
+        .filter((rec) => !rec.supersededBy && !rec.retired)
+        .filter((rec) => rec.proposal.channel === channel)
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .map((rec) => rec.proposal);
     },
 
     // The delete IS the claim — see the interface. Nothing is awaited between

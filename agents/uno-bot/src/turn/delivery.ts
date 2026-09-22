@@ -232,6 +232,9 @@ export type GateNote =
   /** A reaction that landed somewhere other than the card it claims: say where
    *  the live card is, and resolve nothing. */
   | { kind: "not-on-the-card"; toolName: string; glyph: string; userId: string }
+  /** A gate emoji typed outside any card's thread, in a DM holding several
+   *  live cards: ask which one, and resolve none of them. */
+  | { kind: "which-card"; count: number }
   /** The door caught the gesture and then failed to run it. */
   | { kind: "resolve-failed"; glyph: string };
 

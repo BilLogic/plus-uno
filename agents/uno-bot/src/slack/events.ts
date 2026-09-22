@@ -33,7 +33,7 @@ import { postVisibleFailure, isCapacityError } from "./delivery";
 import { postingDeps } from "./slack-delivery";
 import { runSlackTurn } from "./turn-adapter";
 import { stripBotMentions } from "./mention";
-import { turnSurfaceOf } from "../turn/request";
+import { cardThreadOf, turnSurfaceOf } from "../turn/request";
 
 // Re-exported for index.ts (SlackEnvelope) + agent-runner.ts (RunnerJobPayload)
 // and any other importer that still reaches for the Slack wire types here.
@@ -413,8 +413,8 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   const userId = event.user!;
   const threadTs = replyThreadTs(event);
   // History and the runner's ordering key on the CONVERSATION, which in a DM is
-  // the whole channel — threadTs above may be undefined there and is only a
-  // post target.
+  // the whole channel — threadTs above is the post target, and the key the
+  // pending card is held on.
   const convTs = conversationTs(event);
   const text = stripBotMentions(event.text!, (await getBotIdentity(env))?.userId);
 
@@ -446,7 +446,12 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   try {
     [history, pending, prd] = await Promise.all([
       buildThreadHistory(env, channel, convTs, event.thread_ts, event.ts, textReadsAsCorrection),
-      threadStateFor(env).getProposalByThread({ channel, thread: convTs }),
+      // The card, by contrast, is the REPLY THREAD's: in a DM a card staged
+      // under one ask is no business of the next unthreaded ask.
+      threadStateFor(env).getProposalByThread({
+        channel,
+        thread: cardThreadOf({ conversationTs: convTs, ...(threadTs ? { replyTs: threadTs } : {}) }),
+      }),
       isThreadReply
         ? extractPrdFromThreadRoot(env, channel, event.thread_ts!)
         : Promise.resolve(null),

@@ -370,9 +370,31 @@ export interface ThreadState {
   /** Look one up by the ts of its card. */
   getProposalByTs(proposalTs: string): Promise<ProposalLookup>;
 
-  /** The freshest live proposal in a conversation — the lookup a typed "yes
-   *  please" needs, which carries no card ts. */
+  /**
+   * The freshest live proposal in a REPLY THREAD — the lookup a typed "yes
+   * please" needs, which carries no card ts.
+   *
+   * `ref.thread` is the thread the card was posted in (`proposalReplyThread`),
+   * NOT the conversation key the rest of this interface takes. A DM is why:
+   * every unthreaded ask there shares the conversation `"dm"`, so a card keyed
+   * on it was every ask's pending card — a second ask read the first ask's
+   * card as its own, retired it as a revision, and a ✅ on it then answered
+   * "replaced" for good. History stays on the conversation; the card belongs
+   * to its thread. In a channel the two are the same value.
+   */
   getProposalByThread(ref: ThreadRef): Promise<PendingProposal | null>;
+
+  /**
+   * Every live proposal in a CHANNEL, whatever thread or conversation it was
+   * staged from, newest first — retired, superseded and aged-out cards left out.
+   *
+   * The one reader is a gate emoji typed as an unthreaded DM line: it sits in
+   * no card's thread, so it answers the DM's only card, and asks which when
+   * there are several rather than guess. The whole channel, not the `"dm"`
+   * conversation: a card staged from a reply inside a DM thread is filed under
+   * that thread, and missing it would let the ✅ run the other card unasked.
+   */
+  getProposalsByChannel(channel: string): Promise<PendingProposal[]>;
 
   /**
    * Take exclusive ownership of a proposal, or report that someone else has it.

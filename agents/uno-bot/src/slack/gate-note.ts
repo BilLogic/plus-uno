@@ -70,6 +70,14 @@ export function renderGateNote(note: GateNote): string {
         `nothing was executed. Use the buttons on the :warning: card for *${note.toolName}* just above, ` +
         `or react there.`
       );
+    case "which-card":
+      // Only an unthreaded DM line reaches this: anywhere else a typed emoji
+      // sits in a card's own thread and answers that card. Two cards are two different writes, and a ✅ outside both threads says
+      // nothing about which one it meant. Guessing runs the wrong one.
+      return (
+        `:point_up: ${note.count} proposals are waiting in this DM, so I can't tell which one that is for — ` +
+        `nothing was executed. React on the :warning: card you mean, or use its buttons.`
+      );
     case "resolve-failed":
       return `:warning: I caught your :${note.glyph}: but hit a snag executing it — give it another go, or tell me and I'll retry.`;
   }

@@ -73,7 +73,20 @@ export type GateSignal =
       decision: Decision;
       userId: string;
     }
-  | { kind: "typed"; channel: string; thread: string; text: string; userId: string }
+  | {
+      kind: "typed";
+      channel: string;
+      /** The reply thread the message sits in — the key a card is held on. */
+      thread: string;
+      text: string;
+      userId: string;
+      /**
+       * Set for an unthreaded DM line, which sits in no card's thread: with no
+       * card of its own it answers the DM's only live card, in whichever
+       * thread, and asks which when there are several.
+       */
+      wholeDm?: true;
+    }
   | {
       kind: "model";
       /** The loop validated the call against this proposal; Gate only claims
@@ -175,7 +188,7 @@ function replyTarget(proposal: PendingProposal): string {
  *
  * The order is fixed and is the whole of the gate's policy: read the decision
  * the signal carries, find the proposal it is about (by card ts, then by
- * conversation), check a reaction is on the card it claims to be, claim, and
+ * reply thread, then — for an unthreaded DM line — the whole DM), check a reaction is on the card it claims to be, claim, and
  * only then describe what to run.
  */
 export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise<GateVerdict> {
@@ -219,8 +232,21 @@ export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise
     };
   }
 
+  if (found.state === "several") {
+    // Outside every card's thread, and more than one card it could mean: two
+    // cards are two different writes, so ask rather than pick one.
+    return {
+      outcome: "none",
+      decision,
+      post: { note: { kind: "which-card", count: found.count }, replyTs: replyTargetOf(signal) },
+    };
+  }
+
   if (found.state === "none") {
-    // Nothing live anywhere in the conversation. A reaction may be ordinary
+    // An unthreaded DM line with no card anywhere in the DM is not about a
+    // card at all: nothing to say here, so the turn hands it to the model.
+    if (signal.kind === "typed" && signal.wholeDm) return { outcome: "none", decision, post: null };
+    // Nothing live anywhere in the thread. A reaction may be ordinary
     // punctuation, so it stays silent; a button press, a typed gate emoji and
     // the model's call are all unambiguously ABOUT a card, so each gets an
     // answer rather than silence.
@@ -322,7 +348,8 @@ async function claim(
 }
 
 /**
- * By card ts, then by conversation.
+ * By card ts, then by reply thread — and, for an unthreaded DM line, across
+ * the whole DM.
  *
  * The by-ts read is the authoritative one — it is the only lookup that can
  * report "expired" or "superseded" — and the by-thread read is what a signal
@@ -338,6 +365,7 @@ async function locate(
   | { state: "found"; proposal: PendingProposal }
   | { state: "superseded" }
   | { state: "expired" }
+  | { state: "several"; count: number }
   | { state: "none" }
 > {
   if (signal.kind !== "typed") {
@@ -360,7 +388,12 @@ async function locate(
   const ref = threadRefOf(signal);
   if (!ref) return { state: "none" };
   const live = await deps.threadState.getProposalByThread(ref).catch(() => null);
-  return live ? { state: "found", proposal: live } : { state: "none" };
+  if (live) return { state: "found", proposal: live };
+
+  if (signal.kind !== "typed" || !signal.wholeDm) return { state: "none" };
+  const all = await deps.threadState.getProposalsByChannel(signal.channel).catch(() => []);
+  if (all.length === 1) return { state: "found", proposal: all[0]! };
+  return all.length > 1 ? { state: "several", count: all.length } : { state: "none" };
 }
 
 function threadRefOf(
