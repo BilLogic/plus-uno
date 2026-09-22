@@ -74,26 +74,26 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 
 ## Hard rules
 
-Every embodiment, including Slack:
+Every embodiment, including Slack. The name in parentheses is how the rest of the harness cites the rule, so renumbering here breaks nothing:
 
-1. **The design system's generated index is the existence law.** Start at `design-system/guidelines/overview.md`, then load only what the task needs (e.g. `design-system/agent-views/components/index.md`, `design-system/agent-views/tokens/tokens.md`). A component absent from the index does not exist — propose creating it rather than asserting it, and check the index before creating one so you do not duplicate what is there.
-2. **Read the source for every name you use.** Props, variants and types come from the component `.jsx` / `.stories.jsx` — or from `get-documentation` on the Storybook MCP endpoint (`docs/connectors/storybook-mcp.md`) — before you write them.
-3. **Icons are Font Awesome Free**: `fa-solid`, `fa-regular`, `fa-brands` — including the brand glyphs (`fa-brands fa-notion`, `fa-brands fa-figma`). Pro families and Pro-only names (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, `fa-grid-2`) are not licensed here and render as blanks.
+1. **The design system's generated index is the existence law.** (`DS-knowledge-is-law`, `no-duplicate-components`) Start at `design-system/guidelines/overview.md`, then load only what the task needs (e.g. `design-system/agent-views/components/index.md`, `design-system/agent-views/tokens/tokens.md`). A component absent from the index does not exist — propose creating it rather than asserting it, and check the index before creating one so you do not duplicate what is there.
+2. **Read the source for every name you use.** (`read-source-first`, `no-hallucinated-props`) Props, variants and types come from the component `.jsx` / `.stories.jsx` — or from `get-documentation` on the Storybook MCP endpoint (`docs/connectors/storybook-mcp.md`) — before you write them.
+3. **Icons are Font Awesome Free** (`FA-Free-only`): `fa-solid`, `fa-regular`, `fa-brands` — including the brand glyphs (`fa-brands fa-notion`, `fa-brands fa-figma`). Pro families and Pro-only names (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, `fa-grid-2`) are not licensed here and render as blanks.
 4. **Notion writes follow `docs/connectors/notion.md`** — the convention surfaces and the ✅-gated tools. Select options, pillars, features and OKRs are exact-matched against what the database already offers; a value that does not exist is a question for the requester. Safety is the gate + schema match, not a hardcoded database fence.
-5. **PLUS components first**, then generic React-Bootstrap where no PLUS equivalent exists (ADR-009). Bootstrap is the UI framework for product UI; Tailwind is present but scoped to the Storybook documentation chrome in `design-system/src/storybook-docs/`, so it is not a precedent for product code.
+5. **PLUS components first** (`PLUS-components-first`), then generic React-Bootstrap where no PLUS equivalent exists (ADR-009). Bootstrap is the UI framework for product UI; Tailwind is present but scoped to the Storybook documentation chrome in `design-system/src/storybook-docs/`, so it is not a precedent for product code.
 
 <!-- ide-only -->
 ### Code authoring — IDE and Actions runners only
 
 Each rule is one line here and its body lives in the document it names; the leading word is the trigger.
 
-6. **Tokens** style everything — colour, spacing, typography, radius, elevation: `design-system/guidelines/foundations/tokens.md` § Non-negotiable rules.
-7. **Layout** starts from the structural formulas: `design-system/guidelines/composition/layout.md`, loaded before a new page, dashboard or layout.
+6. **Tokens** (`tokens-over-literals`) style everything — colour, spacing, typography, radius, elevation: `design-system/guidelines/foundations/tokens.md` § Non-negotiable rules.
+7. **Layout** (`no-hallucinated-layouts`) starts from the structural formulas: `design-system/guidelines/composition/layout.md`, loaded before a new page, dashboard or layout.
 8. **Figma input** means registries first, then the implement-design workflow: `design-system/guidelines/figma/registry-load-gate.md`, then `design-system/guidelines/figma/mcp-guide.md`.
 9. **Packages** are the user's call: ask before installing one.
-10. **Imports** of public components come from the `@/components` barrel: `docs/engineering/coding.md` § Imports.
-11. **Generated files** are regenerated from their source, and `npm run check:harness` says which one is stale: `docs/engineering/setup.md` § The harness gate.
-12. **Storybook** validates a component behaviour change — the story and its tests, not just the build: `docs/connectors/storybook-mcp.md`.
+10. **Imports** (`no-deep-imports`) of public components come from the `@/components` barrel: `docs/engineering/coding.md` § Imports.
+11. **Generated files** (`generated-tokens`) are regenerated from their source, and `npm run check:harness` says which one is stale: `docs/engineering/setup.md` § The harness gate.
+12. **Storybook** (`Storybook-validation`) validates a component behaviour change — the story and its tests, not just the build: `docs/connectors/storybook-mcp.md`.
 13. **Large or risky edits** get the plan and the touched files confirmed first.
 14. **Intake** runs one step per message when the briefing file is present: `skills/uno-prototype/references/intake.md` § One step per turn.
 15. **Figma write-back** goes through the DS gate: `design-system/guidelines/figma/component-alignment.md` § Write-back gate.

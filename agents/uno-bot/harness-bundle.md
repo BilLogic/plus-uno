@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,201 chars from 16 files**, against an assembled budget of 175,000 (799 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 153,817 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,449 chars from 16 files**, against an assembled budget of 175,000 (551 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,065 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,031 (−7,277 ide-only) | 10,031 | 20,000 (constitution) |
-| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,993 | 30,052 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,041 | 57,134 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,527 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 70,571 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,284 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,571 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 89,274 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,676 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,647 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,645 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 15,493 | 127,180 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 130,428 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 161,015 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 165,604 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 174,201 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,279 (−7,396 ide-only) | 10,279 | 20,000 (constitution) |
+| 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,993 | 30,300 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,041 | 57,382 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,775 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 70,819 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,532 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,819 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,661 | 89,522 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,924 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,895 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,893 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 15,493 | 127,428 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 130,676 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 161,263 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 165,852 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 174,449 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -131,13 +131,13 @@ Authored protocol is normative and lives in three places: `docs/connectors/` (to
 
 ## Hard rules
 
-Every embodiment, including Slack:
+Every embodiment, including Slack. The name in parentheses is how the rest of the harness cites the rule, so renumbering here breaks nothing:
 
-1. **The design system's generated index is the existence law.** Start at `design-system/guidelines/overview.md`, then load only what the task needs (e.g. `design-system/agent-views/components/index.md`, `design-system/agent-views/tokens/tokens.md`). A component absent from the index does not exist — propose creating it rather than asserting it, and check the index before creating one so you do not duplicate what is there.
-2. **Read the source for every name you use.** Props, variants and types come from the component `.jsx` / `.stories.jsx` — or from `get-documentation` on the Storybook MCP endpoint (`docs/connectors/storybook-mcp.md`) — before you write them.
-3. **Icons are Font Awesome Free**: `fa-solid`, `fa-regular`, `fa-brands` — including the brand glyphs (`fa-brands fa-notion`, `fa-brands fa-figma`). Pro families and Pro-only names (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, `fa-grid-2`) are not licensed here and render as blanks.
+1. **The design system's generated index is the existence law.** (`DS-knowledge-is-law`, `no-duplicate-components`) Start at `design-system/guidelines/overview.md`, then load only what the task needs (e.g. `design-system/agent-views/components/index.md`, `design-system/agent-views/tokens/tokens.md`). A component absent from the index does not exist — propose creating it rather than asserting it, and check the index before creating one so you do not duplicate what is there.
+2. **Read the source for every name you use.** (`read-source-first`, `no-hallucinated-props`) Props, variants and types come from the component `.jsx` / `.stories.jsx` — or from `get-documentation` on the Storybook MCP endpoint (`docs/connectors/storybook-mcp.md`) — before you write them.
+3. **Icons are Font Awesome Free** (`FA-Free-only`): `fa-solid`, `fa-regular`, `fa-brands` — including the brand glyphs (`fa-brands fa-notion`, `fa-brands fa-figma`). Pro families and Pro-only names (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, `fa-grid-2`) are not licensed here and render as blanks.
 4. **Notion writes follow `docs/connectors/notion.md`** — the convention surfaces and the ✅-gated tools. Select options, pillars, features and OKRs are exact-matched against what the database already offers; a value that does not exist is a question for the requester. Safety is the gate + schema match, not a hardcoded database fence.
-5. **PLUS components first**, then generic React-Bootstrap where no PLUS equivalent exists (ADR-009). Bootstrap is the UI framework for product UI; Tailwind is present but scoped to the Storybook documentation chrome in `design-system/src/storybook-docs/`, so it is not a precedent for product code.
+5. **PLUS components first** (`PLUS-components-first`), then generic React-Bootstrap where no PLUS equivalent exists (ADR-009). Bootstrap is the UI framework for product UI; Tailwind is present but scoped to the Storybook documentation chrome in `design-system/src/storybook-docs/`, so it is not a precedent for product code.
 
 
 ## Knowledge
