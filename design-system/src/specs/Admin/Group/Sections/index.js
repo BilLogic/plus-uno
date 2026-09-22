@@ -6,6 +6,6 @@
  */
 
 // No custom sections - uses shared components:
-// - PageLayout (from components/PageLayout)
+// - PageLayout (from Universal/Pages/PageLayout)
 // - TopBar (from Universal/Sections/TopBar)
 // - Sidebar (from Universal/Sections/Sidebar)
