@@ -253,3 +253,37 @@ test("grouping, quotes and boolean operators cannot carry a scope qualifier past
   assert.equal(codeSearchTerms("hero OR org:y"), "hero");
   assert.equal(codeSearchTerms('"hero" AND (user:z OR path:src)'), "hero path:src");
 });
+
+/* ------------------------------------------------------ repo visibility */
+
+test("visibility GETs the listed repo once per isolate, and reads GitHub's private flag", async () => {
+  const { githubRepoVisibility } = await import("../src/integrations/github.js");
+  calls = [];
+  reply = { status: 200, body: { full_name: SITE, private: false, visibility: "public" } };
+  assert.equal(await githubRepoVisibility(ENV, await listed(SITE)), "public");
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0]!.url, `https://api.github.com/repos/${SITE}`);
+  assert.equal(calls[0]!.method, "GET");
+  assert.equal(calls[0]!.headers.authorization, "Bearer ghp_test");
+
+  // The same isolate asks again: the answer is remembered, nothing is fetched.
+  reply = { status: 200, body: { private: true } };
+  assert.equal(await githubRepoVisibility(ENV, await listed(SITE)), "public");
+  assert.equal(calls.length, 1);
+});
+
+test("a visibility lookup that fails is unknown, and is not remembered", async () => {
+  const { githubRepoVisibility } = await import("../src/integrations/github.js");
+  calls = [];
+  reply = { status: 404, body: { message: "Not Found" } };
+  assert.equal(await githubRepoVisibility(ENV, await listed(REPO)), "unknown");
+  // A reply without the flag is not an answer either.
+  reply = { status: 200, body: { full_name: REPO } };
+  assert.equal(await githubRepoVisibility(ENV, await listed(REPO)), "unknown");
+
+  reply = { status: 200, body: { private: true } };
+  assert.equal(await githubRepoVisibility(ENV, await listed(REPO)), "private");
+  assert.equal(calls.length, 3, "each failure is retried on the next card");
+  assert.equal(await githubRepoVisibility(ENV, await listed(REPO)), "private");
+  assert.equal(calls.length, 3);
+});

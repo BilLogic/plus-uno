@@ -1,16 +1,17 @@
-// github_issue_create executor — files a GitHub intake on the Worker's repo,
-// then posts the issue link back in the thread. Side effect → runs only past
-// the ✅ gate, from `agent/resolve-proposal.ts`.
+// github_issue_create executor — files a GitHub intake on a repo from the
+// Worker's repo list, then posts the issue link back in the thread. Side
+// effect → runs only past the ✅ gate, from `agent/resolve-proposal.ts`.
 //
 // A direct REST create, not a third `repository_dispatch`: the two dispatch
 // tools start Actions, this one writes one issue, so it stays its own named
 // tool rather than the start of a generic `github_dispatch`.
 //
-// The model's input is a title and a body. Everything else is the Worker's:
-// the repo (the repo list's default, `GITHUB_REPO`, resolved in the binding),
-// the two triage labels and the
-// footer naming the requester and the thread (`github-issue-render.ts`), added
-// here so the model can neither choose a label nor leave the footer out.
+// The model's input is a title, a body and, optionally, a repo. The repo
+// reaches GitHub only as the entry the resolver returns (the default,
+// `GITHUB_REPO`, when none is named), so one off the list is refused here and
+// nothing is sent. Everything else is the Worker's: the two triage labels and
+// the footer naming the requester and the thread (`github-issue-render.ts`),
+// added here so the model can neither choose a label nor leave the footer out.
 //
 // IT TAKES NAMED DEPENDENCIES — the GitHub client, the requester's name,
 // whether the ask came from a DM, the thread permalink and the thread post — so `fileGithubIssue` is driven in
@@ -34,7 +35,7 @@ import {
 } from "./github-issue-render";
 
 export interface GithubIssueDeps {
-  /** Creates the issue on its one repo. */
+  /** Creates the issue on the one resolved repo. */
   github: GithubIssueClient;
   /** The requester's display name, for the footer. */
   requesterName(): Promise<string>;
@@ -65,7 +66,7 @@ export async function fileGithubIssue(
   const repo = deps.github.repo;
   let issue: CreatedIssue;
   try {
-    // A DM's link is never fetched: the issue is public and a DM stays a DM.
+    // A DM's link is never fetched: the issue may be public and a DM stays a DM.
     const [requester, permalink] = await Promise.all([
       deps.requesterName(),
       deps.requestedInDm ? null : deps.threadPermalink(),
@@ -133,7 +134,7 @@ function failureCause(err: unknown, repo: string): string {
 /**
  * The binding: `Env` and the thread, turned into the named dependencies.
  * @param env - Worker bindings
- * @param input - Tool args from the model — `title` and `body`
+ * @param input - Tool args from the model — `title`, `body` and `repo`
  * @param slack - Thread context: where to post, and who asked
  */
 export async function executeGithubIssueCreate(
@@ -141,9 +142,11 @@ export async function executeGithubIssueCreate(
   input: Record<string, unknown>,
   slack: SlackContext,
 ): Promise<string> {
-  // The default repo, through the same resolver as every GitHub tool — so a
-  // misconfigured list refuses the filing rather than falling back to a repo.
-  const target = resolveRepoFor(env, undefined);
+  // The model's repo, through the same resolver as every GitHub tool — so an
+  // unlisted repo or a misconfigured list refuses the filing rather than
+  // falling back to a repo. Preflight refused it before staging; this is the
+  // backstop for a card staged before the list changed.
+  const target = resolveRepoFor(env, input.repo);
   if (!target.ok) return JSON.stringify({ ok: false, status: "github_failed", error: target.error });
   return fileGithubIssue(input, {
     github: githubIssueClient(env, target.entry),

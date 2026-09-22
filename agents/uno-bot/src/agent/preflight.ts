@@ -22,6 +22,7 @@ import { listDsComponents, matchComponent, closestComponents } from "../integrat
 // Node test can both reach it without dragging `Env` behind them.
 import { placeholderRefusal } from "./placeholder";
 import { relayRecipientId } from "../tools/relayed-dm-render";
+import { resolveRepoFor } from "../integrations/github";
 
 export interface PreflightCtx {
   env: Env;
@@ -199,6 +200,16 @@ export async function preflight(
       const text = typeof input.text === "string" ? input.text.trim() : "";
       if (!text) {
         return { ask: ":incoming_envelope: What should the DM say? Give me the message and I'll stage it for your ✅." };
+      }
+      return null;
+    }
+
+    case "github_issue_create": {
+      // The repo must be on the Worker's list: an unlisted one is refused here,
+      // naming the list, so no card offers a filing the executor would refuse.
+      const target = resolveRepoFor(ctx.env, input.repo);
+      if (!target.ok) {
+        return { ask: `:mag: ${target.error} Which of those should this intake go on?` };
       }
       return null;
     }

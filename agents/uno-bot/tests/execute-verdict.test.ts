@@ -202,3 +202,43 @@ test("an approved GitHub intake names who asked in its footer, and links the iss
   assert.equal(note.channel, "D0REQUESTER");
   assert.equal(note.thread_ts, "1700000000.000100", "under the real reply ts, not the conversation key");
 });
+
+const LISTED = {
+  GITHUB_TOKEN: "ghp_test",
+  GITHUB_REPO: "BilLogic/plus-uno",
+  GITHUB_REPOS: JSON.stringify([
+    { repo: "BilLogic/plus-uno", purpose: "uno-bot and the harness", workflows: [] },
+    { repo: "BilLogic/plus-marketing-website", purpose: "the public marketing site", workflows: [] },
+  ]),
+};
+
+test("an approved intake naming a listed repo is filed there, with the two fixed labels and the footer", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env(LISTED),
+    won([{
+      toolName: "github_issue_create",
+      // The model's spelling; the list's is what reaches GitHub.
+      input: { title: "Hero CTA 404s", body: "The hero button links nowhere.", repo: "plus-marketing-website" },
+    }]),
+  );
+
+  const filings = calls.filter((c) => /^https:\/\/api\.github\.com\/repos\/.+\/issues$/.test(c.url));
+  assert.deepEqual(filings.map((c) => c.url), ["https://api.github.com/repos/BilLogic/plus-marketing-website/issues"]);
+  const sent = filings[0]!.body!;
+  assert.deepEqual(sent.labels, ["harness-intake", "needs-triage"]);
+  assert.match(String(sent.body), /^The hero button links nowhere\.\n\n---\nFiled from Slack by uno-bot on behalf of Bill Guo/);
+  assert.equal(sent.repo, undefined, "the repo is the URL's, never a field of the model's");
+  assert.ok(posts().some((p) => /on BilLogic\/plus-marketing-website/.test(String(p.text))));
+});
+
+test("an approved intake naming a repo off the list is refused, and nothing reaches GitHub", async () => {
+  calls = [];
+  const run = await executeVerdict();
+  await run(
+    env(LISTED),
+    won([{ toolName: "github_issue_create", input: { title: "A gap", body: "Details.", repo: "someone/else" } }]),
+  );
+  assert.deepEqual(calls.filter((c) => c.url.startsWith("https://api.github.com/")), []);
+});

@@ -31,6 +31,8 @@ import {
   type NewIssue,
 } from "../src/integrations/github";
 import { batchOutcomeNote, runOperations } from "../src/gate/index";
+import { preflight } from "../src/agent/preflight";
+import type { Env } from "../src/types";
 
 // ── the fakes the executor takes by name ─────────────────────────────────────
 
@@ -224,5 +226,33 @@ test("a draft with no title or no body files nothing", async () => {
     const result = JSON.parse(await fileGithubIssue(input, deps(github).deps)) as { ok: boolean };
     assert.equal(result.ok, false, JSON.stringify(input));
     assert.equal(github.sent.length, 0, JSON.stringify(input));
+  }
+});
+
+// ── preflight: the repo, before a card is staged ─────────────────────────────
+
+const LISTED_ENV = {
+  GITHUB_REPO: REPO,
+  GITHUB_REPOS: JSON.stringify([
+    { repo: REPO, purpose: "uno-bot and the harness", workflows: [] },
+    { repo: "BilLogic/plus-marketing-website", purpose: "the public marketing site", workflows: [] },
+  ]),
+} as unknown as Env;
+
+test("preflight refuses an intake aimed at a repo off the list, naming the list, before any card", async () => {
+  const ask = await preflight(
+    "github_issue_create",
+    { ...DRAFT, repo: "someone/else" },
+    { env: LISTED_ENV, prd: null },
+  );
+  assert.ok(ask, "an unlisted repo must not reach the card");
+  assert.match(ask.ask, /someone\/else/);
+  assert.match(ask.ask, /BilLogic\/plus-marketing-website \(the public marketing site\)/);
+});
+
+test("preflight lets a listed repo, or none, through to the card", async () => {
+  for (const repo of ["BilLogic/plus-marketing-website", "plus-marketing-website", undefined]) {
+    const input = repo === undefined ? { ...DRAFT } : { ...DRAFT, repo };
+    assert.equal(await preflight("github_issue_create", input, { env: LISTED_ENV, prd: null }), null, String(repo));
   }
 });
