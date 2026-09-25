@@ -1,7 +1,7 @@
 // read_source executor — READ-ONLY. Fetches the CONTENT of a link the user
 // pasted so the bot answers from the actual source instead of its priors
 // (fixes the "doesn't read what it's linked" cluster). Dispatches by domain:
-//   notion.so  → page title + properties (incl. Owner/people) + block text
+//   notion.so / app.notion.com → page title + properties (incl. Owner/people) + block text
 //   figma.com  → node name/type + text layers (for review/inspection)
 //                (the frame IMAGE arrives separately — slack/vision.ts renders
 //                 the first frame link in the message and attaches it to the
@@ -11,7 +11,7 @@
 // Runs inline in the agent loop (no side effect, no gate).
 
 import type { Env, SlackContext } from "../types";
-import { parseNotionPageId, readNotionPage } from "../integrations/notion";
+import { canonicalNotionUrl, parseNotionPageId, readNotionPage } from "../integrations/notion";
 import { parseFigmaUrl, fetchFigmaNode } from "../integrations/figma";
 import { FIGMA_NOTE, FIGMA_TRUNCATION_NOTE } from "../integrations/figma-reading";
 import { countedFetch } from "../net";
@@ -85,7 +85,10 @@ export async function executeReadSource(
     }
 
     // ---- Notion ----
-    if (/(^|\.)notion\.so$/.test(host) || /(^|\.)notion\.site$/.test(host)) {
+    // app.notion.com is the host the API itself now hands out (#729), so it is
+    // in teammates' messages and the bot's own earlier replies. Without it here
+    // that link fell through to the generic fetch and never reached the API.
+    if (/(^|\.)notion\.so$/.test(host) || /(^|\.)notion\.site$/.test(host) || host === "app.notion.com") {
       const pageId = parseNotionPageId(url);
       if (!pageId) return JSON.stringify({ ok: false, error: "couldn't extract a Notion page id from that URL" });
       let page;
@@ -109,7 +112,7 @@ export async function executeReadSource(
       return JSON.stringify({
         ok: true,
         source_type: "notion",
-        url,
+        url: canonicalNotionUrl(url),
         title: page.title,
         properties: page.properties,
         people: page.people,
