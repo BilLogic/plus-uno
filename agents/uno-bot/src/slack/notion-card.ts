@@ -18,6 +18,7 @@
 import type { CardRevision, CardTarget } from "../turn/index";
 import type { Env } from "../types";
 import {
+  canonicalNotionUrl,
   describeNotionTarget,
   normalizeName,
   parseNotionPageId,
@@ -101,7 +102,7 @@ export async function buildNotionRevision(
   if (target) {
     revision.page = { url: target.url, title: target.title, parent: target.parent };
   } else if (pageUrl) {
-    revision.page = { url: pageUrl };
+    revision.page = { url: canonicalNotionUrl(pageUrl) };
   }
 
   // One entry per changed field, always — what it says now, what it will say.

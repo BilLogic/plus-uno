@@ -360,7 +360,7 @@ export async function queryThirdPartyApps(
       if (!name) return null;
       return {
         name,
-        url: r.url ?? `https://www.notion.so/${r.id.replace(/-/g, "")}`,
+        url: canonicalNotionUrl(r.url, r.id),
         admins: (p["Application Admin"]?.people ?? []).map((u) => u.name ?? "").filter(Boolean),
         powerUserPageIds: (p["Power User(s)"]?.relation ?? []).map((rel) => rel.id ?? "").filter(Boolean),
         usageStatus: p["Usage Status"]?.status?.name ?? undefined,
@@ -457,7 +457,7 @@ export async function queryCatalogDatabase(
       return {
         id: r.id.replace(/-/g, ""),
         title,
-        url: r.url ?? `https://www.notion.so/${r.id.replace(/-/g, "")}`,
+        url: canonicalNotionUrl(r.url, r.id),
         meta: catalogMeta(props),
       };
     },
@@ -500,6 +500,29 @@ export function parseNotionPageId(input: string): string | null {
   if (typeof input !== "string") return null;
   const m = input.match(NOTION_ID_RE);
   return m ? m[0].replace(/-/g, "").toLowerCase() : null;
+}
+
+/**
+ * A Notion link a teammate can open. The API's `url` on a page or database now
+ * comes back as `https://app.notion.com/p/<slug>-<id>`, and that host can 404
+ * in an ordinary browser session (#729 — a proposal card's page link,
+ * 2026-09-25). The same page at `https://www.notion.so/<slug>-<id>` opens.
+ *
+ * Every `url` read off a Notion API response goes through here. The rewrite
+ * swaps the origin and drops the `/p` segment, and keeps the rest: a workspace
+ * segment (`/p/plus-tutors/<id>`), a `?v=` view, a `#block` anchor. Any other
+ * host passes through untouched. With no `url`, the page id alone is the link.
+ */
+export function canonicalNotionUrl(url: string | null | undefined, id?: string): string {
+  if (!url) return id ? `https://www.notion.so/${id.replace(/-/g, "")}` : "";
+  let u: URL;
+  try {
+    u = new URL(url);
+  } catch {
+    return url;
+  }
+  if (u.hostname !== "app.notion.com") return url;
+  return `https://www.notion.so${u.pathname.replace(/^\/p(?=\/|$)/, "")}${u.search}${u.hash}`;
 }
 
 export interface ArchivedCard {
@@ -757,7 +780,7 @@ export async function notionSearch(
         }
       }
       const bareId = r.id.replace(/-/g, "");
-      hits.push({ id: bareId, title, url: r.url ?? `https://www.notion.so/${bareId}` });
+      hits.push({ id: bareId, title, url: canonicalNotionUrl(r.url, bareId) });
     }
     return hits;
   } finally {
@@ -936,7 +959,7 @@ export async function notionCreate(
 
     return {
       id: data.id,
-      url: data.url ?? `https://www.notion.so/${data.id.replace(/-/g, "")}`,
+      url: canonicalNotionUrl(data.url, data.id),
       label: plan.label,
     };
   } finally {
@@ -1241,7 +1264,7 @@ export async function describeNotionTarget(
       }
     }
 
-    const url = page.url || `https://www.notion.so/${pageId}`;
+    const url = canonicalNotionUrl(page.url, pageId);
     const dbId = page.parent?.database_id;
     if (!dbId) {
       const parent = page.parent?.type === "page_id" ? "a sub-page" : "a standalone page";
@@ -1633,7 +1656,7 @@ export async function queryRoadmapCards(
       }
       return {
         title,
-        url: r.url ?? "",
+        url: canonicalNotionUrl(r.url, r.id),
         card_number: cardNumber,
         design_status: designStatus,
         dev_status: devStatus,
