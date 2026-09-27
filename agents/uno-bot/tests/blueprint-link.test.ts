@@ -11,7 +11,7 @@ import {
   chunkBody,
 } from "../src/integrations/blueprint-link";
 
-const APP = "https://uno-blueprint.netlify.app";
+const APP = "https://plus-uno.netlify.app/blueprint";
 const CELL = "a2e7ef9b-bbc3-4e2c-a5aa-238748abeca7";
 const TITLE =
   "Scenario: Reporting an Issue · Path: Happy Path (happy) · Step: Reach out · Layer: Front Stage Tech";
@@ -25,12 +25,22 @@ test("a trailing slash on the configured base does not double up", () => {
   assert.equal(cellUrl(`${APP}/`, CELL), `${APP}/?cell=${CELL}`);
 });
 
+test("an app served under a path keeps the path, with the slash before the query", () => {
+  // The app is served under a base path, and its router only answers at the
+  // path's own root: `/blueprint/?cell=` opens the cell, `/?cell=` lands on
+  // another site and `/blueprint?cell=` relies on a redirect keeping the query.
+  const url = new URL(cellUrl("https://plus-uno.netlify.app/blueprint", CELL)!);
+  assert.equal(url.pathname, "/blueprint/");
+  assert.equal(url.searchParams.get("cell"), CELL);
+  assert.equal(sliceUrl("https://plus-uno.netlify.app/blueprint/", "s-1"), "https://plus-uno.netlify.app/blueprint/?slice=s-1");
+});
+
 test("no base, no id, or a non-http base yields no link at all", () => {
   // A URL that resolves to nothing is worse than no URL: the model presents it
   // as a citation and the reader lands nowhere.
   assert.equal(cellUrl(undefined, CELL), undefined);
   assert.equal(cellUrl("", CELL), undefined);
-  assert.equal(cellUrl("uno-blueprint.netlify.app", CELL), undefined);
+  assert.equal(cellUrl("plus-uno.netlify.app/blueprint", CELL), undefined);
   assert.equal(cellUrl(APP, ""), undefined);
 });
 

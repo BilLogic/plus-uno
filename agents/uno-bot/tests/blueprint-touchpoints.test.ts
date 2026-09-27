@@ -70,8 +70,8 @@ test("the registry filter matches any word on name, kind or summary", () => {
 test("a registry row links to the app root, and to nothing when no app is configured", () => {
   // No per-touchpoint route exists in the app's URL layer, so the honest link
   // is the blueprint itself — never a minted `?touchpoint=` the app ignores.
-  assert.equal(appRootUrl("https://uno-blueprint.netlify.app"), "https://uno-blueprint.netlify.app/");
-  assert.equal(appRootUrl("https://uno-blueprint.netlify.app///"), "https://uno-blueprint.netlify.app/");
+  assert.equal(appRootUrl("https://plus-uno.netlify.app/blueprint"), "https://plus-uno.netlify.app/blueprint/");
+  assert.equal(appRootUrl("https://plus-uno.netlify.app/blueprint///"), "https://plus-uno.netlify.app/blueprint/");
   assert.equal(appRootUrl(undefined), undefined);
   assert.equal(appRootUrl("not a url"), undefined);
   assert.ok(!("touchpoint" in BLUEPRINT_CONTRACT.urlParams), "the app grew a touchpoint route — link it instead of the root");

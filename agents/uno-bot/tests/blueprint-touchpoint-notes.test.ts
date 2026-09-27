@@ -16,7 +16,7 @@ import {
   TOUCHPOINT_NOTES,
 } from "../src/tools/blueprint-touchpoint-notes";
 
-const APP = "https://uno-blueprint.netlify.app/";
+const APP = "https://plus-uno.netlify.app/blueprint/";
 
 test("rows earn the registry note, and the absence note does not fire", () => {
   const notes = touchpointNotes({ words: ["zoom"], rows: 2, registryTotal: 93, appUrl: APP });

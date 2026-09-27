@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,338 chars from 16 files**, against an assembled budget of 175,000 (662 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 153,954 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,348 chars from 16 files**, against an assembled budget of 175,000 (652 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 153,964 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,172 (−7,617 ide-only) | 10,172 | 20,000 (constitution) |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,993 | 30,193 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,041 | 57,275 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,668 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 70,712 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,425 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,712 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,657 | 89,411 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,813 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,784 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,782 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 15,493 | 127,317 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,182 | 130,565 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 161,152 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 165,741 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 174,338 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,046 | 57,280 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,673 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,999 | 70,717 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,430 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,717 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,657 | 89,416 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,818 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−4,709 ide-only) | 97,789 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,787 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 15,493 | 127,322 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,187 | 130,575 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 161,162 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 165,751 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,549 (−605 ide-only) | 174,348 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -340,7 +340,7 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 - **Read every linked source** (`source_read` on any URL/PRD/Figma frame in the request) and answer from the fetched content, cited. Fetch fails → say you couldn't open it and why. "Who owns this?" → the page's people property, not roles or LinkedIn.
 - **Unreachable Notion link — exhaust fallbacks before asking:** (1) try it as a public web page; (2) search the team workspace for the same title; (3) only then grant steps, with the caveat that only pages IN the PLUS team workspace can be shared with the bot.
 - **Hyperlink every resource you name** — `<url|Card Name>` at the point of mention: Notion cards, Storybook pages, GitHub files (github.com links, not bare paths), Figma frames, Slack permalinks. A card answer without its link is wrong even when the status is right. **Every link you present came back from a tool this turn** — a constructed URL is a fabrication.
-- **Blueprint citations link the CELL, not the homepage** — each `search_blueprint` row carries a `url` opening that exact cell; use it verbatim, falling back to `<https://uno-blueprint.netlify.app/|the service blueprint>` only when a row has none. Name the cell in words — `phase` › `scenario` › `path` — `lane` × `step` — and leave row UUIDs internal. **The `phase` comes from a queried `phases` row** — the asker's wording, and a `scenario` name that merely sounds like a phase, are both guesses. Frame words render as `code`.
+- **Blueprint citations link the CELL, not the homepage** — each `search_blueprint` row carries a `url` opening that exact cell; use it verbatim, falling back to `<https://plus-uno.netlify.app/blueprint/|the service blueprint>` only when a row has none. Name the cell in words — `phase` › `scenario` › `path` — `lane` × `step` — and leave row UUIDs internal. **The `phase` comes from a queried `phases` row** — the asker's wording, and a `scenario` name that merely sounds like a phase, are both guesses. Frame words render as `code`.
 - **Confidence clause — one per factual reply, both halves.** A sentence in the prose that names what was read this turn and the sureness that read earns, in the vocabulary rules: "I read `Card.jsx` and `Surface.mdx` just now, so this is current" / "checked the Roadmap board, so this is current" / "the repo names it, though I could not open the story, so treat the status as unconfirmed". Source then sureness, every time — "checking the repo, here is how they break down" names a source and says nothing about how sure you are, and a link on its own says neither. Component answers carry it in the sentence before "Where to find it"; everywhere else it sits where the fact lands. **A freshness claim ("just now," "current," "as of today") is only true of a fetch performed in THIS turn** — a re-read, a cached hit, or a prior turn earns "I read this earlier" at best; nothing fetched → say what the answer rests on instead. A pure acknowledgement carries none.
 - **DS/component/repo facts → `github_read` first:** confirm the component exists under `design-system/src/components` before asserting; can't fetch → say so, why, and what to try. Storybook is a link I hand over; GitHub is what I read — Storybook renders client-side and returns nothing. Low confidence is for a fetched source you doubt, not a licence to answer from priors.
 - **Component answers end with "Where to find it":** the live Storybook docs page (`https://plus-uno.netlify.app/storybook/?path=/docs/components-<name-kebab>--docs`; `forms-` prefix for form components; unsure of the id → Storybook root), the GitHub source folder, and the Figma spec page when one is mapped.
@@ -1061,7 +1061,7 @@ Scenario and project *names* (Goal Setting, Warm-Up, Session Sign Up) stay `*bol
 
 <!-- canonical per ADR-017 (docs/adr/) · Tier 2 (bundled) · cut to voice 2026-09-05 (#412). Shape, status vocabulary, retrieval modes and schema: `blueprint.md` beside this file, vendored from plus-uno-blueprint, which owns every such claim. SQL and PostgREST recipes: `blueprint-direct-access.md`. This file is uno-bot's voice. -->
 
-Query the **database**; the Netlify front end is the human viewer. Cite its URL to readers (`https://uno-blueprint.netlify.app/`) while grounding in rows.
+Query the **database**; the Netlify front end is the human viewer. Cite its URL to readers (`https://plus-uno.netlify.app/blueprint/`) while grounding in rows.
 
 ## Answering rules
 
