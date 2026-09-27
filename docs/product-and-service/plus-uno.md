@@ -75,6 +75,7 @@ All deployments use **Netlify** exclusively. No other hosting providers (Vercel,
 |--------|-----|--------|
 | **Prototype Marketplace** | https://plus-uno.netlify.app | `netlify.toml` — builds `dist/` via `npm run build:all` |
 | **Storybook** | https://plus-uno.netlify.app/storybook/ | Static build at `dist/storybook/` via `build:all` |
+| **PLUS Uno Blueprint** (the blueprint app) | https://plus-uno.netlify.app/blueprint/ | The web app that renders the uno-blueprint source; its own Netlify site (`plus-uno-blueprint`), served under `/blueprint/` and proxied by a forced rewrite in `netlify.toml` |
 | **Standalone prototypes** | Per-prototype Netlify deploys (optional) | Individual `dist/` folders via Netlify CLI |
 
 **Environment variables (Netlify dashboard):**

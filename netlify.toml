@@ -20,6 +20,18 @@
   status = 302
   force = true
 
+# /blueprint/ is PLUS Uno Blueprint, the web app that renders the uno-blueprint
+# source. It is built and deployed on its own Netlify site (plus-uno-blueprint),
+# which serves it under /blueprint/, and proxied here unchanged. Forced, so
+# nothing in this build under the path shadows it; it must come BEFORE the SPA
+# catch-all. Netlify does not apply custom headers to proxied content, so the
+# app keeps its own CSP and cache headers.
+[[redirects]]
+  from = "/blueprint/*"
+  to = "https://plus-uno-blueprint.netlify.app/blueprint/:splat"
+  status = 200
+  force = true
+
 # Storybook static files — serve as-is (must come BEFORE the SPA catch-all)
 [[redirects]]
   from = "/storybook/*"
