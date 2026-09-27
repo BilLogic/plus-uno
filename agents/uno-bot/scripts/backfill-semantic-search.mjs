@@ -43,7 +43,7 @@
 //                  for the blueprint index.
 //   EMBED_REGION   default "us-central1"  (Vertex path only; "global" does not
 //                  serve embeddings)
-//   BLUEPRINT_URL  default "https://uno-blueprint.netlify.app/"  (citation base)
+//   BLUEPRINT_URL  default "https://plus-uno.netlify.app/blueprint/"  (citation base)
 //
 // Run:  node scripts/backfill-semantic-search.mjs
 //
@@ -69,7 +69,7 @@ const {
   GEMINI_SA_PRIVATE_KEY,
   OPENAI_API_KEY,
   EMBED_REGION = "us-central1",
-  BLUEPRINT_URL = "https://uno-blueprint.netlify.app/",
+  BLUEPRINT_URL = "https://plus-uno.netlify.app/blueprint/",
 } = process.env;
 
 const ARGV = process.argv.slice(2);

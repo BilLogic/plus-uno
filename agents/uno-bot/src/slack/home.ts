@@ -119,7 +119,7 @@ const HOME_BODY = [
         {
           type: "button",
           text: { type: "plain_text", text: "🗺️ Service blueprint", emoji: true },
-          url: "https://uno-blueprint.netlify.app/",
+          url: "https://plus-uno.netlify.app/blueprint/",
         },
         {
           type: "button",

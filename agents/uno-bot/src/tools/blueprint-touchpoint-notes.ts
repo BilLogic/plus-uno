@@ -89,7 +89,7 @@ export function touchpointNotes({
  *  the day it is added. */
 export const TOUCHPOINT_NOTES: ReadonlyArray<readonly [name: string, text: string]> = [
   ["TOUCHPOINT_NOTE", TOUCHPOINT_NOTE],
-  ["touchpointLinkNote", touchpointLinkNote("https://uno-blueprint.netlify.app/")!],
+  ["touchpointLinkNote", touchpointLinkNote("https://plus-uno.netlify.app/blueprint/")!],
   ["touchpointCountNote", touchpointCountNote(3, 93)!],
   ["touchpointAbsenceNote", touchpointAbsenceNote(["zoom"], 93)],
 ];
