@@ -35,7 +35,8 @@ export const CONFIDENCE_FLOOR = 0.7;
 /** The detector's tier: a comparison, not a turn. */
 export const DETECTOR_TIER = "chill" as const;
 
-const MAX_MESSAGE_CHARS = 1_200;
+/** Characters of one thread message the detector is shown. */
+export const MAX_MESSAGE_CHARS = 1_200;
 const MAX_SOURCE_CHARS = 4_000;
 /** A writable block longer than this is not offered at all: shown cut, its
  *  replacement would overwrite the part the model never saw. */

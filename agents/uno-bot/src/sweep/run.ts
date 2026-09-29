@@ -58,7 +58,7 @@ import type { PendingProposal } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import type { ScheduledJob } from "../scheduled/runs";
 import { cardPlan, destinationKey, planSweepCards, sweepCard, SWEEP_CARD_TTL_MS, type SweepCardPlan } from "./cards";
-import type { DriftDetector } from "./detector";
+import { MAX_MESSAGE_CHARS, type DriftDetector } from "./detector";
 import {
   classifyLink,
   linksIn,
@@ -88,6 +88,12 @@ export const FIRST_SWEEP_WINDOW_MS = 24 * 60 * 60 * 1000;
 export const ACTIVE_THREAD_LOOKBACK_MS = 7 * 24 * 60 * 60 * 1000;
 /** `conversations.history` pages of 200, at most this many per job. */
 export const MAX_HISTORY_PAGES = 5;
+/** Characters of thread text the detector is shown; past it, the oldest
+ *  replies are left out (the root always stays) and the run notes it. */
+export const MAX_THREAD_CHARS = 24_000;
+/** Consecutive failed nights after which a thread is skipped and the cursor
+ *  moves past it. */
+export const MAX_FAILED_NIGHTS = 2;
 /** Sources followed per thread, Notion first. */
 export const MAX_SOURCES_PER_THREAD = 3;
 /** `conversations.replies` pages of 200 read per thread; a longer thread is
@@ -276,21 +282,42 @@ async function sweepChannel(job: ScheduledJob, deps: SweepDeps): Promise<SweepJo
   try {
     const { units, readTo } = await activeThreads(deps, channel, oldest, cursor);
     if (readTo) notes.push(`history ran past ${MAX_HISTORY_PAGES} pages; the cursor stays at or before ${readTo}`);
+    const failing = new Set(units.length && !deps.dryRun ? await deps.store.failingThreads(channel) : []);
+    // A thread that failed: held — the cursor stays before it and the job
+    // stops — unless it has now failed `MAX_FAILED_NIGHTS` nights running,
+    // when it is skipped and the cursor moves past it. A budget stop throws
+    // past this; a model quota stop holds without counting.
+    const failed = async (rootTs: string, why: string, counts: boolean): Promise<"hold" | "skip"> => {
+      if (!counts || deps.dryRun) return "hold";
+      const nights = await deps.store.recordThreadFailure(channel, rootTs, runDate);
+      if (nights < MAX_FAILED_NIGHTS) return "hold";
+      await deps.store.clearThreadFailure(channel, rootTs);
+      console.warn(`[sweep] ${channel} thread ${rootTs} skipped after ${nights} failed nights: ${why}`);
+      notes.push(`thread ${rootTs} skipped after ${nights} failed nights (${why})`);
+      return "skip";
+    };
     for (const unit of units) {
       const messages = unit.replies ? await readThread(deps, channel, unit.root.ts) : [unit.root];
       if (!messages) {
-        return finish("handled", `stopped at ${reached}: a thread's replies could not be read`, threads, kept);
-      }
-      if (messages !== "too-long") {
+        const why = "its replies could not be read";
+        if ((await failed(unit.root.ts, why, true)) === "hold") {
+          return finish("handled", `stopped at ${reached}: a thread's replies could not be read`, threads, kept);
+        }
+      } else if (messages !== "too-long") {
         const humans = messages.filter((m) => isHuman(m, deps.config.botUserId)).map(toSweepMessage);
         threads += 1;
         const found = await sweepThread(deps, { channel, rootTs: unit.root.ts, humans, runDate, now, resolved });
         if (!found.ok) {
-          return finish("handled", `stopped at ${reached}: the detector did not answer (${found.error})`, threads, kept);
+          if ((await failed(unit.root.ts, found.error, found.counts)) === "hold") {
+            return finish("handled", `stopped at ${reached}: ${found.error}`, threads, kept);
+          }
+        } else {
+          if (found.trimmed) notes.push(`thread ${unit.root.ts}: ${found.trimmed} oldest repl(ies) left out of the detector's view`);
+          kept.push(...found.findings);
+          readOnly += found.readOnly;
+          if (!deps.dryRun && found.findings.length) await deps.store.addFindings(found.findings);
+          if (failing.has(unit.root.ts) && !deps.dryRun) await deps.store.clearThreadFailure(channel, unit.root.ts);
         }
-        kept.push(...found.findings);
-        readOnly += found.readOnly;
-        if (!deps.dryRun && found.findings.length) await deps.store.addFindings(found.findings);
       } else {
         notes.push(`thread ${unit.root.ts} has more than ${MAX_REPLY_PAGES * 200} replies and was left unread`);
       }
@@ -382,8 +409,11 @@ async function sweepThread(
     now: number;
     resolved: Map<string, string | null>;
   },
-): Promise<{ ok: true; findings: PendingFinding[]; readOnly: number } | { ok: false; error: string }> {
-  const none = { ok: true as const, findings: [], readOnly: 0 };
+): Promise<
+  | { ok: true; findings: PendingFinding[]; readOnly: number; trimmed: number }
+  | { ok: false; error: string; counts: boolean }
+> {
+  const none = { ok: true as const, findings: [], readOnly: 0, trimmed: 0 };
   const root = t.humans.find((m) => m.ts === t.rootTs) ?? t.humans[0];
   if (!root) return none;
   const links = [...new Set(t.humans.flatMap((m) => linksIn(m.text)))]
@@ -398,16 +428,26 @@ async function sweepThread(
   );
   const sources: SweepSource[] = [];
   for (const link of chosen) {
-    const source = await deps.sources.read(link.url, link.kind);
-    if (source) sources.push(source);
+    try {
+      const source = await deps.sources.read(link.url, link.kind);
+      if (source) sources.push(source);
+    } catch (err) {
+      // A page that failed to read is not a page with nothing on it: the
+      // thread is held, like a budget stop, and the failure is counted.
+      rethrowIfBudget(err);
+      return { ok: false, error: `a linked page could not be read (${err instanceof Error ? err.message : String(err)})`, counts: true };
+    }
   }
   if (!sources.some((s) => s.writable)) return none;
 
+  const shown = withinThreadBudget(t.humans, root.ts);
   const detected = await deps.detector.detect({
-    thread: { channel: t.channel, channelKind: "public", rootTs: t.rootTs, messages: t.humans },
+    thread: { channel: t.channel, channelKind: "public", rootTs: t.rootTs, messages: shown.messages },
     sources,
   });
-  if (!detected.ok) return detected;
+  if (!detected.ok) {
+    return { ok: false, error: `the detector did not answer (${detected.error})`, counts: !MODEL_QUOTA.test(detected.error) };
+  }
 
   const participants = [...new Set(t.humans.map((m) => m.user))];
   const findings: PendingFinding[] = [];
@@ -451,7 +491,29 @@ async function sweepThread(
       participants,
     });
   }
-  return { ok: true, findings, readOnly };
+  return { ok: true, findings, readOnly, trimmed: shown.trimmed };
+}
+
+/** A model stop that is the quota's, not the thread's: held, never counted. */
+const MODEL_QUOTA = /\b429\b|quota|rate.?limit|resource.?exhausted/i;
+
+/**
+ * The thread as the detector sees it: the root, then the newest replies that
+ * fit `MAX_THREAD_CHARS`, in order. Evidence can only cite what was shown.
+ */
+function withinThreadBudget(messages: SweepMessage[], rootTs: string): { messages: SweepMessage[]; trimmed: number } {
+  const size = (m: SweepMessage) => Math.min(m.text.length, MAX_MESSAGE_CHARS) + 40;
+  const root = messages.find((m) => m.ts === rootTs);
+  let left = MAX_THREAD_CHARS - (root ? size(root) : 0);
+  const kept: SweepMessage[] = [];
+  for (const m of [...messages].reverse()) {
+    if (m === root) continue;
+    if (size(m) > left) break;
+    left -= size(m);
+    kept.unshift(m);
+  }
+  const shown = root ? [root, ...kept] : kept;
+  return { messages: shown, trimmed: messages.length - shown.length };
 }
 
 /** The card's Contributors as Slack ids, each name looked up once per job. */
@@ -783,7 +845,6 @@ function itemRecord(f: PendingFinding, plan: SweepCardPlan, now: number): SweepI
     runDate: f.runDate,
     channel: f.evidence.channel,
     threadTs: f.evidence.threadTs ?? "",
-    targetUrl: f.target.url,
     // Carded findings always name a block (`planSweepCards`).
     blockId: f.blockId!,
     ownerId: f.owner,

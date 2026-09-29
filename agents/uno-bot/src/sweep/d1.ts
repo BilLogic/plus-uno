@@ -46,7 +46,6 @@ const ITEM_COLUMNS = [
   "run_date",
   "channel_id",
   "thread_ts",
-  "target_url",
   "block_id",
   "owner_id",
   "status",
@@ -83,6 +82,13 @@ const INSERT_ITEMS =
   `SELECT ${ITEM_COLUMNS.map((c) => `json_extract(value, '$.${c}')`).join(", ")} FROM json_each(?) WHERE true ` +
   `ON CONFLICT (item_id) DO NOTHING`;
 const SELECT_ITEMS = `SELECT ${ITEM_COLUMNS.join(", ")} FROM sweep_items`;
+const RECORD_FAILURE =
+  "INSERT INTO sweep_thread_failures (channel_id, thread_ts, nights, last_run_date) VALUES (?, ?, 1, ?) " +
+  "ON CONFLICT (channel_id, thread_ts) DO UPDATE SET " +
+  "nights = CASE WHEN last_run_date = excluded.last_run_date THEN nights ELSE nights + 1 END, " +
+  "last_run_date = excluded.last_run_date RETURNING nights";
+const FAILING_THREADS = "SELECT thread_ts FROM sweep_thread_failures WHERE channel_id = ?";
+const CLEAR_FAILURE = "DELETE FROM sweep_thread_failures WHERE channel_id = ? AND thread_ts = ?";
 const MARK_POSTED = "UPDATE sweep_items SET proposal_ts = ?, posted_at = ? WHERE card_key = ?";
 const RELEASE_CARD = "DELETE FROM sweep_items WHERE card_key = ? AND proposal_ts IS NULL";
 
@@ -135,7 +141,6 @@ function itemRow(i: SweepItemRecord): ItemRow {
     run_date: i.runDate,
     channel_id: i.channel,
     thread_ts: i.threadTs,
-    target_url: i.targetUrl,
     block_id: i.blockId,
     owner_id: i.ownerId,
     status: i.status,
@@ -156,7 +161,6 @@ function fromItemRow(row: ItemRow): SweepItemRecord {
     runDate: String(row.run_date),
     channel: String(row.channel_id),
     threadTs: String(row.thread_ts),
-    targetUrl: String(row.target_url),
     blockId: String(row.block_id),
     ownerId: String(row.owner_id),
     status: row.status as SweepItemRecord["status"],
@@ -206,6 +210,20 @@ export function createD1SweepRecords(deps: { db: SweepDatabase }): SweepRecords 
     itemsForFindings: async (findingIds) =>
       findingIds.length ? items("finding_id IN (SELECT value FROM json_each(?))", JSON.stringify(findingIds)) : [],
     openItems: () => items("status = 'proposed'"),
+    async recordThreadFailure(channel, threadTs, runDate) {
+      chargeD1Query();
+      const row = await db.prepare(RECORD_FAILURE).bind(channel, threadTs, runDate).first<{ nights: unknown }>();
+      return Number(row?.nights ?? 1);
+    },
+    async failingThreads(channel) {
+      chargeD1Query();
+      const { results } = await db.prepare(FAILING_THREADS).bind(channel).all<{ thread_ts: unknown }>();
+      return results.map((r) => String(r.thread_ts));
+    },
+    async clearThreadFailure(channel, threadTs) {
+      chargeD1Query();
+      await db.prepare(CLEAR_FAILURE).bind(channel, threadTs).run();
+    },
     async markPosted(cardKey, proposalTs, at) {
       chargeD1Query();
       await db.prepare(MARK_POSTED).bind(proposalTs, at, cardKey).run();

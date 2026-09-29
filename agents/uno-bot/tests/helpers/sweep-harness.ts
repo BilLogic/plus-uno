@@ -100,6 +100,8 @@ export interface SweepHarness {
   clock: { now: number };
   /** Replies calls left before the budget stops the job; Infinity for none. */
   budget: { replies: number };
+  /** Source URLs whose read throws, as a Notion 5xx would. */
+  broken: Set<string>;
   /** What the meter says is left; Infinity for no limit. */
   headroom: { subrequests: number; d1Queries: number };
   /** One-shot faults: each, when set, is thrown by the next call of its kind
@@ -130,7 +132,10 @@ export function sweepHarness(opts: {
     ...base,
     async generate(prompt) {
       (base.generated as unknown[]).push(prompt);
-      return { ok: true, model: "recorded", text: replies.shift() ?? "" };
+      const next = replies.shift() ?? "";
+      // A recorded reply of `FAIL: <message>` is the model call failing.
+      if (next.startsWith("FAIL: ")) return { ok: false, model: "recorded", message: next.slice(6) };
+      return { ok: true, model: "recorded", text: next };
     },
   };
   const posted: SweepHarness["posted"] = [];
@@ -138,6 +143,7 @@ export function sweepHarness(opts: {
   const reads: string[] = [];
   const budget = { replies: Infinity };
   const headroom = { subrequests: Infinity, d1Queries: Infinity };
+  const broken = new Set<string>();
   const faults: SweepHarness["faults"] = {};
   const pageSize = opts.pageSize ?? Infinity;
   const page = <T>(list: T[], cursor: string | undefined): { messages: T[]; nextCursor?: string } => {
@@ -185,6 +191,7 @@ export function sweepHarness(opts: {
     },
     sources: {
       async read(url) {
+        if (broken.has(url)) throw new Error("Notion 503: service unavailable");
         return sources.get(url) ?? null;
       },
     },
@@ -234,7 +241,7 @@ export function sweepHarness(opts: {
     now: () => clock.now,
     ...(opts.dryRun ? { dryRun: true } : {}),
   };
-  return { deps, store, threadState, provider, replies, posted, staged, reads, clock, budget, headroom, faults };
+  return { deps, store, threadState, provider, replies, posted, staged, reads, clock, budget, headroom, faults, broken };
 }
 
 /** A human message. */

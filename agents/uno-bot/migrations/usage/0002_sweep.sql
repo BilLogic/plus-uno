@@ -1,13 +1,14 @@
 -- The end-of-day sweep's records (src/sweep/store.ts): each swept channel's
--- cursor, one row per sweep job, and one row per proposed fix.
+-- cursor, one row per sweep job, one row per proposed fix, and the threads
+-- that keep failing to sweep.
 --
--- Additive: three new tables and their indexes; `turns` is untouched. Applied
+-- Additive: four new tables and their indexes; `turns` is untouched. Applied
 -- with `wrangler d1 migrations apply uno-bot-usage` — see migrations/README.md.
 --
 -- Times are epoch milliseconds. List columns hold a JSON array of strings.
--- Nothing here holds message text (ADR-030): what a page and a thread said,
--- and the replacement, wait in KV until the morning post and are never
--- written here.
+-- Nothing here holds message text or a link (ADR-030): the page's URL, what
+-- the page and the thread said, and the replacement wait in KV until the
+-- morning post and are never written here.
 
 -- How far each channel has been swept: the last message whose thread was
 -- fully processed. Here, not in KV, so the next run reads what the last one
@@ -47,7 +48,6 @@ CREATE TABLE sweep_items (
   run_date     TEXT    NOT NULL,                 -- the end-of-day run that found it
   channel_id   TEXT    NOT NULL,
   thread_ts    TEXT    NOT NULL,
-  target_url   TEXT    NOT NULL,
   block_id     TEXT    NOT NULL,
   owner_id     TEXT    NOT NULL,
   status       TEXT    NOT NULL CHECK (status IN ('proposed', 'confirmed', 'dropped', 'refused_stale', 'failed')),
@@ -72,5 +72,17 @@ CREATE INDEX sweep_items_by_finding ON sweep_items (finding_id);
 -- The morning reads every open item: a place with a live card gets no second
 -- one, and a card recorded but never marked posted is finished first.
 CREATE INDEX sweep_items_by_status ON sweep_items (status);
+
+-- A thread whose replies, linked page or detector call failed to read, by
+-- consecutive nights: the second such night skips the thread and moves the
+-- cursor past it, so one bad thread cannot hold a channel still. A night that
+-- sweeps it clears the row.
+CREATE TABLE sweep_thread_failures (
+  channel_id     TEXT    NOT NULL,
+  thread_ts      TEXT    NOT NULL,
+  nights         INTEGER NOT NULL,
+  last_run_date  TEXT    NOT NULL,               -- YYYY-MM-DD: a same-night retry adds no night
+  PRIMARY KEY (channel_id, thread_ts)
+);
 
 PRAGMA optimize;

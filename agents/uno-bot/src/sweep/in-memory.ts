@@ -29,6 +29,7 @@ export function createInMemorySweepStore(): InMemorySweepStore {
   const cursors = new Map<string, string>();
   const runs = new Map<string, SweepRunRecord>();
   const items = new Map<string, SweepItemRecord>();
+  const failures = new Map<string, { nights: number; lastRunDate: string }>();
   let queue: PendingFinding[] = [];
   return {
     async cursor(channel) {
@@ -71,6 +72,19 @@ export function createInMemorySweepStore(): InMemorySweepStore {
     async updateItem(itemId, patch) {
       const item = items.get(itemId);
       if (item) items.set(itemId, { ...item, ...patch });
+    },
+    async recordThreadFailure(channel, threadTs, runDate) {
+      const key = `${channel}:${threadTs}`;
+      const had = failures.get(key);
+      const nights = !had ? 1 : had.lastRunDate === runDate ? had.nights : had.nights + 1;
+      failures.set(key, { nights, lastRunDate: runDate });
+      return nights;
+    },
+    async failingThreads(channel) {
+      return [...failures.keys()].filter((k) => k.startsWith(`${channel}:`)).map((k) => k.slice(channel.length + 1));
+    },
+    async clearThreadFailure(channel, threadTs) {
+      failures.delete(`${channel}:${threadTs}`);
     },
     async pendingFindings() {
       return copy(queue);

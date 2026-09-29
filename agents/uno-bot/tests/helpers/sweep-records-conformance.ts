@@ -41,7 +41,6 @@ export function sweepItem(over: Partial<SweepItemRecord> = {}): SweepItemRecord 
     runDate: "2026-09-29",
     channel: "C0DESIGN",
     threadTs: "1790694000.000000",
-    targetUrl: "https://www.notion.so/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     blockId: "blk-1",
     ownerId: "U0ADE",
     status: "proposed",
@@ -121,6 +120,18 @@ export function runSweepRecordsConformance(label: string, make: () => SweepRecor
       cardA.map((i) => ({ ...i, proposalTs: "1790776800.900009", postedAt: 1_790_776_801_000 })),
     );
     assert.deepEqual(await records.itemsOnCard("card-b"), []);
+  });
+
+  it("a thread's failed nights count once per run date, and clear", async () => {
+    const records = make();
+    assert.equal(await records.recordThreadFailure("C0DESIGN", "1790.1", "2026-09-29"), 1);
+    assert.equal(await records.recordThreadFailure("C0DESIGN", "1790.1", "2026-09-29"), 1, "a same-night retry");
+    assert.equal(await records.recordThreadFailure("C0DESIGN", "1790.1", "2026-09-30"), 2);
+    assert.deepEqual(await records.failingThreads("C0DESIGN"), ["1790.1"]);
+    assert.deepEqual(await records.failingThreads("C0OTHER"), []);
+    await records.clearThreadFailure("C0DESIGN", "1790.1");
+    assert.deepEqual(await records.failingThreads("C0DESIGN"), []);
+    assert.equal(await records.recordThreadFailure("C0DESIGN", "1790.1", "2026-10-01"), 1);
   });
 
   it("an update changes only what it names", async () => {

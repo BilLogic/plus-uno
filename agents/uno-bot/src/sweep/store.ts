@@ -49,7 +49,6 @@ export interface SweepItemRecord {
   runDate: string;
   channel: string;
   threadTs: string;
-  targetUrl: string;
   blockId: string;
   ownerId: string;
   status: SweepItemStatus;
@@ -123,6 +122,13 @@ export interface SweepRecords {
    *  findings, still queued, are carded again. */
   releaseCard(cardKey: string): Promise<void>;
   updateItem(itemId: string, patch: SweepItemPatch): Promise<void>;
+  /** The threads in a channel with a failed night on record, by root ts. */
+  failingThreads(channel: string): Promise<string[]>;
+  /** A thread failed to sweep on this run date: how many consecutive nights
+   *  it has now failed (a same-night retry adds none). */
+  recordThreadFailure(channel: string, threadTs: string, runDate: string): Promise<number>;
+  /** The thread swept, or was skipped: its failures start again from none. */
+  clearThreadFailure(channel: string, threadTs: string): Promise<void>;
 }
 
 /** The KV half. */

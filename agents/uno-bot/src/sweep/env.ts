@@ -282,30 +282,28 @@ function kindOf(channel: { is_private?: boolean; is_im?: boolean; is_mpim?: bool
   return channel.is_private ? "private" : "public";
 }
 
-/** One linked source, read; null when it could not be. */
+/**
+ * One linked source, read; null when the link names nothing readable. A
+ * Notion read that fails — a 429, a 5xx, a page not shared — throws: the job
+ * holds the thread rather than read "no findings" off a page it never saw.
+ */
 async function readSource(env: Env, url: string, kind: TargetKind): Promise<SweepSource | null> {
   if (kind === "notion") {
     const pageId = parseNotionPageId(url);
     if (!pageId) return null;
-    try {
-      const page = await readNotionPage(env, pageId);
-      return {
-        url: canonicalNotionUrl(url),
-        kind,
-        writable: true,
-        title: page.title,
-        // The block's own text, without the list or to-do mark its rendered
-        // line leads with: what a replace writes back is this text.
-        blocks: page.blocks.map((b) => ({ id: b.id, lastEditedTime: b.lastEditedTime, text: stripBlockPrefix(b.type, b.text) })),
-        text: page.text.slice(0, CONTEXT_TEXT_CAP),
-        pillars: splitList(page.properties["Product Pillar"]),
-        contributors: page.people["Contributor"] ?? [],
-      };
-    } catch (err) {
-      if (err instanceof SubrequestBudgetError) throw err;
-      console.warn(`[sweep] Notion page unread: ${err instanceof Error ? err.message : String(err)}`);
-      return null;
-    }
+    const page = await readNotionPage(env, pageId);
+    return {
+      url: canonicalNotionUrl(url),
+      kind,
+      writable: true,
+      title: page.title,
+      // The block's own text, without the list or to-do mark its rendered
+      // line leads with: what a replace writes back is this text.
+      blocks: page.blocks.map((b) => ({ id: b.id, lastEditedTime: b.lastEditedTime, text: stripBlockPrefix(b.type, b.text) })),
+      text: page.text.slice(0, CONTEXT_TEXT_CAP),
+      pillars: splitList(page.properties["Product Pillar"]),
+      contributors: page.people["Contributor"] ?? [],
+    };
   }
   const canvas = kind === "canvas" ? parseSlackCanvasId(url) : null;
   const raw = await executeReadSource(env, { url }, canvas ? { sharedCanvasIds: [canvas] } : undefined);

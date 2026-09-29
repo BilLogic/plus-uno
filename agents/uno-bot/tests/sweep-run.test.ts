@@ -487,6 +487,73 @@ test("a long thread is read page by page, and one past the page cap is left with
   assert.match(skipped.note ?? "", /left unread/);
 });
 
+test("a thread whose page keeps failing holds the cursor one night, and is skipped the next", async () => {
+  const bad = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_B.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+  const good = thread({ user: "U0STARTER", when: ts(29, 17), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 18) }]);
+  const h = sweepHarness({
+    channels: channelOf(bad, good),
+    sources: [PAGE_A, PAGE_B],
+    detectorReplies: [reply(drift({ source: PAGE_A, evidence: [ts(29, 18)], claimedBy: "U0ADE" }))],
+    now: at(29, 22),
+  });
+  h.broken.add(PAGE_B.url);
+  const swept = ts(29, 0);
+  await h.store.saveCursor(DESIGN, swept, 0);
+
+  const first = await runSweepJob(END_OF_DAY, h.deps);
+  assert.match(first.note ?? "", /a linked page could not be read/);
+  assert.equal(await h.store.cursor(DESIGN), swept, "held: nothing past the failing thread is swept");
+  assert.equal(h.provider.generated.length, 0);
+
+  // A retry the same night adds no night.
+  h.clock.now = at(29, 22, 5);
+  await runSweepJob(END_OF_DAY, h.deps);
+  assert.equal(await h.store.cursor(DESIGN), swept);
+
+  h.clock.now = at(30, 22);
+  const second = await runSweepJob(END_OF_DAY, h.deps);
+  assert.match(second.note ?? "", /skipped after 2 failed nights/);
+  assert.equal(await h.store.cursor(DESIGN), good.root.latest_reply, "the cursor moved past it");
+  assert.equal(second.findings.length, 1, "the thread after it is swept");
+});
+
+test("a model quota stop holds the cursor every night without counting toward a skip", async () => {
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+  const h = sweepHarness({
+    channels: channelOf(t),
+    sources: [PAGE_A],
+    detectorReplies: ["FAIL: 429 quota exceeded", "FAIL: 429 quota exceeded", "FAIL: 429 quota exceeded"],
+    now: at(29, 22),
+  });
+  await h.store.saveCursor(DESIGN, ts(29, 0), 0);
+  for (const day of [29, 30, 31]) {
+    h.clock.now = at(day, 22);
+    const report = await runSweepJob(END_OF_DAY, h.deps);
+    assert.match(report.note ?? "", /429/);
+    assert.doesNotMatch(report.note ?? "", /skipped/);
+  }
+  assert.equal(await h.store.cursor(DESIGN), ts(29, 0));
+});
+
+test("a thread too long for the detector's budget is shown root first and newest replies, with a note", async () => {
+  const long = "We went back and forth on the launch date. ".repeat(28);
+  const replies = Array.from({ length: 30 }, (_, i) => ({ user: "U0ADE", when: ts(29, 16, i), text: `${long} (${i})` }));
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, replies);
+  const h = sweepHarness({
+    channels: channelOf(t),
+    sources: [PAGE_A],
+    detectorReplies: [reply(drift({ source: PAGE_A, evidence: [ts(29, 16, 29)], claimedBy: "U0ADE" }))],
+    now: at(29, 22),
+  });
+  const night = await runSweepJob(END_OF_DAY, h.deps);
+  const prompt = h.provider.generated[0]!.prompt;
+  assert.ok(prompt.includes(t.root.ts), "the root stays");
+  assert.ok(prompt.includes(ts(29, 16, 29)), "the newest reply is shown");
+  assert.ok(!prompt.includes(ts(29, 16, 0)), "the oldest reply is left out");
+  assert.match(night.note ?? "", /oldest repl\(ies\) left out/);
+  assert.equal(night.findings.length, 1);
+});
+
 test("on budget exhaustion the job saves its cursor at the last fully processed thread and defers with its key", async () => {
   const threads = [15, 16, 17].map((hh) =>
     thread({ user: "U0STARTER", when: ts(29, hh), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, hh, 30) }]),
