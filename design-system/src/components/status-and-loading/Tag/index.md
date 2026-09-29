@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/Tag/Tag.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/Tag/Tag.stories.jsx` — Colors, Behaviors, Types, AvatarFallback, TypeBehaviors, PersonFocusRing, RemoveFocusRingOnTypes, AvatarEdgeCases, AvatarFills, Selecting, StateLayers, Removing, RemoveNeedsANameForNodeLabels, FocusRing, LinkWithRemove, DisabledInField, CountOnSelectable, Saving, Truncation, OnImages, ElevatedOnlyReadOnlyAndLink, DeprecatedNames, Interactive
+**Stories:** `design-system/src/components/status-and-loading/Tag/Tag.stories.jsx` — Colors, Behaviors, Types, AvatarFallback, TypeBehaviors, PersonFocusRing, RemoveFocusRingOnTypes, AvatarEdgeCases, AvatarFills, Selecting, StateLayers, Removing, RemoveNeedsANameForNodeLabels, FocusRing, LinkWithRemove, DisabledInField, CountOnSelectable, Saving, Truncation, OnImages, ElevatedAvatarTypes, ElevatedDisabled, ElevatedRemoveFocus, ElevatedOnlyReadOnlyAndLink, DeprecatedNames, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/Tag/Tag.mdx`
 
@@ -30,7 +30,7 @@
 | `linkComponent` | elementType | — | Router link to render instead of `<a>` for a `link` tag. |
 | `isSelected` | bool | `false` | `selectable` only: the toggle's state, published as `aria-pressed`. |
 | `isLoading` | bool | `false` | Saving: a spinner replaces the swatch or avatar and the tag ignores presses until it is done. |
-| `isElevated` | bool | `false` | For a tag on an image or video: a solid surface fill, no border and the Elevation 2 shadow, with the hue kept on the swatch. `read-only` and `link` only; ignored with a warning on `removable` and `selectable`. |
+| `isElevated` | bool | `false` | For a tag on an image or video: a solid surface fill, no border and the Elevation 2 shadow, with the hue kept on the swatch or the avatar's own fill. Disabled keeps the ground and shadow and turns the content Secondary (Text). Focus on the tag or a link's × has a surface gap inside the ring. `read-only` and `link` only, on every type; ignored with a warning on `removable` and `selectable`. |
 | `onClick` | func | — | Fires on `selectable`, and on a `link`. |
 | `onRemove` | func | — | `removable`, or a `link` with a separate ×: called when the × is pressed. |
 | `removeLabel` | string | — | Overrides the ×'s accessible name. Defaults to `Remove <label>`. |

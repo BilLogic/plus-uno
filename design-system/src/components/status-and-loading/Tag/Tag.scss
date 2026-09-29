@@ -538,3 +538,15 @@ $tag-colors: (
         0 0 0 var(--size-element-stroke-lg, 2px) var(--color-surface-container-lowest, #ffffff),
         var(--elevation-light-2);
 }
+
+/*
+ * The × of an elevated link takes the same gap on focus: 2px of the surface
+ * color between the × and its ring, so the ring reads on a dark picture. The
+ * ring and the 12 fill are restated for check:focus-ring, as above.
+ */
+.plus-tag--elevated .plus-tag__remove:focus-visible {
+    background-color: var(--color-on-surface-variant-state-12, rgba(63, 72, 74, 0.12));
+    outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
+    outline-offset: var(--size-element-stroke-lg, 2px);
+    box-shadow: 0 0 0 var(--size-element-stroke-lg, 2px) var(--color-surface-container-lowest, #ffffff);
+}

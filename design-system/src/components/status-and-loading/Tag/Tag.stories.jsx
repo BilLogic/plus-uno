@@ -1064,8 +1064,7 @@ const onPicture = {
 
 /**
  * Tags on a thumbnail: `isElevated` lifts a read-only or link tag onto the
- * picture. Figma draws it on plain tags; a person, agent or team tag takes the
- * same ground, since nothing about the avatar changes.
+ * picture. A person, agent or team tag takes the same ground.
  */
 export const OnImages = () => (
     <div style={thumbnail}>
@@ -1196,6 +1195,211 @@ OnImages.play = async ({ canvasElement }) => {
     await userEvent.tab();
     await expect(splitLink).toHaveFocus();
     await expectGappedRing(split, 'an elevated split link');
+};
+
+/**
+ * A person, an agent or a team on a picture: the same elevated ground as a
+ * plain tag, and the avatar keeps its own fill on it (a person Surface
+ * Container High, an agent the AI purple, a team the Technology Tools 08
+ * wash). A link's hover, press and focus are a plain elevated link's.
+ */
+export const ElevatedAvatarTypes = () => (
+    <div style={thumbnail}>
+        <div style={picture} aria-hidden="true" />
+        <div style={onPicture}>
+            {AVATAR_TAG_TYPES.map((type) => (
+                <Tag key={type} type={type} isElevated data-testid={`${type}-read-only`}>
+                    {`${type} read`}
+                </Tag>
+            ))}
+            {AVATAR_TAG_TYPES.map((type) => (
+                <Tag key={type} type={type} behavior="link" href={`#${type}`} isElevated>
+                    {`${type} link`}
+                </Tag>
+            ))}
+        </div>
+    </div>
+);
+
+ElevatedAvatarTypes.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const t = (token) => tokenColor(canvasElement, token);
+    const ground = t('--color-surface-container-lowest');
+    const shadow = computedShadow(canvasElement, 'var(--elevation-light-2)');
+    const avatarFill = {
+        person: t('--color-surface-container-high'),
+        agent: t('--color-mastering-content-container'),
+        team: t('--color-technology-tools-state-08'),
+    };
+
+    for (const type of AVATAR_TAG_TYPES) {
+        for (const tag of [
+            canvas.getByTestId(`${type}-read-only`),
+            canvas.getByRole('link', { name: `${type} link` }),
+        ]) {
+            const s = getComputedStyle(tag);
+            const name = tag.textContent;
+            await expect(px(s.height), `${name} is 22 tall`).toBe(22);
+            await expect(s.backgroundColor, `${name} has the solid fill`).toBe(ground);
+            await expect(s.borderTopColor, `${name} has no border`).toBe(CLEAR);
+            await expect(s.boxShadow, `${name} has the Elevation 2 shadow`).toBe(shadow);
+            await expect(getComputedStyle(avatarOf(tag)).backgroundColor, `${name} keeps its avatar fill`)
+                .toBe(avatarFill[type]);
+        }
+    }
+
+    const layer = (token) => `linear-gradient(${t(token)}, ${t(token)})`;
+    const ring = t('--color-focus-ring');
+    const gapped = computedShadow(
+        canvasElement,
+        '0 0 0 var(--size-element-stroke-lg) var(--color-surface-container-lowest), var(--elevation-light-2)',
+    );
+    for (const type of AVATAR_TAG_TYPES) {
+        const link = canvas.getByRole('link', { name: `${type} link` });
+        await expect(whileForced(link, ':hover', 'backgroundColor'), `${type} hover keeps the fill`).toBe(ground);
+        await expect(whileForced(link, ':hover', 'backgroundImage'), `${type} hover layer`)
+            .toBe(layer('--color-on-surface-state-08'));
+        await expect(whileForced(link, ':active', 'backgroundImage'), `${type} press layer`)
+            .toBe(layer('--color-on-surface-state-12'));
+
+        await userEvent.tab();
+        await expect(link).toHaveFocus();
+        const s = getComputedStyle(link);
+        await expect(s.outlineStyle, `${type} focus`).toBe('solid');
+        await expect(px(s.outlineOffset), `${type} focus`).toBe(2);
+        await expect(s.outlineColor, `${type} focus`).toBe(ring);
+        await expect(s.boxShadow, `${type} focus has the surface gap`).toBe(gapped);
+    }
+};
+
+/**
+ * An elevated tag in a disabled field keeps its solid ground and Elevation 2,
+ * since the translucent disabled fill would sink into the picture. Only its
+ * content turns Secondary (Text): the label, the swatch, and an avatar drawn
+ * as any disabled avatar (the on-surface 12 fill, Secondary initials). No
+ * hover, no press, nothing to focus. Plain read-only and link on every color,
+ * and the three avatar types.
+ */
+export const ElevatedDisabled = () => (
+    <div style={{ ...thumbnail, height: '200px' }}>
+        <div style={picture} aria-hidden="true" />
+        <div style={onPicture}>
+            <TagContext.Provider value={{ isDisabled: true }}>
+                {TAG_COLORS.map((color) => (
+                    <Tag key={color} color={color} isElevated data-testid={`read-only-${color}`}>
+                        {color}
+                    </Tag>
+                ))}
+                {TAG_COLORS.map((color) => (
+                    <Tag key={color} color={color} behavior="link" href="#tag" isElevated data-testid={`link-${color}`}>
+                        {`${color} link`}
+                    </Tag>
+                ))}
+                {AVATAR_TAG_TYPES.map((type) => (
+                    <Tag key={type} type={type} isElevated data-testid={`avatar-${type}`}>
+                        {`${type} tag`}
+                    </Tag>
+                ))}
+            </TagContext.Provider>
+        </div>
+    </div>
+);
+
+ElevatedDisabled.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const t = (token) => tokenColor(canvasElement, token);
+    const ground = t('--color-surface-container-lowest');
+    const shadow = computedShadow(canvasElement, 'var(--elevation-light-2)');
+    const secondary = t('--color-secondary-text');
+
+    await expect(canvas.queryByRole('link'), 'a disabled link is not a link').toBeNull();
+
+    const expectGround = async (tag, what) => {
+        const s = getComputedStyle(tag);
+        await expect(px(s.height), `${what} is 22 tall`).toBe(22);
+        await expect(s.backgroundColor, `${what} keeps the solid fill`).toBe(ground);
+        await expect(s.borderTopColor, `${what} has no border`).toBe(CLEAR);
+        await expect(s.boxShadow, `${what} keeps the Elevation 2 shadow`).toBe(shadow);
+        await expect(s.color, `${what} text is Secondary (Text)`).toBe(secondary);
+        for (const pseudo of [':hover', ':active']) {
+            await expect(whileForced(tag, pseudo, 'backgroundColor'), `${what} ${pseudo} fill`).toBe(ground);
+            await expect(whileForced(tag, pseudo, 'backgroundImage'), `${what} ${pseudo} has no layer`).toBe('none');
+            await expect(whileForced(tag, pseudo, 'boxShadow'), `${what} ${pseudo} shadow`).toBe(shadow);
+        }
+    };
+
+    for (const color of TAG_COLORS) {
+        for (const id of [`read-only-${color}`, `link-${color}`]) {
+            const tag = canvas.getByTestId(id);
+            await expectGround(tag, id);
+            await expect(getComputedStyle(avatarOf(tag)).backgroundColor, `${id} swatch is Secondary (Text)`)
+                .toBe(secondary);
+        }
+        const label = within(canvas.getByTestId(`link-${color}`)).getByText(`${color} link`);
+        await expect(
+            whileForced(canvas.getByTestId(`link-${color}`), ':hover', 'textDecorationLine', label),
+            `${color} link has no underline`,
+        ).toBe('none');
+    }
+
+    for (const type of AVATAR_TAG_TYPES) {
+        const tag = canvas.getByTestId(`avatar-${type}`);
+        await expectGround(tag, type);
+        const avatar = avatarOf(tag);
+        await expect(getComputedStyle(avatar).backgroundColor, `${type} avatar takes the disabled fill`)
+            .toBe(t('--color-on-surface-state-12'));
+        await expect(getComputedStyle(avatar.firstElementChild).color, `${type} initials are Secondary (Text)`)
+            .toBe(secondary);
+    }
+};
+
+/**
+ * The × of an elevated link has a white gap inside its focus ring, as the tag's
+ * own focus does: a 2px Surface Container Lowest gap, then the 2px ring, whose
+ * outer corner is 6. A × off the image keeps the plain ring.
+ */
+export const ElevatedRemoveFocus = () => (
+    <div style={thumbnail}>
+        <div style={picture} aria-hidden="true" />
+        <div style={onPicture}>
+            <Tag behavior="link" color="teal" href="#unit" isElevated onRemove={() => {}}>Unit 3</Tag>
+            <Tag behavior="link" color="teal" href="#unit" onRemove={() => {}}>Unit 4</Tag>
+        </div>
+    </div>
+);
+
+ElevatedRemoveFocus.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const t = (token) => tokenColor(canvasElement, token);
+    const ring = t('--color-focus-ring');
+
+    const expectRing = async (x, what) => {
+        const s = getComputedStyle(x);
+        await expect(s.outlineStyle, what).toBe('solid');
+        await expect(px(s.outlineWidth), what).toBe(2);
+        await expect(px(s.outlineOffset), `${what} sits 2px outside`).toBe(2);
+        await expect(s.outlineColor, what).toBe(ring);
+        const outer = px(s.borderTopLeftRadius) + px(s.outlineOffset) + px(s.outlineWidth);
+        await expect(outer, `${what}: the ring's outer corner is 6`).toBe(6);
+    };
+
+    await userEvent.tab();
+    await userEvent.tab();
+    const elevated = canvas.getByRole('button', { name: 'Remove Unit 3' });
+    await expect(elevated).toHaveFocus();
+    await expectRing(elevated, 'the elevated ×');
+    await expect(getComputedStyle(elevated).boxShadow, 'a 2px surface gap inside the ring').toBe(
+        computedShadow(canvasElement, '0 0 0 var(--size-element-stroke-lg) var(--color-surface-container-lowest)'),
+    );
+
+    await userEvent.tab();
+    await userEvent.tab();
+    const plain = canvas.getByRole('button', { name: 'Remove Unit 4' });
+    await expect(plain).toHaveFocus();
+    await expectRing(plain, 'the plain ×');
+    await expect(getComputedStyle(plain).boxShadow, 'no gap off the image').toBe('none');
+    await expect(getComputedStyle(plain).backgroundColor, 'with the 12 fill under it')
+        .toBe(t('--color-on-surface-variant-state-12'));
 };
 
 /**
