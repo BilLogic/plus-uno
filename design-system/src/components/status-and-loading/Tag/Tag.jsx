@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useRef } from 'react';
+import React, { createContext, useContext, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Count from '../Count';
 import Tooltip from '../../overlays/Tooltip';
@@ -17,6 +17,12 @@ import './Tag.scss';
  * stays neutral, and the hue sits on the border and on a 10px swatch. One size,
  * 22 tall, for every behavior.
  *
+ * FOUR TYPES. A plain tag leads with the swatch. A person, an agent or a team
+ * leads with a 16 avatar in its place, shaped so the three never read as one
+ * another: a person is round (and so is the whole tag, and its ×), an agent is
+ * a hexagon, a team is a square with radius-2 corners. The tag stays 22 tall and pads
+ * 4 on the avatar side, as a plain tag does on its swatch side.
+ *
  * NO `disabled` PROP. A tag is disabled because the field holding it is: the
  * field wraps its tags in `TagContext.Provider`, so one tag can never disagree
  * with the tags beside it.
@@ -30,6 +36,9 @@ import './Tag.scss';
 export const TAG_COLORS = ['grey', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal'];
 
 export const TAG_BEHAVIORS = ['read-only', 'removable', 'selectable', 'link'];
+
+/** What the tag names: a plain category, or a person, an agent or a team. */
+export const TAG_TYPES = ['plain', 'person', 'agent', 'team'];
 
 /** The old `variant` values, still accepted as a deprecated alias for `behavior`. */
 export const TAG_VARIANTS = ['read-only', 'dismissible', 'selectable', 'operational'];
@@ -68,12 +77,71 @@ const warn = (message) => {
     console.warn(message);
 };
 
+/**
+ * What stands in for a missing avatar. A person gets the first letters of the
+ * first and last words ("Rosa Chen" is RC); an agent or a team gets one letter,
+ * since a team name's second word is usually "team".
+ */
+const initialsOf = (label, type) => {
+    if (typeof label !== 'string') return '';
+    const words = label.trim().split(/\s+/).filter(Boolean);
+    if (!words.length) return '';
+    // Whole characters, not UTF-16 halves, so an emoji is never split.
+    const firstChar = (word) => Array.from(word)[0];
+    const first = firstChar(words[0]);
+    const last = type === 'person' && words.length > 1 ? firstChar(words[words.length - 1]) : '';
+    // Capped after upper-casing, since one letter can become two (ß is SS).
+    return Array.from(`${first}${last}`.toUpperCase()).slice(0, 2).join('');
+};
+
+/**
+ * The 16 avatar of a person, agent or team tag. An image source renders as an
+ * image, any other node as itself, and a missing or broken source as initials.
+ * The box is the same size in every case, so a photo that fails to load never
+ * moves the tag. Decorative: the tag's words already name who it is.
+ */
+const TagAvatar = ({ type, avatar, label }) => {
+    // The source that failed, not a flag: a new source is a fresh chance to
+    // load without an effect to reset anything.
+    const [failedSrc, setFailedSrc] = useState(null);
+    const failed = failedSrc === avatar;
+
+    let content;
+    if (typeof avatar === 'string' && avatar && !failed) {
+        content = <img className="plus-tag__avatar-img" src={avatar} alt="" onError={() => setFailedSrc(avatar)} />;
+    } else if (avatar && typeof avatar !== 'string') {
+        content = avatar;
+    } else {
+        content = <span className="plus-tag__initials">{initialsOf(label, type)}</span>;
+    }
+
+    return (
+        <span className={`plus-tag__avatar plus-tag__avatar--${type}`} aria-hidden="true">
+            {content}
+        </span>
+    );
+};
+
+/*
+ * The spinner in an avatar's box, drawn as Figma draws it: a 12 ring, 1.8
+ * thick, three quarters of the way round. It is an SVG stroke rather than a
+ * border because a browser rounds a 1.8 border down to whole device pixels.
+ * The arc is 3/4 of the centerline's circumference (r 5.1: 2 × π × 5.1 = 32.04).
+ */
+const AvatarSpinner = () => (
+    <svg className="plus-tag__avatar-spinner" viewBox="0 0 12 12" focusable="false">
+        <circle cx="6" cy="6" r="5.1" fill="none" strokeWidth="1.8" strokeDasharray="24.03 32.04" />
+    </svg>
+);
+
 export const Tag = ({
     text,
     children,
     behavior,
     variant,
     color = 'grey',
+    type = 'plain',
+    avatar,
     count,
     elemBefore,
     swatchBefore,
@@ -116,6 +184,22 @@ export const Tag = ({
     }
     if (!resolved) resolved = href ? 'link' : 'read-only';
 
+    const hasAvatar = type === 'person' || type === 'agent' || type === 'team';
+    if (!hasAvatar && avatar) {
+        warn('[Tag] `avatar` is only shown on type="person", "agent" or "team"; a plain tag leads with its swatch.');
+    }
+    if (hasAvatar && elemBefore) {
+        warn(`[Tag] \`elemBefore\` is ignored on type="${type}"; an avatar type leads with its avatar.`);
+    }
+    if (hasAvatar && swatchBefore) {
+        warn(`[Tag] \`swatchBefore\` is ignored on type="${type}"; an avatar type leads with its avatar.`);
+    }
+    // Initials come from the words, so a label that is not text leaves the
+    // avatar blank.
+    if (hasAvatar && !avatar && typeof label !== 'string') {
+        warn(`[Tag] the label is not text, so a type="${type}" tag has no initials to fall back on. Pass \`avatar\`.`);
+    }
+
     const isSelectable = resolved === 'selectable';
     const isAction = resolved === 'action';
     const isLink = resolved === 'link';
@@ -144,6 +228,7 @@ export const Tag = ({
     const classes = [
         'plus-tag',
         `plus-tag--${resolvedColor}`,
+        hasAvatar ? `plus-tag--${type}` : '',
         isDisabled ? 'plus-tag--disabled' : `plus-tag--${resolved}`,
         isSelectable && isSelected ? 'plus-tag--selected' : '',
         isLoading ? 'plus-tag--loading' : '',
@@ -156,12 +241,20 @@ export const Tag = ({
         ? { '--plus-tag-max': typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth, ...styleProp }
         : styleProp;
 
-    // Saving swaps the swatch for a spinner of the same size, so the tag keeps
-    // its width. The overflow `+n` is a count of hidden tags, not a category,
-    // so it carries no swatch.
+    // Saving swaps the swatch or avatar for a spinner in the same box, so the
+    // tag keeps its width. The overflow `+n` is a count of hidden tags, not a
+    // category, so it carries no swatch.
     let lead = null;
-    if (isLoading) {
+    if (isLoading && hasAvatar) {
+        lead = (
+            <span className="plus-tag__avatar plus-tag__avatar--saving" aria-hidden="true">
+                <AvatarSpinner />
+            </span>
+        );
+    } else if (isLoading) {
         lead = <span className="plus-tag__spinner" aria-hidden="true" />;
+    } else if (hasAvatar) {
+        lead = <TagAvatar type={type} avatar={avatar} label={label} />;
     } else if (elemBefore) {
         lead = <span className="plus-tag__elem-before">{elemBefore}</span>;
     } else if (!isAction) {
@@ -325,11 +418,15 @@ Tag.propTypes = {
     behavior: PropTypes.oneOf(TAG_BEHAVIORS),
     /** Deprecated: use `behavior`. `dismissible` is `removable`; `operational` renders a plain button. */
     variant: PropTypes.oneOf(TAG_VARIANTS),
-    /** A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. */
+    /** A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. On an avatar type the border is neutral and the color fills the avatar; grey agents fill AI purple and grey teams Technology Tools blue. */
     color: PropTypes.oneOf(ACCEPTED_COLORS),
+    /** What the tag names. `plain` leads with the swatch; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. */
+    type: PropTypes.oneOf(TAG_TYPES),
+    /** The avatar of a person, agent or team tag: an image source, or a node. Missing or broken, it falls back to initials. Decorative. */
+    avatar: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /** `selectable` only: a small neutral Count, such as a filter's result count. Ignored with a warning elsewhere. */
     count: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    /** Leading content in place of the swatch, such as an icon. */
+    /** Leading content in place of the swatch, such as an icon. Plain tags only: an avatar type leads with its avatar. */
     elemBefore: PropTypes.node,
     /** Overrides the swatch color, for a tag acting as a chart legend entry. Any CSS color. */
     swatchBefore: PropTypes.string,
@@ -341,7 +438,7 @@ Tag.propTypes = {
     linkComponent: PropTypes.elementType,
     /** `selectable` only: the toggle's state, published as `aria-pressed`. */
     isSelected: PropTypes.bool,
-    /** Saving: a spinner replaces the swatch and the tag ignores presses until it is done. */
+    /** Saving: a spinner replaces the swatch or avatar and the tag ignores presses until it is done. */
     isLoading: PropTypes.bool,
     /** Fires on `selectable`, and on a `link`. */
     onClick: PropTypes.func,

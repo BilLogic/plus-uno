@@ -2105,6 +2105,15 @@
               "teal"
             ]
           },
+          "type": {
+            "type": "enum",
+            "values": [
+              "plain",
+              "person",
+              "agent",
+              "team"
+            ]
+          },
           "isSelected": {
             "type": "boolean"
           },
@@ -2128,7 +2137,7 @@
               "isSelected": "selected",
               "isLoading": "state=saving"
             },
-            "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on grey, plain, read-only, rest and false. state=saving is isLoading; state=disabled comes from TagContext, never a prop; remove? on a link is link plus onRemove; count? is count. The type axis (person, agent, team) and elevated=true are later work and not in code yet."
+            "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on grey, plain, read-only, rest and false. state=saving is isLoading; state=disabled comes from TagContext, never a prop; remove? on a link is link plus onRemove; count? is count. type is the same four values in code (plain, person, agent, team); the avatar slot is the avatar prop, with initials when it is missing. elevated=true is later work and not in code yet."
           },
           {
             "id": "remove-button",
