@@ -9,6 +9,7 @@
 import assert from "node:assert/strict";
 
 import type { ProposalEvent, ProposalEventLog } from "../../src/usage/proposal-events";
+import type { ResolutionLog } from "../../src/usage/resolution";
 import type { UsageLog } from "../../src/usage/store";
 import { turnRecord, type ConformanceRunner } from "./usage-log-conformance";
 
@@ -58,7 +59,7 @@ export function eventRow(event: ProposalEvent["event"], over: Partial<ProposalEv
 
 export function runProposalEventConformance(
   label: string,
-  make: () => { events: ProposalEventLog; turns: UsageLog },
+  make: () => { events: ProposalEventLog; turns: UsageLog; resolutions: ResolutionLog },
   runner: ConformanceRunner,
 ): void {
   const it = (name: string, fn: () => Promise<void>) => runner.it(`[${label}] ${name}`, fn);
@@ -132,6 +133,35 @@ export function runProposalEventConformance(
     assert.deepEqual(
       (await events.overdue(1_800_000_000_000)).map((o) => o.proposalId),
       ["1700000000.000500"],
+    );
+  });
+
+  it("does not expire an ask's card whose batch completed, even with its confirmed event lost", async () => {
+    // The ✅'s own write timed out; #822's task_completed on the staging turn
+    // is the evidence the card ran.
+    const { events, turns, resolutions } = make();
+    await turns.record(turnRecord());
+    await events.record(stagedRow());
+    await resolutions.recordTaskCompleted("1700000000.000300", 1_700_000_100_000);
+    assert.deepEqual(await events.overdue(1_800_000_000_000), []);
+    assert.equal(await events.expireOverdue(1_800_000_000_000), 0);
+  });
+
+  it("still expires a card whose staging turn resolved some other way, or a re-staged card", async () => {
+    // Only task_completed is evidence the card ran; and a re-staged card's
+    // turn row names the root card, whichever of its cards ran.
+    const { events, turns, resolutions } = make();
+    await turns.record(turnRecord());
+    await events.record(stagedRow());
+    await resolutions.recordTaskCompleted("1700000000.000300", 1_700_000_100_000);
+    await events.record(
+      stagedRow({ proposalId: "1700000000.000900", via: "restage", originProposalId: "1700000000.000300" }),
+    );
+    await turns.record(turnRecord({ turnId: "C1:1700000000.000500", proposalId: "1700000000.000600" }));
+    await events.record(stagedRow({ proposalId: "1700000000.000600", turnId: "C1:1700000000.000500" }));
+    assert.deepEqual(
+      (await events.overdue(1_800_000_000_000)).map((o) => o.proposalId),
+      ["1700000000.000600", "1700000000.000900"],
     );
   });
 

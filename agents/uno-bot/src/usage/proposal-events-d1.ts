@@ -76,13 +76,21 @@ const INSERT =
 // `rowid` breaks a tie in time by the order the rows were written.
 const EVENTS_OF = `SELECT ${COLUMNS.join(", ")} FROM proposal_events WHERE proposal_id = ? ORDER BY at, rowid`;
 
-/** Staged cards past their lifetime, with no outcome recorded. The outcome
- *  list is the module's constant, spelled into the SQL once at load — never a
- *  value from a caller. */
+/**
+ * Staged cards past their lifetime, with no outcome recorded — and no sign
+ * elsewhere in the database that the card RAN: an ask's own card whose batch
+ * completed has `task_completed` on its staging turn's row (`turns.proposal_id`
+ * is that card), so a ✅ whose `confirmed` write was lost is not read as aged
+ * out. A re-staged card is not checked that way: the turn row names the ask's
+ * root card, whichever of its cards ran. The outcome list is the module's
+ * constant, spelled into the SQL once at load — never a value from a caller.
+ */
 const OVERDUE_FROM =
   `FROM proposal_events s WHERE s.event = 'staged' AND s.ttl_ms IS NOT NULL AND s.at + s.ttl_ms <= ? ` +
   `AND NOT EXISTS (SELECT 1 FROM proposal_events o WHERE o.proposal_id = s.proposal_id ` +
-  `AND o.event IN (${OUTCOME_EVENTS.map((e) => `'${e}'`).join(", ")}))`;
+  `AND o.event IN (${OUTCOME_EVENTS.map((e) => `'${e}'`).join(", ")})) ` +
+  `AND NOT (s.origin_proposal_id IS NULL AND EXISTS (SELECT 1 FROM turns t ` +
+  `WHERE t.proposal_id = s.proposal_id AND t.resolution = 'task_completed'))`;
 
 const OVERDUE = `SELECT s.proposal_id AS proposal_id, s.at + s.ttl_ms AS expired_at ${OVERDUE_FROM} ORDER BY expired_at, proposal_id`;
 

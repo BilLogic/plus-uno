@@ -83,9 +83,13 @@ export interface ProposalEvent {
    * null.
    */
   testTraffic: boolean | null;
-  /** A re-staged card's original: its staged row lends this one its turn, its
-   *  channel and its test-traffic flag, so a ticket its ✅ files still finds a
-   *  turn row. */
+  /**
+   * A re-staged card's ROOT — the ask's own card, `PendingProposal.originProposalTs`
+   * (`stagingCardOf`), however many re-stagings ago. Its staged row lends this
+   * one its turn, its channel and its test-traffic flag, so a ticket its ✅
+   * files still finds a turn row, and a middle re-stage whose row was dropped
+   * breaks nothing.
+   */
   originProposalId: string | null;
 
   // ── staged ──
@@ -130,7 +134,8 @@ export interface ProposalEventLog {
   record(event: ProposalEvent): Promise<void>;
   /** Every event of one card, oldest first. */
   eventsOf(proposalId: string): Promise<ProposalEvent[]>;
-  /** Staged cards past their lifetime with no outcome yet — what `expireOverdue`
+  /** Staged cards past their lifetime with no outcome yet, and no sign the
+   *  card ran (`task_completed` on its staging turn) — what `expireOverdue`
    *  would record, read without writing (the sweep's dry run). */
   overdue(now: number): Promise<OverdueProposal[]>;
   /** Record `expired` for every overdue card, in one statement. Answers how
@@ -210,8 +215,6 @@ export function stagedEvent(input: {
   turnId?: string;
   /** The staging turn's test-traffic flag; absent, inherited (see the field). */
   testTraffic?: boolean;
-  /** For a re-staged card, the card it re-stages. */
-  originProposalId?: string;
   askText?: string;
   roles?: Readonly<Record<string, TeamRole>>;
 }): ProposalEvent {
@@ -229,7 +232,7 @@ export function stagedEvent(input: {
     channelId: input.channelStored ? proposal.channel : null,
     turnId: input.turnId ?? null,
     testTraffic: input.testTraffic ?? null,
-    originProposalId: input.originProposalId ?? null,
+    originProposalId: proposal.originProposalTs ?? null,
     requesterId: requester,
     tools: proposalOperations(proposal).map((op) => op.toolName),
     ttlMs: proposalTtlMs(proposal),

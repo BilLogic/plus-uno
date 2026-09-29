@@ -501,6 +501,31 @@ test("a re-staged card carries its original's turn, so its ticket still finds a 
   );
 });
 
+test("a card re-staged twice takes the ask's card's turn even when the middle staged row was lost", async () => {
+  // Root card → first re-stage (its staged write dropped) → second re-stage.
+  // Keyed to the root, not the parent, so the missing middle row costs nothing.
+  const h = harness();
+  const root = { ...PENDING, proposalTs: "1700000000.000300" };
+  await h.proposalEvents.record(
+    stagedEvent({ proposal: root, at: 0, via: "turn", channelStored: true, turnId: "C1:1700000000.000200", testTraffic: true }),
+  );
+  const dropping: ProposalEventLog = { ...h.proposalEvents, record: async () => {} };
+  const middle = await restageExecution(
+    { proposal: root, operations: [{ toolName: "notion_create", input: { title: "again" } }] },
+    { threadState: h.threadState, delivery: h.delivery, cards: h.deps.cards, proposalEvents: dropping },
+  );
+  assert.deepEqual(await h.proposalEvents.eventsOf(middle!.proposal.proposalTs), []);
+  const last = await restageExecution(
+    { proposal: middle!.proposal, operations: [{ toolName: "notion_create", input: { title: "once more" } }] },
+    { threadState: h.threadState, delivery: h.delivery, cards: h.deps.cards, proposalEvents: h.proposalEvents },
+  );
+  const [row] = await h.proposalEvents.eventsOf(last!.proposal.proposalTs);
+  assert.deepEqual(
+    [row?.originProposalId, row?.turnId, row?.channelId, row?.testTraffic],
+    [root.proposalTs, "C1:1700000000.000200", CHANNEL, true],
+  );
+});
+
 test("a card a re-stage retires is recorded superseded by the re-stage, not by a revision", async () => {
   const h = harness();
   const live = { ...PENDING, proposalTs: "1700000000.000400" };

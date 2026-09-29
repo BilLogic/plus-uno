@@ -1474,9 +1474,9 @@ export async function restageExecution(
     originProposalTs: stagingCardOf(original),
   };
   const { retired } = await deps.threadState.putProposal(proposal);
-  // The fresh card is the original's successor on the record: it takes the
-  // original's turn, channel and test-traffic flag, so a ticket its ✅ files
-  // still finds the turn that asked for it.
+  // The fresh card is the ask's card's successor on the record: through
+  // `originProposalTs` it takes that card's turn, channel and test-traffic
+  // flag, so a ticket its ✅ files still finds the turn that asked for it.
   await recordProposalEvents(deps.proposalEvents, [
     ...supersededEvents(retired, Date.now(), "restage"),
     stagedEvent({
@@ -1484,7 +1484,6 @@ export async function restageExecution(
       at: Date.now(),
       via: "restage",
       channelStored: false,
-      originProposalId: original.proposalTs,
     }),
   ]);
   return { proposal, card };

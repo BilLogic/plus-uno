@@ -68,6 +68,7 @@ runProposalEventConformance(
   () => ({
     events: createD1ProposalEventLog({ db: bindings.USAGE_DB }),
     turns: createD1UsageLog({ db: bindings.USAGE_DB }),
+    resolutions: createD1ResolutionLog({ db: bindings.USAGE_DB }),
   }),
   { it: (name, fn) => it(name, fn) },
 );

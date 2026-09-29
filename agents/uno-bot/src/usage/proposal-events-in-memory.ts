@@ -4,7 +4,9 @@
 // conformance suite: the first write of an event for a card is kept, copies go
 // in and out, and the expiry pass reads "no outcome yet" exactly as the SQL
 // does. `turns`, when given, is the usage log whose rows `noteSelfFiledTicket`
-// writes — the same database in production, two objects here.
+// writes, and `completed` answers whether an ask's own card has
+// `task_completed` on its staging turn — the same database in production,
+// separate objects here.
 
 import type { UsageLog } from "./store";
 import { OUTCOME_EVENTS, type OverdueProposal, type ProposalEvent, type ProposalEventLog } from "./proposal-events";
@@ -18,17 +20,24 @@ const OUTCOMES = new Set(OUTCOME_EVENTS);
 
 const copy = (e: ProposalEvent): ProposalEvent => ({ ...e, tools: [...e.tools] });
 
-export function createInMemoryProposalEventLog(deps: { turns?: UsageLog } = {}): InMemoryProposalEventLog {
+export function createInMemoryProposalEventLog(
+  deps: { turns?: UsageLog; completed?: (proposalId: string) => Promise<boolean> } = {},
+): InMemoryProposalEventLog {
   const rows: ProposalEvent[] = [];
   const has = (proposalId: string, event: string) =>
     rows.some((r) => r.proposalId === proposalId && r.event === event);
 
-  const overdue = (now: number): OverdueProposal[] =>
-    rows
-      .filter((r) => r.event === "staged" && r.ttlMs !== null && r.at + r.ttlMs <= now)
-      .filter((r) => !rows.some((o) => o.proposalId === r.proposalId && OUTCOMES.has(o.event)))
-      .map((r) => ({ proposalId: r.proposalId, expiredAt: r.at + (r.ttlMs ?? 0) }))
-      .sort((a, b) => a.expiredAt - b.expiredAt || a.proposalId.localeCompare(b.proposalId));
+  const overdue = async (now: number): Promise<OverdueProposal[]> => {
+    const due: OverdueProposal[] = [];
+    for (const r of rows) {
+      if (r.event !== "staged" || r.ttlMs === null || r.at + r.ttlMs > now) continue;
+      if (rows.some((o) => o.proposalId === r.proposalId && OUTCOMES.has(o.event))) continue;
+      // The D1 query's evidence that the card ran (see `OVERDUE_FROM` there).
+      if (r.originProposalId === null && (await deps.completed?.(r.proposalId))) continue;
+      due.push({ proposalId: r.proposalId, expiredAt: r.at + r.ttlMs });
+    }
+    return due.sort((a, b) => a.expiredAt - b.expiredAt || a.proposalId.localeCompare(b.proposalId));
+  };
 
   return {
     async record(event) {
@@ -55,7 +64,7 @@ export function createInMemoryProposalEventLog(deps: { turns?: UsageLog } = {}):
       return overdue(now);
     },
     async expireOverdue(now) {
-      const due = overdue(now);
+      const due = await overdue(now);
       for (const { proposalId, expiredAt } of due) {
         const staged = rows.find((r) => r.proposalId === proposalId && r.event === "staged")!;
         rows.push({
