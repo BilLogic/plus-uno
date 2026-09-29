@@ -293,7 +293,8 @@ CLAUDE_MODEL = "claude-sonnet-5"
 # never count toward adoption: #uno-bot-sandbox. Comma-separated channel ids.
 # Every /debug/* and /health/* route (the eval transport included) and a
 # greeting with no ask are test traffic without being listed here.
-TEST_CHANNEL_IDS = ""
+#   uno-bot-sandbox C0B4QBWAUJU
+TEST_CHANNEL_IDS = "C0B4QBWAUJU"
 
 # Secrets are set via `npm run secrets:set` (or `wrangler secret put`).
 # GENERATED from scripts/secrets.mjs — edit there, then `npm run check:secrets -- --fix`.
