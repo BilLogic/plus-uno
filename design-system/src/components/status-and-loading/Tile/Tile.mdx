@@ -1,0 +1,214 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TileStories from './Tile.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "content": {
+      "type": "enum",
+      "values": ["icon", "logo", "image"]
+    },
+    "size": {
+      "type": "enum",
+      "values": ["16", "20", "24", "32", "40", "48"]
+    },
+    "appearance": {
+      "type": "enum",
+      "values": ["subtle", "bold"]
+    },
+    "color": {
+      "type": "enum",
+      "values": ["grey", "blue", "green", "purple", "magenta", "yellow", "teal", "white"]
+    },
+    "hasBorder": { "type": "boolean" }
+  },
+  "sets": [
+    {
+      "id": "tile",
+      "name": "Tile",
+      "componentSetNodeId": "17878:1928",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1928",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": true,
+      "variantProps": {
+        "hasBorder": "border?"
+      },
+      "notes": "On the Iconography, Logos & Imagery page. Figma marks defaults in the value name (\"32 (default)\", \"subtle (default)\", \"grey (default)\"); code takes the bare value. Logo and image variants hold a media slot, which code fills with `children` or `src`. Image variants exist for grey only, since the picture covers the ground."
+    }
+  ]
+};
+
+<Meta of={TileStories} />
+
+<Title />
+A square that frames an icon, a logo or an image: tool logos, school crests,
+lesson thumbnails and the icon beside a list item. Its corners are a quarter of
+its size.
+
+<DocsTabs of={TileStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17906-48560"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Tile"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Six sizes, from 16 to 48, for every kind of content. The icon scales with the tile: 10 in a 16 tile, 24 in a 48.</>}>
+    <Canvas of={TileStories.Sizes} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Icon colors
+
+<DocsCanvasShell description={<>Subtle is the color's container with its on-container icon. Grey is surface-container-high with on-surface-variant.</>}>
+    <DsCanvasQuiet of={TileStories.IconSubtle} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Bold is the solid color with its on-color icon. Grey bold is the inverse surface.</>}>
+    <DsCanvasQuiet of={TileStories.IconBold} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Logos
+
+<DocsCanvasShell description={<>A logo is inset like an icon and keeps its own colors. It sits on white by default, or on grey or a color's container when it needs contrast.</>}>
+    <DsCanvasQuiet of={TileStories.Logos} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Images
+
+<DocsCanvasShell description={<>An image fills the tile and crops to the square, so a landscape picture is never squashed.</>}>
+    <DsCanvasQuiet of={TileStories.Images} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Border
+
+<DocsCanvasShell description={<><code>hasBorder</code> adds a 1px outline-variant edge inside the tile, for a logo or image whose own edge fades into the page.</>}>
+    <DsCanvasQuiet of={TileStories.WithBorder} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={TileStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Tile` wherever a small square picture stands for a thing: a tool's logo in
+a list of integrations, a school's crest beside its name, a lesson's thumbnail,
+or an icon marking the kind of item in a row. Putting all of them in one frame
+keeps them the same size and shape wherever they appear.
+
+Use an icon on its own when it sits inline with text and needs no frame. Use
+`UserAvatar` for a person: people are round, and a tile is square.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Pick the content, then the color.
+
+Icons take `appearance` and `color`. Logos take a ground color only, since the
+logo keeps its own. Images cover the whole tile, so color does not apply.
+
+```jsx
+// Incorrect: a bold appearance on a logo does nothing, and a color on an
+// image is hidden under the picture.
+<Tile content="logo" appearance="bold" src={logoUrl} />
+<Tile content="image" color="blue" src={photoUrl} />
+
+// Correct.
+<Tile icon="book-open" appearance="bold" color="blue" />
+<Tile content="logo" src={logoUrl} />
+<Tile content="image" src={photoUrl} />
+```
+
+### Colors are categories.
+
+`color` follows `Tag`: plain names, never a status. Keep one color per kind of
+item across the app, or leave tiles grey.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Decorative by default.** A tile usually sits beside a name that already
+  says what it is, so it is hidden from assistive technology
+  (`aria-hidden="true"`) unless it has a `label`.
+- **`label` makes it one image with a name.** The tile becomes `role="img"`
+  with that name, and the picture inside it stays hidden, so the square is
+  announced once. Give a tile a label whenever it stands alone, such as a
+  logo with no name beside it.
+- **Not a control.** A tile has no hover or focus state. To make one clickable,
+  wrap it in a button or link that carries the accessible name.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a person, use `UserAvatar`.
+- For a value someone picked, with a label, use `Tag`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

@@ -41,6 +41,7 @@ export { default as StaticBadgeSmart } from '@/components/_internal/StaticBadgeS
 export { default as Tag } from '@/components/status-and-loading/Tag';
 export { default as TagGroup } from '@/components/status-and-loading/TagGroup';
 export { default as Table } from '@/components/_internal/Table';
+export { default as Tile } from '@/components/status-and-loading/Tile';
 export { default as Toast } from '@/components/messaging/Toast';
 export { default as Tooltip } from '@/components/overlays/Tooltip';
 export { default as UserAvatar } from '@/components/_internal/UserAvatar';
