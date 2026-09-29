@@ -139,9 +139,8 @@ Badge's `counter` prop.
 - **Is it the condition something is in, and can that condition change?** Status.
 - **Otherwise** (a subject, a person, a category): Tag.
 
-`size="small"` (16) is for use inside a label; Status and Tag will nest it when
-they ship. Status is being built beside Count; until it lands, a state is a
-`BadgeVariants` status.
+`size="small"` (16) is for use inside a label: Status nests it through its
+`count` prop, and Tag will when it is rebuilt.
 
 </div>
 
@@ -204,7 +203,7 @@ On a light surface it barely separates from the page; use subtle there.
 
 ## Related
 
-- For the condition something is in, use Status (until it lands, `BadgeVariants`).
+- For the condition something is in, use `Status`; `count` nests a Count inside it.
 - For a category, a subject or a person, use `Tag`.
 - The BadgeVariants `counter` variant and Badge's `counter` prop are the counters this
   replaces; their callers move in a later change.

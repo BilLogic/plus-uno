@@ -7,8 +7,8 @@ import './Count.scss';
  *
  * WHICH LABEL, IN THREE QUESTIONS. Is it a number? Count. Is it the condition
  * something is in, and can that condition change? Status. Otherwise, Tag. `size`
- * small (16) is for use inside a label; Status and Tag will nest it when they
- * ship, so there is one count shape across the product.
+ * small (16) is for use inside a label: Status nests it, and Tag will when it
+ * is rebuilt, so there is one count shape across the product.
  *
  * THE NAMES FOLLOW THE LIBRARY. `appearance`, `style` and `size` take the same
  * words Button and Alert use, and the same values as the Count set in Figma, so
