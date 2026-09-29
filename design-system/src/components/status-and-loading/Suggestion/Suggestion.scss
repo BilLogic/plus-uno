@@ -71,11 +71,16 @@
 }
 
 /*
- * Disabled, from the field or the caller: a native disabled button. The same
+ * Disabled, from the field: a native disabled button. The same
  * on-surface 12 ground as a disabled Tag, a dashed Outline Variant edge (the
  * dash stays, so it still reads as a suggestion), and the words and glyph in
  * Secondary (Text). No hover, press or focus: the hover and pressed layers are
  * held at the disabled ground, and a disabled button never takes focus.
+ *
+ * The ground and ink repeat Tag's `.plus-tag--disabled` on purpose: the
+ * generated docs list the tokens each component's own stylesheet names, so a
+ * shared partial would drop them from both. The DisabledBesideTags story
+ * asserts the two stay equal.
  */
 .plus-suggestion:disabled,
 .plus-suggestion:disabled:hover,

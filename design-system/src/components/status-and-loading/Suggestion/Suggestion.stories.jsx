@@ -242,12 +242,13 @@ FocusRing.play = async ({ canvasElement }) => {
  * Disabled, beside disabled Tags: the same on-surface 12 ground as a disabled
  * Tag, a dashed Outline Variant edge (the dash stays, so it still reads as a
  * suggestion), and the words and glyph in Secondary (Text). It comes from the
- * field's `TagContext` or from the caller's own `disabled`; either way it is a
- * disabled button, still named, skipped by Tab and never accepted.
+ * field's `TagContext` only, as a Tag's does: a disabled button, still named,
+ * skipped by Tab and never accepted. There is no `disabled` prop, so a stray
+ * one outside a disabled field changes nothing.
  */
 export const DisabledBesideTags = {
-    args: { onAccept: fn() },
-    render: ({ onAccept }) => (
+    args: { onAccept: fn(), onStray: fn() },
+    render: ({ onAccept, onStray }) => (
         <div style={row}>
             <button type="button">Before</button>
             <TagContext.Provider value={{ isDisabled: true }}>
@@ -256,8 +257,8 @@ export const DisabledBesideTags = {
                 <Suggestion label="Relationships" onAccept={onAccept} />
                 <Suggestion type="prompt" label="Summarize" onAccept={onAccept} />
             </TagContext.Provider>
-            <Suggestion label="Fractions" disabled onAccept={onAccept} />
             <button type="button">After</button>
+            <Suggestion label="Fractions" disabled onAccept={onStray} />
         </div>
     ),
 };
@@ -270,11 +271,7 @@ DisabledBesideTags.play = async ({ canvasElement, args }) => {
     const ink = t('--color-secondary-text');
     const tag = canvas.getByTestId('tag');
 
-    const names = [
-        'Add Relationships, suggested',
-        'Summarize, suggested',
-        'Add Fractions, suggested',
-    ];
+    const names = ['Add Relationships, suggested', 'Summarize, suggested'];
     for (const name of names) {
         // The name is unchanged, and the disabled state reaches assistive tech.
         const el = canvas.getByRole('button', { name });
@@ -287,6 +284,8 @@ DisabledBesideTags.play = async ({ canvasElement, args }) => {
         await expect(s.borderTopStyle, `${name}: still dashed`).toBe('dashed');
         await expect(s.borderTopColor, `${name}: Outline Variant edge`).toBe(edge);
         await expect(s.color, `${name}: Secondary (Text) words`).toBe(ink);
+        await expect(s.color, `${name}: the disabled Tag's words`)
+            .toBe(getComputedStyle(tag).color);
         await expect(getComputedStyle(el.querySelector('i')).color, `${name}: and glyph`).toBe(ink);
         await expect(px(s.height), `${name}: the box does not move`).toBe(22);
 
@@ -300,12 +299,22 @@ DisabledBesideTags.play = async ({ canvasElement, args }) => {
     await userEvent.tab();
     await expect(canvas.getByRole('button', { name: 'After' })).toHaveFocus();
 
-    // Never accepted, by pointer or by keyboard.
+    // Never accepted: a click on a disabled button does not reach `onAccept`.
+    // (Tab never reaches it, so there is no keyboard press to test.)
     for (const name of names) {
         await userEvent.click(canvas.getByRole('button', { name }), { pointerEventsCheck: 0 });
     }
-    await userEvent.keyboard('{Enter}');
     await expect(args.onAccept).not.toHaveBeenCalled();
+
+    // A stray `disabled` outside a disabled field is not a prop: the
+    // suggestion stays live, takes focus and is accepted.
+    const stray = canvas.getByRole('button', { name: 'Add Fractions, suggested' });
+    await expect(stray).toBeEnabled();
+    canvas.getByRole('button', { name: 'After' }).focus();
+    await userEvent.tab();
+    await expect(stray).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onStray).toHaveBeenCalledWith('Fractions', expect.anything());
 };
 
 /**

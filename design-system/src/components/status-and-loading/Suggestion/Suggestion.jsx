@@ -17,8 +17,9 @@ import './Suggestion.scss';
  * The component does not change itself when accepted; the field that owns the
  * value decides what appears next.
  *
- * DISABLED comes from the field or TagGroup, through the `TagContext` a Tag
- * reads, or from the caller's own `disabled`. It is a native disabled button:
+ * NO `disabled` PROP, as Tag has none. It is disabled because its field or
+ * TagGroup is, through the `TagContext` a Tag reads, so a suggestion can never
+ * disagree with the tags beside it. Disabled, it is a native disabled button:
  * out of the tab order, announced as disabled, and never accepted.
  */
 
@@ -41,8 +42,6 @@ export const Suggestion = ({
     id,
     ...rest
 }) => {
-    // Disabled comes from the field or TagGroup, through the context Tag reads,
-    // so a disabled group can never leave a suggestion in it pressable.
     const { isDisabled = false } = useTagContext() || {};
     const isPrompt = type === 'prompt';
     // Anything but `prompt` is an insert, so an unknown type still renders one.
@@ -68,10 +67,9 @@ export const Suggestion = ({
             // the spread, so a stray `aria-label` or `onClick` cannot replace
             // them. A caller's `onClick` still fires, before `onAccept`.
             aria-label={name}
-            // Native `disabled`, from the field or from the caller's own
-            // `disabled`: out of the tab order, announced as disabled, and no
-            // click reaches `onAccept`. The look is `:disabled` in the styles.
-            disabled={isDisabled || rest.disabled || undefined}
+            // After the spread, so the field's state wins and a stray
+            // `disabled` in `rest` never reaches the button.
+            disabled={isDisabled || undefined}
             onClick={(e) => {
                 onClick?.(e);
                 onAccept?.(isPrompt ? (text ?? label) : (value ?? label), e);
@@ -96,8 +94,6 @@ Suggestion.propTypes = {
     onAccept: PropTypes.func,
     /** Fires on press, before `onAccept`. It never replaces `onAccept`. */
     onClick: PropTypes.func,
-    /** Disables it: not focusable and never accepted. A disabled field or TagGroup disables it too. */
-    disabled: PropTypes.bool,
     className: PropTypes.string,
     id: PropTypes.string,
 };

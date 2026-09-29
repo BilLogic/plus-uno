@@ -21,7 +21,7 @@ export const figmaMeta = {
       "source": "manual",
       "status": "verified",
       "isComponentSet": true,
-      "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from the disabled prop or a disabled field's TagContext."
+      "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from a disabled field's TagContext, never a prop."
     }
   ]
 };
@@ -68,7 +68,7 @@ as Tag, so it sits in the tag row where the value will land.
     <DsCanvasQuiet of={SuggestionStories.AcceptIntoTags} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Disabled, beside disabled Tags: the same on-surface 12 ground, a dashed Outline Variant edge so it still reads as a suggestion, and Secondary (Text) words. It comes from the field or from its own <code>disabled</code>, and cannot be focused or accepted.</>}>
+<DocsCanvasShell description={<>Disabled, beside disabled Tags: the same on-surface 12 ground, a dashed Outline Variant edge so it still reads as a suggestion, and Secondary (Text) words. It follows the field, and cannot be focused or accepted.</>}>
     <DsCanvasQuiet of={SuggestionStories.DisabledBesideTags} />
 </DocsCanvasShell>
 
@@ -157,8 +157,8 @@ sentence. For a prompt, pass the full words as `text` and a short `label`.
 ### Disabled comes from the field.
 
 Inside a disabled field or `TagGroup`, a suggestion reads the same
-`TagContext` a Tag does and is disabled with the tags beside it. Pass
-`disabled` only for a suggestion that cannot be accepted on its own.
+`TagContext` a Tag does and is disabled with the tags beside it. Like Tag,
+it has no `disabled` prop of its own.
 
 </div>
 

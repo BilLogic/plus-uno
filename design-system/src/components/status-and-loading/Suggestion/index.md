@@ -21,7 +21,6 @@
 | `text` | string | — | `prompt` only: the text `onAccept` receives. Defaults to `label`. |
 | `onAccept` | func | — | Called with the value (insert) or the text (prompt), then the click event. |
 | `onClick` | func | — | Fires on press, before `onAccept`. It never replaces `onAccept`. |
-| `disabled` | bool | — | Disables it: not focusable and never accepted. A disabled field or TagGroup disables it too. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |
 
