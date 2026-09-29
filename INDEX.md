@@ -62,7 +62,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`agents/reviewers/uno-lens.md`](agents/reviewers/uno-lens.md) | Judges whether the artifact does what the PRD says and violates no known blueprint constraint (target: docs/evals/rubrics/uno-review.md → groundingfidelity) |
 | [`agents/uno-bot/AGENT.md`](agents/uno-bot/AGENT.md) | The Worker persona delta — how uno-bot differs from the constitution. |
 | [`agents/uno-bot/harness-bundle.md`](agents/uno-bot/harness-bundle.md) | Generated readable companion to the baked Worker prompt — the load-order manifest plus the assembled harness as markdown. |
-| [`agents/uno-bot/migrations/README.md`](agents/uno-bot/migrations/README.md) | The bot's semantic-retrieval schema — semanticsearch (corpuschunks, blueprintchunkssrc, matchcorpuschunks) — used to be authored here as 0001..0004 and hand-applied to the hosted p |
+| [`agents/uno-bot/migrations/README.md`](agents/uno-bot/migrations/README.md) | The Worker's own database migrations — the uno-bot-usage D1 schema under usage/ and how to apply it — and why the blueprint's retrieval schema is not here. |
 | [`agents/uno-bot/README.md`](agents/uno-bot/README.md) | A Cloudflare Worker that puts uno (the PLUS design agent) in Slack as @uno-bot: it receives Slack events, runs an agentic tool-use loop, answers grounded questions across Notion / |
 | [`agents/writers/blueprint.md`](agents/writers/blueprint.md) | The only agent that touches uno-blueprint (Supabase, the product source of truth) |
 | [`agents/writers/figma.md`](agents/writers/figma.md) | The only agent that writes to the Figma workspace |
@@ -182,6 +182,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/027-own-the-worker-rather-than-rent-a-managed-slack-agent.md`](docs/adr/027-own-the-worker-rather-than-rent-a-managed-slack-agent.md) | uno-bot stays a self-hosted Worker rather than a managed Slack agent, until a managed agent can hold the proposal gate and reach the blueprint and Notion, or the plumbing costs more than a stated bound (2026-09-04) |
 | [`docs/adr/028-a-tier-is-model-plus-thinking-level-moving-together.md`](docs/adr/028-a-tier-is-model-plus-thinking-level-moving-together.md) | On the Gemini lane a tier is one named configuration of model PLUS thinking level — chill low, default medium, grind high — reversing the 2026-08-07 call to pin one dial; attribution comes from changing one tier at a time (2026-09-04) |
 | [`docs/adr/029-in-place-block-replacement-behind-the-gate.md`](docs/adr/029-in-place-block-replacement-behind-the-gate.md) | uno-bot may rewrite a named Notion block in place — keyed by a block id plus the last-edited stamp seen at read, behind the ✅ gate — relaxing the append-only rule that made every correction a contradicting section at the bottom of the page (2026-09-15) |
+| [`docs/adr/030-the-usage-record-lives-in-d1-not-analytics-engine.md`](docs/adr/030-the-usage-record-lives-in-d1-not-analytics-engine.md) | uno-bot's per-turn usage record is a D1 (SQLite) database, uno-bot-usage, rather than Workers Analytics Engine — rows are updated after the turn, every metric is re-runnable SQL, and nothing may be sampled or expire mid-window; with what the database is for and what it never stores (2026-09-29) |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -211,6 +212,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-140 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+141 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 raw eval data are deliberately not indexed — they record what happened rather
 than telling you what to do.

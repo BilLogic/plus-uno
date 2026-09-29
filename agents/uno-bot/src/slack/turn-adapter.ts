@@ -13,13 +13,13 @@
 // SO THIS FILE HOLDS ONLY SLACK'S DIFFERENCES. The request is built by
 // `slack/turn-request.ts` — pure, and driven by the parity test beside the eval
 // builder — and the dependencies by `turn/env-deps.ts`, which both callers
-// share. What is named here is the four entries that are Slack's alone: the
+// share. What is named here is the five entries that are Slack's alone: the
 // Durable Object store, the posting Delivery, a verdict that actually EXECUTES,
-// and the real ts a tool's own posts thread off.
+// the real ts a tool's own posts thread off, and where the turn came from.
 //
 // `Env` enters here and stops here.
 
-import { executeVerdict } from "../agent/resolve-proposal";
+import { runVerdict } from "../agent/resolve-proposal";
 import { threadStateFor } from "../thread-state/production";
 import type { Env } from "../types";
 import { buildTurnDeps, type TurnWiring } from "../turn/env-deps";
@@ -70,7 +70,7 @@ export async function runSlackTurn(
 }
 
 /**
- * Slack's four differences, and nothing else.
+ * Slack's five differences, and nothing else.
  *
  * Exported so the parity test can build production's own wiring rather than a
  * copy of it: a dependency added to `turn/env-deps.ts` reaches both callers or
@@ -95,10 +95,14 @@ export function slackTurnWiring(
 
     // Production is the caller that performs the irreversible thing behind the
     // ✅: the Notion card, the PR, the share-out post.
-    applyVerdict: (verdict) => executeVerdict(env, verdict),
+    applyVerdict: (verdict) => runVerdict(env, verdict),
 
     // A real ts, not the conversation key: tool-side posts still thread off the
     // user's message.
     toolThreadTs: event.thread_ts ?? event.ts,
+
+    // A person in Slack. Whether their channel is the sandbox is the usage
+    // record's to decide, from `TEST_CHANNEL_IDS`.
+    origin: "slack",
   };
 }
