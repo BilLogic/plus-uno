@@ -6,15 +6,10 @@
       "ratio": 1,
       "why": "NOT A DEFECT — the check's blind spot 1. The header's ground is set by child modifiers (&--created is --color-success, &--updated --color-info, &--cancelled --color-warning), which this reads as the page. White on those three is 6.17 / 4.53 / 3.52:1; the last is the same --color-warning question recorded below, in a place that is genuinely white-on-gold."
     },
-    "design-system/src/components/forms-and-inputs/DateAndTimePicker.scss|--color-primary|--color-primary-state-08": {
-      "count": 3,
-      "ratio": 4.46,
-      "why": "LIVE, MARGINAL — 4.46:1 against primary's own 8% wash, a hair under 4.5. Not a mistake in this file: --color-primary is 5.02:1 on the page and passes there, and it fails here only because the wash lightens the ground. The fix is a token decision (#268 — does --color-primary need a darker text sibling, which is what --color-primary-text at 7.78:1 already is), not a per-call-site edit."
-    },
     "design-system/src/components/forms-and-inputs/DateAndTimePicker.scss|--color-primary|--color-primary-state-12": {
       "count": 1,
-      "ratio": 4.2,
-      "why": "LIVE, MARGINAL — 4.20:1. Same as the state-08 entry above and slightly worse, because a 12% wash lightens the ground further. Same #268 decision."
+      "ratio": 4.27,
+      "why": "LIVE, MARGINAL — 4.27:1 against primary's own 12% wash, a hair under 4.5. --color-primary is 5.02:1 on the page and fails here only because the wash lightens the ground; the 8% wash now passes. The fix is a token decision (#268 — --color-primary-text at 7.78:1 is the darker text sibling), not a per-call-site edit."
     },
     "design-system/src/components/forms-and-inputs/Rating.scss|--color-outline-variant|--color-surface": {
       "count": 1,
@@ -75,11 +70,6 @@
       "count": 1,
       "ratio": 1.62,
       "why": "EXEMPT — a 14px table-header icon beside a text label. Decorative; the label carries the meaning."
-    },
-    "design-system/src/specs/Universal/Sections/TopBar/TopBar.scss|--color-primary|--color-primary-state-08": {
-      "count": 1,
-      "ratio": 4.46,
-      "why": "LIVE, MARGINAL — 4.46:1. The sidebar toggle's icon on primary's 8% wash, the same pair as the DateAndTimePicker entries and the same #268 token decision. The rule cites a Figma node, so changing it here would put the code and the design out of step for a 0.04 difference."
     }
   }
 }

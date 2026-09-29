@@ -20,8 +20,8 @@ Each color role has multiple variants:
 
 **`-state-NN` is the role at 8/12/16%.** Each overlay is its role's solid at
 that alpha, matching the `State-layers` variables in Figma. The one exception is
-shadow: `--color-shadow-state-*` is black, and there is no `--color-shadow`
-token. Still read the overlay token rather than computing it from the base, and
+shadow: `--color-shadow-state-08/12/16` are black washes with no solid shadow
+role beside them. Still read the overlay token rather than computing it from the base, and
 if a wash ever stops matching its base, check the Figma variable before you
 choose a side. `design-system/tests/tokens-node.test.js` fails on any new
 divergence.
