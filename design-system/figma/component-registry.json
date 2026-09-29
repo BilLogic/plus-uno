@@ -1994,13 +1994,13 @@
         "mdxPath": "design-system/src/components/status-and-loading/Tag/Tag.mdx",
         "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Tag",
         "props": {
-          "variant": {
+          "behavior": {
             "type": "enum",
             "values": [
               "read-only",
-              "dismissible",
+              "removable",
               "selectable",
-              "operational"
+              "link"
             ]
           },
           "color": {
@@ -2011,7 +2011,7 @@
               "green",
               "purple",
               "magenta",
-              "orange",
+              "yellow",
               "teal"
             ]
           },
@@ -2029,19 +2029,29 @@
           {
             "id": "tag",
             "name": "Tag",
-            "componentSetNodeId": "17558:1218",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17558-1218",
+            "componentSetNodeId": "17877:47506",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17877-47506",
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
             "variantProps": {
-              "variant": "trailing + selected",
-              "isSelected": "selected"
+              "isSelected": "selected",
+              "isLoading": "state=saving"
             },
-            "notes": "Created 2026-08-29 on the Badge page, BESIDE Dismissible Badges rather than instead of it (#276, #339 finding 2). The code's `variant` axis does not map one-to-one: read-only and operational are both trailing=none/selected=false, dismissible is trailing=dismiss, selectable is the selected axis — three of the four look identical at rest. Published: all 28 variants (7 colours × trailing × selected) present in the 2026-09-15 components snapshot."
+            "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on grey, plain, read-only, rest and false. state=saving is isLoading; state=disabled comes from TagContext, never a prop; remove? on a link is link plus onRemove; count? is count. The type axis (person, agent, team) and elevated=true are later work and not in code yet."
+          },
+          {
+            "id": "remove-button",
+            "name": "Remove button",
+            "componentSetNodeId": "17827:846",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-846",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "On the Button page. Tag uses size small (16, 12px ×); its states are the × inside a removable tag. Medium and large are not built in code yet."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17558-1218"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17884-2099"
       }
     },
     "Textarea": {

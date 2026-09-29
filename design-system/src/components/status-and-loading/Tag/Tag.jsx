@@ -35,6 +35,9 @@ export const TAG_VARIANTS = ['read-only', 'dismissible', 'selectable', 'operatio
 /** Deprecated names, still accepted, and what each one now means. */
 const DEPRECATED_COLORS = { orange: 'yellow' };
 
+/** Every name `color` accepts: the seven, then the deprecated aliases. */
+const ACCEPTED_COLORS = ['grey', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'orange'];
+
 /*
  * `operational` has no place in the new set: a tag that performs an action
  * once is a button that looks like a tag, which is what TagGroup's `+n` still
@@ -47,9 +50,6 @@ const DEPRECATED_VARIANTS = {
     selectable: 'selectable',
     operational: 'action',
 };
-
-/** Default cap on the whole tag, in px. The label ellipsizes past it. */
-export const TAG_MAX_WIDTH = 180;
 
 /**
  * Disabled state for every tag inside a field or TagGroup. A field wraps its
@@ -96,7 +96,7 @@ export const Tag = ({
     count,
     elemBefore,
     swatchBefore,
-    maxWidth = TAG_MAX_WIDTH,
+    maxWidth = 180,
     href,
     linkComponent,
     isSelected = false,
@@ -289,7 +289,7 @@ Tag.propTypes = {
     /** Deprecated: use `behavior`. `dismissible` is `removable`; `operational` renders a plain button. */
     variant: PropTypes.oneOf(TAG_VARIANTS),
     /** A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. */
-    color: PropTypes.oneOf(TAG_COLORS.concat(Object.keys(DEPRECATED_COLORS))),
+    color: PropTypes.oneOf(ACCEPTED_COLORS),
     /** `selectable` only: a small neutral Count, such as a filter's result count. Ignored with a warning elsewhere. */
     count: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** Leading content in place of the swatch, such as an icon. */
