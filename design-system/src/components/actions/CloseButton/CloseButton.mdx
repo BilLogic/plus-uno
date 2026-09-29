@@ -95,7 +95,8 @@ The one dismiss control for surfaces that close as a whole: a fixed 24×24 hit a
 Use `CloseButton` to close a surface as a whole — an `Alert`, a `Toast`, a
 `Modal`. It is a fixed 24×24 box with a 16px ×, the WCAG 2.2 minimum target
 size, and it keeps that size whatever text sits beside it. Where it sits on a
-line of text is the parent's job: `Alert` centers it on its first line.
+line of text is the parent's job: `Alert` centers it on its first line, and
+`Toast` places it at the end of its header.
 
 Two tones: `default` for neutral surfaces, and `inverse` for colored or dark
 grounds, where the × and its focus ring take the light surface color. `inverse`
@@ -177,7 +178,8 @@ available, and the × is neutral on every intent.
 
 ## Related
 
-- `Alert` uses it for its dismiss control.
+- `Alert` uses it for its dismiss control, in the `default` tone.
+- `Toast` uses it in the `inverse` tone on every header color, named "Close".
 - For an action with a label, use `Button`.
 
 </div>
