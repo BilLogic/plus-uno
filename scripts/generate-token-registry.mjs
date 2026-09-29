@@ -18,6 +18,7 @@ import { fileURLToPath } from 'url';
 
 import { tokenDeclarationPattern, varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 import { TOKEN_DIR, tokenSources } from '../design-system/src/lib/tokens-node.mjs';
+import { isEntry } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -141,7 +142,7 @@ function slug(text) {
  * @param {string} name full Figma variable path, e.g. "Card/pad-x-md"
  * @returns {string[]}
  */
-function deriveCandidates(collection, name) {
+export function deriveCandidates(collection, name) {
   const parts = name.split('/').map((p) => p.trim());
   const leaf = parts[parts.length - 1];
   const head = parts[0].replace(/^_/, '');
@@ -162,9 +163,6 @@ function deriveCandidates(collection, name) {
       out.push(`--color-${base}-state-${neutralTint[1]}`);
     }
     if (/\(text\)/i.test(leaf)) out.push(`--color-${slug(leaf.replace(/\(text\)/i, ''))}-text`);
-    // `Success (Border)` is the hue at 45% for outlined labels; `Success Border` is
-    // the 3:1 role. Both slug to `success-border`, so the pale one is named apart.
-    if (/\(border\)/i.test(leaf)) out.push(`--color-${slug(leaf.replace(/\(border\)/i, ''))}-border-subtle`);
     out.push(`--color-${slug(leaf)}`);
     out.push(`--color-${slug(head)}-${slug(leaf)}`);
     return out;
@@ -356,4 +354,4 @@ function main() {
   }
 }
 
-main();
+if (isEntry(import.meta.url)) main();

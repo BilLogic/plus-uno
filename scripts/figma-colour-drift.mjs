@@ -53,8 +53,6 @@ export function cssName(figmaName) {
       .trim()
       .toLowerCase()
       .replace(/\s*\(text\)$/, '-text')
-      // `(Border)` is the hue at 45% for outlined labels, NOT the 3:1 `Border` role.
-      .replace(/\s*\(border\)$/, '-border-subtle')
       .replace(/\s+container$/, '-container')
       .replace(/\s+icon$/, '-icon')
       .replace(/\s+border$/, '-border')

@@ -43,7 +43,7 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity variants. Use `-container` tokens instead for elevated or filled surfaces.
 
 ### Label Border Convention
-`<Hue>/<Hue> (Border)` is the hue at 45%, the border of an outlined label (Tag, date Status), and maps to `var(--color-<hue>-border-subtle)`. It is not `<Hue> Border`, the 3:1 role that maps to `var(--color-<hue>-border)`. Success, Warning, Danger, Tertiary and the five SMART hues have one.
+`<Hue>/<Hue> Border Subtle` is the hue at 45%, the border of an outlined label (Tag, date Status), and maps to `var(--color-<hue>-border-subtle)`. It is not `<Hue> Border`, the 3:1 role that maps to `var(--color-<hue>-border)`. Success, Warning, Danger, Tertiary and the five SMART hues have one.
 
 ## Typography Tokens
 

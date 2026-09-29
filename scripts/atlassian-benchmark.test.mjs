@@ -108,7 +108,7 @@ test('the seven intents all still carry the same shape', () => {
   // One role sits outside the shared eleven on purpose: `-border-subtle`, the
   // intent at 45% that an outlined label (Tag, date Status) draws its border
   // with. Labels speak tertiary, danger, success, warning and info, never
-  // primary or secondary, and BS4 Foundation has no `(Border)` variable for
+  // primary or secondary, and BS4 Foundation has no `Border Subtle` variable for
   // those two. So the five label intents move together on it, and the two
   // action intents are held to not having it.
   const tokens = ourTokens(REPO_ROOT);

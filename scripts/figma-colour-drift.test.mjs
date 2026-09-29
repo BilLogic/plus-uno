@@ -27,13 +27,11 @@ test('the Figma naming convention maps onto the CSS one', () => {
   assert.equal(cssName('Neutral Colors/Alternative/inverse-on-surface'), '--color-inverse-on-surface');
 });
 
-test('the pale label border does not collide with the 3:1 border role', () => {
+test('the pale label border maps apart from the 3:1 border role', () => {
   // `Success Border` is the role an icon or edge clears 3:1 with; `Success
-  // (Border)` is the hue at 45% that outlined labels draw with. Stripping the
-  // parentheses would map both to `--color-success-border` and compare one
-  // value against the other.
-  assert.equal(cssName('Success/Success (Border)'), '--color-success-border-subtle');
-  assert.equal(cssName('Mastering-Content/Mastering-Content (Border)'), '--color-mastering-content-border-subtle');
+  // Border Subtle` is the hue at 45% that outlined labels draw with.
+  assert.equal(cssName('Success/Success Border Subtle'), '--color-success-border-subtle');
+  assert.equal(cssName('Mastering-Content/Mastering-Content Border Subtle'), '--color-mastering-content-border-subtle');
   assert.equal(cssName('Success/Success Border'), '--color-success-border');
 });
 
