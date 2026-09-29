@@ -6,12 +6,14 @@
  * grows the pill instead of jumping the layout.
  *
  * The two heights have no semantic token yet (label heights 16/20/22/32 are a
- * token follow-up), so they are local custom properties with the value as the
- * documented default. The minimum widths and the dot take the spacing
+ * token follow-up), so they are local custom properties set from
+ * `_label-heights.scss`, which Skeleton reads too. The minimum widths and the dot take the spacing
  * primitives Figma binds them to. Padding is the Element token, which is 4.
  */
+@use '../label-heights' as label;
+
 .plus-count {
-    --plus-count-size: 20px;
+    --plus-count-size: #{label.$count-height};
     --plus-count-min: var(--size-spacing-medium-space-400, 20px);
 
     display: inline-flex;
@@ -29,7 +31,7 @@
 }
 
 .plus-count--small {
-    --plus-count-size: 16px;
+    --plus-count-size: #{label.$count-height-small};
     --plus-count-min: var(--size-spacing-medium-space-300, 16px);
 }
 

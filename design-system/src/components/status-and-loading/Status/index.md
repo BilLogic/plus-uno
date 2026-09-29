@@ -33,7 +33,7 @@ From `design-system/src/components/status-and-loading/Status/Status.scss`. Overr
 
 ## Related
 
-Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Progress` · `Spinner` · `Tag` · `TagGroup` · `Tile`
+Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Progress` · `Skeleton` · `Spinner` · `Tag` · `TagGroup` · `Tile`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

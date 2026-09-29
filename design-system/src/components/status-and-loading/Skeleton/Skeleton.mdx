@@ -1,0 +1,224 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SkeletonStories from './Skeleton.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "shape": { "type": "enum", "values": ["rect", "circle", "text"] },
+    "preset": { "type": "enum", "values": ["status", "status-spacious", "count", "tag", "tag-person", "tag-group", "paragraph"] },
+    "isShimmering": { "type": "boolean" }
+  },
+  "sets": [
+    {
+      "id": "skeleton",
+      "name": "Skeleton",
+      "componentSetNodeId": "17878:1851",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1851",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": true,
+      "notes": "On the Loading page. Figma has one preset property for shapes and presets alike (rect (default), circle, text, paragraph and the label presets); code splits it into shape and preset. shimmer? is isShimmering, off by default in Figma so static designs read clearly and on by default in code. Docs page: node 17885:47731."
+    }
+  ]
+};
+
+<Meta of={SkeletonStories} />
+
+<Title />
+A grey placeholder shape while content loads. One component draws every
+placeholder: a rectangle, a circle or a text bar, plus presets the exact size of
+Status, Count and Tag, so nothing moves when the value arrives.
+
+<DocsTabs of={SkeletonStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-47731"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Skeleton"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Each label preset beside the label it stands in for: Status 20 and 32, Count 20 (round), Tag 22 and person Tag 22 (round). The preset has the label's height and corners; its width stands in for the text.</>}>
+    <Canvas of={SkeletonStories.LabelPresets} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants
+
+<DocsCanvasShell description={<>Rectangle (the default), circle and text bar. Each takes <code>width</code> and <code>height</code>; a rectangle takes <code>radius</code> as a token name.</>}>
+    <DsCanvasQuiet of={SkeletonStories.Shapes} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><code>lines</code> repeats the text bar 8 apart, and the last line is shorter so the block reads as text. <code>preset="paragraph"</code> is three lines.</>}>
+    <DsCanvasQuiet of={SkeletonStories.Paragraph} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><code>preset="tag-group"</code> is three tag shapes at the TagGroup gap, for a tag list that loads on its own.</>}>
+    <DsCanvasQuiet of={SkeletonStories.TagGroupPreset} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>The shimmer is on by default. <code>isShimmering={'{false}'}</code> is a flat fill.</>}>
+    <DsCanvasQuiet of={SkeletonStories.Shimmer} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Under <code>prefers-reduced-motion: reduce</code> the shimmer stops and the fill is flat.</>}>
+    <DsCanvasQuiet of={SkeletonStories.ReducedMotion} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>A loading table. The region carries <code>aria-busy="true"</code>, and every label inside it is a plain text bar: the container owns the skeleton.</>}>
+    <DsCanvasQuiet of={SkeletonStories.LoadingTable} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A loading card. The card's skeleton owns everything inside it, its tags included.</>}>
+    <DsCanvasQuiet of={SkeletonStories.LoadingCard} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={SkeletonStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Skeleton` while content loads, so the space it will fill is already on
+screen and the layout does not jump when it arrives.
+
+- **One label loading on its own** (a Status calculated after the row appears, a
+  tag list fetched separately): the matching preset.
+- **A whole table or card loading:** plain text bars and shapes, composed to the
+  real content's dimensions.
+- **A thumbnail, avatar or header:** a rectangle or circle with its own size.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+The loading rules, as Do and Don't.
+
+### Do: use a label preset when one label loads after its row is on screen.
+
+```jsx
+<span>Unit 3 review {status ? <Status style="success">{status}</Status> : <Skeleton preset="status" />}</span>
+```
+
+### Do: use plain text bars inside a loading table or card.
+
+The container owns the skeleton. Labels become the same text bars as the rest,
+so a loading table does not fill with dozens of label shapes.
+
+```jsx
+// Incorrect — label shapes inside a loading container.
+<tr><td><Skeleton shape="text" /></td><td><Skeleton preset="status" /></td><td><Skeleton preset="tag-group" /></td></tr>
+
+// Correct — text bars throughout.
+<tr><td><Skeleton shape="text" /></td><td><Skeleton shape="text" width={64} /></td><td><Skeleton shape="text" width={64} /></td></tr>
+```
+
+### Don't: skeleton a Count on a button, tab or nav item.
+
+Show nothing until the number arrives; `Count` already renders nothing without
+a value.
+
+```jsx
+// Incorrect
+<button type="button">Messages <Skeleton preset="count" /></button>
+
+// Correct
+<button type="button">Messages <Count value={unread} /></button>
+```
+
+### Don't: skeleton a Count alone inside a Status or Tag.
+
+Skeleton the host instead: one `preset="status"` for the whole Status.
+
+### Don't: skeleton a toast, modal, menu or spinner.
+
+They appear when they have something to say. A Tag saving a change keeps its
+own spinner (`isLoading`), so saving and loading look different.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Every skeleton is hidden from assistive tech.** It renders `aria-hidden="true"`
+  with no role, never takes focus and ignores the pointer, so a screen reader
+  does not read a list of empty items and a placeholder cannot be clicked.
+- **The loading region carries the busy state.** Set `aria-busy="true"` once on
+  the container that is loading, and remove it when the content arrives. The
+  component does not set it, because it cannot see the region.
+- **Reduced motion.** Under `prefers-reduced-motion: reduce` the shimmer stops
+  and the fill is flat.
+- **Contrast in any theme.** The fill is `surface-container` and the shimmer
+  moves toward `surface-container-lowest`, both theme tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- `Status`, `Count` and `Tag` are the labels the presets are sized to.
+- `Spinner` is for an action in progress and for full-page transitions; a Tag
+  saving a change uses its own spinner.
+- The loading guidance in the surfaces guideline points here.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

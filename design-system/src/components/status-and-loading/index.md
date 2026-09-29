@@ -2,7 +2,7 @@
 
 # Status and loading
 
-10 components. Each row links to the generated facts; the three columns after it are the
+11 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
@@ -12,13 +12,14 @@ authored half (#166), counted rather than assumed.
 | [BadgeVariants](BadgeVariants.md) | 15 | ✅ | ✕ | ✅ |
 | [Count](Count/index.md) | 10 | ✅ | ✕ | ✅ |
 | [Progress](Progress/index.md) | 11 | ✅ | ✕ | ✅ |
+| [Skeleton](Skeleton/index.md) | 9 | ✅ | ✕ | ✅ |
 | [Spinner](Spinner/index.md) | 4 | ✅ | ✕ | ✅ |
 | [Status](Status/index.md) | 9 | ✅ | ✕ | ✅ |
 | [Tag](Tag/index.md) | 19 | ✅ | ✕ | ✅ |
 | [TagGroup](TagGroup/index.md) | 8 | ✅ | ✕ | ✅ |
 | [Tile](Tile/index.md) | 10 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 10/10 (100%) · Correct/incorrect 0/10 (0%) · Accessibility 10/10 (100%)
+**Authored coverage:** When to use 11/11 (100%) · Correct/incorrect 0/11 (0%) · Accessibility 11/11 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says
