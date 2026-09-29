@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import './Skeleton.scss';
 
 /**
- * `Skeleton` — a grey placeholder shape while content loads.
+ * `Skeleton` — a gray placeholder shape while content loads.
  *
  * ONE PIECE, MANY SHAPES. A rectangle, a circle or a text bar that can repeat
  * as lines, plus presets sized to the labels: Status (20 and 32), Count (20,
@@ -56,6 +56,19 @@ const TAG_GROUP_WIDTHS = ['wide', 'narrow', 'widest'];
 
 const toLength = (value) => (typeof value === 'number' ? `${value}px` : value);
 
+/*
+ * A prop the chosen shape or preset ignores is almost always a mistake, so it
+ * warns in development rather than failing silently. It still renders.
+ */
+const warnIgnored = (props, why) => {
+    if (!props.length || process.env.NODE_ENV === 'production') return;
+    // eslint-disable-next-line no-console
+    console.warn(`[Skeleton] ${props.map((p) => `\`${p}\``).join(', ')} ${props.length > 1 ? 'are' : 'is'} ignored ${why}.`);
+};
+
+/** The props in `names` that were actually passed. */
+const given = (values, names) => names.filter((name) => values[name] !== undefined);
+
 export const Skeleton = ({
     shape = 'rect',
     preset,
@@ -69,6 +82,18 @@ export const Skeleton = ({
     ...rest
 }) => {
     const motion = isShimmering ? 'plus-skeleton--shimmer' : '';
+    const passed = { width, height, radius, lines };
+
+    const isParagraph = preset === 'paragraph';
+    const isLabel = LABEL_PRESETS.includes(preset);
+    // A preset wins over `shape`: a label preset is always a single bar.
+    const resolvedShape = isParagraph ? 'text' : isLabel || preset === 'tag-group' ? 'rect' : shape;
+    const count = resolvedShape === 'text' ? Math.max(1, Math.floor(lines ?? (isParagraph ? 3 : 1))) : 1;
+
+    if (preset) warnIgnored(given(passed, ['height', 'radius']), `with preset="${preset}": a preset sets them`);
+    if (preset === 'count' || preset === 'tag-group') warnIgnored(given(passed, ['width']), `with preset="${preset}": its width is fixed`);
+    if (resolvedShape !== 'text') warnIgnored(given(passed, ['lines']), `unless the shape is text`);
+    if (!preset && count > 1) warnIgnored(given(passed, ['height', 'radius']), `on several lines: each line is a 16-tall text bar`);
 
     /*
      * A tag group is three tag shapes at the group's gap. The group is hidden
@@ -89,10 +114,6 @@ export const Skeleton = ({
         );
     }
 
-    const isParagraph = preset === 'paragraph';
-    const isLabel = LABEL_PRESETS.includes(preset);
-    const resolvedShape = isParagraph ? 'text' : shape;
-
     const vars = {};
     if (preset !== 'count' && width !== undefined) vars['--plus-skeleton-width'] = toLength(width);
     if (!isLabel && !isParagraph) {
@@ -106,7 +127,6 @@ export const Skeleton = ({
     }
 
     const shapeClass = isLabel ? `plus-skeleton--${preset}` : `plus-skeleton--${resolvedShape}`;
-    const count = resolvedShape === 'text' ? Math.max(1, Math.floor(lines ?? (isParagraph ? 3 : 1))) : 1;
 
     /*
      * Several lines are a column of text bars at the Element sm gap, the last
@@ -144,11 +164,11 @@ Skeleton.propTypes = {
     preset: PropTypes.oneOf(SKELETON_PRESETS),
     /** Any CSS length, or a number of pixels. Text bars fill the line by default; a label preset has a stand-in width. Ignored by `count` and `tag-group`. */
     width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    /** Any CSS length, or a number of pixels. Ignored by presets. */
+    /** Any CSS length, or a number of pixels. Ignored by presets and by several text `lines`, which are always 16 tall. */
     height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    /** A radius token name, such as `element-radius-md` or `card-radius-sm`. Ignored by presets and by `circle`. */
+    /** A radius token name, such as `element-radius-md` or `card-radius-sm`. Ignored by presets, by `circle` and by several text `lines`, which keep the text bar's radius. */
     radius: PropTypes.oneOf(Object.keys(SKELETON_RADII)),
-    /** `text` only: how many bars. The last of several is shorter. */
+    /** `text` (and `paragraph`) only: how many bars. The last of several is shorter. Ignored, with a warning, on any other shape or preset. */
     lines: PropTypes.number,
     /** The shimmer sweep. Off, it is a flat fill, which is also what reduced motion gets. */
     isShimmering: PropTypes.bool,

@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/Skeleton/Skeleton.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/Skeleton/Skeleton.stories.jsx` — LabelPresets, TagGroupPreset, Shapes, Paragraph, Shimmer, ReducedMotion, LoadingTable, LoadingCard, Interactive
+**Stories:** `design-system/src/components/status-and-loading/Skeleton/Skeleton.stories.jsx` — LabelPresets, PersonTagPreset, PresetWinsOverShape, TagGroupPreset, Shapes, Paragraph, Shimmer, ReducedMotion, LoadingTable, LoadingCard, IgnoredPropsWarn, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/Skeleton/Skeleton.mdx`
 
@@ -18,9 +18,9 @@
 | `shape` | oneOf | `'rect'` | `rect` by default; `circle` for avatars and round counts; `text` is a 16-tall bar that can repeat as `lines`. A preset wins over it. |
 | `preset` | oneOf | — | Sized to a label (`status`, `status-spacious`, `count`, `tag`, `tag-person`), a loading TagGroup (`tag-group`) or three lines of text (`paragraph`). Sets shape, height and corners together and wins over them. |
 | `width` | number or string | — | Any CSS length, or a number of pixels. Text bars fill the line by default; a label preset has a stand-in width. Ignored by `count` and `tag-group`. |
-| `height` | number or string | — | Any CSS length, or a number of pixels. Ignored by presets. |
-| `radius` | oneOf | — | A radius token name, such as `element-radius-md` or `card-radius-sm`. Ignored by presets and by `circle`. |
-| `lines` | number | — | `text` only: how many bars. The last of several is shorter. |
+| `height` | number or string | — | Any CSS length, or a number of pixels. Ignored by presets and by several text `lines`, which are always 16 tall. |
+| `radius` | oneOf | — | A radius token name, such as `element-radius-md` or `card-radius-sm`. Ignored by presets, by `circle` and by several text `lines`, which keep the text bar's radius. |
+| `lines` | number | — | `text` (and `paragraph`) only: how many bars. The last of several is shorter. Ignored, with a warning, on any other shape or preset. |
 | `isShimmering` | bool | `true` | The shimmer sweep. Off, it is a flat fill, which is also what reduced motion gets. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |

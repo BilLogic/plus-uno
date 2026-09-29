@@ -68,7 +68,7 @@ When a view has no data, show three things — never a blank panel and never a b
 
 ## Loading
 
-- **Cards and lists** — `Skeleton`, composed to the real card's dimensions, with `aria-busy="true"` on the loading region. Inside a loading container every label is a plain text bar; the label presets are for one label loading on its own. The rules are on Skeleton's docs page (`design-system/src/components/status-and-loading/Skeleton/Skeleton.mdx`).
+- **Cards and lists** — `Skeleton`, composed to the real card's dimensions, with `aria-busy="true"` on the loading region and a visually hidden `role="status"` label inside it that says what is loading and announces when it arrives. Inside a loading container every label is a plain text bar; the label presets are for one label loading on its own. The rules are on Skeleton's docs page (`design-system/src/components/status-and-loading/Skeleton/Skeleton.mdx`).
 - **Inline actions** (button click, form submit) — spinner inside the button, button disabled.
 - **Full-page transitions** — centered spinner with a label.
 

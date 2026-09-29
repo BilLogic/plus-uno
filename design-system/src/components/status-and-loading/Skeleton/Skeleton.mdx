@@ -28,7 +28,7 @@ export const figmaMeta = {
 <Meta of={SkeletonStories} />
 
 <Title />
-A grey placeholder shape while content loads. One component draws every
+A gray placeholder shape while content loads. One component draws every
 placeholder: a rectangle, a circle or a text bar, plus presets the exact size of
 Status, Count and Tag, so nothing moves when the value arrives.
 
@@ -49,7 +49,7 @@ Status, Count and Tag, so nothing moves when the value arrives.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Each label preset beside the label it stands in for: Status 20 and 32, Count 20 (round), Tag 22 and person Tag 22 (round). The preset has the label's height and corners; its width stands in for the text.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Each label preset beside the label it stands in for: Status 20 and 32, Count 20 (round) and Tag 22. The preset has the label's height and corners; its width stands in for the text.</>}>
     <Canvas of={SkeletonStories.LabelPresets} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -91,11 +91,11 @@ Status, Count and Tag, so nothing moves when the value arrives.
 
 ## Content
 
-<DocsCanvasShell description={<>A loading table. The region carries <code>aria-busy="true"</code>, and every label inside it is a plain text bar: the container owns the skeleton.</>}>
+<DocsCanvasShell description={<>A loading table. The region carries <code>aria-busy="true"</code> and a visually hidden status, "Loading students…", and every label inside it is a plain text bar: the container owns the skeleton.</>}>
     <DsCanvasQuiet of={SkeletonStories.LoadingTable} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>A loading card. The card's skeleton owns everything inside it, its tags included.</>}>
+<DocsCanvasShell description={<>A loading card. The card's skeleton owns everything inside it, its tags included. When the content arrives, <code>aria-busy</code> comes off and the status announces it.</>}>
     <DsCanvasQuiet of={SkeletonStories.LoadingCard} />
 </DocsCanvasShell>
 
@@ -199,6 +199,19 @@ own spinner (`isLoading`), so saving and loading look different.
 - **The loading region carries the busy state.** Set `aria-busy="true"` once on
   the container that is loading, and remove it when the content arrives. The
   component does not set it, because it cannot see the region.
+- **Pair the busy state with a live label.** `aria-busy` alone is not announced
+  by every screen reader. Inside the region, render a visually hidden
+  `role="status"` element that says what is loading ("Loading students…").
+  Keep it mounted, and when the content arrives, change its text ("Students
+  loaded") or empty it, so the arrival is announced once and not repeated.
+
+```jsx
+<section aria-labelledby="students" aria-busy={loading || undefined}>
+  <h3 id="students">Students</h3>
+  <div role="status" className="visually-hidden">{loading ? 'Loading students…' : 'Students loaded'}</div>
+  {loading ? <Skeleton shape="text" lines={3} /> : renderStudents(students)}
+</section>
+```
 - **Reduced motion.** Under `prefers-reduced-motion: reduce` the shimmer stops
   and the fill is flat.
 - **Contrast in any theme.** The fill is `surface-container` and the shimmer
@@ -214,6 +227,7 @@ own spinner (`isLoading`), so saving and loading look different.
 - `Spinner` is for an action in progress and for full-page transitions; a Tag
   saving a change uses its own spinner.
 - The loading guidance in the surfaces guideline points here.
+- `.plus-skeleton-block` in `design-system/src/styles/_skeleton.scss` is deprecated; use `Skeleton` instead.
 
 </div>
 

@@ -1,5 +1,5 @@
 /*
- * Skeleton — a grey placeholder shape while content loads.
+ * Skeleton — a gray placeholder shape while content loads.
  *
  * THE LOOK. Fill is surface-container, so it keeps its contrast in any theme.
  * The shimmer is a band of surface-container-lowest swept across the fill.
@@ -137,11 +137,11 @@
     );
     background-repeat: no-repeat;
     background-size: 50% 100%;
-    animation: plus-skeleton-shimmer var(--plus-skeleton-duration) ease-in-out infinite;
+    animation: plus-skeleton-sweep var(--plus-skeleton-duration) ease-in-out infinite;
 }
 
 /* The band enters at the left edge and leaves past the right one. */
-@keyframes plus-skeleton-shimmer {
+@keyframes plus-skeleton-sweep {
     from { background-position: -100% 0; }
     to { background-position: 200% 0; }
 }

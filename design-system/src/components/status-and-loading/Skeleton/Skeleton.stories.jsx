@@ -1,7 +1,6 @@
-import React from 'react';
-import { expect, within } from 'storybook/test';
+import React, { useState } from 'react';
+import { expect, spyOn, userEvent, within } from 'storybook/test';
 
-import { withForcedMedia } from '@/storybook-docs/lib/force-media.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Count from '../Count';
 import Status from '../Status';
@@ -10,7 +9,7 @@ import TagGroup from '../TagGroup';
 import Skeleton, { SKELETON_PRESETS, SKELETON_RADII, SKELETON_SHAPES } from './Skeleton';
 
 /**
- * `Skeleton` — a grey placeholder shape while content loads.
+ * `Skeleton` — a gray placeholder shape while content loads.
  *
  * THE TEST SEAM IS THIS FILE: story `play:` functions run by `check:storybook`
  * in a real browser. Every assertion is something a person could observe —
@@ -26,7 +25,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'A grey placeholder shape while content loads, with presets sized to Status, '
+                    'A gray placeholder shape while content loads, with presets sized to Status, '
                     + 'Count and Tag. Hidden from assistive tech; the loading region carries aria-busy.',
             },
         },
@@ -85,10 +84,6 @@ export const LabelPresets = () => (
             <Skeleton preset="tag" data-testid="tag" />
             <Tag text="Algebra" />
         </span>
-        <span style={pair}>
-            <Skeleton preset="tag-person" data-testid="tag-person" />
-            <Tag text="Geometry" />
-        </span>
     </div>
 );
 LabelPresets.play = async ({ canvasElement }) => {
@@ -118,13 +113,38 @@ LabelPresets.play = async ({ canvasElement }) => {
     const count = canvas.getByTestId('count');
     await expect(box(count).width, 'count is a circle').toBe(box(count).height);
     await expect(box(canvas.getByTestId('tag')).height).toBe(22);
+};
 
-    // The person Tag is not in code yet, so the person preset is held to the
-    // Tag's height and to being fully round.
+/**
+ * The person Tag preset on its own: a Tag's height, fully round. It is not
+ * paired with a label until the person Tag is in code.
+ */
+export const PersonTagPreset = () => (
+    <Skeleton preset="tag-person" data-testid="tag-person" />
+);
+PersonTagPreset.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
     const person = canvas.getByTestId('tag-person');
-    await expect(box(person).height, 'tag-person is the Tag height').toBe(box(tag).height);
+    await expect(box(person).height, 'tag-person is the Tag height, 22').toBe(22);
     await expect(radius(person), 'tag-person is fully round').toBeGreaterThanOrEqual(box(person).height / 2);
     await expectInert(person, 'tag-person');
+};
+
+/** A preset wins over `shape`: a label preset is one bar, whatever `shape` and `lines` say. */
+export const PresetWinsOverShape = () => (
+    <div style={row}>
+        <Skeleton preset="status" shape="text" lines={3} data-testid="status" />
+        <Status>Completed</Status>
+    </div>
+);
+PresetWinsOverShape.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const skeleton = canvas.getByTestId('status');
+    const status = labelOf(canvas.getByText('Completed'));
+    await expect(skeleton.children, 'one bar, not three lines').toHaveLength(0);
+    await expect(box(skeleton).height, 'the Status height, not a text bar').toBe(box(status).height);
+    await expect(radius(skeleton)).toBe(radius(status));
+    await expect(box(skeleton).width, 'the status stand-in width').toBe(64);
 };
 
 /** A loading TagGroup: three tag shapes at the group's gap. */
@@ -239,12 +259,39 @@ Shimmer.play = async ({ canvasElement }) => {
     await expect(off.animationName, 'no animation when off').toBe('none');
     await expect(off.backgroundImage, 'a flat fill when off').toBe('none');
     await expect(off.backgroundColor).toBe(tokenColor(canvasElement, '--color-surface-container'));
+
+    // The sweep is Skeleton's own keyframe, defined once. Another stylesheet
+    // defining the same name would silently replace one of the two sweeps.
+    await expect(on.animationName, 'the sweep is Skeleton\'s keyframe').toBe('plus-skeleton-sweep');
+    const definitions = [];
+    for (const sheet of document.styleSheets) {
+        let rules;
+        try { rules = sheet.cssRules; } catch { continue; }
+        for (const rule of rules) {
+            if (rule instanceof CSSKeyframesRule && rule.name === 'plus-skeleton-sweep') definitions.push(rule);
+        }
+    }
+    await expect(definitions, 'one definition of the sweep keyframe').toHaveLength(1);
+};
+
+/**
+ * The motion preference as the runner sets it. In the Storybook test runner a
+ * Playwright command emulates `prefers-reduced-motion` for the whole page (see
+ * `commands` in vite.config.js). In Storybook itself there is no runner, so
+ * the function returns false and the story has nothing to measure.
+ */
+const emulateReducedMotion = async (value) => {
+    const commands = window.__vitest_browser_runner__?.commands;
+    if (!commands) return false;
+    await commands.triggerCommand('emulateReducedMotion', [value]);
+    return true;
 };
 
 /**
  * Under `prefers-reduced-motion: reduce` the shimmer stops and the fill is
- * flat. The play function forces the media query through the cascade, since a
- * story cannot set the browser's own motion preference.
+ * flat. The test runner really emulates the preference, through Playwright.
+ * Opened in Storybook there is no runner to ask, so the play function stops
+ * there: toggle the OS setting to see it.
  */
 export const ReducedMotion = () => (
     <div style={row}>
@@ -255,30 +302,36 @@ export const ReducedMotion = () => (
 ReducedMotion.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const shapes = [canvas.getByTestId('status'), ...canvas.getByTestId('lines').children];
-
-    for (const el of shapes) {
-        await expect(getComputedStyle(el).animationName, 'shimmers with motion allowed').not.toBe('none');
-    }
-    const reduced = withForcedMedia('(prefers-reduced-motion: reduce)', () => shapes.map((el) => {
+    const measure = () => shapes.map((el) => {
         const s = getComputedStyle(el);
         return { animation: s.animationName, image: s.backgroundImage, fill: s.backgroundColor };
-    }));
+    });
+
+    if (!(await emulateReducedMotion('reduce'))) return;
+    let reduced;
+    try {
+        await expect(window.matchMedia('(prefers-reduced-motion: reduce)').matches, 'the runner emulates the preference').toBe(true);
+        reduced = measure();
+    } finally {
+        await emulateReducedMotion(null);
+    }
+
     for (const s of reduced) {
         await expect(s.animation, 'no animation under reduced motion').toBe('none');
         await expect(s.image, 'a flat fill under reduced motion').toBe('none');
         await expect(s.fill).toBe(tokenColor(canvasElement, '--color-surface-container'));
     }
-    // And the page is restored afterwards.
-    await expect(getComputedStyle(shapes[0]).animationName).not.toBe('none');
 };
 
 /**
- * A loading table: the region carries `aria-busy`, and every label inside it
- * is a plain text bar. No label shapes inside a loading container.
+ * A loading table. The region carries `aria-busy`, a visually hidden status
+ * says what is loading, and every label inside is a plain text bar: no label
+ * shapes inside a loading container.
  */
 export const LoadingTable = () => (
-    <section aria-labelledby="skeleton-students" aria-busy="true" data-testid="region">
+    <section aria-labelledby="skeleton-students" aria-busy="true">
         <h3 id="skeleton-students" className="h6">Students</h3>
+        <div role="status" className="visually-hidden">Loading students…</div>
         <div style={{ display: 'grid', gap: '12px' }}>
             {[140, 110, 160].map((width) => (
                 <div key={width} style={{ display: 'flex', gap: '48px', alignItems: 'center' }}>
@@ -294,6 +347,7 @@ LoadingTable.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const region = canvas.getByRole('region', { name: 'Students' });
     await expect(region, 'the region is busy').toHaveAttribute('aria-busy', 'true');
+    await expect(within(region).getByRole('status'), 'a live label says what is loading').toHaveTextContent('Loading students…');
     const bars = [...region.querySelectorAll('[aria-hidden="true"]')];
     await expect(bars, 'nine text bars').toHaveLength(9);
     for (const bar of bars) {
@@ -301,32 +355,126 @@ LoadingTable.play = async ({ canvasElement }) => {
     }
 };
 
-/** A loading card: the card's skeleton owns everything inside, its tags included. */
-export const LoadingCard = () => (
-    <div
-        aria-busy="true"
-        aria-label="Session summary"
-        role="group"
-        style={{
-            display: 'grid',
-            gap: '10px',
-            width: '294px',
-            padding: '16px',
-            border: '1px solid var(--color-outline-variant)',
-            borderRadius: 'var(--size-card-radius-sm)',
-        }}
-    >
-        <Skeleton shape="text" width={180} />
-        <Skeleton shape="text" lines={2} />
-        <span style={{ display: 'flex', gap: '8px' }}>
-            <Skeleton shape="text" width={56} />
-            <Skeleton shape="text" width={56} />
-        </span>
-    </div>
-);
+/**
+ * A loading card: the card's skeleton owns everything inside, its tags
+ * included. The live label announces the card, and changes when it arrives.
+ */
+export const LoadingCard = () => {
+    const [loaded, setLoaded] = useState(false);
+    return (
+        <div style={{ display: 'grid', gap: '12px', justifyItems: 'start' }}>
+            <div
+                aria-busy={loaded ? undefined : 'true'}
+                aria-label="Session summary"
+                role="group"
+                style={{
+                    display: 'grid',
+                    gap: '10px',
+                    width: '294px',
+                    padding: '16px',
+                    border: '1px solid var(--color-outline-variant)',
+                    borderRadius: 'var(--size-card-radius-sm)',
+                }}
+            >
+                <div role="status" className="visually-hidden">
+                    {loaded ? 'Session summary loaded' : 'Loading session summary…'}
+                </div>
+                {loaded ? (
+                    <>
+                        <p className="body1-txt" style={{ margin: 0 }}>Unit 3 review</p>
+                        <p className="body3-txt" style={{ margin: 0 }}>Four students worked through ratios and rates.</p>
+                        <span style={{ display: 'flex', gap: '8px' }}>
+                            <Tag text="Ratios" />
+                            <Tag text="Rates" />
+                        </span>
+                    </>
+                ) : (
+                    <>
+                        <Skeleton shape="text" width={180} />
+                        <Skeleton shape="text" lines={2} />
+                        <span style={{ display: 'flex', gap: '8px' }}>
+                            <Skeleton shape="text" width={56} />
+                            <Skeleton shape="text" width={56} />
+                        </span>
+                    </>
+                )}
+            </div>
+            <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => setLoaded((v) => !v)}>
+                {loaded ? 'Show loading' : 'Finish loading'}
+            </button>
+        </div>
+    );
+};
 LoadingCard.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole('group', { name: 'Session summary' })).toHaveAttribute('aria-busy', 'true');
+    const card = canvas.getByRole('group', { name: 'Session summary' });
+    await expect(card).toHaveAttribute('aria-busy', 'true');
+    await expect(within(card).getByRole('status')).toHaveTextContent('Loading session summary…');
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Finish loading' }));
+    await expect(card, 'not busy once the content arrives').not.toHaveAttribute('aria-busy');
+    // Each Tag keeps its own quiet saving status, so the live label is found by what it says.
+    await expect(within(card).getByText('Session summary loaded'), 'the arrival is announced').toHaveAttribute('role', 'status');
+    // A skeleton is a hidden shape that ignores the pointer; a Tag's own hidden
+    // swatch is not one.
+    const placeholders = [...card.querySelectorAll('[aria-hidden="true"]')]
+        .filter((el) => getComputedStyle(el).pointerEvents === 'none');
+    await expect(placeholders, 'no skeletons left').toHaveLength(0);
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Show loading' }));
+};
+
+/**
+ * A prop the shape or preset ignores warns in development. The misconfigured
+ * skeletons mount on a button press after the console is watched, and a
+ * well-formed one is shown not to warn.
+ */
+export const IgnoredPropsWarn = () => {
+    const [mounted, setMounted] = useState(null);
+    const cases = {
+        'Good': <Skeleton shape="text" lines={3} width={200} />,
+        'Preset height': <Skeleton preset="status" height={40} radius="card-radius-sm" />,
+        'Count width': <Skeleton preset="count" width={40} />,
+        'Group width': <Skeleton preset="tag-group" width={300} />,
+        'Rect lines': <Skeleton lines={3} />,
+        'Lines height': <Skeleton shape="text" lines={2} height={24} radius="card-radius-sm" />,
+    };
+    return (
+        <div style={{ display: 'grid', gap: '12px' }}>
+            <div style={row}>
+                {Object.keys(cases).map((name) => (
+                    <button key={name} type="button" onClick={() => setMounted(name)}>{name}</button>
+                ))}
+            </div>
+            <div data-testid="mounted">{mounted && cases[mounted]}</div>
+        </div>
+    );
+};
+IgnoredPropsWarn.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const warn = spyOn(console, 'warn').mockImplementation(() => {});
+    const messages = () => warn.mock.calls.map(([m]) => String(m)).filter((m) => m.startsWith('[Skeleton]'));
+    const expected = {
+        'Good': [],
+        'Preset height': ['`height`, `radius` are ignored with preset="status"'],
+        'Count width': ['`width` is ignored with preset="count"'],
+        'Group width': ['`width` is ignored with preset="tag-group"'],
+        'Rect lines': ['`lines` is ignored unless the shape is text'],
+        'Lines height': ['`height`, `radius` are ignored on several lines'],
+    };
+    try {
+        for (const [name, parts] of Object.entries(expected)) {
+            warn.mockClear();
+            await userEvent.click(canvas.getByRole('button', { name }));
+            const seen = messages();
+            if (!parts.length) await expect(seen, `${name} does not warn`).toHaveLength(0);
+            for (const part of parts) {
+                await expect(seen.some((m) => m.includes(part)), `${name} warns: ${part}`).toBe(true);
+            }
+        }
+    } finally {
+        warn.mockRestore();
+    }
 };
 
 /* -------------------------------------------------------------- playground */
@@ -339,13 +487,14 @@ export const Interactive = {
         width: 160,
         height: 64,
         radius: 'element-radius-md',
-        lines: 1,
+        lines: undefined,
         isShimmering: true,
     },
     argTypes: {
         shape: { control: 'inline-radio', options: SKELETON_SHAPES },
         preset: { control: 'select', options: [undefined, ...SKELETON_PRESETS] },
         radius: { control: 'select', options: Object.keys(SKELETON_RADII) },
+        lines: { control: 'number' },
     },
     render: (args) => <Skeleton {...args} />,
 };
