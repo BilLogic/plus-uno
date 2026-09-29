@@ -22,9 +22,9 @@
       "why": "NOT MEASURABLE HERE — the ground is `linear-gradient(transparent, var(--color-scrim))` over a photograph. The check composites the scrim over the page and gets 2.35:1, which is neither the top of the gradient (transparent, so whatever the image is) nor the real image beneath. A caption over an arbitrary photo needs a scrim strong enough for the WORST image, and only rendering can answer that. It read 2.81:1 until #383 took --color-scrim from 0.38 to M3's published 0.32, which is the whole of the move: the scrim got weaker, so every composite over it did. Re-recorded rather than fixed because the fix is a stronger scrim on this one gradient, and how dark a caption's scrim has to be over an unknown photograph is Bill's call on a rendered carousel, not a number this check can reach."
     },
     "design-system/src/components/messaging/Toast/Toast.scss|--color-surface|--color-warning": {
-      "count": 3,
+      "count": 2,
       "ratio": 3.52,
-      "why": "ACCEPTED EXCEPTION — the warning Toast header's icon, title and timestamp in the surface color on the Warning fill, as Figma draws every Toast header (decided 2026-09-29). 3.52:1 is below AA for the small timestamp and the title; kept so the warning Toast reads as one of the set. Scoped to these three declarations; do not darken them to clear it."
+      "why": "ACCEPTED EXCEPTION — the warning Toast header's title (16px bold, not large text) and timestamp in the surface color on the Warning fill, as Figma draws every Toast header (decided 2026-09-29). 3.52:1 is below AA's 4.5:1 for both; kept so the warning Toast reads as one of the set. The icon and × on the same fill pass as non-text (3:1). Same pair as the SessionManagementSnackbar entry above and the Progress open decision below, but this acceptance covers the Toast header only and does not settle the Progress question. Do not darken them to clear it."
     },
     "design-system/src/components/status-and-loading/Progress/Progress.scss|--color-on-warning|--color-warning": {
       "count": 1,

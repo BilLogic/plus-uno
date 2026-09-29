@@ -4,6 +4,8 @@
  * Uses design system tokens - no hardcoded values
  */
 
+@use '../../../styles/icon-glyph' as *;
+
 .plus-toast.toast,
 .plus-toast,
 .toast.plus-toast {
@@ -118,19 +120,19 @@
         }
     }
 
-    // Warning draws its header content in the surface color, as Figma does on
-    // every header fill. The small timestamp is 3.52:1 on --color-warning,
-    // below AA's 4.5:1: an accepted exception, kept so the warning Toast reads
-    // as one of the set, and recorded in docs/evals/text-contrast-baseline.json.
-    // Do not darken it here.
+    // Title and timestamp: accepted contrast exception, recorded in the
+    // text-contrast baseline; do not darken.
     &.warning {
 
         .plus-toast-header,
         .toast-header {
             background-color: var(--color-warning) !important;
 
-            .plus-toast-icon i {
-                color: var(--color-surface) !important;
+            .plus-toast-icon {
+                @include icon-glyph {
+                    // @contrast: non-text
+                    color: var(--color-surface) !important;
+                }
             }
 
             .plus-toast-title {

@@ -91,12 +91,11 @@ function ToastVariantsDemos() {
 }
 
 /*
- * `color-contrast` skips ONLY the warning header's title and timestamp: the
- * surface color on the Warning fill is 3.52:1, below AA's 4.5:1, and that is
- * an accepted exception (see WarningHeader). The rule still runs on every
- * other element, including the other headers; every other rule stays on.
+ * `color-contrast` skips only the warning header's title and timestamp:
+ * accepted contrast exception, recorded in the text-contrast baseline; do not
+ * darken. Every other element and rule is still checked.
  */
-const WARNING_HEADER_CONTRAST_EXCEPTION = {
+const WARNING_HEADER_A11Y_PARAMS = {
     a11y: {
         config: {
             rules: [{
@@ -112,7 +111,7 @@ export const Styles = () => (
         <ToastVariantsDemos />
     </div>
 );
-Styles.parameters = WARNING_HEADER_CONTRAST_EXCEPTION;
+Styles.parameters = WARNING_HEADER_A11Y_PARAMS;
 
 export const Overview = () => (
     <ToastContainer className="p-3" style={{ position: 'static' }}>
@@ -251,11 +250,9 @@ Dismiss.play = async ({ canvasElement }) => {
 };
 
 /**
- * The warning header draws its content like every other header: title,
- * timestamp, icon and × all in the surface color, as in Figma. The small
- * timestamp is 3.52:1 on the Warning fill, below AA's 4.5:1: an accepted
- * exception, kept so the warning Toast reads as one of the set. It is recorded
- * in the text-contrast baseline, and in the Toast docs.
+ * The warning header's title, timestamp, icon and × are the surface color, as
+ * on every header in Figma. Title and timestamp: accepted contrast exception,
+ * recorded in the text-contrast baseline; do not darken.
  */
 export const WarningHeader = () => (
     <Toast style="warning" title="Warning toast" timestamp="Just now" show autohide={false} data-testid="warning-header">
@@ -263,7 +260,7 @@ export const WarningHeader = () => (
     </Toast>
 );
 
-WarningHeader.parameters = WARNING_HEADER_CONTRAST_EXCEPTION;
+WarningHeader.parameters = WARNING_HEADER_A11Y_PARAMS;
 
 WarningHeader.play = async ({ canvasElement }) => {
     const toast = within(canvasElement).getByTestId('warning-header');
