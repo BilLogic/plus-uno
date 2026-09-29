@@ -7,7 +7,9 @@ import test from "node:test";
 import { fakeProvider } from "../src/agent/providers/fake";
 import {
   CLASSIFY_TIER,
+  ClassifyError,
   PAIN_CATEGORY_OF_SUB_TYPE,
+  classifyMaxTokens,
   SUB_TYPES,
   classifyAsks,
   painCategoryOf,
@@ -85,8 +87,32 @@ test("an ask the answer leaves out is blank", async () => {
 });
 
 test("a failed call or an unreadable answer throws, so nothing is written from it", async () => {
-  await assert.rejects(classifyAsks(fakeProvider({ generateFailMessage: "429" }), ["a"]), /429/);
-  await assert.rejects(classifyAsks(fakeProvider({ generateReplies: ["I think it is a recap"] }), ["a"]), /unreadable/);
+  await assert.rejects(classifyAsks(fakeProvider({ generateFailMessage: "429" }), ["a"]), (err: unknown) => {
+    assert.ok(err instanceof ClassifyError);
+    assert.equal(err.kind, "failed");
+    return true;
+  });
+  await assert.rejects(classifyAsks(fakeProvider({ generateUnavailableMessage: "no key" }), ["a"]), /unavailable/);
+});
+
+test("an unreadable answer's error names its length, never its words", async () => {
+  const reply = "I think SECRET-PHRASE is a recap";
+  await assert.rejects(classifyAsks(fakeProvider({ generateReplies: [reply] }), ["a"]), (err: unknown) => {
+    assert.ok(err instanceof ClassifyError);
+    assert.equal(err.kind, "unreadable");
+    assert.equal(err.message, `classifier unreadable: ${reply.length} chars, not a JSON object`);
+    assert.ok(!err.message.includes("SECRET"));
+    return true;
+  });
+});
+
+test("the output ceiling leaves room for the tier's thinking", async () => {
+  assert.equal(classifyMaxTokens(1), 2_048);
+  assert.equal(classifyMaxTokens(20), 2_048);
+  assert.equal(classifyMaxTokens(40), 2_600);
+  const fake = fakeProvider({ generateReplies: ['{"1": "Domain fact"}'] });
+  await classifyAsks(fake, ["a"]);
+  assert.equal(fake.generated[0]!.maxTokens, 2_048);
 });
 
 test("no asks, no call", async () => {

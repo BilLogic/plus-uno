@@ -14,6 +14,7 @@
 //
 // PURE: no `Env`, no Workers global. `Env` stops in `./production.ts`.
 
+import type { ConversationType } from "../turn/turn";
 import type { PainCategory, SubType } from "./categories";
 
 /** One turn, as the `turns` table holds it. Field names are camelCase here and
@@ -28,11 +29,16 @@ export interface TurnRecord {
   build: string;
   /** Slack user id of the asker. */
   requesterId: string;
-  /** The code's surface: `assistant` is the app DM, `channel` everything else. */
+  /** The code's surface: `assistant` is the app DM, `channel` everything else
+   *  — a group DM included, since it is delivered like a channel. Who the
+   *  conversation belongs to is `conversationType`. */
   surface: "assistant" | "channel";
+  /** `channel` · `group` (private channel) · `mpim` (group DM) · `im` (app DM);
+   *  null when the event did not say (an `app_mention`). */
+  conversationType: ConversationType | null;
   /** True when the ask arrived inside an existing thread. */
   inThread: boolean;
-  /** The channel id, for channel turns only — null for DM turns. */
+  /** The channel id, for channel turns only — null for a DM or group DM. */
   channelId: string | null;
 
   // ── timing ──
@@ -82,8 +88,9 @@ export interface TurnRecord {
 
   // ── corpus categories (`./categories.ts`) ──
   /** What a CHANNEL ask said, kept only until the end-of-day classifier labels
-   *  it, and never past 14 days (ADR-030). Always null for a DM turn and for
-   *  test traffic: those never store text at any point. */
+   *  it, and never past 14 days (ADR-030). Null — at every point — unless the
+   *  conversation is known to be a channel (`keepsRequestText`), and for test
+   *  traffic. */
   requestText: string | null;
   /** The corpus Sub-type, exact-matched to the options; null is blank. */
   subType: SubType | null;

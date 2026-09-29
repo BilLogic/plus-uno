@@ -14,7 +14,8 @@ import { slackTurnWiring } from "../src/slack/turn-adapter";
 import { createInMemoryThreadState } from "../src/thread-state/index";
 import { recordingDelivery, runTurn } from "../src/turn/index";
 import type { Env } from "../src/types";
-import type { TurnRecord, UsageLog } from "../src/usage/index";
+import { fakeProvider } from "../src/agent/providers/fake";
+import { classifyAsks, type TurnRecord, type UsageLog } from "../src/usage/index";
 import { BUILD } from "../src/version";
 import { CHANNEL, PENDING, REF, harness, request } from "./helpers/turn-harness";
 
@@ -50,7 +51,7 @@ test("an answered turn records who, where, when, what ran and what it cost", asy
     ],
   });
 
-  const outcome = await runTurn(request(), h.deps);
+  const outcome = await runTurn(request({ conversationType: "channel" }), h.deps);
   assert.equal(outcome.disposition, "answered");
 
   const row = only(h.usage.records());
@@ -59,6 +60,7 @@ test("an answered turn records who, where, when, what ran and what it cost", asy
     build: BUILD,
     requesterId: "U1",
     surface: "channel",
+    conversationType: "channel",
     inThread: true,
     channelId: CHANNEL,
     askTs: "1700000000.000200",
@@ -234,7 +236,7 @@ test("channel asks and test traffic are never classified in the turn", async () 
     return "Domain fact" as const;
   };
   // A channel ask waits for the end-of-day run.
-  await runTurn(request(), harness({ classifyAsk }).deps);
+  await runTurn(request({ conversationType: "channel" }), harness({ classifyAsk }).deps);
   // A DM greeting is test traffic.
   const greeting = harness({
     classifyAsk,
@@ -250,9 +252,46 @@ test("channel asks and test traffic are never classified in the turn", async () 
   assert.deepEqual([g.testTraffic, g.requestText, g.painCategory], [true, null, null]);
 });
 
+test("a group-DM ask is labelled in the turn, and its text is never stored", async () => {
+  const h = harness({ classifyAsk: async () => "Relay/routing" });
+  await runTurn(request({ conversationType: "mpim", text: "who owns the tutor import?" }), h.deps);
+  const row = only(h.usage.records());
+  assert.equal(row.requestText, null);
+  assert.equal(row.conversationType, "mpim");
+  assert.equal(row.channelId, null);
+  assert.deepEqual([row.subType, row.painCategory], ["Relay/routing", 4]);
+  assert.ok(!JSON.stringify(h.usage.records()).includes("tutor import"), "no trace of the words");
+});
+
+test("an ask whose conversation type is unknown (an app_mention) is labelled in the turn, with no text", async () => {
+  const h = harness({ classifyAsk: async () => "Artifact location" });
+  await runTurn(request(), h.deps);
+  const row = only(h.usage.records());
+  assert.deepEqual([row.conversationType, row.requestText, row.subType], [null, null, "Artifact location"]);
+});
+
+test("the classifier's words never reach a log line", async () => {
+  const errors: string[] = [];
+  const original = console.error;
+  console.error = (...args: unknown[]) => errors.push(args.map(String).join(" "));
+  try {
+    const reply = "I would call this SECRET-PHRASE a recap";
+    const h = harness({
+      classifyAsk: async (text) => (await classifyAsks(fakeProvider({ generateReplies: [reply] }), [text]))[0] ?? null,
+    });
+    await runTurn(request({ ...DM, text: "PRIVATE-ASK about the footer" }), h.deps);
+  } finally {
+    console.error = original;
+  }
+  const line = errors.find((e) => e.includes("not classified"));
+  assert.ok(line, "the failure is logged");
+  assert.match(line!, /unreadable: \d+ chars/);
+  assert.ok(!errors.some((e) => e.includes("SECRET-PHRASE") || e.includes("PRIVATE-ASK")));
+});
+
 test("a channel ask that is test traffic keeps no text", async () => {
   const h = harness({ testChannelIds: [CHANNEL] });
-  await runTurn(request(), h.deps);
+  await runTurn(request({ conversationType: "channel" }), h.deps);
   assert.equal(only(h.usage.records()).requestText, null);
 });
 

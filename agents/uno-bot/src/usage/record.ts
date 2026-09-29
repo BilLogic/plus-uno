@@ -7,7 +7,7 @@
 // whether the turn was test traffic. Pure, so each rule is a table test.
 
 import type { ModelTier } from "../agent/routing";
-import type { TurnDisposition } from "../turn/turn";
+import type { ConversationType, TurnDisposition } from "../turn/turn";
 import { painCategoryOf, type SubType } from "./categories";
 import { estimateCostUsd, type TokenSpend } from "./prices";
 import type { TurnRecord } from "./store";
@@ -49,6 +49,8 @@ export interface TurnRecordFacts {
   testChannelIds: readonly string[];
   requesterId: string;
   surface: "assistant" | "channel";
+  /** Whose conversation, when the event said (`turn/request.ts`). */
+  conversationType?: ConversationType;
   inThread: boolean;
   channel: string;
   /** The asker's message ts. */
@@ -169,6 +171,21 @@ export function turnIdOf(channel: string, askTs: string, startedAt: number): str
 /** The most of a channel ask the record keeps for its classifier. */
 export const MAX_REQUEST_TEXT_CHARS = 2_000;
 
+/**
+ * Whether an ask made here may be stored as text for the end-of-day
+ * classifier: only in a conversation KNOWN to be a channel, public or private.
+ * A DM, a group DM and a conversation of unknown type never store text; their
+ * asks are labelled in the turn instead (`turn/turn.ts`).
+ */
+export function keepsRequestText(conversationType: ConversationType | null | undefined): boolean {
+  return conversationType === "channel" || conversationType === "group";
+}
+
+/** A group DM or the app DM: a conversation between people, not a channel. */
+function isDirect(conversationType: ConversationType | undefined): boolean {
+  return conversationType === "im" || conversationType === "mpim";
+}
+
 export function buildTurnRecord(facts: TurnRecordFacts): TurnRecord {
   const askedAt = askedAtOf(facts.askTs, facts.startedAt);
   const usage = facts.spend?.usage;
@@ -179,8 +196,9 @@ export function buildTurnRecord(facts: TurnRecordFacts): TurnRecord {
     build: facts.build,
     requesterId: facts.requesterId,
     surface: facts.surface,
+    conversationType: facts.conversationType ?? null,
     inThread: facts.inThread,
-    channelId: facts.surface === "channel" ? facts.channel : null,
+    channelId: facts.surface === "channel" && !isDirect(facts.conversationType) ? facts.channel : null,
     askTs: facts.askTs,
     askedAt,
     firstAnswerAt: facts.firstAnswerAt,
@@ -205,11 +223,13 @@ export function buildTurnRecord(facts: TurnRecordFacts): TurnRecord {
     stopUsed: facts.disposition === "stopped",
     selfFiledTicketUrl: selfFiledTicketOf(facts.executed),
     testTraffic,
-    // A DM ask is never stored as text, and test traffic is never classified,
-    // so neither keeps any. A channel ask keeps its text for the end-of-day
-    // classifier, which nulls it in the same write that labels it.
+    // Only a real ask in a known channel keeps its text, for the end-of-day
+    // classifier, which nulls it in the same write that labels it. A DM, a
+    // group DM, an unknown conversation and test traffic never store any.
     requestText:
-      facts.surface === "channel" && !testTraffic ? facts.question.slice(0, MAX_REQUEST_TEXT_CHARS) : null,
+      keepsRequestText(facts.conversationType) && !testTraffic
+        ? facts.question.slice(0, MAX_REQUEST_TEXT_CHARS)
+        : null,
     subType: null,
     // Ticket kickoff needs no classifier: a real turn that staged a card is 7.
     painCategory: testTraffic ? null : painCategoryOf(null, staged),

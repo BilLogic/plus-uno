@@ -171,8 +171,11 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
       log: usageLogFor(env),
       origin: wiring.origin,
       testChannelIds: testChannelIdsOf(env),
-      // A DM ask's label, taken in the turn on the same adapter the turn ran on.
-      classifyAsk: async (text) => (await classifyAsks(selectProvider(env), [text]))[0] ?? null,
+      // An ask's in-turn label, on the same adapter the turn ran on — only
+      // when there is a database to keep it in; otherwise no call is spent.
+      ...(env.USAGE_DB
+        ? { classifyAsk: async (text: string) => (await classifyAsks(selectProvider(env), [text]))[0] ?? null }
+        : {}),
     },
 
     // The reads a card needs and Turn may not make itself — shared with the

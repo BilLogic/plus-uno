@@ -142,10 +142,16 @@ const PROGRESS_LABEL = "Reading the question and this thread";
  *  lingers on a slow database before the record is given up as lost. */
 export const USAGE_WRITE_TIMEOUT_MS = 1_000;
 
-/** The longest a DM ask's in-turn classification may hold the end of a turn.
- *  The answer is already out, but the thread's next job waits behind it, so
- *  this stays short. Past it the row is written unlabelled, as a failed call is. */
-export const ASK_CLASSIFY_TIMEOUT_MS = 1_500;
+/**
+ * The longest an ask's in-turn classification may hold the end of a turn.
+ * The answer is already out; what waits is the thread's next job. NOT
+ * MEASURED: a flash-lite one-shot at the chill tier's `low` thinking, with a
+ * few hundred tokens in and a dozen out, is expected around 1–2 s at p50 on
+ * Vertex, so 4 s is meant to cover the tail without holding a follow-up long.
+ * Past it the row is written unlabelled, as a failed call is. Read the
+ * `[usage] … not classified: timed out` lines to tune it.
+ */
+export const ASK_CLASSIFY_TIMEOUT_MS = 4_000;
 
 // ── The request ──────────────────────────────────────────────────────────────
 
@@ -162,6 +168,18 @@ export const ASK_CLASSIFY_TIMEOUT_MS = 1_500;
  */
 export type TurnSurface = "channel" | "assistant";
 
+/**
+ * What kind of conversation an ask was made in, as Slack types it: a public
+ * `channel`, a private `group`, a group DM (`mpim`) or the app DM (`im`).
+ *
+ * NOT the surface. `surface` says where the answer is delivered, and a group
+ * DM is delivered like a channel; this says whose conversation it is, which is
+ * what the usage record's privacy rules read (`usage/record.ts`). Unknown when
+ * the event did not say — an `app_mention` carries no `channel_type` — and
+ * unknown is treated as private.
+ */
+export type ConversationType = "channel" | "group" | "mpim" | "im";
+
 export interface TurnRequest {
   // ----- who -----
   /** Slack user id of the person whose turn this is. */
@@ -177,6 +195,8 @@ export interface TurnRequest {
   /** The person's own message, which is what a reaction lands on. */
   userMsgTs: string;
   surface: TurnSurface;
+  /** Whose conversation this is, when known (`conversationTypeOf`). */
+  conversationType?: ConversationType;
   /** True when the message arrived inside an existing thread. A turn that
    *  OPENED its thread is the one allowed to title it, and the antecedent
    *  window only ever opens for a top-level channel @mention. */
@@ -357,9 +377,10 @@ export interface TurnUsage {
   writeTimeoutMs?: number;
   /**
    * Label one ask with its corpus Sub-type — one short `chill` call
-   * (`usage/categories.ts` `classifyAsks`). Asked for a real DM ask only, as
-   * the turn finishes, because a DM row never holds text for the end-of-day
-   * classifier to read. Absent, DM asks are recorded unlabelled.
+   * (`usage/categories.ts` `classifyAsks`). Asked, as the turn finishes, only
+   * for a real ask whose row keeps no text for the end-of-day classifier to
+   * read (a DM, a group DM, an unknown conversation). Absent, those asks are
+   * recorded unlabelled.
    */
   classifyAsk?(text: string): Promise<SubType | null>;
   /** Overrides `ASK_CLASSIFY_TIMEOUT_MS`. */
@@ -600,6 +621,7 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
     testChannelIds: deps.usage.testChannelIds,
     requesterId: request.userId,
     surface: request.surface,
+    ...(request.conversationType ? { conversationType: request.conversationType } : {}),
     inThread: request.threaded,
     channel: request.channel,
     askTs: request.userMsgTs,
@@ -615,24 +637,25 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
     ...(outcome.staged ? { proposalId: outcome.staged.proposal.proposalTs } : {}),
     ...(outcome.executed ? { executed: outcome.executed } : {}),
   });
-  await recordTurn(await labelDmAsk(record, request.text, deps.usage, clock), deps.usage);
+  await recordTurn(await labelInTurn(record, request.text, deps.usage, clock), deps.usage);
   return outcome;
 }
 
 /**
- * A DM ask, labelled in the turn: the one moment its text exists, since the
- * row never holds it. Channel asks, test traffic (greetings included) and a
- * caller with no classifier are left as they are. A call that fails or
- * outlasts its timeout leaves the row unlabelled and is logged — it never
- * fails the turn.
+ * An ask whose row will never hold its text — a DM, a group DM, a conversation
+ * of unknown type — labelled in the turn: the one moment its text exists.
+ * A channel ask (labelled at the end of the day), test traffic (greetings
+ * included) and a caller with no classifier are left as they are. A call that
+ * fails or outlasts its timeout leaves the row unlabelled and is logged
+ * without the model's words — it never fails the turn.
  */
-async function labelDmAsk(
+async function labelInTurn(
   record: TurnRecord,
   text: string,
   usage: TurnUsage,
   clock: () => number,
 ): Promise<TurnRecord> {
-  if (record.surface !== "assistant" || record.testTraffic || !usage.classifyAsk) return record;
+  if (record.requestText !== null || record.testTraffic || !usage.classifyAsk) return record;
   try {
     const subType = await withTimeout(
       usage.classifyAsk(text),

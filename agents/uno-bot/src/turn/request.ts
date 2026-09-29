@@ -20,7 +20,7 @@ import type { AgentImage, HistoricalImages } from "../agent/provider-conversatio
 import type { ModelTier } from "../agent/routing";
 import { proposalReplyThread } from "../thread-state/index";
 import type { HistoryTurn, PendingProposal, VisionReference } from "../thread-state/index";
-import type { TurnRequest, TurnSurface } from "./turn";
+import type { ConversationType, TurnRequest, TurnSurface } from "./turn";
 import type { IntakeThread } from "./intake-channel";
 
 /**
@@ -37,6 +37,8 @@ export interface TurnFacts {
   replyTs?: string;
   userMsgTs: string;
   threaded: boolean;
+  /** Slack's `channel_type` for the event, when the event carried one. */
+  channelType?: string;
   text: string;
   /** The body including attachment lines, when it differs from `text`. */
   attachmentsText?: string;
@@ -79,6 +81,18 @@ export function turnSurfaceOf(channel: string): TurnSurface {
 }
 
 /**
+ * Whose conversation a channel id is: Slack's `channel_type` when the event
+ * carried one, else what the id alone proves — an app DM (`D…`) is `im` — else
+ * unknown. A value Slack adds later is unknown too, never guessed at.
+ */
+export function conversationTypeOf(channel: string, channelType?: string): ConversationType | undefined {
+  if (channelType === "channel" || channelType === "group" || channelType === "mpim" || channelType === "im") {
+    return channelType;
+  }
+  return turnSurfaceOf(channel) === "assistant" ? "im" : undefined;
+}
+
+/**
  * The thread a turn's card lives in: where its pending proposal is read, and
  * where a card it stages is posted and kept.
  *
@@ -107,6 +121,9 @@ export function buildTurnRequest(facts: TurnFacts): TurnRequest {
     ...(facts.replyTs ? { replyTs: facts.replyTs } : {}),
     userMsgTs: facts.userMsgTs,
     surface: turnSurfaceOf(facts.channel),
+    ...(conversationTypeOf(facts.channel, facts.channelType)
+      ? { conversationType: conversationTypeOf(facts.channel, facts.channelType)! }
+      : {}),
     threaded: facts.threaded,
     text: facts.text,
     ...(attachmentsText ? { attachmentsText } : {}),

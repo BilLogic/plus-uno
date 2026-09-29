@@ -91,6 +91,8 @@ test("each run is planned with its jobs, keyed by the UTC run date", () => {
   assert.deepEqual(morning.jobs.map((j) => [j.key, j.kind]), [
     ["figma-library-post", "figma-library-post"],
     ["figma-library-track", "figma-library-track"],
+    // Both runs purge, so text never outlives its 14 days over a weekend.
+    ["usage-text-purge", "usage-text-purge"],
   ]);
   const endOfDay = planRun("end-of-day", at(22, 0));
   assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind, j.after]), [

@@ -26,7 +26,8 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * post turns it into a card in #plus-universal, and the morning track follows
  * each posted card to its PR (src/figma-poll.ts, src/figma-library/). The
  * usage record's two: the end-of-day classify jobs label a batch of channel
- * asks each, and the purge nulls text past its 14 days (src/usage/classify-run.ts).
+ * asks each, and the purge — in both runs — keeps text under its 14 days
+ * (src/usage/classify-run.ts).
  */
 export type ScheduledJobKind =
   | "noop"
@@ -70,6 +71,9 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
   morning: [
     { key: "figma-library-post", kind: "figma-library-post" },
     { key: "figma-library-track", kind: "figma-library-track" },
+    // Both runs purge, so no text outlives 14 days across a weekend and one
+    // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).
+    { key: "usage-text-purge", kind: "usage-text-purge" },
   ],
   "end-of-day": [
     { key: "figma-library-poll", kind: "figma-library-poll" },

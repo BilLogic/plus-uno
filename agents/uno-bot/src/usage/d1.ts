@@ -11,6 +11,7 @@
 // run is what exercises it against a real (local) D1.
 
 import { chargeD1Query } from "../net";
+import type { ConversationType } from "../turn/turn";
 import { subTypeOf, type PainCategory } from "./categories";
 import type { TurnRecord, UsageLog } from "./store";
 
@@ -53,6 +54,7 @@ const COLUMNS = [
   "stop_used",
   "self_filed_ticket_url",
   "test_traffic",
+  "conversation_type",
   "request_text",
   "sub_type",
   "pain_category",
@@ -115,6 +117,7 @@ function toRow(r: TurnRecord): unknown[] {
     stop_used: bool(r.stopUsed),
     self_filed_ticket_url: r.selfFiledTicketUrl,
     test_traffic: bool(r.testTraffic),
+    conversation_type: r.conversationType,
     request_text: r.requestText,
     sub_type: r.subType,
     pain_category: r.painCategory,
@@ -124,6 +127,9 @@ function toRow(r: TurnRecord): unknown[] {
 }
 
 const str = (v: unknown): string => String(v);
+const CONVERSATION_TYPES = ["channel", "group", "mpim", "im"] as const;
+const conversationTypeOf = (v: unknown): ConversationType | null =>
+  CONVERSATION_TYPES.find((t) => t === v) ?? null;
 const strOrNull = (v: unknown): string | null => (v == null ? null : String(v));
 const num = (v: unknown): number => Number(v);
 const numOrNull = (v: unknown): number | null => (v == null ? null : Number(v));
@@ -161,6 +167,7 @@ function fromRow(row: Row): TurnRecord {
     stopUsed: num(row.stop_used) === 1,
     selfFiledTicketUrl: strOrNull(row.self_filed_ticket_url),
     testTraffic: num(row.test_traffic) === 1,
+    conversationType: conversationTypeOf(row.conversation_type),
     requestText: strOrNull(row.request_text),
     subType: subTypeOf(row.sub_type),
     painCategory: numOrNull(row.pain_category) as PainCategory | null,

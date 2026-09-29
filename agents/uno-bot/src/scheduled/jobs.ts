@@ -35,24 +35,25 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
     console.log(`[figma-library] track: ${(await runLibraryTrack(env, { dryRun })).summary}`);
   },
   // End of day: label one batch of the channel asks still holding text, and
-  // null that text in the same write.
+  // null that text in the same write. Counts only — never the model's words.
   "usage-classify": async (env, job, { dryRun }) => {
     const store = askCategoriesFor(env);
     if (!store) return;
-    const { labelled, blank } = await runClassifyBatch({
-      store,
-      provider: selectProvider(env),
-      now: () => Date.now(),
-      dryRun,
-    });
-    console.log(`[usage] ${job.key}: ${labelled} ask(s) labelled, ${blank} blank${dryRun ? " (dry run)" : ""}`);
+    const r = await runClassifyBatch({ store, provider: selectProvider(env), now: () => Date.now(), dryRun });
+    const verb = dryRun ? "would label" : "labelled";
+    console.log(
+      `[usage] ${job.key}: ${verb} ${r.labelled} ask(s) (${r.blank} blank), ${r.failed} failed, ${r.givenUp} given up`,
+    );
   },
-  // End of day: text older than 14 days goes, whatever happened to it.
+  // Both runs: text past the purge cutoff goes, whatever happened to it.
   "usage-text-purge": async (env, _job, { dryRun }) => {
     const store = askCategoriesFor(env);
     if (!store) return;
-    const cleared = await runTextPurge({ store, now: () => Date.now(), dryRun });
-    console.log(`[usage] text purge: ${cleared} row(s) cleared${dryRun ? " (dry run, nothing written)" : ""}`);
+    if (dryRun) {
+      console.log("[usage] text purge: dry run, nothing cleared");
+      return;
+    }
+    console.log(`[usage] text purge: ${await runTextPurge({ store, now: () => Date.now(), dryRun })} row(s) cleared`);
   },
 };
 
