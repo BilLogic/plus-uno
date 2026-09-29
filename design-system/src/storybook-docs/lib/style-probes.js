@@ -20,6 +20,20 @@ export const tokenColor = (host, token) => {
     return value;
 };
 
+/**
+ * What a `box-shadow` value resolves to once computed, read through a probe, so
+ * a story compares a shadow against its token (`var(--elevation-light-2)`) or
+ * a composition of tokens, never against a hand-typed copy of the numbers.
+ */
+export const computedShadow = (host, value) => {
+    const probe = document.createElement('span');
+    probe.style.boxShadow = value;
+    host.appendChild(probe);
+    const shadow = getComputedStyle(probe).boxShadow;
+    probe.remove();
+    return shadow;
+};
+
 /** The alpha channel of a computed color; 1 when it has none. */
 export const alpha = (color) => {
     const parts = color.match(/[\d.]+/g).map(Number);

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { expect, fn, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
-import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { computedShadow, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Tag, { AVATAR_TAG_TYPES, TAG_BEHAVIORS, TAG_COLORS, TagContext } from './Tag';
 
 /**
@@ -1030,6 +1030,187 @@ Truncation.play = async ({ canvasElement }) => {
     await userEvent.tab();
     await expect(canvas.getByText('Short'), 'a label that fits takes no focus').not.toHaveFocus();
     await expect(canvas.getByText('Short')).not.toHaveAttribute('tabindex');
+};
+
+/* --------------------------------------------------------------- on images */
+
+/*
+ * A stand-in for a lesson thumbnail: a gradient from a warm hue to the dark
+ * inverse surface, drawn from tokens so no story depends on a network image,
+ * and dark enough at one end that an outlined tag would sink into it.
+ */
+const thumbnail = {
+    position: 'relative',
+    width: '480px',
+    maxWidth: '100%',
+    height: '160px',
+    borderRadius: 'var(--size-element-radius-lg, 8px)',
+    overflow: 'hidden',
+};
+const picture = {
+    position: 'absolute',
+    inset: 0,
+    backgroundImage: 'linear-gradient(135deg, var(--color-social-emotional-container, #ffdea0), '
+        + 'var(--color-tertiary, #0e8175) 45%, var(--color-inverse-surface, #2e3133))',
+};
+/* Placed 8 from the corner, as the Figma docs place it. */
+const onPicture = {
+    ...row,
+    position: 'absolute',
+    top: 'var(--size-spacing-small-space-100, 8px)',
+    left: 'var(--size-spacing-small-space-100, 8px)',
+    right: 'var(--size-spacing-small-space-100, 8px)',
+};
+
+/**
+ * Tags on a thumbnail: `isElevated` lifts a read-only or link tag onto the
+ * picture. Figma draws it on plain tags; a person, agent or team tag takes the
+ * same ground, since nothing about the avatar changes.
+ */
+export const OnImages = () => (
+    <div style={thumbnail}>
+        <div style={picture} aria-hidden="true" />
+        <div style={onPicture}>
+            <Tag color="blue" isElevated data-testid="read-only">Algebra</Tag>
+            <Tag color="green" isElevated>Advocacy</Tag>
+            <Tag color="grey" isElevated>Video</Tag>
+            <Tag type="person" color="blue" isElevated data-testid="person">Rosa Chen</Tag>
+            <Tag behavior="link" color="magenta" href="#lesson" isElevated>Open lesson</Tag>
+            <Tag behavior="link" color="teal" href="#unit" isElevated onRemove={() => {}} data-testid="split">
+                Unit 3
+            </Tag>
+            <TagContext.Provider value={{ isDisabled: true }}>
+                <Tag color="yellow" isElevated data-testid="disabled">Archived</Tag>
+            </TagContext.Provider>
+        </div>
+    </div>
+);
+
+/**
+ * Elevated: a solid Surface Container Lowest fill, no border, the Elevation 2
+ * shadow and neutral text, with the hue kept on the swatch, still 22 tall. A
+ * link's hover and press lay the on-surface 08 and 12 layers over the solid
+ * fill rather than replacing it, and its focus ring has a 2px surface gap
+ * inside it, so the ring reads on a dark picture.
+ */
+OnImages.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const t = (token) => tokenColor(canvasElement, token);
+    const ground = t('--color-surface-container-lowest');
+    const shadow = computedShadow(canvasElement, 'var(--elevation-light-2)');
+
+    const tags = [
+        canvas.getByTestId('read-only'),
+        canvas.getByText('Advocacy').parentElement,
+        canvas.getByText('Video').parentElement,
+        canvas.getByTestId('person'),
+        canvas.getByRole('link', { name: 'Open lesson' }),
+        canvas.getByTestId('split'),
+    ];
+    for (const tag of tags) {
+        const s = getComputedStyle(tag);
+        const name = tag.textContent;
+        await expect(px(s.height), `${name} is 22 tall`).toBe(22);
+        await expect(s.backgroundColor, `${name} has a solid fill`).toBe(ground);
+        await expect(s.borderTopColor, `${name} has no border`).toBe(CLEAR);
+        await expect(s.boxShadow, `${name} has the Elevation 2 shadow`).toBe(shadow);
+        await expect(s.color, `${name} text is neutral`).toBe(t('--color-on-surface'));
+    }
+    const swatch = canvas.getByTestId('read-only').querySelector('[aria-hidden="true"]');
+    await expect(getComputedStyle(swatch).backgroundColor, 'the hue stays on the swatch')
+        .toBe(t('--color-technology-tools'));
+    const avatar = canvas.getByTestId('person').querySelector('[aria-hidden="true"]');
+    await expect(getComputedStyle(avatar).backgroundColor, 'the color stays on the avatar')
+        .toBe(t('--color-technology-tools-container'));
+
+    // Disabled from the field: the solid ground and shadow stay, since the
+    // translucent disabled fill would sink into the picture; the words go
+    // to the disabled color, and hovering changes nothing.
+    const disabled = canvas.getByTestId('disabled');
+    await expect(getComputedStyle(disabled).backgroundColor).toBe(ground);
+    await expect(getComputedStyle(disabled).boxShadow).toBe(shadow);
+    await expect(getComputedStyle(disabled).color).toBe(t('--color-secondary-text'));
+    await expect(whileForced(disabled, ':hover', 'backgroundColor')).toBe(ground);
+
+    // Hover and press: the state layer sits over the solid fill, which stays.
+    const layer = (token) => `linear-gradient(${t(token)}, ${t(token)})`;
+    const link = canvas.getByRole('link', { name: 'Open lesson' });
+    for (const [pseudo, token] of [[':hover', '--color-on-surface-state-08'], [':active', '--color-on-surface-state-12']]) {
+        await expect(whileForced(link, pseudo, 'backgroundColor'), `${pseudo} keeps the fill`).toBe(ground);
+        await expect(whileForced(link, pseudo, 'backgroundImage'), `${pseudo} layer`).toBe(layer(token));
+        await expect(whileForced(link, pseudo, 'boxShadow'), `${pseudo} keeps the shadow`).toBe(shadow);
+    }
+    const split = canvas.getByTestId('split');
+    const splitLink = canvas.getByRole('link', { name: 'Unit 3' });
+    await expect(whileForced(splitLink, ':hover', 'backgroundColor', split)).toBe(ground);
+    await expect(whileForced(splitLink, ':hover', 'backgroundImage', split)).toBe(layer('--color-on-surface-state-08'));
+    await expect(whileForced(splitLink, ':active', 'backgroundImage', split)).toBe(layer('--color-on-surface-state-12'));
+
+    // Focus: the standard ring, 2px outside, with the 2px between it and the
+    // tag filled in the surface color.
+    const ring = t('--color-focus-ring');
+    const gapped = computedShadow(
+        canvasElement,
+        '0 0 0 var(--size-element-stroke-lg) var(--color-surface-container-lowest), var(--elevation-light-2)',
+    );
+    const expectGappedRing = async (el, measured, what) => {
+        const s = getComputedStyle(measured);
+        await expect(s.outlineStyle, what).toBe('solid');
+        await expect(px(s.outlineWidth), what).toBe(2);
+        await expect(px(s.outlineOffset), what).toBe(2);
+        await expect(s.outlineColor, what).toBe(ring);
+        await expect(s.boxShadow, `${what}: a 2px surface gap inside the ring`).toBe(gapped);
+    };
+    await userEvent.tab();
+    await expect(link).toHaveFocus();
+    await expectGappedRing(link, link, 'an elevated link');
+    await userEvent.tab();
+    await expect(splitLink).toHaveFocus();
+    await expectGappedRing(splitLink, split, 'an elevated split link');
+};
+
+/**
+ * Editing happens off the image, so `isElevated` is for read-only and link
+ * tags only. On a removable or selectable tag it is ignored, and development
+ * says so: the tag keeps its outline and gains no shadow.
+ */
+export const ElevatedOnlyReadOnlyAndLink = {
+    render: () => {
+        const [mounted, setMounted] = useState(false);
+        return (
+            <div style={row}>
+                <button type="button" onClick={() => setMounted(true)}>Mount elevated editable tags</button>
+                {mounted && (
+                    <>
+                        <Tag behavior="removable" color="purple" isElevated onRemove={() => {}} data-testid="removable">
+                            Geometry
+                        </Tag>
+                        <Tag behavior="selectable" color="purple" isElevated>Fractions</Tag>
+                    </>
+                )}
+            </div>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const warn = spyOn(console, 'warn').mockImplementation(() => {});
+        try {
+            await userEvent.click(canvas.getByRole('button', { name: 'Mount elevated editable tags' }));
+            const border = tokenColor(canvasElement, '--color-mastering-content-border-subtle');
+            const removable = canvas.getByTestId('removable');
+            const selectable = canvas.getByRole('button', { name: 'Fractions' });
+            for (const [tag, name] of [[removable, 'removable'], [selectable, 'selectable']]) {
+                const s = getComputedStyle(tag);
+                await expect(s.boxShadow, `${name} gains no shadow`).toBe('none');
+                await expect(s.borderTopColor, `${name} keeps its outline`).toBe(border);
+                await expect(s.backgroundColor, `${name} keeps its clear ground`).toBe(CLEAR);
+            }
+            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('`isElevated` is only for behavior="read-only" or "link"; it is ignored on "removable"'));
+            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('`isElevated` is only for behavior="read-only" or "link"; it is ignored on "selectable"'));
+        } finally {
+            warn.mockRestore();
+        }
+    },
 };
 
 /* ------------------------------------------------------------- deprecation */
