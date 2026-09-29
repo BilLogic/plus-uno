@@ -15,7 +15,7 @@
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `size` | enum | `'md'` | Divider thickness |
+| `size` | enum | `'md'` | Divider thickness: sm 1px, md 1.5px, lg 2px, xl 3px. The pixel strings alias the names; "2.5px" maps to xl and draws 3px. |
 | `style` | enum | `'light'` | — |
 | `opacity10` | bool | `false` | Apply 10% opacity for subtle separation |
 | `id` | string | — | — |

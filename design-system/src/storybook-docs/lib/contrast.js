@@ -18,10 +18,8 @@ import { composite, contrast, parseColour } from '../../lib/tokens.mjs';
  * @returns {number}
  */
 export function contrastRatio(foreground, background) {
-    const back = parseColour(background);
-    const front = parseColour(foreground);
-    if (!back || !front) throw new Error(`cannot read ${foreground} on ${background}`);
-    return contrast(front.a < 1 ? composite(front, back) : front, back);
+    const { front, back } = flatten(foreground, background);
+    return contrast(front, back);
 }
 
 /**
@@ -34,9 +32,14 @@ export function contrastRatio(foreground, background) {
  * @returns {string}
  */
 export function paintedOver(color, background) {
+    const { r, g, b } = flatten(color, background).front;
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
+/** Both colors parsed, the front one laid over the (opaque) back one. */
+function flatten(color, background) {
     const back = parseColour(background);
     const front = parseColour(color);
     if (!back || !front) throw new Error(`cannot read ${color} on ${background}`);
-    const { r, g, b } = front.a < 1 ? composite(front, back) : front;
-    return `rgb(${r}, ${g}, ${b})`;
+    return { front: front.a < 1 ? composite(front, back) : front, back };
 }

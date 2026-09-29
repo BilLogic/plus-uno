@@ -7,11 +7,7 @@
     display: flex !important;
     /* Override Bootstrap display: block    display: flex; */
     align-items: flex-start;
-    /*
-     * 4px corners. Figma binds the primitive `Border/Radius/radius-100` here
-     * rather than a semantic radius, so the Alert reads the same primitive.
-     */
-    border-radius: var(--size-border-radius-radius-100);
+    border-radius: var(--size-modal-radius-sm);
     width: 100%;
     /* Full width - responsive */
     max-width: 100%;

@@ -10,26 +10,21 @@
 /** A computed length as a number of pixels. */
 export const px = (value) => parseFloat(value);
 
-/** What a token resolves to as a computed color, read through a probe. */
-export const tokenColor = (host, token) => {
-    const probe = document.createElement('span');
-    probe.style.backgroundColor = `var(${token})`;
-    host.appendChild(probe);
-    const value = getComputedStyle(probe).backgroundColor;
-    probe.remove();
+/** Set `property` to `var(token)` on a throwaway span in `host`; return its computed value. */
+const probe = (host, property, token, extra = {}) => {
+    const span = document.createElement('span');
+    Object.assign(span.style, extra, { [property]: `var(${token})` });
+    host.appendChild(span);
+    const value = getComputedStyle(span)[property];
+    span.remove();
     return value;
 };
 
+/** What a token resolves to as a computed color, read through a probe. */
+export const tokenColor = (host, token) => probe(host, 'backgroundColor', token);
+
 /** What a length token resolves to, in pixels, read through a probe. */
-export const tokenLength = (host, token) => {
-    const probe = document.createElement('span');
-    probe.style.display = 'block';
-    probe.style.width = `var(${token})`;
-    host.appendChild(probe);
-    const value = px(getComputedStyle(probe).width);
-    probe.remove();
-    return value;
-};
+export const tokenLength = (host, token) => px(probe(host, 'width', token, { display: 'block' }));
 
 /** The alpha channel of a computed color; 1 when it has none. */
 export const alpha = (color) => {

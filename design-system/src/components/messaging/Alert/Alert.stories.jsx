@@ -12,7 +12,7 @@ export default {
     parameters: {
         layout: 'padded',
         changelog: [
-            { date: '2026-09-29', kind: 'changed', summary: 'The ground is each style\'s Container 08 state layer (`--color-<style>-container-state-08`) instead of its base-color state layer, and the corners are 4px (radius-100) instead of 6px, as Figma binds them. The left border reads `--size-element-stroke-xl`, which is now 3px.' },
+            { date: '2026-09-29', kind: 'changed', summary: 'The ground is each style\'s Container 08 state layer (`--color-<style>-container-state-08`) instead of its base-color state layer, and the corners are 4px (`--size-modal-radius-sm`) instead of 6px, as Figma draws them. The left border reads `--size-element-stroke-xl`, which is now 3px.' },
             { date: '2026-09-29', kind: 'added', summary: 'A leading icon on the first line of text, with a default per style: success circle-check, danger circle-exclamation, warning triangle-exclamation, and circle-info for primary, secondary and info. `leadingVisual` takes a Font Awesome solid name or a node to replace it, or `false` to remove it.' },
             { date: '2026-09-29', kind: 'changed', summary: 'The border is one 3px line on the left edge, in each style\'s Border color (`--color-<style>-border`), instead of 1px on all four sides in the base color. Warning\'s border moves to its darker Border role, which holds 3:1 on every surface step.' },
             { date: '2026-09-29', kind: 'changed', summary: 'Title and body text are `--color-on-surface` in every style, instead of the style\'s on-container color. Links in the body inherit it.' },
@@ -391,9 +391,11 @@ BorderAndText.play = async ({ canvasElement }) => {
         await expect(contrastRatio(s.borderLeftColor, ground), `${id}: border holds 3:1 on the darkest surface`)
             .toBeGreaterThanOrEqual(3);
 
-        // 4px corners (Border/Radius/radius-100) and the Container 08 ground.
+        // 4px corners (--size-modal-radius-sm) and the Container 08 ground.
+        const radius = tokenLength(canvasElement, '--size-modal-radius-sm');
+        await expect(radius, 'the radius token is 4px, as Figma draws it').toBe(4);
         for (const corner of ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft']) {
-            await expect(px(s[`border${corner}Radius`]), `${id}: ${corner} radius is 4px`).toBe(4);
+            await expect(px(s[`border${corner}Radius`]), `${id}: ${corner} radius is the modal-radius-sm token`).toBe(radius);
         }
         await expect(s.backgroundColor, `${id}: ground is the Container 08 state layer`)
             .toBe(tokenColor(canvasElement, `--color-${style}-container-state-08`));

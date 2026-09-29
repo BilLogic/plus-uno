@@ -11,6 +11,7 @@ export default {
     parameters: {
         changelog: [
             { date: '2026-09-29', kind: 'changed', summary: '`xl` is 3px instead of 2.5px: `--size-element-stroke-xl` now resolves to stroke-300, as Figma\'s Element/stroke-xl does.' },
+            { date: '2026-09-29', kind: 'changed', summary: '`size="2.5px"` now draws 3px: the alias still maps to `xl`.' },
         ],
         docs: {
             description: {
@@ -26,7 +27,7 @@ export default {
         size: {
             control: 'select',
             options: ['sm', 'md', 'lg', 'xl'],
-            description: 'Divider thickness',
+            description: 'Divider thickness: sm 1px, md 1.5px, lg 2px, xl 3px. The pixel strings alias the names; "2.5px" maps to xl and draws 3px.',
             table: { category: 'Design' }
         },
         opacity10: {
