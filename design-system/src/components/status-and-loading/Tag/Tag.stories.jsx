@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { expect, fn, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
-import { computedShadow, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { computedShadow, probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Tag, { AVATAR_TAG_TYPES, TAG_BEHAVIORS, TAG_COLORS, TagContext } from './Tag';
 
 /**
@@ -1073,7 +1073,7 @@ export const OnImages = () => (
         <div style={onPicture}>
             <Tag color="blue" isElevated data-testid="read-only">Algebra</Tag>
             <Tag color="green" isElevated>Advocacy</Tag>
-            <Tag color="grey" isElevated>Video</Tag>
+            <Tag behavior="link" color="grey" href="#video" isElevated>Video</Tag>
             <Tag type="person" color="blue" isElevated data-testid="person">Rosa Chen</Tag>
             <Tag behavior="link" color="magenta" href="#lesson" isElevated>Open lesson</Tag>
             <Tag behavior="link" color="teal" href="#unit" isElevated onRemove={() => {}} data-testid="split">
@@ -1102,7 +1102,7 @@ OnImages.play = async ({ canvasElement }) => {
     const tags = [
         canvas.getByTestId('read-only'),
         canvas.getByText('Advocacy').parentElement,
-        canvas.getByText('Video').parentElement,
+        canvas.getByRole('link', { name: 'Video' }),
         canvas.getByTestId('person'),
         canvas.getByRole('link', { name: 'Open lesson' }),
         canvas.getByTestId('split'),
@@ -1153,7 +1153,7 @@ OnImages.play = async ({ canvasElement }) => {
         canvasElement,
         '0 0 0 var(--size-element-stroke-lg) var(--color-surface-container-lowest), var(--elevation-light-2)',
     );
-    const expectGappedRing = async (el, measured, what) => {
+    const expectGappedRing = async (measured, what) => {
         const s = getComputedStyle(measured);
         await expect(s.outlineStyle, what).toBe('solid');
         await expect(px(s.outlineWidth), what).toBe(2);
@@ -1161,12 +1161,41 @@ OnImages.play = async ({ canvasElement }) => {
         await expect(s.outlineColor, what).toBe(ring);
         await expect(s.boxShadow, `${what}: a 2px surface gap inside the ring`).toBe(gapped);
     };
+    const video = canvas.getByRole('link', { name: 'Video' });
+    await userEvent.tab();
+    await expect(video).toHaveFocus();
+    await expectGappedRing(video, 'an elevated grey link');
+
+    /*
+     * The rule that draws the gap must draw the ring itself. The computed
+     * outline above would still pass if it only inherited the ring from the
+     * plain focus rule, but check:focus-ring scores each rule on its own
+     * strongest indicator, and a gap-only rule fails it. So find the focus
+     * rule that paints the gap on the focused tag, and read its own outline.
+     */
+    const gapRules = [...document.styleSheets]
+        .flatMap((sheet) => {
+            try {
+                return [...sheet.cssRules];
+            } catch {
+                return [];
+            }
+        })
+        .filter((rule) => rule.selectorText?.includes(':focus-visible')
+            && rule.style.getPropertyValue('box-shadow')
+            && video.matches(rule.selectorText));
+    await expect(gapRules.length, 'one focus rule paints the gap').toBe(1);
+    await expect(
+        probe(canvasElement, 'outline', gapRules[0].style.getPropertyValue('outline')),
+        'and that rule draws the standard ring itself',
+    ).toBe(probe(canvasElement, 'outline', '2px solid var(--color-focus-ring)'));
+
     await userEvent.tab();
     await expect(link).toHaveFocus();
-    await expectGappedRing(link, link, 'an elevated link');
+    await expectGappedRing(link, 'an elevated link');
     await userEvent.tab();
     await expect(splitLink).toHaveFocus();
-    await expectGappedRing(splitLink, split, 'an elevated split link');
+    await expectGappedRing(split, 'an elevated split link');
 };
 
 /**

@@ -484,6 +484,9 @@ $tag-colors: (
  * on anything else. The border turns clear rather than going away, so the tag
  * stays 22 tall.
  *
+ * The base tokens, not the `--surface-raised` role pair: that role layer is
+ * still an open proposal that no component consumes yet.
+ *
  * It sits after disabled on purpose: a disabled tag on a picture keeps its
  * solid ground, since the translucent disabled fill would sink into the image,
  * and takes only the disabled text and swatch.
@@ -522,8 +525,10 @@ $tag-colors: (
 /*
  * Focus: the standard ring 2px outside the tag, with the 2px between them
  * filled in the surface color, so the ring reads on a dark picture. The gap is
- * a spread shadow under the outline, so it follows the tag's corners. The ring
- * is restated here so this rule names its own affordance, not only the gap.
+ * a spread shadow under the outline, so it follows the tag's corners.
+ *
+ * The ring is restated rather than inherited: check:focus-ring scores each
+ * rule on its own strongest indicator, and the white gap alone would fail it.
  */
 .plus-tag--elevated:focus-visible,
 .plus-tag--elevated.plus-tag--split:has(> .plus-tag__link:focus-visible) {

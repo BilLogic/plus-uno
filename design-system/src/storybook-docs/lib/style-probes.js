@@ -10,29 +10,29 @@
 /** A computed length as a number of pixels. */
 export const px = (value) => parseFloat(value);
 
-/** What a token resolves to as a computed color, read through a probe. */
-export const tokenColor = (host, token) => {
-    const probe = document.createElement('span');
-    probe.style.backgroundColor = `var(${token})`;
-    host.appendChild(probe);
-    const value = getComputedStyle(probe).backgroundColor;
-    probe.remove();
-    return value;
+/**
+ * What `value` computes to as `property` (a camelCase style name), read
+ * through a throwaway element inside `host`, so tokens resolve in the
+ * story's own cascade.
+ */
+export const probe = (host, property, value) => {
+    const el = document.createElement('span');
+    el.style[property] = value;
+    host.appendChild(el);
+    const computed = getComputedStyle(el)[property];
+    el.remove();
+    return computed;
 };
+
+/** What a token resolves to as a computed color, read through a probe. */
+export const tokenColor = (host, token) => probe(host, 'backgroundColor', `var(${token})`);
 
 /**
  * What a `box-shadow` value resolves to once computed, read through a probe, so
  * a story compares a shadow against its token (`var(--elevation-light-2)`) or
  * a composition of tokens, never against a hand-typed copy of the numbers.
  */
-export const computedShadow = (host, value) => {
-    const probe = document.createElement('span');
-    probe.style.boxShadow = value;
-    host.appendChild(probe);
-    const shadow = getComputedStyle(probe).boxShadow;
-    probe.remove();
-    return shadow;
-};
+export const computedShadow = (host, value) => probe(host, 'boxShadow', value);
 
 /** The alpha channel of a computed color; 1 when it has none. */
 export const alpha = (color) => {
