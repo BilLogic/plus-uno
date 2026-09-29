@@ -27,6 +27,7 @@
 // Import-free and Env-free: it renders and posts nothing.
 
 import type { GateNote } from "../turn/index";
+import { PROPOSAL_TTL_MS } from "../thread-state/index";
 import { SLACK_USER_ID } from "./mrkdwn";
 
 /** The lost race. */
@@ -34,10 +35,28 @@ export const STALE_POST =
   ":hourglass: That proposal was already resolved — another confirmation got there first, " +
   "so nothing was executed twice.";
 
-/** The delayed ✅/❌ on a card that aged out. */
-export const EXPIRED_POST =
-  ":hourglass: That proposal had already expired — nothing was executed. " +
-  "Proposals stay live for an hour. Ask me again and I'll set the same thing up fresh.";
+/**
+ * The delayed ✅/❌ on a card that aged out, naming how long it was live — the
+ * card's own lifetime, which is an hour unless it set one.
+ */
+export function expiredPost(ttlMs?: number): string {
+  return (
+    ":hourglass: That proposal had already expired — nothing was executed. " +
+    `It stayed live for ${lifetimeWords(ttlMs ?? PROPOSAL_TTL_MS)}. ` +
+    "Ask me again and I'll set the same thing up fresh."
+  );
+}
+
+/** The expiry line for a card on the default hour. */
+export const EXPIRED_POST = expiredPost();
+
+/** A lifetime as a person says it: "an hour", "72 hours", "30 minutes". */
+function lifetimeWords(ms: number): string {
+  const minutes = Math.round(ms / 60_000);
+  if (minutes % 60 !== 0) return minutes === 1 ? "a minute" : `${minutes} minutes`;
+  const hours = minutes / 60;
+  return hours === 1 ? "an hour" : `${hours} hours`;
+}
 
 /** The ✅/⛔ on a proposal a revision replaced (#573). */
 export const SUPERSEDED_POST =
@@ -59,7 +78,7 @@ export function renderGateNote(note: GateNote): string {
     case "already-resolved":
       return STALE_POST;
     case "expired":
-      return EXPIRED_POST;
+      return expiredPost(note.ttlMs);
     case "superseded":
       return SUPERSEDED_POST;
     case "not-on-the-card":
@@ -79,11 +98,34 @@ export function renderGateNote(note: GateNote): string {
         `:point_up: ${note.count} proposals are waiting in this DM, so I can't tell which one that is for — ` +
         `nothing was executed. React on the :warning: card you mean, or use its buttons.`
       );
+    case "not-a-confirmer":
+      return notAConfirmerLine(note);
     case "resolve-failed":
       return `:warning: I caught your :${note.glyph}: but hit a snag executing it — give it another go, or tell me and I'll retry.`;
     case "cut-off":
       return cutOffLine(note);
   }
+}
+
+/**
+ * A signal from someone the card does not accept. Names who can confirm,
+ * since that is what the person needs in order to get it moving. Only Slack
+ * user ids are mentioned, which is what the markup sanitiser keeps
+ * (`SLACK_USER_ID`); anything else would blank the post, so it is left out.
+ */
+function notAConfirmerLine(note: Extract<GateNote, { kind: "not-a-confirmer" }>): string {
+  const to = note.userId && SLACK_USER_ID.test(note.userId) ? `<@${note.userId}> ` : "";
+  const who = note.confirmers.filter((id) => SLACK_USER_ID.test(id)).map((id) => `<@${id}>`);
+  const can = who.length
+    ? `Only ${joinNames(who)} can confirm or cancel this proposal`
+    : "Nobody here can confirm or cancel this proposal";
+  return `:lock: ${to}${can} — nothing was executed.`;
+}
+
+/** "a", "a or b", "a, b or c". */
+function joinNames(names: string[]): string {
+  if (names.length <= 1) return names.join("");
+  return `${names.slice(0, -1).join(", ")} or ${names[names.length - 1]}`;
 }
 
 /**

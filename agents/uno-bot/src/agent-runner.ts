@@ -15,93 +15,55 @@
 // share a class with ThreadState — the pipeline stub-calls ThreadState mid-run,
 // and a DO fetch-ing itself deadlocks behind its own input gate.
 //
-// alarm() catches per job and never rethrows: a thrown alarm is auto-retried,
-// which would re-run a possibly half-delivered agent turn. The pipeline's own
-// visible-failure posts remain the user-facing error path.
+// A scheduled run queues on an instance of its own (`runnerNameForRun`), never
+// on a thread's, so a person's turn never waits behind a run's jobs.
+//
+// The scheduling itself — one job per alarm, the deferred retry, a run's
+// ordering and idempotency — lives in src/runner/queue.ts over a storage port,
+// and this class hands it `state.storage` and the job bodies. alarm() never
+// rethrows: a thrown alarm is auto-retried, which would re-run a possibly
+// half-delivered agent turn.
 
 import type { Env } from "./types";
 import { runMetered } from "./net";
-// The retry cadence for a deferred job is one HALF of a single rule — how long
-// a lease is trusted (`RUN_LEASE_MS`) and how often a deferred job comes back
-// to test it — and the other half has always lived with the store. It was
-// declared here, in the file that could not answer "why did a killed run come
-// back two minutes later?" on its own. The whole rule now lives in ThreadState
-// and this scheduler reads it (#494).
-import { DEFER_RETRY_MS } from "./thread-state/index";
-import {
-  onRunnerJob,
-  type RunnerJobPayload,
-} from "./slack/events";
-
-interface RunnerJob {
-  job: RunnerJobPayload;
-  enqueuedAt: number;
-}
-
-const JOB_PREFIX = "job:";
+import { onRunnerJob } from "./slack/events";
+import { enqueueRun, enqueueThreadJob, runOneJob, type RunnerDeps, type RunnerJob } from "./runner/queue";
+import { runScheduledJob } from "./scheduled/jobs";
+import type { ScheduledRun } from "./scheduled/runs";
 
 export class AgentRunner {
   private state: DurableObjectState;
-  private env: Env;
+  private deps: RunnerDeps;
 
   constructor(state: DurableObjectState, env: Env) {
     this.state = state;
-    this.env = env;
+    this.deps = {
+      now: () => Date.now(),
+      runThreadJob: (job) => onRunnerJob(env, job),
+      runScheduledJob: (job) => runScheduledJob(env, job, { dryRun: false }),
+    };
   }
 
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
     if (request.method === "POST" && url.pathname === "/enqueue") {
       const job = (await request.json()) as RunnerJob;
-      // Monotonic-enough key: jobs drain in enqueue order within the thread.
-      const key = `${JOB_PREFIX}${String(job.enqueuedAt).padStart(15, "0")}:${crypto.randomUUID()}`;
-      await this.state.storage.put(key, job);
-      if ((await this.state.storage.getAlarm()) === null) {
-        await this.state.storage.setAlarm(Date.now());
-      }
+      await enqueueThreadJob(this.state.storage, job, Date.now());
       return new Response(JSON.stringify({ ok: true }), { status: 202 });
+    }
+    if (request.method === "POST" && url.pathname === "/enqueue-run") {
+      const run = (await request.json()) as ScheduledRun;
+      const queued = await enqueueRun(this.state.storage, run, Date.now());
+      return new Response(JSON.stringify({ ok: true, queued }), { status: 202 });
     }
     return new Response("not found", { status: 404 });
   }
 
   alarm(): Promise<void> {
-    // The agent turn runs here, so THIS is the invocation the 50-subrequest cap
+    // The job runs here, so THIS is the invocation the 50-subrequest cap
     // applies to — open the meter around the whole firing. The budget gate in
-    // the agent loop reads the counter this establishes.
-    return runMetered(() => this.runOneJob());
-  }
-
-  private async runOneJob(): Promise<void> {
-    // ONE job per alarm invocation — free-tier Workers cap subrequests at 50
-    // per invocation, and a single agent turn spends most of that budget
-    // (Slack + DO hops + grounding tool calls + model API). Processing a second
-    // job in the same invocation blew the cap live (2026-07-10: "Too many
-    // subrequests"), killing the first job's reply delivery. Each alarm
-    // firing gets a FRESH budget, so drain the queue one job per firing.
-    const jobs = await this.state.storage.list<RunnerJob>({ prefix: JOB_PREFIX, limit: 1 });
-    for (const [key, job] of jobs) {
-      let outcome: "handled" | "deferred" = "handled";
-      try {
-        outcome = await onRunnerJob(this.env, job.job);
-      } catch (err) {
-        // Never rethrow: alarm retries would re-run the agent turn.
-        console.error(`[runner] job failed: ${err instanceof Error ? err.message : String(err)}`);
-      }
-      if (outcome === "deferred") {
-        // The turn's run-lease is held elsewhere. Deleting here is how killed
-        // runs used to go permanently silent — instead KEEP the job and check
-        // back: it resolves to "done" (drop) or a stale-lease reclaim (re-run).
-        console.log("[runner] job deferred — run-lease held; retrying in 2 min");
-        await this.state.storage.setAlarm(Date.now() + DEFER_RETRY_MS);
-        return;
-      }
-      await this.state.storage.delete(key);
-    }
-    // More queued (the drained job's sibling duplicate, or new arrivals):
-    // process them in a fresh invocation with a fresh subrequest budget.
-    const remaining = await this.state.storage.list({ prefix: JOB_PREFIX, limit: 1 });
-    if (remaining.size > 0) {
-      await this.state.storage.setAlarm(Date.now());
-    }
+    // the agent loop, and a scheduled job's ceiling, read the counter this
+    // establishes.
+    return runMetered(() => runOneJob(this.state.storage, this.deps));
   }
 }

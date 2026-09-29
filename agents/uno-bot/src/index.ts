@@ -1,7 +1,7 @@
 // The Worker entry: verify, route, export the Durable Objects.
 //
 // Nothing here knows blueprint schema, embed models, Slack probing or cache
-// internals. Those are Diagnostics' (src/diagnostics/) — eleven `/debug/*`
+// internals. Those are Diagnostics' (src/diagnostics/) — twelve `/debug/*`
 // probes plus the public `/health/blueprint` contract probe, behind one auth
 // check and one report envelope. `/health` stays here: it is the uptime route,
 // it reads only the build id, and monitoring watches it.
@@ -14,21 +14,29 @@ import { parseInteraction, handleInteraction } from "./slack/interactive";
 import { startSlackOAuth, handleSlackOAuthCallback } from "./oauth/slack";
 import { BUILD } from "./version";
 import { runFigmaPoll } from "./figma-poll";
+import { onScheduledFiring } from "./scheduled/runs";
+import { enqueueScheduledRun } from "./scheduled/jobs";
 import { runMetered } from "./net";
 import * as diagnostics from "./diagnostics";
 
 export default {
-  // Cron (wrangler.toml [triggers]) — the Figma library poll: detect DS
-  // publishes, file the PRD, post the "🎨 Figma Design System Updated" card to
-  // #uno-bot. Scheduled invocations get their own subrequest budget and a
-  // 15-minute wall clock, so the poll runs here, not in a DO alarm.
-  async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+  // Cron (wrangler.toml [triggers]). Every firing runs the Figma library poll:
+  // detect DS publishes, file the PRD, post the "🎨 Figma Design System
+  // Updated" card to #uno-bot. The 14:00 and 22:00 UTC firings also enqueue
+  // the morning and end-of-day runs on their own AgentRunner, one job per
+  // alarm (src/scheduled/runs.ts). Scheduled invocations get their own
+  // subrequest budget and a 15-minute wall clock, so the poll runs here, not
+  // in a DO alarm.
+  async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
     // Metered like every other invocation: the poll fans out over Figma files
     // under the same 50-subrequest cap, and would die the same silent way.
     ctx.waitUntil(
-      runMetered(() => runFigmaPoll(env))
-        .then((r) => console.log(`[figma-poll] ${r.summary}`))
-        .catch((err) => console.error(`[figma-poll] failed: ${err instanceof Error ? err.message : String(err)}`)),
+      runMetered(() =>
+        onScheduledFiring(controller.scheduledTime, {
+          pollFigma: () => runFigmaPoll(env).then((r) => console.log(`[figma-poll] ${r.summary}`)),
+          enqueueRun: (run) => enqueueScheduledRun(env, run),
+        }),
+      ),
     );
   },
 

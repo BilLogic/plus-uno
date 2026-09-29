@@ -167,6 +167,20 @@ export function internalSubrequestsUsed(): number {
   return meterStore.getStore()?.internal ?? 0;
 }
 
+/**
+ * Internal subrequests spent so far this invocation under one `charge` label.
+ * 0 when nothing carried the label, including outside a meter.
+ *
+ * D1 queries are Cloudflare-service calls like any other, and `/debug/sweep`
+ * reports a job's D1 count as its `"d1"` charges — so a D1 call site charges
+ * `charge(1, "d1")` per query, or the sweep reads 0 for it.
+ *
+ * @param label - The label `charge` was given
+ */
+export function internalSubrequestsFor(label: string): number {
+  return meterStore.getStore()?.internalByLabel[label] ?? 0;
+}
+
 /** Compact breakdown, e.g. `api.notion.com:7 slack.com:4 | internal do:2 kv:1`. */
 export function meterBreakdown(): string {
   const m = meterStore.getStore();

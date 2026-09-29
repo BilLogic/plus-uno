@@ -37,6 +37,7 @@ const ALLOWED_BARE_FETCH = new Set(["net.ts"]);
 // cannot instrument itself.
 const CHARGED_STUB_CALLS = new Set([
   "slack/events.ts", // enqueueAgentJob charges 1 for the AgentRunner hop
+  "scheduled/jobs.ts", // enqueueScheduledRun charges 1 for the run's AgentRunner hop
 ]);
 
 // A Durable Object RPC hop — `stub.readHistory(ref, at)` (#493) — is the same
