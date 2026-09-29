@@ -45,6 +45,7 @@ const Divider = ({
 };
 
 Divider.propTypes = {
+    /** Thickness: sm 1px, md 1.5px, lg 2px, xl 3px. The pixel strings alias the names; "2.5px" maps to xl and draws 3px. */
     size: PropTypes.oneOf(['sm', 'md', 'lg', 'xl', '1px', '1.5px', '2px', '2.5px']),
     style: PropTypes.oneOf(['light', 'dark']),
     opacity10: PropTypes.bool,

@@ -223,11 +223,11 @@
       "id": "element-stroke-xl",
       "name": "element/stroke/xl",
       "valuesByMode": {
-        "Default": 2.5
+        "Default": 3
       },
       "resolvedValuesByMode": {
         "Default": {
-          "resolvedValue": 2.5
+          "resolvedValue": 3
         }
       }
     },
