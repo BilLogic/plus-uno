@@ -93,7 +93,15 @@ export interface SweepHarness {
   replies: string[];
   /** Every card posted, with the key it was tagged with; `withdrawn` holds
    *  the text a withdrawn card was edited to. */
-  posted: Array<{ channel: string; threadTs: string | null; text: string; ts: string; cardKey: string; withdrawn?: string }>;
+  posted: Array<{
+    channel: string;
+    threadTs: string | null;
+    text: string;
+    ts: string;
+    cardKey: string;
+    digest: string;
+    withdrawn?: string;
+  }>;
   staged: PendingProposal[];
   /** Every Slack read, as `method channel [ts]`. */
   reads: string[];
@@ -107,6 +115,9 @@ export interface SweepHarness {
   /** One-shot faults: each, when set, is thrown by the next call of its kind
    *  and cleared. */
   faults: { post?: Error; stage?: Error; addItems?: Error };
+  /** Morning searches for a posted card left that answer "unknown", as a
+   *  failed Slack read would. */
+  unknownSearches: { left: number };
 }
 
 export function sweepHarness(opts: {
@@ -144,6 +155,7 @@ export function sweepHarness(opts: {
   const budget = { replies: Infinity };
   const headroom = { subrequests: Infinity, d1Queries: Infinity };
   const broken = new Set<string>();
+  const unknownSearches = { left: 0 };
   const faults: SweepHarness["faults"] = {};
   const pageSize = opts.pageSize ?? Infinity;
   const page = <T>(list: T[], cursor: string | undefined): { messages: T[]; nextCursor?: string } => {
@@ -207,17 +219,21 @@ export function sweepHarness(opts: {
         const rendered = renderProposalCard(card);
         return { text: rendered.text, blocks: rendered.blocks ?? proposalCardBlocks(rendered.text) };
       },
-      async post(to, card, cardKey) {
+      async post(to, card, tag) {
         nextTs += 1;
         const ts = `${Math.floor(clock.now / 1000)}.${String(900000 + nextTs)}`;
-        posted.push({ channel: to.channel, threadTs: to.threadTs, text: card.text, ts, cardKey });
+        posted.push({ channel: to.channel, threadTs: to.threadTs, text: card.text, ts, cardKey: tag.cardKey, digest: tag.digest });
         // A stop after Slack took the post, before the job heard back.
         once("post");
         return { ok: true, ts };
       },
       async findPosted(to, cardKey) {
-        const hit = posted.filter((p) => p.channel === to.channel && p.threadTs === to.threadTs && p.cardKey === cardKey).at(-1);
-        return hit ? { ts: hit.ts, text: hit.text } : null;
+        if (unknownSearches.left > 0) {
+          unknownSearches.left -= 1;
+          return { state: "unknown", why: "Slack said ratelimited" };
+        }
+        const hit = posted.find((p) => p.channel === to.channel && p.threadTs === to.threadTs && p.cardKey === cardKey);
+        return hit ? { state: "found", ts: hit.ts, text: hit.text, digest: hit.digest } : { state: "absent" };
       },
       async stage(proposal) {
         once("stage");
@@ -241,7 +257,7 @@ export function sweepHarness(opts: {
     now: () => clock.now,
     ...(opts.dryRun ? { dryRun: true } : {}),
   };
-  return { deps, store, threadState, provider, replies, posted, staged, reads, clock, budget, headroom, faults, broken };
+  return { deps, store, threadState, provider, replies, posted, staged, reads, clock, budget, headroom, faults, broken, unknownSearches };
 }
 
 /** A human message. */

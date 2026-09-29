@@ -32,7 +32,8 @@ Every proactive job sends a finding to the first rung that fits (`pickDestinatio
 - **Timing:** the card posts at the next weekday morning run (14:00 UTC), so its 72 h start when people can act on it.
 - **One live card per thread,** holding up to 10 fixes. More fixes, and a later day's fixes for a thread whose card is still live, wait in the queue until that card is resolved or expires, then go out on the next one. A fix the thread has already had on a card (proposed, dropped or applied) is left off later ones.
 - **Beside a turn's card:** the sweep card has its own slot in the thread, so an unrelated ask made there (filing an issue, say) stages as its own card and leaves the sweep card live.
-- **Each fix** is one `notion_update` in-place replace of a whole block, stamped with the `last_edited_time` the sweep read (ADR-029). If the block has moved since then, the write is refused and nothing is written. The card shows each fix as the text it changes, before → after, with a little context either side.
+- **Each fix** is one `notion_update` in-place replace of a whole block, stamped with the `last_edited_time` the sweep read (ADR-029). If the block has moved since then, the write is refused and nothing is written. The block keeps its type: a list item stays a list item, a to-do keeps its tick, a heading its level.
+- **Shown whole:** the card shows every fix's full change, before → after, with a little context either side. A card holds only as many fixes as one Slack message shows in full; the rest wait for the next card.
 - **Whole blocks only:** the detector sees every block it may rewrite in full, and a block too long for that is left alone. A drafted fix that carries a truncation mark, or comes back much shorter than its block when no one in the thread asked for a removal, is discarded.
 - **Owner:** each fix names one owner, who is @-mentioned. That is whoever claimed or did the work in the thread; failing that, the linked card's `Contributor`; failing that, the thread starter.
 - **Who can confirm:** the owners plus everyone who posted in the thread. A ✅ from anyone else gets the note naming who can.
@@ -40,10 +41,10 @@ Every proactive job sends a finding to the first rung that fits (`pickDestinatio
 
 ## Dropping, revising, declining
 
-In a thread where uno-bot's only posts are sweep cards, it answers a reply only when the reply is addressed to the card: an @mention, a typed ✅ or ⛔, or words about its fixes ("drop 2", "keep the first one", "reword fix 3"). The rest of the thread's conversation is the team's own.
+In a thread where uno-bot's only posts are sweep cards, it answers a reply only when the reply is addressed to the card: an @mention, a typed ✅ or ⛔, a reply naming fixes by number ("drop 2", "keep 1 and 3", "item 2"), or a reply posted straight after the card. The rest of the thread's conversation is the team's own.
 
-- **Drop an item:** reply in the thread ("drop 2"). Stage the same batch without that operation, keeping every other operation byte for byte. The revision replaces the card and keeps its TTL and its confirmers.
-- **Drop the last item:** cancel the card through `proposal_resolve`.
+- **"drop 2", "keep 1 and 3":** the Worker applies these itself, by number: the revision is the card's own fixes minus the dropped ones, and it replaces the card, keeping its TTL and its confirmers. Dropping every fix cancels the card.
+- **Any other change to the fixes** comes to you: stage the same batch without the operations the reply leaves out, every other operation byte for byte. Nothing left → cancel with `proposal_resolve`.
 - **Only a confirmer can revise.** Anyone else is told who can, and the card stays as it is. This holds on every card that names its confirmers.
 - **Change only what was asked:** a revision holds the card's own fixes, minus the dropped ones, each exactly as it was. A batch that touches none of the card's blocks is a separate ask, staged beside it.
 - **⛔** declines the whole card.

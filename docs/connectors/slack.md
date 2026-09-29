@@ -37,7 +37,8 @@ The Worker's one proactive read of channels, whose rules the bot reads through `
   - findings in no thread go to #plus-universal for the design system and to #plus-design otherwise (`pickDestination` in `agents/uno-bot/src/sweep/finding.ts`).
   - Proactive output stays out of #uno-bot, and the owner it mentions comes from the thread or the card, not a default to the lead.
 - **Cards** post at the next weekday 14:00 UTC run: one live card per thread, up to 10 fixes, and the rest queued until it resolves. Owners and thread posters can confirm; a card lapses after 72 h with no re-ping.
-- **Posted means staged.** A card starts only when the invocation's budget covers it; its items are recorded, it is posted tagged with its key in message metadata, staged, then marked posted. A retry finds a posted-but-unstaged card by that tag and finishes it; a staging that fails outright edits the card to say it did not go through and releases its items.
+- **Posted means staged.** A card starts only when the invocation's budget covers it. Its snapshot (the fixes as shown) goes to KV and its items to D1; it is posted tagged with its key and its operations' digest in message metadata, staged, then marked posted. A retry stages only from the snapshot, and only when the posted card's digest matches; a card the search comes back unsure about is held. A staging that fails outright edits the card to say it did not go through and releases its items.
+- **A failing thread** (replies, a linked page, or the detector) holds the cursor; on its second night running it is skipped with a note, so one thread holds a channel back two nights at most. A model quota stop holds without counting.
 <!-- /ide-only -->
 
 ## Share-out post

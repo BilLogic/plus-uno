@@ -13,7 +13,9 @@
 //     HARNESS_KV, one key per channel under `sweep:findings:`. Each channel's
 //     job writes only its own key, so two end-of-day jobs a few seconds apart
 //     never overwrite each other's findings through KV's eventual consistency.
-//     A finding older than 30 days is dropped as the queue is read.
+//     A finding older than 30 days is dropped as the queue is read. A card's
+//     snapshot waits under `sweep:card:` from before its post until it is
+//     staged or released.
 //   • Delivery: `chat.postMessage` in the destination, the card rendered by the
 //     proposal renderer and tagged with its key in message metadata, and
 //     `ThreadState.putProposal`. A card is found again by that tag
@@ -61,11 +63,13 @@ import { createD1SweepRecords } from "./d1";
 import { recordSweepResolution, recordSweepRestage, recordSweepRevision } from "./outcomes";
 import type { ChannelKind, SweepSource, TargetKind } from "./finding";
 import { SWEEP_CARD_EVENT, WITHDRAWN_SWEEP_CARD_EVENT } from "./cards";
-import { runSweepJob, type SweepDeps, type SweepJobReport } from "./run";
-import { mergeFindings, type FindingQueue, type PendingFinding, type SweepStore } from "./store";
+import { FIND_POSTED_PAGES, runSweepJob, type CardTag, type SweepDeps, type SweepJobReport } from "./run";
+import { mergeFindings, type CardSnapshot, type FindingQueue, type PendingFinding, type SweepStore } from "./store";
 
 /** One key per channel: `sweep:findings:<channel>`. */
 const QUEUE_KV_PREFIX = "sweep:findings:";
+/** One key per card still to stage: `sweep:card:<card key>`. */
+const CARD_KV_PREFIX = "sweep:card:";
 /** A finding not posted within 30 days is dropped as the queue is read — long
  *  enough for a busy thread's overflow to wait out several live cards; a fix
  *  that old whose block has moved is refused at the write anyway (ADR-029). */
@@ -73,8 +77,7 @@ const QUEUE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 /** The key itself outlives its newest finding by the same week. */
 const QUEUE_TTL_SECONDS = QUEUE_MAX_AGE_MS / 1000;
 const CONTEXT_TEXT_CAP = 4_000;
-/** Pages read looking for a card by its tag. */
-const FIND_PAGES = 3;
+
 
 /**
  * One sweep job on `Env`.
@@ -146,10 +149,14 @@ async function sweepDepsFor(
           ...(rendered.followUp?.length ? { followUp: rendered.followUp } : {}),
         };
       },
-      async post(to, card, cardKey) {
-        const metadata = tagOf(cardKey);
+      async post(to, card, tag) {
         for (const text of card.followUp ?? []) {
-          const sent = await postMessage(env, { channel: to.channel, text, metadata, ...(to.threadTs ? { thread_ts: to.threadTs } : {}) });
+          const sent = await postMessage(env, {
+            channel: to.channel,
+            text,
+            metadata: tagOf(tag, "plan"),
+            ...(to.threadTs ? { thread_ts: to.threadTs } : {}),
+          });
           // A card whose plan did not go up ahead of it is not posted at all.
           if (!sent.ok) return { ok: false };
         }
@@ -157,29 +164,35 @@ async function sweepDepsFor(
           channel: to.channel,
           text: card.text,
           blocks: card.blocks,
-          metadata,
+          metadata: tagOf(tag, "card"),
           ...(to.threadTs ? { thread_ts: to.threadTs } : {}),
         });
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
       async findPosted(to, cardKey, since) {
+        // The card's own message: its tag's type, key and role — never merely
+        // the latest tagged message, which may be a follow-up or another card.
         const isCard = (m: { metadata?: SlackMessageMetadata }) =>
-          m.metadata?.event_type === SWEEP_CARD_EVENT && m.metadata.event_payload.card_key === cardKey;
+          m.metadata?.event_type === SWEEP_CARD_EVENT &&
+          m.metadata.event_payload.card_key === cardKey &&
+          m.metadata.event_payload.role === "card";
         let cursor: string | undefined;
-        for (let i = 0; i < FIND_PAGES; i++) {
+        for (let i = 0; i < FIND_POSTED_PAGES; i++) {
           const res = to.threadTs
             ? await measured(() =>
                 conversationsReplies(env, to.channel, to.threadTs!, 200, { includeMetadata: true, ...(cursor ? { cursor } : {}) }),
               )
             : await measured(() => conversationsHistorySince(env, to.channel, since, cursor, { includeMetadata: true }));
-          if (!res.ok) return null;
-          // The card is the last message with the tag: follow-ups go first.
-          const hit = [...(res.messages ?? [])].filter(isCard).sort((a, b) => Number(b.ts) - Number(a.ts))[0];
-          if (hit) return { ts: hit.ts, text: hit.text ?? "" };
+          if (!res.ok) return { state: "unknown", why: `Slack said ${res.error ?? "no"}` };
+          const hit = (res.messages ?? []).find(isCard);
+          if (hit) {
+            const digest = hit.metadata?.event_payload.digest;
+            return { state: "found", ts: hit.ts, text: hit.text ?? "", digest: typeof digest === "string" ? digest : "" };
+          }
           cursor = res.response_metadata?.next_cursor;
-          if (!cursor) return null;
+          if (!cursor) return { state: "absent" };
         }
-        return null;
+        return { state: "unknown", why: `more than ${FIND_POSTED_PAGES} pages to search` };
       },
       stage: (proposal) => threadStateFor(env).putProposal(proposal),
       async withdraw(channel, ts, text, cardKey) {
@@ -263,9 +276,10 @@ export async function recordSweepRestageFor(env: Env, from: PendingProposal, to:
   }
 }
 
-/** The tag a sweep card carries in Slack's message metadata. */
-function tagOf(cardKey: string): SlackMessageMetadata {
-  return { event_type: SWEEP_CARD_EVENT, event_payload: { card_key: cardKey } };
+/** The tag a sweep card's messages carry in Slack's message metadata: its
+ *  key, its operations' digest, and which message this is. */
+function tagOf(tag: CardTag, role: "card" | "plan"): SlackMessageMetadata {
+  return { event_type: SWEEP_CARD_EVENT, event_payload: { card_key: tag.cardKey, digest: tag.digest, role } };
 }
 
 /** A read that tripped the budget is the budget stop, whatever it returned. */
@@ -369,6 +383,18 @@ function kvQueue(kv: KVNamespace): FindingQueue {
         const drop = new Set(gone);
         await write(channel, (await read(channel)).filter((f) => !drop.has(f.id)));
       }
+    },
+    async saveCard(snapshot) {
+      charge(1, "kv");
+      await kv.put(`${CARD_KV_PREFIX}${snapshot.key}`, JSON.stringify(snapshot), { expirationTtl: QUEUE_TTL_SECONDS });
+    },
+    async cardSnapshot(cardKey) {
+      charge(1, "kv");
+      return (await kv.get<CardSnapshot>(`${CARD_KV_PREFIX}${cardKey}`, "json")) ?? null;
+    },
+    async dropCard(cardKey) {
+      charge(1, "kv");
+      await kv.delete(`${CARD_KV_PREFIX}${cardKey}`);
     },
   };
 }

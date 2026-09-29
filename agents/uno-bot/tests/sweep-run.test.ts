@@ -413,6 +413,173 @@ test("a card whose budget is not there is not started: the job defers before pos
   await assertOneStagedCard(h);
 });
 
+test("a card shows every fix whole: it holds only as many as one message fits, and the rest wait", async () => {
+  // Three linked pages of four long blocks, each fix nearly twice its block.
+  const pages = ["b", "c", "d"].map((p, n) =>
+    notionPage(`888888888888888888888888888888${p}${p}`, {
+      blocks: Array.from({ length: 4 }, (_, i) => ({
+        id: `blk-${n}${i}`,
+        lastEditedTime: "2026-09-01T10:00:00.000Z",
+        text: `Block ${n}${i}: ${"alpha beta gamma ".repeat(110).trim()}`,
+      })),
+    }),
+  );
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: pages.map((p) => p.url) }, [{ user: "U0ADE", when: ts(29, 16) }]);
+  const found = pages.flatMap((page) =>
+    page.blocks.map((b) => ({ page, b, fix: `${b.text.slice(0, 9)} ${"delta epsilon zeta omega ".repeat(150).trim()}` })),
+  );
+  const fixes = found.map((f) => f.fix);
+  const h = sweepHarness({
+    channels: channelOf(t),
+    sources: pages,
+    detectorReplies: [reply(...found.map((f) => drift({ source: f.page, block: f.b.id, evidence: [ts(29, 16)], replacement: f.fix })))],
+    now: at(29, 22),
+  });
+  await runSweepJob(END_OF_DAY, h.deps);
+  h.clock.now = at(30, 14);
+  const morning = await runSweepJob(MORNING, h.deps);
+
+  const held = h.staged[0]!.operations!.length;
+  assert.ok(held > 0 && held < 10, `the card holds ${held}`);
+  for (const op of h.staged[0]!.operations!) {
+    const content = (op.input.replace as Array<{ content: string }>)[0]!.content;
+    assert.ok(fixes.includes(content));
+    assert.ok(h.posted[0]!.text.includes(content.slice(10)), "each fix it holds is shown whole");
+  }
+  assert.doesNotMatch(h.posted[0]!.text, / … /, "nothing elided");
+  assert.equal((await h.store.pendingFindings()).length, 12 - held, "the rest wait in the queue");
+  assert.match(morning.note ?? "", /wait for room on a card/);
+});
+
+test("a fix too long to show whole even alone is not offered", async () => {
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+  const h = sweepHarness({
+    channels: channelOf(t),
+    sources: [PAGE_A],
+    detectorReplies: [reply(drift({ source: PAGE_A, evidence: [ts(29, 16)], claimedBy: "U0ADE" }))],
+    now: at(29, 22),
+  });
+  await runSweepJob(END_OF_DAY, h.deps);
+  // A renderer that can only show the card by moving its plan to a follow-up.
+  const render = h.deps.delivery.render;
+  h.deps.delivery.render = (card) => ({ ...render(card), followUp: ["the plan"] });
+  h.clock.now = at(30, 14);
+  const morning = await runSweepJob(MORNING, h.deps);
+  assert.equal(h.posted.length, 0);
+  assert.match(morning.note ?? "", /too long to show whole on a card — not offered/);
+  assert.deepEqual(await h.store.pendingFindings(), []);
+});
+
+/** A card posted in the morning whose staging stopped, in a thread whose page
+ *  the next night re-reads with new text and a fresher stamp. */
+async function postedButUnstaged() {
+  const page = notionPage("9999999999999999999999999999999a");
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [page.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+  const h = sweepHarness({
+    channels: channelOf(t),
+    sources: [page],
+    detectorReplies: [reply(drift({ source: page, evidence: [ts(29, 16)], claimedBy: "U0ADE" }))],
+    now: at(29, 22),
+  });
+  await runSweepJob(END_OF_DAY, h.deps);
+  h.faults.stage = new SubrequestBudgetError(38);
+  h.clock.now = at(30, 14);
+  await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
+  const shown = h.posted[0]!;
+
+  // The card's own post is activity; that night re-reads the thread, the page
+  // has moved, and the detector drafts other text for the same block.
+  const reply2 = msg("U0ADE", ts(30, 16), "actually, let's say December", { thread_ts: t.root.ts });
+  t.messages.push(reply2);
+  t.root.reply_count = 2;
+  t.root.latest_reply = reply2.ts;
+  page.blocks[0] = { ...page.blocks[0]!, lastEditedTime: "2026-09-30T18:00:00.000Z" };
+  h.replies.push(
+    reply(drift({ source: page, evidence: [ts(30, 16)], claimedBy: "U0ADE", replacement: "Launch date: December 5" })),
+  );
+  h.clock.now = at(30, 22);
+  await runSweepJob(END_OF_DAY, h.deps);
+  assert.equal((await h.store.pendingFindings())[0]!.replacement, "Launch date: December 5", "the queue now holds the re-read");
+  return { h, page, shown };
+}
+
+test("a card finished on a later morning stages what it showed, not what the queue re-read since", async () => {
+  const { h, page, shown } = await postedButUnstaged();
+
+  h.clock.now = at(31, 14);
+  await runSweepJob(MORNING, h.deps);
+
+  assert.equal(h.posted.length, 1, "no second card");
+  assert.equal(h.staged.length, 1);
+  const staged = h.staged[0]!;
+  assert.equal(staged.proposalTs, shown.ts);
+  assert.deepEqual((staged.operations![0]!.input.replace as unknown[])[0], {
+    block_id: page.blocks[0]!.id,
+    last_edited_time: "2026-09-01T10:00:00.000Z",
+    content: "Launch date: November 1",
+  }, "the text and the stamp the card showed");
+  assert.deepEqual(await h.store.pendingFindings(), []);
+  assert.equal(await h.store.cardSnapshot(shown.cardKey), null, "the snapshot is dropped once staged");
+});
+
+test("a posted card whose digest differs from its snapshot is withdrawn, never staged", async () => {
+  const { h, shown } = await postedButUnstaged();
+  shown.digest = "someone-else";
+
+  h.clock.now = at(31, 14);
+  const morning = await runSweepJob(MORNING, h.deps);
+
+  assert.match(shown.withdrawn ?? "", /didn't go through/);
+  assert.match(morning.note ?? "", /other fixes than its snapshot/);
+  assert.ok(h.staged.every((s) => s.proposalTs !== shown.ts), "the mismatched card is never staged");
+});
+
+test("a card that cannot be found for sure is held, not posted again; once found it is staged", async () => {
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+  const h = sweepHarness({
+    channels: channelOf(t),
+    sources: [PAGE_A],
+    detectorReplies: [reply(drift({ source: PAGE_A, evidence: [ts(29, 16)], claimedBy: "U0ADE" }))],
+    now: at(29, 22),
+  });
+  await runSweepJob(END_OF_DAY, h.deps);
+  h.faults.stage = new SubrequestBudgetError(38);
+  h.clock.now = at(30, 14);
+  await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
+
+  h.unknownSearches.left = 1;
+  h.clock.now = at(30, 14, 2);
+  const held = await runSweepJob(MORNING, h.deps);
+  assert.match(held.note ?? "", /held for the next try/);
+  assert.equal(h.posted.length, 1, "not posted again");
+  assert.equal(h.staged.length, 0);
+
+  h.clock.now = at(30, 14, 4);
+  await runSweepJob(MORNING, h.deps);
+  await assertOneStagedCard(h);
+});
+
+test("a card still unknown after its 72 h is released and its fix carded afresh", async () => {
+  const t = thread({ user: "U0STARTER", when: ts(29, 15), pages: [PAGE_A.url] }, [{ user: "U0ADE", when: ts(29, 16) }]);
+  const h = sweepHarness({
+    channels: channelOf(t),
+    sources: [PAGE_A],
+    detectorReplies: [reply(drift({ source: PAGE_A, evidence: [ts(29, 16)], claimedBy: "U0ADE" }))],
+    now: at(29, 22),
+  });
+  await runSweepJob(END_OF_DAY, h.deps);
+  h.faults.post = new SubrequestBudgetError(38);
+  h.clock.now = at(30, 14);
+  await assert.rejects(runSweepJob(MORNING, h.deps), isSubrequestBudgetError);
+
+  h.unknownSearches.left = 1;
+  h.clock.now = at(33, 14, 30);
+  const morning = await runSweepJob(MORNING, h.deps);
+  assert.match(morning.note ?? "", /still not found after its 72 h/);
+  assert.equal(h.posted.length, 2, "a fresh card");
+  assert.equal(h.staged.length, 1);
+});
+
 /** Exactly one card posted and staged, every item on it, none left without a ts. */
 async function assertOneStagedCard(h: ReturnType<typeof sweepHarness>): Promise<void> {
   assert.equal(h.posted.length, 1, "posted once");

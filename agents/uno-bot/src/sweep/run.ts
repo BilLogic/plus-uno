@@ -57,7 +57,15 @@ import type { HistoryMessage } from "../slack/api";
 import type { PendingProposal } from "../thread-state/index";
 import type { ProposalCard } from "../turn/index";
 import type { ScheduledJob } from "../scheduled/runs";
-import { cardPlan, destinationKey, planSweepCards, sweepCard, SWEEP_CARD_TTL_MS, type SweepCardPlan } from "./cards";
+import {
+  cardPlan,
+  destinationKey,
+  operationsDigest,
+  planSweepCards,
+  sweepCard,
+  SWEEP_CARD_TTL_MS,
+  type SweepCardPlan,
+} from "./cards";
 import { MAX_MESSAGE_CHARS, type DriftDetector } from "./detector";
 import {
   classifyLink,
@@ -73,6 +81,7 @@ import {
 } from "./finding";
 import { postableAt } from "./schedule";
 import type {
+  CardSnapshot,
   PendingFinding,
   SweepItemRecord,
   SweepItemStatus,
@@ -99,6 +108,9 @@ export const MAX_SOURCES_PER_THREAD = 3;
 /** `conversations.replies` pages of 200 read per thread; a longer thread is
  *  left unread, with a note. */
 export const MAX_REPLY_PAGES = 5;
+/** Pages of a thread (or of a channel's top) read looking for a posted card
+ *  by its tag; past them the answer is "unknown", and the card is held. */
+export const FIND_POSTED_PAGES = 3;
 /** Permalinks fetched per morning job — one per item, best-effort. */
 export const MAX_PERMALINKS = 20;
 /**
@@ -144,15 +156,29 @@ export interface CardPlace {
   threadTs: string | null;
 }
 
+/** What a card's Slack tag carries (`SWEEP_CARD_EVENT`). */
+export interface CardTag {
+  cardKey: string;
+  /** `operationsDigest` of what the card shows. */
+  digest: string;
+}
+
+/** A search for a posted card by its tag: found, surely not there, or not
+ *  known — a failed read, or more pages than the search reads. */
+export type PostedCard =
+  | { state: "found"; ts: string; text: string; digest: string }
+  | { state: "absent" }
+  | { state: "unknown"; why: string };
+
 /** Posting and staging, and the reads the morning needs. */
 export interface SweepDelivery {
   render(card: ProposalCard): RenderedSweepCard;
-  /** Post the card — and any follow-up before it — tagged with its key
-   *  (`SWEEP_CARD_EVENT`). */
-  post(to: CardPlace, card: RenderedSweepCard, cardKey: string): Promise<{ ok: boolean; ts?: string }>;
-  /** The card already posted under this key, by its tag, or null. `since`
-   *  bounds a channel-top search. */
-  findPosted(to: CardPlace, cardKey: string, since: string): Promise<{ ts: string; text: string } | null>;
+  /** Post the card — and any follow-up before it — tagged with its key and
+   *  digest; the card's own message as the card, a follow-up as its plan. */
+  post(to: CardPlace, card: RenderedSweepCard, tag: CardTag): Promise<{ ok: boolean; ts?: string }>;
+  /** The card's own message under this key, matched by its tag's key and
+   *  role. `since` bounds a channel-top search. */
+  findPosted(to: CardPlace, cardKey: string, since: string): Promise<PostedCard>;
   /** Stage the card, as a turn's staging does. */
   stage(proposal: PendingProposal): Promise<void>;
   /** Replace a posted card's text, remove its buttons, and retag it so a
@@ -564,14 +590,19 @@ async function postFindings(job: ScheduledJob, deps: SweepDeps): Promise<SweepJo
     // First, any card an earlier try recorded and never marked posted: find it
     // by its tag and finish staging it, or release it to be carded again.
     const live = new Set<string>();
+    // A finding on a card held unfinished waits with it.
+    const held = new Set<string>();
     for (const [cardKey, items] of groupBy(open.filter((i) => i.proposalTs === null), (i) => i.cardKey)) {
-      if (await finishUnposted(ctx, cardKey, items, queued)) live.add(items[0]!.destination);
+      const outcome = await finishUnposted(ctx, cardKey);
+      // A card finished, or held for a later try, still occupies its place.
+      if (outcome !== "released") live.add(items[0]!.destination);
+      if (outcome === "held") for (const i of items) held.add(i.findingId);
     }
     for (const i of open) {
       if (i.proposalTs !== null && (i.postedAt ?? 0) + SWEEP_CARD_TTL_MS > now) live.add(i.destination);
     }
 
-    const stillDue = due.filter((f) => !carded.some((c) => c.id === f.id));
+    const stillDue = due.filter((f) => !carded.some((c) => c.id === f.id) && !held.has(f.id));
     const { fresh, already } = await sortOutCarded(deps, stillDue);
     if (already.length && !deps.dryRun) await deps.store.removeFindings(already.map((f) => f.id));
 
@@ -662,10 +693,12 @@ async function postCard(ctx: MorningCtx, planned: SweepCardPlan, postDate: strin
     return;
   }
 
+  const digest = operationsDigest(plan.operations);
+  await deps.store.saveCard({ key: plan.key, destination: plan.destination, items: plan.items, digest });
   await deps.store.addItems(plan.items.map((f) => itemRecord(f, plan, now)));
-  const sent = await deps.delivery.post(to, rendered, plan.key);
+  const sent = await deps.delivery.post(to, rendered, { cardKey: plan.key, digest });
   if (!sent.ok || !sent.ts) {
-    await deps.store.releaseCard(plan.key);
+    await release(deps, plan.key);
     notes.push(`${plan.key}: the post failed — kept for tomorrow`);
     return;
   }
@@ -724,12 +757,20 @@ async function stageOrWithdraw(
     if (isSubrequestBudgetError(err)) throw err;
     const why = err instanceof Error ? err.message : String(err);
     await deps.delivery.withdraw(posted.channel, posted.ts, WITHDRAWN_TEXT, plan.key).catch(rethrowIfBudget);
-    await deps.store.releaseCard(plan.key);
+    await release(deps, plan.key);
     ctx.notes.push(`${plan.key}: posted but not staged (${why}) — withdrawn, kept for tomorrow`);
     return false;
   }
   await deps.store.markPosted(plan.key, posted.ts, ctx.now);
+  await deps.store.dropCard(plan.key);
   return true;
+}
+
+/** A card that did not go through: its unposted items and its snapshot go;
+ *  its findings, still queued, are carded again. */
+async function release(deps: SweepDeps, cardKey: string): Promise<void> {
+  await deps.store.releaseCard(cardKey);
+  await deps.store.dropCard(cardKey);
 }
 
 /** What a card that did not go through is edited to say. */
@@ -737,59 +778,80 @@ export const WITHDRAWN_TEXT =
   ":warning: This end-of-day sweep card didn't go through, so it can't be confirmed. Its fixes are kept, and come back on a fresh card.";
 
 /**
- * Finish a card an earlier try recorded but never marked posted. Rebuilt from
- * its queued findings and found in Slack by its tag, it is staged; never
- * posted, it is released and its findings are carded as if new.
+ * Finish a card an earlier try recorded but never marked posted — only ever
+ * from its snapshot, the fixes it showed, and only when the card Slack holds
+ * carries the same digest. Otherwise:
+ *   • never posted → released, its findings carded afresh;
+ *   • posted, but with no snapshot or a digest that differs → withdrawn and
+ *     released: staging it would run text nobody was shown;
+ *   • not known (a failed read, or too many pages) → held for the next try,
+ *     and released once its 72 h would have run out anyway.
  *
- * @returns Whether the card is now live
+ * @returns `live` when it is staged, `held` when it waits, `released`
  */
-async function finishUnposted(
-  ctx: MorningCtx,
-  cardKey: string,
-  items: SweepItemRecord[],
-  queued: PendingFinding[],
-): Promise<boolean> {
-  const { deps, notes } = ctx;
-  const byId = new Map(queued.map((f) => [f.id, f] as const));
-  const findings = items.map((i) => byId.get(i.findingId)).filter((f): f is PendingFinding => !!f);
-  const whole = findings.length === items.length && findings.length > 0;
-  const destination = whole ? pickDestination(findings[0]!) : null;
+async function finishUnposted(ctx: MorningCtx, cardKey: string): Promise<"live" | "held" | "released"> {
+  const { deps, notes, now } = ctx;
+  const snapshot = await deps.store.cardSnapshot(cardKey);
+  const destination = snapshot?.destination ?? null;
   const to = destination ? resolveDestination(destination, deps.config) : null;
-  if (!whole || !destination || !to) {
-    await deps.store.releaseCard(cardKey);
-    notes.push(`${cardKey}: recorded but its findings are gone — released`);
-    return false;
+  if (!snapshot || !to) {
+    // Nothing to stage from, so nothing is staged; the fixes, still queued,
+    // go out on a fresh card.
+    await release(deps, cardKey);
+    notes.push(`${cardKey}: recorded without a snapshot — released`);
+    return "released";
   }
-  ensureHeadroom(deps, { subrequests: 1 + CARD_COST.reserveSubrequests, d1Queries: CARD_COST.d1Queries });
+  const plan = cardPlan(cardKey, snapshot.destination, snapshot.items);
+  if (operationsDigest(plan.operations) !== snapshot.digest) {
+    await release(deps, cardKey);
+    notes.push(`${cardKey}: its snapshot does not match its digest — released`);
+    return "released";
+  }
+  ensureHeadroom(deps, { subrequests: FIND_POSTED_PAGES + CARD_COST.reserveSubrequests, d1Queries: CARD_COST.d1Queries });
   const postDate = cardKey.slice(0, 10);
-  const found = await deps.delivery.findPosted(to, cardKey, tsOf(Date.parse(`${postDate}T00:00:00Z`)));
-  if (!found) {
-    await deps.store.releaseCard(cardKey);
-    return false;
+  const posted = await deps.delivery.findPosted(to, cardKey, tsOf(Date.parse(`${postDate}T00:00:00Z`)));
+  if (posted.state === "unknown") {
+    if (now > Date.parse(`${postDate}T00:00:00Z`) + SWEEP_CARD_TTL_MS) {
+      await release(deps, cardKey);
+      notes.push(`${cardKey}: still not found after its 72 h (${posted.why}) — released`);
+      return "released";
+    }
+    notes.push(`${cardKey}: could not tell whether it went up (${posted.why}) — held for the next try`);
+    return "held";
   }
-  const ordered = [...findings].sort((a, b) => a.driftAt - b.driftAt || a.id.localeCompare(b.id));
-  const plan = cardPlan(cardKey, destination, ordered);
+  if (posted.state === "absent") {
+    await release(deps, cardKey);
+    return "released";
+  }
+  if (posted.digest !== snapshot.digest) {
+    await deps.delivery.withdraw(to.channel, posted.ts, WITHDRAWN_TEXT, cardKey).catch(rethrowIfBudget);
+    await release(deps, cardKey);
+    notes.push(`${cardKey}: the posted card shows other fixes than its snapshot — withdrawn`);
+    return "released";
+  }
   const staged = await stageOrWithdraw(ctx, plan, {
     channel: to.channel,
-    root: to.threadTs ?? found.ts,
-    ts: found.ts,
-    text: found.text,
+    root: to.threadTs ?? posted.ts,
+    ts: posted.ts,
+    text: posted.text,
     postDate,
   });
-  if (!staged) return false;
-  await deps.store.removeFindings(ordered.map((f) => f.id));
+  if (!staged) return "released";
+  // A later night may have queued the same finding again, re-read; it is
+  // carded now, as it was shown.
+  await deps.store.removeFindings(plan.items.map((f) => f.id));
   notes.push(`${cardKey}: finished staging a card an earlier try posted`);
   ctx.cards.push({
     key: cardKey,
-    destination,
+    destination: plan.destination,
     channel: to.channel,
     threadTs: to.threadTs,
-    items: ordered.length,
-    text: found.text,
-    proposalTs: found.ts,
+    items: plan.items.length,
+    text: posted.text,
+    proposalTs: posted.ts,
   });
-  ctx.carded.push(...ordered);
-  return true;
+  ctx.carded.push(...plan.items);
+  return "live";
 }
 
 /** An item in one of these states means the thread has had this fix. */

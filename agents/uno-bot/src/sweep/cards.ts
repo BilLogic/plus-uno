@@ -119,6 +119,39 @@ export function cardPlan(key: string, destination: Destination, items: PendingFi
   };
 }
 
+/**
+ * A short, stable digest of a card's operations — key order and whitespace
+ * in the JSON do not move it, any change of text or stamp does. It rides the
+ * card's Slack tag and its snapshot, so a card is only ever staged with the
+ * operations it showed.
+ */
+export function operationsDigest(operations: readonly ProposalOperation[]): string {
+  const text = stable(operations);
+  // cyrb53: not a cryptographic hash — it detects a changed batch, and
+  // nothing here trusts it against an adversary.
+  let h1 = 0xdeadbeef;
+  let h2 = 0x41c6ce57;
+  for (let i = 0; i < text.length; i++) {
+    const c = text.charCodeAt(i);
+    h1 = Math.imul(h1 ^ c, 2654435761);
+    h2 = Math.imul(h2 ^ c, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+}
+
+function stable(v: unknown): string {
+  if (Array.isArray(v)) return `[${v.map(stable).join(",")}]`;
+  if (v !== null && typeof v === "object") {
+    return `{${Object.entries(v as Record<string, unknown>)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([k, val]) => `${JSON.stringify(k)}:${stable(val)}`)
+      .join(",")}}`;
+  }
+  return JSON.stringify(v);
+}
+
 /** One key per place a card can land: a thread, or a team channel. */
 export function destinationKey(d: Destination): string {
   return d.rung === "private" || d.rung === "thread" ? `${d.channel}:${d.threadTs ?? ""}` : d.channel;
@@ -270,7 +303,7 @@ export function sweepCardPick(text: string, count: number): number[] | null {
 export function sweepCardInstruction(): string {
   return [
     "(system: SWEEP CARD — the pending card is an end-of-day sweep card: one `notion_update` per fix, each an in-place replace.",
-    "A reply that drops an item (\"drop 2\", \"not the second one\") → stage the SAME batch without that operation, every other operation byte for byte. Nothing left → cancel with `proposal_resolve`.",
+    "A reply that drops an item in words (\"not the second one\"; a bare \"drop 2\" is applied before you see it) → stage the SAME batch without that operation, every other operation byte for byte. Nothing left → cancel with `proposal_resolve`.",
     "Change only what the reply asked for: the revision holds the card's own fixes, minus the dropped ones. For anything more, `read_reference` `docs/connectors/slack-sweep`.)",
   ].join("\n");
 }

@@ -7,6 +7,7 @@
 
 import {
   mergeFindings,
+  type CardSnapshot,
   type PendingFinding,
   type SweepItemRecord,
   type SweepRunRecord,
@@ -31,6 +32,7 @@ export function createInMemorySweepStore(): InMemorySweepStore {
   const items = new Map<string, SweepItemRecord>();
   const failures = new Map<string, { nights: number; lastRunDate: string }>();
   let queue: PendingFinding[] = [];
+  const cards = new Map<string, CardSnapshot>();
   return {
     async cursor(channel) {
       return cursors.get(channel) ?? null;
@@ -95,6 +97,16 @@ export function createInMemorySweepStore(): InMemorySweepStore {
     async removeFindings(ids) {
       const gone = new Set(ids);
       queue = queue.filter((f) => !gone.has(f.id));
+    },
+    async saveCard(snapshot) {
+      cards.set(snapshot.key, copy(snapshot));
+    },
+    async cardSnapshot(cardKey) {
+      const snapshot = cards.get(cardKey);
+      return snapshot ? copy(snapshot) : null;
+    },
+    async dropCard(cardKey) {
+      cards.delete(cardKey);
     },
     runs() {
       return [...runs.values()].map(copy);

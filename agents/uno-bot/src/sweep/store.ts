@@ -19,7 +19,7 @@
 //
 // PURE: no `Env`, no Workers global.
 
-import type { DriftFinding } from "./finding";
+import type { Destination, DriftFinding } from "./finding";
 
 /** A finding waiting for its morning, as the queue holds it. */
 export interface PendingFinding extends DriftFinding {
@@ -131,12 +131,31 @@ export interface SweepRecords {
   clearThreadFailure(channel: string, threadTs: string): Promise<void>;
 }
 
+/**
+ * A card exactly as it was posted: its fixes (permalinks and all), where it
+ * went, and the digest of the operations it showed. Kept from before the post
+ * until the card is staged, so a retry stages what people saw — never
+ * whatever the queue holds by then, which a later night may have re-detected
+ * with new text and a fresher stamp.
+ */
+export interface CardSnapshot {
+  key: string;
+  destination: Destination;
+  items: PendingFinding[];
+  /** `operationsDigest` of the card's operations, also on its Slack tag. */
+  digest: string;
+}
+
 /** The KV half. */
 export interface FindingQueue {
   pendingFindings(): Promise<PendingFinding[]>;
   /** Adds, replacing a finding with the same id by the newer read. */
   addFindings(findings: PendingFinding[]): Promise<void>;
   removeFindings(ids: string[]): Promise<void>;
+  /** Keep a card's snapshot until it is staged or released. */
+  saveCard(snapshot: CardSnapshot): Promise<void>;
+  cardSnapshot(cardKey: string): Promise<CardSnapshot | null>;
+  dropCard(cardKey: string): Promise<void>;
 }
 
 export type SweepStore = SweepRecords & FindingQueue;
