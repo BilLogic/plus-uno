@@ -27,6 +27,7 @@ import { restageFor } from "../turn/env-deps";
 import type { SlackReactionAddedEvent } from "./events";
 import { conversationsReplies, getBotIdentity } from "./api";
 import { slackDelivery } from "./slack-delivery";
+import { reactionRecorderFor } from "../usage/resolution-env";
 
 export async function handleReaction(env: Env, event: SlackReactionAddedEvent): Promise<void> {
   if (event.item.type !== "message") return;
@@ -37,6 +38,7 @@ export async function handleReaction(env: Env, event: SlackReactionAddedEvent): 
       messageTs: event.item.ts,
       glyph: event.reaction,
       userId: event.user,
+      ...(event.item_user ? { messageAuthorId: event.item_user } : {}),
     },
     reactionDoorDeps(env),
   );
@@ -70,5 +72,7 @@ function reactionDoorDeps(env: Env): ReactionDoorDeps {
     applyVerdict: (verdict) => executeVerdict(env, verdict),
 
     restage: restageFor(env, threadState),
+
+    recordReaction: reactionRecorderFor(env),
   };
 }

@@ -55,6 +55,9 @@ Three jobs, from the spec (#742):
 
 - DM text.
 - Anything about the other party in a DM beyond what a reminder strictly needs.
+  The one DM-derived fact kept is a boolean, `escalated_to_lead`: whether an
+  asker raised the same topic with the lead. It is read on the lead's own token
+  (ADR-020, the 2026-09-29 amendment).
 - Channel request text past its classification, and in any case past 14 days.
 - Secrets and tokens.
 
