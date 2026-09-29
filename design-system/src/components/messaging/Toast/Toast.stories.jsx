@@ -90,11 +90,29 @@ function ToastVariantsDemos() {
     );
 }
 
+/*
+ * `color-contrast` skips ONLY the warning header's title and timestamp: the
+ * surface color on the Warning fill is 3.52:1, below AA's 4.5:1, and that is
+ * an accepted exception (see WarningHeader). The rule still runs on every
+ * other element, including the other headers; every other rule stays on.
+ */
+const WARNING_HEADER_CONTRAST_EXCEPTION = {
+    a11y: {
+        config: {
+            rules: [{
+                id: 'color-contrast',
+                selector: '*:not(.plus-toast.warning .plus-toast-title):not(.plus-toast.warning .plus-toast-timestamp)',
+            }],
+        },
+    },
+};
+
 export const Styles = () => (
     <div className="d-flex flex-column gap-3">
         <ToastVariantsDemos />
     </div>
 );
+Styles.parameters = WARNING_HEADER_CONTRAST_EXCEPTION;
 
 export const Overview = () => (
     <ToastContainer className="p-3" style={{ position: 'static' }}>
@@ -230,6 +248,38 @@ Dismiss.play = async ({ canvasElement }) => {
     await userEvent.click(within(warning).getByRole('button', { name: 'Close' }));
     await expect(canvas.getByTestId('dismiss-closed')).toHaveTextContent('warning');
     await waitFor(() => expect(canvas.queryByTestId('dismiss-warning')).toBeNull());
+};
+
+/**
+ * The warning header draws its content like every other header: title,
+ * timestamp, icon and × all in the surface color, as in Figma. The small
+ * timestamp is 3.52:1 on the Warning fill, below AA's 4.5:1: an accepted
+ * exception, kept so the warning Toast reads as one of the set. It is recorded
+ * in the text-contrast baseline, and in the Toast docs.
+ */
+export const WarningHeader = () => (
+    <Toast style="warning" title="Warning toast" timestamp="Just now" show autohide={false} data-testid="warning-header">
+        Header content is the surface color.
+    </Toast>
+);
+
+WarningHeader.parameters = WARNING_HEADER_CONTRAST_EXCEPTION;
+
+WarningHeader.play = async ({ canvasElement }) => {
+    const toast = within(canvasElement).getByTestId('warning-header');
+    const header = toast.querySelector('.toast-header');
+    const surface = tokenColor(canvasElement, '--color-surface');
+    await expect(getComputedStyle(header).backgroundColor, 'header fill').toBe(tokenColor(canvasElement, '--color-warning'));
+
+    const parts = {
+        title: toast.querySelector('.plus-toast-title'),
+        timestamp: toast.querySelector('.plus-toast-timestamp'),
+        icon: toast.querySelector('.plus-toast-icon i'),
+        close: within(toast).getByRole('button', { name: 'Close' }).querySelector('i'),
+    };
+    for (const [part, node] of Object.entries(parts)) {
+        await expect(getComputedStyle(node).color, `warning ${part} is the surface color`).toBe(surface);
+    }
 };
 
 /**
