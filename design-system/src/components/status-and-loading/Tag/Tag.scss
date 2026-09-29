@@ -4,14 +4,17 @@
  * ONE SIZE: 22 tall including a 1px border, B3 12 text, padding 4, gap 4,
  * radius 4. The label heights (16/20/22/32) have no semantic token yet, so the
  * 22 is a local custom property set from `_label-heights.scss`, as Count does.
- * The swatch 10, radius 2 and × 16 are Figma-bound spacing and radius
+ * The swatch 10, radius 2, × 16, the 16 avatar box (space-300) and the 12
+ * spinner inside it (space-200) are Figma-bound spacing and radius
  * primitives, because no Element token names them.
  *
  * THE COLOR MAP. Per name: the subtle border, the hue (swatch, spinner and the
- * selected border), and the hue's 08, 12 and 16 state layers. Each hue borrows
+ * selected border), the hue's 08, 12 and 16 state layers, and the avatar fill
+ * (the hue's Container) for the avatar types. Each hue borrows
  * the curriculum token whose color it names; teal is Tertiary, never Info.
  * Grey is not a hue: its border is Outline Variant, its swatch and selected
- * border are Outline, and its state layers are on-surface-variant.
+ * border are Outline, its state layers are on-surface-variant, and its avatar
+ * fill is Surface Container High.
  * The map holds whole `var()` references so the generated docs list them.
  *
  *   blue     technology-tools
@@ -30,6 +33,7 @@ $tag-colors: (
         var(--color-on-surface-variant-state-08, rgba(65, 72, 77, 0.08)),
         var(--color-on-surface-variant-state-12, rgba(65, 72, 77, 0.12)),
         var(--color-on-surface-variant-state-16, rgba(65, 72, 77, 0.16)),
+        var(--color-surface-container-high, #e7e8eb),
     ),
     'blue': (
         var(--color-technology-tools-border-subtle, rgba(0, 92, 189, 0.45)),
@@ -37,6 +41,7 @@ $tag-colors: (
         var(--color-technology-tools-state-08, rgba(0, 92, 189, 0.08)),
         var(--color-technology-tools-state-12, rgba(0, 92, 189, 0.12)),
         var(--color-technology-tools-state-16, rgba(0, 92, 189, 0.16)),
+        var(--color-technology-tools-container, #d7e2ff),
     ),
     'green': (
         var(--color-advocacy-border-subtle, rgba(22, 119, 69, 0.45)),
@@ -44,6 +49,7 @@ $tag-colors: (
         var(--color-advocacy-state-08, rgba(22, 119, 69, 0.08)),
         var(--color-advocacy-state-12, rgba(22, 119, 69, 0.12)),
         var(--color-advocacy-state-16, rgba(22, 119, 69, 0.16)),
+        var(--color-advocacy-container, #b3f1bf),
     ),
     'purple': (
         var(--color-mastering-content-border-subtle, rgba(134, 89, 169, 0.45)),
@@ -51,6 +57,7 @@ $tag-colors: (
         var(--color-mastering-content-state-08, rgba(127, 63, 177, 0.08)),
         var(--color-mastering-content-state-12, rgba(127, 63, 177, 0.12)),
         var(--color-mastering-content-state-16, rgba(127, 63, 177, 0.16)),
+        var(--color-mastering-content-container, #f2daff),
     ),
     'magenta': (
         var(--color-relationship-border-subtle, rgba(199, 11, 119, 0.45)),
@@ -58,6 +65,7 @@ $tag-colors: (
         var(--color-relationship-state-08, rgba(199, 11, 119, 0.08)),
         var(--color-relationship-state-12, rgba(199, 11, 119, 0.12)),
         var(--color-relationship-state-16, rgba(199, 11, 119, 0.16)),
+        var(--color-relationship-container, #ffd9e4),
     ),
     'yellow': (
         var(--color-social-emotional-border-subtle, rgba(140, 102, 0, 0.45)),
@@ -65,6 +73,7 @@ $tag-colors: (
         var(--color-social-emotional-state-08, rgba(125, 87, 0, 0.08)),
         var(--color-social-emotional-state-12, rgba(125, 87, 0, 0.12)),
         var(--color-social-emotional-state-16, rgba(125, 87, 0, 0.16)),
+        var(--color-social-emotional-container, #ffdea0),
     ),
     'teal': (
         var(--color-tertiary-border-subtle, rgba(14, 129, 117, 0.45)),
@@ -72,6 +81,7 @@ $tag-colors: (
         var(--color-tertiary-state-08, rgba(14, 129, 117, 0.08)),
         var(--color-tertiary-state-12, rgba(14, 129, 117, 0.12)),
         var(--color-tertiary-state-16, rgba(14, 129, 117, 0.16)),
+        var(--color-tertiary-container, #85ecd5),
     ),
 );
 
@@ -115,7 +125,102 @@ $tag-colors: (
         --plus-tag-08: #{nth($tokens, 3)};
         --plus-tag-12: #{nth($tokens, 4)};
         --plus-tag-16: #{nth($tokens, 5)};
+        --plus-tag-avatar: #{nth($tokens, 6)};
     }
+}
+
+/* ------------------------------------------------------------ avatar types */
+
+/*
+ * A person, an agent or a team: the border and state layers are neutral on
+ * every color, because the avatar already says who it is and a hued border
+ * would claim a category as well. The color moves into the avatar's fill.
+ */
+.plus-tag--person,
+.plus-tag--agent,
+.plus-tag--team {
+    --plus-tag-border: #{nth(map-get($tag-colors, 'grey'), 1)};
+    --plus-tag-hue: #{nth(map-get($tag-colors, 'grey'), 2)};
+    --plus-tag-08: #{nth(map-get($tag-colors, 'grey'), 3)};
+    --plus-tag-12: #{nth(map-get($tag-colors, 'grey'), 4)};
+    --plus-tag-16: #{nth(map-get($tag-colors, 'grey'), 5)};
+}
+
+/*
+ * Grey avatars, as the Figma set draws them: a grey agent sits on the
+ * Mastering Content Container (the AI purple) and a grey team on Technology
+ * Tools 08, so neither reads as a person's neutral disc.
+ *
+ * The team fill is a state layer used at rest, which
+ * guidelines/foundations/color.md keeps for interaction ("Use state layers for
+ * interaction"; "Use `-container` for backgrounds"). It stays because Figma
+ * binds this exact variable on all 16 team variants on purpose: an 08 wash is
+ * paler than any Container, and the rule is Bill's call rather than this
+ * stylesheet's. The avatar is never interactive, so no hover layer stacks on it.
+ */
+.plus-tag--grey.plus-tag--agent {
+    --plus-tag-avatar: var(--color-mastering-content-container, #f2daff);
+}
+
+.plus-tag--grey.plus-tag--team {
+    --plus-tag-avatar: var(--color-technology-tools-state-08, rgba(0, 92, 189, 0.08));
+}
+
+/* A person is round: the tag, the avatar and the ×. */
+.plus-tag--person {
+    border-radius: var(--size-element-radius-full, 999px);
+}
+
+/* The 16 avatar in the swatch's place. */
+.plus-tag__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    box-sizing: border-box;
+    width: var(--size-spacing-medium-space-300, 16px);
+    height: var(--size-spacing-medium-space-300, 16px);
+    overflow: hidden;
+    background-color: var(--plus-tag-avatar);
+}
+
+.plus-tag__avatar--person {
+    border-radius: var(--size-element-radius-full, 999px);
+}
+
+/* Radius 2: a primitive, because no Element radius token is 2. */
+.plus-tag__avatar--team {
+    border-radius: var(--size-border-radius-radius-50, 2px);
+}
+
+/* A hexagon 13.86 wide in the 16 box, pointed top and bottom, as in Figma. */
+.plus-tag__avatar--agent {
+    clip-path: polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
+}
+
+/* While saving, the box stays and holds the spinner, with no fill. */
+.plus-tag__avatar--saving {
+    background-color: transparent;
+}
+
+.plus-tag__avatar-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/*
+ * Initials: Lato SemiBold 7, as in Figma. The 7px has no type token; it is the
+ * one size that fits two letters in a 16 disc.
+ */
+.plus-tag__initials {
+    color: var(--color-on-surface, #191c1e);
+    font-family: var(--font-family-header, "Lato", sans-serif);
+    font-size: 7px;
+    font-weight: var(--font-weight-semibold-2, 600);
+    line-height: 1;
+    letter-spacing: 0;
 }
 
 .plus-tag__label {
@@ -253,6 +358,11 @@ $tag-colors: (
     background-color: var(--color-on-surface-variant-state-16, rgba(65, 72, 77, 0.16));
 }
 
+/* Round on a person tag, as its host is. */
+.plus-tag--person .plus-tag__remove {
+    border-radius: var(--size-element-radius-full, 999px);
+}
+
 /* Focus: the 12 fill plus a 2px Focus Ring 2px outside the ×. */
 .plus-tag__remove:focus-visible {
     background-color: var(--color-on-surface-variant-state-12, rgba(65, 72, 77, 0.12));
@@ -267,7 +377,10 @@ $tag-colors: (
     cursor: progress;
 }
 
-/* The spinner takes the swatch's box exactly, so saving keeps the width. */
+/*
+ * The spinner takes the swatch's box exactly, so saving keeps the width. In an
+ * avatar's box it is 12, inset 2, as Figma draws it.
+ */
 .plus-tag__spinner {
     flex: none;
     box-sizing: border-box;
@@ -282,12 +395,27 @@ $tag-colors: (
     animation: plus-tag-spin 0.8s linear infinite;
 }
 
+/*
+ * In an avatar's box the spinner is Figma's: 12 across, in on-surface-variant
+ * on every color, a 3/4 arc with a 1.8 ring. The 1.8 lives in the SVG's
+ * stroke-width, a literal because no stroke token is 1.8.
+ */
+.plus-tag__avatar-spinner {
+    display: block;
+    width: var(--size-spacing-medium-space-200, 12px);
+    height: var(--size-spacing-medium-space-200, 12px);
+    color: var(--color-on-surface-variant, #3f484a);
+    stroke: currentColor;
+    animation: plus-tag-spin 0.8s linear infinite;
+}
+
 @keyframes plus-tag-spin {
     to { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .plus-tag__spinner {
+    .plus-tag__spinner,
+    .plus-tag__avatar-spinner {
         animation-duration: 2.4s;
     }
 }
@@ -331,4 +459,14 @@ $tag-colors: (
 
 .plus-tag--disabled .plus-tag__label {
     text-decoration: none;
+}
+
+/* A disabled avatar's fill and initials follow the tag's own. */
+/* Saving keeps its clear ground, so the spinner never sits on a grey disc. */
+.plus-tag--disabled .plus-tag__avatar:not(.plus-tag__avatar--saving) {
+    background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
+}
+
+.plus-tag--disabled .plus-tag__initials {
+    color: var(--color-secondary-text, #3b525f);
 }
