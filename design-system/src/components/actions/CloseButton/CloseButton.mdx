@@ -54,6 +54,10 @@ The one dismiss control for surfaces that close as a whole: a fixed 24×24 hit a
     <DsCanvasQuiet of={CloseButtonStories.Tones} />
 </DocsCanvasShell>
 
+<DocsCanvasShell description={<><code>inverse</code> on each ground it is declared for.</>}>
+    <DsCanvasQuiet of={CloseButtonStories.InverseGrounds} />
+</DocsCanvasShell>
+
 <DocsCanvasShell description={<>The same size beside text of any size — it never scales with its surroundings.</>}>
     <DsCanvasQuiet of={CloseButtonStories.FixedSize} />
 </DocsCanvasShell>
@@ -94,7 +98,12 @@ size, and it keeps that size whatever text sits beside it. Where it sits on a
 line of text is the parent's job: `Alert` centers it on its first line.
 
 Two tones: `default` for neutral surfaces, and `inverse` for colored or dark
-grounds, where the × and its focus ring take the light surface color. There is
+grounds, where the × and its focus ring take the light surface color. `inverse`
+is only for these grounds: `--color-inverse-surface`, `--color-primary`,
+`--color-secondary`, `--color-success`, `--color-danger`, `--color-tertiary`
+and `--color-info`. Each is declared on the tone and measured by
+`check:focus-ring` and `check:text-contrast`. Warning is not one of them: the ×
+on `--color-warning` is 3.52:1, under the 4.5:1 those checks hold a color to. There is
 no disabled state and there are no color variants: a close control is always
 available, and the × is neutral on every intent.
 
@@ -135,7 +144,7 @@ available, and the × is neutral on every intent.
 // Incorrect — a light × and a light focus ring on the light page are invisible.
 <CloseButton tone="inverse" onClick={close} />
 
-// Correct — only on a colored or dark ground the caller paints.
+// Correct — only on one of the declared grounds, painted by the caller.
 <div style={{ background: 'var(--color-inverse-surface)' }}>
   <CloseButton tone="inverse" onClick={close} />
 </div>
@@ -153,8 +162,10 @@ available, and the × is neutral on every intent.
 - **The × is `aria-hidden`.** The name is the whole of what is announced.
 - **The focus ring** is `--color-focus-ring`, 2px, drawn 2px outside the box
   with radius `--size-element-radius-lg`, over a 12% state layer. On `inverse`
-  it is `--color-focus-ring-inverse`, which aliases surface and is only visible
-  on the dark and colored grounds that tone is for.
+  it is `--color-focus-ring-inverse`, which aliases surface. It is at least
+  4.53:1 on every declared ground, from `--color-tertiary` to 12.46:1 on
+  `--color-inverse-surface`. The *Inverse grounds* story renders each one and
+  measures the ring as the browser paints it.
 - **It is a real `<button type="button">`**, so Enter and Space press it and it
   never submits a surrounding form.
 

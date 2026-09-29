@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { run } from './check-focus-ring.mjs';
-import { AFFORDANCE, NEGATED, colours, failures, focusRules, indicators, invisible, ratio } from './focus-ring.mjs';
+import { AFFORDANCE, NEGATED, colours, declarationErrors, failures, focusRules, indicators, invisible, ratio } from './focus-ring.mjs';
 import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
 const VALUES = colours();
@@ -162,6 +162,72 @@ test('an empty token directory fires the sentinel floor, not a clean sweep', () 
       found.some((message) => /no longer defines --color-focus-ring/.test(message)),
       `expected the vanished role, got:\n${found.join('\n')}`,
     );
+  } finally {
+    done();
+  }
+});
+
+/*
+ * `@grounds` — a ring drawn on a ground its CALLER paints declares that ground,
+ * and is held to 3:1 on EVERY declared ground rather than on the page.
+ */
+const inverseRing = (grounds) => [
+  '.x--inverse {',
+  `  // @grounds: ${grounds}`,
+  '  &:focus-visible::after {',
+  '    border-color: var(--color-surface);',
+  '  }',
+  '}',
+].join('\n');
+
+test('@grounds: a ring is measured on each declared ground and passes when every one clears 3:1', () => {
+  const root = corpus({ 'design-system/src/a.scss': inverseRing('--color-inverse-surface --color-primary') });
+  const rules = focusRules(['design-system/src/a.scss'], root);
+  const entries = indicators(rules, VALUES);
+  assert.equal(entries.length, 1);
+  assert.deepEqual(entries[0].grounds.map((g) => g.ground).sort(), ['--color-inverse-surface', '--color-primary']);
+  // `best` is the WEAKEST ground: the rule is only as visible as that.
+  assert.equal(entries[0].best.ground, '--color-primary');
+  assert.ok(entries[0].best.ratio >= 3);
+  assert.deepEqual([...invisible(entries).keys()], []);
+  assert.deepEqual(declarationErrors(rules, VALUES), []);
+});
+
+test('@grounds: a single declared ground under 3:1 fails the rule, naming that ground', () => {
+  // Surface on the light surface-container is the ring on a ground it was never for.
+  const root = corpus({ 'design-system/src/a.scss': inverseRing('--color-primary --color-surface-container') });
+  const entries = indicators(focusRules(['design-system/src/a.scss'], root), VALUES);
+  const under = invisible(entries);
+  assert.equal(under.size, 1);
+  assert.equal([...under.values()][0].best.ground, '--color-surface-container');
+  assert.match(failures(under, { fresh: [...under.keys()] })[0], /on --color-surface-container/);
+});
+
+test('@grounds: an unknown token or an empty list is an error, not a pass', () => {
+  const unknown = corpus({ 'design-system/src/a.scss': inverseRing('--color-primary --color-nope') });
+  assert.match(declarationErrors(focusRules(['design-system/src/a.scss'], unknown), VALUES).join('\n'), /--color-nope/);
+  const empty = corpus({ 'design-system/src/a.scss': inverseRing('') });
+  assert.match(declarationErrors(focusRules(['design-system/src/a.scss'], empty), VALUES).join('\n'), /declares no grounds/);
+});
+
+test('@grounds: an undeclared ring is still measured on the page, unchanged', () => {
+  const root = corpus({ 'design-system/src/a.scss': '.x:focus-visible { outline: 2px solid var(--color-surface); }\n' });
+  const entries = indicators(focusRules(['design-system/src/a.scss'], root), VALUES);
+  assert.equal(entries[0].best.ground, '--color-surface');
+  assert.equal(invisible(entries).size, 1);
+});
+
+test('@grounds: a bad declaration fails the whole check', () => {
+  const { root, done } = policyTree({
+    'design-system/src/tokens/_colors.scss':
+      ':root { --color-surface: #f9f9fc; --color-primary: #0472a8; --color-focus-ring: #0472a8; }\n',
+    'design-system/src/tokens/_color_roles.scss': ':root { --color-focus-ring: var(--color-primary); }\n',
+    'design-system/src/a.scss': inverseRing('--color-primary --color-nope'),
+    'docs/evals/focus-ring.json': FOCUS_BASELINE,
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(found.some((m) => /@grounds/.test(m) && /--color-nope/.test(m)), found.join('\n'));
   } finally {
     done();
   }

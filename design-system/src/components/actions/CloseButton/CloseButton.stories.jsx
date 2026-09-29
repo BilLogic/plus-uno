@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 
+import { contrast, parseColour } from '@/lib/tokens.mjs';
 import CloseButton from './CloseButton';
 
 export default {
@@ -24,7 +25,7 @@ export default {
         tone: {
             control: 'inline-radio',
             options: ['default', 'inverse'],
-            description: '`default` on neutral surfaces, `inverse` on colored or dark grounds',
+            description: '`default` on neutral surfaces, `inverse` only on the declared colored and dark grounds',
             table: { category: 'Design' },
         },
         what: {
@@ -217,6 +218,55 @@ Focus.play = async ({ canvasElement }) => {
         await expect(getComputedStyle(button).backgroundColor).toBe(getComputedStyle(probe).backgroundColor);
         probe.remove();
 
+        button.blur();
+    }
+};
+
+/**
+ * The grounds `tone="inverse"` is declared for — the `@grounds` list on
+ * `.plus-close-btn--inverse` in `CloseButton.scss`, which `check:focus-ring`
+ * and `check:text-contrast` measure from the token files. This renders each
+ * one and measures the ring and the × as the browser paints them. Warning is
+ * not on the list: the × on it is 3.52:1, under the 4.5:1 `check:text-contrast`
+ * holds every color to.
+ */
+const INVERSE_GROUNDS = [
+    '--color-inverse-surface',
+    '--color-primary',
+    '--color-secondary',
+    '--color-success',
+    '--color-danger',
+    '--color-tertiary',
+    '--color-info',
+];
+
+export const InverseGrounds = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
+        {INVERSE_GROUNDS.map((ground) => (
+            <div key={ground} data-ground={ground} style={{ ...inverseGround, background: `var(${ground})` }}>
+                <CloseButton tone="inverse" what={`example on ${ground.replace('--color-', '')}`} />
+            </div>
+        ))}
+    </div>
+);
+
+InverseGrounds.play = async ({ canvasElement }) => {
+    // Same WCAG luminance the checks use, from the shared token module.
+    const ratioOf = (a, b) => contrast(parseColour(a), parseColour(b));
+    for (const ground of INVERSE_GROUNDS) {
+        const wrapper = canvasElement.querySelector(`[data-ground="${ground}"]`);
+        const button = within(wrapper).getByRole('button');
+        const paint = getComputedStyle(wrapper).backgroundColor;
+
+        button.focus({ focusVisible: true });
+        await expect(button.matches(':focus-visible'), `${ground}: keyboard-focused`).toBe(true);
+        const ring = getComputedStyle(button, '::after').borderTopColor;
+        const ringRatio = ratioOf(ring, paint);
+        await expect(ringRatio, `${ground}: ring ${ring} on ${paint} is ${ringRatio.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
+
+        const glyph = getComputedStyle(button.querySelector('i')).color;
+        const glyphRatio = ratioOf(glyph, paint);
+        await expect(glyphRatio, `${ground}: × ${glyph} on ${paint} is ${glyphRatio.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
         button.blur();
     }
 };

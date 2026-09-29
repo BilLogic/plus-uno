@@ -31,7 +31,10 @@
  *     which is the right default — the overwhelming majority of `color:` in
  *     this repository is text on a page or on a near-white container — but it
  *     is an assumption, and a finding that contradicts it is the check being
- *     wrong rather than the code.
+ *     wrong rather than the code. A rule whose ground is painted by its caller
+ *     can DECLARE it — `// @grounds: --color-primary …` in the block, see
+ *     `scripts/lib/declared-grounds.mjs` — and is then measured on every
+ *     declared ground instead of the page, against the same threshold.
  *  2. INLINE STYLES. `style={{ color: 'var(--color-warning)' }}` in JSX is
  *     invisible here. The corpus is stylesheets.
  *  3. `--color-on-*` AND `--color-inverse-*`. Skipped by design: they exist to
@@ -56,6 +59,7 @@ import { fileURLToPath } from 'node:url';
 
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { documents } from './lib/corpus.mjs';
+import { declaredGrounds, groundErrors } from './lib/declared-grounds.mjs';
 
 import {
   composite,
@@ -163,15 +167,35 @@ export function textDeclarations(files, root = REPO_ROOT) {
     lines.forEach((line, index) => {
       const declaration = /(^|[\s;{])color\s*:\s*([^;]+);/.exec(line);
       if (declaration) {
-        const ground = groundFor(source, offset);
+        const own = groundFor(source, offset);
+        // The rule's own background wins; failing that, the grounds it
+        // declares with `@grounds`, each measured; failing that, the page.
+        const declared = own === PAGE_TOKEN ? declaredGrounds(source, offset) : null;
+        const grounds = declared?.tokens.length ? declared.tokens : [own];
         for (const match of declaration[2].matchAll(varReferencePattern('--color-'))) {
-          uses.push({ token: match[1], file, line: index + 1, source: line.trim(), ground });
+          for (const ground of grounds) {
+            uses.push({ token: match[1], file, line: index + 1, source: line.trim(), ground, declared });
+          }
         }
       }
       offset += line.length + 1;
     });
   }
   return uses;
+}
+
+/**
+ * `@grounds` declarations that cannot be measured — an empty list, or a token
+ * the token file does not define — as `file:line — reason`, once each.
+ */
+export function declarationErrors(uses, values) {
+  const seen = new Map();
+  for (const use of uses) {
+    if (!use.declared) continue;
+    const key = `${use.file}:${use.declared.line}`;
+    if (!seen.has(key)) seen.set(key, groundErrors(use.declared, values));
+  }
+  return [...seen].flatMap(([key, errors]) => errors.map((error) => `${key} — \`@grounds\` ${error}.`));
 }
 
 /**

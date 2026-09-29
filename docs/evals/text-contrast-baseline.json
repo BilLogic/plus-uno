@@ -6,11 +6,6 @@
       "ratio": 1,
       "why": "NOT A DEFECT — the check's blind spot 1. The header's ground is set by child modifiers (&--created is --color-success, &--updated --color-info, &--cancelled --color-warning), which this reads as the page. White on those three is 6.17 / 4.53 / 3.52:1; the last is the same --color-warning question recorded below, in a place that is genuinely white-on-gold."
     },
-    "design-system/src/components/actions/CloseButton/CloseButton.scss|--color-surface|--color-surface": {
-      "count": 1,
-      "ratio": 1,
-      "why": "NOT A DEFECT — the check's blind spot 1. This is the × of `CloseButton tone=\"inverse\"`, which exists only for colored or dark grounds its caller paints, and this reads the page. Surface on those grounds is 12.46:1 on inverse-surface, 5.02:1 on primary, 6.15 / 6.17 / 6.70:1 on danger / success / secondary, 4.53:1 on tertiary and info, 3.52:1 on warning. The × is an icon, held to 3:1 (WCAG 1.4.11), which every one of those clears. The default tone keeps --color-on-surface-variant."
-    },
     "design-system/src/components/forms-and-inputs/DateAndTimePicker.scss|--color-primary|--color-primary-state-08": {
       "count": 3,
       "ratio": 4.46,

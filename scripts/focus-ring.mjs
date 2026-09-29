@@ -42,7 +42,9 @@
  *     spread of widths is REPORTED (six spellings) rather than judged, because
  *     which one wins is a decision, not a measurement.
  *  3. GROUND BEYOND THE RULE. As with `check:text-contrast`: a background set by
- *     an ancestor is invisible, and the page is assumed.
+ *     an ancestor is invisible, and the page is assumed — unless the rule
+ *     DECLARES its grounds with `@grounds`, in which case it is measured on
+ *     every one and must clear 3:1 on each (`scripts/lib/declared-grounds.mjs`).
  *  4. `:focus` VS `:focus-visible`. Both count. Whether a component should use
  *     one or the other is a separate question from whether its ring can be
  *     seen.
@@ -59,6 +61,7 @@ import {
 } from '../design-system/src/lib/tokens.mjs';
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { PAGE_TOKEN, tokenValues } from './button-contrast.mjs';
+import { declaredGrounds, groundErrors } from './lib/declared-grounds.mjs';
 import { REPO_ROOT, groundFor, stylesheets } from './text-contrast.mjs';
 
 export { REPO_ROOT, stylesheets };
@@ -129,6 +132,9 @@ export function focusRules(files, root = REPO_ROOT) {
         value: declaration[3].split(/\s+/).join(' ').trim(),
         tokens: [...declaration[3].matchAll(varReferencePattern('--color-'))].map((m) => m[1]),
         ground: groundFor(source, declaration.index),
+        // Grounds the rule DECLARES it sits on (`// @grounds: …`), for a ring
+        // drawn on a ground its caller paints. See `scripts/lib/declared-grounds.mjs`.
+        declared: declaredGrounds(source, declaration.index),
         block: blockStart(source, declaration.index),
       });
     }
@@ -178,27 +184,71 @@ export function ratio(token, ground, values, page = PAGE_TOKEN) {
 }
 
 /**
+ * The grounds one rule is measured on. Its own rule's background wins, because
+ * that is the paint directly beneath it; failing that, the grounds it DECLARES
+ * with `@grounds`, every one of which it must clear; failing that, the page.
+ */
+export function groundsOf(rule) {
+  if (rule.ground !== PAGE_TOKEN) return [rule.ground];
+  if (rule.declared && rule.declared.tokens.length) return rule.declared.tokens;
+  return [PAGE_TOKEN];
+}
+
+/**
  * One entry per focus RULE — not per declaration — carrying its strongest
  * affordance. See the header: a 1.13:1 glow beside a 5.02:1 border is a rule
  * that can be seen.
+ *
+ * On more than one ground (a declared `@grounds` list), the rule is only as
+ * visible as it is on its WORST ground: the strongest affordance is found per
+ * ground, and `best` is the weakest of those. `grounds` keeps every one, so a
+ * report can say which ground failed and a summary can show the spread.
  */
 export function indicators(rules, values) {
   const byBlock = new Map();
   for (const rule of rules) {
     const key = `${rule.file}#${rule.block}`;
-    const entry = byBlock.get(key) ?? { file: rule.file, line: rule.line, selector: rule.selector, best: null, spellings: [] };
+    const entry = byBlock.get(key)
+      ?? { file: rule.file, line: rule.line, selector: rule.selector, best: null, spellings: [], perGround: new Map() };
     entry.spellings.push(`${rule.property}: ${rule.value}`);
-    for (const token of rule.tokens) {
-      const measured = ratio(token, rule.ground, values);
-      if (measured === null) continue;
-      if (!entry.best || measured > entry.best.ratio) {
-        entry.best = { token, ratio: measured, property: rule.property, ground: rule.ground };
+    if (rule.ground === PAGE_TOKEN && rule.declared?.tokens.length) entry.declared = true;
+    for (const ground of groundsOf(rule)) {
+      for (const token of rule.tokens) {
+        const measured = ratio(token, ground, values);
+        if (measured === null) continue;
+        const current = entry.perGround.get(ground);
+        if (!current || measured > current.ratio) {
+          entry.perGround.set(ground, { token, ratio: measured, property: rule.property, ground });
+        }
       }
     }
     entry.line = Math.min(entry.line, rule.line);
     byBlock.set(key, entry);
   }
+  for (const entry of byBlock.values()) {
+    for (const measured of entry.perGround.values()) {
+      if (!entry.best || measured.ratio < entry.best.ratio) entry.best = measured;
+    }
+    entry.grounds = [...entry.perGround.values()];
+    delete entry.perGround;
+  }
   return [...byBlock.values()].filter((entry) => entry.best);
+}
+
+/**
+ * `@grounds` declarations that cannot be measured — an empty list, or a token
+ * the token files do not define — as `file:line — reason`. Each is a failure of
+ * its own: a declaration that measures nothing would otherwise read as green.
+ */
+export function declarationErrors(rules, values) {
+  const seen = new Map();
+  for (const rule of rules) {
+    if (!rule.declared) continue;
+    const key = `${rule.file}:${rule.declared.line}`;
+    if (seen.has(key)) continue;
+    seen.set(key, groundErrors(rule.declared, values));
+  }
+  return [...seen].flatMap(([key, errors]) => errors.map((error) => `${key} — \`@grounds\` ${error}.`));
 }
 
 /**

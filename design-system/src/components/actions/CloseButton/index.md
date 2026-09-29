@@ -9,7 +9,7 @@ The one dismiss control for surfaces that close as a whole — Alert, Toast, Mod
 
 **Source:** `design-system/src/components/actions/CloseButton/CloseButton.jsx`
 
-**Stories:** `design-system/src/components/actions/CloseButton/CloseButton.stories.jsx` — Tones, FixedSize, Names, Focus, Overview, Interactive
+**Stories:** `design-system/src/components/actions/CloseButton/CloseButton.stories.jsx` — Tones, FixedSize, Names, Focus, InverseGrounds, Overview, Interactive
 
 **Storybook page:** `design-system/src/components/actions/CloseButton/CloseButton.mdx`
 
@@ -17,7 +17,7 @@ The one dismiss control for surfaces that close as a whole — Alert, Toast, Mod
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `tone` | enum | `'default'` | `default` on neutral surfaces, `inverse` on colored or dark grounds |
+| `tone` | enum | `'default'` | `default` on neutral surfaces, `inverse` only on the declared colored and dark grounds |
 | `what` | string | — | What closes — the accessible name becomes "Dismiss {what}" |
 | `onClick` | func | — | Called when the button is pressed |
 | `className` | string | `''` | Additional CSS classes |
