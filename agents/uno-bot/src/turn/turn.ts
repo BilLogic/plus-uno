@@ -143,8 +143,9 @@ const PROGRESS_LABEL = "Reading the question and this thread";
 export const USAGE_WRITE_TIMEOUT_MS = 1_000;
 
 /** The longest a DM ask's in-turn classification may hold the end of a turn.
- *  Past it the row is written unlabelled — blank, as a failed call is. */
-export const ASK_CLASSIFY_TIMEOUT_MS = 3_000;
+ *  The answer is already out, but the thread's next job waits behind it, so
+ *  this stays short. Past it the row is written unlabelled, as a failed call is. */
+export const ASK_CLASSIFY_TIMEOUT_MS = 1_500;
 
 // ── The request ──────────────────────────────────────────────────────────────
 
@@ -632,23 +633,17 @@ async function labelDmAsk(
   clock: () => number,
 ): Promise<TurnRecord> {
   if (record.surface !== "assistant" || record.testTraffic || !usage.classifyAsk) return record;
-  const timeoutMs = usage.classifyTimeoutMs ?? ASK_CLASSIFY_TIMEOUT_MS;
-  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
-    const subType = await Promise.race([
+    const subType = await withTimeout(
       usage.classifyAsk(text),
-      new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error(`timed out after ${timeoutMs} ms`)), timeoutMs);
-      }),
-    ]);
+      usage.classifyTimeoutMs ?? ASK_CLASSIFY_TIMEOUT_MS,
+    );
     return withAskLabel(record, subType, clock());
   } catch (err) {
     console.error(
       `[usage] turn ${record.turnId} not classified: ${err instanceof Error ? err.message : String(err)}`,
     );
     return record;
-  } finally {
-    if (timer !== undefined) clearTimeout(timer);
   }
 }
 
@@ -680,19 +675,25 @@ function watchFirstAnswer(delivery: Delivery, onFirst: () => void): Delivery {
  * thing it measures.
  */
 async function recordTurn(record: TurnRecord, usage: TurnUsage): Promise<void> {
-  const timeoutMs = usage.writeTimeoutMs ?? USAGE_WRITE_TIMEOUT_MS;
-  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
-    await Promise.race([
-      usage.log.record(record),
-      new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error(`timed out after ${timeoutMs} ms`)), timeoutMs);
-      }),
-    ]);
+    await withTimeout(usage.log.record(record), usage.writeTimeoutMs ?? USAGE_WRITE_TIMEOUT_MS);
   } catch (err) {
     console.error(
       `[usage] turn ${record.turnId} not recorded: ${err instanceof Error ? err.message : String(err)}`,
     );
+  }
+}
+
+/** `work`, or a rejection once `timeoutMs` has passed — whichever is first. */
+async function withTimeout<T>(work: Promise<T>, timeoutMs: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      work,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`timed out after ${timeoutMs} ms`)), timeoutMs);
+      }),
+    ]);
   } finally {
     if (timer !== undefined) clearTimeout(timer);
   }

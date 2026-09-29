@@ -99,8 +99,9 @@ export interface TurnRecord {
  * `record` is an UPSERT on `turnId`: a turn retried by the runner rewrites its
  * own row rather than adding a second. The category columns are the
  * classifier's once it has run: a retry never blanks a label (a null leaves
- * the stored one), and never brings text back to a row already classified. A caller must treat a throw as a lost
- * record, never as a lost turn — Turn logs and swallows it.
+ * the stored one), and never brings text back to a row already classified.
+ * A caller must treat a throw as a lost record, never as a lost turn — Turn
+ * logs and swallows it.
  */
 export interface UsageLog {
   record(turn: TurnRecord): Promise<void>;

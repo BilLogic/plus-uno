@@ -2,7 +2,7 @@
 -- until the end-of-day classifier labels it, and the labels themselves
 -- (src/usage/categories.ts, ADR-030).
 --
--- Additive: four nullable columns and one partial index. `classified_at`
+-- Additive: three nullable columns and one partial index. `classified_at`
 -- already exists (0001).
 --
 -- request_text is the one column in this database that holds message text. It

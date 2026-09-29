@@ -72,8 +72,9 @@ const ON_RETRY: Partial<Record<(typeof COLUMNS)[number], string>> = {
 };
 
 // An upsert that rewrites THIS record's columns only: a retried turn replaces
-// its own values, and columns a later writer owns (the ones later migrations
-// add) survive it. `INSERT OR REPLACE` would delete the row first and lose them.
+// its own values, the classifier's columns follow `ON_RETRY`, and columns a
+// later migration adds for another writer survive it by being left out.
+// `INSERT OR REPLACE` would delete the row first and lose them.
 const UPSERT =
   `INSERT INTO turns (${COLUMNS.join(", ")}) VALUES (${COLUMNS.map(() => "?").join(", ")}) ` +
   `ON CONFLICT (turn_id) DO UPDATE SET ` +

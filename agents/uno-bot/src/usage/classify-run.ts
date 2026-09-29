@@ -17,7 +17,9 @@ import type { AskCategoryStore } from "./category-store";
 /** Asks per classify job — one `chill` call and one batched write each. */
 export const CLASSIFY_BATCH_SIZE = 20;
 
-/** Classify jobs in one end-of-day run: up to this many batches a day. */
+/** Classify jobs in one end-of-day run: up to this many batches a day, so at
+ *  most 100 asks. A busier day's remainder waits for the next run, oldest
+ *  first; an ask still waiting after 14 days loses its text unlabelled. */
 export const CLASSIFY_BATCHES = 5;
 
 /** How long channel text may be kept, whatever happened to it (ADR-030). */

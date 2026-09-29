@@ -38,8 +38,9 @@ logged and dropped). A deploy with no pending migration needs no step.
   fields become SQL columns.
 - Bound parameters in the Worker, always; nothing is assembled into SQL from a
   value.
-- What the database never stores — message text past classification, anything
-  from a DM, secrets — is ADR-030's, and a migration does not widen it.
+- What the database never stores — message text past classification, any DM
+  text (a DM ask keeps only its category labels), secrets — is ADR-030's, and a
+  migration does not widen it.
 
 **Tested** by `npm run test:workerd`: the UsageLog conformance suite applies
 every file here to a local D1 before it runs, so a migration that fails to apply,
