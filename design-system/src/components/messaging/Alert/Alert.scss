@@ -11,7 +11,16 @@
     width: 100%;
     /* Full width - responsive */
     max-width: 100%;
-    border: var(--size-element-border) solid;
+    /*
+     * One border, on the left: Figma's `Element/stroke-xl`. That variable is
+     * 3px in Figma (stroke-300), but the code token `--size-element-stroke-xl`
+     * still resolves to 2.5px (stroke-250), and Divider's xl reads it too. Until
+     * the token is settled for both, the Alert takes the 3px primitive directly
+     * rather than moving Divider with it.
+     */
+    border: 0 solid;
+    border-left-width: var(--size-border-stroke-stroke-300);
+    color: var(--color-on-surface);
     box-sizing: border-box;
     /* Figma: Padding on container (16px), Gap between content and dismiss (variable) */
     padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
@@ -46,9 +55,8 @@
     white-space: pre-wrap;
     margin: 0;
 
-    // Links inherit the alert's on-container text color (already tuned for
-    // contrast against each theme's background) instead of Bootstrap's
-    // default link blue, which can fail contrast on light theme backgrounds.
+    // Links inherit the alert's on-surface text color instead of Bootstrap's
+    // default link blue, which can fail contrast on the tinted ground.
     a {
         color: inherit;
         text-decoration: underline;
@@ -127,8 +135,7 @@ $alert-themes: 'primary', 'secondary', 'success', 'danger', 'warning', 'info';
 @each $theme in $alert-themes {
     .plus-alert.#{$theme} {
         background-color: var(--color-#{$theme}-state-08);
-        border-color: var(--color-#{$theme});
-        color: var(--color-on-#{$theme}-container);
+        border-color: var(--color-#{$theme}-border);
 
         .plus-alert-leading {
             color: var(--color-#{$theme}-icon);
