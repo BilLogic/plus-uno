@@ -4,7 +4,7 @@
  * THE BOX. Medium is 20 tall (B3 12, icon 12, radius 4); large is 32 (B2 14
  * semibold, icon 16, radius 6). The two heights have no semantic token yet
  * (label heights 16/20/22/32 are a token follow-up), so they are local custom
- * properties with the value as the documented default.
+ * properties set from `_label-heights.scss`, which Skeleton reads too.
  *
  * THE PADDING, AS FIGMA BUILDS IT. The label and icon sit in an inner wrapper
  * (`__content`) whose right padding, added to the outer right padding, makes
@@ -18,8 +18,10 @@
  * THE BORDER IS AN INSET SHADOW. A 1px inside border that takes no layout, as
  * a Figma inside stroke does, so the height and the padding stay exact.
  */
+@use '../label-heights' as label;
+
 .plus-status {
-    --plus-status-height: 20px;
+    --plus-status-height: #{label.$status-height};
     --plus-status-icon-box: 20px;
 
     display: inline-flex;
@@ -48,7 +50,7 @@
 }
 
 .plus-status--large {
-    --plus-status-height: 32px;
+    --plus-status-height: #{label.$status-height-large};
     --plus-status-icon-box: 22px;
 
     padding: 0 var(--size-spacing-small-space-075, 6px) 0 var(--size-element-pad-x-md, 12px);

@@ -34,7 +34,7 @@ From `design-system/src/components/status-and-loading/Count/Count.scss`. Overrid
 
 ## Related
 
-Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Progress` · `Spinner` · `Status` · `Suggestion` · `Tag` · `TagGroup` · `Tile`
+Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Progress` · `Skeleton` · `Spinner` · `Status` · `Suggestion` · `Tag` · `TagGroup` · `Tile`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

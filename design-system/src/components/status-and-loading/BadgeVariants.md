@@ -45,7 +45,7 @@ From `design-system/src/components/status-and-loading/BadgeVariants.scss`. Overr
 
 ## Related
 
-Same group: `AiLabel` · `Badge` · `Count` · `Progress` · `Spinner` · `Status` · `Suggestion` · `Tag` · `TagGroup` · `Tile`
+Same group: `AiLabel` · `Badge` · `Count` · `Progress` · `Skeleton` · `Spinner` · `Status` · `Suggestion` · `Tag` · `TagGroup` · `Tile`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

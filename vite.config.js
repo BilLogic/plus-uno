@@ -187,7 +187,18 @@ export default defineConfig({
             provider: playwright({}),
             instances: [{
               browser: 'chromium'
-            }]
+            }],
+            // Runner-side commands a story's `play:` can reach through
+            // `window.__vitest_browser_runner__.commands.triggerCommand`, for
+            // what the page cannot do to itself. A story cannot set the
+            // browser's motion preference; Playwright can, for the whole page.
+            // Pass `null` to restore the default. Skeleton's ReducedMotion
+            // story uses it.
+            commands: {
+              emulateReducedMotion: async ({ page }, value) => {
+                await page.emulateMedia({ reducedMotion: value });
+              }
+            }
           },
           // Vitest replaces config arrays rather than merging them, so naming a
           // setup file here deletes the ones @storybook/addon-vitest injects from
