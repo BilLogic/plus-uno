@@ -34,7 +34,7 @@ From `design-system/src/components/status-and-loading/Tile/Tile.scss`. Override 
 
 ## Related
 
-Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Progress` · `Skeleton` · `Spinner` · `Status` · `Tag` · `TagGroup`
+Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Progress` · `Skeleton` · `Spinner` · `Status` · `Suggestion` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

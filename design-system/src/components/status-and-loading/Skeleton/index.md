@@ -33,7 +33,7 @@ From `design-system/src/components/status-and-loading/Skeleton/Skeleton.scss`. O
 
 ## Related
 
-Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Progress` · `Spinner` · `Status` · `Tag` · `TagGroup` · `Tile`
+Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Progress` · `Spinner` · `Status` · `Suggestion` · `Tag` · `TagGroup` · `Tile`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
