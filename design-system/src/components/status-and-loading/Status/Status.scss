@@ -105,12 +105,12 @@
  * mapping Count and Tag use.
  */
 $status-state: (
-    'neutral': (var(--color-surface-container, #edeef0), var(--color-on-surface-variant, #3f484a), var(--color-on-surface-variant-state-16, rgba(65, 72, 77, 0.16))),
+    'neutral': (var(--color-surface-container, #edeef0), var(--color-on-surface-variant, #3f484a), var(--color-on-surface-variant-state-16, rgba(63, 72, 74, 0.16))),
     'success': (var(--color-success-state-08, rgba(62, 105, 26, 0.08)), var(--color-success-text, #2c5609), var(--color-success-state-16, rgba(62, 105, 26, 0.16))),
-    'warning': (var(--color-warning-state-08, rgba(113, 92, 0, 0.08)), var(--color-warning-text, #5b4a00), var(--color-warning-state-16, rgba(113, 92, 0, 0.16))),
-    'danger': (var(--color-danger-state-08, rgba(190, 12, 22, 0.08)), var(--color-danger-text, #9b0606), var(--color-danger-state-16, rgba(190, 12, 22, 0.16))),
+    'warning': (var(--color-warning-state-08, rgba(159, 130, 5, 0.08)), var(--color-warning-text, #5b4a00), var(--color-warning-state-16, rgba(159, 130, 5, 0.16))),
+    'danger': (var(--color-danger-state-08, rgba(186, 26, 26, 0.08)), var(--color-danger-text, #9b0606), var(--color-danger-state-16, rgba(186, 26, 26, 0.16))),
     'info': (var(--color-info-state-08, rgba(14, 129, 117, 0.08)), var(--color-info-text, #005a50), var(--color-info-state-16, rgba(14, 129, 117, 0.16))),
-    'discovery': (var(--color-mastering-content-state-08, rgba(127, 63, 177, 0.08)), var(--color-mastering-content-text, #673a8b), var(--color-mastering-content-state-16, rgba(127, 63, 177, 0.16))),
+    'discovery': (var(--color-mastering-content-state-08, rgba(134, 89, 169, 0.08)), var(--color-mastering-content-text, #673a8b), var(--color-mastering-content-state-16, rgba(134, 89, 169, 0.16))),
 );
 
 /*
