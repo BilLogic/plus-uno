@@ -1062,6 +1062,32 @@ const onPicture = {
     right: 'var(--size-spacing-small-space-100, 8px)',
 };
 
+/** A state layer over the elevated fill, as it computes: a one-color gradient. */
+const stateLayer = (host, token) => {
+    const color = tokenColor(host, token);
+    return `linear-gradient(${color}, ${color})`;
+};
+
+/** The 2px surface gap as a computed shadow: under a ×, or stacked on Elevation 2 under a tag. */
+const surfaceGap = (host, { onElevation = true } = {}) => computedShadow(
+    host,
+    `0 0 0 var(--size-element-stroke-lg) var(--color-surface-container-lowest)${onElevation ? ', var(--elevation-light-2)' : ''}`,
+);
+
+/**
+ * The focus ring on `measured`: 2px solid Focus Ring, 2px outside, and the
+ * computed `box-shadow` under it, which is the surface gap on an elevated tag
+ * (the default) and `none` on a × off the image.
+ */
+const expectFocusRing = async (host, measured, what, shadow = surfaceGap(host)) => {
+    const s = getComputedStyle(measured);
+    await expect(s.outlineStyle, what).toBe('solid');
+    await expect(px(s.outlineWidth), what).toBe(2);
+    await expect(px(s.outlineOffset), `${what} sits 2px outside`).toBe(2);
+    await expect(s.outlineColor, what).toBe(tokenColor(host, '--color-focus-ring'));
+    await expect(s.boxShadow, `${what}: the shadow under the ring`).toBe(shadow);
+};
+
 /**
  * Tags on a thumbnail: `isElevated` lifts a read-only or link tag onto the
  * picture. A person, agent or team tag takes the same ground.
@@ -1132,7 +1158,7 @@ OnImages.play = async ({ canvasElement }) => {
     await expect(whileForced(disabled, ':hover', 'backgroundColor')).toBe(ground);
 
     // Hover and press: the state layer sits over the solid fill, which stays.
-    const layer = (token) => `linear-gradient(${t(token)}, ${t(token)})`;
+    const layer = (token) => stateLayer(canvasElement, token);
     const link = canvas.getByRole('link', { name: 'Open lesson' });
     for (const [pseudo, token] of [[':hover', '--color-on-surface-state-08'], [':active', '--color-on-surface-state-12']]) {
         await expect(whileForced(link, pseudo, 'backgroundColor'), `${pseudo} keeps the fill`).toBe(ground);
@@ -1147,54 +1173,17 @@ OnImages.play = async ({ canvasElement }) => {
 
     // Focus: the standard ring, 2px outside, with the 2px between it and the
     // tag filled in the surface color.
-    const ring = t('--color-focus-ring');
-    const gapped = computedShadow(
-        canvasElement,
-        '0 0 0 var(--size-element-stroke-lg) var(--color-surface-container-lowest), var(--elevation-light-2)',
-    );
-    const expectGappedRing = async (measured, what) => {
-        const s = getComputedStyle(measured);
-        await expect(s.outlineStyle, what).toBe('solid');
-        await expect(px(s.outlineWidth), what).toBe(2);
-        await expect(px(s.outlineOffset), what).toBe(2);
-        await expect(s.outlineColor, what).toBe(ring);
-        await expect(s.boxShadow, `${what}: a 2px surface gap inside the ring`).toBe(gapped);
-    };
     const video = canvas.getByRole('link', { name: 'Video' });
     await userEvent.tab();
     await expect(video).toHaveFocus();
-    await expectGappedRing(video, 'an elevated grey link');
-
-    /*
-     * The rule that draws the gap must draw the ring itself. The computed
-     * outline above would still pass if it only inherited the ring from the
-     * plain focus rule, but check:focus-ring scores each rule on its own
-     * strongest indicator, and a gap-only rule fails it. So find the focus
-     * rule that paints the gap on the focused tag, and read its own outline.
-     */
-    const gapRules = Array.from(document.styleSheets)
-        .flatMap((sheet) => {
-            try {
-                return Array.from(sheet.cssRules);
-            } catch {
-                return [];
-            }
-        })
-        .filter((rule) => rule.selectorText?.includes(':focus-visible')
-            && rule.style.getPropertyValue('box-shadow')
-            && video.matches(rule.selectorText));
-    await expect(gapRules.length, 'one focus rule paints the gap').toBe(1);
-    await expect(
-        probe(canvasElement, 'outline', gapRules[0].style.getPropertyValue('outline')),
-        'and that rule draws the standard ring itself',
-    ).toBe(probe(canvasElement, 'outline', '2px solid var(--color-focus-ring)'));
+    await expectFocusRing(canvasElement, video, 'an elevated grey link');
 
     await userEvent.tab();
     await expect(link).toHaveFocus();
-    await expectGappedRing(link, 'an elevated link');
+    await expectFocusRing(canvasElement, link, 'an elevated link');
     await userEvent.tab();
     await expect(splitLink).toHaveFocus();
-    await expectGappedRing(split, 'an elevated split link');
+    await expectFocusRing(canvasElement, split, 'an elevated split link');
 };
 
 /**
@@ -1248,12 +1237,7 @@ ElevatedAvatarTypes.play = async ({ canvasElement }) => {
         }
     }
 
-    const layer = (token) => `linear-gradient(${t(token)}, ${t(token)})`;
-    const ring = t('--color-focus-ring');
-    const gapped = computedShadow(
-        canvasElement,
-        '0 0 0 var(--size-element-stroke-lg) var(--color-surface-container-lowest), var(--elevation-light-2)',
-    );
+    const layer = (token) => stateLayer(canvasElement, token);
     for (const type of AVATAR_TAG_TYPES) {
         const link = canvas.getByRole('link', { name: `${type} link` });
         await expect(whileForced(link, ':hover', 'backgroundColor'), `${type} hover keeps the fill`).toBe(ground);
@@ -1264,11 +1248,7 @@ ElevatedAvatarTypes.play = async ({ canvasElement }) => {
 
         await userEvent.tab();
         await expect(link).toHaveFocus();
-        const s = getComputedStyle(link);
-        await expect(s.outlineStyle, `${type} focus`).toBe('solid');
-        await expect(px(s.outlineOffset), `${type} focus`).toBe(2);
-        await expect(s.outlineColor, `${type} focus`).toBe(ring);
-        await expect(s.boxShadow, `${type} focus has the surface gap`).toBe(gapped);
+        await expectFocusRing(canvasElement, link, `${type} focus`);
     }
 };
 
@@ -1354,15 +1334,22 @@ ElevatedDisabled.play = async ({ canvasElement }) => {
 };
 
 /**
- * The × of an elevated link has a white gap inside its focus ring, as the tag's
- * own focus does: a 2px Surface Container Lowest gap, then the 2px ring, whose
- * outer corner is 6. A × off the image keeps the plain ring.
+ * The × of an elevated link has a surface gap inside its focus ring, as the
+ * tag's own focus does: a 2px Surface Container Lowest gap, then the 2px ring.
+ * On a plain, agent or team tag the × is radius 2, so the gap's corner is 4
+ * and the ring's 6; on a person tag the ×, its gap and its ring are round. A ×
+ * off the image keeps the plain ring.
  */
 export const ElevatedRemoveFocus = () => (
-    <div style={thumbnail}>
+    <div style={{ ...thumbnail, height: '200px' }}>
         <div style={picture} aria-hidden="true" />
         <div style={onPicture}>
             <Tag behavior="link" color="teal" href="#unit" isElevated onRemove={() => {}}>Unit 3</Tag>
+            {AVATAR_TAG_TYPES.map((type) => (
+                <Tag key={type} type={type} behavior="link" href={`#${type}`} isElevated onRemove={() => {}}>
+                    {`${type} link`}
+                </Tag>
+            ))}
             <Tag behavior="link" color="teal" href="#unit" onRemove={() => {}}>Unit 4</Tag>
         </div>
     </div>
@@ -1370,36 +1357,46 @@ export const ElevatedRemoveFocus = () => (
 
 ElevatedRemoveFocus.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const t = (token) => tokenColor(canvasElement, token);
-    const ring = t('--color-focus-ring');
+    const gap = surfaceGap(canvasElement, { onElevation: false });
+    const spread = px(probe(canvasElement, 'width', 'var(--size-element-stroke-lg)'));
 
-    const expectRing = async (x, what) => {
+    // Tab past the link to its ×, and check the ring and what sits under it.
+    const focusRemove = async (name, what, shadow) => {
+        await userEvent.tab();
+        await userEvent.tab();
+        const x = canvas.getByRole('button', { name });
+        await expect(x).toHaveFocus();
+        await expectFocusRing(canvasElement, x, what, shadow);
+        return x;
+    };
+    // The gap is a spread shadow, so its corner is the ×'s radius plus the
+    // spread; the ring's is the ×'s radius plus its offset and width.
+    const expectSquareCorners = async (x, what) => {
         const s = getComputedStyle(x);
-        await expect(s.outlineStyle, what).toBe('solid');
-        await expect(px(s.outlineWidth), what).toBe(2);
-        await expect(px(s.outlineOffset), `${what} sits 2px outside`).toBe(2);
-        await expect(s.outlineColor, what).toBe(ring);
-        const outer = px(s.borderTopLeftRadius) + px(s.outlineOffset) + px(s.outlineWidth);
-        await expect(outer, `${what}: the ring's outer corner is 6`).toBe(6);
+        const radius = px(s.borderTopLeftRadius);
+        await expect(radius + spread, `${what}: the gap's corner is 4`).toBe(4);
+        await expect(radius + px(s.outlineOffset) + px(s.outlineWidth), `${what}: the ring's corner is 6`).toBe(6);
     };
 
-    await userEvent.tab();
-    await userEvent.tab();
-    const elevated = canvas.getByRole('button', { name: 'Remove Unit 3' });
-    await expect(elevated).toHaveFocus();
-    await expectRing(elevated, 'the elevated ×');
-    await expect(getComputedStyle(elevated).boxShadow, 'a 2px surface gap inside the ring').toBe(
-        computedShadow(canvasElement, '0 0 0 var(--size-element-stroke-lg) var(--color-surface-container-lowest)'),
-    );
+    await expectSquareCorners(await focusRemove('Remove Unit 3', 'the elevated ×', gap), 'the elevated ×');
 
-    await userEvent.tab();
-    await userEvent.tab();
-    const plain = canvas.getByRole('button', { name: 'Remove Unit 4' });
-    await expect(plain).toHaveFocus();
-    await expectRing(plain, 'the plain ×');
-    await expect(getComputedStyle(plain).boxShadow, 'no gap off the image').toBe('none');
+    for (const type of AVATAR_TAG_TYPES) {
+        const x = await focusRemove(`Remove ${type} link`, `the elevated ${type} ×`, gap);
+        if (type === 'person') {
+            // A radius of at least half the side is a circle, and the gap and
+            // the ring follow the ×'s corner outward, so all three are round.
+            const s = getComputedStyle(x);
+            await expect(px(s.borderTopLeftRadius), 'the person × is round, so its gap and ring are')
+                .toBeGreaterThanOrEqual(px(s.height) / 2);
+        } else {
+            await expectSquareCorners(x, `the elevated ${type} ×`);
+        }
+    }
+
+    const plain = await focusRemove('Remove Unit 4', 'the plain ×', 'none');
+    await expectSquareCorners(plain, 'the plain ×');
     await expect(getComputedStyle(plain).backgroundColor, 'with the 12 fill under it')
-        .toBe(t('--color-on-surface-variant-state-12'));
+        .toBe(tokenColor(canvasElement, '--color-on-surface-variant-state-12'));
 };
 
 /**
