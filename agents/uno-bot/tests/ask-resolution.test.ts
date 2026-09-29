@@ -22,8 +22,11 @@ import {
   ASK_RESOLUTION_JOBS,
   MAX_THREAD_ATTEMPTS,
   PASS_LIMIT,
+  TRY_LATER,
   createLeadDmReader,
+  passThreadOf,
   runResolutionPass,
+  type PassThread,
   type DmMessage,
   type SlackRead,
   type ThreadMessage,
@@ -67,7 +70,7 @@ function thread(...rest: ThreadMessage[]): ThreadMessage[] {
 async function pass(
   resolutions: ResolutionLog,
   opts: {
-    thread?: ThreadMessage[] | null;
+    thread?: PassThread;
     dms?: DmMessage[] | null;
     lead?: string | null;
     dryRun?: boolean;
@@ -212,7 +215,7 @@ describe("the end-of-day pass", () => {
 
   it("writes escalated_to_lead on an ask a reaction already resolved, and keeps the reaction", async () => {
     const { resolutions, turn } = await world();
-    await resolutions.recordReaction({ turnId: turn.turnId, requesterId: ASKER, at: ASK_MS + 10_000 });
+    await resolutions.recordReaction({ turnId: turn.turnId, requesterId: ASKER, reactedTs: tsAt(5_000), at: ASK_MS + 10_000 });
     await pass(resolutions, { thread: thread({ ts: tsAt(HOUR), user: LEAD, text: "also here" }) });
     const got = await resolutions.getResolution(turn.turnId);
     assert.equal(got?.resolution, "reaction");
@@ -275,6 +278,42 @@ describe("the end-of-day pass", () => {
     assert.equal(after.summary.skipped, 0);
   });
 
+  it("a thread Slack says is gone counts towards the limit; a rate limit, a network error or a 5xx does not", () => {
+    for (const error of ["channel_not_found", "not_in_channel", "thread_not_found"]) {
+      assert.equal(passThreadOf({ ok: false, error }), null, error);
+    }
+    assert.equal(passThreadOf({ ok: true, messages: thread(), has_more: true }), null);
+    for (const error of ["ratelimited", "network_error", "http_503", "http_500", undefined]) {
+      assert.equal(passThreadOf({ ok: false, error }), TRY_LATER, String(error));
+    }
+    assert.deepEqual(passThreadOf({ ok: true, messages: thread() }), thread());
+  });
+
+  it("a rate-limited read leaves resolution_attempts unchanged; a thread_not_found bumps it", async () => {
+    const { resolutions, turn } = await world();
+    const busy = await pass(resolutions, { thread: passThreadOf({ ok: false, error: "ratelimited" }) });
+    assert.equal(busy.summary.skipped, 0);
+    assert.equal(busy.summary.deferred, 1);
+    assert.match(busy.summary.summary, /1 left for a later read/);
+    assert.deepEqual(await resolutions.getResolution(turn.turnId), {
+      resolution: null,
+      resolvedAt: null,
+      escalatedToLead: null,
+      resolutionCheckedAt: null,
+      resolutionAttempts: 0,
+      resolutionAttemptedAt: null,
+    });
+    // Left unread, so the run's next job reads it again.
+    const gone = await pass(resolutions, {
+      thread: passThreadOf({ ok: false, error: "thread_not_found" }),
+      now: ASK_MS + 25 * HOUR + 60_000,
+    });
+    assert.equal(gone.summary.skipped, 1);
+    const got = await resolutions.getResolution(turn.turnId);
+    assert.equal(got?.resolutionAttempts, 1);
+    assert.equal(got?.resolution, "none");
+  });
+
   it("an unreadable thread does not block the asks behind it", async () => {
     const { usage, resolutions, turn } = await world();
     const others = Array.from({ length: PASS_LIMIT }, (_, i) =>
@@ -333,12 +372,13 @@ describe("the end-of-day pass", () => {
   });
 
   it("the missing-token line is logged by the announcing job only", async () => {
-    const { resolutions } = await world();
     const lines: string[] = [];
     const original = console.log;
     console.log = (...args: unknown[]) => lines.push(args.join(" "));
     try {
+      // Each job with an ask of its own to read, so each reaches the announcement.
       for (const announce of [true, false, false]) {
+        const { resolutions } = await world();
         await runResolutionPass({
           log: resolutions,
           now: () => ASK_MS + 25 * HOUR,
@@ -347,7 +387,7 @@ describe("the end-of-day pass", () => {
           threadOf: async () => thread(),
           leadDmsWith: null,
           announce,
-          dryRun: true,
+          dryRun: false,
         });
       }
     } finally {
@@ -388,11 +428,39 @@ describe("the end-of-day pass", () => {
     }
   });
 
-  it("a dry run reads and writes nothing", async () => {
+  it("a dry run counts the asks due, and reads nothing from Slack and writes nothing", async () => {
     const { resolutions, turn } = await world();
-    const { summary } = await pass(resolutions, { dryRun: true });
-    assert.equal(summary.noEscalation, 1);
-    assert.equal((await resolutions.getResolution(turn.turnId))?.resolutionCheckedAt, null);
+    const reads: string[] = [];
+    const lines: string[] = [];
+    const original = console.log;
+    console.log = (...args: unknown[]) => lines.push(args.join(" "));
+    let summary;
+    try {
+      summary = await runResolutionPass({
+        log: resolutions,
+        now: () => ASK_MS + 25 * HOUR,
+        leadUserId: LEAD,
+        botUserId: async () => {
+          reads.push("auth.test");
+          return BOT;
+        },
+        threadOf: async () => {
+          reads.push("conversations.replies");
+          return thread();
+        },
+        // What the sweep probe hands over: no token looked up, so no refresh.
+        leadDmsWith: null,
+        dryRun: true,
+      });
+    } finally {
+      console.log = original;
+    }
+    assert.deepEqual(reads, []);
+    assert.equal(summary.checked, 0);
+    assert.match(summary.summary, /1 ask\(s\) due \(dry run: nothing read, nothing written\)/);
+    // The probe looks up no token, so it must not say the lead has none.
+    assert.deepEqual(lines, []);
+    assert.equal((await resolutions.getResolution(turn.turnId))?.resolutionAttempts, 0);
   });
 
   it("test traffic and asks under a day old are not read", async () => {
@@ -551,8 +619,10 @@ describe("the reaction door records the asker's ✅ on an answer", () => {
     threadRoot?: string;
     thread?: ThreadMessage[] | null;
     threadState?: ReturnType<typeof createInMemoryThreadState>;
+    /** The card the reactor's ask staged, on its usage row. */
+    proposalId?: string;
   }) {
-    const { usage, resolutions, turn } = await world();
+    const { usage, resolutions, turn } = await world({ proposalId: opts.proposalId ?? null });
     const otherTurn = turnRecord({
       turnId: `C1:${tsAt(10_000)}`,
       askTs: tsAt(10_000),
@@ -651,6 +721,15 @@ describe("the reaction door records the asker's ✅ on an answer", () => {
 
   it("a ✅ on a message the bot did not write records nothing", async () => {
     const { mine } = await react({ userId: ASKER, author: "U9" });
+    assert.equal(mine?.resolution, null);
+  });
+
+  it("a ✅ on a card already used up records nothing: the reacted ts is a known card", async () => {
+    // The card was claimed, rejected or cleared, so the gate finds no proposal
+    // and does nothing; the reacted message still maps to the ask by thread.
+    const { mine, verdicts, recorded } = await react({ userId: ASKER, proposalId: ANSWER_TS });
+    assert.deepEqual(verdicts, []);
+    assert.deepEqual(recorded, [ANSWER_TS]);
     assert.equal(mine?.resolution, null);
   });
 

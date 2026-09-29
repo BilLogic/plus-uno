@@ -96,8 +96,9 @@ export interface ReactionDoorDeps {
    * Put the asker's ✅ / 👍 on a bot answer on the usage record
    * (`usage/resolution.ts`). Called only for a reaction the gate did not act
    * on as a card, so nothing a card sees changes; the adapter matches the
-   * reactor to the ask, so someone else's reaction records nothing. Must not
-   * throw — the envelope logs and swallows.
+   * reactor to the ask, so someone else's reaction records nothing, and
+   * refuses a reacted ts that is a known card — one used up, which the gate
+   * no longer holds, still is. Must not throw — the envelope logs and swallows.
    */
   recordReaction?(reaction: AnswerReaction): Promise<void>;
 }

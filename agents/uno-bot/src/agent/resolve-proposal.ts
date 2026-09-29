@@ -141,11 +141,6 @@ export async function runVerdict(
         outcomes,
       }),
     );
-    // The self-serve signal: a batch that ran whole resolves the ask that
-    // staged it — the ask's own card, even when this one re-staged it after a
-    // cut-off. Logged and swallowed inside, like every usage write.
-    await recordTaskCompletion(env, stagingCardOf(pending), run.operations.length, outcomes);
-
     // Record the outcome (including any resulting URL) in thread history, so
     // later turns know what was actually done — e.g. the created PRD's Notion
     // link, so "delete that PRD" works and the bot never claims it created
@@ -155,21 +150,33 @@ export async function runVerdict(
       { channel: run.channel, thread: run.threadTs },
       { role: "assistant", content: batchOutcomeNote(outcomes) },
     );
-    if (fenced) return outcomes;
-
-    // Say what ran. A batch's partial result is invisible otherwise: the person
-    // approved four things and the thread would show one tool's reply.
-    const resultMessage = batchResultMessage(outcomes);
-    if (resultMessage) {
-      // Under the verdict's own reply target, which the gate already worked out
-      // — the REAL message ts the card was posted with, never the conversation
-      // key (see `PendingProposal.replyTs` for the DM that swallowed a write).
-      await postMessage(env, {
-        channel: run.channel,
-        text: resultMessage,
-        ...(verdict.post?.replyTs ? { thread_ts: verdict.post.replyTs } : {}),
-      });
+    if (!fenced) {
+      // Say what ran. A batch's partial result is invisible otherwise: the person
+      // approved four things and the thread would show one tool's reply.
+      const resultMessage = batchResultMessage(outcomes);
+      if (resultMessage) {
+        // Under the verdict's own reply target, which the gate already worked out
+        // — the REAL message ts the card was posted with, never the conversation
+        // key (see `PendingProposal.replyTs` for the DM that swallowed a write).
+        await postMessage(env, {
+          channel: run.channel,
+          text: resultMessage,
+          ...(verdict.post?.replyTs ? { thread_ts: verdict.post.replyTs } : {}),
+        });
+      }
     }
+
+    // The self-serve signal: a batch that ran whole resolves the ask that
+    // staged it — the ask's own card, even when this one re-staged it after a
+    // cut-off. LAST, once the person has been told: it is a record, not the
+    // work, so even a budget stop here (the one throw it lets out) costs the
+    // record alone — never the note, the result, or a false "resolve-failed".
+    try {
+      await recordTaskCompletion(env, stagingCardOf(pending), run.operations.length, outcomes);
+    } catch (err) {
+      console.error(`[resolution] task completion not recorded: ${err instanceof Error ? err.message : String(err)}`);
+    }
+    if (fenced) return outcomes;
   } finally {
     // Told, fenced, or telling it threw: the run is over either way. Only what
     // stops this function BEFORE the batch returns — an evicted isolate, a
