@@ -15,8 +15,9 @@
  * WHY THERE IS NO RATCHET HERE. `check:intent-roles` ratchets because the thing
  * it counts is a vocabulary, and vocabulary moves one call site at a time. This
  * counts a defect. A focus indicator nobody can see is not a preference to be
- * migrated at leisure, so the bar is zero and an exception has to argue that a
- * keyboard user does not need to see this particular thing.
+ * migrated at leisure, so the bar is zero and an exception has to show that
+ * the ring is still seen on the ground it is actually used on — the one
+ * ground this check cannot read.
  *
  * Run: `npm run check:focus-ring`.
  */

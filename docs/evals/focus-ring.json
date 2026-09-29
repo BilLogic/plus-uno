@@ -7,6 +7,6 @@
     "fixedBy": "--color-focus-ring, 5.02:1 on the page"
   },
   "exceptions": {
-    "design-system/src/components/actions/CloseButton/CloseButton.scss:77": "The inverse CloseButton exists only for colored or dark grounds, which its CALLER paints; the check scores the ring against the page because a ground set by an ancestor is its blind spot 3. On the grounds it is for, --color-focus-ring-inverse (#f9f9fc) measures 12.46:1 on inverse-surface, 5.02:1 on primary, 6.15:1 on danger, 6.17:1 on success, 6.70:1 on secondary, 4.53:1 on tertiary/info and 3.52:1 on warning — all at or above 3:1. On the page it would be invisible, which is why the default tone keeps --color-focus-ring."
+    "design-system/src/components/actions/CloseButton/CloseButton.scss:81": "The inverse CloseButton exists only for colored or dark grounds, which its CALLER paints; the check scores the ring against the page because a ground set by an ancestor is its blind spot 3. On the grounds it is for, --color-focus-ring-inverse (#f9f9fc) measures 12.46:1 on inverse-surface, 5.02:1 on primary, 6.15:1 on danger, 6.17:1 on success, 6.70:1 on secondary, 4.53:1 on tertiary/info and 3.52:1 on warning — all at or above 3:1. On the page it would be invisible, which is why the default tone keeps --color-focus-ring."
   }
 }

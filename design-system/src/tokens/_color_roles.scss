@@ -153,7 +153,9 @@
      * surface color the × itself wears there. It is measured against the page
      * by `check:focus-ring`, which cannot see a ground set by an ancestor; the
      * one rule that uses it is recorded in `docs/evals/focus-ring.json` with
-     * that argument.
+     * that argument. The Figma variable exists (colors / accent, aliasing
+     * Neutral Colors/surface) but is not yet in figma-variables-snapshot.json;
+     * refresh with `npm run snapshot:figma-variables`.
      */
     --color-focus-ring-inverse: var(--color-surface);
 }

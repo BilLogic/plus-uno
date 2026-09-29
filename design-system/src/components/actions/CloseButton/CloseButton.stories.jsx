@@ -138,11 +138,16 @@ FixedSize.play = async ({ canvasElement }) => {
 /** "Close" by default, "Dismiss {what}" when the caller says what closes. */
 export const Names = () => {
     const [closed, setClosed] = useState(0);
+    const [submitted, setSubmitted] = useState(false);
     return (
         <div style={row}>
             <CloseButton onClick={() => setClosed((n) => n + 1)} />
             <CloseButton what="session reminder" onClick={() => setClosed((n) => n + 1)} />
+            <form onSubmit={(event) => { event.preventDefault(); setSubmitted(true); }}>
+                <CloseButton what="form panel" type="submit" onClick={() => setClosed((n) => n + 1)} />
+            </form>
             <span className="body2-txt" style={label} data-testid="closed-count">{closed}</span>
+            <span className="body2-txt" style={label} data-testid="submitted">{submitted ? 'submitted' : 'not submitted'}</span>
         </div>
     );
 };
@@ -158,6 +163,13 @@ Names.play = async ({ canvasElement }) => {
     await userEvent.click(plain);
     await userEvent.click(named);
     await expect(canvas.getByTestId('closed-count')).toHaveTextContent('2');
+
+    // A caller's `type="submit"` does not win: inside a form it still does not submit.
+    const inForm = canvas.getByRole('button', { name: 'Dismiss form panel' });
+    await expect(inForm).toHaveAttribute('type', 'button');
+    await userEvent.click(inForm);
+    await expect(canvas.getByTestId('closed-count')).toHaveTextContent('3');
+    await expect(canvas.getByTestId('submitted')).toHaveTextContent('not submitted');
 };
 
 /**

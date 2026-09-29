@@ -20,6 +20,8 @@ const CloseButton = ({
     'aria-label': ariaLabel,
     ...props
 }) => {
+    // `type` is set AFTER the spread: a close control never submits a form,
+    // whatever a caller passes.
     const name = ariaLabel || (what ? `Dismiss ${what}` : 'Close');
     const classes = [
         'plus-close-btn',
@@ -28,7 +30,7 @@ const CloseButton = ({
     ].filter(Boolean).join(' ');
 
     return (
-        <button type="button" className={classes} aria-label={name} onClick={onClick} {...props}>
+        <button className={classes} aria-label={name} onClick={onClick} {...props} type="button">
             <i className="plus-close-btn__icon fa-solid fa-xmark" aria-hidden="true" />
         </button>
     );

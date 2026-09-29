@@ -4,6 +4,10 @@
  * The 24px box, the 2px ring offset and the 1 line height are raw on purpose:
  * the library has no control-size or focus-offset token, and Figma spells them
  * raw too. Everything else is a token.
+ *
+ * The 16px × borrows the type scale: there is no icon-size token, so it uses
+ * `--font-size-fa-h5-solid`, which resolves to `--font-size-h6`. Retuning h6
+ * changes the ×, and the FixedSize story's play function fails when it does.
  */
 
 .plus-close-btn {
