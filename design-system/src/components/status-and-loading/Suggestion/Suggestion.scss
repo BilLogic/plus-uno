@@ -69,3 +69,19 @@
     outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
     outline-offset: var(--size-element-stroke-lg, 2px);
 }
+
+/*
+ * Disabled, from the field or the caller: a native disabled button. The same
+ * on-surface 12 ground as a disabled Tag, a dashed Outline Variant edge (the
+ * dash stays, so it still reads as a suggestion), and the words and glyph in
+ * Secondary (Text). No hover, press or focus: the hover and pressed layers are
+ * held at the disabled ground, and a disabled button never takes focus.
+ */
+.plus-suggestion:disabled,
+.plus-suggestion:disabled:hover,
+.plus-suggestion:disabled:active {
+    border-color: var(--color-outline-variant, #bec8ca);
+    background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
+    color: var(--color-secondary-text, #3b525f);
+    cursor: default;
+}

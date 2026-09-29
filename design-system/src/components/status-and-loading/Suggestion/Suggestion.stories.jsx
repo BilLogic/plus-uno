@@ -3,7 +3,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
-import Tag from '../Tag';
+import Tag, { TagContext } from '../Tag';
 import TagGroup from '../TagGroup';
 import Suggestion, { SUGGESTION_TYPES } from './Suggestion';
 
@@ -236,6 +236,76 @@ FocusRing.play = async ({ canvasElement }) => {
         await expect(s.borderTopStyle).toBe('dashed');
         await expect(s.backgroundColor).toBe(CLEAR);
     }
+};
+
+/**
+ * Disabled, beside disabled Tags: the same on-surface 12 ground as a disabled
+ * Tag, a dashed Outline Variant edge (the dash stays, so it still reads as a
+ * suggestion), and the words and glyph in Secondary (Text). It comes from the
+ * field's `TagContext` or from the caller's own `disabled`; either way it is a
+ * disabled button, still named, skipped by Tab and never accepted.
+ */
+export const DisabledBesideTags = {
+    args: { onAccept: fn() },
+    render: ({ onAccept }) => (
+        <div style={row}>
+            <button type="button">Before</button>
+            <TagContext.Provider value={{ isDisabled: true }}>
+                <Tag color="blue" data-testid="tag">Algebra</Tag>
+                <Tag behavior="removable" color="blue" onRemove={() => {}}>Advocacy</Tag>
+                <Suggestion label="Relationships" onAccept={onAccept} />
+                <Suggestion type="prompt" label="Summarize" onAccept={onAccept} />
+            </TagContext.Provider>
+            <Suggestion label="Fractions" disabled onAccept={onAccept} />
+            <button type="button">After</button>
+        </div>
+    ),
+};
+
+DisabledBesideTags.play = async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const t = (token) => tokenColor(canvasElement, token);
+    const fill = t('--color-on-surface-state-12');
+    const edge = t('--color-outline-variant');
+    const ink = t('--color-secondary-text');
+    const tag = canvas.getByTestId('tag');
+
+    const names = [
+        'Add Relationships, suggested',
+        'Summarize, suggested',
+        'Add Fractions, suggested',
+    ];
+    for (const name of names) {
+        // The name is unchanged, and the disabled state reaches assistive tech.
+        const el = canvas.getByRole('button', { name });
+        await expect(el, name).toBeDisabled();
+
+        const s = getComputedStyle(el);
+        await expect(s.backgroundColor, `${name}: on-surface 12`).toBe(fill);
+        await expect(s.backgroundColor, `${name}: the disabled Tag's ground`)
+            .toBe(getComputedStyle(tag).backgroundColor);
+        await expect(s.borderTopStyle, `${name}: still dashed`).toBe('dashed');
+        await expect(s.borderTopColor, `${name}: Outline Variant edge`).toBe(edge);
+        await expect(s.color, `${name}: Secondary (Text) words`).toBe(ink);
+        await expect(getComputedStyle(el.querySelector('i')).color, `${name}: and glyph`).toBe(ink);
+        await expect(px(s.height), `${name}: the box does not move`).toBe(22);
+
+        // No hover or press: the ground never changes under a pointer.
+        await expect(whileForced(el, ':hover', 'backgroundColor'), `${name}: no hover`).toBe(fill);
+        await expect(whileForced(el, ':active', 'backgroundColor'), `${name}: no press`).toBe(fill);
+    }
+
+    // Not focusable: Tab goes straight past every disabled tag and suggestion.
+    canvas.getByRole('button', { name: 'Before' }).focus();
+    await userEvent.tab();
+    await expect(canvas.getByRole('button', { name: 'After' })).toHaveFocus();
+
+    // Never accepted, by pointer or by keyboard.
+    for (const name of names) {
+        await userEvent.click(canvas.getByRole('button', { name }), { pointerEventsCheck: 0 });
+    }
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onAccept).not.toHaveBeenCalled();
 };
 
 /**

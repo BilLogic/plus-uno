@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useTagContext } from '../Tag';
 import './Suggestion.scss';
 
 /**
@@ -15,6 +16,10 @@ import './Suggestion.scss';
  * proposes words to send or to fill a text box: `onAccept` hands back `text`.
  * The component does not change itself when accepted; the field that owns the
  * value decides what appears next.
+ *
+ * DISABLED comes from the field or TagGroup, through the `TagContext` a Tag
+ * reads, or from the caller's own `disabled`. It is a native disabled button:
+ * out of the tab order, announced as disabled, and never accepted.
  */
 
 export const SUGGESTION_TYPES = ['insert', 'prompt'];
@@ -36,6 +41,9 @@ export const Suggestion = ({
     id,
     ...rest
 }) => {
+    // Disabled comes from the field or TagGroup, through the context Tag reads,
+    // so a disabled group can never leave a suggestion in it pressable.
+    const { isDisabled = false } = useTagContext() || {};
     const isPrompt = type === 'prompt';
     // Anything but `prompt` is an insert, so an unknown type still renders one.
     const kind = isPrompt ? 'prompt' : 'insert';
@@ -60,6 +68,10 @@ export const Suggestion = ({
             // the spread, so a stray `aria-label` or `onClick` cannot replace
             // them. A caller's `onClick` still fires, before `onAccept`.
             aria-label={name}
+            // Native `disabled`, from the field or from the caller's own
+            // `disabled`: out of the tab order, announced as disabled, and no
+            // click reaches `onAccept`. The look is `:disabled` in the styles.
+            disabled={isDisabled || rest.disabled || undefined}
             onClick={(e) => {
                 onClick?.(e);
                 onAccept?.(isPrompt ? (text ?? label) : (value ?? label), e);
@@ -84,6 +96,8 @@ Suggestion.propTypes = {
     onAccept: PropTypes.func,
     /** Fires on press, before `onAccept`. It never replaces `onAccept`. */
     onClick: PropTypes.func,
+    /** Disables it: not focusable and never accepted. A disabled field or TagGroup disables it too. */
+    disabled: PropTypes.bool,
     className: PropTypes.string,
     id: PropTypes.string,
 };
