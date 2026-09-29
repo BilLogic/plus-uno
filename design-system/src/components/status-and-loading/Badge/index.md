@@ -43,7 +43,7 @@ From `design-system/src/components/status-and-loading/Badge/Badge.scss`. Overrid
 
 ## Related
 
-Same group: `AiLabel` · `BadgeVariants` · `Progress` · `Spinner` · `Tag` · `TagGroup`
+Same group: `AiLabel` · `BadgeVariants` · `Progress` · `Spinner` · `Tag` · `TagGroup` · `Tile`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
