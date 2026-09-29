@@ -13,7 +13,7 @@ import { handleSlashCommand } from "./slack/commands";
 import { parseInteraction, handleInteraction } from "./slack/interactive";
 import { startSlackOAuth, handleSlackOAuthCallback } from "./oauth/slack";
 import { BUILD } from "./version";
-import { onScheduledFiring } from "./scheduled/runs";
+import { onScheduledFiring, sweepChannelsFrom } from "./scheduled/runs";
 import { enqueueScheduledRun } from "./scheduled/jobs";
 import { runMetered } from "./net";
 import * as diagnostics from "./diagnostics";
@@ -30,6 +30,7 @@ export default {
       runMetered(() =>
         onScheduledFiring(controller.scheduledTime, {
           enqueueRun: (run) => enqueueScheduledRun(env, run),
+          sweepChannels: sweepChannelsFrom(env.SWEEP_CHANNELS, env.UNO_BOT_CHANNEL_ID),
         }),
       ),
     );

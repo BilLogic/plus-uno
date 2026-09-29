@@ -26,6 +26,7 @@ import {
 import {
   CUT_OFF_SWEEP_RETRY_MS,
   CUT_OFF_SWEEP_SLACK_MS,
+  CUT_OFF_SWEEP_WINDOW_MS,
   DM_CONVERSATION,
   EXECUTION_CUTOFF_MS,
   PROPOSAL_TTL_MS,
@@ -577,6 +578,19 @@ describe("when the alarm wakes for an execution", () => {
     const now = started + EXECUTION_CUTOFF_MS + 2;
     assert.equal(cutOffSweepAt(owed, now), now + CUT_OFF_SWEEP_RETRY_MS);
     assert.equal(cutOffSweepAt(execution, started + PROPOSAL_TTL_MS + 1), null);
+  });
+
+  // A 72 h card's hand-off that keeps failing would otherwise re-arm every two
+  // minutes for three days — about 2,160 looks against the hour card's 30.
+  it("for a long-lived card, only within the hour's window", () => {
+    const longLived = { ...execution, proposal: { ...PROPOSAL, ttlMs: 72 * 60 * 60 * 1000 } };
+    const inside = started + CUT_OFF_SWEEP_WINDOW_MS - 1;
+    assert.equal(cutOffSweepAt(longLived, inside), inside + CUT_OFF_SWEEP_RETRY_MS);
+    assert.equal(cutOffSweepAt(longLived, started + CUT_OFF_SWEEP_WINDOW_MS + 1), null);
+    assert.equal(cutOffSweepAt(longLived, started + 2 * 60 * 60 * 1000), null);
+    // The window only ever shortens a card's retries, never lengthens them.
+    const short = { ...execution, proposal: { ...PROPOSAL, ttlMs: 20 * 60 * 1000 } };
+    assert.equal(cutOffSweepAt(short, started + 20 * 60 * 1000 + 1), null);
   });
 });
 

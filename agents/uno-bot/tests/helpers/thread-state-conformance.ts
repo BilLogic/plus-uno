@@ -263,6 +263,20 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
   });
 
+  // The sweep posts more than ten fixes for one thread as several cards there,
+  // each in its own slot: staging one retires only a card in the same slot.
+  it("cards in different slots of one thread stay live side by side", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread, slot: 0 }));
+    await store.putProposal(proposal({ proposalTs: "1700.3", replyTs: THREAD.thread, slot: 1 }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found");
+    assert.equal((await store.getProposalByTs("1700.3")).state, "found");
+    // A revision of one keeps its slot, and retires that card only.
+    await store.putProposal(proposal({ proposalTs: "1700.4", replyTs: THREAD.thread, slot: 0 }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
+    assert.equal((await store.getProposalByTs("1700.3")).state, "found");
+  });
+
   // "superseded" and "expired" are different things to say to a person: one card
   // was replaced two seconds ago, the other aged out an hour ago.
   it("a superseded ts is not reported as expired", async () => {

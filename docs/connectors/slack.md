@@ -21,6 +21,24 @@ summary: Pillar → channel map (group announcements; all private — uno-bot mu
 Pillar → channel map (group announcements; **all private — uno-bot must be invited before posting/@here**):
 `Universal` → #plus-universal `C072E8SFLKV` · `Admin` → #plus-admin `C089A3E9CCW` · `Toolkit` → #plus-toolkit `C08925VDFF1` · `Training` → #plus-training `C07L5RZV6DR` · `Marketing` → #plus-marketing `C052BG9NE86`. Tutoring + Help Center: unmapped — flag at retro.
 
+<!-- ide-only -->
+## The end-of-day sweep — read path and audience rule
+
+The Worker's one proactive read of channels, whose rules the bot reads through `read_reference` (`docs/connectors/slack-sweep.md`):
+
+- **Read path.** At the 22:00 UTC end-of-day run, one job per channel on `SWEEP_CHANNELS` (`agents/uno-bot/wrangler.toml`) reads with the **bot token**:
+  - `conversations.info` first: a private channel is skipped, and a DM or group DM stays unread;
+  - then `conversations.history` since the channel's cursor, in pages of 200, plus `conversations.replies` for every thread active since then.
+  - The cursor lives in D1 (`sweep_cursors`) and moves after each thread, so a job stopped by the budget resumes where it stopped.
+  - #uno-bot stays off the read path, whatever the list says.
+- **Audience rule.** A finding reaches only people who could already see its evidence:
+  - a public thread's finding is posted in that thread;
+  - a private channel's stays there, and a DM's goes back to that DM;
+  - findings in no thread go to #plus-universal for the design system and to #plus-design otherwise (`pickDestination` in `agents/uno-bot/src/sweep/finding.ts`).
+  - Proactive output stays out of #uno-bot, and the owner it mentions comes from the thread or the card, not a default to the lead.
+- **Cards** post at the next weekday 14:00 UTC run, one per source thread per day and up to 10 fixes each. Owners and thread posters can confirm; a card lapses after 72 h with no re-ping.
+<!-- /ide-only -->
+
 ## Share-out post
 
 The Flow 3 feedback rail. Bundle completeness is loudly audited — on uno-bot the card flags any gap before ✅ posts. *(revised 2026-07-16; tool brought into line 2026-08-22)*

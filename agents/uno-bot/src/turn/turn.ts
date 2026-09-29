@@ -71,6 +71,7 @@ import { describeIssueUpdate, issueUpdateFromInput } from "../tools/github-issue
 import {
   MAX_HISTORY_TURNS,
   inheritedTerms,
+  mayConfirm,
   proposalOperations,
   proposalReplyThread,
   type AssistantContext,
@@ -86,6 +87,7 @@ import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
+import { sweepCardInstruction } from "../sweep/cards";
 import {
   withWorkingSignal,
   type CardCaveat,
@@ -817,6 +819,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     modelBlocks.push(intakeChannelInstruction({ senderId: request.userId, isReply: request.threaded }));
   }
 
+  // A reply under a sweep card is most often someone dropping an item from it.
+  if (request.pending?.sweepRun) modelBlocks.push(sweepCardInstruction());
+
   // The antecedent window: what "this" points at. Only for a top-level channel
   // @mention with a dangling pronoun, and only ever ONE page of the
   // conversation the message came from.
@@ -1110,6 +1115,31 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     );
   }
 
+  // A card that names its confirmers is revised only by one of them. A
+  // revision keeps the card's confirmer set, so one staged by anyone else could
+  // never run — and staging it would still retire the card its owners can
+  // confirm. So it is refused, and the card stays live exactly as it was.
+  // #uno-bot is the exception: there a reply joins the confirmer set
+  // (`intake-channel.ts`).
+  if (request.pending && !request.intakeChannel && !mayConfirm(request.pending, request.userId)) {
+    const refusal = revisionRefusal(request.pending.confirmers ?? [], request.userId);
+    await delivery.postNote(refusal);
+    await memory.remember(refusal);
+    return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
+  }
+
+  // A sweep card's revision drops fixes and does nothing else: each of its
+  // operations must be one of the card's own, as it was. Anything else — a fix
+  // rewritten, a stamp changed, one added — is refused and the card stays.
+  if (request.pending?.sweepRun && !isSubsetOf(result.operations, proposalOperations(request.pending))) {
+    const refusal =
+      ":lock: That would change a fix on this sweep card rather than drop one, so the card stays as it is. " +
+      "Reply with the number of a fix to drop it, or ⛔ the card and ask me for the change you want.";
+    await delivery.postNote(refusal);
+    await memory.remember(refusal);
+    return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
+  }
+
   // A different proposal is already pending: retire it, because the card about
   // to go up replaces it. RETIRE, never claim (#583): a claim DELETES, and the
   // record deleted here is the one a late ✅ needs in order to be told its card
@@ -1170,6 +1200,10 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     // A revision is held to the terms of the card it replaces — its lifetime
     // and who may confirm it. A fresh card has none and gets the defaults.
     ...inheritedTerms(request.pending),
+    // A revision of a sweep card stays in its card's slot, and stays a sweep
+    // card, so its items are still recorded (`sweep/outcomes.ts`).
+    ...(request.pending?.slot !== undefined ? { slot: request.pending.slot } : {}),
+    ...(request.pending?.sweepRun ? { sweepRun: request.pending.sweepRun } : {}),
     // In #uno-bot the poster and the thread's repliers confirm, and a revision
     // adds whoever staged it (`turn/intake-channel.ts`).
     ...(request.intakeChannel
@@ -1189,6 +1223,21 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     wrote: memory.wrote(),
     telemetry,
   };
+}
+
+/**
+ * What a person outside a card's confirmer set is told when their message
+ * would have revised it. Names who can, since that is who to ask; only a Slack
+ * user id is mentioned.
+ */
+export function revisionRefusal(confirmers: readonly string[], userId: string): string {
+  const id = /^[UW][A-Z0-9]{2,20}$/;
+  const to = id.test(userId) ? `<@${userId}> ` : "";
+  const who = confirmers.filter((c) => id.test(c)).map((c) => `<@${c}>`);
+  const names = who.length <= 1 ? who.join("") : `${who.slice(0, -1).join(", ")} or ${who[who.length - 1]}`;
+  return who.length
+    ? `:lock: ${to}Only ${names} can change this proposal, so it stays as it is — ask one of them if it needs a change.`
+    : `:lock: ${to}Nobody here can change this proposal, so it stays as it is.`;
 }
 
 // ── The gate path ────────────────────────────────────────────────────────────
@@ -1888,6 +1937,12 @@ function caveatsFor(
 /** Key-order-independent JSON compare, so two generations of the same tool
  *  input register as identical even if the model emitted fields in a different
  *  order. */
+/** Every operation in `revised` is one of `original`'s, byte for byte. */
+function isSubsetOf(revised: readonly ProposalOperation[], original: readonly ProposalOperation[]): boolean {
+  const kept = new Set(original.map(stableStringify));
+  return revised.length > 0 && revised.every((op) => kept.has(stableStringify(op)));
+}
+
 function stableStringify(v: unknown): string {
   if (Array.isArray(v)) return `[${v.map(stableStringify).join(",")}]`;
   if (v !== null && typeof v === "object") {

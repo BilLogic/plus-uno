@@ -33,6 +33,7 @@ import { batchResultMessage } from "../slack/batch-result";
 import type { GateVerdict, OperationOutcome } from "../gate/index";
 import { proposalOperations } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
+import { recordSweepResolutionFor } from "../sweep/env";
 import { isToolName } from "./tool-table";
 import { TOOLS_BY_NAME } from "./tools";
 
@@ -83,6 +84,8 @@ export async function runVerdict(
         content: `(Cancelled the proposed ${pending.toolName} — nothing was done.)`,
       },
     );
+    // A sweep card's ⛔ drops its items (`sweep/outcomes.ts`).
+    await recordSweepResolutionFor(env, pending, undefined);
     return;
   }
 
@@ -123,6 +126,10 @@ export async function runVerdict(
       fenced = true;
     }),
   );
+  // A sweep card's items are recorded as what each write came to — confirmed,
+  // refused because the block moved since the read, or failed. Best-effort,
+  // and before anything below can return early.
+  await recordSweepResolutionFor(env, pending, outcomes);
 
   // Past the batch every operation has come back, or the fence stopped it, so
   // whatever happens next the execution record goes. A throw below — the

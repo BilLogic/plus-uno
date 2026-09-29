@@ -12,6 +12,7 @@ import {
   planRun,
   runnerNameForRun,
   runsForFiring,
+  sweepChannelsFrom,
   type ScheduledRun,
 } from "../src/scheduled/runs";
 import { enqueueScheduledRun } from "../src/scheduled/jobs";
@@ -83,9 +84,37 @@ test("each run is planned with its jobs, keyed by the UTC run date", () => {
   assert.deepEqual(morning.jobs.map((j) => [j.key, j.kind]), [
     ["figma-library-post", "figma-library-post"],
     ["figma-library-track", "figma-library-track"],
+    ["sweep-post", "sweep-post"],
   ]);
   const endOfDay = planRun("end-of-day", at(22, 0));
   assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind]), [["figma-library-poll", "figma-library-poll"]]);
+});
+
+test("the end-of-day run sweeps each listed channel as its own job; the morning posts", () => {
+  const endOfDay = planRun("end-of-day", at(22, 0), ["C0DESIGN", "C0OTHER"]);
+  assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind, j.channel]), [
+    ["figma-library-poll", "figma-library-poll", undefined],
+    ["sweep:C0DESIGN", "sweep-channel", "C0DESIGN"],
+    ["sweep:C0OTHER", "sweep-channel", "C0OTHER"],
+  ]);
+  // The channels are the end of day's alone: the morning run only posts.
+  assert.equal(planRun("morning", at(14, 0), ["C0DESIGN"]).jobs.some((j) => j.kind === "sweep-channel"), false);
+});
+
+test("SWEEP_CHANNELS never includes #uno-bot or a DM, whatever it says", () => {
+  assert.deepEqual(sweepChannelsFrom(" C0DESIGN, C0UNOBOT ,D0DM,,C0DESIGN", "C0UNOBOT"), ["C0DESIGN"]);
+  assert.deepEqual(sweepChannelsFrom(undefined, "C0UNOBOT"), []);
+});
+
+test("a firing plans the end-of-day sweep over the channels it was handed", async () => {
+  const runs: ScheduledRun[] = [];
+  await onScheduledFiring(at(22, 0), {
+    enqueueRun: async (run) => {
+      runs.push(run);
+    },
+    sweepChannels: ["C0DESIGN"],
+  });
+  assert.deepEqual(runs[0]?.jobs.map((j) => j.key), ["figma-library-poll", "sweep:C0DESIGN"]);
 });
 
 test("a run's runner is never a thread's runner", () => {

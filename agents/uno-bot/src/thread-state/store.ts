@@ -109,6 +109,16 @@ export const CUT_OFF_SWEEP_SLACK_MS = 30_000;
 export const CUT_OFF_SWEEP_RETRY_MS = 2 * 60 * 1000;
 
 /**
+ * How long the alarm keeps looking at one cut-off run, whatever the card's own
+ * TTL: the hour, or the TTL when that is shorter. Each look re-arms the alarm
+ * `CUT_OFF_SWEEP_RETRY_MS` out, so a 72 h card measured by its TTL would be
+ * retried about 2,160 times on a hand-off that keeps failing; capped, about 30.
+ * A person's own look — a press, a reaction, the next turn in the thread — can
+ * still take the record for the card's whole TTL.
+ */
+export const CUT_OFF_SWEEP_WINDOW_MS = 60 * 60 * 1000;
+
+/**
  * How many times a cut-off note is tried before the teller gives up.
  *
  * Also the bound on duplicates: a post that Slack accepted and then timed out
@@ -242,6 +252,22 @@ export interface PendingProposal {
    * other card means by one.
    */
   onCancel?: ProposalOperation[];
+  /**
+   * Which of several cards staged side by side in ONE reply thread this is.
+   * Absent — every turn's card — the thread holds one live card and staging
+   * retires the rest. Present, staging retires only a card in the same slot
+   * (`proposalSlot`): the end-of-day sweep posts more than ten fixes for one
+   * thread as several cards there, each live on its own. A revision keeps its
+   * card's slot.
+   */
+  slot?: number;
+  /**
+   * Set on a card the end-of-day sweep staged: the morning it was posted,
+   * `YYYY-MM-DD`. What a ✅, a ⛔ or a revision does to such a card is also
+   * recorded against its `sweep_items` (`sweep/outcomes.ts`). A revision and
+   * a re-staged card carry it.
+   */
+  sweepRun?: string;
 }
 
 /**
@@ -307,6 +333,16 @@ export function proposalReplyThread(
   proposal: Pick<PendingProposal, "replyTs" | "threadTs">,
 ): string {
   return proposal.replyTs ?? proposal.threadTs;
+}
+
+/**
+ * The grain one card retires another at: its reply thread, and within it its
+ * `slot` when it has one. Both adapters' `putProposal` compare with this, so
+ * cards in different slots of one thread stay live side by side.
+ */
+export function proposalSlot(proposal: Pick<PendingProposal, "replyTs" | "threadTs" | "slot">): string {
+  const thread = proposalReplyThread(proposal);
+  return proposal.slot === undefined ? thread : `${thread}#${proposal.slot}`;
 }
 
 /**
@@ -385,7 +421,8 @@ export function afterFailedNote(execution: Execution): { record: Execution; repo
 /**
  * When the ThreadState alarm should next fire for this execution, or null
  * when it never needs to: a taken record owed no note has a teller, and one past
- * its TTL is the GC's. One not yet cut off is due just past the threshold;
+ * `CUT_OFF_SWEEP_WINDOW_MS` (or its TTL, when shorter) is left to a person's
+ * look and then the GC. One not yet cut off is due just past the threshold;
  * one already past it is what `findCutOffExecutions` found and the alarm
  * handed over, and is looked at again in `CUT_OFF_SWEEP_RETRY_MS` in case
  * nobody took it.
@@ -393,7 +430,7 @@ export function afterFailedNote(execution: Execution): { record: Execution; repo
 export function cutOffSweepAt(execution: Execution, now: number): number | null {
   if (execution.takenAt !== undefined && !execution.noteOwed) return null;
   const age = now - execution.startedAt;
-  if (age > proposalTtlMs(execution.proposal)) return null;
+  if (age > Math.min(proposalTtlMs(execution.proposal), CUT_OFF_SWEEP_WINDOW_MS)) return null;
   if (age > EXECUTION_CUTOFF_MS) return now + CUT_OFF_SWEEP_RETRY_MS;
   return execution.startedAt + EXECUTION_CUTOFF_MS + CUT_OFF_SWEEP_SLACK_MS;
 }

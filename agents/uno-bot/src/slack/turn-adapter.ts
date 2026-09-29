@@ -21,6 +21,7 @@
 
 import { runVerdict } from "../agent/resolve-proposal";
 import { threadStateFor } from "../thread-state/production";
+import { recordSweepRevisionFor } from "../sweep/env";
 import type { Env } from "../types";
 import { buildTurnDeps, type TurnWiring } from "../turn/env-deps";
 import { runTurn, type TurnOutcome, type TurnRequest } from "../turn/index";
@@ -66,7 +67,11 @@ export async function runSlackTurn(
 
   const request = slackTurnRequest(event, envelope, vision);
 
-  return runTurn(request, buildTurnDeps(env, request, slackTurnWiring(env, event, request)));
+  const outcome = await runTurn(request, buildTurnDeps(env, request, slackTurnWiring(env, event, request)));
+  // A turn that revised a sweep card — a reply dropping an item — moves the
+  // kept items to the new card and records the rest as dropped. Best-effort.
+  await recordSweepRevisionFor(env, request.pending, outcome.staged?.proposal);
+  return outcome;
 }
 
 /**

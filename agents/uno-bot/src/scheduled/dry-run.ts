@@ -37,6 +37,9 @@ export interface JobReading {
   d1_queries: number;
   wall_ms: number;
   cpu_ms: null;
+  /** What the job's body reported, when it reported anything — the sweep's
+   *  findings and the text of the cards it would post. */
+  detail?: unknown;
 }
 
 /** The rehearsal's report. */
@@ -66,7 +69,7 @@ const CPU_NOTE =
  */
 export async function dryRunScheduledRun(
   run: ScheduledRun,
-  execute: (job: ScheduledJob) => Promise<void>,
+  execute: (job: ScheduledJob) => Promise<unknown>,
   now: () => number = () => Date.now(),
 ): Promise<DryRunReport> {
   const queue = run.jobs.map((job) => ({ date: run.date, job }));
@@ -84,9 +87,12 @@ export async function dryRunScheduledRun(
     }
     const before = { ext: subrequestsUsed(), internal: internalSubrequestsUsed(), d1: internalSubrequestsFor("d1") };
     const startedAt = now();
-    const outcome = await runWithinCeiling(() => execute(job), startSubrequests + LOOKUP_CEILING);
-    jobs.push(
-      reading(
+    let detail: unknown;
+    const outcome = await runWithinCeiling(async () => {
+      detail = await execute(job);
+    }, startSubrequests + LOOKUP_CEILING);
+    jobs.push({
+      ...reading(
         job,
         outcome,
         subrequestsUsed() - before.ext,
@@ -94,7 +100,8 @@ export async function dryRunScheduledRun(
         internalSubrequestsFor("d1") - before.d1,
         now() - startedAt,
       ),
-    );
+      ...(detail !== undefined ? { detail } : {}),
+    });
   }
 
   return {

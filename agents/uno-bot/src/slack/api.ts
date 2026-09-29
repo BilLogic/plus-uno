@@ -161,6 +161,41 @@ export async function conversationsMembers(env: Env, channel: string, limit = 10
   );
 }
 
+/** conversations.info via the bot token — what kind of conversation this is. */
+export async function conversationsInfo(env: Env, channel: string) {
+  return slackGet<
+    SlackResponse & { channel?: { id?: string; is_private?: boolean; is_im?: boolean; is_mpim?: boolean } }
+  >(env, "conversations.info", { channel });
+}
+
+/** One message as conversations.history returns it, threads summarised. */
+export interface HistoryMessage {
+  ts: string;
+  user?: string;
+  bot_id?: string;
+  subtype?: string;
+  text?: string;
+  thread_ts?: string;
+  reply_count?: number;
+  latest_reply?: string;
+}
+
+/**
+ * One page of a channel's top-level messages posted after `oldest`, via the
+ * bot token — the end-of-day sweep's read (`sweep/env.ts`). Pages of 200; the
+ * caller follows `response_metadata.next_cursor` as far as its budget allows.
+ */
+export async function conversationsHistorySince(env: Env, channel: string, oldest: string, cursor?: string) {
+  return slackGet<
+    SlackResponse & { messages?: HistoryMessage[]; response_metadata?: { next_cursor?: string } }
+  >(env, "conversations.history", {
+    channel,
+    oldest,
+    limit: "200",
+    ...(cursor ? { cursor } : {}),
+  });
+}
+
 export interface PostMessageInput {
   channel: string;
   text: string;
