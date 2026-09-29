@@ -1,16 +1,18 @@
 /*
  * Count — a number on its own, as a pill.
  *
- * EVERY COUNT IS A PILL: 20 on its own, 16 inside a Status or Tag, with the
+ * EVERY COUNT IS A PILL: 20 on its own, 16 for use inside a label, with the
  * minimum width equal to the height so a single digit is a circle and 9 → 10
  * grows the pill instead of jumping the layout.
  *
  * The two heights have no semantic token yet (label heights 16/20/22/32 are a
  * token follow-up), so they are local custom properties with the value as the
- * documented default. Padding is the Element token, which is 4.
+ * documented default. The minimum widths and the dot take the spacing
+ * primitives Figma binds them to. Padding is the Element token, which is 4.
  */
 .plus-count {
     --plus-count-size: 20px;
+    --plus-count-min: var(--size-spacing-medium-space-400, 20px);
 
     display: inline-flex;
     align-items: center;
@@ -18,7 +20,7 @@
     flex: none;
     box-sizing: border-box;
     height: var(--plus-count-size);
-    min-width: var(--plus-count-size);
+    min-width: var(--plus-count-min);
     margin: 0;
     padding: 0 var(--size-element-pad-x-xs, 4px);
     border-radius: var(--size-element-radius-full, 999px);
@@ -28,6 +30,7 @@
 
 .plus-count--small {
     --plus-count-size: 16px;
+    --plus-count-min: var(--size-spacing-medium-space-300, 16px);
 }
 
 /*
@@ -83,7 +86,7 @@ $count-dot: (
 }
 
 /*
- * Inverse is for counts on filled buttons and dark surfaces. It replaces the
+ * Inverse is for counts on dark surfaces such as inverse-surface. It replaces the
  * three filled counter styles with one: the surface at 16% (there is no 20%
  * step), with surface ink. It is neutral whatever `style` says.
  */
@@ -94,7 +97,7 @@ $count-dot: (
 
 /* The dot: 8, solid, no number. Its name comes from `label`. */
 .plus-count--dot {
-    --plus-count-size: 8px;
+    --plus-count-size: var(--size-spacing-small-space-100, 8px);
 
     width: var(--plus-count-size);
     min-width: 0;

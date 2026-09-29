@@ -6,9 +6,9 @@ import './Count.scss';
  * `Count` — a number on its own, as a pill.
  *
  * WHICH LABEL, IN THREE QUESTIONS. Is it a number? Count. Is it the condition
- * something is in, and can that condition change? Status. Otherwise, Tag. A
- * Status or Tag that carries a number renders this inside itself at `size`
- * small, so there is one count shape across the product.
+ * something is in, and can that condition change? Status. Otherwise, Tag. `size`
+ * small (16) is for use inside a label; Status and Tag will nest it when they
+ * ship, so there is one count shape across the product.
  *
  * THE NAMES FOLLOW THE LIBRARY. `appearance`, `style` and `size` take the same
  * words Button and Alert use, and the same values as the Count set in Figma, so
@@ -106,11 +106,11 @@ Count.propTypes = {
     max: PropTypes.number,
     /** Render a count of 0 instead of nothing. */
     showZero: PropTypes.bool,
-    /** `subtle` by default; `bold` asks for action now (at most one per area); `inverse` sits on filled or dark surfaces; `dot` is presence without a number. */
+    /** `subtle` by default; `bold` asks for action now (at most one per area); `inverse` sits on dark surfaces such as inverse-surface; `dot` is presence without a number. */
     appearance: PropTypes.oneOf(COUNT_APPEARANCES),
     /** The intent. Use one only when the number carries it. `inverse` is always neutral. */
     style: PropTypes.oneOf(COUNT_STYLES),
-    /** `medium` (20) on its own; `small` (16) only inside a Status or Tag. A dot is always 8. */
+    /** `medium` (20) on its own; `small` (16) is for use inside a label. A dot is always 8. */
     size: PropTypes.oneOf(COUNT_SIZES),
     /** A 2px surface ring, for a count pinned to the corner of an icon or avatar. */
     ring: PropTypes.bool,

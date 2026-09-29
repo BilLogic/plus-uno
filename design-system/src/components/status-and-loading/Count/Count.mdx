@@ -38,7 +38,7 @@ items, results, errors.
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-46653"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17883-1895"
     githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Count"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -50,7 +50,7 @@ items, results, errors.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Subtle by default; bold when it asks for action now; inverse on filled or dark surfaces; dot for presence without a number.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Subtle by default; bold when it asks for action now; inverse on dark surfaces such as inverse-surface; dot for presence without a number.</>}>
     <Canvas of={CountStories.Appearances} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -60,7 +60,7 @@ items, results, errors.
 
 ## Variants
 
-<DocsCanvasShell description={<>Medium (20) on its own; small (16) inside a Status or Tag. The minimum width equals the height, so one digit is a circle and more digits grow the pill.</>}>
+<DocsCanvasShell description={<>Medium (20) on its own; small (16) for use inside a label. The minimum width equals the height, so one digit is a circle and more digits grow the pill.</>}>
     <DsCanvasQuiet of={CountStories.Sizes} />
 </DocsCanvasShell>
 
@@ -93,7 +93,7 @@ items, results, errors.
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>With <code>label</code>, a number is read as information rather than a bare digit.</>}>
-    <DsCanvasQuiet of={CountStories.LabelledNumber} />
+    <DsCanvasQuiet of={CountStories.LabeledNumber} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>A dot needs <code>label</code>. Without one it warns in development.</>}>
@@ -132,16 +132,16 @@ items, results, errors.
 
 Use `Count` for a number on its own: unread messages on a nav item, results on a
 tab, errors in a section header, a notification on a bell. It replaces the
-hand-built counters inside nav, tabs and the Badge `counter` variant.
+hand-built counters inside nav and tabs, the BadgeVariants `counter` variant and
+Badge's `counter` prop.
 
 - **Is it a number?** Count.
 - **Is it the condition something is in, and can that condition change?** Status.
 - **Otherwise** (a subject, a person, a category): Tag.
 
-Inside a Status or Tag, the number comes from that label's own count option,
-which renders a small Count of the same style. Do not place a Count beside a
-label to fake that. Status is being built beside Count; until it lands, a state
-is a `BadgeVariants` status.
+`size="small"` (16) is for use inside a label; Status and Tag will nest it when
+they ship. Status is being built beside Count; until it lands, a state is a
+`BadgeVariants` status.
 
 </div>
 
@@ -174,7 +174,7 @@ count per area.
 <Count value={unread} />
 ```
 
-### Use inverse on filled and dark surfaces.
+### Use inverse on dark surfaces such as inverse-surface.
 
 Inverse is the surface at 16%, so it reads on a dark ground. On a light surface
 it disappears; use subtle there.
@@ -205,7 +205,8 @@ it disappears; use subtle there.
 
 - For the condition something is in, use Status (until it lands, `BadgeVariants`).
 - For a category, a subject or a person, use `Tag`.
-- `BadgeVariants` `counter` is the counter this replaces; its callers move in a later change.
+- The BadgeVariants `counter` variant and Badge's `counter` prop are the counters this
+  replaces; their callers move in a later change.
 
 </div>
 

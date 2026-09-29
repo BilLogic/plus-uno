@@ -142,8 +142,8 @@ const RENDERS_WITH = {
   Count: { value: 1 },
 };
 
-function baseProps(props, name) {
-  const base = { ...(RENDERS_WITH[name] ?? {}) };
+function baseProps(props, componentName) {
+  const base = { ...(RENDERS_WITH[componentName] ?? {}) };
   // Required props only. Handing an OPTIONAL `children` to `ButtonGroup` — which
   // clones each child and pushes `style` onto it — turned a fabricated `<span>`
   // into a React error that had nothing to do with the documented variant.

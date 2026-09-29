@@ -187,16 +187,26 @@ Ring.play = async ({ canvasElement }) => {
     await expect(dot.getBoundingClientRect().height).toBe(8);
 };
 
-/** Every style, subtle and bold. Bold warning uses Warning Container. */
+/**
+ * Every style, subtle and bold, at both sizes, and the dot. Bold warning uses
+ * Warning Container.
+ */
 export const Styles = () => (
     <div style={{ display: 'grid', gap: '12px' }}>
-        {['subtle', 'bold'].map((appearance) => (
-            <div key={appearance} style={row} data-testid={appearance}>
+        {['subtle', 'bold'].flatMap((appearance) => COUNT_SIZES.map((size) => (
+            <div key={`${appearance}-${size}`} style={row}>
                 {COUNT_STYLES.map((style) => (
-                    <Count key={style} value={12} appearance={appearance} style={style} label={`${appearance} ${style}`} />
+                    <Count
+                        key={style}
+                        value={12}
+                        appearance={appearance}
+                        style={style}
+                        size={size}
+                        label={`${appearance} ${style} ${size}`}
+                    />
                 ))}
             </div>
-        ))}
+        )))}
         <div style={row}>
             {COUNT_STYLES.map((style) => (
                 <Count key={style} appearance="dot" style={style} label={`dot ${style}`} />
@@ -206,59 +216,84 @@ export const Styles = () => (
 );
 Styles.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const ground = (appearance, style) =>
-        getComputedStyle(canvas.getByText(`${appearance} ${style}`).parentElement).backgroundColor;
+    const pill = (name) => canvas.getByText(name).parentElement;
+    const token = (name) => tokenColor(canvasElement, name);
 
-    const subtle = {
-        success: '--color-success-state-08',
-        warning: '--color-warning-state-08',
-        danger: '--color-danger-state-08',
-        info: '--color-tertiary-state-08',
-        discovery: '--color-mastering-content-state-08',
+    // [ground, ink] per style, from the Figma set.
+    const expected = {
+        subtle: {
+            neutral: ['--color-on-surface-variant-state-08', '--color-on-surface-variant'],
+            success: ['--color-success-state-08', '--color-success-text'],
+            warning: ['--color-warning-state-08', '--color-warning-text'],
+            danger: ['--color-danger-state-08', '--color-danger-text'],
+            info: ['--color-tertiary-state-08', '--color-tertiary-text'],
+            discovery: ['--color-mastering-content-state-08', '--color-mastering-content-text'],
+        },
+        bold: {
+            neutral: ['--color-inverse-surface', '--color-inverse-on-surface'],
+            success: ['--color-success', '--color-on-success'],
+            warning: ['--color-warning-container', '--color-on-warning-container'],
+            danger: ['--color-danger', '--color-on-danger'],
+            info: ['--color-tertiary', '--color-on-tertiary'],
+            discovery: ['--color-mastering-content', '--color-on-mastering-content'],
+        },
     };
-    for (const [style, token] of Object.entries(subtle)) {
-        await expect(ground('subtle', style), `subtle ${style}`).toBe(tokenColor(canvasElement, token));
+
+    for (const [appearance, styles] of Object.entries(expected)) {
+        for (const size of COUNT_SIZES) {
+            for (const [style, [ground, ink]] of Object.entries(styles)) {
+                const name = `${appearance} ${style} ${size}`;
+                const s = getComputedStyle(pill(name));
+                await expect(s.backgroundColor, `${name} ground`).toBe(token(ground));
+                await expect(s.color, `${name} ink`).toBe(token(ink));
+                await expect(pill(name).getBoundingClientRect().height, `${name} height`).toBe(size === 'small' ? 16 : 20);
+            }
+        }
     }
 
-    const bold = {
-        neutral: '--color-inverse-surface',
+    const dots = {
+        neutral: '--color-on-surface-variant',
         success: '--color-success',
-        warning: '--color-warning-container',
+        warning: '--color-warning',
         danger: '--color-danger',
         info: '--color-tertiary',
         discovery: '--color-mastering-content',
     };
-    for (const [style, token] of Object.entries(bold)) {
-        await expect(ground('bold', style), `bold ${style}`).toBe(tokenColor(canvasElement, token));
-    }
-
-    for (const style of COUNT_STYLES) {
-        await expect(canvas.getByRole('img', { name: `dot ${style}` })).toBeInTheDocument();
+    for (const [style, fill] of Object.entries(dots)) {
+        const dot = canvas.getByRole('img', { name: `dot ${style}` });
+        await expect(getComputedStyle(dot).backgroundColor, `dot ${style} fill`).toBe(token(fill));
     }
 };
 
 /**
  * A dot without `label` warns in development; with one, the name is exposed.
- * The unnamed dot mounts on a button press so the warning is observed as it
- * happens, and is removed again so the story itself stays accessible.
+ * Both dots mount on a button press after the console is watched, so the
+ * named one is shown not to warn and the unnamed one is shown to. The unnamed
+ * dot is removed again so the story itself stays accessible.
  */
 export const DotNeedsALabel = () => {
+    const [named, setNamed] = useState(false);
     const [unnamed, setUnnamed] = useState(false);
     return (
         <div style={row}>
+            <button type="button" onClick={() => setNamed(true)}>Mount a named dot</button>
             <button type="button" onClick={() => setUnnamed((v) => !v)}>
                 {unnamed ? 'Remove the unnamed dot' : 'Mount an unnamed dot'}
             </button>
+            {named && <Count appearance="dot" style="success" label="Online" />}
             {unnamed && <span data-testid="unnamed"><Count appearance="dot" /></span>}
-            <Count appearance="dot" style="success" label="Online" />
         </div>
     );
 };
 DotNeedsALabel.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const warn = spyOn(console, 'warn').mockImplementation(() => {});
+    const countWarnings = () => warn.mock.calls.filter(([m]) => String(m).includes('[Count]'));
     try {
-        await expect(warn, 'a named dot does not warn').not.toHaveBeenCalled();
+        await userEvent.click(canvas.getByRole('button', { name: 'Mount a named dot' }));
+        await expect(canvas.getByRole('img', { name: 'Online' })).toBeInTheDocument();
+        await expect(countWarnings(), 'a named dot does not warn').toHaveLength(0);
+
         await userEvent.click(canvas.getByRole('button', { name: 'Mount an unnamed dot' }));
         await expect(canvas.getByTestId('unnamed')).toBeInTheDocument();
         await expect(warn).toHaveBeenCalledWith(expect.stringContaining('needs a `label`'));
@@ -266,16 +301,15 @@ DotNeedsALabel.play = async ({ canvasElement }) => {
     } finally {
         warn.mockRestore();
     }
-    await expect(canvas.getByRole('img', { name: 'Online' })).toBeInTheDocument();
 };
 
 /** With a label, a number is read as information rather than a bare digit. */
-export const LabelledNumber = () => (
+export const LabeledNumber = () => (
     <button type="button" className="btn btn-outline-secondary">
         Messages <Count value={4} label="4 unread" />
     </button>
 );
-LabelledNumber.play = async ({ canvasElement }) => {
+LabeledNumber.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('button', { name: 'Messages 4 unread' })).toBeInTheDocument();
     await expect(canvas.queryByRole('img')).toBeNull();

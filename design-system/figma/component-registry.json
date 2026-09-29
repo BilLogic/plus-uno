@@ -732,7 +732,7 @@
             "notes": "On the Status, Count & Tag page, beside the Counter set it replaces. Figma values carry a (default) suffix on subtle, neutral and medium; ring? is ring in code. Inverse exists in neutral only, and dot in medium only. Docs page: node 17883:1895."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-46653"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17883-1895"
       }
     },
     "DateAndTimePicker": {

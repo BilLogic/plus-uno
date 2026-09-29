@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/Count/Count.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/Count/Count.stories.jsx` — Appearances, Sizes, Max, Zero, Ring, Styles, DotNeedsALabel, LabelledNumber, Interactive
+**Stories:** `design-system/src/components/status-and-loading/Count/Count.stories.jsx` — Appearances, Sizes, Max, Zero, Ring, Styles, DotNeedsALabel, LabeledNumber, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/Count/Count.mdx`
 
@@ -18,9 +18,9 @@
 | `value` | number or string | — | The number. Hidden at 0 (and below) unless `showZero`. Ignored by `dot`. |
 | `max` | number | `99` | Above this the pill shows `{max}+`. |
 | `showZero` | bool | `false` | Render a count of 0 instead of nothing. |
-| `appearance` | oneOf | `'subtle'` | `subtle` by default; `bold` asks for action now (at most one per area); `inverse` sits on filled or dark surfaces; `dot` is presence without a number. |
+| `appearance` | oneOf | `'subtle'` | `subtle` by default; `bold` asks for action now (at most one per area); `inverse` sits on dark surfaces such as inverse-surface; `dot` is presence without a number. |
 | `style` | oneOf | `'neutral'` | The intent. Use one only when the number carries it. `inverse` is always neutral. |
-| `size` | oneOf | `'medium'` | `medium` (20) on its own; `small` (16) only inside a Status or Tag. A dot is always 8. |
+| `size` | oneOf | `'medium'` | `medium` (20) on its own; `small` (16) is for use inside a label. A dot is always 8. |
 | `ring` | bool | `false` | A 2px surface ring, for a count pinned to the corner of an icon or avatar. |
 | `label` | string | — | The accessible name. Required for `dot`; on a number it replaces the bare digits for screen readers. |
 | `className` | string | `''` | — |
@@ -28,7 +28,7 @@
 
 ## Tokens touched
 
-`--color-danger` · `--color-danger-state-08` · `--color-danger-text` · `--color-info` · `--color-info-state-08` · `--color-info-text` · `--color-inverse-on-surface` · `--color-inverse-surface` · `--color-mastering-content` · `--color-mastering-content-state-08` · `--color-mastering-content-text` · `--color-on-danger` · `--color-on-info` · `--color-on-mastering-content` · `--color-on-success` · `--color-on-surface-variant` · `--color-on-surface-variant-state-08` · `--color-on-warning-container` · `--color-success` · `--color-success-state-08` · `--color-success-text` · `--color-surface` · `--color-surface-state-16` · `--color-warning` · `--color-warning-container` · `--color-warning-state-08` · `--color-warning-text` · `--plus-count-size` · `--size-element-pad-x-xs` · `--size-element-radius-full` · `--size-element-stroke-lg`
+`--color-danger` · `--color-danger-state-08` · `--color-danger-text` · `--color-info` · `--color-info-state-08` · `--color-info-text` · `--color-inverse-on-surface` · `--color-inverse-surface` · `--color-mastering-content` · `--color-mastering-content-state-08` · `--color-mastering-content-text` · `--color-on-danger` · `--color-on-info` · `--color-on-mastering-content` · `--color-on-success` · `--color-on-surface-variant` · `--color-on-surface-variant-state-08` · `--color-on-warning-container` · `--color-success` · `--color-success-state-08` · `--color-success-text` · `--color-surface` · `--color-surface-state-16` · `--color-warning` · `--color-warning-container` · `--color-warning-state-08` · `--color-warning-text` · `--plus-count-min` · `--plus-count-size` · `--size-element-pad-x-xs` · `--size-element-radius-full` · `--size-element-stroke-lg` · `--size-spacing-medium-space-300` · `--size-spacing-medium-space-400` · `--size-spacing-small-space-100`
 
 From `design-system/src/components/status-and-loading/Count/Count.scss`. Override these through the token layer, never with a literal.
 
