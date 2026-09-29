@@ -170,6 +170,10 @@ export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<vo
 
   // D5: announce a successful reviewable artifact to #plus-design (right place
   // + person + time). Best-effort — never let a fan-out failure break the flow.
+  // A card the Worker staged itself has no requester to name, and its own
+  // channel thread is where the result is followed (the Figma library card),
+  // so it asks nobody for a review here.
+  if (!run.requesterUserId) return;
   for (const outcome of outcomes) {
     if (!warrantsReviewRequest(outcome.toolName) || !outcome.ok) continue;
     try {

@@ -3,14 +3,13 @@ name: uno-implement
 description: >
   Implements a design-system change end-to-end: both the component source
   (.jsx, .scss) and its Storybook docs (.stories.jsx, .mdx) update together
-  in one Claude pass. Use when a designer types `implement <component>` in
-  Slack after the polling flow created a Notion PRD, or when figma-implement.yml
-  fires via repository_dispatch.
+  in one Claude pass. Use when figma-implement.yml fires via
+  repository_dispatch — from a ✅ on the Figma library card in #plus-universal,
+  or a designer's approved implement in Slack — or a manual workflow run.
 trigger_types:
-  - slack_keyword          # Designer types "implement <component>" in Slack
   - github_dispatch        # repository_dispatch from the uno-bot Worker OR manual workflow_dispatch
-                           # (NOT the polling cron itself — polling creates the Notion PRD;
-                           # the designer initiates implementation from Slack)
+                           # (the library poll itself dispatches nothing — a person's ✅ on its
+                           # #plus-universal card does)
 model_default: claude-sonnet-4-6
 status: migration-draft
 references_when:
@@ -39,11 +38,11 @@ You are not a generalist coding assistant. You know Plus's specific stack, conve
 
 ## When to Use
 
-- A designer types `implement <component>` in `#uno-bot` after reviewing a Notion PRD (the primary live trigger — registry row in [docs/engineering/operations.md](../../../docs/engineering/operations.md))
-- A designer triggers a component implement in Slack — **always tied to its Notion PRD** (the polling bot creates the PRD and posts it; the designer implements from that thread). A component implement is never done without a PRD; if none is in the thread, the bot asks for the link first.
+- A #plus-universal member ✅s the Figma library card for a publish (the primary live trigger — registry row in [docs/engineering/operations.md](../../../docs/engineering/operations.md)). The spec is the `harness-intake` issue the same card files; the dispatch carries every mapped component as one comma-separated `component` list, and the PR title lists them.
+- A designer's component implement in Slack — **tied to its Notion PRD** (pasted, or linked from the thread root). A designer's implement is never done without a PRD; if none is in hand, the bot asks for the link first.
 - A `repository_dispatch` event with `event_type: implement-figma-changes` arrives at `figma-implement.yml`, whether dispatched by the uno-bot Worker (downstream of Slack) or a manual GitHub-UI workflow run
 
-> **Note:** the Figma library polling cron (the Worker cron in `agents/uno-bot/src/figma-poll.ts` — registry row 1 of `docs/engineering/operations.md`) does **not** invoke this skill directly. It creates the Notion PRD and posts a Slack notification; the designer initiates implementation from Slack.
+> **Note:** the Figma library poll (the end-of-day job in `agents/uno-bot/src/figma-poll.ts` — registry row 1 of `docs/engineering/operations.md`) does **not** invoke this skill directly. It finds the publish; the next morning's card drafts the intake, and a person's ✅ on it dispatches the run.
 
 **Do NOT use this skill for:**
 
@@ -55,7 +54,7 @@ You are not a generalist coding assistant. You know Plus's specific stack, conve
 
 | Input | Source | Required? |
 |-------|--------|-----------|
-| Component name (parsed from `implement <component>` message) OR direct spec (PRD link, change description) | Slack message text → uno-bot Worker → `repository_dispatch`, OR a manual GitHub-UI workflow run | Yes |
+| Component name, or a comma-separated list from a library publish, OR direct spec (PRD link, change description) | an approved uno-bot card → `repository_dispatch`, OR a manual GitHub-UI workflow run | Yes |
 | Notion PRD (from the polling notification in the thread, or the designer's pasted link; the Action also falls back to `findPRDByComponent()`) | Notion database | **Yes — required** |
 | Target branch | Always a new `ds-review/{component}-{date}-{time}` branch (uniform with the live `figma-implement.yml` convention — do NOT diverge) | No |
 
@@ -201,14 +200,14 @@ Estimated per-invocation cost on Sonnet 4.6: **~$0.15-0.35** for an update; **~$
 ## Migration TODO (Week 2)
 
 - [ ] Verify the SKILL.md body when stripped of meta sections produces equivalent system-prompt content to the live script's inline prompt at `scripts/implement-figma-changes.js` lines 475-527. Side-by-side diff is the regression check.
-- [ ] Confirm both invocation paths the pipeline supports — keyword-triggered (`implement <component>` in Slack → uno-bot Worker → `repository_dispatch`) and manual dispatch (GitHub UI → workflow run) — produce equivalent outputs.
+- [ ] Confirm both invocation paths the pipeline supports — card-triggered (an approved uno-bot card → `repository_dispatch`) and manual dispatch (GitHub UI → workflow run) — produce equivalent outputs.
 - [ ] Regression test: invoke this skill against 2-3 past PRs' specs and verify the output is structurally similar to what was merged. Allow stylistic variation; flag structural divergence.
 - [ ] Update `figma-implement.yml` to set the working PR title to match `feat: Figma DS update — {component}` (already matches the script's `PR_TITLE` env var). No yaml change needed if the env var is already wired.
 - [ ] Confirm `model_default: claude-sonnet-4-6` is the right model ID and is supported by the Anthropic API at runtime (script currently uses `claude-sonnet-4-20250514` — bumping is part of this migration).
 
 ## Related Skills
 
-- **`uno-review`** — evaluates an artifact against Plus standards. After critique surfaces fixable issues, the designer can pivot to `implement <component>` to apply them via this skill.
+- **`uno-review`** — evaluates an artifact against Plus standards. After critique surfaces fixable issues, the designer can ask uno-bot to implement the component, with its PRD, to apply them via this skill.
 - **Conversational Q&A (uno-bot default mode)** — answers Plus-specific questions. If a designer asks "how would I implement X?" they probably want this skill instead; the router should route to `uno-implement` for action-oriented requests.
 
 ## Sample Invocations

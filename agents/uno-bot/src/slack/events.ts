@@ -461,8 +461,8 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   const textReadsAsCorrection = looksLikeCorrection(text);
 
   // If this message is a thread reply (not the thread root itself), check the
-  // parent message for a Notion PRD URL — that is how a PRD reaches the
-  // implement workflow from the polling bot's notification.
+  // parent message for a Notion PRD URL — that is how a PRD linked at the top
+  // of a thread reaches the implement workflow.
   const isThreadReply = !!event.thread_ts && event.thread_ts !== event.ts;
 
   // Loading thread context runs BEFORE the turn, so a throw here (a Slack

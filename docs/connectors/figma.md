@@ -47,8 +47,15 @@ The conventions above are the workspace's. This section is the Worker's, and it 
 | See human-pasted images | `slack/vision.ts` | ≤3 files, png/jpeg/gif/webp, ≤3.5MB each |
 | Read a frame's **name**, **node type**, **text layers** | `source_read` → `integrations/figma.ts` | ≤200 text layers, and it reports when it truncated |
 | Render the frame into the ✅ proposal card | `slack/proposal-render.ts` | — |
-| Notice DS-library component adds/removes/renames and version publishes, post the card, open a PRD | `figma-poll.ts`, cron | `FIGMA_FILE_KEY` only; subrequest-budgeted |
+| Notice a DS-library publish (component adds, removes, renames, visual changes) and turn it into one intake and one card in #plus-universal | `figma-poll.ts` (end-of-day run) → `figma-library/` (morning run) | `FIGMA_FILE_KEY` only; one poll a weekday; subrequest-budgeted |
 | Hand a frame to a GitHub Action that does the real Figma-to-code work | `prototype_scaffold` / `component_implement` | the runner has depth the Worker doesn't; output is a code PR |
+
+**A library publish, from Figma to a merged PR.** The end-of-day run's `figma-library-poll` job diffs the DS file against its KV snapshot; one poll that finds a change is one change set, kept in KV until morning. The morning run's `figma-library-post` job turns each into:
+
+- **one drafted `harness-intake` issue** — every changed component with its Figma link, the code directory `design-system/figma/component-registry.json` maps it to, and the proposed change. A component the registry does not map is listed as "no code mapping" and nothing is drafted for it. The intake is the spec; no Notion PRD is filed.
+- **one message in #plus-universal** (`PLUS_UNIVERSAL_CHANNEL_ID`): the change summary, the publisher's Figma handle, and a proposal card. Any member of the channel, read at posting time, may decide it, for 72 hours. ✅ files the intake and sends `repository_dispatch` `implement-figma-changes` to `figma-implement.yml` with every mapped component as one list; ⛔ files the intake only.
+
+The morning run's `figma-library-track` job then follows each card: when the Action's PR opens it is linked in the intake and in the card's thread, and when it merges the intake is closed as incorporated. It is a morning look, not a webhook, so each step lands the morning after it happens. Nothing about the library posts to #uno-bot any more, and there is no "implement <component>" reply path.
 
 **Out of reach because we drop it, rather than because Figma withholds it.** `/v1/files/:key/nodes` returns `fills`, `boundVariables` and `absoluteBoundingBox`; `fetchFigmaNode` keeps name, type and text. So the colour, measurement and presence of a binding are **unread, not absent**, and saying "this frame uses no token" would be a claim about our reader wearing the costume of a claim about the design.
 

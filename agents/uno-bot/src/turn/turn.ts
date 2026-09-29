@@ -1150,8 +1150,11 @@ export async function restageExecution(
     await deps.delivery.postFailure("delivery");
     return null;
   }
+  // A cancel run is not carried over: part of the original may already have
+  // happened, and a ⛔ on the fresh card must run nothing a second time.
+  const { onCancel: _onCancel, ...kept } = original;
   const proposal: PendingProposal = {
-    ...original,
+    ...kept,
     operations: restage.operations,
     toolName: first.toolName,
     input: first.input,
