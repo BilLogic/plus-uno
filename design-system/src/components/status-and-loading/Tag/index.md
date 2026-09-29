@@ -43,7 +43,7 @@ From `design-system/src/components/status-and-loading/Tag/Tag.scss`. Override th
 
 ## Related
 
-Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Progress` · `Spinner` · `Status` · `TagGroup` · `Tile`
+Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Progress` · `Spinner` · `Status` · `Suggestion` · `TagGroup` · `Tile`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

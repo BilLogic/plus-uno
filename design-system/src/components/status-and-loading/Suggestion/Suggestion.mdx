@@ -1,0 +1,184 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as SuggestionStories from './Suggestion.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "type": {
+      "type": "enum",
+      "values": ["insert", "prompt"]
+    }
+  },
+  "sets": [
+    {
+      "id": "suggestion",
+      "name": "Suggestion",
+      "componentSetNodeId": "17878:1769",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1769",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": true,
+      "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop."
+    }
+  ]
+};
+
+<Meta of={SuggestionStories} />
+
+<Title />
+A value the system proposes that a person can accept, such as an AI-suggested
+focus area. A button, not a label: it has the same height, padding and radius
+as Tag, so it sits in the tag row where the value will land.
+
+<DocsTabs of={SuggestionStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-57"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Suggestion"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<><code>insert</code> adds a value to the field and leads with a plus. <code>prompt</code> sends or fills text and leads with a sparkle wand.</>}>
+    <Canvas of={SuggestionStories.Types} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## In a tag row
+
+<DocsCanvasShell description={<>The same 22-tall box as Tag, with its words on the same baseline. Suggestions follow the tags already in the field.</>}>
+    <DsCanvasQuiet of={SuggestionStories.InATagRow} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Accepted, an insert suggestion becomes a Tag: the field adds the value and drops the suggestion. Press one to try it.</>}>
+    <DsCanvasQuiet of={SuggestionStories.AcceptIntoTags} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Rest is a dashed edge on a clear ground. Hover is the Mastering Content 08 state layer and pressed the 16.</>}>
+    <DsCanvasQuiet of={SuggestionStories.StateLayers} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Keyboard focus is a 2px Focus Ring 3px outside the dashed edge. Press Tab to see it.</>}>
+    <DsCanvasQuiet of={SuggestionStories.FocusRing} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={SuggestionStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Suggestion` when the system proposes a value and a person decides whether
+to take it: an AI-suggested focus area beside the ones already chosen, or a
+suggested question beside a chat box. Put it in the row where the accepted
+value will land, after the tags already there.
+
+Use `Tag` for a value that is already in the field. Use `Button` for an action
+that is not a proposed value, and `AiLabel` to mark content the agent has
+already produced.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### The field decides what happens next.
+
+`onAccept` hands back the value (insert) or the text (prompt). The suggestion
+does not change itself; the field that owns the value adds a Tag, sends the
+message or fills the text box, and stops offering the suggestion.
+
+```jsx
+// Incorrect: a Tag styled as a suggestion is not a button, so nobody can
+// accept it with a keyboard.
+<Tag behavior="read-only" color="purple">Relationships</Tag>
+
+// Correct: insert hands back the value; the field turns it into a Tag.
+<Suggestion label="Relationships" value="focus-relationships" onAccept={addFocusArea} />
+
+// Correct: prompt hands back the text to send or fill.
+<Suggestion type="prompt" label="Summarize" text="Summarize this session" onAccept={send} />
+```
+
+### Keep the words short.
+
+A suggestion sits in a tag row, so its label is a value's name, not a
+sentence. For a prompt, pass the full words as `text` and a short `label`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A real button.** It takes focus, and Enter or Space accepts it.
+- **Named for what pressing it does.** An insert suggestion is announced as
+  "Add {label}, suggested", so a screen-reader user knows pressing it adds a
+  value. A prompt is not added to anything, so it is announced as
+  "{label}, suggested".
+- **The glyph is decorative.** The plus and the sparkle wand are hidden from
+  assistive technology; the name already says what the suggestion does.
+- **Focus is a ring, not a fill**: a 2px Focus Ring 3px outside the edge, so
+  focus never reads as pressed.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a value already in the field, use `Tag`, inside a `TagGroup`.
+- To mark content the agent produced, use `AiLabel`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>
