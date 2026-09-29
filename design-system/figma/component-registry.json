@@ -2123,6 +2123,77 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13543-5904"
       }
     },
+    "Tile": {
+      "code": {
+        "import": "@/components/status-and-loading",
+        "export": "default",
+        "mdxPath": "design-system/src/components/status-and-loading/Tile/Tile.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Tile",
+        "props": {
+          "content": {
+            "type": "enum",
+            "values": [
+              "icon",
+              "logo",
+              "image"
+            ]
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "16",
+              "20",
+              "24",
+              "32",
+              "40",
+              "48"
+            ]
+          },
+          "appearance": {
+            "type": "enum",
+            "values": [
+              "subtle",
+              "bold"
+            ]
+          },
+          "color": {
+            "type": "enum",
+            "values": [
+              "grey",
+              "blue",
+              "green",
+              "purple",
+              "magenta",
+              "yellow",
+              "teal",
+              "white"
+            ]
+          },
+          "hasBorder": {
+            "type": "boolean"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "tile",
+            "name": "Tile",
+            "componentSetNodeId": "17878:1928",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1928",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "variantProps": {
+              "hasBorder": "border?"
+            },
+            "notes": "On the Iconography, Logos & Imagery page. Figma marks defaults in the value name (\"32 (default)\", \"subtle (default)\", \"grey (default)\"); code takes the bare value. Logo and image variants hold a media slot, which code fills with `children` or `src`. Image variants exist for grey only, since the picture covers the ground."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17906-48560"
+      }
+    },
     "Toast": {
       "code": {
         "import": "@/components/messaging",
