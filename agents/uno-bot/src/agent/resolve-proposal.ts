@@ -33,6 +33,7 @@ import { batchResultMessage } from "../slack/batch-result";
 import type { GateVerdict, OperationOutcome } from "../gate/index";
 import { proposalOperations } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
+import { recordTaskCompletion } from "../usage/resolution-env";
 import { isToolName } from "./tool-table";
 import { TOOLS_BY_NAME } from "./tools";
 
@@ -140,6 +141,9 @@ export async function runVerdict(
         outcomes,
       }),
     );
+    // The self-serve signal: a batch that ran whole resolves the ask that
+    // staged it. Logged and swallowed inside, like every usage write.
+    await recordTaskCompletion(env, pending.proposalTs, run.operations.length, outcomes);
 
     // Record the outcome (including any resulting URL) in thread history, so
     // later turns know what was actually done — e.g. the created PRD's Notion

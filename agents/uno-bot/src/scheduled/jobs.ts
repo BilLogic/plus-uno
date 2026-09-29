@@ -9,6 +9,7 @@ import type { Env } from "../types";
 import { charge } from "../net";
 import { runFigmaPoll } from "../figma-poll";
 import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
+import { runAskResolution } from "../usage/resolution-env";
 import { runnerNameForRun, type ScheduledJob, type ScheduledJobKind, type ScheduledRun } from "./runs";
 
 /** One job kind's work. Resolving is done; a budget stop is thrown through. */
@@ -30,6 +31,10 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // Morning: link each posted card's PR, and close its intake on merge.
   "figma-library-track": async (env, _job, { dryRun }) => {
     console.log(`[figma-library] track: ${(await runLibraryTrack(env, { dryRun })).summary}`);
+  },
+  // End of day: 24 h on, record how each ask was resolved (src/usage/resolution-pass.ts).
+  "ask-resolution": async (env, _job, { dryRun }) => {
+    console.log(`[resolution] ${(await runAskResolution(env, { dryRun })).summary}`);
   },
 };
 

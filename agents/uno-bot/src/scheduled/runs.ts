@@ -23,8 +23,15 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * The Figma library's three: the end-of-day poll finds a publish, the morning
  * post turns it into a card in #plus-universal, and the morning track follows
  * each posted card to its PR (src/figma-poll.ts, src/figma-library/).
+ * `ask-resolution` is the end-of-day 24 h pass that records how each ask was
+ * resolved (src/usage/resolution-pass.ts).
  */
-export type ScheduledJobKind = "noop" | "figma-library-poll" | "figma-library-post" | "figma-library-track";
+export type ScheduledJobKind =
+  | "noop"
+  | "figma-library-poll"
+  | "figma-library-post"
+  | "figma-library-track"
+  | "ask-resolution";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -61,7 +68,10 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "figma-library-post", kind: "figma-library-post" },
     { key: "figma-library-track", kind: "figma-library-track" },
   ],
-  "end-of-day": [{ key: "figma-library-poll", kind: "figma-library-poll" }],
+  "end-of-day": [
+    { key: "figma-library-poll", kind: "figma-library-poll" },
+    { key: "ask-resolution", kind: "ask-resolution" },
+  ],
 };
 
 /** The run names, for a caller that takes one as input. */
