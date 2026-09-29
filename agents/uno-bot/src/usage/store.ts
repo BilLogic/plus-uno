@@ -14,6 +14,8 @@
 //
 // PURE: no `Env`, no Workers global. `Env` stops in `./production.ts`.
 
+import type { PainCategory, SubType } from "./categories";
+
 /** One turn, as the `turns` table holds it. Field names are camelCase here and
  *  snake_case in SQL; `./d1.ts` is the one place they are mapped. */
 export interface TurnRecord {
@@ -77,13 +79,27 @@ export interface TurnRecord {
   selfFiledTicketUrl: string | null;
   /** Evals, debug probes, the sandbox channel, bare greetings (`./record.ts`). */
   testTraffic: boolean;
+
+  // ── corpus categories (`./categories.ts`) ──
+  /** What a CHANNEL ask said, kept only until the end-of-day classifier labels
+   *  it, and never past 14 days (ADR-030). Always null for a DM turn and for
+   *  test traffic: those never store text at any point. */
+  requestText: string | null;
+  /** The corpus Sub-type, exact-matched to the options; null is blank. */
+  subType: SubType | null;
+  /** 1–7 (`painCategoryOf`); 7 is a turn that staged a card or intake. */
+  painCategory: PainCategory | null;
+  /** When a classifier labelled the ask, epoch ms; null until one has. */
+  classifiedAt: number | null;
 }
 
 /**
  * Where a finished turn is written.
  *
  * `record` is an UPSERT on `turnId`: a turn retried by the runner rewrites its
- * own row rather than adding a second. A caller must treat a throw as a lost
+ * own row rather than adding a second. The category columns are the
+ * classifier's once it has run: a retry never blanks a label (a null leaves
+ * the stored one), and never brings text back to a row already classified. A caller must treat a throw as a lost
  * record, never as a lost turn — Turn logs and swallows it.
  */
 export interface UsageLog {

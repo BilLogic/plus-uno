@@ -8,6 +8,7 @@
 
 import type { ModelTier } from "../agent/routing";
 import type { TurnDisposition } from "../turn/turn";
+import { painCategoryOf, type SubType } from "./categories";
 import { estimateCostUsd, type TokenSpend } from "./prices";
 import type { TurnRecord } from "./store";
 
@@ -52,7 +53,8 @@ export interface TurnRecordFacts {
   channel: string;
   /** The asker's message ts. */
   askTs: string;
-  /** What the person asked, as typed — read for the greeting rule, never stored. */
+  /** What the person asked, as typed — read for the greeting rule, and kept
+   *  (as `requestText`) for a real channel ask only, until it is classified. */
   question: string;
   /** The clock when the turn began, epoch ms — the ask time when `askTs` is
    *  not a Slack ts (an eval conversation's synthetic one). */
@@ -164,9 +166,14 @@ export function turnIdOf(channel: string, askTs: string, startedAt: number): str
   return SLACK_TS.test(askTs) ? `${channel}:${askTs}` : `${channel}:${askTs}@${startedAt}`;
 }
 
+/** The most of a channel ask the record keeps for its classifier. */
+export const MAX_REQUEST_TEXT_CHARS = 2_000;
+
 export function buildTurnRecord(facts: TurnRecordFacts): TurnRecord {
   const askedAt = askedAtOf(facts.askTs, facts.startedAt);
   const usage = facts.spend?.usage;
+  const testTraffic = isTestTraffic(facts);
+  const staged = facts.proposalId !== undefined;
   return {
     turnId: turnIdOf(facts.channel, facts.askTs, facts.startedAt),
     build: facts.build,
@@ -197,6 +204,32 @@ export function buildTurnRecord(facts: TurnRecordFacts): TurnRecord {
     proposalId: facts.proposalId ?? null,
     stopUsed: facts.disposition === "stopped",
     selfFiledTicketUrl: selfFiledTicketOf(facts.executed),
-    testTraffic: isTestTraffic(facts),
+    testTraffic,
+    // A DM ask is never stored as text, and test traffic is never classified,
+    // so neither keeps any. A channel ask keeps its text for the end-of-day
+    // classifier, which nulls it in the same write that labels it.
+    requestText:
+      facts.surface === "channel" && !testTraffic ? facts.question.slice(0, MAX_REQUEST_TEXT_CHARS) : null,
+    subType: null,
+    // Ticket kickoff needs no classifier: a real turn that staged a card is 7.
+    painCategory: testTraffic ? null : painCategoryOf(null, staged),
+    classifiedAt: null,
+  };
+}
+
+/**
+ * A record with its ask labelled — a DM turn's in-turn classification. The
+ * pain_category keeps a staged turn's 7; the text stays null.
+ *
+ * @param record - The turn's record
+ * @param subType - The classifier's exact-matched answer; null is blank
+ * @param at - When it answered, epoch ms
+ */
+export function withAskLabel(record: TurnRecord, subType: SubType | null, at: number): TurnRecord {
+  return {
+    ...record,
+    subType,
+    painCategory: painCategoryOf(subType, record.proposalId !== null),
+    classifiedAt: at,
   };
 }

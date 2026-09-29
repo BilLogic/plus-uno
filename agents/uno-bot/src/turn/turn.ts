@@ -81,7 +81,14 @@ import {
   type ThreadState,
   type VisionReference,
 } from "../thread-state/index";
-import { buildTurnRecord, type TurnOrigin, type TurnRecord, type UsageLog } from "../usage/index";
+import {
+  buildTurnRecord,
+  withAskLabel,
+  type SubType,
+  type TurnOrigin,
+  type TurnRecord,
+  type UsageLog,
+} from "../usage/index";
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
@@ -134,6 +141,10 @@ const PROGRESS_LABEL = "Reading the question and this thread";
  *  already in front of the person by then; this bounds how long the invocation
  *  lingers on a slow database before the record is given up as lost. */
 export const USAGE_WRITE_TIMEOUT_MS = 1_000;
+
+/** The longest a DM ask's in-turn classification may hold the end of a turn.
+ *  Past it the row is written unlabelled — blank, as a failed call is. */
+export const ASK_CLASSIFY_TIMEOUT_MS = 3_000;
 
 // ── The request ──────────────────────────────────────────────────────────────
 
@@ -343,6 +354,15 @@ export interface TurnUsage {
   testChannelIds: readonly string[];
   /** Overrides `USAGE_WRITE_TIMEOUT_MS`; a test's way to not wait it out. */
   writeTimeoutMs?: number;
+  /**
+   * Label one ask with its corpus Sub-type — one short `chill` call
+   * (`usage/categories.ts` `classifyAsks`). Asked for a real DM ask only, as
+   * the turn finishes, because a DM row never holds text for the end-of-day
+   * classifier to read. Absent, DM asks are recorded unlabelled.
+   */
+  classifyAsk?(text: string): Promise<SubType | null>;
+  /** Overrides `ASK_CLASSIFY_TIMEOUT_MS`. */
+  classifyTimeoutMs?: number;
 }
 
 export interface TurnDeps {
@@ -571,32 +591,65 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
   );
 
   // Written AFTER the working signal is down and the answer is out, so the
-  // record costs the person nothing they can see.
-  await recordTurn(
-    buildTurnRecord({
-      build: BUILD,
-      origin: deps.usage.origin,
-      testChannelIds: deps.usage.testChannelIds,
-      requesterId: request.userId,
-      surface: request.surface,
-      inThread: request.threaded,
-      channel: request.channel,
-      askTs: request.userMsgTs,
-      question: request.text,
-      startedAt,
-      firstAnswerAt,
-      tier: outcome.telemetry.tier,
-      routeReason: outcome.telemetry.route,
-      ...(outcome.telemetry.spend ? { spend: outcome.telemetry.spend } : {}),
-      toolsCalled: outcome.telemetry.tools,
-      ...(outcome.posted !== undefined ? { posted: outcome.posted } : {}),
-      disposition: outcome.disposition,
-      ...(outcome.staged ? { proposalId: outcome.staged.proposal.proposalTs } : {}),
-      ...(outcome.executed ? { executed: outcome.executed } : {}),
-    }),
-    deps.usage,
-  );
+  // record — and a DM ask's classification — costs the person nothing they
+  // can see.
+  const record = buildTurnRecord({
+    build: BUILD,
+    origin: deps.usage.origin,
+    testChannelIds: deps.usage.testChannelIds,
+    requesterId: request.userId,
+    surface: request.surface,
+    inThread: request.threaded,
+    channel: request.channel,
+    askTs: request.userMsgTs,
+    question: request.text,
+    startedAt,
+    firstAnswerAt,
+    tier: outcome.telemetry.tier,
+    routeReason: outcome.telemetry.route,
+    ...(outcome.telemetry.spend ? { spend: outcome.telemetry.spend } : {}),
+    toolsCalled: outcome.telemetry.tools,
+    ...(outcome.posted !== undefined ? { posted: outcome.posted } : {}),
+    disposition: outcome.disposition,
+    ...(outcome.staged ? { proposalId: outcome.staged.proposal.proposalTs } : {}),
+    ...(outcome.executed ? { executed: outcome.executed } : {}),
+  });
+  await recordTurn(await labelDmAsk(record, request.text, deps.usage, clock), deps.usage);
   return outcome;
+}
+
+/**
+ * A DM ask, labelled in the turn: the one moment its text exists, since the
+ * row never holds it. Channel asks, test traffic (greetings included) and a
+ * caller with no classifier are left as they are. A call that fails or
+ * outlasts its timeout leaves the row unlabelled and is logged — it never
+ * fails the turn.
+ */
+async function labelDmAsk(
+  record: TurnRecord,
+  text: string,
+  usage: TurnUsage,
+  clock: () => number,
+): Promise<TurnRecord> {
+  if (record.surface !== "assistant" || record.testTraffic || !usage.classifyAsk) return record;
+  const timeoutMs = usage.classifyTimeoutMs ?? ASK_CLASSIFY_TIMEOUT_MS;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const subType = await Promise.race([
+      usage.classifyAsk(text),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`timed out after ${timeoutMs} ms`)), timeoutMs);
+      }),
+    ]);
+    return withAskLabel(record, subType, clock());
+  } catch (err) {
+    console.error(
+      `[usage] turn ${record.turnId} not classified: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return record;
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
+  }
 }
 
 /**

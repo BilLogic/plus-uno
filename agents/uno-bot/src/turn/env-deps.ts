@@ -35,7 +35,7 @@ import { fetchFigmaImagePngUrl, parseFigmaUrl } from "../integrations/figma";
 import { githubRepoVisibility, githubWorkflowClient, resolveRepoFor } from "../integrations/github";
 import type { ThreadState } from "../thread-state/index";
 import type { Env } from "../types";
-import type { TurnOrigin } from "../usage/index";
+import { classifyAsks, type TurnOrigin } from "../usage/index";
 import { testChannelIdsOf, usageLogFor } from "../usage/production";
 import type { Delivery } from "./delivery";
 import { restageExecution, type TurnDeps, type TurnRequest } from "./turn";
@@ -171,6 +171,8 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
       log: usageLogFor(env),
       origin: wiring.origin,
       testChannelIds: testChannelIdsOf(env),
+      // A DM ask's label, taken in the turn on the same adapter the turn ran on.
+      classifyAsk: async (text) => (await classifyAsks(selectProvider(env), [text]))[0] ?? null,
     },
 
     // The reads a card needs and Turn may not make itself — shared with the

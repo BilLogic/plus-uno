@@ -8,6 +8,9 @@
 import type { Env } from "../types";
 import { charge } from "../net";
 import { runFigmaPoll } from "../figma-poll";
+import { selectProvider } from "../agent/run-agent";
+import { runClassifyBatch, runTextPurge } from "../usage/classify-run";
+import { askCategoriesFor } from "../usage/production";
 import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
 import { runnerNameForRun, type ScheduledJob, type ScheduledJobKind, type ScheduledRun } from "./runs";
 
@@ -30,6 +33,26 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // Morning: link each posted card's PR, and close its intake on merge.
   "figma-library-track": async (env, _job, { dryRun }) => {
     console.log(`[figma-library] track: ${(await runLibraryTrack(env, { dryRun })).summary}`);
+  },
+  // End of day: label one batch of the channel asks still holding text, and
+  // null that text in the same write.
+  "usage-classify": async (env, job, { dryRun }) => {
+    const store = askCategoriesFor(env);
+    if (!store) return;
+    const { labelled, blank } = await runClassifyBatch({
+      store,
+      provider: selectProvider(env),
+      now: () => Date.now(),
+      dryRun,
+    });
+    console.log(`[usage] ${job.key}: ${labelled} ask(s) labelled, ${blank} blank${dryRun ? " (dry run)" : ""}`);
+  },
+  // End of day: text older than 14 days goes, whatever happened to it.
+  "usage-text-purge": async (env, _job, { dryRun }) => {
+    const store = askCategoriesFor(env);
+    if (!store) return;
+    const cleared = await runTextPurge({ store, now: () => Date.now(), dryRun });
+    console.log(`[usage] text purge: ${cleared} row(s) cleared${dryRun ? " (dry run, nothing written)" : ""}`);
   },
 };
 

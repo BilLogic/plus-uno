@@ -10,10 +10,12 @@ import {
   buildTurnRecord,
   estimateCostUsd,
   isTestTraffic,
+  MAX_REQUEST_TEXT_CHARS,
   ratesFor,
   selfFiledTicketOf,
   sourcesCitedIn,
   type TurnRecordFacts,
+  withAskLabel,
 } from "../src/usage/index";
 import type { TurnDisposition } from "../src/turn/index";
 
@@ -184,4 +186,33 @@ test("test traffic: a debug route, a sandbox channel, a bare greeting — and no
   assert.equal(isTestTraffic({ ...base, disposition: "reacted", question: "thanks!" }), true);
   // A reaction to a real question is still a real ask.
   assert.equal(isTestTraffic({ ...base, disposition: "reacted", question: "is this right?" }), false);
+});
+
+// ── corpus categories ────────────────────────────────────────────────────────
+
+test("a real channel ask keeps its text, capped; a DM ask and test traffic keep none", () => {
+  assert.equal(buildTurnRecord(facts()).requestText, "where is the onboarding PRD?");
+  assert.equal(
+    buildTurnRecord(facts({ question: "x".repeat(MAX_REQUEST_TEXT_CHARS + 50) })).requestText?.length,
+    MAX_REQUEST_TEXT_CHARS,
+  );
+  assert.equal(buildTurnRecord(facts({ surface: "assistant", channel: "D9" })).requestText, null);
+  assert.equal(buildTurnRecord(facts({ origin: "debug" })).requestText, null);
+  assert.equal(buildTurnRecord(facts({ testChannelIds: ["C1"] })).requestText, null);
+});
+
+test("a real turn that staged a card is pain_category 7 before any classifier runs", () => {
+  assert.equal(buildTurnRecord(facts({ proposalId: "1.2", disposition: "staged" })).painCategory, 7);
+  assert.equal(buildTurnRecord(facts()).painCategory, null);
+  assert.equal(buildTurnRecord(facts({ proposalId: "1.2", origin: "debug" })).painCategory, null);
+});
+
+test("an in-turn label sets the Sub-type, its pain_category and when, and keeps a staged 7", () => {
+  const labelled = withAskLabel(buildTurnRecord(facts({ surface: "assistant", channel: "D9" })), "Sync/drift", 99);
+  assert.deepEqual(
+    [labelled.subType, labelled.painCategory, labelled.classifiedAt, labelled.requestText],
+    ["Sync/drift", 3, 99, null],
+  );
+  const staged = buildTurnRecord(facts({ surface: "assistant", channel: "D9", proposalId: "1.2" }));
+  assert.equal(withAskLabel(staged, null, 99).painCategory, 7);
 });

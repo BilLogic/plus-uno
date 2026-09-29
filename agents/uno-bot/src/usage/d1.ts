@@ -11,6 +11,7 @@
 // run is what exercises it against a real (local) D1.
 
 import { chargeD1Query } from "../net";
+import { subTypeOf, type PainCategory } from "./categories";
 import type { TurnRecord, UsageLog } from "./store";
 
 /** The slice of `D1Database` this adapter uses. */
@@ -52,19 +53,32 @@ const COLUMNS = [
   "stop_used",
   "self_filed_ticket_url",
   "test_traffic",
+  "request_text",
+  "sub_type",
+  "pain_category",
+  "classified_at",
 ] as const;
 
 type Row = Record<(typeof COLUMNS)[number], unknown>;
 
+/** How a retried turn's upsert writes a column the classifier owns: a null
+ *  leaves the stored label, and a classified row never gets its text back —
+ *  the rule `./in-memory.ts` `mergeOnRetry` states for a map. */
+const ON_RETRY: Partial<Record<(typeof COLUMNS)[number], string>> = {
+  request_text: "CASE WHEN turns.classified_at IS NULL THEN excluded.request_text ELSE NULL END",
+  sub_type: "COALESCE(excluded.sub_type, turns.sub_type)",
+  pain_category: "COALESCE(excluded.pain_category, turns.pain_category)",
+  classified_at: "COALESCE(excluded.classified_at, turns.classified_at)",
+};
+
 // An upsert that rewrites THIS record's columns only: a retried turn replaces
-// its own values, and columns a later writer owns (`classified_at`, and the
-// ones later migrations add) survive it. `INSERT OR REPLACE` would delete the
-// row first and lose them.
+// its own values, and columns a later writer owns (the ones later migrations
+// add) survive it. `INSERT OR REPLACE` would delete the row first and lose them.
 const UPSERT =
   `INSERT INTO turns (${COLUMNS.join(", ")}) VALUES (${COLUMNS.map(() => "?").join(", ")}) ` +
   `ON CONFLICT (turn_id) DO UPDATE SET ` +
   COLUMNS.filter((c) => c !== "turn_id")
-    .map((c) => `${c} = excluded.${c}`)
+    .map((c) => `${c} = ${ON_RETRY[c] ?? `excluded.${c}`}`)
     .join(", ");
 
 const SELECT = `SELECT ${COLUMNS.join(", ")} FROM turns WHERE turn_id = ?`;
@@ -100,6 +114,10 @@ function toRow(r: TurnRecord): unknown[] {
     stop_used: bool(r.stopUsed),
     self_filed_ticket_url: r.selfFiledTicketUrl,
     test_traffic: bool(r.testTraffic),
+    request_text: r.requestText,
+    sub_type: r.subType,
+    pain_category: r.painCategory,
+    classified_at: r.classifiedAt,
   };
   return COLUMNS.map((c) => row[c]);
 }
@@ -142,6 +160,10 @@ function fromRow(row: Row): TurnRecord {
     stopUsed: num(row.stop_used) === 1,
     selfFiledTicketUrl: strOrNull(row.self_filed_ticket_url),
     testTraffic: num(row.test_traffic) === 1,
+    requestText: strOrNull(row.request_text),
+    subType: subTypeOf(row.sub_type),
+    painCategory: numOrNull(row.pain_category) as PainCategory | null,
+    classifiedAt: numOrNull(row.classified_at),
   };
 }
 
