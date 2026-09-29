@@ -24,15 +24,32 @@ import './Skeleton.scss';
  */
 
 export const SKELETON_SHAPES = ['rect', 'circle', 'text'];
-export const SKELETON_PRESETS = [
-    'status',
-    'status-spacious',
-    'count',
-    'tag',
-    'tag-person',
-    'tag-group',
-    'paragraph',
-];
+
+/**
+ * Every preset, in one place: the shape it draws, the bars it renders, the
+ * default number of lines, and the props it ignores. The component and its
+ * development warnings both read this map.
+ *
+ * `bars` are the modifier classes of the shapes a preset draws. One bar is a
+ * single shape; several are a group, drawn as `group` lays them out.
+ */
+const PRESETS = {
+    status: { shape: 'rect', bars: ['status'], ignores: ['height', 'radius'] },
+    'status-spacious': { shape: 'rect', bars: ['status-spacious'], ignores: ['height', 'radius'] },
+    count: { shape: 'rect', bars: ['count'], ignores: ['width', 'height', 'radius'] },
+    tag: { shape: 'rect', bars: ['tag'], ignores: ['height', 'radius'] },
+    'tag-person': { shape: 'rect', bars: ['tag-person'], ignores: ['height', 'radius'] },
+    /* Three tag shapes at the TagGroup gap, as Figma draws them. */
+    'tag-group': {
+        shape: 'rect',
+        group: 'tags',
+        bars: ['tag tag-wide', 'tag tag-narrow', 'tag tag-widest'],
+        ignores: ['width', 'height', 'radius'],
+    },
+    paragraph: { shape: 'text', lines: 3, ignores: ['height', 'radius'] },
+};
+
+export const SKELETON_PRESETS = Object.keys(PRESETS);
 
 /** Radius token names, each the full token with its fallback. */
 export const SKELETON_RADII = {
@@ -48,13 +65,13 @@ export const SKELETON_RADII = {
     'section-radius-lg': 'var(--size-section-radius-lg, 16px)',
 };
 
-/** The presets that stand in for one label. */
-const LABEL_PRESETS = ['status', 'status-spacious', 'count', 'tag', 'tag-person'];
-
-/** The three tag shapes of a loading TagGroup, as Figma draws them. */
-const TAG_GROUP_WIDTHS = ['wide', 'narrow', 'widest'];
-
 const toLength = (value) => (typeof value === 'number' ? `${value}px` : value);
+
+/** Class names from parts, skipping the empty ones. */
+const cls = (...parts) => parts.filter(Boolean).join(' ');
+
+/** `plus-skeleton--a plus-skeleton--b` from `'a b'`. */
+const modifiers = (bar) => bar.split(' ').map((m) => `plus-skeleton--${m}`);
 
 /*
  * A prop the chosen shape or preset ignores is almost always a mistake, so it
@@ -66,11 +83,31 @@ const warnIgnored = (props, why) => {
     console.warn(`[Skeleton] ${props.map((p) => `\`${p}\``).join(', ')} ${props.length > 1 ? 'are' : 'is'} ignored ${why}.`);
 };
 
-/** The props in `names` that were actually passed. */
-const given = (values, names) => names.filter((name) => values[name] !== undefined);
+/**
+ * Which of the passed props this shape or preset ignores, and why, as
+ * [props, reason] pairs. What is ignored here is also what the style leaves
+ * out, so the warning and the rendering cannot disagree.
+ */
+const ignoredProps = ({ preset, def, shape, resolvedShape, lines, passed }) => {
+    const found = [];
+    const add = (names, why) => {
+        const hit = names.filter((name) => passed[name] !== undefined);
+        if (hit.length) found.push([hit, why]);
+    };
+    if (def) {
+        // A preset wins over `shape`: named only when it asked for something else.
+        const overridden = shape !== undefined && shape !== def.shape ? ['shape'] : [];
+        add([...def.ignores, ...overridden], `with preset="${preset}", which sets its own size and shape`);
+    } else {
+        if (resolvedShape === 'circle') add(['radius'], 'on a circle, which is always round');
+        if (lines > 1) add(['height', 'radius'], 'on several lines: each line is a 16-tall text bar');
+    }
+    if (resolvedShape !== 'text') add(['lines'], 'unless the shape is text');
+    return found;
+};
 
 export const Skeleton = ({
-    shape = 'rect',
+    shape,
     preset,
     width,
     height,
@@ -81,92 +118,59 @@ export const Skeleton = ({
     style,
     ...rest
 }) => {
-    const motion = isShimmering ? 'plus-skeleton--shimmer' : '';
-    const passed = { width, height, radius, lines };
+    const def = PRESETS[preset];
+    const resolvedShape = def ? def.shape : (shape ?? 'rect');
+    const count = resolvedShape === 'text' ? Math.max(1, Math.floor(lines ?? def?.lines ?? 1)) : 1;
+    const passed = { shape, width, height, radius, lines };
 
-    const isParagraph = preset === 'paragraph';
-    const isLabel = LABEL_PRESETS.includes(preset);
-    // A preset wins over `shape`: a label preset is always a single bar.
-    const resolvedShape = isParagraph ? 'text' : isLabel || preset === 'tag-group' ? 'rect' : shape;
-    const count = resolvedShape === 'text' ? Math.max(1, Math.floor(lines ?? (isParagraph ? 3 : 1))) : 1;
-
-    if (preset) warnIgnored(given(passed, ['height', 'radius']), `with preset="${preset}": a preset sets them`);
-    if (preset === 'count' || preset === 'tag-group') warnIgnored(given(passed, ['width']), `with preset="${preset}": its width is fixed`);
-    if (resolvedShape !== 'text') warnIgnored(given(passed, ['lines']), `unless the shape is text`);
-    if (!preset && count > 1) warnIgnored(given(passed, ['height', 'radius']), `on several lines: each line is a 16-tall text bar`);
-
-    /*
-     * A tag group is three tag shapes at the group's gap. The group is hidden
-     * as a whole; the shapes inside it take their size from the tag preset.
-     */
-    if (preset === 'tag-group') {
-        return (
-            <span
-                {...rest}
-                className={['plus-skeleton-group', 'plus-skeleton-group--tags', className].filter(Boolean).join(' ')}
-                style={style}
-                aria-hidden="true"
-            >
-                {TAG_GROUP_WIDTHS.map((w) => (
-                    <span key={w} className={['plus-skeleton', 'plus-skeleton--tag', `plus-skeleton--tag-${w}`, motion].filter(Boolean).join(' ')} />
-                ))}
-            </span>
-        );
-    }
+    const ignored = ignoredProps({ preset, def, shape, resolvedShape, lines: count, passed });
+    ignored.forEach(([props, why]) => warnIgnored(props, why));
+    const skipped = new Set(ignored.flatMap(([props]) => props));
+    const use = (name) => passed[name] !== undefined && !skipped.has(name);
 
     const vars = {};
-    if (preset !== 'count' && width !== undefined) vars['--plus-skeleton-width'] = toLength(width);
-    if (!isLabel && !isParagraph) {
-        if (height !== undefined) vars['--plus-skeleton-height'] = toLength(height);
-        if (radius !== undefined && SKELETON_RADII[radius]) vars['--plus-skeleton-radius'] = SKELETON_RADII[radius];
-        // A circle is as wide as it is tall: one size, from whichever was given.
-        if (resolvedShape === 'circle' && (width ?? height) !== undefined) {
-            vars['--plus-skeleton-width'] = toLength(width ?? height);
-            vars['--plus-skeleton-height'] = toLength(width ?? height);
-        }
+    if (use('width')) vars['--plus-skeleton-width'] = toLength(width);
+    if (use('height')) vars['--plus-skeleton-height'] = toLength(height);
+    if (use('radius') && SKELETON_RADII[radius]) vars['--plus-skeleton-radius'] = SKELETON_RADII[radius];
+    // A circle is as wide as it is tall: one size, from whichever was given.
+    if (!def && resolvedShape === 'circle' && (width ?? height) !== undefined) {
+        vars['--plus-skeleton-width'] = toLength(width ?? height);
+        vars['--plus-skeleton-height'] = toLength(width ?? height);
     }
-
-    const shapeClass = isLabel ? `plus-skeleton--${preset}` : `plus-skeleton--${resolvedShape}`;
 
     /*
-     * Several lines are a column of text bars at the Element sm gap, the last
-     * one shorter so the block reads as text rather than as a stack of bars.
+     * The bars to draw. Several lines are a column of text bars at the Element
+     * sm gap, the last one shorter so the block reads as text rather than as a
+     * stack of bars.
      */
-    if (count > 1) {
-        return (
-            <span
-                {...rest}
-                className={['plus-skeleton-group', 'plus-skeleton-group--lines', className].filter(Boolean).join(' ')}
-                style={{ ...vars, ...style }}
-                aria-hidden="true"
-            >
-                {Array.from({ length: count }, (_, i) => (
-                    <span key={i} className={['plus-skeleton', 'plus-skeleton--text', motion].filter(Boolean).join(' ')} />
-                ))}
-            </span>
-        );
-    }
+    const bars = def?.bars ?? Array.from({ length: count }, () => resolvedShape);
+    const group = def?.group ?? (bars.length > 1 ? 'lines' : null);
+    const motion = isShimmering ? 'plus-skeleton--shimmer' : '';
+    const shared = { ...rest, style: { ...vars, ...style }, 'aria-hidden': 'true' };
 
+    if (!group) {
+        return <span {...shared} className={cls('plus-skeleton', ...modifiers(bars[0]), motion, className)} />;
+    }
     return (
-        <span
-            {...rest}
-            className={['plus-skeleton', shapeClass, motion, className].filter(Boolean).join(' ')}
-            style={{ ...vars, ...style }}
-            aria-hidden="true"
-        />
+        <span {...shared} className={cls('plus-skeleton-group', `plus-skeleton-group--${group}`, className)}>
+            {bars.map((bar, i) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <span key={i} className={cls('plus-skeleton', ...modifiers(bar), motion)} />
+            ))}
+        </span>
     );
 };
 
 Skeleton.propTypes = {
-    /** `rect` by default; `circle` for avatars and round counts; `text` is a 16-tall bar that can repeat as `lines`. A preset wins over it. */
+    /** `rect` by default; `circle` for avatars and round counts; `text` is a 16-tall bar that can repeat as `lines`. A preset wins over it, with a warning when they disagree. */
     shape: PropTypes.oneOf(SKELETON_SHAPES),
     /** Sized to a label (`status`, `status-spacious`, `count`, `tag`, `tag-person`), a loading TagGroup (`tag-group`) or three lines of text (`paragraph`). Sets shape, height and corners together and wins over them. */
     preset: PropTypes.oneOf(SKELETON_PRESETS),
     /** Any CSS length, or a number of pixels. Text bars fill the line by default; a label preset has a stand-in width. Ignored by `count` and `tag-group`. */
     width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    /** Any CSS length, or a number of pixels. Ignored by presets and by several text `lines`, which are always 16 tall. */
+    /** Any CSS length, or a number of pixels. Ignored, with a warning, by presets and by several text `lines`, which are always 16 tall. */
     height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    /** A radius token name, such as `element-radius-md` or `card-radius-sm`. Ignored by presets, by `circle` and by several text `lines`, which keep the text bar's radius. */
+    /** A radius token name, such as `element-radius-md` or `card-radius-sm`. Ignored, with a warning, by presets, by `circle` (always round) and by several text `lines`, which keep the text bar's radius. */
     radius: PropTypes.oneOf(Object.keys(SKELETON_RADII)),
     /** `text` (and `paragraph`) only: how many bars. The last of several is shorter. Ignored, with a warning, on any other shape or preset. */
     lines: PropTypes.number,

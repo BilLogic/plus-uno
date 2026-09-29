@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { expect, spyOn, userEvent, within } from 'storybook/test';
+import React, { useEffect, useState } from 'react';
+import { expect, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Count from '../Count';
@@ -18,6 +18,42 @@ import Skeleton, { SKELETON_PRESETS, SKELETON_RADII, SKELETON_SHAPES } from './S
  * in the same story, which is what keeps the two from drifting.
  */
 
+/* ------------------------------------------------------------- the runner */
+
+/**
+ * True inside the Storybook test runner (Vitest Browser Mode), where Vite runs
+ * in `test` mode. Plain Storybook runs in `development` or `production`.
+ */
+const IN_TEST_RUNNER = import.meta.env.MODE === 'test';
+
+/**
+ * Sets the page's `prefers-reduced-motion` through the runner: a custom
+ * browser command (`commands.emulateReducedMotion` in vite.config.js) calls
+ * Playwright's `page.emulateMedia`. `null` restores no preference.
+ *
+ * THIS USES A PRIVATE API. `window.__vitest_browser_runner__.commands` is
+ * Vitest's internal handle, checked against Vitest 4.1.11. The documented
+ * route, `import { commands } from 'vitest/browser'`, cannot be used here: that
+ * module throws when loaded outside Browser Mode, and this file also loads in
+ * plain Storybook. If a Vitest upgrade moves the handle, the ReducedMotion
+ * story fails loudly inside the runner rather than skipping.
+ *
+ * @returns {Promise<boolean>} false only in plain Storybook, where there is no
+ *   runner to ask; inside the runner a missing handle throws.
+ */
+const emulateReducedMotion = async (value) => {
+    if (!IN_TEST_RUNNER) return false;
+    const commands = window.__vitest_browser_runner__?.commands;
+    if (!commands) {
+        throw new Error(
+            'emulateReducedMotion: the Vitest runner handle (window.__vitest_browser_runner__.commands) '
+            + 'is missing. Check it against the installed Vitest version.',
+        );
+    }
+    await commands.triggerCommand('emulateReducedMotion', [value]);
+    return true;
+};
+
 export default {
     title: 'Components/Status and loading/Skeleton',
     component: Skeleton,
@@ -29,6 +65,17 @@ export default {
                     + 'Count and Tag. Hidden from assistive tech; the loading region carries aria-busy.',
             },
         },
+    },
+    /*
+     * Every story in this file starts, and ends, with no motion preference, so
+     * a ReducedMotion run that times out cannot leave the page reduced for the
+     * stories after it.
+     */
+    beforeEach: async () => {
+        await emulateReducedMotion(null);
+        return async () => {
+            await emulateReducedMotion(null);
+        };
     },
 };
 
@@ -268,23 +315,10 @@ Shimmer.play = async ({ canvasElement }) => {
 };
 
 /**
- * The motion preference as the runner sets it. In the Storybook test runner a
- * Playwright command emulates `prefers-reduced-motion` for the whole page (see
- * `commands` in vite.config.js). In Storybook itself there is no runner, so
- * the function returns false and the story has nothing to measure.
- */
-const emulateReducedMotion = async (value) => {
-    const commands = window.__vitest_browser_runner__?.commands;
-    if (!commands) return false;
-    await commands.triggerCommand('emulateReducedMotion', [value]);
-    return true;
-};
-
-/**
  * Under `prefers-reduced-motion: reduce` the shimmer stops and the fill is
  * flat. The test runner really emulates the preference, through Playwright.
- * Opened in Storybook there is no runner to ask, so the play function stops
- * there: toggle the OS setting to see it.
+ * Opened in plain Storybook there is no runner to ask, so the play function
+ * stops there: toggle the OS setting to see it.
  */
 export const ReducedMotion = () => (
     <div style={row}>
@@ -317,30 +351,59 @@ ReducedMotion.play = async ({ canvasElement }) => {
 };
 
 /**
- * A loading table. The region carries `aria-busy`, a visually hidden status
- * says what is loading, and every label inside is a plain text bar: no label
- * shapes inside a loading container.
+ * The live label a loading region is paired with. It sits beside the busy
+ * region, never inside it, and mounts empty: text a status holds when it
+ * mounts is not announced, and text inside a busy region may be held back
+ * until the region is no longer busy. So the message is set after mount, and
+ * set again when the content arrives.
  */
-export const LoadingTable = () => (
-    <section aria-labelledby="skeleton-students" aria-busy="true">
-        <h3 id="skeleton-students" className="h6">Students</h3>
-        <div role="status" className="visually-hidden">Loading students…</div>
-        <div style={{ display: 'grid', gap: '12px' }}>
-            {[140, 110, 160].map((width) => (
-                <div key={width} style={{ display: 'flex', gap: '48px', alignItems: 'center' }}>
-                    <Skeleton shape="text" width={width} />
-                    <Skeleton shape="text" width={64} />
-                    <Skeleton shape="text" width={64} />
+const useLoadingMessage = (loading, { busy, done }) => {
+    const [message, setMessage] = useState('');
+    useEffect(() => {
+        setMessage(loading ? busy : done);
+    }, [loading, busy, done]);
+    return message;
+};
+
+/** The status is outside every busy region. */
+const expectOutsideBusy = async (status) => {
+    await expect(status.closest('[aria-busy]'), 'the live label is not inside the busy region').toBeNull();
+};
+
+/**
+ * A loading table. The region carries `aria-busy`, a visually hidden status
+ * beside it says what is loading, and every label inside is a plain text bar:
+ * no label shapes inside a loading container.
+ */
+export const LoadingTable = () => {
+    const message = useLoadingMessage(true, { busy: 'Loading students…', done: 'Students loaded' });
+    return (
+        <div>
+            <div role="status" className="visually-hidden">{message}</div>
+            <section aria-labelledby="skeleton-students" aria-busy="true">
+                <h3 id="skeleton-students" className="h6">Students</h3>
+                <div style={{ display: 'grid', gap: '12px' }}>
+                    {[140, 110, 160].map((width) => (
+                        <div key={width} style={{ display: 'flex', gap: '48px', alignItems: 'center' }}>
+                            <Skeleton shape="text" width={width} />
+                            <Skeleton shape="text" width={64} />
+                            <Skeleton shape="text" width={64} />
+                        </div>
+                    ))}
                 </div>
-            ))}
+            </section>
         </div>
-    </section>
-);
+    );
+};
 LoadingTable.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const region = canvas.getByRole('region', { name: 'Students' });
     await expect(region, 'the region is busy').toHaveAttribute('aria-busy', 'true');
-    await expect(within(region).getByRole('status'), 'a live label says what is loading').toHaveTextContent('Loading students…');
+
+    const status = canvas.getByRole('status');
+    await expectOutsideBusy(status);
+    await waitFor(() => expect(status, 'the live label says what is loading').toHaveTextContent('Loading students…'));
+
     const bars = [...region.querySelectorAll('[aria-hidden="true"]')];
     await expect(bars, 'nine text bars').toHaveLength(9);
     for (const bar of bars) {
@@ -350,12 +413,14 @@ LoadingTable.play = async ({ canvasElement }) => {
 
 /**
  * A loading card: the card's skeleton owns everything inside, its tags
- * included. The live label announces the card, and changes when it arrives.
+ * included. The live label beside it announces the loading, and the arrival.
  */
 export const LoadingCard = () => {
     const [loaded, setLoaded] = useState(false);
+    const message = useLoadingMessage(!loaded, { busy: 'Loading session summary…', done: 'Session summary loaded' });
     return (
         <div style={{ display: 'grid', gap: '12px', justifyItems: 'start' }}>
+            <div role="status" className="visually-hidden" data-testid="live">{message}</div>
             <div
                 aria-busy={loaded ? undefined : 'true'}
                 aria-label="Session summary"
@@ -369,9 +434,6 @@ export const LoadingCard = () => {
                     borderRadius: 'var(--size-card-radius-sm)',
                 }}
             >
-                <div role="status" className="visually-hidden">
-                    {loaded ? 'Session summary loaded' : 'Loading session summary…'}
-                </div>
                 {loaded ? (
                     <>
                         <p className="body1-txt" style={{ margin: 0 }}>Unit 3 review</p>
@@ -401,13 +463,15 @@ export const LoadingCard = () => {
 LoadingCard.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const card = canvas.getByRole('group', { name: 'Session summary' });
+    const live = canvas.getByTestId('live');
+    await expect(live).toHaveAttribute('role', 'status');
+    await expectOutsideBusy(live);
     await expect(card).toHaveAttribute('aria-busy', 'true');
-    await expect(within(card).getByRole('status')).toHaveTextContent('Loading session summary…');
+    await waitFor(() => expect(live).toHaveTextContent('Loading session summary…'));
 
     await userEvent.click(canvas.getByRole('button', { name: 'Finish loading' }));
     await expect(card, 'not busy once the content arrives').not.toHaveAttribute('aria-busy');
-    // Each Tag keeps its own quiet saving status, so the live label is found by what it says.
-    await expect(within(card).getByText('Session summary loaded'), 'the arrival is announced').toHaveAttribute('role', 'status');
+    await waitFor(() => expect(live, 'the arrival is announced').toHaveTextContent('Session summary loaded'));
     // A skeleton is a hidden shape that ignores the pointer; a Tag's own hidden
     // swatch is not one.
     const placeholders = [...card.querySelectorAll('[aria-hidden="true"]')]
@@ -431,6 +495,9 @@ export const IgnoredPropsWarn = () => {
         'Group width': <Skeleton preset="tag-group" width={300} />,
         'Rect lines': <Skeleton lines={3} />,
         'Lines height': <Skeleton shape="text" lines={2} height={24} radius="card-radius-sm" />,
+        'Preset shape': <Skeleton preset="status" shape="text" />,
+        'Circle radius': <Skeleton shape="circle" radius="card-radius-sm" data-testid="circle-radius" />,
+        'Same shape': <Skeleton preset="paragraph" shape="text" />,
     };
     return (
         <div style={{ display: 'grid', gap: '12px' }}>
@@ -454,6 +521,9 @@ IgnoredPropsWarn.play = async ({ canvasElement }) => {
         'Group width': ['`width` is ignored with preset="tag-group"'],
         'Rect lines': ['`lines` is ignored unless the shape is text'],
         'Lines height': ['`height`, `radius` are ignored on several lines'],
+        'Preset shape': ['`shape` is ignored with preset="status"'],
+        'Circle radius': ['`radius` is ignored on a circle'],
+        'Same shape': [],
     };
     try {
         for (const [name, parts] of Object.entries(expected)) {
@@ -465,6 +535,10 @@ IgnoredPropsWarn.play = async ({ canvasElement }) => {
                 await expect(seen.some((m) => m.includes(part)), `${name} warns: ${part}`).toBe(true);
             }
         }
+        // The circle stays round: the ignored radius never reaches the style.
+        await userEvent.click(canvas.getByRole('button', { name: 'Circle radius' }));
+        const circle = canvas.getByTestId('circle-radius');
+        await expect(radius(circle), 'a circle is round whatever radius says').toBeGreaterThanOrEqual(box(circle).height / 2);
     } finally {
         warn.mockRestore();
     }

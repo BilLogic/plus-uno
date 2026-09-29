@@ -91,11 +91,11 @@ Status, Count and Tag, so nothing moves when the value arrives.
 
 ## Content
 
-<DocsCanvasShell description={<>A loading table. The region carries <code>aria-busy="true"</code> and a visually hidden status, "Loading students…", and every label inside it is a plain text bar: the container owns the skeleton.</>}>
+<DocsCanvasShell description={<>A loading table. The region carries <code>aria-busy="true"</code>, a visually hidden status beside it says "Loading students…", and every label inside it is a plain text bar: the container owns the skeleton.</>}>
     <DsCanvasQuiet of={SkeletonStories.LoadingTable} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>A loading card. The card's skeleton owns everything inside it, its tags included. When the content arrives, <code>aria-busy</code> comes off and the status announces it.</>}>
+<DocsCanvasShell description={<>A loading card. The card's skeleton owns everything inside it, its tags included. When the content arrives, <code>aria-busy</code> comes off and the status beside the card announces it.</>}>
     <DsCanvasQuiet of={SkeletonStories.LoadingCard} />
 </DocsCanvasShell>
 
@@ -200,15 +200,22 @@ own spinner (`isLoading`), so saving and loading look different.
   the container that is loading, and remove it when the content arrives. The
   component does not set it, because it cannot see the region.
 - **Pair the busy state with a live label.** `aria-busy` alone is not announced
-  by every screen reader. Inside the region, render a visually hidden
-  `role="status"` element that says what is loading ("Loading students…").
-  Keep it mounted, and when the content arrives, change its text ("Students
-  loaded") or empty it, so the arrival is announced once and not repeated.
+  by every screen reader. Render a visually hidden `role="status"` element
+  **beside** the busy region, not inside it: content inside a busy region may
+  be held back until it is no longer busy. Mount the status **empty** and set
+  its text after mount ("Loading students…"), because text a status already
+  holds when it mounts is not announced. Keep it mounted, and when the content
+  arrives, set its text again ("Students loaded").
 
 ```jsx
+const [message, setMessage] = useState('');
+useEffect(() => {
+  setMessage(loading ? 'Loading students…' : 'Students loaded');
+}, [loading]);
+
+<div role="status" className="visually-hidden">{message}</div>
 <section aria-labelledby="students" aria-busy={loading || undefined}>
   <h3 id="students">Students</h3>
-  <div role="status" className="visually-hidden">{loading ? 'Loading students…' : 'Students loaded'}</div>
   {loading ? <Skeleton shape="text" lines={3} /> : renderStudents(students)}
 </section>
 ```

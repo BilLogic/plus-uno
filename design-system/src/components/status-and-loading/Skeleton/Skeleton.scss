@@ -15,6 +15,12 @@
  * a preset is always the size of its label. The widths are stand-ins for the
  * text; 72, 56 and 88 have no spacing primitive, so they are literals.
  *
+ * THE SPACING PRIMITIVES. The rest of the sizes are Figma-bound spacing
+ * primitives, because no Element token names them: space-900 (64) for the
+ * default height and the status width, space-600 (32) for the circle,
+ * space-300 (16) for the text bar's height, and space-1000 (80) for the
+ * tag-person width.
+ *
  * NOT A TARGET. No pointer events and no selection: a placeholder cannot be
  * clicked, and the component renders it `aria-hidden` with no focus.
  */
