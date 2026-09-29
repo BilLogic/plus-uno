@@ -86,6 +86,10 @@ wraps or collapses, which edge it lines up on, and whether it is disabled.
     <DsCanvasQuiet of={TagGroupStories.MaxVisible} />
 </DocsCanvasShell>
 
+<DocsCanvasShell description={<>The cap never squeezes a tag: <code>maxVisible={'{0}'}</code> puts every tag behind <code>+n</code>, and a cap of 1 with room shows its tag whole.</>}>
+    <DsCanvasQuiet of={TagGroupStories.CapNeverSqueezes} />
+</DocsCanvasShell>
+
 <DocsCanvasShell description={<>A set short enough to fit shows no overflow tag at all.</>}>
     <DsCanvasQuiet of={TagGroupStories.NoOverflowWhenItFits} />
 </DocsCanvasShell>
@@ -218,7 +222,8 @@ group and every Tag and Suggestion in it follows.
 `collapse` counts what fits by width, so it suits a table cell or a card
 header where a second line would break the layout. Give the group a width to
 fit into: a group that can grow shows everything. Use `maxVisible` only to show
-fewer than fit.
+fewer than fit. The cap never squeezes a tag: `maxVisible={0}` puts every tag
+behind `+n`. Only a row too narrow for its first tag squeezes that tag.
 
 `+n` reserves room for the widest label it could show at its number of digits
 (`+88` when up to 99 tags are hidden), not for the label it shows now. That is
@@ -229,6 +234,12 @@ Suggestions are offers, not values, so they are never hidden: they are not
 counted into `+n`, never appear in its menu, and always sit after it. Their
 width comes off the row before tags are counted, so a group with suggestions
 shows fewer tags, not fewer suggestions.
+
+A Suggestion is recognized by a marker on the component, so pass Suggestions
+as direct children of the group. A memoized Suggestion works as is; a wrapper
+component of your own must copy the marker
+(`MySuggestion.isSuggestion = Suggestion.isSuggestion`), or it is counted as a
+tag.
 
 In the menu, a hidden tag keeps what it does. A selectable tag toggles there,
 shows selected, and the menu stays open so the change is seen. A link tag is a
@@ -258,7 +269,7 @@ right-aligned. Everywhere else, tags read from the left.
 - **Hidden tags leave the list.** A collapsed group's hidden tags are out of
   sight, out of the tab order and out of the list's count until the menu shows
   them.
-- **`+n` is named "n more tags"** and reports whether its menu is open. Enter
+- **`+n` is named "n more tags"** ("1 more tag" for one) and reports whether its menu is open. Enter
   or Space opens it, Tab reaches each hidden tag, and Escape closes it with
   focus back on `+n`. A selectable tag in the menu is a toggle button that
   reports `aria-pressed`; a link tag is a real link, whose arrow is decorative.

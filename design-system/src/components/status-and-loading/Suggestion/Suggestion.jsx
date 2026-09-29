@@ -81,6 +81,13 @@ export const Suggestion = ({
     );
 };
 
+/*
+ * The marker TagGroup looks for, rather than comparing component identity,
+ * so a memoized Suggestion, or a wrapper that copies this marker, is still
+ * kept out of `+n` and at the end of the row.
+ */
+Suggestion.isSuggestion = true;
+
 Suggestion.propTypes = {
     /** The proposed value's words. The accessible name is built from it. */
     label: PropTypes.string.isRequired,

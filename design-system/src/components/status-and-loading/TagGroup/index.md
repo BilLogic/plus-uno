@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.stories.jsx` — Wrapping, Collapse, CollapseMenu, CollapseWithSuggestions, MenuKeepsActions, MaxVisible, NoOverflowWhenItFits, ConditionalChildrenAreNotCounted, OverflowTag, DigitBoundary, StableOnParentRender, SqueezedFirstReplaced, AlignmentRight, Disabled, RemovableSet, CustomOverflowAction, Interactive
+**Stories:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.stories.jsx` — Wrapping, Collapse, CollapseMenu, CollapseWithSuggestions, MenuKeepsActions, MaxVisible, OneMoreTag, CapNeverSqueezes, WrappedSuggestionsAreNotCounted, NoOverflowWhenItFits, ConditionalChildrenAreNotCounted, OverflowTag, DigitBoundary, StableOnParentRender, SqueezedFirstReplaced, AlignmentRight, Disabled, RemovableSet, CustomOverflowAction, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.mdx`
 
@@ -15,13 +15,13 @@
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `children` | node | — | The tags, and any Suggestions offered beside them. Suggestions always sit at the end, after `+n`, and are never counted or hidden. `null` and `false` are skipped rather than counted. |
+| `children` | node | — | The tags, and any Suggestions offered beside them. Suggestions always sit at the end, after `+n`, and are never counted or hidden; they must be direct children, or components that carry Suggestion's `isSuggestion` marker. `null` and `false` are skipped rather than counted. |
 | `label` | string | — | The group's accessible name — what this set of tags is. |
 | `overflow` | enum | `'wrap'` | `wrap` flows onto more lines; `collapse` keeps one line, shows as many tags as fit, and puts the rest behind `+n`. |
 | `alignment` | enum | `'left'` | `right` lines the tags and the `+n` up on the right edge, for a right-aligned table column. |
 | `disabled` | bool | `false` | Disables every Tag and Suggestion in the group, as a disabled field does. |
 | `maxVisible` | number | — | `collapse` only: the most tags to show before `+n`, even when more would fit. By default, as many as fit. |
-| `overflowLabel` | func | — | Formats the overflow tag's visible label. Defaults to `+n`; its accessible name is always "n more tags". |
+| `overflowLabel` | func | — | Formats the overflow tag's visible label. Defaults to `+n`; its accessible name is always "n more tags" ("1 more tag"). |
 | `onOverflowClick` | func | — | Replaces the `+n` menu — for opening a picker or a panel instead. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |

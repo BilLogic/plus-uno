@@ -405,6 +405,80 @@ MaxVisible.play = async ({ canvasElement }) => {
 };
 
 /**
+ * One hidden tag is "1 more tag", not "1 more tags".
+ */
+export const OneMoreTag = () => (
+    <div style={{ width: '600px' }}>
+        <TagGroup label="Subjects" overflow="collapse" maxVisible={1}>
+            <Tag color="green">Science</Tag>
+            <Tag color="green">History</Tag>
+        </TagGroup>
+    </div>
+);
+
+OneMoreTag.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const more = await canvas.findByRole('button', { name: '1 more tag' });
+    await expect(more).toHaveTextContent('+1');
+};
+
+/**
+ * The cap is not the width. `maxVisible={0}` puts every tag behind `+n` and
+ * squeezes nothing, and a cap of 1 with room to spare shows its tag whole.
+ */
+export const CapNeverSqueezes = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '600px' }}>
+        <TagGroup label="None shown" overflow="collapse" maxVisible={0}>
+            {SUBJECTS.map((s) => <Tag key={s} color="green">{s}</Tag>)}
+        </TagGroup>
+        <TagGroup label="One shown" overflow="collapse" maxVisible={1}>
+            {SUBJECTS.map((s) => <Tag key={s} color="green" data-testid={`one-${s}`}>{s}</Tag>)}
+        </TagGroup>
+    </div>
+);
+
+CapNeverSqueezes.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const none = canvas.getByRole('list', { name: 'None shown' });
+    await expect(
+        await within(none).findByRole('button', { name: `${SUBJECTS.length} more tags` }),
+        'every tag is behind +n',
+    ).toBeInTheDocument();
+    await expect(readCollapseList(none), 'no tag shows, squeezed or not').toBe(0);
+
+    const one = canvas.getByRole('list', { name: 'One shown' });
+    await within(one).findByRole('button', { name: `${SUBJECTS.length - 1} more tags` });
+    const words = within(canvas.getByTestId('one-Science')).getByText('Science');
+    await expect(words.scrollWidth, 'the one tag is whole').toBeLessThanOrEqual(words.clientWidth);
+};
+
+/**
+ * A Suggestion is found by the marker it carries, so a memoized Suggestion,
+ * or a wrapper that forwards the marker, is still never counted into `+n`.
+ */
+const MemoSuggestion = React.memo(Suggestion);
+const WrappedSuggestion = (props) => <Suggestion {...props} />;
+WrappedSuggestion.isSuggestion = Suggestion.isSuggestion;
+
+export const WrappedSuggestionsAreNotCounted = () => (
+    <div style={{ width: '600px' }}>
+        <TagGroup label="Subjects" overflow="collapse" maxVisible={2}>
+            {SUBJECTS.slice(0, 4).map((s) => <Tag key={s} color="green">{s}</Tag>)}
+            <MemoSuggestion label="Fractions" />
+            <WrappedSuggestion label="Ratios" />
+        </TagGroup>
+    </div>
+);
+
+WrappedSuggestionsAreNotCounted.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const more = await canvas.findByRole('button', { name: '2 more tags' });
+    await expect(canvas.getByRole('button', { name: 'Add Fractions, suggested' })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'Add Ratios, suggested' })).toBeVisible();
+    await expect(box(canvas.getByRole('button', { name: 'Add Fractions, suggested' })).left).toBeGreaterThan(box(more).right);
+};
+
+/**
  * A set short enough to fit shows no overflow tag.
  *
  * `+0` is the failure this guards: an off-by-one would render an overflow tag

@@ -66,6 +66,18 @@ const DEPRECATED_VARIANTS = {
 };
 
 /**
+ * What a tag does, from its props: `behavior` wins; `variant` is the old name
+ * for it; with neither, an `href` still makes a link, as it did before
+ * `behavior` existed. Exported so TagGroup's `+n` menu gives a hidden tag the
+ * same action the tag itself has. It never warns; Tag does that.
+ */
+export const resolveTagBehavior = ({ behavior, variant, href } = {}) => {
+    if (behavior) return behavior;
+    if (variant) return DEPRECATED_VARIANTS[variant];
+    return href ? 'link' : 'read-only';
+};
+
+/**
  * Disabled state for every tag inside a field. A field wraps its tags in
  * `<TagContext.Provider value={{ isDisabled: true }}>`.
  */
@@ -191,18 +203,14 @@ export const Tag = ({
         resolvedColor = DEPRECATED_COLORS[resolvedColor];
     }
 
-    // `behavior` wins; `variant` is the old name for it. With neither, an
-    // `href` still makes a link, as it did before `behavior` existed.
-    let resolved = behavior;
-    if (!resolved && variant) {
+    if (!behavior && variant) {
         if (variant === 'operational') {
             warn('[Tag] variant="operational" is deprecated; use behavior="selectable" with `aria-expanded`.');
         } else {
             warn(`[Tag] variant="${variant}" is deprecated; use behavior="${DEPRECATED_VARIANTS[variant]}".`);
         }
-        resolved = DEPRECATED_VARIANTS[variant];
     }
-    if (!resolved) resolved = href ? 'link' : 'read-only';
+    const resolved = resolveTagBehavior({ behavior, variant, href });
 
     const hasAvatar = AVATAR_TAG_TYPES.includes(type);
     if (!hasAvatar && avatar) {

@@ -199,6 +199,8 @@ would run off the edge, remeasuring on scroll and resize.
   of a split button it sits, or the control inside a custom `toggle`. A custom
   toggle with nothing focusable in it returns focus to whatever had it when the
   menu opened, if that is still on the page, and otherwise leaves focus alone.
+  Focus moves only once the menu has closed: a caller that controls `isOpen`
+  and keeps it open leaves focus where it was.
   A click outside, bound to `mousedown`, also closes it.
 - **A custom `toggle` brings its own keyboard access.** The node you pass is
   wrapped in a `div` with an `onClick` and no role or tabindex, so a control
@@ -208,7 +210,7 @@ would run off the edge, remeasuring on scroll and resize.
   built-in toggle.
 - **Links and toggles say what they are.** An item with `href` is a real
   link (`linkComponent` for a router's), so it is announced as a link and can
-  open in a new tab. An item with `toggle` is a button that reports
+  open in a new tab. An item with `isToggle` is a button that reports
   `selected` as `aria-pressed`; `keepOpen` leaves the menu open after it.
 - **Icons are decorative — mostly.** The selected check mark, the multi-select
   checkbox, `leadingIcon` and `trailingIcon` are all `aria-hidden`. The

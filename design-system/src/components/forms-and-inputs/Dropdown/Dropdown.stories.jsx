@@ -328,8 +328,8 @@ export const LinkAndToggleItems = () => (
             buttonText="Views"
             items={[
                 { text: 'Open report', href: '#report', trailingIcon: 'arrow-right' },
-                { text: 'Pinned', toggle: true, selected: true, keepOpen: true },
-                { text: 'Archived', toggle: true, selected: false, keepOpen: true },
+                { text: 'Pinned', isToggle: true, selected: true, keepOpen: true },
+                { text: 'Archived', isToggle: true, selected: false, keepOpen: true },
                 { text: 'Rename' },
             ]}
         />
@@ -348,6 +348,26 @@ LinkAndToggleItems.play = async ({ canvasElement }) => {
     await expect(canvas.getByRole('button', { name: 'Archived' })).toHaveAttribute('aria-pressed', 'false');
     await expect(canvas.getByRole('button', { name: 'Rename' }), 'a plain item is not a toggle')
         .not.toHaveAttribute('aria-pressed');
+};
+
+/**
+ * A controlled caller that keeps the menu open when Escape asks to close it:
+ * focus stays where it is, on the item, and does not jump to the toggle of a
+ * menu that is still open.
+ */
+export const EscapeIgnoredWhenControlledStaysOpen = () => (
+    <div style={{ padding: '24px 24px 160px' }}>
+        <Dropdown buttonText="Pinned open" items={ESCAPE_ITEMS} isOpen onToggle={() => {}} />
+    </div>
+);
+
+EscapeIgnoredWhenControlledStaysOpen.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const first = canvas.getByRole('button', { name: 'Rename' });
+    first.focus();
+    await userEvent.keyboard('{Escape}');
+    await expect(canvas.getByRole('button', { name: 'Rename' }), 'the menu is still open').toBeVisible();
+    await expect(first, 'focus stays on the item').toHaveFocus();
 };
 
 export const Interactive = {

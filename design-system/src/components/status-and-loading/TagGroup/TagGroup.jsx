@@ -1,7 +1,6 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import Tag, { TagContext, useTagContext } from '../Tag';
-import Suggestion from '../Suggestion';
+import Tag, { TagContext, resolveTagBehavior, useTagContext } from '../Tag';
 import Dropdown from '../../forms-and-inputs/Dropdown';
 import './TagGroup.scss';
 
@@ -46,14 +45,13 @@ const labelOf = (child) => {
 };
 
 /**
- * What a tag does, resolved as Tag resolves it: `behavior`, else the old
- * `variant`, else a link when it has `href`.
+ * A Suggestion, found by the marker Suggestion carries: on the component, or
+ * on what a `memo` or `forwardRef` wraps. A wrapper of its own must copy the
+ * marker (`Wrapper.isSuggestion = Suggestion.isSuggestion`).
  */
-const VARIANT_BEHAVIORS = { selectable: 'selectable', operational: 'action' };
-const behaviorOf = (props) => {
-    if (props.behavior) return props.behavior;
-    if (props.variant) return VARIANT_BEHAVIORS[props.variant] || 'read-only';
-    return props.href ? 'link' : 'read-only';
+const isSuggestion = (child) => {
+    const type = child?.type;
+    return Boolean(type && (type.isSuggestion || type.type?.isSuggestion || type.render?.isSuggestion));
 };
 
 /**
@@ -66,9 +64,9 @@ const behaviorOf = (props) => {
 const menuItemOf = (child) => {
     const props = child.props || {};
     const text = labelOf(child);
-    switch (behaviorOf(props)) {
+    switch (resolveTagBehavior(props)) {
         case 'selectable':
-            return { text, toggle: true, selected: Boolean(props.isSelected), keepOpen: true, onClick: props.onClick };
+            return { text, isToggle: true, selected: Boolean(props.isSelected), keepOpen: true, onClick: props.onClick };
         case 'link':
             return {
                 text,
@@ -87,9 +85,11 @@ const menuItemOf = (child) => {
 /**
  * How many of `widths` fit in `available`, with `gap` between them and room
  * for the overflow tag when any are left out, and whether the first has to
- * shrink to fit at all. At least one always shows: a row of only `+n` hides
- * every value behind a press, while one tag that truncates still says what
- * the set is about.
+ * shrink to fit at all. When the width alone stops the first tag, it still
+ * shows, squeezed: a row of only `+n` hides every value behind a press, while
+ * one tag that truncates still says what the set is about. The cap never
+ * squeezes: a tag the cap leaves out is simply behind `+n`, so `maxVisible={0}`
+ * shows `+n` alone.
  */
 const countThatFit = (widths, available, gap, overflowWidth, cap) => {
     const limit = Math.min(widths.length, cap);
@@ -106,7 +106,8 @@ const countThatFit = (widths, available, gap, overflowWidth, cap) => {
         used = next;
         count = i + 1;
     }
-    if (count === 0 && widths.length) return { count: 1, squeeze: true };
+    // Squeezed only when the width stopped the first tag, not the cap.
+    if (count === 0 && limit > 0) return { count: 1, squeeze: true };
     return { count, squeeze: false };
 };
 
@@ -123,7 +124,7 @@ export const TagGroup = ({
     id,
     ...rest
 }) => {
-    const parent = useTagContext() || {};
+    const parent = useTagContext();
     const isDisabled = Boolean(disabled || parent.isDisabled);
     const context = useMemo(() => ({ ...parent, isDisabled }), [parent, isDisabled]);
 
@@ -132,7 +133,6 @@ export const TagGroup = ({
     const members = React.Children.toArray(children).filter(Boolean);
     // Suggestions are split off: they are never counted, hidden or listed in
     // the menu, and they always come last.
-    const isSuggestion = (child) => child.type === Suggestion;
     const items = members.filter((child) => !isSuggestion(child));
     const suggestions = members.filter(isSuggestion);
 
@@ -248,7 +248,7 @@ export const TagGroup = ({
     let more = null;
     if (collapses && hidden > 0) {
         const tag = overflowTag(format(hidden), {
-            'aria-label': `${hidden} more tags`,
+            'aria-label': `${hidden} more ${hidden === 1 ? 'tag' : 'tags'}`,
             // With `onOverflowClick` the caller opens its own picker, which
             // holds its own state, so `+n` stays collapsed.
             'aria-expanded': onOverflowClick ? false : menuIsOpen,
@@ -299,7 +299,6 @@ export const TagGroup = ({
                         ]
                             .filter(Boolean).join(' ')}
                         data-tag-index={i}
-                        data-tag-key={child.key}
                         // `Children.toArray` gives every child a key.
                         key={child.key}
                     >
@@ -307,7 +306,7 @@ export const TagGroup = ({
                     </div>
                 ))}
                 {more && (
-                    <div role="listitem" className="plus-tag-group__item" data-tag-more="">
+                    <div role="listitem" className="plus-tag-group__item">
                         {more}
                     </div>
                 )}
@@ -331,7 +330,7 @@ export const TagGroup = ({
 };
 
 TagGroup.propTypes = {
-    /** The tags, and any Suggestions offered beside them. Suggestions always sit at the end, after `+n`, and are never counted or hidden. `null` and `false` are skipped rather than counted. */
+    /** The tags, and any Suggestions offered beside them. Suggestions always sit at the end, after `+n`, and are never counted or hidden; they must be direct children, or components that carry Suggestion's `isSuggestion` marker. `null` and `false` are skipped rather than counted. */
     children: PropTypes.node,
     /** The group's accessible name — what this set of tags is. */
     label: PropTypes.string,
@@ -343,7 +342,7 @@ TagGroup.propTypes = {
     disabled: PropTypes.bool,
     /** `collapse` only: the most tags to show before `+n`, even when more would fit. By default, as many as fit. */
     maxVisible: PropTypes.number,
-    /** Formats the overflow tag's visible label. Defaults to `+n`; its accessible name is always "n more tags". */
+    /** Formats the overflow tag's visible label. Defaults to `+n`; its accessible name is always "n more tags" ("1 more tag"). */
     overflowLabel: PropTypes.func,
     /** Replaces the `+n` menu — for opening a picker or a panel instead. */
     onOverflowClick: PropTypes.func,

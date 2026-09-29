@@ -25,6 +25,8 @@ const Dropdown = ({
     const toggleRef = useRef(null);
     const customToggleRef = useRef(null);
     const openerRef = useRef(null);
+    // Where Escape asked focus to go, held until the menu has really closed.
+    const escapeFocusRef = useRef(null);
     // Viewport-aware placement: the menu flips up when there isn't room below, and right-aligns
     // when a left-aligned menu would spill off the right edge. Only the default vertical dropdown
     // is auto-placed; an explicit `direction` of dropup/dropleft/dropright is honored as authored.
@@ -43,6 +45,8 @@ const Dropdown = ({
      * is what makes the controlled half usable.
      */
     const setOpen = (next) => {
+        // Any open or close supersedes an Escape still waiting to land.
+        escapeFocusRef.current = null;
         if (!isControlled) {
             setInternalIsOpen(next);
         }
@@ -66,23 +70,34 @@ const Dropdown = ({
      * `span`) sends focus back to whatever had it when the menu opened, if
      * that is still on the page; otherwise focus is left alone. It is never
      * moved to the page itself.
+     *
+     * Focus moves once the menu has actually closed, not when Escape asks: a
+     * caller that controls `isOpen` may keep it open, and then focus stays on
+     * the item rather than jumping to the toggle of a menu that is still open.
      */
     const handleKeyDown = (event) => {
         if (event.key !== 'Escape' || !show) return;
         event.stopPropagation();
-        closeDropdown();
         const custom = customToggleRef.current;
         const opener = openerRef.current;
         const target = toggleRef.current
             || custom?.querySelector('button:not([disabled]), a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
             || (opener && opener.isConnected && opener !== document.body ? opener : null);
-        target?.focus();
+        closeDropdown();
+        escapeFocusRef.current = target;
     };
 
-    // What had focus when the menu opened, however it was opened (the toggle,
-    // or a caller that controls `isOpen`).
+    // Opening records what had focus, however it was opened (the toggle, or a
+    // caller that controls `isOpen`). Closing after an Escape moves focus.
     useLayoutEffect(() => {
-        if (show) openerRef.current = document.activeElement;
+        if (show) {
+            openerRef.current = document.activeElement;
+            escapeFocusRef.current = null;
+            return;
+        }
+        const target = escapeFocusRef.current;
+        escapeFocusRef.current = null;
+        target?.focus();
     }, [show]);
 
     useEffect(() => {
@@ -290,8 +305,9 @@ const Dropdown = ({
                     );
                     /*
                      * An item with `href` goes somewhere, so it is a link, not
-                     * a button that navigates: it opens in a new tab, shows its
-                     * address and is announced as a link. `linkComponent` is a
+                     * a button that navigates: it opens in the same tab, as
+                     * Tag's link does, can be opened in a new one, and is
+                     * announced as a link. `linkComponent` is a
                      * router's link, as Tag takes one.
                      */
                     const Link = item.linkComponent || 'a';
@@ -306,9 +322,9 @@ const Dropdown = ({
                                     type="button"
                                     className={itemClasses}
                                     disabled={item.disabled}
-                                    // A `toggle` item switches on and off in
+                                    // An `isToggle` item switches on and off in
                                     // place, so it says whether it is on.
-                                    aria-pressed={item.toggle ? Boolean(item.selected) : undefined}
+                                    aria-pressed={item.isToggle ? Boolean(item.selected) : undefined}
                                     onClick={choose}
                                 >
                                     {inner}
@@ -353,7 +369,7 @@ Dropdown.propTypes = {
         /** Router link to render instead of `<a>` for an item with `href`. */
         linkComponent: PropTypes.elementType,
         /** An on/off item: it publishes `selected` as `aria-pressed`. */
-        toggle: PropTypes.bool
+        isToggle: PropTypes.bool
     })),
     size: PropTypes.oneOf(['small', 'default', 'large']),
     style: PropTypes.oneOf(['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'default']),
