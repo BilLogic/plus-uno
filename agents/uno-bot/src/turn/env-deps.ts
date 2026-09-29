@@ -36,7 +36,7 @@ import { githubRepoVisibility, githubWorkflowClient, resolveRepoFor } from "../i
 import type { ThreadState } from "../thread-state/index";
 import type { Env } from "../types";
 import type { TurnOrigin } from "../usage/index";
-import { testChannelIdsOf, usageLogFor } from "../usage/production";
+import { classifyAskFor, testChannelIdsOf, usageLogFor } from "../usage/production";
 import type { Delivery } from "./delivery";
 import { restageExecution, type TurnDeps, type TurnRequest } from "./turn";
 
@@ -171,6 +171,8 @@ export function buildTurnDeps(env: Env, request: TurnRequest, wiring: TurnWiring
       log: usageLogFor(env),
       origin: wiring.origin,
       testChannelIds: testChannelIdsOf(env),
+      // An ask's in-turn label — only when there is a database to keep it in.
+      ...(classifyAskFor(env) ? { classifyAsk: classifyAskFor(env)! } : {}),
     },
 
     // The reads a card needs and Turn may not make itself — shared with the
