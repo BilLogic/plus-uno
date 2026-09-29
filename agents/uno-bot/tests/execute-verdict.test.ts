@@ -416,3 +416,39 @@ test("a run a later look has taken stops at its next operation and tells no outc
     "the note and the re-staged card are the thread's account, not a batch result",
   );
 });
+
+// ── The self-serve record, after the person has been told ───────────────────
+
+test("a budget stop in the task-completion write still posts the result and the history note", async () => {
+  calls = [];
+  appended = [];
+  executionCalls = [];
+  const { D1QueryBudgetError } = await import("../src/net.js");
+  const writes: string[] = [];
+  const USAGE_DB = {
+    prepare: () => ({
+      bind: () => ({
+        run: async () => ({}),
+        all: async () => ({ results: [] }),
+        first: async () => {
+          writes.push(`task_completed after ${posts().filter((p) => p.channel === "D0REQUESTER").length} result post(s)`);
+          throw new D1QueryBudgetError(40);
+        },
+      }),
+    }),
+  };
+  const run = await executeVerdict();
+  await run(
+    { ...env(), USAGE_DB } as unknown as Env,
+    won([
+      { toolName: "dm_relay", input: { recipient: "U0COCO0001", text: "one" } },
+      { toolName: "dm_relay", input: { recipient: "U0COCO0002", text: "two" } },
+    ]),
+  );
+  const result = posts().filter((p) => p.channel === "D0REQUESTER");
+  assert.equal(result.length, 1, "the batch result was posted");
+  assert.equal(result[0]!.thread_ts, "1700000000.000100");
+  assert.ok(appended.some((a) => a.ref.channel === "D0REQUESTER"), "the history note was written");
+  assert.deepEqual(writes, ["task_completed after 1 result post(s)"], "the write was tried, last");
+  assert.ok(executionCalls.includes("end 1700000000.000300"));
+});

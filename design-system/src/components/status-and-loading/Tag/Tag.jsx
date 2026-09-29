@@ -23,6 +23,15 @@ import './Tag.scss';
  * a hexagon, a team is a square with radius-2 corners. The tag stays 22 tall and pads
  * 4 on the avatar side, as a plain tag does on its swatch side.
  *
+ * ON AN IMAGE. `isElevated` lifts a read-only or link tag onto a photo or a
+ * video: a solid surface fill, no border, the Elevation 2 shadow, neutral text,
+ * and the hue still on the swatch, so it reads on any picture. A person, agent
+ * or team tag takes the same ground and keeps its avatar's fill. In a disabled
+ * field the ground and shadow stay and only the content turns Secondary
+ * (Text). Focus, on the tag or on a link's ×, has a surface gap inside the
+ * ring. Editing happens off the image, so a removable or selectable tag
+ * ignores it.
+ *
  * NO `disabled` PROP. A tag is disabled because the field holding it is: the
  * field wraps its tags in `TagContext.Provider`, so one tag can never disagree
  * with the tags beside it.
@@ -182,6 +191,7 @@ export const Tag = ({
     linkComponent,
     isSelected = false,
     isLoading = false,
+    isElevated = false,
     onClick,
     onRemove,
     removeLabel,
@@ -240,6 +250,13 @@ export const Tag = ({
     }
     const showCount = isSelectable && count !== undefined && count !== null;
 
+    // Elevated is for a tag sitting on a picture, which is only ever read or
+    // followed: a value is edited off the image, where the outline reads.
+    const canElevate = resolved === 'read-only' || isLink;
+    if (isElevated && !canElevate) {
+        warn(`[Tag] \`isElevated\` is only for behavior="read-only" or "link"; it is ignored on "${resolved}".`);
+    }
+
     // The × renders for removable, and for a link with `onRemove`. Never in a
     // disabled field: a value you cannot change has nothing to remove.
     const hasRemove = (resolved === 'removable' || isLink)
@@ -260,6 +277,7 @@ export const Tag = ({
         isDisabled ? 'plus-tag--disabled' : `plus-tag--${resolved}`,
         isSelectable && isSelected ? 'plus-tag--selected' : '',
         isLoading ? 'plus-tag--loading' : '',
+        isElevated && canElevate ? 'plus-tag--elevated' : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -476,6 +494,8 @@ Tag.propTypes = {
     isSelected: PropTypes.bool,
     /** Saving: a spinner replaces the swatch or avatar and the tag ignores presses until it is done. */
     isLoading: PropTypes.bool,
+    /** For a tag on an image or video: a solid surface fill, no border and the Elevation 2 shadow, with the hue kept on the swatch or the avatar's own fill. Disabled keeps the ground and shadow and turns the content Secondary (Text). Focus on the tag or a link's × has a surface gap inside the ring. `read-only` and `link` only, on every type; ignored with a warning on `removable` and `selectable`. */
+    isElevated: PropTypes.bool,
     /** Fires on `selectable`, and on a `link`. */
     onClick: PropTypes.func,
     /** `removable`, or a `link` with a separate ×: called when the × is pressed. */

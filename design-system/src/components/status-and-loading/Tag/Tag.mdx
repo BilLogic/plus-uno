@@ -20,7 +20,8 @@ export const figmaMeta = {
       "values": ["plain", "person", "agent", "team"]
     },
     "isSelected": { "type": "boolean" },
-    "isLoading": { "type": "boolean" }
+    "isLoading": { "type": "boolean" },
+    "isElevated": { "type": "boolean" }
   },
   "sets": [
     {
@@ -33,9 +34,10 @@ export const figmaMeta = {
       "isComponentSet": true,
       "variantProps": {
         "isSelected": "selected",
-        "isLoading": "state=saving"
+        "isLoading": "state=saving",
+        "isElevated": "elevated"
       },
-      "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on grey, plain, read-only, rest and false. state=saving is isLoading; state=disabled comes from TagContext, never a prop; remove? on a link is link plus onRemove; count? is count. type is the same four values in code (plain, person, agent, team); the avatar slot is the avatar prop, with initials when it is missing. elevated=true is later work and not in code yet."
+      "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on grey, plain, read-only, rest and false. state=saving is isLoading; state=disabled comes from TagContext, never a prop; remove? on a link is link plus onRemove; count? is count. type is the same four values in code (plain, person, agent, team); the avatar slot is the avatar prop, with initials when it is missing. elevated=true is isElevated, drawn for read-only and link on plain, person, agent and team, including disabled (from TagContext) and focus × on a link's separate ×; code ignores it on removable and selectable with a warning."
     },
     {
       "id": "remove-button",
@@ -136,6 +138,32 @@ category.
 
 <DocsCanvasShell description={<>A link with <code>onRemove</code> is two targets: the text is the link, the × is its sibling, and the tab order is link, then ×.</>}>
     <DsCanvasQuiet of={TagStories.LinkWithRemove} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## On images
+
+<DocsCanvasShell description={<><code>isElevated</code> lifts a read-only or link tag onto a photo, a thumbnail or a video: a solid surface fill, no border, the Elevation 2 shadow and neutral text, with the hue kept on the swatch. Place it 8 from the image corner, never centered over a face or text.</>}>
+    <DsCanvasQuiet of={TagStories.OnImages} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A person, agent or team tag takes the same ground, and its avatar keeps its own fill.</>}>
+    <DsCanvasQuiet of={TagStories.ElevatedAvatarTypes} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>In a disabled field an elevated tag keeps its solid ground and Elevation 2, since the translucent disabled fill would sink into the picture. Only the content turns Secondary (Text): the label, the swatch, and the avatar as any disabled avatar. No hover or press.</>}>
+    <DsCanvasQuiet of={TagStories.ElevatedDisabled} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Focus on an elevated link's × has the same 2px surface gap inside its ring as the tag's own focus. A × off the image keeps the plain ring.</>}>
+    <DsCanvasQuiet of={TagStories.ElevatedRemoveFocus} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Editing happens off the image, so a removable or selectable tag ignores <code>isElevated</code> and keeps its outline, with a warning in development.</>}>
+    <DsCanvasQuiet of={TagStories.ElevatedOnlyReadOnlyAndLink} />
 </DocsCanvasShell>
 
 </div>
@@ -255,6 +283,17 @@ Status lands, a state is a `BadgeVariants` status.
 initials stand in without moving the tag. On a plain tag it is ignored with a
 warning.
 
+### Lift a tag onto an image with `isElevated`.
+
+```jsx
+// A subject on a lesson thumbnail, 8 from the corner.
+<Tag color="blue" isElevated>Algebra</Tag>
+<Tag behavior="link" href="/lessons/42" color="magenta" isElevated>Open lesson</Tag>
+```
+
+Read-only and link only: a value is edited off the image. On a removable or
+selectable tag `isElevated` is ignored with a warning.
+
 ### Disable the field, not the tag.
 
 There is no `disabled` prop. A field or group that is disabled says so once,
@@ -302,6 +341,9 @@ with `aria-expanded`.
   but do nothing until the save lands.
 - **A × needs a name.** When the label is not text, pass `removeLabel`, or the
   × is named only "Remove" and development warns.
+- **An elevated tag's focus ring has a surface gap.** The 2px between the tag
+  (or a link's ×) and the ring is filled in the surface color, so the ring
+  reads on a dark picture.
 - **Disabled tags take no focus, and say they are disabled.** They come from
   a disabled field. A selectable tag is a native disabled button, announced as
   disabled. Every other tag is a span, which has no disabled state a screen
