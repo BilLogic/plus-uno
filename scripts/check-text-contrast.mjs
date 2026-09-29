@@ -40,11 +40,10 @@
  */
 import { AA_TEXT, PAGE_TOKEN } from './button-contrast.mjs';
 import { REPO_ROOT } from './lib/corpus.mjs';
+import { NON_TEXT, declarationErrors } from './lib/declared-grounds.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 import {
-  NON_TEXT,
-  declarationErrors,
   census,
   ratio,
   findings,
@@ -84,7 +83,7 @@ const inputs = byRoot((repoRoot) => {
   const files = stylesheets(repoRoot);
   const uses = textDeclarations(files, repoRoot);
   const found = findings(uses, values);
-  return { values, files, uses, found, counts: census(found), declarations: declarationErrors(files, repoRoot, values) };
+  return { values, files, uses, found, counts: census(found), declarations: declarationErrors(files, repoRoot, values, { contrast: true }) };
 });
 
 /**

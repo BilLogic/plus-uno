@@ -65,7 +65,7 @@ import { fileURLToPath } from 'node:url';
 
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { documents } from './lib/corpus.mjs';
-import { analyzeSheet, annotationErrors, groundAt, isNonText } from './lib/declared-grounds.mjs';
+import { NON_TEXT, analyzeSheet, groundAt, isNonText } from './lib/declared-grounds.mjs';
 
 import {
   composite,
@@ -96,66 +96,6 @@ export function stylesheets(root = REPO_ROOT, dir = CORPUS) {
 }
 
 /**
- * The innermost `{ … }` a byte offset sits in, with nested blocks blanked out.
- *
- * Blanking rather than removing keeps offsets stable, and it is what makes
- * "does this rule set a background?" answerable: a background declared in a
- * CHILD rule is not this rule's ground, and a substring search would find it.
- */
-export function enclosingBlock(source, offset) {
-  const opens = [];
-  let start = -1;
-  for (let i = 0; i < offset; i += 1) {
-    if (source[i] === '{') opens.push(i);
-    else if (source[i] === '}') opens.pop();
-  }
-  if (!opens.length) return null;
-  start = opens[opens.length - 1];
-
-  let depth = 0;
-  let end = source.length;
-  for (let i = start; i < source.length; i += 1) {
-    if (source[i] === '{') depth += 1;
-    else if (source[i] === '}') {
-      depth -= 1;
-      if (depth === 0) { end = i; break; }
-    }
-  }
-
-  const chars = source.slice(start + 1, end).split('');
-  let nested = 0;
-  for (let i = 0; i < chars.length; i += 1) {
-    if (chars[i] === '{') { nested += 1; chars[i] = ' '; continue; }
-    if (chars[i] === '}') { nested -= 1; chars[i] = ' '; continue; }
-    if (nested > 0) chars[i] = ' ';
-  }
-  return chars.join('');
-}
-
-/**
- * `background[-color]: … var(--color-x`, with the token grammar taken from the
- * module rather than spelled again here (#507). A fresh RegExp per call because
- * the module's pattern carries `/g`, and a shared one keeps `lastIndex`.
- */
-const BACKGROUND_TOKEN = () =>
-  new RegExp(`background(?:-color)?\\s*:\\s*[^;]*?${varReferencePattern('--color-').source}`);
-
-/**
- * The ground a declaration is drawn on: the `background-color` of its own rule
- * if that rule sets one, otherwise the page.
- *
- * Only `--color-*` grounds count. A literal or a gradient leaves the page
- * assumption in place, which is stated rather than silently trusted — see
- * blind spot 1.
- */
-export function groundFor(source, offset, fallback = PAGE_TOKEN) {
-  const block = enclosingBlock(source, offset);
-  if (!block) return fallback;
-  const match = BACKGROUND_TOKEN().exec(block);
-  return match ? match[1] : fallback;
-}
-
-/**
  * Every `color:` declaration naming a `--color-*` token, with the ground its
  * own rule puts it on.
  *
@@ -183,13 +123,18 @@ export function textDeclarations(files, root = REPO_ROOT) {
         const grounds = resolved.kind === 'background'
           ? [resolved.token]
           : (declared?.tokens.length ? declared.tokens : [PAGE_TOKEN]);
+        // Where the ground came from, for the report: this rule's own
+        // background, an ancestor's, a declared `@grounds`, or the page.
+        const origin = resolved.kind === 'background'
+          ? { kind: resolved.own ? 'own' : 'ancestor', line: resolved.line }
+          : (declared?.tokens.length ? { kind: 'grounds', line: declared.line } : { kind: 'page' });
         // `@contrast: non-text` — a graphic, held to 3:1 — counts only on the
         // declaration's own rule and only with an icon subject. Anywhere else
         // it is an error and the declaration keeps the text bar.
         const nonText = isNonText(sheet, at);
         for (const match of declaration[2].matchAll(varReferencePattern('--color-'))) {
           for (const ground of grounds) {
-            uses.push({ token: match[1], file, line: index + 1, source: line.trim(), ground, declared, nonText });
+            uses.push({ token: match[1], file, line: index + 1, source: line.trim(), ground, origin, declared, nonText });
           }
         }
       }
@@ -197,20 +142,6 @@ export function textDeclarations(files, root = REPO_ROOT) {
     });
   }
   return uses;
-}
-
-/**
- * Annotation errors across the stylesheets, as `file:line — reason`, swept
- * over every file whether or not the rule has its own background: placement
- * (must open its block, one of a kind per block), an empty or unknown
- * `@grounds`, and a `@contrast` that is not `non-text` or sits on a selector
- * that is not an icon.
- */
-export function declarationErrors(files, root = REPO_ROOT, values) {
-  return files.flatMap((file) => {
-    const source = fs.readFileSync(path.join(root, file), 'utf8');
-    return /@(grounds|contrast)\b/.test(source) ? annotationErrors(file, source, values, { contrast: true }) : [];
-  });
 }
 
 /**
@@ -262,9 +193,6 @@ export function ratio(token, values, ground = PAGE_TOKEN) {
  * different defect (a dangling token) with a different check, and reporting it
  * here as a contrast failure would name the wrong problem.
  */
-/** WCAG 1.4.11 — a graphic, such as an icon glyph, needs 3:1. */
-export const NON_TEXT = 3;
-
 export function findings(uses, values, { threshold = AA_TEXT } = {}) {
   const out = [];
   for (const use of uses) {
@@ -294,22 +222,37 @@ export function readValues(root = REPO_ROOT) {
   return tokenValues(fs.readFileSync(path.join(root, TOKENS_FILE), 'utf8'));
 }
 
+/**
+ * Where a finding's ground came from, in words. A use built without an origin
+ * (a hand-made one in a test) is labelled from its ground alone.
+ */
+export function groundLabel(finding) {
+  const origin = finding.origin ?? { kind: finding.ground === PAGE_TOKEN ? 'page' : 'own' };
+  switch (origin.kind) {
+    case 'own': return " (its own rule's background)";
+    case 'ancestor': return ` (the background of an ancestor rule, line ${origin.line})`;
+    case 'grounds': return ` (declared by @grounds, line ${origin.line})`;
+    default: return ' (no rule sets a background, so the page is assumed)';
+  }
+}
+
 export function report(found, { threshold = AA_TEXT } = {}) {
   const lines = found.map(
     (f) =>
       `  ${f.file}:${f.line}\n` +
       `      ${f.source}\n` +
       `      ${f.token} is ${f.ratio}:1 on ${f.ground}` +
-      (f.ground === PAGE_TOKEN ? ' (its rule sets no background, so the page is assumed)' : ' (its own rule)') +
+      groundLabel(f) +
       (f.bar === NON_TEXT ? ` — a non-text glyph needs ${NON_TEXT}:1` : ` — AA text needs ${threshold}:1`) +
       (f.sibling ? `\n      → ${f.sibling} is ${f.siblingRatio}:1 and exists for exactly this.` : ''),
   );
   return (
     `[text-contrast] ${found.length} text colour${found.length === 1 ? '' : 's'} below AA:\n\n` +
     `${lines.join('\n\n')}\n\n` +
-    `  A ground is read from the declaration's OWN rule. One set by an ancestor is\n` +
-    `  invisible here — if that is what happened, the check is wrong and should learn\n` +
-    `  the ground; do not silence it by moving the declaration.`
+    `  A ground is resolved outward from the declaration's rule: the first rule with a\n` +
+    `  --color-* background or a @grounds decides, and the page if none does. If the\n` +
+    `  real ground is painted somewhere this cannot see, the check is wrong and should\n` +
+    `  learn the ground; do not silence it by moving the declaration.`
   );
 }
 

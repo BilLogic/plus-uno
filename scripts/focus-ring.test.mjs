@@ -5,7 +5,8 @@ import path from 'node:path';
 import test from 'node:test';
 
 import { run } from './check-focus-ring.mjs';
-import { AFFORDANCE, NEGATED, colours, declarationErrors, failures, focusRules, indicators, invisible, ratio } from './focus-ring.mjs';
+import { AFFORDANCE, NEGATED, colours, failures, focusRules, indicators, invisible, ratio } from './focus-ring.mjs';
+import { declarationErrors } from './lib/declared-grounds.mjs';
 import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
 const VALUES = colours();
@@ -218,8 +219,9 @@ test('@grounds: an undeclared ring is still measured on the page, unchanged', ()
 });
 
 test('@grounds: a rule whose OWN background is the page token keeps it over an ancestor declaration', () => {
-  // `groundFor` used to answer PAGE for both "no background" and "the page",
-  // so an ancestor's `@grounds` replaced a rule that painted the page itself.
+  // The old one-block ground read answered PAGE for both "no background" and
+  // "the page", so an ancestor's `@grounds` replaced a rule that painted the
+  // page itself.
   const root = corpus({
     [A]: [
       '.x--inverse {',

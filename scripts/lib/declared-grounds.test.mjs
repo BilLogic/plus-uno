@@ -19,6 +19,7 @@ import {
   groundsOfSelector,
   hasIconSubject,
   isNonText,
+  resolvedSelectors,
 } from './declared-grounds.mjs';
 
 const VALUES = new Map([
@@ -69,7 +70,7 @@ test('an annotation at the top level or inside an at-rule belongs to no rule: an
 
 test('a nearer background beats a farther @grounds', () => {
   const source = '.x {\n  // @grounds: --color-primary\n  .y {\n    background-color: var(--color-success);\n    .z { color: red; }\n  }\n}\n';
-  assert.deepEqual(ground(source, 'color: red'), { kind: 'background', token: '--color-success', line: 3 });
+  assert.deepEqual(ground(source, 'color: red'), { kind: 'background', token: '--color-success', line: 3, own: false });
 });
 
 test('a nearer @grounds beats a farther background', () => {
@@ -128,6 +129,26 @@ test('@contrast resolves SCSS nesting and `&` before judging the subject', () =>
   assert.deepEqual(errors('.x {\n  &__icon {\n    // @contrast: non-text\n    color: red;\n  }\n}\n'), []);
   assert.deepEqual(errors('.x {\n  .fa-solid {\n    // @contrast: non-text\n    color: red;\n  }\n}\n'), []);
   assert.match(errors('.fa-solid {\n  & + .label {\n    // @contrast: non-text\n    color: red;\n  }\n}\n').join('\n'), /text selector/);
+});
+
+/** The resolved selectors of the rule whose own selector is `own`. */
+const resolved = (source, own) => {
+  let found = null;
+  analyzeSheet(source).root.walkRules((rule) => { if (rule.selector === own) found = rule; });
+  return resolvedSelectors(found);
+};
+
+test('`&` expands to the parent literally, even when the parent holds a replacement pattern', () => {
+  // `String.replace` reads `$&`, `$'` and `` $` `` in a replacement STRING as
+  // patterns; the parent selector is text and must arrive as written.
+  assert.deepEqual(resolved('.a[data-x="$&"] {\n  &:hover { color: red; }\n}\n', '&:hover'), ['.a[data-x="$&"]:hover']);
+  assert.deepEqual(resolved(".a[data-x=\"$'\"] {\n  &:hover { color: red; }\n}\n", '&:hover'), [".a[data-x=\"$'\"]:hover"]);
+});
+
+test('an `&` inside a quoted attribute value is text, not the parent', () => {
+  assert.deepEqual(resolved('.p {\n  &[data-label="a & b"] { color: red; }\n}\n', '&[data-label="a & b"]'), ['.p[data-label="a & b"]']);
+  // No `&` outside the quotes, so the rule nests as a descendant.
+  assert.deepEqual(resolved(".p {\n  [data-label='a & b'] { color: red; }\n}\n", "[data-label='a & b']"), [".p [data-label='a & b']"]);
 });
 
 test('@contrast never reaches a nested rule: nested text keeps the text bar', () => {

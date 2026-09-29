@@ -34,16 +34,15 @@ import path from 'node:path';
 
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import {
-  NON_TEXT,
   REPO_ROOT,
   colours,
-  declarationErrors,
   failures,
   focusRules,
   indicators,
   invisible,
   stylesheets,
 } from './focus-ring.mjs';
+import { NON_TEXT, declarationErrors } from './lib/declared-grounds.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 

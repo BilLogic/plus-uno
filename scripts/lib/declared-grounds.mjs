@@ -65,10 +65,21 @@
  * where the component is used — its docs have to say the same thing, which no
  * check can read.
  */
+import fs from 'node:fs';
+import path from 'node:path';
+
 import postcssScss from 'postcss-scss';
 import selectorParser from 'postcss-selector-parser';
 
 import { parseColour, resolveToken } from '../../design-system/src/lib/tokens.mjs';
+import { REPO_ROOT } from './corpus.mjs';
+
+/**
+ * WCAG 1.4.11's bar for a graphic: a focus indicator (`check:focus-ring`) and
+ * an icon glyph under `@contrast: non-text` (`check:text-contrast`) both need
+ * 3:1. One constant, so the two checks cannot hold them to different bars.
+ */
+export const NON_TEXT = 3;
 
 const KINDS = ['grounds', 'contrast'];
 const ANNOTATION = /^@([a-z-]+)\s*:([\s\S]*)$/;
@@ -146,15 +157,19 @@ function ownBackground(rule) {
 /**
  * The ground for the declaration at `offset` (semantics 1 and 2).
  *
- * @returns {{ kind: 'background', token: string, line: number }
+ * `own` says whether a background came from the declaration's own rule or
+ * from an ancestor, so a report can say where its ground was found.
+ *
+ * @returns {{ kind: 'background', token: string, line: number, own: boolean }
  *   | { kind: 'grounds', tokens: string[], line: number }
  *   | { kind: 'page' }}
  */
 export function groundAt(sheet, offset) {
-  for (let node = ruleAt(sheet, offset); node; node = node.parent) {
+  const start = ruleAt(sheet, offset);
+  for (let node = start; node; node = node.parent) {
     if (node.type !== 'rule') continue;
     const background = ownBackground(node);
-    if (background) return { kind: 'background', token: background, line: node.source.start.line };
+    if (background) return { kind: 'background', token: background, line: node.source.start.line, own: node === start };
     const declared = sheet.annotations.get(node)?.grounds;
     if (declared) return { kind: 'grounds', tokens: declared.tokens, line: declared.line };
   }
@@ -168,7 +183,37 @@ export function resolvedSelectors(rule) {
   const own = rule.selectors ?? [rule.selector];
   if (!parent || parent.type !== 'rule') return own;
   const outer = resolvedSelectors(parent);
-  return outer.flatMap((p) => own.map((s) => (s.includes('&') ? s.replace(/&/g, p) : `${p} ${s}`)));
+  return outer.flatMap((p) => own.map((s) => expandParent(s, p) ?? `${p} ${s}`));
+}
+
+/**
+ * `selector` with every `&` outside a quoted string replaced by `parent`, or
+ * null when it has none (the rule then nests as a descendant). Two traps it
+ * avoids: an `&` inside an attribute value such as `[data-label="a & b"]` is
+ * text, not the parent; and the parent is inserted as written, never through a
+ * `String.replace` replacement string, where `$&`, `$'` and `` $` `` are patterns.
+ */
+function expandParent(selector, parent) {
+  let out = '';
+  let quote = null;
+  let found = false;
+  for (let i = 0; i < selector.length; i += 1) {
+    const ch = selector[i];
+    if (quote) {
+      out += ch;
+      if (ch === '\\' && i + 1 < selector.length) out += selector[++i];
+      else if (ch === quote) quote = null;
+    } else if (ch === '"' || ch === "'") {
+      quote = ch;
+      out += ch;
+    } else if (ch === '&') {
+      found = true;
+      out += parent;
+    } else {
+      out += ch;
+    }
+  }
+  return found ? out : null;
 }
 
 const ICON_CLASS = (name) => name === 'fa' || name === 'fas' || name === 'far' || name.startsWith('fa-') || name.endsWith('__icon');
@@ -248,6 +293,25 @@ export function annotationErrors(file, source, values, { contrast = false, sheet
     if (contrast && own.contrast) out.push(...contrastErrors(own.contrast).map((m) => `${file}:${own.contrast.line} — ${m}.`));
   }
   return out;
+}
+
+/**
+ * Annotation errors across the stylesheets, as `file:line — reason`, swept over
+ * every file that mentions an annotation, not just the rules a check measures,
+ * so a misplaced one is found wherever it is: an annotation that does not open
+ * its block, a second one of a kind in a block, an empty or unknown `@grounds`,
+ * and, with `contrast`, a `@contrast` that is not `non-text` or sits on a
+ * selector that is not an icon. Each is a failure of its own, because a
+ * declaration that measures nothing would otherwise read as green.
+ *
+ * `check:focus-ring` reads only `@grounds`; `check:text-contrast` reads both,
+ * so it passes `{ contrast: true }`.
+ */
+export function declarationErrors(files, root = REPO_ROOT, values, { contrast = false } = {}) {
+  return files.flatMap((file) => {
+    const source = fs.readFileSync(path.join(root, file), 'utf8');
+    return /@(grounds|contrast)\b/.test(source) ? annotationErrors(file, source, values, { contrast }) : [];
+  });
 }
 
 /**

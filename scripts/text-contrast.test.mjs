@@ -28,10 +28,8 @@ import path from 'node:path';
 
 import {
   census,
-  declarationErrors,
-  enclosingBlock,
   findings,
-  groundFor,
+  groundLabel,
   keyOf,
   opaqueGround,
   ratchetFailures,
@@ -39,6 +37,7 @@ import {
   textDeclarations,
   textSibling,
 } from './text-contrast.mjs';
+import { declarationErrors } from './lib/declared-grounds.mjs';
 
 /**
  * A Map, because that is what `tokenValues` returns. Stated here because the
@@ -100,20 +99,6 @@ test('background-color and border-color are not text', () => {
     `.a {\n  background-color: var(--color-warning);\n  border-color: var(--color-warning);\n}\n`,
   );
   assert.deepEqual(textDeclarations([file], root), []);
-});
-
-test('enclosingBlock blanks nested rules so a child cannot answer for a parent', () => {
-  const source = `.a {\n  color: red;\n  .b {\n    background: blue;\n  }\n}\n`;
-  const block = enclosingBlock(source, source.indexOf('color: red'));
-  assert.match(block, /color: red/);
-  assert.doesNotMatch(block, /blue/);
-});
-
-test('groundFor ignores a literal background', () => {
-  // Only a token ground is trusted; a literal leaves the page assumption in
-  // place rather than being silently used.
-  const source = `.a {\n  background-color: #ffffff;\n  color: var(--color-warning);\n}\n`;
-  assert.equal(groundFor(source, source.indexOf('color: var(--color-warning)')), '--color-surface');
 });
 
 test('the -text sibling is offered only when the token file defines one', () => {
@@ -194,9 +179,9 @@ test('the baseline key is file + token + ground, not a line number', () => {
 const INVERSE = (grounds) =>
   `.x--inverse {\n  // @grounds: ${grounds}\n  color: var(--color-surface);\n  &:hover { color: var(--color-surface); }\n}\n`;
 
-const errorsOf = ({ root, file }) => declarationErrors([file], root, VALUES).join('\n');
+const errorsOf = ({ root, file }) => declarationErrors([file], root, VALUES, { contrast: true }).join('\n');
 
-test('@grounds: a colour is measured on each declared ground, and passes when all clear the bar', () => {
+test('@grounds: a color is measured on each declared ground, and passes when all clear the bar', () => {
   const fx = fixture('inverse.scss', INVERSE('--color-success --color-primary'));
   const uses = textDeclarations([fx.file], fx.root);
   // Two declarations (the rule and its nested :hover) × two grounds.
@@ -276,4 +261,23 @@ test('@contrast: non-text on a text selector is an error, and the text bar stays
   const uses = textDeclarations([fx.file], fx.root);
   assert.ok(uses.every((u) => !u.nonText));
   assert.equal(findings(uses, VALUES)[0].bar, 4.5);
+});
+
+test('a finding names where its ground came from: own rule, ancestor, @grounds, or the page', () => {
+  const { root, file } = fixture(
+    'origin.scss',
+    [
+      '.own {\n  background-color: var(--color-success);\n  color: var(--color-warning);\n}\n',
+      '.outer {\n  background-color: var(--color-success);\n  .inner { color: var(--color-warning); }\n}\n',
+      '.declared {\n  // @grounds: --color-success\n  color: var(--color-warning);\n}\n',
+      '.page {\n  color: var(--color-warning);\n}\n',
+    ].join(''),
+  );
+  const labels = textDeclarations([file], root).map((use) => groundLabel(use));
+  assert.deepEqual(labels, [
+    " (its own rule's background)",
+    ' (the background of an ancestor rule, line 5)',
+    ' (declared by @grounds, line 10)',
+    ' (no rule sets a background, so the page is assumed)',
+  ]);
 });

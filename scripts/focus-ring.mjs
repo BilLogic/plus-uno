@@ -63,13 +63,10 @@ import {
 } from '../design-system/src/lib/tokens.mjs';
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { PAGE_TOKEN, tokenValues } from './button-contrast.mjs';
-import { analyzeSheet, annotationErrors, groundAt } from './lib/declared-grounds.mjs';
-import { REPO_ROOT, groundFor, stylesheets } from './text-contrast.mjs';
+import { NON_TEXT, analyzeSheet, groundAt } from './lib/declared-grounds.mjs';
+import { REPO_ROOT, stylesheets } from './text-contrast.mjs';
 
 export { REPO_ROOT, stylesheets };
-
-/** WCAG 1.4.11 — non-text contrast. A ring is a graphical object. */
-export const NON_TEXT = 3;
 
 /**
  * The properties that can carry a visible focus affordance.
@@ -127,6 +124,11 @@ export function focusRules(files, root = REPO_ROOT) {
     for (const declaration of source.matchAll(AFFORDANCE)) {
       const chain = selectorChain(source, declaration.index);
       if (!/focus/i.test(chain.replace(NEGATED, ''))) continue;
+      // The ground, resolved structurally (`scripts/lib/declared-grounds.mjs`):
+      // the first rule outward from this one with a background or a
+      // `@grounds` decides, and the page if none does.
+      const resolved = groundAt(sheet, declaration.index + declaration[1].length);
+      const declared = resolved.kind === 'grounds' ? { tokens: resolved.tokens, line: resolved.line } : null;
       rules.push({
         file,
         line: source.slice(0, declaration.index).split('\n').length,
@@ -134,16 +136,8 @@ export function focusRules(files, root = REPO_ROOT) {
         property: declaration[2],
         value: declaration[3].split(/\s+/).join(' ').trim(),
         tokens: [...declaration[3].matchAll(varReferencePattern('--color-'))].map((m) => m[1]),
-        // The ground, resolved structurally (`scripts/lib/declared-grounds.mjs`):
-        // the first rule outward from this one with a background or a
-        // `@grounds` decides, and the page if none does.
-        ...(() => {
-          const resolved = groundAt(sheet, declaration.index + declaration[1].length);
-          return {
-            ground: resolved.kind === 'background' ? resolved.token : PAGE_TOKEN,
-            declared: resolved.kind === 'grounds' ? { tokens: resolved.tokens, line: resolved.line } : null,
-          };
-        })(),
+        ground: resolved.kind === 'background' ? resolved.token : PAGE_TOKEN,
+        declared,
         block: blockStart(source, declaration.index),
       });
     }
@@ -241,21 +235,6 @@ export function indicators(rules, values) {
     delete entry.perGround;
   }
   return [...byBlock.values()].filter((entry) => entry.best);
-}
-
-/**
- * Annotation errors across the stylesheets, as `file:line — reason`: an
- * annotation that does not open its block, a second one of a kind in a block,
- * an empty `@grounds`, or a ground token the token files do not define. Swept
- * over every file, not just the focus rules, so a misplaced declaration is
- * found wherever it is. Each is a failure of its own: a declaration that
- * measures nothing would otherwise read as green.
- */
-export function declarationErrors(files, root = REPO_ROOT, values) {
-  return files.flatMap((file) => {
-    const source = fs.readFileSync(path.join(root, file), 'utf8');
-    return /@(grounds|contrast)\b/.test(source) ? annotationErrors(file, source, values) : [];
-  });
 }
 
 /**
