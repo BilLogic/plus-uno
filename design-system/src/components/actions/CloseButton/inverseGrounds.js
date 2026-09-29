@@ -2,10 +2,10 @@
  * The grounds `CloseButton tone="inverse"` is for — the same list as the
  * `@grounds` line on `.plus-close-btn--inverse` in `CloseButton.scss`.
  *
- * One source for the two readers that are not the contrast checks: the
- * InverseGrounds story renders the button on each, and a unit test
- * (`scripts/lib/declared-grounds.test.mjs`) and that story both fail when this
- * list and the SCSS line disagree.
+ * The InverseGrounds story renders the button on each. A unit test
+ * (`scripts/lib/declared-grounds.test.mjs`) parses the SCSS with the same
+ * library the contrast checks use and fails when this list and the `@grounds`
+ * annotation disagree.
  */
 export const INVERSE_GROUNDS = [
     '--color-inverse-surface',

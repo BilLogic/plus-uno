@@ -3,7 +3,6 @@ import { expect, userEvent, within } from 'storybook/test';
 
 import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
 import CloseButton from './CloseButton';
-import closeButtonScss from './CloseButton.scss?raw';
 import { INVERSE_GROUNDS } from './inverseGrounds.js';
 
 export default {
@@ -226,10 +225,10 @@ Focus.play = async ({ canvasElement }) => {
 
 /**
  * `tone="inverse"` on every ground it is declared for. The list comes from
- * `inverseGrounds.js`, and the play function first checks it against the
- * `@grounds` line in `CloseButton.scss` that `check:focus-ring` and
- * `check:text-contrast` measure — so the grounds rendered here are the grounds
- * those checks measure.
+ * `inverseGrounds.js`, which `scripts/lib/declared-grounds.test.mjs` holds to
+ * the `@grounds` on `.plus-close-btn--inverse` — parsed by the same library
+ * `check:focus-ring` and `check:text-contrast` use — so the grounds rendered
+ * here are the grounds those checks measure.
  */
 export const InverseGrounds = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
@@ -242,9 +241,6 @@ export const InverseGrounds = () => (
 );
 
 InverseGrounds.play = async ({ canvasElement }) => {
-    const declared = /@grounds:\s*([^\n]*)/.exec(closeButtonScss)[1].trim().split(/\s+/);
-    await expect(INVERSE_GROUNDS, 'the story renders the grounds the SCSS declares').toEqual(declared);
-
     // Same WCAG luminance the checks use (the shared story contrast util).
     const ratioOf = contrastRatio;
     for (const ground of INVERSE_GROUNDS) {

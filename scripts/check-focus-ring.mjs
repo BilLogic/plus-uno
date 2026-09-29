@@ -12,10 +12,12 @@
  * `docs/evals/focus-ring.json` records the sweep with no exceptions.
  *
  * A RING ON A GROUND ITS CALLER PAINTS is measured, not excused. A rule can
- * declare the grounds it sits on with `// @grounds: --color-x --color-y` in
- * its block (`scripts/lib/declared-grounds.mjs`); it is then held to 3:1 on
- * EVERY declared ground instead of the page, and one ground under the bar fails
- * it. An empty list or an unknown token is an error. `CloseButton tone="inverse"`
+ * declare the grounds it sits on with `// @grounds: --color-x --color-y` as
+ * the first thing in a rule (`scripts/lib/declared-grounds.mjs`, an AST walk
+ * over postcss-scss). Walking out from a focus rule, the first rule with a
+ * background or a `@grounds` decides its ground; a declared list is held to
+ * 3:1 on EVERY ground, and one ground under the bar fails it. A misplaced,
+ * duplicated, empty or unknown annotation is an error. `CloseButton tone="inverse"`
  * is the first: its light ring is measured on the eight fills it is for.
  *
  * WHY THERE IS NO RATCHET HERE. `check:intent-roles` ratchets because the thing

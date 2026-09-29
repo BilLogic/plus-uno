@@ -1,158 +1,217 @@
 /**
- * Block annotations for the contrast checks: `@grounds` and `@contrast`.
+ * Block annotations for the contrast checks — `@grounds` and `@contrast` — and
+ * the ground a declaration sits on, read STRUCTURALLY: the stylesheet is parsed
+ * with postcss + postcss-scss and selectors with postcss-selector-parser, so
+ * every rule below is about nodes, not about text that happens to look right.
  *
- * WHY. `check:focus-ring` and `check:text-contrast` read a ground from the
- * declaration's own rule, and fall back to the page. A component built for a
- * ground its CALLER paints — `CloseButton tone="inverse"` on an intent fill or
- * a dark surface — has no background in its own rule, so both checks measured
- * its light ring and light × against the light page and reported 1.00:1. The
- * honest answers were an exception that excused the rule, or this: the rule
- * names the grounds it is for, and each one is measured against the same bar
- * the page would be.
+ * WHY. `check:focus-ring` and `check:text-contrast` measure a color against the
+ * ground it sits on, and fall back to the page. A component built for a ground
+ * its CALLER paints — `CloseButton tone="inverse"` on an intent fill or a dark
+ * surface — has no background of its own, so both checks measured its light
+ * ring and light × against the light page and reported 1.00:1. The honest
+ * answers were an exception that excused the rule, or this: the rule names the
+ * grounds it is for, and each one is measured against the same bar.
  *
- * THE TWO ANNOTATIONS.
+ * ─── THE ANNOTATIONS ────────────────────────────────────────────────────────
  *
- *   `@grounds: --color-x --color-y`  the grounds the block's colors sit on.
- *   `@contrast: non-text`            the block's colors are a graphic (an icon
- *                                    glyph), held to WCAG 1.4.11's 3:1 instead
- *                                    of text's 4.5:1. Only on an icon selector.
+ *   `@grounds: --color-x --color-y`  the grounds this rule and everything nested
+ *                                    in it sit on.
+ *   `@contrast: non-text`            this rule's own colors are a graphic (an
+ *                                    icon glyph), held to WCAG 1.4.11's 3:1
+ *                                    instead of text's 4.5:1.
  *
- *     .plus-close-btn--inverse {
- *         // @grounds: --color-inverse-surface --color-primary
- *         &:focus-visible::after { border-color: var(--color-focus-ring-inverse); }
- *         .plus-close-btn__icon.fa-solid {
- *             // @contrast: non-text
- *             color: var(--color-surface);
+ * An annotation is a comment node at the START of a rule — nothing but other
+ * comments before it — and it belongs to that rule. Anywhere else (after a
+ * declaration or a nested rule, at the top level, inside an at-rule) it is an
+ * error: "must open its block". A second annotation of the same kind in one
+ * rule is an error too. Either comment form works; a block comment may span
+ * lines.
+ *
+ * ─── SEMANTICS ──────────────────────────────────────────────────────────────
+ *
+ *  1. GROUND RESOLUTION. For a measured declaration, walk from its own rule
+ *     outward through its ancestors. The FIRST rule that has either a
+ *     background declaration naming a `--color-*` token or a `@grounds`
+ *     annotation decides: its background, or its declared grounds (each
+ *     measured). A rule with both is decided by its background — that is the
+ *     paint directly beneath. If no rule decides, the ground is the page. So a
+ *     nearer background beats a farther `@grounds`, and a nearer `@grounds`
+ *     beats a farther background.
+ *
+ *  2. `@grounds` SCOPE. It covers the rule it opens and everything nested in
+ *     it, up to the first nearer rule that decides for itself. That is the
+ *     intent — children of a block on primary are on primary:
+ *
+ *         .zz {
+ *             // @grounds: --color-primary
+ *             .a { color: var(--color-surface); }   // measured on primary
+ *             .b { color: var(--color-surface); }   // measured on primary
  *         }
- *     }
  *
- * PLACEMENT. An annotation must OPEN its block — only whitespace and other
- * comments may come before it — so it is unmistakably that block's own and not
- * a note about the next rule. It covers the block and everything nested in it;
- * the innermost annotation of a kind wins. Either comment form works, and a
- * `/* … *\/` may run over several lines.
+ *  3. `@contrast: non-text` applies ONLY to declarations directly in the rule it
+ *     opens; it never reaches a nested rule, so nested text cannot inherit a
+ *     graphic's bar. It is valid only if EVERY selector in the rule's resolved
+ *     list (SCSS nesting resolved, `&` expanded) has an icon SUBJECT: the last
+ *     compound, after any combinator, contains a class `fa`, `fas`, `far` or
+ *     `fa-*`, a class ending in `__icon`, or the type `svg`. Anything inside
+ *     `:not()` or another functional pseudo-class is ignored when deciding.
+ *     Otherwise it is an error and the declarations keep the text bar.
  *
  * WHAT IT REFUSES, each as an error rather than a silent pass: an annotation
- * that does not open its block, a second annotation of the same kind in one
- * block, an empty `@grounds`, a ground token the token files do not define or
- * cannot resolve to a color, an `@contrast` value other than `non-text`, and
- * `@contrast: non-text` on a selector that is not an icon. A declared ground is
- * a promise about where the component is used — the component's docs have to
- * say the same thing, which no check can read.
+ * that does not open its rule, a second one of a kind in a rule, an empty
+ * `@grounds`, a ground token the token files do not define or cannot resolve to
+ * a color, an `@contrast` value other than `non-text`, and `@contrast:
+ * non-text` without an icon subject. A declared ground is a promise about
+ * where the component is used — its docs have to say the same thing, which no
+ * check can read.
  */
+import postcssScss from 'postcss-scss';
+import selectorParser from 'postcss-selector-parser';
+
 import { parseColour, resolveToken } from '../../design-system/src/lib/tokens.mjs';
 
-/** The kinds this module reads, and nothing else — a typo like `@ground` is not one. */
 const KINDS = ['grounds', 'contrast'];
+const ANNOTATION = /^@([a-z-]+)\s*:([\s\S]*)$/;
+const BACKGROUND = /^background(-color)?$/;
+const COLOR_TOKEN = /var\(\s*(--color-[a-z0-9-]+)/;
 
-/** A selector that names an icon: a Font Awesome class, a BEM `__icon` element, or `svg`. */
-export const ICON_SELECTOR = /(\.fa-[a-z0-9-]+|\.fa\b|\.fas\b|\.far\b|__icon\b|(^|[\s>+~(,])svg\b)/;
-
-/** Every `{ … }` block in a stylesheet: where it opens and closes, and its selector. */
-function blocks(source) {
-  const out = [];
-  const stack = [];
-  let comment = null;
-  for (let i = 0; i < source.length; i += 1) {
-    if (comment === 'line') { if (source[i] === '\n') comment = null; continue; }
-    if (comment === 'block') { if (source[i] === '*' && source[i + 1] === '/') { comment = null; i += 1; } continue; }
-    if (source[i] === '/' && source[i + 1] === '/' && source[i - 1] !== ':') { comment = 'line'; continue; }
-    if (source[i] === '/' && source[i + 1] === '*') { comment = 'block'; i += 1; continue; }
-    if (source[i] === '{') stack.push(i);
-    else if (source[i] === '}') {
-      const start = stack.pop();
-      if (start === undefined) continue;
-      const before = source.slice(0, start);
-      const cut = Math.max(before.lastIndexOf(';'), before.lastIndexOf('{'), before.lastIndexOf('}'));
-      const selector = before.slice(cut + 1).replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, ' ').trim().replace(/\s+/g, ' ');
-      out.push({ start, end: i, selector });
-    }
-  }
-  return out;
+/** A comment's text as one line: block-comment `*` gutters stripped. */
+function commentBody(comment) {
+  return comment.text.split('\n').map((line) => line.replace(/^\s*\*\s?/, '')).join(' ').trim();
 }
-
-/** The block's own text: nested blocks blanked (newlines kept, so offsets and lines hold). */
-function ownText(source, block) {
-  const chars = source.slice(block.start + 1, block.end).split('');
-  let nested = 0;
-  for (let i = 0; i < chars.length; i += 1) {
-    if (chars[i] === '{') { nested += 1; chars[i] = ' '; continue; }
-    if (chars[i] === '}') { nested -= 1; chars[i] = ' '; continue; }
-    if (nested > 0 && chars[i] !== '\n') chars[i] = ' ';
-  }
-  return chars.join('');
-}
-
-const COMMENT = /\/\/[^\n]*|\/\*[\s\S]*?\*\//g;
-const ANNOTATION = /@([a-z-]+)\s*:([\s\S]*)$/;
 
 /**
- * The annotations a block declares, with their placement errors.
+ * Parse a stylesheet once: the tree, each rule's annotations, and the
+ * placement errors.
  *
- * @returns {{ grounds: null|{tokens: string[], line: number}, contrast: null|{value: string, line: number}, errors: {line: number, message: string}[] }}
+ * @param {string} source
  */
-function annotationsOf(source, block) {
-  const text = ownText(source, block);
-  const lineAt = (index) => source.slice(0, block.start + 1 + index).split('\n').length;
-  // Where the block's first real content starts: anything that is not
-  // whitespace or a comment. An annotation after it does not open the block.
-  const firstContent = text.replace(COMMENT, (m) => ' '.repeat(m.length)).search(/\S/);
-  const found = { grounds: null, contrast: null, errors: [] };
-  for (const comment of text.matchAll(COMMENT)) {
-    const body = comment[0].startsWith('//')
-      ? comment[0].slice(2)
-      : comment[0].slice(2, -2).split('\n').map((l) => l.replace(/^\s*\*?/, '')).join(' ');
-    const match = ANNOTATION.exec(body.trim());
-    if (!match || !KINDS.includes(match[1])) continue;
+export function analyzeSheet(source) {
+  const root = postcssScss.parse(source);
+  /** @type {Map<import('postcss').Rule, {grounds?: object, contrast?: object}>} */
+  const annotations = new Map();
+  const errors = [];
+
+  root.walkComments((comment) => {
+    const match = ANNOTATION.exec(commentBody(comment));
+    if (!match || !KINDS.includes(match[1])) return;
     const [, kind, raw] = match;
-    const line = lineAt(comment.index);
-    if (firstContent !== -1 && comment.index > firstContent) {
-      found.errors.push({ line, message: `@${kind} must open its block` });
-      continue;
+    const line = comment.source.start.line;
+    const parent = comment.parent;
+    const siblings = parent.nodes ?? [];
+    const opens = parent.type === 'rule'
+      && siblings.slice(0, siblings.indexOf(comment)).every((node) => node.type === 'comment');
+    if (!opens) {
+      errors.push({ line, message: `@${kind} must open its block` });
+      return;
     }
-    if (found[kind]) {
-      found.errors.push({ line, message: `a second @${kind} in one block (the first is on line ${found[kind].line})` });
-      continue;
+    const own = annotations.get(parent) ?? {};
+    if (own[kind]) {
+      errors.push({ line, message: `a second @${kind} in one block (the first is on line ${own[kind].line})` });
+      return;
     }
-    found[kind] = kind === 'grounds'
-      ? { tokens: raw.trim().split(/[\s,]+/).filter(Boolean), line, selector: block.selector }
-      : { value: raw.trim(), line, selector: block.selector };
-  }
+    own[kind] = kind === 'grounds'
+      ? { tokens: raw.trim().split(/[\s,]+/).filter(Boolean), line }
+      : { value: raw.trim(), line, rule: parent };
+    annotations.set(parent, own);
+  });
+
+  return { root, annotations, errors };
+}
+
+/** The innermost rule whose source range contains `offset`, or null. */
+export function ruleAt(sheet, offset) {
+  let found = null;
+  sheet.root.walkRules((rule) => {
+    const start = rule.source?.start?.offset;
+    const end = rule.source?.end?.offset;
+    if (start === undefined || end === undefined) return;
+    if (start <= offset && offset <= end) {
+      if (!found || start >= found.source.start.offset) found = rule;
+    }
+  });
   return found;
 }
 
-/**
- * Every annotated block in a stylesheet, and every placement error in it —
- * swept over the WHOLE file, so a misplaced or duplicated annotation is found
- * even on a block that holds nothing a check measures.
- */
-export function fileAnnotations(source) {
-  const all = blocks(source).map((block) => ({ block, ...annotationsOf(source, block) }));
-  return {
-    blocks: all,
-    errors: all.flatMap((a) => a.errors),
-  };
+/** The `--color-*` token a rule's own background declaration names, or null. */
+function ownBackground(rule) {
+  for (const node of rule.nodes ?? []) {
+    if (node.type !== 'decl' || !BACKGROUND.test(node.prop)) continue;
+    const token = COLOR_TOKEN.exec(node.value);
+    if (token) return token[1];
+  }
+  return null;
 }
 
 /**
- * The annotations in force at `offset`: for each kind, the innermost enclosing
- * block that declares it (validly placed).
+ * The ground for the declaration at `offset` (semantics 1 and 2).
  *
- * @returns {{ grounds: null|{tokens: string[], line: number}, contrast: null|{value: string, line: number, selector: string} }}
+ * @returns {{ kind: 'background', token: string, line: number }
+ *   | { kind: 'grounds', tokens: string[], line: number }
+ *   | { kind: 'page' }}
  */
-export function annotationsAt(source, offset, annotations = fileAnnotations(source)) {
-  const enclosing = annotations.blocks
-    .filter((a) => a.block.start < offset && offset < a.block.end)
-    .sort((a, b) => b.block.start - a.block.start);
-  return {
-    grounds: enclosing.find((a) => a.grounds)?.grounds ?? null,
-    contrast: enclosing.find((a) => a.contrast)?.contrast ?? null,
-  };
+export function groundAt(sheet, offset) {
+  for (let node = ruleAt(sheet, offset); node; node = node.parent) {
+    if (node.type !== 'rule') continue;
+    const background = ownBackground(node);
+    if (background) return { kind: 'background', token: background, line: node.source.start.line };
+    const declared = sheet.annotations.get(node)?.grounds;
+    if (declared) return { kind: 'grounds', tokens: declared.tokens, line: declared.line };
+  }
+  return { kind: 'page' };
 }
 
-/** Back-compatible reader: the `@grounds` in force at `offset`, or null. */
-export function declaredGrounds(source, offset) {
-  return annotationsAt(source, offset).grounds;
+/** The selectors of `rule` with SCSS nesting resolved and `&` expanded. */
+export function resolvedSelectors(rule) {
+  let parent = rule.parent;
+  while (parent && parent.type !== 'rule' && parent.type !== 'root') parent = parent.parent;
+  const own = rule.selectors ?? [rule.selector];
+  if (!parent || parent.type !== 'rule') return own;
+  const outer = resolvedSelectors(parent);
+  return outer.flatMap((p) => own.map((s) => (s.includes('&') ? s.replace(/&/g, p) : `${p} ${s}`)));
+}
+
+const ICON_CLASS = (name) => name === 'fa' || name === 'fas' || name === 'far' || name.startsWith('fa-') || name.endsWith('__icon');
+
+/** Does this one selector's subject — its last compound — name an icon? */
+export function hasIconSubject(selector) {
+  let answer = false;
+  selectorParser((selectors) => {
+    const first = selectors.first;
+    if (!first) return;
+    const nodes = first.nodes;
+    let start = 0;
+    nodes.forEach((node, index) => { if (node.type === 'combinator') start = index + 1; });
+    // Only the subject compound's own nodes: classes, tags and pseudos at top
+    // level. The contents of `:not()` and friends are never walked.
+    answer = nodes.slice(start).some((node) => (node.type === 'class' && ICON_CLASS(node.value))
+      || (node.type === 'tag' && node.value.toLowerCase() === 'svg'));
+  }).processSync(selector);
+  return answer;
+}
+
+/**
+ * The `@contrast` annotation on the declaration's OWN rule (semantics 3), or
+ * null. Never inherited from an ancestor.
+ */
+export function contrastAt(sheet, offset) {
+  const rule = ruleAt(sheet, offset);
+  return rule ? sheet.annotations.get(rule)?.contrast ?? null : null;
+}
+
+/** Why a `@contrast` annotation is not allowed, or `[]`. */
+export function contrastErrors(declared) {
+  if (declared.value !== 'non-text') return [`@contrast: \`${declared.value}\` is not a known value (only \`non-text\`)`];
+  const selectors = resolvedSelectors(declared.rule);
+  const text = selectors.filter((s) => !hasIconSubject(s));
+  if (text.length) return [`@contrast: non-text on a text selector \`${text.join(', ')}\``];
+  return [];
+}
+
+/** Is the declaration at `offset` held to the non-text bar? Only when its own rule says so, validly. */
+export function isNonText(sheet, offset) {
+  const declared = contrastAt(sheet, offset);
+  return Boolean(declared && !contrastErrors(declared).length);
 }
 
 /**
@@ -178,27 +237,27 @@ export function groundErrors(declared, values) {
 }
 
 /**
- * Why a `@contrast` declaration is not allowed, or `[]`. `non-text` is the
- * only value, and only on an icon selector: a 3:1 bar on text would be a text
- * failure the check stopped seeing.
+ * Every annotation error in one stylesheet, as `file:line — message`: placement
+ * errors, `@grounds` lists checked against `values`, and (when asked)
+ * `@contrast` values and selectors. Swept over the whole file.
  */
-export function contrastErrors(declared) {
-  if (declared.value !== 'non-text') return [`@contrast: \`${declared.value}\` is not a known value (only \`non-text\`)`];
-  if (!ICON_SELECTOR.test(declared.selector)) return [`@contrast: non-text on a text selector \`${declared.selector}\``];
-  return [];
+export function annotationErrors(file, source, values, { contrast = false, sheet = analyzeSheet(source) } = {}) {
+  const out = sheet.errors.map((e) => `${file}:${e.line} — ${e.message}.`);
+  for (const own of sheet.annotations.values()) {
+    if (own.grounds) out.push(...groundErrors(own.grounds, values).map((m) => `${file}:${own.grounds.line} — \`@grounds\` ${m}.`));
+    if (contrast && own.contrast) out.push(...contrastErrors(own.contrast).map((m) => `${file}:${own.contrast.line} — ${m}.`));
+  }
+  return out;
 }
 
 /**
- * Every annotation error in one stylesheet, as `file:line — message`: placement
- * errors from the sweep, `@grounds` lists checked against `values`, and (when
- * asked) `@contrast` values and selectors.
+ * The `@grounds` list on the rule whose selector is exactly `selector`, for the
+ * drift guard that holds an exported list to the stylesheet.
  */
-export function annotationErrors(file, source, values, { contrast = false } = {}) {
-  const annotations = fileAnnotations(source);
-  const out = annotations.errors.map((e) => `${file}:${e.line} — ${e.message}.`);
-  for (const a of annotations.blocks) {
-    if (a.grounds) out.push(...groundErrors(a.grounds, values).map((m) => `${file}:${a.grounds.line} — \`@grounds\` ${m}.`));
-    if (contrast && a.contrast) out.push(...contrastErrors(a.contrast).map((m) => `${file}:${a.contrast.line} — ${m}.`));
+export function groundsOfSelector(source, selector) {
+  const sheet = analyzeSheet(source);
+  for (const [rule, own] of sheet.annotations) {
+    if (rule.selector === selector && own.grounds) return own.grounds.tokens;
   }
-  return out;
+  return null;
 }

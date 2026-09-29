@@ -66,8 +66,8 @@
 // those grounds: check:focus-ring holds the ring to 3:1 on each one, and
 // check:text-contrast holds the × to the non-text 3:1 (it is an icon glyph,
 // WCAG 1.4.11) on each one, instead of on the page. The list is also exported
-// from `inverseGrounds.js`; a unit test and the InverseGrounds story both hold
-// the two to each other. Keep CloseButton.mdx in step.
+// from `inverseGrounds.js`, which a unit test holds to this annotation. Keep
+// CloseButton.mdx in step.
 .plus-close-btn--inverse {
     // @grounds: --color-inverse-surface --color-primary --color-secondary --color-success --color-danger --color-tertiary --color-info --color-warning
 

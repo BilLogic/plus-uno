@@ -31,12 +31,12 @@
  *     which is the right default — the overwhelming majority of `color:` in
  *     this repository is text on a page or on a near-white container — but it
  *     is an assumption, and a finding that contradicts it is the check being
- *     wrong rather than the code. A rule whose ground is painted by its caller
- *     can DECLARE it — `// @grounds: --color-primary …` in the block, see
- *     `scripts/lib/declared-grounds.mjs` — and is then measured on every
- *     declared ground instead of the page, against the same threshold. The
- *     rule's own background still wins over any declaration, including a
- *     background that is the page token itself.
+ *     wrong rather than the code. The ground is now resolved STRUCTURALLY
+ *     (`scripts/lib/declared-grounds.mjs`, postcss-scss): walking out from the
+ *     declaration's rule, the first rule with a `--color-*` background or a
+ *     `// @grounds: …` annotation decides, and the page if none does. So a
+ *     nested rule on a parent's fill is measured on that fill, and a rule on
+ *     a ground its caller paints declares it and is measured on each one.
  *  2. INLINE STYLES. `style={{ color: 'var(--color-warning)' }}` in JSX is
  *     invisible here. The corpus is stylesheets.
  *  3. `--color-on-*` AND `--color-inverse-*`. Skipped by design: they exist to
@@ -51,9 +51,10 @@
  *     carry the exemptions with a reason each, because a checker that tried to
  *     infer "is this an inactive graphic?" from a stylesheet would be guessing
  *     about the thing that matters most. A graphic can instead be DECLARED:
- *     `// @contrast: non-text` opening a rule whose selector names an icon (a
- *     Font Awesome class, an `__icon` element, or `svg`) holds its colors to
- *     3:1. On any other selector the declaration is an error, not a lower bar.
+ *     `// @contrast: non-text` opening a rule holds that rule's own colors —
+ *     never a nested rule's — to 3:1, and only if every resolved selector's
+ *     subject is an icon (a Font Awesome class, an `__icon` element class, or
+ *     `svg`). Otherwise it is an error, not a lower bar.
  *  5. WHETHER THE REPLACEMENT IS RIGHT. It reports that a token is unreadable
  *     on the page and names the `-text` sibling where one exists. Whether that
  *     sibling is the correct colour for the role is a design question.
@@ -64,7 +65,7 @@ import { fileURLToPath } from 'node:url';
 
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { documents } from './lib/corpus.mjs';
-import { annotationErrors, annotationsAt, contrastErrors, fileAnnotations } from './lib/declared-grounds.mjs';
+import { analyzeSheet, annotationErrors, groundAt, isNonText } from './lib/declared-grounds.mjs';
 
 import {
   composite,
@@ -167,24 +168,25 @@ export function textDeclarations(files, root = REPO_ROOT) {
   const uses = [];
   for (const file of files) {
     const source = fs.readFileSync(path.join(root, file), 'utf8');
-    const annotations = fileAnnotations(source);
+    const sheet = analyzeSheet(source);
     const lines = source.split('\n');
     let offset = 0;
     lines.forEach((line, index) => {
       const declaration = /(^|[\s;{])color\s*:\s*([^;]+);/.exec(line);
       if (declaration) {
-        // The rule's own background wins — null when it sets none, which is
-        // not the same answer as a rule that paints the page under itself.
-        // Failing that, the grounds it declares with `@grounds`, each
-        // measured; failing that, the page.
-        const own = groundFor(source, offset, null);
-        const at = annotationsAt(source, offset + declaration.index, annotations);
-        const declared = own ? null : at.grounds;
-        const grounds = own ? [own] : (declared?.tokens.length ? declared.tokens : [PAGE_TOKEN]);
-        // `@contrast: non-text` — a graphic, held to 3:1 — only counts where it
-        // is allowed, on an icon selector. Anywhere else it is an error and the
-        // declaration keeps the text bar.
-        const nonText = Boolean(at.contrast && !contrastErrors(at.contrast).length);
+        // The ground, resolved structurally: walking out from this rule, the
+        // first rule with a background or a `@grounds` decides; the page if
+        // none does. `scripts/lib/declared-grounds.mjs` states the rules.
+        const at = offset + declaration.index + declaration[1].length;
+        const resolved = groundAt(sheet, at);
+        const declared = resolved.kind === 'grounds' ? { tokens: resolved.tokens, line: resolved.line } : null;
+        const grounds = resolved.kind === 'background'
+          ? [resolved.token]
+          : (declared?.tokens.length ? declared.tokens : [PAGE_TOKEN]);
+        // `@contrast: non-text` — a graphic, held to 3:1 — counts only on the
+        // declaration's own rule and only with an icon subject. Anywhere else
+        // it is an error and the declaration keeps the text bar.
+        const nonText = isNonText(sheet, at);
         for (const match of declaration[2].matchAll(varReferencePattern('--color-'))) {
           for (const ground of grounds) {
             uses.push({ token: match[1], file, line: index + 1, source: line.trim(), ground, declared, nonText });

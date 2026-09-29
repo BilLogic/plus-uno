@@ -41,10 +41,12 @@
  *  2. SIZE AND OFFSET. A 1px ring at 5:1 passes here and fails 2.4.11. The
  *     spread of widths is REPORTED (six spellings) rather than judged, because
  *     which one wins is a decision, not a measurement.
- *  3. GROUND BEYOND THE RULE. As with `check:text-contrast`: a background set by
- *     an ancestor is invisible, and the page is assumed — unless the rule
- *     DECLARES its grounds with `@grounds`, in which case it is measured on
- *     every one and must clear 3:1 on each (`scripts/lib/declared-grounds.mjs`).
+ *  3. GROUND BEYOND THE STYLESHEET. The ground is resolved structurally, as in
+ *     `check:text-contrast` (`scripts/lib/declared-grounds.mjs`): walking out
+ *     from the rule, the first rule with a `--color-*` background or a
+ *     `@grounds` annotation decides, and a declared list must clear 3:1 on
+ *     every ground. A ground painted by another component entirely, with no
+ *     annotation, is still invisible and the page is assumed.
  *  4. `:focus` VS `:focus-visible`. Both count. Whether a component should use
  *     one or the other is a separate question from whether its ring can be
  *     seen.
@@ -61,7 +63,7 @@ import {
 } from '../design-system/src/lib/tokens.mjs';
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { PAGE_TOKEN, tokenValues } from './button-contrast.mjs';
-import { annotationErrors, annotationsAt, fileAnnotations } from './lib/declared-grounds.mjs';
+import { analyzeSheet, annotationErrors, groundAt } from './lib/declared-grounds.mjs';
 import { REPO_ROOT, groundFor, stylesheets } from './text-contrast.mjs';
 
 export { REPO_ROOT, stylesheets };
@@ -121,7 +123,7 @@ export function focusRules(files, root = REPO_ROOT) {
   const rules = [];
   for (const file of files) {
     const source = fs.readFileSync(path.join(root, file), 'utf8');
-    const annotations = fileAnnotations(source);
+    const sheet = analyzeSheet(source);
     for (const declaration of source.matchAll(AFFORDANCE)) {
       const chain = selectorChain(source, declaration.index);
       if (!/focus/i.test(chain.replace(NEGATED, ''))) continue;
@@ -132,14 +134,16 @@ export function focusRules(files, root = REPO_ROOT) {
         property: declaration[2],
         value: declaration[3].split(/\s+/).join(' ').trim(),
         tokens: [...declaration[3].matchAll(varReferencePattern('--color-'))].map((m) => m[1]),
-        // The rule's OWN background, or null when it sets none. Null and the
-        // page token are different answers: a rule that paints the page under
-        // itself has a ground, and an ancestor's `@grounds` must not replace it.
-        own: groundFor(source, declaration.index, null),
-        ground: groundFor(source, declaration.index),
-        // Grounds the rule DECLARES it sits on (`// @grounds: …`), for a ring
-        // drawn on a ground its caller paints. See `scripts/lib/declared-grounds.mjs`.
-        declared: annotationsAt(source, declaration.index, annotations).grounds,
+        // The ground, resolved structurally (`scripts/lib/declared-grounds.mjs`):
+        // the first rule outward from this one with a background or a
+        // `@grounds` decides, and the page if none does.
+        ...(() => {
+          const resolved = groundAt(sheet, declaration.index + declaration[1].length);
+          return {
+            ground: resolved.kind === 'background' ? resolved.token : PAGE_TOKEN,
+            declared: resolved.kind === 'grounds' ? { tokens: resolved.tokens, line: resolved.line } : null,
+          };
+        })(),
         block: blockStart(source, declaration.index),
       });
     }
@@ -189,14 +193,13 @@ export function ratio(token, ground, values, page = PAGE_TOKEN) {
 }
 
 /**
- * The grounds one rule is measured on. Its own rule's background wins, because
- * that is the paint directly beneath it; failing that, the grounds it DECLARES
- * with `@grounds`, every one of which it must clear; failing that, the page.
+ * The grounds one rule is measured on: the declared `@grounds` when the ground
+ * walk ended at one (every one must clear 3:1), otherwise the single ground it
+ * resolved to — a background, or the page.
  */
 export function groundsOf(rule) {
-  if (rule.own) return [rule.own];
   if (rule.declared && rule.declared.tokens.length) return rule.declared.tokens;
-  return [PAGE_TOKEN];
+  return [rule.ground];
 }
 
 /**
@@ -216,7 +219,7 @@ export function indicators(rules, values) {
     const entry = byBlock.get(key)
       ?? { file: rule.file, line: rule.line, selector: rule.selector, best: null, spellings: [], perGround: new Map() };
     entry.spellings.push(`${rule.property}: ${rule.value}`);
-    if (!rule.own && rule.declared?.tokens.length) entry.declared = true;
+    if (rule.declared?.tokens.length) entry.declared = true;
     for (const ground of groundsOf(rule)) {
       for (const token of rule.tokens) {
         const measured = ratio(token, ground, values);
