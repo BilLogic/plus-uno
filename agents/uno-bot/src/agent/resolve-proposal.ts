@@ -31,9 +31,10 @@ import { addReaction, postMessage, postReviewRequest, warrantsReviewRequest } fr
 import { batchOutcomeNote, batchTelemetryLine, runOperations, settleInto } from "../gate/index";
 import { batchResultMessage } from "../slack/batch-result";
 import type { GateVerdict, OperationOutcome } from "../gate/index";
-import { proposalOperations } from "../thread-state/index";
+import { proposalOperations, stagingCardOf } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
 import { recordSweepResolutionFor } from "../sweep/env";
+import { recordTaskCompletion } from "../usage/resolution-env";
 import { isToolName } from "./tool-table";
 import { TOOLS_BY_NAME } from "./tools";
 
@@ -147,6 +148,10 @@ export async function runVerdict(
         outcomes,
       }),
     );
+    // The self-serve signal: a batch that ran whole resolves the ask that
+    // staged it — the ask's own card, even when this one re-staged it after a
+    // cut-off. Logged and swallowed inside, like every usage write.
+    await recordTaskCompletion(env, stagingCardOf(pending), run.operations.length, outcomes);
 
     // Record the outcome (including any resulting URL) in thread history, so
     // later turns know what was actually done — e.g. the created PRD's Notion

@@ -15,7 +15,14 @@ import { runClassifyBatch, runTextPurge } from "../usage/classify-run";
 import { askCategoriesFor } from "../usage/production";
 import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
 import { runSweepJobOnEnv } from "../sweep/env";
-import { runnerNameForRun, type ScheduledJob, type ScheduledJobKind, type ScheduledRun } from "./runs";
+import { runAskResolution } from "../usage/resolution-env";
+import {
+  FIRST_ASK_RESOLUTION_KEY,
+  runnerNameForRun,
+  type ScheduledJob,
+  type ScheduledJobKind,
+  type ScheduledRun,
+} from "./runs";
 
 /** One job kind's work, answering with its report. Resolving is done; a
  *  budget stop is thrown through. */
@@ -67,6 +74,13 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
     if (!store) return;
     const cleared = await runTextPurge({ store, now: () => Date.now(), dryRun });
     console.log(`[usage] text purge: ${dryRun ? "dry run, nothing cleared" : `${cleared} row(s) cleared`}`);
+  },
+  // End of day: 24 h on, record how each ask was resolved (src/usage/resolution-pass.ts).
+  // A dry run rehearses one of them: the rest would re-read the same asks.
+  "ask-resolution": async (env, job, { dryRun }) => {
+    const first = job.key === FIRST_ASK_RESOLUTION_KEY;
+    if (dryRun && !first) return;
+    console.log(`[resolution] ${(await runAskResolution(env, { dryRun, announce: first })).summary}`);
   },
 };
 

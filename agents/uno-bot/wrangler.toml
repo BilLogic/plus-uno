@@ -310,6 +310,12 @@ CLAUDE_MODEL = "claude-sonnet-5"
 # greeting with no ask are test traffic without being listed here.
 #   uno-bot-sandbox C0B4QBWAUJU
 TEST_CHANNEL_IDS = "C0B4QBWAUJU"
+# The lead: a reply of theirs in an ask's thread, or a DM to them from the asker
+# on the same topic within 24 h, marks the ask escalated (src/usage/resolution.ts).
+# The end-of-day pass reads that DM half on the lead's OWN connected token
+# (/oauth/slack/start, ADR-020); unconnected, it records "none" instead.
+#   Bill U03FYQJRQHX
+LEAD_USER_ID = "U03FYQJRQHX"
 
 # Secrets are set via `npm run secrets:set` (or `wrangler secret put`).
 # GENERATED from scripts/secrets.mjs — edit there, then `npm run check:secrets -- --fix`.

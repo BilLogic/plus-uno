@@ -16,6 +16,11 @@
 // through its two named dependencies (tests/scheduled-firing.test.ts).
 
 import { CLASSIFY_BATCHES } from "../usage/classify-run";
+import { ASK_RESOLUTION_JOBS } from "../usage/resolution-pass";
+
+/** The end-of-day run's first `ask-resolution` job: the one that announces a
+ *  missing token, and the one a dry run rehearses. */
+export const FIRST_ASK_RESOLUTION_KEY = "ask-resolution-1";
 
 /** The two runs a weekday holds. */
 export type ScheduledRunName = "morning" | "end-of-day";
@@ -27,9 +32,11 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * each posted card to its PR (src/figma-poll.ts, src/figma-library/). The
  * usage record's two: the end-of-day classify jobs label a batch of channel
  * asks each, and the purge — in both runs — keeps text under its 14 days
- * (src/usage/classify-run.ts). The sweep's two: one end-of-day `sweep-channel`
- * job per swept channel reads the day and keeps its drift findings, and the
- * morning `sweep-post` stages them as proposal cards (src/sweep/).
+ * (src/usage/classify-run.ts). `ask-resolution` is the end-of-day 24 h pass
+ * that records how each ask was resolved (src/usage/resolution-pass.ts). The
+ * sweep's two: one end-of-day `sweep-channel` job per swept channel reads the
+ * day and keeps its drift findings, and the morning `sweep-post` stages them as
+ * proposal cards (src/sweep/).
  */
 export type ScheduledJobKind =
   | "noop"
@@ -38,6 +45,7 @@ export type ScheduledJobKind =
   | "figma-library-track"
   | "usage-classify"
   | "usage-text-purge"
+  | "ask-resolution"
   | "sweep-channel"
   | "sweep-post";
 
@@ -89,6 +97,12 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     ...Array.from({ length: CLASSIFY_BATCHES }, (_, i) => ({
       key: `usage-classify-${i + 1}`,
       kind: "usage-classify" as const,
+    })),
+    // One alarm reads `PASS_LIMIT` asks; the run holds enough jobs for a day's
+    // (src/usage/resolution-pass.ts states the budget math).
+    ...Array.from({ length: ASK_RESOLUTION_JOBS }, (_, i) => ({
+      key: i === 0 ? FIRST_ASK_RESOLUTION_KEY : `ask-resolution-${i + 1}`,
+      kind: "ask-resolution" as const,
     })),
     // Not after the classify jobs: the purge holds whether or not they ran.
     { key: "usage-text-purge", kind: "usage-text-purge" },

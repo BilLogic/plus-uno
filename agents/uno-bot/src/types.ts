@@ -154,6 +154,10 @@ export interface Env {
   /** Comma-separated channel ids whose turns are test traffic on the usage
    *  record — #uno-bot-sandbox. */
   TEST_CHANNEL_IDS?: string;
+  /** Slack user id of the lead: whose thread replies, and DMs from an asker,
+   *  count as an ask escalated (src/usage/resolution.ts). Their own connected
+   *  token reads the DM half (ADR-020). */
+  LEAD_USER_ID?: string;
   /** "on" enables chat.startStream, on every surface. Shipped off, and the
    *  reason is `wrangler.toml`'s — not the one that used to stand here.
    *  This comment read `invalid_arguments` "even with thread_ts +

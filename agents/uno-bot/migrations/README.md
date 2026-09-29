@@ -38,7 +38,9 @@ logged and dropped). A deploy with no pending migration needs no step.
   Worker writes is also mapped in its table's adapter, the one place record
   fields become SQL columns: `agents/uno-bot/src/usage/d1.ts` for `turns` —
   or, for the columns only the classifier writes (the categories, the attempt
-  count, the text purge), `agents/uno-bot/src/usage/category-store.ts` — and
+  count, the text purge), `agents/uno-bot/src/usage/category-store.ts`, and for
+  the resolution columns written after the turn,
+  `agents/uno-bot/src/usage/resolution-d1.ts` — and
   `agents/uno-bot/src/sweep/d1.ts` for the sweep's.
 - Bound parameters in the Worker, always; nothing is assembled into SQL from a
   value.
