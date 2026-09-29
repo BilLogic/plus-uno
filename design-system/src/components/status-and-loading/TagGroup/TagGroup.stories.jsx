@@ -281,6 +281,7 @@ export const CollapseWithSuggestions = {
         };
 
         await waitFor(check);
+        const at420 = readCollapse(canvasElement).shown.length;
         frame.style.width = '560px';
         await waitFor(check);
         // Too narrow for a second tag: the first squeezes, suggestions stay whole.
@@ -289,6 +290,8 @@ export const CollapseWithSuggestions = {
         await expect(box(prompt()).right).toBeLessThanOrEqual(box(list).right + 0.5);
         await expect(prompt().scrollWidth, 'a suggestion never truncates').toBeLessThanOrEqual(prompt().clientWidth);
         frame.style.width = '420px';
+        // Back to the first count, so the row has settled, not just fitted.
+        await waitFor(() => expect(readCollapse(canvasElement).shown).toHaveLength(at420));
         await waitFor(check);
 
         // The menu lists the hidden tags only, never a suggestion.
@@ -352,11 +355,14 @@ export const MenuKeepsActions = {
         await expect(canvas.getByText('Mathematics picked')).toBeInTheDocument();
         await expect(more, 'toggling keeps the menu open').toHaveAttribute('aria-expanded', 'true');
         await expect(canvas.getByRole('button', { name: 'Mathematics' })).toHaveAttribute('aria-pressed', 'true');
-        // Waited for: the item's background eases in.
+        // Waited for: the item's background eases in. The token is read once,
+        // outside the wait: its probe element would otherwise wake the wait's
+        // own mutation observer on every read.
+        const selectedGround = tokenColor(canvasElement, '--color-primary-state-08');
         await waitFor(() => expect(
             getComputedStyle(canvas.getByRole('button', { name: 'Mathematics' })).backgroundColor,
             'the item shows the menu\'s selected state',
-        ).toBe(tokenColor(canvasElement, '--color-primary-state-08')));
+        ).toBe(selectedGround));
 
         // Link: a real link to the tag's href, named by its words, with an
         // arrow that is not read out. The tag's own onClick still fires.

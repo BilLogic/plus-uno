@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.stories.jsx` — Wrapping, Collapse, CollapseMenu, MaxVisible, NoOverflowWhenItFits, ConditionalChildrenAreNotCounted, OverflowTag, DigitBoundary, StableOnParentRender, SqueezedFirstReplaced, AlignmentRight, Disabled, RemovableSet, CustomOverflowAction, Interactive
+**Stories:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.stories.jsx` — Wrapping, Collapse, CollapseMenu, CollapseWithSuggestions, MenuKeepsActions, MaxVisible, NoOverflowWhenItFits, ConditionalChildrenAreNotCounted, OverflowTag, DigitBoundary, StableOnParentRender, SqueezedFirstReplaced, AlignmentRight, Disabled, RemovableSet, CustomOverflowAction, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/TagGroup/TagGroup.mdx`
 
@@ -15,7 +15,7 @@
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `children` | node | — | The tags, and any Suggestions offered beside them. `null` and `false` are skipped rather than counted. |
+| `children` | node | — | The tags, and any Suggestions offered beside them. Suggestions always sit at the end, after `+n`, and are never counted or hidden. `null` and `false` are skipped rather than counted. |
 | `label` | string | — | The group's accessible name — what this set of tags is. |
 | `overflow` | enum | `'wrap'` | `wrap` flows onto more lines; `collapse` keeps one line, shows as many tags as fit, and puts the rest behind `+n`. |
 | `alignment` | enum | `'left'` | `right` lines the tags and the `+n` up on the right edge, for a right-aligned table column. |
