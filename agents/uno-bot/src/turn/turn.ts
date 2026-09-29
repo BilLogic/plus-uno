@@ -77,7 +77,7 @@ import {
 } from "../thread-state/index";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
-import { intakeChannelInstruction } from "./intake-channel";
+import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
 import {
   withWorkingSignal,
   type CardCaveat,
@@ -166,9 +166,10 @@ export interface TurnRequest {
   /** The instruction a leading scope keyword (`ds:`, `notion:`) turned into:
    *  where to START, never a filter. */
   scopeInstruction?: string;
-  /** The message is in #uno-bot, where the team reports problems with uno-bot
-   *  and asks for changes to it (`turn/intake-channel.ts`). */
-  intakeChannel?: boolean;
+  /** Set when the message is in #uno-bot, where the team reports problems
+   *  with uno-bot and asks for changes to it: who has posted in its thread,
+   *  which is who may confirm the card it stages (`turn/intake-channel.ts`). */
+  intakeChannel?: IntakeThread;
 
   // ----- what came with it -----
   /** Decoded image bytes for this turn. The adapter downloads; Turn never
@@ -1043,6 +1044,11 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     // A revision is held to the terms of the card it replaces — its lifetime
     // and who may confirm it. A fresh card has none and gets the defaults.
     ...inheritedTerms(request.pending),
+    // In #uno-bot the poster and the thread's repliers confirm, and a revision
+    // adds whoever staged it (`turn/intake-channel.ts`).
+    ...(request.intakeChannel
+      ? { confirmers: intakeConfirmers(request.intakeChannel, request.pending, request.userId) }
+      : {}),
   };
   await threadState.putProposal(proposal);
   // A proposal is still a completed conversational turn. An agent_view DM has

@@ -476,11 +476,12 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // Loading thread context runs BEFORE the turn, so a throw here (a Slack
   // history read, a store lookup, the Notion PRD extraction) must not be
   // silent — post a visible error rather than letting the handler die quietly.
-  let history: Awaited<ReturnType<typeof buildThreadHistory>>;
+  let history: HistoryTurn[];
+  let participants: string[];
   let pending: PendingProposal | null;
   let prd: Awaited<ReturnType<typeof extractPrdFromThreadRoot>>;
   try {
-    [history, pending, prd] = await Promise.all([
+    [{ turns: history, participants }, pending, prd] = await Promise.all([
       buildThreadHistory(env, channel, convTs, event.thread_ts, event.ts, textReadsAsCorrection),
       // The card, by contrast, is the REPLY THREAD's: in a DM a card staged
       // under one ask is no business of the next unthreaded ask.
@@ -508,7 +509,11 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     history,
     pending,
     prd,
-    ...(isIntakeChannel(channel, env.UNO_BOT_CHANNEL_ID) ? { intakeChannel: true } : {}),
+    // Who may confirm the card: the poster and everyone in the thread so far,
+    // read off the thread the history rebuild already fetched.
+    ...(isIntakeChannel(channel, env.UNO_BOT_CHANNEL_ID)
+      ? { intakeChannel: { participants: [...participants, userId] } }
+      : {}),
   });
   console.log(
     `[turn] ${outcome.disposition} tier=${outcome.telemetry.tier} route=${outcome.telemetry.route} ` +
@@ -524,7 +529,9 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
 // `user`. Falls back to the Durable Object history if the thread read fails or
 // the bot's identity is unknown. The current message is excluded (it's passed
 // separately as userText). buildMessages() in run-agent merges any consecutive
-// same-role turns this produces.
+// same-role turns this produces. It also returns the people who have posted in
+// the thread, oldest first — the #uno-bot intake's confirmers — which the Slack
+// read already carries; the store fallback knows none.
 const THREAD_HISTORY_LIMIT = 100;
 
 // Two different ts values on purpose (see replyThreadTs/conversationTs):
@@ -546,10 +553,11 @@ async function buildThreadHistory(
   // turn that needs it: a correction, where "what did I actually look up last
   // time" is the whole question.
   wantReceipts = false,
-): Promise<HistoryTurn[]> {
+): Promise<{ turns: HistoryTurn[]; participants: string[] }> {
   const store = threadStateFor(env);
   const ref = { channel, thread: convTs };
-  if (!threadTs) return store.readHistory(ref);
+  const fromStore = async () => ({ turns: await store.readHistory(ref), participants: [] });
+  if (!threadTs) return fromStore();
   try {
     const [identity, replies, stored] = await Promise.all([
       getBotIdentity(env),
@@ -567,9 +575,11 @@ async function buildThreadHistory(
     }
     if (identity && replies.ok && replies.messages?.length) {
       const turns: HistoryTurn[] = [];
+      const participants: string[] = [];
       for (const m of replies.messages) {
         if (m.ts === currentTs) continue;
         const isBot = m.user === identity.userId || (!!m.bot_id && m.bot_id === identity.botId);
+        if (!isBot && !m.bot_id && m.user && !participants.includes(m.user)) participants.push(m.user);
         const rawContent = stripBotMentions(m.text ?? "", identity.userId);
         const canvasContent = messageTextWithCanvasAttachments(rawContent, m.files);
         const sharedCanvasIds = canvasIdsSharedBySlackHistoryMessage({
@@ -594,10 +604,10 @@ async function buildThreadHistory(
           ...(sharedCanvasIds.length ? { sharedCanvasIds } : {}),
         });
       }
-      if (turns.length) return turns;
+      if (turns.length) return { turns, participants };
     }
   } catch (err) {
     console.warn(`[history] thread read failed, using DO fallback: ${err instanceof Error ? err.message : String(err)}`);
   }
-  return store.readHistory(ref);
+  return fromStore();
 }

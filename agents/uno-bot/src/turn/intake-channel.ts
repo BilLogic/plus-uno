@@ -11,10 +11,21 @@
 // (`github_intake_search`), the gated `github_issue_create` whose executor
 // fixes the `harness-intake` label and appends the post's link and the
 // reporter, and `github_issue_update` for a comment on a match. What this
-// module adds is the instruction that points a post at them.
+// module adds is the instruction that points a post at them, and who may
+// confirm the card: the poster plus the people who have replied in its thread,
+// held on the card as its confirmer set (`PendingProposal.confirmers`).
 //
 // PURE: no `Env`, no Slack module, so Turn can import it (`turn.test.ts`
 // asserts Turn imports no Slack module) and a Node test can drive it.
+
+import type { PendingProposal } from "../thread-state/index";
+
+/** A message in #uno-bot, as far as the intake cares: who has posted in its
+ *  thread so far, poster first. The envelope reads them off the thread it
+ *  already fetched for history; a top-level post is its poster alone. */
+export interface IntakeThread {
+  participants: string[];
+}
 
 /**
  * True when `channel` is the configured #uno-bot. Unset config means there is
@@ -43,4 +54,21 @@ export function intakeChannelInstruction(message: { senderId: string; isReply: b
     "4. Reply in one short line — \"Want me to file this?\" — with the card as the draft. A reply here that refines it gets a revised card.",
     "A question gets its answer and no card; add the intake offer only when it also reports a problem or asks for a change.)",
   ].join("\n");
+}
+
+/**
+ * Who may confirm a card staged in #uno-bot: everyone the card it revises
+ * already admitted (or that card's requester, when it had no set), the thread's
+ * participants, and the person whose turn stages it — each once, in that order.
+ *
+ * Grows with the thread: a reply that revises the card joins its replier, and
+ * inherits everyone before.
+ */
+export function intakeConfirmers(
+  thread: IntakeThread,
+  pending: Pick<PendingProposal, "confirmers" | "requesterUserId"> | null,
+  senderId: string,
+): string[] {
+  const before = pending ? (pending.confirmers ?? [pending.requesterUserId]) : [];
+  return [...new Set([...before, ...thread.participants, senderId])];
 }

@@ -17,8 +17,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import { runTurn } from "../src/turn/index";
-import { intakeChannelInstruction, isIntakeChannel } from "../src/turn/intake-channel";
-import { resolveSignal, runOperations } from "../src/gate/index";
+import { intakeChannelInstruction, intakeConfirmers, isIntakeChannel } from "../src/turn/intake-channel";
+import { resolveSignal, runOperations, type GateSignal } from "../src/gate/index";
 import { fileGithubIssue } from "../src/tools/github-issue";
 import type { CreatedIssue, GithubIssueClient, NewIssue } from "../src/integrations/github";
 import { CHANNEL, harness, postsOf, request } from "./helpers/turn-harness";
@@ -54,7 +54,7 @@ const intakePost = (text: string) =>
     userMsgTs: POST_TS,
     threaded: false,
     text,
-    intakeChannel: true,
+    intakeChannel: { participants: [POSTER] },
   });
 
 /** What the model was handed for this turn: the question block, as sent. */
@@ -181,7 +181,7 @@ test("a reply in the intake thread that refines the draft stages a revision, whi
       threaded: true,
       text: "add that it happened twice today",
       pending,
-      intakeChannel: true,
+      intakeChannel: { participants: [POSTER, "U2"] },
     }),
     h.deps,
   );
@@ -193,6 +193,39 @@ test("a reply in the intake thread that refines the draft stages a revision, whi
   assert.equal(live?.proposalTs, second.staged!.proposal.proposalTs);
   // The replier refines; the reporter is still the thread's opener.
   assert.match(sentText(h), /the person who opened this thread/);
+  // And the replier joins the people who may confirm it.
+  assert.deepEqual(second.staged!.proposal.confirmers, [POSTER, "U2"]);
+});
+
+// ── who may confirm ──────────────────────────────────────────────────────────
+
+test("the confirmers are the poster plus everyone who has replied, and the sender, once each", () => {
+  assert.deepEqual(intakeConfirmers({ participants: [POSTER] }, null, POSTER), [POSTER]);
+  assert.deepEqual(intakeConfirmers({ participants: [POSTER, "U3", POSTER] }, null, "U2"), [POSTER, "U3", "U2"]);
+  // A revision keeps everyone the card it replaces already admitted.
+  assert.deepEqual(
+    intakeConfirmers({ participants: [] }, { confirmers: [POSTER, "U3"], requesterUserId: POSTER }, "U2"),
+    [POSTER, "U3", "U2"],
+  );
+  // A card staged before the channel set confirmers still admits its requester.
+  assert.deepEqual(intakeConfirmers({ participants: [] }, { requesterUserId: POSTER }, "U2"), [POSTER, "U2"]);
+});
+
+test("a card staged in #uno-bot admits the poster and the people in its thread, on the default lifetime", async () => {
+  const h = harness({
+    replies: [{ text: "Want me to file this?", toolCalls: [{ name: "github_issue_create", args: DRAFT }] }],
+  });
+  const outcome = await runTurn(intakePost(REPORT), h.deps);
+  assert.deepEqual(outcome.staged!.proposal.confirmers, [POSTER]);
+  assert.equal(outcome.staged!.proposal.ttlMs, undefined, "the default TTL, not one of its own");
+});
+
+test("a card anywhere else has no confirmer set: anyone in the thread may confirm, as before", async () => {
+  const h = harness({
+    replies: [{ text: "Filing it.", toolCalls: [{ name: "github_issue_create", args: DRAFT }] }],
+  });
+  const outcome = await runTurn(request({ text: REPORT }), h.deps);
+  assert.equal(outcome.staged!.proposal.confirmers, undefined);
 });
 
 // ── the gate ─────────────────────────────────────────────────────────────────
@@ -249,4 +282,32 @@ test("✅ from the poster files the issue with the harness-intake label and repl
   assert.ok(posted[0]!.includes(filed.url), posted[0]!);
   // Consumed: a second ✅ finds nothing to file.
   assert.equal((await h.threadState.getProposalByTs(cardTs)).state, "none");
+});
+
+/** A ✅ reaction on the card, from `userId`. */
+const approve = (cardTs: string, userId: string): GateSignal => ({
+  kind: "reaction",
+  messageTs: cardTs,
+  channel: CHANNEL,
+  thread: POST_TS,
+  glyph: "white_check_mark",
+  userId,
+});
+
+test("✅ from someone outside the thread files nothing and is told who can confirm", async () => {
+  const h = harness({
+    replies: [{ text: "Want me to file this?", toolCalls: [{ name: "github_issue_create", args: DRAFT }] }],
+  });
+  const outcome = await runTurn(intakePost(REPORT), h.deps);
+  const cardTs = outcome.staged!.proposal.proposalTs;
+
+  const verdict = await resolveSignal(approve(cardTs, "U9"), { threadState: h.threadState });
+
+  assert.equal(verdict.outcome, "none");
+  assert.equal(verdict.execute, undefined, "nothing is filed");
+  assert.deepEqual(verdict.post?.note, { kind: "not-a-confirmer", confirmers: [POSTER], userId: "U9" });
+  // The card is untouched for the people who may confirm it.
+  assert.equal((await h.threadState.getProposalByTs(cardTs)).state, "found");
+  const theirs = await resolveSignal(approve(cardTs, POSTER), { threadState: h.threadState });
+  assert.equal(theirs.outcome, "won");
 });

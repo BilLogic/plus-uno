@@ -113,7 +113,7 @@ export function evalTurnRequest(
       // eval surface does not have — out of the measurement.
       threaded: true,
       text: prompt,
-      ...(isIntakeChannel(channel, intakeChannelId) ? { intakeChannel: true } : {}),
+      ...(isIntakeChannel(channel, intakeChannelId) ? { intakeChannel: { participants: [userId] } } : {}),
       history,
       pending,
     }),
