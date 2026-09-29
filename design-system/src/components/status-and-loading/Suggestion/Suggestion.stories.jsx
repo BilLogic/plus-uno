@@ -239,16 +239,16 @@ FocusRing.play = async ({ canvasElement }) => {
 };
 
 /**
- * Disabled, beside disabled Tags: the same on-surface 12 ground as a disabled
- * Tag, a dashed Outline Variant edge (the dash stays, so it still reads as a
- * suggestion), and the words and glyph in Secondary (Text). It comes from the
- * field's `TagContext` only, as a Tag's does: a disabled button, still named,
- * skipped by Tab and never accepted. There is no `disabled` prop, so a stray
- * one outside a disabled field changes nothing.
+ * Disabled, beside disabled Tags, from the field's `TagContext` only. Its
+ * ground and words are asserted equal to the disabled Tag's, because the two
+ * stylesheets each name the pair. There is no `disabled` prop, so a stray one
+ * outside a disabled field changes nothing.
  */
+const onStray = fn();
+
 export const DisabledBesideTags = {
-    args: { onAccept: fn(), onStray: fn() },
-    render: ({ onAccept, onStray }) => (
+    args: { onAccept: fn() },
+    render: ({ onAccept }) => (
         <div style={row}>
             <button type="button">Before</button>
             <TagContext.Provider value={{ isDisabled: true }}>
@@ -264,6 +264,7 @@ export const DisabledBesideTags = {
 };
 
 DisabledBesideTags.play = async ({ canvasElement, args }) => {
+    onStray.mockClear();
     const canvas = within(canvasElement);
     const t = (token) => tokenColor(canvasElement, token);
     const fill = t('--color-on-surface-state-12');
@@ -314,7 +315,7 @@ DisabledBesideTags.play = async ({ canvasElement, args }) => {
     await userEvent.tab();
     await expect(stray).toHaveFocus();
     await userEvent.keyboard('{Enter}');
-    await expect(args.onStray).toHaveBeenCalledWith('Fractions', expect.anything());
+    await expect(onStray).toHaveBeenCalledWith('Fractions', expect.anything());
 };
 
 /**

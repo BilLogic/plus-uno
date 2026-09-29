@@ -17,9 +17,9 @@ import './Suggestion.scss';
  * The component does not change itself when accepted; the field that owns the
  * value decides what appears next.
  *
- * NO `disabled` PROP, as Tag has none. It is disabled because its field or
- * TagGroup is, through the `TagContext` a Tag reads, so a suggestion can never
- * disagree with the tags beside it. Disabled, it is a native disabled button:
+ * NO `disabled` PROP, as Tag has none. Disabled comes from the field through
+ * `TagContext`, the value a Tag reads, so a suggestion can never disagree
+ * with the tags beside it. Disabled, it is a native disabled button:
  * out of the tab order, announced as disabled, and never accepted.
  */
 
