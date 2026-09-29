@@ -40,6 +40,8 @@ export interface TurnFacts {
   /** The body including attachment lines, when it differs from `text`. */
   attachmentsText?: string;
   scopeInstruction?: string;
+  /** In #uno-bot — the caller reads its config through `isIntakeChannel`. */
+  intakeChannel?: boolean;
   images?: AgentImage[];
   historicalImages?: HistoricalImages;
   visionNotes?: string[];
@@ -107,6 +109,7 @@ export function buildTurnRequest(facts: TurnFacts): TurnRequest {
     text: facts.text,
     ...(attachmentsText ? { attachmentsText } : {}),
     ...(facts.scopeInstruction ? { scopeInstruction: facts.scopeInstruction } : {}),
+    ...(facts.intakeChannel ? { intakeChannel: true } : {}),
     images: facts.images ?? [],
     ...(facts.historicalImages ? { historicalImages: facts.historicalImages } : {}),
     ...(facts.visionNotes?.length ? { visionNotes: facts.visionNotes } : {}),

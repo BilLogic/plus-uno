@@ -37,6 +37,8 @@ export interface TurnEnvelope {
   pending: PendingProposal | null;
   /** The Notion PRD carried on the thread root, if any. */
   prd: { id?: string; url?: string } | null;
+  /** The message is in #uno-bot (`turn/intake-channel.ts` § `isIntakeChannel`). */
+  intakeChannel?: boolean;
 }
 
 /** Nothing visual arrived, so the vision pass never ran. A fresh object each
@@ -103,6 +105,7 @@ export function slackTurnRequest(
     text,
     attachmentsText,
     ...(scoped ? { scopeInstruction: scoped.scope.instruction } : {}),
+    ...(envelope.intakeChannel ? { intakeChannel: true } : {}),
     images: vision.images,
     ...(vision.historicalImages ? { historicalImages: vision.historicalImages } : {}),
     visionNotes: vision.notes,

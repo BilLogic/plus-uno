@@ -35,6 +35,7 @@ import { postingDeps } from "./slack-delivery";
 import { runSlackTurn } from "./turn-adapter";
 import { stripBotMentions } from "./mention";
 import { cardThreadOf, turnSurfaceOf } from "../turn/request";
+import { isIntakeChannel } from "../turn/intake-channel";
 
 // Re-exported for index.ts (SlackEnvelope) + agent-runner.ts (RunnerJobPayload)
 // and any other importer that still reaches for the Slack wire types here.
@@ -311,17 +312,24 @@ function isUserTurn(event: SlackMessageEvent): boolean {
 // Gate for plain `message` events: should the bot engage at all? Slack delivers
 // a `message` event for EVERY message in a channel the bot is a member of, so
 // without this the bot replies to everything (e.g. someone typing "implement"
-// with no @mention). It engages only on: a DM, an explicit @mention in the text,
-// or a follow-up inside a thread it is already part of (an active proposal, or
-// the bot has already posted there) so replies don't need a re-mention. A
-// top-level channel message with no @mention is ignored. (app_mention events
-// bypass this entirely — they are always an explicit mention.)
-async function shouldHandleMessage(env: Env, event: SlackMessageEvent): Promise<boolean> {
+// with no @mention). It engages only on: a DM, a top-level post in #uno-bot,
+// an explicit @mention in the text, or a follow-up inside a thread it is
+// already part of (an active proposal, or the bot has already posted there) so
+// replies don't need a re-mention. Any other top-level channel message with no
+// @mention is ignored. (app_mention events bypass this entirely — they are
+// always an explicit mention.)
+// Exported for `tests/message-engagement.test.ts`.
+export async function shouldHandleMessage(env: Env, event: SlackMessageEvent): Promise<boolean> {
   if (!isUserTurn(event)) return false;
 
   // An app DM is direct to the bot. Which channel ids those are is
   // `turn/request.ts` § `turnSurfaceOf`, not a literal here (#595).
   if (isDm(event.channel)) return true;
+
+  // #uno-bot is where the team reports problems with uno-bot and asks for
+  // changes to it, so a post there is addressed to the bot without a mention.
+  // Top-level only: a reply in a thread there keeps the follow-up rule below.
+  if (!event.thread_ts && isIntakeChannel(event.channel, env.UNO_BOT_CHANNEL_ID)) return true;
 
   const identity = await getBotIdentity(env);
   // Explicit @mention of the bot anywhere in the text.
@@ -501,6 +509,7 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     history,
     pending,
     prd,
+    ...(isIntakeChannel(channel, env.UNO_BOT_CHANNEL_ID) ? { intakeChannel: true } : {}),
   });
   console.log(
     `[turn] ${outcome.disposition} tier=${outcome.telemetry.tier} route=${outcome.telemetry.route} ` +

@@ -76,6 +76,7 @@ import {
 } from "../thread-state/index";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
+import { intakeChannelInstruction } from "./intake-channel";
 import {
   withWorkingSignal,
   type CardCaveat,
@@ -164,6 +165,9 @@ export interface TurnRequest {
   /** The instruction a leading scope keyword (`ds:`, `notion:`) turned into:
    *  where to START, never a filter. */
   scopeInstruction?: string;
+  /** The message is in #uno-bot, where the team reports problems with uno-bot
+   *  and asks for changes to it (`turn/intake-channel.ts`). */
+  intakeChannel?: boolean;
 
   // ----- what came with it -----
   /** Decoded image bytes for this turn. The adapter downloads; Turn never
@@ -680,6 +684,10 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
 
   if (request.scopeInstruction) {
     modelBlocks.push(`(system: SCOPE — ${request.scopeInstruction})`);
+  }
+
+  if (request.intakeChannel) {
+    modelBlocks.push(intakeChannelInstruction({ userId: request.userId, threaded: request.threaded }));
   }
 
   // The antecedent window: what "this" points at. Only for a top-level channel
