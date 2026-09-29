@@ -15,6 +15,8 @@
 // Free of `Env` and Workers globals, so the Node suite drives the whole firing
 // through its two named dependencies (tests/scheduled-firing.test.ts).
 
+import { CLASSIFY_BATCHES } from "../usage/classify-run";
+
 /** The two runs a weekday holds. */
 export type ScheduledRunName = "morning" | "end-of-day";
 
@@ -23,15 +25,19 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * The Figma library's three: the end-of-day poll finds a publish, the morning
  * post turns it into a card in #plus-universal, and the morning track follows
  * each posted card to its PR (src/figma-poll.ts, src/figma-library/). The
- * sweep's two: one end-of-day `sweep-channel` job per swept channel reads the
- * day and keeps its drift findings, and the morning `sweep-post` stages them as
- * proposal cards (src/sweep/).
+ * usage record's two: the end-of-day classify jobs label a batch of channel
+ * asks each, and the purge — in both runs — keeps text under its 14 days
+ * (src/usage/classify-run.ts). The sweep's two: one end-of-day `sweep-channel`
+ * job per swept channel reads the day and keeps its drift findings, and the
+ * morning `sweep-post` stages them as proposal cards (src/sweep/).
  */
 export type ScheduledJobKind =
   | "noop"
   | "figma-library-poll"
   | "figma-library-post"
   | "figma-library-track"
+  | "usage-classify"
+  | "usage-text-purge"
   | "sweep-channel"
   | "sweep-post";
 
@@ -72,8 +78,21 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "figma-library-post", kind: "figma-library-post" },
     { key: "figma-library-track", kind: "figma-library-track" },
     { key: "sweep-post", kind: "sweep-post" },
+    // Both runs purge, so no text outlives 14 days across a weekend and one
+    // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).
+    { key: "usage-text-purge", kind: "usage-text-purge" },
   ],
-  "end-of-day": [{ key: "figma-library-poll", kind: "figma-library-poll" }],
+  "end-of-day": [
+    { key: "figma-library-poll", kind: "figma-library-poll" },
+    // One job per classification batch, each an alarm of its own. Each takes
+    // whatever is still pending, so a quiet day's later jobs find nothing.
+    ...Array.from({ length: CLASSIFY_BATCHES }, (_, i) => ({
+      key: `usage-classify-${i + 1}`,
+      kind: "usage-classify" as const,
+    })),
+    // Not after the classify jobs: the purge holds whether or not they ran.
+    { key: "usage-text-purge", kind: "usage-text-purge" },
+  ],
 };
 
 /** The run names, for a caller that takes one as input. */
@@ -108,7 +127,11 @@ export function planRun(name: ScheduledRunName, at: number, sweepChannels: reado
     name === "end-of-day"
       ? sweepChannels.map((channel) => ({ key: `sweep:${channel}`, kind: "sweep-channel", channel }))
       : [];
-  return { name, date: new Date(at).toISOString().slice(0, 10), jobs: [...RUN_PLANS[name], ...sweeps] };
+  // The sweep jobs go before the purge, which stays last in every run.
+  const plan = RUN_PLANS[name];
+  const purge = plan.findIndex((j) => j.kind === "usage-text-purge");
+  const jobs = purge < 0 ? [...plan, ...sweeps] : [...plan.slice(0, purge), ...sweeps, ...plan.slice(purge)];
+  return { name, date: new Date(at).toISOString().slice(0, 10), jobs };
 }
 
 /**

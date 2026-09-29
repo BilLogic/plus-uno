@@ -43,7 +43,15 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
   // The dependency set is the whole of what a firing can do.
   const deps: Parameters<typeof onScheduledFiring>[1] = { enqueueRun: async () => {} };
   assert.deepEqual(Object.keys(deps), ["enqueueRun"]);
-  assert.deepEqual(planRun("end-of-day", at(22, 0)).jobs.map((j) => j.kind), ["figma-library-poll"]);
+  assert.deepEqual(planRun("end-of-day", at(22, 0)).jobs.map((j) => j.kind), [
+    "figma-library-poll",
+    "usage-classify",
+    "usage-classify",
+    "usage-classify",
+    "usage-classify",
+    "usage-classify",
+    "usage-text-purge",
+  ]);
 });
 
 test("14:00 UTC enqueues the morning run and 22:00 UTC the end-of-day run", async () => {
@@ -85,17 +93,31 @@ test("each run is planned with its jobs, keyed by the UTC run date", () => {
     ["figma-library-post", "figma-library-post"],
     ["figma-library-track", "figma-library-track"],
     ["sweep-post", "sweep-post"],
+    // Both runs purge, so text never outlives its 14 days over a weekend.
+    ["usage-text-purge", "usage-text-purge"],
   ]);
   const endOfDay = planRun("end-of-day", at(22, 0));
-  assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind]), [["figma-library-poll", "figma-library-poll"]]);
+  assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind, j.after]), [
+    ["figma-library-poll", "figma-library-poll", undefined],
+    // One job per classification batch.
+    ["usage-classify-1", "usage-classify", undefined],
+    ["usage-classify-2", "usage-classify", undefined],
+    ["usage-classify-3", "usage-classify", undefined],
+    ["usage-classify-4", "usage-classify", undefined],
+    ["usage-classify-5", "usage-classify", undefined],
+    // Waits on nothing, so it runs whether or not the classify jobs did.
+    ["usage-text-purge", "usage-text-purge", undefined],
+  ]);
 });
 
-test("the end-of-day run sweeps each listed channel as its own job; the morning posts", () => {
+test("the end-of-day run sweeps each listed channel as its own job, before the purge; the morning posts", () => {
   const endOfDay = planRun("end-of-day", at(22, 0), ["C0DESIGN", "C0OTHER"]);
-  assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind, j.channel]), [
-    ["figma-library-poll", "figma-library-poll", undefined],
+  const jobs = endOfDay.jobs.map((j) => [j.key, j.kind, j.channel]);
+  assert.deepEqual(jobs.slice(-3), [
     ["sweep:C0DESIGN", "sweep-channel", "C0DESIGN"],
     ["sweep:C0OTHER", "sweep-channel", "C0OTHER"],
+    // The purge stays last.
+    ["usage-text-purge", "usage-text-purge", undefined],
   ]);
   // The channels are the end of day's alone: the morning run only posts.
   assert.equal(planRun("morning", at(14, 0), ["C0DESIGN"]).jobs.some((j) => j.kind === "sweep-channel"), false);
@@ -114,7 +136,7 @@ test("a firing plans the end-of-day sweep over the channels it was handed", asyn
     },
     sweepChannels: ["C0DESIGN"],
   });
-  assert.deepEqual(runs[0]?.jobs.map((j) => j.key), ["figma-library-poll", "sweep:C0DESIGN"]);
+  assert.deepEqual(runs[0]?.jobs.map((j) => j.key).slice(-2), ["sweep:C0DESIGN", "usage-text-purge"]);
 });
 
 test("a run's runner is never a thread's runner", () => {

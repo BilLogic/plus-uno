@@ -10,6 +10,9 @@
 import type { Env } from "../types";
 import { charge } from "../net";
 import { runFigmaPoll } from "../figma-poll";
+import { selectProvider } from "../agent/run-agent";
+import { runClassifyBatch, runTextPurge } from "../usage/classify-run";
+import { askCategoriesFor } from "../usage/production";
 import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
 import { runSweepJobOnEnv } from "../sweep/env";
 import { runnerNameForRun, type ScheduledJob, type ScheduledJobKind, type ScheduledRun } from "./runs";
@@ -47,6 +50,24 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   "sweep-channel": sweepBody,
   // Morning: the findings whose morning has come become proposal cards.
   "sweep-post": sweepBody,
+  // End of day: label one batch of the channel asks still holding text, and
+  // null that text in the same write. Counts only — never the model's words.
+  "usage-classify": async (env, job, { dryRun }) => {
+    const store = askCategoriesFor(env);
+    if (!store) return;
+    const r = await runClassifyBatch({ store, provider: selectProvider(env), now: () => Date.now(), dryRun });
+    const verb = dryRun ? "would label" : "labelled";
+    console.log(
+      `[usage] ${job.key}: ${verb} ${r.labelled} ask(s) (${r.blank} blank), ${r.failed} failed, ${r.givenUp} given up`,
+    );
+  },
+  // Both runs: text past the purge cutoff goes, whatever happened to it.
+  "usage-text-purge": async (env, _job, { dryRun }) => {
+    const store = askCategoriesFor(env);
+    if (!store) return;
+    const cleared = await runTextPurge({ store, now: () => Date.now(), dryRun });
+    console.log(`[usage] text purge: ${dryRun ? "dry run, nothing cleared" : `${cleared} row(s) cleared`}`);
+  },
 };
 
 /**
