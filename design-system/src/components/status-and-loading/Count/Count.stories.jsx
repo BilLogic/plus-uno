@@ -1,0 +1,359 @@
+import React, { useState } from 'react';
+import { expect, spyOn, userEvent, within } from 'storybook/test';
+
+import Count, { COUNT_APPEARANCES, COUNT_SIZES, COUNT_STYLES } from './Count';
+
+/**
+ * `Count` — a number on its own, as a pill.
+ *
+ * THE TEST SEAM IS THIS FILE: story `play:` functions run by `check:storybook`
+ * in a real browser. Every assertion is something a person could observe —
+ * rendered text, accessible names, computed size and color — and never a class
+ * name. Colors are compared against the token they should resolve to, read
+ * through a probe element, so a wrong mapping fails here rather than in review.
+ *
+ * Contrast is not re-asserted: the a11y ratchet tracks `color-contrast` over
+ * every story rendered.
+ */
+
+export default {
+    title: 'Components/Status and loading/Count',
+    component: Count,
+    parameters: {
+        docs: {
+            description: {
+                component:
+                    'A number on its own: unread items, results, errors. For the condition '
+                    + 'something is in, use Status; for a category, use Tag.',
+            },
+        },
+    },
+};
+
+const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
+
+/* ------------------------------------------------------------------ helpers */
+
+const px = (v) => parseFloat(v);
+
+/** What a token resolves to as a computed color, read through a probe. */
+const tokenColor = (host, token) => {
+    const probe = document.createElement('span');
+    probe.style.backgroundColor = `var(${token})`;
+    host.appendChild(probe);
+    const value = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return value;
+};
+
+const alpha = (color) => {
+    const parts = color.match(/[\d.]+/g).map(Number);
+    return parts.length === 4 ? parts[3] : 1;
+};
+
+/** WCAG contrast ratio between two opaque computed colors. */
+const contrast = (a, b) => {
+    const lum = (color) => {
+        const [r, g, b2] = color.match(/[\d.]+/g).slice(0, 3).map((v) => {
+            const c = Number(v) / 255;
+            return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b2;
+    };
+    const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
+    return (hi + 0.05) / (lo + 0.05);
+};
+
+/** The pill that holds a given piece of text. */
+const pillOf = (canvas, text) => canvas.getByText(text).parentElement;
+
+/* ----------------------------------------------------------------- stories */
+
+/** The four appearances. Subtle is the default; bold asks for action now; dot is presence. */
+export const Appearances = () => (
+    <div style={row}>
+        <Count value={12} />
+        <Count value={13} appearance="bold" style="danger" />
+        <button type="button" className="btn btn-primary">
+            Review <Count value={14} appearance="inverse" />
+        </button>
+        <span style={{ background: 'var(--color-inverse-surface)', padding: '8px', borderRadius: '6px' }}>
+            <Count value={15} appearance="inverse" />
+        </span>
+        <Count appearance="dot" style="danger" label="New activity" />
+    </div>
+);
+Appearances.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    const subtle = getComputedStyle(pillOf(canvas, '12'));
+    await expect(subtle.backgroundColor, 'subtle neutral is on-surface-variant 08').toBe(
+        tokenColor(canvasElement, '--color-on-surface-variant-state-08'),
+    );
+    await expect(alpha(subtle.backgroundColor), 'subtle is translucent').toBeCloseTo(0.08, 2);
+    await expect(subtle.color).toBe(tokenColor(canvasElement, '--color-on-surface-variant'));
+
+    const bold = getComputedStyle(pillOf(canvas, '13'));
+    await expect(bold.backgroundColor).toBe(tokenColor(canvasElement, '--color-danger'));
+    await expect(bold.color).toBe(tokenColor(canvasElement, '--color-on-danger'));
+
+    // Inverse is a solid white pill with dark text, on a primary button and on
+    // inverse-surface alike.
+    for (const text of ['14', '15']) {
+        const inverse = getComputedStyle(pillOf(canvas, text));
+        await expect(inverse.backgroundColor, 'inverse is surface-container-lowest').toBe(
+            tokenColor(canvasElement, '--color-surface-container-lowest'),
+        );
+        await expect(alpha(inverse.backgroundColor), 'inverse is solid').toBe(1);
+        await expect(inverse.color).toBe(tokenColor(canvasElement, '--color-on-surface-variant'));
+        await expect(contrast(inverse.color, inverse.backgroundColor), 'AA on any fill').toBeGreaterThanOrEqual(4.5);
+    }
+
+    const dot = canvas.getByRole('img', { name: 'New activity' });
+    const d = getComputedStyle(dot);
+    await expect(px(d.height)).toBe(8);
+    await expect(px(d.width)).toBe(8);
+    await expect(d.backgroundColor).toBe(tokenColor(canvasElement, '--color-danger'));
+    await expect(dot).toHaveTextContent('');
+};
+
+/** Both sizes: 20 on its own, 16 inside a Status or Tag. Min-width equals height. */
+export const Sizes = () => (
+    <div style={row}>
+        <Count value={1} />
+        <Count value={2} size="small" />
+        <Count value={1204} />
+    </div>
+);
+Sizes.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    for (const [text, size] of [['1', 20], ['2', 16]]) {
+        const pill = pillOf(canvas, text);
+        const s = getComputedStyle(pill);
+        await expect(pill.getBoundingClientRect().height, `${text} is ${size} tall`).toBe(size);
+        await expect(px(s.minWidth), 'min-width equals height').toBe(size);
+        await expect(pill.getBoundingClientRect().width, 'one digit is a circle').toBe(size);
+        await expect(px(s.paddingLeft), 'padding is the Element xs token, not 8').toBe(4);
+        await expect(px(s.paddingRight)).toBe(4);
+        await expect(px(s.borderRadius), 'fully rounded').toBeGreaterThanOrEqual(size / 2);
+        await expect(px(getComputedStyle(canvas.getByText(text)).fontSize), 'B3 12').toBe(12);
+    }
+
+    const wide = pillOf(canvas, '99+');
+    await expect(wide.getBoundingClientRect().width, 'grows with its digits').toBeGreaterThan(20);
+    await expect(wide.getBoundingClientRect().height).toBe(20);
+};
+
+/** `max` caps the number with a `+`. */
+export const Max = () => (
+    <div style={row}>
+        <Count value={99} />
+        <Count value={100} />
+        <Count value={12} max={9} />
+    </div>
+);
+Max.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('99')).toBeInTheDocument();
+    await expect(canvas.getByText('99+')).toBeInTheDocument();
+    await expect(canvas.getByText('9+')).toBeInTheDocument();
+    await expect(canvas.queryByText('100')).toBeNull();
+};
+
+/** A count of 0 renders nothing, unless `showZero`. */
+export const Zero = () => (
+    <div style={row}>
+        <span data-testid="hidden">Messages <Count value={0} /></span>
+        <span data-testid="shown">Results <Count value={0} showZero /></span>
+    </div>
+);
+Zero.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const hidden = canvas.getByTestId('hidden');
+    await expect(hidden).toHaveTextContent(/^Messages$/);
+    await expect(hidden.children).toHaveLength(0);
+    await expect(within(canvas.getByTestId('shown')).getByText('0')).toBeInTheDocument();
+};
+
+/** The ring, for a count pinned to an icon or avatar: 2px of surface outside the pill. */
+export const Ring = () => (
+    <div style={row}>
+        <span style={{ position: 'relative', display: 'inline-flex' }}>
+            <i className="fa-solid fa-bell" aria-hidden="true" style={{ fontSize: '20px' }} />
+            <span style={{ position: 'absolute', top: '-6px', right: '-10px' }}>
+                <Count value={3} appearance="bold" style="danger" ring label="3 notifications" />
+            </span>
+        </span>
+        <span style={{ position: 'relative', display: 'inline-flex' }}>
+            <i className="fa-solid fa-bell" aria-hidden="true" style={{ fontSize: '20px' }} />
+            <span style={{ position: 'absolute', top: '-2px', right: '-2px', display: 'flex' }}>
+                <Count appearance="dot" style="danger" ring label="New notifications" />
+            </span>
+        </span>
+    </div>
+);
+Ring.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const surface = tokenColor(canvasElement, '--color-surface');
+
+    const numeric = canvas.getByText('3').parentElement;
+    const dot = canvas.getByRole('img', { name: 'New notifications' });
+    for (const el of [numeric, dot]) {
+        const shadow = getComputedStyle(el).boxShadow;
+        await expect(shadow, 'the ring is the surface color').toContain(surface);
+        await expect(shadow, 'the ring is 2px, spread outside the box').toMatch(/0px 0px 0px 2px/);
+    }
+    await expect(numeric.getBoundingClientRect().height, 'the ring does not change the height').toBe(20);
+    await expect(dot.getBoundingClientRect().height).toBe(8);
+};
+
+/**
+ * Every style, subtle and bold, at both sizes, and the dot. Bold warning uses
+ * Warning Container.
+ */
+export const Styles = () => (
+    <div style={{ display: 'grid', gap: '12px' }}>
+        {['subtle', 'bold'].flatMap((appearance) => COUNT_SIZES.map((size) => (
+            <div key={`${appearance}-${size}`} style={row}>
+                {COUNT_STYLES.map((style) => (
+                    <Count
+                        key={style}
+                        value={12}
+                        appearance={appearance}
+                        style={style}
+                        size={size}
+                        label={`${appearance} ${style} ${size}`}
+                    />
+                ))}
+            </div>
+        )))}
+        <div style={row}>
+            {COUNT_STYLES.map((style) => (
+                <Count key={style} appearance="dot" style={style} label={`dot ${style}`} />
+            ))}
+        </div>
+    </div>
+);
+Styles.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const pill = (name) => canvas.getByText(name).parentElement;
+    const token = (name) => tokenColor(canvasElement, name);
+
+    // [ground, ink] per style, from the Figma set.
+    const expected = {
+        subtle: {
+            neutral: ['--color-on-surface-variant-state-08', '--color-on-surface-variant'],
+            success: ['--color-success-state-08', '--color-success-text'],
+            warning: ['--color-warning-state-08', '--color-warning-text'],
+            danger: ['--color-danger-state-08', '--color-danger-text'],
+            info: ['--color-tertiary-state-08', '--color-tertiary-text'],
+            discovery: ['--color-mastering-content-state-08', '--color-mastering-content-text'],
+        },
+        bold: {
+            neutral: ['--color-inverse-surface', '--color-inverse-on-surface'],
+            success: ['--color-success', '--color-on-success'],
+            warning: ['--color-warning-container', '--color-on-warning-container'],
+            danger: ['--color-danger', '--color-on-danger'],
+            info: ['--color-tertiary', '--color-on-tertiary'],
+            discovery: ['--color-mastering-content', '--color-on-mastering-content'],
+        },
+    };
+
+    for (const [appearance, styles] of Object.entries(expected)) {
+        for (const size of COUNT_SIZES) {
+            for (const [style, [ground, ink]] of Object.entries(styles)) {
+                const name = `${appearance} ${style} ${size}`;
+                const s = getComputedStyle(pill(name));
+                await expect(s.backgroundColor, `${name} ground`).toBe(token(ground));
+                await expect(s.color, `${name} ink`).toBe(token(ink));
+                await expect(pill(name).getBoundingClientRect().height, `${name} height`).toBe(size === 'small' ? 16 : 20);
+            }
+        }
+    }
+
+    const dots = {
+        neutral: '--color-on-surface-variant',
+        success: '--color-success',
+        warning: '--color-warning',
+        danger: '--color-danger',
+        info: '--color-tertiary',
+        discovery: '--color-mastering-content',
+    };
+    for (const [style, fill] of Object.entries(dots)) {
+        const dot = canvas.getByRole('img', { name: `dot ${style}` });
+        await expect(getComputedStyle(dot).backgroundColor, `dot ${style} fill`).toBe(token(fill));
+    }
+};
+
+/**
+ * A dot without `label` warns in development; with one, the name is exposed.
+ * Both dots mount on a button press after the console is watched, so the
+ * named one is shown not to warn and the unnamed one is shown to. The unnamed
+ * dot is removed again so the story itself stays accessible.
+ */
+export const DotNeedsALabel = () => {
+    const [named, setNamed] = useState(false);
+    const [unnamed, setUnnamed] = useState(false);
+    return (
+        <div style={row}>
+            <button type="button" onClick={() => setNamed(true)}>Mount a named dot</button>
+            <button type="button" onClick={() => setUnnamed((v) => !v)}>
+                {unnamed ? 'Remove the unnamed dot' : 'Mount an unnamed dot'}
+            </button>
+            {named && <Count appearance="dot" style="success" label="Online" />}
+            {unnamed && <span data-testid="unnamed"><Count appearance="dot" /></span>}
+        </div>
+    );
+};
+DotNeedsALabel.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const warn = spyOn(console, 'warn').mockImplementation(() => {});
+    const countWarnings = () => warn.mock.calls.filter(([m]) => String(m).includes('[Count]'));
+    try {
+        await userEvent.click(canvas.getByRole('button', { name: 'Mount a named dot' }));
+        await expect(canvas.getByRole('img', { name: 'Online' })).toBeInTheDocument();
+        await expect(countWarnings(), 'a named dot does not warn').toHaveLength(0);
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Mount an unnamed dot' }));
+        await expect(canvas.getByTestId('unnamed')).toBeInTheDocument();
+        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('needs a `label`'));
+        await userEvent.click(canvas.getByRole('button', { name: 'Remove the unnamed dot' }));
+    } finally {
+        warn.mockRestore();
+    }
+};
+
+/** With a label, a number is read as information rather than a bare digit. */
+export const LabeledNumber = () => (
+    <button type="button" className="btn btn-outline-secondary">
+        Messages <Count value={4} label="4 unread" />
+    </button>
+);
+LabeledNumber.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('button', { name: 'Messages 4 unread' })).toBeInTheDocument();
+    await expect(canvas.queryByRole('img')).toBeNull();
+};
+
+/* -------------------------------------------------------------- playground */
+
+/** Interactive playground. */
+export const Interactive = {
+    args: {
+        value: 12,
+        max: 99,
+        showZero: false,
+        appearance: 'subtle',
+        style: 'neutral',
+        size: 'medium',
+        ring: false,
+        label: '',
+    },
+    argTypes: {
+        appearance: { control: 'inline-radio', options: COUNT_APPEARANCES },
+        style: { control: 'select', options: COUNT_STYLES },
+        size: { control: 'inline-radio', options: COUNT_SIZES },
+    },
+    render: (args) => <Count {...args} label={args.label || (args.appearance === 'dot' ? 'Notification' : undefined)} />,
+};

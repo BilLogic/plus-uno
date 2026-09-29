@@ -525,7 +525,8 @@ describe('the colour key is finer than the normaliser it replaces', () => {
 
     // And every comparison the check does make is opaque on both sides. The
     // count is asserted because a DROP in it is how a capture quietly stops
-    // reading fallbacks at all.
+    // reading fallbacks at all. A new stylesheet whose opaque fallbacks agree
+    // with their tokens raises it, as Tile's and Count's did.
     let comparable = 0;
     for (const use of usages) {
       if (use.literal === null || !tokens.has(use.token)) continue;
@@ -536,7 +537,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
       expect(literal.length, `${use.literal} carries alpha`).toBe(7);
       expect(tokenValue.length, `${use.token} carries alpha`).toBe(7);
     }
-    expect(comparable).toBe(478);
+    expect(comparable).toBe(501);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

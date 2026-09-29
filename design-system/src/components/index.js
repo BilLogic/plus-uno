@@ -13,6 +13,7 @@ export { default as ButtonGroup } from '@/components/actions/ButtonGroup';
 export { default as Card } from '@/components/layout-and-structure/Card';
 export { default as Carousel } from '@/components/layout-and-structure/Carousel';
 export { default as Collapse } from '@/components/layout-and-structure/Collapse';
+export { default as Count } from '@/components/status-and-loading/Count';
 export { default as Divider } from '@/components/layout-and-structure/Divider';
 export { default as Dropdown } from '@/components/forms-and-inputs/Dropdown';
 export { default as Footer } from '@/components/_internal/Footer/Footer';
