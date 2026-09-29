@@ -7,6 +7,9 @@
 export * from "./store";
 export * from "./record";
 export * from "./prices";
+export * from "./categories";
+export * from "./category-store";
+export * from "./classify-run";
 export { createInMemoryUsageLog, type InMemoryUsageLog } from "./in-memory";
 export { createD1UsageLog, type UsageDatabase } from "./d1";
 // How each ask was resolved: a second port over the same rows. Its `Env`

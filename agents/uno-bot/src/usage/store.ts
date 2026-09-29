@@ -15,8 +15,12 @@
 // PURE: no `Env`, no Workers global. `Env` stops in `./production.ts` (and, for
 // the resolution columns, `./resolution-env.ts`).
 
+import type { ConversationType } from "../turn/turn";
+import type { PainCategory, SubType } from "./categories";
+
 /** One turn, as the `turns` table holds it. Field names are camelCase here and
- *  snake_case in SQL; `./d1.ts` is the one place they are mapped. */
+ *  snake_case in SQL; `./d1.ts` is the one place they are mapped. The
+ *  classifier's writes to the category columns are `./category-store.ts`'s. */
 export interface TurnRecord {
   // ── identity and place ──
   /** `<channel>:<the asker's message ts>` — stable across a retried alarm, so
@@ -27,11 +31,16 @@ export interface TurnRecord {
   build: string;
   /** Slack user id of the asker. */
   requesterId: string;
-  /** The code's surface: `assistant` is the app DM, `channel` everything else. */
+  /** The code's surface: `assistant` is the app DM, `channel` everything else
+   *  — a group DM included, since it is delivered like a channel. Who the
+   *  conversation belongs to is `conversationType`. */
   surface: "assistant" | "channel";
+  /** `channel` · `group` (private channel) · `mpim` (group DM) · `im` (app DM);
+   *  null when the event did not say (an `app_mention`). */
+  conversationType: ConversationType | null;
   /** True when the ask arrived inside an existing thread. */
   inThread: boolean;
-  /** The channel id, for channel turns only — null for DM turns. */
+  /** The channel id, for channel turns only — null for a DM or group DM. */
   channelId: string | null;
 
   // ── timing ──
@@ -78,14 +87,30 @@ export interface TurnRecord {
   selfFiledTicketUrl: string | null;
   /** Evals, debug probes, the sandbox channel, bare greetings (`./record.ts`). */
   testTraffic: boolean;
+
+  // ── corpus categories (`./categories.ts`) ──
+  /** What a CHANNEL ask said, kept only until the end-of-day classifier labels
+   *  it, and never past 14 days (ADR-030). Null — at every point — unless the
+   *  conversation is known to be a channel (`keepsRequestText`), and for test
+   *  traffic. */
+  requestText: string | null;
+  /** The corpus Sub-type, exact-matched to the options; null is blank. */
+  subType: SubType | null;
+  /** 1–7 (`painCategoryOf`); 7 is a turn that staged a card or intake. */
+  painCategory: PainCategory | null;
+  /** When a classifier labelled the ask, epoch ms; null until one has. */
+  classifiedAt: number | null;
 }
 
 /**
  * Where a finished turn is written.
  *
  * `record` is an UPSERT on `turnId`: a turn retried by the runner rewrites its
- * own row rather than adding a second. A caller must treat a throw as a lost
- * record, never as a lost turn — Turn logs and swallows it.
+ * own row rather than adding a second. The category columns are the
+ * classifier's once it has run: a retry never blanks a label (a null leaves
+ * the stored one), and never brings text back to a row already classified.
+ * A caller must treat a throw as a lost record, never as a lost turn — Turn
+ * logs and swallows it.
  */
 export interface UsageLog {
   record(turn: TurnRecord): Promise<void>;

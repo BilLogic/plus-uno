@@ -15,10 +15,11 @@ import { applyD1Migrations, env } from "cloudflare:test";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { D1_QUERY_CAP, d1QueriesUsed, internalSubrequestsUsed, isSubrequestBudgetError, runMetered } from "../../src/net";
+import { createD1AskCategories } from "../../src/usage/category-store";
 import { createD1UsageLog } from "../../src/usage/d1";
 import { createD1ResolutionLog } from "../../src/usage/resolution-d1";
 import { runResolutionLogConformance } from "../helpers/resolution-log-conformance";
-import { runUsageLogConformance, turnRecord } from "../helpers/usage-log-conformance";
+import { runCategoryConformance, runUsageLogConformance, turnRecord } from "../helpers/usage-log-conformance";
 
 const bindings = env as unknown as {
   USAGE_DB: D1Database;
@@ -36,6 +37,17 @@ beforeEach(async () => {
 runUsageLogConformance("d1", () => createD1UsageLog({ db: bindings.USAGE_DB }), {
   it: (name, fn) => it(name, fn),
 });
+
+// The corpus-category cases — the classifier's queue, its one write, the
+// 14-day purge on a fake clock — against the real schema.
+runCategoryConformance(
+  "d1",
+  () => ({
+    log: createD1UsageLog({ db: bindings.USAGE_DB }),
+    store: createD1AskCategories({ db: bindings.USAGE_DB }),
+  }),
+  { it: (name, fn) => it(name, fn) },
+);
 
 runResolutionLogConformance(
   "d1",
@@ -82,6 +94,7 @@ describe("[d1] the migrations", () => {
       "turns_by_time",
       "turns_resolution_unchecked",
       "turns_unclassified",
+      "turns_with_text",
     ]);
   });
 
@@ -97,5 +110,21 @@ describe("[d1] the migrations", () => {
       "EXPLAIN QUERY PLAN SELECT turn_id FROM turns WHERE resolution_checked_at IS NULL AND test_traffic = 0 AND asked_at > 0 ORDER BY asked_at",
     ).all<{ detail: string }>();
     expect(results.map((r) => r.detail).join(" | ")).toMatch(/turns_resolution_unchecked/);
+  });
+});
+
+describe("[d1] the categories migration", () => {
+  it("serves the purge from the rows-with-text index", async () => {
+    const { results } = await bindings.USAGE_DB.prepare(
+      "EXPLAIN QUERY PLAN UPDATE turns SET request_text = NULL WHERE request_text IS NOT NULL AND asked_at < 1",
+    ).all<{ detail: string }>();
+    expect(results.map((r) => r.detail).join(" | ")).toMatch(/turns_with_text/);
+  });
+
+  it("refuses a pain_category outside 1–7", async () => {
+    await createD1UsageLog({ db: bindings.USAGE_DB }).record(turnRecord());
+    await expect(
+      bindings.USAGE_DB.prepare("UPDATE turns SET pain_category = 8").run(),
+    ).rejects.toThrow(/CHECK/);
   });
 });

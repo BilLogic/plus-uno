@@ -15,6 +15,7 @@
 // Free of `Env` and Workers globals, so the Node suite drives the whole firing
 // through its two named dependencies (tests/scheduled-firing.test.ts).
 
+import { CLASSIFY_BATCHES } from "../usage/classify-run";
 import { ASK_RESOLUTION_JOBS } from "../usage/resolution-pass";
 
 /** The end-of-day run's first `ask-resolution` job: the one that announces a
@@ -28,15 +29,19 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * What a scheduled job does. `noop` proves the path and does nothing else.
  * The Figma library's three: the end-of-day poll finds a publish, the morning
  * post turns it into a card in #plus-universal, and the morning track follows
- * each posted card to its PR (src/figma-poll.ts, src/figma-library/).
- * `ask-resolution` is the end-of-day 24 h pass that records how each ask was
- * resolved (src/usage/resolution-pass.ts).
+ * each posted card to its PR (src/figma-poll.ts, src/figma-library/). The
+ * usage record's two: the end-of-day classify jobs label a batch of channel
+ * asks each, and the purge — in both runs — keeps text under its 14 days
+ * (src/usage/classify-run.ts). `ask-resolution` is the end-of-day 24 h pass
+ * that records how each ask was resolved (src/usage/resolution-pass.ts).
  */
 export type ScheduledJobKind =
   | "noop"
   | "figma-library-poll"
   | "figma-library-post"
   | "figma-library-track"
+  | "usage-classify"
+  | "usage-text-purge"
   | "ask-resolution";
 
 /** One unit of a run — one alarm's work. */
@@ -73,15 +78,26 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
   morning: [
     { key: "figma-library-post", kind: "figma-library-post" },
     { key: "figma-library-track", kind: "figma-library-track" },
+    // Both runs purge, so no text outlives 14 days across a weekend and one
+    // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).
+    { key: "usage-text-purge", kind: "usage-text-purge" },
   ],
   "end-of-day": [
     { key: "figma-library-poll", kind: "figma-library-poll" },
+    // One job per classification batch, each an alarm of its own. Each takes
+    // whatever is still pending, so a quiet day's later jobs find nothing.
+    ...Array.from({ length: CLASSIFY_BATCHES }, (_, i) => ({
+      key: `usage-classify-${i + 1}`,
+      kind: "usage-classify" as const,
+    })),
     // One alarm reads `PASS_LIMIT` asks; the run holds enough jobs for a day's
     // (src/usage/resolution-pass.ts states the budget math).
     ...Array.from({ length: ASK_RESOLUTION_JOBS }, (_, i) => ({
       key: i === 0 ? FIRST_ASK_RESOLUTION_KEY : `ask-resolution-${i + 1}`,
       kind: "ask-resolution" as const,
     })),
+    // Not after the classify jobs: the purge holds whether or not they ran.
+    { key: "usage-text-purge", kind: "usage-text-purge" },
   ],
 };
 

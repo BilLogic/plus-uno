@@ -42,7 +42,21 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
   // The dependency set is the whole of what a firing can do.
   const deps: Parameters<typeof onScheduledFiring>[1] = { enqueueRun: async () => {} };
   assert.deepEqual(Object.keys(deps), ["enqueueRun"]);
-  assert.deepEqual(planRun("end-of-day", at(22, 0)).jobs[0]?.kind, "figma-library-poll");
+  assert.deepEqual(planRun("end-of-day", at(22, 0)).jobs.map((j) => j.kind), [
+    "figma-library-poll",
+    "usage-classify",
+    "usage-classify",
+    "usage-classify",
+    "usage-classify",
+    "usage-classify",
+    "ask-resolution",
+    "ask-resolution",
+    "ask-resolution",
+    "ask-resolution",
+    "ask-resolution",
+    "ask-resolution",
+    "usage-text-purge",
+  ]);
 });
 
 test("14:00 UTC enqueues the morning run and 22:00 UTC the end-of-day run", async () => {
@@ -83,17 +97,27 @@ test("each run is planned with its jobs, keyed by the UTC run date", () => {
   assert.deepEqual(morning.jobs.map((j) => [j.key, j.kind]), [
     ["figma-library-post", "figma-library-post"],
     ["figma-library-track", "figma-library-track"],
+    // Both runs purge, so text never outlives its 14 days over a weekend.
+    ["usage-text-purge", "usage-text-purge"],
   ]);
   const endOfDay = planRun("end-of-day", at(22, 0));
-  assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind]), [
-    ["figma-library-poll", "figma-library-poll"],
+  assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind, j.after]), [
+    ["figma-library-poll", "figma-library-poll", undefined],
+    // One job per classification batch.
+    ["usage-classify-1", "usage-classify", undefined],
+    ["usage-classify-2", "usage-classify", undefined],
+    ["usage-classify-3", "usage-classify", undefined],
+    ["usage-classify-4", "usage-classify", undefined],
+    ["usage-classify-5", "usage-classify", undefined],
     // One job per `PASS_LIMIT` asks (src/usage/resolution-pass.ts).
-    ["ask-resolution-1", "ask-resolution"],
-    ["ask-resolution-2", "ask-resolution"],
-    ["ask-resolution-3", "ask-resolution"],
-    ["ask-resolution-4", "ask-resolution"],
-    ["ask-resolution-5", "ask-resolution"],
-    ["ask-resolution-6", "ask-resolution"],
+    ["ask-resolution-1", "ask-resolution", undefined],
+    ["ask-resolution-2", "ask-resolution", undefined],
+    ["ask-resolution-3", "ask-resolution", undefined],
+    ["ask-resolution-4", "ask-resolution", undefined],
+    ["ask-resolution-5", "ask-resolution", undefined],
+    ["ask-resolution-6", "ask-resolution", undefined],
+    // Waits on nothing, so it runs whether or not the classify jobs did.
+    ["usage-text-purge", "usage-text-purge", undefined],
   ]);
 });
 

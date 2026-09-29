@@ -82,7 +82,14 @@ import {
   type ThreadState,
   type VisionReference,
 } from "../thread-state/index";
-import { buildTurnRecord, type TurnOrigin, type TurnRecord, type UsageLog } from "../usage/index";
+import {
+  buildTurnRecord,
+  withAskLabel,
+  type SubType,
+  type TurnOrigin,
+  type TurnRecord,
+  type UsageLog,
+} from "../usage/index";
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
@@ -136,6 +143,17 @@ const PROGRESS_LABEL = "Reading the question and this thread";
  *  lingers on a slow database before the record is given up as lost. */
 export const USAGE_WRITE_TIMEOUT_MS = 1_000;
 
+/**
+ * The longest an ask's in-turn classification may hold the end of a turn.
+ * The answer is already out; what waits is the thread's next job. NOT
+ * MEASURED: a flash-lite one-shot at the chill tier's `low` thinking, with a
+ * few hundred tokens in and a dozen out, is expected around 1–2 s at p50 on
+ * Vertex, so 4 s is meant to cover the tail without holding a follow-up long.
+ * Past it the row is written unlabelled, as a failed call is. Read the
+ * `[usage] … not classified: timed out` lines to tune it.
+ */
+export const ASK_CLASSIFY_TIMEOUT_MS = 4_000;
+
 // ── The request ──────────────────────────────────────────────────────────────
 
 /**
@@ -150,6 +168,24 @@ export const USAGE_WRITE_TIMEOUT_MS = 1_000;
  * read by both callers and by `slack/assistant.ts`.
  */
 export type TurnSurface = "channel" | "assistant";
+
+/**
+ * What kind of conversation an ask was made in, as Slack types it: a public
+ * `channel`, a private `group`, a group DM (`mpim`) or the app DM (`im`).
+ *
+ * NOT the surface. `surface` says where the answer is delivered, and a group
+ * DM is delivered like a channel; this says whose conversation it is, which is
+ * what the usage record's privacy rules read (`usage/record.ts`). Unknown when
+ * the event did not say — an `app_mention` carries no `channel_type` — and
+ * unknown is treated as private.
+ */
+export const CONVERSATION_TYPES = ["channel", "group", "mpim", "im"] as const;
+export type ConversationType = (typeof CONVERSATION_TYPES)[number];
+
+/** A value as a `ConversationType`, or undefined when it is not one. */
+export function asConversationType(value: unknown): ConversationType | undefined {
+  return CONVERSATION_TYPES.find((t) => t === value);
+}
 
 export interface TurnRequest {
   // ----- who -----
@@ -166,6 +202,8 @@ export interface TurnRequest {
   /** The person's own message, which is what a reaction lands on. */
   userMsgTs: string;
   surface: TurnSurface;
+  /** Whose conversation this is, when known (`conversationTypeOf`). */
+  conversationType?: ConversationType;
   /** True when the message arrived inside an existing thread. A turn that
    *  OPENED its thread is the one allowed to title it, and the antecedent
    *  window only ever opens for a top-level channel @mention. */
@@ -344,6 +382,16 @@ export interface TurnUsage {
   testChannelIds: readonly string[];
   /** Overrides `USAGE_WRITE_TIMEOUT_MS`; a test's way to not wait it out. */
   writeTimeoutMs?: number;
+  /**
+   * Label one ask with its corpus Sub-type — one short `chill` call
+   * (`usage/categories.ts` `classifyAsks`). Asked, as the turn finishes, only
+   * for a real ask whose row keeps no text for the end-of-day classifier to
+   * read (a DM, a group DM, an unknown conversation). Absent, those asks are
+   * recorded unlabelled.
+   */
+  classifyAsk?(text: string): Promise<SubType | null>;
+  /** Overrides `ASK_CLASSIFY_TIMEOUT_MS`. */
+  classifyTimeoutMs?: number;
 }
 
 export interface TurnDeps {
@@ -572,32 +620,61 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
   );
 
   // Written AFTER the working signal is down and the answer is out, so the
-  // record costs the person nothing they can see.
-  await recordTurn(
-    buildTurnRecord({
-      build: BUILD,
-      origin: deps.usage.origin,
-      testChannelIds: deps.usage.testChannelIds,
-      requesterId: request.userId,
-      surface: request.surface,
-      inThread: request.threaded,
-      channel: request.channel,
-      askTs: request.userMsgTs,
-      question: request.text,
-      startedAt,
-      firstAnswerAt,
-      tier: outcome.telemetry.tier,
-      routeReason: outcome.telemetry.route,
-      ...(outcome.telemetry.spend ? { spend: outcome.telemetry.spend } : {}),
-      toolsCalled: outcome.telemetry.tools,
-      ...(outcome.posted !== undefined ? { posted: outcome.posted } : {}),
-      disposition: outcome.disposition,
-      ...(outcome.staged ? { proposalId: outcome.staged.proposal.proposalTs } : {}),
-      ...(outcome.executed ? { executed: outcome.executed } : {}),
-    }),
-    deps.usage,
-  );
+  // record — and a DM ask's classification — costs the person nothing they
+  // can see.
+  const record = buildTurnRecord({
+    build: BUILD,
+    origin: deps.usage.origin,
+    testChannelIds: deps.usage.testChannelIds,
+    requesterId: request.userId,
+    surface: request.surface,
+    ...(request.conversationType ? { conversationType: request.conversationType } : {}),
+    inThread: request.threaded,
+    channel: request.channel,
+    askTs: request.userMsgTs,
+    question: request.text,
+    startedAt,
+    firstAnswerAt,
+    tier: outcome.telemetry.tier,
+    routeReason: outcome.telemetry.route,
+    ...(outcome.telemetry.spend ? { spend: outcome.telemetry.spend } : {}),
+    toolsCalled: outcome.telemetry.tools,
+    ...(outcome.posted !== undefined ? { posted: outcome.posted } : {}),
+    disposition: outcome.disposition,
+    ...(outcome.staged ? { proposalId: outcome.staged.proposal.proposalTs } : {}),
+    ...(outcome.executed ? { executed: outcome.executed } : {}),
+  });
+  await recordTurn(await labelInTurn(record, request.text, deps.usage, clock), deps.usage);
   return outcome;
+}
+
+/**
+ * An ask whose row will never hold its text — a DM, a group DM, a conversation
+ * of unknown type — labelled in the turn: the one moment its text exists.
+ * A channel ask (labelled at the end of the day), test traffic (greetings
+ * included) and a caller with no classifier are left as they are. A call that
+ * fails or outlasts its timeout leaves the row unlabelled and is logged
+ * without the model's words — it never fails the turn.
+ */
+async function labelInTurn(
+  record: TurnRecord,
+  text: string,
+  usage: TurnUsage,
+  clock: () => number,
+): Promise<TurnRecord> {
+  if (record.requestText !== null || record.testTraffic || !usage.classifyAsk) return record;
+  try {
+    const subType = await withTimeout(
+      usage.classifyAsk(text),
+      usage.classifyTimeoutMs ?? ASK_CLASSIFY_TIMEOUT_MS,
+    );
+    return withAskLabel(record, subType, clock());
+  } catch (err) {
+    console.error(
+      `[usage] turn ${record.turnId} not classified: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return record;
+  }
 }
 
 /**
@@ -628,19 +705,25 @@ function watchFirstAnswer(delivery: Delivery, onFirst: () => void): Delivery {
  * thing it measures.
  */
 async function recordTurn(record: TurnRecord, usage: TurnUsage): Promise<void> {
-  const timeoutMs = usage.writeTimeoutMs ?? USAGE_WRITE_TIMEOUT_MS;
-  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
-    await Promise.race([
-      usage.log.record(record),
-      new Promise<never>((_, reject) => {
-        timer = setTimeout(() => reject(new Error(`timed out after ${timeoutMs} ms`)), timeoutMs);
-      }),
-    ]);
+    await withTimeout(usage.log.record(record), usage.writeTimeoutMs ?? USAGE_WRITE_TIMEOUT_MS);
   } catch (err) {
     console.error(
       `[usage] turn ${record.turnId} not recorded: ${err instanceof Error ? err.message : String(err)}`,
     );
+  }
+}
+
+/** `work`, or a rejection once `timeoutMs` has passed — whichever is first. */
+async function withTimeout<T>(work: Promise<T>, timeoutMs: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      work,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`timed out after ${timeoutMs} ms`)), timeoutMs);
+      }),
+    ]);
   } finally {
     if (timer !== undefined) clearTimeout(timer);
   }
