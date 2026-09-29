@@ -103,9 +103,10 @@ Figma → npm run sync:tokens → npm run generate:tokens → commit SCSS
 ```
 
 - Never edit generated token files (`_colors.scss`, `_spacing_semantics.scss`, etc.) directly
-- Exception, 2026-09-29: the state-layer bases in `_colors.scss` were hand-set
-  to match the Figma `State-layers` variables, because the color source JSON
-  lags Figma. Carry them into the source before the generator next runs.
+- Exception, 2026-09-29: ten of the state-layer bases in `_colors.scss` were
+  hand-set to match the Figma `State-layers` variables, because the color
+  source JSON lags Figma. Carry them into the source before the generator next
+  runs.
 - Token source is Figma; SCSS is generated output
 - Figma mapping tables: `design-system/guidelines/figma/token-mapping.md`
 - Refresh agent views: `npm run generate:agent`

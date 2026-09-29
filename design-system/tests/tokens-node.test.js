@@ -14,8 +14,8 @@
  *   the corpus   where tokens live, read once, aliases followed — and read
  *                THROUGH the one reader, which is the defect a first
  *                implementation of this module committed and this file guards.
- *   the family   which family a token name belongs to — and, since #644, the
- *                one place the colour family's naming promises MORE than its
+ *   the family   which family a token name belongs to — and the one place
+ *                the color family's naming promises MORE than its
  *                values keep: a `-state-08/12/16` overlay is a wash of the
  *                role it is named after, except the three shadow steps, which
  *                name a role that has no token. That one exception is pinned
@@ -24,7 +24,7 @@
  *
  * The third is the one with teeth, in two directions:
  *
- *   WIDER than `parseColour`: two harness checks each carried their own colour
+ *   WIDER than `parseColour`: two harness checks each carried their own color
  *   key. #621 retired the fallback checks' rival; #622 retired the docs
  *   check's. Both are spelled below, so the parity stays a measurement against
  *   the implementations that were deleted rather than against the module
@@ -305,7 +305,7 @@ describe('a state overlay is mixed from the base it is named after', () => {
 
   /**
    * The exception, by BASE rather than by overlay: all three steps of a base
-   * diverge together, because they are three alphas over one colour.
+   * diverge together, because they are three alphas over one color.
    *
    * `--color-shadow` is the only row, and it is not a drift: there is no
    * `--color-shadow` token at all, and a shadow wash is black. It is recorded
@@ -417,9 +417,9 @@ describe('the colour key — every form the checks accept', () => {
 describe('the colour key is finer than the normaliser it replaces', () => {
   /*
    * ONE PAIR, NAMED. `--color-secondary-state-08` is the 8% overlay of the
-   * colour `--color-secondary-border` is; the old normaliser is `parseColour`
+   * color `--color-secondary-border` is; the old normaliser is `parseColour`
    * followed by `toHex`, and `toHex` drops alpha, so it calls them the same
-   * colour.
+   * color.
    */
   it('calls a translucent overlay and its solid DIFFERENT, where the normaliser called them equal', () => {
     const corpus = tokenCorpus();
@@ -435,7 +435,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
 
   /*
    * AND HOW MANY OF THEM THERE ARE, counted rather than recalled: every
-   * unordered pair of live colour tokens the old normaliser could read, where
+   * unordered pair of live color tokens the old normaliser could read, where
    * it says equal and this key says unequal. 315 on 2026-09-18; 357 on
    * 2026-09-29, when the ten `-border-subtle` label borders added 45% washes of
    * bases already in the corpus; 405 the same day, when ten state-layer bases
