@@ -14,28 +14,31 @@ name: check:harness
 # commit GitHub builds from the head and the base, so that pair would have been
 # caught on the second PR rather than on main.
 #
-# EXACTLY ONE `npm ci`, AND IT IS SCOPED. The composite is ~14s, and the job
-# around it is 34–38s: the difference is mostly the single `npm ci` in
-# `agents/uno-bot` (~11s) that the step below explains. That is the whole
-# dependency budget. This header read "NO `npm ci`, DELIBERATELY … every
-# composed sub-check is dependency-free" for three weeks after the install
-# landed with the Worker's `typecheck` and `test` rows (2026-08-29) — a file
-# arguing for a number forty lines above the step that changed it. Re-measured
-# and restated in #580, and re-measured again in #587, which moved the 4s
-# workerd step out to its own job: 40s became 34–38s. Every figure here is a
-# measurement rather than a subtraction — run 35277835410 for the 40s and its
-# per-step breakdown, runs 35279458463 and 35280023516 for the 34s and the 38s
-# (all 2026-09-17). WHICH IS THE HONEST SHAPE OF THE SAVING: 4s off a job whose
-# run-to-run spread is itself about 4s, so the seconds are a rounding error and
-# the reason that step moved is legibility, argued in `uno-bot-checks.yml`.
+# TWO INSTALLS, BOTH SCOPED. Neither is a root `npm ci` of every devDependency.
+#   1. `npm ci` in `agents/uno-bot` (14–15s), which the step below explains.
+#   2. The stylesheet parser `check:focus-ring` and `check:text-contrast` read
+#      `@grounds` and `@contrast` with: postcss, postcss-scss and
+#      postcss-selector-parser plus their transitive dependencies, each at the
+#      version package-lock.json resolves, into the runner's temp directory and
+#      linked into `node_modules` (0–1s). What it buys: those two checks and
+#      their tests in `test:scripts` can run at all.
+# This header read "EXACTLY ONE `npm ci`" and 34–38s until the second install
+# landed, and before that "NO `npm ci`, DELIBERATELY" for three weeks after the
+# first one did — a file arguing for a number forty lines above the step that
+# changed it, twice. So the figure is re-measured rather than carried: the job
+# is 64–69s, of which the composite is 38–42s (runs 36616445040, 36617289152
+# and 36618392737, 2026-09-29). The second install is not where the time went
+# since the 34–38s reading; the composite grew. Earlier measurements: run
+# 35277835410 for 40s, runs 35279458463 and 35280023516 for 34s and 38s
+# (2026-09-17), after #587 moved the 4s workerd step out to its own job, whose
+# reason was legibility rather than seconds.
 #
-# 34–38s is still what keeps this gate switched on, and the rule the old paragraph
-# was protecting stands: a future sub-check that needs a package installs it in
-# its own step and says what it bought, rather than growing a blanket `npm ci`
-# at the root. A gate that costs ten minutes gets marked "not required" the
-# first busy week. A sub-check that would need a RUNTIME goes further out still
-# — to its own job, on its own name — which is what #587 decided for
-# `test:workerd` and wrote up in `uno-bot-checks.yml`.
+# The rule stands: a future sub-check that needs a package installs it in its
+# own step and says what it bought, rather than growing a blanket `npm ci` at
+# the root. A gate that costs ten minutes gets marked "not required" the first
+# busy week. A sub-check that would need a RUNTIME goes further out still — to
+# its own job, on its own name — which is what #587 decided for `test:workerd`
+# and wrote up in `uno-bot-checks.yml`.
 #
 # NOT PATHS-FILTERED, for the same reason `uno-bot-deploy.yml` is not: the
 # generated artifacts are assembled from docs/, skills/, design-system/ and the
@@ -96,19 +99,50 @@ jobs:
         working-directory: agents/uno-bot
         run: npm ci
 
-      # What it bought: `check:focus-ring`, `check:text-contrast` and their
-      # tests in `test:scripts` read `@grounds` and `@contrast` from a PARSED
-      # stylesheet (`scripts/lib/declared-grounds.mjs`), which needs postcss,
-      # postcss-scss and postcss-selector-parser. Scoped, per the header: the
-      # three packages at the versions package-lock.json pins, installed into
-      # the runner's temp directory and linked into the root node_modules, not a
-      # root `npm ci` of every devDependency.
+      # The second scoped install (see the header). The three packages and
+      # every package they depend on, each at the version package-lock.json
+      # resolves, so nothing here is chosen by the registry on the day.
+      # `--ignore-scripts`, because none of them needs an install script. The
+      # link step refuses to replace anything already in `node_modules`: a
+      # name there is a package this job did not expect, and shadowing it
+      # would be a silent change of what the checks run against.
       - name: Install the stylesheet parser for the contrast checks
         run: |
-          versions=$(node -p "const l = require('./package-lock.json').packages; ['postcss', 'postcss-scss', 'postcss-selector-parser'].map((n) => n + '@' + l['node_modules/' + n].version).join(' ')")
-          npm install --prefix "$RUNNER_TEMP/grounds" --no-save --no-audit --no-fund --ignore-scripts $versions
+          pins=$(node -e "
+            const lock = require('./package-lock.json').packages;
+            const pinned = new Map();
+            const queue = ['postcss', 'postcss-scss', 'postcss-selector-parser'].map((name) => ['node_modules/' + name, name]);
+            while (queue.length) {
+              const [at, name] = queue.shift();
+              // A dependency resolves where npm would: nested under its parent
+              // first, then at the top level.
+              const key = [at, 'node_modules/' + name].find((k) => lock[k]);
+              if (!key) throw new Error(name + ' is not in package-lock.json');
+              const { version, dependencies = {} } = lock[key];
+              if (pinned.has(name)) {
+                if (pinned.get(name) !== version) throw new Error('two versions of ' + name + ' in the lock; this step installs one');
+                continue;
+              }
+              pinned.set(name, version);
+              queue.push(...Object.keys(dependencies).map((dep) => [key + '/node_modules/' + dep, dep]));
+            }
+            console.log([...pinned].map(([name, version]) => name + '@' + version).join(' '));
+          ")
+          echo "Pinned: $pins"
+          npm install --prefix "$RUNNER_TEMP/grounds" --no-save --no-audit --no-fund --ignore-scripts $pins
           mkdir -p node_modules
-          ln -s "$RUNNER_TEMP"/grounds/node_modules/* node_modules/
+          for dir in "$RUNNER_TEMP"/grounds/node_modules/*; do
+            name=$(basename "$dir")
+            case " $pins " in
+              *" $name@"*) ;;
+              *) echo "::error::$name was installed but is not one of the pinned packages: $pins"; exit 1 ;;
+            esac
+            if [ -e "node_modules/$name" ] || [ -L "node_modules/$name" ]; then
+              echo "::error::node_modules/$name already exists; refusing to replace it with the pinned $name"
+              exit 1
+            fi
+            ln -s "$dir" "node_modules/$name"
+          done
 
       # One command, one exit code. The composite names every sub-check that
       # failed and prints each one's own diagnostic underneath — it does not stop
