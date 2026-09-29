@@ -19,7 +19,8 @@
  * primitives, because no Element token names them: space-900 (64) for the
  * default height and the status width, space-600 (32) for the circle,
  * space-300 (16) for the text bar's height, and space-1000 (80) for the
- * tag-person width.
+ * tag-person width. The status-spacious corner is the radius-150 primitive
+ * (6) for the same reason, as Status's large size is.
  *
  * NOT A TARGET. No pointer events and no selection: a placeholder cannot be
  * clicked, and the component renders it `aria-hidden` with no focus.

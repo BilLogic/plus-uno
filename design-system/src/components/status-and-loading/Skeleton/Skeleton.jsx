@@ -30,20 +30,20 @@ export const SKELETON_SHAPES = ['rect', 'circle', 'text'];
  * default number of lines, and the props it ignores. The component and its
  * development warnings both read this map.
  *
- * `bars` are the modifier classes of the shapes a preset draws. One bar is a
- * single shape; several are a group, drawn as `group` lays them out.
+ * `bars` lists the shapes a preset draws, each as its modifier names. One bar
+ * is a single shape; several are a group, drawn as `group` lays them out.
  */
 const PRESETS = {
-    status: { shape: 'rect', bars: ['status'], ignores: ['height', 'radius'] },
-    'status-spacious': { shape: 'rect', bars: ['status-spacious'], ignores: ['height', 'radius'] },
-    count: { shape: 'rect', bars: ['count'], ignores: ['width', 'height', 'radius'] },
-    tag: { shape: 'rect', bars: ['tag'], ignores: ['height', 'radius'] },
-    'tag-person': { shape: 'rect', bars: ['tag-person'], ignores: ['height', 'radius'] },
+    status: { shape: 'rect', bars: [['status']], ignores: ['height', 'radius'] },
+    'status-spacious': { shape: 'rect', bars: [['status-spacious']], ignores: ['height', 'radius'] },
+    count: { shape: 'rect', bars: [['count']], ignores: ['width', 'height', 'radius'] },
+    tag: { shape: 'rect', bars: [['tag']], ignores: ['height', 'radius'] },
+    'tag-person': { shape: 'rect', bars: [['tag-person']], ignores: ['height', 'radius'] },
     /* Three tag shapes at the TagGroup gap, as Figma draws them. */
     'tag-group': {
         shape: 'rect',
         group: 'tags',
-        bars: ['tag tag-wide', 'tag tag-narrow', 'tag tag-widest'],
+        bars: [['tag'], ['tag', 'tag-narrow'], ['tag', 'tag-widest']],
         ignores: ['width', 'height', 'radius'],
     },
     paragraph: { shape: 'text', lines: 3, ignores: ['height', 'radius'] },
@@ -70,8 +70,8 @@ const toLength = (value) => (typeof value === 'number' ? `${value}px` : value);
 /** Class names from parts, skipping the empty ones. */
 const cls = (...parts) => parts.filter(Boolean).join(' ');
 
-/** `plus-skeleton--a plus-skeleton--b` from `'a b'`. */
-const modifiers = (bar) => bar.split(' ').map((m) => `plus-skeleton--${m}`);
+/** `plus-skeleton--a plus-skeleton--b` from `['a', 'b']`. */
+const modifiers = (bar) => bar.map((m) => `plus-skeleton--${m}`);
 
 /*
  * A prop the chosen shape or preset ignores is almost always a mistake, so it
@@ -99,7 +99,13 @@ const ignoredProps = ({ preset, def, shape, resolvedShape, lines, passed }) => {
         const overridden = shape !== undefined && shape !== def.shape ? ['shape'] : [];
         add([...def.ignores, ...overridden], `with preset="${preset}", which sets its own size and shape`);
     } else {
-        if (resolvedShape === 'circle') add(['radius'], 'on a circle, which is always round');
+        if (resolvedShape === 'circle') {
+            add(['radius'], 'on a circle, which is always round');
+            // A circle takes one size. Given two that differ, the width wins.
+            if (passed.width !== undefined && passed.height !== undefined && toLength(passed.width) !== toLength(passed.height)) {
+                add(['height'], 'on a circle when it differs from `width`: a circle takes one size, the width');
+            }
+        }
         if (lines > 1) add(['height', 'radius'], 'on several lines: each line is a 16-tall text bar');
     }
     if (resolvedShape !== 'text') add(['lines'], 'unless the shape is text');
@@ -143,10 +149,12 @@ export const Skeleton = ({
      * sm gap, the last one shorter so the block reads as text rather than as a
      * stack of bars.
      */
-    const bars = def?.bars ?? Array.from({ length: count }, () => resolvedShape);
+    const bars = def?.bars ?? Array.from({ length: count }, () => [resolvedShape]);
     const group = def?.group ?? (bars.length > 1 ? 'lines' : null);
     const motion = isShimmering ? 'plus-skeleton--shimmer' : '';
-    const shared = { ...rest, style: { ...vars, ...style }, 'aria-hidden': 'true' };
+    // Never a role and never focusable, whatever the caller passes: a
+    // placeholder is not something to reach or name.
+    const shared = { ...rest, style: { ...vars, ...style }, 'aria-hidden': 'true', role: undefined, tabIndex: undefined };
 
     if (!group) {
         return <span {...shared} className={cls('plus-skeleton', ...modifiers(bars[0]), motion, className)} />;
@@ -166,7 +174,7 @@ Skeleton.propTypes = {
     shape: PropTypes.oneOf(SKELETON_SHAPES),
     /** Sized to a label (`status`, `status-spacious`, `count`, `tag`, `tag-person`), a loading TagGroup (`tag-group`) or three lines of text (`paragraph`). Sets shape, height and corners together and wins over them. */
     preset: PropTypes.oneOf(SKELETON_PRESETS),
-    /** Any CSS length, or a number of pixels. Text bars fill the line by default; a label preset has a stand-in width. Ignored by `count` and `tag-group`. */
+    /** Any CSS length, or a number of pixels. Text bars fill the line by default; a label preset has a stand-in width. Ignored by `count` and `tag-group`. A circle takes one size: `width`, or `height` when no width is given. */
     width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** Any CSS length, or a number of pixels. Ignored, with a warning, by presets and by several text `lines`, which are always 16 tall. */
     height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),

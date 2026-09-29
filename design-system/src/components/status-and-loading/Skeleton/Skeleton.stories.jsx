@@ -21,10 +21,24 @@ import Skeleton, { SKELETON_PRESETS, SKELETON_RADII, SKELETON_SHAPES } from './S
 /* ------------------------------------------------------------- the runner */
 
 /**
- * True inside the Storybook test runner (Vitest Browser Mode), where Vite runs
- * in `test` mode. Plain Storybook runs in `development` or `production`.
+ * Whether this is the Storybook test runner (Vitest Browser Mode). Two signals
+ * must agree: Vite's `test` mode, and Vitest's own browser marker
+ * (`window.__vitest_browser__`, private, checked against Vitest 4.1.11). Plain
+ * Storybook has neither. If only one is present — `vitest --mode other`, or a
+ * Vitest upgrade that drops the marker — this throws, so the ReducedMotion
+ * story fails instead of skipping silently.
  */
-const IN_TEST_RUNNER = import.meta.env.MODE === 'test';
+const inTestRunner = () => {
+    const testMode = import.meta.env.MODE === 'test';
+    const marker = window.__vitest_browser__ === true;
+    if (testMode !== marker) {
+        throw new Error(
+            `Skeleton stories: the runner signals disagree (Vite mode "${import.meta.env.MODE}", `
+            + `window.__vitest_browser__ ${marker ? 'present' : 'absent'}). Check both against the installed Vitest.`,
+        );
+    }
+    return marker;
+};
 
 /**
  * Sets the page's `prefers-reduced-motion` through the runner: a custom
@@ -42,7 +56,7 @@ const IN_TEST_RUNNER = import.meta.env.MODE === 'test';
  *   runner to ask; inside the runner a missing handle throws.
  */
 const emulateReducedMotion = async (value) => {
-    if (!IN_TEST_RUNNER) return false;
+    if (!inTestRunner()) return false;
     const commands = window.__vitest_browser_runner__?.commands;
     if (!commands) {
         throw new Error(
@@ -225,6 +239,8 @@ export const Shapes = () => (
         <Skeleton shape="circle" data-testid="circle" />
         <Skeleton shape="text" width={160} data-testid="text" />
         <Skeleton width={96} height={96} radius="card-radius-sm" data-testid="thumb" />
+        {/* A caller's role and tabIndex are dropped: a placeholder is never named or reached. */}
+        <Skeleton shape="text" width={80} role="img" tabIndex={0} data-testid="stripped" />
     </div>
 );
 Shapes.play = async ({ canvasElement }) => {
@@ -244,6 +260,8 @@ Shapes.play = async ({ canvasElement }) => {
     await expect(box(text).height, 'a text bar is 16 tall').toBe(16);
     await expect(radius(text)).toBe(4);
     await expect(box(text).width).toBe(160);
+
+    await expectInert(canvas.getByTestId('stripped'), 'a skeleton given role and tabIndex');
 
     const thumb = canvas.getByTestId('thumb');
     await expect(radius(thumb), 'radius takes a token name').toBe(12);
@@ -335,13 +353,9 @@ ReducedMotion.play = async ({ canvasElement }) => {
     });
 
     if (!(await emulateReducedMotion('reduce'))) return;
-    let reduced;
-    try {
-        await expect(window.matchMedia('(prefers-reduced-motion: reduce)').matches, 'the runner emulates the preference').toBe(true);
-        reduced = measure();
-    } finally {
-        await emulateReducedMotion(null);
-    }
+    // The file's beforeEach puts the preference back, even if this times out.
+    await expect(window.matchMedia('(prefers-reduced-motion: reduce)').matches, 'the runner emulates the preference').toBe(true);
+    const reduced = measure();
 
     for (const s of reduced) {
         await expect(s.animation, 'no animation under reduced motion').toBe('none');
@@ -355,7 +369,8 @@ ReducedMotion.play = async ({ canvasElement }) => {
  * region, never inside it, and mounts empty: text a status holds when it
  * mounts is not announced, and text inside a busy region may be held back
  * until the region is no longer busy. So the message is set after mount, and
- * set again when the content arrives.
+ * set again when the content arrives. A region that mounts already loaded
+ * announces only the "…loaded" message: there was no loading to announce.
  */
 const useLoadingMessage = (loading, { busy, done }) => {
     const [message, setMessage] = useState('');
@@ -376,22 +391,36 @@ const expectOutsideBusy = async (status) => {
  * no label shapes inside a loading container.
  */
 export const LoadingTable = () => {
-    const message = useLoadingMessage(true, { busy: 'Loading students…', done: 'Students loaded' });
+    const [loaded, setLoaded] = useState(false);
+    const message = useLoadingMessage(!loaded, { busy: 'Loading students…', done: 'Students loaded' });
     return (
-        <div>
-            <div role="status" className="visually-hidden">{message}</div>
-            <section aria-labelledby="skeleton-students" aria-busy="true">
+        <div style={{ display: 'grid', gap: '12px', justifyItems: 'start' }}>
+            <div role="status" className="visually-hidden" data-testid="live">{message}</div>
+            <section aria-labelledby="skeleton-students" aria-busy={loaded ? undefined : 'true'}>
                 <h3 id="skeleton-students" className="h6">Students</h3>
                 <div style={{ display: 'grid', gap: '12px' }}>
-                    {[140, 110, 160].map((width) => (
-                        <div key={width} style={{ display: 'flex', gap: '48px', alignItems: 'center' }}>
-                            <Skeleton shape="text" width={width} />
-                            <Skeleton shape="text" width={64} />
-                            <Skeleton shape="text" width={64} />
+                    {[['Rosa Chen', 140], ['Kai Brooks', 110], ['Amara Okafor', 160]].map(([name, width]) => (
+                        <div key={name} style={{ display: 'flex', gap: '48px', alignItems: 'center' }}>
+                            {loaded ? (
+                                <>
+                                    <span className="body2-txt" style={{ width }}>{name}</span>
+                                    <Status style="success">Active</Status>
+                                    <Tag text="Algebra" />
+                                </>
+                            ) : (
+                                <>
+                                    <Skeleton shape="text" width={width} />
+                                    <Skeleton shape="text" width={64} />
+                                    <Skeleton shape="text" width={64} />
+                                </>
+                            )}
                         </div>
                     ))}
                 </div>
             </section>
+            <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => setLoaded((v) => !v)}>
+                {loaded ? 'Show loading' : 'Finish loading'}
+            </button>
         </div>
     );
 };
@@ -400,15 +429,23 @@ LoadingTable.play = async ({ canvasElement }) => {
     const region = canvas.getByRole('region', { name: 'Students' });
     await expect(region, 'the region is busy').toHaveAttribute('aria-busy', 'true');
 
-    const status = canvas.getByRole('status');
-    await expectOutsideBusy(status);
-    await waitFor(() => expect(status, 'the live label says what is loading').toHaveTextContent('Loading students…'));
+    const live = canvas.getByTestId('live');
+    await expect(live).toHaveAttribute('role', 'status');
+    await expectOutsideBusy(live);
+    await waitFor(() => expect(live, 'the live label says what is loading').toHaveTextContent('Loading students…'));
 
     const bars = [...region.querySelectorAll('[aria-hidden="true"]')];
     await expect(bars, 'nine text bars').toHaveLength(9);
     for (const bar of bars) {
         await expect(box(bar).height, 'every bar is a text bar').toBe(16);
     }
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Finish loading' }));
+    await expect(region, 'not busy once the students arrive').not.toHaveAttribute('aria-busy');
+    await waitFor(() => expect(live, 'the arrival is announced').toHaveTextContent('Students loaded'));
+    await expect(within(region).getByText('Rosa Chen')).toBeInTheDocument();
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Show loading' }));
 };
 
 /**
@@ -498,6 +535,7 @@ export const IgnoredPropsWarn = () => {
         'Preset shape': <Skeleton preset="status" shape="text" />,
         'Circle radius': <Skeleton shape="circle" radius="card-radius-sm" data-testid="circle-radius" />,
         'Same shape': <Skeleton preset="paragraph" shape="text" />,
+        'Circle sizes': <Skeleton shape="circle" width={40} height={24} data-testid="circle-sizes" />,
     };
     return (
         <div style={{ display: 'grid', gap: '12px' }}>
@@ -524,6 +562,7 @@ IgnoredPropsWarn.play = async ({ canvasElement }) => {
         'Preset shape': ['`shape` is ignored with preset="status"'],
         'Circle radius': ['`radius` is ignored on a circle'],
         'Same shape': [],
+        'Circle sizes': ['`height` is ignored on a circle when it differs from `width`'],
     };
     try {
         for (const [name, parts] of Object.entries(expected)) {
@@ -539,6 +578,12 @@ IgnoredPropsWarn.play = async ({ canvasElement }) => {
         await userEvent.click(canvas.getByRole('button', { name: 'Circle radius' }));
         const circle = canvas.getByTestId('circle-radius');
         await expect(radius(circle), 'a circle is round whatever radius says').toBeGreaterThanOrEqual(box(circle).height / 2);
+
+        // Two sizes that differ: the width wins, and the circle stays a circle.
+        await userEvent.click(canvas.getByRole('button', { name: 'Circle sizes' }));
+        const sized = canvas.getByTestId('circle-sizes');
+        await expect(box(sized).width).toBe(40);
+        await expect(box(sized).height, 'the width wins').toBe(40);
     } finally {
         warn.mockRestore();
     }
@@ -551,10 +596,6 @@ export const Interactive = {
     args: {
         shape: 'rect',
         preset: undefined,
-        width: 160,
-        height: 64,
-        radius: 'element-radius-md',
-        lines: undefined,
         isShimmering: true,
     },
     argTypes: {

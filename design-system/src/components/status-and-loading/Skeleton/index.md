@@ -17,7 +17,7 @@
 |------|------|---------|-------------|
 | `shape` | oneOf | — | `rect` by default; `circle` for avatars and round counts; `text` is a 16-tall bar that can repeat as `lines`. A preset wins over it, with a warning when they disagree. |
 | `preset` | oneOf | — | Sized to a label (`status`, `status-spacious`, `count`, `tag`, `tag-person`), a loading TagGroup (`tag-group`) or three lines of text (`paragraph`). Sets shape, height and corners together and wins over them. |
-| `width` | number or string | — | Any CSS length, or a number of pixels. Text bars fill the line by default; a label preset has a stand-in width. Ignored by `count` and `tag-group`. |
+| `width` | number or string | — | Any CSS length, or a number of pixels. Text bars fill the line by default; a label preset has a stand-in width. Ignored by `count` and `tag-group`. A circle takes one size: `width`, or `height` when no width is given. |
 | `height` | number or string | — | Any CSS length, or a number of pixels. Ignored, with a warning, by presets and by several text `lines`, which are always 16 tall. |
 | `radius` | oneOf | — | A radius token name, such as `element-radius-md` or `card-radius-sm`. Ignored, with a warning, by presets, by `circle` (always round) and by several text `lines`, which keep the text bar's radius. |
 | `lines` | number | — | `text` (and `paragraph`) only: how many bars. The last of several is shorter. Ignored, with a warning, on any other shape or preset. |

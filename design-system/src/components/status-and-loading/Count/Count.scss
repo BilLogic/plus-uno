@@ -7,8 +7,9 @@
  *
  * The two heights have no semantic token yet (label heights 16/20/22/32 are a
  * token follow-up), so they are local custom properties set from
- * `_label-heights.scss`, which Skeleton reads too. The minimum widths and the dot take the spacing
- * primitives Figma binds them to. Padding is the Element token, which is 4.
+ * `_label-heights.scss`, which Skeleton reads too. The minimum widths and
+ * the dot take the spacing primitives Figma binds them to. Padding is the
+ * Element token, which is 4.
  */
 @use '../label-heights' as label;
 
