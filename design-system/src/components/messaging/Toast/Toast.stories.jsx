@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
+import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Toast, { ToastContainer } from './Toast';
 import Button from '@/components/actions/Button/Button';
@@ -8,6 +11,9 @@ export default {
     component: Toast,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-09-29', kind: 'changed', summary: 'The × is the shared CloseButton in its inverse tone on every header color: a fixed 24×24 box with a 16px × and a visible focus ring.' },
+        ],
         docs: {
             description: {
                 component: 'Toast component for displaying notifications. Based on react-bootstrap Toast.'
@@ -150,4 +156,75 @@ Interactive.parameters = {
                 'Preview keeps the toast centered. In product code, `position` on `ToastContainer` still controls fixed corner placement.',
         },
     },
+};
+
+const TOAST_STYLES = ['primary', 'secondary', 'danger', 'success', 'info', 'warning'];
+
+/**
+ * The × on every header color. It is the shared `CloseButton` in its inverse
+ * tone: 24×24 with a 16px × in surface, and on keyboard focus the inverse ring,
+ * each at least 3:1 against the header it sits on (warning is the tightest, at
+ * about 3.52:1). Pressing it calls `onClose`.
+ */
+export const Dismiss = () => {
+    const [closed, setClosed] = useState([]);
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
+            {TOAST_STYLES.map((style) => (
+                <Toast
+                    key={style}
+                    style={style}
+                    title={`${style} toast`}
+                    timestamp="Just now"
+                    show={!closed.includes(style)}
+                    autohide={false}
+                    onClose={() => setClosed((list) => [...list, style])}
+                    data-testid={`dismiss-${style}`}
+                >
+                    Press the × to close it.
+                </Toast>
+            ))}
+            <span className="body2-txt" data-testid="dismiss-closed">{closed.join(' ')}</span>
+        </div>
+    );
+};
+
+Dismiss.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const surface = tokenColor(canvasElement, '--color-surface');
+    const ringInverse = tokenColor(canvasElement, '--color-focus-ring-inverse');
+
+    for (const style of TOAST_STYLES) {
+        const toast = canvas.getByTestId(`dismiss-${style}`);
+        const button = within(toast).getByRole('button', { name: 'Close' });
+        const header = toast.querySelector('.toast-header');
+        const ground = getComputedStyle(header).backgroundColor;
+
+        const { width, height } = button.getBoundingClientRect();
+        await expect(Math.round(width), `${style}: width`).toBe(24);
+        await expect(Math.round(height), `${style}: height`).toBe(24);
+        const glyph = button.querySelector('i');
+        await expect(glyph).toHaveAttribute('aria-hidden', 'true');
+        await expect(getComputedStyle(glyph).fontSize, `${style}: icon size`).toBe('16px');
+        await expect(getComputedStyle(glyph).color, `${style}: × is the inverse tone`).toBe(surface);
+
+        // The × is an icon glyph: WCAG 1.4.11 non-text, 3:1.
+        const glyphRatio = contrastRatio(getComputedStyle(glyph).color, ground);
+        await expect(glyphRatio, `${style}: × on ${ground} is ${glyphRatio.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
+
+        button.focus({ focusVisible: true });
+        await expect(button.matches(':focus-visible'), `${style}: keyboard-focused`).toBe(true);
+        const ring = getComputedStyle(button, '::after');
+        await expect(ring.borderTopWidth, `${style}: ring width`).toBe('2px');
+        await expect(ring.borderTopColor, `${style}: inverse ring`).toBe(ringInverse);
+        const ringRatio = contrastRatio(ring.borderTopColor, ground);
+        await expect(ringRatio, `${style}: ring on ${ground} is ${ringRatio.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
+        button.blur();
+    }
+
+    // Dismissal is unchanged: the button, found by its name, calls onClose.
+    const warning = canvas.getByTestId('dismiss-warning');
+    await userEvent.click(within(warning).getByRole('button', { name: 'Close' }));
+    await expect(canvas.getByTestId('dismiss-closed')).toHaveTextContent('warning');
+    await waitFor(() => expect(canvas.queryByTestId('dismiss-warning')).toBeNull());
 };

@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Toast as BootstrapToast, ToastContainer as BootstrapToastContainer } from 'react-bootstrap';
+import CloseButton from '@/components/actions/CloseButton';
 import './Toast.scss';
 
 export const Toast = ({
@@ -93,16 +94,12 @@ export const Toast = ({
                 </div>
                 <strong className="plus-toast-title">{title}</strong>
                 {timestamp && <small className="plus-toast-timestamp">{timestamp}</small>}
-                {dismissible && (
-                    <button
-                        type="button"
-                        className="plus-toast-close"
-                        aria-label="Close"
-                        onClick={onClose}
-                    >
-                        <i className="fas fa-xmark"></i>
-                    </button>
-                )}
+                {/*
+                  * The shared CloseButton, inverse on every header color: the
+                  * header is always a filled ground (see Toast.scss). Its name
+                  * stays "Close", the CloseButton default.
+                  */}
+                {dismissible && <CloseButton tone="inverse" onClick={onClose} />}
             </BootstrapToast.Header>
             <div className="plus-toast-divider"></div>
             <BootstrapToast.Body className={`plus-toast-body ${bodyClass}`}>

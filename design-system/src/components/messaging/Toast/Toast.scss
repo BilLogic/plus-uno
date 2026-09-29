@@ -54,32 +54,8 @@
             flex-shrink: 0;
         }
 
-        // Custom close button with Font Awesome
-        .plus-toast-close {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            border: none;
-            padding: 0;
-            margin-left: var(--size-element-gap-sm);
-            cursor: pointer;
-            opacity: 0.6;
-            flex-shrink: 0;
-
-            i {
-                font-size: var(--font-size-fa-body1-solid);
-                color: var(--color-on-surface);
-            }
-
-            &:hover {
-                opacity: 1;
-            }
-
-            &:focus {
-                outline: none;
-            }
-        }
+        // The × is the shared CloseButton (inverse tone), styled by its own
+        // stylesheet; the header's gap spaces it from the timestamp.
     }
 
     // --- DIVIDER ---
@@ -119,10 +95,6 @@
             .plus-toast-timestamp {
                 color: var(--color-on-danger) !important;
             }
-
-            .plus-toast-close i {
-                color: var(--color-on-danger) !important;
-            }
         }
     }
 
@@ -141,10 +113,6 @@
             }
 
             .plus-toast-timestamp {
-                color: var(--color-on-success) !important;
-            }
-
-            .plus-toast-close i {
                 color: var(--color-on-success) !important;
             }
         }
@@ -170,10 +138,6 @@
             .plus-toast-timestamp {
                 color: var(--color-on-warning-container) !important;
             }
-
-            .plus-toast-close i {
-                color: var(--color-on-warning-container) !important;
-            }
         }
     }
 
@@ -192,10 +156,6 @@
             }
 
             .plus-toast-timestamp {
-                color: var(--color-on-info) !important;
-            }
-
-            .plus-toast-close i {
                 color: var(--color-on-info) !important;
             }
         }
@@ -218,10 +178,6 @@
             .plus-toast-timestamp {
                 color: var(--color-on-primary) !important;
             }
-
-            .plus-toast-close i {
-                color: var(--color-on-primary) !important;
-            }
         }
     }
 
@@ -240,10 +196,6 @@
             }
 
             .plus-toast-timestamp {
-                color: var(--color-on-secondary) !important;
-            }
-
-            .plus-toast-close i {
                 color: var(--color-on-secondary) !important;
             }
         }

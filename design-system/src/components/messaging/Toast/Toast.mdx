@@ -53,6 +53,10 @@ export const figmaMeta = {
     <DsCanvasQuiet of={ToastStories.Styles} />
 </DocsCanvasShell>
 
+<DocsCanvasShell description={<>Dismiss control — the shared <code>CloseButton</code>, <code>inverse</code> on every header color.</>}>
+    <DsCanvasQuiet of={ToastStories.Dismiss} />
+</DocsCanvasShell>
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -141,7 +145,10 @@ Turning it off with `autohide={false}` leaves a toast that never goes away.
 - **Announcement needs the region to already exist.** A toast mounted at the same
   moment as its container may not be announced at all. Render `ToastContainer`
   with the page and put toasts into it.
-- **The close button is named.** "Close", with the icon inside it.
+- **The close button is named "Close".** It is the shared `CloseButton` in its
+  `inverse` tone on every header color: a fixed 24×24 target whose × is
+  `aria-hidden`. The × and its focus ring are at least 3:1 on each header, the
+  tightest being warning at about 3.52:1.
 - **The style icon is not hidden.** It is a decorative glyph without
   `aria-hidden`, so some screen readers will read it. The title beside it carries
   the meaning; the colour and icon should never carry it alone.
