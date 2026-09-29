@@ -41,8 +41,12 @@
  *  2. SIZE AND OFFSET. A 1px ring at 5:1 passes here and fails 2.4.11. The
  *     spread of widths is REPORTED (six spellings) rather than judged, because
  *     which one wins is a decision, not a measurement.
- *  3. GROUND BEYOND THE RULE. As with `check:text-contrast`: a background set by
- *     an ancestor is invisible, and the page is assumed.
+ *  3. GROUND BEYOND THE STYLESHEET. The ground is resolved structurally, as in
+ *     `check:text-contrast` (`scripts/lib/declared-grounds.mjs`): walking out
+ *     from the rule, the first rule with a `--color-*` background or a
+ *     `@grounds` annotation decides, and a declared list must clear 3:1 on
+ *     every ground. A ground painted by another component entirely, with no
+ *     annotation, is still invisible and the page is assumed.
  *  4. `:focus` VS `:focus-visible`. Both count. Whether a component should use
  *     one or the other is a separate question from whether its ring can be
  *     seen.
@@ -59,12 +63,10 @@ import {
 } from '../design-system/src/lib/tokens.mjs';
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { PAGE_TOKEN, tokenValues } from './button-contrast.mjs';
-import { REPO_ROOT, groundFor, stylesheets } from './text-contrast.mjs';
+import { NON_TEXT, analyzeSheet, groundAt } from './lib/declared-grounds.mjs';
+import { REPO_ROOT, stylesheets } from './text-contrast.mjs';
 
 export { REPO_ROOT, stylesheets };
-
-/** WCAG 1.4.11 — non-text contrast. A ring is a graphical object. */
-export const NON_TEXT = 3;
 
 /**
  * The properties that can carry a visible focus affordance.
@@ -118,9 +120,15 @@ export function focusRules(files, root = REPO_ROOT) {
   const rules = [];
   for (const file of files) {
     const source = fs.readFileSync(path.join(root, file), 'utf8');
+    const sheet = analyzeSheet(source);
     for (const declaration of source.matchAll(AFFORDANCE)) {
       const chain = selectorChain(source, declaration.index);
       if (!/focus/i.test(chain.replace(NEGATED, ''))) continue;
+      // The ground, resolved structurally (`scripts/lib/declared-grounds.mjs`):
+      // the first rule outward from this one with a background or a
+      // `@grounds` decides, and the page if none does.
+      const resolved = groundAt(sheet, declaration.index + declaration[1].length);
+      const declared = resolved.kind === 'grounds' ? { tokens: resolved.tokens, line: resolved.line } : null;
       rules.push({
         file,
         line: source.slice(0, declaration.index).split('\n').length,
@@ -128,7 +136,8 @@ export function focusRules(files, root = REPO_ROOT) {
         property: declaration[2],
         value: declaration[3].split(/\s+/).join(' ').trim(),
         tokens: [...declaration[3].matchAll(varReferencePattern('--color-'))].map((m) => m[1]),
-        ground: groundFor(source, declaration.index),
+        ground: resolved.kind === 'background' ? resolved.token : PAGE_TOKEN,
+        declared,
         block: blockStart(source, declaration.index),
       });
     }
@@ -178,25 +187,52 @@ export function ratio(token, ground, values, page = PAGE_TOKEN) {
 }
 
 /**
+ * The grounds one rule is measured on: the declared `@grounds` when the ground
+ * walk ended at one (every one must clear 3:1), otherwise the single ground it
+ * resolved to — a background, or the page.
+ */
+export function groundsOf(rule) {
+  if (rule.declared && rule.declared.tokens.length) return rule.declared.tokens;
+  return [rule.ground];
+}
+
+/**
  * One entry per focus RULE — not per declaration — carrying its strongest
  * affordance. See the header: a 1.13:1 glow beside a 5.02:1 border is a rule
  * that can be seen.
+ *
+ * On more than one ground (a declared `@grounds` list), the rule is only as
+ * visible as it is on its WORST ground: the strongest affordance is found per
+ * ground, and `best` is the weakest of those. `grounds` keeps every one, so a
+ * report can say which ground failed and a summary can show the spread.
  */
 export function indicators(rules, values) {
   const byBlock = new Map();
   for (const rule of rules) {
     const key = `${rule.file}#${rule.block}`;
-    const entry = byBlock.get(key) ?? { file: rule.file, line: rule.line, selector: rule.selector, best: null, spellings: [] };
+    const entry = byBlock.get(key)
+      ?? { file: rule.file, line: rule.line, selector: rule.selector, best: null, spellings: [], perGround: new Map() };
     entry.spellings.push(`${rule.property}: ${rule.value}`);
-    for (const token of rule.tokens) {
-      const measured = ratio(token, rule.ground, values);
-      if (measured === null) continue;
-      if (!entry.best || measured > entry.best.ratio) {
-        entry.best = { token, ratio: measured, property: rule.property, ground: rule.ground };
+    if (rule.declared?.tokens.length) entry.declared = true;
+    for (const ground of groundsOf(rule)) {
+      for (const token of rule.tokens) {
+        const measured = ratio(token, ground, values);
+        if (measured === null) continue;
+        const current = entry.perGround.get(ground);
+        if (!current || measured > current.ratio) {
+          entry.perGround.set(ground, { token, ratio: measured, property: rule.property, ground });
+        }
       }
     }
     entry.line = Math.min(entry.line, rule.line);
     byBlock.set(key, entry);
+  }
+  for (const entry of byBlock.values()) {
+    for (const measured of entry.perGround.values()) {
+      if (!entry.best || measured.ratio < entry.best.ratio) entry.best = measured;
+    }
+    entry.grounds = [...entry.perGround.values()];
+    delete entry.perGround;
   }
   return [...byBlock.values()].filter((entry) => entry.best);
 }

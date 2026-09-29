@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import RBAlert from 'react-bootstrap/Alert';
+import CloseButton from '@/components/actions/CloseButton';
 import './Alert.scss';
 
 /**
@@ -47,8 +48,11 @@ const Alert = ({
     // The 'style' prop maps to our SCSS classes (primary, secondary, etc.)
     const alertStyle = style || 'primary';
 
-    // Dismiss button matches the hierarchy: h4 with title, body1-txt without
-    const dismissBtnClass = title ? 'h4' : 'body1-txt';
+    // The × centers on the first line of text: the title line when there is a
+    // title, otherwise the first body line. An invisible strut in that line's
+    // text style gives the dismiss column exactly one line of height; the
+    // button itself stays 24×24 whatever the text size.
+    const firstLineClass = title ? 'h4' : 'body2-txt';
 
     return (
         <RBAlert
@@ -66,16 +70,12 @@ const Alert = ({
             </div>
 
             {canDismiss && (
-                <button
-                    type="button"
-                    className={`plus-alert-dismiss-btn ${dismissBtnClass}`}
-                    onClick={handleClose}
-                    aria-label="Close alert"
-                >
-                    <i className="fa-solid fa-xmark"></i>
-                </button>
+                <div className="plus-alert-dismiss">
+                    <span className={`plus-alert-dismiss-strut ${firstLineClass}`} aria-hidden="true">{'\u200B'}</span>
+                    <CloseButton aria-label="Close alert" onClick={handleClose} />
+                </div>
             )}
-        </RBAlert >
+        </RBAlert>
     );
 };
 

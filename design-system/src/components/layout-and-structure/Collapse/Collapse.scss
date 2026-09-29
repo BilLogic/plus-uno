@@ -36,8 +36,11 @@
         filter: brightness(0.92);
     }
 
+    // The ring is inset, so it is drawn on the trigger's own primary fill,
+    // where the default ring (primary) would vanish at 1:1. It takes the
+    // inverse ring, the light surface color, which reads on primary.
     &:focus {
-        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring-inverse);
         outline-offset: calc(-1 * var(--size-element-stroke-lg));
     }
 

@@ -29,6 +29,8 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 | On Surface Variant | `var(--color-on-surface-variant)` | Secondary text |
 | Outline | `var(--color-outline)` | Borders, dividers |
 | Outline Variant | `var(--color-outline-variant)` | Subtle borders |
+| Focus / Focus Ring | `var(--color-focus-ring)` | Every focus indicator on a neutral ground |
+| Focus / Focus Ring Inverse | `var(--color-focus-ring-inverse)` | Focus indicator on a colored or dark ground; aliases surface |
 
 ### SMART Competency Colors
 | Figma | PLUS CSS Token |

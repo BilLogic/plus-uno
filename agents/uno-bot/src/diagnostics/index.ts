@@ -26,6 +26,7 @@ import { blueprintProbe, blueprintSearchProbe, blueprintSubjectProbe } from "./p
 import { homeProbe, slackSearchProbe, slackStreamProbe } from "./probes/slack";
 import { figmaPollProbe } from "./probes/figma";
 import { turnEvalProbe } from "./probes/turn";
+import { sweepProbe } from "./probes/sweep";
 
 const PROBE_BODIES: Record<ProbeName, ProbeRun> = {
   "blueprint-health": blueprintHealthProbe,
@@ -40,6 +41,7 @@ const PROBE_BODIES: Record<ProbeName, ProbeRun> = {
   "blueprint-search": blueprintSearchProbe,
   "blueprint-subject": blueprintSubjectProbe,
   "figma-poll": figmaPollProbe,
+  sweep: sweepProbe,
 };
 
 /** Every probe this Worker serves. */

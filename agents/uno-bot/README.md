@@ -73,7 +73,7 @@ uno-bot/
     │                     /slack/{events,commands,interactive} · /oauth/slack/{start,callback} ·
     │                     everything diagnostic → src/diagnostics — plus the cron scheduled() handler
     ├── diagnostics/      Every probe, behind one token gate and one report envelope: the public
-    │                     /health/blueprint contract probe + eleven /debug/* probes (routes.ts is
+    │                     /health/blueprint contract probe + twelve /debug/* probes (routes.ts is
     │                     the route table; probes/ holds the bodies)
     ├── agent/            loop.ts (THE agent loop) · model-provider.ts (the ModelProvider
     │                     seam) · providers/ (gemini · claude · fake) · loop-policy.ts (the
@@ -100,6 +100,10 @@ uno-bot/
     │                     methods that ARE the interface above. No HTTP routes
     ├── agent-runner.ts   Durable Object: runs the agent turn in an alarm — outlives the ~30s
     │                     waitUntil() cancellation window that killed long runs
+    ├── runner/           The runner's scheduling over a storage port: one job per alarm, the
+    │                     deferred retry, a scheduled run's order and idempotency (+ in-memory runner)
+    ├── scheduled/        The morning (14:00 UTC) and end-of-day (22:00 UTC) runs the cron
+    │                     enqueues, their job bodies, and the /debug/sweep dry run
     └── version.ts        BUILD string returned by /health
 ```
 
@@ -155,6 +159,7 @@ curl https://<worker-url>/health   # expect: uno-bot ok <BUILD>
 
 - **Bot behavior:** run the Test Plan's smoke trio in `#uno-bot-sandbox` — the injection case (gate + safety), the Goal-Setting retrieval case (grounding + citations), and the bare hi-fi ask (clarify-before-build). Cancel any staged proposals afterward; one case per thread.
 - **Provider health (all auth-gated by `DEBUG_TOKEN`):** `GET /debug/gemini` (live Gemini round-trip) · `GET /debug/vertex-claude` (live Claude-on-Vertex round-trip — run before flipping `MODEL_PROVIDER="vertex-claude"`) · `GET /debug/gemini-cache` (no model call: reports whether the Gemini adapter's system prompt is served from a Vertex `cachedContents` resource, and the exact reason when it isn't — on `GEMINI_REGION = "global"` it never can be, see wrangler.toml).
+- **Scheduled runs (auth-gated by `DEBUG_TOKEN`):** `GET /debug/sweep?dry_run=1&run=morning|end-of-day` (default end-of-day) — plans the run the cron would enqueue and dry-runs each job in the request, reporting the planned jobs and, per job, its subrequests, Cloudflare-service hops, D1 queries and wall time. Dry runs only; the runs fire from the cron, one alarm per job.
 - **Figma poll (auth-gated by `DEBUG_TOKEN`):** `GET /debug/figma-poll?dry_run=1` — diffs the DS file against the KV snapshot and reports, without writing KV/Notion/Slack. Drop `dry_run` to fire the real thing (posts to `#uno-bot`, files a PRD). First-ever run (empty KV) seeds the snapshot and notifies nothing.
 - **Stream / markup probe (auth-gated by `DEBUG_TOKEN`):** `GET /debug/slack-stream?channel=…&thread_ts=…&user=…&team=…` opens a stream and returns Slack's raw verdict (`&stop=<ts>` closes it). Add `&text=<url-encoded>` to append that text raw and close: the markup probe in `docs/connectors/slack.md` § Streamed text. `text=` goes only to a DM (`D…`) or the alert channel, at most 2,000 chars; `appended` reports whether the append landed.
 - **Every probe's report** carries the same envelope beside its own payload: `build`, `ms`, and the subrequest accounting `subrequests` / `subrequest_hosts` / `internal_subrequests` / `budget_trips` (ADR-022), so a probe says how close the invocation came to Cloudflare's cap and whether any read was cut short. An unauthorized probe and an unknown path answer alike (`404 not found`).

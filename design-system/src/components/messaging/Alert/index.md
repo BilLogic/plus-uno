@@ -9,7 +9,7 @@ Uses the standard React children pattern for content (matching React Bootstrap c
 
 **Source:** `design-system/src/components/messaging/Alert/Alert.jsx`
 
-**Stories:** `design-system/src/components/messaging/Alert/Alert.stories.jsx` — Styles, Content, Overview, Interactive
+**Stories:** `design-system/src/components/messaging/Alert/Alert.stories.jsx` — Styles, Content, Overview, Interactive, DismissPlacement
 
 **Storybook page:** `design-system/src/components/messaging/Alert/Alert.mdx`
 
@@ -35,7 +35,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-` · `--color-on-` · `--color-on-surface-variant` · `--font-weight-medium` · `--size-card-gap-sm` · `--size-card-pad-x-sm` · `--size-card-pad-y-sm` · `--size-element-border` · `--size-element-gap-sm` · `--size-modal-radius-md`
+`--color-` · `--color-on-` · `--font-weight-medium` · `--size-card-gap-sm` · `--size-card-pad-x-sm` · `--size-card-pad-y-sm` · `--size-element-border` · `--size-element-gap-sm` · `--size-modal-radius-md`
 
 From `design-system/src/components/messaging/Alert/Alert.scss`. Override these through the token layer, never with a literal.
 

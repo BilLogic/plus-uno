@@ -28,9 +28,8 @@ import path from 'node:path';
 
 import {
   census,
-  enclosingBlock,
   findings,
-  groundFor,
+  groundLabel,
   keyOf,
   opaqueGround,
   ratchetFailures,
@@ -38,6 +37,7 @@ import {
   textDeclarations,
   textSibling,
 } from './text-contrast.mjs';
+import { declarationErrors } from './lib/declared-grounds.mjs';
 
 /**
  * A Map, because that is what `tokenValues` returns. Stated here because the
@@ -99,20 +99,6 @@ test('background-color and border-color are not text', () => {
     `.a {\n  background-color: var(--color-warning);\n  border-color: var(--color-warning);\n}\n`,
   );
   assert.deepEqual(textDeclarations([file], root), []);
-});
-
-test('enclosingBlock blanks nested rules so a child cannot answer for a parent', () => {
-  const source = `.a {\n  color: red;\n  .b {\n    background: blue;\n  }\n}\n`;
-  const block = enclosingBlock(source, source.indexOf('color: red'));
-  assert.match(block, /color: red/);
-  assert.doesNotMatch(block, /blue/);
-});
-
-test('groundFor ignores a literal background', () => {
-  // Only a token ground is trusted; a literal leaves the page assumption in
-  // place rather than being silently used.
-  const source = `.a {\n  background-color: #ffffff;\n  color: var(--color-warning);\n}\n`;
-  assert.equal(groundFor(source, source.indexOf('color: var(--color-warning)')), '--color-surface');
 });
 
 test('the -text sibling is offered only when the token file defines one', () => {
@@ -183,4 +169,115 @@ test('the baseline key is file + token + ground, not a line number', () => {
   assert.equal(key, KEY);
   assert.deepEqual(census([{ file: 'a.scss', token: '--color-warning', ground: '--color-surface', line: 1 },
     { file: 'a.scss', token: '--color-warning', ground: '--color-surface', line: 40 }]), { [KEY]: 2 });
+});
+
+/*
+ * `@grounds` — a rule painted on a ground its CALLER sets declares it, and is
+ * measured on every declared ground instead of the page. `@contrast: non-text`
+ * holds an icon glyph to 3:1.
+ */
+const INVERSE = (grounds) =>
+  `.x--inverse {\n  // @grounds: ${grounds}\n  color: var(--color-surface);\n  &:hover { color: var(--color-surface); }\n}\n`;
+
+const errorsOf = ({ root, file }) => declarationErrors([file], root, VALUES, { contrast: true }).join('\n');
+
+test('@grounds: a color is measured on each declared ground, and passes when all clear the bar', () => {
+  const fx = fixture('inverse.scss', INVERSE('--color-success --color-primary'));
+  const uses = textDeclarations([fx.file], fx.root);
+  // Two declarations (the rule and its nested :hover) × two grounds.
+  assert.deepEqual(uses.map((u) => u.ground).sort(), ['--color-primary', '--color-primary', '--color-success', '--color-success']);
+  assert.deepEqual(findings(uses, VALUES), []);
+  assert.equal(errorsOf(fx), '');
+});
+
+test('@grounds: one declared ground under the bar is a finding, keyed by that ground', () => {
+  const { root, file } = fixture('inverse.scss', INVERSE('--color-success --color-warning'));
+  const found = findings(textDeclarations([file], root), VALUES);
+  assert.ok(found.length > 0);
+  assert.ok(found.every((f) => f.ground === '--color-warning' && f.ratio === 3.52));
+});
+
+test('@grounds: an unknown token or an empty list is an error, not a pass', () => {
+  assert.match(errorsOf(fixture('unknown.scss', INVERSE('--color-success --color-nope'))), /--color-nope/);
+  assert.match(errorsOf(fixture('empty.scss', INVERSE(''))), /declares no grounds/);
+});
+
+test('@grounds: without a declaration nothing changes — the page is the ground', () => {
+  const { root, file } = fixture('plain.scss', `.x {\n  color: var(--color-surface);\n}\n`);
+  const [use] = textDeclarations([file], root);
+  assert.equal(use.ground, '--color-surface');
+  assert.equal(use.declared, null);
+  assert.equal(use.nonText, false);
+  assert.equal(findings([use], VALUES)[0].ratio, 1);
+});
+
+test('@grounds: a background in the rule itself still wins over a declaration', () => {
+  const { root, file } = fixture(
+    'own.scss',
+    `.x {\n  // @grounds: --color-warning\n  background-color: var(--color-success);\n  color: var(--color-surface);\n}\n`,
+  );
+  assert.deepEqual(textDeclarations([file], root).map((u) => u.ground), ['--color-success']);
+});
+
+test('@grounds: an OWN background that is the page token beats an ancestor declaration', () => {
+  const { root, file } = fixture(
+    'own-page.scss',
+    `.x {\n  // @grounds: --color-success\n  .y {\n    background-color: var(--color-surface);\n    color: var(--color-surface);\n  }\n}\n`,
+  );
+  const uses = textDeclarations([file], root);
+  assert.deepEqual(uses.map((u) => u.ground), ['--color-surface']);
+  assert.equal(findings(uses, VALUES).length, 1);
+});
+
+test('@grounds: a declaration is validated even where the rule has its own background', () => {
+  const fx = fixture(
+    'own-bad.scss',
+    `.x {\n  // @grounds: --color-nope\n  background-color: var(--color-success);\n  color: var(--color-surface);\n}\n`,
+  );
+  assert.match(errorsOf(fx), /--color-nope/);
+});
+
+const ICON = (selector, grounds = '--color-success') =>
+  `.x--inverse {\n  // @grounds: ${grounds}\n  ${selector} {\n    // @contrast: non-text\n    color: var(--color-surface);\n  }\n}\n`;
+
+test('@contrast: non-text holds an icon glyph to 3:1 — passes at 3.52:1 on warning', () => {
+  const fx = fixture('glyph.scss', ICON('.x__icon.fa-solid', '--color-warning'));
+  const uses = textDeclarations([fx.file], fx.root);
+  assert.ok(uses.every((u) => u.nonText));
+  assert.deepEqual(findings(uses, VALUES), []);
+  assert.equal(errorsOf(fx), '');
+});
+
+test('@contrast: non-text still fails a glyph under 3:1', () => {
+  const { root, file } = fixture('glyph-low.scss', ICON('svg', '--color-surface'));
+  const [found] = findings(textDeclarations([file], root), VALUES);
+  assert.equal(found.bar, 3);
+  assert.equal(found.ratio, 1);
+});
+
+test('@contrast: non-text on a text selector is an error, and the text bar stays', () => {
+  const fx = fixture('text.scss', ICON('.x__label', '--color-warning'));
+  assert.match(errorsOf(fx), /@contrast: non-text on a text selector/);
+  const uses = textDeclarations([fx.file], fx.root);
+  assert.ok(uses.every((u) => !u.nonText));
+  assert.equal(findings(uses, VALUES)[0].bar, 4.5);
+});
+
+test('a finding names where its ground came from: own rule, ancestor, @grounds, or the page', () => {
+  const { root, file } = fixture(
+    'origin.scss',
+    [
+      '.own {\n  background-color: var(--color-success);\n  color: var(--color-warning);\n}\n',
+      '.outer {\n  background-color: var(--color-success);\n  .inner { color: var(--color-warning); }\n}\n',
+      '.declared {\n  // @grounds: --color-success\n  color: var(--color-warning);\n}\n',
+      '.page {\n  color: var(--color-warning);\n}\n',
+    ].join(''),
+  );
+  const labels = textDeclarations([file], root).map((use) => groundLabel(use));
+  assert.deepEqual(labels, [
+    " (its own rule's background)",
+    ' (the background of an ancestor rule, line 5)',
+    ' (declared by @grounds, line 10)',
+    ' (no rule sets a background, so the page is assumed)',
+  ]);
 });

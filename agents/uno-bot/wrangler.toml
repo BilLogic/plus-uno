@@ -20,6 +20,18 @@ head_sampling_rate = 1
 # PR #38). Detects DS publishes, files a PRD, posts the update card to #uno-bot.
 # Scheduled invocations get a fresh subrequest budget + a 15-min wall clock, so
 # the poll never competes with an agent turn. Manual firing: GET /debug/figma-poll.
+#
+# The same trigger anchors the two SCHEDULED RUNS (src/scheduled/runs.ts). No
+# cron is added for them — the free plan caps an account at 5 cron triggers —
+# so the handler reads each firing's scheduled time, and every firing still
+# runs the Figma poll exactly as above:
+#   • 14:00 UTC → the morning run     (10:00 ET in EDT, 09:00 ET in EST)
+#   • 22:00 UTC → the end-of-day run  (18:00 ET in EDT, 17:00 ET in EST)
+# Budget: the handler only ENQUEUES the run on its own AgentRunner instance (one
+# DO hop, inside the ~10ms scheduled CPU limit). The runner then runs ONE job
+# per alarm, each on a fresh 50-subrequest budget with lookups under the
+# ceiling (ADR-022, LOOKUP_CEILING = 38); a job the ceiling cuts short keeps its
+# place and retries. Dry run: GET /debug/sweep?dry_run=1&run=morning|end-of-day.
 [triggers]
 crons = ["*/15 13-23 * * 1-5"]
 

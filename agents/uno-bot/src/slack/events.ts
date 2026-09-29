@@ -37,8 +37,7 @@ import { stripBotMentions } from "./mention";
 import { cardThreadOf, turnSurfaceOf } from "../turn/request";
 import { isIntakeChannel } from "../turn/intake-channel";
 
-// Re-exported for index.ts (SlackEnvelope) + agent-runner.ts (RunnerJobPayload)
-// and any other importer that still reaches for the Slack wire types here.
+// Re-exported for index.ts (SlackEnvelope) and any other importer that still reaches for the Slack wire types here.
 export type {
   SlackEventFile,
   SlackMessageEvent,

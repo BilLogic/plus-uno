@@ -142,4 +142,21 @@
      * hold them to.
      */
     --color-focus-ring: var(--color-primary);
+
+    /*
+     * THE FOCUS RING ON A COLORED GROUND — Figma `Focus/Focus Ring Inverse`.
+     *
+     * The first time the ring stops aliasing primary. A control sitting on an
+     * intent fill or a dark surface (`CloseButton tone="inverse"`, or the
+     * Collapse trigger's inset ring on its own primary fill) cannot use
+     * primary, which vanishes into those grounds, so its ring takes the light
+     * surface color. `check:focus-ring` holds it to 3:1 on the ground it sits
+     * on: a background it can see, or the grounds its rule declares
+     * (`// @grounds: …`), each one rather than the page.
+     *
+     * The Figma variable exists (colors / accent, aliasing Neutral
+     * Colors/surface) but is not yet in figma-variables-snapshot.json; refresh
+     * with `npm run snapshot:figma-variables`.
+     */
+    --color-focus-ring-inverse: var(--color-surface);
 }

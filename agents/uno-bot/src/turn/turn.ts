@@ -64,6 +64,7 @@ import { relayRecipientId } from "../tools/relayed-dm-render";
 import { describeIssueUpdate, issueUpdateFromInput } from "../tools/github-issue-update-render";
 import {
   MAX_HISTORY_TURNS,
+  inheritedTerms,
   proposalOperations,
   proposalReplyThread,
   type AssistantContext,
@@ -886,6 +887,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
         pending: result.pending,
         decision: result.decision,
         ...(result.messageToUser ? { messageToUser: result.messageToUser } : {}),
+        userId: request.userId,
       },
       { threadState },
     );
@@ -936,6 +938,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
         pending: request.pending,
         decision: "confirm",
         ...(result.previewText ? { messageToUser: result.previewText } : {}),
+        userId: request.userId,
       },
       { threadState },
     );
@@ -1037,6 +1040,9 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     requesterUserId: request.userId,
     ...(prd?.id ? { notionPrdId: prd.id } : {}),
     ...(prd?.url ? { notionPrdUrl: prd.url } : {}),
+    // A revision is held to the terms of the card it replaces — its lifetime
+    // and who may confirm it. A fresh card has none and gets the defaults.
+    ...inheritedTerms(request.pending),
   };
   await threadState.putProposal(proposal);
   // A proposal is still a completed conversational turn. An agent_view DM has
@@ -1114,9 +1120,10 @@ async function settleVerdict(
  * The card is built exactly as a staged proposal's is, reads included (the
  * repo an intake lands in and whether it is public, a workflow's branch), so
  * the person approves what will actually run rather than a copy of the old
- * card. It keeps the original's requester, thread and PRD, and gets a ts and an
- * hour of its own; staging it retires any card still live in that reply
- * thread, as every staging does (`ThreadState.putProposal`).
+ * card. It keeps the original's requester, thread, PRD and terms (lifetime and
+ * confirmer set — the same `ProposalTerms` a revision inherits), and gets a ts
+ * and a fresh run of that lifetime; staging it retires any card still live in
+ * that reply thread, as every staging does (`ThreadState.putProposal`).
  *
  * Exported because two doors outside Turn — the reaction and the button on the
  * stuck card — are later looks too, and a card is Turn's to build. Their
