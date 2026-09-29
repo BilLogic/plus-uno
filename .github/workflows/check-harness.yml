@@ -96,6 +96,20 @@ jobs:
         working-directory: agents/uno-bot
         run: npm ci
 
+      # What it bought: `check:focus-ring`, `check:text-contrast` and their
+      # tests in `test:scripts` read `@grounds` and `@contrast` from a PARSED
+      # stylesheet (`scripts/lib/declared-grounds.mjs`), which needs postcss,
+      # postcss-scss and postcss-selector-parser. Scoped, per the header: the
+      # three packages at the versions package-lock.json pins, installed into
+      # the runner's temp directory and linked into the root node_modules, not a
+      # root `npm ci` of every devDependency.
+      - name: Install the stylesheet parser for the contrast checks
+        run: |
+          versions=$(node -p "const l = require('./package-lock.json').packages; ['postcss', 'postcss-scss', 'postcss-selector-parser'].map((n) => n + '@' + l['node_modules/' + n].version).join(' ')")
+          npm install --prefix "$RUNNER_TEMP/grounds" --no-save --no-audit --no-fund --ignore-scripts $versions
+          mkdir -p node_modules
+          ln -s "$RUNNER_TEMP"/grounds/node_modules/* node_modules/
+
       # One command, one exit code. The composite names every sub-check that
       # failed and prints each one's own diagnostic underneath — it does not stop
       # at the first, so one run reports everything wrong with the branch.
