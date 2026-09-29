@@ -275,7 +275,8 @@ AcceptIntoTags.play = async ({ canvasElement }) => {
 /** Change the props in the docs playground. */
 export const Interactive = {
     args: {
-        label: 'Relationships',
+        // Placeholder text is the component name, as in the Figma set.
+        label: 'Suggestion',
         type: 'insert',
         onAccept: fn(),
     },

@@ -61,7 +61,9 @@
 
 /*
  * Focus: a 2px Focus Ring 2px outside the dashed edge, as Tag's is, so its
- * outer corner is radius-lg (8) as the Figma set draws it. The ground stays clear, so focus never reads as pressed.
+ * outer corner is radius-lg (8) as the Figma set draws it.
+ *
+ * The ground stays clear, so focus never reads as pressed.
  */
 .plus-suggestion:focus-visible {
     outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);

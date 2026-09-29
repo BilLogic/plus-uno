@@ -37,14 +37,16 @@ export const Suggestion = ({
     ...rest
 }) => {
     const isPrompt = type === 'prompt';
+    // Anything but `prompt` is an insert, so an unknown type still renders one.
+    const kind = isPrompt ? 'prompt' : 'insert';
 
     // Pressing an insert adds a value, so its name says "Add". A prompt is not
     // added to anything; it sends or fills its words, so it is named by them.
-    const name = isPrompt ? `${label}, suggested` : `Add ${label}, suggested`;
+    const name = kind === 'prompt' ? `${label}, suggested` : `Add ${label}, suggested`;
 
     const classes = [
         'plus-suggestion',
-        `plus-suggestion--${isPrompt ? 'prompt' : 'insert'}`,
+        `plus-suggestion--${kind}`,
         className,
     ].filter(Boolean).join(' ');
 
@@ -63,7 +65,7 @@ export const Suggestion = ({
                 onAccept?.(isPrompt ? (text ?? label) : (value ?? label), e);
             }}
         >
-            <i className={`fa-solid ${ICONS[isPrompt ? 'prompt' : 'insert']} plus-suggestion__icon`} aria-hidden="true" />
+            <i className={`fa-solid ${ICONS[kind]} plus-suggestion__icon`} aria-hidden="true" />
             <span className="plus-suggestion__label body3-txt">{label}</span>
         </button>
     );
