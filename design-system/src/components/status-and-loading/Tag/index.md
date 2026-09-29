@@ -40,7 +40,7 @@ From `design-system/src/components/status-and-loading/Tag/Tag.scss`. Override th
 
 ## Related
 
-Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Progress` · `Spinner` · `TagGroup`
+Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Progress` · `Spinner` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

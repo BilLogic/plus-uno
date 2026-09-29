@@ -679,6 +679,62 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19499"
       }
     },
+    "Count": {
+      "code": {
+        "import": "@/components/status-and-loading",
+        "export": "default",
+        "mdxPath": "design-system/src/components/status-and-loading/Count/Count.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Count",
+        "props": {
+          "appearance": {
+            "type": "enum",
+            "values": [
+              "subtle",
+              "bold",
+              "inverse",
+              "dot"
+            ]
+          },
+          "style": {
+            "type": "enum",
+            "values": [
+              "neutral",
+              "success",
+              "warning",
+              "danger",
+              "info",
+              "discovery"
+            ]
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "medium",
+              "small"
+            ]
+          },
+          "ring": {
+            "type": "boolean"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "count",
+            "name": "Count",
+            "componentSetNodeId": "17876:46653",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-46653",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "On the Status, Count & Tag page, beside the Counter set it replaces. Figma values carry a (default) suffix on subtle, neutral and medium; ring? is ring in code. Inverse exists in neutral only, and dot in medium only. Docs page: node 17883:1895."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-46653"
+      }
+    },
     "DateAndTimePicker": {
       "code": {
         "import": "@/components/forms-and-inputs",
