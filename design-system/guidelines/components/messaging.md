@@ -63,7 +63,9 @@ content too.
 Every close control in the group has a hard-coded label: `Close alert` on
 `Alert`, `Close` on `Toast`, `Close modal` on `Modal`. None of them can be
 renamed, so several dismissible messages on one screen expose several
-identically named buttons.
+identically named buttons. `CloseButton`, the shared 24×24 dismiss control that
+`Alert` uses, takes `what` for a "Dismiss {what}" name; `Alert` passes its
+established label instead.
 
 ## Related
 

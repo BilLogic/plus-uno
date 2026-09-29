@@ -1,4 +1,5 @@
 import React from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Alert from './Alert';
 
@@ -8,6 +9,9 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
+        changelog: [
+            { date: '2026-09-29', kind: 'changed', summary: 'The × is the shared CloseButton: it stays 24×24 with a 16px icon and centers on the first line of text instead of growing with the title or body.' },
+        ],
         docs: {
             description: {
                 component: `
@@ -92,7 +96,7 @@ function AlertContentDemos() {
                     Use when concise copy does not require a heading.
                 </p>
                 <Alert style="primary" dismissable>
-                    Alert without title — message only. Dismiss button adapts to body text size.
+                    Alert without title — message only. The dismiss button centers on the first body line.
                 </Alert>
             </section>
             <section>
@@ -156,3 +160,60 @@ Interactive.args = {
     dismissable: true,
 };
 
+
+/**
+ * Where the × sits. It is centered on the FIRST line of text — the title line
+ * when there is a title, otherwise the first body line — and it stays there
+ * when the text wraps. It is the shared `CloseButton`, so it is 24×24 with a
+ * 16px icon whatever the text size beside it.
+ */
+export const DismissPlacement = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '400px' }}>
+        <Alert style="primary" title="With a title" data-testid="placement-title">
+            The × centers on the title line, not on the alert.
+        </Alert>
+        <Alert style="warning" data-testid="placement-body">
+            Without a title the × centers on the first body line, even when the message runs on
+            long enough to wrap onto a second and a third line inside a narrow alert.
+        </Alert>
+        <Alert style="info" title="A title long enough to wrap onto a second line" data-testid="placement-wrap">
+            Short body.
+        </Alert>
+    </div>
+);
+
+/** The first line box of `element`: its content-box top plus one line height. */
+function firstLine(element) {
+    const style = getComputedStyle(element);
+    const top = element.getBoundingClientRect().top + parseFloat(style.paddingTop) + parseFloat(style.borderTopWidth);
+    const height = parseFloat(style.lineHeight);
+    return { top, bottom: top + height, center: top + height / 2 };
+}
+
+DismissPlacement.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const cases = [
+        ['placement-title', '.plus-alert-title'],
+        ['placement-body', '.plus-alert-text'],
+        ['placement-wrap', '.plus-alert-title'],
+    ];
+    for (const [id, lineOwner] of cases) {
+        const alert = canvas.getByTestId(id);
+        const button = within(alert).getByRole('button', { name: 'Close alert' });
+        const rect = button.getBoundingClientRect();
+        await expect(Math.round(rect.width), `${id}: width`).toBe(24);
+        await expect(Math.round(rect.height), `${id}: height`).toBe(24);
+        await expect(getComputedStyle(button.querySelector('i')).fontSize, `${id}: icon`).toBe('16px');
+
+        const line = firstLine(alert.querySelector(lineOwner));
+        const center = rect.top + rect.height / 2;
+        await expect(center, `${id}: × center is inside the first line box`).toBeGreaterThanOrEqual(line.top);
+        await expect(center, `${id}: × center is inside the first line box`).toBeLessThanOrEqual(line.bottom);
+        await expect(Math.abs(center - line.center), `${id}: × is centered on the first line`).toBeLessThanOrEqual(1);
+    }
+
+    // Dismissal is unchanged: the button removes its alert.
+    const body = canvas.getByTestId('placement-body');
+    await userEvent.click(within(body).getByRole('button', { name: 'Close alert' }));
+    await expect(canvas.queryByTestId('placement-body')).toBeNull();
+};

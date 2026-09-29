@@ -9,7 +9,8 @@
  * itself with a #84cfff border at 1.62:1, the AM/PM toggle and the file drop
  * zone with an 8% tint at 1.13:1, four textarea states at 2.22:1, and six
  * readonly fields with the same grey they wear at rest. All 29 are fixed;
- * `docs/evals/focus-ring.json` records the sweep and holds no exceptions.
+ * `docs/evals/focus-ring.json` records the sweep and one argued exception:
+ * the inverse CloseButton ring, which is drawn for grounds its caller paints.
  *
  * WHY THERE IS NO RATCHET HERE. `check:intent-roles` ratchets because the thing
  * it counts is a vocabulary, and vocabulary moves one call site at a time. This
@@ -119,13 +120,21 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   return found;
 }
 
-/** The green line, which carries the narrowest ring the sweep measured. */
+/**
+ * The green line, which carries the narrowest ring the sweep measured among the
+ * rules it holds to the bar. A recorded exception is counted apart: it is under
+ * 3:1 on the page by definition, and naming it as the "worst" of rules that
+ * are "all at or above 3:1" would contradict itself.
+ */
 export function summary({ repoRoot = REPO_ROOT } = {}) {
   const { rules } = inputs(repoRoot);
-  const worst = rules.reduce((low, entry) => (entry.best.ratio < low.best.ratio ? entry : low), rules[0]);
+  const under = invisible(rules);
+  const held = rules.filter((entry) => !under.has(`${entry.file}:${entry.line}`));
+  const worst = held.reduce((low, entry) => (entry.best.ratio < low.best.ratio ? entry : low), held[0]);
+  const recorded = under.size ? `, ${under.size} recorded in ${RECORD}` : '';
   return (
-    `${rules.length} focus rules, all at or above ${NON_TEXT}:1 ` +
-    `(worst ${worst.best.ratio.toFixed(2)}:1, ${worst.best.token} in ${path.basename(worst.file)})`
+    `${held.length} focus rules, all at or above ${NON_TEXT}:1 ` +
+    `(worst ${worst.best.ratio.toFixed(2)}:1, ${worst.best.token} in ${path.basename(worst.file)})${recorded}`
   );
 }
 

@@ -1,0 +1,79 @@
+/**
+ * CloseButton — Figma: Button page, "Close button" set.
+ *
+ * The 24px box, the 2px ring offset and the 1 line height are raw on purpose:
+ * the library has no control-size or focus-offset token, and Figma spells them
+ * raw too. Everything else is a token.
+ */
+
+.plus-close-btn {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-radius: var(--size-element-radius-md);
+    background-color: transparent;
+    color: var(--color-on-surface-variant);
+    cursor: pointer;
+
+    // Specific enough to beat the typography classes' `.h4 .fa-solid` icon
+    // sizing, which is what used to make the × grow with its surrounding text.
+    .plus-close-btn__icon.fa-solid {
+        font-size: var(--font-size-fa-h5-solid);
+        line-height: 1;
+        color: inherit;
+    }
+
+    &:hover {
+        background-color: var(--color-on-surface-variant-state-08);
+    }
+
+    &:active {
+        background-color: var(--color-on-surface-variant-state-16);
+    }
+
+    &:focus {
+        outline: none;
+    }
+
+    &:focus-visible {
+        background-color: var(--color-on-surface-variant-state-12);
+    }
+
+    // The ring sits 2px outside the box with its own, larger radius — an
+    // outline would inherit the box's radius, so it is drawn as a pseudo-element.
+    &:focus-visible::after {
+        content: '';
+        position: absolute;
+        inset: calc(-1 * (var(--size-element-stroke-lg) + 2px));
+        border: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+        border-radius: var(--size-element-radius-lg);
+        pointer-events: none;
+    }
+}
+
+.plus-close-btn--inverse {
+    color: var(--color-surface);
+
+    &:hover {
+        background-color: var(--color-surface-state-08);
+    }
+
+    &:active {
+        background-color: var(--color-surface-state-16);
+    }
+
+    &:focus-visible {
+        background-color: var(--color-surface-state-12);
+    }
+
+    &:focus-visible::after {
+        border-color: var(--color-focus-ring-inverse);
+    }
+}

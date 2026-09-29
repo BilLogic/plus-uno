@@ -453,11 +453,13 @@ describe('the colour key is finer than the normaliser it replaces', () => {
    * unordered pair of live colour tokens the old normaliser could read, where
    * it says equal and this key says unequal. 315 on 2026-09-18; 357 on 2026-09-29,
    * when the ten `-border-subtle` label borders added 45% washes of bases
-   * already in the corpus. The number is
+   * already in the corpus; 363 the same day, when `--color-focus-ring-inverse`
+   * arrived as another solid #f9f9fc and paired with the six surface
+   * overlays. The number is
    * asserted rather than logged because a migrating caller's exposure is this
    * number, and a drift in it is news either way.
    */
-  it('differs from the normaliser on 357 live token pairs', () => {
+  it('differs from the normaliser on 363 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
       .map((entry) => entry.value)
       .filter((value) => normaliseColour(value) !== null);
@@ -470,7 +472,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
         pairs += 1;
       }
     }
-    expect(pairs).toBe(357);
+    expect(pairs).toBe(363);
   });
 
   /*
