@@ -162,6 +162,9 @@ function deriveCandidates(collection, name) {
       out.push(`--color-${base}-state-${neutralTint[1]}`);
     }
     if (/\(text\)/i.test(leaf)) out.push(`--color-${slug(leaf.replace(/\(text\)/i, ''))}-text`);
+    // `Success (Border)` is the hue at 45% for outlined labels; `Success Border` is
+    // the 3:1 role. Both slug to `success-border`, so the pale one is named apart.
+    if (/\(border\)/i.test(leaf)) out.push(`--color-${slug(leaf.replace(/\(border\)/i, ''))}-border-subtle`);
     out.push(`--color-${slug(leaf)}`);
     out.push(`--color-${slug(head)}-${slug(leaf)}`);
     return out;

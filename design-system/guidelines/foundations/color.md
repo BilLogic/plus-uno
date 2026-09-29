@@ -16,6 +16,7 @@ Each color role has multiple variants:
 - `--color-on-{role}` - Content color on filled backgrounds
 - `--color-{role}-container` - Container/background version
 - `--color-{role}-state-08/12/16` - State layers for hover/active states
+- `--color-{role}-border-subtle` - The role at 45%: the pale border of an outlined label (Tag, date Status). Figma names it `{Role}/{Role} (Border)`, beside the 3:1 `{Role} Border` role, which is `--color-{role}-border`. Success, Warning, Danger, Tertiary and the five SMART hues have one; Info aliases Tertiary's, and Primary and Secondary have none, because no label uses them.
 
 **`-state-NN` names an overlay; it does not derive one.** The suffix reads as
 "`--color-{role}` at 8/12/16%", and for 84 of the 117 overlays that is what it

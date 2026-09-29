@@ -30,7 +30,7 @@
  *   agreeing with itself.
  *
  *   FINER than `normaliseColour`: alpha is part of this key and is not part of
- *   that one. Over the live corpus that is 315 token pairs, and the two tests
+ *   that one. Over the live corpus that is 357 token pairs, and the two tests
  *   under "finer than the normaliser" assert the difference directly and then
  *   pin the narrow reason today's output does not move — rather than asserting
  *   "output unchanged", which is a property of the fallback CAPTURE and not of
@@ -281,7 +281,7 @@ describe('the family map — one statement of which family a name is in', () => 
  * under `design-system/src` reach for a `-state-08/12/16` token, 70 of them for
  * one of the eleven divergent bases — and it moves measurements that are already
  * recorded: `docs/evals/text-contrast-baseline.json` holds three entries whose
- * ground is `--color-primary-state-08` or `-12`, and the 315 alpha-only pairs
+ * ground is `--color-primary-state-08` or `-12`, and the 357 alpha-only pairs
  * asserted further down this file are counted over these same live values, so a
  * re-mix is news there too. Which of the two halves is the intended colour is a
  * Figma question and a visible design change, so it is #268's and Bill's, not a
@@ -451,11 +451,13 @@ describe('the colour key is finer than the normaliser it replaces', () => {
   /*
    * AND HOW MANY OF THEM THERE ARE, counted rather than recalled: every
    * unordered pair of live colour tokens the old normaliser could read, where
-   * it says equal and this key says unequal. 315 on 2026-09-18. The number is
+   * it says equal and this key says unequal. 315 on 2026-09-18; 357 on 2026-09-29,
+   * when the ten `-border-subtle` label borders added 45% washes of bases
+   * already in the corpus. The number is
    * asserted rather than logged because a migrating caller's exposure is this
    * number, and a drift in it is news either way.
    */
-  it('differs from the normaliser on 315 live token pairs', () => {
+  it('differs from the normaliser on 357 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
       .map((entry) => entry.value)
       .filter((value) => normaliseColour(value) !== null);
@@ -468,7 +470,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
         pairs += 1;
       }
     }
-    expect(pairs).toBe(315);
+    expect(pairs).toBe(357);
   });
 
   /*
@@ -488,7 +490,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
    * docblock to match.)
    *
    * So every colour comparison the check makes is opaque on both sides, and the
-   * 315 pairs above are all outside the compared set. The day the capture is
+   * 357 pairs above are all outside the compared set. The day the capture is
    * widened to read a whole `rgba()` fallback, that stops being true, and this
    * test is what says so.
    */

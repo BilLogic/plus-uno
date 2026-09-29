@@ -101,7 +101,7 @@
     padding: var(--size-element-pad-y-sm, 8px) var(--size-element-pad-x-sm, 12px);
     
     .plus-form-tag-item {
-        padding: var(--size-element-pad-y-xs, 2px) var(--size-element-pad-x-xs, 6px);
+        padding: var(--size-element-pad-y-xs, 2px) var(--size-spacing-small-space-075); // 6px: no Element step at 6
         
         .plus-form-tag-icon {
             width: 14px;

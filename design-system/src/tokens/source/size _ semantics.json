@@ -40,6 +40,18 @@
       }
     },
     {
+      "id": "element-pad-x-xs",
+      "name": "element/pad/x/xs",
+      "valuesByMode": {
+        "Default": 4
+      },
+      "resolvedValuesByMode": {
+        "Default": {
+          "resolvedValue": 4
+        }
+      }
+    },
+    {
       "id": "element-pad-y-lg",
       "name": "element/pad/y/lg",
       "valuesByMode": {
