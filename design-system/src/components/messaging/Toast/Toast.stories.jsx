@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
-import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Toast, { ToastContainer } from './Toast';
 import Button from '@/components/actions/Button/Button';
@@ -162,9 +162,11 @@ const TOAST_STYLES = ['primary', 'secondary', 'danger', 'success', 'info', 'warn
 
 /**
  * The × on every header color. It is the shared `CloseButton` in its inverse
- * tone: 24×24 with a 16px × in surface, and on keyboard focus the inverse ring,
- * each at least 3:1 against the header it sits on (warning is the tightest, at
- * about 3.52:1). Pressing it calls `onClose`.
+ * tone, so its size and focus ring are CloseButton's own tests; what is tested
+ * here is how the Toast uses it. It sits one header gap after the timestamp, as
+ * in Figma, and its × and focus ring are each at least 3:1 on every header. The
+ * tightest ground is recorded once, in CloseButton's docs. Pressing it calls
+ * `onClose`.
  */
 export const Dismiss = () => {
     const [closed, setClosed] = useState([]);
@@ -200,24 +202,25 @@ Dismiss.play = async ({ canvasElement }) => {
         const header = toast.querySelector('.toast-header');
         const ground = getComputedStyle(header).backgroundColor;
 
-        const { width, height } = button.getBoundingClientRect();
-        await expect(Math.round(width), `${style}: width`).toBe(24);
-        await expect(Math.round(height), `${style}: height`).toBe(24);
-        const glyph = button.querySelector('i');
-        await expect(glyph).toHaveAttribute('aria-hidden', 'true');
-        await expect(getComputedStyle(glyph).fontSize, `${style}: icon size`).toBe('16px');
-        await expect(getComputedStyle(glyph).color, `${style}: × is the inverse tone`).toBe(surface);
+        // One header gap between the timestamp and the ×: the Figma header's
+        // Meta → Dismiss spacing, with no extra margin on either side.
+        const headerGap = px(getComputedStyle(header).columnGap);
+        await expect(headerGap, `${style}: header gap`).toBe(8);
+        const timestamp = toast.querySelector('.plus-toast-timestamp').getBoundingClientRect();
+        const gap = button.getBoundingClientRect().left - timestamp.right;
+        await expect(Math.round(gap), `${style}: timestamp → × gap`).toBe(headerGap);
 
+        const glyph = button.querySelector('i');
+        await expect(getComputedStyle(glyph).color, `${style}: × is the inverse tone`).toBe(surface);
         // The × is an icon glyph: WCAG 1.4.11 non-text, 3:1.
         const glyphRatio = contrastRatio(getComputedStyle(glyph).color, ground);
         await expect(glyphRatio, `${style}: × on ${ground} is ${glyphRatio.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
 
         button.focus({ focusVisible: true });
         await expect(button.matches(':focus-visible'), `${style}: keyboard-focused`).toBe(true);
-        const ring = getComputedStyle(button, '::after');
-        await expect(ring.borderTopWidth, `${style}: ring width`).toBe('2px');
-        await expect(ring.borderTopColor, `${style}: inverse ring`).toBe(ringInverse);
-        const ringRatio = contrastRatio(ring.borderTopColor, ground);
+        const ring = getComputedStyle(button, '::after').borderTopColor;
+        await expect(ring, `${style}: inverse ring`).toBe(ringInverse);
+        const ringRatio = contrastRatio(ring, ground);
         await expect(ringRatio, `${style}: ring on ${ground} is ${ringRatio.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
         button.blur();
     }
@@ -227,4 +230,23 @@ Dismiss.play = async ({ canvasElement }) => {
     await userEvent.click(within(warning).getByRole('button', { name: 'Close' }));
     await expect(canvas.getByTestId('dismiss-closed')).toHaveTextContent('warning');
     await waitFor(() => expect(canvas.queryByTestId('dismiss-warning')).toBeNull());
+};
+
+/**
+ * A style outside the list renders as the default, secondary, rather than an
+ * unfilled header: the × is inverse and would be white on white.
+ */
+export const UnknownStyle = () => (
+    <Toast style="not-a-style" title="Unknown style" show autohide={false} data-testid="unknown-style">
+        Falls back to secondary.
+    </Toast>
+);
+
+UnknownStyle.play = async ({ canvasElement }) => {
+    const toast = within(canvasElement).getByTestId('unknown-style');
+    const header = toast.querySelector('.toast-header');
+    await expect(getComputedStyle(header).backgroundColor).toBe(tokenColor(canvasElement, '--color-secondary'));
+    const glyph = within(toast).getByRole('button', { name: 'Close' }).querySelector('i');
+    const ratio = contrastRatio(getComputedStyle(glyph).color, getComputedStyle(header).backgroundColor);
+    await expect(ratio).toBeGreaterThanOrEqual(3);
 };

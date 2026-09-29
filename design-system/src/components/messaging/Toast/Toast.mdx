@@ -135,10 +135,11 @@ Turning it off with `autohide={false}` leaves a toast that never goes away.
 
 ## Accessibility
 
-- **It always interrupts.** `role="alert"` with `aria-live="assertive"` and
-  `aria-atomic` is set for every style, so a success toast cuts across whatever
-  a screen reader was saying. Reserve toasts for moments where that is
-  proportionate, and prefer inline confirmation where it is not.
+- **Only danger and warning interrupt.** Those two styles are `role="alert"`
+  with `aria-live="assertive"`. Every other style is `role="status"` with
+  `aria-live="polite"`, so a success toast waits for the screen reader to finish
+  what it is saying. Every style is `aria-atomic`, so the toast is read as one
+  message.
 - **A five-second timeout is a timing limit.** Content that disappears on its own
   has to be dismissible or extendable to satisfy WCAG's timing rule. The close
   button is what does that here, which is why it is on by default.
@@ -147,11 +148,10 @@ Turning it off with `autohide={false}` leaves a toast that never goes away.
   with the page and put toasts into it.
 - **The close button is named "Close".** It is the shared `CloseButton` in its
   `inverse` tone on every header color: a fixed 24×24 target whose × is
-  `aria-hidden`. The × and its focus ring are at least 3:1 on each header, the
-  tightest being warning at about 3.52:1.
-- **The style icon is not hidden.** It is a decorative glyph without
-  `aria-hidden`, so some screen readers will read it. The title beside it carries
-  the meaning; the colour and icon should never carry it alone.
+  `aria-hidden`. The × and its focus ring are at least 3:1 on each header; the
+  tightest ground is recorded in `CloseButton`'s accessibility notes.
+- **The style icon is decorative.** It is `aria-hidden`, so the title beside it
+  carries the meaning; the color and icon should never carry it alone.
 
 </div>
 
