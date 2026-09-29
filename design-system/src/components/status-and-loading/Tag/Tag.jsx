@@ -37,8 +37,11 @@ export const TAG_COLORS = ['grey', 'blue', 'green', 'purple', 'magenta', 'yellow
 
 export const TAG_BEHAVIORS = ['read-only', 'removable', 'selectable', 'link'];
 
-/** What the tag names: a plain category, or a person, an agent or a team. */
-export const TAG_TYPES = ['plain', 'person', 'agent', 'team'];
+/** The types that lead with a 16 avatar: a person, an agent or a team. */
+export const AVATAR_TAG_TYPES = ['person', 'agent', 'team'];
+
+/** What the tag names: a plain category, or one of the avatar types. */
+export const TAG_TYPES = ['plain', ...AVATAR_TAG_TYPES];
 
 /** The old `variant` values, still accepted as a deprecated alias for `behavior`. */
 export const TAG_VARIANTS = ['read-only', 'dismissible', 'selectable', 'operational'];
@@ -94,20 +97,40 @@ const initialsOf = (label, type) => {
     return Array.from(`${first}${last}`.toUpperCase()).slice(0, 2).join('');
 };
 
+/*
+ * The spinner in an avatar's box, drawn as Figma draws it: a 12 ring, 1.8
+ * thick, three quarters of the way round. It is an SVG stroke rather than a
+ * border because a browser rounds a 1.8 border down to whole device pixels.
+ * The radius is the stroke's centerline (6 less half the 1.8), and the arc is
+ * three quarters of its circumference.
+ */
+const SPINNER_RADIUS = 5.1;
+const SPINNER_CIRCUMFERENCE = 2 * Math.PI * SPINNER_RADIUS;
+const SPINNER_DASHARRAY = `${(SPINNER_CIRCUMFERENCE * 3) / 4} ${SPINNER_CIRCUMFERENCE}`;
+
+const AvatarSpinner = () => (
+    <svg className="plus-tag__avatar-spinner" viewBox="0 0 12 12" focusable="false">
+        <circle cx="6" cy="6" r={SPINNER_RADIUS} fill="none" strokeWidth="1.8" strokeDasharray={SPINNER_DASHARRAY} />
+    </svg>
+);
+
 /**
  * The 16 avatar of a person, agent or team tag. An image source renders as an
  * image, any other node as itself, and a missing or broken source as initials.
- * The box is the same size in every case, so a photo that fails to load never
- * moves the tag. Decorative: the tag's words already name who it is.
+ * While saving, the box holds the spinner instead. The box is the same size in
+ * every case, so a photo that fails to load never moves the tag. Decorative:
+ * the tag's words already name who it is.
  */
-const TagAvatar = ({ type, avatar, label }) => {
+const TagAvatar = ({ type, avatar, label, isLoading }) => {
     // The source that failed, not a flag: a new source is a fresh chance to
     // load without an effect to reset anything.
     const [failedSrc, setFailedSrc] = useState(null);
     const failed = failedSrc === avatar;
 
     let content;
-    if (typeof avatar === 'string' && avatar && !failed) {
+    if (isLoading) {
+        content = <AvatarSpinner />;
+    } else if (typeof avatar === 'string' && avatar && !failed) {
         content = <img className="plus-tag__avatar-img" src={avatar} alt="" onError={() => setFailedSrc(avatar)} />;
     } else if (avatar && typeof avatar !== 'string') {
         content = avatar;
@@ -115,24 +138,17 @@ const TagAvatar = ({ type, avatar, label }) => {
         content = <span className="plus-tag__initials">{initialsOf(label, type)}</span>;
     }
 
+    // Saving drops the shape modifier: the box is clear and holds only the
+    // spinner, so there is no shape to draw.
     return (
-        <span className={`plus-tag__avatar plus-tag__avatar--${type}`} aria-hidden="true">
+        <span
+            className={`plus-tag__avatar ${isLoading ? 'plus-tag__avatar--saving' : `plus-tag__avatar--${type}`}`}
+            aria-hidden="true"
+        >
             {content}
         </span>
     );
 };
-
-/*
- * The spinner in an avatar's box, drawn as Figma draws it: a 12 ring, 1.8
- * thick, three quarters of the way round. It is an SVG stroke rather than a
- * border because a browser rounds a 1.8 border down to whole device pixels.
- * The arc is 3/4 of the centerline's circumference (r 5.1: 2 × π × 5.1 = 32.04).
- */
-const AvatarSpinner = () => (
-    <svg className="plus-tag__avatar-spinner" viewBox="0 0 12 12" focusable="false">
-        <circle cx="6" cy="6" r="5.1" fill="none" strokeWidth="1.8" strokeDasharray="24.03 32.04" />
-    </svg>
-);
 
 export const Tag = ({
     text,
@@ -184,15 +200,14 @@ export const Tag = ({
     }
     if (!resolved) resolved = href ? 'link' : 'read-only';
 
-    const hasAvatar = type === 'person' || type === 'agent' || type === 'team';
+    const hasAvatar = AVATAR_TAG_TYPES.includes(type);
     if (!hasAvatar && avatar) {
         warn('[Tag] `avatar` is only shown on type="person", "agent" or "team"; a plain tag leads with its swatch.');
     }
-    if (hasAvatar && elemBefore) {
-        warn(`[Tag] \`elemBefore\` is ignored on type="${type}"; an avatar type leads with its avatar.`);
-    }
-    if (hasAvatar && swatchBefore) {
-        warn(`[Tag] \`swatchBefore\` is ignored on type="${type}"; an avatar type leads with its avatar.`);
+    if (hasAvatar) {
+        for (const [name, value] of [['elemBefore', elemBefore], ['swatchBefore', swatchBefore]]) {
+            if (value) warn(`[Tag] \`${name}\` is ignored on type="${type}"; an avatar type leads with its avatar.`);
+        }
     }
     // Initials come from the words, so a label that is not text leaves the
     // avatar blank.
@@ -245,16 +260,10 @@ export const Tag = ({
     // tag keeps its width. The overflow `+n` is a count of hidden tags, not a
     // category, so it carries no swatch.
     let lead = null;
-    if (isLoading && hasAvatar) {
-        lead = (
-            <span className="plus-tag__avatar plus-tag__avatar--saving" aria-hidden="true">
-                <AvatarSpinner />
-            </span>
-        );
+    if (hasAvatar) {
+        lead = <TagAvatar type={type} avatar={avatar} label={label} isLoading={isLoading} />;
     } else if (isLoading) {
         lead = <span className="plus-tag__spinner" aria-hidden="true" />;
-    } else if (hasAvatar) {
-        lead = <TagAvatar type={type} avatar={avatar} label={label} />;
     } else if (elemBefore) {
         lead = <span className="plus-tag__elem-before">{elemBefore}</span>;
     } else if (!isAction) {
@@ -418,7 +427,7 @@ Tag.propTypes = {
     behavior: PropTypes.oneOf(TAG_BEHAVIORS),
     /** Deprecated: use `behavior`. `dismissible` is `removable`; `operational` renders a plain button. */
     variant: PropTypes.oneOf(TAG_VARIANTS),
-    /** A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. On an avatar type the border is neutral and the color fills the avatar; grey agents fill AI purple and grey teams Technology Tools blue. */
+    /** A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. On an avatar type the border is neutral and the color fills the avatar; grey agents fill AI purple and grey teams a Technology Tools 08 wash. */
     color: PropTypes.oneOf(ACCEPTED_COLORS),
     /** What the tag names. `plain` leads with the swatch; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. */
     type: PropTypes.oneOf(TAG_TYPES),

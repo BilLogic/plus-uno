@@ -3,7 +3,7 @@ import { expect, fn, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
-import Tag, { TAG_BEHAVIORS, TAG_COLORS, TagContext } from './Tag';
+import Tag, { AVATAR_TAG_TYPES, TAG_BEHAVIORS, TAG_COLORS, TagContext } from './Tag';
 
 /**
  * `Tag` — a category, outlined: color on the border and swatch, neutral text,
@@ -229,7 +229,7 @@ Types.play = async ({ canvasElement }) => {
  */
 export const AvatarFallback = () => (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
-        {['person', 'agent', 'team'].map((type) => (
+        {AVATAR_TAG_TYPES.map((type) => (
             <div key={type} style={row}>
                 <Tag type={type} avatar={PHOTO} data-testid={`${type}-loaded`}>Rosa Chen</Tag>
                 <Tag type={type} avatar={BROKEN} data-testid={`${type}-broken`}>Rosa Chen</Tag>
@@ -243,7 +243,7 @@ AvatarFallback.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const initials = { person: 'RC', agent: 'R', team: 'R' };
 
-    for (const type of ['person', 'agent', 'team']) {
+    for (const type of AVATAR_TAG_TYPES) {
         const loaded = canvas.getByTestId(`${type}-loaded`);
         const broken = canvas.getByTestId(`${type}-broken`);
         const none = canvas.getByTestId(`${type}-none`);
@@ -472,6 +472,46 @@ export const AvatarEdgeCases = {
             warn.mockRestore();
         }
     },
+};
+
+/**
+ * The avatar's fill. A hued person or team sits on its hue's Container, a grey
+ * team on the Technology Tools 08 wash, and a disabled tag's photo stays whole:
+ * the image covers the box at full opacity and in full color.
+ */
+export const AvatarFills = () => (
+    <div style={row}>
+        <Tag type="team" color="blue" data-testid="team-blue">Math team</Tag>
+        <Tag type="person" color="teal" data-testid="person-teal">Rosa Chen</Tag>
+        <Tag type="team" data-testid="team-grey">Science team</Tag>
+        <TagContext.Provider value={{ isDisabled: true }}>
+            <Tag type="person" avatar={PHOTO} data-testid="disabled-photo">Kai Brooks</Tag>
+        </TagContext.Provider>
+    </div>
+);
+
+AvatarFills.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const fill = (id) => getComputedStyle(avatarOf(canvas.getByTestId(id))).backgroundColor;
+
+    await expect(fill('team-blue'), 'a blue team fills Technology Tools Container')
+        .toBe(tokenColor(canvasElement, '--color-technology-tools-container'));
+    await expect(fill('person-teal'), 'a teal person fills Tertiary Container')
+        .toBe(tokenColor(canvasElement, '--color-tertiary-container'));
+    await expect(fill('team-grey'), 'a grey team fills the Technology Tools 08 wash')
+        .toBe(tokenColor(canvasElement, '--color-technology-tools-state-08'));
+
+    // Disabled greys the tag, never the person: the photo shows as it is.
+    const img = canvas.getByTestId('disabled-photo').querySelector('img');
+    await expect(img, 'the photo is shown').not.toBeNull();
+    await expect(px(getComputedStyle(img).width), 'covering the 16 box').toBe(16);
+    let node = img;
+    while (node && node !== canvasElement) {
+        const s = getComputedStyle(node);
+        await expect(Number(s.opacity), 'at full opacity').toBe(1);
+        await expect(s.filter, 'not desaturated').toBe('none');
+        node = node.parentElement;
+    }
 };
 
 /* -------------------------------------------------------------- selectable */
