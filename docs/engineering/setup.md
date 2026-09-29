@@ -222,7 +222,8 @@ in a file.
 `.github/workflows/uno-bot-checks.yml` runs three jobs on every pull request —
 `typecheck` (`tsc --noEmit` over `agents/uno-bot/src/**`), `tests` (the Worker's
 unit suite, the largest in this repository) and `conformance` (`test:workerd`,
-the ThreadState suite against a real Durable Object under workerd). All three
+the ThreadState suite against a real Durable Object under workerd, and the
+UsageLog suite against a local D1 with the real migrations applied). All three
 are registry rows; the first two are composed into `check:harness` as well, so
 the pre-push command stays whole. The jobs exist for their NAMES. A red
 `check:harness` is one GitHub check covering the whole composite, so
@@ -234,8 +235,8 @@ All three commands are in the `npm run deploy` chain too, so a push straight to
 `main` — unprotected, and 19 people can make one — meets the same gates on the
 way to production. None reads a secret: `tsc` reads the checkout, the unit suite
 is pure functions plus mocked `fetch`, and `conformance` boots workerd locally
-from the `wrangler` already in devDependencies, against a Durable Object
-miniflare creates in a temporary directory. So a fork PR runs all three.
+from the `wrangler` already in devDependencies, against a Durable Object and a
+D1 database miniflare creates in a temporary directory. So a fork PR runs all three.
 
 `conformance` is the one that costs a runtime, which is why it is a job of its
 own rather than a member of the fast composite: 3.1s warm and 4.5s cold locally,
