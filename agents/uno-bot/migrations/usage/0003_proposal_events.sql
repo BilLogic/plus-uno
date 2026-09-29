@@ -20,7 +20,9 @@ CREATE TABLE proposal_events (
   -- model), or who staged, replaced, aged out or refused it (turn, restage,
   -- worker, revision, end-of-day, executor)
   via                TEXT    NOT NULL,
-  channel_id         TEXT,                          -- channel cards only, as in `turns`
+  -- staged and expired rows of channel cards only: none for a DM or group DM,
+  -- as in `turns`
+  channel_id         TEXT,
   -- the staging turn's test-traffic flag, carried onto every later event of
   -- the card, so a sandbox card is excluded without a join
   test_traffic       INTEGER NOT NULL DEFAULT 0 CHECK (test_traffic IN (0, 1)),
@@ -37,6 +39,10 @@ CREATE TABLE proposal_events (
   requester_role     TEXT    CHECK (requester_role IN ('pm', 'dev', 'design')),
   aimed_at_role      TEXT    CHECK (aimed_at_role IN ('pm', 'dev', 'design')),
   thread_started_at  INTEGER,
+  -- staged: a ticket the bot filed on itself from this card's reaction or
+  -- button ✅, kept here as well as on the staging turn's row, which may not
+  -- have been written yet when the ✅ lands
+  ticket_url         TEXT,
 
   -- confirmed and cancelled: who decided, and whether that was someone other
   -- than the requester

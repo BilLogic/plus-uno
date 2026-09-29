@@ -116,11 +116,11 @@ async function recordOutcome(
   outcomes: OperationOutcome[],
   at: number,
 ): Promise<void> {
-  await recordProposalEvents(record.events, executionEvents(pending, outcomes, at));
+  await recordProposalEvents(record.events, executionEvents(pending.proposalTs, outcomes, at));
   const door = verdict.by?.door;
   const ticket = door === "reaction" || door === "button" ? selfFiledTicketOf(outcomes) : null;
   if (ticket) {
-    await quietly(`ticket on ${pending.proposalTs}`, () =>
+    await quietly(`self-filed ticket on ${pending.proposalTs}`, () =>
       record.events.noteSelfFiledTicket(pending.proposalTs, ticket),
     );
   }

@@ -38,7 +38,7 @@ const CARD: PendingProposal = {
 
 describe("the staged event", () => {
   it("dates the card by its own ts and the thread by its root, and names what the batch runs", () => {
-    const e = stagedEvent({ proposal: CARD, at: 5, via: "turn", turnId: "C1:1700000250.000000", roles: ROLES });
+    const e = stagedEvent({ proposal: CARD, at: 5, via: "turn", channelStored: true, turnId: "C1:1700000250.000000", roles: ROLES });
     assert.equal(e.proposalId, CARD.proposalTs);
     assert.equal(e.event, "staged");
     assert.equal(e.at, 1_700_000_300_000);
@@ -55,6 +55,7 @@ describe("the staged event", () => {
       proposal: CARD,
       at: 5,
       via: "turn",
+      channelStored: true,
       askText: "<@UDEV> can you file that? cc <@UPM>",
       roles: ROLES,
     });
@@ -64,11 +65,11 @@ describe("the staged event", () => {
 
   it("skips the requester's own mention and records no role for someone off the map", () => {
     const named = (askText: string) =>
-      stagedEvent({ proposal: CARD, at: 5, via: "turn", askText, roles: ROLES }).aimedAtRole;
+      stagedEvent({ proposal: CARD, at: 5, via: "turn", channelStored: true, askText, roles: ROLES }).aimedAtRole;
     assert.equal(named("me <@UPM> and <@UDES|dana>"), "design");
     assert.equal(named("<@U0NOTONMAP> please"), null);
     assert.equal(named("no one named here"), null);
-    assert.equal(stagedEvent({ proposal: { ...CARD, requesterUserId: "U0NEW" }, at: 5, via: "turn", roles: ROLES }).requesterRole, null);
+    assert.equal(stagedEvent({ proposal: { ...CARD, requesterUserId: "U0NEW" }, at: 5, via: "turn", channelStored: true, roles: ROLES }).requesterRole, null);
   });
 
   it("carries the card's own lifetime, and falls back to the clock for a ts that is not Slack's", () => {
@@ -76,6 +77,7 @@ describe("the staged event", () => {
       proposal: { ...CARD, ttlMs: 72 * 3_600_000, proposalTs: "eval-card", replyTs: "dm", userMsgTs: "eval" },
       at: 42,
       via: "worker",
+      channelStored: true,
     });
     assert.equal(e.ttlMs, 72 * 3_600_000);
     assert.equal(e.at, 42);
@@ -86,7 +88,7 @@ describe("the staged event", () => {
 describe("the DM rule `turns` keeps", () => {
   it("stores no channel for a DM card and records no one a DM ask named", () => {
     const dm = { ...CARD, channel: "D0REQUESTER" };
-    const e = stagedEvent({ proposal: dm, at: 5, via: "turn", askText: "<@UDEV> can you file that?", roles: ROLES });
+    const e = stagedEvent({ proposal: dm, at: 5, via: "turn", channelStored: false, askText: "<@UDEV> can you file that?", roles: ROLES });
     assert.equal(e.channelId, null);
     assert.equal(e.aimedAtRole, null);
     // The requester's own role is not about anyone else, and stays.
@@ -100,7 +102,7 @@ describe("who confirmed", () => {
   it("is unknown, never 'someone else', on a card the Worker staged with no requester", () => {
     const worker = { ...CARD, requesterUserId: "" };
     assert.equal(verdictEvents(won(worker, "U0MEMBER1"), 9)[0]!.confirmedByOther, null);
-    assert.equal(stagedEvent({ proposal: worker, at: 5, via: "worker" }).requesterId, null);
+    assert.equal(stagedEvent({ proposal: worker, at: 5, via: "worker", channelStored: true }).requesterId, null);
   });
 
   it("is true for someone other than the requester and false for the requester", () => {
@@ -123,7 +125,7 @@ describe("a refused stale write", () => {
 
   it("is one event per resolution, however many operations refused", () => {
     const events = executionEvents(
-      CARD,
+      CARD.proposalTs,
       [
         outcome("notion_update", { ok: false, status: "no_changes", refused: ["a", "b"], staleStamps: 2 }),
         outcome("notion_update", { ok: false, status: "no_changes", refused: ["c"], staleStamps: 1 }),
@@ -138,7 +140,7 @@ describe("a refused stale write", () => {
   it("is not a refusal for any other reason, nor a write that landed", () => {
     assert.deepEqual(
       executionEvents(
-        CARD,
+        CARD.proposalTs,
         [
           outcome("notion_update", { ok: true, replaced: 1, refused: ["x (content empty)"], staleStamps: 0 }),
           outcome("github_issue_create", { ok: true, issue_url: "https://github.com/BilLogic/plus-uno/issues/1" }),
@@ -154,7 +156,7 @@ describe("a refused stale write", () => {
 describe("the end-of-day expiry pass", () => {
   it("gives an untouched card exactly one expired event, dated to when it aged out", async () => {
     const log = createInMemoryProposalEventLog();
-    await log.record(stagedEvent({ proposal: CARD, at: 0, via: "turn" }));
+    await log.record(stagedEvent({ proposal: CARD, at: 0, via: "turn", channelStored: true }));
     const stagedAt = 1_700_000_300_000;
     // The pass the evening it was staged, the next one, and a retried alarm.
     let clock = stagedAt + PROPOSAL_TTL_MS - 1;
@@ -171,7 +173,7 @@ describe("the end-of-day expiry pass", () => {
 
   it("writes nothing on a dry run, and says what it would have recorded", async () => {
     const log = createInMemoryProposalEventLog();
-    await log.record(stagedEvent({ proposal: CARD, at: 0, via: "turn" }));
+    await log.record(stagedEvent({ proposal: CARD, at: 0, via: "turn", channelStored: true }));
     const r = await runProposalExpiry(log, 1_800_000_000_000, { dryRun: true });
     assert.equal(r.expired, 0);
     assert.match(r.summary, /^1 proposal\(s\) would be recorded expired/);
@@ -190,8 +192,8 @@ describe("a write that fails", () => {
       },
     };
     await recordProposalEvents(flaky, [
-      { ...stagedEvent({ proposal: CARD, at: 0, via: "turn" }), event: "superseded" },
-      stagedEvent({ proposal: CARD, at: 0, via: "turn" }),
+      { ...stagedEvent({ proposal: CARD, at: 0, via: "turn", channelStored: true }), event: "superseded" },
+      stagedEvent({ proposal: CARD, at: 0, via: "turn", channelStored: true }),
     ]);
     assert.deepEqual(tried, ["superseded", "staged"]);
   });
@@ -202,7 +204,7 @@ describe("a write that fails", () => {
       record: () => new Promise(() => {}),
     };
     const started = Date.now();
-    await recordProposalEvents(hung, [stagedEvent({ proposal: CARD, at: 0, via: "turn" })], 20);
+    await recordProposalEvents(hung, [stagedEvent({ proposal: CARD, at: 0, via: "turn", channelStored: true })], 20);
     assert.ok(Date.now() - started < 1_000);
   });
 });

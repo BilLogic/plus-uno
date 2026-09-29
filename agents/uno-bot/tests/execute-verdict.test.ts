@@ -612,10 +612,15 @@ function stagingTurn() {
     stopUsed: false,
     selfFiledTicketUrl: null,
     testTraffic: false,
+    conversationType: "channel" as const,
+    requestText: null,
+    subType: null,
+    painCategory: null,
+    classifiedAt: null,
   };
 }
 
 async function stagedFor(turnId: string) {
   const verdict = won(intake);
-  return { ...(await usage()).stagedEvent({ proposal: verdict.proposal!, at: 0, via: "turn" as const }), turnId };
+  return { ...(await usage()).stagedEvent({ proposal: verdict.proposal!, at: 0, via: "turn" as const, channelStored: true }), turnId };
 }

@@ -31,6 +31,7 @@ import {
   type ProposalEventLog,
   type TurnOrigin,
   type UsageLog,
+  type SubType,
 } from "../../src/usage/index";
 import type { ModelUsage } from "../../src/agent/model-provider";
 import type { AbsenceContext } from "../../src/agent/absence";
@@ -193,6 +194,8 @@ export function harness(opts: {
   providerUsage?: Partial<ModelUsage>;
   /** The turn's clock. Absent, the real one. */
   now?: () => number;
+  /** A DM ask's in-turn classifier. Absent, DM asks are recorded unlabelled. */
+  classifyAsk?: (text: string) => Promise<SubType | null>;
 } = {}): Harness {
   const delivery = opts.delivery ?? recordingDelivery();
   const threadState = opts.threadState ?? createInMemoryThreadState();
@@ -296,8 +299,10 @@ export function harness(opts: {
       origin: opts.origin ?? "slack",
       testChannelIds: opts.testChannelIds ?? [],
       // A log that never answers must not make the suite wait out production's
-      // timeout.
+      // timeout — nor a classifier that never answers.
       writeTimeoutMs: 50,
+      classifyTimeoutMs: 50,
+      ...(opts.classifyAsk ? { classifyAsk: opts.classifyAsk } : {}),
     },
 
     ...(opts.now ? { now: opts.now } : {}),

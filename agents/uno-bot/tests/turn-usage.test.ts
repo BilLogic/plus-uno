@@ -16,8 +16,11 @@ import { recordingDelivery, restageExecution, runTurn } from "../src/turn/index"
 import type { Env } from "../src/types";
 import { buildTurnDeps } from "../src/turn/env-deps";
 import { NO_PROPOSAL_EVENT_LOG } from "../src/usage/production";
+import { fakeProvider } from "../src/agent/providers/fake";
 import {
+  classifyAsks,
   createInMemoryProposalEventLog,
+  createInMemoryUsageLog,
   runProposalExpiry,
   stagedEvent,
   type ProposalEventLog,
@@ -59,7 +62,7 @@ test("an answered turn records who, where, when, what ran and what it cost", asy
     ],
   });
 
-  const outcome = await runTurn(request(), h.deps);
+  const outcome = await runTurn(request({ conversationType: "channel" }), h.deps);
   assert.equal(outcome.disposition, "answered");
 
   const row = only(h.usage.records());
@@ -68,6 +71,7 @@ test("an answered turn records who, where, when, what ran and what it cost", asy
     build: BUILD,
     requesterId: "U1",
     surface: "channel",
+    conversationType: "channel",
     inThread: true,
     channelId: CHANNEL,
     askTs: "1700000000.000200",
@@ -93,6 +97,11 @@ test("an answered turn records who, where, when, what ran and what it cost", asy
     stopUsed: false,
     selfFiledTicketUrl: null,
     testTraffic: false,
+    // A channel ask keeps its text for the end-of-day classifier.
+    requestText: "how does a call-off reach a fill-in?",
+    subType: null,
+    painCategory: null,
+    classifiedAt: null,
   });
   assert.ok(row.firstAnswerAt! > T, "the answer time is read after the turn began");
 });
@@ -112,6 +121,8 @@ test("a staged turn records the card's ts as its proposal id", async () => {
   const row = only(h.usage.records());
   assert.equal(row.disposition, "staged");
   assert.equal(row.proposalId, outcome.staged!.proposal.proposalTs);
+  // Ticket kickoff, before any classifier has read it.
+  assert.equal(row.painCategory, 7);
   assert.ok(row.firstAnswerAt !== null, "the card is what the person was answered with");
   assert.equal(row.stopUsed, false);
 });
@@ -201,6 +212,120 @@ test("a greeting with no ask — a reaction and nothing asked — is test traffi
   const row = only(h.usage.records());
   assert.equal(row.disposition, "reacted");
   assert.equal(row.testTraffic, true);
+});
+
+// ── corpus categories ────────────────────────────────────────────────────────
+
+const DM = { channel: "D0DM", surface: "assistant" as const, threaded: false };
+
+test("a DM ask is labelled in the turn, and its row never holds text", async () => {
+  const asked: string[] = [];
+  const h = harness({
+    now: ticking(),
+    classifyAsk: async (text) => {
+      asked.push(text);
+      return "Decision recall";
+    },
+  });
+  await runTurn(request({ ...DM, text: "what did we decide on the footer?" }), h.deps);
+
+  const row = only(h.usage.records());
+  assert.deepEqual(asked, ["what did we decide on the footer?"]);
+  assert.equal(row.requestText, null);
+  assert.equal(row.subType, "Decision recall");
+  assert.equal(row.painCategory, 2);
+  assert.ok(row.classifiedAt !== null && row.classifiedAt > T);
+});
+
+test("a DM ask that staged a card is ticket kickoff, whatever it asked", async () => {
+  const h = harness({
+    replies: [{ text: "I'll file a card.", toolCalls: [{ name: "notion_create", args: { title: "Footer" } }] }],
+    classifyAsk: async () => "Status recap",
+  });
+  await runTurn(request({ ...DM, text: "file a card for the footer" }), h.deps);
+  const row = only(h.usage.records());
+  assert.deepEqual([row.subType, row.painCategory, row.requestText], ["Status recap", 7, null]);
+});
+
+test("a DM classifier that fails or hangs leaves the row unlabelled and the turn answered", async () => {
+  for (const classifyAsk of [
+    async (): Promise<null> => {
+      throw new Error("429");
+    },
+    () => new Promise<null>(() => {}),
+  ]) {
+    const h = harness({ classifyAsk });
+    const outcome = await runTurn(request({ ...DM }), h.deps);
+    assert.equal(outcome.disposition, "answered");
+    const row = only(h.usage.records());
+    assert.deepEqual([row.subType, row.classifiedAt, row.requestText], [null, null, null]);
+  }
+});
+
+test("channel asks and test traffic are never classified in the turn", async () => {
+  let calls = 0;
+  const classifyAsk = async () => {
+    calls += 1;
+    return "Domain fact" as const;
+  };
+  // A channel ask waits for the end-of-day run.
+  await runTurn(request({ conversationType: "channel" }), harness({ classifyAsk }).deps);
+  // A DM greeting is test traffic.
+  const greeting = harness({
+    classifyAsk,
+    replies: [{ text: "", toolCalls: [{ name: "slack_react", args: { emoji: "wave" } }] }, { text: "" }],
+  });
+  await runTurn(request({ ...DM, text: "morning uno!" }), greeting.deps);
+  // An eval DM is test traffic.
+  const evalDm = harness({ classifyAsk, origin: "debug" });
+  await runTurn(request({ ...DM }), evalDm.deps);
+
+  assert.equal(calls, 0);
+  const g = only(greeting.usage.records());
+  assert.deepEqual([g.testTraffic, g.requestText, g.painCategory], [true, null, null]);
+});
+
+test("a group-DM ask is labelled in the turn, and its text is never stored", async () => {
+  const h = harness({ classifyAsk: async () => "Relay/routing" });
+  await runTurn(request({ conversationType: "mpim", text: "who owns the tutor import?" }), h.deps);
+  const row = only(h.usage.records());
+  assert.equal(row.requestText, null);
+  assert.equal(row.conversationType, "mpim");
+  assert.equal(row.channelId, null);
+  assert.deepEqual([row.subType, row.painCategory], ["Relay/routing", 4]);
+  assert.ok(!JSON.stringify(h.usage.records()).includes("tutor import"), "no trace of the words");
+});
+
+test("an ask whose conversation type is unknown (an app_mention) is labelled in the turn, with no text", async () => {
+  const h = harness({ classifyAsk: async () => "Artifact location" });
+  await runTurn(request(), h.deps);
+  const row = only(h.usage.records());
+  assert.deepEqual([row.conversationType, row.requestText, row.subType], [null, null, "Artifact location"]);
+});
+
+test("the classifier's words never reach a log line", async () => {
+  const errors: string[] = [];
+  const original = console.error;
+  console.error = (...args: unknown[]) => errors.push(args.map(String).join(" "));
+  try {
+    const reply = "I would call this SECRET-PHRASE a recap";
+    const h = harness({
+      classifyAsk: async (text) => (await classifyAsks(fakeProvider({ generateReplies: [reply] }), [text]))[0] ?? null,
+    });
+    await runTurn(request({ ...DM, text: "PRIVATE-ASK about the footer" }), h.deps);
+  } finally {
+    console.error = original;
+  }
+  const line = errors.find((e) => e.includes("not classified"));
+  assert.ok(line, "the failure is logged");
+  assert.match(line!, /unreadable: \d+ chars/);
+  assert.ok(!errors.some((e) => e.includes("SECRET-PHRASE") || e.includes("PRIVATE-ASK")));
+});
+
+test("a channel ask that is test traffic keeps no text", async () => {
+  const h = harness({ testChannelIds: [CHANNEL] });
+  await runTurn(request({ conversationType: "channel" }), h.deps);
+  assert.equal(only(h.usage.records()).requestText, null);
 });
 
 // ── the ticket the bot filed on itself ───────────────────────────────────────
@@ -302,7 +427,7 @@ test("a card the staging itself retired is recorded superseded, and the expiry p
   // No pending card handed in, but one is live in the thread: the store's
   // backstop retires it as the new card goes up.
   const h = harness({ replies: [REVISION] });
-  await h.proposalEvents.record(stagedEvent({ proposal: PENDING, at: 0, via: "turn" }));
+  await h.proposalEvents.record(stagedEvent({ proposal: PENDING, at: 0, via: "turn", channelStored: true }));
   await h.threadState.putProposal(PENDING);
   await runTurn(request({ text: "file the v2 card" }), h.deps);
   await runProposalExpiry(h.proposalEvents, 1_800_000_000_000, { dryRun: false });
@@ -329,11 +454,41 @@ test("the staged event is on the record before the turn's own row is written", a
   assert.deepEqual(seenAtTurnWrite, ["staged"]);
 });
 
+test("a ticket a reaction ✅ files before the staging turn's row exists still lands on that row", async () => {
+  // The ✅ lands the moment the staged event is written — before this turn has
+  // written its own row, so the ticket can only wait on the card.
+  const url = "https://github.com/BilLogic/plus-uno/issues/904";
+  const usage = createInMemoryUsageLog();
+  const inner = createInMemoryProposalEventLog({ turns: usage });
+  const racing: ProposalEventLog = {
+    ...inner,
+    async record(event) {
+      await inner.record(event);
+      if (event.event === "staged") await inner.noteSelfFiledTicket(event.proposalId, url);
+    },
+  };
+  const h = harness({ replies: [REVISION], usageLog: usage, proposalEventLog: racing });
+  await runTurn(request({ text: "file it" }), h.deps);
+  assert.equal(only(usage.records()).selfFiledTicketUrl, url);
+});
+
+test("a card staged in a DM or a group DM names no channel and records no one its ask named", async () => {
+  for (const over of [
+    { surface: "assistant" as const, channel: "D0ASKER01" },
+    { surface: "channel" as const, channel: "C0GROUPDM", conversationType: "mpim" as const },
+  ]) {
+    const h = harness({ replies: [REVISION] });
+    await runTurn(request({ ...over, text: "<@U2> asked me to file it" }), h.deps);
+    const [staged] = h.proposalEvents.events();
+    assert.deepEqual([staged?.event, staged?.channelId, staged?.aimedAtRole], ["staged", null, null], over.channel);
+  }
+});
+
 test("a re-staged card carries its original's turn, so its ticket still finds a turn row", async () => {
   const h = harness();
   const original = { ...PENDING, proposalTs: "1700000000.000300" };
   await h.proposalEvents.record(
-    stagedEvent({ proposal: original, at: 0, via: "turn", turnId: "C1:1700000000.000200", testTraffic: true }),
+    stagedEvent({ proposal: original, at: 0, via: "turn", channelStored: true, turnId: "C1:1700000000.000200", testTraffic: true }),
   );
   const staged = await restageExecution(
     { proposal: original, operations: [{ toolName: "notion_create", input: { title: "again" } }] },
@@ -341,8 +496,22 @@ test("a re-staged card carries its original's turn, so its ticket still finds a 
   );
   const [row] = await h.proposalEvents.eventsOf(staged!.proposal.proposalTs);
   assert.deepEqual(
-    [row?.via, row?.originProposalId, row?.turnId, row?.testTraffic],
-    ["restage", original.proposalTs, "C1:1700000000.000200", true],
+    [row?.via, row?.originProposalId, row?.turnId, row?.channelId, row?.testTraffic],
+    ["restage", original.proposalTs, "C1:1700000000.000200", CHANNEL, true],
+  );
+});
+
+test("a card a re-stage retires is recorded superseded by the re-stage, not by a revision", async () => {
+  const h = harness();
+  const live = { ...PENDING, proposalTs: "1700000000.000400" };
+  await h.threadState.putProposal(live);
+  await restageExecution(
+    { proposal: PENDING, operations: [{ toolName: "notion_create", input: { title: "again" } }] },
+    { threadState: h.threadState, delivery: h.delivery, cards: h.deps.cards, proposalEvents: h.proposalEvents },
+  );
+  assert.deepEqual(
+    (await h.proposalEvents.eventsOf(live.proposalTs)).map((e) => [e.event, e.via]),
+    [["superseded", "restage"]],
   );
 });
 

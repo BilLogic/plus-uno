@@ -258,7 +258,7 @@ export function cancelRunOf(proposal: PendingProposal): PendingProposal | null {
 
 /** What a staging did beside storing the card: the ts of each live card in
  *  the same reply thread it retired (`ThreadState.putProposal`). */
-export interface StagedProposal {
+export interface StagingReport {
   retired: string[];
 }
 
@@ -546,7 +546,7 @@ export interface ThreadState {
    * (that call reported them) — so the usage record can say a card was
    * replaced only when it was.
    */
-  putProposal(proposal: PendingProposal): Promise<StagedProposal>;
+  putProposal(proposal: PendingProposal): Promise<StagingReport>;
 
   /**
    * Retire a card because a revision is about to take its place — keeping the

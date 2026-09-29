@@ -33,12 +33,13 @@ export function createInMemoryProposalEventLog(deps: { turns?: UsageLog } = {}):
   return {
     async record(event) {
       if (has(event.proposalId, event.event)) return;
-      // The two inheriting columns, as the D1 insert resolves them.
+      // The inheriting columns, as the D1 insert resolves them.
       const stagedOf = (id: string | null) =>
         id === null ? undefined : rows.find((r) => r.proposalId === id && r.event === "staged");
       rows.push({
         ...copy(event),
         turnId: event.turnId ?? stagedOf(event.originProposalId)?.turnId ?? null,
+        channelId: event.channelId ?? stagedOf(event.originProposalId)?.channelId ?? null,
         testTraffic:
           event.testTraffic ?? stagedOf(event.originProposalId ?? event.proposalId)?.testTraffic ?? false,
       });
@@ -70,16 +71,22 @@ export function createInMemoryProposalEventLog(deps: { turns?: UsageLog } = {}):
           requesterRole: null,
           aimedAtRole: null,
           threadStartedAt: null,
+          ticketUrl: null,
         });
       }
       return due.length;
     },
     async noteSelfFiledTicket(proposalId, url) {
-      const turnId = rows.find((r) => r.proposalId === proposalId && r.event === "staged")?.turnId;
+      const staged = rows.find((r) => r.proposalId === proposalId && r.event === "staged");
+      if (staged && staged.ticketUrl === null) staged.ticketUrl = url;
+      const turnId = staged?.turnId;
       if (!turnId || !deps.turns) return;
       const turn = await deps.turns.get(turnId);
       if (!turn || turn.selfFiledTicketUrl !== null) return;
       await deps.turns.record({ ...turn, selfFiledTicketUrl: url });
+    },
+    async ticketFor(proposalId) {
+      return rows.find((r) => r.proposalId === proposalId && r.event === "staged")?.ticketUrl ?? null;
     },
     events() {
       return rows.map(copy);

@@ -67,8 +67,13 @@ export interface ProposalEvent {
    *  aged out, not to the pass that noticed. */
   at: number;
   via: ProposalEventVia;
-  /** The channel, for channel cards only — null for a DM card, as `turns`
-   *  keeps no channel for a DM turn. */
+  /**
+   * The channel — on a card's staged row (and the expired row copied from
+   * it) only, and only for a channel card: a DM or group DM card names none,
+   * the rule `turns` keeps (`./record.ts` `storesChannel`). A later event is
+   * found through its card, so it carries none either. A re-staged card
+   * written with none takes its original's.
+   */
   channelId: string | null;
   /**
    * Test traffic, by the staging turn's rule (`./record.ts` `isTestTraffic`),
@@ -78,8 +83,9 @@ export interface ProposalEvent {
    * null.
    */
   testTraffic: boolean | null;
-  /** A re-staged card's original: its staged row lends this one its turn and
-   *  its test-traffic flag, so a ticket its ✅ files still finds a turn row. */
+  /** A re-staged card's original: its staged row lends this one its turn, its
+   *  channel and its test-traffic flag, so a ticket its ✅ files still finds a
+   *  turn row. */
   originProposalId: string | null;
 
   // ── staged ──
@@ -96,6 +102,9 @@ export interface ProposalEvent {
   /** When the thread the card was staged in began, epoch ms: the thread's root
    *  message, which is the ask itself when the ask opened the thread. */
   threadStartedAt: number | null;
+  /** A ticket the bot filed on itself from the card's reaction or button ✅
+   *  (`noteSelfFiledTicket`) — written later, never by `record`. */
+  ticketUrl: string | null;
 
   // ── confirmed and cancelled ──
   /** Who decided. */
@@ -131,9 +140,13 @@ export interface ProposalEventLog {
    * Put a ticket the bot filed on itself on the row of the turn that STAGED
    * the card — for a ✅ that landed on a reaction or a button, which no turn
    * runs, so no turn row would otherwise carry it. A turn row that already
-   * names a ticket keeps it.
+   * names a ticket keeps it. The ticket is kept on the card's staged row too,
+   * where `ticketFor` reads it: the ✅ can land before the staging turn's own
+   * row is written, and that turn picks it up from there.
    */
   noteSelfFiledTicket(proposalId: string, url: string): Promise<void>;
+  /** The ticket noted on a card's staged row, or null. */
+  ticketFor(proposalId: string): Promise<string | null>;
 }
 
 // ── Building events ──────────────────────────────────────────────────────────
@@ -149,37 +162,30 @@ const EMPTY: Omit<ProposalEvent, "proposalId" | "event" | "at" | "via"> = {
   requesterRole: null,
   aimedAtRole: null,
   threadStartedAt: null,
+  ticketUrl: null,
   actorId: null,
   confirmedByOther: null,
 };
 
-/** A DM's channel id: what `turns` keeps no channel for, and whose asks
- *  record no one they named. */
-export function isDmChannel(channel: string): boolean {
-  return channel.startsWith("D");
-}
-
-/** A bare event: the four columns every row has, and the channel. */
+/** A bare event: the four columns every row has. */
 export function proposalEvent(
-  proposal: Pick<PendingProposal, "proposalTs" | "channel">,
+  proposalId: string,
   event: ProposalEventKind,
   at: number,
   via: ProposalEventVia,
 ): ProposalEvent {
-  return {
-    ...EMPTY,
-    proposalId: proposal.proposalTs,
-    event,
-    at,
-    via,
-    channelId: isDmChannel(proposal.channel) ? null : proposal.channel,
-  };
+  return { ...EMPTY, proposalId, event, at, via };
 }
 
-/** `superseded` for each card a revision or a staging retired — the ts the
- *  store reported, in the staging card's channel. */
-export function supersededEvents(retired: readonly string[], channel: string, at: number): ProposalEvent[] {
-  return retired.map((proposalTs) => proposalEvent({ proposalTs, channel }, "superseded", at, "revision"));
+/** `superseded` for each card a staging retired — the ts the store reported,
+ *  `via` whoever staged its successor: a turn's revision, a re-stage, the
+ *  Worker. */
+export function supersededEvents(
+  retired: readonly string[],
+  at: number,
+  via: "revision" | "restage" | "worker",
+): ProposalEvent[] {
+  return retired.map((proposalTs) => proposalEvent(proposalTs, "superseded", at, via));
 }
 
 /**
@@ -189,14 +195,18 @@ export function supersededEvents(retired: readonly string[], channel: string, at
  * Dated by the card's own ts, which is when Slack took it; `at` is only for a
  * card whose ts is not a Slack one (an eval conversation's). `askText` is read
  * for the person it names and never kept; with no text (a card the Worker
- * staged itself, or a re-stage) nobody was named, and in a DM nobody named is
- * recorded — the rule `turns` keeps for DM text.
+ * staged itself, or a re-stage) nobody was named. `channelStored` is the
+ * staging conversation read by `turns`' rule (`./record.ts` `storesChannel`):
+ * a DM or group DM card names no channel and records nobody its ask named. A
+ * re-staged card stores none of its own and takes its original's.
  */
 export function stagedEvent(input: {
   proposal: PendingProposal;
   /** When a card with no Slack ts was staged, epoch ms. */
   at: number;
   via: "turn" | "restage" | "worker";
+  /** Whether the staging conversation may be named (see above). */
+  channelStored: boolean;
   turnId?: string;
   /** The staging turn's test-traffic flag; absent, inherited (see the field). */
   testTraffic?: boolean;
@@ -208,14 +218,15 @@ export function stagedEvent(input: {
   const { proposal } = input;
   const requester = proposal.requesterUserId || null;
   const aimedAt =
-    input.askText && !isDmChannel(proposal.channel) ? aimedAtOf(input.askText, proposal.requesterUserId) : null;
+    input.askText && input.channelStored ? aimedAtOf(input.askText, proposal.requesterUserId) : null;
   // The thread's root ts: the reply thread the card went up in. In a channel
   // that IS the root message; in a DM each ask has its own thread since the
   // agent_view migration. A root that is not a Slack ts dates nothing.
   const root = proposal.replyTs ?? proposal.userMsgTs;
   const rootAt = askedAtOf(root, Number.NaN);
   return {
-    ...proposalEvent(proposal, "staged", askedAtOf(proposal.proposalTs, input.at), input.via),
+    ...proposalEvent(proposal.proposalTs, "staged", askedAtOf(proposal.proposalTs, input.at), input.via),
+    channelId: input.channelStored ? proposal.channel : null,
     turnId: input.turnId ?? null,
     testTraffic: input.testTraffic ?? null,
     originProposalId: input.originProposalId ?? null,
@@ -241,7 +252,7 @@ export function verdictEvents(verdict: GateVerdict, at: number): ProposalEvent[]
   const confirmed = verdict.decision === "confirm";
   return [
     {
-      ...proposalEvent(proposal, confirmed ? "confirmed" : "cancelled", at, verdict.by?.door ?? "model"),
+      ...proposalEvent(proposal.proposalTs, confirmed ? "confirmed" : "cancelled", at, verdict.by?.door ?? "model"),
       actorId: actor,
       // Unknown, not "no", when the signal named nobody — and when the card
       // has no requester to compare with (one the Worker staged itself).
@@ -257,11 +268,11 @@ export function verdictEvents(verdict: GateVerdict, at: number): ProposalEvent[]
  * was read (ADR-029) — one per resolution, not per operation.
  */
 export function executionEvents(
-  proposal: Pick<PendingProposal, "proposalTs" | "channel">,
+  proposalId: string,
   outcomes: readonly OperationOutcome[],
   at: number,
 ): ProposalEvent[] {
-  return outcomes.some(refusedStale) ? [proposalEvent(proposal, "refused_stale", at, "executor")] : [];
+  return outcomes.some(refusedStale) ? [proposalEvent(proposalId, "refused_stale", at, "executor")] : [];
 }
 
 /** Whether an operation's own result says a stamp had moved (`staleStamps` on
@@ -290,7 +301,7 @@ export async function recordProposalEvents(
   timeoutMs: number = PROPOSAL_EVENT_TIMEOUT_MS,
 ): Promise<void> {
   for (const event of events) {
-    await quietly(`${event.event} on ${event.proposalId}`, () => log.record(event), timeoutMs);
+    await quietly(`proposal event ${event.event} on ${event.proposalId}`, () => log.record(event), timeoutMs);
   }
 }
 
@@ -309,7 +320,7 @@ export async function quietly(
       }),
     ]);
   } catch (err) {
-    console.error(`[usage] proposal event ${what} not recorded: ${err instanceof Error ? err.message : String(err)}`);
+    console.error(`[usage] ${what} not recorded: ${err instanceof Error ? err.message : String(err)}`);
   } finally {
     if (timer !== undefined) clearTimeout(timer);
   }

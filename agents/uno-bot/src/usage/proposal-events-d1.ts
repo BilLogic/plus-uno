@@ -44,6 +44,7 @@ const COLUMNS = [
   "requester_role",
   "aimed_at_role",
   "thread_started_at",
+  "ticket_url",
   "actor_id",
   "confirmed_by_other",
 ] as const;
@@ -54,13 +55,14 @@ const STAGED_OF = (column: string) =>
   `(SELECT ${column} FROM proposal_events WHERE proposal_id = ? AND event = 'staged')`;
 
 /**
- * Each column's placeholder. Two inherit when written null: `turn_id` from a
- * re-staged card's original, and `test_traffic` from the card's own staged
- * row (or its original's), false when there is none — see
+ * Each column's placeholder. Three inherit when written null: `turn_id` and
+ * `channel_id` from a re-staged card's original, and `test_traffic` from the
+ * card's own staged row (or its original's), false when there is none — see
  * `ProposalEvent.testTraffic`. Each subquery takes its own bound id.
  */
 const PLACEHOLDER: Partial<Record<(typeof COLUMNS)[number], string>> = {
   turn_id: `COALESCE(?, ${STAGED_OF("turn_id")})`,
+  channel_id: `COALESCE(?, ${STAGED_OF("channel_id")})`,
   test_traffic: `COALESCE(?, ${STAGED_OF("test_traffic")}, 0)`,
 };
 
@@ -89,6 +91,13 @@ const EXPIRE =
   `SELECT s.proposal_id, 'expired', s.at + s.ttl_ms, 'end-of-day', s.channel_id, s.test_traffic ${OVERDUE_FROM} ` +
   `ON CONFLICT (proposal_id, event) DO NOTHING`;
 
+// The card's staged row keeps the ticket, whether or not the turn row exists
+// yet (`ticketFor` is how that turn picks it up).
+const NOTE_TICKET_ON_CARD =
+  `UPDATE proposal_events SET ticket_url = ? WHERE proposal_id = ? AND event = 'staged' AND ticket_url IS NULL`;
+
+const TICKET_FOR = `SELECT ticket_url FROM proposal_events WHERE proposal_id = ? AND event = 'staged'`;
+
 // The staging turn's row, found through the staged event; a row that already
 // names a ticket keeps it.
 const NOTE_TICKET =
@@ -102,6 +111,7 @@ function toRow(e: ProposalEvent): unknown[] {
   const inheritFrom = e.originProposalId ?? e.proposalId;
   const row: Record<(typeof COLUMNS)[number], unknown[]> = mapRow(e);
   row.turn_id = [e.turnId, e.originProposalId];
+  row.channel_id = [e.channelId, e.originProposalId];
   row.test_traffic = [boolOrNull(e.testTraffic), inheritFrom];
   return COLUMNS.flatMap((c) => row[c]);
 }
@@ -122,6 +132,7 @@ function mapRow(e: ProposalEvent): Record<(typeof COLUMNS)[number], unknown[]> {
     requester_role: e.requesterRole,
     aimed_at_role: e.aimedAtRole,
     thread_started_at: e.threadStartedAt,
+    ticket_url: e.ticketUrl,
     actor_id: e.actorId,
     confirmed_by_other: boolOrNull(e.confirmedByOther),
   };
@@ -152,6 +163,7 @@ function fromRow(row: Row): ProposalEvent {
     requesterRole: roleOrNull(row.requester_role),
     aimedAtRole: roleOrNull(row.aimed_at_role),
     threadStartedAt: numOrNull(row.thread_started_at),
+    ticketUrl: strOrNull(row.ticket_url),
     actorId: strOrNull(row.actor_id),
     confirmedByOther: row.confirmed_by_other == null ? null : Number(row.confirmed_by_other) === 1,
   };
@@ -186,7 +198,14 @@ export function createD1ProposalEventLog(deps: { db: ProposalEventDatabase }): P
     },
     async noteSelfFiledTicket(proposalId, url) {
       chargeD1Query();
+      await db.prepare(NOTE_TICKET_ON_CARD).bind(url, proposalId).run();
+      chargeD1Query();
       await db.prepare(NOTE_TICKET).bind(url, proposalId).run();
+    },
+    async ticketFor(proposalId) {
+      chargeD1Query();
+      const { results } = await db.prepare(TICKET_FOR).bind(proposalId).all<{ ticket_url: unknown }>();
+      return strOrNull(results[0]?.ticket_url);
     },
   };
 }

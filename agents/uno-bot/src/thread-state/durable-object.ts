@@ -40,7 +40,7 @@ import type {
   PendingProposal,
   ProposalLookup,
   RunClaim,
-  StagedProposal,
+  StagingReport,
   ThreadRef,
   ThreadState,
   ThreadStateDeps,
@@ -97,7 +97,7 @@ export function createDurableObjectThreadState(
 
     // ----- proposals -----
 
-    putProposal(proposal: PendingProposal): Promise<StagedProposal> {
+    putProposal(proposal: PendingProposal): Promise<StagingReport> {
       return hop().putProposal(proposal, now());
     },
 

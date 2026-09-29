@@ -69,3 +69,18 @@
     outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
     outline-offset: var(--size-element-stroke-lg, 2px);
 }
+
+/*
+ * Disabled. The ground and ink repeat Tag's `.plus-tag--disabled` on purpose:
+ * the generated docs list the tokens each component's own stylesheet names,
+ * so a shared partial would drop them from both. The DisabledBesideTags story
+ * asserts the two stay equal. Hover and press hold the disabled ground.
+ */
+.plus-suggestion:disabled,
+.plus-suggestion:disabled:hover,
+.plus-suggestion:disabled:active {
+    border-color: var(--color-outline-variant, #bec8ca);
+    background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
+    color: var(--color-secondary-text, #3b525f);
+    cursor: default;
+}

@@ -31,6 +31,7 @@ export function stagedRow(over: Partial<ProposalEvent> = {}): ProposalEvent {
     requesterRole: "pm",
     aimedAtRole: "dev",
     threadStartedAt: 1_700_000_000_100,
+    ticketUrl: null,
     actorId: null,
     confirmedByOther: null,
     ...over,
@@ -201,6 +202,26 @@ export function runProposalEventConformance(
       (await turns.get("C1:1700000000.000200"))?.selfFiledTicketUrl,
       "https://github.com/BilLogic/plus-uno/issues/901",
     );
+  });
+
+  it("keeps a ticket on the card's staged row even before the turn's row exists", async () => {
+    // The ✅ can land before the staging turn writes its own row; that turn
+    // reads it back from here (`ticketFor`).
+    const { events, turns } = make();
+    await events.record(stagedRow());
+    assert.equal(await events.ticketFor("1700000000.000300"), null);
+    await events.noteSelfFiledTicket("1700000000.000300", "https://github.com/BilLogic/plus-uno/issues/903");
+    assert.equal(await events.ticketFor("1700000000.000300"), "https://github.com/BilLogic/plus-uno/issues/903");
+    assert.equal(await turns.get("C1:1700000000.000200"), null);
+  });
+
+  it("gives a re-staged card with no channel of its own its original's", async () => {
+    const { events } = make();
+    await events.record(stagedRow());
+    await events.record(
+      stagedRow({ proposalId: "1700000000.000900", via: "restage", channelId: null, originProposalId: "1700000000.000300" }),
+    );
+    assert.equal((await events.eventsOf("1700000000.000900"))[0]?.channelId, "C1");
   });
 
   it("puts a ticket nowhere when no turn staged the card", async () => {

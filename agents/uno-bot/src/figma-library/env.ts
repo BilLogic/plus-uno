@@ -74,8 +74,9 @@ export async function runLibraryPost(env: Env, opts: { dryRun: boolean }): Promi
         const { retired } = await threadStateFor(env).putProposal(proposal);
         // On the usage record like any card, staged by the Worker itself.
         await recordProposalEvents(proposalEventLogFor(env), [
-          ...supersededEvents(retired, proposal.channel, Date.now()),
-          stagedEvent({ proposal, at: Date.now(), via: "worker" }),
+          ...supersededEvents(retired, Date.now(), "worker"),
+          // Always a channel card (#plus-universal).
+          stagedEvent({ proposal, at: Date.now(), via: "worker", channelStored: true }),
         ]);
       },
       channel,

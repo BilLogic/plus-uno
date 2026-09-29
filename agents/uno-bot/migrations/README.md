@@ -35,12 +35,16 @@ logged and dropped). A deploy with no pending migration needs no step.
 - Never edit a migration that has run anywhere. Add the next number.
 - Additive only: new tables, new nullable columns, new indexes. A column the
   Worker writes is also mapped in its table's adapter — `agents/uno-bot/src/usage/d1.ts`
-  for `turns`, `proposal-events-d1.ts` for `proposal_events` — the one place
-  per table where record fields become SQL columns.
+  for `turns`, `proposal-events-d1.ts` for `proposal_events` — the one place per
+  table where record fields become SQL columns; the columns only the classifier
+  writes (the categories, the attempt count, the text purge) are mapped in
+  `agents/uno-bot/src/usage/category-store.ts`, and a ticket filed from a card's
+  reaction or button onto its staging turn by `proposal-events-d1.ts`.
 - Bound parameters in the Worker, always; nothing is assembled into SQL from a
   value.
-- What the database never stores — message text past classification, anything
-  from a DM, secrets — is ADR-030's, and a migration does not widen it.
+- What the database never stores — message text past classification, any DM
+  text (a DM ask keeps only its category labels), secrets — is ADR-030's, and a
+  migration does not widen it.
 
 **Tested** by `npm run test:workerd`: the UsageLog and ProposalEventLog
 conformance suites apply every file here to a local D1 before they run, so a
