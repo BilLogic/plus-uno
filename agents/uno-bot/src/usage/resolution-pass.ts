@@ -21,9 +21,14 @@
 //   - an ask whose DM half is unknown is read again, at most once a day, until
 //     it leaves the window (`PASS_LOOKBACK_MS`) — a `none` becomes a real
 //     answer once the lead's token works;
-//   - a thread that cannot be read whole (refused, or longer than one page) is
-//     read `MAX_THREAD_ATTEMPTS` times in all, a day apart, then recorded
-//     `none` and settled, so it never pins the queue;
+//   - a thread that cannot be read whole (gone to the bot, or longer than one
+//     page) is read `MAX_THREAD_ATTEMPTS` times in all, a day apart, then
+//     recorded `none` and settled, so it never pins the queue;
+//   - EXCEPT a read that failed for now — a rate limit, a network error, a
+//     5xx (`passThreadOf`). That is not a read: nothing is recorded, and the
+//     run's next job reads the ask again. The six jobs run back to back, so a
+//     busy day's reads outrun conversations.replies' rate limit, and counting
+//     those as attempts would settle live threads as `none`;
 //   - asks never read go first, then the oldest, so re-reading the unknowns
 //     never starves a new ask of its first read.
 //
@@ -35,6 +40,7 @@ import {
   ESCALATION_WINDOW_MS,
   sameTopic,
   tsToMs,
+  wholeThread,
   type PassCandidate,
   type PassOutcome,
   type ResolutionLog,
@@ -52,6 +58,28 @@ export const RETRY_AFTER_MS = 20 * 60 * 60 * 1000;
 
 /** Reads of an unreadable thread before the pass records `none` and settles it. */
 export const MAX_THREAD_ATTEMPTS = 3;
+
+/** A thread read that failed for now, not for good: the ask stays unread. */
+export const TRY_LATER = "try-later";
+
+/** The pass's read of a thread: whole, unreadable for good (null), or `TRY_LATER`. */
+export type PassThread = ThreadMessage[] | null | typeof TRY_LATER;
+
+/** Slack's answers that mean the bot cannot read the thread at all. */
+const THREAD_GONE = new Set(["channel_not_found", "not_in_channel", "thread_not_found"]);
+
+/**
+ * Sort one conversations.replies answer for the pass. Only a thread the bot
+ * cannot read at all (`THREAD_GONE`), or one longer than a page, counts
+ * towards `MAX_THREAD_ATTEMPTS`; every other failure — `ratelimited`,
+ * `network_error`, an `http_5xx` — is `TRY_LATER`.
+ *
+ * @param res - Slack's answer, as `slack/api.ts` hands it back
+ */
+export function passThreadOf(res: Parameters<typeof wholeThread>[0] & { error?: string }): PassThread {
+  if (res.ok) return wholeThread(res);
+  return THREAD_GONE.has(res.error ?? "") ? null : TRY_LATER;
+}
 
 /** Pages of the lead's DM list one pass reads; a list longer than that is unknown. */
 export const IM_LIST_PAGES = 3;
@@ -94,15 +122,17 @@ export interface ResolutionPassDeps {
   leadUserId: string | null;
   /** The bot's own user id, so its replies are not a person's. */
   botUserId(): Promise<string | undefined>;
-  /** The whole thread the ask sits in, oldest first; null when unreadable. */
-  threadOf(channel: string, askTs: string): Promise<ThreadMessage[] | null>;
+  /** The whole thread the ask sits in, oldest first; null when unreadable for
+   *  good, `TRY_LATER` when Slack could not answer now (`passThreadOf`). */
+  threadOf(channel: string, askTs: string): Promise<PassThread>;
   /**
    * The asker's DM with the lead between two ts, on the lead's own token
    * (`createLeadDmReader`). The reader itself is null when the pass has no such
    * token; a read it answers null could not be made, and counts the same way.
    */
   leadDmsWith: LeadDmReader | null;
-  /** Reads as it would, writes nothing. */
+  /** Counts the asks due, and reads and writes nothing: the sweep probe's
+   *  rehearsal shares the lookup ceiling, and must not spend it on Slack. */
   dryRun: boolean;
   /** Log the missing-token line — the run's first job only, so it is one line
    *  per run. Default true. */
@@ -115,6 +145,8 @@ export interface ResolutionPassSummary {
   none: number;
   escalated: number;
   skipped: number;
+  /** Asks left unread because Slack could not answer now (`TRY_LATER`). */
+  deferred: number;
   summary: string;
 }
 
@@ -254,8 +286,11 @@ export async function runResolutionPass(deps: ResolutionPassDeps): Promise<Resol
     attemptedBefore: now - RETRY_AFTER_MS,
     limit: PASS_LIMIT,
   });
-  const counts = { checked: 0, noEscalation: 0, none: 0, escalated: 0, skipped: 0 };
+  const counts = { checked: 0, noEscalation: 0, none: 0, escalated: 0, skipped: 0, deferred: 0 };
   if (pending.length === 0) return { ...counts, summary: "no asks to check" };
+  if (deps.dryRun) {
+    return { ...counts, summary: `${pending.length} ask(s) due (dry run: nothing read, nothing written)` };
+  }
 
   const lead = deps.leadUserId;
   const dmReader = lead ? deps.leadDmsWith : null;
@@ -269,8 +304,12 @@ export async function runResolutionPass(deps: ResolutionPassDeps): Promise<Resol
 
   for (const ask of pending) {
     const thread = await deps.threadOf(ask.channel, ask.askTs);
+    if (thread === TRY_LATER) {
+      counts.deferred++;
+      continue;
+    }
     if (!thread) {
-      if (!deps.dryRun) await deps.log.recordPass(ask.turnId, unreadableOutcome(ask), now);
+      await deps.log.recordPass(ask.turnId, unreadableOutcome(ask), now);
       counts.skipped++;
       continue;
     }
@@ -282,7 +321,7 @@ export async function runResolutionPass(deps: ResolutionPassDeps): Promise<Resol
           ? []
           : null;
     const outcome = decideAsk(ask, thread, dms, { bot, lead });
-    if (!deps.dryRun) await deps.log.recordPass(ask.turnId, outcome, now);
+    await deps.log.recordPass(ask.turnId, outcome, now);
     counts.checked++;
     if (outcome.resolution === "no_escalation") counts.noEscalation++;
     if (outcome.resolution === "none") counts.none++;
@@ -291,6 +330,7 @@ export async function runResolutionPass(deps: ResolutionPassDeps): Promise<Resol
 
   const summary =
     `${counts.checked} ask(s) checked: ${counts.noEscalation} no_escalation, ${counts.none} none, ` +
-    `${counts.escalated} escalated to the lead, ${counts.skipped} unreadable${deps.dryRun ? " (dry run, nothing written)" : ""}`;
+    `${counts.escalated} escalated to the lead, ${counts.skipped} unreadable` +
+    (counts.deferred ? `, ${counts.deferred} left for a later read (Slack could not answer now)` : "");
   return { ...counts, summary };
 }
