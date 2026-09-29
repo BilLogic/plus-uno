@@ -13,6 +13,8 @@ import { turnRecord, type ConformanceRunner } from "./usage-log-conformance";
 
 const HOUR = 60 * 60 * 1000;
 const T0 = 1_700_000_000_200;
+/** A bot answer's ts: the message a reaction lands on. */
+const ANSWER = "1700000005.000200";
 
 /** A channel ask at `T0 + offsetMs`, by `requesterId`. */
 function ask(offsetMs: number, over: Parameters<typeof turnRecord>[0] = {}) {
@@ -52,16 +54,30 @@ export function runResolutionLogConformance(
     const { usage, resolutions } = make();
     const turn = ask(0);
     await usage.record(turn);
-    assert.equal(await resolutions.recordReaction({ turnId: turn.turnId, requesterId: "U2", at: T0 + HOUR }), null);
-    assert.equal(await resolutions.recordReaction({ turnId: "C1:0", requesterId: "U1", at: T0 + HOUR }), null);
+    assert.equal(await resolutions.recordReaction({ turnId: turn.turnId, requesterId: "U2", reactedTs: ANSWER, at: T0 + HOUR }), null);
+    assert.equal(await resolutions.recordReaction({ turnId: "C1:0", requesterId: "U1", reactedTs: ANSWER, at: T0 + HOUR }), null);
     assert.equal(await resolutions.getResolution(turn.turnId).then((r) => r?.resolution), null);
 
-    assert.equal(await resolutions.recordReaction({ turnId: turn.turnId, requesterId: "U1", at: T0 + HOUR }), turn.turnId);
+    assert.equal(await resolutions.recordReaction({ turnId: turn.turnId, requesterId: "U1", reactedTs: ANSWER, at: T0 + HOUR }), turn.turnId);
     assert.deepEqual(await resolutions.getResolution(turn.turnId), {
       ...EMPTY,
       resolution: "reaction",
       resolvedAt: T0 + HOUR,
     });
+  });
+
+  it("a reaction on a message that is a known card records nothing, whoever's card it is", async () => {
+    const { usage, resolutions } = make();
+    const turn = ask(0, { proposalId: "1700000000.000900" });
+    const other = ask(HOUR, { proposalId: "1700000000.000950" });
+    await usage.record(turn);
+    await usage.record(other);
+    for (const card of ["1700000000.000900", "1700000000.000950"]) {
+      assert.equal(await resolutions.recordReaction({ turnId: turn.turnId, requesterId: "U1", reactedTs: card, at: T0 + HOUR }), null);
+    }
+    assert.equal((await resolutions.getResolution(turn.turnId))?.resolution, null);
+    // The same ask, reacted on its answer instead, resolves.
+    assert.equal(await resolutions.recordReaction({ turnId: turn.turnId, requesterId: "U1", reactedTs: ANSWER, at: T0 + HOUR }), turn.turnId);
   });
 
   it("a completed batch resolves the turn that staged its card", async () => {
@@ -81,7 +97,7 @@ export function runResolutionLogConformance(
     assert.equal((await resolutions.getResolution(turn.turnId))?.resolution, "none");
 
     assert.equal(await resolutions.recordTaskCompleted("1700000000.000900", T0 + 26 * HOUR), turn.turnId);
-    assert.equal(await resolutions.recordReaction({ turnId: turn.turnId, requesterId: "U1", at: T0 + 27 * HOUR }), null);
+    assert.equal(await resolutions.recordReaction({ turnId: turn.turnId, requesterId: "U1", reactedTs: ANSWER, at: T0 + 27 * HOUR }), null);
     // A later pass does not overwrite a person's signal.
     await resolutions.recordPass(turn.turnId, { resolution: "no_escalation", escalatedToLead: false, settled: true }, T0 + 49 * HOUR);
 
