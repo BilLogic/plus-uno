@@ -3,7 +3,7 @@
  *
  * ONE SIZE: 22 tall including a 1px border, B3 12 text, padding 4, gap 4,
  * radius 4. The label heights (16/20/22/32) have no semantic token yet, so the
- * 22 is a local custom property with its value as the default, as Count does.
+ * 22 is a local custom property set from `_label-heights.scss`, as Count does.
  * The swatch 10, radius 2, × 16, the 16 avatar box (space-300) and the 12
  * spinner inside it (space-200) are Figma-bound spacing and radius
  * primitives, because no Element token names them.
@@ -24,6 +24,8 @@
  *   yellow   social-emotional
  *   teal     tertiary
  */
+@use '../label-heights' as label;
+
 $tag-colors: (
     'grey': (
         var(--color-outline-variant, #bec8ca),
@@ -84,7 +86,7 @@ $tag-colors: (
 );
 
 .plus-tag {
-    --plus-tag-height: 22px;
+    --plus-tag-height: #{label.$tag-height};
 
     position: relative;
     display: inline-flex;
