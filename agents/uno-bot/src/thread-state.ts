@@ -52,12 +52,13 @@ import {
   EXECUTION_CUTOFF_MS,
   HISTORY_TTL_MS,
   MAX_HISTORY_TURNS,
-  PROPOSAL_TTL_MS,
   RUN_LEASE_MS,
   afterFailedNote,
   cutOffSweepAt,
   cutOffTakeable,
+  ownTtl,
   proposalReplyThread,
+  proposalTtlMs,
   type CutOffNoteReport,
   type Execution,
   type HistoryTurn,
@@ -185,8 +186,8 @@ export class ThreadState extends DurableObject<Env> {
 
   // Delete expired records by their own TTL. Keys: event:{id}
   // (EVENT_DEDUP_TTL_MS), hist:{…} (HISTORY_TTL_MS), prop:{ts} and exec:{ts}
-  // (PROPOSAL_TTL_MS). Answers when the next sweep is due: a day away if
-  // anything remains, never if the store is empty.
+  // (each card's own, `proposalTtlMs`). Answers when the next sweep is due: a
+  // day away if anything remains, never if the store is empty.
   private async collectGarbage(now: number): Promise<number> {
     let remaining = 0;
     const events = await this.storage.list<EventRecord>({ prefix: "event:" });
@@ -201,12 +202,12 @@ export class ThreadState extends DurableObject<Env> {
     }
     const props = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
     for (const [key, rec] of props) {
-      if (now - rec.createdAt > PROPOSAL_TTL_MS) await this.storage.delete(key);
+      if (now - rec.createdAt > recordTtlMs(rec)) await this.storage.delete(key);
       else remaining++;
     }
     const execs = await this.storage.list<Execution>({ prefix: "exec:" });
     for (const [key, rec] of execs) {
-      if (now - rec.startedAt > PROPOSAL_TTL_MS) await this.storage.delete(key);
+      if (now - rec.startedAt > proposalTtlMs(rec.proposal)) await this.storage.delete(key);
       else remaining++;
     }
     // Active-run pointers: one key per user, overwritten each turn, so this is
@@ -300,7 +301,7 @@ export class ThreadState extends DurableObject<Env> {
   // key — and why that is what keeps two unrelated DM asks apart — is in
   // `thread-state/store.ts` on `putProposal`. One scan of the staged set, as
   // `getProposalByThread` does: live cardinality is small because proposals
-  // expire after an hour.
+  // expire by their TTL.
   //
   // Retire first, then write — a choice, not an accident: the new card is the
   // one a racing ✅ has to be able to find, so it is the last thing to land.
@@ -313,7 +314,7 @@ export class ThreadState extends DurableObject<Env> {
       // still wants this ts — that is the caller who retired it ahead of
       // staging this very card (#583).
       if (rec.supersededBy) continue;
-      if (at - rec.createdAt > PROPOSAL_TTL_MS) continue; // already "expired"
+      if (at - rec.createdAt > recordTtlMs(rec)) continue; // already "expired"
       const pending = rec.payload as PendingProposal | null;
       if (!pending || pending.channel !== proposal.channel) continue;
       if (proposalReplyThread(pending) !== thread) continue;
@@ -343,7 +344,7 @@ export class ThreadState extends DurableObject<Env> {
   // retirement does not matter: a chain still ends in a live newest card.
   private async successorIsLive(ts: string, at: number): Promise<boolean> {
     const rec = await this.storage.get<ProposalRecord>(proposalKey(ts));
-    return !!rec && at - rec.createdAt <= PROPOSAL_TTL_MS;
+    return !!rec && at - rec.createdAt <= recordTtlMs(rec);
   }
 
   // "expired", "superseded" and "none" are different answers on purpose: the
@@ -357,9 +358,9 @@ export class ThreadState extends DurableObject<Env> {
     if (rec.supersededBy && (await this.successorIsLive(rec.supersededBy, at))) {
       return { state: "superseded" };
     }
-    if (at - rec.createdAt > PROPOSAL_TTL_MS) {
+    if (at - rec.createdAt > recordTtlMs(rec)) {
       await this.storage.delete(proposalKey(proposalTs));
-      return { state: "expired" };
+      return { state: "expired", ...ownTtl((rec.payload as PendingProposal | null) ?? {}) };
     }
     if (rec.supersededBy || rec.retired) return { state: "superseded" };
     return {
@@ -369,13 +370,13 @@ export class ThreadState extends DurableObject<Env> {
     };
   }
 
-  // Scans the staged set: proposals expire after an hour, so live cardinality
+  // Scans the staged set: proposals expire by their TTL, so live cardinality
   // stays small.
   async getProposalByThread(ref: ThreadRef, at: number): Promise<PendingProposal | null> {
     const all = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
     let best: ProposalRecord | null = null;
     for (const rec of all.values()) {
-      if (at - rec.createdAt > PROPOSAL_TTL_MS) continue;
+      if (at - rec.createdAt > recordTtlMs(rec)) continue;
       if (rec.supersededBy || rec.retired) continue; // retired, so never the thread's live card
       const proposal = rec.payload as PendingProposal | null;
       if (!proposal || proposal.channel !== ref.channel) continue;
@@ -391,7 +392,7 @@ export class ThreadState extends DurableObject<Env> {
     const all = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
     const live: ProposalRecord[] = [];
     for (const rec of all.values()) {
-      if (at - rec.createdAt > PROPOSAL_TTL_MS) continue;
+      if (at - rec.createdAt > recordTtlMs(rec)) continue;
       if (rec.supersededBy || rec.retired) continue;
       const proposal = rec.payload as PendingProposal | null;
       if (!proposal || proposal.channel !== channel) continue;
@@ -467,7 +468,7 @@ export class ThreadState extends DurableObject<Env> {
     const key = executionKey(proposalTs);
     const rec = await this.storage.get<Execution>(key);
     if (!rec) return null;
-    if (at - rec.startedAt > PROPOSAL_TTL_MS) {
+    if (at - rec.startedAt > proposalTtlMs(rec.proposal)) {
       await this.storage.delete(key);
       return null;
     }
@@ -633,6 +634,12 @@ export class ThreadState extends DurableObject<Env> {
 
 function historyKey(channel: string, thread: string): string {
   return `hist:${channel}:${thread}`;
+}
+
+// A proposal record's lifetime, read off the card it holds. The payload is
+// stored opaque, and a record with none reads as the default hour.
+function recordTtlMs(rec: ProposalRecord): number {
+  return proposalTtlMs((rec.payload as PendingProposal | null) ?? {});
 }
 
 function proposalKey(ts: string): string {
