@@ -28,6 +28,8 @@
     box-sizing: border-box;
     height: var(--plus-status-height);
     min-width: 0;
+    /* The cap from `maxWidth` (200 by default), never wider than the container. */
+    max-width: min(var(--plus-status-max, 200px), 100%);
     margin: 0;
     padding: 0 var(--size-spacing-small-space-025, 2px) 0 var(--size-element-pad-x-xs, 4px);
     gap: var(--size-spacing-small-space-025, 2px);

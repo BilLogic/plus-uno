@@ -301,6 +301,37 @@ Truncation.play = async ({ canvasElement }) => {
 };
 
 /**
+ * The cap never outgrows the container: in a column narrower than 200 the
+ * Status clamps to the column and truncates, rather than overflowing it. A
+ * smaller `maxWidth` still caps it in a wide one.
+ */
+export const NarrowContainer = () => (
+    <div style={grid}>
+        <div data-testid="column" style={{ width: '120px', border: '1px dashed var(--color-outline-variant)' }}>
+            <Status style="info" data-testid="clamped">Waiting on the district data export</Status>
+        </div>
+        <div style={{ width: '400px' }}>
+            <Status style="info" maxWidth={100} data-testid="capped">Waiting on the district data export</Status>
+        </div>
+    </div>
+);
+NarrowContainer.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const text = 'Waiting on the district data export';
+
+    const column = canvas.getByTestId('column');
+    const clamped = canvas.getByTestId('clamped');
+    await expect(clamped.getBoundingClientRect().width, 'clamped to the column').toBeLessThanOrEqual(column.clientWidth);
+    await expect(clamped.getBoundingClientRect().right, 'does not overflow').toBeLessThanOrEqual(column.getBoundingClientRect().right);
+    const label = within(clamped).getByText(text);
+    await expect(label.scrollWidth, 'the label truncates instead').toBeGreaterThan(label.clientWidth);
+    await waitFor(() => expect(clamped).toHaveAttribute('tabindex', '0'));
+
+    const capped = canvas.getByTestId('capped');
+    await expect(capped.getBoundingClientRect().width, 'a smaller maxWidth still caps it').toBeLessThanOrEqual(100);
+};
+
+/**
  * A Status is never a button: no button role, no click handler, and it is read
  * as its text. An `onClick`, a `role` or a `tabIndex` passed to it is dropped
  * with a development warning; `role="button"` never reaches the DOM.

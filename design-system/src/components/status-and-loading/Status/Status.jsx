@@ -136,6 +136,10 @@ export const Status = ({
     ].filter(Boolean).join(' ');
 
     /*
+     * `maxWidth` travels as a custom property, not an inline `max-width`, so
+     * the stylesheet can also clamp to the container: a Status in a column
+     * narrower than its cap truncates instead of overflowing.
+     *
      * The tooltip is always mounted and switched on only while the label is
      * clipped, so the element a person is focused on never remounts under them
      * when the page resizes.
@@ -145,7 +149,7 @@ export const Status = ({
             <span
                 id={id}
                 className={classes}
-                style={{ maxWidth }}
+                style={{ '--plus-status-max': typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth }}
                 {...rest}
                 tabIndex={truncated ? 0 : undefined}
             >
@@ -185,7 +189,7 @@ Status.propTypes = {
     leadingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /** A number nested inside the label as a Count of the same style: small (16) in medium, medium (20) in large. Hidden at 0. */
     count: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    /** The widest the Status grows, in px or any CSS length. Past it the label ends in an ellipsis and the full text is a tooltip. */
+    /** The widest the Status grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. */
     maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     className: PropTypes.string,
     id: PropTypes.string,

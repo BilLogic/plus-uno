@@ -75,6 +75,10 @@ is in, whether the system calculated it or a person set it.
     <DsCanvasQuiet of={StatusStories.Truncation} />
 </DocsCanvasShell>
 
+<DocsCanvasShell description={<>The cap never outgrows the container: in a column narrower than 200 the Status clamps to the column and truncates the same way.</>}>
+    <DsCanvasQuiet of={StatusStories.NarrowContainer} />
+</DocsCanvasShell>
+
 <DocsCanvasShell description={<>A date takes only neutral, warning and danger. Any other style falls back to neutral with a development warning.</>}>
     <DsCanvasQuiet of={StatusStories.DateStyleFallback} />
 </DocsCanvasShell>

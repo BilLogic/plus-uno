@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/Status/Status.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/Status/Status.stories.jsx` — Styles, Dates, WithCount, LeadingVisual, Truncation, NeverAButton, DateStyleFallback, PinnedWeight, UnknownValuesFallBack, Interactive
+**Stories:** `design-system/src/components/status-and-loading/Status/Status.stories.jsx` — Styles, Dates, WithCount, LeadingVisual, Truncation, NarrowContainer, NeverAButton, DateStyleFallback, PinnedWeight, UnknownValuesFallBack, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/Status/Status.mdx`
 
@@ -21,13 +21,13 @@
 | `size` | oneOf | `'medium'` | `medium` (20) in rows, lists and sentences; `large` (32) beside a heading. |
 | `leadingVisual` | string or node | — | One icon before the label: a Font Awesome solid name (`circle-check`) or a node. Ignored by `date`, which has its own. |
 | `count` | number or string | — | A number nested inside the label as a Count of the same style: small (16) in medium, medium (20) in large. Hidden at 0. |
-| `maxWidth` | number or string | `200` | The widest the Status grows, in px or any CSS length. Past it the label ends in an ellipsis and the full text is a tooltip. |
+| `maxWidth` | number or string | `200` | The widest the Status grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |
 
 ## Tokens touched
 
-`--color-danger-border-subtle` · `--color-danger-state-08` · `--color-danger-state-16` · `--color-danger-text` · `--color-focus-ring` · `--color-info-state-08` · `--color-info-state-16` · `--color-info-text` · `--color-mastering-content-state-08` · `--color-mastering-content-state-16` · `--color-mastering-content-text` · `--color-on-surface-variant` · `--color-on-surface-variant-state-16` · `--color-outline-variant` · `--color-success-state-08` · `--color-success-state-16` · `--color-success-text` · `--color-surface-container` · `--color-warning-border-subtle` · `--color-warning-state-08` · `--color-warning-state-16` · `--color-warning-text` · `--font-size-fa-body2` · `--font-size-fa-h5` · `--font-weight-body2-semibold` · `--font-weight-body3-regular` · `--plus-status-edge` · `--plus-status-height` · `--plus-status-icon-box` · `--size-border-radius-radius-150` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-x-xs` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-element-stroke-sm` · `--size-spacing-small-space-025` · `--size-spacing-small-space-075`
+`--color-danger-border-subtle` · `--color-danger-state-08` · `--color-danger-state-16` · `--color-danger-text` · `--color-focus-ring` · `--color-info-state-08` · `--color-info-state-16` · `--color-info-text` · `--color-mastering-content-state-08` · `--color-mastering-content-state-16` · `--color-mastering-content-text` · `--color-on-surface-variant` · `--color-on-surface-variant-state-16` · `--color-outline-variant` · `--color-success-state-08` · `--color-success-state-16` · `--color-success-text` · `--color-surface-container` · `--color-warning-border-subtle` · `--color-warning-state-08` · `--color-warning-state-16` · `--color-warning-text` · `--font-size-fa-body2` · `--font-size-fa-h5` · `--font-weight-body2-semibold` · `--font-weight-body3-regular` · `--plus-status-edge` · `--plus-status-height` · `--plus-status-icon-box` · `--plus-status-max` · `--size-border-radius-radius-150` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-x-xs` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-element-stroke-sm` · `--size-spacing-small-space-025` · `--size-spacing-small-space-075`
 
 From `design-system/src/components/status-and-loading/Status/Status.scss`. Override these through the token layer, never with a literal.
 
