@@ -1,0 +1,226 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as StatusStories from './Status.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "type": { "type": "enum", "values": ["state", "date"] },
+    "style": { "type": "enum", "values": ["neutral", "success", "warning", "danger", "info", "discovery"] },
+    "size": { "type": "enum", "values": ["medium", "large"] },
+    "leadingVisual": { "type": "boolean" },
+    "count": { "type": "boolean" }
+  },
+  "sets": [
+    {
+      "id": "status",
+      "name": "Status",
+      "componentSetNodeId": "17876:1653",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-1653",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": true,
+      "notes": "On the Status, Count & Tag page, beside the Static Badges it replaces. Figma values carry a (default) suffix on state, neutral and medium. leadingVisual? and count? are booleans in Figma; in code leadingVisual takes the icon and count takes the number. Figma's label text is children. Date exists in neutral, warning and danger only. Docs page: node 17882:1647."
+    }
+  ]
+};
+
+<Meta of={StatusStories} />
+
+<Title />
+Is it a number? Count. Is it the condition something is in, and can that
+condition change? Status. Otherwise, Tag. A Status is the condition something
+is in, whether the system calculated it or a person set it.
+
+<DocsTabs of={StatusStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17882-1647"
+    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Status"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Six styles, each with a meaning. The fill is the style's 08 state layer, the text its (Text) color, and a 1px inside border its 16 layer; neutral is surface-container.</>}>
+    <Canvas of={StatusStories.Styles} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants
+
+<DocsCanvasShell description={<><code>type="date"</code> is outlined, with a fixed icon per style: calendar when the date is not close, clock when it is due soon, alert when it is overdue.</>}>
+    <DsCanvasQuiet of={StatusStories.Dates} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Past <code>maxWidth</code> (200) the label ends in an ellipsis, and the full text shows in a tooltip on hover and on keyboard focus. A Status that fits is not a tab stop.</>}>
+    <DsCanvasQuiet of={StatusStories.Truncation} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A date takes only neutral, warning and danger. Any other style falls back to neutral with a development warning.</>}>
+    <DsCanvasQuiet of={StatusStories.DateStyleFallback} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<><code>leadingVisual</code> adds one icon before the label, in the text color.</>}>
+    <DsCanvasQuiet of={StatusStories.LeadingVisual} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><code>count</code> nests a Count of the same style: small (16) in medium, medium (20) in large, inset equally from the top and the right. A count of 0 is hidden.</>}>
+    <DsCanvasQuiet of={StatusStories.WithCount} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A Status is never a button. An <code>onClick</code> passed to it is dropped with a development warning.</>}>
+    <DsCanvasQuiet of={StatusStories.NeverAButton} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={StatusStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Status` for the condition something is in when that condition can change:
+completed, needs review, missed, in progress, due tomorrow, overdue. It is the
+same component whether the system calculated the state or a person set it.
+
+- **Is it a number?** Count.
+- **Is it the condition something is in, and can that condition change?** Status.
+- **Otherwise** (a subject, a person, a category): Tag.
+
+Use `size="medium"` (20) in rows, lists and sentences, and `size="large"` (32)
+beside a heading. Status replaces the BadgeVariants `status` and `date`
+variants; their callers move in a later change.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Let the style carry a meaning.
+
+Each style means one thing: neutral (not started), success (done), warning
+(needs attention), danger (failed or missed), info (in progress) and discovery
+(new). There is no color prop; a category with a color is a Tag.
+
+```jsx
+// Incorrect — a category borrowing a status color.
+<Status style="info">Math</Status>
+
+// Correct — a condition that can change.
+<Status style="info">In progress</Status>
+```
+
+### Let the app pick a date's style.
+
+A date is neutral when it is not close, warning when it is due soon and danger
+when it is overdue. Derive the style from the date and the due-soon window,
+and write the label as people say it.
+
+```jsx
+<Status type="date" style="warning">Due tomorrow</Status>
+<Status type="date" style="danger">2 days overdue</Status>
+```
+
+### Nest a count instead of placing one beside it.
+
+```jsx
+// Incorrect — two labels that read as unrelated.
+<Status style="success">Completed</Status> <Count value={38} />
+
+// Correct — one label; the number reads as part of it.
+<Status style="success" count={38}>Completed</Status>
+```
+
+### Edit in the field, not on the label.
+
+A Status never opens a menu. Where a status can be changed, the field around it
+becomes an inline Dropdown whose options are grouped To do · In progress ·
+Complete · Exception · Failed, each group with one style (neutral · info ·
+success · warning · danger).
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Read as its text.** A Status is a `span` with no role, so a screen reader
+  announces its text and nothing suggests it can be pressed. An `onClick` is
+  dropped with a development warning.
+- **Not a tab stop, unless truncated.** When the label is clipped, the Status
+  takes focus so a keyboard user can reach the tooltip holding the full text;
+  pointer users get the same tooltip on hover. The full text is always in the
+  DOM, so a screen reader hears all of it.
+- **Not color alone.** Dates differ in icon as well as color (calendar, clock,
+  alert), and a state can add a `leadingVisual` where color alone is not enough.
+  Icons are decorative and hidden from assistive technology.
+- **An edge on any surface.** The 1px inside border keeps a pale fill visible
+  on white and on grey; in forced-colors mode it becomes a real border.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a number on its own, use `Count`; Status nests one through `count`.
+- For a category, a subject or a person, use `Tag`.
+- The BadgeVariants `status` and `date` variants are the labels this replaces;
+  their callers move in a later change.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

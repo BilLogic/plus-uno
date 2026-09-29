@@ -1838,6 +1838,63 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19485"
       }
     },
+    "Status": {
+      "code": {
+        "import": "@/components/status-and-loading",
+        "export": "default",
+        "mdxPath": "design-system/src/components/status-and-loading/Status/Status.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Status",
+        "props": {
+          "type": {
+            "type": "enum",
+            "values": [
+              "state",
+              "date"
+            ]
+          },
+          "style": {
+            "type": "enum",
+            "values": [
+              "neutral",
+              "success",
+              "warning",
+              "danger",
+              "info",
+              "discovery"
+            ]
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "medium",
+              "large"
+            ]
+          },
+          "leadingVisual": {
+            "type": "boolean"
+          },
+          "count": {
+            "type": "boolean"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "status",
+            "name": "Status",
+            "componentSetNodeId": "17876:1653",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-1653",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "On the Status, Count & Tag page, beside the Static Badges it replaces. Figma values carry a (default) suffix on state, neutral and medium. leadingVisual? and count? are booleans in Figma; in code leadingVisual takes the icon and count takes the number. Figma's label text is children. Date exists in neutral, warning and danger only. Docs page: node 17882:1647."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17882-1647"
+      }
+    },
     "Switch": {
       "code": {
         "import": "@/components/forms-and-inputs",
