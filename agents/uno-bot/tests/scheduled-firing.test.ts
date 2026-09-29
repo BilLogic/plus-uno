@@ -83,6 +83,7 @@ test("each run is planned with its jobs, keyed by the UTC run date", () => {
   assert.deepEqual(morning.jobs.map((j) => [j.key, j.kind]), [
     ["figma-library-post", "figma-library-post"],
     ["figma-library-track", "figma-library-track"],
+    ["ds-precedence-post", "ds-precedence-post"],
   ]);
   const endOfDay = planRun("end-of-day", at(22, 0));
   assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind]), [["figma-library-poll", "figma-library-poll"]]);
@@ -125,4 +126,21 @@ test("the enqueue reaches the run's own runner, and costs one charged hop", asyn
   assert.deepEqual(named, ["scheduled-run/end-of-day"]);
   assert.deepEqual(bodies, [run]);
   assert.equal(hops, 1);
+});
+
+test("the DS precedence check runs on Friday's end-of-day run only, after the library poll", () => {
+  // 2026-10-02 is a Friday.
+  const friday = planRun("end-of-day", Date.UTC(2026, 9, 2, 22, 0));
+  assert.deepEqual(friday.jobs.map((j) => [j.key, j.after ?? []]), [
+    ["figma-library-poll", []],
+    ["ds-precedence-check", ["figma-library-poll"]],
+  ]);
+  for (let day = 28; day <= 30; day++) {
+    // Monday to Thursday of the same week: the poll only.
+    const other = planRun("end-of-day", Date.UTC(2026, 8, day, 22, 0));
+    assert.deepEqual(other.jobs.map((j) => j.kind), ["figma-library-poll"]);
+  }
+  assert.deepEqual(planRun("end-of-day", Date.UTC(2026, 9, 1, 22, 0)).jobs.map((j) => j.kind), ["figma-library-poll"]);
+  // The post is on every morning, so a morning whose reads fail is retried.
+  assert.ok(planRun("morning", Date.UTC(2026, 9, 5, 14, 0)).jobs.some((j) => j.kind === "ds-precedence-post"));
 });

@@ -9,6 +9,7 @@ import type { Env } from "../types";
 import { charge } from "../net";
 import { runFigmaPoll } from "../figma-poll";
 import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
+import { runDsPrecedenceCheck, runDsPrecedencePost } from "../ds-precedence/env";
 import { runnerNameForRun, type ScheduledJob, type ScheduledJobKind, type ScheduledRun } from "./runs";
 
 /** One job kind's work. Resolving is done; a budget stop is thrown through. */
@@ -30,6 +31,15 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // Morning: link each posted card's PR, and close its intake on merge.
   "figma-library-track": async (env, _job, { dryRun }) => {
     console.log(`[figma-library] track: ${(await runLibraryTrack(env, { dryRun })).summary}`);
+  },
+  // Friday's end of day: compare code with the library and keep the
+  // disagreements for the morning (src/ds-precedence/).
+  "ds-precedence-check": async (env, _job, { dryRun }) => {
+    console.log(`[ds-precedence] check: ${(await runDsPrecedenceCheck(env, { dryRun })).summary}`);
+  },
+  // Morning: a waiting report becomes one thread and one card in #plus-universal.
+  "ds-precedence-post": async (env, _job, { dryRun }) => {
+    console.log(`[ds-precedence] post: ${(await runDsPrecedencePost(env, { dryRun })).summary}`);
   },
 };
 

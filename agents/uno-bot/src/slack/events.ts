@@ -36,6 +36,7 @@ import { runSlackTurn } from "./turn-adapter";
 import { stripBotMentions } from "./mention";
 import { cardThreadOf, turnSurfaceOf } from "../turn/request";
 import { isIntakeChannel } from "../turn/intake-channel";
+import { handleDsPrecedenceReply, isDsPrecedenceDispute } from "../ds-precedence/env";
 
 // Re-exported for index.ts (SlackEnvelope) and any other importer that still reaches for the Slack wire types here.
 export type {
@@ -77,6 +78,9 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
   switch (event.type) {
     case "message": {
       const msg = event as SlackMessageEvent;
+      // A `dispute N` reply in the weekly DS precedence thread revises its
+      // card; it is not a turn (src/ds-precedence/).
+      if (isUserTurn(msg) && (await disputeHandled(env, msg))) return;
       if (await shouldHandleMessage(env, msg)) {
         await enqueueAgentJob(env, { kind: "message", event: msg }, conversationKey(msg));
       } else {
@@ -87,6 +91,8 @@ async function dispatchInnerEvent(env: Env, event: SlackInnerEvent): Promise<voi
     case "app_mention": {
       // Explicit @mention always engages.
       const msg = appMentionToMessage(event as SlackAppMentionEvent);
+      // Its `message` twin carries a weekly-thread dispute; no turn for it.
+      if (await isDsPrecedenceDispute(env, msg).catch(() => false)) return;
       await enqueueAgentJob(env, { kind: "message", event: msg }, conversationKey(msg));
       return;
     }
@@ -298,6 +304,16 @@ function conversationTs(e: ThreadedEvent): string {
 
 function conversationKey(e: ThreadedEvent): string {
   return `${e.channel}:${conversationTs(e)}`;
+}
+
+async function disputeHandled(env: Env, msg: SlackMessageEvent): Promise<boolean> {
+  try {
+    return await handleDsPrecedenceReply(env, msg);
+  } catch (err) {
+    // A failed revision leaves the reply to the agent rather than to nobody.
+    console.error(`[ds-precedence] dispute not handled: ${err instanceof Error ? err.message : String(err)}`);
+    return false;
+  }
 }
 
 function isUserTurn(event: SlackMessageEvent): boolean {

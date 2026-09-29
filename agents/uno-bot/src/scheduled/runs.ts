@@ -22,9 +22,17 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * What a scheduled job does. `noop` proves the path and does nothing else.
  * The Figma library's three: the end-of-day poll finds a publish, the morning
  * post turns it into a card in #plus-universal, and the morning track follows
- * each posted card to its PR (src/figma-poll.ts, src/figma-library/).
+ * each posted card to its PR (src/figma-poll.ts, src/figma-library/). The
+ * weekly DS precedence check's two: Friday's end-of-day check, and the morning
+ * post that opens its thread in #plus-universal (src/ds-precedence/).
  */
-export type ScheduledJobKind = "noop" | "figma-library-poll" | "figma-library-post" | "figma-library-track";
+export type ScheduledJobKind =
+  | "noop"
+  | "figma-library-poll"
+  | "figma-library-post"
+  | "figma-library-track"
+  | "ds-precedence-check"
+  | "ds-precedence-post";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -36,6 +44,9 @@ export interface ScheduledJob {
    * be done first. The runner passes over it while any of them is pending.
    */
   readonly after?: readonly string[];
+  /** The UTC weekday (0 Sunday … 6 Saturday) the job is planned on; absent,
+   *  every day its run fires. */
+  readonly weekday?: number;
 }
 
 /** A run, planned for one date. */
@@ -52,16 +63,31 @@ const RUN_HOURS: Record<ScheduledRunName, number> = {
   "end-of-day": 22,
 };
 
+/** Friday, as `Date.getUTCDay` numbers it. */
+const FRIDAY = 5;
+
 /**
  * Every run's jobs. A publish found at the end of the day is posted the next
  * morning, like every proactive job; the tracker follows cards already posted.
+ *
+ * The DS precedence check is weekly, on FRIDAY's end-of-day run: the week's
+ * merges and any library publish have landed, so it reads where the week
+ * ended, and its thread opens Monday's morning run — the start of the week
+ * the team has to act on it, with the card live until the next check. It runs
+ * after the library poll, so a publish found that evening is already among
+ * the components it leaves to the library flow. Its post is on every morning,
+ * not only Monday's: a report waits in KV until a morning posts it.
  */
 const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
   morning: [
     { key: "figma-library-post", kind: "figma-library-post" },
     { key: "figma-library-track", kind: "figma-library-track" },
+    { key: "ds-precedence-post", kind: "ds-precedence-post" },
   ],
-  "end-of-day": [{ key: "figma-library-poll", kind: "figma-library-poll" }],
+  "end-of-day": [
+    { key: "figma-library-poll", kind: "figma-library-poll" },
+    { key: "ds-precedence-check", kind: "ds-precedence-check", after: ["figma-library-poll"], weekday: FRIDAY },
+  ],
 };
 
 /** The run names, for a caller that takes one as input. */
@@ -83,13 +109,15 @@ export function runsForFiring(scheduledTime: number): ScheduledRunName[] {
 }
 
 /**
- * A run, planned for the UTC date of `at`.
+ * A run, planned for the UTC date of `at`: its jobs for that weekday.
  *
  * @param name - Which run
  * @param at - When it fires, epoch ms
  */
 export function planRun(name: ScheduledRunName, at: number): ScheduledRun {
-  return { name, date: new Date(at).toISOString().slice(0, 10), jobs: RUN_PLANS[name] };
+  const d = new Date(at);
+  const jobs = RUN_PLANS[name].filter((job) => job.weekday === undefined || job.weekday === d.getUTCDay());
+  return { name, date: d.toISOString().slice(0, 10), jobs };
 }
 
 /**

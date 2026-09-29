@@ -98,17 +98,18 @@ test("the rehearsal stops before the invocation's budget is gone", async () => {
 
 test("the probe dry-runs the named run's jobs", async () => {
   // An unconfigured Worker: no channel to post in and no repo to track, so
-  // both morning jobs say so and spend nothing.
+  // every morning job says so and spends nothing.
   const url = new URL("https://w/debug/sweep?dry_run=1&run=morning");
   const report = await runMetered(() => sweepProbe({} as Env, url, new Request(url)));
   assert.ok("body" in report);
   const body = report.body as { ok: boolean; run: string; planned: unknown[]; jobs: { key: string; outcome: string; subrequests: number }[] };
   assert.equal(body.ok, true);
   assert.equal(body.run, "morning");
-  assert.equal(body.planned.length, 2);
+  assert.equal(body.planned.length, 3);
   assert.deepEqual(body.jobs.map((j) => [j.key, j.outcome, j.subrequests]), [
     ["figma-library-post", "handled", 0],
     ["figma-library-track", "handled", 0],
+    ["ds-precedence-post", "handled", 0],
   ]);
 });
 
