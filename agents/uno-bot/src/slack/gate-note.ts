@@ -79,11 +79,34 @@ export function renderGateNote(note: GateNote): string {
         `:point_up: ${note.count} proposals are waiting in this DM, so I can't tell which one that is for — ` +
         `nothing was executed. React on the :warning: card you mean, or use its buttons.`
       );
+    case "not-a-confirmer":
+      return notAConfirmerLine(note);
     case "resolve-failed":
       return `:warning: I caught your :${note.glyph}: but hit a snag executing it — give it another go, or tell me and I'll retry.`;
     case "cut-off":
       return cutOffLine(note);
   }
+}
+
+/**
+ * A signal from someone the card does not accept. Names who can confirm,
+ * since that is what the person needs in order to get it moving. Only Slack
+ * user ids are mentioned, which is what the markup sanitiser keeps
+ * (`SLACK_USER_ID`); anything else would blank the post, so it is left out.
+ */
+function notAConfirmerLine(note: Extract<GateNote, { kind: "not-a-confirmer" }>): string {
+  const to = note.userId && SLACK_USER_ID.test(note.userId) ? `<@${note.userId}> ` : "";
+  const who = note.confirmers.filter((id) => SLACK_USER_ID.test(id)).map((id) => `<@${id}>`);
+  const can = who.length
+    ? `Only ${joinNames(who)} can confirm or cancel this proposal`
+    : "Nobody here can confirm or cancel this proposal";
+  return `:lock: ${to}${can} — nothing was executed.`;
+}
+
+/** "a", "a or b", "a, b or c". */
+function joinNames(names: string[]): string {
+  if (names.length <= 1) return names.join("");
+  return `${names.slice(0, -1).join(", ")} or ${names[names.length - 1]}`;
 }
 
 /**

@@ -53,7 +53,7 @@ import {
   type TurnSettlement,
 } from "../src/turn/index";
 import { runButtonDoor, type ButtonDoorTarget } from "../src/slack/button-door";
-import { STALE_POST } from "../src/slack/gate-note";
+import { STALE_POST, renderGateNote } from "../src/slack/gate-note";
 
 // ── one staged proposal, and the four signals that resolve it ────────────────
 
@@ -235,6 +235,81 @@ describe("four signals, one verdict", () => {
       // The whole point of a decline: there is nothing for the caller to run.
       assert.equal(verdict.execute, undefined, signal.kind);
     }
+  });
+});
+
+// A card may name who can confirm it. Every door is held to that set, and a
+// refused signal leaves the card exactly as it was for someone who may.
+describe("a card with a confirmer set", () => {
+  const OWNER = "U7";
+  const OUTSIDER = "U2";
+
+  async function stagedFor(confirmers: string[]): Promise<ThreadState> {
+    const store = createInMemoryThreadState();
+    await store.putProposal({ ...PROPOSAL, confirmers });
+    return store;
+  }
+
+  /** Each door, from one person. The model's signal names the turn's person. */
+  const doorsFrom = (userId: string): Array<{ name: string; signal: GateSignal }> => [
+    { name: "reaction on the card", signal: reaction({ userId }) },
+    { name: "the card's ✅ button", signal: { kind: "button", messageTs: CARD_TS, decision: "confirm", userId } },
+    { name: "the emoji typed alone", signal: { kind: "typed", channel: CHANNEL, thread: THREAD, text: "✅", userId } },
+    {
+      name: "the model's proposal_resolve",
+      signal: { kind: "model", pending: { ...PROPOSAL, confirmers: [OWNER] }, decision: "confirm", userId },
+    },
+  ];
+
+  it("refuses someone outside the set on every door, names who can, and leaves the card", async () => {
+    for (const door of doorsFrom(OUTSIDER)) {
+      const threadState = await stagedFor([OWNER]);
+      const verdict = await resolveSignal(door.signal, { threadState });
+      assert.equal(verdict.outcome, "none", door.name);
+      assert.equal(verdict.execute, undefined, door.name);
+      assert.deepEqual(
+        verdict.post,
+        { note: { kind: "not-a-confirmer", confirmers: [OWNER], userId: OUTSIDER }, replyTs: THREAD },
+        door.name,
+      );
+      assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found", door.name);
+    }
+  });
+
+  it("lets a listed confirmer win on every door", async () => {
+    for (const door of doorsFrom(OWNER)) {
+      const verdict = await resolveSignal(door.signal, { threadState: await stagedFor([OWNER]) });
+      assert.equal(verdict.outcome, "won", door.name);
+      assert.notEqual(verdict.execute, undefined, door.name);
+    }
+  });
+
+  it("refuses the model's signal when it does not say who is acting", async () => {
+    const pending = { ...PROPOSAL, confirmers: [OWNER] };
+    const threadState = await stagedFor([OWNER]);
+    const verdict = await resolveSignal({ kind: "model", pending, decision: "confirm" }, { threadState });
+    assert.equal(verdict.outcome, "none");
+    assert.deepEqual(verdict.post?.note, { kind: "not-a-confirmer", confirmers: [OWNER] });
+    assert.equal(await threadState.claimProposal(CARD_TS), true);
+  });
+
+  it("a refused ⛔ cancels nothing either", async () => {
+    const threadState = await stagedFor([OWNER]);
+    const verdict = await resolveSignal(reaction({ glyph: "no_entry", userId: OUTSIDER }), { threadState });
+    assert.equal(verdict.outcome, "none");
+    assert.equal(verdict.decision, "cancel");
+    assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found");
+  });
+
+  it("names the confirmers in Slack, and the person who was refused", () => {
+    assert.equal(
+      renderGateNote({ kind: "not-a-confirmer", confirmers: ["U0000007", "U0000008"], userId: "U0000002" }),
+      ":lock: <@U0000002> Only <@U0000007> or <@U0000008> can confirm or cancel this proposal — nothing was executed.",
+    );
+    assert.equal(
+      renderGateNote({ kind: "not-a-confirmer", confirmers: [] }),
+      ":lock: Nobody here can confirm or cancel this proposal — nothing was executed.",
+    );
   });
 });
 
@@ -620,6 +695,19 @@ describe("the reaction door", () => {
     assert.deepEqual(kindsOf(delivery), []);
     assert.deepEqual(ran, []);
   });
+
+  it("answers a reaction from outside the confirmer set with who can confirm, and runs nothing", async () => {
+    const threadState = createInMemoryThreadState();
+    await threadState.putProposal({ ...PROPOSAL, confirmers: ["U7"] });
+    const { delivery, ran } = await drive({ threadState, userId: "U2" });
+    assert.deepEqual(delivery.gateNotes, [{ kind: "not-a-confirmer", confirmers: ["U7"], userId: "U2" }]);
+    assert.equal(ran.some((v) => v.outcome === "won"), false);
+    assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found");
+
+    const owner = await drive({ threadState, userId: "U7" });
+    assert.deepEqual(owner.delivery.gateNotes, [{ kind: "resolved", decision: "confirm" }]);
+    assert.equal(owner.ran[0]?.outcome, "won");
+  });
 });
 
 // ── the other door outside Turn ──────────────────────────────────────────────
@@ -780,6 +868,21 @@ describe("the button door", () => {
       ["working", "working-clear"],
     );
     assert.equal(delivery.calls.find((c) => c.kind === "working-clear")?.settlement, "idle");
+  });
+
+  it("answers a press from outside the confirmer set with who can confirm, and keeps the card", async () => {
+    const threadState = createInMemoryThreadState();
+    await threadState.putProposal({ ...PROPOSAL, confirmers: ["U7"] });
+    const { ephemerals, replacements, ran } = await drive({ threadState, userId: "U2" });
+    assert.deepEqual(ephemerals, [
+      renderGateNote({ kind: "not-a-confirmer", confirmers: ["U7"], userId: "U2" }),
+    ]);
+    assert.deepEqual(ran, []);
+    assert.deepEqual(replacements, []);
+    assert.equal((await threadState.getProposalByTs(CARD_TS)).state, "found");
+
+    const owner = await drive({ threadState, userId: "U7" });
+    assert.equal(owner.ran[0]?.outcome, "won");
   });
 });
 

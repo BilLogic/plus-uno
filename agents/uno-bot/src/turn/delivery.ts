@@ -239,6 +239,10 @@ export type GateNote =
   /** A gate emoji typed outside any card's thread, in a DM holding several
    *  live cards: ask which one, and resolve none of them. */
   | { kind: "which-card"; count: number }
+  /** A signal from someone outside the card's confirmer set: resolve
+   *  nothing, and name who can. `userId` is who was refused, when the signal
+   *  carried one. */
+  | { kind: "not-a-confirmer"; confirmers: string[]; userId?: string }
   /** The door caught the gesture and then failed to run it. */
   | { kind: "resolve-failed"; glyph: string }
   /**
