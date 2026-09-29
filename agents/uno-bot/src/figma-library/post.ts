@@ -24,6 +24,11 @@
 // findings for tomorrow: a card whose every row read "no code mapping", or one
 // nobody could confirm, would be worse than a day's wait.
 //
+// Subrequest math, per job: the registry (1) and the channel's members (at
+// most 3 pages), then per change set one post; the staging is a Durable Object
+// hop and KV is the internal bucket. The poll keeps at most `MAX_FINDINGS` (5)
+// change sets waiting, so 1 + 3 + 5 = 9 — far under the lookup ceiling of 38.
+//
 // Named dependencies; `Env` enters in `figma-library/env.ts`.
 
 import type { PendingProposal, ProposalOperation } from "../thread-state/index";
@@ -57,6 +62,7 @@ export interface PostDeps {
 }
 
 export interface PostResult {
+  /** Cards posted — or, on a dry run, drafted and not posted. */
   posted: number;
   pending: number;
   summary: string;
@@ -85,8 +91,11 @@ export function libraryOperations(intake: PublishIntake): { operations: Proposal
  * @param changeSet - What the poll found
  * @param intake - Its drafted intake
  */
-export function libraryCard(changeSet: LibraryChangeSet, intake: PublishIntake): ProposalCard {
-  const { operations } = libraryOperations(intake);
+export function libraryCard(
+  changeSet: LibraryChangeSet,
+  intake: PublishIntake,
+  operations: ProposalOperation[] = libraryOperations(intake).operations,
+): ProposalCard {
   return {
     kind: "confirm",
     verb: operations.length > 1 ? "file this intake and start the implementation" : "file this intake",
@@ -123,7 +132,8 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
   while (waiting.length) {
     const changeSet = waiting[0]!;
     const intake = draftPublishIntake(changeSet, registry);
-    const card = renderProposalCard(libraryCard(changeSet, intake));
+    const { operations, onCancel } = libraryOperations(intake);
+    const card = renderProposalCard(libraryCard(changeSet, intake, operations));
     if (opts.dryRun) {
       waiting.shift();
       posted += 1;
@@ -135,7 +145,6 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
       break;
     }
     const ts = sent.ts;
-    const { operations, onCancel } = libraryOperations(intake);
     try {
       await deps.stage({
         operations,
@@ -171,5 +180,6 @@ export async function postLibraryFindings(deps: PostDeps, opts: { dryRun?: boole
     await deps.tracked.write(tracked);
     await deps.findings.write(waiting);
   }
-  return { posted, pending: waiting.length, summary: `posted ${posted}, ${waiting.length} waiting` };
+  const verb = opts.dryRun ? "would post" : "posted";
+  return { posted, pending: waiting.length, summary: `${verb} ${posted}, ${waiting.length} waiting` };
 }

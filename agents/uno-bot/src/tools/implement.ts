@@ -13,8 +13,10 @@
 // root that links one. The Figma library card (`figma-library/post.ts`) names
 // every mapped component of one publish and carries `library_publish`, the
 // Figma version it came from: its spec is the intake the same card files, so it
-// needs no PRD. `library_publish` is not in the model's schema — the schema
-// refuses extra keys — so the model's path always needs its PRD.
+// needs no PRD. `library_publish` is not in the model's schema, but a provider
+// may not enforce that, so it is honoured only on a card nobody requested — the
+// Worker's own (`requestedBy` unset). A model-staged card always has a
+// requester, so the model's path always needs its PRD.
 
 import type { Env } from "../types";
 import { repositoryDispatch } from "./github-dispatch";
@@ -50,7 +52,8 @@ export function implementPayload(input: Record<string, unknown>, slack: SlackCon
   const raw = typeof input.component === "string" ? input.component.trim() : "";
   const notes = typeof input.notes === "string" ? input.notes.slice(0, 2000) : undefined;
   const inputPrdUrl = typeof input.notion_prd_url === "string" ? input.notion_prd_url.trim() : "";
-  const libraryPublish = typeof input.library_publish === "string" ? input.library_publish.trim() : "";
+  const libraryPublish =
+    !slack.requestedBy && typeof input.library_publish === "string" ? input.library_publish.trim() : "";
   if (!raw) return { ok: false, error: "missing 'component' in input" };
 
   const names = libraryPublish ? raw.split(",").map((n) => n.trim()).filter(Boolean) : [raw];

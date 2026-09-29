@@ -357,6 +357,12 @@ describe("the implement payload", () => {
     assert.equal(implementPayload({ component: "Badge", notion_prd_url: "https://www.notion.so/x-0123456789abcdef0123456789abcdef" }, slack).ok, true);
   });
 
+  it("ignores library_publish on a card someone requested — the model cannot skip its PRD", () => {
+    const fromModel = { ...slack, requestedBy: "U0DESIGNR" };
+    const built = implementPayload({ component: "Badge", library_publish: "123" }, fromModel);
+    assert.equal(built.ok, false);
+  });
+
   it("refuses a list from the model, and a malformed name or version on the library path", () => {
     assert.equal(implementPayload({ component: "Badge, Button", notion_prd_url: "https://www.notion.so/0123456789abcdef0123456789abcdef" }, slack).ok, false);
     assert.equal(implementPayload({ component: "Badge; rm -rf", library_publish: "1" }, slack).ok, false);
@@ -377,7 +383,9 @@ describe("the morning tracker", () => {
     implement: "Accordion, Badge",
   });
 
-  function trackDeps(pulls: Awaited<ReturnType<TrackDeps["github"]["recentPulls"]>>, tracked = [card()]) {
+  type Pulls = Awaited<ReturnType<TrackDeps["github"]["recentPulls"]>>;
+  /** `pulls` is the recent-pulls window; `byNumber` is every PR GitHub has. */
+  function trackDeps(pulls: Pulls, tracked = [card()], byNumber: Pulls = pulls) {
     const calls: string[] = [];
     const store = kv(tracked);
     const deps: TrackDeps = {
@@ -388,6 +396,7 @@ describe("the morning tracker", () => {
           { number: 870, url: "https://github.com/o/r/issues/870", body: `${card().marker}\n\n## What was published` },
         ],
         recentPulls: async () => pulls,
+        pull: async (number) => byNumber.find((p) => p.number === number) ?? null,
         comment: async (issue, body) => {
           calls.push(`comment #${issue}: ${body}`);
         },
@@ -441,6 +450,28 @@ describe("the morning tracker", () => {
     const { deps, calls } = trackDeps([pr({ title: implementPrTitle("Badge") }), pr({ createdAt: "2026-09-01T00:00:00Z" })]);
     await trackLibraryIntakes(deps);
     assert.deepEqual(calls, []);
+  });
+
+  it("sees a linked PR merge after it has left the recent-pulls window", async () => {
+    const linkedCard = { ...card(), intake: { number: 870, url: "https://github.com/o/r/issues/870" }, pr: { number: 880, url: "https://github.com/o/r/pull/880" } };
+    const { deps, calls, store } = trackDeps([], [linkedCard], [pr({ state: "closed", merged: true })]);
+    const result = await trackLibraryIntakes(deps);
+    assert.equal(result.closed, 1);
+    assert.ok(calls.includes("close #870"));
+    assert.deepEqual(store.value, []);
+  });
+
+  it("gives each PR to one card when two publishes dispatch the same components", async () => {
+    const older = card();
+    const newer = { ...card(), key: "2210000000000000009", marker: "<!-- uno-bot:figma-publish:2210000000000000009 -->", ts: "1790000000.000002", postedAt: POSTED_AT + 60 * 60 * 1000 };
+    const first = pr();
+    const second = { ...pr({ createdAt: "2026-09-30T16:30:00Z" }), number: 881, url: "https://github.com/o/r/pull/881" };
+    const { deps, store } = trackDeps([second, first], [older, newer]);
+    await trackLibraryIntakes(deps);
+    assert.deepEqual(store.value.map((t) => [t.key, t.pr?.number]), [
+      [older.key, 880],
+      [newer.key, 881],
+    ]);
   });
 
   it("lets a card with no PR go after two weeks", async () => {

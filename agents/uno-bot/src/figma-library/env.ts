@@ -94,6 +94,7 @@ export async function runLibraryTrack(env: Env, opts: { dryRun: boolean }): Prom
       github: {
         recentIntakes: (since) => reads.recentIntakes(since),
         recentPulls: () => reads.recentPulls(),
+        pull: (number) => reads.pull(number),
         comment: async (issue, body) => {
           await writes.comment(issue, body);
         },

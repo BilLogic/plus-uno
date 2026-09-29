@@ -618,9 +618,39 @@ export interface GithubLibraryReads {
   /** `harness-intake` issues updated since `since` (ISO), pulls left out. */
   recentIntakes(since: string): Promise<Array<{ number: number; url: string; body: string }>>;
   /** The most recently opened pulls, any state. */
-  recentPulls(): Promise<
-    Array<{ number: number; title: string; url: string; createdAt: string; state: "open" | "closed"; merged: boolean }>
-  >;
+  recentPulls(): Promise<LibraryPull[]>;
+  /** One pull by number, as it stands now; null on a 404. */
+  pull(number: number): Promise<LibraryPull | null>;
+}
+
+/** A pull as the library tracker reads it. */
+export interface LibraryPull {
+  number: number;
+  title: string;
+  url: string;
+  createdAt: string;
+  state: "open" | "closed";
+  merged: boolean;
+}
+
+/** GitHub's pull JSON, as far as the tracker reads it; null when unusable. */
+function libraryPullOf(p: {
+  number?: unknown;
+  title?: unknown;
+  html_url?: unknown;
+  created_at?: unknown;
+  state?: unknown;
+  merged_at?: unknown;
+}): LibraryPull | null {
+  if (typeof p.number !== "number" || typeof p.title !== "string" || typeof p.html_url !== "string") return null;
+  return {
+    number: p.number,
+    title: p.title,
+    url: p.html_url,
+    createdAt: typeof p.created_at === "string" ? p.created_at : "",
+    state: p.state === "closed" ? "closed" : "open",
+    merged: typeof p.merged_at === "string" && p.merged_at !== "",
+  };
 }
 
 const LIBRARY_PAGE = 50;
@@ -672,26 +702,20 @@ export function githubLibraryReads(env: Env, target: RepoEntry): GithubLibraryRe
     },
     async recentPulls() {
       const url = `https://api.github.com/repos/${repo}/pulls?state=all&sort=created&direction=desc&per_page=${LIBRARY_PAGE}`;
-      const data = (await (await get("pull list", url)).json().catch(() => [])) as Array<{
-        number?: unknown;
-        title?: unknown;
-        html_url?: unknown;
-        created_at?: unknown;
-        state?: unknown;
-        merged_at?: unknown;
-      }>;
-      return (Array.isArray(data) ? data : []).flatMap((p) =>
-        typeof p.number === "number" && typeof p.title === "string" && typeof p.html_url === "string"
-          ? [{
-              number: p.number,
-              title: p.title,
-              url: p.html_url,
-              createdAt: typeof p.created_at === "string" ? p.created_at : "",
-              state: p.state === "closed" ? ("closed" as const) : ("open" as const),
-              merged: typeof p.merged_at === "string" && p.merged_at !== "",
-            }]
-          : [],
-      );
+      const data = (await (await get("pull list", url)).json().catch(() => [])) as Array<Parameters<typeof libraryPullOf>[0]>;
+      return (Array.isArray(data) ? data : []).flatMap((p) => {
+        const pull = libraryPullOf(p);
+        return pull ? [pull] : [];
+      });
+    },
+    async pull(number) {
+      try {
+        const res = await get("pull read", `https://api.github.com/repos/${repo}/pulls/${number}`);
+        return libraryPullOf((await res.json().catch(() => ({}))) as Parameters<typeof libraryPullOf>[0]);
+      } catch (err) {
+        if (err instanceof GithubRequestError && err.status === 404) return null;
+        throw err;
+      }
     },
   };
 }

@@ -5,20 +5,25 @@
 //
 // A POLL, NOT A WEBHOOK. The Worker has no GitHub webhook route, so this looks
 // once a morning: a PR opened after the ✅ is linked the next morning, and one
-// merged is closed out the morning after that. Two reads a run cover every
-// card — the repo's recent pulls, and its `harness-intake` issues updated since
+// merged is closed out the morning after that. Two reads a run find what is
+// new — the repo's recent pulls, and its `harness-intake` issues updated since
 // the oldest card — and each card is matched in memory:
 //   • the intake by the hidden marker its body opens with (`publishMarker`);
 //   • the PR by the title `figma-implement.yml` gives it — "feat: Figma DS
 //     update — <component list>", the list the card dispatched — opened after
-//     the card was posted.
+//     the card was posted. Oldest card first, each PR goes to one card only, so
+//     two publishes of the same components get a PR each rather than sharing.
+// A PR once linked is read back by its number, so one that stays open past the
+// recent-pulls window is still seen merging.
 // Neither the ✅ nor the ⛔ is recorded anywhere this job can read, so it does
 // not ask: a card whose PR never appears (a ⛔, an expired card, a failed run)
 // is dropped after `TRACK_DAYS`.
 //
-// Subrequest math, per job: 2 reads, then at most 3 writes per card (intake
-// comment, thread post, close) for at most `MAX_TRACKED_PER_RUN` cards —
-// 2 + 3 × 10 = 32, under the lookup ceiling of 38. KV is the internal bucket.
+// Subrequest math, per job: 2 reads, then per card at most 1 read (its linked
+// PR) and 5 writes (a PR linked and merged in one look: intake comment, thread
+// post, intake comment, close, thread post) for at most `MAX_TRACKED_PER_RUN`
+// cards — 2 + 6 × 5 = 32, under the lookup ceiling of 38. KV is the internal
+// bucket.
 //
 // Named dependencies; `Env` enters in `figma-library/env.ts`.
 
@@ -60,6 +65,8 @@ export interface TrackDeps {
     recentIntakes(since: string): Promise<IntakeRef[]>;
     /** The repo's most recently opened pulls, any state. */
     recentPulls(): Promise<PullRef[]>;
+    /** One pull by number, as it stands now; null when GitHub has none. */
+    pull(number: number): Promise<PullRef | null>;
     comment(issue: number, body: string): Promise<void>;
     close(issue: number): Promise<void>;
   };
@@ -72,7 +79,7 @@ export const TRACK_DAYS = 14;
 /** A card whose PR is open but unmerged is let go after this. */
 export const TRACK_MAX_DAYS = 45;
 /** Cards looked at per run, oldest first; the rest wait a morning. */
-export const MAX_TRACKED_PER_RUN = 10;
+export const MAX_TRACKED_PER_RUN = 5;
 /** A PR opened this long before the card counts too — clocks disagree. */
 const CLOCK_SLACK_MS = 5 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -105,6 +112,10 @@ export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: bool
   const [intakes, pulls] = await Promise.all([deps.github.recentIntakes(since), deps.github.recentPulls()]);
 
   const done = new Set<string>();
+  // A PR belongs to one card: every PR already linked is taken, and a new
+  // match goes to the oldest card that wants it, earliest PR first.
+  const taken = new Set(tracked.flatMap((t) => (t.pr ? [t.pr.number] : [])));
+  const oldestFirst = [...pulls].sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
   let linked = 0;
   let closed = 0;
   let dropped = 0;
@@ -115,13 +126,18 @@ export async function trackLibraryIntakes(deps: TrackDeps, opts: { dryRun?: bool
       if (intake) card.intake = { number: intake.number, url: intake.url };
     }
 
-    const pr = card.implement
-      ? pulls.find(
-          (p) =>
-            p.title.trim() === implementPrTitle(card.implement!) &&
-            Date.parse(p.createdAt) >= card.postedAt - CLOCK_SLACK_MS,
-        )
-      : undefined;
+    let pr: PullRef | null | undefined;
+    if (card.pr) {
+      pr = await deps.github.pull(card.pr.number);
+    } else if (card.implement) {
+      pr = oldestFirst.find(
+        (p) =>
+          !taken.has(p.number) &&
+          p.title.trim() === implementPrTitle(card.implement!) &&
+          Date.parse(p.createdAt) >= card.postedAt - CLOCK_SLACK_MS,
+      );
+      if (pr) taken.add(pr.number);
+    }
 
     if (pr && !card.pr) {
       card.pr = { number: pr.number, url: pr.url };

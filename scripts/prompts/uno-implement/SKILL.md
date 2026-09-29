@@ -55,7 +55,7 @@ You are not a generalist coding assistant. You know Plus's specific stack, conve
 | Input | Source | Required? |
 |-------|--------|-----------|
 | Component name, or a comma-separated list from a library publish, OR direct spec (PRD link, change description) | an approved uno-bot card → `repository_dispatch`, OR a manual GitHub-UI workflow run | Yes |
-| Notion PRD (from the polling notification in the thread, or the designer's pasted link; the Action also falls back to `findPRDByComponent()`) | Notion database | **Yes — required** |
+| The spec: for a library publish, its `harness-intake` issue (found by the `uno-bot:figma-publish:<version>` marker; the payload's `figma_version_id`); otherwise the Notion PRD (the designer's link or the thread root's; the Action falls back to `findPRDByComponent()` only on this path) | GitHub issues / Notion database | **Yes — required** |
 | Target branch | Always a new `ds-review/{component}-{date}-{time}` branch (uniform with the live `figma-implement.yml` convention — do NOT diverge) | No |
 
 ## PLUS Design System Conventions
@@ -94,7 +94,7 @@ The design token files (`_colors.scss`, `_spacing_semantics.scss`, `_primitives.
 
 ## Workflow
 
-1. **Read the spec.** Fetch the linked Notion PRD / change description. If the spec is unfetchable, post an error to the originating Slack thread and exit. For Slack-triggered runs, post a "🔧 Working on it…" ack before proceeding; skip the ack for manual GitHub-UI dispatches.
+1. **Read the spec.** Fetch the publish's intake, or the linked Notion PRD / change description. If the spec is unfetchable, post an error to the originating Slack thread and exit. For Slack-triggered runs, post a "🔧 Working on it…" ack before proceeding; skip the ack for manual GitHub-UI dispatches.
 2. **Locate the relevant files.** Components live in `design-system/src/components/`, forms in `design-system/src/components/forms-and-inputs/`, specs in `design-system/src/specs/`. Confirm the target component exists in `design-system/agent-views/components/index.md` (or flag it as a new component if not — see [references/new-component-scaffolding.md](references/new-component-scaffolding.md), loaded automatically when `isNewComponent` is true).
 3. **Verify props and styles.** Read the existing `.jsx` and `.stories.jsx` for any component you'll touch. Don't hallucinate props. Don't change a prop's type without flagging it in the PR description.
 4. **Plan the change.** List the files that will be modified — **including** the corresponding stories file. If the change touches a prop or variant, the stories MUST be updated in the same pass; do not ship code-only or stories-only. If >5 files total, stop and escalate to the in-IDE agent.
