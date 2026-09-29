@@ -35,6 +35,7 @@ import { postingDeps } from "./slack-delivery";
 import { runSlackTurn } from "./turn-adapter";
 import { stripBotMentions } from "./mention";
 import { cardThreadOf, turnSurfaceOf } from "../turn/request";
+import { isIntakeChannel } from "../turn/intake-channel";
 
 // Re-exported for index.ts (SlackEnvelope) and any other importer that still reaches for the Slack wire types here.
 export type {
@@ -310,17 +311,24 @@ function isUserTurn(event: SlackMessageEvent): boolean {
 // Gate for plain `message` events: should the bot engage at all? Slack delivers
 // a `message` event for EVERY message in a channel the bot is a member of, so
 // without this the bot replies to everything (e.g. someone typing "implement"
-// with no @mention). It engages only on: a DM, an explicit @mention in the text,
-// or a follow-up inside a thread it is already part of (an active proposal, or
-// the bot has already posted there) so replies don't need a re-mention. A
-// top-level channel message with no @mention is ignored. (app_mention events
-// bypass this entirely — they are always an explicit mention.)
-async function shouldHandleMessage(env: Env, event: SlackMessageEvent): Promise<boolean> {
+// with no @mention). It engages only on: a DM, a top-level post in #uno-bot,
+// an explicit @mention in the text, or a follow-up inside a thread it is
+// already part of (an active proposal, or the bot has already posted there) so
+// replies don't need a re-mention. Any other top-level channel message with no
+// @mention is ignored. (app_mention events bypass this entirely — they are
+// always an explicit mention.)
+// Exported for `tests/message-engagement.test.ts`.
+export async function shouldHandleMessage(env: Env, event: SlackMessageEvent): Promise<boolean> {
   if (!isUserTurn(event)) return false;
 
   // An app DM is direct to the bot. Which channel ids those are is
   // `turn/request.ts` § `turnSurfaceOf`, not a literal here (#595).
   if (isDm(event.channel)) return true;
+
+  // #uno-bot is where the team reports problems with uno-bot and asks for
+  // changes to it, so a post there is addressed to the bot without a mention.
+  // Top-level only: a reply in a thread there keeps the follow-up rule below.
+  if (!event.thread_ts && isIntakeChannel(event.channel, env.UNO_BOT_CHANNEL_ID)) return true;
 
   const identity = await getBotIdentity(env);
   // Explicit @mention of the bot anywhere in the text.
@@ -468,11 +476,12 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
   // Loading thread context runs BEFORE the turn, so a throw here (a Slack
   // history read, a store lookup, the Notion PRD extraction) must not be
   // silent — post a visible error rather than letting the handler die quietly.
-  let history: Awaited<ReturnType<typeof buildThreadHistory>>;
+  let history: HistoryTurn[];
+  let participants: string[];
   let pending: PendingProposal | null;
   let prd: Awaited<ReturnType<typeof extractPrdFromThreadRoot>>;
   try {
-    [history, pending, prd] = await Promise.all([
+    [{ turns: history, participants }, pending, prd] = await Promise.all([
       buildThreadHistory(env, channel, convTs, event.thread_ts, event.ts, textReadsAsCorrection),
       // The card, by contrast, is the REPLY THREAD's: in a DM a card staged
       // under one ask is no business of the next unthreaded ask.
@@ -500,6 +509,11 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
     history,
     pending,
     prd,
+    // Who may confirm the card: the poster and everyone in the thread so far,
+    // read off the thread the history rebuild already fetched.
+    ...(isIntakeChannel(channel, env.UNO_BOT_CHANNEL_ID)
+      ? { intakeChannel: { participants: [...participants, userId] } }
+      : {}),
   });
   console.log(
     `[turn] ${outcome.disposition} tier=${outcome.telemetry.tier} route=${outcome.telemetry.route} ` +
@@ -515,7 +529,9 @@ async function handleUserMessage(env: Env, event: SlackMessageEvent): Promise<vo
 // `user`. Falls back to the Durable Object history if the thread read fails or
 // the bot's identity is unknown. The current message is excluded (it's passed
 // separately as userText). buildMessages() in run-agent merges any consecutive
-// same-role turns this produces.
+// same-role turns this produces. It also returns the people who have posted in
+// the thread, oldest first — the #uno-bot intake's confirmers — which the Slack
+// read already carries; the store fallback knows none.
 const THREAD_HISTORY_LIMIT = 100;
 
 // Two different ts values on purpose (see replyThreadTs/conversationTs):
@@ -537,10 +553,11 @@ async function buildThreadHistory(
   // turn that needs it: a correction, where "what did I actually look up last
   // time" is the whole question.
   wantReceipts = false,
-): Promise<HistoryTurn[]> {
+): Promise<{ turns: HistoryTurn[]; participants: string[] }> {
   const store = threadStateFor(env);
   const ref = { channel, thread: convTs };
-  if (!threadTs) return store.readHistory(ref);
+  const fromStore = async () => ({ turns: await store.readHistory(ref), participants: [] });
+  if (!threadTs) return fromStore();
   try {
     const [identity, replies, stored] = await Promise.all([
       getBotIdentity(env),
@@ -558,9 +575,11 @@ async function buildThreadHistory(
     }
     if (identity && replies.ok && replies.messages?.length) {
       const turns: HistoryTurn[] = [];
+      const participants: string[] = [];
       for (const m of replies.messages) {
         if (m.ts === currentTs) continue;
         const isBot = m.user === identity.userId || (!!m.bot_id && m.bot_id === identity.botId);
+        if (!isBot && !m.bot_id && m.user && !participants.includes(m.user)) participants.push(m.user);
         const rawContent = stripBotMentions(m.text ?? "", identity.userId);
         const canvasContent = messageTextWithCanvasAttachments(rawContent, m.files);
         const sharedCanvasIds = canvasIdsSharedBySlackHistoryMessage({
@@ -585,10 +604,10 @@ async function buildThreadHistory(
           ...(sharedCanvasIds.length ? { sharedCanvasIds } : {}),
         });
       }
-      if (turns.length) return turns;
+      if (turns.length) return { turns, participants };
     }
   } catch (err) {
     console.warn(`[history] thread read failed, using DO fallback: ${err instanceof Error ? err.message : String(err)}`);
   }
-  return store.readHistory(ref);
+  return fromStore();
 }

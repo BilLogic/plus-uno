@@ -206,6 +206,11 @@ FIGMA_FILE_KEY = "zAecJNRdvJzAUOcjV32tRX"
 # (drafted intake + implementation), and its members are who may confirm it.
 # Leave blank → the findings wait in KV and nothing is posted.
 PLUS_UNIVERSAL_CHANNEL_ID = "C072E8SFLKV"
+# #uno-bot channel id — the intake channel (src/turn/intake-channel.ts): a
+# top-level post there engages with no @mention and becomes a drafted intake.
+# Nothing about the Figma library posts here any more. Leave blank → there is
+# no intake channel.
+UNO_BOT_CHANNEL_ID = "C0ARJ2A3A69"
 # #plus-design channel id — reviewable artifacts (component_implement /
 # prototype_scaffold PRs, new PRDs from notion_create) are announced here for
 # team REVIEW (D5). Leave blank to disable fan-out (replies stay in-thread).

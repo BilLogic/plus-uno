@@ -15,26 +15,26 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,859 chars from 16 files**, against an assembled budget of 175,000 (141 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,475 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **174,930 chars from 16 files**, against an assembled budget of 175,000 (70 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 154,546 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,172 (−7,617 ide-only) | 10,172 | 20,000 (constitution) |
 | 2 | constitution | [`CONTEXT.md`](../../CONTEXT.md) | 19,990 | 30,190 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,046 | 57,277 | 28,000 (persona) |
-| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,670 | 7,000 (Worker face) |
-| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,972 | 70,687 | 7,000 (Worker face) |
-| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,400 | 7,000 (Worker face) |
-| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,687 | 7,000 (Worker face) |
-| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,657 | 89,386 | 7,000 (Worker face) |
-| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,788 | 7,000 (Worker face) |
-| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−6,210 ide-only) | 97,759 | — |
-| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,757 | — |
-| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 15,750 | 127,549 | — |
-| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,187 | 130,802 | — |
-| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 161,389 | — |
-| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 165,978 | — |
-| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,833 (−605 ide-only) | 174,859 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 27,125 | 57,356 | 28,000 (persona) |
+| 4 | skills | [`skills/uno-maintain/bot.md`](../../skills/uno-maintain/bot.md) | 6,349 | 63,749 | 7,000 (Worker face) |
+| 5 | skills | [`skills/uno-prototype/bot.md`](../../skills/uno-prototype/bot.md) | 6,972 | 70,766 | 7,000 (Worker face) |
+| 6 | skills | [`skills/uno-publish/bot.md`](../../skills/uno-publish/bot.md) | 6,670 | 77,479 | 7,000 (Worker face) |
+| 7 | skills | [`skills/uno-research/bot.md`](../../skills/uno-research/bot.md) | 5,243 | 82,766 | 7,000 (Worker face) |
+| 8 | skills | [`skills/uno-review/bot.md`](../../skills/uno-review/bot.md) | 6,657 | 89,465 | 7,000 (Worker face) |
+| 9 | skills | [`skills/uno-synthesize/bot.md`](../../skills/uno-synthesize/bot.md) | 6,356 | 95,867 | 7,000 (Worker face) |
+| 10 | connectors | [`docs/connectors/figma.md`](../../docs/connectors/figma.md) | 1,929 (−6,210 ide-only) | 97,838 | — |
+| 11 | connectors | [`docs/connectors/notion.md`](../../docs/connectors/notion.md) | 13,955 (−4,814 ide-only) | 111,836 | — |
+| 12 | connectors | [`docs/connectors/slack.md`](../../docs/connectors/slack.md) | 16,091 | 127,969 | — |
+| 13 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,187 | 131,222 | — |
+| 14 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 30,532 | 161,809 | — |
+| 15 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,535 (−1,219 ide-only) | 166,398 | — |
+| 16 | engineering | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 8,484 (−605 ide-only) | 174,930 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -368,7 +368,7 @@ The ✅-gated tools of the gate list (§ Tool routing) — zero irreversible act
 
 ## Slack etiquette
 
-- **Thread replies on the originating message.** Manually-dispatched work with no thread → top-level in `#uno-bot` (`C0ARJ2A3A69`).
+- **Thread replies on the originating message.** Manually-dispatched work with no thread → top-level in `#uno-bot` (`C0ARJ2A3A69`), where a post is the team's intake about me (the INTAKE CHANNEL note says how).
 - **Reactions are the personality channel — any workspace emoji, custom ones first-class** (via `slack_react`). Replies are word-budgeted; reactions aren't — this is where the character lives:
   - Match the emoji to the *content*, not just the sentiment — 🎉/🚀 for a ship, 🔥 for a clever fix, 🧹 for untangling a naming mess, 🍿 for Friday deploy chatter. The "it actually read the message" signal IS the joke; a reflex 👍 says nothing.
   - Join a pile-on once; mirror a playful reaction once — twice is a loop. Heavy moments get plain reactions (👀, ✅) or none.
@@ -889,8 +889,10 @@ Two limits the Worker now handles, worth knowing because they shape what you wri
 |---|---|---|
 | #plus-design | `C03FC8AS69K` | review requests, design-team coordination |
 | #plus-design-feedback | `C074QG2V7DJ` | share-out bundles + feedback threads |
-| #uno-bot | `C0ARJ2A3A69` | delivery alerts |
-| #plus-universal | `C072E8SFLKV` | design-ops; a Figma library publish lands here as one card (`docs/connectors/figma.md`) |
+| #uno-bot | `C0ARJ2A3A69` | team intake about uno-bot |
+| #plus-universal | `C072E8SFLKV` | Figma library publish cards |
+
+#uno-bot is where the team reports problems with uno-bot and asks for changes. A top-level post engages with no @mention. A report or change request becomes a drafted GitHub intake (`harness-intake`), or a comment on the open intake it matches, staged in the post's thread; a ✅ from the poster or anyone who has replied there files it. A plain question is just answered. #uno-bot-sandbox posts stay test traffic.
 
 Pillar → channel map (group announcements; **all private — uno-bot must be invited before posting/@here**):
 `Universal` → #plus-universal `C072E8SFLKV` · `Admin` → #plus-admin `C089A3E9CCW` · `Toolkit` → #plus-toolkit `C08925VDFF1` · `Training` → #plus-training `C07L5RZV6DR` · `Marketing` → #plus-marketing `C052BG9NE86`. Tutoring + Help Center: unmapped — flag at retro.
@@ -920,7 +922,7 @@ Bundle links (Loom · live preview · Figma replica · Decisions DB) go in `link
 
 ## Two gates — never conflate
 
-1. **Proposal-confirmation gate** (uno-bot side-effect proposals): ⚠️ card with ✅ Approve / ⛔ Cancel buttons; a ✅ (or 👍) / ⛔ (or ❌) reaction on the card, or that emoji typed alone, does the same; a typed reply in words goes to the model, which reads it in context. Anyone in the thread may confirm or cancel (the requester lock was removed 2026-07-14), 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state/store.ts` is the source of truth). **One live card per reply thread:** staging a revised card retires the one it replaces — a ✅ or ⛔ on the superseded card executes nothing and says it was replaced, which is a different answer from the expired one. The grain is the reply thread rather than the conversation, so two independent asks in one DM each keep their own card. **The Figma library card sets its own terms:** 72 hours, #plus-universal members only, and its ⛔ still files the intake — the one card where a cancel runs part of the batch, as it says.
+1. **Proposal-confirmation gate** (uno-bot side-effect proposals): ⚠️ card with ✅ Approve / ⛔ Cancel buttons; a ✅ (or 👍) / ⛔ (or ❌) reaction on the card, or that emoji typed alone, does the same; a typed reply in words goes to the model, which reads it in context. Anyone in the thread may confirm or cancel (the requester lock was removed 2026-07-14), unless the card names its confirmers, as a #uno-bot intake does. 60-min expiry (`PROPOSAL_TTL_MS` in `agents/uno-bot/src/thread-state/store.ts` is the source of truth). **One live card per reply thread:** staging a revised card retires the one it replaces — a ✅ or ⛔ on the superseded card executes nothing and says it was replaced, which is a different answer from the expired one. The grain is the reply thread rather than the conversation, so two independent asks in one DM each keep their own card. The Figma library card: 72 hours, #plus-universal members only, and its ⛔ still files the intake.
 2. **Reviewer-verdict gate** (Flow 5 maintenance review, routed reviewers in #plus-design): ✅ approve · 🔁 request changes · ❌ reject. Never auto-merge; 🔁 loops the proposal with changes.
 
 Decisions reached in threads are written to **Decisions DB** (row with **Roadmap Card** = the project + **Evidence** = Slack permalink) **before** the thread is considered resolved. Do not append to obsolete Decision Log subpages.
@@ -1677,7 +1679,7 @@ THE standing-automation registry. An automation absent from the table below is u
 
 | Automation | Trigger | Skill / method it runs | Agent | Implementation | Runs on · billed to | Owner | Status |
 |---|---|---|---|---|---|---|---|
-| Figma library sync | Worker scheduled runs on the cron `*/15 13-23 * * 1-5`: poll in the end-of-day run (22:00 UTC), post + track in the morning run (14:00 UTC) | uno-maintain (intake lane) | uno-bot | `agents/uno-bot/src/figma-poll.ts` (end-of-day job; snapshot + findings in KV) → `agents/uno-bot/src/figma-library/` (morning jobs: one drafted `harness-intake` + one ✅-gated card in `#plus-universal`; ✅ files it and dispatches `figma-implement.yml`, ⛔ files it only; the tracker links the PR and closes the intake on merge). Manual: `GET /debug/figma-poll`, `GET /debug/sweep?dry_run=1&run=morning`. Legacy script kept: `scripts/poll-figma-library.js` (`npm run figma:poll`) | CF Worker scheduled runs · no model call — deterministic Figma REST diff → drafted intake → Slack card | Bill | ✅ live (on deploy) |
+| Figma library sync | Worker scheduled runs: poll at end of day, post + track next morning | uno-maintain (intake) | uno-bot | `agents/uno-bot/src/figma-poll.ts` → `src/figma-library/`: one `harness-intake` + one ✅-gated card in `#plus-universal` (details: `docs/connectors/figma.md`). Manual: `GET /debug/figma-poll`. Legacy: `scripts/poll-figma-library.js` | CF Worker · no model call — Figma REST diff → drafted intake → Slack card | Bill | ✅ live (on deploy) |
 | Implement component | `repository_dispatch` from uno-bot confirm | uno-prototype (codegen) | uno-bot proposes; Actions executes | `figma-implement.yml` → `scripts/implement-figma-changes.js` + `scripts/prompts/uno-implement` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
 | Implement design | `repository_dispatch` from uno-bot confirm | uno-prototype (design → prototypes scaffold) | uno-bot proposes; Actions executes | `figma-implement-design.yml` + `scripts/prompts/uno-implement-design` + machine-check post-step (method §5.1; results in the draft PR) | GHA · Anthropic API key (`ANTHROPIC_API_KEY`) | Bill | ✅ live |
 | Marketplace add/edit | — | uno-publish (registration) | — | ❌ **not built.** The two stub workflows (`marketplace-add.yml` / `marketplace-edit.yml`) were deleted in #158 — they logged a payload and posted a construction notice, and nothing dispatched them. No Worker tool exists. The open product question — repo data file (`src/pages/PrototypeMarket/prototypes-data.js`) versus the Notion database when they disagree — is tracked in #173 and must be answered before this is built | (planned) | — | planned |

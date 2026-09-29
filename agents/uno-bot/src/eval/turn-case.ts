@@ -27,7 +27,7 @@
 import type { AgentResult } from "../agent/loop";
 import type { ToolCall } from "../agent/tool-transcript";
 import type { HistoryTurn, PendingProposal } from "../thread-state/index";
-import { buildTurnRequest, type DeliveryCall, type TurnOutcome, type TurnRequest } from "../turn/index";
+import { buildTurnRequest, isIntakeChannel, type DeliveryCall, type TurnOutcome, type TurnRequest } from "../turn/index";
 
 /** The synthetic surface an eval turn arrives on. `C_EVAL` is a channel by the
  *  one statement of the rule (`turn/request.ts` § `turnSurfaceOf`, which the
@@ -68,6 +68,9 @@ const USER_ID = /^[UW][A-Z0-9]{2,20}$/;
  */
 export function evalTurnRequest(
   body: EvalTurnBody,
+  /** The Worker's #uno-bot id, so a case posted there reads as the intake it
+   *  would be in Slack. Absent, no channel is. */
+  intakeChannelId?: string,
 ): { ok: true; request: TurnRequest } | { ok: false; error: string } {
   const prompt = typeof body.prompt === "string" ? body.prompt.trim() : "";
   if (!prompt) return { ok: false, error: "missing prompt" };
@@ -110,6 +113,7 @@ export function evalTurnRequest(
       // eval surface does not have — out of the measurement.
       threaded: true,
       text: prompt,
+      ...(isIntakeChannel(channel, intakeChannelId) ? { intakeChannel: { participants: [userId] } } : {}),
       history,
       pending,
     }),

@@ -51,6 +51,9 @@ export interface Env {
   // and whose members may confirm it.
   FIGMA_FILE_KEY?: string;
   PLUS_UNIVERSAL_CHANNEL_ID?: string;
+  /** #uno-bot, the intake channel (`turn/intake-channel.ts`): a top-level post
+   *  there engages with no @mention. Unset → there is no intake channel. */
+  UNO_BOT_CHANNEL_ID?: string;
   NOTION_API_KEY: string;
   NOTION_ROADMAP_DB_ID: string;
   NOTION_TEAM_DB_ID: string;
