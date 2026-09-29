@@ -161,6 +161,31 @@ IconBold.play = async ({ canvasElement }) => {
     }
 };
 
+/**
+ * `orange` is the old name for `yellow`, kept as a deprecated alias: it paints
+ * exactly what `yellow` paints, in both appearances.
+ */
+export const OrangeIsYellow = () => (
+    <div style={row}>
+        <Tile color="yellow" icon="book-open" data-testid="yellow" />
+        <Tile color="orange" icon="book-open" data-testid="orange" />
+        <Tile color="yellow" appearance="bold" icon="book-open" data-testid="yellow-bold" />
+        <Tile color="orange" appearance="bold" icon="book-open" data-testid="orange-bold" />
+    </div>
+);
+
+OrangeIsYellow.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const [a, b] of [['yellow', 'orange'], ['yellow-bold', 'orange-bold']]) {
+        const want = canvas.getByTestId(a);
+        const got = canvas.getByTestId(b);
+        await expect(getComputedStyle(got).backgroundColor).toBe(getComputedStyle(want).backgroundColor);
+        await expect(getComputedStyle(got.querySelector('i')).color).toBe(getComputedStyle(want.querySelector('i')).color);
+    }
+    await expect(getComputedStyle(canvas.getByTestId('orange')).backgroundColor)
+        .toBe(tokenColor(canvasElement, '--color-social-emotional-container'));
+};
+
 /* ------------------------------------------------------------------ logos */
 
 const Logo = () => (
@@ -204,7 +229,7 @@ Logos.play = async ({ canvasElement }) => {
     }
 
     const grounds = {
-        white: '--color-surface',
+        white: '--color-surface-container-lowest',
         grey: '--color-surface-container',
         ...Object.fromEntries(Object.entries(HUE).map(([c, h]) => [c, `--color-${h}-container`])),
     };
@@ -221,7 +246,7 @@ export const LogoDefaultsToWhite = () => (
 
 LogoDefaultsToWhite.play = async ({ canvasElement }) => {
     const tile = within(canvasElement).getByTestId('tile');
-    await expect(getComputedStyle(tile).backgroundColor).toBe(tokenColor(canvasElement, '--color-surface'));
+    await expect(getComputedStyle(tile).backgroundColor).toBe(tokenColor(canvasElement, '--color-surface-container-lowest'));
 };
 
 /* ----------------------------------------------------------------- images */
@@ -299,7 +324,7 @@ Decorative.play = async ({ canvasElement }) => {
     }
 };
 
-export const Labelled = () => (
+export const Labeled = () => (
     <div style={row}>
         <Tile icon="book-open" label="Lesson" />
         <Tile content="logo" label="Figma"><Logo /></Tile>
@@ -311,7 +336,7 @@ export const Labelled = () => (
  * `label` makes a tile one image with a name — one announcement for the whole
  * square, not one for the square and another for the picture inside it.
  */
-Labelled.play = async ({ canvasElement }) => {
+Labeled.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getAllByRole('img')).toHaveLength(3);
     await expect(canvas.getByRole('img', { name: 'Lesson' })).toBeInTheDocument();

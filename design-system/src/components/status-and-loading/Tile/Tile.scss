@@ -1,43 +1,41 @@
 /*
  * Tile — a square that frames an icon, a logo or an image.
  *
- * ONE SIZE SCALE FOR EVERY KIND OF CONTENT. Each size sets three things: the
- * square, its radius (a quarter of the size), and the inner size an icon or a
- * logo is inset to. No semantic token names a tile's size, so the square takes
- * the spacing primitives; the inner size is the Font Awesome size of the same
- * step, so an icon and a logo in the same tile are the same size.
+ * ONE SIZE SCALE FOR EVERY KIND OF CONTENT. Each size sets the square and the
+ * inner size an icon or a logo is inset to; the radius is a quarter of the
+ * square, computed, so every size gets the same proportion.
  *
- * Radius 5 and 10 (sizes 20 and 40) have no token and are literals until an
- * Element radius token exists for them.
+ * No Element size token names a tile's square yet, so it takes the spacing
+ * primitives. The inner size is the Font Awesome size of the same step, so an
+ * icon and a logo in the same tile are the same size. Every value carries its
+ * literal as a fallback, so a page without the token sheet still gets squares.
  */
 $tile-sizes: (
-    16: (--size-spacing-medium-space-300, var(--size-border-radius-radius-100), --font-size-fa-body3),
-    20: (--size-spacing-medium-space-400, 5px, --font-size-fa-body2),
-    24: (--size-spacing-medium-space-500, var(--size-border-radius-radius-150), --font-size-fa-body1),
-    32: (--size-spacing-large-space-600, var(--size-border-radius-radius-200), --font-size-fa-h5),
-    40: (--size-spacing-large-space-700, 10px, --font-size-fa-h4),
-    48: (--size-spacing-large-space-800, var(--size-border-radius-radius-300), --font-size-fa-h3),
+    16: (var(--size-spacing-medium-space-300, 16px), var(--font-size-fa-body3, 10px)),
+    20: (var(--size-spacing-medium-space-400, 20px), var(--font-size-fa-body2, 12px)),
+    24: (var(--size-spacing-medium-space-500, 24px), var(--font-size-fa-body1, 14px)),
+    32: (var(--size-spacing-large-space-600, 32px), var(--font-size-fa-h5, 16px)),
+    40: (var(--size-spacing-large-space-700, 40px), var(--font-size-fa-h4, 20px)),
+    48: (var(--size-spacing-large-space-800, 48px), var(--font-size-fa-h3, 24px)),
 );
 
 /*
- * The color names follow Tag, each borrowing the curriculum hue whose color it
- * names. Per hue: Container, On-Container, base, On-base.
+ * The color names follow the Tag color set in the label spec, where yellow
+ * replaces orange. Each hue name borrows the curriculum hue whose color it
+ * names; grey is not a hue, so it names its neutral pairs directly.
  *
- *   subtle icon  Container ground, On-Container glyph
- *   bold icon    base ground, On-base glyph
- *   logo         Container ground (the logo keeps its own colors)
- *
- * Grey is not a hue, so it names its pairs directly: subtle is
- * surface-container-high with on-surface-variant, bold is the inverse surface,
- * and a grey logo sits on surface-container.
+ * Per name: subtle icon ground, subtle icon glyph, bold icon ground, bold icon
+ * glyph, logo ground. A logo keeps its own colors, so it takes a ground only.
+ * The map holds whole `var()` references so the generated docs can list them.
  */
-$tile-hues: (
-    'blue': 'technology-tools',
-    'green': 'advocacy',
-    'purple': 'mastering-content',
-    'magenta': 'relationship',
-    'yellow': 'social-emotional',
-    'teal': 'tertiary',
+$tile-colors: (
+    'grey': (var(--color-surface-container-high), var(--color-on-surface-variant), var(--color-inverse-surface), var(--color-inverse-on-surface), var(--color-surface-container)),
+    'blue': (var(--color-technology-tools-container), var(--color-on-technology-tools-container), var(--color-technology-tools), var(--color-on-technology-tools), var(--color-technology-tools-container)),
+    'green': (var(--color-advocacy-container), var(--color-on-advocacy-container), var(--color-advocacy), var(--color-on-advocacy), var(--color-advocacy-container)),
+    'purple': (var(--color-mastering-content-container), var(--color-on-mastering-content-container), var(--color-mastering-content), var(--color-on-mastering-content), var(--color-mastering-content-container)),
+    'magenta': (var(--color-relationship-container), var(--color-on-relationship-container), var(--color-relationship), var(--color-on-relationship), var(--color-relationship-container)),
+    'yellow': (var(--color-social-emotional-container), var(--color-on-social-emotional-container), var(--color-social-emotional), var(--color-on-social-emotional), var(--color-social-emotional-container)),
+    'teal': (var(--color-tertiary-container), var(--color-on-tertiary-container), var(--color-tertiary), var(--color-on-tertiary), var(--color-tertiary-container)),
 );
 
 .plus-tile {
@@ -47,20 +45,19 @@ $tile-hues: (
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    inline-size: var(--tile-size);
-    block-size: var(--tile-size);
-    border-radius: var(--tile-radius);
+    inline-size: var(--tile-size, 32px);
+    block-size: var(--tile-size, 32px);
+    border-radius: calc(var(--tile-size, 32px) / 4);
     overflow: hidden;
     vertical-align: middle;
-    background-color: var(--color-surface-container-high);
-    color: var(--color-on-surface-variant);
+    background-color: var(--color-surface-container-high, #e7e8eb);
+    color: var(--color-on-surface-variant, #3f484a);
 }
 
 @each $size, $values in $tile-sizes {
     .plus-tile--#{$size} {
-        --tile-size: var(#{nth($values, 1)});
-        --tile-radius: #{nth($values, 2)};
-        --tile-inner: var(#{nth($values, 3)});
+        --tile-size: #{nth($values, 1)};
+        --tile-inner: #{nth($values, 2)};
     }
 }
 
@@ -70,60 +67,49 @@ $tile-hues: (
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: var(--tile-inner);
+    font-size: var(--tile-inner, 16px);
     line-height: 1;
 }
 
 /* Two classes deep, so the body's own Font Awesome size cannot win. */
 .plus-tile .plus-tile__icon > * {
-    font-size: var(--tile-inner);
+    font-size: var(--tile-inner, 16px);
     line-height: 1;
     color: inherit;
 }
 
-.plus-tile--icon.plus-tile--bold.plus-tile--grey {
-    background-color: var(--color-inverse-surface);
-    color: var(--color-inverse-on-surface);
-}
-
-@each $name, $hue in $tile-hues {
+@each $name, $tokens in $tile-colors {
     .plus-tile--icon.plus-tile--subtle.plus-tile--#{$name} {
-        background-color: var(--color-#{$hue}-container);
-        color: var(--color-on-#{$hue}-container);
+        background-color: nth($tokens, 1);
+        color: nth($tokens, 2);
     }
 
     .plus-tile--icon.plus-tile--bold.plus-tile--#{$name} {
-        background-color: var(--color-#{$hue});
-        color: var(--color-on-#{$hue});
+        background-color: nth($tokens, 3);
+        color: nth($tokens, 4);
+    }
+
+    .plus-tile--logo.plus-tile--#{$name} {
+        background-color: nth($tokens, 5);
     }
 }
 
 /* ------------------------------------------------------------------ logo */
 
-/* "White" is the Figma set's name for this ground; the variable it binds is surface. */
+/* White is the default logo ground, and is only ever a logo's. */
 .plus-tile--logo.plus-tile--white {
-    background-color: var(--color-surface);
-}
-
-.plus-tile--logo.plus-tile--grey {
-    background-color: var(--color-surface-container);
-}
-
-@each $name, $hue in $tile-hues {
-    .plus-tile--logo.plus-tile--#{$name} {
-        background-color: var(--color-#{$hue}-container);
-    }
+    background-color: var(--color-surface-container-lowest, #ffffff);
 }
 
 .plus-tile__logo {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    inline-size: var(--tile-inner);
-    block-size: var(--tile-inner);
-    font-size: var(--tile-inner);
+    inline-size: var(--tile-inner, 16px);
+    block-size: var(--tile-inner, 16px);
+    font-size: var(--tile-inner, 16px);
     line-height: 1;
-    border-radius: var(--size-border-radius-radius-50);
+    border-radius: var(--size-border-radius-radius-50, 2px);
     overflow: hidden;
 }
 

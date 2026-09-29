@@ -17,11 +17,15 @@ export const TILE_CONTENTS = ['icon', 'logo', 'image'];
 export const TILE_APPEARANCES = ['subtle', 'bold'];
 
 /**
- * The color names follow `Tag`: a tile's color is a category, never a status.
- * `white` is for logos, which carry their own colors and mostly want a plain
- * ground. The name-to-token map is in `Tile.scss`.
+ * The color names follow the Tag color set in the label spec, where `yellow`
+ * replaces `orange`: a tile's color is a category, never a status. `white` is
+ * for logos, which carry their own colors and mostly want a plain ground. The
+ * name-to-token map is in `Tile.scss`.
  */
 export const TILE_COLORS = ['grey', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'white'];
+
+/** Deprecated names, still accepted, and the color each one now means. */
+const DEPRECATED_COLORS = { orange: 'yellow' };
 
 /**
  * A string icon is a Font Awesome Free name (`book-open`, drawn solid) or a full
@@ -49,6 +53,13 @@ export const Tile = ({
     // A logo with no color chosen sits on white; everything else on grey. An
     // icon has no white ground, since the glyph would take no color from it.
     let resolvedColor = color ?? (content === 'logo' ? 'white' : 'grey');
+    if (DEPRECATED_COLORS[resolvedColor]) {
+        if (process.env.NODE_ENV !== 'production') {
+            // eslint-disable-next-line no-console
+            console.warn(`[Tile] color="${resolvedColor}" is deprecated; use "${DEPRECATED_COLORS[resolvedColor]}".`);
+        }
+        resolvedColor = DEPRECATED_COLORS[resolvedColor];
+    }
     if (content !== 'logo' && resolvedColor === 'white') resolvedColor = 'grey';
 
     const classes = [
@@ -95,8 +106,8 @@ Tile.propTypes = {
     size: PropTypes.oneOf(TILE_SIZES),
     /** Icons only. `subtle` is the color's container; `bold` is the solid color. */
     appearance: PropTypes.oneOf(TILE_APPEARANCES),
-    /** A category color, as on `Tag`. `white` is for logos. Defaults to white for a logo, grey otherwise. */
-    color: PropTypes.oneOf(TILE_COLORS),
+    /** A category color from the Tag set. `white` is for logos. Defaults to white for a logo, grey otherwise. `orange` is a deprecated alias for `yellow`. */
+    color: PropTypes.oneOf(TILE_COLORS.concat(Object.keys(DEPRECATED_COLORS))),
     /** `icon` only: a Font Awesome Free name (`book-open`), a class list, or a node. */
     icon: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /** `logo` or `image`: the picture's URL. */
