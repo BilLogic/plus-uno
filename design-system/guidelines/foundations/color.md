@@ -93,3 +93,11 @@ Use state layer tokens for interactive states:
 2. **Use state layers for interaction** - Never hardcode hover/active colors
 3. **Use `-container` for backgrounds** - Container tokens for subtle background fills
 4. **Info equals Tertiary** - Info colors are aliases to Tertiary tokens
+
+### Exception: grey team avatars
+
+A grey Tag of type `team` fills its avatar with
+`--color-technology-tools-state-08` at rest, against rule 3 and the intent of
+rule 2. The Figma set binds that variable on every team variant: an 08 wash is
+paler than any Container, so a grey team never reads as a person's neutral
+disc. The avatar is never interactive, so no hover layer stacks on it.
