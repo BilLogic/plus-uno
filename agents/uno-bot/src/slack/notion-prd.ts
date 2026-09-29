@@ -1,8 +1,7 @@
-// Extract a Notion PRD reference from the root message of a Slack thread.
-// Mirrors v1 behavior: the polling bot posts a PRD notification (with a
-// notion.so link) as the thread root, and designers reply with "implement X"
-// in that thread. v2 walks the parent message, finds the Notion URL, and
-// forwards the page id + url to the figma-implement workflow as before.
+// Extract a Notion PRD reference from the root message of a Slack thread: a
+// thread whose first message links a PRD carries that PRD to the implement and
+// scaffold workflows. (The Figma library poll used to post such roots; its
+// publishes now go to #plus-universal as a card whose spec is an intake.)
 
 import type { Env } from "../types";
 import { canonicalNotionUrl } from "../integrations/notion";

@@ -41,6 +41,7 @@ import {
   typedEmojiDecision,
 } from "../src/gate/reactions";
 import {
+  EXECUTION_CUTOFF_MS,
   PROPOSAL_TTL_MS,
   createInMemoryThreadState,
   type PendingProposal,
@@ -309,6 +310,73 @@ describe("a card with a confirmer set", () => {
     assert.equal(
       renderGateNote({ kind: "not-a-confirmer", confirmers: [] }),
       ":lock: Nobody here can confirm or cancel this proposal — nothing was executed.",
+    );
+  });
+});
+
+// A card the Worker stages itself may say what a ⛔ still runs — the library
+// card files its intake either way. A turn's card never sets it, so a cancel
+// there still runs nothing (the describe above).
+describe("a card that names what a cancel still runs", () => {
+  const INTAKE = { toolName: "github_issue_create", input: { title: "Figma publish", body: "…" } };
+  const DISPATCH = { toolName: "component_implement", input: { component: "Badge" } };
+  const CARD: PendingProposal = {
+    ...PROPOSAL,
+    toolName: INTAKE.toolName,
+    input: INTAKE.input,
+    operations: [INTAKE, DISPATCH],
+    onCancel: [INTAKE],
+  };
+
+  async function stagedCard(): Promise<ThreadState> {
+    const store = createInMemoryThreadState();
+    await store.putProposal(CARD);
+    return store;
+  }
+
+  it("runs only those operations on a ⛔, on every door, and says so", async () => {
+    const cancels: Array<{ name: string; signal: GateSignal }> = [
+      { name: "reaction", signal: reaction({ glyph: "no_entry" }) },
+      { name: "button", signal: button("cancel") },
+      { name: "typed", signal: typed("⛔") },
+      { name: "model", signal: { kind: "model", pending: CARD, decision: "cancel" } },
+    ];
+    for (const door of cancels) {
+      const verdict = await resolveSignal(door.signal, { threadState: await stagedCard() });
+      assert.equal(verdict.outcome, "won", door.name);
+      assert.equal(verdict.decision, "cancel", door.name);
+      assert.deepEqual(verdict.execute?.operations, [INTAKE], door.name);
+      if (door.signal.kind !== "model") {
+        assert.deepEqual(
+          verdict.post?.note,
+          { kind: "resolved", decision: "cancel", stillRuns: ["github_issue_create"] },
+          door.name,
+        );
+      }
+    }
+  });
+
+  it("runs the whole batch on a ✅", async () => {
+    const verdict = await resolveSignal(button("confirm"), { threadState: await stagedCard() });
+    assert.deepEqual(verdict.execute?.operations, [INTAKE, DISPATCH]);
+  });
+
+  it("records the cancel's run as the execution, so a cut-off one offers back only it", async () => {
+    let clock = 1_000_000;
+    const threadState = createInMemoryThreadState({ now: () => clock });
+    await threadState.putProposal(CARD);
+    await resolveSignal(button("cancel"), { threadState });
+    clock += EXECUTION_CUTOFF_MS + 1;
+    const execution = await threadState.takeCutOffExecution(CARD_TS);
+    assert.ok(execution);
+    assert.deepEqual(execution.proposal.operations, [INTAKE]);
+    assert.equal(execution.proposal.onCancel, undefined);
+  });
+
+  it("says in Slack what the cancel still does", () => {
+    assert.equal(
+      renderGateNote({ kind: "resolved", decision: "cancel", stillRuns: ["github_issue_create"] }),
+      "Cancelled — this card still files an issue on a cancel, so that part goes ahead.",
     );
   });
 });

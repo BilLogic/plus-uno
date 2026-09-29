@@ -74,8 +74,8 @@ export async function preflight(
       if (!ctx.prd?.id && !ctx.implementPrdUrl) {
         return {
           ask:
-            ":memo: Before I implement a component I need its *Notion PRD* — the polling bot creates one and posts it in #uno-bot.\n" +
-            "• Run `implement` from *that* PRD-notification thread, or\n" +
+            ":memo: Before I implement a component I need its *Notion PRD*.\n" +
+            "• Ask from a thread whose first message links the PRD, or\n" +
             "• paste the PRD link here and I'll use it.\n\n" +
             "I won't implement a component without a PRD.",
         };

@@ -13,27 +13,22 @@ import { handleSlashCommand } from "./slack/commands";
 import { parseInteraction, handleInteraction } from "./slack/interactive";
 import { startSlackOAuth, handleSlackOAuthCallback } from "./oauth/slack";
 import { BUILD } from "./version";
-import { runFigmaPoll } from "./figma-poll";
 import { onScheduledFiring } from "./scheduled/runs";
 import { enqueueScheduledRun } from "./scheduled/jobs";
 import { runMetered } from "./net";
 import * as diagnostics from "./diagnostics";
 
 export default {
-  // Cron (wrangler.toml [triggers]). Every firing runs the Figma library poll:
-  // detect DS publishes, file the PRD, post the "🎨 Figma Design System
-  // Updated" card to #uno-bot. The 14:00 and 22:00 UTC firings also enqueue
+  // Cron (wrangler.toml [triggers]). The 14:00 and 22:00 UTC firings enqueue
   // the morning and end-of-day runs on their own AgentRunner, one job per
-  // alarm (src/scheduled/runs.ts). Scheduled invocations get their own
-  // subrequest budget and a 15-minute wall clock, so the poll runs here, not
-  // in a DO alarm.
+  // alarm (src/scheduled/runs.ts); every other firing does nothing. The Figma
+  // library poll is one of those jobs now, not work done on every firing.
   async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
-    // Metered like every other invocation: the poll fans out over Figma files
-    // under the same 50-subrequest cap, and would die the same silent way.
+    // Metered like every other invocation: the enqueue is a Durable Object hop
+    // the meter charges.
     ctx.waitUntil(
       runMetered(() =>
         onScheduledFiring(controller.scheduledTime, {
-          pollFigma: () => runFigmaPoll(env).then((r) => console.log(`[figma-poll] ${r.summary}`)),
           enqueueRun: (run) => enqueueScheduledRun(env, run),
         }),
       ),
