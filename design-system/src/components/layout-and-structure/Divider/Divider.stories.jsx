@@ -27,7 +27,6 @@ export default {
         size: {
             control: 'select',
             options: ['sm', 'md', 'lg', 'xl'],
-            description: 'Divider thickness: sm 1px, md 1.5px, lg 2px, xl 3px. The pixel strings alias the names; "2.5px" maps to xl and draws 3px.',
             table: { category: 'Design' }
         },
         opacity10: {
@@ -168,7 +167,7 @@ export const Sizes = () => (
 Sizes.play = async ({ canvasElement }) => {
     const expected = { sm: 1, md: 1.5, lg: 2, xl: 3 };
     for (const [size, height] of Object.entries(expected)) {
-        const line = canvasElement.querySelector(`#divider-size-${size}`).firstElementChild;
+        const line = canvasElement.querySelector(`#divider-size-${size} .plus-divider-line`);
         const drawn = px(getComputedStyle(line).height);
         await expect(drawn, `${size}: line is ${height}px`).toBe(height);
         await expect(drawn, `${size}: line is the stroke-${size} token`)

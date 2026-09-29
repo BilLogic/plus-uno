@@ -23,7 +23,11 @@ const probe = (host, property, token, extra = {}) => {
 /** What a token resolves to as a computed color, read through a probe. */
 export const tokenColor = (host, token) => probe(host, 'backgroundColor', token);
 
-/** What a length token resolves to, in pixels, read through a probe. */
+/**
+ * What a length token resolves to, in pixels, read through a probe. It reads
+ * the layout width of a block span, so it is reliable for plain length tokens
+ * on story canvases only.
+ */
 export const tokenLength = (host, token) => px(probe(host, 'width', token, { display: 'block' }));
 
 /** The alpha channel of a computed color; 1 when it has none. */
