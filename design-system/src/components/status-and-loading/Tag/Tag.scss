@@ -4,12 +4,14 @@
  * ONE SIZE: 22 tall including a 1px border, B3 12 text, padding 4, gap 4,
  * radius 4. The label heights (16/20/22/32) have no semantic token yet, so the
  * 22 is a local custom property with its value as the default, as Count does.
+ * The swatch 10, radius 2 and × 16 are Figma-bound spacing and radius
+ * primitives, because no Element token names them.
  *
  * THE COLOR MAP. Per name: the subtle border, the hue (swatch, spinner and the
  * selected border), and the hue's 08, 12 and 16 state layers. Each hue borrows
  * the curriculum token whose color it names; teal is Tertiary, never Info.
- * Grey is not a hue: its border is on-surface-variant at 16, its swatch and
- * selected border are Outline, and its state layers are on-surface-variant.
+ * Grey is not a hue: its border is Outline Variant, its swatch and selected
+ * border are Outline, and its state layers are on-surface-variant.
  * The map holds whole `var()` references so the generated docs list them.
  *
  *   blue     technology-tools
@@ -21,7 +23,7 @@
  */
 $tag-colors: (
     'grey': (
-        var(--color-on-surface-variant-state-16, rgba(65, 72, 77, 0.16)),
+        var(--color-outline-variant, #bec8ca),
         var(--color-outline, #6f797a),
         var(--color-on-surface-variant-state-08, rgba(65, 72, 77, 0.08)),
         var(--color-on-surface-variant-state-12, rgba(65, 72, 77, 0.12)),
@@ -80,7 +82,8 @@ $tag-colors: (
     gap: var(--size-element-gap-xs, 4px);
     box-sizing: border-box;
     height: var(--plus-tag-height);
-    max-width: 100%;
+    /* The cap from `maxWidth`, still clamped by a container narrower than it. */
+    max-width: min(var(--plus-tag-max, 180px), 100%);
     min-width: 0;
     vertical-align: middle;
 
@@ -93,6 +96,7 @@ $tag-colors: (
     border: var(--size-element-border, 1px) solid var(--plus-tag-border);
     border-radius: var(--size-element-radius-md, 4px);
     background-color: transparent;
+    appearance: none;
 
     /* Neutral text on every color: the hue is on the border and swatch. */
     color: var(--color-on-surface, #191c1e);
@@ -268,8 +272,10 @@ $tag-colors: (
     width: var(--size-spacing-small-space-150, 10px);
     height: var(--size-spacing-small-space-150, 10px);
     border: var(--size-element-stroke-md, 1.5px) solid transparent;
+    /* Three quarters of the ring: a 270° arc. */
     border-top-color: var(--plus-tag-hue);
     border-right-color: var(--plus-tag-hue);
+    border-bottom-color: var(--plus-tag-hue);
     border-radius: var(--size-element-radius-full, 999px);
     animation: plus-tag-spin 0.8s linear infinite;
 }

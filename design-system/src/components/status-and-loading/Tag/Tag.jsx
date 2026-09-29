@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Count from '../Count';
+import Tooltip from '../../overlays/Tooltip';
 import './Tag.scss';
 
 /**
@@ -15,8 +16,8 @@ import './Tag.scss';
  * stays neutral, and the hue sits on the border and on a 10px swatch. One size,
  * 22 tall, for every behavior.
  *
- * NO `disabled` PROP. A tag is disabled because the field or TagGroup holding it
- * is, so the state arrives through `TagContext` and one tag can never disagree
+ * NO `disabled` PROP. A tag is disabled because the field holding it is: the
+ * field wraps its tags in `TagContext.Provider`, so one tag can never disagree
  * with the tags beside it.
  */
 
@@ -52,12 +53,12 @@ const DEPRECATED_VARIANTS = {
 };
 
 /**
- * Disabled state for every tag inside a field or TagGroup. A field wraps its
- * tags in `<TagContext.Provider value={{ isDisabled: true }}>`.
+ * Disabled state for every tag inside a field. A field wraps its tags in
+ * `<TagContext.Provider value={{ isDisabled: true }}>`.
  */
 export const TagContext = createContext({ isDisabled: false });
 
-/** What the containing field or TagGroup says about its tags. */
+/** What the containing field says about its tags. */
 export const useTagContext = () => useContext(TagContext);
 
 const warn = (message) => {
@@ -68,8 +69,7 @@ const warn = (message) => {
 
 /*
  * Only a label that is really clipped gets a tooltip. With a 180 cap on every
- * tag, putting the full text in `title` unconditionally would give every short
- * tag a tooltip that repeats what it already shows.
+ * tag, a tooltip on every tag would repeat what most of them already show.
  */
 const useTruncated = (ref, deps) => {
     const [truncated, setTruncated] = useState(false);
@@ -125,7 +125,7 @@ export const Tag = ({
     let resolved = behavior;
     if (!resolved && variant) {
         // `operational` has no replacement to point at yet, so it stays quiet
-        // until TagGroup's `+n`, its one caller, moves off it.
+        // until TagGroup's `+n`, its one caller, moves to its own path.
         if (variant !== 'operational') {
             warn(`[Tag] variant="${variant}" is deprecated; use behavior="${DEPRECATED_VARIANTS[variant]}".`);
         }
@@ -151,29 +151,37 @@ export const Tag = ({
         && typeof onRemove === 'function'
         && !isDisabled;
 
+    // A × named only "Remove" is one of a row of identical controls.
+    if (hasRemove && !removeLabel && typeof label !== 'string') {
+        warn('[Tag] the label is not text, so the × is named only "Remove". Pass `removeLabel` to say what it removes.');
+    }
+
+    // A disabled tag drops its behavior class, so no hover, press or underline
+    // rule written for the behavior can reach it.
     const classes = [
         'plus-tag',
         `plus-tag--${resolvedColor}`,
-        `plus-tag--${resolved}`,
+        isDisabled ? 'plus-tag--disabled' : `plus-tag--${resolved}`,
         isSelectable && isSelected ? 'plus-tag--selected' : '',
-        isDisabled ? 'plus-tag--disabled' : '',
         isLoading ? 'plus-tag--loading' : '',
         className,
     ].filter(Boolean).join(' ');
 
+    // The cap is a custom property so the stylesheet can still clamp it to a
+    // narrow container: `min(cap, 100%)`.
     const style = maxWidth
-        ? { maxWidth: typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth, ...styleProp }
+        ? { '--plus-tag-max': typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth, ...styleProp }
         : styleProp;
 
     // Saving swaps the swatch for a spinner of the same size, so the tag keeps
-    // its width. The spinner itself is decoration; one status line says what is
-    // happening, so it is announced once rather than once per spinning part.
-    let lead;
+    // its width. The overflow `+n` is a count of hidden tags, not a category,
+    // so it carries no swatch.
+    let lead = null;
     if (isLoading) {
         lead = <span className="plus-tag__spinner" aria-hidden="true" />;
     } else if (elemBefore) {
         lead = <span className="plus-tag__elem-before">{elemBefore}</span>;
-    } else {
+    } else if (!isAction) {
         lead = (
             <span
                 className={['plus-tag__swatch', swatchBefore ? 'plus-tag__swatch--custom' : ''].filter(Boolean).join(' ')}
@@ -184,19 +192,40 @@ export const Tag = ({
         );
     }
 
-    const labelNode = (
+    /*
+     * The tooltip goes on whatever takes focus. A tag that is already a control
+     * carries it on the control, so a clipped label adds no second tab stop. On
+     * a span tag the label itself becomes focusable, and only while clipped.
+     * The Tooltip is always mounted and switched on by truncation, so nothing a
+     * person is focused on remounts when the page resizes.
+     */
+    const tooltipText = typeof label === 'string' ? label : '';
+    const withTooltip = (element) => (
+        <Tooltip text={tooltipText || ' '} trigger={truncated && tooltipText ? ['hover', 'focus'] : []}>
+            {element}
+        </Tooltip>
+    );
+
+    const isControl = isSelectable || isAction || (isLink && !isDisabled);
+    const labelSpan = (
         <span
             ref={labelRef}
             className="plus-tag__label body3-txt"
-            title={truncated && typeof label === 'string' ? label : undefined}
+            tabIndex={!isControl && !isDisabled && truncated ? 0 : undefined}
         >
             {label}
         </span>
     );
+    const labelNode = isControl ? labelSpan : withTooltip(labelSpan);
 
-    const status = isLoading ? (
-        <span className="plus-tag__status" role="status">Saving</span>
-    ) : null;
+    /*
+     * One live region per tag, always mounted and outside the control, so
+     * "Saving" is announced once when it appears and never becomes part of
+     * the control's name.
+     */
+    const status = (
+        <span className="plus-tag__status" role="status">{isLoading ? 'Saving' : ''}</span>
+    );
 
     const removeButton = hasRemove ? (
         <button
@@ -222,60 +251,85 @@ export const Tag = ({
 
     if (isSelectable || isAction) {
         return (
-            <button
-                type="button"
-                {...shared}
-                disabled={isDisabled || undefined}
-                aria-disabled={isLoading ? 'true' : undefined}
-                // `aria-pressed` makes a selectable tag a toggle rather than a
-                // button that happens to look different afterwards.
-                aria-pressed={isSelectable ? isSelected : undefined}
-                onClick={(e) => {
-                    if (isLoading) return;
-                    onClick?.(e);
-                }}
-            >
-                {lead}
-                {labelNode}
-                {showCount && <Count value={count} size="small" />}
+            <>
+                {withTooltip(
+                    <button
+                        type="button"
+                        {...shared}
+                        disabled={isDisabled || undefined}
+                        aria-disabled={isLoading ? 'true' : undefined}
+                        // `aria-pressed` makes a selectable tag a toggle rather
+                        // than a button that looks different afterwards.
+                        aria-pressed={isSelectable ? isSelected : undefined}
+                        onClick={(e) => {
+                            if (isLoading) return;
+                            onClick?.(e);
+                        }}
+                    >
+                        {lead}
+                        {labelNode}
+                        {showCount && <Count value={count} size="small" />}
+                    </button>,
+                )}
                 {status}
-            </button>
+            </>
         );
     }
 
     if (isLink && !isDisabled) {
         const Link = linkComponent || 'a';
+        const linkProps = {
+            href,
+            'aria-disabled': isLoading ? 'true' : undefined,
+            onClick: (e) => {
+                if (isLoading) {
+                    e.preventDefault();
+                    return;
+                }
+                onClick?.(e);
+            },
+        };
         if (hasRemove) {
             // Two targets, never one inside the other: the text is the link and
             // the × is its sibling, so removing a tag can never follow it. Tab
             // order is the DOM order, link then ×.
             return (
-                <span {...shared} className={`${classes} plus-tag--split`}>
-                    <Link className="plus-tag__link" href={href} onClick={onClick}>
-                        {lead}
-                        {labelNode}
-                    </Link>
-                    {removeButton}
+                <>
+                    <span {...shared} className={`${classes} plus-tag--split`}>
+                        {withTooltip(
+                            <Link className="plus-tag__link" {...linkProps}>
+                                {lead}
+                                {labelNode}
+                            </Link>,
+                        )}
+                        {removeButton}
+                    </span>
                     {status}
-                </span>
+                </>
             );
         }
         return (
-            <Link {...shared} href={href} onClick={onClick}>
-                {lead}
-                {labelNode}
+            <>
+                {withTooltip(
+                    <Link {...shared} {...linkProps}>
+                        {lead}
+                        {labelNode}
+                    </Link>,
+                )}
                 {status}
-            </Link>
+            </>
         );
     }
 
     return (
-        <span {...shared}>
-            {lead}
-            {labelNode}
-            {removeButton}
+        <>
+            <span {...shared}>
+                {lead}
+                {labelNode}
+                {removeButton}
+            </span>
             {status}
-        </span>
+        </>
     );
 };
 

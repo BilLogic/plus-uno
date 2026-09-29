@@ -134,7 +134,7 @@ category.
     <DsCanvasQuiet of={TagStories.DisabledInField} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Every tag caps at 180 wide. A clipped label ellipsizes and shows its full text as a tooltip.</>}>
+<DocsCanvasShell description={<>Every tag caps at 180 wide, and narrower in a narrower container. A clipped label ellipsizes, and its full text is a tooltip that hover and keyboard focus both reach.</>}>
     <DsCanvasQuiet of={TagStories.Truncation} />
 </DocsCanvasShell>
 
@@ -250,12 +250,16 @@ and every tag inside follows:
   change of lightness alone.
 - **A link with a × is two tab stops**, link then ×, and pressing the × never
   follows the link.
-- **Saving is announced once.** The spinner is hidden; one status line says
-  "Saving". The × stays focusable but does nothing until the save lands.
+- **Saving is announced once.** The spinner is hidden; a status region beside
+  the tag, outside its name, says "Saving". The × and a link stay focusable
+  but do nothing until the save lands.
+- **A × needs a name.** When the label is not text, pass `removeLabel`, or the
+  × is named only "Remove" and development warns.
 - **Disabled tags take no focus.** They come from a disabled field, so the
   field is what a keyboard user meets.
-- **A clipped label keeps its full text** as a tooltip, set only when the label
-  really is clipped.
+- **A clipped label keeps its full text** in a tooltip that hover and keyboard
+  focus both reach. On a control the control carries it; on a plain tag the
+  label takes focus while, and only while, it is clipped.
 - **The swatch is decoration** and is hidden from assistive technology.
 
 </div>
