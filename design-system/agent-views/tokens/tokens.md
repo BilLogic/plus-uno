@@ -33,6 +33,7 @@ Use for padding, margin, and gaps.
 --size-element-pad-x-lg
 --size-element-pad-x-md
 --size-element-pad-x-sm
+--size-element-pad-x-xs
 --size-element-pad-y-lg
 --size-element-pad-y-md
 --size-element-pad-y-sm
@@ -236,6 +237,7 @@ Use semantic colors (never hex codes).
 
 ```css
 --color-advocacy
+--color-advocacy-border-subtle
 --color-advocacy-container
 --color-advocacy-container-state-08
 --color-advocacy-container-state-12
@@ -245,6 +247,7 @@ Use semantic colors (never hex codes).
 --color-advocacy-state-16
 --color-advocacy-text
 --color-danger
+--color-danger-border-subtle
 --color-danger-container
 --color-danger-container-state-08
 --color-danger-container-state-12
@@ -255,6 +258,7 @@ Use semantic colors (never hex codes).
 --color-danger-text
 --color-disabled-opacity
 --color-info
+--color-info-border-subtle
 --color-info-container
 --color-info-container-state-08
 --color-info-container-state-12
@@ -270,6 +274,7 @@ Use semantic colors (never hex codes).
 --color-inverse-surface-state-12
 --color-inverse-surface-state-16
 --color-mastering-content
+--color-mastering-content-border-subtle
 --color-mastering-content-container
 --color-mastering-content-container-state-08
 --color-mastering-content-container-state-12
@@ -328,6 +333,7 @@ Use semantic colors (never hex codes).
 --color-primary-state-16
 --color-primary-text
 --color-relationship
+--color-relationship-border-subtle
 --color-relationship-container
 --color-relationship-container-state-08
 --color-relationship-container-state-12
@@ -350,6 +356,7 @@ Use semantic colors (never hex codes).
 --color-shadow-state-12
 --color-shadow-state-16
 --color-social-emotional
+--color-social-emotional-border-subtle
 --color-social-emotional-container
 --color-social-emotional-container-state-08
 --color-social-emotional-container-state-12
@@ -359,6 +366,7 @@ Use semantic colors (never hex codes).
 --color-social-emotional-state-16
 --color-social-emotional-text
 --color-success
+--color-success-border-subtle
 --color-success-container
 --color-success-container-state-08
 --color-success-container-state-12
@@ -404,6 +412,7 @@ Use semantic colors (never hex codes).
 --color-surface-variant-state-12
 --color-surface-variant-state-16
 --color-technology-tools
+--color-technology-tools-border-subtle
 --color-technology-tools-container
 --color-technology-tools-container-state-08
 --color-technology-tools-container-state-12
@@ -413,6 +422,7 @@ Use semantic colors (never hex codes).
 --color-technology-tools-state-16
 --color-technology-tools-text
 --color-tertiary
+--color-tertiary-border-subtle
 --color-tertiary-container
 --color-tertiary-container-state-08
 --color-tertiary-container-state-12
@@ -422,6 +432,7 @@ Use semantic colors (never hex codes).
 --color-tertiary-state-16
 --color-tertiary-text
 --color-warning
+--color-warning-border-subtle
 --color-warning-container
 --color-warning-container-state-08
 --color-warning-container-state-12

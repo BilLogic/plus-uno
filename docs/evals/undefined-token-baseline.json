@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 91,
-    "uses": 271,
+    "names": 90,
+    "uses": 270,
     "bare": 5
   },
   "tokens": {
@@ -218,10 +218,6 @@
     },
     "--size-ele-gap-xs": {
       "uses": 9,
-      "bare": 0
-    },
-    "--size-element-pad-x-xs": {
-      "uses": 1,
       "bare": 0
     },
     "--size-element-pad-y-xs": {

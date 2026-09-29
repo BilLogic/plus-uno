@@ -54,6 +54,8 @@
    --color-on-tertiary: #ffffff;
    --color-tertiary-container: #85ecd5;
    --color-on-tertiary-container: #005a50;
+   --color-tertiary-border-subtle: rgba(14, 129, 117, 0.45);
+   /* Figma: Tertiary/Tertiary Border Subtle - Tertiary at 45%, the border of an outlined label */
 
    /* Tertiary State Layers */
    --color-tertiary-state-08: rgba(14, 129, 117, 0.08);
@@ -71,6 +73,8 @@
    --color-on-danger: #ffffff;
    --color-danger-container: #ffdad6;
    --color-on-danger-container: #410002;
+   --color-danger-border-subtle: rgba(186, 26, 26, 0.45);
+   /* Figma: Danger/Danger Border Subtle - Danger at 45%, the border of an outlined label */
 
    /* Danger State Layers */
    /* Using actual danger color from Figma: rgb(190, 12, 22) */
@@ -89,6 +93,8 @@
    --color-on-success: #ffffff;
    --color-success-container: #bdf292;
    --color-on-success-container: #0c2000;
+   --color-success-border-subtle: rgba(62, 105, 26, 0.45);
+   /* Figma: Success/Success Border Subtle - Success at 45%, the border of an outlined label */
 
    /* Success State Layers */
    --color-success-state-08: rgba(62, 105, 26, 0.08);
@@ -106,6 +112,8 @@
    --color-on-warning: #ffffff;
    --color-warning-container: #ffe17a;
    --color-on-warning-container: #231b00;
+   --color-warning-border-subtle: rgba(159, 130, 5, 0.45);
+   /* Figma: Warning/Warning Border Subtle - Warning at 45%, the border of an outlined label */
 
    /* Warning State Layers */
    /* Using actual warning color from Figma: rgb(113, 92, 0) */
@@ -123,6 +131,7 @@
    --color-on-info: var(--color-on-tertiary);
    --color-info-container: var(--color-tertiary-container);
    --color-on-info-container: var(--color-on-tertiary-container);
+   --color-info-border-subtle: var(--color-tertiary-border-subtle);
 
    /* Info State Layers */
    /* Info aliases to Tertiary */
@@ -140,6 +149,8 @@
    --color-on-social-emotional: #ffffff;
    --color-social-emotional-container: #ffdea0;
    --color-on-social-emotional-container: #5c4300;
+   --color-social-emotional-border-subtle: rgba(140, 102, 0, 0.45);
+   /* Figma: Social-Emotional/Social-Emotional Border Subtle - Social-Emotional at 45%, the border of an outlined label */
 
    /* Social-Emotional State Layers */
    --color-social-emotional-state-08: rgba(125, 87, 0, 0.08);
@@ -156,6 +167,8 @@
    --color-on-mastering-content: #ffffff;
    --color-mastering-content-container: #f2daff;
    --color-on-mastering-content-container: #583a6f;
+   --color-mastering-content-border-subtle: rgba(134, 89, 169, 0.45);
+   /* Figma: Mastering-Content/Mastering-Content Border Subtle - Mastering-Content at 45%, the border of an outlined label */
 
    /* Mastering Content State Layers */
    --color-mastering-content-state-08: rgba(127, 63, 177, 0.08);
@@ -172,6 +185,8 @@
    --color-on-advocacy: #ffffff;
    --color-advocacy-container: #b3f1bf;
    --color-on-advocacy-container: #16512c;
+   --color-advocacy-border-subtle: rgba(22, 119, 69, 0.45);
+   /* Figma: Advocacy/Advocacy Border Subtle - Advocacy at 45%, the border of an outlined label */
 
    /* Advocacy State Layers */
    --color-advocacy-state-08: rgba(22, 119, 69, 0.08);
@@ -188,6 +203,8 @@
    --color-on-relationship: #ffffff;
    --color-relationship-container: #ffd9e4;
    --color-on-relationship-container: #3f001b;
+   --color-relationship-border-subtle: rgba(199, 11, 119, 0.45);
+   /* Figma: Relationship/Relationship Border Subtle - Relationship at 45%, the border of an outlined label */
 
    /* Relationship State Layers */
    --color-relationship-state-08: rgba(199, 11, 119, 0.08);
@@ -204,6 +221,8 @@
    --color-on-technology-tools: #ffffff;
    --color-technology-tools-container: #d7e2ff;
    --color-on-technology-tools-container: #001a40;
+   --color-technology-tools-border-subtle: rgba(0, 92, 189, 0.45);
+   /* Figma: Technology-Tools/Technology-Tools Border Subtle - Technology-Tools at 45%, the border of an outlined label */
 
    /* Technology Tools State Layers */
    --color-technology-tools-state-08: rgba(0, 92, 189, 0.08);
