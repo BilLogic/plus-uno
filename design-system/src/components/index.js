@@ -44,6 +44,7 @@ export { default as Tag } from '@/components/status-and-loading/Tag';
 // The disabled state a field hands the tags it wraps in `TagContext.Provider`.
 export { TagContext, useTagContext } from '@/components/status-and-loading/Tag';
 export { default as TagGroup } from '@/components/status-and-loading/TagGroup';
+export { default as Suggestion } from '@/components/status-and-loading/Suggestion';
 export { default as Table } from '@/components/_internal/Table';
 export { default as Tile } from '@/components/status-and-loading/Tile';
 export { default as Toast } from '@/components/messaging/Toast';
