@@ -229,8 +229,9 @@ export type GateNote =
   | { kind: "said"; text: string }
   /** The lost race: someone else's confirmation got there first. */
   | { kind: "already-resolved" }
-  /** A ✅ on a card that aged out of the store. */
-  | { kind: "expired" }
+  /** A ✅ on a card that aged out of the store. `ttlMs` is the card's own
+   *  lifetime when it set one; absent, it lived the default hour. */
+  | { kind: "expired"; ttlMs?: number }
   /** A ✅ on a card a revision replaced (#573). */
   | { kind: "superseded" }
   /** A reaction that landed somewhere other than the card it claims: say where

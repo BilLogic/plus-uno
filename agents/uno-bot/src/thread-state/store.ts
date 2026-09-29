@@ -94,7 +94,7 @@ export const CANCEL_TTL_MS = 5 * 60_000;
  * operation and stops, telling nothing, once it is set
  * (`ThreadState.settleOperation`). The note and the re-staged card are then
  * the only account. Five minutes is how long a person waits to be told; it is
- * short against the hour a re-staged card stays useful.
+ * short against the TTL a re-staged card stays useful.
  */
 export const EXECUTION_CUTOFF_MS = 5 * 60 * 1000;
 
@@ -235,9 +235,19 @@ export interface PendingProposal {
   confirmers?: string[];
 }
 
+/** A card's own terms: how long it lives and who may confirm it. Both
+ *  optional, and a card with neither is held to the defaults. */
+export type ProposalTerms = Pick<PendingProposal, "ttlMs" | "confirmers">;
+
 /** How long a proposal stays confirmable: its own `ttlMs`, or the hour. */
 export function proposalTtlMs(proposal: Pick<PendingProposal, "ttlMs">): number {
   return proposal.ttlMs ?? PROPOSAL_TTL_MS;
+}
+
+/** The card's own `ttlMs`, spread onto an "expired" lookup — absent for a
+ *  card on the default hour, so that answer reads exactly as it always has. */
+export function ownTtl(proposal: Pick<PendingProposal, "ttlMs">): { ttlMs?: number } {
+  return proposal.ttlMs !== undefined ? { ttlMs: proposal.ttlMs } : {};
 }
 
 /**
@@ -258,9 +268,7 @@ export function mayConfirm(
  * may confirm it. A person pushing back on a card is asking for different
  * content, not a different gate, so the revision is held to the same terms.
  */
-export function inheritedTerms(
-  replaced: Pick<PendingProposal, "ttlMs" | "confirmers"> | null | undefined,
-): Pick<PendingProposal, "ttlMs" | "confirmers"> {
+export function inheritedTerms(replaced: ProposalTerms | null | undefined): ProposalTerms {
   return {
     ...(replaced?.ttlMs !== undefined ? { ttlMs: replaced.ttlMs } : {}),
     ...(replaced?.confirmers ? { confirmers: [...replaced.confirmers] } : {}),
@@ -305,7 +313,7 @@ export function proposalOperations(
  * claim is won, each operation is marked as it comes back, and it is removed
  * once the outcome has been told. One still here past `EXECUTION_CUTOFF_MS`
  * is a run that never told anyone; once taken, it stays as the fence until
- * its hour is up.
+ * its TTL is up.
  */
 export interface Execution {
   /** The approved card, whole — its operations are the batch that was run,
@@ -333,7 +341,7 @@ export interface Execution {
 export type CutOffNoteReport = "told" | "owed" | "given-up";
 
 /**
- * Whether a look may take this execution now: cut off and inside its hour,
+ * Whether a look may take this execution now: cut off and inside its TTL,
  * and either never taken or owed a note a teller failed to post. Both
  * adapters decide with this, so find and take cannot disagree.
  */
@@ -356,7 +364,7 @@ export function afterFailedNote(execution: Execution): { record: Execution; repo
 /**
  * When the ThreadState alarm should next fire for this execution, or null
  * when it never needs to: a taken record owed no note has a teller, and one past
- * its hour is the GC's. One not yet cut off is due just past the threshold;
+ * its TTL is the GC's. One not yet cut off is due just past the threshold;
  * one already past it is what `findCutOffExecutions` found and the alarm
  * handed over, and is looked at again in `CUT_OFF_SWEEP_RETRY_MS` in case
  * nobody took it.
@@ -411,10 +419,12 @@ export type ProposalLookup =
   | { state: "found"; proposal: PendingProposal; createdAt: number }
   /** Retired by a newer card staged in the same reply thread, or retired ahead
    *  of one by `retireProposal` — in which case it reads this way from the
-   *  moment of retirement, and for the rest of its hour if the revision it made
+   *  moment of retirement, and for the rest of its TTL if the revision it made
    *  way for never lands. */
   | { state: "superseded" }
-  | { state: "expired" }
+  /** `ttlMs` is the card's own lifetime when it set one, so the person can be
+   *  told how long it was live; absent, it lived the default hour. */
+  | { state: "expired"; ttlMs?: number }
   | { state: "none" };
 
 /**
@@ -538,7 +548,7 @@ export interface ThreadState {
    * THE COST, WHEN THE REVISION NEVER ARRIVES. One exit retires a card and then
    * fails to post its replacement (`disposition: "failed"`), leaving a retired
    * record with no successor. A ✅ on it is told to confirm on the thread's
-   * newest card when there is none, for the hour until its TTL turns the answer
+   * newest card when there is none, until its TTL turns the answer
    * back into "expired". That is the better of the two available wrongs — the
    * claim-and-delete it replaces answered "already resolved, another
    * confirmation got there first", which invents a second person — and it is
@@ -678,7 +688,7 @@ export interface ThreadState {
    * fence never re-opens, so a run that is only slow cannot resume work a
    * later card would offer again — and is marked owed, so the next take tells
    * it again with the same functions. After `CUT_OFF_NOTE_ATTEMPTS` failed
-   * notes it is "given-up": still taken, owed nothing, gone with its hour. An
+   * notes it is "given-up": still taken, owed nothing, gone with its TTL. An
    * unknown or untaken ts reports "told": there is nothing to owe.
    */
   reportCutOffNote(proposalTs: string, posted: boolean): Promise<CutOffNoteReport>;

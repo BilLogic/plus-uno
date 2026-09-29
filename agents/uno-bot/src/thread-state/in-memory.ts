@@ -24,6 +24,7 @@ import {
   RUN_LEASE_MS,
   afterFailedNote,
   cutOffTakeable,
+  ownTtl,
   proposalReplyThread,
   proposalTtlMs,
   type Execution,
@@ -188,7 +189,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       if (rec.supersededBy && successorIsLive(rec.supersededBy)) return { state: "superseded" };
       if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) {
         proposals.delete(proposalTs);
-        return { state: "expired" };
+        return { state: "expired", ...ownTtl(rec.proposal) };
       }
       if (rec.supersededBy || rec.retired) return { state: "superseded" };
       return { state: "found", proposal: rec.proposal, createdAt: rec.createdAt };
@@ -196,7 +197,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
 
     async getProposalByThread(ref) {
       // Scans the staged set, as the Durable Object does: proposals expire
-      // after an hour, so the live cardinality stays small.
+      // by their TTL, so the live cardinality stays small.
       let best: ProposalRecord | null = null;
       for (const rec of proposals.values()) {
         if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) continue;

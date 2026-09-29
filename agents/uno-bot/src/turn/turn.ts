@@ -1112,9 +1112,10 @@ async function settleVerdict(
  * The card is built exactly as a staged proposal's is, reads included (the
  * repo an intake lands in and whether it is public, a workflow's branch), so
  * the person approves what will actually run rather than a copy of the old
- * card. It keeps the original's requester, thread, PRD, lifetime and confirmer
- * set, and gets a ts and a fresh run of that lifetime of its own; staging it retires any card still live in that reply
- * thread, as every staging does (`ThreadState.putProposal`).
+ * card. It keeps the original's requester, thread, PRD and terms (lifetime and
+ * confirmer set — the same `ProposalTerms` a revision inherits), and gets a ts
+ * and a fresh run of that lifetime; staging it retires any card still live in
+ * that reply thread, as every staging does (`ThreadState.putProposal`).
  *
  * Exported because two doors outside Turn — the reaction and the button on the
  * stuck card — are later looks too, and a card is Turn's to build. Their

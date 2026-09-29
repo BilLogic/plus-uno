@@ -56,6 +56,7 @@ import {
   afterFailedNote,
   cutOffSweepAt,
   cutOffTakeable,
+  ownTtl,
   proposalReplyThread,
   proposalTtlMs,
   type CutOffNoteReport,
@@ -185,9 +186,8 @@ export class ThreadState extends DurableObject<Env> {
 
   // Delete expired records by their own TTL. Keys: event:{id}
   // (EVENT_DEDUP_TTL_MS), hist:{…} (HISTORY_TTL_MS), prop:{ts} and exec:{ts}
-  // (each record's own `proposalTtlMs`, an hour unless the card set one — a
-  // 72 h card measured by the default would be deleted an hour in). Answers when the next sweep is due: a day away if
-  // anything remains, never if the store is empty.
+  // (each card's own, `proposalTtlMs`). Answers when the next sweep is due: a
+  // day away if anything remains, never if the store is empty.
   private async collectGarbage(now: number): Promise<number> {
     let remaining = 0;
     const events = await this.storage.list<EventRecord>({ prefix: "event:" });
@@ -301,7 +301,7 @@ export class ThreadState extends DurableObject<Env> {
   // key — and why that is what keeps two unrelated DM asks apart — is in
   // `thread-state/store.ts` on `putProposal`. One scan of the staged set, as
   // `getProposalByThread` does: live cardinality is small because proposals
-  // expire after an hour.
+  // expire by their TTL.
   //
   // Retire first, then write — a choice, not an accident: the new card is the
   // one a racing ✅ has to be able to find, so it is the last thing to land.
@@ -360,7 +360,7 @@ export class ThreadState extends DurableObject<Env> {
     }
     if (at - rec.createdAt > recordTtlMs(rec)) {
       await this.storage.delete(proposalKey(proposalTs));
-      return { state: "expired" };
+      return { state: "expired", ...ownTtl((rec.payload as PendingProposal | null) ?? {}) };
     }
     if (rec.supersededBy || rec.retired) return { state: "superseded" };
     return {
@@ -370,7 +370,7 @@ export class ThreadState extends DurableObject<Env> {
     };
   }
 
-  // Scans the staged set: proposals expire after an hour, so live cardinality
+  // Scans the staged set: proposals expire by their TTL, so live cardinality
   // stays small.
   async getProposalByThread(ref: ThreadRef, at: number): Promise<PendingProposal | null> {
     const all = await this.storage.list<ProposalRecord>({ prefix: "prop:" });

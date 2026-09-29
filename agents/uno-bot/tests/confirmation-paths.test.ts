@@ -314,6 +314,21 @@ describe("a card with a confirmer set", () => {
 });
 
 describe("a card that is no longer there", () => {
+  it("tells a card with its own lifetime how long it was live", async () => {
+    const HOUR_MS = 60 * 60 * 1000;
+    let clock = 1_000_000;
+    const threadState = createInMemoryThreadState({ now: () => clock });
+    await threadState.putProposal({ ...PROPOSAL, ttlMs: 72 * HOUR_MS });
+    clock += 73 * HOUR_MS;
+
+    const verdict = await resolveSignal(reaction(), { threadState });
+    assert.equal(verdict.outcome, "stale");
+    assert.deepEqual(verdict.post?.note, { kind: "expired", ttlMs: 72 * HOUR_MS });
+    assert.match(renderGateNote(verdict.post!.note), /It stayed live for 72 hours\./);
+    // And the default card still reads as the hour.
+    assert.match(renderGateNote({ kind: "expired" }), /It stayed live for an hour\./);
+  });
+
   it("reports an expired proposal as stale, in the expired wording", async () => {
     let clock = 1_000_000;
     const threadState = await staged({ at: () => clock });

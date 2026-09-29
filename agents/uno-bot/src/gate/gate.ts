@@ -254,7 +254,12 @@ export async function resolveSignal(signal: GateSignal, deps: GateDeps): Promise
     return {
       outcome: "stale",
       decision,
-      post: { note: { kind: "expired" }, replyTs: replyTargetOf(signal) },
+      post: {
+        // The card's own lifetime rides along when it had one, so the note
+        // says how long it was live rather than assuming the hour.
+        note: { kind: "expired", ...(found.ttlMs !== undefined ? { ttlMs: found.ttlMs } : {}) },
+        replyTs: replyTargetOf(signal),
+      },
     };
   }
 
@@ -479,7 +484,7 @@ async function locate(
 ): Promise<
   | { state: "found"; proposal: PendingProposal }
   | { state: "superseded" }
-  | { state: "expired" }
+  | { state: "expired"; ttlMs?: number }
   | { state: "cut-off"; execution: Execution }
   | { state: "several"; count: number }
   | { state: "none" }
@@ -498,7 +503,7 @@ async function locate(
     // the proposal I am holding", when what actually happened is that the card
     // they acted on was replaced.
     if (byTs.state === "superseded") return { state: "superseded" };
-    if (byTs.state === "expired") return { state: "expired" };
+    if (byTs.state === "expired") return byTs;
     // No card under this ts — and the claim that consumed it may belong to a
     // run that was cut off. Only a gesture ON the stuck card asks this: a
     // reaction anywhere else must not collect another card's note.
