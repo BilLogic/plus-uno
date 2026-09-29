@@ -15,6 +15,8 @@
 // Free of `Env` and Workers globals, so the Node suite drives the whole firing
 // through its two named dependencies (tests/scheduled-firing.test.ts).
 
+import { CLASSIFY_BATCHES } from "../usage/classify-run";
+
 /** The two runs a weekday holds. */
 export type ScheduledRunName = "morning" | "end-of-day";
 
@@ -22,9 +24,18 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * What a scheduled job does. `noop` proves the path and does nothing else.
  * The Figma library's three: the end-of-day poll finds a publish, the morning
  * post turns it into a card in #plus-universal, and the morning track follows
- * each posted card to its PR (src/figma-poll.ts, src/figma-library/).
+ * each posted card to its PR (src/figma-poll.ts, src/figma-library/). The
+ * usage record's two: the end-of-day classify jobs label a batch of channel
+ * asks each, and the purge — in both runs — keeps text under its 14 days
+ * (src/usage/classify-run.ts).
  */
-export type ScheduledJobKind = "noop" | "figma-library-poll" | "figma-library-post" | "figma-library-track";
+export type ScheduledJobKind =
+  | "noop"
+  | "figma-library-poll"
+  | "figma-library-post"
+  | "figma-library-track"
+  | "usage-classify"
+  | "usage-text-purge";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -60,8 +71,21 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
   morning: [
     { key: "figma-library-post", kind: "figma-library-post" },
     { key: "figma-library-track", kind: "figma-library-track" },
+    // Both runs purge, so no text outlives 14 days across a weekend and one
+    // missed run (src/usage/classify-run.ts `PURGE_AFTER_MS`).
+    { key: "usage-text-purge", kind: "usage-text-purge" },
   ],
-  "end-of-day": [{ key: "figma-library-poll", kind: "figma-library-poll" }],
+  "end-of-day": [
+    { key: "figma-library-poll", kind: "figma-library-poll" },
+    // One job per classification batch, each an alarm of its own. Each takes
+    // whatever is still pending, so a quiet day's later jobs find nothing.
+    ...Array.from({ length: CLASSIFY_BATCHES }, (_, i) => ({
+      key: `usage-classify-${i + 1}`,
+      kind: "usage-classify" as const,
+    })),
+    // Not after the classify jobs: the purge holds whether or not they ran.
+    { key: "usage-text-purge", kind: "usage-text-purge" },
+  ],
 };
 
 /** The run names, for a caller that takes one as input. */
