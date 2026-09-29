@@ -91,7 +91,7 @@ export async function handleEvalTurn(request: Request, env: Env): Promise<Respon
     return Response.json({ ok: false, error: "bad json" }, { status: 400 });
   }
 
-  const built = evalTurnRequest(body);
+  const built = evalTurnRequest(body, env.UNO_BOT_CHANNEL_ID);
   if (!built.ok) return Response.json({ ok: false, error: built.error }, { status: 400 });
   const turnRequest = built.request;
 
