@@ -22,6 +22,8 @@ export function stagedRow(over: Partial<ProposalEvent> = {}): ProposalEvent {
     at: 1_700_000_000_300,
     via: "turn",
     channelId: "C1",
+    testTraffic: false,
+    originProposalId: null,
     turnId: "C1:1700000000.000200",
     requesterId: "U1",
     tools: ["github_issue_create", "notion_update"],
@@ -144,6 +146,45 @@ export function runProposalEventConformance(
       eventRow("expired", { at: staged.at + HOUR, via: "end-of-day" }),
     ]);
     assert.deepEqual(await events.overdue(now), []);
+  });
+
+  it("carries the staged row's test-traffic flag onto every later event of the card, the expiry included", async () => {
+    const { events } = make();
+    await events.record(stagedRow({ testTraffic: true }));
+    await events.record(eventRow("refused_stale", { testTraffic: null }));
+    await events.expireOverdue(1_800_000_000_000);
+    assert.deepEqual(
+      (await events.eventsOf("1700000000.000300")).map((e) => [e.event, e.testTraffic]),
+      [
+        ["staged", true],
+        ["refused_stale", true],
+        ["expired", true],
+      ],
+    );
+  });
+
+  it("reads an event with no staged row to inherit from as real traffic", async () => {
+    const { events } = make();
+    await events.record(eventRow("confirmed", { testTraffic: null }));
+    assert.equal((await events.eventsOf("1700000000.000300"))[0]?.testTraffic, false);
+  });
+
+  it("gives a re-staged card its original's turn and test-traffic flag", async () => {
+    const { events } = make();
+    await events.record(stagedRow({ testTraffic: true }));
+    await events.record(
+      stagedRow({
+        proposalId: "1700000000.000900",
+        via: "restage",
+        turnId: null,
+        testTraffic: null,
+        originProposalId: "1700000000.000300",
+      }),
+    );
+    const [restaged] = await events.eventsOf("1700000000.000900");
+    assert.equal(restaged?.turnId, "C1:1700000000.000200");
+    assert.equal(restaged?.testTraffic, true);
+    assert.equal(restaged?.originProposalId, "1700000000.000300");
   });
 
   it("puts a ticket on the staging turn's row, and keeps one it already names", async () => {

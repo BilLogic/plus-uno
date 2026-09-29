@@ -83,10 +83,11 @@ import {
 } from "../thread-state/index";
 import {
   buildTurnRecord,
-  proposalEvent,
+  isTestTraffic,
   recordProposalEvents,
   stagedEvent,
-  type ProposalEvent,
+  supersededEvents,
+  turnIdOf,
   type ProposalEventLog,
   type TurnOrigin,
   type TurnRecord,
@@ -275,13 +276,8 @@ export interface TurnOutcome {
   posted?: string;
   /** Set when the turn ended in a visible failure instead of an answer. */
   failure?: { stage: DeliveryFailureStage };
-  /** The card now awaiting a ✅, when the loop asked for one — or, `restaged`,
-   *  the fresh card for what a cut-off run never finished. */
-  staged?: { proposal: PendingProposal; card: ProposalCard; restaged?: true };
-  /** The card this turn retired because its revision was going up — set even
-   *  when Slack then refused the revision, since the old card is out of reach
-   *  either way. */
-  superseded?: PendingProposal;
+  /** The card now awaiting a ✅, when the loop asked for one. */
+  staged?: { proposal: PendingProposal; card: ProposalCard };
   /** What thread memory was told: the turns appended, and how many older ones
    *  compaction dropped. */
   wrote: { turns: HistoryTurn[]; compacted: number };
@@ -582,9 +578,22 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
     firstAnswerAt ??= clock();
   });
 
+  // What a card this turn stages is recorded with, known before it runs: the
+  // row it joins to, and the test-traffic rule as it reads for a staging turn.
+  const staging: StagingFacts = {
+    turnId: turnIdOf(request.channel, request.userMsgTs, startedAt),
+    testTraffic: isTestTraffic({
+      origin: deps.usage.origin,
+      channel: request.channel,
+      testChannelIds: deps.usage.testChannelIds,
+      disposition: "staged",
+      question: request.text,
+    }),
+  };
+
   const outcome = await withWorkingSignal(
     delivery,
-    (watched) => turnBody(request, { ...deps, delivery: watched }),
+    (watched) => turnBody(request, { ...deps, delivery: watched }, staging),
     (outcome) => settlementOf({ disposition: outcome.disposition, cardLive }),
   );
 
@@ -612,34 +621,14 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
     ...(outcome.executed ? { executed: outcome.executed } : {}),
   });
   await recordTurn(record, deps.usage);
-  await recordProposalEvents(
-    deps.usage.proposalEvents,
-    turnProposalEvents(request, outcome, record.turnId, clock()),
-    deps.usage.writeTimeoutMs,
-  );
   return outcome;
 }
 
-/**
- * What a turn leaves on the proposal record: the card a revision replaced, and
- * the card it staged, with the ask read for the person it named. A re-staged
- * card is recorded where it was staged (`restageExecution`), with no ask of
- * its own.
- */
-function turnProposalEvents(
-  request: TurnRequest,
-  outcome: TurnOutcome,
-  turnId: string,
-  at: number,
-): ProposalEvent[] {
-  const events: ProposalEvent[] = [];
-  if (outcome.superseded) events.push(proposalEvent(outcome.superseded, "superseded", at, "revision"));
-  if (outcome.staged && !outcome.staged.restaged) {
-    events.push(
-      stagedEvent({ proposal: outcome.staged.proposal, at, via: "turn", turnId, askText: request.text }),
-    );
-  }
-  return events;
+/** What a card this turn stages is recorded with (`usage/proposal-events.ts`). */
+interface StagingFacts {
+  /** This turn's row — the staged event's join to `turns`. */
+  turnId: string;
+  testTraffic: boolean;
 }
 
 /**
@@ -688,7 +677,7 @@ async function recordTurn(record: TurnRecord, usage: TurnUsage): Promise<void> {
   }
 }
 
-async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {
+async function turnBody(request: TurnRequest, deps: TurnDeps, staging: StagingFacts): Promise<TurnOutcome> {
   const { delivery, threadState } = deps;
 
   // When this turn began, which is what scopes a stop press to it. Taken HERE
@@ -1166,8 +1155,18 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // the thread's pending card too: this closes the seconds the revision spends
   // being written, during which the old card would otherwise still execute the
   // input the person just pushed back on.
-  if (request.pending) await threadState.retireProposal(request.pending.proposalTs);
-  const superseded = request.pending ? { superseded: request.pending } : {};
+  const retiredAhead =
+    request.pending && (await threadState.retireProposal(request.pending.proposalTs)).retired
+      ? [request.pending.proposalTs]
+      : [];
+  // On the record only when the retire took a live card out of reach — not
+  // one a ✅ claimed meanwhile, which has its own outcome.
+  const recordSuperseded = (retired: readonly string[]) =>
+    recordProposalEvents(
+      deps.usage.proposalEvents,
+      supersededEvents(retired, request.channel, deps.now?.() ?? Date.now()),
+      deps.usage.writeTimeoutMs,
+    );
 
   const card = await buildCard(
     result,
@@ -1182,10 +1181,11 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   const posted = await delivery.card(card);
   if (!posted.ok || !posted.ts) {
     console.error(`[turn] proposal card was not staged (${result.toolName})`);
+    // The card it was replacing is out of reach whether or not this one landed.
+    await recordSuperseded(retiredAhead);
     return {
       disposition: "failed",
       failure: { stage: "delivery" },
-      ...superseded,
       wrote: memory.wrote(),
       telemetry,
     };
@@ -1221,7 +1221,24 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
       ? { confirmers: intakeConfirmers(request.intakeChannel, request.pending, request.userId) }
       : {}),
   };
-  await threadState.putProposal(proposal);
+  const { retired: retiredByStaging } = await threadState.putProposal(proposal);
+  // On the record as soon as it is stored, so a ✅ that lands before the turn
+  // finishes finds the staged row — and the turn it joins to — already there.
+  await recordSuperseded([...retiredAhead, ...retiredByStaging]);
+  await recordProposalEvents(
+    deps.usage.proposalEvents,
+    [
+      stagedEvent({
+        proposal,
+        at: deps.now?.() ?? Date.now(),
+        via: "turn",
+        turnId: staging.turnId,
+        testTraffic: staging.testTraffic,
+        askText: request.text,
+      }),
+    ],
+    deps.usage.writeTimeoutMs,
+  );
   // A proposal is still a completed conversational turn. An agent_view DM has
   // no Slack thread to rebuild, so preserving this exchange in the store is the
   // only way its image pointer reaches the immediate follow-up.
@@ -1231,7 +1248,6 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     disposition: "staged",
     posted: posted.text,
     staged: { proposal, card },
-    ...superseded,
     wrote: memory.wrote(),
     telemetry,
   };
@@ -1322,7 +1338,7 @@ export async function restageExecution(
     /** Where the fresh card's staging is recorded. */
     proposalEvents: ProposalEventLog;
   },
-): Promise<{ proposal: PendingProposal; card: ProposalCard; restaged: true } | null> {
+): Promise<{ proposal: PendingProposal; card: ProposalCard } | null> {
   const original = restage.proposal;
   const first = restage.operations[0]!;
   const built = await buildCard(
@@ -1356,11 +1372,15 @@ export async function restageExecution(
     proposalTs: posted.ts,
     proposalText: posted.text,
   };
-  await deps.threadState.putProposal(proposal);
+  const { retired } = await deps.threadState.putProposal(proposal);
+  // The fresh card is the original's successor on the record: it takes the
+  // original's turn and test-traffic flag, so a ticket its ✅ files still finds
+  // the turn that asked for it.
   await recordProposalEvents(deps.proposalEvents, [
-    stagedEvent({ proposal, at: Date.now(), via: "restage" }),
+    ...supersededEvents(retired, proposal.channel, Date.now()),
+    stagedEvent({ proposal, at: Date.now(), via: "restage", originProposalId: original.proposalTs }),
   ]);
-  return { proposal, card, restaged: true };
+  return { proposal, card };
 }
 
 // ── The reply path ───────────────────────────────────────────────────────────

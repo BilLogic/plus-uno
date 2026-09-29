@@ -67,7 +67,20 @@ export interface ProposalEvent {
    *  aged out, not to the pass that noticed. */
   at: number;
   via: ProposalEventVia;
+  /** The channel, for channel cards only — null for a DM card, as `turns`
+   *  keeps no channel for a DM turn. */
   channelId: string | null;
+  /**
+   * Test traffic, by the staging turn's rule (`./record.ts` `isTestTraffic`),
+   * so a sandbox card is excludable without a join. Written null, an event
+   * takes the value of its card's staged row — or, for a re-staged card, of
+   * the card it re-stages — and false when there is none. Read back, never
+   * null.
+   */
+  testTraffic: boolean | null;
+  /** A re-staged card's original: its staged row lends this one its turn and
+   *  its test-traffic flag, so a ticket its ✅ files still finds a turn row. */
+  originProposalId: string | null;
 
   // ── staged ──
   /** The staging turn, when a turn staged it — the join to `turns`. */
@@ -127,6 +140,8 @@ export interface ProposalEventLog {
 
 const EMPTY: Omit<ProposalEvent, "proposalId" | "event" | "at" | "via"> = {
   channelId: null,
+  testTraffic: null,
+  originProposalId: null,
   turnId: null,
   requesterId: null,
   tools: [],
@@ -138,6 +153,12 @@ const EMPTY: Omit<ProposalEvent, "proposalId" | "event" | "at" | "via"> = {
   confirmedByOther: null,
 };
 
+/** A DM's channel id: what `turns` keeps no channel for, and whose asks
+ *  record no one they named. */
+export function isDmChannel(channel: string): boolean {
+  return channel.startsWith("D");
+}
+
 /** A bare event: the four columns every row has, and the channel. */
 export function proposalEvent(
   proposal: Pick<PendingProposal, "proposalTs" | "channel">,
@@ -145,7 +166,20 @@ export function proposalEvent(
   at: number,
   via: ProposalEventVia,
 ): ProposalEvent {
-  return { ...EMPTY, proposalId: proposal.proposalTs, event, at, via, channelId: proposal.channel };
+  return {
+    ...EMPTY,
+    proposalId: proposal.proposalTs,
+    event,
+    at,
+    via,
+    channelId: isDmChannel(proposal.channel) ? null : proposal.channel,
+  };
+}
+
+/** `superseded` for each card a revision or a staging retired — the ts the
+ *  store reported, in the staging card's channel. */
+export function supersededEvents(retired: readonly string[], channel: string, at: number): ProposalEvent[] {
+  return retired.map((proposalTs) => proposalEvent({ proposalTs, channel }, "superseded", at, "revision"));
 }
 
 /**
@@ -155,7 +189,8 @@ export function proposalEvent(
  * Dated by the card's own ts, which is when Slack took it; `at` is only for a
  * card whose ts is not a Slack one (an eval conversation's). `askText` is read
  * for the person it names and never kept; with no text (a card the Worker
- * staged itself, or a re-stage) nobody was named.
+ * staged itself, or a re-stage) nobody was named, and in a DM nobody named is
+ * recorded — the rule `turns` keeps for DM text.
  */
 export function stagedEvent(input: {
   proposal: PendingProposal;
@@ -163,12 +198,17 @@ export function stagedEvent(input: {
   at: number;
   via: "turn" | "restage" | "worker";
   turnId?: string;
+  /** The staging turn's test-traffic flag; absent, inherited (see the field). */
+  testTraffic?: boolean;
+  /** For a re-staged card, the card it re-stages. */
+  originProposalId?: string;
   askText?: string;
   roles?: Readonly<Record<string, TeamRole>>;
 }): ProposalEvent {
   const { proposal } = input;
   const requester = proposal.requesterUserId || null;
-  const aimedAt = input.askText ? aimedAtOf(input.askText, proposal.requesterUserId) : null;
+  const aimedAt =
+    input.askText && !isDmChannel(proposal.channel) ? aimedAtOf(input.askText, proposal.requesterUserId) : null;
   // The thread's root ts: the reply thread the card went up in. In a channel
   // that IS the root message; in a DM each ask has its own thread since the
   // agent_view migration. A root that is not a Slack ts dates nothing.
@@ -177,6 +217,8 @@ export function stagedEvent(input: {
   return {
     ...proposalEvent(proposal, "staged", askedAtOf(proposal.proposalTs, input.at), input.via),
     turnId: input.turnId ?? null,
+    testTraffic: input.testTraffic ?? null,
+    originProposalId: input.originProposalId ?? null,
     requesterId: requester,
     tools: proposalOperations(proposal).map((op) => op.toolName),
     ttlMs: proposalTtlMs(proposal),
@@ -201,8 +243,10 @@ export function verdictEvents(verdict: GateVerdict, at: number): ProposalEvent[]
     {
       ...proposalEvent(proposal, confirmed ? "confirmed" : "cancelled", at, verdict.by?.door ?? "model"),
       actorId: actor,
-      // Unknown, not "no", when the signal named nobody.
-      confirmedByOther: confirmed && actor !== null ? actor !== proposal.requesterUserId : null,
+      // Unknown, not "no", when the signal named nobody — and when the card
+      // has no requester to compare with (one the Worker staged itself).
+      confirmedByOther:
+        confirmed && actor !== null && proposal.requesterUserId ? actor !== proposal.requesterUserId : null,
     },
   ];
 }

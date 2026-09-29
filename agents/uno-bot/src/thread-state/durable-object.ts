@@ -40,6 +40,7 @@ import type {
   PendingProposal,
   ProposalLookup,
   RunClaim,
+  StagedProposal,
   ThreadRef,
   ThreadState,
   ThreadStateDeps,
@@ -96,14 +97,14 @@ export function createDurableObjectThreadState(
 
     // ----- proposals -----
 
-    putProposal(proposal: PendingProposal): Promise<void> {
+    putProposal(proposal: PendingProposal): Promise<StagedProposal> {
       return hop().putProposal(proposal, now());
     },
 
     // Retire, as distinct from claim: the record stays readable so a ✅ on the
     // replaced card can be told it was replaced (#583).
-    retireProposal(proposalTs: string): Promise<void> {
-      return hop().retireProposal(proposalTs);
+    retireProposal(proposalTs: string): Promise<{ retired: boolean }> {
+      return hop().retireProposal(proposalTs, now());
     },
 
     getProposalByTs(proposalTs: string): Promise<ProposalLookup> {

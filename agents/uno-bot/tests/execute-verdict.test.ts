@@ -501,6 +501,37 @@ test("a write refused because its page moved is recorded refused_stale, once for
   ]);
 });
 
+test("what the batch leaves on the record is written before the history note, so a throw there cannot drop it", async () => {
+  calls = [];
+  const events = (await usage()).createInMemoryProposalEventLog();
+  const run = await executeVerdict();
+  const failingHistory = {
+    idFromName: () => "thread-state",
+    get: () => ({
+      ...THREAD_STATE.get(),
+      appendHistory: async () => {
+        throw new Error("history write refused");
+      },
+    }),
+  };
+  const stale = {
+    toolName: "notion_update",
+    input: {
+      page_url: "https://www.notion.so/A-page-0123456789abcdef0123456789abcdef",
+      replace: [{ block_id: "1f2e3d4c5b6a79881f2e3d4c5b6a7988", last_edited_time: "2026-09-15T14:02:00.000Z", content: "x" }],
+    },
+  };
+  await assert.rejects(
+    run(
+      { ...env({ NOTION_API_KEY: "secret_test" }), THREAD_STATE: failingHistory } as unknown as Env,
+      by(won([stale]), "reaction", "U0PRESSER1"),
+      { events, now: CLOCK },
+    ),
+    /history write refused/,
+  );
+  assert.deepEqual(events.events().map((e) => e.event), ["confirmed", "refused_stale"]);
+});
+
 test("a ✅ on a reaction or a button that files a ticket on the bot puts it on the staging turn's row", async () => {
   for (const door of ["reaction", "button"] as const) {
     calls = [];

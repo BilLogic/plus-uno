@@ -4,7 +4,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-import type { OperationOutcome } from "../src/gate/index";
+import type { GateVerdict, OperationOutcome } from "../src/gate/index";
 import { PROPOSAL_TTL_MS, type PendingProposal } from "../src/thread-state/index";
 import {
   createInMemoryProposalEventLog,
@@ -12,6 +12,7 @@ import {
   recordProposalEvents,
   runProposalExpiry,
   stagedEvent,
+  verdictEvents,
   type ProposalEventLog,
   type TeamRole,
 } from "../src/usage/index";
@@ -81,6 +82,36 @@ describe("the staged event", () => {
     assert.equal(e.threadStartedAt, null);
   });
 });
+
+describe("the DM rule `turns` keeps", () => {
+  it("stores no channel for a DM card and records no one a DM ask named", () => {
+    const dm = { ...CARD, channel: "D0REQUESTER" };
+    const e = stagedEvent({ proposal: dm, at: 5, via: "turn", askText: "<@UDEV> can you file that?", roles: ROLES });
+    assert.equal(e.channelId, null);
+    assert.equal(e.aimedAtRole, null);
+    // The requester's own role is not about anyone else, and stays.
+    assert.equal(e.requesterRole, "pm");
+    const confirmed = verdictEvents(won(dm, "UDEV"), 9)[0]!;
+    assert.equal(confirmed.channelId, null);
+  });
+});
+
+describe("who confirmed", () => {
+  it("is unknown, never 'someone else', on a card the Worker staged with no requester", () => {
+    const worker = { ...CARD, requesterUserId: "" };
+    assert.equal(verdictEvents(won(worker, "U0MEMBER1"), 9)[0]!.confirmedByOther, null);
+    assert.equal(stagedEvent({ proposal: worker, at: 5, via: "worker" }).requesterId, null);
+  });
+
+  it("is true for someone other than the requester and false for the requester", () => {
+    assert.equal(verdictEvents(won(CARD, "UDEV"), 9)[0]!.confirmedByOther, true);
+    assert.equal(verdictEvents(won(CARD, "UPM"), 9)[0]!.confirmedByOther, false);
+  });
+});
+
+function won(proposal: PendingProposal, userId: string): GateVerdict {
+  return { outcome: "won", proposal, decision: "confirm", post: null, by: { door: "reaction", userId } };
+}
 
 describe("a refused stale write", () => {
   const outcome = (toolName: string, result: unknown): OperationOutcome => ({

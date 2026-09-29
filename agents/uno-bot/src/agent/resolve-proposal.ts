@@ -97,9 +97,12 @@ export async function runVerdict(
   // Started now, awaited once the run is over: the write costs the run nothing.
   const decided = recordProposalEvents(record.events, verdictEvents(verdict, now()));
   try {
-    const outcomes = await runWonVerdict(env, verdict, pending);
-    if (outcomes) await recordOutcome(record, pending, verdict, outcomes, now());
-    return outcomes;
+    // What the batch leaves on the record is written the moment it is back —
+    // before the history note and the result post, so a throw in either
+    // cannot drop it.
+    return await runWonVerdict(env, verdict, pending, (outcomes) =>
+      recordOutcome(record, pending, verdict, outcomes, now()),
+    );
   } finally {
     await decided;
   }
@@ -127,6 +130,8 @@ async function runWonVerdict(
   env: Env,
   verdict: GateVerdict,
   pending: PendingProposal,
+  /** Told the outcomes as soon as the batch is back. Never throws. */
+  onBatchBack: (outcomes: OperationOutcome[]) => Promise<void>,
 ): Promise<OperationOutcome[] | undefined> {
   const store = threadStateFor(env);
 
@@ -190,6 +195,7 @@ async function runWonVerdict(
       fenced = true;
     }),
   );
+  await onBatchBack(outcomes);
 
   // Past the batch every operation has come back, or the fence stopped it, so
   // whatever happens next the execution record goes. A throw below — the

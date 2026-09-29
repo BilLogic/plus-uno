@@ -105,6 +105,15 @@ export function runUsageLogConformance(
     assert.deepEqual(await log.get(retried.turnId), retried);
   });
 
+  it("a rewrite that names no ticket keeps the one already on the row", async () => {
+    // A ✅ on the card a turn staged can put a ticket on that turn's row
+    // before the turn's own record lands; the record must not clear it.
+    const log = make();
+    await log.record(turnRecord());
+    await log.record(turnRecord({ selfFiledTicketUrl: null, disposition: "staged" }));
+    assert.deepEqual(await log.get(turnRecord().turnId), turnRecord({ disposition: "staged" }));
+  });
+
   it("two turns are two rows", async () => {
     const log = make();
     const a = turnRecord({ turnId: "C1:1.1" });

@@ -292,6 +292,44 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
   });
 
+  // What a staging and a retire REPORT: the usage record says a card was
+  // replaced only when one of these calls is what took it out of reach.
+  it("staging reports the live card it retired, and nothing else", async () => {
+    const { store, clock } = setup();
+    assert.deepEqual(await store.putProposal(proposal({ proposalTs: "1700.2" })), { retired: [] });
+    assert.deepEqual(await store.putProposal(proposal({ proposalTs: "1700.3" })), { retired: ["1700.2"] });
+    // Another thread's card, and an aged-out one, are not this staging's.
+    await store.putProposal(proposal({ proposalTs: "1700.4", threadTs: OTHER.thread, replyTs: OTHER.thread }));
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    assert.deepEqual(await store.putProposal(proposal({ proposalTs: "1700.5" })), { retired: [] });
+  });
+
+  it("a staging does not report a card its caller already retired", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    assert.deepEqual(await store.retireProposal("1700.2"), { retired: true });
+    assert.deepEqual(await store.putProposal(proposal({ proposalTs: "1700.3" })), { retired: [] });
+  });
+
+  it("a retire reports false for a card claimed, already retired, replaced, aged out or unknown", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2" }));
+    assert.equal(await store.claimProposal("1700.2"), true);
+    assert.deepEqual(await store.retireProposal("1700.2"), { retired: false });
+
+    await store.putProposal(proposal({ proposalTs: "1700.3" }));
+    assert.deepEqual(await store.retireProposal("1700.3"), { retired: true });
+    assert.deepEqual(await store.retireProposal("1700.3"), { retired: false });
+
+    await store.putProposal(proposal({ proposalTs: "1700.4" }));
+    await store.putProposal(proposal({ proposalTs: "1700.5" })); // replaces 1700.4
+    assert.deepEqual(await store.retireProposal("1700.4"), { retired: false });
+
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    assert.deepEqual(await store.retireProposal("1700.5"), { retired: false });
+    assert.deepEqual(await store.retireProposal("9999.9"), { retired: false });
+  });
+
   // A card that was replaced AND has since aged out reads as superseded while
   // its successor is live. The expired wording ends "ask me again and I'll set
   // the same thing up fresh" — in front of a live card that asks for a THIRD

@@ -22,7 +22,10 @@ export function createInMemoryUsageLog(): InMemoryUsageLog {
   const rows = new Map<string, TurnRecord>();
   return {
     async record(turn) {
-      rows.set(turn.turnId, copy(turn));
+      // A ticket already on the row survives a rewrite that names none, as the
+      // D1 upsert keeps it.
+      const kept = rows.get(turn.turnId)?.selfFiledTicketUrl ?? null;
+      rows.set(turn.turnId, { ...copy(turn), selfFiledTicketUrl: turn.selfFiledTicketUrl ?? kept });
     },
     async get(turnId) {
       const row = rows.get(turnId);

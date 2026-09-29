@@ -12,10 +12,14 @@ import { evalTurnRequest } from "../src/eval/turn-case";
 import { evalTurnWiring } from "../src/eval/turn-adapter";
 import { slackTurnWiring } from "../src/slack/turn-adapter";
 import { createInMemoryThreadState } from "../src/thread-state/index";
-import { recordingDelivery, runTurn } from "../src/turn/index";
+import { recordingDelivery, restageExecution, runTurn } from "../src/turn/index";
 import type { Env } from "../src/types";
+import { buildTurnDeps } from "../src/turn/env-deps";
+import { NO_PROPOSAL_EVENT_LOG } from "../src/usage/production";
 import {
   createInMemoryProposalEventLog,
+  runProposalExpiry,
+  stagedEvent,
   type ProposalEventLog,
   type TurnRecord,
   type UsageLog,
@@ -165,6 +169,28 @@ test("the debug routes' wiring marks its turns as test traffic, and Slack's does
   assert.equal(slackWiring.origin, "slack");
 });
 
+test("the debug routes' turns write no proposal events to the production table at all", () => {
+  // The database is bound: a write would reach it. The eval wiring never does.
+  const env = { USAGE_DB: {} } as unknown as Env;
+  const delivery = recordingDelivery();
+  const evalWiring = evalTurnWiring(request(), {
+    delivery,
+    threadState: createInMemoryThreadState(),
+    report: { resolutions: [], gateAsk: null, tools: [], calls: delivery.calls, dials: null },
+    filled: new Set<number>(),
+    onResult: () => {},
+  });
+  assert.equal(buildTurnDeps(env, request(), evalWiring).usage.proposalEvents, NO_PROPOSAL_EVENT_LOG);
+  const slackWiring = slackTurnWiring(env, { type: "message", channel: CHANNEL, user: "U1", ts: "1.2", text: "hi" }, request());
+  assert.notEqual(buildTurnDeps(env, request(), slackWiring).usage.proposalEvents, NO_PROPOSAL_EVENT_LOG);
+});
+
+test("a card staged in the sandbox channel is test traffic on its own row", async () => {
+  const h = harness({ replies: [REVISION], testChannelIds: [CHANNEL] });
+  await runTurn(request({ text: "file it" }), h.deps);
+  assert.deepEqual(h.proposalEvents.events().map((e) => [e.event, e.testTraffic]), [["staged", true]]);
+});
+
 test("a greeting with no ask — a reaction and nothing asked — is test traffic", async () => {
   const h = harness({
     replies: [{ text: "", toolCalls: [{ name: "slack_react", args: { emoji: "wave" } }] }, { text: "" }],
@@ -256,6 +282,67 @@ test("a revision Slack refused still records the card it retired as superseded",
   assert.deepEqual(
     h.proposalEvents.events().map((e) => [e.proposalId, e.event]),
     [[PENDING.proposalTs, "superseded"]],
+  );
+});
+
+test("a card claimed while its revision was being written is never recorded superseded", async () => {
+  // A ✅ won the card meanwhile: it has its own outcome, and the retire took
+  // nothing out of reach.
+  const h = harness({ replies: [REVISION] });
+  await h.threadState.putProposal(PENDING);
+  assert.equal(await h.threadState.claimProposal(PENDING.proposalTs), true);
+  await runTurn(request({ text: "change the title to v2", pending: PENDING }), h.deps);
+  assert.deepEqual(
+    h.proposalEvents.events().filter((e) => e.proposalId === PENDING.proposalTs),
+    [],
+  );
+});
+
+test("a card the staging itself retired is recorded superseded, and the expiry pass leaves it alone", async () => {
+  // No pending card handed in, but one is live in the thread: the store's
+  // backstop retires it as the new card goes up.
+  const h = harness({ replies: [REVISION] });
+  await h.proposalEvents.record(stagedEvent({ proposal: PENDING, at: 0, via: "turn" }));
+  await h.threadState.putProposal(PENDING);
+  await runTurn(request({ text: "file the v2 card" }), h.deps);
+  await runProposalExpiry(h.proposalEvents, 1_800_000_000_000, { dryRun: false });
+  assert.deepEqual(
+    (await h.proposalEvents.eventsOf(PENDING.proposalTs)).map((e) => e.event),
+    ["staged", "superseded"],
+  );
+});
+
+test("the staged event is on the record before the turn's own row is written", async () => {
+  // So a reaction ✅ in that window still finds the staged row and its turn.
+  let seenAtTurnWrite: string[] = [];
+  const h = harness({ replies: [REVISION] });
+  const events = h.proposalEvents;
+  const usageLog: UsageLog = {
+    async record(turn) {
+      seenAtTurnWrite = events.events().map((e) => e.event);
+      await h.usage.record(turn);
+    },
+    get: (id) => h.usage.get(id),
+  };
+  const h2 = harness({ replies: [REVISION], usageLog, proposalEventLog: events });
+  await runTurn(request({ text: "file it" }), h2.deps);
+  assert.deepEqual(seenAtTurnWrite, ["staged"]);
+});
+
+test("a re-staged card carries its original's turn, so its ticket still finds a turn row", async () => {
+  const h = harness();
+  const original = { ...PENDING, proposalTs: "1700000000.000300" };
+  await h.proposalEvents.record(
+    stagedEvent({ proposal: original, at: 0, via: "turn", turnId: "C1:1700000000.000200", testTraffic: true }),
+  );
+  const staged = await restageExecution(
+    { proposal: original, operations: [{ toolName: "notion_create", input: { title: "again" } }] },
+    { threadState: h.threadState, delivery: h.delivery, cards: h.deps.cards, proposalEvents: h.proposalEvents },
+  );
+  const [row] = await h.proposalEvents.eventsOf(staged!.proposal.proposalTs);
+  assert.deepEqual(
+    [row?.via, row?.originProposalId, row?.turnId, row?.testTraffic],
+    ["restage", original.proposalTs, "C1:1700000000.000200", true],
   );
 });
 

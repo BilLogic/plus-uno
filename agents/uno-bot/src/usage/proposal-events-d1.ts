@@ -35,6 +35,8 @@ const COLUMNS = [
   "at",
   "via",
   "channel_id",
+  "test_traffic",
+  "origin_proposal_id",
   "turn_id",
   "requester_id",
   "tools",
@@ -48,10 +50,25 @@ const COLUMNS = [
 
 type Row = Record<(typeof COLUMNS)[number], unknown>;
 
+const STAGED_OF = (column: string) =>
+  `(SELECT ${column} FROM proposal_events WHERE proposal_id = ? AND event = 'staged')`;
+
+/**
+ * Each column's placeholder. Two inherit when written null: `turn_id` from a
+ * re-staged card's original, and `test_traffic` from the card's own staged
+ * row (or its original's), false when there is none — see
+ * `ProposalEvent.testTraffic`. Each subquery takes its own bound id.
+ */
+const PLACEHOLDER: Partial<Record<(typeof COLUMNS)[number], string>> = {
+  turn_id: `COALESCE(?, ${STAGED_OF("turn_id")})`,
+  test_traffic: `COALESCE(?, ${STAGED_OF("test_traffic")}, 0)`,
+};
+
 // The first write of an event for a card is the one kept: a retried alarm or a
 // second path recording the same staging changes nothing.
 const INSERT =
-  `INSERT INTO proposal_events (${COLUMNS.join(", ")}) VALUES (${COLUMNS.map(() => "?").join(", ")}) ` +
+  `INSERT INTO proposal_events (${COLUMNS.join(", ")}) ` +
+  `VALUES (${COLUMNS.map((c) => PLACEHOLDER[c] ?? "?").join(", ")}) ` +
   `ON CONFLICT (proposal_id, event) DO NOTHING`;
 
 // `rowid` breaks a tie in time by the order the rows were written.
@@ -68,8 +85,8 @@ const OVERDUE_FROM =
 const OVERDUE = `SELECT s.proposal_id AS proposal_id, s.at + s.ttl_ms AS expired_at ${OVERDUE_FROM} ORDER BY expired_at, proposal_id`;
 
 const EXPIRE =
-  `INSERT INTO proposal_events (proposal_id, event, at, via, channel_id) ` +
-  `SELECT s.proposal_id, 'expired', s.at + s.ttl_ms, 'end-of-day', s.channel_id ${OVERDUE_FROM} ` +
+  `INSERT INTO proposal_events (proposal_id, event, at, via, channel_id, test_traffic) ` +
+  `SELECT s.proposal_id, 'expired', s.at + s.ttl_ms, 'end-of-day', s.channel_id, s.test_traffic ${OVERDUE_FROM} ` +
   `ON CONFLICT (proposal_id, event) DO NOTHING`;
 
 // The staging turn's row, found through the staged event; a row that already
@@ -81,12 +98,23 @@ const NOTE_TICKET =
 const boolOrNull = (b: boolean | null): number | null => (b === null ? null : b ? 1 : 0);
 
 function toRow(e: ProposalEvent): unknown[] {
+  // The inheriting columns bind their value, then the id their subquery reads.
+  const inheritFrom = e.originProposalId ?? e.proposalId;
+  const row: Record<(typeof COLUMNS)[number], unknown[]> = mapRow(e);
+  row.turn_id = [e.turnId, e.originProposalId];
+  row.test_traffic = [boolOrNull(e.testTraffic), inheritFrom];
+  return COLUMNS.flatMap((c) => row[c]);
+}
+
+function mapRow(e: ProposalEvent): Record<(typeof COLUMNS)[number], unknown[]> {
   const row: Row = {
     proposal_id: e.proposalId,
     event: e.event,
     at: e.at,
     via: e.via,
     channel_id: e.channelId,
+    test_traffic: boolOrNull(e.testTraffic),
+    origin_proposal_id: e.originProposalId,
     turn_id: e.turnId,
     requester_id: e.requesterId,
     tools: JSON.stringify(e.tools),
@@ -97,7 +125,7 @@ function toRow(e: ProposalEvent): unknown[] {
     actor_id: e.actorId,
     confirmed_by_other: boolOrNull(e.confirmedByOther),
   };
-  return COLUMNS.map((c) => row[c]);
+  return Object.fromEntries(COLUMNS.map((c) => [c, [row[c]]])) as Record<(typeof COLUMNS)[number], unknown[]>;
 }
 
 const strOrNull = (v: unknown): string | null => (v == null ? null : String(v));
@@ -115,6 +143,8 @@ function fromRow(row: Row): ProposalEvent {
     at: Number(row.at),
     via: String(row.via) as ProposalEventVia,
     channelId: strOrNull(row.channel_id),
+    testTraffic: Number(row.test_traffic) === 1,
+    originProposalId: strOrNull(row.origin_proposal_id),
     turnId: strOrNull(row.turn_id),
     requesterId: strOrNull(row.requester_id),
     tools: list(row.tools),

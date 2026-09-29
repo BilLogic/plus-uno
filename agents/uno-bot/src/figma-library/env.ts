@@ -11,7 +11,7 @@
 import type { Env } from "../types";
 import { conversationsMembers, postMessage } from "../slack/api";
 import { threadStateFor } from "../thread-state/production";
-import { recordProposalEvents, stagedEvent } from "../usage/index";
+import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
 import { proposalEventLogFor } from "../usage/production";
 import { githubIssueUpdateClient, githubLibraryReads, resolveRepoFor } from "../integrations/github";
 import { FINDINGS_KV_KEY, kvJson } from "../figma-poll";
@@ -71,9 +71,10 @@ export async function runLibraryPost(env: Env, opts: { dryRun: boolean }): Promi
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
       async stage(proposal) {
-        await threadStateFor(env).putProposal(proposal);
+        const { retired } = await threadStateFor(env).putProposal(proposal);
         // On the usage record like any card, staged by the Worker itself.
         await recordProposalEvents(proposalEventLogFor(env), [
+          ...supersededEvents(retired, proposal.channel, Date.now()),
           stagedEvent({ proposal, at: Date.now(), via: "worker" }),
         ]);
       },

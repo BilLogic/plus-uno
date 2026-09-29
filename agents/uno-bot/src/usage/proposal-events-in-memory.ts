@@ -32,7 +32,16 @@ export function createInMemoryProposalEventLog(deps: { turns?: UsageLog } = {}):
 
   return {
     async record(event) {
-      if (!has(event.proposalId, event.event)) rows.push(copy(event));
+      if (has(event.proposalId, event.event)) return;
+      // The two inheriting columns, as the D1 insert resolves them.
+      const stagedOf = (id: string | null) =>
+        id === null ? undefined : rows.find((r) => r.proposalId === id && r.event === "staged");
+      rows.push({
+        ...copy(event),
+        turnId: event.turnId ?? stagedOf(event.originProposalId)?.turnId ?? null,
+        testTraffic:
+          event.testTraffic ?? stagedOf(event.originProposalId ?? event.proposalId)?.testTraffic ?? false,
+      });
     },
     async eventsOf(proposalId) {
       return rows
@@ -53,6 +62,7 @@ export function createInMemoryProposalEventLog(deps: { turns?: UsageLog } = {}):
           event: "expired",
           at: expiredAt,
           via: "end-of-day",
+          originProposalId: null,
           turnId: null,
           requesterId: null,
           tools: [],

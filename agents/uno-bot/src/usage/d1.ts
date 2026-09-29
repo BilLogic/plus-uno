@@ -59,12 +59,16 @@ type Row = Record<(typeof COLUMNS)[number], unknown>;
 // An upsert that rewrites THIS record's columns only: a retried turn replaces
 // its own values, and columns a later writer owns (`classified_at`, and the
 // ones later migrations add) survive it. `INSERT OR REPLACE` would delete the
-// row first and lose them.
+// row first and lose them. A ticket another writer already put on the row (a
+// reaction ✅ on the card this turn staged, `noteSelfFiledTicket`) survives a
+// rewrite that names none.
 const UPSERT =
   `INSERT INTO turns (${COLUMNS.join(", ")}) VALUES (${COLUMNS.map(() => "?").join(", ")}) ` +
   `ON CONFLICT (turn_id) DO UPDATE SET ` +
   COLUMNS.filter((c) => c !== "turn_id")
-    .map((c) => `${c} = excluded.${c}`)
+    .map((c) =>
+      c === "self_filed_ticket_url" ? `${c} = COALESCE(excluded.${c}, turns.${c})` : `${c} = excluded.${c}`,
+    )
     .join(", ");
 
 const SELECT = `SELECT ${COLUMNS.join(", ")} FROM turns WHERE turn_id = ?`;

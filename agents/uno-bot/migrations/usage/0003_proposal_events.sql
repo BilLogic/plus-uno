@@ -20,7 +20,12 @@ CREATE TABLE proposal_events (
   -- model), or who staged, replaced, aged out or refused it (turn, restage,
   -- worker, revision, end-of-day, executor)
   via                TEXT    NOT NULL,
-  channel_id         TEXT,
+  channel_id         TEXT,                          -- channel cards only, as in `turns`
+  -- the staging turn's test-traffic flag, carried onto every later event of
+  -- the card, so a sandbox card is excluded without a join
+  test_traffic       INTEGER NOT NULL DEFAULT 0 CHECK (test_traffic IN (0, 1)),
+  -- a re-staged card's original, whose staged row lends it its turn
+  origin_proposal_id TEXT,
 
   -- staged: what was staged, by whom, and for how long
   turn_id            TEXT,                          -- the staging turn, when a turn staged it
