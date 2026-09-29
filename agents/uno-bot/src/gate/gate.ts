@@ -34,7 +34,7 @@
 // ones, so it would compile this file either way — `tsconfig.test.json`.)
 
 import { mapReaction, typedEmojiDecision, type Decision } from "./reactions";
-import { mayConfirm, proposalOperations, unfinishedOperations } from "../thread-state/index";
+import { cancelRunOf, mayConfirm, proposalOperations, unfinishedOperations } from "../thread-state/index";
 import type {
   Execution,
   PendingProposal,
@@ -387,8 +387,12 @@ async function claim(
   // write is logged and the run goes ahead untracked, as every run did before
   // the record existed: refusing to run an approved card over bookkeeping
   // would be a worse answer to the person than the rare untracked cut-off.
-  if (decision === "confirm") {
-    await deps.threadState.beginExecution(proposal).catch((err: unknown) => {
+  // What runs: the card on a ✅; on a ⛔, only what the card said a cancel
+  // still runs (`PendingProposal.onCancel`), which every turn's card leaves
+  // unset — so for them a cancel runs nothing, as it always has.
+  const run = decision === "confirm" ? proposal : cancelRunOf(proposal);
+  if (run) {
+    await deps.threadState.beginExecution(run).catch((err: unknown) => {
       console.warn(
         `[gate] execution record for ${proposal.proposalTs} not written: ${err instanceof Error ? err.message : String(err)}`,
       );
@@ -402,21 +406,27 @@ async function claim(
     post: {
       // The model's own words when it brought any, and otherwise the fact that
       // the card resolved — which is all Gate knows and all it needs to say.
-      note: narrative ? { kind: "said", text: narrative } : { kind: "resolved", decision },
+      note: narrative
+        ? { kind: "said", text: narrative }
+        : {
+            kind: "resolved",
+            decision,
+            ...(decision === "cancel" && run ? { stillRuns: proposalOperations(run).map((op) => op.toolName) } : {}),
+          },
       replyTs: replyTarget(proposal),
     },
-    ...(decision === "confirm"
+    ...(run
       ? {
           execute: {
-            operations: proposalOperations(proposal),
-            toolName: proposal.toolName,
-            input: proposal.input,
-            channel: proposal.channel,
-            threadTs: proposal.threadTs,
-            userMsgTs: proposal.userMsgTs,
-            requesterUserId: proposal.requesterUserId,
-            ...(proposal.notionPrdId ? { notionPrdId: proposal.notionPrdId } : {}),
-            ...(proposal.notionPrdUrl ? { notionPrdUrl: proposal.notionPrdUrl } : {}),
+            operations: proposalOperations(run),
+            toolName: run.toolName,
+            input: run.input,
+            channel: run.channel,
+            threadTs: run.threadTs,
+            userMsgTs: run.userMsgTs,
+            requesterUserId: run.requesterUserId,
+            ...(run.notionPrdId ? { notionPrdId: run.notionPrdId } : {}),
+            ...(run.notionPrdUrl ? { notionPrdUrl: run.notionPrdUrl } : {}),
           },
         }
       : {}),

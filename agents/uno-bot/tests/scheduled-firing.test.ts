@@ -1,9 +1,10 @@
-// The cron firing: the Figma poll on every one, a scheduled run on two.
+// The cron firing: a scheduled run on two slots, and nothing on the rest.
 //
 // No cron was added for the runs. The weekday `*/15 13-23` trigger already
 // fires at 14:00 and 22:00 UTC, so the handler reads the scheduled time and
-// enqueues the matching run beside the poll. Driven through the firing's named
-// dependencies, so the test sees exactly which of the two it asked for.
+// enqueues the matching run. The Figma library poll that used to run on every
+// firing is the end-of-day run's job now. Driven through the firing's named
+// dependency, so the test sees exactly what it asked for.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
@@ -28,24 +29,20 @@ function everyFiring(): number[] {
 }
 
 async function fire(scheduledTime: number) {
-  const polls: number[] = [];
   const runs: ScheduledRun[] = [];
   await onScheduledFiring(scheduledTime, {
-    pollFigma: async () => {
-      polls.push(scheduledTime);
-    },
     enqueueRun: async (run) => {
       runs.push(run);
     },
   });
-  return { polls, runs };
+  return { runs };
 }
 
-test("the Figma poll runs on every firing, exactly once", async () => {
-  for (const t of everyFiring()) {
-    const { polls } = await fire(t);
-    assert.equal(polls.length, 1, new Date(t).toISOString());
-  }
+test("a firing only enqueues: the Figma poll is a job of the end-of-day run", () => {
+  // The dependency set is the whole of what a firing can do.
+  const deps: Parameters<typeof onScheduledFiring>[1] = { enqueueRun: async () => {} };
+  assert.deepEqual(Object.keys(deps), ["enqueueRun"]);
+  assert.deepEqual(planRun("end-of-day", at(22, 0)).jobs.map((j) => j.kind), ["figma-library-poll"]);
 });
 
 test("14:00 UTC enqueues the morning run and 22:00 UTC the end-of-day run", async () => {
@@ -69,27 +66,26 @@ test("no other firing enqueues a run", async () => {
   assert.deepEqual(runsForFiring(at(14, 15)), []);
 });
 
-test("a failed enqueue does not cost the Figma poll, nor a failed poll the run", async () => {
-  const polls: string[] = [];
+test("a failed enqueue is logged and swallowed, not thrown out of the handler", async () => {
   const runs: string[] = [];
   await onScheduledFiring(at(22, 0), {
-    pollFigma: async () => {
-      polls.push("ran");
-      throw new Error("figma down");
-    },
     enqueueRun: async (run) => {
       runs.push(run.name);
       throw new Error("runner down");
     },
   });
-  assert.deepEqual(polls, ["ran"]);
   assert.deepEqual(runs, ["end-of-day"]);
 });
 
-test("each run is planned as its no-op job, keyed by the UTC run date", () => {
-  const run = planRun("morning", at(14, 0));
-  assert.equal(run.date, "2026-09-29");
-  assert.deepEqual(run.jobs.map((j) => [j.key, j.kind]), [["noop", "noop"]]);
+test("each run is planned with its jobs, keyed by the UTC run date", () => {
+  const morning = planRun("morning", at(14, 0));
+  assert.equal(morning.date, "2026-09-29");
+  assert.deepEqual(morning.jobs.map((j) => [j.key, j.kind]), [
+    ["figma-library-post", "figma-library-post"],
+    ["figma-library-track", "figma-library-track"],
+  ]);
+  const endOfDay = planRun("end-of-day", at(22, 0));
+  assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind]), [["figma-library-poll", "figma-library-poll"]]);
 });
 
 test("a run's runner is never a thread's runner", () => {

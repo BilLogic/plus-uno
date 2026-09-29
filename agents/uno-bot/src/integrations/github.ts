@@ -18,7 +18,9 @@
 // duplicate check runs first — open issues by label and keyword, for
 // `github_intake_search` — a client for the same reason. And the read the
 // intake card makes: whether the repo is public, asked once per isolate. And
-// the workflow dispatch `github_workflow_run` sends past the Gate.
+// the workflow dispatch `github_workflow_run` sends past the Gate. And the
+// Figma library jobs' reads — the component registry whole, recent intakes and
+// recent pulls — which no tool offers the model.
 
 import type { Env } from "../types";
 import { countedFetch } from "../net";
@@ -601,6 +603,118 @@ export function githubWorkflowClient(env: Env, target: RepoEntry): GithubWorkflo
         // The status only, as the create logs it.
         console.warn(`[github] dispatch ${workflow} on ${repo} refused: ${res.status}`);
         throw new GithubRequestError(res.status, `GitHub workflow dispatch ${res.status} for ${workflow} on ${repo}`);
+      }
+    },
+  };
+}
+
+/** The reads the Figma library jobs make, bound to one repo. Each throws
+ *  `GithubRequestError` on any non-2xx. */
+export interface GithubLibraryReads {
+  readonly repo: string;
+  /** A file's whole text from the default branch — no cap, unlike
+   *  `githubReadPath`, whose 12k cap would cut the component registry. */
+  rawFile(path: string): Promise<string>;
+  /** `harness-intake` issues updated since `since` (ISO), pulls left out. */
+  recentIntakes(since: string): Promise<Array<{ number: number; url: string; body: string }>>;
+  /** The most recently opened pulls, any state. */
+  recentPulls(): Promise<LibraryPull[]>;
+  /** One pull by number, as it stands now; null on a 404. */
+  pull(number: number): Promise<LibraryPull | null>;
+}
+
+/** A pull as the library tracker reads it. */
+export interface LibraryPull {
+  number: number;
+  title: string;
+  url: string;
+  createdAt: string;
+  state: "open" | "closed";
+  merged: boolean;
+}
+
+/** GitHub's pull JSON, as far as the tracker reads it; null when unusable. */
+function libraryPullOf(p: {
+  number?: unknown;
+  title?: unknown;
+  html_url?: unknown;
+  created_at?: unknown;
+  state?: unknown;
+  merged_at?: unknown;
+}): LibraryPull | null {
+  if (typeof p.number !== "number" || typeof p.title !== "string" || typeof p.html_url !== "string") return null;
+  return {
+    number: p.number,
+    title: p.title,
+    url: p.html_url,
+    createdAt: typeof p.created_at === "string" ? p.created_at : "",
+    state: p.state === "closed" ? "closed" : "open",
+    merged: typeof p.merged_at === "string" && p.merged_at !== "",
+  };
+}
+
+const LIBRARY_PAGE = 50;
+
+/**
+ * The library jobs' reads on one listed repo (GET …/contents with the raw
+ * media type, GET …/issues, GET …/pulls). One subrequest per call.
+ */
+export function githubLibraryReads(env: Env, target: RepoEntry): GithubLibraryReads {
+  const repo = target.repo;
+  const get = async (what: string, url: string, accept = "application/vnd.github+json"): Promise<Response> => {
+    if (!env.GITHUB_TOKEN) throw new Error("GitHub not configured on the Worker (GITHUB_TOKEN)");
+    const res = await countedFetch(url, {
+      headers: {
+        authorization: `Bearer ${env.GITHUB_TOKEN}`,
+        accept,
+        "x-github-api-version": "2022-11-28",
+        "user-agent": "uno-bot",
+      },
+    }, GH_TIMEOUT_MS);
+    if (!res.ok) {
+      console.warn(`[github] ${what} on ${repo} refused: ${res.status}`);
+      throw new GithubRequestError(res.status, `GitHub ${what} ${res.status} for ${repo}`);
+    }
+    return res;
+  };
+  return {
+    repo,
+    async rawFile(path) {
+      const clean = path.replace(/^\/+/, "");
+      const res = await get("contents read", `https://api.github.com/repos/${repo}/contents/${clean}`, "application/vnd.github.raw+json");
+      return res.text();
+    },
+    async recentIntakes(since) {
+      const url =
+        `https://api.github.com/repos/${repo}/issues?labels=harness-intake&state=all` +
+        `&since=${encodeURIComponent(since)}&per_page=${LIBRARY_PAGE}`;
+      const data = (await (await get("issue list", url)).json().catch(() => [])) as Array<{
+        number?: unknown;
+        html_url?: unknown;
+        body?: unknown;
+        pull_request?: unknown;
+      }>;
+      return (Array.isArray(data) ? data : []).flatMap((i) =>
+        typeof i.number === "number" && typeof i.html_url === "string" && !i.pull_request
+          ? [{ number: i.number, url: i.html_url, body: typeof i.body === "string" ? i.body : "" }]
+          : [],
+      );
+    },
+    async recentPulls() {
+      const url = `https://api.github.com/repos/${repo}/pulls?state=all&sort=created&direction=desc&per_page=${LIBRARY_PAGE}`;
+      const data = (await (await get("pull list", url)).json().catch(() => [])) as Array<Parameters<typeof libraryPullOf>[0]>;
+      return (Array.isArray(data) ? data : []).flatMap((p) => {
+        const pull = libraryPullOf(p);
+        return pull ? [pull] : [];
+      });
+    },
+    async pull(number) {
+      try {
+        const res = await get("pull read", `https://api.github.com/repos/${repo}/pulls/${number}`);
+        return libraryPullOf((await res.json().catch(() => ({}))) as Parameters<typeof libraryPullOf>[0]);
+      } catch (err) {
+        if (err instanceof GithubRequestError && err.status === 404) return null;
+        throw err;
       }
     },
   };

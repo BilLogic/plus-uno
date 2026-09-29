@@ -33,11 +33,45 @@ const FIGMA_FILE_KEY = process.env.FIGMA_FILE_KEY;
 const PR_TITLE = process.env.PR_TITLE || '';
 const PR_BODY_FILE = process.env.PR_BODY_FILE;
 const NOTION_PRD_ID = process.env.NOTION_PRD_ID || '';
+// Set when uno-bot's Figma library card dispatched the run: the publish's
+// Figma version id. Its spec is the `harness-intake` issue the same card filed,
+// found by the marker its body opens with — never a Notion PRD.
+const FIGMA_VERSION_ID = /^\d{1,24}$/.test(process.env.FIGMA_VERSION_ID || '') ? process.env.FIGMA_VERSION_ID : '';
 // CLAUDE_MODEL is loaded from scripts/prompts/uno-implement/SKILL.md frontmatter at runtime — see main()
 const COMPONENTS_DIR = resolve('design-system/src/components');
 const TOKENS_DIR = resolve(TOKEN_DIR);
 
 // ─── Helpers ───────────────────────────────────────────────
+
+/**
+ * The `harness-intake` issue uno-bot filed for a Figma library publish, found
+ * by the marker its body opens with (agents/uno-bot/src/figma-library/draft.ts
+ * `publishMarker`). Null when there is no token, no repo or no match — the run
+ * then goes ahead from the component list alone.
+ */
+async function findLibraryIntake(versionId) {
+  const token = process.env.GITHUB_TOKEN;
+  const repo = process.env.GITHUB_REPOSITORY;
+  if (!token || !repo) return null;
+  const marker = `<!-- uno-bot:figma-publish:${versionId} -->`;
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repo}/issues?labels=harness-intake&state=all&per_page=50`, {
+      headers: { authorization: `Bearer ${token}`, accept: 'application/vnd.github+json', 'user-agent': 'figma-implement' },
+    });
+    if (!res.ok) {
+      console.warn(`   ⚠️  Intake lookup refused: ${res.status}`);
+      return null;
+    }
+    const issues = await res.json();
+    const hit = (Array.isArray(issues) ? issues : []).find(
+      (i) => !i.pull_request && typeof i.body === 'string' && i.body.includes(marker),
+    );
+    return hit ? { number: hit.number, url: hit.html_url, body: hit.body } : null;
+  } catch (e) {
+    console.warn(`   ⚠️  Intake lookup failed: ${e.message}`);
+    return null;
+  }
+}
 
 function httpsGet(url, headers = {}) {
   return new Promise((resolve, reject) => {
@@ -341,10 +375,20 @@ async function main() {
   const prBody = getPRBody();
   console.log(`🎨 Implementing changes for: ${componentNames.join(', ')}\n`);
 
-  // Fetch Notion PRD context if available
+  // A library publish's spec is its intake; a designer's implement reads its
+  // Notion PRD. Never both, and a library run never searches Notion — a stale
+  // PRD from the retired poll flow would be the wrong spec.
   let prdContext = '';
   let prdId = NOTION_PRD_ID;
-  try {
+  if (FIGMA_VERSION_ID) {
+    const intake = await findLibraryIntake(FIGMA_VERSION_ID);
+    if (intake) {
+      prdContext = `Intake #${intake.number} (${intake.url}):\n\n${intake.body.slice(0, 12000)}`;
+      console.log(`   ✅ Intake loaded: #${intake.number}`);
+    } else {
+      console.log('   ℹ️  No intake found for this publish — proceeding from the component list');
+    }
+  } else try {
     let prd = null;
     if (prdId) {
       console.log('📋 Fetching Notion PRD by ID...');
@@ -525,7 +569,9 @@ async function main() {
         tokenContext,
         '\n## Change Context\n',
         prBody || 'No additional context provided.',
-        prdContext ? '\n## Notion PRD Context (Designer Review Notes)\n' + prdContext : '',
+        prdContext
+          ? (FIGMA_VERSION_ID ? '\n## The Intake (the spec for this publish)\n' : '\n## Notion PRD Context (Designer Review Notes)\n') + prdContext
+          : '',
         `\n## Task\n`,
         isNewComponent
           ? `Create a new ${name} component from scratch based on the Figma design above.`
