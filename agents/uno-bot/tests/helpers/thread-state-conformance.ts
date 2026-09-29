@@ -925,4 +925,82 @@ export function runThreadStateConformance(
     assert.equal(await store.claimRun("Ev1"), "claimed");
     assert.equal((await store.checkAndRecordEvent("Ev1")).seen, true);
   });
+
+  // ----- a record's own lifetime -----
+  //
+  // A proposal may carry its own `ttlMs`, and every TTL read honours it: the
+  // lookups, the claim, the cut-off window. 72 h is the case it exists for —
+  // a card that has to outlive a weekend — and 71 h / 73 h put it either side
+  // of the line, both far past the hour every other card lives by.
+
+  const HOUR_MS = 60 * 60 * 1000;
+  const LONG_TTL_MS = 72 * HOUR_MS;
+
+  it("a proposal with its own TTL is found and claimable at 71 h", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ ttlMs: LONG_TTL_MS }));
+    clock.advance(LONG_TTL_MS - HOUR_MS);
+    const found = await store.getProposalByTs("1700.2");
+    assert.equal(found.state, "found");
+    assert.equal(found.state === "found" && found.proposal.ttlMs, LONG_TTL_MS);
+    assert.equal((await store.getProposalByThread(THREAD))?.proposalTs, "1700.2");
+    assert.deepEqual(
+      (await store.getProposalsByChannel(THREAD.channel)).map((p) => p.proposalTs),
+      ["1700.2"],
+    );
+    assert.equal(await store.claimProposal("1700.2"), true);
+  });
+
+  it("a proposal with its own TTL is expired at 73 h", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ ttlMs: LONG_TTL_MS }));
+    clock.advance(LONG_TTL_MS + HOUR_MS);
+    assert.equal(await store.getProposalByThread(THREAD), null);
+    assert.deepEqual(await store.getProposalsByChannel(THREAD.channel), []);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
+  });
+
+  it("a proposal without its own TTL still expires after the hour", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: LONG_TTL_MS }));
+    await store.putProposal(proposal({ proposalTs: "1700.4", threadTs: OTHER.thread }));
+    clock.advance(PROPOSAL_TTL_MS + 1);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found");
+    assert.equal((await store.getProposalByTs("1700.4")).state, "expired");
+  });
+
+  // The successor's own TTL decides whether it is still live to point at.
+  it("a successor with its own TTL keeps its predecessor superseded at 71 h", async () => {
+    const { store, clock } = setup();
+    await store.putProposal(proposal({ proposalTs: "1700.2", ttlMs: LONG_TTL_MS }));
+    await store.putProposal(proposal({ proposalTs: "1700.3", ttlMs: LONG_TTL_MS }));
+    clock.advance(LONG_TTL_MS - HOUR_MS);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
+    clock.advance(2 * HOUR_MS);
+    assert.equal((await store.getProposalByTs("1700.2")).state, "expired");
+  });
+
+  it("an execution of a proposal with its own TTL is takeable at 71 h and gone at 73 h", async () => {
+    const early = setup();
+    await early.store.beginExecution(proposal({ ttlMs: LONG_TTL_MS }));
+    early.clock.advance(LONG_TTL_MS - HOUR_MS);
+    assert.deepEqual(
+      (await early.store.findCutOffExecutions()).map((e) => e.proposal.proposalTs),
+      ["1700.2"],
+    );
+    assert.notEqual(await early.store.takeCutOffExecution("1700.2"), null);
+
+    const late = setup();
+    await late.store.beginExecution(proposal({ ttlMs: LONG_TTL_MS }));
+    late.clock.advance(LONG_TTL_MS + HOUR_MS);
+    assert.deepEqual(await late.store.findCutOffExecutions(), []);
+    assert.equal(await late.store.takeCutOffExecution("1700.2"), null);
+  });
+
+  it("a proposal keeps the confirmer set it was staged with", async () => {
+    const { store } = setup();
+    await store.putProposal(proposal({ confirmers: ["U7", "U8"] }));
+    const found = await store.getProposalByTs("1700.2");
+    assert.deepEqual(found.state === "found" && found.proposal.confirmers, ["U7", "U8"]);
+  });
 }

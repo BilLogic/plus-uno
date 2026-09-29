@@ -787,6 +787,76 @@ test("staging a revised card supersedes the one it replaces", async () => {
   assert.equal((await h.threadState.getProposalByThread(REF))?.proposalTs, revisedTs);
 });
 
+// A card with its own lifetime and confirmer set keeps both through a
+// revision: pushing back on the content is not a way round the gate.
+test("a revised card inherits the lifetime and confirmer set of the card it replaces", async () => {
+  const held: PendingProposal = { ...PENDING, ttlMs: 72 * 60 * 60 * 1000, confirmers: ["U7", "U8"] };
+  const h = harness({
+    replies: [
+      {
+        text: "Filing the revised card.",
+        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign v2" } }],
+      },
+    ],
+  });
+  await h.threadState.putProposal(held);
+
+  const outcome = await runTurn(request({ text: "make it about reflections only", pending: held }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  assert.equal(outcome.staged!.proposal.ttlMs, held.ttlMs);
+  assert.deepEqual(outcome.staged!.proposal.confirmers, ["U7", "U8"]);
+  const stored = await h.threadState.getProposalByThread(REF);
+  assert.equal(stored?.ttlMs, held.ttlMs);
+  assert.deepEqual(stored?.confirmers, ["U7", "U8"]);
+});
+
+test("a fresh card carries neither a lifetime nor a confirmer set of its own", async () => {
+  const h = harness({
+    replies: [{ text: "Filing it.", toolCalls: [{ name: "notion_create", args: { title: "One" } }] }],
+  });
+  const outcome = await runTurn(request({ text: "file a card" }), h.deps);
+  assert.equal(outcome.disposition, "staged");
+  assert.equal("ttlMs" in outcome.staged!.proposal, false);
+  assert.equal("confirmers" in outcome.staged!.proposal, false);
+});
+
+// The turn's two gate doors are held to the confirmer set too: the person
+// whose turn it is is the one checked, on the typed emoji and on the model's
+// own `proposal_resolve`.
+test("a typed ✅ from outside the confirmer set runs nothing and names who can confirm", async () => {
+  const held: PendingProposal = { ...PENDING, confirmers: ["U7"] };
+  const h = harness();
+  await h.threadState.putProposal(held);
+
+  const outcome = await runTurn(request({ text: ":white_check_mark:", pending: held, userId: "U2" }), h.deps);
+
+  assert.equal(outcome.disposition, "resolved");
+  assert.deepEqual(h.resolved, []);
+  assert.deepEqual(h.delivery.gateNotes, [{ kind: "not-a-confirmer", confirmers: ["U7"], userId: "U2" }]);
+  assert.equal(h.provider.sends.length, 0);
+  assert.equal((await h.threadState.getProposalByTs(held.proposalTs)).state, "found");
+});
+
+test("the model's proposal_resolve in an outsider's turn runs nothing; in a confirmer's it wins", async () => {
+  const held: PendingProposal = { ...PENDING, confirmers: ["U7"] };
+  const resolveReply = {
+    toolCalls: [{ name: "proposal_resolve", args: { decision: "confirm", message_to_user: "Filing it now." } }],
+  };
+  const h = harness({ replies: [resolveReply, resolveReply] });
+  await h.threadState.putProposal(held);
+
+  await runTurn(request({ text: "yes please", pending: held, userId: "U2" }), h.deps);
+  assert.deepEqual(h.resolved, []);
+  assert.deepEqual(h.delivery.gateNotes, [{ kind: "not-a-confirmer", confirmers: ["U7"], userId: "U2" }]);
+  assert.equal((await h.threadState.getProposalByTs(held.proposalTs)).state, "found");
+
+  await runTurn(request({ text: "yes please", pending: held, userId: "U7" }), h.deps);
+  assert.deepEqual(h.resolved, [
+    { toolName: "notion_create", decision: "confirm", note: { kind: "said", text: "Filing it now." }, executed: true },
+  ]);
+});
+
 test("a rewrite ask stages a replace, and never a silent append", async () => {
   // The Calendar Sync shape (2026-09-15): a page said something that had stopped
   // being true, and append-only meant the correction could only land BELOW the
