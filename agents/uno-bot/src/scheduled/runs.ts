@@ -22,9 +22,16 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * What a scheduled job does. `noop` proves the path and does nothing else.
  * The Figma library's three: the end-of-day poll finds a publish, the morning
  * post turns it into a card in #plus-universal, and the morning track follows
- * each posted card to its PR (src/figma-poll.ts, src/figma-library/).
+ * each posted card to its PR (src/figma-poll.ts, src/figma-library/). The
+ * end-of-day `proposal-expiry` records every card that aged out untouched on
+ * the usage record (src/usage/proposal-events.ts).
  */
-export type ScheduledJobKind = "noop" | "figma-library-poll" | "figma-library-post" | "figma-library-track";
+export type ScheduledJobKind =
+  | "noop"
+  | "figma-library-poll"
+  | "figma-library-post"
+  | "figma-library-track"
+  | "proposal-expiry";
 
 /** One unit of a run — one alarm's work. */
 export interface ScheduledJob {
@@ -61,7 +68,10 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     { key: "figma-library-post", kind: "figma-library-post" },
     { key: "figma-library-track", kind: "figma-library-track" },
   ],
-  "end-of-day": [{ key: "figma-library-poll", kind: "figma-library-poll" }],
+  "end-of-day": [
+    { key: "figma-library-poll", kind: "figma-library-poll" },
+    { key: "proposal-expiry", kind: "proposal-expiry" },
+  ],
 };
 
 /** The run names, for a caller that takes one as input. */

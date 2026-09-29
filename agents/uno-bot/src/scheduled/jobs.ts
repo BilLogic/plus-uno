@@ -9,6 +9,8 @@ import type { Env } from "../types";
 import { charge } from "../net";
 import { runFigmaPoll } from "../figma-poll";
 import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
+import { runProposalExpiry } from "../usage/index";
+import { proposalEventLogFor } from "../usage/production";
 import { runnerNameForRun, type ScheduledJob, type ScheduledJobKind, type ScheduledRun } from "./runs";
 
 /** One job kind's work. Resolving is done; a budget stop is thrown through. */
@@ -30,6 +32,12 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
   // Morning: link each posted card's PR, and close its intake on merge.
   "figma-library-track": async (env, _job, { dryRun }) => {
     console.log(`[figma-library] track: ${(await runLibraryTrack(env, { dryRun })).summary}`);
+  },
+  // End of day: every card that aged out with no outcome gets its `expired`
+  // event, dated to when it aged out. Idempotent, so a retried alarm adds none.
+  "proposal-expiry": async (env, _job, { dryRun }) => {
+    const { summary } = await runProposalExpiry(proposalEventLogFor(env), Date.now(), { dryRun });
+    console.log(`[usage] proposal expiry: ${summary}`);
   },
 };
 

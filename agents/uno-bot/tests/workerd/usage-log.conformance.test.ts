@@ -17,6 +17,8 @@ import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { D1_QUERY_CAP, d1QueriesUsed, internalSubrequestsUsed, isSubrequestBudgetError, runMetered } from "../../src/net";
 import { createD1UsageLog } from "../../src/usage/d1";
 import { runUsageLogConformance, turnRecord } from "../helpers/usage-log-conformance";
+import { createD1ProposalEventLog } from "../../src/usage/proposal-events-d1";
+import { runProposalEventConformance, stagedRow } from "../helpers/proposal-events-conformance";
 
 const bindings = env as unknown as {
   USAGE_DB: D1Database;
@@ -29,10 +31,41 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await bindings.USAGE_DB.prepare("DELETE FROM turns").run();
+  await bindings.USAGE_DB.prepare("DELETE FROM proposal_events").run();
 });
 
 runUsageLogConformance("d1", () => createD1UsageLog({ db: bindings.USAGE_DB }), {
   it: (name, fn) => it(name, fn),
+});
+
+// The proposal-event suite on the same database: `noteSelfFiledTicket` writes
+// the `turns` row the usage log reads back.
+runProposalEventConformance(
+  "d1",
+  () => ({
+    events: createD1ProposalEventLog({ db: bindings.USAGE_DB }),
+    turns: createD1UsageLog({ db: bindings.USAGE_DB }),
+  }),
+  { it: (name, fn) => it(name, fn) },
+);
+
+describe("[d1] proposal events", () => {
+  it("refuses an event kind the schema does not name", async () => {
+    const events = createD1ProposalEventLog({ db: bindings.USAGE_DB });
+    await expect(
+      events.record({ ...stagedRow(), event: "approved" as never }),
+    ).rejects.toThrow(/CHECK/);
+  });
+
+  it("charges one D1 query per statement, the expiry pass included", async () => {
+    const events = createD1ProposalEventLog({ db: bindings.USAGE_DB });
+    const spent = await runMetered(async () => {
+      await events.record(stagedRow());
+      await events.expireOverdue(Date.now());
+      return d1QueriesUsed();
+    });
+    expect(spent).toBe(2);
+  });
 });
 
 describe("[d1] the meter", () => {

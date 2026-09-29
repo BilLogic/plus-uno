@@ -81,7 +81,17 @@ import {
   type ThreadState,
   type VisionReference,
 } from "../thread-state/index";
-import { buildTurnRecord, type TurnOrigin, type TurnRecord, type UsageLog } from "../usage/index";
+import {
+  buildTurnRecord,
+  proposalEvent,
+  recordProposalEvents,
+  stagedEvent,
+  type ProposalEvent,
+  type ProposalEventLog,
+  type TurnOrigin,
+  type TurnRecord,
+  type UsageLog,
+} from "../usage/index";
 import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
@@ -265,8 +275,13 @@ export interface TurnOutcome {
   posted?: string;
   /** Set when the turn ended in a visible failure instead of an answer. */
   failure?: { stage: DeliveryFailureStage };
-  /** The card now awaiting a ✅, when the loop asked for one. */
-  staged?: { proposal: PendingProposal; card: ProposalCard };
+  /** The card now awaiting a ✅, when the loop asked for one — or, `restaged`,
+   *  the fresh card for what a cut-off run never finished. */
+  staged?: { proposal: PendingProposal; card: ProposalCard; restaged?: true };
+  /** The card this turn retired because its revision was going up — set even
+   *  when Slack then refused the revision, since the old card is out of reach
+   *  either way. */
+  superseded?: PendingProposal;
   /** What thread memory was told: the turns appended, and how many older ones
    *  compaction dropped. */
   wrote: { turns: HistoryTurn[]; compacted: number };
@@ -341,6 +356,9 @@ export interface TurnUsage {
   origin: TurnOrigin;
   /** `TEST_CHANNEL_IDS`, parsed: #uno-bot-sandbox. */
   testChannelIds: readonly string[];
+  /** Where the cards this turn stages, and the one a revision replaces, are
+   *  recorded (`usage/proposal-events.ts`). */
+  proposalEvents: ProposalEventLog;
   /** Overrides `USAGE_WRITE_TIMEOUT_MS`; a test's way to not wait it out. */
   writeTimeoutMs?: number;
 }
@@ -572,31 +590,56 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
 
   // Written AFTER the working signal is down and the answer is out, so the
   // record costs the person nothing they can see.
-  await recordTurn(
-    buildTurnRecord({
-      build: BUILD,
-      origin: deps.usage.origin,
-      testChannelIds: deps.usage.testChannelIds,
-      requesterId: request.userId,
-      surface: request.surface,
-      inThread: request.threaded,
-      channel: request.channel,
-      askTs: request.userMsgTs,
-      question: request.text,
-      startedAt,
-      firstAnswerAt,
-      tier: outcome.telemetry.tier,
-      routeReason: outcome.telemetry.route,
-      ...(outcome.telemetry.spend ? { spend: outcome.telemetry.spend } : {}),
-      toolsCalled: outcome.telemetry.tools,
-      ...(outcome.posted !== undefined ? { posted: outcome.posted } : {}),
-      disposition: outcome.disposition,
-      ...(outcome.staged ? { proposalId: outcome.staged.proposal.proposalTs } : {}),
-      ...(outcome.executed ? { executed: outcome.executed } : {}),
-    }),
-    deps.usage,
+  const record = buildTurnRecord({
+    build: BUILD,
+    origin: deps.usage.origin,
+    testChannelIds: deps.usage.testChannelIds,
+    requesterId: request.userId,
+    surface: request.surface,
+    inThread: request.threaded,
+    channel: request.channel,
+    askTs: request.userMsgTs,
+    question: request.text,
+    startedAt,
+    firstAnswerAt,
+    tier: outcome.telemetry.tier,
+    routeReason: outcome.telemetry.route,
+    ...(outcome.telemetry.spend ? { spend: outcome.telemetry.spend } : {}),
+    toolsCalled: outcome.telemetry.tools,
+    ...(outcome.posted !== undefined ? { posted: outcome.posted } : {}),
+    disposition: outcome.disposition,
+    ...(outcome.staged ? { proposalId: outcome.staged.proposal.proposalTs } : {}),
+    ...(outcome.executed ? { executed: outcome.executed } : {}),
+  });
+  await recordTurn(record, deps.usage);
+  await recordProposalEvents(
+    deps.usage.proposalEvents,
+    turnProposalEvents(request, outcome, record.turnId, clock()),
+    deps.usage.writeTimeoutMs,
   );
   return outcome;
+}
+
+/**
+ * What a turn leaves on the proposal record: the card a revision replaced, and
+ * the card it staged, with the ask read for the person it named. A re-staged
+ * card is recorded where it was staged (`restageExecution`), with no ask of
+ * its own.
+ */
+function turnProposalEvents(
+  request: TurnRequest,
+  outcome: TurnOutcome,
+  turnId: string,
+  at: number,
+): ProposalEvent[] {
+  const events: ProposalEvent[] = [];
+  if (outcome.superseded) events.push(proposalEvent(outcome.superseded, "superseded", at, "revision"));
+  if (outcome.staged && !outcome.staged.restaged) {
+    events.push(
+      stagedEvent({ proposal: outcome.staged.proposal, at, via: "turn", turnId, askText: request.text }),
+    );
+  }
+  return events;
 }
 
 /**
@@ -1124,6 +1167,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // being written, during which the old card would otherwise still execute the
   // input the person just pushed back on.
   if (request.pending) await threadState.retireProposal(request.pending.proposalTs);
+  const superseded = request.pending ? { superseded: request.pending } : {};
 
   const card = await buildCard(
     result,
@@ -1141,6 +1185,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     return {
       disposition: "failed",
       failure: { stage: "delivery" },
+      ...superseded,
       wrote: memory.wrote(),
       telemetry,
     };
@@ -1186,6 +1231,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     disposition: "staged",
     posted: posted.text,
     staged: { proposal, card },
+    ...superseded,
     wrote: memory.wrote(),
     telemetry,
   };
@@ -1235,7 +1281,12 @@ async function settleVerdict(
   }
   // A cut-off run's leftovers go back on a card of their own, after the note
   // that explains them — the card holds the buttons, so it comes last.
-  const staged = verdict.restage ? await restageExecution(verdict.restage, ctx.deps) : null;
+  const staged = verdict.restage
+    ? await restageExecution(verdict.restage, {
+        ...ctx.deps,
+        proposalEvents: ctx.deps.usage.proposalEvents,
+      })
+    : null;
   if (staged) await ctx.memory.remember(staged.proposal.proposalText);
   return {
     disposition: staged ? "staged" : "resolved",
@@ -1267,8 +1318,11 @@ async function settleVerdict(
  */
 export async function restageExecution(
   restage: GateRestage,
-  deps: Pick<TurnDeps, "threadState" | "delivery" | "cards">,
-): Promise<{ proposal: PendingProposal; card: ProposalCard } | null> {
+  deps: Pick<TurnDeps, "threadState" | "delivery" | "cards"> & {
+    /** Where the fresh card's staging is recorded. */
+    proposalEvents: ProposalEventLog;
+  },
+): Promise<{ proposal: PendingProposal; card: ProposalCard; restaged: true } | null> {
   const original = restage.proposal;
   const first = restage.operations[0]!;
   const built = await buildCard(
@@ -1303,7 +1357,10 @@ export async function restageExecution(
     proposalText: posted.text,
   };
   await deps.threadState.putProposal(proposal);
-  return { proposal, card };
+  await recordProposalEvents(deps.proposalEvents, [
+    stagedEvent({ proposal, at: Date.now(), via: "restage" }),
+  ]);
+  return { proposal, card, restaged: true };
 }
 
 // ── The reply path ───────────────────────────────────────────────────────────

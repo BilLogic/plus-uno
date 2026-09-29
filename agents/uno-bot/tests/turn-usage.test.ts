@@ -14,7 +14,12 @@ import { slackTurnWiring } from "../src/slack/turn-adapter";
 import { createInMemoryThreadState } from "../src/thread-state/index";
 import { recordingDelivery, runTurn } from "../src/turn/index";
 import type { Env } from "../src/types";
-import type { TurnRecord, UsageLog } from "../src/usage/index";
+import {
+  createInMemoryProposalEventLog,
+  type ProposalEventLog,
+  type TurnRecord,
+  type UsageLog,
+} from "../src/usage/index";
 import { BUILD } from "../src/version";
 import { CHANNEL, PENDING, REF, harness, request } from "./helpers/turn-harness";
 
@@ -191,6 +196,88 @@ test("a typed ✅ that files an issue on the bot's own repo records the ticket",
   assert.equal(row.selfFiledTicketUrl, url);
   assert.equal(row.provider, null, "a typed ✅ runs no model");
   assert.equal(row.costUsd, 0);
+});
+
+// ── proposal events ──────────────────────────────────────────────────────────
+
+const REVISION = {
+  text: "Revised — the title you asked for.",
+  toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign, v2" } }],
+};
+
+test("a staged card is recorded staged, joined to the turn, with when its thread began", async () => {
+  const h = harness({
+    now: ticking(),
+    replies: [
+      {
+        text: "I'll file a Roadmap card.",
+        toolCalls: [{ name: "notion_create", args: { title: "Reflection redesign" } }],
+      },
+    ],
+  });
+  const outcome = await runTurn(request({ text: "<@U2> asked me to file a card for the reflection redesign" }), h.deps);
+  const card = outcome.staged!.proposal;
+
+  const [staged, ...rest] = h.proposalEvents.events();
+  assert.deepEqual(rest, []);
+  assert.equal(staged!.proposalId, card.proposalTs);
+  assert.equal(staged!.event, "staged");
+  assert.equal(staged!.via, "turn");
+  assert.equal(staged!.turnId, only(h.usage.records()).turnId);
+  assert.equal(staged!.requesterId, "U1");
+  assert.deepEqual(staged!.tools, ["notion_create"]);
+  // The thread's root message: the conversation this ask was a reply in.
+  assert.equal(staged!.threadStartedAt, 1_700_000_000_000);
+  assert.ok(staged!.at > T, "dated when the card went up, after the turn began");
+});
+
+test("a superseding revision records the card it replaced, then the one it staged", async () => {
+  const h = harness({ replies: [REVISION] });
+  await h.threadState.putProposal(PENDING);
+  const outcome = await runTurn(request({ text: "change the title to v2", pending: PENDING }), h.deps);
+  assert.equal(outcome.disposition, "staged");
+
+  assert.deepEqual(
+    h.proposalEvents.events().map((e) => [e.proposalId, e.event, e.via]),
+    [
+      [PENDING.proposalTs, "superseded", "revision"],
+      [outcome.staged!.proposal.proposalTs, "staged", "turn"],
+    ],
+  );
+});
+
+test("a revision Slack refused still records the card it retired as superseded", async () => {
+  // The old card is out of reach either way (`ThreadState.retireProposal`),
+  // so the expiry pass must not later read it as one that aged out untouched.
+  const h = harness({ replies: [REVISION], delivery: recordingDelivery({ stagingFails: true }) });
+  await h.threadState.putProposal(PENDING);
+  const outcome = await runTurn(request({ text: "change the title to v2", pending: PENDING }), h.deps);
+  assert.equal(outcome.disposition, "failed");
+  assert.deepEqual(
+    h.proposalEvents.events().map((e) => [e.proposalId, e.event]),
+    [[PENDING.proposalTs, "superseded"]],
+  );
+});
+
+test("a turn that stages nothing records no proposal event", async () => {
+  const h = harness();
+  await runTurn(request(), h.deps);
+  assert.deepEqual(h.proposalEvents.events(), []);
+});
+
+test("a proposal-event log that throws does not fail the turn or unstage its card", async () => {
+  const throwing: ProposalEventLog = {
+    ...createInMemoryProposalEventLog(),
+    async record() {
+      throw new Error("D1_ERROR: database unavailable");
+    },
+  };
+  const h = harness({ replies: [REVISION], proposalEventLog: throwing });
+  await h.threadState.putProposal(PENDING);
+  const outcome = await runTurn(request({ text: "change the title to v2", pending: PENDING }), h.deps);
+  assert.equal(outcome.disposition, "staged");
+  assert.ok(await h.threadState.getProposalByThread(REF), "the revision is live");
+  assert.equal(only(h.usage.records()).disposition, "staged");
 });
 
 // ── a failing log ────────────────────────────────────────────────────────────

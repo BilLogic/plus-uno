@@ -42,7 +42,7 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
   // The dependency set is the whole of what a firing can do.
   const deps: Parameters<typeof onScheduledFiring>[1] = { enqueueRun: async () => {} };
   assert.deepEqual(Object.keys(deps), ["enqueueRun"]);
-  assert.deepEqual(planRun("end-of-day", at(22, 0)).jobs.map((j) => j.kind), ["figma-library-poll"]);
+  assert.deepEqual(planRun("end-of-day", at(22, 0)).jobs.map((j) => j.kind), ["figma-library-poll", "proposal-expiry"]);
 });
 
 test("14:00 UTC enqueues the morning run and 22:00 UTC the end-of-day run", async () => {
@@ -85,7 +85,10 @@ test("each run is planned with its jobs, keyed by the UTC run date", () => {
     ["figma-library-track", "figma-library-track"],
   ]);
   const endOfDay = planRun("end-of-day", at(22, 0));
-  assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind]), [["figma-library-poll", "figma-library-poll"]]);
+  assert.deepEqual(endOfDay.jobs.map((j) => [j.key, j.kind]), [
+    ["figma-library-poll", "figma-library-poll"],
+    ["proposal-expiry", "proposal-expiry"],
+  ]);
 });
 
 test("a run's runner is never a thread's runner", () => {
