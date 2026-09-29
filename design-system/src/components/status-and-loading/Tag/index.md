@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/Tag/Tag.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/Tag/Tag.stories.jsx` — Colors, Behaviors, Types, AvatarFallback, TypeBehaviors, PersonFocusRing, RemoveFocusRingOnTypes, AvatarEdgeCases, Selecting, StateLayers, Removing, RemoveNeedsANameForNodeLabels, FocusRing, LinkWithRemove, DisabledInField, CountOnSelectable, Saving, Truncation, DeprecatedNames, Interactive
+**Stories:** `design-system/src/components/status-and-loading/Tag/Tag.stories.jsx` — Colors, Behaviors, Types, AvatarFallback, TypeBehaviors, PersonFocusRing, RemoveFocusRingOnTypes, AvatarEdgeCases, AvatarFills, Selecting, StateLayers, Removing, RemoveNeedsANameForNodeLabels, FocusRing, LinkWithRemove, DisabledInField, CountOnSelectable, Saving, Truncation, DeprecatedNames, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/Tag/Tag.mdx`
 
@@ -19,7 +19,7 @@
 | `children` | node | — | The label (takes precedence over `text`). |
 | `behavior` | oneOf | — | What a person can do with the tag. `read-only` by default; `link` needs `href`. |
 | `variant` | oneOf | — | Deprecated: use `behavior`. `dismissible` is `removable`; `operational` renders a plain button. |
-| `color` | oneOf | `'grey'` | A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. On an avatar type the border is neutral and the color fills the avatar; grey agents fill AI purple and grey teams Technology Tools blue. |
+| `color` | oneOf | `'grey'` | A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. On an avatar type the border is neutral and the color fills the avatar; grey agents fill AI purple and grey teams a Technology Tools 08 wash. |
 | `type` | oneOf | `'plain'` | What the tag names. `plain` leads with the swatch; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. |
 | `avatar` | string or node | — | The avatar of a person, agent or team tag: an image source, or a node. Missing or broken, it falls back to initials. Decorative. |
 | `count` | number or string | — | `selectable` only: a small neutral Count, such as a filter's result count. Ignored with a warning elsewhere. |
