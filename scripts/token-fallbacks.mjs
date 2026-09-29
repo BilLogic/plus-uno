@@ -100,8 +100,8 @@
  *
  * `fallbackUsages` below now tries a whole color function before the plain
  * literal, using the pattern source `colourKey` itself reads with. Measured
- * over the live tree, that is 86 `rgba()` fallback sites across 21 files, all
- * captured; 83 name a defined token and are compared with alpha on both
+ * over the live tree, that is 85 `rgba()` fallback sites across 20 files, all
+ * captured; 82 name a defined token and are compared with alpha on both
  * sides, and 3 name a token defined nowhere. Widening the capture found 12
  * disagreeing sites across 8 token/value pairs, all stale and all fixed rather
  * than recorded. `design-system/tests/tokens-node.test.js` pins those counts,

@@ -1,6 +1,7 @@
 import React from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Alert, { ALERT_ICONS, ALERT_STYLES } from './Alert';
 
@@ -12,6 +13,8 @@ export default {
         layout: 'padded',
         changelog: [
             { date: '2026-09-29', kind: 'added', summary: 'A leading icon on the first line of text, with a default per style: success circle-check, danger circle-exclamation, warning triangle-exclamation, and circle-info for primary, secondary and info. `leadingVisual` takes a Font Awesome solid name or a node to replace it, or `false` to remove it.' },
+            { date: '2026-09-29', kind: 'changed', summary: 'The border is one 3px line on the left edge, in each style\'s Border color (`--color-<style>-border`), instead of 1px on all four sides in the base color. Warning\'s border moves to its darker Border role, which holds 3:1 on every surface step.' },
+            { date: '2026-09-29', kind: 'changed', summary: 'Title and body text are `--color-on-surface` in every style, instead of the style\'s on-container color. Links in the body inherit it.' },
             { date: '2026-09-29', kind: 'changed', summary: 'The × is the shared CloseButton: it stays 24×24 with a 16px icon and centers on the first line of text instead of growing with the title or body.' },
         ],
         docs: {
@@ -335,4 +338,60 @@ LeadingIcon.play = async ({ canvasElement }) => {
     // The × is unchanged beside the icon: it still dismisses its alert.
     await userEvent.click(within(none).getByRole('button', { name: 'Close alert' }));
     await expect(canvas.queryByTestId('icon-none')).toBeNull();
+};
+
+/**
+ * The border and the text. Each style draws one 3px border on the left, in its
+ * Border color, and nothing on the other three sides. The title, the body and
+ * any link in it are on-surface, whatever the style: the style is carried by
+ * the border, the icon and the ground. Shown on the darkest surface step, the
+ * hardest ground for a border to hold 3:1 on.
+ */
+export const BorderAndText = () => (
+    <div
+        data-testid="border-ground"
+        style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--size-section-gap-lg)',
+            padding: 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)',
+            background: 'var(--color-surface-container-highest)',
+        }}
+    >
+        {ALERT_STYLES.map((style) => (
+            <Alert key={style} style={style} title="Title" data-testid={`border-${style}`}>
+                You have a message here, with <a href="#">a link</a> in it.
+            </Alert>
+        ))}
+    </div>
+);
+
+BorderAndText.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const ground = getComputedStyle(canvas.getByTestId('border-ground')).backgroundColor;
+    const onSurface = tokenColor(canvasElement, '--color-on-surface');
+
+    for (const style of ALERT_STYLES) {
+        const id = `border-${style}`;
+        const alert = canvas.getByTestId(id);
+        const s = getComputedStyle(alert);
+
+        // Left only, 3px, the style's Border role.
+        await expect(s.borderLeftStyle, `${id}: left border is drawn`).toBe('solid');
+        await expect(px(s.borderLeftWidth), `${id}: left border is 3px, as Figma draws it`).toBe(3);
+        for (const side of ['Top', 'Right', 'Bottom']) {
+            await expect(px(s[`border${side}Width`]), `${id}: no ${side.toLowerCase()} border`).toBe(0);
+        }
+        await expect(s.borderLeftColor, `${id}: border color`).toBe(tokenColor(canvasElement, `--color-${style}-border`));
+        await expect(contrastRatio(s.borderLeftColor, ground), `${id}: border holds 3:1 on the darkest surface`)
+            .toBeGreaterThanOrEqual(3);
+
+        // Title, body and link are on-surface.
+        const title = within(alert).getByText('Title');
+        const body = within(alert).getByText(/You have a message here/);
+        const link = within(alert).getByRole('link', { name: 'a link' });
+        await expect(getComputedStyle(title).color, `${id}: title color`).toBe(onSurface);
+        await expect(getComputedStyle(body).color, `${id}: body color`).toBe(onSurface);
+        await expect(getComputedStyle(link).color, `${id}: link inherits the text color`).toBe(onSurface);
+    }
 };
