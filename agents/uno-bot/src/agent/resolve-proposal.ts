@@ -31,8 +31,17 @@ import { addReaction, postMessage, postReviewRequest, warrantsReviewRequest } fr
 import { batchOutcomeNote, batchTelemetryLine, runOperations, settleInto } from "../gate/index";
 import { batchResultMessage } from "../slack/batch-result";
 import type { GateVerdict, OperationOutcome } from "../gate/index";
-import { proposalOperations, stagingCardOf } from "../thread-state/index";
+import { proposalOperations, stagingCardOf, type PendingProposal } from "../thread-state/index";
 import { threadStateFor } from "../thread-state/production";
+import {
+  executionEvents,
+  quietly,
+  recordProposalEvents,
+  selfFiledTicketOf,
+  verdictEvents,
+  type ProposalEventLog,
+} from "../usage/index";
+import { proposalEventLogFor } from "../usage/production";
 import { recordTaskCompletion } from "../usage/resolution-env";
 import { isToolName } from "./tool-table";
 import { TOOLS_BY_NAME } from "./tools";
@@ -46,8 +55,21 @@ import { TOOLS_BY_NAME } from "./tools";
  * whatever the gate returned without branching: the one thing that must never
  * happen past a lost race is execution.
  */
-export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<void> {
-  await runVerdict(env, verdict);
+export async function executeVerdict(
+  env: Env,
+  verdict: GateVerdict,
+  record?: VerdictRecording,
+): Promise<void> {
+  await runVerdict(env, verdict, record);
+}
+
+/**
+ * Where a verdict's proposal events go. Production takes the usage database
+ * (`proposalEventLogFor`); a test hands its own log and clock.
+ */
+export interface VerdictRecording {
+  events: ProposalEventLog;
+  now?: () => number;
 }
 
 /**
@@ -55,13 +77,63 @@ export async function executeVerdict(env: Env, verdict: GateVerdict): Promise<vo
  * operation — or undefined when nothing ran (a lost race, a decline). Turn's
  * Slack wiring takes this form: the usage record reads it for a ticket the bot
  * filed on itself. The doors, which have no use for it, take `executeVerdict`.
+ *
+ * EVERY door's verdict passes through here, which is what makes this the one
+ * place a verdict's proposal events are written: `confirmed` or `cancelled`,
+ * with the door and the person, as the run starts — so a run cut off part-way
+ * still has its ✅ on the record — and `refused_stale` once the batch is back,
+ * when an operation found its page had moved. A ✅ taken on a reaction or a
+ * button, which no turn runs, also puts a ticket the bot filed on itself on
+ * the staging turn's row; the typed and model doors run inside a turn, whose
+ * own row carries it. A failed write never changes how the proposal resolves.
  */
 export async function runVerdict(
   env: Env,
   verdict: GateVerdict,
+  record: VerdictRecording = { events: proposalEventLogFor(env) },
 ): Promise<OperationOutcome[] | undefined> {
   if (verdict.outcome !== "won" || !verdict.proposal) return;
   const pending = verdict.proposal;
+  const now = record.now ?? Date.now;
+  // Started now, awaited once the run is over: the write costs the run nothing.
+  const decided = recordProposalEvents(record.events, verdictEvents(verdict, now()));
+  try {
+    // What the batch leaves on the record is written the moment it is back —
+    // before the history note and the result post, so a throw in either
+    // cannot drop it.
+    return await runWonVerdict(env, verdict, pending, (outcomes) =>
+      recordOutcome(record, pending, verdict, outcomes, now()),
+    );
+  } finally {
+    await decided;
+  }
+}
+
+/** What an executed batch leaves on the usage record, past the verdict's own event. */
+async function recordOutcome(
+  record: VerdictRecording,
+  pending: PendingProposal,
+  verdict: GateVerdict,
+  outcomes: OperationOutcome[],
+  at: number,
+): Promise<void> {
+  await recordProposalEvents(record.events, executionEvents(pending.proposalTs, outcomes, at));
+  const door = verdict.by?.door;
+  const ticket = door === "reaction" || door === "button" ? selfFiledTicketOf(outcomes) : null;
+  if (ticket) {
+    await quietly(`self-filed ticket on ${pending.proposalTs}`, () =>
+      record.events.noteSelfFiledTicket(pending.proposalTs, ticket),
+    );
+  }
+}
+
+async function runWonVerdict(
+  env: Env,
+  verdict: GateVerdict,
+  pending: PendingProposal,
+  /** Told the outcomes as soon as the batch is back. Never throws. */
+  onBatchBack: (outcomes: OperationOutcome[]) => Promise<void>,
+): Promise<OperationOutcome[] | undefined> {
   const store = threadStateFor(env);
 
   await addReaction(
@@ -124,6 +196,7 @@ export async function runVerdict(
       fenced = true;
     }),
   );
+  await onBatchBack(outcomes);
 
   // Past the batch every operation has come back, or the fence stopped it, so
   // whatever happens next the execution record goes. A throw below — the

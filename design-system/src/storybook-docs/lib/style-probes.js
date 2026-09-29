@@ -13,10 +13,11 @@ export const px = (value) => parseFloat(value);
 /**
  * What `value` computes to as `property` (a camelCase style name), read
  * through a throwaway element inside `host`, so tokens resolve in the
- * story's own cascade.
+ * story's own cascade. `extra` sets any other styles the probe needs first.
  */
-export const probe = (host, property, value) => {
+export const probe = (host, property, value, extra = {}) => {
     const el = document.createElement('span');
+    Object.assign(el.style, extra);
     el.style[property] = value;
     host.appendChild(el);
     const computed = getComputedStyle(el)[property];
@@ -26,6 +27,13 @@ export const probe = (host, property, value) => {
 
 /** What a token resolves to as a computed color, read through a probe. */
 export const tokenColor = (host, token) => probe(host, 'backgroundColor', `var(${token})`);
+
+/**
+ * What a length token resolves to, in pixels, read through a probe. It reads
+ * the layout width of a block span, so it is reliable for plain length tokens
+ * on story canvases only.
+ */
+export const tokenLength = (host, token) => px(probe(host, 'width', `var(${token})`, { display: 'block' }));
 
 /**
  * What a `box-shadow` value resolves to once computed, read through a probe, so
