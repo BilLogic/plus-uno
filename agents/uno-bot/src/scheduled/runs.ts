@@ -108,15 +108,22 @@ export function runsForFiring(scheduledTime: number): ScheduledRunName[] {
   return RUN_NAMES.filter((name) => RUN_HOURS[name] === d.getUTCHours());
 }
 
+/** Weekday names as a caller spells them, in `Date.getUTCDay` order. */
+export const WEEKDAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
+
 /**
- * A run, planned for the UTC date of `at`: its jobs for that weekday.
+ * A run, planned for the UTC date of `at`: its jobs for that weekday, or for
+ * `weekday` when given — how the sweep probe rehearses Friday's jobs on a
+ * Tuesday. The date stays `at`'s.
  *
  * @param name - Which run
  * @param at - When it fires, epoch ms
+ * @param weekday - Plan this weekday's jobs instead (0 Sunday … 6 Saturday)
  */
-export function planRun(name: ScheduledRunName, at: number): ScheduledRun {
+export function planRun(name: ScheduledRunName, at: number, weekday?: number): ScheduledRun {
   const d = new Date(at);
-  const jobs = RUN_PLANS[name].filter((job) => job.weekday === undefined || job.weekday === d.getUTCDay());
+  const day = weekday ?? d.getUTCDay();
+  const jobs = RUN_PLANS[name].filter((job) => job.weekday === undefined || job.weekday === day);
   return { name, date: d.toISOString().slice(0, 10), jobs };
 }
 

@@ -113,6 +113,34 @@ test("the probe dry-runs the named run's jobs", async () => {
   ]);
 });
 
+test("the probe rehearses another weekday's jobs: Friday's DS precedence check on any day", async () => {
+  // Unconfigured, so the check says so and spends nothing — what matters is
+  // that it is planned, after the library poll, whatever today is.
+  const url = new URL("https://w/debug/sweep?dry_run=1&run=end-of-day&weekday=fri");
+  const report = await runMetered(() => sweepProbe({} as Env, url, new Request(url)));
+  assert.ok("body" in report);
+  const body = report.body as { ok: boolean; planned: { key: string; after: string[] }[]; jobs: { key: string; outcome: string }[] };
+  assert.equal(body.ok, true);
+  assert.deepEqual(body.planned.map((j) => [j.key, j.after]), [
+    ["figma-library-poll", []],
+    ["ds-precedence-check", ["figma-library-poll"]],
+  ]);
+  assert.deepEqual(body.jobs.map((j) => [j.key, j.outcome]), [
+    ["figma-library-poll", "handled"],
+    ["ds-precedence-check", "handled"],
+  ]);
+
+  const tuesday = new URL("https://w/debug/sweep?dry_run=1&run=end-of-day&weekday=tue");
+  const plain = await runMetered(() => sweepProbe({} as Env, tuesday, new Request(tuesday)));
+  assert.ok("body" in plain);
+  assert.deepEqual((plain.body as { planned: { key: string }[] }).planned.map((j) => j.key), ["figma-library-poll"]);
+
+  const bad = new URL("https://w/debug/sweep?dry_run=1&weekday=someday");
+  const refused = await sweepProbe({} as Env, bad, new Request(bad));
+  assert.ok("body" in refused);
+  assert.equal(refused.status, 400);
+});
+
 test("the probe refuses a live run and an unknown run name", async () => {
   const live = new URL("https://w/debug/sweep?run=morning");
   const refused = await sweepProbe({} as Env, live, new Request(live));
