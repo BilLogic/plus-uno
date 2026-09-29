@@ -14,9 +14,9 @@ const open = (r: AskResolution): boolean => r.resolution === null || r.resolutio
 
 export function createInMemoryResolutionLog(turns: InMemoryUsageLog): ResolutionLog {
   const columns = new Map<string, AskResolution>();
-  const of = (turnId: string): AskResolution => columns.get(turnId) ?? EMPTY;
+  const columnsOf = (turnId: string): AskResolution => columns.get(turnId) ?? EMPTY;
   const resolve = (turnId: string, resolution: AskResolution["resolution"], at: number): string | null => {
-    const current = of(turnId);
+    const current = columnsOf(turnId);
     if (!open(current)) return null;
     columns.set(turnId, { ...current, resolution, resolvedAt: at });
     return turnId;
@@ -46,7 +46,7 @@ export function createInMemoryResolutionLog(turns: InMemoryUsageLog): Resolution
         .filter(
           (t) =>
             !t.testTraffic &&
-            of(t.turnId).resolutionCheckedAt === null &&
+            columnsOf(t.turnId).resolutionCheckedAt === null &&
             t.askedAt > q.askedAfter &&
             t.askedAt <= q.askedBefore,
         )
@@ -58,22 +58,22 @@ export function createInMemoryResolutionLog(turns: InMemoryUsageLog): Resolution
           channel: channelOfTurnId(t.turnId),
           askTs: t.askTs,
           askedAt: t.askedAt,
-          resolved: !open(of(t.turnId)),
+          resolved: !open(columnsOf(t.turnId)),
         }));
     },
     async recordPass(turnId, outcome, at) {
       if (!(await turns.get(turnId))) return;
-      const current = of(turnId);
+      const current = columnsOf(turnId);
       const settles = outcome.resolution !== null && open(current);
       columns.set(turnId, {
         resolution: settles ? outcome.resolution : current.resolution,
         resolvedAt: settles ? at : current.resolvedAt,
         escalatedToLead: outcome.escalatedToLead,
-        resolutionCheckedAt: at,
+        resolutionCheckedAt: outcome.escalatedToLead === null ? null : at,
       });
     },
     async getResolution(turnId) {
-      return (await turns.get(turnId)) ? { ...of(turnId) } : null;
+      return (await turns.get(turnId)) ? { ...columnsOf(turnId) } : null;
     },
   };
 }

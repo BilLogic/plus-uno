@@ -43,8 +43,9 @@ const PENDING =
   `ORDER BY asked_at LIMIT ?`;
 
 // The pass only ever settles an OPEN ask, and `escalated_to_lead` is its own.
+// An ask whose escalation it could not tell stays in the queue.
 const RECORD_PASS =
-  `UPDATE turns SET resolution_checked_at = ?1, escalated_to_lead = ?2, ` +
+  `UPDATE turns SET resolution_checked_at = CASE WHEN ?2 IS NULL THEN NULL ELSE ?1 END, escalated_to_lead = ?2, ` +
   `resolved_at = CASE WHEN ?3 IS NOT NULL AND ${OPEN} THEN ?1 ELSE resolved_at END, ` +
   `resolution = CASE WHEN ?3 IS NOT NULL AND ${OPEN} THEN ?3 ELSE resolution END ` +
   `WHERE turn_id = ?4`;
@@ -52,30 +53,30 @@ const RECORD_PASS =
 const GET =
   `SELECT resolution, resolved_at, escalated_to_lead, resolution_checked_at FROM turns WHERE turn_id = ?`;
 
-type Pending = { turn_id: unknown; requester_id: unknown; ask_ts: unknown; asked_at: unknown; resolution: unknown };
-type Got = { resolution: unknown; resolved_at: unknown; escalated_to_lead: unknown; resolution_checked_at: unknown };
+type PendingRow = { turn_id: unknown; requester_id: unknown; ask_ts: unknown; asked_at: unknown; resolution: unknown };
+type ResolutionRow = { resolution: unknown; resolved_at: unknown; escalated_to_lead: unknown; resolution_checked_at: unknown };
 
 const numOrNull = (v: unknown): number | null => (v == null ? null : Number(v));
 
 export function createD1ResolutionLog(deps: { db: ResolutionDatabase }): ResolutionLog {
   const { db } = deps;
-  const returned = async (stmt: ReturnType<ReturnType<ResolutionDatabase["prepare"]>["bind"]>) => {
+  const changedTurnId = async (stmt: ReturnType<ReturnType<ResolutionDatabase["prepare"]>["bind"]>) => {
     chargeD1Query();
     const row = await stmt.first<{ turn_id: unknown }>();
     return row ? String(row.turn_id) : null;
   };
   return {
     recordReaction(q) {
-      return returned(
+      return changedTurnId(
         db.prepare(RECORD_REACTION).bind(q.at, `${q.channel}:`, `${q.channel};`, q.requesterId, q.fromMs, q.toMs),
       );
     },
     recordTaskCompleted(proposalId, at) {
-      return returned(db.prepare(RECORD_TASK).bind(at, proposalId));
+      return changedTurnId(db.prepare(RECORD_TASK).bind(at, proposalId));
     },
     async pendingPass(q) {
       chargeD1Query();
-      const { results } = await db.prepare(PENDING).bind(q.askedAfter, q.askedBefore, q.limit).all<Pending>();
+      const { results } = await db.prepare(PENDING).bind(q.askedAfter, q.askedBefore, q.limit).all<PendingRow>();
       return results.map(
         (r): PassCandidate => ({
           turnId: String(r.turn_id),
@@ -94,7 +95,7 @@ export function createD1ResolutionLog(deps: { db: ResolutionDatabase }): Resolut
     },
     async getResolution(turnId) {
       chargeD1Query();
-      const row = await db.prepare(GET).bind(turnId).first<Got>();
+      const row = await db.prepare(GET).bind(turnId).first<ResolutionRow>();
       if (!row) return null;
       const escalated = numOrNull(row.escalated_to_lead);
       return {

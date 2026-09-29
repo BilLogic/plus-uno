@@ -19,7 +19,8 @@ ALTER TABLE turns ADD COLUMN resolved_at INTEGER;
 ALTER TABLE turns ADD COLUMN escalated_to_lead INTEGER
   CHECK (escalated_to_lead IN (0, 1));
 
--- When the end-of-day pass handled the ask. Null is its queue.
+-- When the end-of-day pass settled the ask's escalation. Null is its queue: an
+-- ask whose DM half it could not read is written and read again next pass.
 ALTER TABLE turns ADD COLUMN resolution_checked_at INTEGER;
 
 -- The pass's queue: real asks it has not read. Partial, like the classifier's.

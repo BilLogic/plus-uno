@@ -15,7 +15,13 @@ import {
   type ResolutionLog,
 } from "../src/usage/resolution";
 import { createInMemoryResolutionLog } from "../src/usage/resolution-in-memory";
-import { runResolutionPass, type DmMessage, type ThreadMessage } from "../src/usage/resolution-pass";
+import {
+  createLeadDmReader,
+  runResolutionPass,
+  type DmMessage,
+  type SlackRead,
+  type ThreadMessage,
+} from "../src/usage/resolution-pass";
 import { turnRecord } from "./helpers/usage-log-conformance";
 
 const HOUR = 60 * 60 * 1000;
@@ -255,6 +261,107 @@ describe("the end-of-day pass", () => {
     const { summary } = await pass(resolutions);
     assert.equal(summary.checked, 0);
     assert.equal(summary.summary, "no asks to check");
+  });
+});
+
+describe("the lead's DM reader is read-only", () => {
+  type Call = { method: string; params: Record<string, string> };
+
+  function fakeSlack(responses: Partial<Record<string, (params: Record<string, string>) => Record<string, unknown>>>) {
+    const calls: Call[] = [];
+    const read: SlackRead = async (method, params) => {
+      calls.push({ method, params });
+      const answer = responses[method];
+      return (answer ? answer(params) : { ok: false, error: "unexpected" }) as { ok: boolean };
+    };
+    return { calls, read };
+  }
+
+  const IMS = { ok: true, channels: [{ id: "DASKER", user: ASKER }], response_metadata: { next_cursor: "" } };
+
+  it("finds the existing DM from the lead's DM list, and reads its window", async () => {
+    const slack = fakeSlack({
+      "users.conversations": () => IMS,
+      "conversations.history": () => ({ ok: true, messages: [{ ts: tsAt(HOUR), user: ASKER, text: "hi" }] }),
+    });
+    const reader = createLeadDmReader(slack.read);
+    assert.deepEqual(await reader(ASKER, ASK_TS, tsAt(24 * HOUR)), [{ ts: tsAt(HOUR), user: ASKER, text: "hi" }]);
+    assert.deepEqual(slack.calls[0]?.params.types, "im");
+    assert.deepEqual(slack.calls[1], {
+      method: "conversations.history",
+      params: { channel: "DASKER", oldest: ASK_TS, latest: tsAt(24 * HOUR), inclusive: "false", limit: "200" },
+    });
+  });
+
+  it("with no existing DM, answers no DM, and makes no write and no further call", async () => {
+    const slack = fakeSlack({ "users.conversations": () => IMS });
+    const reader = createLeadDmReader(slack.read);
+    assert.deepEqual(await reader("U-NEVER-DMED", ASK_TS, tsAt(24 * HOUR)), []);
+    assert.deepEqual(
+      slack.calls.map((c) => c.method),
+      ["users.conversations"],
+    );
+    assert.ok(slack.calls.every((c) => c.method !== "conversations.open"));
+  });
+
+  it("lists the DMs once per pass, across asks and pages", async () => {
+    const slack = fakeSlack({
+      "users.conversations": (params) =>
+        params.cursor
+          ? { ok: true, channels: [{ id: "DOTHER", user: "U8" }], response_metadata: { next_cursor: "" } }
+          : { ...IMS, response_metadata: { next_cursor: "page2" } },
+      "conversations.history": () => ({ ok: true, messages: [] }),
+    });
+    const reader = createLeadDmReader(slack.read);
+    await reader(ASKER, ASK_TS, tsAt(24 * HOUR));
+    await reader("U8", ASK_TS, tsAt(24 * HOUR));
+    await reader("U9", ASK_TS, tsAt(24 * HOUR));
+    assert.deepEqual(
+      slack.calls.map((c) => [c.method, c.params.channel ?? c.params.cursor ?? ""]),
+      [
+        ["users.conversations", ""],
+        ["users.conversations", "page2"],
+        ["conversations.history", "DASKER"],
+        ["conversations.history", "DOTHER"],
+      ],
+    );
+  });
+
+  it("a DM list it cannot read is unknown, never no DM", async () => {
+    const slack = fakeSlack({ "users.conversations": () => ({ ok: false, error: "missing_scope" }) });
+    const reader = createLeadDmReader(slack.read);
+    const lines: string[] = [];
+    const original = console.log;
+    console.log = (...args: unknown[]) => lines.push(args.join(" "));
+    try {
+      assert.equal(await reader(ASKER, ASK_TS, tsAt(24 * HOUR)), null);
+      assert.equal(await reader("U8", ASK_TS, tsAt(24 * HOUR)), null);
+    } finally {
+      console.log = original;
+    }
+    assert.equal(lines.filter((l) => l.startsWith("[resolution]")).length, 1);
+    assert.equal(slack.calls.length, 1);
+  });
+
+  it("a DM history it cannot read is unknown, and the pass records none", async () => {
+    const slack = fakeSlack({
+      "users.conversations": () => IMS,
+      "conversations.history": () => ({ ok: false, error: "token_revoked" }),
+    });
+    const { resolutions, turn } = await world();
+    await runResolutionPass({
+      log: resolutions,
+      now: () => ASK_MS + 25 * HOUR,
+      leadUserId: LEAD,
+      botUserId: async () => BOT,
+      threadOf: async () => thread(),
+      leadDmsWith: createLeadDmReader(slack.read),
+      dryRun: false,
+    });
+    const got = await resolutions.getResolution(turn.turnId);
+    assert.equal(got?.resolution, "none");
+    assert.equal(got?.escalatedToLead, null);
+    assert.equal(got?.resolutionCheckedAt, null); // read again next pass
   });
 });
 

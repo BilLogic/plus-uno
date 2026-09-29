@@ -40,8 +40,18 @@ export interface AskResolution {
   resolvedAt: number | null;
   /** Null until the pass has read the thread and the DMs, or when it could not. */
   escalatedToLead: boolean | null;
-  /** When the end-of-day pass handled the ask, epoch ms. */
+  /** When the end-of-day pass settled the ask's escalation, epoch ms. */
   resolutionCheckedAt: number | null;
+}
+
+/** The asker's ✅ / 👍 on a bot answer, as the reaction door hands it over. */
+export interface AnswerReaction {
+  channel: string;
+  /** The thread the answer sits in; the answer's own ts when it is in none. */
+  threadRoot: string;
+  reactedTs: string;
+  /** Who reacted; matched against the ask's requester. */
+  userId: string;
 }
 
 /** An ask the end-of-day pass has still to read. */
@@ -87,7 +97,12 @@ export interface ResolutionLog {
   recordTaskCompleted(proposalId: string, at: number): Promise<string | null>;
   /** Non-test asks the pass has not handled, asked inside the window, oldest first. */
   pendingPass(q: { askedAfter: number; askedBefore: number; limit: number }): Promise<PassCandidate[]>;
-  /** The pass's verdict on one ask; marks it handled either way. */
+  /**
+   * The pass's verdict on one ask. It leaves the queue only once its escalation
+   * is known: a verdict with `escalatedToLead: null` (the DM half unread) is
+   * written, and the ask is read again on the next pass, so a `none` becomes a
+   * real answer once the lead's token is connected.
+   */
   recordPass(turnId: string, outcome: PassOutcome, at: number): Promise<void>;
   /** One ask's resolution columns, or null when there is no such turn. */
   getResolution(turnId: string): Promise<AskResolution | null>;
@@ -140,7 +155,7 @@ const STOPWORDS = new Set(
   (
     "about above after again also another because been before being between both could does doing down during each " +
     "from further have having here hers into just like more most much must only other over same should some such than " +
-    "that their them then there these they this those through under until very want were what when where which while " +
+    "that their them then these they this those through under until very want were what when where which while " +
     "will with would your yours thanks thank please hey hello know think need make there's it's i'm can't don't"
   ).split(" "),
 );

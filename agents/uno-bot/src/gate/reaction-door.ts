@@ -26,7 +26,7 @@
 // the Node suite DRIVE it rather than read it.
 
 import { mapReaction } from "./reactions";
-import { isResolvingReaction } from "../usage/resolution";
+import { isResolvingReaction, type AnswerReaction } from "../usage/resolution";
 import type { ThreadState } from "../thread-state/index";
 import { withWorkingSignal, type Delivery } from "../turn/index";
 import { resolveSignal, type GateRestage, type GateVerdict } from "./gate";
@@ -99,7 +99,7 @@ export interface ReactionDoorDeps {
    * reactor to the ask, so someone else's reaction records nothing. Must not
    * throw — the envelope logs and swallows.
    */
-  recordReaction?(reaction: { channel: string; threadRoot: string; reactedTs: string; userId: string }): Promise<void>;
+  recordReaction?(reaction: AnswerReaction): Promise<void>;
 }
 
 export async function runReactionDoor(

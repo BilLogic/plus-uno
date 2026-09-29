@@ -105,11 +105,25 @@ async function slackGet<T extends SlackResponse>(
   method: string,
   params: Record<string, string>,
 ): Promise<T> {
+  return slackReadAs<T>(env.SLACK_BOT_TOKEN, method, params);
+}
+
+/**
+ * A Slack READ method on a token other than the bot's — a person's own
+ * connected one (ADR-020). GET only, so the caller holding a user token can
+ * read with it and never write; the transport, parse guard and failure warn
+ * are the bot's own.
+ */
+export async function slackReadAs<T extends SlackResponse = SlackResponse>(
+  token: string,
+  method: string,
+  params: Record<string, string>,
+): Promise<T> {
   const qs = new URLSearchParams(params).toString();
   let res: Response;
   try {
     res = await countedFetch(`https://slack.com/api/${method}?${qs}`, {
-      headers: { authorization: `Bearer ${env.SLACK_BOT_TOKEN}` },
+      headers: { authorization: `Bearer ${token}` },
     });
   } catch (err) {
     // A budget stop is not a network error — let the loop report it as one and

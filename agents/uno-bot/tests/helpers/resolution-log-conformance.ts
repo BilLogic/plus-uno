@@ -167,12 +167,36 @@ export function runResolutionLogConformance(
     const { usage, resolutions } = make();
     const turn = ask(0);
     await usage.record(turn);
-    await resolutions.recordPass(turn.turnId, { resolution: null, escalatedToLead: null }, T0 + 30 * HOUR);
+    await resolutions.recordPass(turn.turnId, { resolution: null, escalatedToLead: false }, T0 + 30 * HOUR);
     assert.deepEqual(await resolutions.getResolution(turn.turnId), {
       resolution: null,
       resolvedAt: null,
-      escalatedToLead: null,
+      escalatedToLead: false,
       resolutionCheckedAt: T0 + 30 * HOUR,
     });
+  });
+
+  it("an ask whose escalation is unknown is written and stays queued", async () => {
+    const { usage, resolutions } = make();
+    const turn = ask(0);
+    await usage.record(turn);
+    await resolutions.recordPass(turn.turnId, { resolution: "none", escalatedToLead: null }, T0 + 30 * HOUR);
+    assert.deepEqual(await resolutions.getResolution(turn.turnId), {
+      resolution: "none",
+      resolvedAt: T0 + 30 * HOUR,
+      escalatedToLead: null,
+      resolutionCheckedAt: null,
+    });
+    const pending = await resolutions.pendingPass({ askedAfter: T0 - 1, askedBefore: T0 + 30 * HOUR, limit: 10 });
+    assert.deepEqual(
+      pending.map((c) => [c.turnId, c.resolved]),
+      [[turn.turnId, false]],
+    );
+
+    // The next pass reads the DMs, and the real answer replaces `none`.
+    await resolutions.recordPass(turn.turnId, { resolution: "no_escalation", escalatedToLead: false }, T0 + 54 * HOUR);
+    const got = await resolutions.getResolution(turn.turnId);
+    assert.equal(got?.resolution, "no_escalation");
+    assert.equal(got?.resolutionCheckedAt, T0 + 54 * HOUR);
   });
 }

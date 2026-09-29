@@ -12,7 +12,8 @@
 // (`tests/helpers/usage-log-conformance.ts`, run under `node --test` and again
 // under workerd against a local D1).
 //
-// PURE: no `Env`, no Workers global. `Env` stops in `./production.ts`.
+// PURE: no `Env`, no Workers global. `Env` stops in `./production.ts` (and, for
+// the resolution columns, `./resolution-env.ts`).
 
 /** One turn, as the `turns` table holds it. Field names are camelCase here and
  *  snake_case in SQL; `./d1.ts` is the one place they are mapped. */

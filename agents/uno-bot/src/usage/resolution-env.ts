@@ -13,12 +13,17 @@
 // amendment.
 
 import type { Env } from "../types";
-import { countedFetch, rethrowIfBudget } from "../net";
+import { rethrowIfBudget } from "../net";
 import { getSlackAccessTokenFor } from "../oauth/slack";
-import { conversationsReplies, getBotIdentity } from "../slack/api";
+import { conversationsReplies, getBotIdentity, slackReadAs } from "../slack/api";
 import { createD1ResolutionLog } from "./resolution-d1";
-import { batchCompleted, reactionWindow, type ResolutionLog } from "./resolution";
-import { runResolutionPass, type DmMessage, type ThreadMessage } from "./resolution-pass";
+import { batchCompleted, reactionWindow, type AnswerReaction, type ResolutionLog } from "./resolution";
+import {
+  createLeadDmReader,
+  runResolutionPass,
+  type LeadDmReader,
+  type ThreadMessage,
+} from "./resolution-pass";
 
 /** A log that keeps nothing — the Worker without `USAGE_DB`. `./production.ts` says so once. */
 const NO_RESOLUTION_LOG: ResolutionLog = {
@@ -45,7 +50,7 @@ const message = (err: unknown): string => (err instanceof Error ? err.message : 
 
 /** The reaction door's `recordReaction`, bound. Logs and swallows a failed write. */
 export function reactionRecorderFor(env: Env) {
-  return async (r: { channel: string; threadRoot: string; reactedTs: string; userId: string }): Promise<void> => {
+  return async (r: AnswerReaction): Promise<void> => {
     try {
       await resolutionLogFor(env).recordReaction({
         channel: r.channel,
@@ -92,63 +97,19 @@ async function threadOf(env: Env, channel: string, askTs: string): Promise<Threa
   return first.messages;
 }
 
-/** One Slack Web API call on a user token. `get` for a read method's query string. */
-async function slackAsUser<T>(
-  token: string,
-  method: string,
-  params: Record<string, string>,
-  verb: "get" | "post",
-): Promise<(T & { ok: true }) | { ok: false; error: string }> {
-  const url = `https://slack.com/api/${method}`;
-  try {
-    const res =
-      verb === "get"
-        ? await countedFetch(`${url}?${new URLSearchParams(params).toString()}`, {
-            headers: { authorization: `Bearer ${token}` },
-          })
-        : await countedFetch(url, {
-            method: "POST",
-            headers: { "content-type": "application/json; charset=utf-8", authorization: `Bearer ${token}` },
-            body: JSON.stringify(params),
-          });
-    const data = (await res.json()) as (T & { ok: true }) | { ok: false; error: string };
-    if (!data.ok) console.warn(`[resolution] ${method} failed: ${data.error}`);
-    return data;
-  } catch (err) {
-    rethrowIfBudget(err);
-    return { ok: false, error: message(err) };
-  }
-}
-
 /**
  * The asker's DM with the lead, read on the lead's own token. Null when the
  * lead has not connected one: the legacy workspace slot is not the lead's.
  */
-async function leadDmReader(
-  env: Env,
-  leadUserId: string,
-): Promise<((askerId: string, oldestTs: string, latestTs: string) => Promise<DmMessage[]>) | null> {
-  const stored = await getSlackAccessTokenFor(env, leadUserId).catch(() => null);
+async function leadDmReader(env: Env, leadUserId: string): Promise<LeadDmReader | null> {
+  const stored = await getSlackAccessTokenFor(env, leadUserId).catch((err: unknown) => {
+    rethrowIfBudget(err);
+    return null;
+  });
   if (!stored?.own) return null;
   const token = stored.token;
-  return async (askerId, oldestTs, latestTs) => {
-    // Finds the existing DM between the two; the lead's token holds `im:write`.
-    const opened = await slackAsUser<{ channel?: { id?: string } }>(
-      token,
-      "conversations.open",
-      { users: askerId },
-      "post",
-    );
-    const channel = opened.ok ? opened.channel?.id : undefined;
-    if (!channel) return [];
-    const history = await slackAsUser<{ messages?: DmMessage[] }>(
-      token,
-      "conversations.history",
-      { channel, oldest: oldestTs, latest: latestTs, inclusive: "false", limit: "200" },
-      "get",
-    );
-    return history.ok && Array.isArray(history.messages) ? history.messages : [];
-  };
+  // GET only (`slackReadAs`): the pass never writes on the lead's token.
+  return createLeadDmReader((method, params) => slackReadAs(token, method, params));
 }
 
 /**

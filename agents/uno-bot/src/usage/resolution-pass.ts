@@ -12,7 +12,8 @@
 // Without the lead's token the DM half cannot be read. The pass then records
 // `none` where it would have said `no_escalation`, leaves `escalated_to_lead`
 // unknown unless the thread already shows the lead replying, and logs one line
-// for the whole pass — it does not guess.
+// for the whole pass — it does not guess. An ask left unknown stays in the
+// queue, so the next pass that can read the DMs replaces the `none`.
 //
 // Each ask is written as soon as it is read, so a pass the subrequest ceiling
 // cuts short resumes where it stopped on the runner's retry. An ask whose
@@ -63,10 +64,11 @@ export interface ResolutionPassDeps {
   /** The whole thread the ask sits in, oldest first; null when unreadable. */
   threadOf(channel: string, askTs: string): Promise<ThreadMessage[] | null>;
   /**
-   * The asker's DM with the lead between two ts, on the lead's own token; null
-   * when the pass has no such token.
+   * The asker's DM with the lead between two ts, on the lead's own token
+   * (`createLeadDmReader`). The reader itself is null when the pass has no such
+   * token; a read it answers null could not be made, and counts the same way.
    */
-  leadDmsWith: ((askerId: string, oldestTs: string, latestTs: string) => Promise<DmMessage[]>) | null;
+  leadDmsWith: LeadDmReader | null;
   /** Reads as it would, writes nothing. */
   dryRun: boolean;
 }
@@ -82,6 +84,77 @@ export interface ResolutionPassSummary {
 
 /** Epoch ms as a Slack ts. */
 const msToTs = (ms: number): string => (ms / 1000).toFixed(6);
+
+/** The asker's DMs with the lead in a window; null when they could not be read. */
+export type LeadDmReader = (askerId: string, oldestTs: string, latestTs: string) => Promise<DmMessage[] | null>;
+
+/** A Slack READ method on the lead's token: GET, query params, Slack's own JSON. */
+export type SlackRead = (
+  method: "users.conversations" | "conversations.history",
+  params: Record<string, string>,
+) => Promise<{ ok: boolean; error?: string; [key: string]: unknown }>;
+
+/** How many pages of the lead's DM list one pass reads before giving up. */
+const IM_LIST_PAGES = 5;
+
+/**
+ * Read the asker's DMs with the lead, READ-ONLY. The job must never create
+ * anything in the lead's Slack — not even an empty DM, which is what
+ * `conversations.open` would do for a pair that has never talked. So the DM is
+ * found among the lead's existing ones (`users.conversations`, `types=im`),
+ * listed once per pass and cached; an asker with no DM has no DM, and no API
+ * write is made to find out.
+ *
+ * The method type admits the two reads and nothing else, so a write cannot be
+ * wired in by accident.
+ *
+ * A list that cannot be read (a missing scope, an error) makes every read
+ * answer null — unknown, never "no DM" — and says so once.
+ *
+ * @param read - One Slack read on the lead's own token
+ */
+export function createLeadDmReader(read: SlackRead): LeadDmReader {
+  let ims: Promise<Map<string, string> | null> | undefined;
+
+  const listIms = async (): Promise<Map<string, string> | null> => {
+    const byUser = new Map<string, string>();
+    let cursor = "";
+    for (let page = 0; page < IM_LIST_PAGES; page++) {
+      const res = await read("users.conversations", {
+        types: "im",
+        exclude_archived: "true",
+        limit: "200",
+        ...(cursor ? { cursor } : {}),
+      });
+      if (!res.ok) {
+        console.log(`[resolution] the lead's DM list is unreadable (${res.error ?? "error"}): DM half recorded unknown`);
+        return null;
+      }
+      for (const c of (res.channels as { id?: string; user?: string }[] | undefined) ?? []) {
+        if (c.id && c.user) byUser.set(c.user, c.id);
+      }
+      cursor = (res.response_metadata as { next_cursor?: string } | undefined)?.next_cursor ?? "";
+      if (!cursor) break;
+    }
+    return byUser;
+  };
+
+  return async (askerId, oldestTs, latestTs) => {
+    ims ??= listIms();
+    const byUser = await ims;
+    if (!byUser) return null;
+    const channel = byUser.get(askerId);
+    if (!channel) return [];
+    const history = await read("conversations.history", {
+      channel,
+      oldest: oldestTs,
+      latest: latestTs,
+      inclusive: "false",
+      limit: "200",
+    });
+    return history.ok && Array.isArray(history.messages) ? (history.messages as DmMessage[]) : null;
+  };
+}
 
 /**
  * Decide one ask.

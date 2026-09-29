@@ -35,7 +35,8 @@ logged and dropped). A deploy with no pending migration needs no step.
 - Never edit a migration that has run anywhere. Add the next number.
 - Additive only: new tables, new nullable columns, new indexes. A column the
   Worker writes is also mapped in `agents/uno-bot/src/usage/d1.ts`, the one place record
-  fields become SQL columns.
+  fields become SQL columns — or, for the resolution columns written after the
+  turn, in `agents/uno-bot/src/usage/resolution-d1.ts`, the one place those do.
 - Bound parameters in the Worker, always; nothing is assembled into SQL from a
   value.
 - What the database never stores — message text past classification, anything
