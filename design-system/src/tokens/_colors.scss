@@ -2,6 +2,12 @@
  * Material Design 3 Color Tokens
  * Generated from Figma design system
  * Follows M3 color role guidance: https://m3.material.io/styles/color/roles
+ *
+ * Hand-edited 2026-09-29: the state-layer bases (the -state-08/12/16 washes)
+ * were set by hand to match the Figma State-layers variables, because the color
+ * source JSON lags Figma and the generator refuses to run against it. Carry
+ * these values into the source before the generator next runs, or it will
+ * revert them.
  */
 
 :root {
