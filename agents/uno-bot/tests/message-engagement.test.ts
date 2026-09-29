@@ -113,22 +113,36 @@ async function withSweepThread<T>(posts: Array<Record<string, unknown>>, fn: () 
   }
 }
 
+// Someone has already replied after the card, so a later reply is not
+// answering the card merely by where it sits.
+const TEAM_REPLY = { user: "U2", ts: "1700.7", text: "morning all" };
+
 test("under a sweep card, the thread's own conversation is left alone", async () => {
-  await withSweepThread([SWEEP_CARD_POST], async () => {
+  await withSweepThread([SWEEP_CARD_POST, TEAM_REPLY], async () => {
     assert.equal(await engages(inSweepThread("lunch at noon?")), false);
+    assert.equal(await engages(inSweepThread("Keep it simple")), false);
+    assert.equal(await engages(inSweepThread("change the header for all breakpoints")), false);
     assert.equal(await engages(inSweepThread("I'll change the deck before Friday")), false);
     assert.equal(await engages(inSweepThread("we should fix the onboarding flow")), false);
+    assert.equal(await engages(inSweepThread("keep the first one, skip the rest")), false, "words alone name no fix");
   });
 });
 
-test("under a sweep card, a reply about the card, a typed gate emoji or an @mention engages", async () => {
-  await withSweepThread([SWEEP_CARD_POST], async () => {
+test("under a sweep card, a reply naming fixes by number, a typed gate emoji or an @mention engages", async () => {
+  await withSweepThread([SWEEP_CARD_POST, TEAM_REPLY], async () => {
     assert.equal(await engages(inSweepThread("drop 2")), true);
-    assert.equal(await engages(inSweepThread("keep the first one, skip the rest")), true);
+    assert.equal(await engages(inSweepThread("keep 1 and 3")), true);
+    assert.equal(await engages(inSweepThread("item 2 is wrong")), true);
     assert.equal(await engages(inSweepThread("can you reword fix 3?")), true);
     assert.equal(await engages(inSweepThread(":white_check_mark:")), true);
     assert.equal(await engages(inSweepThread("⛔")), true);
     assert.equal(await engages(inSweepThread(`<@${BOT}> what does this card change?`)), true);
+  });
+});
+
+test("a reply posted straight after the sweep card is answering it", async () => {
+  await withSweepThread([SWEEP_CARD_POST], async () => {
+    assert.equal(await engages(inSweepThread("Keep it simple")), true);
   });
 });
 

@@ -94,7 +94,7 @@ import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
-import { replacedBlocks, sweepCardInstruction } from "../sweep/cards";
+import { replacedBlocks, sweepCardInstruction, sweepCardPick } from "../sweep/cards";
 import {
   withWorkingSignal,
   type CardCaveat,
@@ -824,6 +824,17 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     }
   }
 
+  // ── "drop 2" / "keep 1 and 3" on a sweep card ──────────────────────────────
+  //
+  // Read by index, with no model call: the revision is the card's own
+  // operations minus the dropped ones, byte for byte, so there is nothing for
+  // a model to reproduce. Anything else said under the card still goes to the
+  // model, and its revision is still held to the subset rule below.
+  if (request.pending?.sweepRun) {
+    const kept = sweepCardPick(request.text, proposalOperations(request.pending).length);
+    if (kept) return dropFromSweepCard(request, deps, memory, kept, cardThread);
+  }
+
   // ── A cut-off run in this thread ───────────────────────────────────────────
   //
   // A card approved here whose run never reported back (`ThreadState`'s
@@ -1319,6 +1330,76 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     wrote: memory.wrote(),
     telemetry,
   };
+}
+
+/**
+ * Stage a sweep card without the fixes a "drop N" left out — or, with none
+ * left, cancel it through the gate as a typed ⛔ would. Held to the card's
+ * confirmer set, like any revision.
+ */
+async function dropFromSweepCard(
+  request: TurnRequest,
+  deps: TurnDeps,
+  memory: ThreadMemory,
+  kept: number[],
+  cardThread: string,
+): Promise<TurnOutcome> {
+  const { delivery, threadState } = deps;
+  const pending = request.pending!;
+  const telemetry: TurnTelemetry = {
+    tier: "chill",
+    route: "sweep-drop",
+    trivial: true,
+    correction: false,
+    tools: [],
+    references: [],
+    interim: 0,
+  };
+  if (!request.intakeChannel && !mayConfirm(pending, request.userId)) {
+    const refusal = revisionRefusal(pending.confirmers ?? [], request.userId);
+    await delivery.postNote(refusal);
+    await memory.remember(refusal);
+    return { disposition: "asked", posted: refusal, wrote: memory.wrote(), telemetry };
+  }
+  if (!kept.length) {
+    const verdict = await resolveSignal(
+      { kind: "typed", channel: request.channel, thread: cardThread, text: "⛔", userId: request.userId },
+      { threadState },
+    );
+    return settleVerdict(verdict, { deps, memory, note: "Cancelled.", telemetry });
+  }
+  const all = proposalOperations(pending);
+  const operations = kept.map((i) => all[i]!);
+  const first = operations[0]!;
+  await threadState.retireProposal(pending.proposalTs);
+  const card = await buildCard(
+    { kind: "proposal", operations, toolName: first.toolName, input: first.input },
+    deps,
+    undefined,
+    request.surface === "assistant",
+  );
+  const posted = await delivery.card(card);
+  if (!posted.ok || !posted.ts) {
+    console.error("[turn] sweep card revision was not staged");
+    return { disposition: "failed", failure: { stage: "delivery" }, wrote: memory.wrote(), telemetry };
+  }
+  const proposal: PendingProposal = {
+    operations,
+    toolName: first.toolName,
+    input: first.input,
+    channel: request.channel,
+    threadTs: request.conversationTs,
+    ...(request.replyTs ? { replyTs: request.replyTs } : {}),
+    userMsgTs: request.userMsgTs,
+    proposalTs: posted.ts,
+    proposalText: posted.text,
+    requesterUserId: request.userId,
+    ...inheritedTerms(pending),
+    sweepRun: pending.sweepRun!,
+  };
+  await threadState.putProposal(proposal);
+  await memory.remember(posted.text);
+  return { disposition: "staged", posted: posted.text, staged: { proposal, card }, wrote: memory.wrote(), telemetry };
 }
 
 /**

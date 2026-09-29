@@ -232,3 +232,43 @@ test("a page read hands back every block's id and last-edited stamp", async () =
     { id: BLOCK, type: "paragraph", lastEditedTime: READ_STAMP, text: "Sync runs nightly." },
   ]);
 });
+
+// A replace keeps the block's own type and state. Notion refuses a PATCH that
+// changes a block's type, so a paragraph written onto a list item, a to-do or
+// a heading would never land; and the display mark a read puts on a list line
+// ("• ", "☐ ") is text the block does not hold.
+for (const c of [
+  { type: "bulleted_list_item", content: "• Owner: Bea", text: "Owner: Bea" },
+  { type: "numbered_list_item", content: "• Step two: sign off", text: "Step two: sign off" },
+  { type: "to_do", content: "☐ Ship the November build", text: "Ship the November build" },
+  { type: "heading_2", content: "Launch plan (November)", text: "Launch plan (November)" },
+  { type: "paragraph", content: "Launch date: November 1", text: "Launch date: November 1" },
+]) {
+  test(`a replace onto a ${c.type} writes that type's rich text only, without a display mark`, async () => {
+    serve({
+      [`GET /blocks/${BLOCK}`]: {
+        body: { id: BLOCK, type: c.type, last_edited_time: READ_STAMP, parent: { type: "page_id", page_id: PAGE } },
+      },
+      [`PATCH /blocks/${BLOCK}`]: { body: { id: BLOCK } },
+    });
+    const { notionUpdate } = await notion();
+
+    const r = await notionUpdate(ENV, PAGE, { replace: [{ blockId: BLOCK, lastEditedTime: READ_STAMP, content: c.content }] });
+
+    assert.equal(r.replaced, 1);
+    const patch = calls[1]!;
+    // Only the type's own key, and in it only `rich_text`: a to-do keeps its
+    // tick and a heading its level because neither is sent.
+    assert.deepEqual(Object.keys(patch.body!), [c.type]);
+    const payload = patch.body![c.type] as { rich_text: { text: { content: string } }[] };
+    assert.deepEqual(Object.keys(payload), ["rich_text"]);
+    assert.equal(payload.rich_text.map((run) => run.text.content).join(""), c.text);
+  });
+}
+
+test("a read's display mark comes off a block's text by its type, and only its own", async () => {
+  const { stripBlockPrefix } = await notion();
+  assert.equal(stripBlockPrefix("bulleted_list_item", "• Owner: Ade"), "Owner: Ade");
+  assert.equal(stripBlockPrefix("to_do", "☐ Ship it"), "Ship it");
+  assert.equal(stripBlockPrefix("paragraph", "• a bullet typed as text"), "• a bullet typed as text");
+});

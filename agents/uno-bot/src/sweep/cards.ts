@@ -45,8 +45,6 @@ export const WITHDRAWN_SWEEP_CARD_EVENT = "uno_sweep_card_withdrawn";
 const QUOTE_CHARS = 200;
 /** Unchanged text shown either side of a fix's changed span. */
 const CONTEXT_CHARS = 40;
-/** A changed span longer than this is shown by its two ends. */
-const SPAN_CHARS = 240;
 
 /** One card, planned. */
 export interface SweepCardPlan {
@@ -166,8 +164,11 @@ export function sweepCard(plan: SweepCardPlan): ProposalCard {
 /**
  * What a fix changes, for the card: the span between the longest common
  * prefix and suffix of the block's text and its replacement, each side with a
- * little unchanged context. `…` marks where the shown text was cut — the card
- * shows it, the replacement never carries it (`replacementProblem`).
+ * little unchanged context. The changed span is shown whole, however long: a
+ * person confirms exactly what will be written. `…` marks only where the
+ * UNCHANGED context was cut — the replacement never carries it
+ * (`replacementProblem`). A card too long for one Slack message holds fewer
+ * fixes rather than elide one (`runSweepJob`).
  *
  * @param original - The block's text as read
  * @param replacement - What the fix writes in its place
@@ -182,8 +183,7 @@ export function changedSpan(original: string, replacement: string): { before: st
   const show = (text: string): string => {
     const start = Math.max(0, head - CONTEXT_CHARS);
     const end = Math.min(text.length, text.length - tail + CONTEXT_CHARS);
-    let middle = text.slice(head, text.length - tail);
-    if (middle.length > SPAN_CHARS) middle = `${middle.slice(0, SPAN_CHARS / 2)} … ${middle.slice(-SPAN_CHARS / 2)}`;
+    const middle = text.slice(head, text.length - tail);
     return `${start > 0 ? "…" : ""}${text.slice(start, head)}${middle}${text.slice(text.length - tail, end)}${end < text.length ? "…" : ""}`;
   };
   return { before: show(a), after: show(b) };
@@ -219,21 +219,48 @@ export function isSweepCardPost(post: { text?: string; metadata?: { event_type?:
   return tag === SWEEP_CARD_EVENT || tag === WITHDRAWN_SWEEP_CARD_EVENT || (post.text ?? "").includes(SWEEP_CARD_MARK);
 }
 
-/** A reply about a card's items: one that opens by dropping or keeping, a
- *  drop / keep / change aimed at a numbered or named fix, or a fix by number. */
-const ABOUT_THE_CARD = [
-  /^\W*(drop|keep|skip|remove|exclude|leave out)\b/i,
-  /\b(drop|keep|skip|remove|exclude|leave out|change|edit|reword|revise|rewrite)\b[^.?!\n]{0,30}?(#?\d{1,2}\b|\b(fix|fixes|item|items|first|second|third|last|all)\b)/i,
-  /\b(fix|item)\s*#?\d{1,2}\b/i,
+/** A reply that names a card's fixes by number: a drop / keep / change
+ *  followed by numbers ("drop 2", "keep 1 and 3"), or a fix named by number
+ *  ("item 2", "fix #3"). Words alone — "keep it simple", "change the header
+ *  for all breakpoints" — are the thread's own conversation. */
+const NAMES_A_FIX = [
+  /\b(drop|keep|skip|remove|exclude|leave out|change|edit|reword|revise|rewrite)(\s+only)?\s+#?\d{1,2}(\s*(,|and|&)\s*#?\d{1,2})*(?![\d:./%])\b/i,
+  /\b(fix|item|number|no\.?)\s*#?\d{1,2}(?![\d:./%])\b/i,
 ];
 
 /**
  * Whether a reply with no @mention, in a thread where uno-bot's only posts are
- * sweep cards, is addressed to the card: a typed gate emoji, or words about its
- * items. Anything else is the thread's own conversation, and is left alone.
+ * sweep cards, is addressed to the card by what it says: a typed gate emoji, or
+ * a fix named by its number. The Slack side also engages on a reply posted
+ * straight after the card (`slack/events.ts`). Anything else is the thread's
+ * own conversation, and is left alone.
  */
 export function engagesOnSweepCard(text: string): boolean {
-  return typedEmojiDecision(text) !== null || ABOUT_THE_CARD.some((re) => re.test(text));
+  return typedEmojiDecision(text) !== null || NAMES_A_FIX.some((re) => re.test(text));
+}
+
+/** "drop 2", "remove 1, 3 and 4", "keep 1 and 3", "keep only 2" — the whole
+ *  reply, fix numbers only. */
+const PICK = /^\W*(drop|remove|keep(?: only)?)\s+((?:#?\d{1,2})(?:\s*(?:,|and|&)\s*#?\d{1,2})*)\W*$/i;
+
+/**
+ * Which of a sweep card's fixes a "drop N" / "keep N" reply leaves, by index
+ * — read structurally, so the revision is the card's own operations minus
+ * the dropped ones, never a batch the model rewrote. Null for any other reply
+ * and for a number the card does not have: those go to the model.
+ *
+ * @param text - The reply
+ * @param count - How many fixes the card holds
+ * @returns The 0-based indexes kept, in card order (empty: all dropped)
+ */
+export function sweepCardPick(text: string, count: number): number[] | null {
+  const m = PICK.exec(text.trim());
+  if (!m) return null;
+  const numbers = [...m[2]!.matchAll(/\d{1,2}/g)].map((d) => Number(d[0]));
+  if (numbers.some((n) => n < 1 || n > count)) return null;
+  const named = new Set(numbers.map((n) => n - 1));
+  const keep = m[1]!.toLowerCase().startsWith("keep");
+  return Array.from({ length: count }, (_, i) => i).filter((i) => named.has(i) === keep);
 }
 
 /**

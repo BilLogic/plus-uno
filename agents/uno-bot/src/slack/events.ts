@@ -375,7 +375,13 @@ export async function shouldHandleMessage(env: Env, event: SlackMessageEvent): P
         (m) => m.user === identity.userId || (!!m.bot_id && m.bot_id === identity.botId),
       );
       if (botPosts.some((m) => !isSweepCardPost(m))) return true;
-      if (botPosts.length) return aboutTheCard;
+      if (botPosts.length) {
+        // A reply posted straight after the card, with nothing in between, is
+        // answering it.
+        const before = msgs.filter((m) => Number(m.ts) < Number(event.ts)).at(-1);
+        const underTheCard = !!before && botPosts.includes(before);
+        return aboutTheCard || underTheCard;
+      }
     }
     return pending ? aboutTheCard : false;
   } catch (err) {

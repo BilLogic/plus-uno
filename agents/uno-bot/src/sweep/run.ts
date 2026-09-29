@@ -546,24 +546,30 @@ interface MorningCtx {
 }
 
 /** Post one planned card, stage it, and mark its items posted. */
-async function postCard(ctx: MorningCtx, plan: SweepCardPlan, postDate: string): Promise<void> {
+async function postCard(ctx: MorningCtx, planned: SweepCardPlan, postDate: string): Promise<void> {
   const { deps, now, notes } = ctx;
-  const to = resolveDestination(plan.destination, deps.config);
-  const ids = plan.items.map((f) => f.id);
+  const to = resolveDestination(planned.destination, deps.config);
   if (!to) {
-    notes.push(`${plan.key}: its channel is not configured`);
+    notes.push(`${planned.key}: its channel is not configured`);
     return;
   }
   if (to.channel === deps.config.unoBot) {
     // Unreachable while #uno-bot is never swept; stated so it stays true.
-    notes.push(`${plan.key}: not posted in #uno-bot`);
-    if (!deps.dryRun) await deps.store.removeFindings(ids);
+    notes.push(`${planned.key}: not posted in #uno-bot`);
+    if (!deps.dryRun) await deps.store.removeFindings(planned.items.map((f) => f.id));
     return;
   }
 
+  // Every fix is shown whole, so a card holds only as many as one Slack
+  // message shows in full; the rest wait in the queue. A fix too long to show
+  // even alone is not offered.
+  const plan = await fitToOneMessage(ctx, planned);
+  if (!plan) return;
+  const ids = plan.items.map((f) => f.id);
+
   // Everything the card will send, counted before any of it is: a card that
   // cannot finish does not start, and the job defers instead.
-  const posts = (deps.delivery.render(sweepCard(plan)).followUp?.length ?? 0) + 1;
+  const posts = 1;
   const links = plan.items.filter((f) => f.evidence.messageTs[0]).length;
   const affordable = Math.min(links, MAX_PERMALINKS - ctx.permalinks);
   if (!deps.dryRun) {
@@ -607,6 +613,36 @@ async function postCard(ctx: MorningCtx, plan: SweepCardPlan, postDate: string):
   await deps.store.removeFindings(ids);
   ctx.cards.push({ ...report, proposalTs: sent.ts });
   ctx.carded.push(...plan.items);
+}
+
+/** Slack's limits on one message: its text, and its blocks. */
+const ONE_MESSAGE = { chars: 40_000, blocks: 50 };
+/** A permalink as long as Slack's, for measuring a card before it has them. */
+const PERMALINK_SIZED = "https://plus.slack.com/archives/C0000000000/p0000000000000000";
+
+/**
+ * The longest head of the plan whose card Slack shows in one message, whole —
+ * no follow-up, no collapsed plan. The fixes cut stay queued; a first fix too
+ * long to show alone leaves the queue with a note, since it can never be
+ * shown whole.
+ */
+async function fitToOneMessage(ctx: MorningCtx, plan: SweepCardPlan): Promise<SweepCardPlan | null> {
+  const { deps, notes } = ctx;
+  const fits = (items: PendingFinding[]): boolean => {
+    const measured = items.map((f) => ({ ...f, evidence: { ...f.evidence, permalinks: [PERMALINK_SIZED] } }));
+    const card = deps.delivery.render(sweepCard(cardPlan(plan.key, plan.destination, measured)));
+    return !card.followUp?.length && card.text.length <= ONE_MESSAGE.chars && card.blocks.length <= ONE_MESSAGE.blocks;
+  };
+  let n = plan.items.length;
+  while (n > 0 && !fits(plan.items.slice(0, n))) n -= 1;
+  if (n === 0) {
+    const [first] = plan.items;
+    notes.push(`${first!.id}: too long to show whole on a card — not offered`);
+    if (!deps.dryRun) await deps.store.removeFindings([first!.id]);
+    return null;
+  }
+  if (n < plan.items.length) notes.push(`${plan.key}: ${plan.items.length - n} fix(es) wait for room on a card`);
+  return n === plan.items.length ? plan : cardPlan(plan.key, plan.destination, plan.items.slice(0, n));
 }
 
 /**

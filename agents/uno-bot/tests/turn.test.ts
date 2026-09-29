@@ -876,7 +876,7 @@ test("a confirmer's revision of a sweep card keeps its sweep run and retires the
   });
   await h.threadState.putProposal(SWEEP_CARD);
 
-  const outcome = await runTurn(request({ text: "drop 2", pending: SWEEP_CARD, userId: "U0OWNER" }), h.deps);
+  const outcome = await runTurn(request({ text: "leave out the owner one", pending: SWEEP_CARD, userId: "U0OWNER" }), h.deps);
 
   assert.equal(outcome.disposition, "staged");
   assert.equal(outcome.staged!.proposal.sweepRun, "2026-09-30");
@@ -899,6 +899,45 @@ test("a sweep card's revision that rewrites a fix is refused, and the card stays
 
   assert.equal(outcome.disposition, "asked");
   assert.match(outcome.posted ?? "", /rather than drop one/);
+  assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found");
+});
+
+// "drop N" is read by index: the revision is the card's own operations minus
+// the dropped one, byte for byte, with no model call to reproduce them.
+test("a confirmer's \"drop 2\" revises a sweep card by index, without the model", async () => {
+  const h = harness();
+  await h.threadState.putProposal(SWEEP_CARD);
+
+  const outcome = await runTurn(request({ text: "drop 2", pending: SWEEP_CARD, userId: "U0OWNER" }), h.deps);
+
+  assert.equal(outcome.disposition, "staged");
+  assert.deepEqual(outcome.staged!.proposal.operations, [{ toolName: "notion_update", input: FIX_ONE }]);
+  assert.equal(outcome.staged!.proposal.sweepRun, "2026-09-30");
+  assert.deepEqual(outcome.staged!.proposal.confirmers, ["U0OWNER"]);
+  assert.equal(h.provider.sends.length, 0, "no model call");
+  assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "superseded");
+});
+
+test("\"keep 2\" keeps only that fix; dropping every fix cancels the card", async () => {
+  const kept = harness();
+  await kept.threadState.putProposal(SWEEP_CARD);
+  const keep = await runTurn(request({ text: "keep 2", pending: SWEEP_CARD, userId: "U0OWNER" }), kept.deps);
+  assert.deepEqual(keep.staged!.proposal.operations, [{ toolName: "notion_update", input: FIX_TWO }]);
+
+  const all = harness();
+  await all.threadState.putProposal(SWEEP_CARD);
+  const dropped = await runTurn(request({ text: "drop 1 and 2", pending: SWEEP_CARD, userId: "U0OWNER" }), all.deps);
+  assert.equal(dropped.disposition, "resolved");
+  assert.equal(dropped.staged, undefined);
+  assert.equal(all.provider.sends.length, 0);
+  assert.notEqual((await all.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found");
+});
+
+test("a fix number the sweep card does not have goes to the model", async () => {
+  const h = harness({ replies: [{ text: "There are only two fixes on that card." }] });
+  await h.threadState.putProposal(SWEEP_CARD);
+  const outcome = await runTurn(request({ text: "drop 7", pending: SWEEP_CARD, userId: "U0OWNER" }), h.deps);
+  assert.notEqual(outcome.disposition, "staged");
   assert.equal((await h.threadState.getProposalByTs(SWEEP_CARD.proposalTs)).state, "found");
 });
 

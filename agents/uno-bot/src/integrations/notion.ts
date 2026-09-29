@@ -620,15 +620,50 @@ function renderProperty(p: NotionProperty): string {
   }
 }
 
+/** The mark a block's rendered line leads with, by type: what a reader of
+ *  `text` sees, and never part of the block's own rich text. */
+function displayPrefix(type: string): string {
+  if (type === "bulleted_list_item" || type === "numbered_list_item") return "• ";
+  if (type === "to_do") return "☐ ";
+  return "";
+}
+
+/**
+ * A block's text without the mark its rendered line leads with — the text an
+ * in-place replacement writes back, so a fix drafted from `• Owner: Ade`
+ * writes `Owner: Ade` into the list item rather than a second bullet.
+ *
+ * @param type - Notion's block type
+ * @param text - The rendered line, or a replacement drafted from one
+ */
+export function stripBlockPrefix(type: string, text: string): string {
+  const prefix = displayPrefix(type);
+  return prefix && text.startsWith(prefix) ? text.slice(prefix.length) : text;
+}
+
+/** Block types whose payload is their `rich_text` plus per-type state
+ *  (a to-do's `checked`, a heading's level): a replace keeps the type and
+ *  that state, and rewrites only the text. */
+const RICH_TEXT_TYPES: ReadonlySet<string> = new Set([
+  "paragraph",
+  "heading_1",
+  "heading_2",
+  "heading_3",
+  "bulleted_list_item",
+  "numbered_list_item",
+  "to_do",
+  "quote",
+  "callout",
+  "toggle",
+]);
+
 function blockText(block: Record<string, unknown>): string {
   const type = block.type as string;
   const body = block[type] as { rich_text?: NotionRichText } | undefined;
   const txt = plain(body?.rich_text);
   if (!txt) return "";
-  if (type === "bulleted_list_item" || type === "numbered_list_item") return `• ${txt}`;
-  if (type === "to_do") return `☐ ${txt}`;
   if (type.startsWith("heading")) return `\n${txt}`;
-  return txt;
+  return `${displayPrefix(type)}${txt}`;
 }
 
 /**
@@ -1334,7 +1369,7 @@ async function replaceBlock(
 
   const getRes = await countedFetch(`${NOTION_API}/blocks/${op.blockId}`, { headers, signal });
   const live = (await getRes.json().catch(() => ({}))) as {
-    id?: string; last_edited_time?: string; message?: string; code?: string;
+    id?: string; type?: string; last_edited_time?: string; message?: string; code?: string;
     parent?: { type?: string; page_id?: string; block_id?: string };
   };
   if (!getRes.ok || !live.id) {
@@ -1352,10 +1387,20 @@ async function replaceBlock(
     };
   }
 
+  // Notion refuses a PATCH that changes a block's type. A text block keeps
+  // its own type and state — the list item stays a list item, the to-do its
+  // tick, the heading its level — and only its rich text is rewritten, with
+  // the line's display mark taken off the replacement first.
+  const liveType = live.type ?? "";
+  const keepType = RICH_TEXT_TYPES.has(liveType);
+  const written = keepType ? markdownToNotionBlocks(stripBlockPrefix(liveType, op.content)) : rendered;
+  const head = written[0] ?? first;
+  const headText = (head[head.type] as { rich_text?: unknown } | undefined)?.rich_text;
+  const payload = keepType && Array.isArray(headText) ? { [liveType]: { rich_text: headText } } : { [head.type]: head[head.type] };
   const res = await countedFetch(`${NOTION_API}/blocks/${op.blockId}`, {
     method: "PATCH",
     headers,
-    body: JSON.stringify({ [first.type]: first[first.type] }),
+    body: JSON.stringify(payload),
     signal,
   });
   if (!res.ok) {
@@ -1363,7 +1408,7 @@ async function replaceBlock(
     throw notionError(res.status, err, `block ${label} update failed`);
   }
 
-  const rest = rendered.slice(1);
+  const rest = written.slice(1);
   if (!rest.length) return { replaced: 1 };
 
   const parentId = live.parent?.page_id ?? live.parent?.block_id;
