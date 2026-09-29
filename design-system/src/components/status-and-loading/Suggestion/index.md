@@ -16,13 +16,19 @@
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `label` | string (required) | — | The proposed value's words. The accessible name is built from it. |
-| `type` | oneOf | `'insert'` | `insert` adds a value to the field; `prompt` sends or fills text. |
+| `type` | enum | `'insert'` | `insert` adds a value to the field; `prompt` sends or fills text. |
 | `value` | any | — | `insert` only: what `onAccept` receives. Defaults to `label`. |
 | `text` | string | — | `prompt` only: the text `onAccept` receives. Defaults to `label`. |
 | `onAccept` | func | — | Called with the value (insert) or the text (prompt), then the click event. |
 | `onClick` | func | — | Fires on press, before `onAccept`. It never replaces `onAccept`. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |
+
+## Variants
+
+**`type`** — `insert` · `prompt`
+
+Anything not listed is not a valid value.
 
 ## Tokens touched
 
