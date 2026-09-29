@@ -38,6 +38,7 @@ import {
 import { evalTurnWiring } from "../src/eval/turn-adapter";
 import { slackTurnRequest, type TurnEnvelope } from "../src/slack/turn-request";
 import { slackTurnWiring } from "../src/slack/turn-adapter";
+import { createInMemoryUsageLog } from "../src/usage/index";
 import { buildTurnDeps } from "../src/turn/env-deps";
 import type { SlackMessageEvent } from "../src/slack/types";
 import type { Env } from "../src/types";
@@ -147,6 +148,10 @@ function harness(
         decision: verdict.decision ?? "confirm",
       });
     },
+
+    // Every eval turn is test traffic on the usage record; this harness keeps
+    // the records it would have written, and asserts nothing about them.
+    usage: { log: createInMemoryUsageLog(), origin: "debug", testChannelIds: [] },
 
     // Structures, not words — the reads a card needs, as the port takes them
     // since #623.
@@ -265,12 +270,14 @@ test("every dependency a turn reads is wired the same way from both adapters", (
   assert.deepEqual(Object.keys(slackWiring).sort(), [
     "applyVerdict",
     "delivery",
+    "origin",
     "threadState",
     "toolThreadTs",
   ]);
   assert.deepEqual(Object.keys(evalWiring).sort(), [
     "applyVerdict",
     "delivery",
+    "origin",
     "reporters",
     "threadState",
     "toolThreadTs",

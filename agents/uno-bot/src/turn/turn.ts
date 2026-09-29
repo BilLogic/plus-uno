@@ -52,12 +52,18 @@ import {
 } from "../agent/confidence";
 import { buildContextBlock, compactHistory } from "../agent/context-state";
 import { correctionDirective, looksLikeCorrection } from "../agent/correction";
-import type { AgentResult } from "../agent/loop";
+import type { AgentResult, TurnSpend } from "../agent/loop";
 import { bounceLogLine, proposalWasAddressed } from "../agent/pending-notice";
 import type { AgentImage, HistoricalImages } from "../agent/provider-conversation";
 import { routeRequest } from "../agent/routing";
 import type { ModelTier } from "../agent/routing";
-import { cutOffVerdict, resolveSignal, type GateRestage, type GateVerdict } from "../gate/index";
+import {
+  cutOffVerdict,
+  resolveSignal,
+  type GateRestage,
+  type GateVerdict,
+  type OperationOutcome,
+} from "../gate/index";
 import { collectStrings } from "../agent/tool-input";
 import { gateWordsFor } from "../agent/tool-table";
 import { relayRecipientId } from "../tools/relayed-dm-render";
@@ -75,6 +81,8 @@ import {
   type ThreadState,
   type VisionReference,
 } from "../thread-state/index";
+import { buildTurnRecord, type TurnOrigin, type TurnRecord, type UsageLog } from "../usage/index";
+import { BUILD } from "../version";
 import { ANTECEDENT_LIMIT, formatAntecedent, needsAntecedent } from "./antecedent";
 import { cardThreadOf } from "./request";
 import { intakeChannelInstruction, intakeConfirmers, type IntakeThread } from "./intake-channel";
@@ -121,6 +129,11 @@ export const BACKSTOP_LINES = [
 ];
 
 const PROGRESS_LABEL = "Reading the question and this thread";
+
+/** The longest a usage-record write may hold the end of a turn. The answer is
+ *  already in front of the person by then; this bounds how long the invocation
+ *  lingers on a slow database before the record is given up as lost. */
+export const USAGE_WRITE_TIMEOUT_MS = 1_000;
 
 // ── The request ──────────────────────────────────────────────────────────────
 
@@ -242,6 +255,8 @@ export interface TurnTelemetry {
   judge?: string;
   /** How many interim lines the person saw. */
   interim: number;
+  /** What the model run ran on and spent, when one ran to its end. */
+  spend?: TurnSpend;
 }
 
 export interface TurnOutcome {
@@ -256,6 +271,9 @@ export interface TurnOutcome {
    *  compaction dropped. */
   wrote: { turns: HistoryTurn[]; compacted: number };
   telemetry: TurnTelemetry;
+  /** What a ✅ taken during this turn ran, operation by operation, when the
+   *  executor reported it. */
+  executed?: OperationOutcome[];
 }
 
 // ── The dependencies ─────────────────────────────────────────────────────────
@@ -303,11 +321,28 @@ export interface TurnAgentRun {
   receipt?: HistoryTurn["retrieval"];
   /** Set only when a search this turn came back EMPTY. */
   absence?: AbsenceContext;
+  /** What the run ran on and spent (`agent/run-agent.ts` `AgentRun.spend`). */
+  spend?: TurnSpend;
 }
 
 export interface TurnJudgement {
   text: string;
   verdict: string;
+}
+
+/**
+ * Where a finished turn is recorded, and the facts about its caller the
+ * test-traffic rule reads (`usage/record.ts`).
+ */
+export interface TurnUsage {
+  log: UsageLog;
+  /** `debug` for anything reached through a debug or health route — the eval
+   *  transport among them — which is test traffic by definition. */
+  origin: TurnOrigin;
+  /** `TEST_CHANNEL_IDS`, parsed: #uno-bot-sandbox. */
+  testChannelIds: readonly string[];
+  /** Overrides `USAGE_WRITE_TIMEOUT_MS`; a test's way to not wait it out. */
+  writeTimeoutMs?: number;
 }
 
 export interface TurnDeps {
@@ -348,8 +383,14 @@ export interface TurnDeps {
    * The DECISION half is not a dependency — `resolveSignal` is pure and the
    * turn calls it directly with `threadState`. Only the execution needs `Env`,
    * which is why this one line is a port and the gate is not.
+   *
+   * Answers with what the batch ran, when it ran one — the usage record reads
+   * it for a ticket the bot filed on itself.
    */
-  applyVerdict(verdict: GateVerdict): Promise<void>;
+  applyVerdict(verdict: GateVerdict): Promise<OperationOutcome[] | void>;
+
+  /** The usage record this turn leaves as it finishes. */
+  usage: TurnUsage;
 
   /**
    * The parts of a card that need a read of their own.
@@ -513,11 +554,95 @@ export async function runTurn(request: TurnRequest, deps: TurnDeps): Promise<Tur
   const cardLive = request.pending
     ? proposalReplyThread(request.pending) === turnThread
     : false;
-  return withWorkingSignal(
-    deps.delivery,
-    (delivery) => turnBody(request, { ...deps, delivery }),
+
+  // The usage record's clock: when the turn began, and when the person was
+  // first shown something — an answer, a card, a note — as Delivery accepted it.
+  const clock = (): number => deps.now?.() ?? Date.now();
+  const startedAt = clock();
+  let firstAnswerAt: number | null = null;
+  const delivery = watchFirstAnswer(deps.delivery, () => {
+    firstAnswerAt ??= clock();
+  });
+
+  const outcome = await withWorkingSignal(
+    delivery,
+    (watched) => turnBody(request, { ...deps, delivery: watched }),
     (outcome) => settlementOf({ disposition: outcome.disposition, cardLive }),
   );
+
+  // Written AFTER the working signal is down and the answer is out, so the
+  // record costs the person nothing they can see.
+  await recordTurn(
+    buildTurnRecord({
+      build: BUILD,
+      origin: deps.usage.origin,
+      testChannelIds: deps.usage.testChannelIds,
+      requesterId: request.userId,
+      surface: request.surface,
+      inThread: request.threaded,
+      channel: request.channel,
+      askTs: request.userMsgTs,
+      question: request.text,
+      startedAt,
+      firstAnswerAt,
+      tier: outcome.telemetry.tier,
+      routeReason: outcome.telemetry.route,
+      ...(outcome.telemetry.spend ? { spend: outcome.telemetry.spend } : {}),
+      toolsCalled: outcome.telemetry.tools,
+      ...(outcome.posted !== undefined ? { posted: outcome.posted } : {}),
+      disposition: outcome.disposition,
+      ...(outcome.staged ? { proposalId: outcome.staged.proposal.proposalTs } : {}),
+      ...(outcome.executed ? { executed: outcome.executed } : {}),
+    }),
+    deps.usage,
+  );
+  return outcome;
+}
+
+/**
+ * Delivery, with a note taken the first time the person is shown something
+ * that answers them: the answer, a card, a clarifying note, a gate verdict.
+ * Not a reaction, an interim line or a failure — none of those answers.
+ */
+function watchFirstAnswer(delivery: Delivery, onFirst: () => void): Delivery {
+  const noted = async <R extends { ok: boolean }>(post: Promise<R>): Promise<R> => {
+    const result = await post;
+    if (result.ok) onFirst();
+    return result;
+  };
+  return {
+    ...delivery,
+    postAnswer: (text) => noted(delivery.postAnswer(text)),
+    postNote: (text) => noted(delivery.postNote(text)),
+    postGateNote: (note) => noted(delivery.postGateNote(note)),
+    card: (proposal) => noted(delivery.card(proposal)),
+  };
+}
+
+/**
+ * Write the turn's usage record, and never let it cost the turn.
+ *
+ * A write that throws or outlasts its timeout is logged and dropped: the
+ * record is instrumentation, and instrumentation must not break or slow the
+ * thing it measures.
+ */
+async function recordTurn(record: TurnRecord, usage: TurnUsage): Promise<void> {
+  const timeoutMs = usage.writeTimeoutMs ?? USAGE_WRITE_TIMEOUT_MS;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await Promise.race([
+      usage.log.record(record),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`timed out after ${timeoutMs} ms`)), timeoutMs);
+      }),
+    ]);
+  } catch (err) {
+    console.error(
+      `[usage] turn ${record.turnId} not recorded: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
+  }
 }
 
 async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutcome> {
@@ -829,6 +954,7 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   telemetry.tools = run.tools;
   telemetry.references = run.references;
   telemetry.interim = interimCount;
+  if (run.spend) telemetry.spend = run.spend;
 
   const result = run.result;
 
@@ -1100,7 +1226,7 @@ async function settleVerdict(
     ? await ctx.deps.delivery.postGateNote(verdict.post.note)
     : undefined;
   const posted = said?.text;
-  await ctx.deps.applyVerdict(verdict);
+  const executed = await ctx.deps.applyVerdict(verdict);
   const remembered = (verdict.outcome === "won" ? ctx.note : undefined) ?? posted;
   if (remembered) await ctx.memory.remember(remembered);
   if (ctx.aside) {
@@ -1116,6 +1242,7 @@ async function settleVerdict(
     ...(staged ? { posted: staged.proposal.proposalText, staged } : posted ? { posted } : {}),
     wrote: ctx.memory.wrote(),
     telemetry: ctx.telemetry,
+    ...(executed ? { executed } : {}),
   };
 }
 
