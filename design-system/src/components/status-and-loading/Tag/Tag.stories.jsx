@@ -420,14 +420,17 @@ RemoveFocusRingOnTypes.play = async ({ canvasElement }) => {
  * upper-cases to two (ß is SS). A label that is not text has no initials, and
  * development says so unless an avatar is given. Leading content meant for a
  * plain tag is ignored on an avatar type, with a warning. A disabled tag that
- * is saving shows its spinner on a clear ground, not a grey disc.
+ * is saving shows its spinner on a clear ground, not a grey disc, and a broken
+ * avatar is still on initials once a save ends.
  */
 export const AvatarEdgeCases = {
     render: () => {
         const [mounted, setMounted] = useState(false);
+        const [saving, setSaving] = useState(false);
         return (
             <div style={row}>
                 <button type="button" onClick={() => setMounted(true)}>Mount the edge cases</button>
+                <button type="button" onClick={() => setSaving((v) => !v)}>Toggle saving</button>
                 {mounted && (
                     <>
                         <Tag type="agent" data-testid="emoji">😀 Helper</Tag>
@@ -439,6 +442,7 @@ export const AvatarEdgeCases = {
                         <TagContext.Provider value={{ isDisabled: true }}>
                             <Tag type="person" isLoading data-testid="disabled-saving">Rosa Chen</Tag>
                         </TagContext.Provider>
+                        <Tag type="person" avatar={BROKEN} isLoading={saving} data-testid="broken-saved">Rosa Chen</Tag>
                     </>
                 )}
             </div>
@@ -468,6 +472,31 @@ export const AvatarEdgeCases = {
 
             const saving = avatarOf(canvas.getByTestId('disabled-saving'));
             await expect(getComputedStyle(saving).backgroundColor, 'no grey disc behind the spinner').toBe(CLEAR);
+
+            // A broken avatar stays broken through a save: once the save ends,
+            // the tag is back on initials and does not retry the image.
+            const brokenSaved = canvas.getByTestId('broken-saved');
+            await waitFor(() => expect(brokenSaved.querySelector('img'), 'the broken image gives up').toBeNull());
+            const toggle = canvas.getByRole('button', { name: 'Toggle saving' });
+            await userEvent.click(toggle);
+            await expect(brokenSaved.querySelector('svg'), 'saving shows the spinner').not.toBeNull();
+            // A retried image could fail again within a frame, so watch for any
+            // image being added at all, not only for one still there.
+            let retried = 0;
+            const watch = new MutationObserver((records) => {
+                for (const r of records) {
+                    for (const n of r.addedNodes) {
+                        if (n.nodeName === 'IMG' || n.querySelector?.('img')) retried += 1;
+                    }
+                }
+            });
+            watch.observe(brokenSaved, { childList: true, subtree: true });
+            await userEvent.click(toggle);
+            await waitFor(() => expect(within(brokenSaved).getByText('RC'), 'back on initials after the save')
+                .toBeInTheDocument());
+            watch.disconnect();
+            await expect(retried, 'no image is retried').toBe(0);
+            await expect(brokenSaved.querySelector('img')).toBeNull();
         } finally {
             warn.mockRestore();
         }

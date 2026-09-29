@@ -120,6 +120,10 @@ const AvatarSpinner = () => (
  * While saving, the box holds the spinner instead. The box is the same size in
  * every case, so a photo that fails to load never moves the tag. Decorative:
  * the tag's words already name who it is.
+ *
+ * The avatar stays mounted through a save, so a source that failed before the
+ * save is still known to have failed after it: the tag goes back to initials
+ * rather than retrying the image.
  */
 const TagAvatar = ({ type, avatar, label, isLoading }) => {
     // The source that failed, not a flag: a new source is a fresh chance to
@@ -204,10 +208,11 @@ export const Tag = ({
     if (!hasAvatar && avatar) {
         warn('[Tag] `avatar` is only shown on type="person", "agent" or "team"; a plain tag leads with its swatch.');
     }
-    if (hasAvatar) {
-        for (const [name, value] of [['elemBefore', elemBefore], ['swatchBefore', swatchBefore]]) {
-            if (value) warn(`[Tag] \`${name}\` is ignored on type="${type}"; an avatar type leads with its avatar.`);
-        }
+    if (hasAvatar && elemBefore) {
+        warn(`[Tag] \`elemBefore\` is ignored on type="${type}"; an avatar type leads with its avatar.`);
+    }
+    if (hasAvatar && swatchBefore) {
+        warn(`[Tag] \`swatchBefore\` is ignored on type="${type}"; an avatar type leads with its avatar.`);
     }
     // Initials come from the words, so a label that is not text leaves the
     // avatar blank.
