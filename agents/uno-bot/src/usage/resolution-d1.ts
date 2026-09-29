@@ -23,9 +23,12 @@ export interface ResolutionDatabase {
 // What a person's signal may replace: nothing yet, or the pass's own answer.
 const PERSON_OPEN = "(resolution IS NULL OR resolution IN ('none', 'no_escalation'))";
 
+// A reacted message that is any turn's card is never an answer: one statement
+// still, the card lookup riding `turns_by_proposal`.
 const RECORD_REACTION =
   `UPDATE turns SET resolution = 'reaction', resolved_at = ?1 ` +
-  `WHERE turn_id = ?2 AND requester_id = ?3 AND ${PERSON_OPEN} RETURNING turn_id`;
+  `WHERE turn_id = ?2 AND requester_id = ?3 AND ${PERSON_OPEN} ` +
+  `AND NOT EXISTS (SELECT 1 FROM turns WHERE proposal_id = ?4) RETURNING turn_id`;
 
 const RECORD_TASK =
   `UPDATE turns SET resolution = 'task_completed', resolved_at = ?1 ` +
@@ -88,7 +91,7 @@ export function createD1ResolutionLog(deps: { db: ResolutionDatabase }): Resolut
   };
   return {
     recordReaction(q) {
-      return turnIdIfUpdated(db.prepare(RECORD_REACTION).bind(q.at, q.turnId, q.requesterId));
+      return turnIdIfUpdated(db.prepare(RECORD_REACTION).bind(q.at, q.turnId, q.requesterId, q.reactedTs));
     },
     recordTaskCompleted(proposalId, at) {
       return turnIdIfUpdated(db.prepare(RECORD_TASK).bind(at, proposalId));

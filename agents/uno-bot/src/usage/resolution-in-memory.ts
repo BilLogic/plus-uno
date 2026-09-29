@@ -34,6 +34,7 @@ export function createInMemoryResolutionLog(turns: InMemoryUsageLog): Resolution
   return {
     async recordReaction(q) {
       const turn = await turns.get(q.turnId);
+      if (turns.records().some((t) => t.proposalId === q.reactedTs)) return null;
       return turn && turn.requesterId === q.requesterId ? resolve(q.turnId, "reaction", q.at) : null;
     },
     async recordTaskCompleted(proposalId, at) {
