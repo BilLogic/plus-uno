@@ -55,9 +55,8 @@ const ACCEPTED_COLORS = ['grey', 'blue', 'green', 'purple', 'magenta', 'yellow',
 /*
  * `operational` has no place in the new set: a tag that performs an action
  * once is a button that looks like a tag. It keeps working as a plain button
- * with no pressed state, and warns. A button with a tag's look is a
- * selectable tag that says what else it is (`aria-expanded`, or its own
- * `aria-pressed`), as TagGroup's `+n` does.
+ * with no pressed state, and warns. A button with a tag's look that opens
+ * something is a selectable tag given `aria-expanded`, as TagGroup's `+n` is.
  */
 const DEPRECATED_VARIANTS = {
     'read-only': 'read-only',
@@ -166,7 +165,6 @@ export const Tag = ({
     count,
     elemBefore,
     swatchBefore,
-    hasSwatch = true,
     maxWidth = 180,
     href,
     linkComponent,
@@ -198,7 +196,7 @@ export const Tag = ({
     let resolved = behavior;
     if (!resolved && variant) {
         if (variant === 'operational') {
-            warn('[Tag] variant="operational" is deprecated; use behavior="selectable" with `aria-expanded` or your own `aria-pressed`.');
+            warn('[Tag] variant="operational" is deprecated; use behavior="selectable" with `aria-expanded`.');
         } else {
             warn(`[Tag] variant="${variant}" is deprecated; use behavior="${DEPRECATED_VARIANTS[variant]}".`);
         }
@@ -273,7 +271,7 @@ export const Tag = ({
         lead = <span className="plus-tag__spinner" aria-hidden="true" />;
     } else if (elemBefore) {
         lead = <span className="plus-tag__elem-before">{elemBefore}</span>;
-    } else if (!isAction && hasSwatch) {
+    } else if (!isAction) {
         lead = (
             <span
                 className={['plus-tag__swatch', swatchBefore ? 'plus-tag__swatch--custom' : ''].filter(Boolean).join(' ')}
@@ -342,21 +340,11 @@ export const Tag = ({
     const shared = { id, className: classes, style, ...rest };
 
     /*
-     * A disabled tag that is not a button has no native state to announce, so
-     * it carries `aria-disabled` itself: each tag says it, rather than a
-     * container role that has no disabled state of its own.
+     * A selectable tag is a toggle, so it publishes `aria-pressed`, unless the
+     * caller passes `aria-expanded`: then it is a button that opens something
+     * (TagGroup's `+n`), and "not pressed" would be the wrong thing to say.
      */
-    const spanShared = isDisabled ? { ...shared, 'aria-disabled': 'true' } : shared;
-
-    /*
-     * A selectable tag is a toggle, so it publishes `aria-pressed`. A caller
-     * that uses the look for something else says so: `aria-expanded` makes it
-     * a button that opens a menu, and an explicit `aria-pressed` (even
-     * `undefined`) replaces the toggle state with the caller's own.
-     */
-    const ownsPressed = Object.prototype.hasOwnProperty.call(rest, 'aria-pressed')
-        || rest['aria-expanded'] !== undefined;
-    const pressed = isSelectable && !ownsPressed ? isSelected : rest['aria-pressed'];
+    const pressed = isSelectable && rest['aria-expanded'] === undefined ? isSelected : undefined;
 
     if (isSelectable || isAction) {
         return (
@@ -432,10 +420,17 @@ export const Tag = ({
 
     return (
         <>
-            <span {...spanShared}>
+            <span {...shared}>
                 {lead}
                 {labelNode}
                 {removeButton}
+                {/*
+                  * A span has no disabled state a screen reader announces
+                  * (ARIA 1.2 does not support aria-disabled on a generic element), so a
+                  * disabled tag that is not a button says it in words: its
+                  * text is read as "Science, disabled".
+                  */}
+                {isDisabled && <span className="visually-hidden">, disabled</span>}
             </span>
             {status}
         </>
@@ -463,8 +458,6 @@ Tag.propTypes = {
     elemBefore: PropTypes.node,
     /** Overrides the swatch color, for a tag acting as a chart legend entry. Any CSS color. */
     swatchBefore: PropTypes.string,
-    /** `false` drops the swatch from a plain tag that counts rather than names a category, such as TagGroup's `+n`. */
-    hasSwatch: PropTypes.bool,
     /** Caps the whole tag (default 180). A clipped label ellipsizes and shows its full text as a tooltip. */
     maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** Where a `link` tag goes. */

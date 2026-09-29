@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
@@ -374,6 +374,99 @@ DigitBoundary.play = async ({ canvasElement }) => {
     await expect(seen.has('+9'), 'and crosses to +9').toBe(true);
 };
 
+/**
+ * A parent that re-renders with the same tags measures nothing and keeps its
+ * resize observer: only a change to the set, a resize, or a new cap measures.
+ */
+export const StableOnParentRender = () => {
+    const [renders, setRenders] = useState(0);
+    const [extra, setExtra] = useState(false);
+    const tags = extra ? [...SUBJECTS, 'Latin'] : SUBJECTS;
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '300px' }}>
+            <TagGroup label="Subjects" overflow="collapse">
+                {tags.map((s) => <Tag key={s} color="green">{s}</Tag>)}
+            </TagGroup>
+            <button type="button" onClick={() => setRenders((n) => n + 1)}>Re-render ({renders})</button>
+            <button type="button" onClick={() => setExtra(true)}>Add Latin</button>
+        </div>
+    );
+};
+
+StableOnParentRender.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const list = canvas.getByRole('list', { name: 'Subjects' });
+    await canvas.findByRole('button', { name: /more tags$/ });
+    // Let the observer's first report after mounting land before counting.
+    await frames(4);
+
+    const measured = spyOn(window, 'getComputedStyle');
+    const rebuilt = spyOn(ResizeObserver.prototype, 'disconnect');
+    const readsOfList = () => measured.mock.calls.filter(([el]) => el === list).length;
+    try {
+        for (let i = 0; i < 3; i += 1) {
+            await userEvent.click(canvas.getByRole('button', { name: /^Re-render/ }));
+        }
+        await expect(canvas.getByRole('button', { name: 'Re-render (3)' })).toBeInTheDocument();
+        await expect(readsOfList(), 'the same tags are not measured again').toBe(0);
+        await expect(rebuilt, 'the observer is kept').not.toHaveBeenCalled();
+
+        // A new tag is a new set: that measures.
+        await userEvent.click(canvas.getByRole('button', { name: 'Add Latin' }));
+        await waitFor(() => expect(readsOfList()).toBeGreaterThan(0));
+        await expect(canvas.getByRole('button', { name: /more tags$/ })).toHaveAccessibleName(
+            `${SUBJECTS.length + 1 - readCollapseList(list)} more tags`,
+        );
+    } finally {
+        measured.mockRestore();
+        rebuilt.mockRestore();
+    }
+};
+
+/** How many tags a person can see on a row. */
+const readCollapseList = (list) => Array.from(list.querySelectorAll('[role="listitem"]'))
+    .filter((el) => el.checkVisibility({ visibilityProperty: true }) && !el.querySelector('[aria-expanded]')).length;
+
+/**
+ * The first tag is replaced while it is squeezed: the row settles on the new
+ * tag's own width in the same frame, with no frame showing a wrong count.
+ */
+export const SqueezedFirstReplaced = () => {
+    const [first, setFirst] = useState('Science');
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ width: '90px' }}>
+                <TagGroup label="Squeezed" overflow="collapse">
+                    {[first, ...SUBJECTS.slice(1)].map((s) => <Tag key={s} color="green">{s}</Tag>)}
+                </TagGroup>
+            </div>
+            <button type="button" onClick={() => setFirst('Art history and visual culture')}>Replace first</button>
+        </div>
+    );
+};
+
+SqueezedFirstReplaced.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const list = canvas.getByRole('list', { name: 'Squeezed' });
+    await waitFor(() => expect(readCollapseList(list)).toBe(1));
+
+    // Record every count the row shows, frame by frame, across the swap.
+    const counts = [];
+    let watching = true;
+    const sample = () => {
+        counts.push(readCollapseList(list));
+        if (watching) requestAnimationFrame(sample);
+    };
+    requestAnimationFrame(sample);
+    await userEvent.click(canvas.getByRole('button', { name: 'Replace first' }));
+    await new Promise((resolve) => { setTimeout(resolve, 200); });
+    watching = false;
+
+    await expect(counts.every((n) => n === 1), `every frame shows one tag: ${counts.join(',')}`).toBe(true);
+    await expect(box(within(list).getByRole('button', { name: /more tags$/ })).right)
+        .toBeLessThanOrEqual(box(list).right + 0.5);
+};
+
 /* --------------------------------------------------------------- alignment */
 
 /**
@@ -441,12 +534,19 @@ export const Disabled = {
         const group = canvas.getByRole('list', { name: 'Focus areas' });
 
         // Every tag is inert and says so itself: no ×, no link, a disabled
-        // toggle, and each tag that is not a button carries aria-disabled.
+        // toggle, and each tag that is not a button reads "<label>, disabled"
+        // (a generic span has no disabled state a screen reader announces).
         await expect(within(group).queryByRole('button', { name: /^Remove/ })).toBeNull();
         await expect(within(group).queryByRole('link')).toBeNull();
         await expect(within(group).getByRole('button', { name: 'Selectable' })).toBeDisabled();
-        for (const id of ['read-only', 'removable', 'link']) {
-            await expect(canvas.getByTestId(id), `${id} is announced disabled`).toHaveAttribute('aria-disabled', 'true');
+        for (const [id, words] of [['read-only', 'Read only'], ['removable', 'Removable'], ['link', 'Link']]) {
+            const tag = canvas.getByTestId(id);
+            await expect(tag, `${id} is read as disabled`).toHaveTextContent(`${words}, disabled`);
+            await expect(tag).not.toHaveAttribute('aria-disabled');
+            // The words are for a screen reader only: nothing on screen changes.
+            const extra = within(tag).getByText(', disabled');
+            await expect(px(getComputedStyle(extra).width)).toBeLessThanOrEqual(1);
+            await expect(box(tag).width).toBeGreaterThan(box(within(tag).getByText(words)).width);
         }
 
         // Suggestions read the same context: still named, announced disabled.
@@ -458,7 +558,7 @@ export const Disabled = {
         // The collapsed group's +n is disabled with the rest.
         const collapsed = canvas.getByRole('list', { name: 'Collapsed focus areas' });
         await expect(await within(collapsed).findByRole('button', { name: /more tags$/ })).toBeDisabled();
-        await expect(canvas.getByTestId('collapsed-Science')).toHaveAttribute('aria-disabled', 'true');
+        await expect(canvas.getByTestId('collapsed-Science')).toHaveTextContent('Science, disabled');
 
         // Nothing between Before and After takes focus.
         canvas.getByRole('button', { name: 'Before' }).focus();

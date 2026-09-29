@@ -110,14 +110,9 @@ export const TagGroup = ({
     const digits = String(Math.max(items.length - 1, 1)).length;
     const widestLabel = format(Number('8'.repeat(digits)));
 
-    // What the last measurement found, read inside `measure` without making
-    // it change identity (and re-subscribe the observer) on every result.
-    const squeezedRef = useRef(false);
-    squeezedRef.current = squeezed;
-    // The first tag's width before it was squeezed, and which tag it was. A
-    // squeezed tag measures narrower than it is, and counting with that width
-    // would let more tags in beside it, squeezing it further.
-    const firstWidth = useRef({ key: null, width: 0 });
+    // The children's keys, as one string: what the set is, without the
+    // identity of a `children` array that every parent render makes anew.
+    const itemKeys = items.map((child) => child.key).join('|');
 
     const measure = useCallback(() => {
         const list = listRef.current;
@@ -125,29 +120,36 @@ export const TagGroup = ({
         const itemEls = Array.from(list.querySelectorAll(':scope > [data-tag-index]'));
         const ghost = list.querySelector(':scope > [data-tag-widest]');
         const gap = parseFloat(getComputedStyle(list).columnGap) || 0;
+
+        /*
+         * Every width is the tag's own, never a squeezed one: a squeezed first
+         * tag measures narrower than it is, and counting with that width would
+         * let more tags in beside it, squeezing it further. Its shrink is
+         * switched off for the reading and back on straight after, inside one
+         * task and before any paint, so nothing flashes, including when the
+         * first tag is replaced while squeezed.
+         */
+        const first = itemEls[0];
+        const shrink = first ? first.style.flexShrink : '';
+        if (first) first.style.flexShrink = '0';
         const widths = itemEls.map((el) => el.getBoundingClientRect().width);
-        if (widths.length) {
-            const key = itemEls[0].getAttribute('data-tag-key');
-            if (squeezedRef.current && firstWidth.current.key === key) {
-                widths[0] = Math.max(widths[0], firstWidth.current.width);
-            } else if (!squeezedRef.current) {
-                firstWidth.current = { key, width: widths[0] };
-            }
-        }
+        if (first) first.style.flexShrink = shrink;
+
         const overflowWidth = ghost ? ghost.getBoundingClientRect().width : 0;
         const next = countThatFit(widths, list.clientWidth, gap, overflowWidth, cap);
         setFit((prev) => (prev.count === next.count && prev.squeeze === next.squeeze ? prev : next));
     }, [collapses, cap]);
 
     /*
-     * Measured when something that sets a width changes: the children, the
-     * overflow mode or the cap here, and a resize of the row, a tag or the
-     * `+n` copy below (a label that changes, a font that loads). Opening the
-     * menu or any other render of this group measures nothing.
+     * Measured when something that sets a width changes: which tags there are,
+     * the overflow mode or the cap here, and a resize of the row, a tag or the
+     * `+n` copy below (a label that changes, a font that loads). A parent that
+     * re-renders the same tags, opening the menu, or any other render of this
+     * group measures nothing and keeps the same observer.
      */
     useLayoutEffect(() => {
         measure();
-    }, [measure, children, widestLabel]);
+    }, [measure, itemKeys, widestLabel]);
 
     useLayoutEffect(() => {
         const list = listRef.current;
@@ -166,21 +168,20 @@ export const TagGroup = ({
             cancelAnimationFrame(frame);
             observer.disconnect();
         };
-    }, [collapses, measure, children, widestLabel]);
+    }, [collapses, measure, itemKeys, widestLabel]);
 
     const menuIsOpen = menuOpen && !isDisabled;
 
     /*
-     * The `+n` is the Figma set's: a grey selectable tag with no swatch. It
-     * opens something rather than toggling, so it reports `aria-expanded` for
-     * its menu, or (when a caller's `onOverflowClick` opens something else)
-     * leaves the toggle state off rather than claim one.
+     * The `+n` is the Figma set's: a grey selectable tag with no swatch (the
+     * swatch is hidden in TagGroup.scss). It opens something rather than
+     * toggling, so it reports `aria-expanded`, which is also what keeps Tag
+     * from announcing it as a toggle.
      */
     const overflowTag = (label, extra) => (
         <Tag
             behavior="selectable"
             color="grey"
-            hasSwatch={false}
             className="plus-tag-group__overflow"
             {...extra}
         >
@@ -192,9 +193,10 @@ export const TagGroup = ({
     if (collapses && hidden > 0) {
         const tag = overflowTag(format(hidden), {
             'aria-label': `${hidden} more tags`,
-            ...(onOverflowClick
-                ? { onClick: onOverflowClick, 'aria-pressed': undefined }
-                : { 'aria-expanded': menuIsOpen }),
+            // With `onOverflowClick` the caller opens its own picker, which
+            // holds its own state, so `+n` stays collapsed.
+            'aria-expanded': onOverflowClick ? false : menuIsOpen,
+            onClick: onOverflowClick,
         });
         more = onOverflowClick ? tag : (
             // The menu is the library's Dropdown: the hidden tags are its items,
@@ -262,10 +264,11 @@ export const TagGroup = ({
                     </div>
                 )}
                 {collapses && items.length > 1 && (
-                    // The widest `+n` this set can show, out of sight and out
-                    // of the list, so its width can be reserved (see above).
+                    // The widest `+n` this set can show, measured so its width
+                    // can be reserved (see above). It is not a list item, and
+                    // it is hidden from sight and from assistive technology.
                     <div className="plus-tag-group__item plus-tag-group__item--hidden" data-tag-widest="" aria-hidden="true">
-                        {overflowTag(widestLabel, { tabIndex: -1, 'aria-pressed': undefined })}
+                        {overflowTag(widestLabel, { tabIndex: -1, 'aria-expanded': false })}
                     </div>
                 )}
             </div>

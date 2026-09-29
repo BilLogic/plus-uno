@@ -26,7 +26,7 @@ export const figmaMeta = {
       "source": "manual",
       "status": "verified",
       "isComponentSet": true,
-      "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on wrap, left and false. The Tags slot (preferred values Tag and Suggestion) is children. The +n is a grey behavior=selectable Tag with no swatch (hasSwatch false in code); code sizes the collapsed row by width, where Figma draws two tags and +n."
+      "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on wrap, left and false. The Tags slot (preferred values Tag and Suggestion) is children. The +n is a grey behavior=selectable Tag with no swatch (TagGroup hides it); code sizes the collapsed row by width, where Figma draws two tags and +n."
     }
   ]
 };
@@ -212,6 +212,11 @@ header where a second line would break the layout. Give the group a width to
 fit into: a group that can grow shows everything. Use `maxVisible` only to show
 fewer than fit.
 
+`+n` reserves room for the widest label it could show at its number of digits
+(`+88` when up to 99 tags are hidden), not for the label it shows now. That is
+what keeps the count steady as `+9` becomes `+10`, and it means a row can show
+one tag fewer than would squeeze in beside a narrower `+n`.
+
 ### Right-align for a right-aligned column.
 
 `alignment="right"` belongs in a table column whose other cells are
@@ -238,9 +243,12 @@ right-aligned. Everywhere else, tags read from the left.
 - **`+n` is named "n more tags"** and reports whether its menu is open. Enter
   or Space opens it, Tab reaches each hidden tag, and Escape closes it with
   focus back on `+n`.
-- **Disabled is announced per tag.** Every control in a disabled group is a
-  disabled button, every other tag carries `aria-disabled` itself, and nothing
-  in it takes focus.
+- **Disabled is announced per tag.** A selectable tag, a Suggestion and `+n`
+  are native disabled buttons, announced as disabled ("Selectable, toggle
+  button, dimmed" or the reader's equivalent). Every other tag is a plain span,
+  which has no disabled state a screen reader announces, so it carries
+  visually hidden text and is read as "Science, disabled". Nothing in a
+  disabled group takes focus.
 
 </div>
 

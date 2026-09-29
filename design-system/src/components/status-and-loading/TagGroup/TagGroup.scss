@@ -75,3 +75,8 @@
 .plus-tag-group__menu > :first-child {
     line-height: 0;
 }
+
+/* `+n` counts hidden tags; it names no category, so it has no swatch. */
+.plus-tag-group__overflow .plus-tag__swatch {
+    display: none;
+}
