@@ -222,8 +222,10 @@ export interface ProposalCard {
  * `slack/gate-note.ts` is where each becomes a line.
  */
 export type GateNote =
-  /** The claim was won and the signal brought no words of its own. */
-  | { kind: "resolved"; decision: "confirm" | "cancel" }
+  /** The claim was won and the signal brought no words of its own.
+   *  `stillRuns` names what a won ⛔ runs anyway, on a card that said a
+   *  cancel would (`PendingProposal.onCancel`). */
+  | { kind: "resolved"; decision: "confirm" | "cancel"; stillRuns?: string[] }
   /** The claim was won and the model said what it was doing. Prose, so it
    *  passes through — the same exemption `ProposalCard.lead` gets. */
   | { kind: "said"; text: string }

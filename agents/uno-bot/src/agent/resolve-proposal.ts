@@ -183,7 +183,10 @@ export async function runVerdict(
 
   // D5: announce a successful reviewable artifact to #plus-design (right place
   // + person + time). Best-effort — never let a fan-out failure break the flow.
-  for (const outcome of outcomes) {
+  // A card the Worker staged itself has no requester to name, and its own
+  // channel thread is where the result is followed (the Figma library card),
+  // so it asks nobody for a review here.
+  for (const outcome of run.requesterUserId ? outcomes : []) {
     if (!warrantsReviewRequest(outcome.toolName) || !outcome.ok) continue;
     try {
       await postReviewRequest(env, {

@@ -29,6 +29,7 @@
 import type { GateNote } from "../turn/index";
 import { PROPOSAL_TTL_MS } from "../thread-state/index";
 import { SLACK_USER_ID } from "./mrkdwn";
+import { gateWordsFor } from "../agent/tool-table";
 
 /** The lost race. */
 export const STALE_POST =
@@ -68,11 +69,25 @@ export function defaultNarrative(decision: "confirm" | "cancel"): string {
   return decision === "confirm" ? "Got it — kicking that off." : "Cancelled.";
 }
 
+/**
+ * A ⛔ on a card that runs part of itself on a cancel. Worded from each row's
+ * own operation kind, so it says what goes ahead rather than naming a tool.
+ */
+function cancelStillRuns(toolNames: readonly string[]): string {
+  const kinds = [...new Set(toolNames.map((name) => thirdPerson(gateWordsFor(name)?.kind ?? name)))];
+  return `Cancelled — this card still ${kinds.join(" and ")} on a cancel, so that part goes ahead.`;
+}
+
+/** "file an issue" → "files an issue": a row's kind is a bare verb phrase. */
+function thirdPerson(phrase: string): string {
+  return phrase.replace(/^(\w+)/, (verb) => (/(s|sh|ch|x)$/.test(verb) ? `${verb}es` : `${verb}s`));
+}
+
 /** One verdict, as the line a person reads. */
 export function renderGateNote(note: GateNote): string {
   switch (note.kind) {
     case "resolved":
-      return defaultNarrative(note.decision);
+      return note.stillRuns?.length ? cancelStillRuns(note.stillRuns) : defaultNarrative(note.decision);
     case "said":
       return note.text;
     case "already-resolved":
