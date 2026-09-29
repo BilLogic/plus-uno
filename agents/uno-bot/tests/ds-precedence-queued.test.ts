@@ -45,7 +45,7 @@ function weeklyThread(): PostedThread {
   };
 }
 
-function harness(opts: { disputeThrows?: boolean } = {}) {
+function harness(opts: { disputeThrows?: boolean; engages?: boolean } = {}) {
   const threadState = createInMemoryThreadState({ now: () => NOW });
   const record = { value: weeklyThread() as PostedThread | null };
   const turns: string[] = [];
@@ -80,6 +80,8 @@ function harness(opts: { disputeThrows?: boolean } = {}) {
         { channel: e.channel, threadTs: e.thread_ts!, user: e.user!, text: e.text ?? "" },
       );
     },
+    // Engages as the gate would in the weekly thread: on an @mention.
+    engages: async (e) => opts.engages ?? /<@/.test(e.text ?? ""),
     turn: async (e) => {
       turns.push(e.ts);
     },
@@ -137,6 +139,31 @@ describe("a dispute on the queued path", () => {
     assert.doesNotMatch(last, /Button|Cascader/);
     assert.equal(record.value?.cardTs, staged[1]!.proposalTs, "the thread record follows the live card");
     assert.equal(staged[0]!.supersedeKey, staged[1]!.supersedeKey, "the revision supersedes the first");
+  });
+
+  it("a dispute the thread declines runs no turn where the reply would not engage", async () => {
+    const { deps, record, turns, staged } = harness();
+    // An item not on the list, and a thread that is not the weekly one.
+    await runMessageJob(reply("1759500600.000001", "dispute 9"), deps);
+    await runMessageJob(reply("1759500600.000002", "dispute 1", { thread_ts: "1759400000.000001" }), deps);
+    assert.deepEqual(turns, []);
+    assert.deepEqual(staged, []);
+    assert.deepEqual(record.value?.disputed, []);
+    // With an @mention it would have engaged anyway, so its turn runs.
+    await runMessageJob(reply("1759500600.000003", "<@UBOT> dispute 9"), deps);
+    assert.deepEqual(turns, ["1759500600.000003"]);
+  });
+
+  it("a reply that only mentions disputing changes nothing", async () => {
+    const { deps, record, turns, staged } = harness();
+    for (const [ts, text] of [["1759500700.000001", "I wouldn't dispute 2"], ["1759500700.000002", "should we dispute 3?"]]) {
+      await runMessageJob(reply(ts!, text!), deps);
+    }
+    assert.deepEqual(staged, [], "no revised card");
+    assert.deepEqual(record.value?.disputed, []);
+    // Not a candidate, so it is an ordinary message: the harness runs its turn
+    // (the dispatch's gate would have dropped it first, as for any reply).
+    assert.equal(turns.length, 2);
   });
 
   it("an ordinary reply runs its turn", async () => {

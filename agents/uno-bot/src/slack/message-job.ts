@@ -11,24 +11,28 @@
 //   • the thread's runner takes one job at a time, so two quick disputes each
 //     read the thread record the other left;
 //   • a revision that throws falls through to the ordinary turn in the same
-//     job, so the reply is answered rather than dropped.
+//     job, so the reply is answered rather than dropped;
+//   • a dispute the thread declines (another thread, an item not on the list,
+//     a card already decided) runs a turn only where the reply would have
+//     engaged uno-bot anyway — queuing a candidate skipped that gate, so it
+//     is asked here.
 // A dispute posted "also send to channel" arrives as a `thread_broadcast`
 // subtype; it is the one subtype let through, and only as a dispute.
 
+import type { RunClaim } from "../thread-state/index";
 import type { SlackMessageEvent } from "./types";
-
-/** The run-lease answer `ThreadState.claimRun` gives. */
-export type RunClaimAnswer = "claimed" | "running" | "done";
 
 export interface MessageJobDeps {
   /** Claim the message's run key; fails open to "claimed" upstream. */
-  claim(runKey: string): Promise<RunClaimAnswer>;
+  claim(runKey: string): Promise<RunClaim>;
   /** Mark the run key done. Best-effort. */
   markDone(runKey: string): Promise<void>;
   /** Whether the event could be a weekly-thread dispute — no reads. */
   disputeCandidate(event: SlackMessageEvent): boolean;
   /** Handle it; true when it did, and the turn is then skipped. */
   dispute(event: SlackMessageEvent): Promise<boolean>;
+  /** Whether the reply engages uno-bot at all (`shouldHandleMessage`). */
+  engages(event: SlackMessageEvent): Promise<boolean>;
   /** The ordinary turn. */
   turn(event: SlackMessageEvent): Promise<void>;
 }
@@ -67,14 +71,17 @@ export async function runMessageJob(event: SlackMessageEvent, deps: MessageJobDe
   }
   try {
     if (candidate) {
+      let threw = false;
       const handled = await deps.dispute(event).catch((err: unknown) => {
         // A failed revision leaves the reply to the turn rather than to nobody.
         console.error(`[ds-precedence] dispute not handled: ${err instanceof Error ? err.message : String(err)}`);
+        threw = true;
         return false;
       });
       if (handled) return "handled";
       // A broadcast is let through only as a dispute.
       if (!isUserTurn(event)) return "handled";
+      if (!threw && !(await deps.engages(event))) return "handled";
     }
     await deps.turn(event);
   } finally {

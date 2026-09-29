@@ -263,6 +263,20 @@ export function runThreadStateConformance(
     assert.equal((await store.getProposalByTs("1700.2")).state, "superseded");
   });
 
+  // A card keyed apart shares a reply thread with the conversation's cards
+  // but supersedes only by its key: neither retires the other, and a card with
+  // the same key still replaces it.
+  it("a card with a supersedeKey is replaced only by its own key", async () => {
+    const { store } = setup();
+    const key = "ds-precedence:1700.1";
+    await store.putProposal(proposal({ proposalTs: "1700.2", replyTs: THREAD.thread, supersedeKey: key }));
+    await store.putProposal(proposal({ proposalTs: "1700.3", replyTs: THREAD.thread }));
+    assert.equal((await store.getProposalByTs("1700.2")).state, "found", "a turn's card leaves it live");
+    await store.putProposal(proposal({ proposalTs: "1700.4", replyTs: THREAD.thread, supersedeKey: key }));
+    assert.equal((await store.getProposalByTs("1700.3")).state, "found", "it leaves the turn's card live");
+    assert.equal((await store.getProposalByTs("1700.2")).state, "superseded", "its revision replaces it");
+  });
+
   // "superseded" and "expired" are different things to say to a person: one card
   // was replaced two seconds ago, the other aged out an hour ago.
   it("a superseded ts is not reported as expired", async () => {

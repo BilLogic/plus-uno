@@ -248,7 +248,10 @@ export interface PendingProposal {
    * Worker stages into a thread people also talk in sets its own key (the
    * weekly DS precedence card): only a card with the same key replaces it, it
    * replaces nothing else, and a turn in that thread does not treat it as the
-   * card its own proposal revises (`revisedBy`).
+   * card its own proposal revises (`revisedBy`). While a turn's card is live
+   * beside it, the thread's pending card — what a typed ✅ resolves — is the
+   * newer of the two, as `getProposalByThread` always answers; a reaction or
+   * button on either card resolves that card.
    */
   supersedeKey?: string;
 }

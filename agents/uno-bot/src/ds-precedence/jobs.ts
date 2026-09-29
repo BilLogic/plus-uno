@@ -3,7 +3,11 @@
 //   • the CHECK — Friday's end-of-day run (`ds-precedence-check`,
 //     src/scheduled/runs.ts): read, compare, and keep the report in KV for the
 //     morning. It posts nothing. A clean week keeps nothing, and clears a
-//     report no morning ever posted, so a stale list never goes out.
+//     report no morning ever posted, so a stale list never goes out. So does a
+//     library that answers fewer sets than `MIN_LIBRARY_RATIO` of the indexed
+//     components: that is a Figma or token fault, not a library that emptied
+//     overnight, and reporting every component missing would file a wrong
+//     intake — the week is skipped, logged once.
 //   • the POST — every morning run (`ds-precedence-post`): when a report is
 //     waiting, open ONE thread in #plus-universal — the list — and put the
 //     card in it. The card files the weekly intake, or comments on the one
@@ -55,6 +59,8 @@ import {
 
 /** How long the weekly card stays confirmable: gone before next week's. */
 export const PRECEDENCE_CARD_TTL_MS = 6 * 24 * 60 * 60 * 1000;
+/** The fewest published sets per indexed component the check believes. */
+const MIN_LIBRARY_RATIO = 0.5;
 /** A revision close to expiry still gets this long. */
 const MIN_REVISION_TTL_MS = 60 * 60 * 1000;
 
@@ -121,7 +127,7 @@ export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boole
   const index = parseComponentIndex(markdown);
   if (!index.length) throw new Error("the component index listed no components — refusing to report every one missing");
   const library = liveLibraryFrom(components);
-  if (library.sets.length < index.length / 2) {
+  if (library.sets.length < index.length * MIN_LIBRARY_RATIO) {
     // An empty or near-empty answer is a Figma or permissions fault, not a
     // library that lost most of its components overnight: reporting every
     // component missing would file a wrong intake. The week is skipped.
@@ -274,9 +280,7 @@ export interface ThreadReply {
 /**
  * The items a reply newly disputes in the live weekly thread — empty when it
  * is not a dispute, not in that thread, after the card expired, or names only
- * items that are not on the list or already dropped. Both the dispute and the
- * @mention guard ask this, so a reply one of them declines the other does too
- * and the agent answers it.
+ * items that are not on the list or already dropped.
  *
  * @param thread - The posted thread, or null
  * @param reply - The reply

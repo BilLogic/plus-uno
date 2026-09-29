@@ -36,7 +36,7 @@ import { runSlackTurn } from "./turn-adapter";
 import { stripBotMentions } from "./mention";
 import { cardThreadOf, turnSurfaceOf } from "../turn/request";
 import { isIntakeChannel } from "../turn/intake-channel";
-import { handleDsPrecedenceReply, isDsPrecedenceCandidate, isScheduledOnlyThread } from "../ds-precedence/env";
+import { handleDsPrecedenceReply, isDsPrecedenceCandidate, isWeeklyPrecedenceThread } from "../ds-precedence/env";
 import { typedEmojiDecision } from "../gate/reactions";
 import { isUserTurn, runMessageJob } from "./message-job";
 
@@ -352,7 +352,7 @@ export async function shouldHandleMessage(env: Env, event: SlackMessageEvent): P
     // DS precedence list and card) is a place people talk about those posts,
     // not to uno-bot: engage on an @mention (above) or a typed gate emoji,
     // until uno-bot has answered in it. `dispute N` is queued on its own.
-    if (await isScheduledOnlyThread(env, event.channel, event.thread_ts)) {
+    if (await isWeeklyPrecedenceThread(env, event.channel, event.thread_ts)) {
       if (typedEmojiDecision(event.text ?? "")) return true;
       return (await store.readHistory(ref)).length > 0;
     }
@@ -416,6 +416,7 @@ async function onMessage(env: Env, event: SlackMessageEvent): Promise<"handled" 
     markDone: (runKey) => store.markRunDone(runKey).catch(() => {}),
     disputeCandidate: (e) => isDsPrecedenceCandidate(env, e),
     dispute: (e) => handleDsPrecedenceReply(env, e),
+    engages: (e) => shouldHandleMessage(env, e),
     turn: (e) => handleUserMessage(env, e),
   });
 }

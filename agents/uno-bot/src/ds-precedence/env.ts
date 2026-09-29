@@ -136,15 +136,16 @@ export async function handleDsPrecedenceReply(env: Env, event: SlackMessageEvent
 }
 
 /**
- * Whether a #plus-universal thread is the weekly DS precedence thread — one
- * whose only uno-bot posts are its scheduled list and card. One KV read, and
- * only for a thread reply in that channel.
+ * Whether a #plus-universal thread is the weekly DS precedence thread, where
+ * uno-bot posted its scheduled list and card. The engagement gate pairs it
+ * with the thread's history: until uno-bot has answered there, those are its
+ * only posts. One KV read, and only for a thread reply in that channel.
  *
  * @param env - Worker bindings
  * @param channel - The reply's channel
  * @param threadTs - The reply's thread
  */
-export async function isScheduledOnlyThread(env: Env, channel: string, threadTs: string): Promise<boolean> {
+export async function isWeeklyPrecedenceThread(env: Env, channel: string, threadTs: string): Promise<boolean> {
   if (!env.HARNESS_KV || channel !== env.PLUS_UNIVERSAL_CHANNEL_ID?.trim()) return false;
   const thread = await kvJson<PostedThread | null>(env, THREAD_KV_KEY, null).read();
   return !!thread && thread.channel === channel && thread.ts === threadTs;

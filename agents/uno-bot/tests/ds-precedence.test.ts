@@ -29,7 +29,7 @@ import {
   type PostDeps,
   type PrecedenceReport,
 } from "../src/ds-precedence/jobs";
-import { handleDsPrecedenceReply, isDsPrecedenceCandidate, isScheduledOnlyThread } from "../src/ds-precedence/env";
+import { handleDsPrecedenceReply, isDsPrecedenceCandidate, isWeeklyPrecedenceThread } from "../src/ds-precedence/env";
 import type { SlackMessageEvent } from "../src/slack/types";
 import type { Env } from "../src/types";
 import { resolveSignal, type GateSignal } from "../src/gate/index";
@@ -641,10 +641,10 @@ describe("the Slack hook", () => {
   });
 
   it("knows the weekly thread, so its replies are not all turns", async () => {
-    assert.equal(await isScheduledOnlyThread(env([]), CHANNEL, thread.ts), true);
-    assert.equal(await isScheduledOnlyThread(env([]), CHANNEL, "1.1"), false);
+    assert.equal(await isWeeklyPrecedenceThread(env([]), CHANNEL, thread.ts), true);
+    assert.equal(await isWeeklyPrecedenceThread(env([]), CHANNEL, "1.1"), false);
     const reads: string[] = [];
-    assert.equal(await isScheduledOnlyThread(env(reads), "C0OTHER", thread.ts), false);
+    assert.equal(await isWeeklyPrecedenceThread(env(reads), "C0OTHER", thread.ts), false);
     assert.deepEqual(reads, [], "another channel reads nothing");
   });
 });
