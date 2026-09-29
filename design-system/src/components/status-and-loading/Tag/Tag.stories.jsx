@@ -146,7 +146,7 @@ const avatarOf = (tag) => tag.querySelector('[aria-hidden="true"]');
 /**
  * The four types. A person, an agent or a team carries a 16 avatar in place of
  * the swatch: round for a person (and the whole tag is round), a hexagon for an
- * agent, a rounded square for a team. With no `avatar`, initials stand in.
+ * agent, a square with radius-2 corners for a team. With no `avatar`, initials stand in.
  */
 export const Types = () => (
     <div style={row}>
@@ -162,7 +162,7 @@ export const Types = () => (
 
 /**
  * Every type is 22 tall with a 16 avatar. A person is fully round, and so is
- * its ×; an agent's avatar is a hexagon; a team's is a square with 2 corners.
+ * its ×; an agent's avatar is a hexagon; a team's is a square with radius-2 corners.
  * The border is neutral on every avatar type, and the color goes to the
  * avatar's fill.
  */
@@ -205,7 +205,7 @@ Types.play = async ({ canvasElement }) => {
         await expect(clip, 'pointed at the top').toContain('50% 0%');
     }
 
-    // A team is a square with 2 corners; a person photo is round.
+    // A team is a square with radius-2 corners; a person photo is round.
     await expect(px(getComputedStyle(avatarOf(canvas.getByTestId('team'))).borderTopLeftRadius)).toBe(2);
     await expect(px(getComputedStyle(avatarOf(canvas.getByTestId('team-photo'))).borderTopLeftRadius)).toBe(2);
     await expect(px(getComputedStyle(avatarOf(canvas.getByTestId('person-photo'))).borderTopLeftRadius))
@@ -339,6 +339,17 @@ export const TypeBehaviors = {
             await expect(tag.getBoundingClientRect().width, `${type}: saving keeps the width`).toBe(before);
             await expect(within(tag).queryByText(/^[A-Z]{1,2}$/), 'the avatar gives way to the spinner').toBeNull();
             await expect(px(getComputedStyle(avatarOf(tag)).width), 'in the same 16 box').toBe(16);
+
+            // The avatar spinner is Figma's: a 3/4 arc in on-surface-variant,
+            // 12 across, whatever the tag's color.
+            const spinner = avatarOf(tag).firstElementChild;
+            const ring = spinner.querySelector('circle');
+            const ink = tokenColor(canvasElement, '--color-on-surface-variant');
+            await expect(px(getComputedStyle(spinner).width), 'a 12 spinner').toBe(12);
+            await expect(getComputedStyle(ring).stroke, 'in on-surface-variant').toBe(ink);
+            await expect(px(getComputedStyle(ring).strokeWidth), 'a 1.8 ring').toBeCloseTo(1.8, 5);
+            const [arc, round] = getComputedStyle(ring).strokeDasharray.split(',').map(px);
+            await expect(arc / round, 'three quarters of the ring').toBeCloseTo(0.75, 2);
             await expect(tag.nextElementSibling, 'announced beside the tag').toHaveAttribute('role', 'status');
             await expect(tag.nextElementSibling).toHaveTextContent('Saving');
             await userEvent.click(canvas.getByRole('button', { name: `Save ${type}` }));
@@ -376,6 +387,91 @@ PersonFocusRing.play = async ({ canvasElement }) => {
     await expect(x).toHaveFocus();
     await expect(getComputedStyle(x).outlineColor).toBe(ring);
     await expect(px(getComputedStyle(x).borderTopLeftRadius), 'and a round ×').toBeGreaterThanOrEqual(8);
+};
+
+/**
+ * The × on an agent or team tag keeps the plain 2 corners, and its focus ring
+ * lands on Figma's radius-150: the ring's outer corner is the ×'s 2, plus the
+ * 2 offset, plus the 2 stroke.
+ */
+export const RemoveFocusRingOnTypes = () => (
+    <div style={row}>
+        <Tag type="agent" behavior="removable" onRemove={() => {}}>PLUS AI</Tag>
+        <Tag type="team" behavior="removable" onRemove={() => {}}>Math team</Tag>
+    </div>
+);
+
+RemoveFocusRingOnTypes.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const name of ['Remove PLUS AI', 'Remove Math team']) {
+        await userEvent.tab();
+        const x = canvas.getByRole('button', { name });
+        await expect(x).toHaveFocus();
+        const s = getComputedStyle(x);
+        await expect(s.outlineStyle, name).toBe('solid');
+        const outer = px(s.borderTopLeftRadius) + px(s.outlineOffset) + px(s.outlineWidth);
+        await expect(outer, `${name}: the ring's outer corner is radius-150`).toBe(6);
+    }
+};
+
+/**
+ * The edges of the fallback. Initials are whole characters, so an emoji or an
+ * accented letter is never split, and never more than two, even when a letter
+ * upper-cases to two (ß is SS). A label that is not text has no initials, and
+ * development says so unless an avatar is given. Leading content meant for a
+ * plain tag is ignored on an avatar type, with a warning. A disabled tag that
+ * is saving shows its spinner on a clear ground, not a grey disc.
+ */
+export const AvatarEdgeCases = {
+    render: () => {
+        const [mounted, setMounted] = useState(false);
+        return (
+            <div style={row}>
+                <button type="button" onClick={() => setMounted(true)}>Mount the edge cases</button>
+                {mounted && (
+                    <>
+                        <Tag type="agent" data-testid="emoji">😀 Helper</Tag>
+                        <Tag type="person" data-testid="eszett">ßen Öztürk</Tag>
+                        <Tag type="person" data-testid="node"><em>Rosa Chen</em></Tag>
+                        <Tag type="person" avatar={PHOTO} data-testid="node-with-avatar"><em>Kai Brooks</em></Tag>
+                        <Tag type="team" elemBefore={<i className="fa-solid fa-star" />} data-testid="elem">Math team</Tag>
+                        <Tag type="team" swatchBefore="#ff0000" data-testid="swatch">Science team</Tag>
+                        <TagContext.Provider value={{ isDisabled: true }}>
+                            <Tag type="person" isLoading data-testid="disabled-saving">Rosa Chen</Tag>
+                        </TagContext.Provider>
+                    </>
+                )}
+            </div>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const warn = spyOn(console, 'warn').mockImplementation(() => {});
+        try {
+            await userEvent.click(canvas.getByRole('button', { name: 'Mount the edge cases' }));
+
+            await expect(avatarOf(canvas.getByTestId('emoji')).textContent, 'an emoji stays whole').toBe('😀');
+            const eszett = avatarOf(canvas.getByTestId('eszett')).textContent;
+            await expect(Array.from(eszett).length, 'never more than two').toBeLessThanOrEqual(2);
+            await expect(eszett).toBe('SS');
+            await expect(avatarOf(canvas.getByTestId('node')).textContent, 'a node has no initials').toBe('');
+
+            const messages = warn.mock.calls.map(([m]) => String(m));
+            await expect(messages.some((m) => m.includes('no initials')), 'a node label with no avatar warns')
+                .toBe(true);
+            await expect(messages.some((m) => m.includes('`elemBefore`'))).toBe(true);
+            await expect(messages.some((m) => m.includes('`swatchBefore`'))).toBe(true);
+
+            // The team keeps its avatar, not the star or the red swatch.
+            await expect(canvas.getByTestId('elem').querySelector('.fa-star')).toBeNull();
+            await expect(px(getComputedStyle(avatarOf(canvas.getByTestId('swatch'))).width)).toBe(16);
+
+            const saving = avatarOf(canvas.getByTestId('disabled-saving'));
+            await expect(getComputedStyle(saving).backgroundColor, 'no grey disc behind the spinner').toBe(CLEAR);
+        } finally {
+            warn.mockRestore();
+        }
+    },
 };
 
 /* -------------------------------------------------------------- selectable */

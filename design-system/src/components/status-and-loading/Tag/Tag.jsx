@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Count from '../Count';
 import Tooltip from '../../overlays/Tooltip';
@@ -20,7 +20,7 @@ import './Tag.scss';
  * FOUR TYPES. A plain tag leads with the swatch. A person, an agent or a team
  * leads with a 16 avatar in its place, shaped so the three never read as one
  * another: a person is round (and so is the whole tag, and its ×), an agent is
- * a hexagon, a team is a square with 2 corners. The tag stays 22 tall and pads
+ * a hexagon, a team is a square with radius-2 corners. The tag stays 22 tall and pads
  * 4 on the avatar side, as a plain tag does on its swatch side.
  *
  * NO `disabled` PROP. A tag is disabled because the field holding it is: the
@@ -86,9 +86,12 @@ const initialsOf = (label, type) => {
     if (typeof label !== 'string') return '';
     const words = label.trim().split(/\s+/).filter(Boolean);
     if (!words.length) return '';
-    const first = words[0][0];
-    const last = type === 'person' && words.length > 1 ? words[words.length - 1][0] : '';
-    return `${first}${last}`.toUpperCase();
+    // Whole characters, not UTF-16 halves, so an emoji is never split.
+    const firstChar = (word) => Array.from(word)[0];
+    const first = firstChar(words[0]);
+    const last = type === 'person' && words.length > 1 ? firstChar(words[words.length - 1]) : '';
+    // Capped after upper-casing, since one letter can become two (ß is SS).
+    return Array.from(`${first}${last}`.toUpperCase()).slice(0, 2).join('');
 };
 
 /**
@@ -98,13 +101,14 @@ const initialsOf = (label, type) => {
  * moves the tag. Decorative: the tag's words already name who it is.
  */
 const TagAvatar = ({ type, avatar, label }) => {
-    const [failed, setFailed] = useState(false);
-    // A new source gets a fresh chance to load.
-    useEffect(() => setFailed(false), [avatar]);
+    // The source that failed, not a flag: a new source is a fresh chance to
+    // load without an effect to reset anything.
+    const [failedSrc, setFailedSrc] = useState(null);
+    const failed = failedSrc === avatar;
 
     let content;
     if (typeof avatar === 'string' && avatar && !failed) {
-        content = <img className="plus-tag__avatar-img" src={avatar} alt="" onError={() => setFailed(true)} />;
+        content = <img className="plus-tag__avatar-img" src={avatar} alt="" onError={() => setFailedSrc(avatar)} />;
     } else if (avatar && typeof avatar !== 'string') {
         content = avatar;
     } else {
@@ -117,6 +121,18 @@ const TagAvatar = ({ type, avatar, label }) => {
         </span>
     );
 };
+
+/*
+ * The spinner in an avatar's box, drawn as Figma draws it: a 12 ring, 1.8
+ * thick, three quarters of the way round. It is an SVG stroke rather than a
+ * border because a browser rounds a 1.8 border down to whole device pixels.
+ * The arc is 3/4 of the centerline's circumference (r 5.1: 2 × π × 5.1 = 32.04).
+ */
+const AvatarSpinner = () => (
+    <svg className="plus-tag__avatar-spinner" viewBox="0 0 12 12" focusable="false">
+        <circle cx="6" cy="6" r="5.1" fill="none" strokeWidth="1.8" strokeDasharray="24.03 32.04" />
+    </svg>
+);
 
 export const Tag = ({
     text,
@@ -172,6 +188,17 @@ export const Tag = ({
     if (!hasAvatar && avatar) {
         warn('[Tag] `avatar` is only shown on type="person", "agent" or "team"; a plain tag leads with its swatch.');
     }
+    if (hasAvatar && elemBefore) {
+        warn(`[Tag] \`elemBefore\` is ignored on type="${type}"; an avatar type leads with its avatar.`);
+    }
+    if (hasAvatar && swatchBefore) {
+        warn(`[Tag] \`swatchBefore\` is ignored on type="${type}"; an avatar type leads with its avatar.`);
+    }
+    // Initials come from the words, so a label that is not text leaves the
+    // avatar blank.
+    if (hasAvatar && !avatar && typeof label !== 'string') {
+        warn(`[Tag] the label is not text, so a type="${type}" tag has no initials to fall back on. Pass \`avatar\`.`);
+    }
 
     const isSelectable = resolved === 'selectable';
     const isAction = resolved === 'action';
@@ -221,7 +248,7 @@ export const Tag = ({
     if (isLoading && hasAvatar) {
         lead = (
             <span className="plus-tag__avatar plus-tag__avatar--saving" aria-hidden="true">
-                <span className="plus-tag__spinner" />
+                <AvatarSpinner />
             </span>
         );
     } else if (isLoading) {
@@ -391,7 +418,7 @@ Tag.propTypes = {
     behavior: PropTypes.oneOf(TAG_BEHAVIORS),
     /** Deprecated: use `behavior`. `dismissible` is `removable`; `operational` renders a plain button. */
     variant: PropTypes.oneOf(TAG_VARIANTS),
-    /** A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. On an avatar type the border is neutral and the color fills the avatar. */
+    /** A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`. On an avatar type the border is neutral and the color fills the avatar; grey agents fill AI purple and grey teams Technology Tools blue. */
     color: PropTypes.oneOf(ACCEPTED_COLORS),
     /** What the tag names. `plain` leads with the swatch; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. */
     type: PropTypes.oneOf(TAG_TYPES),

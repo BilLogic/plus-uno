@@ -4,7 +4,8 @@
  * ONE SIZE: 22 tall including a 1px border, B3 12 text, padding 4, gap 4,
  * radius 4. The label heights (16/20/22/32) have no semantic token yet, so the
  * 22 is a local custom property with its value as the default, as Count does.
- * The swatch 10, radius 2 and × 16 are Figma-bound spacing and radius
+ * The swatch 10, radius 2, × 16, the 16 avatar box (space-300) and the 12
+ * spinner inside it (space-200) are Figma-bound spacing and radius
  * primitives, because no Element token names them.
  *
  * THE COLOR MAP. Per name: the subtle border, the hue (swatch, spinner and the
@@ -145,8 +146,15 @@ $tag-colors: (
 
 /*
  * Grey avatars, as the Figma set draws them: a grey agent sits on the
- * Mastering Content Container (the AI purple) and a grey team on the Technology
- * Tools 08 layer, so neither reads as a person's neutral disc.
+ * Mastering Content Container (the AI purple) and a grey team on Technology
+ * Tools 08, so neither reads as a person's neutral disc.
+ *
+ * The team fill is a state layer used at rest, which
+ * guidelines/foundations/color.md keeps for interaction ("Use state layers for
+ * interaction"; "Use `-container` for backgrounds"). It stays because Figma
+ * binds this exact variable on all 16 team variants on purpose: an 08 wash is
+ * paler than any Container, and the rule is Bill's call rather than this
+ * stylesheet's. The avatar is never interactive, so no hover layer stacks on it.
  */
 .plus-tag--grey.plus-tag--agent {
     --plus-tag-avatar: var(--color-mastering-content-container, #f2daff);
@@ -385,9 +393,18 @@ $tag-colors: (
     animation: plus-tag-spin 0.8s linear infinite;
 }
 
-.plus-tag__avatar--saving > .plus-tag__spinner {
+/*
+ * In an avatar's box the spinner is Figma's: 12 across, in on-surface-variant
+ * on every color, a 3/4 arc with a 1.8 ring. The 1.8 lives in the SVG's
+ * stroke-width, a literal because no stroke token is 1.8.
+ */
+.plus-tag__avatar-spinner {
+    display: block;
     width: var(--size-spacing-medium-space-200, 12px);
     height: var(--size-spacing-medium-space-200, 12px);
+    color: var(--color-on-surface-variant, #3f484a);
+    stroke: currentColor;
+    animation: plus-tag-spin 0.8s linear infinite;
 }
 
 @keyframes plus-tag-spin {
@@ -395,7 +412,8 @@ $tag-colors: (
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .plus-tag__spinner {
+    .plus-tag__spinner,
+    .plus-tag__avatar-spinner {
         animation-duration: 2.4s;
     }
 }
@@ -442,7 +460,8 @@ $tag-colors: (
 }
 
 /* A disabled avatar's fill and initials follow the tag's own. */
-.plus-tag--disabled .plus-tag__avatar {
+/* Saving keeps its clear ground, so the spinner never sits on a grey disc. */
+.plus-tag--disabled .plus-tag__avatar:not(.plus-tag__avatar--saving) {
     background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
 }
 
