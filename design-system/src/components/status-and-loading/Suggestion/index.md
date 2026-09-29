@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/status-and-loading/Suggestion/Suggestion.jsx`
 
-**Stories:** `design-system/src/components/status-and-loading/Suggestion/Suggestion.stories.jsx` — Types, InATagRow, Callbacks, StateLayers, FocusRing, AcceptIntoTags, Interactive
+**Stories:** `design-system/src/components/status-and-loading/Suggestion/Suggestion.stories.jsx` — Types, InATagRow, Callbacks, StateLayers, FocusRing, DisabledBesideTags, AcceptIntoTags, Interactive
 
 **Storybook page:** `design-system/src/components/status-and-loading/Suggestion/Suggestion.mdx`
 
@@ -32,7 +32,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-focus-ring` · `--color-mastering-content-border-subtle` · `--color-mastering-content-state-08` · `--color-mastering-content-state-16` · `--color-mastering-content-text` · `--font-size-fa-body2` · `--plus-suggestion-height` · `--size-element-border` · `--size-element-gap-xs` · `--size-element-pad-x-xs` · `--size-element-radius-md` · `--size-element-stroke-lg`
+`--color-focus-ring` · `--color-mastering-content-border-subtle` · `--color-mastering-content-state-08` · `--color-mastering-content-state-16` · `--color-mastering-content-text` · `--color-on-surface-state-12` · `--color-outline-variant` · `--color-secondary-text` · `--font-size-fa-body2` · `--plus-suggestion-height` · `--size-element-border` · `--size-element-gap-xs` · `--size-element-pad-x-xs` · `--size-element-radius-md` · `--size-element-stroke-lg`
 
 From `design-system/src/components/status-and-loading/Suggestion/Suggestion.scss`. Override these through the token layer, never with a literal.
 
