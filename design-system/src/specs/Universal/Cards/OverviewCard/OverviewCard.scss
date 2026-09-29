@@ -203,9 +203,18 @@
             color: var(--color-social-emotional-text, #674a00);
         }
 
+        // The glyph itself, not its container, so the non-text bar applies
+        // only to an icon: a Font Awesome glyph or an svg.
         .plus-overview-card__icon {
-            // @contrast: non-text
-            color: var(--color-social-emotional, #8c6600);
+            .fa,
+            .fas,
+            .far,
+            .fa-solid,
+            .fa-regular,
+            svg {
+                // @contrast: non-text
+                color: var(--color-social-emotional, #8c6600);
+            }
         }
     }
 
@@ -221,9 +230,18 @@
             color: var(--color-mastering-content-text, #673a8b);
         }
 
+        // The glyph itself, not its container, so the non-text bar applies
+        // only to an icon: a Font Awesome glyph or an svg.
         .plus-overview-card__icon {
-            // @contrast: non-text
-            color: var(--color-mastering-content, #8659a9);
+            .fa,
+            .fas,
+            .far,
+            .fa-solid,
+            .fa-regular,
+            svg {
+                // @contrast: non-text
+                color: var(--color-mastering-content, #8659a9);
+            }
         }
     }
 
