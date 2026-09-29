@@ -46,15 +46,15 @@ const AiPromptedQuestionBox = ({
         const skeletonBar = {
             height: 'var(--font-size-body3)',
             borderRadius: 'var(--size-element-radius-md)',
-            backgroundColor: 'var(--color-mastering-content-state-28, var(--color-mastering-content-state-16))',
+            backgroundColor: 'var(--color-mastering-content-state-16)',
         };
         return (
             <div className={className} role="status" aria-live="polite" style={shellStyle}>
                 <Spinner size="sm" variant="border" />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)', flex: 1, minWidth: 0 }}>
-                    <div style={{ ...skeletonBar, width: '84%' }} />
-                    <div style={{ ...skeletonBar, width: '60%' }} />
-                    <div style={{ ...skeletonBar, width: '36%' }} />
+                    <div data-testid="skeleton-bar" style={{ ...skeletonBar, width: '84%' }} />
+                    <div data-testid="skeleton-bar" style={{ ...skeletonBar, width: '60%' }} />
+                    <div data-testid="skeleton-bar" style={{ ...skeletonBar, width: '36%' }} />
                     <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
                         Preparing your question…
                     </span>
