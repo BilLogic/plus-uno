@@ -2,6 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './Divider.scss';
 
+/** Deprecated sizes, still accepted, and the size each one now means. */
+const DEPRECATED_SIZES = { '2.5px': 'xl' };
+
+/** Deprecated sizes already warned about: each one says so once per session. */
+const warned = new Set();
+
+const warnDeprecatedSize = (size) => {
+    if (process.env.NODE_ENV === 'production' || warned.has(size)) return;
+    warned.add(size);
+    // eslint-disable-next-line no-console
+    console.warn(`[Divider] size="${size}" is deprecated; use size="${DEPRECATED_SIZES[size]}".`);
+};
+
 const Divider = ({
     size = 'md',
     style = 'light',
@@ -22,6 +35,7 @@ const Divider = ({
         "2.5px": "xl"
     };
 
+    if (DEPRECATED_SIZES[size]) warnDeprecatedSize(size);
     const sizeClass = sizeMap[size] || "md";
 
     const classes = [
@@ -45,7 +59,7 @@ const Divider = ({
 };
 
 Divider.propTypes = {
-    /** Thickness: sm 1px, md 1.5px, lg 2px, xl 3px. The pixel strings alias the names; "2.5px" maps to xl and draws 3px. */
+    /** Thickness: sm 1px, md 1.5px, lg 2px, xl 3px. The pixel strings alias the names. `2.5px` is a deprecated alias for `xl`: it draws 3px; use `xl`. */
     size: PropTypes.oneOf(['sm', 'md', 'lg', 'xl', '1px', '1.5px', '2px', '2.5px']),
     style: PropTypes.oneOf(['light', 'dark']),
     opacity10: PropTypes.bool,

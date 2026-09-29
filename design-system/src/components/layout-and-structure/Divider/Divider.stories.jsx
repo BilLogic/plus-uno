@@ -1,5 +1,5 @@
-import React from 'react';
-import { expect } from 'storybook/test';
+import React, { useState } from 'react';
+import { expect, spyOn, userEvent, within } from 'storybook/test';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Divider from '@/components/layout-and-structure/Divider';
@@ -12,6 +12,7 @@ export default {
         changelog: [
             { date: '2026-09-29', kind: 'changed', summary: '`xl` is 3px instead of 2.5px: `--size-element-stroke-xl` now resolves to stroke-300, as Figma\'s Element/stroke-xl does.' },
             { date: '2026-09-29', kind: 'changed', summary: '`size="2.5px"` now draws 3px: the alias still maps to `xl`.' },
+            { date: '2026-09-29', kind: 'deprecated', summary: '`size="2.5px"` is deprecated: use `size="xl"`. It still draws xl (3px) and warns once in development.' },
         ],
         docs: {
             description: {
@@ -173,6 +174,46 @@ Sizes.play = async ({ canvasElement }) => {
         await expect(drawn, `${size}: line is the stroke-${size} token`)
             .toBe(tokenLength(canvasElement, `--size-element-stroke-${size}`));
     }
+};
+
+/**
+ * The old `size="2.5px"` alias keeps working and draws `xl` (3px), but its name
+ * no longer says what it draws, so development says to use `size="xl"`. It says
+ * so once however many dividers use it; production stays quiet.
+ */
+export const DeprecatedSize = {
+    render: () => {
+        const [count, setCount] = useState(0);
+        return (
+            <div style={dividerCol}>
+                <button type="button" onClick={() => setCount((n) => n + 1)}>Add a divider</button>
+                {Array.from({ length: count }, (_, i) => (
+                    <Divider key={i} size="2.5px" id={`divider-deprecated-${i}`} />
+                ))}
+            </div>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const warn = spyOn(console, 'warn').mockImplementation(() => {});
+        try {
+            const add = canvas.getByRole('button', { name: 'Add a divider' });
+            await userEvent.click(add);
+            await userEvent.click(add);
+
+            const line = canvasElement.querySelector('#divider-deprecated-0 .plus-divider-line');
+            const drawn = px(getComputedStyle(line).height);
+            await expect(drawn, '2.5px draws 3px').toBe(3);
+            await expect(drawn, '2.5px draws the stroke-xl token')
+                .toBe(tokenLength(canvasElement, '--size-element-stroke-xl'));
+
+            const warnings = warn.mock.calls.map(([m]) => String(m)).filter((m) => m.includes('size="2.5px"'));
+            await expect(warnings, 'one warning for two dividers and three renders').toHaveLength(1);
+            await expect(warnings[0]).toContain('is deprecated; use size="xl"');
+        } finally {
+            warn.mockRestore();
+        }
+    },
 };
 
 export const Styles = () => (
