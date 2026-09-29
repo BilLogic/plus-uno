@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { expect, within } from 'storybook/test';
+import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Collapse from './Collapse';
 import Card from '@/components/layout-and-structure/Card/Card';
@@ -259,6 +261,32 @@ Overview.parameters = {
     docs: {
         source: { language: 'jsx', code: webAppSourceSnippets.collapse }
     }
+};
+
+/**
+ * The trigger's focus ring is inset, so it is drawn on the trigger's own
+ * primary fill. The default ring is primary and would vanish there at 1:1, so
+ * the trigger takes Focus Ring Inverse, held to 3:1 on the fill it sits on.
+ */
+Overview.play = async ({ canvasElement }) => {
+    const trigger = within(canvasElement).getByRole('button', { name: 'Toggle Content' });
+
+    const probe = canvasElement.ownerDocument.createElement('span');
+    probe.style.color = 'var(--color-focus-ring-inverse)';
+    canvasElement.appendChild(probe);
+    const inverseRing = getComputedStyle(probe).color;
+    probe.remove();
+
+    trigger.focus();
+    await expect(trigger.matches(':focus'), 'the trigger is focused').toBe(true);
+
+    const style = getComputedStyle(trigger);
+    await expect(style.outlineStyle).toBe('solid');
+    await expect(style.outlineColor).toBe(inverseRing);
+    const ratio = contrastRatio(style.outlineColor, style.backgroundColor);
+    await expect(ratio, `ring ${style.outlineColor} on ${style.backgroundColor} is ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
+
+    trigger.blur();
 };
 
 /**
