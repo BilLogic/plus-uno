@@ -61,7 +61,7 @@ import {
 } from '../design-system/src/lib/tokens.mjs';
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { PAGE_TOKEN, tokenValues } from './button-contrast.mjs';
-import { declaredGrounds, groundErrors } from './lib/declared-grounds.mjs';
+import { annotationErrors, annotationsAt, fileAnnotations } from './lib/declared-grounds.mjs';
 import { REPO_ROOT, groundFor, stylesheets } from './text-contrast.mjs';
 
 export { REPO_ROOT, stylesheets };
@@ -121,6 +121,7 @@ export function focusRules(files, root = REPO_ROOT) {
   const rules = [];
   for (const file of files) {
     const source = fs.readFileSync(path.join(root, file), 'utf8');
+    const annotations = fileAnnotations(source);
     for (const declaration of source.matchAll(AFFORDANCE)) {
       const chain = selectorChain(source, declaration.index);
       if (!/focus/i.test(chain.replace(NEGATED, ''))) continue;
@@ -131,10 +132,14 @@ export function focusRules(files, root = REPO_ROOT) {
         property: declaration[2],
         value: declaration[3].split(/\s+/).join(' ').trim(),
         tokens: [...declaration[3].matchAll(varReferencePattern('--color-'))].map((m) => m[1]),
+        // The rule's OWN background, or null when it sets none. Null and the
+        // page token are different answers: a rule that paints the page under
+        // itself has a ground, and an ancestor's `@grounds` must not replace it.
+        own: groundFor(source, declaration.index, null),
         ground: groundFor(source, declaration.index),
         // Grounds the rule DECLARES it sits on (`// @grounds: …`), for a ring
         // drawn on a ground its caller paints. See `scripts/lib/declared-grounds.mjs`.
-        declared: declaredGrounds(source, declaration.index),
+        declared: annotationsAt(source, declaration.index, annotations).grounds,
         block: blockStart(source, declaration.index),
       });
     }
@@ -189,7 +194,7 @@ export function ratio(token, ground, values, page = PAGE_TOKEN) {
  * with `@grounds`, every one of which it must clear; failing that, the page.
  */
 export function groundsOf(rule) {
-  if (rule.ground !== PAGE_TOKEN) return [rule.ground];
+  if (rule.own) return [rule.own];
   if (rule.declared && rule.declared.tokens.length) return rule.declared.tokens;
   return [PAGE_TOKEN];
 }
@@ -211,7 +216,7 @@ export function indicators(rules, values) {
     const entry = byBlock.get(key)
       ?? { file: rule.file, line: rule.line, selector: rule.selector, best: null, spellings: [], perGround: new Map() };
     entry.spellings.push(`${rule.property}: ${rule.value}`);
-    if (rule.ground === PAGE_TOKEN && rule.declared?.tokens.length) entry.declared = true;
+    if (!rule.own && rule.declared?.tokens.length) entry.declared = true;
     for (const ground of groundsOf(rule)) {
       for (const token of rule.tokens) {
         const measured = ratio(token, ground, values);
@@ -236,19 +241,18 @@ export function indicators(rules, values) {
 }
 
 /**
- * `@grounds` declarations that cannot be measured — an empty list, or a token
- * the token files do not define — as `file:line — reason`. Each is a failure of
- * its own: a declaration that measures nothing would otherwise read as green.
+ * Annotation errors across the stylesheets, as `file:line — reason`: an
+ * annotation that does not open its block, a second one of a kind in a block,
+ * an empty `@grounds`, or a ground token the token files do not define. Swept
+ * over every file, not just the focus rules, so a misplaced declaration is
+ * found wherever it is. Each is a failure of its own: a declaration that
+ * measures nothing would otherwise read as green.
  */
-export function declarationErrors(rules, values) {
-  const seen = new Map();
-  for (const rule of rules) {
-    if (!rule.declared) continue;
-    const key = `${rule.file}:${rule.declared.line}`;
-    if (seen.has(key)) continue;
-    seen.set(key, groundErrors(rule.declared, values));
-  }
-  return [...seen].flatMap(([key, errors]) => errors.map((error) => `${key} — \`@grounds\` ${error}.`));
+export function declarationErrors(files, root = REPO_ROOT, values) {
+  return files.flatMap((file) => {
+    const source = fs.readFileSync(path.join(root, file), 'utf8');
+    return /@(grounds|contrast)\b/.test(source) ? annotationErrors(file, source, values) : [];
+  });
 }
 
 /**

@@ -3,7 +3,7 @@ import { composite, contrast, parseColour } from '../../lib/tokens.mjs';
 /**
  * WCAG contrast between two COMPUTED colors, for story `play:` functions.
  *
- * A test util, not shipped code: nothing in `@/components` imports it. It is a
+ * A test util, not shipped code: no shipped component imports it. It is a
  * thin adapter over `design-system/src/lib/tokens.mjs`, the same luminance
  * `check:text-contrast`, `check:button-contrast` and `check:focus-ring` fail
  * the build on — so the ratio a story asserts on a rendered pixel and the ratio

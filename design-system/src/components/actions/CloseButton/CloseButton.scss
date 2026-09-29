@@ -63,12 +63,18 @@
 }
 
 // The inverse tone is drawn on a ground its caller paints, so it DECLARES
-// those grounds: check:focus-ring holds the ring to 3:1 and check:text-contrast
-// holds the × to 4.5:1 on each one, instead of on the page. Warning is not
-// listed — the × on it is 3.52:1. Keep this list and CloseButton.mdx in step.
+// those grounds: check:focus-ring holds the ring to 3:1 on each one, and
+// check:text-contrast holds the × to the non-text 3:1 (it is an icon glyph,
+// WCAG 1.4.11) on each one, instead of on the page. The list is also exported
+// from `inverseGrounds.js`; a unit test and the InverseGrounds story both hold
+// the two to each other. Keep CloseButton.mdx in step.
 .plus-close-btn--inverse {
-    // @grounds: --color-inverse-surface --color-primary --color-secondary --color-success --color-danger --color-tertiary --color-info
-    color: var(--color-surface);
+    // @grounds: --color-inverse-surface --color-primary --color-secondary --color-success --color-danger --color-tertiary --color-info --color-warning
+
+    .plus-close-btn__icon.fa-solid {
+        // @contrast: non-text
+        color: var(--color-surface);
+    }
 
     &:hover {
         background-color: var(--color-surface-state-08);

@@ -3,6 +3,8 @@ import { expect, userEvent, within } from 'storybook/test';
 
 import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
 import CloseButton from './CloseButton';
+import closeButtonScss from './CloseButton.scss?raw';
+import { INVERSE_GROUNDS } from './inverseGrounds.js';
 
 export default {
     title: 'Components/Actions/Close button',
@@ -223,23 +225,12 @@ Focus.play = async ({ canvasElement }) => {
 };
 
 /**
- * The grounds `tone="inverse"` is declared for — the `@grounds` list on
- * `.plus-close-btn--inverse` in `CloseButton.scss`, which `check:focus-ring`
- * and `check:text-contrast` measure from the token files. This renders each
- * one and measures the ring and the × as the browser paints them. Warning is
- * not on the list: the × on it is 3.52:1, under the 4.5:1 `check:text-contrast`
- * holds every color to.
+ * `tone="inverse"` on every ground it is declared for. The list comes from
+ * `inverseGrounds.js`, and the play function first checks it against the
+ * `@grounds` line in `CloseButton.scss` that `check:focus-ring` and
+ * `check:text-contrast` measure — so the grounds rendered here are the grounds
+ * those checks measure.
  */
-const INVERSE_GROUNDS = [
-    '--color-inverse-surface',
-    '--color-primary',
-    '--color-secondary',
-    '--color-success',
-    '--color-danger',
-    '--color-tertiary',
-    '--color-info',
-];
-
 export const InverseGrounds = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
         {INVERSE_GROUNDS.map((ground) => (
@@ -251,6 +242,9 @@ export const InverseGrounds = () => (
 );
 
 InverseGrounds.play = async ({ canvasElement }) => {
+    const declared = /@grounds:\s*([^\n]*)/.exec(closeButtonScss)[1].trim().split(/\s+/);
+    await expect(INVERSE_GROUNDS, 'the story renders the grounds the SCSS declares').toEqual(declared);
+
     // Same WCAG luminance the checks use (the shared story contrast util).
     const ratioOf = contrastRatio;
     for (const ground of INVERSE_GROUNDS) {
@@ -264,6 +258,8 @@ InverseGrounds.play = async ({ canvasElement }) => {
         const ringRatio = ratioOf(ring, paint);
         await expect(ringRatio, `${ground}: ring ${ring} on ${paint} is ${ringRatio.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
 
+        // The × is an icon glyph: WCAG 1.4.11 non-text, 3:1 — the bar
+        // `@contrast: non-text` holds it to in check:text-contrast.
         const glyph = getComputedStyle(button.querySelector('i')).color;
         const glyphRatio = ratioOf(glyph, paint);
         await expect(glyphRatio, `${ground}: × ${glyph} on ${paint} is ${glyphRatio.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);

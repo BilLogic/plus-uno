@@ -43,6 +43,7 @@ import { REPO_ROOT } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 import {
+  NON_TEXT,
   declarationErrors,
   census,
   ratio,
@@ -83,7 +84,7 @@ const inputs = byRoot((repoRoot) => {
   const files = stylesheets(repoRoot);
   const uses = textDeclarations(files, repoRoot);
   const found = findings(uses, values);
-  return { values, files, uses, found, counts: census(found), declarations: declarationErrors(uses, values) };
+  return { values, files, uses, found, counts: census(found), declarations: declarationErrors(files, repoRoot, values) };
 });
 
 /**
@@ -132,22 +133,36 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 export function summary({ repoRoot = REPO_ROOT } = {}) {
   const { files, uses, found, values } = inputs(repoRoot);
   const distinct = new Set(uses.map((u) => u.token)).size;
+  const idOf = (u) => `${u.file}:${u.line}:${u.token}`;
   // A declaration on N declared grounds is N measurements but one declaration.
-  const declarations = new Set(uses.map((u) => `${u.file}:${u.line}:${u.token}`)).size;
+  const declarations = new Set(uses.map(idOf)).size;
+  const worstOf = (list) => list
+    .map((u) => ({ ...u, ratio: ratio(u.token, values, u.ground) }))
+    .reduce((low, u) => (u.ratio < low.ratio ? u : low));
+
   const onDeclared = uses.filter((u) => u.declared?.tokens.length);
   let declared = '';
   if (onDeclared.length) {
-    const worst = onDeclared
-      .map((u) => ({ ...u, ratio: ratio(u.token, values, u.ground) }))
-      .reduce((low, u) => (u.ratio < low.ratio ? u : low));
-    const count = new Set(onDeclared.map((u) => `${u.file}:${u.line}:${u.token}`)).size;
-    declared = ` ${count} measured on declared @grounds (${onDeclared.length} grounds, worst ` +
+    const worst = worstOf(onDeclared);
+    const count = new Set(onDeclared.map(idOf)).size;
+    const grounds = new Set(onDeclared.map((u) => u.ground)).size;
+    declared = ` ${count} measured on declared @grounds (${grounds} ground${grounds === 1 ? '' : 's'}, worst ` +
       `${worst.ratio.toFixed(2)}:1, ${worst.token} on ${worst.ground}).`;
+  }
+  // Glyph colors held to the non-text bar, reported apart so the 4.5:1 count
+  // above never quietly absorbs a 3:1 one.
+  const glyphs = uses.filter((u) => u.nonText);
+  let nonText = '';
+  if (glyphs.length) {
+    const worst = worstOf(glyphs);
+    const count = new Set(glyphs.map(idOf)).size;
+    nonText = ` ${count} non-text glyph color${count === 1 ? '' : 's'} (@contrast: non-text) held to ${NON_TEXT}:1, ` +
+      `worst ${worst.ratio.toFixed(2)}:1 on ${worst.ground}.`;
   }
   return (
     `${declarations} color: declarations across ${files.length} stylesheets, ` +
-    `${distinct} distinct tokens. ${found.length} below AA ${AA_TEXT}:1, all recorded with a reason ` +
-    `(${ratchetFor(repoRoot).entries.size} entries).${declared}`
+    `${distinct} distinct tokens. ${found.length} below their bar (AA text ${AA_TEXT}:1), all recorded with a reason ` +
+    `(${ratchetFor(repoRoot).entries.size} entries).${declared}${nonText}`
   );
 }
 

@@ -34,7 +34,9 @@
  *     wrong rather than the code. A rule whose ground is painted by its caller
  *     can DECLARE it — `// @grounds: --color-primary …` in the block, see
  *     `scripts/lib/declared-grounds.mjs` — and is then measured on every
- *     declared ground instead of the page, against the same threshold.
+ *     declared ground instead of the page, against the same threshold. The
+ *     rule's own background still wins over any declaration, including a
+ *     background that is the page token itself.
  *  2. INLINE STYLES. `style={{ color: 'var(--color-warning)' }}` in JSX is
  *     invisible here. The corpus is stylesheets.
  *  3. `--color-on-*` AND `--color-inverse-*`. Skipped by design: they exist to
@@ -48,7 +50,10 @@
  *     defect. It applies the text threshold to everything and lets the baseline
  *     carry the exemptions with a reason each, because a checker that tried to
  *     infer "is this an inactive graphic?" from a stylesheet would be guessing
- *     about the thing that matters most.
+ *     about the thing that matters most. A graphic can instead be DECLARED:
+ *     `// @contrast: non-text` opening a rule whose selector names an icon (a
+ *     Font Awesome class, an `__icon` element, or `svg`) holds its colors to
+ *     3:1. On any other selector the declaration is an error, not a lower bar.
  *  5. WHETHER THE REPLACEMENT IS RIGHT. It reports that a token is unreadable
  *     on the page and names the `-text` sibling where one exists. Whether that
  *     sibling is the correct colour for the role is a design question.
@@ -59,7 +64,7 @@ import { fileURLToPath } from 'node:url';
 
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { documents } from './lib/corpus.mjs';
-import { declaredGrounds, groundErrors } from './lib/declared-grounds.mjs';
+import { annotationErrors, annotationsAt, contrastErrors, fileAnnotations } from './lib/declared-grounds.mjs';
 
 import {
   composite,
@@ -162,19 +167,27 @@ export function textDeclarations(files, root = REPO_ROOT) {
   const uses = [];
   for (const file of files) {
     const source = fs.readFileSync(path.join(root, file), 'utf8');
+    const annotations = fileAnnotations(source);
     const lines = source.split('\n');
     let offset = 0;
     lines.forEach((line, index) => {
       const declaration = /(^|[\s;{])color\s*:\s*([^;]+);/.exec(line);
       if (declaration) {
-        const own = groundFor(source, offset);
-        // The rule's own background wins; failing that, the grounds it
-        // declares with `@grounds`, each measured; failing that, the page.
-        const declared = own === PAGE_TOKEN ? declaredGrounds(source, offset) : null;
-        const grounds = declared?.tokens.length ? declared.tokens : [own];
+        // The rule's own background wins — null when it sets none, which is
+        // not the same answer as a rule that paints the page under itself.
+        // Failing that, the grounds it declares with `@grounds`, each
+        // measured; failing that, the page.
+        const own = groundFor(source, offset, null);
+        const at = annotationsAt(source, offset + declaration.index, annotations);
+        const declared = own ? null : at.grounds;
+        const grounds = own ? [own] : (declared?.tokens.length ? declared.tokens : [PAGE_TOKEN]);
+        // `@contrast: non-text` — a graphic, held to 3:1 — only counts where it
+        // is allowed, on an icon selector. Anywhere else it is an error and the
+        // declaration keeps the text bar.
+        const nonText = Boolean(at.contrast && !contrastErrors(at.contrast).length);
         for (const match of declaration[2].matchAll(varReferencePattern('--color-'))) {
           for (const ground of grounds) {
-            uses.push({ token: match[1], file, line: index + 1, source: line.trim(), ground, declared });
+            uses.push({ token: match[1], file, line: index + 1, source: line.trim(), ground, declared, nonText });
           }
         }
       }
@@ -185,17 +198,17 @@ export function textDeclarations(files, root = REPO_ROOT) {
 }
 
 /**
- * `@grounds` declarations that cannot be measured — an empty list, or a token
- * the token file does not define — as `file:line — reason`, once each.
+ * Annotation errors across the stylesheets, as `file:line — reason`, swept
+ * over every file whether or not the rule has its own background: placement
+ * (must open its block, one of a kind per block), an empty or unknown
+ * `@grounds`, and a `@contrast` that is not `non-text` or sits on a selector
+ * that is not an icon.
  */
-export function declarationErrors(uses, values) {
-  const seen = new Map();
-  for (const use of uses) {
-    if (!use.declared) continue;
-    const key = `${use.file}:${use.declared.line}`;
-    if (!seen.has(key)) seen.set(key, groundErrors(use.declared, values));
-  }
-  return [...seen].flatMap(([key, errors]) => errors.map((error) => `${key} — \`@grounds\` ${error}.`));
+export function declarationErrors(files, root = REPO_ROOT, values) {
+  return files.flatMap((file) => {
+    const source = fs.readFileSync(path.join(root, file), 'utf8');
+    return /@(grounds|contrast)\b/.test(source) ? annotationErrors(file, source, values, { contrast: true }) : [];
+  });
 }
 
 /**
@@ -247,6 +260,9 @@ export function ratio(token, values, ground = PAGE_TOKEN) {
  * different defect (a dangling token) with a different check, and reporting it
  * here as a contrast failure would name the wrong problem.
  */
+/** WCAG 1.4.11 — a graphic, such as an icon glyph, needs 3:1. */
+export const NON_TEXT = 3;
+
 export function findings(uses, values, { threshold = AA_TEXT } = {}) {
   const out = [];
   for (const use of uses) {
@@ -257,12 +273,14 @@ export function findings(uses, values, { threshold = AA_TEXT } = {}) {
     // measuring them against a surface they were never for.
     if (OFF_PAGE.test(use.token) && ground === PAGE_TOKEN) continue;
     const measured = ratio(use.token, values, ground);
-    if (measured === null || measured >= threshold) continue;
+    const bar = use.nonText ? NON_TEXT : threshold;
+    if (measured === null || measured >= bar) continue;
     const sibling = textSibling(use.token, values);
     out.push({
       ...use,
       ground,
       ratio: Number(measured.toFixed(2)),
+      bar,
       sibling,
       siblingRatio: sibling ? Number(ratio(sibling, values, ground).toFixed(2)) : null,
     });
@@ -281,7 +299,7 @@ export function report(found, { threshold = AA_TEXT } = {}) {
       `      ${f.source}\n` +
       `      ${f.token} is ${f.ratio}:1 on ${f.ground}` +
       (f.ground === PAGE_TOKEN ? ' (its rule sets no background, so the page is assumed)' : ' (its own rule)') +
-      ` — AA text needs ${threshold}:1` +
+      (f.bar === NON_TEXT ? ` — a non-text glyph needs ${NON_TEXT}:1` : ` — AA text needs ${threshold}:1`) +
       (f.sibling ? `\n      → ${f.sibling} is ${f.siblingRatio}:1 and exists for exactly this.` : ''),
   );
   return (

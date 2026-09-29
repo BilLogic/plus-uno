@@ -180,40 +180,59 @@ const inverseRing = (grounds) => [
   '}',
 ].join('\n');
 
+const A = 'design-system/src/a.scss';
+
 test('@grounds: a ring is measured on each declared ground and passes when every one clears 3:1', () => {
-  const root = corpus({ 'design-system/src/a.scss': inverseRing('--color-inverse-surface --color-primary') });
-  const rules = focusRules(['design-system/src/a.scss'], root);
-  const entries = indicators(rules, VALUES);
+  const root = corpus({ [A]: inverseRing('--color-inverse-surface --color-primary') });
+  const entries = indicators(focusRules([A], root), VALUES);
   assert.equal(entries.length, 1);
   assert.deepEqual(entries[0].grounds.map((g) => g.ground).sort(), ['--color-inverse-surface', '--color-primary']);
   // `best` is the WEAKEST ground: the rule is only as visible as that.
   assert.equal(entries[0].best.ground, '--color-primary');
   assert.ok(entries[0].best.ratio >= 3);
   assert.deepEqual([...invisible(entries).keys()], []);
-  assert.deepEqual(declarationErrors(rules, VALUES), []);
+  assert.deepEqual(declarationErrors([A], root, VALUES), []);
 });
 
 test('@grounds: a single declared ground under 3:1 fails the rule, naming that ground', () => {
   // Surface on the light surface-container is the ring on a ground it was never for.
-  const root = corpus({ 'design-system/src/a.scss': inverseRing('--color-primary --color-surface-container') });
-  const entries = indicators(focusRules(['design-system/src/a.scss'], root), VALUES);
-  const under = invisible(entries);
+  const root = corpus({ [A]: inverseRing('--color-primary --color-surface-container') });
+  const under = invisible(indicators(focusRules([A], root), VALUES));
   assert.equal(under.size, 1);
   assert.equal([...under.values()][0].best.ground, '--color-surface-container');
   assert.match(failures(under, { fresh: [...under.keys()] })[0], /on --color-surface-container/);
 });
 
 test('@grounds: an unknown token or an empty list is an error, not a pass', () => {
-  const unknown = corpus({ 'design-system/src/a.scss': inverseRing('--color-primary --color-nope') });
-  assert.match(declarationErrors(focusRules(['design-system/src/a.scss'], unknown), VALUES).join('\n'), /--color-nope/);
-  const empty = corpus({ 'design-system/src/a.scss': inverseRing('') });
-  assert.match(declarationErrors(focusRules(['design-system/src/a.scss'], empty), VALUES).join('\n'), /declares no grounds/);
+  const unknown = corpus({ [A]: inverseRing('--color-primary --color-nope') });
+  assert.match(declarationErrors([A], unknown, VALUES).join('\n'), /--color-nope/);
+  const empty = corpus({ [A]: inverseRing('') });
+  assert.match(declarationErrors([A], empty, VALUES).join('\n'), /declares no grounds/);
 });
 
 test('@grounds: an undeclared ring is still measured on the page, unchanged', () => {
-  const root = corpus({ 'design-system/src/a.scss': '.x:focus-visible { outline: 2px solid var(--color-surface); }\n' });
-  const entries = indicators(focusRules(['design-system/src/a.scss'], root), VALUES);
+  const root = corpus({ [A]: '.x:focus-visible { outline: 2px solid var(--color-surface); }\n' });
+  const entries = indicators(focusRules([A], root), VALUES);
   assert.equal(entries[0].best.ground, '--color-surface');
+  assert.equal(invisible(entries).size, 1);
+});
+
+test('@grounds: a rule whose OWN background is the page token keeps it over an ancestor declaration', () => {
+  // `groundFor` used to answer PAGE for both "no background" and "the page",
+  // so an ancestor's `@grounds` replaced a rule that painted the page itself.
+  const root = corpus({
+    [A]: [
+      '.x--inverse {',
+      '  // @grounds: --color-primary',
+      '  &:focus-visible {',
+      '    background-color: var(--color-surface);',
+      '    outline: 2px solid var(--color-surface);',
+      '  }',
+      '}',
+    ].join('\n'),
+  });
+  const entries = indicators(focusRules([A], root), VALUES);
+  assert.deepEqual(entries[0].grounds.map((g) => g.ground), ['--color-surface']);
   assert.equal(invisible(entries).size, 1);
 });
 
@@ -222,7 +241,7 @@ test('@grounds: a bad declaration fails the whole check', () => {
     'design-system/src/tokens/_colors.scss':
       ':root { --color-surface: #f9f9fc; --color-primary: #0472a8; --color-focus-ring: #0472a8; }\n',
     'design-system/src/tokens/_color_roles.scss': ':root { --color-focus-ring: var(--color-primary); }\n',
-    'design-system/src/a.scss': inverseRing('--color-primary --color-nope'),
+    [A]: inverseRing('--color-primary --color-nope'),
     'docs/evals/focus-ring.json': FOCUS_BASELINE,
   });
   try {

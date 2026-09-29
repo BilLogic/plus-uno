@@ -16,7 +16,7 @@
  * its block (`scripts/lib/declared-grounds.mjs`); it is then held to 3:1 on
  * EVERY declared ground instead of the page, and one ground under the bar fails
  * it. An empty list or an unknown token is an error. `CloseButton tone="inverse"`
- * is the first: its light ring is measured on the seven fills it is for.
+ * is the first: its light ring is measured on the eight fills it is for.
  *
  * WHY THERE IS NO RATCHET HERE. `check:intent-roles` ratchets because the thing
  * it counts is a vocabulary, and vocabulary moves one call site at a time. This
@@ -74,7 +74,7 @@ const inputs = byRoot((repoRoot) => {
   return {
     files,
     rules: indicators(raw, values),
-    declarations: declarationErrors(raw, values),
+    declarations: declarationErrors(files, repoRoot, values),
     // A vanished roles file is the floor case, not a crash (#611).
     roles: fs.existsSync(rolesPath) ? fs.readFileSync(rolesPath, 'utf8') : '',
   };
@@ -152,7 +152,8 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   // each one is weakest on — the number a reviewer of that declaration wants.
   const declared = rules
     .filter((entry) => entry.declared)
-    .map((entry) => `${path.basename(entry.file)} on ${entry.grounds.length} declared grounds, worst ` +
+    .map((entry) => `${path.basename(entry.file)} on ${entry.grounds.length} declared ` +
+      `ground${entry.grounds.length === 1 ? '' : 's'}, worst ` +
       `${entry.best.ratio.toFixed(2)}:1 on ${entry.best.ground}`);
   return (
     `${held.length} focus rules, all at or above ${NON_TEXT}:1 ` +

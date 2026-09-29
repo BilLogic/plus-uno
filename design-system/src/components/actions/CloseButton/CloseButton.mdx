@@ -100,10 +100,12 @@ line of text is the parent's job: `Alert` centers it on its first line.
 Two tones: `default` for neutral surfaces, and `inverse` for colored or dark
 grounds, where the × and its focus ring take the light surface color. `inverse`
 is only for these grounds: `--color-inverse-surface`, `--color-primary`,
-`--color-secondary`, `--color-success`, `--color-danger`, `--color-tertiary`
-and `--color-info`. Each is declared on the tone and measured by
-`check:focus-ring` and `check:text-contrast`. Warning is not one of them: the ×
-on `--color-warning` is 3.52:1, under the 4.5:1 those checks hold a color to. There is
+`--color-secondary`, `--color-success`, `--color-danger`, `--color-tertiary`,
+`--color-info` and `--color-warning`. Each is declared on the tone and
+measured by `check:focus-ring` for the ring and by `check:text-contrast` for
+the ×. The × is an icon glyph, so it is held to WCAG's non-text 3:1, not
+text's 4.5:1. Warning is the tightest at 3.52:1 for both, and the Figma warning
+Toast already puts the inverse × on it. There is
 no disabled state and there are no color variants: a close control is always
 available, and the × is neutral on every intent.
 
@@ -163,9 +165,9 @@ available, and the × is neutral on every intent.
 - **The focus ring** is `--color-focus-ring`, 2px, drawn 2px outside the box
   with radius `--size-element-radius-lg`, over a 12% state layer. On `inverse`
   it is `--color-focus-ring-inverse`, which aliases surface. It is at least
-  4.53:1 on every declared ground, from `--color-tertiary` to 12.46:1 on
+  3:1 on every declared ground, from 3.52:1 on `--color-warning` to 12.46:1 on
   `--color-inverse-surface`. The *Inverse grounds* story renders each one and
-  measures the ring as the browser paints it.
+  measures the ring and the × as the browser paints them.
 - **It is a real `<button type="button">`**, so Enter and Space press it and it
   never submits a surrounding form.
 
