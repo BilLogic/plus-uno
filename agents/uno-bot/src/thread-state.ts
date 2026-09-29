@@ -306,8 +306,9 @@ export class ThreadState extends DurableObject<Env> {
   //
   // Retire first, then write — a choice, not an accident: the new card is the
   // one a racing ✅ has to be able to find, so it is the last thing to land.
-  async putProposal(proposal: PendingProposal, at: number): Promise<void> {
+  async putProposal(proposal: PendingProposal, at: number): Promise<{ retired: string[] }> {
     const slot = proposalSlot(proposal);
+    const retired: string[] = [];
     const all = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
     for (const [key, rec] of all) {
       if (key === proposalKey(proposal.proposalTs)) continue;
@@ -323,22 +324,29 @@ export class ThreadState extends DurableObject<Env> {
         ...rec,
         supersededBy: proposal.proposalTs,
       });
+      // Reported only if this staging is what took it out of reach.
+      if (!rec.retired) retired.push(pending.proposalTs);
     }
     await this.storage.put<ProposalRecord>(proposalKey(proposal.proposalTs), {
       payload: proposal,
       createdAt: at,
     });
     await this.ensureGcAlarm();
+    return { retired };
   }
 
   // Retire without consuming — the counterpart to the claim, and why the two
   // are different methods is on the interface (#583). A missing record is a
   // no-op: there is nothing left that could be acted on.
-  async retireProposal(proposalTs: string): Promise<void> {
+  async retireProposal(proposalTs: string, at: number): Promise<{ retired: boolean }> {
     const key = proposalKey(proposalTs);
     const rec = await this.storage.get<ProposalRecord>(key);
-    if (!rec) return;
+    // Claimed (gone), already retired or replaced, or aged out: this call
+    // retired nothing, and says so.
+    if (!rec || rec.retired || rec.supersededBy) return { retired: false };
+    if (at - rec.createdAt > recordTtlMs(rec)) return { retired: false };
     await this.storage.put<ProposalRecord>(key, { ...rec, retired: true });
+    return { retired: true };
   }
 
   // Is the card that retired another one still around to be looked at? Its own

@@ -33,10 +33,12 @@ export type ScheduledRunName = "morning" | "end-of-day";
  * usage record's two: the end-of-day classify jobs label a batch of channel
  * asks each, and the purge — in both runs — keeps text under its 14 days
  * (src/usage/classify-run.ts). `ask-resolution` is the end-of-day 24 h pass
- * that records how each ask was resolved (src/usage/resolution-pass.ts). The
- * sweep's two: one end-of-day `sweep-channel` job per swept channel reads the
- * day and keeps its drift findings, and the morning `sweep-post` stages them as
- * proposal cards (src/sweep/).
+ * that records how each ask was resolved (src/usage/resolution-pass.ts).
+ * The end-of-day `proposal-expiry` records every card that aged out untouched
+ * (src/usage/proposal-events.ts).
+ * The sweep's two: one end-of-day `sweep-channel` job per swept channel reads
+ * the day and keeps its drift findings, and the morning `sweep-post` stages
+ * them as proposal cards (src/sweep/).
  */
 export type ScheduledJobKind =
   | "noop"
@@ -46,6 +48,7 @@ export type ScheduledJobKind =
   | "usage-classify"
   | "usage-text-purge"
   | "ask-resolution"
+  | "proposal-expiry"
   | "sweep-channel"
   | "sweep-post";
 
@@ -106,6 +109,7 @@ const RUN_PLANS: Record<ScheduledRunName, readonly ScheduledJob[]> = {
     })),
     // Not after the classify jobs: the purge holds whether or not they ran.
     { key: "usage-text-purge", kind: "usage-text-purge" },
+    { key: "proposal-expiry", kind: "proposal-expiry" },
   ],
 };
 

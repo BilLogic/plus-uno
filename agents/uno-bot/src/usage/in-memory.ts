@@ -33,6 +33,9 @@ export function mergeOnRetry(stored: TurnRecord | undefined, incoming: TurnRecor
     subType: incoming.subType ?? stored.subType,
     painCategory: incoming.painCategory ?? stored.painCategory,
     classifiedAt: incoming.classifiedAt ?? stored.classifiedAt,
+    // A ticket another writer put on the row (`noteSelfFiledTicket`) survives
+    // a rewrite that names none.
+    selfFiledTicketUrl: incoming.selfFiledTicketUrl ?? stored.selfFiledTicketUrl,
   };
 }
 

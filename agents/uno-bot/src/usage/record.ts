@@ -186,6 +186,15 @@ function isDirect(conversationType: ConversationType | undefined): boolean {
   return conversationType === "im" || conversationType === "mpim";
 }
 
+/** Whether a record may name the channel it came from: a channel turn that is
+ *  not a DM or a group DM. The proposal record keeps the same rule. */
+export function storesChannel(
+  surface: "assistant" | "channel",
+  conversationType: ConversationType | undefined,
+): boolean {
+  return surface === "channel" && !isDirect(conversationType);
+}
+
 export function buildTurnRecord(facts: TurnRecordFacts): TurnRecord {
   const askedAt = askedAtOf(facts.askTs, facts.startedAt);
   const usage = facts.spend?.usage;
@@ -198,7 +207,7 @@ export function buildTurnRecord(facts: TurnRecordFacts): TurnRecord {
     surface: facts.surface,
     conversationType: facts.conversationType ?? null,
     inThread: facts.inThread,
-    channelId: facts.surface === "channel" && !isDirect(facts.conversationType) ? facts.channel : null,
+    channelId: storesChannel(facts.surface, facts.conversationType) ? facts.channel : null,
     askTs: facts.askTs,
     askedAt,
     firstAnswerAt: facts.firstAnswerAt,

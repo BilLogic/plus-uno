@@ -27,8 +27,10 @@ import {
 } from "./resolution";
 import {
   createLeadDmReader,
+  passThreadOf,
   runResolutionPass,
   type LeadDmReader,
+  type PassThread,
 } from "./resolution-pass";
 
 /** A log that keeps nothing — the Worker without `USAGE_DB`. `./production.ts` says so once. */
@@ -103,12 +105,18 @@ async function wholeThreadAt(env: Env, channel: string, ts: string): Promise<Thr
   return wholeThread(await conversationsReplies(env, channel, ts, THREAD_PAGE));
 }
 
-/** The ask's whole thread, oldest first, on the bot token; null when unknown. */
-async function threadOf(env: Env, channel: string, askTs: string): Promise<ThreadMessage[] | null> {
-  const first = await wholeThreadAt(env, channel, askTs);
+/** A thread read for the pass: a failure for now is told apart (`passThreadOf`). */
+async function passThreadAt(env: Env, channel: string, ts: string): Promise<PassThread> {
+  return passThreadOf(await conversationsReplies(env, channel, ts, THREAD_PAGE));
+}
+
+/** The ask's whole thread, oldest first, on the bot token (`PassThread`). */
+async function threadOf(env: Env, channel: string, askTs: string): Promise<PassThread> {
+  const first = await passThreadAt(env, channel, askTs);
+  if (!Array.isArray(first)) return first;
   // Asked inside a thread: read from its root so every reply is in view.
-  const root = first?.[0]?.thread_ts;
-  if (first && root && root !== first[0]!.ts) return wholeThreadAt(env, channel, root);
+  const root = first[0]?.thread_ts;
+  if (root && root !== first[0]!.ts) return passThreadAt(env, channel, root);
   return first;
 }
 
@@ -132,8 +140,10 @@ async function leadDmReader(env: Env, leadUserId: string, announce: boolean): Pr
  * The `ask-resolution` job: the end-of-day pass, on the Worker's bindings.
  *
  * @param env - The Worker environment
- * @param opts - `dryRun` for the sweep probe: reads, writes nothing. `announce`
- *   for the run's first job only, so a missing token is one log line per run.
+ * @param opts - `dryRun` for the sweep probe: counts the asks due, and makes no
+ *   Slack read and no token lookup (a lookup can refresh the lead's token).
+ *   `announce` for the run's first job only, so a missing token is one log
+ *   line per run.
  */
 export async function runAskResolution(
   env: Env,
@@ -147,7 +157,7 @@ export async function runAskResolution(
     leadUserId,
     botUserId: async () => (await getBotIdentity(env))?.userId,
     threadOf: (channel, askTs) => threadOf(env, channel, askTs),
-    leadDmsWith: leadUserId ? await leadDmReader(env, leadUserId, opts.announce) : null,
+    leadDmsWith: leadUserId && !opts.dryRun ? await leadDmReader(env, leadUserId, opts.announce) : null,
     dryRun: opts.dryRun,
     announce: opts.announce,
   });

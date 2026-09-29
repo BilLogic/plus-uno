@@ -995,6 +995,7 @@ test("re-staging a cut-off sweep card tells onRestaged which card replaced which
     { proposal: SWEEP_CARD, operations: [{ toolName: "notion_update", input: FIX_TWO }] },
     {
       ...h.deps,
+      proposalEvents: h.deps.usage.proposalEvents,
       onRestaged: async (from, to) => {
         moved.push([from.proposalTs, to.proposalTs, to.sweepRun]);
       },

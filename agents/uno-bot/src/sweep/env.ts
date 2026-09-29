@@ -194,7 +194,9 @@ async function sweepDepsFor(
         }
         return { state: "unknown", why: `more than ${FIND_POSTED_PAGES} pages to search` };
       },
-      stage: (proposal) => threadStateFor(env).putProposal(proposal),
+      async stage(proposal) {
+        await threadStateFor(env).putProposal(proposal);
+      },
       async withdraw(channel, ts, text, cardKey) {
         await updateMessage(env, {
           channel,

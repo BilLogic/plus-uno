@@ -168,7 +168,8 @@ test("the end-of-day probe plans one sweep job per SWEEP_CHANNELS entry, #uno-bo
     body.planned.map((j) => j.key).filter((k) => k.startsWith("sweep:")),
     ["sweep:C0DESIGN", "sweep:C0OTHER"],
   );
-  assert.equal(body.planned.at(-1)?.key, "usage-text-purge", "the purge stays last");
+  const keys = body.planned.map((j) => j.key);
+  assert.ok(keys.indexOf("sweep:C0OTHER") < keys.indexOf("usage-text-purge"), "the sweeps run before the purge");
   // Unbound here, so the job says it did nothing rather than reading anything.
   assert.match(body.jobs.find((j) => j.key === "sweep:C0DESIGN")?.detail?.summary ?? "", /not bound/);
   // A rehearsal runs one job per kind: the second channel is reported, not run.

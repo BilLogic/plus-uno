@@ -287,6 +287,12 @@ export function cancelRunOf(proposal: PendingProposal): PendingProposal | null {
   return { ...rest, operations, toolName: operations[0]!.toolName, input: operations[0]!.input };
 }
 
+/** What a staging did beside storing the card: the ts of each live card in
+ *  the same reply thread it retired (`ThreadState.putProposal`). */
+export interface StagingReport {
+  retired: string[];
+}
+
 /** A card's own terms: how long it lives and who may confirm it. Both
  *  optional, and a card with neither is held to the defaults. */
 export type ProposalTerms = Pick<PendingProposal, "ttlMs" | "confirmers">;
@@ -578,8 +584,13 @@ export interface ThreadState {
    * surfaces: in a channel the two are the same value anyway, and in a DM the
    * fallback only ever compares a pre-migration record, which had no per-ask
    * thread to be told apart by in the first place.
+   *
+   * Answers with the cards THIS staging retired — live ones it found and
+   * stamped, not ones a caller had already retired through `retireProposal`
+   * (that call reported them) — so the usage record can say a card was
+   * replaced only when it was.
    */
-  putProposal(proposal: PendingProposal): Promise<void>;
+  putProposal(proposal: PendingProposal): Promise<StagingReport>;
 
   /**
    * Retire a card because a revision is about to take its place — keeping the
@@ -618,8 +629,12 @@ export interface ThreadState {
    * claim-and-delete it replaces answered "already resolved, another
    * confirmation got there first", which invents a second person — and it is
    * bounded, so it is accepted rather than fixed.
+   *
+   * `retired` is true only when THIS call took a live card out of reach: a
+   * card already claimed (so gone), already retired or replaced, or aged out
+   * answers false — nothing was replaced by this revision.
    */
-  retireProposal(proposalTs: string): Promise<void>;
+  retireProposal(proposalTs: string): Promise<{ retired: boolean }>;
 
   /** Look one up by the ts of its card. */
   getProposalByTs(proposalTs: string): Promise<ProposalLookup>;

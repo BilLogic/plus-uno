@@ -63,7 +63,9 @@ Three jobs, from the spec (#742):
 
 The first migration stores no message text at all: the row carries ids, times,
 counts, names of tools, and the *kinds* of source an answer linked to (Notion,
-the blueprint, Figma), never the links or the words.
+the blueprint, Figma), never the links or the words. The one link kept is a
+GitHub issue uno-bot filed on itself: `turns.self_filed_ticket_url` (0001),
+and the same link on a card's staged row, `proposal_events.ticket_url` (0003).
 
 **Access** is the uno-bot Cloudflare account's members and the query files. The
 bot never quotes one person's rows to another. **Retention**: turn metadata is

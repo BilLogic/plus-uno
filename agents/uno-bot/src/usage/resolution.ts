@@ -124,9 +124,12 @@ export interface PassOutcome {
 export interface ResolutionLog {
   /**
    * The asker's ✅ / 👍 on an answer. `turnId` is the ask the answer answers
-   * (`answeredAskOf`); it is resolved only when `requesterId` asked it.
+   * (`answeredAskOf`); it is resolved only when `requesterId` asked it, and
+   * never when `reactedTs` is a card some turn staged (its `proposal_id`): a
+   * card the gate found used up — claimed, rejected, cleared — is still a
+   * card, and a ✅ on it is not "that answered it".
    */
-  recordReaction(q: { turnId: string; requesterId: string; at: number }): Promise<string | null>;
+  recordReaction(q: { turnId: string; requesterId: string; reactedTs: string; at: number }): Promise<string | null>;
   /** A ✅-approved batch completed: resolves the turn that staged the card. */
   recordTaskCompleted(proposalId: string, at: number): Promise<string | null>;
   /**
@@ -214,7 +217,7 @@ export async function recordAnswerReaction(
   const thread = await deps.threadOf(r.channel, r.threadRoot);
   if (!thread) return null;
   const turnId = answeredAskOf(r.channel, thread, r.reactedTs);
-  return turnId ? deps.log.recordReaction({ turnId, requesterId: r.userId, at: deps.now() }) : null;
+  return turnId ? deps.log.recordReaction({ turnId, requesterId: r.userId, reactedTs: r.reactedTs, at: deps.now() }) : null;
 }
 
 /**

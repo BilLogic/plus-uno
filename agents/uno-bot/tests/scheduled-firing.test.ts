@@ -57,6 +57,7 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
     "ask-resolution",
     "ask-resolution",
     "usage-text-purge",
+    "proposal-expiry",
   ]);
 });
 
@@ -120,18 +121,22 @@ test("each run is planned with its jobs, keyed by the UTC run date", () => {
     ["ask-resolution-6", "ask-resolution", undefined],
     // Waits on nothing, so it runs whether or not the classify jobs did.
     ["usage-text-purge", "usage-text-purge", undefined],
+    ["proposal-expiry", "proposal-expiry", undefined],
   ]);
 });
 
 test("the end-of-day run sweeps each listed channel as its own job, before the purge; the morning posts", () => {
   const endOfDay = planRun("end-of-day", at(22, 0), ["C0DESIGN", "C0OTHER"]);
   const jobs = endOfDay.jobs.map((j) => [j.key, j.kind, j.channel]);
-  assert.deepEqual(jobs.slice(-3), [
+  // The sweep jobs go straight before the purge; what the plan holds after it
+  // stays after it.
+  const purge = jobs.findIndex(([key]) => key === "usage-text-purge");
+  assert.deepEqual(jobs.slice(purge - 2, purge + 1), [
     ["sweep:C0DESIGN", "sweep-channel", "C0DESIGN"],
     ["sweep:C0OTHER", "sweep-channel", "C0OTHER"],
-    // The purge stays last.
     ["usage-text-purge", "usage-text-purge", undefined],
   ]);
+  assert.deepEqual(jobs.slice(purge + 1).map(([key]) => key), ["proposal-expiry"]);
   // The channels are the end of day's alone: the morning run only posts.
   assert.equal(planRun("morning", at(14, 0), ["C0DESIGN"]).jobs.some((j) => j.kind === "sweep-channel"), false);
 });
@@ -149,7 +154,7 @@ test("a firing plans the end-of-day sweep over the channels it was handed", asyn
     },
     sweepChannels: ["C0DESIGN"],
   });
-  assert.deepEqual(runs[0]?.jobs.map((j) => j.key).slice(-2), ["sweep:C0DESIGN", "usage-text-purge"]);
+  assert.deepEqual(runs[0]?.jobs.map((j) => j.key).slice(-3), ["sweep:C0DESIGN", "usage-text-purge", "proposal-expiry"]);
 });
 
 test("a run's runner is never a thread's runner", () => {

@@ -35,23 +35,25 @@ logged and dropped). A deploy with no pending migration needs no step.
 
 - Never edit a migration that has run anywhere. Add the next number.
 - Additive only: new tables, new nullable columns, new indexes. A column the
-  Worker writes is also mapped in its table's adapter, the one place record
-  fields become SQL columns: `agents/uno-bot/src/usage/d1.ts` for `turns` —
-  or, for the columns only the classifier writes (the categories, the attempt
-  count, the text purge), `agents/uno-bot/src/usage/category-store.ts`, and for
-  the resolution columns written after the turn,
-  `agents/uno-bot/src/usage/resolution-d1.ts` — and
-  `agents/uno-bot/src/sweep/d1.ts` for the sweep's.
+  Worker writes is also mapped in its table's adapter — `agents/uno-bot/src/usage/d1.ts`
+  for `turns`, `proposal-events-d1.ts` for `proposal_events` — the one place per
+  table where record fields become SQL columns; the columns only the classifier
+  writes (the categories, the attempt count, the text purge) are mapped in
+  `agents/uno-bot/src/usage/category-store.ts`, the resolution columns written
+  after the turn in `agents/uno-bot/src/usage/resolution-d1.ts`, and a ticket
+  filed from a card's reaction or button onto its staging turn by
+  `proposal-events-d1.ts`. The sweep's tables are mapped in
+  `agents/uno-bot/src/sweep/d1.ts`.
 - Bound parameters in the Worker, always; nothing is assembled into SQL from a
   value.
 - What the database never stores — message text past classification, any DM
   text (a DM ask keeps only its category labels), secrets — is ADR-030's, and a
   migration does not widen it.
 
-**Tested** by `npm run test:workerd`: the UsageLog and sweep records
-conformance suites apply every file here to a local D1 before they run, so a
-migration that fails to apply, or a column an adapter names and the schema
-lacks, fails there.
+**Tested** by `npm run test:workerd`: the UsageLog, ProposalEventLog and sweep
+records conformance suites apply every file here to a local D1 before they
+run, so a migration that fails to apply, or a column an adapter names and the
+schema lacks, fails there.
 
 ## The retrieval schema is in the app repo
 

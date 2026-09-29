@@ -12,9 +12,10 @@ import { charge } from "../net";
 import { runFigmaPoll } from "../figma-poll";
 import { selectProvider } from "../agent/run-agent";
 import { runClassifyBatch, runTextPurge } from "../usage/classify-run";
-import { askCategoriesFor } from "../usage/production";
+import { askCategoriesFor, proposalEventLogFor } from "../usage/production";
 import { runLibraryPost, runLibraryTrack } from "../figma-library/env";
 import { runSweepJobOnEnv } from "../sweep/env";
+import { runProposalExpiry } from "../usage/index";
 import { runAskResolution } from "../usage/resolution-env";
 import {
   FIRST_ASK_RESOLUTION_KEY,
@@ -81,6 +82,12 @@ const JOB_BODIES: Record<ScheduledJobKind, JobBody> = {
     const first = job.key === FIRST_ASK_RESOLUTION_KEY;
     if (dryRun && !first) return;
     console.log(`[resolution] ${(await runAskResolution(env, { dryRun, announce: first })).summary}`);
+  },
+  // End of day: every card that aged out with no outcome gets its `expired`
+  // event, dated to when it aged out. Idempotent, so a retried alarm adds none.
+  "proposal-expiry": async (env, _job, { dryRun }) => {
+    const { summary } = await runProposalExpiry(proposalEventLogFor(env), Date.now(), { dryRun });
+    console.log(`[usage] proposal expiry: ${summary}`);
   },
 };
 

@@ -1149,6 +1149,10 @@ export interface NotionUpdateResult {
   replaced: number;
   /** Replacements that wrote NOTHING, each saying which block and why. */
   refused: string[];
+  /** How many of `refused` were refused because the block's stamp had moved
+   *  since it was read (ADR-029) — what the usage record counts as a stale
+   *  write refused. */
+  staleStamps: number;
 }
 
 // Fetch a page's title + its PARENT DATABASE property schema (real names, types,
@@ -1353,7 +1357,7 @@ async function replaceBlock(
   op: NotionBlockReplacement,
   headers: Record<string, string>,
   signal: AbortSignal,
-): Promise<{ replaced: number; refusal?: string }> {
+): Promise<{ replaced: number; refusal?: string; stale?: true }> {
   const label = shortBlockId(op.blockId);
   const rendered = markdownToNotionBlocks(op.content);
   if (!rendered.length) {
@@ -1384,6 +1388,7 @@ async function replaceBlock(
     return {
       replaced: 0,
       refusal: `${label} changed since read (read ${seen || "no stamp cited"}, now ${now || "unknown"})`,
+      stale: true,
     };
   }
 
@@ -1455,6 +1460,7 @@ export async function notionUpdate(
   const updated: string[] = [];
   const skipped: string[] = [];
   const refused: string[] = [];
+  let staleStamps = 0;
   let appended = 0;
   let replaced = 0;
 
@@ -1509,6 +1515,7 @@ export async function notionUpdate(
       const r = await replaceBlock(env, op, headers, controller.signal);
       replaced += r.replaced;
       if (r.refusal) refused.push(r.refusal);
+      if (r.stale) staleStamps++;
     }
 
     // 3) Narrative append.
@@ -1545,7 +1552,7 @@ export async function notionUpdate(
     // Drop any cached read so the next read reflects this write, not a stale copy.
     if (updated.length || appended || replaced) evictReadCache(pageId);
 
-    return { id: pageId, updated, skipped, appended, replaced, refused };
+    return { id: pageId, updated, skipped, appended, replaced, refused, staleStamps };
   } finally {
     clearTimeout(timer);
   }
