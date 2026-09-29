@@ -13,10 +13,13 @@
 //     the intake, so a ⛔ files nothing.
 //     Every morning rather than only Monday's: a morning whose reads fail keeps
 //     the report, and the next one posts it.
-//   • the DISPUTE — a reply in that thread naming items (`dispute 2`) posts a
-//     revised card in the same thread without them. Staging it in the same
-//     reply thread supersedes the old card (ThreadState.putProposal), so a
-//     late ✅ on the old one is told it was replaced. The revision keeps the
+//   • the DISPUTE — a reply in that thread starting `dispute 2` posts a
+//     revised card in the same thread without them. It runs at the head of
+//     the thread's queued job (slack/message-job.ts), so it is handled once
+//     and two disputes run one after the other. Every weekly card carries the
+//     thread's own `supersedeKey`: a revision supersedes the old card, so a
+//     late ✅ on it is told it was replaced, while a turn's card in the same
+//     thread and the weekly card leave each other alone. The revision keeps the
 //     old card's expiry. Disputing every item withdraws the card. Only a card
 //     still pending is revised: once it is decided, the intake is filed (or
 //     declined), and a revision would file a second one.
@@ -117,10 +120,21 @@ export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boole
   ]);
   const index = parseComponentIndex(markdown);
   if (!index.length) throw new Error("the component index listed no components — refusing to report every one missing");
+  const library = liveLibraryFrom(components);
+  if (library.sets.length < index.length / 2) {
+    // An empty or near-empty answer is a Figma or permissions fault, not a
+    // library that lost most of its components overnight: reporting every
+    // component missing would file a wrong intake. The week is skipped.
+    console.error(
+      `[ds-precedence] the library answered ${library.sets.length} set(s) for ${index.length} indexed components — week skipped`,
+    );
+    if (!opts.dryRun) await deps.report.write(null);
+    return { found: 0, summary: `library near-empty (${library.sets.length} sets) — week skipped` };
+  }
   const items = findDisagreements({
     index,
     registry,
-    library: liveLibraryFrom(components),
+    library,
     fileKey: deps.fileKey,
     repo: deps.repo,
     inFlight: await deps.inFlight(registry),
@@ -174,6 +188,9 @@ function stagedCard(
     requesterUserId: "",
     ttlMs,
     confirmers: [...thread.confirmers],
+    // Keyed apart from the thread: a turn's card in this thread neither
+    // replaces the weekly card nor is replaced by it; its revisions share it.
+    supersedeKey: `ds-precedence:${thread.ts}`,
   };
 }
 

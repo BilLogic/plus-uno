@@ -85,3 +85,52 @@ test("a thread reply in #uno-bot keeps the follow-up rule: no bot in the thread,
 test("an @mention anywhere still engages", async () => {
   assert.equal(await engages(post({ channel: OTHER, text: `<@${BOT}> what's the token for primary?` })), true);
 });
+
+// ── The weekly DS precedence thread ─────────────────────────────────────────
+// uno-bot's only posts there are its scheduled list and card, which leaves a
+// live card in the thread. People reply to each other about the list, so a
+// reply is not a turn: an @mention or a typed gate emoji engages, and once
+// uno-bot has answered there the follow-up rule resumes.
+
+const UNIVERSAL = "C072E8SFLKV";
+const WEEKLY = "1759500000.000001";
+
+function weeklyEnv(history: unknown[] = []): Env {
+  return {
+    ...ENV,
+    PLUS_UNIVERSAL_CHANNEL_ID: UNIVERSAL,
+    HARNESS_KV: { get: async () => ({ channel: UNIVERSAL, ts: WEEKLY }) },
+    THREAD_STATE: {
+      idFromName: (name: string) => name,
+      get: () => ({
+        // A card is live in the thread.
+        async getProposalByThread() {
+          return { proposalTs: "1759500000.000002" };
+        },
+        async readHistory() {
+          return history;
+        },
+      }),
+    },
+  } as unknown as Env;
+}
+
+const weeklyReply = (text: string) => post({ channel: UNIVERSAL, ts: "1759500100.000001", thread_ts: WEEKLY, text });
+
+test("a plain reply in the weekly thread does not engage, though a card is live there", async () => {
+  assert.equal(await engages(weeklyReply("agree with 2, the set exists"), weeklyEnv()), false);
+});
+
+test("an @mention or a typed gate emoji in the weekly thread engages", async () => {
+  assert.equal(await engages(weeklyReply(`<@${BOT}> why is Button listed?`), weeklyEnv()), true);
+  assert.equal(await engages(weeklyReply("✅"), weeklyEnv()), true);
+});
+
+test("once uno-bot has answered in the weekly thread, follow-ups engage as anywhere", async () => {
+  assert.equal(await engages(weeklyReply("and item 3?"), weeklyEnv([{ role: "assistant", text: "…" }])), true);
+});
+
+test("another thread in #plus-universal with a live card keeps the ordinary rule", async () => {
+  const other = post({ channel: UNIVERSAL, ts: "1759500100.000002", thread_ts: "1759400000.000001", text: "looks good" });
+  assert.equal(await engages(other, weeklyEnv()), true);
+});

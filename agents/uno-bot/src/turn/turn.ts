@@ -73,6 +73,7 @@ import {
   inheritedTerms,
   proposalOperations,
   proposalReplyThread,
+  revisedBy,
   type AssistantContext,
   type HistoryTurn,
   type PendingProposal,
@@ -1123,7 +1124,11 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
   // the thread's pending card too: this closes the seconds the revision spends
   // being written, during which the old card would otherwise still execute the
   // input the person just pushed back on.
-  if (request.pending) await threadState.retireProposal(request.pending.proposalTs);
+  //
+  // A card keyed apart (`supersedeKey`, the Worker's weekly card) is not the
+  // one this card revises: it stays live beside it, and lends it no terms.
+  const revised = revisedBy(request.pending);
+  if (revised) await threadState.retireProposal(revised.proposalTs);
 
   const card = await buildCard(
     result,
@@ -1169,11 +1174,11 @@ async function turnBody(request: TurnRequest, deps: TurnDeps): Promise<TurnOutco
     ...(prd?.url ? { notionPrdUrl: prd.url } : {}),
     // A revision is held to the terms of the card it replaces — its lifetime
     // and who may confirm it. A fresh card has none and gets the defaults.
-    ...inheritedTerms(request.pending),
+    ...inheritedTerms(revised),
     // In #uno-bot the poster and the thread's repliers confirm, and a revision
     // adds whoever staged it (`turn/intake-channel.ts`).
     ...(request.intakeChannel
-      ? { confirmers: intakeConfirmers(request.intakeChannel, request.pending, request.userId) }
+      ? { confirmers: intakeConfirmers(request.intakeChannel, revised, request.userId) }
       : {}),
   };
   await threadState.putProposal(proposal);

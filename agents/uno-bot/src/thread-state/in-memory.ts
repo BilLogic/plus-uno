@@ -26,6 +26,7 @@ import {
   cutOffTakeable,
   ownTtl,
   proposalReplyThread,
+  supersessionKey,
   proposalTtlMs,
   type Execution,
   type HistoryTurn,
@@ -156,7 +157,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       // grain, and why a DM needs it, are in `putProposal`'s contract. Only
       // LIVE records are touched: an aged-out card is already answered by
       // "expired".
-      const thread = proposalReplyThread(proposal);
+      const thread = supersessionKey(proposal);
       for (const rec of proposals.values()) {
         if (rec.proposal.proposalTs === proposal.proposalTs) continue;
         // A record already stamped with a successor is settled. One only
@@ -165,7 +166,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         if (rec.supersededBy) continue;
         if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) continue;
         if (rec.proposal.channel !== proposal.channel) continue;
-        if (proposalReplyThread(rec.proposal) !== thread) continue;
+        if (supersessionKey(rec.proposal) !== thread) continue;
         rec.supersededBy = proposal.proposalTs;
       }
       // Retire first, then write — a choice, not an accident: the new card is

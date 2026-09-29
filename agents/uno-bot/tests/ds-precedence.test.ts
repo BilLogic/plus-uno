@@ -29,11 +29,11 @@ import {
   type PostDeps,
   type PrecedenceReport,
 } from "../src/ds-precedence/jobs";
-import { handleDsPrecedenceReply, isDsPrecedenceDispute } from "../src/ds-precedence/env";
+import { handleDsPrecedenceReply, isDsPrecedenceCandidate, isScheduledOnlyThread } from "../src/ds-precedence/env";
 import type { SlackMessageEvent } from "../src/slack/types";
 import type { Env } from "../src/types";
 import { resolveSignal, type GateSignal } from "../src/gate/index";
-import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
+import { createInMemoryThreadState, revisedBy, type PendingProposal } from "../src/thread-state/index";
 
 const FILE_KEY = "zAecJNRdvJzAUOcjV32tRX";
 const REPO = "BilLogic/plus-uno";
@@ -313,6 +313,18 @@ describe("the end-of-day check", () => {
     assert.equal(report.box.value, null);
   });
 
+  it("an empty or near-empty library skips the week rather than reporting every component missing", async () => {
+    // Nothing at all, and one set for three indexed components.
+    for (const components of [[], LIBRARY.meta!.components!.slice(0, 1)]) {
+      const stale = kv<PrecedenceReport | null>({ checkedAt: "x", items: [] } as unknown as PrecedenceReport);
+      const { deps, report } = checkDeps({ meta: { components } }, stale);
+      const result = await runPrecedenceCheck(deps);
+      assert.equal(result.found, 0);
+      assert.match(result.summary, /week skipped/);
+      assert.equal(report.box.value, null, "nothing is kept for the morning, so nothing posts");
+    }
+  });
+
   it("a dry run compares and writes nothing", async () => {
     const { deps, report } = checkDeps(LIBRARY);
     await runPrecedenceCheck(deps, { dryRun: true });
@@ -408,6 +420,37 @@ describe("the morning post", () => {
     assert.deepEqual(won.execute!.operations.map((op) => op.toolName), ["github_issue_create"]);
   });
 
+  it("a turn's card in the weekly thread leaves the weekly card live, and its ✅ still works", async () => {
+    const { deps, staged } = postDeps(await weekReport(), null);
+    await postPrecedenceReport(deps);
+    const threadState = createInMemoryThreadState();
+    const weekly = staged[0]!;
+    await threadState.putProposal(weekly);
+    // A turn answering an @mention in the same thread: it sees the weekly card
+    // as the thread's pending card, but does not revise it.
+    assert.equal(revisedBy(weekly), null);
+    const agentCard: PendingProposal = {
+      toolName: "notion_create",
+      input: { title: "x" },
+      channel: CHANNEL,
+      threadTs: weekly.threadTs,
+      replyTs: weekly.replyTs!,
+      userMsgTs: "1759500009.000001",
+      proposalTs: "1759500009.000002",
+      proposalText: "card",
+      requesterUserId: MEMBERS[0]!,
+    };
+    await threadState.putProposal(agentCard);
+    assert.equal((await threadState.getProposalByTs(weekly.proposalTs)).state, "found");
+    assert.equal((await threadState.getProposalByTs(agentCard.proposalTs)).state, "found");
+    const won = await resolveSignal(
+      { kind: "reaction", messageTs: weekly.proposalTs, channel: CHANNEL, thread: weekly.replyTs!, glyph: "white_check_mark", userId: MEMBERS[1]! },
+      { threadState },
+    );
+    assert.equal(won.outcome, "won");
+    assert.deepEqual(won.execute!.operations.map((op) => op.toolName), ["github_issue_create"]);
+  });
+
   it("a ⛔ runs nothing: the card's one operation is the intake", async () => {
     const { deps, staged } = postDeps(await weekReport(), null);
     await postPrecedenceReport(deps);
@@ -432,9 +475,14 @@ describe("a dispute in the thread", () => {
 
   it("reads `dispute N` replies, and nothing looser", () => {
     assert.deepEqual(disputedItems("dispute 2"), [2]);
-    assert.deepEqual(disputedItems("I'd dispute #1 and 3, see the set"), [1, 3]);
+    assert.deepEqual(disputedItems("dispute #1 and 3, see the set"), [1, 3]);
     assert.deepEqual(disputedItems("Dispute 2, 4"), [2, 4]);
+    assert.deepEqual(disputedItems("<@UBOT> dispute 2 — it is on its way"), [2]);
     assert.deepEqual(disputedItems("item 2 looks wrong"), []);
+    // Only a reply that STARTS with the word counts.
+    assert.deepEqual(disputedItems("I wouldn't dispute 2"), []);
+    assert.deepEqual(disputedItems("should we dispute 3?"), []);
+    assert.deepEqual(disputedItems("dispute 3?"), [], "a question, not a dispute");
   });
 
   it("revises the card without the disputed item, in the same thread", async () => {
@@ -580,15 +628,23 @@ describe("the Slack hook", () => {
     assert.deepEqual(reads, []);
   });
 
-  it("the mention twin of a dispute in the weekly thread stands aside", async () => {
-    assert.equal(await isDsPrecedenceDispute(env([]), msg({})), true);
-    assert.equal(await isDsPrecedenceDispute(env([]), msg({ thread_ts: "1.1" })), false);
-    assert.equal(await isDsPrecedenceDispute(env([]), msg({ text: "hi" })), false);
-    // A dispute the dispute path would decline — an item not on the list, or
-    // one already dropped — is not stood aside for, so the agent answers it.
-    assert.equal(await isDsPrecedenceDispute(env([]), msg({ text: "dispute 9" })), false);
-    assert.equal(await isDsPrecedenceDispute(env([]), msg({ text: "dispute 2" })), false);
-    // Nor once the card is decided: the dispute path declines it then too.
-    assert.equal(await isDsPrecedenceDispute(env([], "none"), msg({})), false);
+  it("queues a person's `dispute N` reply or broadcast in a #plus-universal thread, and nothing else", () => {
+    const e = env([]);
+    assert.equal(isDsPrecedenceCandidate(e, msg({})), true);
+    assert.equal(isDsPrecedenceCandidate(e, msg({ text: "<@UBOT> dispute 1" })), true);
+    assert.equal(isDsPrecedenceCandidate(e, msg({ subtype: "thread_broadcast" })), true);
+    assert.equal(isDsPrecedenceCandidate(e, msg({ subtype: "message_changed" })), false);
+    assert.equal(isDsPrecedenceCandidate(e, msg({ bot_id: "B1" })), false);
+    assert.equal(isDsPrecedenceCandidate(e, msg({ channel: "C0OTHER" })), false);
+    assert.equal(isDsPrecedenceCandidate(e, msg({ thread_ts: undefined })), false);
+    assert.equal(isDsPrecedenceCandidate(e, msg({ text: "I wouldn't dispute 1" })), false);
+  });
+
+  it("knows the weekly thread, so its replies are not all turns", async () => {
+    assert.equal(await isScheduledOnlyThread(env([]), CHANNEL, thread.ts), true);
+    assert.equal(await isScheduledOnlyThread(env([]), CHANNEL, "1.1"), false);
+    const reads: string[] = [];
+    assert.equal(await isScheduledOnlyThread(env(reads), "C0OTHER", thread.ts), false);
+    assert.deepEqual(reads, [], "another channel reads nothing");
   });
 });

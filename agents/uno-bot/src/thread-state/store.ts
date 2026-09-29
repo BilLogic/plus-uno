@@ -242,6 +242,15 @@ export interface PendingProposal {
    * other card means by one.
    */
   onCancel?: ProposalOperation[];
+  /**
+   * What this card supersedes by, when not its reply thread. Absent — every
+   * turn's card — cards in one reply thread replace one another. A card the
+   * Worker stages into a thread people also talk in sets its own key (the
+   * weekly DS precedence card): only a card with the same key replaces it, it
+   * replaces nothing else, and a turn in that thread does not treat it as the
+   * card its own proposal revises (`revisedBy`).
+   */
+  supersedeKey?: string;
 }
 
 /**
@@ -294,6 +303,23 @@ export function inheritedTerms(replaced: ProposalTerms | null | undefined): Prop
     ...(replaced?.ttlMs !== undefined ? { ttlMs: replaced.ttlMs } : {}),
     ...(replaced?.confirmers ? { confirmers: [...replaced.confirmers] } : {}),
   };
+}
+
+/**
+ * What a card supersedes by: its own `supersedeKey`, else its reply thread.
+ * Both adapters' `putProposal` compare cards with this.
+ */
+export function supersessionKey(proposal: Pick<PendingProposal, "replyTs" | "threadTs" | "supersedeKey">): string {
+  return proposal.supersedeKey ?? proposalReplyThread(proposal);
+}
+
+/**
+ * The pending card a turn's new proposal revises: the thread's card, unless it
+ * is keyed apart (`supersedeKey`) — a Worker-staged card that a turn's card
+ * neither retires nor inherits its terms from.
+ */
+export function revisedBy(pending: PendingProposal | null): PendingProposal | null {
+  return pending && pending.supersedeKey === undefined ? pending : null;
 }
 
 /**
@@ -524,6 +550,9 @@ export interface ThreadState {
    * In a channel `replyTs` IS the thread root, so channel behaviour is
    * unchanged; in a DM each ask has its own thread since the agent_view
    * migration, so a revision still retires the card it revises.
+   *
+   * A card with a `supersedeKey` is compared by that key instead, so it and
+   * the thread's other cards leave one another alone (`supersessionKey`).
    *
    * A card a caller already retired through `retireProposal` is stamped with
    * this one's ts as it passes, which is what gives the tie-break above its

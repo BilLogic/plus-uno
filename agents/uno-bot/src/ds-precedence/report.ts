@@ -31,14 +31,15 @@ export type IntakeTarget = { kind: "create" } | { kind: "update"; issue: number;
 const RULE = `${SOURCE_NAMES.code} > ${SOURCE_NAMES.library} > ${SOURCE_NAMES["spec-pages"]}`;
 
 /**
- * The item numbers a reply disputes: `dispute 2`, `dispute #2, 4`,
- * `dispute 1 and 3`. Nothing looser — a reply that only mentions a number is
- * a conversation, and goes to the agent.
+ * The item numbers a reply disputes. Only a reply that STARTS with `dispute`
+ * and a number counts — `dispute 2`, `dispute #2, 4`, `dispute 1 and 3`, then
+ * anything — after any leading @mentions. "I wouldn't dispute 2" and "should
+ * we dispute 3?" are a conversation, and go to the agent.
  *
  * @param text - The reply
  */
 export function disputedItems(text: string): number[] {
-  const m = /\bdispute\s+((?:#?\d+)(?:\s*(?:,|and|&)\s*#?\d+)*)/i.exec(text);
+  const m = /^\s*(?:<@[A-Z0-9]+>[\s,:]*)*dispute\s+((?:#?\d+)(?:\s*(?:,|and|&)\s*#?\d+)*)(?![\w.]*\?)(?!\w)/i.exec(text);
   if (!m) return [];
   return [...new Set(m[1]!.match(/\d+/g)!.map(Number))].sort((a, b) => a - b);
 }

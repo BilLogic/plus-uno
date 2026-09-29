@@ -18,7 +18,6 @@ import { inFlightComponents, type PrecedenceRegistry } from "./compare";
 import { disputedItems, PRECEDENCE_MARKER } from "./report";
 import {
   disputePrecedenceItems,
-  freshDisputes,
   postPrecedenceReport,
   runPrecedenceCheck,
   type CheckResult,
@@ -97,56 +96,58 @@ export async function runDsPrecedencePost(env: Env, opts: { dryRun: boolean }): 
 }
 
 /**
- * A reply in #plus-universal that may dispute an item of the weekly thread.
- * Cheap for every other message: nothing is read unless the reply is in
- * #plus-universal, in a thread, and says `dispute N`.
+ * Whether a message could be a dispute of the weekly thread: a person's reply
+ * (or "also send to channel" broadcast) in a #plus-universal thread that starts
+ * with `dispute N`. Reads nothing — the dispatch uses it to queue the reply on
+ * the thread's runner, where `handleDsPrecedenceReply` decides.
  *
  * @param env - Worker bindings
  * @param event - The message
- * @returns Whether it was a dispute, handled — the agent then leaves it
+ */
+export function isDsPrecedenceCandidate(env: Env, event: SlackMessageEvent): boolean {
+  const channel = env.PLUS_UNIVERSAL_CHANNEL_ID?.trim();
+  if (!channel || event.channel !== channel || !event.thread_ts || !env.HARNESS_KV) return false;
+  if (event.bot_id || !event.user || (event.subtype && event.subtype !== "thread_broadcast")) return false;
+  return disputedItems(event.text ?? "").length > 0;
+}
+
+/**
+ * A queued reply that disputes items of the live weekly thread: revise its
+ * card. Runs at the head of the thread's job (`slack/message-job.ts`).
+ *
+ * @param env - Worker bindings
+ * @param event - The message
+ * @returns Whether it was a dispute, handled — the turn is then skipped
  */
 export async function handleDsPrecedenceReply(env: Env, event: SlackMessageEvent): Promise<boolean> {
-  const channel = mayDispute(env, event);
-  if (!channel || !event.thread_ts || !event.user || !event.text) return false;
+  if (!isDsPrecedenceCandidate(env, event)) return false;
   const store = threadStateFor(env);
   return disputePrecedenceItems(
     {
       thread: kvJson<PostedThread | null>(env, THREAD_KV_KEY, null),
-      post: (message) => post(env, channel, message),
+      post: (message) => post(env, event.channel, message),
       stage: (proposal) => store.putProposal(proposal),
       retire: (ts) => store.retireProposal(ts),
-      pending: (ts) => cardPending(env, ts),
+      pending: async (ts) => (await store.getProposalByTs(ts)).state === "found",
       now: () => Date.now(),
     },
-    { channel: event.channel, threadTs: event.thread_ts, user: event.user, text: event.text },
+    { channel: event.channel, threadTs: event.thread_ts!, user: event.user!, text: event.text ?? "" },
   );
 }
 
 /**
- * Whether an @mention is a dispute reply in the live weekly thread. The
- * mention's `message` event carries the dispute (`handleDsPrecedenceReply`);
- * this lets the `app_mention` twin stand aside rather than start an agent turn
- * that answers the same reply a second time.
+ * Whether a #plus-universal thread is the weekly DS precedence thread — one
+ * whose only uno-bot posts are its scheduled list and card. One KV read, and
+ * only for a thread reply in that channel.
  *
  * @param env - Worker bindings
- * @param event - The mention, as a message
+ * @param channel - The reply's channel
+ * @param threadTs - The reply's thread
  */
-export async function isDsPrecedenceDispute(env: Env, event: SlackMessageEvent): Promise<boolean> {
-  if (!mayDispute(env, event) || !event.thread_ts) return false;
+export async function isScheduledOnlyThread(env: Env, channel: string, threadTs: string): Promise<boolean> {
+  if (!env.HARNESS_KV || channel !== env.PLUS_UNIVERSAL_CHANNEL_ID?.trim()) return false;
   const thread = await kvJson<PostedThread | null>(env, THREAD_KV_KEY, null).read();
-  const reply = { channel: event.channel, threadTs: event.thread_ts, text: event.text ?? "" };
-  return !!thread && freshDisputes(thread, reply, Date.now()).length > 0 && (await cardPending(env, thread.cardTs));
-}
-
-async function cardPending(env: Env, proposalTs: string): Promise<boolean> {
-  return (await threadStateFor(env).getProposalByTs(proposalTs)).state === "found";
-}
-
-/** The channel, when the message could be a dispute at all; no read spent. */
-function mayDispute(env: Env, event: SlackMessageEvent): string | null {
-  const channel = env.PLUS_UNIVERSAL_CHANNEL_ID?.trim();
-  if (!channel || event.channel !== channel || !event.thread_ts || !env.HARNESS_KV) return null;
-  return disputedItems(event.text ?? "").length ? channel : null;
+  return !!thread && thread.channel === channel && thread.ts === threadTs;
 }
 
 async function post(

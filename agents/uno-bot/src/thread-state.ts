@@ -59,6 +59,7 @@ import {
   ownTtl,
   proposalReplyThread,
   proposalTtlMs,
+  supersessionKey,
   type CutOffNoteReport,
   type Execution,
   type HistoryTurn,
@@ -306,7 +307,7 @@ export class ThreadState extends DurableObject<Env> {
   // Retire first, then write — a choice, not an accident: the new card is the
   // one a racing ✅ has to be able to find, so it is the last thing to land.
   async putProposal(proposal: PendingProposal, at: number): Promise<void> {
-    const thread = proposalReplyThread(proposal);
+    const thread = supersessionKey(proposal);
     const all = await this.storage.list<ProposalRecord>({ prefix: "prop:" });
     for (const [key, rec] of all) {
       if (key === proposalKey(proposal.proposalTs)) continue;
@@ -317,7 +318,7 @@ export class ThreadState extends DurableObject<Env> {
       if (at - rec.createdAt > recordTtlMs(rec)) continue; // already "expired"
       const pending = rec.payload as PendingProposal | null;
       if (!pending || pending.channel !== proposal.channel) continue;
-      if (proposalReplyThread(pending) !== thread) continue;
+      if (supersessionKey(pending) !== thread) continue;
       await this.storage.put<ProposalRecord>(key, {
         ...rec,
         supersededBy: proposal.proposalTs,
