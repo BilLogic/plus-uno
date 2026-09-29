@@ -359,11 +359,6 @@
     margin-bottom: 0 !important;
 }
 
-.insight-alert-icon {
-    margin-right: var(--size-element-gap-sm);
-    font-size: 20px;
-}
-
 /* ============================================
    TIME ALLOCATION SECTION
    ============================================ */
@@ -1261,6 +1256,11 @@
     border-radius: 4px;
 }
 
+/*
+ * The insight ink on a tertiary insight's icon. A warning or success alert
+ * keeps its own ground (`.plus-alert.<style>` outranks `.insight-alert`), so
+ * its icon keeps its own style's color and does not take this class.
+ */
 .insight-alert .insight-alert-icon {
     color: var(--color-on-tertiary-container, var(--color-on-surface));
 }

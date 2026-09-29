@@ -17,13 +17,21 @@
 |------|------|---------|-------------|
 | `children` | node | — | The label (takes precedence over `text`). |
 | `text` | string | — | The label, as a string. Defaults per `origin`. |
-| `origin` | oneOf | `'generated'` | Who authored the value — the axis that matters, not whether a model was involved. |
-| `confidence` | oneOf | `'high'` | `low` adds the caution treatment and the note. |
+| `origin` | enum | `'generated'` | Who authored the value — the axis that matters, not whether a model was involved. |
+| `confidence` | enum | `'high'` | `low` adds the caution treatment and the note. |
 | `note` | string | — | What to do about low confidence. Shown only when `confidence` is `low`. |
 | `onExplain` | func | — | Renders a real button inside the mark. The mark itself is never a control. |
 | `explainLabel` | string | `'How was this made?'` | The explain button's own words. It says what it DOES. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |
+
+## Variants
+
+**`origin`** — `generated` · `assisted` · `reviewed`
+
+**`confidence`** — `high` · `low`
+
+Anything not listed is not a valid value.
 
 ## Tokens touched
 
