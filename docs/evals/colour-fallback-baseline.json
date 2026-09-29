@@ -95,6 +95,7 @@
     "--color-error-container",
     "--color-muted",
     "--color-neutral-container",
+    "--color-neutral-text",
     "--color-on-background",
     "--color-on-error-container",
     "--color-on-surface-variant-2",

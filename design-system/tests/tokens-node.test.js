@@ -467,7 +467,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
    * mechanism over the whole live corpus rather than asserted as "output
    * unchanged".
    *
-   * THE MECHANISM. `fallbackUsages` tries a whole colour function —
+   * THE MECHANISM. `fallbackUsages` tries a whole color function —
    * `rgba(…)`, `rgb(…)`, `hsla(…)`, commas and all — before the plain
    * `[^),]+` literal. Until it did, the plain literal was the only branch: it
    * admits no comma and no `)`, so a `var(--color-x, rgba(4, 114, 168, 0.08))`
@@ -479,9 +479,10 @@ describe('the colour key is finer than the normaliser it replaces', () => {
    * files, every one captured. 83 name a defined token and are compared with
    * alpha on both sides; the other 3 name tokens that are defined nowhere,
    * and are the check's undefined-token finding instead. All 83 agree,
-   * because the disagreeing washes were fixed when the capture widened.
+   * because the disagreeing washes were fixed when the capture widened, and
+   * the test asserts it: a stale wash here is a failure, not a recount.
    */
-  it('compares every live rgba() colour fallback with its alpha, because the capture reads a whole colour function', () => {
+  it('compares every live rgba() color fallback with its alpha, because the capture reads a whole color function', () => {
     const roots = ['design-system/src', '.storybook', 'prototypes'];
     const extensions = ['.scss', '.css', '.jsx', '.tsx', '.mdx', '.html'];
     const root = resolve('..');
@@ -492,7 +493,7 @@ describe('the colour key is finer than the normaliser it replaces', () => {
       })),
     );
 
-    // The population this test is about: every wash written beside a colour
+    // The population this test is about: every wash written beside a color
     // token. Counted per SITE, not per file.
     const washes = sources.reduce(
       (n, s) => n + (s.text.match(/var\(\s*--color-[a-z0-9-]+\s*,\s*rgba\(/g) ?? []).length,
@@ -523,7 +524,9 @@ describe('the colour key is finer than the normaliser it replaces', () => {
       const tokenValue = colourKey(tokens.get(use.token));
       if (literal === null || tokenValue === null) continue;
       comparable += 1;
-      if (literal.length === 9 || tokenValue.length === 9) withAlpha += 1;
+      if (literal.length !== 9 && tokenValue.length !== 9) continue;
+      withAlpha += 1;
+      expect(literal, `${use.path}:${use.line} ${use.token}`).toBe(tokenValue);
     }
     expect(withAlpha).toBe(83);
     expect(comparable).toBe(632);

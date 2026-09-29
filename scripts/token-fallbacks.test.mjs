@@ -63,7 +63,7 @@ test('a whole rgba() fallback is captured, commas and alpha included', () => {
   ]);
 });
 
-test('rgb(), hsl() and space-separated syntax are captured too, with room before the closing paren', () => {
+test('rgb() in space syntax and hsla() are captured too, with room before the closing paren', () => {
   const uses = fallbackUsages([
     {
       path: 'a.scss',
@@ -76,6 +76,56 @@ test('rgb(), hsl() and space-separated syntax are captured too, with room before
     uses.map((use) => use.literal),
     ['rgb(4 114 168 / 50%)', 'hsla(0, 0%, 0%, 0.5)'],
   );
+});
+
+test('an uppercase color function is captured, since CSS function names are case-insensitive', () => {
+  const uses = fallbackUsages([{ path: 'a.scss', text: 'color: var(--color-scrim, RGBA(0, 0, 0, 0.32));' }]);
+  assert.deepEqual(uses.map((use) => use.literal), ['RGBA(0, 0, 0, 0.32)']);
+});
+
+test('a color function holding a var() falls through to the plain literal, as a fragment', () => {
+  // It is not a color the key can read, so the audit counts it as not
+  // comparable rather than guessing.
+  const uses = fallbackUsages([{ path: 'a.scss', text: 'color: var(--color-a, rgba(var(--x), 0.5));' }]);
+  assert.deepEqual(uses, [{ path: 'a.scss', line: 1, token: '--color-a', literal: 'rgba(var(--x' }]);
+});
+
+test('two var() calls on one line are both captured, each with its own fallback', () => {
+  const uses = fallbackUsages([
+    {
+      path: 'a.scss',
+      text: 'border: 1px solid var(--color-a, rgba(0, 0, 0, 0.12)); color: var(--color-b, #3f484a);',
+    },
+  ]);
+  assert.deepEqual(
+    uses.map(({ token, literal }) => [token, literal]),
+    [
+      ['--color-a', 'rgba(0, 0, 0, 0.12)'],
+      ['--color-b', '#3f484a'],
+    ],
+  );
+});
+
+test('a nested var() fallback is captured as the outer literal, and the inner var() in its own right', () => {
+  // The outer token still names a token, so an undefined one is still found;
+  // its literal is the inner var(), which the audit counts as not comparable.
+  const uses = fallbackUsages([{ path: 'a.scss', text: 'color: var(--color-a, var(--color-b, #fff));' }]);
+  assert.deepEqual(
+    uses.map(({ token, literal }) => [token, literal]),
+    [
+      ['--color-a', 'var(--color-b, #fff)'],
+      ['--color-b', '#fff'],
+    ],
+  );
+  const audit = fallbackAudit({
+    tokens: new Map([
+      ['--color-a', '#ffffff'],
+      ['--color-b', '#ffffff'],
+    ]),
+    usages: uses,
+  });
+  assert.equal(audit.incomparable, 1);
+  assert.equal(audit.agreeing, 1);
 });
 
 /* -------------------------------------------------------------------- audit */
@@ -105,7 +155,7 @@ test('a fallback that agrees is counted and not reported', () => {
 });
 
 test('an rgba() fallback is compared with its alpha, so a stale wash is reported', () => {
-  // The alpha is part of the colour: a wash at 0.5 over a token at 0.32 paints
+  // The alpha is part of the color: a wash at 0.5 over a token at 0.32 paints
   // a different scrim, and so does the right alpha over the wrong base.
   const audit = fallbackAudit({
     tokens: new Map([['--color-tertiary-state-08', 'rgba(14, 129, 117, 0.08)']]),

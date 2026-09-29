@@ -98,7 +98,8 @@
  * is written that way, so when the state-layer bases were re-mixed the stale
  * washes beside them went unreported.
  *
- * `fallbackUsages` below now tries a whole colour function first. Measured
+ * `fallbackUsages` below now tries a whole color function before the plain
+ * literal, using the pattern source `colourKey` itself reads with. Measured
  * over the live tree, that is 86 `rgba()` fallback sites across 21 files, all
  * captured; 83 name a defined token and are compared with alpha on both
  * sides, and 3 name a token defined nowhere. Widening the capture found 12
@@ -107,44 +108,62 @@
  * so a capture that quietly stops reading washes is told what it has changed.
  */
 
-import { colourKey } from '../design-system/src/lib/tokens-node.mjs';
+import { COLOR_FUNCTION_SOURCE, colourKey } from '../design-system/src/lib/tokens-node.mjs';
 import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
+
+/**
+ * A nested `var()` fallback, one level of parentheses deep inside it, so
+ * `var(--b, #fff)` and `var(--b, rgba(0, 0, 0, 0.5))` are read whole. Deeper
+ * nesting falls through to the plain literal and the outer `var()` is not
+ * matched, which is the one shape this capture still does not see.
+ */
+const NESTED_VAR = 'var\\((?:[^()]|\\([^()]*\\))*\\)';
+
+/**
+ * The fallback, in the order its branches are tried: a nested `var()`, then a
+ * whole color function (the shared source, so the capture reads exactly what
+ * `colourKey` reads), then a plain literal. The color function comes before
+ * the plain literal because the plain literal stops at the first comma, and
+ * every state-layer wash is written with commas. The fallback is read from
+ * the named group, so the shared source's own numbered groups, which come
+ * after the token name's, shift nothing a caller reads.
+ */
+const FALLBACK = `(?<literal>${NESTED_VAR}|${COLOR_FUNCTION_SOURCE}|[^),]+)`;
 
 /**
  * Every `var(--color-*, …)` in the given files, with the file and line.
  *
- * A nested `var()` fallback is captured with `literal: null` rather than
- * skipped: it is not comparable, but a check that silently dropped it would be
- * unable to say how much of the corpus it actually looked at.
+ * A nested `var()` fallback is captured with that inner `var()` as its
+ * literal, which the audit counts as not comparable rather than dropping: a
+ * check that silently skipped it could not say how much of the corpus it
+ * actually looked at. The inner `var()` is captured in its own right as well,
+ * so its fallback is still compared against its own token.
  *
- * The `var(--name` half is the module's `varReferencePattern` (#507); the tail
- * that captures the fallback literal is this check's, because the module
+ * A color function whose arguments hold a `var()`, such as
+ * `rgba(var(--x), 0.5)`, is not a color function to the shared source, so it
+ * falls through to the plain literal and arrives as the fragment
+ * `rgba(var(--x`, which the audit counts as not comparable.
+ *
+ * The `var(--name` half is the module's `varReferencePattern`; the tail that
+ * captures the fallback literal is this check's, because the module
  * deliberately stops at the name.
  *
  * @param {{path: string, text: string}[]} files
  * @param {{prefix?: string}} [options]
  */
-/**
- * A whole colour function — `rgba(4, 114, 168, 0.08)`, `rgb(4 114 168 / 50%)`,
- * `hsla(…)` — tried BEFORE the plain literal, because the plain literal stops
- * at the first comma and every state-layer wash is written with commas. It
- * admits no inner parenthesis, so `rgba(var(--x), 0.5)` falls through to the
- * plain branch and arrives as the incomparable fragment it always did.
- */
-const COLOUR_FUNCTION = '(?:rgba?|hsla?)\\([^()]*\\)';
-
 export function fallbackUsages(files, { prefix = '--color-' } = {}) {
   const uses = [];
-  const call = new RegExp(
-    `${varReferencePattern(prefix).source}\\s*(?:,\\s*(${COLOUR_FUNCTION}|[^),]+))?\\s*\\)`,
-    'g',
-  );
+  const call = new RegExp(`${varReferencePattern(prefix).source}\\s*(?:,\\s*${FALLBACK})?\\s*\\)`, 'g');
+  const scan = (path, line, text) => {
+    for (const m of text.matchAll(call)) {
+      const literal = m.groups.literal ? m.groups.literal.trim() : null;
+      uses.push({ path, line, token: m[1], literal });
+      // A match consumes its nested `var()`, so read that one as well.
+      if (literal?.startsWith('var(')) scan(path, line, literal);
+    }
+  };
   for (const { path, text } of files) {
-    text.split('\n').forEach((line, i) => {
-      for (const m of line.matchAll(call)) {
-        uses.push({ path, line: i + 1, token: m[1], literal: m[2] ? m[2].trim() : null });
-      }
-    });
+    text.split('\n').forEach((line, i) => scan(path, i + 1, line));
   }
   return uses;
 }
