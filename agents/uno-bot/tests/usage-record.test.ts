@@ -10,12 +10,17 @@ import {
   buildTurnRecord,
   estimateCostUsd,
   isTestTraffic,
+  MAX_REQUEST_TEXT_CHARS,
+  keepsRequestText,
   ratesFor,
   selfFiledTicketOf,
   sourcesCitedIn,
   type TurnRecordFacts,
+  withAskLabel,
 } from "../src/usage/index";
 import type { TurnDisposition } from "../src/turn/index";
+import { conversationTypeOf } from "../src/turn/request";
+import { slackTurnRequest } from "../src/slack/turn-request";
 
 const SEP_2026 = Date.UTC(2026, 8, 29);
 
@@ -25,6 +30,7 @@ const facts = (over: Partial<TurnRecordFacts> = {}): TurnRecordFacts => ({
   testChannelIds: [],
   requesterId: "U1",
   surface: "channel",
+  conversationType: "channel",
   inThread: false,
   channel: "C1",
   askTs: "1790000000.100000",
@@ -184,4 +190,83 @@ test("test traffic: a debug route, a sandbox channel, a bare greeting — and no
   assert.equal(isTestTraffic({ ...base, disposition: "reacted", question: "thanks!" }), true);
   // A reaction to a real question is still a real ask.
   assert.equal(isTestTraffic({ ...base, disposition: "reacted", question: "is this right?" }), false);
+});
+
+// ── corpus categories ────────────────────────────────────────────────────────
+
+test("a real channel ask keeps its text, capped; a DM ask and test traffic keep none", () => {
+  assert.equal(buildTurnRecord(facts()).requestText, "where is the onboarding PRD?");
+  assert.equal(
+    buildTurnRecord(facts({ question: "x".repeat(MAX_REQUEST_TEXT_CHARS + 50) })).requestText?.length,
+    MAX_REQUEST_TEXT_CHARS,
+  );
+  assert.equal(buildTurnRecord(facts({ conversationType: "group" })).requestText, "where is the onboarding PRD?");
+  assert.equal(
+    buildTurnRecord(facts({ surface: "assistant", conversationType: "im", channel: "D9" })).requestText,
+    null,
+  );
+  assert.equal(buildTurnRecord(facts({ origin: "debug" })).requestText, null);
+  assert.equal(buildTurnRecord(facts({ testChannelIds: ["C1"] })).requestText, null);
+});
+
+test("a group DM's text is never stored, and its row names it for what it is", () => {
+  const record = buildTurnRecord(facts({ conversationType: "mpim", channel: "G9" }));
+  assert.equal(record.requestText, null);
+  assert.equal(record.surface, "channel", "delivered like a channel");
+  assert.equal(record.conversationType, "mpim");
+  assert.equal(record.channelId, null, "a group DM's id is not kept");
+});
+
+test("an ask of unknown conversation type keeps no text — unknown is private", () => {
+  const { conversationType: _omit, ...unknown } = facts();
+  const record = buildTurnRecord(unknown);
+  assert.equal(record.requestText, null);
+  assert.equal(record.conversationType, null);
+  assert.equal(keepsRequestText(undefined), false);
+  assert.deepEqual(
+    (["channel", "group", "mpim", "im"] as const).map((t) => keepsRequestText(t)),
+    [true, true, false, false],
+  );
+});
+
+test("a real turn that staged a card is pain_category 7 before any classifier runs", () => {
+  assert.equal(buildTurnRecord(facts({ proposalId: "1.2", disposition: "staged" })).painCategory, 7);
+  assert.equal(buildTurnRecord(facts()).painCategory, null);
+  assert.equal(buildTurnRecord(facts({ proposalId: "1.2", origin: "debug" })).painCategory, null);
+});
+
+test("an in-turn label sets the Sub-type, its pain_category and when, and keeps a staged 7", () => {
+  const labelled = withAskLabel(
+    buildTurnRecord(facts({ surface: "assistant", conversationType: "im", channel: "D9" })),
+    "Sync/drift",
+    99,
+  );
+  assert.deepEqual(
+    [labelled.subType, labelled.painCategory, labelled.classifiedAt, labelled.requestText],
+    ["Sync/drift", 3, 99, null],
+  );
+  const staged = buildTurnRecord(facts({ surface: "assistant", channel: "D9", proposalId: "1.2" }));
+  assert.equal(withAskLabel(staged, null, 99).painCategory, 7);
+});
+
+// ── whose conversation ───────────────────────────────────────────────────────
+
+test("the conversation type is the event's channel_type, else what the id proves, else unknown", () => {
+  assert.equal(conversationTypeOf("C1", "channel"), "channel");
+  assert.equal(conversationTypeOf("G1", "group"), "group");
+  assert.equal(conversationTypeOf("C9", "mpim"), "mpim");
+  assert.equal(conversationTypeOf("D1", undefined), "im");
+  assert.equal(conversationTypeOf("D1", "app_home"), "im");
+  // An app_mention carries no channel_type: a C… id may be a channel or not.
+  assert.equal(conversationTypeOf("C1", undefined), undefined);
+  assert.equal(conversationTypeOf("C1", "something-new"), undefined);
+});
+
+test("a Slack group-DM message reaches the turn as a group DM", () => {
+  const request = slackTurnRequest(
+    { type: "message", channel: "C0MPIM", channel_type: "mpim", user: "U1", ts: "1.2", text: "hi" },
+    { conversationTs: "1.2", text: "hi", history: [], pending: null, prd: null },
+  );
+  assert.equal(request.surface, "channel");
+  assert.equal(request.conversationType, "mpim");
 });
