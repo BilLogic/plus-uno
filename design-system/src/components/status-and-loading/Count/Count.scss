@@ -86,13 +86,14 @@ $count-dot: (
 }
 
 /*
- * Inverse is for counts on dark surfaces such as inverse-surface. It replaces the
- * three filled counter styles with one: the surface at 16% (there is no 20%
- * step), with surface ink. It is neutral whatever `style` says.
+ * Inverse is for counts on filled buttons and dark surfaces. It replaces the
+ * three filled counter styles with one: a solid white pill with dark text, so
+ * it passes contrast on any fill rather than depending on the ground beneath
+ * it. It is neutral whatever `style` says.
  */
 .plus-count--inverse {
-    background-color: var(--color-surface-state-16, rgba(249, 249, 252, 0.16));
-    color: var(--color-surface, #f9f9fc);
+    background-color: var(--color-surface-container-lowest, #ffffff);
+    color: var(--color-on-surface-variant, #3f484a);
 }
 
 /* The dot: 8, solid, no number. Its name comes from `label`. */

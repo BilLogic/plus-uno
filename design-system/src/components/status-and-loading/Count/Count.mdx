@@ -50,7 +50,7 @@ items, results, errors.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Subtle by default; bold when it asks for action now; inverse on dark surfaces such as inverse-surface; dot for presence without a number.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Subtle by default; bold when it asks for action now; inverse on filled buttons and dark surfaces; dot for presence without a number.</>}>
     <Canvas of={CountStories.Appearances} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -174,10 +174,10 @@ count per area.
 <Count value={unread} />
 ```
 
-### Use inverse on dark surfaces such as inverse-surface.
+### Use inverse on filled buttons and dark surfaces.
 
-Inverse is the surface at 16%, so it reads on a dark ground. On a light surface
-it disappears; use subtle there.
+Inverse is a solid white pill with dark text, so it passes contrast on any fill.
+On a light surface it barely separates from the page; use subtle there.
 
 </div>
 
@@ -195,7 +195,8 @@ it disappears; use subtle there.
   and nav items; whatever is pressable is the thing around it.
 - **Contrast.** Subtle uses each style's (Text) color, and bold warning uses the
   Warning Container pair because warning with white text fails AA. Inverse
-  clears AA on dark surfaces such as inverse-surface.
+  is a solid white pill with dark text, so it clears AA on any fill, including
+  a primary button.
 
 </div>
 

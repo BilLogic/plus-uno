@@ -106,7 +106,7 @@ Count.propTypes = {
     max: PropTypes.number,
     /** Render a count of 0 instead of nothing. */
     showZero: PropTypes.bool,
-    /** `subtle` by default; `bold` asks for action now (at most one per area); `inverse` sits on dark surfaces such as inverse-surface; `dot` is presence without a number. */
+    /** `subtle` by default; `bold` asks for action now (at most one per area); `inverse` is a solid white pill for filled buttons and dark surfaces; `dot` is presence without a number. */
     appearance: PropTypes.oneOf(COUNT_APPEARANCES),
     /** The intent. Use one only when the number carries it. `inverse` is always neutral. */
     style: PropTypes.oneOf(COUNT_STYLES),

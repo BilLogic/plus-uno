@@ -51,6 +51,19 @@ const alpha = (color) => {
     return parts.length === 4 ? parts[3] : 1;
 };
 
+/** WCAG contrast ratio between two opaque computed colors. */
+const contrast = (a, b) => {
+    const lum = (color) => {
+        const [r, g, b2] = color.match(/[\d.]+/g).slice(0, 3).map((v) => {
+            const c = Number(v) / 255;
+            return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b2;
+    };
+    const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
+    return (hi + 0.05) / (lo + 0.05);
+};
+
 /** The pill that holds a given piece of text. */
 const pillOf = (canvas, text) => canvas.getByText(text).parentElement;
 
@@ -61,8 +74,11 @@ export const Appearances = () => (
     <div style={row}>
         <Count value={12} />
         <Count value={13} appearance="bold" style="danger" />
+        <button type="button" className="btn btn-primary">
+            Review <Count value={14} appearance="inverse" />
+        </button>
         <span style={{ background: 'var(--color-inverse-surface)', padding: '8px', borderRadius: '6px' }}>
-            <Count value={14} appearance="inverse" />
+            <Count value={15} appearance="inverse" />
         </span>
         <Count appearance="dot" style="danger" label="New activity" />
     </div>
@@ -81,12 +97,17 @@ Appearances.play = async ({ canvasElement }) => {
     await expect(bold.backgroundColor).toBe(tokenColor(canvasElement, '--color-danger'));
     await expect(bold.color).toBe(tokenColor(canvasElement, '--color-on-danger'));
 
-    const inverse = getComputedStyle(pillOf(canvas, '14'));
-    await expect(inverse.backgroundColor, 'inverse is surface at 16%').toBe(
-        tokenColor(canvasElement, '--color-surface-state-16'),
-    );
-    await expect(alpha(inverse.backgroundColor)).toBeCloseTo(0.16, 2);
-    await expect(inverse.color).toBe(tokenColor(canvasElement, '--color-surface'));
+    // Inverse is a solid white pill with dark text, on a primary button and on
+    // inverse-surface alike.
+    for (const text of ['14', '15']) {
+        const inverse = getComputedStyle(pillOf(canvas, text));
+        await expect(inverse.backgroundColor, 'inverse is surface-container-lowest').toBe(
+            tokenColor(canvasElement, '--color-surface-container-lowest'),
+        );
+        await expect(alpha(inverse.backgroundColor), 'inverse is solid').toBe(1);
+        await expect(inverse.color).toBe(tokenColor(canvasElement, '--color-on-surface-variant'));
+        await expect(contrast(inverse.color, inverse.backgroundColor), 'AA on any fill').toBeGreaterThanOrEqual(4.5);
+    }
 
     const dot = canvas.getByRole('img', { name: 'New activity' });
     const d = getComputedStyle(dot);
