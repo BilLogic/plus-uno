@@ -21,6 +21,7 @@ import type { ModelTier } from "../agent/routing";
 import { proposalReplyThread } from "../thread-state/index";
 import type { HistoryTurn, PendingProposal, VisionReference } from "../thread-state/index";
 import type { TurnRequest, TurnSurface } from "./turn";
+import type { IntakeThread } from "./intake-channel";
 
 /**
  * The envelope facts a caller resolves, before any of the turn's conventions
@@ -40,6 +41,9 @@ export interface TurnFacts {
   /** The body including attachment lines, when it differs from `text`. */
   attachmentsText?: string;
   scopeInstruction?: string;
+  /** In #uno-bot — the caller reads its config through `isIntakeChannel` —
+   *  with who has posted in the thread. */
+  intakeChannel?: IntakeThread;
   images?: AgentImage[];
   historicalImages?: HistoricalImages;
   visionNotes?: string[];
@@ -107,6 +111,7 @@ export function buildTurnRequest(facts: TurnFacts): TurnRequest {
     text: facts.text,
     ...(attachmentsText ? { attachmentsText } : {}),
     ...(facts.scopeInstruction ? { scopeInstruction: facts.scopeInstruction } : {}),
+    ...(facts.intakeChannel ? { intakeChannel: facts.intakeChannel } : {}),
     images: facts.images ?? [],
     ...(facts.historicalImages ? { historicalImages: facts.historicalImages } : {}),
     ...(facts.visionNotes?.length ? { visionNotes: facts.visionNotes } : {}),
