@@ -12,7 +12,8 @@
 // (`tests/helpers/usage-log-conformance.ts`, run under `node --test` and again
 // under workerd against a local D1).
 //
-// PURE: no `Env`, no Workers global. `Env` stops in `./production.ts`.
+// PURE: no `Env`, no Workers global. `Env` stops in `./production.ts` (and, for
+// the resolution columns, `./resolution-env.ts`).
 
 import type { ConversationType } from "../turn/turn";
 import type { PainCategory, SubType } from "./categories";

@@ -1,5 +1,5 @@
-// The one place production's UsageLog is built, and the one file in the module
-// that takes `Env`.
+// The one place production's UsageLog is built, and one of the module's two
+// files that take `Env` (the other is `./resolution-env.ts`).
 //
 // A missing binding is not an error: a Worker deployed without `USAGE_DB` —
 // before the database was bound, or in a local `wrangler dev` without it —

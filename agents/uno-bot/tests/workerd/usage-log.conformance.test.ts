@@ -17,6 +17,8 @@ import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { D1_QUERY_CAP, d1QueriesUsed, internalSubrequestsUsed, isSubrequestBudgetError, runMetered } from "../../src/net";
 import { createD1AskCategories } from "../../src/usage/category-store";
 import { createD1UsageLog } from "../../src/usage/d1";
+import { createD1ResolutionLog } from "../../src/usage/resolution-d1";
+import { runResolutionLogConformance } from "../helpers/resolution-log-conformance";
 import { runCategoryConformance, runUsageLogConformance, turnRecord } from "../helpers/usage-log-conformance";
 import { createD1ProposalEventLog } from "../../src/usage/proposal-events-d1";
 import { runProposalEventConformance, stagedRow } from "../helpers/proposal-events-conformance";
@@ -46,6 +48,15 @@ runCategoryConformance(
   () => ({
     log: createD1UsageLog({ db: bindings.USAGE_DB }),
     store: createD1AskCategories({ db: bindings.USAGE_DB }),
+  }),
+  { it: (name, fn) => it(name, fn) },
+);
+
+runResolutionLogConformance(
+  "d1",
+  () => ({
+    usage: createD1UsageLog({ db: bindings.USAGE_DB }),
+    resolutions: createD1ResolutionLog({ db: bindings.USAGE_DB }),
   }),
   { it: (name, fn) => it(name, fn) },
 );
@@ -105,14 +116,16 @@ describe("[d1] the meter", () => {
   });
 });
 
-describe("[d1] the first migration", () => {
-  it("indexes time, requester and the unclassified rows", async () => {
+describe("[d1] the migrations", () => {
+  it("index time, requester, the unclassified rows, the resolution queue and the card", async () => {
     const { results } = await bindings.USAGE_DB.prepare(
       "SELECT name FROM sqlite_master WHERE type = 'index' AND tbl_name = 'turns' AND sql IS NOT NULL ORDER BY name",
     ).all<{ name: string }>();
     expect(results.map((r) => r.name)).toEqual([
+      "turns_by_proposal",
       "turns_by_requester",
       "turns_by_time",
+      "turns_resolution_unchecked",
       "turns_unclassified",
       "turns_with_text",
     ]);
@@ -123,6 +136,13 @@ describe("[d1] the first migration", () => {
       "EXPLAIN QUERY PLAN SELECT turn_id FROM turns WHERE classified_at IS NULL AND test_traffic = 0 ORDER BY asked_at",
     ).all<{ detail: string }>();
     expect(results.map((r) => r.detail).join(" | ")).toMatch(/turns_unclassified/);
+  });
+
+  it("serves the resolution pass's queue from its partial index", async () => {
+    const { results } = await bindings.USAGE_DB.prepare(
+      "EXPLAIN QUERY PLAN SELECT turn_id FROM turns WHERE resolution_checked_at IS NULL AND test_traffic = 0 AND asked_at > 0 ORDER BY asked_at",
+    ).all<{ detail: string }>();
+    expect(results.map((r) => r.detail).join(" | ")).toMatch(/turns_resolution_unchecked/);
   });
 });
 

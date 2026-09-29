@@ -242,6 +242,18 @@ export interface PendingProposal {
    * other card means by one.
    */
   onCancel?: ProposalOperation[];
+  /**
+   * The card a person's ask first staged, when this one re-stages it after a
+   * cut-off run (`turn/turn.ts` `restageExecution`). Absent on every other
+   * card. The usage record keys the staging ask on its card, so a ✅ on the
+   * re-staged card still resolves the ask that started it (`stagingCardOf`).
+   */
+  originProposalTs?: string;
+}
+
+/** The card the ask behind this proposal staged: its origin, or itself. */
+export function stagingCardOf(proposal: Pick<PendingProposal, "proposalTs" | "originProposalTs">): string {
+  return proposal.originProposalTs ?? proposal.proposalTs;
 }
 
 /**

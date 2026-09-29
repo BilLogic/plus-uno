@@ -143,6 +143,8 @@ export interface SlackReactionAddedEvent {
   user: string;
   reaction: string;
   item: { type: "message"; channel: string; ts: string };
+  /** Who wrote the reacted message. */
+  item_user?: string;
   event_ts: string;
 }
 

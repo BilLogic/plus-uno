@@ -38,8 +38,10 @@ logged and dropped). A deploy with no pending migration needs no step.
   for `turns`, `proposal-events-d1.ts` for `proposal_events` — the one place per
   table where record fields become SQL columns; the columns only the classifier
   writes (the categories, the attempt count, the text purge) are mapped in
-  `agents/uno-bot/src/usage/category-store.ts`, and a ticket filed from a card's
-  reaction or button onto its staging turn by `proposal-events-d1.ts`.
+  `agents/uno-bot/src/usage/category-store.ts`, the resolution columns written
+  after the turn in `agents/uno-bot/src/usage/resolution-d1.ts`, and a ticket
+  filed from a card's reaction or button onto its staging turn by
+  `proposal-events-d1.ts`.
 - Bound parameters in the Worker, always; nothing is assembled into SQL from a
   value.
 - What the database never stores — message text past classification, any DM
