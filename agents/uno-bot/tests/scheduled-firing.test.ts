@@ -14,7 +14,7 @@ import {
   runsForFiring,
   type ScheduledRun,
 } from "../src/scheduled/runs";
-import { enqueueScheduledRun } from "../src/scheduled/jobs";
+import { enqueueScheduledRun, runScheduledJob } from "../src/scheduled/jobs";
 import { internalSubrequestsFor, runMetered } from "../src/net";
 import type { Env } from "../src/types";
 
@@ -49,6 +49,12 @@ test("a firing only enqueues: the Figma poll is a job of the end-of-day run", ()
     "usage-classify",
     "usage-classify",
     "usage-classify",
+    "ask-resolution",
+    "ask-resolution",
+    "ask-resolution",
+    "ask-resolution",
+    "ask-resolution",
+    "ask-resolution",
     "usage-text-purge",
   ]);
 });
@@ -103,6 +109,13 @@ test("each run is planned with its jobs, keyed by the UTC run date", () => {
     ["usage-classify-3", "usage-classify", undefined],
     ["usage-classify-4", "usage-classify", undefined],
     ["usage-classify-5", "usage-classify", undefined],
+    // One job per `PASS_LIMIT` asks (src/usage/resolution-pass.ts).
+    ["ask-resolution-1", "ask-resolution", undefined],
+    ["ask-resolution-2", "ask-resolution", undefined],
+    ["ask-resolution-3", "ask-resolution", undefined],
+    ["ask-resolution-4", "ask-resolution", undefined],
+    ["ask-resolution-5", "ask-resolution", undefined],
+    ["ask-resolution-6", "ask-resolution", undefined],
     // Waits on nothing, so it runs whether or not the classify jobs did.
     ["usage-text-purge", "usage-text-purge", undefined],
   ]);
@@ -145,4 +158,19 @@ test("the enqueue reaches the run's own runner, and costs one charged hop", asyn
   assert.deepEqual(named, ["scheduled-run/end-of-day"]);
   assert.deepEqual(bodies, [run]);
   assert.equal(hops, 1);
+});
+
+test("a dry run rehearses one ask-resolution job, not all of them", async () => {
+  const lines: string[] = [];
+  const original = console.log;
+  console.log = (...args: unknown[]) => lines.push(args.join(" "));
+  try {
+    for (const job of planRun("end-of-day", at(22, 0)).jobs.filter((j) => j.kind === "ask-resolution")) {
+      await runScheduledJob({} as Env, job, { dryRun: true });
+    }
+  } finally {
+    console.log = original;
+  }
+  // Only the first job ran; with no database bound it says so and stops.
+  assert.deepEqual(lines, ["[resolution] no USAGE_DB binding — nothing to check"]);
 });

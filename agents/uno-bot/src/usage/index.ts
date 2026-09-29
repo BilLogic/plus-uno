@@ -12,3 +12,9 @@ export * from "./category-store";
 export * from "./classify-run";
 export { createInMemoryUsageLog, type InMemoryUsageLog } from "./in-memory";
 export { createD1UsageLog, type UsageDatabase } from "./d1";
+// How each ask was resolved: a second port over the same rows. Its `Env`
+// wiring, `./resolution-env.ts`, stays out of the front door like `./production.ts`.
+export * from "./resolution";
+export { createInMemoryResolutionLog } from "./resolution-in-memory";
+export { createD1ResolutionLog, type ResolutionDatabase } from "./resolution-d1";
+export { decideAsk, runResolutionPass, type ResolutionPassDeps } from "./resolution-pass";
