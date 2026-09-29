@@ -34,15 +34,17 @@ logged and dropped). A deploy with no pending migration needs no step.
 
 - Never edit a migration that has run anywhere. Add the next number.
 - Additive only: new tables, new nullable columns, new indexes. A column the
-  Worker writes is also mapped in `agents/uno-bot/src/usage/d1.ts`, the one place record
-  fields become SQL columns.
+  Worker writes is also mapped in its table's adapter — `agents/uno-bot/src/usage/d1.ts`
+  for `turns`, `proposal-events-d1.ts` for `proposal_events` — the one place
+  per table where record fields become SQL columns.
 - Bound parameters in the Worker, always; nothing is assembled into SQL from a
   value.
 - What the database never stores — message text past classification, anything
   from a DM, secrets — is ADR-030's, and a migration does not widen it.
 
-**Tested** by `npm run test:workerd`: the UsageLog conformance suite applies
-every file here to a local D1 before it runs, so a migration that fails to apply,
+**Tested** by `npm run test:workerd`: the UsageLog and ProposalEventLog
+conformance suites apply every file here to a local D1 before they run, so a
+migration that fails to apply,
 or a column the adapter names and the schema lacks, fails there.
 
 ## The retrieval schema is in the app repo

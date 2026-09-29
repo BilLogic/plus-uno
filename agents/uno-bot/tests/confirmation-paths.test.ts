@@ -186,7 +186,7 @@ describe("four signals, one verdict", () => {
       const actor = door.signal.kind === "model" ? null : "U2";
       assert.deepEqual(
         events.map((e) => [e.proposalId, e.event, e.via, e.actorId, e.confirmedByOther]),
-        [[CARD_TS, "confirmed", via, actor, actor !== null]],
+        [[CARD_TS, "confirmed", via, actor, actor === null ? null : true]],
         door.name,
       );
     }

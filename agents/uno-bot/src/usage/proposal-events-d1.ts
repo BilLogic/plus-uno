@@ -8,7 +8,14 @@
 // what exercises it against a real (local) D1.
 
 import { chargeD1Query } from "../net";
-import type { OverdueProposal, ProposalEvent, ProposalEventKind, ProposalEventLog } from "./proposal-events";
+import {
+  OUTCOME_EVENTS,
+  type OverdueProposal,
+  type ProposalEvent,
+  type ProposalEventKind,
+  type ProposalEventLog,
+  type ProposalEventVia,
+} from "./proposal-events";
 import type { TeamRole } from "./roles";
 
 /** The slice of `D1Database` this adapter uses. */
@@ -50,11 +57,13 @@ const INSERT =
 // `rowid` breaks a tie in time by the order the rows were written.
 const EVENTS_OF = `SELECT ${COLUMNS.join(", ")} FROM proposal_events WHERE proposal_id = ? ORDER BY at, rowid`;
 
-/** Staged cards past their lifetime, with no outcome recorded. */
+/** Staged cards past their lifetime, with no outcome recorded. The outcome
+ *  list is the module's constant, spelled into the SQL once at load — never a
+ *  value from a caller. */
 const OVERDUE_FROM =
   `FROM proposal_events s WHERE s.event = 'staged' AND s.ttl_ms IS NOT NULL AND s.at + s.ttl_ms <= ? ` +
   `AND NOT EXISTS (SELECT 1 FROM proposal_events o WHERE o.proposal_id = s.proposal_id ` +
-  `AND o.event IN ('confirmed', 'cancelled', 'superseded', 'expired'))`;
+  `AND o.event IN (${OUTCOME_EVENTS.map((e) => `'${e}'`).join(", ")}))`;
 
 const OVERDUE = `SELECT s.proposal_id AS proposal_id, s.at + s.ttl_ms AS expired_at ${OVERDUE_FROM} ORDER BY expired_at, proposal_id`;
 
@@ -104,7 +113,7 @@ function fromRow(row: Row): ProposalEvent {
     proposalId: String(row.proposal_id),
     event: String(row.event) as ProposalEventKind,
     at: Number(row.at),
-    via: String(row.via),
+    via: String(row.via) as ProposalEventVia,
     channelId: strOrNull(row.channel_id),
     turnId: strOrNull(row.turn_id),
     requesterId: strOrNull(row.requester_id),

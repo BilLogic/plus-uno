@@ -7,15 +7,14 @@
 // writes — the same database in production, two objects here.
 
 import type { UsageLog } from "./store";
-import type { OverdueProposal, ProposalEvent, ProposalEventLog } from "./proposal-events";
+import { OUTCOME_EVENTS, type OverdueProposal, type ProposalEvent, type ProposalEventLog } from "./proposal-events";
 
 export interface InMemoryProposalEventLog extends ProposalEventLog {
   /** Every event, in the order it was first recorded. For tests. */
   events(): ProposalEvent[];
 }
 
-/** The events after which a card is no longer waiting on anyone. */
-const OUTCOMES = new Set(["confirmed", "cancelled", "superseded", "expired"]);
+const OUTCOMES = new Set(OUTCOME_EVENTS);
 
 const copy = (e: ProposalEvent): ProposalEvent => ({ ...e, tools: [...e.tools] });
 

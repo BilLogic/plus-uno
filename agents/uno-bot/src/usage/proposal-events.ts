@@ -33,6 +33,29 @@ export type ProposalEventKind =
   | "expired"
   | "refused_stale";
 
+/** The events after which a card is no longer waiting on anyone — what the
+ *  expiry pass reads as "has an outcome". A refused stale write follows a ✅,
+ *  so it is not one of them. Both adapters read this list. */
+export const OUTCOME_EVENTS: readonly ProposalEventKind[] = ["confirmed", "cancelled", "superseded", "expired"];
+
+/**
+ * How an event happened. For a verdict, the door it came through: `reaction`,
+ * `button`, `typed` or `model`. Otherwise who did it: `turn`, `restage` or
+ * `worker` staged it, a `revision` replaced it, the `end-of-day` pass aged it
+ * out, the `executor` refused a stale write.
+ */
+export type ProposalEventVia =
+  | "reaction"
+  | "button"
+  | "typed"
+  | "model"
+  | "turn"
+  | "restage"
+  | "worker"
+  | "revision"
+  | "end-of-day"
+  | "executor";
+
 /** One thing that happened to one card, as `proposal_events` holds it. Field
  *  names are camelCase here and snake_case in SQL; `./proposal-events-d1.ts`
  *  is the one place they are mapped. Columns an event does not use are null. */
@@ -43,13 +66,7 @@ export interface ProposalEvent {
   /** When it happened, epoch ms. An expiry is dated to the moment the card
    *  aged out, not to the pass that noticed. */
   at: number;
-  /**
-   * How it happened. For a verdict, the door it came through: `reaction`,
-   * `button`, `typed` or `model`. Otherwise who did it: `turn`, `restage` or
-   * `worker` staged it, a `revision` replaced it, the `end-of-day` pass aged
-   * it out, the `executor` refused a stale write.
-   */
-  via: string;
+  via: ProposalEventVia;
   channelId: string | null;
 
   // ── staged ──
@@ -126,7 +143,7 @@ export function proposalEvent(
   proposal: Pick<PendingProposal, "proposalTs" | "channel">,
   event: ProposalEventKind,
   at: number,
-  via: string,
+  via: ProposalEventVia,
 ): ProposalEvent {
   return { ...EMPTY, proposalId: proposal.proposalTs, event, at, via, channelId: proposal.channel };
 }
@@ -182,9 +199,10 @@ export function verdictEvents(verdict: GateVerdict, at: number): ProposalEvent[]
   const confirmed = verdict.decision === "confirm";
   return [
     {
-      ...proposalEvent(proposal, confirmed ? "confirmed" : "cancelled", at, verdict.by?.door ?? "unknown"),
+      ...proposalEvent(proposal, confirmed ? "confirmed" : "cancelled", at, verdict.by?.door ?? "model"),
       actorId: actor,
-      confirmedByOther: confirmed ? actor !== null && actor !== proposal.requesterUserId : null,
+      // Unknown, not "no", when the signal named nobody.
+      confirmedByOther: confirmed && actor !== null ? actor !== proposal.requesterUserId : null,
     },
   ];
 }
