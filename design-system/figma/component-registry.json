@@ -1768,6 +1768,55 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17118-120"
       }
     },
+    "Skeleton": {
+      "code": {
+        "import": "@/components/status-and-loading",
+        "export": "default",
+        "mdxPath": "design-system/src/components/status-and-loading/Skeleton/Skeleton.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Skeleton",
+        "props": {
+          "shape": {
+            "type": "enum",
+            "values": [
+              "rect",
+              "circle",
+              "text"
+            ]
+          },
+          "preset": {
+            "type": "enum",
+            "values": [
+              "status",
+              "status-spacious",
+              "count",
+              "tag",
+              "tag-person",
+              "tag-group",
+              "paragraph"
+            ]
+          },
+          "isShimmering": {
+            "type": "boolean"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "skeleton",
+            "name": "Skeleton",
+            "componentSetNodeId": "17878:1851",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1851",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "On the Loading page. Figma has one preset property for shapes and presets alike (rect (default), circle, text, paragraph and the label presets); code splits it into shape and preset. shimmer? is isShimmering, off by default in Figma so static designs read clearly and on by default in code. Docs page: node 17885:47731."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-47731"
+      }
+    },
     "SmartBadges": {
       "code": {
         "import": "@/specs/Universal/Elements/SmartBadges/SmartBadges",

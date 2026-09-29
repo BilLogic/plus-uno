@@ -3,7 +3,7 @@
  *
  * ONE SIZE: 22 tall including a 1px border, B3 12 text, padding 4, gap 4,
  * radius 4. The label heights (16/20/22/32) have no semantic token yet, so the
- * 22 is a local custom property with its value as the default, as Count does.
+ * 22 is a local custom property set from `_label-heights.scss`, as Count does.
  * The swatch 10, radius 2, × 16, the 16 avatar box (space-300) and the 12
  * spinner inside it (space-200) are Figma-bound spacing and radius
  * primitives, because no Element token names them.
@@ -24,6 +24,8 @@
  *   yellow   social-emotional
  *   teal     tertiary
  */
+@use '../label-heights' as label;
+
 $tag-colors: (
     'grey': (
         var(--color-outline-variant, #bec8ca),
@@ -84,7 +86,7 @@ $tag-colors: (
 );
 
 .plus-tag {
-    --plus-tag-height: 22px;
+    --plus-tag-height: #{label.$tag-height};
 
     position: relative;
     display: inline-flex;
@@ -116,14 +118,25 @@ $tag-colors: (
     white-space: nowrap;
 }
 
+/*
+ * One entry of the map as the tag's custom properties. `$with-avatar: false`
+ * leaves the avatar fill alone, for the avatar types' neutral border below.
+ */
+@mixin tag-color-vars($tokens, $with-avatar: true) {
+    --plus-tag-border: #{nth($tokens, 1)};
+    --plus-tag-hue: #{nth($tokens, 2)};
+    --plus-tag-08: #{nth($tokens, 3)};
+    --plus-tag-12: #{nth($tokens, 4)};
+    --plus-tag-16: #{nth($tokens, 5)};
+
+    @if $with-avatar {
+        --plus-tag-avatar: #{nth($tokens, 6)};
+    }
+}
+
 @each $name, $tokens in $tag-colors {
     .plus-tag--#{$name} {
-        --plus-tag-border: #{nth($tokens, 1)};
-        --plus-tag-hue: #{nth($tokens, 2)};
-        --plus-tag-08: #{nth($tokens, 3)};
-        --plus-tag-12: #{nth($tokens, 4)};
-        --plus-tag-16: #{nth($tokens, 5)};
-        --plus-tag-avatar: #{nth($tokens, 6)};
+        @include tag-color-vars($tokens);
     }
 }
 
@@ -137,24 +150,15 @@ $tag-colors: (
 .plus-tag--person,
 .plus-tag--agent,
 .plus-tag--team {
-    --plus-tag-border: #{nth(map-get($tag-colors, 'grey'), 1)};
-    --plus-tag-hue: #{nth(map-get($tag-colors, 'grey'), 2)};
-    --plus-tag-08: #{nth(map-get($tag-colors, 'grey'), 3)};
-    --plus-tag-12: #{nth(map-get($tag-colors, 'grey'), 4)};
-    --plus-tag-16: #{nth(map-get($tag-colors, 'grey'), 5)};
+    @include tag-color-vars(map-get($tag-colors, 'grey'), $with-avatar: false);
 }
 
 /*
  * Grey avatars, as the Figma set draws them: a grey agent sits on the
  * Mastering Content Container (the AI purple) and a grey team on Technology
  * Tools 08, so neither reads as a person's neutral disc.
- *
- * The team fill is a state layer used at rest, which
- * guidelines/foundations/color.md keeps for interaction ("Use state layers for
- * interaction"; "Use `-container` for backgrounds"). It stays because Figma
- * binds this exact variable on all 16 team variants on purpose: an 08 wash is
- * paler than any Container, and the rule is Bill's call rather than this
- * stylesheet's. The avatar is never interactive, so no hover layer stacks on it.
+ * The team's state layer at rest is a named exception in
+ * guidelines/foundations/color.md.
  */
 .plus-tag--grey.plus-tag--agent {
     --plus-tag-avatar: var(--color-mastering-content-container, #f2daff);
@@ -459,8 +463,10 @@ $tag-colors: (
     text-decoration: none;
 }
 
-/* A disabled avatar's fill and initials follow the tag's own. */
-/* Saving keeps its clear ground, so the spinner never sits on a grey disc. */
+/*
+ * A disabled avatar's fill and initials follow the tag's own. Saving keeps its
+ * clear ground, so the spinner never sits on a grey disc.
+ */
 .plus-tag--disabled .plus-tag__avatar:not(.plus-tag__avatar--saving) {
     background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
 }
