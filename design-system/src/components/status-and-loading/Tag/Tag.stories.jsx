@@ -1173,10 +1173,10 @@ OnImages.play = async ({ canvasElement }) => {
      * strongest indicator, and a gap-only rule fails it. So find the focus
      * rule that paints the gap on the focused tag, and read its own outline.
      */
-    const gapRules = [...document.styleSheets]
+    const gapRules = Array.from(document.styleSheets)
         .flatMap((sheet) => {
             try {
-                return [...sheet.cssRules];
+                return Array.from(sheet.cssRules);
             } catch {
                 return [];
             }
