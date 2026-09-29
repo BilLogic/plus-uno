@@ -304,13 +304,13 @@ export const DosAndDonts = () => (
                 <div style={{
                     borderRight: '1px solid var(--color-outline-variant)',
                     borderTop: '1px solid var(--color-outline-variant)',
-                    backgroundColor: i % 2 ? 'transparent' : 'var(--color-surface-container-low, rgba(0,0,0,0.02))',
+                    backgroundColor: i % 2 ? 'transparent' : 'var(--color-surface-container-low, #f3f3f6)',
                 }}>
                     <PairCell tone="do">{p.do}</PairCell>
                 </div>
                 <div style={{
                     borderTop: '1px solid var(--color-outline-variant)',
-                    backgroundColor: i % 2 ? 'transparent' : 'var(--color-surface-container-low, rgba(0,0,0,0.02))',
+                    backgroundColor: i % 2 ? 'transparent' : 'var(--color-surface-container-low, #f3f3f6)',
                 }}>
                     <PairCell tone="dont">{p.dont}</PairCell>
                 </div>

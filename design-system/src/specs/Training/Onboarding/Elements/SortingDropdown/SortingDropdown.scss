@@ -24,11 +24,11 @@
         transition: background-color 0.15s ease;
 
         &:hover {
-            background-color: var(--color-secondary-state-08, rgba(0, 0, 0, 0.08));
+            background-color: var(--color-secondary-state-08, rgba(68, 92, 106, 0.08));
         }
 
         &--open {
-            background-color: var(--color-secondary-state-08, rgba(0, 0, 0, 0.08));
+            background-color: var(--color-secondary-state-08, rgba(68, 92, 106, 0.08));
         }
     }
 

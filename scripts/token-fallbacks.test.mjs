@@ -51,6 +51,33 @@ test('the line number is the line the usage is on', () => {
   assert.equal(uses[0].line, 3);
 });
 
+test('a whole rgba() fallback is captured, commas and alpha included', () => {
+  // Every state-layer wash is written this way, so a capture that stopped at
+  // the first comma would miss exactly the fallbacks a re-mixed base leaves
+  // stale.
+  const uses = fallbackUsages([
+    { path: 'a.scss', text: 'background: var(--color-primary-state-08, rgba(4, 114, 168, 0.08));' },
+  ]);
+  assert.deepEqual(uses, [
+    { path: 'a.scss', line: 1, token: '--color-primary-state-08', literal: 'rgba(4, 114, 168, 0.08)' },
+  ]);
+});
+
+test('rgb(), hsl() and space-separated syntax are captured too, with room before the closing paren', () => {
+  const uses = fallbackUsages([
+    {
+      path: 'a.scss',
+      text:
+        'a { color: var(--color-a, rgb(4 114 168 / 50%) ); }\n' +
+        'b { color: var(--color-b, hsla(0, 0%, 0%, 0.5)); }',
+    },
+  ]);
+  assert.deepEqual(
+    uses.map((use) => use.literal),
+    ['rgb(4 114 168 / 50%)', 'hsla(0, 0%, 0%, 0.5)'],
+  );
+});
+
 /* -------------------------------------------------------------------- audit */
 
 test('a fallback that disagrees with its token is reported', () => {
@@ -75,6 +102,25 @@ test('a fallback that agrees is counted and not reported', () => {
   assert.deepEqual(audit.disagreements, []);
   assert.equal(audit.agreeing, 1);
   assert.equal(audit.comparable, 1);
+});
+
+test('an rgba() fallback is compared with its alpha, so a stale wash is reported', () => {
+  // The alpha is part of the colour: a wash at 0.5 over a token at 0.32 paints
+  // a different scrim, and so does the right alpha over the wrong base.
+  const audit = fallbackAudit({
+    tokens: new Map([['--color-tertiary-state-08', 'rgba(14, 129, 117, 0.08)']]),
+    usages: [
+      { path: 'a.scss', line: 1, token: '--color-tertiary-state-08', literal: 'rgba(14, 129, 117, 0.08)' },
+      { path: 'b.scss', line: 2, token: '--color-tertiary-state-08', literal: 'rgba(0, 82, 221, 0.08)' },
+      { path: 'c.scss', line: 3, token: '--color-tertiary-state-08', literal: 'rgba(14, 129, 117, 0.5)' },
+    ],
+  });
+  assert.equal(audit.comparable, 3);
+  assert.equal(audit.agreeing, 1);
+  assert.deepEqual(
+    audit.disagreements.map((d) => d.where),
+    ['b.scss:2', 'c.scss:3'],
+  );
 });
 
 test('an undefined token is reported with a count, not as a disagreement', () => {

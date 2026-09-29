@@ -89,19 +89,22 @@
  * about FALLBACKS — capturing the literal beside a token, auditing a FAMILY's
  * uses against their tokens, and the wording of the two reports.
  *
- * THE NEW KEY IS FINER THAN THE ONE IT REPLACES, and the migration was measured
- * rather than assumed. `colourKey` keeps alpha where `normaliseColour`
- * (`parseColour` then `toHex`) dropped it, which over the live corpus is 315
- * token pairs called equal before and unequal after. None of them reaches a
- * comparison here, and the reason is `fallbackUsages` below rather than
- * anything about the key: the fallback literal is captured with `[^),]+`, which
- * admits neither a comma nor a `)`, and the pattern then demands the `var()`'s
- * own `)`. A whole `rgba()` fallback satisfies neither, so the 25 sites writing
- * `var(--color-x, rgba(…))` are not matched at all — not captured, not counted
- * incomparable, simply not seen. Of the 476 comparable colour comparisons that
- * are left in this tree, zero carry alpha on either side.
- * `design-system/tests/tokens-node.test.js` pins that mechanism, so a check
- * that one day widens the capture is told what it has changed.
+ * THE KEY KEEPS ALPHA, AND THE CAPTURE NOW READS IT. `colourKey` keeps alpha
+ * where the `normaliseColour` it replaced (`parseColour` then `toHex`) dropped
+ * it. For a long time that reached no comparison here, because the fallback
+ * literal was captured with `[^),]+` alone: it admits neither a comma nor a
+ * `)`, so a whole `var(--color-x, rgba(…))` was not matched at all — not
+ * captured, not counted incomparable, simply not seen. Every state-layer wash
+ * is written that way, so when the state-layer bases were re-mixed the stale
+ * washes beside them went unreported.
+ *
+ * `fallbackUsages` below now tries a whole colour function first. Measured
+ * over the live tree, that is 86 `rgba()` fallback sites across 21 files, all
+ * captured; 83 name a defined token and are compared with alpha on both
+ * sides, and 3 name a token defined nowhere. Widening the capture found 12
+ * disagreeing sites across 8 token/value pairs, all stale and all fixed rather
+ * than recorded. `design-system/tests/tokens-node.test.js` pins those counts,
+ * so a capture that quietly stops reading washes is told what it has changed.
  */
 
 import { colourKey } from '../design-system/src/lib/tokens-node.mjs';
@@ -121,9 +124,21 @@ import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
  * @param {{path: string, text: string}[]} files
  * @param {{prefix?: string}} [options]
  */
+/**
+ * A whole colour function — `rgba(4, 114, 168, 0.08)`, `rgb(4 114 168 / 50%)`,
+ * `hsla(…)` — tried BEFORE the plain literal, because the plain literal stops
+ * at the first comma and every state-layer wash is written with commas. It
+ * admits no inner parenthesis, so `rgba(var(--x), 0.5)` falls through to the
+ * plain branch and arrives as the incomparable fragment it always did.
+ */
+const COLOUR_FUNCTION = '(?:rgba?|hsla?)\\([^()]*\\)';
+
 export function fallbackUsages(files, { prefix = '--color-' } = {}) {
   const uses = [];
-  const call = new RegExp(`${varReferencePattern(prefix).source}\\s*(?:,\\s*([^),]+))?\\)`, 'g');
+  const call = new RegExp(
+    `${varReferencePattern(prefix).source}\\s*(?:,\\s*(${COLOUR_FUNCTION}|[^),]+))?\\s*\\)`,
+    'g',
+  );
   for (const { path, text } of files) {
     text.split('\n').forEach((line, i) => {
       for (const m of line.matchAll(call)) {
